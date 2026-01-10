@@ -1,0 +1,53 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "spec.md",
+    "docs/poc-plan.md",
+    "docs/testing-strategy.md",
+    "docs/art-direction.md",
+    "docs/art-pipeline.md",
+    "docs/earthbound-reference-notes.md"
+  ],
+  "mcp": {
+    "godot": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "node",
+        "/Users/bash/Sites/unfrgivn/godot-mcp/build/index.js"
+      ],
+      "environment": {
+        "DEBUG": "true"
+      }
+    }
+  },
+  "permission": {
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.example": "allow"
+    },
+    "bash": {
+      "*": "allow"
+    },
+    "edit": "allow",
+    "external_directory": "ask",
+    "doom_loop": "ask",
+    "skill": "allow",
+    "task": "allow"
+  },
+  "lsp": {
+    "gdscript": {
+      "command": ["godot-lsp-bridge"],
+      "extensions": [".gd", ".gdshader"]
+    }
+  },
+  "agent": {
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    }
+  }
+}

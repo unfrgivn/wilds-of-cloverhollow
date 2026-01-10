@@ -1,0 +1,20 @@
+# Godot 4
+.godot/
+.import/
+export_presets.cfg
+*.import
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Builds
+build/
+dist/
+
+# Logs / reports
+report/
+
+# Local-only reference screenshots (do not commit)
+art/reference/earthbound/*
+!art/reference/earthbound/README.md

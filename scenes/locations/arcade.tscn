@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/interactables/quest_cabinet.gd" id="6_quest"]
 [ext_resource type="Script" path="res://scripts/interactables/container.gd" id="7_container"]
 [ext_resource type="Texture2D" path="res://assets/environments/arcade.jpg" id="8_bg"]
+[ext_resource type="Script" path="res://scripts/interactables/claw_machine.gd" id="9_claw"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
 size = Vector2(80, 40)
@@ -145,8 +146,7 @@ shape = SubResource("RectangleShape2D_cabinet")
 [node name="ClawMachine" type="Area2D" parent="Interactables"]
 position = Vector2(350, 630)
 collision_layer = 2
-script = ExtResource("3_sign")
-sign_text = "A claw machine full of plushies. One of them seems to be... watching you?"
+script = ExtResource("9_claw")
 
 [node name="ClawCollision" type="CollisionShape2D" parent="Interactables/ClawMachine"]
 shape = SubResource("RectangleShape2D_claw")

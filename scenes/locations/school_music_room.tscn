@@ -1,15 +1,21 @@
-[gd_scene load_steps=9 format=3 uid="uid://school_music"]
+[gd_scene load_steps=8 format=3 uid="uid://music_room_scene"]
 
-[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
-[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
-[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="4_npc"]
-[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="5_sign"]
-[ext_resource type="Texture2D" path="res://assets/environments/school_music_room.png" id="6_bg"]
-[ext_resource type="Texture2D" path="res://assets/sprites/npcs/teacher_music.png" id="7_teacher"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://d1karbxyqsu24" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" uid="uid://c3i6iyv6a1sqc" path="res://scripts/interactables/door.gd" id="3_door"]
+[ext_resource type="Script" uid="uid://djpct1dcayo4u" path="res://scripts/interactables/sign.gd" id="4_sign"]
+[ext_resource type="Script" uid="uid://b066nf0p6ii4o" path="res://scripts/interactables/npc.gd" id="5_npc"]
+[ext_resource type="Texture2D" uid="uid://srfaqa7gwljb" path="res://assets/environments/school_music_room.jpg" id="6_bg"]
+[ext_resource type="Texture2D" uid="uid://hy3hre7k0lxr" path="res://assets/sprites/npcs/kid/idle.png" id="7_npc_sprite"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_exit_door"]
 size = Vector2(80, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
+size = Vector2(48, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
+size = Vector2(60, 50)
 
 [node name="SchoolMusicRoom" type="Node2D"]
 
@@ -20,74 +26,73 @@ texture = ExtResource("6_bg")
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="FromHall" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(600, 680)
+position = Vector2(700, 600)
 script = ExtResource("2_spawn")
 spawn_id = "from_hall"
 
 [node name="Default" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(600, 500)
+position = Vector2(700, 500)
 script = ExtResource("2_spawn")
 spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(600, 500)
+position = Vector2(700, 600)
 
 [node name="Collisions" type="StaticBody2D" parent="."]
 
 [node name="TopWall" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(150, 200, 1050, 200, 1050, 280, 150, 280)
+polygon = PackedVector2Array(0, 0, 1408, 0, 1408, 280, 0, 280)
+
+[node name="BottomWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(0, 680, 1408, 680, 1408, 768, 0, 768)
 
 [node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(100, 200, 180, 200, 180, 750, 100, 750)
+polygon = PackedVector2Array(0, 0, 80, 0, 80, 768, 0, 768)
 
 [node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(1020, 200, 1100, 200, 1100, 750, 1020, 750)
-
-[node name="Piano" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(800, 300, 1000, 300, 1000, 450, 800, 450)
+polygon = PackedVector2Array(1328, 0, 1408, 0, 1408, 768, 1328, 768)
 
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="ExitDoor" type="Area2D" parent="Interactables"]
-position = Vector2(600, 720)
+position = Vector2(700, 680)
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("3_door")
-target_scene = "res://scenes/locations/school_hall.tscn"
+target_scene = "res://scenes/locations/school_upstairs_hall.tscn"
 spawn_id = "from_music"
 is_automatic = true
 
-[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
-shape = SubResource("RectangleShape2D_door")
+[node name="ExitDoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
+shape = SubResource("RectangleShape2D_exit_door")
 
 [node name="MrMelody" type="Area2D" parent="Interactables"]
-position = Vector2(400, 350)
+position = Vector2(350, 380)
 collision_layer = 2
-script = ExtResource("4_npc")
+script = ExtResource("5_npc")
 npc_name = "Mr. Melody"
-dialogue_lines = Array[String](["Ah, young Fae! Do you hear it? The music of the spheres!", "Every note tells a story, every rhythm holds a secret.", "They say the old arcade machines play a very... peculiar tune.", "If you ever hear music where there shouldn't be any... listen closely!"])
+dialogue_lines = ["Music speaks where words fail!", "Have you ever heard a tune that made you feel... like you were somewhere else entirely?", "There's an old song about Cloverhollow. The melody is beautiful, but the lyrics are... strange."]
 
 [node name="TeacherSprite" type="Sprite2D" parent="Interactables/MrMelody"]
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("7_teacher")
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("7_npc_sprite")
 
 [node name="TeacherCollision" type="CollisionShape2D" parent="Interactables/MrMelody"]
-shape = SubResource("RectangleShape2D_door")
+shape = SubResource("RectangleShape2D_npc")
 
 [node name="Piano" type="Area2D" parent="Interactables"]
-position = Vector2(900, 380)
+position = Vector2(900, 400)
 collision_layer = 2
-script = ExtResource("5_sign")
-sign_text = "A beautiful upright piano. When you press a key, you hear a distant echo..."
+script = ExtResource("4_sign")
+sign_text = "A grand piano. When you press a key, it sounds like distant bells..."
 
 [node name="PianoCollision" type="CollisionShape2D" parent="Interactables/Piano"]
-shape = SubResource("RectangleShape2D_door")
+shape = SubResource("RectangleShape2D_prop")
 
-[node name="Instruments" type="Area2D" parent="Interactables"]
-position = Vector2(250, 450)
+[node name="MusicStand" type="Area2D" parent="Interactables"]
+position = Vector2(550, 450)
 collision_layer = 2
-script = ExtResource("5_sign")
-sign_text = "Tambourines, recorders, and xylophones. Everything a young musician needs!"
+script = ExtResource("4_sign")
+sign_text = "Sheet music for 'The Hollow Light Waltz'. The notes seem to shimmer."
 
-[node name="InstrumentCollision" type="CollisionShape2D" parent="Interactables/Instruments"]
-shape = SubResource("RectangleShape2D_door")
+[node name="StandCollision" type="CollisionShape2D" parent="Interactables/MusicStand"]
+shape = SubResource("RectangleShape2D_prop")

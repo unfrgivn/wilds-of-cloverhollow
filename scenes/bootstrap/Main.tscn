@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://main_bootstrap"]
 
 [ext_resource type="Script" path="res://scripts/bootstrap/Main.gd" id="1_main"]
-[ext_resource type="PackedScene" uid="uid://c8k2q4e4yq2w" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 
 [sub_resource type="Animation" id="Animation_fade_in"]
 resource_name = "fade_in"
@@ -31,7 +31,7 @@ script = ExtResource("1_main")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"fade": SubResource("AnimationLibrary_fade")
+"": SubResource("AnimationLibrary_fade")
 }
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_level_loaded"]

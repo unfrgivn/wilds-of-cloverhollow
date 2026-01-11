@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://player_scene"]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_script"]
 [ext_resource type="SpriteFrames" path="res://assets/sprites/fae/fae_animations_watercolor.tres" id="2_animations"]

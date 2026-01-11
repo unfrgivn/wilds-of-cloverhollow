@@ -1,33 +1,29 @@
-[gd_scene load_steps=15 format=3 uid="uid://fae_hall"]
+[gd_scene load_steps=13 format=3 uid="uid://csbie4un6yjc5"]
 
-[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
-[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="3_sign"]
-[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="4_door"]
-[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="5_npc"]
-[ext_resource type="Texture2D" path="res://assets/environments/fae_living_room.jpg" id="6_bg"]
-[ext_resource type="Texture2D" path="res://assets/sprites/mom.png" id="7_mom"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(80, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_stairs"]
-size = Vector2(100, 80)
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://d1karbxyqsu24" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" uid="uid://djpct1dcayo4u" path="res://scripts/interactables/sign.gd" id="3_sign"]
+[ext_resource type="Script" uid="uid://c3i6iyv6a1sqc" path="res://scripts/interactables/door.gd" id="4_door"]
+[ext_resource type="Script" uid="uid://b066nf0p6ii4o" path="res://scripts/interactables/npc.gd" id="5_npc"]
+[ext_resource type="Texture2D" uid="uid://j088ot1k0hna" path="res://assets/environments/fae_living_room.jpg" id="6_bg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sofa"]
-size = Vector2(150, 80)
+size = Vector2(139.10895, 62.716644)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tv"]
 size = Vector2(100, 60)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stairs"]
+size = Vector2(100, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(80, 40)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
-size = Vector2(50, 50)
+size = Vector2(72, 119)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
 size = Vector2(40, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_table"]
-size = Vector2(80, 60)
 
 [node name="FaeLivingRoom" type="Node2D"]
 
@@ -38,7 +34,7 @@ texture = ExtResource("6_bg")
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="FromUpstairs" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(780, 500)
+position = Vector2(941, 564)
 script = ExtResource("2_spawn")
 spawn_id = "from_upstairs"
 
@@ -53,12 +49,12 @@ script = ExtResource("2_spawn")
 spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(600, 550)
+position = Vector2(598, 554)
 
 [node name="Collisions" type="StaticBody2D" parent="."]
 
 [node name="BackWall" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(150, 250, 1050, 250, 1050, 320, 150, 320)
+polygon = PackedVector2Array(150, 250, 1050, 250, 1050, 320, 803, 452, 641, 366, 522, 398, 288, 444, 217, 482, 170, 449, 150, 320)
 
 [node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
 polygon = PackedVector2Array(100, 250, 180, 250, 180, 750, 100, 750)
@@ -67,35 +63,33 @@ polygon = PackedVector2Array(100, 250, 180, 250, 180, 750, 100, 750)
 polygon = PackedVector2Array(1020, 250, 1100, 250, 1100, 750, 1020, 750)
 
 [node name="BottomWallLeft" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(100, 720, 620, 720, 620, 800, 100, 800)
+position = Vector2(20, 80)
+polygon = PackedVector2Array(148, 505, 454, 561, 461, 631, 447, 662, 584, 740, 624, 731, 620, 800, 158, 664)
 
 [node name="BottomWallRight" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(780, 720, 1100, 720, 1100, 800, 780, 800)
+polygon = PackedVector2Array(760, 725, 1016, 590, 1023, 747, 763, 794)
 
 [node name="Furniture" type="StaticBody2D" parent="."]
 
 [node name="LeftSofaCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(350, 500)
+position = Vector2(382, 431)
+rotation = -0.54820496
 shape = SubResource("RectangleShape2D_sofa")
 
 [node name="RightSofaCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(600, 520)
+position = Vector2(656, 438)
+rotation = 0.50727725
 shape = SubResource("RectangleShape2D_sofa")
 
 [node name="TVCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(350, 680)
+position = Vector2(397, 603)
 shape = SubResource("RectangleShape2D_tv")
-
-[node name="CoffeeTableCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(480, 580)
-shape = SubResource("RectangleShape2D_table")
 
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="StairsUp" type="Area2D" parent="Interactables"]
-position = Vector2(780, 450)
+position = Vector2(918, 497)
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("4_door")
 target_scene = "res://scenes/locations/fae_upstairs_hall.tscn"
 spawn_id = "from_downstairs"
@@ -107,7 +101,6 @@ shape = SubResource("RectangleShape2D_stairs")
 [node name="DoorToTown" type="Area2D" parent="Interactables"]
 position = Vector2(700, 740)
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("4_door")
 target_scene = "res://scenes/locations/cloverhollow_town.tscn"
 spawn_id = "from_fae_house"
@@ -123,10 +116,12 @@ script = ExtResource("3_sign")
 sign_text = "The family sofa. It's been here longer than you've been alive."
 
 [node name="SofaArea" type="CollisionShape2D" parent="Interactables/Sofa"]
+position = Vector2(32, -69)
+rotation = -0.54820496
 shape = SubResource("RectangleShape2D_sofa")
 
 [node name="TV" type="Area2D" parent="Interactables"]
-position = Vector2(350, 680)
+position = Vector2(397, 603)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "The TV is playing the news. Something about strange lights in the sky..."
@@ -135,23 +130,23 @@ sign_text = "The TV is playing the news. Something about strange lights in the s
 shape = SubResource("RectangleShape2D_tv")
 
 [node name="FamilyPhotos" type="Area2D" parent="Interactables"]
-position = Vector2(250, 350)
+position = Vector2(225, 379)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "Family photos on the wall. You, Oliver, Mom, and Dad... but one photo is turned face-down."
 
 [node name="PhotoArea" type="CollisionShape2D" parent="Interactables/FamilyPhotos"]
+position = Vector2(-5, 63)
 shape = SubResource("RectangleShape2D_prop")
 
 [node name="Mom" type="Area2D" parent="Interactables"]
-position = Vector2(720, 520)
+position = Vector2(524, 478)
 collision_layer = 2
 script = ExtResource("5_npc")
 npc_name = "Mom"
-dialogue_lines = ["Good morning, sweetie!", "Oliver's still in his room. That boy and his dinosaurs...", "Don't forget - the town festival is today! Maybe check out the Arcade?"]
+dialogue_lines = Array[String](["Good morning, sweetie!", "Oliver's still in his room. That boy and his dinosaurs...", "Don't forget - the town festival is today! Maybe check out the Arcade?"])
 
 [node name="MomSprite" type="Sprite2D" parent="Interactables/Mom"]
-texture = ExtResource("7_mom")
 
 [node name="MomCollision" type="CollisionShape2D" parent="Interactables/Mom"]
 shape = SubResource("RectangleShape2D_npc")

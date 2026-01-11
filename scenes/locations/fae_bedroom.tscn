@@ -1,32 +1,26 @@
-[gd_scene load_steps=14 format=3 uid="uid://fae_bedroom"]
+[gd_scene load_steps=12 format=3 uid="uid://clb5x8rdv3sd0"]
 
-[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
-[ext_resource type="Script" path="res://scripts/interactables/container.gd" id="3_container"]
-[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="4_sign"]
-[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="5_door"]
-[ext_resource type="Texture2D" path="res://assets/environments/fae_bedroom.jpg" id="6_bg"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://d1karbxyqsu24" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" uid="uid://drhll6gqhsp54" path="res://scripts/interactables/container.gd" id="3_container"]
+[ext_resource type="Script" uid="uid://djpct1dcayo4u" path="res://scripts/interactables/sign.gd" id="4_sign"]
+[ext_resource type="Script" uid="uid://c3i6iyv6a1sqc" path="res://scripts/interactables/door.gd" id="5_door"]
+[ext_resource type="Texture2D" uid="uid://cr2rwv7k2xn22" path="res://assets/environments/fae_bedroom.jpg" id="6_bg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bed"]
+size = Vector2(166, 129.25)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_desk"]
+size = Vector2(131, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bookshelf"]
+size = Vector2(121.5, 58.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_chest"]
+size = Vector2(121.5, 66.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
 size = Vector2(100, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bed"]
-size = Vector2(180, 160)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_desk"]
-size = Vector2(100, 80)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bookshelf"]
-size = Vector2(120, 150)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_chest"]
-size = Vector2(100, 80)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
-size = Vector2(50, 50)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_rug"]
-size = Vector2(200, 150)
 
 [node name="FaeBedroom" type="Node2D"]
 
@@ -52,24 +46,29 @@ position = Vector2(576, 550)
 [node name="Collisions" type="StaticBody2D" parent="."]
 
 [node name="BackWall" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(150, 280, 1000, 280, 1000, 350, 150, 350)
+position = Vector2(-2, 85)
+polygon = PackedVector2Array(150, 280, 1000, 280, 998, 443, 860, 398, 825.5818, 350, 150, 350)
 
 [node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
 polygon = PackedVector2Array(100, 280, 180, 280, 180, 750, 100, 750)
 
 [node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(970, 280, 1050, 280, 1050, 750, 970, 750)
+polygon = PackedVector2Array(970, 280, 1050, 280, 1050, 750, 970, 750, 965, 660, 1009, 620)
 
 [node name="BottomWallLeft" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(100, 720, 320, 720, 320, 800, 100, 800)
+position = Vector2(-57, 16)
+scale = Vector2(1.4731566, 1)
+polygon = PackedVector2Array(100, 720, 162.23666, 634, 318.36398, 761, 320, 800, 100, 800)
 
 [node name="BottomWallRight" type="CollisionPolygon2D" parent="Collisions"]
-polygon = PackedVector2Array(480, 720, 1050, 720, 1050, 800, 480, 800)
+position = Vector2(58, 92)
+polygon = PackedVector2Array(473, 756, 906, 570, 933, 665, 521, 816, 480, 800)
 
 [node name="Furniture" type="StaticBody2D" parent="."]
 
 [node name="BedCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(590, 450)
+position = Vector2(618, 434.75)
+rotation = 0.42940024
 shape = SubResource("RectangleShape2D_bed")
 
 [node name="DeskCollision" type="CollisionShape2D" parent="Furniture"]
@@ -77,11 +76,13 @@ position = Vector2(400, 470)
 shape = SubResource("RectangleShape2D_desk")
 
 [node name="BookshelfCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(220, 550)
+position = Vector2(257.75, 525.75)
+rotation = -0.38947895
 shape = SubResource("RectangleShape2D_bookshelf")
 
 [node name="ChestCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(740, 590)
+position = Vector2(787, 537)
+rotation = -0.4563319
 shape = SubResource("RectangleShape2D_chest")
 
 [node name="Interactables" type="Node2D" parent="."]
@@ -93,6 +94,8 @@ script = ExtResource("4_sign")
 sign_text = "Your cozy bed. The patchwork quilt smells like home."
 
 [node name="BedArea" type="CollisionShape2D" parent="Interactables/Bed"]
+position = Vector2(27, -21.625)
+rotation = 0.42940024
 shape = SubResource("RectangleShape2D_bed")
 
 [node name="Desk" type="Area2D" parent="Interactables"]
@@ -102,6 +105,7 @@ script = ExtResource("4_sign")
 sign_text = "Your desk, covered in doodles and half-finished homework."
 
 [node name="DeskArea" type="CollisionShape2D" parent="Interactables/Desk"]
+position = Vector2(15.5, 0)
 shape = SubResource("RectangleShape2D_desk")
 
 [node name="Bookshelf" type="Area2D" parent="Interactables"]
@@ -111,25 +115,27 @@ script = ExtResource("4_sign")
 sign_text = "Books about stars, crystals, and strange creatures. Your teddy bear sits on top, watching."
 
 [node name="BookshelfArea" type="CollisionShape2D" parent="Interactables/Bookshelf"]
+position = Vector2(37, -27)
+rotation = -0.38947895
 shape = SubResource("RectangleShape2D_bookshelf")
 
 [node name="ToyChest" type="Area2D" parent="Interactables"]
-position = Vector2(740, 590)
+position = Vector2(760, 545)
 collision_layer = 2
 script = ExtResource("3_container")
 container_id = "fae_bedroom_journal"
 item_id = "journal"
-item_count = 1
-loot_text = "Found your Journal! It's full of weird dreams you've been having lately..."
 opened_text = "The toy chest. Your journal used to be hidden here."
+loot_text = "Found your Journal! It's full of weird dreams you've been having lately..."
 
 [node name="ChestArea" type="CollisionShape2D" parent="Interactables/ToyChest"]
+position = Vector2(25.25, -13.25)
+rotation = -0.4563319
 shape = SubResource("RectangleShape2D_chest")
 
 [node name="DoorToHall" type="Area2D" parent="Interactables"]
-position = Vector2(400, 740)
+position = Vector2(470, 761)
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("5_door")
 target_scene = "res://scenes/locations/fae_upstairs_hall.tscn"
 spawn_id = "from_fae_room"

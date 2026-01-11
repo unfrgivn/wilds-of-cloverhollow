@@ -6,66 +6,71 @@
 [ext_resource type="Script" path="res://scripts/interactables/door.gd" id="4_door"]
 [ext_resource type="Script" path="res://scripts/interactables/container.gd" id="5_container"]
 [ext_resource type="Script" path="res://scripts/interactables/hidden_sigil.gd" id="6_sigil"]
-[ext_resource type="Texture2D" path="res://assets/environments/school_hall.png" id="7_bg"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(496, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
-size = Vector2(16, 336)
+[ext_resource type="Texture2D" path="res://assets/environments/school_hall.jpg" id="7_bg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(32, 24)
+size = Vector2(80, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
-size = Vector2(48, 32)
+size = Vector2(60, 50)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lockers"]
-size = Vector2(24, 80)
+size = Vector2(40, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sigil"]
+size = Vector2(50, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_closet"]
+size = Vector2(50, 40)
 
 [node name="SchoolHall" type="Node2D"]
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(240, 160)
+position = Vector2(704, 384)
 texture = ExtResource("7_bg")
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="FromTown" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(240, 280)
+position = Vector2(600, 700)
 script = ExtResource("2_spawn")
 spawn_id = "from_town"
 
 [node name="Default" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(240, 160)
+position = Vector2(600, 550)
 script = ExtResource("2_spawn")
 spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(240, 160)
+position = Vector2(600, 550)
 
-[node name="Walls" type="StaticBody2D" parent="."]
+[node name="Collisions" type="StaticBody2D" parent="."]
 
-[node name="TopWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(240, -8)
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="LeftLockers" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(180, 480, 380, 480, 380, 720, 180, 720)
 
-[node name="BottomWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(240, 328)
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="RightLockers" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(820, 480, 1020, 480, 1020, 720, 820, 720)
 
-[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(-8, 160)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="TopWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(200, 350, 1000, 350, 1000, 420, 200, 420)
 
-[node name="RightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(488, 160)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(120, 350, 200, 350, 200, 800, 120, 800)
+
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1000, 350, 1080, 350, 1080, 800, 1000, 800)
+
+[node name="BottomWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(120, 780, 500, 780, 500, 850, 120, 850)
+
+[node name="BottomWallRight" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(700, 780, 1080, 780, 1080, 850, 700, 850)
 
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="ExitDoor" type="Area2D" parent="Interactables"]
-position = Vector2(240, 300)
+position = Vector2(600, 760)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("4_door")
@@ -77,7 +82,7 @@ is_automatic = true
 shape = SubResource("RectangleShape2D_door")
 
 [node name="BulletinBoard" type="Area2D" parent="Interactables"]
-position = Vector2(120, 40)
+position = Vector2(400, 440)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "NOTICE: Festival volunteers needed! Also, has anyone seen the janitor's blacklight? - Principal"
@@ -86,7 +91,7 @@ sign_text = "NOTICE: Festival volunteers needed! Also, has anyone seen the janit
 shape = SubResource("RectangleShape2D_prop")
 
 [node name="TrophyCase" type="Area2D" parent="Interactables"]
-position = Vector2(360, 40)
+position = Vector2(600, 400)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "Cloverhollow Spelling Bee Champions 1987-2024. One trophy has a strange symbol scratched into it..."
@@ -95,7 +100,7 @@ sign_text = "Cloverhollow Spelling Bee Champions 1987-2024. One trophy has a str
 shape = SubResource("RectangleShape2D_prop")
 
 [node name="Lockers" type="Area2D" parent="Interactables"]
-position = Vector2(40, 160)
+position = Vector2(280, 600)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "Rows of lockers. Most are locked, but one has a faint glow coming from inside..."
@@ -104,7 +109,7 @@ sign_text = "Rows of lockers. Most are locked, but one has a faint glow coming f
 shape = SubResource("RectangleShape2D_lockers")
 
 [node name="HiddenSigil" type="Area2D" parent="Interactables"]
-position = Vector2(440, 160)
+position = Vector2(920, 600)
 collision_layer = 2
 script = ExtResource("6_sigil")
 sigil_id = "sigil_school"
@@ -112,10 +117,10 @@ hidden_text = "Under the blacklight, strange symbols glow on the wall... They fo
 revealed_text = "The Eye of the School. It sees all who pass through these halls."
 
 [node name="SigilCollision" type="CollisionShape2D" parent="Interactables/HiddenSigil"]
-shape = SubResource("RectangleShape2D_prop")
+shape = SubResource("RectangleShape2D_sigil")
 
 [node name="JanitorCloset" type="Area2D" parent="Interactables"]
-position = Vector2(60, 280)
+position = Vector2(200, 700)
 collision_layer = 2
 script = ExtResource("5_container")
 container_id = "school_janitor_closet"
@@ -125,4 +130,4 @@ loot_text = "Found the Blacklight Lantern! It hums softly in your hands..."
 opened_text = "An empty closet. Smells like cleaning supplies."
 
 [node name="ClosetCollision" type="CollisionShape2D" parent="Interactables/JanitorCloset"]
-shape = SubResource("RectangleShape2D_door")
+shape = SubResource("RectangleShape2D_closet")

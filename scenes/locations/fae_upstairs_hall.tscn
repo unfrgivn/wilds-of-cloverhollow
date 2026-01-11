@@ -1,86 +1,75 @@
-[gd_scene load_steps=12 format=3 uid="uid://fae_upstairs_hall"]
+[gd_scene load_steps=10 format=3 uid="uid://fae_upstairs_hall"]
 
 [ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
 [ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
 [ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="4_sign"]
-[ext_resource type="Texture2D" path="res://assets/environments/fae_upstairs_hall.png" id="5_bg"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(320, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
-size = Vector2(16, 240)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_left"]
-size = Vector2(96, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_right"]
-size = Vector2(96, 16)
+[ext_resource type="Texture2D" path="res://assets/environments/fae_upstairs_hall.jpg" id="5_bg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(40, 24)
+size = Vector2(80, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stairs"]
+size = Vector2(100, 60)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
-size = Vector2(32, 32)
+size = Vector2(50, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_railing"]
+size = Vector2(200, 30)
 
 [node name="FaeUpstairsHall" type="Node2D"]
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(160, 120)
+position = Vector2(600, 448)
 texture = ExtResource("5_bg")
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="FromDownstairs" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(160, 200)
+position = Vector2(350, 580)
 script = ExtResource("2_spawn")
 spawn_id = "from_downstairs"
 
 [node name="FromFaeRoom" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(100, 100)
+position = Vector2(400, 480)
 script = ExtResource("2_spawn")
 spawn_id = "from_fae_room"
 
 [node name="FromOliverRoom" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(220, 100)
+position = Vector2(760, 480)
 script = ExtResource("2_spawn")
 spawn_id = "from_oliver_room"
 
 [node name="Default" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(160, 150)
+position = Vector2(580, 520)
 script = ExtResource("2_spawn")
 spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(160, 150)
+position = Vector2(580, 520)
 
-[node name="Walls" type="StaticBody2D" parent="."]
+[node name="Collisions" type="StaticBody2D" parent="."]
 
-[node name="TopWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(160, -8)
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="BackWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(200, 320, 1000, 320, 1000, 400, 200, 400)
 
-[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(-8, 120)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(140, 320, 220, 320, 220, 700, 140, 700)
 
-[node name="RightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(328, 120)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(980, 320, 1060, 320, 1060, 700, 980, 700)
 
-[node name="BottomLeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(48, 248)
-shape = SubResource("RectangleShape2D_wall_bottom_left")
+[node name="StairRailing" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(200, 550, 420, 550, 420, 580, 200, 580)
 
-[node name="BottomRightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(272, 248)
-shape = SubResource("RectangleShape2D_wall_bottom_right")
+[node name="SideTable" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(900, 450, 980, 450, 980, 550, 900, 550)
 
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="DoorToFaeRoom" type="Area2D" parent="Interactables"]
-position = Vector2(80, 60)
+position = Vector2(360, 400)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("3_door")
@@ -92,7 +81,7 @@ is_automatic = true
 shape = SubResource("RectangleShape2D_door")
 
 [node name="DoorToOliverRoom" type="Area2D" parent="Interactables"]
-position = Vector2(240, 60)
+position = Vector2(720, 400)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("3_door")
@@ -104,7 +93,7 @@ is_automatic = true
 shape = SubResource("RectangleShape2D_door")
 
 [node name="StairsDown" type="Area2D" parent="Interactables"]
-position = Vector2(160, 220)
+position = Vector2(300, 620)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("3_door")
@@ -113,10 +102,10 @@ spawn_id = "from_upstairs"
 is_automatic = true
 
 [node name="StairCollision" type="CollisionShape2D" parent="Interactables/StairsDown"]
-shape = SubResource("RectangleShape2D_door")
+shape = SubResource("RectangleShape2D_stairs")
 
 [node name="HallTable" type="Area2D" parent="Interactables"]
-position = Vector2(160, 80)
+position = Vector2(940, 500)
 collision_layer = 2
 script = ExtResource("4_sign")
 sign_text = "A small table with a vase of dried flowers. There's a family photo tucked behind it."

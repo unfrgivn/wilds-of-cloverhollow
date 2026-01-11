@@ -1,93 +1,86 @@
-[gd_scene load_steps=13 format=3 uid="uid://oliver_room"]
+[gd_scene load_steps=11 format=3 uid="uid://oliver_room"]
 
 [ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
 [ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
 [ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="4_sign"]
-[ext_resource type="Texture2D" path="res://assets/environments/oliver_room.png" id="5_bg"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(320, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
-size = Vector2(16, 240)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_left"]
-size = Vector2(96, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_right"]
-size = Vector2(96, 16)
+[ext_resource type="Texture2D" path="res://assets/environments/oliver_room.jpg" id="5_bg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(40, 24)
+size = Vector2(80, 40)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bed"]
-size = Vector2(80, 48)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_crib"]
+size = Vector2(160, 100)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
-size = Vector2(48, 40)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_changing_table"]
+size = Vector2(100, 60)
 
-[node name="OliverRoom" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rocking_chair"]
+size = Vector2(80, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_toys"]
+size = Vector2(100, 80)
+
+[node name="OliverNursery" type="Node2D"]
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(160, 120)
+position = Vector2(704, 384)
 texture = ExtResource("5_bg")
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="FromHall" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(160, 200)
+position = Vector2(704, 650)
 script = ExtResource("2_spawn")
 spawn_id = "from_hall"
 
 [node name="Default" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(200, 160)
+position = Vector2(704, 500)
 script = ExtResource("2_spawn")
 spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(200, 160)
+position = Vector2(704, 500)
 
-[node name="Walls" type="StaticBody2D" parent="."]
+[node name="Collisions" type="StaticBody2D" parent="."]
 
-[node name="TopWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(160, -8)
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="BackWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(150, 180, 1260, 180, 1260, 260, 150, 260)
 
-[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(-8, 120)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(80, 180, 170, 180, 170, 700, 80, 700)
 
-[node name="RightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(328, 120)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1240, 180, 1330, 180, 1330, 700, 1240, 700)
 
-[node name="BottomLeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(48, 248)
-shape = SubResource("RectangleShape2D_wall_bottom_left")
+[node name="BottomWallLeft" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(80, 680, 600, 680, 600, 768, 80, 768)
 
-[node name="BottomRightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(272, 248)
-shape = SubResource("RectangleShape2D_wall_bottom_right")
+[node name="BottomWallRight" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(800, 680, 1330, 680, 1330, 768, 800, 768)
 
 [node name="Furniture" type="StaticBody2D" parent="."]
 
-[node name="BedCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(160, 70)
-shape = SubResource("RectangleShape2D_bed")
+[node name="CribCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(400, 350)
+shape = SubResource("RectangleShape2D_crib")
 
-[node name="DeskCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(50, 120)
-shape = SubResource("RectangleShape2D_prop")
+[node name="ChangingTableCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(950, 320)
+shape = SubResource("RectangleShape2D_changing_table")
 
-[node name="BookshelfCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(270, 120)
-shape = SubResource("RectangleShape2D_prop")
+[node name="RockingChairCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(1100, 500)
+shape = SubResource("RectangleShape2D_rocking_chair")
+
+[node name="ToyPileCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(300, 550)
+shape = SubResource("RectangleShape2D_toys")
 
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="DoorToHall" type="Area2D" parent="Interactables"]
-position = Vector2(160, 230)
+position = Vector2(704, 700)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("3_door")
@@ -98,38 +91,47 @@ is_automatic = true
 [node name="DoorCollision" type="CollisionShape2D" parent="Interactables/DoorToHall"]
 shape = SubResource("RectangleShape2D_door")
 
-[node name="Bed" type="Area2D" parent="Interactables"]
-position = Vector2(160, 70)
+[node name="Crib" type="Area2D" parent="Interactables"]
+position = Vector2(400, 350)
 collision_layer = 2
 script = ExtResource("4_sign")
-sign_text = "Oliver's bed. The dinosaur blanket is his favorite - he's had it since he was a baby."
+sign_text = "Oliver's crib. He's sleeping peacefully, clutching a tiny stuffed T-Rex. The mobile above plays a soft lullaby."
 
-[node name="BedArea" type="CollisionShape2D" parent="Interactables/Bed"]
-shape = SubResource("RectangleShape2D_bed")
+[node name="CribArea" type="CollisionShape2D" parent="Interactables/Crib"]
+shape = SubResource("RectangleShape2D_crib")
 
-[node name="Desk" type="Area2D" parent="Interactables"]
-position = Vector2(50, 120)
+[node name="ChangingTable" type="Area2D" parent="Interactables"]
+position = Vector2(950, 320)
 collision_layer = 2
 script = ExtResource("4_sign")
-sign_text = "Oliver's computer. The screen shows a paused game... is that a dinosaur dating simulator?"
+sign_text = "The changing table. Diapers, wipes, and... is that dinosaur-shaped baby powder?"
 
-[node name="DeskArea" type="CollisionShape2D" parent="Interactables/Desk"]
-shape = SubResource("RectangleShape2D_prop")
+[node name="TableArea" type="CollisionShape2D" parent="Interactables/ChangingTable"]
+shape = SubResource("RectangleShape2D_changing_table")
 
-[node name="Bookshelf" type="Area2D" parent="Interactables"]
-position = Vector2(270, 120)
+[node name="RockingChair" type="Area2D" parent="Interactables"]
+position = Vector2(1100, 500)
 collision_layer = 2
 script = ExtResource("4_sign")
-sign_text = "Books about dinosaurs, space, and... ancient mysteries? Oliver has weird taste."
+sign_text = "Mom's rocking chair. She spends hours here reading to Oliver. His favorite book is 'Dino Dreams.'"
 
-[node name="BookshelfArea" type="CollisionShape2D" parent="Interactables/Bookshelf"]
-shape = SubResource("RectangleShape2D_prop")
+[node name="ChairArea" type="CollisionShape2D" parent="Interactables/RockingChair"]
+shape = SubResource("RectangleShape2D_rocking_chair")
 
-[node name="ToyDinosaurs" type="Area2D" parent="Interactables"]
-position = Vector2(120, 180)
+[node name="DinosaurToys" type="Area2D" parent="Interactables"]
+position = Vector2(300, 550)
 collision_layer = 2
 script = ExtResource("4_sign")
-sign_text = "Toy dinosaurs scattered across the floor. Classic Oliver."
+sign_text = "A pile of dinosaur plushies and toys. Triceratops, Stegosaurus, T-Rex... Oliver is obsessed."
 
-[node name="ToyArea" type="CollisionShape2D" parent="Interactables/ToyDinosaurs"]
-shape = SubResource("RectangleShape2D_prop")
+[node name="ToyArea" type="CollisionShape2D" parent="Interactables/DinosaurToys"]
+shape = SubResource("RectangleShape2D_toys")
+
+[node name="DinoMobile" type="Area2D" parent="Interactables"]
+position = Vector2(400, 280)
+collision_layer = 2
+script = ExtResource("4_sign")
+sign_text = "A mobile with dangling dinosaurs. They spin slowly, casting tiny dino shadows on the walls."
+
+[node name="MobileArea" type="CollisionShape2D" parent="Interactables/DinosaurToys"]
+shape = SubResource("RectangleShape2D_toys")

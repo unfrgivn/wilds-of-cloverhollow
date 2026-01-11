@@ -1,109 +1,99 @@
-[gd_scene load_steps=18 format=3 uid="uid://fae_hall"]
+[gd_scene load_steps=15 format=3 uid="uid://fae_hall"]
 
 [ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
 [ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="3_sign"]
 [ext_resource type="Script" path="res://scripts/interactables/door.gd" id="4_door"]
 [ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="5_npc"]
-[ext_resource type="Texture2D" path="res://assets/environments/fae_living_room.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/environments/fae_living_room.jpg" id="6_bg"]
 [ext_resource type="Texture2D" path="res://assets/sprites/mom.png" id="7_mom"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(400, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
-size = Vector2(16, 300)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_left"]
-size = Vector2(136, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_right"]
-size = Vector2(136, 16)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(64, 24)
+size = Vector2(80, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stairs"]
-size = Vector2(48, 32)
+size = Vector2(100, 80)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sofa"]
-size = Vector2(80, 48)
+size = Vector2(150, 80)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tv"]
-size = Vector2(64, 32)
+size = Vector2(100, 60)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
-size = Vector2(32, 32)
+size = Vector2(50, 50)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
-size = Vector2(24, 24)
+size = Vector2(40, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_table"]
+size = Vector2(80, 60)
 
 [node name="FaeLivingRoom" type="Node2D"]
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(200, 150)
+position = Vector2(600, 448)
 texture = ExtResource("6_bg")
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 
 [node name="FromUpstairs" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(340, 120)
+position = Vector2(780, 500)
 script = ExtResource("2_spawn")
 spawn_id = "from_upstairs"
 
 [node name="FromTown" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(200, 260)
+position = Vector2(700, 680)
 script = ExtResource("2_spawn")
 spawn_id = "from_town"
 
 [node name="Default" type="Marker2D" parent="SpawnPoints"]
-position = Vector2(200, 180)
+position = Vector2(600, 550)
 script = ExtResource("2_spawn")
 spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(200, 180)
+position = Vector2(600, 550)
 
-[node name="Walls" type="StaticBody2D" parent="."]
+[node name="Collisions" type="StaticBody2D" parent="."]
 
-[node name="TopWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(200, -8)
-shape = SubResource("RectangleShape2D_wall_h")
+[node name="BackWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(150, 250, 1050, 250, 1050, 320, 150, 320)
 
-[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(-8, 150)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 250, 180, 250, 180, 750, 100, 750)
 
-[node name="RightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(408, 150)
-shape = SubResource("RectangleShape2D_wall_v")
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1020, 250, 1100, 250, 1100, 750, 1020, 750)
 
-[node name="BottomLeftWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(68, 308)
-shape = SubResource("RectangleShape2D_wall_bottom_left")
+[node name="BottomWallLeft" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 720, 620, 720, 620, 800, 100, 800)
 
-[node name="BottomRightWall" type="CollisionShape2D" parent="Walls"]
-position = Vector2(332, 308)
-shape = SubResource("RectangleShape2D_wall_bottom_right")
+[node name="BottomWallRight" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(780, 720, 1100, 720, 1100, 800, 780, 800)
 
 [node name="Furniture" type="StaticBody2D" parent="."]
 
-[node name="SofaCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(80, 140)
+[node name="LeftSofaCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(350, 500)
+shape = SubResource("RectangleShape2D_sofa")
+
+[node name="RightSofaCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(600, 520)
 shape = SubResource("RectangleShape2D_sofa")
 
 [node name="TVCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(200, 50)
+position = Vector2(350, 680)
 shape = SubResource("RectangleShape2D_tv")
 
-[node name="PlantCollision" type="CollisionShape2D" parent="Furniture"]
-position = Vector2(50, 60)
-shape = SubResource("RectangleShape2D_prop")
+[node name="CoffeeTableCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(480, 580)
+shape = SubResource("RectangleShape2D_table")
 
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="StairsUp" type="Area2D" parent="Interactables"]
-position = Vector2(360, 100)
+position = Vector2(780, 450)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("4_door")
@@ -115,7 +105,7 @@ is_automatic = true
 shape = SubResource("RectangleShape2D_stairs")
 
 [node name="DoorToTown" type="Area2D" parent="Interactables"]
-position = Vector2(200, 285)
+position = Vector2(700, 740)
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("4_door")
@@ -127,7 +117,7 @@ is_automatic = true
 shape = SubResource("RectangleShape2D_door")
 
 [node name="Sofa" type="Area2D" parent="Interactables"]
-position = Vector2(80, 140)
+position = Vector2(350, 500)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "The family sofa. It's been here longer than you've been alive."
@@ -136,7 +126,7 @@ sign_text = "The family sofa. It's been here longer than you've been alive."
 shape = SubResource("RectangleShape2D_sofa")
 
 [node name="TV" type="Area2D" parent="Interactables"]
-position = Vector2(200, 50)
+position = Vector2(350, 680)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "The TV is playing the news. Something about strange lights in the sky..."
@@ -145,7 +135,7 @@ sign_text = "The TV is playing the news. Something about strange lights in the s
 shape = SubResource("RectangleShape2D_tv")
 
 [node name="FamilyPhotos" type="Area2D" parent="Interactables"]
-position = Vector2(120, 50)
+position = Vector2(250, 350)
 collision_layer = 2
 script = ExtResource("3_sign")
 sign_text = "Family photos on the wall. You, Oliver, Mom, and Dad... but one photo is turned face-down."
@@ -154,7 +144,7 @@ sign_text = "Family photos on the wall. You, Oliver, Mom, and Dad... but one pho
 shape = SubResource("RectangleShape2D_prop")
 
 [node name="Mom" type="Area2D" parent="Interactables"]
-position = Vector2(280, 180)
+position = Vector2(720, 520)
 collision_layer = 2
 script = ExtResource("5_npc")
 npc_name = "Mom"

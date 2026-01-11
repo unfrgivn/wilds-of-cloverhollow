@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://fw14h1tna36x"]
+[gd_scene load_steps=14 format=3 uid="uid://fw14h1tna36x"]
 
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Script" uid="uid://d1karbxyqsu24" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
@@ -8,8 +8,8 @@
 [ext_resource type="Script" uid="uid://drhll6gqhsp54" path="res://scripts/interactables/container.gd" id="6_container"]
 [ext_resource type="Script" uid="uid://dkdcwdus5p2dm" path="res://scripts/interactables/hidden_sigil.gd" id="7_sigil"]
 [ext_resource type="Texture2D" uid="uid://ddk6jp3gc8gnf" path="res://assets/environments/cloverhollow_town.jpg" id="8_bg"]
-[ext_resource type="Texture2D" path="res://assets/sprites/npcs/old_man/idle.png" id="9_oldman_sprite"]
-[ext_resource type="Texture2D" path="res://assets/sprites/npcs/kid/idle.png" id="10_kid_sprite"]
+[ext_resource type="Texture2D" uid="uid://cabokuj1ofnvg" path="res://assets/sprites/npcs/old_man/idle.png" id="9_oldman_sprite"]
+[ext_resource type="Texture2D" uid="uid://hy3hre7k0lxr" path="res://assets/sprites/npcs/kid/idle.png" id="10_kid_sprite"]
 
 [sub_resource type="RectangleShape2D" id="shape_door"]
 size = Vector2(63.5, 60.5)
@@ -18,7 +18,7 @@ size = Vector2(63.5, 60.5)
 size = Vector2(50, 40)
 
 [sub_resource type="CircleShape2D" id="shape_npc"]
-radius = 20.0
+radius = 26.305893
 
 [node name="CloverHollowTown" type="Node2D"]
 
@@ -248,11 +248,13 @@ scale = Vector2(0.17, 0.17)
 texture = ExtResource("9_oldman_sprite")
 
 [node name="NPCCollision" type="CollisionShape2D" parent="Interactables/OldMan"]
+position = Vector2(-3, -52)
 shape = SubResource("shape_npc")
 
 [node name="OldManBody" type="StaticBody2D" parent="Interactables/OldMan"]
 
 [node name="BodyCollision" type="CollisionShape2D" parent="Interactables/OldMan/OldManBody"]
+position = Vector2(-1, -50)
 shape = SubResource("shape_npc")
 
 [node name="Kid" type="Area2D" parent="Interactables"]
@@ -264,15 +266,17 @@ dialogue_lines = Array[String](["Have you been to the Arcade yet?", "There's thi
 
 [node name="KidSprite" type="Sprite2D" parent="Interactables/Kid"]
 position = Vector2(0, -60)
-scale = Vector2(0.20, 0.20)
+scale = Vector2(0.2, 0.2)
 texture = ExtResource("10_kid_sprite")
 
 [node name="NPCCollision" type="CollisionShape2D" parent="Interactables/Kid"]
+position = Vector2(-5, -44)
 shape = SubResource("shape_npc")
 
 [node name="KidBody" type="StaticBody2D" parent="Interactables/Kid"]
 
 [node name="BodyCollision" type="CollisionShape2D" parent="Interactables/Kid/KidBody"]
+position = Vector2(-5, -43)
 shape = SubResource("shape_npc")
 
 [node name="HiddenSigil" type="Area2D" parent="Interactables"]

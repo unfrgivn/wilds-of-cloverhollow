@@ -2,7 +2,7 @@
 description: Implements core Godot gameplay systems (movement, interactions, transitions, state)
 mode: subagent
 temperature: 0.2
-model: anthropic/claude-opus-4-5
+model: github-copilot/claude-opus-4-5
 ---
 
 You are the Godot Gameplay Engineer for Cloverhollow.

@@ -1,0 +1,158 @@
+[gd_scene load_steps=15 format=3 uid="uid://arcade"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="3_sign"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="4_door"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="5_npc"]
+[ext_resource type="Script" path="res://scripts/interactables/quest_cabinet.gd" id="6_quest"]
+[ext_resource type="Script" path="res://scripts/interactables/container.gd" id="7_container"]
+[ext_resource type="Texture2D" path="res://assets/environments/arcade.png" id="8_bg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
+size = Vector2(416, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
+size = Vector2(16, 336)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(32, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cabinet"]
+size = Vector2(40, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_counter"]
+size = Vector2(60, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
+size = Vector2(24, 24)
+
+[node name="Arcade" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(200, 160)
+texture = ExtResource("8_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromTown" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(200, 280)
+script = ExtResource("2_spawn")
+spawn_id = "from_town"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(200, 160)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(200, 160)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(200, -8)
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="BottomWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(200, 328)
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-8, 160)
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(408, 160)
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="ExitDoor" type="Area2D" parent="Interactables"]
+position = Vector2(200, 300)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/cloverhollow_town.tscn"
+spawn_id = "from_arcade"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="ArcadeCabinet1" type="Area2D" parent="Interactables"]
+position = Vector2(60, 60)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "SPACE BLASTERS - High Score: 999,999 by ???"
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="Interactables/ArcadeCabinet1"]
+shape = SubResource("RectangleShape2D_cabinet")
+
+[node name="ArcadeCabinet2" type="Area2D" parent="Interactables"]
+position = Vector2(140, 60)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "BURGER TIME - The screen flickers occasionally."
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="Interactables/ArcadeCabinet2"]
+shape = SubResource("RectangleShape2D_cabinet")
+
+[node name="ArcadeCabinet3" type="Area2D" parent="Interactables"]
+position = Vector2(260, 60)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "PAC-ATTACK - Someone scratched 'IT WATCHES' on the side."
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="Interactables/ArcadeCabinet3"]
+shape = SubResource("RectangleShape2D_cabinet")
+
+[node name="TheHollow" type="Area2D" parent="Interactables"]
+position = Vector2(340, 60)
+collision_layer = 2
+script = ExtResource("6_quest")
+required_sigils = ["sigil_school", "sigil_town"]
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="Interactables/TheHollow"]
+shape = SubResource("RectangleShape2D_cabinet")
+
+[node name="ClawMachine" type="Area2D" parent="Interactables"]
+position = Vector2(60, 200)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "A claw machine full of plushies. One of them seems to be... watching you?"
+
+[node name="ClawCollision" type="CollisionShape2D" parent="Interactables/ClawMachine"]
+shape = SubResource("RectangleShape2D_cabinet")
+
+[node name="TicketCounter" type="Area2D" parent="Interactables"]
+position = Vector2(340, 200)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "TICKET PRIZES: Candy (10), Stickers (25), Mysterious Orb (???)... The Mysterious Orb slot is empty."
+
+[node name="CounterCollision" type="CollisionShape2D" parent="Interactables/TicketCounter"]
+shape = SubResource("RectangleShape2D_counter")
+
+[node name="ArcadeWorker" type="Area2D" parent="Interactables"]
+position = Vector2(340, 240)
+collision_layer = 2
+script = ExtResource("5_npc")
+npc_name = "Arcade Worker"
+dialogue_lines = ["Welcome to PIXEL PARADISE!", "That cabinet in the corner? THE HOLLOW?", "Nobody's ever beaten it. The owner says it came with the building.", "Weird thing is... I don't remember it being there last month."]
+
+[node name="WorkerCollision" type="CollisionShape2D" parent="Interactables/ArcadeWorker"]
+shape = SubResource("RectangleShape2D_npc")
+
+[node name="MysteriousStranger" type="Area2D" parent="Interactables"]
+position = Vector2(140, 200)
+collision_layer = 2
+script = ExtResource("7_container")
+container_id = "arcade_stranger_lantern"
+item_id = "blacklight_lantern"
+item_count = 1
+loot_text = "The stranger hands you a strange lantern that glows purple. 'Use it to see what others cannot. Press [C] to toggle it on and off.'"
+opened_text = "The stranger nods knowingly. 'You have what you need. Look for the signs... they're everywhere, if you know how to see.'"
+
+[node name="StrangerCollision" type="CollisionShape2D" parent="Interactables/MysteriousStranger"]
+shape = SubResource("RectangleShape2D_npc")

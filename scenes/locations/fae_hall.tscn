@@ -1,0 +1,167 @@
+[gd_scene load_steps=18 format=3 uid="uid://fae_hall"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="3_sign"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="4_door"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="5_npc"]
+[ext_resource type="Texture2D" path="res://assets/environments/fae_living_room.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mom.png" id="7_mom"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
+size = Vector2(400, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
+size = Vector2(16, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_left"]
+size = Vector2(136, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_bottom_right"]
+size = Vector2(136, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(64, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stairs"]
+size = Vector2(48, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sofa"]
+size = Vector2(80, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tv"]
+size = Vector2(64, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_prop"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
+size = Vector2(24, 24)
+
+[node name="FaeLivingRoom" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(200, 150)
+texture = ExtResource("6_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromUpstairs" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(340, 120)
+script = ExtResource("2_spawn")
+spawn_id = "from_upstairs"
+
+[node name="FromTown" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(200, 260)
+script = ExtResource("2_spawn")
+spawn_id = "from_town"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(200, 180)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(200, 180)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(200, -8)
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-8, 150)
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(408, 150)
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="BottomLeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(68, 308)
+shape = SubResource("RectangleShape2D_wall_bottom_left")
+
+[node name="BottomRightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(332, 308)
+shape = SubResource("RectangleShape2D_wall_bottom_right")
+
+[node name="Furniture" type="StaticBody2D" parent="."]
+
+[node name="SofaCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(80, 140)
+shape = SubResource("RectangleShape2D_sofa")
+
+[node name="TVCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(200, 50)
+shape = SubResource("RectangleShape2D_tv")
+
+[node name="PlantCollision" type="CollisionShape2D" parent="Furniture"]
+position = Vector2(50, 60)
+shape = SubResource("RectangleShape2D_prop")
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="StairsUp" type="Area2D" parent="Interactables"]
+position = Vector2(360, 100)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/fae_upstairs_hall.tscn"
+spawn_id = "from_downstairs"
+is_automatic = true
+
+[node name="StairCollision" type="CollisionShape2D" parent="Interactables/StairsUp"]
+shape = SubResource("RectangleShape2D_stairs")
+
+[node name="DoorToTown" type="Area2D" parent="Interactables"]
+position = Vector2(200, 285)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/cloverhollow_town.tscn"
+spawn_id = "from_fae_house"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/DoorToTown"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Sofa" type="Area2D" parent="Interactables"]
+position = Vector2(80, 140)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "The family sofa. It's been here longer than you've been alive."
+
+[node name="SofaArea" type="CollisionShape2D" parent="Interactables/Sofa"]
+shape = SubResource("RectangleShape2D_sofa")
+
+[node name="TV" type="Area2D" parent="Interactables"]
+position = Vector2(200, 50)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "The TV is playing the news. Something about strange lights in the sky..."
+
+[node name="TVArea" type="CollisionShape2D" parent="Interactables/TV"]
+shape = SubResource("RectangleShape2D_tv")
+
+[node name="FamilyPhotos" type="Area2D" parent="Interactables"]
+position = Vector2(120, 50)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "Family photos on the wall. You, Oliver, Mom, and Dad... but one photo is turned face-down."
+
+[node name="PhotoArea" type="CollisionShape2D" parent="Interactables/FamilyPhotos"]
+shape = SubResource("RectangleShape2D_prop")
+
+[node name="Mom" type="Area2D" parent="Interactables"]
+position = Vector2(280, 180)
+collision_layer = 2
+script = ExtResource("5_npc")
+npc_name = "Mom"
+dialogue_lines = ["Good morning, sweetie!", "Oliver's still in his room. That boy and his dinosaurs...", "Don't forget - the town festival is today! Maybe check out the Arcade?"]
+
+[node name="MomSprite" type="Sprite2D" parent="Interactables/Mom"]
+texture = ExtResource("7_mom")
+
+[node name="MomCollision" type="CollisionShape2D" parent="Interactables/Mom"]
+shape = SubResource("RectangleShape2D_npc")

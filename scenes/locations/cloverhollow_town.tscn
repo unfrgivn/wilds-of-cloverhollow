@@ -1,0 +1,177 @@
+[gd_scene load_steps=12 format=3 uid="uid://fw14h1tna36x"]
+
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://d1karbxyqsu24" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" uid="uid://djpct1dcayo4u" path="res://scripts/interactables/sign.gd" id="3_sign"]
+[ext_resource type="Script" uid="uid://c3i6iyv6a1sqc" path="res://scripts/interactables/door.gd" id="4_door"]
+[ext_resource type="Script" uid="uid://b066nf0p6ii4o" path="res://scripts/interactables/npc.gd" id="5_npc"]
+[ext_resource type="Script" uid="uid://drhll6gqhsp54" path="res://scripts/interactables/container.gd" id="6_container"]
+[ext_resource type="Script" uid="uid://dkdcwdus5p2dm" path="res://scripts/interactables/hidden_sigil.gd" id="7_sigil"]
+[ext_resource type="Texture2D" uid="uid://ddk6jp3gc8gnf" path="res://assets/environments/cloverhollow_town.jpg" id="8_bg"]
+
+[sub_resource type="RectangleShape2D" id="shape_door"]
+size = Vector2(52, 53)
+
+[sub_resource type="RectangleShape2D" id="shape_interact"]
+size = Vector2(34, 28)
+
+[sub_resource type="CircleShape2D" id="shape_npc"]
+
+[node name="CloverHollowTown" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(160, 120)
+texture = ExtResource("8_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromFaeHouse" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(-157, 87)
+script = ExtResource("2_spawn")
+spawn_id = "from_fae_house"
+
+[node name="FromSchool" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(167, -77)
+script = ExtResource("2_spawn")
+spawn_id = "from_school"
+
+[node name="FromArcade" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(571, 101)
+script = ExtResource("2_spawn")
+spawn_id = "from_arcade"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(19, 115)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(-37, 145)
+
+[node name="Collisions" type="StaticBody2D" parent="."]
+
+[node name="FaeHouse" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(-442.0714, -666.13885)
+scale = Vector2(3.7678568, 5.722222)
+polygon = PackedVector2Array(6.654022, 111.34466, 74.33175, 77.6165, 97.4218, 100.68446, 96.89099, 120.08253, 46.464447, 141.22815, 9.042648, 134.41263)
+
+[node name="School" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(-306.77777, -616.28125)
+scale = Vector2(3.2361112, 6.9125)
+polygon = PackedVector2Array(93.25322, 43.440323, 214.38628, 43.729652, 217.16739, 65.284805, 205, 75, 92.32619, 76.71338)
+
+[node name="Arcade" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(-147.92859, -428.375)
+scale = Vector2(3.0535715, 3.925)
+polygon = PackedVector2Array(255.7427, 57.929935, 297.66083, 81.62421, 298.3158, 133.34395, 270.15207, 147.86624, 211.20468, 122.388535, 208.9123, 80.09554)
+
+[node name="Fountain" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(4, 51)
+polygon = PackedVector2Array(101, 114, 136, 79, 180, 77, 202.48334, 100.300934, 235, 134, 233, 188, 173, 226, 98, 206, 80, 157)
+
+[node name="ForestTopLeft" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(-439, -324)
+polygon = PackedVector2Array(0, 0, 50, 0, 50, 80, 0, 80)
+
+[node name="ForestTopRight" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(441, -329)
+polygon = PackedVector2Array(270, 0, 320, 0, 320, 80, 270, 80)
+
+[node name="ForestBottomLeft" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(-434, 210)
+polygon = PackedVector2Array(0, 190, 50, 190, 50, 240, 0, 240)
+
+[node name="ForestBottomRight" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(437, 212)
+polygon = PackedVector2Array(270, 190, 320, 190, 320, 240, 270, 240)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="FaeHouseDoor" type="Area2D" parent="Interactables"]
+position = Vector2(-165, 47)
+collision_layer = 2
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/fae_hall.tscn"
+spawn_id = "from_town"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/FaeHouseDoor"]
+shape = SubResource("shape_door")
+
+[node name="SchoolDoor" type="Area2D" parent="Interactables"]
+position = Vector2(128, 84)
+collision_layer = 2
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/school_hall.tscn"
+spawn_id = "from_town"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/SchoolDoor"]
+position = Vector2(45, -201.5)
+shape = SubResource("shape_door")
+
+[node name="ArcadeDoor" type="Area2D" parent="Interactables"]
+position = Vector2(256, 140)
+collision_layer = 2
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/arcade.tscn"
+spawn_id = "from_town"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ArcadeDoor"]
+position = Vector2(328, -80)
+shape = SubResource("shape_door")
+
+[node name="TownSign" type="Area2D" parent="Interactables"]
+position = Vector2(414, 458)
+collision_layer = 2
+script = ExtResource("3_sign")
+sign_text = "Welcome to CLOVERHOLLOW - Where Every Day is a Little Weird!"
+
+[node name="SignCollision" type="CollisionShape2D" parent="Interactables/TownSign"]
+shape = SubResource("shape_interact")
+
+[node name="Mailbox" type="Area2D" parent="Interactables"]
+position = Vector2(-37, 30)
+collision_layer = 2
+script = ExtResource("6_container")
+container_id = "town_mailbox"
+item_id = "candy"
+item_count = 3
+opened_text = "The mailbox is empty now."
+loot_text = "Found 3 pieces of Candy! Who leaves candy in a mailbox?"
+
+[node name="MailboxCollision" type="CollisionShape2D" parent="Interactables/Mailbox"]
+position = Vector2(3, 0)
+shape = SubResource("shape_interact")
+
+[node name="OldMan" type="Area2D" parent="Interactables"]
+position = Vector2(-102, 236)
+collision_layer = 2
+script = ExtResource("5_npc")
+npc_name = "Old Timer"
+dialogue_lines = Array[String](["Back in my day, the Arcade didn't have those... strange cabinets.", "Something's not right about that new machine.", "I swear I saw it GLOW last night..."])
+
+[node name="NPCCollision" type="CollisionShape2D" parent="Interactables/OldMan"]
+shape = SubResource("shape_npc")
+
+[node name="Kid" type="Area2D" parent="Interactables"]
+position = Vector2(410, 226)
+collision_layer = 2
+script = ExtResource("5_npc")
+npc_name = "Timmy"
+dialogue_lines = Array[String](["Have you been to the Arcade yet?", "There's this one cabinet that nobody can beat...", "It's called 'THE HOLLOW'. Creepy name, right?"])
+
+[node name="NPCCollision" type="CollisionShape2D" parent="Interactables/Kid"]
+shape = SubResource("shape_npc")
+
+[node name="HiddenSigil" type="Area2D" parent="Interactables"]
+position = Vector2(148, 364)
+collision_layer = 2
+script = ExtResource("7_sigil")
+sigil_id = "sigil_town"
+hidden_text = "Glowing symbols appear on the ground... They form a spiral, pulling your gaze inward."
+revealed_text = "The Spiral of the Town. It marks a place between worlds."
+
+[node name="SigilCollision" type="CollisionShape2D" parent="Interactables/HiddenSigil"]
+shape = SubResource("shape_interact")

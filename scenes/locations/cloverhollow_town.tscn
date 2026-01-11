@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://drhll6gqhsp54" path="res://scripts/interactables/container.gd" id="6_container"]
 [ext_resource type="Script" uid="uid://dkdcwdus5p2dm" path="res://scripts/interactables/hidden_sigil.gd" id="7_sigil"]
 [ext_resource type="Texture2D" uid="uid://ddk6jp3gc8gnf" path="res://assets/environments/cloverhollow_town.jpg" id="8_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/old_man/idle.png" id="9_oldman_sprite"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/kid/idle.png" id="10_kid_sprite"]
 
 [sub_resource type="RectangleShape2D" id="shape_door"]
 size = Vector2(63.5, 60.5)
@@ -98,6 +100,7 @@ position = Vector2(-72, 2)
 polygon = PackedVector2Array(0, 0, 80, 0, 80, 850, 0, 850)
 
 [node name="RightBorder" type="CollisionPolygon2D" parent="Collisions"]
+position = Vector2(-48, -17)
 polygon = PackedVector2Array(1456, 0, 1536, 0, 1536, 850, 1456, 850)
 
 [node name="Trees" type="CollisionPolygon2D" parent="Collisions"]
@@ -106,7 +109,7 @@ polygon = PackedVector2Array(353, 533, 423, 609, 486, 659, 542, 721, 330, 731, 3
 
 [node name="Trees2" type="CollisionPolygon2D" parent="Collisions"]
 position = Vector2(54, -193)
-polygon = PackedVector2Array(337, 524, 382, 542, 402, 590, 404, 629, 389, 665, 341, 688, 316, 667, 259, 643, 243, 593, 266, 537)
+polygon = PackedVector2Array(338, 539, 381, 558, 394, 592, 392, 627, 376, 663, 341, 688, 316, 667, 259, 643, 243, 593, 279, 557)
 
 [node name="Trees3" type="CollisionPolygon2D" parent="Collisions"]
 position = Vector2(228, 167)
@@ -163,7 +166,7 @@ polygon = PackedVector2Array(251, 513, 336, 476, 352, 509, 260, 559)
 [node name="Interactables" type="Node2D" parent="."]
 
 [node name="FaeHouseDoor" type="Area2D" parent="Interactables"]
-position = Vector2(330, 390)
+position = Vector2(331, 370)
 collision_layer = 2
 script = ExtResource("4_door")
 target_scene = "res://scenes/locations/fae_hall.tscn"
@@ -239,7 +242,17 @@ script = ExtResource("5_npc")
 npc_name = "Old Timer"
 dialogue_lines = Array[String](["Back in my day, the Arcade didn't have those... strange cabinets.", "Something's not right about that new machine.", "I swear I saw it GLOW last night..."])
 
+[node name="OldManSprite" type="Sprite2D" parent="Interactables/OldMan"]
+position = Vector2(0, -70)
+scale = Vector2(0.17, 0.17)
+texture = ExtResource("9_oldman_sprite")
+
 [node name="NPCCollision" type="CollisionShape2D" parent="Interactables/OldMan"]
+shape = SubResource("shape_npc")
+
+[node name="OldManBody" type="StaticBody2D" parent="Interactables/OldMan"]
+
+[node name="BodyCollision" type="CollisionShape2D" parent="Interactables/OldMan/OldManBody"]
 shape = SubResource("shape_npc")
 
 [node name="Kid" type="Area2D" parent="Interactables"]
@@ -249,7 +262,17 @@ script = ExtResource("5_npc")
 npc_name = "Timmy"
 dialogue_lines = Array[String](["Have you been to the Arcade yet?", "There's this one cabinet that nobody can beat...", "It's called 'THE HOLLOW'. Creepy name, right?"])
 
+[node name="KidSprite" type="Sprite2D" parent="Interactables/Kid"]
+position = Vector2(0, -60)
+scale = Vector2(0.20, 0.20)
+texture = ExtResource("10_kid_sprite")
+
 [node name="NPCCollision" type="CollisionShape2D" parent="Interactables/Kid"]
+shape = SubResource("shape_npc")
+
+[node name="KidBody" type="StaticBody2D" parent="Interactables/Kid"]
+
+[node name="BodyCollision" type="CollisionShape2D" parent="Interactables/Kid/KidBody"]
 shape = SubResource("shape_npc")
 
 [node name="HiddenSigil" type="Area2D" parent="Interactables"]

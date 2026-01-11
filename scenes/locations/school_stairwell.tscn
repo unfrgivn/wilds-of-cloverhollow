@@ -1,0 +1,98 @@
+[gd_scene load_steps=7 format=3 uid="uid://school_stairwell"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="4_sign"]
+[ext_resource type="Texture2D" path="res://assets/environments/school_stairwell.png" id="5_bg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(80, 40)
+
+[node name="SchoolStairwell" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(704, 384)
+texture = ExtResource("5_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromFirstFloor" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(300, 600)
+script = ExtResource("2_spawn")
+spawn_id = "from_first_floor"
+
+[node name="FromSecondFloor" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(900, 400)
+script = ExtResource("2_spawn")
+spawn_id = "from_second_floor"
+
+[node name="FromPrincipal" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 300)
+script = ExtResource("2_spawn")
+spawn_id = "from_principal"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 500)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(600, 500)
+
+[node name="Collisions" type="StaticBody2D" parent="."]
+
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 200, 200, 200, 200, 750, 100, 750)
+
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1000, 200, 1100, 200, 1100, 750, 1000, 750)
+
+[node name="StairsUp" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(750, 250, 950, 250, 950, 450, 750, 450)
+
+[node name="StairsDown" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(250, 450, 450, 450, 450, 650, 250, 650)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="ToFirstFloor" type="Area2D" parent="Interactables"]
+position = Vector2(350, 680)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3_door")
+target_scene = "res://scenes/locations/school_hall.tscn"
+spawn_id = "from_stairs"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ToFirstFloor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="ToPrincipal" type="Area2D" parent="Interactables"]
+position = Vector2(600, 280)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3_door")
+target_scene = "res://scenes/locations/school_principal_office.tscn"
+spawn_id = "from_stairs"
+
+[node name="PrincipalDoorCollision" type="CollisionShape2D" parent="Interactables/ToPrincipal"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="NoticeBoard" type="Area2D" parent="Interactables"]
+position = Vector2(550, 400)
+collision_layer = 2
+script = ExtResource("4_sign")
+sign_text = "School Rules: 1. No running. 2. No yelling. 3. DO NOT go to the basement after dark."
+
+[node name="NoticeCollision" type="CollisionShape2D" parent="Interactables/NoticeBoard"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Window" type="Area2D" parent="Interactables"]
+position = Vector2(850, 350)
+collision_layer = 2
+script = ExtResource("4_sign")
+sign_text = "A window overlooking the town. You can see the Arcade from here... is that a light flickering inside?"
+
+[node name="WindowCollision" type="CollisionShape2D" parent="Interactables/Window"]
+shape = SubResource("RectangleShape2D_door")

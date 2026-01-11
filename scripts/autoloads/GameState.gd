@@ -16,6 +16,10 @@ var counters: Dictionary = {
 # Container states: tracks which containers have been looted
 var looted_containers: Dictionary = {}
 
+# Companion state: tracks active companions
+var has_maddie: bool = false
+const MADDIE_SCENE: String = "res://scenes/companions/Maddie.tscn"
+
 
 func _ready() -> void:
 	pass
@@ -92,6 +96,42 @@ func is_container_looted(container_id: String) -> bool:
 	return looted_containers.get(container_id, false)
 
 
+# --- Companion Management ---
+
+func acquire_maddie() -> void:
+	has_maddie = true
+	print("[GameState] Maddie joined the party!")
+
+
+func spawn_companion_if_needed(scene_root: Node) -> void:
+	if not has_maddie:
+		return
+	
+	# Check if Maddie already exists in scene
+	var existing := scene_root.get_node_or_null("Maddie")
+	if existing:
+		return
+	
+	# Find the player to spawn near
+	var players := scene_root.get_tree().get_nodes_in_group("player")
+	if players.is_empty():
+		push_warning("[GameState] No player found to spawn Maddie near")
+		return
+	
+	var player: Node2D = players[0]
+	
+	# Load and spawn Maddie
+	var maddie_scene := load(MADDIE_SCENE)
+	if not maddie_scene:
+		push_error("[GameState] Failed to load Maddie scene")
+		return
+	
+	var maddie: Node2D = maddie_scene.instantiate()
+	maddie.global_position = player.global_position + Vector2(30, 20)
+	scene_root.add_child(maddie)
+	print("[GameState] Spawned Maddie at %s" % maddie.global_position)
+
+
 # --- Reset (for new game) ---
 
 func reset_all() -> void:
@@ -99,3 +139,4 @@ func reset_all() -> void:
 	quest_flags.clear()
 	counters = {"candy": 0, "gems": 0}
 	looted_containers.clear()
+	has_maddie = false

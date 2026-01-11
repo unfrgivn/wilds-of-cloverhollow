@@ -7,6 +7,7 @@ class_name Player
 @export var acceleration: float = 1200.0
 @export var friction: float = 1200.0
 
+var can_move: bool = true
 var _nearby_interactable: Interactable = null
 
 @onready var interaction_area: Area2D = $InteractionArea
@@ -50,7 +51,7 @@ func _move_to_spawn_point() -> void:
 	push_warning("[Player] Spawn point not found: %s" % spawn_id)
 
 func _physics_process(delta: float) -> void:
-	if UIRoot.is_dialogue_active:
+	if not can_move or UIRoot.is_dialogue_active:
 		velocity = Vector2.ZERO
 		return
 	

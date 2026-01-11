@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://c3i6iyv6a1sqc" path="res://scripts/interactables/door.gd" id="4_door"]
 [ext_resource type="Script" uid="uid://b066nf0p6ii4o" path="res://scripts/interactables/npc.gd" id="5_npc"]
 [ext_resource type="Texture2D" uid="uid://j088ot1k0hna" path="res://assets/environments/fae_living_room.jpg" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/mom/idle.png" id="7_mom_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sofa"]
 size = Vector2(139.10895, 62.716644)
@@ -147,6 +148,14 @@ npc_name = "Mom"
 dialogue_lines = Array[String](["Good morning, sweetie!", "Oliver's still in his room. That boy and his dinosaurs...", "Don't forget - the town festival is today! Maybe check out the Arcade?"])
 
 [node name="MomSprite" type="Sprite2D" parent="Interactables/Mom"]
+position = Vector2(0, -70)
+scale = Vector2(0.19, 0.19)
+texture = ExtResource("7_mom_sprite")
 
 [node name="MomCollision" type="CollisionShape2D" parent="Interactables/Mom"]
+shape = SubResource("RectangleShape2D_npc")
+
+[node name="MomBody" type="StaticBody2D" parent="Interactables/Mom"]
+
+[node name="BodyCollision" type="CollisionShape2D" parent="Interactables/Mom/MomBody"]
 shape = SubResource("RectangleShape2D_npc")

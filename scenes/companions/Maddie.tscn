@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/companions/follower_companion.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/npcs/maddie/maddie_animations.tres" id="2_animations"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_maddie"]
+size = Vector2(24, 20)
+
+[node name="Maddie" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.35, 0.35)
+sprite_frames = ExtResource("2_animations")
+animation = &"idle_down"
+autoplay = "idle_down"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 10)
+shape = SubResource("RectangleShape2D_maddie")

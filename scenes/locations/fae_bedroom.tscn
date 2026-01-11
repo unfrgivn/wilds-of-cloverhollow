@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://djpct1dcayo4u" path="res://scripts/interactables/sign.gd" id="4_sign"]
 [ext_resource type="Script" uid="uid://c3i6iyv6a1sqc" path="res://scripts/interactables/door.gd" id="5_door"]
 [ext_resource type="Texture2D" uid="uid://cr2rwv7k2xn22" path="res://assets/environments/fae_bedroom.jpg" id="6_bg"]
+[ext_resource type="PackedScene" path="res://scenes/companions/Maddie.tscn" id="7_maddie"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bed"]
 size = Vector2(166, 129.25)
@@ -42,6 +43,9 @@ spawn_id = "default"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(576, 550)
+
+[node name="Maddie" parent="." instance=ExtResource("7_maddie")]
+position = Vector2(620, 580)
 
 [node name="Collisions" type="StaticBody2D" parent="."]
 

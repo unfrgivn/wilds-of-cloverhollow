@@ -1,0 +1,102 @@
+[gd_scene load_steps=9 format=3 uid="uid://school_principal"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="4_npc"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="5_sign"]
+[ext_resource type="Texture2D" path="res://assets/environments/school_principal_office.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/principal.png" id="7_principal"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(80, 40)
+
+[node name="SchoolPrincipalOffice" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(704, 384)
+texture = ExtResource("6_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromStairs" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 680)
+script = ExtResource("2_spawn")
+spawn_id = "from_stairs"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 500)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(600, 500)
+
+[node name="Collisions" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(150, 200, 1050, 200, 1050, 280, 150, 280)
+
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 200, 180, 200, 180, 750, 100, 750)
+
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1020, 200, 1100, 200, 1100, 750, 1020, 750)
+
+[node name="Desk" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(400, 350, 700, 350, 700, 450, 400, 450)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="ExitDoor" type="Area2D" parent="Interactables"]
+position = Vector2(600, 720)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3_door")
+target_scene = "res://scenes/locations/school_stairwell.tscn"
+spawn_id = "from_principal"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="PrincipalHemlock" type="Area2D" parent="Interactables"]
+position = Vector2(550, 380)
+collision_layer = 2
+script = ExtResource("4_npc")
+npc_name = "Principal Hemlock"
+dialogue_lines = Array[String](["Ah, young Fae! Welcome to my office.", "I've been principal here for 35 years now...", "This school has quite a history. Some of it... better left forgotten.", "But you seem like a curious one. Just be careful what you uncover.", "Some doors are closed for a reason."])
+
+[node name="PrincipalSprite" type="Sprite2D" parent="Interactables/PrincipalHemlock"]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("7_principal")
+
+[node name="PrincipalCollision" type="CollisionShape2D" parent="Interactables/PrincipalHemlock"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Bookshelf" type="Area2D" parent="Interactables"]
+position = Vector2(900, 400)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "A bookshelf full of old yearbooks and awards. One book is titled 'The Founding of Cloverhollow - 1823'"
+
+[node name="BookshelfCollision" type="CollisionShape2D" parent="Interactables/Bookshelf"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Diplomas" type="Area2D" parent="Interactables"]
+position = Vector2(300, 300)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "Framed diplomas and certificates. One has a strange seal with an eye symbol..."
+
+[node name="DiplomaCollision" type="CollisionShape2D" parent="Interactables/Diplomas"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="FamilyPhoto" type="Area2D" parent="Interactables"]
+position = Vector2(550, 320)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "A family photo on the desk. The principal looks much younger. Is that... the arcade in the background?"
+
+[node name="PhotoCollision" type="CollisionShape2D" parent="Interactables/FamilyPhoto"]
+shape = SubResource("RectangleShape2D_door")

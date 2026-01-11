@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://scripts/interactables/container.gd" id="5_container"]
 [ext_resource type="Script" path="res://scripts/interactables/hidden_sigil.gd" id="6_sigil"]
 [ext_resource type="Texture2D" path="res://assets/environments/school_hall.jpg" id="7_bg"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="8_npc"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/kid.png" id="9_classmate"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
 size = Vector2(80, 40)
@@ -40,6 +42,31 @@ spawn_id = "from_town"
 position = Vector2(600, 550)
 script = ExtResource("2_spawn")
 spawn_id = "default"
+
+[node name="FromHomeroom" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(300, 480)
+script = ExtResource("2_spawn")
+spawn_id = "from_homeroom"
+
+[node name="FromMusic" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(500, 480)
+script = ExtResource("2_spawn")
+spawn_id = "from_music"
+
+[node name="FromArt" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(700, 480)
+script = ExtResource("2_spawn")
+spawn_id = "from_art"
+
+[node name="FromNurse" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(900, 480)
+script = ExtResource("2_spawn")
+spawn_id = "from_nurse"
+
+[node name="FromStairs" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(950, 550)
+script = ExtResource("2_spawn")
+spawn_id = "from_stairs"
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(600, 550)
@@ -131,3 +158,72 @@ opened_text = "An empty closet. Smells like cleaning supplies."
 
 [node name="ClosetCollision" type="CollisionShape2D" parent="Interactables/JanitorCloset"]
 shape = SubResource("RectangleShape2D_closet")
+
+[node name="HomeroomDoor" type="Area2D" parent="Interactables"]
+position = Vector2(300, 420)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/school_homeroom.tscn"
+spawn_id = "from_hall"
+
+[node name="HomeroomDoorCollision" type="CollisionShape2D" parent="Interactables/HomeroomDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="MusicRoomDoor" type="Area2D" parent="Interactables"]
+position = Vector2(500, 420)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/school_music_room.tscn"
+spawn_id = "from_hall"
+
+[node name="MusicDoorCollision" type="CollisionShape2D" parent="Interactables/MusicRoomDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="ArtRoomDoor" type="Area2D" parent="Interactables"]
+position = Vector2(700, 420)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/school_art_room.tscn"
+spawn_id = "from_hall"
+
+[node name="ArtDoorCollision" type="CollisionShape2D" parent="Interactables/ArtRoomDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="NurseOfficeDoor" type="Area2D" parent="Interactables"]
+position = Vector2(900, 420)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/school_nurse_office.tscn"
+spawn_id = "from_hall"
+
+[node name="NurseDoorCollision" type="CollisionShape2D" parent="Interactables/NurseOfficeDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="StairwellDoor" type="Area2D" parent="Interactables"]
+position = Vector2(1050, 550)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("4_door")
+target_scene = "res://scenes/locations/school_stairwell.tscn"
+spawn_id = "from_first_floor"
+
+[node name="StairsDoorCollision" type="CollisionShape2D" parent="Interactables/StairwellDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="ClassmateJenny" type="Area2D" parent="Interactables"]
+position = Vector2(450, 600)
+collision_layer = 2
+script = ExtResource("8_npc")
+npc_name = "Jenny"
+dialogue_lines = Array[String](["Hi Fae! Are you ready for the festival?", "I heard there's going to be a treasure hunt!", "Maybe we can team up!"])
+
+[node name="JennySprite" type="Sprite2D" parent="Interactables/ClassmateJenny"]
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("9_classmate")
+
+[node name="JennyCollision" type="CollisionShape2D" parent="Interactables/ClassmateJenny"]
+shape = SubResource("RectangleShape2D_prop")

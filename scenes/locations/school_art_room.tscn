@@ -1,0 +1,99 @@
+[gd_scene load_steps=9 format=3 uid="uid://school_art"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="4_npc"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="5_sign"]
+[ext_resource type="Texture2D" path="res://assets/environments/school_art_room.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/teacher_art.png" id="7_teacher"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(80, 40)
+
+[node name="SchoolArtRoom" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(704, 384)
+texture = ExtResource("6_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromHall" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 680)
+script = ExtResource("2_spawn")
+spawn_id = "from_hall"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 500)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(600, 500)
+
+[node name="Collisions" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(150, 200, 1050, 200, 1050, 280, 150, 280)
+
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 200, 180, 200, 180, 750, 100, 750)
+
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1020, 200, 1100, 200, 1100, 750, 1020, 750)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="ExitDoor" type="Area2D" parent="Interactables"]
+position = Vector2(600, 720)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3_door")
+target_scene = "res://scenes/locations/school_hall.tscn"
+spawn_id = "from_art"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="MsCanvas" type="Area2D" parent="Interactables"]
+position = Vector2(300, 350)
+collision_layer = 2
+script = ExtResource("4_npc")
+npc_name = "Ms. Canvas"
+dialogue_lines = Array[String](["Welcome to the art room, dear! Let your creativity flow!", "Art isn't just about what you see... it's about what you FEEL.", "Some of the old paintings in town have hidden messages...", "If you look at them just right, you might see something special!"])
+
+[node name="TeacherSprite" type="Sprite2D" parent="Interactables/MsCanvas"]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("7_teacher")
+
+[node name="TeacherCollision" type="CollisionShape2D" parent="Interactables/MsCanvas"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Easel" type="Area2D" parent="Interactables"]
+position = Vector2(800, 400)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "A canvas with a half-finished painting. It looks like... Cloverhollow at night?"
+
+[node name="EaselCollision" type="CollisionShape2D" parent="Interactables/Easel"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="SupplyShelf" type="Area2D" parent="Interactables"]
+position = Vector2(200, 500)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "Paints, brushes, and colorful supplies. There's a jar of glow-in-the-dark paint!"
+
+[node name="ShelfCollision" type="CollisionShape2D" parent="Interactables/SupplyShelf"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="StudentArt" type="Area2D" parent="Interactables"]
+position = Vector2(550, 280)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "Student artwork hanging on a clothesline. One painting shows a strange glowing symbol..."
+
+[node name="ArtCollision" type="CollisionShape2D" parent="Interactables/StudentArt"]
+shape = SubResource("RectangleShape2D_door")

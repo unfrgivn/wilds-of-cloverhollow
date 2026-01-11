@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://player_scene"]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_script"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/fae/fae_animations.tres" id="2_animations"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/fae/fae_animations_watercolor.tres" id="2_animations"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(48, 48)
@@ -9,11 +9,11 @@ size = Vector2(48, 48)
 [sub_resource type="CircleShape2D" id="CircleShape2D_interaction"]
 radius = 60.0
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_script")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-scale = Vector2(3, 3)
+scale = Vector2(0.35, 0.35)
 sprite_frames = ExtResource("2_animations")
 animation = &"idle_down"
 

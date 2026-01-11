@@ -1,0 +1,102 @@
+[gd_scene load_steps=9 format=3 uid="uid://school_nurse"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="4_npc"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="5_sign"]
+[ext_resource type="Texture2D" path="res://assets/environments/school_nurse_office.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/nurse_hollie.png" id="7_nurse"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(80, 40)
+
+[node name="SchoolNurseOffice" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(704, 384)
+texture = ExtResource("6_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromHall" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 680)
+script = ExtResource("2_spawn")
+spawn_id = "from_hall"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 500)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(600, 500)
+
+[node name="Collisions" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(150, 200, 1050, 200, 1050, 280, 150, 280)
+
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 200, 180, 200, 180, 750, 100, 750)
+
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1020, 200, 1100, 200, 1100, 750, 1020, 750)
+
+[node name="ExamBed" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(750, 350, 1000, 350, 1000, 500, 750, 500)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="ExitDoor" type="Area2D" parent="Interactables"]
+position = Vector2(600, 720)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3_door")
+target_scene = "res://scenes/locations/school_hall.tscn"
+spawn_id = "from_nurse"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="NurseHollie" type="Area2D" parent="Interactables"]
+position = Vector2(350, 400)
+collision_layer = 2
+script = ExtResource("4_npc")
+npc_name = "Nurse Hollie"
+dialogue_lines = Array[String](["Hello sweetie! Feeling okay today?", "You know, I've been here for 20 years now...", "Sometimes at night, I hear strange sounds from the basement.", "If you ever feel unwell, come see me! I have band-aids with stars on them!"])
+
+[node name="NurseSprite" type="Sprite2D" parent="Interactables/NurseHollie"]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("7_nurse")
+
+[node name="NurseCollision" type="CollisionShape2D" parent="Interactables/NurseHollie"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="MedicineCabinet" type="Area2D" parent="Interactables"]
+position = Vector2(200, 350)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "A cabinet full of first aid supplies. There's a bottle labeled 'For Unusual Ailments'..."
+
+[node name="CabinetCollision" type="CollisionShape2D" parent="Interactables/MedicineCabinet"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="RestBed" type="Area2D" parent="Interactables"]
+position = Vector2(875, 425)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "A comfy examination bed with a soft curtain. Perfect for resting..."
+
+[node name="BedCollision" type="CollisionShape2D" parent="Interactables/RestBed"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="EyeChart" type="Area2D" parent="Interactables"]
+position = Vector2(550, 280)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "An eye chart on the wall. Wait... are some of those letters forming a word? 'H-O-L-L-O-W'?"
+
+[node name="ChartCollision" type="CollisionShape2D" parent="Interactables/EyeChart"]
+shape = SubResource("RectangleShape2D_door")

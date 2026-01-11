@@ -1,0 +1,94 @@
+[gd_scene load_steps=10 format=3 uid="uid://school_homeroom"]
+
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="2_spawn"]
+[ext_resource type="Script" path="res://scripts/interactables/door.gd" id="3_door"]
+[ext_resource type="Script" path="res://scripts/interactables/npc.gd" id="4_npc"]
+[ext_resource type="Script" path="res://scripts/interactables/sign.gd" id="5_sign"]
+[ext_resource type="Texture2D" path="res://assets/environments/school_homeroom.png" id="6_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/teacher_homeroom.png" id="7_teacher"]
+[ext_resource type="Texture2D" path="res://assets/sprites/npcs/classmates.png" id="8_classmates"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(80, 40)
+
+[node name="SchoolHomeroom" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(704, 384)
+texture = ExtResource("6_bg")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromHall" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 680)
+script = ExtResource("2_spawn")
+spawn_id = "from_hall"
+
+[node name="Default" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 550)
+script = ExtResource("2_spawn")
+spawn_id = "default"
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(600, 550)
+
+[node name="Collisions" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(150, 200, 1050, 200, 1050, 300, 150, 300)
+
+[node name="LeftWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(100, 200, 180, 200, 180, 750, 100, 750)
+
+[node name="RightWall" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(1020, 200, 1100, 200, 1100, 750, 1020, 750)
+
+[node name="TeacherDesk" type="CollisionPolygon2D" parent="Collisions"]
+polygon = PackedVector2Array(450, 300, 650, 300, 650, 380, 450, 380)
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="ExitDoor" type="Area2D" parent="Interactables"]
+position = Vector2(600, 720)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3_door")
+target_scene = "res://scenes/locations/school_hall.tscn"
+spawn_id = "from_homeroom"
+is_automatic = true
+
+[node name="DoorCollision" type="CollisionShape2D" parent="Interactables/ExitDoor"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="MrsMaple" type="Area2D" parent="Interactables"]
+position = Vector2(550, 350)
+collision_layer = 2
+script = ExtResource("4_npc")
+npc_name = "Mrs. Maple"
+dialogue_lines = Array[String](["Good morning, class! Today we're learning about local history.", "Cloverhollow was founded over 200 years ago...", "There are many mysteries in this town, if you know where to look!", "Now, open your textbooks to page 42."])
+
+[node name="TeacherSprite" type="Sprite2D" parent="Interactables/MrsMaple"]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("7_teacher")
+
+[node name="TeacherCollision" type="CollisionShape2D" parent="Interactables/MrsMaple"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Chalkboard" type="Area2D" parent="Interactables"]
+position = Vector2(550, 250)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "Today's lesson: The History of Cloverhollow. There's a drawing of what looks like... an eye?"
+
+[node name="ChalkboardCollision" type="CollisionShape2D" parent="Interactables/Chalkboard"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="StudentDesk" type="Area2D" parent="Interactables"]
+position = Vector2(350, 500)
+collision_layer = 2
+script = ExtResource("5_sign")
+sign_text = "A student desk with doodles. Someone drew a cat that looks like Maddie!"
+
+[node name="DeskCollision" type="CollisionShape2D" parent="Interactables/StudentDesk"]
+shape = SubResource("RectangleShape2D_door")

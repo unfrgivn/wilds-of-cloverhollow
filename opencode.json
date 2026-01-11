@@ -1,13 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": [
-    "spec.md",
-    "docs/poc-plan.md",
-    "docs/testing-strategy.md",
-    "docs/art-direction.md",
-    "docs/art-pipeline.md",
-    "docs/earthbound-reference-notes.md"
-  ],
+  "instructions": ["spec.md", "docs/*.md"],
   "mcp": {
     "godot": {
       "type": "local",

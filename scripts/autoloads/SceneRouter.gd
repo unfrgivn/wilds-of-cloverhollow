@@ -48,6 +48,11 @@ func go_to_scene(target_scene: String, spawn_id: String = "") -> void:
 	# Position player at spawn point (handled by the scene or player)
 	# The player/scene should call get_and_clear_spawn_id() to get the spawn
 	
+	# Spawn companions after scene loads
+	var current_scene := get_tree().current_scene
+	if current_scene:
+		GameState.spawn_companion_if_needed(current_scene)
+	
 	# Fade in
 	if fade_overlay:
 		await _fade_from_black()

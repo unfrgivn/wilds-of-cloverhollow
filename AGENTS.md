@@ -6,15 +6,20 @@ A Godot 4.5 EarthBound-inspired exploration RPG. This file guides AI agents work
 
 Before starting any work, agents MUST read:
 1. **`spec.md`** — Product specification and requirements (source of truth)
-2. **`docs/poc-plan.md`** — Implementation phases and exit criteria
-3. **`docs/testing-strategy.md`** — Testing approach and conventions
+2. **`TODO.md`** — Phased task list with current priorities
+3. **`docs/poc-plan.md`** — Implementation phases and exit criteria
+4. **`docs/testing-strategy.md`** — Testing approach and conventions
 
 Additional docs to consult as needed:
+- `CHANGELOG.md` — History of completed work and changes
 - `docs/art-direction.md` — Visual style guidelines
 - `docs/art-pipeline.md` — Asset generation workflow
 - `docs/earthbound-reference-notes.md` — Inspiration guidelines (what to emulate vs avoid)
 
-**Keep `spec.md` up-to-date**: If requirements change during implementation, update `spec.md` to reflect the current state. The spec is the living source of truth, not a static document.
+**Keep living documents up-to-date**:
+- `spec.md` — Update when requirements change
+- `TODO.md` — Update task status as work progresses; add new ideas to Backlog
+- `CHANGELOG.md` — Record completed work after each session
 
 ## Demo Scope (Milestone 1)
 

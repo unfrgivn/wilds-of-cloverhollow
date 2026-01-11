@@ -7,6 +7,7 @@
 size = Vector2(24, 20)
 
 [node name="Maddie" type="CharacterBody2D"]
+z_index = -1
 collision_layer = 8
 collision_mask = 1
 script = ExtResource("1_script")

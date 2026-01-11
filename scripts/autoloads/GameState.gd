@@ -17,7 +17,7 @@ var counters: Dictionary = {
 var looted_containers: Dictionary = {}
 
 # Companion state: tracks active companions
-var has_maddie: bool = false
+var has_maddie: bool = true  # Maddie starts in party for demo
 const MADDIE_SCENE: String = "res://scenes/companions/Maddie.tscn"
 
 

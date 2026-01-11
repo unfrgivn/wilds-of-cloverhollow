@@ -3,6 +3,8 @@ class_name Player
 
 ## Player controller for top-down movement and interaction
 
+signal player_positioned  # Emitted after player moves to spawn point
+
 @export var move_speed: float = 150.0
 @export var acceleration: float = 1200.0
 @export var friction: float = 1200.0
@@ -28,12 +30,14 @@ func _ready() -> void:
 func _move_to_spawn_point() -> void:
 	var spawn_id := SceneRouter.get_and_clear_spawn_id()
 	if spawn_id.is_empty():
+		player_positioned.emit()
 		return
 	
 	# Find SpawnPoints node in current scene
 	var spawn_points := get_tree().current_scene.get_node_or_null("SpawnPoints")
 	if not spawn_points:
 		push_warning("[Player] No SpawnPoints node in scene")
+		player_positioned.emit()
 		return
 	
 	# Find the specific spawn marker
@@ -41,14 +45,17 @@ func _move_to_spawn_point() -> void:
 		if child.has_method("get_spawn_id") and child.get_spawn_id() == spawn_id:
 			global_position = child.global_position
 			print("[Player] Spawned at: %s (%s)" % [spawn_id, global_position])
+			player_positioned.emit()
 			return
 		# Also check if it has spawn_id property directly
 		if "spawn_id" in child and child.spawn_id == spawn_id:
 			global_position = child.global_position
 			print("[Player] Spawned at: %s (%s)" % [spawn_id, global_position])
+			player_positioned.emit()
 			return
 	
 	push_warning("[Player] Spawn point not found: %s" % spawn_id)
+	player_positioned.emit()
 
 func _physics_process(delta: float) -> void:
 	if not can_move or UIRoot.is_dialogue_active:

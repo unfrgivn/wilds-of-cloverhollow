@@ -45,12 +45,16 @@ func go_to_scene(target_scene: String, spawn_id: String = "") -> void:
 	# Wait a frame for scene to initialize
 	await get_tree().process_frame
 	
-	# Position player at spawn point (handled by the scene or player)
-	# The player/scene should call get_and_clear_spawn_id() to get the spawn
-	
-	# Spawn companions after scene loads
+	# Spawn companions after player is positioned
 	var current_scene := get_tree().current_scene
 	if current_scene:
+		var player := current_scene.get_node_or_null("Player") as Player
+		if player:
+			# Wait for player to finish positioning at spawn point
+			if not player.is_node_ready():
+				await player.ready
+			# Give player a frame to run _ready and position themselves
+			await get_tree().process_frame
 		GameState.spawn_companion_if_needed(current_scene)
 	
 	# Fade in

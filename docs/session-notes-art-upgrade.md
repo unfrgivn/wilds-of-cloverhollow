@@ -135,6 +135,69 @@ Fae's design (from `art/reference/concepts/characters/character_concept_sheet_fa
 2. `fix: remove extra door from Oliver's nursery artwork`
 3. `fix: clear walkway in Oliver's nursery, reduce floor clutter`
 
+## NPC Sprite "Sticker Outline" Fix (January 2026)
+
+### Problem
+Generated NPC sprites (mom, old_man) appeared as "stickers superimposed on the background":
+- Thick white border baked into the artwork making characters look pasted-on
+- Some sprites had fake checkerboard transparency instead of real alpha channel
+- The kid NPC was correct (proper transparency, thin dark ink edge, no white border)
+
+### Root Cause
+The nano banana image generation tool sometimes produces sprites with:
+1. White "sticker outline" painted INTO the artwork (not just edge artifacts)
+2. Fake transparency patterns instead of true RGBA alpha channel
+
+### Solution: ImageMagick Morphological Erosion
+Simple transparency operations don't work because the white border is painted into the art. Use morphological erosion to shrink the alpha mask, effectively removing the outer white ring:
+
+```bash
+# Remove ~8 pixel white sticker border while preserving character art
+magick input.png \
+  \( +clone -alpha extract -morphology Erode Disk:8 \) \
+  -compose CopyOpacity -composite \
+  output.png
+```
+
+**How it works:**
+1. `+clone -alpha extract` — extracts the alpha channel as grayscale
+2. `-morphology Erode Disk:8` — shrinks the mask inward by ~8 pixels
+3. `-compose CopyOpacity -composite` — applies the eroded mask back
+
+**Adjust the erosion amount:**
+- `Disk:4` — light erosion (thin white borders)
+- `Disk:8` — standard (most generated sprites)
+- `Disk:12` — aggressive (very thick white borders)
+
+### Files Fixed
+| File | Issue | Fix Applied |
+|------|-------|-------------|
+| `assets/sprites/npcs/mom/idle.png` | White sticker outline | Disk:8 erosion |
+| `assets/sprites/npcs/old_man/idle.png` | Fake transparency + white outline | Disk:8 erosion |
+
+Backups saved as `idle_broken.png` in each folder.
+
+### Post-Fix Godot Import
+After replacing sprite files, Godot's import cache may be invalid:
+```bash
+# Delete stale import files
+rm assets/sprites/npcs/*/idle.png.import
+
+# Reimport
+godot --headless --path . --import
+```
+
+### Prevention for Future Sprites
+Add these constraints to NPC generation prompts:
+- "TRUE transparent background (no checkerboard pattern)"
+- "NO white sticker outline or glow around character edges"
+- "Thin dark brown/sepia ink outline only (matching kid NPC reference)"
+
+Reference the working sprite: `assets/sprites/npcs/kid/idle.png`
+
+### Walk Animation Sprites
+The `walk1.png` and `walk2.png` files likely have the same sticker issue and will need the same erosion treatment when addressed.
+
 ## Next Steps
 
 1. Fine-tune collision polygons using F3 debug tool during playtesting
@@ -142,3 +205,4 @@ Fae's design (from `art/reference/concepts/characters/character_concept_sheet_fa
 3. Add remaining NPC sprites (Mom, Arcade Worker, Mysterious Stranger)
 4. Implement the Blacklight Lantern mechanic and hidden sigils
 5. Complete "The Hollow Light" quest flow
+6. Apply erosion fix to walk animation sprites (walk1.png, walk2.png) for all NPCs

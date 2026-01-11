@@ -104,3 +104,40 @@ If the team wants a more SNES-like presentation while keeping this art style:
 - render world to a low-resolution `SubViewport`
 - scale up with nearest-neighbor
 - optionally apply a very mild posterize/palette shader (only if it improves readability)
+
+## 7. Fixing "sticker outline" artifacts on sprites
+
+Generated NPC/character sprites sometimes have a thick white border baked into the artwork, making them look like stickers pasted on backgrounds. This is NOT a transparency issue; the white is painted into the art.
+
+### Detection
+Compare against a known-good sprite (e.g., `assets/sprites/npcs/kid/idle.png`):
+- Good: thin dark brown/sepia ink outline, true transparency, blends with background
+- Bad: thick white halo around character, looks "pasted on"
+
+### Fix: ImageMagick morphological erosion
+
+```bash
+# Remove ~8 pixel white sticker border
+magick input.png \
+  \( +clone -alpha extract -morphology Erode Disk:8 \) \
+  -compose CopyOpacity -composite \
+  output.png
+```
+
+**Erosion amounts:**
+- `Disk:4` — thin white borders
+- `Disk:8` — standard (most cases)
+- `Disk:12` — very thick borders
+
+### Post-fix Godot reimport
+
+```bash
+rm path/to/sprite.png.import
+godot --headless --path . --import
+```
+
+### Prevention
+Add to NPC generation prompts:
+- "TRUE transparent background (no checkerboard pattern)"
+- "NO white sticker outline or glow around edges"
+- "Thin dark brown/sepia ink outline only"

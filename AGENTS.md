@@ -2,6 +2,20 @@
 
 A Godot 4.5 EarthBound-inspired exploration RPG. This file guides AI agents working in this codebase.
 
+## Required Reading
+
+Before starting any work, agents MUST read:
+1. **`spec.md`** — Product specification and requirements (source of truth)
+2. **`docs/poc-plan.md`** — Implementation phases and exit criteria
+3. **`docs/testing-strategy.md`** — Testing approach and conventions
+
+Additional docs to consult as needed:
+- `docs/art-direction.md` — Visual style guidelines
+- `docs/art-pipeline.md` — Asset generation workflow
+- `docs/earthbound-reference-notes.md` — Inspiration guidelines (what to emulate vs avoid)
+
+**Keep `spec.md` up-to-date**: If requirements change during implementation, update `spec.md` to reflect the current state. The spec is the living source of truth, not a static document.
+
 ## Demo Scope (Milestone 1)
 
 Player character **Fae** explores the starter town **Cloverhollow**:

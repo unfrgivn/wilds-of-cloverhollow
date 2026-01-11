@@ -197,6 +197,60 @@ func test_container_cannot_be_looted_twice() -> void:
 
 ## Agent Workflow
 
+### Feature Specification Workflow (MANDATORY for new features)
+
+When implementing a new feature or significant change, agents MUST follow this interview-driven workflow:
+
+#### Phase 1: Context Gathering
+1. Read `spec.md` thoroughly to understand current requirements
+2. Read relevant docs (`poc-plan.md`, `art-direction.md`, etc.)
+3. Identify what's already specified vs. what needs clarification
+
+#### Phase 2: Deep Interview
+Before writing any implementation code, interview the user about:
+
+**Technical Implementation**
+- Data structures and state management approach
+- Integration points with existing systems (GameState, SceneRouter, UIRoot)
+- Edge cases and error handling expectations
+- Performance considerations for the target platform
+
+**UI & UX**
+- Interaction flow and player feedback
+- Visual presentation and animation expectations
+- Accessibility considerations
+- How this feature fits the "SNES-like feel" requirement
+
+**Content & Narrative**
+- How this feature ties into the demo narrative
+- NPC dialogue or item descriptions needed
+- Any "weird stakes" tone considerations
+
+**Tradeoffs & Concerns**
+- Scope boundaries (what's in vs. out for the demo)
+- Quality vs. speed tradeoffs
+- Dependencies on other unfinished work
+- Potential conflicts with existing architecture
+
+**Testing & Verification**
+- What constitutes "done" for this feature
+- Specific test scenarios to cover
+- How to verify visually vs. programmatically
+
+#### Phase 3: Specification Update
+After the interview is complete:
+1. Update `spec.md` with the clarified requirements
+2. Add any new sections or subsections as needed
+3. Ensure the spec reflects the agreed-upon scope and implementation approach
+4. Get user confirmation before proceeding to implementation
+
+#### Phase 4: Implementation
+Only after spec is updated and confirmed:
+1. Create a todo list breaking down the work
+2. Proceed with implementation following the updated spec
+
+**Key principle**: The interview should surface non-obvious requirements. Don't ask questions that are already clearly answered in the spec or codebase. Focus on ambiguities, edge cases, and design decisions that require human judgment.
+
 ### Before Making Changes
 1. Run headless smoke test to verify project loads
 2. Check existing patterns in similar files

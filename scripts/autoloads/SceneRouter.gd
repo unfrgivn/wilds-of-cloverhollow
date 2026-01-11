@@ -42,7 +42,10 @@ func go_to_scene(target_scene: String, spawn_id: String = "") -> void:
 		is_transitioning = false
 		return
 	
-	# Wait a frame for scene to initialize
+	# Wait for the scene tree to update - change_scene_to_file is deferred
+	# We need to wait until current_scene is valid
+	await get_tree().tree_changed
+	# Extra frame to ensure all nodes are ready
 	await get_tree().process_frame
 	
 	# Spawn companions after player is positioned
@@ -50,10 +53,10 @@ func go_to_scene(target_scene: String, spawn_id: String = "") -> void:
 	if current_scene:
 		var player := current_scene.get_node_or_null("Player") as Player
 		if player:
-			# Wait for player to finish positioning at spawn point
+			# Wait for player to be ready if not already
 			if not player.is_node_ready():
 				await player.ready
-			# Give player a frame to run _ready and position themselves
+			# Give player an extra frame to position at spawn point
 			await get_tree().process_frame
 		GameState.spawn_companion_if_needed(current_scene)
 	

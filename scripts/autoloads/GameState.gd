@@ -112,13 +112,16 @@ func spawn_companion_if_needed(scene_root: Node) -> void:
 	if existing:
 		return
 	
-	# Find the player to spawn near
-	var players := scene_root.get_tree().get_nodes_in_group("player")
-	if players.is_empty():
+	# Find the player - try direct node first, then group
+	var player: Node2D = scene_root.get_node_or_null("Player")
+	if not player:
+		var players := scene_root.get_tree().get_nodes_in_group("player")
+		if not players.is_empty():
+			player = players[0]
+	
+	if not player:
 		push_warning("[GameState] No player found to spawn Maddie near")
 		return
-	
-	var player: Node2D = players[0]
 	
 	# Load and spawn Maddie
 	var maddie_scene := load(MADDIE_SCENE)

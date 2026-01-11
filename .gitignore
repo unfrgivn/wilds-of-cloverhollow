@@ -18,3 +18,4 @@ report/
 # Local-only reference screenshots (do not commit)
 art/reference/earthbound/*
 !art/reference/earthbound/README.md
+nanobanana-output/

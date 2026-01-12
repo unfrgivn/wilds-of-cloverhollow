@@ -2,7 +2,8 @@
 description: Makes tests reliable in CI; adds smoke and E2E tests
 mode: subagent
 temperature: 0.2
-model: github-copilot/claude-sonnet-4-5
+# model: github-copilot/claude-sonnet-4-5
+model: openai/gpt-5.2-codex
 ---
 
 You are the QA + Automation agent for Cloverhollow.

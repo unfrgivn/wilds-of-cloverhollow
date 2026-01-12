@@ -2,7 +2,8 @@
 description: Owns the playable demo architecture and acceptance criteria
 mode: subagent
 temperature: 0.2
-model: github-copilot/claude-opus-4-5
+# model: github-copilot/claude-opus-4-5
+model: openai/gpt-5.2-codex
 ---
 
 You are the Product Architect for Cloverhollow, a Godot 4.5 SNES-style RPG demo (EarthBound-like).

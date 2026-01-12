@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
-[ext_resource type="Texture2D" path="res://content/scenes/town_square_01/ground.png" id="2_ground"]
+[ext_resource type="Texture2D" path="res://content/scenes/town_square_01/bg_ground.png" id="2_ground"]
 [ext_resource type="Script" path="res://game/tools/markers/spawn_marker_2d.gd" id="3_spawn"]
 [ext_resource type="Script" path="res://game/tools/markers/hotspot_marker_2d.gd" id="4_hotspot"]
 [ext_resource type="Script" path="res://game/tools/markers/exit_marker_2d.gd" id="5_exit"]

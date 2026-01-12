@@ -20,10 +20,10 @@ The repository’s responsibility is to keep this repeatable:
   - raw tool outputs (high-res PNG)
 - `art/exports/`
   - game-ready PNGs (cropped, transparent, sized)
-- `assets/`
-  - imported game assets referenced by scenes/resources
+- `content/scenes/`
+  - scene-ready PNGs used by the prototype
 
-Note: `art/reference/concepts/` already contains the target style samples.
+Note: `references/legacy_art/reference/concepts/` contains the target style samples.
 
 ## 2. Generation constraints (critical)
 
@@ -53,6 +53,7 @@ Constraints:
 - Keep floors readable (clear plane, minimal high-frequency texture)
 - Leave a navigable lane between doorways and key interactables
 - Avoid extreme perspective distortion (player must “fit”)
+- Target output size: 1280×720 for backdrops unless otherwise specified
 
 ### 2.3 Props / icons
 - Transparent background
@@ -62,11 +63,13 @@ Constraints:
 
 ## 3. Godot import settings
 
-Decide per project whether textures should be filtered.
+Current defaults (project-wide):
+- `rendering/textures/canvas_textures/default_texture_filter = Linear`
+- `importer_defaults/texture/mipmaps/generate = false`
 
 Recommended options:
 - If using a low-res SubViewport: allow filtered textures but let the SubViewport provide coherence.
-- If using true pixel art: disable filtering and mipmaps on relevant textures.
+- If using true pixel art: switch the default filter to Nearest and keep mipmaps off.
 
 ## 4. Prompt templates
 

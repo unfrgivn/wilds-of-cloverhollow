@@ -1,0 +1,80 @@
+{
+  "scene_id": "inn_01",
+  "size_px": [
+    1280,
+    720
+  ],
+  "assets": {
+    "ground": "res://content/scenes/inn_01/ground.png",
+    "walkmask_raw": "res://content/scenes/inn_01/_baked/walkmask_raw.png",
+    "walkmask_player": "res://content/scenes/inn_01/_baked/walkmask_player.png",
+    "navpoly": "res://content/scenes/inn_01/_baked/navpoly.tres"
+  },
+  "player_spawn": {
+    "id": "spawn_default",
+    "pos": [
+      140,
+      160
+    ]
+  },
+  "props": [
+    {
+      "def": "res://content/props/bench_01/bench_01_def.tres",
+      "pos": [
+        320,
+        300
+      ],
+      "variant": 0
+    },
+    {
+      "def": "res://content/props/crate_01/crate_01_def.tres",
+      "pos": [
+        440,
+        320
+      ],
+      "variant": 1
+    }
+  ],
+  "decals": [
+    {
+      "id": "sparkle_01",
+      "texture": "res://content/decals/sparkle_01.png",
+      "pos": [
+        360,
+        360
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "z_index": -2
+    }
+  ],
+  "hotspots": [
+    {
+      "id": "inn_sign",
+      "type": "talk",
+      "pos": [
+        260,
+        200
+      ],
+      "radius": 18,
+      "text": "Welcome to the inn."
+    }
+  ],
+  "exits": [
+    {
+      "id": "to_town",
+      "rect": [
+        60,
+        620,
+        48,
+        32
+      ],
+      "target": {
+        "scene_id": "town_square_01",
+        "spawn_id": "spawn_default"
+      }
+    }
+  ]
+}

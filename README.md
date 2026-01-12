@@ -1,16 +1,20 @@
-# Cloverhollow (Godot 4.5) — Layout-Authoritative Scene Pipeline Prototype
+# Cloverhollow (Godot 4.5) — Composable World Pipeline Prototype
 
-A fresh **Godot 4.5** prototype that proves a layout-authoritative scene pipeline. Scenes are defined by JSON and walkmask images, with headless validation to enforce correctness.
+A Godot 4.5 prototype that proves a **layout-authoritative** world pipeline. Author scenes in `layout.tscn`, export deterministic `scene.json`, bake walkmasks/navpolys, and load baked assets at runtime.
 
 ## Prototype goals
-- Load scenes from per-folder `scene.json`
-- Block movement using `walkmask.png` sampling (no tilemaps, no collision polygons for world blocking)
-- Define hotspots, exits, and spawns only in JSON
-- Validate scenes headlessly (bounds, walkable placement, reachability)
-- Target resolution: **1280x720**, with **1 world unit = 1 pixel** and `(0,0)` at top-left
+- Author scenes with props, decals, and markers in editor-only `layout.tscn`
+- Export deterministic `scene.json` (placements, spawn, exits, hotspots, decals)
+- Bake `walkmask_raw`, `walkmask_player`, and `navpoly`
+- Block player movement by sampling `walkmask_player`
+- Render prop variants and decals
+- Drive NPC pathfinding from baked `navpoly`
+- Validate scenes headlessly
 
 ## Documentation
 - Specification: `spec.md`
+- Pipeline guide: `docs/pipeline_prototype.md`
+- UX design plan: `docs/ux_design_plan.md`
 - Reference notes: `docs/reference_notes.md`
 
 ## Typical commands
@@ -20,14 +24,14 @@ Run editor:
 godot --path .
 ```
 
-Headless smoke boot:
+Build content (export → QA → bake → validate):
 ```bash
-godot --headless --path . --quit
+godot --headless --quit --script res://tools/build_content.gd
 ```
 
-Headless validator (after it is added):
+Validate scenes only:
 ```bash
-godot --headless --path . --script res://tools/validate_scenes.gd
+godot --headless --quit --script res://tools/validate_scenes.gd
 ```
 
 ## IP / Legal

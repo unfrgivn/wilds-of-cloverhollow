@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://core/SceneRunner.gd" id="1_scenrun"]
+
+[node name="Main" type="Node2D"]
+
+[node name="SceneRoot" type="Node2D" parent="."]
+
+[node name="SceneRunner" type="Node" parent="."]
+script = ExtResource("1_scenrun")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="DebugLabel" type="Label" parent="UI"]
+text = ""
+position = Vector2(8, 8)

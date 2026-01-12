@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://claw_game_scene"]
-
-[ext_resource type="Script" uid="uid://claw_game_script" path="res://scripts/minigames/claw_game.gd" id="1_script"]
-
-[node name="ClawGame" type="CanvasLayer"]
-layer = 110
-script = ExtResource("1_script")

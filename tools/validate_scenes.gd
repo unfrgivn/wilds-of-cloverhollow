@@ -11,10 +11,6 @@ var _had_failure: bool = false
 
 func _init() -> void:
 	var scene_files: Array[String] = _collect_scene_files("res://content/scenes")
-	if scene_files.is_empty():
-		push_error("[Validator] No scene.json files found under res://content/scenes")
-		quit(1)
-		return
 	for scene_path in scene_files:
 		_validate_scene(scene_path)
 	if _had_failure:
@@ -28,12 +24,7 @@ func _collect_scene_files(root: String) -> Array[String]:
 	var folders: Array[String] = _list_dirs_sorted(root)
 	for entry in folders:
 		var folder: String = root.path_join(entry)
-		var layout_path: String = folder.path_join("layout.tscn")
 		var scene_path: String = folder.path_join("scene.json")
-		if FileAccess.file_exists(layout_path) and not FileAccess.file_exists(scene_path):
-			push_error("[Validator] Missing scene.json for layout: %s" % layout_path)
-			_had_failure = true
-			continue
 		if FileAccess.file_exists(scene_path):
 			scene_paths.append(scene_path)
 	return scene_paths

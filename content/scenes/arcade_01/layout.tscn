@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/arcade_01/ground.png" id="2_ground"]
@@ -6,10 +6,20 @@
 [ext_resource type="Script" path="res://game/tools/markers/hotspot_marker_2d.gd" id="4_hotspot"]
 [ext_resource type="Script" path="res://game/tools/markers/exit_marker_2d.gd" id="5_exit"]
 [ext_resource type="Script" path="res://game/tools/markers/decal_marker_2d.gd" id="6_decal"]
-[ext_resource type="PackedScene" path="res://content/props/bench_01/bench_01.tscn" id="6_bench"]
-[ext_resource type="PackedScene" path="res://content/props/crate_01/crate_01.tscn" id="7_crate"]
-[ext_resource type="Resource" path="res://content/props/bench_01/bench_01_def.tres" id="8_bench_def"]
-[ext_resource type="Resource" path="res://content/props/crate_01/crate_01_def.tres" id="9_crate_def"]
+[ext_resource type="PackedScene" path="res://content/props/arcade_cabinet_01/arcade_cabinet_01.tscn" id="10_cabinet"]
+[ext_resource type="Resource" path="res://content/props/arcade_cabinet_01/arcade_cabinet_01_def.tres" id="11_cabinet_def"]
+[ext_resource type="PackedScene" path="res://content/props/claw_machine_01/claw_machine_01.tscn" id="12_claw"]
+[ext_resource type="Resource" path="res://content/props/claw_machine_01/claw_machine_01_def.tres" id="13_claw_def"]
+[ext_resource type="PackedScene" path="res://content/props/ticket_counter_01/ticket_counter_01.tscn" id="14_counter"]
+[ext_resource type="Resource" path="res://content/props/ticket_counter_01/ticket_counter_01_def.tres" id="15_counter_def"]
+[ext_resource type="PackedScene" path="res://content/props/arcade_cabinet_double_01/arcade_cabinet_double_01.tscn" id="16_cabinet_double"]
+[ext_resource type="Resource" path="res://content/props/arcade_cabinet_double_01/arcade_cabinet_double_01_def.tres" id="17_cabinet_double_def"]
+[ext_resource type="PackedScene" path="res://content/props/gumball_machine_01/gumball_machine_01.tscn" id="18_gumball"]
+[ext_resource type="Resource" path="res://content/props/gumball_machine_01/gumball_machine_01_def.tres" id="19_gumball_def"]
+[ext_resource type="PackedScene" path="res://content/props/stool_01/stool_01.tscn" id="20_stool"]
+[ext_resource type="Resource" path="res://content/props/stool_01/stool_01_def.tres" id="21_stool_def"]
+[ext_resource type="PackedScene" path="res://content/props/room_shell_arcade_01/room_shell_arcade_01.tscn" id="22_room_shell"]
+[ext_resource type="Resource" path="res://content/props/room_shell_arcade_01/room_shell_arcade_01_def.tres" id="23_room_shell_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -30,14 +40,34 @@ position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
 
-[node name="Bench01" parent="Props" instance=ExtResource("6_bench")]
-prop_def = ExtResource("8_bench_def")
-variant = 1
-position = Vector2(320, 300)
+[node name="ArcadeRoomShell" parent="Props" instance=ExtResource("22_room_shell")]
+prop_def = ExtResource("23_room_shell_def")
+position = Vector2(520, 640)
 
-[node name="Crate01" parent="Props" instance=ExtResource("7_crate")]
-prop_def = ExtResource("9_crate_def")
-position = Vector2(440, 320)
+[node name="ArcadeCabinet01" parent="Props" instance=ExtResource("10_cabinet")]
+prop_def = ExtResource("11_cabinet_def")
+position = Vector2(300, 300)
+
+[node name="ClawMachine01" parent="Props" instance=ExtResource("12_claw")]
+prop_def = ExtResource("13_claw_def")
+position = Vector2(500, 300)
+bake_mode = "live"
+
+[node name="TicketCounter01" parent="Props" instance=ExtResource("14_counter")]
+prop_def = ExtResource("15_counter_def")
+position = Vector2(700, 200)
+
+[node name="ArcadeCabinetDouble01" parent="Props" instance=ExtResource("16_cabinet_double")]
+prop_def = ExtResource("17_cabinet_double_def")
+position = Vector2(380, 300)
+
+[node name="GumballMachine01" parent="Props" instance=ExtResource("18_gumball")]
+prop_def = ExtResource("19_gumball_def")
+position = Vector2(760, 240)
+
+[node name="Stool01" parent="Props" instance=ExtResource("20_stool")]
+prop_def = ExtResource("21_stool_def")
+position = Vector2(700, 260)
 
 [node name="Markers" type="Node2D" parent="."]
 
@@ -48,6 +78,14 @@ texture_path = "res://content/decals/sparkle_01.png"
 size_px = Vector2i(16, 16)
 decal_z_index = -2
 position = Vector2(420, 360)
+
+[node name="Decal_Scuff" type="Node2D" parent="Markers"]
+script = ExtResource("6_decal")
+decal_id = "scuff_01"
+texture_path = "res://content/decals/scuff_01.png"
+size_px = Vector2i(16, 16)
+decal_z_index = -2
+position = Vector2(520, 380)
 
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")

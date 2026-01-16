@@ -6,6 +6,8 @@
   ],
   "assets": {
     "ground": "res://content/scenes/school_hall_01/ground.png",
+    "plate_base": "res://content/scenes/school_hall_01/_baked/plate_base.png",
+    "plate_overhang": "res://content/scenes/school_hall_01/_baked/plate_overhang.png",
     "walkmask_raw": "res://content/scenes/school_hall_01/_baked/walkmask_raw.png",
     "walkmask_player": "res://content/scenes/school_hall_01/_baked/walkmask_player.png",
     "navpoly": "res://content/scenes/school_hall_01/_baked/navpoly.tres"
@@ -19,20 +21,58 @@
   },
   "props": [
     {
-      "def": "res://content/props/bench_01/bench_01_def.tres",
+      "def": "res://content/props/bulletin_board_01/bulletin_board_01_def.tres",
       "pos": [
-        320,
-        300
+        900,
+        200
       ],
-      "variant": 0
+      "variant": 0,
+      "bake": "static"
     },
     {
-      "def": "res://content/props/fence_01/fence_01_def.tres",
+      "def": "res://content/props/locker_row_01/locker_row_01_def.tres",
       "pos": [
-        460,
-        320
+        500,
+        200
       ],
-      "variant": 0
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/poster_01/poster_01_def.tres",
+      "pos": [
+        820,
+        140
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/room_shell_school_01/room_shell_school_01_def.tres",
+      "pos": [
+        520,
+        640
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/rug_rect_01/rug_rect_01_def.tres",
+      "pos": [
+        640,
+        380
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/trophy_case_01/trophy_case_01_def.tres",
+      "pos": [
+        260,
+        168
+      ],
+      "variant": 0,
+      "bake": "static"
     }
   ],
   "decals": [
@@ -48,6 +88,19 @@
         16
       ],
       "z_index": -2
+    },
+    {
+      "id": "scuff_01",
+      "texture": "res://content/decals/scuff_01.png",
+      "pos": [
+        520,
+        360
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "z_index": -2
     }
   ],
   "hotspots": [
@@ -56,7 +109,7 @@
       "type": "talk",
       "pos": [
         260,
-        200
+        240
       ],
       "radius": 18,
       "text": "The trophy case glints."

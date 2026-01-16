@@ -6,6 +6,8 @@
   ],
   "assets": {
     "ground": "res://content/scenes/arcade_01/ground.png",
+    "plate_base": "res://content/scenes/arcade_01/_baked/plate_base.png",
+    "plate_overhang": "res://content/scenes/arcade_01/_baked/plate_overhang.png",
     "walkmask_raw": "res://content/scenes/arcade_01/_baked/walkmask_raw.png",
     "walkmask_player": "res://content/scenes/arcade_01/_baked/walkmask_player.png",
     "navpoly": "res://content/scenes/arcade_01/_baked/navpoly.tres"
@@ -19,23 +21,83 @@
   },
   "props": [
     {
-      "def": "res://content/props/bench_01/bench_01_def.tres",
+      "def": "res://content/props/arcade_cabinet_01/arcade_cabinet_01_def.tres",
       "pos": [
-        320,
+        300,
         300
       ],
-      "variant": 1
+      "variant": 0,
+      "bake": "static"
     },
     {
-      "def": "res://content/props/crate_01/crate_01_def.tres",
+      "def": "res://content/props/arcade_cabinet_double_01/arcade_cabinet_double_01_def.tres",
       "pos": [
-        440,
-        320
+        380,
+        300
       ],
-      "variant": 0
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/claw_machine_01/claw_machine_01_def.tres",
+      "pos": [
+        500,
+        300
+      ],
+      "variant": 0,
+      "bake": "live"
+    },
+    {
+      "def": "res://content/props/gumball_machine_01/gumball_machine_01_def.tres",
+      "pos": [
+        760,
+        240
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/room_shell_arcade_01/room_shell_arcade_01_def.tres",
+      "pos": [
+        520,
+        640
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/stool_01/stool_01_def.tres",
+      "pos": [
+        700,
+        260
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/ticket_counter_01/ticket_counter_01_def.tres",
+      "pos": [
+        700,
+        200
+      ],
+      "variant": 0,
+      "bake": "static"
     }
   ],
   "decals": [
+    {
+      "id": "scuff_01",
+      "texture": "res://content/decals/scuff_01.png",
+      "pos": [
+        520,
+        380
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "z_index": -2
+    },
     {
       "id": "sparkle_01",
       "texture": "res://content/decals/sparkle_01.png",

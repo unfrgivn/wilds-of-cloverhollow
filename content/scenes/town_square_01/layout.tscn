@@ -1,17 +1,41 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
-[ext_resource type="Texture2D" path="res://content/scenes/town_square_01/bg_ground.png" id="2_ground"]
+[ext_resource type="Texture2D" path="res://content/scenes/town_square_01/ground.png" id="2_ground"]
 [ext_resource type="Script" path="res://game/tools/markers/spawn_marker_2d.gd" id="3_spawn"]
 [ext_resource type="Script" path="res://game/tools/markers/hotspot_marker_2d.gd" id="4_hotspot"]
 [ext_resource type="Script" path="res://game/tools/markers/exit_marker_2d.gd" id="5_exit"]
 [ext_resource type="Script" path="res://game/tools/markers/decal_marker_2d.gd" id="6_decal"]
-[ext_resource type="PackedScene" path="res://content/props/tree_01/tree_01.tscn" id="6_tree"]
-[ext_resource type="PackedScene" path="res://content/props/bench_01/bench_01.tscn" id="7_bench"]
-[ext_resource type="PackedScene" path="res://content/props/lamp_01/lamp_01.tscn" id="8_lamp"]
-[ext_resource type="Resource" path="res://content/props/tree_01/tree_01_def.tres" id="9_tree_def"]
-[ext_resource type="Resource" path="res://content/props/bench_01/bench_01_def.tres" id="10_bench_def"]
-[ext_resource type="Resource" path="res://content/props/lamp_01/lamp_01_def.tres" id="11_lamp_def"]
+[ext_resource type="PackedScene" path="res://content/props/wall_straight_01/wall_straight_01.tscn" id="20_wall_s"]
+[ext_resource type="Resource" path="res://content/props/wall_straight_01/wall_straight_01_def.tres" id="21_wall_s_def"]
+[ext_resource type="PackedScene" path="res://content/props/wall_window_01/wall_window_01.tscn" id="22_wall_w"]
+[ext_resource type="Resource" path="res://content/props/wall_window_01/wall_window_01_def.tres" id="23_wall_w_def"]
+[ext_resource type="PackedScene" path="res://content/props/door_01/door_01.tscn" id="24_door"]
+[ext_resource type="Resource" path="res://content/props/door_01/door_01_def.tres" id="25_door_def"]
+[ext_resource type="PackedScene" path="res://content/props/roof_straight_01/roof_straight_01.tscn" id="26_roof_s"]
+[ext_resource type="Resource" path="res://content/props/roof_straight_01/roof_straight_01_def.tres" id="27_roof_s_def"]
+[ext_resource type="PackedScene" path="res://content/props/sign_wall_01/sign_wall_01.tscn" id="28_sign_w"]
+[ext_resource type="Resource" path="res://content/props/sign_wall_01/sign_wall_01_def.tres" id="29_sign_w_def"]
+[ext_resource type="PackedScene" path="res://content/props/sign_round_01/sign_round_01.tscn" id="30_sign_r"]
+[ext_resource type="Resource" path="res://content/props/sign_round_01/sign_round_01_def.tres" id="31_sign_r_def"]
+[ext_resource type="PackedScene" path="res://content/props/fence_straight_01/fence_straight_01.tscn" id="32_fence_s"]
+[ext_resource type="Resource" path="res://content/props/fence_straight_01/fence_straight_01_def.tres" id="33_fence_s_def"]
+[ext_resource type="PackedScene" path="res://content/props/gate_single_01/gate_single_01.tscn" id="34_gate"]
+[ext_resource type="Resource" path="res://content/props/gate_single_01/gate_single_01_def.tres" id="35_gate_def"]
+[ext_resource type="PackedScene" path="res://content/props/wall_lantern_01/wall_lantern_01.tscn" id="36_lantern"]
+[ext_resource type="Resource" path="res://content/props/wall_lantern_01/wall_lantern_01_def.tres" id="37_lantern_def"]
+[ext_resource type="PackedScene" path="res://content/props/house_timber_01/house_timber_01.tscn" id="40_house_t1"]
+[ext_resource type="Resource" path="res://content/props/house_timber_01/house_timber_01_def.tres" id="41_house_t1_def"]
+[ext_resource type="PackedScene" path="res://content/props/house_timber_02/house_timber_02.tscn" id="42_house_t2"]
+[ext_resource type="Resource" path="res://content/props/house_timber_02/house_timber_02_def.tres" id="43_house_t2_def"]
+[ext_resource type="PackedScene" path="res://content/props/house_stone_01/house_stone_01.tscn" id="44_house_s1"]
+[ext_resource type="Resource" path="res://content/props/house_stone_01/house_stone_01_def.tres" id="45_house_s1_def"]
+[ext_resource type="PackedScene" path="res://content/props/house_stone_02/house_stone_02.tscn" id="46_house_s2"]
+[ext_resource type="Resource" path="res://content/props/house_stone_02/house_stone_02_def.tres" id="47_house_s2_def"]
+[ext_resource type="PackedScene" path="res://content/props/shop_01/shop_01.tscn" id="48_shop"]
+[ext_resource type="Resource" path="res://content/props/shop_01/shop_01_def.tres" id="49_shop_def"]
+[ext_resource type="PackedScene" path="res://content/props/school_01_exterior/school_01_exterior.tscn" id="50_school"]
+[ext_resource type="Resource" path="res://content/props/school_01_exterior/school_01_exterior_def.tres" id="51_school_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -32,7 +56,7 @@ size = Vector2(48, 32)
 script = ExtResource("1_layout")
 scene_id = "town_square_01"
 default_spawn_id = "spawn_default"
-base_walkmask_path = ""
+base_walkmask_path = "res://content/scenes/town_square_01/base_walkmask.png"
 
 [node name="Ground" type="Sprite2D" parent="."]
 texture = ExtResource("2_ground")
@@ -41,18 +65,37 @@ position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
 
-[node name="Tree01" parent="Props" instance=ExtResource("6_tree")]
-prop_def = ExtResource("9_tree_def")
-position = Vector2(240, 300)
+[node name="Inn_Building" parent="Props" instance=ExtResource("42_house_t2")]
+prop_def = ExtResource("43_house_t2_def")
+position = Vector2(420, 220)
 
-[node name="Bench01" parent="Props" instance=ExtResource("7_bench")]
-prop_def = ExtResource("10_bench_def")
-variant = 1
-position = Vector2(360, 320)
+[node name="School_Building" parent="Props" instance=ExtResource("50_school")]
+prop_def = ExtResource("51_school_def")
+position = Vector2(540, 320)
 
-[node name="Lamp01" parent="Props" instance=ExtResource("8_lamp")]
-prop_def = ExtResource("11_lamp_def")
-position = Vector2(520, 300)
+[node name="Arcade_Building" parent="Props" instance=ExtResource("44_house_s1")]
+prop_def = ExtResource("45_house_s1_def")
+position = Vector2(660, 300)
+
+[node name="House_Building" parent="Props" instance=ExtResource("40_house_t1")]
+prop_def = ExtResource("41_house_t1_def")
+position = Vector2(780, 320)
+
+[node name="Shop_Building" parent="Props" instance=ExtResource("48_shop")]
+prop_def = ExtResource("49_shop_def")
+position = Vector2(300, 260)
+
+[node name="Fence_Left" parent="Props" instance=ExtResource("32_fence_s")]
+prop_def = ExtResource("33_fence_s_def")
+position = Vector2(200, 400)
+
+[node name="Gate_Left" parent="Props" instance=ExtResource("34_gate")]
+prop_def = ExtResource("35_gate_def")
+position = Vector2(240, 400)
+
+[node name="Fence_Right" parent="Props" instance=ExtResource("32_fence_s")]
+prop_def = ExtResource("33_fence_s_def")
+position = Vector2(280, 400)
 
 [node name="Markers" type="Node2D" parent="."]
 
@@ -75,14 +118,14 @@ position = Vector2(520, 340)
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")
 spawn_id = "spawn_default"
-position = Vector2(120, 140)
+position = Vector2(640, 620)
 
 [node name="Hotspot_Npc" type="Area2D" parent="Markers"]
 script = ExtResource("4_hotspot")
 hotspot_id = "npc_test"
 hotspot_type = "talk"
 text = "Hello from town square."
-position = Vector2(220, 180)
+position = Vector2(640, 360)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Npc"]
 shape = SubResource("1_hotspot_circle")
@@ -92,7 +135,7 @@ script = ExtResource("5_exit")
 exit_id = "to_inn"
 target_scene_id = "inn_01"
 target_spawn_id = "spawn_default"
-position = Vector2(444, 176)
+position = Vector2(420, 260)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Inn"]
 shape = SubResource("2_exit_inn")
@@ -102,7 +145,7 @@ script = ExtResource("5_exit")
 exit_id = "to_school"
 target_scene_id = "school_hall_01"
 target_spawn_id = "spawn_default"
-position = Vector2(544, 216)
+position = Vector2(540, 360)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_School"]
 shape = SubResource("3_exit_school")
@@ -112,7 +155,7 @@ script = ExtResource("5_exit")
 exit_id = "to_arcade"
 target_scene_id = "arcade_01"
 target_spawn_id = "spawn_default"
-position = Vector2(644, 256)
+position = Vector2(660, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Arcade"]
 shape = SubResource("4_exit_arcade")
@@ -122,7 +165,7 @@ script = ExtResource("5_exit")
 exit_id = "to_house"
 target_scene_id = "fae_house_01"
 target_spawn_id = "spawn_default"
-position = Vector2(744, 296)
+position = Vector2(780, 320)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_House"]
 shape = SubResource("5_exit_house")

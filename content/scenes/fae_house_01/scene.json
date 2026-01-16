@@ -6,6 +6,9 @@
   ],
   "assets": {
     "ground": "res://content/scenes/fae_house_01/ground.png",
+    "plate_base": "res://content/scenes/fae_house_01/_baked/plate_base.png",
+    "plate_overhang": "res://content/scenes/fae_house_01/_baked/plate_overhang.png",
+    "base_walkmask": "res://content/scenes/fae_house_01/base_walkmask.png",
     "walkmask_raw": "res://content/scenes/fae_house_01/_baked/walkmask_raw.png",
     "walkmask_player": "res://content/scenes/fae_house_01/_baked/walkmask_player.png",
     "navpoly": "res://content/scenes/fae_house_01/_baked/navpoly.tres"
@@ -13,26 +16,100 @@
   "player_spawn": {
     "id": "spawn_default",
     "pos": [
-      140,
-      160
+      820,
+      640
     ]
   },
   "props": [
     {
-      "def": "res://content/props/bench_01/bench_01_def.tres",
+      "def": "res://content/props/bed_single_01/bed_single_01_def.tres",
       "pos": [
-        320,
-        300
+        360,
+        520
       ],
-      "variant": 0
+      "variant": 0,
+      "bake": "static"
     },
     {
-      "def": "res://content/props/lamp_01/lamp_01_def.tres",
+      "def": "res://content/props/bookshelf_01/bookshelf_01_def.tres",
       "pos": [
-        460,
-        320
+        500,
+        200
       ],
-      "variant": 0
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/chair_01/chair_01_def.tres",
+      "pos": [
+        700,
+        440
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/desk_01/desk_01_def.tres",
+      "pos": [
+        200,
+        300
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/dresser_01/dresser_01_def.tres",
+      "pos": [
+        520,
+        560
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/poster_01/poster_01_def.tres",
+      "pos": [
+        600,
+        160
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/rug_rect_01/rug_rect_01_def.tres",
+      "pos": [
+        640,
+        480
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/rug_round_01/rug_round_01_def.tres",
+      "pos": [
+        600,
+        400
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/sofa_01/sofa_01_def.tres",
+      "pos": [
+        700,
+        520
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/table_round_01/table_round_01_def.tres",
+      "pos": [
+        640,
+        440
+      ],
+      "variant": 0,
+      "bake": "static"
     }
   ],
   "decals": [
@@ -48,6 +125,19 @@
         16
       ],
       "z_index": -2
+    },
+    {
+      "id": "sparkle_01",
+      "texture": "res://content/decals/sparkle_01.png",
+      "pos": [
+        520,
+        420
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "z_index": -2
     }
   ],
   "hotspots": [
@@ -55,8 +145,8 @@
       "id": "bed",
       "type": "talk",
       "pos": [
-        260,
-        200
+        360,
+        600
       ],
       "radius": 18,
       "text": "The bed looks cozy."
@@ -66,8 +156,8 @@
     {
       "id": "to_town",
       "rect": [
-        60,
-        620,
+        821,
+        634,
         48,
         32
       ],

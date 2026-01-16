@@ -6,6 +6,8 @@
   ],
   "assets": {
     "ground": "res://content/scenes/school_hall_01/ground.png",
+    "plate_base": "res://content/scenes/school_hall_03/_baked/plate_base.png",
+    "plate_overhang": "res://content/scenes/school_hall_03/_baked/plate_overhang.png",
     "walkmask_raw": "res://content/scenes/school_hall_03/_baked/walkmask_raw.png",
     "walkmask_player": "res://content/scenes/school_hall_03/_baked/walkmask_player.png",
     "navpoly": "res://content/scenes/school_hall_03/_baked/navpoly.tres"
@@ -24,7 +26,8 @@
         320,
         300
       ],
-      "variant": 0
+      "variant": 0,
+      "bake": "static"
     },
     {
       "def": "res://content/props/fence_01/fence_01_def.tres",
@@ -32,7 +35,8 @@
         460,
         320
       ],
-      "variant": 0
+      "variant": 1,
+      "bake": "static"
     }
   ],
   "decals": [
@@ -42,6 +46,19 @@
       "pos": [
         360,
         360
+      ],
+      "size": [
+        16,
+        16
+      ],
+      "z_index": -2
+    },
+    {
+      "id": "sparkle_01",
+      "texture": "res://content/decals/sparkle_01.png",
+      "pos": [
+        520,
+        380
       ],
       "size": [
         16,

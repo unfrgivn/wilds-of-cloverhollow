@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/fae_house_01/ground.png" id="2_ground"]
@@ -6,10 +6,26 @@
 [ext_resource type="Script" path="res://game/tools/markers/hotspot_marker_2d.gd" id="4_hotspot"]
 [ext_resource type="Script" path="res://game/tools/markers/exit_marker_2d.gd" id="5_exit"]
 [ext_resource type="Script" path="res://game/tools/markers/decal_marker_2d.gd" id="6_decal"]
-[ext_resource type="PackedScene" path="res://content/props/bench_01/bench_01.tscn" id="6_bench"]
-[ext_resource type="PackedScene" path="res://content/props/lamp_01/lamp_01.tscn" id="7_lamp"]
-[ext_resource type="Resource" path="res://content/props/bench_01/bench_01_def.tres" id="8_bench_def"]
-[ext_resource type="Resource" path="res://content/props/lamp_01/lamp_01_def.tres" id="9_lamp_def"]
+[ext_resource type="PackedScene" path="res://content/props/bed_single_01/bed_single_01.tscn" id="10_bed"]
+[ext_resource type="Resource" path="res://content/props/bed_single_01/bed_single_01_def.tres" id="11_bed_def"]
+[ext_resource type="PackedScene" path="res://content/props/desk_01/desk_01.tscn" id="12_desk"]
+[ext_resource type="Resource" path="res://content/props/desk_01/desk_01_def.tres" id="13_desk_def"]
+[ext_resource type="PackedScene" path="res://content/props/bookshelf_01/bookshelf_01.tscn" id="14_bookshelf"]
+[ext_resource type="Resource" path="res://content/props/bookshelf_01/bookshelf_01_def.tres" id="15_bookshelf_def"]
+[ext_resource type="PackedScene" path="res://content/props/rug_round_01/rug_round_01.tscn" id="16_rug"]
+[ext_resource type="Resource" path="res://content/props/rug_round_01/rug_round_01_def.tres" id="17_rug_def"]
+[ext_resource type="PackedScene" path="res://content/props/dresser_01/dresser_01.tscn" id="18_dresser"]
+[ext_resource type="Resource" path="res://content/props/dresser_01/dresser_01_def.tres" id="19_dresser_def"]
+[ext_resource type="PackedScene" path="res://content/props/sofa_01/sofa_01.tscn" id="20_sofa"]
+[ext_resource type="Resource" path="res://content/props/sofa_01/sofa_01_def.tres" id="21_sofa_def"]
+[ext_resource type="PackedScene" path="res://content/props/table_round_01/table_round_01.tscn" id="22_table"]
+[ext_resource type="Resource" path="res://content/props/table_round_01/table_round_01_def.tres" id="23_table_def"]
+[ext_resource type="PackedScene" path="res://content/props/chair_01/chair_01.tscn" id="24_chair"]
+[ext_resource type="Resource" path="res://content/props/chair_01/chair_01_def.tres" id="25_chair_def"]
+[ext_resource type="PackedScene" path="res://content/props/rug_rect_01/rug_rect_01.tscn" id="26_rug_rect"]
+[ext_resource type="Resource" path="res://content/props/rug_rect_01/rug_rect_01_def.tres" id="27_rug_rect_def"]
+[ext_resource type="PackedScene" path="res://content/props/poster_01/poster_01.tscn" id="28_poster"]
+[ext_resource type="Resource" path="res://content/props/poster_01/poster_01_def.tres" id="29_poster_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -21,7 +37,7 @@ size = Vector2(48, 32)
 script = ExtResource("1_layout")
 scene_id = "fae_house_01"
 default_spawn_id = "spawn_default"
-base_walkmask_path = ""
+base_walkmask_path = "res://content/scenes/fae_house_01/base_walkmask.png"
 
 [node name="Ground" type="Sprite2D" parent="."]
 texture = ExtResource("2_ground")
@@ -30,13 +46,45 @@ position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
 
-[node name="Bench01" parent="Props" instance=ExtResource("6_bench")]
-prop_def = ExtResource("8_bench_def")
-position = Vector2(320, 300)
+[node name="BedSingle01" parent="Props" instance=ExtResource("10_bed")]
+prop_def = ExtResource("11_bed_def")
+position = Vector2(360, 520)
 
-[node name="Lamp01" parent="Props" instance=ExtResource("7_lamp")]
-prop_def = ExtResource("9_lamp_def")
-position = Vector2(460, 320)
+[node name="Desk01" parent="Props" instance=ExtResource("12_desk")]
+prop_def = ExtResource("13_desk_def")
+position = Vector2(200, 300)
+
+[node name="Bookshelf01" parent="Props" instance=ExtResource("14_bookshelf")]
+prop_def = ExtResource("15_bookshelf_def")
+position = Vector2(500, 200)
+
+[node name="RugRound01" parent="Props" instance=ExtResource("16_rug")]
+prop_def = ExtResource("17_rug_def")
+position = Vector2(600, 400)
+
+[node name="Dresser01" parent="Props" instance=ExtResource("18_dresser")]
+prop_def = ExtResource("19_dresser_def")
+position = Vector2(520, 560)
+
+[node name="Sofa01" parent="Props" instance=ExtResource("20_sofa")]
+prop_def = ExtResource("21_sofa_def")
+position = Vector2(700, 520)
+
+[node name="TableRound01" parent="Props" instance=ExtResource("22_table")]
+prop_def = ExtResource("23_table_def")
+position = Vector2(640, 440)
+
+[node name="Chair01" parent="Props" instance=ExtResource("24_chair")]
+prop_def = ExtResource("25_chair_def")
+position = Vector2(700, 440)
+
+[node name="RugRect01" parent="Props" instance=ExtResource("26_rug_rect")]
+prop_def = ExtResource("27_rug_rect_def")
+position = Vector2(640, 480)
+
+[node name="Poster01" parent="Props" instance=ExtResource("28_poster")]
+prop_def = ExtResource("29_poster_def")
+position = Vector2(600, 160)
 
 [node name="Markers" type="Node2D" parent="."]
 
@@ -48,17 +96,25 @@ size_px = Vector2i(16, 16)
 decal_z_index = -2
 position = Vector2(320, 360)
 
+[node name="Decal_Sparkle" type="Node2D" parent="Markers"]
+script = ExtResource("6_decal")
+decal_id = "sparkle_01"
+texture_path = "res://content/decals/sparkle_01.png"
+size_px = Vector2i(16, 16)
+decal_z_index = -2
+position = Vector2(520, 420)
+
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")
 spawn_id = "spawn_default"
-position = Vector2(140, 160)
+position = Vector2(820, 640)
 
 [node name="Hotspot_Bed" type="Area2D" parent="Markers"]
 script = ExtResource("4_hotspot")
 hotspot_id = "bed"
 hotspot_type = "talk"
 text = "The bed looks cozy."
-position = Vector2(260, 200)
+position = Vector2(360, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Bed"]
 shape = SubResource("1_hotspot_circle")
@@ -68,7 +124,7 @@ script = ExtResource("5_exit")
 exit_id = "to_town"
 target_scene_id = "town_square_01"
 target_spawn_id = "spawn_default"
-position = Vector2(84, 636)
+position = Vector2(845, 650)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Town"]
 shape = SubResource("2_exit_town")

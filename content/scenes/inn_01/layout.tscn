@@ -32,6 +32,7 @@ position = Vector2(0, 0)
 
 [node name="Bench01" parent="Props" instance=ExtResource("6_bench")]
 prop_def = ExtResource("8_bench_def")
+variant = 1
 position = Vector2(320, 300)
 
 [node name="Crate01" parent="Props" instance=ExtResource("7_crate")]
@@ -48,6 +49,14 @@ texture_path = "res://content/decals/sparkle_01.png"
 size_px = Vector2i(16, 16)
 decal_z_index = -2
 position = Vector2(360, 360)
+
+[node name="Decal_Leaf" type="Node2D" parent="Markers"]
+script = ExtResource("6_decal")
+decal_id = "leaf_01"
+texture_path = "res://content/decals/leaf_01.png"
+size_px = Vector2i(16, 16)
+decal_z_index = -2
+position = Vector2(480, 360)
 
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")

@@ -52,6 +52,10 @@ static func load_from_scene_folder(folder_path: String) -> Blueprint:
 	var assets_data: Dictionary = data["assets"]
 	if not _require_key(assets_data, "ground"):
 		return null
+	if not _require_key(assets_data, "plate_base"):
+		return null
+	if not _require_key(assets_data, "plate_overhang"):
+		return null
 	if not _require_key(assets_data, "walkmask_raw"):
 		return null
 	if not _require_key(assets_data, "walkmask_player"):
@@ -60,6 +64,8 @@ static func load_from_scene_folder(folder_path: String) -> Blueprint:
 		return null
 	var normalized_assets: Dictionary = {}
 	normalized_assets["ground"] = _normalize_path(folder_path, assets_data["ground"])
+	normalized_assets["plate_base"] = _normalize_path(folder_path, assets_data["plate_base"])
+	normalized_assets["plate_overhang"] = _normalize_path(folder_path, assets_data["plate_overhang"])
 	normalized_assets["walkmask_raw"] = _normalize_path(folder_path, assets_data["walkmask_raw"])
 	normalized_assets["walkmask_player"] = _normalize_path(folder_path, assets_data["walkmask_player"])
 	normalized_assets["navpoly"] = _normalize_path(folder_path, assets_data["navpoly"])
@@ -103,6 +109,10 @@ static func load_from_scene_folder(folder_path: String) -> Blueprint:
 		normalized_prop["def"] = _normalize_path(folder_path, prop_data["def"])
 		normalized_prop["pos"] = Vector2(float(pos_arr[0]), float(pos_arr[1]))
 		normalized_prop["variant"] = int(prop_data.get("variant", 0))
+		var bake_value: String = str(prop_data.get("bake", "static")).strip_edges().to_lower()
+		if bake_value != "static" and bake_value != "live":
+			bake_value = "static"
+		normalized_prop["bake"] = bake_value
 		blueprint.props.append(normalized_prop)
 
 	if typeof(data["decals"]) != TYPE_ARRAY:

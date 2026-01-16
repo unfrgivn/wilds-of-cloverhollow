@@ -9,3 +9,5 @@ class_name PropDef
 @export var footprint_mask: Texture2D
 @export var footprint_anchor_px: Vector2i = Vector2i.ZERO
 @export var has_overhang: bool = false
+@export_enum("static", "live") var default_bake_mode: String = "static"
+@export_enum("PROP", "BUILDING", "ROOM_SHELL", "WALL", "DECAL") var category: String = "PROP"

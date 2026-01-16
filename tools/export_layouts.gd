@@ -6,6 +6,8 @@ const BAKED_DIR: String = "_baked"
 const WALKMASK_RAW: String = "walkmask_raw.png"
 const WALKMASK_PLAYER: String = "walkmask_player.png"
 const NAVPOLY_PATH: String = "navpoly.tres"
+const PLATE_BASE: String = "plate_base.png"
+const PLATE_OVERHANG: String = "plate_overhang.png"
 
 const LAYOUT_ROOT_SCRIPT: Script = preload("res://game/tools/layout_root.gd")
 const SPAWN_MARKER_SCRIPT: Script = preload("res://game/tools/markers/spawn_marker_2d.gd")
@@ -60,13 +62,13 @@ func _export_scene(scene_id: String) -> void:
 	if layout_root == null:
 		push_error("[Export] LayoutRoot missing in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	var scene_id_value: String = str(layout_root.get("scene_id"))
 	if scene_id_value.strip_edges() == "":
 		push_error("[Export] LayoutRoot.scene_id missing in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	var default_spawn_id: String = str(layout_root.get("default_spawn_id"))
 	var base_walkmask_path: String = str(layout_root.get("base_walkmask_path")).strip_edges()
@@ -75,63 +77,65 @@ func _export_scene(scene_id: String) -> void:
 	if ground_sprite == null:
 		push_error("[Export] Missing Ground Sprite2D in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	if ground_sprite.texture == null:
 		push_error("[Export] Ground texture missing in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	if ground_sprite.texture.resource_path == "":
 		push_error("[Export] Ground texture must be saved to disk in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	var ground_size: Vector2i = Vector2i(int(ground_sprite.texture.get_width()), int(ground_sprite.texture.get_height()))
 	if ground_size.x <= 0 or ground_size.y <= 0:
 		push_error("[Export] Ground texture has invalid size in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 
 	var spawn_marker: Node = _find_spawn_marker(layout_root, default_spawn_id)
 	if spawn_marker == null:
 		push_error("[Export] No SpawnMarker2D found in %s" % layout_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	var spawn_id: String = str(spawn_marker.get("spawn_id"))
 	var spawn_pos: Vector2i = _round_vector2((spawn_marker as Node2D).global_position)
 
 	var props: Array[Dictionary] = _collect_props(layout_root)
 	if _had_failure:
-		instance.queue_free()
+		instance.free()
 		return
 	props.sort_custom(_sort_props)
 
 	var decals: Array[Dictionary] = _collect_decals(layout_root)
 	if _had_failure:
-		instance.queue_free()
+		instance.free()
 		return
 	decals.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a["id"]) < str(b["id"]))
 
 	var hotspots: Array[Dictionary] = _collect_hotspots(layout_root)
 	if _had_failure:
-		instance.queue_free()
+		instance.free()
 		return
 	hotspots.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a["id"]) < str(b["id"]))
 
 	var exits: Array[Dictionary] = _collect_exits(layout_root)
 	if _had_failure:
-		instance.queue_free()
+		instance.free()
 		return
 	exits.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a["id"]) < str(b["id"]))
 
 	var assets: Dictionary = {}
 	assets["ground"] = ground_sprite.texture.resource_path
+	assets["plate_base"] = scene_folder.path_join(BAKED_DIR).path_join(PLATE_BASE)
+	assets["plate_overhang"] = scene_folder.path_join(BAKED_DIR).path_join(PLATE_OVERHANG)
 	if base_walkmask_path != "":
 		assets["base_walkmask"] = base_walkmask_path
 	assets["walkmask_raw"] = scene_folder.path_join(BAKED_DIR).path_join(WALKMASK_RAW)
@@ -158,7 +162,7 @@ func _export_scene(scene_id: String) -> void:
 	if file == null:
 		push_error("[Export] Failed to write %s" % output_path)
 		_had_failure = true
-		instance.queue_free()
+		instance.free()
 		return
 	file.store_string(json_text)
 	file.close()
@@ -169,7 +173,7 @@ func _export_scene(scene_id: String) -> void:
 		hotspots.size(),
 		exits.size()
 	])
-	instance.queue_free()
+	instance.free()
 
 func _find_layout_root(root: Node) -> Node:
 	if _node_has_script(root, LAYOUT_ROOT_SCRIPT):
@@ -206,12 +210,27 @@ func _collect_props(layout_root: Node) -> Array[Dictionary]:
 		var variant: int = 0
 		if typeof(variant_value) == TYPE_INT:
 			variant = int(variant_value)
+		var bake_mode: String = _resolve_bake_mode(prop_node, prop_def)
 		props.append({
 			"def": prop_def.resource_path,
 			"pos": [pos.x, pos.y],
-			"variant": variant
+			"variant": variant,
+			"bake": bake_mode
 		})
 	return props
+
+func _resolve_bake_mode(prop_node: Node, prop_def: Resource) -> String:
+	var override_value: Variant = prop_node.get("bake_mode")
+	if typeof(override_value) == TYPE_STRING:
+		var override_text: String = str(override_value).strip_edges().to_lower()
+		if override_text == "static" or override_text == "live":
+			return override_text
+	if prop_def is PropDef:
+		var def: PropDef = prop_def
+		var def_value: String = str(def.default_bake_mode).strip_edges().to_lower()
+		if def_value == "static" or def_value == "live":
+			return def_value
+	return "static"
 
 func _collect_decals(layout_root: Node) -> Array[Dictionary]:
 	var decals: Array[Dictionary] = []

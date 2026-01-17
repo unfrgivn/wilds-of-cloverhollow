@@ -169,6 +169,16 @@
       "text": "The bed looks cozy."
     },
     {
+      "id": "bookshelf",
+      "type": "check",
+      "pos": [
+        500,
+        320
+      ],
+      "radius": 18,
+      "text": "A shelf full of storybooks and science fair trophies."
+    },
+    {
       "id": "desk",
       "type": "check",
       "pos": [

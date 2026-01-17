@@ -140,6 +140,26 @@
       ],
       "radius": 18,
       "text": "The arcade glows softly."
+    },
+    {
+      "id": "claw_machine",
+      "type": "play",
+      "pos": [
+        500,
+        340
+      ],
+      "radius": 18,
+      "text": "The claw machine hums patiently."
+    },
+    {
+      "id": "gumball_machine",
+      "type": "check",
+      "pos": [
+        760,
+        300
+      ],
+      "radius": 18,
+      "text": "A gumball machine, mostly empty."
     }
   ],
   "exits": [

@@ -114,6 +114,26 @@ position = Vector2(280, 320)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Arcade"]
 shape = SubResource("1_hotspot_circle")
 
+[node name="Hotspot_Claw" type="Area2D" parent="Markers"]
+script = ExtResource("4_hotspot")
+hotspot_id = "claw_machine"
+hotspot_type = "play"
+text = "The claw machine hums patiently."
+position = Vector2(500, 340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Claw"]
+shape = SubResource("1_hotspot_circle")
+
+[node name="Hotspot_Gumball" type="Area2D" parent="Markers"]
+script = ExtResource("4_hotspot")
+hotspot_id = "gumball_machine"
+hotspot_type = "check"
+text = "A gumball machine, mostly empty."
+position = Vector2(760, 300)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Gumball"]
+shape = SubResource("1_hotspot_circle")
+
 [node name="Exit_Town" type="Area2D" parent="Markers"]
 script = ExtResource("5_exit")
 exit_id = "to_town"

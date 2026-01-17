@@ -167,6 +167,16 @@
       ],
       "radius": 18,
       "text": "The bed looks cozy."
+    },
+    {
+      "id": "desk",
+      "type": "check",
+      "pos": [
+        200,
+        340
+      ],
+      "radius": 18,
+      "text": "A stack of sketches and half-finished ideas."
     }
   ],
   "exits": [

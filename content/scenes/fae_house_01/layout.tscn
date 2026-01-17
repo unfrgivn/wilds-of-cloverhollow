@@ -131,6 +131,16 @@ position = Vector2(360, 560)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Bed"]
 shape = SubResource("1_hotspot_circle")
 
+[node name="Hotspot_Desk" type="Area2D" parent="Markers"]
+script = ExtResource("4_hotspot")
+hotspot_id = "desk"
+hotspot_type = "check"
+text = "A stack of sketches and half-finished ideas."
+position = Vector2(200, 340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Desk"]
+shape = SubResource("1_hotspot_circle")
+
 [node name="Exit_Town" type="Area2D" parent="Markers"]
 script = ExtResource("5_exit")
 exit_id = "to_town"

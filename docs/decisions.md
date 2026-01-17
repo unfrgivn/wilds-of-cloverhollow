@@ -13,6 +13,12 @@
 - Material library writes placeholder 1x1 images when design kit textures are missing.
 - Placeholder design-kit textures generated at `128x128` in `art/design_kit/` (wood/stone/plaster/roof) until real textures are provided.
 
+## 2026-01-17 — Concept-derived design kit textures
+
+- Generated watercolor design-kit textures from `references/legacy_art/reference/concepts/` palettes.
+- Files: `wood_planks_a.png`, `stone_blocks_a.png`, `roof_tile_a.png` at `1024×1024`, `plaster_a.png` at `1408×768`.
+- Converted generated JPEG outputs to PNG via `sips` to satisfy Godot import requirements.
+
 ## 2026-01-16 — Path B pipeline defaults
 
 - **Plate baking implementation**: use `tools/bake_scene_plates.gd` (Godot Image API) for deterministic compositing without adding a Python/PIL dependency.

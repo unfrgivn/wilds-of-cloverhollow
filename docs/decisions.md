@@ -20,6 +20,8 @@
 - Converted generated JPEG outputs to PNG via `sips` to satisfy Godot import requirements.
 - Added variant B textures: `wood_planks_b.png`, `stone_blocks_b.png`, `plaster_b.png`, `roof_tile_b.png` from the same palette.
 - Design-kit UV tiling scales: wood `4x`, stone `3x`, plaster `2x`, roof tiles `5x`.
+- Added solid utility materials for trims and windows: `MAT_TRIM_LIGHT`, `MAT_TRIM_DARK`, `MAT_WINDOW_GLASS`, `MAT_DOOR_WOOD`.
+- Generated new `town_square_01/ground.png` from concept palette and converted the JPEG output to `1280x720` PNG via `sips`.
 
 ## 2026-01-16 — Path B pipeline defaults
 

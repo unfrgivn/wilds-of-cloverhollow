@@ -69,6 +69,12 @@ Optional variants:
 - `MAT_PLASTER_B` → `art/design_kit/plaster_b.*`
 - `MAT_ROOF_TILE_B` → `art/design_kit/roof_tile_b.*`
 
+Utility solids:
+- `MAT_TRIM_LIGHT` (light trim)
+- `MAT_TRIM_DARK` (dark trim)
+- `MAT_WINDOW_GLASS` (window fill)
+- `MAT_DOOR_WOOD` (door fill)
+
 If the design kit textures are missing, the pipeline uses generated `128x128` placeholders under `art/design_kit/`.
 
 ## Blender export commands

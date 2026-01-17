@@ -66,6 +66,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/lamp_01/lamp_01_def.tres",
+      "pos": [
+        260,
+        260
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/poster_01/poster_01_def.tres",
       "pos": [
         600,

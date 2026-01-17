@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/fae_house_01/ground.png" id="2_ground"]
@@ -28,6 +28,8 @@
 [ext_resource type="Resource" path="res://content/props/poster_01/poster_01_def.tres" id="29_poster_def"]
 [ext_resource type="PackedScene" path="res://content/props/room_shell_fae_house_01/room_shell_fae_house_01.tscn" id="30_room_shell"]
 [ext_resource type="Resource" path="res://content/props/room_shell_fae_house_01/room_shell_fae_house_01_def.tres" id="31_room_shell_def"]
+[ext_resource type="PackedScene" path="res://content/props/lamp_01/lamp_01.tscn" id="32_lamp"]
+[ext_resource type="Resource" path="res://content/props/lamp_01/lamp_01_def.tres" id="33_lamp_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -59,6 +61,10 @@ position = Vector2(360, 520)
 [node name="Desk01" parent="Props" instance=ExtResource("12_desk")]
 prop_def = ExtResource("13_desk_def")
 position = Vector2(200, 300)
+
+[node name="Lamp01" parent="Props" instance=ExtResource("32_lamp")]
+prop_def = ExtResource("33_lamp_def")
+position = Vector2(260, 260)
 
 [node name="Bookshelf01" parent="Props" instance=ExtResource("14_bookshelf")]
 prop_def = ExtResource("15_bookshelf_def")

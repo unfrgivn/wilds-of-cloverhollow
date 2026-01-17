@@ -15,8 +15,8 @@
   "player_spawn": {
     "id": "spawn_default",
     "pos": [
-      820,
-      640
+      520,
+      420
     ]
   },
   "props": [
@@ -163,7 +163,7 @@
       "type": "talk",
       "pos": [
         360,
-        600
+        560
       ],
       "radius": 18,
       "text": "The bed looks cozy."
@@ -173,8 +173,8 @@
     {
       "id": "to_town",
       "rect": [
-        821,
-        634,
+        496,
+        584,
         48,
         32
       ],

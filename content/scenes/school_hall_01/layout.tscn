@@ -90,7 +90,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "trophy_case"
 hotspot_type = "talk"
 text = "The trophy case glints."
-position = Vector2(320, 300)
+position = Vector2(280, 320)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_School"]
 shape = SubResource("1_hotspot_circle")
@@ -100,7 +100,7 @@ script = ExtResource("5_exit")
 exit_id = "to_town"
 target_scene_id = "town_square_01"
 target_spawn_id = "spawn_default"
-position = Vector2(84, 636)
+position = Vector2(520, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Town"]
 shape = SubResource("2_exit_town")

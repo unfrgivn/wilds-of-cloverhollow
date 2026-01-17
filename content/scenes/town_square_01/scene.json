@@ -25,7 +25,7 @@
       "def": "res://content/props/barrel_01/barrel_01_def.tres",
       "pos": [
         420,
-        380
+        520
       ],
       "variant": 0,
       "bake": "static"
@@ -204,6 +204,16 @@
     }
   ],
   "hotspots": [
+    {
+      "id": "barrel",
+      "type": "check",
+      "pos": [
+        420,
+        560
+      ],
+      "radius": 18,
+      "text": "A barrel that smells faintly of cider."
+    },
     {
       "id": "bench",
       "type": "check",

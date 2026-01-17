@@ -127,7 +127,7 @@ position = Vector2(260, 320)
 
 [node name="Barrel01" parent="Props" instance=ExtResource("60_barrel")]
 prop_def = ExtResource("61_barrel_def")
-position = Vector2(420, 380)
+position = Vector2(420, 520)
 
 [node name="Signpost01" parent="Props" instance=ExtResource("62_signpost")]
 prop_def = ExtResource("63_signpost_def")
@@ -196,6 +196,16 @@ text = "The bench is warm from the afternoon sun."
 position = Vector2(360, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Bench"]
+shape = SubResource("1_hotspot_circle")
+
+[node name="Hotspot_Barrel" type="Area2D" parent="Markers"]
+script = ExtResource("4_hotspot")
+hotspot_id = "barrel"
+hotspot_type = "check"
+text = "A barrel that smells faintly of cider."
+position = Vector2(420, 560)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Barrel"]
 shape = SubResource("1_hotspot_circle")
 
 [node name="Exit_Inn" type="Area2D" parent="Markers"]

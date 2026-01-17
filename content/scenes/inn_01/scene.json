@@ -57,6 +57,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/poster_01/poster_01_def.tres",
+      "pos": [
+        640,
+        200
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/room_shell_inn_01/room_shell_inn_01_def.tres",
       "pos": [
         520,

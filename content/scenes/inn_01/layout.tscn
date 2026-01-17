@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/inn_01/ground.png" id="2_ground"]
@@ -20,6 +20,8 @@
 [ext_resource type="Resource" path="res://content/props/rug_rect_01/rug_rect_01_def.tres" id="17_rug_rect_def"]
 [ext_resource type="PackedScene" path="res://content/props/lamp_01/lamp_01.tscn" id="18_lamp"]
 [ext_resource type="Resource" path="res://content/props/lamp_01/lamp_01_def.tres" id="19_lamp_def"]
+[ext_resource type="PackedScene" path="res://content/props/poster_01/poster_01.tscn" id="20_poster"]
+[ext_resource type="Resource" path="res://content/props/poster_01/poster_01_def.tres" id="21_poster_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -69,6 +71,10 @@ position = Vector2(600, 420)
 [node name="Lamp01" parent="Props" instance=ExtResource("18_lamp")]
 prop_def = ExtResource("19_lamp_def")
 position = Vector2(700, 260)
+
+[node name="Poster01" parent="Props" instance=ExtResource("20_poster")]
+prop_def = ExtResource("21_poster_def")
+position = Vector2(640, 200)
 
 [node name="Markers" type="Node2D" parent="."]
 

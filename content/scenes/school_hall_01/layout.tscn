@@ -16,8 +16,8 @@
 [ext_resource type="Resource" path="res://content/props/rug_rect_01/rug_rect_01_def.tres" id="17_rug_rect_def"]
 [ext_resource type="PackedScene" path="res://content/props/poster_01/poster_01.tscn" id="18_poster"]
 [ext_resource type="Resource" path="res://content/props/poster_01/poster_01_def.tres" id="19_poster_def"]
-[ext_resource type="PackedScene" path="res://content/props/room_shell_school_01/room_shell_school_01.tscn" id="20_room_shell"]
-[ext_resource type="Resource" path="res://content/props/room_shell_school_01/room_shell_school_01_def.tres" id="21_room_shell_def"]
+[ext_resource type="PackedScene" path="res://content/props/school_hall_shell_01/school_hall_shell_01.tscn" id="20_school_shell"]
+[ext_resource type="Resource" path="res://content/props/school_hall_shell_01/school_hall_shell_01_def.tres" id="21_school_shell_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -38,8 +38,8 @@ position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
 
-[node name="SchoolRoomShell" parent="Props" instance=ExtResource("20_room_shell")]
-prop_def = ExtResource("21_room_shell_def")
+[node name="SchoolRoomShell" parent="Props" instance=ExtResource("20_school_shell")]
+prop_def = ExtResource("21_school_shell_def")
 position = Vector2(520, 640)
 
 [node name="TrophyCase01" parent="Props" instance=ExtResource("10_trophy")]

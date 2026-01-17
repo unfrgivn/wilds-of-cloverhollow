@@ -76,6 +76,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/house_01/house_01_def.tres",
+      "pos": [
+        420,
+        220
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/house_stone_01/house_stone_01_def.tres",
       "pos": [
         660,
@@ -89,15 +98,6 @@
       "pos": [
         780,
         320
-      ],
-      "variant": 0,
-      "bake": "static"
-    },
-    {
-      "def": "res://content/props/house_timber_02/house_timber_02_def.tres",
-      "pos": [
-        420,
-        220
       ],
       "variant": 0,
       "bake": "static"

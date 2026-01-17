@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PropDef" load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://content/props/house_01/visuals/_processed/base.png" id="1_5cwta"]
+[ext_resource type="Texture2D" path="res://content/props/house_01/footprints/block.png" id="2_v7c5m"]
+[ext_resource type="Texture2D" path="res://content/props/house_01/visuals/_processed/overhang.png" id="3_gr7oi"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="4_06i3h"]
+[ext_resource type="PackedScene" path="res://content/props/house_01/house_01.tscn" id="4_v7c5m"]
+
+[resource]
+script = ExtResource("4_06i3h")
+id = "house_01"
+prefab = ExtResource("4_v7c5m")
+base_textures = Array[Texture2D]([ExtResource("1_5cwta")])
+overhang_textures = Array[Texture2D]([ExtResource("3_gr7oi")])
+footprint_mask = ExtResource("2_v7c5m")
+footprint_anchor_px = Vector2i(256, 511)
+has_overhang = true

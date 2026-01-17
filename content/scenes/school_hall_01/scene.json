@@ -48,19 +48,19 @@
       "bake": "static"
     },
     {
-      "def": "res://content/props/room_shell_school_01/room_shell_school_01_def.tres",
+      "def": "res://content/props/rug_rect_01/rug_rect_01_def.tres",
       "pos": [
-        520,
-        640
+        640,
+        380
       ],
       "variant": 0,
       "bake": "static"
     },
     {
-      "def": "res://content/props/rug_rect_01/rug_rect_01_def.tres",
+      "def": "res://content/props/school_hall_shell_01/school_hall_shell_01_def.tres",
       "pos": [
-        640,
-        380
+        520,
+        640
       ],
       "variant": 0,
       "bake": "static"

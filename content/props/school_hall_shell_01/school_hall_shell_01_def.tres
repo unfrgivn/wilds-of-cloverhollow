@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PropDef" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://content/props/school_hall_shell_01/visuals/_processed/base.png" id="1_jobbj"]
+[ext_resource type="Texture2D" path="res://content/props/school_hall_shell_01/footprints/block.png" id="2_djxkb"]
+[ext_resource type="PackedScene" path="res://content/props/school_hall_shell_01/school_hall_shell_01.tscn" id="3_djxkb"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="3_m13fg"]
+
+[resource]
+script = ExtResource("3_m13fg")
+id = "school_hall_shell_01"
+prefab = ExtResource("3_djxkb")
+base_textures = Array[Texture2D]([ExtResource("1_jobbj")])
+footprint_mask = ExtResource("2_djxkb")
+footprint_anchor_px = Vector2i(256, 511)

@@ -15,6 +15,9 @@ dist/
 # Logs / reports
 report/
 
+# Generated prop processing outputs
+content/props/**/visuals/_processed/
+
 # Local-only reference screenshots (do not commit)
 art/reference/earthbound/*
 !art/reference/earthbound/README.md

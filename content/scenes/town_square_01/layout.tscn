@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=3]
+[gd_scene load_steps=55 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/town_square_01/ground.png" id="2_ground"]
@@ -48,6 +48,8 @@
 [ext_resource type="Resource" path="res://content/props/barrel_01/barrel_01_def.tres" id="61_barrel_def"]
 [ext_resource type="PackedScene" path="res://content/props/signpost_01/signpost_01.tscn" id="62_signpost"]
 [ext_resource type="Resource" path="res://content/props/signpost_01/signpost_01_def.tres" id="63_signpost_def"]
+[ext_resource type="PackedScene" path="res://content/props/house_01/house_01.tscn" id="64_house_01"]
+[ext_resource type="Resource" path="res://content/props/house_01/house_01_def.tres" id="65_house_01_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -77,8 +79,8 @@ position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
 
-[node name="Inn_Building" parent="Props" instance=ExtResource("42_house_t2")]
-prop_def = ExtResource("43_house_t2_def")
+[node name="Inn_Building" parent="Props" instance=ExtResource("64_house_01")]
+prop_def = ExtResource("65_house_01_def")
 position = Vector2(420, 220)
 
 [node name="School_Building" parent="Props" instance=ExtResource("50_school")]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=53 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/town_square_01/ground.png" id="2_ground"]
@@ -36,6 +36,18 @@
 [ext_resource type="Resource" path="res://content/props/shop_01/shop_01_def.tres" id="49_shop_def"]
 [ext_resource type="PackedScene" path="res://content/props/school_01_exterior/school_01_exterior.tscn" id="50_school"]
 [ext_resource type="Resource" path="res://content/props/school_01_exterior/school_01_exterior_def.tres" id="51_school_def"]
+[ext_resource type="PackedScene" path="res://content/props/bench_01/bench_01.tscn" id="52_bench"]
+[ext_resource type="Resource" path="res://content/props/bench_01/bench_01_def.tres" id="53_bench_def"]
+[ext_resource type="PackedScene" path="res://content/props/lamp_01/lamp_01.tscn" id="54_lamp"]
+[ext_resource type="Resource" path="res://content/props/lamp_01/lamp_01_def.tres" id="55_lamp_def"]
+[ext_resource type="PackedScene" path="res://content/props/tree_01/tree_01.tscn" id="56_tree"]
+[ext_resource type="Resource" path="res://content/props/tree_01/tree_01_def.tres" id="57_tree_def"]
+[ext_resource type="PackedScene" path="res://content/props/planter_01/planter_01.tscn" id="58_planter"]
+[ext_resource type="Resource" path="res://content/props/planter_01/planter_01_def.tres" id="59_planter_def"]
+[ext_resource type="PackedScene" path="res://content/props/barrel_01/barrel_01.tscn" id="60_barrel"]
+[ext_resource type="Resource" path="res://content/props/barrel_01/barrel_01_def.tres" id="61_barrel_def"]
+[ext_resource type="PackedScene" path="res://content/props/signpost_01/signpost_01.tscn" id="62_signpost"]
+[ext_resource type="Resource" path="res://content/props/signpost_01/signpost_01_def.tres" id="63_signpost_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -96,6 +108,30 @@ position = Vector2(240, 400)
 [node name="Fence_Right" parent="Props" instance=ExtResource("32_fence_s")]
 prop_def = ExtResource("33_fence_s_def")
 position = Vector2(280, 400)
+
+[node name="Tree01" parent="Props" instance=ExtResource("56_tree")]
+prop_def = ExtResource("57_tree_def")
+position = Vector2(120, 220)
+
+[node name="Bench01" parent="Props" instance=ExtResource("52_bench")]
+prop_def = ExtResource("53_bench_def")
+position = Vector2(360, 460)
+
+[node name="Lamp01" parent="Props" instance=ExtResource("54_lamp")]
+prop_def = ExtResource("55_lamp_def")
+position = Vector2(540, 460)
+
+[node name="Planter01" parent="Props" instance=ExtResource("58_planter")]
+prop_def = ExtResource("59_planter_def")
+position = Vector2(260, 320)
+
+[node name="Barrel01" parent="Props" instance=ExtResource("60_barrel")]
+prop_def = ExtResource("61_barrel_def")
+position = Vector2(420, 380)
+
+[node name="Signpost01" parent="Props" instance=ExtResource("62_signpost")]
+prop_def = ExtResource("63_signpost_def")
+position = Vector2(240, 440)
 
 [node name="Markers" type="Node2D" parent="."]
 

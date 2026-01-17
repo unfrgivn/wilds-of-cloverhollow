@@ -30,6 +30,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/chair_01/chair_01_def.tres",
+      "pos": [
+        600,
+        420
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/crate_01/crate_01_def.tres",
       "pos": [
         440,
@@ -39,10 +48,37 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/lamp_01/lamp_01_def.tres",
+      "pos": [
+        700,
+        260
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/room_shell_inn_01/room_shell_inn_01_def.tres",
       "pos": [
         520,
         640
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/rug_rect_01/rug_rect_01_def.tres",
+      "pos": [
+        520,
+        440
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/table_01/table_01_def.tres",
+      "pos": [
+        520,
+        420
       ],
       "variant": 0,
       "bake": "static"

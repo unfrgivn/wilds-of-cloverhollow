@@ -11,3 +11,13 @@
 
 - Remove generated logs and artifacts created by headless runs.
 - Keep tracked `.uid` files intact; leave existing untracked content alone unless it was explicitly created for Path B.
+
+## 2026-01-16 — Blender sprite factory baseline
+
+- Use Blender as the source of truth for prop/building/room shell sprites.
+- Enforce transparent PNG exports with orthographic camera and bottom-center anchoring.
+
+## 2026-01-16 — Placeholder reset for Path B
+
+- Regenerate placeholder prop packages for all layout references via `tools/generate_path_b_props.gd`.
+- Ground-only generator writes a fully-walkable `base_walkmask.png` for town square.

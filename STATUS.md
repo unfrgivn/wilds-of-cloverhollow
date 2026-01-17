@@ -1,12 +1,14 @@
 # Status
 
 ## Current
-- Path B pipeline stages added (crop, plate bake) and runtime loads plates.
-- New placeholder building and room shell props generated for Path B.
-- `town_square_01`, `arcade_01`, and `school_hall_01` layouts updated to use building/room shell props.
-- Ground plates regenerated for town, arcade, and school hall.
+- Reset visuals to start fresh with Blender sprite factory pipeline.
+- Placeholder props regenerated (buildings, rooms, core furniture set).
+- Ground-only plates regenerated with walkable base mask.
+- Art QA blocks opaque backgrounds and checkerboards.
+- Path B pipeline remains in place (crop, plate bake, plate rendering).
+- Layouts use building/room shell props for Path B.
 
 ## Next
-- Run `tools/build_content.gd` to regenerate scene.json, plates, walkmasks, and navpolys.
-- Review baked `plate_base.png`/`plate_overhang.png` for cohesion and adjust prop positions/colors.
-- Tighten interactive prop bake modes (live vs static) as interactions are finalized.
+- Regenerate placeholder props and ground-only plates.
+- Run `tools/build_content.gd` to rebuild scene.json, plates, walkmasks, and navpolys.
+- Swap placeholder props with Blender exports as they are produced.

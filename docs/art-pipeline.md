@@ -1,146 +1,63 @@
-# Art Pipeline — nano banana (image generation) → Godot 4.5 assets
+# Art Pipeline — Blender Sprite Factory → Godot 4.5 assets
 
-This project uses an external image generation tool (“nano banana” via the user’s image tool) to generate:
-- characters / NPCs
-- environment backdrops (interiors/exteriors)
-- props and item icons
-- UI elements
-
-The repository’s responsibility is to keep this repeatable:
-- store prompts + constraints
-- store chosen outputs
-- document import/slicing conventions for Godot
+This project uses Blender as the sprite factory for all props, buildings, room shells, and UI art. The goal is consistent, repeatable, transparent PNG output that feeds the Path B pipeline.
 
 ## 1. Folder layout (recommended)
 
-- `art/prompts/`
-  - prompt templates (markdown/yaml)
-  - constraints per asset type
-- `art/source/`
-  - raw tool outputs (high-res PNG)
+- `art/blender/`
+  - `.blend` source files
+  - per‑asset collections
 - `art/exports/`
-  - game-ready PNGs (cropped, transparent, sized)
+  - final PNG exports (RGBA, transparent)
+- `content/props/`
+  - prop packages (used by the prototype)
 - `content/scenes/`
-  - scene-ready PNGs used by the prototype
+  - scene assets (ground plates and baked outputs)
 
-Note: `references/legacy_art/reference/concepts/` contains the target style samples.
+## 2. Blender export settings (required)
 
-## 2. Generation constraints (critical)
+### 2.1 Scene + render
+- **Render engine**: Eevee or Cycles (consistent per asset set)
+- **Color management**: View Transform = Standard
+- **Film**: Transparent = ON
+- **Output**: PNG, RGBA, 8‑bit
+- **Resolution**: fixed per asset class (document in the `.blend` file)
 
-To avoid “almost usable” art, bake these constraints into prompts:
+### 2.2 Camera + anchoring
+- **Camera**: Orthographic
+- **Anchor convention**: prop feet/contact point at `(0,0,0)`
+- **Bottom‑center alignment**: the prop’s feet align to the bottom‑center of the image
+- **Consistent scale**: 1 world unit = 1 pixel in Godot
 
-### 2.1 Characters/NPCs
-- Transparent background
-- Consistent neutral lighting (no dramatic cast shadows)
-- Keep silhouette clean (no wispy edges)
-- Maintain consistent head/torso proportions across frames
-- Provide **4 directions**: front, back, left, right
-- Provide **walk cycle** frames: idle + step1 + step2 (minimum)
-- Keep the feet aligned to a consistent baseline (for ground contact)
+### 2.3 Naming
+- `prop_id_base.png`
+- `prop_id_overhang.png`
+- `prop_id_shadow.png` (optional)
 
-Output format suggestion:
-- sprite sheet: 4 rows (directions) × 3 columns (idle/step/step)
-- or separate PNGs per frame with consistent canvas size
+## 3. Export checklist (hard requirements)
 
-### 2.2 Interiors (rooms)
-Two acceptable styles:
-1) Single backdrop image (room “diorama”) + colliders + hotspots
-2) Modular prop kit placed in-engine
+- PNG has true alpha, no checkerboard background
+- No opaque background or black/white boxes
+- Crop to alpha bounds with `ART_PADDING_PX` padding
+- Overhang sprites only contain draw‑over elements
 
-For speed, prefer (1) for the demo.
+## 4. Import into prop packages
 
-Constraints:
-- Keep floors readable (clear plane, minimal high-frequency texture)
-- Leave a navigable lane between doorways and key interactables
-- Avoid extreme perspective distortion (player must “fit”)
-- Target output size: 1280×720 for backdrops unless otherwise specified
+For each prop package:
+- Copy PNGs into `content/props/<prop_id>/visuals/`
+- Ensure `base.png` and `overhang.png` are transparent
+- Keep `footprints/block.png` authoritative for collisions
 
-### 2.3 Props / icons
-- Transparent background
-- Sticker-outline optional, but consistent
-- Limit micro-detail (icons must read at small sizes)
-- Export at multiple scales if needed (e.g., 64×64, 128×128)
+## 5. Ground plates (Path B)
 
-## 3. Godot import settings
+- `ground.png` must be **ground only** (dirt, grass, paths, puddles)
+- **No buildings, walls, furniture, or vertical art** on `ground.png`
 
-Current defaults (project-wide):
-- `rendering/textures/canvas_textures/default_texture_filter = Linear`
-- `importer_defaults/texture/mipmaps/generate = false`
+## 6. Validation gates
 
-Recommended options:
-- If using a low-res SubViewport: allow filtered textures but let the SubViewport provide coherence.
-- If using true pixel art: switch the default filter to Nearest and keep mipmaps off.
+Before committing new art:
+- Run `godot --headless --quit --script res://tools/crop_prop_images.gd`
+- Run `godot --headless --quit --script res://tools/qa_art.gd`
+- Run `godot --headless --quit --script res://tools/bake_scene_plates.gd`
 
-## 4. Prompt templates
-
-You should store prompts in `art/prompts/` and treat them like code.
-
-### 4.1 Fae exploration sprite sheet (example prompt)
-- “Create a 2D game sprite sheet of a child adventurer named Fae in a cozy watercolor sticker style.
-   Provide 4 directions (front, back, left, right), each with 3 frames (idle, step1, step2).
-   Transparent background. Consistent character scale and baseline alignment. Simple shading.
-   Outfit: purple hoodie, shorts, sneakers, glittery backpack with star/heart stickers.
-   Canvas: 768×1024, arranged in a 4×3 grid with equal cell sizes.”
-
-### 4.2 Arcade interior backdrop (example prompt)
-- “Create a cozy cutaway arcade interior diorama in soft watercolor style, angled top-down.
-   Include neon signs, 6 arcade cabinets, claw machine, ticket counter, gumball machines.
-   Leave a clear walkable lane from the entrance to the counter.
-   No characters. No text except simple signage shapes. Output as a single PNG backdrop.”
-
-### 4.3 School hall backdrop (example prompt)
-- “Create a cutaway school hallway interior, soft warm lighting, lockers, bulletin board,
-   trophy case, and two doors. Leave a wide clear path through the center.
-   Output as a single PNG with no characters.”
-
-## 5. Acceptance checks before importing
-
-For each generated asset:
-- Is the background actually transparent where expected?
-- Is the scale consistent with existing assets?
-- Are edges clean enough for in-game compositing?
-- Does it read well when downscaled to the game’s internal resolution?
-
-## 6. Optional: “retro filter” toggle
-
-If the team wants a more SNES-like presentation while keeping this art style:
-- render world to a low-resolution `SubViewport`
-- scale up with nearest-neighbor
-- optionally apply a very mild posterize/palette shader (only if it improves readability)
-
-## 7. Fixing "sticker outline" artifacts on sprites
-
-Generated NPC/character sprites sometimes have a thick white border baked into the artwork, making them look like stickers pasted on backgrounds. This is NOT a transparency issue; the white is painted into the art.
-
-### Detection
-Compare against a known-good sprite (e.g., `assets/sprites/npcs/kid/idle.png`):
-- Good: thin dark brown/sepia ink outline, true transparency, blends with background
-- Bad: thick white halo around character, looks "pasted on"
-
-### Fix: ImageMagick morphological erosion
-
-```bash
-# Remove ~8 pixel white sticker border
-magick input.png \
-  \( +clone -alpha extract -morphology Erode Disk:8 \) \
-  -compose CopyOpacity -composite \
-  output.png
-```
-
-**Erosion amounts:**
-- `Disk:4` — thin white borders
-- `Disk:8` — standard (most cases)
-- `Disk:12` — very thick borders
-
-### Post-fix Godot reimport
-
-```bash
-rm path/to/sprite.png.import
-godot --headless --path . --import
-```
-
-### Prevention
-Add to NPC generation prompts:
-- "TRUE transparent background (no checkerboard pattern)"
-- "NO white sticker outline or glow around edges"
-- "Thin dark brown/sepia ink outline only"
+If QA fails, the asset does not enter the repo.

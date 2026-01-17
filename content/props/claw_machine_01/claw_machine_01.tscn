@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/props/prop_instance.gd" id="1_instance"]
+[ext_resource type="Texture2D" path="res://content/props/claw_machine_01/visuals/base.png" id="2_base"]
+
+[node name="ClawMachine01" type="Node2D"]
+script = ExtResource("1_instance")
+
+[node name="ShadowSprite" type="Sprite2D" parent="."]
+z_index = -1
+
+[node name="BaseSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_base")

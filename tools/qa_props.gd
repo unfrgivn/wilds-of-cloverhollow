@@ -178,19 +178,16 @@ func _count_blocked_pixels(image: Image) -> int:
 	return count
 
 func _load_footprint_image(prop_path: String, texture: Texture2D) -> Image:
-	var image: Image = texture.get_image()
-	if image != null and image.get_width() > 0 and image.get_height() > 0:
-		return image
 	var footprint_path: String = texture.resource_path
 	if footprint_path == "":
 		_report_error("Footprint texture has no resource_path", prop_path, "footprint_mask")
 		return null
-	var fallback: Image = Image.new()
-	var error: Error = fallback.load(footprint_path)
-	if error != OK:
-		_report_error("Footprint load failed (get_image + load_from_file)", prop_path, "footprint_mask", footprint_path)
+	var absolute_path: String = ProjectSettings.globalize_path(footprint_path)
+	var image: Image = Image.load_from_file(absolute_path)
+	if image == null or image.is_empty():
+		_report_error("Footprint load failed (load_from_file)", prop_path, "footprint_mask", footprint_path)
 		return null
-	return fallback
+	return image
 
 func _list_dirs_sorted(folder: String) -> Array[String]:
 	var dir: DirAccess = DirAccess.open(folder)

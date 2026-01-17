@@ -46,3 +46,8 @@ res://content/props/<prop_id>/
 - `plate_base.png`: ground + static shadows + static base sprites
 - `plate_overhang.png`: static overhang sprites
 - `tools/bake_scene_plates.gd` produces both outputs deterministically.
+
+## Blender Sprite Factory
+- Author in Blender and export RGBA PNGs with transparent film.
+- Use orthographic camera and bottom-center anchoring (feet at world origin).
+- Name outputs consistently and run `crop_prop_images.gd` + `qa_art.gd` before bake.

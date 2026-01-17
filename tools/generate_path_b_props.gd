@@ -179,7 +179,432 @@ func _build_specs() -> Array[PropSpec]:
 		"ROOM_SHELL"
 	))
 
+	var cabinet_size: Vector2i = Vector2i(96, 140)
+	specs.append(PropSpec.new(
+		"arcade_cabinet_01",
+		cabinet_size,
+		Vector2i.ZERO,
+		Color(0.62, 0.72, 0.86, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		cabinet_size,
+		[_footprint_rect(cabinet_size, 32, padding)],
+		"static",
+		"PROP"
+	))
+
+	var cabinet_double_size: Vector2i = Vector2i(140, 140)
+	specs.append(PropSpec.new(
+		"arcade_cabinet_double_01",
+		cabinet_double_size,
+		Vector2i.ZERO,
+		Color(0.70, 0.60, 0.86, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		cabinet_double_size,
+		[_footprint_rect(cabinet_double_size, 32, padding)],
+		"static",
+		"PROP"
+	))
+
+	var claw_size: Vector2i = Vector2i(120, 160)
+	specs.append(PropSpec.new(
+		"claw_machine_01",
+		claw_size,
+		Vector2i.ZERO,
+		Color(0.85, 0.65, 0.75, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		claw_size,
+		[_footprint_rect(claw_size, 32, padding)],
+		"live",
+		"PROP"
+	))
+
+	var counter_size: Vector2i = Vector2i(200, 80)
+	specs.append(PropSpec.new(
+		"ticket_counter_01",
+		counter_size,
+		Vector2i.ZERO,
+		Color(0.78, 0.68, 0.62, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		counter_size,
+		[_footprint_rect(counter_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var gumball_size: Vector2i = Vector2i(64, 96)
+	specs.append(PropSpec.new(
+		"gumball_machine_01",
+		gumball_size,
+		Vector2i.ZERO,
+		Color(0.78, 0.76, 0.92, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		gumball_size,
+		[_footprint_rect(gumball_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var stool_size: Vector2i = Vector2i(48, 48)
+	specs.append(PropSpec.new(
+		"stool_01",
+		stool_size,
+		Vector2i.ZERO,
+		Color(0.72, 0.58, 0.48, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		stool_size,
+		[_footprint_rect(stool_size, 20, padding)],
+		"static",
+		"PROP"
+	))
+
+	var bed_size: Vector2i = Vector2i(160, 80)
+	specs.append(PropSpec.new(
+		"bed_single_01",
+		bed_size,
+		Vector2i.ZERO,
+		Color(0.86, 0.78, 0.84, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		bed_size,
+		[_footprint_rect(bed_size, 32, padding)],
+		"static",
+		"PROP"
+	))
+
+	var desk_size: Vector2i = Vector2i(120, 80)
+	specs.append(PropSpec.new(
+		"desk_01",
+		desk_size,
+		Vector2i.ZERO,
+		Color(0.76, 0.70, 0.60, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		desk_size,
+		[_footprint_rect(desk_size, 28, padding)],
+		"static",
+		"PROP"
+	))
+
+	var shelf_size: Vector2i = Vector2i(120, 140)
+	specs.append(PropSpec.new(
+		"bookshelf_01",
+		shelf_size,
+		Vector2i.ZERO,
+		Color(0.70, 0.64, 0.58, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		shelf_size,
+		[_footprint_rect(shelf_size, 32, padding)],
+		"static",
+		"PROP"
+	))
+
+	var rug_round_size: Vector2i = Vector2i(120, 120)
+	specs.append(PropSpec.new(
+		"rug_round_01",
+		rug_round_size,
+		Vector2i.ZERO,
+		Color(0.88, 0.80, 0.72, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		rug_round_size,
+		[],
+		"static",
+		"PROP"
+	))
+
+	var dresser_size: Vector2i = Vector2i(120, 80)
+	specs.append(PropSpec.new(
+		"dresser_01",
+		dresser_size,
+		Vector2i.ZERO,
+		Color(0.74, 0.68, 0.62, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		dresser_size,
+		[_footprint_rect(dresser_size, 28, padding)],
+		"static",
+		"PROP"
+	))
+
+	var sofa_size: Vector2i = Vector2i(180, 90)
+	specs.append(PropSpec.new(
+		"sofa_01",
+		sofa_size,
+		Vector2i.ZERO,
+		Color(0.78, 0.70, 0.76, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		sofa_size,
+		[_footprint_rect(sofa_size, 32, padding)],
+		"static",
+		"PROP"
+	))
+
+	var table_size: Vector2i = Vector2i(96, 96)
+	specs.append(PropSpec.new(
+		"table_round_01",
+		table_size,
+		Vector2i.ZERO,
+		Color(0.76, 0.68, 0.60, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		table_size,
+		[_footprint_rect(table_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var chair_size: Vector2i = Vector2i(56, 56)
+	specs.append(PropSpec.new(
+		"chair_01",
+		chair_size,
+		Vector2i.ZERO,
+		Color(0.70, 0.60, 0.50, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		chair_size,
+		[_footprint_rect(chair_size, 20, padding)],
+		"static",
+		"PROP"
+	))
+
+	var rug_rect_size: Vector2i = Vector2i(180, 120)
+	specs.append(PropSpec.new(
+		"rug_rect_01",
+		rug_rect_size,
+		Vector2i.ZERO,
+		Color(0.88, 0.82, 0.76, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		rug_rect_size,
+		[],
+		"static",
+		"PROP"
+	))
+
+	var poster_size: Vector2i = Vector2i(80, 60)
+	specs.append(PropSpec.new(
+		"poster_01",
+		poster_size,
+		Vector2i.ZERO,
+		Color(0.90, 0.76, 0.82, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		poster_size,
+		[],
+		"static",
+		"DECAL"
+	))
+
+	var trophy_size: Vector2i = Vector2i(160, 100)
+	specs.append(PropSpec.new(
+		"trophy_case_01",
+		trophy_size,
+		Vector2i.ZERO,
+		Color(0.82, 0.74, 0.62, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		trophy_size,
+		[_footprint_rect(trophy_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var locker_size: Vector2i = Vector2i(200, 120)
+	specs.append(PropSpec.new(
+		"locker_row_01",
+		locker_size,
+		Vector2i.ZERO,
+		Color(0.68, 0.78, 0.84, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		locker_size,
+		[_footprint_rect(locker_size, 28, padding)],
+		"static",
+		"PROP"
+	))
+
+	var bulletin_size: Vector2i = Vector2i(160, 80)
+	specs.append(PropSpec.new(
+		"bulletin_board_01",
+		bulletin_size,
+		Vector2i.ZERO,
+		Color(0.88, 0.78, 0.64, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		bulletin_size,
+		[],
+		"static",
+		"PROP"
+	))
+
+	var wall_size: Vector2i = Vector2i(128, 64)
+	specs.append(PropSpec.new(
+		"wall_straight_01",
+		wall_size,
+		Vector2i(128, 32),
+		Color(0.82, 0.76, 0.70, 1.0),
+		Color(0.60, 0.56, 0.50, 1.0),
+		true,
+		true,
+		wall_size,
+		[_footprint_rect(wall_size, 20, padding)],
+		"static",
+		"WALL"
+	))
+
+	specs.append(PropSpec.new(
+		"wall_window_01",
+		wall_size,
+		Vector2i(128, 32),
+		Color(0.80, 0.74, 0.70, 1.0),
+		Color(0.62, 0.58, 0.52, 1.0),
+		true,
+		true,
+		wall_size,
+		[_footprint_rect(wall_size, 20, padding)],
+		"static",
+		"WALL"
+	))
+
+	var door_size: Vector2i = Vector2i(64, 80)
+	specs.append(PropSpec.new(
+		"door_01",
+		door_size,
+		Vector2i.ZERO,
+		Color(0.62, 0.52, 0.44, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		door_size,
+		[_footprint_rect(door_size, 24, padding)],
+		"live",
+		"PROP"
+	))
+
+	var roof_size: Vector2i = Vector2i(128, 64)
+	specs.append(PropSpec.new(
+		"roof_straight_01",
+		roof_size,
+		Vector2i(128, 48),
+		Color(0.60, 0.50, 0.46, 1.0),
+		Color(0.48, 0.42, 0.38, 1.0),
+		false,
+		true,
+		roof_size,
+		[],
+		"static",
+		"BUILDING"
+	))
+
+	var sign_wall_size: Vector2i = Vector2i(64, 48)
+	specs.append(PropSpec.new(
+		"sign_wall_01",
+		sign_wall_size,
+		Vector2i.ZERO,
+		Color(0.90, 0.74, 0.62, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		sign_wall_size,
+		[],
+		"live",
+		"PROP"
+	))
+
+	var sign_round_size: Vector2i = Vector2i(64, 48)
+	specs.append(PropSpec.new(
+		"sign_round_01",
+		sign_round_size,
+		Vector2i.ZERO,
+		Color(0.86, 0.70, 0.74, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		sign_round_size,
+		[],
+		"live",
+		"PROP"
+	))
+
+	var fence_size: Vector2i = Vector2i(96, 48)
+	specs.append(PropSpec.new(
+		"fence_straight_01",
+		fence_size,
+		Vector2i.ZERO,
+		Color(0.70, 0.70, 0.74, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		fence_size,
+		[_footprint_rect(fence_size, 18, padding)],
+		"static",
+		"WALL"
+	))
+
+	var gate_size: Vector2i = Vector2i(64, 64)
+	specs.append(PropSpec.new(
+		"gate_single_01",
+		gate_size,
+		Vector2i.ZERO,
+		Color(0.64, 0.66, 0.70, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		gate_size,
+		[_footprint_rect(gate_size, 18, padding)],
+		"static",
+		"WALL"
+	))
+
+	var lantern_size: Vector2i = Vector2i(48, 64)
+	specs.append(PropSpec.new(
+		"wall_lantern_01",
+		lantern_size,
+		Vector2i.ZERO,
+		Color(0.90, 0.86, 0.70, 1.0),
+		Color(0, 0, 0, 0),
+		false,
+		false,
+		lantern_size,
+		[],
+		"static",
+		"PROP"
+	))
+
 	return specs
+
+func _footprint_rect(size: Vector2i, height: int, padding: int) -> Rect2i:
+	var width: int = max(1, size.x - padding * 2)
+	var rect_height: int = min(height, size.y - padding)
+	var y: int = max(0, size.y - rect_height - padding)
+	return Rect2i(padding, y, width, rect_height)
 
 func _generate_prop(spec: PropSpec) -> void:
 	var base_dir: String = PROP_ROOT.path_join(spec.id)

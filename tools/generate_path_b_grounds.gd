@@ -25,7 +25,7 @@ func _generate_town_square() -> void:
 	_save_png(image, SCENE_ROOT.path_join("town_square_01").path_join("ground.png"))
 
 	var walkmask: Image = Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)
-	walkmask.fill(Color(0, 0, 0, 0))
+	walkmask.fill(Color(1, 1, 1, 1))
 	_save_png(walkmask, SCENE_ROOT.path_join("town_square_01").path_join("base_walkmask.png"))
 
 func _generate_arcade() -> void:

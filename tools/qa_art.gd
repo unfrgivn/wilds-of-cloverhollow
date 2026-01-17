@@ -179,8 +179,12 @@ func _validate_checkerboard(image: Image, prop_path: String, label: String) -> v
 	if opaque_ratio < 0.9:
 		return
 	var dominant_ratio: float = _dominant_color_ratio(image)
-	if dominant_ratio > 0.6:
+	if dominant_ratio > 0.7:
 		_push_error("%s texture appears to have opaque background" % label, prop_path)
+		return
+	var top_two_ratio: float = _top_two_color_ratio(image)
+	if top_two_ratio > 0.75:
+		_push_error("%s texture appears to have baked checkerboard" % label, prop_path)
 
 func _has_alpha_channel(image: Image) -> bool:
 	var format: Image.Format = image.get_format()
@@ -223,6 +227,36 @@ func _dominant_color_ratio(image: Image) -> float:
 		if count > max_count:
 			max_count = count
 	return float(max_count) / float(total)
+
+func _top_two_color_ratio(image: Image) -> float:
+	var width: int = image.get_width()
+	var height: int = image.get_height()
+	if width == 0 or height == 0:
+		return 0.0
+	var counts: Dictionary = {}
+	var sample_step: int = 4
+	var total: int = 0
+	for y in range(0, height, sample_step):
+		for x in range(0, width, sample_step):
+			var color: Color = image.get_pixel(x, y)
+			if color.a < 0.95:
+				continue
+			var key: String = "%d_%d_%d" % [int(color.r * 15.0), int(color.g * 15.0), int(color.b * 15.0)]
+			counts[key] = int(counts.get(key, 0)) + 1
+			total += 1
+	if total == 0:
+		return 0.0
+	var top_counts: Array[int] = []
+	for value in counts.values():
+		top_counts.append(int(value))
+	top_counts.sort()
+	if top_counts.is_empty():
+		return 0.0
+	var top_one: int = top_counts[top_counts.size() - 1]
+	var top_two: int = 0
+	if top_counts.size() > 1:
+		top_two = top_counts[top_counts.size() - 2]
+	return float(top_one + top_two) / float(total)
 
 func _border_alpha_ratio(image: Image, padding: int, alpha_threshold: float) -> float:
 	var width: int = image.get_width()

@@ -7,6 +7,8 @@ const PipelineConstants: Script = preload("res://game/tools/pipeline_constants.g
 
 const ALPHA_THRESHOLD: float = PipelineConstants.ALPHA_THRESHOLD
 const SHADOW_ALPHA: float = PipelineConstants.SHADOW_ALPHA
+var SHADOW_BLUR_PX: float = PipelineConstants.SHADOW_BLUR_PX
+var SHADOW_OFFSET_PX: Vector2i = PipelineConstants.SHADOW_OFFSET_PX
 
 var _had_errors: bool = false
 
@@ -103,19 +105,46 @@ func _generate_shadow(prop_path: String) -> void:
 	var footprint_image: Image = _load_image(footprint_texture)
 	if footprint_image == null:
 		return
-	var shadow_image: Image = Image.create(footprint_image.get_width(), footprint_image.get_height(), false, Image.FORMAT_RGBA8)
-	shadow_image.fill(Color(0, 0, 0, 0))
-	for y in range(footprint_image.get_height()):
-		for x in range(footprint_image.get_width()):
+	footprint_image.convert(Image.FORMAT_RGBA8)
+	var width: int = footprint_image.get_width()
+	var height: int = footprint_image.get_height()
+	var mask: Image = Image.create(width, height, false, Image.FORMAT_RGBA8)
+	mask.fill(Color(0, 0, 0, 0))
+	for y in range(height):
+		for x in range(width):
 			if footprint_image.get_pixel(x, y).a <= ALPHA_THRESHOLD:
 				continue
-			shadow_image.set_pixel(x, y, Color(0, 0, 0, SHADOW_ALPHA))
+			mask.set_pixel(x, y, Color(0, 0, 0, 1.0))
+	var blurred: Image = _blur_mask(mask)
+	var shadow_image: Image = Image.create(width, height, false, Image.FORMAT_RGBA8)
+	shadow_image.fill(Color(0, 0, 0, 0))
+	for y in range(height):
+		for x in range(width):
+			var alpha: float = blurred.get_pixel(x, y).a * SHADOW_ALPHA
+			if alpha <= 0.0:
+				continue
+			var target_x: int = x + SHADOW_OFFSET_PX.x
+			var target_y: int = y + SHADOW_OFFSET_PX.y
+			if target_x < 0 or target_y < 0 or target_x >= width or target_y >= height:
+				continue
+			shadow_image.set_pixel(target_x, target_y, Color(0, 0, 0, alpha))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(generated_path.get_base_dir()))
 	var save_error: Error = shadow_image.save_png(generated_path)
 	if save_error != OK:
 		_push_error("Failed to save shadow", generated_path)
 		return
 	print("[PropShadow] Wrote %s" % generated_path)
+
+func _blur_mask(mask: Image) -> Image:
+	var width: int = mask.get_width()
+	var height: int = mask.get_height()
+	var factor: int = max(1, int(round(SHADOW_BLUR_PX)))
+	var small_w: int = max(1, int(ceil(float(width) / float(factor))))
+	var small_h: int = max(1, int(ceil(float(height) / float(factor))))
+	var blurred: Image = mask.duplicate()
+	blurred.resize(small_w, small_h, Image.INTERPOLATE_BILINEAR)
+	blurred.resize(width, height, Image.INTERPOLATE_BILINEAR)
+	return blurred
 
 func _load_image(texture: Texture2D) -> Image:
 	var path: String = texture.resource_path

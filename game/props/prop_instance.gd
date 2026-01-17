@@ -73,7 +73,8 @@ func _align_shadow_sprite(sprite: Sprite2D) -> void:
 		return
 	sprite.centered = false
 	sprite.position = _shadow_anchor_offset(size)
-	sprite.position += Vector2(PIPELINE_CONSTANTS.SHADOW_OFFSET_PX)
+	if not _is_generated_shadow(sprite.texture):
+		sprite.position += Vector2(PIPELINE_CONSTANTS.SHADOW_OFFSET_PX)
 	sprite.modulate = Color(1.0, 1.0, 1.0, PIPELINE_CONSTANTS.SHADOW_ALPHA)
 
 func _shadow_anchor_offset(texture_size: Vector2i) -> Vector2:
@@ -111,6 +112,12 @@ func _resolve_shadow_texture() -> Texture2D:
 		var generated_resource: Resource = ResourceLoader.load(generated_path)
 		return generated_resource as Texture2D
 	return null
+
+func _is_generated_shadow(texture: Texture2D) -> bool:
+	if texture == null:
+		return false
+	var path: String = texture.resource_path
+	return path.ends_with(SHADOW_GENERATED_PATH)
 
 func extract_overhang_node() -> Node:
 	var overhang_node: Node = get_node_or_null("OverhangSprite")

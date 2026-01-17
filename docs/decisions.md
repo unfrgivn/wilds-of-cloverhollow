@@ -1,5 +1,17 @@
 # Decisions
 
+## 2026-01-16 — Blender export + manifest defaults
+
+- `ART_PADDING_PX = 2` for processed prop textures.
+- `SHADOW_ALPHA = 0.5` for generated shadows.
+- `SHADOW_OFFSET_PX = (0, 6)` applied during shadow generation.
+- `SHADOW_BLUR_PX = 6.0` using `Image.gaussian_blur`.
+- Blender template requires `RENDER_CAM`, `FOOTPRINT_CAM`, and `ANCHOR` at Z=0.
+- Design kit textures live in `art/design_kit/` (placeholder until provided).
+- Blender template defaults: render resolution `512x512`, `RENDER_CAM` orthographic (ortho_scale `512`, location `(0, -10, 10)`, rotation `(60°, 0°, 45°)`), `FOOTPRINT_CAM` orthographic (ortho_scale `512`, location `(0, 0, 10)`, rotation `(0°, 0°, 0°)`), `KEY_LIGHT` sun energy `3.0`.
+- When multiple assets share a .blend file, sub-collections and anchors may be suffixed (e.g. `COL_BASE.001`, `ANCHOR_house_01`); the exporter treats `COL_*` prefixes as valid.
+- Material library writes placeholder 1x1 images when design kit textures are missing.
+
 ## 2026-01-16 — Path B pipeline defaults
 
 - **Plate baking implementation**: use `tools/bake_scene_plates.gd` (Godot Image API) for deterministic compositing without adding a Python/PIL dependency.

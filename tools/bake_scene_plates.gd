@@ -125,11 +125,13 @@ func _collect_prop_layers(prop_def: PropDef, prop_pos: Vector2i, variant: int, s
 		if base_image != null:
 			var offset: Vector2i = _bottom_center_offset(base_image.get_size())
 			bases.append(_layer_entry(base_image, prop_pos, offset))
-	var shadow_texture: Texture2D = _resolve_shadow_texture(prop_def)
-	if shadow_texture != null:
+	var shadow_entry: Dictionary = _resolve_shadow_entry(prop_def)
+	if not shadow_entry.is_empty():
+		var shadow_texture: Texture2D = shadow_entry["texture"]
+		var shadow_extra: Vector2i = shadow_entry["offset"]
 		var shadow_image: Image = _load_texture_image(shadow_texture)
 		if shadow_image != null:
-			var shadow_offset: Vector2i = _shadow_offset(prop_def, shadow_image)
+			var shadow_offset: Vector2i = _shadow_offset(prop_def, shadow_image, shadow_extra)
 			shadows.append(_layer_entry(shadow_image, prop_pos, shadow_offset))
 	if prop_def.has_overhang:
 		var overhang_texture: Texture2D = _resolve_variant_texture(prop_def.overhang_textures, variant)
@@ -145,25 +147,40 @@ func _resolve_variant_texture(textures: Array[Texture2D], variant: int) -> Textu
 	var index: int = clamp(variant, 0, textures.size() - 1)
 	return textures[index]
 
-func _resolve_shadow_texture(prop_def: PropDef) -> Texture2D:
+func _resolve_shadow_entry(prop_def: PropDef) -> Dictionary:
 	if prop_def.resource_path == "":
-		return null
+		return {}
 	var base_dir: String = prop_def.resource_path.get_base_dir()
 	var authored_path: String = base_dir.path_join("visuals/shadow.png")
-	if ResourceLoader.exists(authored_path):
-		return ResourceLoader.load(authored_path) as Texture2D
+	if ResourceLoader.exists(authored_path, "Texture2D"):
+		return {
+			"texture": ResourceLoader.load(authored_path) as Texture2D,
+			"offset": PIPELINE_CONSTANTS.SHADOW_OFFSET_PX
+		}
+	if FileAccess.file_exists(authored_path):
+		var authored_texture: Texture2D = _load_texture_from_file(authored_path)
+		if authored_texture != null:
+			return {
+				"texture": authored_texture,
+				"offset": PIPELINE_CONSTANTS.SHADOW_OFFSET_PX
+			}
 	var generated_path: String = base_dir.path_join("_generated/shadow.png")
-	if ResourceLoader.exists(generated_path):
-		return ResourceLoader.load(generated_path) as Texture2D
-	return null
+	if FileAccess.file_exists(generated_path):
+		var generated_texture: Texture2D = _load_texture_from_file(generated_path)
+		if generated_texture != null:
+			return {
+				"texture": generated_texture,
+				"offset": Vector2i.ZERO
+			}
+	return {}
 
-func _shadow_offset(prop_def: PropDef, shadow_image: Image) -> Vector2i:
+func _shadow_offset(prop_def: PropDef, shadow_image: Image, extra_offset: Vector2i) -> Vector2i:
 	var size: Vector2i = shadow_image.get_size()
 	if prop_def.footprint_mask != null:
 		var footprint_size: Vector2i = Vector2i(prop_def.footprint_mask.get_size())
 		if footprint_size == size and prop_def.footprint_anchor_px != Vector2i.ZERO:
-			return Vector2i(-prop_def.footprint_anchor_px.x, -prop_def.footprint_anchor_px.y) + PIPELINE_CONSTANTS.SHADOW_OFFSET_PX
-	return _bottom_center_offset(size) + PIPELINE_CONSTANTS.SHADOW_OFFSET_PX
+			return Vector2i(-prop_def.footprint_anchor_px.x, -prop_def.footprint_anchor_px.y) + extra_offset
+	return _bottom_center_offset(size) + extra_offset
 
 func _bottom_center_offset(size: Vector2i) -> Vector2i:
 	return Vector2i(-size.x / 2, -size.y)
@@ -173,7 +190,8 @@ func _layer_entry(image: Image, prop_pos: Vector2i, offset: Vector2i) -> Diction
 		"image": image,
 		"pos": prop_pos,
 		"offset": offset,
-		"sort": prop_pos.y
+		"sort_y": prop_pos.y,
+		"sort_x": prop_pos.x
 	}
 
 func _blend_layer(target: Image, layer: Dictionary) -> void:
@@ -187,7 +205,9 @@ func _blend_layer(target: Image, layer: Dictionary) -> void:
 	target.blend_rect(image, rect, origin)
 
 func _sort_layer(a: Dictionary, b: Dictionary) -> bool:
-	return int(a["sort"]) < int(b["sort"])
+	if int(a["sort_y"]) == int(b["sort_y"]):
+		return int(a["sort_x"]) < int(b["sort_x"])
+	return int(a["sort_y"]) < int(b["sort_y"])
 
 func _load_texture_image(texture: Texture2D) -> Image:
 	if texture == null:
@@ -202,6 +222,12 @@ func _load_texture_image(texture: Texture2D) -> Image:
 	if fallback == null or fallback.is_empty():
 		return null
 	return fallback
+
+func _load_texture_from_file(path: String) -> Texture2D:
+	var image: Image = Image.load_from_file(path)
+	if image == null or image.is_empty():
+		return null
+	return ImageTexture.create_from_image(image)
 
 func _load_image_from_path(path: String, scene_path: String, label: String) -> Image:
 	var texture: Texture2D = ResourceLoader.load(path) as Texture2D

@@ -5,9 +5,10 @@ const PROJECT_ROOT: String = "res://"
 const STEPS: Array[Dictionary] = [
 	{"name": "export_layouts", "script": "res://tools/export_layouts.gd"},
 	{"name": "qa_props", "script": "res://tools/qa_props.gd"},
-	{"name": "crop_prop_images", "script": "res://tools/crop_prop_images.gd"},
+	{"name": "process_prop_images", "script": "res://tools/process_prop_images.gd"},
 	{"name": "generate_prop_shadows", "script": "res://tools/generate_prop_shadows.gd"},
 	{"name": "qa_art", "script": "res://tools/qa_art.gd"},
+	{"name": "import_prop_manifests", "script": "res://tools/import_prop_manifests.gd"},
 	{"name": "bake_scene_plates", "script": "res://tools/bake_scene_plates.gd"},
 	{"name": "bake_walkmasks", "script": "res://tools/bake_walkmasks.gd"},
 	{"name": "bake_navpolys", "script": "res://tools/bake_navpolys.gd"},

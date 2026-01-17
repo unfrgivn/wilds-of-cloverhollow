@@ -204,7 +204,7 @@ func _spawn_decals(blueprint: Blueprint) -> void:
 
 func _spawn_props(blueprint: Blueprint) -> void:
 	for prop_data in blueprint.props:
-		var bake_mode: String = str(prop_data.get("bake", "live")).strip_edges().to_lower()
+		var bake_mode: String = str(prop_data.get("bake", "static")).strip_edges().to_lower()
 		if bake_mode != "live":
 			continue
 		var def_path: String = str(prop_data["def"]).strip_edges()

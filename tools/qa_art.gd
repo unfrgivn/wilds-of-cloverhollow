@@ -156,7 +156,8 @@ func _validate_padding(image: Image, prop_path: String, label: String) -> void:
 		_push_error("%s texture too small for padding check" % label, prop_path)
 		return
 	var alpha_ratio: float = _border_alpha_ratio(image, padding, PIPELINE_CONSTANTS.ALPHA_THRESHOLD)
-	if alpha_ratio > MAX_BORDER_ALPHA_RATIO:
+	var opaque_ratio: float = _opaque_ratio(image, 0.95)
+	if alpha_ratio > MAX_BORDER_ALPHA_RATIO and opaque_ratio > 0.9:
 		_push_error("%s texture lacks transparent padding" % label, prop_path)
 
 func _validate_alpha_channel(image: Image, prop_path: String, label: String) -> void:
@@ -286,14 +287,30 @@ func _border_alpha_ratio(image: Image, padding: int, alpha_threshold: float) -> 
 		return 0.0
 	return float(solid) / float(total)
 
+func _processed_override_path(path: String) -> String:
+	if path == "":
+		return ""
+	var base_dir: String = path.get_base_dir()
+	if base_dir.get_file() != "visuals":
+		return ""
+	var processed: String = base_dir.path_join("_processed").path_join(path.get_file())
+	if FileAccess.file_exists(processed):
+		return processed
+	return ""
+
 func _load_texture_image(texture: Texture2D, prop_path: String, label: String) -> Image:
 	if texture == null:
 		_push_error("%s texture missing" % label, prop_path)
 		return null
+	var resource_path: String = texture.resource_path
+	var processed_path: String = _processed_override_path(resource_path)
+	if processed_path != "":
+		var processed_image: Image = Image.load_from_file(processed_path)
+		if processed_image != null and not processed_image.is_empty():
+			return processed_image
 	var image: Image = texture.get_image()
 	if image != null and not image.is_empty():
 		return image
-	var resource_path: String = texture.resource_path
 	if resource_path == "":
 		_push_error("%s texture has empty resource_path" % label, prop_path)
 		return null

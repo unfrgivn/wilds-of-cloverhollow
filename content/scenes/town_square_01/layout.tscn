@@ -228,6 +228,16 @@ position = Vector2(460, 360)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Planter"]
 shape = SubResource("1_hotspot_circle")
 
+[node name="Hotspot_Tree" type="Area2D" parent="Markers"]
+script = ExtResource("4_hotspot")
+hotspot_id = "tree"
+hotspot_type = "check"
+text = "The tree sways with a whisper of leaves."
+position = Vector2(1040, 320)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Tree"]
+shape = SubResource("1_hotspot_circle")
+
 [node name="Exit_Inn" type="Area2D" parent="Markers"]
 script = ExtResource("5_exit")
 exit_id = "to_inn"

@@ -263,6 +263,16 @@
       ],
       "radius": 18,
       "text": "A hand-painted sign points toward the town center."
+    },
+    {
+      "id": "tree",
+      "type": "check",
+      "pos": [
+        1040,
+        320
+      ],
+      "radius": 18,
+      "text": "The tree sways with a whisper of leaves."
     }
   ],
   "exits": [

@@ -105,6 +105,16 @@
   ],
   "hotspots": [
     {
+      "id": "bulletin_board",
+      "type": "check",
+      "pos": [
+        340,
+        320
+      ],
+      "radius": 18,
+      "text": "The bulletin board is packed with flyers."
+    },
+    {
       "id": "trophy_case",
       "type": "talk",
       "pos": [

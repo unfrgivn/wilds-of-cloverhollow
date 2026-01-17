@@ -61,11 +61,11 @@ func _bake_scene(scene_path: String) -> void:
 
 	var navpoly: NavigationPolygon = NavigationPolygon.new()
 	navpoly.agent_radius = NPC_RADIUS_PX
+	var source_data: NavigationMeshSourceGeometryData2D = NavigationMeshSourceGeometryData2D.new()
 	for outline in outlines:
 		var poly: PackedVector2Array = outline
-		navpoly.add_outline(poly)
-	push_warning("[BakeNavpoly] Using deprecated make_polygons_from_outlines; upgrade to NavigationServer2D bake when signature confirmed")
-	navpoly.make_polygons_from_outlines()
+		source_data.add_traversable_outline(poly)
+	NavigationServer2D.bake_from_source_geometry_data(navpoly, source_data)
 
 	var navpoly_path: String = str(assets["navpoly"]).strip_edges()
 

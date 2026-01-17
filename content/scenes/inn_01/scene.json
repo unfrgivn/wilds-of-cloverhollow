@@ -37,6 +37,15 @@
       ],
       "variant": 1,
       "bake": "static"
+    },
+    {
+      "def": "res://content/props/room_shell_inn_01/room_shell_inn_01_def.tres",
+      "pos": [
+        520,
+        640
+      ],
+      "variant": 0,
+      "bake": "static"
     }
   ],
   "decals": [

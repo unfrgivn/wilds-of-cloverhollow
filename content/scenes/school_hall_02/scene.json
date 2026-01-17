@@ -15,8 +15,8 @@
   "player_spawn": {
     "id": "spawn_default",
     "pos": [
-      140,
-      160
+      220,
+      320
     ]
   },
   "props": [
@@ -30,12 +30,21 @@
       "bake": "static"
     },
     {
-      "def": "res://content/props/fence_01/fence_01_def.tres",
+      "def": "res://content/props/fence_straight_01/fence_straight_01_def.tres",
       "pos": [
         460,
         320
       ],
       "variant": 1,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/room_shell_school_01/room_shell_school_01_def.tres",
+      "pos": [
+        520,
+        640
+      ],
+      "variant": 0,
       "bake": "static"
     }
   ],

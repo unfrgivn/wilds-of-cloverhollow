@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/school_hall_01/ground.png" id="2_ground"]
@@ -7,9 +7,11 @@
 [ext_resource type="Script" path="res://game/tools/markers/exit_marker_2d.gd" id="5_exit"]
 [ext_resource type="Script" path="res://game/tools/markers/decal_marker_2d.gd" id="6_decal"]
 [ext_resource type="PackedScene" path="res://content/props/bench_01/bench_01.tscn" id="6_bench"]
-[ext_resource type="PackedScene" path="res://content/props/fence_01/fence_01.tscn" id="7_fence"]
+[ext_resource type="PackedScene" path="res://content/props/fence_straight_01/fence_straight_01.tscn" id="7_fence"]
 [ext_resource type="Resource" path="res://content/props/bench_01/bench_01_def.tres" id="8_bench_def"]
-[ext_resource type="Resource" path="res://content/props/fence_01/fence_01_def.tres" id="9_fence_def"]
+[ext_resource type="Resource" path="res://content/props/fence_straight_01/fence_straight_01_def.tres" id="9_fence_def"]
+[ext_resource type="PackedScene" path="res://content/props/room_shell_school_01/room_shell_school_01.tscn" id="10_room_shell"]
+[ext_resource type="Resource" path="res://content/props/room_shell_school_01/room_shell_school_01_def.tres" id="11_room_shell_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -29,6 +31,10 @@ centered = false
 position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
+
+[node name="SchoolRoomShell" parent="Props" instance=ExtResource("10_room_shell")]
+prop_def = ExtResource("11_room_shell_def")
+position = Vector2(520, 640)
 
 [node name="Bench01" parent="Props" instance=ExtResource("6_bench")]
 prop_def = ExtResource("8_bench_def")
@@ -60,7 +66,7 @@ position = Vector2(520, 380)
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")
 spawn_id = "spawn_default"
-position = Vector2(140, 160)
+position = Vector2(220, 320)
 
 [node name="Hotspot_School" type="Area2D" parent="Markers"]
 script = ExtResource("4_hotspot")

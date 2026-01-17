@@ -15,8 +15,8 @@
   "player_spawn": {
     "id": "spawn_default",
     "pos": [
-      140,
-      160
+      220,
+      320
     ]
   },
   "props": [
@@ -117,8 +117,8 @@
       "id": "arcade_sign",
       "type": "talk",
       "pos": [
-        260,
-        200
+        280,
+        320
       ],
       "radius": 18,
       "text": "The arcade glows softly."

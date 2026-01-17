@@ -21,3 +21,7 @@
 
 - Regenerate placeholder prop packages for all layout references via `tools/generate_path_b_props.gd`.
 - Ground-only generator writes a fully-walkable `base_walkmask.png` for town square.
+
+## 2026-01-16 — Remove legacy kit test scene
+
+- Drop `content/scenes/building_kit_test` to avoid exporting stale kit layouts.

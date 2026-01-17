@@ -2,8 +2,9 @@
 
 ## Current
 - Reset visuals to start fresh with Blender sprite factory pipeline.
-- Placeholder props regenerated (buildings, rooms, core furniture set).
+- Placeholder props regenerated (buildings, rooms, hero prop set).
 - Ground-only plates regenerated with walkable base mask.
+- Removed `building_kit_test` scene to keep pipeline clean.
 - Art QA blocks opaque backgrounds and checkerboards.
 - Path B pipeline remains in place (crop, plate bake, plate rendering).
 - Layouts use building/room shell props for Path B.

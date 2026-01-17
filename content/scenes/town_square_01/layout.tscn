@@ -155,7 +155,7 @@ script = ExtResource("5_exit")
 exit_id = "to_arcade"
 target_scene_id = "arcade_01"
 target_spawn_id = "spawn_default"
-position = Vector2(660, 300)
+position = Vector2(660, 340)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Arcade"]
 shape = SubResource("4_exit_arcade")

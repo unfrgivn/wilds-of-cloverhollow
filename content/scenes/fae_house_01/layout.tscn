@@ -26,6 +26,8 @@
 [ext_resource type="Resource" path="res://content/props/rug_rect_01/rug_rect_01_def.tres" id="27_rug_rect_def"]
 [ext_resource type="PackedScene" path="res://content/props/poster_01/poster_01.tscn" id="28_poster"]
 [ext_resource type="Resource" path="res://content/props/poster_01/poster_01_def.tres" id="29_poster_def"]
+[ext_resource type="PackedScene" path="res://content/props/room_shell_fae_house_01/room_shell_fae_house_01.tscn" id="30_room_shell"]
+[ext_resource type="Resource" path="res://content/props/room_shell_fae_house_01/room_shell_fae_house_01_def.tres" id="31_room_shell_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -37,7 +39,7 @@ size = Vector2(48, 32)
 script = ExtResource("1_layout")
 scene_id = "fae_house_01"
 default_spawn_id = "spawn_default"
-base_walkmask_path = "res://content/scenes/fae_house_01/base_walkmask.png"
+base_walkmask_path = ""
 
 [node name="Ground" type="Sprite2D" parent="."]
 texture = ExtResource("2_ground")
@@ -45,6 +47,10 @@ centered = false
 position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
+
+[node name="FaeHouseRoomShell" parent="Props" instance=ExtResource("30_room_shell")]
+prop_def = ExtResource("31_room_shell_def")
+position = Vector2(520, 640)
 
 [node name="BedSingle01" parent="Props" instance=ExtResource("10_bed")]
 prop_def = ExtResource("11_bed_def")

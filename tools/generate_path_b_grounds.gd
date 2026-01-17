@@ -9,6 +9,8 @@ func _run() -> void:
 	_generate_town_square()
 	_generate_arcade()
 	_generate_school_hall()
+	_generate_inn()
+	_generate_fae_house()
 	print("[PathBGrounds] Generated ground plates")
 	quit(0)
 
@@ -43,6 +45,22 @@ func _generate_school_hall() -> void:
 	var hallway: Rect2i = Rect2i(240, 180, 800, 360)
 	image.fill_rect(hallway, Color(0.76, 0.72, 0.68, 1.0))
 	_save_png(image, SCENE_ROOT.path_join("school_hall_01").path_join("ground.png"))
+
+func _generate_inn() -> void:
+	var size: Vector2i = Vector2i(1280, 720)
+	var image: Image = Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0.86, 0.80, 0.74, 1.0))
+	var floor_rect: Rect2i = Rect2i(240, 180, 800, 360)
+	image.fill_rect(floor_rect, Color(0.78, 0.70, 0.64, 1.0))
+	_save_png(image, SCENE_ROOT.path_join("inn_01").path_join("ground.png"))
+
+func _generate_fae_house() -> void:
+	var size: Vector2i = Vector2i(1280, 720)
+	var image: Image = Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0.88, 0.82, 0.76, 1.0))
+	var floor_rect: Rect2i = Rect2i(200, 160, 880, 400)
+	image.fill_rect(floor_rect, Color(0.80, 0.74, 0.70, 1.0))
+	_save_png(image, SCENE_ROOT.path_join("fae_house_01").path_join("ground.png"))
 
 func _save_png(image: Image, path: String) -> void:
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())

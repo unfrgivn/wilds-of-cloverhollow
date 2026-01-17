@@ -15,8 +15,8 @@
   "player_spawn": {
     "id": "spawn_default",
     "pos": [
-      140,
-      160
+      220,
+      320
     ]
   },
   "props": [
@@ -108,8 +108,8 @@
       "id": "trophy_case",
       "type": "talk",
       "pos": [
-        260,
-        240
+        320,
+        300
       ],
       "radius": 18,
       "text": "The trophy case glints."

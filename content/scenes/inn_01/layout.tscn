@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" path="res://content/props/crate_01/crate_01.tscn" id="7_crate"]
 [ext_resource type="Resource" path="res://content/props/bench_01/bench_01_def.tres" id="8_bench_def"]
 [ext_resource type="Resource" path="res://content/props/crate_01/crate_01_def.tres" id="9_crate_def"]
+[ext_resource type="PackedScene" path="res://content/props/room_shell_inn_01/room_shell_inn_01.tscn" id="10_room_shell"]
+[ext_resource type="Resource" path="res://content/props/room_shell_inn_01/room_shell_inn_01_def.tres" id="11_room_shell_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -29,6 +31,10 @@ centered = false
 position = Vector2(0, 0)
 
 [node name="Props" type="Node2D" parent="."]
+
+[node name="InnRoomShell" parent="Props" instance=ExtResource("10_room_shell")]
+prop_def = ExtResource("11_room_shell_def")
+position = Vector2(520, 640)
 
 [node name="Bench01" parent="Props" instance=ExtResource("6_bench")]
 prop_def = ExtResource("8_bench_def")

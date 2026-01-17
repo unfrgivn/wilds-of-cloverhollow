@@ -83,14 +83,14 @@ position = Vector2(520, 360)
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")
 spawn_id = "spawn_default"
-position = Vector2(140, 160)
+position = Vector2(220, 320)
 
 [node name="Hotspot_School" type="Area2D" parent="Markers"]
 script = ExtResource("4_hotspot")
 hotspot_id = "trophy_case"
 hotspot_type = "talk"
 text = "The trophy case glints."
-position = Vector2(260, 240)
+position = Vector2(320, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_School"]
 shape = SubResource("1_hotspot_circle")

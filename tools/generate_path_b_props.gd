@@ -179,6 +179,34 @@ func _build_specs() -> Array[PropSpec]:
 		"ROOM_SHELL"
 	))
 
+	specs.append(PropSpec.new(
+		"room_shell_inn_01",
+		room_size,
+		room_overhang,
+		Color(0.84, 0.78, 0.72, 1.0),
+		Color(0.62, 0.54, 0.48, 1.0),
+		true,
+		true,
+		room_size,
+		room_footprints,
+		"static",
+		"ROOM_SHELL"
+	))
+
+	specs.append(PropSpec.new(
+		"room_shell_fae_house_01",
+		room_size,
+		room_overhang,
+		Color(0.86, 0.80, 0.76, 1.0),
+		Color(0.64, 0.56, 0.52, 1.0),
+		true,
+		true,
+		room_size,
+		room_footprints,
+		"static",
+		"ROOM_SHELL"
+	))
+
 	var cabinet_size: Vector2i = Vector2i(96, 140)
 	specs.append(PropSpec.new(
 		"arcade_cabinet_01",
@@ -594,6 +622,126 @@ func _build_specs() -> Array[PropSpec]:
 		false,
 		lantern_size,
 		[],
+		"static",
+		"PROP"
+	))
+
+	var bench_size: Vector2i = Vector2i(140, 60)
+	specs.append(PropSpec.new(
+		"bench_01",
+		bench_size,
+		Vector2i.ZERO,
+		Color(0.72, 0.62, 0.52, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		bench_size,
+		[_footprint_rect(bench_size, 20, padding)],
+		"static",
+		"PROP"
+	))
+
+	var crate_size: Vector2i = Vector2i(64, 64)
+	specs.append(PropSpec.new(
+		"crate_01",
+		crate_size,
+		Vector2i.ZERO,
+		Color(0.70, 0.60, 0.50, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		crate_size,
+		[_footprint_rect(crate_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var lamp_size: Vector2i = Vector2i(64, 160)
+	specs.append(PropSpec.new(
+		"lamp_01",
+		lamp_size,
+		Vector2i.ZERO,
+		Color(0.88, 0.84, 0.70, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		lamp_size,
+		[_footprint_rect(lamp_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var tree_size: Vector2i = Vector2i(160, 200)
+	specs.append(PropSpec.new(
+		"tree_01",
+		tree_size,
+		Vector2i(160, 80),
+		Color(0.58, 0.72, 0.58, 1.0),
+		Color(0.46, 0.62, 0.46, 1.0),
+		true,
+		true,
+		tree_size,
+		[_footprint_rect(tree_size, 40, padding)],
+		"static",
+		"PROP"
+	))
+
+	var planter_size: Vector2i = Vector2i(64, 64)
+	specs.append(PropSpec.new(
+		"planter_01",
+		planter_size,
+		Vector2i.ZERO,
+		Color(0.76, 0.70, 0.62, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		planter_size,
+		[_footprint_rect(planter_size, 20, padding)],
+		"static",
+		"PROP"
+	))
+
+	var barrel_size: Vector2i = Vector2i(64, 80)
+	specs.append(PropSpec.new(
+		"barrel_01",
+		barrel_size,
+		Vector2i.ZERO,
+		Color(0.68, 0.58, 0.50, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		barrel_size,
+		[_footprint_rect(barrel_size, 24, padding)],
+		"static",
+		"PROP"
+	))
+
+	var signpost_size: Vector2i = Vector2i(48, 96)
+	specs.append(PropSpec.new(
+		"signpost_01",
+		signpost_size,
+		Vector2i.ZERO,
+		Color(0.78, 0.66, 0.58, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		signpost_size,
+		[_footprint_rect(signpost_size, 20, padding)],
+		"live",
+		"PROP"
+	))
+
+	var table_rect_size: Vector2i = Vector2i(120, 80)
+	specs.append(PropSpec.new(
+		"table_01",
+		table_rect_size,
+		Vector2i.ZERO,
+		Color(0.76, 0.68, 0.60, 1.0),
+		Color(0, 0, 0, 0),
+		true,
+		false,
+		table_rect_size,
+		[_footprint_rect(table_rect_size, 24, padding)],
 		"static",
 		"PROP"
 	))

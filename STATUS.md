@@ -7,4 +7,5 @@
 
 ## Next
 - Verify scenes in the editor and confirm plate rendering.
+- Use `F9` for clean screenshot captures.
 - Replace placeholder Blender assets/materials with real design-kit textures.

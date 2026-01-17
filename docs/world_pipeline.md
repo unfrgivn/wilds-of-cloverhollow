@@ -71,3 +71,12 @@ All tools operate on referenced assets by default. Use `--all` where supported.
 - Only `bake="live"` props are instantiated at runtime.
 - Player movement uses `walkmask_player.png` sampling.
 - NPCs use `navpoly.tres` baked from the walkmask.
+
+## Debug toggles
+- `F1` toggles debug visuals.
+- `F2` toggles exit markers.
+- `F3` toggles overhangs.
+- `F4` toggles decals.
+- `F5` toggles walkmask overlay.
+- `F6` toggles nav overlay.
+- `F9` activates clean screenshot mode.

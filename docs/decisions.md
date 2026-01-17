@@ -18,6 +18,7 @@
 - Generated watercolor design-kit textures from `references/legacy_art/reference/concepts/` palettes.
 - Files: `wood_planks_a.png`, `stone_blocks_a.png`, `roof_tile_a.png` at `1024×1024`, `plaster_a.png` at `1408×768`.
 - Converted generated JPEG outputs to PNG via `sips` to satisfy Godot import requirements.
+- Added variant B textures: `wood_planks_b.png`, `stone_blocks_b.png`, `plaster_b.png`, `roof_tile_b.png` from the same palette.
 
 ## 2026-01-16 — Path B pipeline defaults
 

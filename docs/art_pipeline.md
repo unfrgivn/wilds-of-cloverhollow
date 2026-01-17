@@ -63,6 +63,8 @@ Mapping (placeholder until real textures land):
 - `MAT_PLASTER_A` → `art/design_kit/plaster_a.*`
 - `MAT_ROOF_TILE_A` → `art/design_kit/roof_tile_a.*`
 
+If the design kit textures are missing, the pipeline uses generated `128x128` placeholders under `art/design_kit/`.
+
 ## Blender export commands
 Single asset:
 ```bash

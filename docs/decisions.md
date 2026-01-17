@@ -11,6 +11,7 @@
 - Blender template defaults: render resolution `512x512`, `RENDER_CAM` orthographic (ortho_scale `512`, location `(0, -10, 10)`, rotation `(60°, 0°, 45°)`), `FOOTPRINT_CAM` orthographic (ortho_scale `512`, location `(0, 0, 10)`, rotation `(0°, 0°, 0°)`), `KEY_LIGHT` sun energy `3.0`.
 - When multiple assets share a .blend file, sub-collections and anchors may be suffixed (e.g. `COL_BASE.001`, `ANCHOR_house_01`); the exporter treats `COL_*` prefixes as valid.
 - Material library writes placeholder 1x1 images when design kit textures are missing.
+- Placeholder design-kit textures generated at `128x128` in `art/design_kit/` (wood/stone/plaster/roof) until real textures are provided.
 
 ## 2026-01-16 — Path B pipeline defaults
 

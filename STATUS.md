@@ -1,11 +1,11 @@
 # Status
 
 ## Current
-- Authored `diorama_template.blend` and `material_library.blend` with placeholder assets/materials.
-- Exported proof assets `house_01` and `school_hall_shell_01` and wired them into layouts.
+- Generated placeholder design-kit textures in `art/design_kit/` and wired them into `material_library.blend`.
+- Updated `diorama_template.blend` to use textured materials and re-exported `house_01` and `school_hall_shell_01`.
 - Full pipeline `build_content.gd` completes with Validator pass; navpoly bake uses `NavigationServer2D`.
 
 ## Next
 - Verify scenes in the editor and confirm plate rendering.
 - Use `F9` for clean screenshot captures.
-- Replace placeholder Blender assets/materials with real design-kit textures.
+- Replace placeholder design-kit textures with real kit assets.

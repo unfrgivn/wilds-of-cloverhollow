@@ -67,14 +67,14 @@ position = Vector2(480, 360)
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")
 spawn_id = "spawn_default"
-position = Vector2(140, 160)
+position = Vector2(220, 320)
 
 [node name="Hotspot_Inn" type="Area2D" parent="Markers"]
 script = ExtResource("4_hotspot")
 hotspot_id = "inn_sign"
 hotspot_type = "talk"
 text = "Welcome to the inn."
-position = Vector2(260, 200)
+position = Vector2(320, 320)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Inn"]
 shape = SubResource("1_hotspot_circle")
@@ -84,7 +84,7 @@ script = ExtResource("5_exit")
 exit_id = "to_town"
 target_scene_id = "town_square_01"
 target_spawn_id = "spawn_default"
-position = Vector2(84, 636)
+position = Vector2(520, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Town"]
 shape = SubResource("2_exit_town")

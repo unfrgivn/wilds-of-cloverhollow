@@ -15,8 +15,8 @@
   "player_spawn": {
     "id": "spawn_default",
     "pos": [
-      140,
-      160
+      220,
+      320
     ]
   },
   "props": [
@@ -81,8 +81,8 @@
       "id": "inn_sign",
       "type": "talk",
       "pos": [
-        260,
-        200
+        320,
+        320
       ],
       "radius": 18,
       "text": "Welcome to the inn."
@@ -92,8 +92,8 @@
     {
       "id": "to_town",
       "rect": [
-        60,
-        620,
+        496,
+        584,
         48,
         32
       ],

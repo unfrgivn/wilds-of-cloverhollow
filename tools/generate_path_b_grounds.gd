@@ -45,6 +45,8 @@ func _generate_school_hall() -> void:
 	var hallway: Rect2i = Rect2i(240, 180, 800, 360)
 	image.fill_rect(hallway, Color(0.76, 0.72, 0.68, 1.0))
 	_save_png(image, SCENE_ROOT.path_join("school_hall_01").path_join("ground.png"))
+	_save_png(image, SCENE_ROOT.path_join("school_hall_02").path_join("ground.png"))
+	_save_png(image, SCENE_ROOT.path_join("school_hall_03").path_join("ground.png"))
 
 func _generate_inn() -> void:
 	var size: Vector2i = Vector2i(1280, 720)

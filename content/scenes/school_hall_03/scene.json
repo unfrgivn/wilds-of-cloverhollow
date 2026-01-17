@@ -1,11 +1,11 @@
 {
-  "scene_id": "school_hall_01",
+  "scene_id": "school_hall_03",
   "size_px": [
     1280,
     720
   ],
   "assets": {
-    "ground": "res://content/scenes/school_hall_01/ground.png",
+    "ground": "res://content/scenes/school_hall_03/ground.png",
     "plate_base": "res://content/scenes/school_hall_03/_baked/plate_base.png",
     "plate_overhang": "res://content/scenes/school_hall_03/_baked/plate_overhang.png",
     "walkmask_raw": "res://content/scenes/school_hall_03/_baked/walkmask_raw.png",
@@ -81,8 +81,8 @@
       "id": "trophy_case",
       "type": "talk",
       "pos": [
-        260,
-        200
+        280,
+        320
       ],
       "radius": 18,
       "text": "The trophy case glints."

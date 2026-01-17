@@ -205,6 +205,16 @@
   ],
   "hotspots": [
     {
+      "id": "bench",
+      "type": "check",
+      "pos": [
+        360,
+        500
+      ],
+      "radius": 18,
+      "text": "The bench is warm from the afternoon sun."
+    },
+    {
       "id": "npc_test",
       "type": "talk",
       "pos": [

@@ -108,7 +108,7 @@
       "id": "bulletin_board",
       "type": "check",
       "pos": [
-        420,
+        220,
         320
       ],
       "radius": 18,

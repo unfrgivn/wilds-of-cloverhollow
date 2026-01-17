@@ -55,12 +55,13 @@ godot --headless --quit --script res://tools/build_content.gd
 2) qa_props
 3) process_prop_images
 4) generate_prop_shadows
-5) qa_art
-6) import_prop_manifests
-7) bake_scene_plates
-8) bake_walkmasks
-9) bake_navpolys
-10) validate_scenes
+5) import_assets (`godot --headless --path . --import`)
+6) qa_art
+7) import_prop_manifests
+8) bake_scene_plates
+9) bake_walkmasks
+10) bake_navpolys
+11) validate_scenes
 
 All tools operate on referenced assets by default. Use `--all` where supported.
 

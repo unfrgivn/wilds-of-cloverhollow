@@ -133,6 +133,18 @@ position = Vector2(420, 380)
 prop_def = ExtResource("63_signpost_def")
 position = Vector2(240, 440)
 
+[node name="Tree02" parent="Props" instance=ExtResource("56_tree")]
+prop_def = ExtResource("57_tree_def")
+position = Vector2(1040, 260)
+
+[node name="Bench02" parent="Props" instance=ExtResource("52_bench")]
+prop_def = ExtResource("53_bench_def")
+position = Vector2(740, 460)
+
+[node name="Planter02" parent="Props" instance=ExtResource("58_planter")]
+prop_def = ExtResource("59_planter_def")
+position = Vector2(460, 320)
+
 [node name="Markers" type="Node2D" parent="."]
 
 [node name="Decal_Scuff" type="Node2D" parent="Markers"]

@@ -40,6 +40,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/bench_01/bench_01_def.tres",
+      "pos": [
+        740,
+        460
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/fence_straight_01/fence_straight_01_def.tres",
       "pos": [
         200,
@@ -112,6 +121,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/planter_01/planter_01_def.tres",
+      "pos": [
+        460,
+        320
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/school_01_exterior/school_01_exterior_def.tres",
       "pos": [
         540,
@@ -143,6 +161,15 @@
       "pos": [
         120,
         220
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/tree_01/tree_01_def.tres",
+      "pos": [
+        1040,
+        260
       ],
       "variant": 0,
       "bake": "static"

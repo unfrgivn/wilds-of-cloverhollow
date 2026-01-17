@@ -123,6 +123,16 @@
   ],
   "hotspots": [
     {
+      "id": "crate",
+      "type": "check",
+      "pos": [
+        440,
+        360
+      ],
+      "radius": 18,
+      "text": "Supplies are stacked for the night."
+    },
+    {
       "id": "inn_sign",
       "type": "talk",
       "pos": [

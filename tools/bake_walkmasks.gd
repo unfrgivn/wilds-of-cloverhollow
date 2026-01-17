@@ -123,9 +123,9 @@ func _create_base_walkmask(width: int, height: int, base_walkmask_path: String, 
 	if not FileAccess.file_exists(base_walkmask_path):
 		_push_error("base_walkmask not found: %s" % base_walkmask_path, scene_path)
 		return null
-	var base_image: Image = Image.new()
-	var error: Error = base_image.load(base_walkmask_path)
-	if error != OK:
+	var absolute_path: String = ProjectSettings.globalize_path(base_walkmask_path)
+	var base_image: Image = Image.load_from_file(absolute_path)
+	if base_image == null or base_image.is_empty():
 		_push_error("Failed to load base_walkmask: %s" % base_walkmask_path, scene_path)
 		return null
 	return base_image
@@ -144,19 +144,16 @@ func _load_scene_json(scene_path: String) -> Dictionary:
 	return parsed
 
 func _load_footprint_image(prop_path: String, texture: Texture2D) -> Image:
-	var image: Image = texture.get_image()
-	if image != null and image.get_width() > 0 and image.get_height() > 0:
-		return image
 	var footprint_path: String = texture.resource_path
 	if footprint_path == "":
 		_push_error("Footprint texture has no resource_path", prop_path)
 		return null
-	var fallback: Image = Image.new()
-	var error: Error = fallback.load(footprint_path)
-	if error != OK:
-		_push_error("Footprint load failed (get_image + load_from_file)", "%s:%s" % [prop_path, footprint_path])
+	var absolute_path: String = ProjectSettings.globalize_path(footprint_path)
+	var image: Image = Image.load_from_file(absolute_path)
+	if image == null or image.is_empty():
+		_push_error("Footprint load failed (load_from_file)", "%s:%s" % [prop_path, footprint_path])
 		return null
-	return fallback
+	return image
 
 func _stamp_footprint(target: Image, footprint: Image, prop_pos: Vector2i, anchor: Vector2i) -> void:
 	var width: int = footprint.get_width()

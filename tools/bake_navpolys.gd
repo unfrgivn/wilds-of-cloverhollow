@@ -46,9 +46,9 @@ func _bake_scene(scene_path: String) -> void:
 		_push_error("walkmask_raw missing: %s" % walkmask_path, scene_path)
 		return
 
-	var image: Image = Image.new()
-	var error: Error = image.load(walkmask_path)
-	if error != OK:
+	var absolute_path: String = ProjectSettings.globalize_path(walkmask_path)
+	var image: Image = Image.load_from_file(absolute_path)
+	if image == null or image.is_empty():
 		_push_error("Failed to load walkmask_raw: %s" % walkmask_path, scene_path)
 		return
 

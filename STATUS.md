@@ -9,6 +9,7 @@
 - Path B pipeline remains in place (crop, plate bake, plate rendering).
 - Blender export sync tool added for prop visuals.
 - Layouts use building/room shell props for Path B.
+- Interaction hotspots now cover key town and interior props.
 
 ## Next
 - Run `tools/sync_blender_exports.gd` to pull new Blender PNGs into prop visuals.

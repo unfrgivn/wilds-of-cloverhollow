@@ -6,3 +6,8 @@
 - **Crop strategy**: `tools/crop_prop_images.gd` overwrites `visuals/base.png` and `visuals/overhang.png` in place to avoid updating PropDef references.
 - **Screenshot toggle**: `F9` forces debug overlays and markers off for clean captures.
 - **Room shell placeholders**: initial room shell props use `960×540` textures, positioned at `(520, 640)` in `arcade_01` and `school_hall_01` layouts.
+
+## 2026-01-16 — Working tree hygiene default
+
+- Remove generated logs and artifacts created by headless runs.
+- Keep tracked `.uid` files intact; leave existing untracked content alone unless it was explicitly created for Path B.

@@ -17,6 +17,11 @@
 - Use Blender as the source of truth for prop/building/room shell sprites.
 - Enforce transparent PNG exports with orthographic camera and bottom-center anchoring.
 
+## 2026-01-16 — Blender export sync defaults
+
+- `tools/sync_blender_exports.gd` maps `*_base.png`, `*_overhang.png`, and `*_shadow.png` into prop visuals.
+- By default, missing prop folders are skipped unless `--allow-create` is provided.
+
 ## 2026-01-16 — Placeholder reset for Path B
 
 - Regenerate placeholder prop packages for all layout references via `tools/generate_path_b_props.gd`.

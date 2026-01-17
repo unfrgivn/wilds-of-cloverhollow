@@ -48,6 +48,17 @@ For each prop package:
 - Ensure `base.png` and `overhang.png` are transparent
 - Keep `footprints/block.png` authoritative for collisions
 
+### 4.1 Sync Blender exports (recommended)
+
+Use the sync tool to copy Blender exports into prop visuals:
+```bash
+godot --headless --quit --script res://tools/sync_blender_exports.gd
+```
+Optional flags:
+- `--dry-run` for a no‑write preview
+- `--allow-create` to create missing prop folders
+- `--allow-missing` to skip if `art/exports` is absent
+
 ## 5. Ground plates (Path B)
 
 - `ground.png` must be **ground only** (dirt, grass, paths, puddles)

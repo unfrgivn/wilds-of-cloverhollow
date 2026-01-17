@@ -213,6 +213,16 @@
       ],
       "radius": 18,
       "text": "Hello from town square."
+    },
+    {
+      "id": "signpost",
+      "type": "check",
+      "pos": [
+        240,
+        470
+      ],
+      "radius": 18,
+      "text": "A hand-painted sign points toward the town center."
     }
   ],
   "exits": [

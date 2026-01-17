@@ -80,3 +80,10 @@ All tools operate on referenced assets by default. Use `--all` where supported.
 - `F5` toggles walkmask overlay.
 - `F6` toggles nav overlay.
 - `F9` activates clean screenshot mode.
+
+## Plate previews (clean background)
+Generate clean plate previews (no UI) for quick review:
+```bash
+godot --headless --quit --script res://tools/render_plate_previews.gd -- --scene town_square_01 --scene school_hall_01
+```
+Outputs: `content/scenes/<scene_id>/_baked/plate_preview.png`.

@@ -1,0 +1,17 @@
+{
+  "anchor": {
+    "anchor_hint": "ANCHOR at feet",
+    "mode": "anchor_empty"
+  },
+  "asset_id": "house_stone_01",
+  "defaults": {
+    "blocks_movement": true,
+    "default_bake_mode": "static",
+    "has_overhang": true
+  },
+  "outputs": {
+    "base_png": "visuals/base.png",
+    "footprint_png": "footprints/block.png",
+    "overhang_png": "visuals/overhang.png"
+  }
+}

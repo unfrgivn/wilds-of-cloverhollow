@@ -1,20 +1,17 @@
 [gd_resource type="Resource" script_class="PropDef" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://game/props/prop_def.gd" id="1_def"]
-[ext_resource type="PackedScene" path="res://content/props/school_01_exterior/school_01_exterior.tscn" id="2_prefab"]
-[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/base.png" id="3_base"]
-[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/overhang.png" id="4_overhang"]
-[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/footprints/block.png" id="5_footprint"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/base.png" id="1_v0po1"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/footprints/block.png" id="2_3n0yh"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/overhang.png" id="3_0kxrh"]
+[ext_resource type="PackedScene" path="res://content/props/school_01_exterior/school_01_exterior.tscn" id="4_3n0yh"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="4_tvjt7"]
 
 [resource]
-script = ExtResource("1_def")
+script = ExtResource("4_tvjt7")
 id = "school_01_exterior"
-prefab = ExtResource("2_prefab")
-base_textures = [ExtResource("3_base")]
-blocks_movement = true
-footprint_mask = ExtResource("5_footprint")
-footprint_anchor_px = Vector2i(128, 191)
+prefab = ExtResource("4_3n0yh")
+base_textures = Array[Texture2D]([ExtResource("1_v0po1")])
+overhang_textures = Array[Texture2D]([ExtResource("3_0kxrh")])
+footprint_mask = ExtResource("2_3n0yh")
+footprint_anchor_px = Vector2i(256, 511)
 has_overhang = true
-overhang_textures = [ExtResource("4_overhang")]
-default_bake_mode = "static"
-category = "BUILDING"

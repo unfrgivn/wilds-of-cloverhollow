@@ -115,6 +115,16 @@
       "text": "The bulletin board is packed with flyers."
     },
     {
+      "id": "lockers",
+      "type": "check",
+      "pos": [
+        760,
+        360
+      ],
+      "radius": 18,
+      "text": "Sticky notes and doodles cover the lockers."
+    },
+    {
       "id": "trophy_case",
       "type": "talk",
       "pos": [

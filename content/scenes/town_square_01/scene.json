@@ -245,6 +245,16 @@
       "text": "Hello from town square."
     },
     {
+      "id": "planter",
+      "type": "check",
+      "pos": [
+        460,
+        360
+      ],
+      "radius": 18,
+      "text": "A planter overflowing with wildflowers."
+    },
+    {
       "id": "signpost",
       "type": "check",
       "pos": [

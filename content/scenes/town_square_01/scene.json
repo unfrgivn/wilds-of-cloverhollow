@@ -225,6 +225,16 @@
       "text": "The bench is warm from the afternoon sun."
     },
     {
+      "id": "lamp",
+      "type": "check",
+      "pos": [
+        540,
+        500
+      ],
+      "radius": 18,
+      "text": "The lantern glows with a soft, steady warmth."
+    },
+    {
       "id": "npc_test",
       "type": "talk",
       "pos": [

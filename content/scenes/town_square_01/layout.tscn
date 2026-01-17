@@ -208,6 +208,16 @@ position = Vector2(420, 560)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Barrel"]
 shape = SubResource("1_hotspot_circle")
 
+[node name="Hotspot_Lamp" type="Area2D" parent="Markers"]
+script = ExtResource("4_hotspot")
+hotspot_id = "lamp"
+hotspot_type = "check"
+text = "The lantern glows with a soft, steady warmth."
+position = Vector2(540, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Lamp"]
+shape = SubResource("1_hotspot_circle")
+
 [node name="Exit_Inn" type="Area2D" parent="Markers"]
 script = ExtResource("5_exit")
 exit_id = "to_inn"

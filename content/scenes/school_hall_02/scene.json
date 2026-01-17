@@ -30,6 +30,15 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/bulletin_board_01/bulletin_board_01_def.tres",
+      "pos": [
+        420,
+        220
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/fence_straight_01/fence_straight_01_def.tres",
       "pos": [
         460,
@@ -39,10 +48,28 @@
       "bake": "static"
     },
     {
+      "def": "res://content/props/locker_row_01/locker_row_01_def.tres",
+      "pos": [
+        760,
+        320
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
       "def": "res://content/props/room_shell_school_01/room_shell_school_01_def.tres",
       "pos": [
         520,
         640
+      ],
+      "variant": 0,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/trophy_case_01/trophy_case_01_def.tres",
+      "pos": [
+        600,
+        220
       ],
       "variant": 0,
       "bake": "static"
@@ -92,8 +119,8 @@
     {
       "id": "to_town",
       "rect": [
-        60,
-        620,
+        496,
+        584,
         48,
         32
       ],

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://game/tools/layout_root.gd" id="1_layout"]
 [ext_resource type="Texture2D" path="res://content/scenes/school_hall_03/ground.png" id="2_ground"]
@@ -12,6 +12,12 @@
 [ext_resource type="Resource" path="res://content/props/fence_straight_01/fence_straight_01_def.tres" id="9_fence_def"]
 [ext_resource type="PackedScene" path="res://content/props/room_shell_school_01/room_shell_school_01.tscn" id="10_room_shell"]
 [ext_resource type="Resource" path="res://content/props/room_shell_school_01/room_shell_school_01_def.tres" id="11_room_shell_def"]
+[ext_resource type="PackedScene" path="res://content/props/locker_row_01/locker_row_01.tscn" id="12_locker"]
+[ext_resource type="Resource" path="res://content/props/locker_row_01/locker_row_01_def.tres" id="13_locker_def"]
+[ext_resource type="PackedScene" path="res://content/props/bulletin_board_01/bulletin_board_01.tscn" id="14_bulletin"]
+[ext_resource type="Resource" path="res://content/props/bulletin_board_01/bulletin_board_01_def.tres" id="15_bulletin_def"]
+[ext_resource type="PackedScene" path="res://content/props/trophy_case_01/trophy_case_01.tscn" id="16_trophy"]
+[ext_resource type="Resource" path="res://content/props/trophy_case_01/trophy_case_01_def.tres" id="17_trophy_def"]
 
 [sub_resource type="CircleShape2D" id="1_hotspot_circle"]
 radius = 18.0
@@ -44,6 +50,18 @@ position = Vector2(320, 300)
 prop_def = ExtResource("9_fence_def")
 variant = 1
 position = Vector2(460, 320)
+
+[node name="LockerRow01" parent="Props" instance=ExtResource("12_locker")]
+prop_def = ExtResource("13_locker_def")
+position = Vector2(760, 320)
+
+[node name="BulletinBoard01" parent="Props" instance=ExtResource("14_bulletin")]
+prop_def = ExtResource("15_bulletin_def")
+position = Vector2(420, 220)
+
+[node name="TrophyCase01" parent="Props" instance=ExtResource("16_trophy")]
+prop_def = ExtResource("17_trophy_def")
+position = Vector2(600, 220)
 
 [node name="Markers" type="Node2D" parent="."]
 
@@ -83,7 +101,7 @@ script = ExtResource("5_exit")
 exit_id = "to_town"
 target_scene_id = "town_square_01"
 target_spawn_id = "spawn_default"
-position = Vector2(84, 636)
+position = Vector2(520, 600)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Town"]
 shape = SubResource("2_exit_town")

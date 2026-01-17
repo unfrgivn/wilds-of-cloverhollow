@@ -129,9 +129,11 @@ func _check_prop_def(prop_path: String) -> void:
 		return
 	if not (instance is Node2D):
 		_report_error("Prefab root must be Node2D", prop_path, "prefab")
+		instance.free()
 		return
 	if instance.get_script() != PROP_INSTANCE_SCRIPT:
 		_report_error("Prefab root must use PropInstance script", prop_path, "prefab")
+		instance.free()
 		return
 
 	var blocks: bool = bool(resource.get("blocks_movement"))
@@ -139,22 +141,27 @@ func _check_prop_def(prop_path: String) -> void:
 	if blocks:
 		if footprint_mask == null:
 			_report_error("Blocking prop missing footprint_mask", prop_path, "footprint_mask")
+			instance.free()
 			return
 		var footprint_image: Image = _load_footprint_image(prop_path, footprint_mask)
 		if footprint_image == null:
+			instance.free()
 			return
 		var width: int = footprint_image.get_width()
 		var height: int = footprint_image.get_height()
 		if width <= 0 or height <= 0:
 			_report_error("Footprint image has invalid size", prop_path, "footprint_mask")
+			instance.free()
 			return
 		var anchor: Vector2i = resource.get("footprint_anchor_px")
 		if anchor.x < 0 or anchor.y < 0 or anchor.x >= width or anchor.y >= height:
 			_report_error("Footprint anchor out of bounds", prop_path, "footprint_anchor_px")
+			instance.free()
 			return
 		var blocked_pixels: int = _count_blocked_pixels(footprint_image)
 		if blocked_pixels < MIN_BLOCK_PIXELS:
 			_report_error("Footprint has too few blocking pixels", prop_path, "footprint_mask")
+			instance.free()
 			return
 	else:
 		if footprint_mask != null:
@@ -166,6 +173,7 @@ func _check_prop_def(prop_path: String) -> void:
 			_report_warning("PropDef.has_overhang true but OverhangSprite missing", prop_path, "has_overhang")
 
 	print("[PropQA] PASS %s" % prop_path)
+	instance.free()
 
 func _count_blocked_pixels(image: Image) -> int:
 	var width: int = image.get_width()

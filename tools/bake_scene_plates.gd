@@ -218,13 +218,15 @@ func _load_texture_image(texture: Texture2D) -> Image:
 	var path: String = texture.resource_path
 	if path == "":
 		return null
-	var fallback: Image = Image.load_from_file(path)
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	var fallback: Image = Image.load_from_file(absolute_path)
 	if fallback == null or fallback.is_empty():
 		return null
 	return fallback
 
 func _load_texture_from_file(path: String) -> Texture2D:
-	var image: Image = Image.load_from_file(path)
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	var image: Image = Image.load_from_file(absolute_path)
 	if image == null or image.is_empty():
 		return null
 	return ImageTexture.create_from_image(image)
@@ -235,7 +237,8 @@ func _load_image_from_path(path: String, scene_path: String, label: String) -> I
 		var tex_image: Image = texture.get_image()
 		if tex_image != null and not tex_image.is_empty():
 			return tex_image
-	var fallback: Image = Image.load_from_file(path)
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	var fallback: Image = Image.load_from_file(absolute_path)
 	if fallback == null or fallback.is_empty():
 		_push_error("Failed to load %s: %s" % [label, path], scene_path)
 		return null

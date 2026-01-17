@@ -130,7 +130,8 @@ func _validate_shadow_image(path: String, prop_path: String, label: String) -> v
 	if not FileAccess.file_exists(path):
 		_push_error("%s path missing" % label, prop_path)
 		return
-	var image: Image = Image.load_from_file(path)
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	var image: Image = Image.load_from_file(absolute_path)
 	if image == null or image.is_empty():
 		_push_error("%s failed to load" % label, prop_path)
 		return
@@ -305,7 +306,7 @@ func _load_texture_image(texture: Texture2D, prop_path: String, label: String) -
 	var resource_path: String = texture.resource_path
 	var processed_path: String = _processed_override_path(resource_path)
 	if processed_path != "":
-		var processed_image: Image = Image.load_from_file(processed_path)
+		var processed_image: Image = Image.load_from_file(ProjectSettings.globalize_path(processed_path))
 		if processed_image != null and not processed_image.is_empty():
 			return processed_image
 	var image: Image = texture.get_image()
@@ -317,7 +318,7 @@ func _load_texture_image(texture: Texture2D, prop_path: String, label: String) -
 	if not FileAccess.file_exists(resource_path):
 		_push_error("%s texture resource_path missing on disk" % label, prop_path)
 		return null
-	var loaded: Image = Image.load_from_file(resource_path)
+	var loaded: Image = Image.load_from_file(ProjectSettings.globalize_path(resource_path))
 	if loaded == null or loaded.is_empty():
 		_push_error("%s texture load_from_file failed" % label, prop_path)
 		return null

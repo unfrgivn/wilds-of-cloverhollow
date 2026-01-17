@@ -93,7 +93,7 @@ func _load_image_for_processing(path: String) -> Image:
 			var image: Image = texture.get_image()
 			if image != null and not image.is_empty():
 				return image
-	return Image.load_from_file(path)
+	return Image.load_from_file(ProjectSettings.globalize_path(path))
 
 func _processed_path(path: String) -> String:
 	var base_dir: String = path.get_base_dir()

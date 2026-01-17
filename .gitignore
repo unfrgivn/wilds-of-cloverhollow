@@ -8,6 +8,9 @@ export_presets.cfg
 .DS_Store
 Thumbs.db
 
+# Blender backups
+*.blend1
+
 # Builds
 build/
 dist/

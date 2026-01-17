@@ -100,7 +100,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "bulletin_board"
 hotspot_type = "check"
 text = "The bulletin board is packed with flyers."
-position = Vector2(420, 320)
+position = Vector2(220, 320)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Bulletin"]
 shape = SubResource("1_hotspot_circle")

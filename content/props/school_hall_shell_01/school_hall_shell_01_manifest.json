@@ -5,7 +5,7 @@
   },
   "asset_id": "school_hall_shell_01",
   "defaults": {
-    "blocks_movement": true,
+    "blocks_movement": false,
     "default_bake_mode": "static",
     "has_overhang": false
   },

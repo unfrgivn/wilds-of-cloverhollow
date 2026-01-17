@@ -206,7 +206,9 @@ func _build_prefab(asset_id: String, prop_def: PropDef, base_texture: Texture2D,
 			(child as Node).owner = root
 
 	var packed: PackedScene = PackedScene.new()
-	if packed.pack(root) != OK:
+	var pack_result: int = packed.pack(root)
+	root.free()
+	if pack_result != OK:
 		_push_error("Failed to pack prefab", asset_id)
 		return null
 	return packed
@@ -232,7 +234,8 @@ func _prefer_processed_path(base_dir: String, file_name: String, fallback: Strin
 func _load_embedded_texture(path: String) -> Texture2D:
 	if not FileAccess.file_exists(path):
 		return null
-	var image: Image = Image.load_from_file(path)
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	var image: Image = Image.load_from_file(absolute_path)
 	if image == null or image.is_empty():
 		return null
 	return ImageTexture.create_from_image(image)
@@ -245,7 +248,8 @@ func _load_texture(path: String) -> Texture2D:
 		if resource is Texture2D:
 			return resource as Texture2D
 	if path.get_extension().to_lower() == "png" and FileAccess.file_exists(path):
-		var image: Image = Image.load_from_file(path)
+		var absolute_path: String = ProjectSettings.globalize_path(path)
+		var image: Image = Image.load_from_file(absolute_path)
 		if image != null and not image.is_empty():
 			var texture: ImageTexture = ImageTexture.create_from_image(image)
 			texture.resource_path = path
@@ -262,7 +266,8 @@ func _load_texture_image(texture: Texture2D) -> Image:
 	var path: String = texture.resource_path
 	if path == "":
 		return null
-	return Image.load_from_file(path)
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	return Image.load_from_file(absolute_path)
 
 func _count_opaque_pixels(image: Image, threshold: float) -> int:
 	var count: int = 0

@@ -87,13 +87,18 @@ func _process_texture(path: String, prop_id: String) -> void:
 	print("[ProcessProps] Wrote %s" % output_path)
 
 func _load_image_for_processing(path: String) -> Image:
+	var absolute_path: String = ProjectSettings.globalize_path(path)
+	if FileAccess.file_exists(absolute_path):
+		var image: Image = Image.load_from_file(absolute_path)
+		if image != null and not image.is_empty():
+			return image
 	if ResourceLoader.exists(path, "Texture2D"):
 		var texture: Texture2D = ResourceLoader.load(path) as Texture2D
 		if texture != null:
-			var image: Image = texture.get_image()
-			if image != null and not image.is_empty():
-				return image
-	return Image.load_from_file(ProjectSettings.globalize_path(path))
+			var texture_image: Image = texture.get_image()
+			if texture_image != null and not texture_image.is_empty():
+				return texture_image
+	return null
 
 func _processed_path(path: String) -> String:
 	var base_dir: String = path.get_base_dir()

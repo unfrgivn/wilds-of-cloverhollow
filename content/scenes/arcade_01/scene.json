@@ -132,6 +132,16 @@
   ],
   "hotspots": [
     {
+      "id": "arcade_cabinets",
+      "type": "check",
+      "pos": [
+        340,
+        340
+      ],
+      "radius": 18,
+      "text": "The cabinets ping with old-school charm."
+    },
+    {
       "id": "arcade_sign",
       "type": "talk",
       "pos": [
@@ -160,6 +170,16 @@
       ],
       "radius": 18,
       "text": "A gumball machine, mostly empty."
+    },
+    {
+      "id": "ticket_counter",
+      "type": "check",
+      "pos": [
+        660,
+        260
+      ],
+      "radius": 18,
+      "text": "The ticket counter is dusted with prize stubs."
     }
   ],
   "exits": [

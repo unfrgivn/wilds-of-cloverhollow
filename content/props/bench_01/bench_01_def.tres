@@ -1,15 +1,18 @@
-[gd_resource type="Resource" script_class="PropDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PropDef" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://game/props/prop_def.gd" id="1_def"]
 [ext_resource type="PackedScene" path="res://content/props/bench_01/bench_01.tscn" id="2_prefab"]
 [ext_resource type="Texture2D" path="res://content/props/bench_01/visuals/base.png" id="3_base"]
 [ext_resource type="Texture2D" path="res://content/props/bench_01/footprints/block.png" id="4_footprint"]
 
+[ext_resource type="Texture2D" path="res://content/props/bench_01/visuals/base_variant_1.png" id="base_var_1"]
+[ext_resource type="Texture2D" path="res://content/props/bench_01/visuals/base_variant_2.png" id="base_var_2"]
+[ext_resource type="Texture2D" path="res://content/props/bench_01/visuals/base_variant_3.png" id="base_var_3"]
 [resource]
 script = ExtResource("1_def")
 id = "bench_01"
 prefab = ExtResource("2_prefab")
-base_textures = [ExtResource("3_base")]
+base_textures = [ExtResource("3_base"), ExtResource("base_var_1"), ExtResource("base_var_2"), ExtResource("base_var_3")]
 blocks_movement = true
 footprint_mask = ExtResource("4_footprint")
 footprint_anchor_px = Vector2i(70, 59)

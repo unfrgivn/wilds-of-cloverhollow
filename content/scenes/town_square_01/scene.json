@@ -17,15 +17,15 @@
     "id": "spawn_default",
     "pos": [
       640,
-      620
+      600
     ]
   },
   "props": [
     {
       "def": "res://content/props/barrel_01/barrel_01_def.tres",
       "pos": [
-        420,
-        520
+        1040,
+        340
       ],
       "variant": 0,
       "bake": "static"
@@ -33,17 +33,26 @@
     {
       "def": "res://content/props/bench_01/bench_01_def.tres",
       "pos": [
-        360,
-        460
+        350,
+        450
       ],
-      "variant": 0,
+      "variant": 1,
       "bake": "static"
     },
     {
       "def": "res://content/props/bench_01/bench_01_def.tres",
       "pos": [
-        740,
-        460
+        930,
+        450
+      ],
+      "variant": 2,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/fence_straight_01/fence_straight_01_def.tres",
+      "pos": [
+        40,
+        340
       ],
       "variant": 0,
       "bake": "static"
@@ -51,17 +60,8 @@
     {
       "def": "res://content/props/fence_straight_01/fence_straight_01_def.tres",
       "pos": [
-        200,
-        400
-      ],
-      "variant": 0,
-      "bake": "static"
-    },
-    {
-      "def": "res://content/props/fence_straight_01/fence_straight_01_def.tres",
-      "pos": [
-        280,
-        400
+        80,
+        340
       ],
       "variant": 0,
       "bake": "static"
@@ -69,8 +69,8 @@
     {
       "def": "res://content/props/gate_single_01/gate_single_01_def.tres",
       "pos": [
-        240,
-        400
+        120,
+        340
       ],
       "variant": 0,
       "bake": "static"
@@ -78,35 +78,44 @@
     {
       "def": "res://content/props/house_01/house_01_def.tres",
       "pos": [
-        420,
-        220
+        640,
+        310
       ],
-      "variant": 0,
+      "variant": 3,
       "bake": "static"
     },
     {
       "def": "res://content/props/house_stone_01/house_stone_01_def.tres",
       "pos": [
-        660,
-        300
+        1100,
+        330
       ],
-      "variant": 0,
+      "variant": 2,
       "bake": "static"
     },
     {
       "def": "res://content/props/house_timber_01/house_timber_01_def.tres",
       "pos": [
-        780,
-        320
+        180,
+        330
       ],
-      "variant": 0,
+      "variant": 1,
       "bake": "static"
     },
     {
       "def": "res://content/props/lamp_01/lamp_01_def.tres",
       "pos": [
-        540,
-        460
+        450,
+        440
+      ],
+      "variant": 1,
+      "bake": "static"
+    },
+    {
+      "def": "res://content/props/planter_01/planter_01_def.tres",
+      "pos": [
+        350,
+        330
       ],
       "variant": 0,
       "bake": "static"
@@ -114,16 +123,7 @@
     {
       "def": "res://content/props/planter_01/planter_01_def.tres",
       "pos": [
-        260,
-        320
-      ],
-      "variant": 0,
-      "bake": "static"
-    },
-    {
-      "def": "res://content/props/planter_01/planter_01_def.tres",
-      "pos": [
-        460,
+        700,
         320
       ],
       "variant": 0,
@@ -132,26 +132,26 @@
     {
       "def": "res://content/props/school_01_exterior/school_01_exterior_def.tres",
       "pos": [
-        540,
+        880,
         320
       ],
-      "variant": 0,
+      "variant": 1,
       "bake": "static"
     },
     {
       "def": "res://content/props/shop_01/shop_01_def.tres",
       "pos": [
-        300,
-        260
+        400,
+        320
       ],
-      "variant": 0,
+      "variant": 2,
       "bake": "static"
     },
     {
       "def": "res://content/props/signpost_01/signpost_01_def.tres",
       "pos": [
-        240,
-        440
+        640,
+        480
       ],
       "variant": 0,
       "bake": "live"
@@ -159,8 +159,8 @@
     {
       "def": "res://content/props/tree_01/tree_01_def.tres",
       "pos": [
-        120,
-        220
+        60,
+        260
       ],
       "variant": 0,
       "bake": "static"
@@ -168,7 +168,7 @@
     {
       "def": "res://content/props/tree_01/tree_01_def.tres",
       "pos": [
-        1040,
+        1220,
         260
       ],
       "variant": 0,
@@ -180,8 +180,8 @@
       "id": "leaf_01",
       "texture": "res://content/decals/leaf_01.png",
       "pos": [
-        520,
-        340
+        700,
+        470
       ],
       "size": [
         16,
@@ -193,8 +193,8 @@
       "id": "scuff_01",
       "texture": "res://content/decals/scuff_01.png",
       "pos": [
-        300,
-        360
+        400,
+        460
       ],
       "size": [
         16,
@@ -208,8 +208,8 @@
       "id": "barrel",
       "type": "check",
       "pos": [
-        420,
-        560
+        1040,
+        360
       ],
       "radius": 18,
       "text": "A barrel that smells faintly of cider."
@@ -218,7 +218,7 @@
       "id": "bench",
       "type": "check",
       "pos": [
-        360,
+        350,
         500
       ],
       "radius": 18,
@@ -228,8 +228,8 @@
       "id": "lamp",
       "type": "check",
       "pos": [
-        540,
-        500
+        450,
+        460
       ],
       "radius": 18,
       "text": "The lantern glows with a soft, steady warmth."
@@ -238,8 +238,8 @@
       "id": "npc_test",
       "type": "talk",
       "pos": [
-        640,
-        360
+        500,
+        400
       ],
       "radius": 18,
       "text": "Hello from town square."
@@ -248,8 +248,8 @@
       "id": "planter",
       "type": "check",
       "pos": [
-        460,
-        360
+        350,
+        350
       ],
       "radius": 18,
       "text": "A planter overflowing with wildflowers."
@@ -258,8 +258,8 @@
       "id": "signpost",
       "type": "check",
       "pos": [
-        240,
-        470
+        640,
+        520
       ],
       "radius": 18,
       "text": "A hand-painted sign points toward the town center."
@@ -268,8 +268,8 @@
       "id": "tree",
       "type": "check",
       "pos": [
-        1040,
-        320
+        60,
+        300
       ],
       "radius": 18,
       "text": "The tree sways with a whisper of leaves."
@@ -279,8 +279,8 @@
     {
       "id": "to_arcade",
       "rect": [
-        636,
-        324,
+        1076,
+        314,
         48,
         32
       ],
@@ -292,8 +292,8 @@
     {
       "id": "to_house",
       "rect": [
-        756,
-        304,
+        156,
+        314,
         48,
         32
       ],
@@ -305,8 +305,8 @@
     {
       "id": "to_inn",
       "rect": [
-        396,
-        244,
+        616,
+        344,
         48,
         32
       ],
@@ -318,8 +318,8 @@
     {
       "id": "to_school",
       "rect": [
-        516,
-        344,
+        856,
+        304,
         48,
         32
       ],

@@ -1,17 +1,23 @@
-[gd_resource type="Resource" script_class="PropDef" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="PropDef" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/base.png" id="1_yienj"]
-[ext_resource type="Texture2D" path="res://content/props/house_stone_01/footprints/block.png" id="2_yylno"]
-[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/overhang.png" id="3_c4use"]
-[ext_resource type="Script" path="res://game/props/prop_def.gd" id="4_axlon"]
-[ext_resource type="PackedScene" path="res://content/props/house_stone_01/house_stone_01.tscn" id="4_yylno"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/base.png" id="1_km4mm"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/base_variant_1.png" id="2_vt486"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/base_variant_2.png" id="3_0kef1"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/base_variant_3.png" id="4_qu4nh"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/footprints/block.png" id="5_el2sc"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/overhang.png" id="6_1fgrn"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/overhang_variant_1.png" id="7_uhpdm"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/overhang_variant_2.png" id="8_3r34t"]
+[ext_resource type="Texture2D" path="res://content/props/house_stone_01/visuals/_processed/overhang_variant_3.png" id="9_ih8nb"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="10_l6iwv"]
+[ext_resource type="PackedScene" path="res://content/props/house_stone_01/house_stone_01.tscn" id="10_vt486"]
 
 [resource]
-script = ExtResource("4_axlon")
+script = ExtResource("10_l6iwv")
 id = "house_stone_01"
-prefab = ExtResource("4_yylno")
-base_textures = Array[Texture2D]([ExtResource("1_yienj")])
-overhang_textures = Array[Texture2D]([ExtResource("3_c4use")])
-footprint_mask = ExtResource("2_yylno")
+prefab = ExtResource("10_vt486")
+base_textures = Array[Texture2D]([ExtResource("1_km4mm"), ExtResource("2_vt486"), ExtResource("3_0kef1"), ExtResource("4_qu4nh")])
+overhang_textures = Array[Texture2D]([ExtResource("6_1fgrn"), ExtResource("7_uhpdm"), ExtResource("8_3r34t"), ExtResource("9_ih8nb")])
+footprint_mask = ExtResource("5_el2sc")
 footprint_anchor_px = Vector2i(256, 511)
 has_overhang = true

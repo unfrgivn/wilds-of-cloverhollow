@@ -114,6 +114,28 @@ func _process_manifest(manifest_path: String) -> void:
 	if has_overhang and overhang_texture == null:
 		_push_warning("Overhang texture missing", resolved_overhang_path)
 
+	var base_textures: Array[Texture2D] = [base_texture]
+	var base_variant_paths: Array[String] = _collect_variant_paths(base_dir, "base")
+	for variant_path in base_variant_paths:
+		var resolved_variant: String = _prefer_processed_path(base_dir, variant_path.get_file(), variant_path)
+		var variant_texture: Texture2D = _load_texture(resolved_variant)
+		if variant_texture == null:
+			_push_warning("Variant texture missing", resolved_variant)
+		else:
+			base_textures.append(variant_texture)
+
+	var overhang_textures: Array[Texture2D] = []
+	if has_overhang and overhang_texture != null:
+		overhang_textures.append(overhang_texture)
+		var overhang_variant_paths: Array[String] = _collect_variant_paths(base_dir, "overhang")
+		for variant_path in overhang_variant_paths:
+			var resolved_variant: String = _prefer_processed_path(base_dir, variant_path.get_file(), variant_path)
+			var variant_texture: Texture2D = _load_texture(resolved_variant)
+			if variant_texture == null:
+				_push_warning("Variant texture missing", resolved_variant)
+			else:
+				overhang_textures.append(variant_texture)
+
 	var footprint_anchor: Vector2i = Vector2i.ZERO
 	if blocks_movement:
 		if footprint_texture == null:
@@ -132,10 +154,8 @@ func _process_manifest(manifest_path: String) -> void:
 	var prop_def: PropDef = PropDef.new()
 	prop_def.id = asset_id
 	prop_def.prefab = null
-	prop_def.base_textures = [base_texture]
-	prop_def.overhang_textures = []
-	if has_overhang and overhang_texture != null:
-		prop_def.overhang_textures = [overhang_texture]
+	prop_def.base_textures = base_textures
+	prop_def.overhang_textures = overhang_textures
 	prop_def.blocks_movement = blocks_movement
 	prop_def.footprint_mask = footprint_texture
 	prop_def.footprint_anchor_px = footprint_anchor
@@ -230,6 +250,23 @@ func _prefer_processed_path(base_dir: String, file_name: String, fallback: Strin
 	if FileAccess.file_exists(processed):
 		return processed
 	return fallback
+
+func _collect_variant_paths(base_dir: String, prefix: String) -> Array[String]:
+	var results: Array[String] = []
+	var visuals_dir: String = base_dir.path_join("visuals")
+	var dir: DirAccess = DirAccess.open(visuals_dir)
+	if dir == null:
+		return results
+	var prefix_match: String = "%s_variant_" % prefix
+	dir.list_dir_begin()
+	var entry: String = dir.get_next()
+	while entry != "":
+		if not dir.current_is_dir() and entry.begins_with(prefix_match) and entry.ends_with(".png"):
+			results.append(visuals_dir.path_join(entry))
+		entry = dir.get_next()
+	dir.list_dir_end()
+	results.sort()
+	return results
 
 func _load_embedded_texture(path: String) -> Texture2D:
 	if not FileAccess.file_exists(path):

@@ -81,71 +81,79 @@ position = Vector2(0, 0)
 
 [node name="Inn_Building" parent="Props" instance=ExtResource("64_house_01")]
 prop_def = ExtResource("65_house_01_def")
-position = Vector2(420, 220)
+variant = 3
+position = Vector2(640, 310)
 
 [node name="School_Building" parent="Props" instance=ExtResource("50_school")]
 prop_def = ExtResource("51_school_def")
-position = Vector2(540, 320)
+variant = 1
+position = Vector2(880, 320)
 
 [node name="Arcade_Building" parent="Props" instance=ExtResource("44_house_s1")]
 prop_def = ExtResource("45_house_s1_def")
-position = Vector2(660, 300)
+variant = 2
+position = Vector2(1100, 330)
 
 [node name="House_Building" parent="Props" instance=ExtResource("40_house_t1")]
 prop_def = ExtResource("41_house_t1_def")
-position = Vector2(780, 320)
+variant = 1
+position = Vector2(180, 330)
 
 [node name="Shop_Building" parent="Props" instance=ExtResource("48_shop")]
 prop_def = ExtResource("49_shop_def")
-position = Vector2(300, 260)
+variant = 2
+position = Vector2(400, 320)
 
 [node name="Fence_Left" parent="Props" instance=ExtResource("32_fence_s")]
 prop_def = ExtResource("33_fence_s_def")
-position = Vector2(200, 400)
+position = Vector2(80, 340)
 
 [node name="Gate_Left" parent="Props" instance=ExtResource("34_gate")]
 prop_def = ExtResource("35_gate_def")
-position = Vector2(240, 400)
+position = Vector2(120, 340)
 
 [node name="Fence_Right" parent="Props" instance=ExtResource("32_fence_s")]
 prop_def = ExtResource("33_fence_s_def")
-position = Vector2(280, 400)
+position = Vector2(40, 340)
 
 [node name="Tree01" parent="Props" instance=ExtResource("56_tree")]
 prop_def = ExtResource("57_tree_def")
-position = Vector2(120, 220)
+position = Vector2(60, 260)
 
 [node name="Bench01" parent="Props" instance=ExtResource("52_bench")]
 prop_def = ExtResource("53_bench_def")
-position = Vector2(360, 460)
+variant = 1
+position = Vector2(350, 450)
 
 [node name="Lamp01" parent="Props" instance=ExtResource("54_lamp")]
 prop_def = ExtResource("55_lamp_def")
-position = Vector2(540, 460)
+variant = 1
+position = Vector2(450, 440)
 
 [node name="Planter01" parent="Props" instance=ExtResource("58_planter")]
 prop_def = ExtResource("59_planter_def")
-position = Vector2(260, 320)
+position = Vector2(350, 330)
 
 [node name="Barrel01" parent="Props" instance=ExtResource("60_barrel")]
 prop_def = ExtResource("61_barrel_def")
-position = Vector2(420, 520)
+position = Vector2(1040, 340)
 
 [node name="Signpost01" parent="Props" instance=ExtResource("62_signpost")]
 prop_def = ExtResource("63_signpost_def")
-position = Vector2(240, 440)
+position = Vector2(640, 480)
 
 [node name="Tree02" parent="Props" instance=ExtResource("56_tree")]
 prop_def = ExtResource("57_tree_def")
-position = Vector2(1040, 260)
+position = Vector2(1220, 260)
 
 [node name="Bench02" parent="Props" instance=ExtResource("52_bench")]
 prop_def = ExtResource("53_bench_def")
-position = Vector2(740, 460)
+variant = 2
+position = Vector2(930, 450)
 
 [node name="Planter02" parent="Props" instance=ExtResource("58_planter")]
 prop_def = ExtResource("59_planter_def")
-position = Vector2(460, 320)
+position = Vector2(700, 320)
 
 [node name="Markers" type="Node2D" parent="."]
 
@@ -155,7 +163,7 @@ decal_id = "scuff_01"
 texture_path = "res://content/decals/scuff_01.png"
 size_px = Vector2i(16, 16)
 decal_z_index = -2
-position = Vector2(300, 360)
+position = Vector2(400, 460)
 
 [node name="Decal_Leaf" type="Node2D" parent="Markers"]
 script = ExtResource("6_decal")
@@ -163,19 +171,19 @@ decal_id = "leaf_01"
 texture_path = "res://content/decals/leaf_01.png"
 size_px = Vector2i(16, 16)
 decal_z_index = -2
-position = Vector2(520, 340)
+position = Vector2(700, 470)
 
 [node name="Spawn_Default" type="Node2D" parent="Markers"]
 script = ExtResource("3_spawn")
 spawn_id = "spawn_default"
-position = Vector2(640, 620)
+position = Vector2(640, 600)
 
 [node name="Hotspot_Npc" type="Area2D" parent="Markers"]
 script = ExtResource("4_hotspot")
 hotspot_id = "npc_test"
 hotspot_type = "talk"
 text = "Hello from town square."
-position = Vector2(640, 360)
+position = Vector2(500, 400)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Npc"]
 shape = SubResource("1_hotspot_circle")
@@ -185,7 +193,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "signpost"
 hotspot_type = "check"
 text = "A hand-painted sign points toward the town center."
-position = Vector2(240, 470)
+position = Vector2(640, 520)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Sign"]
 shape = SubResource("1_hotspot_circle")
@@ -195,7 +203,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "bench"
 hotspot_type = "check"
 text = "The bench is warm from the afternoon sun."
-position = Vector2(360, 500)
+position = Vector2(350, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Bench"]
 shape = SubResource("1_hotspot_circle")
@@ -205,7 +213,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "barrel"
 hotspot_type = "check"
 text = "A barrel that smells faintly of cider."
-position = Vector2(420, 560)
+position = Vector2(1040, 360)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Barrel"]
 shape = SubResource("1_hotspot_circle")
@@ -215,7 +223,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "lamp"
 hotspot_type = "check"
 text = "The lantern glows with a soft, steady warmth."
-position = Vector2(540, 500)
+position = Vector2(450, 460)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Lamp"]
 shape = SubResource("1_hotspot_circle")
@@ -225,7 +233,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "planter"
 hotspot_type = "check"
 text = "A planter overflowing with wildflowers."
-position = Vector2(460, 360)
+position = Vector2(350, 350)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Planter"]
 shape = SubResource("1_hotspot_circle")
@@ -235,7 +243,7 @@ script = ExtResource("4_hotspot")
 hotspot_id = "tree"
 hotspot_type = "check"
 text = "The tree sways with a whisper of leaves."
-position = Vector2(1040, 320)
+position = Vector2(60, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Hotspot_Tree"]
 shape = SubResource("1_hotspot_circle")
@@ -245,7 +253,7 @@ script = ExtResource("5_exit")
 exit_id = "to_inn"
 target_scene_id = "inn_01"
 target_spawn_id = "spawn_default"
-position = Vector2(420, 260)
+position = Vector2(640, 360)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Inn"]
 shape = SubResource("2_exit_inn")
@@ -255,7 +263,7 @@ script = ExtResource("5_exit")
 exit_id = "to_school"
 target_scene_id = "school_hall_01"
 target_spawn_id = "spawn_default"
-position = Vector2(540, 360)
+position = Vector2(880, 320)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_School"]
 shape = SubResource("3_exit_school")
@@ -265,7 +273,7 @@ script = ExtResource("5_exit")
 exit_id = "to_arcade"
 target_scene_id = "arcade_01"
 target_spawn_id = "spawn_default"
-position = Vector2(660, 340)
+position = Vector2(1100, 330)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_Arcade"]
 shape = SubResource("4_exit_arcade")
@@ -275,7 +283,7 @@ script = ExtResource("5_exit")
 exit_id = "to_house"
 target_scene_id = "fae_house_01"
 target_spawn_id = "spawn_default"
-position = Vector2(780, 320)
+position = Vector2(180, 330)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Markers/Exit_House"]
 shape = SubResource("5_exit_house")

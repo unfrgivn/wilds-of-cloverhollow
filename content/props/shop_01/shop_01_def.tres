@@ -1,17 +1,23 @@
-[gd_resource type="Resource" script_class="PropDef" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="PropDef" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/base.png" id="1_4stie"]
-[ext_resource type="Texture2D" path="res://content/props/shop_01/footprints/block.png" id="2_xyhva"]
-[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/overhang.png" id="3_d7stl"]
-[ext_resource type="Script" path="res://game/props/prop_def.gd" id="4_iqxq7"]
-[ext_resource type="PackedScene" path="res://content/props/shop_01/shop_01.tscn" id="4_xyhva"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/base.png" id="1_tlvqy"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/base_variant_1.png" id="2_6jews"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/base_variant_2.png" id="3_t1bw6"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/base_variant_3.png" id="4_5n763"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/footprints/block.png" id="5_vcpou"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/overhang.png" id="6_gpwtx"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/overhang_variant_1.png" id="7_4l45u"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/overhang_variant_2.png" id="8_p8a0o"]
+[ext_resource type="Texture2D" path="res://content/props/shop_01/visuals/_processed/overhang_variant_3.png" id="9_r8cl1"]
+[ext_resource type="PackedScene" path="res://content/props/shop_01/shop_01.tscn" id="10_6jews"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="10_w2ce7"]
 
 [resource]
-script = ExtResource("4_iqxq7")
+script = ExtResource("10_w2ce7")
 id = "shop_01"
-prefab = ExtResource("4_xyhva")
-base_textures = Array[Texture2D]([ExtResource("1_4stie")])
-overhang_textures = Array[Texture2D]([ExtResource("3_d7stl")])
-footprint_mask = ExtResource("2_xyhva")
+prefab = ExtResource("10_6jews")
+base_textures = Array[Texture2D]([ExtResource("1_tlvqy"), ExtResource("2_6jews"), ExtResource("3_t1bw6"), ExtResource("4_5n763")])
+overhang_textures = Array[Texture2D]([ExtResource("6_gpwtx"), ExtResource("7_4l45u"), ExtResource("8_p8a0o"), ExtResource("9_r8cl1")])
+footprint_mask = ExtResource("5_vcpou")
 footprint_anchor_px = Vector2i(256, 511)
 has_overhang = true

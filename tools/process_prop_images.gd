@@ -104,6 +104,23 @@ func _processed_path(path: String) -> String:
 	var base_dir: String = path.get_base_dir()
 	return base_dir.path_join("_processed").path_join(path.get_file())
 
+func _collect_variant_paths(base_dir: String, prefix: String) -> Array[String]:
+	var results: Array[String] = []
+	var visuals_dir: String = base_dir.path_join("visuals")
+	var dir: DirAccess = DirAccess.open(visuals_dir)
+	if dir == null:
+		return results
+	var prefix_match: String = "%s_variant_" % prefix
+	dir.list_dir_begin()
+	var entry: String = dir.get_next()
+	while entry != "":
+		if not dir.current_is_dir() and entry.begins_with(prefix_match) and entry.ends_with(".png"):
+			results.append(visuals_dir.path_join(entry))
+		entry = dir.get_next()
+	dir.list_dir_end()
+	results.sort()
+	return results
+
 func _source_from_manifest(manifest_path: String) -> Dictionary:
 	var data: Dictionary = _load_manifest(manifest_path)
 	if data.is_empty():
@@ -123,6 +140,8 @@ func _source_from_manifest(manifest_path: String) -> Dictionary:
 	textures.append(base_dir.path_join(base_rel))
 	if overhang_rel != "":
 		textures.append(base_dir.path_join(overhang_rel))
+	textures.append_array(_collect_variant_paths(base_dir, "base"))
+	textures.append_array(_collect_variant_paths(base_dir, "overhang"))
 	return {"id": asset_id, "textures": _unique_sorted(textures)}
 
 func _source_from_prop_def(def_path: String) -> Dictionary:

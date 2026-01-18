@@ -1,17 +1,23 @@
-[gd_resource type="Resource" script_class="PropDef" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="PropDef" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/base.png" id="1_v0po1"]
-[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/footprints/block.png" id="2_3n0yh"]
-[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/overhang.png" id="3_0kxrh"]
-[ext_resource type="PackedScene" path="res://content/props/school_01_exterior/school_01_exterior.tscn" id="4_3n0yh"]
-[ext_resource type="Script" path="res://game/props/prop_def.gd" id="4_tvjt7"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/base.png" id="1_cs5aa"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/base_variant_1.png" id="2_ivrqk"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/base_variant_2.png" id="3_qn03d"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/base_variant_3.png" id="4_5108s"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/footprints/block.png" id="5_fn0n6"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/overhang.png" id="6_cw7er"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/overhang_variant_1.png" id="7_183j0"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/overhang_variant_2.png" id="8_u5n0m"]
+[ext_resource type="Texture2D" path="res://content/props/school_01_exterior/visuals/_processed/overhang_variant_3.png" id="9_rqjlh"]
+[ext_resource type="PackedScene" path="res://content/props/school_01_exterior/school_01_exterior.tscn" id="10_ivrqk"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="10_stea4"]
 
 [resource]
-script = ExtResource("4_tvjt7")
+script = ExtResource("10_stea4")
 id = "school_01_exterior"
-prefab = ExtResource("4_3n0yh")
-base_textures = Array[Texture2D]([ExtResource("1_v0po1")])
-overhang_textures = Array[Texture2D]([ExtResource("3_0kxrh")])
-footprint_mask = ExtResource("2_3n0yh")
+prefab = ExtResource("10_ivrqk")
+base_textures = Array[Texture2D]([ExtResource("1_cs5aa"), ExtResource("2_ivrqk"), ExtResource("3_qn03d"), ExtResource("4_5108s")])
+overhang_textures = Array[Texture2D]([ExtResource("6_cw7er"), ExtResource("7_183j0"), ExtResource("8_u5n0m"), ExtResource("9_rqjlh")])
+footprint_mask = ExtResource("5_fn0n6")
 footprint_anchor_px = Vector2i(256, 511)
 has_overhang = true

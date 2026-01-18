@@ -1,17 +1,23 @@
-[gd_resource type="Resource" script_class="PropDef" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="PropDef" load_steps=12 format=3]
 
-[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/base.png" id="1_nwcce"]
-[ext_resource type="Texture2D" path="res://content/props/house_timber_01/footprints/block.png" id="2_4kqwd"]
-[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/overhang.png" id="3_sekkb"]
-[ext_resource type="PackedScene" path="res://content/props/house_timber_01/house_timber_01.tscn" id="4_4kqwd"]
-[ext_resource type="Script" path="res://game/props/prop_def.gd" id="4_mvvwu"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/base.png" id="1_5poh5"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/base_variant_1.png" id="2_6r0uh"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/base_variant_2.png" id="3_yp4fh"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/base_variant_3.png" id="4_epwfs"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/footprints/block.png" id="5_rcvvd"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/overhang.png" id="6_ydfbu"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/overhang_variant_1.png" id="7_hpvav"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/overhang_variant_2.png" id="8_yjdtl"]
+[ext_resource type="Texture2D" path="res://content/props/house_timber_01/visuals/_processed/overhang_variant_3.png" id="9_l3gaj"]
+[ext_resource type="PackedScene" path="res://content/props/house_timber_01/house_timber_01.tscn" id="10_6r0uh"]
+[ext_resource type="Script" path="res://game/props/prop_def.gd" id="10_7pkjm"]
 
 [resource]
-script = ExtResource("4_mvvwu")
+script = ExtResource("10_7pkjm")
 id = "house_timber_01"
-prefab = ExtResource("4_4kqwd")
-base_textures = Array[Texture2D]([ExtResource("1_nwcce")])
-overhang_textures = Array[Texture2D]([ExtResource("3_sekkb")])
-footprint_mask = ExtResource("2_4kqwd")
+prefab = ExtResource("10_6r0uh")
+base_textures = Array[Texture2D]([ExtResource("1_5poh5"), ExtResource("2_6r0uh"), ExtResource("3_yp4fh"), ExtResource("4_epwfs")])
+overhang_textures = Array[Texture2D]([ExtResource("6_ydfbu"), ExtResource("7_hpvav"), ExtResource("8_yjdtl"), ExtResource("9_l3gaj")])
+footprint_mask = ExtResource("5_rcvvd")
 footprint_anchor_px = Vector2i(256, 511)
 has_overhang = true

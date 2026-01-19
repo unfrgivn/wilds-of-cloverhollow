@@ -8,4 +8,5 @@ This folder is the “how we work” playbook. It is written so you can:
 ## Start here
 - `master-prompt.md` — copy/paste prompts for starting sessions (Product Architect + Coding Agent)
 - `plan.md` — detailed milestone plan (engineering + art pipeline + content production)
+- `next-milestone-command.md` — usage guide for the `/next-milestone` command
 - `biome-workshop.md` — repeatable process for designing and adding a new biome pack

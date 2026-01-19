@@ -288,6 +288,39 @@ transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 
 [node name="DockRock" parent="Landmarks/Dock" instance=ExtResource("16_rock")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
+[node name="Schoolyard" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -18)
+
+[node name="SchoolFence1" parent="Landmarks/Schoolyard" instance=ExtResource("15_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="SchoolFence2" parent="Landmarks/Schoolyard" instance=ExtResource("15_fence")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -3, 0, 0)
+
+[node name="SchoolBench" parent="Landmarks/Schoolyard" instance=ExtResource("9_bench")]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 1, 0, 1)
+
+[node name="SchoolLamp" parent="Landmarks/Schoolyard" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="Market" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 5)
+
+[node name="MarketCrate1" parent="Landmarks/Market" instance=ExtResource("13_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="MarketCrate2" parent="Landmarks/Market" instance=ExtResource("13_crate")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 0.2, 0.5, 0.2)
+
+[node name="MarketBarrel1" parent="Landmarks/Market" instance=ExtResource("18_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 0.5)
+
+[node name="MarketSign" parent="Landmarks/Market" instance=ExtResource("10_signpost")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 1.5, 0, 1)
+
+[node name="MarketPot" parent="Landmarks/Market" instance=ExtResource("14_flower")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
+
 [node name="Paths" type="Node3D" parent="."]
 
 [node name="PathEW" type="MeshInstance3D" parent="Paths"]

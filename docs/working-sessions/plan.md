@@ -472,6 +472,7 @@ Build a real town exterior with NPCs, interactions, and navigation.
 ## Milestone 17 — Fae house interior + routing
 
 **Owner:** World Scene Builder + Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Ship Fae house interior and wire transitions to/from town.

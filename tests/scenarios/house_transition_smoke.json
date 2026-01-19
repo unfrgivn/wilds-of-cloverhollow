@@ -1,0 +1,15 @@
+{
+  "id": "house_transition_smoke",
+  "start_scene": "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_FaeHouse.tscn",
+  "seed": 1701,
+  "quit_after_frames": 900,
+  "actions": [
+    {"type": "wait_frames", "frames": 20},
+    {"type": "move_to", "x": 0.0, "z": 4.0, "tolerance": 0.3, "timeout_frames": 600},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "move_to", "x": 5.0, "z": 5.0, "tolerance": 0.4, "timeout_frames": 900},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "arrived_in_town"}
+  ]
+}

@@ -1,0 +1,114 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/QuestNPC.tscn" id="4_npc"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/Sign.tscn" id="5_sign"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/Container.tscn" id="6_container"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/Door.tscn" id="7_door"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/EnemyActor.tscn" id="8_enemy"]
+[ext_resource type="PackedScene" path="res://game/assets/props/bench.tscn" id="9_bench"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sign_post.tscn" id="10_signpost"]
+[ext_resource type="PackedScene" path="res://game/assets/props/lamp_post.tscn" id="11_lamp"]
+[ext_resource type="PackedScene" path="res://game/assets/props/mailbox.tscn" id="12_mailbox"]
+[ext_resource type="PackedScene" path="res://game/assets/props/crate.tscn" id="13_crate"]
+[ext_resource type="PackedScene" path="res://game/assets/props/flower_pot.tscn" id="14_flower"]
+[ext_resource type="PackedScene" path="res://game/assets/props/fence_straight.tscn" id="15_fence"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_1"]
+vertices = PackedVector3Array(-20, 0, -20, -20, 0, 20, 20, 0, 20, 20, 0, -20)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(40, 0.1, 40)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(40, 0.1, 40)
+
+[node name="Area_Cloverhollow_Town" type="Node3D"]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_1")
+
+[node name="Ground" type="StaticBody3D" parent="NavigationRegion3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Ground"]
+mesh = SubResource("BoxMesh_ground")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Ground"]
+shape = SubResource("BoxShape3D_ground")
+
+[node name="FollowCameraRig" parent="." instance=ExtResource("2_cam")]
+target_path = NodePath("../Player")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Spawn_Default" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("1_spawn")
+spawn_id = "Town_Default"
+is_default = true
+
+[node name="Spawn_FromHouse" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+script = ExtResource("1_spawn")
+spawn_id = "Town_FromHouse"
+
+[node name="NPC_Mayor" parent="." instance=ExtResource("4_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+quest_id = "lantern_note"
+speaker_name = "Mayor"
+intro_text = "Welcome to Cloverhollow!"
+
+[node name="NPC_Kid" parent="." instance=ExtResource("4_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+quest_id = "lantern_note"
+speaker_name = "Kid"
+intro_text = "Have you seen the lantern?"
+
+[node name="TownSign" parent="." instance=ExtResource("5_sign")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
+speaker_name = "Sign"
+message = "Cloverhollow Town Square"
+
+[node name="Chest" parent="." instance=ExtResource("6_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+item_id = "berry"
+opened_text = "You found a potion!"
+
+[node name="Enemy_Slime" parent="." instance=ExtResource("8_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+battle_scene = "res://game/scenes/battle/BattleScene.tscn"
+encounter_id = "test_encounter"
+
+[node name="DoorToHouse" parent="." instance=ExtResource("7_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 6)
+target_scene = "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_FaeHouse.tscn"
+target_spawn_id = "House_FromTown"
+
+[node name="BusStop" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+
+[node name="Bench" parent="BusStop" instance=ExtResource("9_bench")]
+
+[node name="SignPost" parent="BusStop" instance=ExtResource("10_signpost")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+
+[node name="Decor" type="Node3D" parent="."]
+
+[node name="LampPost" parent="Decor" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
+
+[node name="Mailbox" parent="Decor" instance=ExtResource("12_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 7)
+
+[node name="Crate" parent="Decor" instance=ExtResource("13_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 6)
+
+[node name="FlowerPot" parent="Decor" instance=ExtResource("14_flower")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 6)
+
+[node name="Fence" parent="Decor" instance=ExtResource("15_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)

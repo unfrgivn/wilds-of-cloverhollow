@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/Door.tscn" id="4_door"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(10, 0.1, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(10, 0.1, 10)
+
+[node name="Area_Cloverhollow_FaeHouse" type="Node3D"]
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="FollowCameraRig" parent="." instance=ExtResource("2_cam")]
+target_path = NodePath("../Player")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+omni_range = 10.0
+
+[node name="Spawn_Default" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("1_spawn")
+spawn_id = "House_Default"
+is_default = true
+
+[node name="Spawn_FromTown" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+script = ExtResource("1_spawn")
+spawn_id = "House_FromTown"
+
+[node name="DoorToTown" parent="." instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+target_scene = "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_Town.tscn"
+target_spawn_id = "Town_FromHouse"

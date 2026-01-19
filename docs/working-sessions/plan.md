@@ -453,6 +453,7 @@ Lock the Cloverhollow look and ship a minimal prop kit plus one enemy family.
 ## Milestone 16 — Cloverhollow town exterior (playable)
 
 **Owner:** World Scene Builder + Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Build a real town exterior with NPCs, interactions, and navigation.

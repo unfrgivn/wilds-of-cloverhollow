@@ -1,0 +1,31 @@
+{
+  "id": "town_smoke",
+  "start_scene": "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_Town.tscn",
+  "seed": 1601,
+  "quit_after_frames": 1500,
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move_to", "x": 2.0, "z": -2.0, "tolerance": 0.3, "timeout_frames": 600},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move_to", "x": -2.0, "z": -2.0, "tolerance": 0.3, "timeout_frames": 600},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move_to", "x": 3.0, "z": 3.0, "tolerance": 0.3, "timeout_frames": 600},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture_checkpoint", "label": "after_town_sign"},
+    {"type": "move_to", "x": -5.0, "z": 5.0, "tolerance": 0.3, "timeout_frames": 900},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "move_to", "x": 5.0, "z": 6.0, "tolerance": 0.4, "timeout_frames": 900},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "move_to", "x": 0.0, "z": 4.0, "tolerance": 0.4, "timeout_frames": 600},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture_checkpoint", "label": "after_house_return"},
+    {"type": "move_to", "x": 8.0, "z": 0.0, "tolerance": 0.4, "timeout_frames": 900},
+    {"type": "wait_frames", "frames": 60}
+  ]
+}

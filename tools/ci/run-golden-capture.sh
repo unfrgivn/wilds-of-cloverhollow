@@ -13,6 +13,11 @@ QUIT_AFTER_FRAMES="${QUIT_AFTER_FRAMES:-1800}"
 FIXED_FPS="${FIXED_FPS:-30}"
 RESOLUTION="${RESOLUTION:-1920x1080}"
 AUDIO_DRIVER="${AUDIO_DRIVER:-Dummy}"
+HEADLESS_MODE="${HEADLESS_MODE:-0}"
+HEADLESS_FLAG=""
+if [[ "$HEADLESS_MODE" == "1" ]]; then
+  HEADLESS_FLAG="--headless"
+fi
 
 SCENARIOS=(
   golden_movement
@@ -26,7 +31,7 @@ for SCENARIO_ID in "${SCENARIOS[@]}"; do
   SCENARIO_DIR="${CAPTURE_ROOT}/${SCENARIO_ID}"
   mkdir -p "$SCENARIO_DIR"
   mkdir -p "$SCENARIO_DIR/movie"
-  "$GODOT_BIN" --headless --audio-driver "$AUDIO_DRIVER" --path . --fixed-fps "$FIXED_FPS" --resolution "$RESOLUTION" --write-movie "${SCENARIO_DIR}/movie/frame.png" -- --scenario "$SCENARIO_ID" --capture_dir "$SCENARIO_DIR" --seed "$SEED" --quit_after_frames "$QUIT_AFTER_FRAMES"
+  "$GODOT_BIN" $HEADLESS_FLAG --audio-driver "$AUDIO_DRIVER" --path . --fixed-fps "$FIXED_FPS" --resolution "$RESOLUTION" --write-movie "${SCENARIO_DIR}/movie/frame.png" -- --scenario "$SCENARIO_ID" --capture_dir "$SCENARIO_DIR" --seed "$SEED" --quit_after_frames "$QUIT_AFTER_FRAMES"
 done
 
 echo "Golden capture complete. Outputs: $CAPTURE_ROOT"

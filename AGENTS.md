@@ -62,7 +62,9 @@ These are configured under `./.opencode/agent/`.
 A feature is "done" only if:
 - `spec.md` updated (if requirements/behavior changed)
 - tests added/updated OR scenario updated
+- `./tools/ci/run-spec-check.sh` passes
 - `./tools/ci/run-smoke.sh` passes
 - `./tools/ci/run-tests.sh` passes
+- `./tools/ci/run-visual-regression.sh` passes (golden capture + diff)
 - At least one scenario capture can be produced deterministically
 

@@ -166,7 +166,8 @@ A "vertical slice" is done when a player can:
 
 ### 8.1 Required
 - Headless smoke boot command
-- Unit/integration tests for core systems
+- Unit/integration tests for core systems (GUT CLI)
+- Spec drift guardrail script must pass in CI
 - Scenario Runner that can:
   - move through an area
   - trigger an interaction

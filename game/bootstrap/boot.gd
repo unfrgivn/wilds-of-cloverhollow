@@ -1,6 +1,6 @@
 extends Node
 
+const DEFAULT_SCENE = "res://game/scenes/tests/TestRoom_Movement.tscn"
+
 func _ready() -> void:
-	# Placeholder bootstrap.
-	# The gameplay engineer will replace this with SceneRouter + Title flow.
-	print("Boot: Wilds of Cloverhollow")
+	get_tree().call_deferred("change_scene_to_file", DEFAULT_SCENE)

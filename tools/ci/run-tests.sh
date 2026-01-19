@@ -2,8 +2,7 @@
 set -euo pipefail
 
 # Run headless unit/integration tests.
-# TODO: install and configure a test framework (e.g., GUT) and update this script.
 
 ./tools/ci/run-smoke.sh
 
-echo "No test framework configured yet. (Implement GUT and update tools/ci/run-tests.sh)"
+GODOT_DISABLE_LEAK_CHECKS=1 godot --headless --path . -s res://addons/gut/gut_cmdln.gd -- -gdir=res://game/tests -ginclude_subdirs -gexit

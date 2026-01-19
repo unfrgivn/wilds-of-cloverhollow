@@ -12,6 +12,9 @@ jobs:
 
       # TODO: install Godot 4.5 CLI (pin version) and cache it.
 
+      - name: Run spec check
+        run: ./tools/ci/run-spec-check.sh
+
       - name: Run smoke
         run: ./tools/ci/run-smoke.sh
 

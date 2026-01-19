@@ -1,12 +1,11 @@
 ---
 name: e2e-tests-gdunit4
-description: End-to-end tests in Godot using GdUnit4
+description: Optional end-to-end tests in Godot using GdUnit4
 compatibility: opencode
 ---
 # Skill (Optional): Add Headless E2E Tests (GdUnit4)
 
-This skill is optional. For Godot **4.5**, the recommended baseline in this repo is **GUT** (see `07-e2e-tests-gut.md`),
-because Godot 4.5 API changes may require a specific GdUnit4 major version.
+This skill is optional. The recommended baseline in this repo is **GUT** (see `e2e-tests-gut`) because it is simpler to keep stable.
 
 If you choose to use GdUnit4 anyway:
 

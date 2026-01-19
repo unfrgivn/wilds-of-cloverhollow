@@ -1,58 +1,44 @@
-# Cloverhollow (Godot 4.5) — EarthBound-inspired exploration RPG demo
+# Wilds of Cloverhollow
 
-This repository is a clean-room, **original** RPG project in **Godot 4.5** that aims to capture the **feel** of classic SNES-era town exploration (readability-first navigation, cutaway interiors, quirky NPC dialogue).
+A cozy, family-friendly JRPG (iOS-first) with:
+- 3/4 overhead exploration camera (fixed, no rotation)
+- 3D low-poly environments + sprite characters
+- visible enemies on the overworld
+- classic turn-based battles (pre-rendered battle backgrounds)
 
-The initial deliverable is a **fully playable demo**:
-- Play as **Fae**
-- Walk around **Cloverhollow**
-- Enter/exit buildings with scene transitions
-- Talk to NPCs and interact with objects/containers
-- Pick up items and view an inventory
-- Use at least one item in the world (Blacklight Lantern)
-- Complete a small “weird stakes” micro-quest
-- Run automated tests headlessly in CI
+## Repo entry points
 
-## Start here
-- Product spec: [`spec.md`](./spec.md)
-- Proof-of-concept plan: [`docs/poc-plan.md`](./docs/poc-plan.md)
-- Scene list: [`docs/scene-list.md`](./docs/scene-list.md)
-- Art direction: [`docs/art-direction.md`](./docs/art-direction.md)
-- Art pipeline: [`docs/art-pipeline.md`](./docs/art-pipeline.md)
-- Testing: [`docs/testing-strategy.md`](./docs/testing-strategy.md)
+- **Product spec (single source of truth):** `./spec.md`
+- **Agent operating manual:** `./AGENTS.md`
+- **Raw brainstorm notes:** `./NOTES.md`
+- **Docs hub:** `./docs/index.md`
+- **Working sessions playbook:** `./docs/working-sessions/index.md`
 
-## Art references
-- User-provided concept samples: `art/reference/concepts/`
-- **Do not commit** copyrighted screenshots: `art/reference/earthbound/` (local-only)
+## Tooling prerequisites (local dev)
 
-## Tooling
-- Godot CLI notes: [`tools/godot-cli.md`](./tools/godot-cli.md)
-- Test running notes: [`tools/testing.md`](./tools/testing.md)
-- Godot MCP notes: [`tools/godot-mcp.md`](./tools/godot-mcp.md)
+- Godot 4.5.x (stable)
+- Blender (for deterministic sprite/background baking)
+- Python 3.11+ (palette + validation tools)
 
-## Typical commands
+## Common commands
 
-Run editor:
-```bash
-godot --path .
-```
+> These will work once the corresponding scripts are implemented by the coding agent.
 
-Headless smoke boot:
-```bash
-godot --headless --path . --quit
-```
+- Run the game:
+  - `godot --path .`
 
-Tests:
-- Preferred: GUT (see `tools/testing.md`)
-- Optional: GdUnit4 (pin a compatible version for Godot 4.5)
+- Headless smoke boot:
+  - `./tools/ci/run-smoke.sh`
 
-## IP / Legal
-This project must **not** use copyrighted EarthBound assets (sprites, maps, music, UI bitmaps, text).
-We mimic the *feel* via original art and systems.
+- Run tests (headless):
+  - `./tools/ci/run-tests.sh`
 
-## Repo structure
-- `docs/` — plans, architecture, art direction, pipelines
-- `tools/` — build/test workflows, MCP notes, CI recipes
-- `agents/` — role briefs for multi-agent development
-- `skills/` — repeatable playbooks for the code agent(s)
-- `art/` — prompts, sources, exports, reference packs
-- (later) `scenes/`, `scripts/`, `assets/`, `tests/` — Godot project content
+- Run an automated scenario capture (no window control required):
+  - `./tools/ci/run-scenario.sh area01_smoke`
+
+## Where assets live
+
+- `art/` contains source assets, templates, and deterministic baking recipes.
+- `game/assets/` contains Godot-imported, runtime assets.
+
+Do not hand-edit baked outputs in `game/assets/`. Fix issues at the source/template level.

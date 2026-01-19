@@ -1,48 +1,38 @@
 ---
 name: cloverhollow-town
-description: Build Cloverhollow town exterior and key buildings
+description: Build Cloverhollow town exterior + key building entrances (3D low-poly)
 compatibility: opencode
 ---
-# Skill: Build Cloverhollow Town (Overworld)
+# Skill: Build Cloverhollow Town (3D)
 
 ## Objective
-Create a small, readable town overworld that supports:
+Create a small, readable 3D town area that supports:
 - exploration
 - multiple building entrances
 - early NPC interactions
-- at least one quest-relevant hidden interaction (lantern reveal)
+- at least one visible enemy encounter for battle testing
 
-## Implementation options (choose one for the demo)
-- **Option A:** TileMap-based town (fast iteration, easy collisions)
-- **Option B:** Single painted backdrop + colliders/hotspots (matches the concept style quickly)
-
-Both are acceptable as long as collision and interactables are clean and testable.
+## Minimum structures
+- Fae's House entrance
+- School entrance
+- Arcade entrance
+- Park landmark
 
 ## Steps
+1) Create `game/scenes/areas/cloverhollow/Area_Cloverhollow_Town.tscn`
+- Low-poly ground + a few buildings (placeholders ok)
+- Collisions on walls/props
+- Navigation surface (NavMesh) suitable for deterministic movement
 
-1) Create `scenes/world/Cloverhollow_Town.tscn`
-- Add clear navigation lanes.
-- Add a recognizable landmark (e.g., center plaza).
+2) Place interactables
+- 2 NPCs
+- 1 sign
+- 1 container
 
-2) Place building entrances
-Minimum:
-- Fae’s House
-- School
-- Arcade
-Optional:
-- Shop/Café
+3) Place at least one visible enemy actor
+- Put it in a predictable location to support Scenario Runner tests
 
-3) Add interactables
-- At least:
-  - 2 NPCs
-  - 1 sign
-  - 1 container (trash can/mailbox)
-  - 1 hidden interaction revealed by the Blacklight Lantern (quest)
-
-4) Add “edge exits” as teasers (optional)
-- A path that is blocked with a sign (“Road closed”, “Come back later”, etc.)
-
-## Verification checklist
-- Player can traverse the town without getting stuck.
-- Player can enter each demo building.
-- Interactions are discoverable and readable (prompt appears in range).
+## Verification
+- Player can traverse without getting stuck
+- Doors route to target interior scenes with correct spawn markers
+- Interactions and battle trigger are reachable and deterministic

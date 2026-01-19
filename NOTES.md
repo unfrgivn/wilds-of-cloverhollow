@@ -1,0 +1,113 @@
+# Game Notes
+
+- Classic Hero’s Journey
+- Genre: Adventure, Puzzle, Light RPG
+- Inspiried by games like Zelda, Mario, Animal Crossing, Stardew Valley, Earthbound
+- Target Audience: Kids 8-12, Family Friendly
+- Calming theme:
+  - Meadows
+  - Forest
+  - Ponds
+  - Hill
+  - Caves
+- Cozy, safe, friendly atmosphere
+  - Cute animals
+  - Fun puzzles
+  - Light combat with non-scary enemies
+- Main Goal: Stop the bad guy from causing chaos in the town while balancing school life
+- Vibe: Wholesome, adventurous, imaginative, playful, magic realism, dreamscape, but also grounded in everyday life and reality
+- Small Town with school, restaurant, grocery store, arcade
+- Bad guy causing chaos and trying to disrupt the calm. We need to stop him from making everything crazy.
+- The main character has to go to school but also stop the bad guy
+  - They need to come up with a way to get out of school to fight the bad guy. Puzzles like:
+    - Finding items
+    - Saying the right dialogue to other characters, e.g. teacher, nurse, art teacher, music teacher, PE teacher
+- The story twist is the bad guy is actually a kid who is the hero’s friend but then the final twist is that it was all just a dream when the hero’s mom wakes them up.
+- The hero meets up with other kids along the way to join the party
+- Start at the hero’s house when they wake up
+- Money can be collected along with gems
+- Locations:
+  - Main Town
+    - Hero's House (starting point)
+    - Other Kids' Houses
+    - School
+    - Park (with playground)
+    - Town Center
+    - Grocery Store
+    - Taco Truck
+    - Ice Cream Shop
+    - Arcade (with playable mini-games like skee-ball, whack-a-mole, claw machine)
+    - Bon Appetit (Restaurant)
+  - Bubblegum Bay (meet 2nd party member here)
+    - Lake
+    - Dock
+    - Boat Rental
+    - Fishing Spot
+    - Cafe
+    - Gift Shop
+  - Pinecone Pass (meet 3rd party member here)
+    - Mountain
+    - Ski Lodge
+    - Ski lift
+    - Hiking Trails
+    - Hot Chocolate Stand
+    - Souvenir Shop
+    - Wildlife Sanctuary
+  - Forest
+    - Clubhouse (buildable throughout the game)
+    - Clubhouse Garden
+  - Enchanted Forest
+    - Center of map and lock ed/gated until later in game
+    - Mystic Pond
+    - Ancient Tree
+    - Fairies and butterflies floating around
+- Bus stations to fast-travel between towns
+- Also a clubhouse that you build throughout the game where you can:
+  - Chest to store items
+  - Mini fridge to store food items that give you energy
+  - Microwave for making dino nuggets and mac n cheese
+  - Garden to grow plants that can be used to feed animals or to give magical powers
+  - ?
+- Tools:
+  - Lantern (or blacklight) to reveal hidden paths and notes
+  - Journal to add notes and clues to (that she keeps under her pillow)
+    - Gift from parents when your baby brother was born to help her feel special and not left out
+  - Lasso for pulling levers or swiging across gaps
+    - Get lasso from PE teacher after completing a quest for them
+  - Flute that calls animal friends to your side like cute kitties and puppies. The animals can help you fight and you earn more animal pals by meeting them throughout the journey
+    - Get flute from music teacher at school after completing a quest for her
+    - Family cat named Maddie who follows you around
+    - Have to build a bond with the animals by feeding them treats and petting them for them to join you
+    - Specific animals have specific abilities that help in puzzles and battles
+- Characters:
+  - Fae (Main Character)
+    - Age: 10
+    - Loves art, music, animals, nature
+    - Brave, curious, kind-hearted, smart
+    - Wears a backpack with her tools and journal
+    - Really good at inventing and building things to help her on her adventure
+  - Sue (Girl party member meet in Bubblegum Bay)
+  - Jordan (Boy party member meet in Pinecone Pass)
+- Enemies:
+  - TBD (Boss Bad Guy who is a kid at Fae's school)
+    - Drank something that gave him powers to cause chaos
+    - Can turn people and animals into mini-bosses and casual enemies
+  - [Need to add more mini-bosses and causal enemies]
+    - Mostly people and animals under the bad guy's control (chaos spell)
+- NPCs:
+  - Mom
+  - Dad
+  - Oliver (Baby brother)
+  - TBD (Classroom Teacher)
+  - TBD (Art Teacher)
+  - TBD (Music Teacher)
+  - TBD (PE Teacher)
+  - Holly (School Nurse)
+  - TBD (Principal)
+  - TBD (Bus Driver)
+  - TBD (Kid at school 1)
+  - TBD (Kid at school 2)
+  - TBD (Arcade operator)
+  - TBD (Old man in town)
+  - TBD (kid in town)
+  - TODO: add all other NPCs for other

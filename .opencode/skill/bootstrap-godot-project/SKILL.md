@@ -1,54 +1,50 @@
 ---
 name: bootstrap-godot-project
-description: Bootstrap Godot 4.5 project scaffolding and CI entry points
+description: Bootstrap Godot 4.5 project scaffolding for iOS-first 2.5D JRPG
 compatibility: opencode
 ---
-# Skill: Bootstrap Godot 4.5 Project (Agent-friendly)
+# Skill: Bootstrap Godot Project (Godot 4.5, iOS-first)
 
 ## Objective
-Create a Godot **4.5** project at the repo root with consistent input actions, autoloads, and optional “retro viewport” support.
+Create a Godot **4.5** project that is:
+- iOS landscape-first
+- friendly to headless automation
+- organized under `res://game/...`
 
 ## Steps
 
 1) Create the project
 - Create a new Godot project at the repo root so `project.godot` is at `./project.godot`.
 
-2) Configure display (baseline)
-- Choose an internal resolution that keeps UI readable (e.g., 320×240 or 400×240).
-- Set stretch mode/aspect so the game letterboxes rather than distorting.
-- Keep this simple and explicit in `ProjectSettings` so it’s reproducible.
+2) Configure display
+- Landscape-only orientation (iOS).
+- Use UI anchors and scaling; do not hardcode a tiny internal resolution.
+- Provide a single reference layout resolution (1920x1080) for UI mockups.
 
-3) Optional: add a low-res SubViewport “retro filter”
-- Create a `RetroViewport.tscn` wrapper:
-  - `SubViewport` renders world at low resolution
-  - a `TextureRect` or `Sprite2D` displays it scaled up
-- Add a toggle flag in settings so you can switch between:
-  - direct rendering
-  - retro viewport rendering
+3) Define InputMap actions
+Required:
+- `move`
+- `interact`
+- `menu`
+- `cancel`
 
-4) Define InputMap actions (keyboard-first)
-- Required:
-  - `move_up`, `move_down`, `move_left`, `move_right`
-  - `interact`, `menu`, `cancel`
-- Suggested bindings:
-  - Movement: WASD + arrows
-  - Interact: Z (and/or Enter)
-  - Cancel: X / Esc
-  - Menu: C / Tab
+Suggested bindings for desktop testing:
+- Movement: WASD + arrows
+- Interact: Enter/Space
+- Cancel: Esc
+- Menu: Tab
 
-5) Add autoload singletons
-- `GameState.gd` (inventory, flags, counters)
-- `SceneRouter.gd` (scene transitions + spawn points)
-- `UIRoot.gd` (dialogue/inventory overlays) or a `UIRoot.tscn` instanced by Main
+4) Add autoload singletons
+- `GameState.gd`
+- `SceneRouter.gd`
+- `ScenarioRunner.gd` (can be no-op at first)
 
-6) Create bootstrap scenes
-- `scenes/bootstrap/Main.tscn`
-  - loads initial scene (town or title)
-  - owns fade layer (or delegates to `SceneRouter`)
-- Optional:
-  - `scenes/bootstrap/Title.tscn` (New Game / Continue)
+5) Create bootstrap scenes
+- `game/bootstrap/Main.tscn`
+  - loads initial scene
+  - owns fade layer (or delegates to SceneRouter)
 
 ## Verification checklist
 - `godot --path .` launches without errors.
-- `godot --headless --path . --quit` returns success (CI smoke boot).
-- Input actions exist and are spelled consistently across scripts/tests.
+- `godot --headless --path . --quit` returns success.
+- Input actions exist and are spelled consistently.

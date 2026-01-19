@@ -1,14 +1,9 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "--- 1. Headless Smoke Test (Project Load) ---"
-godot --headless --path . --quit
-if [ $? -eq 0 ]; then
-    echo "✅ Smoke test passed."
-else
-    echo "❌ Smoke test failed."
-    exit 1
-fi
+# Run headless unit/integration tests.
+# TODO: install and configure a test framework (e.g., GUT) and update this script.
 
-echo "--- 2. Running GUT Tests ---"
-godot --headless --path . -s addons/gut/gut_cmdln.gd
+./tools/ci/run-smoke.sh
+
+echo "No test framework configured yet. (Implement GUT and update tools/ci/run-tests.sh)"

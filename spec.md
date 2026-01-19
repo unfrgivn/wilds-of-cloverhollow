@@ -1,216 +1,187 @@
-# Product Specification — Cloverhollow (EarthBound-inspired exploration RPG)
+# Wilds of Cloverhollow — Spec (Single Source of Truth)
 
-## 1. Product goal
+This document is authoritative. If behavior, art, data formats, or UX changes, update `spec.md` in the same change.
 
-Build an **original** 2D exploration RPG in **Godot 4.5** that evokes the **feel** of a classic SNES-era game (readability-first town exploration, cozy “dollhouse” interiors, fast scene transitions, quirky NPC dialogue), while using **fully original** story, characters, and assets.
+## 1) Product definition
 
-**Milestone 1 (this repo):** a **fully playable demo** set in the starter town **Cloverhollow**, where the player character **Fae** can:
+### 1.1 Audience + tone
+- Audience: kids 8–12 and families
+- Tone: cozy, safe, friendly, whimsical magic-realism
+- Core loop: explore a small-town world, solve light puzzles, make animal friends, and engage in light JRPG combat
 
-- Walk around town (top-down / oblique)
-- Enter/exit buildings with smooth scene transitions
-- Talk to NPCs
-- Interact with world objects (signs, bins, containers, beds, arcade machines, lockers)
-- Pick up items into an inventory and use at least **one** item in the world
-- Complete a short “weird stakes” micro-quest that spans multiple locations
+### 1.1.1 Inspirations (non-binding)
+- Cozy exploration + light puzzles (Zelda-like structure)
+- Friendly small-town life + discovery (Animal Crossing / Stardew-like vibe)
+- Wholesome, humorous JRPG tone (EarthBound-like *tone*, not literal art style)
 
-Battles are **not required** for the demo, but the architecture should not block future battle integration.
+### 1.2 Narrative (high level)
+- Hero: Fae (age 10)
+- Hero balances school life with stopping a chaos-causing antagonist (a kid at school)
+- Party members join across regions
 
-## 2. Technical baseline
+## 2) Platform + engine
 
-- Engine: **Godot 4.5**
-- Scripting: **GDScript**
-- Rendering: **2D (CanvasItem)**
-- Platforms (demo): desktop (Windows/macOS/Linux)
-- Input (demo): **keyboard** (controller support can be added later without redesign)
+- Platform: iOS native, landscape-only (iPhone + iPad)
+- Engine: Godot 4.5.x (GDScript)
+- Dev hardware: macOS only
 
-### 2.1 Presentation target (SNES-like feel without forced pixel art)
+## 3) World presentation
 
-The demo should *feel* like an SNES RPG primarily through:
-- constrained play-space scale and tight town layout
-- fast, readable interaction loops
-- clear collision and navigation lanes
-- consistent camera framing
-- UI that prioritizes legibility
+### 3.1 Camera
+- Exploration camera: fixed 3/4 overhead, no rotation
+- Prefer orthographic camera for readability
 
-**Art source of truth:** the user-provided concept samples in `art/reference/concepts/`.
+### 3.2 World structure
+- Discrete areas (scene-per-area)
+- Transitions via SceneRouter with deterministic spawn points
 
-Optional (recommended) rendering approach:
-- render the world into a **low-resolution SubViewport** and scale up (for a “retro” cohesiveness even with non-pixel source art)
-- keep this as a toggle (`Settings -> Retro Filter`) so the team can evaluate the look quickly
+### 3.3 Movement
+- Free analog movement
+- 8-direction facing selection (based on movement vector)
 
-## 3. Art pipeline
+### 3.4 Encounters
+- Visible overworld enemies
+- Touch/collision triggers battle transition
 
-### 3.1 Generation tool
-Art is produced using an external image generation tool (“nano banana” via the user’s image tool). The repository should:
-- store prompts and constraints
-- store the chosen outputs (PNG)
-- provide a repeatable import/slicing workflow (sprite sheets / atlases)
+### 3.5 Reference resolution + world scale (initial calibration)
+These numbers exist to prevent "scale drift" across assets and UI.
 
-See:
-- `docs/art-pipeline.md`
-- `art/reference/concepts/` (style targets)
+- **Design reference resolution (UI + composition):** 1920×1080 (landscape)
+  - Used for UI mockups, battle layout positioning, and snapshot comparisons.
+  - The game must still scale to iPhone/iPad safely (see safe-area notes in docs).
 
-### 3.2 Style targets (from provided samples)
-The current direction reads as:
-- cozy watercolor / soft shading
-- sticker-like outlines on props and collectibles
-- “cutaway room” interiors (dollhouse / diorama)
-- warm lighting, friendly shapes
-- occasional “odd” motifs (hypnotic eyes, neon glow, blacklight effects)
+- **World units:** 1 Godot unit = 1 meter.
 
-This style is acceptable and can still support EarthBound-like gameplay pacing.
+- **Exploration camera:** fixed orthographic.
+  - `keep_aspect = KEEP_HEIGHT` (Hor+ behavior).
+  - Starting pitch: ~-60°.
 
-### 3.3 Asset constraints (so generated art remains usable)
-- Characters/NPCs: deliver either
-  - **(Preferred)** 4-direction walk cycle (idle + 2–4 step frames per direction), transparent background, consistent pivot; or
-  - (POC) a single idle pose with a procedural bob animation (acceptable for the first playable)
-- Interiors: deliver each room as either
-  - a single background image + collision polygons + hotspots; or
-  - a small tile/prop kit placed in-engine
-- Props/collectibles: individual PNGs suitable for atlasing
+- **Character scale target:**
+  - Humanoid height in-world: 1.7 m.
+  - On-screen target (at 1080p reference): ~160 px tall.
+  - Recommended sprite authoring height: ~320 px tall (2×) so devices mostly downscale.
 
-## 4. Player experience (demo)
+Notes:
+- The exact orthographic `Camera3D.size` will be tuned to hit the ~160px target.
+- If this calibration changes, update this section and regenerate any dependent assets.
 
-### 4.1 Core loop
-1. Explore → see points of interest
-2. Talk/check → get quirky dialogue + hints
-3. Acquire an item → inventory updates
-4. Use item in the world → unlock a new interaction
-5. Complete micro-quest → end-of-demo stinger
+## 4) Art direction + determinism
 
-### 4.2 “Weird stakes” micro-quest (demo narrative)
-The demo quest should start cozy but become quietly unsettling.
+### 4.1 Visual stack
+- Environments: 3D low-poly, toon/flat look
+- Characters/enemies: sprites in 3D exploration, baked deterministically from 3D sources (preferred)
+- Battles: 2D battle scene with pre-rendered battle backgrounds
 
-**Proposed demo quest: “The Hollow Light”**
-- Fae finds (or is given) a **Blacklight Lantern**
-- Using it reveals **hidden sigils/notes** in Cloverhollow (at least 2 locations)
-- The final reveal is in the **Arcade** (one cabinet “responds” to the hidden markings)
-- The demo ends after a short, eerie interaction (no battle required)
+### 4.2 Palettes
+- Per-biome palette for environment accents
+- Shared palette for:
+  - UI
+  - skin tones
+  - outline/ink colors
 
-This quest is deliberately small but seeds the larger mystery.
+### 4.3 Toon shading
+- 4-band toon shading ramp
+- Lighting rig is biome-configurable but template-controlled
 
-## 5. Gameplay requirements
+### 4.4 Sprite standards (exploration + battle)
 
-### 5.1 Movement
-- Top-down movement in 8 directions (or 4 directions for animation simplicity)
-- Smooth acceleration/deceleration (configurable)
-- Collision against static colliders
-- Depth sorting (Y-sorting) so the player walks “behind” props when appropriate
+#### Exploration (overworld)
+- Characters and most enemies use **8-direction** animation sets:
+  - Directions: N, NE, E, SE, S, SW, W, NW.
+  - Facing selection is derived from the movement vector (camera does not rotate).
 
-### 5.2 Interactions
-- A single interaction input (“Check/Talk”)
-- Interactable types:
-  - NPC conversation
-  - Sign / plaque / bulletin board (text only)
-  - Container (gives item once; then becomes “empty”)
-  - Door / warp trigger
-  - Bed (rest / flavor)
-  - Arcade machine (flavor now; quest hook later)
+#### Battle
+- Battle uses a classic side-view with **2-direction** sprite sets:
+  - Facing: L/R.
+  - Party faces left; enemies face right.
 
-### 5.3 Inventory
-- Item pickup adds to inventory
-- Inventory UI can be minimal in demo (list)
-- At least one “usable” item for the quest:
-  - Blacklight Lantern: toggled on/off; reveals hidden objects / enables checks
+#### Required minimum animations (v0)
+- Overworld: `idle`, `walk`
+- Battle: `idle`, `attack`, `hurt`
 
-### 5.4 Scene transitions
-- Doorways/warps between:
-  - Cloverhollow exterior (town)
-  - Fae’s House (bedroom + at least one other room)
-  - School interior
-  - Arcade interior
-- Transitions include a short fade and correct spawn placement
+If an entity lacks an animation, the game must fall back gracefully (e.g., reuse `idle`).
 
-### 5.5 World state
-- NPC state and container depletion should persist across scene changes
-- Quest flags persist for the duration of a session (save system is optional for demo)
+### 4.5 Town-first style lock
+- Cloverhollow is the visual "truth" for the game.
+- Do not expand to additional biomes until:
+  - Cloverhollow palette + ramp are locked
+  - at least 10 town props exist
+  - at least 1 enemy family is implemented (sprites + battle)
 
-## 6. Demo content scope
+### 4.6 Deterministic pipeline rule
+All assets must be reproducible from:
+- a versioned recipe (`art/recipes/...`)
+- a versioned template (`art/templates/...`)
+- pinned tool settings
 
-### 6.1 Locations (minimum)
-- Cloverhollow Town (exterior)
-  - town center plaza (landmark)
-  - 3–5 buildings with at least 2 enterable in demo
-- Fae’s House
-  - Bedroom (starter room with item pickup)
-  - Hall or Living room (navigation + interactions)
-- School (single interior “hall” space is sufficient)
-- Arcade (single interior room is sufficient)
+No manual per-asset tweaks in Godot that cannot be regenerated.
 
-### 6.2 NPCs (minimum)
-- 3 NPCs total (across locations), each with at least 2 lines of dialogue
-- 1 “weird” NPC or creature (e.g., the “Chaos Raccoon” concept) that points at the mystery
+## 5) Battle UX (no cassette theming)
 
-### 6.3 Items (minimum)
-- 3 items total:
-  - 1 starter item in Fae’s bedroom (e.g., Journal)
-  - 1 quest item (Blacklight Lantern)
-  - 1 currency/collectible (Candy or Gems) to demonstrate counters
+### 5.1 UI goals
+- Readability first
+- Minimal themed chrome at first (simple boxes are acceptable)
+- No cassette-player motif (Cassette Beasts is a reference for clarity/framing only)
+- No large, themed bottom "device" bar
 
-## 7. System architecture requirements
+### 5.2 Layout (baseline)
+- Top HUD:
+  - Enemy list with small portraits + HP bars + status (top-left)
+  - Party list with portraits + HP/MP + status (top-right)
+- Bottom:
+  - Command menu box (Attack / Skills / Items / Defend / Run)
+  - Context/help text box
 
-The implementation must remain simple, testable, and agent-friendly.
+### 5.3 Party
+- 4 party members max on screen (MC + 2 + pet), equal spacing
 
-### 7.1 Autoloads (singletons)
-- `GameState`: quest flags, inventory, counters
-- `SceneRouter`: transitions, spawn points, fade control
-- `UIRoot`: global HUD and modal UI (dialogue, inventory)
+### 5.4 Battle backgrounds
+- Pre-rendered PNG background per encounter/biome.
+- Backgrounds are authored at high resolution and downscaled as needed for iOS.
+- Optional foreground overlay (fg.png) is allowed.
 
-### 7.2 Data model
-- Items as `Resource` (e.g., `ItemData.tres`) with:
-  - id, display_name, description
-  - icon texture
-  - tags (quest, consumable, key)
-- Dialogue as lightweight JSON or `.tres` resources
+## 6) Initial biomes (v0)
 
-### 7.3 Scene conventions
-- Each location scene provides named spawn markers (e.g., `SpawnPoints/FrontDoor`)
-- Interactables implement a shared interface (e.g., `Interactable.gd`) for consistent testing
+Biomes are implemented as packs: palette + prop kit + enemy roster + battle backgrounds.
 
-## 8. Input mapping (keyboard demo)
+Planned scale (non-binding): 8+ biomes over the life of the project.
 
-Required actions:
-- `move_up/down/left/right` — WASD + arrow keys
-- `interact` — `Z` / `Enter` / `Space` (choose one canonical default)
-- `cancel` — `X` / `Esc`
-- `menu` — `C` / `Tab`
+- Cloverhollow (main town)
+- Bubblegum Bay (beach town)
+- Pinecone Pass (mountain ski town)
+- Enchanted Forest (gated/late-game)
+- Forest near Cloverhollow (clubhouse woods)
 
-(Controller parity is out-of-scope for the first playable but the action names must not be keyboard-specific.)
+## 7) MVP vertical slice (definition of done)
 
-## 9. Testing and automation
+A "vertical slice" is done when a player can:
+1. Start at Fae's house
+2. Walk to Cloverhollow town
+3. Interact with 2 NPCs + 1 sign + 1 container
+4. See a visible enemy and trigger a battle
+5. Win a battle and return to exploration
+6. Fast-travel is stubbed (bus stop UI placeholder)
 
-The repo must support:
-- **Headless execution** for CI validation
-- Automated tests for:
-  - loading scenes without errors
-  - interacting with an object yields expected state changes
-  - scene transitions place the player at correct spawn
-  - completing the micro-quest sets the completion flag
+## 8) Testing + automation
 
-Preferred approach for Godot 4.5:
-- **GUT (Godot Unit Test)** for unit/integration/E2E-style scene tests (CLI-friendly)
-- Optional: integrate **GdUnit4** later if desired
+### 8.1 Required
+- Headless smoke boot command
+- Unit/integration tests for core systems
+- Scenario Runner that can:
+  - move through an area
+  - trigger an interaction
+  - trigger a battle
+  - write deterministic capture artifacts
 
-The opencode agent should be able to:
-- build/run the project from CLI
-- run headless tests
-- optionally drive the editor/runtime via Godot MCP
+### 8.2 Visual regression
+- Primary: deterministic video output (Movie Maker mode)
+- Secondary: checkpoint screenshots (if stable)
 
-See:
-- `docs/testing-strategy.md`
-- `tools/testing.md`
-- `tools/godot-mcp.md`
+### 8.3 No OS window control requirement
+Automation must not rely on clicking/focusing a game window.
+All automated playtests must be runnable via CLI and produce artifacts to disk.
 
-## 10. Out of scope (demo)
-- Turn-based battle system
-- Saving/loading to disk (optional)
-- Multiple party members
-- Audio/music production (use placeholders)
-- Full town buildout beyond the required locations
+## 9) Explicit non-goals (v0)
+- Web export
+- Switch export (possible later via porting partner, but not planned for v0)
 
-## 11. Repository conventions
-
-- Keep code small and composable (agent-friendly modules)
-- Prefer data-driven content (Resources/JSON) over hard-coded strings
-- All interactables should be testable without manual editor clicking
-- Do not commit copyrighted reference screenshots

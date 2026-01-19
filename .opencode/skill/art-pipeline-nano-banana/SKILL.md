@@ -1,61 +1,45 @@
 ---
 name: art-pipeline-nano-banana
-description: Nano banana prompt and import pipeline for EarthBound-like pixel art
+description: Use nano banana (Gemini CLI) to generate references and inputs for the deterministic 2.5D pipeline
 compatibility: opencode
 ---
-# Skill: Art Pipeline Integration (nano banana outputs → Godot-ready assets)
+# Skill: Art Pipeline (nano banana as input generator)
 
 ## Objective
-Turn externally generated images (nano banana via the user’s image tool) into game-ready assets with consistent scale, naming, and import settings.
+Use nano banana to generate **inputs** (concept refs, mood boards, modular parts) while keeping final game assets deterministic via templates + palettes.
 
-## Steps
+This repo does **not** accept “AI images dropped directly into game/assets” as final art.
 
-1) Create art folders (if not already present)
-- `art/prompts/`
-- `art/source/`
-- `art/exports/`
+## What nano banana is allowed for
+- Mood boards for biomes (to derive palettes)
+- Concept sheets for props/characters (to guide modeling)
+- UI style exploration (boxes, typography, icon language)
 
-2) Add prompt templates
-- Create markdown or yaml templates per asset type:
-  - `fae_sprite_sheet.md`
-  - `npc_sprite_sheet.md`
-  - `room_backdrop_arcade.md`
-  - `room_backdrop_school.md`
-  - `props_icons.md`
+## Where outputs must go
+All generated images must land under:
+- `art/source/ai/nanobanana-output/`
 
-3) Define hard constraints in every prompt
-- transparent background for sprites/props
-- consistent canvas size (so slicing is deterministic)
-- consistent baseline alignment for walk cycles
-- no embedded text (except simple signage shapes)
+## Prompting patterns (examples)
 
-4) Export processing (manual or scripted)
-- Crop excess whitespace.
-- Ensure background transparency is correct.
-- Normalize scale relative to your chosen character height.
-- Save to `art/exports/` using stable filenames:
-  - `fae_walksheet_v01.png`
-  - `arcade_backdrop_v01.png`
-  - `prop_blacklight_lantern_v01.png`
+### Biome mood board (Bubblegum Bay)
+- Goal: palette direction (NOT final textures)
+- Prompt template:
+  - “Landscape-only JRPG biome mood board, low-poly toon, 4-band shading feel, playful pastel seaside town, calm ocean blues, candy accents, no text, 6 panels.”
 
-5) Godot import rules
-Decide whether the project uses:
-- direct rendering (filtered textures OK), or
-- low-res SubViewport retro filter (recommended for cohesive look)
+### Prop concept sheet
+- “Turnaround concept sheet for a low-poly toon prop: <prop>, simple shapes, clean silhouettes, no text, white background, 3 views.”
 
-For each imported texture:
-- disable mipmaps unless you explicitly need them
-- ensure alpha is preserved
+### UI exploration
+- “Turn-based JRPG UI mockup, top HUD with portraits and HP/MP bars, bottom command menu boxes, cozy kid-friendly, no cassette theme, no text labels.”
 
-6) Create resources for in-game use
-- For sprite sheets:
-  - build `SpriteFrames` resources for `AnimatedSprite2D`
-  - name animations consistently: `walk_down`, `walk_up`, `walk_left`, `walk_right`, `idle_*`
-- For item icons:
-  - reference the PNG in `ItemData.tres` resources
+## Next step (convert to deterministic assets)
+After generation:
+1) Extract palette candidates (tools/python)
+2) Build the prop/character in Blender using templates
+3) Bake sprites/backgrounds via scripts
+4) Validate outputs
 
 ## Acceptance checks
-- Fae sprite frames align (no “teleporting” pivot between frames).
-- Props read at inventory icon size.
-- Rooms have enough empty floor space for navigation.
-- Everything looks acceptable when rendered at the internal game resolution.
+- Any nano banana output used in production must have:
+  - a recipe stub referencing it
+  - a deterministic conversion step (Blender bake or modeling)

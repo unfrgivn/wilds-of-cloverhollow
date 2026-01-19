@@ -13,7 +13,7 @@ import { tool } from "@opencode-ai/plugin"
   Generated images are saved to ./nanobanana-output/
 */
 
-const outputDir = "nanobanana-output"
+const outputDir = "art/source/ai/nanobanana-output"
 
 export const generate = tool({
   description: "Generate images from text prompts using Gemini CLI nanobanana extension",

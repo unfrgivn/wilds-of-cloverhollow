@@ -1,21 +1,19 @@
-# Godot 4
+# Godot
 .godot/
 .import/
-export_presets.cfg
-*.import
+.export/
+*.tmp
+
+# Builds / exports
+builds/
+export/
+
+# Capture artifacts
+captures/*
+!captures/README.md
+
+# Local AI outputs
+art/source/ai/nanobanana-output/
 
 # OS
 .DS_Store
-Thumbs.db
-
-# Builds
-build/
-dist/
-
-# Logs / reports
-report/
-
-# Local-only reference screenshots (do not commit)
-art/reference/earthbound/*
-!art/reference/earthbound/README.md
-nanobanana-output/

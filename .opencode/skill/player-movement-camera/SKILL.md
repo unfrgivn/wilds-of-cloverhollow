@@ -1,44 +1,45 @@
 ---
 name: player-movement-camera
-description: Implement top-down movement and camera for the Cloverhollow demo
+description: Implement 3D exploration movement + fixed 3/4 camera + 8-direction facing
 compatibility: opencode
 ---
-# Skill: Implement Player Movement + Camera (Exploration)
+# Skill: Player Movement + Camera (Exploration, 3D)
 
 ## Objective
-Implement EarthBound-like overworld exploration movement: responsive, collision-safe, and visually stable.
+Implement exploration movement for a 2.5D JRPG:
+- 3D world, sprite characters
+- fixed 3/4 overhead camera (no rotation)
+- free analog movement with 8-direction facing selection
 
 ## Steps
 
-1) Create `scenes/player/Player.tscn`
+1) Create `game/scenes/actors/Player.tscn`
 Suggested node tree:
-- `CharacterBody2D` (root)
-  - `Sprite2D` (or `AnimatedSprite2D`) for visuals
-  - `CollisionShape2D` (capsule/rectangle)
-  - `Area2D` (`InteractionDetector`)
-    - `CollisionShape2D` (circle/box in front of player, or around player)
+- `CharacterBody3D` (root)
+  - `AnimatedSprite3D` (visual)
+  - `CollisionShape3D`
+  - `Area3D` (InteractionDetector)
 
-2) Implement `scripts/player/Player.gd`
-- Read input actions: `move_up/down/left/right`
-- Build a move vector
-  - normalize for diagonals
-- Apply speed and move with `move_and_slide()`
-- Track facing direction
-  - minimum: 4 directions (N/S/E/W)
-  - optional: 8 directions (N/NE/E/SE/S/SW/W/NW) if animations exist
+2) Implement `game/scripts/exploration/player.gd`
+- Read analog input (`move` vector) and convert to world-space.
+- Use `move_and_slide()`.
+- Derive facing direction (8-way) from the movement vector.
+- Drive the `AnimatedSprite3D` animation based on facing + locomotion.
 
 3) Camera
-- Add a `Camera2D` to follow the player.
-- If using a low-res SubViewport, keep camera simple and let the viewport scaling provide stability.
-- If not using SubViewport, consider snapping camera to whole pixels to reduce shimmer (only if needed).
+- Add a fixed `Camera3D` (orthographic recommended) that follows the player.
+- Keep camera stable (no per-frame jitter).
 
-4) Build a collision test scene
-- `scenes/tests/TestRoom_Movement.tscn` with:
-  - walls
-  - a few obstacles
-  - open space for diagonal movement checks
+Calibration guidance (initial):
+- Use the `spec.md` reference resolution (1920×1080) as the composition target.
+- Target: humanoid ~160 px tall at 1080p.
+- Start with an orthographic camera and tune `Camera3D.size` until the target is met.
+
+4) Test scene
+- Create `game/scenes/tests/TestRoom_Movement.tscn` with walls + obstacles.
 
 ## Verification
-- Player cannot pass through walls/obstacles.
-- Diagonal movement is not faster than cardinal movement.
-- Camera framing is consistent and non-jittery in the chosen rendering mode.
+- Player cannot pass through walls.
+- Diagonals are not faster than cardinals.
+- Facing changes correctly across 8 directions.
+- Camera is stable and framing consistent.

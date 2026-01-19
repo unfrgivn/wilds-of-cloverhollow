@@ -47,6 +47,12 @@ size = Vector3(50, 0.05, 3)
 [sub_resource type="BoxMesh" id="BoxMesh_PathNS"]
 size = Vector3(3, 0.05, 50)
 
+[sub_resource type="BoxMesh" id="BoxMesh_Library"]
+size = Vector3(12, 6, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_Library"]
+size = Vector3(12, 6, 8)
+
 [node name="Area_Cloverhollow_Town" type="Node3D"]
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
@@ -134,6 +140,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 6)
 [node name="Fence" parent="Decor" instance=ExtResource("15_fence")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
 
+[node name="FenceN1" parent="Decor" instance=ExtResource("15_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -8)
+
+[node name="FenceN2" parent="Decor" instance=ExtResource("15_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -8)
+
+[node name="BushLib1" parent="Decor" instance=ExtResource("17_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 16)
+
+[node name="BushLib2" parent="Decor" instance=ExtResource("17_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 16)
+
 [node name="Buildings" type="Node3D" parent="."]
 
 [node name="School" type="StaticBody3D" parent="Buildings"]
@@ -154,6 +172,15 @@ mesh = SubResource("BoxMesh_Arcade")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Arcade"]
 shape = SubResource("BoxShape3D_Arcade")
 
+[node name="Library" type="StaticBody3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, 15)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Library"]
+mesh = SubResource("BoxMesh_Library")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Library"]
+shape = SubResource("BoxShape3D_Library")
+
 [node name="Landmarks" type="Node3D" parent="."]
 
 [node name="ParkCenter" type="Node3D" parent="Landmarks"]
@@ -173,6 +200,24 @@ transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 2, 0, 2)
 
 [node name="BarrelPark" parent="Landmarks/ParkCenter" instance=ExtResource("18_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
+
+[node name="Plaza" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 12)
+
+[node name="Crate1" parent="Landmarks/Plaza" instance=ExtResource("13_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Crate2" parent="Landmarks/Plaza" instance=ExtResource("13_crate")]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 0.5, 0.5, 0.2)
+
+[node name="Barrel1" parent="Landmarks/Plaza" instance=ExtResource("18_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0.5)
+
+[node name="MarketSign" parent="Landmarks/Plaza" instance=ExtResource("10_signpost")]
+transform = Transform3D(0.707, 0, -0.707, 0, 1, 0, 0.707, 0, 0.707, 1.5, 0, 1.5)
+
+[node name="PlazaLamp" parent="Landmarks/Plaza" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 
 [node name="Paths" type="Node3D" parent="."]
 

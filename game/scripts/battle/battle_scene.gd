@@ -4,6 +4,7 @@ extends Node2D
 
 const BattleActor = preload("res://game/scripts/battle/battle_actor.gd")
 const BattleState = preload("res://game/scripts/battle/battle_state.gd")
+const BattleBackgroundLoader = preload("res://game/scripts/battle/battle_background_loader.gd")
 
 var _battle_state
 
@@ -14,6 +15,8 @@ var _battle_state
 @onready var _party_list: VBoxContainer = $CanvasLayer/SafeArea/HudStack/TopHud/PartyPanel/PartyList
 @onready var _info_label: Label = $CanvasLayer/SafeArea/HudStack/BottomHud/InfoPanel/InfoLabel
 @onready var _command_menu: VBoxContainer = $CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu
+@onready var _background_rect: TextureRect = $CanvasLayer/Background
+@onready var _foreground_rect: TextureRect = $CanvasLayer/Foreground
 
 
 func _ready() -> void:
@@ -26,6 +29,7 @@ func _ready() -> void:
 	_battle_state = BattleState.new()
 	_battle_state.setup(_build_party(), _build_enemies())
 	_wire_command_buttons()
+	_load_background()
 	_refresh_hud()
 	_update_info("Choose a command.")
 
@@ -92,9 +96,7 @@ func _build_party() -> Array:
 func _build_enemies() -> Array:
 	_ensure_data_loaded()
 	var enemies: Array = []
-	var encounter_id = ""
-	if _game_state != null:
-		encounter_id = String(_game_state.get_value("encounter_id", ""))
+	var encounter_id = _current_encounter_id()
 	var encounter = _get_encounter_def(encounter_id)
 	if encounter != null and encounter.enemy_ids.size() > 0:
 		for enemy_id in encounter.enemy_ids:
@@ -105,6 +107,51 @@ func _build_enemies() -> Array:
 		enemies.append(BattleActor.new("slime_a", "Slime A", 9, 0, true))
 		enemies.append(BattleActor.new("slime_b", "Slime B", 9, 0, true))
 	return enemies
+
+
+func _current_encounter_id() -> String:
+	var encounter_id = ""
+	if _game_state != null:
+		encounter_id = String(_game_state.get_value("encounter_id", ""))
+	return encounter_id
+
+
+func _load_background() -> void:
+	if _background_rect != null:
+		_background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	if _foreground_rect != null:
+		_foreground_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_foreground_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+
+	var encounter_id = _current_encounter_id()
+	var encounter = _get_encounter_def(encounter_id)
+	var biome_id = ""
+	var background_id = ""
+	if encounter != null:
+		biome_id = String(encounter.biome_id)
+		background_id = String(encounter.battle_background_id)
+
+	var loader = BattleBackgroundLoader.new()
+	var result = loader.load_background(biome_id, background_id)
+	_apply_background(result)
+
+
+func _apply_background(result: Dictionary) -> void:
+	if _background_rect != null:
+		var bg = result.get("bg", null)
+		if bg != null:
+			_background_rect.texture = bg
+			_background_rect.visible = true
+		else:
+			_background_rect.visible = false
+	if _foreground_rect != null:
+		var fg = result.get("fg", null)
+		if fg != null:
+			_foreground_rect.texture = fg
+			_foreground_rect.visible = true
+		else:
+			_foreground_rect.visible = false
 
 
 func _ensure_data_loaded() -> void:

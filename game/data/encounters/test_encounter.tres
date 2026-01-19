@@ -7,3 +7,5 @@ script = ExtResource("1")
 id = "test_encounter"
 enemy_ids = ["slime_a", "slime_b"]
 battle_scene = "res://game/scenes/battle/BattleScene.tscn"
+biome_id = "cloverhollow"
+battle_background_id = "meadow_stub"

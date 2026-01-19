@@ -34,6 +34,7 @@ Later (for device builds):
 ## Milestone 0 — Repo boot + CI sanity
 
 **Owner:** QA Automation + Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 The project boots reliably (macOS) and has working headless entrypoints.
@@ -63,6 +64,7 @@ The project boots reliably (macOS) and has working headless entrypoints.
 ## Milestone 1 — Exploration core: movement + camera + 8-direction facing
 
 **Owner:** Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Player can move with free analog input in a 3D scene, with a fixed 3/4 overhead camera and stable 8-direction sprite facing.
@@ -97,6 +99,7 @@ Player can move with free analog input in a 3D scene, with a fixed 3/4 overhead 
 ## Milestone 2 — Interactions + dialogue
 
 **Owner:** UI Systems + Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Player can interact with NPCs and objects, producing dialogue text and basic item pickup.
@@ -124,6 +127,7 @@ Player can interact with NPCs and objects, producing dialogue text and basic ite
 ## Milestone 3 — SceneRouter + deterministic transitions
 
 **Owner:** Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Discrete areas load deterministically with spawn markers and transitions.
@@ -150,6 +154,7 @@ Discrete areas load deterministically with spawn markers and transitions.
 ## Milestone 4 — Visible enemies + encounter trigger
 
 **Owner:** World Scene Builder + Godot Gameplay Engineer
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Enemies are visible in exploration and trigger battle on collision/interaction.
@@ -175,6 +180,7 @@ Enemies are visible in exploration and trigger battle on collision/interaction.
 ## Milestone 5 — Battle system v0 (classic turn-based)
 
 **Owner:** Battle Systems + UI Systems
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Turn-based battle loop with 4 party members and a top HUD (no cassette theming).
@@ -390,3 +396,24 @@ Make the game feel production-ready: readable UI on iPhone, stable performance, 
 
 ### Acceptance criteria
 - Vertical slice runs smoothly on target devices and looks consistent across scenes.
+
+---
+
+## Milestone 14 — Cloverhollow battle background bake
+
+**Owner:** Art Pipeline
+
+### Objective
+Bake a deterministic Cloverhollow battle background and register it for encounters.
+
+### Tasks
+1. Create an art recipe + template for the Cloverhollow battle background.
+2. Bake a background to `game/assets/battle_backgrounds/cloverhollow/meadow_stub/bg.png` (optional `fg.png`).
+3. Validate output via scenario capture (no fallback texture).
+
+### Acceptance criteria
+- Encounter uses baked Cloverhollow background without fallback.
+- Outputs are reproducible from `art/recipes/...` and `art/templates/...`.
+
+### Notes
+- Requires art direction input on Cloverhollow scene composition and palette alignment.

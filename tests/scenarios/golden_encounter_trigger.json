@@ -6,7 +6,7 @@
     {"type": "wait_frames", "frames": 10},
     {"type": "move_to", "x": 3.0, "z": 0.0, "tolerance": 0.2, "timeout_frames": 240},
     {"type": "wait_frames", "frames": 60},
-    {"type": "capture", "label": "battle_loaded_from_data"},
+    {"type": "capture", "label": "battle_background_loaded"},
     {"type": "select_battle_command", "command": "attack", "wait_frames": 30},
     {"type": "wait_frames", "frames": 60},
     {"type": "capture", "label": "battle_turn_complete"}

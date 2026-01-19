@@ -46,6 +46,7 @@ This document is authoritative. If behavior, art, data formats, or UX changes, u
 ### 3.5 Runtime state + data spine
 - GameState tracks current scene, spawn id, party roster, flags, inventory, encounter id, return scene
 - DataRegistry loads `.tres` defs for enemies, encounters, party members, items, skills, and biomes from `res://game/data/...`
+- Encounter defs include `biome_id` and `battle_background_id` to resolve battle backgrounds from `game/assets/battle_backgrounds/<biome>/<id>/bg.png` (optional `fg.png`)
 
 ### 3.6 Reference resolution + world scale (initial calibration)
 These numbers exist to prevent "scale drift" across assets and UI.
@@ -142,6 +143,7 @@ No manual per-asset tweaks in Godot that cannot be regenerated.
 
 ### 5.4 Battle backgrounds
 - Pre-rendered PNG background per encounter/biome.
+- Battle scenes load backgrounds via `EncounterDef` (`biome_id` + `battle_background_id`).
 - Backgrounds are authored at high resolution and downscaled as needed for iOS.
 - Optional foreground overlay (fg.png) is allowed.
 

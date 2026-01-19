@@ -22,6 +22,13 @@ The `DataRegistry` autoload loads `.tres` resources from `res://game/data/*` on 
 - `res://game/data/skills/*.tres` → `SkillDef`
 - `res://game/data/biomes/*.tres` → `BiomeDef`
 
+## EncounterDef fields
+- `id`
+- `enemy_ids`
+- `battle_scene`
+- `biome_id`
+- `battle_background_id`
+
 ## Biome pack
 Biome data should include:
 - palette id + shared UI/skin palette

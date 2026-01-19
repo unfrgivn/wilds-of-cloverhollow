@@ -43,7 +43,11 @@ This document is authoritative. If behavior, art, data formats, or UX changes, u
 - Visible overworld enemies
 - Touch/collision triggers battle transition
 
-### 3.5 Reference resolution + world scale (initial calibration)
+### 3.5 Runtime state + data spine
+- GameState tracks current scene, spawn id, party roster, flags, inventory, encounter id, return scene
+- DataRegistry loads `.tres` defs for enemies, encounters, party members, items, skills, and biomes from `res://game/data/...`
+
+### 3.6 Reference resolution + world scale (initial calibration)
 These numbers exist to prevent "scale drift" across assets and UI.
 
 - **Design reference resolution (UI + composition):** 1920×1080 (landscape)

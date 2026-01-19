@@ -203,6 +203,7 @@ Turn-based battle loop with 4 party members and a top HUD (no cassette theming).
 ## Milestone 6 — Data spine (Resources + JSON)
 
 **Owner:** Product Architect + Battle Systems
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 New content (enemies, skills, items) can be added without code changes.

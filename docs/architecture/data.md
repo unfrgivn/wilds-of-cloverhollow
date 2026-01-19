@@ -11,6 +11,17 @@ Two acceptable patterns:
 1. Godot `Resource` (`.tres`) assets
 2. JSON/YAML in `game/data/...` with a loader
 
+## Data registry
+The `DataRegistry` autoload loads `.tres` resources from `res://game/data/*` on boot so gameplay systems can query by stable id.
+
+### Current data paths
+- `res://game/data/enemies/*.tres` → `EnemyDef`
+- `res://game/data/characters/*.tres` → `PartyMemberDef`
+- `res://game/data/encounters/*.tres` → `EncounterDef`
+- `res://game/data/items/*.tres` → `ItemDef`
+- `res://game/data/skills/*.tres` → `SkillDef`
+- `res://game/data/biomes/*.tres` → `BiomeDef`
+
 ## Biome pack
 Biome data should include:
 - palette id + shared UI/skin palette

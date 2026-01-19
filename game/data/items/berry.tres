@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ItemDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/data/item_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "berry"
+display_name = "Berry"
+description = "A simple berry that heals a little."

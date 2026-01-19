@@ -53,6 +53,12 @@ size = Vector3(12, 6, 8)
 [sub_resource type="BoxShape3D" id="BoxShape3D_Library"]
 size = Vector3(12, 6, 8)
 
+[sub_resource type="BoxMesh" id="BoxMesh_Cafe"]
+size = Vector3(10, 5, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_Cafe"]
+size = Vector3(10, 5, 8)
+
 [node name="Area_Cloverhollow_Town" type="Node3D"]
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
@@ -181,6 +187,15 @@ mesh = SubResource("BoxMesh_Library")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Library"]
 shape = SubResource("BoxShape3D_Library")
 
+[node name="Cafe" type="StaticBody3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.5, -12)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Cafe"]
+mesh = SubResource("BoxMesh_Cafe")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Cafe"]
+shape = SubResource("BoxShape3D_Cafe")
+
 [node name="Landmarks" type="Node3D" parent="."]
 
 [node name="ParkCenter" type="Node3D" parent="Landmarks"]
@@ -218,6 +233,27 @@ transform = Transform3D(0.707, 0, -0.707, 0, 1, 0, 0.707, 0, 0.707, 1.5, 0, 1.5)
 
 [node name="PlazaLamp" parent="Landmarks/Plaza" instance=ExtResource("11_lamp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+
+[node name="Playground" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -12)
+
+[node name="FencePlay1" parent="Landmarks/Playground" instance=ExtResource("15_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="FencePlay2" parent="Landmarks/Playground" instance=ExtResource("15_fence")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -3, 0, 0)
+
+[node name="BenchPlay" parent="Landmarks/Playground" instance=ExtResource("9_bench")]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 2, 0, 2)
+
+[node name="RockPlay" parent="Landmarks/Playground" instance=ExtResource("16_rock")]
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, -1, 0, 1)
+
+[node name="BushPlay" parent="Landmarks/Playground" instance=ExtResource("17_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+
+[node name="LampPlay" parent="Landmarks/Playground" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
 
 [node name="Paths" type="Node3D" parent="."]
 

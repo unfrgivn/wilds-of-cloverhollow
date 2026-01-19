@@ -25,6 +25,7 @@ EncounterManager="*res://game/autoload/EncounterManager.gd"
 DialogueManager="*res://game/autoload/DialogueManager.gd"
 PerformanceSettings="*res://game/autoload/PerformanceSettings.gd"
 TouchControlsManager="*res://game/autoload/TouchControlsManager.gd"
+DebugOverlay="*res://game/autoload/debug_overlay.gd"
 InventoryController="*res://game/autoload/InventoryController.gd"
 
 [display]

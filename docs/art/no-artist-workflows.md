@@ -33,11 +33,11 @@ You need ONE of:
 1. Put the source mesh in:
    - `art/source/blender/props/<prop_id>/source.glb`
 2. Create a recipe:
-   - `art/recipes/props/<prop_id>.yml`
+   - `art/recipes/props/<prop_id>.json`
 3. Run:
-   - `python3 tools/python/validate_assets.py --recipe art/recipes/props/<prop_id>.yml`
+   - `python3 tools/python/validate_assets.py --recipe art/recipes/props/<prop_id>.json`
 4. Bake/normalize (once implemented):
-   - `python3 tools/blender/normalize_prop_mesh.py --recipe art/recipes/props/<prop_id>.yml`
+   - `blender -b -P tools/blender/normalize_prop_mesh.py -- --recipe art/recipes/props/<prop_id>.json`
 5. Confirm output:
    - `art/exports/models/props/<prop_id>/<prop_id>.glb`
 
@@ -56,13 +56,14 @@ You need ONE of:
 
 ### Steps
 1. Create recipe:
-   - `art/recipes/characters/<char_id>.yml`
+   - `art/recipes/characters/<char_id>.json`
 2. Put any source meshes/textures under:
    - `art/source/blender/characters/<char_id>/...`
 3. Run sprite bake:
-   - `python3 tools/blender/bake_character_sprites.py --recipe art/recipes/characters/<char_id>.yml`
-4. Run palette normalization:
-   - `python3 tools/python/palette_quantize.py --in art/exports/sprites/<char_id>/... --palette art/palettes/<biome>.palette.json --global art/palettes/global_ui_skin.palette.json`
+   - `blender -b -P tools/blender/bake_character_sprites.py -- --recipe art/recipes/characters/<char_id>.json`
+4. Run palette normalization (Godot headless):
+   - `python3 tools/python/palette_quantize.py --in art/exports/sprites/<char_id>/... --out ... --palette art/palettes/<biome>.palette.json`
+   - Set `GODOT_BIN` if the Godot binary is not on PATH.
 5. Run validator:
    - `python3 tools/python/validate_assets.py --character <char_id>`
 
@@ -77,10 +78,10 @@ You need ONE of:
 
 ### Steps
 1. Create recipe:
-   - `art/recipes/battle_backgrounds/<biome>/<bg_id>.yml`
+   - `art/recipes/battle_backgrounds/<biome>/<bg_id>.json`
 2. Build the diorama scene (agent can do this) using biome materials.
 3. Render via script:
-   - `python3 tools/blender/bake_battle_background.py --recipe art/recipes/battle_backgrounds/<biome>/<bg_id>.yml`
+   - `blender -b -P tools/blender/bake_battle_background.py -- --recipe art/recipes/battle_backgrounds/<biome>/<bg_id>.json`
 4. Palette normalize if needed.
 5. Copy/verify the final output lands in:
    - `game/assets/battle_backgrounds/<biome>/<bg_id>/bg.png`

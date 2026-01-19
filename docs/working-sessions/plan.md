@@ -277,6 +277,7 @@ Agents can run deterministic playtests without controlling a live window.
 ## Milestone 9 — Art pipeline: beginner-friendly, deterministic
 
 **Owner:** Art Pipeline
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 You (without graphics experience) can generate:

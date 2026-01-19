@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
 [ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
@@ -15,16 +15,37 @@
 [ext_resource type="PackedScene" path="res://game/assets/props/crate.tscn" id="13_crate"]
 [ext_resource type="PackedScene" path="res://game/assets/props/flower_pot.tscn" id="14_flower"]
 [ext_resource type="PackedScene" path="res://game/assets/props/fence_straight.tscn" id="15_fence"]
+[ext_resource type="PackedScene" path="res://game/assets/props/rock_small.tscn" id="16_rock"]
+[ext_resource type="PackedScene" path="res://game/assets/props/bush_round.tscn" id="17_bush"]
+[ext_resource type="PackedScene" path="res://game/assets/props/barrel.tscn" id="18_barrel"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
-vertices = PackedVector3Array(-20, 0, -20, -20, 0, 20, 20, 0, 20, 20, 0, -20)
+vertices = PackedVector3Array(-30, 0, -30, -30, 0, 30, 30, 0, 30, 30, 0, -30)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ground"]
-size = Vector3(40, 0.1, 40)
+size = Vector3(60, 0.1, 60)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
-size = Vector3(40, 0.1, 40)
+size = Vector3(60, 0.1, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_School"]
+size = Vector3(14, 6, 6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_School"]
+size = Vector3(14, 6, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_Arcade"]
+size = Vector3(10, 5, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_Arcade"]
+size = Vector3(10, 5, 8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_PathEW"]
+size = Vector3(50, 0.05, 3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_PathNS"]
+size = Vector3(3, 0.05, 50)
 
 [node name="Area_Cloverhollow_Town" type="Node3D"]
 
@@ -112,3 +133,53 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 6)
 
 [node name="Fence" parent="Decor" instance=ExtResource("15_fence")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="School" type="StaticBody3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -18)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/School"]
+mesh = SubResource("BoxMesh_School")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/School"]
+shape = SubResource("BoxShape3D_School")
+
+[node name="Arcade" type="StaticBody3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Arcade"]
+mesh = SubResource("BoxMesh_Arcade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Arcade"]
+shape = SubResource("BoxShape3D_Arcade")
+
+[node name="Landmarks" type="Node3D" parent="."]
+
+[node name="ParkCenter" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 5)
+
+[node name="Rock" parent="Landmarks/ParkCenter" instance=ExtResource("16_rock")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="Bush1" parent="Landmarks/ParkCenter" instance=ExtResource("17_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+
+[node name="Bush2" parent="Landmarks/ParkCenter" instance=ExtResource("17_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+
+[node name="BenchPark" parent="Landmarks/ParkCenter" instance=ExtResource("9_bench")]
+transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 2, 0, 2)
+
+[node name="BarrelPark" parent="Landmarks/ParkCenter" instance=ExtResource("18_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
+
+[node name="Paths" type="Node3D" parent="."]
+
+[node name="PathEW" type="MeshInstance3D" parent="Paths"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("BoxMesh_PathEW")
+
+[node name="PathNS" type="MeshInstance3D" parent="Paths"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("BoxMesh_PathNS")

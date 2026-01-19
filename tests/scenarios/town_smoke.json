@@ -25,6 +25,9 @@
     {"type": "interact"},
     {"type": "wait_frames", "frames": 60},
     {"type": "capture_checkpoint", "label": "after_house_return"},
+    {"type": "move_to", "x": 15.0, "z": 5.0, "tolerance": 0.6, "timeout_frames": 900},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "park_landmark"},
     {"type": "move_to", "x": 8.0, "z": 0.0, "tolerance": 0.4, "timeout_frames": 900},
     {"type": "wait_frames", "frames": 60},
     {"type": "capture_checkpoint", "label": "battle_start"}

@@ -2,7 +2,7 @@
   "id": "town_smoke",
   "start_scene": "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_Town.tscn",
   "seed": 1601,
-  "quit_after_frames": 3000,
+  "quit_after_frames": 3600,
   "actions": [
     {"type": "wait_frames", "frames": 30},
     {"type": "move_to", "x": 2.0, "z": -2.0, "tolerance": 0.3, "timeout_frames": 600},
@@ -46,6 +46,12 @@
     {"type": "move_to", "x": -20.0, "z": 5.0, "tolerance": 0.6, "timeout_frames": 900},
     {"type": "wait_frames", "frames": 30},
     {"type": "capture_checkpoint", "label": "market_nook"},
+    {"type": "move_to", "x": -11.0, "z": 2.0, "tolerance": 0.6, "timeout_frames": 900},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "bus_plaza"},
+    {"type": "move_to", "x": 22.0, "z": -5.0, "tolerance": 0.6, "timeout_frames": 900},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "riverside_path"},
     {"type": "move_to", "x": 8.0, "z": 0.0, "tolerance": 0.4, "timeout_frames": 900},
     {"type": "wait_frames", "frames": 60},
     {"type": "capture_checkpoint", "label": "battle_start"}

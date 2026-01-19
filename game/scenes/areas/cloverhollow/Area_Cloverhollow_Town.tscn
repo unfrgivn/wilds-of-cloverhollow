@@ -321,6 +321,36 @@ transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 1.5, 0, 1)
 [node name="MarketPot" parent="Landmarks/Market" instance=ExtResource("14_flower")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
 
+[node name="BusPlaza" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 2)
+
+[node name="BusBench" parent="Landmarks/BusPlaza" instance=ExtResource("9_bench")]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0, 0)
+
+[node name="BusLamp" parent="Landmarks/BusPlaza" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
+
+[node name="BusSign" parent="Landmarks/BusPlaza" instance=ExtResource("10_signpost")]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 1, 0, 1)
+
+[node name="BusPot" parent="Landmarks/BusPlaza" instance=ExtResource("14_flower")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.5)
+
+[node name="RiversidePath" type="Node3D" parent="Landmarks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -5)
+
+[node name="RiverFence" parent="Landmarks/RiversidePath" instance=ExtResource("15_fence")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="RiverRock" parent="Landmarks/RiversidePath" instance=ExtResource("16_rock")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 1, 0, 1)
+
+[node name="RiverBarrel" parent="Landmarks/RiversidePath" instance=ExtResource("18_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0.5)
+
+[node name="RiverCrate" parent="Landmarks/RiversidePath" instance=ExtResource("13_crate")]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 0.5, 0, 0.5)
+
 [node name="Paths" type="Node3D" parent="."]
 
 [node name="PathEW" type="MeshInstance3D" parent="Paths"]

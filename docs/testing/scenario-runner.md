@@ -30,18 +30,22 @@ Initial JSON schema (v1):
 
 ## Outputs
 - `trace.json`
+- optional checkpoint frames from `capture` actions
 - optional movie output in deterministic mode
 
 Recommended capture folder structure:
 - `captures/<scenario_id>/<timestamp>/trace.json`
-- `captures/<scenario_id>/<timestamp>/frames/*.png` (optional)
+- `captures/<scenario_id>/<timestamp>/frames/<label>_<frame>.png`
 - `captures/<scenario_id>/<timestamp>/movie/*.png` (PNG sequence, optional)
+
+Note: In headless mode, checkpoint frame capture is skipped. Use Movie Maker mode for visual regression.
 
 ## Recommended scenario actions
 - wait_frames
 - move_to (navagent)
 - interact (by node name/group)
 - trigger_encounter
+- select_battle_command
 - capture_checkpoint
 
 ## Deterministic video capture (preferred)
@@ -51,3 +55,8 @@ Example pattern (actual flags may vary by implementation):
 ```bash
 godot --path . --write-movie "captures/<id>/movie/frame.png" --fixed-fps 30 -- --scenario <id> --quit_after_frames 1800
 ```
+
+Repo helper:
+- `./tools/ci/run-scenario-rendered.sh <scenario_id>` produces a Movie Maker capture under `captures/<scenario_id>/<timestamp>/movie`.
+- Set `HEADLESS_MODE=1` to force headless rendering when supported.
+- Set `AUDIO_DRIVER=Dummy` to suppress audio device errors during capture.

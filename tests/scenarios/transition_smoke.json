@@ -1,0 +1,14 @@
+{
+  "id": "transition_smoke",
+  "start_scene": "res://game/scenes/tests/TestRoom_TransitionA.tscn",
+  "seed": 12345,
+  "actions": [
+    {"type": "wait_frames", "frames": 20},
+    {"type": "move_to", "x": 3.8, "z": 0.0, "tolerance": 0.2, "timeout_frames": 240},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 40},
+    {"type": "capture", "label": "arrived_b"},
+    {"type": "move_to", "x": -2.0, "z": 0.0, "tolerance": 0.2, "timeout_frames": 240},
+    {"type": "capture", "label": "moved_in_b"}
+  ]
+}

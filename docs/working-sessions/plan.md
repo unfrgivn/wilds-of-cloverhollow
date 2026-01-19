@@ -424,3 +424,97 @@ Bake a deterministic Cloverhollow battle background and register it for encounte
 
 ### Notes
 - Requires art direction input on Cloverhollow scene composition and palette alignment.
+
+---
+
+## Milestone 15 — Cloverhollow art lock + prop kit
+
+**Owner:** Art Pipeline + Product Architect
+**Status:** ✅ Completed (2026-01-19)
+
+### Objective
+Lock the Cloverhollow look and ship a minimal prop kit plus one enemy family.
+
+### Tasks
+1. Finalize Cloverhollow palette + ramp JSON.
+2. Produce 10 town props (low-poly) via `art/recipes/...` and `art/templates/...`.
+3. Create one enemy family base model and bake sprites (overworld + battle).
+
+### Acceptance criteria
+- Palette/ramp are committed under `art/palettes/` and referenced in docs.
+- 10 props exist as deterministic recipes and runtime assets under `game/assets/props/`.
+- Enemy family has baked sprites under `game/assets/sprites/enemies/<family>/...`.
+
+### Notes
+- Needs final art direction call on Cloverhollow prop list.
+
+---
+
+## Milestone 16 — Cloverhollow town exterior (playable)
+
+**Owner:** World Scene Builder + Godot Gameplay Engineer
+
+### Objective
+Build a real town exterior with NPCs, interactions, and navigation.
+
+### Tasks
+1. Create `Area_Cloverhollow_Town.tscn` with navmesh, collisions, and spawn markers.
+2. Place at least 2 NPCs, 1 sign, 1 container, and a bus stop placeholder.
+3. Wire SceneRouter transitions to Fae house and to battle encounters.
+
+### Acceptance criteria
+- Town is fully walkable with interactables and visible enemy encounter.
+- Scenario Runner can traverse town and hit all required interactions.
+
+---
+
+## Milestone 17 — Fae house interior + routing
+
+**Owner:** World Scene Builder + Godot Gameplay Engineer
+
+### Objective
+Ship Fae house interior and wire transitions to/from town.
+
+### Tasks
+1. Build `Area_Cloverhollow_FaeHouse.tscn` with props and collisions.
+2. Add door interactables and spawn markers for enter/exit.
+3. Update SceneRouter entries for house/town links.
+
+### Acceptance criteria
+- Player can start inside Fae house and walk to town.
+- Scenario Runner captures the transition deterministically.
+
+---
+
+## Milestone 18 — Cloverhollow sprites + battle backgrounds
+
+**Owner:** Art Pipeline + Battle Systems
+
+### Objective
+Replace placeholders with baked sprites and battle background art.
+
+### Tasks
+1. Bake Fae + NPC sprite sets (8-dir overworld, 2-dir battle).
+2. Bake at least one Cloverhollow battle background (bg + optional fg).
+3. Wire EncounterDefs to the baked background ids.
+
+### Acceptance criteria
+- Overworld uses sprites (not capsules) for Fae/NPCs/enemy.
+- Battles use baked Cloverhollow background with no fallback.
+
+---
+
+## Milestone 19 — Playable town demo + visual baseline
+
+**Owner:** QA Automation + Product Architect
+
+### Objective
+Deliver a playable town demo with deterministic captures.
+
+### Tasks
+1. Add golden scenario that starts at Fae house, reaches town, interacts with 2 NPCs + sign + container, triggers battle, and returns.
+2. Run rendered capture and update visual baselines.
+
+### Acceptance criteria
+- Golden scenario passes headlessly and with rendered capture.
+- Visual baseline artifacts are stored under `captures/`.

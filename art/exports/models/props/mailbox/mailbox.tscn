@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_fb2uo"]
+size = Vector3(0.1, 1, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cy17t"]
+specular_mode = 2
+albedo_color = Color(0.5529412, 0.43137255, 0.3882353, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6cq5o"]
+size = Vector3(0.4, 0.3, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l45a4"]
+specular_mode = 2
+albedo_color = Color(0.7411765, 0.7411765, 0.7411765, 1)
+
+[node name="mailbox" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_fb2uo")
+surface_material_override/0 = SubResource("StandardMaterial3D_cy17t")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.1)
+mesh = SubResource("BoxMesh_6cq5o")
+surface_material_override/0 = SubResource("StandardMaterial3D_l45a4")

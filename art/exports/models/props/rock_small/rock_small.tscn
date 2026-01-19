@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="SphereMesh" id="SphereMesh_wc52d"]
+radius = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7u7qh"]
+specular_mode = 2
+albedo_color = Color(0.61960787, 0.61960787, 0.61960787, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4qgsh"]
+radius = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gc2gy"]
+specular_mode = 2
+albedo_color = Color(0.61960787, 0.61960787, 0.61960787, 1)
+
+[node name="rock_small" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.2, 0, 0, 0, 0.8, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("SphereMesh_wc52d")
+surface_material_override/0 = SubResource("StandardMaterial3D_7u7qh")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 0.9, 0.3, 0.1, 0.2)
+mesh = SubResource("SphereMesh_4qgsh")
+surface_material_override/0 = SubResource("StandardMaterial3D_gc2gy")

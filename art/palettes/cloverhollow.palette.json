@@ -1,0 +1,17 @@
+{
+  "id": "cloverhollow",
+  "colors": {
+    "grass_base": "#4caf50",
+    "grass_shadow": "#388e3c",
+    "dirt_base": "#795548",
+    "dirt_shadow": "#5d4037",
+    "stone_base": "#9e9e9e",
+    "stone_highlight": "#bdbdbd",
+    "wood_base": "#8d6e63",
+    "wood_dark": "#5d4037",
+    "roof_red": "#d32f2f",
+    "water_blue": "#2196f3",
+    "flower_yellow": "#ffeb3b",
+    "flower_white": "#ffffff"
+  }
+}

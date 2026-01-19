@@ -1,0 +1,7 @@
+{
+  "id": "rock_small",
+  "parts": [
+    { "type": "sphere", "radius": 0.4, "pos": [0, 0.2, 0], "scale": [1.2, 0.8, 1.0], "color": "stone_base" },
+    { "type": "sphere", "radius": 0.3, "pos": [0.3, 0.1, 0.2], "scale": [1.0, 0.7, 0.9], "color": "stone_base" }
+  ]
+}

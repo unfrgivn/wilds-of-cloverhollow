@@ -14,7 +14,7 @@ This doc defines “one-command” recipes for:
 ## 0) Folder meanings (don’t skip)
 
 - `art/source/` — raw inputs and references (AI outputs, kitbash, scans, notes)
-- `art/templates/` — versioned Blender/Godot templates that lock camera, lighting, and shader settings
+- `art/templates/` — versioned Blender/Godot templates that lock camera, lighting, and materials
 - `art/recipes/` — per-asset YAML/JSON files that describe how to reproduce outputs
 - `art/exports/` — deterministic outputs (sprites, models, backgrounds) that get imported into Godot
 
@@ -25,52 +25,54 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 ## 1) Create a new prop (low-poly toon)
 
 ### Inputs
-You need ONE of:
-- an AI-generated mesh (GLB/FBX/OBJ), or
-- a simple mesh you created from primitives.
+- A JSON recipe defining composite parts (box, cylinder, sphere) and palette colors.
 
 ### Steps
-1. Put the source mesh in:
-   - `art/source/blender/props/<prop_id>/source.glb`
-2. Create a recipe:
-   - `art/recipes/props/<prop_id>.json`
-3. Run:
-   - `python3 tools/python/validate_assets.py --recipe art/recipes/props/<prop_id>.json`
-4. Bake/normalize (once implemented):
-   - `blender -b -P tools/blender/normalize_prop_mesh.py -- --recipe art/recipes/props/<prop_id>.json`
-5. Confirm output:
-   - `art/exports/models/props/<prop_id>/<prop_id>.glb`
+1. Create a recipe:
+   - `art/recipes/props/<biome>/<prop_id>.json`
+   - Example:
+     ```json
+     {
+       "id": "crate",
+       "parts": [
+         { "type": "box", "size": [1, 1, 1], "color": "wood_base" }
+       ]
+     }
+     ```
+2. Run bake script (Godot headless):
+   - `python3 tools/python/bake_props.py --recipe art/recipes/props/<biome>/<prop_id>.json`
+   - Or bake all: `python3 tools/python/bake_props.py --all`
+   - Set `GODOT_BIN` if the Godot binary is not on PATH.
+3. Confirm output:
+   - `art/exports/models/props/<prop_id>/<prop_id>.tscn`
+   - `game/assets/props/<prop_id>.tscn`
 
 ### Quality gates (what “good” means)
-- Correct scale in meters (no microscopic or giant meshes)
-- Uses only approved toon materials
-- Has collision (or collision is intentionally omitted and documented)
+- Correct scale in meters (1 unit = 1 meter)
+- Uses only approved palette colors
+- Deterministic generation (same recipe = same output)
 
 ---
 
 ## 2) Create a new character/NPC (sprite bake)
 
-### What you need
-- A single humanoid rig template (provided in `art/templates/blender/character_rig.blend` once created)
-- Optional modular parts (hair, outfit) that the agent can swap
+### Inputs
+- A JSON recipe defining the character structure (composite parts).
 
 ### Steps
 1. Create recipe:
    - `art/recipes/characters/<char_id>.json`
-2. Put any source meshes/textures under:
-   - `art/source/blender/characters/<char_id>/...`
-3. Run sprite bake:
-   - `blender -b -P tools/blender/bake_character_sprites.py -- --recipe art/recipes/characters/<char_id>.json`
-4. Run palette normalization (Godot headless):
-   - `python3 tools/python/palette_quantize.py --in art/exports/sprites/<char_id>/... --out ... --palette art/palettes/<biome>.palette.json`
+2. Run sprite bake (Godot headless):
+   - `python3 tools/python/bake_sprites.py --recipe art/recipes/characters/<char_id>.json`
    - Set `GODOT_BIN` if the Godot binary is not on PATH.
-5. Run validator:
+3. Run validator:
    - `python3 tools/python/validate_assets.py --character <char_id>`
 
 ### Output expectations
 - Overworld: 8 directions (N, NE, E, SE, S, SW, W, NW)
-- Battle: 2 directions (L/R)
+- Battle: 2 directions (L/R) (outputs `*_battle_idle_L.png` and `*_battle_idle_R.png`)
 - Transparent background for all frames
+- Outputs to `art/exports/sprites/<char_id>/` and `game/assets/sprites/enemies/<char_id>/`
 
 ---
 

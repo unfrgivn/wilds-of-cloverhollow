@@ -1,0 +1,8 @@
+{
+  "id": "bush_round",
+  "parts": [
+    { "type": "sphere", "radius": 0.5, "pos": [0, 0.4, 0], "color": "grass_base" },
+    { "type": "sphere", "radius": 0.4, "pos": [0.3, 0.3, 0.2], "color": "grass_base" },
+    { "type": "sphere", "radius": 0.4, "pos": [-0.3, 0.3, -0.1], "color": "grass_base" }
+  ]
+}

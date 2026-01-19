@@ -60,6 +60,19 @@ def validate_character(char_id: str):
             print(f"  - {m}")
         sys.exit(1)
 
+    battle_files = [
+        f"{char_id}_battle_idle_L.png",
+        f"{char_id}_battle_idle_R.png",
+    ]
+    battle_present = any((base_path / f).exists() for f in battle_files)
+    if battle_present:
+        battle_missing = [f for f in battle_files if not (base_path / f).exists()]
+        if battle_missing:
+            print(f"Error: Missing battle sprite files for {char_id}:")
+            for m in battle_missing:
+                print(f"  - {m}")
+            sys.exit(1)
+
     print(f"Success: Character {char_id} validated.")
 
 
@@ -72,10 +85,19 @@ def validate_recipe(recipe_path: str):
         if "characters" in recipe_path:
             validate_character(asset_id)
         elif "props" in recipe_path:
-            prop_path = Path(f"art/exports/models/props/{asset_id}/{asset_id}.glb")
-            if not prop_path.exists():
-                print(f"Error: Prop output {prop_path} missing")
+            prop_path_tscn = Path(
+                f"art/exports/models/props/{asset_id}/{asset_id}.tscn"
+            )
+            prop_path_glb = Path(f"art/exports/models/props/{asset_id}/{asset_id}.glb")
+
+            if not prop_path_tscn.exists() and not prop_path_glb.exists():
+                print(f"Error: Prop output {prop_path_tscn} (or .glb) missing")
                 sys.exit(1)
+            if prop_path_tscn.exists():
+                runtime_prop = Path(f"game/assets/props/{asset_id}.tscn")
+                if not runtime_prop.exists():
+                    print(f"Error: Runtime prop {runtime_prop} missing")
+                    sys.exit(1)
             print(f"Success: Prop {asset_id} validated.")
         elif "battle_backgrounds" in recipe_path:
             parts = Path(recipe_path).parts

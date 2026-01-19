@@ -1,0 +1,38 @@
+[gd_scene load_steps=7 format=3]
+
+[sub_resource type="SphereMesh" id="SphereMesh_6mhbp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2kqi5"]
+specular_mode = 2
+albedo_color = Color(0.29803923, 0.6862745, 0.3137255, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_riswb"]
+radius = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qpdx0"]
+specular_mode = 2
+albedo_color = Color(0.29803923, 0.6862745, 0.3137255, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_fffy8"]
+radius = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hj4rl"]
+specular_mode = 2
+albedo_color = Color(0.29803923, 0.6862745, 0.3137255, 1)
+
+[node name="bush_round" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("SphereMesh_6mhbp")
+surface_material_override/0 = SubResource("StandardMaterial3D_2kqi5")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.3, 0.2)
+mesh = SubResource("SphereMesh_riswb")
+surface_material_override/0 = SubResource("StandardMaterial3D_qpdx0")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.3, -0.1)
+mesh = SubResource("SphereMesh_fffy8")
+surface_material_override/0 = SubResource("StandardMaterial3D_hj4rl")

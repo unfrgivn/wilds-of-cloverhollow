@@ -227,9 +227,11 @@ New content (enemies, skills, items) can be added without code changes.
 
 ## Milestone 7 — Pre-rendered battle backgrounds (production path)
 
-**Owner:** Art Pipeline + UI Systems
+**Owner:** Art Pipeline + Battle Systems
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
+
 Battle backgrounds are baked deterministically and referenced by encounter data.
 
 ### Tasks
@@ -248,6 +250,7 @@ Battle backgrounds are baked deterministically and referenced by encounter data.
 ## Milestone 8 — Scenario Runner + deterministic video capture
 
 **Owner:** QA Automation
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Agents can run deterministic playtests without controlling a live window.
@@ -402,6 +405,7 @@ Make the game feel production-ready: readable UI on iPhone, stable performance, 
 ## Milestone 14 — Cloverhollow battle background bake
 
 **Owner:** Art Pipeline
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Bake a deterministic Cloverhollow battle background and register it for encounters.

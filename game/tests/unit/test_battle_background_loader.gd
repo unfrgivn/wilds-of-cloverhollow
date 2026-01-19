@@ -14,3 +14,8 @@ func test_defaults_use_cloverhollow_paths() -> void:
 	var result = loader.load_background("", "")
 	assert_eq("res://game/assets/battle_backgrounds/cloverhollow/default/bg.png", result.get("bg_path", ""))
 	assert_eq("res://game/assets/battle_backgrounds/cloverhollow/default/fg.png", result.get("fg_path", ""))
+
+
+func test_stub_background_assets_exist() -> void:
+	assert_true(FileAccess.file_exists("res://game/assets/battle_backgrounds/cloverhollow/default/bg.png"))
+	assert_true(FileAccess.file_exists("res://game/assets/battle_backgrounds/cloverhollow/meadow_stub/bg.png"))

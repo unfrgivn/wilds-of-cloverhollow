@@ -180,6 +180,7 @@ A "vertical slice" is done when a player can:
   - trigger an interaction
   - trigger a battle
   - write deterministic capture artifacts
+- Golden path scenario: `tests/scenarios/golden_vertical_slice.json` exercises transition, interaction, encounter, and one battle turn
 
 ### 8.2 Visual regression
 - Primary: deterministic video output (Movie Maker mode)

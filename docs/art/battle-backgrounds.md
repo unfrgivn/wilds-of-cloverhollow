@@ -21,3 +21,8 @@ Rule: never ship a background that was upscaled from a smaller source.
 - Blender diorama scenes or Godot stage scenes (choose one and standardize)
 
 Initial standard: use Blender dioramas for deterministic output controlled by templates.
+
+## Stub generation (development)
+- Placeholder background uses `tools/art/generate_battle_background_stub.gd`.
+- Recipe: `art/recipes/battle_backgrounds/cloverhollow_meadow_stub.md`.
+- Run: `godot --headless --script tools/art/generate_battle_background_stub.gd`.

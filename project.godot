@@ -19,6 +19,7 @@ config/features=PackedStringArray("4.5")
 GameState="*res://game/autoload/GameState.gd"
 SceneRouter="*res://game/autoload/SceneRouter.gd"
 ScenarioRunner="*res://game/autoload/ScenarioRunner.gd"
+EncounterManager="*res://game/autoload/EncounterManager.gd"
 DialogueManager="*res://game/autoload/DialogueManager.gd"
 
 [display]

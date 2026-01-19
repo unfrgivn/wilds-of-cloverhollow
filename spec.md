@@ -24,6 +24,8 @@ This document is authoritative. If behavior, art, data formats, or UX changes, u
 - Platform: iOS native, landscape-only (iPhone + iPad)
 - Engine: Godot 4.5.x (GDScript)
 - Dev hardware: macOS only
+- Touch input: virtual joystick + interact button, safe-area aware
+- Performance: render scale presets with CLI override
 
 ## 3) World presentation
 

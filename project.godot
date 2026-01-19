@@ -22,6 +22,8 @@ ScenarioRunner="*res://game/autoload/ScenarioRunner.gd"
 DataRegistry="*res://game/autoload/DataRegistry.gd"
 EncounterManager="*res://game/autoload/EncounterManager.gd"
 DialogueManager="*res://game/autoload/DialogueManager.gd"
+PerformanceSettings="*res://game/autoload/PerformanceSettings.gd"
+TouchControlsManager="*res://game/autoload/TouchControlsManager.gd"
 
 [display]
 

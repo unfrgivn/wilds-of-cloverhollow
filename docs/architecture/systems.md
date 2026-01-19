@@ -5,6 +5,7 @@
 - Party follower chain (3 followers)
 - Interactions (NPC, sign, container)
 - Visible enemy spawners + encounter trigger
+- TouchControls (virtual joystick + interact button)
 
 ## Scene routing
 - Fade out/in transitions
@@ -18,3 +19,6 @@
 ## Automation
 - ScenarioRunner for headless e2e
 - Deterministic capture artifacts
+
+## Performance
+- PerformanceSettings autoload for render scale presets

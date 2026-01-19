@@ -304,6 +304,7 @@ and import them into Godot with no manual editor tweaking.
 ## Milestone 10 — iOS packaging + touch polish
 
 **Owner:** UI Systems + QA Automation
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Game is comfortable on iPhone/iPad in landscape with safe-area aware touch controls.

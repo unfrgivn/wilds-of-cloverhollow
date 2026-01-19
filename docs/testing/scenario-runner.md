@@ -9,6 +9,8 @@ Run with CLI args passed after `--`:
 - `--capture_dir <dir>`
 - `--seed <int>`
 - `--quit_after_frames <int>`
+- `--touch_controls` (force TouchControls on desktop)
+- `--render_scale <float>` (override render scale preset)
 
 ## Scenario files
 Scenario definitions live in:
@@ -60,3 +62,4 @@ Repo helper:
 - `./tools/ci/run-scenario-rendered.sh <scenario_id>` produces a Movie Maker capture under `captures/<scenario_id>/<timestamp>/movie`.
 - Set `HEADLESS_MODE=1` to force headless rendering when supported.
 - Set `AUDIO_DRIVER=Dummy` to suppress audio device errors during capture.
+- Set `EXTRA_ARGS="--touch_controls"` to pass extra project args.

@@ -17,6 +17,11 @@ GODOT_BIN="${GODOT_BIN:-godot}"
 HEADLESS_MODE="${HEADLESS_MODE:-0}"
 HEADLESS_FLAG=""
 AUDIO_DRIVER="${AUDIO_DRIVER:-Dummy}"
+EXTRA_ARGS_RAW="${EXTRA_ARGS:-}"
+EXTRA_ARGS=()
+if [[ -n "$EXTRA_ARGS_RAW" ]]; then
+  read -r -a EXTRA_ARGS <<< "$EXTRA_ARGS_RAW"
+fi
 if [[ "$HEADLESS_MODE" == "1" ]]; then
   HEADLESS_FLAG="--headless"
 fi
@@ -24,6 +29,6 @@ fi
 mkdir -p "$CAPTURE_DIR"
 mkdir -p "$CAPTURE_DIR/movie"
 
-"$GODOT_BIN" $HEADLESS_FLAG --audio-driver "$AUDIO_DRIVER" --path . --fixed-fps "$FIXED_FPS" --resolution "$RESOLUTION" --write-movie "${CAPTURE_DIR}/movie/frame.png" -- --scenario "$SCENARIO_ID" --capture_dir "$CAPTURE_DIR" --seed "$SEED" --quit_after_frames "$QUIT_AFTER_FRAMES"
+"$GODOT_BIN" $HEADLESS_FLAG --audio-driver "$AUDIO_DRIVER" --path . --fixed-fps "$FIXED_FPS" --resolution "$RESOLUTION" --write-movie "${CAPTURE_DIR}/movie/frame.png" -- --scenario "$SCENARIO_ID" --capture_dir "$CAPTURE_DIR" --seed "$SEED" --quit_after_frames "$QUIT_AFTER_FRAMES" "${EXTRA_ARGS[@]}"
 
 echo "Rendered scenario complete. Outputs: $CAPTURE_DIR"

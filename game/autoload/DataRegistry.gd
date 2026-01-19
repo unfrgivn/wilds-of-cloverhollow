@@ -6,6 +6,7 @@ var encounters: Dictionary = {}
 var items: Dictionary = {}
 var skills: Dictionary = {}
 var biomes: Dictionary = {}
+var quests: Dictionary = {}
 
 
 func _ready() -> void:
@@ -19,6 +20,7 @@ func load_all() -> void:
 	items = _load_defs("res://game/data/items")
 	skills = _load_defs("res://game/data/skills")
 	biomes = _load_defs("res://game/data/biomes")
+	quests = _load_defs("res://game/data/quests")
 
 
 func get_enemy(enemy_id: String) -> Resource:
@@ -37,12 +39,26 @@ func get_item(item_id: String) -> Resource:
 	return items.get(item_id, null)
 
 
+func get_tool(tool_id: String) -> Resource:
+	var item = items.get(tool_id, null)
+	if item == null:
+		return null
+	var is_tool = bool(item.get("is_tool"))
+	if is_tool:
+		return item
+	return null
+
+
 func get_skill(skill_id: String) -> Resource:
 	return skills.get(skill_id, null)
 
 
 func get_biome(biome_id: String) -> Resource:
 	return biomes.get(biome_id, null)
+
+
+func get_quest(quest_id: String) -> Resource:
+	return quests.get(quest_id, null)
 
 
 func _load_defs(path: String, _expected_script: Script = null) -> Dictionary:

@@ -20,6 +20,7 @@ The `DataRegistry` autoload loads `.tres` resources from `res://game/data/*` on 
 - `res://game/data/encounters/*.tres` → `EncounterDef`
 - `res://game/data/items/*.tres` → `ItemDef`
 - `res://game/data/skills/*.tres` → `SkillDef`
+- `res://game/data/quests/*.tres` → `QuestDef`
 - `res://game/data/biomes/*.tres` → `BiomeDef`
 
 ## EncounterDef fields
@@ -28,6 +29,19 @@ The `DataRegistry` autoload loads `.tres` resources from `res://game/data/*` on 
 - `battle_scene`
 - `biome_id`
 - `battle_background_id`
+
+## QuestDef fields
+- `id`
+- `title`
+- `description`
+- `steps`
+- `completion_flag`
+
+## ItemDef fields
+- `id`
+- `display_name`
+- `description`
+- `is_tool`
 
 ## Biome pack
 Biome data should include:

@@ -52,3 +52,12 @@ offset_top = -140.0
 offset_right = -24.0
 offset_bottom = -24.0
 text = "Interact"
+
+[node name="MenuButton" type="Button" parent="SafeArea/Layout"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 80.0
+text = "Menu"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="QuestDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/data/quest_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "lantern_note"
+title = "Lantern and the Hidden Note"
+description = "Find out what the flicker in the alley is trying to show you."
+steps = ["Borrow a lantern.", "Use the lantern to reveal the hidden note."]
+completion_flag = "quest_lantern_note_complete"

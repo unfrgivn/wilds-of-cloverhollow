@@ -46,8 +46,9 @@ This document is authoritative. If behavior, art, data formats, or UX changes, u
 - Touch/collision triggers battle transition
 
 ### 3.5 Runtime state + data spine
-- GameState tracks current scene, spawn id, party roster, flags, inventory, encounter id, return scene
-- DataRegistry loads `.tres` defs for enemies, encounters, party members, items, skills, and biomes from `res://game/data/...`
+- GameState tracks current scene, spawn id, party roster, flags, inventory (including tools), quest state, encounter id, return scene
+- QuestLog autoload tracks quest progress and completion flags, backed by GameState persistence
+- DataRegistry loads `.tres` defs for enemies, encounters, party members, items/tools, skills, quests, and biomes from `res://game/data/...`
 - Encounter defs include `biome_id` and `battle_background_id` to resolve battle backgrounds from `game/assets/battle_backgrounds/<biome>/<id>/bg.png` (optional `fg.png`)
 
 ### 3.6 Reference resolution + world scale (initial calibration)

@@ -26,3 +26,20 @@ func test_loads_party_defs() -> void:
 	var member = registry.get_party_member("fae")
 	assert_true(member != null)
 	assert_eq("Fae", member.display_name)
+
+
+func test_loads_quest_defs() -> void:
+	var registry = load(REGISTRY_SCRIPT).new()
+	registry.load_all()
+	var quest = registry.get_quest("lantern_note")
+	assert_true(quest != null)
+	assert_eq("Lantern and the Hidden Note", quest.title)
+	assert_eq(2, quest.steps.size())
+
+
+func test_loads_tool_item_defs() -> void:
+	var registry = load(REGISTRY_SCRIPT).new()
+	registry.load_all()
+	var tool = registry.get_tool("lantern")
+	assert_true(tool != null)
+	assert_true(tool.is_tool)

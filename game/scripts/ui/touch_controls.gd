@@ -6,6 +6,7 @@ extends CanvasLayer
 @onready var safe_area: MarginContainer = $SafeArea
 @onready var joystick: Control = $SafeArea/Layout/Joystick
 @onready var action_button: Button = $SafeArea/Layout/ActionButton
+@onready var menu_button: Button = $SafeArea/Layout/MenuButton
 
 var _last_strengths := {
 	"move_left": 0.0,
@@ -26,6 +27,8 @@ func _ready() -> void:
 	if action_button != null:
 		action_button.button_down.connect(_on_action_down)
 		action_button.button_up.connect(_on_action_up)
+	if menu_button != null:
+		menu_button.pressed.connect(_on_menu_pressed)
 
 func _exit_tree() -> void:
 	_release_actions()
@@ -92,3 +95,7 @@ func _on_action_down() -> void:
 
 func _on_action_up() -> void:
 	Input.action_release("interact")
+
+func _on_menu_pressed() -> void:
+	Input.action_press("ui_menu")
+	Input.action_release("ui_menu")

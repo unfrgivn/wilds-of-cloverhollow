@@ -325,6 +325,7 @@ Game is comfortable on iPhone/iPad in landscape with safe-area aware touch contr
 ## Milestone 11 — Core JRPG systems (inventory, tools, quests)
 
 **Owner:** Godot Gameplay Engineer + Product Architect
+**Status:** ✅ Completed (2026-01-19)
 
 ### Objective
 Move from “slice” to “game” by implementing the minimum systems needed to support:

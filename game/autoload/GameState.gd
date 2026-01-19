@@ -2,6 +2,7 @@ extends Node
 
 var flags := {}
 var inventory := {}
+var quests := {}
 var values := {}
 var party_members: Array[String] = []
 var input_blocked := false
@@ -20,8 +21,42 @@ func add_item(item_id: String, count: int = 1) -> void:
 	inventory[item_id] = current + count
 
 
+func remove_item(item_id: String, count: int = 1) -> bool:
+	if count <= 0:
+		return false
+	var current = int(inventory.get(item_id, 0))
+	if current < count:
+		return false
+	var next_count = current - count
+	if next_count <= 0:
+		inventory.erase(item_id)
+	else:
+		inventory[item_id] = next_count
+	return true
+
+
+func has_item(item_id: String, count: int = 1) -> bool:
+	return get_item_count(item_id) >= max(count, 1)
+
+
 func get_item_count(item_id: String) -> int:
 	return int(inventory.get(item_id, 0))
+
+
+func set_quest_state(quest_id: String, state: Dictionary) -> void:
+	quests[quest_id] = state.duplicate()
+
+
+func get_quest_state(quest_id: String) -> Dictionary:
+	return quests.get(quest_id, {}).duplicate()
+
+
+func has_quest(quest_id: String) -> bool:
+	return quests.has(quest_id)
+
+
+func clear_quest(quest_id: String) -> void:
+	quests.erase(quest_id)
 
 
 func add_party_member(member_id: String) -> bool:
@@ -61,6 +96,7 @@ func clear_value(key: String) -> void:
 func reset() -> void:
 	flags = {}
 	inventory = {}
+	quests = {}
 	values = {}
 	party_members = []
 	input_blocked = false
@@ -70,6 +106,7 @@ func to_dict() -> Dictionary:
 	return {
 		"flags": flags.duplicate(),
 		"inventory": inventory.duplicate(),
+		"quests": quests.duplicate(),
 		"values": values.duplicate(),
 		"party": party_members.duplicate(),
 	}
@@ -78,6 +115,7 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary) -> void:
 	flags = data.get("flags", {}).duplicate()
 	inventory = data.get("inventory", {}).duplicate()
+	quests = data.get("quests", {}).duplicate()
 	values = data.get("values", {}).duplicate()
 	party_members = data.get("party", []).duplicate()
 

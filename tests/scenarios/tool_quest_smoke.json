@@ -1,0 +1,20 @@
+{
+  "id": "tool_quest_smoke",
+  "start_scene": "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_ToolQuest.tscn",
+  "seed": 11011,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "move_to", "x": 3.0, "z": -3.0, "tolerance": 0.25, "timeout_frames": 240},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture_checkpoint", "label": "quest_giver_check"},
+    {"type": "move_to", "x": -3.0, "z": -3.0, "tolerance": 0.25, "timeout_frames": 240},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture_checkpoint", "label": "note_revealed"}
+  ]
+}

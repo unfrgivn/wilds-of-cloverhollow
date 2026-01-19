@@ -3,7 +3,8 @@
 ## Exploration
 - Player movement (analog) + 8-direction facing
 - Party follower chain (3 followers)
-- Interactions (NPC, sign, container)
+- Interactions (NPC, sign, container, tool-gated)
+- QuestLog tracking quest progress
 - Visible enemy spawners + encounter trigger
 - TouchControls (virtual joystick + interact button)
 

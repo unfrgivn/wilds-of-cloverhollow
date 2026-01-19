@@ -13,3 +13,4 @@
 - Interaction prompt appears when in range
 - Interactions are deterministic and data-driven
 - Doors route via SceneRouter spawn markers
+- Tool-gated interactables check inventory tools before unlocking

@@ -1,0 +1,99 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/QuestNPC.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/ToolGate.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/Player.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="5"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
+size = Vector2(20, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.3, 0.6, 0.35, 1)
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_Floor"]
+size = Vector3(20, 0.1, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_WallLong"]
+size = Vector3(20, 2, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_WallShort"]
+size = Vector3(0.5, 2, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_WallLong"]
+size = Vector3(20, 2, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_WallShort"]
+size = Vector3(0.5, 2, 20)
+
+[node name="Area_Cloverhollow_ToolQuest" type="Node3D"]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="NavigationRegion3D"]
+mesh = SubResource("PlaneMesh_1")
+material_override = SubResource("StandardMaterial3D_1")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D/Floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Floor/StaticBody3D"]
+shape = SubResource("BoxShape3D_Floor")
+
+[node name="Wall_North" type="StaticBody3D" parent="NavigationRegion3D"]
+position = Vector3(0, 1, -10)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Wall_North"]
+shape = SubResource("BoxShape3D_WallLong")
+
+[node name="Visual" type="MeshInstance3D" parent="NavigationRegion3D/Wall_North"]
+mesh = SubResource("BoxMesh_WallLong")
+
+[node name="Wall_South" type="StaticBody3D" parent="NavigationRegion3D"]
+position = Vector3(0, 1, 10)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Wall_South"]
+shape = SubResource("BoxShape3D_WallLong")
+
+[node name="Visual" type="MeshInstance3D" parent="NavigationRegion3D/Wall_South"]
+mesh = SubResource("BoxMesh_WallLong")
+
+[node name="Wall_West" type="StaticBody3D" parent="NavigationRegion3D"]
+position = Vector3(-10, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Wall_West"]
+shape = SubResource("BoxShape3D_WallShort")
+
+[node name="Visual" type="MeshInstance3D" parent="NavigationRegion3D/Wall_West"]
+mesh = SubResource("BoxMesh_WallShort")
+
+[node name="Wall_East" type="StaticBody3D" parent="NavigationRegion3D"]
+position = Vector3(10, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Wall_East"]
+shape = SubResource("BoxShape3D_WallShort")
+
+[node name="Visual" type="MeshInstance3D" parent="NavigationRegion3D/Wall_East"]
+mesh = SubResource("BoxMesh_WallShort")
+
+[node name="Player" parent="." instance=ExtResource("4")]
+position = Vector3(0, 0, 0)
+
+[node name="FollowCameraRig" parent="." instance=ExtResource("5")]
+target_path = NodePath("../Player")
+
+[node name="SpawnMarker_Default" type="Marker3D" parent="."]
+script = ExtResource("1")
+spawn_id = "default"
+is_default = true
+
+[node name="QuestNPC" parent="." instance=ExtResource("2")]
+position = Vector3(3, 0, -3)
+
+[node name="ToolGate" parent="." instance=ExtResource("3")]
+position = Vector3(-3, 0, -3)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 10, 0)
+shadow_enabled = true

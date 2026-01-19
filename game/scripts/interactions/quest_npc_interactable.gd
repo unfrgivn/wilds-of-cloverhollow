@@ -1,6 +1,10 @@
 class_name QuestNPCInteractable
 extends Interactable
 
+const SPRITE_DIR := "res://game/assets/sprites/characters/npc_citizen"
+const SPRITE_ID := "npc_citizen"
+const SPRITE_LOADER := preload("res://game/scripts/exploration/sprite_frames_loader.gd")
+
 @export var quest_id: String = ""
 @export var speaker_name: String = "Villager"
 @export_multiline var intro_text: String = "Hey there!"
@@ -13,9 +17,26 @@ extends Interactable
 @export var start_item_id: String = ""
 @export var start_item_quantity: int = 1
 
+@onready var animated_sprite: AnimatedSprite3D = $AnimatedSprite3D
 @onready var _dialogue_manager = get_node("/root/DialogueManager")
 @onready var _quest_log = get_node_or_null("/root/QuestLog")
 @onready var _game_state = get_node("/root/GameState")
+
+
+func _ready() -> void:
+	super._ready()
+	_load_sprite_frames()
+
+
+func _load_sprite_frames() -> void:
+	if animated_sprite == null:
+		return
+	var frames = SPRITE_LOADER.build_frames(SPRITE_DIR, SPRITE_ID)
+	if frames == null:
+		return
+	animated_sprite.sprite_frames = frames
+	if frames.has_animation("idle_s"):
+		animated_sprite.play("idle_s")
 
 
 func interact(_interactor: Node) -> void:

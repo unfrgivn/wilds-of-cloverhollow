@@ -1,14 +1,6 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/interactions/quest_npc_interactable.gd" id="1"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
-radius = 0.4
-height = 1.7
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-albedo_color = Color(0.2, 0.4, 0.8, 1)
-roughness = 0.5
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
 height = 1.7
@@ -26,10 +18,9 @@ start_item_id = "lantern"
 start_item_quantity = 1
 prompt_text = "Talk"
 
-[node name="Visual" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
-mesh = SubResource("CapsuleMesh_1")
-material_override = SubResource("StandardMaterial3D_1")
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+position = Vector3(0, 0.6, 0)
+billboard = 1
 
 [node name="InteractArea" type="Area3D" parent="."]
 collision_layer = 2

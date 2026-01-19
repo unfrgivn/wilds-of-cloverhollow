@@ -62,6 +62,16 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 ### Steps
 1. Create recipe:
    - `art/recipes/characters/<char_id>.json`
+   - Example:
+     ```json
+     {
+       "id": "fae",
+       "type": "character",
+       "category": "character",
+       "parts": [...]
+     }
+     ```
+   - `category` can be "character" (for party/NPCs) or "enemy" (default).
 2. Run sprite bake (Godot headless):
    - `python3 tools/python/bake_sprites.py --recipe art/recipes/characters/<char_id>.json`
    - Set `GODOT_BIN` if the Godot binary is not on PATH.
@@ -72,7 +82,10 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 - Overworld: 8 directions (N, NE, E, SE, S, SW, W, NW)
 - Battle: 2 directions (L/R) (outputs `*_battle_idle_L.png` and `*_battle_idle_R.png`)
 - Transparent background for all frames
-- Outputs to `art/exports/sprites/<char_id>/` and `game/assets/sprites/enemies/<char_id>/`
+- Outputs to `art/exports/sprites/<char_id>/`
+- Runtime copies go to:
+  - `game/assets/sprites/characters/<char_id>/` (if category="character")
+  - `game/assets/sprites/enemies/<char_id>/` (if category="enemy")
 
 ---
 
@@ -81,11 +94,19 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 ### Steps
 1. Create recipe:
    - `art/recipes/battle_backgrounds/<biome>/<bg_id>.json`
-2. Build the diorama scene (agent can do this) using biome materials.
-3. Render via script:
-   - `blender -b -P tools/blender/bake_battle_background.py -- --recipe art/recipes/battle_backgrounds/<biome>/<bg_id>.json`
-4. Palette normalize if needed.
-5. Copy/verify the final output lands in:
+   - Example:
+     ```json
+     {
+       "id": "town_square",
+       "type": "battle_background",
+       "biome": "cloverhollow",
+       "colors": { "sky": "sky_day", "ground": "grass_base" }
+     }
+     ```
+2. Run bake script (Godot headless):
+   - `python3 tools/python/bake_battle_backgrounds.py --recipe art/recipes/battle_backgrounds/<biome>/<bg_id>.json`
+   - Or bake all: `python3 tools/python/bake_battle_backgrounds.py --all`
+3. Copy/verify the final output lands in:
    - `game/assets/battle_backgrounds/<biome>/<bg_id>/bg.png`
 
 ### Quality gates

@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://testroompropshowcase"]
+[gd_scene load_steps=21 format=3 uid="uid://cuxn2xw0yoqai"]
 
 [ext_resource type="PackedScene" path="res://game/scenes/exploration/Player.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2"]

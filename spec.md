@@ -107,6 +107,10 @@ Notes:
 - Overworld: `idle`, `walk`
 - Battle: `idle`, `attack`, `hurt`
 
+#### Overworld sprite filename convention
+- Files are named `{id}_idle_<DIR>.png` and `{id}_walk_<DIR>.png` with `DIR` in `N, NE, E, SE, S, SW, W, NW`.
+- Runtime animation names are `idle_<dir>` and `walk_<dir>` (lowercase `dir`).
+
 If an entity lacks an animation, the game must fall back gracefully (e.g., reuse `idle`).
 
 ### 4.5 Town-first style lock

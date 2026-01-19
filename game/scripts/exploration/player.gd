@@ -2,6 +2,10 @@ extends CharacterBody3D
 
 @export var move_speed := 4.0
 
+const SPRITE_DIR := "res://game/assets/sprites/characters/fae"
+const SPRITE_ID := "fae"
+const SPRITE_LOADER := preload("res://game/scripts/exploration/sprite_frames_loader.gd")
+
 enum Facing { E, SE, S, SW, W, NW, N, NE }
 
 const FACING_ORDER := [
@@ -37,10 +41,21 @@ var scenario_control := false
 
 func _ready() -> void:
 	motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
+	_load_sprite_frames()
 	_update_animation(false)
 
 
+func _load_sprite_frames() -> void:
+	if animated_sprite == null:
+		return
+	var frames = SPRITE_LOADER.build_frames(SPRITE_DIR, SPRITE_ID)
+	if frames == null:
+		return
+	animated_sprite.sprite_frames = frames
+
+
 func _physics_process(_delta: float) -> void:
+
 	var input_vector = _get_input_vector()
 	var move_direction = Vector3(input_vector.x, 0.0, input_vector.y)
 

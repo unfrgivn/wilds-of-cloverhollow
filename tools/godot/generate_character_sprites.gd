@@ -31,11 +31,17 @@ func generate_sprites(recipe_path: String) -> void:
 
 	var data = json.data
 	var char_id = data.get("id", "unknown")
+	var category = data.get("category", "enemy")
 	var palette = load_palette("res://art/palettes/cloverhollow.palette.json")
 	var sprite_color = resolve_sprite_color(data, palette)
 
 	var export_dir = "res://art/exports/sprites/" + char_id
-	var runtime_dir = "res://game/assets/sprites/enemies/" + char_id
+	var runtime_dir = ""
+	if category == "character":
+		runtime_dir = "res://game/assets/sprites/characters/" + char_id
+	else:
+		runtime_dir = "res://game/assets/sprites/enemies/" + char_id
+	
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(export_dir))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(runtime_dir))
 

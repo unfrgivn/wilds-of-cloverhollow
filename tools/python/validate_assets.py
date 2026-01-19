@@ -36,8 +36,8 @@ def parse_recipe(recipe_path: str) -> dict:
         sys.exit(1)
 
 
-def validate_character(char_id: str):
-    print(f"Validating character: {char_id}")
+def validate_character(char_id: str, category: str = "enemy"):
+    print(f"Validating character: {char_id} (category: {category})")
     base_path = Path("art/exports/sprites") / char_id
 
     if not base_path.exists():
@@ -73,6 +73,17 @@ def validate_character(char_id: str):
                 print(f"  - {m}")
             sys.exit(1)
 
+    runtime_base = "characters" if category == "character" else "enemies"
+    runtime_path = Path(f"game/assets/sprites/{runtime_base}/{char_id}")
+
+    if not runtime_path.exists():
+        print(f"Error: Runtime directory {runtime_path} missing")
+        sys.exit(1)
+
+    if not any(runtime_path.iterdir()):
+        print(f"Error: Runtime directory {runtime_path} is empty")
+        sys.exit(1)
+
     print(f"Success: Character {char_id} validated.")
 
 
@@ -83,7 +94,8 @@ def validate_recipe(recipe_path: str):
     if "id" in data:
         asset_id = data["id"]
         if "characters" in recipe_path:
-            validate_character(asset_id)
+            category = data.get("category", "enemy")
+            validate_character(asset_id, category)
         elif "props" in recipe_path:
             prop_path_tscn = Path(
                 f"art/exports/models/props/{asset_id}/{asset_id}.tscn"

@@ -131,6 +131,7 @@ No manual per-asset tweaks in Godot that cannot be regenerated.
 - Bottom:
   - Command menu box (Attack / Skills / Items / Defend / Run)
   - Context/help text box
+- Baseline scene: `res://game/scenes/battle/BattleScene.tscn`
 
 ### 5.3 Party
 - 4 party members max on screen (MC + 2 + pet), equal spacing

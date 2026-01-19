@@ -12,3 +12,8 @@
 
 ## Party
 - Up to 4 party members displayed equally
+
+## Runtime
+- Battle logic lives in `res://game/scripts/battle/battle_state.gd`
+- Default scene is `res://game/scenes/battle/BattleScene.tscn`
+- Scenario automation uses `select_battle_command` actions

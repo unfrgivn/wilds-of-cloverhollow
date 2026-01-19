@@ -1,0 +1,133 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/battle/battle_scene.gd" id="1"]
+
+[node name="BattleScene" type="Node2D"]
+script = ExtResource("1")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Background" type="ColorRect" parent="CanvasLayer"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="BattlerLayer" type="Control" parent="CanvasLayer"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+
+[node name="EnemySpriteA" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
+color = Color(0.6, 0.2, 0.2, 1)
+position = Vector2(1220, 240)
+size = Vector2(140, 160)
+
+[node name="EnemySpriteB" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
+color = Color(0.6, 0.2, 0.2, 1)
+position = Vector2(1400, 280)
+size = Vector2(140, 160)
+
+[node name="PartySprite1" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
+color = Color(0.2, 0.6, 0.3, 1)
+position = Vector2(420, 520)
+size = Vector2(120, 140)
+
+[node name="PartySprite2" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
+color = Color(0.2, 0.6, 0.3, 1)
+position = Vector2(560, 560)
+size = Vector2(120, 140)
+
+[node name="PartySprite3" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
+color = Color(0.2, 0.6, 0.3, 1)
+position = Vector2(700, 600)
+size = Vector2(120, 140)
+
+[node name="PartySprite4" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
+color = Color(0.2, 0.6, 0.3, 1)
+position = Vector2(840, 640)
+size = Vector2(120, 140)
+
+[node name="SafeArea" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HudStack" type="VBoxContainer" parent="CanvasLayer/SafeArea"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="TopHud" type="HBoxContainer" parent="CanvasLayer/SafeArea/HudStack"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="EnemyPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/TopHud"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="EnemyList" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack/TopHud/EnemyPanel"]
+layout_mode = 2
+
+[node name="PartyPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/TopHud"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="PartyList" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack/TopHud/PartyPanel"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="CanvasLayer/SafeArea/HudStack"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="BottomHud" type="HBoxContainer" parent="CanvasLayer/SafeArea/HudStack"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="InfoPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="InfoLabel" type="Label" parent="CanvasLayer/SafeArea/HudStack/BottomHud/InfoPanel"]
+layout_mode = 2
+text = "Choose a command."
+
+[node name="CommandPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="CommandMenu" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel"]
+layout_mode = 2
+
+[node name="Attack" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+layout_mode = 2
+text = "Attack"
+
+[node name="Skills" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+layout_mode = 2
+text = "Skills"
+
+[node name="Items" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+layout_mode = 2
+text = "Items"
+
+[node name="Defend" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+layout_mode = 2
+text = "Defend"
+
+[node name="Run" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+layout_mode = 2
+text = "Run"

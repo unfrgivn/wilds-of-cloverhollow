@@ -100,12 +100,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 quest_id = "lantern_note"
 speaker_name = "Mayor"
 intro_text = "Welcome to Cloverhollow!"
+sprite_id = "npc_mayor"
 
 [node name="NPC_Kid" parent="." instance=ExtResource("4_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 quest_id = "lantern_note"
 speaker_name = "Kid"
 intro_text = "Have you seen the lantern?"
+sprite_id = "npc_kid"
 
 [node name="TownSign" parent="." instance=ExtResource("5_sign")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)

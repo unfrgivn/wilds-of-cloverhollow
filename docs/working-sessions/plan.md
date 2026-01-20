@@ -520,3 +520,117 @@ Deliver a playable town demo with deterministic captures.
 ### Acceptance criteria
 - Golden scenario passes headlessly and with rendered capture.
 - Visual baseline artifacts are stored under `captures/`.
+
+---
+
+## Milestone 20 — Character sprite pipeline v1 (Fae + NPCs)
+
+**Owner:** Art Pipeline + UI Systems
+
+### Objective
+Ship deterministic character sprite outputs for Fae and a small NPC set using the final palette/ramp.
+
+### Tasks
+1. Finalize the Blender rig/template for character sprite baking (overworld idle/walk).
+2. Bake Fae + at least 2 town NPCs to `game/assets/sprites/characters/<id>/`.
+3. Update validation to enforce naming and frame counts for character outputs.
+4. Add scenario `character_sprite_smoke.json` that captures Fae + NPCs in town.
+
+### Acceptance criteria
+- Fae and NPCs use baked sprites for overworld idle/walk in Cloverhollow.
+- Sprite outputs are deterministic and palette-compliant.
+- Scenario produces deterministic captures.
+
+---
+
+## Milestone 21 — Battle sprite suite (attack/hurt)
+
+**Owner:** Art Pipeline + Battle Systems
+
+### Objective
+Expand battle sprites beyond idle to include attack/hurt for Fae and a Cloverhollow enemy family.
+
+### Tasks
+1. Add battle animation clips (attack/hurt) to character and enemy rig templates.
+2. Bake battle sprite frames for Fae and the Cloverhollow enemy family.
+3. Wire battle state to play attack/hurt animations.
+4. Add scenario `battle_animation_smoke.json` capturing a full attack/hurt sequence.
+
+### Acceptance criteria
+- Battle sprites include attack/hurt frames and follow naming conventions.
+- Battle animations trigger correctly in the turn loop.
+- Scenario produces deterministic captures.
+
+---
+
+## Milestone 22 — Cloverhollow building facade pipeline
+
+**Owner:** Art Pipeline + World Scene Builder
+
+### Objective
+Replace placeholder building meshes with deterministic, style-locked facades.
+
+### Tasks
+1. Define a modular facade template (walls, roofs, windows) with palette/ramp constraints.
+2. Create facade recipes for School, Arcade, Library, Cafe, Clinic.
+3. Bake and import facades under `game/assets/buildings/`.
+4. Replace placeholder building meshes in `Area_Cloverhollow_Town.tscn` and update collisions.
+
+### Acceptance criteria
+- Town facades match Cloverhollow style lock and palette/ramp requirements.
+- Building collisions align with navmesh and interactables.
+
+---
+
+## Milestone 23 — Cloverhollow decor kit polish
+
+**Owner:** Art Pipeline + World Scene Builder
+
+### Objective
+Finalize decor props (fences, lamps, benches, foliage) for a cohesive town look.
+
+### Tasks
+1. Expand decor recipes under `art/recipes/props/cloverhollow/` with final-quality props.
+2. Bake and validate decor assets for palette compliance and budgets.
+3. Replace remaining placeholder decor in the town scene.
+4. Add scenario `town_decor_smoke.json` to capture updated decor density.
+
+### Acceptance criteria
+- Decor props are deterministic and palette-compliant.
+- Town scene uses final decor assets without placeholder meshes.
+
+---
+
+## Milestone 24 — Town art pass + visual baseline
+
+**Owner:** Product Architect + Art Pipeline + QA Automation
+
+### Objective
+Polish Cloverhollow to style-lock quality and refresh visual baselines.
+
+### Tasks
+1. Audit Cloverhollow scenes for palette/ramp compliance and scale consistency.
+2. Replace any remaining placeholder meshes or unbaked assets.
+3. Run rendered capture scenarios and update visual baselines.
+
+### Acceptance criteria
+- Cloverhollow exterior + Fae house are style-locked.
+- Visual baselines are updated under `captures/`.
+
+---
+
+## Milestone 25 — Art pipeline hardening + CI checks
+
+**Owner:** Art Pipeline + QA Automation
+
+### Objective
+Harden validation and CI guardrails to prevent art drift.
+
+### Tasks
+1. Add `tools/ci/run-asset-check.sh` to validate recipes vs runtime assets.
+2. Extend `tools/python/validate_assets.py` for palette compliance and naming.
+3. Add CI coverage for asset validation failures.
+
+### Acceptance criteria
+- CI fails when assets lack recipes or violate palette/naming rules.
+- Asset checks are deterministic and reproducible.

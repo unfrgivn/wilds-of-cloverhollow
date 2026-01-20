@@ -1,10 +1,11 @@
 class_name QuestNPCInteractable
 extends Interactable
 
-const SPRITE_DIR := "res://game/assets/sprites/characters/npc_citizen"
-const SPRITE_ID := "npc_citizen"
+const DEFAULT_SPRITE_DIR := "res://game/assets/sprites/characters"
 const SPRITE_LOADER := preload("res://game/scripts/exploration/sprite_frames_loader.gd")
 
+@export var sprite_id: String = "npc_citizen"
+@export var sprite_dir: String = DEFAULT_SPRITE_DIR
 @export var quest_id: String = ""
 @export var speaker_name: String = "Villager"
 @export_multiline var intro_text: String = "Hey there!"
@@ -31,7 +32,13 @@ func _ready() -> void:
 func _load_sprite_frames() -> void:
 	if animated_sprite == null:
 		return
-	var frames = SPRITE_LOADER.build_frames(SPRITE_DIR, SPRITE_ID)
+	if sprite_id.is_empty():
+		return
+	var resolved_dir = sprite_dir
+	if resolved_dir.is_empty():
+		resolved_dir = DEFAULT_SPRITE_DIR
+	var sprite_path = "%s/%s" % [resolved_dir, sprite_id]
+	var frames = SPRITE_LOADER.build_frames(sprite_path, sprite_id)
 	if frames == null:
 		return
 	animated_sprite.sprite_frames = frames

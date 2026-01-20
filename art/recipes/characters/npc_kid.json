@@ -1,0 +1,8 @@
+{
+  "id": "npc_kid",
+  "type": "character",
+  "category": "character",
+  "parts": [
+    { "type": "sphere", "radius": 0.5, "pos": [0, 0.5, 0], "scale": [0.75, 1.2, 0.75], "color": "water_blue" }
+  ]
+}

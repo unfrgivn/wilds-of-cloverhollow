@@ -3,6 +3,7 @@
   "parts": [
     { "type": "cylinder", "height": 1.2, "radius": 0.5, "pos": [0, 0.6, 0], "color": "wood_base" },
     { "type": "cylinder", "height": 0.1, "radius": 0.52, "pos": [0, 1.0, 0], "color": "stone_base" },
+    { "type": "cylinder", "height": 0.08, "radius": 0.5, "pos": [0, 0.6, 0], "color": "wood_dark" },
     { "type": "cylinder", "height": 0.1, "radius": 0.52, "pos": [0, 0.2, 0], "color": "stone_base" }
   ]
 }

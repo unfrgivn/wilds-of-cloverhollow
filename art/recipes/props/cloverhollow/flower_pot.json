@@ -3,6 +3,7 @@
   "parts": [
     { "type": "cylinder", "height": 0.4, "radius": 0.3, "pos": [0, 0.2, 0], "color": "roof_red" },
     { "type": "cylinder", "height": 0.1, "radius": 0.25, "pos": [0, 0.35, 0], "color": "dirt_base" },
-    { "type": "sphere", "radius": 0.15, "pos": [0, 0.5, 0], "color": "flower_white" }
+    { "type": "sphere", "radius": 0.15, "pos": [0, 0.5, 0], "color": "flower_white" },
+    { "type": "sphere", "radius": 0.12, "pos": [0.15, 0.48, 0.05], "color": "flower_yellow" }
   ]
 }

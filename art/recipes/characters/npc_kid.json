@@ -3,6 +3,9 @@
   "type": "character",
   "category": "character",
   "parts": [
-    { "type": "sphere", "radius": 0.5, "pos": [0, 0.5, 0], "scale": [0.75, 1.2, 0.75], "color": "water_blue" }
+    { "type": "sphere", "radius": 0.45, "pos": [0, 0.4, 0], "scale": [0.8, 1.1, 0.8], "color": "water_blue" },
+    { "type": "sphere", "radius": 0.22, "pos": [0, 1.05, 0], "color": "flower_white" },
+    { "type": "cylinder", "height": 0.2, "radius": 0.18, "pos": [0, 1.22, 0], "color": "roof_red" },
+    { "type": "box", "size": [0.5, 0.12, 0.25], "pos": [0, 0.8, 0.3], "color": "flower_yellow" }
   ]
 }

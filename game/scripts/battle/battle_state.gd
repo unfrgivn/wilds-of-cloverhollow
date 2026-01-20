@@ -15,6 +15,7 @@ var result := ""
 var last_log := ""
 var turn_count := 0
 var last_player_command := ""
+var last_actions: Array = []
 
 
 func setup(party_list: Array, enemy_list: Array) -> void:
@@ -25,6 +26,7 @@ func setup(party_list: Array, enemy_list: Array) -> void:
 	last_log = ""
 	turn_count = 0
 	last_player_command = ""
+	last_actions = []
 	_clear_guards()
 
 
@@ -33,6 +35,7 @@ func select_command(command_id: String) -> bool:
 		return false
 	phase = PHASE_RESOLVING
 	last_player_command = command_id
+	last_actions.clear()
 	_handle_player_command(command_id)
 	if not result.is_empty():
 		phase = PHASE_COMPLETE
@@ -79,6 +82,7 @@ func _player_attack(actor, damage: int, verb: String = "attack") -> void:
 		result = "victory"
 		last_log = "No enemies remain."
 		return
+	_record_action(actor, target, verb)
 	var dealt = target.apply_damage(damage)
 	var action_label = "attacks"
 	if verb == "skill":
@@ -101,11 +105,32 @@ func _handle_enemy_turn() -> void:
 		result = "defeat"
 		last_log = "Party defeated."
 		return
+	_record_action(attacker, target, "attack")
 	var dealt = target.apply_damage(2)
 	last_log = "%s hits %s for %d." % [attacker.display_name, target.display_name, dealt]
 	_clear_guards()
 	if not _has_alive(party):
 		result = "defeat"
+
+
+func _record_action(attacker: BattleActor, target: BattleActor, verb: String) -> void:
+	var attacker_list = enemies if attacker.is_enemy else party
+	var target_list = enemies if target.is_enemy else party
+	var action = {
+		"attacker_is_enemy": attacker.is_enemy,
+		"attacker_index": _index_of_actor(attacker_list, attacker),
+		"target_is_enemy": target.is_enemy,
+		"target_index": _index_of_actor(target_list, target),
+		"verb": verb,
+	}
+	last_actions.append(action)
+
+
+func _index_of_actor(list: Array, actor: BattleActor) -> int:
+	for i in range(list.size()):
+		if list[i] == actor:
+			return i
+	return -1
 
 
 func _clear_guards() -> void:

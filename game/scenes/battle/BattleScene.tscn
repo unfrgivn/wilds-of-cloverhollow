@@ -29,35 +29,41 @@ offset_right = 0.0
 offset_bottom = 0.0
 mouse_filter = 2
 
-[node name="EnemySpriteA" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
-color = Color(0.6, 0.2, 0.2, 1)
+[node name="EnemySpriteA" type="AnimatedSprite2D" parent="CanvasLayer/BattlerLayer"]
 position = Vector2(1220, 240)
-size = Vector2(140, 160)
+scale = Vector2(0.5, 0.5)
+centered = false
+playing = true
 
-[node name="EnemySpriteB" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
-color = Color(0.6, 0.2, 0.2, 1)
+[node name="EnemySpriteB" type="AnimatedSprite2D" parent="CanvasLayer/BattlerLayer"]
 position = Vector2(1400, 280)
-size = Vector2(140, 160)
+scale = Vector2(0.5, 0.5)
+centered = false
+playing = true
 
-[node name="PartySprite1" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
-color = Color(0.2, 0.6, 0.3, 1)
+[node name="PartySprite1" type="AnimatedSprite2D" parent="CanvasLayer/BattlerLayer"]
 position = Vector2(420, 520)
-size = Vector2(120, 140)
+scale = Vector2(0.5, 0.5)
+centered = false
+playing = true
 
-[node name="PartySprite2" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
-color = Color(0.2, 0.6, 0.3, 1)
+[node name="PartySprite2" type="AnimatedSprite2D" parent="CanvasLayer/BattlerLayer"]
 position = Vector2(560, 560)
-size = Vector2(120, 140)
+scale = Vector2(0.5, 0.5)
+centered = false
+playing = true
 
-[node name="PartySprite3" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
-color = Color(0.2, 0.6, 0.3, 1)
+[node name="PartySprite3" type="AnimatedSprite2D" parent="CanvasLayer/BattlerLayer"]
 position = Vector2(700, 600)
-size = Vector2(120, 140)
+scale = Vector2(0.5, 0.5)
+centered = false
+playing = true
 
-[node name="PartySprite4" type="ColorRect" parent="CanvasLayer/BattlerLayer"]
-color = Color(0.2, 0.6, 0.3, 1)
+[node name="PartySprite4" type="AnimatedSprite2D" parent="CanvasLayer/BattlerLayer"]
 position = Vector2(840, 640)
-size = Vector2(120, 140)
+scale = Vector2(0.5, 0.5)
+centered = false
+playing = true
 
 [node name="Foreground" type="TextureRect" parent="CanvasLayer"]
 anchor_left = 0.0

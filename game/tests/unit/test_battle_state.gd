@@ -21,6 +21,9 @@ func test_attack_advances_turn() -> void:
 	assert_eq("awaiting_command", state.phase)
 	assert_true(enemies[0].hp < enemies[0].max_hp)
 	assert_eq(1, state.turn_count)
+	assert_eq(2, state.last_actions.size())
+	assert_eq(false, state.last_actions[0]["attacker_is_enemy"])
+	assert_eq(true, state.last_actions[0]["target_is_enemy"])
 
 
 func test_run_ends_battle() -> void:

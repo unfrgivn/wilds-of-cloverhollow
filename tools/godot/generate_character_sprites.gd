@@ -56,7 +56,7 @@ func generate_sprites(recipe_path: String) -> void:
 			img.save_png(runtime_dir + "/" + filename)
 			print("Saved " + filename)
 
-	var battle_anims = ["idle"]
+	var battle_anims = ["idle", "attack", "hurt"]
 	var battle_dirs = ["L", "R"]
 	for anim in battle_anims:
 		for dir_name in battle_dirs:

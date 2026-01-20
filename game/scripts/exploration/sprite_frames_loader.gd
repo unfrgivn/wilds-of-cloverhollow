@@ -3,6 +3,8 @@ extends RefCounted
 
 const DIRECTIONS := ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 const ANIMATIONS := ["idle", "walk"]
+const BATTLE_DIRECTIONS := ["L", "R"]
+const BATTLE_ANIMATIONS := ["idle", "attack", "hurt"]
 
 
 static func build_frames(base_dir: String, sprite_id: String, frame_rate: float = 8.0) -> SpriteFrames:
@@ -23,6 +25,36 @@ static func build_frames(base_dir: String, sprite_id: String, frame_rate: float 
 				frames.add_animation(anim_name)
 				frames.set_animation_speed(anim_name, frame_rate)
 				frames.set_animation_loop(anim_name, true)
+			for file_name in files:
+				var texture_path = "%s/%s" % [base_dir, file_name]
+				var texture = _load_texture(texture_path)
+				if texture != null:
+					frames.add_frame(anim_name, texture)
+					total_frames += 1
+
+	if total_frames == 0:
+		return null
+	return frames
+
+
+func build_battle_frames(base_dir: String, sprite_id: String, frame_rate: float = 8.0) -> SpriteFrames:
+	if base_dir.is_empty() or sprite_id.is_empty():
+		return null
+
+	var frames := SpriteFrames.new()
+	var total_frames := 0
+
+	for anim in BATTLE_ANIMATIONS:
+		for direction in BATTLE_DIRECTIONS:
+			var prefix = "%s_battle_%s_%s" % [sprite_id, anim, direction]
+			var files = _collect_files(base_dir, prefix)
+			if files.is_empty():
+				continue
+			var anim_name = "battle_%s_%s" % [anim, direction.to_lower()]
+			if not frames.has_animation(anim_name):
+				frames.add_animation(anim_name)
+				frames.set_animation_speed(anim_name, frame_rate)
+				frames.set_animation_loop(anim_name, anim == "idle")
 			for file_name in files:
 				var texture_path = "%s/%s" % [base_dir, file_name]
 				var texture = _load_texture(texture_path)

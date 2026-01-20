@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_xypit"]
+size = Vector3(0.5, 3, 9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1pc3r"]
+specular_mode = 2
+albedo_color = Color(0.61960787, 0.61960787, 0.61960787, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7w41m"]
+size = Vector3(0.6, 0.2, 9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uthrw"]
+specular_mode = 2
+albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pa0mv"]
+size = Vector3(0.6, 0.2, 9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_isppy"]
+specular_mode = 2
+albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+
+[node name="house_wall_v" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("BoxMesh_xypit")
+surface_material_override/0 = SubResource("StandardMaterial3D_1pc3r")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("BoxMesh_7w41m")
+surface_material_override/0 = SubResource("StandardMaterial3D_uthrw")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+mesh = SubResource("BoxMesh_pa0mv")
+surface_material_override/0 = SubResource("StandardMaterial3D_isppy")

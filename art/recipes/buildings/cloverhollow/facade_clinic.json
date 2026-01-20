@@ -4,9 +4,10 @@
   "parts": [
     { "type": "box", "size": [10, 6, 8], "color": "stone_highlight" },
     { "type": "box", "size": [10, 1.2, 8], "color": "roof_red", "pos": [0, 3.6, 0] },
-    { "type": "box", "size": [4, 1, 0.5], "color": "water_blue", "pos": [0, 2.0, 4.3] },
-    { "type": "box", "size": [0.6, 2.0, 0.4], "color": "flower_white", "pos": [0, 0.5, 4.4] },
-    { "type": "box", "size": [2.0, 0.6, 0.4], "color": "flower_white", "pos": [0, 0.5, 4.4] },
-    { "type": "box", "size": [2.2, 3, 0.5], "color": "wood_dark", "pos": [0, -1.5, 4.2] }
+    { "type": "box", "size": [2.4, 3.0, 0.5], "color": "wood_dark", "pos": [0, -1.5, 4.2] },
+    { "type": "box", "size": [2.0, 2.0, 0.4], "color": "water_blue", "pos": [3.0, 0.6, 4.3] },
+    { "type": "box", "size": [2.0, 2.0, 0.4], "color": "water_blue", "pos": [-3.0, 0.6, 4.3] },
+    { "type": "box", "size": [0.6, 2.2, 0.4], "color": "flower_white", "pos": [0, 0.6, 4.4] },
+    { "type": "box", "size": [2.2, 0.6, 0.4], "color": "flower_white", "pos": [0, 0.6, 4.4] }
   ]
 }

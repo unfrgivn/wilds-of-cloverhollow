@@ -4,8 +4,9 @@
   "parts": [
     { "type": "box", "size": [10, 5, 8], "color": "wood_dark" },
     { "type": "box", "size": [10, 1.2, 8], "color": "roof_red", "pos": [0, 3.1, 0] },
-    { "type": "box", "size": [8, 1, 1], "color": "flower_yellow", "pos": [0, 1.5, 4.5] },
-    { "type": "box", "size": [5, 1, 0.6], "color": "water_blue", "pos": [0, 2.2, 4.3] },
-    { "type": "box", "size": [2.2, 3, 0.5], "color": "wood_base", "pos": [0, -1.5, 4.2] }
+    { "type": "box", "size": [2.4, 2.8, 0.5], "color": "wood_base", "pos": [0, -1.1, 4.2] },
+    { "type": "box", "size": [2.0, 2.0, 0.4], "color": "water_blue", "pos": [-3.0, 0.4, 4.3] },
+    { "type": "box", "size": [2.0, 2.0, 0.4], "color": "water_blue", "pos": [3.0, 0.4, 4.3] },
+    { "type": "box", "size": [6.0, 0.8, 0.4], "color": "flower_yellow", "pos": [0, 1.9, 4.4] }
   ]
 }

@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_a5vgw"]
+size = Vector3(2, 2, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_157wj"]
+specular_mode = 2
+albedo_color = Color(0.12941177, 0.5882353, 0.9529412, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cih8r"]
+size = Vector3(2.2, 0.2, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xwb07"]
+specular_mode = 2
+albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+
+[node name="kit_window" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_a5vgw")
+surface_material_override/0 = SubResource("StandardMaterial3D_157wj")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("BoxMesh_cih8r")
+surface_material_override/0 = SubResource("StandardMaterial3D_xwb07")

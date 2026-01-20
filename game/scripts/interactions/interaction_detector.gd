@@ -21,6 +21,7 @@ func try_interact(interactor: Node) -> bool:
 	if candidate == null:
 		return false
 	if candidate.can_interact(interactor):
+		print("[Interact] ", candidate.name, " @ ", candidate.get_path())
 		candidate.interact(interactor)
 		return true
 	return false

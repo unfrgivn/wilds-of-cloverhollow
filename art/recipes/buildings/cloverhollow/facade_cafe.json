@@ -1,0 +1,11 @@
+{
+  "id": "facade_cafe",
+  "type": "building_facade",
+  "parts": [
+    { "type": "box", "size": [10, 5, 8], "color": "wood_base" },
+    { "type": "box", "size": [10, 1.2, 8], "color": "roof_red", "pos": [0, 3.1, 0] },
+    { "type": "box", "size": [8, 0.6, 1.2], "color": "flower_yellow", "pos": [0, 0.6, 4.6] },
+    { "type": "box", "size": [2.2, 2.8, 0.5], "color": "wood_dark", "pos": [0, -1.1, 4.2] },
+    { "type": "box", "size": [3, 2, 0.4], "color": "water_blue", "pos": [3, 0.5, 4.2] }
+  ]
+}

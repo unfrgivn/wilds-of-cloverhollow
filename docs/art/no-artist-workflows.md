@@ -54,7 +54,39 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 
 ---
 
-## 2) Create a new character/NPC (sprite bake)
+## 2) Create a building facade (low-poly toon)
+
+### Inputs
+- A JSON recipe defining composite parts (box, cylinder, sphere) and palette colors.
+
+### Steps
+1. Create a recipe:
+   - `art/recipes/buildings/<biome>/<building_id>.json`
+   - Example:
+     ```json
+     {
+       "id": "facade_school",
+       "parts": [
+         { "type": "box", "size": [14, 6, 6], "color": "stone_base" }
+       ]
+     }
+     ```
+2. Run bake script (Godot headless):
+   - `python3 tools/python/bake_buildings.py --recipe art/recipes/buildings/<biome>/<building_id>.json`
+   - Or bake all: `python3 tools/python/bake_buildings.py --all`
+   - Set `GODOT_BIN` if the Godot binary is not on PATH.
+3. Confirm output:
+   - `art/exports/models/buildings/<building_id>/<building_id>.tscn`
+   - `game/assets/buildings/<building_id>.tscn`
+
+### Quality gates (what “good” means)
+- Correct scale in meters (1 unit = 1 meter)
+- Uses only approved palette colors
+- Deterministic generation (same recipe = same output)
+
+---
+
+## 3) Create a new character/NPC (sprite bake)
 
 ### Inputs
 - A JSON recipe defining the character structure (composite parts).
@@ -89,7 +121,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 
 ---
 
-## 3) Create a battle background (pre-render)
+## 4) Create a battle background (pre-render)
 
 ### Steps
 1. Create recipe:
@@ -115,7 +147,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 
 ---
 
-## 4) The single most important rule
+## 5) The single most important rule
 
 If you cannot reproduce an asset from:
 - the recipe,

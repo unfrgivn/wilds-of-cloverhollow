@@ -1,0 +1,62 @@
+[gd_scene load_steps=11 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_bidxw"]
+size = Vector3(10, 5, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f8cdu"]
+specular_mode = 2
+albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_axc1p"]
+size = Vector3(10, 1.2, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xx56o"]
+specular_mode = 2
+albedo_color = Color(0.827451, 0.18431373, 0.18431373, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hgvgn"]
+size = Vector3(8, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q6nmp"]
+specular_mode = 2
+albedo_color = Color(1, 0.92156863, 0.23137255, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vrqw4"]
+size = Vector3(5, 1, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2jvcr"]
+specular_mode = 2
+albedo_color = Color(0.12941177, 0.5882353, 0.9529412, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mihgq"]
+size = Vector3(2.2, 3, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3fnj8"]
+specular_mode = 2
+albedo_color = Color(0.5529412, 0.43137255, 0.3882353, 1)
+
+[node name="facade_arcade" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_bidxw")
+surface_material_override/0 = SubResource("StandardMaterial3D_f8cdu")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
+mesh = SubResource("BoxMesh_axc1p")
+surface_material_override/0 = SubResource("StandardMaterial3D_xx56o")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 4.5)
+mesh = SubResource("BoxMesh_hgvgn")
+surface_material_override/0 = SubResource("StandardMaterial3D_q6nmp")
+
+[node name="@MeshInstance3D@5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 4.3)
+mesh = SubResource("BoxMesh_vrqw4")
+surface_material_override/0 = SubResource("StandardMaterial3D_2jvcr")
+
+[node name="@MeshInstance3D@6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5, 4.2)
+mesh = SubResource("BoxMesh_mihgq")
+surface_material_override/0 = SubResource("StandardMaterial3D_3fnj8")

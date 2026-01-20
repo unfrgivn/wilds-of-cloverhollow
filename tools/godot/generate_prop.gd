@@ -4,21 +4,27 @@ extends SceneTree
 func _init():
 	var args = OS.get_cmdline_user_args()
 	var recipe_path = ""
+	var export_root = ""
+	var runtime_root = ""
 	
 	# Parse args manually since we are in --script mode
 	for i in range(args.size()):
 		if args[i] == "--recipe" and i + 1 < args.size():
 			recipe_path = args[i+1]
+		elif args[i] == "--export_root" and i + 1 < args.size():
+			export_root = args[i+1]
+		elif args[i] == "--runtime_root" and i + 1 < args.size():
+			runtime_root = args[i+1]
 			
 	if recipe_path == "":
 		print("Error: --recipe argument required")
 		quit(1)
 		return
 
-	generate_prop(recipe_path)
+	generate_prop(recipe_path, export_root, runtime_root)
 	quit(0)
 
-func generate_prop(recipe_path):
+func generate_prop(recipe_path, export_root: String, runtime_root: String):
 	var file = FileAccess.open(recipe_path, FileAccess.READ)
 	if not file:
 		print("Error: Could not open recipe file: " + recipe_path)
@@ -64,8 +70,10 @@ func generate_prop(recipe_path):
 					node.scale = Vector3(s[0], s[1], s[2])
 
 	# Ensure output directories exist
-	var export_dir = "res://art/exports/models/props/" + prop_id
-	var runtime_dir = "res://game/assets/props"
+	var resolved_export_root = export_root if export_root != "" else "res://art/exports/models/props"
+	var resolved_runtime_root = runtime_root if runtime_root != "" else "res://game/assets/props"
+	var export_dir = resolved_export_root + "/" + prop_id
+	var runtime_dir = resolved_runtime_root
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(export_dir))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(runtime_dir))
 		

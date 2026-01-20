@@ -111,6 +111,23 @@ def validate_recipe(recipe_path: str):
                     print(f"Error: Runtime prop {runtime_prop} missing")
                     sys.exit(1)
             print(f"Success: Prop {asset_id} validated.")
+        elif "buildings" in recipe_path:
+            building_path_tscn = Path(
+                f"art/exports/models/buildings/{asset_id}/{asset_id}.tscn"
+            )
+            building_path_glb = Path(
+                f"art/exports/models/buildings/{asset_id}/{asset_id}.glb"
+            )
+
+            if not building_path_tscn.exists() and not building_path_glb.exists():
+                print(f"Error: Building output {building_path_tscn} (or .glb) missing")
+                sys.exit(1)
+            if building_path_tscn.exists():
+                runtime_building = Path(f"game/assets/buildings/{asset_id}.tscn")
+                if not runtime_building.exists():
+                    print(f"Error: Runtime building {runtime_building} missing")
+                    sys.exit(1)
+            print(f"Success: Building {asset_id} validated.")
         elif "battle_backgrounds" in recipe_path:
             parts = Path(recipe_path).parts
             if len(parts) >= 2:

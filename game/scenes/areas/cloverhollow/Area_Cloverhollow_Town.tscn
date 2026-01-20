@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=37 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
 [ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
@@ -18,6 +18,11 @@
 [ext_resource type="PackedScene" path="res://game/assets/props/rock_small.tscn" id="16_rock"]
 [ext_resource type="PackedScene" path="res://game/assets/props/bush_round.tscn" id="17_bush"]
 [ext_resource type="PackedScene" path="res://game/assets/props/barrel.tscn" id="18_barrel"]
+[ext_resource type="PackedScene" path="res://game/assets/buildings/facade_school.tscn" id="19_facade_school"]
+[ext_resource type="PackedScene" path="res://game/assets/buildings/facade_arcade.tscn" id="20_facade_arcade"]
+[ext_resource type="PackedScene" path="res://game/assets/buildings/facade_library.tscn" id="21_facade_library"]
+[ext_resource type="PackedScene" path="res://game/assets/buildings/facade_cafe.tscn" id="22_facade_cafe"]
+[ext_resource type="PackedScene" path="res://game/assets/buildings/facade_clinic.tscn" id="23_facade_clinic"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
 vertices = PackedVector3Array(-30, 0, -30, -30, 0, 30, 30, 0, 30, 30, 0, -30)
@@ -171,8 +176,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 16)
 [node name="School" type="StaticBody3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -18)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/School"]
-mesh = SubResource("BoxMesh_School")
+[node name="Facade" parent="Buildings/School" instance=ExtResource("19_facade_school")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/School"]
 shape = SubResource("BoxShape3D_School")
@@ -180,8 +184,7 @@ shape = SubResource("BoxShape3D_School")
 [node name="Arcade" type="StaticBody3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.5, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Arcade"]
-mesh = SubResource("BoxMesh_Arcade")
+[node name="Facade" parent="Buildings/Arcade" instance=ExtResource("20_facade_arcade")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Arcade"]
 shape = SubResource("BoxShape3D_Arcade")
@@ -189,8 +192,7 @@ shape = SubResource("BoxShape3D_Arcade")
 [node name="Library" type="StaticBody3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, 15)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Library"]
-mesh = SubResource("BoxMesh_Library")
+[node name="Facade" parent="Buildings/Library" instance=ExtResource("21_facade_library")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Library"]
 shape = SubResource("BoxShape3D_Library")
@@ -198,8 +200,7 @@ shape = SubResource("BoxShape3D_Library")
 [node name="Cafe" type="StaticBody3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.5, -12)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Cafe"]
-mesh = SubResource("BoxMesh_Cafe")
+[node name="Facade" parent="Buildings/Cafe" instance=ExtResource("22_facade_cafe")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Cafe"]
 shape = SubResource("BoxShape3D_Cafe")
@@ -207,8 +208,7 @@ shape = SubResource("BoxShape3D_Cafe")
 [node name="Clinic" type="StaticBody3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 22)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Buildings/Clinic"]
-mesh = SubResource("BoxMesh_Clinic")
+[node name="Facade" parent="Buildings/Clinic" instance=ExtResource("23_facade_clinic")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Clinic"]
 shape = SubResource("BoxShape3D_Clinic")

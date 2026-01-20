@@ -1,0 +1,14 @@
+{
+  "id": "facade_town_hall",
+  "type": "building_facade",
+  "parts": [
+    { "type": "box", "size": [14, 6, 6], "color": "stone_base" },
+    { "type": "box", "size": [14, 1.5, 6], "color": "roof_red", "pos": [0, 3.75, 0] },
+    { "type": "box", "size": [2.8, 3.2, 0.5], "color": "wood_dark", "pos": [0, -1.4, 3.25] },
+    { "type": "box", "size": [2.2, 2.2, 0.4], "color": "water_blue", "pos": [-4.2, 0.6, 3.2] },
+    { "type": "box", "size": [2.2, 2.2, 0.4], "color": "water_blue", "pos": [4.2, 0.6, 3.2] },
+    { "type": "box", "size": [6.5, 0.8, 0.4], "color": "flower_yellow", "pos": [0, 2.2, 3.2] },
+    { "type": "box", "size": [0.6, 3.2, 0.6], "color": "stone_highlight", "pos": [-4.8, -0.2, 2.6] },
+    { "type": "box", "size": [0.6, 3.2, 0.6], "color": "stone_highlight", "pos": [4.8, -0.2, 2.6] }
+  ]
+}

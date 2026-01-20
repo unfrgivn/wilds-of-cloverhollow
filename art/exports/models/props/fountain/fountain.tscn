@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5i544"]
+radius = 0.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s1vi5"]
+specular_mode = 2
+albedo_color = Color(0.12941177, 0.5882353, 0.9529412, 1)
+
+[node name="fountain" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+mesh = SubResource("SphereMesh_5i544")
+surface_material_override/0 = SubResource("StandardMaterial3D_s1vi5")

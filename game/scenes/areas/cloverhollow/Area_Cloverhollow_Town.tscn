@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
 [ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
@@ -23,6 +23,8 @@
 [ext_resource type="PackedScene" path="res://game/assets/buildings/facade_library.tscn" id="21_facade_library"]
 [ext_resource type="PackedScene" path="res://game/assets/buildings/facade_cafe.tscn" id="22_facade_cafe"]
 [ext_resource type="PackedScene" path="res://game/assets/buildings/facade_clinic.tscn" id="23_facade_clinic"]
+[ext_resource type="PackedScene" path="res://game/assets/buildings/facade_town_hall.tscn" id="24_facade_town_hall"]
+[ext_resource type="PackedScene" path="res://game/assets/props/fountain.tscn" id="25_fountain"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
 vertices = PackedVector3Array(-30, 0, -30, -30, 0, 30, 30, 0, 30, 30, 0, -30)
@@ -176,7 +178,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 16)
 [node name="School" type="StaticBody3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -18)
 
-[node name="Facade" parent="Buildings/School" instance=ExtResource("19_facade_school")]
+[node name="Facade" parent="Buildings/School" instance=ExtResource("24_facade_town_hall")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/School"]
 shape = SubResource("BoxShape3D_School")
@@ -220,6 +222,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 5)
 
 [node name="Rock" parent="Landmarks/ParkCenter" instance=ExtResource("16_rock")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="Fountain" parent="Landmarks/ParkCenter" instance=ExtResource("25_fountain")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Bush1" parent="Landmarks/ParkCenter" instance=ExtResource("17_bush")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)

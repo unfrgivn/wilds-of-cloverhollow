@@ -634,3 +634,64 @@ Harden validation and CI guardrails to prevent art drift.
 ### Acceptance criteria
 - CI fails when assets lack recipes or violate palette/naming rules.
 - Asset checks are deterministic and reproducible.
+
+---
+
+## Milestone 26 — Style-lock hero art pack
+
+**Owner:** Product Architect + Art Pipeline + World Scene Builder + Battle Systems
+
+### Objective
+Produce a small set of hero assets that define the final art style for the game.
+
+### Tasks
+1. Create a hero building facade recipe (Town Hall) with distinct silhouette and palette accents.
+2. Create a hero prop recipe (Town Fountain) as the style reference for props.
+3. Refine hero NPC and enemy recipes (Mayor + Slime) to match style lock.
+4. Author a hero battle background recipe for Cloverhollow town square.
+5. Replace placeholders in town and battle scenes with hero assets.
+6. Capture `style_lock_smoke.json` (town) and `battle_animation_smoke.json` (battle).
+
+### Acceptance criteria
+- Town Hall + Fountain appear in Cloverhollow with palette/ramp compliance.
+- Mayor + Slime sprites use refined silhouettes and match the hero look.
+- Battle uses hero background with updated captures.
+
+---
+
+## Milestone 27 — Modular building kit v1
+
+**Owner:** Art Pipeline + World Scene Builder
+
+### Objective
+Establish a reusable building kit that can author all Cloverhollow facades consistently.
+
+### Tasks
+1. Define modular wall, roof, window, and door prop recipes.
+2. Update facade recipes for School, Arcade, Library, Cafe, Clinic to use the kit.
+3. Bake and import updated facades under `game/assets/buildings/`.
+4. Validate collisions and navmesh alignment in town scene.
+5. Capture `building_facade_smoke.json` after updates.
+
+### Acceptance criteria
+- All town facades use the modular kit and share consistent proportions.
+- Building collisions remain aligned with navigation and interactables.
+
+---
+
+## Milestone 28 — Sprite polish pass v1
+
+**Owner:** Art Pipeline + Battle Systems + UI Systems
+
+### Objective
+Polish overworld and battle sprites for hero characters to final-quality silhouettes.
+
+### Tasks
+1. Refine Fae, Mayor, Kid, and Slime recipes with multi-part shapes.
+2. Re-bake overworld idle/walk and battle idle/attack/hurt frames.
+3. Ensure sprite loader and battle animations still resolve correctly.
+4. Capture `character_sprite_smoke.json` and `battle_animation_smoke.json` with new sprites.
+
+### Acceptance criteria
+- Overworld and battle sprites show refined silhouettes and clean shading.
+- Scenarios produce deterministic captures for sprite polish.

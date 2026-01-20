@@ -3,6 +3,11 @@
   "type": "character",
   "category": "character",
   "parts": [
-    { "type": "sphere", "radius": 0.5, "pos": [0, 0.5, 0], "scale": [1.05, 1.7, 1.05], "color": "roof_red" }
+    { "type": "sphere", "radius": 0.55, "pos": [0, 0.45, 0], "scale": [1.1, 1.4, 1.0], "color": "wood_base" },
+    { "type": "sphere", "radius": 0.28, "pos": [0, 1.35, 0], "color": "flower_white" },
+    { "type": "box", "size": [0.9, 0.2, 0.4], "pos": [0, 0.9, 0.4], "color": "wood_dark" },
+    { "type": "cylinder", "height": 0.1, "radius": 0.35, "pos": [0, 1.55, 0], "color": "roof_red" },
+    { "type": "cylinder", "height": 0.3, "radius": 0.22, "pos": [0, 1.75, 0], "color": "roof_red" },
+    { "type": "box", "size": [0.6, 0.1, 0.2], "pos": [0, 1.95, 0], "color": "wood_dark" }
   ]
 }

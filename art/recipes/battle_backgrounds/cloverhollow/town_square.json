@@ -4,7 +4,7 @@
   "biome": "cloverhollow",
   "colors": {
     "sky": "sky_day",
-    "ground": "grass_base",
-    "features": "stone_light"
+    "ground": "grass_shadow",
+    "features": "stone_highlight"
   }
 }

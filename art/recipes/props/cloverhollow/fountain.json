@@ -1,0 +1,11 @@
+{
+  "id": "fountain",
+  "type": "prop",
+  "parts": [
+    { "type": "cylinder", "height": 0.3, "radius": 1.4, "pos": [0, 0.15, 0], "color": "stone_base" },
+    { "type": "cylinder", "height": 0.2, "radius": 1.2, "pos": [0, 0.35, 0], "color": "stone_highlight" },
+    { "type": "cylinder", "height": 0.15, "radius": 1.0, "pos": [0, 0.48, 0], "color": "water_blue" },
+    { "type": "cylinder", "height": 0.9, "radius": 0.25, "pos": [0, 0.8, 0], "color": "stone_highlight" },
+    { "type": "sphere", "radius": 0.25, "pos": [0, 1.35, 0], "color": "water_blue" }
+  ]
+}

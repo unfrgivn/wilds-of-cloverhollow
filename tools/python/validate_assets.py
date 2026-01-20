@@ -1,10 +1,3 @@
-"""Asset validation tool.
-
-Usage:
-  python3 tools/python/validate_assets.py --recipe <recipe_path>
-  python3 tools/python/validate_assets.py --character <char_id>
-"""
-
 import argparse
 import sys
 import json
@@ -142,18 +135,106 @@ def validate_recipe(recipe_path: str):
         print("Warning: Recipe has no 'id' field, skipping specific checks.")
 
 
+def _collect_recipe_paths() -> list[Path]:
+    root = Path("art/recipes")
+    if not root.exists():
+        return []
+    return sorted(root.rglob("*.json"))
+
+
+def validate_all_recipes() -> None:
+    recipes = _collect_recipe_paths()
+    if not recipes:
+        print("Error: No recipes found under art/recipes")
+        sys.exit(1)
+    for recipe in recipes:
+        validate_recipe(str(recipe))
+
+
+def _has_recipe(asset_id: str, root: str) -> bool:
+    root_path = Path(root)
+    if not root_path.exists():
+        return False
+    return any(root_path.rglob(f"{asset_id}.json"))
+
+
+def check_missing_recipes() -> None:
+    errors = []
+
+    prop_runtime = Path("game/assets/props")
+    if prop_runtime.exists():
+        for prop in prop_runtime.glob("*.tscn"):
+            asset_id = prop.stem
+            if not _has_recipe(asset_id, "art/recipes/props"):
+                errors.append(f"Missing recipe for prop: {asset_id}")
+
+    building_runtime = Path("game/assets/buildings")
+    if building_runtime.exists():
+        for building in building_runtime.glob("*.tscn"):
+            asset_id = building.stem
+            if not _has_recipe(asset_id, "art/recipes/buildings"):
+                errors.append(f"Missing recipe for building: {asset_id}")
+
+    for category in ["characters", "enemies"]:
+        sprite_root = Path(f"game/assets/sprites/{category}")
+        if not sprite_root.exists():
+            continue
+        for entry in sprite_root.iterdir():
+            if not entry.is_dir():
+                continue
+            asset_id = entry.name
+            if not _has_recipe(asset_id, "art/recipes/characters"):
+                errors.append(f"Missing recipe for sprite {category}: {asset_id}")
+
+    battle_root = Path("game/assets/battle_backgrounds")
+    if battle_root.exists():
+        for bg_path in battle_root.rglob("bg.png"):
+            bg_id = bg_path.parent.name
+            biome = bg_path.parent.parent.name
+            recipe = Path(f"art/recipes/battle_backgrounds/{biome}/{bg_id}.json")
+            if not recipe.exists():
+                errors.append(f"Missing recipe for battle background: {biome}/{bg_id}")
+
+    if errors:
+        print("Error: Found runtime assets without recipes:")
+        for error in errors:
+            print(f"  - {error}")
+        sys.exit(1)
+
+    print("Success: All runtime assets have recipes.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Validate assets")
     parser.add_argument("--recipe", help="Path to recipe file")
     parser.add_argument("--character", help="Character ID to validate")
+    parser.add_argument("--all", action="store_true", help="Validate all recipes")
+    parser.add_argument(
+        "--check-missing",
+        action="store_true",
+        help="Fail if runtime assets lack recipes",
+    )
 
     args = parser.parse_args()
 
     if args.character:
         validate_character(args.character)
-    elif args.recipe:
+        return
+
+    if args.recipe:
         validate_recipe(args.recipe)
-    else:
+        return
+
+    ran = False
+    if args.all:
+        validate_all_recipes()
+        ran = True
+
+    if args.check_missing:
+        check_missing_recipes()
+        ran = True
+
+    if not ran:
         parser.print_help()
         sys.exit(1)
 

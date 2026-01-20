@@ -1,6 +1,7 @@
 class_name QuestNPCInteractable
-extends Interactable
+extends "res://game/scripts/interactions/interactable.gd"
 
+const DialogueLine = preload("res://game/scripts/ui/dialogue_line.gd")
 const DEFAULT_SPRITE_DIR := "res://game/assets/sprites/characters"
 const SPRITE_LOADER := preload("res://game/scripts/exploration/sprite_frames_loader.gd")
 

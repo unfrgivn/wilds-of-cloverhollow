@@ -1,4 +1,6 @@
-extends Interactable
+extends "res://game/scripts/interactions/interactable.gd"
+
+const DialogueLine = preload("res://game/scripts/ui/dialogue_line.gd")
 
 @export var flag_key: String = "container_opened"
 @export var item_id: String = ""

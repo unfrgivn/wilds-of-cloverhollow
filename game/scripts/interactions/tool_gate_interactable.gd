@@ -1,5 +1,7 @@
 class_name ToolGateInteractable
-extends Interactable
+extends "res://game/scripts/interactions/interactable.gd"
+
+const DialogueLine = preload("res://game/scripts/ui/dialogue_line.gd")
 
 @export var required_tool: String = "shovel"
 @export var consume_tool: bool = false

@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const DialogueLine = preload("res://game/scripts/ui/dialogue_line.gd")
+
 @onready var safe_area: MarginContainer = $SafeArea
 @onready var panel: PanelContainer = $SafeArea/DialoguePanel
 @onready var text_label: RichTextLabel = $SafeArea/DialoguePanel/VBoxContainer/DialogueText

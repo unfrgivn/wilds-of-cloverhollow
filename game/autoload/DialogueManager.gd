@@ -1,5 +1,7 @@
 extends Node
 
+const DialogueLine = preload("res://game/scripts/ui/dialogue_line.gd")
+
 signal dialogue_started
 signal dialogue_finished
 signal line_started(line: DialogueLine)

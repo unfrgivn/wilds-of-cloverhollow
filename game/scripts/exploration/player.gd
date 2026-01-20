@@ -5,6 +5,7 @@ extends CharacterBody3D
 const SPRITE_DIR := "res://game/assets/sprites/characters/fae"
 const SPRITE_ID := "fae"
 const SPRITE_LOADER := preload("res://game/scripts/exploration/sprite_frames_loader.gd")
+const InteractionDetector = preload("res://game/scripts/interactions/interaction_detector.gd")
 
 enum Facing { E, SE, S, SW, W, NW, N, NE }
 

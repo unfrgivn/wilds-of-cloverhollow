@@ -1,6 +1,8 @@
 class_name InteractionDetector
 extends Area3D
 
+const Interactable = preload("res://game/scripts/interactions/interactable.gd")
+
 var _candidates: Array[Interactable] = []
 @onready var _game_state = get_node("/root/GameState")
 

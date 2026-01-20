@@ -1,7 +1,7 @@
 extends Node3D
 
 @export var target_path: NodePath
-@export var follow_offset := Vector3(0.0, 8.0, 8.0)
+@export var follow_offset := Vector3(0.0, 9.8, 5.7)
 @export var camera_size := 11.5
 
 @onready var camera: Camera3D = $Camera3D

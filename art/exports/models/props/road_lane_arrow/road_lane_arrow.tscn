@@ -1,42 +1,19 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=3 format=3]
 
-[sub_resource type="BoxMesh" id="BoxMesh_3r822"]
-size = Vector3(0.6, 0.02, 2.4)
+[sub_resource type="Image" id="Image_3r822"]
+data = {
+"data": PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 253, 216, 53, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+"format": "RGBA8",
+"height": 5,
+"mipmaps": false,
+"width": 43
+}
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_djgp8"]
-diffuse_mode = 3
-specular_mode = 2
-albedo_color = Color(0.99215686, 0.84705883, 0.20784314, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_bl0mj"]
-size = Vector3(1.6, 0.02, 1.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jvxw6"]
-diffuse_mode = 3
-specular_mode = 2
-albedo_color = Color(0.99215686, 0.84705883, 0.20784314, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_4ai7v"]
-size = Vector3(1, 0.02, 0.6)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iwo4e"]
-diffuse_mode = 3
-specular_mode = 2
-albedo_color = Color(0.99215686, 0.84705883, 0.20784314, 1)
+[sub_resource type="ImageTexture" id="ImageTexture_djgp8"]
+image = SubResource("Image_3r822")
 
 [node name="road_lane_arrow" type="Node3D"]
 
-[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.2)
-mesh = SubResource("BoxMesh_3r822")
-surface_material_override/0 = SubResource("StandardMaterial3D_djgp8")
-
-[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 1.4)
-mesh = SubResource("BoxMesh_bl0mj")
-surface_material_override/0 = SubResource("StandardMaterial3D_jvxw6")
-
-[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.8)
-mesh = SubResource("BoxMesh_4ai7v")
-surface_material_override/0 = SubResource("StandardMaterial3D_iwo4e")
+[node name="road_lane_arrow_Sprite" type="Sprite3D" parent="."]
+pixel_size = 0.041666668
+texture = SubResource("ImageTexture_djgp8")

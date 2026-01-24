@@ -2,6 +2,10 @@
   "id": "fae",
   "type": "character",
   "category": "character",
+  "render": {
+    "resolution": 64,
+    "filter": "BOX"
+  },
   "parts": [
     { "type": "sphere", "radius": 0.5, "pos": [0, 0.45, 0], "scale": [0.9, 1.4, 0.8], "color": "hero_blue" },
     { "type": "sphere", "radius": 0.25, "pos": [0, 1.25, 0], "color": "flower_white" },

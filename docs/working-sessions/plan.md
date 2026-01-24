@@ -55,6 +55,7 @@ Lock the pixel art kit (grid, palette, shading) and update the bake pipeline to 
 
 ### Milestone P2 — Cloverhollow pixel conversion (core pack)
 **Owner:** Art Pipeline + World Scene Builder
+**Status:** ✅ Completed (2026-01-23)
 
 **Objective**
 Convert Cloverhollow to the simplified pixel art style.
@@ -67,6 +68,9 @@ Convert Cloverhollow to the simplified pixel art style.
 **Acceptance criteria**
 - Town scene uses pixel props + facades with no 3D low-poly assets.
 - Overworld + battle sprites are pixel art and palette compliant.
+
+**Notes**
+- Cloverhollow props, facades, sprites, and battle backgrounds re-baked at 24 px/m with 48/72 px sprite sizing.
 
 ---
 

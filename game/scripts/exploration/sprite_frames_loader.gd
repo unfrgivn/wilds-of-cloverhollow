@@ -68,11 +68,10 @@ func build_battle_frames(base_dir: String, sprite_id: String, frame_rate: float 
 
 
 static func _load_texture(texture_path: String) -> Texture2D:
-	var image := Image.new()
-	var result = image.load(texture_path)
-	if result != OK:
-		return null
-	return ImageTexture.create_from_image(image)
+	var texture = load(texture_path)
+	if texture is Texture2D:
+		return texture
+	return null
 
 
 static func _collect_files(base_dir: String, prefix: String) -> Array[String]:

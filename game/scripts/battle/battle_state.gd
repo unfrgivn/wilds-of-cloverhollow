@@ -30,13 +30,13 @@ func setup(party_list: Array, enemy_list: Array) -> void:
 	_clear_guards()
 
 
-func select_command(command_id: String) -> bool:
+func select_command(command_id: String, target_index: int = -1) -> bool:
 	if phase != PHASE_AWAITING or not result.is_empty():
 		return false
 	phase = PHASE_RESOLVING
 	last_player_command = command_id
 	last_actions.clear()
-	_handle_player_command(command_id)
+	_handle_player_command(command_id, target_index)
 	if not result.is_empty():
 		phase = PHASE_COMPLETE
 		return true
@@ -49,17 +49,17 @@ func select_command(command_id: String) -> bool:
 	return true
 
 
-func _handle_player_command(command_id: String) -> void:
+func _handle_player_command(command_id: String, target_index: int) -> void:
 	var actor = _first_alive(party)
 	if actor == null:
 		result = "defeat"
 		last_log = "Party has no fighters."
 		return
 	if command_id == "attack":
-		_player_attack(actor, 3)
+		_player_attack(actor, 3, target_index)
 		return
 	if command_id == "skills":
-		_player_attack(actor, 4, "skill")
+		_player_attack(actor, 4, target_index, "skill")
 		return
 	if command_id == "items":
 		var healed = actor.heal(2)
@@ -76,8 +76,10 @@ func _handle_player_command(command_id: String) -> void:
 	last_log = "Command not recognized."
 
 
-func _player_attack(actor, damage: int, verb: String = "attack") -> void:
-	var target = _first_alive(enemies)
+func _player_attack(actor, damage: int, target_index: int = -1, verb: String = "attack") -> void:
+	var target = _select_target(enemies, target_index)
+	if target == null:
+		target = _first_alive(enemies)
 	if target == null:
 		result = "victory"
 		last_log = "No enemies remain."
@@ -111,6 +113,15 @@ func _handle_enemy_turn() -> void:
 	_clear_guards()
 	if not _has_alive(party):
 		result = "defeat"
+
+
+func _select_target(list: Array, target_index: int):
+	if target_index < 0 or target_index >= list.size():
+		return null
+	var target = list[target_index]
+	if target != null and target.is_alive():
+		return target
+	return null
 
 
 func _record_action(attacker: BattleActor, target: BattleActor, verb: String) -> void:

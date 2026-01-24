@@ -65,6 +65,11 @@ scale = Vector2(0.5, 0.5)
 centered = false
 playing = true
 
+[node name="TargetCursor" type="Label" parent="CanvasLayer/BattlerLayer"]
+text = "▶"
+visible = false
+z_index = 5
+
 [node name="Foreground" type="TextureRect" parent="CanvasLayer"]
 anchor_left = 0.0
 anchor_top = 0.0
@@ -103,14 +108,15 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="PartyList" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack/TopHud/PartyPanel"]
+[node name="PartyList" type="HBoxContainer" parent="CanvasLayer/SafeArea/HudStack/TopHud/PartyPanel"]
 layout_mode = 2
+theme_override_constants/separation = 16
 
 [node name="Spacer" type="Control" parent="CanvasLayer/SafeArea/HudStack"]
 layout_mode = 2
 size_flags_vertical = 8
 
-[node name="BottomHud" type="HBoxContainer" parent="CanvasLayer/SafeArea/HudStack"]
+[node name="BottomHud" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack"]
 layout_mode = 2
 size_flags_horizontal = 8
 
@@ -121,31 +127,52 @@ size_flags_vertical = 8
 
 [node name="InfoLabel" type="Label" parent="CanvasLayer/SafeArea/HudStack/BottomHud/InfoPanel"]
 layout_mode = 2
+autowrap_mode = 2
 text = "Choose a command."
 
-[node name="CommandPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud"]
+[node name="ControlsRow" type="HBoxContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud"]
 layout_mode = 2
 size_flags_horizontal = 8
+theme_override_constants/separation = 16
 
-[node name="CommandMenu" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel"]
+[node name="CommandPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow"]
 layout_mode = 2
 
-[node name="Attack" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+[node name="CommandGrid" type="GridContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel"]
 layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="Attack" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel/CommandGrid"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 60)
 text = "Attack"
 
-[node name="Skills" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+[node name="Skills" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel/CommandGrid"]
 layout_mode = 2
+custom_minimum_size = Vector2(140, 60)
 text = "Skills"
 
-[node name="Items" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+[node name="Items" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel/CommandGrid"]
 layout_mode = 2
+custom_minimum_size = Vector2(140, 60)
 text = "Items"
 
-[node name="Defend" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+[node name="Defend" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel/CommandGrid"]
 layout_mode = 2
+custom_minimum_size = Vector2(140, 60)
 text = "Defend"
 
-[node name="Run" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu"]
+[node name="Run" type="Button" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel/CommandGrid"]
 layout_mode = 2
+custom_minimum_size = Vector2(140, 60)
 text = "Run"
+
+[node name="SubMenuPanel" type="PanelContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow"]
+layout_mode = 2
+size_flags_horizontal = 8
+visible = false
+
+[node name="SubMenuList" type="VBoxContainer" parent="CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/SubMenuPanel"]
+layout_mode = 2

@@ -18,9 +18,12 @@ var _sprite_loader = SPRITE_LOADER.new()
 @onready var _data_registry = get_node_or_null("/root/DataRegistry")
 @onready var _encounter_manager = get_node_or_null("/root/EncounterManager")
 @onready var _enemy_list: VBoxContainer = $CanvasLayer/SafeArea/HudStack/TopHud/EnemyPanel/EnemyList
-@onready var _party_list: VBoxContainer = $CanvasLayer/SafeArea/HudStack/TopHud/PartyPanel/PartyList
+@onready var _party_list: Container = $CanvasLayer/SafeArea/HudStack/TopHud/PartyPanel/PartyList
 @onready var _info_label: Label = $CanvasLayer/SafeArea/HudStack/BottomHud/InfoPanel/InfoLabel
-@onready var _command_menu: VBoxContainer = $CanvasLayer/SafeArea/HudStack/BottomHud/CommandPanel/CommandMenu
+@onready var _command_menu: GridContainer = $CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/CommandPanel/CommandGrid
+@onready var _submenu_panel: PanelContainer = $CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/SubMenuPanel
+@onready var _submenu_list: VBoxContainer = $CanvasLayer/SafeArea/HudStack/BottomHud/ControlsRow/SubMenuPanel/SubMenuList
+@onready var _target_cursor: Label = $CanvasLayer/BattlerLayer/TargetCursor
 @onready var _background_rect: TextureRect = $CanvasLayer/Background
 @onready var _foreground_rect: TextureRect = $CanvasLayer/Foreground
 @onready var _enemy_sprites: Array[AnimatedSprite2D] = [
@@ -45,16 +48,18 @@ func _ready() -> void:
 	_battle_state = BattleState.new()
 	_battle_state.setup(_build_party(), _build_enemies())
 	_wire_command_buttons()
+	_close_submenu()
 	_load_background()
 	_load_battler_sprites()
 	_refresh_hud()
 	_update_info("Choose a command.")
 
 
-func select_battle_command(command_id: String) -> void:
+func select_battle_command(command_id: String, target_index: int = -1) -> void:
 	if _battle_state == null:
 		return
-	var accepted = _battle_state.select_command(command_id)
+	_close_submenu()
+	var accepted = _battle_state.select_command(command_id, target_index)
 	if not accepted:
 		_update_info("Command ignored.")
 		return
@@ -70,6 +75,72 @@ func _wire_command_buttons() -> void:
 		if child is Button:
 			var command_id = _command_id_for_button(child)
 			child.pressed.connect(_on_command_pressed.bind(command_id))
+
+
+func _open_target_menu(command_id: String) -> void:
+	if _battle_state == null or _submenu_panel == null or _submenu_list == null:
+		select_battle_command(command_id)
+		return
+	_close_submenu()
+	var indices = _active_enemy_indices()
+	if indices.is_empty():
+		select_battle_command(command_id)
+		return
+	_submenu_panel.visible = true
+	for idx in indices:
+		var actor = _battle_state.enemies[idx]
+		var button = Button.new()
+		button.text = actor.display_name
+		button.pressed.connect(_on_target_selected.bind(command_id, idx))
+		button.focus_entered.connect(_on_target_hovered.bind(idx))
+		button.mouse_entered.connect(_on_target_hovered.bind(idx))
+		_submenu_list.add_child(button)
+	_on_target_hovered(indices[0])
+	_update_info("Select a target.")
+
+
+func _active_enemy_indices() -> Array[int]:
+	var indices: Array[int] = []
+	if _battle_state == null:
+		return indices
+	for i in range(_battle_state.enemies.size()):
+		if _battle_state.enemies[i].is_alive():
+			indices.append(i)
+	return indices
+
+
+func _on_target_selected(command_id: String, target_index: int) -> void:
+	_close_submenu()
+	select_battle_command(command_id, target_index)
+
+
+func _on_target_hovered(target_index: int) -> void:
+	_position_target_cursor(true, target_index)
+
+
+func _close_submenu() -> void:
+	if _submenu_panel != null:
+		_submenu_panel.visible = false
+	if _submenu_list != null:
+		for child in _submenu_list.get_children():
+			child.queue_free()
+	if _target_cursor != null:
+		_target_cursor.visible = false
+
+
+func _position_target_cursor(is_enemy: bool, index: int) -> void:
+	if _target_cursor == null:
+		return
+	var sprites = _enemy_sprites if is_enemy else _party_sprites
+	if index < 0 or index >= sprites.size():
+		_target_cursor.visible = false
+		return
+	var sprite = sprites[index]
+	if sprite == null:
+		_target_cursor.visible = false
+		return
+	_target_cursor.visible = true
+	_target_cursor.global_position = sprite.global_position + Vector2(0, -40)
 
 
 func _command_id_for_button(button: Button) -> String:
@@ -88,6 +159,9 @@ func _command_id_for_button(button: Button) -> String:
 
 
 func _on_command_pressed(command_id: String) -> void:
+	if command_id == "attack" or command_id == "skills":
+		_open_target_menu(command_id)
+		return
 	select_battle_command(command_id)
 
 
@@ -235,6 +309,8 @@ func _play_battler_anim(action: Dictionary, is_attacker: bool, anim: String) -> 
 	var anim_name = "battle_%s_%s" % [anim, _battle_dir(is_enemy)]
 	if sprite.sprite_frames.has_animation(anim_name):
 		sprite.play(anim_name)
+		if anim == "hurt":
+			_flash_sprite(sprite)
 
 
 func _get_sprite_for_action(action: Dictionary, is_attacker: bool) -> AnimatedSprite2D:
@@ -261,6 +337,14 @@ func _play_idle(sprite: AnimatedSprite2D, is_enemy: bool) -> void:
 	var anim_name = "battle_idle_%s" % [_battle_dir(is_enemy)]
 	if sprite.sprite_frames.has_animation(anim_name):
 		sprite.play(anim_name)
+
+
+func _flash_sprite(sprite: AnimatedSprite2D) -> void:
+	if sprite == null:
+		return
+	sprite.modulate = Color(1.4, 1.4, 1.4)
+	var tween = get_tree().create_tween()
+	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.1)
 
 
 func _battle_dir(is_enemy: bool) -> String:
@@ -297,12 +381,13 @@ func _refresh_hud() -> void:
 	_set_list(_party_list, _battle_state.party, true)
 
 
-func _set_list(container: VBoxContainer, actors: Array, show_mp: bool) -> void:
+func _set_list(container: Container, actors: Array, show_mp: bool) -> void:
 	for child in container.get_children():
 		child.queue_free()
 	for actor in actors:
 		var label = Label.new()
 		label.text = _format_actor_line(actor, show_mp)
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		container.add_child(label)
 
 

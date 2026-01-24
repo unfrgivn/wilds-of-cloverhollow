@@ -471,9 +471,11 @@ Add new biomes (Bubblegum Bay, Pinecone Pass, etc.) using a repeatable pack proc
 ## Milestone 13 — Polish pass (visual, UX, performance)
 
 **Owner:** UI Systems + Art Pipeline + QA Automation
+**Status:** ✅ Completed (2026-01-24)
 
-### Objective
+**Objective**
 Make the game feel production-ready: readable UI on iPhone, stable performance, consistent art.
+
 
 ### Tasks
 1. UI pass:
@@ -491,6 +493,11 @@ Make the game feel production-ready: readable UI on iPhone, stable performance, 
 
 ### Acceptance criteria
 - Vertical slice runs smoothly on target devices and looks consistent across scenes.
+
+**Notes**
+- Battle UI uses grid commands, target submenu, and cursor with hit flash feedback.
+- Render scale presets remain 1.0/0.85/0.7 via PerformanceSettings.
+- Visual regression updated at `captures/20260124_100106` with report `reports/visual-diff/20260124_100106/index.html`.
 
 ---
 

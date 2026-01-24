@@ -1,12 +1,12 @@
-# Toon shading (4-band)
+# Pixel shading (3-step)
 
 ## Target
-- 4 discrete light bands
-- Minimal specular
-- Optional subtle rim light
+- 3 discrete light bands (highlight, mid, shadow)
+- No gradients, no dithering
+- Single key light from upper-left
+- 1px ink outline on silhouettes
 
-## Implementation options
-1) Godot toon shader material for runtime 3D
-2) Blender toon material for baking sprites/backgrounds
-
-Keep both in sync via shared ramp textures in `art/ramps/`.
+## Implementation notes
+- Quantize colors through the palette at bake time
+- Use nearest filtering for all pixel assets
+- Keep shading ramps consistent across biomes via palette values (no separate ramp textures)

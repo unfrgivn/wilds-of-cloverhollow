@@ -2,9 +2,9 @@
 
 A cozy, family-friendly JRPG (iOS-first) with:
 - 3/4 overhead exploration camera (fixed, no rotation)
-- 3D low-poly environments + sprite characters
+- pixel art environments + sprite characters
 - visible enemies on the overworld
-- classic turn-based battles (pre-rendered battle backgrounds)
+- classic turn-based battles (pixel art battle backgrounds)
 
 ## Repo entry points
 
@@ -17,7 +17,6 @@ A cozy, family-friendly JRPG (iOS-first) with:
 ## Tooling prerequisites (local dev)
 
 - Godot 4.5.x (stable)
-- Blender (for deterministic sprite/background baking)
 - Python 3.11+ (palette + validation tools)
 
 ## Common commands

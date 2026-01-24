@@ -13,6 +13,8 @@ def bake_background(recipe_path):
     cmd = [
         godot_bin,
         "--headless",
+        "--path",
+        ".",
         "--script",
         "tools/godot/generate_battle_background.gd",
         "--",

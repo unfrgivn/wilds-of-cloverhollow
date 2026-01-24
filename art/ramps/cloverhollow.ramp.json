@@ -1,9 +1,0 @@
-{
-  "id": "cloverhollow_ramp",
-  "bands": [
-    { "threshold": 0.0, "color": "#000000" },
-    { "threshold": 0.3, "color": "#555555" },
-    { "threshold": 0.6, "color": "#aaaaaa" },
-    { "threshold": 0.8, "color": "#ffffff" }
-  ]
-}

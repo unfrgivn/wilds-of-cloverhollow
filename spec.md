@@ -64,32 +64,33 @@ These numbers exist to prevent "scale drift" across assets and UI.
   - `keep_aspect = KEEP_HEIGHT` (Hor+ behavior).
   - Starting pitch: ~-60°.
 
-- **Character scale target:**
-  - Humanoid height in-world: 1.7 m.
-  - On-screen target (at 1080p reference): ~160 px tall.
-  - Recommended sprite authoring height: ~320 px tall (2×) so devices mostly downscale.
+- **Pixel scale target:**
+  - **Pixel density:** 24 px per meter (design kit default).
+  - Humanoid height in-world: 1.7 m → ~41 px tall in exploration.
+  - Recommended sprite bake sizes: 48 px overworld, 72 px battle (pixel-perfect nearest).
 
 Notes:
-- The exact orthographic `Camera3D.size` will be tuned to hit the ~160px target.
+- The exact orthographic `Camera3D.size` will be tuned to hit the ~54px target.
 - If this calibration changes, update this section and regenerate any dependent assets.
 
 ## 4) Art direction + determinism
 
 ### 4.1 Visual stack
-- Environments: 3D low-poly, toon/flat look
-- Characters/enemies: sprites in 3D exploration, baked deterministically from 3D sources (preferred)
-- Battles: 2D battle scene with pre-rendered battle backgrounds
+- Environments: pixel art tiles + props (sprite-based, grid-aligned)
+- Characters/enemies: pixel art sprites in exploration and battle
+- Battles: 2D pixel art battle scenes with pre-rendered backgrounds
 
 ### 4.2 Palettes
-- Per-biome palette for environment accents
+- Per-biome palette for environment accents (max 24 colors per biome scene)
 - Shared palette for:
   - UI
   - skin tones
   - outline/ink colors
 
-### 4.3 Toon shading
-- 4-band toon shading ramp
-- Lighting rig is biome-configurable but template-controlled
+### 4.3 Pixel shading
+- 3-step value ramp (no gradients, no dithering)
+- Single key light (upper-left) baked into sprites
+- 1px ink outline on character silhouettes (selective internal outlines)
 
 ### 4.4 Sprite standards (exploration + battle)
 
@@ -116,7 +117,7 @@ If an entity lacks an animation, the game must fall back gracefully (e.g., reuse
 ### 4.5 Town-first style lock
 - Cloverhollow is the visual "truth" for the game.
 - Do not expand to additional biomes until:
-  - Cloverhollow palette + ramp are locked
+  - Cloverhollow palette + pixel kit settings are locked
   - at least 10 town props exist
   - at least 1 enemy family is implemented (sprites + battle)
 
@@ -124,7 +125,7 @@ If an entity lacks an animation, the game must fall back gracefully (e.g., reuse
 All assets must be reproducible from:
 - a versioned recipe (`art/recipes/...`)
 - a versioned template (`art/templates/...`)
-- pinned tool settings
+- pinned tool settings (resolution, pixel density, filter)
 
 No manual per-asset tweaks in Godot that cannot be regenerated.
 
@@ -151,7 +152,7 @@ No manual per-asset tweaks in Godot that cannot be regenerated.
 ### 5.4 Battle backgrounds
 - Pre-rendered PNG background per encounter/biome.
 - Battle scenes load backgrounds via `EncounterDef` (`biome_id` + `battle_background_id`).
-- Backgrounds are authored at high resolution and downscaled as needed for iOS.
+- Backgrounds are authored at 960×540 and scaled to 1920×1080 with nearest-neighbor integer scaling.
 - Optional foreground overlay (fg.png) is allowed.
 
 ## 6) Initial biomes (v0)

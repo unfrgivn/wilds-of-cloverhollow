@@ -1,31 +1,31 @@
-# No-artist workflows (generate assets deterministically)
+# No-artist workflows (deterministic pixel art)
 
 This document is written for a developer who does **not** do manual 2D/3D art.
 
 Principle: AI can generate inputs, but **templates + scripts** are what make the output consistent.
 
 This doc defines “one-command” recipes for:
-- 3D props (low-poly toon)
-- character sprites (3D → 8-direction overworld + L/R battle)
-- pre-rendered battle backgrounds
+- pixel props (Sprite3D planes)
+- character sprites (8-direction overworld + L/R battle)
+- pixel art battle backgrounds
 
 ---
 
 ## 0) Folder meanings (don’t skip)
 
 - `art/source/` — raw inputs and references (AI outputs, kitbash, scans, notes)
-- `art/templates/` — versioned Blender/Godot templates that lock camera, lighting, and materials
+- `art/templates/` — versioned kit settings (grid, palette, render resolution)
 - `art/recipes/` — per-asset YAML/JSON files that describe how to reproduce outputs
-- `art/exports/` — deterministic outputs (sprites, models, backgrounds) that get imported into Godot
+- `art/exports/` — deterministic outputs (sprites, scenes, backgrounds) that get imported into Godot
 
 Rule: if something looks wrong in-game, fix the **template or recipe**, not the imported asset.
 
 ---
 
-## 1) Create a new prop (low-poly toon)
+## 1) Create a new prop (pixel art)
 
 ### Inputs
-- A JSON recipe defining composite parts (box, cylinder, sphere) and palette colors.
+- A JSON recipe defining composite parts (box, sphere) and palette colors.
 
 ### Steps
 1. Create a recipe:
@@ -34,6 +34,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
      ```json
      {
        "id": "crate",
+       "render": { "pixels_per_meter": 24, "resolution": 72 },
        "parts": [
          { "type": "box", "size": [1, 1, 1], "color": "wood_base" }
        ]
@@ -54,10 +55,10 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 
 ---
 
-## 2) Create a building facade (low-poly toon)
+## 2) Create a building facade (pixel art)
 
 ### Inputs
-- A JSON recipe defining composite parts (box, cylinder, sphere) and palette colors.
+- A JSON recipe defining composite parts (box, sphere) and palette colors.
 
 ### Steps
 1. Create a recipe:
@@ -66,6 +67,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
      ```json
      {
        "id": "facade_school",
+       "render": { "pixels_per_meter": 24, "resolution": 192 },
        "parts": [
          { "type": "box", "size": [14, 6, 6], "color": "stone_base" }
        ]
@@ -100,6 +102,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
        "id": "fae",
        "type": "character",
        "category": "character",
+       "render": { "pixels_per_meter": 24, "resolution": 48 },
        "parts": [...]
      }
      ```
@@ -121,7 +124,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
 
 ---
 
-## 4) Create a battle background (pre-render)
+## 4) Create a battle background (pixel art)
 
 ### Steps
 1. Create recipe:
@@ -142,7 +145,7 @@ Rule: if something looks wrong in-game, fix the **template or recipe**, not the 
    - `game/assets/battle_backgrounds/<biome>/<bg_id>/bg.png`
 
 ### Quality gates
-- No banding artifacts that violate the 4-band toon shading intent
+- Palette-compliant, 3-step shading only
 - Foreground is optional, but if used it must be alpha-clean
 
 ---

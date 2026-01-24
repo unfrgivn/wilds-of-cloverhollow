@@ -13,6 +13,8 @@ def bake_sprite(recipe_path):
     cmd = [
         godot_bin,
         "--headless",
+        "--path",
+        ".",
         "--script",
         "tools/godot/generate_character_sprites.gd",
         "--",

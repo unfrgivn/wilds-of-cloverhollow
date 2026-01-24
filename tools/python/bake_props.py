@@ -13,6 +13,8 @@ def bake_prop(recipe_path):
     cmd = [
         godot_bin,
         "--headless",
+        "--path",
+        ".",
         "--script",
         "tools/godot/generate_prop.gd",
         "--",

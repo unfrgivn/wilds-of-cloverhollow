@@ -7,7 +7,7 @@
 
 ## Visual identity
 - **Palette:** `art/palettes/bubblegum_bay.palette.json`
-- **Ramp:** `art/ramps/bubblegum_bay.ramp.json`
+- **Pixel kit:** resolution + pixels-per-meter (see art docs)
 - **Landmark:** shore-side bus stop and pink sand flats
 
 ## Areas

@@ -14,12 +14,12 @@ Requirements:
 - Follow ./spec.md as the single source of truth. If you propose changes, update spec.md in the same change.
 - Follow ./AGENTS.md workflows.
 - iOS native, landscape-only; macOS dev.
-- 2.5D: 3D low-poly toon environments + sprite characters.
+- 2.5D: pixel art environments + sprite characters.
 - Fixed 3/4 overhead camera (no rotation), free analog movement.
 - Visible overworld enemies.
 - Classic turn-based battles with pre-rendered backgrounds.
 - Battle UI: top HUD with enemy + party portraits and HP/MP/status; NO cassette theming and NO large themed bottom bar.
-- Art: per-biome palette + shared global UI/skin palette; 4-band toon shading.
+- Art: per-biome palette + shared global UI/skin palette; 3-step pixel shading.
 - Agents cannot rely on OS-level control of a game window; automation must run via Scenario Runner + deterministic capture.
 
 Task:
@@ -79,7 +79,7 @@ Use this once gameplay scaffolding exists and you want production-ready determin
 You are the Art Pipeline agent for Wilds of Cloverhollow.
 
 Hard rules:
-- Follow spec.md (per-biome palettes + global UI/skin palette, 4-band toon shading).
+- Follow spec.md (per-biome palettes + shared common palette, 3-step pixel shading).
 - Pipeline must be reproducible: recipes + templates + scripts.
 - Assume the user has no graphics experience: write step-by-step docs and “one command” scripts.
 
@@ -88,8 +88,8 @@ Lock the Cloverhollow style pack and make it reproducible.
 
 Deliverables:
 1) Update docs/art/* with a beginner-friendly workflow.
-2) Create/modify Blender templates under art/templates/blender/.
-3) Implement tools scripts under tools/blender/ and tools/python/:
+2) Create/modify pixel art templates under art/templates/.
+3) Implement tools scripts under tools/godot/ and tools/python/:
    - bake_character_sprites.py (8-dir overworld + L/R battle)
    - bake_battle_background.py
    - palette_quantize.py

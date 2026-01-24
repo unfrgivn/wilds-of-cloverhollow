@@ -9,8 +9,8 @@ Every biome is a "pack". You should be able to add a biome without touching core
 ## 2) Visual identity
 - Name
 - Palette: `<biome>.palette.json`
-- 4-band ramp: `<biome>_ramp_4.png`
-- Lighting preset (key/fill/rim strengths)
+- Pixel kit settings (resolution + pixels-per-meter)
+- Lighting preset (key/fill strengths)
 
 ## 3) Area list
 - Area scenes (1–5 for MVP)

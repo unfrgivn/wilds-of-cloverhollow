@@ -24,10 +24,80 @@ The goal is to ship a **vertical slice** first, then grow content packs (biomes)
 Minimum:
 - Godot 4.5.x (stable)
 - Python 3.11+ (scripts)
-- Blender (sprite/background bakes)
 
 Later (for device builds):
 - Xcode (iOS export)
+
+---
+
+## Pixel art conversion milestones (v3)
+
+### Milestone P1 — Pixel Art Design Kit + pipeline
+**Owner:** Art Pipeline + Product Architect
+**Status:** ✅ Completed (2026-01-23)
+
+**Objective**
+Lock the pixel art kit (grid, palette, shading) and update the bake pipeline to output pixel assets deterministically.
+
+**Tasks**
+1. Update `spec.md` + docs/art/* to define the pixel art kit.
+2. Update bake scripts to render pixel art (props, buildings, sprites, backgrounds).
+3. Enforce nearest-neighbor filtering and palette quantization in outputs.
+
+**Acceptance criteria**
+- A recipe can generate a pixel prop + sprite with consistent palette compliance.
+
+**Notes**
+- Pixel kit defaults set to 24 px/m with 48 px overworld sprites and 72 px battle sprites.
+- Bake scripts render pixel textures from recipes (Sprite3D/PNG outputs).
+
+---
+
+### Milestone P2 — Cloverhollow pixel conversion (core pack)
+**Owner:** Art Pipeline + World Scene Builder
+
+**Objective**
+Convert Cloverhollow to the simplified pixel art style.
+
+**Tasks**
+1. Convert town props + facades to pixel assets.
+2. Convert Fae + 2 NPCs + 1 enemy to pixel sprites.
+3. Convert one Cloverhollow battle background to pixel art.
+
+**Acceptance criteria**
+- Town scene uses pixel props + facades with no 3D low-poly assets.
+- Overworld + battle sprites are pixel art and palette compliant.
+
+---
+
+### Milestone P3 — Biome conversion pass
+**Owner:** Art Pipeline + QA Automation
+
+**Objective**
+Convert remaining biome packs to the pixel art style with deterministic outputs.
+
+**Tasks**
+1. Convert each biome prop kit + backgrounds.
+2. Convert biome enemy sprites.
+3. Update scenario captures and visual baselines.
+
+**Acceptance criteria**
+- All biomes render with pixel art assets and pass capture checks.
+
+---
+
+### Milestone P4 — Pixel polish + validation
+**Owner:** Art Pipeline + QA Automation
+
+**Objective**
+Stabilize the pixel art look and automate regression testing.
+
+**Tasks**
+1. Add validation rules for palette compliance + pixel grid.
+2. Stabilize golden captures for key scenarios.
+
+**Acceptance criteria**
+- Visual regression reports are stable across runs.
 
 ---
 
@@ -287,9 +357,9 @@ You (without graphics experience) can generate:
 and import them into Godot with no manual editor tweaking.
 
 ### Tasks
-1. Create Blender templates:
-   - character rig template
-   - battle background diorama template
+1. Create pixel art templates:
+   - sprite render template
+   - battle background stage template
 2. Implement “one command” scripts:
    - bake character sprite sets (8-dir overworld + L/R battle)
    - bake battle backgrounds
@@ -368,7 +438,7 @@ Add new biomes (Bubblegum Bay, Pinecone Pass, etc.) using a repeatable pack proc
 ### Tasks
 1. Implement `BiomeDef` loader and registry.
 2. Create per-biome folders using the biome pack skill:
-   - docs, palettes, ramps, recipes, starter scenes
+   - docs, palettes, pixel kit settings, recipes, starter scenes
 3. Define a minimum per-biome “ship checklist” (see biome workshop doc).
 4. Add one additional biome end-to-end (Bubblegum Bay) as the template example.
 5. Add at least one scenario per biome for regression.
@@ -414,7 +484,7 @@ Make the game feel production-ready: readable UI on iPhone, stable performance, 
 Bake a deterministic Cloverhollow battle background and register it for encounters.
 
 ### Tasks
-1. Create an art recipe + template for the Cloverhollow battle background.
+1. Create a pixel art recipe + template for the Cloverhollow battle background.
 2. Bake a background to `game/assets/battle_backgrounds/cloverhollow/meadow_stub/bg.png` (optional `fg.png`).
 3. Validate output via scenario capture (no fallback texture).
 
@@ -436,12 +506,12 @@ Bake a deterministic Cloverhollow battle background and register it for encounte
 Lock the Cloverhollow look and ship a minimal prop kit plus one enemy family.
 
 ### Tasks
-1. Finalize Cloverhollow palette + ramp JSON.
-2. Produce 10 town props (low-poly) via `art/recipes/...` and `art/templates/...`.
-3. Create one enemy family base model and bake sprites (overworld + battle).
+1. Finalize Cloverhollow palette + pixel kit settings.
+2. Produce 10 town props (pixel art) via `art/recipes/...` and `art/templates/...`.
+3. Create one enemy family sprite set (overworld + battle).
 
 ### Acceptance criteria
-- Palette/ramp are committed under `art/palettes/` and referenced in docs.
+- Palette + pixel kit settings are committed under `art/palettes/` and referenced in docs.
 - 10 props exist as deterministic recipes and runtime assets under `game/assets/props/`.
 - Enemy family has baked sprites under `game/assets/sprites/enemies/<family>/...`.
 
@@ -528,10 +598,10 @@ Deliver a playable town demo with deterministic captures.
 **Owner:** Art Pipeline + UI Systems
 
 ### Objective
-Ship deterministic character sprite outputs for Fae and a small NPC set using the final palette/ramp.
+Ship deterministic character sprite outputs for Fae and a small NPC set using the final palette + pixel kit.
 
 ### Tasks
-1. Finalize the Blender rig/template for character sprite baking (overworld idle/walk).
+1. Finalize the pixel art sprite template + renderer (overworld idle/walk).
 2. Bake Fae + at least 2 town NPCs to `game/assets/sprites/characters/<id>/`.
 3. Update validation to enforce naming and frame counts for character outputs.
 4. Add scenario `character_sprite_smoke.json` that captures Fae + NPCs in town.
@@ -551,7 +621,7 @@ Ship deterministic character sprite outputs for Fae and a small NPC set using th
 Expand battle sprites beyond idle to include attack/hurt for Fae and a Cloverhollow enemy family.
 
 ### Tasks
-1. Add battle animation clips (attack/hurt) to character and enemy rig templates.
+1. Add battle animation frames (attack/hurt) to pixel sprite recipes.
 2. Bake battle sprite frames for Fae and the Cloverhollow enemy family.
 3. Wire battle state to play attack/hurt animations.
 4. Add scenario `battle_animation_smoke.json` capturing a full attack/hurt sequence.
@@ -571,13 +641,13 @@ Expand battle sprites beyond idle to include attack/hurt for Fae and a Cloverhol
 Replace placeholder building meshes with deterministic, style-locked facades.
 
 ### Tasks
-1. Define a modular facade template (walls, roofs, windows) with palette/ramp constraints.
+1. Define a modular facade template (walls, roofs, windows) with palette + pixel kit constraints.
 2. Create facade recipes for School, Arcade, Library, Cafe, Clinic.
 3. Bake and import facades under `game/assets/buildings/`.
 4. Replace placeholder building meshes in `Area_Cloverhollow_Town.tscn` and update collisions.
 
 ### Acceptance criteria
-- Town facades match Cloverhollow style lock and palette/ramp requirements.
+- Town facades match Cloverhollow style lock and palette + pixel kit requirements.
 - Building collisions align with navmesh and interactables.
 
 ---
@@ -609,7 +679,7 @@ Finalize decor props (fences, lamps, benches, foliage) for a cohesive town look.
 Polish Cloverhollow to style-lock quality and refresh visual baselines.
 
 ### Tasks
-1. Audit Cloverhollow scenes for palette/ramp compliance and scale consistency.
+1. Audit Cloverhollow scenes for palette + pixel kit compliance and scale consistency.
 2. Replace any remaining placeholder meshes or unbaked assets.
 3. Run rendered capture scenarios and update visual baselines.
 
@@ -653,7 +723,7 @@ Produce a small set of hero assets that define the final art style for the game.
 6. Capture `style_lock_smoke.json` (town) and `battle_animation_smoke.json` (battle).
 
 ### Acceptance criteria
-- Town Hall + Fountain appear in Cloverhollow with palette/ramp compliance.
+- Town Hall + Fountain appear in Cloverhollow with palette + pixel kit compliance.
 - Mayor + Slime sprites use refined silhouettes and match the hero look.
 - Battle uses hero background with updated captures.
 

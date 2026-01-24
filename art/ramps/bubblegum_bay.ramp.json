@@ -1,9 +1,0 @@
-{
-  "id": "bubblegum_bay",
-  "bands": [
-    { "threshold": 0.0, "color": "#2a1c3f" },
-    { "threshold": 0.3, "color": "#6b4f8f" },
-    { "threshold": 0.6, "color": "#c5a8e8" },
-    { "threshold": 0.8, "color": "#ffffff" }
-  ]
-}

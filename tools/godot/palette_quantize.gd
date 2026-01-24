@@ -59,9 +59,18 @@ func _load_palette(path: String) -> Array[Color]:
 		return []
 	var content: String = file.get_as_text()
 	var data: Variant = JSON.parse_string(content)
+	var colors: Array[Color] = []
+	if typeof(data) == TYPE_DICTIONARY:
+		if data.has("colors"):
+			var color_dict: Dictionary = data["colors"]
+			for key in color_dict.keys():
+				var color: Color = _palette_entry_to_color(color_dict[key])
+				if color.a >= 0.0:
+					colors.append(color)
+			return colors
+		return []
 	if typeof(data) != TYPE_ARRAY:
 		return []
-	var colors: Array[Color] = []
 	for entry in data:
 		var color: Color = _palette_entry_to_color(entry)
 		if color.a >= 0.0:

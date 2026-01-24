@@ -5,6 +5,6 @@
 - stable frame pacing
 
 ## Levers
-- Reduce 3D render scale if needed
-- Keep low-poly budgets
+- Reduce render scale if needed
+- Keep pixel asset resolutions conservative
 - Bake backgrounds and avoid heavy realtime effects

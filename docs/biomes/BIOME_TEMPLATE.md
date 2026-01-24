@@ -7,7 +7,7 @@
 
 ## Visual identity
 - Palette file:
-- Ramp file:
+- Pixel kit settings:
 - Landmark:
 
 ## Areas

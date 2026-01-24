@@ -13,7 +13,7 @@ This doc complements:
 ## Phase 0 — Preconditions (town-first)
 
 Before you start a new biome, Cloverhollow must be stable:
-- Cloverhollow palette + 4-band ramp exist and are versioned.
+- Cloverhollow palette + pixel kit settings exist and are versioned.
 - At least 10 Cloverhollow props exist and look consistent.
 - At least one enemy family exists (overworld + battle sprites) and can be reused as a template.
 
@@ -55,7 +55,7 @@ Output: a brief that is readable by both humans and agents.
 
 ---
 
-## Phase 2 — Palette + ramp (style lock for the biome)
+## Phase 2 — Palette + pixel kit (style lock for the biome)
 
 ### 1) Generate mood references
 Use AI to generate 10–20 reference images for the biome.
@@ -64,20 +64,20 @@ These are not final assets; they are inputs to palette selection.
 ### 2) Choose palette structure
 Every biome has:
 - `art/palettes/<biome_id>.palette.json`
-- `art/ramps/<biome_id>_ramp_4.png`
+- pixel kit settings (resolution + pixels-per-meter)
 
 Rules:
-- Global UI/skin palette remains unchanged.
+- Shared common palette remains unchanged.
 - The biome palette should be small and purposeful.
 
 Recommended starting targets:
-- 24–48 biome colors
-- 4-band ramp tuned to the biome lighting vibe
+- 24 biome colors
+- 3-step value ramp baked into palette values
 
-### 3) Validate palette
+### 3) Validate palette + pixel kit
 Run `tools/python/validate_assets.py` (once implemented) and ensure:
 - the palette file loads
-- the ramp has exactly 4 bands
+- pixel kit settings are present and integer-scaled
 
 ---
 
@@ -132,7 +132,7 @@ For each enemy family, define:
 
 For each biome:
 - Create 2–3 background recipes under `art/recipes/battle_backgrounds/<biome_id>/`.
-- Bake at high resolution (e.g., 3840×2160 source) and downscale at runtime.
+- Bake at 960×540 and scale to 1920×1080 with nearest-neighbor integer scaling.
 
 ---
 
@@ -150,7 +150,7 @@ For each biome:
 
 A biome is considered MVP-complete when:
 - The hub scene loads and is navigable.
-- The palette + ramp are locked and validated.
+- The palette + pixel kit are locked and validated.
 - At least 10 props exist and match style.
 - At least 3 enemy families exist (at least one fully implemented).
 - At least 2 battle backgrounds exist.

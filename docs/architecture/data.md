@@ -46,7 +46,7 @@ The `DataRegistry` autoload loads `.tres` resources from `res://game/data/*` on 
 ## Biome pack
 Biome data should include:
 - palette id + shared UI/skin palette
-- toon ramp id
+- pixel kit settings id (resolution + pixels-per-meter)
 - lighting preset id
 - prop kit ids
 - visible enemy roster ids

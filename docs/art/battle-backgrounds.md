@@ -1,7 +1,7 @@
-# Battle backgrounds (pre-rendered)
+# Battle backgrounds (pixel art)
 
 ## Goals
-- High visual quality with low runtime cost on iOS
+- High readability with low runtime cost on iOS
 - Cohesive look with exploration environments
 
 ## Outputs
@@ -11,16 +11,15 @@
 ## Recommended resolutions (initial)
 These are defaults; adjust if performance or memory requires.
 
-- **Source render (authoring):** 3840×2160 (4K)
-  - Rationale: iPad-class devices will downscale, not upscale.
-- **In-game usage:** downscale to fit the current viewport.
+- **Source render (authoring):** 960×540 (2× of 480×270)
+- **In-game usage:** nearest-neighbor scale to 1920×1080 (integer scale only)
 
-Rule: never ship a background that was upscaled from a smaller source.
+Rule: never ship a background that was upscaled from a smaller source by non-integer scaling.
 
 ## Source
-- Blender diorama scenes or Godot stage scenes (choose one and standardize)
+- Godot pixel stage scenes or deterministic recipe renders (choose one and standardize)
 
-Initial standard: use Blender dioramas for deterministic output controlled by templates.
+Initial standard: use Godot headless recipes for deterministic output controlled by templates.
 
 ## Stub generation (development)
 - Placeholder background uses `tools/art/generate_battle_background_stub.gd`.

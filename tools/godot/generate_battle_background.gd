@@ -1,6 +1,6 @@
 extends SceneTree
 
-const OUTPUT_SIZE := Vector2i(1920, 1080)
+const OUTPUT_SIZE := Vector2i(960, 540)
 
 func _init() -> void:
 	var args = OS.get_cmdline_user_args()
@@ -44,18 +44,25 @@ func generate_background(recipe_path: String) -> void:
 
 func make_background(data: Dictionary, palette: Dictionary) -> Image:
 	var img = Image.create(OUTPUT_SIZE.x, OUTPUT_SIZE.y, false, Image.FORMAT_RGBA8)
-	
 	var colors = data.get("colors", {})
 	var sky_color = resolve_color(colors.get("sky", ""), palette, Color(0.4, 0.6, 0.9))
 	var ground_color = resolve_color(colors.get("ground", ""), palette, Color(0.3, 0.8, 0.3))
-	
+	var path_color = resolve_color(colors.get("path", ""), palette, ground_color.darkened(0.2))
+
 	img.fill(sky_color)
-	
 	var horizon_y = int(OUTPUT_SIZE.y * 0.6)
+	img.fill_rect(Rect2i(0, horizon_y, OUTPUT_SIZE.x, OUTPUT_SIZE.y - horizon_y), ground_color)
+
+	var path_height = OUTPUT_SIZE.y - horizon_y
 	for y in range(horizon_y, OUTPUT_SIZE.y):
-		for x in range(OUTPUT_SIZE.x):
-			img.set_pixel(x, y, ground_color)
-			
+		var t = float(y - horizon_y) / float(max(path_height - 1, 1))
+		var half_width = int(OUTPUT_SIZE.x * (0.05 + 0.35 * t))
+		var center_x = int(OUTPUT_SIZE.x * 0.5)
+		var left = max(center_x - half_width, 0)
+		var right = min(center_x + half_width, OUTPUT_SIZE.x - 1)
+		for x in range(left, right):
+			img.set_pixel(x, y, path_color)
+	
 	return img
 
 func resolve_color(color_name: String, palette: Dictionary, default: Color) -> Color:

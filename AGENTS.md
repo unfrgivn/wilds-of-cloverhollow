@@ -54,7 +54,7 @@ These are configured under `./.opencode/agent/`.
 - **battle-systems**: battle loop, turn system, data models.
 - **ui-systems**: dialogue, battle HUD, touch controls + safe-area.
 - **world-scene-builder**: area scenes, collisions, nav mesh, spawns, visible enemies.
-- **art-pipeline**: Blender templates, palette/ramp tools, bake scripts, validators.
+- **art-pipeline**: Pixel art templates, palette tools, bake scripts, validators.
 - **qa-automation**: test framework, CI reliability, scenario capture stability.
 
 ## 5) Definition of done (any feature)

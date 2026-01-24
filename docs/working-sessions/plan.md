@@ -76,6 +76,7 @@ Convert Cloverhollow to the simplified pixel art style.
 
 ### Milestone P3 — Biome conversion pass
 **Owner:** Art Pipeline + QA Automation
+**Status:** ✅ Completed (2026-01-23)
 
 **Objective**
 Convert remaining biome packs to the pixel art style with deterministic outputs.
@@ -87,6 +88,9 @@ Convert remaining biome packs to the pixel art style with deterministic outputs.
 
 **Acceptance criteria**
 - All biomes render with pixel art assets and pass capture checks.
+
+**Notes**
+- Bubblegum Bay capture updated at `captures/bubblegum_bay_smoke/20260123_230937`.
 
 ---
 

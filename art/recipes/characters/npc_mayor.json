@@ -2,6 +2,8 @@
   "id": "npc_mayor",
   "type": "character",
   "category": "character",
+  "palette": "res://art/palettes/cloverhollow.palette.json",
+  "render": { "resolution": 72, "pixels_per_meter": 24 },
   "parts": [
     { "type": "sphere", "radius": 0.55, "pos": [0, 0.45, 0], "scale": [1.1, 1.4, 1.0], "color": "wood_base" },
     { "type": "sphere", "radius": 0.28, "pos": [0, 1.35, 0], "color": "flower_white" },

@@ -1,7 +1,14 @@
 import argparse
 import sys
 import json
+import struct
 from pathlib import Path
+
+
+PIXELS_PER_METER_DEFAULT = 24
+SPRITE_RESOLUTION_DEFAULT = 48
+SPRITE_RESOLUTION_ALLOWED = {48, 72}
+BATTLE_BG_SIZE = (960, 540)
 
 
 def parse_recipe(recipe_path: str) -> dict:
@@ -29,7 +36,106 @@ def parse_recipe(recipe_path: str) -> dict:
         sys.exit(1)
 
 
-def validate_character(char_id: str, category: str = "enemy"):
+def load_palette(palette_path: Path) -> dict | None:
+    if not palette_path.exists():
+        print(f"Error: Palette {palette_path} not found")
+        sys.exit(1)
+    with open(palette_path, "r") as f:
+        data = json.load(f)
+    if isinstance(data, dict):
+        if "colors" in data:
+            return data["colors"]
+        return data
+    if isinstance(data, list):
+        return None
+    return None
+
+
+def resolve_palette_path(recipe_path: str, data: dict) -> Path:
+    if "palette" in data:
+        palette_ref = str(data["palette"])
+        if palette_ref.startswith("res://"):
+            palette_ref = palette_ref.replace("res://", "", 1)
+        return Path(palette_ref)
+    if "characters" in recipe_path:
+        common = Path("art/palettes/common.palette.json")
+        if common.exists():
+            return common
+    parts = Path(recipe_path).parts
+    if "recipes" in parts:
+        idx = parts.index("recipes")
+        if idx + 2 < len(parts):
+            biome = parts[idx + 2]
+            candidate = Path("art/palettes") / f"{biome}.palette.json"
+            if candidate.exists():
+                return candidate
+    return Path("art/palettes/cloverhollow.palette.json")
+
+
+def read_png_size(path: Path) -> tuple[int, int]:
+    with open(path, "rb") as f:
+        header = f.read(24)
+    if len(header) < 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError(f"Invalid PNG header for {path}")
+    width, height = struct.unpack(">II", header[16:24])
+    return width, height
+
+
+def validate_palette_colors(data: dict, recipe_path: str) -> None:
+    palette_path = resolve_palette_path(recipe_path, data)
+    palette = load_palette(palette_path)
+    if not palette:
+        return
+    missing = set()
+    for part in data.get("parts", []):
+        color_name = part.get("color")
+        if color_name and color_name not in palette:
+            missing.add(color_name)
+    colors = data.get("colors", {})
+    if isinstance(colors, dict):
+        for color_name in colors.values():
+            if color_name and color_name not in palette:
+                missing.add(color_name)
+    if missing:
+        print(f"Error: Palette {palette_path} missing colors for {recipe_path}:")
+        for name in sorted(missing):
+            print(f"  - {name}")
+        sys.exit(1)
+
+
+def validate_pixel_kit(data: dict, recipe_path: str) -> None:
+    render = data.get("render", {})
+    if not isinstance(render, dict):
+        return
+    if "pixels_per_meter" in render:
+        ppm = render.get("pixels_per_meter")
+        if not isinstance(ppm, int):
+            print(f"Error: pixels_per_meter must be int in {recipe_path}")
+            sys.exit(1)
+        if ppm != PIXELS_PER_METER_DEFAULT:
+            print(
+                f"Error: pixels_per_meter {ppm} does not match pixel kit default {PIXELS_PER_METER_DEFAULT} in {recipe_path}"
+            )
+            sys.exit(1)
+    if "resolution" in render:
+        resolution = render.get("resolution")
+        if not isinstance(resolution, int):
+            print(f"Error: resolution must be int in {recipe_path}")
+            sys.exit(1)
+        if "characters" in recipe_path and resolution not in SPRITE_RESOLUTION_ALLOWED:
+            print(
+                f"Error: sprite resolution {resolution} is not allowed in {recipe_path}"
+            )
+            sys.exit(1)
+    for key in ["padding", "max_size"]:
+        if key in render and not isinstance(render[key], int):
+            print(f"Error: {key} must be int in {recipe_path}")
+            sys.exit(1)
+
+
+def validate_character(
+    char_id: str, category: str = "enemy", expected_resolution: int | None = None
+):
     print(f"Validating character: {char_id} (category: {category})")
     base_path = Path("art/exports/sprites") / char_id
 
@@ -66,6 +172,16 @@ def validate_character(char_id: str, category: str = "enemy"):
                 print(f"  - {m}")
             sys.exit(1)
 
+    if expected_resolution:
+        sample_path = base_path / f"{char_id}_idle_N.png"
+        if sample_path.exists():
+            width, height = read_png_size(sample_path)
+            if width > expected_resolution or height > expected_resolution:
+                print(
+                    f"Error: Sprite {sample_path} exceeds expected resolution {expected_resolution}px"
+                )
+                sys.exit(1)
+
     runtime_base = "characters" if category == "character" else "enemies"
     runtime_path = Path(f"game/assets/sprites/{runtime_base}/{char_id}")
 
@@ -83,17 +199,25 @@ def validate_character(char_id: str, category: str = "enemy"):
 def validate_recipe(recipe_path: str):
     print(f"Validating recipe: {recipe_path}")
     data = parse_recipe(recipe_path)
+    validate_pixel_kit(data, recipe_path)
+    validate_palette_colors(data, recipe_path)
 
     if "id" in data:
         asset_id = data["id"]
         if "characters" in recipe_path:
             category = data.get("category", "enemy")
-            validate_character(asset_id, category)
+            render = data.get("render", {})
+            expected_resolution = int(
+                render.get("resolution", SPRITE_RESOLUTION_DEFAULT)
+            )
+            validate_character(asset_id, category, expected_resolution)
         elif "props" in recipe_path:
             prop_path_tscn = Path(
                 f"art/exports/models/props/{asset_id}/{asset_id}.tscn"
             )
             prop_path_glb = Path(f"art/exports/models/props/{asset_id}/{asset_id}.glb")
+            prop_path_png = Path(f"art/exports/models/props/{asset_id}/{asset_id}.png")
+            runtime_png = Path(f"game/assets/props/{asset_id}.png")
 
             if not prop_path_tscn.exists() and not prop_path_glb.exists():
                 print(f"Error: Prop output {prop_path_tscn} (or .glb) missing")
@@ -103,6 +227,21 @@ def validate_recipe(recipe_path: str):
                 if not runtime_prop.exists():
                     print(f"Error: Runtime prop {runtime_prop} missing")
                     sys.exit(1)
+            if not prop_path_png.exists():
+                print(f"Error: Prop texture {prop_path_png} missing")
+                sys.exit(1)
+            if not runtime_png.exists():
+                print(f"Error: Runtime prop texture {runtime_png} missing")
+                sys.exit(1)
+            render = data.get("render", {})
+            max_size = render.get("max_size", render.get("resolution"))
+            if isinstance(max_size, int):
+                width, height = read_png_size(prop_path_png)
+                if width > max_size or height > max_size:
+                    print(
+                        f"Error: Prop texture {prop_path_png} exceeds max size {max_size}px"
+                    )
+                    sys.exit(1)
             print(f"Success: Prop {asset_id} validated.")
         elif "buildings" in recipe_path:
             building_path_tscn = Path(
@@ -111,6 +250,10 @@ def validate_recipe(recipe_path: str):
             building_path_glb = Path(
                 f"art/exports/models/buildings/{asset_id}/{asset_id}.glb"
             )
+            building_path_png = Path(
+                f"art/exports/models/buildings/{asset_id}/{asset_id}.png"
+            )
+            runtime_png = Path(f"game/assets/buildings/{asset_id}.png")
 
             if not building_path_tscn.exists() and not building_path_glb.exists():
                 print(f"Error: Building output {building_path_tscn} (or .glb) missing")
@@ -119,6 +262,21 @@ def validate_recipe(recipe_path: str):
                 runtime_building = Path(f"game/assets/buildings/{asset_id}.tscn")
                 if not runtime_building.exists():
                     print(f"Error: Runtime building {runtime_building} missing")
+                    sys.exit(1)
+            if not building_path_png.exists():
+                print(f"Error: Building texture {building_path_png} missing")
+                sys.exit(1)
+            if not runtime_png.exists():
+                print(f"Error: Runtime building texture {runtime_png} missing")
+                sys.exit(1)
+            render = data.get("render", {})
+            max_size = render.get("max_size", render.get("resolution"))
+            if isinstance(max_size, int):
+                width, height = read_png_size(building_path_png)
+                if width > max_size or height > max_size:
+                    print(
+                        f"Error: Building texture {building_path_png} exceeds max size {max_size}px"
+                    )
                     sys.exit(1)
             print(f"Success: Building {asset_id} validated.")
         elif "battle_backgrounds" in recipe_path:
@@ -129,6 +287,12 @@ def validate_recipe(recipe_path: str):
                 bg_path = Path(f"game/assets/battle_backgrounds/{biome}/{bg_id}/bg.png")
                 if not bg_path.exists():
                     print(f"Error: Battle background {bg_path} missing")
+                    sys.exit(1)
+                width, height = read_png_size(bg_path)
+                if (width, height) != BATTLE_BG_SIZE:
+                    print(
+                        f"Error: Battle background {bg_path} must be {BATTLE_BG_SIZE[0]}x{BATTLE_BG_SIZE[1]}"
+                    )
                     sys.exit(1)
                 print(f"Success: Battle background {bg_id} validated.")
     else:

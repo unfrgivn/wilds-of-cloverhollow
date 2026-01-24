@@ -2,6 +2,7 @@
   "id": "npc_kid",
   "type": "character",
   "category": "character",
+  "palette": "res://art/palettes/cloverhollow.palette.json",
   "parts": [
     { "type": "sphere", "radius": 0.45, "pos": [0, 0.4, 0], "scale": [0.8, 1.1, 0.8], "color": "water_blue" },
     { "type": "sphere", "radius": 0.22, "pos": [0, 1.05, 0], "color": "flower_white" },

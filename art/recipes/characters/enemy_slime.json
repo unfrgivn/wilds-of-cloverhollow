@@ -2,6 +2,7 @@
   "id": "enemy_slime",
   "type": "character",
   "category": "enemy",
+  "palette": "res://art/palettes/cloverhollow.palette.json",
   "parts": [
     { "type": "sphere", "radius": 0.55, "pos": [0, 0.45, 0], "scale": [1.3, 0.7, 1.2], "color": "grass_base" },
     { "type": "sphere", "radius": 0.45, "pos": [0, 0.25, 0], "scale": [1.1, 0.6, 1.0], "color": "grass_shadow" },

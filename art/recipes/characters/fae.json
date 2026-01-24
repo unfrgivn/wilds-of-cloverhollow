@@ -3,7 +3,7 @@
   "type": "character",
   "category": "character",
   "render": {
-    "resolution": 64,
+    "resolution": 48,
     "filter": "BOX"
   },
   "parts": [

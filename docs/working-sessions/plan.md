@@ -96,6 +96,7 @@ Convert remaining biome packs to the pixel art style with deterministic outputs.
 
 ### Milestone P4 — Pixel polish + validation
 **Owner:** Art Pipeline + QA Automation
+**Status:** ✅ Completed (2026-01-23)
 
 **Objective**
 Stabilize the pixel art look and automate regression testing.
@@ -106,6 +107,10 @@ Stabilize the pixel art look and automate regression testing.
 
 **Acceptance criteria**
 - Visual regression reports are stable across runs.
+
+**Notes**
+- Asset validation passes with `python tools/python/validate_assets.py --all --check-missing`.
+- Visual regression updated at `captures/20260123_233758` with report `reports/visual-diff/20260123_233758/index.html`.
 
 ---
 

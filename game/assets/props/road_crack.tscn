@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_segw2"]
+size = Vector3(2.8, 0.01, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jfpox"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.12156863, 0.13333334, 0.14901961, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qxmq6"]
+size = Vector3(1.2, 0.01, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ueenl"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.12156863, 0.13333334, 0.14901961, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hf7p4"]
+size = Vector3(1.2, 0.01, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gulk4"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.12156863, 0.13333334, 0.14901961, 1)
+
+[node name="road_crack" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0)
+mesh = SubResource("BoxMesh_segw2")
+surface_material_override/0 = SubResource("StandardMaterial3D_jfpox")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.005, 0.2)
+mesh = SubResource("BoxMesh_qxmq6")
+surface_material_override/0 = SubResource("StandardMaterial3D_ueenl")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.005, -0.2)
+mesh = SubResource("BoxMesh_hf7p4")
+surface_material_override/0 = SubResource("StandardMaterial3D_gulk4")

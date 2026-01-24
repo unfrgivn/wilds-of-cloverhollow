@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_cgg88"]
+size = Vector3(2.4, 0.02, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hpclg"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.12156863, 0.13333334, 0.14901961, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6vlhw"]
+size = Vector3(2, 0.01, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_el638"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.18431373, 0.20392157, 0.22352941, 1)
+
+[node name="road_patch" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+mesh = SubResource("BoxMesh_cgg88")
+surface_material_override/0 = SubResource("StandardMaterial3D_hpclg")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+mesh = SubResource("BoxMesh_6vlhw")
+surface_material_override/0 = SubResource("StandardMaterial3D_el638")

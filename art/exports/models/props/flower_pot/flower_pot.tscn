@@ -1,26 +1,70 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=11 format=3]
 
-[sub_resource type="SphereMesh" id="SphereMesh_4fypf"]
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_3wc26"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_j2hre"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 0.4
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w1g55"]
+render_priority = 0
+shader = ExtResource("1_3wc26")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iaf70"]
+next_pass = SubResource("ShaderMaterial_w1g55")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.827451, 0.18431373, 0.18431373, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_52t5n"]
+top_radius = 0.25
+bottom_radius = 0.25
+height = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2bcvn"]
+next_pass = SubResource("ShaderMaterial_w1g55")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.4745098, 0.33333334, 0.28235295, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_6kwe2"]
 radius = 0.15
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3wc26"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qawy5"]
+next_pass = SubResource("ShaderMaterial_w1g55")
+diffuse_mode = 3
 specular_mode = 2
 
-[sub_resource type="SphereMesh" id="SphereMesh_j2hre"]
+[sub_resource type="SphereMesh" id="SphereMesh_oqnc7"]
 radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w1g55"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2iod6"]
+next_pass = SubResource("ShaderMaterial_w1g55")
+diffuse_mode = 3
 specular_mode = 2
 albedo_color = Color(1, 0.92156863, 0.23137255, 1)
 
 [node name="flower_pot" type="Node3D"]
 
 [node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-mesh = SubResource("SphereMesh_4fypf")
-surface_material_override/0 = SubResource("StandardMaterial3D_3wc26")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("CylinderMesh_j2hre")
+surface_material_override/0 = SubResource("StandardMaterial3D_iaf70")
 
 [node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("CylinderMesh_52t5n")
+surface_material_override/0 = SubResource("StandardMaterial3D_2bcvn")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("SphereMesh_6kwe2")
+surface_material_override/0 = SubResource("StandardMaterial3D_qawy5")
+
+[node name="@MeshInstance3D@5" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.48, 0.05)
-mesh = SubResource("SphereMesh_j2hre")
-surface_material_override/0 = SubResource("StandardMaterial3D_w1g55")
+mesh = SubResource("SphereMesh_oqnc7")
+surface_material_override/0 = SubResource("StandardMaterial3D_2iod6")

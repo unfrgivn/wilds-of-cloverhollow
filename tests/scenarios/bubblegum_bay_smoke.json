@@ -1,0 +1,27 @@
+{
+  "id": "bubblegum_bay_smoke",
+  "start_scene": "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_Town.tscn",
+  "seed": 2044,
+  "quit_after_frames": 1800,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "move_to", "x": -8.0, "z": 0.0, "tolerance": 0.6, "timeout_frames": 300},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "entered_bay"},
+    {"type": "move_to", "x": -2.0, "z": 2.0, "tolerance": 0.6, "timeout_frames": 300},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "move_to", "x": 5.0, "z": 0.0, "tolerance": 0.6, "timeout_frames": 300},
+    {"type": "trigger_encounter", "target": "EnemyActor"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "battle_start"},
+    {"type": "select_battle_command", "command": "attack", "wait_frames": 30},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture_checkpoint", "label": "battle_turn_complete"},
+    {"type": "move_to", "x": 0.0, "z": 8.0, "tolerance": 0.6, "timeout_frames": 300},
+    {"type": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture_checkpoint", "label": "returned_town"}
+  ]
+}

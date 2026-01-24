@@ -1,0 +1,10 @@
+{
+  "id": "planter_box",
+  "parts": [
+    { "type": "box", "size": [1.4, 0.4, 0.6], "pos": [0, 0.2, 0], "color": "wood_fence" },
+    { "type": "box", "size": [1.2, 0.2, 0.5], "pos": [0, 0.35, 0], "color": "dirt_base" },
+    { "type": "sphere", "radius": 0.12, "pos": [0.4, 0.55, 0.1], "color": "flower_yellow" },
+    { "type": "sphere", "radius": 0.12, "pos": [-0.3, 0.55, -0.1], "color": "flower_white" },
+    { "type": "sphere", "radius": 0.12, "pos": [0.0, 0.55, -0.2], "color": "flower_yellow" }
+  ]
+}

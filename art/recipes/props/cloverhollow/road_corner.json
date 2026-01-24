@@ -1,0 +1,13 @@
+{
+  "id": "road_corner",
+  "parts": [
+    { "type": "box", "size": [8, 0.1, 4.8], "pos": [-2, 0.05, 0], "color": "road_asphalt_dark" },
+    { "type": "box", "size": [4.8, 0.1, 8], "pos": [0, 0.05, -2], "color": "road_asphalt_dark" },
+    { "type": "box", "size": [7.2, 0.03, 4.0], "pos": [-2, 0.085, 0], "color": "road_asphalt_light" },
+    { "type": "box", "size": [4.0, 0.03, 7.2], "pos": [0, 0.085, -2], "color": "road_asphalt_light" },
+    { "type": "box", "size": [8, 0.02, 0.2], "pos": [-2, 0.09, 2.2], "color": "road_edge" },
+    { "type": "box", "size": [0.2, 0.02, 8], "pos": [2.2, 0.09, -2], "color": "road_edge" },
+    { "type": "box", "size": [6.4, 0.02, 0.2], "pos": [-2.6, 0.1, 0], "color": "road_marking" },
+    { "type": "box", "size": [0.2, 0.02, 6.4], "pos": [0, 0.1, -2.6], "color": "road_marking" }
+  ]
+}

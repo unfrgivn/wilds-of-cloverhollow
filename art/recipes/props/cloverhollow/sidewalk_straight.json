@@ -1,0 +1,9 @@
+{
+  "id": "sidewalk_straight",
+  "parts": [
+    { "type": "box", "size": [16, 0.12, 2.2], "pos": [0, 0.06, 0], "color": "sidewalk_concrete" },
+    { "type": "box", "size": [15.2, 0.02, 1.8], "pos": [0, 0.11, 0], "color": "stone_highlight" },
+    { "type": "box", "size": [16, 0.04, 0.2], "pos": [0, 0.1, -1.05], "color": "sidewalk_edge" },
+    { "type": "box", "size": [16, 0.04, 0.2], "pos": [0, 0.1, 1.05], "color": "sidewalk_edge" }
+  ]
+}

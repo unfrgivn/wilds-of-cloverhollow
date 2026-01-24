@@ -1,0 +1,8 @@
+{
+  "id": "road_traffic_island",
+  "parts": [
+    { "type": "box", "size": [3.2, 0.14, 1.2], "pos": [0, 0.07, 0], "color": "curb_dark" },
+    { "type": "box", "size": [3.0, 0.04, 1.0], "pos": [0, 0.13, 0], "color": "curb_light" },
+    { "type": "box", "size": [2.4, 0.02, 0.8], "pos": [0, 0.16, 0], "color": "stone_highlight" }
+  ]
+}

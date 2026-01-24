@@ -1,16 +1,28 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
-[sub_resource type="BoxMesh" id="BoxMesh_jj6ee"]
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_h6iya"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_13kqx"]
 size = Vector3(4, 1.2, 4)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h6iya"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oksq8"]
+render_priority = 0
+shader = ExtResource("1_h6iya")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tkjae"]
+next_pass = SubResource("ShaderMaterial_oksq8")
+diffuse_mode = 3
 specular_mode = 2
 albedo_color = Color(0.827451, 0.18431373, 0.18431373, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_13kqx"]
+[sub_resource type="BoxMesh" id="BoxMesh_bopdo"]
 size = Vector3(4, 0.2, 4)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oksq8"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0sdbq"]
+next_pass = SubResource("ShaderMaterial_oksq8")
+diffuse_mode = 3
 specular_mode = 2
 albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
 
@@ -18,10 +30,10 @@ albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
 
 [node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
-mesh = SubResource("BoxMesh_jj6ee")
-surface_material_override/0 = SubResource("StandardMaterial3D_h6iya")
+mesh = SubResource("BoxMesh_13kqx")
+surface_material_override/0 = SubResource("StandardMaterial3D_tkjae")
 
 [node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-mesh = SubResource("BoxMesh_13kqx")
-surface_material_override/0 = SubResource("StandardMaterial3D_oksq8")
+mesh = SubResource("BoxMesh_bopdo")
+surface_material_override/0 = SubResource("StandardMaterial3D_0sdbq")

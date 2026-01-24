@@ -1,0 +1,14 @@
+{
+  "id": "road_crosswalk",
+  "parts": [
+    { "type": "box", "size": [16, 0.1, 4.8], "pos": [0, 0.05, 0], "color": "road_asphalt_dark" },
+    { "type": "box", "size": [15.6, 0.03, 4.0], "pos": [0, 0.085, 0], "color": "road_asphalt_light" },
+    { "type": "box", "size": [16, 0.02, 0.2], "pos": [0, 0.09, 2.2], "color": "road_edge" },
+    { "type": "box", "size": [16, 0.02, 0.2], "pos": [0, 0.09, -2.2], "color": "road_edge" },
+    { "type": "box", "size": [1.0, 0.02, 4.0], "pos": [-4, 0.11, 0], "color": "road_marking" },
+    { "type": "box", "size": [1.0, 0.02, 4.0], "pos": [-2, 0.11, 0], "color": "road_marking" },
+    { "type": "box", "size": [1.0, 0.02, 4.0], "pos": [0, 0.11, 0], "color": "road_marking" },
+    { "type": "box", "size": [1.0, 0.02, 4.0], "pos": [2, 0.11, 0], "color": "road_marking" },
+    { "type": "box", "size": [1.0, 0.02, 4.0], "pos": [4, 0.11, 0], "color": "road_marking" }
+  ]
+}

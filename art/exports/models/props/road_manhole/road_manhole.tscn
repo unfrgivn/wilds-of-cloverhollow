@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_hhxt0"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_uhejd"]
+top_radius = 0.6
+bottom_radius = 0.6
+height = 0.05
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xnle5"]
+render_priority = 0
+shader = ExtResource("1_hhxt0")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ubgh5"]
+next_pass = SubResource("ShaderMaterial_xnle5")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.12156863, 0.13333334, 0.14901961, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a4u54"]
+top_radius = 0.45
+bottom_radius = 0.45
+height = 0.02
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_btvn6"]
+next_pass = SubResource("ShaderMaterial_xnle5")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.3529412, 0.38039216, 0.40392157, 1)
+
+[node name="road_manhole" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+mesh = SubResource("CylinderMesh_uhejd")
+surface_material_override/0 = SubResource("StandardMaterial3D_ubgh5")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("CylinderMesh_a4u54")
+surface_material_override/0 = SubResource("StandardMaterial3D_btvn6")

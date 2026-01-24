@@ -1,0 +1,9 @@
+{
+  "id": "road_gutter_grate",
+  "parts": [
+    { "type": "box", "size": [2.2, 0.03, 0.7], "pos": [0, 0.015, 0], "color": "road_grate" },
+    { "type": "box", "size": [2.1, 0.02, 0.1], "pos": [0, 0.03, -0.25], "color": "road_edge" },
+    { "type": "box", "size": [2.1, 0.02, 0.1], "pos": [0, 0.03, 0.0], "color": "road_edge" },
+    { "type": "box", "size": [2.1, 0.02, 0.1], "pos": [0, 0.03, 0.25], "color": "road_edge" }
+  ]
+}

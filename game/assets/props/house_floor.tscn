@@ -4,6 +4,7 @@
 size = Vector3(10, 0.1, 10)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0c7nt"]
+diffuse_mode = 3
 specular_mode = 2
 albedo_color = Color(0.5529412, 0.43137255, 0.3882353, 1)
 
@@ -11,6 +12,7 @@ albedo_color = Color(0.5529412, 0.43137255, 0.3882353, 1)
 size = Vector3(6, 0.05, 3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_osqxn"]
+diffuse_mode = 3
 specular_mode = 2
 albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
 

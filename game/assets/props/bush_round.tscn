@@ -1,50 +1,108 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=17 format=3]
 
-[sub_resource type="SphereMesh" id="SphereMesh_6mhbp"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2kqi5"]
-specular_mode = 2
-albedo_color = Color(0.29803923, 0.6862745, 0.3137255, 1)
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_2qf5m"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_riswb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qpdx0"]
+render_priority = 0
+shader = ExtResource("1_2qf5m")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fffy8"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_hj4rl"]
 radius = 0.4
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qpdx0"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flble"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
 specular_mode = 2
-albedo_color = Color(0.29803923, 0.6862745, 0.3137255, 1)
+albedo_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
 
-[sub_resource type="SphereMesh" id="SphereMesh_fffy8"]
+[sub_resource type="SphereMesh" id="SphereMesh_0sqlf"]
 radius = 0.4
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hj4rl"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ni758"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
 specular_mode = 2
-albedo_color = Color(0.29803923, 0.6862745, 0.3137255, 1)
+albedo_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
 
-[sub_resource type="SphereMesh" id="SphereMesh_flble"]
+[sub_resource type="SphereMesh" id="SphereMesh_yw56g"]
 radius = 0.25
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0sqlf"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_48cqo"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
 specular_mode = 2
-albedo_color = Color(0.21960784, 0.5568628, 0.23529412, 1)
+albedo_color = Color(0.105882354, 0.36862746, 0.1254902, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_k0h15"]
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ticv3"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.105882354, 0.36862746, 0.1254902, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ge0qq"]
+radius = 0.18
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p7eyg"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_icq70"]
+radius = 0.16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dokh5"]
+next_pass = SubResource("ShaderMaterial_qpdx0")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
 
 [node name="bush_round" type="Node3D"]
 
 [node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
-mesh = SubResource("SphereMesh_6mhbp")
-surface_material_override/0 = SubResource("StandardMaterial3D_2kqi5")
+mesh = SubResource("SphereMesh_riswb")
+surface_material_override/0 = SubResource("StandardMaterial3D_fffy8")
 
 [node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.3, 0.2)
-mesh = SubResource("SphereMesh_riswb")
-surface_material_override/0 = SubResource("StandardMaterial3D_qpdx0")
+mesh = SubResource("SphereMesh_hj4rl")
+surface_material_override/0 = SubResource("StandardMaterial3D_flble")
 
 [node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.3, -0.1)
-mesh = SubResource("SphereMesh_fffy8")
-surface_material_override/0 = SubResource("StandardMaterial3D_hj4rl")
+mesh = SubResource("SphereMesh_0sqlf")
+surface_material_override/0 = SubResource("StandardMaterial3D_ni758")
 
 [node name="@MeshInstance3D@5" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.2)
-mesh = SubResource("SphereMesh_flble")
-surface_material_override/0 = SubResource("StandardMaterial3D_0sqlf")
+mesh = SubResource("SphereMesh_yw56g")
+surface_material_override/0 = SubResource("StandardMaterial3D_48cqo")
+
+[node name="@MeshInstance3D@6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.55, -0.3)
+mesh = SubResource("SphereMesh_k0h15")
+surface_material_override/0 = SubResource("StandardMaterial3D_ticv3")
+
+[node name="@MeshInstance3D@7" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.45, 0.15)
+mesh = SubResource("SphereMesh_ge0qq")
+surface_material_override/0 = SubResource("StandardMaterial3D_p7eyg")
+
+[node name="@MeshInstance3D@8" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.35, -0.1)
+mesh = SubResource("SphereMesh_icq70")
+surface_material_override/0 = SubResource("StandardMaterial3D_dokh5")

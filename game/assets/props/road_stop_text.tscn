@@ -1,0 +1,55 @@
+[gd_scene load_steps=9 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_j40h3"]
+size = Vector3(2, 0.02, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_llcip"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9254902, 0.9372549, 0.94509804, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_loogd"]
+size = Vector3(1.4, 0.02, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d81dy"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9254902, 0.9372549, 0.94509804, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_j4wq5"]
+size = Vector3(2, 0.02, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7iv6d"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9254902, 0.9372549, 0.94509804, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ca8qj"]
+size = Vector3(0.6, 0.02, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jtyvb"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9254902, 0.9372549, 0.94509804, 1)
+
+[node name="road_stop_text" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.01, 0.6)
+mesh = SubResource("BoxMesh_j40h3")
+surface_material_override/0 = SubResource("StandardMaterial3D_llcip")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.01, 0)
+mesh = SubResource("BoxMesh_loogd")
+surface_material_override/0 = SubResource("StandardMaterial3D_d81dy")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.01, -0.6)
+mesh = SubResource("BoxMesh_j4wq5")
+surface_material_override/0 = SubResource("StandardMaterial3D_7iv6d")
+
+[node name="@MeshInstance3D@5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.01, 0)
+mesh = SubResource("BoxMesh_ca8qj")
+surface_material_override/0 = SubResource("StandardMaterial3D_jtyvb")

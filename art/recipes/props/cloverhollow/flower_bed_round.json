@@ -1,0 +1,10 @@
+{
+  "id": "flower_bed_round",
+  "parts": [
+    { "type": "cylinder", "height": 0.2, "radius": 1.0, "pos": [0, 0.1, 0], "color": "dirt_base" },
+    { "type": "sphere", "radius": 0.15, "pos": [0.4, 0.35, 0.2], "color": "flower_yellow" },
+    { "type": "sphere", "radius": 0.15, "pos": [-0.3, 0.3, -0.1], "color": "flower_white" },
+    { "type": "sphere", "radius": 0.15, "pos": [0.0, 0.32, -0.4], "color": "flower_yellow" },
+    { "type": "sphere", "radius": 0.18, "pos": [-0.4, 0.33, 0.4], "color": "flower_white" }
+  ]
+}

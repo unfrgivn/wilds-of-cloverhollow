@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3]
+[gd_scene load_steps=90 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
 [ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
@@ -25,10 +25,64 @@
 [ext_resource type="PackedScene" path="res://game/assets/buildings/facade_clinic.tscn" id="23_facade_clinic"]
 [ext_resource type="PackedScene" path="res://game/assets/buildings/facade_town_hall.tscn" id="24_facade_town_hall"]
 [ext_resource type="PackedScene" path="res://game/assets/props/fountain.tscn" id="25_fountain"]
+[ext_resource type="PackedScene" path="res://game/assets/props/ground_grass_large.tscn" id="26_ground"]
+[ext_resource type="PackedScene" path="res://game/assets/props/plaza_pavers.tscn" id="27_plaza"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_straight.tscn" id="28_road_straight"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_corner.tscn" id="29_road_corner"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_crosswalk.tscn" id="40_road_crosswalk"]
+[ext_resource type="PackedScene" path="res://game/assets/props/curb_straight.tscn" id="41_curb_straight"]
+[ext_resource type="PackedScene" path="res://game/assets/props/curb_corner.tscn" id="42_curb_corner"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_lane_arrow.tscn" id="43_road_lane_arrow"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_gutter_grate.tscn" id="44_road_gutter_grate"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_patch.tscn" id="45_road_patch"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_centerline_dash.tscn" id="46_road_centerline_dash"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_manhole.tscn" id="47_road_manhole"]
+[ext_resource type="PackedScene" path="res://game/assets/props/curb_ramp.tscn" id="48_curb_ramp"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_stop_line.tscn" id="49_road_stop_line"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_parking_slot.tscn" id="50_road_parking_slot"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_speed_bump.tscn" id="51_road_speed_bump"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_turn_arrow_left.tscn" id="52_road_turn_left"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_bike_lane.tscn" id="53_road_bike"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_parking_block.tscn" id="54_road_parking_block"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_traffic_island.tscn" id="55_road_traffic_island"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_bus_bay.tscn" id="56_road_bus_bay"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_merge_arrow.tscn" id="57_road_merge_arrow"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_center_median.tscn" id="58_road_center_median"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_bus_text.tscn" id="59_road_bus_text"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_chevrons.tscn" id="60_road_chevrons"]
+[ext_resource type="PackedScene" path="res://game/assets/props/curb_bumpout.tscn" id="61_curb_bumpout"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_yield_triangle.tscn" id="69_road_yield_triangle"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_school_zone.tscn" id="70_road_school_zone"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_faded_marking.tscn" id="71_road_faded_marking"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_arrow_straight.tscn" id="72_road_arrow_straight"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_arrow_right.tscn" id="73_road_arrow_right"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_stop_text.tscn" id="74_road_stop_text"]
+[ext_resource type="PackedScene" path="res://game/assets/props/road_crack.tscn" id="75_road_crack"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sign_speed_limit.tscn" id="62_sign_speed"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sign_stop.tscn" id="63_sign_stop"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sign_crosswalk.tscn" id="64_sign_crosswalk"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sign_no_parking.tscn" id="65_sign_no_parking"]
+[ext_resource type="PackedScene" path="res://game/assets/props/facade_sign_banner.tscn" id="66_facade_sign_banner"]
+[ext_resource type="PackedScene" path="res://game/assets/props/facade_sign_hanging.tscn" id="67_facade_sign_hanging"]
+[ext_resource type="PackedScene" path="res://game/assets/props/facade_sign_emblem.tscn" id="68_facade_sign_emblem"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sidewalk_straight.tscn" id="30_sidewalk_straight"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sidewalk_corner.tscn" id="31_sidewalk_corner"]
+[ext_resource type="PackedScene" path="res://game/assets/props/tree_deciduous_small.tscn" id="32_tree_small"]
+[ext_resource type="PackedScene" path="res://game/assets/props/tree_deciduous_large.tscn" id="33_tree_large"]
+[ext_resource type="PackedScene" path="res://game/assets/props/hedge_straight.tscn" id="34_hedge"]
+[ext_resource type="PackedScene" path="res://game/assets/props/flower_bed_round.tscn" id="35_flower_bed"]
+[ext_resource type="PackedScene" path="res://game/assets/props/market_stall_canopy.tscn" id="36_market"]
+[ext_resource type="PackedScene" path="res://game/assets/props/trash_can_wood.tscn" id="37_trash"]
+[ext_resource type="PackedScene" path="res://game/assets/props/sign_board.tscn" id="38_sign_board"]
+[ext_resource type="PackedScene" path="res://game/assets/props/planter_box.tscn" id="39_planter_box"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
 vertices = PackedVector3Array(-30, 0, -30, -30, 0, 30, 30, 0, 30, 30, 0, -30)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[sub_resource type="Environment" id="Environment_1"]
+ambient_light_color = Color(0.85, 0.82, 0.78, 1)
+ambient_light_energy = 1.1
 
 [sub_resource type="BoxMesh" id="BoxMesh_ground"]
 size = Vector3(60, 0.1, 60)
@@ -80,10 +134,20 @@ navigation_mesh = SubResource("NavigationMesh_1")
 [node name="Ground" type="StaticBody3D" parent="NavigationRegion3D"]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Ground"]
+visible = false
 mesh = SubResource("BoxMesh_ground")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Ground"]
 shape = SubResource("BoxShape3D_ground")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 10, 0)
+light_color = Color(1, 0.98, 0.92, 1)
+light_energy = 1.1
+shadow_enabled = true
 
 [node name="FollowCameraRig" parent="." instance=ExtResource("2_cam")]
 target_path = NodePath("../Player")
@@ -92,15 +156,20 @@ target_path = NodePath("../Player")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Spawn_Default" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6)
 script = ExtResource("1_spawn")
 spawn_id = "Town_Default"
 is_default = true
 
 [node name="Spawn_FromHouse" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 14)
 script = ExtResource("1_spawn")
 spawn_id = "Town_FromHouse"
+
+[node name="Spawn_FromBus" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 14)
+script = ExtResource("1_spawn")
+spawn_id = "Town_FromBus"
 
 [node name="NPC_Mayor" parent="." instance=ExtResource("4_npc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
@@ -117,7 +186,7 @@ intro_text = "Have you seen the lantern?"
 sprite_id = "npc_kid"
 
 [node name="TownSign" parent="." instance=ExtResource("5_sign")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 speaker_name = "Sign"
 message = "Cloverhollow Town Square"
 
@@ -127,17 +196,22 @@ item_id = "berry"
 opened_text = "You found a potion!"
 
 [node name="Enemy_Slime" parent="." instance=ExtResource("8_enemy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
 battle_scene = "res://game/scenes/battle/BattleScene.tscn"
 encounter_id = "test_encounter"
 
 [node name="DoorToHouse" parent="." instance=ExtResource("7_door")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 12)
 target_scene = "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_FaeHouse.tscn"
 target_spawn_id = "House_FromTown"
 
 [node name="BusStop" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 14)
+
+[node name="DoorToBubblegumBay" parent="BusStop" instance=ExtResource("7_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+target_scene = "res://game/scenes/areas/bubblegum_bay/Area_BubblegumBay_Shore.tscn"
+target_spawn_id = "Bay_FromTown"
 
 [node name="Bench" parent="BusStop" instance=ExtResource("9_bench")]
 
@@ -149,23 +223,56 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 [node name="LampPost" parent="Decor" instance=ExtResource("11_lamp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
 
+[node name="LampPostTownHall" parent="Decor" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -12)
+
+[node name="LampPostCafe" parent="Decor" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 2)
+
 [node name="Mailbox" parent="Decor" instance=ExtResource("12_mailbox")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 12)
 
 [node name="Crate" parent="Decor" instance=ExtResource("13_crate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 6)
 
 [node name="FlowerPot" parent="Decor" instance=ExtResource("14_flower")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 2)
+
+[node name="SignBoardLibrary" parent="Decor" instance=ExtResource("38_sign_board")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -14)
+
+[node name="SignBoardMarket" parent="Decor" instance=ExtResource("38_sign_board")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 6)
+
+[node name="SignStop" parent="Decor" instance=ExtResource("63_sign_stop")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -14)
+
+[node name="SignCrosswalk" parent="Decor" instance=ExtResource("64_sign_crosswalk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -14)
+
+[node name="SignSpeedLimit" parent="Decor" instance=ExtResource("62_sign_speed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -6)
+
+[node name="SignNoParking" parent="Decor" instance=ExtResource("65_sign_no_parking")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 12)
+
+[node name="PlanterCafe" parent="Decor" instance=ExtResource("39_planter_box")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 1)
+
+[node name="PlanterTownHall" parent="Decor" instance=ExtResource("39_planter_box")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -12)
+
+[node name="TrashCan" parent="Decor" instance=ExtResource("37_trash")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 12)
 
 [node name="Fence" parent="Decor" instance=ExtResource("15_fence")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 10)
 
 [node name="FenceN1" parent="Decor" instance=ExtResource("15_fence")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 10)
 
 [node name="FenceN2" parent="Decor" instance=ExtResource("15_fence")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 10)
 
 [node name="BushLib1" parent="Decor" instance=ExtResource("17_bush")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 16)
@@ -176,41 +283,67 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 16)
 [node name="Buildings" type="Node3D" parent="."]
 
 [node name="School" type="StaticBody3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3, -18)
 
-[node name="Facade" parent="Buildings/School" instance=ExtResource("24_facade_town_hall")]
+[node name="Facade" parent="Buildings/School" instance=ExtResource("19_facade_school")]
+
+[node name="SignBanner" parent="Buildings/School" instance=ExtResource("66_facade_sign_banner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 3.4)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/School"]
 shape = SubResource("BoxShape3D_School")
 
+[node name="TownHall" type="StaticBody3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -18)
+
+[node name="Facade" parent="Buildings/TownHall" instance=ExtResource("24_facade_town_hall")]
+
+[node name="SignEmblem" parent="Buildings/TownHall" instance=ExtResource("68_facade_sign_emblem")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 3.6)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/TownHall"]
+shape = SubResource("BoxShape3D_School")
+
 [node name="Arcade" type="StaticBody3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 10)
 
 [node name="Facade" parent="Buildings/Arcade" instance=ExtResource("20_facade_arcade")]
+
+[node name="SignHanging" parent="Buildings/Arcade" instance=ExtResource("67_facade_sign_hanging")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, 3.4)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Arcade"]
 shape = SubResource("BoxShape3D_Arcade")
 
 [node name="Library" type="StaticBody3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, -18)
 
 [node name="Facade" parent="Buildings/Library" instance=ExtResource("21_facade_library")]
+
+[node name="SignBanner" parent="Buildings/Library" instance=ExtResource("66_facade_sign_banner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 3.6)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Library"]
 shape = SubResource("BoxShape3D_Library")
 
 [node name="Cafe" type="StaticBody3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.5, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 0)
 
 [node name="Facade" parent="Buildings/Cafe" instance=ExtResource("22_facade_cafe")]
+
+[node name="SignHanging" parent="Buildings/Cafe" instance=ExtResource("67_facade_sign_hanging")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 1.7, 3.4)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Cafe"]
 shape = SubResource("BoxShape3D_Cafe")
 
 [node name="Clinic" type="StaticBody3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3, 0)
 
 [node name="Facade" parent="Buildings/Clinic" instance=ExtResource("23_facade_clinic")]
+
+[node name="SignEmblem" parent="Buildings/Clinic" instance=ExtResource("68_facade_sign_emblem")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 3.5)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Buildings/Clinic"]
 shape = SubResource("BoxShape3D_Clinic")
@@ -218,13 +351,19 @@ shape = SubResource("BoxShape3D_Clinic")
 [node name="Landmarks" type="Node3D" parent="."]
 
 [node name="ParkCenter" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Rock" parent="Landmarks/ParkCenter" instance=ExtResource("16_rock")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 
 [node name="Fountain" parent="Landmarks/ParkCenter" instance=ExtResource("25_fountain")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="FlowerBedNE" parent="Landmarks/ParkCenter" instance=ExtResource("35_flower_bed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+
+[node name="FlowerBedSW" parent="Landmarks/ParkCenter" instance=ExtResource("35_flower_bed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
 
 [node name="Bush1" parent="Landmarks/ParkCenter" instance=ExtResource("17_bush")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
@@ -239,7 +378,7 @@ transform = Transform3D(0.707, 0, 0.707, 0, 1, 0, -0.707, 0, 0.707, 2, 0, 2)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
 
 [node name="Plaza" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
 
 [node name="Crate1" parent="Landmarks/Plaza" instance=ExtResource("13_crate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -253,11 +392,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0.5)
 [node name="MarketSign" parent="Landmarks/Plaza" instance=ExtResource("10_signpost")]
 transform = Transform3D(0.707, 0, -0.707, 0, 1, 0, 0.707, 0, 0.707, 1.5, 0, 1.5)
 
+[node name="PlanterPlazaNW" parent="Landmarks/Plaza" instance=ExtResource("39_planter_box")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1.5)
+
+[node name="PlanterPlazaSE" parent="Landmarks/Plaza" instance=ExtResource("39_planter_box")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 1.5)
+
 [node name="PlazaLamp" parent="Landmarks/Plaza" instance=ExtResource("11_lamp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 
+[node name="PlazaLampNE" parent="Landmarks/Plaza" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+
+[node name="PlazaLampSW" parent="Landmarks/Plaza" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="PlazaLampSE" parent="Landmarks/Plaza" instance=ExtResource("11_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+
 [node name="Playground" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 10)
 
 [node name="FencePlay1" parent="Landmarks/Playground" instance=ExtResource("15_fence")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
@@ -278,7 +432,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
 
 [node name="Dock" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 10)
 
 [node name="DockFence" parent="Landmarks/Dock" instance=ExtResource("15_fence")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -2)
@@ -296,7 +450,7 @@ transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="Schoolyard" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, -12)
 
 [node name="SchoolFence1" parent="Landmarks/Schoolyard" instance=ExtResource("15_fence")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
@@ -311,7 +465,10 @@ transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
 
 [node name="Market" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 6)
+
+[node name="MarketStall" parent="Landmarks/Market" instance=ExtResource("36_market")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="MarketCrate1" parent="Landmarks/Market" instance=ExtResource("13_crate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -329,7 +486,7 @@ transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 1.5, 0, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
 
 [node name="BusPlaza" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 12)
 
 [node name="BusBench" parent="Landmarks/BusPlaza" instance=ExtResource("9_bench")]
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0, 0)
@@ -344,7 +501,7 @@ transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 1, 0, 1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.5)
 
 [node name="RiversidePath" type="Node3D" parent="Landmarks"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -8)
 
 [node name="RiverFence" parent="Landmarks/RiversidePath" instance=ExtResource("15_fence")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
@@ -358,12 +515,291 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0.5)
 [node name="RiverCrate" parent="Landmarks/RiversidePath" instance=ExtResource("13_crate")]
 transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 0.5, 0, 0.5)
 
-[node name="Paths" type="Node3D" parent="."]
+[node name="GroundVisual" type="Node3D" parent="."]
 
-[node name="PathEW" type="MeshInstance3D" parent="Paths"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
-mesh = SubResource("BoxMesh_PathEW")
+[node name="GrassBase" parent="GroundVisual" instance=ExtResource("26_ground")]
+scale = Vector3(1.5, 1, 1.5)
 
-[node name="PathNS" type="MeshInstance3D" parent="Paths"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
-mesh = SubResource("BoxMesh_PathNS")
+[node name="PlazaPavers" parent="GroundVisual" instance=ExtResource("27_plaza")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+
+[node name="Road_EW_0" parent="GroundVisual" instance=ExtResource("28_road_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+
+[node name="Road_EW_W" parent="GroundVisual" instance=ExtResource("28_road_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.015, 0)
+
+[node name="Road_EW_E" parent="GroundVisual" instance=ExtResource("28_road_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.015, 0)
+
+[node name="Road_NS_0" parent="GroundVisual" instance=ExtResource("28_road_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Road_NS_N" parent="GroundVisual" instance=ExtResource("28_road_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, -16)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Road_NS_S" parent="GroundVisual" instance=ExtResource("40_road_crosswalk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 16)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Sidewalk_North" parent="GroundVisual" instance=ExtResource("30_sidewalk_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -4.2)
+
+[node name="Sidewalk_South" parent="GroundVisual" instance=ExtResource("30_sidewalk_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 4.2)
+
+[node name="Sidewalk_West" parent="GroundVisual" instance=ExtResource("30_sidewalk_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0.03, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Sidewalk_East" parent="GroundVisual" instance=ExtResource("30_sidewalk_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.03, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SidewalkCorner_NE" parent="GroundVisual" instance=ExtResource("31_sidewalk_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.03, -4.2)
+
+[node name="SidewalkCorner_NW" parent="GroundVisual" instance=ExtResource("31_sidewalk_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0.03, -4.2)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SidewalkCorner_SW" parent="GroundVisual" instance=ExtResource("31_sidewalk_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0.03, 4.2)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="SidewalkCorner_SE" parent="GroundVisual" instance=ExtResource("31_sidewalk_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.03, 4.2)
+rotation_degrees = Vector3(0, 270, 0)
+
+[node name="Curb_North" parent="GroundVisual" instance=ExtResource("41_curb_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -2.8)
+
+[node name="Curb_South" parent="GroundVisual" instance=ExtResource("41_curb_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 2.8)
+
+[node name="Curb_West" parent="GroundVisual" instance=ExtResource("41_curb_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0.02, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Curb_East" parent="GroundVisual" instance=ExtResource("41_curb_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.02, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="CurbCorner_NE" parent="GroundVisual" instance=ExtResource("42_curb_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.02, -2.8)
+
+[node name="CurbCorner_NW" parent="GroundVisual" instance=ExtResource("42_curb_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0.02, -2.8)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="CurbCorner_SW" parent="GroundVisual" instance=ExtResource("42_curb_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0.02, 2.8)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="CurbCorner_SE" parent="GroundVisual" instance=ExtResource("42_curb_corner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.02, 2.8)
+rotation_degrees = Vector3(0, 270, 0)
+
+[node name="CurbRamp_North" parent="GroundVisual" instance=ExtResource("48_curb_ramp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -2.8)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="CurbRamp_South" parent="GroundVisual" instance=ExtResource("48_curb_ramp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 2.8)
+
+[node name="CurbRamp_West" parent="GroundVisual" instance=ExtResource("48_curb_ramp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0.02, 0)
+rotation_degrees = Vector3(0, -90, 0)
+
+[node name="CurbRamp_East" parent="GroundVisual" instance=ExtResource("48_curb_ramp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.02, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="RoadArrow_EW" parent="GroundVisual" instance=ExtResource("43_road_lane_arrow")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.11, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="RoadArrow_NS" parent="GroundVisual" instance=ExtResource("43_road_lane_arrow")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, -8)
+
+[node name="RoadTurnLeft_N" parent="GroundVisual" instance=ExtResource("52_road_turn_left")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.11, -10)
+
+[node name="RoadYield_W" parent="GroundVisual" instance=ExtResource("69_road_yield_triangle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.11, 0)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="RoadSchoolZone" parent="GroundVisual" instance=ExtResource("70_road_school_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, -14)
+
+[node name="RoadFaded_E" parent="GroundVisual" instance=ExtResource("71_road_faded_marking")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.11, 0)
+
+[node name="BikeLane_North" parent="GroundVisual" instance=ExtResource("53_road_bike")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, -2.4)
+
+[node name="RoadStopLine_N" parent="GroundVisual" instance=ExtResource("49_road_stop_line")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, -13)
+
+[node name="TrafficIsland_N" parent="GroundVisual" instance=ExtResource("55_road_traffic_island")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -11)
+
+[node name="CenterMedian_N" parent="GroundVisual" instance=ExtResource("58_road_center_median")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -6)
+
+[node name="BusBay_W" parent="GroundVisual" instance=ExtResource("56_road_bus_bay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.11, 12)
+
+[node name="BusText_W" parent="GroundVisual" instance=ExtResource("59_road_bus_text")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.12, 11)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="Chevrons_N" parent="GroundVisual" instance=ExtResource("60_road_chevrons")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, -6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Chevrons_S" parent="GroundVisual" instance=ExtResource("60_road_chevrons")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="CurbBumpout_NW" parent="GroundVisual" instance=ExtResource("61_curb_bumpout")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 0.03, -2.2)
+
+[node name="CurbBumpout_NE" parent="GroundVisual" instance=ExtResource("61_curb_bumpout")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 0.03, -2.2)
+
+[node name="MergeArrow_E" parent="GroundVisual" instance=ExtResource("57_road_merge_arrow")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.11, 10)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="RoadStopLine_S" parent="GroundVisual" instance=ExtResource("49_road_stop_line")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 13)
+
+[node name="RoadStopText_S" parent="GroundVisual" instance=ExtResource("74_road_stop_text")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 11.5)
+
+[node name="RoadArrowStraight_S" parent="GroundVisual" instance=ExtResource("72_road_arrow_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 6)
+
+[node name="RoadArrowRight_E" parent="GroundVisual" instance=ExtResource("73_road_arrow_right")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.11, 2)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="RoadCrack_W" parent="GroundVisual" instance=ExtResource("75_road_crack")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.02, -4)
+
+[node name="RoadCrack_E" parent="GroundVisual" instance=ExtResource("75_road_crack")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.02, 4)
+
+[node name="RoadSpeedBump" parent="GroundVisual" instance=ExtResource("51_road_speed_bump")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 8)
+
+[node name="Parking_NW" parent="GroundVisual" instance=ExtResource("50_road_parking_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.11, -3.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Parking_NE" parent="GroundVisual" instance=ExtResource("50_road_parking_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.11, -3.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Parking_SW" parent="GroundVisual" instance=ExtResource("50_road_parking_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.11, 3.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Parking_SE" parent="GroundVisual" instance=ExtResource("50_road_parking_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.11, 3.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="ParkingBlock_NW" parent="GroundVisual" instance=ExtResource("54_road_parking_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.07, -4.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="ParkingBlock_NE" parent="GroundVisual" instance=ExtResource("54_road_parking_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.07, -4.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="ParkingBlock_SW" parent="GroundVisual" instance=ExtResource("54_road_parking_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.07, 4.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="ParkingBlock_SE" parent="GroundVisual" instance=ExtResource("54_road_parking_block")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.07, 4.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="RoadPatch_W" parent="GroundVisual" instance=ExtResource("45_road_patch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.07, 0)
+
+[node name="RoadPatch_E" parent="GroundVisual" instance=ExtResource("45_road_patch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.07, 0)
+
+[node name="Centerline_EW_W" parent="GroundVisual" instance=ExtResource("46_road_centerline_dash")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.11, 0)
+
+[node name="Centerline_EW_E" parent="GroundVisual" instance=ExtResource("46_road_centerline_dash")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.11, 0)
+
+[node name="Centerline_NS_N" parent="GroundVisual" instance=ExtResource("46_road_centerline_dash")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, -12)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Centerline_NS_S" parent="GroundVisual" instance=ExtResource("46_road_centerline_dash")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 12)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Manhole_NE" parent="GroundVisual" instance=ExtResource("47_road_manhole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.06, -4)
+
+[node name="Manhole_SW" parent="GroundVisual" instance=ExtResource("47_road_manhole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.06, 4)
+
+[node name="GutterGrate_NW" parent="GroundVisual" instance=ExtResource("44_road_gutter_grate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.04, -2.8)
+
+[node name="GutterGrate_NE" parent="GroundVisual" instance=ExtResource("44_road_gutter_grate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.04, -2.8)
+
+[node name="GutterGrate_SW" parent="GroundVisual" instance=ExtResource("44_road_gutter_grate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.04, 2.8)
+
+[node name="GutterGrate_SE" parent="GroundVisual" instance=ExtResource("44_road_gutter_grate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.04, 2.8)
+
+[node name="TownFoliage" type="Node3D" parent="."]
+
+[node name="Tree_NW" parent="TownFoliage" instance=ExtResource("33_tree_large")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -20)
+
+[node name="Tree_NE" parent="TownFoliage" instance=ExtResource("33_tree_large")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, -20)
+
+[node name="Tree_SW" parent="TownFoliage" instance=ExtResource("33_tree_large")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 20)
+
+[node name="Tree_SE" parent="TownFoliage" instance=ExtResource("33_tree_large")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 20)
+
+[node name="Tree_Square_W" parent="TownFoliage" instance=ExtResource("32_tree_small")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -2)
+
+[node name="Tree_Square_E" parent="TownFoliage" instance=ExtResource("32_tree_small")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -2)
+
+[node name="Hedge_N1" parent="TownFoliage" instance=ExtResource("34_hedge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -22)
+
+[node name="Hedge_N2" parent="TownFoliage" instance=ExtResource("34_hedge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+
+[node name="Hedge_N3" parent="TownFoliage" instance=ExtResource("34_hedge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -22)
+
+[node name="Hedge_S1" parent="TownFoliage" instance=ExtResource("34_hedge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 22)
+
+[node name="Hedge_S2" parent="TownFoliage" instance=ExtResource("34_hedge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 22)
+
+[node name="Hedge_S3" parent="TownFoliage" instance=ExtResource("34_hedge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 22)

@@ -1,0 +1,8 @@
+{
+  "id": "curb_bumpout",
+  "parts": [
+    { "type": "box", "size": [2.4, 0.18, 1.2], "pos": [0, 0.09, 0], "color": "curb_dark" },
+    { "type": "box", "size": [2.2, 0.05, 1.0], "pos": [0, 0.18, 0], "color": "curb_light" },
+    { "type": "box", "size": [1.8, 0.03, 0.8], "pos": [0, 0.21, 0], "color": "stone_highlight" }
+  ]
+}

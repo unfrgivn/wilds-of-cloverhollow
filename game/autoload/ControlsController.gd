@@ -7,11 +7,19 @@ var _game_state
 
 func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
+	set_process_input(true)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
+func _input(event: InputEvent) -> void:
+	if _is_toggle_event(event):
 		_toggle_overlay()
 		get_viewport().set_input_as_handled()
+
+func _is_toggle_event(event: InputEvent) -> bool:
+	if event.is_action_pressed("ui_cancel"):
+		return true
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		return true
+	return false
 
 func _toggle_overlay() -> void:
 	if _overlay_instance == null:

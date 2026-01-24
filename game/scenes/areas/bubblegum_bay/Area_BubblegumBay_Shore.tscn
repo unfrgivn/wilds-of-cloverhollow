@@ -1,0 +1,85 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/scene/spawn_marker.gd" id="1_spawn"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/FollowCameraRig.tscn" id="2_cam"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/Door.tscn" id="4_door"]
+[ext_resource type="PackedScene" path="res://game/scenes/exploration/EnemyActor.tscn" id="5_enemy"]
+[ext_resource type="PackedScene" path="res://game/scenes/props/Sign.tscn" id="6_sign"]
+[ext_resource type="PackedScene" path="res://game/assets/props/bench.tscn" id="7_bench"]
+[ext_resource type="PackedScene" path="res://game/assets/props/lamp_post.tscn" id="8_lamp"]
+[ext_resource type="PackedScene" path="res://game/assets/props/rock_small.tscn" id="9_rock"]
+[ext_resource type="PackedScene" path="res://game/assets/props/bush_round.tscn" id="10_bush"]
+[ext_resource type="PackedScene" path="res://game/assets/props/barrel.tscn" id="11_barrel"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_1"]
+vertices = PackedVector3Array(-10, 0, -10, -10, 0, 10, 10, 0, 10, 10, 0, -10)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(20, 0.1, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(20, 0.1, 20)
+
+[node name="Area_BubblegumBay_Shore" type="Node3D"]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_1")
+
+[node name="Floor" type="StaticBody3D" parent="NavigationRegion3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="FollowCameraRig" parent="." instance=ExtResource("2_cam")]
+target_path = NodePath("../Player")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Spawn_Default" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+script = ExtResource("1_spawn")
+spawn_id = "Bay_Default"
+is_default = true
+
+[node name="Spawn_FromTown" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+script = ExtResource("1_spawn")
+spawn_id = "Bay_FromTown"
+
+[node name="DoorToTown" parent="." instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
+target_scene = "res://game/scenes/areas/cloverhollow/Area_Cloverhollow_Town.tscn"
+target_spawn_id = "Town_FromBus"
+
+[node name="ShoreSign" parent="." instance=ExtResource("6_sign")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+speaker_name = "Sign"
+message = "Bubblegum Bay Shore"
+
+[node name="Enemy_Slime" parent="." instance=ExtResource("5_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+battle_scene = "res://game/scenes/battle/BattleScene.tscn"
+encounter_id = "bubblegum_bay_encounter"
+
+[node name="Decor" type="Node3D" parent="."]
+
+[node name="Bench" parent="Decor" instance=ExtResource("7_bench")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -2)
+
+[node name="LampPost" parent="Decor" instance=ExtResource("8_lamp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -3)
+
+[node name="Rock" parent="Decor" instance=ExtResource("9_rock")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 6, 0, -4)
+
+[node name="Bush" parent="Decor" instance=ExtResource("10_bush")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -3)
+
+[node name="Barrel" parent="Decor" instance=ExtResource("11_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -5)

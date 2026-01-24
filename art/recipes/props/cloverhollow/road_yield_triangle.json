@@ -1,0 +1,8 @@
+{
+  "id": "road_yield_triangle",
+  "parts": [
+    { "type": "box", "size": [1.6, 0.02, 0.2], "pos": [0, 0.01, 0.6], "color": "road_marking_yellow" },
+    { "type": "box", "size": [1.4, 0.02, 0.2], "pos": [-0.6, 0.01, 0.0], "rot": [0, 60, 0], "color": "road_marking_yellow" },
+    { "type": "box", "size": [1.4, 0.02, 0.2], "pos": [0.6, 0.01, 0.0], "rot": [0, -60, 0], "color": "road_marking_yellow" }
+  ]
+}

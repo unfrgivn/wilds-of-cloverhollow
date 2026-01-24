@@ -1,0 +1,9 @@
+{
+  "id": "facade_sign_hanging",
+  "parts": [
+    { "type": "box", "size": [0.2, 0.2, 0.8], "pos": [0, 0.1, -0.4], "color": "wood_dark" },
+    { "type": "box", "size": [1.4, 0.2, 0.2], "pos": [0, 0.1, -1.2], "color": "wood_dark" },
+    { "type": "box", "size": [1.2, 0.6, 0.1], "pos": [0, -0.2, -1.2], "color": "sign_red" },
+    { "type": "box", "size": [0.8, 0.08, 0.12], "pos": [0, -0.2, -1.05], "color": "sign_white" }
+  ]
+}

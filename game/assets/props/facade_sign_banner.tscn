@@ -1,0 +1,51 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_a6tx2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_wej0q"]
+size = Vector3(2.8, 0.3, 0.2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eq62f"]
+render_priority = 0
+shader = ExtResource("1_a6tx2")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w5hdk"]
+next_pass = SubResource("ShaderMaterial_eq62f")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(1, 0.7176471, 0.3019608, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yy06h"]
+size = Vector3(2.4, 0.06, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c3bye"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.8980392, 0.22352941, 0.20784314, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cxj3e"]
+size = Vector3(1.8, 0.05, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uqf2l"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9607843, 0.9607843, 0.9607843, 1)
+
+[node name="facade_sign_banner" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("BoxMesh_wej0q")
+surface_material_override/0 = SubResource("StandardMaterial3D_w5hdk")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("BoxMesh_yy06h")
+surface_material_override/0 = SubResource("StandardMaterial3D_c3bye")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0.15)
+mesh = SubResource("BoxMesh_cxj3e")
+surface_material_override/0 = SubResource("StandardMaterial3D_uqf2l")

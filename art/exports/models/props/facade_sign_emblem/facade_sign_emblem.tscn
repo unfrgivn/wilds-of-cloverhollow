@@ -1,0 +1,54 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_nfyyg"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bdgit"]
+top_radius = 0.7
+bottom_radius = 0.7
+height = 0.08
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0y7ko"]
+render_priority = 0
+shader = ExtResource("1_nfyyg")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hy23x"]
+next_pass = SubResource("ShaderMaterial_0y7ko")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(1, 0.7176471, 0.3019608, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_x0p5f"]
+height = 0.04
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gyoig"]
+next_pass = SubResource("ShaderMaterial_0y7ko")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.8980392, 0.22352941, 0.20784314, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lxb4u"]
+size = Vector3(0.4, 0.04, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4xdj1"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9607843, 0.9607843, 0.9607843, 1)
+
+[node name="facade_sign_emblem" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_bdgit")
+surface_material_override/0 = SubResource("StandardMaterial3D_hy23x")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("CylinderMesh_x0p5f")
+surface_material_override/0 = SubResource("StandardMaterial3D_gyoig")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.2)
+mesh = SubResource("BoxMesh_lxb4u")
+surface_material_override/0 = SubResource("StandardMaterial3D_4xdj1")

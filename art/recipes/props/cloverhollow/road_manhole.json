@@ -1,0 +1,7 @@
+{
+  "id": "road_manhole",
+  "parts": [
+    { "type": "cylinder", "height": 0.05, "radius": 0.6, "pos": [0, 0.025, 0], "color": "road_edge" },
+    { "type": "cylinder", "height": 0.02, "radius": 0.45, "pos": [0, 0.045, 0], "color": "road_asphalt_light" }
+  ]
+}

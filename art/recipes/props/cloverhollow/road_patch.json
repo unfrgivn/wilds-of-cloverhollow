@@ -1,0 +1,7 @@
+{
+  "id": "road_patch",
+  "parts": [
+    { "type": "box", "size": [2.4, 0.02, 1.2], "pos": [0, 0.01, 0], "color": "road_edge" },
+    { "type": "box", "size": [2.0, 0.01, 0.9], "pos": [0, 0.025, 0], "color": "road_asphalt_dark" }
+  ]
+}

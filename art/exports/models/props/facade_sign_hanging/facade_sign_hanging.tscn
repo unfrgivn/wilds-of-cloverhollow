@@ -1,0 +1,66 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Shader" path="res://game/shaders/outline.gdshader" id="1_u8x72"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_8ef7p"]
+size = Vector3(0.2, 0.2, 0.8)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_652lu"]
+render_priority = 0
+shader = ExtResource("1_u8x72")
+shader_parameter/outline_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+shader_parameter/outline_width = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8hnr3"]
+next_pass = SubResource("ShaderMaterial_652lu")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_isphk"]
+size = Vector3(1.4, 0.2, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lu73s"]
+next_pass = SubResource("ShaderMaterial_652lu")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_e48bo"]
+size = Vector3(1.2, 0.6, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m01yh"]
+next_pass = SubResource("ShaderMaterial_652lu")
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.8980392, 0.22352941, 0.20784314, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5ocgt"]
+size = Vector3(0.8, 0.08, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ggrj"]
+diffuse_mode = 3
+specular_mode = 2
+albedo_color = Color(0.9607843, 0.9607843, 0.9607843, 1)
+
+[node name="facade_sign_hanging" type="Node3D"]
+
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.4)
+mesh = SubResource("BoxMesh_8ef7p")
+surface_material_override/0 = SubResource("StandardMaterial3D_8hnr3")
+
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -1.2)
+mesh = SubResource("BoxMesh_isphk")
+surface_material_override/0 = SubResource("StandardMaterial3D_lu73s")
+
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, -1.2)
+mesh = SubResource("BoxMesh_e48bo")
+surface_material_override/0 = SubResource("StandardMaterial3D_m01yh")
+
+[node name="@MeshInstance3D@5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, -1.05)
+mesh = SubResource("BoxMesh_5ocgt")
+surface_material_override/0 = SubResource("StandardMaterial3D_6ggrj")

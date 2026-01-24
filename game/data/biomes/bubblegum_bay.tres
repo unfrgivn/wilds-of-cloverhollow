@@ -6,4 +6,7 @@
 script = ExtResource("1")
 id = "bubblegum_bay"
 display_name = "Bubblegum Bay"
+palette_path = "res://art/palettes/bubblegum_bay.palette.json"
+pixels_per_meter = 24
+sprite_resolution = 48
 battle_background_ids = ["shore"]

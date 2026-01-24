@@ -11,13 +11,11 @@
 [ext_resource type="PackedScene" path="res://game/assets/props/rock_small.tscn" id="9_rock"]
 [ext_resource type="PackedScene" path="res://game/assets/props/bush_round.tscn" id="10_bush"]
 [ext_resource type="PackedScene" path="res://game/assets/props/barrel.tscn" id="11_barrel"]
+[ext_resource type="PackedScene" path="res://game/assets/props/ground_sand_large.tscn" id="12_ground"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_1"]
 vertices = PackedVector3Array(-10, 0, -10, -10, 0, 10, 10, 0, 10, 10, 0, -10)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
-
-[sub_resource type="BoxMesh" id="BoxMesh_floor"]
-size = Vector3(20, 0.1, 20)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(20, 0.1, 20)
@@ -28,9 +26,6 @@ size = Vector3(20, 0.1, 20)
 navigation_mesh = SubResource("NavigationMesh_1")
 
 [node name="Floor" type="StaticBody3D" parent="NavigationRegion3D"]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Floor"]
-mesh = SubResource("BoxMesh_floor")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Floor"]
 shape = SubResource("BoxShape3D_floor")
@@ -68,6 +63,9 @@ battle_scene = "res://game/scenes/battle/BattleScene.tscn"
 encounter_id = "bubblegum_bay_encounter"
 
 [node name="Decor" type="Node3D" parent="."]
+
+[node name="GroundSand" parent="Decor" instance=ExtResource("12_ground")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="Bench" parent="Decor" instance=ExtResource("7_bench")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -2)

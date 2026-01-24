@@ -6,4 +6,7 @@
 script = ExtResource("1")
 id = "cloverhollow"
 display_name = "Cloverhollow"
+palette_path = "res://art/palettes/cloverhollow.palette.json"
+pixels_per_meter = 24
+sprite_resolution = 48
 battle_background_ids = []

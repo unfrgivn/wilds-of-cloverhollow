@@ -444,9 +444,11 @@ Move from “slice” to “game” by implementing the minimum systems needed t
 ## Milestone 12 — Biome pack expansion process (repeatable content pipeline)
 
 **Owner:** Product Architect + Art Pipeline + World Scene Builder
+**Status:** ✅ Completed (2026-01-24)
 
-### Objective
+**Objective**
 Add new biomes (Bubblegum Bay, Pinecone Pass, etc.) using a repeatable pack process without destabilizing systems.
+
 
 ### Tasks
 1. Implement `BiomeDef` loader and registry.
@@ -459,6 +461,10 @@ Add new biomes (Bubblegum Bay, Pinecone Pass, etc.) using a repeatable pack proc
 ### Acceptance criteria
 - Bubblegum Bay is playable end-to-end (enter biome, interact, one encounter, battle, return).
 - Adding Pinecone Pass is mostly copy/paste + new content recipes.
+
+**Notes**
+- Biome defs include palette + pixel kit settings.
+- Bubblegum Bay uses pixel ground prop and capture `captures/bubblegum_bay_smoke/20260124_085224`.
 
 ---
 

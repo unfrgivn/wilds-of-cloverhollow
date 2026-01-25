@@ -1,0 +1,18 @@
+{
+  "scenario_id": "interaction_smoke",
+  "description": "Verify player can interact with sign and see dialogue UI",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "initial"},
+    {"type": "move", "direction": "left", "frames": 40},
+    {"type": "move", "direction": "up", "frames": 25},
+    {"type": "capture", "label": "near_sign"},
+    {"type": "wait_frames", "frames": 3},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "dialogue_visible"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 3},
+    {"type": "capture", "label": "dialogue_dismissed"}
+  ]
+}

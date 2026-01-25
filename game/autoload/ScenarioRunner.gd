@@ -138,6 +138,17 @@ func _step_actions() -> void:
             _action_index += 1
         return
 
+    if t == "press":
+        var input_action := str(action.get("action", ""))
+        if input_action != "":
+            Input.action_press(input_action)
+            # Release next frame to simulate a tap
+            await get_tree().process_frame
+            Input.action_release(input_action)
+            _trace["events"].append({"type": "press", "frame": _frame, "action": input_action})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

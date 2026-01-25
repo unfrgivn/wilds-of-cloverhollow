@@ -48,6 +48,13 @@ This file is the single source of truth. If code changes behavior, update this f
 - Visible overworld enemies.
 - Colliding with or triggering an enemy starts a battle.
 
+### 3.5 Interaction system
+- Player has an InteractionArea (Area2D) for detecting nearby interactables.
+- Interactable objects (signs, NPCs) extend the `Interactable` base class.
+- Pressing the "interact" action triggers dialogue or other interaction.
+- DialogueManager autoload handles showing/hiding dialogue UI.
+- Player movement is disabled while dialogue is showing.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.
@@ -96,6 +103,7 @@ This file is the single source of truth. If code changes behavior, update this f
   - `wait_frames`: Pause for N frames before continuing.
   - `capture`: Save a screenshot with a label.
   - `move`: Simulate directional input (left/right/up/down) for N frames.
+  - `press`: Simulate a button press for an input action (e.g., "interact").
 
 ### 8.2 Deterministic artifacts
 - Every milestone must add/update at least one Scenario Runner scenario.

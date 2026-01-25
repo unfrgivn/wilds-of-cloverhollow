@@ -34,7 +34,7 @@ Playable 2D exploration slice with pixel-stable camera and a controllable player
 
 ---
 
-## Milestone 2 — Interaction + dialogue  **Owner:** Godot Gameplay Engineer + UI Systems
+## Milestone 2 — Interaction + dialogue  **Status:** ✅ Completed (2026-01-25)  **Owner:** Godot Gameplay Engineer + UI Systems
 ### Objective
 Player can interact with an object/NPC and see a dialogue box.
 

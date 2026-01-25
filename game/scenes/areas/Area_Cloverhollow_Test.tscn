@@ -1,15 +1,23 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
 [ext_resource type="Script" path="res://game/scripts/enemies/OverworldEnemy.gd" id="3"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/slime/overworld/slime_placeholder.png" id="4"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="5"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
 size = Vector2(120, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(16, 16)
 
 [node name="Area_Cloverhollow_Test" type="Node2D"]
 
@@ -40,6 +48,11 @@ shape = SubResource("RectangleShape2D_1")
 enabled = true
 position_smoothing_enabled = false
 
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("CircleShape2D_1")
+
 [node name="Enemy" type="Area2D" parent="."]
 position = Vector2(320, 160)
 script = ExtResource("3")
@@ -50,3 +63,19 @@ centered = true
 
 [node name="EnemyCollision" type="CollisionShape2D" parent="Enemy"]
 shape = SubResource("RectangleShape2D_1")
+
+[node name="Sign" type="Area2D" parent="."]
+position = Vector2(180, 100)
+script = ExtResource("5")
+dialogue_text = "Welcome to Cloverhollow!
+This is a test sign."
+
+[node name="SignSprite" type="Sprite2D" parent="Sign"]
+modulate = Color(0.6, 0.4, 0.2, 1)
+scale = Vector2(1, 1.5)
+texture = ExtResource("2")
+
+[node name="SignCollision" type="CollisionShape2D" parent="Sign"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="DialogueUI" parent="." instance=ExtResource("6")]

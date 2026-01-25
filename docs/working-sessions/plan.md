@@ -58,7 +58,7 @@ Discrete areas with stable spawn points and transitions.
 
 ---
 
-## Milestone 4 — Visible enemies + encounter trigger  **Owner:** Godot Gameplay Engineer
+## Milestone 4 — Visible enemies + encounter trigger  **Status:** ✅ Completed (2026-01-25)  **Owner:** Godot Gameplay Engineer
 ### Objective
 Overworld enemies are visible and trigger battle reliably.
 

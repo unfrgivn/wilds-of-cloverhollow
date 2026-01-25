@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/battle/BattleScene.gd" id="1"]
+
+[node name="BattleScene" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.2, 1)
+
+[node name="BattleUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="TopHUD" type="Panel" parent="BattleUI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 48.0
+
+[node name="EnemyInfo" type="Label" parent="BattleUI/TopHUD"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 200.0
+offset_bottom = 24.0
+text = "Enemy: Slime"
+
+[node name="EnemyHP" type="Label" parent="BattleUI/TopHUD"]
+offset_left = 8.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 40.0
+text = "HP: 10/10"
+
+[node name="PartyInfo" type="Label" parent="BattleUI/TopHUD"]
+offset_left = 312.0
+offset_top = 8.0
+offset_right = 504.0
+offset_bottom = 24.0
+text = "Fae"
+horizontal_alignment = 2
+
+[node name="PartyHP" type="Label" parent="BattleUI/TopHUD"]
+offset_left = 312.0
+offset_top = 24.0
+offset_right = 504.0
+offset_bottom = 40.0
+text = "HP: 20/20  MP: 10/10"
+horizontal_alignment = 2
+
+[node name="CommandMenu" type="Panel" parent="BattleUI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -80.0
+offset_right = 100.0
+offset_bottom = -8.0
+
+[node name="VBox" type="VBoxContainer" parent="BattleUI/CommandMenu"]
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 192.0
+offset_bottom = 68.0
+
+[node name="AttackBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+text = "> Attack"
+
+[node name="SkillBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+text = "  Skill"
+
+[node name="ItemBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+text = "  Item"
+
+[node name="RunBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+text = "  Run"
+
+[node name="BattleMessage" type="Label" parent="BattleUI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = -84.0
+text = "A wild Slime appeared! (Press E to flee)"
+horizontal_alignment = 1

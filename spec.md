@@ -62,6 +62,13 @@ This file is the single source of truth. If code changes behavior, update this f
 - Transitions specify target area path and target spawn marker ID.
 - Player is repositioned to the spawn marker after area load.
 
+### 3.7 Battle entry
+- BattleManager autoload handles battle transitions and state.
+- OverworldEnemy (Area2D) detects player collision and calls `BattleManager.start_battle(enemy_data)`.
+- Enemy data includes `enemy_id` and `enemy_name` for battle setup.
+- On collision, the enemy is consumed (queue_free) and battle scene loads.
+- After battle ends, player returns to the overworld via SceneRouter.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

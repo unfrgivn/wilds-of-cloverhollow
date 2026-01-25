@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 ScenarioRunner="*res://game/autoload/ScenarioRunner.gd"
 DialogueManager="*res://game/autoload/DialogueManager.gd"
 SceneRouter="*res://game/autoload/SceneRouter.gd"
+BattleManager="*res://game/autoload/BattleManager.gd"
 
 [display]
 

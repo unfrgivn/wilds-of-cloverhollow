@@ -1,0 +1,14 @@
+{
+  "scenario_id": "encounter_trigger_smoke",
+  "description": "Test that colliding with an overworld enemy triggers the battle scene",
+  "actions": [
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "before_encounter" },
+    { "type": "move", "direction": "right", "frames": 60 },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "in_battle" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "after_flee" }
+  ]
+}

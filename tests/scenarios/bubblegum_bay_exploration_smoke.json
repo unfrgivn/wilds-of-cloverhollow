@@ -1,0 +1,13 @@
+{
+  "scenario_id": "bubblegum_bay_exploration_smoke",
+  "description": "Verify player can explore Bubblegum Bay area",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/areas/Area_bubblegum_bay.tscn"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "initial"},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "capture", "label": "after_move"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "final"}
+  ]
+}

@@ -158,7 +158,7 @@ First real content pack (style lock).
 
 ---
 
-## Milestone 11 — Biome pack factory workflow  **Owner:** World Producer + Art Pipeline
+## Milestone 11 — Biome pack factory workflow  **Status:** ✅ Completed (2026-01-25)  **Owner:** World Producer + Art Pipeline
 ### Objective
 Adding a biome is repeatable and safe.
 

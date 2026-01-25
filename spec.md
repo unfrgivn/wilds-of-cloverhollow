@@ -146,6 +146,22 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Enemy: Grumpy Squirrel (non-scary, green, visible in overworld).
 - Battle background: cloverhollow_meadow.png (512x288).
 
+### 7.2 Bubblegum Bay (v0 blockout)
+- Wilderness biome: beach/bay area with pastel pink/purple palette.
+- Single area scene with sand, water, bubble props.
+- Connected to Town Center via area transition.
+- Enemy: Pink Slime (reskinned slime).
+- Battle background: bubblegum_bay.png (512x288).
+
+### 7.3 Biome factory workflow
+- `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
+  - Palette stub in `art/palettes/<id>.palette.json`
+  - Biome data in `game/data/biomes/<id>.json`
+  - Encounter table in `game/data/encounters/<id>.json`
+  - Scenario stub in `tests/scenarios/<id>_exploration_smoke.json`
+  - Checklist in `docs/biomes/<id>.md`
+- `tools/content/check-biome.sh <id>`: Validates biome completeness (palette, tileset, scene, scenario, docs).
+
 ## 8. Automation and agentic workflows (non-negotiable)
 
 ### 8.1 Scenario Runner

@@ -127,6 +127,11 @@ position = Vector2(432, 220)
 script = ExtResource("7")
 marker_id = "from_arcade"
 
+[node name="from_bubblegum_bay" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 250)
+script = ExtResource("7")
+marker_id = "from_bubblegum_bay"
+
 [node name="TransitionToHeroHouse" type="Area2D" parent="."]
 position = Vector2(30, 160)
 script = ExtResource("8")
@@ -176,4 +181,21 @@ offset_top = -30.0
 offset_right = 40.0
 offset_bottom = -10.0
 text = "Arcade →"
+horizontal_alignment = 1
+
+[node name="TransitionToBubblegumBay" type="Area2D" parent="."]
+position = Vector2(256, 280)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_bubblegum_bay.tscn"
+target_spawn_id = "from_town"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToBubblegumBay"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToBubblegumBay"]
+offset_left = -50.0
+offset_top = -30.0
+offset_right = 50.0
+offset_bottom = -10.0
+text = "↓ Bubblegum Bay"
 horizontal_alignment = 1

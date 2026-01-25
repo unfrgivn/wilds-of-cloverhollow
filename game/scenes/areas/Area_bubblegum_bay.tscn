@@ -1,0 +1,147 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
+[ext_resource type="Script" path="res://game/scripts/enemies/OverworldEnemy.gd" id="3"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/slime_placeholder.png" id="4"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="5"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="6"]
+[ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="7"]
+[ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(16, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(32, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(16, 16)
+
+[node name="Area_bubblegum_bay" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.53, 0.81, 0.92, 1)
+
+[node name="Sand" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 180.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(1.0, 0.84, 0.0, 1)
+
+[node name="Water" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 220.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.25, 0.41, 0.88, 1)
+
+[node name="BubbleProp1" type="ColorRect" parent="."]
+offset_left = 100.0
+offset_top = 80.0
+offset_right = 140.0
+offset_bottom = 120.0
+color = Color(1.0, 0.41, 0.71, 1)
+
+[node name="BubbleProp2" type="ColorRect" parent="."]
+offset_left = 350.0
+offset_top = 60.0
+offset_right = 400.0
+offset_bottom = 110.0
+color = Color(0.87, 0.63, 0.87, 1)
+
+[node name="BubbleProp3" type="ColorRect" parent="."]
+offset_left = 450.0
+offset_top = 100.0
+offset_right = 480.0
+offset_bottom = 130.0
+color = Color(1.0, 0.08, 0.58, 1)
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(256, 160)
+script = ExtResource("1")
+
+[node name="Sprite" type="Sprite2D" parent="Player"]
+texture = ExtResource("2")
+centered = true
+
+[node name="Collision" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+enabled = true
+position_smoothing_enabled = false
+
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="BeachSign" type="Area2D" parent="."]
+position = Vector2(200, 150)
+script = ExtResource("5")
+dialogue_text = "Welcome to Bubblegum Bay!
+A sweet and colorful beach paradise."
+
+[node name="SignSprite" type="ColorRect" parent="BeachSign"]
+offset_left = -12.0
+offset_top = -16.0
+offset_right = 12.0
+offset_bottom = 0.0
+color = Color(1.0, 0.84, 0.0, 1)
+
+[node name="SignCollision" type="CollisionShape2D" parent="BeachSign"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="Enemy" type="Area2D" parent="."]
+position = Vector2(380, 170)
+script = ExtResource("3")
+enemy_id = "slime"
+enemy_name = "Pink Slime"
+
+[node name="EnemySprite" type="Sprite2D" parent="Enemy"]
+texture = ExtResource("4")
+centered = true
+modulate = Color(1.0, 0.41, 0.71, 1)
+
+[node name="EnemyCollision" type="CollisionShape2D" parent="Enemy"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="DialogueUI" parent="." instance=ExtResource("6")]
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="default" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 160)
+script = ExtResource("7")
+
+[node name="from_town" type="Marker2D" parent="Spawns"]
+position = Vector2(50, 160)
+script = ExtResource("7")
+marker_id = "from_town"
+
+[node name="TransitionToTown" type="Area2D" parent="."]
+position = Vector2(20, 160)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_TownCenter.tscn"
+target_spawn_id = "from_bubblegum_bay"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToTown"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToTown"]
+offset_left = -40.0
+offset_top = -30.0
+offset_right = 40.0
+offset_bottom = -10.0
+text = "← To Town"
+horizontal_alignment = 1

@@ -1,5 +1,5 @@
 extends Node
-class_name ScenarioRunner
+# Note: Do NOT add class_name here; it conflicts with the autoload singleton name.
 
 # Minimal Scenario Runner scaffold.
 # Implement full action set in later milestones.

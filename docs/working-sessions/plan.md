@@ -8,7 +8,7 @@ Status convention:
 
 ---
 
-## Milestone 0 — Repo boot + CI sanity  **Owner:** QA Automation + Godot Gameplay Engineer
+## Milestone 0 — Repo boot + CI sanity  **Status:** ✅ Completed (2026-01-25)  **Owner:** QA Automation + Godot Gameplay Engineer
 ### Objective
 The project boots reliably (macOS) and has a repeatable CLI workflow for smoke/tests/scenarios.
 

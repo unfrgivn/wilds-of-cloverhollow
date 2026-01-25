@@ -137,6 +137,15 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Discrete areas/scenes are allowed (and preferred for simplicity).
 - Biomes/towns planned: Cloverhollow (main town), Bubblegum Bay, Pinecone Pass, Enchanted Forest, Forest/Clubhouse Woods, and more (8+ total).
 
+### 7.1 Cloverhollow town (v0 blockout)
+- Town Center: central hub connecting to other areas; props (benches, lamps), sign, enemy spawn.
+- Hero House: Fae's home exterior with trees, fence, mailbox.
+- School: Cloverhollow Elementary exterior with benches, sign.
+- Arcade: Pixel Palace Arcade exterior with lamps, sign.
+- Props: bench, sign, lamp, tree (16x32), fence (all 16x16 except tree).
+- Enemy: Grumpy Squirrel (non-scary, green, visible in overworld).
+- Battle background: cloverhollow_meadow.png (512x288).
+
 ## 8. Automation and agentic workflows (non-negotiable)
 
 ### 8.1 Scenario Runner

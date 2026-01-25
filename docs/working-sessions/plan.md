@@ -142,7 +142,7 @@ Prevent spec drift.
 
 ---
 
-## Milestone 10 — Cloverhollow town pack v0  **Owner:** World Builder + Art Pipeline
+## Milestone 10 — Cloverhollow town pack v0  **Status:** ✅ Completed (2026-01-25)  **Owner:** World Builder + Art Pipeline
 ### Objective
 First real content pack (style lock).
 

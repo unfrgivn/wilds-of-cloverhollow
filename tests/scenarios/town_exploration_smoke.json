@@ -1,0 +1,23 @@
+{
+  "scenario_id": "town_exploration_smoke",
+  "description": "Verify player can explore Cloverhollow town center with props and enemy visible",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/areas/Area_TownCenter.tscn"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "town_center_initial"},
+    {"type": "move", "direction": "left", "frames": 30},
+    {"type": "capture", "label": "after_move_left"},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "capture", "label": "near_sign"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "sign_dialogue"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "move", "direction": "down", "frames": 20},
+    {"type": "move", "direction": "right", "frames": 40},
+    {"type": "capture", "label": "near_enemy"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "final_position"}
+  ]
+}

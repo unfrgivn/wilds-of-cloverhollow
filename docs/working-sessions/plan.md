@@ -207,7 +207,7 @@ Document concept art aesthetic for consistent asset creation.
 
 ---
 
-## Milestone 15 — Hero's Home exterior  **Owner:** World Builder + Art Pipeline
+## Milestone 15 — Hero's Home exterior  **Status:** ✅ Completed (2026-01-25)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Complete exterior tilemap and props for the protagonist's house.
 

@@ -1,0 +1,19 @@
+{
+  "scenario_id": "hero_home_exterior_render",
+  "description": "Golden capture for Hero's Home exterior with 2-story cottage",
+  "golden": true,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_HeroHouse.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "hero_home_exterior_initial" },
+    { "type": "move", "direction": "up", "frames": 20 },
+    { "type": "capture", "label": "hero_home_near_house" },
+    { "type": "move", "direction": "left", "frames": 25 },
+    { "type": "capture", "label": "hero_home_garden_left" },
+    { "type": "move", "direction": "right", "frames": 50 },
+    { "type": "capture", "label": "hero_home_garden_right" },
+    { "type": "move", "direction": "down", "frames": 20 },
+    { "type": "wait_frames", "frames": 15 },
+    { "type": "capture", "label": "hero_home_exterior_final" }
+  ]
+}

@@ -173,10 +173,11 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 
 ### 7.1 Cloverhollow town (v0 blockout)
 - Town Center: central hub connecting to other areas; props (benches, lamps), sign, enemy spawn.
-- Hero House: Fae's home exterior with trees, fence, mailbox.
+- Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
+- Hero House Interior: placeholder scene with floor, walls, door transition back to exterior.
 - School: Cloverhollow Elementary exterior with benches, sign.
 - Arcade: Pixel Palace Arcade exterior with lamps, sign.
-- Props: bench, sign, lamp, tree (16x32), fence (all 16x16 except tree).
+- Props: bench, sign, lamp, tree (16x32), fence, flowers (all 16x16 except tree).
 - Enemy: Grumpy Squirrel (non-scary, green, visible in overworld).
 - Battle background: cloverhollow_meadow.png (512x288).
 

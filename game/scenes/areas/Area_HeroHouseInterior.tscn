@@ -1,10 +1,18 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="3"]
 [ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="4"]
 [ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/table.png" id="6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/chair.png" id="7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/stove.png" id="8"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/sink.png" id="9"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/couch.png" id="10"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/rug.png" id="11"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/bookshelf.png" id="12"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/stairs.png" id="13"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -14,6 +22,18 @@ radius = 24.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
 size = Vector2(24, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(20, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(32, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6"]
+size = Vector2(16, 32)
 
 [node name="Area_HeroHouseInterior" type="Node2D"]
 
@@ -26,34 +46,98 @@ offset_bottom = 288.0
 color = Color(0.55, 0.42, 0.28, 1)
 
 [node name="Floor" type="ColorRect" parent="."]
-offset_left = 80.0
-offset_top = 80.0
-offset_right = 432.0
+offset_left = 60.0
+offset_top = 70.0
+offset_right = 452.0
 offset_bottom = 250.0
 color = Color(0.65, 0.52, 0.35, 1)
 
 [node name="Walls" type="Node2D" parent="."]
 
 [node name="WallLeft" type="ColorRect" parent="Walls"]
-offset_left = 60.0
-offset_top = 40.0
-offset_right = 80.0
+offset_left = 40.0
+offset_top = 30.0
+offset_right = 60.0
 offset_bottom = 250.0
 color = Color(0.71, 0.54, 0.3, 1)
 
 [node name="WallRight" type="ColorRect" parent="Walls"]
-offset_left = 432.0
-offset_top = 40.0
-offset_right = 452.0
+offset_left = 452.0
+offset_top = 30.0
+offset_right = 472.0
 offset_bottom = 250.0
 color = Color(0.71, 0.54, 0.3, 1)
 
 [node name="WallTop" type="ColorRect" parent="Walls"]
-offset_left = 60.0
-offset_top = 40.0
-offset_right = 452.0
-offset_bottom = 80.0
+offset_left = 40.0
+offset_top = 30.0
+offset_right = 472.0
+offset_bottom = 70.0
 color = Color(0.71, 0.54, 0.3, 1)
+
+[node name="KitchenArea" type="Node2D" parent="."]
+position = Vector2(370, 100)
+
+[node name="KitchenFloor" type="ColorRect" parent="KitchenArea"]
+offset_left = -60.0
+offset_top = -20.0
+offset_right = 60.0
+offset_bottom = 100.0
+color = Color(0.75, 0.7, 0.65, 1)
+
+[node name="Stove" type="Sprite2D" parent="KitchenArea"]
+position = Vector2(40, 0)
+texture = ExtResource("8")
+
+[node name="Sink" type="Sprite2D" parent="KitchenArea"]
+position = Vector2(40, 25)
+texture = ExtResource("9")
+
+[node name="Table" type="Sprite2D" parent="KitchenArea"]
+position = Vector2(-20, 50)
+texture = ExtResource("6")
+
+[node name="Chair1" type="Sprite2D" parent="KitchenArea"]
+position = Vector2(-40, 50)
+texture = ExtResource("7")
+
+[node name="Chair2" type="Sprite2D" parent="KitchenArea"]
+position = Vector2(0, 50)
+texture = ExtResource("7")
+
+[node name="Chair3" type="Sprite2D" parent="KitchenArea"]
+position = Vector2(-20, 70)
+texture = ExtResource("7")
+
+[node name="LivingRoomArea" type="Node2D" parent="."]
+position = Vector2(150, 140)
+
+[node name="Rug" type="Sprite2D" parent="LivingRoomArea"]
+position = Vector2(0, 30)
+texture = ExtResource("11")
+
+[node name="Couch" type="Sprite2D" parent="LivingRoomArea"]
+position = Vector2(0, 0)
+texture = ExtResource("10")
+
+[node name="Bookshelf" type="Sprite2D" parent="LivingRoomArea"]
+position = Vector2(-60, -40)
+texture = ExtResource("12")
+
+[node name="StairsArea" type="Node2D" parent="."]
+position = Vector2(435, 100)
+
+[node name="Stairs" type="Sprite2D" parent="StairsArea"]
+position = Vector2(0, 16)
+texture = ExtResource("13")
+
+[node name="StairsLabel" type="Label" parent="StairsArea"]
+offset_left = -30.0
+offset_top = -20.0
+offset_right = 30.0
+offset_bottom = 0.0
+text = "Upstairs"
+horizontal_alignment = 1
 
 [node name="Door" type="ColorRect" parent="."]
 offset_left = 246.0
@@ -62,13 +146,35 @@ offset_right = 266.0
 offset_bottom = 250.0
 color = Color(0.54, 0.42, 0.25, 1)
 
-[node name="PlaceholderLabel" type="Label" parent="."]
-offset_left = 180.0
-offset_top = 130.0
-offset_right = 332.0
-offset_bottom = 160.0
-text = "Interior - Placeholder"
-horizontal_alignment = 1
+[node name="Props" type="Node2D" parent="."]
+
+[node name="KitchenCollision" type="StaticBody2D" parent="Props"]
+position = Vector2(410, 100)
+
+[node name="StoveCollision" type="CollisionShape2D" parent="Props/KitchenCollision"]
+shape = SubResource("RectangleShape2D_4")
+
+[node name="SinkCollision" type="CollisionShape2D" parent="Props/KitchenCollision"]
+position = Vector2(0, 25)
+shape = SubResource("RectangleShape2D_4")
+
+[node name="TableCollision" type="StaticBody2D" parent="Props"]
+position = Vector2(350, 150)
+
+[node name="TableShape" type="CollisionShape2D" parent="Props/TableCollision"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="CouchCollision" type="StaticBody2D" parent="Props"]
+position = Vector2(150, 140)
+
+[node name="CouchShape" type="CollisionShape2D" parent="Props/CouchCollision"]
+shape = SubResource("RectangleShape2D_5")
+
+[node name="BookshelfCollision" type="StaticBody2D" parent="Props"]
+position = Vector2(90, 100)
+
+[node name="BookshelfShape" type="CollisionShape2D" parent="Props/BookshelfCollision"]
+shape = SubResource("RectangleShape2D_6")
 
 [node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(256, 200)
@@ -99,6 +205,11 @@ position = Vector2(256, 220)
 script = ExtResource("4")
 marker_id = "from_exterior"
 
+[node name="from_upper" type="Marker2D" parent="Spawns"]
+position = Vector2(420, 150)
+script = ExtResource("4")
+marker_id = "from_upper"
+
 [node name="default" type="Marker2D" parent="Spawns"]
 position = Vector2(256, 180)
 script = ExtResource("4")
@@ -111,3 +222,12 @@ target_spawn_id = "from_interior"
 
 [node name="DoorShape" type="CollisionShape2D" parent="DoorTransition"]
 shape = SubResource("RectangleShape2D_2")
+
+[node name="StairsTransition" type="Area2D" parent="."]
+position = Vector2(435, 85)
+script = ExtResource("5")
+target_area = "res://game/scenes/areas/Area_HeroHouseUpper.tscn"
+target_spawn_id = "from_ground"
+
+[node name="StairsShape" type="CollisionShape2D" parent="StairsTransition"]
+shape = SubResource("RectangleShape2D_3")

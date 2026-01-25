@@ -220,7 +220,7 @@ Complete exterior tilemap and props for the protagonist's house.
 
 ---
 
-## Milestone 16 — Hero's Home interior ground floor  **Owner:** World Builder + Art Pipeline
+## Milestone 16 — Hero's Home interior ground floor  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Interior scene for hero's home main floor.
 

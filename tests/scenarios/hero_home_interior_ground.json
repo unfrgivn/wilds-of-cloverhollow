@@ -1,0 +1,25 @@
+{
+  "scenario_id": "hero_home_interior_ground",
+  "description": "Verify Hero's Home interior ground floor: kitchen and living room areas",
+  "scene": "res://game/scenes/areas/Area_HeroHouseInterior.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "initial_interior_spawn"},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "kitchen_area"},
+    {"type": "move", "direction": "up", "frames": 40},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_stove"},
+    {"type": "move", "direction": "left", "frames": 100},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "living_room_area"},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_couch"},
+    {"type": "move", "direction": "right", "frames": 50},
+    {"type": "move", "direction": "down", "frames": 40},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_exit_door"}
+  ]
+}

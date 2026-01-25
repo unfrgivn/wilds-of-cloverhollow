@@ -1,8 +1,0 @@
-{
-  "id": "facade_sign_emblem",
-  "parts": [
-    { "type": "cylinder", "height": 0.08, "radius": 0.7, "pos": [0, 0.04, 0], "color": "sign_gold" },
-    { "type": "cylinder", "height": 0.04, "radius": 0.5, "pos": [0, 0.08, 0], "color": "sign_red" },
-    { "type": "box", "size": [0.4, 0.04, 0.1], "pos": [0, 0.1, 0.2], "color": "sign_white" }
-  ]
-}

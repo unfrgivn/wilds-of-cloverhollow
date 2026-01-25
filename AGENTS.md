@@ -1,70 +1,53 @@
-# AGENTS.md — Operating Manual for Coding + Content Agents
+# AGENTS.md
 
-This repo is designed to be driven by autonomous agents (opencode) without requiring OS-level control of a running game window.
+This repo is designed for autonomous agent work.
 
-## 1) Non-negotiable workflow
+## Non-negotiable rules
+1. `spec.md` is the single source of truth.
+   - If you change behavior, interfaces, file formats, or decisions, update `spec.md` in the same milestone commit.
+2. Do not stop to ask questions.
+   - Make reasonable assumptions and proceed.
+   - If missing input is truly required, add a new future milestone in `docs/working-sessions/plan.md` with clear acceptance criteria and continue.
+3. One commit per milestone.
+   - Commit message format: `Milestone <N>: <Title>`
+4. No OS-level window control.
+   - All verification must run via Scenario Runner and deterministic artifacts (captures + traces).
+5. Small diffs only.
+   - Avoid refactors unless required to complete the current milestone.
 
-1. **Spec-first**: read and follow `./spec.md`. If you change behavior or formats, update `spec.md` in the same change.
-2. **Automate everything**: features must be testable headlessly and/or via Scenario Runner.
-3. **No manual, irreproducible art**: runtime assets must be reproducible from `art/recipes/...` + `art/templates/...`.
+## Definition of Done (every milestone)
+A milestone is complete only if all are true:
 
-## 2) Repo conventions
+A) Implementation
+- Code + scenes live under `res://game/...` only (unless spec explicitly says otherwise).
+- No manual editor-only steps required to reproduce; if unavoidable, document precisely in `docs/`.
 
-### 2.1 Godot paths
-- Game code lives under: `res://game/...` (repo folder `./game/...`)
-- Use `res://game/scenes/...` for scenes and `res://game/scripts/...` for scripts.
+B) Spec hygiene
+- `spec.md` updated if anything changed materially.
 
-### 2.2 Naming
-- Scenes: `PascalCase.tscn` or `Area_<Biome>_<Name>.tscn`
-- Scripts: `snake_case.gd` or `PascalCase.gd` (pick one and stay consistent)
-- Data resources: `*.tres` with stable ids
+C) Automation
+- Add or update at least one Scenario Runner scenario proving the milestone.
+- Ensure deterministic artifacts written under `captures/`.
+- If UI/visual changes occurred: add/update a rendered capture scenario.
 
-### 2.3 Asset boundaries
-- `art/` is source-of-truth for generation templates, recipes, and raw outputs.
-- `game/assets/` is *runtime/imported* only. Do not hand-edit generated outputs.
+D) Tests
+- Add/update tests where appropriate.
 
-## 3) Required automation entrypoints
+E) Docs
+- Update `docs/` if new flags, commands, workflows, or schemas were introduced.
 
-Agents must maintain these scripts:
-- `tools/ci/run-smoke.sh`
-- `tools/ci/run-tests.sh`
-- `tools/ci/run-scenario.sh <scenario_id>`
+## Mandatory commands to run (every milestone)
+Agents must run and report results for:
 
-### 3.1 Scenario Runner requirements
-The game must support running a deterministic scenario from CLI args:
-- `--scenario <id>`
-- `--capture_dir <dir>`
-- `--seed <int>`
-- `--quit_after_frames <int>`
+- `./tools/ci/run-smoke.sh`
+- `./tools/ci/run-tests.sh`
+- `./tools/ci/run-spec-check.sh`
+- `./tools/ci/run-scenario.sh <scenario_id>`
+- `./tools/ci/run-scenario-rendered.sh <scenario_id>` (if present; if missing and milestone affects visuals/UI, implement it)
 
-The Scenario Runner must be able to:
-- load an area
-- move to a waypoint
-- interact with an object/NPC
-- trigger a visible enemy encounter
-- execute one full battle turn
-- exit
+## Milestone progression
+Use `/next-milestone` to select work from `docs/working-sessions/plan.md`.
 
-## 4) Recommended agent roles (opencode)
-
-These are configured under `./.opencode/agent/`.
-
-- **product-architect**: keeps `spec.md` coherent; defines acceptance criteria.
-- **godot-gameplay-engineer**: exploration systems, SceneRouter, GameState.
-- **battle-systems**: battle loop, turn system, data models.
-- **ui-systems**: dialogue, battle HUD, touch controls + safe-area.
-- **world-scene-builder**: area scenes, collisions, nav mesh, spawns, visible enemies.
-- **art-pipeline**: Pixel art templates, palette tools, bake scripts, validators.
-- **qa-automation**: test framework, CI reliability, scenario capture stability.
-
-## 5) Definition of done (any feature)
-
-A feature is "done" only if:
-- `spec.md` updated (if requirements/behavior changed)
-- tests added/updated OR scenario updated
-- `./tools/ci/run-spec-check.sh` passes
-- `./tools/ci/run-smoke.sh` passes
-- `./tools/ci/run-tests.sh` passes
-- `./tools/ci/run-visual-regression.sh` passes (golden capture + diff)
-- At least one scenario capture can be produced deterministically
-
+Milestone completion status convention:
+- Completed milestones include `**Status:** ✅ Completed (YYYY-MM-DD)` in the milestone header line.
+- Incomplete milestones have no status field.

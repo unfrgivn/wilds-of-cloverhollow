@@ -1,43 +1,28 @@
-# Wilds of Cloverhollow
+# Wilds of Cloverhollow (Pixel JRPG Scaffold)
 
-A cozy, family-friendly JRPG (iOS-first) with:
-- 3/4 overhead exploration camera (fixed, no rotation)
-- pixel art environments + sprite characters
-- visible enemies on the overworld
-- classic turn-based battles (pixel art battle backgrounds)
+This repo is a starter scaffold for building **Wilds of Cloverhollow** as a **classic pixel-art JRPG** in **Godot**.
 
-## Repo entry points
+## Quick start (macOS)
+1. Install Godot 4.x (recommended: 4.5).
+2. Open this folder in Godot.
+3. Run the project.
 
-- **Product spec (single source of truth):** `./spec.md`
-- **Agent operating manual:** `./AGENTS.md`
-- **Raw brainstorm notes:** `./NOTES.md`
-- **Docs hub:** `./docs/index.md`
-- **Working sessions playbook:** `./docs/working-sessions/index.md`
+## Working style
+- `spec.md` is the single source of truth.
+- Use `/next-milestone` to progress through `docs/working-sessions/plan.md`.
+- One commit per milestone.
 
-## Tooling prerequisites (local dev)
+## Scripts
+All scripts assume `GODOT_BIN` points at your Godot executable.
 
-- Godot 4.5.x (stable)
-- Python 3.11+ (palette + validation tools)
+Examples:
+- `GODOT_BIN="/Applications/Godot.app/Contents/MacOS/Godot" ./tools/ci/run-smoke.sh`
 
-## Common commands
-
-> These will work once the corresponding scripts are implemented by the coding agent.
-
-- Run the game:
-  - `godot --path .`
-
-- Headless smoke boot:
-  - `./tools/ci/run-smoke.sh`
-
-- Run tests (headless):
-  - `./tools/ci/run-tests.sh`
-
-- Run an automated scenario capture (no window control required):
-  - `./tools/ci/run-scenario.sh area01_smoke`
-
-## Where assets live
-
-- `art/` contains source assets, templates, and deterministic baking recipes.
-- `game/assets/` contains Godot-imported, runtime assets.
-
-Do not hand-edit baked outputs in `game/assets/`. Fix issues at the source/template level.
+## Repo layout (high level)
+- `spec.md` — game specification and locked decisions
+- `AGENTS.md` — agent operating rules (automation + no window control)
+- `docs/` — design + pipeline + working session docs
+- `.opencode/` — opencode commands, agents, and skills
+- `game/` — Godot project content under `res://game/...`
+- `art/` — source assets + palettes + recipes (not runtime imports)
+- `tools/` — CI scripts, linters, capture tooling stubs

@@ -1,8 +1,0 @@
-{
-  "id": "kit_roof_panel",
-  "type": "prop",
-  "parts": [
-    { "type": "box", "size": [4, 1.2, 4], "pos": [0, 0.6, 0], "color": "roof_red" },
-    { "type": "box", "size": [4, 0.2, 4], "pos": [0, 0.1, 0], "color": "wood_dark" }
-  ]
-}

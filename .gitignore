@@ -1,19 +1,18 @@
 # Godot
 .godot/
 .import/
-.export/
-*.tmp
+export.cfg
+export_presets.cfg
 
-# Builds / exports
-builds/
-export/
-
-# Capture artifacts
-captures/*
-!captures/README.md
-
-# Local AI outputs
-art/source/ai/nanobanana-output/
-
-# OS
+# macOS
 .DS_Store
+
+# Local artifacts
+captures/
+reports/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/

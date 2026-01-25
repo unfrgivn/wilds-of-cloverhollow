@@ -1,65 +1,26 @@
 # Scenario Runner
 
-## Goal
-Allow agents to playtest without OS-level control.
+## Why it exists
+Agents cannot rely on OS-level window control to playtest the game. The Scenario Runner provides deterministic, scripted playthroughs that can run from CLI and emit artifacts (trace + captures).
 
-## Inputs
-Run with CLI args passed after `--`:
-- `--scenario <id>`
-- `--capture_dir <dir>`
-- `--seed <int>`
-- `--quit_after_frames <int>`
-- `--touch_controls` (force TouchControls on desktop)
-- `--render_scale <float>` (override render scale preset)
+## CLI contract (baseline)
+The game should accept args after `--`, for example:
 
-## Scenario files
-Scenario definitions live in:
-- `tests/scenarios/<id>.json`
+- `--scenario scenario_id`
+- `--scenario_file tests/scenarios/scenario_id.json`
+- `--seed 12345`
+- `--capture_dir captures/<run_id>`
+- `--quit_after_frames 1800`
 
-Initial JSON schema (v1):
-```json
-{
-  "id": "movement_smoke",
-  "start_scene": "res://game/scenes/tests/TestRoom_Movement.tscn",
-  "seed": 12345,
-  "actions": [
-    {"type": "wait_frames", "frames": 30},
-    {"type": "move_to", "x": 4.0, "z": 2.0, "tolerance": 0.2, "timeout_frames": 600},
-    {"type": "capture", "label": "arrived"}
-  ]
-}
-```
+## Scenario actions (baseline)
+Recommended minimal action set:
+- `load_scene`: load an area/battle scene
+- `wait_frames`: advance deterministic frames
+- `move`: inject movement vector for N frames
+- `press`: simulate a button press (interact, confirm, cancel)
+- `capture`: save a PNG checkpoint with a label
+- `assert`: basic assertions (scene loaded, variable equals)
 
-## Outputs
-- `trace.json`
-- optional checkpoint frames from `capture` actions
-- optional movie output in deterministic mode
-
-Recommended capture folder structure:
-- `captures/<scenario_id>/<timestamp>/trace.json`
-- `captures/<scenario_id>/<timestamp>/frames/<label>_<frame>.png`
-- `captures/<scenario_id>/<timestamp>/movie/*.png` (PNG sequence, optional)
-
-Note: In headless mode, checkpoint frame capture is skipped. Use Movie Maker mode for visual regression.
-
-## Recommended scenario actions
-- wait_frames
-- move_to (navagent)
-- interact (by node name/group)
-- trigger_encounter
-- select_battle_command
-- capture_checkpoint
-
-## Deterministic video capture (preferred)
-Prefer Godot Movie Maker mode for regression because it does not require OS-level screen recording.
-
-Example pattern (actual flags may vary by implementation):
-```bash
-godot --path . --write-movie "captures/<id>/movie/frame.png" --fixed-fps 30 -- --scenario <id> --quit_after_frames 1800
-```
-
-Repo helper:
-- `./tools/ci/run-scenario-rendered.sh <scenario_id>` produces a Movie Maker capture under `captures/<scenario_id>/<timestamp>/movie`.
-- Set `HEADLESS_MODE=1` to force headless rendering when supported.
-- Set `AUDIO_DRIVER=Dummy` to suppress audio device errors during capture.
-- Set `EXTRA_ARGS="--touch_controls"` to pass extra project args.
+## Artifacts
+- `trace.json`: chronological events + asserts
+- `frames/*.png`: capture checkpoints

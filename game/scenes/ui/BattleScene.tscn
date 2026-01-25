@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="BattleScene" type="Node2D"]
+
+[node name="Label" type="Label" parent="."]
+text = "Battle (placeholder)"
+position = Vector2(16, 16)

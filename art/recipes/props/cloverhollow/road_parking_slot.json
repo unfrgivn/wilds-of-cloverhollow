@@ -1,7 +1,0 @@
-{
-  "id": "road_parking_slot",
-  "parts": [
-    { "type": "box", "size": [3.2, 0.02, 0.1], "pos": [-0.6, 0.01, 0], "color": "road_marking" },
-    { "type": "box", "size": [3.2, 0.02, 0.1], "pos": [0.6, 0.01, 0], "color": "road_marking" }
-  ]
-}

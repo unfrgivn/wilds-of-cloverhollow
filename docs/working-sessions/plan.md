@@ -1,793 +1,203 @@
-# Detailed plan: from scaffold → fully playable iOS JRPG
+# Working Sessions Plan
 
-This plan assumes:
-- you develop on macOS only,
-- iOS native is the only target for v0,
-- agents cannot depend on OS-level window control,
-- and art must be deterministic (template + recipes, not manual edits).
+This file is the milestone source. `/next-milestone` selects work from here.
 
-The goal is to ship a **vertical slice** first, then grow content packs (biomes) predictably.
+Status convention:
+- Completed milestones include `**Status:** ✅ Completed (YYYY-MM-DD)` in the milestone header line.
+- Incomplete milestones have no status field.
 
 ---
 
-## Guiding principles (non-negotiable)
-
-1) **Spec-first**: `spec.md` is authoritative. Any behavior change requires a `spec.md` update in the same change.
-2) **No manual art drift**: runtime assets are generated from `art/recipes/` + `art/templates/` and validated.
-3) **Automation first**: every milestone adds or updates at least one Scenario Runner scenario.
-4) **Town-first**: Cloverhollow is the style lock anchor; do not expand biomes until Cloverhollow is stable.
-
----
-
-## Toolchain prerequisites
-
-Minimum:
-- Godot 4.5.x (stable)
-- Python 3.11+ (scripts)
-
-Later (for device builds):
-- Xcode (iOS export)
-
----
-
-## Pixel art conversion milestones (v3)
-
-### Milestone P1 — Pixel Art Design Kit + pipeline
-**Owner:** Art Pipeline + Product Architect
-**Status:** ✅ Completed (2026-01-23)
-
-**Objective**
-Lock the pixel art kit (grid, palette, shading) and update the bake pipeline to output pixel assets deterministically.
-
-**Tasks**
-1. Update `spec.md` + docs/art/* to define the pixel art kit.
-2. Update bake scripts to render pixel art (props, buildings, sprites, backgrounds).
-3. Enforce nearest-neighbor filtering and palette quantization in outputs.
-
-**Acceptance criteria**
-- A recipe can generate a pixel prop + sprite with consistent palette compliance.
-
-**Notes**
-- Pixel kit defaults set to 24 px/m with 48 px overworld sprites and 72 px battle sprites.
-- Bake scripts render pixel textures from recipes (Sprite3D/PNG outputs).
-
----
-
-### Milestone P2 — Cloverhollow pixel conversion (core pack)
-**Owner:** Art Pipeline + World Scene Builder
-**Status:** ✅ Completed (2026-01-23)
-
-**Objective**
-Convert Cloverhollow to the simplified pixel art style.
-
-**Tasks**
-1. Convert town props + facades to pixel assets.
-2. Convert Fae + 2 NPCs + 1 enemy to pixel sprites.
-3. Convert one Cloverhollow battle background to pixel art.
-
-**Acceptance criteria**
-- Town scene uses pixel props + facades with no 3D low-poly assets.
-- Overworld + battle sprites are pixel art and palette compliant.
-
-**Notes**
-- Cloverhollow props, facades, sprites, and battle backgrounds re-baked at 24 px/m with 48/72 px sprite sizing.
-
----
-
-### Milestone P3 — Biome conversion pass
-**Owner:** Art Pipeline + QA Automation
-**Status:** ✅ Completed (2026-01-23)
-
-**Objective**
-Convert remaining biome packs to the pixel art style with deterministic outputs.
-
-**Tasks**
-1. Convert each biome prop kit + backgrounds.
-2. Convert biome enemy sprites.
-3. Update scenario captures and visual baselines.
-
-**Acceptance criteria**
-- All biomes render with pixel art assets and pass capture checks.
-
-**Notes**
-- Bubblegum Bay capture updated at `captures/bubblegum_bay_smoke/20260123_230937`.
-
----
-
-### Milestone P4 — Pixel polish + validation
-**Owner:** Art Pipeline + QA Automation
-**Status:** ✅ Completed (2026-01-23)
-
-**Objective**
-Stabilize the pixel art look and automate regression testing.
-
-**Tasks**
-1. Add validation rules for palette compliance + pixel grid.
-2. Stabilize golden captures for key scenarios.
-
-**Acceptance criteria**
-- Visual regression reports are stable across runs.
-
-**Notes**
-- Asset validation passes with `python tools/python/validate_assets.py --all --check-missing`.
-- Visual regression updated at `captures/20260123_233758` with report `reports/visual-diff/20260123_233758/index.html`.
-
----
-
-## Milestone 0 — Repo boot + CI sanity
-
-**Owner:** QA Automation + Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 0 — Repo boot + CI sanity  **Owner:** QA Automation + Godot Gameplay Engineer
 ### Objective
-The project boots reliably (macOS) and has working headless entrypoints.
-
-### Tasks
-1. Confirm `project.godot` boots and loads `res://game/bootstrap/Main.tscn`.
-2. Implement minimal `game/bootstrap/boot.gd` so it:
-   - parses CLI user args after `--` (for later)
-   - loads a test scene (temporary)
-3. Ensure `tools/ci/run-smoke.sh`:
-   - runs Godot headless
-   - fails on errors
-4. Set up GUT test framework (if not already) and make `tools/ci/run-tests.sh` run it.
+The project boots reliably (macOS) and has a repeatable CLI workflow for smoke/tests/scenarios.
 
 ### Acceptance criteria
-- `./tools/ci/run-smoke.sh` passes on macOS.
-- `./tools/ci/run-tests.sh` passes on macOS.
-
-### Files (expected)
-- `game/bootstrap/boot.gd`
-- `game/bootstrap/Main.tscn`
-- `tools/ci/run-smoke.sh`
-- `tools/ci/run-tests.sh`
+- Godot project opens and runs the default scene.
+- `./tools/ci/run-smoke.sh` returns 0.
+- `./tools/ci/run-tests.sh` returns 0 (even if only placeholder tests exist).
+- `./tools/ci/run-scenario.sh scenario_smoke` runs and produces a trace under `captures/`.
+- `spec.md` reflects the current project constraints.
 
 ---
 
-## Milestone 1 — Exploration core: movement + camera + 8-direction facing
-
-**Owner:** Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 1 — Pixel exploration core (2D)  **Owner:** Godot Gameplay Engineer
 ### Objective
-Player can move with free analog input in a 3D scene, with a fixed 3/4 overhead camera and stable 8-direction sprite facing.
-
-### Tasks
-1. Create `game/scenes/actors/Player.tscn`:
-   - `CharacterBody3D` root
-   - `CollisionShape3D`
-   - `AnimatedSprite3D` visual
-2. Implement `game/scripts/exploration/player.gd`:
-   - analog input → normalized movement
-   - diagonal normalization (no faster diagonals)
-   - 8-direction selection from movement vector
-3. Create `game/scenes/camera/FollowCameraRig.tscn`:
-   - orthographic `Camera3D`
-   - fixed pitch ~-60°, no yaw rotation
-   - follow player in X/Z
-4. Create a test room scene `game/scenes/tests/TestRoom_Movement.tscn` with collisions.
-5. Add a Scenario Runner scenario `tests/scenarios/movement_smoke.json`:
-   - load test room
-   - move in a square
-   - capture a checkpoint
+Playable 2D exploration slice with pixel-stable camera and a controllable player.
 
 ### Acceptance criteria
-- Player moves smoothly, no wall clipping.
-- Facing changes correctly across all 8 directions.
-- Camera does not jitter.
-- `./tools/ci/run-scenario.sh movement_smoke` produces artifacts.
+- 2D area scene exists (`Area_Cloverhollow_Test.tscn` or equivalent).
+- Player moves with free analog input (keyboard ok for now; touch later).
+- Camera2D follows player with pixel-stable movement (no shimmer).
+- Collisions exist (at least one wall/obstacle).
+- Scenario `exploration_walk_smoke` runs via Scenario Runner.
 
 ---
 
-## Milestone 2 — Interactions + dialogue
-
-**Owner:** UI Systems + Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 2 — Interaction + dialogue  **Owner:** Godot Gameplay Engineer + UI Systems
 ### Objective
-Player can interact with NPCs and objects, producing dialogue text and basic item pickup.
-
-### Tasks
-1. Define an `Interactable` interface (group tag + script) and `InteractionDetector` on Player.
-2. Implement `DialogueBox.tscn` + `dialogue_box.gd`:
-   - typewriter text
-   - tap to advance
-   - optional speaker name
-3. Add `Sign` and `Container` interactables:
-   - sign: displays text
-   - container: gives a stub item and sets a flag in GameState
-4. Add Scenario `interaction_smoke.json`:
-   - walk to sign, interact, capture
-   - walk to container, interact, capture
+Player can interact with an object/NPC and see a dialogue box.
 
 ### Acceptance criteria
-- All interactions work with keyboard/mouse on macOS and are touch-friendly by design.
-- GameState receives a flag or item stub.
-- Scenario produces deterministic captures.
+- Interaction detector (Area2D) on player.
+- At least one interactable (sign or NPC).
+- Dialogue UI appears and can be dismissed.
+- Scenario `interaction_smoke` proves it end-to-end.
 
 ---
 
-## Milestone 3 — SceneRouter + deterministic transitions
-
-**Owner:** Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 3 — Area transitions + spawn system  **Owner:** Godot Gameplay Engineer
 ### Objective
-Discrete areas load deterministically with spawn markers and transitions.
-
-### Tasks
-1. Implement `SceneRouter.gd`:
-   - `goto_scene(scene_path, spawn_marker_id)`
-   - fade-out → load → position → fade-in
-2. Define spawn markers via `Marker3D` with stable IDs.
-3. Implement `Door` interactable that routes scenes.
-4. Add scenario `transition_smoke.json`:
-   - start in one scene
-   - go through a door
-   - confirm spawn marker
-   - capture
+Discrete areas with stable spawn points and transitions.
 
 ### Acceptance criteria
-- Door transitions always spawn at correct marker.
-- No input loss or stuck state.
-- Scenario produces deterministic output.
+- A SceneRouter/AreaLoader exists.
+- At least two areas and one transition between them.
+- Stable spawn marker IDs (string IDs).
+- Scenario `area_transition_smoke` loads area A -> area B -> returns.
 
 ---
 
-## Milestone 4 — Visible enemies + encounter trigger
-
-**Owner:** World Scene Builder + Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 4 — Visible enemies + encounter trigger  **Owner:** Godot Gameplay Engineer
 ### Objective
-Enemies are visible in exploration and trigger battle on collision/interaction.
-
-### Tasks
-1. Create `EnemyActor.tscn`:
-   - simple patrol/wander
-   - trigger collider
-2. Implement `EncounterManager`:
-   - transition from exploration → battle
-   - pass encounter data (enemy ids, background id)
-3. Add scenario `encounter_trigger.json`:
-   - move to visible enemy
-   - trigger battle
-   - capture battle start
+Overworld enemies are visible and trigger battle reliably.
 
 ### Acceptance criteria
-- Touching the enemy triggers battle.
-- After battle resolves, player returns to exploration.
+- Enemy actor exists and is visible on map.
+- Collision/trigger starts battle transition.
+- Scenario `encounter_trigger_smoke` triggers a battle entry.
 
 ---
 
-## Milestone 5 — Battle system v0 (classic turn-based)
-
-**Owner:** Battle Systems + UI Systems
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 5 — Battle loop v0  **Owner:** Battle Systems + UI Systems
 ### Objective
-Turn-based battle loop with 4 party members and a top HUD (no cassette theming).
-
-### Tasks
-1. Implement `BattleScene.tscn` (2D root):
-   - background sprite (pre-rendered placeholder)
-   - enemy and party battler sprites
-   - top HUD: enemy list left, party list right (portraits + HP/MP)
-   - bottom: command menu + info box
-2. Implement core battle flow:
-   - start state → player command selection → resolve → enemy AI → loop
-   - win/lose
-3. Integrate with Scenario Runner:
-   - auto-select Attack for first party member
-   - run one full turn
-   - capture
+A minimal but complete turn-based battle loop.
 
 ### Acceptance criteria
-- A battle can be completed.
-- UI is readable at the 1920×1080 reference and scales.
-- No cassette motifs.
+- Battle scene loads with placeholder background.
+- Party of 4 displayed.
+- Enemy displayed.
+- Turn order works for at least “Attack” and “Defend”.
+- Battle UI:
+  - status HUD at top (party + enemies)
+  - command menu boxes at bottom/side
+  - no cassette theming
+- Scenario `battle_one_turn` performs one action and ends the turn.
 
 ---
 
-## Milestone 6 — Data spine (Resources + JSON)
-
-**Owner:** Product Architect + Battle Systems
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 6 — Data-driven content spine  **Owner:** Data Systems + Gameplay
 ### Objective
-New content (enemies, skills, items) can be added without code changes.
-
-### Tasks
-1. Define `Resource` schemas:
-   - `EnemyDef`, `PartyMemberDef`, `SkillDef`, `ItemDef`, `EncounterDef`, `BiomeDef`
-2. Add loaders and stable IDs.
-3. Update battle to read from defs.
+Enemies/skills/items/encounters defined in data, not hard-coded.
 
 ### Acceptance criteria
-- Add a new enemy via data only.
+- Data schema exists for:
+  - biomes
+  - enemies
+  - skills
+  - items
+  - encounters
+- Adding a new enemy uses data + sprite drop-in only.
+- Content lint script exists (even if minimal).
 
 ---
 
-## Milestone 7 — Pre-rendered battle backgrounds (production path)
-
-**Owner:** Art Pipeline + Battle Systems
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 7 — Pixel art pipeline tooling  **Owner:** Art Pipeline + QA Automation
 ### Objective
-
-Battle backgrounds are baked deterministically and referenced by encounter data.
-
-### Tasks
-1. Standardize background outputs:
-   - `game/assets/battle_backgrounds/<biome>/<id>/bg.png`
-   - optional `fg.png`
-2. Implement `BattleBackgroundLoader`:
-   - loads bg + optional fg
-3. Provide first Cloverhollow background stub.
+Deterministic, non-artist-friendly asset workflow.
 
 ### Acceptance criteria
-- Battle uses correct background from encounter data.
+- Global palette and Cloverhollow palette exist under `art/palettes/`.
+- Scripts exist (can be stubs initially):
+  - quantize_to_palette
+  - validate_sprite
+  - pack_spritesheet
+- Docs exist for:
+  - tile workflow
+  - sprite workflow
+- At least one placeholder sprite set passes validation.
 
 ---
 
-## Milestone 8 — Scenario Runner + deterministic video capture
-
-**Owner:** QA Automation
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 8 — Golden capture + visual diff  **Owner:** QA Automation
 ### Objective
-Agents can run deterministic playtests without controlling a live window.
-
-### Tasks
-1. Implement Scenario Runner as an Autoload that:
-   - reads `--scenario <id>`
-   - executes actions with fixed frame stepping
-2. Add `tools/ci/run-scenario.sh` that:
-   - writes outputs under `./captures/<scenario>/<timestamp>/`
-3. Add a “golden path” scenario for the vertical slice:
-   - start at Fae’s house
-   - exit to town
-   - interact with NPC
-   - trigger visible enemy battle
-   - win
+Artifact-based testing for visuals without OS-level window control.
 
 ### Acceptance criteria
-- Scenario runs unattended and produces artifacts.
-- Video capture is the primary regression signal.
+- Rendered scenario runner exists (`run-scenario-rendered.sh`).
+- At least 3 golden scenarios produce deterministic capture frames.
+- Diff report generated against baselines.
+- Baseline update workflow documented.
 
 ---
 
-## Milestone 9 — Art pipeline: beginner-friendly, deterministic
-
-**Owner:** Art Pipeline
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 9 — Spec drift guardrail  **Owner:** Spec Steward + QA Automation
 ### Objective
-You (without graphics experience) can generate:
-- a new NPC sprite set,
-- a new enemy sprite set,
-- a new battle background,
-and import them into Godot with no manual editor tweaking.
-
-### Tasks
-1. Create pixel art templates:
-   - sprite render template
-   - battle background stage template
-2. Implement “one command” scripts:
-   - bake character sprite sets (8-dir overworld + L/R battle)
-   - bake battle backgrounds
-3. Implement palette quantization + validation.
-4. Document workflows in `docs/art/no-artist-workflows.md`.
+Prevent spec drift.
 
 ### Acceptance criteria
-- A new asset can be reproduced from `art/recipes/...`.
+- CI/local check fails if `game/**` changes but `spec.md` does not.
+- Allow explicit override for known refactors.
+- Documented in `docs/working-sessions/`.
 
 ---
 
-## Milestone 10 — iOS packaging + touch polish
-
-**Owner:** UI Systems + QA Automation
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 10 — Cloverhollow town pack v0  **Owner:** World Builder + Art Pipeline
 ### Objective
-Game is comfortable on iPhone/iPad in landscape with safe-area aware touch controls.
-
-### Tasks
-1. Implement `TouchControls.tscn`:
-   - virtual joystick
-   - action button
-2. Safe-area placement
-3. Performance toggles (render scale)
-4. iOS export documentation + on-device smoke checklist
+First real content pack (style lock).
 
 ### Acceptance criteria
-- Vertical slice runs on a real iPhone/iPad.
+- Cloverhollow area has at least:
+  - hero house exterior
+  - town center
+  - school exterior (blockout ok)
+  - arcade exterior (blockout ok)
+- Minimum prop set implemented as reusable sprites (bench, sign, lamp, tree, fence).
+- At least one non-scary enemy type.
+- At least one battle background.
 
 ---
 
-## Milestone 11 — Core JRPG systems (inventory, tools, quests)
-
-**Owner:** Godot Gameplay Engineer + Product Architect
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 11 — Biome pack factory workflow  **Owner:** World Producer + Art Pipeline
 ### Objective
-Move from “slice” to “game” by implementing the minimum systems needed to support:
-- tool-gated exploration (lantern/blacklight, lasso, flute, journal),
-- simple quests and flags,
-- inventory and consumables,
-- and party progression.
-
-### Tasks
-1. Inventory system:
-   - Item definitions (`ItemDef`) and quantities
-   - Add/remove items, simple UI list
-2. Tool system:
-   - Tool items are inventory-backed but activate world interactions
-   - Tool-gated interactables (e.g., hidden note reveals with lantern)
-3. Quest/flag system:
-   - Quest definition format
-   - Objective state (flags + counters)
-   - Quest reward hooks (items/party)
-4. Party system:
-   - Party roster (up to 4)
-   - Join/leave support (story-driven)
-5. Save/load:
-   - save slot
-   - serialize inventory, quest flags, position, biome
+Adding a biome is repeatable and safe.
 
 ### Acceptance criteria
-- A tool-gated interaction exists in Cloverhollow (e.g., lantern reveals a hidden note).
-- A simple quest can be completed via data definitions.
+- `/new-biome <id>` scaffolds docs + palette + stub data + scenario stub.
+- Biome checklist is enforced (at least by linter or human checklist).
+- Implement Bubblegum Bay as the first non-town biome pack.
 
 ---
 
-## Milestone 12 — Biome pack expansion process (repeatable content pipeline)
-
-**Owner:** Product Architect + Art Pipeline + World Scene Builder
-**Status:** ✅ Completed (2026-01-24)
-
-**Objective**
-Add new biomes (Bubblegum Bay, Pinecone Pass, etc.) using a repeatable pack process without destabilizing systems.
-
-
-### Tasks
-1. Implement `BiomeDef` loader and registry.
-2. Create per-biome folders using the biome pack skill:
-   - docs, palettes, pixel kit settings, recipes, starter scenes
-3. Define a minimum per-biome “ship checklist” (see biome workshop doc).
-4. Add one additional biome end-to-end (Bubblegum Bay) as the template example.
-5. Add at least one scenario per biome for regression.
-
-### Acceptance criteria
-- Bubblegum Bay is playable end-to-end (enter biome, interact, one encounter, battle, return).
-- Adding Pinecone Pass is mostly copy/paste + new content recipes.
-
-**Notes**
-- Biome defs include palette + pixel kit settings.
-- Bubblegum Bay uses pixel ground prop and capture `captures/bubblegum_bay_smoke/20260124_085224`.
-
----
-
-## Milestone 13 — Polish pass (visual, UX, performance)
-
-**Owner:** UI Systems + Art Pipeline + QA Automation
-**Status:** ✅ Completed (2026-01-24)
-
-**Objective**
-Make the game feel production-ready: readable UI on iPhone, stable performance, consistent art.
-
-
-### Tasks
-1. UI pass:
-   - improve battle command flow
-   - add targeting UI
-   - add status effects clarity
-2. Animation/VFX pass:
-   - add hit flashes, simple effects (palette-safe)
-3. Performance:
-   - render scale option
-   - reduce overdraw
-   - iOS profiling checklist
-4. Visual regression:
-   - establish golden capture baselines and a diff workflow
-
-### Acceptance criteria
-- Vertical slice runs smoothly on target devices and looks consistent across scenes.
-
-**Notes**
-- Battle UI uses grid commands, target submenu, and cursor with hit flash feedback.
-- Render scale presets remain 1.0/0.85/0.7 via PerformanceSettings.
-- Visual regression updated at `captures/20260124_100106` with report `reports/visual-diff/20260124_100106/index.html`.
-
----
-
-## Milestone 14 — Cloverhollow battle background bake
-
-**Owner:** Art Pipeline
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 12 — iOS touch controls  **Owner:** UI Systems + Gameplay
 ### Objective
-Bake a deterministic Cloverhollow battle background and register it for encounters.
-
-### Tasks
-1. Create a pixel art recipe + template for the Cloverhollow battle background.
-2. Bake a background to `game/assets/battle_backgrounds/cloverhollow/meadow_stub/bg.png` (optional `fg.png`).
-3. Validate output via scenario capture (no fallback texture).
+Playable on iPhone/iPad landscape with touch.
 
 ### Acceptance criteria
-- Encounter uses baked Cloverhollow background without fallback.
-- Outputs are reproducible from `art/recipes/...` and `art/templates/...`.
-
-### Notes
-- Requires art direction input on Cloverhollow scene composition and palette alignment.
+- Virtual joystick + interact button.
+- Safe placement for iPhone notches.
+- No critical UI overlap.
 
 ---
 
-## Milestone 15 — Cloverhollow art lock + prop kit
-
-**Owner:** Art Pipeline + Product Architect
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 13 — Save/Load + tools (lantern/journal/lasso/flute)  **Owner:** Gameplay + Data Systems
 ### Objective
-Lock the Cloverhollow look and ship a minimal prop kit plus one enemy family.
-
-### Tasks
-1. Finalize Cloverhollow palette + pixel kit settings.
-2. Produce 10 town props (pixel art) via `art/recipes/...` and `art/templates/...`.
-3. Create one enemy family sprite set (overworld + battle).
+Start the “adventure + puzzle + light RPG” loop.
 
 ### Acceptance criteria
-- Palette + pixel kit settings are committed under `art/palettes/` and referenced in docs.
-- 10 props exist as deterministic recipes and runtime assets under `game/assets/props/`.
-- Enemy family has baked sprites under `game/assets/sprites/enemies/<family>/...`.
+- Save/load for player position and inventory.
+- Implement at least one tool-gated interaction (placeholder art ok).
+- Add at least one “school life” gating puzzle stub.
 
-### Notes
-- Needs final art direction call on Cloverhollow prop list.
 
 ---
 
-## Milestone 16 — Cloverhollow town exterior (playable)
-
-**Owner:** World Scene Builder + Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
+## Milestone 14 — Optional: 8-direction overworld animation upgrade  **Owner:** Art Pipeline + Gameplay
 ### Objective
-Build a real town exterior with NPCs, interactions, and navigation.
-
-### Tasks
-1. Create `Area_Cloverhollow_Town.tscn` with navmesh, collisions, and spawn markers.
-2. Place at least 2 NPCs, 1 sign, 1 container, and a bus stop placeholder.
-3. Wire SceneRouter transitions to Fae house and to battle encounters.
+Increase animation fidelity without breaking the pixel style lock.
 
 ### Acceptance criteria
-- Town is fully walkable with interactables and visible enemy encounter.
-- Scenario Runner can traverse town and hit all required interactions.
-
----
-
-## Milestone 17 — Fae house interior + routing
-
-**Owner:** World Scene Builder + Godot Gameplay Engineer
-**Status:** ✅ Completed (2026-01-19)
-
-### Objective
-Ship Fae house interior and wire transitions to/from town.
-
-### Tasks
-1. Build `Area_Cloverhollow_FaeHouse.tscn` with props and collisions.
-2. Add door interactables and spawn markers for enter/exit.
-3. Update SceneRouter entries for house/town links.
-
-### Acceptance criteria
-- Player can start inside Fae house and walk to town.
-- Scenario Runner captures the transition deterministically.
-
----
-
-## Milestone 18 — Cloverhollow sprites + battle backgrounds
-
-**Owner:** Art Pipeline + Battle Systems
-
-### Objective
-Replace placeholders with baked sprites and battle background art.
-
-### Tasks
-1. Bake Fae + NPC sprite sets (8-dir overworld, 2-dir battle).
-2. Bake at least one Cloverhollow battle background (bg + optional fg).
-3. Wire EncounterDefs to the baked background ids.
-
-### Acceptance criteria
-- Overworld uses sprites (not capsules) for Fae/NPCs/enemy.
-- Battles use baked Cloverhollow background with no fallback.
-
----
-
-## Milestone 19 — Playable town demo + visual baseline
-
-**Owner:** QA Automation + Product Architect
-
-### Objective
-Deliver a playable town demo with deterministic captures.
-
-### Tasks
-1. Add golden scenario that starts at Fae house, reaches town, interacts with 2 NPCs + sign + container, triggers battle, and returns.
-2. Run rendered capture and update visual baselines.
-
-### Acceptance criteria
-- Golden scenario passes headlessly and with rendered capture.
-- Visual baseline artifacts are stored under `captures/`.
-
----
-
-## Milestone 20 — Character sprite pipeline v1 (Fae + NPCs)
-
-**Owner:** Art Pipeline + UI Systems
-
-### Objective
-Ship deterministic character sprite outputs for Fae and a small NPC set using the final palette + pixel kit.
-
-### Tasks
-1. Finalize the pixel art sprite template + renderer (overworld idle/walk).
-2. Bake Fae + at least 2 town NPCs to `game/assets/sprites/characters/<id>/`.
-3. Update validation to enforce naming and frame counts for character outputs.
-4. Add scenario `character_sprite_smoke.json` that captures Fae + NPCs in town.
-
-### Acceptance criteria
-- Fae and NPCs use baked sprites for overworld idle/walk in Cloverhollow.
-- Sprite outputs are deterministic and palette-compliant.
-- Scenario produces deterministic captures.
-
----
-
-## Milestone 21 — Battle sprite suite (attack/hurt)
-
-**Owner:** Art Pipeline + Battle Systems
-
-### Objective
-Expand battle sprites beyond idle to include attack/hurt for Fae and a Cloverhollow enemy family.
-
-### Tasks
-1. Add battle animation frames (attack/hurt) to pixel sprite recipes.
-2. Bake battle sprite frames for Fae and the Cloverhollow enemy family.
-3. Wire battle state to play attack/hurt animations.
-4. Add scenario `battle_animation_smoke.json` capturing a full attack/hurt sequence.
-
-### Acceptance criteria
-- Battle sprites include attack/hurt frames and follow naming conventions.
-- Battle animations trigger correctly in the turn loop.
-- Scenario produces deterministic captures.
-
----
-
-## Milestone 22 — Cloverhollow building facade pipeline
-
-**Owner:** Art Pipeline + World Scene Builder
-
-### Objective
-Replace placeholder building meshes with deterministic, style-locked facades.
-
-### Tasks
-1. Define a modular facade template (walls, roofs, windows) with palette + pixel kit constraints.
-2. Create facade recipes for School, Arcade, Library, Cafe, Clinic.
-3. Bake and import facades under `game/assets/buildings/`.
-4. Replace placeholder building meshes in `Area_Cloverhollow_Town.tscn` and update collisions.
-
-### Acceptance criteria
-- Town facades match Cloverhollow style lock and palette + pixel kit requirements.
-- Building collisions align with navmesh and interactables.
-
----
-
-## Milestone 23 — Cloverhollow decor kit polish
-
-**Owner:** Art Pipeline + World Scene Builder
-
-### Objective
-Finalize decor props (fences, lamps, benches, foliage) for a cohesive town look.
-
-### Tasks
-1. Expand decor recipes under `art/recipes/props/cloverhollow/` with final-quality props.
-2. Bake and validate decor assets for palette compliance and budgets.
-3. Replace remaining placeholder decor in the town scene.
-4. Add scenario `town_decor_smoke.json` to capture updated decor density.
-
-### Acceptance criteria
-- Decor props are deterministic and palette-compliant.
-- Town scene uses final decor assets without placeholder meshes.
-
----
-
-## Milestone 24 — Town art pass + visual baseline
-
-**Owner:** Product Architect + Art Pipeline + QA Automation
-
-### Objective
-Polish Cloverhollow to style-lock quality and refresh visual baselines.
-
-### Tasks
-1. Audit Cloverhollow scenes for palette + pixel kit compliance and scale consistency.
-2. Replace any remaining placeholder meshes or unbaked assets.
-3. Run rendered capture scenarios and update visual baselines.
-
-### Acceptance criteria
-- Cloverhollow exterior + Fae house are style-locked.
-- Visual baselines are updated under `captures/`.
-
----
-
-## Milestone 25 — Art pipeline hardening + CI checks
-
-**Owner:** Art Pipeline + QA Automation
-
-### Objective
-Harden validation and CI guardrails to prevent art drift.
-
-### Tasks
-1. Add `tools/ci/run-asset-check.sh` to validate recipes vs runtime assets.
-2. Extend `tools/python/validate_assets.py` for palette compliance and naming.
-3. Add CI coverage for asset validation failures.
-
-### Acceptance criteria
-- CI fails when assets lack recipes or violate palette/naming rules.
-- Asset checks are deterministic and reproducible.
-
----
-
-## Milestone 26 — Style-lock hero art pack
-
-**Owner:** Product Architect + Art Pipeline + World Scene Builder + Battle Systems
-
-### Objective
-Produce a small set of hero assets that define the final art style for the game.
-
-### Tasks
-1. Create a hero building facade recipe (Town Hall) with distinct silhouette and palette accents.
-2. Create a hero prop recipe (Town Fountain) as the style reference for props.
-3. Refine hero NPC and enemy recipes (Mayor + Slime) to match style lock.
-4. Author a hero battle background recipe for Cloverhollow town square.
-5. Replace placeholders in town and battle scenes with hero assets.
-6. Capture `style_lock_smoke.json` (town) and `battle_animation_smoke.json` (battle).
-
-### Acceptance criteria
-- Town Hall + Fountain appear in Cloverhollow with palette + pixel kit compliance.
-- Mayor + Slime sprites use refined silhouettes and match the hero look.
-- Battle uses hero background with updated captures.
-
----
-
-## Milestone 27 — Modular building kit v1
-
-**Owner:** Art Pipeline + World Scene Builder
-
-### Objective
-Establish a reusable building kit that can author all Cloverhollow facades consistently.
-
-### Tasks
-1. Define modular wall, roof, window, and door prop recipes.
-2. Update facade recipes for School, Arcade, Library, Cafe, Clinic to use the kit.
-3. Bake and import updated facades under `game/assets/buildings/`.
-4. Validate collisions and navmesh alignment in town scene.
-5. Capture `building_facade_smoke.json` after updates.
-
-### Acceptance criteria
-- All town facades use the modular kit and share consistent proportions.
-- Building collisions remain aligned with navigation and interactables.
-
----
-
-## Milestone 28 — Sprite polish pass v1
-
-**Owner:** Art Pipeline + Battle Systems + UI Systems
-
-### Objective
-Polish overworld and battle sprites for hero characters to final-quality silhouettes.
-
-### Tasks
-1. Refine Fae, Mayor, Kid, and Slime recipes with multi-part shapes.
-2. Re-bake overworld idle/walk and battle idle/attack/hurt frames.
-3. Ensure sprite loader and battle animations still resolve correctly.
-4. Capture `character_sprite_smoke.json` and `battle_animation_smoke.json` with new sprites.
-
-### Acceptance criteria
-- Overworld and battle sprites show refined silhouettes and clean shading.
-- Scenarios produce deterministic captures for sprite polish.
+- Player overworld supports 8-direction animation.
+- Diagonal movement uses diagonal sprites (not nearest-cardinal).
+- Sprite pipeline and validation updated to handle 8-direction sets.
+- Visual regression baselines updated intentionally.

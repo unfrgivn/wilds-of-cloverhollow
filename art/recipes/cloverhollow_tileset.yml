@@ -1,0 +1,18 @@
+id: cloverhollow_tileset_v0
+type: tileset
+biome: cloverhollow
+tile_size: 16
+output:
+  raw_dir: art/tilesets/cloverhollow/source
+  atlas: art/tilesets/cloverhollow/atlas.png
+palette:
+  global: art/palettes/global_ui_skin.palette.json
+  biome: art/palettes/cloverhollow.palette.json
+generation:
+  model: TBD
+  seed: 12345
+  prompt: >
+    Pixel art tileset for a cozy small town biome.
+    Clean shapes, limited shading, no texture noise, fits 16x16 tiles.
+notes:
+  - This is a placeholder recipe. Replace model/prompt/seed once you lock a style.

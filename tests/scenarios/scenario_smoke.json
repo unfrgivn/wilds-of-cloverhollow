@@ -1,0 +1,17 @@
+{
+  "id": "scenario_smoke",
+  "actions": [
+    {
+      "type": "wait_frames",
+      "frames": 5
+    },
+    {
+      "type": "capture",
+      "label": "boot"
+    },
+    {
+      "type": "wait_frames",
+      "frames": 10
+    }
+  ]
+}

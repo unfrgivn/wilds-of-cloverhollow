@@ -1,8 +1,0 @@
-{
-  "id": "road_crack",
-  "parts": [
-    { "type": "box", "size": [2.8, 0.01, 0.06], "pos": [0, 0.005, 0], "color": "road_edge" },
-    { "type": "box", "size": [1.2, 0.01, 0.06], "pos": [-0.6, 0.005, 0.2], "color": "road_edge" },
-    { "type": "box", "size": [1.2, 0.01, 0.06], "pos": [0.8, 0.005, -0.2], "color": "road_edge" }
-  ]
-}

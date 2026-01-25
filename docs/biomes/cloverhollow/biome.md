@@ -1,21 +1,26 @@
 # Cloverhollow (main town)
 
-## Summary
-Cloverhollow is the starting biome and sets the visual "truth" for the whole game.
+This is the style anchor biome. Other biomes should feel compatible.
 
-## Must-have locations (v0)
-- Fae's house (start)
-- School
-- Park (playground)
-- Town center landmark
-- Grocery store
-- Taco truck
-- Ice cream shop
-- Arcade
-- Restaurant (Bon Appetit)
-- Bus stop for fast travel (stub)
+## Mood
+- Cozy, safe, friendly, playful.
 
-## Interaction goals
-- Cozy everyday-life props
-- Friendly NPCs
-- A clear town loop that teaches movement and interaction
+## Required locations (v0)
+- Hero house exterior (start point)
+- Town center
+- School exterior
+- Arcade exterior
+- Grocery exterior
+
+## Tile/prop needs (initial)
+Tiles:
+- grass/dirt/path
+- town sidewalk
+- simple building wall/roof tiles (blockout ok)
+
+Props:
+- bench
+- sign
+- street lamp
+- tree
+- fence

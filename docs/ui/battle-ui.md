@@ -1,20 +1,22 @@
-# Battle UI
+# Battle UI (v0)
 
-## Style guidance
-- Cassette Beasts is a reference for **clarity and framing only**.
-- Do **not** use cassette-player motifs or direct thematic borrowing.
-- Start with simple boxes; evolve into a unique Cloverhollow style later.
+## Goals
+- Fast readability on iPhone landscape.
+- Minimal theming to start; box UI is fine.
+- No cassette theming; do not reference cassette/player devices.
 
-## Baseline layout
+## Layout baseline
+- Top HUD:
+  - Party: portraits + HP/MP + status icons
+  - Enemies: names + HP (bar or numeric) + status icons
+- Bottom/side:
+  - Command menu boxes (Attack / Skill / Item / Defend / Run)
+  - Context/help box (shows selected action description)
 
-### Top HUD
-- Left: enemies (name + HP bar + status icons)
-- Right: party (name + HP/MP bars + status icons)
+## Interaction
+- Touch-friendly selection.
+- Keyboard navigation is acceptable for early development/testing.
 
-### Bottom UI
-- Right: command menu box (Attack / Skills / Items / Defend / Run)
-- Left: contextual help/info text
-
-## Input
-- iOS touch-first (tapping menu items)
-- Optional controller support later
+## Visual constraints
+- Use global UI palette colors.
+- Keep font large enough to read on iPhone landscape.

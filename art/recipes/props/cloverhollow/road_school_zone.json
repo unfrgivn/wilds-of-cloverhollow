@@ -1,8 +1,0 @@
-{
-  "id": "road_school_zone",
-  "parts": [
-    { "type": "box", "size": [4.0, 0.02, 2.0], "pos": [0, 0.01, 0], "color": "road_marking_yellow" },
-    { "type": "box", "size": [3.2, 0.02, 0.3], "pos": [0, 0.02, 0.4], "color": "sign_white" },
-    { "type": "box", "size": [3.2, 0.02, 0.3], "pos": [0, 0.02, -0.4], "color": "sign_white" }
-  ]
-}

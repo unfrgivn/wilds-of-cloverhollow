@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="SkillDef" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://game/scripts/data/skill_def.gd" id="1"]
-
-[resource]
-script = ExtResource("1")
-id = "spark"
-display_name = "Spark"
-description = "A tiny burst of magic for testing."

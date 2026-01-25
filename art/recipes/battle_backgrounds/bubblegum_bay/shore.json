@@ -1,9 +1,0 @@
-{
-  "id": "shore",
-  "type": "battle_background",
-  "biome": "bubblegum_bay",
-  "colors": {
-    "sky": "sky_day",
-    "ground": "dirt_base"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "id": "road_speed_bump",
-  "parts": [
-    { "type": "box", "size": [2.4, 0.08, 0.6], "pos": [0, 0.04, 0], "color": "road_edge" },
-    { "type": "box", "size": [2.2, 0.02, 0.12], "pos": [0, 0.09, 0], "color": "road_marking_yellow" }
-  ]
-}

@@ -1,8 +1,0 @@
-{
-  "id": "kit_window",
-  "type": "prop",
-  "parts": [
-    { "type": "box", "size": [2, 2, 0.4], "pos": [0, 1.0, 0], "color": "water_blue" },
-    { "type": "box", "size": [2.2, 0.2, 0.5], "pos": [0, 0.1, 0], "color": "wood_dark" }
-  ]
-}

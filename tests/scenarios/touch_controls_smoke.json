@@ -1,9 +1,0 @@
-{
-  "id": "touch_controls_smoke",
-  "start_scene": "res://game/scenes/tests/TestRoom_Movement.tscn",
-  "seed": 12345,
-  "actions": [
-    {"type": "wait_frames", "frames": 30},
-    {"type": "capture", "label": "touch_controls"}
-  ]
-}

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-
-python3 "$ROOT_DIR/tools/spec/check_spec_drift.py"
+python3 ./tools/spec/check_spec_drift.py

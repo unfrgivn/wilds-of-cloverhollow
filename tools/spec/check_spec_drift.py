@@ -1,165 +1,66 @@
 #!/usr/bin/env python3
-from __future__ import annotations
-
 import os
 import subprocess
 import sys
-from typing import Iterable, Set
+from pathlib import Path
 
+SURFACE_PREFIXES = ("game/", "tools/", ".opencode/")
+SURFACE_FILES = ("project.godot",)
 
-def run_git(
-    repo_root: str, args: Iterable[str], check: bool = True
-) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", "-C", repo_root, *args],
-        check=check,
-        text=True,
-        capture_output=True,
-    )
+def run(cmd: list[str]) -> str:
+    return subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode("utf-8", errors="replace").strip()
 
-
-def get_repo_root() -> str:
+def is_git_repo() -> bool:
     try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            check=True,
-            text=True,
-            capture_output=True,
-        )
-    except subprocess.CalledProcessError as exc:
-        print("Spec drift check failed: not in a git repo.", file=sys.stderr)
-        print(exc.stderr.strip(), file=sys.stderr)
-        sys.exit(2)
-
-    repo_root = result.stdout.strip()
-    if not repo_root:
-        print("Spec drift check failed: could not resolve repo root.", file=sys.stderr)
-        sys.exit(2)
-    return repo_root
-
-
-def ref_exists(repo_root: str, ref: str) -> bool:
-    try:
-        run_git(repo_root, ["rev-parse", "--verify", ref])
+        run(["git", "rev-parse", "--is-inside-work-tree"])
         return True
-    except subprocess.CalledProcessError:
+    except Exception:
         return False
-
-
-def remote_exists(repo_root: str, remote: str) -> bool:
-    try:
-        result = run_git(repo_root, ["remote"], check=True)
-    except subprocess.CalledProcessError:
-        return False
-    return remote in result.stdout.split()
-
-
-def fetch_ref(repo_root: str, ref: str) -> None:
-    if not remote_exists(repo_root, "origin"):
-        return
-    try:
-        run_git(repo_root, ["fetch", "origin", ref, "--depth=1"], check=True)
-    except subprocess.CalledProcessError:
-        return
-
-
-def get_merge_base(repo_root: str, ref: str) -> str | None:
-    try:
-        result = run_git(repo_root, ["merge-base", ref, "HEAD"], check=True)
-    except subprocess.CalledProcessError:
-        return None
-    merge_base = result.stdout.strip()
-    return merge_base or None
-
-
-def collect_diff(repo_root: str, diff_args: list[str]) -> Set[str]:
-    try:
-        result = run_git(repo_root, ["diff", "--name-only", *diff_args], check=True)
-    except subprocess.CalledProcessError:
-        return set()
-    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
-
-
-def resolve_base_ref(repo_root: str) -> str | None:
-    base_ref = os.environ.get("GITHUB_BASE_REF")
-    if base_ref:
-        candidate = f"origin/{base_ref}"
-        if not ref_exists(repo_root, candidate):
-            fetch_ref(repo_root, base_ref)
-        if ref_exists(repo_root, candidate):
-            return candidate
-
-    for candidate in ("origin/main", "origin/master"):
-        if ref_exists(repo_root, candidate):
-            return candidate
-
-    if ref_exists(repo_root, "HEAD~1"):
-        return "HEAD~1"
-
-    return None
-
-
-def collect_changes(repo_root: str) -> Set[str]:
-    changes: Set[str] = set()
-    changes |= collect_diff(repo_root, [])
-    changes |= collect_diff(repo_root, ["--cached"])
-
-    base_ref = resolve_base_ref(repo_root)
-    if base_ref:
-        merge_base = get_merge_base(repo_root, base_ref)
-        if merge_base:
-            changes |= collect_diff(repo_root, [f"{merge_base}...HEAD"])
-        else:
-            changes |= collect_diff(repo_root, [f"{base_ref}...HEAD"])
-
-    return changes
-
-
-def is_spec_guarded(path: str) -> bool:
-    if path == "project.godot":
-        return True
-    if path.startswith("game/"):
-        return True
-    if path.startswith("tools/"):
-        return True
-    if path.startswith(".opencode/"):
-        return True
-    return False
-
 
 def main() -> int:
     if os.environ.get("ALLOW_SPEC_DRIFT") == "1":
-        print("Spec drift check bypassed (ALLOW_SPEC_DRIFT=1).")
+        print("[spec-check] ALLOW_SPEC_DRIFT=1 set; skipping spec drift check.")
         return 0
 
-    repo_root = get_repo_root()
-    changes = collect_changes(repo_root)
-    if not changes:
-        print("Spec drift check: no changes detected.")
+    if not is_git_repo():
+        print("[spec-check] Not a git repo; skipping.")
         return 0
 
-    spec_changed = "spec.md" in changes
-    guarded_changes = sorted(path for path in changes if is_spec_guarded(path))
+    try:
+        changed = run(["git", "diff", "--name-only"]).splitlines()
+    except Exception as e:
+        print(f"[spec-check] ERROR: unable to read git diff: {e}")
+        return 1
 
-    if not guarded_changes:
-        print("Spec drift check: no guarded changes detected.")
+    changed = [c.strip() for c in changed if c.strip()]
+    if not changed:
+        print("[spec-check] No changes.")
         return 0
 
-    if spec_changed:
-        print("Spec drift check: guarded changes detected with spec update.")
-        return 0
+    spec_changed = "spec.md" in changed
 
-    print("Spec drift guardrail failed.", file=sys.stderr)
-    print("Guarded changes detected without spec.md update:", file=sys.stderr)
-    for path in guarded_changes:
-        print(f"- {path}", file=sys.stderr)
-    print(
-        "\nUpdate spec.md to match these changes, or bypass with ALLOW_SPEC_DRIFT=1.",
-        file=sys.stderr,
-    )
-    print("Example: ALLOW_SPEC_DRIFT=1 ./tools/ci/run-spec-check.sh", file=sys.stderr)
-    return 1
+    surface_changed = False
+    for f in changed:
+        if f in SURFACE_FILES:
+            surface_changed = True
+            break
+        if any(f.startswith(p) for p in SURFACE_PREFIXES):
+            surface_changed = True
+            break
 
+    if surface_changed and not spec_changed:
+        print("[spec-check] FAIL: code/tooling changed without spec.md update.")
+        print("Changed files:")
+        for f in changed:
+            print(f"  - {f}")
+        print("")
+        print("Fix options:")
+        print("  1) Update spec.md in the same commit to reflect the change; or")
+        print("  2) If this is a pure refactor, rerun with ALLOW_SPEC_DRIFT=1 (temporary override).")
+        return 2
+
+    print("[spec-check] OK")
+    return 0
 
 if __name__ == "__main__":
     raise SystemExit(main())

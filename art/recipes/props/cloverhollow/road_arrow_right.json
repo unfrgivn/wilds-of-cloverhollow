@@ -1,8 +1,0 @@
-{
-  "id": "road_arrow_right",
-  "parts": [
-    { "type": "box", "size": [0.6, 0.02, 2.0], "pos": [-0.2, 0.01, 0.2], "color": "road_marking_yellow" },
-    { "type": "box", "size": [1.4, 0.02, 0.6], "pos": [0.8, 0.01, 1.0], "color": "road_marking_yellow" },
-    { "type": "box", "size": [0.6, 0.02, 0.6], "pos": [1.2, 0.01, 1.0], "color": "road_marking_yellow" }
-  ]
-}

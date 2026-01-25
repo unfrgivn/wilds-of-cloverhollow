@@ -1,11 +1,14 @@
 # Palettes
 
-## Structure
-- `art/palettes/common.palette.json` (shared character/ink colors)
+## Files
+- `art/palettes/global_ui_skin.palette.json`
 - `art/palettes/<biome>.palette.json`
 
-## Rules
-- UI + skin colors are global and immutable.
-- Each biome adds colors for environment accents and VFX.
-- Limit biome palettes to 24 colors per scene.
-- All outputs are quantized to palette colors (no gradients).
+## Rule
+All art must quantize to `global + biome`.
+
+## Workflow (non-artist friendly)
+1. Lock biome palette first.
+2. Generate tiles/props.
+3. Quantize outputs.
+4. Validate; reject anything that breaks readability.

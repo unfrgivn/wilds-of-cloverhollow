@@ -1,7 +1,0 @@
-{
-  "id": "trash_can_wood",
-  "parts": [
-    { "type": "cylinder", "height": 0.8, "radius": 0.35, "pos": [0, 0.4, 0], "color": "wood_fence" },
-    { "type": "cylinder", "height": 0.12, "radius": 0.4, "pos": [0, 0.86, 0], "color": "wood_dark" }
-  ]
-}

@@ -1,9 +1,3 @@
-# Cloverhollow palette (v0)
+# Cloverhollow palette
 
-TODO: define:
-- base ground/grass
-- building neutral set
-- accent set (flowers, awnings)
-- sky/water accents
-
-Remember: UI + skin colors are global.
+TODO: define palette targets and export to art/palettes/cloverhollow.palette.json

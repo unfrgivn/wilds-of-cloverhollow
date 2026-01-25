@@ -1,0 +1,9 @@
+{
+  "biome": "cloverhollow",
+  "visible_enemies": [
+    {
+      "id": "slime",
+      "weight": 1
+    }
+  ]
+}

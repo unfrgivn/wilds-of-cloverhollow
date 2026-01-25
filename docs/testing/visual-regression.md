@@ -1,24 +1,17 @@
 # Visual regression
 
-Primary strategy:
-- Deterministic movie capture from scripted scenarios
+## Concept
+Use deterministic capture checkpoints (PNG frames) and diff them against baselines.
 
-Secondary strategy:
-- Checkpoint screenshots (only if capture is stable across GPUs)
+## Why
+This catches UI/layout regressions and rendering drift without manual playtesting.
 
-Baseline storage:
-- `tests/visual-baselines/<scenario_id>/movie/*.png`
+## Files
+- `baselines/visual/<scenario_id>/frames/*.png`
+- `captures/golden/<scenario_id>/<run_id>/frames/*.png`
+- `reports/visual-diff/<scenario_id>/<run_id>/index.html`
 
-Workflow:
-- `./tools/ci/run-golden-capture.sh <run_id>`
-- `./tools/ci/update-visual-baseline.sh <run_id>`
-- `./tools/ci/run-visual-diff.sh <run_id>`
-- `./tools/ci/run-visual-regression.sh <run_id>`
-
-Reports:
-- `reports/visual-diff/<run_id>/index.html`
-
-Adding a golden scenario:
-- Create `tests/scenarios/<id>.json` and ensure it runs headlessly
-- Add `<id>` to `SCENARIOS` in `tools/ci/run-golden-capture.sh` and `tools/ci/update-visual-baseline.sh`
-- Capture + update baselines, then run visual diff
+## Workflow
+1. Run golden capture.
+2. Diff frames.
+3. Only update baselines intentionally.

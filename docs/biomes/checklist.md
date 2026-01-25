@@ -1,39 +1,27 @@
 # Biome checklist
 
-Every biome is a "pack". You should be able to add a biome without touching core systems.
+This is the repeatable checklist for adding a new biome.
 
-## 1) Narrative + purpose
-- Why does this biome exist in the story?
-- Which party member/tool/plot beat is introduced here?
+## Design
+- Theme and mood words
+- Navigation constraints (paths, gates)
+- Unique hook (mechanic or puzzle use of a tool)
 
-## 2) Visual identity
-- Name
-- Palette: `<biome>.palette.json`
-- Pixel kit settings (resolution + pixels-per-meter)
-- Lighting preset (key/fill strengths)
+## Art
+- Biome palette created and locked
+- Minimum tiles:
+  - ground
+  - path
+  - edges/transitions (autotiles)
+  - water (if applicable)
+- Minimum props: 10 reusable sprites
+- At least 1 battle background
 
-## 3) Area list
-- Area scenes (1–5 for MVP)
-- Entrances/exits
-- Bus stop/fast travel hooks
+## Gameplay
+- Encounter table (visible enemies)
+- At least 1 NPC interaction
+- At least 1 puzzle or tool-gated interaction
 
-## 4) Prop kit
-- Minimum 10 props per biome (MVP)
-- Landmark prop (1)
-- Signage set (2–4)
-
-## 5) NPCs + interactions
-- 3–6 NPCs (MVP)
-- 1–2 quest interactions
-- 1 hidden interaction (tool-gated) optional
-
-## 6) Enemy roster
-- 3 enemy families (MVP)
-- 1 miniboss (optional)
-- Encounter tables + visible spawners
-
-## 7) Battle backgrounds
-- 2–3 backgrounds (MVP)
-
-## 8) Acceptance tests
-- At least one Scenario Runner path through the biome
+## Automation
+- One biome smoke scenario
+- Added to golden scenarios if it becomes part of MVP path

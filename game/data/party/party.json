@@ -1,0 +1,25 @@
+{
+  "party_max_size": 4,
+  "members": [
+    {
+      "id": "fae",
+      "name": "Fae",
+      "role": "hero"
+    },
+    {
+      "id": "sue",
+      "name": "Sue",
+      "role": "party"
+    },
+    {
+      "id": "jordan",
+      "name": "Jordan",
+      "role": "party"
+    },
+    {
+      "id": "maddie",
+      "name": "Maddie",
+      "role": "pet"
+    }
+  ]
+}

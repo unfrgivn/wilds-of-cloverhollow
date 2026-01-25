@@ -1,8 +1,0 @@
-{
-  "id": "road_lane_arrow",
-  "parts": [
-    { "type": "box", "size": [0.6, 0.02, 2.4], "pos": [0, 0.01, -0.2], "color": "road_marking_yellow" },
-    { "type": "box", "size": [1.6, 0.02, 1.2], "pos": [0, 0.01, 1.4], "color": "road_marking_yellow" },
-    { "type": "box", "size": [1.0, 0.02, 0.6], "pos": [0, 0.01, 0.8], "color": "road_marking_yellow" }
-  ]
-}

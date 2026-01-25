@@ -1,0 +1,18 @@
+{
+  "name": "global_ui_skin",
+  "version": 1,
+  "colors": [
+    "#000000",
+    "#ffffff",
+    "#3a3a3a",
+    "#7a7a7a",
+    "#c0c0c0",
+    "#d8b08c",
+    "#b07d62",
+    "#7a4b3a",
+    "#2a5bd7",
+    "#d72a2a",
+    "#2ad75b",
+    "#f2d32a"
+  ]
+}

@@ -102,7 +102,7 @@ Enemies/skills/items/encounters defined in data, not hard-coded.
 
 ---
 
-## Milestone 7 — Pixel art pipeline tooling  **Owner:** Art Pipeline + QA Automation
+## Milestone 7 — Pixel art pipeline tooling  **Status:** ✅ Completed (2026-01-25)  **Owner:** Art Pipeline + QA Automation
 ### Objective
 Deterministic, non-artist-friendly asset workflow.
 

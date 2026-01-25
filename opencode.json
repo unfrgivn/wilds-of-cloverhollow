@@ -2,11 +2,6 @@
   "$schema": "https://opencode.ai/config.json",
   "instructions": ["spec.md", "docs/*.md"],
   "mcp": {
-    "blender": {
-      "type": "local",
-      "enabled": true,
-      "command": ["uvx", "blender-mcp"]
-    },
     "godot": {
       "type": "local",
       "enabled": true,

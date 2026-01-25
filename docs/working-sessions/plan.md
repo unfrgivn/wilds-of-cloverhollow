@@ -169,7 +169,7 @@ Adding a biome is repeatable and safe.
 
 ---
 
-## Milestone 12 — iOS touch controls  **Owner:** UI Systems + Gameplay
+## Milestone 12 — iOS touch controls  **Status:** ✅ Completed (2026-01-25)  **Owner:** UI Systems + Gameplay
 ### Objective
 Playable on iPhone/iPad landscape with touch.
 

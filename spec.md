@@ -69,6 +69,13 @@ This file is the single source of truth. If code changes behavior, update this f
 - On collision, the enemy is consumed (queue_free) and battle scene loads.
 - After battle ends, player returns to the overworld via SceneRouter.
 
+### 3.8 Touch controls (iOS)
+- TouchControlsManager autoload spawns touch UI on mobile platforms.
+- Virtual joystick (left side): circular touch area that injects movement input.
+- Interact button (right side): touch button that triggers the "interact" action.
+- Safe margins (20px sides, 10px top/bottom) ensure UI avoids iPhone notches/home indicator.
+- Controls are hidden during battles and menus.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -22,6 +22,7 @@ DialogueManager="*res://game/autoload/DialogueManager.gd"
 SceneRouter="*res://game/autoload/SceneRouter.gd"
 BattleManager="*res://game/autoload/BattleManager.gd"
 GameData="*res://game/autoload/GameData.gd"
+TouchControlsManager="*res://game/autoload/TouchControlsManager.gd"
 
 [display]
 

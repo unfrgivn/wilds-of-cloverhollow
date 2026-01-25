@@ -1,0 +1,114 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/ui/VirtualJoystick.gd" id="1"]
+[ext_resource type="Script" path="res://game/scripts/ui/TouchInteractButton.gd" id="2"]
+
+[node name="TouchControls" type="CanvasLayer"]
+layer = 100
+
+[node name="SafeMargin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="HBox" type="HBoxContainer" parent="SafeMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="LeftSpacer" type="Control" parent="SafeMargin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="JoystickContainer" type="Control" parent="SafeMargin/HBox"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="VirtualJoystick" type="Control" parent="SafeMargin/HBox/JoystickContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="SafeMargin/HBox/JoystickContainer/VirtualJoystick"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+color = Color(0.2, 0.2, 0.2, 0.5)
+
+[node name="Knob" type="ColorRect" parent="SafeMargin/HBox/JoystickContainer/VirtualJoystick"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0.4, 0.4, 0.4, 0.8)
+
+[node name="MiddleSpacer" type="Control" parent="SafeMargin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonContainer" type="Control" parent="SafeMargin/HBox"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="InteractButton" type="Control" parent="SafeMargin/HBox/ButtonContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2")
+
+[node name="ButtonVisual" type="ColorRect" parent="SafeMargin/HBox/ButtonContainer/InteractButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_top = -30.0
+offset_right = 30.0
+offset_bottom = 30.0
+color = Color(0.17, 0.36, 0.84, 0.7)
+
+[node name="Label" type="Label" parent="SafeMargin/HBox/ButtonContainer/InteractButton/ButtonVisual"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -10.0
+offset_right = 20.0
+offset_bottom = 10.0
+text = "A"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightSpacer" type="Control" parent="SafeMargin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3

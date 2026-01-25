@@ -1,0 +1,17 @@
+{
+  "scenario_id": "touch_controls_smoke",
+  "description": "Verify touch controls UI appears and inputs work",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/areas/Area_TownCenter.tscn"},
+    {"type": "wait_frames", "frames": 15},
+    {"type": "capture", "label": "initial_with_touch_ui"},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "capture", "label": "after_move"},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "after_interact"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "final"}
+  ]
+}

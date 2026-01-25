@@ -131,7 +131,7 @@ Artifact-based testing for visuals without OS-level window control.
 
 ---
 
-## Milestone 9 — Spec drift guardrail  **Owner:** Spec Steward + QA Automation
+## Milestone 9 — Spec drift guardrail  **Status:** ✅ Completed (2026-01-25)  **Owner:** Spec Steward + QA Automation
 ### Objective
 Prevent spec drift.
 

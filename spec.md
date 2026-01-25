@@ -156,7 +156,11 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - UI/visual changes must add/update a rendered capture scenario producing deterministic frames for diffing.
 
 ### 8.3 Guardrails
-- Spec drift guardrail must exist (CI fails if gameplay changes without spec.md updates).
+- Spec drift guardrail (`tools/spec/check_spec_drift.py`):
+  - CI/local check fails if `game/**`, `tools/**`, `.opencode/**`, or `project.godot` changes without `spec.md` update.
+  - Override via commit message tags: `[spec-ok]` or `[refactor]`.
+  - Override via environment: `ALLOW_SPEC_DRIFT=1`.
+  - Full documentation: `docs/working-sessions/spec-drift-guardrail.md`.
 - Visual regression diffing is required for golden scenarios.
 
 ## 9. Repo conventions

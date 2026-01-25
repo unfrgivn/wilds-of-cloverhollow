@@ -86,7 +86,7 @@ A minimal but complete turn-based battle loop.
 
 ---
 
-## Milestone 6 — Data-driven content spine  **Owner:** Data Systems + Gameplay
+## Milestone 6 — Data-driven content spine  **Status:** ✅ Completed (2026-01-25)  **Owner:** Data Systems + Gameplay
 ### Objective
 Enemies/skills/items/encounters defined in data, not hard-coded.
 

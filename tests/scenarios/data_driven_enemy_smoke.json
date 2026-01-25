@@ -1,0 +1,12 @@
+{
+  "scenario_id": "data_driven_enemy_smoke",
+  "description": "Test that enemies load from GameData JSON instead of hardcoded values",
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/battle/BattleScene.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "battle_with_data_enemy" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 60 },
+    { "type": "capture", "label": "after_data_enemy_turn" }
+  ]
+}

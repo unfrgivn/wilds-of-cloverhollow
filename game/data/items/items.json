@@ -1,0 +1,54 @@
+{
+  "items": [
+    {
+      "id": "potion",
+      "name": "Potion",
+      "description": "Restores 20 HP to one ally.",
+      "type": "consumable",
+      "effect": "heal_hp",
+      "power": 20,
+      "target": "single_ally",
+      "price": 50
+    },
+    {
+      "id": "ether",
+      "name": "Ether",
+      "description": "Restores 10 MP to one ally.",
+      "type": "consumable",
+      "effect": "heal_mp",
+      "power": 10,
+      "target": "single_ally",
+      "price": 100
+    },
+    {
+      "id": "antidote",
+      "name": "Antidote",
+      "description": "Cures poison status.",
+      "type": "consumable",
+      "effect": "cure_poison",
+      "power": 0,
+      "target": "single_ally",
+      "price": 30
+    },
+    {
+      "id": "acorn",
+      "name": "Acorn",
+      "description": "A hard acorn. Can be thrown at enemies or given to squirrels.",
+      "type": "consumable",
+      "effect": "damage",
+      "power": 5,
+      "target": "single_enemy",
+      "price": 10
+    },
+    {
+      "id": "honey_drop",
+      "name": "Honey Drop",
+      "description": "Sweet honey. Restores 5 HP and tastes delicious.",
+      "type": "consumable",
+      "effect": "heal_hp",
+      "power": 5,
+      "target": "single_ally",
+      "price": 15
+    }
+  ]
+}

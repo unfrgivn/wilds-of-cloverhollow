@@ -1,0 +1,43 @@
+{
+  "enemies": [
+    {
+      "id": "slime",
+      "name": "Slime",
+      "description": "A wobbly blob of goo. Not too dangerous, just... slimy.",
+      "max_hp": 15,
+      "max_mp": 0,
+      "attack": 4,
+      "defense": 1,
+      "speed": 3,
+      "sprite": "res://game/assets/enemies/slime.png",
+      "skills": [],
+      "drops": []
+    },
+    {
+      "id": "grumpy_squirrel",
+      "name": "Grumpy Squirrel",
+      "description": "An acorn-hoarding menace with a bad attitude.",
+      "max_hp": 12,
+      "max_mp": 5,
+      "attack": 5,
+      "defense": 2,
+      "speed": 6,
+      "sprite": "res://game/assets/enemies/grumpy_squirrel.png",
+      "skills": ["acorn_toss"],
+      "drops": ["acorn"]
+    },
+    {
+      "id": "angry_bee",
+      "name": "Angry Bee",
+      "description": "Bzzz! It's not happy you disturbed its hive.",
+      "max_hp": 8,
+      "max_mp": 0,
+      "attack": 6,
+      "defense": 0,
+      "speed": 8,
+      "sprite": "res://game/assets/enemies/angry_bee.png",
+      "skills": [],
+      "drops": ["honey_drop"]
+    }
+  ]
+}

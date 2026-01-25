@@ -97,8 +97,25 @@ This file is the single source of truth. If code changes behavior, update this f
 - Victory: all enemies defeated. Defeat: all party defeated.
 - BattleState class manages turn flow and win/loss conditions.
 - Combatant class (Resource) represents party members and enemies.
+- Party and enemy stats loaded from GameData autoload (data-driven).
 
-### 5.4 Scenario action: load_scene
+### 5.4 Data schemas (locked)
+All game content is data-driven via JSON files under `game/data/`:
+- `enemies/enemies.json`: Enemy definitions with id, name, max_hp, max_mp, attack, defense, speed, skills[], drops[].
+- `skills/skills.json`: Skill definitions with id, name, type, mp_cost, power, target, element.
+- `items/items.json`: Item definitions with id, name, type, effect, power, target, price.
+- `party/party.json`: Party member definitions with id, name, role, max_hp, max_mp, attack, defense, speed, skills[].
+- `biomes/<biome>.json`: Biome metadata (id, name, palette_path).
+- `encounters/<biome>.json`: Encounter tables for each biome.
+
+GameData autoload loads and caches all data on startup. Adding new content requires only JSON + sprite assets (no code changes).
+
+Content lint script (`tools/lint/lint-content.sh`) validates:
+- JSON syntax
+- Required fields per schema
+- Reference integrity (skill/item IDs referenced must exist)
+
+### 5.5 Scenario action: load_scene
 - `load_scene`: Load a scene directly by path (for testing battles without overworld trigger).
 
 ## 6. Art direction and determinism

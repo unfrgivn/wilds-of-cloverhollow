@@ -31,18 +31,22 @@ func _ready() -> void:
 	_setup_battle()
 
 func _setup_battle() -> void:
-	# Create placeholder party (Fae, Sue, Jordan, Maddie the pet)
+	# Load party from GameData
 	var party: Array = []
-	party.append(_create_combatant("Fae", 25, 15, 6, 3, 7, true))
-	party.append(_create_combatant("Sue", 20, 20, 5, 2, 5, true))
-	party.append(_create_combatant("Jordan", 22, 10, 7, 4, 4, true))
-	party.append(_create_combatant("Maddie", 15, 5, 4, 2, 8, true))  # Pet, fast
+	for member_data in GameData.get_all_party_members():
+		party.append(_create_combatant_from_data(member_data, true))
 	
-	# Create enemy from BattleManager data or placeholder
+	# Create enemy from GameData using enemy_id
 	var enemies: Array = []
-	var enemy_data: Dictionary = BattleManager.current_enemy_data
-	var enemy_name: String = enemy_data.get("enemy_name", "Slime")
-	enemies.append(_create_combatant(enemy_name, 15, 0, 4, 1, 3, false))
+	var battle_enemy_data: Dictionary = BattleManager.current_enemy_data
+	var enemy_id: String = battle_enemy_data.get("enemy_id", "slime")
+	var enemy_data: Dictionary = GameData.get_enemy(enemy_id)
+	if enemy_data.is_empty():
+		# Fallback to placeholder if enemy not found
+		push_warning("[BattleScene] Enemy '%s' not found in GameData, using fallback" % enemy_id)
+		enemies.append(_create_combatant(battle_enemy_data.get("enemy_name", "Unknown"), 10, 0, 3, 1, 3, false))
+	else:
+		enemies.append(_create_combatant_from_data(enemy_data, false))
 	
 	# Initialize battle state
 	battle_state = BattleStateScript.new()
@@ -70,6 +74,20 @@ func _create_combatant(cname: String, hp: int, mp: int, atk: int, def: int, spd:
 	c.attack = atk
 	c.defense = def
 	c.speed = spd
+	c.is_player = is_player
+	return c
+
+## Create combatant from data dictionary (loaded from GameData)
+func _create_combatant_from_data(data: Dictionary, is_player: bool):
+	var c = CombatantScript.new()
+	c.display_name = data.get("name", "Unknown")
+	c.max_hp = data.get("max_hp", 10)
+	c.current_hp = c.max_hp
+	c.max_mp = data.get("max_mp", 0)
+	c.current_mp = c.max_mp
+	c.attack = data.get("attack", 3)
+	c.defense = data.get("defense", 1)
+	c.speed = data.get("speed", 3)
 	c.is_player = is_player
 	return c
 

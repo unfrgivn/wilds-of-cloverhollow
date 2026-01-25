@@ -4,22 +4,54 @@
     {
       "id": "fae",
       "name": "Fae",
-      "role": "hero"
+      "role": "hero",
+      "description": "The main character. Brave and curious.",
+      "max_hp": 25,
+      "max_mp": 15,
+      "attack": 6,
+      "defense": 3,
+      "speed": 7,
+      "skills": ["spark"],
+      "sprite": "res://game/assets/party/fae.png"
     },
     {
       "id": "sue",
       "name": "Sue",
-      "role": "party"
+      "role": "party",
+      "description": "A friend from Bubblegum Bay. Kind and supportive.",
+      "max_hp": 20,
+      "max_mp": 20,
+      "attack": 5,
+      "defense": 2,
+      "speed": 5,
+      "skills": ["heal_light", "encourage"],
+      "sprite": "res://game/assets/party/sue.png"
     },
     {
       "id": "jordan",
       "name": "Jordan",
-      "role": "party"
+      "role": "party",
+      "description": "A friend from Pinecone Pass. Strong and dependable.",
+      "max_hp": 22,
+      "max_mp": 10,
+      "attack": 7,
+      "defense": 4,
+      "speed": 4,
+      "skills": [],
+      "sprite": "res://game/assets/party/jordan.png"
     },
     {
       "id": "maddie",
       "name": "Maddie",
-      "role": "pet"
+      "role": "pet",
+      "description": "Fae's loyal cat. Fast and feisty.",
+      "max_hp": 15,
+      "max_mp": 5,
+      "attack": 4,
+      "defense": 2,
+      "speed": 8,
+      "skills": [],
+      "sprite": "res://game/assets/party/maddie.png"
     }
   ]
 }

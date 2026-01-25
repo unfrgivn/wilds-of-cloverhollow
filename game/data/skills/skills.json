@@ -1,0 +1,45 @@
+{
+  "skills": [
+    {
+      "id": "acorn_toss",
+      "name": "Acorn Toss",
+      "description": "Throws a hard acorn at the target.",
+      "type": "attack",
+      "mp_cost": 2,
+      "power": 6,
+      "target": "single_enemy",
+      "element": "none"
+    },
+    {
+      "id": "heal_light",
+      "name": "Heal Light",
+      "description": "Restores a small amount of HP to one ally.",
+      "type": "heal",
+      "mp_cost": 3,
+      "power": 10,
+      "target": "single_ally",
+      "element": "none"
+    },
+    {
+      "id": "spark",
+      "name": "Spark",
+      "description": "A tiny bolt of magical energy.",
+      "type": "attack",
+      "mp_cost": 4,
+      "power": 8,
+      "target": "single_enemy",
+      "element": "magic"
+    },
+    {
+      "id": "encourage",
+      "name": "Encourage",
+      "description": "Boosts an ally's attack for the battle.",
+      "type": "buff",
+      "mp_cost": 5,
+      "power": 0,
+      "target": "single_ally",
+      "element": "none",
+      "effect": "attack_up"
+    }
+  ]
+}

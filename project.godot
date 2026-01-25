@@ -23,6 +23,8 @@ SceneRouter="*res://game/autoload/SceneRouter.gd"
 BattleManager="*res://game/autoload/BattleManager.gd"
 GameData="*res://game/autoload/GameData.gd"
 TouchControlsManager="*res://game/autoload/TouchControlsManager.gd"
+InventoryManager="*res://game/autoload/InventoryManager.gd"
+SaveManager="*res://game/autoload/SaveManager.gd"
 
 [display]
 

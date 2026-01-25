@@ -93,6 +93,22 @@ func _load_scenario_file_if_exists() -> void:
         _actions = parsed["actions"]
         _trace["events"].append({"type": "info", "frame": _frame, "msg": "Loaded actions: %d" % _actions.size()})
 
+    # Load custom scene if specified
+    if parsed.has("scene") and typeof(parsed["scene"]) == TYPE_STRING:
+        var scene_path: String = parsed["scene"]
+        if scene_path != "":
+            _trace["events"].append({"type": "info", "frame": _frame, "msg": "Loading scene: %s" % scene_path})
+            # Use call_deferred to avoid issues with loading during _ready
+            call_deferred("_load_starting_scene", scene_path)
+
+func _load_starting_scene(scene_path: String) -> void:
+    var result := get_tree().change_scene_to_file(scene_path)
+    if result == OK:
+        SceneRouter.current_area = scene_path
+        _trace["events"].append({"type": "scene_loaded", "frame": _frame, "scene": scene_path})
+    else:
+        _trace["events"].append({"type": "error", "frame": _frame, "msg": "Failed to load scene: %s" % scene_path})
+
 func _step_actions() -> void:
     if _action_index >= _actions.size():
         return
@@ -154,6 +170,49 @@ func _step_actions() -> void:
             await get_tree().process_frame
             Input.action_release(input_action)
             _trace["events"].append({"type": "press", "frame": _frame, "action": input_action})
+        _action_index += 1
+        return
+
+    if t == "save_game":
+        var result: bool = SaveManager.save_game()
+        _trace["events"].append({"type": "save_game", "frame": _frame, "success": result})
+        _action_index += 1
+        return
+
+    if t == "load_game":
+        var result: bool = await SaveManager.load_game()
+        _trace["events"].append({"type": "load_game", "frame": _frame, "success": result})
+        _action_index += 1
+        return
+
+    if t == "acquire_tool":
+        var tool_id := str(action.get("tool_id", ""))
+        if tool_id != "":
+            InventoryManager.acquire_tool(tool_id)
+            _trace["events"].append({"type": "acquire_tool", "frame": _frame, "tool_id": tool_id})
+        _action_index += 1
+        return
+
+    if t == "set_story_flag":
+        var flag := str(action.get("flag", ""))
+        var value = action.get("value", true)
+        if flag != "":
+            InventoryManager.set_story_flag(flag, value)
+            _trace["events"].append({"type": "set_story_flag", "frame": _frame, "flag": flag, "value": value})
+        _action_index += 1
+        return
+
+    if t == "check_tool":
+        var tool_id := str(action.get("tool_id", ""))
+        var has_it: bool = InventoryManager.has_tool(tool_id)
+        _trace["events"].append({"type": "check_tool", "frame": _frame, "tool_id": tool_id, "has_tool": has_it})
+        _action_index += 1
+        return
+
+    if t == "check_story_flag":
+        var flag := str(action.get("flag", ""))
+        var has_it: bool = InventoryManager.has_story_flag(flag)
+        _trace["events"].append({"type": "check_story_flag", "frame": _frame, "flag": flag, "has_flag": has_it})
         _action_index += 1
         return
 

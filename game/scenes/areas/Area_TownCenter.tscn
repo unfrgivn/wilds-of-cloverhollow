@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -11,6 +11,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/lamp.png" id="9"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/bench.png" id="10"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="11"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ToolGatedInteractable.gd" id="12"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ItemPickup.gd" id="13"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -199,3 +201,45 @@ offset_right = 50.0
 offset_bottom = -10.0
 text = "↓ Bubblegum Bay"
 horizontal_alignment = 1
+
+[node name="LanternPickup" type="Area2D" parent="."]
+position = Vector2(130, 200)
+script = ExtResource("13")
+pickup_type = "tool"
+pickup_id = "lantern"
+dialogue_text = "You found a Lantern!
+Now you can explore dark places."
+
+[node name="PickupSprite" type="Sprite2D" parent="LanternPickup"]
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("9")
+
+[node name="PickupCollision" type="CollisionShape2D" parent="LanternPickup"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="DarkCaveEntrance" type="Area2D" parent="."]
+position = Vector2(380, 100)
+script = ExtResource("12")
+required_tool = "lantern"
+dialogue_without_tool = "It's too dark to see inside...
+You need something to light the way."
+dialogue_with_tool = "You light up the cave with your lantern!
+You can see an old treasure chest inside."
+
+[node name="CaveSprite" type="ColorRect" parent="DarkCaveEntrance"]
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+color = Color(0.15, 0.1, 0.15, 1)
+
+[node name="CaveLabel" type="Label" parent="DarkCaveEntrance"]
+offset_left = -30.0
+offset_top = -28.0
+offset_right = 30.0
+offset_bottom = -12.0
+text = "Dark Cave"
+horizontal_alignment = 1
+
+[node name="CaveCollision" type="CollisionShape2D" parent="DarkCaveEntrance"]
+shape = SubResource("RectangleShape2D_3")

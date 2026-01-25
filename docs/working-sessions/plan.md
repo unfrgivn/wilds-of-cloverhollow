@@ -180,7 +180,7 @@ Playable on iPhone/iPad landscape with touch.
 
 ---
 
-## Milestone 13 — Save/Load + tools (lantern/journal/lasso/flute)  **Owner:** Gameplay + Data Systems
+## Milestone 13 — Save/Load + tools (lantern/journal/lasso/flute)  **Status:** ✅ Completed (2026-01-25)  **Owner:** Gameplay + Data Systems
 ### Objective
 Start the "adventure + puzzle + light RPG" loop.
 

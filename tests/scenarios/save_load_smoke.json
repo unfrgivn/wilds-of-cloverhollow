@@ -1,0 +1,23 @@
+{
+  "scenario_id": "save_load_smoke",
+  "description": "Verify save/load: acquire tool, move, save, reset, load, verify tool and position restored",
+  "scene": "res://game/scenes/areas/Area_Cloverhollow_Test.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "initial_position"},
+    {"type": "acquire_tool", "tool_id": "lantern"},
+    {"type": "check_tool", "tool_id": "lantern"},
+    {"type": "set_story_flag", "flag": "test_flag", "value": true},
+    {"type": "check_story_flag", "flag": "test_flag"},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "after_move"},
+    {"type": "save_game"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "load_game"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "after_load"},
+    {"type": "check_tool", "tool_id": "lantern"},
+    {"type": "check_story_flag", "flag": "test_flag"}
+  ]
+}

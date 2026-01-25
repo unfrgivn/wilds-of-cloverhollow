@@ -76,6 +76,28 @@ This file is the single source of truth. If code changes behavior, update this f
 - Safe margins (20px sides, 10px top/bottom) ensure UI avoids iPhone notches/home indicator.
 - Controls are hidden during battles and menus.
 
+### 3.9 Save/Load system
+- SaveManager autoload handles save/load operations.
+- Save file stored in `user://saves/save_slot_0.json` (iOS-compatible).
+- Save data includes: version, timestamp, current_area, player_position, inventory, story_flags.
+- InventoryManager autoload tracks tools and items, persisted via SaveManager.
+- Version field enables future save file migrations.
+
+### 3.10 Inventory and tools
+- InventoryManager autoload tracks:
+  - Tools: lantern, journal, lasso, flute (acquired once, not consumable).
+  - Items: consumables with quantity (potion, ether, etc.).
+  - Story flags: named progression markers (e.g., "talked_to_teacher").
+- Tool checks: `has_tool(id)`, `acquire_tool(id)`.
+- Item checks: `has_item(id, count)`, `add_item(id, count)`, `remove_item(id, count)`.
+- Story flags: `has_story_flag(flag)`, `set_story_flag(flag, value)`, `get_story_flag(flag)`.
+
+### 3.11 Gated interactions
+- ToolGatedInteractable: requires a specific tool to proceed (e.g., lantern for dark areas).
+- StoryGatedInteractable: requires a story flag (e.g., "talked_to_teacher" for library access).
+- ItemPickup: collectible that grants tools or items when interacted.
+- All gated interactables show different dialogue depending on whether requirements are met.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.
@@ -182,6 +204,12 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   - `capture`: Save a screenshot with a label.
   - `move`: Simulate directional input (left/right/up/down) for N frames.
   - `press`: Simulate a button press for an input action (e.g., "interact").
+  - `save_game`: Save current game state (position, inventory, story flags).
+  - `load_game`: Load game state from save file.
+  - `acquire_tool`: Give a tool to the player (tool_id).
+  - `set_story_flag`: Set a story flag (flag, value).
+  - `check_tool`: Log whether player has a tool (tool_id).
+  - `check_story_flag`: Log whether a story flag is set (flag).
 
 ### 8.2 Deterministic artifacts
 - Every milestone must add/update at least one Scenario Runner scenario.

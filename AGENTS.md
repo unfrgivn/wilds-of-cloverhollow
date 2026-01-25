@@ -9,7 +9,7 @@ This repo is designed for autonomous agent work.
    - Make reasonable assumptions and proceed.
    - If missing input is truly required, add a new future milestone in `docs/working-sessions/plan.md` with clear acceptance criteria and continue.
 3. One commit per milestone.
-   - Commit message format: `Milestone <N>: <Title>`
+   - Commit message format: `feat: <Title> (Milestone <N>)`
    - Push to main immediately after committing (`git push origin main`).
    - Do NOT ask the user for permission to push; push automatically.
    - If push fails, rebase with `git pull --rebase origin main`, resolve conflicts, and push again.
@@ -54,3 +54,5 @@ Use `/next-milestone` to select work from `docs/working-sessions/plan.md`.
 Milestone completion status convention:
 - Completed milestones include `**Status:** ✅ Completed (YYYY-MM-DD)` in the milestone header line.
 - Incomplete milestones have no status field.
+
+Call `/next-milestone` after completion to move onto the next milestone

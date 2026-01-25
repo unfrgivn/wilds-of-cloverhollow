@@ -9,74 +9,87 @@ script = ExtResource("1")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.1, 0.1, 0.2, 1)
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.15, 0.12, 0.25, 1)
 
 [node name="BattleUI" type="CanvasLayer" parent="."]
 layer = 10
 
-[node name="TopHUD" type="Panel" parent="BattleUI"]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 48.0
+[node name="TopHUD" type="HBoxContainer" parent="BattleUI"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 508.0
+offset_bottom = 64.0
 
-[node name="EnemyInfo" type="Label" parent="BattleUI/TopHUD"]
-offset_left = 8.0
-offset_top = 8.0
-offset_right = 200.0
-offset_bottom = 24.0
-text = "Enemy: Slime"
+[node name="EnemyPanel" type="PanelContainer" parent="BattleUI/TopHUD"]
+custom_minimum_size = Vector2(140, 0)
 
-[node name="EnemyHP" type="Label" parent="BattleUI/TopHUD"]
-offset_left = 8.0
-offset_top = 24.0
-offset_right = 200.0
-offset_bottom = 40.0
-text = "HP: 10/10"
+[node name="VBox" type="VBoxContainer" parent="BattleUI/TopHUD/EnemyPanel"]
+layout_mode = 2
 
-[node name="PartyInfo" type="Label" parent="BattleUI/TopHUD"]
-offset_left = 312.0
-offset_top = 8.0
-offset_right = 504.0
-offset_bottom = 24.0
-text = "Fae"
-horizontal_alignment = 2
+[node name="EnemyName" type="Label" parent="BattleUI/TopHUD/EnemyPanel"]
+layout_mode = 2
+text = "Slime"
 
-[node name="PartyHP" type="Label" parent="BattleUI/TopHUD"]
-offset_left = 312.0
-offset_top = 24.0
-offset_right = 504.0
-offset_bottom = 40.0
-text = "HP: 20/20  MP: 10/10"
-horizontal_alignment = 2
+[node name="EnemyHP" type="Label" parent="BattleUI/TopHUD/EnemyPanel"]
+layout_mode = 2
+text = "HP: 15/15"
 
-[node name="CommandMenu" type="Panel" parent="BattleUI"]
+[node name="Spacer" type="Control" parent="BattleUI/TopHUD"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PartyPanel" type="PanelContainer" parent="BattleUI/TopHUD"]
+custom_minimum_size = Vector2(200, 0)
+
+[node name="PartyStats" type="VBoxContainer" parent="BattleUI/TopHUD/PartyPanel"]
+layout_mode = 2
+
+[node name="CommandMenu" type="PanelContainer" parent="BattleUI"]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -80.0
-offset_right = 100.0
-offset_bottom = -8.0
+offset_left = -60.0
+offset_top = -72.0
+offset_right = 60.0
+offset_bottom = -4.0
 
-[node name="VBox" type="VBoxContainer" parent="BattleUI/CommandMenu"]
-offset_left = 8.0
-offset_top = 4.0
-offset_right = 192.0
-offset_bottom = 68.0
+[node name="MenuContainer" type="VBoxContainer" parent="BattleUI/CommandMenu"]
+layout_mode = 2
 
-[node name="AttackBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+[node name="Attack" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
+layout_mode = 2
 text = "> Attack"
 
-[node name="SkillBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+[node name="Skill" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
+layout_mode = 2
 text = "  Skill"
 
-[node name="ItemBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+[node name="Item" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
+layout_mode = 2
 text = "  Item"
 
-[node name="RunBtn" type="Label" parent="BattleUI/CommandMenu/VBox"]
+[node name="Defend" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
+layout_mode = 2
+text = "  Defend"
+
+[node name="Run" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
+layout_mode = 2
 text = "  Run"
+
+[node name="TurnIndicator" type="Label" parent="BattleUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 70.0
+offset_right = 80.0
+offset_bottom = 86.0
+text = "Fae's turn"
+horizontal_alignment = 1
 
 [node name="BattleMessage" type="Label" parent="BattleUI"]
 anchors_preset = 7
@@ -85,8 +98,8 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -200.0
-offset_top = -100.0
+offset_top = -90.0
 offset_right = 200.0
-offset_bottom = -84.0
-text = "A wild Slime appeared! (Press E to flee)"
+offset_bottom = -74.0
+text = "Battle started!"
 horizontal_alignment = 1

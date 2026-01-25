@@ -69,7 +69,7 @@ Overworld enemies are visible and trigger battle reliably.
 
 ---
 
-## Milestone 5 — Battle loop v0  **Owner:** Battle Systems + UI Systems
+## Milestone 5 — Battle loop v0  **Status:** ✅ Completed (2026-01-25)  **Owner:** Battle Systems + UI Systems
 ### Objective
 A minimal but complete turn-based battle loop.
 

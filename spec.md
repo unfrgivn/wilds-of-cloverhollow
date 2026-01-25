@@ -83,8 +83,23 @@ This file is the single source of truth. If code changes behavior, update this f
 ### 5.2 Battle UI (locked preferences)
 - HUD framing: enemy + party status at the top (HP/MP/status readability).
 - No cassette theming.
-- No large themed “device bar”.
+- No large themed "device bar".
 - Boxes are acceptable for v0, but the UI must remain readable at iPhone landscape scale.
+
+### 5.3 Battle loop (v0)
+- Turn order determined by combatant speed (highest first).
+- Each combatant has: display_name, max_hp, current_hp, max_mp, current_mp, attack, defense, speed.
+- Player turn: command menu with Attack, Skill (placeholder), Item (placeholder), Defend, Run.
+- Attack: deals damage = attacker.attack - target.defense (minimum 1).
+- Defend: doubles effective defense until next turn.
+- Run: ends battle with "flee" result.
+- Enemy AI: attacks first alive party member.
+- Victory: all enemies defeated. Defeat: all party defeated.
+- BattleState class manages turn flow and win/loss conditions.
+- Combatant class (Resource) represents party members and enemies.
+
+### 5.4 Scenario action: load_scene
+- `load_scene`: Load a scene directly by path (for testing battles without overworld trigger).
 
 ## 6. Art direction and determinism
 

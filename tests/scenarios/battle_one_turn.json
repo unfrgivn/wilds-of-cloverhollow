@@ -1,0 +1,12 @@
+{
+  "scenario_id": "battle_one_turn",
+  "description": "Test that the battle system allows performing one Attack action",
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/battle/BattleScene.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "battle_start" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 60 },
+    { "type": "capture", "label": "after_attack" }
+  ]
+}

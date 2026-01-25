@@ -105,6 +105,14 @@ func _step_actions() -> void:
 
     var t: String = str(action["type"])
 
+    if t == "load_scene":
+        var scene_path := str(action.get("scene", ""))
+        if scene_path != "":
+            _trace["events"].append({"type": "load_scene", "frame": _frame, "scene": scene_path})
+            get_tree().change_scene_to_file(scene_path)
+        _action_index += 1
+        return
+
     if t == "wait_frames":
         if _wait_remaining == 0:
             _wait_remaining = int(action.get("frames", 1))

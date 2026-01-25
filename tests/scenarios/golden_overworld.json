@@ -1,0 +1,14 @@
+{
+  "scenario_id": "golden_overworld",
+  "description": "Golden capture for overworld scene with player movement",
+  "golden": true,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_Cloverhollow_Test.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "overworld_initial" },
+    { "type": "move", "direction": "right", "frames": 30 },
+    { "type": "capture", "label": "overworld_after_move" },
+    { "type": "wait_frames", "frames": 15 },
+    { "type": "capture", "label": "overworld_idle" }
+  ]
+}

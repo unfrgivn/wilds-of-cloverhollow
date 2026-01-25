@@ -119,7 +119,7 @@ Deterministic, non-artist-friendly asset workflow.
 
 ---
 
-## Milestone 8 — Golden capture + visual diff  **Owner:** QA Automation
+## Milestone 8 — Golden capture + visual diff  **Status:** ✅ Completed (2026-01-25)  **Owner:** QA Automation
 ### Objective
 Artifact-based testing for visuals without OS-level window control.
 

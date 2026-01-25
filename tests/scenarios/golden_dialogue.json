@@ -1,0 +1,17 @@
+{
+  "scenario_id": "golden_dialogue",
+  "description": "Golden capture for dialogue UI interaction",
+  "golden": true,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_Cloverhollow_Test.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "dialogue_before" },
+    { "type": "move", "direction": "up", "frames": 15 },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "dialogue_showing" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "dialogue_dismissed" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "scenario_id": "golden_battle",
+  "description": "Golden capture for battle scene with command menu",
+  "golden": true,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/battle/BattleScene.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "battle_initial" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "battle_after_attack" },
+    { "type": "wait_frames", "frames": 60 },
+    { "type": "capture", "label": "battle_enemy_turn" }
+  ]
+}

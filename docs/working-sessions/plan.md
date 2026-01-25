@@ -191,7 +191,7 @@ Start the "adventure + puzzle + light RPG" loop.
 
 ---
 
-## Milestone 14 — Concept art integration documentation  **Owner:** Art Pipeline
+## Milestone 14 — Concept art integration documentation  **Status:** ✅ Completed (2026-01-25)  **Owner:** Art Pipeline
 ### Objective
 Document concept art aesthetic for consistent asset creation.
 

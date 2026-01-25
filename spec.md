@@ -149,15 +149,20 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 
 ## 6. Art direction and determinism
 
-### 6.1 Key rule
+### 6.1 Concept art reference
+- `docs/art/concept-reference.md` is the aesthetic guide for all asset creation.
+- Asset creators must reference this document before creating new content.
+- Concept art source files live in `docs/art/concepts/`.
+
+### 6.2 Key rule
 **All art must be normalizable and consistent.** AI outputs are treated as raw inputs; the pipeline enforces style.
 
-### 6.2 Palettes (locked)
+### 6.3 Palettes (locked)
 - Each biome has a palette.
 - There is a shared global palette for UI + skin tones + outline/ink.
 - All tiles/sprites must quantize to: biome palette ∪ global palette.
 
-### 6.3 Pixel style constraints (locked)
+### 6.4 Pixel style constraints (locked)
 - Single pixel density (no mixed-scale sprites).
 - No resampling; nearest-neighbor only.
 - Avoid noisy textures; prefer clean shapes and limited shading bands per material.

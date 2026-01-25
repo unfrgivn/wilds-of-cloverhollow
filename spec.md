@@ -39,9 +39,9 @@ This file is the single source of truth. If code changes behavior, update this f
 
 ### 3.3 Movement (locked)
 - Free analog movement.
-- Facing/animation: start with **4-direction** (N/S/E/W).
-  - If moving diagonally, pick the closest cardinal direction for animation.
-  - 8-direction animation is a future upgrade milestone, not a baseline requirement.
+- Facing/animation: **8-direction** (N, NE, E, SE, S, SW, W, NW).
+  - All character and NPC sprites must include 8-direction variants.
+  - Diagonal movement uses diagonal sprites (not nearest-cardinal fallback).
 
 ### 3.4 Encounters (locked)
 - Visible overworld enemies.

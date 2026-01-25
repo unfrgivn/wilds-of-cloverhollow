@@ -10,6 +10,9 @@ This repo is designed for autonomous agent work.
    - If missing input is truly required, add a new future milestone in `docs/working-sessions/plan.md` with clear acceptance criteria and continue.
 3. One commit per milestone.
    - Commit message format: `Milestone <N>: <Title>`
+   - Push to main immediately after committing (`git push origin main`).
+   - Do NOT ask the user for permission to push; push automatically.
+   - If push fails, rebase with `git pull --rebase origin main`, resolve conflicts, and push again.
 4. No OS-level window control.
    - All verification must run via Scenario Runner and deterministic artifacts (captures + traces).
 5. Small diffs only.

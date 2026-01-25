@@ -76,11 +76,15 @@ Step 5: Spec + docs hygiene
 - Update spec.md for any behavior or decision changes.
 - Update docs/ if you introduced new workflows/flags/commands.
 
-Step 6: Commit + mark complete
+Step 6: Commit + push + mark complete
 - Create ONE commit for this milestone:
   - Message: "Milestone <N>: <Title>"
 - Update the milestone header in docs/working-sessions/plan.md to include:
   **Status:** ✅ Completed (YYYY-MM-DD)
+- Push to main immediately:
+  - Run `git push origin main`
+  - Do NOT ask the user for permission; push automatically
+  - If push fails (e.g., remote is ahead), run `git pull --rebase origin main`, resolve any conflicts, and push again
 
 Handling blockers without questions
 - If something is missing (assets, narrative, encounter lists, etc.), do not ask.

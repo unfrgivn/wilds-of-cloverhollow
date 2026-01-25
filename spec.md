@@ -36,6 +36,7 @@ This file is the single source of truth. If code changes behavior, update this f
 - Internal base resolution (logical): **512×288** (16:9).
 - Rendering: scale up with nearest-neighbor; no filtering.
 - Camera: Camera2D must move on whole pixels (no shimmer).
+- Player position snaps to integers after `move_and_slide()` for pixel-stable rendering.
 
 ### 3.3 Movement (locked)
 - Free analog movement.
@@ -91,6 +92,10 @@ This file is the single source of truth. If code changes behavior, update this f
   - inject deterministic inputs
   - trigger interactions and encounters
   - emit artifacts (trace, screenshots/frames, optional movies)
+- Supported scenario actions:
+  - `wait_frames`: Pause for N frames before continuing.
+  - `capture`: Save a screenshot with a label.
+  - `move`: Simulate directional input (left/right/up/down) for N frames.
 
 ### 8.2 Deterministic artifacts
 - Every milestone must add/update at least one Scenario Runner scenario.

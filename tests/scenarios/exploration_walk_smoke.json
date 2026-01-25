@@ -1,0 +1,14 @@
+{
+  "scenario_id": "exploration_walk_smoke",
+  "description": "Verify player movement and pixel-stable camera in Cloverhollow test area",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "initial_position"},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "capture", "label": "after_move_right"},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "capture", "label": "after_move_up"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "final_position"}
+  ]
+}

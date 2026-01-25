@@ -21,7 +21,7 @@ The project boots reliably (macOS) and has a repeatable CLI workflow for smoke/t
 
 ---
 
-## Milestone 1 — Pixel exploration core (2D)  **Owner:** Godot Gameplay Engineer
+## Milestone 1 — Pixel exploration core (2D)  **Status:** ✅ Completed (2026-01-25)  **Owner:** Godot Gameplay Engineer
 ### Objective
 Playable 2D exploration slice with pixel-stable camera and a controllable player.
 

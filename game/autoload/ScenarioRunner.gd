@@ -13,6 +13,8 @@ var _frame: int = 0
 var _actions: Array = []
 var _action_index: int = 0
 var _wait_remaining: int = 0
+var _move_remaining: int = 0
+var _move_direction: String = ""
 var _trace: Dictionary = {}
 
 func _ready() -> void:
@@ -121,6 +123,21 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "move":
+        if _move_remaining == 0:
+            _move_remaining = int(action.get("frames", 1))
+            _move_direction = str(action.get("direction", ""))
+            _start_move_input(_move_direction)
+            _trace["events"].append({"type": "move_start", "frame": _frame, "direction": _move_direction, "frames": _move_remaining})
+        _move_remaining -= 1
+        if _move_remaining <= 0:
+            _stop_move_input()
+            _trace["events"].append({"type": "move_end", "frame": _frame})
+            _move_remaining = 0
+            _move_direction = ""
+            _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1
@@ -148,3 +165,22 @@ func _write_trace() -> void:
     var f := FileAccess.open(file_path, FileAccess.WRITE)
     f.store_string(JSON.stringify(_trace, "  "))
     f.close()
+
+func _start_move_input(direction: String) -> void:
+    # Simulate directional input by sending input actions
+    match direction:
+        "left":
+            Input.action_press("ui_left")
+        "right":
+            Input.action_press("ui_right")
+        "up":
+            Input.action_press("ui_up")
+        "down":
+            Input.action_press("ui_down")
+
+func _stop_move_input() -> void:
+    # Release all directional inputs
+    Input.action_release("ui_left")
+    Input.action_release("ui_right")
+    Input.action_release("ui_up")
+    Input.action_release("ui_down")

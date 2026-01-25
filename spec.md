@@ -55,6 +55,13 @@ This file is the single source of truth. If code changes behavior, update this f
 - DialogueManager autoload handles showing/hiding dialogue UI.
 - Player movement is disabled while dialogue is showing.
 
+### 3.6 Area transitions
+- SceneRouter autoload manages scene changes and player spawn placement.
+- Areas contain SpawnMarker nodes (string-based IDs like "from_forest", "default").
+- AreaTransition zones (Area2D) trigger scene changes when the player enters.
+- Transitions specify target area path and target spawn marker ID.
+- Player is repositioned to the spawn marker after area load.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

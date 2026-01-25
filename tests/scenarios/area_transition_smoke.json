@@ -1,0 +1,14 @@
+{
+  "scenario_id": "area_transition_smoke",
+  "description": "Verify area transitions: Town -> Forest -> Town with spawn markers",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "initial_in_town"},
+    {"type": "move", "direction": "right", "frames": 150},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "in_forest"},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "back_in_town"}
+  ]
+}

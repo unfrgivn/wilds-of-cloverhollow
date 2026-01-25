@@ -46,7 +46,7 @@ Player can interact with an object/NPC and see a dialogue box.
 
 ---
 
-## Milestone 3 — Area transitions + spawn system  **Owner:** Godot Gameplay Engineer
+## Milestone 3 — Area transitions + spawn system  **Status:** ✅ Completed (2026-01-25)  **Owner:** Godot Gameplay Engineer
 ### Objective
 Discrete areas with stable spawn points and transitions.
 

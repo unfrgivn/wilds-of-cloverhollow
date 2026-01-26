@@ -1,0 +1,22 @@
+{
+  "scenario_id": "shop_buy_smoke",
+  "description": "Test shopkeeper interaction and purchase flow",
+  "golden": false,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_GeneralStore.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "shop_interior_start" },
+    { "type": "move", "direction": "up", "frames": 30 },
+    { "type": "move", "direction": "right", "frames": 40 },
+    { "type": "capture", "label": "near_shopkeeper" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "shop_ui_open" },
+    { "type": "press", "action": "ui_accept" },
+    { "type": "wait_frames", "frames": 15 },
+    { "type": "capture", "label": "after_purchase" },
+    { "type": "press", "action": "ui_cancel" },
+    { "type": "wait_frames", "frames": 15 },
+    { "type": "capture", "label": "shop_ui_closed" }
+  ]
+}

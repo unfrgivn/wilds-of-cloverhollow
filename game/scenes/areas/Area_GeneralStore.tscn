@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -9,6 +9,9 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/shop/shelf.png" id="7"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/shop/crate.png" id="8"]
 [ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="9"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ShopNPC.gd" id="10"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/shopkeeper/shopkeeper.png" id="11"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/ShopUI.tscn" id="12"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(16, 16)
@@ -118,6 +121,19 @@ position = Vector2(0, -12)
 shape = SubResource("1")
 
 [node name="DialogueUI" parent="." instance=ExtResource("3")]
+
+[node name="ShopUI" parent="." instance=ExtResource("12")]
+
+[node name="Shopkeeper" type="Area2D" parent="."]
+position = Vector2(380, 140)
+script = ExtResource("10")
+shop_items = Array[String](["potion", "ether", "antidote"])
+
+[node name="Sprite2D" type="Sprite2D" parent="Shopkeeper"]
+texture = ExtResource("11")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Shopkeeper"]
+shape = SubResource("1")
 
 [node name="Spawns" type="Node2D" parent="."]
 

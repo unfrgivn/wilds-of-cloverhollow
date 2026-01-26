@@ -294,7 +294,7 @@ Shop building where player buys items.
 
 ---
 
-## Milestone 22 — General Store NPC: Shopkeeper  **Owner:** Character Systems + UI Systems
+## Milestone 22 — General Store NPC: Shopkeeper  **Owner:** Character Systems + UI Systems  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Shopkeeper with buy/sell interface.
 

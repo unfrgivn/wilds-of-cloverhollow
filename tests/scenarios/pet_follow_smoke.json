@@ -1,0 +1,25 @@
+{
+  "scenario_id": "pet_follow_smoke",
+  "description": "Verify pet companion follows player at consistent spacing with random idle animations",
+  "scene": "res://game/scenes/areas/Area_HeroHouseInterior.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "initial_with_pet"},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "pet_following_right"},
+    {"type": "move", "direction": "up", "frames": 50},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "pet_following_up"},
+    {"type": "move", "direction": "left", "frames": 80},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "pet_following_left"},
+    {"type": "move", "direction": "down", "frames": 40},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "pet_following_down"},
+    {"type": "wait_frames", "frames": 180},
+    {"type": "capture", "label": "pet_idle_wait"},
+    {"type": "wait_frames", "frames": 180},
+    {"type": "capture", "label": "pet_possible_special_idle"}
+  ]
+}

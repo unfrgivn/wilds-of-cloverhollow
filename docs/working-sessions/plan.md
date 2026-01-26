@@ -257,7 +257,7 @@ Mom NPC with dialogue.
 
 ---
 
-## Milestone 19 — Hero's Home NPC: Pet companion  **Owner:** Character Systems + Art Pipeline
+## Milestone 19 — Hero's Home NPC: Pet companion  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Pet that follows player and has personality.
 

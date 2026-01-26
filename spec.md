@@ -103,6 +103,13 @@ This file is the single source of truth. If code changes behavior, update this f
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.
 
+### 4.1 Pet companion
+- PetCompanion: CharacterBody2D that follows the player at consistent spacing (~32px).
+- Follow behavior: moves towards player when distance exceeds threshold.
+- Sprites: idle (4 directions), walk cycle (4 directions x 2 frames).
+- Random idle animations: sit, scratch, yawn - triggered after ~5 seconds of standing still.
+- Pet starts in Hero House Interior, follows player between rooms.
+
 ## 5. Battle system
 
 ### 5.1 Battle format (locked)

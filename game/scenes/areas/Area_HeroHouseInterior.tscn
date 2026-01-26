@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -15,6 +15,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/stairs.png" id="13"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/mom/mom_idle_south.png" id="14"]
 [ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="15"]
+[ext_resource type="Script" path="res://game/scripts/characters/PetCompanion.gd" id="16"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/pet/pet_idle_south.png" id="17"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -39,6 +41,9 @@ size = Vector2(16, 32)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_Mom"]
 radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Pet"]
+size = Vector2(12, 12)
 
 [node name="Area_HeroHouseInterior" type="Node2D"]
 
@@ -213,6 +218,17 @@ position_smoothing_enabled = false
 
 [node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
 shape = SubResource("CircleShape2D_1")
+
+[node name="Pet" type="CharacterBody2D" parent="."]
+position = Vector2(236, 210)
+script = ExtResource("16")
+
+[node name="Sprite" type="Sprite2D" parent="Pet"]
+texture = ExtResource("17")
+centered = true
+
+[node name="Collision" type="CollisionShape2D" parent="Pet"]
+shape = SubResource("RectangleShape2D_Pet")
 
 [node name="DialogueUI" parent="." instance=ExtResource("3")]
 

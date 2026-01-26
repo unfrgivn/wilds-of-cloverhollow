@@ -1,0 +1,21 @@
+{
+  "scenario_id": "flee_smoke",
+  "description": "Verifies flee/escape from battle - tests Run command in battle menu",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "battle_start"},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "run_selected"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "flee_attempt_result"}
+  ]
+}

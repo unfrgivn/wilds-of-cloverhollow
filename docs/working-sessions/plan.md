@@ -888,7 +888,7 @@ Game over handling.
 
 ---
 
-## Milestone 72 — Battle: Flee/escape  **Owner:** Battle Systems
+## Milestone 72 — Battle: Flee/escape  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Run away from battle.
 

@@ -303,10 +303,43 @@ func _execute_defend(combatant) -> void:
 	battle_state.end_current_turn()
 
 func _execute_run() -> void:
-	_show_message("Escaped!")
-	print("[BattleScene] Player fled")
-	await get_tree().create_timer(0.5).timeout
-	BattleManager.end_battle("flee")
+	# Calculate flee success rate based on average party speed vs average enemy speed
+	var party_speed: int = 0
+	var party_count: int = 0
+	for member in battle_state.party:
+		if not member.is_defeated():
+			party_speed += member.speed
+			party_count += 1
+	
+	var enemy_speed: int = 0
+	var enemy_count: int = 0
+	for enemy in battle_state.enemies:
+		if not enemy.is_defeated():
+			enemy_speed += enemy.speed
+			enemy_count += 1
+	
+	# Calculate average speeds (avoid divide by zero)
+	var avg_party_speed: float = float(party_speed) / max(party_count, 1)
+	var avg_enemy_speed: float = float(enemy_speed) / max(enemy_count, 1)
+	
+	# Base flee chance: 50% + 5% per point of speed advantage, capped at 10-90%
+	var speed_diff: float = avg_party_speed - avg_enemy_speed
+	var flee_chance: float = clampf(0.5 + (speed_diff * 0.05), 0.1, 0.9)
+	
+	# Roll for escape
+	var roll: float = randf()
+	print("[BattleScene] Flee attempt: party_speed=%d, enemy_speed=%d, chance=%.0f%%, roll=%.2f" % [party_speed, enemy_speed, flee_chance * 100, roll])
+	
+	if roll < flee_chance:
+		_show_message("Got away safely!")
+		print("[BattleScene] Player fled successfully")
+		await get_tree().create_timer(0.5).timeout
+		BattleManager.end_battle("flee")
+	else:
+		_show_message("Couldn't escape!")
+		print("[BattleScene] Flee failed")
+		await get_tree().create_timer(0.5).timeout
+		battle_state.end_current_turn()
 
 func _execute_enemy_turn(enemy) -> void:
 	var target = battle_state.get_first_alive_party_member()

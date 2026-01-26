@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -12,6 +12,9 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/school/window.png" id="10"]
 [ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="11"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/teacher/teacher_idle_south.png" id="12"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_a_idle_north.png" id="13"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_b_idle_north.png" id="14"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_c_idle_north.png" id="15"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_Player"]
 size = Vector2(16, 20)
@@ -313,4 +316,43 @@ centered = true
 offset = Vector2(0, -12)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Teacher"]
+shape = SubResource("CircleShape2D_NPC")
+
+[node name="StudentA" type="Area2D" parent="."]
+position = Vector2(180, 118)
+script = ExtResource("11")
+dialogue_branches = Array[String](["Hi! I'm studying for the big test next week. It's going to be tough!", "Did you hear about the weird noises coming from the old clubhouse?"])
+
+[node name="Sprite" type="Sprite2D" parent="StudentA"]
+texture = ExtResource("13")
+centered = true
+offset = Vector2(0, -12)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StudentA"]
+shape = SubResource("CircleShape2D_NPC")
+
+[node name="StudentB" type="Area2D" parent="."]
+position = Vector2(340, 158)
+script = ExtResource("11")
+dialogue_branches = Array[String](["I can't wait for lunch! The cafeteria has my favorite today.", "Have you explored Bubblegum Bay yet? The beach is so pretty!"])
+
+[node name="Sprite" type="Sprite2D" parent="StudentB"]
+texture = ExtResource("14")
+centered = true
+offset = Vector2(0, -12)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StudentB"]
+shape = SubResource("CircleShape2D_NPC")
+
+[node name="StudentC" type="Area2D" parent="."]
+position = Vector2(100, 198)
+script = ExtResource("11")
+dialogue_branches = Array[String](["I heard there's a secret path behind the school that leads to the forest!", "My older sibling says there's treasure hidden somewhere in town."])
+
+[node name="Sprite" type="Sprite2D" parent="StudentC"]
+texture = ExtResource("15")
+centered = true
+offset = Vector2(0, -12)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StudentC"]
 shape = SubResource("CircleShape2D_NPC")

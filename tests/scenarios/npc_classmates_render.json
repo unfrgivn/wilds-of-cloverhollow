@@ -1,0 +1,41 @@
+{
+  "scenario_id": "npc_classmates_render",
+  "description": "Verify 3 classmate NPCs with unique sprites and dialogue at their desks",
+  "scene": "res://game/scenes/areas/Area_SchoolClassroom.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "classroom_with_students"},
+    
+    {"type": "move", "direction": "left", "frames": 100},
+    {"type": "move", "direction": "up", "frames": 50},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_student_a"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "student_a_dialogue"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "move", "direction": "down", "frames": 15},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_student_b"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "student_b_dialogue"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "move", "direction": "left", "frames": 90},
+    {"type": "move", "direction": "down", "frames": 15},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_student_c"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "student_c_dialogue"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "after_all_dialogues"}
+  ]
+}

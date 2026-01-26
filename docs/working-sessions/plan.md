@@ -356,7 +356,7 @@ Teacher character with classroom dialogue.
 
 ---
 
-## Milestone 27 — School NPC: Classmates (3+)  **Owner:** Character Systems + Art Pipeline
+## Milestone 27 — School NPC: Classmates (3+)  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Multiple student NPCs with distinct looks.
 

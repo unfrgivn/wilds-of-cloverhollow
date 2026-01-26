@@ -1,0 +1,26 @@
+{
+  "id": "find_clubhouse_smoke",
+  "name": "Find the Clubhouse Quest Smoke Test",
+  "description": "Verify the find clubhouse quest flow - talk to classmate, navigate forest, find clubhouse",
+  "area": "res://game/scenes/areas/Area_SchoolClassroom.tscn",
+  "steps": [
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "classroom_start"},
+    {"action": "move", "direction": "up", "frames": 15},
+    {"action": "move", "direction": "left", "frames": 10},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "student_dialogue_1"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "clubhouse_hint_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "capture", "label": "quest_hint_complete"}
+  ]
+}

@@ -1432,7 +1432,7 @@ Forest combat visuals.
 
 ---
 
-## Milestone 117 — Quest: Find the clubhouse  **Owner:** Story + Gameplay
+## Milestone 117 — Quest: Find the clubhouse  **Owner:** Story + Gameplay **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Exploration quest.
 

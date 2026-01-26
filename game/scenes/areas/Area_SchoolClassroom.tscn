@@ -323,7 +323,7 @@ shape = SubResource("CircleShape2D_NPC")
 [node name="StudentA" type="Area2D" parent="."]
 position = Vector2(180, 118)
 script = ExtResource("11")
-dialogue_branches = Array[String](["Hi! I'm studying for the big test next week. It's going to be tough!", "Did you hear about the weird noises coming from the old clubhouse?"])
+dialogue_branches = Array[String](["Hi! I'm studying for the big test next week. It's going to be tough!", "Psst... have you heard about the SECRET CLUBHOUSE in the forest?", "It's hidden beyond the forest path. Look for a big tree with a rope ladder!", "The gang meets there after school. Go find it if you want to join us!"])
 
 [node name="Sprite" type="Sprite2D" parent="StudentA"]
 texture = ExtResource("13")

@@ -135,8 +135,9 @@ This file is the single source of truth. If code changes behavior, update this f
 - chaos_investigation: Talk to townspeople about strange events (flags: chaos_investigation_done).
 - chaos_gather_evidence: Collect evidence items (glowing shard, torn cloak) and bring to Elder.
 - chaos_unlock_forest: Elder unlocks forest path after evidence gathered (grants lantern, sets forest_unlocked).
+- find_clubhouse: Classmate hints at secret clubhouse, navigate forest to discover it (flags: clubhouse_found).
 
-### 3.12 Opening cutscene
+### 3.13 Opening cutscene
 - GameIntroController (Main.tscn script) orchestrates game start sequence.
 - Sequence: TitleScreen → IntroNarration → Hero Bedroom (wake up).
 - TitleScreen: Game title with Start button, fade transitions.

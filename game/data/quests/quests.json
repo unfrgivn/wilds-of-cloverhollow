@@ -120,6 +120,17 @@
       "required_flag": "chaos_evidence_gathered",
       "completion_flag": "forest_unlocked",
       "objectives": ["Speak with the Elder about the evidence", "Receive the forest key"]
+    },
+    {
+      "id": "find_clubhouse",
+      "name": "The Secret Clubhouse",
+      "description": "A classmate mentioned a secret clubhouse hidden in the forest. Find it and discover its secrets!",
+      "type": "exploration",
+      "reward_gold": 40,
+      "reward_items": [],
+      "required_flag": "forest_unlocked",
+      "completion_flag": "clubhouse_found",
+      "objectives": ["Talk to a classmate about the clubhouse", "Navigate through the forest", "Discover the secret clubhouse"]
     }
   ]
 }

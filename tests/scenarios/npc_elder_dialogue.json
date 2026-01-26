@@ -1,0 +1,31 @@
+{
+  "scenario_id": "npc_elder_dialogue",
+  "description": "Walk to Elder NPC on bench, interact multiple times to cycle through dialogue branches",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "park_start"},
+    {"type": "move", "direction": "right", "frames": 80},
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "capture", "label": "near_elder"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "elder_dialogue_1"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "elder_dialogue_2"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "elder_dialogue_3"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "elder_dialogue_4_quest_hook"}
+  ]
+}

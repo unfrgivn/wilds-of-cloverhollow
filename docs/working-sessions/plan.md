@@ -431,7 +431,7 @@ Park/green space for Cloverhollow.
 
 ---
 
-## Milestone 33 — Town Park NPC: Elder  **Owner:** Character Systems + Art Pipeline
+## Milestone 33 — Town Park NPC: Elder  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Elderly character with lore/hints.
 

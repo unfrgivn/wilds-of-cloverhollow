@@ -808,7 +808,7 @@ Pet-exclusive skills.
 
 ---
 
-## Milestone 65 — Item: Potions  **Owner:** Battle Systems + Data Systems
+## Milestone 65 — Item: Potions  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26) + Data Systems
 ### Objective
 Consumable healing items.
 

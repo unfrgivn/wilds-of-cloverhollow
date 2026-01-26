@@ -79,6 +79,46 @@
       "power": 5,
       "target": "pet",
       "price": 40
+    },
+    {
+      "id": "hi_potion",
+      "name": "Hi-Potion",
+      "description": "Restores 50 HP to one ally.",
+      "type": "consumable",
+      "effect": "heal_hp",
+      "power": 50,
+      "target": "single_ally",
+      "price": 150
+    },
+    {
+      "id": "mega_potion",
+      "name": "Mega Potion",
+      "description": "Restores 30 HP to all allies.",
+      "type": "consumable",
+      "effect": "heal_hp",
+      "power": 30,
+      "target": "all_allies",
+      "price": 300
+    },
+    {
+      "id": "hi_ether",
+      "name": "Hi-Ether",
+      "description": "Restores 30 MP to one ally.",
+      "type": "consumable",
+      "effect": "heal_mp",
+      "power": 30,
+      "target": "single_ally",
+      "price": 250
+    },
+    {
+      "id": "elixir",
+      "name": "Elixir",
+      "description": "Fully restores HP and MP to one ally.",
+      "type": "consumable",
+      "effect": "full_restore",
+      "power": 999,
+      "target": "single_ally",
+      "price": 1000
     }
   ]
 }

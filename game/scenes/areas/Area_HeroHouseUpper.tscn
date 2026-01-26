@@ -94,10 +94,17 @@ color = Color(0.71, 0.54, 0.3, 1)
 
 [node name="Bedroom" type="Node2D" parent="."]
 
-[node name="Bed" type="Sprite2D" parent="Bedroom"]
+[node name="Bed" type="Area2D" parent="Bedroom"]
 position = Vector2(120, 100)
+script = ExtResource("14")
+dialogue_text = "*Yawn* Time to wake up! It's a new day in Cloverhollow. Better get dressed and head downstairs."
+
+[node name="BedSprite" type="Sprite2D" parent="Bedroom/Bed"]
 texture = ExtResource("6")
 centered = true
+
+[node name="BedInteractShape" type="CollisionShape2D" parent="Bedroom/Bed"]
+shape = SubResource("RectangleShape2D_bed")
 
 [node name="BedCollision" type="StaticBody2D" parent="Bedroom/Bed"]
 
@@ -119,10 +126,17 @@ position = Vector2(216, 80)
 texture = ExtResource("8")
 centered = true
 
-[node name="Closet" type="Sprite2D" parent="Bedroom"]
+[node name="Closet" type="Area2D" parent="Bedroom"]
 position = Vector2(80, 130)
+script = ExtResource("14")
+dialogue_text = "You put on your favorite outfit. Looking ready for adventure! Now go see Mom downstairs."
+
+[node name="ClosetSprite" type="Sprite2D" parent="Bedroom/Closet"]
 texture = ExtResource("9")
 centered = true
+
+[node name="ClosetInteractShape" type="CollisionShape2D" parent="Bedroom/Closet"]
+shape = SubResource("RectangleShape2D_closet")
 
 [node name="ClosetCollision" type="StaticBody2D" parent="Bedroom/Closet"]
 

@@ -963,7 +963,7 @@ Game intro sequence.
 
 ---
 
-## Milestone 78 — Story: Morning routine tutorial  **Owner:** Story + Gameplay
+## Milestone 78 — Story: Morning routine tutorial  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Guided first moments.
 

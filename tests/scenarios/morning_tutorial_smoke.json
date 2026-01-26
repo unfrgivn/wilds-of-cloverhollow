@@ -1,0 +1,30 @@
+{
+  "scenario_id": "morning_tutorial_smoke",
+  "description": "Verifies morning tutorial: wake up, get dressed, talk to mom",
+  "scene": "res://game/scenes/areas/Area_HeroHouseUpper.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "move", "direction": "left", "frames": 15},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move", "direction": "down", "frames": 20},
+    {"type": "move", "direction": "left", "frames": 15},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move", "direction": "right", "frames": 80},
+    {"type": "move", "direction": "down", "frames": 40},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "move", "direction": "left", "frames": 40},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "morning_routine_complete"}
+  ]
+}

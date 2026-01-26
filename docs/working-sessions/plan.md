@@ -539,7 +539,7 @@ Pet shop attendant.
 
 ---
 
-## Milestone 42 — Blacksmith/Tool Shop exterior + interior  **Owner:** World Builder + Art Pipeline
+## Milestone 42 — Blacksmith/Tool Shop exterior + interior  **Status:** ✅ Completed (2025-01-25)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Shop for adventure tools.
 

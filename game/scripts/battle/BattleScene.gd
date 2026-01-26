@@ -3,6 +3,7 @@ extends Node2D
 
 const CombatantScript := preload("res://game/scripts/battle/Combatant.gd")
 const BattleStateScript := preload("res://game/scripts/battle/BattleState.gd")
+const VictoryScreenScene := preload("res://game/scenes/battle/VictoryScreen.tscn")
 
 ## Phase constants (mirror BattleState.Phase enum)
 const PHASE_STARTING := 0
@@ -23,6 +24,9 @@ var selecting_target: bool = false
 var target_selection: int = 0
 var selectable_targets: Array = []
 var pending_action: String = ""
+
+## Victory screen instance
+var victory_screen = null
 
 ## UI references
 @onready var enemy_name_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyName
@@ -132,14 +136,46 @@ func _on_turn_ended(combatant) -> void:
 func _on_battle_won() -> void:
 	print("[BattleScene] Victory!")
 	_show_message("Victory!")
-	await get_tree().create_timer(1.0).timeout
-	BattleManager.end_battle("victory")
+	await get_tree().create_timer(0.5).timeout
+	
+	# Calculate rewards from defeated enemies
+	var total_xp: int = 0
+	var total_gold: int = 0
+	var items_dropped: Array = []
+	
+	for enemy_combatant in battle_state.enemies:
+		# Look up enemy data to get xp/gold/drops
+		var battle_enemy_data: Dictionary = BattleManager.current_enemy_data
+		var enemy_id: String = battle_enemy_data.get("enemy_id", "slime")
+		var enemy_data: Dictionary = GameData.get_enemy(enemy_id)
+		
+		total_xp += enemy_data.get("xp", 5)
+		total_gold += enemy_data.get("gold", 0)
+		
+		# Roll for drops (100% chance for now, since we don't have drop rates)
+		var drops: Array = enemy_data.get("drops", [])
+		for drop_id in drops:
+			if not items_dropped.has(drop_id):
+				items_dropped.append(drop_id)
+	
+	# Show victory screen
+	victory_screen = VictoryScreenScene.instantiate()
+	add_child(victory_screen)
+	victory_screen.continue_pressed.connect(_on_victory_continue)
+	victory_screen.show_victory(total_xp, total_gold, items_dropped)
 
 func _on_battle_lost() -> void:
 	print("[BattleScene] Defeat...")
 	_show_message("Defeat...")
 	await get_tree().create_timer(1.0).timeout
 	BattleManager.end_battle("defeat")
+
+func _on_victory_continue() -> void:
+	# Clean up victory screen and return to overworld
+	if victory_screen:
+		victory_screen.queue_free()
+		victory_screen = null
+	BattleManager.end_battle("victory")
 
 func _input(event: InputEvent) -> void:
 	if battle_state == null:

@@ -864,7 +864,7 @@ Player chooses attack target.
 
 ---
 
-## Milestone 70 — Battle: Victory screen  **Owner:** UI Systems + Battle Systems
+## Milestone 70 — Battle: Victory screen  **Owner:** UI Systems + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Post-battle rewards UI.
 

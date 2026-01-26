@@ -1,0 +1,14 @@
+{
+  "scenario_id": "victory_screen_render",
+  "description": "Renders victory screen after winning a battle - verifies XP/gold/items display",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "battle_start"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 120},
+    {"type": "capture", "label": "victory_screen_visible"}
+  ]
+}

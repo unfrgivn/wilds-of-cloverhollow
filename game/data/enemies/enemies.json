@@ -9,6 +9,8 @@
       "attack": 4,
       "defense": 1,
       "speed": 3,
+      "xp": 5,
+      "gold": 3,
       "sprite": "res://game/assets/enemies/slime.png",
       "skills": [],
       "drops": []
@@ -22,6 +24,8 @@
       "attack": 5,
       "defense": 2,
       "speed": 6,
+      "xp": 8,
+      "gold": 5,
       "sprite": "res://game/assets/enemies/grumpy_squirrel.png",
       "skills": ["acorn_toss"],
       "drops": ["acorn"]
@@ -35,6 +39,8 @@
       "attack": 6,
       "defense": 0,
       "speed": 8,
+      "xp": 6,
+      "gold": 2,
       "sprite": "res://game/assets/enemies/angry_bee.png",
       "skills": [],
       "drops": ["honey_drop"]
@@ -48,6 +54,8 @@
       "attack": 4,
       "defense": 3,
       "speed": 7,
+      "xp": 7,
+      "gold": 4,
       "sprite": "res://game/assets/sprites/enemies/dusty_bunny/idle_1.png",
       "skills": ["dust_kick"],
       "drops": ["carrot"]
@@ -61,6 +69,8 @@
       "attack": 3,
       "defense": 1,
       "speed": 12,
+      "xp": 5,
+      "gold": 8,
       "sprite": "res://game/assets/sprites/enemies/mischief_mouse/idle_1.png",
       "skills": ["quick_nibble"],
       "drops": ["cheese_crumb"]
@@ -74,6 +84,8 @@
       "attack": 5,
       "defense": 2,
       "speed": 9,
+      "xp": 9,
+      "gold": 6,
       "sprite": "res://game/assets/sprites/enemies/cranky_crow/idle_1.png",
       "skills": ["dive_peck"],
       "drops": ["black_feather"],
@@ -88,6 +100,8 @@
       "attack": 4,
       "defense": 4,
       "speed": 5,
+      "xp": 10,
+      "gold": 7,
       "sprite": "res://game/assets/sprites/enemies/muddy_frog/idle_1.png",
       "skills": ["mud_splash"],
       "drops": ["swamp_moss"],

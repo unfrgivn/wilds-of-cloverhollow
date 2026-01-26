@@ -1496,7 +1496,7 @@ Antagonist introduction.
 
 ---
 
-## Milestone 122 — Story: Rally the town  **Owner:** Story + Gameplay
+## Milestone 122 — Story: Rally the town  **Owner:** Story + Gameplay  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Gathering allies.
 

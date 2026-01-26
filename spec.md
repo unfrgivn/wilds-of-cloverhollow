@@ -140,6 +140,9 @@ This file is the single source of truth. If code changes behavior, update this f
   - VillainEncounter script triggers cutscene on player collision.
   - Chaos Lord sprite: game/assets/sprites/characters/villain/chaos_lord.png.
   - Cutscene: villain taunts player and escapes deeper into forest.
+- rally_town: After villain reveal, player rallies townspeople for support (flags: ally_elder_rallied, ally_teacher_rallied, ally_blacksmith_rallied, party_formed).
+  - AllyNPC script handles rally dialogue and item gifts.
+  - Key allies: Elder (supplies), Teacher (knowledge), Blacksmith (equipment).
 
 ### 3.13 Opening cutscene
 - GameIntroController (Main.tscn script) orchestrates game start sequence.

@@ -1,0 +1,28 @@
+{
+    "id": "rally_town_smoke",
+    "description": "Test rally the town story progression",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "rally_start"},
+        
+        {"type": "set_story_flag", "flag": "villain_revealed", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "rally_villain_known"},
+        
+        {"type": "set_story_flag", "flag": "ally_elder_rallied", "value": true},
+        {"type": "set_story_flag", "flag": "ally_teacher_rallied", "value": true},
+        {"type": "set_story_flag", "flag": "ally_blacksmith_rallied", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        
+        {"type": "check_story_flag", "flag": "ally_elder_rallied"},
+        {"type": "check_story_flag", "flag": "ally_teacher_rallied"},
+        {"type": "check_story_flag", "flag": "ally_blacksmith_rallied"},
+        
+        {"type": "set_story_flag", "flag": "party_formed", "value": true},
+        {"type": "check_story_flag", "flag": "party_formed"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "rally_complete"}
+    ]
+}

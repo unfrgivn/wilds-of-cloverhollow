@@ -1584,7 +1584,7 @@ Complete audio coverage.
 
 ---
 
-## Milestone 129 — Bug fix sweep  **Owner:** QA Automation + Gameplay
+## Milestone 129 — Bug fix sweep  **Status:** ✅ Completed (2026-01-26)  **Owner:** QA Automation + Gameplay
 ### Objective
 Address known issues.
 

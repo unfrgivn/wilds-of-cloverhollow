@@ -1,0 +1,15 @@
+{
+    "id": "map_screen_render",
+    "name": "Map screen UI render test",
+    "description": "Opens the map screen and verifies display",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "open_map"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "capture", "label": "map_screen_open"},
+        {"type": "close_map"},
+        {"type": "wait_frames", "frames": 5},
+        {"type": "capture", "label": "map_screen_closed"}
+    ]
+}

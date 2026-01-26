@@ -492,6 +492,24 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "open_map":
+        var map_scene := preload("res://game/scenes/ui/MapScreenUI.tscn")
+        var map_ui := map_scene.instantiate()
+        get_tree().root.add_child(map_ui)
+        map_ui.open_map()
+        _trace["events"].append({"type": "open_map", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "close_map":
+        var map_nodes := get_tree().get_nodes_in_group("map_screen_ui")
+        for node in map_nodes:
+            node.close_map()
+            node.queue_free()
+        _trace["events"].append({"type": "close_map", "frame": _frame})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

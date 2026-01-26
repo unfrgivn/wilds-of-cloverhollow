@@ -1,0 +1,72 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0pf45j2ry8ij"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/MapScreenUI.gd" id="1_script"]
+
+[node name="MapScreenUI" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -120.0
+offset_right = 160.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 310.0
+offset_bottom = 25.0
+text = "Town Map"
+horizontal_alignment = 1
+
+[node name="MapContainer" type="Control" parent="Panel"]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 30.0
+offset_right = 288.0
+offset_bottom = 222.0
+
+[node name="MapTexture" type="ColorRect" parent="Panel/MapContainer"]
+layout_mode = 0
+offset_right = 256.0
+offset_bottom = 192.0
+color = Color(0.55, 0.76, 0.29, 1)
+
+[node name="Marker" type="ColorRect" parent="Panel/MapContainer"]
+layout_mode = 0
+offset_left = 124.0
+offset_top = 92.0
+offset_right = 132.0
+offset_bottom = 100.0
+color = Color(1, 0.2, 0.2, 1)
+
+[node name="LabelsContainer" type="Control" parent="Panel/MapContainer"]
+layout_mode = 0
+offset_right = 256.0
+offset_bottom = 192.0
+
+[node name="LocationLabel" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 220.0
+offset_right = 310.0
+offset_bottom = 235.0
+text = "Current: Town Center"
+horizontal_alignment = 1

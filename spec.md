@@ -251,6 +251,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - Navigation: up/down to select quest, left/right to switch tabs, cancel to close.
 - Scenario actions: `open_quest_log`, `close_quest_log`.
 
+### 3.24 Map screen UI
+- MapScreenUI (CanvasLayer): town map display.
+- Opens from pause menu Map option (future) or via scenario action.
+- Cloverhollow map image with building representations.
+- Current location marker (red) positioned based on current area.
+- Building labels showing location names.
+- Location text showing current area name.
+- Navigation: cancel/pause to close.
+- Scenario actions: `open_map`, `close_map`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

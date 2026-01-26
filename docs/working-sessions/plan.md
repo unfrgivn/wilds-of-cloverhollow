@@ -1456,7 +1456,7 @@ Combat quest in forest.
 
 ---
 
-## Milestone 119 — Tool: Lantern  **Owner:** Gameplay + Art Pipeline
+## Milestone 119 — Tool: Lantern  **Owner:** Gameplay + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Light-based puzzle tool.
 

@@ -1,0 +1,22 @@
+{
+    "id": "lantern_smoke",
+    "description": "Test lantern tool acquisition and gated area access",
+    "scene": "res://game/scenes/areas/Forest_Entrance.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "lantern_start"},
+        
+        {"type": "check_tool", "tool_id": "lantern"},
+        {"type": "capture", "label": "lantern_not_acquired"},
+        
+        {"type": "acquire_tool", "tool_id": "lantern"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "lantern_acquired"},
+        
+        {"type": "check_tool", "tool_id": "lantern"},
+        {"type": "capture", "label": "lantern_has_tool"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "lantern_complete"}
+    ]
+}

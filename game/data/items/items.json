@@ -220,6 +220,46 @@
       "power": 5,
       "target": "single_ally",
       "price": 5
+    },
+    {
+      "id": "lantern",
+      "name": "Lantern",
+      "description": "A sturdy lantern that illuminates dark areas. Essential for exploring caves and the deep forest.",
+      "type": "tool",
+      "effect": "illuminate",
+      "power": 0,
+      "target": "self",
+      "price": 0
+    },
+    {
+      "id": "journal",
+      "name": "Journal",
+      "description": "A personal journal for recording discoveries and clues about the mysterious happenings.",
+      "type": "tool",
+      "effect": "record",
+      "power": 0,
+      "target": "self",
+      "price": 0
+    },
+    {
+      "id": "lasso",
+      "name": "Lasso",
+      "description": "A strong rope lasso for catching runaway critters and pulling distant objects.",
+      "type": "tool",
+      "effect": "catch",
+      "power": 0,
+      "target": "world",
+      "price": 0
+    },
+    {
+      "id": "flute",
+      "name": "Flute",
+      "description": "A magical flute that can calm wild creatures and reveal hidden paths.",
+      "type": "tool",
+      "effect": "music",
+      "power": 0,
+      "target": "world",
+      "price": 0
     }
   ]
 }

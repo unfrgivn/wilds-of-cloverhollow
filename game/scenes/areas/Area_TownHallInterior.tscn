@@ -1,0 +1,287 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="3"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="4"]
+[ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="5"]
+[ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(16, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(32, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(16, 16)
+
+[node name="Area_TownHallInterior" type="Node2D"]
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.55, 0.50, 0.45, 1)
+
+[node name="Walls" type="ColorRect" parent="."]
+offset_right = 512.0
+offset_bottom = 50.0
+color = Color(0.80, 0.78, 0.75, 1)
+
+[node name="WallTrim" type="ColorRect" parent="."]
+offset_top = 48.0
+offset_right = 512.0
+offset_bottom = 52.0
+color = Color(0.60, 0.55, 0.50, 1)
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="ReceptionDesk" type="Node2D" parent="Props"]
+position = Vector2(256, 100)
+
+[node name="DeskBase" type="ColorRect" parent="Props/ReceptionDesk"]
+offset_left = -60.0
+offset_top = -12.0
+offset_right = 60.0
+offset_bottom = 12.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+[node name="DeskTop" type="ColorRect" parent="Props/ReceptionDesk"]
+offset_left = -62.0
+offset_top = -14.0
+offset_right = 62.0
+offset_bottom = -10.0
+color = Color(0.55, 0.45, 0.35, 1)
+
+[node name="DeskCollision" type="StaticBody2D" parent="Props/ReceptionDesk"]
+
+[node name="Shape" type="CollisionShape2D" parent="Props/ReceptionDesk/DeskCollision"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="MayorOfficeDoor" type="Node2D" parent="Props"]
+position = Vector2(420, 45)
+
+[node name="DoorFrame" type="ColorRect" parent="Props/MayorOfficeDoor"]
+offset_left = -24.0
+offset_top = -20.0
+offset_right = 24.0
+offset_bottom = 20.0
+color = Color(0.40, 0.30, 0.22, 1)
+
+[node name="Door" type="ColorRect" parent="Props/MayorOfficeDoor"]
+offset_left = -20.0
+offset_top = -16.0
+offset_right = 20.0
+offset_bottom = 16.0
+color = Color(0.50, 0.40, 0.30, 1)
+
+[node name="DoorLabel" type="Label" parent="Props/MayorOfficeDoor"]
+offset_left = -40.0
+offset_top = -35.0
+offset_right = 40.0
+offset_bottom = -20.0
+text = "Mayor's Office"
+horizontal_alignment = 1
+
+[node name="NoticeBoard" type="Node2D" parent="Props"]
+position = Vector2(100, 45)
+
+[node name="BoardBack" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = -40.0
+offset_top = -25.0
+offset_right = 40.0
+offset_bottom = 25.0
+color = Color(0.50, 0.40, 0.30, 1)
+
+[node name="BoardFrame" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = -38.0
+offset_top = -23.0
+offset_right = 38.0
+offset_bottom = 23.0
+color = Color(0.75, 0.70, 0.60, 1)
+
+[node name="Poster1" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = -32.0
+offset_top = -18.0
+offset_right = -8.0
+offset_bottom = 0.0
+color = Color(0.95, 0.90, 0.80, 1)
+
+[node name="Poster2" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = -4.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = -2.0
+color = Color(0.90, 0.95, 0.85, 1)
+
+[node name="Poster3" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = 22.0
+offset_top = -16.0
+offset_right = 36.0
+offset_bottom = 2.0
+color = Color(0.85, 0.88, 0.95, 1)
+
+[node name="Poster4" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = -28.0
+offset_top = 4.0
+offset_right = -10.0
+offset_bottom = 18.0
+color = Color(0.95, 0.85, 0.85, 1)
+
+[node name="Poster5" type="ColorRect" parent="Props/NoticeBoard"]
+offset_left = 8.0
+offset_top = 2.0
+offset_right = 32.0
+offset_bottom = 18.0
+color = Color(0.88, 0.92, 0.88, 1)
+
+[node name="BoardTitle" type="Label" parent="Props/NoticeBoard"]
+offset_left = -35.0
+offset_top = -40.0
+offset_right = 35.0
+offset_bottom = -25.0
+text = "NOTICES"
+horizontal_alignment = 1
+
+[node name="WaitingChairs" type="Node2D" parent="Props"]
+position = Vector2(380, 180)
+
+[node name="Chair1" type="ColorRect" parent="Props/WaitingChairs"]
+offset_left = -30.0
+offset_top = -8.0
+offset_right = -14.0
+offset_bottom = 8.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+[node name="Chair2" type="ColorRect" parent="Props/WaitingChairs"]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+[node name="Chair3" type="ColorRect" parent="Props/WaitingChairs"]
+offset_left = 14.0
+offset_top = -8.0
+offset_right = 30.0
+offset_bottom = 8.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+[node name="PlantPot1" type="ColorRect" parent="Props"]
+offset_left = 40.0
+offset_top = 100.0
+offset_right = 56.0
+offset_bottom = 130.0
+color = Color(0.25, 0.50, 0.25, 1)
+
+[node name="Pot1" type="ColorRect" parent="Props"]
+offset_left = 42.0
+offset_top = 125.0
+offset_right = 54.0
+offset_bottom = 135.0
+color = Color(0.55, 0.35, 0.25, 1)
+
+[node name="PlantPot2" type="ColorRect" parent="Props"]
+offset_left = 456.0
+offset_top = 100.0
+offset_right = 472.0
+offset_bottom = 130.0
+color = Color(0.25, 0.50, 0.25, 1)
+
+[node name="Pot2" type="ColorRect" parent="Props"]
+offset_left = 458.0
+offset_top = 125.0
+offset_right = 470.0
+offset_bottom = 135.0
+color = Color(0.55, 0.35, 0.25, 1)
+
+[node name="Flagpole" type="Node2D" parent="Props"]
+position = Vector2(480, 60)
+
+[node name="Pole" type="ColorRect" parent="Props/Flagpole"]
+offset_left = -2.0
+offset_top = -40.0
+offset_right = 2.0
+offset_bottom = 40.0
+color = Color(0.65, 0.55, 0.40, 1)
+
+[node name="Flag" type="ColorRect" parent="Props/Flagpole"]
+offset_left = -18.0
+offset_top = -38.0
+offset_right = -2.0
+offset_bottom = -22.0
+color = Color(0.30, 0.50, 0.70, 1)
+
+[node name="NoticeInteractable" type="Area2D" parent="."]
+position = Vector2(100, 100)
+script = ExtResource("3")
+dialogue_text = "Notice Board - Quest Postings:
+- HELP WANTED: Find the Mayor's missing cat
+- REWARD: Rare mushrooms from the forest
+- URGENT: Strange sounds in the old mine"
+
+[node name="NoticeCollision" type="CollisionShape2D" parent="NoticeInteractable"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="MayorDoorInteractable" type="Area2D" parent="."]
+position = Vector2(420, 80)
+script = ExtResource("3")
+dialogue_text = "The Mayor's Office is currently closed.
+Please check back during office hours."
+
+[node name="DoorCollision" type="CollisionShape2D" parent="MayorDoorInteractable"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(256, 240)
+script = ExtResource("1")
+
+[node name="Sprite" type="Sprite2D" parent="Player"]
+texture = ExtResource("2")
+centered = true
+
+[node name="Collision" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+enabled = true
+position_smoothing_enabled = false
+
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="DialogueUI" parent="." instance=ExtResource("4")]
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="default" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 240)
+script = ExtResource("5")
+
+[node name="from_town_center" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 260)
+script = ExtResource("5")
+marker_id = "from_town_center"
+
+[node name="TransitionToTownCenter" type="Area2D" parent="."]
+position = Vector2(256, 280)
+script = ExtResource("6")
+target_area = "res://game/scenes/areas/Area_TownCenter.tscn"
+target_spawn_id = "from_town_hall"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToTownCenter"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToTownCenter"]
+offset_left = -40.0
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 10.0
+text = "↓ Exit"
+horizontal_alignment = 1

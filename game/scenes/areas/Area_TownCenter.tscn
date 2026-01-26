@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -20,6 +20,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_arcade.png" id="18"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_library.png" id="19"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_cafe.png" id="20"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_townhall.png" id="21"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -131,6 +132,10 @@ texture = ExtResource("19")
 position = Vector2(320, 50)
 texture = ExtResource("20")
 
+[node name="TownHallFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(60, 220)
+texture = ExtResource("21")
+
 [node name="TownSign" type="Area2D" parent="."]
 position = Vector2(256, 100)
 script = ExtResource("5")
@@ -203,6 +208,11 @@ marker_id = "from_library"
 position = Vector2(320, 80)
 script = ExtResource("7")
 marker_id = "from_cafe"
+
+[node name="from_town_hall" type="Marker2D" parent="Spawns"]
+position = Vector2(60, 250)
+script = ExtResource("7")
+marker_id = "from_town_hall"
 
 [node name="NPCSpawns" type="Node2D" parent="."]
 
@@ -391,4 +401,21 @@ offset_top = -15.0
 offset_right = 30.0
 offset_bottom = 5.0
 text = "Café"
+horizontal_alignment = 1
+
+[node name="TransitionToTownHall" type="Area2D" parent="."]
+position = Vector2(60, 252)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_TownHallInterior.tscn"
+target_spawn_id = "from_town_center"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToTownHall"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToTownHall"]
+offset_left = -35.0
+offset_top = -15.0
+offset_right = 35.0
+offset_bottom = 5.0
+text = "Town Hall"
 horizontal_alignment = 1

@@ -491,7 +491,7 @@ Baker character with food items.
 
 ---
 
-## Milestone 38 — Town Hall exterior + interior  **Owner:** World Builder + Art Pipeline
+## Milestone 38 — Town Hall exterior + interior  **Status:** ✅ Completed (2026-01-25)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Administrative building.
 

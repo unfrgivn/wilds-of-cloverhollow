@@ -1,0 +1,29 @@
+{
+  "scenario_id": "town_hall_walkthrough",
+  "description": "Enter Town Hall from Town Center, explore interior with reception, notice board, mayor's office door",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "town_center_start"},
+    {"type": "move", "direction": "left", "frames": 60},
+    {"type": "move", "direction": "down", "frames": 50},
+    {"type": "capture", "label": "near_town_hall"},
+    {"type": "move", "direction": "down", "frames": 20},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "town_hall_interior"},
+    {"type": "move", "direction": "up", "frames": 60},
+    {"type": "move", "direction": "left", "frames": 40},
+    {"type": "capture", "label": "notice_board_area"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "notice_board_dialogue"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "move", "direction": "right", "frames": 100},
+    {"type": "capture", "label": "mayor_office_area"},
+    {"type": "move", "direction": "down", "frames": 80},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "back_to_town_center"}
+  ]
+}

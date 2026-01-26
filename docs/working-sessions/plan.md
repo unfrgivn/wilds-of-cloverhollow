@@ -1468,7 +1468,7 @@ Light-based puzzle tool.
 
 ---
 
-## Milestone 120 — Forest: Dark hollow (lantern gated)  **Owner:** World Builder + Gameplay
+## Milestone 120 — Forest: Dark hollow (lantern gated)  **Owner:** World Builder + Gameplay  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Area requiring lantern.
 

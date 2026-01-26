@@ -1,0 +1,22 @@
+{
+    "id": "dark_hollow_smoke",
+    "description": "Test Dark Hollow area with lantern mechanic and treasure",
+    "scene": "res://game/scenes/areas/Dark_Hollow.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "dark_hollow_start_dark"},
+        
+        {"type": "check_tool", "tool_id": "lantern"},
+        
+        {"type": "acquire_tool", "tool_id": "lantern"},
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "dark_hollow_with_lantern"},
+        
+        {"type": "move", "direction": "right", "frames": 120},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "dark_hollow_near_treasure"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "dark_hollow_complete"}
+    ]
+}

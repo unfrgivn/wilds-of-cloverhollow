@@ -601,6 +601,17 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Battle background: grove.png (512x288).
 - Scenario: `hidden_grove_render` for visual/interaction testing.
 
+### 7.5.3 Dark Hollow (v0 blockout)
+- Very dark forest area requiring lantern tool to navigate.
+- Dark blue/black background with minimal visibility.
+- DarkAreaOverlay (CanvasModulate) applies dark tint; fades when player has lantern.
+- Props: 8 trees around perimeter, treasure chest in hidden alcove.
+- Interactables: TreasureChest (requires lantern, gives 5 ethers, sets "dark_hollow_treasure_found" flag).
+- Transitions: to Forest Path (west, "from_hollow" spawn).
+- Spawn markers: default, from_path.
+- Battle background: deep_woods.png (512x288).
+- Scenario: `dark_hollow_smoke` for lantern mechanic testing.
+
 ### 7.6 Biome factory workflow
 - `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
   - Palette stub in `art/palettes/<id>.palette.json`

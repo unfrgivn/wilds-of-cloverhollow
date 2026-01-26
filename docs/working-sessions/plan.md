@@ -467,7 +467,7 @@ Librarian with book lookup mechanic.
 
 ---
 
-## Milestone 36 — Café/Bakery exterior + interior  **Owner:** World Builder + Art Pipeline
+## Milestone 36 — Café/Bakery exterior + interior  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Cozy café in town.
 

@@ -923,7 +923,7 @@ Multi-phase boss encounter.
 
 ---
 
-## Milestone 75 — Experience and leveling  **Owner:** Battle Systems + Data Systems
+## Milestone 75 — Experience and leveling  **Owner:** Battle Systems + Data Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Character progression.
 

@@ -25,11 +25,14 @@ func show_victory(xp: int, gold: int, items: Array) -> void:
 	total_gold = gold
 	items_gained = items
 	
-	_update_ui()
+	# Award XP to party and check for level ups
+	var level_ups: Array = PartyManager.award_xp(xp)
+	
+	_update_ui(level_ups)
 	visible = true
 	print("[VictoryScreen] Victory! XP: %d, Gold: %d, Items: %s" % [xp, gold, items])
 
-func _update_ui() -> void:
+func _update_ui(level_ups: Array = []) -> void:
 	if xp_label:
 		xp_label.text = "XP Gained: %d" % total_xp
 	if gold_label:
@@ -55,6 +58,15 @@ func _update_ui() -> void:
 				item_label.add_theme_font_size_override("font_size", 8)
 				item_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				items_container.add_child(item_label)
+		
+		# Show level ups
+		for level_up in level_ups:
+			var level_label := Label.new()
+			level_label.text = "%s leveled up! Lv %d" % [level_up.name, level_up.new_level]
+			level_label.add_theme_font_size_override("font_size", 8)
+			level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			level_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
+			items_container.add_child(level_label)
 
 func _on_continue_pressed() -> void:
 	visible = false

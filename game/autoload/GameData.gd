@@ -159,6 +159,10 @@ func get_all_party_members() -> Array:
 		return party_data["members"]
 	return []
 
+## Get full party data including thresholds and growth
+func get_party_data() -> Dictionary:
+	return party_data
+
 ## Get biome data by id
 func get_biome(biome_id: String) -> Dictionary:
 	if biomes.has(biome_id):

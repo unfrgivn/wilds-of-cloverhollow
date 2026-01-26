@@ -1,0 +1,14 @@
+{
+  "scenario_id": "level_up_smoke",
+  "description": "Verifies XP accumulation and level up after battle victory",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "battle_start"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 180},
+    {"type": "capture", "label": "victory_with_xp"}
+  ]
+}

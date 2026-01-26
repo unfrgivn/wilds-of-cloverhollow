@@ -269,7 +269,7 @@ Pet that follows player and has personality.
 
 ---
 
-## Milestone 20 — Town Square exterior  **Owner:** World Builder + Art Pipeline
+## Milestone 20 — Town Square exterior  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Central hub area for Cloverhollow.
 

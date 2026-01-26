@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -13,6 +13,12 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="11"]
 [ext_resource type="Script" path="res://game/scripts/interaction/ToolGatedInteractable.gd" id="12"]
 [ext_resource type="Script" path="res://game/scripts/interaction/ItemPickup.gd" id="13"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/fountain.png" id="14"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/tree.png" id="15"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_shop.png" id="16"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_school.png" id="17"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_arcade.png" id="18"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_library.png" id="19"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -81,6 +87,45 @@ texture = ExtResource("10")
 position = Vector2(312, 180)
 texture = ExtResource("10")
 
+[node name="Fountain" type="Sprite2D" parent="Props"]
+position = Vector2(256, 160)
+texture = ExtResource("14")
+z_index = -1
+
+[node name="Tree1" type="Sprite2D" parent="Props"]
+position = Vector2(120, 100)
+texture = ExtResource("15")
+
+[node name="Tree2" type="Sprite2D" parent="Props"]
+position = Vector2(400, 100)
+texture = ExtResource("15")
+
+[node name="Tree3" type="Sprite2D" parent="Props"]
+position = Vector2(100, 220)
+texture = ExtResource("15")
+
+[node name="Tree4" type="Sprite2D" parent="Props"]
+position = Vector2(420, 220)
+texture = ExtResource("15")
+
+[node name="Buildings" type="Node2D" parent="."]
+
+[node name="ShopFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(60, 80)
+texture = ExtResource("16")
+
+[node name="SchoolFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(460, 60)
+texture = ExtResource("17")
+
+[node name="ArcadeFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(460, 180)
+texture = ExtResource("18")
+
+[node name="LibraryFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(180, 50)
+texture = ExtResource("19")
+
 [node name="TownSign" type="Area2D" parent="."]
 position = Vector2(256, 100)
 script = ExtResource("5")
@@ -133,6 +178,17 @@ marker_id = "from_arcade"
 position = Vector2(256, 250)
 script = ExtResource("7")
 marker_id = "from_bubblegum_bay"
+
+[node name="NPCSpawns" type="Node2D" parent="."]
+
+[node name="NPCSpawn1" type="Marker2D" parent="NPCSpawns"]
+position = Vector2(180, 160)
+
+[node name="NPCSpawn2" type="Marker2D" parent="NPCSpawns"]
+position = Vector2(330, 140)
+
+[node name="NPCSpawn3" type="Marker2D" parent="NPCSpawns"]
+position = Vector2(280, 200)
 
 [node name="TransitionToHeroHouse" type="Area2D" parent="."]
 position = Vector2(30, 160)

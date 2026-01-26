@@ -1,0 +1,21 @@
+{
+  "scenario_id": "town_square_render",
+  "description": "Golden capture for Town Square/Town Center with fountain and building facades",
+  "golden": true,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "town_square_initial" },
+    { "type": "move", "direction": "up", "frames": 30 },
+    { "type": "capture", "label": "town_square_near_fountain" },
+    { "type": "move", "direction": "left", "frames": 40 },
+    { "type": "capture", "label": "town_square_west_shops" },
+    { "type": "move", "direction": "right", "frames": 80 },
+    { "type": "capture", "label": "town_square_east_buildings" },
+    { "type": "move", "direction": "down", "frames": 30 },
+    { "type": "capture", "label": "town_square_south_area" },
+    { "type": "move", "direction": "up", "frames": 15 },
+    { "type": "wait_frames", "frames": 15 },
+    { "type": "capture", "label": "town_square_final" }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "localization_smoke",
+  "description": "Verify localization system - language switching and translations",
+  "setup": {
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn"
+  },
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "check_locale"},
+    
+    {"type": "set_locale", "locale": "en"},
+    {"type": "check_locale"},
+    {"type": "check_translation", "key": "UI_SETTINGS"},
+    {"type": "check_translation", "key": "UI_SAVE"},
+    {"type": "check_translation", "key": "UI_ATTACK"},
+    
+    {"type": "set_locale", "locale": "es"},
+    {"type": "check_locale"},
+    {"type": "check_translation", "key": "UI_SETTINGS"},
+    {"type": "check_translation", "key": "UI_SAVE"},
+    {"type": "check_translation", "key": "UI_ATTACK"},
+    
+    {"type": "set_locale", "locale": "fr"},
+    {"type": "check_locale"},
+    {"type": "check_translation", "key": "UI_SETTINGS"},
+    {"type": "check_translation", "key": "UI_SAVE"},
+    {"type": "check_translation", "key": "UI_ATTACK"},
+    
+    {"type": "set_locale", "locale": "en"},
+    {"type": "check_locale"},
+    
+    {"type": "wait_frames", "frames": 5}
+  ]
+}

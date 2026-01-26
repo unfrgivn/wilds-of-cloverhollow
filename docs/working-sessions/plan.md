@@ -1617,7 +1617,7 @@ Ensure smooth performance.
 
 ---
 
-## Milestone 132 — Localization stub  **Owner:** Data Systems
+## Milestone 132 — Localization stub  **Status:** ✅ Completed (2026-01-26)  **Owner:** Data Systems
 ### Objective
 Prepare for translation.
 

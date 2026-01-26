@@ -1,0 +1,61 @@
+keys,en,es,fr
+UI_SETTINGS,Settings,Configuración,Paramètres
+UI_MUSIC,Music,Música,Musique
+UI_SFX,SFX,Efectos,Effets Sonores
+UI_TOUCH_CONTROLS,Touch Controls,Controles Táctiles,Contrôles Tactiles
+UI_TEXT_SIZE,Text Size,Tamaño de Texto,Taille du Texte
+UI_LANGUAGE,Language,Idioma,Langue
+UI_CREDITS,Credits,Créditos,Crédits
+UI_BACK,Back,Atrás,Retour
+UI_SMALL,Small,Pequeño,Petit
+UI_MEDIUM,Medium,Mediano,Moyen
+UI_LARGE,Large,Grande,Grand
+UI_RESUME,Resume,Continuar,Reprendre
+UI_ITEMS,Items,Objetos,Objets
+UI_SAVE,Save,Guardar,Sauvegarder
+UI_QUIT,Quit,Salir,Quitter
+UI_PARTY,Party,Grupo,Équipe
+UI_QUESTS,Quests,Misiones,Quêtes
+UI_MAP,Map,Mapa,Carte
+UI_CONFIRM,Confirm,Confirmar,Confirmer
+UI_CANCEL,Cancel,Cancelar,Annuler
+UI_YES,Yes,Sí,Oui
+UI_NO,No,No,Non
+UI_ACCEPT,Accept,Aceptar,Accepter
+UI_DECLINE,Decline,Rechazar,Refuser
+UI_START,Start,Iniciar,Démarrer
+UI_CONTINUE,Continue,Continuar,Continuer
+UI_NEW_GAME,New Game,Nueva Partida,Nouvelle Partie
+UI_LOAD_GAME,Load Game,Cargar Partida,Charger Partie
+UI_SAVE_GAME,Save Game,Guardar Partida,Sauvegarder Partie
+UI_EMPTY_SLOT,Empty,Vacío,Vide
+UI_DELETE,Delete,Eliminar,Supprimer
+UI_HP,HP,PV,PV
+UI_MP,MP,PM,PM
+UI_ATK,ATK,ATQ,ATQ
+UI_DEF,DEF,DEF,DÉF
+UI_SPD,SPD,VEL,VIT
+UI_ATTACK,Attack,Atacar,Attaquer
+UI_SKILL,Skill,Habilidad,Compétence
+UI_ITEM,Item,Objeto,Objet
+UI_DEFEND,Defend,Defender,Défendre
+UI_RUN,Run,Huir,Fuir
+UI_VICTORY,Victory!,¡Victoria!,Victoire !
+UI_DEFEAT,Defeat...,Derrota...,Défaite...
+UI_LEVEL_UP,Level Up!,¡Subiste de nivel!,Niveau supérieur !
+UI_QUEST_ACCEPTED,Quest Accepted,Misión Aceptada,Quête Acceptée
+UI_QUEST_COMPLETED,Quest Completed,Misión Completada,Quête Terminée
+UI_ITEM_OBTAINED,Item Obtained,Objeto Obtenido,Objet Obtenu
+UI_TOOL_ACQUIRED,Tool Acquired,Herramienta Adquirida,Outil Acquis
+UI_ACTIVE,Active,Activas,Actives
+UI_COMPLETED,Completed,Completadas,Terminées
+UI_OBJECTIVES,Objectives,Objetivos,Objectifs
+UI_REWARDS,Rewards,Recompensas,Récompenses
+UI_GOLD,Gold,Oro,Or
+MSG_SAVE_SUCCESS,Game saved!,¡Partida guardada!,Partie sauvegardée !
+MSG_LOAD_SUCCESS,Game loaded!,¡Partida cargada!,Partie chargée !
+MSG_NO_SAVE,No save data found,No hay datos guardados,Aucune sauvegarde trouvée
+MSG_CONFIRM_QUIT,Return to title?,¿Volver al título?,Retourner au titre ?
+LANG_EN,English,Inglés,Anglais
+LANG_ES,Español,Español,Espagnol
+LANG_FR,Français,Francés,Français

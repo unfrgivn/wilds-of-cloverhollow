@@ -696,6 +696,32 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Localization actions
+    if t == "set_locale":
+        var locale: String = action.get("locale", "en")
+        LocalizationManager.set_locale(locale)
+        SettingsManager.set_locale(locale)
+        _trace["events"].append({"type": "set_locale", "frame": _frame, "locale": locale})
+        print("[Scenario] Locale set to: %s" % locale)
+        _action_index += 1
+        return
+
+    if t == "check_locale":
+        var current_locale: String = LocalizationManager.get_locale()
+        var locale_name: String = LocalizationManager.get_current_locale_name()
+        _trace["events"].append({"type": "check_locale", "frame": _frame, "locale": current_locale, "name": locale_name})
+        print("[Scenario] Locale: %s (%s)" % [current_locale, locale_name])
+        _action_index += 1
+        return
+
+    if t == "check_translation":
+        var key: String = action.get("key", "")
+        var translated: String = tr(key)
+        _trace["events"].append({"type": "check_translation", "frame": _frame, "key": key, "translated": translated})
+        print("[Scenario] Translation '%s' -> '%s'" % [key, translated])
+        _action_index += 1
+        return
+
     # Tutorial hints actions
     if t == "show_hint":
         var hint_id: String = str(action.get("hint_id", ""))

@@ -39,6 +39,11 @@ TutorialHintsManager="*res://game/autoload/TutorialHintsManager.gd"
 CutsceneManager="*res://game/autoload/CutsceneManager.gd"
 PhotoModeManager="*res://game/autoload/PhotoModeManager.gd"
 AchievementManager="*res://game/autoload/AchievementManager.gd"
+LocalizationManager="*res://game/autoload/LocalizationManager.gd"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://game/data/localization/translations.csv")
 
 [display]
 

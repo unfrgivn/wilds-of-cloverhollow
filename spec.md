@@ -420,6 +420,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - Signals: `achievement_unlocked(id, data)`, `achievement_progress(id, current, target)`.
 - Scenario actions: `unlock_achievement`, `record_progress`, `check_achievement`, `reset_achievements`.
 
+### 3.35 Localization system
+- LocalizationManager autoload handles language switching.
+- Supported locales: en (English), es (Español), fr (Français).
+- Translations stored in `game/data/localization/translations.csv`.
+- CSV format: keys column + one column per locale.
+- TranslationServer.set_locale() for runtime switching.
+- SettingsUI language option with left/right cycling.
+- SettingsManager persists locale preference.
+- Signals: `language_changed(locale)`, `locale_changed(locale)`.
+- Scenario actions: `set_locale`, `check_locale`, `check_translation`.
+- Note: CSV requires Godot Editor import to generate .translation files.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

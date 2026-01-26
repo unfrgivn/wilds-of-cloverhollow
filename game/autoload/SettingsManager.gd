@@ -4,6 +4,7 @@ extends Node
 
 signal settings_changed
 signal text_size_changed(new_size: int)
+signal locale_changed(locale: String)
 
 const SETTINGS_FILE := "user://settings.json"
 
@@ -16,6 +17,9 @@ var touch_control_size: int = 1  # 0=small, 1=medium, 2=large
 
 # Accessibility settings
 var text_size: int = 1  # 0=small, 1=medium, 2=large
+
+# Localization
+var locale: String = "en"  # Language code
 
 # Text size scale factors
 const TEXT_SIZE_SCALES: Array[float] = [0.8, 1.0, 1.3]
@@ -59,6 +63,17 @@ func get_text_size_scale() -> float:
 func get_text_size_name() -> String:
     return TEXT_SIZE_NAMES[text_size]
 
+func set_locale(new_locale: String) -> void:
+    if new_locale == locale:
+        return
+    locale = new_locale
+    locale_changed.emit(locale)
+    settings_changed.emit()
+    print("[SettingsManager] Locale: %s" % locale)
+
+func get_locale() -> String:
+    return locale
+
 func _apply_volume(bus_name: String, value: float) -> void:
     var bus_index := AudioServer.get_bus_index(bus_name)
     if bus_index >= 0:
@@ -77,6 +92,7 @@ func save_settings() -> void:
         "sfx_volume": sfx_volume,
         "touch_control_size": touch_control_size,
         "text_size": text_size,
+        "locale": locale,
     }
     
     var file := FileAccess.open(SETTINGS_FILE, FileAccess.WRITE)
@@ -111,6 +127,7 @@ func load_settings() -> void:
     sfx_volume = data.get("sfx_volume", 1.0)
     touch_control_size = data.get("touch_control_size", 1)
     text_size = data.get("text_size", 1)
+    locale = data.get("locale", "en")
     
     # Apply loaded settings
     _apply_volume(MUSIC_BUS, music_volume)
@@ -124,6 +141,7 @@ func get_save_data() -> Dictionary:
         "sfx_volume": sfx_volume,
         "touch_control_size": touch_control_size,
         "text_size": text_size,
+        "locale": locale,
     }
 
 func load_save_data(data: Dictionary) -> void:
@@ -131,5 +149,6 @@ func load_save_data(data: Dictionary) -> void:
     sfx_volume = data.get("sfx_volume", 1.0)
     touch_control_size = data.get("touch_control_size", 1)
     text_size = data.get("text_size", 1)
+    locale = data.get("locale", "en")
     _apply_volume(MUSIC_BUS, music_volume)
     _apply_volume(SFX_BUS, sfx_volume)

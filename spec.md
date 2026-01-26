@@ -566,7 +566,18 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Enemy: Grumpy Stump (camouflaged tree stump, high defense 8, slow but tanky, 20 HP).
 - Scenario: `forest_path_render` for visual/interaction testing.
 
-### 7.5 Biome factory workflow
+### 7.5 Clubhouse Exterior (v0 blockout)
+- Secret clubhouse in the woods, accessible from Forest Path.
+- Forest clearing background with dark green borders.
+- Large tree with treehouse structure (48x64 sprite) and rope ladder (16x48).
+- "No Adults" sign (16x16) with interactable dialogue.
+- Props: 8 trees around clearing, treehouse structure, rope ladder.
+- Interactables: rope ladder (climb dialogue), "No Adults" sign (kids only message).
+- Transitions: to Forest Path (southwest, "from_clubhouse" spawn), to Clubhouse Interior (future).
+- Spawn markers: default, from_path, from_interior.
+- Scenario: `clubhouse_exterior_render` for visual/interaction testing.
+
+### 7.6 Biome factory workflow
 - `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
   - Palette stub in `art/palettes/<id>.palette.json`
   - Biome data in `game/data/biomes/<id>.json`

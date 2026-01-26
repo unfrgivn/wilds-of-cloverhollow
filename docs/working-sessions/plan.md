@@ -1384,7 +1384,7 @@ Tanky forest enemy.
 
 ---
 
-## Milestone 113 — Clubhouse exterior  **Owner:** World Builder + Art Pipeline
+## Milestone 113 — Clubhouse exterior  **Owner:** World Builder + Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Secret clubhouse in woods.
 

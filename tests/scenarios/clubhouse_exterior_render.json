@@ -1,0 +1,27 @@
+{
+  "id": "clubhouse_exterior_render",
+  "name": "Clubhouse Exterior Render Test",
+  "description": "Verify the clubhouse exterior area with treehouse, rope ladder, and No Adults sign",
+  "area": "res://game/scenes/areas/Clubhouse_Exterior.tscn",
+  "steps": [
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "clubhouse_initial_view"},
+    {"action": "move", "direction": "up", "frames": 20},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "capture", "label": "clubhouse_near_treehouse"},
+    {"action": "move", "direction": "left", "frames": 15},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "no_adults_sign_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "move", "direction": "right", "frames": 20},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "rope_ladder_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "capture", "label": "clubhouse_final"}
+  ]
+}

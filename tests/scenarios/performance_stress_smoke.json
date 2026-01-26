@@ -1,0 +1,40 @@
+{
+  "id": "performance_stress_smoke",
+  "description": "Performance stress test - spawn entities, run calculations, check FPS",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30, "_comment": "Wait for scene to stabilize"},
+
+    {"type": "check_fps", "_comment": "Baseline FPS before stress"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "baseline"},
+
+    {"type": "spawn_stress_entities", "count": 50, "_comment": "Spawn 50 sprites"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "check_fps", "_comment": "FPS after 50 entities"},
+    {"type": "capture", "label": "after_50_entities"},
+
+    {"type": "spawn_stress_entities", "count": 100, "_comment": "Spawn 100 more sprites"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "check_fps", "_comment": "FPS after 150 total entities"},
+    {"type": "capture", "label": "after_150_entities"},
+
+    {"type": "stress_loop", "iterations": 10000, "_comment": "CPU stress test"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_fps", "_comment": "FPS after CPU stress"},
+
+    {"type": "spawn_stress_entities", "count": 200, "_comment": "Spawn 200 more sprites"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "check_fps", "_comment": "FPS after 350 total entities"},
+    {"type": "capture", "label": "after_350_entities"},
+
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_fps", "_comment": "FPS while moving"},
+
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_fps", "_comment": "Final FPS check"},
+    {"type": "capture", "label": "stress_complete"}
+  ]
+}

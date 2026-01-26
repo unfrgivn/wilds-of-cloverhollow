@@ -346,6 +346,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - Save/load integration via `get_save_data()`, `load_save_data(data)`.
 - Scenario actions: `show_hint`, `dismiss_hint`, `check_hint`, `reset_hint`, `reset_all_hints`, `set_hints_enabled`.
 
+### 3.31 Performance optimization
+- VisibilityCuller script disables processing for off-screen entities.
+- Uses VisibleOnScreenNotifier2D to detect screen visibility.
+- Configurable: cull_physics_process, cull_process for process callback control.
+- AnimationPlayer pausing: pauses animations when off-screen for CPU savings.
+- VisibilityCuller.tscn prefab available for easy scene integration.
+- Scenario actions: `check_fps`, `spawn_stress_entities`, `stress_loop` for performance testing.
+- Player.gd already optimized: minimal _physics_process, pixel snapping on integers.
+- Godot 4 built-in culling: 2D sprites auto-culled when outside camera viewport.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

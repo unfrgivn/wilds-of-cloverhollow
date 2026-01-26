@@ -707,6 +707,38 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Performance testing actions
+    if t == "check_fps":
+        var fps := Engine.get_frames_per_second()
+        _trace["events"].append({"type": "check_fps", "frame": _frame, "fps": fps})
+        print("[Scenario] FPS: %d" % fps)
+        _action_index += 1
+        return
+
+    if t == "spawn_stress_entities":
+        var count: int = int(action.get("count", 10))
+        var spawned := 0
+        for i in range(count):
+            var sprite := Sprite2D.new()
+            sprite.position = Vector2(randf_range(0, 512), randf_range(0, 288))
+            sprite.modulate = Color(randf(), randf(), randf(), 1.0)
+            get_tree().current_scene.add_child(sprite)
+            spawned += 1
+        _trace["events"].append({"type": "spawn_stress_entities", "frame": _frame, "count": spawned})
+        print("[Scenario] Spawned %d stress entities" % spawned)
+        _action_index += 1
+        return
+
+    if t == "stress_loop":
+        var iterations: int = int(action.get("iterations", 1000))
+        var result := 0.0
+        for i in range(iterations):
+            result += sin(float(i)) * cos(float(i))
+        _trace["events"].append({"type": "stress_loop", "frame": _frame, "iterations": iterations, "result": result})
+        print("[Scenario] Stress loop: %d iterations" % iterations)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

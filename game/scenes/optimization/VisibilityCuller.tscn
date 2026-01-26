@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://visibility_culler"]
+
+[ext_resource type="Script" path="res://game/scripts/optimization/VisibilityCuller.gd" id="1_script"]
+
+[node name="VisibilityCuller" type="Node"]
+script = ExtResource("1_script")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-16, -16, 32, 32)

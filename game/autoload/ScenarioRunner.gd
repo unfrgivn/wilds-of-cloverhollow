@@ -853,6 +853,46 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Achievement actions
+    if t == "unlock_achievement":
+        var achievement_id: String = str(action.get("achievement_id", ""))
+        if achievement_id != "":
+            var success: bool = AchievementManager.unlock_achievement(achievement_id)
+            _trace["events"].append({"type": "unlock_achievement", "frame": _frame, "achievement_id": achievement_id, "success": success})
+            print("[Scenario] unlock_achievement: %s, success=%s" % [achievement_id, success])
+        _action_index += 1
+        return
+
+    if t == "record_progress":
+        var trigger_type: String = str(action.get("trigger", ""))
+        var amount: int = int(action.get("amount", 1))
+        if trigger_type != "":
+            AchievementManager.record_progress(trigger_type, amount)
+            var current: int = AchievementManager.get_progress(trigger_type)
+            _trace["events"].append({"type": "record_progress", "frame": _frame, "trigger": trigger_type, "amount": amount, "current": current})
+            print("[Scenario] record_progress: %s +%d (now %d)" % [trigger_type, amount, current])
+        _action_index += 1
+        return
+
+    if t == "check_achievement":
+        var achievement_id: String = str(action.get("achievement_id", ""))
+        var is_unlocked: bool = false
+        if achievement_id != "":
+            is_unlocked = AchievementManager.is_unlocked(achievement_id)
+        var total_points: int = AchievementManager.get_total_points()
+        var unlocked_count: int = AchievementManager.get_unlocked_achievement_ids().size()
+        _trace["events"].append({"type": "check_achievement", "frame": _frame, "achievement_id": achievement_id, "is_unlocked": is_unlocked, "total_points": total_points, "unlocked_count": unlocked_count})
+        print("[Scenario] check_achievement: id=%s unlocked=%s, total_points=%d, unlocked_count=%d" % [achievement_id, is_unlocked, total_points, unlocked_count])
+        _action_index += 1
+        return
+
+    if t == "reset_achievements":
+        AchievementManager.reset_all()
+        _trace["events"].append({"type": "reset_achievements", "frame": _frame})
+        print("[Scenario] reset_achievements")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

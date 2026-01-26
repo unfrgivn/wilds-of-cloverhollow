@@ -398,6 +398,20 @@ This file is the single source of truth. If code changes behavior, update this f
 - Signals: `photo_mode_entered`, `photo_mode_exited`, `photo_taken(path)`, `ui_hidden`, `ui_shown`.
 - Scenario actions: `enter_photo_mode`, `exit_photo_mode`, `take_photo`, `hide_photo_ui`, `show_photo_ui`, `check_photo_mode`.
 
+### 3.34 Achievement system
+- AchievementManager autoload handles achievement tracking and unlocking.
+- Achievement data stored in `game/data/achievements/achievements.json`.
+- Achievement data format:
+  - Each achievement has: id, name, description, icon, hidden, trigger, trigger_value, points.
+  - Trigger types: game_started, areas_visited, npcs_talked, battles_won, quests_started, quests_completed, tools_acquired, photos_taken, secret_found, story_flag.
+- Progress tracking via `record_progress(trigger_type, amount)` - auto-unlocks when threshold reached.
+- Persistence: unlocked achievements and progress stored in `user://achievements.json`.
+- AchievementPopupUI (CanvasLayer): animated notification popup on unlock.
+  - Shows icon, name, description, and points earned.
+  - Queue system for multiple unlocks.
+- Signals: `achievement_unlocked(id, data)`, `achievement_progress(id, current, target)`.
+- Scenario actions: `unlock_achievement`, `record_progress`, `check_achievement`, `reset_achievements`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

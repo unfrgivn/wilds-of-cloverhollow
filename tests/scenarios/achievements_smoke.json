@@ -1,0 +1,23 @@
+{
+    "id": "achievements_smoke",
+    "description": "Test achievement system: unlock, progress, check",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "reset_achievements"},
+        {"type": "check_achievement", "achievement_id": "first_steps"},
+        {"type": "unlock_achievement", "achievement_id": "first_steps"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_achievement", "achievement_id": "first_steps"},
+        {"type": "capture", "label": "achievement_unlocked"},
+        {"type": "record_progress", "trigger": "areas_visited", "amount": 3},
+        {"type": "check_achievement", "achievement_id": "explorer"},
+        {"type": "record_progress", "trigger": "areas_visited", "amount": 2},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_achievement", "achievement_id": "explorer"},
+        {"type": "capture", "label": "progress_achievement_unlocked"},
+        {"type": "unlock_achievement", "achievement_id": "first_steps"},
+        {"type": "check_achievement", "achievement_id": "first_steps"},
+        {"type": "wait_frames", "frames": 10}
+    ]
+}

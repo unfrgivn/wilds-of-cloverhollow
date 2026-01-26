@@ -1,0 +1,102 @@
+{
+    "achievements": {
+        "first_steps": {
+            "id": "first_steps",
+            "name": "First Steps",
+            "description": "Begin your adventure in Cloverhollow",
+            "icon": "footprints",
+            "hidden": false,
+            "trigger": "game_started",
+            "points": 10
+        },
+        "explorer": {
+            "id": "explorer",
+            "name": "Explorer",
+            "description": "Visit 5 different areas",
+            "icon": "compass",
+            "hidden": false,
+            "trigger": "areas_visited",
+            "trigger_value": 5,
+            "points": 25
+        },
+        "social_butterfly": {
+            "id": "social_butterfly",
+            "name": "Social Butterfly",
+            "description": "Talk to 10 different NPCs",
+            "icon": "chat",
+            "hidden": false,
+            "trigger": "npcs_talked",
+            "trigger_value": 10,
+            "points": 25
+        },
+        "first_battle": {
+            "id": "first_battle",
+            "name": "Battle Ready",
+            "description": "Win your first battle",
+            "icon": "sword",
+            "hidden": false,
+            "trigger": "battles_won",
+            "trigger_value": 1,
+            "points": 15
+        },
+        "quest_starter": {
+            "id": "quest_starter",
+            "name": "Quest Starter",
+            "description": "Accept your first quest",
+            "icon": "scroll",
+            "hidden": false,
+            "trigger": "quests_started",
+            "trigger_value": 1,
+            "points": 10
+        },
+        "quest_hero": {
+            "id": "quest_hero",
+            "name": "Quest Hero",
+            "description": "Complete 5 quests",
+            "icon": "trophy",
+            "hidden": false,
+            "trigger": "quests_completed",
+            "trigger_value": 5,
+            "points": 50
+        },
+        "collector": {
+            "id": "collector",
+            "name": "Collector",
+            "description": "Acquire 3 different tools",
+            "icon": "toolbox",
+            "hidden": false,
+            "trigger": "tools_acquired",
+            "trigger_value": 3,
+            "points": 30
+        },
+        "photographer": {
+            "id": "photographer",
+            "name": "Photographer",
+            "description": "Take your first photo",
+            "icon": "camera",
+            "hidden": false,
+            "trigger": "photos_taken",
+            "trigger_value": 1,
+            "points": 15
+        },
+        "secret_finder": {
+            "id": "secret_finder",
+            "name": "Secret Finder",
+            "description": "Discover a hidden secret",
+            "icon": "star",
+            "hidden": true,
+            "trigger": "secret_found",
+            "points": 100
+        },
+        "chaos_hunter": {
+            "id": "chaos_hunter",
+            "name": "Chaos Hunter",
+            "description": "Begin the investigation into the strange events",
+            "icon": "magnifier",
+            "hidden": false,
+            "trigger": "story_flag",
+            "trigger_value": "chaos_investigation_done",
+            "points": 25
+        }
+    }
+}

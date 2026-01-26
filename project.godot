@@ -38,6 +38,7 @@ NotificationManager="*res://game/autoload/NotificationManager.gd"
 TutorialHintsManager="*res://game/autoload/TutorialHintsManager.gd"
 CutsceneManager="*res://game/autoload/CutsceneManager.gd"
 PhotoModeManager="*res://game/autoload/PhotoModeManager.gd"
+AchievementManager="*res://game/autoload/AchievementManager.gd"
 
 [display]
 

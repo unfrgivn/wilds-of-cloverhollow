@@ -1,0 +1,337 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="3"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="4"]
+[ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="5"]
+[ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(16, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(32, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(16, 16)
+
+[node name="Area_LibraryInterior" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.55, 0.40, 0.28, 1)
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_left = 40.0
+offset_top = 60.0
+offset_right = 472.0
+offset_bottom = 260.0
+color = Color(0.45, 0.32, 0.20, 1)
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(256, 220)
+script = ExtResource("1")
+
+[node name="Sprite" type="Sprite2D" parent="Player"]
+texture = ExtResource("2")
+centered = true
+
+[node name="Collision" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+enabled = true
+position_smoothing_enabled = false
+
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Bookshelves" type="Node2D" parent="."]
+
+[node name="BookshelfRow1_1" type="ColorRect" parent="Bookshelves"]
+offset_left = 60.0
+offset_top = 70.0
+offset_right = 92.0
+offset_bottom = 130.0
+color = Color(0.40, 0.26, 0.13, 1)
+
+[node name="Books1_1" type="ColorRect" parent="Bookshelves/BookshelfRow1_1"]
+offset_left = 2.0
+offset_top = 8.0
+offset_right = 30.0
+offset_bottom = 20.0
+color = Color(0.80, 0.20, 0.20, 1)
+
+[node name="Books1_2" type="ColorRect" parent="Bookshelves/BookshelfRow1_1"]
+offset_left = 2.0
+offset_top = 24.0
+offset_right = 30.0
+offset_bottom = 36.0
+color = Color(0.20, 0.50, 0.80, 1)
+
+[node name="Books1_3" type="ColorRect" parent="Bookshelves/BookshelfRow1_1"]
+offset_left = 2.0
+offset_top = 40.0
+offset_right = 30.0
+offset_bottom = 52.0
+color = Color(0.20, 0.70, 0.30, 1)
+
+[node name="BookshelfRow1_2" type="ColorRect" parent="Bookshelves"]
+offset_left = 100.0
+offset_top = 70.0
+offset_right = 132.0
+offset_bottom = 130.0
+color = Color(0.40, 0.26, 0.13, 1)
+
+[node name="Books2_1" type="ColorRect" parent="Bookshelves/BookshelfRow1_2"]
+offset_left = 2.0
+offset_top = 8.0
+offset_right = 30.0
+offset_bottom = 20.0
+color = Color(0.70, 0.50, 0.20, 1)
+
+[node name="Books2_2" type="ColorRect" parent="Bookshelves/BookshelfRow1_2"]
+offset_left = 2.0
+offset_top = 24.0
+offset_right = 30.0
+offset_bottom = 36.0
+color = Color(0.60, 0.20, 0.60, 1)
+
+[node name="Books2_3" type="ColorRect" parent="Bookshelves/BookshelfRow1_2"]
+offset_left = 2.0
+offset_top = 40.0
+offset_right = 30.0
+offset_bottom = 52.0
+color = Color(0.90, 0.80, 0.20, 1)
+
+[node name="BookshelfRow1_3" type="ColorRect" parent="Bookshelves"]
+offset_left = 140.0
+offset_top = 70.0
+offset_right = 172.0
+offset_bottom = 130.0
+color = Color(0.40, 0.26, 0.13, 1)
+
+[node name="Books3_1" type="ColorRect" parent="Bookshelves/BookshelfRow1_3"]
+offset_left = 2.0
+offset_top = 8.0
+offset_right = 30.0
+offset_bottom = 20.0
+color = Color(0.30, 0.60, 0.50, 1)
+
+[node name="Books3_2" type="ColorRect" parent="Bookshelves/BookshelfRow1_3"]
+offset_left = 2.0
+offset_top = 24.0
+offset_right = 30.0
+offset_bottom = 36.0
+color = Color(0.85, 0.40, 0.25, 1)
+
+[node name="Books3_3" type="ColorRect" parent="Bookshelves/BookshelfRow1_3"]
+offset_left = 2.0
+offset_top = 40.0
+offset_right = 30.0
+offset_bottom = 52.0
+color = Color(0.50, 0.50, 0.80, 1)
+
+[node name="BookshelfRow2_1" type="ColorRect" parent="Bookshelves"]
+offset_left = 380.0
+offset_top = 70.0
+offset_right = 412.0
+offset_bottom = 130.0
+color = Color(0.40, 0.26, 0.13, 1)
+
+[node name="Books4_1" type="ColorRect" parent="Bookshelves/BookshelfRow2_1"]
+offset_left = 2.0
+offset_top = 8.0
+offset_right = 30.0
+offset_bottom = 20.0
+color = Color(0.20, 0.40, 0.70, 1)
+
+[node name="Books4_2" type="ColorRect" parent="Bookshelves/BookshelfRow2_1"]
+offset_left = 2.0
+offset_top = 24.0
+offset_right = 30.0
+offset_bottom = 36.0
+color = Color(0.75, 0.30, 0.40, 1)
+
+[node name="Books4_3" type="ColorRect" parent="Bookshelves/BookshelfRow2_1"]
+offset_left = 2.0
+offset_top = 40.0
+offset_right = 30.0
+offset_bottom = 52.0
+color = Color(0.25, 0.65, 0.35, 1)
+
+[node name="BookshelfRow2_2" type="ColorRect" parent="Bookshelves"]
+offset_left = 420.0
+offset_top = 70.0
+offset_right = 452.0
+offset_bottom = 130.0
+color = Color(0.40, 0.26, 0.13, 1)
+
+[node name="Books5_1" type="ColorRect" parent="Bookshelves/BookshelfRow2_2"]
+offset_left = 2.0
+offset_top = 8.0
+offset_right = 30.0
+offset_bottom = 20.0
+color = Color(0.85, 0.65, 0.15, 1)
+
+[node name="Books5_2" type="ColorRect" parent="Bookshelves/BookshelfRow2_2"]
+offset_left = 2.0
+offset_top = 24.0
+offset_right = 30.0
+offset_bottom = 36.0
+color = Color(0.55, 0.25, 0.70, 1)
+
+[node name="Books5_3" type="ColorRect" parent="Bookshelves/BookshelfRow2_2"]
+offset_left = 2.0
+offset_top = 40.0
+offset_right = 30.0
+offset_bottom = 52.0
+color = Color(0.35, 0.75, 0.60, 1)
+
+[node name="Ladder" type="ColorRect" parent="Bookshelves"]
+offset_left = 165.0
+offset_top = 75.0
+offset_right = 175.0
+offset_bottom = 135.0
+color = Color(0.60, 0.45, 0.25, 1)
+
+[node name="LadderRung1" type="ColorRect" parent="Bookshelves/Ladder"]
+offset_left = -3.0
+offset_top = 10.0
+offset_right = 13.0
+offset_bottom = 14.0
+color = Color(0.50, 0.35, 0.15, 1)
+
+[node name="LadderRung2" type="ColorRect" parent="Bookshelves/Ladder"]
+offset_left = -3.0
+offset_top = 25.0
+offset_right = 13.0
+offset_bottom = 29.0
+color = Color(0.50, 0.35, 0.15, 1)
+
+[node name="LadderRung3" type="ColorRect" parent="Bookshelves/Ladder"]
+offset_left = -3.0
+offset_top = 40.0
+offset_right = 13.0
+offset_bottom = 44.0
+color = Color(0.50, 0.35, 0.15, 1)
+
+[node name="ReadingNooks" type="Node2D" parent="."]
+
+[node name="ReadingTable1" type="ColorRect" parent="ReadingNooks"]
+offset_left = 200.0
+offset_top = 150.0
+offset_right = 260.0
+offset_bottom = 175.0
+color = Color(0.50, 0.35, 0.20, 1)
+
+[node name="Chair1" type="ColorRect" parent="ReadingNooks"]
+offset_left = 210.0
+offset_top = 180.0
+offset_right = 226.0
+offset_bottom = 196.0
+color = Color(0.60, 0.30, 0.15, 1)
+
+[node name="Chair2" type="ColorRect" parent="ReadingNooks"]
+offset_left = 244.0
+offset_top = 180.0
+offset_right = 260.0
+offset_bottom = 196.0
+color = Color(0.60, 0.30, 0.15, 1)
+
+[node name="ReadingTable2" type="ColorRect" parent="ReadingNooks"]
+offset_left = 300.0
+offset_top = 150.0
+offset_right = 360.0
+offset_bottom = 175.0
+color = Color(0.50, 0.35, 0.20, 1)
+
+[node name="Chair3" type="ColorRect" parent="ReadingNooks"]
+offset_left = 310.0
+offset_top = 180.0
+offset_right = 326.0
+offset_bottom = 196.0
+color = Color(0.60, 0.30, 0.15, 1)
+
+[node name="Chair4" type="ColorRect" parent="ReadingNooks"]
+offset_left = 344.0
+offset_top = 180.0
+offset_right = 360.0
+offset_bottom = 196.0
+color = Color(0.60, 0.30, 0.15, 1)
+
+[node name="CheckoutDesk" type="Node2D" parent="."]
+
+[node name="DeskBase" type="ColorRect" parent="CheckoutDesk"]
+offset_left = 220.0
+offset_top = 80.0
+offset_right = 292.0
+offset_bottom = 110.0
+color = Color(0.45, 0.30, 0.18, 1)
+
+[node name="DeskTop" type="ColorRect" parent="CheckoutDesk"]
+offset_left = 218.0
+offset_top = 75.0
+offset_right = 294.0
+offset_bottom = 82.0
+color = Color(0.55, 0.38, 0.22, 1)
+
+[node name="BookStack" type="ColorRect" parent="CheckoutDesk"]
+offset_left = 270.0
+offset_top = 68.0
+offset_right = 285.0
+offset_bottom = 78.0
+color = Color(0.70, 0.30, 0.25, 1)
+
+[node name="LibrarySign" type="Area2D" parent="."]
+position = Vector2(256, 60)
+script = ExtResource("3")
+dialogue_text = "Welcome to Cloverhollow Library!
+Knowledge awaits in every book."
+
+[node name="SignSprite" type="Sprite2D" parent="LibrarySign"]
+texture = ExtResource("7")
+
+[node name="SignCollision" type="CollisionShape2D" parent="LibrarySign"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="DialogueUI" parent="." instance=ExtResource("4")]
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="default" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 220)
+script = ExtResource("5")
+
+[node name="from_town_center" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 245)
+script = ExtResource("5")
+marker_id = "from_town_center"
+
+[node name="DoorTransition" type="Area2D" parent="."]
+position = Vector2(256, 265)
+script = ExtResource("6")
+target_area = "res://game/scenes/areas/Area_TownCenter.tscn"
+target_spawn_id = "from_library"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="DoorTransition"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="TransitionLabel" type="Label" parent="DoorTransition"]
+offset_left = -30.0
+offset_top = -10.0
+offset_right = 30.0
+offset_bottom = 10.0
+text = "Exit"
+horizontal_alignment = 1

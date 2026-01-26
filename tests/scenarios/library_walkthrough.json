@@ -1,0 +1,26 @@
+{
+  "scenario_id": "library_walkthrough",
+  "description": "Walk through library interior, view bookshelves, reading nooks, checkout desk, and ladder",
+  "scene": "res://game/scenes/areas/Area_LibraryInterior.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "library_entrance"},
+    {"type": "move", "direction": "up", "frames": 40},
+    {"type": "capture", "label": "reading_area"},
+    {"type": "move", "direction": "left", "frames": 60},
+    {"type": "move", "direction": "up", "frames": 40},
+    {"type": "capture", "label": "left_bookshelves"},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "capture", "label": "checkout_desk"},
+    {"type": "move", "direction": "right", "frames": 80},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "capture", "label": "right_bookshelves"},
+    {"type": "move", "direction": "left", "frames": 100},
+    {"type": "capture", "label": "ladder_view"},
+    {"type": "move", "direction": "up", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "library_sign_dialogue"}
+  ]
+}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/clinic/exam_table.png" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/clinic/medicine_cabinet.png" id="9"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/clinic/reception_desk.png" id="10"]
+[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="11"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/doctor/doctor_idle_south.png" id="12"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -147,6 +149,18 @@ Potions, bandages, and healing supplies.
 Only the doctor should touch these."
 
 [node name="MedicineCabinetCollision" type="CollisionShape2D" parent="MedicineCabinetInteractable"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="DoctorNPC" type="Area2D" parent="."]
+position = Vector2(256, 75)
+script = ExtResource("11")
+dialogue_branches = ["Hello! I'm Dr. Willowmere.\nWelcome to Cloverhollow Clinic!\nHow can I help you today?", "Remember to get plenty of rest!\nSleep helps your body heal and recover.\nAim for 8 hours every night.", "Eating healthy foods makes you strong!\nFruits and vegetables are your friends.\nThey give you energy for adventures!", "Exercise is important too!\nRunning, jumping, and playing keep you fit.\nA healthy adventurer is a happy adventurer!", "Need your party healed? Not just yet...\nBut soon I'll be offering full healing services!\nFor now, use potions from the General Store."]
+
+[node name="DoctorSprite" type="Sprite2D" parent="DoctorNPC"]
+texture = ExtResource("12")
+centered = true
+
+[node name="DoctorCollision" type="CollisionShape2D" parent="DoctorNPC"]
 shape = SubResource("RectangleShape2D_3")
 
 [node name="Spawns" type="Node2D" parent="."]

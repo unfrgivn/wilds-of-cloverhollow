@@ -575,7 +575,7 @@ Healing/recovery location.
 
 ---
 
-## Milestone 45 — Clinic NPC: Doctor  **Owner:** Character Systems + Art Pipeline
+## Milestone 45 — Clinic NPC: Doctor  **Status:** ✅ Completed (2025-01-26)  **Owner:** Character Systems + Art Pipeline
 ### Objective
 Doctor for healing services.
 

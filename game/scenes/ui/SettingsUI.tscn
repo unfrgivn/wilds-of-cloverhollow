@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://cfmq29xhj1kv3"]
+[gd_scene load_steps=2 format=3 uid="uid://cfmq3axhj1kv3"]
 
 [ext_resource type="Script" path="res://game/scripts/ui/SettingsUI.gd" id="1_script"]
 
@@ -98,6 +98,20 @@ size_flags_horizontal = 3
 text = "Touch Controls"
 
 [node name="TouchSizeLabel" type="Label" parent="Panel/OptionsContainer/TouchRow"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Medium"
+horizontal_alignment = 2
+
+[node name="TextRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
+layout_mode = 2
+
+[node name="TextLabel" type="Label" parent="Panel/OptionsContainer/TextRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Text Size"
+
+[node name="TextSizeLabel" type="Label" parent="Panel/OptionsContainer/TextRow"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 text = "Medium"

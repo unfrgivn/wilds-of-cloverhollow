@@ -269,6 +269,7 @@ This file is the single source of truth. If code changes behavior, update this f
 - Music volume slider (0-100%).
 - SFX volume slider (0-100%).
 - Touch control size option (Small/Medium/Large).
+- Text size option (Small/Medium/Large) for accessibility.
 - Credits button (shows game credits dialogue).
 - Back button closes settings and saves.
 - Navigation: cancel/pause to close.
@@ -319,6 +320,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - InventoryManager triggers item/tool notifications on acquisition.
 - NotificationUI (CanvasLayer): animated popup display with slide-in/fade effects.
 - Scenario actions: `show_notification`, `show_quest_notification`, `show_item_notification`, `show_level_up_notification`, `check_notification`, `clear_notifications`.
+
+### 3.29 Text size accessibility
+- SettingsManager handles text_size setting (0=small, 1=medium, 2=large).
+- TEXT_SIZE_SCALES: [0.8, 1.0, 1.3] multipliers for font sizes.
+- TEXT_SIZE_NAMES: ["Small", "Medium", "Large"] for display.
+- Signal: text_size_changed(new_size: int) emitted on change.
+- SettingsUI provides left/right cycling for text size option.
+- DialogueUI listens to text_size_changed and applies scale to dialogue labels.
+- Font scaling: base font size multiplied by scale factor.
+- Settings persisted to user://settings.json with other settings.
+- Scenario actions: `set_text_size`, `check_text_size`.
 
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).

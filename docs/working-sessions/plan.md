@@ -1230,7 +1230,7 @@ Toast/popup notifications.
 
 ---
 
-## Milestone 100 — Accessibility: Text size options  **Owner:** UI Systems
+## Milestone 100 — Accessibility: Text size options  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Readable text for all users.
 

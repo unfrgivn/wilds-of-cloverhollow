@@ -8,10 +8,18 @@ extends CanvasLayer
 var _showing_choices: bool = false
 var _choice_buttons: Array = []
 var _selected_choice: int = 0
+var _base_font_size: int = 16  # Default font size
 
 func _ready() -> void:
 	DialogueManager.register_ui(self)
 	hide_dialogue()
+	
+	# Store base font size and apply current scale
+	_base_font_size = label.get_theme_font_size("font_size") if label.has_theme_font_size("font_size") else 16
+	_apply_text_scale()
+	
+	# Listen for text size changes
+	SettingsManager.text_size_changed.connect(_on_text_size_changed)
 	
 	# Create choices container if it doesn't exist
 	if not choices_container:
@@ -20,6 +28,15 @@ func _ready() -> void:
 		panel.add_child(choices_container)
 		choices_container.position = Vector2(8, 28)
 		choices_container.size = Vector2(464, 40)
+
+func _on_text_size_changed(_new_size: int) -> void:
+	_apply_text_scale()
+
+func _apply_text_scale() -> void:
+	var scale: float = SettingsManager.get_text_size_scale()
+	var new_size := int(_base_font_size * scale)
+	label.add_theme_font_size_override("font_size", new_size)
+	print("[DialogueUI] Text size scaled to: %d (scale: %.1f)" % [new_size, scale])
 
 func _input(event: InputEvent) -> void:
 	if not visible:

@@ -646,6 +646,23 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Text size / accessibility actions
+    if t == "set_text_size":
+        var size: int = action.get("size", 1)
+        SettingsManager.set_text_size(size)
+        _trace["events"].append({"type": "set_text_size", "frame": _frame, "size": size})
+        _action_index += 1
+        return
+
+    if t == "check_text_size":
+        var current_size: int = SettingsManager.text_size
+        var scale: float = SettingsManager.get_text_size_scale()
+        var name: String = SettingsManager.get_text_size_name()
+        _trace["events"].append({"type": "check_text_size", "frame": _frame, "size": current_size, "scale": scale, "name": name})
+        print("[Scenario] Text size: %d (%s, scale=%.1f)" % [current_size, name, scale])
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

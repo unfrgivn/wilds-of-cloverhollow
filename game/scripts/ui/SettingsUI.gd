@@ -6,7 +6,7 @@ signal settings_closed
 
 var _is_active: bool = false
 var _selected_index: int = 0
-var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Credits", "Back"]
+var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text Size", "Credits", "Back"]
 
 @onready var panel: Panel = $Panel
 @onready var title_label: Label = $Panel/TitleLabel
@@ -16,6 +16,7 @@ var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Cred
 @onready var sfx_slider: HSlider = $Panel/OptionsContainer/SFXRow/SFXSlider
 @onready var sfx_value: Label = $Panel/OptionsContainer/SFXRow/SFXValue
 @onready var touch_size_label: Label = $Panel/OptionsContainer/TouchRow/TouchSizeLabel
+@onready var text_size_label: Label = $Panel/OptionsContainer/TextRow/TextSizeLabel
 @onready var credits_button: Button = $Panel/OptionsContainer/CreditsButton
 @onready var back_button: Button = $Panel/OptionsContainer/BackButton
 @onready var dimmer: ColorRect = $Dimmer
@@ -47,9 +48,15 @@ func _input(event: InputEvent) -> void:
         if _selected_index == 2:  # Touch Size row
             _cycle_touch_size(-1)
             get_viewport().set_input_as_handled()
+        elif _selected_index == 3:  # Text Size row
+            _cycle_text_size(-1)
+            get_viewport().set_input_as_handled()
     elif event.is_action_pressed("ui_right"):
         if _selected_index == 2:  # Touch Size row
             _cycle_touch_size(1)
+            get_viewport().set_input_as_handled()
+        elif _selected_index == 3:  # Text Size row
+            _cycle_text_size(1)
             get_viewport().set_input_as_handled()
 
 func open_settings() -> void:
@@ -71,6 +78,7 @@ func _load_current_values() -> void:
     _update_music_label()
     _update_sfx_label()
     _update_touch_size_label()
+    _update_text_size_label()
 
 func _on_music_changed(value: float) -> void:
     SettingsManager.set_music_volume(value / 100.0)
@@ -95,6 +103,16 @@ func _cycle_touch_size(direction: int) -> void:
     new_size = wrapi(new_size, 0, 3)
     SettingsManager.set_touch_control_size(new_size)
     _update_touch_size_label()
+
+func _update_text_size_label() -> void:
+    if text_size_label:
+        text_size_label.text = SettingsManager.get_text_size_name()
+
+func _cycle_text_size(direction: int) -> void:
+    var new_size := SettingsManager.text_size + direction
+    new_size = wrapi(new_size, 0, 3)
+    SettingsManager.set_text_size(new_size)
+    _update_text_size_label()
 
 func _on_credits_pressed() -> void:
     # Show credits dialog (placeholder for now)

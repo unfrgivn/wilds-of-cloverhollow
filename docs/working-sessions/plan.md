@@ -1532,7 +1532,7 @@ Mid-game challenging fight.
 
 ---
 
-## Milestone 125 — Story: Cliffhanger ending  **Owner:** Story + Art Pipeline
+## Milestone 125 — Story: Cliffhanger ending  **Owner:** Story + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Demo ending with hook.
 

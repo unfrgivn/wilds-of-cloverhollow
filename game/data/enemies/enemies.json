@@ -125,6 +125,21 @@
       "phase_threshold": 50,
       "phase_2_attack_bonus": 3,
       "phase_2_speed_bonus": 2
+    },
+    {
+      "id": "angry_acorn",
+      "name": "Angry Acorn",
+      "description": "A bitter little nut that rolls around bumping into everyone. Watch out for its headbutt!",
+      "max_hp": 10,
+      "max_mp": 0,
+      "attack": 5,
+      "defense": 3,
+      "speed": 4,
+      "xp": 6,
+      "gold": 4,
+      "sprite": "res://game/assets/sprites/enemies/angry_acorn/idle_1.png",
+      "skills": ["roll_attack"],
+      "drops": ["acorn"]
     }
   ]
 }

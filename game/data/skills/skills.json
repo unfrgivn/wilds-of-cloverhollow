@@ -172,6 +172,16 @@
       "target": "all_enemies",
       "element": "earth",
       "boss_only": true
+    },
+    {
+      "id": "roll_attack",
+      "name": "Roll Attack",
+      "description": "The acorn tucks in and rolls into the target with surprising force.",
+      "type": "attack",
+      "mp_cost": 0,
+      "power": 7,
+      "target": "single_enemy",
+      "element": "none"
     }
   ]
 }

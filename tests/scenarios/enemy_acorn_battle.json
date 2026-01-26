@@ -1,0 +1,14 @@
+{
+    "id": "enemy_acorn_battle",
+    "description": "Battle test with Angry Acorn enemy in forest path",
+    "scene": "res://game/scenes/areas/Forest_Path.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_path_with_acorn"},
+        {"type": "move", "direction": "right", "frames": 80},
+        {"type": "capture", "label": "approaching_acorn"},
+        {"type": "move", "direction": "right", "frames": 40},
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "battle_started"}
+    ]
+}

@@ -1,0 +1,31 @@
+{
+  "biome_id": "forest",
+  "biome_name": "Enchanted Forest",
+  "encounters": [
+    {
+      "id": "single_acorn",
+      "enemies": ["angry_acorn"],
+      "weight": 40,
+      "min_level": 1
+    },
+    {
+      "id": "acorn_pair",
+      "enemies": ["angry_acorn", "angry_acorn"],
+      "weight": 30,
+      "min_level": 2
+    },
+    {
+      "id": "acorn_squirrel",
+      "enemies": ["angry_acorn", "grumpy_squirrel"],
+      "weight": 20,
+      "min_level": 3
+    },
+    {
+      "id": "forest_guardian",
+      "enemies": ["forest_guardian"],
+      "weight": 5,
+      "min_level": 5,
+      "boss": true
+    }
+  ]
+}

@@ -1351,7 +1351,7 @@ Main forest exploration zone.
 
 ---
 
-## Milestone 110 — Forest enemies: Angry Acorn  **Owner:** Art Pipeline + Battle Systems
+## Milestone 110 — Forest enemies: Angry Acorn  **Status:** ✅ Completed (2026-01-26)  **Owner:** Art Pipeline + Battle Systems
 ### Objective
 Forest-themed enemy.
 

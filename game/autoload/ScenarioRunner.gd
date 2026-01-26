@@ -510,6 +510,38 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "open_settings":
+        var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
+        var settings_ui := settings_scene.instantiate()
+        get_tree().root.add_child(settings_ui)
+        settings_ui.open_settings()
+        _trace["events"].append({"type": "open_settings", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "close_settings":
+        var settings_nodes := get_tree().get_nodes_in_group("settings_ui")
+        for node in settings_nodes:
+            node.close_settings()
+            node.queue_free()
+        _trace["events"].append({"type": "close_settings", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "set_music_volume":
+        var value := float(action.get("value", 1.0))
+        SettingsManager.set_music_volume(value)
+        _trace["events"].append({"type": "set_music_volume", "frame": _frame, "value": value})
+        _action_index += 1
+        return
+
+    if t == "set_sfx_volume":
+        var value := float(action.get("value", 1.0))
+        SettingsManager.set_sfx_volume(value)
+        _trace["events"].append({"type": "set_sfx_volume", "frame": _frame, "value": value})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

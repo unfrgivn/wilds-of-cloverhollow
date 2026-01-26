@@ -31,6 +31,7 @@ PartyManager="*res://game/autoload/PartyManager.gd"
 QuestManager="*res://game/autoload/QuestManager.gd"
 AffinityManager="*res://game/autoload/AffinityManager.gd"
 PauseManager="*res://game/autoload/PauseManager.gd"
+SettingsManager="*res://game/autoload/SettingsManager.gd"
 
 [display]
 

@@ -261,6 +261,19 @@ This file is the single source of truth. If code changes behavior, update this f
 - Navigation: cancel/pause to close.
 - Scenario actions: `open_map`, `close_map`.
 
+### 3.25 Settings UI
+- SettingsManager autoload handles settings persistence.
+- Settings stored in `user://settings.json`.
+- SettingsUI (CanvasLayer): game options menu.
+- Opens from pause menu Settings option (future) or via scenario action.
+- Music volume slider (0-100%).
+- SFX volume slider (0-100%).
+- Touch control size option (Small/Medium/Large).
+- Credits button (shows game credits dialogue).
+- Back button closes settings and saves.
+- Navigation: cancel/pause to close.
+- Scenario actions: `open_settings`, `close_settings`, `set_music_volume`, `set_sfx_volume`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

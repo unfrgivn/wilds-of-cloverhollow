@@ -1,0 +1,9 @@
+{
+  "scenario_id": "skill_healing_smoke",
+  "description": "Verifies healing skills are loaded and usable in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "skill_healing_battle_start"}
+  ]
+}

@@ -772,7 +772,7 @@ Multiple attack skill types.
 
 ---
 
-## Milestone 62 — Skill: Healing  **Owner:** Battle Systems
+## Milestone 62 — Skill: Healing  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 HP recovery skills.
 

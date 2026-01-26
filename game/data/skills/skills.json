@@ -73,6 +73,27 @@
       "target": "single_enemy",
       "element": "none",
       "priority": "low"
+    },
+    {
+      "id": "group_heal",
+      "name": "Group Heal",
+      "description": "Restores HP to all allies.",
+      "type": "heal",
+      "mp_cost": 8,
+      "power": 8,
+      "target": "all_allies",
+      "element": "none"
+    },
+    {
+      "id": "revive",
+      "name": "Revive",
+      "description": "Brings a fallen ally back to life with some HP.",
+      "type": "heal",
+      "mp_cost": 10,
+      "power": 15,
+      "target": "single_ally",
+      "element": "none",
+      "effect": "revive"
     }
   ]
 }

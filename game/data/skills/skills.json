@@ -203,6 +203,40 @@
       "power": 4,
       "target": "single_enemy",
       "element": "earth"
+    },
+    {
+      "id": "chaos_bolt",
+      "name": "Chaos Bolt",
+      "description": "A bolt of chaotic dark energy that strikes unpredictably.",
+      "type": "attack",
+      "mp_cost": 5,
+      "power": 12,
+      "target": "single_enemy",
+      "element": "chaos",
+      "mini_boss_only": true
+    },
+    {
+      "id": "shadow_strike",
+      "name": "Shadow Strike",
+      "description": "The minion vanishes into shadow and reappears to strike.",
+      "type": "attack",
+      "mp_cost": 8,
+      "power": 15,
+      "target": "single_enemy",
+      "element": "dark",
+      "mini_boss_only": true
+    },
+    {
+      "id": "dark_shield",
+      "name": "Dark Shield",
+      "description": "Wraps itself in protective dark energy, raising defense.",
+      "type": "buff",
+      "mp_cost": 6,
+      "power": 0,
+      "target": "self",
+      "element": "dark",
+      "effect": "defense_up",
+      "mini_boss_only": true
     }
   ]
 }

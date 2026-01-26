@@ -1,0 +1,22 @@
+{
+    "id": "miniboss_battle_smoke",
+    "description": "Test mini-boss battle encounter with Chaos Minion",
+    "scene": "res://game/scenes/battle/BattleScene.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "miniboss_battle_start"},
+        
+        {"type": "set_story_flag", "flag": "villain_revealed", "value": true},
+        {"type": "set_story_flag", "flag": "party_formed", "value": true},
+        {"type": "wait_frames", "frames": 30},
+        
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "miniboss_battle_inprogress"},
+        
+        {"type": "set_story_flag", "flag": "chaos_minion_defeated", "value": true},
+        {"type": "check_story_flag", "flag": "chaos_minion_defeated"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "miniboss_battle_complete"}
+    ]
+}

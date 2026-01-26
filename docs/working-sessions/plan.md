@@ -1520,7 +1520,7 @@ Pre-finale preparation.
 
 ---
 
-## Milestone 124 — Boss: Mini-boss encounter  **Owner:** Battle Systems + Art Pipeline
+## Milestone 124 — Boss: Mini-boss encounter  **Owner:** Battle Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Mid-game challenging fight.
 

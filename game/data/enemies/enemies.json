@@ -171,6 +171,22 @@
       "sprite": "res://game/assets/sprites/enemies/grumpy_stump/idle_1.png",
       "skills": ["root_smash"],
       "drops": ["old_wood"]
+    },
+    {
+      "id": "chaos_minion",
+      "name": "Chaos Minion",
+      "description": "A shadowy servant of the Chaos Lord. It radiates dark energy and attacks with chaotic magic!",
+      "max_hp": 60,
+      "max_mp": 30,
+      "attack": 10,
+      "defense": 4,
+      "speed": 7,
+      "xp": 35,
+      "gold": 25,
+      "sprite": "res://game/assets/sprites/enemies/chaos_minion/idle_1.png",
+      "skills": ["chaos_bolt", "shadow_strike", "dark_shield"],
+      "drops": ["chaos_shard", "dark_essence"],
+      "flags": ["mini_boss"]
     }
   ]
 }

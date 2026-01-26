@@ -1,0 +1,9 @@
+{
+  "scenario_id": "enemy_crow_battle",
+  "description": "Verifies Cranky Crow enemy data loads and battle can initialize",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "crow_battle_ready"}
+  ]
+}

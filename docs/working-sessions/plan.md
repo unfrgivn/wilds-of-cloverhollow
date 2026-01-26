@@ -695,7 +695,7 @@ Small, fast enemy type.
 
 ---
 
-## Milestone 55 — Enemy: Cranky Crow  **Owner:** Art Pipeline + Battle Systems
+## Milestone 55 — Enemy: Cranky Crow  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Flying enemy type.
 

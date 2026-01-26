@@ -64,6 +64,20 @@
       "sprite": "res://game/assets/sprites/enemies/mischief_mouse/idle_1.png",
       "skills": ["quick_nibble"],
       "drops": ["cheese_crumb"]
+    },
+    {
+      "id": "cranky_crow",
+      "name": "Cranky Crow",
+      "description": "A bad-tempered bird that dive-bombs anyone who gets too close.",
+      "max_hp": 10,
+      "max_mp": 4,
+      "attack": 5,
+      "defense": 2,
+      "speed": 9,
+      "sprite": "res://game/assets/sprites/enemies/cranky_crow/idle_1.png",
+      "skills": ["dive_peck"],
+      "drops": ["black_feather"],
+      "flags": ["flying", "can_evade"]
     }
   ]
 }

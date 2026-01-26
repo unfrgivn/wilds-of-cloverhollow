@@ -1,0 +1,22 @@
+{
+  "scenario_id": "classroom_render",
+  "description": "Visual regression test for School Classroom with desks, chalkboard, and windows",
+  "golden": true,
+  "actions": [
+    {"type": "load_scene", "scene": "res://game/scenes/areas/Area_SchoolClassroom.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "classroom_initial_view"},
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "classroom_teacher_desk"},
+    {"type": "move", "direction": "left", "frames": 50},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "classroom_windows"},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "classroom_student_desks"},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "classroom_center"}
+  ]
+}

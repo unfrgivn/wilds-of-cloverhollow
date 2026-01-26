@@ -187,6 +187,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Hero House Interior (Upper Floor): Bedroom area (bed, desk with lamp, closet), bathroom area (tub, toilet, sink), interactable mirror with placeholder dialogue, stairs transition back to ground floor.
 - School: Cloverhollow Elementary exterior with school building (double doors), playground area (swing set, slide), flagpole, bike rack, benches, sign. Teacher NPC with story-gated library access. Transition to Town Center.
 - School Hall (Interior): Main hallway with lockers (6 rows), bulletin board, trophy case, principal's office door, 4 classroom doors (Rooms 101-104). Transitions to/from school exterior.
+- School Classroom (Interior): Standard classroom with teacher's desk, chalkboard, clock, 2 windows, 15 student desks in 3 rows. Transitions to/from school hall.
 - Arcade: Pixel Palace Arcade exterior with lamps, sign.
 - Props: bench, sign, lamp, tree (16x32), fence, flowers (all 16x16 except tree).
 - Enemy: Grumpy Squirrel (non-scary, green, visible in overworld).

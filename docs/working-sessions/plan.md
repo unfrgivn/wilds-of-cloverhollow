@@ -331,7 +331,7 @@ School main hallway and lobby.
 
 ---
 
-## Milestone 25 — School interior: Classroom  **Owner:** World Builder + Art Pipeline
+## Milestone 25 — School interior: Classroom  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Player's classroom scene.
 

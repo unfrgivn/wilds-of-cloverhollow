@@ -242,6 +242,11 @@ position = Vector2(256, 230)
 script = ExtResource("4")
 marker_id = "from_exterior"
 
+[node name="from_classroom" type="Marker2D" parent="Spawns"]
+position = Vector2(100, 210)
+script = ExtResource("4")
+marker_id = "from_classroom"
+
 [node name="default" type="Marker2D" parent="Spawns"]
 position = Vector2(256, 180)
 script = ExtResource("4")
@@ -253,4 +258,13 @@ target_area = "res://game/scenes/areas/Area_School.tscn"
 target_spawn_id = "from_interior"
 
 [node name="ExitShape" type="CollisionShape2D" parent="ExitTransition"]
+shape = SubResource("RectangleShape2D_Transition")
+
+[node name="ClassroomTransition" type="Area2D" parent="."]
+position = Vector2(100, 232)
+script = ExtResource("5")
+target_area = "res://game/scenes/areas/Area_SchoolClassroom.tscn"
+target_spawn_id = "from_hall"
+
+[node name="ClassroomTransitionShape" type="CollisionShape2D" parent="ClassroomTransition"]
 shape = SubResource("RectangleShape2D_Transition")

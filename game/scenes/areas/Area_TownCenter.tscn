@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -21,6 +21,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_library.png" id="19"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_cafe.png" id="20"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_townhall.png" id="21"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_petshop.png" id="22"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -136,6 +137,10 @@ texture = ExtResource("20")
 position = Vector2(60, 220)
 texture = ExtResource("21")
 
+[node name="PetShopFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(390, 50)
+texture = ExtResource("22")
+
 [node name="TownSign" type="Area2D" parent="."]
 position = Vector2(256, 100)
 script = ExtResource("5")
@@ -213,6 +218,11 @@ marker_id = "from_cafe"
 position = Vector2(60, 250)
 script = ExtResource("7")
 marker_id = "from_town_hall"
+
+[node name="from_pet_shop" type="Marker2D" parent="Spawns"]
+position = Vector2(390, 80)
+script = ExtResource("7")
+marker_id = "from_pet_shop"
 
 [node name="NPCSpawns" type="Node2D" parent="."]
 
@@ -418,4 +428,21 @@ offset_top = -15.0
 offset_right = 35.0
 offset_bottom = 5.0
 text = "Town Hall"
+horizontal_alignment = 1
+
+[node name="TransitionToPetShop" type="Area2D" parent="."]
+position = Vector2(390, 75)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_PetShopInterior.tscn"
+target_spawn_id = "from_town_center"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToPetShop"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToPetShop"]
+offset_left = -30.0
+offset_top = -15.0
+offset_right = 30.0
+offset_bottom = 5.0
+text = "Pet Shop"
 horizontal_alignment = 1

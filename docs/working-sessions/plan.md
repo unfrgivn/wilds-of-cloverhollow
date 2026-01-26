@@ -515,7 +515,7 @@ Mayor character for story quests.
 
 ---
 
-## Milestone 40 — Pet Shop exterior + interior  **Owner:** World Builder + Art Pipeline
+## Milestone 40 — Pet Shop exterior + interior  **Status:** ✅ Completed (2026-01-25)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Shop for pet-related items.
 

@@ -123,6 +123,14 @@ This file is the single source of truth. If code changes behavior, update this f
 - Time advances automatically on area transitions.
 - Scenario action `set_time_phase`: instantly set time for testing.
 
+### 3.14 Weather system
+- WeatherManager autoload manages weather state and effects.
+- 3 weather types: Clear (0), Rain (1), Storm (2).
+- Rain: CPUParticles2D system with angled raindrops.
+- Storm: Heavy rain + periodic thunder flashes via ColorRect overlay.
+- Thunder flash: white overlay tween (quick bright pulse).
+- Scenario actions: `set_weather`, `trigger_thunder`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

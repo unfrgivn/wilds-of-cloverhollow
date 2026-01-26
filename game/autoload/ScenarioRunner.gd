@@ -223,6 +223,19 @@ func _step_actions() -> void:
 		_action_index += 1
 		return
 
+	if t == "set_weather":
+		var weather: int = int(action.get("weather", 0))
+		WeatherManager.set_weather(weather)
+		_trace["events"].append({"type": "set_weather", "frame": _frame, "weather": weather, "weather_name": WeatherManager.get_weather_name()})
+		_action_index += 1
+		return
+
+	if t == "trigger_thunder":
+		WeatherManager.trigger_thunder()
+		_trace["events"].append({"type": "trigger_thunder", "frame": _frame})
+		_action_index += 1
+		return
+
 	# Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

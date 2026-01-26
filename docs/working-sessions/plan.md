@@ -611,7 +611,7 @@ Time-of-day palette shifts.
 
 ---
 
-## Milestone 48 — Weather effects stub  **Owner:** Art Pipeline + Gameplay
+## Milestone 48 — Weather effects stub  **Status:** ✅ Completed (2025-01-26)  **Owner:** Art Pipeline + Gameplay
 ### Objective
 Rain and weather particle effects.
 

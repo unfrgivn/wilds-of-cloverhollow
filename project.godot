@@ -26,6 +26,7 @@ TouchControlsManager="*res://game/autoload/TouchControlsManager.gd"
 InventoryManager="*res://game/autoload/InventoryManager.gd"
 SaveManager="*res://game/autoload/SaveManager.gd"
 DayNightManager="*res://game/autoload/DayNightManager.gd"
+WeatherManager="*res://game/autoload/WeatherManager.gd"
 
 [display]
 

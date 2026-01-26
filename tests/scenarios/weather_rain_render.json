@@ -1,0 +1,27 @@
+{
+  "id": "weather_rain_render",
+  "description": "Test weather effects - clear, rain, storm with thunder",
+  "starting_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    { "type": "wait_frames", "frames": 30 },
+    
+    { "type": "set_weather", "weather": 0 },
+    { "type": "wait_frames", "frames": 20 },
+    { "type": "capture", "label": "weather_clear" },
+    
+    { "type": "set_weather", "weather": 1 },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "weather_rain" },
+    
+    { "type": "set_weather", "weather": 2 },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "weather_storm" },
+    
+    { "type": "trigger_thunder" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "thunder_flash" },
+    
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "storm_final" }
+  ]
+}

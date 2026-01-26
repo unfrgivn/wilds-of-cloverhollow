@@ -717,7 +717,7 @@ Status effect enemy.
 
 ---
 
-## Milestone 57 — Party member: Main character battle sprite  **Owner:** Art Pipeline
+## Milestone 57 — Party member: Main character battle sprite  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Hero battle sprite.
 

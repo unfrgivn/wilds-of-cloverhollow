@@ -1,0 +1,9 @@
+{
+  "scenario_id": "hero_battle_sprite_render",
+  "description": "Verifies Fae battle sprites load correctly in battle scene",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "hero_battle_sprite_idle"}
+  ]
+}

@@ -1,0 +1,94 @@
+name: visual-regression
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      update_golden:
+        description: 'Update golden captures'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  GODOT_VERSION: "4.4"
+  GODOT_RELEASE: "stable"
+
+jobs:
+  visual-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb imagemagick
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/godot
+            /usr/local/bin/godot
+          key: godot-${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}-linux
+
+      - name: Install Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}/Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_linux.x86_64.zip
+          unzip -q Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_linux.x86_64.zip
+          sudo mv Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      - name: Import project
+        run: |
+          timeout 30 godot --headless --import || true
+
+      - name: Run rendered scenarios
+        run: |
+          mkdir -p captures/current
+          ./tools/ci/run-visual-regression.sh
+
+      - name: Compare with golden captures
+        id: diff
+        run: |
+          ./tools/ci/compare-captures.sh
+        continue-on-error: true
+
+      - name: Upload diff report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-diff-report
+          path: captures/diff-report/
+          retention-days: 14
+
+      - name: Upload current captures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: current-captures
+          path: captures/current/
+          retention-days: 7
+
+      - name: Update golden captures
+        if: github.event.inputs.update_golden == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          rm -rf captures/golden
+          cp -r captures/current captures/golden
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add captures/golden
+          git commit -m "chore: Update golden captures" || echo "No changes to commit"
+          git push
+
+      - name: Fail on diff
+        if: steps.diff.outcome == 'failure'
+        run: |
+          echo "Visual regression detected! Check the diff report artifact."
+          exit 1

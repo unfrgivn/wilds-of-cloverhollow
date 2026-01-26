@@ -1716,7 +1716,7 @@ Automated CI on push.
 
 ---
 
-## Milestone 140 — CI: Visual regression in CI  **Owner:** QA Automation
+## Milestone 140 — CI: Visual regression in CI  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Automated visual diffing.
 

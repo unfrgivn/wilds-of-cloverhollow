@@ -1,0 +1,133 @@
+[gd_scene load_steps=2 format=3 uid="uid://party_status_ui"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/PartyStatusUI.gd" id="1_script"]
+
+[node name="PartyStatusUI" type="CanvasLayer"]
+layer = 101
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -110.0
+offset_right = 200.0
+offset_bottom = 110.0
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -40.0
+offset_top = 4.0
+offset_right = 40.0
+offset_bottom = 18.0
+text = "PARTY"
+horizontal_alignment = 1
+
+[node name="MembersContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 8.0
+offset_top = 24.0
+offset_right = 115.0
+offset_bottom = 200.0
+
+[node name="DetailsPanel" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 120.0
+offset_top = 24.0
+offset_right = 392.0
+offset_bottom = 200.0
+
+[node name="MemberName" type="Label" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = 20.0
+text = "Character Name"
+
+[node name="HPBar" type="ProgressBar" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 24.0
+offset_right = -4.0
+offset_bottom = 40.0
+max_value = 100.0
+value = 75.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="Panel/DetailsPanel/HPBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+text = "HP"
+vertical_alignment = 1
+
+[node name="MPBar" type="ProgressBar" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 44.0
+offset_right = -4.0
+offset_bottom = 60.0
+max_value = 100.0
+value = 50.0
+show_percentage = false
+
+[node name="MPLabel" type="Label" parent="Panel/DetailsPanel/MPBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+text = "MP"
+vertical_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 68.0
+offset_right = -4.0
+offset_bottom = 84.0
+text = "ATK: 10  DEF: 5  SPD: 8"
+
+[node name="EquipmentLabel" type="Label" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 92.0
+offset_right = -4.0
+offset_bottom = 160.0
+text = "Weapon: (none)
+Armor: (none)
+Accessory: (none)"

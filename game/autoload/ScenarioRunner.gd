@@ -433,6 +433,31 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "open_party_status":
+        var party_scene := preload("res://game/scenes/ui/PartyStatusUI.tscn")
+        var party_ui := party_scene.instantiate()
+        get_tree().root.add_child(party_ui)
+        party_ui.open_party_status()
+        _trace["events"].append({"type": "open_party_status", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "close_party_status":
+        var party_nodes := get_tree().get_nodes_in_group("party_status_ui")
+        for node in party_nodes:
+            node.close_party_status()
+            node.queue_free()
+        _trace["events"].append({"type": "close_party_status", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "check_party_member":
+        var member_id := str(action.get("member_id", ""))
+        var state: Dictionary = PartyManager.get_member_state(member_id)
+        _trace["events"].append({"type": "check_party_member", "frame": _frame, "member_id": member_id, "state": state})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

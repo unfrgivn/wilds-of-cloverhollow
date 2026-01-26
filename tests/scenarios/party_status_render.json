@@ -1,0 +1,23 @@
+{
+  "scenario_id": "party_status_render",
+  "description": "Test party status UI: open, view members, check stats and equipment",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_party_member", "member_id": "fae"},
+    {"type": "check_party_member", "member_id": "sue"},
+    {"type": "capture", "label": "before_party_status"},
+    {"type": "open_party_status"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "party_status_open"},
+    {"type": "close_party_status"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "party_status_closed"},
+    {"type": "equip_item", "member_id": "fae", "equip_id": "wooden_sword"},
+    {"type": "check_party_member", "member_id": "fae"},
+    {"type": "open_party_status"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "party_status_with_equipment"}
+  ]
+}

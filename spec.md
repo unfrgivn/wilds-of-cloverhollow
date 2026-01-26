@@ -230,6 +230,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - Navigation: arrow keys for grid, accept to open actions, cancel to close.
 - Scenario actions: `add_inventory_item`, `remove_inventory_item`, `check_inventory`, `open_inventory`, `close_inventory`.
 
+### 3.22 Party status UI
+- PartyStatusUI (CanvasLayer): party member stats screen.
+- Opens from pause menu Party option.
+- Member list on left side, details panel on right.
+- HP/MP progress bars showing current/max values.
+- Stats display: ATK, DEF, SPD (including equipment bonuses).
+- Equipment slots: weapon, armor, accessory.
+- Navigation: up/down to select member, cancel to close.
+- Scenario actions: `open_party_status`, `close_party_status`, `check_party_member`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

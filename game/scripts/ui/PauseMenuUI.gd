@@ -5,11 +5,12 @@ extends CanvasLayer
 signal menu_closed
 signal resume_pressed
 signal items_pressed
+signal party_pressed
 signal save_pressed
 signal quit_pressed
 
 var _selected_index: int = 0
-var _menu_options: Array[String] = ["Resume", "Items", "Save", "Quit"]
+var _menu_options: Array[String] = ["Resume", "Items", "Party", "Save", "Quit"]
 var _is_active: bool = false
 
 @onready var panel: Panel = $Panel
@@ -95,6 +96,8 @@ func _select_option() -> void:
 			_on_resume()
 		"Items":
 			_on_items()
+		"Party":
+			_on_party()
 		"Save":
 			_on_save()
 		"Quit":
@@ -122,6 +125,24 @@ func _on_inventory_closed(inventory_ui: Node) -> void:
 	inventory_ui.queue_free()
 	visible = true
 	print("[PauseMenuUI] Inventory closed, returning to pause menu")
+
+func _on_party() -> void:
+	party_pressed.emit()
+	# Hide pause menu while party status is open
+	visible = false
+	
+	# Open party status UI
+	var party_scene := preload("res://game/scenes/ui/PartyStatusUI.tscn")
+	var party_ui := party_scene.instantiate()
+	get_tree().root.add_child(party_ui)
+	party_ui.open_party_status()
+	party_ui.party_status_closed.connect(_on_party_closed.bind(party_ui))
+	print("[PauseMenuUI] Opened party status")
+
+func _on_party_closed(party_ui: Node) -> void:
+	party_ui.queue_free()
+	visible = true
+	print("[PauseMenuUI] Party status closed, returning to pause menu")
 
 func _on_save() -> void:
 	save_pressed.emit()

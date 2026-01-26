@@ -1146,7 +1146,7 @@ Item management screen.
 
 ---
 
-## Milestone 93 — Menu: Party status  **Owner:** UI Systems
+## Milestone 93 — Menu: Party status  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Party member stats screen.
 

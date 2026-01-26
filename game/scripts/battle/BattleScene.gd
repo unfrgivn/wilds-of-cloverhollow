@@ -143,6 +143,7 @@ func _on_turn_ended(combatant) -> void:
 
 func _on_battle_won() -> void:
 	print("[BattleScene] Victory!")
+	SFXManager.play("victory")
 	_show_message("Victory!")
 	await get_tree().create_timer(0.5).timeout
 	
@@ -174,6 +175,7 @@ func _on_battle_won() -> void:
 
 func _on_battle_lost() -> void:
 	print("[BattleScene] Defeat...")
+	SFXManager.play("defeat")
 	_show_message("Defeat...")
 	await get_tree().create_timer(0.5).timeout
 	
@@ -294,6 +296,7 @@ func _execute_attack(attacker, target) -> void:
 	if target == null:
 		return
 	var damage: int = target.take_damage(attacker.attack)
+	SFXManager.play_attack_hit()
 	_show_message("%s attacks %s for %d damage!" % [attacker.display_name, target.display_name, damage])
 	print("[BattleScene] %s attacks %s for %d damage" % [attacker.display_name, target.display_name, damage])
 	
@@ -305,6 +308,7 @@ func _execute_attack(attacker, target) -> void:
 
 func _execute_defend(combatant) -> void:
 	combatant.apply_defend()
+	SFXManager.play("defend")
 	_show_message("%s defends!" % combatant.display_name)
 	print("[BattleScene] %s defends" % combatant.display_name)
 	await get_tree().create_timer(0.5).timeout
@@ -339,6 +343,7 @@ func _execute_run() -> void:
 	print("[BattleScene] Flee attempt: party_speed=%d, enemy_speed=%d, chance=%.0f%%, roll=%.2f" % [party_speed, enemy_speed, flee_chance * 100, roll])
 	
 	if roll < flee_chance:
+		SFXManager.play("run_away")
 		_show_message("Got away safely!")
 		print("[BattleScene] Player fled successfully")
 		await get_tree().create_timer(0.5).timeout
@@ -401,6 +406,7 @@ func _execute_enemy_turn(enemy) -> void:
 	
 	# Default: basic attack
 	var damage: int = target.take_damage(enemy.attack)
+	SFXManager.play("enemy_hit")
 	_show_message("%s attacks %s for %d damage!" % [enemy.display_name, target.display_name, damage])
 	print("[BattleScene] %s attacks %s for %d damage" % [enemy.display_name, target.display_name, damage])
 	await get_tree().create_timer(0.8).timeout

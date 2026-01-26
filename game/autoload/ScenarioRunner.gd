@@ -577,6 +577,28 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # SFX actions
+    if t == "play_sfx":
+        var sfx_id: String = str(action.get("sfx_id", ""))
+        if sfx_id != "":
+            SFXManager.play(sfx_id)
+            _trace["events"].append({"type": "play_sfx", "frame": _frame, "sfx_id": sfx_id})
+        _action_index += 1
+        return
+
+    if t == "check_sfx":
+        var last_sfx: String = SFXManager.get_last_sfx()
+        _trace["events"].append({"type": "check_sfx", "frame": _frame, "last_sfx": last_sfx})
+        print("[Scenario] Last SFX: ", last_sfx)
+        _action_index += 1
+        return
+
+    if t == "stop_sfx":
+        SFXManager.stop_all()
+        _trace["events"].append({"type": "stop_sfx", "frame": _frame})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

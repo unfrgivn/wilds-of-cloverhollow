@@ -1206,7 +1206,7 @@ Background music playback.
 
 ---
 
-## Milestone 98 — Audio: Sound effects  **Owner:** Audio + Gameplay
+## Milestone 98 — Audio: Sound effects  **Status:** ✅ Completed (2026-01-26) **Owner:** Audio + Gameplay
 ### Objective
 SFX for actions.
 

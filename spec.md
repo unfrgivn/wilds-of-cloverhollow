@@ -289,6 +289,22 @@ This file is the single source of truth. If code changes behavior, update this f
 - Placeholder paths: actual `.ogg` files to be added in future milestone.
 - Scenario actions: `play_music`, `play_area_music`, `play_battle_music`, `stop_music`, `check_music`.
 
+### 3.27 Sound effects system
+- SFXManager autoload handles sound effect playback.
+- SFX_PATHS dictionary maps SFX IDs to `.wav` file paths under `game/assets/audio/sfx/`.
+- Audio player pool (8 players) allows simultaneous SFX playback.
+- SFX categories: menu (move, select, cancel), battle (hit, miss, defend, victory), interaction (dialogue, pickup).
+- `play(sfx_id)`: Plays a specific sound effect.
+- Convenience methods: `play_menu_move()`, `play_menu_select()`, `play_attack_hit()`, etc.
+- `get_last_sfx()`: Returns the last played SFX ID for testing.
+- `stop_all()`: Stops all playing sound effects.
+- UI integration: PauseMenuUI plays SFX on navigation and selection.
+- Battle integration: BattleScene plays SFX on attacks, defends, victory, defeat.
+- Dialogue integration: DialogueManager plays SFX on open/close.
+- Inventory integration: InventoryManager plays SFX on tool/item acquisition.
+- Placeholder paths: actual `.wav` files to be added in future milestone.
+- Scenario actions: `play_sfx`, `check_sfx`, `stop_sfx`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

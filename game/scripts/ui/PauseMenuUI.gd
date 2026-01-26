@@ -74,6 +74,7 @@ func _populate_options() -> void:
 func _move_selection(delta: int) -> void:
 	_selected_index = wrapi(_selected_index + delta, 0, _menu_options.size())
 	_update_selection()
+	SFXManager.play_menu_move()
 
 func _update_selection() -> void:
 	var buttons = options_container.get_children()
@@ -90,6 +91,7 @@ func _on_option_pressed(index: int) -> void:
 func _select_option() -> void:
 	var option = _menu_options[_selected_index]
 	print("[PauseMenuUI] Selected: %s" % option)
+	SFXManager.play_menu_select()
 	
 	match option:
 		"Resume":
@@ -104,6 +106,7 @@ func _select_option() -> void:
 			_on_quit()
 
 func _on_resume() -> void:
+	SFXManager.play_menu_cancel()
 	resume_pressed.emit()
 	close_menu()
 	PauseManager.toggle_pause()
@@ -147,6 +150,7 @@ func _on_party_closed(party_ui: Node) -> void:
 func _on_save() -> void:
 	save_pressed.emit()
 	SaveManager.save_game()
+	SFXManager.play("save_game")
 	print("[PauseMenuUI] Game saved!")
 	# Show save confirmation briefly
 	title_label.text = "Game Saved!"

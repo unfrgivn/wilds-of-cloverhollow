@@ -1,0 +1,27 @@
+{
+  "id": "sfx_smoke",
+  "name": "SFX System Smoke Test",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "play_sfx", "sfx_id": "menu_move" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_sfx" },
+    { "type": "play_sfx", "sfx_id": "menu_select" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_sfx" },
+    { "type": "play_sfx", "sfx_id": "attack_hit" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_sfx" },
+    { "type": "play_sfx", "sfx_id": "dialogue_open" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_sfx" },
+    { "type": "play_sfx", "sfx_id": "item_pickup" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_sfx" },
+    { "type": "stop_sfx" },
+    { "type": "capture", "label": "sfx_test_complete" },
+    { "type": "wait_frames", "frames": 10 }
+  ]
+}

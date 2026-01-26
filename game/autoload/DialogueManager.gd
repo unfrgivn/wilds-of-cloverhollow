@@ -28,6 +28,7 @@ func show_dialogue(text: String) -> void:
 	_is_showing = true
 	_waiting_for_choice = false
 	_current_choices = []
+	SFXManager.play_dialogue_open()
 	_dialogue_ui.show_text(text)
 	dialogue_shown.emit(text)
 
@@ -74,6 +75,7 @@ func hide_dialogue() -> void:
 	_is_showing = false
 	_waiting_for_choice = false
 	_current_choices = []
+	SFXManager.play_dialogue_close()
 	_dialogue_ui.hide_dialogue()
 	dialogue_hidden.emit()
 	dialogue_finished.emit()

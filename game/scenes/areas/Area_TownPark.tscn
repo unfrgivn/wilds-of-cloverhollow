@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" path="res://game/scripts/interaction/LostCatInteractable.gd" id="14"]
 [ext_resource type="Script" path="res://game/scripts/interaction/BerryPickup.gd" id="15"]
 [ext_resource type="Script" path="res://game/scripts/interaction/ForestGate.gd" id="16"]
+[ext_resource type="Script" path="res://game/scripts/interaction/BranchingDialogueNPC.gd" id="17"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -336,4 +337,23 @@ offset_bottom = 4.0
 color = Color(0.8, 0.2, 0.3, 1)
 
 [node name="BerryCollision" type="CollisionShape2D" parent="Berry2"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="FriendlyTraveler" type="Area2D" parent="."]
+position = Vector2(300, 85)
+script = ExtResource("17")
+npc_name = "Friendly Traveler"
+greeting = "Hello, young adventurer! What brings you to the park today?"
+choice_1 = ["Ask about the forest", "The forest? It's been sealed for years now. Strange magic, they say. The Elder might know more.", "asked_about_forest"]
+choice_2 = ["Ask about the town", "Cloverhollow is a peaceful place. Everyone knows everyone here!", ""]
+choice_3 = ["Say goodbye", "Safe travels, friend! May your path be clear.", ""]
+
+[node name="TravelerSprite" type="ColorRect" parent="FriendlyTraveler"]
+offset_left = -8.0
+offset_top = -16.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0.4, 0.6, 0.8, 1)
+
+[node name="TravelerCollision" type="CollisionShape2D" parent="FriendlyTraveler"]
 shape = SubResource("RectangleShape2D_3")

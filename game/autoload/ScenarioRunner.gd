@@ -307,6 +307,37 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "show_dialogue_choices":
+        var prompt := str(action.get("prompt", "Choose an option:"))
+        var choices: Array = action.get("choices", [])
+        # Convert choice arrays to dictionaries if needed
+        var choice_dicts: Array = []
+        for c in choices:
+            if typeof(c) == TYPE_DICTIONARY:
+                choice_dicts.append(c)
+            elif typeof(c) == TYPE_ARRAY and c.size() >= 2:
+                choice_dicts.append({"text": str(c[0]), "response": str(c[1]), "flag": str(c[2]) if c.size() > 2 else ""})
+        DialogueManager.show_dialogue_with_choices(prompt, choice_dicts)
+        _trace["events"].append({"type": "show_dialogue_choices", "frame": _frame, "prompt": prompt, "choices_count": choice_dicts.size()})
+        _action_index += 1
+        return
+
+    if t == "select_dialogue_choice":
+        var choice_index: int = int(action.get("choice_index", 0))
+        if DialogueManager.is_waiting_for_choice():
+            DialogueManager.select_choice(choice_index)
+            _trace["events"].append({"type": "select_dialogue_choice", "frame": _frame, "choice_index": choice_index})
+        else:
+            _trace["events"].append({"type": "select_dialogue_choice", "frame": _frame, "choice_index": choice_index, "error": "not_waiting_for_choice"})
+        _action_index += 1
+        return
+
+    if t == "hide_dialogue":
+        DialogueManager.hide_dialogue()
+        _trace["events"].append({"type": "hide_dialogue", "frame": _frame})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

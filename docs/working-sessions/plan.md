@@ -1095,7 +1095,7 @@ Main story progression.
 
 ---
 
-## Milestone 89 — Dialogue branching system  **Owner:** Gameplay + UI Systems
+## Milestone 89 — Dialogue branching system  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + UI Systems
 ### Objective
 Player choices affect dialogue.
 

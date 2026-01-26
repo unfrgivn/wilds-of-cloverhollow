@@ -55,6 +55,12 @@ This file is the single source of truth. If code changes behavior, update this f
 - DialogueManager autoload handles showing/hiding dialogue UI.
 - Player movement is disabled while dialogue is showing.
 - NPCDialogueTree: NPC class that cycles through multiple dialogue branches on each interaction.
+- Dialogue branching: DialogueManager supports `show_dialogue_with_choices(prompt, choices)`.
+  - choices: Array of {text, response, flag} - each option shown as a selectable button.
+  - Player navigates choices with up/down, confirms with interact/accept.
+  - Selected choice's flag (if set) is stored as a story flag.
+  - Selected choice's response is shown as follow-up dialogue.
+- BranchingDialogueNPC: NPC script with exported choice arrays for dialogue trees.
 
 ### 3.6 Area transitions
 - SceneRouter autoload manages scene changes and player spawn placement.

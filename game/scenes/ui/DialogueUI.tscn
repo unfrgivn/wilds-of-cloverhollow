@@ -13,20 +13,25 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -240.0
-offset_top = -80.0
+offset_top = -100.0
 offset_right = 240.0
 offset_bottom = -8.0
 
 [node name="Label" type="Label" parent="Panel"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
 offset_left = 8.0
 offset_top = 8.0
 offset_right = -8.0
-offset_bottom = -8.0
+offset_bottom = 28.0
 text = "Dialogue text goes here..."
 horizontal_alignment = 1
-vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+offset_left = 8.0
+offset_top = 32.0
+offset_right = 472.0
+offset_bottom = 88.0

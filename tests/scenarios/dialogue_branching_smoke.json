@@ -1,0 +1,40 @@
+{
+  "scenario_id": "dialogue_branching_smoke",
+  "description": "Test dialogue branching system with choices and story flags",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "park_scene_loaded"},
+    
+    {"type": "show_dialogue_choices", "prompt": "What would you like to ask about?", "choices": [
+      {"text": "Ask about the forest", "response": "The forest is mysterious!", "flag": "asked_about_forest"},
+      {"text": "Ask about the town", "response": "Cloverhollow is peaceful.", "flag": ""},
+      {"text": "Say goodbye", "response": "Farewell!", "flag": ""}
+    ]},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "choices_shown"},
+    
+    {"type": "select_dialogue_choice", "choice_index": 0},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "asked_about_forest"},
+    {"type": "capture", "label": "choice_0_selected"},
+    
+    {"type": "hide_dialogue"},
+    {"type": "wait_frames", "frames": 5},
+    
+    {"type": "show_dialogue_choices", "prompt": "Another question?", "choices": [
+      {"text": "Choice A", "response": "You picked A!", "flag": "picked_choice_a"},
+      {"text": "Choice B", "response": "You picked B!", "flag": "picked_choice_b"}
+    ]},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "select_dialogue_choice", "choice_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "picked_choice_b"},
+    {"type": "capture", "label": "choice_b_selected"},
+    
+    {"type": "hide_dialogue"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "dialogue_branching_complete"}
+  ]
+}

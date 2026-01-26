@@ -784,7 +784,7 @@ HP recovery skills.
 
 ---
 
-## Milestone 63 — Skill: Status effects  **Owner:** Battle Systems
+## Milestone 63 — Skill: Status effects  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Buff/debuff skills.
 

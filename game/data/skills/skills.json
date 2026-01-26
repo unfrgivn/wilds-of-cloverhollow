@@ -94,6 +94,39 @@
       "target": "single_ally",
       "element": "none",
       "effect": "revive"
+    },
+    {
+      "id": "poison_sting",
+      "name": "Poison Sting",
+      "description": "A venomous strike that poisons the target.",
+      "type": "attack",
+      "mp_cost": 3,
+      "power": 3,
+      "target": "single_enemy",
+      "element": "none",
+      "effect": "poison"
+    },
+    {
+      "id": "lullaby",
+      "name": "Lullaby",
+      "description": "Sings a soothing melody that puts enemies to sleep.",
+      "type": "status",
+      "mp_cost": 5,
+      "power": 0,
+      "target": "single_enemy",
+      "element": "none",
+      "effect": "sleep"
+    },
+    {
+      "id": "stun_shock",
+      "name": "Stun Shock",
+      "description": "A jolt of electricity that may stun the target.",
+      "type": "attack",
+      "mp_cost": 4,
+      "power": 5,
+      "target": "single_enemy",
+      "element": "magic",
+      "effect": "stun"
     }
   ]
 }

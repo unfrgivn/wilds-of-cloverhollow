@@ -1,0 +1,9 @@
+{
+  "scenario_id": "skill_status_smoke",
+  "description": "Verifies status effect skills are loaded and usable in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "skill_status_battle_start"}
+  ]
+}

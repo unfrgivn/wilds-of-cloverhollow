@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/blacksmith/anvil.png" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/blacksmith/weapon_rack.png" id="9"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/blacksmith/workbench.png" id="10"]
+[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="11"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/blacksmith/blacksmith_idle_south.png" id="12"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -177,6 +179,18 @@ Hammers, tongs, chisels, and files.
 Everything an explorer might need."
 
 [node name="ToolDisplayCollision" type="CollisionShape2D" parent="ToolDisplayInteractable"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="BlacksmithNPC" type="Area2D" parent="."]
+position = Vector2(415, 165)
+script = ExtResource("11")
+dialogue_branches = ["Welcome to my forge! I'm Ironhammer.\nI craft the finest tools and weapons in Cloverhollow.\nWhat can I do for you today?", "The secret to good metalwork is patience.\nYou heat the metal, hammer it, cool it...\nRepeat until it's just right!", "These weapons aren't just for show.\nWhen you're ready for adventure, come back.\nI'll have something special forged for you.", "I've been smithing since I was your age.\nMy father taught me, and his father before him.\nIt's a proud tradition in our family.", "Need your gear upgraded? Not quite ready yet...\nBut soon I'll be offering special services!\nKeep collecting materials and come back!"]
+
+[node name="BlacksmithSprite" type="Sprite2D" parent="BlacksmithNPC"]
+texture = ExtResource("12")
+centered = true
+
+[node name="BlacksmithCollision" type="CollisionShape2D" parent="BlacksmithNPC"]
 shape = SubResource("RectangleShape2D_3")
 
 [node name="Spawns" type="Node2D" parent="."]

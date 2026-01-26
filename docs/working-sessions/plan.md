@@ -551,7 +551,7 @@ Shop for adventure tools.
 
 ---
 
-## Milestone 43 — Blacksmith NPC  **Owner:** Character Systems + Art Pipeline
+## Milestone 43 — Blacksmith NPC  **Status:** ✅ Completed (2025-01-25)  **Owner:** Character Systems + Art Pipeline
 ### Objective
 Tool/weapon shop keeper.
 

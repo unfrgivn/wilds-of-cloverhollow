@@ -1,0 +1,19 @@
+{
+  "scenario_id": "walk_to_school_smoke",
+  "description": "Verifies walk to school quest: mom sets flag, arrive at school triggers progress",
+  "scene": "res://game/scenes/areas/Area_HeroHouseInterior.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "check_story_flag", "flag": "go_to_school"},
+    {"type": "move", "direction": "left", "frames": 30},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "check_story_flag", "flag": "go_to_school"},
+    {"type": "set_story_flag", "flag": "arrived_at_school", "value": true},
+    {"type": "check_story_flag", "flag": "arrived_at_school"},
+    {"type": "wait_frames", "frames": 30}
+  ]
+}

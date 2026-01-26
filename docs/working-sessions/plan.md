@@ -975,7 +975,7 @@ Guided first moments.
 
 ---
 
-## Milestone 79 — Story: Walk to school quest  **Owner:** Story + Gameplay
+## Milestone 79 — Story: Walk to school quest  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 First outdoor exploration.
 

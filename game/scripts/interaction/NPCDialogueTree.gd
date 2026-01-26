@@ -12,6 +12,9 @@ signal interaction_ended
 ## Fallback dialogue if no branches defined
 @export_multiline var dialogue_text: String = "Hello there!"
 
+## Story flag to set on first interaction (optional)
+@export var sets_story_flag: String = ""
+
 ## Current branch index
 var _current_branch: int = 0
 
@@ -23,6 +26,10 @@ func _ready() -> void:
 ## Called when the player interacts with this NPC
 func interact() -> void:
 	interaction_started.emit()
+	
+	# Set story flag on first interaction if configured
+	if not sets_story_flag.is_empty() and _current_branch == 0:
+		InventoryManager.set_story_flag(sets_story_flag, true)
 	
 	if dialogue_branches.is_empty():
 		DialogueManager.show_dialogue("...")

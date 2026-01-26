@@ -122,8 +122,9 @@ texture = ExtResource("7")
 [node name="Mom" type="Area2D" parent="KitchenArea"]
 position = Vector2(10, 20)
 script = ExtResource("15")
-dialogue_branches = Array[String](["Good morning, sweetie! Did you sleep well? Today is going to be a big day!", "Remember to be careful out there. If you see any strange creatures, come straight home!", "I'm so proud of you. Now go have fun with your friends, but don't forget to do your homework later!"])
-dialogue_text = "Hello, dear!"
+dialogue_branches = Array[String](["Good morning, sweetie! Did you sleep well? You need to hurry up and get to school. Head out the front door and go east through Town Center!", "Remember to be careful out there. If you see any strange creatures, come straight home!", "I'm so proud of you. Now go have fun with your friends, but don't forget to do your homework later!"])
+dialogue_text = "Hello, dear! School is east through Town Center."
+sets_story_flag = "go_to_school"
 
 [node name="MomSprite" type="Sprite2D" parent="KitchenArea/Mom"]
 texture = ExtResource("14")

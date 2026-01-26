@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/playground/slide.png" id="12"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/playground/flagpole.png" id="13"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/playground/bike_rack.png" id="14"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ArrivalTrigger.gd" id="20"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -211,6 +212,15 @@ You may use the library now.
 Just remember to return any books!"
 grants_flag = "talked_to_teacher"
 one_time_use = true
+
+[node name="SchoolArrival" type="Area2D" parent="."]
+position = Vector2(256, 160)
+script = ExtResource("20")
+arrival_flag = "arrived_at_school"
+dialogue_text = "You made it to Cloverhollow Elementary! Time for class!"
+
+[node name="ArrivalShape" type="CollisionShape2D" parent="SchoolArrival"]
+shape = SubResource("RectangleShape2D_3")
 
 [node name="TeacherSprite" type="ColorRect" parent="Teacher"]
 offset_left = -8.0

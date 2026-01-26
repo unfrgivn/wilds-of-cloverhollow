@@ -1,0 +1,31 @@
+{
+  "scenario_id": "npc_librarian_dialogue",
+  "description": "Interact with librarian NPC, cycle through dialogue about research topics",
+  "scene": "res://game/scenes/areas/Area_LibraryInterior.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "library_start"},
+    {"type": "move", "direction": "up", "frames": 80},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "near_librarian"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "librarian_dialogue_1"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "librarian_dialogue_2"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "librarian_dialogue_3"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "librarian_dialogue_4"}
+  ]
+}

@@ -455,7 +455,7 @@ Town library building.
 
 ---
 
-## Milestone 35 — Library NPC: Librarian  **Owner:** Character Systems + Art Pipeline
+## Milestone 35 — Library NPC: Librarian  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Librarian with book lookup mechanic.
 

@@ -587,7 +587,7 @@ Doctor for healing services.
 
 ---
 
-## Milestone 46 — Town Bulletin Board system  **Owner:** Gameplay + UI Systems
+## Milestone 46 — Town Bulletin Board system  **Status:** ✅ Completed (2025-01-26)  **Owner:** Gameplay + UI Systems
 ### Objective
 Quest/notice discovery mechanic.
 

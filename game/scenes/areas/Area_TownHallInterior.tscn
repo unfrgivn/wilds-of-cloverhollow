@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="7"]
 [ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/mayor/mayor_idle_south.png" id="9"]
+[ext_resource type="Script" path="res://game/scripts/interaction/BulletinBoardInteractable.gd" id="10"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -223,11 +224,7 @@ color = Color(0.30, 0.50, 0.70, 1)
 
 [node name="NoticeInteractable" type="Area2D" parent="."]
 position = Vector2(100, 100)
-script = ExtResource("3")
-dialogue_text = "Notice Board - Quest Postings:
-- HELP WANTED: Find the Mayor's missing cat
-- REWARD: Rare mushrooms from the forest
-- URGENT: Strange sounds in the old mine"
+script = ExtResource("10")
 
 [node name="NoticeCollision" type="CollisionShape2D" parent="NoticeInteractable"]
 shape = SubResource("RectangleShape2D_3")

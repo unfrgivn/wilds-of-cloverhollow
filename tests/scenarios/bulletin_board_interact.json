@@ -1,0 +1,30 @@
+{
+  "id": "bulletin_board_interact",
+  "description": "Test bulletin board interaction and quest UI",
+  "starting_scene": "res://game/scenes/areas/Area_TownHallInterior.tscn",
+  "actions": [
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "town_hall_interior_start" },
+    
+    { "type": "move", "direction": "up", "frames": 20 },
+    { "type": "move", "direction": "left", "frames": 40 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "near_bulletin_board" },
+    
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "quest_ui_opened" },
+    
+    { "type": "press", "action": "ui_accept" },
+    { "type": "wait_frames", "frames": 20 },
+    { "type": "capture", "label": "quest_details_shown" },
+    
+    { "type": "press", "action": "ui_accept" },
+    { "type": "wait_frames", "frames": 20 },
+    { "type": "capture", "label": "quest_accepted" },
+    
+    { "type": "press", "action": "ui_cancel" },
+    { "type": "wait_frames", "frames": 20 },
+    { "type": "capture", "label": "quest_ui_closed" }
+  ]
+}

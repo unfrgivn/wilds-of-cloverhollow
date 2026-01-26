@@ -99,6 +99,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - ItemPickup: collectible that grants tools or items when interacted.
 - All gated interactables show different dialogue depending on whether requirements are met.
 
+### 3.12 Bulletin board and quest system
+- BulletinBoardInteractable: opens QuestUI when interacted.
+- QuestUI (CanvasLayer): displays available quests from the bulletin board.
+  - Quest list view: shows quest names, navigate with up/down, select to view details.
+  - Quest details view: shows name, description, reward, objectives. Accept/Decline buttons.
+  - Accepting a quest sets `quest_accepted_{quest_id}` story flag.
+  - Completed quests (matching completion_flag) are hidden from the board.
+  - Quests with required_flag only show if that flag is set.
+- Quest data stored in `game/data/quests/quests.json`:
+  - Fields: id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
+- GameData autoload loads quest data at startup via `get_quest(id)` and `get_available_quests()`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.
@@ -144,6 +156,7 @@ All game content is data-driven via JSON files under `game/data/`:
 - `party/party.json`: Party member definitions with id, name, role, max_hp, max_mp, attack, defense, speed, skills[].
 - `biomes/<biome>.json`: Biome metadata (id, name, palette_path).
 - `encounters/<biome>.json`: Encounter tables for each biome.
+- `quests/quests.json`: Quest definitions with id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
 
 GameData autoload loads and caches all data on startup. Adding new content requires only JSON + sprite assets (no code changes).
 

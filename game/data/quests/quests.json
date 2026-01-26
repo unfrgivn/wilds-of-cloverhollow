@@ -1,0 +1,37 @@
+{
+  "quests": [
+    {
+      "id": "find_mayors_cat",
+      "name": "Find the Mayor's Cat",
+      "description": "Mayor Thornwood's beloved cat has gone missing. Search around town to find it.",
+      "type": "fetch",
+      "reward_gold": 50,
+      "reward_items": [],
+      "required_flag": null,
+      "completion_flag": "mayors_cat_found",
+      "objectives": ["Find the cat", "Return to the Mayor"]
+    },
+    {
+      "id": "forest_mushrooms",
+      "name": "Rare Forest Mushrooms",
+      "description": "The Elder needs rare mushrooms from the forest for a special remedy.",
+      "type": "collect",
+      "reward_gold": 30,
+      "reward_items": ["potion"],
+      "required_flag": null,
+      "completion_flag": "mushrooms_collected",
+      "objectives": ["Collect 3 rare mushrooms", "Bring them to the Elder"]
+    },
+    {
+      "id": "mine_investigation",
+      "name": "Strange Sounds in the Mine",
+      "description": "URGENT: Unusual sounds have been reported coming from the old mine. Investigate!",
+      "type": "investigation",
+      "reward_gold": 100,
+      "reward_items": [],
+      "required_flag": "talked_to_mayor",
+      "completion_flag": "mine_investigated",
+      "objectives": ["Enter the old mine", "Find the source of the sounds", "Report back"]
+    }
+  ]
+}

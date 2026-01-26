@@ -8,6 +8,7 @@ const ITEMS_PATH := "res://game/data/items/items.json"
 const PARTY_PATH := "res://game/data/party/party.json"
 const BIOMES_DIR := "res://game/data/biomes/"
 const ENCOUNTERS_DIR := "res://game/data/encounters/"
+const QUESTS_PATH := "res://game/data/quests/quests.json"
 
 ## Cached data (dictionaries keyed by id)
 var enemies: Dictionary = {}
@@ -16,6 +17,7 @@ var items: Dictionary = {}
 var party_members: Dictionary = {}
 var biomes: Dictionary = {}
 var encounters: Dictionary = {}
+var quests: Dictionary = {}
 
 ## Raw party data
 var party_data: Dictionary = {}
@@ -30,8 +32,9 @@ func _load_all_data() -> void:
 	_load_party()
 	_load_biomes()
 	_load_encounters()
-	print("[GameData] All data loaded: %d enemies, %d skills, %d items, %d party members" % [
-		enemies.size(), skills.size(), items.size(), party_members.size()
+	_load_quests()
+	print("[GameData] All data loaded: %d enemies, %d skills, %d items, %d party members, %d quests" % [
+		enemies.size(), skills.size(), items.size(), party_members.size(), quests.size()
 	])
 
 func _load_enemies() -> void:
@@ -89,6 +92,13 @@ func _load_encounters() -> void:
 			if data.has("biome"):
 				encounters[data["biome"]] = data
 		file_name = dir.get_next()
+
+func _load_quests() -> void:
+	var data := _load_json(QUESTS_PATH)
+	if data.has("quests"):
+		for quest in data["quests"]:
+			if quest.has("id"):
+				quests[quest["id"]] = quest
 
 func _load_json(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
@@ -154,3 +164,27 @@ func get_encounters_for_biome(biome_id: String) -> Dictionary:
 		return encounters[biome_id]
 	push_warning("[GameData] Encounters not found for biome: %s" % biome_id)
 	return {}
+
+## Get quest data by id
+func get_quest(quest_id: String) -> Dictionary:
+	if quests.has(quest_id):
+		return quests[quest_id]
+	push_warning("[GameData] Quest not found: %s" % quest_id)
+	return {}
+
+## Get all available quests (optionally filter by completion status)
+func get_available_quests() -> Array:
+	var result: Array = []
+	for quest_id in quests.keys():
+		var quest = quests[quest_id]
+		# Check if quest has a required flag that isn't met
+		var required_flag = quest.get("required_flag")
+		if required_flag != null and required_flag != "":
+			if not InventoryManager.has_story_flag(required_flag):
+				continue
+		# Check if quest is already completed
+		var completion_flag = quest.get("completion_flag", "")
+		if completion_flag != "" and InventoryManager.has_story_flag(completion_flag):
+			continue
+		result.append(quest)
+	return result

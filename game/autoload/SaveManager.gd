@@ -256,6 +256,107 @@ func has_any_save() -> bool:
     return false
 
 
+## ============================================================================
+## Cloud Sync Hooks (stubs for future implementation)
+## ============================================================================
+
+signal cloud_sync_started
+signal cloud_sync_completed(success: bool)
+signal cloud_conflict_detected(local_timestamp: int, cloud_timestamp: int)
+
+## Whether cloud sync is enabled (future feature)
+var cloud_sync_enabled: bool = false
+
+## Cloud sync status
+enum CloudSyncStatus { IDLE, SYNCING, ERROR, CONFLICT }
+var cloud_sync_status: CloudSyncStatus = CloudSyncStatus.IDLE
+
+
+## Upload local save to cloud (stub - no-op)
+func cloud_upload(slot: int) -> bool:
+    if not cloud_sync_enabled:
+        print("[SaveManager] Cloud sync disabled, skipping upload")
+        return false
+    
+    # TODO: Implement actual cloud upload (Game Center, iCloud, etc.)
+    print("[SaveManager] Cloud upload stub for slot %d" % slot)
+    cloud_sync_started.emit()
+    
+    # Simulate async operation completion
+    cloud_sync_completed.emit(true)
+    return true
+
+
+## Download save from cloud (stub - no-op)
+func cloud_download(slot: int) -> bool:
+    if not cloud_sync_enabled:
+        print("[SaveManager] Cloud sync disabled, skipping download")
+        return false
+    
+    # TODO: Implement actual cloud download
+    print("[SaveManager] Cloud download stub for slot %d" % slot)
+    cloud_sync_started.emit()
+    
+    # Simulate async operation completion
+    cloud_sync_completed.emit(true)
+    return true
+
+
+## Check if cloud has newer save (stub - always returns false)
+func cloud_has_newer_save(slot: int) -> bool:
+    if not cloud_sync_enabled:
+        return false
+    
+    # TODO: Compare local timestamp with cloud timestamp
+    print("[SaveManager] Cloud check stub for slot %d" % slot)
+    return false
+
+
+## Get save data as portable JSON string (for cloud upload)
+func get_save_data_json(slot: int) -> String:
+    var path := _get_slot_path(slot)
+    if not FileAccess.file_exists(path):
+        return ""
+    
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return ""
+    
+    var json_string := file.get_as_text()
+    file.close()
+    return json_string
+
+
+## Import save data from JSON string (for cloud download)
+func import_save_data_json(slot: int, json_string: String) -> bool:
+    if slot < 0 or slot >= MAX_SLOTS:
+        return false
+    
+    # Validate JSON
+    var json := JSON.new()
+    var error := json.parse(json_string)
+    if error != OK:
+        push_error("[SaveManager] Invalid JSON for import: %s" % json.get_error_message())
+        return false
+    
+    # Validate required fields
+    var data: Dictionary = json.data
+    if not data.has("version") or not data.has("timestamp"):
+        push_error("[SaveManager] Missing required fields in imported save")
+        return false
+    
+    # Write to slot
+    var path := _get_slot_path(slot)
+    var file := FileAccess.open(path, FileAccess.WRITE)
+    if file == null:
+        return false
+    
+    file.store_string(json_string)
+    file.close()
+    print("[SaveManager] Imported save to slot %d" % slot)
+    return true
+
+
 func _find_player() -> Node2D:
     var root := get_tree().current_scene
     if root == null:

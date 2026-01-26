@@ -95,6 +95,11 @@ This file is the single source of truth. If code changes behavior, update this f
   - Supports save, load, and delete operations.
   - Tab key deletes selected slot, Cancel closes UI.
 - Scenario actions: `save_game`, `load_game`, `delete_save`, `check_save_slots`, `has_save` (all support slot parameter).
+- Cloud sync hooks (stubs for future implementation):
+  - `cloud_upload(slot)`, `cloud_download(slot)`: Upload/download save data.
+  - `get_save_data_json(slot)`, `import_save_data_json(slot, json)`: Portable JSON serialization.
+  - Signals: `cloud_sync_started`, `cloud_sync_completed`, `cloud_conflict_detected`.
+- Save format documented in `docs/save-format.md`.
 
 ### 3.10 Inventory and tools
 - InventoryManager autoload tracks:

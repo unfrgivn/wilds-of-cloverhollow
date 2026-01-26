@@ -1,0 +1,19 @@
+{
+    "id": "visual_polish_check",
+    "description": "Visual polish validation - captures key areas for visual regression",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "visual_town_center"},
+        
+        {"type": "move", "direction": "up", "frames": 30},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "visual_town_buildings"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "visual_ui_elements"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "visual_polish_complete"}
+    ]
+}

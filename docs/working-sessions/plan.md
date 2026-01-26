@@ -1560,7 +1560,7 @@ End-to-end automated playtest.
 
 ---
 
-## Milestone 127 — Visual polish pass  **Owner:** Art Pipeline + UI Systems
+## Milestone 127 — Visual polish pass  **Owner:** Art Pipeline + UI Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Consistent visual quality.
 

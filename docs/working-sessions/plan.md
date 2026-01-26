@@ -405,7 +405,7 @@ Arcade owner character.
 
 ---
 
-## Milestone 31 — Arcade minigame stub  **Owner:** Gameplay + UI Systems
+## Milestone 31 — Arcade minigame stub  **Owner:** Gameplay + UI Systems  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Playable cabinet interaction (simple minigame).
 

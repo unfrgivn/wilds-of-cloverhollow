@@ -1,6 +1,7 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ArcadeCabinetInteractable.gd" id="17"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="3"]
 [ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="4"]
@@ -94,10 +95,19 @@ color = Color(0.2, 0.8, 0.9, 1)
 
 [node name="ArcadeCabinets" type="Node2D" parent="."]
 
-[node name="Cabinet1" type="Sprite2D" parent="ArcadeCabinets"]
+[node name="Cabinet1_Interactable" type="Area2D" parent="ArcadeCabinets"]
 position = Vector2(80, 100)
+script = ExtResource("17")
+game_name = "Catch-A-Star"
+minigame_scene = "res://game/scenes/minigame/ArcadeMinigame.tscn"
+placeholder_text = ""
+
+[node name="Sprite" type="Sprite2D" parent="ArcadeCabinets/Cabinet1_Interactable"]
 texture = ExtResource("6")
 centered = true
+
+[node name="InteractionShape" type="CollisionShape2D" parent="ArcadeCabinets/Cabinet1_Interactable"]
+shape = SubResource("CircleShape2D_1")
 
 [node name="Cabinet2" type="Sprite2D" parent="ArcadeCabinets"]
 position = Vector2(120, 100)
@@ -271,6 +281,11 @@ marker_id = "from_exterior"
 [node name="default" type="Marker2D" parent="Spawns"]
 position = Vector2(256, 180)
 script = ExtResource("4")
+
+[node name="from_minigame" type="Marker2D" parent="Spawns"]
+position = Vector2(100, 140)
+script = ExtResource("4")
+marker_id = "from_minigame"
 
 [node name="DoorTransition" type="Area2D" parent="."]
 position = Vector2(256, 255)

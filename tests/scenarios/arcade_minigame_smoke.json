@@ -1,0 +1,22 @@
+{
+  "scenario_id": "arcade_minigame_smoke",
+  "description": "Interact with arcade cabinet to launch minigame, play briefly, capture states",
+  "scene": "res://game/scenes/areas/Area_ArcadeInterior.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "arcade_before_minigame"},
+    {"type": "move", "direction": "up", "frames": 40},
+    {"type": "move", "direction": "left", "frames": 100},
+    {"type": "capture", "label": "near_cabinet"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "minigame_start_prompt"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "minigame_playing"},
+    {"type": "move", "direction": "left", "frames": 30},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "capture", "label": "minigame_catching"}
+  ]
+}

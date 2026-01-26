@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/playground/flagpole.png" id="13"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/playground/bike_rack.png" id="14"]
 [ext_resource type="Script" path="res://game/scripts/interaction/ArrivalTrigger.gd" id="20"]
+[ext_resource type="Script" path="res://game/scripts/events/MysteriousFigureController.gd" id="30"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -28,6 +29,9 @@ size = Vector2(16, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
 size = Vector2(160, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(80, 40)
 
 [node name="Area_School" type="Node2D"]
 
@@ -282,3 +286,20 @@ target_spawn_id = "from_exterior"
 
 [node name="TransitionHallShape" type="CollisionShape2D" parent="TransitionToHall"]
 shape = SubResource("RectangleShape2D_3")
+
+[node name="MysteriousFigureController" type="Node" parent="."]
+script = ExtResource("30")
+shadow_figure_path = NodePath("../ShadowFigure")
+trigger_area_path = NodePath("../MysteryTrigger")
+
+[node name="ShadowFigure" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(480, 80)
+texture = ExtResource("2")
+modulate = Color(0.2, 0.2, 0.3, 0.8)
+
+[node name="MysteryTrigger" type="Area2D" parent="."]
+position = Vector2(80, 200)
+
+[node name="MysteryTriggerShape" type="CollisionShape2D" parent="MysteryTrigger"]
+shape = SubResource("RectangleShape2D_5")

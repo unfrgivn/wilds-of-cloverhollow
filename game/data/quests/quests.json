@@ -1,6 +1,17 @@
 {
   "quests": [
     {
+      "id": "investigate_disturbance",
+      "name": "Investigate Disturbance",
+      "description": "Strange things are happening in Cloverhollow. A mysterious figure was spotted near the school. Find out what's going on.",
+      "type": "investigation",
+      "reward_gold": 75,
+      "reward_items": [],
+      "required_flag": "mysterious_figure_seen",
+      "completion_flag": "disturbance_investigated",
+      "objectives": ["Talk to townspeople about strange events", "Investigate the mysterious figure"]
+    },
+    {
       "id": "find_mayors_cat",
       "name": "Find the Mayor's Cat",
       "description": "Mayor Thornwood's beloved cat has gone missing. Search around town to find it.",

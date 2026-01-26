@@ -999,7 +999,7 @@ Classroom story beat.
 
 ---
 
-## Milestone 81 — Story: Meet the bad guy hint  **Owner:** Story + Art Pipeline
+## Milestone 81 — Story: Meet the bad guy hint  **Owner:** Story + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Antagonist foreshadowing.
 

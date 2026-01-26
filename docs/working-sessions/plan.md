@@ -1218,7 +1218,7 @@ SFX for actions.
 
 ---
 
-## Milestone 99 — Notifications system  **Owner:** UI Systems
+## Milestone 99 — Notifications system  **Status:** ✅ Completed (2026-01-26) **Owner:** UI Systems
 ### Objective
 Toast/popup notifications.
 

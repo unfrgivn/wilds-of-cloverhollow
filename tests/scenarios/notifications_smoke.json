@@ -1,0 +1,27 @@
+{
+  "id": "notifications_smoke",
+  "name": "Notifications System Smoke Test",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "show_notification", "title": "Test", "message": "Hello World" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_notification" },
+    { "type": "wait_frames", "frames": 60 },
+    { "type": "show_quest_notification", "quest_name": "Find the Lost Key" },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_notification" },
+    { "type": "wait_frames", "frames": 60 },
+    { "type": "show_item_notification", "item_name": "Potion", "count": 3 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_notification" },
+    { "type": "wait_frames", "frames": 60 },
+    { "type": "show_level_up_notification", "character_name": "Fae", "new_level": 5 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "check_notification" },
+    { "type": "clear_notifications" },
+    { "type": "capture", "label": "notifications_test_complete" },
+    { "type": "wait_frames", "frames": 10 }
+  ]
+}

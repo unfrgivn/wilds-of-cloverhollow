@@ -37,6 +37,7 @@ func acquire_tool(tool_id: String) -> void:
 	if not tools.get(tool_id, false):
 		tools[tool_id] = true
 		SFXManager.play("tool_acquire")
+		NotificationManager.show_tool_acquired(tool_id.capitalize())
 		tool_acquired.emit(tool_id)
 		inventory_changed.emit()
 		print("[InventoryManager] Tool acquired: %s" % tool_id)
@@ -57,6 +58,7 @@ func add_item(item_id: String, count: int = 1) -> void:
 	if count <= 0:
 		return
 	SFXManager.play_item_pickup()
+	NotificationManager.show_item_obtained(item_id.capitalize(), count)
 	var current: int = items.get(item_id, 0)
 	items[item_id] = current + count
 	item_added.emit(item_id, count)

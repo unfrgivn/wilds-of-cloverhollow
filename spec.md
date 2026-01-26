@@ -305,6 +305,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - Placeholder paths: actual `.wav` files to be added in future milestone.
 - Scenario actions: `play_sfx`, `check_sfx`, `stop_sfx`.
 
+### 3.28 Notification system
+- NotificationManager autoload handles toast/popup notifications.
+- Notification types: INFO, QUEST, ITEM, LEVEL_UP, ACHIEVEMENT.
+- Queue system: notifications queue and display sequentially with auto-hide after duration.
+- `show_notification(title, message, type)`: Generic notification.
+- `show_quest_received(quest_name)`: Quest started notification.
+- `show_quest_completed(quest_name)`: Quest complete notification.
+- `show_item_obtained(item_name, count)`: Item pickup notification.
+- `show_tool_acquired(tool_name)`: Tool acquisition notification.
+- `show_level_up(character_name, new_level)`: Level up notification.
+- QuestManager triggers quest notifications on start/complete.
+- InventoryManager triggers item/tool notifications on acquisition.
+- NotificationUI (CanvasLayer): animated popup display with slide-in/fade effects.
+- Scenario actions: `show_notification`, `show_quest_notification`, `show_item_notification`, `show_level_up_notification`, `check_notification`, `clear_notifications`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

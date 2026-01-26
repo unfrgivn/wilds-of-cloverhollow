@@ -48,6 +48,11 @@ func start_quest(quest_id: String) -> bool:
 	InventoryManager.set_story_flag("quest_accepted_" + quest_id, true)
 	
 	quest_started.emit(quest_id)
+	
+	# Show notification
+	var quest_name: String = quest_data.get("name", quest_id)
+	NotificationManager.show_quest_received(quest_name)
+	
 	print("[QuestManager] Quest started: %s" % quest_id)
 	return true
 
@@ -115,6 +120,11 @@ func complete_quest(quest_id: String) -> bool:
 	_completed_quests.append(quest_id)
 	
 	quest_completed.emit(quest_id)
+	
+	# Show notification
+	var quest_name: String = quest_data.get("name", quest_id)
+	NotificationManager.show_quest_completed(quest_name)
+	
 	print("[QuestManager] Quest completed: %s" % quest_id)
 	return true
 

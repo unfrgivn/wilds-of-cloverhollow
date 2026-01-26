@@ -599,6 +599,53 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Notification actions
+    if t == "show_notification":
+        var title: String = str(action.get("title", ""))
+        var message: String = str(action.get("message", ""))
+        NotificationManager.show_notification(title, message)
+        _trace["events"].append({"type": "show_notification", "frame": _frame, "title": title, "message": message})
+        _action_index += 1
+        return
+
+    if t == "show_quest_notification":
+        var quest_name: String = str(action.get("quest_name", ""))
+        NotificationManager.show_quest_received(quest_name)
+        _trace["events"].append({"type": "show_quest_notification", "frame": _frame, "quest_name": quest_name})
+        _action_index += 1
+        return
+
+    if t == "show_item_notification":
+        var item_name: String = str(action.get("item_name", ""))
+        var count: int = action.get("count", 1)
+        NotificationManager.show_item_obtained(item_name, count)
+        _trace["events"].append({"type": "show_item_notification", "frame": _frame, "item_name": item_name, "count": count})
+        _action_index += 1
+        return
+
+    if t == "show_level_up_notification":
+        var character_name: String = str(action.get("character_name", "Hero"))
+        var new_level: int = action.get("new_level", 1)
+        NotificationManager.show_level_up(character_name, new_level)
+        _trace["events"].append({"type": "show_level_up_notification", "frame": _frame, "character_name": character_name, "new_level": new_level})
+        _action_index += 1
+        return
+
+    if t == "check_notification":
+        var current := NotificationManager.get_current_notification()
+        var is_showing := NotificationManager.is_showing()
+        var queue_size := NotificationManager.get_queue_size()
+        _trace["events"].append({"type": "check_notification", "frame": _frame, "is_showing": is_showing, "current": current, "queue_size": queue_size})
+        print("[Scenario] Notification showing: %s, queue: %d" % [is_showing, queue_size])
+        _action_index += 1
+        return
+
+    if t == "clear_notifications":
+        NotificationManager.clear_all()
+        _trace["events"].append({"type": "clear_notifications", "frame": _frame})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

@@ -1011,7 +1011,7 @@ Antagonist foreshadowing.
 
 ---
 
-## Milestone 82 — Quest system framework  **Owner:** Gameplay + Data Systems
+## Milestone 82 — Quest system framework  **Owner:** Gameplay + Data Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Quest tracking infrastructure.
 

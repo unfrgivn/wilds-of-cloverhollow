@@ -274,6 +274,39 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "start_quest":
+        var quest_id := str(action.get("quest_id", ""))
+        if quest_id != "":
+            var success: bool = QuestManager.start_quest(quest_id)
+            _trace["events"].append({"type": "start_quest", "frame": _frame, "quest_id": quest_id, "success": success})
+        _action_index += 1
+        return
+
+    if t == "complete_quest":
+        var quest_id := str(action.get("quest_id", ""))
+        if quest_id != "":
+            var success: bool = QuestManager.complete_quest(quest_id)
+            _trace["events"].append({"type": "complete_quest", "frame": _frame, "quest_id": quest_id, "success": success})
+        _action_index += 1
+        return
+
+    if t == "complete_objective":
+        var quest_id := str(action.get("quest_id", ""))
+        var objective_index: int = int(action.get("objective_index", 0))
+        if quest_id != "":
+            var success: bool = QuestManager.complete_objective(quest_id, objective_index)
+            _trace["events"].append({"type": "complete_objective", "frame": _frame, "quest_id": quest_id, "objective_index": objective_index, "success": success})
+        _action_index += 1
+        return
+
+    if t == "check_quest":
+        var quest_id := str(action.get("quest_id", ""))
+        var is_active: bool = QuestManager.is_quest_active(quest_id)
+        var is_completed: bool = QuestManager.is_quest_completed(quest_id)
+        _trace["events"].append({"type": "check_quest", "frame": _frame, "quest_id": quest_id, "is_active": is_active, "is_completed": is_completed})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

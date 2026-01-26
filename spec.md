@@ -120,7 +120,20 @@ This file is the single source of truth. If code changes behavior, update this f
   - Fields: id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
 - GameData autoload loads quest data at startup via `get_quest(id)` and `get_available_quests()`.
 
-### 3.13 Day/Night cycle
+### 3.14 Quest manager
+- QuestManager autoload tracks active and completed quests.
+- `start_quest(quest_id)`: Starts a quest, initializes objective tracking, emits `quest_started`.
+- `complete_objective(quest_id, index)`: Marks an objective complete, auto-completes quest if all done.
+- `complete_quest(quest_id)`: Completes quest, sets completion_flag, grants rewards, emits `quest_completed`.
+- `is_quest_active(quest_id)`, `is_quest_completed(quest_id)`: Query quest state.
+- `get_active_quests()`: Returns array of active quest data with objective status.
+- `get_save_data()`, `load_save_data(data)`: Persistence support.
+- QuestLogUI (CanvasLayer): Player menu to view active and completed quests.
+  - Tabs: Active/Completed toggle.
+  - Quest list with selection, details panel showing objectives and rewards.
+  - Objectives show checkboxes ([x] complete, [ ] incomplete).
+
+### 3.15 Day/Night cycle
 - DayNightManager autoload tracks time of day.
 - 4 time phases: Morning (0), Afternoon (1), Evening (2), Night (3).
 - CanvasModulate overlay applies color tinting per phase:
@@ -132,7 +145,7 @@ This file is the single source of truth. If code changes behavior, update this f
 - Time advances automatically on area transitions.
 - Scenario action `set_time_phase`: instantly set time for testing.
 
-### 3.14 Weather system
+### 3.16 Weather system
 - WeatherManager autoload manages weather state and effects.
 - 3 weather types: Clear (0), Rain (1), Storm (2).
 - Rain: CPUParticles2D system with angled raindrops.
@@ -140,13 +153,13 @@ This file is the single source of truth. If code changes behavior, update this f
 - Thunder flash: white overlay tween (quick bright pulse).
 - Scenario actions: `set_weather`, `trigger_thunder`.
 
-### 3.15 Lamp props
+### 3.17 Lamp props
 - Lamp script (Sprite2D) that toggles between on/off textures.
 - Lamps connect to DayNightManager.time_changed signal.
 - Lamps turn on at evening and night (phases 2 and 3).
 - lamp_on.png and lamp_off.png sprite variants in props/lamp/.
 
-### 3.16 NPC schedule system
+### 3.18 NPC schedule system
 - ScheduledNPC script (CharacterBody2D) manages time-based NPC visibility.
 - NPCs appear/disappear based on current time phase and area.
 - Schedule data stored in `game/data/npcs/schedules.json`:

@@ -1,0 +1,17 @@
+{
+  "scenario_id": "quest_system_smoke",
+  "description": "Test quest manager: start, objectives, complete quests",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "start_quest", "quest_id": "find_mayors_cat"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "find_mayors_cat"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_quest", "quest_id": "find_mayors_cat"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "find_mayors_cat"},
+    {"type": "capture", "label": "quest_completed"}
+  ]
+}

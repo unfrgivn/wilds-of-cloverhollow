@@ -1,15 +1,15 @@
 {
-  "id": "bad_guy_hint_smoke",
+  "scenario_id": "bad_guy_hint_smoke",
   "description": "Test mysterious figure cutscene triggers after first class",
   "scene": "res://game/scenes/areas/Area_School.tscn",
   "spawn_marker": "from_town",
-  "steps": [
-    {"action": "set_story_flag", "flag": "first_class_complete", "value": true},
-    {"action": "wait_frames", "frames": 30},
-    {"action": "capture", "label": "school_before_trigger"},
-    {"action": "move", "direction": "left", "frames": 40},
-    {"action": "wait_frames", "frames": 60},
-    {"action": "check_story_flag", "flag": "mysterious_figure_seen"},
-    {"action": "capture", "label": "after_mysterious_figure"}
+  "actions": [
+    {"type": "set_story_flag", "flag": "first_class_complete", "value": true},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "school_before_trigger"},
+    {"type": "move", "direction": "left", "frames": 40},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "check_story_flag", "flag": "mysterious_figure_seen"},
+    {"type": "capture", "label": "after_mysterious_figure"}
   ]
 }

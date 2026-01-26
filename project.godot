@@ -28,6 +28,7 @@ SaveManager="*res://game/autoload/SaveManager.gd"
 DayNightManager="*res://game/autoload/DayNightManager.gd"
 WeatherManager="*res://game/autoload/WeatherManager.gd"
 PartyManager="*res://game/autoload/PartyManager.gd"
+QuestManager="*res://game/autoload/QuestManager.gd"
 
 [display]
 

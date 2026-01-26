@@ -1639,7 +1639,7 @@ Prepare for user analytics.
 
 ---
 
-## Milestone 134 — Crash reporting stub  **Owner:** Data Systems
+## Milestone 134 — Crash reporting stub  **Status:** ✅ Completed (2026-01-26)  **Owner:** Data Systems
 ### Objective
 Error tracking preparation.
 

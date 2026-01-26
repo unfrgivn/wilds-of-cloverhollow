@@ -1,0 +1,23 @@
+{
+  "id": "crash_report_smoke",
+  "description": "Verify crash reporting system - error logging and buffer management",
+  "setup": {
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn"
+  },
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "check_crash_reports"},
+    
+    {"type": "log_error", "message": "Test error 1", "error_type": "ERROR"},
+    {"type": "log_error", "message": "Test warning", "error_type": "WARNING"},
+    {"type": "log_error", "message": "Test exception", "error_type": "Exception"},
+    
+    {"type": "check_crash_reports"},
+    
+    {"type": "clear_crash_reports"},
+    {"type": "check_crash_reports"},
+    
+    {"type": "wait_frames", "frames": 5}
+  ]
+}

@@ -947,6 +947,31 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Crash report actions
+    if t == "log_error":
+        var message: String = str(action.get("message", "Test error"))
+        var error_type: String = str(action.get("error_type", "ERROR"))
+        CrashReportManager.log_error(message, error_type)
+        _trace["events"].append({"type": "log_error", "frame": _frame, "message": message, "error_type": error_type})
+        print("[Scenario] log_error: %s (%s)" % [message, error_type])
+        _action_index += 1
+        return
+
+    if t == "check_crash_reports":
+        var error_count: int = CrashReportManager.get_error_count()
+        var errors: Array[Dictionary] = CrashReportManager.get_error_buffer()
+        _trace["events"].append({"type": "check_crash_reports", "frame": _frame, "error_count": error_count})
+        print("[Scenario] Crash reports: %d errors logged" % error_count)
+        _action_index += 1
+        return
+
+    if t == "clear_crash_reports":
+        CrashReportManager.clear_error_buffer()
+        _trace["events"].append({"type": "clear_crash_reports", "frame": _frame})
+        print("[Scenario] clear_crash_reports")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

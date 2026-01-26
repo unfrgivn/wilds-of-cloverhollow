@@ -41,6 +41,7 @@ PhotoModeManager="*res://game/autoload/PhotoModeManager.gd"
 AchievementManager="*res://game/autoload/AchievementManager.gd"
 LocalizationManager="*res://game/autoload/LocalizationManager.gd"
 AnalyticsManager="*res://game/autoload/AnalyticsManager.gd"
+CrashReportManager="*res://game/autoload/CrashReportManager.gd"
 
 [internationalization]
 

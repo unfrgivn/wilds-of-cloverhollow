@@ -443,6 +443,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `track_event`, `check_analytics`, `clear_analytics`.
 - Note: No data is sent externally - stub for future backend integration.
 
+### 3.37 Crash reporting (stub)
+- CrashReportManager autoload handles error logging.
+- Error buffer: stores up to 50 errors locally.
+- Log file: `user://crash_reports/error_log.txt` with rotation.
+- Error logging: log_error(message, type), log_warning(message), log_exception(message).
+- Session tracking: logs session start/end with platform and version info.
+- Stub methods for backend: upload_crash_report(), upload_all_reports().
+- Signals: error_logged, crash_report_uploaded.
+- Scenario actions: `log_error`, `check_crash_reports`, `clear_crash_reports`.
+- Note: No data is sent externally - stub for future backend integration.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -728,7 +728,7 @@ Hero battle sprite.
 
 ---
 
-## Milestone 58 — Party member: Friend A battle sprite  **Owner:** Art Pipeline
+## Milestone 58 — Party member: Friend A battle sprite  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 First party member ally.
 

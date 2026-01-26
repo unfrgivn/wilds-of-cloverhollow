@@ -1,0 +1,9 @@
+{
+  "scenario_id": "sue_battle_sprite_render",
+  "description": "Verifies Sue battle sprites load correctly in battle scene",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "sue_battle_sprite_idle"}
+  ]
+}

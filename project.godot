@@ -40,6 +40,7 @@ CutsceneManager="*res://game/autoload/CutsceneManager.gd"
 PhotoModeManager="*res://game/autoload/PhotoModeManager.gd"
 AchievementManager="*res://game/autoload/AchievementManager.gd"
 LocalizationManager="*res://game/autoload/LocalizationManager.gd"
+AnalyticsManager="*res://game/autoload/AnalyticsManager.gd"
 
 [internationalization]
 

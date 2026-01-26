@@ -919,6 +919,34 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Analytics actions
+    if t == "track_event":
+        var event_name: String = str(action.get("event", ""))
+        var properties: Dictionary = action.get("properties", {})
+        if event_name != "":
+            AnalyticsManager.track_event(event_name, properties)
+            _trace["events"].append({"type": "track_event", "frame": _frame, "event": event_name, "properties": properties})
+            print("[Scenario] track_event: %s %s" % [event_name, properties])
+        _action_index += 1
+        return
+
+    if t == "check_analytics":
+        var event_count: int = AnalyticsManager.get_event_count()
+        var session_id: String = AnalyticsManager.session_id
+        var session_duration: float = AnalyticsManager.get_session_duration()
+        var session_active: bool = AnalyticsManager.is_session_active()
+        _trace["events"].append({"type": "check_analytics", "frame": _frame, "event_count": event_count, "session_id": session_id, "session_duration": session_duration, "session_active": session_active})
+        print("[Scenario] Analytics: session=%s, events=%d, duration=%.1fs, active=%s" % [session_id, event_count, session_duration, session_active])
+        _action_index += 1
+        return
+
+    if t == "clear_analytics":
+        AnalyticsManager.clear_event_buffer()
+        _trace["events"].append({"type": "clear_analytics", "frame": _frame})
+        print("[Scenario] clear_analytics")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

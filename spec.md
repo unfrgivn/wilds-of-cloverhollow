@@ -432,6 +432,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_locale`, `check_locale`, `check_translation`.
 - Note: CSV requires Godot Editor import to generate .translation files.
 
+### 3.36 Analytics system (stub)
+- AnalyticsManager autoload handles event tracking.
+- Session management: start_session(), end_session(), get_session_duration().
+- Event buffer: stores up to 100 events locally.
+- Standard events: track_area_enter(), track_battle_start/end(), track_quest_start/complete(), track_item_acquired(), track_tool_acquired(), track_npc_interact(), track_save/load_game(), track_achievement(), track_level_up(), track_cutscene_start/skip().
+- Custom events: track_event(name, properties).
+- Stub methods for backend integration: flush_to_backend(), set_user_id(), set_user_property().
+- Signals: event_logged, session_started, session_ended.
+- Scenario actions: `track_event`, `check_analytics`, `clear_analytics`.
+- Note: No data is sent externally - stub for future backend integration.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -1,0 +1,23 @@
+{
+  "id": "analytics_smoke",
+  "description": "Verify analytics system - event tracking and session management",
+  "setup": {
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn"
+  },
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "check_analytics"},
+    
+    {"type": "track_event", "event": "test_event_1", "properties": {"key": "value", "count": 5}},
+    {"type": "track_event", "event": "test_event_2", "properties": {"action": "test"}},
+    {"type": "track_event", "event": "area_enter", "properties": {"area": "TestArea"}},
+    
+    {"type": "check_analytics"},
+    
+    {"type": "clear_analytics"},
+    {"type": "check_analytics"},
+    
+    {"type": "wait_frames", "frames": 5}
+  ]
+}

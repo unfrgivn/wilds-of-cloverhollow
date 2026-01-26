@@ -175,7 +175,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Town Center: central hub connecting to other areas; props (benches, lamps), sign, enemy spawn.
 - Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
 - Hero House Interior (Ground Floor): Kitchen area (stove, sink, table with chairs), living room area (couch, rug, bookshelf), door transition back to exterior, stairs transition to upper floor.
-- Hero House Interior (Upper Floor): Placeholder scene with stairs transition back to ground floor.
+- Hero House Interior (Upper Floor): Bedroom area (bed, desk with lamp, closet), bathroom area (tub, toilet, sink), interactable mirror with placeholder dialogue, stairs transition back to ground floor.
 - School: Cloverhollow Elementary exterior with benches, sign.
 - Arcade: Pixel Palace Arcade exterior with lamps, sign.
 - Props: bench, sign, lamp, tree (16x32), fence, flowers (all 16x16 except tree).

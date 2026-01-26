@@ -1,10 +1,19 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="3"]
 [ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="4"]
 [ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/bed.png" id="6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/desk.png" id="7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/lamp.png" id="8"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/closet.png" id="9"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/tub.png" id="10"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/toilet.png" id="11"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/bathroom_sink.png" id="12"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/upper/mirror.png" id="13"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="14"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -14,6 +23,27 @@ radius = 24.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
 size = Vector2(20, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bed"]
+size = Vector2(32, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_desk"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_closet"]
+size = Vector2(16, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tub"]
+size = Vector2(32, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_toilet"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sink"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mirror"]
+size = Vector2(16, 24)
 
 [node name="Area_HeroHouseUpper" type="Node2D"]
 
@@ -55,13 +85,98 @@ offset_right = 472.0
 offset_bottom = 70.0
 color = Color(0.71, 0.54, 0.3, 1)
 
-[node name="PlaceholderLabel" type="Label" parent="."]
-offset_left = 180.0
-offset_top = 130.0
-offset_right = 332.0
-offset_bottom = 160.0
-text = "Upper Floor - Placeholder"
-horizontal_alignment = 1
+[node name="BathroomWall" type="ColorRect" parent="Walls"]
+offset_left = 300.0
+offset_top = 70.0
+offset_right = 310.0
+offset_bottom = 200.0
+color = Color(0.71, 0.54, 0.3, 1)
+
+[node name="Bedroom" type="Node2D" parent="."]
+
+[node name="Bed" type="Sprite2D" parent="Bedroom"]
+position = Vector2(120, 100)
+texture = ExtResource("6")
+centered = true
+
+[node name="BedCollision" type="StaticBody2D" parent="Bedroom/Bed"]
+
+[node name="Shape" type="CollisionShape2D" parent="Bedroom/Bed/BedCollision"]
+shape = SubResource("RectangleShape2D_bed")
+
+[node name="Desk" type="Sprite2D" parent="Bedroom"]
+position = Vector2(200, 90)
+texture = ExtResource("7")
+centered = true
+
+[node name="DeskCollision" type="StaticBody2D" parent="Bedroom/Desk"]
+
+[node name="Shape" type="CollisionShape2D" parent="Bedroom/Desk/DeskCollision"]
+shape = SubResource("RectangleShape2D_desk")
+
+[node name="DeskLamp" type="Sprite2D" parent="Bedroom"]
+position = Vector2(216, 80)
+texture = ExtResource("8")
+centered = true
+
+[node name="Closet" type="Sprite2D" parent="Bedroom"]
+position = Vector2(80, 130)
+texture = ExtResource("9")
+centered = true
+
+[node name="ClosetCollision" type="StaticBody2D" parent="Bedroom/Closet"]
+
+[node name="Shape" type="CollisionShape2D" parent="Bedroom/Closet/ClosetCollision"]
+shape = SubResource("RectangleShape2D_closet")
+
+[node name="Bathroom" type="Node2D" parent="."]
+
+[node name="Tub" type="Sprite2D" parent="Bathroom"]
+position = Vector2(380, 100)
+texture = ExtResource("10")
+centered = true
+
+[node name="TubCollision" type="StaticBody2D" parent="Bathroom/Tub"]
+
+[node name="Shape" type="CollisionShape2D" parent="Bathroom/Tub/TubCollision"]
+shape = SubResource("RectangleShape2D_tub")
+
+[node name="Toilet" type="Sprite2D" parent="Bathroom"]
+position = Vector2(340, 160)
+texture = ExtResource("11")
+centered = true
+
+[node name="ToiletCollision" type="StaticBody2D" parent="Bathroom/Toilet"]
+
+[node name="Shape" type="CollisionShape2D" parent="Bathroom/Toilet/ToiletCollision"]
+shape = SubResource("RectangleShape2D_toilet")
+
+[node name="BathroomSink" type="Sprite2D" parent="Bathroom"]
+position = Vector2(400, 160)
+texture = ExtResource("12")
+centered = true
+
+[node name="SinkCollision" type="StaticBody2D" parent="Bathroom/BathroomSink"]
+
+[node name="Shape" type="CollisionShape2D" parent="Bathroom/BathroomSink/SinkCollision"]
+shape = SubResource("RectangleShape2D_sink")
+
+[node name="Mirror" type="Area2D" parent="Bathroom"]
+position = Vector2(430, 90)
+script = ExtResource("14")
+dialogue_text = "You see your reflection staring back at you. Looking good today, hero!"
+
+[node name="MirrorSprite" type="Sprite2D" parent="Bathroom/Mirror"]
+texture = ExtResource("13")
+centered = true
+
+[node name="MirrorCollision" type="CollisionShape2D" parent="Bathroom/Mirror"]
+shape = SubResource("RectangleShape2D_mirror")
+
+[node name="MirrorBody" type="StaticBody2D" parent="Bathroom/Mirror"]
+
+[node name="MirrorBodyShape" type="CollisionShape2D" parent="Bathroom/Mirror/MirrorBody"]
+shape = SubResource("RectangleShape2D_mirror")
 
 [node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(256, 180)

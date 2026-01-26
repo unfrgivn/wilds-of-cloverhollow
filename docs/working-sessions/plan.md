@@ -232,7 +232,7 @@ Interior scene for hero's home main floor.
 
 ---
 
-## Milestone 17 — Hero's Home interior upper floor  **Owner:** World Builder + Art Pipeline
+## Milestone 17 — Hero's Home interior upper floor  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Hero's bedroom and upstairs area.
 

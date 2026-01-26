@@ -550,6 +550,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Enemy: Sneaky Snake (green snake with poison bite attack, 12 HP, visible overworld enemy).
 - Transitions: to Town Park (south, "from_forest" spawn), to Forest Path (east, "from_entrance" spawn).
 - Spawn markers: default, from_park, from_forest.
+- Battle background: forest_clearing.png (512x288).
 - Scenario: `forest_entrance_render` for visual/interaction testing.
 
 ### 7.4 Forest Path (v0 blockout)
@@ -564,6 +565,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Spawn markers: default, from_entrance, from_deep.
 - Enemy: Angry Acorn (cute acorn with angry face, uses roll attack, 10 HP, visible overworld enemy).
 - Enemy: Grumpy Stump (camouflaged tree stump, high defense 8, slow but tanky, 20 HP).
+- Battle background: deep_woods.png (512x288).
 - Scenario: `forest_path_render` for visual/interaction testing.
 
 ### 7.5 Clubhouse Exterior (v0 blockout)
@@ -595,6 +597,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Interactables: fairy ring center (legend dialogue), lore scroll pickup (ancient forest lore item).
 - Transitions: to Forest Path (west, "from_grove" spawn).
 - Spawn markers: default, from_forest.
+- Battle background: grove.png (512x288).
 - Scenario: `hidden_grove_render` for visual/interaction testing.
 
 ### 7.6 Biome factory workflow

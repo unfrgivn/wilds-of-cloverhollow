@@ -1420,7 +1420,7 @@ Magical/special area.
 
 ---
 
-## Milestone 116 — Forest battle backgrounds  **Owner:** Art Pipeline
+## Milestone 116 — Forest battle backgrounds  **Owner:** Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Forest combat visuals.
 

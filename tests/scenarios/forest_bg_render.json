@@ -1,0 +1,14 @@
+{
+  "id": "forest_bg_render",
+  "name": "Forest Battle Backgrounds Render Test",
+  "description": "Verify forest battle backgrounds display correctly",
+  "area": "res://game/scenes/areas/Forest_Entrance.tscn",
+  "steps": [
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "forest_entrance_overworld"},
+    {"action": "move", "direction": "up", "frames": 20},
+    {"action": "move", "direction": "right", "frames": 30},
+    {"action": "wait_frames", "frames": 60},
+    {"action": "capture", "label": "forest_battle_triggered"}
+  ]
+}

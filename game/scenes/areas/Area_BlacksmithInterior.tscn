@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/blacksmith/workbench.png" id="10"]
 [ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="11"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/blacksmith/blacksmith_idle_south.png" id="12"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ToolGiverNPC.gd" id="13"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -191,6 +192,19 @@ texture = ExtResource("12")
 centered = true
 
 [node name="BlacksmithCollision" type="CollisionShape2D" parent="BlacksmithNPC"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="WrenchGiver" type="Area2D" parent="."]
+position = Vector2(380, 165)
+script = ExtResource("13")
+npc_name = "Ironhammer"
+tool_id = "wrench"
+quest_id = "fix_fountain"
+dialogue_first_meeting = "Heard about the fountain being broken, eh? Here, take this wrench - should help you fix it up. Just tighten those loose pipes and she'll be good as new!"
+dialogue_give_tool = "You received a Wrench! Now you can fix the town fountain."
+dialogue_already_have_tool = "You've already got the wrench! Go fix that fountain - the whole town is counting on you."
+
+[node name="WrenchGiverCollision" type="CollisionShape2D" parent="WrenchGiver"]
 shape = SubResource("RectangleShape2D_3")
 
 [node name="Spawns" type="Node2D" parent="."]

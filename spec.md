@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow — spec
 
-Last updated: 2026-01-25
+Last updated: 2026-01-26
 
 This file is the single source of truth. If code changes behavior, update this file in the same commit.
 
@@ -97,6 +97,12 @@ This file is the single source of truth. If code changes behavior, update this f
 - ToolGatedInteractable: requires a specific tool to proceed (e.g., lantern for dark areas).
 - StoryGatedInteractable: requires a story flag (e.g., "talked_to_teacher" for library access).
 - ItemPickup: collectible that grants tools or items when interacted.
+- ToolGiverNPC: NPC that gives a tool to the player once (e.g., blacksmith gives wrench).
+  - Tracks tool_id and quest_id for quest objective completion.
+  - Shows different dialogue if player already has the tool.
+- BrokenFountain: Tool-gated interactable that requires a specific tool to fix.
+  - Auto-starts associated quest if player lacks the tool.
+  - Sets story flag and completes quest when repaired.
 - All gated interactables show different dialogue depending on whether requirements are met.
 
 ### 3.12 Opening cutscene

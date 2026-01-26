@@ -1,0 +1,25 @@
+{
+  "scenario_id": "fix_fountain_smoke",
+  "description": "Test fix fountain quest flow: get wrench from blacksmith, repair fountain",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "start_quest", "quest_id": "fix_fountain"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "fix_fountain"},
+    {"type": "capture", "label": "quest_started"},
+    {"type": "acquire_tool", "tool_id": "wrench"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_tool", "tool_id": "wrench"},
+    {"type": "complete_objective", "quest_id": "fix_fountain", "objective_index": 0},
+    {"type": "capture", "label": "got_wrench"},
+    {"type": "set_story_flag", "flag": "fountain_fixed", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_objective", "quest_id": "fix_fountain", "objective_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "fix_fountain"},
+    {"type": "check_story_flag", "flag": "fountain_fixed"},
+    {"type": "capture", "label": "fountain_repaired"}
+  ]
+}

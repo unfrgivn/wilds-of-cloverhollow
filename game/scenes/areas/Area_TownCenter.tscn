@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -29,6 +29,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/lamp/lamp_off.png" id="27"]
 [ext_resource type="Script" path="res://game/scripts/characters/ScheduledNPC.gd" id="28"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/elder/elder_idle_south.png" id="29"]
+[ext_resource type="Script" path="res://game/scripts/interaction/BrokenFountain.gd" id="30"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -525,3 +526,12 @@ texture = ExtResource("29")
 
 [node name="Collision" type="CollisionShape2D" parent="ScheduledNPCs/ElderNPC"]
 shape = SubResource("RectangleShape2D_1")
+
+[node name="BrokenFountain" type="Area2D" parent="."]
+position = Vector2(256, 175)
+script = ExtResource("30")
+required_tool = "wrench"
+quest_id = "fix_fountain"
+
+[node name="FountainCollision" type="CollisionShape2D" parent="BrokenFountain"]
+shape = SubResource("RectangleShape2D_3")

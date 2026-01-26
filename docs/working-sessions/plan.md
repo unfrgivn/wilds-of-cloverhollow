@@ -1071,7 +1071,7 @@ Investigation quest.
 
 ---
 
-## Milestone 87 — Quest: Fix the fountain  **Owner:** Story + Gameplay
+## Milestone 87 — Quest: Fix the fountain  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Tool-gated puzzle quest.
 

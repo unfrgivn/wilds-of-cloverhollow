@@ -56,6 +56,17 @@
       "objectives": ["Find the old town records in the library", "Learn about the villain's history"]
     },
     {
+      "id": "fix_fountain",
+      "name": "Fix the Fountain",
+      "description": "The town fountain is broken and leaking. Get a wrench from the blacksmith and fix it!",
+      "type": "repair",
+      "reward_gold": 35,
+      "reward_items": [],
+      "required_flag": null,
+      "completion_flag": "fountain_fixed",
+      "objectives": ["Get a wrench from the blacksmith", "Repair the fountain"]
+    },
+    {
       "id": "forest_mushrooms",
       "name": "Rare Forest Mushrooms",
       "description": "The Elder needs rare mushrooms from the forest for a special remedy.",

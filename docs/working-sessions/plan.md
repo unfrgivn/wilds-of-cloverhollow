@@ -1484,7 +1484,7 @@ Area requiring lantern.
 
 ---
 
-## Milestone 121 — Story: Villain reveal  **Owner:** Story + Art Pipeline
+## Milestone 121 — Story: Villain reveal  **Owner:** Story + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Antagonist introduction.
 

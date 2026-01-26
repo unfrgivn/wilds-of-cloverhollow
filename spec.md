@@ -136,6 +136,10 @@ This file is the single source of truth. If code changes behavior, update this f
 - chaos_gather_evidence: Collect evidence items (glowing shard, torn cloak) and bring to Elder.
 - chaos_unlock_forest: Elder unlocks forest path after evidence gathered (grants lantern, sets forest_unlocked).
 - find_clubhouse: Classmate hints at secret clubhouse, navigate forest to discover it (flags: clubhouse_found).
+- villain_reveal: Player encounters the Chaos Lord in Dark Hollow, triggering confrontation cutscene (flags: villain_revealed).
+  - VillainEncounter script triggers cutscene on player collision.
+  - Chaos Lord sprite: game/assets/sprites/characters/villain/chaos_lord.png.
+  - Cutscene: villain taunts player and escapes deeper into forest.
 
 ### 3.13 Opening cutscene
 - GameIntroController (Main.tscn script) orchestrates game start sequence.

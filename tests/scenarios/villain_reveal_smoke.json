@@ -1,0 +1,23 @@
+{
+    "id": "villain_reveal_smoke",
+    "description": "Test villain reveal cutscene trigger in Dark Hollow",
+    "scene": "res://game/scenes/areas/Dark_Hollow.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "villain_scene_start"},
+        
+        {"type": "acquire_tool", "tool_id": "lantern"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "villain_lantern_acquired"},
+        
+        {"type": "move", "direction": "right", "frames": 60},
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "villain_encounter_triggered"},
+        
+        {"type": "wait_frames", "frames": 120},
+        {"type": "capture", "label": "villain_cutscene_playing"},
+        
+        {"type": "check_story_flag", "flag": "villain_revealed"},
+        {"type": "capture", "label": "villain_reveal_complete"}
+    ]
+}

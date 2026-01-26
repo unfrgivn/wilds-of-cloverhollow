@@ -1083,7 +1083,7 @@ Tool-gated puzzle quest.
 
 ---
 
-## Milestone 88 — Quest chain: The chaos begins  **Owner:** Story + Gameplay
+## Milestone 88 — Quest chain: The chaos begins  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Main story progression.
 

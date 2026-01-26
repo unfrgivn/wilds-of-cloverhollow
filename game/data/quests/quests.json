@@ -87,6 +87,39 @@
       "required_flag": "talked_to_mayor",
       "completion_flag": "mine_investigated",
       "objectives": ["Enter the old mine", "Find the source of the sounds", "Report back"]
+    },
+    {
+      "id": "chaos_investigation",
+      "name": "The Chaos Begins",
+      "description": "The Mayor is worried about strange occurrences around town. Talk to the townspeople to find out what's happening.",
+      "type": "investigation",
+      "reward_gold": 50,
+      "reward_items": [],
+      "required_flag": null,
+      "completion_flag": "chaos_investigation_done",
+      "objectives": ["Talk to the Shopkeeper about missing items", "Talk to the Teacher about strange lights", "Report findings to the Mayor"]
+    },
+    {
+      "id": "chaos_gather_evidence",
+      "name": "Gathering Evidence",
+      "description": "The Mayor needs proof of the strange happenings. Gather evidence from around Cloverhollow.",
+      "type": "collect",
+      "reward_gold": 60,
+      "reward_items": [],
+      "required_flag": "chaos_investigation_done",
+      "completion_flag": "chaos_evidence_gathered",
+      "objectives": ["Find the glowing shard near the school", "Find the torn cloak near the fountain", "Bring evidence to the Elder"]
+    },
+    {
+      "id": "chaos_unlock_forest",
+      "name": "The Path Forward",
+      "description": "The Elder recognizes the evidence as signs of dark magic from the forest. Convince her to unlock the forest path.",
+      "type": "story",
+      "reward_gold": 75,
+      "reward_items": ["lantern"],
+      "required_flag": "chaos_evidence_gathered",
+      "completion_flag": "forest_unlocked",
+      "objectives": ["Speak with the Elder about the evidence", "Receive the forest key"]
     }
   ]
 }

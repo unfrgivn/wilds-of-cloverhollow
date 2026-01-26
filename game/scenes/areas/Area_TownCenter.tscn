@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -30,6 +30,7 @@
 [ext_resource type="Script" path="res://game/scripts/characters/ScheduledNPC.gd" id="28"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/elder/elder_idle_south.png" id="29"]
 [ext_resource type="Script" path="res://game/scripts/interaction/BrokenFountain.gd" id="30"]
+[ext_resource type="Script" path="res://game/scripts/interaction/EvidencePickup.gd" id="31"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -534,4 +535,23 @@ required_tool = "wrench"
 quest_id = "fix_fountain"
 
 [node name="FountainCollision" type="CollisionShape2D" parent="BrokenFountain"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TornCloakEvidence" type="Area2D" parent="."]
+position = Vector2(280, 180)
+script = ExtResource("31")
+evidence_id = "torn_cloak"
+evidence_name = "Torn Cloak"
+pickup_dialogue = "You found a torn piece of dark cloth near the fountain. This could be evidence!"
+quest_id = "chaos_gather_evidence"
+objective_index = 1
+
+[node name="CloakSprite" type="ColorRect" parent="TornCloakEvidence"]
+offset_left = -6.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 6.0
+color = Color(0.2, 0.15, 0.3, 1)
+
+[node name="CloakCollision" type="CollisionShape2D" parent="TornCloakEvidence"]
 shape = SubResource("RectangleShape2D_3")

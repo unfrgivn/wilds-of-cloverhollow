@@ -1,0 +1,47 @@
+{
+  "scenario_id": "chaos_begins_smoke",
+  "description": "Test chaos quest chain: investigation -> gather evidence -> unlock forest",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "start_quest", "quest_id": "chaos_investigation"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "chaos_investigation"},
+    {"type": "capture", "label": "chaos_investigation_started"},
+    
+    {"type": "complete_objective", "quest_id": "chaos_investigation", "objective_index": 0},
+    {"type": "complete_objective", "quest_id": "chaos_investigation", "objective_index": 1},
+    {"type": "complete_objective", "quest_id": "chaos_investigation", "objective_index": 2},
+    {"type": "set_story_flag", "flag": "chaos_investigation_done", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "chaos_investigation_done"},
+    {"type": "capture", "label": "investigation_complete"},
+    
+    {"type": "start_quest", "quest_id": "chaos_gather_evidence"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "chaos_gather_evidence"},
+    
+    {"type": "set_story_flag", "flag": "evidence_glowing_shard_collected", "value": true},
+    {"type": "complete_objective", "quest_id": "chaos_gather_evidence", "objective_index": 0},
+    {"type": "set_story_flag", "flag": "evidence_torn_cloak_collected", "value": true},
+    {"type": "complete_objective", "quest_id": "chaos_gather_evidence", "objective_index": 1},
+    {"type": "set_story_flag", "flag": "chaos_evidence_gathered", "value": true},
+    {"type": "complete_objective", "quest_id": "chaos_gather_evidence", "objective_index": 2},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "chaos_evidence_gathered"},
+    {"type": "capture", "label": "evidence_gathered"},
+    
+    {"type": "start_quest", "quest_id": "chaos_unlock_forest"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "acquire_tool", "tool_id": "lantern"},
+    {"type": "set_story_flag", "flag": "forest_unlocked", "value": true},
+    {"type": "complete_objective", "quest_id": "chaos_unlock_forest", "objective_index": 0},
+    {"type": "complete_objective", "quest_id": "chaos_unlock_forest", "objective_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "forest_unlocked"},
+    {"type": "check_tool", "tool_id": "lantern"},
+    {"type": "capture", "label": "forest_unlocked"}
+  ]
+}

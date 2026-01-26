@@ -103,7 +103,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - BrokenFountain: Tool-gated interactable that requires a specific tool to fix.
   - Auto-starts associated quest if player lacks the tool.
   - Sets story flag and completes quest when repaired.
+- ForestGate: Story-gated transition that blocks forest access until `forest_unlocked` flag is set.
+  - Shows locked/unlocked dialogue based on story progression.
+  - Transitions to target area when unlocked.
+- EvidencePickup: Collectible evidence item for quest progression.
+  - Tracks collection via story flags (evidence_{id}_collected).
+  - Completes quest objectives when picked up.
+- ChaosQuestChainNPC: Multi-role NPC for quest chain progression.
+  - Roles: quest_giver, evidence_receiver, forest_unlocker.
+  - Handles multiple quests in sequence based on story flags.
 - All gated interactables show different dialogue depending on whether requirements are met.
+
+### 3.12 Main quest chain
+- chaos_investigation: Talk to townspeople about strange events (flags: chaos_investigation_done).
+- chaos_gather_evidence: Collect evidence items (glowing shard, torn cloak) and bring to Elder.
+- chaos_unlock_forest: Elder unlocks forest path after evidence gathered (grants lantern, sets forest_unlocked).
 
 ### 3.12 Opening cutscene
 - GameIntroController (Main.tscn script) orchestrates game start sequence.

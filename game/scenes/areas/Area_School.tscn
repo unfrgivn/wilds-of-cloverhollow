@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/playground/bike_rack.png" id="14"]
 [ext_resource type="Script" path="res://game/scripts/interaction/ArrivalTrigger.gd" id="20"]
 [ext_resource type="Script" path="res://game/scripts/events/MysteriousFigureController.gd" id="30"]
+[ext_resource type="Script" path="res://game/scripts/interaction/EvidencePickup.gd" id="31"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -303,3 +304,22 @@ position = Vector2(80, 200)
 
 [node name="MysteryTriggerShape" type="CollisionShape2D" parent="MysteryTrigger"]
 shape = SubResource("RectangleShape2D_5")
+
+[node name="GlowingShardEvidence" type="Area2D" parent="."]
+position = Vector2(350, 230)
+script = ExtResource("31")
+evidence_id = "glowing_shard"
+evidence_name = "Glowing Shard"
+pickup_dialogue = "You found a strange glowing shard near the playground. It pulses with an eerie light..."
+quest_id = "chaos_gather_evidence"
+objective_index = 0
+
+[node name="ShardSprite" type="ColorRect" parent="GlowingShardEvidence"]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+color = Color(0.5, 0.9, 0.7, 1)
+
+[node name="ShardCollision" type="CollisionShape2D" parent="GlowingShardEvidence"]
+shape = SubResource("RectangleShape2D_3")

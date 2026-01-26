@@ -1,0 +1,61 @@
+{
+  "id": "save_slots_smoke",
+  "description": "Test save slots system: multiple slots, previews, delete",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+
+    {"type": "delete_save", "slot": 0, "_comment": "Clear slot 0"},
+    {"type": "delete_save", "slot": 1, "_comment": "Clear slot 1"},
+    {"type": "delete_save", "slot": 2, "_comment": "Clear slot 2"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "check_save_slots", "_comment": "All slots should be empty"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "has_save", "slot": 0, "_comment": "Should be false"},
+    {"type": "has_save", "slot": 1, "_comment": "Should be false"},
+    {"type": "has_save", "slot": 2, "_comment": "Should be false"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "save_game", "slot": 0, "_comment": "Save to slot 0"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "after_save_slot0"},
+
+    {"type": "has_save", "slot": 0, "_comment": "Should now be true"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "save_game", "slot": 1, "_comment": "Save to slot 1 at new position"},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "check_save_slots", "_comment": "Slots 0 and 1 should have data"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "move", "direction": "left", "frames": 60},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "save_game", "slot": 2, "_comment": "Save to slot 2"},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "check_save_slots", "_comment": "All 3 slots should now have data"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "all_slots_filled"},
+
+    {"type": "delete_save", "slot": 1, "_comment": "Delete slot 1"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "has_save", "slot": 0, "_comment": "Should be true"},
+    {"type": "has_save", "slot": 1, "_comment": "Should be false after delete"},
+    {"type": "has_save", "slot": 2, "_comment": "Should be true"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "check_save_slots", "_comment": "Slots 0 and 2 should have data, 1 empty"},
+    {"type": "capture", "label": "save_slots_complete"}
+  ]
+}

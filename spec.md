@@ -85,10 +85,16 @@ This file is the single source of truth. If code changes behavior, update this f
 
 ### 3.9 Save/Load system
 - SaveManager autoload handles save/load operations.
-- Save file stored in `user://saves/save_slot_0.json` (iOS-compatible).
+- Multiple save slots: 3 slots (0, 1, 2) stored in `user://saves/save_slot_N.json`.
 - Save data includes: version, timestamp, current_area, player_position, inventory, story_flags.
 - InventoryManager autoload tracks tools and items, persisted via SaveManager.
 - Version field enables future save file migrations.
+- Slot preview: `get_slot_preview(slot)` returns area_name, timestamp_formatted, empty status.
+- SaveSlotUI (CanvasLayer): slot selection screen with preview info.
+  - Shows all 3 slots with area name and save time.
+  - Supports save, load, and delete operations.
+  - Tab key deletes selected slot, Cancel closes UI.
+- Scenario actions: `save_game`, `load_game`, `delete_save`, `check_save_slots`, `has_save` (all support slot parameter).
 
 ### 3.10 Inventory and tools
 - InventoryManager autoload tracks:

@@ -177,14 +177,47 @@ func _step_actions() -> void:
         return
 
     if t == "save_game":
-        var result: bool = SaveManager.save_game()
-        _trace["events"].append({"type": "save_game", "frame": _frame, "success": result})
+        var slot: int = int(action.get("slot", 0))
+        var result: bool = SaveManager.save_game(slot)
+        _trace["events"].append({"type": "save_game", "frame": _frame, "slot": slot, "success": result})
+        print("[Scenario] save_game slot=%d success=%s" % [slot, result])
         _action_index += 1
         return
 
     if t == "load_game":
-        var result: bool = await SaveManager.load_game()
-        _trace["events"].append({"type": "load_game", "frame": _frame, "success": result})
+        var slot: int = int(action.get("slot", 0))
+        var result: bool = await SaveManager.load_game(slot)
+        _trace["events"].append({"type": "load_game", "frame": _frame, "slot": slot, "success": result})
+        print("[Scenario] load_game slot=%d success=%s" % [slot, result])
+        _action_index += 1
+        return
+
+    if t == "delete_save":
+        var slot: int = int(action.get("slot", 0))
+        var result: bool = SaveManager.delete_save(slot)
+        _trace["events"].append({"type": "delete_save", "frame": _frame, "slot": slot, "success": result})
+        print("[Scenario] delete_save slot=%d success=%s" % [slot, result])
+        _action_index += 1
+        return
+
+    if t == "check_save_slots":
+        var previews: Array = []
+        for i in range(SaveManager.MAX_SLOTS):
+            previews.append(SaveManager.get_slot_preview(i))
+        _trace["events"].append({"type": "check_save_slots", "frame": _frame, "slots": previews})
+        for preview: Dictionary in previews:
+            var slot_idx: int = int(preview.get("slot", -1))
+            var empty: bool = preview.get("empty", true)
+            var area: String = preview.get("area_name", "")
+            print("[Scenario] Slot %d: empty=%s area=%s" % [slot_idx, empty, area])
+        _action_index += 1
+        return
+
+    if t == "has_save":
+        var slot: int = int(action.get("slot", 0))
+        var has_it: bool = SaveManager.has_save(slot)
+        _trace["events"].append({"type": "has_save", "frame": _frame, "slot": slot, "has_save": has_it})
+        print("[Scenario] has_save slot=%d: %s" % [slot, has_it])
         _action_index += 1
         return
 

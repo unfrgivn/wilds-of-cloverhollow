@@ -209,14 +209,21 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
-    if t == "check_story_flag":
-        var flag := str(action.get("flag", ""))
-        var has_it: bool = InventoryManager.has_story_flag(flag)
-        _trace["events"].append({"type": "check_story_flag", "frame": _frame, "flag": flag, "has_flag": has_it})
-        _action_index += 1
-        return
+	if t == "check_story_flag":
+		var flag := str(action.get("flag", ""))
+		var has_it: bool = InventoryManager.has_story_flag(flag)
+		_trace["events"].append({"type": "check_story_flag", "frame": _frame, "flag": flag, "has_flag": has_it})
+		_action_index += 1
+		return
 
-    # Unknown action types are currently no-ops.
+	if t == "set_time_phase":
+		var phase: int = int(action.get("phase", 0))
+		DayNightManager.set_time_instant(phase)
+		_trace["events"].append({"type": "set_time_phase", "frame": _frame, "phase": phase, "phase_name": DayNightManager.get_phase_name()})
+		_action_index += 1
+		return
+
+	# Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1
 

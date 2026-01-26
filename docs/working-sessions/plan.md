@@ -599,7 +599,7 @@ Quest/notice discovery mechanic.
 
 ---
 
-## Milestone 47 — Day/Night cycle (visual only)  **Owner:** Art Pipeline + Gameplay
+## Milestone 47 — Day/Night cycle (visual only)  **Status:** ✅ Completed (2025-01-26)  **Owner:** Art Pipeline + Gameplay
 ### Objective
 Time-of-day palette shifts.
 

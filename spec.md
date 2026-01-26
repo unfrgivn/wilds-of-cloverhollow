@@ -111,6 +111,18 @@ This file is the single source of truth. If code changes behavior, update this f
   - Fields: id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
 - GameData autoload loads quest data at startup via `get_quest(id)` and `get_available_quests()`.
 
+### 3.13 Day/Night cycle
+- DayNightManager autoload tracks time of day.
+- 4 time phases: Morning (0), Afternoon (1), Evening (2), Night (3).
+- CanvasModulate overlay applies color tinting per phase:
+  - Morning: warm sunrise (1.0, 0.95, 0.9)
+  - Afternoon: neutral daylight (1.0, 1.0, 1.0)
+  - Evening: orange sunset (1.0, 0.85, 0.7)
+  - Night: cool blue (0.6, 0.65, 0.85)
+- Smooth tween transitions between phases (1 second default).
+- Time advances automatically on area transitions.
+- Scenario action `set_time_phase`: instantly set time for testing.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

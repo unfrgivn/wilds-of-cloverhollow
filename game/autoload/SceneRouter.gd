@@ -26,10 +26,13 @@ func go_to_area(area_path: String, spawn_marker_id: String = "default") -> void:
         push_error("SceneRouter: Failed to load area '%s'" % area_path)
         return
     
-    current_area = area_path
-    # Spawning happens in _on_area_ready after scene loads
-    
-    # Wait for scene to be ready, then place player
+	current_area = area_path
+	# Spawning happens in _on_area_ready after scene loads
+	
+	# Advance time on area transition (simplified day/night progression)
+	DayNightManager.advance_time()
+	
+	# Wait for scene to be ready, then place player
     await get_tree().process_frame
     await get_tree().process_frame
     _place_player_at_spawn()

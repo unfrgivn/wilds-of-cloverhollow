@@ -662,7 +662,7 @@ Multiple battle backgrounds for town area.
 
 ---
 
-## Milestone 52 — Enemy: Grumpy Squirrel  **Owner:** Art Pipeline + Battle Systems
+## Milestone 52 — Enemy: Grumpy Squirrel  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 First creature enemy with animations.
 

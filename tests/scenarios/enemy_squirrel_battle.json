@@ -1,0 +1,12 @@
+{
+  "scenario_id": "enemy_squirrel_battle",
+  "description": "Verifies Grumpy Squirrel enemy battle initialization and display",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/areas/Area_TownCenter.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move", "direction": "up", "frames": 10},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "squirrel_battle_started"}
+  ]
+}

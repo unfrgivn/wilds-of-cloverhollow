@@ -1,0 +1,20 @@
+{
+  "scenario_id": "lost_cat_quest_smoke",
+  "description": "Test lost cat quest flow: start, find cat, complete",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "start_quest", "quest_id": "find_mayors_cat"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "find_mayors_cat"},
+    {"type": "capture", "label": "quest_active"},
+    {"type": "set_story_flag", "flag": "found_mayors_cat", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_objective", "quest_id": "find_mayors_cat", "objective_index": 0},
+    {"type": "complete_objective", "quest_id": "find_mayors_cat", "objective_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "find_mayors_cat"},
+    {"type": "capture", "label": "quest_completed"}
+  ]
+}

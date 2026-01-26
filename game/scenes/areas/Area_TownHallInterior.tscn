@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="5"]
 [ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="6"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="7"]
-[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="8"]
+[ext_resource type="Script" path="res://game/scripts/interaction/QuestGiverNPC.gd" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/mayor/mayor_idle_south.png" id="9"]
 [ext_resource type="Script" path="res://game/scripts/interaction/BulletinBoardInteractable.gd" id="10"]
 
@@ -241,7 +241,14 @@ shape = SubResource("RectangleShape2D_3")
 [node name="Mayor" type="Area2D" parent="."]
 position = Vector2(256, 75)
 script = ExtResource("8")
-dialogue_branches = Array[String](["Welcome to Cloverhollow Town Hall! I'm Mayor Thornwood. How may I help you today?", "Our town has been facing some... unusual problems lately. Strange creatures appearing, odd noises from the forest...", "If you're looking to help, check the notice board. We've posted several tasks that need attention.", "Between you and me, I've received reports of something stirring in the old woods. The Elder might know more about the town's history with such matters.", "I've placed a reward for anyone who can investigate the disturbances. Speak to me when you've learned more about what's happening."])
+npc_name = "Mayor Thornwood"
+quest_id = "find_mayors_cat"
+dialogue_offer = "Oh dear, I'm so worried! My beloved cat Whiskers has gone missing. She wandered off toward the park yesterday and hasn't returned. Could you please find her?"
+dialogue_accepted = "Thank you so much! Please check the Town Park - that's where she was last seen."
+dialogue_in_progress = "Any sign of Whiskers? Please check the Town Park!"
+dialogue_ready_to_complete = "You found Whiskers! Oh, thank you so much! Here's a reward for your kindness."
+dialogue_completed = "Whiskers is safe and sound, thanks to you. You're a true hero!"
+completion_check_flag = "found_mayors_cat"
 
 [node name="MayorSprite" type="Sprite2D" parent="Mayor"]
 texture = ExtResource("9")

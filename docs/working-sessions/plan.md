@@ -1023,7 +1023,7 @@ Quest tracking infrastructure.
 
 ---
 
-## Milestone 83 — Quest: Find the lost cat  **Owner:** Story + Gameplay
+## Milestone 83 — Quest: Find the lost cat  **Owner:** Story + Gameplay  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Simple fetch quest.
 

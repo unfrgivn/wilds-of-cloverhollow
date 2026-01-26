@@ -115,6 +115,58 @@
             ],
             "background_color": "#000000",
             "music": null
+        },
+        "demo_ending": {
+            "id": "demo_ending",
+            "name": "Demo Ending",
+            "steps": [
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "You defeated the Chaos Minion!",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "But the Chaos Lord escapes deeper into the dark forest...",
+                    "duration": 3.0
+                },
+                {
+                    "type": "shake",
+                    "intensity": 3,
+                    "duration": 0.5
+                },
+                {
+                    "type": "text",
+                    "speaker": "Chaos Lord",
+                    "text": "This isn't over! I'll be waiting in the heart of the forest!",
+                    "duration": 3.0
+                },
+                {
+                    "type": "flash",
+                    "color": "#4a0080",
+                    "duration": 0.5
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "The battle for Cloverhollow has only just begun...",
+                    "duration": 4.0
+                },
+                {
+                    "type": "wait",
+                    "duration": 1.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "TO BE CONTINUED...",
+                    "duration": 4.0
+                }
+            ],
+            "background_color": "#0a0510",
+            "music": "ending"
         }
     }
 }

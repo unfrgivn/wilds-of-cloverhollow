@@ -1,0 +1,22 @@
+{
+    "id": "demo_ending_render",
+    "description": "Test demo ending cutscene with cliffhanger and credits hook",
+    "scene": "res://game/scenes/areas/Dark_Hollow.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "demo_ending_start"},
+        
+        {"type": "set_story_flag", "flag": "villain_revealed", "value": true},
+        {"type": "set_story_flag", "flag": "party_formed", "value": true},
+        {"type": "set_story_flag", "flag": "chaos_minion_defeated", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        
+        {"type": "set_story_flag", "flag": "demo_complete", "value": true},
+        {"type": "check_story_flag", "flag": "demo_complete"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "demo_ending_flags_set"},
+        
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "demo_ending_complete"}
+    ]
+}

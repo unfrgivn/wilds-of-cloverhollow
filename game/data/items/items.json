@@ -119,6 +119,46 @@
       "power": 999,
       "target": "single_ally",
       "price": 1000
+    },
+    {
+      "id": "eye_drops",
+      "name": "Eye Drops",
+      "description": "Clears blurry vision and cures blindness.",
+      "type": "consumable",
+      "effect": "cure_blind",
+      "power": 0,
+      "target": "single_ally",
+      "price": 30
+    },
+    {
+      "id": "alarm_clock",
+      "name": "Alarm Clock",
+      "description": "A loud noise that wakes up sleeping allies.",
+      "type": "consumable",
+      "effect": "cure_sleep",
+      "power": 0,
+      "target": "single_ally",
+      "price": 25
+    },
+    {
+      "id": "smelling_salts",
+      "name": "Smelling Salts",
+      "description": "Strong-smelling salts that cure stun and confusion.",
+      "type": "consumable",
+      "effect": "cure_stun",
+      "power": 0,
+      "target": "single_ally",
+      "price": 35
+    },
+    {
+      "id": "remedy",
+      "name": "Remedy",
+      "description": "Cures all status ailments.",
+      "type": "consumable",
+      "effect": "cure_all",
+      "power": 0,
+      "target": "single_ally",
+      "price": 200
     }
   ]
 }

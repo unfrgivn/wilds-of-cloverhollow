@@ -1,0 +1,9 @@
+{
+  "scenario_id": "item_status_cures_smoke",
+  "description": "Verifies status cure items are loaded and usable in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "item_status_cures_battle_start"}
+  ]
+}

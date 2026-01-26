@@ -820,7 +820,7 @@ Consumable healing items.
 
 ---
 
-## Milestone 66 — Item: Status cures  **Owner:** Battle Systems + Data Systems
+## Milestone 66 — Item: Status cures  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26) + Data Systems
 ### Objective
 Items that remove status effects.
 

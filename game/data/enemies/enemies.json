@@ -51,6 +51,19 @@
       "sprite": "res://game/assets/sprites/enemies/dusty_bunny/idle_1.png",
       "skills": ["dust_kick"],
       "drops": ["carrot"]
+    },
+    {
+      "id": "mischief_mouse",
+      "name": "Mischief Mouse",
+      "description": "A quick little mouse that loves to steal snacks.",
+      "max_hp": 8,
+      "max_mp": 2,
+      "attack": 3,
+      "defense": 1,
+      "speed": 12,
+      "sprite": "res://game/assets/sprites/enemies/mischief_mouse/idle_1.png",
+      "skills": ["quick_nibble"],
+      "drops": ["cheese_crumb"]
     }
   ]
 }

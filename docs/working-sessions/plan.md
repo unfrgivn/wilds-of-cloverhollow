@@ -684,7 +684,7 @@ Second creature enemy.
 
 ---
 
-## Milestone 54 — Enemy: Mischief Mouse  **Owner:** Art Pipeline + Battle Systems
+## Milestone 54 — Enemy: Mischief Mouse  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Small, fast enemy type.
 

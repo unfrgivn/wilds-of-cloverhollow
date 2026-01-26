@@ -479,7 +479,7 @@ Cozy café in town.
 
 ---
 
-## Milestone 37 — Café NPC: Baker  **Owner:** Character Systems + Art Pipeline
+## Milestone 37 — Café NPC: Baker  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Baker character with food items.
 

@@ -1,0 +1,32 @@
+{
+  "scenario_id": "npc_baker_dialogue",
+  "description": "Interact with Baker NPC in café, cycle through dialogue about pastries and recipe mechanic hook",
+  "scene": "res://game/scenes/areas/Area_CafeInterior.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "cafe_start"},
+    {"type": "move", "direction": "up", "frames": 80},
+    {"type": "move", "direction": "right", "frames": 40},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "near_baker"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "baker_dialogue_1"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "baker_dialogue_2"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "baker_dialogue_3"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "baker_dialogue_4"}
+  ]
+}

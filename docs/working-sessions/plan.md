@@ -1508,7 +1508,7 @@ Gathering allies.
 
 ---
 
-## Milestone 123 — Story: Prepare for battle  **Owner:** Story + Gameplay
+## Milestone 123 — Story: Prepare for battle  **Owner:** Story + Gameplay  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Pre-finale preparation.
 

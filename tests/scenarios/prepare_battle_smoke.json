@@ -1,0 +1,30 @@
+{
+    "id": "prepare_battle_smoke",
+    "description": "Test pre-battle preparation flow (equipment, heal, save)",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "prepare_start"},
+        
+        {"type": "set_story_flag", "flag": "party_formed", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        
+        {"type": "acquire_tool", "tool_id": "lantern"},
+        {"type": "acquire_tool", "tool_id": "journal"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "prepare_tools_acquired"},
+        
+        {"type": "check_tool", "tool_id": "lantern"},
+        {"type": "check_tool", "tool_id": "journal"},
+        
+        {"type": "save_game"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "prepare_game_saved"},
+        
+        {"type": "set_story_flag", "flag": "battle_preparation_complete", "value": true},
+        {"type": "check_story_flag", "flag": "battle_preparation_complete"},
+        
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "prepare_complete"}
+    ]
+}

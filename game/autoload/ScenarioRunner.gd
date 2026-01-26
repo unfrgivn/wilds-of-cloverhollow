@@ -390,6 +390,49 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "add_inventory_item":
+        var item_id := str(action.get("item_id", ""))
+        var count: int = int(action.get("count", 1))
+        if item_id != "":
+            InventoryManager.add_item(item_id, count)
+            _trace["events"].append({"type": "add_inventory_item", "frame": _frame, "item_id": item_id, "count": count})
+        _action_index += 1
+        return
+
+    if t == "remove_inventory_item":
+        var item_id := str(action.get("item_id", ""))
+        var count: int = int(action.get("count", 1))
+        if item_id != "":
+            var success: bool = InventoryManager.remove_item(item_id, count)
+            _trace["events"].append({"type": "remove_inventory_item", "frame": _frame, "item_id": item_id, "count": count, "success": success})
+        _action_index += 1
+        return
+
+    if t == "check_inventory":
+        var item_id := str(action.get("item_id", ""))
+        var count: int = InventoryManager.get_item_count(item_id)
+        _trace["events"].append({"type": "check_inventory", "frame": _frame, "item_id": item_id, "count": count})
+        _action_index += 1
+        return
+
+    if t == "open_inventory":
+        var inventory_scene := preload("res://game/scenes/ui/InventoryUI.tscn")
+        var inventory_ui := inventory_scene.instantiate()
+        get_tree().root.add_child(inventory_ui)
+        inventory_ui.open_inventory()
+        _trace["events"].append({"type": "open_inventory", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "close_inventory":
+        var inventory_nodes := get_tree().get_nodes_in_group("inventory_ui")
+        for node in inventory_nodes:
+            node.close_inventory()
+            node.queue_free()
+        _trace["events"].append({"type": "close_inventory", "frame": _frame})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

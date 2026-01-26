@@ -221,6 +221,15 @@ This file is the single source of truth. If code changes behavior, update this f
 - Navigation: up/down to select, accept/interact to confirm, cancel/pause to resume.
 - Scenario actions: `pause_game`, `unpause_game`, `toggle_pause`, `check_pause`.
 
+### 3.21 Inventory UI
+- InventoryUI (CanvasLayer): grid-based item management screen.
+- Opens from pause menu Items option.
+- Displays owned items from InventoryManager with count.
+- Details panel shows: item name, description, type/effect.
+- Actions: Use (consumables only), Discard, Cancel.
+- Navigation: arrow keys for grid, accept to open actions, cancel to close.
+- Scenario actions: `add_inventory_item`, `remove_inventory_item`, `check_inventory`, `open_inventory`, `close_inventory`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

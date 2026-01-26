@@ -1,0 +1,26 @@
+{
+  "scenario_id": "inventory_ui_render",
+  "description": "Test inventory UI: add items, open inventory, verify display",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "add_inventory_item", "item_id": "potion", "count": 5},
+    {"type": "add_inventory_item", "item_id": "ether", "count": 3},
+    {"type": "add_inventory_item", "item_id": "antidote", "count": 2},
+    {"type": "check_inventory", "item_id": "potion"},
+    {"type": "check_inventory", "item_id": "ether"},
+    {"type": "capture", "label": "before_inventory"},
+    {"type": "open_inventory"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "inventory_open_items"},
+    {"type": "close_inventory"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "inventory_closed"},
+    {"type": "remove_inventory_item", "item_id": "potion", "count": 2},
+    {"type": "check_inventory", "item_id": "potion"},
+    {"type": "open_inventory"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "inventory_after_use"}
+  ]
+}

@@ -107,7 +107,21 @@ func _on_resume() -> void:
 
 func _on_items() -> void:
 	items_pressed.emit()
-	print("[PauseMenuUI] Items selected (placeholder - inventory UI not yet available)")
+	# Hide pause menu while inventory is open
+	visible = false
+	
+	# Open inventory UI
+	var inventory_scene := preload("res://game/scenes/ui/InventoryUI.tscn")
+	var inventory_ui := inventory_scene.instantiate()
+	get_tree().root.add_child(inventory_ui)
+	inventory_ui.open_inventory()
+	inventory_ui.inventory_closed.connect(_on_inventory_closed.bind(inventory_ui))
+	print("[PauseMenuUI] Opened inventory")
+
+func _on_inventory_closed(inventory_ui: Node) -> void:
+	inventory_ui.queue_free()
+	visible = true
+	print("[PauseMenuUI] Inventory closed, returning to pause menu")
 
 func _on_save() -> void:
 	save_pressed.emit()

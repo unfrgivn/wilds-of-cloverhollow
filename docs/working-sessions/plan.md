@@ -1134,7 +1134,7 @@ In-game pause functionality.
 
 ---
 
-## Milestone 92 — Menu: Inventory UI  **Owner:** UI Systems
+## Milestone 92 — Menu: Inventory UI  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Item management screen.
 

@@ -1,0 +1,97 @@
+[gd_scene load_steps=2 format=3 uid="uid://inventory_ui"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/InventoryUI.gd" id="1_script"]
+
+[node name="InventoryUI" type="CanvasLayer"]
+layer = 101
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 100.0
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -40.0
+offset_top = 4.0
+offset_right = 40.0
+offset_bottom = 18.0
+text = "INVENTORY"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 8.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 140.0
+columns = 2
+
+[node name="DetailsPanel" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 208.0
+offset_top = 24.0
+offset_right = 392.0
+offset_bottom = 140.0
+
+[node name="ItemName" type="Label" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = 20.0
+text = "Item Name"
+
+[node name="ItemDesc" type="Label" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 24.0
+offset_right = -4.0
+offset_bottom = 80.0
+autowrap_mode = 2
+
+[node name="ItemType" type="Label" parent="Panel/DetailsPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 84.0
+offset_right = -4.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1.0)
+
+[node name="ActionsContainer" type="VBoxContainer" parent="Panel"]
+visible = false
+layout_mode = 1
+anchors_preset = 0
+offset_left = 8.0
+offset_top = 144.0
+offset_right = 200.0
+offset_bottom = 195.0

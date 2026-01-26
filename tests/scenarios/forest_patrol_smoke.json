@@ -1,0 +1,28 @@
+{
+  "id": "forest_patrol_smoke",
+  "name": "Forest Patrol Quest Smoke Test",
+  "description": "Verify the forest patrol quest flow - talk to Elder, defeat enemies",
+  "area": "res://game/scenes/areas/Area_TownPark.tscn",
+  "steps": [
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "town_park_start"},
+    {"action": "move", "direction": "right", "frames": 30},
+    {"action": "move", "direction": "up", "frames": 15},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "elder_dialogue_1"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "elder_patrol_quest"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "capture", "label": "patrol_quest_complete"}
+  ]
+}

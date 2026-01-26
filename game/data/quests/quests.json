@@ -131,6 +131,17 @@
       "required_flag": "forest_unlocked",
       "completion_flag": "clubhouse_found",
       "objectives": ["Talk to a classmate about the clubhouse", "Navigate through the forest", "Discover the secret clubhouse"]
+    },
+    {
+      "id": "forest_patrol",
+      "name": "Forest Patrol",
+      "description": "The Elder is worried about dangerous creatures in the forest. Defeat 5 forest creatures to keep the paths safe.",
+      "type": "combat",
+      "reward_gold": 100,
+      "reward_items": ["forest_passage_permit"],
+      "required_flag": "forest_unlocked",
+      "completion_flag": "forest_patrol_complete",
+      "objectives": ["Speak with the Elder about forest dangers", "Defeat 5 forest creatures", "Return to the Elder for your reward"]
     }
   ]
 }

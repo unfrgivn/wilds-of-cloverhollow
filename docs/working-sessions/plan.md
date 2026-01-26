@@ -1444,7 +1444,7 @@ Exploration quest.
 
 ---
 
-## Milestone 118 — Quest: Forest patrol  **Owner:** Story + Gameplay
+## Milestone 118 — Quest: Forest patrol  **Owner:** Story + Gameplay **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Combat quest in forest.
 

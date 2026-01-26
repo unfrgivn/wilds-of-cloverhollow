@@ -205,7 +205,7 @@ texture = ExtResource("9")
 [node name="ElderNPC" type="Area2D" parent="PicnicArea"]
 position = Vector2(220, 92)
 script = ExtResource("12")
-dialogue_branches = Array[String](["Ah, young one! This park has been here since Cloverhollow was just a tiny village. I remember when Old Mayor Bramble planted those very trees...", "They say the forest to the east wasn't always so wild. Once, there was a path that led to an enchanted grove. But something changed it...", "If you're looking for adventure, keep your eyes open. Strange things have been happening in town lately. Shadows where there shouldn't be any...", "I hear tell there's someone causing mischief around here. Perhaps you could help the townsfolk? An old timer like me can only do so much these days."])
+dialogue_branches = Array[String](["Ah, young one! This park has been here since Cloverhollow was just a tiny village. I remember when Old Mayor Bramble planted those very trees...", "They say the forest to the east wasn't always so wild. Once, there was a path that led to an enchanted grove. But something changed it...", "If you're looking for adventure, keep your eyes open. Strange things have been happening in town lately. Shadows where there shouldn't be any...", "I'm worried about the forest creatures. They've become more aggressive lately. Perhaps a brave soul could patrol the forest and thin their numbers?", "Defeat 5 forest creatures and I'll make sure you receive a proper Forest Passage Permit. The town could use a hero like you!"])
 
 [node name="ElderSprite" type="Sprite2D" parent="PicnicArea/ElderNPC"]
 texture = ExtResource("13")

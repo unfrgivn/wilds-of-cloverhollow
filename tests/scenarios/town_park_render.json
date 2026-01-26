@@ -1,0 +1,25 @@
+{
+  "scenario_id": "town_park_render",
+  "description": "Walk through Town Park, capture key areas including pond, bridge, picnic area, and forest edge",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "park_entrance"},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "capture", "label": "park_center"},
+    {"type": "move", "direction": "down", "frames": 40},
+    {"type": "capture", "label": "near_pond"},
+    {"type": "move", "direction": "right", "frames": 50},
+    {"type": "capture", "label": "pond_bridge"},
+    {"type": "move", "direction": "up", "frames": 40},
+    {"type": "move", "direction": "right", "frames": 80},
+    {"type": "capture", "label": "forest_edge"},
+    {"type": "move", "direction": "left", "frames": 120},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "capture", "label": "picnic_area"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "park_sign_dialogue"}
+  ]
+}

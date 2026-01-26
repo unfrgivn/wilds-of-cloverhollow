@@ -184,6 +184,11 @@ position = Vector2(60, 130)
 script = ExtResource("7")
 marker_id = "from_general_store"
 
+[node name="from_park" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 50)
+script = ExtResource("7")
+marker_id = "from_park"
+
 [node name="NPCSpawns" type="Node2D" parent="."]
 
 [node name="NPCSpawn1" type="Marker2D" parent="NPCSpawns"]
@@ -320,4 +325,21 @@ offset_top = -20.0
 offset_right = 30.0
 offset_bottom = 0.0
 text = "Shop"
+horizontal_alignment = 1
+
+[node name="TransitionToPark" type="Area2D" parent="."]
+position = Vector2(256, 20)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_TownPark.tscn"
+target_spawn_id = "from_town_center"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToPark"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToPark"]
+offset_left = -40.0
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 10.0
+text = "↑ Park"
 horizontal_alignment = 1

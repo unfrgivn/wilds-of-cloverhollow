@@ -418,7 +418,7 @@ Playable cabinet interaction (simple minigame).
 
 ---
 
-## Milestone 32 — Town Park area  **Owner:** World Builder + Art Pipeline
+## Milestone 32 — Town Park area  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Park/green space for Cloverhollow.
 

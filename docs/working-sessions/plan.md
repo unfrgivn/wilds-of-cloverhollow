@@ -831,7 +831,7 @@ Items that remove status effects.
 
 ---
 
-## Milestone 67 — Item: Battle throwables  **Owner:** Battle Systems + Data Systems
+## Milestone 67 — Item: Battle throwables  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26) + Data Systems
 ### Objective
 Damage items.
 

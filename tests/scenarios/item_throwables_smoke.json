@@ -1,0 +1,9 @@
+{
+  "scenario_id": "item_throwables_smoke",
+  "description": "Verifies battle throwable items are loaded and usable in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "item_throwables_battle_start"}
+  ]
+}

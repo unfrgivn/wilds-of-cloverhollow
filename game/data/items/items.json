@@ -159,6 +159,47 @@
       "power": 0,
       "target": "single_ally",
       "price": 200
+    },
+    {
+      "id": "bomb",
+      "name": "Bomb",
+      "description": "Explodes on impact, dealing fire damage to one enemy.",
+      "type": "consumable",
+      "effect": "damage",
+      "power": 25,
+      "target": "single_enemy",
+      "element": "fire",
+      "price": 100
+    },
+    {
+      "id": "smoke_bomb",
+      "name": "Smoke Bomb",
+      "description": "Creates a smoke screen, guaranteeing escape from battle.",
+      "type": "consumable",
+      "effect": "escape",
+      "power": 0,
+      "target": "party",
+      "price": 50
+    },
+    {
+      "id": "flash_powder",
+      "name": "Flash Powder",
+      "description": "Blinds all enemies temporarily.",
+      "type": "consumable",
+      "effect": "inflict_blind",
+      "power": 0,
+      "target": "all_enemies",
+      "price": 60
+    },
+    {
+      "id": "stink_bomb",
+      "name": "Stink Bomb",
+      "description": "Poisons all enemies with a terrible smell.",
+      "type": "consumable",
+      "effect": "inflict_poison",
+      "power": 0,
+      "target": "all_enemies",
+      "price": 75
     }
   ]
 }

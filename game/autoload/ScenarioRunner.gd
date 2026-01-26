@@ -338,6 +338,32 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "set_affinity":
+        var npc_id := str(action.get("npc_id", ""))
+        var value: int = int(action.get("value", 0))
+        AffinityManager.set_affinity(npc_id, value)
+        _trace["events"].append({"type": "set_affinity", "frame": _frame, "npc_id": npc_id, "value": value})
+        _action_index += 1
+        return
+
+    if t == "change_affinity":
+        var npc_id := str(action.get("npc_id", ""))
+        var amount: int = int(action.get("amount", 0))
+        var old_value: int = AffinityManager.get_affinity(npc_id)
+        AffinityManager.change_affinity(npc_id, amount)
+        var new_value: int = AffinityManager.get_affinity(npc_id)
+        _trace["events"].append({"type": "change_affinity", "frame": _frame, "npc_id": npc_id, "amount": amount, "old_value": old_value, "new_value": new_value})
+        _action_index += 1
+        return
+
+    if t == "check_affinity":
+        var npc_id := str(action.get("npc_id", ""))
+        var affinity: int = AffinityManager.get_affinity(npc_id)
+        var level: String = AffinityManager.get_npc_level(npc_id)
+        _trace["events"].append({"type": "check_affinity", "frame": _frame, "npc_id": npc_id, "affinity": affinity, "level": level})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

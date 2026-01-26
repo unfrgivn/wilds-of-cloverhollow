@@ -1,0 +1,24 @@
+{
+  "scenario_id": "affinity_smoke",
+  "description": "Test affinity system: set, change, check levels",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "set_affinity", "npc_id": "elder", "value": 10},
+    {"type": "check_affinity", "npc_id": "elder"},
+    {"type": "capture", "label": "elder_stranger"},
+    {"type": "change_affinity", "npc_id": "elder", "amount": 15},
+    {"type": "check_affinity", "npc_id": "elder"},
+    {"type": "capture", "label": "elder_acquaintance"},
+    {"type": "change_affinity", "npc_id": "elder", "amount": 30},
+    {"type": "check_affinity", "npc_id": "elder"},
+    {"type": "capture", "label": "elder_friend"},
+    {"type": "change_affinity", "npc_id": "elder", "amount": -20},
+    {"type": "check_affinity", "npc_id": "elder"},
+    {"type": "capture", "label": "elder_decreased"},
+    {"type": "set_affinity", "npc_id": "shopkeeper", "value": 80},
+    {"type": "check_affinity", "npc_id": "shopkeeper"},
+    {"type": "capture", "label": "shopkeeper_best_friend"}
+  ]
+}

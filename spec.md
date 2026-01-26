@@ -195,6 +195,20 @@ This file is the single source of truth. If code changes behavior, update this f
 - ScheduledNPC connects to DayNightManager.time_changed signal.
 - On time change, NPC shows if current scene matches scheduled area for that phase, hides otherwise.
 
+### 3.19 Relationship/affinity system
+- AffinityManager autoload tracks NPC friendship levels.
+- Affinity score: 0-100 per NPC, higher is better.
+- Affinity levels (thresholds): Stranger(0), Acquaintance(20), Friend(40), Good Friend(60), Best Friend(80), Soulmate(100).
+- Affinity data stored in `game/data/npcs/affinity.json`:
+  - npcs: array of {npc_id, npc_name, starting_affinity}.
+  - affinity_events: standard modifiers (gift_liked: +10, gift_disliked: -5, etc.).
+- API: `get_affinity(npc_id)`, `set_affinity(npc_id, value)`, `change_affinity(npc_id, amount)`.
+- `get_npc_level(npc_id)`: returns current relationship level name.
+- Signals: `affinity_changed(npc_id, old_value, new_value)`, `affinity_level_up(npc_id, old_level, new_level)`.
+- Dialogue choices can modify affinity via `affinity_change` field in choice data.
+- AffinityUI (CanvasLayer): displays NPC list with relationship bars and levels.
+- Scenario actions: `set_affinity`, `change_affinity`, `check_affinity`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -29,6 +29,7 @@ DayNightManager="*res://game/autoload/DayNightManager.gd"
 WeatherManager="*res://game/autoload/WeatherManager.gd"
 PartyManager="*res://game/autoload/PartyManager.gd"
 QuestManager="*res://game/autoload/QuestManager.gd"
+AffinityManager="*res://game/autoload/AffinityManager.gd"
 
 [display]
 

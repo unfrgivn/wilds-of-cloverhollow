@@ -1,0 +1,72 @@
+{
+  "npcs": [
+    {
+      "id": "elder",
+      "name": "Elder Willow",
+      "starting_affinity": 10,
+      "portrait": "res://game/assets/sprites/characters/npcs/elder/portrait.png"
+    },
+    {
+      "id": "mayor",
+      "name": "Mayor Thornwood",
+      "starting_affinity": 5,
+      "portrait": "res://game/assets/sprites/characters/npcs/mayor/portrait.png"
+    },
+    {
+      "id": "baker",
+      "name": "Baker Rosemary",
+      "starting_affinity": 15,
+      "portrait": "res://game/assets/sprites/characters/npcs/baker/portrait.png"
+    },
+    {
+      "id": "shopkeeper",
+      "name": "Shopkeeper Wren",
+      "starting_affinity": 10,
+      "portrait": "res://game/assets/sprites/characters/npcs/shopkeeper/portrait.png"
+    },
+    {
+      "id": "teacher",
+      "name": "Teacher Sage",
+      "starting_affinity": 20,
+      "portrait": "res://game/assets/sprites/characters/npcs/teacher/portrait.png"
+    },
+    {
+      "id": "librarian",
+      "name": "Librarian Fern",
+      "starting_affinity": 10,
+      "portrait": "res://game/assets/sprites/characters/npcs/librarian/portrait.png"
+    },
+    {
+      "id": "blacksmith",
+      "name": "Blacksmith Ironhammer",
+      "starting_affinity": 5,
+      "portrait": "res://game/assets/sprites/characters/npcs/blacksmith/portrait.png"
+    },
+    {
+      "id": "doctor",
+      "name": "Dr. Willowmere",
+      "starting_affinity": 15,
+      "portrait": "res://game/assets/sprites/characters/npcs/doctor/portrait.png"
+    },
+    {
+      "id": "arcade_owner",
+      "name": "Buzz",
+      "starting_affinity": 20,
+      "portrait": "res://game/assets/sprites/characters/npcs/arcade_owner/portrait.png"
+    },
+    {
+      "id": "pet_clerk",
+      "name": "Clover",
+      "starting_affinity": 25,
+      "portrait": "res://game/assets/sprites/characters/npcs/pet_clerk/portrait.png"
+    }
+  ],
+  "affinity_events": {
+    "complete_quest": 10,
+    "give_gift": 5,
+    "help_npc": 8,
+    "rude_response": -5,
+    "ignore_request": -3,
+    "daily_talk": 1
+  }
+}

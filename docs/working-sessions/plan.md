@@ -1107,7 +1107,7 @@ Player choices affect dialogue.
 
 ---
 
-## Milestone 90 — Relationship/affinity tracking  **Owner:** Gameplay + Data Systems
+## Milestone 90 — Relationship/affinity tracking  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + Data Systems
 ### Objective
 NPC friendship levels.
 

@@ -1047,7 +1047,7 @@ Collection quest.
 
 ---
 
-## Milestone 85 — Quest: Pest control  **Owner:** Story + Gameplay
+## Milestone 85 — Quest: Pest control  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Combat-focused quest.
 

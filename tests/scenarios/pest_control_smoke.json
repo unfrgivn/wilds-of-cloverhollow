@@ -1,0 +1,28 @@
+{
+  "scenario_id": "pest_control_smoke",
+  "description": "Test pest control quest flow: start, defeat mice via flags, complete, check discount",
+  "scene": "res://game/scenes/areas/Area_GeneralStore.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "start_quest", "quest_id": "pest_control"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "pest_control"},
+    {"type": "capture", "label": "quest_started"},
+    {"type": "set_story_flag", "flag": "mouse_1_defeated", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "set_story_flag", "flag": "mouse_2_defeated", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "set_story_flag", "flag": "mouse_3_defeated", "value": true},
+    {"type": "set_story_flag", "flag": "all_mice_defeated", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_objective", "quest_id": "pest_control", "objective_index": 0},
+    {"type": "check_quest", "quest_id": "pest_control"},
+    {"type": "capture", "label": "mice_defeated"},
+    {"type": "complete_objective", "quest_id": "pest_control", "objective_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "pest_control"},
+    {"type": "check_story_flag", "flag": "pest_control_done"},
+    {"type": "capture", "label": "quest_completed"}
+  ]
+}

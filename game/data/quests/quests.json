@@ -34,6 +34,17 @@
       "objectives": ["Collect 3 berries", "Deliver to the Baker"]
     },
     {
+      "id": "pest_control",
+      "name": "Pest Control",
+      "description": "The shopkeeper has a mouse problem in the basement! Clear out the pesky critters.",
+      "type": "combat",
+      "reward_gold": 40,
+      "reward_items": [],
+      "required_flag": null,
+      "completion_flag": "pest_control_done",
+      "objectives": ["Defeat 3 mice in the basement", "Report back to the Shopkeeper"]
+    },
+    {
       "id": "forest_mushrooms",
       "name": "Rare Forest Mushrooms",
       "description": "The Elder needs rare mushrooms from the forest for a special remedy.",

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -9,9 +9,10 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/shop/shelf.png" id="7"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/shop/crate.png" id="8"]
 [ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="9"]
-[ext_resource type="Script" path="res://game/scripts/interaction/ShopNPC.gd" id="10"]
+[ext_resource type="Script" path="res://game/scripts/interaction/QuestAwareShopNPC.gd" id="10"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/shopkeeper/shopkeeper.png" id="11"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/ShopUI.tscn" id="12"]
+[ext_resource type="Script" path="res://game/scripts/interaction/QuestGiverNPC.gd" id="13"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(16, 16)
@@ -127,7 +128,15 @@ shape = SubResource("1")
 [node name="Shopkeeper" type="Area2D" parent="."]
 position = Vector2(380, 140)
 script = ExtResource("10")
+quest_id = "pest_control"
+dialogue_offer = "Oh thank goodness you're here! I've got a terrible mouse problem in the basement. Could you clear them out for me? There's 3 of those pesky critters!"
+dialogue_accepted = "The basement door is over there. Be careful, they're quick little things!"
+dialogue_in_progress = "Still working on those mice? There's 3 of them hiding in the basement!"
+dialogue_ready_to_complete = "You got all the mice? Oh wonderful! Here's your reward, and I'll give you a discount on anything in the shop from now on!"
+dialogue_completed = "Thanks again for dealing with those mice! Remember, you get 20% off everything!"
+completion_check_flag = "all_mice_defeated"
 shop_items = Array[String](["potion", "ether", "antidote"])
+discount_percent = 20
 
 [node name="Sprite2D" type="Sprite2D" parent="Shopkeeper"]
 texture = ExtResource("11")
@@ -147,6 +156,11 @@ position = Vector2(256, 240)
 script = ExtResource("4")
 marker_id = "from_town_center"
 
+[node name="from_basement" type="Marker2D" parent="Spawns"]
+position = Vector2(100, 200)
+script = ExtResource("4")
+marker_id = "from_basement"
+
 [node name="TransitionToTownCenter" type="Area2D" parent="."]
 position = Vector2(256, 268)
 script = ExtResource("5")
@@ -155,3 +169,19 @@ target_spawn_id = "from_general_store"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TransitionToTownCenter"]
 shape = SubResource("2")
+
+[node name="BasementDoor" type="Area2D" parent="."]
+position = Vector2(80, 200)
+script = ExtResource("5")
+target_area = "res://game/scenes/areas/Area_ShopBasement.tscn"
+target_spawn_id = "from_shop"
+
+[node name="DoorSprite" type="ColorRect" parent="BasementDoor"]
+offset_left = -8.0
+offset_top = -12.0
+offset_right = 8.0
+offset_bottom = 4.0
+color = Color(0.3, 0.22, 0.15, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BasementDoor"]
+shape = SubResource("1")

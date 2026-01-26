@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/school/chalkboard.png" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/school/clock.png" id="9"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/school/window.png" id="10"]
+[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="11"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/teacher/teacher_idle_south.png" id="12"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_Player"]
 size = Vector2(16, 20)
@@ -25,6 +27,9 @@ size = Vector2(24, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_TeacherDesk"]
 size = Vector2(48, 24)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_NPC"]
+radius = 20.0
 
 [node name="Area_SchoolClassroom" type="Node2D"]
 
@@ -296,3 +301,16 @@ target_spawn_id = "from_classroom"
 
 [node name="ExitShape" type="CollisionShape2D" parent="ExitTransition"]
 shape = SubResource("RectangleShape2D_Transition")
+
+[node name="Teacher" type="Area2D" parent="."]
+position = Vector2(256, 72)
+script = ExtResource("11")
+dialogue_branches = Array[String](["Good morning, class! Today we'll be learning about the history of Cloverhollow.", "Remember to complete your homework by tomorrow! It's very important for your grades.", "If you need any help with your studies, don't hesitate to ask. That's what I'm here for!"])
+
+[node name="Sprite" type="Sprite2D" parent="Teacher"]
+texture = ExtResource("12")
+centered = true
+offset = Vector2(0, -12)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Teacher"]
+shape = SubResource("CircleShape2D_NPC")

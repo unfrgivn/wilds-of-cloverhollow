@@ -1,0 +1,30 @@
+{
+  "scenario_id": "npc_teacher_dialogue",
+  "description": "Verify Teacher NPC at desk with dialogue tree branching",
+  "scene": "res://game/scenes/areas/Area_SchoolClassroom.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "initial_classroom_spawn"},
+    {"type": "move", "direction": "left", "frames": 80},
+    {"type": "move", "direction": "up", "frames": 70},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "near_teacher"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "dialogue_branch_1"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "dialogue_branch_2"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "dialogue_branch_3"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "capture", "label": "after_dialogue"}
+  ]
+}

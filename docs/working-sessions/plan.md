@@ -344,7 +344,7 @@ Player's classroom scene.
 
 ---
 
-## Milestone 26 — School NPC: Teacher  **Owner:** Character Systems + Art Pipeline
+## Milestone 26 — School NPC: Teacher  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Teacher character with classroom dialogue.
 

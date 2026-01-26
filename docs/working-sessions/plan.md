@@ -623,7 +623,7 @@ Rain and weather particle effects.
 
 ---
 
-## Milestone 49 — Streetlight/lamp toggle  **Owner:** Gameplay + Art Pipeline
+## Milestone 49 — Streetlight/lamp toggle  **Status:** ✅ Completed (2025-01-26)  **Owner:** Gameplay + Art Pipeline
 ### Objective
 Lights turn on at night.
 

@@ -1,0 +1,24 @@
+{
+  "id": "lamp_night_render",
+  "description": "Test lamp on/off toggle with day/night cycle",
+  "starting_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    { "type": "wait_frames", "frames": 30 },
+    
+    { "type": "set_time_phase", "phase": 0 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "lamp_morning_off" },
+    
+    { "type": "set_time_phase", "phase": 1 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "lamp_afternoon_off" },
+    
+    { "type": "set_time_phase", "phase": 2 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "lamp_evening_on" },
+    
+    { "type": "set_time_phase", "phase": 3 },
+    { "type": "wait_frames", "frames": 10 },
+    { "type": "capture", "label": "lamp_night_on" }
+  ]
+}

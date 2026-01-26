@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -24,6 +24,9 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_petshop.png" id="22"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_blacksmith.png" id="23"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_clinic.png" id="24"]
+[ext_resource type="Script" path="res://game/scripts/props/Lamp.gd" id="25"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/lamp/lamp_on.png" id="26"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/lamp/lamp_off.png" id="27"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -78,11 +81,17 @@ shape = SubResource("CircleShape2D_1")
 
 [node name="Lamp1" type="Sprite2D" parent="Props"]
 position = Vector2(150, 140)
-texture = ExtResource("9")
+texture = ExtResource("27")
+script = ExtResource("25")
+lamp_on_texture = ExtResource("26")
+lamp_off_texture = ExtResource("27")
 
 [node name="Lamp2" type="Sprite2D" parent="Props"]
 position = Vector2(362, 140)
-texture = ExtResource("9")
+texture = ExtResource("27")
+script = ExtResource("25")
+lamp_on_texture = ExtResource("26")
+lamp_off_texture = ExtResource("27")
 
 [node name="Bench1" type="Sprite2D" parent="Props"]
 position = Vector2(200, 180)

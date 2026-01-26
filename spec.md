@@ -131,6 +131,12 @@ This file is the single source of truth. If code changes behavior, update this f
 - Thunder flash: white overlay tween (quick bright pulse).
 - Scenario actions: `set_weather`, `trigger_thunder`.
 
+### 3.15 Lamp props
+- Lamp script (Sprite2D) that toggles between on/off textures.
+- Lamps connect to DayNightManager.time_changed signal.
+- Lamps turn on at evening and night (phases 2 and 3).
+- lamp_on.png and lamp_off.png sprite variants in props/lamp/.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -540,7 +540,18 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Enemy: Pink Slime (reskinned slime).
 - Battle background: bubblegum_bay.png (512x288).
 
-### 7.3 Biome factory workflow
+### 7.3 Forest Entrance (v0 blockout)
+- Transition area: connects Town Park to deeper forest areas.
+- Dark green forest background with forest edge borders (darker tree lines).
+- Central clearing for player movement between transitions.
+- Wooden arch/gate prop (32x48) at the entrance from town side.
+- Warning sign prop (16x16) with interactable dialogue about dangers ahead.
+- Props: 10 trees scattered around edges, wooden arch, warning sign.
+- Transitions: to Town Park (south, "from_forest" spawn), to Forest Path (east, "from_entrance" spawn).
+- Spawn markers: default, from_park, from_forest.
+- Scenario: `forest_entrance_render` for visual/interaction testing.
+
+### 7.4 Biome factory workflow
 - `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
   - Palette stub in `art/palettes/<id>.palette.json`
   - Biome data in `game/data/biomes/<id>.json`

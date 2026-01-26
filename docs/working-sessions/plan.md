@@ -1326,7 +1326,7 @@ Achievement tracking.
 
 ---
 
-## Milestone 108 — Forest entrance area  **Owner:** World Builder + Art Pipeline
+## Milestone 108 — Forest entrance area  **Status:** ✅ Completed (2026-01-26)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Transition from town to forest.
 

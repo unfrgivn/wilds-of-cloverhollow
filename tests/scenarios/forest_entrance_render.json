@@ -1,0 +1,20 @@
+{
+    "id": "forest_entrance_render",
+    "description": "Render test for forest entrance area with wooden arch and warning sign",
+    "scene": "res://game/scenes/areas/Forest_Entrance.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_entrance_initial"},
+        {"type": "move", "direction": "up", "frames": 30},
+        {"type": "capture", "label": "forest_entrance_clearing"},
+        {"type": "move", "direction": "right", "frames": 45},
+        {"type": "capture", "label": "forest_entrance_near_sign"},
+        {"type": "press", "action": "interact"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_entrance_warning_dialogue"},
+        {"type": "press", "action": "interact"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "move", "direction": "right", "frames": 60},
+        {"type": "capture", "label": "forest_entrance_toward_forest"}
+    ]
+}

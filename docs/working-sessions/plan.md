@@ -393,7 +393,7 @@ Interior with arcade machines.
 
 ---
 
-## Milestone 30 — Arcade NPC: Owner  **Owner:** Character Systems + Art Pipeline
+## Milestone 30 — Arcade NPC: Owner  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Arcade owner character.
 

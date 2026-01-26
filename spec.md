@@ -240,6 +240,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - Navigation: up/down to select member, cancel to close.
 - Scenario actions: `open_party_status`, `close_party_status`, `check_party_member`.
 
+### 3.23 Quest log UI
+- QuestLogUI (CanvasLayer): quest tracking interface.
+- Opens from pause menu Quests option (future) or via scenario action.
+- Tabs: Active and Completed quests.
+- Active tab shows quests from QuestManager.get_active_quests() with objective status.
+- Completed tab shows quests from QuestManager.get_completed_quest_ids().
+- Quest list on left, details panel on right.
+- Details panel: quest name, description, objectives with checkboxes, rewards.
+- Navigation: up/down to select quest, left/right to switch tabs, cancel to close.
+- Scenario actions: `open_quest_log`, `close_quest_log`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

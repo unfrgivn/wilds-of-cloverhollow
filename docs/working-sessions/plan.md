@@ -1158,7 +1158,7 @@ Party member stats screen.
 
 ---
 
-## Milestone 94 — Menu: Quest log  **Owner:** UI Systems
+## Milestone 94 — Menu: Quest log  **Owner:** UI Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Quest tracking interface.
 

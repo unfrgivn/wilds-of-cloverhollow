@@ -1,0 +1,24 @@
+{
+  "scenario_id": "quest_log_render",
+  "description": "Test quest log UI: start quests, open log, view active and completed",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "start_quest", "quest_id": "fix_fountain"},
+    {"type": "start_quest", "quest_id": "chaos_investigation"},
+    {"type": "capture", "label": "before_quest_log"},
+    {"type": "open_quest_log"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "quest_log_active"},
+    {"type": "close_quest_log"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_quest", "quest_id": "fix_fountain"},
+    {"type": "open_quest_log"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "quest_log_one_completed"},
+    {"type": "close_quest_log"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "quest_log_closed"}
+  ]
+}

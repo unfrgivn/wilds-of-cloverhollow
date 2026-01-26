@@ -458,6 +458,40 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "open_quest_log":
+        var quest_log_scene := preload("res://game/scenes/ui/QuestLogUI.tscn")
+        var quest_log_ui := quest_log_scene.instantiate()
+        get_tree().root.add_child(quest_log_ui)
+        quest_log_ui.open_quest_log()
+        _trace["events"].append({"type": "open_quest_log", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "close_quest_log":
+        var quest_log_nodes := get_tree().get_nodes_in_group("quest_log_ui")
+        for node in quest_log_nodes:
+            node.close_quest_log()
+            node.queue_free()
+        _trace["events"].append({"type": "close_quest_log", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "start_quest":
+        var quest_id := str(action.get("quest_id", ""))
+        if quest_id != "":
+            QuestManager.start_quest(quest_id)
+            _trace["events"].append({"type": "start_quest", "frame": _frame, "quest_id": quest_id})
+        _action_index += 1
+        return
+
+    if t == "complete_quest":
+        var quest_id := str(action.get("quest_id", ""))
+        if quest_id != "":
+            QuestManager.complete_quest(quest_id)
+            _trace["events"].append({"type": "complete_quest", "frame": _frame, "quest_id": quest_id})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

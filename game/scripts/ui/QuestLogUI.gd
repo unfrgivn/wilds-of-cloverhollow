@@ -1,209 +1,235 @@
 extends CanvasLayer
 
-## QuestLogUI - Shows player's active and completed quests
-## Opened via pause menu or quest button
+## QuestLogUI - Quest tracking interface with active/completed tabs
 
-signal closed
+signal quest_log_closed
 
-enum View { ACTIVE, COMPLETED }
+enum TabMode { ACTIVE, COMPLETED }
 
-@onready var _panel: Panel = $Panel
-@onready var _title_label: Label = $Panel/TitleLabel
-@onready var _tabs: HBoxContainer = $Panel/TabsContainer
-@onready var _active_tab: Button = $Panel/TabsContainer/ActiveTab
-@onready var _completed_tab: Button = $Panel/TabsContainer/CompletedTab
-@onready var _quests_container: VBoxContainer = $Panel/QuestsContainer
-@onready var _details_panel: Panel = $Panel/DetailsPanel
-@onready var _quest_name_label: Label = $Panel/DetailsPanel/QuestName
-@onready var _quest_desc_label: Label = $Panel/DetailsPanel/QuestDescription
-@onready var _objectives_container: VBoxContainer = $Panel/DetailsPanel/ObjectivesContainer
-@onready var _close_button: Button = $Panel/CloseButton
-
-var _current_view: View = View.ACTIVE
+var _is_active: bool = false
+var _current_tab: TabMode = TabMode.ACTIVE
 var _selected_quest_index: int = 0
-var _displayed_quests: Array[Dictionary] = []
+var _active_quests: Array[Dictionary] = []
+var _completed_quest_ids: Array[String] = []
 
+@onready var panel: Panel = $Panel
+@onready var title_label: Label = $Panel/TitleLabel
+@onready var tab_container: HBoxContainer = $Panel/TabContainer
+@onready var active_tab: Button = $Panel/TabContainer/ActiveTab
+@onready var completed_tab: Button = $Panel/TabContainer/CompletedTab
+@onready var quest_list: VBoxContainer = $Panel/QuestList
+@onready var details_panel: Panel = $Panel/DetailsPanel
+@onready var quest_name: Label = $Panel/DetailsPanel/QuestName
+@onready var quest_desc: Label = $Panel/DetailsPanel/QuestDesc
+@onready var objectives_label: Label = $Panel/DetailsPanel/ObjectivesLabel
+@onready var reward_label: Label = $Panel/DetailsPanel/RewardLabel
+@onready var dimmer: ColorRect = $Dimmer
 
 func _ready() -> void:
+	add_to_group("quest_log_ui")
 	visible = false
-	_active_tab.pressed.connect(_on_active_tab_pressed)
-	_completed_tab.pressed.connect(_on_completed_tab_pressed)
-	_close_button.pressed.connect(close_log)
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	_update_tab_visuals()
-
+	active_tab.pressed.connect(_on_active_tab_pressed)
+	completed_tab.pressed.connect(_on_completed_tab_pressed)
 
 func _input(event: InputEvent) -> void:
-	if not visible:
+	if not _is_active:
 		return
 	
-	if event.is_action_pressed("ui_cancel"):
-		close_log()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_up"):
-		_select_previous()
+	if event.is_action_pressed("ui_up"):
+		_move_selection(-1)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_down"):
-		_select_next()
+		_move_selection(1)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_left"):
+		_switch_tab(-1)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_right"):
+		_switch_tab(1)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+		close_quest_log()
 		get_viewport().set_input_as_handled()
 
-
-func open_log() -> void:
-	visible = true
-	_current_view = View.ACTIVE
+func open_quest_log() -> void:
+	_is_active = true
+	_current_tab = TabMode.ACTIVE
 	_selected_quest_index = 0
-	_update_tab_visuals()
-	_refresh_quest_list()
-	
-	# Pause player
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player.has_method("set_movement_enabled"):
-		player.set_movement_enabled(false)
+	visible = true
+	_refresh_data()
+	_update_tabs()
+	_update_quest_list()
+	_update_details()
+	print("[QuestLogUI] Opened")
 
-
-func close_log() -> void:
+func close_quest_log() -> void:
+	_is_active = false
 	visible = false
-	closed.emit()
-	
-	# Resume player
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player.has_method("set_movement_enabled"):
-		player.set_movement_enabled(true)
+	quest_log_closed.emit()
+	print("[QuestLogUI] Closed")
 
+func _refresh_data() -> void:
+	_active_quests = QuestManager.get_active_quests()
+	_completed_quest_ids = QuestManager.get_completed_quest_ids()
+
+func _switch_tab(direction: int) -> void:
+	if direction < 0:
+		_current_tab = TabMode.ACTIVE
+	else:
+		_current_tab = TabMode.COMPLETED
+	_selected_quest_index = 0
+	_update_tabs()
+	_update_quest_list()
+	_update_details()
 
 func _on_active_tab_pressed() -> void:
-	_current_view = View.ACTIVE
+	_current_tab = TabMode.ACTIVE
 	_selected_quest_index = 0
-	_update_tab_visuals()
-	_refresh_quest_list()
-
+	_update_tabs()
+	_update_quest_list()
+	_update_details()
 
 func _on_completed_tab_pressed() -> void:
-	_current_view = View.COMPLETED
+	_current_tab = TabMode.COMPLETED
 	_selected_quest_index = 0
-	_update_tab_visuals()
-	_refresh_quest_list()
+	_update_tabs()
+	_update_quest_list()
+	_update_details()
 
+func _update_tabs() -> void:
+	active_tab.flat = (_current_tab != TabMode.ACTIVE)
+	completed_tab.flat = (_current_tab != TabMode.COMPLETED)
+	
+	if _current_tab == TabMode.ACTIVE:
+		active_tab.grab_focus()
+	else:
+		completed_tab.grab_focus()
 
-func _update_tab_visuals() -> void:
-	_active_tab.disabled = _current_view == View.ACTIVE
-	_completed_tab.disabled = _current_view == View.COMPLETED
-
-
-func _refresh_quest_list() -> void:
+func _update_quest_list() -> void:
 	# Clear existing
-	for child in _quests_container.get_children():
+	for child in quest_list.get_children():
 		child.queue_free()
 	
-	# Get quests based on view
-	_displayed_quests.clear()
+	var quests_to_show: Array = []
 	
-	if _current_view == View.ACTIVE:
-		_displayed_quests = QuestManager.get_active_quests()
-		_title_label.text = "Quest Log - Active"
+	if _current_tab == TabMode.ACTIVE:
+		quests_to_show = _active_quests
 	else:
-		# Get completed quest data
-		var completed_ids := QuestManager.get_completed_quest_ids()
-		for quest_id in completed_ids:
-			var quest_data := GameData.get_quest(quest_id)
+		# Build completed quest list from IDs
+		for quest_id in _completed_quest_ids:
+			var quest_data: Dictionary = GameData.get_quest(quest_id)
 			if not quest_data.is_empty():
-				_displayed_quests.append(quest_data)
-		_title_label.text = "Quest Log - Completed"
+				quests_to_show.append(quest_data)
 	
-	# Create list items
-	for i in range(_displayed_quests.size()):
-		var quest: Dictionary = _displayed_quests[i]
-		var item := Button.new()
-		item.text = quest.get("name", "Unknown Quest")
-		item.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		item.pressed.connect(_on_quest_item_pressed.bind(i))
-		_quests_container.add_child(item)
-	
-	# Show empty message if no quests
-	if _displayed_quests.is_empty():
+	if quests_to_show.size() == 0:
 		var empty_label := Label.new()
-		if _current_view == View.ACTIVE:
-			empty_label.text = "No active quests."
-		else:
-			empty_label.text = "No completed quests."
+		empty_label.text = "No quests" if _current_tab == TabMode.ACTIVE else "No completed quests"
+		empty_label.custom_minimum_size = Vector2(150, 24)
 		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_quests_container.add_child(empty_label)
+		quest_list.add_child(empty_label)
+		return
 	
-	# Select first quest
-	_selected_quest_index = 0
+	# Create quest buttons
+	for i in range(quests_to_show.size()):
+		var quest: Dictionary = quests_to_show[i]
+		var quest_button := Button.new()
+		quest_button.text = quest.get("name", "Unknown Quest")
+		quest_button.custom_minimum_size = Vector2(150, 20)
+		quest_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		quest_button.pressed.connect(_on_quest_pressed.bind(i))
+		quest_list.add_child(quest_button)
+	
+	# Wait a frame then update selection
+	await get_tree().process_frame
+	_update_selection()
+
+func _move_selection(delta: int) -> void:
+	var count: int = _get_quest_count()
+	if count == 0:
+		return
+	_selected_quest_index = wrapi(_selected_quest_index + delta, 0, count)
 	_update_selection()
 	_update_details()
 
+func _get_quest_count() -> int:
+	if _current_tab == TabMode.ACTIVE:
+		return _active_quests.size()
+	else:
+		return _completed_quest_ids.size()
 
-func _on_quest_item_pressed(index: int) -> void:
+func _update_selection() -> void:
+	var buttons := quest_list.get_children()
+	for i in range(buttons.size()):
+		if buttons[i] is Button:
+			buttons[i].flat = (i != _selected_quest_index)
+			if i == _selected_quest_index:
+				buttons[i].grab_focus()
+
+func _on_quest_pressed(index: int) -> void:
 	_selected_quest_index = index
 	_update_selection()
 	_update_details()
 
-
-func _select_previous() -> void:
-	if _displayed_quests.is_empty():
-		return
-	_selected_quest_index = max(0, _selected_quest_index - 1)
-	_update_selection()
-	_update_details()
-
-
-func _select_next() -> void:
-	if _displayed_quests.is_empty():
-		return
-	_selected_quest_index = min(_displayed_quests.size() - 1, _selected_quest_index + 1)
-	_update_selection()
-	_update_details()
-
-
-func _update_selection() -> void:
-	var buttons := _quests_container.get_children()
-	for i in range(buttons.size()):
-		var btn := buttons[i]
-		if btn is Button:
-			btn.button_pressed = (i == _selected_quest_index)
-
-
 func _update_details() -> void:
-	# Clear objectives
-	for child in _objectives_container.get_children():
-		child.queue_free()
+	var quest_data: Dictionary = _get_selected_quest_data()
 	
-	if _displayed_quests.is_empty() or _selected_quest_index >= _displayed_quests.size():
-		_quest_name_label.text = ""
-		_quest_desc_label.text = ""
-		_details_panel.visible = false
+	if quest_data.is_empty():
+		quest_name.text = ""
+		quest_desc.text = "Select a quest to view details"
+		objectives_label.text = ""
+		reward_label.text = ""
 		return
 	
-	_details_panel.visible = true
-	var quest: Dictionary = _displayed_quests[_selected_quest_index]
+	quest_name.text = quest_data.get("name", "Unknown Quest")
+	quest_desc.text = quest_data.get("description", "")
 	
-	_quest_name_label.text = quest.get("name", "Unknown Quest")
-	_quest_desc_label.text = quest.get("description", "")
-	
-	# Show objectives
-	var objectives: Array = quest.get("objectives", [])
-	var objective_status: Array = quest.get("objective_status", [])
+	# Objectives
+	var objectives: Array = quest_data.get("objectives", [])
+	var objective_status: Array = quest_data.get("objective_status", [])
+	var obj_lines: PackedStringArray = []
 	
 	for i in range(objectives.size()):
-		var obj_label := Label.new()
-		var completed := false
+		var obj: Dictionary = objectives[i] if objectives[i] is Dictionary else {"description": str(objectives[i])}
+		var desc: String = obj.get("description", "Objective %d" % (i + 1))
+		var is_complete: bool = false
 		if i < objective_status.size():
-			completed = objective_status[i]
+			is_complete = objective_status[i]
 		
-		var prefix := "[x] " if completed or _current_view == View.COMPLETED else "[ ] "
-		obj_label.text = prefix + objectives[i]
-		obj_label.add_theme_font_size_override("font_size", 10)
-		_objectives_container.add_child(obj_label)
+		var checkbox: String = "[x]" if is_complete else "[ ]"
+		obj_lines.append("%s %s" % [checkbox, desc])
 	
-	# Show reward if completed view
-	if _current_view == View.COMPLETED:
-		var reward_gold: int = quest.get("reward_gold", 0)
-		if reward_gold > 0:
-			var reward_label := Label.new()
-			reward_label.text = "Reward: %d gold" % reward_gold
-			reward_label.add_theme_font_size_override("font_size", 10)
-			reward_label.add_theme_color_override("font_color", Color.GOLD)
-			_objectives_container.add_child(reward_label)
+	if obj_lines.size() > 0:
+		objectives_label.text = "\n".join(obj_lines)
+	else:
+		objectives_label.text = ""
+	
+	# Rewards
+	var reward_gold: int = quest_data.get("reward_gold", 0)
+	var reward_items: Array = quest_data.get("reward_items", [])
+	var reward_parts: PackedStringArray = []
+	
+	if reward_gold > 0:
+		reward_parts.append("%d gold" % reward_gold)
+	for item_id in reward_items:
+		var item_data: Dictionary = GameData.get_item(item_id)
+		if not item_data.is_empty():
+			reward_parts.append(item_data.get("name", item_id))
+		else:
+			reward_parts.append(item_id)
+	
+	if reward_parts.size() > 0:
+		reward_label.text = "Reward: " + ", ".join(reward_parts)
+	else:
+		reward_label.text = ""
+
+func _get_selected_quest_data() -> Dictionary:
+	if _current_tab == TabMode.ACTIVE:
+		if _selected_quest_index >= 0 and _selected_quest_index < _active_quests.size():
+			return _active_quests[_selected_quest_index]
+	else:
+		if _selected_quest_index >= 0 and _selected_quest_index < _completed_quest_ids.size():
+			var quest_id: String = _completed_quest_ids[_selected_quest_index]
+			return GameData.get_quest(quest_id)
+	return {}

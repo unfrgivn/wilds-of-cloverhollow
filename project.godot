@@ -35,6 +35,7 @@ SettingsManager="*res://game/autoload/SettingsManager.gd"
 MusicManager="*res://game/autoload/MusicManager.gd"
 SFXManager="*res://game/autoload/SFXManager.gd"
 NotificationManager="*res://game/autoload/NotificationManager.gd"
+TutorialHintsManager="*res://game/autoload/TutorialHintsManager.gd"
 
 [display]
 

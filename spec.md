@@ -332,6 +332,20 @@ This file is the single source of truth. If code changes behavior, update this f
 - Settings persisted to user://settings.json with other settings.
 - Scenario actions: `set_text_size`, `check_text_size`.
 
+### 3.30 Tutorial hints system
+- TutorialHintsManager autoload handles contextual help popups.
+- Hint definitions: id, title, message, priority for each mechanic.
+- Built-in hints: movement, interact, dialogue, battle_start, battle_attack, battle_defend, quest_board, inventory, save_game.
+- Hints show once per game (first-time mechanics), then persist as dismissed.
+- Hint queue: if a hint is showing, additional hints queue and display sequentially.
+- Dismissed hints stored in `user://tutorial_hints.json`.
+- TutorialHintUI (CanvasLayer): animated popup with title, message, dismiss instruction.
+- Hints can be enabled/disabled globally via `hints_enabled`.
+- API: `show_hint(hint_id)`, `dismiss_current_hint()`, `has_seen_hint(hint_id)`, `reset_hint(hint_id)`, `reset_all_hints()`, `set_hints_enabled(enabled)`.
+- Signals: `hint_shown(hint_id)`, `hint_dismissed(hint_id)`.
+- Save/load integration via `get_save_data()`, `load_save_data(data)`.
+- Scenario actions: `show_hint`, `dismiss_hint`, `check_hint`, `reset_hint`, `reset_all_hints`, `set_hints_enabled`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

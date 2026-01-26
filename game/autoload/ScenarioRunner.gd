@@ -663,6 +663,50 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Tutorial hints actions
+    if t == "show_hint":
+        var hint_id: String = str(action.get("hint_id", ""))
+        TutorialHintsManager.show_hint(hint_id)
+        _trace["events"].append({"type": "show_hint", "frame": _frame, "hint_id": hint_id})
+        _action_index += 1
+        return
+
+    if t == "dismiss_hint":
+        TutorialHintsManager.dismiss_current_hint()
+        _trace["events"].append({"type": "dismiss_hint", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "check_hint":
+        var hint_id: String = str(action.get("hint_id", ""))
+        var current_hint: String = TutorialHintsManager.get_current_hint()
+        var has_seen: bool = TutorialHintsManager.has_seen_hint(hint_id)
+        var dismissed_hints: Array = TutorialHintsManager.get_dismissed_hints()
+        _trace["events"].append({"type": "check_hint", "frame": _frame, "hint_id": hint_id, "current_hint": current_hint, "has_seen": has_seen, "dismissed_count": dismissed_hints.size()})
+        print("[Scenario] Hint check: %s, current=%s, seen=%s, dismissed=%d" % [hint_id, current_hint, has_seen, dismissed_hints.size()])
+        _action_index += 1
+        return
+
+    if t == "reset_hint":
+        var hint_id: String = str(action.get("hint_id", ""))
+        TutorialHintsManager.reset_hint(hint_id)
+        _trace["events"].append({"type": "reset_hint", "frame": _frame, "hint_id": hint_id})
+        _action_index += 1
+        return
+
+    if t == "reset_all_hints":
+        TutorialHintsManager.reset_all_hints()
+        _trace["events"].append({"type": "reset_all_hints", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "set_hints_enabled":
+        var enabled: bool = action.get("enabled", true)
+        TutorialHintsManager.set_hints_enabled(enabled)
+        _trace["events"].append({"type": "set_hints_enabled", "frame": _frame, "enabled": enabled})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

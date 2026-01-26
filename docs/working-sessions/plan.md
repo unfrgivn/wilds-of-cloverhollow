@@ -1241,7 +1241,7 @@ Readable text for all users.
 
 ---
 
-## Milestone 101 — Tutorial hints system  **Owner:** Gameplay + UI Systems
+## Milestone 101 — Tutorial hints system  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + UI Systems
 ### Objective
 Contextual help popups.
 

@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://tutorial_hint_ui"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/TutorialHintUI.gd" id="1_script"]
+
+[node name="TutorialHintUI" type="CanvasLayer"]
+layer = 110
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 106.0
+offset_top = 200.0
+offset_right = 406.0
+offset_bottom = 275.0
+modulate = Color(1, 1, 1, 0)
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 10
+text = "Tutorial Hint"
+horizontal_alignment = 1
+
+[node name="MessageLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 8
+text = "This is a helpful hint message."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DismissLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 6
+text = "Press any button to dismiss"
+horizontal_alignment = 1

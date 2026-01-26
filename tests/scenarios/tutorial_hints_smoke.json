@@ -1,0 +1,67 @@
+{
+  "id": "tutorial_hints_smoke",
+  "description": "Test tutorial hints system: show, dismiss, and persistence",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "reset_all_hints", "_comment": "Clear any previously dismissed hints"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "set_hints_enabled", "enabled": true},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "check_hint", "hint_id": "movement", "_comment": "Check movement hint not yet seen"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "show_hint", "hint_id": "movement"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "hint_movement_shown"},
+
+    {"type": "check_hint", "hint_id": "movement", "_comment": "Should show as current hint"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "dismiss_hint"},
+    {"type": "wait_frames", "frames": 15},
+    {"type": "capture", "label": "hint_dismissed"},
+
+    {"type": "check_hint", "hint_id": "movement", "_comment": "Should now be marked as seen"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "show_hint", "hint_id": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "hint_interact_shown"},
+
+    {"type": "dismiss_hint"},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "show_hint", "hint_id": "movement", "_comment": "Try showing dismissed hint - should not appear"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_hint", "hint_id": "movement", "_comment": "Should still be dismissed, not showing"},
+
+    {"type": "reset_hint", "hint_id": "movement"},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "show_hint", "hint_id": "movement", "_comment": "After reset, should show again"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "hint_movement_after_reset"},
+
+    {"type": "dismiss_hint"},
+    {"type": "wait_frames", "frames": 10},
+
+    {"type": "set_hints_enabled", "enabled": false},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "show_hint", "hint_id": "dialogue", "_comment": "Should not show when disabled"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_hint", "hint_id": "dialogue", "_comment": "Should not be current since hints disabled"},
+
+    {"type": "set_hints_enabled", "enabled": true},
+    {"type": "wait_frames", "frames": 5},
+
+    {"type": "check_hint", "hint_id": "movement", "_comment": "Final check - movement should be seen"},
+
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "tutorial_hints_complete"}
+  ]
+}

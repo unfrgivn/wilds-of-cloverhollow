@@ -1123,7 +1123,7 @@ NPC friendship levels.
 
 ---
 
-## Milestone 91 — Menu: Pause menu  **Owner:** UI Systems
+## Milestone 91 — Menu: Pause menu  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 In-game pause functionality.
 

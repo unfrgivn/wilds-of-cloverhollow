@@ -209,6 +209,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - AffinityUI (CanvasLayer): displays NPC list with relationship bars and levels.
 - Scenario actions: `set_affinity`, `change_affinity`, `check_affinity`.
 
+### 3.20 Pause menu
+- PauseManager autoload handles game pause state.
+- Input: "pause" action (Escape key, P key) toggles pause.
+- Pausing sets `get_tree().paused = true` and shows PauseMenuUI.
+- PauseMenuUI (CanvasLayer): modal overlay with Resume, Items, Save, Quit options.
+  - Resume: unpauses game and closes menu.
+  - Items: placeholder for inventory UI (M92).
+  - Save: triggers SaveManager.save_game() with confirmation.
+  - Quit: unpauses and returns to Main.tscn (title screen).
+- Navigation: up/down to select, accept/interact to confirm, cancel/pause to resume.
+- Scenario actions: `pause_game`, `unpause_game`, `toggle_pause`, `check_pause`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

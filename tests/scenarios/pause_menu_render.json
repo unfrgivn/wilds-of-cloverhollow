@@ -1,0 +1,25 @@
+{
+  "scenario_id": "pause_menu_render",
+  "description": "Test pause menu: pause/unpause game, verify menu displays",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_pause"},
+    {"type": "capture", "label": "before_pause"},
+    {"type": "pause_game"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_pause"},
+    {"type": "capture", "label": "pause_menu_open"},
+    {"type": "unpause_game"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_pause"},
+    {"type": "capture", "label": "after_unpause"},
+    {"type": "toggle_pause"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "toggled_pause_on"},
+    {"type": "toggle_pause"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "toggled_pause_off"}
+  ]
+}

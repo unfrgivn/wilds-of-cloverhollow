@@ -18,6 +18,9 @@ var _move_direction: String = ""
 var _trace: Dictionary = {}
 
 func _ready() -> void:
+    # Ensure scenario runner continues to process even when game is paused
+    process_mode = Node.PROCESS_MODE_ALWAYS
+    
     var args := OS.get_cmdline_user_args()
     _parse_args(args)
 
@@ -361,6 +364,29 @@ func _step_actions() -> void:
         var affinity: int = AffinityManager.get_affinity(npc_id)
         var level: String = AffinityManager.get_npc_level(npc_id)
         _trace["events"].append({"type": "check_affinity", "frame": _frame, "npc_id": npc_id, "affinity": affinity, "level": level})
+        _action_index += 1
+        return
+
+    if t == "pause_game":
+        PauseManager.pause_game()
+        _trace["events"].append({"type": "pause_game", "frame": _frame, "is_paused": PauseManager.is_paused()})
+        _action_index += 1
+        return
+
+    if t == "unpause_game":
+        PauseManager.unpause_game()
+        _trace["events"].append({"type": "unpause_game", "frame": _frame, "is_paused": PauseManager.is_paused()})
+        _action_index += 1
+        return
+
+    if t == "toggle_pause":
+        PauseManager.toggle_pause()
+        _trace["events"].append({"type": "toggle_pause", "frame": _frame, "is_paused": PauseManager.is_paused()})
+        _action_index += 1
+        return
+
+    if t == "check_pause":
+        _trace["events"].append({"type": "check_pause", "frame": _frame, "is_paused": PauseManager.is_paused()})
         _action_index += 1
         return
 

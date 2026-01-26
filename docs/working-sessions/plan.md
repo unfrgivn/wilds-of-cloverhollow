@@ -900,7 +900,7 @@ Run away from battle.
 
 ---
 
-## Milestone 73 — Battle: Enemy AI basic  **Owner:** Battle Systems
+## Milestone 73 — Battle: Enemy AI basic  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Enemies make decisions.
 

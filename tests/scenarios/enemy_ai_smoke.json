@@ -1,0 +1,20 @@
+{
+  "scenario_id": "enemy_ai_smoke",
+  "description": "Verifies enemy AI makes decisions - random attacks and skill usage",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "battle_start"},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "player_defended"},
+    {"type": "wait_frames", "frames": 90},
+    {"type": "capture", "label": "enemy_turn_executed"}
+  ]
+}

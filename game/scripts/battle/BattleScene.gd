@@ -347,6 +347,51 @@ func _execute_enemy_turn(enemy) -> void:
 		battle_state.end_current_turn()
 		return
 	
+	# Get enemy's skills from GameData
+	var enemy_data: Dictionary = BattleManager.current_enemy_data
+	var enemy_id: String = enemy_data.get("enemy_id", "slime")
+	var full_data: Dictionary = GameData.get_enemy(enemy_id)
+	var skills: Array = full_data.get("skills", [])
+	
+	# Check if enemy is low on HP (below 30%)
+	var hp_ratio: float = float(enemy.current_hp) / float(enemy.max_hp)
+	var needs_heal: bool = hp_ratio < 0.3
+	
+	# Check for healing skills if low HP
+	if needs_heal:
+		for skill_id in skills:
+			var skill_data: Dictionary = GameData.get_skill(skill_id)
+			if skill_data.get("type", "") == "heal" and enemy.current_mp >= skill_data.get("mp_cost", 0):
+				# Use healing skill
+				var heal_power: int = skill_data.get("power", 10)
+				var healed: int = enemy.heal(heal_power)
+				enemy.current_mp -= skill_data.get("mp_cost", 0)
+				_show_message("%s uses %s! Heals %d HP!" % [enemy.display_name, skill_data.get("name", "Heal"), healed])
+				print("[BattleScene] %s heals for %d (AI: low HP)" % [enemy.display_name, healed])
+				await get_tree().create_timer(0.8).timeout
+				battle_state.end_current_turn()
+				return
+	
+	# Random chance to use a skill (50% if has skills with enough MP)
+	var usable_skills: Array = []
+	for skill_id in skills:
+		var skill_data: Dictionary = GameData.get_skill(skill_id)
+		if skill_data.get("type", "") == "attack" and enemy.current_mp >= skill_data.get("mp_cost", 0):
+			usable_skills.append(skill_data)
+	
+	if not usable_skills.is_empty() and randf() < 0.5:
+		# Use a random skill
+		var chosen_skill: Dictionary = usable_skills[randi() % usable_skills.size()]
+		var skill_power: int = chosen_skill.get("power", 5)
+		var damage: int = target.take_damage(enemy.attack + skill_power - target.defense)
+		enemy.current_mp -= chosen_skill.get("mp_cost", 0)
+		_show_message("%s uses %s on %s for %d damage!" % [enemy.display_name, chosen_skill.get("name", "Attack"), target.display_name, damage])
+		print("[BattleScene] %s uses %s on %s for %d damage (AI: skill)" % [enemy.display_name, chosen_skill.get("name", "Attack"), target.display_name, damage])
+		await get_tree().create_timer(0.8).timeout
+		battle_state.end_current_turn()
+		return
+	
+	# Default: basic attack
 	var damage: int = target.take_damage(enemy.attack)
 	_show_message("%s attacks %s for %d damage!" % [enemy.display_name, target.display_name, damage])
 	print("[BattleScene] %s attacks %s for %d damage" % [enemy.display_name, target.display_name, damage])

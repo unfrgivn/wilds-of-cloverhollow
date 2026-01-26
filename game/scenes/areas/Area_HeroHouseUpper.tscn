@@ -211,6 +211,11 @@ marker_id = "from_ground"
 position = Vector2(256, 180)
 script = ExtResource("4")
 
+[node name="bed" type="Marker2D" parent="Spawns"]
+position = Vector2(150, 120)
+script = ExtResource("4")
+marker_id = "bed"
+
 [node name="StairsTransition" type="Area2D" parent="."]
 position = Vector2(420, 230)
 script = ExtResource("5")

@@ -99,7 +99,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - ItemPickup: collectible that grants tools or items when interacted.
 - All gated interactables show different dialogue depending on whether requirements are met.
 
-### 3.12 Bulletin board and quest system
+### 3.12 Opening cutscene
+- GameIntroController (Main.tscn script) orchestrates game start sequence.
+- Sequence: TitleScreen → IntroNarration → Hero Bedroom (wake up).
+- TitleScreen: Game title with Start button, fade transitions.
+- IntroNarration: 6-line story text crawl with typewriter effect.
+  - Press interact/accept to skip typing or advance.
+  - Fades to black after final line.
+- Player spawns at "bed" marker in Area_HeroHouseUpper.tscn.
+
+### 3.13 Bulletin board and quest system
 - BulletinBoardInteractable: opens QuestUI when interacted.
 - QuestUI (CanvasLayer): displays available quests from the bulletin board.
   - Quest list view: shows quest names, navigate with up/down, select to view details.

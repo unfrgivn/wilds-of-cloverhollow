@@ -951,7 +951,7 @@ Equippable items affecting stats.
 
 ---
 
-## Milestone 77 — Story: Opening cutscene  **Owner:** Story + Art Pipeline
+## Milestone 77 — Story: Opening cutscene  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Art Pipeline
 ### Objective
 Game intro sequence.
 

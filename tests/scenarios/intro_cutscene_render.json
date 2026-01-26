@@ -1,0 +1,25 @@
+{
+  "scenario_id": "intro_cutscene_render",
+  "description": "Verifies opening cutscene: title screen, intro narration, fade to bedroom",
+  "scene": "res://game/scenes/Main.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "title_screen"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 90},
+    {"type": "capture", "label": "intro_narration_line1"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 120},
+    {"type": "capture", "label": "hero_bedroom_wakeup"}
+  ]
+}

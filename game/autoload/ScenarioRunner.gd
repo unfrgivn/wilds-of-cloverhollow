@@ -807,6 +807,52 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Photo mode actions
+    if t == "enter_photo_mode":
+        PhotoModeManager.enter_photo_mode()
+        _trace["events"].append({"type": "enter_photo_mode", "frame": _frame})
+        print("[Scenario] enter_photo_mode")
+        _action_index += 1
+        return
+
+    if t == "exit_photo_mode":
+        PhotoModeManager.exit_photo_mode()
+        _trace["events"].append({"type": "exit_photo_mode", "frame": _frame})
+        print("[Scenario] exit_photo_mode")
+        _action_index += 1
+        return
+
+    if t == "hide_photo_ui":
+        PhotoModeManager.hide_ui()
+        _trace["events"].append({"type": "hide_photo_ui", "frame": _frame})
+        print("[Scenario] hide_photo_ui")
+        _action_index += 1
+        return
+
+    if t == "show_photo_ui":
+        PhotoModeManager.show_ui()
+        _trace["events"].append({"type": "show_photo_ui", "frame": _frame})
+        print("[Scenario] show_photo_ui")
+        _action_index += 1
+        return
+
+    if t == "take_photo":
+        # Note: take_photo is async but we just trigger it and move on
+        PhotoModeManager.take_photo()
+        _trace["events"].append({"type": "take_photo", "frame": _frame})
+        print("[Scenario] take_photo")
+        _action_index += 1
+        return
+
+    if t == "check_photo_mode":
+        var is_active: bool = PhotoModeManager.is_active()
+        var ui_hidden: bool = PhotoModeManager.is_ui_hidden()
+        var photo_count: int = PhotoModeManager.get_photo_count()
+        _trace["events"].append({"type": "check_photo_mode", "frame": _frame, "is_active": is_active, "ui_hidden": ui_hidden, "photo_count": photo_count})
+        print("[Scenario] check_photo_mode: active=%s, ui_hidden=%s, photos=%d" % [is_active, ui_hidden, photo_count])
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

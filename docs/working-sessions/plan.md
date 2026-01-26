@@ -1298,7 +1298,7 @@ Scripted story sequences.
 
 ---
 
-## Milestone 106 — Photo mode stub  **Owner:** UI Systems + Gameplay
+## Milestone 106 — Photo mode stub  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems + Gameplay
 ### Objective
 Screenshot capture feature.
 

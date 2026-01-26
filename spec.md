@@ -384,6 +384,20 @@ This file is the single source of truth. If code changes behavior, update this f
 - Signals: `cutscene_started(cutscene_id)`, `cutscene_step_completed(step_index)`, `cutscene_finished(cutscene_id)`, `cutscene_skipped(cutscene_id)`.
 - Scenario actions: `play_cutscene`, `skip_cutscene`, `check_cutscene`, `wait_cutscene_end`.
 
+### 3.33 Photo mode
+- PhotoModeManager autoload handles screenshot capture feature.
+- Photos saved to `user://photos/` as PNG files with timestamp naming.
+- PhotoModeUI (CanvasLayer): controls overlay for photo mode.
+  - Take Photo button: captures screenshot.
+  - Hide UI button: toggles visibility of all game UI.
+  - Exit button: exits photo mode.
+- Game pauses during photo mode (process_mode = PROCESS_MODE_ALWAYS on PhotoModeUI).
+- Flash effect on photo capture.
+- Photo count display shows total saved photos.
+- Hide UI recursively hides all CanvasLayers with layer >= 10 (preserves game layers).
+- Signals: `photo_mode_entered`, `photo_mode_exited`, `photo_taken(path)`, `ui_hidden`, `ui_shown`.
+- Scenario actions: `enter_photo_mode`, `exit_photo_mode`, `take_photo`, `hide_photo_ui`, `show_photo_ui`, `check_photo_mode`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

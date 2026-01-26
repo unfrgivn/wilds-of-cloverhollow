@@ -1,0 +1,27 @@
+{
+    "id": "photo_mode_smoke",
+    "description": "Test photo mode: enter, take photo, hide UI, exit",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "check_photo_mode"},
+        {"type": "enter_photo_mode"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_photo_mode"},
+        {"type": "capture", "label": "photo_mode_active"},
+        {"type": "take_photo"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "check_photo_mode"},
+        {"type": "hide_photo_ui"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_photo_mode"},
+        {"type": "capture", "label": "photo_mode_ui_hidden"},
+        {"type": "show_photo_ui"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_photo_mode"},
+        {"type": "exit_photo_mode"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_photo_mode"},
+        {"type": "capture", "label": "photo_mode_exited"}
+    ]
+}

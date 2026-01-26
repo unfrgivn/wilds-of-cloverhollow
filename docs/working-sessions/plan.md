@@ -368,7 +368,7 @@ Multiple student NPCs with distinct looks.
 
 ---
 
-## Milestone 28 — Arcade exterior  **Owner:** World Builder + Art Pipeline
+## Milestone 28 — Arcade exterior  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Arcade building facade.
 

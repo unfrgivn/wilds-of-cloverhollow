@@ -551,7 +551,19 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Spawn markers: default, from_park, from_forest.
 - Scenario: `forest_entrance_render` for visual/interaction testing.
 
-### 7.4 Biome factory workflow
+### 7.4 Forest Path (v0 blockout)
+- Winding path through dense forest connecting Forest Entrance to deeper areas.
+- Very dark green forest background with dense tree borders.
+- Winding dirt path layout (not straight, curves around trees).
+- Mushroom props: small (8x8), medium (12x12), large (16x16) red-capped mushrooms.
+- Props: 15+ trees creating dense forest feel, 9 mushrooms of varying sizes.
+- Hidden alcoves: 2 small clearings off the main path for exploration rewards.
+- Interactable alcove spots with discovery dialogue.
+- Transitions: to Forest Entrance (west, "from_entrance" spawn), to Forest Deep (east, "from_path" spawn).
+- Spawn markers: default, from_entrance, from_deep.
+- Scenario: `forest_path_render` for visual/interaction testing.
+
+### 7.5 Biome factory workflow
 - `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
   - Palette stub in `art/palettes/<id>.palette.json`
   - Biome data in `game/data/biomes/<id>.json`

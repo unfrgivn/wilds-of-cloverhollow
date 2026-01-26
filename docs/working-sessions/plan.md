@@ -1338,7 +1338,7 @@ Transition from town to forest.
 
 ---
 
-## Milestone 109 — Forest path area  **Owner:** World Builder + Art Pipeline
+## Milestone 109 — Forest path area  **Status:** ✅ Completed (2026-01-26)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Main forest exploration zone.
 

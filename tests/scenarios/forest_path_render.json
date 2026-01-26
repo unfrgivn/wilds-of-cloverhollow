@@ -1,0 +1,23 @@
+{
+    "id": "forest_path_render",
+    "description": "Render test for forest path area with winding path, mushrooms, and hidden alcoves",
+    "scene": "res://game/scenes/areas/Forest_Path.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_path_entrance"},
+        {"type": "move", "direction": "right", "frames": 60},
+        {"type": "capture", "label": "forest_path_middle"},
+        {"type": "move", "direction": "up", "frames": 30},
+        {"type": "capture", "label": "forest_path_alcove_top"},
+        {"type": "press", "action": "interact"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_path_alcove_dialogue"},
+        {"type": "press", "action": "interact"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "move", "direction": "down", "frames": 30},
+        {"type": "move", "direction": "right", "frames": 90},
+        {"type": "capture", "label": "forest_path_end"},
+        {"type": "move", "direction": "down", "frames": 30},
+        {"type": "capture", "label": "forest_path_alcove_bottom"}
+    ]
+}

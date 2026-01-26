@@ -1,0 +1,303 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
+[ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="3"]
+[ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="4"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="5"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/tree.png" id="6"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/forest/mushroom_small.png" id="7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/forest/mushroom_medium.png" id="8"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/forest/mushroom_large.png" id="9"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="10"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(16, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(32, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(48, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(16, 16)
+
+[node name="Forest_Path" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.08, 0.22, 0.08, 1)
+
+[node name="DenseTreesTop" type="ColorRect" parent="."]
+offset_right = 512.0
+offset_bottom = 50.0
+color = Color(0.05, 0.15, 0.05, 1)
+
+[node name="DenseTreesBottom" type="ColorRect" parent="."]
+offset_top = 238.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.05, 0.15, 0.05, 1)
+
+[node name="DenseTreesLeft" type="ColorRect" parent="."]
+offset_top = 50.0
+offset_right = 30.0
+offset_bottom = 238.0
+color = Color(0.05, 0.15, 0.05, 1)
+
+[node name="DenseTreesRight" type="ColorRect" parent="."]
+offset_left = 482.0
+offset_top = 50.0
+offset_right = 512.0
+offset_bottom = 238.0
+color = Color(0.05, 0.15, 0.05, 1)
+
+[node name="PathMain" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 130.0
+offset_right = 160.0
+offset_bottom = 170.0
+color = Color(0.3, 0.22, 0.12, 1)
+
+[node name="PathCurve1" type="ColorRect" parent="."]
+offset_left = 140.0
+offset_top = 100.0
+offset_right = 180.0
+offset_bottom = 170.0
+color = Color(0.3, 0.22, 0.12, 1)
+
+[node name="PathMiddle" type="ColorRect" parent="."]
+offset_left = 160.0
+offset_top = 100.0
+offset_right = 340.0
+offset_bottom = 140.0
+color = Color(0.3, 0.22, 0.12, 1)
+
+[node name="PathCurve2" type="ColorRect" parent="."]
+offset_left = 320.0
+offset_top = 100.0
+offset_right = 360.0
+offset_bottom = 180.0
+color = Color(0.3, 0.22, 0.12, 1)
+
+[node name="PathEnd" type="ColorRect" parent="."]
+offset_left = 340.0
+offset_top = 140.0
+offset_right = 512.0
+offset_bottom = 180.0
+color = Color(0.3, 0.22, 0.12, 1)
+
+[node name="AlcoveTop" type="ColorRect" parent="."]
+offset_left = 200.0
+offset_top = 55.0
+offset_right = 280.0
+offset_bottom = 100.0
+color = Color(0.15, 0.32, 0.15, 1)
+
+[node name="AlcoveBottom" type="ColorRect" parent="."]
+offset_left = 380.0
+offset_top = 180.0
+offset_right = 450.0
+offset_bottom = 230.0
+color = Color(0.15, 0.32, 0.15, 1)
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(60, 150)
+script = ExtResource("1")
+
+[node name="Sprite" type="Sprite2D" parent="Player"]
+texture = ExtResource("2")
+centered = true
+
+[node name="Collision" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+enabled = true
+position_smoothing_enabled = false
+
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Trees" type="Node2D" parent="."]
+
+[node name="Tree1" type="Sprite2D" parent="Trees"]
+position = Vector2(50, 40)
+texture = ExtResource("6")
+
+[node name="Tree2" type="Sprite2D" parent="Trees"]
+position = Vector2(100, 35)
+texture = ExtResource("6")
+
+[node name="Tree3" type="Sprite2D" parent="Trees"]
+position = Vector2(150, 42)
+texture = ExtResource("6")
+
+[node name="Tree4" type="Sprite2D" parent="Trees"]
+position = Vector2(320, 38)
+texture = ExtResource("6")
+
+[node name="Tree5" type="Sprite2D" parent="Trees"]
+position = Vector2(400, 45)
+texture = ExtResource("6")
+
+[node name="Tree6" type="Sprite2D" parent="Trees"]
+position = Vector2(470, 35)
+texture = ExtResource("6")
+
+[node name="Tree7" type="Sprite2D" parent="Trees"]
+position = Vector2(50, 250)
+texture = ExtResource("6")
+
+[node name="Tree8" type="Sprite2D" parent="Trees"]
+position = Vector2(120, 260)
+texture = ExtResource("6")
+
+[node name="Tree9" type="Sprite2D" parent="Trees"]
+position = Vector2(200, 255)
+texture = ExtResource("6")
+
+[node name="Tree10" type="Sprite2D" parent="Trees"]
+position = Vector2(280, 248)
+texture = ExtResource("6")
+
+[node name="Tree11" type="Sprite2D" parent="Trees"]
+position = Vector2(460, 250)
+texture = ExtResource("6")
+
+[node name="Tree12" type="Sprite2D" parent="Trees"]
+position = Vector2(60, 90)
+texture = ExtResource("6")
+
+[node name="Tree13" type="Sprite2D" parent="Trees"]
+position = Vector2(100, 200)
+texture = ExtResource("6")
+
+[node name="Tree14" type="Sprite2D" parent="Trees"]
+position = Vector2(440, 80)
+texture = ExtResource("6")
+
+[node name="Tree15" type="Sprite2D" parent="Trees"]
+position = Vector2(480, 200)
+texture = ExtResource("6")
+
+[node name="Mushrooms" type="Node2D" parent="."]
+
+[node name="MushroomSmall1" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(85, 120)
+texture = ExtResource("7")
+
+[node name="MushroomSmall2" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(210, 145)
+texture = ExtResource("7")
+
+[node name="MushroomSmall3" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(370, 125)
+texture = ExtResource("7")
+
+[node name="MushroomSmall4" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(420, 195)
+texture = ExtResource("7")
+
+[node name="MushroomMedium1" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(130, 175)
+texture = ExtResource("8")
+
+[node name="MushroomMedium2" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(295, 88)
+texture = ExtResource("8")
+
+[node name="MushroomMedium3" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(400, 215)
+texture = ExtResource("8")
+
+[node name="MushroomLarge1" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(240, 70)
+texture = ExtResource("9")
+
+[node name="MushroomLarge2" type="Sprite2D" parent="Mushrooms"]
+position = Vector2(415, 200)
+texture = ExtResource("9")
+
+[node name="HiddenTreasureSign" type="Area2D" parent="."]
+position = Vector2(240, 75)
+script = ExtResource("10")
+dialogue_text = "✨ You found a hidden alcove! The mushrooms here seem to glow faintly..."
+
+[node name="SignSprite" type="Sprite2D" parent="HiddenTreasureSign"]
+texture = ExtResource("7")
+scale = Vector2(1.5, 1.5)
+
+[node name="SignCollision" type="CollisionShape2D" parent="HiddenTreasureSign"]
+shape = SubResource("RectangleShape2D_4")
+
+[node name="SecretAlcoveSign" type="Area2D" parent="."]
+position = Vector2(415, 205)
+script = ExtResource("10")
+dialogue_text = "🍄 A cluster of giant mushrooms! They look magical. Maybe they're hiding something..."
+
+[node name="SignSprite" type="Sprite2D" parent="SecretAlcoveSign"]
+texture = ExtResource("8")
+scale = Vector2(1.5, 1.5)
+
+[node name="SignCollision" type="CollisionShape2D" parent="SecretAlcoveSign"]
+shape = SubResource("RectangleShape2D_4")
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="default" type="Marker2D" parent="Spawns"]
+position = Vector2(60, 150)
+script = ExtResource("3")
+
+[node name="from_entrance" type="Marker2D" parent="Spawns"]
+position = Vector2(60, 150)
+script = ExtResource("3")
+marker_id = "from_entrance"
+
+[node name="from_deep" type="Marker2D" parent="Spawns"]
+position = Vector2(480, 160)
+script = ExtResource("3")
+marker_id = "from_deep"
+
+[node name="TransitionToEntrance" type="Area2D" parent="."]
+position = Vector2(10, 150)
+script = ExtResource("4")
+target_area = "res://game/scenes/areas/Forest_Entrance.tscn"
+target_spawn_id = "from_forest"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToEntrance"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToEntrance"]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 60.0
+offset_bottom = -10.0
+text = "← Entrance"
+horizontal_alignment = 1
+
+[node name="TransitionToDeep" type="Area2D" parent="."]
+position = Vector2(500, 160)
+script = ExtResource("4")
+target_area = "res://game/scenes/areas/Forest_Deep.tscn"
+target_spawn_id = "from_path"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToDeep"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToDeep"]
+offset_left = -50.0
+offset_top = -30.0
+offset_right = 30.0
+offset_bottom = -10.0
+text = "Deeper →"
+horizontal_alignment = 1
+
+[node name="DialogueUI" parent="." instance=ExtResource("5")]

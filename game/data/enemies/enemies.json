@@ -78,6 +78,20 @@
       "skills": ["dive_peck"],
       "drops": ["black_feather"],
       "flags": ["flying", "can_evade"]
+    },
+    {
+      "id": "muddy_frog",
+      "name": "Muddy Frog",
+      "description": "A swamp dweller that flings mud to slow down foes.",
+      "max_hp": 15,
+      "max_mp": 8,
+      "attack": 4,
+      "defense": 4,
+      "speed": 5,
+      "sprite": "res://game/assets/sprites/enemies/muddy_frog/idle_1.png",
+      "skills": ["mud_splash"],
+      "drops": ["swamp_moss"],
+      "flags": ["status_effect"]
     }
   ]
 }

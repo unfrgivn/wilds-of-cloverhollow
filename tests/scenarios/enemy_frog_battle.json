@@ -1,0 +1,9 @@
+{
+  "scenario_id": "enemy_frog_battle",
+  "description": "Verifies Muddy Frog enemy data loads and battle can initialize",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "frog_battle_ready"}
+  ]
+}

@@ -706,7 +706,7 @@ Flying enemy type.
 
 ---
 
-## Milestone 56 — Enemy: Muddy Frog  **Owner:** Art Pipeline + Battle Systems
+## Milestone 56 — Enemy: Muddy Frog  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Status effect enemy.
 

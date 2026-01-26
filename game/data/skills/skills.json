@@ -40,6 +40,17 @@
       "target": "single_ally",
       "element": "none",
       "effect": "attack_up"
+    },
+    {
+      "id": "mud_splash",
+      "name": "Mud Splash",
+      "description": "Flings sticky mud that slows the target.",
+      "type": "attack",
+      "mp_cost": 4,
+      "power": 5,
+      "target": "single_enemy",
+      "element": "earth",
+      "effect": "slow"
     }
   ]
 }

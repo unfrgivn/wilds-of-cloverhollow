@@ -106,6 +106,25 @@
       "skills": ["mud_splash"],
       "drops": ["swamp_moss"],
       "flags": ["status_effect"]
+    },
+    {
+      "id": "forest_guardian",
+      "name": "Forest Guardian",
+      "description": "An ancient tree spirit protecting the Enchanted Forest. It grows stronger when angered!",
+      "max_hp": 100,
+      "max_mp": 20,
+      "attack": 8,
+      "defense": 5,
+      "speed": 4,
+      "xp": 50,
+      "gold": 30,
+      "sprite": "res://game/assets/sprites/enemies/forest_guardian/idle_1.png",
+      "skills": ["power_strike", "heal_light", "root_slam"],
+      "drops": ["ancient_bark", "forest_gem"],
+      "flags": ["boss", "phase_change"],
+      "phase_threshold": 50,
+      "phase_2_attack_bonus": 3,
+      "phase_2_speed_bonus": 2
     }
   ]
 }

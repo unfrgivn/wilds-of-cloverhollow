@@ -161,6 +161,17 @@
       "element": "none",
       "effect": "accuracy_down",
       "pet_only": true
+    },
+    {
+      "id": "root_slam",
+      "name": "Root Slam",
+      "description": "Massive roots erupt from the ground, hitting all enemies.",
+      "type": "attack",
+      "mp_cost": 6,
+      "power": 10,
+      "target": "all_enemies",
+      "element": "earth",
+      "boss_only": true
     }
   ]
 }

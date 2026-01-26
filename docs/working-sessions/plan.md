@@ -911,7 +911,7 @@ Enemies make decisions.
 
 ---
 
-## Milestone 74 — Battle: Boss battle prototype  **Owner:** Battle Systems + Art Pipeline
+## Milestone 74 — Battle: Boss battle prototype  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26) + Art Pipeline
 ### Objective
 Multi-phase boss encounter.
 

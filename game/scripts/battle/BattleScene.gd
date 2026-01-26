@@ -32,6 +32,10 @@ var victory_screen = null
 ## Game over screen instance
 var game_over_screen = null
 
+## Boss phase tracking
+var boss_phase: int = 1
+var boss_phase_triggered: bool = false
+
 ## UI references
 @onready var enemy_name_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyName
 @onready var enemy_hp_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyHP
@@ -292,6 +296,10 @@ func _execute_attack(attacker, target) -> void:
 	var damage: int = target.take_damage(attacker.attack)
 	_show_message("%s attacks %s for %d damage!" % [attacker.display_name, target.display_name, damage])
 	print("[BattleScene] %s attacks %s for %d damage" % [attacker.display_name, target.display_name, damage])
+	
+	# Check for boss phase change
+	await _check_boss_phase_change(target)
+	
 	await get_tree().create_timer(0.8).timeout
 	battle_state.end_current_turn()
 
@@ -472,3 +480,44 @@ func _show_message(msg: String) -> void:
 	if battle_message:
 		battle_message.text = msg
 	print("[BattleScene] Message: %s" % msg)
+
+## Check if boss should change phase
+func _check_boss_phase_change(target) -> void:
+	if boss_phase_triggered:
+		return
+	
+	# Check if target is a boss enemy
+	var enemy_data: Dictionary = BattleManager.current_enemy_data
+	var enemy_id: String = enemy_data.get("enemy_id", "")
+	var full_data: Dictionary = GameData.get_enemy(enemy_id)
+	var flags: Array = full_data.get("flags", [])
+	
+	if not flags.has("boss") or not flags.has("phase_change"):
+		return
+	
+	# Check HP threshold (default 50%)
+	var threshold: int = full_data.get("phase_threshold", 50)
+	var hp_percent: float = (float(target.current_hp) / float(target.max_hp)) * 100.0
+	
+	if hp_percent <= threshold and boss_phase == 1:
+		boss_phase = 2
+		boss_phase_triggered = true
+		
+		# Apply phase 2 stat bonuses
+		var attack_bonus: int = full_data.get("phase_2_attack_bonus", 2)
+		var speed_bonus: int = full_data.get("phase_2_speed_bonus", 1)
+		target.attack += attack_bonus
+		target.speed += speed_bonus
+		
+		# Show phase change message
+		_show_message("%s enters Phase 2! It's enraged!" % target.display_name)
+		print("[BattleScene] BOSS PHASE 2: %s gains +%d ATK, +%d SPD" % [target.display_name, attack_bonus, speed_bonus])
+		
+		# Boss music trigger stub
+		_trigger_boss_music_phase_2()
+		
+		await get_tree().create_timer(1.0).timeout
+
+## Stub for boss music phase 2 trigger
+func _trigger_boss_music_phase_2() -> void:
+	print("[BattleScene] STUB: Boss music phase 2 would play here")

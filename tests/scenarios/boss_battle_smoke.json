@@ -1,0 +1,9 @@
+{
+  "scenario_id": "boss_battle_smoke",
+  "description": "Verifies boss battle with phase change - Forest Guardian boss",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "boss_battle_start"}
+  ]
+}

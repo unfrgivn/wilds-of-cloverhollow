@@ -49,6 +49,36 @@
       "power": 5,
       "target": "single_ally",
       "price": 15
+    },
+    {
+      "id": "pet_treat",
+      "name": "Pet Treat",
+      "description": "A tasty snack for your pet companion. Boosts morale!",
+      "type": "consumable",
+      "effect": "pet_buff",
+      "power": 10,
+      "target": "pet",
+      "price": 25
+    },
+    {
+      "id": "fancy_collar",
+      "name": "Fancy Collar",
+      "description": "A stylish collar for your pet. Makes them look adorable!",
+      "type": "accessory",
+      "effect": "pet_defense",
+      "power": 2,
+      "target": "pet",
+      "price": 75
+    },
+    {
+      "id": "squeaky_toy",
+      "name": "Squeaky Toy",
+      "description": "A fun toy that keeps your pet entertained.",
+      "type": "accessory",
+      "effect": "pet_happiness",
+      "power": 5,
+      "target": "pet",
+      "price": 40
     }
   ]
 }

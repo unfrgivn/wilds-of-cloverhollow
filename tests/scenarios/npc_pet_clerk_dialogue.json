@@ -1,0 +1,20 @@
+{
+  "scenario_id": "npc_pet_clerk_dialogue",
+  "description": "Test Pet Clerk NPC shop interaction in Pet Shop Interior",
+  "scene": "res://game/scenes/areas/Area_PetShopInterior.tscn",
+  "golden": true,
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "pet_shop_start"},
+    {"type": "move", "direction": "up", "frames": 80},
+    {"type": "capture", "label": "near_clerk"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "shop_ui_open"},
+    {"type": "press", "action": "ui_cancel"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "shop_closed"},
+    {"type": "move", "direction": "down", "frames": 40},
+    {"type": "capture", "label": "after_shopping"}
+  ]
+}

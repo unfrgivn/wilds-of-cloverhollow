@@ -527,7 +527,7 @@ Shop for pet-related items.
 
 ---
 
-## Milestone 41 — Pet Shop NPC: Clerk  **Owner:** Character Systems + Art Pipeline
+## Milestone 41 — Pet Shop NPC: Clerk  **Status:** ✅ Completed (2025-01-25)  **Owner:** Character Systems + Art Pipeline
 ### Objective
 Pet shop attendant.
 

@@ -547,6 +547,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Wooden arch/gate prop (32x48) at the entrance from town side.
 - Warning sign prop (16x16) with interactable dialogue about dangers ahead.
 - Props: 10 trees scattered around edges, wooden arch, warning sign.
+- Enemy: Sneaky Snake (green snake with poison bite attack, 12 HP, visible overworld enemy).
 - Transitions: to Town Park (south, "from_forest" spawn), to Forest Path (east, "from_entrance" spawn).
 - Spawn markers: default, from_park, from_forest.
 - Scenario: `forest_entrance_render` for visual/interaction testing.

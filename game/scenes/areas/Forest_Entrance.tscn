@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/forest/wooden_arch.png" id="7"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/forest/warning_sign.png" id="8"]
 [ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="9"]
+[ext_resource type="Script" path="res://game/scripts/enemies/OverworldEnemy.gd" id="10"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/sneaky_snake/overworld.png" id="11"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -21,6 +23,9 @@ size = Vector2(64, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
 size = Vector2(16, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 12.0
 
 [node name="Forest_Entrance" type="Node2D"]
 
@@ -150,6 +155,20 @@ texture = ExtResource("8")
 
 [node name="SignCollision" type="CollisionShape2D" parent="WarningSign"]
 shape = SubResource("RectangleShape2D_3")
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="SneakySnake1" type="Area2D" parent="Enemies"]
+position = Vector2(180, 150)
+script = ExtResource("10")
+enemy_id = "sneaky_snake"
+enemy_name = "Sneaky Snake"
+
+[node name="Sprite" type="Sprite2D" parent="Enemies/SneakySnake1"]
+texture = ExtResource("11")
+
+[node name="Collision" type="CollisionShape2D" parent="Enemies/SneakySnake1"]
+shape = SubResource("CircleShape2D_2")
 
 [node name="Spawns" type="Node2D" parent="."]
 

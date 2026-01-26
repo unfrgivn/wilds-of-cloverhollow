@@ -1362,7 +1362,7 @@ Forest-themed enemy.
 
 ---
 
-## Milestone 111 — Forest enemies: Sneaky Snake  **Owner:** Art Pipeline + Battle Systems
+## Milestone 111 — Forest enemies: Sneaky Snake  **Status:** ✅ Completed (2026-01-26)  **Owner:** Art Pipeline + Battle Systems
 ### Objective
 Status-inflicting forest enemy.
 

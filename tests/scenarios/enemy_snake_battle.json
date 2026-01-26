@@ -1,0 +1,15 @@
+{
+    "id": "enemy_snake_battle",
+    "description": "Battle test with Sneaky Snake enemy in forest entrance",
+    "scene": "res://game/scenes/areas/Forest_Entrance.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_entrance_with_snake"},
+        {"type": "move", "direction": "up", "frames": 40},
+        {"type": "move", "direction": "left", "frames": 50},
+        {"type": "capture", "label": "approaching_snake"},
+        {"type": "move", "direction": "left", "frames": 30},
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "battle_with_snake"}
+    ]
+}

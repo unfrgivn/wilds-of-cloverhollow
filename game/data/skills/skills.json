@@ -182,6 +182,17 @@
       "power": 7,
       "target": "single_enemy",
       "element": "none"
+    },
+    {
+      "id": "poison_bite",
+      "name": "Poison Bite",
+      "description": "A venomous bite that may poison the target, dealing damage over time.",
+      "type": "attack",
+      "mp_cost": 3,
+      "power": 5,
+      "target": "single_enemy",
+      "element": "poison",
+      "effect": "poison"
     }
   ]
 }

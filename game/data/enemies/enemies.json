@@ -140,6 +140,22 @@
       "sprite": "res://game/assets/sprites/enemies/angry_acorn/idle_1.png",
       "skills": ["roll_attack"],
       "drops": ["acorn"]
+    },
+    {
+      "id": "sneaky_snake",
+      "name": "Sneaky Snake",
+      "description": "A slippery serpent that lurks in the underbrush. Its venomous bite can poison unwary travelers.",
+      "max_hp": 12,
+      "max_mp": 8,
+      "attack": 4,
+      "defense": 2,
+      "speed": 6,
+      "xp": 8,
+      "gold": 5,
+      "sprite": "res://game/assets/sprites/enemies/sneaky_snake/idle_1.png",
+      "skills": ["poison_bite"],
+      "drops": ["snake_scale"],
+      "flags": ["status_effect"]
     }
   ]
 }

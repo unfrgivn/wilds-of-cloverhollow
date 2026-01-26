@@ -1,0 +1,23 @@
+{
+  "scenario_id": "general_store_walkthrough",
+  "description": "Test General Store exterior/interior transitions and props",
+  "golden": true,
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn" },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "town_center_start" },
+    { "type": "move", "direction": "left", "frames": 60 },
+    { "type": "move", "direction": "up", "frames": 40 },
+    { "type": "capture", "label": "near_shop_facade" },
+    { "type": "move", "direction": "up", "frames": 20 },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "inside_general_store" },
+    { "type": "move", "direction": "up", "frames": 30 },
+    { "type": "capture", "label": "store_counter_area" },
+    { "type": "move", "direction": "left", "frames": 40 },
+    { "type": "capture", "label": "store_shelves" },
+    { "type": "move", "direction": "down", "frames": 50 },
+    { "type": "wait_frames", "frames": 30 },
+    { "type": "capture", "label": "back_in_town_center" }
+  ]
+}

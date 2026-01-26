@@ -180,7 +180,8 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Biomes/towns planned: Cloverhollow (main town), Bubblegum Bay, Pinecone Pass, Enchanted Forest, Forest/Clubhouse Woods, and more (8+ total).
 
 ### 7.1 Cloverhollow town (v0 blockout)
-- Town Center (Town Square): central hub connecting to other areas; fountain centerpiece, 4 trees, benches, lamps, sign, enemy spawn. Building facades: General Store, School, Arcade, Library (48x64 sprites). 3 NPC spawn markers for future NPCs. Transitions to Hero House (west), School (east-top), Arcade (east-bottom), Bubblegum Bay (south).
+- Town Center (Town Square): central hub connecting to other areas; fountain centerpiece, 4 trees, benches, lamps, sign, enemy spawn. Building facades: General Store, School, Arcade, Library (48x64 sprites). 3 NPC spawn markers for future NPCs. Transitions to Hero House (west), School (east-top), Arcade (east-bottom), Bubblegum Bay (south), General Store (near shop facade).
+- General Store: Interior shop where player buys items. Counter with cash register, 4 shelves with potions/supplies, display crates with produce. Door transition back to Town Center. Welcome sign with shop dialogue.
 - Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
 - Hero House Interior (Ground Floor): Kitchen area (stove, sink, table with chairs), living room area (couch, rug, bookshelf), door transition back to exterior, stairs transition to upper floor. Mom NPC in kitchen with branching dialogue (3 branches).
 - Hero House Interior (Upper Floor): Bedroom area (bed, desk with lamp, closet), bathroom area (tub, toilet, sink), interactable mirror with placeholder dialogue, stairs transition back to ground floor.

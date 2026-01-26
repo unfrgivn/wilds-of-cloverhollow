@@ -13,6 +13,7 @@ export_presets.cfg
 captures/
 reports/
 *.log
+nanobanana-output/
 
 # Python
 __pycache__/

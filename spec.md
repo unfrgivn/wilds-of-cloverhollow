@@ -54,6 +54,7 @@ This file is the single source of truth. If code changes behavior, update this f
 - Pressing the "interact" action triggers dialogue or other interaction.
 - DialogueManager autoload handles showing/hiding dialogue UI.
 - Player movement is disabled while dialogue is showing.
+- NPCDialogueTree: NPC class that cycles through multiple dialogue branches on each interaction.
 
 ### 3.6 Area transitions
 - SceneRouter autoload manages scene changes and player spawn placement.
@@ -174,7 +175,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 ### 7.1 Cloverhollow town (v0 blockout)
 - Town Center: central hub connecting to other areas; props (benches, lamps), sign, enemy spawn.
 - Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
-- Hero House Interior (Ground Floor): Kitchen area (stove, sink, table with chairs), living room area (couch, rug, bookshelf), door transition back to exterior, stairs transition to upper floor.
+- Hero House Interior (Ground Floor): Kitchen area (stove, sink, table with chairs), living room area (couch, rug, bookshelf), door transition back to exterior, stairs transition to upper floor. Mom NPC in kitchen with branching dialogue (3 branches).
 - Hero House Interior (Upper Floor): Bedroom area (bed, desk with lamp, closet), bathroom area (tub, toilet, sink), interactable mirror with placeholder dialogue, stairs transition back to ground floor.
 - School: Cloverhollow Elementary exterior with benches, sign.
 - Arcade: Pixel Palace Arcade exterior with lamps, sign.

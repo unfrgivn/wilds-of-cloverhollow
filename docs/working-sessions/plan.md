@@ -245,7 +245,7 @@ Hero's bedroom and upstairs area.
 
 ---
 
-## Milestone 18 — Hero's Home NPC: Mom  **Owner:** Character Systems + Art Pipeline
+## Milestone 18 — Hero's Home NPC: Mom  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Mom NPC with dialogue.
 

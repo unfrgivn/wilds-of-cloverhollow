@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -13,6 +13,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/rug.png" id="11"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/bookshelf.png" id="12"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/interior/stairs.png" id="13"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/mom/mom_idle_south.png" id="14"]
+[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="15"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -34,6 +36,9 @@ size = Vector2(32, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6"]
 size = Vector2(16, 32)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_Mom"]
+radius = 16.0
 
 [node name="Area_HeroHouseInterior" type="Node2D"]
 
@@ -108,6 +113,19 @@ texture = ExtResource("7")
 [node name="Chair3" type="Sprite2D" parent="KitchenArea"]
 position = Vector2(-20, 70)
 texture = ExtResource("7")
+
+[node name="Mom" type="Area2D" parent="KitchenArea"]
+position = Vector2(10, 20)
+script = ExtResource("15")
+dialogue_branches = Array[String](["Good morning, sweetie! Did you sleep well? Today is going to be a big day!", "Remember to be careful out there. If you see any strange creatures, come straight home!", "I'm so proud of you. Now go have fun with your friends, but don't forget to do your homework later!"])
+dialogue_text = "Hello, dear!"
+
+[node name="MomSprite" type="Sprite2D" parent="KitchenArea/Mom"]
+texture = ExtResource("14")
+centered = true
+
+[node name="MomCollision" type="CollisionShape2D" parent="KitchenArea/Mom"]
+shape = SubResource("CircleShape2D_Mom")
 
 [node name="LivingRoomArea" type="Node2D" parent="."]
 position = Vector2(150, 140)

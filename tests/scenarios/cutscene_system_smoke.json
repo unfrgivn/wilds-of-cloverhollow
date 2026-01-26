@@ -1,0 +1,23 @@
+{
+    "id": "cutscene_system_smoke",
+    "description": "Test cutscene system: play, check, skip, verify",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "check_cutscene"},
+        {"type": "play_cutscene", "cutscene_id": "test_cutscene", "can_skip": true},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_cutscene"},
+        {"type": "capture", "label": "cutscene_playing"},
+        {"type": "wait_frames", "frames": 60},
+        {"type": "skip_cutscene"},
+        {"type": "wait_frames", "frames": 10},
+        {"type": "check_cutscene"},
+        {"type": "capture", "label": "cutscene_skipped"},
+        {"type": "play_cutscene", "cutscene_id": "test_cutscene", "can_skip": true},
+        {"type": "wait_cutscene_end"},
+        {"type": "check_cutscene"},
+        {"type": "capture", "label": "cutscene_finished"},
+        {"type": "wait_frames", "frames": 10}
+    ]
+}

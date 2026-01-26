@@ -367,6 +367,23 @@ This file is the single source of truth. If code changes behavior, update this f
 - Player.gd already optimized: minimal _physics_process, pixel snapping on integers.
 - Godot 4 built-in culling: 2D sprites auto-culled when outside camera viewport.
 
+### 3.32 Cutscene system
+- CutsceneManager autoload handles playing scripted story sequences.
+- Cutscene data stored in `game/data/cutscenes/cutscenes.json`.
+- Cutscene data format:
+  - Each cutscene has: id, name, steps[], background_color, music.
+  - Step types: text (speaker, text, duration), wait (duration), shake (intensity, duration), flash (color, duration).
+- CutsceneUI (CanvasLayer): visual overlay for cutscene playback.
+  - Text panel with speaker name and dialogue text.
+  - Typewriter effect for text display.
+  - Skip hint shows when skipping is allowed.
+  - Flash and shake visual effects.
+- Skip support: Press cancel action to skip cutscene if can_skip is true.
+- Advance support: Press interact/accept to speed up typewriter or advance step.
+- Game pauses during cutscene playback (process_mode = PROCESS_MODE_ALWAYS on CutsceneUI).
+- Signals: `cutscene_started(cutscene_id)`, `cutscene_step_completed(step_index)`, `cutscene_finished(cutscene_id)`, `cutscene_skipped(cutscene_id)`.
+- Scenario actions: `play_cutscene`, `skip_cutscene`, `check_cutscene`, `wait_cutscene_end`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

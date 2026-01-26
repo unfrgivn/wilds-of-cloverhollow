@@ -1286,7 +1286,7 @@ Future cloud sync preparation.
 
 ---
 
-## Milestone 105 — Cutscene system  **Owner:** Story + Gameplay
+## Milestone 105 — Cutscene system  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Scripted story sequences.
 

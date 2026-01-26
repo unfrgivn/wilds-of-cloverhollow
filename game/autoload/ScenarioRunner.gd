@@ -772,6 +772,41 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Cutscene actions
+    if t == "play_cutscene":
+        var cutscene_id: String = str(action.get("cutscene_id", ""))
+        var can_skip: bool = action.get("can_skip", true)
+        if cutscene_id != "":
+            var success: bool = CutsceneManager.play_cutscene(cutscene_id, can_skip)
+            _trace["events"].append({"type": "play_cutscene", "frame": _frame, "cutscene_id": cutscene_id, "can_skip": can_skip, "success": success})
+            print("[Scenario] play_cutscene: %s, success=%s" % [cutscene_id, success])
+        _action_index += 1
+        return
+
+    if t == "skip_cutscene":
+        CutsceneManager.skip_cutscene()
+        _trace["events"].append({"type": "skip_cutscene", "frame": _frame})
+        print("[Scenario] skip_cutscene")
+        _action_index += 1
+        return
+
+    if t == "check_cutscene":
+        var is_playing: bool = CutsceneManager.is_playing()
+        var current_id: String = CutsceneManager.get_current_cutscene_id()
+        var can_skip: bool = CutsceneManager.can_skip_current()
+        _trace["events"].append({"type": "check_cutscene", "frame": _frame, "is_playing": is_playing, "current_id": current_id, "can_skip": can_skip})
+        print("[Scenario] check_cutscene: playing=%s, id=%s, can_skip=%s" % [is_playing, current_id, can_skip])
+        _action_index += 1
+        return
+
+    if t == "wait_cutscene_end":
+        if CutsceneManager.is_playing():
+            # Stay on this action until cutscene ends
+            return
+        _trace["events"].append({"type": "wait_cutscene_end", "frame": _frame})
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

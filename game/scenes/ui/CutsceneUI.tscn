@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=3 uid="uid://cutscene_ui"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/CutsceneUI.gd" id="1_script"]
+
+[node name="CutsceneUI" type="CanvasLayer"]
+layer = 120
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0, 0, 0, 1)
+
+[node name="TextPanel" type="PanelContainer" parent="."]
+offset_left = 32.0
+offset_top = 180.0
+offset_right = 480.0
+offset_bottom = 270.0
+
+[node name="VBox" type="VBoxContainer" parent="TextPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SpeakerLabel" type="Label" parent="TextPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 10
+text = "Speaker"
+
+[node name="TextLabel" type="Label" parent="TextPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 8
+text = "Dialogue text goes here..."
+autowrap_mode = 2
+
+[node name="SkipLabel" type="Label" parent="."]
+offset_left = 360.0
+offset_top = 10.0
+offset_right = 500.0
+offset_bottom = 24.0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 6
+text = "Press Cancel to skip"
+horizontal_alignment = 2
+
+[node name="FlashOverlay" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(1, 1, 1, 1)

@@ -36,6 +36,7 @@ MusicManager="*res://game/autoload/MusicManager.gd"
 SFXManager="*res://game/autoload/SFXManager.gd"
 NotificationManager="*res://game/autoload/NotificationManager.gd"
 TutorialHintsManager="*res://game/autoload/TutorialHintsManager.gd"
+CutsceneManager="*res://game/autoload/CutsceneManager.gd"
 
 [display]
 

@@ -1,0 +1,120 @@
+{
+    "cutscenes": {
+        "intro_narration": {
+            "id": "intro_narration",
+            "name": "Opening Narration",
+            "steps": [
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "In the peaceful town of Cloverhollow...",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "Where every day was filled with sunshine and laughter...",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "Something strange has begun to stir.",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "Animals acting wild, shadows moving on their own...",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "The townspeople whisper of a mysterious figure in the forest.",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "And so begins your adventure...",
+                    "duration": 3.0
+                }
+            ],
+            "background_color": "#000000",
+            "music": "intro"
+        },
+        "villain_reveal": {
+            "id": "villain_reveal",
+            "name": "The Villain Appears",
+            "steps": [
+                {
+                    "type": "text",
+                    "speaker": "???",
+                    "text": "Ha ha ha! So you're the ones meddling in my plans!",
+                    "duration": 3.0
+                },
+                {
+                    "type": "shake",
+                    "intensity": 5,
+                    "duration": 0.5
+                },
+                {
+                    "type": "text",
+                    "speaker": "???",
+                    "text": "You think you can stop me? The Chaos Lord?",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "Hero",
+                    "text": "We'll do whatever it takes to protect Cloverhollow!",
+                    "duration": 3.0
+                },
+                {
+                    "type": "text",
+                    "speaker": "Chaos Lord",
+                    "text": "Fools! This town will fall into darkness... starting NOW!",
+                    "duration": 3.0
+                },
+                {
+                    "type": "flash",
+                    "color": "#FFFFFF",
+                    "duration": 0.3
+                },
+                {
+                    "type": "text",
+                    "speaker": "",
+                    "text": "The Chaos Lord vanishes in a flash of dark energy...",
+                    "duration": 3.0
+                }
+            ],
+            "background_color": "#1a0a2e",
+            "music": "tension"
+        },
+        "test_cutscene": {
+            "id": "test_cutscene",
+            "name": "Test Cutscene",
+            "steps": [
+                {
+                    "type": "text",
+                    "speaker": "Narrator",
+                    "text": "This is a test cutscene.",
+                    "duration": 2.0
+                },
+                {
+                    "type": "wait",
+                    "duration": 0.5
+                },
+                {
+                    "type": "text",
+                    "speaker": "Test Speaker",
+                    "text": "The cutscene system is working!",
+                    "duration": 2.0
+                }
+            ],
+            "background_color": "#000000",
+            "music": null
+        }
+    }
+}

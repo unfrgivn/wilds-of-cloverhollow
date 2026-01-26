@@ -503,7 +503,7 @@ Administrative building.
 
 ---
 
-## Milestone 39 — Town Hall NPC: Mayor  **Owner:** Character Systems + Art Pipeline
+## Milestone 39 — Town Hall NPC: Mayor  **Status:** ✅ Completed (2026-01-25)  **Owner:** Character Systems + Art Pipeline
 ### Objective
 Mayor character for story quests.
 

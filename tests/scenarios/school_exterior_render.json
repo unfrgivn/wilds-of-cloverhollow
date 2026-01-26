@@ -1,0 +1,22 @@
+{
+  "scenario_id": "school_exterior_render",
+  "description": "Visual regression test for School exterior with playground, flagpole, and bike rack",
+  "golden": true,
+  "actions": [
+    {"type": "load_scene", "scene": "res://game/scenes/areas/Area_School.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "school_initial_view"},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "school_playground_area"},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "school_building_close"},
+    {"type": "move", "direction": "left", "frames": 40},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "school_flagpole_area"},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "school_bike_rack_area"}
+  ]
+}

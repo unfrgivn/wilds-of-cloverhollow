@@ -185,7 +185,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
 - Hero House Interior (Ground Floor): Kitchen area (stove, sink, table with chairs), living room area (couch, rug, bookshelf), door transition back to exterior, stairs transition to upper floor. Mom NPC in kitchen with branching dialogue (3 branches).
 - Hero House Interior (Upper Floor): Bedroom area (bed, desk with lamp, closet), bathroom area (tub, toilet, sink), interactable mirror with placeholder dialogue, stairs transition back to ground floor.
-- School: Cloverhollow Elementary exterior with benches, sign.
+- School: Cloverhollow Elementary exterior with school building (double doors), playground area (swing set, slide), flagpole, bike rack, benches, sign. Teacher NPC with story-gated library access. Transition to Town Center.
 - Arcade: Pixel Palace Arcade exterior with lamps, sign.
 - Props: bench, sign, lamp, tree (16x32), fence, flowers (all 16x16 except tree).
 - Enemy: Grumpy Squirrel (non-scary, green, visible in overworld).

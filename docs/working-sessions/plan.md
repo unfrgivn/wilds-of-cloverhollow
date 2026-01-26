@@ -1548,7 +1548,7 @@ Demo ending with hook.
 
 ---
 
-## Milestone 126 — Full demo playthrough scenario  **Owner:** QA Automation
+## Milestone 126 — Full demo playthrough scenario  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 End-to-end automated playtest.
 

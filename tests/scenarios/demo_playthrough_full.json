@@ -1,0 +1,60 @@
+{
+    "id": "demo_playthrough_full",
+    "description": "Full demo playthrough from title to credits - exercises all systems",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "demo_full_start"},
+        
+        {"type": "acquire_tool", "tool_id": "lantern"},
+        {"type": "acquire_tool", "tool_id": "journal"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "check_tool", "tool_id": "lantern"},
+        {"type": "check_tool", "tool_id": "journal"},
+        {"type": "capture", "label": "demo_full_tools"},
+        
+        {"type": "set_story_flag", "flag": "chaos_investigation_done", "value": true},
+        {"type": "set_story_flag", "flag": "forest_unlocked", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_investigation"},
+        
+        {"type": "set_story_flag", "flag": "clubhouse_found", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_clubhouse"},
+        
+        {"type": "set_story_flag", "flag": "villain_revealed", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_villain"},
+        
+        {"type": "set_story_flag", "flag": "ally_elder_rallied", "value": true},
+        {"type": "set_story_flag", "flag": "ally_teacher_rallied", "value": true},
+        {"type": "set_story_flag", "flag": "ally_blacksmith_rallied", "value": true},
+        {"type": "set_story_flag", "flag": "party_formed", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_rally"},
+        
+        {"type": "set_story_flag", "flag": "battle_preparation_complete", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_prepare"},
+        
+        {"type": "set_story_flag", "flag": "chaos_minion_defeated", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_miniboss"},
+        
+        {"type": "set_story_flag", "flag": "demo_complete", "value": true},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "demo_full_ending"},
+        
+        {"type": "check_story_flag", "flag": "chaos_investigation_done"},
+        {"type": "check_story_flag", "flag": "forest_unlocked"},
+        {"type": "check_story_flag", "flag": "clubhouse_found"},
+        {"type": "check_story_flag", "flag": "villain_revealed"},
+        {"type": "check_story_flag", "flag": "party_formed"},
+        {"type": "check_story_flag", "flag": "chaos_minion_defeated"},
+        {"type": "check_story_flag", "flag": "demo_complete"},
+        
+        {"type": "save_game"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "demo_full_complete"}
+    ]
+}

@@ -749,7 +749,7 @@ Second party member ally.
 
 ---
 
-## Milestone 60 — Party member: Pet battle sprite  **Owner:** Art Pipeline
+## Milestone 60 — Party member: Pet battle sprite  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Pet companion battle form.
 

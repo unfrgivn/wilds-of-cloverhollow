@@ -318,7 +318,7 @@ Cloverhollow School building facade.
 
 ---
 
-## Milestone 24 — School interior: Main Hall  **Owner:** World Builder + Art Pipeline
+## Milestone 24 — School interior: Main Hall  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 School main hallway and lobby.
 

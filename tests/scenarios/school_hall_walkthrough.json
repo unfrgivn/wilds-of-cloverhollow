@@ -1,0 +1,22 @@
+{
+  "scenario_id": "school_hall_walkthrough",
+  "description": "Test walkthrough of School Main Hall with lockers, trophy case, and classroom doors",
+  "golden": true,
+  "actions": [
+    {"type": "load_scene", "scene": "res://game/scenes/areas/Area_SchoolHall.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "hall_initial_view"},
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "hall_lockers_view"},
+    {"type": "move", "direction": "left", "frames": 40},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "hall_trophy_case"},
+    {"type": "move", "direction": "right", "frames": 60},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "hall_principal_office"},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "hall_classroom_doors"}
+  ]
+}

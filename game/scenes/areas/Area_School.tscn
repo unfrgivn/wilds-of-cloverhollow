@@ -180,6 +180,11 @@ position = Vector2(50, 200)
 script = ExtResource("7")
 marker_id = "from_town"
 
+[node name="from_interior" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 150)
+script = ExtResource("7")
+marker_id = "from_interior"
+
 [node name="TransitionToTown" type="Area2D" parent="."]
 position = Vector2(20, 200)
 script = ExtResource("8")
@@ -257,4 +262,13 @@ text = "Library"
 horizontal_alignment = 1
 
 [node name="LibraryCollision" type="CollisionShape2D" parent="LibraryDoor"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TransitionToHall" type="Area2D" parent="."]
+position = Vector2(256, 135)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_SchoolHall.tscn"
+target_spawn_id = "from_exterior"
+
+[node name="TransitionHallShape" type="CollisionShape2D" parent="TransitionToHall"]
 shape = SubResource("RectangleShape2D_3")

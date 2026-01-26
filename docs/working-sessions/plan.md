@@ -739,7 +739,7 @@ First party member ally.
 
 ---
 
-## Milestone 59 — Party member: Friend B battle sprite  **Owner:** Art Pipeline
+## Milestone 59 — Party member: Friend B battle sprite  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Second party member ally.
 

@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="5"]
 [ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="6"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="7"]
-[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="8"]
+[ext_resource type="Script" path="res://game/scripts/interaction/QuestGiverNPC.gd" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/shopkeeper/shopkeeper.png" id="9"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
@@ -213,7 +213,14 @@ horizontal_alignment = 1
 [node name="Baker" type="Area2D" parent="."]
 position = Vector2(350, 75)
 script = ExtResource("8")
-dialogue_branches = Array[String](["Welcome to Cloverhollow Café! I'm the baker here. Everything is made fresh daily!", "Our specialty is the Clover Cream Puff - it's a secret family recipe passed down for generations.", "I'm always experimenting with new recipes. Maybe someday I'll share some with you... if you help me gather the ingredients!", "The kitchen is where the magic happens! Fresh bread, pastries, and the best coffee in town."])
+npc_name = "Baker"
+quest_id = "gather_berries"
+dialogue_offer = "Oh hello there! I'm working on a new recipe, but I'm all out of fresh berries. Could you gather 3 berries from the park and forest for me?"
+dialogue_accepted = "Wonderful! You can find wild berries growing in the Town Park and near the Forest Entrance. Bring me 3!"
+dialogue_in_progress = "Still looking for those berries? Check the Town Park and the Forest Entrance!"
+dialogue_ready_to_complete = "You got all 3 berries! Perfect! Here, take this fresh pastry as a reward!"
+dialogue_completed = "Thank you again for those berries! My new recipe is coming along wonderfully!"
+completion_check_flag = "has_all_berries"
 
 [node name="BakerSprite" type="Sprite2D" parent="Baker"]
 texture = ExtResource("9")

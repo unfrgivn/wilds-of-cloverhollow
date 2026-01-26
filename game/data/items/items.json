@@ -200,6 +200,26 @@
       "power": 0,
       "target": "all_enemies",
       "price": 75
+    },
+    {
+      "id": "pastry",
+      "name": "Fresh Pastry",
+      "description": "A delicious pastry from the café. Restores 15 HP.",
+      "type": "consumable",
+      "effect": "heal_hp",
+      "power": 15,
+      "target": "single_ally",
+      "price": 20
+    },
+    {
+      "id": "berry",
+      "name": "Berry",
+      "description": "A sweet berry. Can be eaten for a small heal or used in cooking.",
+      "type": "consumable",
+      "effect": "heal_hp",
+      "power": 5,
+      "target": "single_ally",
+      "price": 5
     }
   ]
 }

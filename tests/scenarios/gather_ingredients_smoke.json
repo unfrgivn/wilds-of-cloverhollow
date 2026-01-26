@@ -1,0 +1,30 @@
+{
+  "scenario_id": "gather_ingredients_smoke",
+  "description": "Test gather berries quest flow: start, collect 3 berries, complete",
+  "scene": "res://game/scenes/areas/Area_CafeInterior.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "start_quest", "quest_id": "gather_berries"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "gather_berries"},
+    {"type": "capture", "label": "quest_started"},
+    {"type": "set_story_flag", "flag": "berry_1_collected", "value": true},
+    {"type": "add_item", "item_id": "berry", "count": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "set_story_flag", "flag": "berry_2_collected", "value": true},
+    {"type": "add_item", "item_id": "berry", "count": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "set_story_flag", "flag": "berry_3_collected", "value": true},
+    {"type": "add_item", "item_id": "berry", "count": 1},
+    {"type": "set_story_flag", "flag": "has_all_berries", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_objective", "quest_id": "gather_berries", "objective_index": 0},
+    {"type": "check_quest", "quest_id": "gather_berries"},
+    {"type": "capture", "label": "berries_collected"},
+    {"type": "complete_objective", "quest_id": "gather_berries", "objective_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "gather_berries"},
+    {"type": "capture", "label": "quest_completed"}
+  ]
+}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="12"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/shopkeeper/shopkeeper.png" id="13"]
 [ext_resource type="Script" path="res://game/scripts/interaction/LostCatInteractable.gd" id="14"]
+[ext_resource type="Script" path="res://game/scripts/interaction/BerryPickup.gd" id="15"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -302,3 +303,33 @@ modulate = Color(0.8, 0.6, 0.4, 1.0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LostCat"]
 shape = SubResource("RectangleShape2D_1")
+
+[node name="Berry1" type="Area2D" parent="."]
+position = Vector2(165, 95)
+script = ExtResource("15")
+berry_id = 1
+
+[node name="BerrySprite" type="ColorRect" parent="Berry1"]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+color = Color(0.8, 0.2, 0.3, 1)
+
+[node name="BerryCollision" type="CollisionShape2D" parent="Berry1"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="Berry2" type="Area2D" parent="."]
+position = Vector2(355, 88)
+script = ExtResource("15")
+berry_id = 2
+
+[node name="BerrySprite" type="ColorRect" parent="Berry2"]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+color = Color(0.8, 0.2, 0.3, 1)
+
+[node name="BerryCollision" type="CollisionShape2D" parent="Berry2"]
+shape = SubResource("RectangleShape2D_3")

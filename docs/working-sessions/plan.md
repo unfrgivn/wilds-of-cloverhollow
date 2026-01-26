@@ -1035,7 +1035,7 @@ Simple fetch quest.
 
 ---
 
-## Milestone 84 — Quest: Gather ingredients  **Owner:** Story + Gameplay
+## Milestone 84 — Quest: Gather ingredients  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Collection quest.
 

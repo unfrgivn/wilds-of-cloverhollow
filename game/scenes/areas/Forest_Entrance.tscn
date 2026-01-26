@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
 [ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="3"]
 [ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="4"]
 [ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="5"]
+[ext_resource type="Script" path="res://game/scripts/interaction/BerryPickup.gd" id="6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -14,6 +15,9 @@ radius = 24.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
 size = Vector2(32, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(16, 16)
 
 [node name="Forest_Entrance" type="Node2D"]
 
@@ -72,3 +76,18 @@ text = "← To Town"
 horizontal_alignment = 1
 
 [node name="DialogueUI" parent="." instance=ExtResource("5")]
+
+[node name="Berry3" type="Area2D" parent="."]
+position = Vector2(180, 160)
+script = ExtResource("6")
+berry_id = 3
+
+[node name="BerrySprite" type="ColorRect" parent="Berry3"]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+color = Color(0.8, 0.2, 0.3, 1)
+
+[node name="BerryCollision" type="CollisionShape2D" parent="Berry3"]
+shape = SubResource("RectangleShape2D_3")

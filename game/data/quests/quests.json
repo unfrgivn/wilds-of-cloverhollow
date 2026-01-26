@@ -23,6 +23,17 @@
       "objectives": ["Find the cat", "Return to the Mayor"]
     },
     {
+      "id": "gather_berries",
+      "name": "Berry Picking",
+      "description": "The baker needs fresh berries for her famous pie. Collect 3 berries from the Town Park and forest edge.",
+      "type": "collect",
+      "reward_gold": 25,
+      "reward_items": ["pastry"],
+      "required_flag": null,
+      "completion_flag": "berries_gathered",
+      "objectives": ["Collect 3 berries", "Deliver to the Baker"]
+    },
+    {
       "id": "forest_mushrooms",
       "name": "Rare Forest Mushrooms",
       "description": "The Elder needs rare mushrooms from the forest for a special remedy.",

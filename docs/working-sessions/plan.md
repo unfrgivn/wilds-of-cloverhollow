@@ -760,7 +760,7 @@ Pet companion battle form.
 
 ---
 
-## Milestone 61 — Skill: Attack variants  **Owner:** Battle Systems
+## Milestone 61 — Skill: Attack variants  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Multiple attack skill types.
 

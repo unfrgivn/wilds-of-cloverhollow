@@ -51,6 +51,28 @@
       "target": "single_enemy",
       "element": "earth",
       "effect": "slow"
+    },
+    {
+      "id": "quick_attack",
+      "name": "Quick Attack",
+      "description": "A swift strike that hits before the enemy can react.",
+      "type": "attack",
+      "mp_cost": 2,
+      "power": 4,
+      "target": "single_enemy",
+      "element": "none",
+      "priority": "high"
+    },
+    {
+      "id": "power_strike",
+      "name": "Power Strike",
+      "description": "A heavy blow that deals massive damage.",
+      "type": "attack",
+      "mp_cost": 4,
+      "power": 12,
+      "target": "single_enemy",
+      "element": "none",
+      "priority": "low"
     }
   ]
 }

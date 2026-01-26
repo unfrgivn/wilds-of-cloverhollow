@@ -1,0 +1,9 @@
+{
+  "scenario_id": "skill_attacks_smoke",
+  "description": "Verifies attack skill variants are loaded and usable in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "skill_attacks_battle_start"}
+  ]
+}

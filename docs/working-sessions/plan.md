@@ -1059,7 +1059,7 @@ Combat-focused quest.
 
 ---
 
-## Milestone 86 — Quest: Library research  **Owner:** Story + Gameplay
+## Milestone 86 — Quest: Library research  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Investigation quest.
 

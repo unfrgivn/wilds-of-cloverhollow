@@ -1,0 +1,25 @@
+{
+  "scenario_id": "library_research_smoke",
+  "description": "Test library research quest: start via Mayor, find book, learn lore, complete",
+  "scene": "res://game/scenes/areas/Area_TownHallInterior.tscn",
+  "spawn_marker": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "set_story_flag", "flag": "mayors_cat_found", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "start_quest", "quest_id": "library_research"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "library_research"},
+    {"type": "capture", "label": "quest_started"},
+    {"type": "set_story_flag", "flag": "found_town_records", "value": true},
+    {"type": "set_story_flag", "flag": "learned_villain_lore", "value": true},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "complete_objective", "quest_id": "library_research", "objective_index": 0},
+    {"type": "complete_objective", "quest_id": "library_research", "objective_index": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_quest", "quest_id": "library_research"},
+    {"type": "check_story_flag", "flag": "learned_villain_lore"},
+    {"type": "check_story_flag", "flag": "library_research_done"},
+    {"type": "capture", "label": "quest_completed"}
+  ]
+}

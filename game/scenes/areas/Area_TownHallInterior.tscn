@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://game/scripts/interaction/QuestGiverNPC.gd" id="8"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/mayor/mayor_idle_south.png" id="9"]
 [ext_resource type="Script" path="res://game/scripts/interaction/BulletinBoardInteractable.gd" id="10"]
+[ext_resource type="Script" path="res://game/scripts/interaction/StoryGatedQuestGiver.gd" id="11"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -25,6 +26,9 @@ size = Vector2(16, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
 size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(20, 20)
 
 [node name="Area_TownHallInterior" type="Node2D"]
 
@@ -255,6 +259,21 @@ texture = ExtResource("9")
 
 [node name="MayorCollision" type="CollisionShape2D" parent="Mayor"]
 shape = SubResource("RectangleShape2D_4")
+
+[node name="ResearchQuestMayor" type="Area2D" parent="."]
+position = Vector2(290, 75)
+script = ExtResource("11")
+required_flag = "mayors_cat_found"
+quest_id = "library_research"
+dialogue_offer = "Now that Whiskers is safe, I need your help with something important. Strange things have been happening in Cloverhollow... I need you to research our town's history at the library. There may be answers in the old records."
+dialogue_accepted = "Thank you! The library has ancient town records. Look for anything about strange happenings in Cloverhollow's past."
+dialogue_in_progress = "Have you found anything in the library records yet? Look for the oldest books about Cloverhollow's history."
+dialogue_ready_to_complete = "So you've discovered the truth about Malachar! This is grave news indeed. Thank you for this crucial information."
+dialogue_completed = "The knowledge you've uncovered will help us prepare for what's to come. You've done Cloverhollow a great service."
+completion_check_flag = "learned_villain_lore"
+
+[node name="ResearchMayorCollision" type="CollisionShape2D" parent="ResearchQuestMayor"]
+shape = SubResource("RectangleShape2D_5")
 
 [node name="Player" type="CharacterBody2D" parent="."]
 position = Vector2(256, 240)

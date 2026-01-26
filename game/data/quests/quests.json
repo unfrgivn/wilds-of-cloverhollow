@@ -45,6 +45,17 @@
       "objectives": ["Defeat 3 mice in the basement", "Report back to the Shopkeeper"]
     },
     {
+      "id": "library_research",
+      "name": "Library Research",
+      "description": "The Mayor needs old town records from the library. Find information about the strange happenings in Cloverhollow's past.",
+      "type": "investigation",
+      "reward_gold": 60,
+      "reward_items": [],
+      "required_flag": "mayors_cat_found",
+      "completion_flag": "library_research_done",
+      "objectives": ["Find the old town records in the library", "Learn about the villain's history"]
+    },
+    {
       "id": "forest_mushrooms",
       "name": "Rare Forest Mushrooms",
       "description": "The Elder needs rare mushrooms from the forest for a special remedy.",

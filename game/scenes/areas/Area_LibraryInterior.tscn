@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="6"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/sign.png" id="7"]
 [ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="8"]
+[ext_resource type="Script" path="res://game/scripts/interaction/ResearchBook.gd" id="10"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/shopkeeper/shopkeeper.png" id="9"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
@@ -351,3 +352,26 @@ offset_right = 30.0
 offset_bottom = 10.0
 text = "Exit"
 horizontal_alignment = 1
+
+[node name="AncientRecords" type="Area2D" parent="."]
+position = Vector2(85, 110)
+script = ExtResource("10")
+book_title = "Ancient Town Records"
+quest_id = "library_research"
+
+[node name="BookSprite" type="ColorRect" parent="AncientRecords"]
+offset_left = -6.0
+offset_top = -4.0
+offset_right = 6.0
+offset_bottom = 4.0
+color = Color(0.5, 0.3, 0.15, 1)
+
+[node name="BookGlow" type="ColorRect" parent="AncientRecords"]
+offset_left = -8.0
+offset_top = -6.0
+offset_right = 8.0
+offset_bottom = 6.0
+color = Color(0.8, 0.7, 0.3, 0.3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AncientRecords"]
+shape = SubResource("RectangleShape2D_3")

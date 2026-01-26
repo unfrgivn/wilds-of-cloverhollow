@@ -1705,7 +1705,7 @@ Magical forest biome setup.
 
 ---
 
-## Milestone 139 — CI: GitHub Actions workflow  **Owner:** QA Automation
+## Milestone 139 — CI: GitHub Actions workflow  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Automated CI on push.
 

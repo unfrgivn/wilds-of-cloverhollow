@@ -2,7 +2,13 @@ name: ci
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
+
+env:
+  GODOT_VERSION: "4.4"
+  GODOT_RELEASE: "stable"
 
 jobs:
   test:
@@ -10,7 +16,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # TODO: install Godot 4.5 CLI (pin version) and cache it.
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/godot
+            /usr/local/bin/godot
+          key: godot-${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}-linux
+
+      - name: Install Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}/Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_linux.x86_64.zip
+          unzip -q Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_linux.x86_64.zip
+          sudo mv Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      - name: Verify Godot installation
+        run: godot --version
+
+      - name: Import project
+        run: |
+          # Run Godot once to import project resources
+          timeout 30 godot --headless --import || true
 
       - name: Run spec check
         run: ./tools/ci/run-spec-check.sh

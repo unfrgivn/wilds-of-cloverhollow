@@ -380,7 +380,7 @@ Arcade building facade.
 
 ---
 
-## Milestone 29 — Arcade interior  **Owner:** World Builder + Art Pipeline
+## Milestone 29 — Arcade interior  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 Interior with arcade machines.
 

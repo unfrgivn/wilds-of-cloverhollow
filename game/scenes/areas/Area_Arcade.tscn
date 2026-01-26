@@ -145,6 +145,11 @@ position = Vector2(50, 220)
 script = ExtResource("7")
 marker_id = "from_town"
 
+[node name="from_interior" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 175)
+script = ExtResource("7")
+marker_id = "from_interior"
+
 [node name="TransitionToTown" type="Area2D" parent="."]
 position = Vector2(20, 220)
 script = ExtResource("8")
@@ -160,4 +165,21 @@ offset_top = -30.0
 offset_right = 40.0
 offset_bottom = -10.0
 text = "← To Town"
+horizontal_alignment = 1
+
+[node name="TransitionToInterior" type="Area2D" parent="."]
+position = Vector2(256, 155)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_ArcadeInterior.tscn"
+target_spawn_id = "from_exterior"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToInterior"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToInterior"]
+offset_left = -30.0
+offset_top = -20.0
+offset_right = 30.0
+offset_bottom = 0.0
+text = "Enter"
 horizontal_alignment = 1

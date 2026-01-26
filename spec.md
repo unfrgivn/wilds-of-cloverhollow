@@ -137,6 +137,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - Lamps turn on at evening and night (phases 2 and 3).
 - lamp_on.png and lamp_off.png sprite variants in props/lamp/.
 
+### 3.16 NPC schedule system
+- ScheduledNPC script (CharacterBody2D) manages time-based NPC visibility.
+- NPCs appear/disappear based on current time phase and area.
+- Schedule data stored in `game/data/npcs/schedules.json`:
+  - Each entry keyed by npc_id contains: npc_id, npc_name, locations (dict by phase), default_area, default_position.
+  - Location entries specify: area (scene path), position [x, y], marker (spawn marker id).
+- GameData autoload loads schedules via `get_npc_schedules()` and `get_npc_schedule(npc_id)`.
+- ScheduledNPC connects to DayNightManager.time_changed signal.
+- On time change, NPC shows if current scene matches scheduled area for that phase, hides otherwise.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.
@@ -183,6 +193,7 @@ All game content is data-driven via JSON files under `game/data/`:
 - `biomes/<biome>.json`: Biome metadata (id, name, palette_path).
 - `encounters/<biome>.json`: Encounter tables for each biome.
 - `quests/quests.json`: Quest definitions with id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
+- `npcs/schedules.json`: NPC schedule definitions with npc_id, npc_name, locations (dict by phase), default_area, default_position.
 
 GameData autoload loads and caches all data on startup. Adding new content requires only JSON + sprite assets (no code changes).
 

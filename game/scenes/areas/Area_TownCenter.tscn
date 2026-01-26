@@ -27,6 +27,8 @@
 [ext_resource type="Script" path="res://game/scripts/props/Lamp.gd" id="25"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/lamp/lamp_on.png" id="26"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/lamp/lamp_off.png" id="27"]
+[ext_resource type="Script" path="res://game/scripts/characters/ScheduledNPC.gd" id="28"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/elder/elder_idle_south.png" id="29"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -509,3 +511,17 @@ offset_right = 25.0
 offset_bottom = 5.0
 text = "Clinic"
 horizontal_alignment = 1
+
+[node name="ScheduledNPCs" type="Node2D" parent="."]
+
+[node name="ElderNPC" type="CharacterBody2D" parent="ScheduledNPCs"]
+position = Vector2(256, 160)
+script = ExtResource("28")
+npc_id = "elder"
+npc_name = "Elder Willowbrook"
+
+[node name="Sprite" type="Sprite2D" parent="ScheduledNPCs/ElderNPC"]
+texture = ExtResource("29")
+
+[node name="Collision" type="CollisionShape2D" parent="ScheduledNPCs/ElderNPC"]
+shape = SubResource("RectangleShape2D_1")

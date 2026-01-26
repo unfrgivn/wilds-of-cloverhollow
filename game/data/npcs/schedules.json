@@ -1,0 +1,28 @@
+{
+  "schedules": {
+    "elder": {
+      "npc_id": "elder",
+      "npc_name": "Elder Willowbrook",
+      "locations": {
+        "0": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [200, 180], "marker": "bench_1" },
+        "1": { "area": "res://game/scenes/areas/Area_TownCenter.tscn", "position": [256, 160], "marker": "fountain" },
+        "2": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [200, 180], "marker": "bench_1" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "default_area": "res://game/scenes/areas/Area_TownPark.tscn",
+      "default_position": [200, 180]
+    },
+    "shopkeeper": {
+      "npc_id": "shopkeeper",
+      "npc_name": "Shopkeeper",
+      "locations": {
+        "0": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
+        "1": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
+        "2": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "default_area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn",
+      "default_position": [256, 100]
+    }
+  }
+}

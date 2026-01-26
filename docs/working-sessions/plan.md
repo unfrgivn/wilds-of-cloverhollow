@@ -634,7 +634,7 @@ Lights turn on at night.
 
 ---
 
-## Milestone 50 — Town NPC schedule system  **Owner:** Character Systems + Gameplay
+## Milestone 50 — Town NPC schedule system  **Owner:** Character Systems + Gameplay  **Status:** ✅ Completed (2026-01-25)
 ### Objective
 NPCs move between locations by time.
 

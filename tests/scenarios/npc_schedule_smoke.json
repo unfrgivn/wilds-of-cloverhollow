@@ -1,0 +1,20 @@
+{
+  "scenario_id": "npc_schedule_smoke",
+  "description": "Verifies NPC schedule system shows/hides NPCs based on time of day",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/areas/Area_TownCenter.tscn"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "set_time_phase", "phase": 0},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "town_center_morning_no_elder"},
+    {"type": "set_time_phase", "phase": 1},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "town_center_afternoon_elder_visible"},
+    {"type": "set_time_phase", "phase": 2},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "town_center_evening_no_elder"},
+    {"type": "set_time_phase", "phase": 3},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "town_center_night_no_elder"}
+  ]
+}

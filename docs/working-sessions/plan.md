@@ -876,7 +876,7 @@ Post-battle rewards UI.
 
 ---
 
-## Milestone 71 — Battle: Defeat/Game Over  **Owner:** UI Systems + Battle Systems
+## Milestone 71 — Battle: Defeat/Game Over  **Owner:** UI Systems + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Game over handling.
 

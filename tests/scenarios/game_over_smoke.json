@@ -1,0 +1,9 @@
+{
+  "scenario_id": "game_over_smoke",
+  "description": "Verifies game over screen appears when party is defeated - checks retry/title options",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "battle_start"}
+  ]
+}

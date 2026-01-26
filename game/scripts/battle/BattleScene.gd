@@ -4,6 +4,7 @@ extends Node2D
 const CombatantScript := preload("res://game/scripts/battle/Combatant.gd")
 const BattleStateScript := preload("res://game/scripts/battle/BattleState.gd")
 const VictoryScreenScene := preload("res://game/scenes/battle/VictoryScreen.tscn")
+const GameOverScreenScene := preload("res://game/scenes/battle/GameOverScreen.tscn")
 
 ## Phase constants (mirror BattleState.Phase enum)
 const PHASE_STARTING := 0
@@ -27,6 +28,9 @@ var pending_action: String = ""
 
 ## Victory screen instance
 var victory_screen = null
+
+## Game over screen instance
+var game_over_screen = null
 
 ## UI references
 @onready var enemy_name_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyName
@@ -167,8 +171,14 @@ func _on_battle_won() -> void:
 func _on_battle_lost() -> void:
 	print("[BattleScene] Defeat...")
 	_show_message("Defeat...")
-	await get_tree().create_timer(1.0).timeout
-	BattleManager.end_battle("defeat")
+	await get_tree().create_timer(0.5).timeout
+	
+	# Show game over screen
+	game_over_screen = GameOverScreenScene.instantiate()
+	add_child(game_over_screen)
+	game_over_screen.retry_pressed.connect(_on_game_over_retry)
+	game_over_screen.return_to_title_pressed.connect(_on_game_over_title)
+	game_over_screen.show_game_over()
 
 func _on_victory_continue() -> void:
 	# Clean up victory screen and return to overworld
@@ -176,6 +186,25 @@ func _on_victory_continue() -> void:
 		victory_screen.queue_free()
 		victory_screen = null
 	BattleManager.end_battle("victory")
+
+func _on_game_over_retry() -> void:
+	# Clean up game over screen and restart battle
+	if game_over_screen:
+		game_over_screen.queue_free()
+		game_over_screen = null
+	# Reload battle with same enemy data
+	BattleManager.start_battle(BattleManager.current_enemy_data)
+
+func _on_game_over_title() -> void:
+	# Clean up game over screen and return to title
+	if game_over_screen:
+		game_over_screen.queue_free()
+		game_over_screen = null
+	# Load saved game or title screen
+	if SaveManager.has_save():
+		SaveManager.load_game()
+	else:
+		BattleManager.end_battle("defeat")
 
 func _input(event: InputEvent) -> void:
 	if battle_state == null:

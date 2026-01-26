@@ -4,6 +4,9 @@ extends Node
 ## Party member runtime data: {member_id: {level, xp, ...}}
 var party_state: Dictionary = {}
 
+## Equipment state: {member_id: {weapon: "", armor: "", accessory: ""}}
+var equipment_state: Dictionary = {}
+
 ## Cached data from GameData
 var level_thresholds: Array = []
 var stat_growth: Dictionary = {}
@@ -29,6 +32,12 @@ func _load_party_data() -> void:
 			"attack": member.get("attack", 5),
 			"defense": member.get("defense", 3),
 			"speed": member.get("speed", 5)
+		}
+		# Initialize equipment slots
+		equipment_state[member_id] = {
+			"weapon": "",
+			"armor": "",
+			"accessory": ""
 		}
 
 ## Award XP to all party members (called after battle victory)
@@ -85,3 +94,64 @@ func get_all_state() -> Dictionary:
 func load_state(state: Dictionary) -> void:
 	party_state = state.duplicate(true)
 	print("[PartyManager] State loaded for %d members" % party_state.size())
+
+## Equip an item to a party member
+func equip_item(member_id: String, equip_id: String) -> bool:
+	if not equipment_state.has(member_id):
+		push_warning("[PartyManager] Member not found: %s" % member_id)
+		return false
+	
+	var equip_data: Dictionary = GameData.get_equipment(equip_id)
+	if equip_data.is_empty():
+		return false
+	
+	var slot: String = equip_data.get("slot", "")
+	if slot not in ["weapon", "armor", "accessory"]:
+		push_warning("[PartyManager] Invalid equipment slot: %s" % slot)
+		return false
+	
+	# Unequip existing item in that slot first
+	unequip_slot(member_id, slot)
+	
+	# Equip new item
+	equipment_state[member_id][slot] = equip_id
+	print("[PartyManager] %s equipped %s in %s slot" % [member_id, equip_id, slot])
+	return true
+
+## Unequip item from a specific slot
+func unequip_slot(member_id: String, slot: String) -> String:
+	if not equipment_state.has(member_id):
+		return ""
+	var current_equip: String = equipment_state[member_id].get(slot, "")
+	if current_equip != "":
+		equipment_state[member_id][slot] = ""
+		print("[PartyManager] %s unequipped %s from %s slot" % [member_id, current_equip, slot])
+	return current_equip
+
+## Get equipment for a member
+func get_equipment(member_id: String) -> Dictionary:
+	return equipment_state.get(member_id, {"weapon": "", "armor": "", "accessory": ""})
+
+## Get total stat with equipment bonuses
+func get_stat_with_equipment(member_id: String, stat: String) -> int:
+	var member: Dictionary = party_state.get(member_id, {})
+	var base_stat: int = member.get(stat, 0)
+	var bonus: int = 0
+	
+	var equip: Dictionary = equipment_state.get(member_id, {})
+	for slot in ["weapon", "armor", "accessory"]:
+		var equip_id: String = equip.get(slot, "")
+		if equip_id != "":
+			var equip_data: Dictionary = GameData.get_equipment(equip_id)
+			bonus += equip_data.get(stat + "_bonus", 0)
+	
+	return base_stat + bonus
+
+## Get all equipment state for saving
+func get_equipment_state() -> Dictionary:
+	return equipment_state.duplicate(true)
+
+## Restore equipment state from save
+func load_equipment_state(state: Dictionary) -> void:
+	equipment_state = state.duplicate(true)
+	print("[PartyManager] Equipment state loaded")

@@ -1,0 +1,21 @@
+{
+  "scenario_id": "equipment_smoke",
+  "description": "Verifies equipment can be equipped/unequipped and stat bonuses apply correctly",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_equipment", "member_id": "fae"},
+    {"type": "equip_item", "member_id": "fae", "equip_id": "wooden_sword"},
+    {"type": "check_equipment", "member_id": "fae"},
+    {"type": "equip_item", "member_id": "fae", "equip_id": "leather_armor"},
+    {"type": "check_equipment", "member_id": "fae"},
+    {"type": "equip_item", "member_id": "fae", "equip_id": "lucky_charm"},
+    {"type": "check_equipment", "member_id": "fae"},
+    {"type": "equip_item", "member_id": "sue", "equip_id": "iron_sword"},
+    {"type": "equip_item", "member_id": "sue", "equip_id": "iron_armor"},
+    {"type": "equip_item", "member_id": "sue", "equip_id": "power_ring"},
+    {"type": "check_equipment", "member_id": "sue"},
+    {"type": "unequip_slot", "member_id": "fae", "slot": "weapon"},
+    {"type": "check_equipment", "member_id": "fae"},
+    {"type": "wait_frames", "frames": 10}
+  ]
+}

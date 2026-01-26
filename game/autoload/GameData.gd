@@ -10,6 +10,7 @@ const BIOMES_DIR := "res://game/data/biomes/"
 const ENCOUNTERS_DIR := "res://game/data/encounters/"
 const QUESTS_PATH := "res://game/data/quests/quests.json"
 const NPC_SCHEDULES_PATH := "res://game/data/npcs/schedules.json"
+const EQUIPMENT_PATH := "res://game/data/equipment/equipment.json"
 
 ## Cached data (dictionaries keyed by id)
 var enemies: Dictionary = {}
@@ -20,6 +21,7 @@ var biomes: Dictionary = {}
 var encounters: Dictionary = {}
 var quests: Dictionary = {}
 var npc_schedules: Dictionary = {}
+var equipment: Dictionary = {}
 
 ## Raw party data
 var party_data: Dictionary = {}
@@ -36,8 +38,9 @@ func _load_all_data() -> void:
 	_load_encounters()
 	_load_quests()
 	_load_npc_schedules()
-	print("[GameData] All data loaded: %d enemies, %d skills, %d items, %d party members, %d quests, %d npc_schedules" % [
-		enemies.size(), skills.size(), items.size(), party_members.size(), quests.size(), npc_schedules.size()
+	_load_equipment()
+	print("[GameData] All data loaded: %d enemies, %d skills, %d items, %d party members, %d quests, %d npc_schedules, %d equipment" % [
+		enemies.size(), skills.size(), items.size(), party_members.size(), quests.size(), npc_schedules.size(), equipment.size()
 	])
 
 func _load_enemies() -> void:
@@ -107,6 +110,13 @@ func _load_npc_schedules() -> void:
 	var data := _load_json(NPC_SCHEDULES_PATH)
 	if data.has("schedules"):
 		npc_schedules = data["schedules"]
+
+func _load_equipment() -> void:
+	var data := _load_json(EQUIPMENT_PATH)
+	if data.has("equipment"):
+		for equip in data["equipment"]:
+			if equip.has("id"):
+				equipment[equip["id"]] = equip
 
 func _load_json(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
@@ -210,3 +220,14 @@ func get_npc_schedule(npc_id_param: String) -> Dictionary:
 	if npc_schedules.has(npc_id_param):
 		return npc_schedules[npc_id_param]
 	return {}
+
+## Get equipment data by id
+func get_equipment(equip_id: String) -> Dictionary:
+	if equipment.has(equip_id):
+		return equipment[equip_id]
+	push_warning("[GameData] Equipment not found: %s" % equip_id)
+	return {}
+
+## Get all equipment
+func get_all_equipment() -> Array:
+	return equipment.values()

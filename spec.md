@@ -194,6 +194,7 @@ All game content is data-driven via JSON files under `game/data/`:
 - `encounters/<biome>.json`: Encounter tables for each biome.
 - `quests/quests.json`: Quest definitions with id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
 - `npcs/schedules.json`: NPC schedule definitions with npc_id, npc_name, locations (dict by phase), default_area, default_position.
+- `equipment/equipment.json`: Equipment definitions with id, name, slot (weapon/armor/accessory), attack_bonus, defense_bonus, speed_bonus, price.
 
 GameData autoload loads and caches all data on startup. Adding new content requires only JSON + sprite assets (no code changes).
 
@@ -202,7 +203,18 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Required fields per schema
 - Reference integrity (skill/item IDs referenced must exist)
 
-### 5.5 Scenario action: load_scene
+### 5.5 Equipment system
+- PartyManager autoload tracks equipment state per party member.
+- 3 equipment slots: weapon, armor, accessory.
+- Equipment data stored in `game/data/equipment/equipment.json`.
+- `equip_item(member_id, equip_id)`: Equips item to correct slot.
+- `unequip_slot(member_id, slot)`: Removes item from slot.
+- `get_stat_with_equipment(member_id, stat)`: Returns base stat + equipment bonuses.
+- Equipment bonuses: attack_bonus, defense_bonus, speed_bonus.
+- EquipmentUI scene allows viewing/changing equipment (stub UI).
+- Scenario actions: `equip_item`, `unequip_slot`, `check_equipment`.
+
+### 5.6 Scenario action: load_scene
 - `load_scene`: Load a scene directly by path (for testing battles without overworld trigger).
 
 ## 6. Art direction and determinism

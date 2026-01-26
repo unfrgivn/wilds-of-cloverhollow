@@ -935,7 +935,7 @@ Character progression.
 
 ---
 
-## Milestone 76 — Equipment system stub  **Owner:** Gameplay + Data Systems
+## Milestone 76 — Equipment system stub  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + Data Systems
 ### Objective
 Equippable items affecting stats.
 

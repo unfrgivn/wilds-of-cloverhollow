@@ -236,6 +236,44 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "equip_item":
+        var member_id := str(action.get("member_id", ""))
+        var equip_id := str(action.get("equip_id", ""))
+        if member_id != "" and equip_id != "":
+            var success: bool = PartyManager.equip_item(member_id, equip_id)
+            _trace["events"].append({"type": "equip_item", "frame": _frame, "member_id": member_id, "equip_id": equip_id, "success": success})
+        _action_index += 1
+        return
+
+    if t == "unequip_slot":
+        var member_id := str(action.get("member_id", ""))
+        var slot := str(action.get("slot", ""))
+        if member_id != "" and slot != "":
+            var removed: String = PartyManager.unequip_slot(member_id, slot)
+            _trace["events"].append({"type": "unequip_slot", "frame": _frame, "member_id": member_id, "slot": slot, "removed": removed})
+        _action_index += 1
+        return
+
+    if t == "check_equipment":
+        var member_id := str(action.get("member_id", ""))
+        var equipment: Dictionary = PartyManager.get_equipment(member_id)
+        var attack_with_equip: int = PartyManager.get_stat_with_equipment(member_id, "attack")
+        var defense_with_equip: int = PartyManager.get_stat_with_equipment(member_id, "defense")
+        var speed_with_equip: int = PartyManager.get_stat_with_equipment(member_id, "speed")
+        _trace["events"].append({
+            "type": "check_equipment",
+            "frame": _frame,
+            "member_id": member_id,
+            "weapon": equipment.get("weapon", ""),
+            "armor": equipment.get("armor", ""),
+            "accessory": equipment.get("accessory", ""),
+            "attack_with_equip": attack_with_equip,
+            "defense_with_equip": defense_with_equip,
+            "speed_with_equip": speed_with_equip
+        })
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

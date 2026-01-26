@@ -5,37 +5,49 @@
     {
       "id": "single_acorn",
       "enemies": ["angry_acorn"],
-      "weight": 35,
+      "weight": 30,
       "min_level": 1
     },
     {
       "id": "single_snake",
       "enemies": ["sneaky_snake"],
-      "weight": 25,
+      "weight": 20,
       "min_level": 1
+    },
+    {
+      "id": "single_stump",
+      "enemies": ["grumpy_stump"],
+      "weight": 15,
+      "min_level": 2
     },
     {
       "id": "acorn_pair",
       "enemies": ["angry_acorn", "angry_acorn"],
-      "weight": 15,
+      "weight": 10,
       "min_level": 2
     },
     {
       "id": "snake_pair",
       "enemies": ["sneaky_snake", "sneaky_snake"],
-      "weight": 10,
+      "weight": 8,
       "min_level": 2
     },
     {
       "id": "acorn_snake",
       "enemies": ["angry_acorn", "sneaky_snake"],
-      "weight": 10,
+      "weight": 8,
       "min_level": 2
+    },
+    {
+      "id": "stump_guard",
+      "enemies": ["grumpy_stump", "angry_acorn"],
+      "weight": 5,
+      "min_level": 3
     },
     {
       "id": "forest_guardian",
       "enemies": ["forest_guardian"],
-      "weight": 5,
+      "weight": 4,
       "min_level": 5,
       "boss": true
     }

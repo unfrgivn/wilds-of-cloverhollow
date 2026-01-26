@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="10"]
 [ext_resource type="Script" path="res://game/scripts/enemies/OverworldEnemy.gd" id="11"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/angry_acorn/overworld.png" id="12"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/enemies/grumpy_stump/overworld.png" id="13"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -279,6 +280,18 @@ enemy_name = "Angry Acorn"
 texture = ExtResource("12")
 
 [node name="Collision" type="CollisionShape2D" parent="Enemies/AngryAcorn2"]
+shape = SubResource("CircleShape2D_2")
+
+[node name="GrumpyStump1" type="Area2D" parent="Enemies"]
+position = Vector2(280, 115)
+script = ExtResource("11")
+enemy_id = "grumpy_stump"
+enemy_name = "Grumpy Stump"
+
+[node name="Sprite" type="Sprite2D" parent="Enemies/GrumpyStump1"]
+texture = ExtResource("13")
+
+[node name="Collision" type="CollisionShape2D" parent="Enemies/GrumpyStump1"]
 shape = SubResource("CircleShape2D_2")
 
 [node name="Spawns" type="Node2D" parent="."]

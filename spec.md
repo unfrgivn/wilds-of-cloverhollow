@@ -563,6 +563,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Transitions: to Forest Entrance (west, "from_entrance" spawn), to Forest Deep (east, "from_path" spawn).
 - Spawn markers: default, from_entrance, from_deep.
 - Enemy: Angry Acorn (cute acorn with angry face, uses roll attack, 10 HP, visible overworld enemy).
+- Enemy: Grumpy Stump (camouflaged tree stump, high defense 8, slow but tanky, 20 HP).
 - Scenario: `forest_path_render` for visual/interaction testing.
 
 ### 7.5 Biome factory workflow

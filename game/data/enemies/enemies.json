@@ -156,6 +156,21 @@
       "skills": ["poison_bite"],
       "drops": ["snake_scale"],
       "flags": ["status_effect"]
+    },
+    {
+      "id": "grumpy_stump",
+      "name": "Grumpy Stump",
+      "description": "An ancient tree stump that's really tired of people stepping on it. Very tough but slow.",
+      "max_hp": 20,
+      "max_mp": 0,
+      "attack": 3,
+      "defense": 8,
+      "speed": 1,
+      "xp": 12,
+      "gold": 8,
+      "sprite": "res://game/assets/sprites/enemies/grumpy_stump/idle_1.png",
+      "skills": ["root_smash"],
+      "drops": ["old_wood"]
     }
   ]
 }

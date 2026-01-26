@@ -193,6 +193,16 @@
       "target": "single_enemy",
       "element": "poison",
       "effect": "poison"
+    },
+    {
+      "id": "root_smash",
+      "name": "Root Smash",
+      "description": "The stump summons roots from the ground to smash the target.",
+      "type": "attack",
+      "mp_cost": 0,
+      "power": 4,
+      "target": "single_enemy",
+      "element": "earth"
     }
   ]
 }

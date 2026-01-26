@@ -1,0 +1,15 @@
+{
+    "id": "enemy_stump_battle",
+    "description": "Battle test with Grumpy Stump enemy in forest path",
+    "scene": "res://game/scenes/areas/Forest_Path.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "forest_path_with_enemies"},
+        {"type": "move", "direction": "right", "frames": 60},
+        {"type": "move", "direction": "up", "frames": 30},
+        {"type": "capture", "label": "approaching_stump"},
+        {"type": "move", "direction": "right", "frames": 50},
+        {"type": "wait_frames", "frames": 60},
+        {"type": "capture", "label": "battle_with_stump"}
+    ]
+}

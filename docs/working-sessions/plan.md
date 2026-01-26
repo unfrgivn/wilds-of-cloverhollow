@@ -1373,7 +1373,7 @@ Status-inflicting forest enemy.
 
 ---
 
-## Milestone 112 — Forest enemies: Grumpy Stump  **Owner:** Art Pipeline + Battle Systems
+## Milestone 112 — Forest enemies: Grumpy Stump  **Status:** ✅ Completed (2026-01-26)  **Owner:** Art Pipeline + Battle Systems
 ### Objective
 Tanky forest enemy.
 

@@ -796,7 +796,7 @@ Buff/debuff skills.
 
 ---
 
-## Milestone 64 — Skill: Pet special attacks  **Owner:** Battle Systems
+## Milestone 64 — Skill: Pet special attacks  **Owner:** Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Pet-exclusive skills.
 

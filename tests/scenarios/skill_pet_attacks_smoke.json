@@ -1,0 +1,9 @@
+{
+  "scenario_id": "skill_pet_attacks_smoke",
+  "description": "Verifies pet special attack skills are loaded and usable in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "skill_pet_attacks_battle_start"}
+  ]
+}

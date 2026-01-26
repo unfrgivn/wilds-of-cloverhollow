@@ -127,6 +127,40 @@
       "target": "single_enemy",
       "element": "magic",
       "effect": "stun"
+    },
+    {
+      "id": "pounce",
+      "name": "Pounce",
+      "description": "Maddie leaps at the enemy with surprising force.",
+      "type": "attack",
+      "mp_cost": 2,
+      "power": 6,
+      "target": "single_enemy",
+      "element": "none",
+      "pet_only": true
+    },
+    {
+      "id": "purr_heal",
+      "name": "Purr Heal",
+      "description": "Maddie's soothing purr heals the party a little.",
+      "type": "heal",
+      "mp_cost": 4,
+      "power": 5,
+      "target": "all_allies",
+      "element": "none",
+      "pet_only": true
+    },
+    {
+      "id": "distract",
+      "name": "Distract",
+      "description": "Maddie distracts enemies, lowering their accuracy.",
+      "type": "status",
+      "mp_cost": 3,
+      "power": 0,
+      "target": "all_enemies",
+      "element": "none",
+      "effect": "accuracy_down",
+      "pet_only": true
     }
   ]
 }

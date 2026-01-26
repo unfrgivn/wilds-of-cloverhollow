@@ -1,0 +1,16 @@
+{
+  "id": "pinecone_pass_exploration_smoke",
+  "description": "Verify Pinecone Pass area loads and player can move",
+  "setup": {
+    "scene": "res://game/scenes/areas/Area_PineconePass.tscn"
+  },
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "move", "direction": "left", "frames": 30},
+    {"type": "move", "direction": "down", "frames": 20},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "pinecone_pass_overview"}
+  ]
+}

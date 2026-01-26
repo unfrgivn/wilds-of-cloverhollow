@@ -1,0 +1,34 @@
+{
+  "name": "Enchanted Forest Palette",
+  "biome": "enchanted_forest",
+  "colors": [
+    "#1a472a",
+    "#0d2818",
+    "#2d5a27",
+    "#3a7d32",
+    "#9b59b6",
+    "#8e44ad",
+    "#e74c3c",
+    "#f39c12",
+    "#00d4ff",
+    "#00ff88",
+    "#ff69b4",
+    "#ffd700",
+    "#2c3e50"
+  ],
+  "color_names": [
+    "forest_dark",
+    "forest_shadow",
+    "forest_mid",
+    "forest_light",
+    "magic_purple",
+    "magic_dark",
+    "magic_red",
+    "magic_orange",
+    "glow_cyan",
+    "glow_green",
+    "glow_pink",
+    "glow_gold",
+    "twilight_blue"
+  ]
+}

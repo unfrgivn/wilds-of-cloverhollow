@@ -1,0 +1,34 @@
+{
+  "name": "Pinecone Pass Palette",
+  "biome": "pinecone_pass",
+  "colors": [
+    "#2d5a27",
+    "#1e4620",
+    "#3a7d32",
+    "#4a8c3f",
+    "#6b4226",
+    "#8b6914",
+    "#a0522d",
+    "#808080",
+    "#696969",
+    "#a9a9a9",
+    "#d3d3d3",
+    "#f5f5dc",
+    "#87ceeb"
+  ],
+  "color_names": [
+    "pine_dark",
+    "pine_shadow",
+    "pine_mid",
+    "pine_light",
+    "bark_brown",
+    "pinecone_brown",
+    "rock_brown",
+    "rock_gray",
+    "rock_dark",
+    "rock_light",
+    "snow_gray",
+    "snow_white",
+    "sky_blue"
+  ]
+}

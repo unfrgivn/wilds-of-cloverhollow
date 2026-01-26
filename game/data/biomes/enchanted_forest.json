@@ -1,0 +1,7 @@
+{
+  "id": "enchanted_forest",
+  "name": "Enchanted Forest",
+  "type": "wilderness",
+  "palette_path": "res://art/palettes/enchanted_forest.palette.json",
+  "description": "A magical forest with glowing flora and mystical creatures"
+}

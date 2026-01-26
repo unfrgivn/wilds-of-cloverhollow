@@ -1665,7 +1665,7 @@ Release-ready demo.
 
 ---
 
-## Milestone 136 — Bubblegum Bay scaffold  **Owner:** World Builder + Art Pipeline
+## Milestone 136 — Bubblegum Bay scaffold  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Beach biome setup.
 
@@ -1677,7 +1677,7 @@ Beach biome setup.
 
 ---
 
-## Milestone 137 — Pinecone Pass scaffold  **Owner:** World Builder + Art Pipeline
+## Milestone 137 — Pinecone Pass scaffold  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Mountain biome setup.
 
@@ -1689,7 +1689,7 @@ Mountain biome setup.
 
 ---
 
-## Milestone 138 — Enchanted Forest scaffold  **Owner:** World Builder + Art Pipeline
+## Milestone 138 — Enchanted Forest scaffold  **Owner:** World Builder + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Magical forest biome setup.
 

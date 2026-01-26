@@ -1,0 +1,7 @@
+{
+  "id": "pinecone_pass",
+  "name": "Pinecone Pass",
+  "type": "wilderness",
+  "palette_path": "res://art/palettes/pinecone_pass.palette.json",
+  "description": "A mountainous alpine pass with pine trees and rocky terrain"
+}

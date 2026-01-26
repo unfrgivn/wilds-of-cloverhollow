@@ -100,3 +100,32 @@ offset_right = 200.0
 offset_bottom = -74.0
 text = "Battle started!"
 horizontal_alignment = 1
+
+[node name="TurnOrderPanel" type="PanelContainer" parent="BattleUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 100.0
+offset_right = 100.0
+offset_bottom = 124.0
+
+[node name="TurnOrderContainer" type="HBoxContainer" parent="BattleUI/TurnOrderPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TurnOrderLabel" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
+layout_mode = 2
+text = "Turn Order:"
+
+[node name="Turn1" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
+layout_mode = 2
+text = "Fae"
+
+[node name="Turn2" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
+layout_mode = 2
+text = ">"
+
+[node name="Turn3" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
+layout_mode = 2
+text = "Slime"

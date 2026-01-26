@@ -1,0 +1,9 @@
+{
+  "scenario_id": "battle_turn_order_render",
+  "description": "Verifies turn order display is visible in battle",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "battle_turn_order_visible"}
+  ]
+}

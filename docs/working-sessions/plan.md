@@ -842,7 +842,7 @@ Damage items.
 
 ---
 
-## Milestone 68 — Battle: Turn order display  **Owner:** UI Systems + Battle Systems
+## Milestone 68 — Battle: Turn order display  **Owner:** UI Systems + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Visual turn order indicator.
 

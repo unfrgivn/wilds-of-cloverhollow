@@ -26,6 +26,7 @@ const MENU_OPTIONS := ["Attack", "Skill", "Item", "Defend", "Run"]
 @onready var battle_message: Label = $BattleUI/BattleMessage
 @onready var turn_indicator: Label = $BattleUI/TurnIndicator
 @onready var background_sprite: Sprite2D = $Background
+@onready var turn_order_container: HBoxContainer = $BattleUI/TurnOrderPanel/TurnOrderContainer
 
 func _ready() -> void:
 	print("[BattleScene] Battle scene loaded")
@@ -242,6 +243,33 @@ func _update_menu_ui() -> void:
 func _update_turn_indicator(combatant) -> void:
 	if turn_indicator:
 		turn_indicator.text = "%s's turn" % combatant.display_name
+	_update_turn_order_ui()
+
+func _update_turn_order_ui() -> void:
+	if turn_order_container == null or battle_state == null:
+		return
+	# Clear existing turn order labels (except the "Turn Order:" label)
+	var children := turn_order_container.get_children()
+	for i in range(children.size() - 1, 0, -1):
+		children[i].queue_free()
+	# Build turn order from battle state
+	var turn_order: Array = battle_state.get_turn_order()
+	for i in turn_order.size():
+		var combatant = turn_order[i]
+		# Add arrow separator
+		if i > 0:
+			var arrow := Label.new()
+			arrow.text = ">"
+			arrow.add_theme_font_size_override("font_size", 8)
+			turn_order_container.add_child(arrow)
+		# Add combatant name
+		var name_label := Label.new()
+		name_label.text = combatant.display_name
+		name_label.add_theme_font_size_override("font_size", 8)
+		# Highlight current turn
+		if i == 0:
+			name_label.modulate = Color(1, 1, 0.5)  # Yellow for current turn
+		turn_order_container.add_child(name_label)
 
 func _show_message(msg: String) -> void:
 	if battle_message:

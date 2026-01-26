@@ -130,3 +130,14 @@ func get_first_alive_party_member():
 		if not member.is_defeated():
 			return member
 	return null
+
+## Get turn order starting from current turn (for UI display)
+func get_turn_order() -> Array:
+	var result: Array = []
+	var size: int = turn_order.size()
+	for i in size:
+		var index: int = (current_turn_index + i) % size
+		var combatant = turn_order[index]
+		if not combatant.is_defeated():
+			result.append(combatant)
+	return result

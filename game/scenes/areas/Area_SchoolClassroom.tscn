@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -15,6 +15,8 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_a_idle_north.png" id="13"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_b_idle_north.png" id="14"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_c_idle_north.png" id="15"]
+[ext_resource type="Script" path="res://game/scripts/events/ClassroomEventController.gd" id="16"]
+[ext_resource type="Script" path="res://game/scripts/interaction/Interactable.gd" id="17"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_Player"]
 size = Vector2(16, 20)
@@ -356,3 +358,15 @@ offset = Vector2(0, -12)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StudentC"]
 shape = SubResource("CircleShape2D_NPC")
+
+[node name="ClassroomEventController" type="Node" parent="."]
+script = ExtResource("16")
+player_desk_path = NodePath("../PlayerDesk")
+
+[node name="PlayerDesk" type="Area2D" parent="."]
+position = Vector2(260, 210)
+script = ExtResource("17")
+dialogue_text = "This is your desk. Time to sit down and pay attention to class!"
+
+[node name="PlayerDeskShape" type="CollisionShape2D" parent="PlayerDesk"]
+shape = SubResource("RectangleShape2D_Desk")

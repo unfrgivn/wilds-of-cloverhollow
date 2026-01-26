@@ -987,7 +987,7 @@ First outdoor exploration.
 
 ---
 
-## Milestone 80 — Story: First class scene  **Owner:** Story + Gameplay
+## Milestone 80 — Story: First class scene  **Owner:** Story + Gameplay  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Classroom story beat.
 

@@ -1,0 +1,25 @@
+{
+  "scenario_id": "first_class_smoke",
+  "description": "Verifies first class scene: enter classroom, sit at desk, witness strange occurrence",
+  "scene": "res://game/scenes/areas/Area_SchoolClassroom.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "check_story_flag", "flag": "first_class_complete"},
+    {"type": "move", "direction": "left", "frames": 80},
+    {"type": "move", "direction": "up", "frames": 20},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 90},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "check_story_flag", "flag": "first_class_complete"},
+    {"type": "capture", "label": "first_class_complete"}
+  ]
+}

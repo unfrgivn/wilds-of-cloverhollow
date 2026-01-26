@@ -673,7 +673,7 @@ First creature enemy with animations.
 
 ---
 
-## Milestone 53 — Enemy: Dusty Bunny  **Owner:** Art Pipeline + Battle Systems
+## Milestone 53 — Enemy: Dusty Bunny  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Second creature enemy.
 

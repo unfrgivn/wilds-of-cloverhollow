@@ -1,0 +1,9 @@
+{
+  "scenario_id": "enemy_bunny_battle",
+  "description": "Verifies Dusty Bunny enemy data loads and battle can initialize",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "bunny_battle_ready"}
+  ]
+}

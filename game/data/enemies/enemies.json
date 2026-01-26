@@ -38,6 +38,19 @@
       "sprite": "res://game/assets/enemies/angry_bee.png",
       "skills": [],
       "drops": ["honey_drop"]
+    },
+    {
+      "id": "dusty_bunny",
+      "name": "Dusty Bunny",
+      "description": "A scruffy rabbit that kicks up dust when it hops.",
+      "max_hp": 14,
+      "max_mp": 3,
+      "attack": 4,
+      "defense": 3,
+      "speed": 7,
+      "sprite": "res://game/assets/sprites/enemies/dusty_bunny/idle_1.png",
+      "skills": ["dust_kick"],
+      "drops": ["carrot"]
     }
   ]
 }

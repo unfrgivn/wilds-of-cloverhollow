@@ -1,0 +1,35 @@
+{
+    "id": "audio_coverage_smoke",
+    "description": "Audio system coverage test - verifies music and SFX triggers",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "audio_start"},
+        
+        {"type": "play_music", "track_id": "town"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "check_music", "track_id": "town"},
+        {"type": "capture", "label": "audio_town_music"},
+        
+        {"type": "play_sfx", "sfx_id": "menu_select"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "check_sfx", "sfx_id": "menu_select"},
+        
+        {"type": "play_sfx", "sfx_id": "pickup"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "check_sfx", "sfx_id": "pickup"},
+        
+        {"type": "play_area_music", "area_name": "forest"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "capture", "label": "audio_forest_music"},
+        
+        {"type": "play_battle_music"},
+        {"type": "wait_frames", "frames": 30},
+        {"type": "check_music", "track_id": "battle"},
+        {"type": "capture", "label": "audio_battle_music"},
+        
+        {"type": "stop_music"},
+        {"type": "wait_frames", "frames": 15},
+        {"type": "capture", "label": "audio_complete"}
+    ]
+}

@@ -1572,7 +1572,7 @@ Consistent visual quality.
 
 ---
 
-## Milestone 128 — Audio polish pass  **Owner:** Audio + QA Automation
+## Milestone 128 — Audio polish pass  **Owner:** Audio + QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Complete audio coverage.
 

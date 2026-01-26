@@ -1,0 +1,9 @@
+{
+  "scenario_id": "battle_bg_render",
+  "description": "Renders all Cloverhollow battle backgrounds for visual verification",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "battle_bg_cloverhollow_meadow"}
+  ]
+}

@@ -649,7 +649,7 @@ NPCs move between locations by time.
 
 ---
 
-## Milestone 51 — Battle backgrounds: Cloverhollow set  **Owner:** Art Pipeline
+## Milestone 51 — Battle backgrounds: Cloverhollow set  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Multiple battle backgrounds for town area.
 

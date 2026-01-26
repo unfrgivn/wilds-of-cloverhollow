@@ -25,10 +25,27 @@ const MENU_OPTIONS := ["Attack", "Skill", "Item", "Defend", "Run"]
 @onready var command_menu: VBoxContainer = $BattleUI/CommandMenu/MenuContainer
 @onready var battle_message: Label = $BattleUI/BattleMessage
 @onready var turn_indicator: Label = $BattleUI/TurnIndicator
+@onready var background_sprite: Sprite2D = $Background
 
 func _ready() -> void:
 	print("[BattleScene] Battle scene loaded")
+	_set_background_for_biome()
 	_setup_battle()
+
+func _set_background_for_biome() -> void:
+	## Set battle background based on current biome/location
+	var biome: String = BattleManager.current_enemy_data.get("biome", "cloverhollow")
+	var bg_paths: Dictionary = {
+		"cloverhollow": "res://game/assets/backgrounds/battle/cloverhollow_meadow.png",
+		"town_square": "res://game/assets/backgrounds/battle/town_square.png",
+		"park": "res://game/assets/backgrounds/battle/park.png",
+		"school_courtyard": "res://game/assets/backgrounds/battle/school_courtyard.png",
+		"bubblegum_bay": "res://game/assets/backgrounds/battle/bubblegum_bay.png"
+	}
+	var bg_path: String = bg_paths.get(biome, bg_paths["cloverhollow"])
+	if background_sprite and ResourceLoader.exists(bg_path):
+		background_sprite.texture = load(bg_path)
+		print("[BattleScene] Set background to: %s" % bg_path)
 
 func _setup_battle() -> void:
 	# Load party from GameData

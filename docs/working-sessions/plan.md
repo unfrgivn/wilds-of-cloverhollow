@@ -563,7 +563,7 @@ Tool/weapon shop keeper.
 
 ---
 
-## Milestone 44 — Cloverhollow Clinic exterior + interior  **Owner:** World Builder + Art Pipeline
+## Milestone 44 — Cloverhollow Clinic exterior + interior  **Status:** ✅ Completed (2025-01-25)  **Owner:** World Builder + Art Pipeline
 ### Objective
 Healing/recovery location.
 

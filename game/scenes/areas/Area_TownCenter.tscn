@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_townhall.png" id="21"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_petshop.png" id="22"]
 [ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_blacksmith.png" id="23"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/props/town/facade_clinic.png" id="24"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 20)
@@ -146,6 +147,10 @@ texture = ExtResource("22")
 position = Vector2(180, 220)
 texture = ExtResource("23")
 
+[node name="ClinicFacade" type="Sprite2D" parent="Buildings"]
+position = Vector2(320, 220)
+texture = ExtResource("24")
+
 [node name="TownSign" type="Area2D" parent="."]
 position = Vector2(256, 100)
 script = ExtResource("5")
@@ -233,6 +238,11 @@ marker_id = "from_pet_shop"
 position = Vector2(180, 250)
 script = ExtResource("7")
 marker_id = "from_blacksmith"
+
+[node name="from_clinic" type="Marker2D" parent="Spawns"]
+position = Vector2(320, 250)
+script = ExtResource("7")
+marker_id = "from_clinic"
 
 [node name="NPCSpawns" type="Node2D" parent="."]
 
@@ -472,4 +482,21 @@ offset_top = -15.0
 offset_right = 35.0
 offset_bottom = 5.0
 text = "Blacksmith"
+horizontal_alignment = 1
+
+[node name="TransitionToClinic" type="Area2D" parent="."]
+position = Vector2(320, 252)
+script = ExtResource("8")
+target_area = "res://game/scenes/areas/Area_ClinicInterior.tscn"
+target_spawn_id = "from_town_center"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToClinic"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToClinic"]
+offset_left = -25.0
+offset_top = -15.0
+offset_right = 25.0
+offset_bottom = 5.0
+text = "Clinic"
 horizontal_alignment = 1

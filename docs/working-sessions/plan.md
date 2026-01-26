@@ -1396,7 +1396,7 @@ Secret clubhouse in woods.
 
 ---
 
-## Milestone 114 — Clubhouse interior  **Owner:** World Builder + Art Pipeline
+## Milestone 114 — Clubhouse interior  **Owner:** World Builder + Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Interior hangout space.
 

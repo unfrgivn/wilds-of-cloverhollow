@@ -1,0 +1,31 @@
+{
+  "id": "clubhouse_interior_render",
+  "name": "Clubhouse Interior Render Test",
+  "description": "Verify the clubhouse interior with pillows, snacks, comics, and map",
+  "area": "res://game/scenes/areas/Clubhouse_Interior.tscn",
+  "steps": [
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "interior_initial_view"},
+    {"action": "move", "direction": "up", "frames": 25},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "wall_map_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "move", "direction": "right", "frames": 30},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "snack_stash_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "move", "direction": "down", "frames": 25},
+    {"action": "move", "direction": "left", "frames": 50},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "comics_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "capture", "label": "interior_final"}
+  ]
+}

@@ -169,4 +169,13 @@ target_spawn = "from_clubhouse"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Transitions/ToForestPath"]
 shape = SubResource("RectangleShape2D_2")
 
+[node name="ToInterior" type="Area2D" parent="Transitions"]
+position = Vector2(256, 130)
+script = ExtResource("4")
+target_area = "res://game/scenes/areas/Clubhouse_Interior.tscn"
+target_spawn = "from_exterior"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Transitions/ToInterior"]
+shape = SubResource("RectangleShape2D_1")
+
 [node name="DialogueUI" parent="." instance=ExtResource("5")]

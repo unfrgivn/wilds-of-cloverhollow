@@ -573,9 +573,19 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - "No Adults" sign (16x16) with interactable dialogue.
 - Props: 8 trees around clearing, treehouse structure, rope ladder.
 - Interactables: rope ladder (climb dialogue), "No Adults" sign (kids only message).
-- Transitions: to Forest Path (southwest, "from_clubhouse" spawn), to Clubhouse Interior (future).
+- Transitions: to Forest Path (southwest, "from_clubhouse" spawn), to Clubhouse Interior (via rope ladder).
 - Spawn markers: default, from_path, from_interior.
 - Scenario: `clubhouse_exterior_render` for visual/interaction testing.
+
+### 7.5.1 Clubhouse Interior (v0 blockout)
+- Cozy treehouse interior accessible via rope ladder from exterior.
+- Warm brown wooden floor and walls.
+- Decorative rug in center for gathering area.
+- Props: 4 pillows (pink and blue variants), snack stash box, comic book stacks, wall map.
+- Interactables: wall map (shows treasure X), snack stash (chips and candy), comics ("Super Bunny Adventures"), pillow area (club meeting spot).
+- Transitions: to Clubhouse Exterior (south, "from_interior" spawn).
+- Spawn markers: default, from_exterior.
+- Scenario: `clubhouse_interior_render` for visual/interaction testing.
 
 ### 7.6 Biome factory workflow
 - `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:

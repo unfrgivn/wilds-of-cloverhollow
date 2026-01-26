@@ -1408,7 +1408,7 @@ Interior hangout space.
 
 ---
 
-## Milestone 115 — Forest: Hidden grove  **Owner:** World Builder + Art Pipeline
+## Milestone 115 — Forest: Hidden grove  **Owner:** World Builder + Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Magical/special area.
 

@@ -366,4 +366,26 @@ offset_bottom = -5.0
 text = "Clubhouse"
 horizontal_alignment = 1
 
+[node name="from_grove" type="Marker2D" parent="Spawns"]
+position = Vector2(380, 100)
+script = ExtResource("3")
+marker_id = "from_grove"
+
+[node name="TransitionToGrove" type="Area2D" parent="."]
+position = Vector2(440, 100)
+script = ExtResource("4")
+target_area = "res://game/scenes/areas/Hidden_Grove.tscn"
+target_spawn_id = "from_forest"
+
+[node name="TransitionShape" type="CollisionShape2D" parent="TransitionToGrove"]
+shape = SubResource("RectangleShape2D_4")
+
+[node name="TransitionLabel" type="Label" parent="TransitionToGrove"]
+offset_left = -30.0
+offset_top = -25.0
+offset_right = 30.0
+offset_bottom = -5.0
+text = "Grove →"
+horizontal_alignment = 1
+
 [node name="DialogueUI" parent="." instance=ExtResource("5")]

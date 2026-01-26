@@ -1,0 +1,27 @@
+{
+  "id": "hidden_grove_render",
+  "name": "Hidden Grove Render Test",
+  "description": "Verify the hidden grove with fairy ring, glowing flowers, and lore scroll",
+  "area": "res://game/scenes/areas/Hidden_Grove.tscn",
+  "steps": [
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "grove_initial_view"},
+    {"action": "move", "direction": "right", "frames": 40},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "capture", "label": "grove_fairy_ring_approach"},
+    {"action": "move", "direction": "right", "frames": 20},
+    {"action": "wait_frames", "frames": 10},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "fairy_ring_dialogue"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "move", "direction": "up", "frames": 10},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 30},
+    {"action": "capture", "label": "lore_scroll_pickup"},
+    {"action": "press", "action_name": "interact"},
+    {"action": "wait_frames", "frames": 20},
+    {"action": "capture", "label": "grove_final"}
+  ]
+}

@@ -587,6 +587,16 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Spawn markers: default, from_exterior.
 - Scenario: `clubhouse_interior_render` for visual/interaction testing.
 
+### 7.5.2 Hidden Grove (v0 blockout)
+- Magical hidden clearing accessible from Forest Path.
+- Very dark green forest background with dense tree borders.
+- Central fairy ring of 12 magical mushrooms forming a circle.
+- Props: 6 trees around perimeter, 12 fairy mushrooms in ring formation, 5 glowing flowers, lore scroll.
+- Interactables: fairy ring center (legend dialogue), lore scroll pickup (ancient forest lore item).
+- Transitions: to Forest Path (west, "from_grove" spawn).
+- Spawn markers: default, from_forest.
+- Scenario: `hidden_grove_render` for visual/interaction testing.
+
 ### 7.6 Biome factory workflow
 - `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
   - Palette stub in `art/palettes/<id>.palette.json`

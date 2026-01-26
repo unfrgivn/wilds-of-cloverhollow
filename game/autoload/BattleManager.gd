@@ -36,6 +36,9 @@ func start_battle(enemy_data: Dictionary = {}) -> void:
 	
 	battle_started.emit(enemy_data)
 	
+	# Play battle music
+	MusicManager.play_battle_music()
+	
 	# Transition to battle scene
 	var result := get_tree().change_scene_to_file(BATTLE_SCENE_PATH)
 	if result != OK:
@@ -54,6 +57,15 @@ func end_battle(result: String = "victory") -> void:
 	
 	in_battle = false
 	battle_ended.emit(result)
+	
+	# Resume previous music (or play victory fanfare briefly)
+	if result == "victory":
+		MusicManager.play_victory_music()
+		# After a short delay, resume area music
+		await get_tree().create_timer(2.0).timeout
+		MusicManager.resume_previous_music()
+	else:
+		MusicManager.resume_previous_music()
 	
 	print("[BattleManager] Battle ended: %s" % result)
 	

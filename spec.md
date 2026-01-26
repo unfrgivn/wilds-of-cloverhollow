@@ -274,6 +274,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - Navigation: cancel/pause to close.
 - Scenario actions: `open_settings`, `close_settings`, `set_music_volume`, `set_sfx_volume`.
 
+### 3.26 Music system
+- MusicManager autoload handles background music playback.
+- Area-based music: AREA_MUSIC dictionary maps area names to track IDs.
+- MUSIC_PATHS dictionary maps track IDs to `.ogg` file paths under `game/assets/audio/music/`.
+- `play_music(track_id)`: Plays a specific track with optional crossfade.
+- `play_area_music(area_name)`: Plays music appropriate for the given area.
+- `play_battle_music()`: Plays battle theme, stores previous track for resume.
+- `play_victory_music()`: Plays victory fanfare.
+- `stop_music()`: Stops current music.
+- `resume_previous_music()`: Resumes track playing before battle.
+- BattleManager triggers battle music on `start_battle()` and victory/resume on `end_battle()`.
+- Crossfade support: smooth transitions between tracks (1 second default).
+- Placeholder paths: actual `.ogg` files to be added in future milestone.
+- Scenario actions: `play_music`, `play_area_music`, `play_battle_music`, `stop_music`, `check_music`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

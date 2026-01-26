@@ -32,6 +32,7 @@ QuestManager="*res://game/autoload/QuestManager.gd"
 AffinityManager="*res://game/autoload/AffinityManager.gd"
 PauseManager="*res://game/autoload/PauseManager.gd"
 SettingsManager="*res://game/autoload/SettingsManager.gd"
+MusicManager="*res://game/autoload/MusicManager.gd"
 
 [display]
 

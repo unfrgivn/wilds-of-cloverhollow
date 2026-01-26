@@ -1,0 +1,22 @@
+{
+    "id": "music_switch_smoke",
+    "name": "Music switching smoke test",
+    "description": "Tests area-based and battle music switching",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "play_area_music", "area": "Area_TownCenter"},
+        {"type": "wait_frames", "frames": 5},
+        {"type": "check_music"},
+        {"type": "play_music", "track_id": "shop_theme"},
+        {"type": "wait_frames", "frames": 5},
+        {"type": "check_music"},
+        {"type": "play_battle_music"},
+        {"type": "wait_frames", "frames": 5},
+        {"type": "check_music"},
+        {"type": "stop_music"},
+        {"type": "wait_frames", "frames": 5},
+        {"type": "check_music"},
+        {"type": "capture", "label": "music_test_done"}
+    ]
+}

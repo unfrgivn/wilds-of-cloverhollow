@@ -1194,7 +1194,7 @@ Game options.
 
 ---
 
-## Milestone 97 — Audio: Music integration  **Owner:** Audio + Gameplay
+## Milestone 97 — Audio: Music integration  **Status:** ✅ Completed (2026-01-26) **Owner:** Audio + Gameplay
 ### Objective
 Background music playback.
 

@@ -542,6 +542,41 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "play_music":
+        var track_id := str(action.get("track_id", ""))
+        if track_id != "":
+            MusicManager.play_music(track_id)
+        _trace["events"].append({"type": "play_music", "frame": _frame, "track_id": track_id})
+        _action_index += 1
+        return
+
+    if t == "play_area_music":
+        var area_name := str(action.get("area", ""))
+        if area_name != "":
+            MusicManager.play_area_music(area_name)
+        _trace["events"].append({"type": "play_area_music", "frame": _frame, "area": area_name})
+        _action_index += 1
+        return
+
+    if t == "play_battle_music":
+        MusicManager.play_battle_music()
+        _trace["events"].append({"type": "play_battle_music", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "stop_music":
+        MusicManager.stop_music()
+        _trace["events"].append({"type": "stop_music", "frame": _frame})
+        _action_index += 1
+        return
+
+    if t == "check_music":
+        var current: String = MusicManager.get_current_track()
+        _trace["events"].append({"type": "check_music", "frame": _frame, "current_track": current})
+        print("[Scenario] Current music: ", current)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

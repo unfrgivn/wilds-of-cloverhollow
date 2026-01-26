@@ -18,6 +18,12 @@ var battle_state = null
 var menu_selection: int = 0
 const MENU_OPTIONS := ["Attack", "Skill", "Item", "Defend", "Run"]
 
+## Target selection state
+var selecting_target: bool = false
+var target_selection: int = 0
+var selectable_targets: Array = []
+var pending_action: String = ""
+
 ## UI references
 @onready var enemy_name_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyName
 @onready var enemy_hp_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyHP
@@ -141,6 +147,21 @@ func _input(event: InputEvent) -> void:
 	if battle_state.phase != PHASE_PLAYER_TURN:
 		return
 	
+	# Target selection mode
+	if selecting_target:
+		if event.is_action_pressed("ui_left"):
+			target_selection = (target_selection - 1 + selectable_targets.size()) % selectable_targets.size()
+			_update_target_ui()
+		elif event.is_action_pressed("ui_right"):
+			target_selection = (target_selection + 1) % selectable_targets.size()
+			_update_target_ui()
+		elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
+			_confirm_target_selection()
+		elif event.is_action_pressed("ui_cancel"):
+			_cancel_target_selection()
+		return
+	
+	# Menu navigation mode
 	if event.is_action_pressed("ui_up"):
 		menu_selection = (menu_selection - 1 + MENU_OPTIONS.size()) % MENU_OPTIONS.size()
 		_update_menu_ui()
@@ -156,8 +177,8 @@ func _execute_menu_selection() -> void:
 		return
 	
 	match menu_selection:
-		0:  # Attack
-			_execute_attack(current, battle_state.get_first_alive_enemy())
+		0:  # Attack - start target selection
+			_start_target_selection("attack", battle_state.get_alive_enemies())
 		1:  # Skill (placeholder - just show message)
 			_show_message("No skills yet!")
 		2:  # Item (placeholder)
@@ -166,6 +187,39 @@ func _execute_menu_selection() -> void:
 			_execute_defend(current)
 		4:  # Run
 			_execute_run()
+
+func _start_target_selection(action: String, targets: Array) -> void:
+	if targets.is_empty():
+		_show_message("No valid targets!")
+		return
+	pending_action = action
+	selectable_targets = targets
+	target_selection = 0
+	selecting_target = true
+	_show_message("Select target (Left/Right, Confirm/Cancel)")
+	_update_target_ui()
+
+func _update_target_ui() -> void:
+	if selectable_targets.is_empty():
+		return
+	var target = selectable_targets[target_selection]
+	_show_message("Target: %s" % target.display_name)
+	# Future: highlight target sprite
+
+func _confirm_target_selection() -> void:
+	var current = battle_state.get_current_combatant()
+	var target = selectable_targets[target_selection]
+	selecting_target = false
+	match pending_action:
+		"attack":
+			_execute_attack(current, target)
+
+func _cancel_target_selection() -> void:
+	selecting_target = false
+	selectable_targets = []
+	pending_action = ""
+	_update_menu_ui()
+	_show_message("Select action")
 
 func _execute_attack(attacker, target) -> void:
 	if target == null:

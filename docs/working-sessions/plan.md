@@ -853,7 +853,7 @@ Visual turn order indicator.
 
 ---
 
-## Milestone 69 — Battle: Target selection  **Owner:** UI Systems + Battle Systems
+## Milestone 69 — Battle: Target selection  **Owner:** UI Systems + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Player chooses attack target.
 

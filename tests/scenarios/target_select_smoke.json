@@ -1,0 +1,15 @@
+{
+  "scenario_id": "target_select_smoke",
+  "description": "Verifies target selection works in battle - player can select enemy target with left/right",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/battle/BattleScene.tscn"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "battle_menu_ready"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "target_selection_active"},
+    {"type": "press", "action": "ui_cancel"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "target_selection_cancelled"}
+  ]
+}

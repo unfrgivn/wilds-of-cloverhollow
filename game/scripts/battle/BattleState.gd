@@ -131,6 +131,22 @@ func get_first_alive_party_member():
 			return member
 	return null
 
+## Get all alive enemies (for target selection)
+func get_alive_enemies() -> Array:
+	var result: Array = []
+	for enemy in enemies:
+		if not enemy.is_defeated():
+			result.append(enemy)
+	return result
+
+## Get all alive party members (for healing target selection)
+func get_alive_party() -> Array:
+	var result: Array = []
+	for member in party:
+		if not member.is_defeated():
+			result.append(member)
+	return result
+
 ## Get turn order starting from current turn (for UI display)
 func get_turn_order() -> Array:
 	var result: Array = []

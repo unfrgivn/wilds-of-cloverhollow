@@ -2019,6 +2019,77 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Community Event Actions ───────────────────────────────────────────
+    if t == "set_event_timestamp":
+        var timestamp: int = _action.get("timestamp", 0)
+        CommunityEventManager.set_override_timestamp(timestamp)
+        _trace["events"].append({"type": "set_event_timestamp", "frame": _frame, "timestamp": timestamp})
+        print("[Scenario] set_event_timestamp: %d" % timestamp)
+        _action_index += 1
+        return
+
+    if t == "clear_event_timestamp":
+        CommunityEventManager.clear_override_timestamp()
+        _trace["events"].append({"type": "clear_event_timestamp", "frame": _frame})
+        print("[Scenario] clear_event_timestamp")
+        _action_index += 1
+        return
+
+    if t == "join_community_event":
+        var event_id: String = _action.get("event_id", "")
+        var success: bool = CommunityEventManager.join_event(event_id)
+        _trace["events"].append({"type": "join_community_event", "frame": _frame, "event_id": event_id, "success": success})
+        print("[Scenario] join_community_event: %s, success=%s" % [event_id, success])
+        _action_index += 1
+        return
+
+    if t == "record_event_progress":
+        var event_id: String = _action.get("event_id", "")
+        var amount: int = _action.get("amount", 1)
+        CommunityEventManager.record_progress(event_id, amount)
+        var current: int = CommunityEventManager.get_event_progress(event_id)
+        _trace["events"].append({"type": "record_event_progress", "frame": _frame, "event_id": event_id, "amount": amount, "current": current})
+        print("[Scenario] record_event_progress: %s +%d (now %d)" % [event_id, amount, current])
+        _action_index += 1
+        return
+
+    if t == "claim_event_reward":
+        var event_id: String = _action.get("event_id", "")
+        var reward: Dictionary = CommunityEventManager.claim_reward(event_id)
+        _trace["events"].append({"type": "claim_event_reward", "frame": _frame, "event_id": event_id, "reward": reward})
+        print("[Scenario] claim_event_reward: %s, gold=%d" % [event_id, reward.get("gold", 0)])
+        _action_index += 1
+        return
+
+    if t == "check_community_event":
+        var event_id: String = _action.get("event_id", "")
+        var is_active: bool = CommunityEventManager.is_event_active(event_id)
+        var is_joined: bool = CommunityEventManager.is_event_joined(event_id)
+        var progress: int = CommunityEventManager.get_event_progress(event_id)
+        var claimed: bool = CommunityEventManager.is_reward_claimed(event_id)
+        var time_remaining: int = CommunityEventManager.get_time_remaining(event_id)
+        _trace["events"].append({"type": "check_community_event", "frame": _frame, "event_id": event_id, "active": is_active, "joined": is_joined, "progress": progress, "claimed": claimed, "time_remaining": time_remaining})
+        print("[Scenario] check_community_event: %s, active=%s, joined=%s, progress=%d, claimed=%s" % [event_id, is_active, is_joined, progress, claimed])
+        _action_index += 1
+        return
+
+    if t == "check_active_community_events":
+        var active_events: Array = CommunityEventManager.get_active_events()
+        var event_ids: Array = []
+        for event in active_events:
+            event_ids.append(event.get("id", ""))
+        _trace["events"].append({"type": "check_active_community_events", "frame": _frame, "count": active_events.size(), "event_ids": event_ids})
+        print("[Scenario] check_active_community_events: %d events (%s)" % [active_events.size(), ", ".join(event_ids)])
+        _action_index += 1
+        return
+
+    if t == "reset_community_events":
+        CommunityEventManager.reset()
+        _trace["events"].append({"type": "reset_community_events", "frame": _frame})
+        print("[Scenario] reset_community_events")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

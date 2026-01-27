@@ -1,0 +1,24 @@
+{
+    "scenario_id": "community_event_smoke",
+    "description": "Test community event framework: join, progress, rewards",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "reset_community_events"},
+        {"type": "check_active_community_events"},
+        {"type": "set_event_timestamp", "timestamp": 1737937000},
+        {"type": "check_active_community_events"},
+        {"type": "check_community_event", "event_id": "launch_celebration"},
+        {"type": "join_community_event", "event_id": "launch_celebration"},
+        {"type": "check_community_event", "event_id": "launch_celebration"},
+        {"type": "record_event_progress", "event_id": "launch_celebration", "amount": 5},
+        {"type": "check_community_event", "event_id": "launch_celebration"},
+        {"type": "record_event_progress", "event_id": "launch_celebration", "amount": 5},
+        {"type": "check_community_event", "event_id": "launch_celebration"},
+        {"type": "claim_event_reward", "event_id": "launch_celebration"},
+        {"type": "check_community_event", "event_id": "launch_celebration"},
+        {"type": "clear_event_timestamp"},
+        {"type": "reset_community_events"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

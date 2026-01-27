@@ -2395,7 +2395,7 @@ Tease next content.
 
 ---
 
-## Milestone 197 — Community event framework  **Owner:** Gameplay + Data Systems
+## Milestone 197 — Community event framework  **Owner:** Gameplay + Data Systems  **Status:** ✅ Completed (2026-01-27)
 ### Objective
 Time-limited events.
 

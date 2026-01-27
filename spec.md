@@ -926,6 +926,28 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario: `multiplayer_stub`.
 - Note: This is a stub - no actual networking. Prepared for future multiplayer feature.
 
+### 3.67 Community events system
+- CommunityEventManager autoload handles time-limited community events.
+- Event data stored in `game/data/events/community_events.json`.
+- Event data format:
+  - Each event has: id, name, description, type, start_timestamp, end_timestamp, goal_count, reward_gold, reward_items[].
+  - Types: collection, battle, exploration, social.
+- Time-based activation: events automatically activate when current time is between start and end timestamps.
+- Override for testing: `set_override_timestamp(timestamp)`, `clear_override_timestamp()`.
+- Player can join active events; progress tracked per-event.
+- Rewards claimable once goal_count is reached.
+- API: `get_all_events()`, `get_event(id)`, `get_active_events()`, `is_event_active(id)`.
+- `join_event(id)`: Joins player to event, returns success status.
+- `is_event_joined(id)`, `get_event_progress(id)`, `record_progress(id, amount)`.
+- `is_reward_claimed(id)`, `claim_reward(id)`: Reward handling.
+- `get_time_remaining(id)`, `format_time_remaining(seconds)`: Time utilities.
+- Signals: `event_started(event_id, event_data)`, `event_ended(event_id)`, `event_progress_updated(event_id, current, goal)`, `event_reward_claimed(event_id, reward)`, `events_refreshed(active_events)`.
+- CommunityEventUI (CanvasLayer): displays active events with progress and rewards.
+- Persistence: state stored in `user://community_events.json`.
+- Scenario actions: `set_event_timestamp`, `clear_event_timestamp`, `join_community_event`, `record_event_progress`, `claim_event_reward`, `check_community_event`, `check_active_community_events`, `reset_community_events`.
+- Scenario: `community_event_smoke`.
+- Note: This is a stub - timestamp-based activation works locally but no server sync.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

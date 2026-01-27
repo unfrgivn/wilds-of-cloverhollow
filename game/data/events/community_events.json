@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "description": "Community time-limited events with unique rewards",
+  "events": [
+    {
+      "id": "launch_celebration",
+      "name": "Launch Celebration",
+      "description": "Celebrate the game launch! Complete quests to earn exclusive rewards.",
+      "type": "quest_completion",
+      "start_timestamp": 1737936000,
+      "end_timestamp": 1738540800,
+      "target_count": 10,
+      "reward_gold": 500,
+      "reward_items": [
+        {"id": "launch_badge", "count": 1}
+      ],
+      "banner_color": "#FFD700"
+    },
+    {
+      "id": "bug_hunt",
+      "name": "Great Bug Hunt",
+      "description": "Catch bugs around Cloverhollow! The more you catch, the better the reward.",
+      "type": "bug_catching",
+      "start_timestamp": 1738540800,
+      "end_timestamp": 1739145600,
+      "target_count": 50,
+      "reward_gold": 300,
+      "reward_items": [
+        {"id": "golden_net", "count": 1}
+      ],
+      "banner_color": "#90EE90"
+    },
+    {
+      "id": "fishing_frenzy",
+      "name": "Fishing Frenzy",
+      "description": "Cast your line and reel in as many fish as you can!",
+      "type": "fishing",
+      "start_timestamp": 1739145600,
+      "end_timestamp": 1739750400,
+      "target_count": 30,
+      "reward_gold": 400,
+      "reward_items": [
+        {"id": "lucky_lure", "count": 1}
+      ],
+      "banner_color": "#87CEEB"
+    },
+    {
+      "id": "photo_contest",
+      "name": "Photo Contest",
+      "description": "Take photos around town! Show off your photography skills.",
+      "type": "photos_taken",
+      "start_timestamp": 1739750400,
+      "end_timestamp": 1740355200,
+      "target_count": 20,
+      "reward_gold": 250,
+      "reward_items": [
+        {"id": "camera_upgrade", "count": 1}
+      ],
+      "banner_color": "#DDA0DD"
+    }
+  ],
+  "event_types": {
+    "quest_completion": "Complete quests to progress",
+    "bug_catching": "Catch bugs to progress",
+    "fishing": "Catch fish to progress",
+    "photos_taken": "Take photos to progress",
+    "battles_won": "Win battles to progress",
+    "npcs_talked": "Talk to NPCs to progress"
+  },
+  "notes": [
+    "Timestamps are Unix timestamps (seconds since epoch)",
+    "Events auto-activate when current time is within start/end range",
+    "Players must explicitly join events to track progress",
+    "Rewards are claimed manually after reaching target"
+  ]
+}

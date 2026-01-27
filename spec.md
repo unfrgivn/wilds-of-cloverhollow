@@ -802,6 +802,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `enable_screen_reader`, `check_accessibility`, `announce`, `reset_accessibility`.
 - Scenario: `screen_reader_smoke`.
 
+### 3.58 Accessibility: Colorblind mode
+- ColorblindFilter autoload applies colorblind palette correction shaders.
+- Modes: None (0), Deuteranopia (1), Protanopia (2).
+- Shader applies color matrix transformation to simulate/correct color blindness.
+- SettingsManager stores colorblind_mode setting with persistence.
+- Signal: `colorblind_mode_changed(mode)` emitted on mode change.
+- SettingsUI provides left/right cycling for colorblind mode option.
+- API: `set_mode(mode)`, `get_mode()`, `get_mode_name()`, `cycle_mode(direction)`.
+- Filter layer 100 (above all game content).
+- Scenario actions: `set_colorblind_mode`, `check_colorblind_mode`.
+- Scenario: `colorblind_render`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

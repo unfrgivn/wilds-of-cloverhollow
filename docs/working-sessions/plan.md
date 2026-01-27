@@ -2063,7 +2063,7 @@ Improve accessibility.
 
 ---
 
-## Milestone 169 — Colorblind mode  **Owner:** Art Pipeline + UI Systems
+## Milestone 169 — Colorblind mode  **Status:** ✅ Completed (2026-01-26)  **Owner:** Art Pipeline + UI Systems
 ### Objective
 Alternative palettes.
 

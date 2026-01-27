@@ -720,6 +720,23 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Colorblind filter actions
+    if t == "set_colorblind_mode":
+        var mode: int = action.get("mode", 0)
+        SettingsManager.set_colorblind_mode(mode)
+        _trace["events"].append({"type": "set_colorblind_mode", "frame": _frame, "mode": mode, "mode_name": SettingsManager.get_colorblind_mode_name()})
+        print("[Scenario] set_colorblind_mode: %s (%s)" % [mode, SettingsManager.get_colorblind_mode_name()])
+        _action_index += 1
+        return
+
+    if t == "check_colorblind_mode":
+        var mode: int = SettingsManager.colorblind_mode
+        var mode_name: String = SettingsManager.get_colorblind_mode_name()
+        _trace["events"].append({"type": "check_colorblind_mode", "frame": _frame, "mode": mode, "mode_name": mode_name})
+        print("[Scenario] check_colorblind_mode: %s (%s)" % [mode, mode_name])
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

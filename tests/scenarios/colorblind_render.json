@@ -1,0 +1,22 @@
+{
+  "id": "colorblind_render",
+  "name": "Colorblind mode rendering test",
+  "description": "Verify colorblind palette filters render correctly",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "colorblind_none"},
+    {"type": "check_colorblind_mode"},
+    {"type": "set_colorblind_mode", "mode": 1},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_colorblind_mode"},
+    {"type": "capture", "label": "colorblind_deuteranopia"},
+    {"type": "set_colorblind_mode", "mode": 2},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_colorblind_mode"},
+    {"type": "capture", "label": "colorblind_protanopia"},
+    {"type": "set_colorblind_mode", "mode": 0},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "colorblind_reset"}
+  ]
+}

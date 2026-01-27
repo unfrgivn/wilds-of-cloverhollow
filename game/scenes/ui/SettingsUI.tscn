@@ -117,6 +117,20 @@ layout_mode = 2
 text = "Medium"
 horizontal_alignment = 2
 
+[node name="ColorblindRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
+layout_mode = 2
+
+[node name="ColorblindRowLabel" type="Label" parent="Panel/OptionsContainer/ColorblindRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Colorblind"
+
+[node name="ColorblindLabel" type="Label" parent="Panel/OptionsContainer/ColorblindRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "None"
+horizontal_alignment = 2
+
 [node name="LanguageRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
 layout_mode = 2
 

@@ -5,6 +5,7 @@ extends Node
 signal settings_changed
 signal text_size_changed(new_size: int)
 signal locale_changed(locale: String)
+signal colorblind_mode_changed(mode: int)
 
 const SETTINGS_FILE := "user://settings.json"
 
@@ -17,6 +18,7 @@ var touch_control_size: int = 1  # 0=small, 1=medium, 2=large
 
 # Accessibility settings
 var text_size: int = 1  # 0=small, 1=medium, 2=large
+var colorblind_mode: int = 0  # 0=none, 1=deuteranopia, 2=protanopia
 
 # Localization
 var locale: String = "en"  # Language code
@@ -24,6 +26,9 @@ var locale: String = "en"  # Language code
 # Text size scale factors
 const TEXT_SIZE_SCALES: Array[float] = [0.8, 1.0, 1.3]
 const TEXT_SIZE_NAMES: Array[String] = ["Small", "Medium", "Large"]
+
+# Colorblind mode names
+const COLORBLIND_MODE_NAMES: Array[String] = ["None", "Deuteranopia", "Protanopia"]
 
 # Audio bus indices (configured in Godot project)
 const MUSIC_BUS := "Music"
@@ -74,6 +79,17 @@ func set_locale(new_locale: String) -> void:
 func get_locale() -> String:
     return locale
 
+func set_colorblind_mode(mode: int) -> void:
+    var old_mode := colorblind_mode
+    colorblind_mode = clampi(mode, 0, 2)
+    if old_mode != colorblind_mode:
+        colorblind_mode_changed.emit(colorblind_mode)
+    settings_changed.emit()
+    print("[SettingsManager] Colorblind mode: %s (%s)" % [colorblind_mode, COLORBLIND_MODE_NAMES[colorblind_mode]])
+
+func get_colorblind_mode_name() -> String:
+    return COLORBLIND_MODE_NAMES[colorblind_mode]
+
 func _apply_volume(bus_name: String, value: float) -> void:
     var bus_index := AudioServer.get_bus_index(bus_name)
     if bus_index >= 0:
@@ -92,6 +108,7 @@ func save_settings() -> void:
         "sfx_volume": sfx_volume,
         "touch_control_size": touch_control_size,
         "text_size": text_size,
+        "colorblind_mode": colorblind_mode,
         "locale": locale,
     }
     
@@ -127,6 +144,7 @@ func load_settings() -> void:
     sfx_volume = data.get("sfx_volume", 1.0)
     touch_control_size = data.get("touch_control_size", 1)
     text_size = data.get("text_size", 1)
+    colorblind_mode = data.get("colorblind_mode", 0)
     locale = data.get("locale", "en")
     
     # Apply loaded settings
@@ -141,6 +159,7 @@ func get_save_data() -> Dictionary:
         "sfx_volume": sfx_volume,
         "touch_control_size": touch_control_size,
         "text_size": text_size,
+        "colorblind_mode": colorblind_mode,
         "locale": locale,
     }
 
@@ -149,6 +168,7 @@ func load_save_data(data: Dictionary) -> void:
     sfx_volume = data.get("sfx_volume", 1.0)
     touch_control_size = data.get("touch_control_size", 1)
     text_size = data.get("text_size", 1)
+    colorblind_mode = data.get("colorblind_mode", 0)
     locale = data.get("locale", "en")
     _apply_volume(MUSIC_BUS, music_volume)
     _apply_volume(SFX_BUS, sfx_volume)

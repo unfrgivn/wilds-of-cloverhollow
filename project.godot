@@ -60,6 +60,7 @@ CreditsManager="*res://game/autoload/CreditsManager.gd"
 VoiceActingManager="*res://game/autoload/VoiceActingManager.gd"
 ArtGalleryManager="*res://game/autoload/ArtGalleryManager.gd"
 AccessibilityManager="*res://game/autoload/AccessibilityManager.gd"
+ColorblindFilter="*res://game/autoload/ColorblindFilter.gd"
 
 [internationalization]
 

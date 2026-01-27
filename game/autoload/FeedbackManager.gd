@@ -8,7 +8,7 @@ signal feedback_ui_closed
 
 # Stored feedback (local, for future upload)
 var _feedback_queue: Array[Dictionary] = []
-var _feedback_ui: Control = null
+var _feedback_ui: CanvasLayer = null
 
 const FEEDBACK_FILE := "user://feedback_queue.json"
 const MAX_QUEUED_FEEDBACK := 50
@@ -18,7 +18,7 @@ func _ready() -> void:
     print("[FeedbackManager] Initialized with %d queued items" % _feedback_queue.size())
 
 ## Register the UI for showing feedback form
-func register_ui(ui: Control) -> void:
+func register_ui(ui: CanvasLayer) -> void:
     _feedback_ui = ui
     print("[FeedbackManager] UI registered")
 

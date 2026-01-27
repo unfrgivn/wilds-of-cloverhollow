@@ -7,7 +7,7 @@ signal patch_notes_dismissed(version: String)
 
 var _current_version: String = "1.0.0"
 var _last_seen_version: String = ""
-var _patch_notes_ui: Control = null
+var _patch_notes_ui: CanvasLayer = null
 
 const STATE_FILE := "user://patch_notes_state.json"
 
@@ -30,7 +30,7 @@ func _ready() -> void:
     print("[PatchNotesManager] Initialized - v%s (last seen: %s)" % [_current_version, _last_seen_version])
 
 ## Register the UI for showing patch notes
-func register_ui(ui: Control) -> void:
+func register_ui(ui: CanvasLayer) -> void:
     _patch_notes_ui = ui
     print("[PatchNotesManager] UI registered")
 

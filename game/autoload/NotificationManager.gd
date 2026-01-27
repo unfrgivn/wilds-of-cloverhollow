@@ -25,13 +25,13 @@ const ITEM_DURATION: float = 2.0
 const QUEST_DURATION: float = 4.0
 
 # Reference to the UI
-var _notification_ui: Control = null
+var _notification_ui: CanvasLayer = null
 
 func _ready() -> void:
     print("[NotificationManager] Initialized")
 
 ## Register the UI for displaying notifications
-func register_ui(ui: Control) -> void:
+func register_ui(ui: CanvasLayer) -> void:
     _notification_ui = ui
     print("[NotificationManager] UI registered")
 

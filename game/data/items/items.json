@@ -350,6 +350,96 @@
       "power": 200,
       "target": "none",
       "price": 200
+    },
+    {
+      "id": "bug_net",
+      "name": "Bug Net",
+      "description": "A lightweight net perfect for catching bugs. Swing it at insects to add them to your collection!",
+      "type": "tool",
+      "effect": "catch_bug",
+      "power": 0,
+      "target": "world",
+      "price": 0
+    },
+    {
+      "id": "common_butterfly",
+      "name": "Common Butterfly",
+      "description": "A pretty butterfly with orange and black wings.",
+      "type": "bug",
+      "effect": "sell",
+      "power": 5,
+      "target": "none",
+      "price": 5
+    },
+    {
+      "id": "ladybug",
+      "name": "Ladybug",
+      "description": "A cute red bug with black spots. Good luck!",
+      "type": "bug",
+      "effect": "sell",
+      "power": 8,
+      "target": "none",
+      "price": 8
+    },
+    {
+      "id": "grasshopper",
+      "name": "Grasshopper",
+      "description": "A bouncy green insect. Quick jumper!",
+      "type": "bug",
+      "effect": "sell",
+      "power": 10,
+      "target": "none",
+      "price": 10
+    },
+    {
+      "id": "firefly",
+      "name": "Firefly",
+      "description": "A magical bug that glows in the dark.",
+      "type": "bug",
+      "effect": "sell",
+      "power": 25,
+      "target": "none",
+      "price": 25
+    },
+    {
+      "id": "dragonfly",
+      "name": "Dragonfly",
+      "description": "A swift flying insect with iridescent wings.",
+      "type": "bug",
+      "effect": "sell",
+      "power": 30,
+      "target": "none",
+      "price": 30
+    },
+    {
+      "id": "stag_beetle",
+      "name": "Stag Beetle",
+      "description": "A large beetle with impressive pincers.",
+      "type": "bug",
+      "effect": "sell",
+      "power": 50,
+      "target": "none",
+      "price": 50
+    },
+    {
+      "id": "rainbow_moth",
+      "name": "Rainbow Moth",
+      "description": "A beautiful moth with rainbow-colored wings.",
+      "type": "bug",
+      "effect": "sell",
+      "power": 75,
+      "target": "none",
+      "price": 75
+    },
+    {
+      "id": "crystal_beetle",
+      "name": "Crystal Beetle",
+      "description": "A legendary beetle with crystalline shell. Incredibly rare!",
+      "type": "bug",
+      "effect": "sell",
+      "power": 200,
+      "target": "none",
+      "price": 200
     }
   ]
 }

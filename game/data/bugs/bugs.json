@@ -1,0 +1,110 @@
+{
+  "bugs": [
+    {
+      "id": "common_butterfly",
+      "name": "Common Butterfly",
+      "description": "A pretty butterfly with orange and black wings. Easy to catch.",
+      "rarity": "common",
+      "locations": ["town_park", "town_center", "forest_entrance"],
+      "speed": 1,
+      "value": 5,
+      "time_of_day": ["morning", "afternoon"]
+    },
+    {
+      "id": "ladybug",
+      "name": "Ladybug",
+      "description": "A cute red bug with black spots. Considered good luck!",
+      "rarity": "common",
+      "locations": ["town_park", "hidden_grove"],
+      "speed": 1,
+      "value": 8,
+      "time_of_day": ["morning", "afternoon", "evening"]
+    },
+    {
+      "id": "grasshopper",
+      "name": "Grasshopper",
+      "description": "A bouncy green insect. Quick little jumper!",
+      "rarity": "common",
+      "locations": ["town_park", "forest_path"],
+      "speed": 2,
+      "value": 10,
+      "time_of_day": ["afternoon"]
+    },
+    {
+      "id": "firefly",
+      "name": "Firefly",
+      "description": "A magical bug that glows in the dark. Only active at night.",
+      "rarity": "uncommon",
+      "locations": ["town_park", "forest_path", "hidden_grove"],
+      "speed": 2,
+      "value": 25,
+      "time_of_day": ["evening", "night"]
+    },
+    {
+      "id": "dragonfly",
+      "name": "Dragonfly",
+      "description": "A swift flying insect with iridescent wings. Hard to catch!",
+      "rarity": "uncommon",
+      "locations": ["town_park", "bubblegum_bay"],
+      "speed": 3,
+      "value": 30,
+      "time_of_day": ["morning", "afternoon"]
+    },
+    {
+      "id": "stag_beetle",
+      "name": "Stag Beetle",
+      "description": "A large beetle with impressive pincers. Rare and valuable.",
+      "rarity": "rare",
+      "locations": ["forest_path", "forest_entrance"],
+      "speed": 2,
+      "value": 50,
+      "time_of_day": ["night"]
+    },
+    {
+      "id": "rainbow_moth",
+      "name": "Rainbow Moth",
+      "description": "A beautiful moth with rainbow-colored wings. Very rare!",
+      "rarity": "rare",
+      "locations": ["hidden_grove"],
+      "speed": 3,
+      "value": 75,
+      "time_of_day": ["evening", "night"]
+    },
+    {
+      "id": "crystal_beetle",
+      "name": "Crystal Beetle",
+      "description": "A legendary beetle with crystalline shell. Incredibly rare!",
+      "rarity": "legendary",
+      "locations": ["hidden_grove"],
+      "speed": 4,
+      "value": 200,
+      "time_of_day": ["night"]
+    }
+  ],
+  "spawn_areas": [
+    {
+      "id": "town_park_grass",
+      "name": "Town Park Grass",
+      "area": "town_park",
+      "bug_pool": ["common_butterfly", "ladybug", "grasshopper", "firefly", "dragonfly"]
+    },
+    {
+      "id": "forest_underbrush",
+      "name": "Forest Underbrush",
+      "area": "forest_path",
+      "bug_pool": ["grasshopper", "firefly", "stag_beetle"]
+    },
+    {
+      "id": "grove_meadow",
+      "name": "Grove Meadow",
+      "area": "hidden_grove",
+      "bug_pool": ["ladybug", "firefly", "rainbow_moth", "crystal_beetle"]
+    }
+  ],
+  "rarity_weights": {
+    "common": 55,
+    "uncommon": 28,
+    "rare": 14,
+    "legendary": 3
+  }
+}

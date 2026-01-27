@@ -1834,7 +1834,7 @@ Fishing minigame.
 
 ---
 
-## Milestone 150 — Minigame: Bug catching  **Owner:** Gameplay + Art Pipeline
+## Milestone 150 — Minigame: Bug catching  **Owner:** Gameplay + Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Collection minigame.
 

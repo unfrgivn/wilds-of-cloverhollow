@@ -484,6 +484,26 @@ This file is the single source of truth. If code changes behavior, update this f
 - Fish items added to inventory on successful catch.
 - Scenario: `fishing_minigame_smoke`.
 
+### 3.40 Bug catching minigame
+- BugSpawner (Area2D): Spawns bugs in grass areas for catching.
+- Requires `bug_net` tool to catch bugs.
+- BugCatchingMinigame (CanvasLayer): Chase-and-catch mechanic.
+  - Searching phase: Bug moves around screen, bouncing off walls.
+  - Chasing phase: Player tracks bug movement.
+  - Catch phase: Press action when bug is in catch zone.
+  - Harder bugs = faster movement, smaller catch window.
+- Bug data stored in `game/data/bugs/bugs.json`:
+  - bugs[]: id, name, rarity, locations[], speed, value, time_of_day[].
+  - spawn_areas[]: id, area, bug_pool[].
+  - rarity_weights: common(55), uncommon(28), rare(14), legendary(3).
+- Bug rarities: common, uncommon, rare, legendary.
+- 8 bug types: common_butterfly, ladybug, grasshopper, firefly, dragonfly, stag_beetle, rainbow_moth, crystal_beetle.
+- 3 spawn areas: town_park_grass, bubblegum_shore, forest_stream.
+- Time-of-day spawning: some bugs only appear at certain times (firefly at night, etc.).
+- Bug items added to inventory on successful catch.
+- BugCollectionLog (CanvasLayer): UI showing caught bugs and collection percentage.
+- Scenario: `bug_catching_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

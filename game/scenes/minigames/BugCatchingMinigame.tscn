@@ -1,0 +1,82 @@
+[gd_scene load_steps=2 format=3 uid="uid://bugcatchingminigame"]
+
+[ext_resource type="Script" path="res://game/scripts/minigames/BugCatchingMinigame.gd" id="1_script"]
+
+[node name="BugCatchingMinigame" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 20.0
+offset_right = 80.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Bug Catching"
+horizontal_alignment = 1
+
+[node name="InstructionLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 220.0
+offset_right = 150.0
+offset_bottom = 250.0
+grow_horizontal = 2
+text = "A bug appeared!"
+horizontal_alignment = 1
+
+[node name="TimerLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 50.0
+grow_horizontal = 0
+text = "5.0"
+horizontal_alignment = 2
+
+[node name="CatchZone" type="ColorRect" parent="Panel"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 85.0
+offset_right = 180.0
+offset_bottom = 145.0
+color = Color(0.2, 0.6, 0.2, 0.3)
+
+[node name="BugSprite" type="ColorRect" parent="Panel"]
+layout_mode = 0
+offset_left = 145.0
+offset_top = 100.0
+offset_right = 165.0
+offset_bottom = 120.0
+color = Color(0.8, 0.6, 0.2, 1)
+
+[node name="ResultLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 180.0
+offset_right = 100.0
+offset_bottom = 210.0
+grow_horizontal = 2
+text = "Caught it!"
+horizontal_alignment = 1

@@ -1,0 +1,17 @@
+{
+    "scenario_id": "bug_catching_smoke",
+    "description": "Test bug catching data loads and items can be acquired",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "acquire_tool", "tool_id": "bug_net"},
+        {"type": "check_tool", "tool_id": "bug_net"},
+        {"type": "add_inventory_item", "item_id": "common_butterfly", "count": 1},
+        {"type": "add_inventory_item", "item_id": "firefly", "count": 1},
+        {"type": "add_inventory_item", "item_id": "stag_beetle", "count": 1},
+        {"type": "check_inventory", "item_id": "common_butterfly"},
+        {"type": "check_inventory", "item_id": "firefly"},
+        {"type": "check_inventory", "item_id": "stag_beetle"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

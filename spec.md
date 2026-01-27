@@ -94,7 +94,15 @@ This file is the single source of truth. If code changes behavior, update this f
   - Shows all 3 slots with area name and save time.
   - Supports save, load, and delete operations.
   - Tab key deletes selected slot, Cancel closes UI.
-- Scenario actions: `save_game`, `load_game`, `delete_save`, `check_save_slots`, `has_save` (all support slot parameter).
+- Corruption recovery:
+  - Backup saves created automatically before overwriting (`.backup` suffix).
+  - Required fields validation: version, timestamp, current_area, player_position.
+  - `is_save_corrupted(slot)`: Checks if save file is corrupted.
+  - `recover_from_backup(slot)`: Attempts to restore from backup.
+  - `has_backup(slot)`: Checks if backup exists.
+  - `save_corrupted` signal emitted on corruption detection (with recovery status).
+  - Automatic recovery attempt when loading corrupted save.
+- Scenario actions: `save_game`, `load_game`, `delete_save`, `check_save_slots`, `has_save`, `corrupt_save`, `check_save_corrupted`, `check_backup`, `recover_backup` (all support slot parameter).
 - Cloud sync hooks (stubs for future implementation):
   - `cloud_upload(slot)`, `cloud_download(slot)`: Upload/download save data.
   - `get_save_data_json(slot)`, `import_save_data_json(slot, json)`: Portable JSON serialization.

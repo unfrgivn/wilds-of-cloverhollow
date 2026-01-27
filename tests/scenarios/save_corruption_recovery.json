@@ -1,0 +1,41 @@
+{
+  "id": "save_corruption_recovery",
+  "description": "Test save corruption detection and backup recovery",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "max_frames": 400,
+  "actions": [
+    {"type": "log", "message": "=== Testing save corruption recovery ==="},
+    {"type": "wait_frames", "count": 30},
+    
+    {"type": "log", "message": "Delete any existing saves..."},
+    {"type": "delete_save", "slot": 0},
+    
+    {"type": "log", "message": "Create initial save..."},
+    {"type": "save_game", "slot": 0},
+    {"type": "wait_frames", "count": 10},
+    {"type": "has_save", "slot": 0},
+    
+    {"type": "log", "message": "Move player and save again (creates backup)..."},
+    {"type": "move", "direction": "right", "frames": 30},
+    {"type": "save_game", "slot": 0},
+    {"type": "wait_frames", "count": 10},
+    
+    {"type": "log", "message": "Check backup exists..."},
+    {"type": "check_backup", "slot": 0},
+    
+    {"type": "log", "message": "Corrupt the save file..."},
+    {"type": "corrupt_save", "slot": 0},
+    {"type": "check_save_corrupted", "slot": 0},
+    
+    {"type": "log", "message": "Attempt to load corrupted save (should recover from backup)..."},
+    {"type": "load_game", "slot": 0},
+    {"type": "wait_frames", "count": 60},
+    
+    {"type": "log", "message": "Verify save is no longer corrupted..."},
+    {"type": "check_save_corrupted", "slot": 0},
+    {"type": "has_save", "slot": 0},
+    
+    {"type": "log", "message": "=== Save corruption recovery test complete ==="},
+    {"type": "capture", "label": "save_corruption_test"}
+  ]
+}

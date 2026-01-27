@@ -3,14 +3,19 @@ extends Node
 ## Supports multiple save slots (0, 1, 2)
 
 const SAVE_DIR := "user://saves/"
+const BACKUP_SUFFIX := ".backup"
 const MAX_SLOTS := 3
 
 signal save_completed(success: bool, slot: int)
 signal load_completed(success: bool, slot: int)
 signal save_deleted(slot: int)
+signal save_corrupted(slot: int, recovered: bool)
 
 ## Save data structure version (for future migrations)
 const SAVE_VERSION := 1
+
+## Required fields for a valid save file
+const REQUIRED_FIELDS := ["version", "timestamp", "current_area", "player_position"]
 
 ## Currently active slot
 var current_slot: int = 0
@@ -28,6 +33,120 @@ func _ensure_save_dir() -> void:
 
 func _get_slot_path(slot: int) -> String:
     return SAVE_DIR + "save_slot_%d.json" % slot
+
+
+func _get_backup_path(slot: int) -> String:
+    return _get_slot_path(slot) + BACKUP_SUFFIX
+
+
+## Create a backup of the current save before overwriting
+func _create_backup(slot: int) -> bool:
+    var source_path := _get_slot_path(slot)
+    if not FileAccess.file_exists(source_path):
+        return true  # Nothing to backup
+    
+    var file := FileAccess.open(source_path, FileAccess.READ)
+    if file == null:
+        return false
+    
+    var content := file.get_as_text()
+    file.close()
+    
+    var backup_file := FileAccess.open(_get_backup_path(slot), FileAccess.WRITE)
+    if backup_file == null:
+        return false
+    
+    backup_file.store_string(content)
+    backup_file.close()
+    print("[SaveManager] Backup created for slot %d" % slot)
+    return true
+
+
+## Validate save data structure
+func _validate_save_data(data: Dictionary) -> bool:
+    for field in REQUIRED_FIELDS:
+        if not data.has(field):
+            push_warning("[SaveManager] Missing required field: %s" % field)
+            return false
+    
+    # Validate player_position structure
+    var pos: Dictionary = data.get("player_position", {})
+    if not pos.has("x") or not pos.has("y"):
+        push_warning("[SaveManager] Invalid player_position structure")
+        return false
+    
+    # Validate version is not too new
+    var version: int = int(data.get("version", 0))
+    if version > SAVE_VERSION:
+        push_warning("[SaveManager] Save version %d newer than supported %d" % [version, SAVE_VERSION])
+        return false
+    
+    return true
+
+
+## Attempt to recover from backup
+func recover_from_backup(slot: int) -> bool:
+    var backup_path := _get_backup_path(slot)
+    if not FileAccess.file_exists(backup_path):
+        push_warning("[SaveManager] No backup found for slot %d" % slot)
+        return false
+    
+    var file := FileAccess.open(backup_path, FileAccess.READ)
+    if file == null:
+        return false
+    
+    var json_string := file.get_as_text()
+    file.close()
+    
+    # Validate backup
+    var json := JSON.new()
+    var error := json.parse(json_string)
+    if error != OK:
+        push_error("[SaveManager] Backup is also corrupted for slot %d" % slot)
+        return false
+    
+    var data: Dictionary = json.data
+    if not _validate_save_data(data):
+        push_error("[SaveManager] Backup failed validation for slot %d" % slot)
+        return false
+    
+    # Restore from backup
+    var save_path := _get_slot_path(slot)
+    var save_file := FileAccess.open(save_path, FileAccess.WRITE)
+    if save_file == null:
+        return false
+    
+    save_file.store_string(json_string)
+    save_file.close()
+    print("[SaveManager] Recovered slot %d from backup" % slot)
+    save_corrupted.emit(slot, true)  # Recovered successfully
+    return true
+
+
+## Check if a save is corrupted
+func is_save_corrupted(slot: int) -> bool:
+    var path := _get_slot_path(slot)
+    if not FileAccess.file_exists(path):
+        return false
+    
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return true
+    
+    var json_string := file.get_as_text()
+    file.close()
+    
+    var json := JSON.new()
+    var error := json.parse(json_string)
+    if error != OK:
+        return true
+    
+    return not _validate_save_data(json.data)
+
+
+## Check if a backup exists for a slot
+func has_backup(slot: int) -> bool:
+    return FileAccess.file_exists(_get_backup_path(slot))
 
 
 ## Build save data from current game state
@@ -64,6 +183,9 @@ func save_game(slot: int = -1) -> bool:
         push_error("[SaveManager] Invalid slot: %d" % slot)
         save_completed.emit(false, slot)
         return false
+    
+    # Create backup before overwriting
+    _create_backup(slot)
     
     var save_data := _build_save_data()
     var json_string := JSON.stringify(save_data, "\t")
@@ -112,11 +234,32 @@ func load_game(slot: int = -1) -> bool:
     var error := json.parse(json_string)
     if error != OK:
         push_error("[SaveManager] Failed to parse save file: %s" % json.get_error_message())
-        load_completed.emit(false, slot)
-        return false
+        # Attempt recovery from backup
+        if recover_from_backup(slot):
+            NotificationManager.show_notification("Save Recovered", "Loaded from backup after detecting corruption.", NotificationManager.NotificationType.INFO)
+            return await load_game(slot)  # Retry load
+        else:
+            save_corrupted.emit(slot, false)  # Could not recover
+            NotificationManager.show_notification("Save Corrupted", "Could not recover save file.", NotificationManager.NotificationType.INFO)
+            load_completed.emit(false, slot)
+            return false
+    
+    var save_data: Dictionary = json.data
+    
+    # Validate save data structure
+    if not _validate_save_data(save_data):
+        push_error("[SaveManager] Save data validation failed for slot %d" % slot)
+        # Attempt recovery
+        if recover_from_backup(slot):
+            NotificationManager.show_notification("Save Recovered", "Loaded from backup after validation failure.", NotificationManager.NotificationType.INFO)
+            return await load_game(slot)
+        else:
+            save_corrupted.emit(slot, false)
+            NotificationManager.show_notification("Save Corrupted", "Save file is invalid.", NotificationManager.NotificationType.INFO)
+            load_completed.emit(false, slot)
+            return false
     
     current_slot = slot
-    var save_data: Dictionary = json.data
     return await _apply_save_data(save_data, slot)
 
 

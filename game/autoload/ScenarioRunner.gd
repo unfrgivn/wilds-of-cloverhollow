@@ -217,7 +217,45 @@ func _step_actions() -> void:
         var slot: int = int(action.get("slot", 0))
         var has_it: bool = SaveManager.has_save(slot)
         _trace["events"].append({"type": "has_save", "frame": _frame, "slot": slot, "has_save": has_it})
-        print("[Scenario] has_save slot=%d: %s" % [slot, has_it])
+        print("[Scenario] has_save slot=%d result=%s" % [slot, has_it])
+        _action_index += 1
+        return
+
+    if t == "corrupt_save":
+        # Write invalid JSON to a save slot for testing corruption recovery
+        var slot: int = int(action.get("slot", 0))
+        var path := SaveManager.SAVE_DIR + "save_slot_%d.json" % slot
+        DirAccess.make_dir_recursive_absolute(SaveManager.SAVE_DIR)
+        var file := FileAccess.open(path, FileAccess.WRITE)
+        if file != null:
+            file.store_string("{invalid json - corrupted for testing")
+            file.close()
+        _trace["events"].append({"type": "corrupt_save", "frame": _frame, "slot": slot})
+        print("[Scenario] corrupt_save slot=%d" % slot)
+        _action_index += 1
+        return
+
+    if t == "check_save_corrupted":
+        var slot: int = int(action.get("slot", 0))
+        var is_corrupted: bool = SaveManager.is_save_corrupted(slot)
+        _trace["events"].append({"type": "check_save_corrupted", "frame": _frame, "slot": slot, "corrupted": is_corrupted})
+        print("[Scenario] check_save_corrupted slot=%d corrupted=%s" % [slot, is_corrupted])
+        _action_index += 1
+        return
+
+    if t == "check_backup":
+        var slot: int = int(action.get("slot", 0))
+        var has_backup: bool = SaveManager.has_backup(slot)
+        _trace["events"].append({"type": "check_backup", "frame": _frame, "slot": slot, "has_backup": has_backup})
+        print("[Scenario] check_backup slot=%d has_backup=%s" % [slot, has_backup])
+        _action_index += 1
+        return
+
+    if t == "recover_backup":
+        var slot: int = int(action.get("slot", 0))
+        var recovered: bool = SaveManager.recover_from_backup(slot)
+        _trace["events"].append({"type": "recover_backup", "frame": _frame, "slot": slot, "recovered": recovered})
+        print("[Scenario] recover_backup slot=%d recovered=%s" % [slot, recovered])
         _action_index += 1
         return
 

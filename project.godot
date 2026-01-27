@@ -55,6 +55,7 @@ InputDebouncer="*res://game/autoload/InputDebouncer.gd"
 MemoryManager="*res://game/autoload/MemoryManager.gd"
 FeedbackManager="*res://game/autoload/FeedbackManager.gd"
 UpdateNotificationManager="*res://game/autoload/UpdateNotificationManager.gd"
+PatchNotesManager="*res://game/autoload/PatchNotesManager.gd"
 
 [internationalization]
 

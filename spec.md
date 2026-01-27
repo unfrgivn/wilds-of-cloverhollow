@@ -735,6 +735,15 @@ This file is the single source of truth. If code changes behavior, update this f
 - UpdatePromptUI (CanvasLayer): modal popup with Update/Later buttons and version info.
 - Stub: No actual backend - for future integration.
 
+### 3.52 Patch notes display
+- PatchNotesManager autoload tracks version-based "What's New" display.
+- State stored in `user://patch_notes_state.json` with last seen version.
+- Patch notes content stored in manager's `patch_notes` Dictionary (keyed by version).
+- API: `should_show_patch_notes()`, `get_current_patch_notes()`, `mark_as_seen()`, `show_patch_notes()`, `dismiss_patch_notes()`, `reset_seen_state()`.
+- Signals: `patch_notes_shown(version)`, `patch_notes_dismissed(version)`.
+- WhatsNewUI (CanvasLayer): scrollable list of bullet points with OK button.
+- Shows automatically on first launch or version update.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

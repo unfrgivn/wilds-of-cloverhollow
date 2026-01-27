@@ -2351,7 +2351,7 @@ Alert users to updates.
 
 ---
 
-## Milestone 193 — Patch notes display  **Owner:** UI Systems
+## Milestone 193 — Patch notes display  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Show what's new.
 

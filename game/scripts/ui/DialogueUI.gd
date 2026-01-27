@@ -67,6 +67,9 @@ func show_text(text: String) -> void:
 	label.text = text
 	label.visible = true
 	visible = true
+	# Announce dialogue for screen readers
+	if AccessibilityManager.screen_reader_enabled:
+		AccessibilityManager.announce("Dialogue: " + text)
 
 func show_choices(prompt: String, choices: Array) -> void:
 	_showing_choices = true
@@ -112,6 +115,9 @@ func _update_choice_highlight() -> void:
 		if i == _selected_choice:
 			button.text = "> " + button.text.trim_prefix("> ")
 			button.add_theme_color_override("font_color", Color.YELLOW)
+			# Announce selected choice for screen readers
+			if AccessibilityManager.screen_reader_enabled:
+				AccessibilityManager.register_focus("Choice %d" % (i + 1), button.text.trim_prefix("> "))
 		else:
 			button.text = button.text.trim_prefix("> ")
 			button.add_theme_color_override("font_color", Color.WHITE)

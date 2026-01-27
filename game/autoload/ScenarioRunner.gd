@@ -687,6 +687,39 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Accessibility actions
+    if t == "enable_screen_reader":
+        var enabled: bool = action.get("enabled", true)
+        AccessibilityManager.screen_reader_enabled = enabled
+        _trace["events"].append({"type": "enable_screen_reader", "frame": _frame, "enabled": enabled})
+        print("[Scenario] enable_screen_reader: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "check_accessibility":
+        var sr_enabled: bool = AccessibilityManager.screen_reader_enabled
+        var focus_name: String = AccessibilityManager.get_current_focus_name()
+        var recent: Array = AccessibilityManager.get_recent_announcements(5)
+        _trace["events"].append({"type": "check_accessibility", "frame": _frame, "screen_reader_enabled": sr_enabled, "focus": focus_name, "recent_announcements": recent})
+        print("[Scenario] check_accessibility: sr=%s, focus=%s" % [sr_enabled, focus_name])
+        _action_index += 1
+        return
+
+    if t == "announce":
+        var text: String = str(action.get("text", ""))
+        AccessibilityManager.announce(text)
+        _trace["events"].append({"type": "announce", "frame": _frame, "text": text})
+        print("[Scenario] announce: %s" % text)
+        _action_index += 1
+        return
+
+    if t == "reset_accessibility":
+        AccessibilityManager.reset()
+        _trace["events"].append({"type": "reset_accessibility", "frame": _frame})
+        print("[Scenario] reset_accessibility")
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

@@ -792,6 +792,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `open_art_gallery`, `close_art_gallery`.
 - Scenario: `art_gallery_smoke`.
 
+### 3.57 Accessibility: Screen reader support
+- AccessibilityManager autoload manages screen reader mode and focus announcements.
+- Settings stored in `user://accessibility_settings.json`.
+- API: `announce(text)`, `register_focus(name, description)`, `clear_focus()`, `toggle_screen_reader()`, `make_accessible(control, name, description)`, `make_buttons_accessible(buttons)`, `get_current_focus_name()`, `get_recent_announcements(count)`, `reset()`.
+- Signals: `screen_reader_enabled_changed(enabled)`, `focus_changed(name, description)`, `element_announced(text)`.
+- DialogueUI announces dialogue text and choice selections when screen reader enabled.
+- PauseMenuUI announces menu opening and focused options when screen reader enabled.
+- Scenario actions: `enable_screen_reader`, `check_accessibility`, `announce`, `reset_accessibility`.
+- Scenario: `screen_reader_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

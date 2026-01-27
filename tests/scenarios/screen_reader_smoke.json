@@ -1,0 +1,27 @@
+{
+  "id": "screen_reader_smoke",
+  "name": "Screen reader accessibility smoke test",
+  "description": "Verify screen reader announcements work for UI elements",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "enable_screen_reader", "enabled": true},
+    {"type": "check_accessibility"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "pause_game"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_accessibility"},
+    {"type": "capture", "label": "screen_reader_pause_menu"},
+    {"type": "press", "action": "ui_down"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_accessibility"},
+    {"type": "unpause_game"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "announce", "text": "Test announcement from scenario"},
+    {"type": "check_accessibility"},
+    {"type": "enable_screen_reader", "enabled": false},
+    {"type": "check_accessibility"},
+    {"type": "reset_accessibility"},
+    {"type": "capture", "label": "screen_reader_disabled"}
+  ]
+}

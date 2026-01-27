@@ -2052,7 +2052,7 @@ Future voice integration.
 
 ---
 
-## Milestone 168 — Accessibility: Screen reader support  **Owner:** UI Systems
+## Milestone 168 — Accessibility: Screen reader support  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Improve accessibility.
 

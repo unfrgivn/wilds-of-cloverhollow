@@ -47,6 +47,9 @@ func open_menu() -> void:
 	_selected_index = 0
 	visible = true
 	_populate_options()
+	# Announce for screen readers
+	if AccessibilityManager.screen_reader_enabled:
+		AccessibilityManager.announce("Pause menu. Use up and down to navigate, select to confirm.")
 	print("[PauseMenuUI] Opened")
 
 func close_menu() -> void:
@@ -85,6 +88,9 @@ func _update_selection() -> void:
 			buttons[i].flat = (i != _selected_index)
 			if i == _selected_index:
 				buttons[i].grab_focus()
+				# Announce for screen readers
+				if AccessibilityManager.screen_reader_enabled:
+					AccessibilityManager.register_focus(_menu_options[i], "Button %d of %d" % [i + 1, _menu_options.size()])
 
 func _on_option_pressed(index: int) -> void:
 	_selected_index = index

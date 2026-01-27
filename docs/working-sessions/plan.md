@@ -1969,7 +1969,7 @@ Clubs and activities.
 
 ---
 
-## Milestone 161 — Style guide documentation  **Owner:** Art Pipeline
+## Milestone 161 — Style guide documentation  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Visual style reference.
 

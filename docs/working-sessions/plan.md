@@ -2303,7 +2303,7 @@ Legal compliance.
 
 ---
 
-## Milestone 189 — Age rating preparation  **Owner:** QA Automation
+## Milestone 189 — Age rating preparation  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 App store rating.
 

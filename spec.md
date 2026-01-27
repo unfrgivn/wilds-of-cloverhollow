@@ -206,13 +206,22 @@ This file is the single source of truth. If code changes behavior, update this f
 
 ### 3.18 NPC schedule system
 - ScheduledNPC script (CharacterBody2D) manages time-based NPC visibility.
-- NPCs appear/disappear based on current time phase and area.
+- NPCs appear/disappear based on current time phase, day of week, and area.
+- DayNightManager tracks both time phase and day of week:
+  - Days: Monday(0) through Sunday(6).
+  - Weekend detection: Saturday(5) and Sunday(6) are weekend days.
+  - Signals: `time_changed(phase, phase_name)`, `day_changed(day, day_name, is_weekend)`.
+  - API: `is_weekend()`, `is_weekday()`, `set_day(day)`, `advance_day()`, `get_day_name()`.
 - Schedule data stored in `game/data/npcs/schedules.json`:
-  - Each entry keyed by npc_id contains: npc_id, npc_name, locations (dict by phase), default_area, default_position.
+  - Each entry keyed by npc_id contains: npc_id, npc_name, weekday_locations, weekend_locations, weekend_dialogue, default_area, default_position.
   - Location entries specify: area (scene path), position [x, y], marker (spawn marker id).
+  - Weekend dialogue: optional array of strings for weekend-specific NPC responses.
+  - Backwards compatible: falls back to `locations` if weekday/weekend keys absent.
 - GameData autoload loads schedules via `get_npc_schedules()` and `get_npc_schedule(npc_id)`.
-- ScheduledNPC connects to DayNightManager.time_changed signal.
-- On time change, NPC shows if current scene matches scheduled area for that phase, hides otherwise.
+- ScheduledNPC connects to DayNightManager.time_changed and day_changed signals.
+- On time/day change, NPC uses weekend_locations if is_weekend, else weekday_locations.
+- ScheduledNPC API: `get_weekend_dialogue()`, `has_weekend_dialogue()`.
+- Scenario actions: `set_day`, `check_day`, `check_weekend`.
 
 ### 3.19 Relationship/affinity system
 - AffinityManager autoload tracks NPC friendship levels.

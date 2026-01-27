@@ -1,11 +1,13 @@
 extends Node
 
-## DayNightManager - Manages time of day and visual color modulation
+## DayNightManager - Manages time of day, day of week, and visual color modulation
 ##
 ## Time phases: morning (0), afternoon (1), evening (2), night (3)
+## Days: 0=Monday through 6=Sunday, with Saturday(5) and Sunday(6) being weekend
 ## Time advances on area transitions (simplified model)
 
 signal time_changed(phase: int, phase_name: String)
+signal day_changed(day: int, day_name: String, is_weekend: bool)
 
 ## Time phases
 enum TimePhase {
@@ -15,8 +17,22 @@ enum TimePhase {
 	NIGHT = 3
 }
 
+## Days of the week
+enum DayOfWeek {
+	MONDAY = 0,
+	TUESDAY = 1,
+	WEDNESDAY = 2,
+	THURSDAY = 3,
+	FRIDAY = 4,
+	SATURDAY = 5,
+	SUNDAY = 6
+}
+
 ## Phase names for display
 const PHASE_NAMES := ["Morning", "Afternoon", "Evening", "Night"]
+
+## Day names for display
+const DAY_NAMES := ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 ## Color modulation for each phase (RGBA multiplier)
 ## These create subtle but noticeable tinting
@@ -30,6 +46,9 @@ const PHASE_COLORS := {
 ## Current time phase
 var current_phase: int = TimePhase.MORNING
 
+## Current day of the week (0=Monday, 6=Sunday)
+var current_day: int = DayOfWeek.MONDAY
+
 ## Transition duration in seconds
 var transition_duration: float = 1.0
 
@@ -42,7 +61,7 @@ var _transitioning: bool = false
 func _ready() -> void:
 	_create_overlay()
 	_apply_phase_color(current_phase)
-	print("[DayNightManager] Initialized at %s" % get_phase_name())
+	print("[DayNightManager] Initialized at %s, %s" % [get_day_name(), get_phase_name()])
 
 func _create_overlay() -> void:
 	_overlay = CanvasModulate.new()
@@ -108,3 +127,45 @@ func set_time_instant(phase: int) -> void:
 ## Get all available phases (for iteration)
 func get_all_phases() -> Array[int]:
 	return [TimePhase.MORNING, TimePhase.AFTERNOON, TimePhase.EVENING, TimePhase.NIGHT]
+
+## Get current day name
+func get_day_name() -> String:
+	return DAY_NAMES[current_day]
+
+## Check if current day is a weekend (Saturday or Sunday)
+func is_weekend() -> bool:
+	return current_day == DayOfWeek.SATURDAY or current_day == DayOfWeek.SUNDAY
+
+## Check if current day is a weekday
+func is_weekday() -> bool:
+	return not is_weekend()
+
+## Advance to next day (wraps after Sunday)
+func advance_day() -> void:
+	var next_day = (current_day + 1) % DayOfWeek.size()
+	set_day(next_day)
+
+## Set specific day
+func set_day(day: int, quiet: bool = false) -> void:
+	if day < 0 or day >= DayOfWeek.size():
+		push_warning("[DayNightManager] Invalid day: %d" % day)
+		return
+	
+	if day == current_day:
+		return
+	
+	var old_day = current_day
+	current_day = day
+	
+	if not quiet:
+		day_changed.emit(current_day, get_day_name(), is_weekend())
+		print("[DayNightManager] Day changed: %s -> %s%s" % [DAY_NAMES[old_day], DAY_NAMES[day], " (weekend)" if is_weekend() else ""])
+
+## Set day instantly (for scenarios/testing)
+func set_day_instant(day: int) -> void:
+	set_day(day, false)
+
+## Get all available days (for iteration)
+func get_all_days() -> Array[int]:
+	return [DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, 
+			DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY]

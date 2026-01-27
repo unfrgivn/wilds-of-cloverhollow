@@ -1,0 +1,43 @@
+{
+  "id": "npc_weekend_smoke",
+  "name": "NPC Weekend Schedule Smoke Test",
+  "description": "Tests that NPCs use weekend schedules when day is Saturday or Sunday",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "actions": [
+    { "type": "comment", "text": "Start on Monday - check weekday schedule" },
+    { "type": "set_day", "day": 0 },
+    { "type": "check_day" },
+    { "type": "check_weekend" },
+    { "type": "set_time_phase", "phase": 0 },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "monday_morning" },
+
+    { "type": "comment", "text": "Change to Saturday - check weekend schedule" },
+    { "type": "set_day", "day": 5 },
+    { "type": "check_day" },
+    { "type": "check_weekend" },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "saturday_morning" },
+
+    { "type": "comment", "text": "Test evening phase on Saturday" },
+    { "type": "set_time_phase", "phase": 2 },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "saturday_evening" },
+
+    { "type": "comment", "text": "Test Sunday" },
+    { "type": "set_day", "day": 6 },
+    { "type": "check_day" },
+    { "type": "check_weekend" },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "sunday_evening" },
+
+    { "type": "comment", "text": "Return to weekday (Friday)" },
+    { "type": "set_day", "day": 4 },
+    { "type": "check_day" },
+    { "type": "check_weekend" },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "friday_evening" },
+
+    { "type": "comment", "text": "Test complete" }
+  ]
+}

@@ -259,6 +259,29 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "set_day":
+        var day: int = int(action.get("day", 0))
+        DayNightManager.set_day(day)
+        _trace["events"].append({"type": "set_day", "frame": _frame, "day": day, "day_name": DayNightManager.get_day_name(), "is_weekend": DayNightManager.is_weekend()})
+        _action_index += 1
+        return
+
+    if t == "check_day":
+        var day: int = DayNightManager.current_day
+        var day_name: String = DayNightManager.get_day_name()
+        var is_weekend: bool = DayNightManager.is_weekend()
+        _trace["events"].append({"type": "check_day", "frame": _frame, "day": day, "day_name": day_name, "is_weekend": is_weekend})
+        print("[ScenarioRunner] Check day: %s (day %d) weekend=%s" % [day_name, day, str(is_weekend)])
+        _action_index += 1
+        return
+
+    if t == "check_weekend":
+        var is_weekend: bool = DayNightManager.is_weekend()
+        _trace["events"].append({"type": "check_weekend", "frame": _frame, "is_weekend": is_weekend})
+        print("[ScenarioRunner] Is weekend: %s" % str(is_weekend))
+        _action_index += 1
+        return
+
     if t == "set_weather":
         var weather: int = int(action.get("weather", 0))
         WeatherManager.set_weather(weather)

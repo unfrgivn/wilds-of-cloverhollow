@@ -1942,7 +1942,7 @@ Dress up the pet.
 
 ---
 
-## Milestone 159 — NPC schedules: Weekend  **Owner:** Character Systems
+## Milestone 159 — NPC schedules: Weekend  **Owner:** Character Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 NPCs in different weekend locations.
 

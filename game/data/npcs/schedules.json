@@ -3,26 +3,71 @@
     "elder": {
       "npc_id": "elder",
       "npc_name": "Elder Willowbrook",
-      "locations": {
+      "weekday_locations": {
         "0": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [200, 180], "marker": "bench_1" },
         "1": { "area": "res://game/scenes/areas/Area_TownCenter.tscn", "position": [256, 160], "marker": "fountain" },
         "2": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [200, 180], "marker": "bench_1" },
         "3": { "area": null, "position": null, "marker": null }
       },
+      "weekend_locations": {
+        "0": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [200, 180], "marker": "bench_1" },
+        "1": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [200, 180], "marker": "bench_1" },
+        "2": { "area": "res://game/scenes/areas/Area_CafeInterior.tscn", "position": [200, 140], "marker": "table_1" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_dialogue": [
+        "Ah, the weekend! A perfect time for reflection.",
+        "I remember when weekends meant fishing by the old creek...",
+        "The cafe has the best tea on Saturday evenings."
+      ],
       "default_area": "res://game/scenes/areas/Area_TownPark.tscn",
       "default_position": [200, 180]
     },
     "shopkeeper": {
       "npc_id": "shopkeeper",
       "npc_name": "Shopkeeper",
-      "locations": {
+      "weekday_locations": {
         "0": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
         "1": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
         "2": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
         "3": { "area": null, "position": null, "marker": null }
       },
+      "weekend_locations": {
+        "0": { "area": null, "position": null, "marker": null },
+        "1": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
+        "2": { "area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn", "position": [256, 100], "marker": "counter" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_dialogue": [
+        "The shop opens later on weekends. Gotta rest sometime!",
+        "Weekend specials coming soon... maybe.",
+        "Even shopkeepers need a break on Saturday mornings!"
+      ],
       "default_area": "res://game/scenes/areas/Area_GeneralStoreInterior.tscn",
       "default_position": [256, 100]
+    },
+    "teacher": {
+      "npc_id": "teacher",
+      "npc_name": "Ms. Primrose",
+      "weekday_locations": {
+        "0": { "area": "res://game/scenes/areas/Area_SchoolClassroom.tscn", "position": [180, 80], "marker": "desk" },
+        "1": { "area": "res://game/scenes/areas/Area_SchoolClassroom.tscn", "position": [180, 80], "marker": "desk" },
+        "2": { "area": "res://game/scenes/areas/Area_School.tscn", "position": [200, 160], "marker": "entrance" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_locations": {
+        "0": { "area": "res://game/scenes/areas/Area_LibraryInterior.tscn", "position": [200, 120], "marker": "reading_table" },
+        "1": { "area": "res://game/scenes/areas/Area_TownPark.tscn", "position": [160, 200], "marker": "bench_2" },
+        "2": { "area": "res://game/scenes/areas/Area_CafeInterior.tscn", "position": [280, 140], "marker": "table_2" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_dialogue": [
+        "No classes on the weekend! Time to catch up on reading.",
+        "I love spending Saturday afternoons in the park.",
+        "The cafe is my favorite spot for grading papers... wait, it's the weekend!"
+      ],
+      "default_area": "res://game/scenes/areas/Area_SchoolClassroom.tscn",
+      "default_position": [180, 80]
     }
   }
 }

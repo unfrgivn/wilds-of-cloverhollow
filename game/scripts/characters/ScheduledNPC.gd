@@ -1,9 +1,10 @@
 class_name ScheduledNPC
 extends CharacterBody2D
 
-## ScheduledNPC - An NPC that moves between locations based on time of day
+## ScheduledNPC - An NPC that moves between locations based on time of day and day of week
 ##
 ## Connects to DayNightManager and relocates based on schedule data
+## Supports separate weekday and weekend schedules
 
 @export var npc_id: String = ""
 @export var npc_name: String = ""
@@ -14,6 +15,9 @@ var schedule: Dictionary = {}
 ## Current area this NPC should appear in
 var _current_scheduled_area: String = ""
 
+## Whether we're using weekend schedule
+var _using_weekend_schedule: bool = false
+
 func _ready() -> void:
 	# Load schedule data if not already set
 	if schedule.is_empty() and not npc_id.is_empty():
@@ -22,7 +26,9 @@ func _ready() -> void:
 	# Connect to DayNightManager
 	if DayNightManager != null:
 		DayNightManager.time_changed.connect(_on_time_changed)
-		# Set initial position based on current time
+		DayNightManager.day_changed.connect(_on_day_changed)
+		# Set initial position based on current time and day
+		_using_weekend_schedule = DayNightManager.is_weekend()
 		_update_for_time(DayNightManager.current_phase)
 
 func _load_schedule() -> void:
@@ -38,11 +44,24 @@ func _load_schedule() -> void:
 func _on_time_changed(phase: int, _phase_name: String) -> void:
 	_update_for_time(phase)
 
+func _on_day_changed(_day: int, _day_name: String, is_weekend: bool) -> void:
+	_using_weekend_schedule = is_weekend
+	_update_for_time(DayNightManager.current_phase)
+
 func _update_for_time(phase: int) -> void:
 	if schedule.is_empty():
 		return
 	
-	var locations: Dictionary = schedule.get("locations", {})
+	# Choose weekday or weekend locations
+	var locations: Dictionary = {}
+	if _using_weekend_schedule and schedule.has("weekend_locations"):
+		locations = schedule.get("weekend_locations", {})
+	elif schedule.has("weekday_locations"):
+		locations = schedule.get("weekday_locations", {})
+	else:
+		# Fallback to old "locations" key for backwards compatibility
+		locations = schedule.get("locations", {})
+	
 	var phase_str := str(phase)
 	
 	if not locations.has(phase_str):
@@ -71,7 +90,8 @@ func _update_for_time(phase: int) -> void:
 			if target_pos is Array and target_pos.size() >= 2:
 				position = Vector2(target_pos[0], target_pos[1])
 			visible = true
-			print("[ScheduledNPC] %s positioned at %s for phase %d" % [npc_id, position, phase])
+			var schedule_type := "weekend" if _using_weekend_schedule else "weekday"
+			print("[ScheduledNPC] %s positioned at %s for phase %d (%s)" % [npc_id, position, phase, schedule_type])
 		else:
 			# Wrong area - hide
 			visible = false
@@ -87,7 +107,14 @@ func get_scheduled_position() -> Vector2:
 	if schedule.is_empty():
 		return position
 	
-	var locations: Dictionary = schedule.get("locations", {})
+	var locations: Dictionary = {}
+	if _using_weekend_schedule and schedule.has("weekend_locations"):
+		locations = schedule.get("weekend_locations", {})
+	elif schedule.has("weekday_locations"):
+		locations = schedule.get("weekday_locations", {})
+	else:
+		locations = schedule.get("locations", {})
+	
 	var phase_str := str(DayNightManager.current_phase)
 	
 	if locations.has(phase_str):
@@ -97,3 +124,13 @@ func get_scheduled_position() -> Vector2:
 			return Vector2(target_pos[0], target_pos[1])
 	
 	return position
+
+## Get weekend-specific dialogue if available
+func get_weekend_dialogue() -> Array:
+	if _using_weekend_schedule and schedule.has("weekend_dialogue"):
+		return schedule.get("weekend_dialogue", [])
+	return []
+
+## Check if NPC has weekend dialogue
+func has_weekend_dialogue() -> bool:
+	return _using_weekend_schedule and schedule.has("weekend_dialogue") and not schedule.get("weekend_dialogue", []).is_empty()

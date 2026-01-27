@@ -1,0 +1,14 @@
+{
+  "scenario_id": "hot_reload_smoke",
+  "description": "Test GameData hot reload functionality",
+  "actions": [
+    {"type": "check_hot_reload"},
+    {"type": "enable_hot_reload", "enabled": true},
+    {"type": "check_hot_reload"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "reload_data"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "enable_hot_reload", "enabled": false},
+    {"type": "check_hot_reload"}
+  ]
+}

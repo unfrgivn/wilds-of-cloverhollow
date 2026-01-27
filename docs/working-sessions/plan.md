@@ -1749,7 +1749,7 @@ One-command asset processing.
 
 ---
 
-## Milestone 143 — Content hot reload  **Owner:** Gameplay + Data Systems
+## Milestone 143 — Content hot reload  **Owner:** Gameplay + Data Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Change data without restart.
 

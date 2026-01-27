@@ -505,6 +505,14 @@ All game content is data-driven via JSON files under `game/data/`:
 
 GameData autoload loads and caches all data on startup. Adding new content requires only JSON + sprite assets (no code changes).
 
+### 5.5.1 Content hot reload
+- GameData supports hot reload for development: `enable_hot_reload(true)`.
+- When enabled, GameData polls file timestamps every 1 second.
+- On file change, `reload_all()` clears caches and reloads all JSON data.
+- Signal `data_reloaded(category)` emitted after reload.
+- Hot reload disabled by default; intended for editor/development only.
+- Scenario actions: `enable_hot_reload`, `reload_data`, `check_hot_reload`.
+
 Content lint script (`tools/lint/lint-content.sh`) validates:
 - JSON syntax
 - Required fields per schema

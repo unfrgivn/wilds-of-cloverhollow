@@ -972,6 +972,29 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Hot reload actions
+    if t == "enable_hot_reload":
+        var enabled: bool = action.get("enabled", true)
+        GameData.enable_hot_reload(enabled)
+        _trace["events"].append({"type": "enable_hot_reload", "frame": _frame, "enabled": enabled})
+        print("[Scenario] enable_hot_reload: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "reload_data":
+        GameData.reload_all()
+        _trace["events"].append({"type": "reload_data", "frame": _frame})
+        print("[Scenario] reload_data")
+        _action_index += 1
+        return
+
+    if t == "check_hot_reload":
+        var enabled: bool = GameData.hot_reload_enabled
+        _trace["events"].append({"type": "check_hot_reload", "frame": _frame, "enabled": enabled})
+        print("[Scenario] check_hot_reload: enabled=%s" % enabled)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

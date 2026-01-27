@@ -1,7 +1,11 @@
 extends Node
-## GameData - Loads and caches all game data from JSON files
 
-## Data file paths
+signal data_reloaded(category: String)
+
+var hot_reload_enabled := false
+var _file_timestamps: Dictionary = {}
+var _check_interval := 1.0
+var _time_since_check := 0.0
 const ENEMIES_PATH := "res://game/data/enemies/enemies.json"
 const SKILLS_PATH := "res://game/data/skills/skills.json"
 const ITEMS_PATH := "res://game/data/items/items.json"
@@ -28,6 +32,15 @@ var party_data: Dictionary = {}
 
 func _ready() -> void:
 	_load_all_data()
+	_record_timestamps()
+
+func _process(delta: float) -> void:
+	if not hot_reload_enabled:
+		return
+	_time_since_check += delta
+	if _time_since_check >= _check_interval:
+		_time_since_check = 0.0
+		_check_for_changes()
 
 func _load_all_data() -> void:
 	_load_enemies()
@@ -231,3 +244,63 @@ func get_equipment(equip_id: String) -> Dictionary:
 ## Get all equipment
 func get_all_equipment() -> Array:
 	return equipment.values()
+
+func enable_hot_reload(enabled: bool = true) -> void:
+	hot_reload_enabled = enabled
+	if enabled:
+		_record_timestamps()
+		print("[GameData] Hot reload enabled")
+	else:
+		print("[GameData] Hot reload disabled")
+
+func reload_all() -> void:
+	print("[GameData] Reloading all data...")
+	enemies.clear()
+	skills.clear()
+	items.clear()
+	party_members.clear()
+	biomes.clear()
+	encounters.clear()
+	quests.clear()
+	npc_schedules.clear()
+	equipment.clear()
+	party_data.clear()
+	_load_all_data()
+	_record_timestamps()
+	data_reloaded.emit("all")
+
+func _record_timestamps() -> void:
+	_file_timestamps.clear()
+	var paths := [ENEMIES_PATH, SKILLS_PATH, ITEMS_PATH, PARTY_PATH, QUESTS_PATH, NPC_SCHEDULES_PATH, EQUIPMENT_PATH]
+	for path in paths:
+		_file_timestamps[path] = _get_file_mtime(path)
+	_record_directory_timestamps(BIOMES_DIR)
+	_record_directory_timestamps(ENCOUNTERS_DIR)
+
+func _record_directory_timestamps(dir_path: String) -> void:
+	var dir := DirAccess.open(dir_path)
+	if dir == null:
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".json"):
+			var full_path := dir_path + file_name
+			_file_timestamps[full_path] = _get_file_mtime(full_path)
+		file_name = dir.get_next()
+
+func _get_file_mtime(path: String) -> int:
+	if not FileAccess.file_exists(path):
+		return 0
+	return FileAccess.get_modified_time(path)
+
+func _check_for_changes() -> void:
+	var changed := false
+	for path in _file_timestamps.keys():
+		var current_mtime := _get_file_mtime(path)
+		if current_mtime != _file_timestamps[path]:
+			print("[GameData] File changed: %s" % path)
+			changed = true
+			break
+	if changed:
+		reload_all()

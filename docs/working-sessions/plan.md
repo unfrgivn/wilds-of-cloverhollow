@@ -1727,7 +1727,7 @@ Automated visual diffing.
 
 ---
 
-## Milestone 141 — Scenario authoring documentation  **Owner:** QA Automation
+## Milestone 141 — Scenario authoring documentation  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Guide for writing scenarios.
 

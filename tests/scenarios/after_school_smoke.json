@@ -1,0 +1,52 @@
+{
+  "id": "after_school_smoke",
+  "name": "After-School Activities Smoke Test",
+  "description": "Tests club room scene and NPCs during afternoon timeblock",
+  "scene": "res://game/scenes/areas/Area_SchoolClubRoom.tscn",
+  "actions": [
+    { "type": "comment", "text": "Set to weekday afternoon - club time" },
+    { "type": "set_day", "day": 1 },
+    { "type": "set_time_phase", "phase": 1 },
+    { "type": "wait_frames", "count": 10 },
+    { "type": "capture", "label": "club_room_afternoon" },
+
+    { "type": "comment", "text": "Move toward Art Club leader" },
+    { "type": "move", "direction": "up", "frames": 30 },
+    { "type": "move", "direction": "left", "frames": 40 },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "near_art_club_leader" },
+
+    { "type": "comment", "text": "Interact with Art Club leader" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "count": 10 },
+    { "type": "capture", "label": "art_club_dialogue" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "count": 5 },
+
+    { "type": "comment", "text": "Move toward Science Club leader" },
+    { "type": "move", "direction": "right", "frames": 80 },
+    { "type": "move", "direction": "down", "frames": 20 },
+    { "type": "wait_frames", "count": 5 },
+    { "type": "capture", "label": "near_science_club_leader" },
+
+    { "type": "comment", "text": "Interact with Science Club leader" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "count": 10 },
+    { "type": "capture", "label": "science_club_dialogue" },
+    { "type": "press", "action": "interact" },
+    { "type": "wait_frames", "count": 5 },
+
+    { "type": "comment", "text": "Test morning phase - clubs should be empty" },
+    { "type": "set_time_phase", "phase": 0 },
+    { "type": "wait_frames", "count": 10 },
+    { "type": "capture", "label": "club_room_morning_empty" },
+
+    { "type": "comment", "text": "Test weekend - clubs should be empty" },
+    { "type": "set_day", "day": 5 },
+    { "type": "set_time_phase", "phase": 1 },
+    { "type": "wait_frames", "count": 10 },
+    { "type": "capture", "label": "club_room_weekend_empty" },
+
+    { "type": "comment", "text": "Test complete" }
+  ]
+}

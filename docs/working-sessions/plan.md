@@ -1953,7 +1953,7 @@ NPCs in different weekend locations.
 
 ---
 
-## Milestone 160 — School: After-school activities  **Owner:** World Builder + Story
+## Milestone 160 — School: After-school activities  **Owner:** World Builder + Story  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Clubs and activities.
 

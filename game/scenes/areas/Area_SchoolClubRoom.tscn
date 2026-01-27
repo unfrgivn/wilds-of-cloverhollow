@@ -1,0 +1,320 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/player/Player.gd" id="1"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/fae/overworld/fae_placeholder.png" id="2"]
+[ext_resource type="PackedScene" path="res://game/scenes/ui/DialogueUI.tscn" id="3"]
+[ext_resource type="Script" path="res://game/scripts/areas/SpawnMarker.gd" id="4"]
+[ext_resource type="Script" path="res://game/scripts/areas/AreaTransition.gd" id="5"]
+[ext_resource type="Script" path="res://game/scripts/interaction/NPCDialogueTree.gd" id="6"]
+[ext_resource type="Script" path="res://game/scripts/characters/ScheduledNPC.gd" id="7"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_a_idle_south.png" id="8"]
+[ext_resource type="Texture2D" path="res://game/assets/sprites/characters/npcs/students/student_b_idle_south.png" id="9"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Player"]
+size = Vector2(16, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_Interaction"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Transition"]
+size = Vector2(24, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Easel"]
+size = Vector2(20, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_NPC"]
+radius = 20.0
+
+[node name="Area_SchoolClubRoom" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+color = Color(0.85, 0.82, 0.75, 1)
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_left = 40.0
+offset_top = 60.0
+offset_right = 472.0
+offset_bottom = 248.0
+color = Color(0.6, 0.55, 0.5, 1)
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="WallTop" type="ColorRect" parent="Walls"]
+offset_left = 40.0
+offset_top = 30.0
+offset_right = 472.0
+offset_bottom = 60.0
+color = Color(0.8, 0.75, 0.65, 1)
+
+[node name="WallLeft" type="ColorRect" parent="Walls"]
+offset_left = 20.0
+offset_top = 30.0
+offset_right = 40.0
+offset_bottom = 268.0
+color = Color(0.8, 0.75, 0.65, 1)
+
+[node name="WallRight" type="ColorRect" parent="Walls"]
+offset_left = 472.0
+offset_top = 30.0
+offset_right = 492.0
+offset_bottom = 268.0
+color = Color(0.8, 0.75, 0.65, 1)
+
+[node name="WallBottom" type="ColorRect" parent="Walls"]
+offset_left = 40.0
+offset_top = 248.0
+offset_right = 472.0
+offset_bottom = 268.0
+color = Color(0.8, 0.75, 0.65, 1)
+
+[node name="ClubSign" type="Label" parent="."]
+offset_left = 200.0
+offset_top = 35.0
+offset_right = 312.0
+offset_bottom = 55.0
+text = "ART CLUB"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Easels" type="Node2D" parent="."]
+
+[node name="Easel1" type="ColorRect" parent="Easels"]
+offset_left = 80.0
+offset_top = 100.0
+offset_right = 100.0
+offset_bottom = 140.0
+color = Color(0.55, 0.35, 0.2, 1)
+
+[node name="Canvas1" type="ColorRect" parent="Easels/Easel1"]
+offset_left = 2.0
+offset_top = 5.0
+offset_right = 18.0
+offset_bottom = 30.0
+color = Color(1.0, 0.98, 0.95, 1)
+
+[node name="Easel2" type="ColorRect" parent="Easels"]
+offset_left = 160.0
+offset_top = 100.0
+offset_right = 180.0
+offset_bottom = 140.0
+color = Color(0.55, 0.35, 0.2, 1)
+
+[node name="Canvas2" type="ColorRect" parent="Easels/Easel2"]
+offset_left = 2.0
+offset_top = 5.0
+offset_right = 18.0
+offset_bottom = 30.0
+color = Color(1.0, 0.98, 0.95, 1)
+
+[node name="Easel3" type="ColorRect" parent="Easels"]
+offset_left = 240.0
+offset_top = 100.0
+offset_right = 260.0
+offset_bottom = 140.0
+color = Color(0.55, 0.35, 0.2, 1)
+
+[node name="Canvas3" type="ColorRect" parent="Easels/Easel3"]
+offset_left = 2.0
+offset_top = 5.0
+offset_right = 18.0
+offset_bottom = 30.0
+color = Color(1.0, 0.98, 0.95, 1)
+
+[node name="SuppliesTable" type="Node2D" parent="."]
+
+[node name="Table" type="ColorRect" parent="SuppliesTable"]
+offset_left = 350.0
+offset_top = 80.0
+offset_right = 450.0
+offset_bottom = 120.0
+color = Color(0.5, 0.35, 0.25, 1)
+
+[node name="PaintJars" type="Label" parent="SuppliesTable"]
+offset_left = 355.0
+offset_top = 85.0
+offset_right = 445.0
+offset_bottom = 115.0
+text = "🎨 Paints"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DisplayWall" type="Node2D" parent="."]
+
+[node name="Painting1" type="ColorRect" parent="DisplayWall"]
+offset_left = 60.0
+offset_top = 40.0
+offset_right = 90.0
+offset_bottom = 58.0
+color = Color(0.9, 0.6, 0.4, 1)
+
+[node name="Painting2" type="ColorRect" parent="DisplayWall"]
+offset_left = 100.0
+offset_top = 40.0
+offset_right = 130.0
+offset_bottom = 58.0
+color = Color(0.5, 0.7, 0.9, 1)
+
+[node name="Painting3" type="ColorRect" parent="DisplayWall"]
+offset_left = 380.0
+offset_top = 40.0
+offset_right = 410.0
+offset_bottom = 58.0
+color = Color(0.7, 0.9, 0.5, 1)
+
+[node name="Painting4" type="ColorRect" parent="DisplayWall"]
+offset_left = 420.0
+offset_top = 40.0
+offset_right = 450.0
+offset_bottom = 58.0
+color = Color(0.9, 0.7, 0.9, 1)
+
+[node name="ScienceCorner" type="Node2D" parent="."]
+
+[node name="ScienceSign" type="Label" parent="ScienceCorner"]
+offset_left = 320.0
+offset_top = 150.0
+offset_right = 460.0
+offset_bottom = 170.0
+text = "SCIENCE CORNER"
+horizontal_alignment = 1
+
+[node name="LabTable" type="ColorRect" parent="ScienceCorner"]
+offset_left = 340.0
+offset_top = 175.0
+offset_right = 440.0
+offset_bottom = 210.0
+color = Color(0.4, 0.45, 0.5, 1)
+
+[node name="Beakers" type="Label" parent="ScienceCorner"]
+offset_left = 345.0
+offset_top = 180.0
+offset_right = 435.0
+offset_bottom = 205.0
+text = "🧪 Beakers"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Collisions" type="Node2D" parent="."]
+
+[node name="Easel1Collision" type="StaticBody2D" parent="Collisions"]
+position = Vector2(90, 125)
+
+[node name="Shape" type="CollisionShape2D" parent="Collisions/Easel1Collision"]
+shape = SubResource("RectangleShape2D_Easel")
+
+[node name="Easel2Collision" type="StaticBody2D" parent="Collisions"]
+position = Vector2(170, 125)
+
+[node name="Shape" type="CollisionShape2D" parent="Collisions/Easel2Collision"]
+shape = SubResource("RectangleShape2D_Easel")
+
+[node name="Easel3Collision" type="StaticBody2D" parent="Collisions"]
+position = Vector2(250, 125)
+
+[node name="Shape" type="CollisionShape2D" parent="Collisions/Easel3Collision"]
+shape = SubResource("RectangleShape2D_Easel")
+
+[node name="SupplyTableCollision" type="StaticBody2D" parent="Collisions"]
+position = Vector2(400, 100)
+
+[node name="Shape" type="CollisionShape2D" parent="Collisions/SupplyTableCollision"]
+shape = SubResource("RectangleShape2D_Easel")
+
+[node name="LabTableCollision" type="StaticBody2D" parent="Collisions"]
+position = Vector2(390, 192)
+
+[node name="Shape" type="CollisionShape2D" parent="Collisions/LabTableCollision"]
+shape = SubResource("RectangleShape2D_Easel")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(256, 230)
+script = ExtResource("1")
+
+[node name="Sprite" type="Sprite2D" parent="Player"]
+texture = ExtResource("2")
+centered = true
+
+[node name="Collision" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_Player")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+enabled = true
+position_smoothing_enabled = false
+
+[node name="InteractionArea" type="Area2D" parent="Player"]
+
+[node name="InteractionShape" type="CollisionShape2D" parent="Player/InteractionArea"]
+shape = SubResource("CircleShape2D_Interaction")
+
+[node name="DialogueUI" parent="." instance=ExtResource("3")]
+
+[node name="Spawns" type="Node2D" parent="."]
+
+[node name="from_hall" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 240)
+script = ExtResource("4")
+marker_id = "from_hall"
+
+[node name="default" type="Marker2D" parent="Spawns"]
+position = Vector2(256, 180)
+script = ExtResource("4")
+
+[node name="art_club_spot" type="Marker2D" parent="Spawns"]
+position = Vector2(120, 150)
+script = ExtResource("4")
+marker_id = "art_club_spot"
+
+[node name="science_club_spot" type="Marker2D" parent="Spawns"]
+position = Vector2(380, 190)
+script = ExtResource("4")
+marker_id = "science_club_spot"
+
+[node name="ExitTransition" type="Area2D" parent="."]
+position = Vector2(256, 258)
+script = ExtResource("5")
+target_area = "res://game/scenes/areas/Area_SchoolHall.tscn"
+target_spawn_id = "from_clubroom"
+
+[node name="ExitShape" type="CollisionShape2D" parent="ExitTransition"]
+shape = SubResource("RectangleShape2D_Transition")
+
+[node name="ArtClubLeader" type="CharacterBody2D" parent="."]
+position = Vector2(120, 150)
+script = ExtResource("7")
+npc_id = "art_club_leader"
+npc_name = "Lily"
+
+[node name="Dialogue" type="Area2D" parent="ArtClubLeader"]
+script = ExtResource("6")
+dialogue_branches = Array[String](["Welcome to Art Club! We meet every afternoon after school.", "Today we're working on landscape paintings. Want to try?", "Art is all about expressing yourself. There's no wrong way to create!", "Our club exhibit is next month. I hope you'll contribute something!"])
+
+[node name="NPCShape" type="CollisionShape2D" parent="ArtClubLeader/Dialogue"]
+shape = SubResource("CircleShape2D_NPC")
+
+[node name="Sprite" type="Sprite2D" parent="ArtClubLeader"]
+texture = ExtResource("8")
+centered = true
+offset = Vector2(0, -12)
+
+[node name="ScienceClubLeader" type="CharacterBody2D" parent="."]
+position = Vector2(380, 190)
+script = ExtResource("7")
+npc_id = "science_club_leader"
+npc_name = "Oliver"
+
+[node name="Dialogue" type="Area2D" parent="ScienceClubLeader"]
+script = ExtResource("6")
+dialogue_branches = Array[String](["Science Club is the best club! We do experiments every afternoon.", "Today we're testing chemical reactions. Safety goggles required!", "Did you know that Cloverhollow has some mysterious phenomena? Very interesting...", "Our hypothesis is that the strange events in town have a scientific explanation!"])
+
+[node name="NPCShape" type="CollisionShape2D" parent="ScienceClubLeader/Dialogue"]
+shape = SubResource("CircleShape2D_NPC")
+
+[node name="Sprite" type="Sprite2D" parent="ScienceClubLeader"]
+texture = ExtResource("9")
+centered = true
+offset = Vector2(0, -12)

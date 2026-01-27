@@ -68,6 +68,50 @@
       ],
       "default_area": "res://game/scenes/areas/Area_SchoolClassroom.tscn",
       "default_position": [180, 80]
+    },
+    "art_club_leader": {
+      "npc_id": "art_club_leader",
+      "npc_name": "Lily",
+      "weekday_locations": {
+        "0": { "area": null, "position": null, "marker": null },
+        "1": { "area": "res://game/scenes/areas/Area_SchoolClubRoom.tscn", "position": [120, 150], "marker": "art_club_spot" },
+        "2": { "area": "res://game/scenes/areas/Area_SchoolClubRoom.tscn", "position": [120, 150], "marker": "art_club_spot" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_locations": {
+        "0": { "area": null, "position": null, "marker": null },
+        "1": { "area": null, "position": null, "marker": null },
+        "2": { "area": null, "position": null, "marker": null },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_dialogue": [
+        "No club meetings on weekends, but I still paint at home!",
+        "Come visit the club room on a weekday afternoon!"
+      ],
+      "default_area": "res://game/scenes/areas/Area_SchoolClubRoom.tscn",
+      "default_position": [120, 150]
+    },
+    "science_club_leader": {
+      "npc_id": "science_club_leader",
+      "npc_name": "Oliver",
+      "weekday_locations": {
+        "0": { "area": null, "position": null, "marker": null },
+        "1": { "area": "res://game/scenes/areas/Area_SchoolClubRoom.tscn", "position": [380, 190], "marker": "science_club_spot" },
+        "2": { "area": "res://game/scenes/areas/Area_SchoolClubRoom.tscn", "position": [380, 190], "marker": "science_club_spot" },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_locations": {
+        "0": { "area": null, "position": null, "marker": null },
+        "1": { "area": null, "position": null, "marker": null },
+        "2": { "area": null, "position": null, "marker": null },
+        "3": { "area": null, "position": null, "marker": null }
+      },
+      "weekend_dialogue": [
+        "Science never sleeps, but the club room does on weekends!",
+        "I'm running experiments at home. Come by on a weekday!"
+      ],
+      "default_area": "res://game/scenes/areas/Area_SchoolClubRoom.tscn",
+      "default_position": [380, 190]
     }
   }
 }

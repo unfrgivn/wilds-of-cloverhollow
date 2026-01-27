@@ -268,3 +268,29 @@ target_spawn_id = "from_hall"
 
 [node name="ClassroomTransitionShape" type="CollisionShape2D" parent="ClassroomTransition"]
 shape = SubResource("RectangleShape2D_Transition")
+
+[node name="from_clubroom" type="Marker2D" parent="Spawns"]
+position = Vector2(300, 210)
+script = ExtResource("4")
+marker_id = "from_clubroom"
+
+[node name="ClubRoomDoor" type="Sprite2D" parent="Doors"]
+position = Vector2(300, 225)
+texture = ExtResource("9")
+
+[node name="ClubRoomLabel" type="Label" parent="Doors/ClubRoomDoor"]
+offset_left = -25.0
+offset_top = 25.0
+offset_right = 25.0
+offset_bottom = 40.0
+text = "Club Room"
+horizontal_alignment = 1
+
+[node name="ClubRoomTransition" type="Area2D" parent="."]
+position = Vector2(300, 232)
+script = ExtResource("5")
+target_area = "res://game/scenes/areas/Area_SchoolClubRoom.tscn"
+target_spawn_id = "from_hall"
+
+[node name="ClubRoomTransitionShape" type="CollisionShape2D" parent="ClubRoomTransition"]
+shape = SubResource("RectangleShape2D_Transition")

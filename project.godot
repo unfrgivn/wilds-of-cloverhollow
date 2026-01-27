@@ -69,6 +69,7 @@ MultiplayerStub="*res://game/autoload/MultiplayerStub.gd"
 CommunityEventManager="*res://game/autoload/CommunityEventManager.gd"
 ControlsOverlay="*res://game/autoload/ControlsOverlay.gd"
 MerchandiseManager="*res://game/autoload/MerchandiseManager.gd"
+SocialSharingManager="*res://game/autoload/SocialSharingManager.gd"
 
 [internationalization]
 

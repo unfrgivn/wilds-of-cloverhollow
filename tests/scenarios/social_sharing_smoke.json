@@ -1,0 +1,49 @@
+{
+  "name": "social_sharing_smoke",
+  "description": "Test social sharing functionality - image creation, sharing, cleanup",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    
+    {"type": "log", "message": "=== Social Sharing Smoke Test ==="},
+    
+    {"type": "log", "message": "--- Test: Check initial state ---"},
+    {"type": "check_sharing"},
+    
+    {"type": "log", "message": "--- Test: Create shareable image with branding ---"},
+    {"type": "create_shareable_image", "include_branding": true},
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "log", "message": "--- Test: Check state after image creation ---"},
+    {"type": "check_sharing"},
+    
+    {"type": "log", "message": "--- Test: Create shareable image without branding ---"},
+    {"type": "create_shareable_image", "include_branding": false},
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "log", "message": "--- Test: Share screen with default message ---"},
+    {"type": "share_screen"},
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "log", "message": "--- Test: Share screen with custom message ---"},
+    {"type": "share_screen", "message": "Custom test message! #TestShare"},
+    {"type": "wait_frames", "frames": 10},
+    
+    {"type": "log", "message": "--- Test: Check share history ---"},
+    {"type": "check_sharing"},
+    
+    {"type": "log", "message": "--- Test: Cleanup old shares (max_age=0 for immediate cleanup) ---"},
+    {"type": "cleanup_shares", "max_age": 0},
+    {"type": "wait_frames", "frames": 5},
+    
+    {"type": "log", "message": "--- Test: Check state after cleanup ---"},
+    {"type": "check_sharing"},
+    
+    {"type": "log", "message": "--- Test: Reset sharing manager ---"},
+    {"type": "reset_sharing"},
+    {"type": "check_sharing"},
+    
+    {"type": "log", "message": "=== Social Sharing Smoke Test Complete ==="},
+    {"type": "wait_frames", "frames": 10}
+  ]
+}

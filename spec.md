@@ -963,6 +963,23 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario: `merchandise_stub`.
 - Note: This is a stub - no actual commerce. Links are logged but not opened.
 
+### 3.69 Social sharing system (stub)
+- SocialSharingManager autoload handles screenshot sharing with branding.
+- Share directory: `user://shares/` for shareable images.
+- Branding overlay: semi-transparent bar at bottom of screenshots.
+- Platform enum: NATIVE, TWITTER, FACEBOOK, INSTAGRAM, CLIPBOARD.
+- API: `create_shareable_image(include_branding)`, `share_image(path, message)`, `share_current_screen(message)`, `share_photo(path, message)`.
+- `copy_to_clipboard(text)`: Copies text to system clipboard.
+- `get_default_message()`: Returns branded share message with hashtag.
+- `get_share_history()`, `clear_history()`: Share tracking.
+- `get_shareable_images()`: Lists all shareable images in share directory.
+- `cleanup_old_shares(max_age_seconds)`: Deletes old share images.
+- `get_last_shared_path()`, `is_sharing()`, `cancel_share()`, `reset()`.
+- Signals: `share_started`, `share_completed(success)`, `share_cancelled`, `shareable_image_created(path)`.
+- Scenario actions: `create_shareable_image`, `share_screen`, `share_image`, `check_sharing`, `cleanup_shares`, `reset_sharing`.
+- Scenario: `social_sharing_smoke`.
+- Note: This is a stub - no actual platform sharing. iOS share sheet integration prepared for future.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -2132,6 +2132,57 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Social Sharing Actions ───────────────────────────────────────────
+    if t == "create_shareable_image":
+        var include_branding: bool = _action.get("include_branding", true)
+        var path: String = await SocialSharingManager.create_shareable_image(include_branding)
+        _trace["events"].append({"type": "create_shareable_image", "frame": _frame, "path": path, "branding": include_branding})
+        print("[Scenario] create_shareable_image: %s (branding=%s)" % [path, include_branding])
+        _action_index += 1
+        return
+
+    if t == "share_screen":
+        var message: String = _action.get("message", "")
+        SocialSharingManager.share_current_screen(message)
+        _trace["events"].append({"type": "share_screen", "frame": _frame, "message": message})
+        print("[Scenario] share_screen: %s" % message.substr(0, 30) if message != "" else "[default message]")
+        _action_index += 1
+        return
+
+    if t == "share_image":
+        var path: String = _action.get("path", "")
+        var message: String = _action.get("message", "")
+        SocialSharingManager.share_image(path, message)
+        _trace["events"].append({"type": "share_image", "frame": _frame, "path": path})
+        print("[Scenario] share_image: %s" % path)
+        _action_index += 1
+        return
+
+    if t == "check_sharing":
+        var is_sharing: bool = SocialSharingManager.is_sharing()
+        var last_shared: String = SocialSharingManager.get_last_shared_path()
+        var history_count: int = SocialSharingManager.get_share_history().size()
+        var shareable_count: int = SocialSharingManager.get_shareable_images().size()
+        _trace["events"].append({"type": "check_sharing", "frame": _frame, "is_sharing": is_sharing, "last_shared": last_shared, "history_count": history_count, "shareable_count": shareable_count})
+        print("[Scenario] check_sharing: sharing=%s, history=%d, images=%d" % [is_sharing, history_count, shareable_count])
+        _action_index += 1
+        return
+
+    if t == "cleanup_shares":
+        var max_age: int = _action.get("max_age", 86400)
+        var deleted: int = SocialSharingManager.cleanup_old_shares(max_age)
+        _trace["events"].append({"type": "cleanup_shares", "frame": _frame, "deleted": deleted})
+        print("[Scenario] cleanup_shares: deleted %d old images" % deleted)
+        _action_index += 1
+        return
+
+    if t == "reset_sharing":
+        SocialSharingManager.reset()
+        _trace["events"].append({"type": "reset_sharing", "frame": _frame})
+        print("[Scenario] reset_sharing")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

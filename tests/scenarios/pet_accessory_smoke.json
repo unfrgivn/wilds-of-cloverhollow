@@ -1,0 +1,72 @@
+{
+    "id": "pet_accessory_smoke",
+    "name": "Pet Accessory System Smoke Test",
+    "description": "Verifies pet accessory data loading, unlock/equip flow, and slot management",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "count": 5},
+        
+        {"type": "log", "message": "=== Pet Accessory System Smoke Test ==="},
+        
+        {"type": "log", "message": "--- Checking default unlocked accessories ---"},
+        {"type": "check_pet_accessories"},
+        
+        {"type": "log", "message": "--- Verify no accessories equipped ---"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "log", "message": "--- Check if red_collar is unlocked (default) ---"},
+        {"type": "check_pet_accessory_unlocked", "accessory_id": "red_collar"},
+        
+        {"type": "log", "message": "--- Check if tiny_hat is locked (conditional) ---"},
+        {"type": "check_pet_accessory_unlocked", "accessory_id": "tiny_hat"},
+        
+        {"type": "log", "message": "--- Unlock tiny_hat ---"},
+        {"type": "unlock_pet_accessory", "accessory_id": "tiny_hat"},
+        
+        {"type": "log", "message": "--- Verify tiny_hat is now unlocked ---"},
+        {"type": "check_pet_accessory_unlocked", "accessory_id": "tiny_hat"},
+        
+        {"type": "log", "message": "--- Equip red_collar (neck slot) ---"},
+        {"type": "equip_pet_accessory", "accessory_id": "red_collar"},
+        
+        {"type": "log", "message": "--- Verify collar is equipped ---"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "log", "message": "--- Equip tiny_hat (head slot) ---"},
+        {"type": "equip_pet_accessory", "accessory_id": "tiny_hat"},
+        
+        {"type": "log", "message": "--- Verify both slots equipped ---"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "log", "message": "--- Equip blue_bandana (replaces collar) ---"},
+        {"type": "equip_pet_accessory", "accessory_id": "blue_bandana"},
+        
+        {"type": "log", "message": "--- Verify bandana replaced collar ---"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "log", "message": "--- Unequip neck slot ---"},
+        {"type": "unequip_pet_accessory", "slot": "neck"},
+        
+        {"type": "log", "message": "--- Verify neck is empty ---"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "log", "message": "--- Try to equip locked accessory (should fail) ---"},
+        {"type": "equip_pet_accessory", "accessory_id": "hero_cape_pet"},
+        
+        {"type": "log", "message": "--- Final accessory state ---"},
+        {"type": "check_pet_accessories"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "log", "message": "--- Reset accessories to default state ---"},
+        {"type": "reset_pet_accessories"},
+        
+        {"type": "log", "message": "--- Verify reset ---"},
+        {"type": "check_pet_accessories"},
+        {"type": "check_equipped_pet_accessories"},
+        
+        {"type": "wait_frames", "count": 5},
+        {"type": "capture", "label": "pet_accessory_smoke_complete"},
+        
+        {"type": "log", "message": "=== Pet Accessory Smoke Test Complete ==="}
+    ]
+}

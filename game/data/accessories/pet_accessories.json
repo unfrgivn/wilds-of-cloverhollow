@@ -1,0 +1,113 @@
+{
+    "accessories": [
+        {
+            "id": "red_collar",
+            "name": "Red Collar",
+            "description": "A simple red collar",
+            "category": "collar",
+            "slot": "neck",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/red_collar.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "blue_bandana",
+            "name": "Blue Bandana",
+            "description": "A cool blue bandana",
+            "category": "collar",
+            "slot": "neck",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/blue_bandana.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "tiny_hat",
+            "name": "Tiny Top Hat",
+            "description": "A fancy little top hat",
+            "category": "hat",
+            "slot": "head",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/tiny_hat.png",
+            "unlocked_by_default": false,
+            "unlock_condition": {
+                "type": "story_flag",
+                "value": "forest_unlocked"
+            }
+        },
+        {
+            "id": "flower_crown",
+            "name": "Flower Crown",
+            "description": "A crown of colorful flowers",
+            "category": "hat",
+            "slot": "head",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/flower_crown.png",
+            "unlocked_by_default": false,
+            "unlock_condition": {
+                "type": "collection",
+                "category": "bugs",
+                "value": 3
+            }
+        },
+        {
+            "id": "golden_tag",
+            "name": "Golden Name Tag",
+            "description": "A shiny golden name tag",
+            "category": "collar",
+            "slot": "neck",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/golden_tag.png",
+            "unlocked_by_default": false,
+            "unlock_condition": {
+                "type": "quest_completed",
+                "value": "find_clubhouse"
+            }
+        },
+        {
+            "id": "bow_tie",
+            "name": "Bow Tie",
+            "description": "A dapper bow tie",
+            "category": "collar",
+            "slot": "neck",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/bow_tie.png",
+            "unlocked_by_default": false,
+            "unlock_condition": {
+                "type": "affinity_level",
+                "value": "friend"
+            }
+        },
+        {
+            "id": "adventure_goggles",
+            "name": "Adventure Goggles",
+            "description": "Goggles for adventurous pets",
+            "category": "face",
+            "slot": "face",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/adventure_goggles.png",
+            "unlocked_by_default": false,
+            "unlock_condition": {
+                "type": "story_flag",
+                "value": "clubhouse_found"
+            }
+        },
+        {
+            "id": "hero_cape_pet",
+            "name": "Mini Hero Cape",
+            "description": "A tiny hero cape for your sidekick",
+            "category": "back",
+            "slot": "back",
+            "sprite_path": "res://game/assets/sprites/pets/accessories/hero_cape_pet.png",
+            "unlocked_by_default": false,
+            "unlock_condition": {
+                "type": "story_flag",
+                "value": "villain_revealed"
+            }
+        }
+    ],
+    "categories": [
+        {"id": "collar", "name": "Collars"},
+        {"id": "hat", "name": "Hats"},
+        {"id": "face", "name": "Face"},
+        {"id": "back", "name": "Back"}
+    ],
+    "slots": [
+        {"id": "neck", "name": "Neck"},
+        {"id": "head", "name": "Head"},
+        {"id": "face", "name": "Face"},
+        {"id": "back", "name": "Back"}
+    ]
+}

@@ -1387,6 +1387,63 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Pet Accessory Actions ───────────────────────────────────────────────
+    if t == "unlock_pet_accessory":
+        var accessory_id: String = action.get("accessory_id", "")
+        PetAccessoryManager.unlock_accessory(accessory_id)
+        _trace["events"].append({"type": "unlock_pet_accessory", "frame": _frame, "accessory_id": accessory_id})
+        print("[Scenario] unlock_pet_accessory: %s" % accessory_id)
+        _action_index += 1
+        return
+
+    if t == "equip_pet_accessory":
+        var accessory_id: String = action.get("accessory_id", "")
+        var success := PetAccessoryManager.equip_accessory(accessory_id)
+        _trace["events"].append({"type": "equip_pet_accessory", "frame": _frame, "accessory_id": accessory_id, "success": success})
+        print("[Scenario] equip_pet_accessory: %s (success=%s)" % [accessory_id, success])
+        _action_index += 1
+        return
+
+    if t == "unequip_pet_accessory":
+        var slot: String = action.get("slot", "")
+        PetAccessoryManager.unequip_slot(slot)
+        _trace["events"].append({"type": "unequip_pet_accessory", "frame": _frame, "slot": slot})
+        print("[Scenario] unequip_pet_accessory: %s" % slot)
+        _action_index += 1
+        return
+
+    if t == "check_pet_accessory_unlocked":
+        var accessory_id: String = action.get("accessory_id", "")
+        var is_unlocked := PetAccessoryManager.is_accessory_unlocked(accessory_id)
+        _trace["events"].append({"type": "check_pet_accessory_unlocked", "frame": _frame, "accessory_id": accessory_id, "unlocked": is_unlocked})
+        print("[Scenario] check_pet_accessory_unlocked: %s = %s" % [accessory_id, is_unlocked])
+        _action_index += 1
+        return
+
+    if t == "check_equipped_pet_accessories":
+        var equipped: Dictionary = PetAccessoryManager.get_equipped_accessories()
+        _trace["events"].append({"type": "check_equipped_pet_accessories", "frame": _frame, "equipped": equipped})
+        print("[Scenario] check_equipped_pet_accessories: %s" % JSON.stringify(equipped))
+        _action_index += 1
+        return
+
+    if t == "check_pet_accessories":
+        var unlocked := PetAccessoryManager.get_unlocked_accessories()
+        var accessory_ids := []
+        for accessory in unlocked:
+            accessory_ids.append(accessory.get("id", ""))
+        _trace["events"].append({"type": "check_pet_accessories", "frame": _frame, "unlocked_count": unlocked.size(), "accessory_ids": accessory_ids})
+        print("[Scenario] check_pet_accessories: %d unlocked (%s)" % [unlocked.size(), ", ".join(accessory_ids)])
+        _action_index += 1
+        return
+
+    if t == "reset_pet_accessories":
+        PetAccessoryManager.reset_unlocks()
+        _trace["events"].append({"type": "reset_pet_accessories", "frame": _frame})
+        print("[Scenario] reset_pet_accessories")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

@@ -643,6 +643,30 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `unlock_outfit`, `equip_outfit`, `check_outfit_unlocked`, `check_equipped_outfit`, `check_outfits`, `reset_outfits`, `check_outfit_conditions`.
 - Scenario: `costume_smoke`.
 
+### 3.48 Pet accessories system
+- PetAccessoryManager autoload manages pet accessory unlocks and equipped state.
+- Accessory data stored in `game/data/accessories/pet_accessories.json`.
+- Accessory data format:
+  - Each accessory has: id, name, description, category, slot, sprite_path, unlocked_by_default (or unlock_condition).
+  - Categories: collar, hat, face, back.
+  - Slots: neck, head, face, back (one accessory per slot).
+  - Unlock conditions: quest_completed, story_flag, collection (count), affinity_level.
+- 8 accessories: 2 default unlocked (red_collar, blue_bandana), 6 conditional.
+- PetAccessoryUI (CanvasLayer): slot-based accessory selection interface.
+  - Slot tabs for filtering accessories by equipment slot.
+  - Accessory grid showing unlocked items.
+  - Details panel with name and description.
+  - Equip/Unequip/Close buttons.
+  - Currently equipped accessory highlighted with checkmark.
+- Pet sprite overlay: PetCompanion.gd maintains overlay sprites for each slot.
+  - Connects to PetAccessoryManager.accessory_equipped/unequipped signals.
+  - _update_accessory_overlay() loads sprite from accessory data.
+- Persistence: unlocked accessories and equipped state saved to `user://pet_accessories.json`.
+- API: `get_all_accessories()`, `get_accessory(id)`, `get_accessories_by_slot(slot)`, `is_accessory_unlocked(id)`, `unlock_accessory(id)`, `equip_accessory(id)`, `unequip_slot(slot)`, `get_equipped_accessory(slot)`, `get_equipped_accessories()`, `reset_unlocks()`.
+- Signals: `accessory_unlocked(accessory_id, accessory_data)`, `accessory_equipped(slot, accessory_id)`, `accessory_unequipped(slot)`, `accessories_loaded`.
+- Scenario actions: `unlock_pet_accessory`, `equip_pet_accessory`, `unequip_pet_accessory`, `check_pet_accessory_unlocked`, `check_equipped_pet_accessories`, `check_pet_accessories`, `reset_pet_accessories`.
+- Scenario: `pet_accessory_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

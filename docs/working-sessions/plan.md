@@ -1930,7 +1930,7 @@ Alternate character appearances.
 
 ---
 
-## Milestone 158 — Pet accessories  **Owner:** Character Systems + Art Pipeline
+## Milestone 158 — Pet accessories  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Dress up the pet.
 

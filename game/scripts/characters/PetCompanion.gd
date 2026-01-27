@@ -41,6 +41,10 @@ var target_position: Vector2 = Vector2.ZERO
 
 @onready var sprite: Sprite2D = $Sprite
 
+## Accessory overlay sprites (keyed by slot name)
+var accessory_overlays: Dictionary = {}
+
+
 func _ready() -> void:
 	# Try to find player in scene
 	_find_player()
@@ -48,6 +52,16 @@ func _ready() -> void:
 	
 	# Randomize initial idle timer
 	idle_timer = randf_range(2.0, idle_animation_interval)
+	
+	# Setup accessory overlays
+	_setup_accessory_overlays()
+	
+	# Connect to accessory manager signals
+	var pam = get_node_or_null("/root/PetAccessoryManager")
+	if pam:
+		pam.accessory_equipped.connect(_on_accessory_equipped)
+		pam.accessory_unequipped.connect(_on_accessory_unequipped)
+		_apply_current_accessories()
 
 func _find_player() -> void:
 	# Look for player in scene tree
@@ -164,3 +178,76 @@ func _animate_special_idle(delta: float) -> void:
 		current_special_idle = ""
 		idle_timer = randf_range(2.0, idle_animation_interval)
 		_update_sprite_idle()
+
+
+## Setup overlay sprites for each accessory slot
+func _setup_accessory_overlays() -> void:
+	var slots := ["neck", "head", "face", "back"]
+	for slot in slots:
+		var overlay := Sprite2D.new()
+		overlay.name = "AccessoryOverlay_" + slot
+		overlay.visible = false
+		add_child(overlay)
+		accessory_overlays[slot] = overlay
+
+
+## Apply currently equipped accessories on startup
+func _apply_current_accessories() -> void:
+	var pam = get_node_or_null("/root/PetAccessoryManager")
+	if not pam:
+		return
+	
+	var equipped: Dictionary = pam.get_equipped_accessories()
+	for slot in equipped.keys():
+		var accessory_id: String = equipped[slot]
+		var accessory_data: Dictionary = pam.get_accessory(accessory_id)
+		_update_accessory_overlay(slot, accessory_data)
+
+
+## Called when an accessory is equipped
+func _on_accessory_equipped(slot: String, accessory_id: String) -> void:
+	var pam = get_node_or_null("/root/PetAccessoryManager")
+	if pam:
+		var accessory_data: Dictionary = pam.get_accessory(accessory_id)
+		_update_accessory_overlay(slot, accessory_data)
+
+
+## Called when an accessory is unequipped
+func _on_accessory_unequipped(slot: String) -> void:
+	if accessory_overlays.has(slot):
+		var overlay: Sprite2D = accessory_overlays[slot]
+		overlay.visible = false
+		overlay.texture = null
+
+
+## Update the overlay sprite for a specific slot
+func _update_accessory_overlay(slot: String, accessory_data: Dictionary) -> void:
+	if not accessory_overlays.has(slot):
+		return
+	
+	var overlay: Sprite2D = accessory_overlays[slot]
+	
+	if accessory_data.is_empty():
+		overlay.visible = false
+		overlay.texture = null
+		return
+	
+	var sprite_path: String = accessory_data.get("sprite_path", "")
+	if sprite_path.is_empty():
+		overlay.visible = false
+		return
+	
+	if ResourceLoader.exists(sprite_path):
+		overlay.texture = load(sprite_path)
+		overlay.visible = true
+	else:
+		# Sprite doesn't exist yet (placeholder)
+		overlay.visible = false
+
+
+## Get current accessory data for a slot
+func get_accessory_in_slot(slot: String) -> Dictionary:
+	var pam = get_node_or_null("/root/PetAccessoryManager")
+	if pam:
+		return pam.get_equipped_accessory_data(slot)
+	return {}

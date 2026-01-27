@@ -58,6 +58,7 @@ UpdateNotificationManager="*res://game/autoload/UpdateNotificationManager.gd"
 PatchNotesManager="*res://game/autoload/PatchNotesManager.gd"
 CreditsManager="*res://game/autoload/CreditsManager.gd"
 VoiceActingManager="*res://game/autoload/VoiceActingManager.gd"
+ArtGalleryManager="*res://game/autoload/ArtGalleryManager.gd"
 
 [internationalization]
 

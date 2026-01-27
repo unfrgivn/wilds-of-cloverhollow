@@ -666,6 +666,27 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Art gallery actions
+    if t == "open_art_gallery":
+        var gallery_scene := preload("res://game/scenes/ui/ArtGalleryUI.tscn")
+        var gallery_ui := gallery_scene.instantiate()
+        get_tree().root.add_child(gallery_ui)
+        gallery_ui.show_gallery()
+        _trace["events"].append({"type": "open_art_gallery", "frame": _frame})
+        print("[Scenario] open_art_gallery")
+        _action_index += 1
+        return
+
+    if t == "close_art_gallery":
+        var gallery_nodes := get_tree().get_nodes_in_group("art_gallery_ui")
+        for node in gallery_nodes:
+            node.queue_free()
+        get_tree().paused = false
+        _trace["events"].append({"type": "close_art_gallery", "frame": _frame})
+        print("[Scenario] close_art_gallery")
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

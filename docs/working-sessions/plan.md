@@ -2170,7 +2170,7 @@ Combat challenge mode.
 
 ---
 
-## Milestone 178 — Art gallery  **Owner:** UI Systems + Art Pipeline
+## Milestone 178 — Art gallery  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems + Art Pipeline
 ### Objective
 Unlockable art viewer.
 

@@ -780,6 +780,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `open_sound_test`, `close_sound_test`.
 - Scenario: `sound_test_smoke`.
 
+### 3.56 Art gallery
+- ArtGalleryManager autoload manages unlockable concept art viewing.
+- GALLERY_DATA array stores art entries with id, name, category, description, path, unlock conditions.
+- Categories: characters, environments, promotional.
+- Unlock conditions: unlocked_by_default, or story_flag requirements.
+- State stored in `user://art_gallery.json`.
+- API: `get_all_art()`, `get_art_by_category(category)`, `is_art_unlocked(art_id)`, `unlock_art(art_id)`, `get_completion_percent()`.
+- Signals: `art_unlocked(art_id, art_data)`, `gallery_opened`, `gallery_closed`.
+- ArtGalleryUI (CanvasLayer): category tabs, art grid with lock icons, preview panel with zoom slider.
+- Scenario actions: `open_art_gallery`, `close_art_gallery`.
+- Scenario: `art_gallery_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

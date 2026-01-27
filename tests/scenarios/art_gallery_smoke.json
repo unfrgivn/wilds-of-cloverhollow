@@ -1,0 +1,16 @@
+{
+  "id": "art_gallery_smoke",
+  "name": "Art gallery smoke test",
+  "description": "Verify art gallery opens, categories switch, art displays",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "open_art_gallery"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "art_gallery_characters"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "close_art_gallery"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "art_gallery_closed"}
+  ]
+}

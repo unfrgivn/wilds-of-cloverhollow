@@ -1,0 +1,14 @@
+{
+  "scenario_id": "scout_recruit_stub",
+  "description": "Test Scout party member data and recruitment quest exist",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "scout_recruited"},
+    {"type": "start_quest", "quest_id": "recruit_scout"},
+    {"type": "check_quest", "quest_id": "recruit_scout"},
+    {"type": "set_story_flag", "flag": "scout_recruited", "value": true},
+    {"type": "check_story_flag", "flag": "scout_recruited"},
+    {"type": "complete_quest", "quest_id": "recruit_scout"},
+    {"type": "check_quest", "quest_id": "recruit_scout"}
+  ]
+}

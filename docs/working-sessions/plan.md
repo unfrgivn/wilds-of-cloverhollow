@@ -1786,7 +1786,7 @@ Developer shortcuts.
 
 ---
 
-## Milestone 146 — Additional party member: Scout  **Owner:** Art Pipeline + Battle Systems
+## Milestone 146 — Additional party member: Scout  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Optional party member.
 
@@ -1798,7 +1798,7 @@ Optional party member.
 
 ---
 
-## Milestone 147 — Additional party member: Bookworm  **Owner:** Art Pipeline + Battle Systems
+## Milestone 147 — Additional party member: Bookworm  **Owner:** Art Pipeline + Battle Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Magic-focused party member.
 

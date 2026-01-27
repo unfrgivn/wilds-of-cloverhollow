@@ -68,6 +68,38 @@
       "speed": 8,
       "skills": [],
       "sprite": "res://game/assets/party/maddie.png"
+    },
+    {
+      "id": "scout",
+      "name": "Scout",
+      "role": "optional",
+      "description": "A swift ranger who excels at exploration and tracking.",
+      "level": 1,
+      "xp": 0,
+      "max_hp": 18,
+      "max_mp": 12,
+      "attack": 5,
+      "defense": 3,
+      "speed": 9,
+      "skills": ["quick_shot", "track"],
+      "sprite": "res://game/assets/party/scout_placeholder.png",
+      "recruitment_quest": "recruit_scout"
+    },
+    {
+      "id": "bookworm",
+      "name": "Bookworm",
+      "role": "optional",
+      "description": "A studious mage with powerful magic but low defense.",
+      "level": 1,
+      "xp": 0,
+      "max_hp": 16,
+      "max_mp": 25,
+      "attack": 3,
+      "defense": 2,
+      "speed": 4,
+      "skills": ["arcane_blast", "study"],
+      "sprite": "res://game/assets/party/bookworm_placeholder.png",
+      "recruitment_quest": "recruit_bookworm"
     }
   ]
 }

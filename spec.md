@@ -469,6 +469,8 @@ This file is the single source of truth. If code changes behavior, update this f
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.
+- Optional recruitable members: Scout (ranger), Bookworm (mage) - unlocked via recruitment quests.
+- Recruitment quests: recruit_scout (forest), recruit_bookworm (library).
 
 ### 4.1 Pet companion
 - PetCompanion: CharacterBody2D that follows the player at consistent spacing (~32px).

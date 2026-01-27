@@ -237,6 +237,49 @@
       "element": "dark",
       "effect": "defense_up",
       "mini_boss_only": true
+    },
+    {
+      "id": "quick_shot",
+      "name": "Quick Shot",
+      "description": "Scout fires a swift arrow that always hits first.",
+      "type": "attack",
+      "mp_cost": 2,
+      "power": 5,
+      "target": "single_enemy",
+      "element": "none",
+      "priority": "high"
+    },
+    {
+      "id": "track",
+      "name": "Track",
+      "description": "Scout tracks enemy movements, increasing party accuracy.",
+      "type": "buff",
+      "mp_cost": 4,
+      "power": 0,
+      "target": "all_allies",
+      "element": "none",
+      "effect": "accuracy_up"
+    },
+    {
+      "id": "arcane_blast",
+      "name": "Arcane Blast",
+      "description": "Bookworm unleashes a powerful blast of magical energy.",
+      "type": "attack",
+      "mp_cost": 6,
+      "power": 14,
+      "target": "single_enemy",
+      "element": "magic"
+    },
+    {
+      "id": "study",
+      "name": "Study",
+      "description": "Bookworm analyzes the enemy, revealing weaknesses.",
+      "type": "status",
+      "mp_cost": 3,
+      "power": 0,
+      "target": "single_enemy",
+      "element": "none",
+      "effect": "defense_down"
     }
   ]
 }

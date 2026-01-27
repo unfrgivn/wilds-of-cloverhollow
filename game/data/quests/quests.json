@@ -142,6 +142,28 @@
       "required_flag": "forest_unlocked",
       "completion_flag": "forest_patrol_complete",
       "objectives": ["Speak with the Elder about forest dangers", "Defeat 5 forest creatures", "Return to the Elder for your reward"]
+    },
+    {
+      "id": "recruit_scout",
+      "name": "The Swift Tracker",
+      "description": "A skilled ranger named Scout has been spotted near the forest. Find them and convince them to join your party.",
+      "type": "recruitment",
+      "reward_gold": 0,
+      "reward_items": [],
+      "required_flag": "forest_unlocked",
+      "completion_flag": "scout_recruited",
+      "objectives": ["Find Scout in the forest", "Complete Scout's tracking challenge", "Recruit Scout to the party"]
+    },
+    {
+      "id": "recruit_bookworm",
+      "name": "The Studious Mage",
+      "description": "A young mage known as Bookworm spends all their time in the library. Help them with a magical problem to gain their trust.",
+      "type": "recruitment",
+      "reward_gold": 0,
+      "reward_items": [],
+      "required_flag": "library_research_done",
+      "completion_flag": "bookworm_recruited",
+      "objectives": ["Find Bookworm in the library", "Help solve the magical puzzle", "Recruit Bookworm to the party"]
     }
   ]
 }

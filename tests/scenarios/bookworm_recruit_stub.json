@@ -1,0 +1,14 @@
+{
+  "scenario_id": "bookworm_recruit_stub",
+  "description": "Test Bookworm party member data and recruitment quest exist",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_story_flag", "flag": "bookworm_recruited"},
+    {"type": "start_quest", "quest_id": "recruit_bookworm"},
+    {"type": "check_quest", "quest_id": "recruit_bookworm"},
+    {"type": "set_story_flag", "flag": "bookworm_recruited", "value": true},
+    {"type": "check_story_flag", "flag": "bookworm_recruited"},
+    {"type": "complete_quest", "quest_id": "recruit_bookworm"},
+    {"type": "check_quest", "quest_id": "recruit_bookworm"}
+  ]
+}

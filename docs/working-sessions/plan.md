@@ -1738,7 +1738,7 @@ Guide for writing scenarios.
 
 ---
 
-## Milestone 142 — Asset pipeline automation  **Owner:** Art Pipeline
+## Milestone 142 — Asset pipeline automation  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 One-command asset processing.
 

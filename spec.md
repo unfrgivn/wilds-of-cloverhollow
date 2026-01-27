@@ -724,6 +724,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - Accessed via Feedback option in pause menu.
 - Scenario actions: `submit_feedback`, `check_feedback`, `clear_feedback`.
 
+### 3.51 Update notification system (stub)
+- UpdateNotificationManager autoload handles app update checks.
+- Version comparison: compares semantic version strings (major.minor.patch).
+- State stored in `user://update_check.json` with last check timestamp.
+- API: `check_for_update()`, `is_update_available()`, `get_time_since_check()`, `should_auto_check()`.
+- `simulate_update_available(version)`: For testing, simulates an available update.
+- `open_store()`: Opens App Store URL (stub).
+- Signals: `update_available(current, latest)`, `update_check_completed(needed)`, `update_check_failed(error)`.
+- UpdatePromptUI (CanvasLayer): modal popup with Update/Later buttons and version info.
+- Stub: No actual backend - for future integration.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

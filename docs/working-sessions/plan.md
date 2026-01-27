@@ -2340,7 +2340,7 @@ In-app feedback.
 
 ---
 
-## Milestone 192 — Update notification system  **Owner:** UI Systems + Data Systems
+## Milestone 192 — Update notification system  **Owner:** UI Systems + Data Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Alert users to updates.
 

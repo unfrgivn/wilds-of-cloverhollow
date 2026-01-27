@@ -54,6 +54,7 @@ PetAccessoryManager="*res://game/autoload/PetAccessoryManager.gd"
 InputDebouncer="*res://game/autoload/InputDebouncer.gd"
 MemoryManager="*res://game/autoload/MemoryManager.gd"
 FeedbackManager="*res://game/autoload/FeedbackManager.gd"
+UpdateNotificationManager="*res://game/autoload/UpdateNotificationManager.gd"
 
 [internationalization]
 

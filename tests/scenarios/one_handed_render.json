@@ -1,0 +1,19 @@
+{
+  "id": "one_handed_render",
+  "name": "One-Handed Mode Render Test",
+  "description": "Tests one-handed mode toggle and compact touch control layout",
+  "starting_area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "count": 10},
+    {"type": "check_one_handed_mode"},
+    {"type": "capture", "label": "standard_layout"},
+    {"type": "set_one_handed_mode", "enabled": true},
+    {"type": "check_one_handed_mode"},
+    {"type": "wait_frames", "count": 5},
+    {"type": "capture", "label": "one_handed_layout"},
+    {"type": "set_one_handed_mode", "enabled": false},
+    {"type": "check_one_handed_mode"},
+    {"type": "capture", "label": "standard_layout_restored"},
+    {"type": "wait_frames", "count": 5}
+  ]
+}

@@ -769,6 +769,22 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # One-handed mode actions
+    if t == "set_one_handed_mode":
+        var enabled: bool = action.get("enabled", false)
+        SettingsManager.set_one_handed_mode(enabled)
+        _trace["events"].append({"type": "set_one_handed_mode", "frame": _frame, "enabled": enabled})
+        print("[Scenario] set_one_handed_mode: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "check_one_handed_mode":
+        var enabled: bool = SettingsManager.one_handed_mode_enabled
+        _trace["events"].append({"type": "check_one_handed_mode", "frame": _frame, "enabled": enabled})
+        print("[Scenario] check_one_handed_mode: %s" % enabled)
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

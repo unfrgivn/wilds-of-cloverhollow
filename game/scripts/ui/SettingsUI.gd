@@ -6,7 +6,7 @@ signal settings_closed
 
 var _is_active: bool = false
 var _selected_index: int = 0
-var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text Size", "Colorblind", "Dyslexia Font", "Reduced Motion", "Language", "Credits", "Back"]
+var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text Size", "Colorblind", "Dyslexia Font", "Reduced Motion", "One-Handed Mode", "Language", "Credits", "Back"]
 
 @onready var panel: Panel = $Panel
 @onready var title_label: Label = $Panel/TitleLabel
@@ -20,6 +20,7 @@ var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text
 @onready var colorblind_label: Label = $Panel/OptionsContainer/ColorblindRow/ColorblindLabel
 @onready var dyslexia_label: Label = $Panel/OptionsContainer/DyslexiaRow/DyslexiaLabel
 @onready var reduced_motion_label: Label = $Panel/OptionsContainer/ReducedMotionRow/ReducedMotionLabel
+@onready var one_handed_label: Label = $Panel/OptionsContainer/OneHandedRow/OneHandedLabel
 @onready var language_label: Label = $Panel/OptionsContainer/LanguageRow/LanguageLabel
 @onready var credits_button: Button = $Panel/OptionsContainer/CreditsButton
 @onready var back_button: Button = $Panel/OptionsContainer/BackButton
@@ -64,7 +65,10 @@ func _input(event: InputEvent) -> void:
         elif _selected_index == 6:  # Reduced Motion row
             _toggle_reduced_motion()
             get_viewport().set_input_as_handled()
-        elif _selected_index == 7:  # Language row
+        elif _selected_index == 7:  # One-Handed Mode row
+            _toggle_one_handed_mode()
+            get_viewport().set_input_as_handled()
+        elif _selected_index == 8:  # Language row
             _cycle_language(-1)
             get_viewport().set_input_as_handled()
     elif event.is_action_pressed("ui_right"):
@@ -83,7 +87,10 @@ func _input(event: InputEvent) -> void:
         elif _selected_index == 6:  # Reduced Motion row
             _toggle_reduced_motion()
             get_viewport().set_input_as_handled()
-        elif _selected_index == 7:  # Language row
+        elif _selected_index == 7:  # One-Handed Mode row
+            _toggle_one_handed_mode()
+            get_viewport().set_input_as_handled()
+        elif _selected_index == 8:  # Language row
             _cycle_language(1)
             get_viewport().set_input_as_handled()
 
@@ -110,6 +117,7 @@ func _load_current_values() -> void:
     _update_colorblind_label()
     _update_dyslexia_label()
     _update_reduced_motion_label()
+    _update_one_handed_label()
     _update_language_label()
 
 func _on_music_changed(value: float) -> void:
@@ -171,6 +179,14 @@ func _update_reduced_motion_label() -> void:
 func _toggle_reduced_motion() -> void:
     SettingsManager.set_reduced_motion(not SettingsManager.reduced_motion_enabled)
     _update_reduced_motion_label()
+
+func _update_one_handed_label() -> void:
+    if one_handed_label:
+        one_handed_label.text = SettingsManager.get_one_handed_mode_name()
+
+func _toggle_one_handed_mode() -> void:
+    SettingsManager.set_one_handed_mode(not SettingsManager.one_handed_mode_enabled)
+    _update_one_handed_label()
 
 func _update_language_label() -> void:
     if language_label:

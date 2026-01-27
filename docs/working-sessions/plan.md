@@ -2098,7 +2098,7 @@ Accessibility option.
 
 ---
 
-## Milestone 172 — One-handed mode  **Owner:** UI Systems
+## Milestone 172 — One-handed mode  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Play with one hand.
 

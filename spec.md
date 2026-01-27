@@ -833,6 +833,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_reduced_motion`, `check_reduced_motion`.
 - Scenario: `reduced_motion_smoke`.
 
+### 3.61 Accessibility: One-handed mode
+- SettingsManager stores one_handed_mode_enabled boolean setting.
+- Signal: `one_handed_mode_changed(enabled)` emitted on toggle.
+- SettingsUI provides On/Off toggle for one-handed mode option.
+- When enabled, TouchControlsManager switches to compact right-side layout.
+- Compact layout: hides spacers, moves joystick next to button, reduces control sizes.
+- API: `set_one_handed_mode(enabled)`, `get_one_handed_mode_name()`.
+- TouchControlsManager API: `is_one_handed_mode()`.
+- Setting stored in user://settings.json and persisted across sessions.
+- Scenario actions: `set_one_handed_mode`, `check_one_handed_mode`.
+- Scenario: `one_handed_render`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

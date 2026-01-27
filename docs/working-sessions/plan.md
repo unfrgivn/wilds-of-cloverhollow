@@ -2314,7 +2314,7 @@ App store rating.
 
 ---
 
-## Milestone 190 — App Store submission  **Owner:** QA Automation
+## Milestone 190 — App Store submission  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Submit for review.
 

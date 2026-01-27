@@ -1102,6 +1102,38 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Seasonal event actions
+    if t == "set_event_date":
+        var month: int = int(action.get("month", 1))
+        var day: int = int(action.get("day", 1))
+        SeasonalEventManager.set_override_date(month, day)
+        _trace["events"].append({"type": "set_event_date", "frame": _frame, "month": month, "day": day})
+        print("[Scenario] set_event_date: %d/%d" % [month, day])
+        _action_index += 1
+        return
+
+    if t == "clear_event_date":
+        SeasonalEventManager.clear_override_date()
+        _trace["events"].append({"type": "clear_event_date", "frame": _frame})
+        print("[Scenario] clear_event_date")
+        _action_index += 1
+        return
+
+    if t == "check_active_events":
+        var active: Array = SeasonalEventManager.get_active_events()
+        _trace["events"].append({"type": "check_active_events", "frame": _frame, "active_events": active})
+        print("[Scenario] check_active_events: %s" % str(active))
+        _action_index += 1
+        return
+
+    if t == "check_event_active":
+        var event_id: String = str(action.get("event_id", ""))
+        var is_active: bool = SeasonalEventManager.is_event_active(event_id)
+        _trace["events"].append({"type": "check_event_active", "frame": _frame, "event_id": event_id, "is_active": is_active})
+        print("[Scenario] check_event_active: %s = %s" % [event_id, is_active])
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

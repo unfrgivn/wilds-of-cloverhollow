@@ -1858,7 +1858,7 @@ Track collectibles.
 
 ---
 
-## Milestone 152 — Seasonal events stub  **Owner:** Data Systems + Story
+## Milestone 152 — Seasonal events stub  **Owner:** Data Systems + Story **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Holiday/seasonal content.
 

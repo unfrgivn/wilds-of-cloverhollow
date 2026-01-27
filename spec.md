@@ -527,6 +527,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `record_collection`, `check_collection`, `check_overall_collection`, `claim_milestone`, `reset_collection`.
 - Scenario: `collection_log_smoke`.
 
+### 3.42 Seasonal events system (stub)
+- SeasonalEventManager autoload handles date-based seasonal events.
+- Event data stored in `game/data/events/seasonal_events.json`.
+- Event data format:
+  - Each event has: id, name, description, start_month, start_day, end_month, end_day.
+  - Optional fields: special_npcs[], special_items[], special_quests[], decorations[], music_override.
+- 4 placeholder events: spring_festival, summer_splash, harvest_moon, winter_wonder.
+- Date-based activation: events automatically activate when current date falls within range.
+- Year-wrap handling: events spanning Dec-Jan (e.g., winter_wonder Dec 15 - Jan 5) work correctly.
+- Override for testing: `set_override_date(month, day)` forces a specific date.
+- API: `get_active_events()`, `is_event_active(event_id)`, `get_event_data(event_id)`.
+- Signals: `event_started(event_id, event_data)`, `event_ended(event_id)`, `active_events_changed(active_events)`.
+- Scenario actions: `set_event_date`, `clear_event_date`, `check_active_events`, `check_event_active`.
+- Scenario: `seasonal_event_stub`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

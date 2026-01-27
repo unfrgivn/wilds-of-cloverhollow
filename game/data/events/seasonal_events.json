@@ -1,0 +1,60 @@
+{
+    "events": [
+        {
+            "id": "spring_festival",
+            "name": "Spring Festival",
+            "description": "Celebrate the arrival of spring with special activities!",
+            "start_month": 3,
+            "start_day": 20,
+            "end_month": 4,
+            "end_day": 10,
+            "special_npcs": ["spring_bunny"],
+            "special_items": ["flower_crown", "spring_egg"],
+            "special_quests": ["egg_hunt"],
+            "decorations": ["spring_banner", "flower_pot"],
+            "music_override": "spring_theme"
+        },
+        {
+            "id": "summer_splash",
+            "name": "Summer Splash",
+            "description": "Cool off with beach fun and water activities!",
+            "start_month": 6,
+            "start_day": 21,
+            "end_month": 7,
+            "end_day": 15,
+            "special_npcs": ["beach_vendor"],
+            "special_items": ["beach_ball", "ice_cream"],
+            "special_quests": ["sandcastle_contest"],
+            "decorations": ["beach_umbrella", "sand_bucket"],
+            "music_override": "summer_theme"
+        },
+        {
+            "id": "harvest_moon",
+            "name": "Harvest Moon Festival",
+            "description": "Gather crops and celebrate the autumn harvest!",
+            "start_month": 10,
+            "start_day": 1,
+            "end_month": 10,
+            "end_day": 31,
+            "special_npcs": ["scarecrow_pete"],
+            "special_items": ["pumpkin_pie", "harvest_basket"],
+            "special_quests": ["pumpkin_patch"],
+            "decorations": ["hay_bale", "corn_stalk"],
+            "music_override": "harvest_theme"
+        },
+        {
+            "id": "winter_wonder",
+            "name": "Winter Wonderland",
+            "description": "Enjoy the cozy winter season with gifts and snow!",
+            "start_month": 12,
+            "start_day": 15,
+            "end_month": 1,
+            "end_day": 5,
+            "special_npcs": ["gift_giver"],
+            "special_items": ["snowball", "hot_cocoa"],
+            "special_quests": ["gift_giving"],
+            "decorations": ["snowman", "holiday_lights"],
+            "music_override": "winter_theme"
+        }
+    ]
+}

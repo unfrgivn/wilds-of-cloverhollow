@@ -1,0 +1,24 @@
+{
+    "scenario_id": "seasonal_event_stub",
+    "description": "Test seasonal event date-based activation",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "clear_event_date"},
+        {"type": "check_active_events"},
+        {"type": "set_event_date", "month": 3, "day": 25},
+        {"type": "check_active_events"},
+        {"type": "check_event_active", "event_id": "spring_festival"},
+        {"type": "set_event_date", "month": 7, "day": 1},
+        {"type": "check_active_events"},
+        {"type": "check_event_active", "event_id": "summer_splash"},
+        {"type": "set_event_date", "month": 10, "day": 15},
+        {"type": "check_active_events"},
+        {"type": "check_event_active", "event_id": "harvest_moon"},
+        {"type": "set_event_date", "month": 12, "day": 25},
+        {"type": "check_active_events"},
+        {"type": "check_event_active", "event_id": "winter_wonder"},
+        {"type": "clear_event_date"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

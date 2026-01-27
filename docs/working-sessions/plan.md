@@ -1993,7 +1993,7 @@ Consistent code conventions.
 
 ---
 
-## Milestone 163 — Scenario catalog  **Owner:** QA Automation
+## Milestone 163 — Scenario catalog  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 List all scenarios.
 

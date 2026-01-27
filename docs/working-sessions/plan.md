@@ -2159,7 +2159,7 @@ Speedrunner features.
 
 ---
 
-## Milestone 177 — Boss rush mode  **Owner:** Gameplay
+## Milestone 177 — Boss rush mode  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay
 ### Objective
 Combat challenge mode.
 

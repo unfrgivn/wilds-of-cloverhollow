@@ -1901,6 +1901,52 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Boss Rush Actions ──────────────────────────────────────────────
+    if t == "start_boss_rush":
+        BossRushManager.start_boss_rush()
+        _trace["events"].append({"type": "start_boss_rush", "frame": _frame})
+        print("[Scenario] start_boss_rush")
+        _action_index += 1
+        return
+
+    if t == "check_boss_rush":
+        var active: bool = BossRushManager.is_active()
+        var boss_index: int = BossRushManager.get_current_boss_index()
+        var total: int = BossRushManager.get_total_bosses()
+        var elapsed: float = BossRushManager.get_elapsed_time()
+        _trace["events"].append({"type": "check_boss_rush", "frame": _frame, "active": active, "boss_index": boss_index, "total": total, "elapsed": elapsed})
+        print("[Scenario] check_boss_rush: active=%s, boss=%d/%d, time=%s" % [active, boss_index, total, BossRushManager.format_time(elapsed)])
+        _action_index += 1
+        return
+
+    if t == "report_boss_defeated":
+        BossRushManager.report_boss_defeated()
+        _trace["events"].append({"type": "report_boss_defeated", "frame": _frame})
+        print("[Scenario] report_boss_defeated")
+        _action_index += 1
+        return
+
+    if t == "check_boss_rush_leaderboard":
+        var entries: Array = BossRushManager.get_leaderboard()
+        _trace["events"].append({"type": "check_boss_rush_leaderboard", "frame": _frame, "entries": entries.size()})
+        print("[Scenario] check_boss_rush_leaderboard: %d entries" % entries.size())
+        _action_index += 1
+        return
+
+    if t == "clear_boss_rush_leaderboard":
+        BossRushManager.clear_leaderboard()
+        _trace["events"].append({"type": "clear_boss_rush_leaderboard", "frame": _frame})
+        print("[Scenario] clear_boss_rush_leaderboard")
+        _action_index += 1
+        return
+
+    if t == "reset_boss_rush":
+        BossRushManager.reset()
+        _trace["events"].append({"type": "reset_boss_rush", "frame": _frame})
+        print("[Scenario] reset_boss_rush")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

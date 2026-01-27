@@ -1,0 +1,24 @@
+{
+  "id": "boss_rush_stub",
+  "name": "Boss Rush Stub Test",
+  "description": "Tests boss rush mode, sequential fights, and leaderboard",
+  "starting_area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "count": 10},
+    {"type": "reset_boss_rush"},
+    {"type": "clear_boss_rush_leaderboard"},
+    {"type": "check_boss_rush"},
+    {"type": "start_boss_rush"},
+    {"type": "check_boss_rush"},
+    {"type": "wait_frames", "count": 30},
+    {"type": "report_boss_defeated"},
+    {"type": "check_boss_rush"},
+    {"type": "wait_frames", "count": 30},
+    {"type": "report_boss_defeated"},
+    {"type": "check_boss_rush"},
+    {"type": "check_boss_rush_leaderboard"},
+    {"type": "capture", "label": "boss_rush_complete"},
+    {"type": "reset_boss_rush"},
+    {"type": "wait_frames", "count": 5}
+  ]
+}

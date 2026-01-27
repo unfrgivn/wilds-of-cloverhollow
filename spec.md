@@ -897,6 +897,20 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `unlock_ng_plus`, `check_ng_plus`, `prepare_ng_plus_carryover`, `start_ng_plus`, `reset_ng_plus`, `check_enemy_multiplier`.
 - Scenario: `new_game_plus_stub`.
 
+### 3.65 Boss rush mode
+- BossRushManager autoload handles Boss Rush challenge mode.
+- Sequential boss fights without healing between battles.
+- Boss lineup: forest_guardian, chaos_minion (expandable).
+- Timer tracking for speedrun leaderboard.
+- Local leaderboard persisted to `user://boss_rush_leaderboard.json`.
+- API: `start_boss_rush()`, `is_active()`, `get_current_boss_index()`, `get_total_bosses()`, `get_current_boss_id()`.
+- `report_boss_defeated()`: Advances to next boss or completes rush.
+- `report_defeat()`: Ends rush on player loss.
+- `get_leaderboard()`, `clear_leaderboard()`, `format_time(seconds)`.
+- Signals: `boss_rush_started`, `boss_rush_ended(victory, time, bosses_defeated)`, `boss_defeated(index, id)`, `leaderboard_updated(entries)`.
+- Scenario actions: `start_boss_rush`, `check_boss_rush`, `report_boss_defeated`, `check_boss_rush_leaderboard`, `clear_boss_rush_leaderboard`, `reset_boss_rush`.
+- Scenario: `boss_rush_stub`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -2281,7 +2281,7 @@ Startup screens.
 
 ---
 
-## Milestone 187 — App icon and metadata  **Owner:** Art Pipeline
+## Milestone 187 — App icon and metadata  **Owner:** Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Store listing assets.
 

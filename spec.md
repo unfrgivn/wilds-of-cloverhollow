@@ -163,6 +163,15 @@ This file is the single source of truth. If code changes behavior, update this f
 - rally_town: After villain reveal, player rallies townspeople for support (flags: ally_elder_rallied, ally_teacher_rallied, ally_blacksmith_rallied, party_formed).
   - AllyNPC script handles rally dialogue and item gifts.
   - Key allies: Elder (supplies), Teacher (knowledge), Blacksmith (equipment).
+- Villain backstory quests (optional, unlock post-villain_revealed):
+  - chaos_lord_origins: Search library for old town records. Discover Cedric, a child who went missing 50 years ago (flags: chaos_origins_discovered).
+    - Lore item: old_town_records.
+  - chaos_lord_betrayal: Find the old teacher's journal in school basement. Learn about the magical accident that consumed Cedric (flags: chaos_betrayal_learned).
+    - Lore item: teachers_journal.
+  - chaos_lord_redemption: Search Cedric's old home in Hidden Grove. Find proof the old Cedric still exists (flags: chaos_redemption_found).
+    - Lore items: cedric_toy, hope_pendant.
+    - Affects ending: unlocks redemption dialogue in final confrontation.
+  - Scenario: `villain_backstory_smoke`.
 
 ### 3.13 Opening cutscene
 - GameIntroController (Main.tscn script) orchestrates game start sequence.

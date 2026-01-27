@@ -164,6 +164,39 @@
       "required_flag": "library_research_done",
       "completion_flag": "bookworm_recruited",
       "objectives": ["Find Bookworm in the library", "Help solve the magical puzzle", "Recruit Bookworm to the party"]
+    },
+    {
+      "id": "chaos_lord_origins",
+      "name": "The Lost Child",
+      "description": "The Elder mentions that the Chaos Lord seems familiar. Search the library for old town records about children who went missing long ago.",
+      "type": "investigation",
+      "reward_gold": 50,
+      "reward_items": [],
+      "required_flag": "villain_revealed",
+      "completion_flag": "chaos_origins_discovered",
+      "objectives": ["Talk to the Elder about the Chaos Lord's appearance", "Search the library for old town records", "Find the missing child report from 50 years ago"]
+    },
+    {
+      "id": "chaos_lord_betrayal",
+      "name": "A Broken Promise",
+      "description": "The old records mention a child named 'Cedric' who was promised help but abandoned during a magical accident. Find witnesses who remember what happened.",
+      "type": "investigation",
+      "reward_gold": 75,
+      "reward_items": [],
+      "required_flag": "chaos_origins_discovered",
+      "completion_flag": "chaos_betrayal_learned",
+      "objectives": ["Ask the Elder about Cedric's story", "Find the old teacher's journal in the school basement", "Read the tragic account of the magical accident"]
+    },
+    {
+      "id": "chaos_lord_redemption",
+      "name": "A Glimmer of Hope",
+      "description": "Cedric wasn't always evil - he was a kind child who loved Cloverhollow. Find proof that the old Cedric still exists somewhere inside the Chaos Lord.",
+      "type": "investigation",
+      "reward_gold": 100,
+      "reward_items": ["hope_pendant"],
+      "required_flag": "chaos_betrayal_learned",
+      "completion_flag": "chaos_redemption_found",
+      "objectives": ["Search Cedric's old home in Hidden Grove for mementos", "Find Cedric's childhood toy", "Discover Cedric's promise to protect Cloverhollow"]
     }
   ]
 }

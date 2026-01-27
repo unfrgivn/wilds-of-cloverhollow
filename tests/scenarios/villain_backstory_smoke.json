@@ -1,0 +1,27 @@
+{
+  "id": "villain_backstory_smoke",
+  "name": "Villain Backstory Quest Chain Smoke Test",
+  "description": "Tests the villain backstory quest chain progression and lore item acquisition",
+  "starting_area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "count": 10},
+    {"type": "set_story_flag", "flag": "villain_revealed", "value": true},
+    {"type": "check_story_flag", "flag": "villain_revealed"},
+    
+    {"type": "set_story_flag", "flag": "chaos_origins_discovered", "value": true},
+    {"type": "acquire_tool", "tool_id": "old_town_records"},
+    {"type": "check_story_flag", "flag": "chaos_origins_discovered"},
+    
+    {"type": "set_story_flag", "flag": "chaos_betrayal_learned", "value": true},
+    {"type": "acquire_tool", "tool_id": "teachers_journal"},
+    {"type": "check_story_flag", "flag": "chaos_betrayal_learned"},
+    
+    {"type": "set_story_flag", "flag": "chaos_redemption_found", "value": true},
+    {"type": "acquire_tool", "tool_id": "cedric_toy"},
+    {"type": "acquire_tool", "tool_id": "hope_pendant"},
+    {"type": "check_story_flag", "flag": "chaos_redemption_found"},
+    
+    {"type": "capture", "label": "villain_backstory_complete"},
+    {"type": "wait_frames", "count": 5}
+  ]
+}

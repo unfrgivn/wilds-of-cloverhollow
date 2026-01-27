@@ -440,6 +440,46 @@
       "power": 200,
       "target": "none",
       "price": 200
+    },
+    {
+      "id": "old_town_records",
+      "name": "Old Town Records",
+      "description": "Dusty library records from 50 years ago. Contains a missing child report for a boy named Cedric.",
+      "type": "lore",
+      "effect": "none",
+      "power": 0,
+      "target": "none",
+      "price": 0
+    },
+    {
+      "id": "teachers_journal",
+      "name": "Old Teacher's Journal",
+      "description": "A worn journal from the school basement. Contains a tragic account of a magical accident that consumed young Cedric.",
+      "type": "lore",
+      "effect": "none",
+      "power": 0,
+      "target": "none",
+      "price": 0
+    },
+    {
+      "id": "cedric_toy",
+      "name": "Cedric's Toy Knight",
+      "description": "A small wooden knight, worn from years of play. Cedric's favorite toy - he wanted to be a hero who protected Cloverhollow.",
+      "type": "lore",
+      "effect": "none",
+      "power": 0,
+      "target": "none",
+      "price": 0
+    },
+    {
+      "id": "hope_pendant",
+      "name": "Pendant of Hope",
+      "description": "Cedric's mother's pendant, found in his old home. Engraved: 'May you always find your way back.' Could this reach the Chaos Lord's heart?",
+      "type": "key_item",
+      "effect": "none",
+      "power": 0,
+      "target": "none",
+      "price": 0
     }
   ]
 }

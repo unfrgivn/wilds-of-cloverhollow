@@ -2113,7 +2113,7 @@ Play with one hand.
 
 ---
 
-## Milestone 173 — Villain backstory quests  **Owner:** Story
+## Milestone 173 — Villain backstory quests  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story
 ### Objective
 Expand antagonist motivation.
 

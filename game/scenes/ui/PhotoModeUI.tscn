@@ -25,6 +25,10 @@ text = "Take Photo"
 layout_mode = 2
 text = "Hide UI"
 
+[node name="StickersButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Stickers"
+
 [node name="ExitButton" type="Button" parent="ControlsPanel/VBox"]
 layout_mode = 2
 text = "Exit"

@@ -5,11 +5,14 @@ extends CanvasLayer
 @onready var controls_panel: PanelContainer = $ControlsPanel
 @onready var photo_button: Button = $ControlsPanel/VBox/PhotoButton
 @onready var hide_ui_button: Button = $ControlsPanel/VBox/HideUIButton
+@onready var stickers_button: Button = $ControlsPanel/VBox/StickersButton
 @onready var exit_button: Button = $ControlsPanel/VBox/ExitButton
 @onready var photo_flash: ColorRect = $PhotoFlash
 @onready var photo_count_label: Label = $PhotoCountLabel
 
 var _is_visible: bool = false
+var _sticker_ui: Node = null
+const STICKER_UI_PATH := "res://game/scenes/ui/PhotoStickerUI.tscn"
 
 
 func _ready() -> void:
@@ -17,6 +20,7 @@ func _ready() -> void:
     
     photo_button.pressed.connect(_on_photo_pressed)
     hide_ui_button.pressed.connect(_on_hide_ui_pressed)
+    stickers_button.pressed.connect(_on_stickers_pressed)
     exit_button.pressed.connect(_on_exit_pressed)
     
     PhotoModeManager.ui_hidden.connect(_on_ui_hidden)
@@ -100,6 +104,41 @@ func _on_hide_ui_pressed() -> void:
 
 func _on_exit_pressed() -> void:
     PhotoModeManager.exit_photo_mode()
+
+
+func _on_stickers_pressed() -> void:
+    _open_sticker_mode()
+
+
+func _open_sticker_mode() -> void:
+    # Hide photo mode UI
+    controls_panel.visible = false
+    photo_count_label.visible = false
+    
+    # Load and show sticker UI
+    if _sticker_ui == null and ResourceLoader.exists(STICKER_UI_PATH):
+        var sticker_scene := load(STICKER_UI_PATH)
+        _sticker_ui = sticker_scene.instantiate()
+        get_tree().root.add_child(_sticker_ui)
+        _sticker_ui.decoration_cancelled.connect(_on_sticker_cancelled)
+        _sticker_ui.decoration_saved.connect(_on_sticker_saved)
+    
+    if _sticker_ui != null:
+        _sticker_ui.show_sticker_ui()
+
+
+func _on_sticker_cancelled() -> void:
+    _close_sticker_mode()
+
+
+func _on_sticker_saved(_path: String) -> void:
+    _update_photo_count()
+
+
+func _close_sticker_mode() -> void:
+    # Show photo mode UI again
+    controls_panel.visible = true
+    photo_count_label.visible = true
 
 
 func _on_ui_hidden() -> void:

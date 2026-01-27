@@ -1,0 +1,45 @@
+{
+    "id": "photo_sticker_smoke",
+    "name": "Photo Sticker Smoke Test",
+    "description": "Verifies sticker unlock/check flow and basic sticker system functionality",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 10},
+        {"type": "log", "message": "=== Photo Sticker Smoke Test ==="},
+        
+        {"type": "log", "message": "Step 1: Check initial sticker state"},
+        {"type": "check_stickers"},
+        
+        {"type": "log", "message": "Step 2: Verify default stickers are unlocked"},
+        {"type": "check_sticker_unlocked", "sticker_id": "heart"},
+        {"type": "check_sticker_unlocked", "sticker_id": "star"},
+        {"type": "check_sticker_unlocked", "sticker_id": "smile"},
+        {"type": "check_sticker_unlocked", "sticker_id": "flower"},
+        {"type": "check_sticker_unlocked", "sticker_id": "sparkle"},
+        {"type": "check_sticker_unlocked", "sticker_id": "speech_bubble"},
+        
+        {"type": "log", "message": "Step 3: Verify conditional stickers are locked"},
+        {"type": "check_sticker_unlocked", "sticker_id": "butterfly"},
+        {"type": "check_sticker_unlocked", "sticker_id": "rainbow"},
+        {"type": "check_sticker_unlocked", "sticker_id": "crown"},
+        
+        {"type": "log", "message": "Step 4: Manually unlock a sticker"},
+        {"type": "unlock_sticker", "sticker_id": "butterfly"},
+        {"type": "check_sticker_unlocked", "sticker_id": "butterfly"},
+        
+        {"type": "log", "message": "Step 5: Check updated sticker counts"},
+        {"type": "check_stickers"},
+        
+        {"type": "log", "message": "Step 6: Reset stickers"},
+        {"type": "reset_stickers"},
+        {"type": "check_stickers"},
+        {"type": "check_sticker_unlocked", "sticker_id": "butterfly"},
+        
+        {"type": "log", "message": "Step 7: Check unlock conditions"},
+        {"type": "check_sticker_conditions"},
+        
+        {"type": "wait_frames", "frames": 5},
+        {"type": "capture", "label": "sticker_smoke_end"},
+        {"type": "log", "message": "=== Photo Sticker Smoke Test Complete ==="}
+    ]
+}

@@ -575,6 +575,28 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario: `trading_stub`.
 - Note: This is a stub - no actual item transfer or networking. Prepared for future multiplayer feature.
 
+### 3.45 Photo sticker system
+- StickerManager autoload manages sticker unlocks and data.
+- Sticker data stored in `game/data/stickers/stickers.json`.
+- Sticker data format:
+  - Each sticker has: id, name, description, category, sprite_path, unlocked_by_default (or unlock_condition).
+  - Categories: basic, nature, special, effects, pets.
+  - Unlock conditions: collection (count), photos_taken (count), quest_completed (quest_id), story_flag (flag), area_visited (area).
+- 12 stickers: 6 default unlocked (heart, star, smile, flower, sparkle, speech_bubble), 6 conditional.
+- PhotoStickerUI (CanvasLayer): sticker decoration overlay accessed from photo mode.
+  - Category tabs for filtering stickers.
+  - Sticker grid showing unlocked stickers.
+  - Drag-and-drop sticker placement on canvas.
+  - Save/Clear/Done/Cancel controls.
+- Photo mode integration: Stickers button in PhotoModeUI opens PhotoStickerUI.
+- Decorated photos saved with stickers composited.
+- API: `is_sticker_unlocked(id)`, `unlock_sticker(id)`, `get_unlocked_stickers()`, `get_stickers_by_category(category)`.
+- `check_unlock_conditions()`: Auto-unlocks stickers when conditions are met.
+- Signals: `sticker_unlocked(sticker_id, sticker_data)`, `stickers_loaded`.
+- Persistence: unlocked stickers saved to `user://stickers.json`.
+- Scenario actions: `unlock_sticker`, `check_sticker_unlocked`, `check_stickers`, `reset_stickers`, `check_sticker_conditions`.
+- Scenario: `photo_sticker_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

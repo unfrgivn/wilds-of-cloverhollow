@@ -1894,7 +1894,7 @@ Item trading between players.
 
 ---
 
-## Milestone 155 — Photo sticker system  **Owner:** UI Systems + Art Pipeline
+## Milestone 155 — Photo sticker system  **Owner:** UI Systems + Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Decorate photos.
 

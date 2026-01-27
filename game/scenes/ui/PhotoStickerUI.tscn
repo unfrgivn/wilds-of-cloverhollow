@@ -1,0 +1,82 @@
+[gd_scene load_steps=2 format=3 uid="uid://photo_sticker_ui"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/PhotoStickerUI.gd" id="1_script"]
+
+[node name="PhotoStickerUI" type="CanvasLayer"]
+layer = 126
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="StickerCanvas" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 288.0
+mouse_filter = 1
+
+[node name="StickerPanel" type="PanelContainer" parent="."]
+offset_left = 10.0
+offset_top = 40.0
+offset_right = 130.0
+offset_bottom = 200.0
+
+[node name="VBox" type="VBoxContainer" parent="StickerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="StickerPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Stickers"
+horizontal_alignment = 1
+
+[node name="CategoryTabs" type="HBoxContainer" parent="StickerPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="StickerScroll" type="ScrollContainer" parent="StickerPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 100)
+
+[node name="StickerGrid" type="GridContainer" parent="StickerPanel/VBox/StickerScroll"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+
+[node name="ControlsPanel" type="PanelContainer" parent="."]
+offset_left = 400.0
+offset_top = 40.0
+offset_right = 502.0
+offset_bottom = 140.0
+
+[node name="VBox" type="VBoxContainer" parent="ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SaveButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Save Photo"
+
+[node name="ClearButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Clear All"
+
+[node name="DoneButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Done"
+
+[node name="CancelButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="InfoLabel" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 24.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 8
+text = "Stickers: 0 | Drag to move"

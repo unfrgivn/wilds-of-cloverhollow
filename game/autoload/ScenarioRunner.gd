@@ -1240,6 +1240,46 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # === Sticker actions ===
+    if t == "unlock_sticker":
+        var sticker_id: String = action.get("sticker_id", "")
+        var result: bool = StickerManager.unlock_sticker(sticker_id)
+        _trace["events"].append({"type": "unlock_sticker", "frame": _frame, "sticker_id": sticker_id, "success": result})
+        print("[Scenario] unlock_sticker: %s -> %s" % [sticker_id, str(result)])
+        _action_index += 1
+        return
+
+    if t == "check_sticker_unlocked":
+        var sticker_id: String = action.get("sticker_id", "")
+        var unlocked: bool = StickerManager.is_sticker_unlocked(sticker_id)
+        _trace["events"].append({"type": "check_sticker_unlocked", "frame": _frame, "sticker_id": sticker_id, "unlocked": unlocked})
+        print("[Scenario] check_sticker_unlocked: %s -> %s" % [sticker_id, str(unlocked)])
+        _action_index += 1
+        return
+
+    if t == "check_stickers":
+        var unlocked_count: int = StickerManager.get_unlocked_count()
+        var total_count: int = StickerManager.get_total_count()
+        _trace["events"].append({"type": "check_stickers", "frame": _frame, "unlocked": unlocked_count, "total": total_count})
+        print("[Scenario] check_stickers: %d/%d unlocked" % [unlocked_count, total_count])
+        _action_index += 1
+        return
+
+    if t == "reset_stickers":
+        StickerManager.reset_unlocks()
+        _trace["events"].append({"type": "reset_stickers", "frame": _frame})
+        print("[Scenario] reset_stickers")
+        _action_index += 1
+        return
+
+    if t == "check_sticker_conditions":
+        StickerManager.check_unlock_conditions()
+        var unlocked_count: int = StickerManager.get_unlocked_count()
+        _trace["events"].append({"type": "check_sticker_conditions", "frame": _frame, "unlocked_after": unlocked_count})
+        print("[Scenario] check_sticker_conditions: %d unlocked after check" % unlocked_count)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

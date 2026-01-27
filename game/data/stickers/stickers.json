@@ -1,0 +1,127 @@
+{
+    "stickers": [
+        {
+            "id": "heart",
+            "name": "Heart",
+            "description": "A cute pink heart",
+            "category": "basic",
+            "sprite_path": "res://game/assets/sprites/stickers/heart.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "star",
+            "name": "Star",
+            "description": "A shiny golden star",
+            "category": "basic",
+            "sprite_path": "res://game/assets/sprites/stickers/star.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "smile",
+            "name": "Smiley",
+            "description": "A happy smiley face",
+            "category": "basic",
+            "sprite_path": "res://game/assets/sprites/stickers/smile.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "flower",
+            "name": "Flower",
+            "description": "A pretty flower",
+            "category": "nature",
+            "sprite_path": "res://game/assets/sprites/stickers/flower.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "butterfly",
+            "name": "Butterfly",
+            "description": "A colorful butterfly",
+            "category": "nature",
+            "sprite_path": "res://game/assets/sprites/stickers/butterfly.png",
+            "unlock_condition": {
+                "type": "collection",
+                "category": "bugs",
+                "count": 3
+            }
+        },
+        {
+            "id": "fish_sticker",
+            "name": "Fish",
+            "description": "A friendly fish",
+            "category": "nature",
+            "sprite_path": "res://game/assets/sprites/stickers/fish.png",
+            "unlock_condition": {
+                "type": "collection",
+                "category": "fish",
+                "count": 3
+            }
+        },
+        {
+            "id": "rainbow",
+            "name": "Rainbow",
+            "description": "A magical rainbow",
+            "category": "special",
+            "sprite_path": "res://game/assets/sprites/stickers/rainbow.png",
+            "unlock_condition": {
+                "type": "photos_taken",
+                "count": 10
+            }
+        },
+        {
+            "id": "crown",
+            "name": "Crown",
+            "description": "A royal crown",
+            "category": "special",
+            "sprite_path": "res://game/assets/sprites/stickers/crown.png",
+            "unlock_condition": {
+                "type": "quest_completed",
+                "quest_id": "chaos_investigation"
+            }
+        },
+        {
+            "id": "sparkle",
+            "name": "Sparkles",
+            "description": "Magical sparkles",
+            "category": "effects",
+            "sprite_path": "res://game/assets/sprites/stickers/sparkle.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "speech_bubble",
+            "name": "Speech Bubble",
+            "description": "Say something!",
+            "category": "effects",
+            "sprite_path": "res://game/assets/sprites/stickers/speech_bubble.png",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "paw_print",
+            "name": "Paw Print",
+            "description": "A cute paw print",
+            "category": "pets",
+            "sprite_path": "res://game/assets/sprites/stickers/paw_print.png",
+            "unlock_condition": {
+                "type": "story_flag",
+                "flag": "pet_selected"
+            }
+        },
+        {
+            "id": "clover",
+            "name": "Clover",
+            "description": "Lucky four-leaf clover",
+            "category": "nature",
+            "sprite_path": "res://game/assets/sprites/stickers/clover.png",
+            "unlock_condition": {
+                "type": "area_visited",
+                "area": "town_center"
+            }
+        }
+    ],
+    "categories": [
+        {"id": "basic", "name": "Basic"},
+        {"id": "nature", "name": "Nature"},
+        {"id": "special", "name": "Special"},
+        {"id": "effects", "name": "Effects"},
+        {"id": "pets", "name": "Pets"}
+    ]
+}

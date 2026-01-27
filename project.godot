@@ -47,6 +47,7 @@ CollectionLogManager="*res://game/autoload/CollectionLogManager.gd"
 SeasonalEventManager="*res://game/autoload/SeasonalEventManager.gd"
 DailyChallengeManager="*res://game/autoload/DailyChallengeManager.gd"
 TradingManager="*res://game/autoload/TradingManager.gd"
+StickerManager="*res://game/autoload/StickerManager.gd"
 
 [internationalization]
 

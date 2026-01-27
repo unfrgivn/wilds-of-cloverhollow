@@ -491,6 +491,29 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    if t == "set_active_pet":
+        var pet_id := str(action.get("pet_id", "maddie"))
+        var success: bool = PartyManager.set_active_pet(pet_id)
+        _trace["events"].append({"type": "set_active_pet", "frame": _frame, "pet_id": pet_id, "success": success})
+        _action_index += 1
+        return
+
+    if t == "check_active_pet":
+        var active_pet: String = PartyManager.get_active_pet()
+        var pet_data: Dictionary = PartyManager.get_active_pet_data()
+        _trace["events"].append({"type": "check_active_pet", "frame": _frame, "active_pet": active_pet, "pet_data": pet_data})
+        _action_index += 1
+        return
+
+    if t == "check_pet_options":
+        var pet_options: Array = PartyManager.get_pet_options()
+        var pet_ids: Array = []
+        for pet in pet_options:
+            pet_ids.append(pet.get("id", ""))
+        _trace["events"].append({"type": "check_pet_options", "frame": _frame, "pet_count": pet_options.size(), "pet_ids": pet_ids})
+        _action_index += 1
+        return
+
     if t == "open_quest_log":
         var quest_log_scene := preload("res://game/scenes/ui/QuestLogUI.tscn")
         var quest_log_ui := quest_log_scene.instantiate()

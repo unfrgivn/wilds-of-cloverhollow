@@ -1810,7 +1810,7 @@ Magic-focused party member.
 
 ---
 
-## Milestone 148 — Pet variants  **Owner:** Art Pipeline + Character Systems
+## Milestone 148 — Pet variants  **Owner:** Art Pipeline + Character Systems **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Multiple pet options.
 

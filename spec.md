@@ -479,6 +479,24 @@ This file is the single source of truth. If code changes behavior, update this f
 - Random idle animations: sit, scratch, yawn - triggered after ~5 seconds of standing still.
 - Pet starts in Hero House Interior, follows player between rooms.
 
+### 4.2 Pet variants and selection
+- 3 pet variants available: Maddie (cat), Buddy (dog), Nibbles (hamster).
+- Pet selection occurs at game start (after intro narration, before gameplay).
+- PetSelectionUI: CanvasLayer with pet buttons, description panel, confirm button.
+- Pet data stored in `game/data/party/party.json` under `pet_options` array.
+- Each pet has: id, name, type, description, stats (max_hp, max_mp, attack, defense, speed), skills[], sprite_path.
+- Pet skills unique per type:
+  - Cat: scratch, pounce.
+  - Dog: bark, fetch.
+  - Hamster: squeak, nibble.
+- PartyManager API:
+  - `get_pet_options()`: Returns array of available pet data.
+  - `set_active_pet(pet_id)`: Sets active pet, updates party_state.
+  - `get_active_pet()`: Returns active pet ID.
+  - `get_active_pet_data()`: Returns active pet's full data.
+- Signal: `pet_selected(pet_id)` emitted on selection.
+- Scenario actions: `check_pet_options`, `set_active_pet`, `check_active_pet`.
+
 ## 5. Battle system
 
 ### 5.1 Battle format (locked)

@@ -280,6 +280,76 @@
       "target": "single_enemy",
       "element": "none",
       "effect": "defense_down"
+    },
+    {
+      "id": "scratch",
+      "name": "Scratch",
+      "description": "Cat scratches the enemy with sharp claws.",
+      "type": "attack",
+      "mp_cost": 0,
+      "power": 4,
+      "target": "single_enemy",
+      "element": "none",
+      "pet_skill": true
+    },
+    {
+      "id": "pounce",
+      "name": "Pounce",
+      "description": "Cat pounces on the enemy for extra damage.",
+      "type": "attack",
+      "mp_cost": 2,
+      "power": 6,
+      "target": "single_enemy",
+      "element": "none",
+      "pet_skill": true
+    },
+    {
+      "id": "bark",
+      "name": "Bark",
+      "description": "Dog barks loudly, lowering enemy attack.",
+      "type": "status",
+      "mp_cost": 1,
+      "power": 0,
+      "target": "single_enemy",
+      "element": "none",
+      "effect": "attack_down",
+      "pet_skill": true
+    },
+    {
+      "id": "fetch",
+      "name": "Fetch",
+      "description": "Dog fetches a random item from somewhere.",
+      "type": "special",
+      "mp_cost": 3,
+      "power": 0,
+      "target": "self",
+      "element": "none",
+      "effect": "random_item",
+      "pet_skill": true
+    },
+    {
+      "id": "squeak",
+      "name": "Squeak",
+      "description": "Hamster squeaks cutely, distracting the enemy.",
+      "type": "status",
+      "mp_cost": 1,
+      "power": 0,
+      "target": "single_enemy",
+      "element": "none",
+      "effect": "distracted",
+      "pet_skill": true
+    },
+    {
+      "id": "nibble",
+      "name": "Nibble",
+      "description": "Hamster nibbles the enemy rapidly.",
+      "type": "attack",
+      "mp_cost": 0,
+      "power": 2,
+      "target": "single_enemy",
+      "element": "none",
+      "hit_count": 3,
+      "pet_skill": true
     }
   ]
 }

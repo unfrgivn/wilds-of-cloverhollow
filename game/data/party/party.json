@@ -8,6 +8,47 @@
     "defense_per_level": 1,
     "speed_per_level": 0
   },
+  "pet_options": [
+    {
+      "id": "maddie",
+      "name": "Maddie",
+      "type": "cat",
+      "description": "Fae's loyal cat. Fast and feisty.",
+      "max_hp": 15,
+      "max_mp": 5,
+      "attack": 4,
+      "defense": 2,
+      "speed": 8,
+      "skills": ["scratch", "pounce"],
+      "sprite": "res://game/assets/party/maddie.png"
+    },
+    {
+      "id": "buddy",
+      "name": "Buddy",
+      "type": "dog",
+      "description": "A loyal dog. Tough and protective.",
+      "max_hp": 20,
+      "max_mp": 3,
+      "attack": 5,
+      "defense": 4,
+      "speed": 5,
+      "skills": ["bark", "fetch"],
+      "sprite": "res://game/assets/party/buddy_placeholder.png"
+    },
+    {
+      "id": "nibbles",
+      "name": "Nibbles",
+      "type": "hamster",
+      "description": "A tiny hamster. Quick and clever.",
+      "max_hp": 10,
+      "max_mp": 8,
+      "attack": 2,
+      "defense": 1,
+      "speed": 10,
+      "skills": ["squeak", "nibble"],
+      "sprite": "res://game/assets/party/nibbles_placeholder.png"
+    }
+  ],
   "members": [
     {
       "id": "fae",

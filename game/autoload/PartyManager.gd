@@ -1,11 +1,19 @@
 extends Node
 ## PartyManager - Handles party progression, XP, and leveling
 
+signal pet_selected(pet_id: String)
+
 ## Party member runtime data: {member_id: {level, xp, ...}}
 var party_state: Dictionary = {}
 
 ## Equipment state: {member_id: {weapon: "", armor: "", accessory: ""}}
 var equipment_state: Dictionary = {}
+
+## Active pet ID (selected at game start)
+var active_pet_id: String = "maddie"
+
+## Available pet options from GameData
+var pet_options: Array = []
 
 ## Cached data from GameData
 var level_thresholds: Array = []
@@ -19,6 +27,7 @@ func _load_party_data() -> void:
 	var party_data: Dictionary = GameData.get_party_data()
 	level_thresholds = party_data.get("level_thresholds", [0, 10, 25, 50, 80, 120])
 	stat_growth = party_data.get("stat_growth", {})
+	pet_options = party_data.get("pet_options", [])
 	
 	for member in party_data.get("members", []):
 		var member_id: String = member.get("id", "")
@@ -155,3 +164,51 @@ func get_equipment_state() -> Dictionary:
 func load_equipment_state(state: Dictionary) -> void:
 	equipment_state = state.duplicate(true)
 	print("[PartyManager] Equipment state loaded")
+
+## Get available pet options
+func get_pet_options() -> Array:
+	return pet_options
+
+## Get pet data by ID from pet_options
+func get_pet_data(pet_id: String) -> Dictionary:
+	for pet in pet_options:
+		if pet.get("id", "") == pet_id:
+			return pet
+	return {}
+
+## Set the active pet (called at game start)
+func set_active_pet(pet_id: String) -> bool:
+	var pet_data: Dictionary = get_pet_data(pet_id)
+	if pet_data.is_empty():
+		push_warning("[PartyManager] Pet not found: %s" % pet_id)
+		return false
+	
+	active_pet_id = pet_id
+	
+	# Update the pet entry in party_state with the selected pet's stats
+	party_state["maddie"] = {
+		"id": pet_data.get("id", pet_id),
+		"name": pet_data.get("name", "Pet"),
+		"level": 1,
+		"xp": 0,
+		"max_hp": pet_data.get("max_hp", 15),
+		"max_mp": pet_data.get("max_mp", 5),
+		"attack": pet_data.get("attack", 4),
+		"defense": pet_data.get("defense", 2),
+		"speed": pet_data.get("speed", 8)
+	}
+	# Also store under the actual pet ID for lookups
+	if pet_id != "maddie":
+		party_state[pet_id] = party_state["maddie"].duplicate()
+	
+	print("[PartyManager] Active pet set to: %s (%s)" % [pet_data.get("name", pet_id), pet_id])
+	pet_selected.emit(pet_id)
+	return true
+
+## Get the currently active pet ID
+func get_active_pet() -> String:
+	return active_pet_id
+
+## Get active pet data
+func get_active_pet_data() -> Dictionary:
+	return get_pet_data(active_pet_id)

@@ -1,0 +1,15 @@
+{
+  "scenario_id": "pet_variants_smoke",
+  "description": "Test pet variant data and selection functionality",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_pet_options"},
+    {"type": "set_active_pet", "pet_id": "buddy"},
+    {"type": "check_active_pet"},
+    {"type": "set_active_pet", "pet_id": "nibbles"},
+    {"type": "check_active_pet"},
+    {"type": "set_active_pet", "pet_id": "maddie"},
+    {"type": "check_active_pet"},
+    {"type": "wait_frames", "frames": 5}
+  ]
+}

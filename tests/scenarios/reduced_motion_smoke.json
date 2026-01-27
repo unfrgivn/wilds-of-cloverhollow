@@ -1,0 +1,17 @@
+{
+  "id": "reduced_motion_smoke",
+  "name": "Reduced Motion Accessibility Test",
+  "description": "Tests reduced motion setting toggle and persistence",
+  "starting_area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "count": 10},
+    {"type": "check_reduced_motion"},
+    {"type": "set_reduced_motion", "enabled": true},
+    {"type": "check_reduced_motion"},
+    {"type": "capture", "label": "reduced_motion_on"},
+    {"type": "set_reduced_motion", "enabled": false},
+    {"type": "check_reduced_motion"},
+    {"type": "capture", "label": "reduced_motion_off"},
+    {"type": "wait_frames", "count": 5}
+  ]
+}

@@ -753,6 +753,22 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Reduced motion actions
+    if t == "set_reduced_motion":
+        var enabled: bool = action.get("enabled", false)
+        SettingsManager.set_reduced_motion(enabled)
+        _trace["events"].append({"type": "set_reduced_motion", "frame": _frame, "enabled": enabled})
+        print("[Scenario] set_reduced_motion: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "check_reduced_motion":
+        var enabled: bool = SettingsManager.reduced_motion_enabled
+        _trace["events"].append({"type": "check_reduced_motion", "frame": _frame, "enabled": enabled})
+        print("[Scenario] check_reduced_motion: %s" % enabled)
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

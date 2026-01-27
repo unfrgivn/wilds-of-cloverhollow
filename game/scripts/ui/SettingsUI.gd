@@ -6,7 +6,7 @@ signal settings_closed
 
 var _is_active: bool = false
 var _selected_index: int = 0
-var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text Size", "Colorblind", "Dyslexia Font", "Language", "Credits", "Back"]
+var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text Size", "Colorblind", "Dyslexia Font", "Reduced Motion", "Language", "Credits", "Back"]
 
 @onready var panel: Panel = $Panel
 @onready var title_label: Label = $Panel/TitleLabel
@@ -19,6 +19,7 @@ var _options: Array[String] = ["Music Volume", "SFX Volume", "Touch Size", "Text
 @onready var text_size_label: Label = $Panel/OptionsContainer/TextRow/TextSizeLabel
 @onready var colorblind_label: Label = $Panel/OptionsContainer/ColorblindRow/ColorblindLabel
 @onready var dyslexia_label: Label = $Panel/OptionsContainer/DyslexiaRow/DyslexiaLabel
+@onready var reduced_motion_label: Label = $Panel/OptionsContainer/ReducedMotionRow/ReducedMotionLabel
 @onready var language_label: Label = $Panel/OptionsContainer/LanguageRow/LanguageLabel
 @onready var credits_button: Button = $Panel/OptionsContainer/CreditsButton
 @onready var back_button: Button = $Panel/OptionsContainer/BackButton
@@ -60,7 +61,10 @@ func _input(event: InputEvent) -> void:
         elif _selected_index == 5:  # Dyslexia row
             _toggle_dyslexia_font()
             get_viewport().set_input_as_handled()
-        elif _selected_index == 6:  # Language row
+        elif _selected_index == 6:  # Reduced Motion row
+            _toggle_reduced_motion()
+            get_viewport().set_input_as_handled()
+        elif _selected_index == 7:  # Language row
             _cycle_language(-1)
             get_viewport().set_input_as_handled()
     elif event.is_action_pressed("ui_right"):
@@ -76,7 +80,10 @@ func _input(event: InputEvent) -> void:
         elif _selected_index == 5:  # Dyslexia row
             _toggle_dyslexia_font()
             get_viewport().set_input_as_handled()
-        elif _selected_index == 6:  # Language row
+        elif _selected_index == 6:  # Reduced Motion row
+            _toggle_reduced_motion()
+            get_viewport().set_input_as_handled()
+        elif _selected_index == 7:  # Language row
             _cycle_language(1)
             get_viewport().set_input_as_handled()
 
@@ -102,6 +109,7 @@ func _load_current_values() -> void:
     _update_text_size_label()
     _update_colorblind_label()
     _update_dyslexia_label()
+    _update_reduced_motion_label()
     _update_language_label()
 
 func _on_music_changed(value: float) -> void:
@@ -155,6 +163,14 @@ func _update_dyslexia_label() -> void:
 func _toggle_dyslexia_font() -> void:
     SettingsManager.set_dyslexia_font(not SettingsManager.dyslexia_font_enabled)
     _update_dyslexia_label()
+
+func _update_reduced_motion_label() -> void:
+    if reduced_motion_label:
+        reduced_motion_label.text = SettingsManager.get_reduced_motion_name()
+
+func _toggle_reduced_motion() -> void:
+    SettingsManager.set_reduced_motion(not SettingsManager.reduced_motion_enabled)
+    _update_reduced_motion_label()
 
 func _update_language_label() -> void:
     if language_label:

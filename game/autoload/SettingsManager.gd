@@ -7,6 +7,7 @@ signal text_size_changed(new_size: int)
 signal locale_changed(locale: String)
 signal colorblind_mode_changed(mode: int)
 signal dyslexia_font_changed(enabled: bool)
+signal reduced_motion_changed(enabled: bool)
 
 const SETTINGS_FILE := "user://settings.json"
 
@@ -21,6 +22,7 @@ var touch_control_size: int = 1  # 0=small, 1=medium, 2=large
 var text_size: int = 1  # 0=small, 1=medium, 2=large
 var colorblind_mode: int = 0  # 0=none, 1=deuteranopia, 2=protanopia
 var dyslexia_font_enabled: bool = false  # Use OpenDyslexic-style font
+var reduced_motion_enabled: bool = false  # Disable screen shake and flashing
 
 # Localization
 var locale: String = "en"  # Language code
@@ -103,6 +105,17 @@ func set_dyslexia_font(enabled: bool) -> void:
 func get_dyslexia_font_name() -> String:
     return "On" if dyslexia_font_enabled else "Off"
 
+func set_reduced_motion(enabled: bool) -> void:
+    if reduced_motion_enabled == enabled:
+        return
+    reduced_motion_enabled = enabled
+    reduced_motion_changed.emit(reduced_motion_enabled)
+    settings_changed.emit()
+    print("[SettingsManager] Reduced motion: %s" % ("On" if enabled else "Off"))
+
+func get_reduced_motion_name() -> String:
+    return "On" if reduced_motion_enabled else "Off"
+
 func _apply_volume(bus_name: String, value: float) -> void:
     var bus_index := AudioServer.get_bus_index(bus_name)
     if bus_index >= 0:
@@ -123,6 +136,7 @@ func save_settings() -> void:
         "text_size": text_size,
         "colorblind_mode": colorblind_mode,
         "dyslexia_font_enabled": dyslexia_font_enabled,
+        "reduced_motion_enabled": reduced_motion_enabled,
         "locale": locale,
     }
     
@@ -160,6 +174,7 @@ func load_settings() -> void:
     text_size = data.get("text_size", 1)
     colorblind_mode = data.get("colorblind_mode", 0)
     dyslexia_font_enabled = data.get("dyslexia_font_enabled", false)
+    reduced_motion_enabled = data.get("reduced_motion_enabled", false)
     locale = data.get("locale", "en")
     
     # Apply loaded settings
@@ -176,6 +191,7 @@ func get_save_data() -> Dictionary:
         "text_size": text_size,
         "colorblind_mode": colorblind_mode,
         "dyslexia_font_enabled": dyslexia_font_enabled,
+        "reduced_motion_enabled": reduced_motion_enabled,
         "locale": locale,
     }
 
@@ -186,6 +202,7 @@ func load_save_data(data: Dictionary) -> void:
     text_size = data.get("text_size", 1)
     colorblind_mode = data.get("colorblind_mode", 0)
     dyslexia_font_enabled = data.get("dyslexia_font_enabled", false)
+    reduced_motion_enabled = data.get("reduced_motion_enabled", false)
     locale = data.get("locale", "en")
     _apply_volume(MUSIC_BUS, music_volume)
     _apply_volume(SFX_BUS, sfx_volume)

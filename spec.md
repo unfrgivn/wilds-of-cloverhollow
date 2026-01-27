@@ -823,6 +823,16 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_dyslexia_font`, `check_dyslexia_font`.
 - Scenario: `dyslexia_font_render`.
 
+### 3.60 Accessibility: Reduced motion mode
+- SettingsManager stores reduced_motion_enabled boolean setting.
+- Signal: `reduced_motion_changed(enabled)` emitted on toggle.
+- SettingsUI provides On/Off toggle for reduced motion option.
+- When enabled, disables screen shake and flashing effects.
+- API: `set_reduced_motion(enabled)`, `get_reduced_motion_name()`.
+- Setting stored in user://settings.json and persisted across sessions.
+- Scenario actions: `set_reduced_motion`, `check_reduced_motion`.
+- Scenario: `reduced_motion_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -2086,7 +2086,7 @@ Alternative font.
 
 ---
 
-## Milestone 171 — Reduced motion mode  **Owner:** UI Systems + Gameplay
+## Milestone 171 — Reduced motion mode  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems + Gameplay
 ### Objective
 Accessibility option.
 

@@ -145,6 +145,20 @@ layout_mode = 2
 text = "Off"
 horizontal_alignment = 2
 
+[node name="ReducedMotionRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
+layout_mode = 2
+
+[node name="ReducedMotionRowLabel" type="Label" parent="Panel/OptionsContainer/ReducedMotionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reduced Motion"
+
+[node name="ReducedMotionLabel" type="Label" parent="Panel/OptionsContainer/ReducedMotionRow"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Off"
+horizontal_alignment = 2
+
 [node name="LanguageRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
 layout_mode = 2
 

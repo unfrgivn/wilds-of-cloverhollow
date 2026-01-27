@@ -61,6 +61,7 @@ VoiceActingManager="*res://game/autoload/VoiceActingManager.gd"
 ArtGalleryManager="*res://game/autoload/ArtGalleryManager.gd"
 AccessibilityManager="*res://game/autoload/AccessibilityManager.gd"
 ColorblindFilter="*res://game/autoload/ColorblindFilter.gd"
+SpeedrunManager="*res://game/autoload/SpeedrunManager.gd"
 
 [internationalization]
 

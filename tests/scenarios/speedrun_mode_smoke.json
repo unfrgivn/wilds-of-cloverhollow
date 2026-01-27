@@ -1,0 +1,25 @@
+{
+  "id": "speedrun_mode_smoke",
+  "name": "Speedrun Mode Smoke Test",
+  "description": "Tests speedrun timer, splits, and mode toggle",
+  "starting_area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "count": 10},
+    {"type": "set_speedrun_mode", "enabled": true},
+    {"type": "check_speedrun_mode"},
+    {"type": "start_speedrun_timer"},
+    {"type": "wait_frames", "count": 30},
+    {"type": "record_split", "name": "test_split_1"},
+    {"type": "check_speedrun_timer"},
+    {"type": "capture", "label": "speedrun_timer_running"},
+    {"type": "wait_frames", "count": 30},
+    {"type": "record_split", "name": "test_split_2"},
+    {"type": "check_speedrun_timer"},
+    {"type": "stop_speedrun_timer"},
+    {"type": "check_speedrun_timer"},
+    {"type": "capture", "label": "speedrun_timer_stopped"},
+    {"type": "set_speedrun_mode", "enabled": false},
+    {"type": "check_speedrun_mode"},
+    {"type": "wait_frames", "count": 5}
+  ]
+}

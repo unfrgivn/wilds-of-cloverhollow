@@ -2147,7 +2147,7 @@ Replayability feature.
 
 ---
 
-## Milestone 176 — Speedrun mode  **Owner:** Gameplay + UI Systems
+## Milestone 176 — Speedrun mode  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + UI Systems
 ### Objective
 Speedrunner features.
 

@@ -845,6 +845,19 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_one_handed_mode`, `check_one_handed_mode`.
 - Scenario: `one_handed_render`.
 
+### 3.62 Speedrun mode
+- SpeedrunManager autoload tracks real-time game timer with splits.
+- SettingsManager stores speedrun_mode_enabled boolean setting.
+- Signal: `speedrun_mode_changed(enabled)` emitted on toggle.
+- SpeedrunTimerUI displays timer in top-right corner when enabled.
+- Timer API: `start_timer()`, `stop_timer()`, `reset_timer()`, `record_split(name)`.
+- Query API: `get_elapsed_time()`, `get_splits()`, `format_time(seconds)`.
+- Signals: `timer_started`, `timer_stopped(total)`, `timer_reset`, `split_recorded(name, time)`.
+- Predefined splits: forest_unlocked, clubhouse_found, villain_revealed, party_formed, demo_complete.
+- Setting stored in user://settings.json and persisted across sessions.
+- Scenario actions: `set_speedrun_mode`, `check_speedrun_mode`, `start_speedrun_timer`, `stop_speedrun_timer`, `record_split`, `check_speedrun_timer`.
+- Scenario: `speedrun_mode_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

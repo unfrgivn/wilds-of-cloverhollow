@@ -785,6 +785,53 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Speedrun mode actions
+    if t == "set_speedrun_mode":
+        var enabled: bool = action.get("enabled", false)
+        SettingsManager.set_speedrun_mode(enabled)
+        _trace["events"].append({"type": "set_speedrun_mode", "frame": _frame, "enabled": enabled})
+        print("[Scenario] set_speedrun_mode: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "check_speedrun_mode":
+        var enabled: bool = SettingsManager.speedrun_mode_enabled
+        _trace["events"].append({"type": "check_speedrun_mode", "frame": _frame, "enabled": enabled})
+        print("[Scenario] check_speedrun_mode: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "start_speedrun_timer":
+        SpeedrunManager.start_timer()
+        _trace["events"].append({"type": "start_speedrun_timer", "frame": _frame})
+        print("[Scenario] start_speedrun_timer")
+        _action_index += 1
+        return
+
+    if t == "stop_speedrun_timer":
+        SpeedrunManager.stop_timer()
+        var elapsed := SpeedrunManager.elapsed_time
+        _trace["events"].append({"type": "stop_speedrun_timer", "frame": _frame, "elapsed": elapsed})
+        print("[Scenario] stop_speedrun_timer: %s" % SpeedrunManager.format_time(elapsed))
+        _action_index += 1
+        return
+
+    if t == "record_split":
+        var split_name: String = action.get("name", "")
+        SpeedrunManager.record_split(split_name)
+        _trace["events"].append({"type": "record_split", "frame": _frame, "name": split_name})
+        print("[Scenario] record_split: %s" % split_name)
+        _action_index += 1
+        return
+
+    if t == "check_speedrun_timer":
+        var elapsed := SpeedrunManager.elapsed_time
+        var is_running: bool = SpeedrunManager.is_running
+        _trace["events"].append({"type": "check_speedrun_timer", "frame": _frame, "elapsed": elapsed, "running": is_running})
+        print("[Scenario] check_speedrun_timer: %s (running=%s)" % [SpeedrunManager.format_time(elapsed), is_running])
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

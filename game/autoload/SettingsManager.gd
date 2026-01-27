@@ -9,6 +9,7 @@ signal colorblind_mode_changed(mode: int)
 signal dyslexia_font_changed(enabled: bool)
 signal reduced_motion_changed(enabled: bool)
 signal one_handed_mode_changed(enabled: bool)
+signal speedrun_mode_changed(enabled: bool)
 
 const SETTINGS_FILE := "user://settings.json"
 
@@ -25,6 +26,7 @@ var colorblind_mode: int = 0  # 0=none, 1=deuteranopia, 2=protanopia
 var dyslexia_font_enabled: bool = false  # Use OpenDyslexic-style font
 var reduced_motion_enabled: bool = false  # Disable screen shake and flashing
 var one_handed_mode_enabled: bool = false  # Compact touch controls for one-handed play
+var speedrun_mode_enabled: bool = false  # Show speedrun timer and enable skip features
 
 # Localization
 var locale: String = "en"  # Language code
@@ -129,6 +131,17 @@ func set_one_handed_mode(enabled: bool) -> void:
 func get_one_handed_mode_name() -> String:
     return "On" if one_handed_mode_enabled else "Off"
 
+func set_speedrun_mode(enabled: bool) -> void:
+    if speedrun_mode_enabled == enabled:
+        return
+    speedrun_mode_enabled = enabled
+    speedrun_mode_changed.emit(speedrun_mode_enabled)
+    settings_changed.emit()
+    print("[SettingsManager] Speedrun mode: %s" % ("On" if enabled else "Off"))
+
+func get_speedrun_mode_name() -> String:
+    return "On" if speedrun_mode_enabled else "Off"
+
 func _apply_volume(bus_name: String, value: float) -> void:
     var bus_index := AudioServer.get_bus_index(bus_name)
     if bus_index >= 0:
@@ -151,6 +164,7 @@ func save_settings() -> void:
         "dyslexia_font_enabled": dyslexia_font_enabled,
         "reduced_motion_enabled": reduced_motion_enabled,
         "one_handed_mode_enabled": one_handed_mode_enabled,
+        "speedrun_mode_enabled": speedrun_mode_enabled,
         "locale": locale,
     }
     
@@ -190,6 +204,7 @@ func load_settings() -> void:
     dyslexia_font_enabled = data.get("dyslexia_font_enabled", false)
     reduced_motion_enabled = data.get("reduced_motion_enabled", false)
     one_handed_mode_enabled = data.get("one_handed_mode_enabled", false)
+    speedrun_mode_enabled = data.get("speedrun_mode_enabled", false)
     locale = data.get("locale", "en")
     
     # Apply loaded settings
@@ -208,6 +223,7 @@ func get_save_data() -> Dictionary:
         "dyslexia_font_enabled": dyslexia_font_enabled,
         "reduced_motion_enabled": reduced_motion_enabled,
         "one_handed_mode_enabled": one_handed_mode_enabled,
+        "speedrun_mode_enabled": speedrun_mode_enabled,
         "locale": locale,
     }
 
@@ -220,6 +236,7 @@ func load_save_data(data: Dictionary) -> void:
     dyslexia_font_enabled = data.get("dyslexia_font_enabled", false)
     reduced_motion_enabled = data.get("reduced_motion_enabled", false)
     one_handed_mode_enabled = data.get("one_handed_mode_enabled", false)
+    speedrun_mode_enabled = data.get("speedrun_mode_enabled", false)
     locale = data.get("locale", "en")
     _apply_volume(MUSIC_BUS, music_volume)
     _apply_volume(SFX_BUS, sfx_volume)

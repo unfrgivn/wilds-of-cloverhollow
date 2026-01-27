@@ -1,0 +1,14 @@
+{
+  "description": "Test interrupted transition handling and recovery",
+  "actions": [
+    {"type": "load_scene", "path": "res://game/scenes/areas/Area_TownCenter.tscn"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_transition_state"},
+    {"type": "simulate_interrupt"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_transition_state"},
+    {"type": "capture", "label": "after_recovery"},
+    {"type": "clear_interrupted_flag"},
+    {"type": "check_transition_state"}
+  ]
+}

@@ -2254,7 +2254,7 @@ Handle memory pressure.
 
 ---
 
-## Milestone 185 — Edge case: Interrupted transitions  **Owner:** QA Automation
+## Milestone 185 — Edge case: Interrupted transitions  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Handle app backgrounding mid-transition.
 

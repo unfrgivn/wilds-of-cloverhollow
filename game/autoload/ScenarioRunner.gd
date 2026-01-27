@@ -1552,6 +1552,36 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Transition Interrupt Actions ───────────────────────────────────────
+    if t == "simulate_interrupt":
+        SceneRouter.simulate_interrupt()
+        _trace["events"].append({"type": "simulate_interrupt", "frame": _frame})
+        print("[Scenario] simulate_interrupt")
+        _action_index += 1
+        return
+
+    if t == "check_transition_state":
+        var in_progress: bool = SceneRouter.is_transition_in_progress()
+        var was_interrupted: bool = SceneRouter.was_interrupted()
+        var current: String = SceneRouter.current_area
+        _trace["events"].append({
+            "type": "check_transition_state",
+            "frame": _frame,
+            "in_progress": in_progress,
+            "was_interrupted": was_interrupted,
+            "current_area": current
+        })
+        print("[Scenario] check_transition_state: in_progress=%s, was_interrupted=%s, current=%s" % [in_progress, was_interrupted, current])
+        _action_index += 1
+        return
+
+    if t == "clear_interrupted_flag":
+        SceneRouter.clear_interrupted_flag()
+        _trace["events"].append({"type": "clear_interrupted_flag", "frame": _frame})
+        print("[Scenario] clear_interrupted_flag")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

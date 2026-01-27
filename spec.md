@@ -68,6 +68,12 @@ This file is the single source of truth. If code changes behavior, update this f
 - AreaTransition zones (Area2D) trigger scene changes when the player enters.
 - Transitions specify target area path and target spawn marker ID.
 - Player is repositioned to the spawn marker after area load.
+- Transition recovery: SceneRouter tracks transition state and recovers if app is backgrounded mid-transition.
+  - Signals: `transition_interrupted(from_area, to_area)`, `transition_recovered(area_path)`.
+  - On app resume during transition, SceneRouter completes the pending transition.
+  - API: `is_transition_in_progress()`, `was_interrupted()`, `clear_interrupted_flag()`, `simulate_interrupt()`.
+  - Scenario actions: `simulate_interrupt`, `check_transition_state`, `clear_interrupted_flag`.
+  - Scenario: `interrupted_transition_smoke`.
 
 ### 3.7 Battle entry
 - BattleManager autoload handles battle transitions and state.

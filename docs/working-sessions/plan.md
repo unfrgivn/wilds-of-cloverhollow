@@ -2004,7 +2004,7 @@ List all scenarios.
 
 ---
 
-## Milestone 164 — Content catalog  **Owner:** Data Systems
+## Milestone 164 — Content catalog  **Owner:** Data Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 List all game content.
 

@@ -260,6 +260,96 @@
       "power": 0,
       "target": "world",
       "price": 0
+    },
+    {
+      "id": "fishing_rod",
+      "name": "Fishing Rod",
+      "description": "A trusty fishing rod. Cast it at a fishing spot to catch fish!",
+      "type": "tool",
+      "effect": "fish",
+      "power": 0,
+      "target": "world",
+      "price": 0
+    },
+    {
+      "id": "common_carp",
+      "name": "Common Carp",
+      "description": "A basic fish found in most waters. Can be sold or cooked.",
+      "type": "fish",
+      "effect": "sell",
+      "power": 10,
+      "target": "none",
+      "price": 10
+    },
+    {
+      "id": "spotted_trout",
+      "name": "Spotted Trout",
+      "description": "A pretty fish with colorful spots. Quite valuable.",
+      "type": "fish",
+      "effect": "sell",
+      "power": 15,
+      "target": "none",
+      "price": 15
+    },
+    {
+      "id": "silver_minnow",
+      "name": "Silver Minnow",
+      "description": "A tiny shimmering fish. Used as bait.",
+      "type": "fish",
+      "effect": "bait",
+      "power": 5,
+      "target": "none",
+      "price": 5
+    },
+    {
+      "id": "rainbow_bass",
+      "name": "Rainbow Bass",
+      "description": "A colorful fish that sparkles. A nice catch!",
+      "type": "fish",
+      "effect": "sell",
+      "power": 30,
+      "target": "none",
+      "price": 30
+    },
+    {
+      "id": "golden_koi",
+      "name": "Golden Koi",
+      "description": "A rare and beautiful golden fish. Very valuable!",
+      "type": "fish",
+      "effect": "sell",
+      "power": 75,
+      "target": "none",
+      "price": 75
+    },
+    {
+      "id": "bubble_fish",
+      "name": "Bubble Fish",
+      "description": "A peculiar fish from Bubblegum Bay. Blows bubbles!",
+      "type": "fish",
+      "effect": "sell",
+      "power": 50,
+      "target": "none",
+      "price": 50
+    },
+    {
+      "id": "forest_catfish",
+      "name": "Forest Catfish",
+      "description": "A shy catfish from the forest streams.",
+      "type": "fish",
+      "effect": "sell",
+      "power": 25,
+      "target": "none",
+      "price": 25
+    },
+    {
+      "id": "crystal_perch",
+      "name": "Crystal Perch",
+      "description": "A legendary fish with glowing crystal scales! Extremely rare.",
+      "type": "fish",
+      "effect": "sell",
+      "power": 200,
+      "target": "none",
+      "price": 200
     }
   ]
 }

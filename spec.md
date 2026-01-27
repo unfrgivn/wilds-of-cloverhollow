@@ -466,6 +466,24 @@ This file is the single source of truth. If code changes behavior, update this f
   - `goto <area_name>`: Warp to any area (e.g., town_center, forest_path).
   - `cheats`: Show cheat status.
 
+### 3.39 Fishing minigame
+- FishingSpot (Area2D): Interactable fishing locations in the world.
+- Requires `fishing_rod` tool to fish.
+- FishingMinigame (CanvasLayer): Timing-based cast/catch mechanic.
+  - Cast phase: Power bar oscillates; press to set cast power.
+  - Wait phase: Wait for fish to bite (random delay based on cast power).
+  - Catch phase: Indicator moves across bar; press when in target zone to catch.
+  - Harder fish = smaller target zone, faster indicator.
+- Fishing data stored in `game/data/fishing/fishing.json`:
+  - fish[]: id, name, description, rarity, locations[], difficulty, value.
+  - fishing_spots[]: id, name, area, fish_pool[].
+  - rarity_weights: common(60), uncommon(25), rare(12), legendary(3).
+- Fish rarities: common, uncommon, rare, legendary.
+- 8 fish types: common_carp, spotted_trout, silver_minnow, rainbow_bass, golden_koi, bubble_fish, forest_catfish, crystal_perch.
+- 4 fishing spots: town_park_pond, bubblegum_shore, forest_stream, grove_pool.
+- Fish items added to inventory on successful catch.
+- Scenario: `fishing_minigame_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

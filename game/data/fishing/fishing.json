@@ -1,0 +1,108 @@
+{
+  "fish": [
+    {
+      "id": "common_carp",
+      "name": "Common Carp",
+      "description": "A basic fish found in most waters. Not very exciting, but reliable.",
+      "rarity": "common",
+      "locations": ["town_park", "bubblegum_bay"],
+      "difficulty": 1,
+      "value": 10
+    },
+    {
+      "id": "spotted_trout",
+      "name": "Spotted Trout",
+      "description": "A pretty fish with colorful spots. Quite tasty when cooked.",
+      "rarity": "common",
+      "locations": ["town_park", "forest_path"],
+      "difficulty": 2,
+      "value": 15
+    },
+    {
+      "id": "silver_minnow",
+      "name": "Silver Minnow",
+      "description": "A tiny shimmering fish. Often used as bait for bigger catches.",
+      "rarity": "common",
+      "locations": ["town_park", "bubblegum_bay"],
+      "difficulty": 1,
+      "value": 5
+    },
+    {
+      "id": "rainbow_bass",
+      "name": "Rainbow Bass",
+      "description": "A colorful fish that sparkles in the sunlight. A nice catch!",
+      "rarity": "uncommon",
+      "locations": ["town_park", "bubblegum_bay", "hidden_grove"],
+      "difficulty": 3,
+      "value": 30
+    },
+    {
+      "id": "golden_koi",
+      "name": "Golden Koi",
+      "description": "A rare and beautiful golden fish. Said to bring good luck.",
+      "rarity": "rare",
+      "locations": ["hidden_grove", "bubblegum_bay"],
+      "difficulty": 5,
+      "value": 75
+    },
+    {
+      "id": "bubble_fish",
+      "name": "Bubble Fish",
+      "description": "A peculiar fish that blows bubbles. Only found in Bubblegum Bay.",
+      "rarity": "rare",
+      "locations": ["bubblegum_bay"],
+      "difficulty": 4,
+      "value": 50
+    },
+    {
+      "id": "forest_catfish",
+      "name": "Forest Catfish",
+      "description": "A shy catfish that hides in shaded forest waters.",
+      "rarity": "uncommon",
+      "locations": ["forest_path", "hidden_grove"],
+      "difficulty": 3,
+      "value": 25
+    },
+    {
+      "id": "crystal_perch",
+      "name": "Crystal Perch",
+      "description": "A legendary fish with scales that glow like crystals. Extremely rare!",
+      "rarity": "legendary",
+      "locations": ["hidden_grove"],
+      "difficulty": 7,
+      "value": 200
+    }
+  ],
+  "fishing_spots": [
+    {
+      "id": "town_park_pond",
+      "name": "Town Park Pond",
+      "area": "town_park",
+      "fish_pool": ["common_carp", "spotted_trout", "silver_minnow", "rainbow_bass"]
+    },
+    {
+      "id": "bubblegum_shore",
+      "name": "Bubblegum Shore",
+      "area": "bubblegum_bay",
+      "fish_pool": ["common_carp", "silver_minnow", "rainbow_bass", "bubble_fish", "golden_koi"]
+    },
+    {
+      "id": "forest_stream",
+      "name": "Forest Stream",
+      "area": "forest_path",
+      "fish_pool": ["spotted_trout", "forest_catfish"]
+    },
+    {
+      "id": "grove_pool",
+      "name": "Grove Pool",
+      "area": "hidden_grove",
+      "fish_pool": ["rainbow_bass", "golden_koi", "forest_catfish", "crystal_perch"]
+    }
+  ],
+  "rarity_weights": {
+    "common": 60,
+    "uncommon": 25,
+    "rare": 12,
+    "legendary": 3
+  }
+}

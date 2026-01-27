@@ -1,0 +1,14 @@
+{
+  "scenario_id": "fishing_minigame_smoke",
+  "description": "Test fishing minigame data loading and fish item rewards",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "acquire_tool", "tool_id": "fishing_rod"},
+    {"type": "check_tool", "tool_id": "fishing_rod"},
+    {"type": "add_inventory_item", "item_id": "common_carp", "count": 1},
+    {"type": "add_inventory_item", "item_id": "golden_koi", "count": 1},
+    {"type": "check_inventory", "item_id": "common_carp"},
+    {"type": "check_inventory", "item_id": "golden_koi"},
+    {"type": "wait_frames", "frames": 5}
+  ]
+}

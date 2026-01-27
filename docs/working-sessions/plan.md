@@ -1822,7 +1822,7 @@ Multiple pet options.
 
 ---
 
-## Milestone 149 — Minigame: Fishing  **Owner:** Gameplay + Art Pipeline
+## Milestone 149 — Minigame: Fishing  **Owner:** Gameplay + Art Pipeline **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Fishing minigame.
 

@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3 uid="uid://fishingminigame"]
+
+[ext_resource type="Script" path="res://game/scripts/minigames/FishingMinigame.gd" id="1_script"]
+
+[node name="FishingMinigame" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 20.0
+offset_right = 80.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Fishing"
+horizontal_alignment = 1
+
+[node name="PowerBar" type="ProgressBar" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 100.0
+offset_right = 150.0
+offset_bottom = 130.0
+grow_horizontal = 2
+max_value = 100.0
+value = 50.0
+show_percentage = false
+
+[node name="TargetZone" type="ColorRect" parent="Panel"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 100.0
+offset_right = 275.0
+offset_bottom = 130.0
+color = Color(0.2, 0.8, 0.2, 0.5)
+
+[node name="Indicator" type="ColorRect" parent="Panel"]
+layout_mode = 0
+offset_left = 106.0
+offset_top = 98.0
+offset_right = 116.0
+offset_bottom = 132.0
+color = Color(1, 0.3, 0.3, 1)
+
+[node name="InstructionLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 150.0
+offset_right = 150.0
+offset_bottom = 180.0
+grow_horizontal = 2
+text = "Press SPACE to cast!"
+horizontal_alignment = 1
+
+[node name="ResultLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 190.0
+offset_right = 100.0
+offset_bottom = 220.0
+grow_horizontal = 2
+text = "Result"
+horizontal_alignment = 1
+
+[node name="FishLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 220.0
+offset_right = 150.0
+offset_bottom = 250.0
+grow_horizontal = 2
+text = "Fish Name"
+horizontal_alignment = 1

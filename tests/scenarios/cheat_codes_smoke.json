@@ -1,0 +1,15 @@
+{
+  "scenario_id": "cheat_codes_smoke",
+  "description": "Test cheat code commands in debug console",
+  "actions": [
+    {"type": "show_debug_console"},
+    {"type": "debug_command", "command": "cheats"},
+    {"type": "debug_command", "command": "godmode"},
+    {"type": "debug_command", "command": "godmode"},
+    {"type": "debug_command", "command": "goto town_park"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "after_goto_town_park"},
+    {"type": "debug_command", "command": "goto invalid_area"},
+    {"type": "hide_debug_console"}
+  ]
+}

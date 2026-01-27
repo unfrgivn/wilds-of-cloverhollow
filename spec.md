@@ -461,6 +461,10 @@ This file is the single source of truth. If code changes behavior, update this f
 - Console UI: top panel with input field and output label.
 - Signal: `command_executed(command, args, result)` for tracking.
 - Scenario actions: `toggle_debug_console`, `show_debug_console`, `hide_debug_console`, `debug_command`, `check_debug_console`.
+- Cheat commands (disabled in release builds):
+  - `godmode`: Toggle invincibility for player.
+  - `goto <area_name>`: Warp to any area (e.g., town_center, forest_path).
+  - `cheats`: Show cheat status.
 
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).

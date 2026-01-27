@@ -4,6 +4,8 @@ signal command_executed(command: String, args: Array, result: String)
 
 var _console_visible := false
 var _console_ui: CanvasLayer = null
+var _cheats_enabled := false
+var godmode_enabled := false
 
 const COMMANDS := {
 	"help": "_cmd_help",
@@ -17,9 +19,17 @@ const COMMANDS := {
 	"set_weather": "_cmd_set_weather",
 	"fps": "_cmd_fps",
 	"reload_data": "_cmd_reload_data",
+	"godmode": "_cmd_godmode",
+	"goto": "_cmd_goto",
+	"cheats": "_cmd_cheats",
 }
 
 func _ready() -> void:
+	if OS.has_feature("release"):
+		_cheats_enabled = false
+		print("[DebugConsole] Cheats disabled (release build)")
+	else:
+		_cheats_enabled = true
 	_create_console_ui()
 	print("[DebugConsole] Initialized")
 
@@ -210,3 +220,45 @@ func _on_command_submitted(text: String) -> void:
 		if input_field:
 			input_field.text = ""
 	execute_command(text)
+
+func _cmd_godmode(_args: Array) -> String:
+	if not _cheats_enabled:
+		return "Cheats disabled in release builds"
+	godmode_enabled = not godmode_enabled
+	return "God mode: %s" % ("ON" if godmode_enabled else "OFF")
+
+func _cmd_goto(args: Array) -> String:
+	if not _cheats_enabled:
+		return "Cheats disabled in release builds"
+	if args.is_empty():
+		return "Usage: goto <area_name> (e.g., town_center, hero_house, forest_entrance)"
+	
+	var area_name: String = args[0].to_lower()
+	var scene_map := {
+		"town_center": "res://game/scenes/areas/Area_TownCenter.tscn",
+		"hero_house": "res://game/scenes/areas/Area_HeroHouse.tscn",
+		"hero_house_interior": "res://game/scenes/areas/Area_HeroHouseInterior.tscn",
+		"school": "res://game/scenes/areas/Area_School.tscn",
+		"arcade": "res://game/scenes/areas/Area_Arcade.tscn",
+		"town_park": "res://game/scenes/areas/Area_TownPark.tscn",
+		"forest_entrance": "res://game/scenes/areas/Area_ForestEntrance.tscn",
+		"forest_path": "res://game/scenes/areas/Area_ForestPath.tscn",
+		"bubblegum_bay": "res://game/scenes/areas/Area_BubblegumBay.tscn",
+		"pinecone_pass": "res://game/scenes/areas/Area_PineconePass.tscn",
+		"enchanted_forest": "res://game/scenes/areas/Area_EnchantedForest.tscn",
+	}
+	
+	if not scene_map.has(area_name):
+		return "Unknown area: %s. Available: %s" % [area_name, ", ".join(scene_map.keys())]
+	
+	var scene_path: String = scene_map[area_name]
+	SceneRouter.go_to_area(scene_path, "default")
+	return "Warping to %s..." % area_name
+
+func _cmd_cheats(_args: Array) -> String:
+	if OS.has_feature("release"):
+		return "Cheats disabled in release builds"
+	return "Cheats: %s" % ("enabled" if _cheats_enabled else "disabled")
+
+func is_godmode_enabled() -> bool:
+	return godmode_enabled and _cheats_enabled

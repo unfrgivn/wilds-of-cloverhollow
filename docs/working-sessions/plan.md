@@ -1771,7 +1771,7 @@ In-game debug commands.
 
 ---
 
-## Milestone 145 — Cheat codes for testing  **Owner:** Gameplay
+## Milestone 145 — Cheat codes for testing  **Owner:** Gameplay  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Developer shortcuts.
 

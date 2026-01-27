@@ -2041,7 +2041,7 @@ Future multiplayer preparation.
 
 ---
 
-## Milestone 167 — Voice acting hooks  **Owner:** Audio + Data Systems
+## Milestone 167 — Voice acting hooks  **Status:** ✅ Completed (2026-01-26)  **Owner:** Audio + Data Systems
 ### Objective
 Future voice integration.
 

@@ -759,6 +759,18 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `play_credits`, `skip_credits`, `check_credits`, `wait_credits_end`.
 - Scenario: `credits_render`.
 
+### 3.54 Voice acting system (stub)
+- VoiceActingManager autoload handles dialogue audio playback.
+- Audio file format: OGG Vorbis (.ogg), mono, 44.1kHz.
+- Audio ID pattern: `{character}_{scene}_{line}` (e.g., "fae_intro_001").
+- File path: `game/assets/audio/voice/{character}/{scene}/{line}.ogg`.
+- Placeholder fallback: `placeholder.ogg` used when file missing.
+- Volume control: voice_enabled, voice_volume settings.
+- API: `play_voice(audio_id)`, `stop_voice()`, `is_playing()`, `play_dialogue_voice(speaker, index, scene_id)`.
+- Signals: `voice_started(audio_id)`, `voice_finished(audio_id)`, `voice_interrupted(audio_id)`.
+- Convention docs: `docs/voice-acting-conventions.md`.
+- Note: Stub - no actual voice files included. Prepared for future VO recording.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

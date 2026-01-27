@@ -1,0 +1,19 @@
+{
+  "id": "credits_render",
+  "name": "Credits roll render test",
+  "description": "Verify credits UI scrolling, vignettes, and skip functionality",
+  "area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "play_credits", "can_skip": true},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "credits_scroll_start"},
+    {"type": "check_credits"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "credits_scroll_mid"},
+    {"type": "skip_credits"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_credits"},
+    {"type": "capture", "label": "credits_skipped"}
+  ]
+}

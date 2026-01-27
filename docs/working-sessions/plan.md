@@ -2194,7 +2194,7 @@ Music/SFX player.
 
 ---
 
-## Milestone 180 — Credits roll  **Owner:** UI Systems + Story
+## Milestone 180 — Credits roll  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems + Story
 ### Objective
 End-of-game credits.
 

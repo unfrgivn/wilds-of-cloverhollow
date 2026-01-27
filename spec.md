@@ -744,6 +744,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - WhatsNewUI (CanvasLayer): scrollable list of bullet points with OK button.
 - Shows automatically on first launch or version update.
 
+### 3.53 Credits roll
+- CreditsManager autoload handles end-of-game credits display.
+- CREDITS_DATA dictionary stores: title, sections (header + entries), vignettes (character + text), end_message.
+- API: `play_credits(can_skip)`, `skip_credits()`, `stop_credits()`, `is_playing()`, `get_credits_data()`.
+- Signals: `credits_started`, `credits_ended`, `credits_skipped`.
+- CreditsUI (CanvasLayer): scrolling credits with vignettes.
+  - Dark background with centered scrolling text.
+  - Section headers in gold, entries in white.
+  - Character vignettes fade in/out between scroll end and finish.
+  - Skip hint visible when can_skip is true.
+  - Press any key to skip (if allowed).
+- Music: plays "credits" track during scroll.
+- Scenario actions: `play_credits`, `skip_credits`, `check_credits`, `wait_credits_end`.
+- Scenario: `credits_render`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

@@ -935,6 +935,37 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Credits actions
+    if t == "play_credits":
+        var can_skip: bool = action.get("can_skip", true)
+        CreditsManager.play_credits(can_skip)
+        _trace["events"].append({"type": "play_credits", "frame": _frame, "can_skip": can_skip})
+        print("[Scenario] play_credits: can_skip=%s" % can_skip)
+        _action_index += 1
+        return
+
+    if t == "skip_credits":
+        CreditsManager.skip_credits()
+        _trace["events"].append({"type": "skip_credits", "frame": _frame})
+        print("[Scenario] skip_credits")
+        _action_index += 1
+        return
+
+    if t == "check_credits":
+        var is_playing: bool = CreditsManager.is_playing()
+        _trace["events"].append({"type": "check_credits", "frame": _frame, "is_playing": is_playing})
+        print("[Scenario] check_credits: playing=%s" % is_playing)
+        _action_index += 1
+        return
+
+    if t == "wait_credits_end":
+        if CreditsManager.is_playing():
+            # Stay on this action until credits end
+            return
+        _trace["events"].append({"type": "wait_credits_end", "frame": _frame})
+        _action_index += 1
+        return
+
     # Photo mode actions
     if t == "enter_photo_mode":
         PhotoModeManager.enter_photo_mode()

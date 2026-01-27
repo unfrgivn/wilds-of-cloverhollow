@@ -2292,7 +2292,7 @@ Store listing assets.
 
 ---
 
-## Milestone 188 — Privacy policy compliance  **Owner:** Data Systems
+## Milestone 188 — Privacy policy compliance  **Owner:** Data Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Legal compliance.
 

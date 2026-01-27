@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dwfk3m9ntyrb8"]
+[gd_scene load_steps=2 format=3 uid="uid://dwfk3nantyrb8"]
 
 [ext_resource type="Script" path="res://game/scripts/ui/OutfitSelectionUI.gd" id="1_outfit_ui"]
 

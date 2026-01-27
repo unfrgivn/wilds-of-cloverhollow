@@ -2406,7 +2406,7 @@ Time-limited events.
 
 ---
 
-## Milestone 198 — Merchandise integration stub  **Owner:** UI Systems
+## Milestone 198 — Merchandise integration stub  **Owner:** UI Systems  **Status:** ✅ Completed (2026-01-27)
 ### Objective
 Future merch links.
 

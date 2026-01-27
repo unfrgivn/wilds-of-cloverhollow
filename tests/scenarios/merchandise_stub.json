@@ -1,0 +1,22 @@
+{
+    "scenario_id": "merchandise_stub",
+    "description": "Test merchandise integration stub: shop links and promo items",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "reset_merchandise"},
+        {"type": "check_merchandise"},
+        {"type": "open_shop", "category": "all"},
+        {"type": "open_shop", "category": "plushies"},
+        {"type": "open_shop", "category": "apparel"},
+        {"type": "check_merchandise"},
+        {"type": "open_promo", "promo_id": "launch_bundle"},
+        {"type": "check_merchandise"},
+        {"type": "set_shop_enabled", "enabled": false},
+        {"type": "open_shop", "category": "all"},
+        {"type": "check_merchandise"},
+        {"type": "set_shop_enabled", "enabled": true},
+        {"type": "reset_merchandise"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

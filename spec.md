@@ -948,6 +948,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario: `community_event_smoke`.
 - Note: This is a stub - timestamp-based activation works locally but no server sync.
 
+### 3.68 Merchandise integration (stub)
+- MerchandiseManager autoload handles external shop links.
+- Shop categories: all, apparel, plushies, accessories.
+- Category data format: name, url, description.
+- Promotional items: special bundles that may unlock in-game content.
+- Promo item format: id, name, description, url, unlocks_outfit (optional).
+- Link click tracking: history of clicked links with timestamps.
+- API: `open_shop(category)`, `open_promo_item(promo_id)`, `open_external_link(link_id, url)`.
+- `get_shop_categories()`, `get_category_data(category)`, `get_promo_items()`.
+- `is_shop_enabled()`, `set_shop_enabled(enabled)`, `get_link_history()`.
+- Signals: `shop_opened(category)`, `shop_closed`, `link_clicked(link_id, url)`.
+- Scenario actions: `open_shop`, `open_promo`, `check_merchandise`, `set_shop_enabled`, `reset_merchandise`.
+- Scenario: `merchandise_stub`.
+- Note: This is a stub - no actual commerce. Links are logged but not opened.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

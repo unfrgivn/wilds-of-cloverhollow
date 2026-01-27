@@ -2090,6 +2090,48 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Merchandise Actions ───────────────────────────────────────────
+    if t == "open_shop":
+        var category: String = _action.get("category", "all")
+        var success: bool = MerchandiseManager.open_shop(category)
+        _trace["events"].append({"type": "open_shop", "frame": _frame, "category": category, "success": success})
+        print("[Scenario] open_shop: %s, success=%s" % [category, success])
+        _action_index += 1
+        return
+
+    if t == "open_promo":
+        var promo_id: String = _action.get("promo_id", "")
+        var success: bool = MerchandiseManager.open_promo_item(promo_id)
+        _trace["events"].append({"type": "open_promo", "frame": _frame, "promo_id": promo_id, "success": success})
+        print("[Scenario] open_promo: %s, success=%s" % [promo_id, success])
+        _action_index += 1
+        return
+
+    if t == "check_merchandise":
+        var categories: Array[String] = MerchandiseManager.get_shop_categories()
+        var promo_count: int = MerchandiseManager.get_promo_items().size()
+        var enabled: bool = MerchandiseManager.is_shop_enabled()
+        var history_count: int = MerchandiseManager.get_link_history().size()
+        _trace["events"].append({"type": "check_merchandise", "frame": _frame, "categories": categories, "promo_count": promo_count, "enabled": enabled, "history_count": history_count})
+        print("[Scenario] check_merchandise: %d categories, %d promos, enabled=%s, history=%d" % [categories.size(), promo_count, enabled, history_count])
+        _action_index += 1
+        return
+
+    if t == "set_shop_enabled":
+        var enabled: bool = _action.get("enabled", true)
+        MerchandiseManager.set_shop_enabled(enabled)
+        _trace["events"].append({"type": "set_shop_enabled", "frame": _frame, "enabled": enabled})
+        print("[Scenario] set_shop_enabled: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "reset_merchandise":
+        MerchandiseManager.reset()
+        _trace["events"].append({"type": "reset_merchandise", "frame": _frame})
+        print("[Scenario] reset_merchandise")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

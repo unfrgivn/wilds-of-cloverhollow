@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://bugcollectionlog"]
+[gd_scene load_steps=2 format=3 uid="uid://c66epojm40ei5"]
 
 [ext_resource type="Script" path="res://game/scripts/ui/BugCollectionLog.gd" id="1_script"]
 

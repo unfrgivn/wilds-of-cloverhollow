@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c2hmk9fq7v4tx"]
+[gd_scene load_steps=2 format=3 uid="uid://c2hmlafq7v4tx"]
 
 [ext_resource type="Script" path="res://game/scripts/ui/PetAccessoryUI.gd" id="1_pet_acc_ui"]
 

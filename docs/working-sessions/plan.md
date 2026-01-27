@@ -1846,7 +1846,7 @@ Collection minigame.
 
 ---
 
-## Milestone 151 — Collection log system  **Owner:** Gameplay + UI Systems
+## Milestone 151 — Collection log system  **Owner:** Gameplay + UI Systems **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Track collectibles.
 

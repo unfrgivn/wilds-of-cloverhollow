@@ -1,0 +1,40 @@
+{
+    "categories": [
+        {
+            "id": "fish",
+            "name": "Fish",
+            "description": "Fish caught while fishing",
+            "data_source": "fishing",
+            "data_key": "fish"
+        },
+        {
+            "id": "bugs",
+            "name": "Bugs",
+            "description": "Bugs caught with a net",
+            "data_source": "bugs",
+            "data_key": "bugs"
+        }
+    ],
+    "milestones": [
+        {
+            "percent": 25,
+            "reward_gold": 100,
+            "reward_items": []
+        },
+        {
+            "percent": 50,
+            "reward_gold": 250,
+            "reward_items": [{"id": "potion", "count": 3}]
+        },
+        {
+            "percent": 75,
+            "reward_gold": 500,
+            "reward_items": [{"id": "ether", "count": 3}]
+        },
+        {
+            "percent": 100,
+            "reward_gold": 1000,
+            "reward_items": [{"id": "elixir", "count": 1}]
+        }
+    ]
+}

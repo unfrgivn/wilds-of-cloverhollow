@@ -43,6 +43,7 @@ LocalizationManager="*res://game/autoload/LocalizationManager.gd"
 AnalyticsManager="*res://game/autoload/AnalyticsManager.gd"
 CrashReportManager="*res://game/autoload/CrashReportManager.gd"
 DebugConsole="*res://game/autoload/DebugConsole.gd"
+CollectionLogManager="*res://game/autoload/CollectionLogManager.gd"
 
 [internationalization]
 

@@ -1055,6 +1055,53 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Collection log actions
+    if t == "record_collection":
+        var category_id: String = str(action.get("category", ""))
+        var item_id: String = str(action.get("item_id", ""))
+        var count: int = int(action.get("count", 1))
+        if category_id != "" and item_id != "":
+            CollectionLogManager.record_collection(category_id, item_id, count)
+            _trace["events"].append({"type": "record_collection", "frame": _frame, "category": category_id, "item_id": item_id, "count": count})
+            print("[Scenario] record_collection: %s/%s x%d" % [category_id, item_id, count])
+        _action_index += 1
+        return
+
+    if t == "check_collection":
+        var category_id: String = str(action.get("category", ""))
+        var collected_count: int = CollectionLogManager.get_collected_count(category_id)
+        var total_count: int = CollectionLogManager.get_total_count(category_id)
+        var completion: float = CollectionLogManager.get_completion_percent(category_id)
+        _trace["events"].append({"type": "check_collection", "frame": _frame, "category": category_id, "collected": collected_count, "total": total_count, "percent": completion})
+        print("[Scenario] check_collection: %s = %d/%d (%.1f%%)" % [category_id, collected_count, total_count, completion])
+        _action_index += 1
+        return
+
+    if t == "check_overall_collection":
+        var overall_percent: float = CollectionLogManager.get_overall_completion_percent()
+        var categories: Array = CollectionLogManager.get_categories()
+        _trace["events"].append({"type": "check_overall_collection", "frame": _frame, "percent": overall_percent, "category_count": categories.size()})
+        print("[Scenario] check_overall_collection: %.1f%% across %d categories" % [overall_percent, categories.size()])
+        _action_index += 1
+        return
+
+    if t == "claim_milestone":
+        var category_id: String = str(action.get("category", ""))
+        var percent: int = int(action.get("percent", 0))
+        var reward: Dictionary = CollectionLogManager.claim_milestone(category_id, percent)
+        var success: bool = reward.size() > 0
+        _trace["events"].append({"type": "claim_milestone", "frame": _frame, "category": category_id, "percent": percent, "success": success})
+        print("[Scenario] claim_milestone: %s %d%% success=%s" % [category_id, percent, success])
+        _action_index += 1
+        return
+
+    if t == "reset_collection":
+        CollectionLogManager.reset_progress()
+        _trace["events"].append({"type": "reset_collection", "frame": _frame})
+        print("[Scenario] reset_collection")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

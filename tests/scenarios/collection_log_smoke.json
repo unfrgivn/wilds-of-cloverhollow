@@ -1,0 +1,19 @@
+{
+    "scenario_id": "collection_log_smoke",
+    "description": "Test collection log system tracks items and calculates percentages",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "reset_collection"},
+        {"type": "check_collection", "category": "fish"},
+        {"type": "check_collection", "category": "bugs"},
+        {"type": "check_overall_collection"},
+        {"type": "record_collection", "category": "fish", "item_id": "common_carp", "count": 1},
+        {"type": "record_collection", "category": "fish", "item_id": "spotted_trout", "count": 2},
+        {"type": "check_collection", "category": "fish"},
+        {"type": "record_collection", "category": "bugs", "item_id": "common_butterfly", "count": 1},
+        {"type": "check_collection", "category": "bugs"},
+        {"type": "check_overall_collection"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

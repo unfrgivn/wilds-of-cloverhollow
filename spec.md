@@ -504,6 +504,29 @@ This file is the single source of truth. If code changes behavior, update this f
 - BugCollectionLog (CanvasLayer): UI showing caught bugs and collection percentage.
 - Scenario: `bug_catching_smoke`.
 
+### 3.41 Collection log system
+- CollectionLogManager autoload tracks collectibles across categories.
+- Collection data stored in `game/data/collections/collections.json`:
+  - categories[]: id, name, description, data_source, data_key.
+  - milestones[]: percent thresholds (25, 50, 75, 100) with reward_gold and reward_items[].
+- Categories: fish (from fishing.json), bugs (from bugs.json).
+- API: `record_collection(category, item_id, count)`, `get_collected_count(category)`, `get_total_count(category)`.
+- `get_completion_percent(category)`: Returns percentage of unique items collected.
+- `get_overall_completion_percent()`: Returns overall completion across all categories.
+- `is_item_collected(category, item_id)`: Checks if specific item was collected.
+- Milestones: claimable rewards at 25%, 50%, 75%, 100% completion.
+- `claim_milestone(category, percent)`: Claims reward, returns reward dict or empty if already claimed.
+- `get_claimable_milestones(category)`: Returns array of reached but unclaimed milestone percents.
+- Signals: `collection_updated(category)`, `milestone_reached(category, percent, reward_gold)`.
+- CollectionLogUI (CanvasLayer): displays categories, items, progress, and milestone rewards.
+  - Category tabs for switching views.
+  - Items show as ??? until collected, then display name and count.
+  - Progress bars for category and overall completion.
+  - Claim button for reached milestones.
+- Persistence: progress saved to `user://collection_log.json`.
+- Scenario actions: `record_collection`, `check_collection`, `check_overall_collection`, `claim_milestone`, `reset_collection`.
+- Scenario: `collection_log_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

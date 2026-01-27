@@ -63,6 +63,7 @@ AccessibilityManager="*res://game/autoload/AccessibilityManager.gd"
 ColorblindFilter="*res://game/autoload/ColorblindFilter.gd"
 SpeedrunManager="*res://game/autoload/SpeedrunManager.gd"
 SecretEndingManager="*res://game/autoload/SecretEndingManager.gd"
+NewGamePlusManager="*res://game/autoload/NewGamePlusManager.gd"
 
 [internationalization]
 

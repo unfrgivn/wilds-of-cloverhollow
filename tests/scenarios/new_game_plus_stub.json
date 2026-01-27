@@ -1,0 +1,29 @@
+{
+  "id": "new_game_plus_stub",
+  "name": "New Game Plus Stub Test",
+  "description": "Tests NG+ unlock, carryover, and enemy scaling",
+  "starting_area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "count": 10},
+    
+    {"type": "reset_ng_plus"},
+    {"type": "check_ng_plus"},
+    
+    {"type": "unlock_ng_plus"},
+    {"type": "check_ng_plus"},
+    
+    {"type": "acquire_tool", "tool_id": "lantern"},
+    {"type": "acquire_tool", "tool_id": "fishing_rod"},
+    {"type": "prepare_ng_plus_carryover"},
+    
+    {"type": "start_ng_plus"},
+    {"type": "check_ng_plus"},
+    {"type": "check_enemy_multiplier"},
+    
+    {"type": "capture", "label": "ng_plus_active"},
+    
+    {"type": "reset_ng_plus"},
+    {"type": "check_ng_plus"},
+    {"type": "wait_frames", "count": 5}
+  ]
+}

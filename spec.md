@@ -878,6 +878,25 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `check_secret_ending`, `check_secret_conditions`, `spare_villain`, `check_hope_pendant`.
 - Scenario: `secret_ending_stub`.
 
+### 3.64 New Game Plus
+- NewGamePlusManager autoload handles NG+ mode progression.
+- Unlocked after completing the game (credits roll).
+- NG+ cycle tracked (0 = normal, 1 = NG+, 2 = NG++, etc.).
+- Carryover: tools, key items (consumables reset, story flags reset).
+- Difficulty scaling per cycle:
+  - ENEMY_STAT_MULTIPLIER: 1.25 (25% stronger per cycle).
+  - XP_BONUS_MULTIPLIER: 1.1 (10% more XP per cycle).
+  - GOLD_BONUS_MULTIPLIER: 1.2 (20% more gold per cycle).
+- API: `unlock_ng_plus()`, `is_ng_plus_unlocked()`, `get_ng_plus_cycle()`, `is_ng_plus_active()`.
+- `prepare_carryover()`: Saves current tools/items for NG+ start.
+- `start_ng_plus()`: Begins NG+ cycle with carried data.
+- `scale_enemy_stats(base_stats)`: Returns scaled stats dictionary.
+- `get_enemy_multiplier()`, `get_xp_multiplier()`, `get_gold_multiplier()`.
+- Signals: `ng_plus_unlocked`, `ng_plus_started(cycle)`.
+- Persistence: state stored in `user://ng_plus.json`.
+- Scenario actions: `unlock_ng_plus`, `check_ng_plus`, `prepare_ng_plus_carryover`, `start_ng_plus`, `reset_ng_plus`, `check_enemy_multiplier`.
+- Scenario: `new_game_plus_stub`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

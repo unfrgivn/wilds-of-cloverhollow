@@ -2135,7 +2135,7 @@ Alternate ending.
 
 ---
 
-## Milestone 175 — New Game Plus  **Owner:** Gameplay + Data Systems
+## Milestone 175 — New Game Plus  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + Data Systems
 ### Objective
 Replayability feature.
 

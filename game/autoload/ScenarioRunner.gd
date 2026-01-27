@@ -1856,6 +1856,51 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── New Game Plus Actions ──────────────────────────────────────────────
+    if t == "unlock_ng_plus":
+        NewGamePlusManager.unlock_ng_plus()
+        _trace["events"].append({"type": "unlock_ng_plus", "frame": _frame})
+        print("[Scenario] unlock_ng_plus")
+        _action_index += 1
+        return
+
+    if t == "check_ng_plus":
+        var unlocked: bool = NewGamePlusManager.is_ng_plus_unlocked()
+        var cycle: int = NewGamePlusManager.get_ng_plus_cycle()
+        var active: bool = NewGamePlusManager.is_ng_plus_active()
+        _trace["events"].append({"type": "check_ng_plus", "frame": _frame, "unlocked": unlocked, "cycle": cycle, "active": active})
+        print("[Scenario] check_ng_plus: unlocked=%s, cycle=%d, active=%s" % [unlocked, cycle, active])
+        _action_index += 1
+        return
+
+    if t == "prepare_ng_plus_carryover":
+        NewGamePlusManager.prepare_carryover()
+        _trace["events"].append({"type": "prepare_ng_plus_carryover", "frame": _frame})
+        print("[Scenario] prepare_ng_plus_carryover")
+        _action_index += 1
+        return
+
+    if t == "start_ng_plus":
+        NewGamePlusManager.start_ng_plus()
+        _trace["events"].append({"type": "start_ng_plus", "frame": _frame})
+        print("[Scenario] start_ng_plus")
+        _action_index += 1
+        return
+
+    if t == "reset_ng_plus":
+        NewGamePlusManager.reset_ng_plus()
+        _trace["events"].append({"type": "reset_ng_plus", "frame": _frame})
+        print("[Scenario] reset_ng_plus")
+        _action_index += 1
+        return
+
+    if t == "check_enemy_multiplier":
+        var multiplier: float = NewGamePlusManager.get_enemy_multiplier()
+        _trace["events"].append({"type": "check_enemy_multiplier", "frame": _frame, "multiplier": multiplier})
+        print("[Scenario] check_enemy_multiplier: %.2f" % multiplier)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

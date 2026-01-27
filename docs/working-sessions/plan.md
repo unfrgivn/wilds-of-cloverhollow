@@ -2124,7 +2124,7 @@ Expand antagonist motivation.
 
 ---
 
-## Milestone 174 — Secret ending conditions  **Owner:** Story + Gameplay
+## Milestone 174 — Secret ending conditions  **Status:** ✅ Completed (2026-01-26)  **Owner:** Story + Gameplay
 ### Objective
 Alternate ending.
 

@@ -867,6 +867,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_speedrun_mode`, `check_speedrun_mode`, `start_speedrun_timer`, `stop_speedrun_timer`, `record_split`, `check_speedrun_timer`.
 - Scenario: `speedrun_mode_smoke`.
 
+### 3.63 Secret ending system
+- SecretEndingManager autoload tracks conditions for alternate endings.
+- Secret "redemption" ending requires completing all villain backstory quests and sparing the villain.
+- Required conditions (story flags): chaos_origins_discovered, chaos_betrayal_learned, chaos_redemption_found, villain_spared.
+- Ending types: "normal" (default), "partial" (3+ conditions met), "redemption" (all conditions met).
+- hope_pendant key item is required for redemption ending dialogue option.
+- API: `is_condition_met(condition)`, `get_conditions_status()`, `get_conditions_met_count()`, `is_secret_ending_available()`, `get_ending_type()`, `spare_villain()`.
+- Signals: `secret_ending_unlocked`, `secret_condition_met(condition)`.
+- Scenario actions: `check_secret_ending`, `check_secret_conditions`, `spare_villain`, `check_hope_pendant`.
+- Scenario: `secret_ending_stub`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

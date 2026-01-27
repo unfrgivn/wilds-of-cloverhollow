@@ -1825,6 +1825,37 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Secret Ending Actions ──────────────────────────────────────────────
+    if t == "check_secret_ending":
+        var ending_type: String = SecretEndingManager.get_ending_type()
+        var conditions_met: int = SecretEndingManager.get_conditions_met_count()
+        var is_available: bool = SecretEndingManager.is_secret_ending_available()
+        _trace["events"].append({"type": "check_secret_ending", "frame": _frame, "ending_type": ending_type, "conditions_met": conditions_met, "available": is_available})
+        print("[Scenario] check_secret_ending: type=%s, conditions=%d/4, available=%s" % [ending_type, conditions_met, is_available])
+        _action_index += 1
+        return
+
+    if t == "check_secret_conditions":
+        var conditions: Dictionary = SecretEndingManager.get_conditions_status()
+        _trace["events"].append({"type": "check_secret_conditions", "frame": _frame, "conditions": conditions})
+        print("[Scenario] check_secret_conditions: %s" % str(conditions))
+        _action_index += 1
+        return
+
+    if t == "spare_villain":
+        SecretEndingManager.spare_villain()
+        _trace["events"].append({"type": "spare_villain", "frame": _frame})
+        print("[Scenario] spare_villain")
+        _action_index += 1
+        return
+
+    if t == "check_hope_pendant":
+        var has_pendant: bool = SecretEndingManager.has_hope_pendant()
+        _trace["events"].append({"type": "check_hope_pendant", "frame": _frame, "has_pendant": has_pendant})
+        print("[Scenario] check_hope_pendant: %s" % has_pendant)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

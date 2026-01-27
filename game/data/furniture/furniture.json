@@ -1,0 +1,117 @@
+{
+    "furniture": [
+        {
+            "id": "cozy_bed",
+            "name": "Cozy Bed",
+            "description": "A comfortable bed with soft pillows",
+            "category": "bed",
+            "size": {"width": 2, "height": 2},
+            "sprite_path": "res://game/assets/sprites/furniture/cozy_bed.png",
+            "price": 0,
+            "unlocked_by_default": true
+        },
+        {
+            "id": "wooden_desk",
+            "name": "Wooden Desk",
+            "description": "A sturdy desk for studying",
+            "category": "desk",
+            "size": {"width": 2, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/wooden_desk.png",
+            "price": 0,
+            "unlocked_by_default": true
+        },
+        {
+            "id": "bookshelf",
+            "name": "Bookshelf",
+            "description": "A shelf filled with adventure books",
+            "category": "storage",
+            "size": {"width": 1, "height": 2},
+            "sprite_path": "res://game/assets/sprites/furniture/bookshelf.png",
+            "price": 50
+        },
+        {
+            "id": "cute_lamp",
+            "name": "Cute Lamp",
+            "description": "A lamp shaped like a mushroom",
+            "category": "decor",
+            "size": {"width": 1, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/cute_lamp.png",
+            "price": 25
+        },
+        {
+            "id": "toy_chest",
+            "name": "Toy Chest",
+            "description": "A colorful chest for treasures",
+            "category": "storage",
+            "size": {"width": 1, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/toy_chest.png",
+            "price": 40
+        },
+        {
+            "id": "fluffy_rug",
+            "name": "Fluffy Rug",
+            "description": "A soft rug for cozy feet",
+            "category": "floor",
+            "size": {"width": 2, "height": 2},
+            "sprite_path": "res://game/assets/sprites/furniture/fluffy_rug.png",
+            "price": 35
+        },
+        {
+            "id": "flower_pot",
+            "name": "Flower Pot",
+            "description": "A cheerful potted plant",
+            "category": "decor",
+            "size": {"width": 1, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/flower_pot.png",
+            "price": 15
+        },
+        {
+            "id": "wall_poster",
+            "name": "Adventure Poster",
+            "description": "A poster of your favorite hero",
+            "category": "wall",
+            "size": {"width": 1, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/wall_poster.png",
+            "price": 20
+        },
+        {
+            "id": "bean_bag",
+            "name": "Bean Bag Chair",
+            "description": "A squishy seat for relaxing",
+            "category": "seating",
+            "size": {"width": 1, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/bean_bag.png",
+            "price": 30
+        },
+        {
+            "id": "trophy_shelf",
+            "name": "Trophy Shelf",
+            "description": "Display your achievements!",
+            "category": "storage",
+            "size": {"width": 1, "height": 1},
+            "sprite_path": "res://game/assets/sprites/furniture/trophy_shelf.png",
+            "price": 60,
+            "unlock_condition": {
+                "type": "quest_completed",
+                "quest_id": "chaos_investigation"
+            }
+        }
+    ],
+    "categories": [
+        {"id": "bed", "name": "Beds"},
+        {"id": "desk", "name": "Desks"},
+        {"id": "storage", "name": "Storage"},
+        {"id": "seating", "name": "Seating"},
+        {"id": "decor", "name": "Decor"},
+        {"id": "floor", "name": "Floor"},
+        {"id": "wall", "name": "Wall"}
+    ],
+    "rooms": [
+        {
+            "id": "hero_bedroom",
+            "name": "Hero's Bedroom",
+            "grid_size": {"width": 8, "height": 6},
+            "placement_layer": 0
+        }
+    ]
+}

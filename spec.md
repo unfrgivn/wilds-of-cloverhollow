@@ -597,6 +597,29 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `unlock_sticker`, `check_sticker_unlocked`, `check_stickers`, `reset_stickers`, `check_sticker_conditions`.
 - Scenario: `photo_sticker_smoke`.
 
+### 3.46 Home customization system (stub)
+- HomeCustomizationManager autoload manages furniture placement and room state.
+- Furniture data stored in `game/data/furniture/furniture.json`.
+- Furniture data format:
+  - Each furniture has: id, name, description, category, size (width/height in grid cells), sprite_path, price, unlocked_by_default (or unlock_condition).
+  - Categories: bed, desk, storage, seating, decor, floor, wall.
+  - Size in grid cells for placement validation.
+- 10 furniture items: 2 default unlocked (cozy_bed, wooden_desk), 8 purchasable/unlockable.
+- FurniturePlacementUI (CanvasLayer): grid-based placement interface.
+  - Category tabs for filtering furniture.
+  - Furniture grid showing owned items.
+  - Grid display for room layout (8x6 default).
+  - Click to place selected furniture.
+  - Clear Room/Done controls.
+- Room grid system: furniture occupies grid cells based on size.
+- Placement validation: bounds checking, grid size limits.
+- Persistence: room state saved to `user://home_customization.json`.
+- API: `is_furniture_unlocked(id)`, `unlock_furniture(id)`, `place_furniture(room_id, furniture_id, position)`, `get_room_placements(room_id)`, `clear_room(room_id)`.
+- Signals: `furniture_placed(room_id, furniture_id, position)`, `furniture_removed(room_id, furniture_id)`, `furniture_unlocked(furniture_id)`, `room_state_changed(room_id)`.
+- Scenario actions: `unlock_furniture`, `place_furniture`, `check_furniture`, `check_room_placements`, `clear_room`, `reset_home_customization`.
+- Scenario: `home_customize_stub`.
+- Note: This is a stub - no visual room rendering or shopping. Prepared for future furniture shop feature.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

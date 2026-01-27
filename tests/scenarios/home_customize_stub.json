@@ -1,0 +1,43 @@
+{
+    "id": "home_customize_stub",
+    "name": "Home Customization Stub Test",
+    "description": "Verifies furniture unlock, placement, and room state management",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 10},
+        {"type": "log", "message": "=== Home Customization Stub Test ==="},
+        
+        {"type": "log", "message": "Step 1: Check initial furniture state"},
+        {"type": "check_furniture"},
+        
+        {"type": "log", "message": "Step 2: Place default furniture (cozy_bed)"},
+        {"type": "place_furniture", "room_id": "hero_bedroom", "furniture_id": "cozy_bed", "x": 0, "y": 0},
+        {"type": "check_room_placements", "room_id": "hero_bedroom"},
+        
+        {"type": "log", "message": "Step 3: Place another default furniture (wooden_desk)"},
+        {"type": "place_furniture", "room_id": "hero_bedroom", "furniture_id": "wooden_desk", "x": 4, "y": 0},
+        {"type": "check_room_placements", "room_id": "hero_bedroom"},
+        
+        {"type": "log", "message": "Step 4: Try to place locked furniture (should fail)"},
+        {"type": "place_furniture", "room_id": "hero_bedroom", "furniture_id": "bookshelf", "x": 6, "y": 0},
+        {"type": "check_room_placements", "room_id": "hero_bedroom"},
+        
+        {"type": "log", "message": "Step 5: Unlock bookshelf and place it"},
+        {"type": "unlock_furniture", "furniture_id": "bookshelf"},
+        {"type": "check_furniture"},
+        {"type": "place_furniture", "room_id": "hero_bedroom", "furniture_id": "bookshelf", "x": 7, "y": 0},
+        {"type": "check_room_placements", "room_id": "hero_bedroom"},
+        
+        {"type": "log", "message": "Step 6: Clear room"},
+        {"type": "clear_room", "room_id": "hero_bedroom"},
+        {"type": "check_room_placements", "room_id": "hero_bedroom"},
+        
+        {"type": "log", "message": "Step 7: Reset all customization"},
+        {"type": "reset_home_customization"},
+        {"type": "check_furniture"},
+        
+        {"type": "wait_frames", "frames": 5},
+        {"type": "capture", "label": "home_customize_stub_end"},
+        {"type": "log", "message": "=== Home Customization Stub Test Complete ==="}
+    ]
+}

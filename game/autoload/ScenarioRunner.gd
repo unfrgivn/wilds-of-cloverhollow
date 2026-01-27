@@ -1280,6 +1280,57 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # === Home Customization actions ===
+    if t == "unlock_furniture":
+        var furniture_id: String = action.get("furniture_id", "")
+        var result: bool = HomeCustomizationManager.unlock_furniture(furniture_id)
+        _trace["events"].append({"type": "unlock_furniture", "frame": _frame, "furniture_id": furniture_id, "success": result})
+        print("[Scenario] unlock_furniture: %s -> %s" % [furniture_id, str(result)])
+        _action_index += 1
+        return
+
+    if t == "place_furniture":
+        var room_id: String = action.get("room_id", "hero_bedroom")
+        var furniture_id: String = action.get("furniture_id", "")
+        var pos_x: int = action.get("x", 0)
+        var pos_y: int = action.get("y", 0)
+        var result: bool = HomeCustomizationManager.place_furniture(room_id, furniture_id, Vector2i(pos_x, pos_y))
+        _trace["events"].append({"type": "place_furniture", "frame": _frame, "room_id": room_id, "furniture_id": furniture_id, "x": pos_x, "y": pos_y, "success": result})
+        print("[Scenario] place_furniture: %s at (%d,%d) in %s -> %s" % [furniture_id, pos_x, pos_y, room_id, str(result)])
+        _action_index += 1
+        return
+
+    if t == "check_furniture":
+        var unlocked_count: int = HomeCustomizationManager.get_unlocked_count()
+        var total_count: int = HomeCustomizationManager.get_total_count()
+        _trace["events"].append({"type": "check_furniture", "frame": _frame, "unlocked": unlocked_count, "total": total_count})
+        print("[Scenario] check_furniture: %d/%d unlocked" % [unlocked_count, total_count])
+        _action_index += 1
+        return
+
+    if t == "check_room_placements":
+        var room_id: String = action.get("room_id", "hero_bedroom")
+        var placements: Array = HomeCustomizationManager.get_room_placements(room_id)
+        _trace["events"].append({"type": "check_room_placements", "frame": _frame, "room_id": room_id, "count": placements.size()})
+        print("[Scenario] check_room_placements: %s has %d items" % [room_id, placements.size()])
+        _action_index += 1
+        return
+
+    if t == "clear_room":
+        var room_id: String = action.get("room_id", "hero_bedroom")
+        HomeCustomizationManager.clear_room(room_id)
+        _trace["events"].append({"type": "clear_room", "frame": _frame, "room_id": room_id})
+        print("[Scenario] clear_room: %s" % room_id)
+        _action_index += 1
+        return
+
+    if t == "reset_home_customization":
+        HomeCustomizationManager.reset_all()
+        _trace["events"].append({"type": "reset_home_customization", "frame": _frame})
+        print("[Scenario] reset_home_customization")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

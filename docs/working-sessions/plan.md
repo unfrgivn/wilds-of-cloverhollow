@@ -1906,7 +1906,7 @@ Decorate photos.
 
 ---
 
-## Milestone 156 — Home customization stub  **Owner:** Gameplay + Art Pipeline
+## Milestone 156 — Home customization stub  **Owner:** Gameplay + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Decorate hero's room.
 

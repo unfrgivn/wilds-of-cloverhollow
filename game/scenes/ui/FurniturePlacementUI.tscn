@@ -1,0 +1,85 @@
+[gd_scene load_steps=2 format=3 uid="uid://furniture_placement_ui"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/FurniturePlacementUI.gd" id="1_script"]
+
+[node name="FurniturePlacementUI" type="CanvasLayer"]
+layer = 127
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.5)
+
+[node name="GridDisplay" type="Control" parent="."]
+offset_left = 140.0
+offset_top = 20.0
+offset_right = 396.0
+offset_bottom = 212.0
+custom_minimum_size = Vector2(256, 192)
+
+[node name="GridBackground" type="ColorRect" parent="GridDisplay"]
+layout_mode = 0
+offset_right = 256.0
+offset_bottom = 192.0
+color = Color(0.2, 0.15, 0.1, 1)
+
+[node name="FurniturePanel" type="PanelContainer" parent="."]
+offset_left = 10.0
+offset_top = 20.0
+offset_right = 130.0
+offset_bottom = 250.0
+
+[node name="VBox" type="VBoxContainer" parent="FurniturePanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="FurniturePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Furniture"
+horizontal_alignment = 1
+
+[node name="CategoryTabs" type="HBoxContainer" parent="FurniturePanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="FurnitureScroll" type="ScrollContainer" parent="FurniturePanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 140)
+
+[node name="FurnitureGrid" type="GridContainer" parent="FurniturePanel/VBox/FurnitureScroll"]
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+
+[node name="ControlsPanel" type="PanelContainer" parent="."]
+offset_left = 410.0
+offset_top = 20.0
+offset_right = 502.0
+offset_bottom = 100.0
+
+[node name="VBox" type="VBoxContainer" parent="ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ClearButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Clear Room"
+
+[node name="DoneButton" type="Button" parent="ControlsPanel/VBox"]
+layout_mode = 2
+text = "Done"
+
+[node name="InfoLabel" type="Label" parent="."]
+offset_left = 140.0
+offset_top = 220.0
+offset_right = 400.0
+offset_bottom = 234.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 8
+text = "Furniture: 0 | Click grid to place"

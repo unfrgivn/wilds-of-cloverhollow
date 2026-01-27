@@ -1870,7 +1870,7 @@ Holiday/seasonal content.
 
 ---
 
-## Milestone 153 — Daily challenges stub  **Owner:** Gameplay + Data Systems
+## Milestone 153 — Daily challenges stub  **Owner:** Gameplay + Data Systems **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Replayable daily content.
 

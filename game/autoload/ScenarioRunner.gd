@@ -1134,6 +1134,57 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Daily challenge actions
+    if t == "set_challenge_day":
+        var day: int = int(action.get("day", 1))
+        DailyChallengeManager.set_override_day(day)
+        _trace["events"].append({"type": "set_challenge_day", "frame": _frame, "day": day})
+        print("[Scenario] set_challenge_day: %d" % day)
+        _action_index += 1
+        return
+
+    if t == "clear_challenge_day":
+        DailyChallengeManager.clear_override_day()
+        _trace["events"].append({"type": "clear_challenge_day", "frame": _frame})
+        print("[Scenario] clear_challenge_day")
+        _action_index += 1
+        return
+
+    if t == "check_active_challenges":
+        var challenges: Array = DailyChallengeManager.get_active_challenges()
+        var ids: Array = []
+        for c in challenges:
+            ids.append(c.get("id", ""))
+        _trace["events"].append({"type": "check_active_challenges", "frame": _frame, "count": challenges.size(), "ids": ids})
+        print("[Scenario] check_active_challenges: %d challenges - %s" % [challenges.size(), str(ids)])
+        _action_index += 1
+        return
+
+    if t == "record_challenge_progress":
+        var challenge_type: String = str(action.get("challenge_type", ""))
+        var amount: int = int(action.get("amount", 1))
+        DailyChallengeManager.record_progress(challenge_type, amount)
+        _trace["events"].append({"type": "record_challenge_progress", "frame": _frame, "challenge_type": challenge_type, "amount": amount})
+        print("[Scenario] record_challenge_progress: %s +%d" % [challenge_type, amount])
+        _action_index += 1
+        return
+
+    if t == "check_challenge_completed":
+        var challenge_id: String = str(action.get("challenge_id", ""))
+        var is_completed: bool = DailyChallengeManager.is_challenge_completed(challenge_id)
+        var progress: int = DailyChallengeManager.get_challenge_progress(challenge_id)
+        _trace["events"].append({"type": "check_challenge_completed", "frame": _frame, "challenge_id": challenge_id, "is_completed": is_completed, "progress": progress})
+        print("[Scenario] check_challenge_completed: %s = %s (progress: %d)" % [challenge_id, is_completed, progress])
+        _action_index += 1
+        return
+
+    if t == "force_refresh_challenges":
+        DailyChallengeManager.force_refresh()
+        _trace["events"].append({"type": "force_refresh_challenges", "frame": _frame})
+        print("[Scenario] force_refresh_challenges")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

@@ -1,0 +1,21 @@
+{
+    "scenario_id": "daily_challenge_stub",
+    "description": "Test daily challenge rotation and progress tracking",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "set_challenge_day", "day": 12345},
+        {"type": "force_refresh_challenges"},
+        {"type": "check_active_challenges"},
+        {"type": "record_challenge_progress", "challenge_type": "fishing", "amount": 1},
+        {"type": "record_challenge_progress", "challenge_type": "fishing", "amount": 1},
+        {"type": "record_challenge_progress", "challenge_type": "fishing", "amount": 1},
+        {"type": "check_challenge_completed", "challenge_id": "catch_3_fish"},
+        {"type": "record_challenge_progress", "challenge_type": "battle", "amount": 2},
+        {"type": "check_challenge_completed", "challenge_id": "win_2_battles"},
+        {"type": "set_challenge_day", "day": 12346},
+        {"type": "check_active_challenges"},
+        {"type": "clear_challenge_day"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

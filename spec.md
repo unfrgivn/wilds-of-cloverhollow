@@ -542,6 +542,22 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_event_date`, `clear_event_date`, `check_active_events`, `check_event_active`.
 - Scenario: `seasonal_event_stub`.
 
+### 3.43 Daily challenges system (stub)
+- DailyChallengeManager autoload handles daily rotating challenges.
+- Challenge data stored in `game/data/challenges/daily_challenges.json`.
+- Challenge data format:
+  - Each challenge has: id, name, description, type, target_count, reward_gold, reward_items[].
+  - Types: fishing, bug_catching, battle, social, exploration, quest, fishing_rare.
+- 7 placeholder challenges with various types and rewards.
+- Daily rotation: 3 challenges randomly selected each day.
+- Progress tracking: `record_progress(type, amount)` increments matching active challenges.
+- Auto-completion: challenge completes when progress >= target_count.
+- Override for testing: `set_override_day(day)`, `force_refresh()`.
+- API: `get_active_challenges()`, `is_challenge_completed(id)`, `get_challenge_progress(id)`.
+- Signals: `challenge_updated(id, current, target)`, `challenge_completed(id, reward_gold)`, `daily_challenges_refreshed(challenges)`.
+- Scenario actions: `set_challenge_day`, `clear_challenge_day`, `check_active_challenges`, `record_challenge_progress`, `check_challenge_completed`, `force_refresh_challenges`.
+- Scenario: `daily_challenge_stub`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

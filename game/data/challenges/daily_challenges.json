@@ -1,0 +1,68 @@
+{
+    "challenges": [
+        {
+            "id": "catch_3_fish",
+            "name": "Fisher's Friend",
+            "description": "Catch 3 fish of any type",
+            "type": "fishing",
+            "target_count": 3,
+            "reward_gold": 50,
+            "reward_items": [{"id": "potion", "count": 1}]
+        },
+        {
+            "id": "catch_5_bugs",
+            "name": "Bug Collector",
+            "description": "Catch 5 bugs of any type",
+            "type": "bug_catching",
+            "target_count": 5,
+            "reward_gold": 50,
+            "reward_items": [{"id": "ether", "count": 1}]
+        },
+        {
+            "id": "win_2_battles",
+            "name": "Battle Ready",
+            "description": "Win 2 battles",
+            "type": "battle",
+            "target_count": 2,
+            "reward_gold": 75,
+            "reward_items": []
+        },
+        {
+            "id": "talk_to_5_npcs",
+            "name": "Social Butterfly",
+            "description": "Talk to 5 different NPCs",
+            "type": "social",
+            "target_count": 5,
+            "reward_gold": 40,
+            "reward_items": []
+        },
+        {
+            "id": "visit_3_areas",
+            "name": "Explorer",
+            "description": "Visit 3 different areas",
+            "type": "exploration",
+            "target_count": 3,
+            "reward_gold": 60,
+            "reward_items": []
+        },
+        {
+            "id": "complete_1_quest",
+            "name": "Quest Champion",
+            "description": "Complete 1 quest",
+            "type": "quest",
+            "target_count": 1,
+            "reward_gold": 100,
+            "reward_items": [{"id": "potion", "count": 2}]
+        },
+        {
+            "id": "catch_rare_fish",
+            "name": "Rare Catch",
+            "description": "Catch a rare or legendary fish",
+            "type": "fishing_rare",
+            "target_count": 1,
+            "reward_gold": 150,
+            "reward_items": [{"id": "ether", "count": 2}]
+        }
+    ],
+    "daily_count": 3
+}

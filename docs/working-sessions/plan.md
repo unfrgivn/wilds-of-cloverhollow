@@ -2329,7 +2329,7 @@ Submit for review.
 
 ---
 
-## Milestone 191 — Feedback collection UI  **Owner:** UI Systems
+## Milestone 191 — Feedback collection UI  **Owner:** UI Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 In-app feedback.
 

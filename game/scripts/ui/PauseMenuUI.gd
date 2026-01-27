@@ -10,7 +10,7 @@ signal save_pressed
 signal quit_pressed
 
 var _selected_index: int = 0
-var _menu_options: Array[String] = ["Resume", "Items", "Party", "Save", "Quit"]
+var _menu_options: Array[String] = ["Resume", "Items", "Party", "Save", "Feedback", "Quit"]
 var _is_active: bool = false
 
 @onready var panel: Panel = $Panel
@@ -104,6 +104,8 @@ func _select_option() -> void:
 			_on_party()
 		"Save":
 			_on_save()
+		"Feedback":
+			_on_feedback()
 		"Quit":
 			_on_quit()
 
@@ -167,3 +169,20 @@ func _on_quit() -> void:
 	# Return to title screen
 	SceneRouter.change_scene("res://game/scenes/Main.tscn", "")
 	print("[PauseMenuUI] Returning to title screen")
+
+func _on_feedback() -> void:
+	# Hide pause menu while feedback is open
+	visible = false
+	
+	# Open feedback UI
+	var feedback_scene := preload("res://game/scenes/ui/FeedbackUI.tscn")
+	var feedback_ui := feedback_scene.instantiate()
+	get_tree().root.add_child(feedback_ui)
+	feedback_ui.show_feedback()
+	feedback_ui.feedback_closed.connect(_on_feedback_closed.bind(feedback_ui))
+	print("[PauseMenuUI] Opened feedback")
+
+func _on_feedback_closed(feedback_ui: Node) -> void:
+	feedback_ui.queue_free()
+	visible = true
+	print("[PauseMenuUI] Feedback closed, returning to pause menu")

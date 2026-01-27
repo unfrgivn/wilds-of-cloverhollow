@@ -53,6 +53,7 @@ CostumeManager="*res://game/autoload/CostumeManager.gd"
 PetAccessoryManager="*res://game/autoload/PetAccessoryManager.gd"
 InputDebouncer="*res://game/autoload/InputDebouncer.gd"
 MemoryManager="*res://game/autoload/MemoryManager.gd"
+FeedbackManager="*res://game/autoload/FeedbackManager.gd"
 
 [internationalization]
 

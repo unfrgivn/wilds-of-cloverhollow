@@ -711,6 +711,19 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `simulate_memory_pressure`, `check_memory`, `reset_memory_pressure`.
 - Scenario: `low_memory_smoke`.
 
+### 3.50 Feedback collection system
+- FeedbackManager autoload handles in-app feedback collection and storage.
+- Feedback data stored locally in `user://feedback_queue.json`.
+- Max queue size: 50 items (oldest removed when exceeded).
+- Feedback fields: message, category, email (optional), timestamp, version, submitted flag.
+- Categories: General, Bug, Suggestion, Other.
+- API: `submit_feedback(message, category, email)`, `get_pending_count()`, `get_all_feedback()`, `clear_all_feedback()`.
+- Stub: `upload_feedback()` for future backend integration.
+- Signals: `feedback_submitted(feedback)`, `feedback_ui_opened`, `feedback_ui_closed`.
+- FeedbackUI (CanvasLayer): modal form with category selector, message input, optional email, submit/cancel buttons.
+- Accessed via Feedback option in pause menu.
+- Scenario actions: `submit_feedback`, `check_feedback`, `clear_feedback`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

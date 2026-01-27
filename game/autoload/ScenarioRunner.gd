@@ -1582,6 +1582,31 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Feedback system actions
+    if t == "submit_feedback":
+        var message: String = action.get("message", "Test feedback")
+        var category: String = action.get("category", "general")
+        FeedbackManager.submit_feedback(message, category)
+        _trace["events"].append({"type": "submit_feedback", "message": message, "category": category, "frame": _frame})
+        print("[Scenario] submit_feedback: %s" % message.substr(0, 30))
+        _action_index += 1
+        return
+
+    if t == "check_feedback":
+        var count := FeedbackManager.get_pending_count()
+        var feedback_list := FeedbackManager.get_all_feedback()
+        _trace["events"].append({"type": "check_feedback", "count": count, "frame": _frame})
+        print("[Scenario] check_feedback: %d items queued" % count)
+        _action_index += 1
+        return
+
+    if t == "clear_feedback":
+        FeedbackManager.clear_all_feedback()
+        _trace["events"].append({"type": "clear_feedback", "frame": _frame})
+        print("[Scenario] clear_feedback")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

@@ -911,6 +911,21 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `start_boss_rush`, `check_boss_rush`, `report_boss_defeated`, `check_boss_rush_leaderboard`, `clear_boss_rush_leaderboard`, `reset_boss_rush`.
 - Scenario: `boss_rush_stub`.
 
+### 3.66 Multiplayer co-op stub
+- MultiplayerStub autoload handles future multiplayer preparation.
+- Player state serialization: `serialize_player_state()` returns position, facing, area, inventory, story_flags.
+- Connection states: DISCONNECTED, CONNECTING, CONNECTED, HOST, ERROR.
+- Message types: PLAYER_STATE, PLAYER_ACTION, CHAT, SYNC_REQUEST, SYNC_RESPONSE, PING, PONG, AREA_CHANGE, BATTLE_INVITE, BATTLE_ACTION.
+- Network schema stored in `game/data/multiplayer/network_schema.json`.
+- API: `host_game(port)`, `join_game(host, port)`, `disconnect_game()`, `is_multiplayer_connected()`, `is_host()`.
+- `serialize_player_state()`, `deserialize_player_state(data)`: State serialization.
+- `create_message(type, payload)`, `send_message(to, msg)`, `broadcast_message(msg)`.
+- `simulate_player_join(id)`, `simulate_player_leave(id)`: Testing helpers.
+- Signals: `connection_state_changed(state)`, `player_joined(id)`, `player_left(id)`, `message_received(from, msg)`.
+- Scenario actions: `host_multiplayer`, `join_multiplayer`, `disconnect_multiplayer`, `check_multiplayer`, `serialize_player_state`, `simulate_player_join`, `simulate_player_leave`, `check_message_schema`, `reset_multiplayer`.
+- Scenario: `multiplayer_stub`.
+- Note: This is a stub - no actual networking. Prepared for future multiplayer feature.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

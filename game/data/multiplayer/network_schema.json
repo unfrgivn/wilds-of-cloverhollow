@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "description": "Network message schema for multiplayer co-op exploration",
+  "max_players": 4,
+  "sync_interval_ms": 100,
+  "message_types": {
+    "PLAYER_STATE": {
+      "id": 0,
+      "description": "Full player state synchronization",
+      "frequency": "periodic",
+      "reliable": false,
+      "fields": {
+        "player_id": {"type": "string", "required": true},
+        "timestamp": {"type": "int", "required": true},
+        "position": {
+          "type": "object",
+          "required": true,
+          "fields": {
+            "x": {"type": "float"},
+            "y": {"type": "float"}
+          }
+        },
+        "facing": {"type": "string", "enum": ["up", "down", "left", "right", "up_left", "up_right", "down_left", "down_right"]},
+        "area": {"type": "string", "description": "Scene path of current area"},
+        "animation": {"type": "string"},
+        "velocity": {
+          "type": "object",
+          "fields": {
+            "x": {"type": "float"},
+            "y": {"type": "float"}
+          }
+        }
+      }
+    },
+    "PLAYER_ACTION": {
+      "id": 1,
+      "description": "Player performed an action",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {
+        "action": {"type": "string", "enum": ["interact", "attack", "use_item", "use_skill", "emote"]},
+        "target_id": {"type": "string", "optional": true},
+        "item_id": {"type": "string", "optional": true},
+        "skill_id": {"type": "string", "optional": true},
+        "emote_id": {"type": "string", "optional": true}
+      }
+    },
+    "CHAT": {
+      "id": 2,
+      "description": "Chat message between players",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {
+        "text": {"type": "string", "max_length": 200},
+        "channel": {"type": "string", "enum": ["all", "party", "whisper"], "default": "all"},
+        "to_player": {"type": "string", "optional": true, "description": "For whisper messages"}
+      }
+    },
+    "SYNC_REQUEST": {
+      "id": 3,
+      "description": "Request full state sync from host",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {}
+    },
+    "SYNC_RESPONSE": {
+      "id": 4,
+      "description": "Full state response from host",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {
+        "world_state": {
+          "type": "object",
+          "fields": {
+            "time_phase": {"type": "int"},
+            "day": {"type": "int"},
+            "weather": {"type": "int"}
+          }
+        },
+        "player_states": {"type": "array", "items": {"$ref": "#/message_types/PLAYER_STATE"}}
+      }
+    },
+    "PING": {
+      "id": 5,
+      "description": "Latency measurement request",
+      "frequency": "periodic",
+      "reliable": false,
+      "fields": {
+        "sent_at": {"type": "int", "description": "Timestamp in milliseconds"}
+      }
+    },
+    "PONG": {
+      "id": 6,
+      "description": "Latency measurement response",
+      "frequency": "event",
+      "reliable": false,
+      "fields": {
+        "sent_at": {"type": "int"},
+        "received_at": {"type": "int"}
+      }
+    },
+    "AREA_CHANGE": {
+      "id": 7,
+      "description": "Player changed areas",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {
+        "from_area": {"type": "string"},
+        "to_area": {"type": "string"},
+        "spawn_marker": {"type": "string"}
+      }
+    },
+    "BATTLE_INVITE": {
+      "id": 8,
+      "description": "Invite player to join battle",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {
+        "battle_id": {"type": "string"},
+        "enemy_ids": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "BATTLE_ACTION": {
+      "id": 9,
+      "description": "Action taken in co-op battle",
+      "frequency": "event",
+      "reliable": true,
+      "fields": {
+        "battle_id": {"type": "string"},
+        "action_type": {"type": "string", "enum": ["attack", "skill", "item", "defend", "flee"]},
+        "target_index": {"type": "int"},
+        "skill_id": {"type": "string", "optional": true},
+        "item_id": {"type": "string", "optional": true}
+      }
+    }
+  },
+  "connection_states": {
+    "DISCONNECTED": {"id": 0, "description": "Not connected to any game"},
+    "CONNECTING": {"id": 1, "description": "Attempting to connect"},
+    "CONNECTED": {"id": 2, "description": "Connected as client"},
+    "HOST": {"id": 3, "description": "Hosting a game"},
+    "ERROR": {"id": 4, "description": "Connection error occurred"}
+  },
+  "notes": [
+    "This is a stub schema for future multiplayer implementation",
+    "No actual networking is implemented in this version",
+    "Schema versioning allows for backward compatibility",
+    "Reliable messages use TCP-like delivery, unreliable use UDP-like"
+  ]
+}

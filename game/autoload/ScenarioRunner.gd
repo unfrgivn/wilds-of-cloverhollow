@@ -1947,6 +1947,78 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Multiplayer Stub Actions ───────────────────────────────────────────
+    if t == "host_multiplayer":
+        var port: int = _action.get("port", 7777)
+        var success: bool = MultiplayerStub.host_game(port)
+        _trace["events"].append({"type": "host_multiplayer", "frame": _frame, "success": success})
+        print("[Scenario] host_multiplayer: port=%d, success=%s" % [port, success])
+        _action_index += 1
+        return
+
+    if t == "join_multiplayer":
+        var host: String = _action.get("host", "127.0.0.1")
+        var port: int = _action.get("port", 7777)
+        var success: bool = MultiplayerStub.join_game(host, port)
+        _trace["events"].append({"type": "join_multiplayer", "frame": _frame, "success": success})
+        print("[Scenario] join_multiplayer: host=%s, port=%d, success=%s" % [host, port, success])
+        _action_index += 1
+        return
+
+    if t == "disconnect_multiplayer":
+        MultiplayerStub.disconnect_game()
+        _trace["events"].append({"type": "disconnect_multiplayer", "frame": _frame})
+        print("[Scenario] disconnect_multiplayer")
+        _action_index += 1
+        return
+
+    if t == "check_multiplayer":
+        var connected: bool = MultiplayerStub.is_multiplayer_connected()
+        var is_host: bool = MultiplayerStub.is_host()
+        var player_count: int = MultiplayerStub.get_player_count()
+        var state_name: String = MultiplayerStub.get_connection_state_name()
+        _trace["events"].append({"type": "check_multiplayer", "frame": _frame, "connected": connected, "is_host": is_host, "player_count": player_count, "state": state_name})
+        print("[Scenario] check_multiplayer: connected=%s, host=%s, players=%d, state=%s" % [connected, is_host, player_count, state_name])
+        _action_index += 1
+        return
+
+    if t == "serialize_player_state":
+        var state: Dictionary = MultiplayerStub.serialize_player_state()
+        _trace["events"].append({"type": "serialize_player_state", "frame": _frame, "state": state})
+        print("[Scenario] serialize_player_state: %s" % JSON.stringify(state))
+        _action_index += 1
+        return
+
+    if t == "simulate_player_join":
+        var player_id: String = _action.get("player_id", "test_player")
+        MultiplayerStub.simulate_player_join(player_id)
+        _trace["events"].append({"type": "simulate_player_join", "frame": _frame, "player_id": player_id})
+        print("[Scenario] simulate_player_join: %s" % player_id)
+        _action_index += 1
+        return
+
+    if t == "simulate_player_leave":
+        var player_id: String = _action.get("player_id", "test_player")
+        MultiplayerStub.simulate_player_leave(player_id)
+        _trace["events"].append({"type": "simulate_player_leave", "frame": _frame, "player_id": player_id})
+        print("[Scenario] simulate_player_leave: %s" % player_id)
+        _action_index += 1
+        return
+
+    if t == "check_message_schema":
+        var schema: Dictionary = MultiplayerStub.get_message_schema()
+        _trace["events"].append({"type": "check_message_schema", "frame": _frame, "version": schema.get("version", 0)})
+        print("[Scenario] check_message_schema: version=%d" % schema.get("version", 0))
+        _action_index += 1
+        return
+
+    if t == "reset_multiplayer":
+        MultiplayerStub.reset()
+        _trace["events"].append({"type": "reset_multiplayer", "frame": _frame})
+        print("[Scenario] reset_multiplayer")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

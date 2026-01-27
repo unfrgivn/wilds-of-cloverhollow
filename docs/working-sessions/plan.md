@@ -2030,7 +2030,7 @@ Auto-generated changelog.
 
 ---
 
-## Milestone 166 — Multiplayer co-op exploration stub  **Owner:** Gameplay + Data Systems
+## Milestone 166 — Multiplayer co-op exploration stub  **Status:** ✅ Completed (2026-01-26)  **Owner:** Gameplay + Data Systems
 ### Objective
 Future multiplayer preparation.
 

@@ -65,6 +65,7 @@ SpeedrunManager="*res://game/autoload/SpeedrunManager.gd"
 SecretEndingManager="*res://game/autoload/SecretEndingManager.gd"
 NewGamePlusManager="*res://game/autoload/NewGamePlusManager.gd"
 BossRushManager="*res://game/autoload/BossRushManager.gd"
+MultiplayerStub="*res://game/autoload/MultiplayerStub.gd"
 
 [internationalization]
 

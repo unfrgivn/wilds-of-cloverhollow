@@ -1760,7 +1760,7 @@ Change data without restart.
 
 ---
 
-## Milestone 144 — Debug console  **Owner:** Gameplay + UI Systems
+## Milestone 144 — Debug console  **Owner:** Gameplay + UI Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 In-game debug commands.
 

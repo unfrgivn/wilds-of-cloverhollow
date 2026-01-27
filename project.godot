@@ -42,6 +42,7 @@ AchievementManager="*res://game/autoload/AchievementManager.gd"
 LocalizationManager="*res://game/autoload/LocalizationManager.gd"
 AnalyticsManager="*res://game/autoload/AnalyticsManager.gd"
 CrashReportManager="*res://game/autoload/CrashReportManager.gd"
+DebugConsole="*res://game/autoload/DebugConsole.gd"
 
 [internationalization]
 

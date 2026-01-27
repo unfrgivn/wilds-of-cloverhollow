@@ -1,0 +1,24 @@
+{
+  "scenario_id": "debug_console_smoke",
+  "description": "Test debug console toggle and commands",
+  "actions": [
+    {"type": "check_debug_console"},
+    {"type": "show_debug_console"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_debug_console"},
+    {"type": "debug_command", "command": "help"},
+    {"type": "debug_command", "command": "fps"},
+    {"type": "debug_command", "command": "heal"},
+    {"type": "debug_command", "command": "give_tool lantern"},
+    {"type": "debug_command", "command": "give_item potion 5"},
+    {"type": "debug_command", "command": "set_flag test_flag true"},
+    {"type": "debug_command", "command": "set_time 2"},
+    {"type": "debug_command", "command": "set_weather 1"},
+    {"type": "hide_debug_console"},
+    {"type": "check_debug_console"},
+    {"type": "toggle_debug_console"},
+    {"type": "check_debug_console"},
+    {"type": "toggle_debug_console"},
+    {"type": "check_debug_console"}
+  ]
+}

@@ -995,6 +995,43 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Debug console actions
+    if t == "toggle_debug_console":
+        DebugConsole.toggle_console()
+        _trace["events"].append({"type": "toggle_debug_console", "frame": _frame})
+        print("[Scenario] toggle_debug_console")
+        _action_index += 1
+        return
+
+    if t == "show_debug_console":
+        DebugConsole.show_console()
+        _trace["events"].append({"type": "show_debug_console", "frame": _frame})
+        print("[Scenario] show_debug_console")
+        _action_index += 1
+        return
+
+    if t == "hide_debug_console":
+        DebugConsole.hide_console()
+        _trace["events"].append({"type": "hide_debug_console", "frame": _frame})
+        print("[Scenario] hide_debug_console")
+        _action_index += 1
+        return
+
+    if t == "debug_command":
+        var command: String = action.get("command", "")
+        var result: String = DebugConsole.execute_command(command)
+        _trace["events"].append({"type": "debug_command", "frame": _frame, "command": command, "result": result})
+        print("[Scenario] debug_command: %s -> %s" % [command, result])
+        _action_index += 1
+        return
+
+    if t == "check_debug_console":
+        var visible: bool = DebugConsole.is_visible()
+        _trace["events"].append({"type": "check_debug_console", "frame": _frame, "visible": visible})
+        print("[Scenario] check_debug_console: visible=%s" % visible)
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

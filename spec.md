@@ -454,6 +454,14 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `log_error`, `check_crash_reports`, `clear_crash_reports`.
 - Note: No data is sent externally - stub for future backend integration.
 
+### 3.38 Debug console
+- DebugConsole autoload provides developer console for debugging.
+- Toggle: Press backtick (`) or "debug_console" action.
+- Commands: help, spawn, teleport, heal, give_tool, give_item, set_flag, set_time, set_weather, fps, reload_data.
+- Console UI: top panel with input field and output label.
+- Signal: `command_executed(command, args, result)` for tracking.
+- Scenario actions: `toggle_debug_console`, `show_debug_console`, `hide_debug_console`, `debug_command`, `check_debug_console`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

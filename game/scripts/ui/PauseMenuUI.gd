@@ -34,10 +34,12 @@ func _input(event: InputEvent) -> void:
 		_move_selection(1)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_accept") or event.is_action_pressed("interact"):
-		_select_option()
+		if InputDebouncer.try_act("pause_menu_select"):
+			_select_option()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
-		_on_resume()
+		if InputDebouncer.try_act("pause_menu_cancel"):
+			_on_resume()
 		get_viewport().set_input_as_handled()
 
 func open_menu() -> void:

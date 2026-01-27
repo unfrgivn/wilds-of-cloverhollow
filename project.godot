@@ -51,6 +51,7 @@ StickerManager="*res://game/autoload/StickerManager.gd"
 HomeCustomizationManager="*res://game/autoload/HomeCustomizationManager.gd"
 CostumeManager="*res://game/autoload/CostumeManager.gd"
 PetAccessoryManager="*res://game/autoload/PetAccessoryManager.gd"
+InputDebouncer="*res://game/autoload/InputDebouncer.gd"
 
 [internationalization]
 

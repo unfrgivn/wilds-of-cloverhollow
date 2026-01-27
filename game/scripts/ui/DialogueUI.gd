@@ -43,7 +43,7 @@ func _input(event: InputEvent) -> void:
 		return
 	
 	if _showing_choices:
-		# Navigate choices with up/down
+		# Navigate choices with up/down (navigation doesn't need debounce, just actions)
 		if event.is_action_pressed("ui_up"):
 			_select_choice(_selected_choice - 1)
 			get_viewport().set_input_as_handled()
@@ -51,12 +51,14 @@ func _input(event: InputEvent) -> void:
 			_select_choice(_selected_choice + 1)
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
-			_confirm_choice()
+			if InputDebouncer.try_act("dialogue_choice"):
+				_confirm_choice()
 			get_viewport().set_input_as_handled()
 	else:
 		# Dismiss dialogue on interact key or ui_accept
 		if event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
-			DialogueManager.hide_dialogue()
+			if InputDebouncer.try_act("dialogue_dismiss"):
+				DialogueManager.hide_dialogue()
 			get_viewport().set_input_as_handled()
 
 func show_text(text: String) -> void:

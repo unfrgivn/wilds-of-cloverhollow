@@ -1,0 +1,41 @@
+{
+  "id": "input_spam_smoke",
+  "description": "Test input spam protection across UI systems",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "max_frames": 300,
+  "actions": [
+    {"type": "log", "message": "=== Testing input spam protection ==="},
+    {"type": "wait_frames", "count": 30},
+    
+    {"type": "log", "message": "Move to sign and interact..."},
+    {"type": "move", "direction": "up", "frames": 30},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "count": 30},
+    
+    {"type": "log", "message": "Spam interact key rapidly (should be debounced)..."},
+    {"type": "press", "action": "interact"},
+    {"type": "press", "action": "interact"},
+    {"type": "press", "action": "interact"},
+    {"type": "press", "action": "interact"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "count": 60},
+    
+    {"type": "log", "message": "Open pause menu..."},
+    {"type": "press", "action": "pause"},
+    {"type": "wait_frames", "count": 20},
+    
+    {"type": "log", "message": "Spam accept key (should be debounced)..."},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "press", "action": "ui_accept"},
+    {"type": "wait_frames", "count": 30},
+    
+    {"type": "log", "message": "Spam cancel key (should be debounced)..."},
+    {"type": "press", "action": "ui_cancel"},
+    {"type": "press", "action": "ui_cancel"},
+    {"type": "wait_frames", "count": 30},
+    
+    {"type": "log", "message": "=== Input spam test complete ==="},
+    {"type": "capture", "label": "input_spam_test"}
+  ]
+}

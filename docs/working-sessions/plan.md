@@ -2182,7 +2182,7 @@ Unlockable art viewer.
 
 ---
 
-## Milestone 179 — Sound test  **Owner:** Audio + UI Systems
+## Milestone 179 — Sound test  **Status:** ✅ Completed (2026-01-26)  **Owner:** Audio + UI Systems
 ### Objective
 Music/SFX player.
 

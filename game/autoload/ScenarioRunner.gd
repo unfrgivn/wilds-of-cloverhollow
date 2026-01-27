@@ -645,6 +645,27 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Sound test actions
+    if t == "open_sound_test":
+        var sound_test_scene := preload("res://game/scenes/ui/SoundTestUI.tscn")
+        var sound_test_ui := sound_test_scene.instantiate()
+        get_tree().root.add_child(sound_test_ui)
+        sound_test_ui.show_sound_test()
+        _trace["events"].append({"type": "open_sound_test", "frame": _frame})
+        print("[Scenario] open_sound_test")
+        _action_index += 1
+        return
+
+    if t == "close_sound_test":
+        var sound_test_nodes := get_tree().get_nodes_in_group("sound_test_ui")
+        for node in sound_test_nodes:
+            node.queue_free()
+        get_tree().paused = false
+        _trace["events"].append({"type": "close_sound_test", "frame": _frame})
+        print("[Scenario] close_sound_test")
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

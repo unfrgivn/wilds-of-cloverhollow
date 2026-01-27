@@ -771,6 +771,15 @@ This file is the single source of truth. If code changes behavior, update this f
 - Convention docs: `docs/voice-acting-conventions.md`.
 - Note: Stub - no actual voice files included. Prepared for future VO recording.
 
+### 3.55 Sound test UI
+- SoundTestUI (CanvasLayer): jukebox for playing music and sound effects.
+- Music tab: lists all music tracks with play buttons.
+- SFX tab: lists all sound effects with play buttons.
+- Now Playing display shows currently playing track.
+- Opens via scenario action or debug menu.
+- Scenario actions: `open_sound_test`, `close_sound_test`.
+- Scenario: `sound_test_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

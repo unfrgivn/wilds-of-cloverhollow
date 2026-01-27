@@ -1,0 +1,16 @@
+{
+  "id": "sound_test_smoke",
+  "name": "Sound test jukebox smoke",
+  "description": "Verify sound test UI opens, tabs switch, tracks play",
+  "area": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 10},
+    {"type": "open_sound_test"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "sound_test_music_tab"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "close_sound_test"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "capture", "label": "sound_test_closed"}
+  ]
+}

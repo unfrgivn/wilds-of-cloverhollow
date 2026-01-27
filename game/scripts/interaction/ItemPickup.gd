@@ -25,7 +25,11 @@ func interact() -> void:
 	if pickup_type == "tool":
 		InventoryManager.acquire_tool(pickup_id)
 	elif pickup_type == "item":
-		InventoryManager.add_item(pickup_id, pickup_count)
+		var added: bool = InventoryManager.add_item(pickup_id, pickup_count)
+		if not added:
+			# Inventory full - don't consume the pickup
+			DialogueManager.show_dialogue("You can't carry any more of that!")
+			return
 	
 	_collected = true
 	pickup_collected.emit(pickup_id)

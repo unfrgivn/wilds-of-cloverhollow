@@ -2210,7 +2210,7 @@ End-of-game credits.
 
 ---
 
-## Milestone 181 — Edge case: Inventory full  **Owner:** QA Automation
+## Milestone 181 — Edge case: Inventory full  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Handle full inventory.
 

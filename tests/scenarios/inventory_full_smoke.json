@@ -1,0 +1,36 @@
+{
+  "id": "inventory_full_smoke",
+  "description": "Test inventory capacity limits and full notification",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "max_frames": 300,
+  "actions": [
+    {"type": "log", "message": "=== Testing inventory capacity ==="},
+    {"type": "wait_frames", "count": 30},
+    
+    {"type": "log", "message": "Check initial capacity..."},
+    {"type": "check_inventory_capacity"},
+    
+    {"type": "log", "message": "Fill inventory to capacity..."},
+    {"type": "fill_inventory", "count": 20},
+    {"type": "check_inventory_capacity"},
+    
+    {"type": "log", "message": "Try adding item when full..."},
+    {"type": "add_inventory_item", "item_id": "overflow_item", "count": 1},
+    {"type": "wait_frames", "count": 60},
+    
+    {"type": "log", "message": "Verify overflow item was rejected..."},
+    {"type": "check_inventory", "item_id": "overflow_item"},
+    
+    {"type": "log", "message": "Test stack limits..."},
+    {"type": "add_inventory_item", "item_id": "test_item_0", "count": 50},
+    {"type": "check_inventory", "item_id": "test_item_0"},
+    
+    {"type": "log", "message": "Try to exceed stack limit..."},
+    {"type": "add_inventory_item", "item_id": "test_item_0", "count": 100},
+    {"type": "wait_frames", "count": 60},
+    {"type": "check_inventory", "item_id": "test_item_0"},
+    
+    {"type": "log", "message": "=== Inventory full test complete ==="},
+    {"type": "capture", "label": "inventory_full_test"}
+  ]
+}

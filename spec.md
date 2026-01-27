@@ -106,6 +106,12 @@ This file is the single source of truth. If code changes behavior, update this f
   - Tools: lantern, journal, lasso, flute (acquired once, not consumable).
   - Items: consumables with quantity (potion, ether, etc.).
   - Story flags: named progression markers (e.g., "talked_to_teacher").
+- Inventory limits:
+  - MAX_ITEM_STACKS: 20 (maximum unique item types).
+  - MAX_STACK_SIZE: 99 (maximum quantity per item type).
+  - `add_item()` returns false if inventory is full, shows notification.
+  - `inventory_full` signal emitted when capacity exceeded.
+  - Helper methods: `has_inventory_space()`, `can_add_item(id, count)`, `get_item_space(id)`.
 - Tool checks: `has_tool(id)`, `acquire_tool(id)`.
 - Item checks: `has_item(id, count)`, `add_item(id, count)`, `remove_item(id, count)`.
 - Story flags: `has_story_flag(flag)`, `set_story_flag(flag, value)`, `get_story_flag(flag)`.

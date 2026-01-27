@@ -450,8 +450,8 @@ func _step_actions() -> void:
         var item_id := str(action.get("item_id", ""))
         var count: int = int(action.get("count", 1))
         if item_id != "":
-            InventoryManager.add_item(item_id, count)
-            _trace["events"].append({"type": "add_inventory_item", "frame": _frame, "item_id": item_id, "count": count})
+            var success: bool = InventoryManager.add_item(item_id, count)
+            _trace["events"].append({"type": "add_inventory_item", "frame": _frame, "item_id": item_id, "count": count, "success": success})
         _action_index += 1
         return
 
@@ -468,6 +468,24 @@ func _step_actions() -> void:
         var item_id := str(action.get("item_id", ""))
         var count: int = InventoryManager.get_item_count(item_id)
         _trace["events"].append({"type": "check_inventory", "frame": _frame, "item_id": item_id, "count": count})
+        _action_index += 1
+        return
+
+    if t == "check_inventory_capacity":
+        var unique_items: int = InventoryManager.get_unique_item_count()
+        var max_stacks: int = InventoryManager.MAX_ITEM_STACKS
+        var has_space: bool = InventoryManager.has_inventory_space()
+        _trace["events"].append({"type": "check_inventory_capacity", "frame": _frame, "unique_items": unique_items, "max_stacks": max_stacks, "has_space": has_space})
+        _action_index += 1
+        return
+
+    if t == "fill_inventory":
+        # Fill inventory with dummy items to test capacity limits
+        var fill_count: int = int(action.get("count", InventoryManager.MAX_ITEM_STACKS))
+        for i in range(fill_count):
+            var dummy_id := "test_item_%d" % i
+            InventoryManager.items[dummy_id] = 1  # Direct manipulation for testing
+        _trace["events"].append({"type": "fill_inventory", "frame": _frame, "fill_count": fill_count, "total_items": InventoryManager.items.size()})
         _action_index += 1
         return
 

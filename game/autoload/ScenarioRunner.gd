@@ -1331,6 +1331,62 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Costume/Outfit Actions ──────────────────────────────────────────────
+    if t == "unlock_outfit":
+        var outfit_id: String = action.get("outfit_id", "")
+        CostumeManager.unlock_outfit(outfit_id)
+        _trace["events"].append({"type": "unlock_outfit", "frame": _frame, "outfit_id": outfit_id})
+        print("[Scenario] unlock_outfit: %s" % outfit_id)
+        _action_index += 1
+        return
+
+    if t == "equip_outfit":
+        var outfit_id: String = action.get("outfit_id", "")
+        var success := CostumeManager.equip_outfit(outfit_id)
+        _trace["events"].append({"type": "equip_outfit", "frame": _frame, "outfit_id": outfit_id, "success": success})
+        print("[Scenario] equip_outfit: %s (success=%s)" % [outfit_id, success])
+        _action_index += 1
+        return
+
+    if t == "check_outfit_unlocked":
+        var outfit_id: String = action.get("outfit_id", "")
+        var is_unlocked := CostumeManager.is_outfit_unlocked(outfit_id)
+        _trace["events"].append({"type": "check_outfit_unlocked", "frame": _frame, "outfit_id": outfit_id, "unlocked": is_unlocked})
+        print("[Scenario] check_outfit_unlocked: %s = %s" % [outfit_id, is_unlocked])
+        _action_index += 1
+        return
+
+    if t == "check_equipped_outfit":
+        var equipped := CostumeManager.get_equipped_outfit()
+        _trace["events"].append({"type": "check_equipped_outfit", "frame": _frame, "equipped": equipped})
+        print("[Scenario] check_equipped_outfit: %s" % equipped)
+        _action_index += 1
+        return
+
+    if t == "check_outfits":
+        var unlocked := CostumeManager.get_unlocked_outfits()
+        var outfit_ids := []
+        for outfit in unlocked:
+            outfit_ids.append(outfit.get("id", ""))
+        _trace["events"].append({"type": "check_outfits", "frame": _frame, "unlocked_count": unlocked.size(), "outfit_ids": outfit_ids})
+        print("[Scenario] check_outfits: %d unlocked (%s)" % [unlocked.size(), ", ".join(outfit_ids)])
+        _action_index += 1
+        return
+
+    if t == "reset_outfits":
+        CostumeManager.reset_unlocks()
+        _trace["events"].append({"type": "reset_outfits", "frame": _frame})
+        print("[Scenario] reset_outfits")
+        _action_index += 1
+        return
+
+    if t == "check_outfit_conditions":
+        CostumeManager.check_unlock_conditions()
+        _trace["events"].append({"type": "check_outfit_conditions", "frame": _frame})
+        print("[Scenario] check_outfit_conditions")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

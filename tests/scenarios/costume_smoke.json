@@ -1,0 +1,62 @@
+{
+    "id": "costume_smoke",
+    "name": "Costume System Smoke Test",
+    "description": "Verifies outfit data loading, unlock/equip flow, and sprite path updates",
+    "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "count": 5},
+        
+        {"type": "log", "message": "=== Costume System Smoke Test ==="},
+        
+        {"type": "log", "message": "--- Checking default unlocked outfits ---"},
+        {"type": "check_outfits"},
+        
+        {"type": "log", "message": "--- Verify default outfit is equipped ---"},
+        {"type": "check_equipped_outfit"},
+        
+        {"type": "log", "message": "--- Check if casual outfit is unlocked (default) ---"},
+        {"type": "check_outfit_unlocked", "outfit_id": "casual"},
+        
+        {"type": "log", "message": "--- Check if explorer outfit is locked (conditional) ---"},
+        {"type": "check_outfit_unlocked", "outfit_id": "explorer"},
+        
+        {"type": "log", "message": "--- Unlock explorer outfit ---"},
+        {"type": "unlock_outfit", "outfit_id": "explorer"},
+        
+        {"type": "log", "message": "--- Verify explorer is now unlocked ---"},
+        {"type": "check_outfit_unlocked", "outfit_id": "explorer"},
+        
+        {"type": "log", "message": "--- Equip casual outfit ---"},
+        {"type": "equip_outfit", "outfit_id": "casual"},
+        
+        {"type": "log", "message": "--- Verify casual is equipped ---"},
+        {"type": "check_equipped_outfit"},
+        
+        {"type": "log", "message": "--- Equip explorer outfit ---"},
+        {"type": "equip_outfit", "outfit_id": "explorer"},
+        
+        {"type": "log", "message": "--- Verify explorer is equipped ---"},
+        {"type": "check_equipped_outfit"},
+        
+        {"type": "log", "message": "--- Try to equip locked outfit (should fail) ---"},
+        {"type": "equip_outfit", "outfit_id": "hero_cape"},
+        
+        {"type": "log", "message": "--- Check unlock conditions ---"},
+        {"type": "check_outfit_conditions"},
+        
+        {"type": "log", "message": "--- Final outfit state ---"},
+        {"type": "check_outfits"},
+        
+        {"type": "log", "message": "--- Reset outfits to default state ---"},
+        {"type": "reset_outfits"},
+        
+        {"type": "log", "message": "--- Verify reset (only defaults unlocked) ---"},
+        {"type": "check_outfits"},
+        {"type": "check_equipped_outfit"},
+        
+        {"type": "wait_frames", "count": 5},
+        {"type": "capture", "label": "costume_smoke_complete"},
+        
+        {"type": "log", "message": "=== Costume Smoke Test Complete ==="}
+    ]
+}

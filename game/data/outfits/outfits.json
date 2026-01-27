@@ -1,0 +1,115 @@
+{
+    "outfits": [
+        {
+            "id": "default",
+            "name": "School Uniform",
+            "description": "Standard Cloverhollow Elementary uniform",
+            "category": "school",
+            "sprite_path": "res://game/assets/sprites/characters/player/default",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "casual",
+            "name": "Casual Clothes",
+            "description": "Comfy everyday wear",
+            "category": "casual",
+            "sprite_path": "res://game/assets/sprites/characters/player/casual",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "pajamas",
+            "name": "Cozy Pajamas",
+            "description": "Perfect for sleepovers",
+            "category": "casual",
+            "sprite_path": "res://game/assets/sprites/characters/player/pajamas",
+            "unlocked_by_default": true
+        },
+        {
+            "id": "explorer",
+            "name": "Explorer Outfit",
+            "description": "Ready for adventure!",
+            "category": "adventure",
+            "sprite_path": "res://game/assets/sprites/characters/player/explorer",
+            "unlock_condition": {
+                "type": "quest_completed",
+                "value": "find_clubhouse"
+            }
+        },
+        {
+            "id": "forest_ranger",
+            "name": "Forest Ranger",
+            "description": "Official forest patrol gear",
+            "category": "adventure",
+            "sprite_path": "res://game/assets/sprites/characters/player/forest_ranger",
+            "unlock_condition": {
+                "type": "story_flag",
+                "value": "forest_unlocked"
+            }
+        },
+        {
+            "id": "party_dress",
+            "name": "Party Dress",
+            "description": "Fancy outfit for special occasions",
+            "category": "formal",
+            "sprite_path": "res://game/assets/sprites/characters/player/party_dress",
+            "unlock_condition": {
+                "type": "affinity_level",
+                "value": "good_friend"
+            }
+        },
+        {
+            "id": "hero_cape",
+            "name": "Hero Cape",
+            "description": "A cape fit for a true hero",
+            "category": "special",
+            "sprite_path": "res://game/assets/sprites/characters/player/hero_cape",
+            "unlock_condition": {
+                "type": "story_flag",
+                "value": "villain_revealed"
+            }
+        },
+        {
+            "id": "fishing_vest",
+            "name": "Fishing Vest",
+            "description": "Pockets for all your tackle",
+            "category": "hobby",
+            "sprite_path": "res://game/assets/sprites/characters/player/fishing_vest",
+            "unlock_condition": {
+                "type": "collection",
+                "category": "fish",
+                "value": 5
+            }
+        },
+        {
+            "id": "bug_catcher",
+            "name": "Bug Catcher Outfit",
+            "description": "Safari-style bug hunting gear",
+            "category": "hobby",
+            "sprite_path": "res://game/assets/sprites/characters/player/bug_catcher",
+            "unlock_condition": {
+                "type": "collection",
+                "category": "bugs",
+                "value": 5
+            }
+        },
+        {
+            "id": "rainbow_hoodie",
+            "name": "Rainbow Hoodie",
+            "description": "Colorful and cozy",
+            "category": "casual",
+            "sprite_path": "res://game/assets/sprites/characters/player/rainbow_hoodie",
+            "unlock_condition": {
+                "type": "photos_taken",
+                "value": 10
+            }
+        }
+    ],
+    "categories": [
+        {"id": "school", "name": "School"},
+        {"id": "casual", "name": "Casual"},
+        {"id": "adventure", "name": "Adventure"},
+        {"id": "formal", "name": "Formal"},
+        {"id": "special", "name": "Special"},
+        {"id": "hobby", "name": "Hobby"}
+    ]
+}

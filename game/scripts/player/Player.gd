@@ -7,12 +7,21 @@ var _current_interactable: Area2D = null
 ## All interactables currently in range
 var _interactables_in_range: Array[Area2D] = []
 
+## Current sprite base path (for costume system)
+var _sprite_base_path: String = "res://game/assets/sprites/characters/player/default"
+
 @onready var interaction_area: Area2D = $InteractionArea
+@onready var player_sprite: Sprite2D = get_node_or_null("Sprite2D")
 
 func _ready() -> void:
     if interaction_area:
         interaction_area.area_entered.connect(_on_area_entered)
         interaction_area.area_exited.connect(_on_area_exited)
+    
+    # Connect to costume changes
+    if CostumeManager:
+        CostumeManager.outfit_equipped.connect(_on_outfit_equipped)
+        _apply_equipped_outfit()
 
 func _physics_process(_delta: float) -> void:
     # Don't move while dialogue is showing
@@ -58,3 +67,32 @@ func _update_current_interactable() -> void:
                 closest_dist = d
                 closest = i
         _current_interactable = closest
+
+
+## Called when a new outfit is equipped
+func _on_outfit_equipped(outfit_id: String) -> void:
+    _apply_equipped_outfit()
+
+
+## Apply the currently equipped outfit's sprite
+func _apply_equipped_outfit() -> void:
+    _sprite_base_path = CostumeManager.get_equipped_sprite_path()
+    _update_sprite()
+
+
+## Update player sprite based on current outfit
+## Future: This will load appropriate sprite frames based on direction/animation
+func _update_sprite() -> void:
+    if not player_sprite:
+        return
+    
+    # Placeholder: Try to load a preview/idle sprite from the costume path
+    var texture_path := _sprite_base_path + "/idle.png"
+    if ResourceLoader.exists(texture_path):
+        player_sprite.texture = load(texture_path)
+    # If no sprite exists, keep existing texture (placeholder)
+
+
+## Get current sprite base path (for external systems)
+func get_sprite_base_path() -> String:
+    return _sprite_base_path

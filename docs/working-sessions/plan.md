@@ -1918,7 +1918,7 @@ Decorate hero's room.
 
 ---
 
-## Milestone 157 — Costume/outfit system  **Owner:** Character Systems + Art Pipeline
+## Milestone 157 — Costume/outfit system  **Owner:** Character Systems + Art Pipeline  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Alternate character appearances.
 

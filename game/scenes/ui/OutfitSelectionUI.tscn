@@ -1,0 +1,93 @@
+[gd_scene load_steps=2 format=3 uid="uid://dwfk3m9ntyrb8"]
+
+[ext_resource type="Script" path="res://game/scripts/ui/OutfitSelectionUI.gd" id="1_outfit_ui"]
+
+[node name="OutfitSelectionUI" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_outfit_ui")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 30.0
+offset_right = -40.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Outfits"
+horizontal_alignment = 1
+
+[node name="CategoryContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OutfitGrid" type="GridContainer" parent="Panel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+
+[node name="VSeparator" type="VSeparator" parent="Panel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+
+[node name="DetailsPanel" type="VBoxContainer" parent="Panel/VBoxContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewContainer" type="CenterContainer" parent="Panel/VBoxContainer/ContentContainer/DetailsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewSprite" type="Sprite2D" parent="Panel/VBoxContainer/ContentContainer/DetailsPanel/PreviewContainer"]
+
+[node name="DetailsContainer" type="VBoxContainer" parent="Panel/VBoxContainer/ContentContainer/DetailsPanel"]
+layout_mode = 2
+
+[node name="OutfitNameLabel" type="Label" parent="Panel/VBoxContainer/ContentContainer/DetailsPanel/DetailsContainer"]
+layout_mode = 2
+text = "Outfit Name"
+horizontal_alignment = 1
+
+[node name="OutfitDescLabel" type="Label" parent="Panel/VBoxContainer/ContentContainer/DetailsPanel/DetailsContainer"]
+layout_mode = 2
+text = "Description goes here"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="EquipButton" type="Button" parent="Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Equip"
+
+[node name="CloseButton" type="Button" parent="Panel/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Close"

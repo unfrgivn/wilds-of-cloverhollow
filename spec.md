@@ -620,6 +620,29 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario: `home_customize_stub`.
 - Note: This is a stub - no visual room rendering or shopping. Prepared for future furniture shop feature.
 
+### 3.47 Costume/outfit system
+- CostumeManager autoload manages outfit unlocks and equipped costume state.
+- Outfit data stored in `game/data/outfits/outfits.json`.
+- Outfit data format:
+  - Each outfit has: id, name, description, category, sprite_path, unlocked_by_default (or unlock_condition).
+  - Categories: school, casual, adventure, formal, special, hobby.
+  - Unlock conditions: quest_completed, story_flag, collection (count), photos_taken, affinity_level.
+- 10 outfits: 3 default unlocked (default, casual, pajamas), 7 conditional.
+- OutfitSelectionUI (CanvasLayer): grid-based outfit selection interface.
+  - Category tabs for filtering outfits.
+  - Outfit grid showing unlocked items.
+  - Preview panel with name and description.
+  - Equip/Close buttons.
+  - Currently equipped outfit highlighted with checkmark.
+- Sprite swapping: Player.gd connects to CostumeManager.outfit_equipped signal.
+  - _sprite_base_path updated on outfit change.
+  - _update_sprite() loads appropriate sprite from costume path.
+- Persistence: unlocked outfits and equipped state saved to `user://costumes.json`.
+- API: `get_all_outfits()`, `get_outfit(id)`, `get_outfits_by_category(category)`, `is_outfit_unlocked(id)`, `unlock_outfit(id)`, `equip_outfit(id)`, `get_equipped_outfit()`, `get_equipped_sprite_path()`, `check_unlock_conditions()`, `reset_unlocks()`.
+- Signals: `outfit_unlocked(outfit_id, outfit_data)`, `outfit_equipped(outfit_id)`, `outfits_loaded`.
+- Scenario actions: `unlock_outfit`, `equip_outfit`, `check_outfit_unlocked`, `check_equipped_outfit`, `check_outfits`, `reset_outfits`, `check_outfit_conditions`.
+- Scenario: `costume_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

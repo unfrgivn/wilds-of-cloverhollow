@@ -6,6 +6,7 @@ signal settings_changed
 signal text_size_changed(new_size: int)
 signal locale_changed(locale: String)
 signal colorblind_mode_changed(mode: int)
+signal dyslexia_font_changed(enabled: bool)
 
 const SETTINGS_FILE := "user://settings.json"
 
@@ -19,6 +20,7 @@ var touch_control_size: int = 1  # 0=small, 1=medium, 2=large
 # Accessibility settings
 var text_size: int = 1  # 0=small, 1=medium, 2=large
 var colorblind_mode: int = 0  # 0=none, 1=deuteranopia, 2=protanopia
+var dyslexia_font_enabled: bool = false  # Use OpenDyslexic-style font
 
 # Localization
 var locale: String = "en"  # Language code
@@ -90,6 +92,17 @@ func set_colorblind_mode(mode: int) -> void:
 func get_colorblind_mode_name() -> String:
     return COLORBLIND_MODE_NAMES[colorblind_mode]
 
+func set_dyslexia_font(enabled: bool) -> void:
+    if dyslexia_font_enabled == enabled:
+        return
+    dyslexia_font_enabled = enabled
+    dyslexia_font_changed.emit(dyslexia_font_enabled)
+    settings_changed.emit()
+    print("[SettingsManager] Dyslexia font: %s" % ("On" if enabled else "Off"))
+
+func get_dyslexia_font_name() -> String:
+    return "On" if dyslexia_font_enabled else "Off"
+
 func _apply_volume(bus_name: String, value: float) -> void:
     var bus_index := AudioServer.get_bus_index(bus_name)
     if bus_index >= 0:
@@ -109,6 +122,7 @@ func save_settings() -> void:
         "touch_control_size": touch_control_size,
         "text_size": text_size,
         "colorblind_mode": colorblind_mode,
+        "dyslexia_font_enabled": dyslexia_font_enabled,
         "locale": locale,
     }
     
@@ -145,6 +159,7 @@ func load_settings() -> void:
     touch_control_size = data.get("touch_control_size", 1)
     text_size = data.get("text_size", 1)
     colorblind_mode = data.get("colorblind_mode", 0)
+    dyslexia_font_enabled = data.get("dyslexia_font_enabled", false)
     locale = data.get("locale", "en")
     
     # Apply loaded settings
@@ -160,6 +175,7 @@ func get_save_data() -> Dictionary:
         "touch_control_size": touch_control_size,
         "text_size": text_size,
         "colorblind_mode": colorblind_mode,
+        "dyslexia_font_enabled": dyslexia_font_enabled,
         "locale": locale,
     }
 
@@ -169,6 +185,7 @@ func load_save_data(data: Dictionary) -> void:
     touch_control_size = data.get("touch_control_size", 1)
     text_size = data.get("text_size", 1)
     colorblind_mode = data.get("colorblind_mode", 0)
+    dyslexia_font_enabled = data.get("dyslexia_font_enabled", false)
     locale = data.get("locale", "en")
     _apply_volume(MUSIC_BUS, music_volume)
     _apply_volume(SFX_BUS, sfx_volume)

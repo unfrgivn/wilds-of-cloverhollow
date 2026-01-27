@@ -814,6 +814,15 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_colorblind_mode`, `check_colorblind_mode`.
 - Scenario: `colorblind_render`.
 
+### 3.59 Accessibility: Dyslexia-friendly font
+- SettingsManager stores dyslexia_font_enabled boolean setting.
+- Signal: `dyslexia_font_changed(enabled)` emitted on toggle.
+- SettingsUI provides On/Off toggle for dyslexia font option.
+- API: `set_dyslexia_font(enabled)`, `get_dyslexia_font_name()`.
+- Font setting stored in user://settings.json and persisted across sessions.
+- Scenario actions: `set_dyslexia_font`, `check_dyslexia_font`.
+- Scenario: `dyslexia_font_render`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

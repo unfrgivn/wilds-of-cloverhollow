@@ -1,0 +1,28 @@
+{
+  "id": "dyslexia_font_render",
+  "name": "Dyslexia font toggle test",
+  "description": "Verify dyslexia-friendly font toggle works in settings",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "check_dyslexia_font"},
+    {"type": "capture", "label": "dyslexia_font_off"},
+    {"type": "set_dyslexia_font", "enabled": true},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "check_dyslexia_font"},
+    {"type": "pause_game"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "capture", "label": "dyslexia_font_on_menu"},
+    {"type": "unpause_game"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "move", "direction": "down", "frames": 10},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 20},
+    {"type": "capture", "label": "dyslexia_font_on_dialogue"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 10},
+    {"type": "set_dyslexia_font", "enabled": false},
+    {"type": "check_dyslexia_font"},
+    {"type": "capture", "label": "dyslexia_font_reset"}
+  ]
+}

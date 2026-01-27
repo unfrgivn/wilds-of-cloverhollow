@@ -737,6 +737,22 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Dyslexia font actions
+    if t == "set_dyslexia_font":
+        var enabled: bool = action.get("enabled", false)
+        SettingsManager.set_dyslexia_font(enabled)
+        _trace["events"].append({"type": "set_dyslexia_font", "frame": _frame, "enabled": enabled})
+        print("[Scenario] set_dyslexia_font: %s" % enabled)
+        _action_index += 1
+        return
+
+    if t == "check_dyslexia_font":
+        var enabled: bool = SettingsManager.dyslexia_font_enabled
+        _trace["events"].append({"type": "check_dyslexia_font", "frame": _frame, "enabled": enabled})
+        print("[Scenario] check_dyslexia_font: %s" % enabled)
+        _action_index += 1
+        return
+
     if t == "open_settings":
         var settings_scene := preload("res://game/scenes/ui/SettingsUI.tscn")
         var settings_ui := settings_scene.instantiate()

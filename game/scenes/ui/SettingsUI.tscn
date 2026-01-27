@@ -131,6 +131,20 @@ layout_mode = 2
 text = "None"
 horizontal_alignment = 2
 
+[node name="DyslexiaRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
+layout_mode = 2
+
+[node name="DyslexiaRowLabel" type="Label" parent="Panel/OptionsContainer/DyslexiaRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Dyslexia Font"
+
+[node name="DyslexiaLabel" type="Label" parent="Panel/OptionsContainer/DyslexiaRow"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "Off"
+horizontal_alignment = 2
+
 [node name="LanguageRow" type="HBoxContainer" parent="Panel/OptionsContainer"]
 layout_mode = 2
 

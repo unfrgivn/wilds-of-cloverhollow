@@ -2075,7 +2075,7 @@ Alternative palettes.
 
 ---
 
-## Milestone 170 — Dyslexia-friendly font option  **Owner:** UI Systems
+## Milestone 170 — Dyslexia-friendly font option  **Status:** ✅ Completed (2026-01-26)  **Owner:** UI Systems
 ### Objective
 Alternative font.
 

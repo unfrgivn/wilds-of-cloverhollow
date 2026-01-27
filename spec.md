@@ -166,7 +166,11 @@ This file is the single source of truth. If code changes behavior, update this f
 
 ### 3.13 Opening cutscene
 - GameIntroController (Main.tscn script) orchestrates game start sequence.
-- Sequence: TitleScreen → IntroNarration → Hero Bedroom (wake up).
+- Sequence: SplashScreen → TitleScreen → IntroNarration → Pet Selection → Hero Bedroom (wake up).
+- SplashScreen: Studio logo and legal text with fade transitions.
+  - Displays "Clover Studios" logo and copyright/legal text.
+  - Auto-advances after 3 seconds or skip on tap/interact after 1 second.
+  - Scenario: `splash_render`.
 - TitleScreen: Game title with Start button, fade transitions.
 - IntroNarration: 6-line story text crawl with typewriter effect.
   - Press interact/accept to skip typing or advance.

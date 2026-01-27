@@ -1,0 +1,12 @@
+{
+  "description": "Render test for splash screen with logo and legal text",
+  "actions": [
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "splash_visible"},
+    {"type": "wait_frames", "frames": 60},
+    {"type": "capture", "label": "skip_hint_visible"},
+    {"type": "press", "action": "interact"},
+    {"type": "wait_frames", "frames": 30},
+    {"type": "capture", "label": "after_skip"}
+  ]
+}

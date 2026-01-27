@@ -1,21 +1,35 @@
 extends Node
 ## GameIntroController - Manages the game intro sequence
-## Title Screen → Intro Narration → Pet Selection → Hero Bedroom
+## Splash Screen → Title Screen → Intro Narration → Pet Selection → Hero Bedroom
 
-enum IntroState { TITLE, NARRATION, PET_SELECTION, GAME }
+enum IntroState { SPLASH, TITLE, NARRATION, PET_SELECTION, GAME }
 
+const SPLASH_SCREEN_SCENE := preload("res://game/scenes/ui/SplashScreen.tscn")
 const TITLE_SCREEN_SCENE := preload("res://game/scenes/ui/TitleScreen.tscn")
 const INTRO_NARRATION_SCENE := preload("res://game/scenes/ui/IntroNarration.tscn")
 const PET_SELECTION_SCENE := preload("res://game/scenes/ui/PetSelectionUI.tscn")
 const HERO_BEDROOM_PATH := "res://game/scenes/areas/Area_HeroHouseUpper.tscn"
 
-var current_state: IntroState = IntroState.TITLE
+var current_state: IntroState = IntroState.SPLASH
+var splash_screen: CanvasLayer
 var title_screen: CanvasLayer
 var intro_narration: CanvasLayer
 var pet_selection: CanvasLayer
 
 
 func _ready() -> void:
+    _show_splash_screen()
+
+
+func _show_splash_screen() -> void:
+    current_state = IntroState.SPLASH
+    splash_screen = SPLASH_SCREEN_SCENE.instantiate()
+    splash_screen.splash_finished.connect(_on_splash_finished)
+    add_child(splash_screen)
+
+
+func _on_splash_finished() -> void:
+    splash_screen.queue_free()
     _show_title_screen()
 
 

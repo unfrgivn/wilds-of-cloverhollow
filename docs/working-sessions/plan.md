@@ -2269,7 +2269,7 @@ Handle app backgrounding mid-transition.
 
 ---
 
-## Milestone 186 — Splash screen + legal  **Owner:** UI Systems
+## Milestone 186 — Splash screen + legal  **Owner:** UI Systems  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Startup screens.
 

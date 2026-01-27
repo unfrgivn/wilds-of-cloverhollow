@@ -2015,7 +2015,7 @@ List all game content.
 
 ---
 
-## Milestone 165 — Changelog automation  **Owner:** QA Automation
+## Milestone 165 — Changelog automation  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Auto-generated changelog.
 

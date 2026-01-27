@@ -1,0 +1,24 @@
+{
+    "scenario_id": "trading_stub",
+    "description": "Test trading offer/accept flow",
+    "start_scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+    "actions": [
+        {"type": "wait_frames", "frames": 5},
+        {"type": "start_trade"},
+        {"type": "check_trade_state"},
+        {"type": "add_to_trade", "item_id": "potion", "count": 2},
+        {"type": "add_to_trade", "item_id": "ether", "count": 1},
+        {"type": "check_trade_state"},
+        {"type": "set_their_offer", "items": [{"item_id": "antidote", "count": 3}]},
+        {"type": "check_trade_state"},
+        {"type": "confirm_trade"},
+        {"type": "check_trade_state"},
+        {"type": "simulate_their_confirm"},
+        {"type": "wait_frames", "frames": 5},
+        {"type": "start_trade"},
+        {"type": "add_to_trade", "item_id": "potion", "count": 1},
+        {"type": "cancel_trade"},
+        {"type": "check_trade_state"},
+        {"type": "wait_frames", "frames": 5}
+    ]
+}

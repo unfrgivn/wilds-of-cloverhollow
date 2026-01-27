@@ -1882,7 +1882,7 @@ Replayable daily content.
 
 ---
 
-## Milestone 154 — Trading system stub  **Owner:** Gameplay + UI Systems
+## Milestone 154 — Trading system stub  **Owner:** Gameplay + UI Systems **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Item trading between players.
 

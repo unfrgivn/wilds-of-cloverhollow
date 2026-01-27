@@ -1185,6 +1185,61 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # Trading actions
+    if t == "start_trade":
+        var success: bool = TradingManager.start_trade()
+        _trace["events"].append({"type": "start_trade", "frame": _frame, "success": success})
+        print("[Scenario] start_trade: success=%s" % success)
+        _action_index += 1
+        return
+
+    if t == "add_to_trade":
+        var item_id: String = str(action.get("item_id", ""))
+        var count: int = int(action.get("count", 1))
+        var success: bool = TradingManager.add_to_offer(item_id, count)
+        _trace["events"].append({"type": "add_to_trade", "frame": _frame, "item_id": item_id, "count": count, "success": success})
+        print("[Scenario] add_to_trade: %s x%d success=%s" % [item_id, count, success])
+        _action_index += 1
+        return
+
+    if t == "set_their_offer":
+        var items: Array = action.get("items", [])
+        TradingManager.set_their_offer(items)
+        _trace["events"].append({"type": "set_their_offer", "frame": _frame, "item_count": items.size()})
+        print("[Scenario] set_their_offer: %d items" % items.size())
+        _action_index += 1
+        return
+
+    if t == "confirm_trade":
+        var success: bool = TradingManager.confirm_trade()
+        _trace["events"].append({"type": "confirm_trade", "frame": _frame, "success": success})
+        print("[Scenario] confirm_trade: success=%s" % success)
+        _action_index += 1
+        return
+
+    if t == "simulate_their_confirm":
+        TradingManager.simulate_their_confirm()
+        _trace["events"].append({"type": "simulate_their_confirm", "frame": _frame})
+        print("[Scenario] simulate_their_confirm")
+        _action_index += 1
+        return
+
+    if t == "cancel_trade":
+        TradingManager.cancel_trade()
+        _trace["events"].append({"type": "cancel_trade", "frame": _frame})
+        print("[Scenario] cancel_trade")
+        _action_index += 1
+        return
+
+    if t == "check_trade_state":
+        var state: int = TradingManager.get_trade_state()
+        var my_offer: Array = TradingManager.get_my_offer()
+        var their_offer: Array = TradingManager.get_their_offer()
+        _trace["events"].append({"type": "check_trade_state", "frame": _frame, "state": state, "my_offer_count": my_offer.size(), "their_offer_count": their_offer.size()})
+        print("[Scenario] check_trade_state: state=%d my_offer=%d their_offer=%d" % [state, my_offer.size(), their_offer.size()])
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

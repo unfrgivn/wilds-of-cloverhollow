@@ -558,6 +558,23 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `set_challenge_day`, `clear_challenge_day`, `check_active_challenges`, `record_challenge_progress`, `check_challenge_completed`, `force_refresh_challenges`.
 - Scenario: `daily_challenge_stub`.
 
+### 3.44 Trading system (stub)
+- TradingManager autoload handles item trading (placeholder for future multiplayer).
+- Trade states: NONE, PENDING, OFFER_PHASE, CONFIRM_PHASE, COMPLETED, CANCELLED.
+- Trade flow:
+  - `start_trade()`: Begins new trade session.
+  - `add_to_offer(item_id, count)`: Adds item to my offer.
+  - `remove_from_offer(item_id, count)`: Removes item from offer.
+  - `set_their_offer(items)`: Stub to simulate other player's offer.
+  - `confirm_trade()`: Confirms my side of trade.
+  - `simulate_their_confirm()`: Stub to simulate other player confirming.
+  - `cancel_trade()`: Cancels current trade.
+- Signals: `trade_started`, `trade_cancelled`, `trade_completed(my_items, their_items)`, `offer_updated(player_id, items)`, `trade_confirmed(player_id)`.
+- TradingUI (CanvasLayer): trade interface showing both offers with add/confirm/cancel buttons.
+- Scenario actions: `start_trade`, `add_to_trade`, `set_their_offer`, `confirm_trade`, `simulate_their_confirm`, `cancel_trade`, `check_trade_state`.
+- Scenario: `trading_stub`.
+- Note: This is a stub - no actual item transfer or networking. Prepared for future multiplayer feature.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

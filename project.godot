@@ -52,6 +52,7 @@ HomeCustomizationManager="*res://game/autoload/HomeCustomizationManager.gd"
 CostumeManager="*res://game/autoload/CostumeManager.gd"
 PetAccessoryManager="*res://game/autoload/PetAccessoryManager.gd"
 InputDebouncer="*res://game/autoload/InputDebouncer.gd"
+MemoryManager="*res://game/autoload/MemoryManager.gd"
 
 [internationalization]
 

@@ -2243,7 +2243,7 @@ Handle mashing buttons.
 
 ---
 
-## Milestone 184 — Edge case: Low memory warning  **Owner:** QA Automation
+## Milestone 184 — Edge case: Low memory warning  **Owner:** QA Automation  **Status:** ✅ Completed (2026-01-26)
 ### Objective
 Handle memory pressure.
 

@@ -690,6 +690,17 @@ This file is the single source of truth. If code changes behavior, update this f
 - Scenario actions: `unlock_pet_accessory`, `equip_pet_accessory`, `unequip_pet_accessory`, `check_pet_accessory_unlocked`, `check_equipped_pet_accessories`, `check_pet_accessories`, `reset_pet_accessories`.
 - Scenario: `pet_accessory_smoke`.
 
+### 3.49 Memory management
+- MemoryManager autoload monitors memory usage and handles low memory situations.
+- Memory pressure levels: NORMAL, WARNING (256MB), CRITICAL (384MB).
+- Periodic monitoring: checks memory every 5 seconds via Timer.
+- Freeable cache system: systems can register cleanup callables via `register_freeable_cache(callable)`.
+- On CRITICAL pressure: automatically calls `free_non_essential_resources()` to clear registered caches.
+- API: `get_memory_usage_mb()`, `get_pressure_name()`, `simulate_memory_pressure(level)`, `reset_pressure()`.
+- Signals: `memory_warning_received`, `memory_freed(amount)`.
+- Scenario actions: `simulate_memory_pressure`, `check_memory`, `reset_memory_pressure`.
+- Scenario: `low_memory_smoke`.
+
 ## 4. Party and characters
 - Party size: 4 total (main character + 2 additional + pet).
 - Overworld: party followers are allowed; equal size and consistent spacing.

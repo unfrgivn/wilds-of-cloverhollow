@@ -1,0 +1,14 @@
+{
+  "description": "Test low memory handling and resource freeing",
+  "actions": [
+    {"type": "check_memory"},
+    {"type": "simulate_memory_pressure", "level": "warning"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_memory"},
+    {"type": "simulate_memory_pressure", "level": "critical"},
+    {"type": "wait_frames", "frames": 5},
+    {"type": "check_memory"},
+    {"type": "reset_memory_pressure"},
+    {"type": "check_memory"}
+  ]
+}

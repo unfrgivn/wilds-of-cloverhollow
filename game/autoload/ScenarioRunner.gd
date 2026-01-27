@@ -1523,6 +1523,35 @@ func _step_actions() -> void:
         _action_index += 1
         return
 
+    # ── Memory Management Actions ──────────────────────────────────────────
+    if t == "simulate_memory_pressure":
+        var level_str: String = str(action.get("level", "warning"))
+        var level: int = MemoryManager.MemoryPressure.WARNING
+        if level_str == "critical":
+            level = MemoryManager.MemoryPressure.CRITICAL
+        elif level_str == "normal":
+            level = MemoryManager.MemoryPressure.NORMAL
+        MemoryManager.simulate_memory_pressure(level)
+        _trace["events"].append({"type": "simulate_memory_pressure", "frame": _frame, "level": level_str})
+        print("[Scenario] simulate_memory_pressure: %s" % level_str)
+        _action_index += 1
+        return
+
+    if t == "check_memory":
+        var usage_mb: int = MemoryManager.get_memory_usage_mb()
+        var pressure: String = MemoryManager.get_pressure_name()
+        _trace["events"].append({"type": "check_memory", "frame": _frame, "usage_mb": usage_mb, "pressure": pressure})
+        print("[Scenario] check_memory: %d MB, pressure=%s" % [usage_mb, pressure])
+        _action_index += 1
+        return
+
+    if t == "reset_memory_pressure":
+        MemoryManager.reset_pressure()
+        _trace["events"].append({"type": "reset_memory_pressure", "frame": _frame})
+        print("[Scenario] reset_memory_pressure")
+        _action_index += 1
+        return
+
     # Unknown action types are currently no-ops.
     _trace["events"].append({"type": "noop", "frame": _frame, "action": t})
     _action_index += 1

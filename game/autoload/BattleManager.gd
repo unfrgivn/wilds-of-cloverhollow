@@ -16,6 +16,12 @@ var _return_spawn_id: String = "default"
 ## Whether a battle is currently active
 var in_battle: bool = false
 
+
+## Check if currently in battle
+func is_in_battle() -> bool:
+	return in_battle
+
+
 func _ready() -> void:
 	pass
 

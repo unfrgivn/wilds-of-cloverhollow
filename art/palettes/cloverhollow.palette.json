@@ -1,7 +1,73 @@
 {
   "name": "cloverhollow",
-  "version": 1,
-  "colors": [
+  "version": 2,
+  "description": "Warm, cozy town palette based on concept art - sunny pastels, warm woods, soft greens",
+  "colors": {
+    "awning_stripes": {
+      "yellow": "#f5d868",
+      "orange": "#e8a84a",
+      "blue_light": "#a8d4e8",
+      "blue": "#6aafcc",
+      "green_light": "#a8e8a8",
+      "green": "#6acc6a",
+      "red": "#d97070",
+      "white": "#f8f4ea"
+    },
+    "brown_sugar": "#B07248",
+    "flowers": {
+      "pink": "#e8a8c4",
+      "purple": "#b088cc",
+      "yellow": "#f5e078",
+      "red": "#d97070",
+      "white": "#f8f4ea"
+    },
+    "foliage": {
+      "highlight": "#8fd978",
+      "light": "#6bc45a",
+      "mid": "#4aa84a",
+      "dark": "#2f6b2f",
+      "shadow": "#1b3f1b"
+    },
+    "forest_green": "#2A4B3A",
+    "ground": {
+      "cream_light": "#f5ead6",
+      "cream": "#e8dcc4",
+      "cream_shadow": "#d4c8a8",
+      "cobble_light": "#c9bda5",
+      "cobble": "#b0a48c",
+      "cobble_shadow": "#8a7f6a"
+    },
+    "metal": {
+      "iron_light": "#6a6a6a",
+      "iron": "#4a4a4a",
+      "iron_dark": "#2a2a2a"
+    },
+    "outlines": {
+      "brown": "#3d3228",
+      "maroon": "#5a3838",
+      "teal": "#2a4a4a"
+    },
+    "roof_terracotta": {
+      "highlight": "#d98860",
+      "mid": "#c46b4a",
+      "shadow": "#8f4a35"
+    },
+    "sunny_meadow": "#99C04A",
+    "water": {
+      "highlight": "#8fd9e8",
+      "light": "#5aa8d7",
+      "mid": "#3a8abd",
+      "dark": "#2a6a8a"
+    },
+    "wood": {
+      "highlight": "#c9a870",
+      "light": "#b58a4d",
+      "mid": "#8a6b3f",
+      "dark": "#5a4a3a",
+      "shadow": "#3d3228"
+    }
+  },
+  "legacy_flat": [
     "#1b3f1b",
     "#2f6b2f",
     "#4aa84a",

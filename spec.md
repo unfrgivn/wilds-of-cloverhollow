@@ -21,7 +21,7 @@ This file is the single source of truth. If code changes behavior, update this f
 - Platform: iOS native.
 - Orientation: landscape only.
 - Development: macOS only.
-- Engine: Godot 4.x.
+- Engine: Godot 4.5.1 for local development and CI verification.
 - Automation constraint: agents must not rely on OS-level window control to playtest; testing must run through an in-game Scenario Runner and deterministic artifacts.
 
 ## 3. Presentation
@@ -40,6 +40,8 @@ This file is the single source of truth. If code changes behavior, update this f
 
 ### 3.3 Movement (locked)
 - Free analog movement.
+- Development keyboard controls use arrows or WASD. Normal startup keeps the
+  splash/title flow; `--skip-intro` is an explicit development shortcut to town.
 - Facing/animation: **8-direction** (N, NE, E, SE, S, SW, W, NW).
   - All character and NPC sprites must include 8-direction variants.
   - Diagonal movement uses diagonal sprites (not nearest-cardinal fallback).
@@ -68,6 +70,8 @@ This file is the single source of truth. If code changes behavior, update this f
 - AreaTransition zones (Area2D) trigger scene changes when the player enters.
 - Transitions specify target area path and target spawn marker ID.
 - Player is repositioned to the spawn marker after area load.
+- Scene replacement is deferred so requests from scene `_ready` methods or
+  physics callbacks do not remove nodes while the tree is busy.
 - Transition recovery: SceneRouter tracks transition state and recovers if app is backgrounded mid-transition.
   - Signals: `transition_interrupted(from_area, to_area)`, `transition_recovered(area_path)`.
   - On app resume during transition, SceneRouter completes the pending transition.
@@ -1220,6 +1224,38 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 ## 8. Automation and agentic workflows (non-negotiable)
 
 ### 8.1 Scenario Runner
+- `assert_scene` compares the current scene path to the expected `scene`.
+- `assert_player_spawn` compares the player to a named `marker_id` with a
+  one-pixel tolerance. Failed assertions add an error and fail the scenario.
+- `assert_intro_state` verifies the requested splash/title state and visible UI.
+- `assert_save_state` verifies the previous save/load/delete operation succeeded
+  and that slot existence matches `exists`.
+- Optional scenario `starting_spawn` selects the starting marker when `scene`
+  is an area. Explicit area scenarios suppress intro routing; `Main.tscn`
+  scenarios retain the normal intro.
+- Asynchronous actions run single-flight. Movement holds input through the
+  requested physics ticks, presses use actual `InputEventAction` events, and
+  rendered captures wait for frame drawing to complete.
+- Test wrappers launch Godot with `--fixed-fps 60` and private per-run `HOME`,
+  `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, and `XDG_CACHE_HOME`. Read-only manifests
+  check that personal Godot user data did not change. This is macOS/Linux test
+  isolation, not a host security sandbox.
+- Scenario RNG is seeded in the first autoload's `_init`, including seed zero.
+  Traces record `isolation_root`, actual `user_data_dir`, `fixed_fps`,
+  `physics_ticks_per_second`, `engine_version`, and `renderer` (display-server
+  name). Movement events include intermediate player positions.
+- CLI scenario wrappers require Bun for shared TypeScript evidence validation.
+  They retain logs and reject nonzero engine exits, runtime/script/parse errors,
+  invalid traces, error/noop events, and failed assertion events.
+- Trace `errors` lists runner failures and `passed` reports action-execution
+  status. Missing scenarios, invalid action lists, unknown actions, and unfinished
+  action execution are failures. Logs and error events must also be checked;
+  the trace flag alone is not gameplay acceptance.
+- Headless capture actions record `capture_skipped` with reason `headless`.
+  Rendered wrappers check capture file presence and PNG signatures; visual
+  review remains required. Explicit capture directories must be empty.
+- Scenario processes have a 120-second watchdog. `readiness_harness_smoke`
+  proves scripted action/capture execution only, not boundary or route correctness.
 - The game must support a Scenario Runner that can:
   - load a scene/area
   - inject deterministic inputs
@@ -1240,6 +1276,12 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 ### 8.2 Deterministic artifacts
 - Every milestone must add/update at least one Scenario Runner scenario.
 - UI/visual changes must add/update a rendered capture scenario producing deterministic frames for diffing.
+- Readiness repeatability is verified with fresh isolated runs, matching
+  intermediate movement events, and identical rendered captures on the same
+  local engine/display setup. `tests/test_repeatability.sh` is headless by
+  default; `--rendered` also compares the rendered pair.
+- This is not universal determinism: wall-clock managers, unexamined private
+  RNG sources, and cross-platform renderer differences remain outside that proof.
 
 ### 8.3 Guardrails
 - Spec drift guardrail (`tools/spec/check_spec_drift.py`):

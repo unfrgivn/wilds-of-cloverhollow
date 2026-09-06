@@ -1,0 +1,10 @@
+{
+  "scenario_id": "intro_boot_smoke",
+  "description": "Verify a normal no-flag boot remains on the splash/title intro flow.",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "assert_scene", "scene": "res://game/scenes/Main.tscn"},
+    {"type": "assert_intro_state", "state": "SPLASH"},
+    {"type": "capture", "label": "intro_boot"}
+  ]
+}

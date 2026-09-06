@@ -17,60 +17,69 @@ var intro_narration: CanvasLayer
 var pet_selection: CanvasLayer
 
 
+## Developer-only opt-in to skip intro and spawn directly in town.
+const SKIP_INTRO_FOR_TESTING := false
+const TEST_SPAWN_AREA := "res://game/scenes/areas/Area_TownCenter.tscn"
+
 func _ready() -> void:
-    _show_splash_screen()
+	if ScenarioRunner.has_explicit_starting_scene:
+		return
+	if SKIP_INTRO_FOR_TESTING or "--skip-intro" in OS.get_cmdline_user_args():
+		SceneRouter.go_to_area(TEST_SPAWN_AREA, "default")
+		return
+	_show_splash_screen()
 
 
 func _show_splash_screen() -> void:
-    current_state = IntroState.SPLASH
-    splash_screen = SPLASH_SCREEN_SCENE.instantiate()
-    splash_screen.splash_finished.connect(_on_splash_finished)
-    add_child(splash_screen)
+	current_state = IntroState.SPLASH
+	splash_screen = SPLASH_SCREEN_SCENE.instantiate()
+	splash_screen.splash_finished.connect(_on_splash_finished)
+	add_child(splash_screen)
 
 
 func _on_splash_finished() -> void:
-    splash_screen.queue_free()
-    _show_title_screen()
+	splash_screen.queue_free()
+	_show_title_screen()
 
 
 func _show_title_screen() -> void:
-    current_state = IntroState.TITLE
-    title_screen = TITLE_SCREEN_SCENE.instantiate()
-    title_screen.start_pressed.connect(_on_title_start_pressed)
-    add_child(title_screen)
+	current_state = IntroState.TITLE
+	title_screen = TITLE_SCREEN_SCENE.instantiate()
+	title_screen.start_pressed.connect(_on_title_start_pressed)
+	add_child(title_screen)
 
 
 func _on_title_start_pressed() -> void:
-    title_screen.queue_free()
-    _show_intro_narration()
+	title_screen.queue_free()
+	_show_intro_narration()
 
 
 func _show_intro_narration() -> void:
-    current_state = IntroState.NARRATION
-    intro_narration = INTRO_NARRATION_SCENE.instantiate()
-    intro_narration.narration_finished.connect(_on_narration_finished)
-    add_child(intro_narration)
+	current_state = IntroState.NARRATION
+	intro_narration = INTRO_NARRATION_SCENE.instantiate()
+	intro_narration.narration_finished.connect(_on_narration_finished)
+	add_child(intro_narration)
 
 
 func _on_narration_finished() -> void:
-    intro_narration.queue_free()
-    _show_pet_selection()
+	intro_narration.queue_free()
+	_show_pet_selection()
 
 
 func _show_pet_selection() -> void:
-    current_state = IntroState.PET_SELECTION
-    pet_selection = PET_SELECTION_SCENE.instantiate()
-    pet_selection.pet_selected.connect(_on_pet_selected)
-    add_child(pet_selection)
-    pet_selection.show_selection()
+	current_state = IntroState.PET_SELECTION
+	pet_selection = PET_SELECTION_SCENE.instantiate()
+	pet_selection.pet_selected.connect(_on_pet_selected)
+	add_child(pet_selection)
+	pet_selection.show_selection()
 
 
 func _on_pet_selected(_pet_id: String) -> void:
-    pet_selection.queue_free()
-    _start_game()
+	pet_selection.queue_free()
+	_start_game()
 
 
 func _start_game() -> void:
-    current_state = IntroState.GAME
-    # Load hero bedroom using SceneRouter
-    SceneRouter.change_area(HERO_BEDROOM_PATH, "bed")
+	current_state = IntroState.GAME
+	# Load hero bedroom using SceneRouter
+	SceneRouter.change_area(HERO_BEDROOM_PATH, "bed")

@@ -62,10 +62,14 @@ func go_to_area(area_path: String, spawn_marker_id: String = "default") -> void:
     _pending_spawn_id = spawn_marker_id
     _transition_in_progress = true
     _transition_target_area = area_path
-    
+
     area_changing.emit(old_area, area_path)
-    
-    # Change the scene
+
+    # Defer scene replacement so calls from _ready and physics callbacks do not
+    # remove nodes while the scene tree is busy.
+    call_deferred("_perform_area_change", area_path)
+
+func _perform_area_change(area_path: String) -> void:
     var result := get_tree().change_scene_to_file(area_path)
     if result != OK:
         push_error("SceneRouter: Failed to load area '%s'" % area_path)
@@ -76,12 +80,14 @@ func go_to_area(area_path: String, spawn_marker_id: String = "default") -> void:
     current_area = area_path
     # Spawning happens in _on_area_ready after scene loads
     
-    # Advance time on area transition (simplified day/night progression)
-    DayNightManager.advance_time()
-    
     # Wait for scene to be ready, then place player
     await get_tree().process_frame
     await get_tree().process_frame
+
+    # Advance time on area transition AFTER scene is ready
+    # (NPCs may query current_scene when time changes)
+    DayNightManager.advance_time()
+
     _place_player_at_spawn()
     
     # Transition complete
@@ -153,3 +159,7 @@ func simulate_interrupt() -> void:
         _transition_target_area = current_area
         _pending_spawn_id = "default"
         _check_transition_state()
+
+## Alias for go_to_area (backwards compatibility)
+func change_area(area_path: String, spawn_marker_id: String = "default") -> void:
+    go_to_area(area_path, spawn_marker_id)

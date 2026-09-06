@@ -1,8 +1,12 @@
 # Scenario Runner Guide
 
-The Scenario Runner enables deterministic, automated game testing without OS-level window control. Scenarios are JSON files that script game actions and capture artifacts for verification.
+The Scenario Runner enables scripted, automated game testing without OS-level window control. Scenarios are JSON files that script game actions and capture artifacts for verification.
 
 ## Quick Start
+
+The scenario wrappers require Godot, Bun (for evidence validation), and the
+existing shell/Python tools. Run from the repository root. Local validation was
+tested with Godot 4.5.1 and Bun 1.3.10. CI provisions the same Bun version.
 
 ```bash
 # Run a scenario
@@ -11,6 +15,46 @@ The Scenario Runner enables deterministic, automated game testing without OS-lev
 # Run with visual capture
 ./tools/ci/run-scenario-rendered.sh town_center_render
 ```
+
+## Evidence and failure handling
+
+The wrappers retain `run.log` and `trace.json` under unique directories:
+
+- `captures/scenarios/<scenario_id>/run.XXXXXX`
+- `captures/rendered/<scenario_id>/run.XXXXXX`
+
+An explicit `CAPTURE_DIR` must be empty to avoid accepting stale evidence.
+Godot scenario execution has a 120-second watchdog. Nonzero engine exits,
+engine/script/parse errors, missing or invalid traces, trace error/noop events,
+failed assertion events, and top-level `passed` other than `true` fail the
+wrapper. Rendered capture events require a corresponding nonempty PNG with a
+PNG signature. That file check does not replace decoding and inspecting the
+image.
+
+The runner adds `errors` and `passed` fields to its trace. It records missing or
+invalid scenarios, unknown actions, unfinished action lists, and failed assertion
+events as failures. Traces also record `user_data_dir` and `isolation_root`.
+Existing actions may still record an error event without changing top-level
+`passed`, which is why callers must inspect both. Direct Godot process exit
+alone is not the acceptance gate.
+
+In headless mode, `capture` adds a `capture_skipped` event with reason
+`headless`, rather than trying to read the dummy renderer. Use the rendered
+wrapper to produce pixels. `readiness_harness_smoke` exercises scripted actions
+and capture from an explicit town scene; it does not assert collision bounds,
+player coordinates, or gameplay transitions.
+
+### Isolation and repeatability scope
+
+Scenario wrappers launch Godot with an isolated `HOME`, `XDG_DATA_HOME`,
+`XDG_CONFIG_HOME`, and `XDG_CACHE_HOME` under each capture directory, and pass
+`--fixed-fps 60` before Godot's `--` user arguments. They record and validate
+the actual Godot user-data path. Save/load round trips therefore cannot touch
+personal `user://` data. The repeatability test compares intermediate movement
+positions and rendered capture bytes across two fresh runs with the same seed.
+
+This is scoped evidence, not a universal determinism claim. Wall-clock-driven
+managers and unexamined random sources remain outside the guarantee.
 
 ## CLI Arguments
 

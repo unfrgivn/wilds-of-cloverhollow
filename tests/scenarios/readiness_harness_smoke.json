@@ -1,0 +1,16 @@
+{
+  "scenario_id": "readiness_harness_smoke",
+  "description": "Exercise scripted Scenario Runner actions and headless capture from an explicit player scene.",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "starting_spawn": "from_hero_house",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "assert_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn"},
+    {"type": "assert_player_spawn", "marker_id": "from_hero_house"},
+    {"type": "move", "direction": "left", "frames": 10},
+    {"type": "move", "direction": "up", "frames": 10},
+    {"type": "move", "direction": "right", "frames": 10},
+    {"type": "move", "direction": "down", "frames": 10},
+    {"type": "capture", "label": "action_execution"}
+  ]
+}

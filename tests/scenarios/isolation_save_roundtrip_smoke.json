@@ -1,0 +1,15 @@
+{
+  "scenario_id": "isolation_save_roundtrip_smoke",
+  "description": "Verify save/load/delete completes inside the isolated Godot user directory.",
+  "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+  "actions": [
+    {"type": "wait_frames", "frames": 5},
+    {"type": "save_game", "slot": 0},
+    {"type": "assert_save_state", "slot": 0, "exists": true},
+    {"type": "load_game", "slot": 0},
+    {"type": "assert_save_state", "slot": 0, "exists": true},
+    {"type": "delete_save", "slot": 0},
+    {"type": "assert_save_state", "slot": 0, "exists": false},
+    {"type": "assert_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn"}
+  ]
+}

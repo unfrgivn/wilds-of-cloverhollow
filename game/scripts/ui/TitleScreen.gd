@@ -17,6 +17,7 @@ func _ready() -> void:
 func _fade_in() -> void:
     var tween := create_tween()
     tween.tween_property(fade_rect, "color:a", 0.0, 1.0)
+    tween.tween_callback(start_button.grab_focus)
 
 
 func _on_start_pressed() -> void:

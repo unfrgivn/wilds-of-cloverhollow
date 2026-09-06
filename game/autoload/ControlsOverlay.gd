@@ -16,11 +16,11 @@ const CONTROLS: Array[Dictionary] = [
 
 var _is_active: bool = false
 
-@onready var panel: Panel = $Panel
-@onready var dimmer: ColorRect = $Dimmer
-@onready var title_label: Label = $Panel/TitleLabel
-@onready var controls_container: VBoxContainer = $Panel/ControlsContainer
-@onready var close_hint: Label = $Panel/CloseHint
+var panel: Panel
+var dimmer: ColorRect
+var title_label: Label
+var controls_container: VBoxContainer
+var close_hint: Label
 
 func _ready() -> void:
     layer = 120  # Above most UI

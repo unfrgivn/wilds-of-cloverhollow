@@ -12,7 +12,17 @@ echo "[smoke] Using GODOT_BIN=$GODOT_BIN"
   exit 1
 }
 
-# Run the project briefly. If you have a headless-compatible flow, replace with --headless.
-"$GODOT_BIN" --path . --quit-after 1 >/dev/null 2>&1 || true
+# Run the project briefly and keep the log, so startup failures cannot be hidden.
+log_file="${SMOKE_LOG:-captures/smoke.log}"
+mkdir -p "$(dirname "$log_file")"
+smoke_root="$(cd "$(dirname "$log_file")" && pwd)/smoke-runtime"
+if ! GODOT_ISOLATION_ROOT="$smoke_root" ./tools/ci/run-godot-isolated.sh --headless --quit-after 1 2>&1 | tee "$log_file"; then
+  echo "[smoke] ERROR: Godot exited unsuccessfully" >&2
+  exit 1
+fi
+if grep -q '^ERROR:' "$log_file"; then
+  echo "[smoke] ERROR: Godot reported runtime errors, see $log_file" >&2
+  exit 1
+fi
 
 echo "[smoke] OK"

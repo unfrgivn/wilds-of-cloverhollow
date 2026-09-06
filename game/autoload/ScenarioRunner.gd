@@ -7,6 +7,9 @@ extends Node
 var scenario_id: String = ""
 var capture_dir: String = ""
 var seed: int = 0
+var isolation_root: String = ""
+var has_explicit_starting_scene: bool = false
+var starting_spawn_id: String = "default"
 var quit_after_frames: int = 0
 
 var _frame: int = 0
@@ -16,14 +19,19 @@ var _wait_remaining: int = 0
 var _move_remaining: int = 0
 var _move_direction: String = ""
 var _trace: Dictionary = {}
+var _errors: Array[String] = []
+var _action_in_flight: bool = false
+var _last_save_operation_success: bool = false
+
+func _init() -> void:
+	_parse_args(OS.get_cmdline_user_args())
+	if scenario_id != "":
+		seed(seed)
 
 func _ready() -> void:
 	# Ensure scenario runner continues to process even when game is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	var args := OS.get_cmdline_user_args()
-	_parse_args(args)
-
 	if scenario_id == "":
 		set_process(false)
 		return
@@ -32,9 +40,18 @@ func _ready() -> void:
 		"scenario_id": scenario_id,
 		"seed": seed,
 		"capture_dir": capture_dir,
+		"isolation_root": isolation_root,
+		"user_data_dir": OS.get_user_data_dir(),
+		"fixed_fps": 60,
+		"physics_ticks_per_second": Engine.physics_ticks_per_second,
+		"engine_version": Engine.get_version_info(),
+		"renderer": DisplayServer.get_name(),
 		"started_at_unix": Time.get_unix_time_from_system(),
 		"events": []
 	}
+	var isolation_prefix := isolation_root.trim_suffix("/") + "/"
+	if isolation_root != "" and not OS.get_user_data_dir().begins_with(isolation_prefix):
+		_record_error("User data directory escaped isolation root: %s" % OS.get_user_data_dir())
 
 	_load_scenario_file_if_exists()
 
@@ -48,7 +65,8 @@ func _process(_delta: float) -> void:
 
 	_step_actions()
 
-	if quit_after_frames > 0 and _frame >= quit_after_frames:
+	if quit_after_frames > 0 and _frame >= quit_after_frames and not _action_in_flight:
+		_finish_trace()
 		_trace["ended_at_unix"] = Time.get_unix_time_from_system()
 		_write_trace()
 		get_tree().quit()
@@ -71,6 +89,10 @@ func _parse_args(args: PackedStringArray) -> void:
 			capture_dir = args[i + 1]
 			i += 2
 			continue
+		if a == "--isolation_root" and i + 1 < args.size():
+			isolation_root = args[i + 1]
+			i += 2
+			continue
 		if a == "--quit_after_frames" and i + 1 < args.size():
 			quit_after_frames = int(args[i + 1])
 			i += 2
@@ -80,7 +102,7 @@ func _parse_args(args: PackedStringArray) -> void:
 func _load_scenario_file_if_exists() -> void:
 	var path := "res://tests/scenarios/%s.json" % scenario_id
 	if not FileAccess.file_exists(path):
-		_trace["events"].append({"type": "info", "frame": _frame, "msg": "No scenario file found; running idle loop."})
+		_record_error("Scenario file not found: %s" % path)
 		return
 
 	var f := FileAccess.open(path, FileAccess.READ)
@@ -89,30 +111,38 @@ func _load_scenario_file_if_exists() -> void:
 
 	var parsed = JSON.parse_string(txt)
 	if typeof(parsed) != TYPE_DICTIONARY:
-		_trace["events"].append({"type": "error", "frame": _frame, "msg": "Scenario JSON invalid."})
+		_record_error("Scenario JSON invalid.")
 		return
 
 	if parsed.has("actions") and typeof(parsed["actions"]) == TYPE_ARRAY:
 		_actions = parsed["actions"]
 		_trace["events"].append({"type": "info", "frame": _frame, "msg": "Loaded actions: %d" % _actions.size()})
+	else:
+		_record_error("Scenario actions must be an array.")
 
 	# Load custom scene if specified
 	if parsed.has("scene") and typeof(parsed["scene"]) == TYPE_STRING:
 		var scene_path: String = parsed["scene"]
 		if scene_path != "":
+			has_explicit_starting_scene = scene_path != "res://game/scenes/Main.tscn"
+			if parsed.has("starting_spawn") and typeof(parsed["starting_spawn"]) == TYPE_STRING:
+				starting_spawn_id = parsed["starting_spawn"]
 			_trace["events"].append({"type": "info", "frame": _frame, "msg": "Loading scene: %s" % scene_path})
 			# Use call_deferred to avoid issues with loading during _ready
 			call_deferred("_load_starting_scene", scene_path)
 
 func _load_starting_scene(scene_path: String) -> void:
-	var result := get_tree().change_scene_to_file(scene_path)
-	if result == OK:
-		SceneRouter.current_area = scene_path
-		_trace["events"].append({"type": "scene_loaded", "frame": _frame, "scene": scene_path})
-	else:
-		_trace["events"].append({"type": "error", "frame": _frame, "msg": "Failed to load scene: %s" % scene_path})
+	SceneRouter.go_to_area(scene_path, starting_spawn_id)
+	_trace["events"].append({"type": "scene_requested", "frame": _frame, "scene": scene_path})
 
 func _step_actions() -> void:
+	if _action_in_flight:
+		return
+	_action_in_flight = true
+	await _execute_action()
+	_action_in_flight = false
+
+func _execute_action() -> void:
 	if _action_index >= _actions.size():
 		return
 
@@ -132,6 +162,51 @@ func _step_actions() -> void:
 		_action_index += 1
 		return
 
+	if t == "assert_scene":
+		var expected_scene := str(action.get("scene", ""))
+		var actual_scene := ""
+		if get_tree().current_scene != null:
+			actual_scene = get_tree().current_scene.scene_file_path
+		var scene_matches := actual_scene == expected_scene
+		_trace["events"].append({"type": "assert_scene", "frame": _frame, "scene": expected_scene, "actual": actual_scene, "passed": scene_matches})
+		if not scene_matches:
+			_record_error("Scene assertion failed: expected %s, got %s" % [expected_scene, actual_scene])
+		_action_index += 1
+		return
+
+	if t == "assert_intro_state":
+		var expected_state := str(action.get("state", "SPLASH"))
+		var actual_state := ""
+		var child_visible := false
+		var intro := get_tree().current_scene
+		if intro != null and intro.has_method("get"):
+			var state_value = intro.get("current_state")
+			var states := ["SPLASH", "TITLE", "NARRATION", "PET_SELECTION", "GAME"]
+			if typeof(state_value) == TYPE_INT and int(state_value) >= 0 and int(state_value) < states.size():
+				actual_state = states[int(state_value)]
+			var child_name := "splash_screen" if expected_state == "SPLASH" else "title_screen"
+			var child = intro.get(child_name)
+			child_visible = child != null and child is CanvasLayer and child.visible
+		var passed := actual_state == expected_state and child_visible
+		_trace["events"].append({"type": "assert_intro_state", "frame": _frame, "expected": expected_state, "actual": actual_state, "child_visible": child_visible, "passed": passed})
+		if not passed:
+			_record_error("Intro state assertion failed: expected %s, got %s" % [expected_state, actual_state])
+		_action_index += 1
+		return
+
+	if t == "assert_player_spawn":
+		var marker_id := str(action.get("marker_id", "default"))
+		var player: Node2D = _find_player_for_assertion()
+		var marker: Node2D = _find_spawn_marker_for_assertion(marker_id)
+		var spawn_matches: bool = player != null and marker != null and player.global_position.distance_to(marker.global_position) <= 1.0
+		var player_position: Vector2 = player.global_position if player != null else Vector2.ZERO
+		var marker_position: Vector2 = marker.global_position if marker != null else Vector2.ZERO
+		_trace["events"].append({"type": "assert_player_spawn", "frame": _frame, "marker_id": marker_id, "player": player_position, "marker": marker_position, "passed": spawn_matches})
+		if not spawn_matches:
+			_record_error("Player spawn assertion failed for marker: %s" % marker_id)
+		_action_index += 1
+		return
+
 	if t == "wait_frames":
 		if _wait_remaining == 0:
 			_wait_remaining = int(action.get("frames", 1))
@@ -146,32 +221,44 @@ func _step_actions() -> void:
 	if t == "capture":
 		var label := str(action.get("label", "capture"))
 		_trace["events"].append({"type": "capture", "frame": _frame, "label": label})
+		if DisplayServer.get_name() == "headless":
+			await get_tree().process_frame
+		else:
+			await RenderingServer.frame_post_draw
 		_try_capture_png(label)
 		_action_index += 1
 		return
 
 	if t == "move":
-		if _move_remaining == 0:
-			_move_remaining = int(action.get("frames", 1))
-			_move_direction = str(action.get("direction", ""))
-			_start_move_input(_move_direction)
-			_trace["events"].append({"type": "move_start", "frame": _frame, "direction": _move_direction, "frames": _move_remaining})
-		_move_remaining -= 1
-		if _move_remaining <= 0:
-			_stop_move_input()
-			_trace["events"].append({"type": "move_end", "frame": _frame})
-			_move_remaining = 0
-			_move_direction = ""
-			_action_index += 1
+		_move_remaining = int(action.get("frames", 1))
+		_move_direction = str(action.get("direction", ""))
+		_start_move_input(_move_direction)
+		_trace["events"].append({"type": "move_start", "frame": _frame, "direction": _move_direction, "frames": _move_remaining})
+		while _move_remaining > 0:
+			await get_tree().physics_frame
+			await get_tree().process_frame
+			_move_remaining -= 1
+		_stop_move_input()
+		var moved_player := _find_player_for_assertion()
+		var moved_position: Vector2 = moved_player.global_position if moved_player != null else Vector2.ZERO
+		_trace["events"].append({"type": "move_end", "frame": _frame, "position": moved_position})
+		_move_remaining = 0
+		_move_direction = ""
+		_action_index += 1
 		return
 
 	if t == "press":
 		var input_action := str(action.get("action", ""))
 		if input_action != "":
-			Input.action_press(input_action)
-			# Release next frame to simulate a tap
-			await get_tree().process_frame
-			Input.action_release(input_action)
+			var press_event := InputEventAction.new()
+			press_event.action = input_action
+			press_event.pressed = true
+			Input.parse_input_event(press_event)
+			await get_tree().physics_frame
+			var release_event := InputEventAction.new()
+			release_event.action = input_action
+			release_event.pressed = false
+			Input.parse_input_event(release_event)
 			_trace["events"].append({"type": "press", "frame": _frame, "action": input_action})
 		_action_index += 1
 		return
@@ -179,6 +266,7 @@ func _step_actions() -> void:
 	if t == "save_game":
 		var slot: int = int(action.get("slot", 0))
 		var result: bool = SaveManager.save_game(slot)
+		_last_save_operation_success = result
 		_trace["events"].append({"type": "save_game", "frame": _frame, "slot": slot, "success": result})
 		print("[Scenario] save_game slot=%d success=%s" % [slot, result])
 		_action_index += 1
@@ -187,6 +275,7 @@ func _step_actions() -> void:
 	if t == "load_game":
 		var slot: int = int(action.get("slot", 0))
 		var result: bool = await SaveManager.load_game(slot)
+		_last_save_operation_success = result
 		_trace["events"].append({"type": "load_game", "frame": _frame, "slot": slot, "success": result})
 		print("[Scenario] load_game slot=%d success=%s" % [slot, result])
 		_action_index += 1
@@ -195,8 +284,20 @@ func _step_actions() -> void:
 	if t == "delete_save":
 		var slot: int = int(action.get("slot", 0))
 		var result: bool = SaveManager.delete_save(slot)
+		_last_save_operation_success = result
 		_trace["events"].append({"type": "delete_save", "frame": _frame, "slot": slot, "success": result})
 		print("[Scenario] delete_save slot=%d success=%s" % [slot, result])
+		_action_index += 1
+		return
+
+	if t == "assert_save_state":
+		var slot: int = int(action.get("slot", 0))
+		var expected_exists: bool = bool(action.get("exists", false))
+		var actual_exists: bool = SaveManager.has_save(slot)
+		var passed: bool = _last_save_operation_success and actual_exists == expected_exists
+		_trace["events"].append({"type": "assert_save_state", "frame": _frame, "slot": slot, "expected_exists": expected_exists, "actual_exists": actual_exists, "operation_success": _last_save_operation_success, "passed": passed})
+		if not passed:
+			_record_error("Save state assertion failed for slot: %d" % slot)
 		_action_index += 1
 		return
 
@@ -2183,12 +2284,14 @@ func _step_actions() -> void:
 		_action_index += 1
 		return
 
-	# Unknown action types are currently no-ops.
-	_trace["events"].append({"type": "noop", "frame": _frame, "action": t})
+	_record_error("Unknown action type: %s" % t)
 	_action_index += 1
 
 func _try_capture_png(label: String) -> void:
 	if capture_dir == "":
+		return
+	if DisplayServer.get_name() == "headless":
+		_trace["events"].append({"type": "capture_skipped", "frame": _frame, "label": label, "reason": "headless"})
 		return
 
 	var file_path := "%s/%04d_%s.png" % [capture_dir, _frame, label]
@@ -2201,6 +2304,17 @@ func _try_capture_png(label: String) -> void:
 	if img == null:
 		return
 	img.save_png(file_path)
+
+func _record_error(message: String) -> void:
+	_errors.append(message)
+	_trace["events"].append({"type": "error", "frame": _frame, "msg": message})
+
+func _finish_trace() -> void:
+	var incomplete := _action_index < _actions.size() or _wait_remaining > 0 or _move_remaining > 0
+	if incomplete:
+		_record_error("Scenario did not exhaust all actions before quit.")
+	_trace["errors"] = _errors.duplicate()
+	_trace["passed"] = _errors.is_empty()
 
 func _write_trace() -> void:
 	if capture_dir == "":
@@ -2229,3 +2343,24 @@ func _stop_move_input() -> void:
 	Input.action_release("ui_right")
 	Input.action_release("ui_up")
 	Input.action_release("ui_down")
+
+func _find_player_for_assertion() -> Node2D:
+	var root := get_tree().current_scene
+	if root == null:
+		return null
+	var player := root.find_child("Player", true, false)
+	if player is Node2D:
+		return player
+	var players := get_tree().get_nodes_in_group("player")
+	if players.size() > 0 and players[0] is Node2D:
+		return players[0]
+	return null
+
+func _find_spawn_marker_for_assertion(marker_id: String) -> Node2D:
+	for candidate in get_tree().get_nodes_in_group("spawn_marker"):
+		if candidate is Node2D:
+			if candidate.has_method("get_marker_id") and str(candidate.get_marker_id()) == marker_id:
+				return candidate
+			if candidate.name == marker_id:
+				return candidate
+	return null

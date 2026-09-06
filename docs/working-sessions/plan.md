@@ -2,6 +2,21 @@
 
 This file is the milestone source. `/next-milestone` selects work from here.
 
+## Active development sequence
+
+The September 6, 2026 request prioritizes autonomous local development before
+more gameplay and artwork. Select these milestones explicitly rather than
+falling through to the older iOS/TestFlight backlog:
+
+1. **M224:** clean startup, trustworthy tests, controlled scenario runs.
+2. **M227:** isolated evaluation and adoption of one current runtime MCP.
+3. **M225:** verified palette/asset tools and reviewed visual baselines.
+4. **M226:** a playable town-to-forest route with boundaries and progression checks.
+
+M227 research and M225 tool implementation may proceed independently while
+M224 is repaired. Their acceptance checks still require a green game baseline.
+Keep one commit per completed milestone and record evidence before advancing.
+
 Status convention:
 - Completed milestones include `**Status:** ✅ Completed (YYYY-MM-DD)` in the milestone header line.
 - Incomplete milestones have no status field.
@@ -1990,6 +2005,79 @@ Consistent code conventions.
 - Naming conventions.
 - Linter config.
 - Published in `docs/`.
+
+---
+
+## Milestone 224 — Reliable Godot startup and scenario execution  **Owner:** QA Automation + Godot Gameplay Engineer  **Status:** ✅ Completed (2026-09-06)
+### Objective
+Replace false-green verification with clean startup, isolated test state,
+repeatable input, and assertion-backed evidence for local development.
+
+### Acceptance criteria
+- Smoke and scenario failures propagate to callers; the test command runs real tests.
+- A readiness scenario produces a trace and a rendered capture under `captures/`.
+- Normal startup preserves the intro; development/scenario shortcuts are explicit.
+- Test runs use isolated user data and controlled timing with assertion-backed repeat-run evidence.
+- Required gates pass and their actual outcomes are recorded in the milestone report.
+- Existing unrelated working-tree changes are preserved.
+
+### Evidence
+- Mandatory gates and rendered repeatability passed independently.
+- See `docs/working-sessions/m224-readiness.md` for commands, assertions, artifacts, and remaining scope.
+
+---
+
+## Milestone 225 — Repair palette validation and establish visual baselines  **Owner:** Art Pipeline + QA Automation
+### Objective
+Make the art acceptance pipeline trustworthy before generating more production assets.
+
+### Acceptance criteria
+- Validation accepts nested palette categories and the biome/global palette union.
+- Fully transparent pixels do not fail color checks; stray visible colors do fail.
+- Validation uses each asset's declared dimensions, including non-16-multiple sprites.
+- Quantization writes an explicit output, preserves alpha, and fails on malformed palettes.
+- Asset recipes reference the actual global palette and do not suppress tool failures.
+- Unit tests cover palette parsing, transparency, dimensions, and invalid inputs.
+- Reviewed rendered baselines exist for overworld, dialogue, and battle with recorded engine/renderer settings.
+- CI and local verification use a documented compatible engine version.
+
+---
+
+## Milestone 226 — Verified town-to-forest playthrough  **Owner:** Godot Gameplay Engineer + QA Automation
+### Objective
+Prove a small connected route before extending autonomous iteration to all levels.
+
+### Acceptance criteria
+- A documented route covers town, park, forest entrance, and a return journey.
+- Scenarios move through actual transition triggers and assert destination scene and spawn.
+- Boundary tests cover all reachable map edges, blocked water/obstacles, and diagonal corners.
+- A progression gate is tested both before and after its requirement is satisfied.
+- Failure and recovery paths include a battle return or save/load checkpoint without overwriting personal saves.
+- Traces and rendered checkpoints demonstrate repeatable outcomes with a fixed seed.
+- Apply RNG seeds, use controlled simulation timing, and isolate `user://` state before asserting repeatability.
+- Remaining untested areas and routes are listed explicitly.
+- The route has readable native-resolution terrain/boundary art, validated against biome/global palettes.
+- Fae's existing eight-direction art is connected to movement and inspected in rendered captures.
+
+---
+
+## Milestone 227 — Isolated Godot agent environment  **Owner:** QA Automation + Godot Gameplay Engineer
+### Objective
+Evaluate and adopt a pinned current inspection integration without installing
+an addon into the main game checkout, with discoverable agent workflows.
+
+### Acceptance criteria
+- Confirm dependency/addon fit before installing a replacement; see `docs/testing/godot-mcp-research.md`.
+- Local skills and agent definitions have valid discovery metadata and follow the current spec.
+- Artwork and level-playtest workflows distinguish validated behavior from placeholders.
+- Record effective MCP connectivity, permissions, dependency audit, and engine version without exposing secrets.
+- Evaluate canonical `satelliteoflove/godot-mcp` 4.1.11 in an isolated project on Godot 4.5.1.
+- Verify OpenCode connection, read-only behavior, runtime state, input, deterministic stepping, and a screenshot.
+- General script execution and unrelated file/export mutation remain denied during the evaluation.
+- Verify startup, shutdown, crash recovery, and project-file preservation.
+- Record whether the addon can be excluded from production exports and how it interacts with Scenario Runner.
+- Evaluate `Erodenn/godot-mcp-runtime` only if the first candidate fails a required criterion or addon footprint is unacceptable.
+- Adopt at most one runtime bridge, or document why neither candidate passed.
 
 ---
 

@@ -1,0 +1,10 @@
+{
+  "scenario_id": "renderer_compatibility_smoke",
+  "description": "Rendered Town Center evidence under the explicit OpenGL compatibility renderer",
+  "actions": [
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn" },
+    { "type": "wait_frames", "frames": 2 },
+    { "type": "assert_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn" },
+    { "type": "capture", "label": "renderer_compatibility_town" }
+  ]
+}

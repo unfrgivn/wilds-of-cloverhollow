@@ -1364,6 +1364,16 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - Reviewed overworld, dialogue, and battle frames live in
   `baselines/visual/<scenario_id>`. Missing/extra/empty images, dimension
   differences, decoding/tool failures, and any pixel difference fail comparison.
+- Hosted Linux uses explicit `GODOT_RENDERING_METHOD=gl_compatibility` and a
+  separate `baselines/visual/linux-gl-compatibility/<scenario_id>` profile.
+  macOS Metal and Linux Compatibility captures are not interchangeable.
+- Artifact launchers validate optional `GODOT_RENDERING_METHOD` values
+  (`forward_plus`, `mobile`, `gl_compatibility`); unset preserves the engine
+  default. Traces record the actual `rendering_method` separately from the
+  display-server name. Invalid overrides fail before engine startup.
+- The visual suite renders all three scenarios before comparison, preserving
+  every failure while retaining complete diagnostic artifacts. Missing baselines
+  still fail, and no candidate is promoted automatically.
 - Baseline promotion requires matching successful scenario evidence and an
   explicit `--reviewed` flag after image review. It replaces the exact image set
   and records the source trace as `provenance.json`; CI never auto-promotes.

@@ -82,6 +82,22 @@ The CI workflow for visual regression:
 to the same rendered scenario wrapper used locally. Linux uses `xvfb-run` when
 available. Set `CAPTURE_DIR` to a fresh output root for each suite run.
 
+Hosted Linux visual CI sets `GODOT_RENDERING_METHOD=gl_compatibility` to avoid
+requiring Vulkan surface support. The isolated Godot wrapper accepts only
+`forward_plus`, `mobile`, or `gl_compatibility`; an invalid value fails before
+Godot starts. Local runs keep the default engine-selected renderer unless the
+override is explicitly set. Scenario traces record both the display driver and
+Godot's `RenderingServer.get_current_rendering_method()` result.
+
+The reviewed baseline profiles are platform-specific. Local macOS Metal runs
+compare against `baselines/visual/<scenario>`. Hosted Linux compatibility runs
+compare against `baselines/visual/linux-gl-compatibility/<scenario>`, and must
+not approve macOS OpenGL compatibility captures. The Linux profile is defined
+by platform Linux, Godot 4.5.1, and `gl_compatibility`; its baselines must be
+created only from reviewed Linux captures. The visual runner renders all three
+scenarios before running any comparisons, retains engine failures, aggregates
+comparison failures, and exits nonzero for any failure or missing baseline.
+
 The canonical baseline root is `baselines/visual`, not ignored
 `captures/golden`. Missing or empty baselines, missing or extra captures,
 dimension differences, invalid images, tool failures, and any changed pixel

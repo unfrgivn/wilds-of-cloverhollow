@@ -10,6 +10,8 @@ on:
 env:
   GODOT_VERSION: "4.5.1"
   GODOT_RELEASE: "stable"
+  GODOT_RENDERING_METHOD: "gl_compatibility"
+  BASELINE_DIR: "baselines/visual/linux-gl-compatibility"
 
 jobs:
   visual-diff:

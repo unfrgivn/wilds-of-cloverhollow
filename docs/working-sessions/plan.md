@@ -12,6 +12,7 @@ falling through to the older iOS/TestFlight backlog:
 2. **M227:** isolated evaluation and adoption of one current runtime MCP.
 3. **M225:** verified palette/asset tools and reviewed visual baselines.
 4. **M226:** a playable town-to-forest route with boundaries and progression checks.
+5. **M228:** explicit supported renderer selection for hosted visual checks.
 
 M227 research and M225 tool implementation may proceed independently while
 M224 is repaired. Their acceptance checks still require a green game baseline.
@@ -2539,3 +2540,21 @@ Document learnings.
 - What to improve.
 - Next project recommendations.
 - Published in `docs/`.
+
+---
+
+## Milestone 228 — Hosted visual renderer compatibility  **Owner:** QA Automation  **Status:** ✅ Completed (2026-09-06)
+### Objective
+Run the strict visual gate on the hosted runner without probing an unsupported Vulkan backend.
+
+### Acceptance criteria
+- Artifact launchers accept a validated, explicit rendering-method override without changing normal game defaults.
+- Hosted visual CI selects Compatibility explicitly; runtime errors are not filtered or ignored.
+- A renderer compatibility scenario emits a trace and native capture using the selected backend.
+- Exact comparisons are checked against reviewed baselines; any new profile requires explicit image review.
+- Mandatory local gates pass and hosted CI/visual results are recorded.
+
+### Evidence
+- Two hosted Linux runs produced matching, successfully validated captures for all three golden scenarios.
+- The Linux profile was reviewed and promoted explicitly; exact repeat comparisons and fourteen local tests passed.
+- See `docs/working-sessions/m228-hosted-visuals.md` for evaluation runs, artifacts, and profile limits.

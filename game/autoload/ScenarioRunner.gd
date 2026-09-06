@@ -61,6 +61,7 @@ func _ready() -> void:
 		"physics_ticks_per_second": Engine.physics_ticks_per_second,
 		"engine_version": Engine.get_version_info(),
 		"renderer": DisplayServer.get_name(),
+		"rendering_method": RenderingServer.get_current_rendering_method(),
 		"has_explicit_starting_scene": has_explicit_starting_scene,
 		"started_at_unix": Time.get_unix_time_from_system(),
 		"events": []

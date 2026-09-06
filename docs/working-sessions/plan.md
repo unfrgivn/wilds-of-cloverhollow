@@ -2061,7 +2061,7 @@ Prove a small connected route before extending autonomous iteration to all level
 
 ---
 
-## Milestone 227 — Isolated Godot agent environment  **Owner:** QA Automation + Godot Gameplay Engineer
+## Milestone 227 — Isolated Godot agent environment  **Owner:** QA Automation + Godot Gameplay Engineer  **Status:** ✅ Completed (2026-09-06)
 ### Objective
 Evaluate and adopt a pinned current inspection integration without installing
 an addon into the main game checkout, with discoverable agent workflows.
@@ -2078,6 +2078,11 @@ an addon into the main game checkout, with discoverable agent workflows.
 - Record whether the addon can be excluded from production exports and how it interacts with Scenario Runner.
 - Evaluate `Erodenn/godot-mcp-runtime` only if the first candidate fails a required criterion or addon footprint is unacceptable.
 - Adopt at most one runtime bridge, or document why neither candidate passed.
+
+### Evidence
+- Adopted pinned Satellite 4.1.11 for snapshot-only read inspection; production dependency audit has zero findings.
+- Native OpenCode calls, targeted park scene inspection, ownership tests, cleanup, and mandatory game regression gates passed.
+- See `docs/working-sessions/m227-inspector.md` and `docs/testing/godot-agent-environment.md`.
 
 ---
 

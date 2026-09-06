@@ -1291,6 +1291,42 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   - Full documentation: `docs/working-sessions/spec-drift-guardrail.md`.
 - Visual regression diffing is required for golden scenarios.
 
+### 8.4 Local agent tooling
+- Project-local OpenCode skills and agents carry discovery metadata and use
+  this spec rather than stale playbook assumptions for dimensions and facing.
+- Default milestone selection follows the plan's active development sequence.
+  Completing it does not implicitly authorize unrelated release/store work.
+- The old local Godot MCP snapshot remains quarantined. The `satellite` server
+  uses pinned `@satelliteoflove/godot-mcp` 4.1.11 from a locked local consumer
+  package, with lifecycle and exact Godot 4.5.1 compatibility checks.
+- Satellite is read-only. OpenCode allows only node/editor inspection, runtime
+  observation, project information, and documentation. Input, arbitrary script
+  execution, scene/node/resource mutation, and generic controls remain denied.
+- The editor addon is installed only into a physical, tool-owned temporary
+  snapshot with private import cache and user-data directories. The canonical
+  project and exports never contain the addon or its autoload. Source changes
+  require an explicit snapshot refresh; snapshot edits are never synced back.
+- `tools/agents/godot_agent_environment.py` provides snapshot, refresh, start,
+  status, and stop operations. An optional `start --scene res://game/...tscn`
+  selects the scene to inspect. Version/path/ownership checks fail closed.
+  Runtime acceptance remains with Scenario Runner inputs, assertions, traces,
+  and rendered captures; no OS-level input automation is required.
+- Optional image generation is not a prerequisite for development. Generated
+  images are source material, not automatically accepted runtime assets.
+- Art validation must distinguish transparent pixels from visible colors and
+  support the current nested biome palette plus shared global palette. Until
+  those checks are verified, do not treat legacy asset task success as approval.
+- A level is not verified by direct scene loading alone. Evidence must cover
+  movement, boundaries, transition/spawn behavior, return travel, and relevant
+  progression gates. Record untested routes explicitly.
+- Tooling findings and readiness evidence live in
+  `docs/testing/agent-tooling-audit.md`.
+- The sourced MCP shortlist and adoption criteria live in
+  `docs/testing/godot-mcp-research.md`. Optional runtime bridges are not an
+  exception to the no-OS-window-control constraint.
+- Setup commands and limits are in `docs/testing/godot-agent-environment.md`.
+  `agent_environment_smoke` verifies the canonical scene without the addon.
+
 ## 9. Repo conventions
 - Source art lives under `art/` and must be reproducible (recipes + palettes).
 - Runtime assets live under `game/assets/`.

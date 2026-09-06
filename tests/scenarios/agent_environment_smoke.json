@@ -1,0 +1,12 @@
+{
+  "scenario_id": "agent_environment_smoke",
+  "description": "Verify the canonical park scene independently of the optional snapshot MCP addon.",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "starting_spawn": "default",
+  "actions": [
+    {"type": "wait_frames", "frames": 8},
+    {"type": "assert_scene", "scene": "res://game/scenes/areas/Area_TownPark.tscn"},
+    {"type": "assert_player_spawn", "marker_id": "default"},
+    {"type": "capture", "label": "canonical_park"}
+  ]
+}

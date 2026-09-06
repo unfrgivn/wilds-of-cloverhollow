@@ -1,0 +1,10 @@
+{
+  "name": "@cloverhollow/satelliteoflove-mcp-runtime",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Pinned DEV-ONLY consumer package for the isolated satelliteoflove Godot MCP evaluation",
+  "type": "module",
+  "dependencies": {
+    "@satelliteoflove/godot-mcp": "4.1.11"
+  }
+}

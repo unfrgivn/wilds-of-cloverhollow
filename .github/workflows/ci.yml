@@ -54,3 +54,6 @@ jobs:
 
       - name: Run tests
         run: ./tools/ci/run-tests.sh
+
+      - name: Test snapshot ownership boundaries
+        run: python3 -m unittest discover -s tests/agents -v

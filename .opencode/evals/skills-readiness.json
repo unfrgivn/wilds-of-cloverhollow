@@ -1,0 +1,38 @@
+{
+  "suite": "project-local-godot-readiness",
+  "status": "prompts-and-evidence-only",
+  "note": "These criteria support static/workflow review. No behavioral eval has been run by this change.",
+  "evals": [
+    {
+      "id": "level-round-trip",
+      "prompt": "Playtest a level boundary, door transition, spawn-marker return, and quest gate using the existing Scenario Runner.",
+      "evidence": [
+        "Uses a real existing scenario ID and documented move/press actions.",
+        "Checks trace.json, run.log, passed, errors/noop events, and completion.",
+        "Inspects rendered PNG captures when visual behavior is involved.",
+        "Does not call check_* output an assertion or use OS window automation."
+      ]
+    },
+    {
+      "id": "art-blocker-honesty",
+      "prompt": "Review a new sprite or tileset against the Cloverhollow art pipeline.",
+      "evidence": [
+        "Reads the style, palette, and sprite docs before making claims.",
+        "Accounts for eight directions, 16x16 tiles, varied documented sprite sizes, and transparency.",
+        "Identifies placeholder validators and flat-colors versus nested-palette tooling risks.",
+        "Does not recommend broken automation as a passing check or blanket quantization as a fix."
+      ]
+    },
+    {
+      "id": "config-discovery",
+      "prompt": "Explain how this repository reports its quarantined Godot MCP, skills, agents, and /godot-readiness command.",
+      "evidence": [
+        "Uses V2-compatible mcp.servers and skill frontmatter/config syntax.",
+        "Reports the legacy Godot MCP as disabled/quarantined and the godot-lsp-bridge as a non-starting V2 compatibility setting.",
+        "States that Scenario Runner does not require MCP.",
+        "Names the project-local skill source and command path without inventing runtime APIs.",
+        "Does not request API keys, install dependencies, or run paid image generation."
+      ]
+    }
+  ]
+}

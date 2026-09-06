@@ -1,0 +1,30 @@
+{
+  "study": "park25d",
+  "builder": "tools/art/build_25d_study_assets.py",
+  "colors": {
+    "wall": "#e8dcc4",
+    "cream": "#f5ead6",
+    "terracotta": "#c46b4a",
+    "roof_dark": "#8f4a35",
+    "wood": "#5a4a3a",
+    "wood_light": "#b58a4d",
+    "glass": "#3a8abd",
+    "iron": "#2a2a2a"
+  },
+  "assets": [
+    {
+      "width_x": 3.2,
+      "depth_godot_z": 2.4,
+      "wall_height": 2.2,
+      "roof_peak": 3.05,
+      "name": "cottage"
+    },
+    {
+      "length_x": 4.0,
+      "width_godot_z": 2.0,
+      "deck_top_y": 0.16,
+      "rail_top_y": 1.0,
+      "name": "bridge"
+    }
+  ]
+}

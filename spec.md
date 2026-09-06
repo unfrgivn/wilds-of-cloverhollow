@@ -26,6 +26,36 @@ This file is the single source of truth. If code changes behavior, update this f
 
 ## 3. Presentation
 
+### 3.0 Branch-only 2.5D visual study
+- On `prototype/2-5d-world-study`, an opt-in original 3D park study may combine
+  modular 3D terrain/buildings with the existing 2D pixel Fae sprites.
+- This experiment does not replace the production 2D presentation below, alter
+  existing saves, or authorize a whole-game rewrite. The default game stays 2D.
+- Compare fixed orthographic and long-lens perspective cameras on the same
+  world and route. These are our test choices, not claims about Cassette Beasts'
+  undocumented projection settings.
+- Demonstrate real elevation, bridge/ramp traversal, collision, jump/landing,
+  lighting, sprite grounding, and 512x288 captures before deciding the direction.
+- Study movement is camera-relative. Sprite facing follows screen input, with
+  eight idle/walk directions and four walk frames at 8 FPS. Fae uses a grounded
+  billboard with normal depth testing, not an always-on-top rendering bypass.
+- Study verification includes the full bridge/ramp return, water pressure on
+  both banks, cliff blocking, and explicit J-key jump/landing. Projection metadata
+  is not an occlusion assertion; rendered captures must also be reviewed.
+- Study-only import/play/record wrappers isolate user data. The authoring-only
+  `art/source/.gdignore` prevents direct Blender imports; runtime GLBs remain
+  importable. MovieMaker recordings use the same Scenario Runner input route.
+- Study code/scenes live under `game/scripts/studies` and `game/scenes/studies`.
+  Blender sources/recipes stay under `art/`; committed GLBs under
+  `game/assets/studies/park25d` are the runtime assets. Blender is not needed to
+  run/import the committed Godot sample.
+- Scenario `loader: "direct"` is an opt-in path around the 2D SceneRouter for
+  the study. Existing scenarios retain their normal loader by default. A
+  scene-restricted `study_3d` action returns structured test evidence without
+  generalizing the production Node2D player helpers.
+- Commit and push this study branch only. Do not merge or push it to main
+  before the visual direction is reviewed.
+
 ### 3.1 Overworld
 - 2D pixel art.
 - Classic 3/4 overhead JRPG look (top-down-ish).

@@ -24,6 +24,7 @@ var _errors: Array[String] = []
 var _action_in_flight: bool = false
 var _last_save_operation_success: bool = false
 var _last_move_delta: Vector2 = Vector2.ZERO
+var _direct_scene_loader: bool = false
 
 func _init() -> void:
 	_parse_args(OS.get_cmdline_user_args())
@@ -136,6 +137,11 @@ func _load_scenario_file_if_exists() -> void:
 		_trace["events"].append({"type": "info", "frame": _frame, "msg": "Loaded actions: %d" % _actions.size()})
 	else:
 		_record_error("Scenario actions must be an array.")
+	var loader_mode := str(parsed.get("loader", "router"))
+	if loader_mode != "router" and loader_mode != "direct":
+		_record_error("Unknown scenario loader mode: %s" % loader_mode)
+	_direct_scene_loader = loader_mode == "direct"
+	_trace["loader_mode"] = loader_mode
 
 	# Load custom scene if specified
 	if parsed.has("scene") and typeof(parsed["scene"]) == TYPE_STRING:
@@ -149,8 +155,13 @@ func _load_scenario_file_if_exists() -> void:
 			call_deferred("_load_starting_scene", scene_path)
 
 func _load_starting_scene(scene_path: String) -> void:
-	SceneRouter.go_to_area(scene_path, starting_spawn_id)
-	_trace["events"].append({"type": "scene_requested", "frame": _frame, "scene": scene_path})
+	if _direct_scene_loader:
+		var result := get_tree().change_scene_to_file(scene_path)
+		if result != OK:
+			_record_error("Direct scene load failed: %s (%d)" % [scene_path, result])
+	else:
+		SceneRouter.go_to_area(scene_path, starting_spawn_id)
+	_trace["events"].append({"type": "scene_requested", "frame": _frame, "scene": scene_path, "loader_mode": "direct" if _direct_scene_loader else "router"})
 
 func _step_actions() -> void:
 	if _action_in_flight:
@@ -170,6 +181,30 @@ func _execute_action() -> void:
 		return
 
 	var t: String = str(action["type"])
+
+	if t == "study_3d":
+		var scene := get_tree().current_scene
+		var data: Dictionary = action.get("data", {}) if typeof(action.get("data", {})) == TYPE_DICTIONARY else {}
+		if scene == null or scene.scene_file_path != "res://game/scenes/studies/Park3DStudy.tscn":
+			_trace["events"].append({"type": "study_3d", "frame": _frame, "passed": false, "error": "wrong study scene"})
+			_record_error("study_3d rejected: current scene is not Park3DStudy")
+			_action_index += 1
+			return
+		if not scene.has_method("study_operation"):
+			_trace["events"].append({"type": "study_3d", "frame": _frame, "passed": false, "error": "missing study_operation"})
+			_record_error("study_3d rejected: study_operation is missing")
+			_action_index += 1
+			return
+		var result: Dictionary = await scene.study_operation(data)
+		var passed := bool(result.get("ok", false))
+		result["type"] = "study_3d"
+		result["frame"] = _frame
+		result["passed"] = passed
+		_trace["events"].append(result)
+		if not passed:
+			_record_error("study_3d operation failed: %s" % str(result.get("error", result.get("operation", "unknown"))))
+		_action_index += 1
+		return
 
 	if t == "load_scene":
 		var scene_path := str(action.get("scene", ""))

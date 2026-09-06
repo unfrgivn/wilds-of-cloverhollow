@@ -4,6 +4,13 @@ This file is the milestone source. `/next-milestone` selects work from here.
 
 ## Active development sequence
 
+### Current branch experiment
+
+On `prototype/2-5d-world-study`, the user's new priority is **M229 only**: an
+isolated 2.5D visual/movement sample inspired by Cassette Beasts' construction.
+Keep main unchanged, publish only this branch, and stop for direction review
+before any whole-game migration. The completed sequence below remains history.
+
 The September 6, 2026 request prioritizes autonomous local development before
 more gameplay and artwork. Select these milestones explicitly rather than
 falling through to the older iOS/TestFlight backlog:
@@ -2558,3 +2565,27 @@ Run the strict visual gate on the hosted runner without probing an unsupported V
 - Two hosted Linux runs produced matching, successfully validated captures for all three golden scenarios.
 - The Linux profile was reviewed and promoted explicitly; exact repeat comparisons and fourteen local tests passed.
 - See `docs/working-sessions/m228-hosted-visuals.md` for evaluation runs, artifacts, and profile limits.
+
+---
+
+## Milestone 229 — Branch-only 2.5D visual study  **Owner:** Art Pipeline + Godot Gameplay Engineer  **Status:** ✅ Completed (2026-09-06)
+### Objective
+Provide original playable visual samples before deciding whether Cloverhollow should return to a 3D terrain/pixel-character world.
+
+### Acceptance criteria
+- Research distinguishes confirmed Cassette Beasts techniques from visual inferences.
+- A separate branch preserves the current 2D game, saves, and default launch.
+- A small original 3D park has a bridge, water boundary, ramp/raised route, and pixel Fae with grounded visuals.
+- Orthographic and weak-perspective captures use the same scene and route.
+- Real-input scenarios prove traversal, elevation, jump/landing, and collision.
+- A short engine-captured motion sample and curated stills are available for review.
+- Blender assets, if used, have reproducible source scripts, measured geometry/contact checks, and runtime GLB exports.
+- Existing 2D smoke/tests/spec checks remain green; study scenarios produce inspected traces and rendered artifacts.
+- No whole-game port or main-branch merge occurs before direction review.
+
+### Delivery
+- See `docs/art/samples/park25d/README.md` for committed stills, a real-engine
+  motion preview, controls, and limits. This is a technical art blockout, not
+  finished art matching Cassette Beasts' detail.
+- Evidence: `docs/working-sessions/m229-25d-study.md`.
+- Stop for direction review. No next implementation milestone is selected.

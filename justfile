@@ -25,6 +25,18 @@ scenario name:
 scenario-rendered name:
     ./tools/ci/run-scenario-rendered.sh {{name}}
 
+study-25d:
+    ./tools/ci/run-study-25d.sh study_25d_walk
+
+study-25d-rendered:
+    ./tools/ci/run-study-25d-rendered.sh study_25d_walk
+
+study-25d-play:
+    ./tools/ci/play-study-25d.sh
+
+study-25d-record:
+    ./tools/ci/record-study-25d.sh study_25d_walk
+
 ci: smoke tests spec-check
 
 # ==================== Assets ====================

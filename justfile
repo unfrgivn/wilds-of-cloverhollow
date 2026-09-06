@@ -32,7 +32,7 @@ ci: smoke tests spec-check
 assets: validate-assets art-tests
 
 art-tests:
-    uv run --locked --project . python tests/art/test_art_pipeline.py
+    uv run --locked --project . python -m unittest discover -s tests/art -p 'test_*.py'
 
 validate-assets:
     #!/usr/bin/env bash

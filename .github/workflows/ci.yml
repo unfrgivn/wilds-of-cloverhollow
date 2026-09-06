@@ -67,7 +67,7 @@ jobs:
         run: ./tools/ci/run-tests.sh
 
       - name: Run art pipeline tests
-        run: uv run --locked python -m unittest tests/art/test_art_pipeline.py
+        run: uv run --locked python -m unittest discover -s tests/art -p 'test_*.py'
 
       - name: Run visual evidence tests
         run: bun test tests/visual/visual-evidence.test.ts tests/agents/review-capture.test.ts

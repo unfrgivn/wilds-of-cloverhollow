@@ -1,6 +1,6 @@
 {
-  "capture_dir": "captures/m225/golden-candidates/run7/golden_dialogue",
-  "ended_at_unix": 1788715496.20528,
+  "capture_dir": "captures/m226/parent-final/goldens/golden_dialogue",
+  "ended_at_unix": 1788722406.72466,
   "engine_version": {
     "build": "official",
     "hash": "f62fdbde15035c5576dad93e586201f4d41ef0cb",
@@ -84,12 +84,13 @@
     }
   ],
   "fixed_fps": 60,
-  "isolation_root": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run7/golden_dialogue/runtime",
+  "has_explicit_starting_scene": false,
+  "isolation_root": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m226/parent-final/goldens/golden_dialogue/runtime",
   "passed": true,
   "physics_ticks_per_second": 60,
   "renderer": "macOS",
   "scenario_id": "golden_dialogue",
   "seed": 225,
-  "started_at_unix": 1788715491.14442,
-  "user_data_dir": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run7/golden_dialogue/runtime/home/Library/Application Support/Godot/app_userdata/Wilds of Cloverhollow"
+  "started_at_unix": 1788722403.62097,
+  "user_data_dir": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m226/parent-final/goldens/golden_dialogue/runtime/home/Library/Application Support/Godot/app_userdata/Wilds of Cloverhollow"
 }

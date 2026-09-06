@@ -25,19 +25,18 @@ if [[ -z "$SCENARIO_ID" ]]; then
 fi
 
 BASELINE_SCENARIO_DIR="$BASELINE_DIR/$SCENARIO_ID"
-command -v magick >/dev/null 2>&1 || { echo "ERROR: ImageMagick is required" >&2; exit 1; }
 
 if [[ -z "$CAPTURE_DIR" ]]; then
     CAPTURE_DIR=$(ls -td captures/rendered/"$SCENARIO_ID"/*/ 2>/dev/null | head -1)
     if [[ -z "$CAPTURE_DIR" ]]; then
-        echo -e "${RED}ERROR:${NC} No captures found for scenario: $SCENARIO_ID"
+        echo "ERROR: No captures found for scenario: $SCENARIO_ID" >&2
         echo "Run scenario first: ./tools/ci/run-scenario-rendered.sh $SCENARIO_ID"
         exit 1
     fi
 fi
 
 if [[ ! -d "$CAPTURE_DIR" ]]; then
-    echo -e "${RED}ERROR:${NC} Capture directory not found: $CAPTURE_DIR"
+    echo "ERROR: Capture directory not found: $CAPTURE_DIR" >&2
     exit 1
 fi
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -31,6 +31,31 @@ describe("visual evidence comparison", () => {
   test("identical images pass comparison", async () => {
     const root = await makeComparisonFixture();
     try { expect(await runCompare(join(root, "baseline"), join(root, "capture"))).toBe(0); } finally { await rm(root, { recursive: true, force: true }); }
+  });
+
+  test("identical images pass with ImageMagick 6 commands and no magick executable", async () => {
+    const root = await makeComparisonFixture();
+    const commandPath = join(root, "commands");
+    try {
+      await mkdir(commandPath);
+      for (const command of ["bash", "bun", "compare", "identify", "mkdir"]) {
+        const executable = Bun.which(command);
+        if (executable === null) throw new Error(`required real executable is unavailable: ${command}`);
+        await symlink(executable, join(commandPath, command));
+      }
+      const stdoutPath = join(root, "compare.stdout");
+      const stderrPath = join(root, "compare.stderr");
+      const result = Bun.spawnSync(["bash", "-c", "tools/ci/diff-visual.sh fixture \"$1\" > \"$2\" 2> \"$3\"", "visual-fallback", join(root, "capture"), stdoutPath, stderrPath], {
+        cwd: join(import.meta.dir, "../.."),
+        env: { ...process.env, PATH: commandPath, BASELINE_DIR: join(root, "baseline") },
+        stdout: "ignore",
+        stderr: "ignore",
+      });
+      const stdout = await readFile(stdoutPath, "utf8");
+      const stderr = await readFile(stderrPath, "utf8");
+      if (result.exitCode !== 0) throw new Error(`ImageMagick 6 fallback comparison failed (exit ${result.exitCode})\nstdout:\n${stdout}\nstderr:\n${stderr}`);
+      expect(stdout).toContain("MATCH: frame.png");
+    } finally { await rm(root, { recursive: true, force: true }); }
   });
 
   test("missing, extra, empty, and invalid images fail comparison", async () => {

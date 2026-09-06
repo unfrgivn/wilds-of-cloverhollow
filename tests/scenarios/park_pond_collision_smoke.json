@@ -1,0 +1,29 @@
+{
+  "scenario_id": "park_pond_collision_smoke",
+  "description": "Verify the exact pond flanks, walkable bridge, and native terrain bounds.",
+  "scene": "res://game/scenes/areas/Area_TownPark.tscn",
+  "starting_spawn": "default",
+  "actions": [
+    {"type": "wait_for_scene", "scene": "res://game/scenes/areas/Area_TownPark.tscn", "max_frames": 120},
+    {"type": "setup_player_position", "x": 272, "y": 150},
+    {"type": "capture", "label": "pond_left_approach"},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "assert_player_position", "x": 272, "y": 166, "tolerance": 0.2},
+    {"type": "assert_player_body_within", "x": 16, "y": 16, "width": 480, "height": 256},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "assert_player_position", "x": 272, "y": 166, "tolerance": 0.2},
+    {"type": "setup_player_position", "x": 336, "y": 150},
+    {"type": "move", "direction": "down", "frames": 30},
+    {"type": "assert_player_position", "x": 336, "y": 166, "tolerance": 0.2},
+    {"type": "setup_player_position", "x": 304, "y": 150},
+    {"type": "capture", "label": "bridge_approach"},
+    {"type": "move", "direction": "down", "frames": 70},
+    {"type": "assert_player_position", "x": 304, "y": 255, "tolerance": 0.2},
+    {"type": "assert_player_body_within", "x": 16, "y": 16, "width": 480, "height": 256},
+    {"type": "setup_player_position", "x": 240, "y": 150},
+    {"type": "move", "direction": "down_right", "frames": 18},
+    {"type": "assert_player_position", "x": 259.0919, "y": 166, "tolerance": 0.2},
+    {"type": "assert_player_body_within", "x": 16, "y": 16, "width": 480, "height": 256},
+    {"type": "capture", "label": "pond_diagonal_corner"}
+  ]
+}

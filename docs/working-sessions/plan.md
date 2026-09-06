@@ -2048,7 +2048,7 @@ Make the art acceptance pipeline trustworthy before generating more production a
 
 ---
 
-## Milestone 226 — Verified town-to-forest playthrough  **Owner:** Godot Gameplay Engineer + QA Automation
+## Milestone 226 — Verified town-to-forest playthrough  **Owner:** Godot Gameplay Engineer + QA Automation  **Status:** ✅ Completed (2026-09-06)
 ### Objective
 Prove a small connected route before extending autonomous iteration to all levels.
 
@@ -2063,6 +2063,10 @@ Prove a small connected route before extending autonomous iteration to all level
 - Remaining untested areas and routes are listed explicitly.
 - The route has readable native-resolution terrain/boundary art, validated against biome/global palettes.
 - Fae's existing eight-direction art is connected to movement and inspected in rendered captures.
+
+### Evidence
+- Full real-input gate/return route, fractional save recovery, fifteen perimeter/corner cases, pond/bridge checks, and eight-direction movement passed independently.
+- All thirteen art tests and updated golden comparisons passed. See `docs/working-sessions/m226-playable-slice.md`.
 
 ---
 

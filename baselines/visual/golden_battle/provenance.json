@@ -1,6 +1,6 @@
 {
-  "capture_dir": "captures/m225/golden-candidates/run9/golden_battle",
-  "ended_at_unix": 1788716060.05416,
+  "capture_dir": "captures/m226/parent-final/goldens/golden_battle",
+  "ended_at_unix": 1788722412.97552,
   "engine_version": {
     "build": "official",
     "hash": "f62fdbde15035c5576dad93e586201f4d41ef0cb",
@@ -78,12 +78,13 @@
     }
   ],
   "fixed_fps": 60,
-  "isolation_root": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run9/golden_battle/runtime",
+  "has_explicit_starting_scene": false,
+  "isolation_root": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m226/parent-final/goldens/golden_battle/runtime",
   "passed": true,
   "physics_ticks_per_second": 60,
   "renderer": "macOS",
   "scenario_id": "golden_battle",
   "seed": 225,
-  "started_at_unix": 1788716054.94957,
-  "user_data_dir": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run9/golden_battle/runtime/home/Library/Application Support/Godot/app_userdata/Wilds of Cloverhollow"
+  "started_at_unix": 1788722409.8948,
+  "user_data_dir": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m226/parent-final/goldens/golden_battle/runtime/home/Library/Application Support/Godot/app_userdata/Wilds of Cloverhollow"
 }

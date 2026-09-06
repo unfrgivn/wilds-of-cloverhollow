@@ -86,7 +86,8 @@ func _perform_area_change(area_path: String) -> void:
 
     # Advance time on area transition AFTER scene is ready
     # (NPCs may query current_scene when time changes)
-    DayNightManager.advance_time()
+    if get_tree().current_scene != null:
+        DayNightManager.advance_time()
 
     _place_player_at_spawn()
     

@@ -1,0 +1,42 @@
+{
+  "id": "playable_town_m226",
+  "source_generators": [
+    "tools/art/generate_fae.py",
+    "tools/art/generate_buildings.py"
+  ],
+  "source_generation": "Run each generator from a private temporary working directory so fixed relative outputs cannot touch canonical assets.",
+  "palette": [
+    "art/palettes/cloverhollow.palette.json",
+    "art/palettes/global_ui_skin.palette.json"
+  ],
+  "sizes": {
+    "fae": "16x24",
+    "buildings": "48x64"
+  },
+  "fae_files": 41,
+  "building_files": 9,
+  "fae_filenames": [
+    "idle.png", "idle_north.png", "idle_ne.png", "idle_east.png", "idle_se.png", "idle_south.png", "idle_sw.png", "idle_west.png", "idle_nw.png",
+    "walk_south_0.png", "walk_south_1.png", "walk_south_2.png", "walk_south_3.png",
+    "walk_north_0.png", "walk_north_1.png", "walk_north_2.png", "walk_north_3.png",
+    "walk_east_0.png", "walk_east_1.png", "walk_east_2.png", "walk_east_3.png",
+    "walk_west_0.png", "walk_west_1.png", "walk_west_2.png", "walk_west_3.png",
+    "walk_ne_0.png", "walk_ne_1.png", "walk_ne_2.png", "walk_ne_3.png",
+    "walk_se_0.png", "walk_se_1.png", "walk_se_2.png", "walk_se_3.png",
+    "walk_sw_0.png", "walk_sw_1.png", "walk_sw_2.png", "walk_sw_3.png",
+    "walk_nw_0.png", "walk_nw_1.png", "walk_nw_2.png", "walk_nw_3.png"
+  ],
+  "building_filenames": [
+    "general_store.png", "school.png", "library.png", "cafe.png", "arcade.png", "clinic.png", "town_hall.png", "pet_shop.png", "blacksmith.png"
+  ],
+  "output_files": {
+    "fae": "game/assets/sprites/characters/player/default/*.png",
+    "buildings": "game/assets/sprites/buildings/*.png"
+  },
+  "command": "uv run --locked --project . python tools/art/normalize_playable_assets.py --output-dir game/assets/sprites --contact-dir captures/m226/playable-art --force",
+  "notes": [
+    "Only the explicit 41 Fae and 9 building filenames are published.",
+    "Quantization preserves alpha and uses a separate output for every source.",
+    "Contact sheets are labeled 2x review artifacts and are not runtime assets."
+  ]
+}

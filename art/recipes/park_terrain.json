@@ -1,0 +1,27 @@
+{
+  "id": "park_terrain_m226",
+  "type": "terrain_tiles",
+  "size": "16x16",
+  "palette": [
+    "art/palettes/cloverhollow.palette.json",
+    "art/palettes/global_ui_skin.palette.json"
+  ],
+  "output_dir": "game/assets/sprites/tiles/park",
+  "capture_output_dir": "captures/m226/art/park_terrain",
+  "order": [
+    "grass",
+    "path_center",
+    "path_edge_n",
+    "path_edge_s",
+    "path_edge_e",
+    "path_edge_w",
+    "path_corner_ne",
+    "path_corner_nw",
+    "path_corner_se",
+    "path_corner_sw",
+    "pond_water",
+    "pond_shore_n",
+    "park_hedge"
+  ],
+  "command": "uv run --locked --project . python tools/art/generate_park_terrain.py --output-dir game/assets/sprites/tiles/park --contact-sheet captures/m226/art/park_terrain/contact_sheet.png --force"
+}

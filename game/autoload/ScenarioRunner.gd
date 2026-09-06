@@ -16,17 +16,32 @@ var _frame: int = 0
 var _actions: Array = []
 var _action_index: int = 0
 var _wait_remaining: int = 0
+var _wait_scene_remaining: int = 0
 var _move_remaining: int = 0
 var _move_direction: String = ""
 var _trace: Dictionary = {}
 var _errors: Array[String] = []
 var _action_in_flight: bool = false
 var _last_save_operation_success: bool = false
+var _last_move_delta: Vector2 = Vector2.ZERO
 
 func _init() -> void:
 	_parse_args(OS.get_cmdline_user_args())
 	if scenario_id != "":
 		seed(seed)
+		_detect_explicit_starting_scene()
+
+func _detect_explicit_starting_scene() -> void:
+	var path := "res://tests/scenarios/%s.json" % scenario_id
+	if not FileAccess.file_exists(path):
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return
+	var parsed = JSON.parse_string(file.get_as_text())
+	file.close()
+	if typeof(parsed) == TYPE_DICTIONARY and parsed.has("scene") and typeof(parsed["scene"]) == TYPE_STRING:
+		has_explicit_starting_scene = str(parsed["scene"]) != "res://game/scenes/Main.tscn"
 
 func _ready() -> void:
 	# Ensure scenario runner continues to process even when game is paused
@@ -46,6 +61,7 @@ func _ready() -> void:
 		"physics_ticks_per_second": Engine.physics_ticks_per_second,
 		"engine_version": Engine.get_version_info(),
 		"renderer": DisplayServer.get_name(),
+		"has_explicit_starting_scene": has_explicit_starting_scene,
 		"started_at_unix": Time.get_unix_time_from_system(),
 		"events": []
 	}
@@ -158,7 +174,8 @@ func _execute_action() -> void:
 		var scene_path := str(action.get("scene", ""))
 		if scene_path != "":
 			_trace["events"].append({"type": "load_scene", "frame": _frame, "scene": scene_path})
-			get_tree().change_scene_to_file(scene_path)
+			var spawn_id := str(action.get("starting_spawn", "default"))
+			SceneRouter.go_to_area(scene_path, spawn_id)
 		_action_index += 1
 		return
 
@@ -172,6 +189,24 @@ func _execute_action() -> void:
 		if not scene_matches:
 			_record_error("Scene assertion failed: expected %s, got %s" % [expected_scene, actual_scene])
 		_action_index += 1
+		return
+
+	if t == "wait_for_scene":
+		var expected_scene := str(action.get("scene", ""))
+		var max_frames := int(action.get("max_frames", 120))
+		if _wait_scene_remaining == 0:
+			_wait_scene_remaining = max_frames
+		var actual_scene := get_tree().current_scene.scene_file_path if get_tree().current_scene != null else ""
+		if actual_scene == expected_scene and not SceneRouter.is_transition_in_progress():
+			_trace["events"].append({"type": "wait_for_scene", "frame": _frame, "scene": expected_scene, "passed": true})
+			_wait_scene_remaining = 0
+			_action_index += 1
+			return
+		_wait_scene_remaining -= 1
+		if _wait_scene_remaining <= 0:
+			_record_error("Scene did not arrive before timeout: %s" % expected_scene)
+			_action_index += 1
+			_wait_scene_remaining = 0
 		return
 
 	if t == "assert_intro_state":
@@ -207,6 +242,78 @@ func _execute_action() -> void:
 		_action_index += 1
 		return
 
+	if t == "assert_player_position":
+		var expected_position := Vector2(float(action.get("x", 0.0)), float(action.get("y", 0.0)))
+		var tolerance := float(action.get("tolerance", 0.5))
+		var player := _find_player_for_assertion()
+		var actual_position: Vector2 = player.global_position if player != null else Vector2.ZERO
+		var passed := player != null and actual_position.distance_to(expected_position) <= tolerance
+		_trace["events"].append({"type": "assert_player_position", "frame": _frame, "expected": expected_position, "actual": actual_position, "tolerance": tolerance, "passed": passed})
+		if not passed:
+			_record_error("Player position assertion failed: expected %s, got %s" % [expected_position, actual_position])
+		_action_index += 1
+		return
+
+	if t == "setup_player_position":
+		var setup_player := _find_player_for_assertion()
+		var setup_position := Vector2(float(action.get("x", 0.0)), float(action.get("y", 0.0)))
+		if setup_player != null:
+			setup_player.global_position = setup_position
+			if setup_player is CharacterBody2D:
+				setup_player.velocity = Vector2.ZERO
+			await get_tree().physics_frame
+			await get_tree().process_frame
+		_trace["events"].append({"type": "setup_player_position", "frame": _frame, "position": setup_position, "passed": setup_player != null})
+		if setup_player == null:
+			_record_error("Player setup position failed: player not found")
+		_action_index += 1
+		return
+
+	if t == "assert_player_body_within":
+		var body_player := _find_player_for_assertion()
+		var allowed_rect := Rect2(float(action.get("x", 0.0)), float(action.get("y", 0.0)), float(action.get("width", 0.0)), float(action.get("height", 0.0)))
+		var body_rect := Rect2()
+		var body_shape := body_player.get_node_or_null("Collision") as CollisionShape2D if body_player != null else null
+		if body_shape != null and body_shape.shape is RectangleShape2D:
+			var size: Vector2 = (body_shape.shape as RectangleShape2D).size
+			body_rect = Rect2(body_shape.global_position - size * 0.5, size)
+		var passed := body_shape != null and allowed_rect.encloses(body_rect)
+		_trace["events"].append({"type": "assert_player_body_within", "frame": _frame, "allowed": allowed_rect, "body": body_rect, "passed": passed})
+		if not passed:
+			_record_error("Player body bounds assertion failed: expected %s inside %s" % [body_rect, allowed_rect])
+		_action_index += 1
+		return
+
+	if t == "assert_player_facing":
+		var expected_direction := str(action.get("direction", "south"))
+		var player := _find_player_for_assertion()
+		var actual_direction := ""
+		var texture_path := ""
+		if player != null and player.has_method("get_facing_direction"):
+			actual_direction = str(player.get_facing_direction())
+		if player != null and player.has_method("get_player_sprite"):
+			var sprite = player.get_player_sprite()
+			if sprite != null and sprite.texture != null:
+				texture_path = sprite.texture.resource_path
+		var texture_name := texture_path.get_file()
+		var matching_texture := texture_name == "idle_%s.png" % expected_direction or texture_name.begins_with("walk_%s_" % expected_direction)
+		var passed := actual_direction == expected_direction and matching_texture
+		_trace["events"].append({"type": "assert_player_facing", "frame": _frame, "expected": expected_direction, "actual": actual_direction, "texture": texture_path, "passed": passed})
+		if not passed:
+			_record_error("Player facing assertion failed: expected %s, got %s" % [expected_direction, actual_direction])
+		_action_index += 1
+		return
+
+	if t == "assert_last_move_delta":
+		var expected_delta := Vector2(float(action.get("x", 0.0)), float(action.get("y", 0.0)))
+		var tolerance := float(action.get("tolerance", 0.05))
+		var passed := _last_move_delta.distance_to(expected_delta) <= tolerance
+		_trace["events"].append({"type": "assert_last_move_delta", "frame": _frame, "expected": expected_delta, "actual": _last_move_delta, "tolerance": tolerance, "passed": passed})
+		if not passed:
+			_record_error("Move delta assertion failed: expected %s, got %s" % [expected_delta, _last_move_delta])
+		_action_index += 1
+		return
+
 	if t == "wait_frames":
 		if _wait_remaining == 0:
 			_wait_remaining = int(action.get("frames", 1))
@@ -230,6 +337,8 @@ func _execute_action() -> void:
 		return
 
 	if t == "move":
+		var move_start_player := _find_player_for_assertion()
+		var move_start_position: Vector2 = move_start_player.global_position if move_start_player != null else Vector2.ZERO
 		_move_remaining = int(action.get("frames", 1))
 		_move_direction = str(action.get("direction", ""))
 		_start_move_input(_move_direction)
@@ -241,8 +350,30 @@ func _execute_action() -> void:
 		_stop_move_input()
 		var moved_player := _find_player_for_assertion()
 		var moved_position: Vector2 = moved_player.global_position if moved_player != null else Vector2.ZERO
-		_trace["events"].append({"type": "move_end", "frame": _frame, "position": moved_position})
+		_last_move_delta = moved_position - move_start_position
+		_trace["events"].append({"type": "move_end", "frame": _frame, "position": moved_position, "delta": _last_move_delta})
 		_move_remaining = 0
+		_move_direction = ""
+		_action_index += 1
+		return
+
+	if t == "move_until_scene":
+		var target_scene := str(action.get("scene", ""))
+		var max_frames := int(action.get("max_frames", 120))
+		_move_direction = str(action.get("direction", ""))
+		_start_move_input(_move_direction)
+		var reached := false
+		for _tick in range(max_frames):
+			await get_tree().physics_frame
+			await get_tree().process_frame
+			var current_scene_path := get_tree().current_scene.scene_file_path if get_tree().current_scene != null else ""
+			if current_scene_path == target_scene:
+				reached = true
+				break
+		_stop_move_input()
+		_trace["events"].append({"type": "move_until_scene", "frame": _frame, "direction": _move_direction, "scene": target_scene, "passed": reached})
+		if not reached:
+			_record_error("Move did not reach scene before timeout: %s" % target_scene)
 		_move_direction = ""
 		_action_index += 1
 		return
@@ -250,14 +381,10 @@ func _execute_action() -> void:
 	if t == "press":
 		var input_action := str(action.get("action", ""))
 		if input_action != "":
-			var press_event := InputEventAction.new()
-			press_event.action = input_action
-			press_event.pressed = true
+			var press_event := _input_event_for_action(input_action, true)
+			var release_event := _input_event_for_action(input_action, false)
 			Input.parse_input_event(press_event)
 			await get_tree().physics_frame
-			var release_event := InputEventAction.new()
-			release_event.action = input_action
-			release_event.pressed = false
 			Input.parse_input_event(release_event)
 			_trace["events"].append({"type": "press", "frame": _frame, "action": input_action})
 		_action_index += 1
@@ -298,6 +425,25 @@ func _execute_action() -> void:
 		_trace["events"].append({"type": "assert_save_state", "frame": _frame, "slot": slot, "expected_exists": expected_exists, "actual_exists": actual_exists, "operation_success": _last_save_operation_success, "passed": passed})
 		if not passed:
 			_record_error("Save state assertion failed for slot: %d" % slot)
+		_action_index += 1
+		return
+
+	if t == "probe_input_debouncer":
+		var context := str(action.get("context", "scenario_probe"))
+		InputDebouncer.clear_cooldown(context)
+		InputDebouncer.mark_acted(context)
+		var blocked_before_ticks := InputDebouncer.get_remaining_cooldown(context)
+		var blocked_before := not InputDebouncer.can_act(context)
+		for _tick in range(8):
+			await get_tree().physics_frame
+		var blocked_at_eight := not InputDebouncer.can_act(context)
+		await get_tree().physics_frame
+		var ready_at_nine := InputDebouncer.can_act(context)
+		var remaining_after := InputDebouncer.get_remaining_cooldown(context)
+		var passed := blocked_before and blocked_at_eight and ready_at_nine and remaining_after == 0.0
+		_trace["events"].append({"type": "probe_input_debouncer", "frame": _frame, "physics_ticks": Engine.physics_ticks_per_second, "blocked_before": blocked_before, "blocked_at_eight": blocked_at_eight, "ready_at_nine": ready_at_nine, "remaining_before_ms": blocked_before_ticks, "remaining_after_ms": remaining_after, "passed": passed})
+		if not passed:
+			_record_error("Input debouncer physics-clock probe failed")
 		_action_index += 1
 		return
 
@@ -2392,6 +2538,18 @@ func _start_move_input(direction: String) -> void:
 			Input.action_press("ui_up")
 		"down":
 			Input.action_press("ui_down")
+		"up_left":
+			Input.action_press("ui_up")
+			Input.action_press("ui_left")
+		"up_right":
+			Input.action_press("ui_up")
+			Input.action_press("ui_right")
+		"down_left":
+			Input.action_press("ui_down")
+			Input.action_press("ui_left")
+		"down_right":
+			Input.action_press("ui_down")
+			Input.action_press("ui_right")
 
 func _stop_move_input() -> void:
 	# Release all directional inputs
@@ -2399,6 +2557,18 @@ func _stop_move_input() -> void:
 	Input.action_release("ui_right")
 	Input.action_release("ui_up")
 	Input.action_release("ui_down")
+
+func _input_event_for_action(action_name: String, pressed: bool) -> InputEvent:
+	for configured_event in InputMap.action_get_events(action_name):
+		if configured_event is InputEventKey:
+			var key_event: InputEventKey = configured_event.duplicate()
+			key_event.pressed = pressed
+			key_event.echo = false
+			return key_event
+	var action_event := InputEventAction.new()
+	action_event.action = action_name
+	action_event.pressed = pressed
+	return action_event
 
 func _find_player_for_assertion() -> Node2D:
 	var root := get_tree().current_scene

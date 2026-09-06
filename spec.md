@@ -36,15 +36,26 @@ This file is the single source of truth. If code changes behavior, update this f
 - Internal base resolution (logical): **512×288** (16:9).
 - Rendering: scale up with nearest-neighbor; no filtering.
 - Camera: Camera2D must move on whole pixels (no shimmer).
-- Player position snaps to integers after `move_and_slide()` for pixel-stable rendering.
+- Player physics/collision positions retain fractional values; never round the
+  body after movement. Pixel alignment is presentation-only: rendered 2D
+  transforms snap to logical pixels, and the unsmoothed follow camera uses a
+  whole-pixel target with area limits on physics ticks.
 
 ### 3.3 Movement (locked)
 - Free analog movement.
+- Unobstructed full-input speed is 90 logical pixels/second. Cardinal and
+  diagonal movement have equal magnitude; input magnitude is preserved after
+  Godot's normal vector/deadzone processing.
 - Development keyboard controls use arrows or WASD. Normal startup keeps the
   splash/title flow; `--skip-intro` is an explicit development shortcut to town.
 - Facing/animation: **8-direction** (N, NE, E, SE, S, SW, W, NW).
   - All character and NPC sprites must include 8-direction variants.
   - Diagonal movement uses diagonal sprites (not nearest-cardinal fallback).
+- Fae uses the normalized `characters/player/default` idle and four-frame walk
+  textures, retaining the last facing while idle. Costume preview fallback is
+  preserved when a costume lacks a directional frame.
+- Input debounce uses a single physics-tick clock for acceptance and remaining
+  time. The 150 ms cooldown is nine physics ticks at the locked 60 Hz rate.
 
 ### 3.4 Encounters (locked)
 - Visible overworld enemies.
@@ -418,7 +429,8 @@ This file is the single source of truth. If code changes behavior, update this f
 - AnimationPlayer pausing: pauses animations when off-screen for CPU savings.
 - VisibilityCuller.tscn prefab available for easy scene integration.
 - Scenario actions: `check_fps`, `spawn_stress_entities`, `stress_loop` for performance testing.
-- Player.gd already optimized: minimal _physics_process, pixel snapping on integers.
+- Player physics retains fractional precision; rendering handles pixel alignment
+  independently so rounding does not bias movement direction or speed.
 - Godot 4 built-in culling: 2D sprites auto-culled when outside camera viewport.
 
 ### 3.32 Cutscene system
@@ -1120,12 +1132,29 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   Every changed asset still needs explicit validation and in-scene review.
 - Commands and acceptance workflow are documented in
   `docs/art/verified-pipeline.md`.
+- The playable town pack rebuilds 41 Fae frames (16x24) and nine transparent
+  building facades (48x64) from existing generators in a private temporary
+  workspace, then normalizes only that declared pack to the biome/global union.
+  Publishing requires explicit output selection and `--force` for replacement.
+- Park terrain is a reproducible set of thirteen native 16x16 tiles. Recipes
+  live in `art/recipes/park_terrain.json` and `art/recipes/playable_town.json`;
+  tests verify dimensions, palette, alpha, seams, and repeat-generation bytes.
 
 ## 7. World structure (content)
 - Discrete areas/scenes are allowed (and preferred for simplicity).
 - Biomes/towns planned: Cloverhollow (main town), Bubblegum Bay, Pinecone Pass, Enchanted Forest, Forest/Clubhouse Woods, and more (8+ total).
 
 ### 7.1 Cloverhollow town (v0 blockout)
+- The playable Town Center/Park/Forest Entrance slice has continuous perimeter
+  collisions with inner edges at x=16/496 and y=16/272. Portal triggers overlap
+  the interior so transitions remain reachable without openings that allow escape.
+- Town Center uses the nine normalized transparent building sprites. Park uses
+  a repeated native 16x16 grass/path/hedge tile grid instead of loose tile previews.
+- The Park pond occupies `(256,176)` through `(352,256)`. Water-flank colliders
+  leave a walkable bridge corridor from x=288 through x=320.
+- Reciprocal route spawns are clear of their triggers: Park `from_town_center`
+  is `(64,144)`, Town `from_park` is `(256,64)`, and Forest `from_park` is
+  `(256,220)`, clear of the arch artwork.
 - Town Center (Town Square): central hub connecting to other areas; fountain centerpiece, 4 trees, benches, lamps, sign, enemy spawn. Building facades: General Store, School, Arcade, Library (48x64 sprites). 3 NPC spawn markers for future NPCs. Transitions to Hero House (west), School (east-top), Arcade (east-bottom), Bubblegum Bay (south), General Store (near shop facade).
 - General Store: Interior shop where player buys items. Counter with cash register, 4 shelves with potions/supplies, display crates with produce. Shopkeeper NPC behind counter with ShopUI buy interface (potion, ether, antidote). Door transition back to Town Center. Welcome sign with shop dialogue.
 - Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
@@ -1243,6 +1272,23 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 ## 8. Automation and agentic workflows (non-negotiable)
 
 ### 8.1 Scenario Runner
+- `wait_for_scene` waits for both scene identity and completed router transition.
+  `move_until_scene` applies real directional input with a bounded tick budget.
+- `setup_player_position` is explicitly test setup, used for isolated collision
+  fixtures, not evidence of traversing a route. Position and full rectangular
+  collision-body assertions verify numeric bounds; facing assertions also verify
+  the directional texture name. `assert_last_move_delta` verifies displacement.
+- Press actions use a configured `InputMap` key when available, with action-event
+  fallback rather than a hardcoded interaction key.
+- `town_forest_route_smoke` proves Town → Park → Forest → Park → Town, locked and
+  unlocked gate dialogue, and slot-0 save/load recovery of `(257.5,218.5)` after
+  movement away. The `forest_unlocked` flag is explicit test setup, not proof
+  of completing the quest chain.
+- `route_boundaries_smoke` verifies twelve non-portal edges and three diagonal
+  corners, including scene identity after pressure and full-body containment.
+  `park_pond_collision_smoke` verifies both blocked water flanks, sustained
+  pressure, diagonal approach, and bridge traversal. Eight-direction movement
+  and the nine-tick debounce contract have dedicated scenarios.
 - `assert_dialogue_state` verifies showing/choice-waiting state.
 - `assert_battle_hud_layout` verifies enemy text, all five command entries,
   party rows, minimum label sizes, viewport containment, and non-overlapping
@@ -1257,7 +1303,7 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   is an area. Explicit area scenarios suppress intro routing; `Main.tscn`
   scenarios retain the normal intro.
 - Asynchronous actions run single-flight. Movement holds input through the
-  requested physics ticks, presses use actual `InputEventAction` events, and
+  requested physics ticks, presses use mapped key/action events, and
   rendered captures wait for frame drawing to complete.
 - Test wrappers launch Godot with `--fixed-fps 60` and private per-run `HOME`,
   `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, and `XDG_CACHE_HOME`. Read-only manifests

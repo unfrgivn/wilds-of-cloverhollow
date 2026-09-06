@@ -13,4 +13,4 @@ export XDG_DATA_HOME="$run_root/data"
 export XDG_CONFIG_HOME="$run_root/config"
 export XDG_CACHE_HOME="$run_root/cache"
 
-exec "$GODOT_BIN" --path . --fixed-fps 60 "$@"
+exec "$GODOT_BIN" --path . --audio-driver Dummy --fixed-fps 60 "$@"

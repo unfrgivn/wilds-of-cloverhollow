@@ -4,6 +4,9 @@ The Scenario Runner enables scripted, automated game testing without OS-level wi
 
 ## Quick Start
 
+Artifact runs use the Dummy audio driver, including rendered runs. They do not
+need an audio device and do not verify audible output quality.
+
 The scenario wrappers require Godot, Bun (for evidence validation), and the
 existing shell/Python tools. Run from the repository root. Local validation was
 tested with Godot 4.5.1 and Bun 1.3.10. CI provisions the same Bun version.

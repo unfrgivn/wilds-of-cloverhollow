@@ -520,6 +520,62 @@ func _execute_action() -> void:
 		_action_index += 1
 		return
 
+	if t == "assert_dialogue_state":
+		var expected_showing := bool(action.get("showing", true))
+		var expected_choice := bool(action.get("waiting_for_choice", false))
+		var actual_showing := DialogueManager.is_showing()
+		var actual_choice := DialogueManager.is_waiting_for_choice()
+		var passed := actual_showing == expected_showing and actual_choice == expected_choice
+		_trace["events"].append({"type": "assert_dialogue_state", "frame": _frame, "expected_showing": expected_showing, "actual_showing": actual_showing, "expected_waiting_for_choice": expected_choice, "actual_waiting_for_choice": actual_choice, "passed": passed})
+		if not passed:
+			_record_error("Dialogue state assertion failed")
+		_action_index += 1
+		return
+
+	if t == "assert_battle_hud_layout":
+		var battle_scene := get_tree().current_scene
+		var name_label: Label = battle_scene.get_node_or_null("BattleUI/TopHUD/EnemyPanel/VBox/EnemyName") as Label if battle_scene != null else null
+		var hp_label: Label = battle_scene.get_node_or_null("BattleUI/TopHUD/EnemyPanel/VBox/EnemyHP") as Label if battle_scene != null else null
+		var command_menu: PanelContainer = battle_scene.get_node_or_null("BattleUI/CommandMenu") as PanelContainer if battle_scene != null else null
+		var party_panel: PanelContainer = battle_scene.get_node_or_null("BattleUI/TopHUD/PartyPanel") as PanelContainer if battle_scene != null else null
+		var battle_log: Label = battle_scene.get_node_or_null("BattleUI/BattleMessage") as Label if battle_scene != null else null
+		var top_hud: Control = battle_scene.get_node_or_null("BattleUI/TopHUD") as Control if battle_scene != null else null
+		var turn_indicator: Label = battle_scene.get_node_or_null("BattleUI/TurnIndicator") as Label if battle_scene != null else null
+		var turn_order: PanelContainer = battle_scene.get_node_or_null("BattleUI/TurnOrderPanel") as PanelContainer if battle_scene != null else null
+		var command_labels: Array[Node] = []
+		var party_rows: Array[Node] = []
+		var bands: Array[Rect2] = []
+		var menu_rect := Rect2()
+		var party_rect := Rect2()
+		if command_menu != null and command_menu.get_node_or_null("MenuContainer") != null:
+			command_labels = command_menu.get_node("MenuContainer").get_children()
+		if party_panel != null and party_panel.get_node_or_null("Margin/PartyStats") != null:
+			party_rows = party_panel.get_node("Margin/PartyStats").get_children()
+		var valid := name_label != null and hp_label != null and name_label.text != "" and hp_label.text != "" and command_menu != null and party_panel != null and battle_log != null and top_hud != null and turn_indicator != null and turn_order != null
+		if valid:
+			var viewport_rect := Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size)
+			menu_rect = command_menu.get_global_rect()
+			party_rect = party_panel.get_global_rect()
+			bands = [top_hud.get_global_rect(), turn_indicator.get_global_rect(), turn_order.get_global_rect(), battle_log.get_global_rect(), menu_rect]
+			valid = not name_label.get_global_rect().intersects(hp_label.get_global_rect()) and name_label.size.x >= name_label.get_combined_minimum_size().x and name_label.size.y >= name_label.get_combined_minimum_size().y and hp_label.size.x >= hp_label.get_combined_minimum_size().x and hp_label.size.y >= hp_label.get_combined_minimum_size().y and viewport_rect.grow(1.0).encloses(menu_rect) and viewport_rect.grow(1.0).encloses(party_rect) and command_labels.size() == 5
+			for band_index in bands.size():
+				if not viewport_rect.grow(1.0).encloses(bands[band_index]):
+					valid = false
+				for other_index in range(band_index + 1, bands.size()):
+					if bands[band_index].intersects(bands[other_index]):
+						valid = false
+			for command_label in command_labels:
+				if command_label is Control and not menu_rect.grow(1.0).encloses(command_label.get_global_rect()):
+					valid = false
+			for party_row in party_rows:
+				if party_row is Control and not party_rect.grow(-4.0).encloses(party_row.get_global_rect()):
+					valid = false
+		_trace["events"].append({"type": "assert_battle_hud_layout", "frame": _frame, "passed": valid, "enemy_name": name_label.text if name_label != null else "", "enemy_hp": hp_label.text if hp_label != null else "", "command_count": command_labels.size() if command_menu != null else 0, "party_count": party_rows.size() if party_panel != null else 0, "band_rects": bands, "command_rects": command_labels.map(func(label): return label.get_global_rect()), "party_row_rects": party_rows.map(func(row): return row.get_global_rect())})
+		if not valid:
+			_record_error("Battle HUD layout assertion failed")
+		_action_index += 1
+		return
+
 	if t == "select_dialogue_choice":
 		var choice_index: int = int(action.get("choice_index", 0))
 		if DialogueManager.is_waiting_for_choice():

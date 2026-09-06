@@ -2,6 +2,11 @@
 
 This document describes the workflow for creating and integrating pixel art assets into Wilds of Cloverhollow.
 
+For the authoritative locked tooling contract and acceptance commands, see
+[`verified-pipeline.md`](verified-pipeline.md). This guide supplies art context;
+the verified pipeline governs validation, quantization, packing, and baseline
+evidence.
+
 ## Directory Structure
 
 ```
@@ -66,7 +71,7 @@ All sprites must use colors from biome palettes:
 Use `tools/art/generate_props.py` to create pixel-perfect sprites:
 
 ```bash
-python3 tools/art/generate_props.py
+uv run --locked --project . python tools/art/generate_props.py
 ```
 
 Generated sprites go to `game/assets/sprites/props/polished/`.
@@ -88,7 +93,7 @@ For complex sprites requiring artistic judgment:
 
 ### Method 3: AI Generation + Refinement
 
-For concept exploration (not production use):
+For supervised concept exploration only (not unattended or production use):
 
 1. Generate with AI tools (results go to `nanobanana-output/`)
 2. AI images are typically 2x+ oversized - expect downscale issues
@@ -115,17 +120,17 @@ For concept exploration (not production use):
 
 After creating sprites:
 
-1. Verify dimensions: `magick identify path/to/sprite.png`
-2. Verify colors match palette (visual inspection)
-3. Test in Godot editor by replacing scene references
-4. Run smoke test: `./tools/ci/run-smoke.sh`
+1. Run the locked targeted validator for every changed asset, using its explicit size and biome/global palette union.
+2. Inspect the changed PNGs natively and run the affected rendered scenario.
+3. Use `just validate-assets` only as its documented two-bench smoke check, not as full-tree certification.
+4. Follow [`verified-pipeline.md`](verified-pipeline.md) for quantization, packing, and reviewed baseline promotion.
 
 ## Workflow Summary
 
 ```
 1. Check palette → art/palettes/{biome}.palette.json
 2. Check style → docs/art/concept-reference.md
-3. Create sprite → tools/art/generate_props.py OR manual
+3. Create sprite → locked programmatic tool OR manual
 4. Export → game/assets/sprites/{type}/
 5. Test → Godot editor + smoke tests
 6. Commit → Include in milestone commit

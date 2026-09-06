@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow — spec
 
-Last updated: 2026-01-26
+Last updated: 2026-09-06
 
 This file is the single source of truth. If code changes behavior, update this file in the same commit.
 
@@ -1102,6 +1102,25 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 - No resampling; nearest-neighbor only.
 - Avoid noisy textures; prefer clean shapes and limited shading bands per material.
 
+### 6.5 Reproducible art tooling
+- Art shell wrappers use the `uv.lock` environment with Pillow 12.3.0.
+- Validation reads nested `colors` objects/lists or a top-level color list.
+  Metadata and `legacy_flat` do not contribute colors; malformed leaves fail.
+- Repeated `--palette` options form a union. `--biome cloverhollow` also includes
+  `global_ui_skin.palette.json`. Fully transparent pixels are excluded from RGB
+  checks; visible off-palette pixels fail.
+- Use explicit asset dimensions such as `--size 16x24`. Grid alignment is an
+  optional extra constraint, not a requirement that every sprite be 16x16.
+- Quantization requires separate input/output paths, preserves alpha, and will
+  not replace an existing output without `--force`. It supports palette unions.
+- Packing uses sorted, equally sized frames and emits an RGBA sheet plus JSON
+  `frames` entries (`file`, `x`, `y`, `width`, `height`). Empty inputs, mismatched
+  dimensions, and source/output collisions fail before writing.
+- `just validate-assets` validates selected samples, not the entire asset tree.
+  Every changed asset still needs explicit validation and in-scene review.
+- Commands and acceptance workflow are documented in
+  `docs/art/verified-pipeline.md`.
+
 ## 7. World structure (content)
 - Discrete areas/scenes are allowed (and preferred for simplicity).
 - Biomes/towns planned: Cloverhollow (main town), Bubblegum Bay, Pinecone Pass, Enchanted Forest, Forest/Clubhouse Woods, and more (8+ total).
@@ -1224,6 +1243,10 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
 ## 8. Automation and agentic workflows (non-negotiable)
 
 ### 8.1 Scenario Runner
+- `assert_dialogue_state` verifies showing/choice-waiting state.
+- `assert_battle_hud_layout` verifies enemy text, all five command entries,
+  party rows, minimum label sizes, viewport containment, and non-overlapping
+  status/turn/log/menu bands.
 - `assert_scene` compares the current scene path to the expected `scene`.
 - `assert_player_spawn` compares the player to a named `marker_id` with a
   one-pixel tolerance. Failed assertions add an error and fail the scenario.
@@ -1240,6 +1263,8 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, and `XDG_CACHE_HOME`. Read-only manifests
   check that personal Godot user data did not change. This is macOS/Linux test
   isolation, not a host security sandbox.
+- Artifact runs use Godot's Dummy audio driver so CI/rendered checks do not
+  require an audio device. They do not certify audible output quality.
 - Scenario RNG is seeded in the first autoload's `_init`, including seed zero.
   Traces record `isolation_root`, actual `user_data_dir`, `fixed_fps`,
   `physics_ticks_per_second`, `engine_version`, and `renderer` (display-server
@@ -1290,6 +1315,12 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   - Override via environment: `ALLOW_SPEC_DRIFT=1`.
   - Full documentation: `docs/working-sessions/spec-drift-guardrail.md`.
 - Visual regression diffing is required for golden scenarios.
+- Reviewed overworld, dialogue, and battle frames live in
+  `baselines/visual/<scenario_id>`. Missing/extra/empty images, dimension
+  differences, decoding/tool failures, and any pixel difference fail comparison.
+- Baseline promotion requires matching successful scenario evidence and an
+  explicit `--reviewed` flag after image review. It replaces the exact image set
+  and records the source trace as `provenance.json`; CI never auto-promotes.
 
 ### 8.4 Local agent tooling
 - Project-local OpenCode skills and agents carry discovery metadata and use
@@ -1313,9 +1344,9 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   and rendered captures; no OS-level input automation is required.
 - Optional image generation is not a prerequisite for development. Generated
   images are source material, not automatically accepted runtime assets.
-- Art validation must distinguish transparent pixels from visible colors and
-  support the current nested biome palette plus shared global palette. Until
-  those checks are verified, do not treat legacy asset task success as approval.
+- Art validation distinguishes transparent pixels from visible colors and
+  supports the nested biome palette plus shared global palette. Selected-sample
+  validation is not approval of the entire legacy asset tree.
 - A level is not verified by direct scene loading alone. Evidence must cover
   movement, boundaries, transition/spawn behavior, return travel, and relevant
   progression gates. Record untested routes explicitly.
@@ -1326,6 +1357,13 @@ Content lint script (`tools/lint/lint-content.sh`) validates:
   exception to the no-OS-window-control constraint.
 - Setup commands and limits are in `docs/testing/godot-agent-environment.md`.
   `agent_environment_smoke` verifies the canonical scene without the addon.
+- PNG critique uses `tools/agents/review-capture.ts`: an actual file attachment
+  in a private, tool-denied OpenCode session. The model is configurable with
+  `GODOT_VISION_MODEL` or `--model`; the verified default is
+  `github-copilot/gemini-3.5-flash`. The legacy hardcoded `vision` tool is denied.
+- Model descriptions alone are not a visual test oracle. Corroborate UI text
+  with OCR, layout with scene/trace assertions, and changes with exact pixel
+  comparisons. Do not infer image contents from filenames or serialized data URIs.
 
 ## 9. Repo conventions
 - Source art lives under `art/` and must be reproducible (recipes + palettes).

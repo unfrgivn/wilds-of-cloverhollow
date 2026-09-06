@@ -75,6 +75,10 @@ shape = SubResource("RectangleShape2D_1")
 [node name="Camera2D" type="Camera2D" parent="Player"]
 enabled = true
 position_smoothing_enabled = false
+limit_left = 0
+limit_top = 0
+limit_right = 512
+limit_bottom = 288
 
 [node name="InteractionArea" type="Area2D" parent="Player"]
 

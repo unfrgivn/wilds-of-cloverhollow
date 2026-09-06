@@ -1,0 +1,58 @@
+{
+  "capture_dir": "captures/m225/golden-candidates/run7/golden_overworld",
+  "ended_at_unix": 1788715487.25519,
+  "engine_version": {
+    "build": "official",
+    "hash": "f62fdbde15035c5576dad93e586201f4d41ef0cb",
+    "hex": 263425,
+    "major": 4,
+    "minor": 5,
+    "patch": 1,
+    "status": "stable",
+    "string": "4.5.1-stable (official)",
+    "timestamp": 0
+  },
+  "errors": [],
+  "events": [
+    {
+      "frame": 0,
+      "msg": "Loaded actions: 4",
+      "type": "info"
+    },
+    {
+      "frame": 1,
+      "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+      "type": "load_scene"
+    },
+    {
+      "frame": 2,
+      "frames": 30,
+      "type": "wait_start"
+    },
+    {
+      "frame": 31,
+      "type": "wait_end"
+    },
+    {
+      "actual": "res://game/scenes/areas/Area_TownCenter.tscn",
+      "frame": 32,
+      "passed": true,
+      "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+      "type": "assert_scene"
+    },
+    {
+      "frame": 33,
+      "label": "overworld_initial",
+      "type": "capture"
+    }
+  ],
+  "fixed_fps": 60,
+  "isolation_root": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run7/golden_overworld/runtime",
+  "passed": true,
+  "physics_ticks_per_second": 60,
+  "renderer": "macOS",
+  "scenario_id": "golden_overworld",
+  "seed": 225,
+  "started_at_unix": 1788715482.16079,
+  "user_data_dir": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run7/golden_overworld/runtime/home/Library/Application Support/Godot/app_userdata/Wilds of Cloverhollow"
+}

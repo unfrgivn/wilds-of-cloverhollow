@@ -1,17 +1,16 @@
 {
   "scenario_id": "golden_dialogue",
-  "description": "Golden capture for dialogue UI interaction",
+  "description": "Golden capture with the dialogue choices UI explicitly shown",
   "golden": true,
   "actions": [
-    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_Cloverhollow_Test.tscn" },
+    { "type": "load_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn" },
     { "type": "wait_frames", "frames": 30 },
-    { "type": "capture", "label": "dialogue_before" },
-    { "type": "move", "direction": "up", "frames": 15 },
-    { "type": "press", "action": "interact" },
+    { "type": "assert_scene", "scene": "res://game/scenes/areas/Area_TownCenter.tscn" },
+    { "type": "show_dialogue_choices", "prompt": "The path divides beneath the old oak.", "choices": [["Follow the lanterns.", "The lanterns lead you onward."], ["Return to town.", "You turn back safely."]] },
     { "type": "wait_frames", "frames": 30 },
+    { "type": "assert_dialogue_state", "showing": true, "waiting_for_choice": true },
     { "type": "capture", "label": "dialogue_showing" },
-    { "type": "press", "action": "interact" },
-    { "type": "wait_frames", "frames": 30 },
-    { "type": "capture", "label": "dialogue_dismissed" }
+    { "type": "hide_dialogue" },
+    { "type": "assert_dialogue_state", "showing": false, "waiting_for_choice": false }
   ]
 }

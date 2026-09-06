@@ -40,11 +40,15 @@ vision. `check_*` actions are log observations, not assertions. Never use
 OS-level window automation.
 
 Fail closed on missing traces/captures, unsupported actions, tool errors, or
-ambiguous results. Existing art blockers are documented rather than hidden:
-the Python art validators are placeholders; shell palette helpers expect a
-flat `.colors[]` array while palettes may be nested; some quantization helpers
-can overwrite inputs or swallow errors. Image generation is optional and must
-not be auto-run, paid, or supplied API keys.
+ambiguous results. For art, use the locked `uv`/Pillow tools described in
+`docs/art/verified-pipeline.md`: nested `.colors` palettes and repeated unions,
+transparent-RGB handling, explicit asset sizes, safe quantization output, and
+sorted same-sized packing with metadata/source-collision guards are implemented.
+Validate every changed asset explicitly; `just validate-assets` checks only two
+selected bench samples and is not full-tree certification. Image generation is
+optional and must not be auto-run, paid, or supplied API keys.
+The M226 park terrain source pass is accepted as an art first pass only; it is
+not gameplay-integrated and must not be reported as finished game art.
 
 ## Useful entrypoints
 

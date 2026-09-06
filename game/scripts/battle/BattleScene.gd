@@ -37,9 +37,9 @@ var boss_phase: int = 1
 var boss_phase_triggered: bool = false
 
 ## UI references
-@onready var enemy_name_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyName
-@onready var enemy_hp_label: Label = $BattleUI/TopHUD/EnemyPanel/EnemyHP
-@onready var party_container: VBoxContainer = $BattleUI/TopHUD/PartyPanel/PartyStats
+@onready var enemy_name_label: Label = $BattleUI/TopHUD/EnemyPanel/VBox/EnemyName
+@onready var enemy_hp_label: Label = $BattleUI/TopHUD/EnemyPanel/VBox/EnemyHP
+@onready var party_container: VBoxContainer = $BattleUI/TopHUD/PartyPanel/Margin/PartyStats
 @onready var command_menu: VBoxContainer = $BattleUI/CommandMenu/MenuContainer
 @onready var battle_message: Label = $BattleUI/BattleMessage
 @onready var turn_indicator: Label = $BattleUI/TurnIndicator

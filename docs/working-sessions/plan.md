@@ -2027,7 +2027,7 @@ repeatable input, and assertion-backed evidence for local development.
 
 ---
 
-## Milestone 225 — Repair palette validation and establish visual baselines  **Owner:** Art Pipeline + QA Automation
+## Milestone 225 — Repair palette validation and establish visual baselines  **Owner:** Art Pipeline + QA Automation  **Status:** ✅ Completed (2026-09-06)
 ### Objective
 Make the art acceptance pipeline trustworthy before generating more production assets.
 
@@ -2040,6 +2040,11 @@ Make the art acceptance pipeline trustworthy before generating more production a
 - Unit tests cover palette parsing, transparency, dimensions, and invalid inputs.
 - Reviewed rendered baselines exist for overworld, dialogue, and battle with recorded engine/renderer settings.
 - CI and local verification use a documented compatible engine version.
+
+### Evidence
+- Mandatory gates, six art tests, eleven visual/review-tool tests, and all three golden comparisons passed independently.
+- Real image attachments plus OCR and layout assertions confirmed the corrected battle HUD/menu and dialogue state.
+- See `docs/working-sessions/m225-art-evidence.md`; cross-GPU equivalence is not assumed.
 
 ---
 

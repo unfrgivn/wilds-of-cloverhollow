@@ -3,67 +3,64 @@ set -euo pipefail
 
 SCENARIO_ID="${1:-}"
 BASELINE_DIR="${BASELINE_DIR:-baselines/visual}"
-
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-usage() {
-    echo "Usage: $0 <scenario_id> [capture_dir]"
-    echo ""
-    echo "Updates baseline images from captured frames."
-    echo ""
-    echo "Arguments:"
-    echo "  scenario_id  - Scenario to update"
-    echo "  capture_dir  - Optional: specific capture directory"
-    echo "                 (default: most recent in captures/rendered/<scenario_id>/)"
-    exit 1
-}
-
-if [[ -z "$SCENARIO_ID" ]]; then
-    usage
-fi
-
-CAPTURE_DIR="${2:-}"
-if [[ -z "$CAPTURE_DIR" ]]; then
-    CAPTURE_DIR=$(ls -td captures/rendered/"$SCENARIO_ID"/*/ 2>/dev/null | head -1)
-    if [[ -z "$CAPTURE_DIR" ]]; then
-        echo -e "${RED}ERROR:${NC} No captures found for scenario: $SCENARIO_ID"
-        echo "Run scenario first: ./tools/ci/run-scenario-rendered.sh $SCENARIO_ID"
-        exit 1
-    fi
-fi
-
-if [[ ! -d "$CAPTURE_DIR" ]]; then
-    echo -e "${RED}ERROR:${NC} Capture directory not found: $CAPTURE_DIR"
-    exit 1
-fi
-
-BASELINE_SCENARIO_DIR="$BASELINE_DIR/$SCENARIO_ID"
-mkdir -p "$BASELINE_SCENARIO_DIR"
-
-echo "=== Updating Baselines ==="
-echo "Scenario: $SCENARIO_ID"
-echo "From:     $CAPTURE_DIR"
-echo "To:       $BASELINE_SCENARIO_DIR"
-echo ""
-
-COUNT=0
-for capture_file in "$CAPTURE_DIR"/*.png; do
-    if [[ ! -f "$capture_file" ]]; then
-        continue
-    fi
-    
-    filename=$(basename "$capture_file")
-    cp "$capture_file" "$BASELINE_SCENARIO_DIR/$filename"
-    echo -e "${GREEN}Updated:${NC} $filename"
-    ((COUNT++)) || true
+CAPTURE_DIR=""
+REVIEWED=0
+for argument in "$@"; do
+  if [[ "$argument" == "--reviewed" ]]; then REVIEWED=1; elif [[ -z "$CAPTURE_DIR" && "$argument" != "$SCENARIO_ID" ]]; then CAPTURE_DIR="$argument"; fi
 done
 
-echo ""
-echo -e "${GREEN}Updated $COUNT baseline image(s)${NC}"
-echo ""
-echo -e "${YELLOW}IMPORTANT:${NC} Review the baselines before committing!"
-echo "  git diff baselines/visual/$SCENARIO_ID/"
-echo "  git add baselines/visual/$SCENARIO_ID/"
+if [[ -z "$SCENARIO_ID" ]]; then
+  echo "Usage: $0 <scenario_id> <capture_dir> --reviewed" >&2
+  exit 2
+fi
+if (( REVIEWED == 0 )); then
+  echo "ERROR: explicit --reviewed is required before copying baselines" >&2
+  exit 1
+fi
+if [[ -z "$CAPTURE_DIR" ]]; then
+  CAPTURE_DIR=$(find "captures/rendered/$SCENARIO_ID" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | sort | tail -1)
+fi
+if [[ -z "$CAPTURE_DIR" || ! -d "$CAPTURE_DIR" ]]; then
+  echo "ERROR: capture directory not found" >&2
+  exit 1
+fi
+if [[ ! -s "$CAPTURE_DIR/trace.json" || ! -s "$CAPTURE_DIR/run.log" ]]; then
+  echo "ERROR: baseline source must include a successful trace.json and run.log" >&2
+  exit 1
+fi
+if ! bun run tools/ci/visual-evidence.ts --validate-source "$SCENARIO_ID" "$CAPTURE_DIR"; then
+  echo "ERROR: trace is invalid or belongs to another scenario" >&2
+  exit 1
+fi
+if grep -qE '(^|: )ERROR:|SCRIPT ERROR:|Parse Error:' "$CAPTURE_DIR/run.log"; then
+  echo "ERROR: baseline source log contains runtime errors" >&2
+  exit 1
+fi
+if ! bun run tools/ci/validate-scenario.ts --trace "$CAPTURE_DIR/trace.json" --log "$CAPTURE_DIR/run.log" --captures "$CAPTURE_DIR" --rendered >/dev/null; then
+  echo "ERROR: baseline source evidence did not pass scenario validation" >&2
+  exit 1
+fi
+frames=()
+while IFS= read -r frame; do frames+=("$frame"); done < <(find "$CAPTURE_DIR" -maxdepth 1 -type f -name '*.png' -print)
+if (( ${#frames[@]} == 0 )); then
+  echo "ERROR: baseline source has no PNG captures" >&2
+  exit 1
+fi
+
+baseline_parent="$BASELINE_DIR"
+mkdir -p "$baseline_parent"
+staging=$(mktemp -d "$baseline_parent/.${SCENARIO_ID}.staging.XXXXXX")
+trap 'rm -rf "$staging"' EXIT
+for frame in "${frames[@]}"; do cp "$frame" "$staging/$(basename "$frame")"; done
+cp "$CAPTURE_DIR/trace.json" "$staging/provenance.json"
+target="$baseline_parent/$SCENARIO_ID"
+backup="$baseline_parent/.${SCENARIO_ID}.backup.$$"
+if [[ -d "$target" ]]; then mv "$target" "$backup"; fi
+if ! mv "$staging" "$target"; then
+  [[ -d "$backup" ]] && mv "$backup" "$target"
+  exit 1
+fi
+rm -rf "$backup"
+trap - EXIT
+echo "Updated ${#frames[@]} baseline image(s) in $BASELINE_DIR/$SCENARIO_ID"
+echo "Review the images before committing."

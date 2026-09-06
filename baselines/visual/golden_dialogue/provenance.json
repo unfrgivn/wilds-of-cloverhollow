@@ -1,0 +1,95 @@
+{
+  "capture_dir": "captures/m225/golden-candidates/run7/golden_dialogue",
+  "ended_at_unix": 1788715496.20528,
+  "engine_version": {
+    "build": "official",
+    "hash": "f62fdbde15035c5576dad93e586201f4d41ef0cb",
+    "hex": 263425,
+    "major": 4,
+    "minor": 5,
+    "patch": 1,
+    "status": "stable",
+    "string": "4.5.1-stable (official)",
+    "timestamp": 0
+  },
+  "errors": [],
+  "events": [
+    {
+      "frame": 0,
+      "msg": "Loaded actions: 9",
+      "type": "info"
+    },
+    {
+      "frame": 1,
+      "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+      "type": "load_scene"
+    },
+    {
+      "frame": 2,
+      "frames": 30,
+      "type": "wait_start"
+    },
+    {
+      "frame": 31,
+      "type": "wait_end"
+    },
+    {
+      "actual": "res://game/scenes/areas/Area_TownCenter.tscn",
+      "frame": 32,
+      "passed": true,
+      "scene": "res://game/scenes/areas/Area_TownCenter.tscn",
+      "type": "assert_scene"
+    },
+    {
+      "choices_count": 2,
+      "frame": 33,
+      "prompt": "The path divides beneath the old oak.",
+      "type": "show_dialogue_choices"
+    },
+    {
+      "frame": 34,
+      "frames": 30,
+      "type": "wait_start"
+    },
+    {
+      "frame": 63,
+      "type": "wait_end"
+    },
+    {
+      "actual_showing": true,
+      "actual_waiting_for_choice": true,
+      "expected_showing": true,
+      "expected_waiting_for_choice": true,
+      "frame": 64,
+      "passed": true,
+      "type": "assert_dialogue_state"
+    },
+    {
+      "frame": 65,
+      "label": "dialogue_showing",
+      "type": "capture"
+    },
+    {
+      "frame": 66,
+      "type": "hide_dialogue"
+    },
+    {
+      "actual_showing": false,
+      "actual_waiting_for_choice": false,
+      "expected_showing": false,
+      "expected_waiting_for_choice": false,
+      "frame": 67,
+      "passed": true,
+      "type": "assert_dialogue_state"
+    }
+  ],
+  "fixed_fps": 60,
+  "isolation_root": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run7/golden_dialogue/runtime",
+  "passed": true,
+  "physics_ticks_per_second": 60,
+  "renderer": "macOS",
+  "scenario_id": "golden_dialogue",
+  "seed": 225,
+  "started_at_unix": 1788715491.14442,
+  "user_data_dir": "/Users/bash/Sites/unfrgivn/wilds-of-cloverhollow/captures/m225/golden-candidates/run7/golden_dialogue/runtime/home/Library/Application Support/Godot/app_userdata/Wilds of Cloverhollow"
+}

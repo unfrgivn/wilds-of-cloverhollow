@@ -1,60 +1,23 @@
 #!/usr/bin/env bash
-# Run visual regression scenarios and capture frames
 set -euo pipefail
 
-: "${GODOT_BIN:=godot}"
-: "${CAPTURE_DIR:=captures/current}"
-: "${SEED:=12345}"
-: "${QUIT_AFTER_FRAMES:=120}"
+BASELINE_DIR="${BASELINE_DIR:-baselines/visual}"
+CAPTURE_ROOT="${CAPTURE_DIR:-captures/current}"
+SCENARIOS=(golden_overworld golden_dialogue golden_battle)
 
-# List of rendered scenarios to run for visual regression
-RENDERED_SCENARIOS=(
-    "town_center_render"
-    "hero_house_render"
-    "battle_scene_render"
-)
-
-mkdir -p "$CAPTURE_DIR"
-
-echo "[visual-regression] Running ${#RENDERED_SCENARIOS[@]} rendered scenarios"
-
-FAILED=0
-for scenario in "${RENDERED_SCENARIOS[@]}"; do
-    SCENARIO_CAPTURE_DIR="$CAPTURE_DIR/$scenario"
-    mkdir -p "$SCENARIO_CAPTURE_DIR"
-    
-    echo "[visual-regression] Running: $scenario"
-    
-    # Run with xvfb-run for headless display on Linux
-    if command -v xvfb-run &> /dev/null; then
-        xvfb-run -a "$GODOT_BIN" --path . -- \
-            --scenario "$scenario" \
-            --seed "$SEED" \
-            --capture_dir "$SCENARIO_CAPTURE_DIR" \
-            --quit_after_frames "$QUIT_AFTER_FRAMES" || {
-            echo "[visual-regression] FAILED: $scenario"
-            FAILED=$((FAILED + 1))
-            continue
-        }
-    else
-        # macOS or systems with display
-        "$GODOT_BIN" --path . -- \
-            --scenario "$scenario" \
-            --seed "$SEED" \
-            --capture_dir "$SCENARIO_CAPTURE_DIR" \
-            --quit_after_frames "$QUIT_AFTER_FRAMES" || {
-            echo "[visual-regression] FAILED: $scenario"
-            FAILED=$((FAILED + 1))
-            continue
-        }
-    fi
-    
-    echo "[visual-regression] OK: $scenario"
-done
-
-if [ $FAILED -gt 0 ]; then
-    echo "[visual-regression] $FAILED scenario(s) failed"
-    exit 1
+if [[ -e "$CAPTURE_ROOT" && -n "$(find "$CAPTURE_ROOT" -mindepth 1 -print -quit 2>/dev/null)" ]]; then
+  echo "ERROR: capture root must be empty: $CAPTURE_ROOT" >&2
+  exit 1
 fi
-
-echo "[visual-regression] All scenarios completed"
+mkdir -p "$CAPTURE_ROOT"
+for scenario in "${SCENARIOS[@]}"; do
+  scenario_capture="$CAPTURE_ROOT/$scenario"
+  mkdir -p "$scenario_capture"
+  if [[ "$(uname -s)" == "Linux" && -x "$(command -v xvfb-run 2>/dev/null || true)" ]]; then
+    xvfb-run -a env CAPTURE_DIR="$scenario_capture" ./tools/ci/run-scenario-rendered.sh "$scenario"
+  else
+    CAPTURE_DIR="$scenario_capture" ./tools/ci/run-scenario-rendered.sh "$scenario"
+  fi
+  BASELINE_DIR="$BASELINE_DIR" ./tools/ci/diff-visual.sh "$scenario" "$scenario_capture"
+done
+echo "[visual-regression] PASS: ${#SCENARIOS[@]} golden scenarios"

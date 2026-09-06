@@ -41,6 +41,7 @@
     {"action": "subagent", "resource": "*", "effect": "allow"},
     {"action": "godot_*", "resource": "*", "effect": "deny"},
     {"action": "image_*", "resource": "*", "effect": "deny"},
+    {"action": "vision", "resource": "*", "effect": "deny"},
     {"action": "nanobanana", "resource": "*", "effect": "deny"},
     {"action": "satellite_*", "resource": "*", "effect": "deny"},
     {"action": "satellite_godot_node_read", "resource": "*", "effect": "allow"},

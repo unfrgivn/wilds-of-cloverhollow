@@ -17,19 +17,19 @@ layer = 10
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 508.0
-offset_bottom = 64.0
+offset_bottom = 108.0
 
 [node name="EnemyPanel" type="PanelContainer" parent="BattleUI/TopHUD"]
-custom_minimum_size = Vector2(140, 0)
+custom_minimum_size = Vector2(190, 0)
 
 [node name="VBox" type="VBoxContainer" parent="BattleUI/TopHUD/EnemyPanel"]
 layout_mode = 2
 
-[node name="EnemyName" type="Label" parent="BattleUI/TopHUD/EnemyPanel"]
+[node name="EnemyName" type="Label" parent="BattleUI/TopHUD/EnemyPanel/VBox"]
 layout_mode = 2
 text = "Slime"
 
-[node name="EnemyHP" type="Label" parent="BattleUI/TopHUD/EnemyPanel"]
+[node name="EnemyHP" type="Label" parent="BattleUI/TopHUD/EnemyPanel/VBox"]
 layout_mode = 2
 text = "HP: 15/15"
 
@@ -38,10 +38,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="PartyPanel" type="PanelContainer" parent="BattleUI/TopHUD"]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 92)
 
-[node name="PartyStats" type="VBoxContainer" parent="BattleUI/TopHUD/PartyPanel"]
+[node name="Margin" type="MarginContainer" parent="BattleUI/TopHUD/PartyPanel"]
 layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="PartyStats" type="VBoxContainer" parent="BattleUI/TopHUD/PartyPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 1
 
 [node name="CommandMenu" type="PanelContainer" parent="BattleUI"]
 anchors_preset = 7
@@ -49,66 +57,73 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -60.0
-offset_top = -72.0
-offset_right = 60.0
+offset_left = -90.0
+offset_top = -112.0
+offset_right = 90.0
 offset_bottom = -4.0
 
 [node name="MenuContainer" type="VBoxContainer" parent="BattleUI/CommandMenu"]
 layout_mode = 2
+theme_override_constants/separation = 0
 
 [node name="Attack" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
 layout_mode = 2
 text = "> Attack"
+theme_override_font_sizes/font_size = 12
 
 [node name="Skill" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
 layout_mode = 2
 text = "  Skill"
+theme_override_font_sizes/font_size = 12
 
 [node name="Item" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
 layout_mode = 2
 text = "  Item"
+theme_override_font_sizes/font_size = 12
 
 [node name="Defend" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
 layout_mode = 2
 text = "  Defend"
+theme_override_font_sizes/font_size = 12
 
 [node name="Run" type="Label" parent="BattleUI/CommandMenu/MenuContainer"]
 layout_mode = 2
 text = "  Run"
+theme_override_font_sizes/font_size = 12
 
 [node name="TurnIndicator" type="Label" parent="BattleUI"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -80.0
-offset_top = 70.0
+offset_top = 112.0
 offset_right = 80.0
-offset_bottom = 86.0
+offset_bottom = 128.0
 text = "Fae's turn"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
 
 [node name="BattleMessage" type="Label" parent="BattleUI"]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -90.0
-offset_right = 200.0
-offset_bottom = -74.0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 56.0
+offset_top = 148.0
+offset_right = 456.0
+offset_bottom = 168.0
 text = "Battle started!"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
 
 [node name="TurnOrderPanel" type="PanelContainer" parent="BattleUI"]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -100.0
-offset_top = 100.0
-offset_right = 100.0
-offset_bottom = 124.0
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 130.0
+offset_right = -4.0
+offset_bottom = 144.0
 
 [node name="TurnOrderContainer" type="HBoxContainer" parent="BattleUI/TurnOrderPanel"]
 layout_mode = 2
@@ -117,15 +132,19 @@ theme_override_constants/separation = 8
 [node name="TurnOrderLabel" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
 layout_mode = 2
 text = "Turn Order:"
+theme_override_font_sizes/font_size = 8
 
 [node name="Turn1" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
 layout_mode = 2
 text = "Fae"
+theme_override_font_sizes/font_size = 8
 
 [node name="Turn2" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
 layout_mode = 2
 text = ">"
+theme_override_font_sizes/font_size = 8
 
 [node name="Turn3" type="Label" parent="BattleUI/TurnOrderPanel/TurnOrderContainer"]
 layout_mode = 2
 text = "Slime"
+theme_override_font_sizes/font_size = 8

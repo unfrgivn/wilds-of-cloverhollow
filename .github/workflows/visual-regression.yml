@@ -6,12 +6,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      update_golden:
-        description: 'Update golden captures'
-        required: false
-        default: 'false'
-        type: boolean
 
 env:
   GODOT_VERSION: "4.5.1"
@@ -22,6 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          version: "0.10.1"
+          python-version: "3.12"
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
@@ -54,24 +54,16 @@ jobs:
         run: |
           timeout 30 godot --headless --import
 
+      - name: Run art pipeline tests
+        run: uv run --locked python -m unittest tests/art/test_art_pipeline.py
+
+      - name: Run visual evidence tests
+        run: bun test tests/visual/visual-evidence.test.ts tests/agents/review-capture.test.ts
+
       - name: Run rendered scenarios
         run: |
           mkdir -p captures/current
           ./tools/ci/run-visual-regression.sh
-
-      - name: Compare with golden captures
-        id: diff
-        run: |
-          ./tools/ci/compare-captures.sh
-        continue-on-error: true
-
-      - name: Upload diff report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: visual-diff-report
-          path: captures/diff-report/
-          retention-days: 14
 
       - name: Upload current captures
         uses: actions/upload-artifact@v4
@@ -80,20 +72,3 @@ jobs:
           name: current-captures
           path: captures/current/
           retention-days: 7
-
-      - name: Update golden captures
-        if: github.event.inputs.update_golden == 'true' && github.ref == 'refs/heads/main'
-        run: |
-          rm -rf captures/golden
-          cp -r captures/current captures/golden
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add captures/golden
-          git commit -m "chore: Update golden captures" || echo "No changes to commit"
-          git push
-
-      - name: Fail on diff
-        if: steps.diff.outcome == 'failure'
-        run: |
-          echo "Visual regression detected! Check the diff report artifact."
-          exit 1

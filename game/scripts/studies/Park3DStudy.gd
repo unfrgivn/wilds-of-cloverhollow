@@ -15,20 +15,23 @@ var hud: Label
 var _jump_requested := false
 var _light_enabled := true
 var _capture_note := ""
+var _presentation_mode := false
+var _hud_panel: ColorRect
+var _vegetation_footprints: Array[Dictionary] = []
 var _fae_sprite: Sprite3D
 var _ground_shadow: MeshInstance3D
 var _shadow_ray: RayCast3D
 var _facing := "south"
 var _walk_clock := 0.0
 var _assets_ready := true
+const SHOWCASE_ROOT := "res://game/assets/studies/park25d/showcase/"
+const TEXTURE_UV_SCALE := 0.625
+const UPPER_TOP := 1.2
 
 var _green := Color("#6f9d5d")
-var _grass := Color("#8caf68")
 var _dark_grass := Color("#476b50")
-var _water := Color("#4c91a2")
 var _sand := Color("#d2ba78")
-var _wood := Color("#8b593e")
-var _stone := Color("#87918b")
+var _grass_shadow := Color("#355b4b")
 
 func _ready() -> void:
 	_build_world()
@@ -60,7 +63,7 @@ func _physics_process(delta: float) -> void:
 		fae.velocity.y = min(fae.velocity.y, 0.0)
 	fae.move_and_slide()
 	_update_shadow()
-	_update_hud(input)
+	_update_hud()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_J:
@@ -73,18 +76,35 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_L:
 			_light_enabled = not _light_enabled
 			key_light.visible = _light_enabled
+		elif event.keycode == KEY_H:
+			_set_presentation_mode(not _presentation_mode)
 
 func _build_world() -> void:
 	# Two raised, layered banks leave a real water channel between them.
-	_add_box("WestBank", Vector3(-5.5, -0.35, 0), Vector3(8, 0.7, 14), _green, true)
-	_add_box("EastBank", Vector3(5.5, -0.35, 0), Vector3(8, 0.7, 14), _grass, true)
-	_add_box("WestStrata", Vector3(-5.5, -0.02, -6.1), Vector3(9, 0.18, 1.1), _dark_grass, false)
-	_add_box("EastStrata", Vector3(5.5, -0.02, 6.1), Vector3(9, 0.18, 1.1), _dark_grass, false)
-	_add_box("Stream", Vector3(0, -0.48, 0), Vector3(3, 0.08, 14), _water, false)
+	_add_box("WestBank", Vector3(-5.5, -0.35, 0), Vector3(8, 0.7, 14), _grass_shadow, true, true)
+	_add_box("EastBank", Vector3(5.5, -0.35, 0), Vector3(8, 0.7, 14), _green, true, true)
+	_add_textured_box("WestBankMasonry", Vector3(-5.5, -0.35, 0), Vector3(8, 0.7, 14), "stone")
+	_add_textured_box("EastBankMasonry", Vector3(5.5, -0.35, 0), Vector3(8, 0.7, 14), "stone")
+	_add_textured_patch("WestGrassSurface", [Vector3(-9.5, 0.002, -7), Vector3(-1.5, 0.002, -7), Vector3(-1.5, 0.002, 7), Vector3(-9.5, 0.002, 7)], "grass")
+	_add_textured_patch("EastGrassSurface", [Vector3(1.5, 0.002, -7), Vector3(9.5, 0.002, -7), Vector3(9.5, 0.002, 7), Vector3(1.5, 0.002, 7)], "grass")
+	# Layered native-colour patches break the banks into an intentional garden floor.
+	_add_textured_patch("WestSoil", [Vector3(-8.8, .006, -5.9), Vector3(-4.8, .006, -6.2), Vector3(-3.2, .006, -4.4), Vector3(-4.5, .006, -3.0), Vector3(-8.8, .006, -3.3)], "soil")
+	_add_textured_patch("EastSoil", [Vector3(4.0, .006, 5.6), Vector3(8.7, .006, 5.6), Vector3(8.7, .006, 6.6), Vector3(3.9, .006, 6.6)], "soil")
+	_add_textured_patch("StreamWater", [Vector3(-1.42, -.42, -7), Vector3(1.42, -.42, -7), Vector3(1.42, -.42, 7), Vector3(-1.42, -.42, 7)], "water")
+	for side in [-1.0, 1.0]:
+		for z in [-4.0, 4.0]:
+			_add_box("StoneWetLine", Vector3(side * 1.404, -.425, z), Vector3(.016, .15, 6.0), Color("#2a6a8a"), false)
+		for z in [-6.4, -5.0, -3.7, -2.1, 1.5, 2.8, 4.3, 5.8]:
+			_add_box("BankFoam", Vector3(side * 1.367, -.414, z), Vector3(.065, .006, .34), Color("#5aa8d7"), false)
+	for z in [-5.2, -2.8, 2.2, 5.0]:
+		_add_box("WaterRipple", Vector3(0, -.375, z), Vector3(1.55, .012, .035), Color("#9bc7bd"), false)
+	_add_path()
 	# Continuous banks leave only the two-metre bridge approach open.
 	for z in [-4.0, 4.0]:
-		_add_box("WaterBarrierWest", Vector3(-1.5, -0.05, z), Vector3(0.18, 1.0, 6.0), _sand, true)
-		_add_box("WaterBarrierEast", Vector3(1.5, -0.05, z), Vector3(0.18, 1.0, 6.0), _sand, true)
+		_add_box("WaterBarrierWest", Vector3(-1.5, -0.05, z), Vector3(0.18, 1.0, 6.0), _sand, true, true)
+		_add_box("WaterBarrierEast", Vector3(1.5, -0.05, z), Vector3(0.18, 1.0, 6.0), _sand, true, true)
+		_add_textured_box("WestMossWall", Vector3(-1.5, -0.05, z), Vector3(0.18, 1.0, 6.0), "stone")
+		_add_textured_box("EastMossWall", Vector3(1.5, -0.05, z), Vector3(0.18, 1.0, 6.0), "stone")
 	_add_box("OuterBoundWest", Vector3(-9.5, 1.0, 0), Vector3(0.1, 2.0, 14), Color(0, 0, 0, 0), true, true)
 	_add_box("OuterBoundEast", Vector3(9.5, 1.0, 0), Vector3(0.1, 2.0, 14), Color(0, 0, 0, 0), true, true)
 	_add_box("OuterBoundNorth", Vector3(0, 1.0, -7), Vector3(19, 2.0, 0.1), Color(0, 0, 0, 0), true, true)
@@ -92,7 +112,7 @@ func _build_world() -> void:
 	_add_box("StreamEdgeWest", Vector3(-1.62, -0.12, 0), Vector3(0.24, 0.28, 2.0), _sand, false)
 	_add_box("StreamEdgeEast", Vector3(1.62, -0.12, 0), Vector3(0.24, 0.28, 2.0), _sand, false)
 	# The asset worker's bridge is visual-only; collision is authored here.
-	_assets_ready = _add_required_model("res://game/assets/studies/park25d/bridge.glb", Vector3.ZERO) and _assets_ready
+	_assets_ready = _add_required_model(SHOWCASE_ROOT + "bridge.glb", Vector3.ZERO) and _assets_ready
 	var deck_top := 0.16
 	_add_box("BridgeDeckCollider", Vector3(0, deck_top * 0.5, 0), Vector3(4.0, deck_top, 2), Color(0, 0, 0, 0), true, true)
 	_add_bridge_approach("BridgeApproachWest", -2.5, -2.0, deck_top)
@@ -101,16 +121,26 @@ func _build_world() -> void:
 	_add_box("BridgeRailBack", Vector3(0, 0.58, 0.78), Vector3(3.34, 0.84, 0.14), Color(0, 0, 0, 0), true, true)
 	# A solid earth wedge reaches the 1.2m east-bank overlook.
 	_add_wedge_ramp()
-	_add_box("UpperLand", Vector3(7.0, 0.6, 3.4), Vector3(2.0, 1.2, 4.2), _dark_grass, true)
+	_add_box("UpperLand", Vector3(7.0, 0.6, 3.4), Vector3(2.0, 1.2, 4.2), _dark_grass, true, true)
+	_add_textured_box("UpperStoneCliff", Vector3(7.0, 0.6, 3.4), Vector3(2.0, 1.2, 4.2), "stone")
+	_add_textured_patch("UpperGrassCap", [Vector3(6.0, 1.202, 1.3), Vector3(8.0, 1.202, 1.3), Vector3(8.0, 1.202, 5.5), Vector3(6.0, 1.202, 5.5)], "grass")
 	_add_box("CliffBoundary", Vector3(8.05, 1.8, 3.4), Vector3(0.1, 1.2, 4.2), Color(0, 0, 0, 0), true, true)
-	_add_box("CliffTrim", Vector3(6.5, 0.74, 1.35), Vector3(3.0, 0.12, 0.22), _sand, false)
 
 	_build_cottage(Vector3(-6.0, 0.0, -3.3))
-	_build_landmark(Vector3(7.0, 1.2, 1.9))
-	for p in [Vector3(-8, 0, -5), Vector3(-3, 0, 5), Vector3(7, 0, -4), Vector3(8.8, 0, -2)]:
-		_build_tree(p)
-	for p in [Vector3(-7.5, 0.0, 1.8), Vector3(-3.8, 0.0, -4.8), Vector3(6.3, 1.2, 4.8), Vector3(7.7, 1.2, 4.8)]:
-		_build_flower(p)
+	_build_landmark(Vector3(7.0, 1.2, 2.2))
+	_add_vegetation("oak_a", Vector3(-8, 0, -5))
+	_add_vegetation("oak_b", Vector3(-8.3, 0, -1.0))
+	_add_vegetation("oak_a", Vector3(-3.1, 0, 5))
+	_add_vegetation("oak_b", Vector3(7.2, 0, -4.5))
+	_add_vegetation("pine", Vector3(-8.4, 0, 3.8))
+	_add_vegetation("bush", Vector3(-7.5, 0, 1.8))
+	_add_vegetation("bush", Vector3(6.3, 1.2, 4.8))
+	_add_vegetation("flowers", Vector3(-3.8, 0, -4.8))
+	_add_vegetation("flowers", Vector3(6.8, 1.2, 4.8))
+	_add_vegetation("reeds", Vector3(-2.0, 0, -5.8))
+	_add_vegetation("reeds", Vector3(2.0, 0, 5.5))
+	_add_vegetation("grass_tuft", Vector3(-4.1, 0, -1.9))
+	_add_vegetation("rock", Vector3(-2.4, 0, 5.9))
 
 func _add_wedge_ramp() -> void:
 	var vertices := PackedVector3Array([
@@ -128,7 +158,7 @@ func _add_wedge_ramp() -> void:
 	var visual := MeshInstance3D.new()
 	visual.name = "SolidWedgeRamp"
 	visual.mesh = mesh
-	visual.material_override = _material(_stone, false)
+	visual.material_override = _textured_material("stone", true)
 	add_child(visual)
 	var body := StaticBody3D.new()
 	body.name = "SolidWedgeRampCollider"
@@ -140,7 +170,7 @@ func _add_wedge_ramp() -> void:
 	add_child(body)
 
 func _build_cottage(pos: Vector3) -> void:
-	_assets_ready = _add_required_model("res://game/assets/studies/park25d/cottage.glb", pos) and _assets_ready
+	_assets_ready = _add_required_model(SHOWCASE_ROOT + "cottage.glb", pos) and _assets_ready
 	# GLB is visual-only. These are intentionally invisible authored colliders.
 	_add_box("CottageCollider", pos + Vector3(0, 1.1, 0), Vector3(3.2, 2.2, 2.4), Color(0, 0, 0, 0), true, true)
 
@@ -161,7 +191,7 @@ func _add_bridge_approach(label: String, x_low: float, x_high: float, top: float
 	var visual := MeshInstance3D.new()
 	visual.name = "%sVisual" % label
 	visual.mesh = mesh
-	visual.material_override = _material(_sand, false)
+	visual.material_override = _textured_material("path", true)
 	add_child(visual)
 	var body := StaticBody3D.new()
 	body.name = label
@@ -173,9 +203,22 @@ func _add_bridge_approach(label: String, x_low: float, x_high: float, top: float
 	add_child(body)
 
 func _build_landmark(pos: Vector3) -> void:
-	_add_box("LandmarkBase", pos + Vector3(0, 0.35, 0), Vector3(2.1, 0.7, 1.5), _stone, true)
-	_add_box("LandmarkCap", pos + Vector3(0, 1.2, 0), Vector3(1.5, 1.0, 1.1), Color("#c88955"), true)
-	_add_box("LandmarkRoof", pos + Vector3(0, 2.0, 0), Vector3(1.8, 0.2, 1.4), Color("#6b536d"), true)
+	# A small lookout shrine, with open posts and a pitched cap instead of stacked boxes.
+	var base_top := 0.16
+	var roof_base := 1.55
+	_add_textured_box("LookoutStoneBase", pos + Vector3(0, base_top * 0.5, 0), Vector3(1.9, base_top, 1.1), "stone")
+	for x in [-.82, .82]:
+		for z in [-.42, .42]: _add_textured_box("LookoutPost", pos + Vector3(x, (base_top + roof_base) * 0.5, z), Vector3(.18, roof_base - base_top, .18), "wood")
+	var seat_bottom := 0.43
+	_add_textured_box("LookoutBenchSeat", pos + Vector3(0, seat_bottom + .05, .28), Vector3(1.25, .10, .28), "wood")
+	for x in [-.45, .45]:
+		_add_textured_box("LookoutBenchLeg", pos + Vector3(x, (base_top + seat_bottom) * 0.5, .28), Vector3(.10, seat_bottom - base_top, .18), "wood")
+	_add_textured_box("LookoutSign", pos + Vector3(0, .75, -.42), Vector3(.78, .38, .06), "wood")
+	_add_textured_box("LookoutSignSupport", pos + Vector3(0, .8, -.42), Vector3(1.64, .1, .12), "wood")
+	var roof := _pyramid_mesh("LookoutRoof", pos + Vector3(0, roof_base, 0), Vector2(.98, .58), .48, Color("#8f4a35"))
+	add_child(roof)
+	_add_textured_box("GardenPotWest", pos + Vector3(-.65, base_top + .22, .28), Vector3(.26, .44, .26), "stone")
+	_add_textured_box("GardenPotEast", pos + Vector3(.65, base_top + .22, .28), Vector3(.26, .44, .26), "stone")
 
 func _add_required_model(path: String, pos: Vector3) -> bool:
 	if not FileAccess.file_exists(path) or not ResourceLoader.exists(path):
@@ -193,14 +236,77 @@ func _add_required_model(path: String, pos: Vector3) -> bool:
 	add_child(model)
 	return true
 
-func _build_tree(pos: Vector3) -> void:
-	_add_box("TreeTrunk", pos + Vector3(0, 0.8, 0), Vector3(0.35, 1.6, 0.35), _wood, true)
-	_add_box("TreeCanopy", pos + Vector3(0, 2.0, 0), Vector3(1.7, 1.5, 1.7), _dark_grass, false)
-	_add_box("TreeCanopyLight", pos + Vector3(0.45, 2.3, 0.25), Vector3(0.65, 0.65, 0.65), _green, false)
+func _add_path() -> void:
+	_add_textured_patch("PathWest", [Vector3(-6.2, .012, -2.05), Vector3(-5.45, .012, -2.05), Vector3(-2.5, .012, -.82), Vector3(-2.5, .012, .82), Vector3(-5.45, .012, -1.2)], "path")
+	_add_textured_patch("PathBridgeWest", [Vector3(-4.8, .012, -.82), Vector3(-2.5, .012, -.82), Vector3(-2.5, .012, .82), Vector3(-4.8, .012, .82)], "path")
+	_add_textured_patch("PathBridgeEast", [Vector3(2.0, .172, -.82), Vector3(2.5, .012, -.82), Vector3(2.5, .012, .82), Vector3(2.0, .172, .82)], "path")
+	# The east approach follows the collision ramp, then becomes level on the ledge.
+	_add_textured_patch("PathRamp", [Vector3(2.0, _ramp_surface_y(2.0), 3.05), Vector3(6.0, _ramp_surface_y(6.0), 3.05), Vector3(6.0, _ramp_surface_y(6.0), 3.75), Vector3(2.0, _ramp_surface_y(2.0), 3.75)], "path")
+	_add_textured_patch("PathUpper", [Vector3(6.0, UPPER_TOP + .012, 3.05), Vector3(8.0, UPPER_TOP + .012, 3.05), Vector3(8.0, UPPER_TOP + .012, 3.75), Vector3(6.0, UPPER_TOP + .012, 3.75)], "path")
 
-func _build_flower(pos: Vector3) -> void:
-	_add_box("FlowerStem", pos + Vector3(0, 0.2, 0), Vector3(0.06, 0.4, 0.06), _dark_grass, false)
-	_add_box("FlowerHead", pos + Vector3(0, 0.45, 0), Vector3(0.24, 0.18, 0.24), Color("#f1cf67"), false)
+func _ramp_surface_y(x: float) -> float:
+	return 0.3 * (x - 2.0) + 0.012
+
+func _add_textured_patch(label: String, points: Array[Vector3], texture_name: String) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in range(1, points.size() - 1):
+		for point in [points[0], points[i], points[i + 1]]:
+			surface.set_uv(Vector2(point.x, point.z) * TEXTURE_UV_SCALE)
+			surface.add_vertex(point)
+	surface.generate_normals()
+	var mesh := MeshInstance3D.new()
+	mesh.name = label
+	mesh.mesh = surface.commit()
+	mesh.material_override = _textured_material(texture_name)
+	add_child(mesh)
+
+func _add_vegetation(asset_name: String, pos: Vector3) -> void:
+	var path := SHOWCASE_ROOT + asset_name + ".png"
+	if not FileAccess.file_exists(path) or not ResourceLoader.exists(path):
+		_assets_ready = false
+		push_error("Required park study vegetation missing: %s" % path)
+		return
+	var sprite := Sprite3D.new()
+	sprite.name = "Vegetation_%s" % asset_name
+	sprite.texture = load(path)
+	sprite.pixel_size = 0.05
+	sprite.centered = true
+	sprite.offset = Vector2(0, sprite.texture.get_height() / 2.0)
+	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sprite.no_depth_test = false
+	sprite.position = pos
+	add_child(sprite)
+	_vegetation_footprints.append({"node": sprite, "foot": pos, "texture_height": sprite.texture.get_height()})
+	if asset_name.begins_with("oak_") or asset_name == "pine":
+		_add_box("TreeTrunkCollision", pos + Vector3(0, .6, 0), Vector3(.28, 1.2, .28), Color("#5a4a3a"), true, true)
+
+func _add_textured_box(label: String, pos: Vector3, size: Vector3, texture_name: String) -> void:
+	var mesh := MeshInstance3D.new()
+	mesh.name = label
+	var box := BoxMesh.new()
+	box.size = size
+	mesh.mesh = box
+	mesh.position = pos
+	mesh.material_override = _textured_material(texture_name, true)
+	add_child(mesh, true)
+
+func _pyramid_mesh(label: String, pos: Vector3, footprint: Vector2, height: float, color: Color) -> MeshInstance3D:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var p := [Vector3(-footprint.x, 0, -footprint.y), Vector3(footprint.x, 0, -footprint.y), Vector3(footprint.x, 0, footprint.y), Vector3(-footprint.x, 0, footprint.y), Vector3(0, height, 0)]
+	for face in [[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4], [0, 3, 2], [0, 2, 1]]:
+		for index in face:
+			surface.set_uv(Vector2(p[index].x, p[index].z) * TEXTURE_UV_SCALE)
+			surface.add_vertex(p[index])
+	surface.generate_normals()
+	var mesh := MeshInstance3D.new()
+	mesh.name = label
+	mesh.mesh = surface.commit()
+	mesh.material_override = _textured_material("roof") if label == "LookoutRoof" else _material(color, false)
+	mesh.position = pos
+	return mesh
 
 func _build_fae() -> void:
 	fae = CharacterBody3D.new()
@@ -310,6 +416,8 @@ func _build_lighting() -> void:
 	key_light.light_color = Color("#ffd19a")
 	key_light.light_energy = 1.15
 	key_light.shadow_enabled = true
+	key_light.shadow_blur = 0.5
+	key_light.shadow_normal_bias = 0.5
 	add_child(key_light)
 	var world := WorldEnvironment.new()
 	var environment := Environment.new()
@@ -324,25 +432,36 @@ func _build_lighting() -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var hud_panel := ColorRect.new()
-	hud_panel.position = Vector2(5, 4)
-	hud_panel.size = Vector2(330, 54)
-	hud_panel.color = Color(0.08, 0.12, 0.12, 0.82)
-	layer.add_child(hud_panel)
+	_hud_panel = ColorRect.new()
+	_hud_panel.position = Vector2(5, 4)
+	_hud_panel.color = Color(0.08, 0.12, 0.12, 0.72)
+	layer.add_child(_hud_panel)
 	hud = Label.new()
-	hud.position = Vector2(10, 7)
-	hud.add_theme_font_size_override("font_size", 12)
+	hud.position = Vector2(10, 5)
+	hud.add_theme_font_size_override("font_size", 10)
 	hud.add_theme_color_override("font_color", Color("#fff1c7"))
 	hud.add_theme_color_override("font_shadow_color", Color("#263c3b"))
 	hud.add_theme_constant_override("shadow_offset_x", 2)
 	hud.add_theme_constant_override("shadow_offset_y", 2)
 	layer.add_child(hud)
+	hud.text = "CLOVERBROOK  •  ORTHOGRAPHIC"
+	_refresh_hud_bounds()
 
-func _update_hud(input: Vector2) -> void:
-	var floor_name := "ground"
-	if fae.position.x > 2.0 and fae.position.y > 0.8:
-		floor_name = "upper ledge 1.2m"
-	hud.text = "PARK STUDY  •  %s\nArrows/WASD move  J jump  1/2 camera  L light\n%s  •  %s" % [floor_name, _capture_note, "airborne" if not fae.is_on_floor() else "grounded"]
+func _set_presentation_mode(enabled: bool) -> void:
+	_presentation_mode = enabled
+	if hud != null:
+		hud.visible = not enabled
+		_hud_panel.visible = not enabled
+
+func _update_hud() -> void:
+	hud.text = "CLOVERBROOK  •  %s" % _capture_note
+	_refresh_hud_bounds()
+
+func _refresh_hud_bounds() -> void:
+	if hud == null or _hud_panel == null:
+		return
+	hud.size = hud.get_minimum_size()
+	_hud_panel.size = hud.position + hud.size + Vector2(8, 6)
 
 func study_operation(data: Dictionary) -> Dictionary:
 	var operation := str(data.get("operation", "checkpoint"))
@@ -400,6 +519,11 @@ func study_operation(data: Dictionary) -> Dictionary:
 			return {"ok": passed, "operation": operation, "label": label, "position": _vec(fae.position), "floor_y": fae.position.y, "on_floor": fae.is_on_floor(), "required_assets": _assets_ready}
 		"capture_note":
 			return {"ok": true, "operation": operation, "profile": _capture_note, "position": _vec(fae.position), "sprite_proof": _sprite_screen_proof()}
+		"presentation":
+			_set_presentation_mode(bool(data.get("enabled", true)))
+			return {"ok": true, "operation": operation, "enabled": _presentation_mode}
+		"geometry_assert":
+			return _geometry_assertions()
 		"sprite_probe":
 			var proof := _sprite_screen_proof()
 			return {"ok": bool(proof.get("visible", false)), "operation": operation, "sprite_proof": proof}
@@ -426,6 +550,176 @@ func study_operation(data: Dictionary) -> Dictionary:
 			return {"ok": passed, "operation": operation, "directions": observations}
 		_:
 			return {"ok": false, "error": "unknown study operation: %s" % operation}
+
+func _geometry_assertions() -> Dictionary:
+	var lookout := _lookout_geometry_observations()
+	var plants := _plant_geometry_observations()
+	var paths := _path_vertex_observations()
+	var hud_observation := _hud_geometry_observation()
+	var passed := _assets_ready and bool(lookout["ok"]) and bool(plants["ok"]) and bool(paths["ok"]) and bool(hud_observation["ok"])
+	return {"ok": passed, "operation": "geometry_assert", "assets_ready": _assets_ready, "plants_grounded": plants, "plant_count": _vegetation_footprints.size(), "path_surfaces": paths, "lookout_contacts": lookout, "hud_fits": hud_observation}
+
+func _mesh_nodes_with_prefix(prefix: String) -> Array[MeshInstance3D]:
+	var matches: Array[MeshInstance3D] = []
+	for child in get_children():
+		if child is MeshInstance3D and str(child.name).begins_with(prefix):
+			matches.append(child as MeshInstance3D)
+	return matches
+
+func _mesh_nodes_under(node: Node) -> Array[MeshInstance3D]:
+	var matches: Array[MeshInstance3D] = []
+	for child in node.get_children():
+		if child is MeshInstance3D:
+			matches.append(child as MeshInstance3D)
+		matches.append_array(_mesh_nodes_under(child))
+	return matches
+
+func _world_aabb_for_node(node: Node) -> Dictionary:
+	var meshes: Array[MeshInstance3D] = []
+	if node == null:
+		return {"ok": false, "aabb": AABB()}
+	if node is MeshInstance3D:
+		meshes.append(node as MeshInstance3D)
+	meshes.append_array(_mesh_nodes_under(node))
+	if meshes.is_empty():
+		return {"ok": false, "aabb": AABB()}
+	var bounds := meshes[0].global_transform * meshes[0].get_aabb()
+	for mesh in meshes.slice(1):
+		bounds = bounds.merge(mesh.global_transform * mesh.get_aabb())
+	return {"ok": true, "aabb": bounds}
+
+func _aabb_contact(label: String, lower: AABB, upper: AABB) -> Dictionary:
+	var bottom := lower.position.y
+	var top := lower.end.y
+	var target := upper.position.y
+	var delta: float = abs(top - target)
+	var overlaps_x: bool = lower.position.x <= upper.end.x and upper.position.x <= lower.end.x
+	var overlaps_z: bool = lower.position.z <= upper.end.z and upper.position.z <= lower.end.z
+	return {"part": label, "lower_bottom": bottom, "lower_top": top, "upper_bottom": target, "delta": delta, "xz_overlap": overlaps_x and overlaps_z, "ok": delta < 0.003 and overlaps_x and overlaps_z}
+
+func _lookout_geometry_observations() -> Dictionary:
+	var base_node := get_node_or_null("LookoutStoneBase")
+	var roof_node := get_node_or_null("LookoutRoof")
+	var base_data := _world_aabb_for_node(base_node) if base_node != null else {"ok": false}
+	var roof_data := _world_aabb_for_node(roof_node) if roof_node != null else {"ok": false}
+	var contacts: Array[Dictionary] = []
+	var posts := _mesh_nodes_with_prefix("LookoutPost")
+	var legs := _mesh_nodes_with_prefix("LookoutBenchLeg")
+	var pots := _mesh_nodes_with_prefix("GardenPot")
+	var valid := bool(base_data.get("ok", false)) and bool(roof_data.get("ok", false)) and posts.size() == 4 and legs.size() == 2 and pots.size() == 2
+	if valid:
+		var base: AABB = base_data["aabb"]
+		var roof: AABB = roof_data["aabb"]
+		for post in posts:
+			var post_data := _world_aabb_for_node(post)
+			var post_box: AABB = post_data["aabb"]
+			var base_contact := _aabb_contact(str(post.name) + "_base", base, post_box)
+			var roof_contact := _aabb_contact(str(post.name) + "_roof", post_box, roof)
+			contacts.append(base_contact)
+			contacts.append(roof_contact)
+			valid = valid and bool(base_contact["ok"]) and bool(roof_contact["ok"])
+		var seat_node := get_node_or_null("LookoutBenchSeat")
+		var seat_data := _world_aabb_for_node(seat_node) if seat_node != null else {"ok": false}
+		valid = valid and bool(seat_data.get("ok", false))
+		if bool(seat_data.get("ok", false)):
+			var seat: AABB = seat_data["aabb"]
+			for leg in legs:
+				var leg_box: AABB = _world_aabb_for_node(leg)["aabb"]
+				var leg_contact := _aabb_contact(str(leg.name) + "_base", base, leg_box)
+				var seat_contact := _aabb_contact(str(leg.name) + "_seat", leg_box, seat)
+				contacts.append(leg_contact)
+				contacts.append(seat_contact)
+				valid = valid and bool(leg_contact["ok"]) and bool(seat_contact["ok"])
+		var pots_inside := true
+		for pot in pots:
+			var pot_box: AABB = _world_aabb_for_node(pot)["aabb"]
+			var pot_contact := _aabb_contact(str(pot.name) + "_base", base, pot_box)
+			var footprint := base.encloses(AABB(Vector3(pot_box.position.x, base.position.y, pot_box.position.z), Vector3(pot_box.size.x, 0, pot_box.size.z)))
+			pot_contact["footprint_inside_base"] = footprint
+			pots_inside = pots_inside and bool(pot_contact["ok"]) and footprint
+			contacts.append(pot_contact)
+			valid = valid and pots_inside
+	return {"ok": valid and contacts.size() == 14, "counts": {"posts": posts.size(), "legs": legs.size(), "pots": pots.size()}, "contacts": contacts}
+
+func _plant_geometry_observations() -> Dictionary:
+	var observations: Array[Dictionary] = []
+	var valid := _vegetation_footprints.size() == 13
+	var west_data := _world_aabb_for_node(get_node_or_null("WestBank"))
+	var east_data := _world_aabb_for_node(get_node_or_null("EastBank"))
+	var upper_data := _world_aabb_for_node(get_node_or_null("UpperLand"))
+	valid = valid and bool(west_data.get("ok", false)) and bool(east_data.get("ok", false)) and bool(upper_data.get("ok", false))
+	for record in _vegetation_footprints:
+		var sprite: Sprite3D = record["node"]
+		var texture := sprite.texture
+		var width := float(texture.get_width()) * sprite.pixel_size if texture != null else 0.0
+		var height := float(texture.get_height()) * sprite.pixel_size if texture != null else 0.0
+		var expected_offset := height / (2.0 * sprite.pixel_size) if not is_zero_approx(sprite.pixel_size) else 0.0
+		var foot := sprite.global_position
+		var bank_name := ""
+		var bank := AABB()
+		for candidate in [{"name": "WestBank", "data": west_data}, {"name": "EastBank", "data": east_data}, {"name": "UpperLand", "data": upper_data}]:
+			var candidate_data: Dictionary = candidate["data"]
+			if not bool(candidate_data.get("ok", false)):
+				continue
+			var candidate_box: AABB = candidate_data["aabb"]
+			var on_floor: bool = abs(foot.y - candidate_box.end.y) < 0.003
+			var on_footprint: bool = foot.x >= candidate_box.position.x and foot.x <= candidate_box.end.x and foot.z >= candidate_box.position.z and foot.z <= candidate_box.end.z
+			if on_floor and on_footprint:
+				bank_name = str(candidate["name"])
+				bank = candidate_box
+				break
+		var canopy_overhang := {"width": width, "height": height, "allowed": true}
+		var footprint := not bank_name.is_empty()
+		var observation := {"name": str(sprite.name), "foot": _vec(foot), "offset": sprite.offset.y, "expected_offset": expected_offset, "bank": bank_name, "bank_top": bank.end.y, "footprint_inside_bank": footprint, "canopy_overhang": canopy_overhang, "ok": sprite.centered and abs(sprite.offset.y - expected_offset) < 0.001 and footprint}
+		observations.append(observation)
+		valid = valid and bool(observation["ok"])
+	return {"ok": valid, "observations": observations}
+
+func _path_vertex_observations() -> Dictionary:
+	var path_names := ["PathWest", "PathBridgeWest", "PathBridgeEast", "PathRamp", "PathUpper"]
+	var observations: Array[Dictionary] = []
+	var valid := true
+	for label in path_names:
+		var mesh := get_node_or_null(label) as MeshInstance3D
+		var path_observation := {"path": label, "vertices": [], "ok": false}
+		if mesh == null or mesh.mesh == null or mesh.mesh.get_surface_count() == 0:
+			observations.append(path_observation)
+			valid = false
+			continue
+		var arrays := mesh.mesh.surface_get_arrays(0)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+		var vertex_ok := vertices.size() > 0 and normals.size() == vertices.size()
+		for index in range(vertices.size()):
+			var point := mesh.global_transform * vertices[index]
+			var expected_y := 0.012
+			var expected_normal := Vector3.UP
+			if label == "PathRamp":
+				expected_y = 0.3 * (point.x - 2.0) + 0.012
+				expected_normal = Vector3(-0.3, 1.0, 0.0).normalized()
+			elif label == "PathBridgeEast":
+				expected_y = 0.32 * (2.5 - point.x) + 0.012
+				expected_normal = Vector3(0.32, 1.0, 0.0).normalized()
+			elif label == "PathUpper":
+				expected_y = 1.212
+			var observed_normal := (mesh.global_basis * normals[index]).normalized()
+			var normal_dot := observed_normal.dot(expected_normal)
+			var point_ok: bool = abs(point.y - expected_y) < 0.003 and normal_dot > 0.999
+			vertex_ok = vertex_ok and point_ok
+			(path_observation["vertices"] as Array).append({"position": _vec(point), "expected_y": expected_y, "normal": _vec(observed_normal), "expected_normal": _vec(expected_normal), "normal_dot": normal_dot, "ok": point_ok})
+		path_observation["ok"] = vertex_ok
+		observations.append(path_observation)
+		valid = valid and vertex_ok
+	return {"ok": valid, "observations": observations}
+
+func _hud_geometry_observation() -> Dictionary:
+	if _hud_panel == null or hud == null:
+		return {"ok": false, "reason": "HUD nodes missing"}
+	var viewport_rect := get_viewport().get_visible_rect()
+	var panel_rect := _hud_panel.get_global_rect()
+	var label_rect := hud.get_global_rect()
+	var ok := viewport_rect.encloses(panel_rect) and panel_rect.encloses(label_rect)
+	return {"ok": ok, "viewport": viewport_rect, "panel": panel_rect, "label": label_rect}
 
 func _drive_to(target: Vector3, max_frames: int) -> Dictionary:
 	var start := fae.position
@@ -506,6 +800,22 @@ func _material(color: Color, transparent: bool) -> StandardMaterial3D:
 	material.roughness = 1.0
 	if transparent:
 		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	return material
+
+func _textured_material(texture_name: String, triplanar: bool = false) -> StandardMaterial3D:
+	var path := SHOWCASE_ROOT + texture_name + ".png"
+	if not FileAccess.file_exists(path) or not ResourceLoader.exists(path):
+		_assets_ready = false
+		push_error("Required park study texture missing: %s" % path)
+		return _material(Color("#2f4b44"), false)
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = load(path)
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	material.texture_repeat = true
+	material.uv1_scale = Vector3(TEXTURE_UV_SCALE, TEXTURE_UV_SCALE, TEXTURE_UV_SCALE) if triplanar else Vector3.ONE
+	material.uv1_triplanar = triplanar
+	material.uv1_world_triplanar = triplanar
+	material.roughness = 1.0
 	return material
 
 func _vec(value: Vector3) -> Dictionary:

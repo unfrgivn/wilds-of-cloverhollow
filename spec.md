@@ -56,6 +56,44 @@ This file is the single source of truth. If code changes behavior, update this f
 - Commit and push this study branch only. Do not merge or push it to main
   before the visual direction is reviewed.
 
+#### M230: Cloverbrook Footbridge art slice
+- The approved next experiment is a full art pass of this one playable study,
+  not a whole-game migration. The intended presentation is a warm, welcoming
+  Cloverhollow village garden with a cottage, footbridge, stream, and elevated
+  lookout, using original art.
+- Replace blockout surfaces and silhouettes with coherent pixel-textured
+  terrain, shaped foliage, finished-looking architecture, stream edges, and
+  deliberately grouped scenery. Preserve readable paths and negative space.
+- Art additions must respect the tested bridge/ramp geometry and player
+  clearance. No changes to the production 2D route, saves, or quest systems.
+- Keep the 512x288 presentation, nearest filtering, eight-direction Fae,
+  normal depth testing, and paired orthographic/perspective comparisons.
+  New vegetation and prop images may use explicitly declared varied sizes.
+- Ambient art animation, if introduced, uses deterministic simulation time.
+  Do not obscure weak assets with heavy blur, bloom, or post-processing.
+- Replace the large diagnostic overlay with compact, readable sample chrome.
+  Hero captures may hide helper UI, but must remain actual rendered gameplay.
+- Validate authored assets, physical contact, geometry, and runtime traversal.
+  Review native captures and a real movement recording before accepting the
+  art pass. A passing trace alone does not establish visual quality.
+- The showcase kit lives under `game/assets/studies/park25d/showcase`, with
+  separate recipes/builders and ignored Blender authoring sources. Retain the
+  M229 assets and gallery as the historical blockout comparison.
+- Terrain textures are 32x32 repeating images at approximately 20 texels per
+  metre. Static foliage uses explicitly declared sprite sizes, bottom-centre
+  anchors, nearest filtering, and the same 0.05-metre pixel scale as Fae.
+- Study `presentation` toggles helper chrome (also bound to H). Study
+  `geometry_assert` measures constructed paths, foliage anchoring, lookout
+  contacts, and UI bounds; it must not substitute hardcoded expected arithmetic
+  for measurements of the actual scene.
+- The two showcase GLB import sidecars use `gltf/embedded_image_handling=3`
+  (Embed as Uncompressed), retaining lossless embedded pixel textures without
+  generating loose prefixed images beside the assets. These sidecars are tracked.
+- Tree roots use small solid trunk footprints. Decorative ground planting is
+  non-interactive. Foliage/water remain static in this slice; broader traversal,
+  fall recovery, mobile behavior, and performance certification remain outside
+  this art pass.
+
 ### 3.1 Overworld
 - 2D pixel art.
 - Classic 3/4 overhead JRPG look (top-down-ish).

@@ -1,5 +1,9 @@
 # Cloverhollow 2.5D direction sample
 
+**Archived M229 blockout. [See the M230 art showcase](../cloverbrook-showcase/README.md).**
+The current study launcher now opens the art-pass version. Commit `86ae934`
+preserves the implementation shown in this older gallery.
+
 This is an original **technical art blockout**, not finished art or a whole-game
 conversion. It tests 3D terrain with pixel Fae, physical elevation, a bridge,
 camera-relative movement, and two fixed camera projections.

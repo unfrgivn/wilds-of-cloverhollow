@@ -51,6 +51,14 @@ def _dot(a: Vec, b: Vec) -> float:
 
 
 class Park3DStudyContractTests(unittest.TestCase):
+    def test_geometry_assertions_measure_scene_nodes_instead_of_repeating_constructor_constants(self) -> None:
+        source = SOURCE.read_text()
+        body = _function(source, "_geometry_assertions")
+        self.assertIn("_mesh_nodes_with_prefix", source)
+        self.assertIn("_path_vertex_observations", source)
+        self.assertIn("get_aabb()", source)
+        self.assertNotIn("0.16 + 1.39", body)
+
     def test_wedge_initializer_is_a_closed_outward_solid_with_expected_slope(self) -> None:
         source = SOURCE.read_text()
         vertices, indices = _geometry(_function(source, "_add_wedge_ramp"))

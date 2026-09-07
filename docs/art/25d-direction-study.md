@@ -9,11 +9,11 @@ construction than either a flat painted background or a fully 3D character game.
 This study is isolated on `prototype/2-5d-world-study`. Main remains the playable
 2D game. A promising screenshot is not approval to port every level.
 
-**[Open the sample gallery and movement clip](samples/park25d/README.md).**
-Run `just study-25d-play` on the study branch to try it yourself. This first
-sample proves the construction and movement, not finished Cassette Beasts-like
-art quality. The next art pass would need textured terrain, richer foliage
-silhouettes, and more deliberate scene dressing.
+**[Open the current art showcase and movement clip](samples/cloverbrook-showcase/README.md).**
+Run `just study-25d-play` on the study branch to try it yourself.
+The [archived blockout](samples/park25d/README.md) records the first construction
+sample. M230 adds textured terrain, authored foliage, upgraded architecture,
+and scene dressing. Review that slice before deciding on a whole-game port.
 
 ## What Cassette Beasts actually does
 

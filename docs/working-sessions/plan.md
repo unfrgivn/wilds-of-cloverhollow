@@ -6,10 +6,11 @@ This file is the milestone source. `/next-milestone` selects work from here.
 
 ### Current branch experiment
 
-On `prototype/2-5d-world-study`, the user's new priority is **M229 only**: an
-isolated 2.5D visual/movement sample inspired by Cassette Beasts' construction.
-Keep main unchanged, publish only this branch, and stop for direction review
-before any whole-game migration. The completed sequence below remains history.
+On `prototype/2-5d-world-study`, M229 established a playable 2.5D blockout.
+The user approved **M230 next**: a full art pass of that one scene, showing what
+a polished Cloverhollow product could look like. Keep main unchanged, publish
+only this branch, and stop for visual review before any whole-game migration.
+The completed sequence below remains history.
 
 The September 6, 2026 request prioritizes autonomous local development before
 more gameplay and artwork. Select these milestones explicitly rather than
@@ -2589,3 +2590,37 @@ Provide original playable visual samples before deciding whether Cloverhollow sh
   finished art matching Cassette Beasts' detail.
 - Evidence: `docs/working-sessions/m229-25d-study.md`.
 - Stop for direction review. No next implementation milestone is selected.
+
+---
+
+## Milestone 230 — Cloverbrook Footbridge showcase art pass  **Owner:** Art Pipeline + Godot Gameplay Engineer  **Status:** ✅ Completed (2026-09-06)
+### Objective
+Turn the existing 2.5D blockout into a cohesive, finished-looking visual slice
+that can inform a product art-direction decision.
+
+### Acceptance criteria
+- Remain on the prototype branch. The default 2D game and saves are unchanged.
+- Terrain has intentional grass, soil/path, stone, cliff, and stream treatments,
+  with consistent pixel scale and transitions rather than naked block surfaces.
+- Trees and planting have varied authored silhouettes, coherent grouping, and
+  enough negative space to preserve route and character readability.
+- The cottage, bridge, and upper lookout look like designed locations rather
+  than primitive placeholders. New props support one coherent village garden.
+- Lighting and compact UI support the scene without hiding it or introducing
+  text clutter, filtering blur, always-on-top characters, or unreadable shadows.
+- The same real-input bridge/ramp/jump/return and boundary checks remain green.
+- Asset sources, recipes, palette/dimension contracts, and relevant tests are
+  reproducible. No paid asset-generation service or new dependency is required.
+- Actual native captures show starting view, bridge, and raised route. Paired
+  cameras and a new real-engine movement clip are committed for review.
+- Independent capture review compares against the M229 blockout and identifies
+  any remaining production-quality gaps. Functional success is not visual approval.
+- Mandatory smoke, tests, spec, headless scenario, and rendered scenario gates pass.
+- Publish only the prototype branch, then stop for visual direction review.
+
+### Delivery
+- `docs/art/samples/cloverbrook-showcase/README.md`: current gallery, before/after,
+  paired cameras, and real-engine MP4/GIF.
+- `docs/working-sessions/m230-showcase.md`: independent checks and limits.
+- M229's blockout gallery and asset kit remain intact as the before state.
+- No whole-game migration or next implementation milestone is selected.

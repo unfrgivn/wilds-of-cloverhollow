@@ -24,7 +24,8 @@ converted separately with ffmpeg. This is an original visual prototype study,
 not a replacement for the default 2D game route.
 
 Controls in the study are WASD or arrow keys, `J` for jump, `1` orthographic,
-`2` long-lens perspective, and `L` for the warm key light. The route is driven
+`2` long-lens perspective, `L` for the warm key light, and `H` to hide/show helper
+chrome. The route is driven
 by real input actions, not position teleportation. The trace records scene,
 camera profile, floor height, grounded state, jump peak, and route checkpoints.
 
@@ -38,3 +39,13 @@ camera-facing quad corners, a screen box, and source texture alpha bounds at
 capture checkpoints. This checks projection and texture availability, not
 occlusion or framebuffer visibility. Actual attachment reviews of the rendered
 captures provide the separate visual check.
+
+M230 loads its required art from `game/assets/studies/park25d/showcase`.
+The camera scenario invokes `study_3d` operation `geometry_assert` to inspect
+actual mesh contacts, path vertices/normals, plant foot anchors, and HUD bounds.
+Operation `presentation` takes an `enabled` boolean to hide/show the helper UI
+without changing the world or controller. A hidden helper does not disable
+scenario assertions or trace evidence.
+
+[Current art showcase](../art/samples/cloverbrook-showcase/README.md) and
+[rebuild instructions](../art/park25d-m230-art-pass.md).

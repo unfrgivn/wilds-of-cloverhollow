@@ -1,0 +1,43 @@
+{
+  "asset": "plaza ground",
+  "date": "2026-10-05",
+  "model": "gemini-3.1-flash-image and gemini-3-pro-image",
+  "calls": 5,
+  "running_total_calls": 9,
+  "references": [
+    "docs/art/concepts/environments/town_center_plaza.png",
+    "docs/art/concepts/environments/topdown_gameplay_screenshot_in_l.png",
+    "docs/art/concepts/props/town_shops_buildings.png",
+    "docs/art/concepts/props/park_props.png",
+    "art/scratch/bedroom-approved-style-reference.png",
+    "art/scratch/fae-idle-down-scale-reference.png"
+  ],
+  "scale_reference_instruction": "Fae idle was supplied only as a 280px source-pixel scale reference; prompts explicitly said do not draw this character.",
+  "prompt_summary": "Wide 3/2 3/4 overhead town plaza with central fountain, small cozy house and clear front door, four compact shops with striped awnings and pictorial signs, open cobblestone routes, lamps with hanging baskets, benches, trees, flower beds, and a right-edge path. Door target was 400px, never above 450px, against a 280px Fae reference. No lettering, characters, animals, UI, or watermark.",
+  "explorations": [
+    "art/scratch/1791216075814-gemini-3.1-flash-image-0.png",
+    "art/scratch/1791216102103-gemini-3.1-flash-image-0.png",
+    "art/scratch/1791216129138-gemini-3.1-flash-image-0.png"
+  ],
+  "final_attempts": [
+    "art/scratch/1791216204171-gemini-3-pro-image-0.png",
+    "art/scratch/1791216286192-gemini-3-pro-image-0.png"
+  ],
+  "selected": "art/source/areas/plaza/plaza-final-pro-02.jpg",
+  "selection_reason": "The second Pro pass had the strongest complete plaza composition: readable house entrance, central fountain, four compact pictorial shop signs, open paths, lamps, benches, flower beds, and clean watercolor treatment. The whole painting was uniformly reduced and paper-padded to bring the generated architecture close to the approved child scale without stretching.",
+  "post_processing": [
+    "Uniformly resize the selected 5056x3392 JPEG to 3000px wide, preserving aspect ratio.",
+    "Center the resulting 3000x2012 image on a #fcfbf6 3500x2200 opaque canvas; no non-uniform stretching.",
+    "Export six opaque WebP tiles at quality 88 in a 3x2 grid.",
+    "Composite Fae's 384x384 idle frame at three 280px-tall scale-check positions, then downscale review output.",
+    "Composite color-coded occluder candidate outlines, then downscale review output.",
+    "Crop the 3130x1440 source-pixel camera view around the house door and resize to 1748x804 for phone review."
+  ],
+  "outputs": {
+    "preview": "art/review/plaza-preview.png",
+    "scale_check": "art/review/plaza-scale-check.png",
+    "phone_view": "art/review/plaza-phone-view.png",
+    "occluders": "art/review/plaza-occluder-candidates.png",
+    "manifest": "public/assets/areas/plaza/ground.json"
+  }
+}

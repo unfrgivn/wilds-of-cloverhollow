@@ -33,3 +33,19 @@
   game fills the view with it so the painting has no visible edge.
 - Check scale by compositing Fae's idle frame at her feet in several floor
   spots, then mock a phone view (720 logical units tall) before approval.
+
+## Plaza
+
+- The bedroom is the best style reference: pass its assembled ground image,
+  not a concept sheet, so the plaza inherits the approved watercolor density,
+  warm-brown line, and paper warmth.
+- Gemini consistently made storefronts and doors too large. Put the target in
+  the prompt twice: doors about 400 source px against Fae's 280px frame, and
+  each facade about one sixth of the image width. Measure the result and use
+  uniform resampling plus paper padding when needed; never stretch the scene.
+- A wide plaza reads best with the fountain near center, the house at a side
+  edge, shops on the far edge, and three broad routes radiating through the
+  open ground. Pictorial signs avoided most lettering artifacts.
+- For the phone review, use a 1565x720 logical viewport (3130x1440 source px)
+  and render it at 1748x804. Keep the house door in the crop because it is the
+  most important transition and scale anchor.

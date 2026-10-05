@@ -1,0 +1,18 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.5
+      - run: bun install --frozen-lockfile
+      # Same commands as `just check` and `just build`.
+      - run: bun run check
+      - run: bun run build
+      - run: bunx playwright install --with-deps chromium
+      # Screenshot baselines are macOS-only for now.
+      - run: bunx playwright test --ignore-snapshots

@@ -1,0 +1,28 @@
+{
+  "name": "wilds-of-cloverhollow",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --strictPort",
+    "typecheck": "tsc --noEmit",
+    "unit": "vitest run",
+    "sim": "bun tools/sim/run-all.ts",
+    "sim:one": "bun tools/sim/run.ts",
+    "purity": "bun tools/purity.ts",
+    "lint": "bun tools/lint.ts",
+    "check": "bun run typecheck && bun run unit && bun run sim && bun run purity && bun run lint",
+    "e2e": "playwright test",
+    "build": "vite build && bun tools/check-dist.ts && vite build --mode harness && bun tools/check-dist.ts --harness",
+    "build:harness": "vite build --mode harness"
+  },
+  "dependencies": {
+    "pixi.js": "8.22.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/bun": "1.4.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.2",
+    "vitest": "5.0.3"
+  }
+}

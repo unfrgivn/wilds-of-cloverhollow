@@ -23,5 +23,9 @@ The previous Godot pixel-art build is archived at tag `archive/godot-pixel`.
 ## Commands (added in Milestone 2)
 - `just dev`: run the game locally
 - `just check`: typecheck, unit tests, headless sim
+- `just sim`: run every scripted deterministic simulation
 - `just e2e`: Playwright end-to-end tests
 - `just build`: production build
+
+Screenshot baselines are macOS-only for now. The harness build is used by the
+Playwright suite and can be started with `bun run build:harness`.

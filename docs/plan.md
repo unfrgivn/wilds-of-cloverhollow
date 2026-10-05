@@ -11,7 +11,7 @@ header line.
 - New `spec.md`, `AGENTS.md`, `README.md`, this plan, and the project
   `opencode.json` MCP config.
 
-## Milestone 2: Harness spike
+## Milestone 2: Harness spike **Status:** ✅ Completed (2026-10-04)
 Goal: prove build, control, inspect, step, and screenshot before any content.
 - Vite, TypeScript, and PixiJS app boots in Chrome. A placeholder room (flat
   shapes) has a placeholder player that moves with arrows/WASD and collides

@@ -82,6 +82,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Determinism: the same world, initial state, and action frames produce the
   same state hash in Chrome (V8) and in Bun (JavaScriptCore, the engine iOS
   uses).
+- Canonical object keys in the state hash use plain JavaScript code-unit
+  ordering, never locale-sensitive comparison.
 - Core math uses only `+ - * /`, `Math.sqrt`, `Math.abs`, `min`, `max`,
   `floor`, `ceil`, `round`, `trunc`, `sign`, and `Math.imul`. Never
   `Math.sin`, `cos`, `tan`, `atan2`, `pow`, `**`, `exp`, `log`, or `hypot`:
@@ -96,6 +98,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
   -1..1) plus booleans `confirm`, `cancel`, and `menu`. Button edges (pressed
   this tick) are derived in the core from the previous frame.
+- Taps are never lost: a key pressed since the previous tick counts as held for
+  that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
   cancel; J opens the journal (`menu`).
 - Gamepad (standard mapping) and touch (virtual stick plus buttons) map to the
@@ -176,6 +180,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   builds (`vite build --mode harness`). Production builds must not contain it;
   `just build` checks this.
 - Hook API v1:
+  - `version` is the literal number `1`; `isPaused()` reports the real-time
+    loop state. `step()` returns `{ tick, x, y, facing }`.
   - `pause()` and `resume()`: stop or start real-time ticking.
   - `step(ticks)`: pause real-time ticking if it is running, advance exactly
     N ticks with the currently held input (queued `input()` frames first, then
@@ -187,6 +193,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `hash()`: the deterministic state hash.
   - `reset({ seed, fixture })`: restart from a named fixture in
     `content/fixtures/` (test-only starting setups such as `new-game`).
+    The default is `new-game`; unknown names throw an error listing known
+    fixtures.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
@@ -197,6 +205,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   gameplay feature has at least one e2e test that uses real key presses.
 - Visual baselines live beside the e2e specs. Update them only after viewing
   the new image.
+- Milestone 2 content uses `content/areas/harness.json`: dimensions, a polygon
+  `walkable`, polygon-array `blockers`, and named `spawns` with facing.
+  Global `content/tunables.json` contains `walkSpeed` and `playerRadius`.
+  Fixtures contain `area`, `spawn`, and optional `seed`.
+  Script files are arrays of `{ frame: ActionFrame, ticks: number }` segments.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

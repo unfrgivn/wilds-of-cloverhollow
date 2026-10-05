@@ -7,11 +7,11 @@ export default defineConfig({
     command:
       "bun run build:harness && bunx vite preview --outDir dist-harness " +
         "--host 127.0.0.1 --base /cloverhollow/",
-    url: "http://127.0.0.1:4173/cloverhollow/",
+    url: `http://127.0.0.1:${process.env.CLOVERHOLLOW_E2E_PORT ?? "4173"}/cloverhollow/`,
     reuseExistingServer: false,
   },
   use: {
-    baseURL: "http://127.0.0.1:4173/cloverhollow/",
+    baseURL: `http://127.0.0.1:${process.env.CLOVERHOLLOW_E2E_PORT ?? "4173"}/cloverhollow/`,
     viewport: { width: 1280, height: 720 },
     deviceScaleFactor: 1,
   },

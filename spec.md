@@ -260,6 +260,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   by keyboard, gamepad, and touch.
 - Player movement is frozen while dialogue is open.
 
+### 7.1 Sticker UI layout
+- The dialogue sticker is anchored inside the bottom safe area, at most 900 CSS
+  pixels wide and about three lines tall. Body text is at least 18 CSS pixels and
+  is limited to roughly 45 characters per line.
+- Dialogue leaves the confirm, cancel, and menu touch buttons clear at 874x402,
+  1180x820, and 1280x720. The virtual stick is hidden while dialogue is open.
+- Choice stickers have at least 44 CSS pixel touch targets and body text has at
+  least 7:1 contrast against the paper.
+- Nunito's Latin variable font is shipped under OFL in
+  `src/assets/fonts/nunito`. It was
+  chosen for its friendly rounded forms and strong small-size legibility.
+
 ## 8. Calm-down battles (v0)
 - Touching a chaos-touched critter starts a battle. Battles are turn-based,
   short (under 2 minutes), and readable.

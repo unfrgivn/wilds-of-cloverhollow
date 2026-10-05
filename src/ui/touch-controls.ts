@@ -11,6 +11,10 @@ type Button = (typeof BUTTONS)[number][0];
 
 export function mountTouchControls(): TouchInput {
   const input = new TouchInput();
+  const setReserve = (value: number): void => {
+    document.documentElement.style.setProperty("--touch-reserve-right", `${value}px`);
+  };
+  setReserve(0);
   if (!shouldShowTouchControls()) return input;
   const root = document.createElement("div");
   root.className = "touch-controls";
@@ -43,6 +47,18 @@ export function mountTouchControls(): TouchInput {
     (button === "menu" ? root : buttons).append(element);
   };
   for (const [button, label] of BUTTONS) createButton(button, label);
+  const updateReserve = (): void => {
+    const actionButtons = root.querySelector<HTMLElement>(".touch-buttons");
+    if (actionButtons === null) return;
+    const safeProbe = document.createElement("div");
+    safeProbe.style.cssText =
+      "position:fixed;right:0;bottom:0;padding-right:env(safe-area-inset-right)";
+    document.body.append(safeProbe);
+    const safeRight = parseFloat(getComputedStyle(safeProbe).paddingRight) || 0;
+    safeProbe.remove();
+    const left = actionButtons.getBoundingClientRect().left;
+    setReserve(Math.max(0, window.innerWidth - left + safeRight));
+  };
 
   const releaseStick = (event: PointerEvent): void => {
     input.endStick(event);
@@ -62,5 +78,7 @@ export function mountTouchControls(): TouchInput {
   root.addEventListener("pointerup", releaseStick);
   root.addEventListener("pointercancel", releaseStick);
   document.body.append(root);
+  updateReserve();
+  window.addEventListener("resize", updateReserve);
   return input;
 }

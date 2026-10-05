@@ -151,13 +151,13 @@ test("holding a real key moves the player in real time", async ({ page }) => {
 test("real keys stop at the room wall, radius respected", async ({ page }) => {
   await openHarness(page);
   await resetPaused(page);
-  await resume(page);
+  // 120 ticks at 4 units per tick is far more than the 240 units to the wall.
   await page.keyboard.down("ArrowLeft");
-  await page.waitForTimeout(2500);
+  await step(page, 120);
   await page.keyboard.up("ArrowLeft");
   const x = (await readState(page)).player.x;
   expect(x).toBeGreaterThanOrEqual(60);
-  expect(x).toBeLessThan(70);
+  expect(x).toBeLessThan(60.01);
 });
 
 test("real keys stop at a blocker, radius respected", async ({ page }) => {

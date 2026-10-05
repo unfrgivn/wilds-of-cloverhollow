@@ -29,15 +29,17 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
 - `justfile` recipes: `dev`, `check`, `e2e`, `build`, `sim`.
 - A GitHub Actions workflow runs check, build, and e2e.
 
-## Milestone 3: Art pipeline and Fae walk cycle (parallel with 2)
-- `docs/art/style-bible.md` distilled from the concepts.
-- `tools/art/` scripts: Gemini generation with reference images, background
-  removal, feet-baseline alignment, and atlas packing with Pixi spritesheet
-  JSON.
-- Fae: 4-direction walk (6 frames; a mirrored right set is allowed) and idle,
-  at the spec section 5 scale, with recipes.
-- A contact sheet PNG for owner review. Owner approval is required before
-  Milestone 5 bulk art.
+## Milestone 3: Art pipeline and Fae walk cycle **Status:** ✅ Completed (2026-10-05)
+- `docs/art/style-bible.md`, `docs/art/pipeline.md`, and `docs/art/areas.md`.
+- `tools/art/` scripts: Gemini generation with reference images, strip
+  segmentation, key-out and despill, feet-baseline alignment, atlas packing
+  with Pixi spritesheet JSON, contact sheets, and an objective sprite
+  validator.
+- Fae v2: 4-direction walk (6 frames; right mirrors left) and idle, with
+  recipes. Owner approved Fae v2 and the bedroom painting at 70% scale.
+- Follow-up (fix commit): `idle_down` hair and three side-walk backpack edges
+  have crop cuts; re-extract from the kept sources and make the validator
+  catch cuts in every direction.
 
 ## Milestone 4: iOS shell **Status:** ✅ Completed (2026-10-05)
 - Capacitor 8 iOS project in `ios/`. `just ios-sim` builds and launches the
@@ -46,27 +48,38 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   confirm button.
 - A simulator screenshot shows the game, and a touch drag moves the player.
 
-## Milestone 5: Bedroom and plaza
-- Painted ground layers and props for both areas (per the style bible), walk
-  and blocker polygons, y-sorting, and one door transition each way with
-  spawns.
-- Fae's sprite replaces the placeholder. An e2e test walks bedroom, plaza,
-  bedroom with real keys; screenshots are reviewed.
+## Milestone 5: Fae in her bedroom
+- Fae's atlas replaces the placeholder circle: walk frames advance with
+  distance walked (no foot sliding), idle per facing, right mirrors left.
+- The bedroom painting renders from its tiles over its paper colour; the
+  camera centres a room smaller than the view.
+- Walkable floor and blocker polygons traced against the painting; y-sorted
+  occluder cutouts where Fae can walk behind tall furniture.
+- `new-game` starts in the bedroom; the harness area stays as a test-only
+  fixture for the existing sim and e2e tests.
+- Unit, sim, and e2e coverage with real keys; reviewed screenshot baselines;
+  `just ios-smoke` passes in the bedroom.
 
-## Milestone 6: Maddie follows
+## Milestone 6: Plaza and doors
+- Painted plaza (per the area scale rule) with y-sorted props and occluders.
+- The bedroom door leads to the plaza and back: fade, target spawn, facing,
+  and unloading the previous area's textures.
+- E2e walks bedroom, plaza, bedroom with real keys; screenshots reviewed.
+
+## Milestone 7: Maddie follows
 - Maddie's sprite set. She follows Fae at a consistent distance, including
   through transitions. Sim and e2e coverage.
 
-## Milestone 7: Talk with a choice
+## Milestone 8: Talk with a choice
 - Interactable prompt and Ink dialogue in the sticker UI, with one choice that
   changes a later line. E2e with real keys.
 
-## Milestone 8: Calm-down battle v0
+## Milestone 9: Calm-down battle v0
 - One chaos critter in the plaza starts a battle with the spec section 8
   actions. Winning awards a sticker. Deterministic sim tests cover outcomes;
   e2e with real keys.
 
-## Milestone 9: Journal and save
+## Milestone 10: Journal and save
 - Journal (notes and sticker album) and one save slot. E2e: save, reload the
   page, and the state is restored.
 

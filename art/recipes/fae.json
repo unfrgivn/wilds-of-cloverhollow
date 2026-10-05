@@ -1,0 +1,51 @@
+{
+  "asset": "fae",
+  "status": "v2-generated-validator-passing-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 15,
+  "generationBreakdown": {
+    "blockedProbe": 1,
+    "successfulImageCalls": 14,
+    "successfulModels": ["gemini-3-pro-image"]
+  },
+  "date": "2026-10-05",
+  "referenceImages": [
+    "docs/art/concepts/characters/character_concept_sheet_fae.png",
+    "docs/art/concepts/characters/character_concept_sheet_sue.png"
+  ],
+  "prompts": {
+    "modelSheet": "V2 Fae model sheet with a large chibi head at 38-40% of total height, messy brown bangs and chin-to-shoulder flyaways, small high bun with grey tie, silver star clip, purple hoodie, navy shorts, rainbow socks, white sneakers with orange soles and trim, holographic sticker backpack, and brown journal peeking from the top. Exactly head-on front, head-on back, and left-facing side views.",
+    "walkDown": "V2 six-frame horizontal HEAD-ON front walk strip, directly centered and symmetrical, foreshortened toward camera, large chibi hair and bangs, white-orange sneakers, alternating legs and arms.",
+    "walkUp": "V4 two three-frame horizontal strips generated from a crop of the canonical back view. Strip A is contact-left, down, passing; strip B is contact-right, down, passing. Wide gutters prevent merged hair, with matching dark hair, high bun, grey tie, large backpack and journal.",
+    "walkLeft": "V2 six-frame horizontal side walk strip with backpack, journal, large chibi hair, white-orange sneakers, and alternating legs and arms. The generated side strip is flopped for the shipped left direction."
+  },
+  "selectedRawSources": [
+    "art/source/fae/fae-model-sheet-v2.png",
+    "art/source/fae/fae-walk-down-strip-v2.png",
+    "art/source/fae/fae-walk-up-strip-v4a.png",
+    "art/source/fae/fae-walk-up-strip-v4b.png",
+    "art/source/fae/fae-walk-left-strip-v2.png"
+  ],
+  "postProcessing": {
+    "source": "The v4 up walk uses two three-frame strips with wide gutters, concatenated in cycle order. Each strip is segmented by connected components after keying, retaining the main figure component and sorting by x. If fewer than six figures are found, the widest component may be split only at a valley with at most six opaque pixels; otherwise extraction fails and requests regeneration. The generated side strip is horizontally flopped after extraction; the standing side idle is flopped through the same path.",
+    "command": "bun tools/art/extract-strip.ts followed by bun tools/art/postprocess.ts --width 384 --height 384 --figure-height 280 --bottom-margin 8 --fuzz 18% --key '#00FF00'",
+    "parameters": {
+      "keyColor": "#00FF00",
+      "fuzz": "18%",
+      "trim": true,
+      "targetFigureHeight": "280 source px",
+      "frameCanvas": "384x384 source px",
+      "feetAlignment": "row 375, 8px bottom margin, horizontally centred",
+      "despill": "G=min(G,max(R,B)) for opaque pixels, then 1px alpha erosion",
+    "islandRemoval": "clean-alpha.ts keeps the largest figure component",
+    "registration": "fixed canvas and trim, with stable centered head region",
+    "walkFrameCount": "six frames per direction; extractor expected=6",
+    "sideIdle": "The standing side source is flopped horizontally after postprocess, exactly like the side walk, so idle_left faces the same direction as walk_left.",
+    "v2Proportion": "The model sheet and all strips were regenerated to keep the total figure at 280 source px while enlarging the head to approximately 38-40% of figure height."
+    },
+    "atlas": "pack-atlas.ts, 5 columns, 384x384 frames, PixiJS v8 JSON anchor {x: 0.5, y: 0.9765625}, baseline 375",
+    "review": "contact-sheet.ts on cream and dark backgrounds plus ImageMagick GIFs at 10 fps, looping",
+    "validator": "validate-sprite.ts, passed all frame edge, component, spill, baseline, height, even walk-count, idle-orientation, idle-vs-walk head consistency, and hard-straight-edge checks"
+  },
+  "selectionReason": "V2 replaces every direction using one approved regenerated model sheet. The larger chibi head, messy bangs and shoulder-length flyaways, grey hair tie, white-orange sneakers, and journal are now consistent across front, back, side, walk, and idle views. The side strip and side idle are flopped into the shipped left direction. All frames were reviewed on cream and dark backgrounds and pass the sprite validator."
+}

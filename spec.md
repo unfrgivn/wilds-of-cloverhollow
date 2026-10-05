@@ -165,6 +165,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one PNG atlas plus JSON frame data per character (Pixi
   spritesheet format). Every frame shares a feet-centered pivot.
+- Fae's atlas (`public/assets/characters/fae/`): 384x384 source-pixel frames
+  (192x192 units), feet baseline at row 375 (anchor `{x: 0.5, y: 375/384}`),
+  animations `walk_down`, `walk_up`, `walk_left` (6 frames each) and
+  `idle_down`, `idle_up`, `idle_left` (1 frame each). Right mirrors left.
+  `tools/art/validate-sprite.ts` must pass for every character atlas.
 - Followers (Maddie) and NPCs follow the same rules. NPCs may ship idle-only.
 
 ## 6. World
@@ -179,6 +184,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   player at the named spawn facing the given direction, and fades in.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`) and `plaza` (from
   `town_center_plaza.png`).
+- Area paintings: opaque WebP tiles (each at most 2048x2048) at 2 source px
+  per unit, listed in `public/assets/areas/<id>/ground.json` with the
+  painting's `paper` margin colour, which fills the view around the painting.
+- Area scale rule: a standard door is about 1.4x Fae's height (about 200
+  units) and furniture is proportional. Paintings are resampled uniformly to
+  meet it, never stretched.
+- The bedroom painting is 2100x1400 source px (1050x700 units), so the whole
+  room fits on one phone screen.
 
 ## 7. Interaction and dialogue
 - The nearest interactable in front of the player (within 60 units) shows a
@@ -261,14 +274,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   outlines, soft pastels, chibi proportions (head to body about 1:1.5 to 1:2),
   and a cozy sticker UI (cream paper, die-cut borders, dark-brown rounded
   lettering, soft drop shadows).
-- Generation: Gemini image API, called from `tools/art/` scripts with concept
-  sheets as reference images. Each kept asset has a recipe in `art/recipes/`
-  (model, prompt, reference images, date, post-processing steps).
-- Post-processing (ImageMagick): background removal, trimming, feet-baseline
-  alignment, scaling to the 2x source scale, and atlas packing.
+- Generation: Gemini image API (`gemini-3-pro-image` for finals), called from
+  `tools/art/gemini-image.ts` with concept sheets as reference images. Each
+  kept asset has a recipe in `art/recipes/` (model, prompt, reference images,
+  date, post-processing steps). Selected raw outputs live in `art/source/`;
+  scratch frames (`art/scratch/`) and review images (`art/review/`) are
+  regenerable and not committed.
+- Post-processing (ImageMagick): background key-out and despill, strip
+  segmentation by connected components, trimming, one uniform scale per strip
+  (never stretched), feet-baseline alignment, and atlas packing. Commands are
+  in `docs/art/pipeline.md`; area rules are in `docs/art/areas.md`.
 - Gate: the owner approves the style of the first character and the first area
-  before bulk generation.
-- Style bible: `docs/art/style-bible.md` (Milestone 3).
+  before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
+  hair with bangs and a high bun, white sneakers with orange trim, journal in
+  the backpack) and the bedroom at 70% scale.
+- Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it
 Multiplayer, merch, speedrun, boss rush, New Game Plus, achievements,

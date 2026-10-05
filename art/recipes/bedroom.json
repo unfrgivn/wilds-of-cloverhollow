@@ -1,0 +1,35 @@
+{
+  "asset": "bedroom ground",
+  "date": "2026-10-05",
+  "model": "gemini-3-pro-image and gemini-3.1-flash-image",
+  "calls": 4,
+  "references": [
+    "docs/art/concepts/environments/hero_house_bedroom.png",
+    "docs/art/concepts/environments/topdown_gameplay_screenshot_in_l.png",
+    "art/scratch/fae-idle-down-scale-reference.png"
+  ],
+  "scale_reference_instruction": "Fae idle frame was supplied only as a 280px source-pixel scale reference; no character was to be drawn.",
+  "prompt_summary": "Full 3:2 playable 3/4 overhead cutaway bedroom, back wall and thin side walls, no front wall, open walkable floor, clear back-wall door, bed, craft desk, window, picture art without words, shelves, rug, and Maddie's cat bed. Watercolor washes, thin warm-brown ink, soft upper-left light, cozy pastel palette, no people, animals, text, UI, watermark, or 3D rendering.",
+  "explorations": [
+    "art/scratch/1791177221697-gemini-3-pro-image-0.png",
+    "art/scratch/1791177253920-gemini-3-pro-image-0.png",
+    "art/scratch/1791177275445-gemini-3.1-flash-image-0.png",
+    "art/scratch/1791177306876-gemini-3-pro-image-0.png"
+  ],
+  "selected": "art/source/areas/bedroom/bedroom-variant-pro-04.jpg",
+  "selection_reason": "The fourth Pro variant had the clearest door, strongest open-floor read, consistent 3/4 perspective, complete wall furniture, and the fewest illegible poster marks. It best matched the concept while preserving gameplay space.",
+  "post_processing": [
+    "Owner-approved runtime scale (2026-10-05): 70% of the original 3000x2000 composition, so the back-wall door is about 1.4x Fae's height and the whole room fits on one phone screen.",
+    "magick bedroom-variant-pro-04.jpg -resize 2100x -gravity center -crop 2100x1400+0+0 +repage bedroom-2100.png (2100x1400 source px = 1050x700 logical units at 2 px per unit).",
+    "Split into two opaque 1050x1400 tiles and export WebP quality 88 (magick bedroom-2100.png -crop 1050x1400+<x>+0 +repage -quality 88 ground_<col>_0.webp).",
+    "Paper margin colour sampled from the corners: #fcfbf6 (recorded in ground.json)."
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/bedroom/ground_0_0.webp",
+      "public/assets/areas/bedroom/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/bedroom/ground.json"
+  },
+  "owner_review": "Approved 2026-10-05 at 70% scale. The first proposal (100%) made the door 2x and the bed nearly 3x Fae's height. The proposed collision layout was a rough draft and must be traced against the 70% painting."
+}

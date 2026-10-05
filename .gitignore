@@ -21,3 +21,6 @@ art/scratch/
 .DS_Store
 
 .derived-data/
+
+# Regenerable art review images
+art/review/

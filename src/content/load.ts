@@ -49,17 +49,42 @@ function direction(value: unknown): value is Direction {
   );
 }
 
+function numberValue(value: Record<string, unknown>, name: string, file: string): number {
+  const result = value[name];
+  field(typeof result === "number", file, name);
+  return result;
+}
+
 export function parseTunables(value: unknown, file: string): Tunables {
   field(record(value), file, "object");
   field(typeof value.walkSpeed === "number", file, "walkSpeed");
   field(typeof value.playerRadius === "number", file, "playerRadius");
   field(typeof value.walkCycleUnits === "number", file, "walkCycleUnits");
   field(typeof value.doorFadeTicks === "number", file, "doorFadeTicks");
+  field(record(value.follow), file, "follow");
+  const followNames = ["distance", "stop", "trailSpacing", "trailMax",
+    "catchUp", "radius", "slot", "heel", "sitDelayTicks", "settleDelayTicks",
+    "walkCycleUnits"] as const;
+  const follow = value.follow;
+  const followValue = (name: string): number => numberValue(follow, name, file);
   return {
     walkSpeed: value.walkSpeed,
     playerRadius: value.playerRadius,
     walkCycleUnits: value.walkCycleUnits,
     doorFadeTicks: value.doorFadeTicks,
+    follow: {
+      distance: followValue(followNames[0]),
+      stop: followValue(followNames[1]),
+      trailSpacing: followValue(followNames[2]),
+      trailMax: followValue(followNames[3]),
+      catchUp: followValue(followNames[4]),
+      radius: followValue(followNames[5]),
+      slot: followValue(followNames[6]),
+      heel: followValue(followNames[7]),
+      sitDelayTicks: followValue(followNames[8]),
+      settleDelayTicks: followValue(followNames[9]),
+      walkCycleUnits: followValue(followNames[10]),
+    },
   };
 }
 

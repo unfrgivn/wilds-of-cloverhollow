@@ -2,5 +2,18 @@
   "walkSpeed": 240,
   "playerRadius": 20,
   "walkCycleUnits": 126,
-  "doorFadeTicks": 18
+  "doorFadeTicks": 18,
+  "follow": {
+    "distance": 90,
+    "stop": 60,
+    "trailSpacing": 8,
+    "trailMax": 64,
+    "catchUp": 1.15,
+    "radius": 12,
+    "slot": 50,
+    "heel": 52,
+    "sitDelayTicks": 30,
+    "settleDelayTicks": 12,
+    "walkCycleUnits": 84
+  }
 }

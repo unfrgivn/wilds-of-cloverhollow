@@ -11,8 +11,10 @@ test("real keys cross bedroom and plaza doors in both directions", async ({ page
   const plaza = await page.evaluate(() => window.__cloverhollow?.getState());
   expect(plaza?.area).toBe("plaza");
   expect(plaza?.player).toEqual({ x: 450, y: 500 });
+  expect(plaza?.maddie).toBeDefined();
   const plazaInfo = await renderInfo(page);
   expect(plazaInfo.area).toBe("plaza");
+  expect(plazaInfo.drawOrder.some((item) => item.label === "maddie")).toBe(true);
   expect(plazaInfo.cachedAreaTextures.some((url) => url.includes("bedroom")))
     .toBe(false);
   expect(plazaInfo.cachedAreaTextures.some((url) => url.includes("plaza")))
@@ -42,6 +44,7 @@ test("plaza screenshot and lamppost depth", async ({ page }) => {
   await page.keyboard.down("ArrowDown");
   await step(page, 38);
   await page.keyboard.up("ArrowDown");
+  await step(page, 60);
   const north = await renderInfo(page);
   const faeNorth = north.drawOrder.findIndex((item) => item.label === "fae");
   const lamp = north.drawOrder.findIndex((item) =>

@@ -1,5 +1,5 @@
 import { Assets, Container, Graphics, Sprite, Spritesheet, Text } from "pixi.js";
-import type { Area, Point, State, World } from "../core";
+import { hiddenFraction, type Area, type Point, type State, type World } from "../core";
 import { AreaView } from "./area-view";
 import { followCamera } from "./camera";
 import { selectFaeAnimation } from "./animation";
@@ -15,6 +15,7 @@ export class GameView {
   private readonly scene = new Container();
   private readonly depth = new Container();
   private readonly player = new Sprite();
+  private readonly maddie = new Sprite();
   private readonly viewportMask = new Graphics();
   private readonly label: Text | undefined;
   private areaView: AreaView | undefined;
@@ -26,6 +27,8 @@ export class GameView {
   private staticPaper = 0;
   private currentAnimation = "idle_down";
   private currentFrame = 0;
+  private currentMaddieAnimation = "idle_down";
+  private currentMaddieFrame = 0;
   private readonly areaTextureUrls = new Set<string>();
 
   constructor(
@@ -34,6 +37,7 @@ export class GameView {
   ) {
     this.depth.sortableChildren = true;
     this.player.label = "fae";
+    this.maddie.label = "maddie";
     this.player.scale.set(0.5);
     this.root.addChild(
       this.background,
@@ -45,6 +49,7 @@ export class GameView {
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.depth);
     this.depth.addChild(this.player);
+    this.depth.addChild(this.maddie);
     if (options.debugLabel) {
       this.label = new Text({ text: "", style: { fill: 0x513b32, fontSize: 18 } });
       this.label.position.set(20, 20);
@@ -54,11 +59,18 @@ export class GameView {
   }
 
   private async loadCharacter(): Promise<void> {
-    await Assets.load({
-      alias: "fae-sheet",
-      src: assetUrl("assets/characters/fae/fae.json"),
-      data: { textureOptions: { autoGenerateMipmaps: true } },
-    });
+    await Promise.all([
+      Assets.load({
+        alias: "fae-sheet",
+        src: assetUrl("assets/characters/fae/fae.json"),
+        data: { textureOptions: { autoGenerateMipmaps: true } },
+      }),
+      Assets.load({
+        alias: "maddie-sheet",
+        src: assetUrl("assets/characters/maddie/maddie.json"),
+        data: { textureOptions: { autoGenerateMipmaps: true } },
+      }),
+    ]);
   }
 
   async setArea(area: Area): Promise<void> {
@@ -126,6 +138,30 @@ export class GameView {
     this.currentFrame = selection.frame;
   }
 
+  private setMaddieTexture(state: State): void {
+    const sheet = Assets.get<Spritesheet>("maddie-sheet");
+    const side = state.maddie.facing === "right" ? "left" : state.maddie.facing;
+    const mirror = state.maddie.facing === "right";
+    const sitting = !state.maddie.motion.moving &&
+      state.maddie.stillTicks >= this.world.tunables.follow.sitDelayTicks;
+    const animation = sitting ? `idle_${side}` : `walk_${side}`;
+    const frames = sheet.animations[animation];
+    if (frames === undefined || frames.length === 0)
+      throw new Error(`Missing Maddie animation ${animation}`);
+    const frame = sitting ? 0 : state.maddie.motion.moving
+      ? Math.floor(state.maddie.motion.distance /
+        this.world.tunables.follow.walkCycleUnits * frames.length) % frames.length
+      : 0;
+    const texture = frames[frame];
+    if (texture === undefined) throw new Error(`Missing Maddie frame ${frame}`);
+    this.maddie.texture = texture;
+    if (texture.defaultAnchor === undefined) throw new Error("Maddie anchor missing");
+    this.maddie.anchor.copyFrom(texture.defaultAnchor);
+    this.maddie.scale.x = mirror ? -0.5 : 0.5;
+    this.currentMaddieAnimation = animation;
+    this.currentMaddieFrame = frame;
+  }
+
   render(state: State, width: number, height: number, resolution: number): void {
     const area = this.world.areas[state.area];
     if (area === undefined) return;
@@ -151,7 +187,10 @@ export class GameView {
     this.scene.position.set(offsetX, offsetY);
     this.player.position.set(state.player.x, state.player.y);
     this.player.zIndex = state.player.y;
+    this.maddie.position.set(state.maddie.x, state.maddie.y);
+    this.maddie.zIndex = state.maddie.y;
     this.setFaeTexture(state);
+    this.setMaddieTexture(state);
     this.depth.sortChildren();
     if (this.label !== undefined)
       this.label.text = `Cloverhollow • tick ${state.tick} · ` +
@@ -165,6 +204,8 @@ export class GameView {
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
+    maddie: { animation: string; frame: number };
+    hidden: number;
     fade: number;
     cachedAreaTextures: string[];
   } {
@@ -177,6 +218,11 @@ export class GameView {
       })),
       animation: this.currentAnimation,
       frame: this.currentFrame,
+      maddie: {
+        animation: this.currentMaddieAnimation,
+        frame: this.currentMaddieFrame,
+      },
+      hidden: hiddenFraction(state.maddie, state.player),
       fade,
       cachedAreaTextures: [...this.areaTextureUrls].filter((url) =>
         Assets.cache.has(url)),

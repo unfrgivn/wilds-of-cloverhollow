@@ -186,6 +186,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   checks are mandatory (no switches); biped-only head checks are enabled by
   `"validator": { "biped": true }` in the character's `art/recipes/` file.
 - Followers (Maddie) and NPCs follow the same rules. NPCs may ship idle-only.
+- Maddie follows Fae using a capped recent-position trail. The follow tunables
+  are `distance` 90, `stop` 60, `trailSpacing` 8, `trailMax` 64,
+  `catchUp` 1.15, `radius` 12, `slot` 50, `heel` 52, `settleDelayTicks` 12,
+  `sitDelayTicks` 30, and her `walkCycleUnits` 84. She uses hysteresis,
+  line-of-sight proximity stopping, her own distance-based animation, and sits
+  after the delay.
+- Visibility is measured with feet-anchored boxes: Fae is 50x140 units and
+  Maddie is 44x60 units. `hiddenFraction` is the overlap area divided by
+  Maddie's box area when her feet are north of Fae; beside or in front is zero.
+  Spawn and settling placement tries side heel slots at ±52 x and -6 y, then
+  +24 y, before the ordinary rear/perpendicular fallbacks. Heel placement must
+  be collision-valid, line-of-sight clear, and have zero hidden fraction.
+  When Fae is standing still and Maddie has been stopped for `settleDelayTicks`
+  (12) while more than 25% hidden, she walks to the first valid visible heel
+  slot. `stillTicks` keeps counting during that short walk, so she sits soon
+  after arriving. She may stay partly hidden while both are walking.
 
 ## 6. World
 - Areas are discrete. `content/areas/<id>.json` is canonical (Tiled may be used
@@ -210,6 +226,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   polygons to be reachable, and every spawn to be at least twice the player
   radius outside every trigger. Door spawns face away from the doorway into
   their destination area. The plaza fixture starts near its fountain.
+- Every area spawn must have a valid Maddie follower slot behind Fae, or on one
+  of the two perpendicular sides, with Maddie's radius clearance. At a door
+  switch the trail resets to `[slot, spawn]` and both characters are frozen.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`) and `plaza` (from
   `town_center_plaza.png`). The placeholder `harness` area stays for
   deterministic tests (fixture `harness`).
@@ -287,8 +306,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     known fixtures.
   - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
-    cache), the depth layer's draw order (`{ label, zIndex }[]`, with `fae` and
-    `occluder:<id>`), and Fae's current animation and frame.
+    cache), Maddie's `hidden` fraction, the depth layer's draw order
+    (`{ label, zIndex }[]`, with `fae`, `maddie`, and `occluder:<id>`), and both
+    characters' current animation and frame.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so

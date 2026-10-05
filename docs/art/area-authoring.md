@@ -23,3 +23,8 @@ player radii outside all triggers. Its target names the destination area and
 spawn, and the spawn faces away from the doorway. `doorFadeTicks` controls the
 deterministic out and in fades. Connection checks are test-time validation;
 runtime content loading only parses the shape data.
+Every spawn also needs a clear Maddie slot behind Fae, with perpendicular side
+fallbacks when the rear slot is blocked. Keep enough open floor around doors
+for both characters to arrive without intersecting furniture.
+Keep the side heel slots open as well; follower validation rejects slots that
+lack collision clearance or hide Maddie behind Fae.

@@ -3,6 +3,8 @@ import { existsSync } from "node:fs";
 import {
   createState,
   distanceToPolygon,
+  followerSlot,
+  hiddenFraction,
   nextRandom,
   pointInPolygon,
   stableHash,
@@ -255,13 +257,13 @@ describe("core", () => {
       ...plaza,
       triggers: [{ ...trigger, target: { area: "missing", spawn: "x" } }],
     };
-    expect(areaConnectionErrors({ ...world.areas, plaza: badTarget }, 20))
+    expect(areaConnectionErrors({ ...world.areas, plaza: badTarget }, world.tunables))
       .toContain("plaza: trigger house-front-door has an invalid target");
     const badSpawn = {
       ...plaza,
       spawns: { ...plaza.spawns, bad: { x: 350, y: 530, facing: "down" as const } },
     };
-    expect(areaConnectionErrors({ ...world.areas, plaza: badSpawn }, 20))
+    expect(areaConnectionErrors({ ...world.areas, plaza: badSpawn }, world.tunables))
       .toContain("plaza: spawn bad is within 40 units of house-front-door");
   });
 
@@ -269,10 +271,101 @@ describe("core", () => {
     for (const area of Object.values(world.areas)) {
       expect(hiddenPositions(area, world.tunables.playerRadius), area.id).toEqual([]);
     }
+  }, 30_000);
+
+  it("keeps Maddie valid during seeded random walks in every area", () => {
+    for (const fixtureName of ["new-game", "plaza"] as const) {
+      const fixtureValue = content.fixtures[fixtureName];
+      if (fixtureValue === undefined) throw new Error("fixture missing");
+      let state = createState(world, fixtureValue);
+      for (let tick = 0; tick < 600; tick += 1) {
+        const random = nextRandom(state);
+        state = random[1];
+        const frame = {
+          ...none,
+          move: {
+            x: random[0] < 0.34 ? -1 : random[0] < 0.67 ? 1 : 0,
+            y: random[0] < 0.5 ? -1 : random[0] < 0.8 ? 1 : 0,
+          },
+        };
+        state = step(world, state, frame).state;
+        const area = world.areas[state.area];
+        if (area === undefined) throw new Error("area missing");
+        expect(pointInPolygon(state.maddie, area.walkable)).toBe(true);
+        expect(distanceToPolygon(state.maddie, area.walkable))
+          .toBeGreaterThanOrEqual(world.tunables.follow.radius - 0.01);
+        for (const blocker of area.blockers) {
+          expect(pointInPolygon(state.maddie, blocker)).toBe(false);
+          expect(distanceToPolygon(state.maddie, blocker))
+            .toBeGreaterThanOrEqual(world.tunables.follow.radius - 0.01);
+        }
+      }
+    }
+  });
+
+  it("spaces and caps Maddie's trail and selects a valid door slot", () => {
+    // Walk a loop around the plaza fountain so both of them keep moving, and
+    // check the trail on every tick, not just at the end.
+    const plazaFixture = content.fixtures.plaza;
+    if (plazaFixture === undefined) throw new Error("plaza fixture missing");
+    let state = createState(world, plazaFixture);
+    const legs: [number, number, number][] = [
+      [0, -1, 40], [-1, 0, 90], [0, 1, 60], [1, 0, 120], [0, -1, 30],
+    ];
+    let checked = 0;
+    for (const [x, y, ticks] of legs) {
+      for (let tick = 0; tick < ticks; tick += 1) {
+        state = step(world, state, { ...none, move: { x, y } }).state;
+        expect(state.trail.length).toBeLessThanOrEqual(world.tunables.follow.trailMax);
+        for (let index = 1; index < state.trail.length; index += 1) {
+          const previous = state.trail[index - 1];
+          const current = state.trail[index];
+          if (previous === undefined || current === undefined) continue;
+          const dx = current.x - previous.x;
+          const dy = current.y - previous.y;
+          expect(Math.sqrt(dx * dx + dy * dy))
+            .toBeGreaterThanOrEqual(world.tunables.follow.trailSpacing);
+          checked += 1;
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(1000);
+    const bedroom = world.areas.bedroom;
+    const spawn = bedroom?.spawns.door;
+    if (bedroom === undefined || spawn === undefined) throw new Error("door missing");
+    expect(followerSlot(
+      bedroom,
+      spawn,
+      world.tunables.follow.slot,
+      world.tunables.follow.radius,
+      world.tunables.follow.heel,
+    )).toBeDefined();
+  });
+
+  it("measures Maddie's visibility from feet-anchored body boxes", () => {
+    expect(hiddenFraction({ x: 552, y: 404 }, { x: 500, y: 410 })).toBe(0);
+    expect(hiddenFraction({ x: 500, y: 350 }, { x: 500, y: 410 })).toBeCloseTo(1);
+    expect(hiddenFraction({ x: 500, y: 420 }, { x: 500, y: 410 })).toBe(0);
   });
 
   it("validates all area connections with the tunable radius", () => {
-    expect(areaConnectionErrors(world.areas, world.tunables.playerRadius)).toEqual([]);
+    expect(areaConnectionErrors(world.areas, world.tunables)).toEqual([]);
+  });
+
+  it("places every spawn slot beside Fae without hiding Maddie", () => {
+    for (const area of Object.values(world.areas)) {
+      for (const spawn of Object.values(area.spawns)) {
+        const slot = followerSlot(
+          area,
+          spawn,
+          world.tunables.follow.slot,
+          world.tunables.follow.radius,
+          world.tunables.follow.heel,
+        );
+        if (slot === undefined) throw new Error(`${area.id}: slot missing`);
+        expect(hiddenFraction(slot, spawn)).toBe(0);
+      }
+    }
   });
 
   it("flags the hiding corridor in the first bedroom layout", () => {

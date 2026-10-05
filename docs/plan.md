@@ -66,12 +66,13 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   and unloading the previous area's textures.
 - E2e walks bedroom, plaza, bedroom with real keys; screenshots reviewed.
 
-## Milestone 7: Maddie follows
+## Milestone 7: Maddie follows **Status:** ✅ Completed (2026-10-05)
 - Owner-approved Maddie atlas; the sprite validator passes with every check on.
 - Core: Maddie follows Fae's recent path (a bounded breadcrumb trail in state)
   about 90 units behind, so she walks around furniture exactly where Fae did
   and never needs her own pathfinding. She stops about 60 units away and sits
-  when Fae stops. Through a door she arrives with Fae, placed behind her.
+  when Fae stops, settling at her heel (beside her, never hidden behind
+  her). Through a door she arrives with Fae, placed at her heel.
 - She y-sorts with Fae and occluders; her walk frames follow her own distance.
 - Unit, sim (door round trip with invariants for both), and e2e (real keys:
   she follows within a distance band, crosses doors, sorts behind occluders);

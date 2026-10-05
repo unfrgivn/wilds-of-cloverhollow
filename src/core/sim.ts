@@ -5,6 +5,7 @@ import type {
   Fixture,
   Point,
   Polygon,
+  Spawn,
   State,
   World,
 } from "./types";
@@ -26,6 +27,10 @@ export function createState(
     throw new Error(`Unknown fixture area: ${fixture.area}`);
   const spawn = area.spawns[fixture.spawn];
   if (spawn === undefined) throw new Error(`Unknown spawn: ${fixture.spawn}`);
+  const slot = followerSlot(area, spawn,
+    world.tunables.follow.slot, world.tunables.follow.radius,
+    world.tunables.follow.heel);
+  if (slot === undefined) throw new Error(`No Maddie slot for ${fixture.area}.${fixture.spawn}`);
   return {
     tick: 0,
     area: area.id,
@@ -35,6 +40,14 @@ export function createState(
     previousInput: blankInput(),
     motion: { distance: 0, moving: false },
     transition: null,
+    maddie: {
+      x: slot.x,
+      y: slot.y,
+      facing: spawn.facing,
+      motion: { distance: 0, moving: false },
+      stillTicks: 0,
+    },
+    trail: [slot, { x: spawn.x, y: spawn.y }],
   };
 }
 
@@ -133,7 +146,7 @@ function pushFromPolygon(
   };
 }
 
-function resolve(point: Point, area: Area, radius: number): Point {
+export function resolveCollision(point: Point, area: Area, radius: number): Point {
   let result = point;
   for (let pass = 0; pass < 8; pass += 1) {
     result = pushFromPolygon(result, area.walkable, radius, true);
@@ -141,6 +154,202 @@ function resolve(point: Point, area: Area, radius: number): Point {
       result = pushFromPolygon(result, blocker, radius, false);
   }
   return result;
+}
+
+function distance(a: Point, b: Point): number {
+  const x = b.x - a.x;
+  const y = b.y - a.y;
+  return Math.sqrt(x * x + y * y);
+}
+
+function segmentClear(area: Area, start: Point, end: Point): boolean {
+  const length = distance(start, end);
+  const samples = Math.max(1, Math.ceil(length / 5));
+  for (let index = 0; index <= samples; index += 1) {
+    const ratio = index / samples;
+    const point = {
+      x: start.x + (end.x - start.x) * ratio,
+      y: start.y + (end.y - start.y) * ratio,
+    };
+    if (!pointInPolygon(point, area.walkable) ||
+        area.blockers.some((blocker) => pointInPolygon(point, blocker))) return false;
+  }
+  return true;
+}
+
+function validFollowerPoint(area: Area, point: Point, radius: number): boolean {
+  return pointInPolygon(point, area.walkable) &&
+    distanceToPolygon(point, area.walkable) >= radius &&
+    area.blockers.every((blocker) =>
+      !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius);
+}
+
+export function followerSlot(
+  area: Area,
+  spawn: Spawn,
+  slot: number,
+  radius: number,
+  heel = slot,
+): Point | undefined {
+  return visibleFollowerSlot(area, spawn, spawn, heel, slot, radius);
+}
+
+export function hiddenFraction(maddie: Point, fae: Point): number {
+  if (maddie.y >= fae.y) return 0;
+  const left = Math.max(maddie.x - 22, fae.x - 25);
+  const right = Math.min(maddie.x + 22, fae.x + 25);
+  const top = Math.max(maddie.y - 60, fae.y - 140);
+  const bottom = Math.min(maddie.y, fae.y);
+  const width = Math.max(0, right - left);
+  const height = Math.max(0, bottom - top);
+  return (width * height) / (44 * 60);
+}
+
+export function visibleFollowerSlot(
+  area: Area,
+  fae: Point,
+  start: Point,
+  heel: number,
+  slot: number,
+  radius: number,
+): Point | undefined {
+  const sign = start.x - fae.x > 0 ? 1 : -1;
+  const heelCandidates = [
+    { x: fae.x + sign * heel, y: fae.y - 6 },
+    { x: fae.x - sign * heel, y: fae.y - 6 },
+    { x: fae.x + sign * heel, y: fae.y + 24 },
+    { x: fae.x - sign * heel, y: fae.y + 24 },
+  ];
+  const candidates = [...heelCandidates];
+  const direction = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+  const facings: Spawn["facing"][] = ["up", "down", "left", "right"];
+  for (const facing of facings) {
+    const vector = direction[facing];
+    candidates.push({ x: fae.x - vector.x * slot, y: fae.y - vector.y * slot });
+  }
+  return candidates.find((point) =>
+    validFollowerPoint(area, point, radius) && segmentClear(area, start, point) &&
+    hiddenFraction(point, fae) === 0,
+  );
+}
+
+function pathDistance(start: Point, points: Point[]): number {
+  let total = 0;
+  let previous = start;
+  for (const point of points) {
+    total += distance(previous, point);
+    previous = point;
+  }
+  return total;
+}
+
+function updateMaddie(
+  world: World,
+  area: Area,
+  state: State,
+  player: Point,
+  playerMoved: boolean,
+): { maddie: State["maddie"]; trail: Point[] } {
+  const tune = world.tunables.follow;
+  const trail = state.trail.slice();
+  const last = trail[trail.length - 1];
+  if (playerMoved && (last === undefined || distance(last, player) >= tune.trailSpacing))
+    trail.push({ ...player });
+  while (trail.length > tune.trailMax) trail.shift();
+  const route = [...trail, player];
+  const direct = distance(state.maddie, player);
+  if (!playerMoved &&
+      state.maddie.stillTicks >= tune.settleDelayTicks &&
+      hiddenFraction(state.maddie, player) > 0.25) {
+    const slot = visibleFollowerSlot(area, player, state.maddie, tune.heel,
+      tune.slot, tune.radius);
+    if (slot !== undefined && segmentClear(area, state.maddie, slot)) {
+      const length = distance(state.maddie, slot);
+      const amount = Math.min(world.tunables.walkSpeed / 60, length);
+      const ratio = length === 0 ? 0 : amount / length;
+      const position = resolveCollision({
+        x: state.maddie.x + (slot.x - state.maddie.x) * ratio,
+        y: state.maddie.y + (slot.y - state.maddie.y) * ratio,
+      }, area, tune.radius);
+      const dx = position.x - state.maddie.x;
+      const dy = position.y - state.maddie.y;
+      const facing = Math.abs(dx) >= Math.abs(dy)
+        ? dx < 0 ? "left" : "right"
+        : dy < 0 ? "up" : "down";
+      const moved = distance(state.maddie, position);
+      return {
+        maddie: {
+          x: position.x, y: position.y, facing,
+          stillTicks: state.maddie.stillTicks + 1,
+          motion: { distance: state.maddie.motion.distance + moved, moving: moved > 0.0001 },
+        },
+        trail,
+      };
+    }
+  }
+  if (direct <= tune.stop && segmentClear(area, state.maddie, player)) {
+    return {
+      maddie: { ...state.maddie, stillTicks: state.maddie.stillTicks + 1,
+        motion: { ...state.maddie.motion, moving: false } },
+      trail: trail.slice(-1),
+    };
+  }
+  const routeLength = pathDistance(state.maddie, route);
+  const moving = state.maddie.motion.moving
+    ? routeLength > tune.stop
+    : routeLength > tune.distance;
+  if (!moving) {
+    return {
+      maddie: { ...state.maddie, stillTicks: state.maddie.stillTicks + 1,
+        motion: { ...state.maddie.motion, moving: false } },
+      trail,
+    };
+  }
+  let position = { x: state.maddie.x, y: state.maddie.y };
+  let remaining = (world.tunables.walkSpeed / 60) *
+    (routeLength > tune.distance + 40 ? tune.catchUp : 1);
+  const targets = route.slice();
+  while (remaining > 0 && targets.length > 0) {
+    const target = targets[0];
+    if (target === undefined) break;
+    const length = distance(position, target);
+    if (length <= remaining) {
+      position = target;
+      remaining -= length;
+      targets.shift();
+      continue;
+    }
+    const ratio = remaining / length;
+    position = {
+      x: position.x + (target.x - position.x) * ratio,
+      y: position.y + (target.y - position.y) * ratio,
+    };
+    remaining = 0;
+  }
+  const resolved = resolveCollision(position, area, tune.radius);
+  const dx = resolved.x - state.maddie.x;
+  const dy = resolved.y - state.maddie.y;
+  let facing = state.maddie.facing;
+  if (Math.abs(dx) >= Math.abs(dy) && dx !== 0) facing = dx < 0 ? "left" : "right";
+  else if (dy !== 0) facing = dy < 0 ? "up" : "down";
+  const moved = Math.sqrt(dx * dx + dy * dy);
+  // `route` ends with Fae's live position, which is a walking target but not a
+  // breadcrumb: keep only the unconsumed breadcrumbs so the spacing holds.
+  const unvisited = targets[targets.length - 1] === player ? targets.slice(0, -1) : targets;
+  return {
+    maddie: {
+      x: resolved.x,
+      y: resolved.y,
+      facing,
+      stillTicks: playerMoved ? 0 : state.maddie.stillTicks + 1,
+      motion: {
+        distance: state.maddie.motion.distance + moved,
+        moving: moved > 0.0001,
+      },
+    },
+    trail: unvisited,
+  };
 }
 
 export function step(
@@ -159,6 +368,9 @@ export function step(
       if (targetArea === undefined) throw new Error("Unknown transition area");
       const spawn = targetArea.spawns[transition.target.spawn];
       if (spawn === undefined) throw new Error("Unknown transition spawn");
+      const slot = followerSlot(targetArea, spawn, world.tunables.follow.slot,
+        world.tunables.follow.radius, world.tunables.follow.heel);
+      if (slot === undefined) throw new Error("No Maddie transition slot");
       return {
         state: {
           ...state,
@@ -169,6 +381,14 @@ export function step(
           previousInput: { ...input },
           motion: { ...state.motion, moving: false },
           transition: { target: transition.target, phase: "in", elapsed: 0 },
+          maddie: {
+            x: slot.x,
+            y: slot.y,
+            facing: spawn.facing,
+            motion: { distance: 0, moving: false },
+            stillTicks: 0,
+          },
+          trail: [slot, { x: spawn.x, y: spawn.y }],
         },
         events: [],
       };
@@ -191,7 +411,7 @@ export function step(
   );
   const scale = length > 1 ? 1 / length : 1;
   const speed = world.tunables.walkSpeed / 60;
-  const player = resolve(
+  const player = resolveCollision(
     {
       x: state.player.x + input.move.x * scale * speed,
       y: state.player.y + input.move.y * scale * speed,
@@ -217,6 +437,15 @@ export function step(
     !pointInPolygon(state.player, item.polygon) &&
     pointInPolygon(player, item.polygon),
   );
+  const follower = trigger === undefined
+    ? updateMaddie(world, area, state, player, displacement > 0.0001)
+    : {
+      maddie: {
+        ...state.maddie,
+        motion: { ...state.maddie.motion, moving: false },
+      },
+      trail: state.trail,
+    };
   return {
     state: {
       ...state,
@@ -231,6 +460,8 @@ export function step(
       transition: trigger === undefined
         ? null
         : { target: trigger.target, phase: "out", elapsed: 0 },
+      maddie: follower.maddie,
+      trail: follower.trail,
     },
     events,
   };

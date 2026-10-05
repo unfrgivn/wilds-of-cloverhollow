@@ -12,6 +12,19 @@ export type Tunables = {
   playerRadius: number;
   walkCycleUnits: number;
   doorFadeTicks: number;
+  follow: {
+    distance: number;
+    stop: number;
+    trailSpacing: number;
+    trailMax: number;
+    catchUp: number;
+    radius: number;
+    slot: number;
+    heel: number;
+    sitDelayTicks: number;
+    settleDelayTicks: number;
+    walkCycleUnits: number;
+  };
 };
 export type Spawn = Point & { facing: Direction };
 export type Area = {
@@ -51,5 +64,13 @@ export type State = {
     phase: "out" | "in";
     elapsed: number;
   } | null;
+  maddie: {
+    x: number;
+    y: number;
+    facing: Direction;
+    motion: { distance: number; moving: boolean };
+    stillTicks: number;
+  };
+  trail: Point[];
 };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

@@ -1,4 +1,11 @@
-import { distanceToPolygon, pointInPolygon, type Area, type Point } from "../core";
+import {
+  distanceToPolygon,
+  followerSlot,
+  pointInPolygon,
+  type Area,
+  type Point,
+  type Tunables,
+} from "../core";
 
 /**
  * Authoring check: can Fae stand somewhere an occluder hides most of her?
@@ -91,12 +98,16 @@ export function hiddenPositions(
 
 export function areaConnectionErrors(
   areas: Record<string, Area>,
-  radius: number,
+  tunables: Tunables,
 ): string[] {
+  const radius = tunables.playerRadius;
+  const { slot, radius: maddieRadius, heel } = tunables.follow;
   const errors: string[] = [];
   for (const area of Object.values(areas)) {
     const reachable = reachablePositions(area, radius);
     for (const [name, spawn] of Object.entries(area.spawns)) {
+      if (followerSlot(area, spawn, slot, maddieRadius, heel) === undefined)
+        errors.push(`${area.id}: spawn ${name} has no Maddie slot`);
       for (const trigger of area.triggers) {
         if (pointInPolygon(spawn, trigger.polygon) ||
             distanceToPolygon(spawn, trigger.polygon) < radius * 2)

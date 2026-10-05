@@ -21,6 +21,8 @@ export type CloverhollowHook = {
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
+    maddie: { animation: string; frame: number };
+    hidden: number;
     fade: number;
     cachedAreaTextures: string[];
   };

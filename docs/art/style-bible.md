@@ -52,6 +52,11 @@ drawstrings and pocket, navy shorts, rainbow-striped socks, WHITE sneakers with
 orange soles and trim, holographic sticker backpack with colorful stickers, and
 a brown leather-bound journal peeking from the backpack top.”
 
+**Maddie block:** “Maddie, Fae's chibi orange-and-cream tabby kitten, huge cute
+head, warm peach-orange stripes, cream muzzle/chest/belly/paws, dark oval eyes,
+pink nose and inner ears, blue collar with a small yellow star tag, fluffy
+cream-tipped tail. Same watercolor washes and thin warm-brown ink as Fae.”
+
 **Sprite block:** “single character only, transparent-looking flat pure green
 background `#00FF00` for keying, no ground shadow, no text, evenly spaced
 frames, identical scale and baseline, full body never cropped.”
@@ -66,6 +71,15 @@ size and 0.56x size; keep alpha edges clean.
 watercolor ink treatment; use black outlines, neon colors, photorealism, 3D
 lighting, motion blur, floor shadows, labels, props that obscure feet, or
 different frame canvases.
+
+For Maddie, read gait as a quadruped: diagonal leg pairs alternate, the tail
+sways, and the front/back views remain head-on. Sitting idles use paws tucked
+under the body and the tail curled around it. Maddie uses a 256x256 source
+canvas, about 116px standing height and about 132px seated height, with an
+anchor baseline at row 247. Those heights are posture results, not separate
+scale targets: choose one scale from the model-sheet head and apply it to every
+walk and idle source. A raised tail makes raw side-facing alpha heuristics
+unreliable, so review Maddie's side row with an explicit left-facing arrow.
 
 ## Generation notes
 

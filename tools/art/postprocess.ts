@@ -13,6 +13,7 @@ if (input.length === 0) throw new Error("--input is required");
 const canvasWidth = Number(value("width", "384"));
 const canvasHeight = Number(value("height", "384"));
 const figureHeight = Number(value("figure-height", "280"));
+const scalePercent = value("scale-percent", "");
 const bottomMargin = Number(value("bottom-margin", "8"));
 const fuzz = value("fuzz", "18%");
 const key = value("key", "#00FF00");
@@ -30,7 +31,7 @@ const command = [
   "-channel", "A", "-morphology", "Erode", "Disk:1",
   "+channel",
   "-trim", "+repage",
-  "-resize", `x${figureHeight}`,
+  "-resize", scalePercent.length > 0 ? `${scalePercent}%` : `x${figureHeight}`,
   "-gravity", "south",
   "-background", "none",
   "-extent", `${canvasWidth}x${canvasHeight - bottomMargin}`,

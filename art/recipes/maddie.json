@@ -1,0 +1,43 @@
+{
+  "asset": "maddie",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 11,
+  "additionalCallsThisRevision": 0,
+  "generationLog": "art/scratch/generation-log.jsonl (39 total repository entries)",
+  "references": ["docs/art/concepts/npcs/maddie_kitten.png", "art/source/maddie/maddie-model-sheet.png"],
+  "selectedRawSources": [
+    "art/source/maddie/maddie-walk-down-v2-a.png",
+    "art/source/maddie/maddie-walk-down-v2-b.png",
+    "art/source/maddie/maddie-walk-up-b.png",
+    "art/source/maddie/maddie-walk-left-a.png",
+    "art/source/maddie/maddie-walk-left-b.png",
+    "art/source/maddie/maddie-idle-sheet.png"
+  ],
+  "generation": {
+    "walk": "Existing three-frame strips were extracted with wide gutters and arranged as contact, down, passing pairs. Up frames 04-06 are horizontal flops of 01-03 so the opposite diagonal pair leads in the second half.",
+    "idle": "The existing three-view sitting sheet supplies front, back, and left sitting poses with tucked paws and curled tails.",
+    "anchorMethod": "Every source was measured against the shared model-sheet standing anchor, then resized once with the factor below. No source was upscaled."
+  },
+  "sourceScaleFactors": {
+    "maddie-walk-down-v2-a.png": 0.1,
+    "maddie-walk-down-v2-b.png": 0.085,
+    "maddie-walk-up-b.png": 0.105,
+    "maddie-walk-left-a.png": 0.14,
+    "maddie-walk-left-b.png": 0.14,
+    "maddie-idle-sheet.png": 0.14
+  },
+  "postProcessing": {
+    "extract": "extract-strip.ts with full connected-component bounds and expected=3",
+    "key": "#00FF00 with 18% fuzz",
+    "canvas": "256x256 source pixels",
+    "uniformScale": "Scale is selected from the shared standing anchor; posture changes determine seated height naturally.",
+    "baseline": 247,
+    "anchor": { "x": 0.5, "y": 0.96484375 },
+    "despill": "postprocess.ts green despill, then atlas packing",
+    "upCycle": "magick -flop applied to up_walk_01..03 to produce up_walk_04..06 before packing",
+    "atlas": "pack-atlas.ts, five columns, PixiJS v8 animation names"
+  },
+  "validator": "Mandatory exact animation set, clearance, components, spill, baseline, ink-aware edges, walk area ratio, idle area ratio, blockiness, and down/up mirror IoU checks.",
+  "selectionReason": "The selected sources preserve the approved orange/cream markings, blue collar, yellow star tag, pink features, cream-tipped tail, clean head-on front/back views, and left-facing side gait."
+}

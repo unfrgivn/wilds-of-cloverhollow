@@ -7,6 +7,8 @@ type Rect = { x: number; y: number; w: number; h: number };
 type SpriteFrame = { frame: Rect; sourceSize: { w: number; h: number } };
 type FrameMetrics = {
   height: number;
+  opaqueArea: number;
+  blockiness: number;
   headWidth: number;
   headMean: [number, number, number];
 };
@@ -85,11 +87,29 @@ async function pixels(atlas: string, frame: Rect): Promise<Uint8Array> {
   return bytes;
 }
 
+function recipePath(atlas: string): string {
+  const explicit = arg("recipe", "");
+  if (explicit.length > 0) return explicit;
+  const file = atlas.split("/").at(-1) ?? "fae.png";
+  const asset = file.endsWith(".png") ? file.slice(0, -4) : file;
+  return `art/recipes/${asset}.json`;
+}
+
+async function isBiped(atlas: string): Promise<boolean> {
+  const path = recipePath(atlas);
+  const file = Bun.file(path);
+  if (!(await file.exists())) return false;
+  const raw: unknown = JSON.parse(await file.text());
+  if (!isObject(raw) || !isObject(raw.validator)) return false;
+  return raw.validator.biped === true;
+}
+
 function checkFrame(
   name: string,
   frame: SpriteFrame,
   bytes: Uint8Array,
   baseline: number,
+  includeHeadMetrics: boolean,
 ): { errors: string[]; metrics: FrameMetrics } {
   const width = frame.sourceSize.w;
   const height = frame.sourceSize.h;
@@ -99,6 +119,9 @@ function checkFrame(
   let minY = height;
   let maxX = -1;
   let maxY = -1;
+  let opaqueArea = 0;
+  let adjacentPairs = 0;
+  let equalAdjacentPairs = 0;
   for (let index = 0; index < width * height; index += 1) {
     const offset = index * 4;
     const red = bytes[offset] ?? 0;
@@ -113,7 +136,21 @@ function checkFrame(
     minY = Math.min(minY, y);
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
+    if (opacity > 128) opaqueArea += 1;
     if (green > Math.max(red, blue) + 12) errors.push("green spill");
+  }
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width - 1; x += 1) {
+      const left = (y * width + x) * 4;
+      const right = left + 4;
+      if ((bytes[left + 3] ?? 0) <= 128 || (bytes[right + 3] ?? 0) <= 128) continue;
+      adjacentPairs += 1;
+      if (bytes[left] === bytes[right] && bytes[left + 1] === bytes[right + 1]
+        && bytes[left + 2] === bytes[right + 2]) equalAdjacentPairs += 1;
+    }
+  }
+  if (adjacentPairs > 0 && equalAdjacentPairs / adjacentPairs > 0.08) {
+    errors.push(`blockiness ${(equalAdjacentPairs / adjacentPairs).toFixed(3)} exceeds 0.08`);
   }
   if (minX < 8 || maxX >= width - 8 || minY < 8) errors.push("opaque pixel within 8px edge");
   if (maxY < 0 || Math.abs(maxY - baseline) > 2) {
@@ -196,6 +233,18 @@ function checkFrame(
       }
     }
   }
+  if (!includeHeadMetrics) {
+    return {
+      errors: [...new Set(errors)].map((error) => `${name}: ${error}`),
+      metrics: {
+        height: maxY >= minY ? maxY - minY + 1 : 0,
+        opaqueArea,
+        blockiness: adjacentPairs === 0 ? 0 : equalAdjacentPairs / adjacentPairs,
+        headWidth: 0,
+        headMean: [0, 0, 0],
+      },
+    };
+  }
   const headBottom = minY + (maxY - minY + 1) * 0.3;
   let headMinX = width;
   let headMaxX = -1;
@@ -219,6 +268,8 @@ function checkFrame(
     errors: [...new Set(errors)].map((error) => `${name}: ${error}`),
     metrics: {
       height: maxY >= minY ? maxY - minY + 1 : 0,
+      opaqueArea,
+      blockiness: adjacentPairs === 0 ? 0 : equalAdjacentPairs / adjacentPairs,
       headWidth,
       headMean: headPixels === 0
         ? [0, 0, 0]
@@ -252,6 +303,39 @@ function iou(left: Uint8Array, right: Uint8Array): number {
     if (leftOpaque || rightOpaque) union += 1;
   }
   return union === 0 ? 1 : intersection / union;
+}
+
+function croppedMirrorIou(bytes: Uint8Array, width: number, height: number): number {
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if ((bytes[(y * width + x) * 4 + 3] ?? 0) <= 128) continue;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+  if (maxX < minX || maxY < minY) return 1;
+  const boxWidth = maxX - minX + 1;
+  const boxHeight = maxY - minY + 1;
+  const mask = new Uint8Array(boxWidth * boxHeight);
+  for (let y = 0; y < boxHeight; y += 1) {
+    for (let x = 0; x < boxWidth; x += 1) {
+      const source = ((minY + y) * width + minX + x) * 4 + 3;
+      if ((bytes[source] ?? 0) > 128) mask[y * boxWidth + x] = 1;
+    }
+  }
+  const flipped = new Uint8Array(mask.length);
+  for (let y = 0; y < boxHeight; y += 1) {
+    for (let x = 0; x < boxWidth; x += 1) {
+      flipped[y * boxWidth + x] = mask[y * boxWidth + boxWidth - x - 1] ?? 0;
+    }
+  }
+  return iou(mask, flipped);
 }
 
 function flipMask(mask: Uint8Array): Uint8Array {
@@ -292,83 +376,214 @@ function registerMask(mask: Uint8Array): Uint8Array {
   return registered;
 }
 
+function fullMaskAt48(bytes: Uint8Array, width: number, height: number): Uint8Array {
+  const size = 48;
+  const mask = new Uint8Array(size * size);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const sourceX = Math.min(width - 1, Math.floor((x * width) / size));
+      const sourceY = Math.min(height - 1, Math.floor((y * height) / size));
+      const source = (sourceY * width + sourceX) * 4 + 3;
+      if ((bytes[source] ?? 0) > 0) mask[y * size + x] = 1;
+    }
+  }
+  return mask;
+}
+
+function binaryMaskAt48(mask: Uint8Array, width: number, height: number): Uint8Array {
+  const result = new Uint8Array(48 * 48);
+  for (let y = 0; y < 48; y += 1) {
+    for (let x = 0; x < 48; x += 1) {
+      const sourceX = Math.min(width - 1, Math.floor((x * width) / 48));
+      const sourceY = Math.min(height - 1, Math.floor((y * height) / 48));
+      result[y * 48 + x] = mask[sourceY * width + sourceX] ?? 0;
+    }
+  }
+  return result;
+}
+
+function openedMask(bytes: Uint8Array, width: number, height: number): Uint8Array {
+  const source = new Uint8Array(width * height);
+  for (let index = 0; index < source.length; index += 1) {
+    source[index] = (bytes[index * 4 + 3] ?? 0) > 0 ? 1 : 0;
+  }
+  const radius = 6;
+  const eroded = new Uint8Array(source.length);
+  for (let y = radius; y < height - radius; y += 1) {
+    for (let x = radius; x < width - radius; x += 1) {
+      let solid = 1;
+      for (let dy = -radius; dy <= radius && solid === 1; dy += 1) {
+        for (let dx = -radius; dx <= radius; dx += 1) {
+          if (dx * dx + dy * dy > radius * radius) continue;
+          if (source[(y + dy) * width + x + dx] === 0) solid = 0;
+        }
+      }
+      eroded[y * width + x] = solid;
+    }
+  }
+  const opened = new Uint8Array(source.length);
+  for (let y = radius; y < height - radius; y += 1) {
+    for (let x = radius; x < width - radius; x += 1) {
+      let solid = 0;
+      for (let dy = -radius; dy <= radius && solid === 0; dy += 1) {
+        for (let dx = -radius; dx <= radius; dx += 1) {
+          if (dx * dx + dy * dy <= radius * radius
+            && eroded[(y + dy) * width + x + dx] === 1) solid = 1;
+        }
+      }
+      opened[y * width + x] = solid;
+    }
+  }
+  return opened;
+}
+
+function openedHeadWidth(mask: Uint8Array, width: number, height: number): number {
+  let minX = width;
+  let maxX = -1;
+  let minY = height;
+  let maxY = -1;
+  for (let index = 0; index < mask.length; index += 1) {
+    if (mask[index] === 0) continue;
+    const x = index % width;
+    const y = Math.floor(index / width);
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+  }
+  const cutoff = minY + (maxY - minY + 1) * 0.6;
+  const rowWidths: number[] = [];
+  for (let y = minY; y < cutoff; y += 1) {
+    let rowMin = width;
+    let rowMax = -1;
+    for (let x = 0; x < width; x += 1) {
+      if (mask[y * width + x] === 1) {
+        rowMin = Math.min(rowMin, x);
+        rowMax = Math.max(rowMax, x);
+      }
+    }
+    if (rowMax >= rowMin) rowWidths.push(rowMax - rowMin + 1);
+  }
+  rowWidths.sort((left, right) => left - right);
+  return rowWidths[Math.floor(rowWidths.length / 2)] ?? 0;
+}
+
+function topPointX(mask: Uint8Array, width: number, height: number): number {
+  let minY = height;
+  let maxY = -1;
+  for (let index = 0; index < mask.length; index += 1) {
+    if (mask[index] === 0) continue;
+    const y = Math.floor(index / width);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+  }
+  const cutoff = minY + (maxY - minY + 1) * 0.3;
+  let total = 0;
+  let count = 0;
+  for (let index = 0; index < mask.length; index += 1) {
+    if (mask[index] === 0) continue;
+    const y = Math.floor(index / width);
+    if (y >= cutoff) continue;
+    total += index % width;
+    count += 1;
+  }
+  return count === 0 ? width / 2 : total / count;
+}
+
 const atlas = arg("atlas", "public/assets/characters/fae/fae.png");
 const jsonPath = arg("json", "public/assets/characters/fae/fae.json");
+const expectedWalk = 6;
+const headOnThreshold = 0.70;
 const rawJson: unknown = JSON.parse(await Bun.file(jsonPath).text());
 const sheet = parseSheet(rawJson);
+const biped = await isBiped(atlas);
 const errors: string[] = [];
-const heights: Record<string, number[]> = {};
 const frameBytes = new Map<string, Uint8Array>();
 const metrics = new Map<string, FrameMetrics>();
 for (const [name, frame] of Object.entries(sheet.frames)) {
   const bytes = await pixels(atlas, frame.frame);
   frameBytes.set(name, bytes);
-  const result = checkFrame(name, frame, bytes, sheet.meta.baseline);
+  const result = checkFrame(name, frame, bytes, sheet.meta.baseline, biped);
   errors.push(...result.errors);
   metrics.set(name, result.metrics);
-  const direction = name.split("_")[0] ?? name;
-  heights[direction] ??= [];
-  heights[direction].push(result.metrics.height);
 }
-for (const direction of ["down", "up", "left"]) {
-  const idleMetrics = metrics.get(`${direction}_idle_01`);
-  const walkNames = sheet.animations[`walk_${direction}`] ?? [];
-  if (idleMetrics === undefined) continue;
-  if (process.env.SPRITE_HEAD_DEBUG === "1") {
-    console.error(
-      `head ${direction}: idle=${idleMetrics.headWidth} `
-      + `rgb=${idleMetrics.headMean.map((value) => value.toFixed(1)).join(",")}`,
+for (const direction of ["down", "up"]) {
+  const names = sheet.animations[`walk_${direction}`] ?? [];
+  const values: number[] = [];
+  for (const name of names) {
+    const frame = sheet.frames[name];
+    const bytes = frameBytes.get(name);
+    if (frame === undefined || bytes === undefined) continue;
+    const value = croppedMirrorIou(bytes, frame.sourceSize.w, frame.sourceSize.h);
+    values.push(value);
+    if (process.env.SPRITE_METRICS === "1") {
+      console.error(`mirror ${name}=${value.toFixed(3)}`);
+    }
+  }
+  const mean = values.length === 0
+    ? 0
+    : values.reduce((total, value) => total + value, 0) / values.length;
+  if (process.env.SPRITE_METRICS === "1") {
+    console.error(`mirror ${direction}_mean=${mean.toFixed(3)}`);
+  }
+  if (mean < headOnThreshold) {
+    errors.push(
+      `${direction}: mean walk mirror IoU ${mean.toFixed(3)} `
+      + `is below ${headOnThreshold.toFixed(2)}`,
     );
   }
-  for (const walkName of walkNames) {
-    const walkMetrics = metrics.get(walkName);
-    if (walkMetrics === undefined) continue;
-    if (process.env.SPRITE_HEAD_DEBUG === "1") {
-      console.error(
-        `head ${walkName}: width=${walkMetrics.headWidth} `
-        + `rgb=${walkMetrics.headMean.map((value) => value.toFixed(1)).join(",")}`,
-      );
-    }
-    if (Math.abs(walkMetrics.headWidth - idleMetrics.headWidth)
-      / idleMetrics.headWidth > 0.08) {
+}
+if (biped) for (const direction of ["down", "up", "left"]) {
+  const idle = metrics.get(`${direction}_idle_01`);
+  if (idle === undefined || idle.headWidth === 0) continue;
+  for (const name of sheet.animations[`walk_${direction}`] ?? []) {
+    const walk = metrics.get(name);
+    if (walk === undefined) continue;
+    if (Math.abs(walk.headWidth - idle.headWidth) / idle.headWidth > 0.08) {
       errors.push(
-        `${walkName}: head width differs from ${direction}_idle_01 by more than 8%`,
+        `${name}: head width differs from ${direction}_idle_01 by more than 8%`,
       );
     }
-    const [idleRed, idleGreen, idleBlue] = idleMetrics.headMean;
-    const [walkRed, walkGreen, walkBlue] = walkMetrics.headMean;
     const colorDistance = Math.sqrt(
-      (walkRed - idleRed) ** 2
-      + (walkGreen - idleGreen) ** 2
-      + (walkBlue - idleBlue) ** 2,
+      (walk.headMean[0] - idle.headMean[0]) ** 2
+      + (walk.headMean[1] - idle.headMean[1]) ** 2
+      + (walk.headMean[2] - idle.headMean[2]) ** 2,
     );
     if (colorDistance > 20) {
       errors.push(
-        `${walkName}: head mean RGB distance from ${direction}_idle_01 `
+        `${name}: head mean RGB distance from ${direction}_idle_01 `
         + `is ${colorDistance.toFixed(1)}, over 20`,
       );
     }
   }
 }
-for (const direction of ["down", "up", "left"]) {
-  const idleName = `${direction}_idle_01`;
-  const walkName = `${direction}_walk_01`;
-  const idle = frameBytes.get(idleName);
-  const walk = frameBytes.get(walkName);
-  if (idle !== undefined && walk !== undefined) {
-    const idleMask = registerMask(maskAt48(idle, 384, 384));
-    const walkMask = registerMask(maskAt48(walk, 384, 384));
-    const normal = iou(idleMask, walkMask);
-    const flipped = iou(flipMask(idleMask), walkMask);
-    const idleSymmetry = iou(idleMask, flipMask(idleMask));
-    if (process.env.SPRITE_ORIENTATION_DEBUG === "1") {
-      console.error(
-        `orientation ${direction}: normal=${normal.toFixed(3)} `
-        + `flipped=${flipped.toFixed(3)} symmetry=${idleSymmetry.toFixed(3)}`,
-      );
-    }
-    if (flipped > normal + 0.05 && idleSymmetry < 0.9) {
-      errors.push(`idle_${direction} appears mirrored relative to walk_${direction}`);
+const requiredAnimations = [
+  "walk_down", "walk_up", "walk_left", "idle_down", "idle_up", "idle_left",
+];
+if (Object.keys(sheet.animations).sort().join(",")
+  !== requiredAnimations.slice().sort().join(",")) {
+  errors.push(`animations must be exactly ${requiredAnimations.join(", ")}`);
+}
+const referencedFrames = new Set(Object.values(sheet.animations).flat());
+const unusedFrames = Object.keys(sheet.frames).filter((name) => !referencedFrames.has(name));
+if (unusedFrames.length > 0) errors.push(`unused frames: ${unusedFrames.join(", ")}`);
+for (const [animation, names] of Object.entries(sheet.animations)) {
+  for (let left = 0; left < names.length; left += 1) {
+    const leftBytes = frameBytes.get(names[left] ?? "");
+    if (leftBytes === undefined) continue;
+    for (let right = left + 1; right < names.length; right += 1) {
+      const rightBytes = frameBytes.get(names[right] ?? "");
+      if (rightBytes === undefined || leftBytes.length !== rightBytes.length) continue;
+      let identical = true;
+      for (let index = 0; index < leftBytes.length; index += 1) {
+        if (leftBytes[index] !== rightBytes[index]) {
+          identical = false;
+          break;
+        }
+      }
+      if (identical) {
+        errors.push(`${animation}: pixel-identical frames ${names[left]} and ${names[right]}`);
+      }
     }
   }
 }
@@ -376,16 +591,28 @@ const walkCounts = ["down", "up", "left"].map(
   (direction) => sheet.animations[`walk_${direction}`]?.length ?? 0,
 );
 if (new Set(walkCounts).size !== 1 || walkCounts[0] === undefined
-  || walkCounts[0] % 2 !== 0 || walkCounts[0] !== 6) {
-  errors.push(`walk animations must all have an even count of 6, got ${walkCounts.join(",")}`);
+  || walkCounts[0] % 2 !== 0 || walkCounts[0] !== expectedWalk) {
+  errors.push(
+    `walk animations must all have an even count of ${expectedWalk}, `
+    + `got ${walkCounts.join(",")}`,
+  );
 }
-for (const [direction, values] of Object.entries(heights)) {
-  const minimum = Math.min(...values);
-  const maximum = Math.max(...values);
-  if (minimum > 0 && maximum / minimum > 1.08) {
-    errors.push(
-      `${direction}: figure heights vary by more than 8% (${minimum}-${maximum})`,
-    );
+for (const direction of ["down", "up", "left"]) {
+  const walk = (sheet.animations[`walk_${direction}`] ?? [])
+    .map((name) => metrics.get(name)?.opaqueArea ?? 0);
+  const idle = metrics.get(`${direction}_idle_01`)?.opaqueArea ?? 0;
+  const minimum = Math.min(...walk);
+  const maximum = Math.max(...walk);
+  const sorted = walk.slice().sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 === 0
+    ? ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2
+    : (sorted[middle] ?? 0);
+  if (minimum > 0 && maximum / minimum > 1.20) {
+    errors.push(`${direction}: walk opaque areas vary by more than 1.20`);
+  }
+  if (median > 0 && (idle / median < 0.70 || idle / median > 1.40)) {
+    errors.push(`${direction}: idle/walk opaque area ratio is outside 0.70-1.40`);
   }
 }
 for (const direction of ["down", "up", "left"]) {

@@ -35,6 +35,18 @@ bun tools/art/postprocess.ts --input art/scratch/source.png \
 # Do not resize frames horizontally to satisfy a metric. If proportions do not
 # match the canonical idle, regenerate the strip.
 
+# Maddie uses a 256x256 canvas, --bottom-margin 8, and --baseline 247. Choose
+# one uniform source scale from the shared model-sheet standing anchor, measure
+# that anchor in every source, and record each factor. Never upscale a source.
+# Do not use separate standing and seated pose-height targets; seated height
+# changes naturally from posture.
+# Generate quadruped walks as two three-frame strips per direction when needed:
+# contact, down, passing, then contact, down, passing. Diagonal leg pairs
+# alternate and the tail sways. Validate Maddie with the mandatory validator;
+# no check-disabling flags exist.
+# Side-facing alpha heuristics are not reliable with a raised tail, so the
+# contact sheet must stamp the expected facing arrows for Maddie's rows.
+
 # 4. Put fixed-size frames in art/scratch/fae-frames/.
 # Names are down_walk_01.png, up_idle_01.png, left_walk_06.png, etc.
 bun tools/art/pack-atlas.ts --input art/scratch/fae-frames \
@@ -73,8 +85,8 @@ at row 375, and anchor `{x: 0.5, y: 375/384}` in PixiJS v8 JSON. Right is
 omitted because the runtime mirrors the left set.
 
 `validate-sprite.ts` checks edges, connected components, green spill, baseline,
-directional height consistency, even six-frame walk counts, required animation
-names, idle orientation (48x48 alpha-mask IoU against walk frame 0), per-frame
-idle-vs-walk head width and colour, and long hard-straight alpha edges in every
-direction when their edge luminance lacks the dark ink expected inside the
-silhouette (crop cuts).
+exact animation names and counts with no unused or duplicate frames, walk area
+ratio at most 1.20, idle area ratio 0.70-1.40, blockiness at most 0.08, and
+down/up walk mirror IoU at least 0.70. Ink-aware hard-straight crop cuts are
+mandatory. Biped-only head checks are enabled by the recipe.
+There are no CLI switches that disable checks.

@@ -178,7 +178,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   (192x192 units), feet baseline at row 375 (anchor `{x: 0.5, y: 375/384}`),
   animations `walk_down`, `walk_up`, `walk_left` (6 frames each) and
   `idle_down`, `idle_up`, `idle_left` (1 frame each). Right mirrors left.
-  `tools/art/validate-sprite.ts` must pass for every character atlas.
+- Maddie's atlas (`public/assets/characters/maddie/`): 256x256 source-pixel
+  frames (128x128 units), feet baseline at row 247 (anchor
+  `{x: 0.5, y: 247/256}`), the same six animation names. She stands about 50
+  units tall and sits about 65; one uniform scale covers every pose.
+- `tools/art/validate-sprite.ts` must pass for every character atlas. All of its
+  checks are mandatory (no switches); biped-only head checks are enabled by
+  `"validator": { "biped": true }` in the character's `art/recipes/` file.
 - Followers (Maddie) and NPCs follow the same rules. NPCs may ship idle-only.
 
 ## 6. World
@@ -326,7 +332,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Gate: the owner approves the style of the first character and the first area
   before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
   hair with bangs and a high bun, white sneakers with orange trim, journal in
-  the backpack) and the bedroom at 70% scale.
+  the backpack), the bedroom at 70% scale, the town plaza, and Maddie.
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

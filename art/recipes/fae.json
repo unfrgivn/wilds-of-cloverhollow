@@ -3,6 +3,7 @@
   "status": "v2-generated-validator-passing-owner-review",
   "model": "gemini-3-pro-image",
   "generationCalls": 15,
+  "validator": { "biped": true },
   "generationBreakdown": {
     "blockedProbe": 1,
     "successfulImageCalls": 14,

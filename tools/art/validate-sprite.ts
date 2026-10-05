@@ -95,7 +95,6 @@ function checkFrame(
   const height = frame.sourceSize.h;
   const alpha = new Uint8Array(width * height);
   const errors: string[] = [];
-  const direction = name.split("_")[0] ?? name;
   let minX = width;
   let minY = height;
   let maxX = -1;
@@ -153,22 +152,47 @@ function checkFrame(
   }
   if (components > 1) errors.push(`${components} alpha components`);
   for (let x = minX; x <= maxX; x += 1) {
-    let run = 0;
-    for (let y = minY; y <= maxY; y += 1) {
-      const current = bytes[(y * width + x) * 4 + 3] ?? 0;
-      const left = x > 0 ? bytes[(y * width + x - 1) * 4 + 3] ?? 0 : 0;
-      const right = x + 1 < width
-        ? bytes[(y * width + x + 1) * 4 + 3] ?? 0
-        : 0;
-      if (current >= 200 && (left <= 10 || right <= 10)) {
-        run += 1;
-        const nearFigureEdge = x <= minX + 4 || x >= maxX - 4;
-        if (direction === "up" && run >= 16 && nearFigureEdge) {
-          errors.push(`${name}: hard straight alpha edge at x=${x}`);
-          break;
+    for (const side of [-1, 1] as const) {
+      let runStart = -1;
+      const edgeCheckBottom = Math.min(maxY, minY + Math.floor((maxY - minY + 1) * 0.7));
+      for (let y = minY; y <= edgeCheckBottom + 1; y += 1) {
+        const current = y <= maxY
+          ? bytes[(y * width + x) * 4 + 3] ?? 0
+          : 0;
+        const neighborX = x + side;
+        const neighbor = y <= maxY && neighborX >= 0 && neighborX < width
+          ? bytes[(y * width + neighborX) * 4 + 3] ?? 0
+          : 0;
+        const continues = current >= 200 && neighbor <= 10;
+        if (continues && runStart < 0) runStart = y;
+        if (!continues && runStart >= 0) {
+          const runLength = y - runStart;
+          const edgeRows = Math.max(0, y - runStart);
+          if (runLength >= 16) {
+            let edgeLuma = 0;
+            let insideLuma = 0;
+            for (let row = runStart; row < y; row += 1) {
+              const edgeOffset = (row * width + x) * 4;
+              const insideX = x - side * 4;
+              const insideOffset = (row * width + insideX) * 4;
+              edgeLuma += ((bytes[edgeOffset] ?? 0)
+                + (bytes[edgeOffset + 1] ?? 0)
+                + (bytes[edgeOffset + 2] ?? 0)) / 3;
+              insideLuma += ((bytes[insideOffset] ?? 0)
+                + (bytes[insideOffset + 1] ?? 0)
+                + (bytes[insideOffset + 2] ?? 0)) / 3;
+            }
+            edgeLuma /= edgeRows;
+            insideLuma /= edgeRows;
+            if (edgeLuma > 115 || Math.abs(edgeLuma - insideLuma) < 25) {
+              errors.push(
+                `${name}: hard edge x=${x} rows=${runStart}-${y - 1} `
+                + `edge=${edgeLuma.toFixed(1)} inside=${insideLuma.toFixed(1)}`,
+              );
+            }
+          }
+          runStart = -1;
         }
-      } else {
-        run = 0;
       }
     }
   }

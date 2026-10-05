@@ -10,14 +10,16 @@ GEMINI_API_KEY=... bun tools/art/gemini-image.ts \
   --model gemini-3-pro-image --aspect-ratio 1:1 --image-size 2K \
   --prompt "..." --ref docs/art/concepts/characters/character_concept_sheet_fae.png
 
-# 2. Segment a generated strip by connected components, dropping islands under
-# the main figure threshold. This avoids equal-width crops and neighbor bleed.
+# 2. Segment a generated strip by connected components, retaining each figure's
+# full alpha bounding box and masking other components. This avoids equal-width
+# or thresholded column crops and neighbor bleed.
 bun tools/art/extract-strip.ts --input art/scratch/walk-strip.png \
   --output art/scratch/strip-frames --key '#00FF00' --fuzz 18% --expected 6
 # If connected components return fewer frames, the script may split the widest
 # component only at its deepest alpha-column valley when that column has at
 # most 6 opaque pixels. Otherwise it fails and the operator must regenerate
-# with more spacing. It fails if six are not found.
+# with more spacing. It fails if six are not found and never cuts through a
+# component's artwork.
 # For a difficult back walk, prefer two three-frame strips with wide gutters.
 # Extract each with --expected 3, then concatenate the extracted frames in
 # contact, down, passing, contact, down, passing order.
@@ -73,5 +75,6 @@ omitted because the runtime mirrors the left set.
 `validate-sprite.ts` checks edges, connected components, green spill, baseline,
 directional height consistency, even six-frame walk counts, required animation
 names, idle orientation (48x48 alpha-mask IoU against walk frame 0), per-frame
-idle-vs-walk head width and colour, and long hard-straight alpha edges in the up
-hair region (crop cuts).
+idle-vs-walk head width and colour, and long hard-straight alpha edges in every
+direction when their edge luminance lacks the dark ink expected inside the
+silhouette (crop cuts).

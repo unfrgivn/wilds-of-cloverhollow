@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 export {};
 
-type Bounds = { start: number; end: number };
+type Bounds = { start: number; end: number; top: number; bottom: number };
 
 function value(name: string, fallback: string): string {
   const index = Bun.argv.indexOf(`--${name}`);
@@ -56,6 +56,8 @@ function findBounds(alpha: Uint8Array, width: number, height: number): Bounds[] 
     let area = 0;
     let minX = width;
     let maxX = 0;
+    let minY = height;
+    let maxY = 0;
     while (queue.length > 0) {
       const current = queue.pop();
       if (current === undefined) continue;
@@ -64,6 +66,8 @@ function findBounds(alpha: Uint8Array, width: number, height: number): Bounds[] 
       const y = Math.floor(current / width);
       minX = Math.min(minX, x);
       maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
       const neighbors = [[-1, 0], [1, 0], [0, -1], [0, 1]] as const;
       for (const [dx, dy] of neighbors) {
         const nextX = x + dx;
@@ -76,7 +80,10 @@ function findBounds(alpha: Uint8Array, width: number, height: number): Bounds[] 
         }
       }
     }
-    components.push({ area, bounds: { start: minX, end: maxX + 1 } });
+    components.push({
+      area,
+      bounds: { start: minX, end: maxX + 1, top: minY, bottom: maxY + 1 },
+    });
   }
   const largest = Math.max(...components.map((component) => component.area));
   return components
@@ -131,7 +138,10 @@ function splitWidest(
   }
   return bounds
     .filter((bound) => bound !== widest)
-    .concat([{ start: widest.start, end: split }, { start: split, end: widest.end }])
+    .concat([
+      { start: widest.start, end: split, top: widest.top, bottom: widest.bottom },
+      { start: split, end: widest.end, top: widest.top, bottom: widest.bottom },
+    ])
     .sort((left, right) => left.start - right.start);
 }
 
@@ -156,8 +166,11 @@ for (const [index, bound] of bounds.entries()) {
   const padding = 12;
   const start = Math.max(0, bound.start - padding);
   const end = Math.min(dimensions.width, bound.end + padding);
+  const top = Math.max(0, bound.top - padding);
+  const bottom = Math.min(dimensions.height, bound.bottom + padding);
   const crop = Bun.spawn([
-    "magick", input, "-crop", `${end - start}x${dimensions.height}+${start}+0`,
+    "magick", input,
+    "-crop", `${end - start}x${bottom - top}+${start}+${top}`,
     "+repage", `${output}/raw-${String(index + 1).padStart(2, "0")}.png`,
   ], { stdout: "inherit", stderr: "inherit" });
   if (await crop.exited !== 0) throw new Error(`Could not crop strip frame ${index + 1}`);

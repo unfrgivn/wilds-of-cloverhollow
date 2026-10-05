@@ -27,7 +27,7 @@
     "art/source/fae/fae-walk-left-strip-v2.png"
   ],
   "postProcessing": {
-    "source": "The v4 up walk uses two three-frame strips with wide gutters, concatenated in cycle order. Each strip is segmented by connected components after keying, retaining the main figure component and sorting by x. If fewer than six figures are found, the widest component may be split only at a valley with at most six opaque pixels; otherwise extraction fails and requests regeneration. The generated side strip is horizontally flopped after extraction; the standing side idle is flopped through the same path.",
+    "source": "The v4 up walk uses two three-frame strips with wide gutters, concatenated in cycle order. Every figure is extracted from its full connected-component bounding box, with other components masked out; no thresholded projection crop is used. If fewer than six figures are found, the widest component may be split only at a valley with at most six opaque pixels; otherwise extraction fails and requests regeneration. The generated side strip is horizontally flopped after extraction; the standing side idle is extracted from the model-sheet component and flopped through the same path.",
     "command": "bun tools/art/extract-strip.ts followed by bun tools/art/postprocess.ts --width 384 --height 384 --figure-height 280 --bottom-margin 8 --fuzz 18% --key '#00FF00'",
     "parameters": {
       "keyColor": "#00FF00",
@@ -45,7 +45,7 @@
     },
     "atlas": "pack-atlas.ts, 5 columns, 384x384 frames, PixiJS v8 JSON anchor {x: 0.5, y: 0.9765625}, baseline 375",
     "review": "contact-sheet.ts on cream and dark backgrounds plus ImageMagick GIFs at 10 fps, looping",
-    "validator": "validate-sprite.ts, passed all frame edge, component, spill, baseline, height, even walk-count, idle-orientation, idle-vs-walk head consistency, and hard-straight-edge checks"
+    "validator": "validate-sprite.ts, passed all frame edge, component, spill, baseline, height, even walk-count, idle-orientation, idle-vs-walk head consistency, and ink-aware hard-straight-edge checks in every direction"
   },
   "selectionReason": "V2 replaces every direction using one approved regenerated model sheet. The larger chibi head, messy bangs and shoulder-length flyaways, grey hair tie, white-orange sneakers, and journal are now consistent across front, back, side, walk, and idle views. The side strip and side idle are flopped into the shipped left direction. All frames were reviewed on cream and dark backgrounds and pass the sprite validator."
 }

@@ -33,16 +33,23 @@ async function alphaProjection(
   height: number,
   key: string,
   fuzz: string,
+  despill: string,
 ): Promise<Uint8Array> {
+  const keyed = `${input}.keyed.png`;
+  const keyProcess = Bun.spawn([
+    "bun", "tools/art/key-alpha.ts", "--input", input, "--output", keyed,
+    "--key", key, "--fuzz", fuzz, "--despill", despill,
+  ], { stdout: "inherit", stderr: "inherit" });
+  if (await keyProcess.exited !== 0) throw new Error("Keying failed");
   const process = Bun.spawn(
-    ["magick", input, "-alpha", "on", "-fuzz", fuzz, "-transparent", key,
-      "-alpha", "extract", "-threshold", "1%", "-depth", "8", "gray:-"],
+    ["magick", keyed, "-alpha", "extract", "-threshold", "1%", "-depth", "8", "gray:-"],
     { stdout: "pipe", stderr: "inherit" },
   );
   const bytes = new Uint8Array(await new Response(process.stdout).arrayBuffer());
   if (await process.exited !== 0 || bytes.length < width * height) {
     throw new Error(`Could not create alpha projection for ${input}`);
   }
+  await Bun.file(keyed).delete();
   return bytes;
 }
 
@@ -148,11 +155,12 @@ function splitWidest(
 const input = value("input", "");
 const output = value("output", "art/scratch/strip-frames");
 const key = value("key", "#00FF00");
+const despill = value("despill", "global-green");
 const fuzz = value("fuzz", "18%");
 const expected = Number(value("expected", "6"));
 if (input.length === 0) throw new Error("--input is required");
 const dimensions = await identify(input);
-const alpha = await alphaProjection(input, dimensions.width, dimensions.height, key, fuzz);
+const alpha = await alphaProjection(input, dimensions.width, dimensions.height, key, fuzz, despill);
 let bounds = findBounds(alpha, dimensions.width, dimensions.height);
 while (bounds.length < expected) {
   bounds = splitWidest(alpha, dimensions.width, dimensions.height, bounds);

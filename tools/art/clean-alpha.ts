@@ -24,11 +24,19 @@ async function dimensions(input: string): Promise<{ width: number; height: numbe
 
 const input = value("input", "");
 const output = value("output", input);
+const key = value("key", "#00FF00");
+const despill = value("despill", "global-green");
 const keepAll = value("keep-all", "false") === "true";
 if (input.length === 0) throw new Error("--input is required");
-const { width, height } = await dimensions(input);
+const keyed = `${output}.keyed.png`;
+const keyProcess = Bun.spawn([
+  "bun", "tools/art/key-alpha.ts", "--input", input, "--output", keyed,
+  "--key", key, "--despill", despill,
+], { stdout: "inherit", stderr: "inherit" });
+if (await keyProcess.exited !== 0) throw new Error("Keying failed");
+const { width, height } = await dimensions(keyed);
 const read = Bun.spawn(
-  ["magick", input, "-alpha", "on", "-depth", "8", "rgba:-"],
+  ["magick", keyed, "-alpha", "on", "-depth", "8", "rgba:-"],
   { stdout: "pipe", stderr: "inherit" },
 );
 const pixels = new Uint8Array(await new Response(read.stdout).arrayBuffer());
@@ -76,13 +84,15 @@ for (const component of components) {
   if (keepAll || component === largestComponent) continue;
   for (const point of component.points) pixels[(point.y * width + point.x) * 4 + 3] = 0;
 }
-for (let index = 0; index < width * height; index += 1) {
-  const offset = index * 4;
-  const opacity = pixels[offset + 3] ?? 0;
-  if (opacity === 0) continue;
-  const red = pixels[offset] ?? 0;
-  const blue = pixels[offset + 2] ?? 0;
-  pixels[offset + 1] = Math.min(pixels[offset + 1] ?? 0, Math.max(red, blue));
+if (despill === "global-green") {
+  for (let index = 0; index < width * height; index += 1) {
+    const offset = index * 4;
+    const opacity = pixels[offset + 3] ?? 0;
+    if (opacity === 0) continue;
+    const red = pixels[offset] ?? 0;
+    const blue = pixels[offset + 2] ?? 0;
+    pixels[offset + 1] = Math.min(pixels[offset + 1] ?? 0, Math.max(red, blue));
+  }
 }
 const eroded = new Uint8Array(pixels);
 for (let y = 0; y < height; y += 1) {
@@ -117,3 +127,4 @@ if (write.stdin === null) throw new Error("Could not open ImageMagick input");
 await write.stdin.write(pixels);
 await write.stdin.end();
 if (await write.exited !== 0) throw new Error(`Could not write ${output}`);
+await Bun.file(keyed).delete();

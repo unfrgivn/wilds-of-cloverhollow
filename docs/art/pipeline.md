@@ -14,7 +14,8 @@ GEMINI_API_KEY=... bun tools/art/gemini-image.ts \
 # full alpha bounding box and masking other components. This avoids equal-width
 # or thresholded column crops and neighbor bleed.
 bun tools/art/extract-strip.ts --input art/scratch/walk-strip.png \
-  --output art/scratch/strip-frames --key '#00FF00' --fuzz 18% --expected 6
+  --output art/scratch/strip-frames --key '#00FF00' --despill global-green \
+  --fuzz 18% --expected 6
 # If connected components return fewer frames, the script may split the widest
 # component only at its deepest alpha-column valley when that column has at
 # most 6 opaque pixels. Otherwise it fails and the operator must regenerate
@@ -28,10 +29,14 @@ bun tools/art/extract-strip.ts --input art/scratch/walk-strip.png \
 # feet to row 375 on the fixed 384x384 canvas.
 bun tools/art/postprocess.ts --input art/scratch/source.png \
   --output art/scratch/fae-frame.png --width 384 --height 384 \
-  --figure-height 280 --bottom-margin 8 --fuzz 18% --key '#00FF00'
-# For concept sheets with paper rather than green, add --key '#F5F1E0'.
+  --figure-height 280 --bottom-margin 8 --fuzz 18% --key '#00FF00' \
+  --despill global-green
+# `--key` is removed by border-connected flood fill. Use `--despill edge` for
+# new green characters on magenta (`#FF00FF`), or `global-green` for legacy Fae
+# and Maddie recipes. `none` skips colour correction.
 # Keep selected raw model/strip outputs in art/source/<character>/.
-# Run clean-alpha.ts on each finished frame to remove disconnected islands.
+# Run clean-alpha.ts on each finished frame to remove disconnected islands,
+# passing the same `--key` and `--despill` options.
 # Do not resize frames horizontally to satisfy a metric. If proportions do not
 # match the canonical idle, regenerate the strip.
 

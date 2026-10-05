@@ -1,0 +1,87 @@
+{
+  "asset": "frog",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 7,
+  "date": "2026-10-05",
+  "referenceImages": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "docs/art/concepts/npcs/chaos_raccoon.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+  ],
+  "selectedOutputs": [
+    "art/source/critters/frog/chaos-raw.png",
+    "art/source/critters/frog/burst-raw.png",
+    "art/source/critters/frog/soothed-ring-raw.png",
+    "art/source/critters/frog/calm-raw.png",
+    "art/source/critters/frog/aura-white-01b-raw.png"
+  ],
+  "scaleFactors": {
+    "chaos_idle_01": 0.1855,
+    "chaos_burst_01": 0.1855,
+    "soothed_01": 0.1855,
+    "calm_idle_01": 0.1855,
+    "chaos_aura_01": 0.28
+  },
+  "postProcessing": {
+    "keyColor": "#FF00FF",
+    "fuzz": "18%",
+    "despill": "edge-only magenta correction within three alpha-edge pixels",
+    "source": "Body sources use border-connected magenta flood fill and three-pixel edge-band despill. The aura uses white-lift and and never chroma-keyed. Frames are placed on fixed 512x512 canvases with an 8px bottom margin. No dither, warping, per-frame registration, or metric-driven resizing is applied.",
+    "frameCanvas": "512x512 source px",
+    "baseline": 504,
+    "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON"
+  },
+  "aura": {
+    "method": "white-to-alpha colour-to-alpha via tools/art/white-to-alpha.ts",
+    "prompt": "Aura alone on pure white: soft watercolour purple and violet scribble swirls forming a loose ring, teal swirl dashes, six to eight lavender four-point sparkles, no frog, no black outlines, generous margin.",
+    "formula": "alpha=max(255-r,255-g,255-b)/255; c'=255-(255-c)/alpha, clamped",
+    "scaleFactor": 0.28,
+    "frames": 1,
+    "engine": "The engine rotates and pulses this single painted aura rather than shipping a translated duplicate.",
+    "canvas": "512x512, baseline 504, clearance measured by checker",
+    "reason": "Purple aura marks are too close to magenta for safe chroma keying, and translucent glow has no reliable single key colour.",
+    "jpegFloor": "Raw Gemini JPEG white-background deviations below 8/255 are treated as paper; no colour correction or alpha cleanup beyond the documented paper floor is applied."
+  },
+  "checker": {
+    "bodyFrames": [
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01",
+      "calm_idle_01"
+    ],
+    "auraFrames": [
+      "chaos_aura_01"
+    ],
+    "rawSources": {
+      "chaos_idle_01": "art/source/critters/frog/chaos-raw.png",
+      "chaos_burst_01": "art/source/critters/frog/burst-raw.png",
+      "soothed_01": "art/source/critters/frog/soothed-ring-raw.png",
+      "calm_idle_01": "art/source/critters/frog/calm-raw.png"
+    },
+    "psnrThreshold": 25,
+    "calibration": {
+      "fae": 31.41,
+      "maddie": 34.62,
+      "frog": 32.67,
+      "syntheticNearest": 32.7,
+      "syntheticBicubic": 32.55,
+      "separatesSynthetic": false
+    },
+    "matteMethods": {
+      "body": "magenta-key",
+      "aura": "white-lift"
+    }
+  },
+  "review": [
+    "art/review/frog-sheet.png",
+    "art/review/frog-chaos-vs-calm.png",
+    "art/review/frog-source-vs-sprite.png",
+    "art/review/frog-in-plaza.png",
+    "art/review/frog-battle-mock.png"
+  ],
+  "matteMethods": {
+    "body": "magenta-key",
+    "aura": "white-lift"
+  }
+}

@@ -51,3 +51,14 @@ source of truth. Work comes from `docs/plan.md`.
 - Every kept generated asset has a recipe in `art/recipes/`. Runtime assets go
   in `public/assets/`. Scratch output goes in `art/scratch/` (gitignored).
 - Never overwrite owner-approved art without a new recipe.
+- Never alter artwork to satisfy a metric: no added noise or dither, no
+  warping, no re-registering or resizing single frames. Fix the source or
+  regenerate. If a metric is wrong for an asset, change the metric with
+  evidence and say so in your report.
+- Pick a chroma key colour the subject doesn't use (magenta for green
+  characters). Despill only the band along the alpha edge, never the interior.
+
+## Working trees
+- Work only in the tree you were assigned (the main tree or a worktree under
+  `.worktrees/`). Before reporting, run `git status --short` in the main tree
+  and in your worktree, and account for every change you made.

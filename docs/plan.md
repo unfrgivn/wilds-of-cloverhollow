@@ -67,21 +67,54 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
 - E2e walks bedroom, plaza, bedroom with real keys; screenshots reviewed.
 
 ## Milestone 7: Maddie follows
-- Maddie's sprite set. She follows Fae at a consistent distance, including
-  through transitions. Sim and e2e coverage.
+- Owner-approved Maddie atlas; the sprite validator passes with every check on.
+- Core: Maddie follows Fae's recent path (a bounded breadcrumb trail in state)
+  about 90 units behind, so she walks around furniture exactly where Fae did
+  and never needs her own pathfinding. She stops about 60 units away and sits
+  when Fae stops. Through a door she arrives with Fae, placed behind her.
+- She y-sorts with Fae and occluders; her walk frames follow her own distance.
+- Unit, sim (door round trip with invariants for both), and e2e (real keys:
+  she follows within a distance band, crosses doors, sorts behind occluders);
+  reviewed baselines; `just ios-smoke` passes.
 
 ## Milestone 8: Talk with a choice
-- Interactable prompt and Ink dialogue in the sticker UI, with one choice that
-  changes a later line. E2e with real keys.
+- Ink pipeline: `content/story/*.ink` compiled by a dev-only Bun script to
+  committed JSON; `just check` fails if the JSON is stale or the story uses
+  POW. The runtime ships only the inkjs engine (no compiler).
+- Core adapter `src/core/ink.ts`, the only core file allowed a package import
+  (`inkjs`): each dialogue action builds a fresh Story, loads `state.ink`,
+  acts, and saves it back (0.15 ms per action in Bun). Fresh Ink state is
+  seeded from the game seed (the Date-based default is never observed). The
+  purity check enforces the import allowlist.
+- Interactables in area JSON; the nearest one in front within 60 units gets a
+  sticker prompt. Confirm opens its knot without also advancing; while open,
+  movement is frozen, up/down choose, confirm reveals then advances, and a
+  touch tap on a choice picks it directly (a new input field). Text reveal is
+  driven by the core, so replays are exact.
+- Sticker-style DOM dialogue box (speaker tag, choices as stickers,
+  `aria-live`).
+- Content: the bedroom window (investigate now, or school first), the journal
+  under Fae's pillow (its line depends on that choice), and the plaza notice
+  board (sets up the chaos critter).
+- Unit, sim, cross-engine hash with dialogue, e2e (real keys and touch taps),
+  reviewed baselines, `just ios-smoke`.
 
 ## Milestone 9: Calm-down battle v0
-- One chaos critter in the plaza starts a battle with the spec section 8
-  actions. Winning awards a sticker. Deterministic sim tests cover outcomes;
-  e2e with real keys.
+- Art: one chaos-touched critter in chaos and calm states (owner review).
+- Core battle state machine (spec 8): Calm meter, Energy, Soothe / Play
+  (Maddie) / Snack / Run, timed-press windows measured in ticks, chaos bursts,
+  seeded PRNG; zero Energy means a rest and a retry, never a loss of progress.
+- Winning turns the critter calm in the plaza and awards a sticker.
+- Unit (meter math, timing windows), sim (win, rest, run), cross-engine hash,
+  e2e with real keys, reviewed baselines.
 
 ## Milestone 10: Journal and save
-- Journal (notes and sticker album) and one save slot. E2e: save, reload the
-  page, and the state is restored.
+- The journal is the pause menu (J or the menu button): notes written from Ink
+  and a sticker album, in the sticker UI style.
+- One save slot: version plus the full game state; loading restores it exactly
+  (the state hash matches).
+- E2e: play, save, reload the page, continue with an identical hash. iOS: the
+  save survives an app relaunch.
 
 ## Later (not scheduled)
 Audio and music, gamepad polish, device testing and TestFlight, Bubblegum Bay

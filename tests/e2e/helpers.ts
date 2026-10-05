@@ -49,9 +49,12 @@ export async function readHash(page: Page): Promise<string> {
 }
 
 export async function renderInfo(page: Page): Promise<{
+  area: string;
   drawOrder: { label: string; zIndex: number }[];
   animation: string;
   frame: number;
+  fade: number;
+  cachedAreaTextures: string[];
 }> {
   const info = await page.evaluate(() => window.__cloverhollow?.renderInfo());
   if (info === undefined) throw new Error("hook unavailable");

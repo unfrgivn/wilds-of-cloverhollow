@@ -203,6 +203,33 @@
       "baseline": 620
     }
   ],
+  "triggers": [
+    {
+      "id": "plaza-door",
+      "polygon": [
+        [
+          465,
+          285
+        ],
+        [
+          585,
+          285
+        ],
+        [
+          585,
+          335
+        ],
+        [
+          465,
+          335
+        ]
+      ],
+      "target": {
+        "area": "plaza",
+        "spawn": "front-door"
+      }
+    }
+  ],
   "spawns": {
     "bed": {
       "x": 500,
@@ -211,7 +238,7 @@
     },
     "door": {
       "x": 525,
-      "y": 325,
+      "y": 380,
       "facing": "down"
     }
   }

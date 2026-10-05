@@ -88,3 +88,30 @@ export function hiddenPositions(
     return coverage >= maxCoverage ? [{ ...point, coverage, occluders }] : [];
   });
 }
+
+export function areaConnectionErrors(
+  areas: Record<string, Area>,
+  radius: number,
+): string[] {
+  const errors: string[] = [];
+  for (const area of Object.values(areas)) {
+    const reachable = reachablePositions(area, radius);
+    for (const [name, spawn] of Object.entries(area.spawns)) {
+      for (const trigger of area.triggers) {
+        if (pointInPolygon(spawn, trigger.polygon) ||
+            distanceToPolygon(spawn, trigger.polygon) < radius * 2)
+          errors.push(
+            `${area.id}: spawn ${name} is within ${radius * 2} units of ${trigger.id}`,
+          );
+      }
+    }
+    for (const trigger of area.triggers) {
+      const target = areas[trigger.target.area];
+      if (target === undefined || target.spawns[trigger.target.spawn] === undefined)
+        errors.push(`${area.id}: trigger ${trigger.id} has an invalid target`);
+      if (!reachable.some((point) => pointInPolygon(point, trigger.polygon)))
+        errors.push(`${area.id}: trigger ${trigger.id} is unreachable`);
+    }
+  }
+  return errors;
+}

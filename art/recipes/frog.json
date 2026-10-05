@@ -1,0 +1,71 @@
+{
+  "asset": "frog",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 6,
+  "date": "2026-10-05",
+  "referenceImages": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "docs/art/concepts/npcs/chaos_raccoon.png",
+    "docs/art/concepts/vfx/vfx_particles.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "prompts": {
+    "sheetAttempts": [
+      "Six frog battle poses in a 3 by 2 sheet, exact approved frog design,
+      chaos spiral eyes and aura, pink bubble burst, soothed smile, calm idle.",
+      "Six frog battle poses in one horizontal strip, same scale and baseline,
+      green chroma background, exact chaos and calm state ordering."
+    ],
+    "selectedSingles": {
+      "chaos": "Full-body frog in yellow swim ring, 3/4 front, spiral eyes,
+      purple scribble aura and sparkles, green chroma background.",
+      "calm": "Full-body approved concept frog in yellow swim ring, 3/4 front,
+      normal dot eyes and happy smile, green chroma background.",
+      "burst": "Chaos frog with puffed cheeks blowing pink bubbles, spiral
+      eyes, purple marks, green chroma background.",
+      "soothed": "Frog with closed smiling eyes, rosy cheeks, fading purple
+      aura and sparse sparkles, green chroma background."
+    }
+  },
+  "selectedOutputs": [
+    "art/scratch/1791221375554-gemini-3-pro-image-0.png",
+    "art/scratch/1791221398802-gemini-3-pro-image-0.png",
+    "art/scratch/1791221423285-gemini-3-pro-image-0.png",
+    "art/scratch/1791221447176-gemini-3-pro-image-0.png"
+  ],
+  "scaleFactors": {
+    "chaos_idle_01": 0.1855,
+    "chaos_idle_02": 0.1782,
+    "chaos_burst_01": 0.1855,
+    "soothed_01": 0.1660,
+    "calm_idle_01": 0.1762,
+    "calm_idle_02": 0.1660
+  },
+  "postProcessing": {
+    "source": "Each selected single was keyed with 18% fuzz, green-despilled,
+    alpha-eroded by one pixel, trimmed, and placed on a 512x512 canvas with an
+    8px bottom margin. The chaos idle source used its warm paper background as
+    the key instead of green. Effect-heavy frames received a conservative
+    registration pass to keep the central body mask within the shared area
+    tolerance. A tiny alternating red-channel registration dither prevents
+    large exact-RGB runs in painted flat washes without changing visible art.",
+    "frameCanvas": "512x512 source px",
+    "figureHeight": "approximately 380 source px",
+    "baseline": 504,
+    "keyColor": "#00FF00",
+    "fuzz": "18%",
+    "despill": "G=min(G,max(R,B)) for opaque pixels",
+    "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON",
+    "runtimeFiles": [
+      "public/assets/critters/frog/frog.png",
+      "public/assets/critters/frog/frog.json"
+    ]
+  },
+  "review": [
+    "art/review/frog-sheet.png",
+    "art/review/frog-chaos-vs-calm.png",
+    "art/review/frog-in-plaza.png",
+    "art/review/frog-battle-mock.png"
+  ]
+}

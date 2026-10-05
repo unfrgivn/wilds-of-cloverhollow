@@ -6,20 +6,23 @@ export type CloverhollowHook = {
   pause: () => void;
   resume: () => void;
   isPaused: () => boolean;
-  step: (ticks: number) => {
+  step: (ticks: number) => Promise<{
     tick: number;
     x: number;
     y: number;
     facing: State["facing"];
-  };
+  }>;
   input: (frame: ActionFrame, ticks: number) => void;
   getState: () => State;
   hash: () => string;
   reset: (options?: { seed?: number; fixture?: string }) => Promise<void>;
   renderInfo: () => {
+    area: string;
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
+    fade: number;
+    cachedAreaTextures: string[];
   };
 };
 
@@ -27,6 +30,7 @@ export function installHook(deps: {
   input: InputSource;
   get: () => State;
   tick: (frame: ActionFrame) => void;
+  ensureArea: () => Promise<void>;
   render: () => void;
   paused: () => boolean;
   setPaused: (paused: boolean) => void;
@@ -38,10 +42,13 @@ export function installHook(deps: {
     pause: () => deps.setPaused(true),
     resume: () => deps.setPaused(false),
     isPaused: deps.paused,
-    step: (ticks) => {
+    step: async (ticks) => {
       deps.setPaused(true);
-      for (let index = 0; index < Math.max(0, ticks); index += 1)
+      await deps.ensureArea();
+      for (let index = 0; index < Math.max(0, ticks); index += 1) {
         deps.tick(deps.input.next());
+        await deps.ensureArea();
+      }
       deps.render();
       const state = deps.get();
       return {

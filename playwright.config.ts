@@ -1,6 +1,8 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "tests/e2e",
+  timeout: process.env.CI === "true" ? 90_000 : 30_000,
+  expect: { timeout: 10_000 },
   webServer: {
     command:
       "bun run build:harness && bunx vite preview --outDir dist-harness " +

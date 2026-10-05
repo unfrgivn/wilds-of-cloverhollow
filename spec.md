@@ -89,7 +89,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `Math.sin`, `cos`, `tan`, `atan2`, `pow`, `**`, `exp`, `log`, or `hypot`:
   their results can differ between JavaScript engines.
 - Real time drives ticks through an accumulator in `src/main.ts`, at most 5
-  ticks per animation frame (extra time is dropped). Rendering may
+  ticks per animation frame (extra time is dropped at the cap; the
+  `src/core/timing.ts` `drainTicks` function). While an area load is pending,
+  the accumulator is reset and no ticks run. Rendering may
   interpolate between ticks for presentation only.
 - Visual-only animation (walk frames, bobbing, text reveal, tweens) derives
   from state and tick and never feeds back into the core.
@@ -192,6 +194,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   (20), and `walkCycleUnits` (126).
 - Transitions: entering a trigger fades out, loads the target area, places the
   player at the named spawn facing the given direction, and fades in.
+- Area triggers use `{ id, polygon, target: { area, spawn } }`. A trigger fires
+  only when the player centre crosses from outside to inside. During the
+  `doorFadeTicks` (18 ticks) fade-out and fade-in phases, input is ignored and
+  motion is idle. The core state stores `transition: null` or
+  `{ target, phase: "out" | "in", elapsed }`; the area and spawn switch at the
+  boundary between phases.
+- Content validation requires trigger targets and spawns to exist, trigger
+  polygons to be reachable, and every spawn to be at least twice the player
+  radius outside every trigger. Door spawns face away from the doorway into
+  their destination area. The plaza fixture starts near its fountain.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`) and `plaza` (from
   `town_center_plaza.png`). The placeholder `harness` area stays for
   deterministic tests (fixture `harness`).
@@ -253,10 +265,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `version` is the literal number `1`; `isPaused()` reports the real-time
     loop state. `step()` returns `{ tick, x, y, facing }`.
   - `pause()` and `resume()`: stop or start real-time ticking.
-  - `step(ticks)`: pause real-time ticking if it is running, advance exactly
-    N ticks with the currently held input (queued `input()` frames first, then
-    live devices), then render once. Returns a state summary. Pausing, holding
-    real keys, then stepping gives deterministic tests with real key presses.
+  - `step(ticks)` returns a Promise. It pauses real-time ticking if it is
+    running, advances exactly N ticks with the currently held input (queued
+    `input()` frames first, then live devices), awaits area loads between ticks,
+    then renders once. Pausing, holding real keys, then stepping gives
+    deterministic tests with real key presses.
   - `input(frame, ticks)`: hold an action frame for the next N ticks, paused or
     running.
   - `getState()`: the full JSON state.
@@ -266,9 +279,10 @@ ios/            Capacitor iOS project (from Milestone 4).
     the game paused. Returns a Promise that resolves once the fixture's area
     has loaded. The default is `new-game`; unknown names throw an error listing
     known fixtures.
-  - `renderInfo()`: read-only render facts for tests: the depth layer's draw
-    order (`{ label, zIndex }[]`, with `fae` and `occluder:<id>`) and Fae's
-    current animation and frame.
+  - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
+    fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
+    cache), the depth layer's draw order (`{ label, zIndex }[]`, with `fae` and
+    `occluder:<id>`), and Fae's current animation and frame.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so

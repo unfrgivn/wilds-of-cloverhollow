@@ -3,7 +3,8 @@ import { join } from "node:path";
 
 type Point = [number, number];
 type Occluder = { id: string; polygon: Point[]; baseline: number };
-type Area = { ground: string; occluders: Occluder[] };
+type Tile = { file: string; x: number; y: number; width: number; height: number };
+type Area = { ground: string; occluders: Occluder[]; tiles: Tile[] };
 
 function readArea(path: string): Area {
   const value: unknown = JSON.parse(readFileSync(path, "utf8"));
@@ -22,7 +23,21 @@ function readArea(path: string): Area {
     return polygon.length >= 3 ? [{ id: item.id, polygon, baseline: item.baseline }] : [];
   });
   if (occluders.length !== value.occluders.length) throw new Error("invalid occluder");
-  return { ground: value.ground, occluders };
+  const manifestPath = join("public/assets/areas", value.ground, "ground.json");
+  const manifest: unknown = JSON.parse(readFileSync(manifestPath, "utf8"));
+  if (typeof manifest !== "object" || manifest === null ||
+      !("tiles" in manifest) || !Array.isArray(manifest.tiles))
+    throw new Error("invalid ground manifest");
+  const tiles = manifest.tiles.flatMap((item: unknown): Tile[] =>
+    typeof item === "object" && item !== null && "file" in item &&
+    "x" in item && "y" in item && "width" in item && "height" in item &&
+    typeof item.file === "string" && typeof item.x === "number" &&
+    typeof item.y === "number" && typeof item.width === "number" &&
+    typeof item.height === "number"
+      ? [{ file: item.file, x: item.x, y: item.y, width: item.width, height: item.height }]
+      : []);
+  if (tiles.length !== manifest.tiles.length) throw new Error("invalid tile");
+  return { ground: value.ground, occluders, tiles };
 }
 
 const areaPath = process.argv[2] ?? "content/areas/bedroom.json";
@@ -32,8 +47,13 @@ mkdirSync(directory, { recursive: true });
 const scratch = join("art/scratch", "area-occluders", area.ground);
 mkdirSync(scratch, { recursive: true });
 const assembled = join(directory, ".assembled.png");
-const assembly = Bun.spawnSync(["magick", `${directory}/ground_0_0.webp`,
-  `${directory}/ground_1_0.webp`, "+append", assembled], { stderr: "pipe" });
+const sourceWidth = Math.max(...area.tiles.map((tile) => tile.x + tile.width));
+const sourceHeight = Math.max(...area.tiles.map((tile) => tile.y + tile.height));
+const assemblyArgs = ["magick", "-size", `${sourceWidth}x${sourceHeight}`, "xc:none"];
+for (const tile of area.tiles)
+  assemblyArgs.push(`${directory}/${tile.file}`, "-geometry", `+${tile.x}+${tile.y}`, "-composite");
+assemblyArgs.push(assembled);
+const assembly = Bun.spawnSync(assemblyArgs, { stderr: "pipe" });
 if (assembly.exitCode !== 0) throw new Error(new TextDecoder().decode(assembly.stderr));
 const cutouts: { id: string; file: string; x: number; y: number }[] = [];
 for (const item of area.occluders) {
@@ -48,7 +68,7 @@ for (const item of area.occluders) {
   const height = maxY - minY;
   const relative = points.map(([x, y]) => `${x - minX},${y - minY}`).join(" L ");
   const mask = join(scratch, `${item.id}.svg`);
-  const output = `${item.id}.png`;
+  const output = `${item.id}.webp`;
   writeFileSync(mask,
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
     `<path fill="white" d="M ${relative} Z"/></svg>`);

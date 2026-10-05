@@ -25,6 +25,10 @@ export class AreaView {
     this.paper = paper;
   }
 
+  get textureUrls(): readonly string[] {
+    return this.textures;
+  }
+
   static async load(area: Area, depth: Container): Promise<AreaView> {
     if (area.ground === undefined) {
       const view = new AreaView(area, depth, 0xf8edcf);

@@ -179,27 +179,42 @@ async function main(): Promise<void> {
     const startY = Math.round(frame.height * 0.62);
     runAxe(axe, [
       "swipe", "--start-x", String(startX), "--start-y", String(startY),
+      "--end-x", String(startX), "--end-y", String(startY - 100),
+      "--duration", "2.0", "--udid", udid,
+    ]);
+    await waitFor(states, (items) => items.some((item) => item.area === "plaza"));
+    const plaza = states.find((item) => item.area === "plaza");
+    if (plaza === undefined) throw new Error("Plaza state line disappeared");
+    const plazaScreenshot = join(directory, "plaza.png");
+    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", plazaScreenshot]);
+    runAxe(axe, [
+      "swipe", "--start-x", String(startX), "--start-y", String(startY),
       "--end-x", String(startX + 80), "--end-y", String(startY),
       "--duration", "2.0", "--udid", udid,
     ]);
     await waitFor(
       states,
-      (items) => items.some((item) => item.tick > before.tick && item.x >= before.x + 50),
+      (items) => items.some((item) => item.tick > plaza.tick &&
+        item.area === "plaza" && item.x >= plaza.x + 50),
     );
     const after = states[states.length - 1];
     if (after === undefined) throw new Error("Final state line disappeared");
     const afterScreenshot = join(directory, "after.png");
     execFileSync("xcrun", ["simctl", "io", udid, "screenshot", afterScreenshot]);
-    if (after.tick <= before.tick || after.x < before.x + 50 || after.facing !== "right") {
+    if (after.tick <= plaza.tick || after.area !== "plaza" ||
+        after.x < plaza.x + 50 || after.facing !== "right") {
       throw new Error(
         `Native drag failed: before=${JSON.stringify(before)} ` +
           `after=${JSON.stringify(after)}`,
       );
     }
     console.log(`before: ${JSON.stringify(before)}`);
+    console.log(`plaza: ${JSON.stringify(plaza)}`);
     console.log(`after: ${JSON.stringify(after)}`);
+    console.log(`states: ${JSON.stringify(states)}`);
     console.log(`console transcript: ${transcriptPath}`);
     console.log(`before screenshot: ${beforeScreenshot}`);
+    console.log(`plaza screenshot: ${plazaScreenshot}`);
     console.log(`after screenshot: ${afterScreenshot}`);
   } catch (error: unknown) {
     const lines = readFileSync(transcriptPath, "utf8").trimEnd().split("\n");

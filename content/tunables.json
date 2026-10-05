@@ -1,5 +1,6 @@
 {
   "walkSpeed": 240,
   "playerRadius": 20,
-  "walkCycleUnits": 126
+  "walkCycleUnits": 126,
+  "doorFadeTicks": 18
 }

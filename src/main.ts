@@ -1,5 +1,11 @@
 import { Application } from "pixi.js";
-import { createState, step, type ActionFrame, type State } from "./core";
+import {
+  createState,
+  drainTicks,
+  step,
+  type ActionFrame,
+  type State,
+} from "./core";
 import { loadContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { createInputSource } from "./platform/input";
@@ -11,7 +17,6 @@ const content = loadContent();
 const app = new Application();
 let state: State;
 let paused = false;
-let loading = true;
 
 async function boot(): Promise<void> {
   preventPinchZoom();
@@ -54,7 +59,6 @@ async function boot(): Promise<void> {
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");
   await view.setArea(initialArea);
-  loading = false;
   let afterTick = (_next: State): void => undefined;
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const { createStateLogger } = await import("./dev/state-log");
@@ -62,7 +66,6 @@ async function boot(): Promise<void> {
     afterTick(state);
   }
   const render = (): void => {
-    if (loading) return;
     view.render(
       state,
       window.innerWidth,
@@ -74,6 +77,24 @@ async function boot(): Promise<void> {
     state = step(content.world, state, frame).state;
     afterTick(state);
   };
+  let areaLoad: Promise<void> | undefined;
+  // Loads whatever area the state is in. If a load for an older target is still
+  // in flight, waits for it and checks again, so callers always end up with the
+  // current area loaded.
+  const ensureArea = async (): Promise<void> => {
+    for (;;) {
+      if (areaLoad !== undefined) {
+        await areaLoad;
+        continue;
+      }
+      const area = content.world.areas[state.area];
+      if (area === undefined) throw new Error(`Unknown area ${state.area}`);
+      if (view.loadedAreaId() === area.id) return;
+      areaLoad = view.setArea(area).then(() => view.resetCamera()).finally(() => {
+        areaLoad = undefined;
+      });
+    }
+  };
   window.addEventListener("resize", render);
   let last = performance.now();
   let accumulator = 0;
@@ -81,14 +102,19 @@ async function boot(): Promise<void> {
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
-    if (!paused) {
-      let ticks = 0;
-      while (accumulator >= 1000 / 60 && ticks < 5) {
+    if (areaLoad !== undefined) {
+      accumulator = 0;
+    } else if (!paused) {
+      const drained = drainTicks(accumulator, 1000 / 60, 5);
+      accumulator = drained.remainingMs;
+      for (let index = 0; index < drained.ticks; index += 1) {
         tick(input.next());
-        accumulator -= 1000 / 60;
-        ticks += 1;
+        if (view.loadedAreaId() !== state.area) {
+          accumulator = 0;
+          void ensureArea();
+          break;
+        }
       }
-      if (ticks === 5) accumulator = 0;
     }
     render();
   });
@@ -99,6 +125,7 @@ async function boot(): Promise<void> {
       input,
       get: () => state,
       tick,
+      ensureArea,
       render,
       paused: () => paused,
       setPaused: (value) => {
@@ -115,13 +142,9 @@ async function boot(): Promise<void> {
             ).join(", ")}`,
           );
         state = createState(content.world, fixture, options.seed);
-        const area = content.world.areas[state.area] ?? initialArea;
-        loading = true;
-        await view.setArea(area);
-        loading = false;
-        view.resetCamera();
+        await ensureArea();
       },
-      renderInfo: () => view.renderInfo(),
+      renderInfo: () => view.renderInfo(state),
     });
   }
 }

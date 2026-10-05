@@ -4,12 +4,14 @@ import { AreaView } from "./area-view";
 import { followCamera } from "./camera";
 import { selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
+import { fadeAlpha } from "./fade";
 
 export class GameView {
   readonly root = new Container();
   readonly ready: Promise<void>;
   private readonly background = new Graphics();
   private readonly paper = new Graphics();
+  private readonly fade = new Graphics();
   private readonly scene = new Container();
   private readonly depth = new Container();
   private readonly player = new Sprite();
@@ -24,6 +26,7 @@ export class GameView {
   private staticPaper = 0;
   private currentAnimation = "idle_down";
   private currentFrame = 0;
+  private readonly areaTextureUrls = new Set<string>();
 
   constructor(
     private readonly world: World,
@@ -32,7 +35,13 @@ export class GameView {
     this.depth.sortableChildren = true;
     this.player.label = "fae";
     this.player.scale.set(0.5);
-    this.root.addChild(this.background, this.paper, this.scene, this.viewportMask);
+    this.root.addChild(
+      this.background,
+      this.paper,
+      this.scene,
+      this.viewportMask,
+      this.fade,
+    );
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.depth);
     this.depth.addChild(this.player);
@@ -57,6 +66,7 @@ export class GameView {
     if (previous !== undefined) await previous.destroy();
     const next = await AreaView.load(area, this.depth);
     this.areaView = next;
+    for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
     this.previousCamera = undefined;
     this.staticWidth = 0;
@@ -71,6 +81,10 @@ export class GameView {
     this.previousCamera = undefined;
   }
 
+  loadedAreaId(): string {
+    return this.areaView?.area.id ?? "";
+  }
+
   private drawStatic(width: number, height: number, paper: number): void {
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const letterboxX = (width - this.viewWidth * scale) / 2;
@@ -80,6 +94,9 @@ export class GameView {
       this.viewWidth * scale, this.viewHeight * scale).fill(paper);
     this.viewportMask.clear().rect(letterboxX, letterboxY,
       this.viewWidth * scale, this.viewHeight * scale).fill(0xffffff);
+    this.fade.clear().rect(letterboxX, letterboxY,
+      this.viewWidth * scale, this.viewHeight * scale).fill(paper);
+    this.fade.alpha = 0;
     this.staticWidth = width;
     this.staticHeight = height;
     this.staticPaper = paper;
@@ -111,12 +128,17 @@ export class GameView {
 
   render(state: State, width: number, height: number, resolution: number): void {
     const area = this.world.areas[state.area];
-    if (area === undefined || this.areaView?.area.id !== area.id)
-      throw new Error(`Area ${state.area} is not loaded`);
+    if (area === undefined) return;
     this.resize(width, height);
+    const loaded = this.areaView;
+    if (loaded === undefined || loaded.area.id !== area.id) {
+      this.drawStatic(width, height, loaded?.paper ?? 0xf8edcf);
+      this.fade.alpha = 1;
+      return;
+    }
     if (width !== this.staticWidth || height !== this.staticHeight ||
-        this.staticPaper !== this.areaView.paper)
-      this.drawStatic(width, height, this.areaView.paper);
+        this.staticPaper !== loaded.paper)
+      this.drawStatic(width, height, loaded.paper);
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const camera = followCamera(this.previousCamera, state.player,
       { width: this.viewWidth, height: this.viewHeight }, area, { x: 80, y: 60 });
@@ -134,20 +156,30 @@ export class GameView {
     if (this.label !== undefined)
       this.label.text = `Cloverhollow • tick ${state.tick} · ` +
         `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
+    const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
+    this.fade.alpha = fade;
   }
 
-  renderInfo(): {
+  renderInfo(state: State): {
+    area: string;
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
+    fade: number;
+    cachedAreaTextures: string[];
   } {
+    const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     return {
+      area: this.areaView?.area.id ?? "",
       drawOrder: this.depth.children.map((child) => ({
         label: child.label,
         zIndex: child.zIndex,
       })),
       animation: this.currentAnimation,
       frame: this.currentFrame,
+      fade,
+      cachedAreaTextures: [...this.areaTextureUrls].filter((url) =>
+        Assets.cache.has(url)),
     };
   }
 }

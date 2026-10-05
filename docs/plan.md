@@ -60,7 +60,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
 - Unit, sim, and e2e coverage with real keys; reviewed screenshot baselines;
   `just ios-smoke` passes in the bedroom.
 
-## Milestone 6: Plaza and doors
+## Milestone 6: Plaza and doors **Status:** ✅ Completed (2026-10-05)
 - Painted plaza (per the area scale rule) with y-sorted props and occluders.
 - The bedroom door leads to the plaza and back: fade, target spawn, facing,
   and unloading the previous area's textures.

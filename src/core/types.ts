@@ -11,6 +11,7 @@ export type Tunables = {
   walkSpeed: number;
   playerRadius: number;
   walkCycleUnits: number;
+  doorFadeTicks: number;
 };
 export type Spawn = Point & { facing: Direction };
 export type Area = {
@@ -21,6 +22,11 @@ export type Area = {
   blockers: Polygon[];
   ground?: string;
   occluders: { id: string; polygon: Polygon; baseline: number }[];
+  triggers: {
+    id: string;
+    polygon: Polygon;
+    target: { area: string; spawn: string };
+  }[];
   spawns: Record<string, Spawn>;
 };
 export type GroundManifest = {
@@ -40,5 +46,10 @@ export type State = {
   rng: number;
   previousInput: ActionFrame;
   motion: { distance: number; moving: boolean };
+  transition: {
+    target: { area: string; spawn: string };
+    phase: "out" | "in";
+    elapsed: number;
+  } | null;
 };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

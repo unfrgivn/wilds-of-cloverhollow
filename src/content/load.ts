@@ -1,7 +1,9 @@
 import areaData from "../../content/areas/harness.json";
 import bedroomData from "../../content/areas/bedroom.json";
+import plazaData from "../../content/areas/plaza.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
+import plazaFixtureData from "../../content/fixtures/plaza.json";
 import tunableData from "../../content/tunables.json";
 import type {
   Area,
@@ -52,10 +54,12 @@ export function parseTunables(value: unknown, file: string): Tunables {
   field(typeof value.walkSpeed === "number", file, "walkSpeed");
   field(typeof value.playerRadius === "number", file, "playerRadius");
   field(typeof value.walkCycleUnits === "number", file, "walkCycleUnits");
+  field(typeof value.doorFadeTicks === "number", file, "doorFadeTicks");
   return {
     walkSpeed: value.walkSpeed,
     playerRadius: value.playerRadius,
     walkCycleUnits: value.walkCycleUnits,
+    doorFadeTicks: value.doorFadeTicks,
   };
 }
 
@@ -69,6 +73,16 @@ export function parseArea(value: unknown, file: string): Area {
     Array.isArray(value.blockers) && value.blockers.every(polygon),
     file,
     "blockers",
+  );
+  field(
+    value.triggers === undefined ||
+      (Array.isArray(value.triggers) && value.triggers.every((item) =>
+        record(item) && typeof item.id === "string" && polygon(item.polygon) &&
+        record(item.target) && typeof item.target.area === "string" &&
+        typeof item.target.spawn === "string",
+      )),
+    file,
+    "triggers",
   );
   field(
     value.ground === undefined || typeof value.ground === "string",
@@ -110,6 +124,11 @@ export function parseArea(value: unknown, file: string): Area {
       id: item.id,
       polygon: item.polygon,
       baseline: item.baseline,
+    })),
+    triggers: (value.triggers ?? []).map((item) => ({
+      id: item.id,
+      polygon: item.polygon,
+      target: { area: item.target.area, spawn: item.target.spawn },
     })),
     spawns,
   };
@@ -181,14 +200,17 @@ export function loadContent(): {
 } {
   const harness = parseArea(areaData, "content/areas/harness.json");
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
+  const plaza = parseArea(plazaData, "content/areas/plaza.json");
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
+    plaza: parseFixture(plazaFixtureData, "content/fixtures/plaza.json"),
   };
+  const areas = { [harness.id]: harness, [bedroom.id]: bedroom, [plaza.id]: plaza };
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
-    areas: { [harness.id]: harness, [bedroom.id]: bedroom },
+      areas,
     },
     fixtures,
   };

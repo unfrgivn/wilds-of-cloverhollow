@@ -64,14 +64,20 @@ test("real keys stop at a blocker, radius respected", async ({ page }) => {
   expect(x).toBeGreaterThan(800);
 });
 
-for (const name of ["harness-600", "concave-corners"]) {
+for (const item of [
+  { name: "harness-600", fixture: "harness" },
+  { name: "concave-corners", fixture: "harness" },
+  { name: "door-round-trip", fixture: "new-game" },
+]) {
+  const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
     page,
   }) => {
-    const path = `tests/sim/scripts/harness/${name}.json`;
+    const folder = fixture === "new-game" ? "new-game" : "harness";
+    const path = `tests/sim/scripts/${folder}/${name}.json`;
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
     await openHarness(page);
-    await resetPaused(page);
+    await resetPaused(page, fixture);
     for (const segment of script)
       await queueInput(page, segment.frame, segment.ticks);
     await step(
@@ -79,7 +85,7 @@ for (const name of ["harness-600", "concave-corners"]) {
       script.reduce((total, segment) => total + segment.ticks, 0),
     );
     const browserHash = await readHash(page);
-    expect(browserHash).toBe(bunHash(path));
+    expect(browserHash).toBe(bunHash(path, fixture));
     console.log(`${name}: browser and Bun hash ${browserHash}`);
   });
 }

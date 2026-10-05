@@ -34,6 +34,7 @@ export function createState(
     rng: seed >>> 0,
     previousInput: blankInput(),
     motion: { distance: 0, moving: false },
+    transition: null,
   };
 }
 
@@ -149,6 +150,42 @@ export function step(
 ): { state: State; events: Event[] } {
   const area = world.areas[state.area];
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
+  if (state.transition !== null) {
+    const transition = state.transition;
+    const elapsed = transition.elapsed + 1;
+    const limit = world.tunables.doorFadeTicks;
+    if (transition.phase === "out" && elapsed >= limit) {
+      const targetArea = world.areas[transition.target.area];
+      if (targetArea === undefined) throw new Error("Unknown transition area");
+      const spawn = targetArea.spawns[transition.target.spawn];
+      if (spawn === undefined) throw new Error("Unknown transition spawn");
+      return {
+        state: {
+          ...state,
+          tick: state.tick + 1,
+          area: targetArea.id,
+          player: { x: spawn.x, y: spawn.y },
+          facing: spawn.facing,
+          previousInput: { ...input },
+          motion: { ...state.motion, moving: false },
+          transition: { target: transition.target, phase: "in", elapsed: 0 },
+        },
+        events: [],
+      };
+    }
+    return {
+      state: {
+        ...state,
+        tick: state.tick + 1,
+        previousInput: { ...input },
+        motion: { ...state.motion, moving: false },
+        transition: transition.phase === "in" && elapsed >= limit
+          ? null
+          : { ...transition, elapsed },
+      },
+      events: [],
+    };
+  }
   const length = Math.sqrt(
     input.move.x * input.move.x + input.move.y * input.move.y,
   );
@@ -176,6 +213,10 @@ export function step(
     if (input[button] && !state.previousInput[button])
       events.push({ type: "button", button });
   }
+  const trigger = area.triggers.find((item) =>
+    !pointInPolygon(state.player, item.polygon) &&
+    pointInPolygon(player, item.polygon),
+  );
   return {
     state: {
       ...state,
@@ -185,8 +226,11 @@ export function step(
       previousInput: { ...input },
       motion: {
         distance: state.motion.distance + displacement,
-        moving: displacement > 0.0001,
+        moving: trigger === undefined && displacement > 0.0001,
       },
+      transition: trigger === undefined
+        ? null
+        : { target: trigger.target, phase: "out", elapsed: 0 },
     },
     events,
   };

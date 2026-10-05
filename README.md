@@ -20,12 +20,17 @@ The previous Godot pixel-art build is archived at tag `archive/godot-pixel`.
 - Xcode 27 for iOS work
 - `GEMINI_API_KEY` for art generation (optional)
 
-## Commands (added in Milestone 2)
+## Commands
 - `just dev`: run the game locally
-- `just check`: typecheck, unit tests, headless sim
+- `just check`: typecheck, unit tests, headless sim, purity, and lint
 - `just sim`: run every scripted deterministic simulation
-- `just e2e`: Playwright end-to-end tests
-- `just build`: production build
+- `just e2e`: Playwright end-to-end tests (Chromium and WebKit)
+- `just build`: production build, plus checks that the dev hook stays out of it
+- `just ios-sim`: build the harness and launch it in the iPhone 17 simulator
+  (set `IOS_SIMULATOR_NAME` to use another simulator)
+- `just ios-smoke`: drag the touch stick in the simulator and verify that the
+  player moved, using the app's live console output
+- `just ios-open`: open the iOS project in Xcode
 
 Screenshot baselines are macOS-only for now. The harness build is used by the
 Playwright suite and can be started with `bun run build:harness`.

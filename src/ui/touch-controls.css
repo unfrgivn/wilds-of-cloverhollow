@@ -1,0 +1,61 @@
+.touch-controls {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.touch-stick {
+  position: absolute;
+  width: calc(var(--stick-radius) * 2);
+  height: calc(var(--stick-radius) * 2);
+  left: calc(20px + env(safe-area-inset-left));
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  border: 3px solid #513b32;
+  border-radius: 50%;
+  background: #fff4d6aa;
+  box-shadow: 0 4px 8px #513b3240;
+  pointer-events: auto;
+}
+
+.touch-buttons {
+  position: absolute;
+  right: calc(20px + env(safe-area-inset-right));
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.touch-button {
+  border: 3px solid #513b32;
+  border-radius: 50%;
+  color: #513b32;
+  background: #fff4d6dd;
+  box-shadow: 0 4px 8px #513b3240;
+  font: 700 28px sans-serif;
+  padding: 0;
+  touch-action: none;
+}
+
+.touch-confirm {
+  width: 84px;
+  height: 84px;
+}
+
+.touch-cancel {
+  width: 58px;
+  height: 58px;
+  font-size: 22px;
+}
+
+.touch-menu {
+  position: absolute;
+  right: calc(20px + env(safe-area-inset-right));
+  top: calc(20px + env(safe-area-inset-top));
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+}

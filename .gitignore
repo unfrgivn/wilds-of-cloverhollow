@@ -19,3 +19,5 @@ art/scratch/
 !.env.example
 *.log
 .DS_Store
+
+.derived-data/

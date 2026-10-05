@@ -3,7 +3,9 @@ import { createState, step, type ActionFrame, type State } from "./core";
 import { loadContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { createInputSource } from "./platform/input";
+import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
+import { preventPinchZoom } from "./platform/gestures";
 
 const content = loadContent();
 const app = new Application();
@@ -11,23 +13,48 @@ let state: State;
 let paused = false;
 
 async function boot(): Promise<void> {
+  preventPinchZoom();
   await app.init({
     resizeTo: window,
     backgroundColor: 0xf8edcf,
     antialias: true,
     resolution: Math.min(window.devicePixelRatio, 2),
+    // Keep the canvas at viewport size in CSS pixels; only the backing store is 2x.
+    autoDensity: true,
+    preference: "webgl",
   });
   app.renderer.background.color = 0xf8edcf;
   const root = document.querySelector("#app");
   if (root === null) throw new Error("Missing #app root");
   root.appendChild(app.canvas);
   const keyboard = new Keyboard();
-  const input = createInputSource(() => keyboard.frame());
-  const view = new GameView(content.world);
+  const touch = mountTouchControls();
+  const input = createInputSource(() => {
+    const keyboardFrame = keyboard.frame();
+    const touchFrame = touch.sample();
+    return {
+      move:
+        touchFrame.move.x !== 0 || touchFrame.move.y !== 0
+          ? touchFrame.move
+          : keyboardFrame.move,
+      confirm: keyboardFrame.confirm || touchFrame.confirm,
+      cancel: keyboardFrame.cancel || touchFrame.cancel,
+      menu: keyboardFrame.menu || touchFrame.menu,
+    };
+  });
+  const view = new GameView(content.world, {
+    debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
+  });
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
   state = createState(content.world, initialFixture);
+  let afterTick = (_next: State): void => undefined;
+  if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
+    const { createStateLogger } = await import("./dev/state-log");
+    afterTick = createStateLogger();
+    afterTick(state);
+  }
   const render = (): void =>
     view.render(
       state,
@@ -37,6 +64,7 @@ async function boot(): Promise<void> {
     );
   const tick = (frame: ActionFrame): void => {
     state = step(content.world, state, frame).state;
+    afterTick(state);
   };
   window.addEventListener("resize", render);
   let last = performance.now();

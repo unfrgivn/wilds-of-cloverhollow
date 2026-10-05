@@ -39,7 +39,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
 - A contact sheet PNG for owner review. Owner approval is required before
   Milestone 5 bulk art.
 
-## Milestone 4: iOS shell
+## Milestone 4: iOS shell **Status:** ✅ Completed (2026-10-05)
 - Capacitor 8 iOS project in `ios/`. `just ios-sim` builds and launches the
   game in an iPhone simulator.
 - Landscape lock, safe-area-aware layout, and a touch virtual stick plus

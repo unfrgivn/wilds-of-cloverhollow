@@ -13,6 +13,6 @@ jobs:
       # Same commands as `just check` and `just build`.
       - run: bun run check
       - run: bun run build
-      - run: bunx playwright install --with-deps chromium
+      - run: bunx playwright install --with-deps chromium webkit
       # Screenshot baselines are macOS-only for now.
       - run: bunx playwright test --ignore-snapshots

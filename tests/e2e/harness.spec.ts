@@ -199,3 +199,106 @@ test("nothing renders inside wide letterbox bars", async ({ page }) => {
   expect(await pixelAt(page, png, 0, 360)).toEqual(background);
   expect(await pixelAt(page, png, 2399, 360)).toEqual(background);
 });
+
+test("touch stick moves and confirm taps for one tick", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "CDP touch dispatch is Chromium-only");
+  await page.goto("/?touch=1");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  await resetPaused(page);
+  const client = await page.context().newCDPSession(page);
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: 120, y: 360, id: 7 }],
+  });
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchMove",
+    touchPoints: [{ x: 180, y: 360, id: 7 }],
+  });
+  await step(page, 30);
+  const moved = await readState(page);
+  expect(moved.player.x).toBeGreaterThan(300);
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: 1160, y: 650, id: 8 }],
+  });
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await step(page, 1);
+  expect((await readState(page)).previousInput.confirm).toBe(true);
+  await step(page, 1);
+  expect((await readState(page)).previousInput.confirm).toBe(false);
+});
+
+test.describe("touchscreen taps", () => {
+  test.use({ hasTouch: true });
+
+  test("a touchscreen confirm tap is held for one tick", async ({ page }) => {
+    await page.goto("/?touch=1");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await resetPaused(page);
+    await page.touchscreen.tap(1160, 650);
+    await step(page, 1);
+    expect((await readState(page)).previousInput.confirm).toBe(true);
+    await step(page, 1);
+    expect((await readState(page)).previousInput.confirm).toBe(false);
+  });
+});
+
+test("touch controls are opt-in on desktop", async ({ page }) => {
+  await openHarness(page);
+  expect(await page.locator(".touch-controls").count()).toBe(0);
+  await page.goto("/?touch=1");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  expect(await page.locator(".touch-controls").count()).toBe(1);
+});
+
+test("WebKit keeps touch controls in separate safe-area regions", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== "webkit", "WebKit layout coverage");
+  await page.setViewportSize({ width: 874, height: 402 });
+  await page.goto("/?touch=1");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  const menu = await page.locator(".touch-menu").boundingBox();
+  const confirm = await page.locator(".touch-confirm").boundingBox();
+  const cancel = await page.locator(".touch-cancel").boundingBox();
+  const stick = await page.locator(".touch-stick").boundingBox();
+  expect(menu).not.toBeNull();
+  expect(confirm).not.toBeNull();
+  expect(cancel).not.toBeNull();
+  expect(stick).not.toBeNull();
+  if (menu === null || confirm === null || cancel === null || stick === null) return;
+  expect(menu.x + menu.width).toBeGreaterThan(800);
+  expect(menu.y).toBeLessThan(80);
+  expect(menu.x + menu.width).toBeLessThanOrEqual(874);
+  expect(menu.y + menu.height).toBeLessThan(confirm.y);
+  expect(menu.y + menu.height).toBeLessThanOrEqual(cancel.y);
+  expect(stick.x).toBeGreaterThanOrEqual(20);
+});
+
+test.describe("high-density screens", () => {
+  // iPhones report devicePixelRatio 3; the backing store is capped at 2x.
+  test.use({ deviceScaleFactor: 3 });
+
+  test("the canvas fills the viewport with a 2x backing store", async ({ page }) => {
+    await openHarness(page);
+    const size = await page.evaluate(() => {
+      const canvas = document.querySelector("canvas");
+      if (canvas === null) throw new Error("canvas missing");
+      const box = canvas.getBoundingClientRect();
+      return {
+        cssWidth: box.width,
+        cssHeight: box.height,
+        backingWidth: canvas.width,
+        backingHeight: canvas.height,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+      };
+    });
+    expect(size.cssWidth).toBe(size.viewportWidth);
+    expect(size.cssHeight).toBe(size.viewportHeight);
+    expect(size.backingWidth).toBe(size.viewportWidth * 2);
+    expect(size.backingHeight).toBe(size.viewportHeight * 2);
+  });
+});

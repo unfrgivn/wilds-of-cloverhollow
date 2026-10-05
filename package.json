@@ -13,12 +13,16 @@
     "check": "bun run typecheck && bun run unit && bun run sim && bun run purity && bun run lint",
     "e2e": "playwright test",
     "build": "vite build && bun tools/check-dist.ts && vite build --mode harness && bun tools/check-dist.ts --harness",
-    "build:harness": "vite build --mode harness"
+    "build:harness": "vite build --mode harness",
+    "ios:sync": "bun run build:harness && CLOVERHOLLOW_WEB_DIR=dist-harness bunx cap sync ios"
   },
   "dependencies": {
+    "@capacitor/core": "8.5.2",
+    "@capacitor/ios": "8.5.2",
     "pixi.js": "8.22.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.2",
     "@playwright/test": "1.63.0",
     "@types/bun": "1.4.2",
     "typescript": "7.0.2",

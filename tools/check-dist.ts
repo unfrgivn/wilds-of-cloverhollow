@@ -13,11 +13,19 @@ const text = bundleText(
 );
 const containsHook =
   text.includes("__cloverhollow") || text.includes("window.__cloverhollow");
+const containsStateLog = text.includes("[cloverhollow] state");
 if (process.argv.includes("--harness") ? !containsHook : containsHook) {
   throw new Error(
     process.argv.includes("--harness")
       ? "harness hook missing"
       : "harness hook leaked into production",
+  );
+}
+if (process.argv.includes("--harness") ? !containsStateLog : containsStateLog) {
+  throw new Error(
+    process.argv.includes("--harness")
+      ? "harness state logger missing"
+      : "state logger leaked into production",
   );
 }
 console.log(

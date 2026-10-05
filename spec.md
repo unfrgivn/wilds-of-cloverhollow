@@ -102,13 +102,50 @@ ios/            Capacitor iOS project (from Milestone 4).
   that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
   cancel; J opens the journal (`menu`).
-- Gamepad (standard mapping) and touch (virtual stick plus buttons) map to the
-  same frame. Touch arrives with the iOS milestone.
+- Gamepad (standard mapping) and touch (virtual stick plus buttons, section
+  3.2.1) map to the same frame. Gamepad support is not built yet.
+
+### 3.2.1 iOS shell decisions (Milestone 4)
+- Capacitor is 8.5.2 with the Swift Package Manager iOS template. The
+  placeholder bundle ID is `com.unfrgivn.cloverhollow`; it may change before
+  TestFlight. The display name is Cloverhollow and the web directory defaults
+  to `dist`, overridable with `CLOVERHOLLOW_WEB_DIR`.
+- The iOS deployment target remains the Capacitor template default, iOS 15.0.
+  The shell is landscape-only on iPhone and iPad, uses full screen, hides the
+  status bar, disables WebView scrolling and zoom, and uses `#f8edcf` as its
+  background.
+- Touch controls are a temporary DOM sticker-style overlay. A floating stick
+  uses a 56 CSS-pixel radius and 12% dead zone; confirm, cancel, and menu are
+  cream outlined buttons with 20-pixel safe-area margins. Controls are shown
+  natively or for coarse pointers, with `?touch=1` and `?touch=0` overrides.
+- `just ios-sync` syncs the harness build, while `just ios-sim` resolves the
+  simulator by name (default `iPhone 17`) and uses a gitignored
+  `.derived-data` directory. Release web syncing is deferred until the
+  TestFlight milestone. MobileBuildMCP is configured for simulator and UI
+  automation workflows with telemetry off.
+- Landscape safe areas include the left and right environment insets and the
+  bottom inset. The resting stick uses the left inset, while the menu is a
+  direct child of the root overlay and uses top/right insets, so it cannot
+  overlap the action buttons. Chromium and desktop WebKit are both Playwright
+  projects; WebKit has a dedicated 874x402 layout assertion.
+- Harness and development builds emit the `[cloverhollow] state` JSON line
+  with tick, area, x, y, and facing fields
+  on initial state, area/facing changes, and position changes no more than
+  four times per second. Capacitor's Debug console forwards these lines to
+  native stdout. Production builds contain neither the logger nor its marker.
+- `just ios-smoke` launches with `--console-pty`, resolves AXe from `AXE_PATH`,
+  PATH, or the bundled MobileBuildMCP npx cache, reads the simulator frame,
+  drags the stick, and stores the full console transcript plus before/after
+  screenshots under `$TMPDIR`. It uses no OCR or fabricated state.
 
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
-- Canvas backing resolution: devicePixelRatio, capped at 2.
+- Canvas backing resolution: devicePixelRatio, capped at 2. The canvas CSS size
+  always equals the viewport (Pixi `autoDensity`); an e2e test at
+  deviceScaleFactor 3 guards this, because iPhones report a ratio of 3.
+- Dev and harness builds draw a `tick N · x,y` readout in the top-left so
+  screenshots describe state. Production builds draw no debug text.
 - Painted art, not pixel art: linear filtering with mipmaps.
 - Source art is authored at 2x logical units (1 unit = 2 source pixels).
 - The camera follows the player with a small dead zone, clamps to area bounds,
@@ -199,6 +236,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
+- The iOS shell's native evidence uses the untouched Capacitor SPM template
+  for native code and AXe for simulator UI description and touch gestures.
+  `just ios-smoke` is the automated native evidence step; it resolves an
+  available simulator by name, uses a line-buffered `--console-pty` stream,
+  and verifies a real rightward drag changes x by at least 50 units.
 - Evidence ladder: core unit tests (Vitest, no mocks), then headless sim
   scripts (`tests/sim`, Bun, thousands of ticks in milliseconds), then
   Playwright e2e with real keyboard input and screenshot comparison. Every

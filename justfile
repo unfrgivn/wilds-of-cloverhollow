@@ -21,3 +21,22 @@ e2e:
 # Build production and harness bundles and check both hook directions.
 build:
   bun run build
+
+# Build the harness and sync it into the native shell.
+ios-sync:
+  bun run build:harness
+  CLOVERHOLLOW_WEB_DIR=dist-harness bunx cap sync ios
+
+# Build, install, and launch the harness on the iPhone 17 simulator.
+ios-sim:
+  just ios-sync
+  bun tools/ios/run.ts
+
+# Run the Xcode project in the native IDE.
+ios-open:
+  open ios/App/App.xcodeproj
+
+# Run the automated AXe-backed native smoke test.
+ios-smoke:
+  just ios-sim
+  bun tools/ios/smoke.ts

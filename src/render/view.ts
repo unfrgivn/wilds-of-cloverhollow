@@ -9,26 +9,30 @@ export class GameView {
   private readonly room = new Graphics();
   private readonly player = new Graphics();
   private readonly viewportMask = new Graphics();
-  private readonly label = new Text({
-    text: "",
-    style: { fill: 0x513b32, fontSize: 18 },
-  });
+  /** Dev/harness-only readout (`tick N · x,y`) so screenshots describe state. */
+  private readonly label: Text | undefined;
   private areaId = "";
   private viewWidth = 960;
   private viewHeight = 720;
   private previousCamera: Point | undefined;
 
-  constructor(private readonly world: World) {
+  constructor(
+    private readonly world: World,
+    options: { debugLabel: boolean },
+  ) {
     this.player
       .circle(0, 0, this.world.tunables.playerRadius)
       .fill(0xffd166)
       .stroke({ width: 4, color: 0x6b4e3d });
-    this.root.addChild(
-      this.background,
-      this.scene,
-      this.viewportMask,
-      this.label,
-    );
+    this.root.addChild(this.background, this.scene, this.viewportMask);
+    if (options.debugLabel) {
+      this.label = new Text({
+        text: "",
+        style: { fill: 0x513b32, fontSize: 18 },
+      });
+      this.label.position.set(20, 20);
+      this.root.addChild(this.label);
+    }
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.room, this.player);
   }
@@ -104,9 +108,10 @@ export class GameView {
         this.viewHeight * scale,
       )
       .fill(0xffffff);
-    const text = `Cloverhollow • tick ${state.tick}`;
-    if (this.label.text !== text) this.label.text = text;
-    this.label.x = 20;
-    this.label.y = 20;
+    if (this.label !== undefined) {
+      const position = `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
+      const text = `Cloverhollow • tick ${state.tick} · ${position}`;
+      if (this.label.text !== text) this.label.text = text;
+    }
   }
 }

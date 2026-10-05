@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-04 (web-first restart)
+Last updated: 2026-10-05 (Milestone 5 implementation)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -146,7 +146,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   deviceScaleFactor 3 guards this, because iPhones report a ratio of 3.
 - Dev and harness builds draw a `tick N · x,y` readout in the top-left so
   screenshots describe state. Production builds draw no debug text.
-- Painted art, not pixel art: linear filtering with mipmaps.
+- Painted art, not pixel art: linear filtering with mipmaps. Runtime asset URLs
+  are document-relative (`assets/...`), which works under Vite sub-paths and
+  Capacitor's `capacitor://localhost` scheme.
 - Source art is authored at 2x logical units (1 unit = 2 source pixels).
 - The camera follows the player with a small dead zone, clamps to area bounds,
   and snaps to whole device pixels.
@@ -154,13 +156,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   y-sort by their foot baseline.
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded), no single texture over 2048x2048, and the previous area unloads on
-  transition.
+  transition. One `AreaView` (`src/render/area-view.ts`) owns an area's sprites
+  and textures; swapping areas destroys them and unloads the textures, and the
+  game neither ticks nor renders until the new area has loaded.
 
 ## 5. Characters and animation (locked)
 - Frame-by-frame animation in 4 directions: down, up, left, right. Right may
   mirror left until a dedicated right set exists.
 - Walk: 6 frames per direction (minimum 4). Frames advance with distance walked
-  so feet do not slide.
+  so feet do not slide: the core accumulates each tick's resolved displacement
+  in `state.motion.distance` (sliding along a wall counts only the slide), and
+  one full cycle spans `walkCycleUnits` (126). Idle shows when a tick's
+  displacement is below epsilon.
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one PNG atlas plus JSON frame data per character (Pixi
@@ -173,25 +180,38 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Followers (Maddie) and NPCs follow the same rules. NPCs may ship idle-only.
 
 ## 6. World
-- Areas are discrete. `content/areas/<id>.json` defines size, ground image(s),
-  props, walkable polygon(s), blocker polygons, triggers (doors and edges),
-  interactables, and named spawn points. JSON is canonical; Tiled may be used
-  for editing, but exported data must match this format.
+- Areas are discrete. `content/areas/<id>.json` is canonical (Tiled may be used
+  for editing if its export matches): `id`, `width` and `height` in units, the
+  `walkable` floor polygon, `blockers` (furniture footprints on the floor
+  plane), `occluders` (`{ id, polygon, baseline }`), named `spawns`
+  (`{ x, y, facing }`), and optional `ground` (the folder of its painting).
+  Doors arrive in Milestone 6 and interactables in Milestone 8.
 - Player collider: a circle of radius 20 units at the feet that slides along
   blockers.
-- Walk speed: 240 units per second (tunable in `content/tunables.json`).
+- `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
+  (20), and `walkCycleUnits` (126).
 - Transitions: entering a trigger fades out, loads the target area, places the
   player at the named spawn facing the given direction, and fades in.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`) and `plaza` (from
-  `town_center_plaza.png`).
+  `town_center_plaza.png`). The placeholder `harness` area stays for
+  deterministic tests (fixture `harness`).
 - Area paintings: opaque WebP tiles (each at most 2048x2048) at 2 source px
-  per unit, listed in `public/assets/areas/<id>/ground.json` with the
-  painting's `paper` margin colour, which fills the view around the painting.
+  per unit, listed in `public/assets/areas/<id>/ground.json` (tile offsets in
+  source px and the painting's `paper` margin colour). The paper colour fills
+  the logical viewport behind the painting; the page colour `#f8edcf` shows
+  only in letterbox bars outside it.
+- Occluders: lossless cutouts of tall furniture, generated from the painting
+  by `tools/art/area-occluders.ts` into the area's asset folder
+  (`occluders.json` lists their unit offsets). An occluder draws over Fae while
+  her feet are above (north of) its baseline. Workflow:
+  `docs/art/area-authoring.md`.
+- Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
+  spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
+  body box (50x140 units above her feet) covered by occluders.
 - Area scale rule: a standard door is about 1.4x Fae's height (about 200
   units) and furniture is proportional. Paintings are resampled uniformly to
-  meet it, never stretched.
-- The bedroom painting is 2100x1400 source px (1050x700 units), so the whole
-  room fits on one phone screen.
+  meet it, never stretched. The bedroom is 1050x700 units (the whole room fits
+  on one phone screen); the plaza is 1750x1100 units.
 
 ## 7. Interaction and dialogue
 - The nearest interactable in front of the player (within 60 units) shows a
@@ -242,9 +262,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `getState()`: the full JSON state.
   - `hash()`: the deterministic state hash.
   - `reset({ seed, fixture })`: restart from a named fixture in
-    `content/fixtures/` (test-only starting setups such as `new-game`).
-    The default is `new-game`; unknown names throw an error listing known
-    fixtures.
+    `content/fixtures/` (test-only starting setups such as `new-game`), leaving
+    the game paused. Returns a Promise that resolves once the fixture's area
+    has loaded. The default is `new-game`; unknown names throw an error listing
+    known fixtures.
+  - `renderInfo()`: read-only render facts for tests: the depth layer's draw
+    order (`{ label, zIndex }[]`, with `fae` and `occluder:<id>`) and Fae's
+    current animation and frame.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
@@ -260,11 +284,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   gameplay feature has at least one e2e test that uses real key presses.
 - Visual baselines live beside the e2e specs. Update them only after viewing
   the new image.
-- Milestone 2 content uses `content/areas/harness.json`: dimensions, a polygon
-  `walkable`, polygon-array `blockers`, and named `spawns` with facing.
-  Global `content/tunables.json` contains `walkSpeed` and `playerRadius`.
-  Fixtures contain `area`, `spawn`, and optional `seed`.
-  Script files are arrays of `{ frame: ActionFrame, ticks: number }` segments.
+- Fixtures (`content/fixtures/<name>.json`) contain `area`, `spawn`, and an
+  optional `seed`. Sim scripts live in `tests/sim/scripts/<fixture>/` and are
+  arrays of `{ frame: ActionFrame, ticks: number }` segments; `bun run sim`
+  starts each from its folder's fixture and checks collision every tick.
+- The Playwright suite serves the harness build from the `/cloverhollow/`
+  sub-path, so any root-relative asset URL fails in tests as it would on iOS.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

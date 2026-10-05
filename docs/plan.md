@@ -48,7 +48,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   confirm button.
 - A simulator screenshot shows the game, and a touch drag moves the player.
 
-## Milestone 5: Fae in her bedroom
+## Milestone 5: Fae in her bedroom **Status:** ✅ Completed (2026-10-05)
 - Fae's atlas replaces the placeholder circle: walk frames advance with
   distance walked (no foot sliding), idle per facing, right mirrors left.
 - The bedroom painting renders from its tiles over its paper colour; the

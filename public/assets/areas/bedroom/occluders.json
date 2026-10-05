@@ -1,0 +1,28 @@
+{
+  "cutouts": [
+    {
+      "id": "bed",
+      "file": "bed.png",
+      "x": 175,
+      "y": 170
+    },
+    {
+      "id": "desk",
+      "file": "desk.png",
+      "x": 90,
+      "y": 285
+    },
+    {
+      "id": "shelf",
+      "file": "shelf.png",
+      "x": 790,
+      "y": 270
+    },
+    {
+      "id": "cat-bed",
+      "file": "cat-bed.png",
+      "x": 825,
+      "y": 510
+    }
+  ]
+}

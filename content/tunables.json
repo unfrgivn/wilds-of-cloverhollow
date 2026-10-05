@@ -1,4 +1,5 @@
 {
   "walkSpeed": 240,
-  "playerRadius": 20
+  "playerRadius": 20,
+  "walkCycleUnits": 126
 }

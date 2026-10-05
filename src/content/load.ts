@@ -1,5 +1,7 @@
 import areaData from "../../content/areas/harness.json";
+import bedroomData from "../../content/areas/bedroom.json";
 import fixtureData from "../../content/fixtures/new-game.json";
+import harnessFixtureData from "../../content/fixtures/harness.json";
 import tunableData from "../../content/tunables.json";
 import type {
   Area,
@@ -9,6 +11,8 @@ import type {
   Spawn,
   Tunables,
   World,
+  GroundManifest,
+  OccluderManifest,
 } from "../core";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -47,7 +51,12 @@ export function parseTunables(value: unknown, file: string): Tunables {
   field(record(value), file, "object");
   field(typeof value.walkSpeed === "number", file, "walkSpeed");
   field(typeof value.playerRadius === "number", file, "playerRadius");
-  return { walkSpeed: value.walkSpeed, playerRadius: value.playerRadius };
+  field(typeof value.walkCycleUnits === "number", file, "walkCycleUnits");
+  return {
+    walkSpeed: value.walkSpeed,
+    playerRadius: value.playerRadius,
+    walkCycleUnits: value.walkCycleUnits,
+  };
 }
 
 export function parseArea(value: unknown, file: string): Area {
@@ -60,6 +69,23 @@ export function parseArea(value: unknown, file: string): Area {
     Array.isArray(value.blockers) && value.blockers.every(polygon),
     file,
     "blockers",
+  );
+  field(
+    value.ground === undefined || typeof value.ground === "string",
+    file,
+    "ground",
+  );
+  field(
+    value.occluders === undefined ||
+      (Array.isArray(value.occluders) && value.occluders.every(
+        (item) =>
+          record(item) &&
+          typeof item.id === "string" &&
+          polygon(item.polygon) &&
+          typeof item.baseline === "number",
+      )),
+    file,
+    "occluders",
   );
   field(record(value.spawns), file, "spawns");
   const spawns: Record<string, Spawn> = {};
@@ -79,6 +105,12 @@ export function parseArea(value: unknown, file: string): Area {
     height: value.height,
     walkable: value.walkable,
     blockers: value.blockers,
+    ground: value.ground,
+    occluders: (value.occluders ?? []).map((item) => ({
+      id: item.id,
+      polygon: item.polygon,
+      baseline: item.baseline,
+    })),
     spawns,
   };
 }
@@ -97,18 +129,66 @@ export function parseFixture(value: unknown, file: string): Fixture {
     : { area: value.area, spawn: value.spawn, seed: value.seed };
 }
 
+export function parseGroundManifest(
+  value: unknown,
+  file: string,
+): GroundManifest {
+  field(record(value), file, "object");
+  field(typeof value.paper === "string", file, "paper");
+  field(Array.isArray(value.tiles), file, "tiles");
+  const tiles = value.tiles.map((item, index) => {
+    field(record(item), file, `tiles.${index}`);
+    field(
+      typeof item.file === "string" && typeof item.x === "number" &&
+        typeof item.y === "number" && typeof item.width === "number" &&
+        typeof item.height === "number",
+      file,
+      `tiles.${index}`,
+    );
+    return {
+      file: item.file,
+      x: item.x,
+      y: item.y,
+      width: item.width,
+      height: item.height,
+    };
+  });
+  return { paper: value.paper, tiles };
+}
+
+export function parseOccluderManifest(
+  value: unknown,
+  file: string,
+): OccluderManifest {
+  field(record(value), file, "object");
+  field(Array.isArray(value.cutouts), file, "cutouts");
+  const cutouts = value.cutouts.map((item, index) => {
+    field(record(item), file, `cutouts.${index}`);
+    field(
+      typeof item.id === "string" && typeof item.file === "string" &&
+        typeof item.x === "number" && typeof item.y === "number",
+      file,
+      `cutouts.${index}`,
+    );
+    return { id: item.id, file: item.file, x: item.x, y: item.y };
+  });
+  return { cutouts };
+}
+
 export function loadContent(): {
   world: World;
   fixtures: Record<string, Fixture>;
 } {
-  const area = parseArea(areaData, "content/areas/harness.json");
+  const harness = parseArea(areaData, "content/areas/harness.json");
+  const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
+    harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
   };
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
-      areas: { [area.id]: area },
+    areas: { [harness.id]: harness, [bedroom.id]: bedroom },
     },
     fixtures,
   };

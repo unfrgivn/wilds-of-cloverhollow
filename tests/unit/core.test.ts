@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { existsSync } from "node:fs";
 import {
   createState,
   distanceToPolygon,
@@ -8,11 +9,17 @@ import {
   step,
   type ActionFrame,
 } from "../../src/core";
-import { loadContent, parseArea } from "../../src/content/load";
+import {
+  loadContent,
+  parseArea,
+  parseGroundManifest,
+  parseOccluderManifest,
+} from "../../src/content/load";
+import { hiddenPositions } from "../../src/content/area-checks";
 
 const content = loadContent();
 const world = content.world;
-const fixture = content.fixtures["new-game"];
+const fixture = content.fixtures.harness;
 if (fixture === undefined) throw new Error("fixture missing");
 const area = world.areas.harness;
 if (area === undefined) throw new Error("area missing");
@@ -57,6 +64,19 @@ describe("core", () => {
       move: { x: 1, y: 0 },
     });
     expect(result.state.player.x).toBe(304);
+    expect(result.state.motion).toEqual({ distance: 4, moving: true });
+  });
+
+  it("counts only resolved displacement, including a wall slide", () => {
+    const start = {
+      ...createState(world, fixture),
+      player: { x: 820, y: 400 },
+    };
+    const result = step(world, start, { ...none, move: { x: 1, y: 1 } });
+    const dx = result.state.player.x - start.player.x;
+    const dy = result.state.player.y - start.player.y;
+    expect(result.state.motion.distance).toBeCloseTo(Math.sqrt(dx * dx + dy * dy));
+    expect(result.state.motion.distance).toBeGreaterThan(0);
   });
 
   it("recovers centres placed inside every blocker", () => {
@@ -174,5 +194,46 @@ describe("core", () => {
     expect(() => parseArea({ id: "broken", width: 10 }, "broken.json")).toThrow(
       /broken.json: invalid height/,
     );
+  });
+
+  it("ships ground tiles and generated occluder cutouts for each painted area", () => {
+    const bedroom = world.areas.bedroom;
+    expect(bedroom?.ground).toBe("bedroom");
+    expect(existsSync("public/assets/areas/bedroom/ground.json")).toBe(true);
+    expect(existsSync("public/assets/areas/bedroom/ground_0_0.webp")).toBe(true);
+    expect(existsSync("public/assets/areas/bedroom/ground_1_0.webp")).toBe(true);
+    for (const occluder of bedroom?.occluders ?? [])
+      expect(existsSync(`public/assets/areas/bedroom/${occluder.id}.png`)).toBe(true);
+  });
+
+  it("validates ground and occluder manifests", () => {
+    expect(() => parseGroundManifest({ paper: "#fff", tiles: [] }, "ground.json"))
+      .not.toThrow();
+    expect(() => parseOccluderManifest({ cutouts: [] }, "occluders.json"))
+      .not.toThrow();
+    expect(() => parseGroundManifest({ paper: "#fff" }, "ground.json"))
+      .toThrow(/ground.json/);
+  });
+
+  it("never lets an occluder hide most of Fae anywhere she can stand", () => {
+    for (const area of Object.values(world.areas)) {
+      expect(hiddenPositions(area, world.tunables.playerRadius), area.id).toEqual([]);
+    }
+  });
+
+  it("flags the hiding corridor in the first bedroom layout", () => {
+    const bedroom = world.areas.bedroom;
+    if (bedroom === undefined) throw new Error("bedroom missing");
+    // The first Milestone 5 bed blocker was a thin band along the bed's front,
+    // leaving a corridor behind the bed where its occluder covered Fae.
+    const corridor = {
+      ...bedroom,
+      blockers: bedroom.blockers.map((blocker, index): [number, number][] =>
+        index === 0 ? [[190, 310], [425, 350], [430, 385], [185, 350]] : blocker,
+      ),
+    };
+    const hidden = hiddenPositions(corridor, world.tunables.playerRadius);
+    expect(hidden.length).toBeGreaterThan(0);
+    expect(hidden.every((position) => position.occluders.includes("bed"))).toBe(true);
   });
 });

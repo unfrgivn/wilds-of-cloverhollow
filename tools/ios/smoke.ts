@@ -1,5 +1,12 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -194,6 +201,11 @@ async function main(): Promise<void> {
     console.log(`console transcript: ${transcriptPath}`);
     console.log(`before screenshot: ${beforeScreenshot}`);
     console.log(`after screenshot: ${afterScreenshot}`);
+  } catch (error: unknown) {
+    const lines = readFileSync(transcriptPath, "utf8").trimEnd().split("\n");
+    console.error("last console lines:");
+    console.error(lines.slice(-40).join("\n"));
+    throw error;
   } finally {
     child.kill();
     await Promise.all([output, errors]);

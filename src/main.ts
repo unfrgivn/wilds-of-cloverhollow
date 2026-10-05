@@ -11,6 +11,7 @@ const content = loadContent();
 const app = new Application();
 let state: State;
 let paused = false;
+let loading = true;
 
 async function boot(): Promise<void> {
   preventPinchZoom();
@@ -49,19 +50,26 @@ async function boot(): Promise<void> {
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
   state = createState(content.world, initialFixture);
+  await view.ready;
+  const initialArea = content.world.areas[state.area];
+  if (initialArea === undefined) throw new Error("Missing initial area");
+  await view.setArea(initialArea);
+  loading = false;
   let afterTick = (_next: State): void => undefined;
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const { createStateLogger } = await import("./dev/state-log");
     afterTick = createStateLogger();
     afterTick(state);
   }
-  const render = (): void =>
+  const render = (): void => {
+    if (loading) return;
     view.render(
       state,
       window.innerWidth,
       window.innerHeight,
       app.renderer.resolution,
     );
+  };
   const tick = (frame: ActionFrame): void => {
     state = step(content.world, state, frame).state;
     afterTick(state);
@@ -96,7 +104,7 @@ async function boot(): Promise<void> {
       setPaused: (value) => {
         paused = value;
       },
-      reset: (options) => {
+      reset: async (options) => {
         keyboard.clearTaps();
         const name = options.fixture ?? "new-game";
         const fixture = content.fixtures[name];
@@ -107,10 +115,19 @@ async function boot(): Promise<void> {
             ).join(", ")}`,
           );
         state = createState(content.world, fixture, options.seed);
+        const area = content.world.areas[state.area] ?? initialArea;
+        loading = true;
+        await view.setArea(area);
+        loading = false;
         view.resetCamera();
       },
+      renderInfo: () => view.renderInfo(),
     });
   }
 }
 
-void boot();
+boot().catch((error: unknown) => {
+  // Capacitor forwards console.error to the native log, so iOS failures are visible.
+  const detail = error instanceof Error ? `${error.message}\n${error.stack ?? ""}` : String(error);
+  console.error(`[cloverhollow] boot failed: ${detail}`);
+});

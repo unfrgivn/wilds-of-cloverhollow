@@ -15,7 +15,12 @@ export type CloverhollowHook = {
   input: (frame: ActionFrame, ticks: number) => void;
   getState: () => State;
   hash: () => string;
-  reset: (options?: { seed?: number; fixture?: string }) => void;
+  reset: (options?: { seed?: number; fixture?: string }) => Promise<void>;
+  renderInfo: () => {
+    drawOrder: { label: string; zIndex: number }[];
+    animation: string;
+    frame: number;
+  };
 };
 
 export function installHook(deps: {
@@ -25,7 +30,8 @@ export function installHook(deps: {
   render: () => void;
   paused: () => boolean;
   setPaused: (paused: boolean) => void;
-  reset: (options: { seed?: number; fixture?: string }) => void;
+  reset: (options: { seed?: number; fixture?: string }) => Promise<void>;
+  renderInfo: CloverhollowHook["renderInfo"];
 }): void {
   const hook: CloverhollowHook = {
     version: 1,
@@ -48,12 +54,13 @@ export function installHook(deps: {
     input: deps.input.queue,
     getState: () => structuredClone(deps.get()),
     hash: () => stableHash(deps.get()),
-    reset: (options = {}) => {
+    reset: async (options = {}) => {
       deps.setPaused(true);
       deps.input.clear();
-      deps.reset(options);
+      await deps.reset(options);
       deps.render();
     },
+    renderInfo: deps.renderInfo,
   };
   window.__cloverhollow = hook;
 }

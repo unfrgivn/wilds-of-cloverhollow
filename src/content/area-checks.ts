@@ -1,0 +1,90 @@
+import { distanceToPolygon, pointInPolygon, type Area, type Point } from "../core";
+
+/**
+ * Authoring check: can Fae stand somewhere an occluder hides most of her?
+ *
+ * Fae's body is approximated by a box 50 units wide and 140 tall, standing on
+ * her feet point. An occluder draws over her while her feet are above
+ * (north of) its baseline. We flood-fill every position the core would allow
+ * from each spawn, on a 5-unit grid, and report positions where occluders
+ * cover at least `maxCoverage` of the sampled body box.
+ *
+ *        x-25   x+25
+ *   y-140 +------+   <- sampled every 5 units
+ *         | Fae  |
+ *       y +--*---+   <- feet point (the collision circle centre)
+ */
+const GRID = 5;
+const BODY_HALF_WIDTH = 25;
+const BODY_HEIGHT = 140;
+
+export type HiddenPosition = Point & { coverage: number; occluders: string[] };
+
+function walkable(area: Area, radius: number, point: Point): boolean {
+  return (
+    pointInPolygon(point, area.walkable) &&
+    distanceToPolygon(point, area.walkable) >= radius &&
+    area.blockers.every(
+      (blocker) =>
+        !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius,
+    )
+  );
+}
+
+export function reachablePositions(area: Area, radius: number): Point[] {
+  const seen = new Set<string>();
+  const reachable: Point[] = [];
+  for (const spawn of Object.values(area.spawns)) {
+    const start = {
+      x: Math.round(spawn.x / GRID) * GRID,
+      y: Math.round(spawn.y / GRID) * GRID,
+    };
+    const key = `${start.x},${start.y}`;
+    if (seen.has(key) || !walkable(area, radius, start)) continue;
+    seen.add(key);
+    const queue = [start];
+    for (let index = 0; index < queue.length; index += 1) {
+      const point = queue[index];
+      if (point === undefined) continue;
+      reachable.push(point);
+      for (const dx of [-GRID, 0, GRID]) {
+        for (const dy of [-GRID, 0, GRID]) {
+          const next = { x: point.x + dx, y: point.y + dy };
+          const nextKey = `${next.x},${next.y}`;
+          if (seen.has(nextKey) || !walkable(area, radius, next)) continue;
+          seen.add(nextKey);
+          queue.push(next);
+        }
+      }
+    }
+  }
+  return reachable;
+}
+
+function bodyCoverage(area: Area, feet: Point): { coverage: number; occluders: string[] } {
+  const covering = area.occluders.filter((occluder) => feet.y < occluder.baseline);
+  const ids = new Set<string>();
+  let covered = 0;
+  let samples = 0;
+  for (let y = feet.y - BODY_HEIGHT; y <= feet.y; y += GRID) {
+    for (let x = feet.x - BODY_HALF_WIDTH; x <= feet.x + BODY_HALF_WIDTH; x += GRID) {
+      samples += 1;
+      const occluder = covering.find((item) => pointInPolygon({ x, y }, item.polygon));
+      if (occluder === undefined) continue;
+      covered += 1;
+      ids.add(occluder.id);
+    }
+  }
+  return { coverage: covered / samples, occluders: [...ids] };
+}
+
+export function hiddenPositions(
+  area: Area,
+  radius: number,
+  maxCoverage = 0.75,
+): HiddenPosition[] {
+  return reachablePositions(area, radius).flatMap((point) => {
+    const { coverage, occluders } = bodyCoverage(area, point);
+    return coverage >= maxCoverage ? [{ ...point, coverage, occluders }] : [];
+  });
+}

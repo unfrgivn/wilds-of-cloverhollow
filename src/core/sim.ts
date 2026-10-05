@@ -33,6 +33,7 @@ export function createState(
     facing: spawn.facing,
     rng: seed >>> 0,
     previousInput: blankInput(),
+    motion: { distance: 0, moving: false },
   };
 }
 
@@ -161,6 +162,11 @@ export function step(
     area,
     world.tunables.playerRadius,
   );
+  const displacementX = player.x - state.player.x;
+  const displacementY = player.y - state.player.y;
+  const displacement = Math.sqrt(
+    displacementX * displacementX + displacementY * displacementY,
+  );
   let facing = state.facing;
   if (Math.abs(input.move.x) >= Math.abs(input.move.y) && input.move.x !== 0)
     facing = input.move.x < 0 ? "left" : "right";
@@ -177,6 +183,10 @@ export function step(
       player,
       facing,
       previousInput: { ...input },
+      motion: {
+        distance: state.motion.distance + displacement,
+        moving: displacement > 0.0001,
+      },
     },
     events,
   };

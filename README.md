@@ -1,28 +1,27 @@
-# Wilds of Cloverhollow (Pixel JRPG Scaffold)
+# Wilds of Cloverhollow
 
-This repo is a starter scaffold for building **Wilds of Cloverhollow** as a **classic pixel-art JRPG** in **Godot**.
+A cozy storybook adventure for kids 8 to 12. Fae, her cat Maddie, and their
+friends calm the chaos spreading through Cloverhollow, one painted scene at a
+time.
 
-## Quick start (macOS)
-1. Install Godot 4.x (recommended: 4.5).
-2. Open this folder in Godot.
-3. Run the project.
+It is a TypeScript web game (PixiJS) wrapped for iOS with Capacitor, built so
+AI agents can build, drive, inspect, and verify it.
 
-## Working style
-- `spec.md` is the single source of truth.
-- Use `/next-milestone` to progress through `docs/working-sessions/plan.md`.
-- One commit per milestone.
+- `spec.md`: what the game is (source of truth)
+- `AGENTS.md`: how agents work in this repo
+- `docs/plan.md`: milestones
+- `NOTES.md`: the original story notes
+- `docs/art/concepts/`: concept art and style references
 
-## Scripts
-All scripts assume `GODOT_BIN` points at your Godot executable.
+The previous Godot pixel-art build is archived at tag `archive/godot-pixel`.
 
-Examples:
-- `GODOT_BIN="/Applications/Godot.app/Contents/MacOS/Godot" ./tools/ci/run-smoke.sh`
+## Requirements
+- Node 24 LTS (`nvm use`), Bun 1.3+, and `just`
+- Xcode 27 for iOS work
+- `GEMINI_API_KEY` for art generation (optional)
 
-## Repo layout (high level)
-- `spec.md` — game specification and locked decisions
-- `AGENTS.md` — agent operating rules (automation + no window control)
-- `docs/` — design + pipeline + working session docs
-- `.opencode/` — opencode commands, agents, and skills
-- `game/` — Godot project content under `res://game/...`
-- `art/` — source assets + palettes + recipes (not runtime imports)
-- `tools/` — CI scripts, linters, capture tooling stubs
+## Commands (added in Milestone 2)
+- `just dev`: run the game locally
+- `just check`: typecheck, unit tests, headless sim
+- `just e2e`: Playwright end-to-end tests
+- `just build`: production build

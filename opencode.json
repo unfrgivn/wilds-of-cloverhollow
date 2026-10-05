@@ -1,67 +1,28 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": ["spec.md", "docs/*.md"],
   "mcp": {
     "servers": {
-      "godot": {
+      "chrome-devtools": {
         "type": "local",
         "command": [
-          "node",
-          "/Users/bash/Sites/unfrgivn/godot-mcp/build/index.js"
-        ],
-        "environment": {
-          "DEBUG": "true"
-        },
-        "disabled": true
+          "npx",
+          "-y",
+          "chrome-devtools-mcp@latest",
+          "--isolated",
+          "--viewport=1280x720",
+          "--no-usage-statistics",
+          "--no-performance-crux"
+        ]
       },
-      "satellite": {
+      "mobilebuild": {
         "type": "local",
-        "command": [
-          "node",
-          "./.opencode/mcp/satelliteoflove/node_modules/@satelliteoflove/godot-mcp/dist/cli.js",
-          "--read-only"
-        ],
-        "environment": {
-          "GODOT_HOST": "127.0.0.1",
-          "GODOT_PORT": "6550",
-          "GODOT_MCP_USAGE_LOG": "0"
-        }
+        "command": ["npx", "-y", "mobilebuildmcp@latest", "mcp"]
+      },
+      "xcode": {
+        "type": "local",
+        "command": ["xcrun", "mcpbridge"],
+        "disabled": true
       }
-    }
-  },
-  "skills": ["./.opencode/skill"],
-  "permissions": [
-    {"action": "read", "resource": "*", "effect": "allow"},
-    {"action": "read", "resource": "*.env", "effect": "deny"},
-    {"action": "read", "resource": "*.env.example", "effect": "allow"},
-    {"action": "shell", "resource": "*", "effect": "allow"},
-    {"action": "edit", "resource": "*", "effect": "allow"},
-    {"action": "external_directory", "resource": "*", "effect": "ask"},
-    {"action": "skill", "resource": "*", "effect": "allow"},
-    {"action": "subagent", "resource": "*", "effect": "allow"},
-    {"action": "godot_*", "resource": "*", "effect": "deny"},
-    {"action": "image_*", "resource": "*", "effect": "deny"},
-    {"action": "vision", "resource": "*", "effect": "deny"},
-    {"action": "nanobanana", "resource": "*", "effect": "deny"},
-    {"action": "satellite_*", "resource": "*", "effect": "deny"},
-    {"action": "satellite_godot_node_read", "resource": "*", "effect": "allow"},
-    {"action": "satellite_godot_editor_read", "resource": "*", "effect": "allow"},
-    {"action": "satellite_godot_runtime_state", "resource": "*", "effect": "allow"},
-    {"action": "satellite_godot_docs", "resource": "*", "effect": "allow"},
-    {"action": "satellite_godot_project", "resource": "*", "effect": "allow"}
-  ],
-  "lsp": {
-    "gdscript": {
-      "command": ["godot-lsp-bridge"],
-      "extensions": [".gd", ".gdshader"]
-    }
-  },
-  "agents": {
-    "plan": {
-      "permissions": [
-        {"action": "edit", "resource": "*", "effect": "deny"},
-        {"action": "shell", "resource": "*", "effect": "deny"}
-      ]
     }
   }
 }

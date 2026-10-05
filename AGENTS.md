@@ -1,58 +1,53 @@
 # AGENTS.md
 
-This repo is designed for autonomous agent work.
+This repo is built by autonomous agents. Read `spec.md` first; it is the single
+source of truth. Work comes from `docs/plan.md`.
 
-## Non-negotiable rules
-1. `spec.md` is the single source of truth.
-   - If you change behavior, interfaces, file formats, or decisions, update `spec.md` in the same milestone commit.
-2. Do not stop to ask questions.
-   - Make reasonable assumptions and proceed.
-   - If missing input is truly required, add a new future milestone in `docs/working-sessions/plan.md` with clear acceptance criteria and continue.
-3. One commit per milestone.
-   - Commit message format: `feat: <Title> (Milestone <N>)`
-   - Push to main immediately after committing (`git push origin main`).
-   - Do NOT ask the user for permission to push; push automatically.
-   - If push fails, rebase with `git pull --rebase origin main`, resolve conflicts, and push again.
-4. No OS-level window control.
-   - All verification must run via Scenario Runner and deterministic artifacts (captures + traces).
-5. Small diffs only.
-   - Avoid refactors unless required to complete the current milestone.
+## Rules
+1. `spec.md` wins. A change to behavior, interfaces, file formats, or decisions
+   updates `spec.md` in the same commit.
+2. Work one milestone at a time. One commit per milestone:
+   `feat: <Title> (Milestone <N>)`. Push to `main` after the gates pass. If an
+   HTTPS push cannot find credentials, push with
+   `git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin main`.
+3. Do not stop to ask about implementation details. Make reasonable
+   assumptions and record them in the milestone notes. These need the owner:
+   a dependency not listed in spec section 2, paid generation beyond the
+   milestone's needs, store or account actions, and deleting owner content
+   (`NOTES.md`, `docs/art/concepts/`).
+4. Keep diffs small. Build nothing from spec section 13 ("Out of scope").
+5. Functional core, imperative shell: `src/core` stays pure (no DOM, Pixi,
+   timers, `Date`, `Math.random`, or I/O).
+6. TypeScript is `strict`. No `any`. Avoid `as` casts; model real shapes and
+   narrow with type guards.
+7. No mock-based tests. Use core unit tests, headless sim scripts, and
+   Playwright e2e tests against the real game.
+8. No breadcrumbs. Delete moved or dead code outright.
 
-## Definition of Done (every milestone)
-A milestone is complete only if all are true:
+## Evidence for every gameplay milestone
+- A core unit test for new rules.
+- A headless sim script when state changes over time.
+- A Playwright e2e test that uses real key presses.
+- A screenshot the agent has actually viewed. Update visual baselines only
+  after viewing the new image.
 
-A) Implementation
-- Code + scenes live under `res://game/...` only (unless spec explicitly says otherwise).
-- No manual editor-only steps required to reproduce; if unavoidable, document precisely in `docs/`.
+## Gates (run and report actual output)
+- `just check`: typecheck, unit tests, headless sim.
+- `just e2e`: Playwright end-to-end tests.
+- `just build`: production build; fails if the dev hook leaks into it.
+- `just ios-sim`: from Milestone 4, for milestones touching iOS.
 
-B) Spec hygiene
-- `spec.md` updated if anything changed materially.
+## Agent tooling
+- Chrome DevTools MCP (project `opencode.json`) opens an isolated Chrome at
+  1280x720. Drive the game with real key presses and the `window.__cloverhollow`
+  hook (spec section 11); take screenshots to see it.
+- MobileBuildMCP builds, runs, taps, and screenshots the iOS Simulator.
+- Xcode MCP (`xcrun mcpbridge`) only works while Xcode has the iOS project
+  open; it is disabled in `opencode.json` until needed.
 
-C) Automation
-- Add or update at least one Scenario Runner scenario proving the milestone.
-- Ensure deterministic artifacts written under `captures/`.
-- If UI/visual changes occurred: add/update a rendered capture scenario.
-
-D) Tests
-- Add/update tests where appropriate.
-
-E) Docs
-- Update `docs/` if new flags, commands, workflows, or schemas were introduced.
-
-## Mandatory commands to run (every milestone)
-Agents must run and report results for:
-
-- `./tools/ci/run-smoke.sh`
-- `./tools/ci/run-tests.sh`
-- `./tools/ci/run-spec-check.sh`
-- `./tools/ci/run-scenario.sh <scenario_id>`
-- `./tools/ci/run-scenario-rendered.sh <scenario_id>` (if present; if missing and milestone affects visuals/UI, implement it)
-
-## Milestone progression
-Use `/next-milestone` to select work from `docs/working-sessions/plan.md`.
-
-Milestone completion status convention:
-- Completed milestones include `**Status:** ✅ Completed (YYYY-MM-DD)` in the milestone header line.
-- Incomplete milestones have no status field.
-
-Call `/next-milestone` after completion to move onto the next milestone
+## Art
+- Style source: `docs/art/concepts/`. Rules: spec section 12 and
+  `docs/art/style-bible.md`.
+- Every kept generated asset has a recipe in `art/recipes/`. Runtime assets go
+  in `public/assets/`. Scratch output goes in `art/scratch/` (gitignored).
+- Never overwrite owner-approved art without a new recipe.

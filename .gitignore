@@ -1,21 +1,21 @@
-# Godot
-.godot/
-.import/
-*.import
-*.uid
-export.cfg
-export_presets.cfg
+# Dependencies and builds
+node_modules/
+dist/
+dist-harness/
+coverage/
 
-# macOS
-.DS_Store
+# Test output
+test-results/
+playwright-report/
+blob-report/
 
-# Local artifacts
-captures/
-reports/
+# Art scratch space and agent worktrees
+art/scratch/
+.worktrees/
+
+# Local
+.env
+.env.*
+!.env.example
 *.log
-nanobanana-output/
-
-# Python
-__pycache__/
-*.pyc
-.venv/
+.DS_Store

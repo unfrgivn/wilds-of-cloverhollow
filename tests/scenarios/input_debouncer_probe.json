@@ -1,7 +1,0 @@
-{
-  "scenario_id": "input_debouncer_probe",
-  "description": "Probe the 150ms input debounce using the physics-tick clock.",
-  "actions": [
-    {"type": "probe_input_debouncer", "context": "scenario_probe"}
-  ]
-}

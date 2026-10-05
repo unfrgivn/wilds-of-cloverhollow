@@ -1,1427 +1,222 @@
-# Wilds of Cloverhollow — spec
+# Wilds of Cloverhollow: spec
 
-Last updated: 2026-09-06
+Last updated: 2026-10-04 (web-first restart)
 
-This file is the single source of truth. If code changes behavior, update this file in the same commit.
+This file is the single source of truth. If code changes behavior, interfaces,
+file formats, or decisions, update this file in the same commit. The previous
+Godot pixel-art build is archived at tag `archive/godot-pixel`; treat it as
+reference material only.
 
-## 1. Product definition
+## 1. Product
 
 ### 1.1 Audience and tone
-- Target audience: kids 8–12; family friendly.
-- Tone: cozy, safe, friendly; cute animals; fun puzzles; light combat with non-scary enemies.
-- Core premise: stop a “bad guy” causing chaos in town while balancing school life.
-
-### 1.2 Pillars
-1. Cozy exploration with readable pixel art.
-2. Light puzzles and item/tool gating.
-3. Turn-based battles that are fast and clear.
-4. Lots of reuse (tiles, props, sprites) to scale content reliably.
-
-## 2. Platform and constraints
-- Platform: iOS native.
-- Orientation: landscape only.
-- Development: macOS only.
-- Engine: Godot 4.5.1 for local development and CI verification.
-- Automation constraint: agents must not rely on OS-level window control to playtest; testing must run through an in-game Scenario Runner and deterministic artifacts.
-
-## 3. Presentation
-
-### 3.1 Overworld
-- 2D pixel art.
-- Classic 3/4 overhead JRPG look (top-down-ish).
-- No camera rotation.
-
-### 3.2 Pixel grid and scaling (locked)
-- Tile size: **16×16**.
-- Internal base resolution (logical): **512×288** (16:9).
-- Rendering: scale up with nearest-neighbor; no filtering.
-- Camera: Camera2D must move on whole pixels (no shimmer).
-- Player physics/collision positions retain fractional values; never round the
-  body after movement. Pixel alignment is presentation-only: rendered 2D
-  transforms snap to logical pixels, and the unsmoothed follow camera uses a
-  whole-pixel target with area limits on physics ticks.
-
-### 3.3 Movement (locked)
-- Free analog movement.
-- Unobstructed full-input speed is 90 logical pixels/second. Cardinal and
-  diagonal movement have equal magnitude; input magnitude is preserved after
-  Godot's normal vector/deadzone processing.
-- Development keyboard controls use arrows or WASD. Normal startup keeps the
-  splash/title flow; `--skip-intro` is an explicit development shortcut to town.
-- Facing/animation: **8-direction** (N, NE, E, SE, S, SW, W, NW).
-  - All character and NPC sprites must include 8-direction variants.
-  - Diagonal movement uses diagonal sprites (not nearest-cardinal fallback).
-- Fae uses the normalized `characters/player/default` idle and four-frame walk
-  textures, retaining the last facing while idle. Costume preview fallback is
-  preserved when a costume lacks a directional frame.
-- Input debounce uses a single physics-tick clock for acceptance and remaining
-  time. The 150 ms cooldown is nine physics ticks at the locked 60 Hz rate.
-
-### 3.4 Encounters (locked)
-- Visible overworld enemies.
-- Colliding with or triggering an enemy starts a battle.
-
-### 3.5 Interaction system
-- Player has an InteractionArea (Area2D) for detecting nearby interactables.
-- Interactable objects (signs, NPCs) extend the `Interactable` base class.
-- Pressing the "interact" action triggers dialogue or other interaction.
-- DialogueManager autoload handles showing/hiding dialogue UI.
-- Player movement is disabled while dialogue is showing.
-- NPCDialogueTree: NPC class that cycles through multiple dialogue branches on each interaction.
-- Dialogue branching: DialogueManager supports `show_dialogue_with_choices(prompt, choices)`.
-  - choices: Array of {text, response, flag} - each option shown as a selectable button.
-  - Player navigates choices with up/down, confirms with interact/accept.
-  - Selected choice's flag (if set) is stored as a story flag.
-  - Selected choice's response is shown as follow-up dialogue.
-- BranchingDialogueNPC: NPC script with exported choice arrays for dialogue trees.
-
-### 3.6 Area transitions
-- SceneRouter autoload manages scene changes and player spawn placement.
-- Areas contain SpawnMarker nodes (string-based IDs like "from_forest", "default").
-- AreaTransition zones (Area2D) trigger scene changes when the player enters.
-- Transitions specify target area path and target spawn marker ID.
-- Player is repositioned to the spawn marker after area load.
-- Scene replacement is deferred so requests from scene `_ready` methods or
-  physics callbacks do not remove nodes while the tree is busy.
-- Transition recovery: SceneRouter tracks transition state and recovers if app is backgrounded mid-transition.
-  - Signals: `transition_interrupted(from_area, to_area)`, `transition_recovered(area_path)`.
-  - On app resume during transition, SceneRouter completes the pending transition.
-  - API: `is_transition_in_progress()`, `was_interrupted()`, `clear_interrupted_flag()`, `simulate_interrupt()`.
-  - Scenario actions: `simulate_interrupt`, `check_transition_state`, `clear_interrupted_flag`.
-  - Scenario: `interrupted_transition_smoke`.
-
-### 3.7 Battle entry
-- BattleManager autoload handles battle transitions and state.
-- OverworldEnemy (Area2D) detects player collision and calls `BattleManager.start_battle(enemy_data)`.
-- Enemy data includes `enemy_id` and `enemy_name` for battle setup.
-- On collision, the enemy is consumed (queue_free) and battle scene loads.
-- After battle ends, player returns to the overworld via SceneRouter.
-
-### 3.8 Touch controls (iOS)
-- TouchControlsManager autoload spawns touch UI on mobile platforms.
-- Virtual joystick (left side): circular touch area that injects movement input.
-- Interact button (right side): touch button that triggers the "interact" action.
-- Safe margins (20px sides, 10px top/bottom) ensure UI avoids iPhone notches/home indicator.
-- Controls are hidden during battles and menus.
-
-### 3.9 Save/Load system
-- SaveManager autoload handles save/load operations.
-- Multiple save slots: 3 slots (0, 1, 2) stored in `user://saves/save_slot_N.json`.
-- Save data includes: version, timestamp, current_area, player_position, inventory, story_flags.
-- InventoryManager autoload tracks tools and items, persisted via SaveManager.
-- Version field enables future save file migrations.
-- Slot preview: `get_slot_preview(slot)` returns area_name, timestamp_formatted, empty status.
-- SaveSlotUI (CanvasLayer): slot selection screen with preview info.
-  - Shows all 3 slots with area name and save time.
-  - Supports save, load, and delete operations.
-  - Tab key deletes selected slot, Cancel closes UI.
-- Corruption recovery:
-  - Backup saves created automatically before overwriting (`.backup` suffix).
-  - Required fields validation: version, timestamp, current_area, player_position.
-  - `is_save_corrupted(slot)`: Checks if save file is corrupted.
-  - `recover_from_backup(slot)`: Attempts to restore from backup.
-  - `has_backup(slot)`: Checks if backup exists.
-  - `save_corrupted` signal emitted on corruption detection (with recovery status).
-  - Automatic recovery attempt when loading corrupted save.
-- Scenario actions: `save_game`, `load_game`, `delete_save`, `check_save_slots`, `has_save`, `corrupt_save`, `check_save_corrupted`, `check_backup`, `recover_backup` (all support slot parameter).
-- Cloud sync hooks (stubs for future implementation):
-  - `cloud_upload(slot)`, `cloud_download(slot)`: Upload/download save data.
-  - `get_save_data_json(slot)`, `import_save_data_json(slot, json)`: Portable JSON serialization.
-  - Signals: `cloud_sync_started`, `cloud_sync_completed`, `cloud_conflict_detected`.
-- Save format documented in `docs/save-format.md`.
-
-### 3.10 Inventory and tools
-- InventoryManager autoload tracks:
-  - Tools: lantern, journal, lasso, flute (acquired once, not consumable).
-  - Items: consumables with quantity (potion, ether, etc.).
-  - Story flags: named progression markers (e.g., "talked_to_teacher").
-- Inventory limits:
-  - MAX_ITEM_STACKS: 20 (maximum unique item types).
-  - MAX_STACK_SIZE: 99 (maximum quantity per item type).
-  - `add_item()` returns false if inventory is full, shows notification.
-  - `inventory_full` signal emitted when capacity exceeded.
-  - Helper methods: `has_inventory_space()`, `can_add_item(id, count)`, `get_item_space(id)`.
-- Tool checks: `has_tool(id)`, `acquire_tool(id)`.
-- Item checks: `has_item(id, count)`, `add_item(id, count)`, `remove_item(id, count)`.
-- Story flags: `has_story_flag(flag)`, `set_story_flag(flag, value)`, `get_story_flag(flag)`.
-
-### 3.11 Gated interactions
-- ToolGatedInteractable: requires a specific tool to proceed (e.g., lantern for dark areas).
-- StoryGatedInteractable: requires a story flag (e.g., "talked_to_teacher" for library access).
-- ItemPickup: collectible that grants tools or items when interacted.
-- ToolGiverNPC: NPC that gives a tool to the player once (e.g., blacksmith gives wrench).
-  - Tracks tool_id and quest_id for quest objective completion.
-  - Shows different dialogue if player already has the tool.
-- BrokenFountain: Tool-gated interactable that requires a specific tool to fix.
-  - Auto-starts associated quest if player lacks the tool.
-  - Sets story flag and completes quest when repaired.
-- ForestGate: Story-gated transition that blocks forest access until `forest_unlocked` flag is set.
-  - Shows locked/unlocked dialogue based on story progression.
-  - Transitions to target area when unlocked.
-- EvidencePickup: Collectible evidence item for quest progression.
-  - Tracks collection via story flags (evidence_{id}_collected).
-  - Completes quest objectives when picked up.
-- ChaosQuestChainNPC: Multi-role NPC for quest chain progression.
-  - Roles: quest_giver, evidence_receiver, forest_unlocker.
-  - Handles multiple quests in sequence based on story flags.
-- All gated interactables show different dialogue depending on whether requirements are met.
-
-### 3.12 Main quest chain
-- chaos_investigation: Talk to townspeople about strange events (flags: chaos_investigation_done).
-- chaos_gather_evidence: Collect evidence items (glowing shard, torn cloak) and bring to Elder.
-- chaos_unlock_forest: Elder unlocks forest path after evidence gathered (grants lantern, sets forest_unlocked).
-- find_clubhouse: Classmate hints at secret clubhouse, navigate forest to discover it (flags: clubhouse_found).
-- villain_reveal: Player encounters the Chaos Lord in Dark Hollow, triggering confrontation cutscene (flags: villain_revealed).
-  - VillainEncounter script triggers cutscene on player collision.
-  - Chaos Lord sprite: game/assets/sprites/characters/villain/chaos_lord.png.
-  - Cutscene: villain taunts player and escapes deeper into forest.
-- rally_town: After villain reveal, player rallies townspeople for support (flags: ally_elder_rallied, ally_teacher_rallied, ally_blacksmith_rallied, party_formed).
-  - AllyNPC script handles rally dialogue and item gifts.
-  - Key allies: Elder (supplies), Teacher (knowledge), Blacksmith (equipment).
-- Villain backstory quests (optional, unlock post-villain_revealed):
-  - chaos_lord_origins: Search library for old town records. Discover Cedric, a child who went missing 50 years ago (flags: chaos_origins_discovered).
-    - Lore item: old_town_records.
-  - chaos_lord_betrayal: Find the old teacher's journal in school basement. Learn about the magical accident that consumed Cedric (flags: chaos_betrayal_learned).
-    - Lore item: teachers_journal.
-  - chaos_lord_redemption: Search Cedric's old home in Hidden Grove. Find proof the old Cedric still exists (flags: chaos_redemption_found).
-    - Lore items: cedric_toy, hope_pendant.
-    - Affects ending: unlocks redemption dialogue in final confrontation.
-  - Scenario: `villain_backstory_smoke`.
-
-### 3.13 Opening cutscene
-- GameIntroController (Main.tscn script) orchestrates game start sequence.
-- Sequence: SplashScreen → TitleScreen → IntroNarration → Pet Selection → Hero Bedroom (wake up).
-- SplashScreen: Studio logo and legal text with fade transitions.
-  - Displays "Clover Studios" logo and copyright/legal text.
-  - Auto-advances after 3 seconds or skip on tap/interact after 1 second.
-  - Scenario: `splash_render`.
-- TitleScreen: Game title with Start button, fade transitions.
-- IntroNarration: 6-line story text crawl with typewriter effect.
-  - Press interact/accept to skip typing or advance.
-  - Fades to black after final line.
-- Player spawns at "bed" marker in Area_HeroHouseUpper.tscn.
-
-### 3.13 Bulletin board and quest system
-- BulletinBoardInteractable: opens QuestUI when interacted.
-- QuestUI (CanvasLayer): displays available quests from the bulletin board.
-  - Quest list view: shows quest names, navigate with up/down, select to view details.
-  - Quest details view: shows name, description, reward, objectives. Accept/Decline buttons.
-  - Accepting a quest sets `quest_accepted_{quest_id}` story flag.
-  - Completed quests (matching completion_flag) are hidden from the board.
-  - Quests with required_flag only show if that flag is set.
-- Quest data stored in `game/data/quests/quests.json`:
-  - Fields: id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
-- GameData autoload loads quest data at startup via `get_quest(id)` and `get_available_quests()`.
-
-### 3.14 Quest manager
-- QuestManager autoload tracks active and completed quests.
-- `start_quest(quest_id)`: Starts a quest, initializes objective tracking, emits `quest_started`.
-- `complete_objective(quest_id, index)`: Marks an objective complete, auto-completes quest if all done.
-- `complete_quest(quest_id)`: Completes quest, sets completion_flag, grants rewards, emits `quest_completed`.
-- `is_quest_active(quest_id)`, `is_quest_completed(quest_id)`: Query quest state.
-- `get_active_quests()`: Returns array of active quest data with objective status.
-- `get_save_data()`, `load_save_data(data)`: Persistence support.
-- QuestLogUI (CanvasLayer): Player menu to view active and completed quests.
-  - Tabs: Active/Completed toggle.
-  - Quest list with selection, details panel showing objectives and rewards.
-  - Objectives show checkboxes ([x] complete, [ ] incomplete).
-
-### 3.15 Day/Night cycle
-- DayNightManager autoload tracks time of day.
-- 4 time phases: Morning (0), Afternoon (1), Evening (2), Night (3).
-- CanvasModulate overlay applies color tinting per phase:
-  - Morning: warm sunrise (1.0, 0.95, 0.9)
-  - Afternoon: neutral daylight (1.0, 1.0, 1.0)
-  - Evening: orange sunset (1.0, 0.85, 0.7)
-  - Night: cool blue (0.6, 0.65, 0.85)
-- Smooth tween transitions between phases (1 second default).
-- Time advances automatically on area transitions.
-- Scenario action `set_time_phase`: instantly set time for testing.
-
-### 3.16 Weather system
-- WeatherManager autoload manages weather state and effects.
-- 3 weather types: Clear (0), Rain (1), Storm (2).
-- Rain: CPUParticles2D system with angled raindrops.
-- Storm: Heavy rain + periodic thunder flashes via ColorRect overlay.
-- Thunder flash: white overlay tween (quick bright pulse).
-- Scenario actions: `set_weather`, `trigger_thunder`.
-
-### 3.17 Lamp props
-- Lamp script (Sprite2D) that toggles between on/off textures.
-- Lamps connect to DayNightManager.time_changed signal.
-- Lamps turn on at evening and night (phases 2 and 3).
-- lamp_on.png and lamp_off.png sprite variants in props/lamp/.
-
-### 3.18 NPC schedule system
-- ScheduledNPC script (CharacterBody2D) manages time-based NPC visibility.
-- NPCs appear/disappear based on current time phase, day of week, and area.
-- DayNightManager tracks both time phase and day of week:
-  - Days: Monday(0) through Sunday(6).
-  - Weekend detection: Saturday(5) and Sunday(6) are weekend days.
-  - Signals: `time_changed(phase, phase_name)`, `day_changed(day, day_name, is_weekend)`.
-  - API: `is_weekend()`, `is_weekday()`, `set_day(day)`, `advance_day()`, `get_day_name()`.
-- Schedule data stored in `game/data/npcs/schedules.json`:
-  - Each entry keyed by npc_id contains: npc_id, npc_name, weekday_locations, weekend_locations, weekend_dialogue, default_area, default_position.
-  - Location entries specify: area (scene path), position [x, y], marker (spawn marker id).
-  - Weekend dialogue: optional array of strings for weekend-specific NPC responses.
-  - Backwards compatible: falls back to `locations` if weekday/weekend keys absent.
-- GameData autoload loads schedules via `get_npc_schedules()` and `get_npc_schedule(npc_id)`.
-- ScheduledNPC connects to DayNightManager.time_changed and day_changed signals.
-- On time/day change, NPC uses weekend_locations if is_weekend, else weekday_locations.
-- ScheduledNPC API: `get_weekend_dialogue()`, `has_weekend_dialogue()`.
-- Scenario actions: `set_day`, `check_day`, `check_weekend`.
-
-### 3.19 Relationship/affinity system
-- AffinityManager autoload tracks NPC friendship levels.
-- Affinity score: 0-100 per NPC, higher is better.
-- Affinity levels (thresholds): Stranger(0), Acquaintance(20), Friend(40), Good Friend(60), Best Friend(80), Soulmate(100).
-- Affinity data stored in `game/data/npcs/affinity.json`:
-  - npcs: array of {npc_id, npc_name, starting_affinity}.
-  - affinity_events: standard modifiers (gift_liked: +10, gift_disliked: -5, etc.).
-- API: `get_affinity(npc_id)`, `set_affinity(npc_id, value)`, `change_affinity(npc_id, amount)`.
-- `get_npc_level(npc_id)`: returns current relationship level name.
-- Signals: `affinity_changed(npc_id, old_value, new_value)`, `affinity_level_up(npc_id, old_level, new_level)`.
-- Dialogue choices can modify affinity via `affinity_change` field in choice data.
-- AffinityUI (CanvasLayer): displays NPC list with relationship bars and levels.
-- Scenario actions: `set_affinity`, `change_affinity`, `check_affinity`.
-
-### 3.20 Pause menu
-- PauseManager autoload handles game pause state.
-- Input: "pause" action (Escape key, P key) toggles pause.
-- Pausing sets `get_tree().paused = true` and shows PauseMenuUI.
-- PauseMenuUI (CanvasLayer): modal overlay with Resume, Items, Save, Quit options.
-  - Resume: unpauses game and closes menu.
-  - Items: placeholder for inventory UI (M92).
-  - Save: triggers SaveManager.save_game() with confirmation.
-  - Quit: unpauses and returns to Main.tscn (title screen).
-- Navigation: up/down to select, accept/interact to confirm, cancel/pause to resume.
-- Scenario actions: `pause_game`, `unpause_game`, `toggle_pause`, `check_pause`.
-
-### 3.21 Inventory UI
-- InventoryUI (CanvasLayer): grid-based item management screen.
-- Opens from pause menu Items option.
-- Displays owned items from InventoryManager with count.
-- Details panel shows: item name, description, type/effect.
-- Actions: Use (consumables only), Discard, Cancel.
-- Navigation: arrow keys for grid, accept to open actions, cancel to close.
-- Scenario actions: `add_inventory_item`, `remove_inventory_item`, `check_inventory`, `open_inventory`, `close_inventory`.
-
-### 3.22 Party status UI
-- PartyStatusUI (CanvasLayer): party member stats screen.
-- Opens from pause menu Party option.
-- Member list on left side, details panel on right.
-- HP/MP progress bars showing current/max values.
-- Stats display: ATK, DEF, SPD (including equipment bonuses).
-- Equipment slots: weapon, armor, accessory.
-- Navigation: up/down to select member, cancel to close.
-- Scenario actions: `open_party_status`, `close_party_status`, `check_party_member`.
-
-### 3.23 Quest log UI
-- QuestLogUI (CanvasLayer): quest tracking interface.
-- Opens from pause menu Quests option (future) or via scenario action.
-- Tabs: Active and Completed quests.
-- Active tab shows quests from QuestManager.get_active_quests() with objective status.
-- Completed tab shows quests from QuestManager.get_completed_quest_ids().
-- Quest list on left, details panel on right.
-- Details panel: quest name, description, objectives with checkboxes, rewards.
-- Navigation: up/down to select quest, left/right to switch tabs, cancel to close.
-- Scenario actions: `open_quest_log`, `close_quest_log`.
-
-### 3.24 Map screen UI
-- MapScreenUI (CanvasLayer): town map display.
-- Opens from pause menu Map option (future) or via scenario action.
-- Cloverhollow map image with building representations.
-- Current location marker (red) positioned based on current area.
-- Building labels showing location names.
-- Location text showing current area name.
-- Navigation: cancel/pause to close.
-- Scenario actions: `open_map`, `close_map`.
-
-### 3.25 Settings UI
-- SettingsManager autoload handles settings persistence.
-- Settings stored in `user://settings.json`.
-- SettingsUI (CanvasLayer): game options menu.
-- Opens from pause menu Settings option (future) or via scenario action.
-- Music volume slider (0-100%).
-- SFX volume slider (0-100%).
-- Touch control size option (Small/Medium/Large).
-- Text size option (Small/Medium/Large) for accessibility.
-- Credits button (shows game credits dialogue).
-- Back button closes settings and saves.
-- Navigation: cancel/pause to close.
-- Scenario actions: `open_settings`, `close_settings`, `set_music_volume`, `set_sfx_volume`.
-
-### 3.26 Music system
-- MusicManager autoload handles background music playback.
-- Area-based music: AREA_MUSIC dictionary maps area names to track IDs.
-- MUSIC_PATHS dictionary maps track IDs to `.ogg` file paths under `game/assets/audio/music/`.
-- `play_music(track_id)`: Plays a specific track with optional crossfade.
-- `play_area_music(area_name)`: Plays music appropriate for the given area.
-- `play_battle_music()`: Plays battle theme, stores previous track for resume.
-- `play_victory_music()`: Plays victory fanfare.
-- `stop_music()`: Stops current music.
-- `resume_previous_music()`: Resumes track playing before battle.
-- BattleManager triggers battle music on `start_battle()` and victory/resume on `end_battle()`.
-- Crossfade support: smooth transitions between tracks (1 second default).
-- Placeholder paths: actual `.ogg` files to be added in future milestone.
-- Scenario actions: `play_music`, `play_area_music`, `play_battle_music`, `stop_music`, `check_music`.
-
-### 3.27 Sound effects system
-- SFXManager autoload handles sound effect playback.
-- SFX_PATHS dictionary maps SFX IDs to `.wav` file paths under `game/assets/audio/sfx/`.
-- Audio player pool (8 players) allows simultaneous SFX playback.
-- SFX categories: menu (move, select, cancel), battle (hit, miss, defend, victory), interaction (dialogue, pickup).
-- `play(sfx_id)`: Plays a specific sound effect.
-- Convenience methods: `play_menu_move()`, `play_menu_select()`, `play_attack_hit()`, etc.
-- `get_last_sfx()`: Returns the last played SFX ID for testing.
-- `stop_all()`: Stops all playing sound effects.
-- UI integration: PauseMenuUI plays SFX on navigation and selection.
-- Battle integration: BattleScene plays SFX on attacks, defends, victory, defeat.
-- Dialogue integration: DialogueManager plays SFX on open/close.
-- Inventory integration: InventoryManager plays SFX on tool/item acquisition.
-- Placeholder paths: actual `.wav` files to be added in future milestone.
-- Scenario actions: `play_sfx`, `check_sfx`, `stop_sfx`.
-
-### 3.28 Notification system
-- NotificationManager autoload handles toast/popup notifications.
-- Notification types: INFO, QUEST, ITEM, LEVEL_UP, ACHIEVEMENT.
-- Queue system: notifications queue and display sequentially with auto-hide after duration.
-- `show_notification(title, message, type)`: Generic notification.
-- `show_quest_received(quest_name)`: Quest started notification.
-- `show_quest_completed(quest_name)`: Quest complete notification.
-- `show_item_obtained(item_name, count)`: Item pickup notification.
-- `show_tool_acquired(tool_name)`: Tool acquisition notification.
-- `show_level_up(character_name, new_level)`: Level up notification.
-- QuestManager triggers quest notifications on start/complete.
-- InventoryManager triggers item/tool notifications on acquisition.
-- NotificationUI (CanvasLayer): animated popup display with slide-in/fade effects.
-- Scenario actions: `show_notification`, `show_quest_notification`, `show_item_notification`, `show_level_up_notification`, `check_notification`, `clear_notifications`.
-
-### 3.29 Text size accessibility
-- SettingsManager handles text_size setting (0=small, 1=medium, 2=large).
-- TEXT_SIZE_SCALES: [0.8, 1.0, 1.3] multipliers for font sizes.
-- TEXT_SIZE_NAMES: ["Small", "Medium", "Large"] for display.
-- Signal: text_size_changed(new_size: int) emitted on change.
-- SettingsUI provides left/right cycling for text size option.
-- DialogueUI listens to text_size_changed and applies scale to dialogue labels.
-- Font scaling: base font size multiplied by scale factor.
-- Settings persisted to user://settings.json with other settings.
-- Scenario actions: `set_text_size`, `check_text_size`.
-
-### 3.30 Tutorial hints system
-- TutorialHintsManager autoload handles contextual help popups.
-- Hint definitions: id, title, message, priority for each mechanic.
-- Built-in hints: movement, interact, dialogue, battle_start, battle_attack, battle_defend, quest_board, inventory, save_game.
-- Hints show once per game (first-time mechanics), then persist as dismissed.
-- Hint queue: if a hint is showing, additional hints queue and display sequentially.
-- Dismissed hints stored in `user://tutorial_hints.json`.
-- TutorialHintUI (CanvasLayer): animated popup with title, message, dismiss instruction.
-- Hints can be enabled/disabled globally via `hints_enabled`.
-- API: `show_hint(hint_id)`, `dismiss_current_hint()`, `has_seen_hint(hint_id)`, `reset_hint(hint_id)`, `reset_all_hints()`, `set_hints_enabled(enabled)`.
-- Signals: `hint_shown(hint_id)`, `hint_dismissed(hint_id)`.
-- Save/load integration via `get_save_data()`, `load_save_data(data)`.
-- Scenario actions: `show_hint`, `dismiss_hint`, `check_hint`, `reset_hint`, `reset_all_hints`, `set_hints_enabled`.
-
-### 3.31 Performance optimization
-- VisibilityCuller script disables processing for off-screen entities.
-- Uses VisibleOnScreenNotifier2D to detect screen visibility.
-- Configurable: cull_physics_process, cull_process for process callback control.
-- AnimationPlayer pausing: pauses animations when off-screen for CPU savings.
-- VisibilityCuller.tscn prefab available for easy scene integration.
-- Scenario actions: `check_fps`, `spawn_stress_entities`, `stress_loop` for performance testing.
-- Player physics retains fractional precision; rendering handles pixel alignment
-  independently so rounding does not bias movement direction or speed.
-- Godot 4 built-in culling: 2D sprites auto-culled when outside camera viewport.
-
-### 3.32 Cutscene system
-- CutsceneManager autoload handles playing scripted story sequences.
-- Cutscene data stored in `game/data/cutscenes/cutscenes.json`.
-- Cutscene data format:
-  - Each cutscene has: id, name, steps[], background_color, music.
-  - Step types: text (speaker, text, duration), wait (duration), shake (intensity, duration), flash (color, duration).
-- CutsceneUI (CanvasLayer): visual overlay for cutscene playback.
-  - Text panel with speaker name and dialogue text.
-  - Typewriter effect for text display.
-  - Skip hint shows when skipping is allowed.
-  - Flash and shake visual effects.
-- Skip support: Press cancel action to skip cutscene if can_skip is true.
-- Advance support: Press interact/accept to speed up typewriter or advance step.
-- Game pauses during cutscene playback (process_mode = PROCESS_MODE_ALWAYS on CutsceneUI).
-- Signals: `cutscene_started(cutscene_id)`, `cutscene_step_completed(step_index)`, `cutscene_finished(cutscene_id)`, `cutscene_skipped(cutscene_id)`.
-- Scenario actions: `play_cutscene`, `skip_cutscene`, `check_cutscene`, `wait_cutscene_end`.
-
-### 3.33 Photo mode
-- PhotoModeManager autoload handles screenshot capture feature.
-- Photos saved to `user://photos/` as PNG files with timestamp naming.
-- PhotoModeUI (CanvasLayer): controls overlay for photo mode.
-  - Take Photo button: captures screenshot.
-  - Hide UI button: toggles visibility of all game UI.
-  - Exit button: exits photo mode.
-- Game pauses during photo mode (process_mode = PROCESS_MODE_ALWAYS on PhotoModeUI).
-- Flash effect on photo capture.
-- Photo count display shows total saved photos.
-- Hide UI recursively hides all CanvasLayers with layer >= 10 (preserves game layers).
-- Signals: `photo_mode_entered`, `photo_mode_exited`, `photo_taken(path)`, `ui_hidden`, `ui_shown`.
-- Scenario actions: `enter_photo_mode`, `exit_photo_mode`, `take_photo`, `hide_photo_ui`, `show_photo_ui`, `check_photo_mode`.
-
-### 3.34 Achievement system
-- AchievementManager autoload handles achievement tracking and unlocking.
-- Achievement data stored in `game/data/achievements/achievements.json`.
-- Achievement data format:
-  - Each achievement has: id, name, description, icon, hidden, trigger, trigger_value, points.
-  - Trigger types: game_started, areas_visited, npcs_talked, battles_won, quests_started, quests_completed, tools_acquired, photos_taken, secret_found, story_flag.
-- Progress tracking via `record_progress(trigger_type, amount)` - auto-unlocks when threshold reached.
-- Persistence: unlocked achievements and progress stored in `user://achievements.json`.
-- AchievementPopupUI (CanvasLayer): animated notification popup on unlock.
-  - Shows icon, name, description, and points earned.
-  - Queue system for multiple unlocks.
-- Signals: `achievement_unlocked(id, data)`, `achievement_progress(id, current, target)`.
-- Scenario actions: `unlock_achievement`, `record_progress`, `check_achievement`, `reset_achievements`.
-
-### 3.35 Localization system
-- LocalizationManager autoload handles language switching.
-- Supported locales: en (English), es (Español), fr (Français).
-- Translations stored in `game/data/localization/translations.csv`.
-- CSV format: keys column + one column per locale.
-- TranslationServer.set_locale() for runtime switching.
-- SettingsUI language option with left/right cycling.
-- SettingsManager persists locale preference.
-- Signals: `language_changed(locale)`, `locale_changed(locale)`.
-- Scenario actions: `set_locale`, `check_locale`, `check_translation`.
-- Note: CSV requires Godot Editor import to generate .translation files.
-
-### 3.36 Analytics system (stub)
-- AnalyticsManager autoload handles event tracking.
-- Session management: start_session(), end_session(), get_session_duration().
-- Event buffer: stores up to 100 events locally.
-- Standard events: track_area_enter(), track_battle_start/end(), track_quest_start/complete(), track_item_acquired(), track_tool_acquired(), track_npc_interact(), track_save/load_game(), track_achievement(), track_level_up(), track_cutscene_start/skip().
-- Custom events: track_event(name, properties).
-- Stub methods for backend integration: flush_to_backend(), set_user_id(), set_user_property().
-- Signals: event_logged, session_started, session_ended.
-- Scenario actions: `track_event`, `check_analytics`, `clear_analytics`.
-- Note: No data is sent externally - stub for future backend integration.
-
-### 3.37 Crash reporting (stub)
-- CrashReportManager autoload handles error logging.
-- Error buffer: stores up to 50 errors locally.
-- Log file: `user://crash_reports/error_log.txt` with rotation.
-- Error logging: log_error(message, type), log_warning(message), log_exception(message).
-- Session tracking: logs session start/end with platform and version info.
-- Stub methods for backend: upload_crash_report(), upload_all_reports().
-- Signals: error_logged, crash_report_uploaded.
-- Scenario actions: `log_error`, `check_crash_reports`, `clear_crash_reports`.
-- Note: No data is sent externally - stub for future backend integration.
-
-### 3.38 Debug console
-- DebugConsole autoload provides developer console for debugging.
-- Toggle: Press backtick (`) or "debug_console" action.
-- Commands: help, spawn, teleport, heal, give_tool, give_item, set_flag, set_time, set_weather, fps, reload_data.
-- Console UI: top panel with input field and output label.
-- Signal: `command_executed(command, args, result)` for tracking.
-- Scenario actions: `toggle_debug_console`, `show_debug_console`, `hide_debug_console`, `debug_command`, `check_debug_console`.
-- Cheat commands (disabled in release builds):
-  - `godmode`: Toggle invincibility for player.
-  - `goto <area_name>`: Warp to any area (e.g., town_center, forest_path).
-  - `cheats`: Show cheat status.
-
-### 3.39 Fishing minigame
-- FishingSpot (Area2D): Interactable fishing locations in the world.
-- Requires `fishing_rod` tool to fish.
-- FishingMinigame (CanvasLayer): Timing-based cast/catch mechanic.
-  - Cast phase: Power bar oscillates; press to set cast power.
-  - Wait phase: Wait for fish to bite (random delay based on cast power).
-  - Catch phase: Indicator moves across bar; press when in target zone to catch.
-  - Harder fish = smaller target zone, faster indicator.
-- Fishing data stored in `game/data/fishing/fishing.json`:
-  - fish[]: id, name, description, rarity, locations[], difficulty, value.
-  - fishing_spots[]: id, name, area, fish_pool[].
-  - rarity_weights: common(60), uncommon(25), rare(12), legendary(3).
-- Fish rarities: common, uncommon, rare, legendary.
-- 8 fish types: common_carp, spotted_trout, silver_minnow, rainbow_bass, golden_koi, bubble_fish, forest_catfish, crystal_perch.
-- 4 fishing spots: town_park_pond, bubblegum_shore, forest_stream, grove_pool.
-- Fish items added to inventory on successful catch.
-- Scenario: `fishing_minigame_smoke`.
-
-### 3.40 Bug catching minigame
-- BugSpawner (Area2D): Spawns bugs in grass areas for catching.
-- Requires `bug_net` tool to catch bugs.
-- BugCatchingMinigame (CanvasLayer): Chase-and-catch mechanic.
-  - Searching phase: Bug moves around screen, bouncing off walls.
-  - Chasing phase: Player tracks bug movement.
-  - Catch phase: Press action when bug is in catch zone.
-  - Harder bugs = faster movement, smaller catch window.
-- Bug data stored in `game/data/bugs/bugs.json`:
-  - bugs[]: id, name, rarity, locations[], speed, value, time_of_day[].
-  - spawn_areas[]: id, area, bug_pool[].
-  - rarity_weights: common(55), uncommon(28), rare(14), legendary(3).
-- Bug rarities: common, uncommon, rare, legendary.
-- 8 bug types: common_butterfly, ladybug, grasshopper, firefly, dragonfly, stag_beetle, rainbow_moth, crystal_beetle.
-- 3 spawn areas: town_park_grass, bubblegum_shore, forest_stream.
-- Time-of-day spawning: some bugs only appear at certain times (firefly at night, etc.).
-- Bug items added to inventory on successful catch.
-- BugCollectionLog (CanvasLayer): UI showing caught bugs and collection percentage.
-- Scenario: `bug_catching_smoke`.
-
-### 3.41 Collection log system
-- CollectionLogManager autoload tracks collectibles across categories.
-- Collection data stored in `game/data/collections/collections.json`:
-  - categories[]: id, name, description, data_source, data_key.
-  - milestones[]: percent thresholds (25, 50, 75, 100) with reward_gold and reward_items[].
-- Categories: fish (from fishing.json), bugs (from bugs.json).
-- API: `record_collection(category, item_id, count)`, `get_collected_count(category)`, `get_total_count(category)`.
-- `get_completion_percent(category)`: Returns percentage of unique items collected.
-- `get_overall_completion_percent()`: Returns overall completion across all categories.
-- `is_item_collected(category, item_id)`: Checks if specific item was collected.
-- Milestones: claimable rewards at 25%, 50%, 75%, 100% completion.
-- `claim_milestone(category, percent)`: Claims reward, returns reward dict or empty if already claimed.
-- `get_claimable_milestones(category)`: Returns array of reached but unclaimed milestone percents.
-- Signals: `collection_updated(category)`, `milestone_reached(category, percent, reward_gold)`.
-- CollectionLogUI (CanvasLayer): displays categories, items, progress, and milestone rewards.
-  - Category tabs for switching views.
-  - Items show as ??? until collected, then display name and count.
-  - Progress bars for category and overall completion.
-  - Claim button for reached milestones.
-- Persistence: progress saved to `user://collection_log.json`.
-- Scenario actions: `record_collection`, `check_collection`, `check_overall_collection`, `claim_milestone`, `reset_collection`.
-- Scenario: `collection_log_smoke`.
-
-### 3.42 Seasonal events system (stub)
-- SeasonalEventManager autoload handles date-based seasonal events.
-- Event data stored in `game/data/events/seasonal_events.json`.
-- Event data format:
-  - Each event has: id, name, description, start_month, start_day, end_month, end_day.
-  - Optional fields: special_npcs[], special_items[], special_quests[], decorations[], music_override.
-- 4 placeholder events: spring_festival, summer_splash, harvest_moon, winter_wonder.
-- Date-based activation: events automatically activate when current date falls within range.
-- Year-wrap handling: events spanning Dec-Jan (e.g., winter_wonder Dec 15 - Jan 5) work correctly.
-- Override for testing: `set_override_date(month, day)` forces a specific date.
-- API: `get_active_events()`, `is_event_active(event_id)`, `get_event_data(event_id)`.
-- Signals: `event_started(event_id, event_data)`, `event_ended(event_id)`, `active_events_changed(active_events)`.
-- Scenario actions: `set_event_date`, `clear_event_date`, `check_active_events`, `check_event_active`.
-- Scenario: `seasonal_event_stub`.
-
-### 3.43 Daily challenges system (stub)
-- DailyChallengeManager autoload handles daily rotating challenges.
-- Challenge data stored in `game/data/challenges/daily_challenges.json`.
-- Challenge data format:
-  - Each challenge has: id, name, description, type, target_count, reward_gold, reward_items[].
-  - Types: fishing, bug_catching, battle, social, exploration, quest, fishing_rare.
-- 7 placeholder challenges with various types and rewards.
-- Daily rotation: 3 challenges randomly selected each day.
-- Progress tracking: `record_progress(type, amount)` increments matching active challenges.
-- Auto-completion: challenge completes when progress >= target_count.
-- Override for testing: `set_override_day(day)`, `force_refresh()`.
-- API: `get_active_challenges()`, `is_challenge_completed(id)`, `get_challenge_progress(id)`.
-- Signals: `challenge_updated(id, current, target)`, `challenge_completed(id, reward_gold)`, `daily_challenges_refreshed(challenges)`.
-- Scenario actions: `set_challenge_day`, `clear_challenge_day`, `check_active_challenges`, `record_challenge_progress`, `check_challenge_completed`, `force_refresh_challenges`.
-- Scenario: `daily_challenge_stub`.
-
-### 3.44 Trading system (stub)
-- TradingManager autoload handles item trading (placeholder for future multiplayer).
-- Trade states: NONE, PENDING, OFFER_PHASE, CONFIRM_PHASE, COMPLETED, CANCELLED.
-- Trade flow:
-  - `start_trade()`: Begins new trade session.
-  - `add_to_offer(item_id, count)`: Adds item to my offer.
-  - `remove_from_offer(item_id, count)`: Removes item from offer.
-  - `set_their_offer(items)`: Stub to simulate other player's offer.
-  - `confirm_trade()`: Confirms my side of trade.
-  - `simulate_their_confirm()`: Stub to simulate other player confirming.
-  - `cancel_trade()`: Cancels current trade.
-- Signals: `trade_started`, `trade_cancelled`, `trade_completed(my_items, their_items)`, `offer_updated(player_id, items)`, `trade_confirmed(player_id)`.
-- TradingUI (CanvasLayer): trade interface showing both offers with add/confirm/cancel buttons.
-- Scenario actions: `start_trade`, `add_to_trade`, `set_their_offer`, `confirm_trade`, `simulate_their_confirm`, `cancel_trade`, `check_trade_state`.
-- Scenario: `trading_stub`.
-- Note: This is a stub - no actual item transfer or networking. Prepared for future multiplayer feature.
-
-### 3.45 Photo sticker system
-- StickerManager autoload manages sticker unlocks and data.
-- Sticker data stored in `game/data/stickers/stickers.json`.
-- Sticker data format:
-  - Each sticker has: id, name, description, category, sprite_path, unlocked_by_default (or unlock_condition).
-  - Categories: basic, nature, special, effects, pets.
-  - Unlock conditions: collection (count), photos_taken (count), quest_completed (quest_id), story_flag (flag), area_visited (area).
-- 12 stickers: 6 default unlocked (heart, star, smile, flower, sparkle, speech_bubble), 6 conditional.
-- PhotoStickerUI (CanvasLayer): sticker decoration overlay accessed from photo mode.
-  - Category tabs for filtering stickers.
-  - Sticker grid showing unlocked stickers.
-  - Drag-and-drop sticker placement on canvas.
-  - Save/Clear/Done/Cancel controls.
-- Photo mode integration: Stickers button in PhotoModeUI opens PhotoStickerUI.
-- Decorated photos saved with stickers composited.
-- API: `is_sticker_unlocked(id)`, `unlock_sticker(id)`, `get_unlocked_stickers()`, `get_stickers_by_category(category)`.
-- `check_unlock_conditions()`: Auto-unlocks stickers when conditions are met.
-- Signals: `sticker_unlocked(sticker_id, sticker_data)`, `stickers_loaded`.
-- Persistence: unlocked stickers saved to `user://stickers.json`.
-- Scenario actions: `unlock_sticker`, `check_sticker_unlocked`, `check_stickers`, `reset_stickers`, `check_sticker_conditions`.
-- Scenario: `photo_sticker_smoke`.
-
-### 3.46 Home customization system (stub)
-- HomeCustomizationManager autoload manages furniture placement and room state.
-- Furniture data stored in `game/data/furniture/furniture.json`.
-- Furniture data format:
-  - Each furniture has: id, name, description, category, size (width/height in grid cells), sprite_path, price, unlocked_by_default (or unlock_condition).
-  - Categories: bed, desk, storage, seating, decor, floor, wall.
-  - Size in grid cells for placement validation.
-- 10 furniture items: 2 default unlocked (cozy_bed, wooden_desk), 8 purchasable/unlockable.
-- FurniturePlacementUI (CanvasLayer): grid-based placement interface.
-  - Category tabs for filtering furniture.
-  - Furniture grid showing owned items.
-  - Grid display for room layout (8x6 default).
-  - Click to place selected furniture.
-  - Clear Room/Done controls.
-- Room grid system: furniture occupies grid cells based on size.
-- Placement validation: bounds checking, grid size limits.
-- Persistence: room state saved to `user://home_customization.json`.
-- API: `is_furniture_unlocked(id)`, `unlock_furniture(id)`, `place_furniture(room_id, furniture_id, position)`, `get_room_placements(room_id)`, `clear_room(room_id)`.
-- Signals: `furniture_placed(room_id, furniture_id, position)`, `furniture_removed(room_id, furniture_id)`, `furniture_unlocked(furniture_id)`, `room_state_changed(room_id)`.
-- Scenario actions: `unlock_furniture`, `place_furniture`, `check_furniture`, `check_room_placements`, `clear_room`, `reset_home_customization`.
-- Scenario: `home_customize_stub`.
-- Note: This is a stub - no visual room rendering or shopping. Prepared for future furniture shop feature.
-
-### 3.47 Costume/outfit system
-- CostumeManager autoload manages outfit unlocks and equipped costume state.
-- Outfit data stored in `game/data/outfits/outfits.json`.
-- Outfit data format:
-  - Each outfit has: id, name, description, category, sprite_path, unlocked_by_default (or unlock_condition).
-  - Categories: school, casual, adventure, formal, special, hobby.
-  - Unlock conditions: quest_completed, story_flag, collection (count), photos_taken, affinity_level.
-- 10 outfits: 3 default unlocked (default, casual, pajamas), 7 conditional.
-- OutfitSelectionUI (CanvasLayer): grid-based outfit selection interface.
-  - Category tabs for filtering outfits.
-  - Outfit grid showing unlocked items.
-  - Preview panel with name and description.
-  - Equip/Close buttons.
-  - Currently equipped outfit highlighted with checkmark.
-- Sprite swapping: Player.gd connects to CostumeManager.outfit_equipped signal.
-  - _sprite_base_path updated on outfit change.
-  - _update_sprite() loads appropriate sprite from costume path.
-- Persistence: unlocked outfits and equipped state saved to `user://costumes.json`.
-- API: `get_all_outfits()`, `get_outfit(id)`, `get_outfits_by_category(category)`, `is_outfit_unlocked(id)`, `unlock_outfit(id)`, `equip_outfit(id)`, `get_equipped_outfit()`, `get_equipped_sprite_path()`, `check_unlock_conditions()`, `reset_unlocks()`.
-- Signals: `outfit_unlocked(outfit_id, outfit_data)`, `outfit_equipped(outfit_id)`, `outfits_loaded`.
-- Scenario actions: `unlock_outfit`, `equip_outfit`, `check_outfit_unlocked`, `check_equipped_outfit`, `check_outfits`, `reset_outfits`, `check_outfit_conditions`.
-- Scenario: `costume_smoke`.
-
-### 3.48 Pet accessories system
-- PetAccessoryManager autoload manages pet accessory unlocks and equipped state.
-- Accessory data stored in `game/data/accessories/pet_accessories.json`.
-- Accessory data format:
-  - Each accessory has: id, name, description, category, slot, sprite_path, unlocked_by_default (or unlock_condition).
-  - Categories: collar, hat, face, back.
-  - Slots: neck, head, face, back (one accessory per slot).
-  - Unlock conditions: quest_completed, story_flag, collection (count), affinity_level.
-- 8 accessories: 2 default unlocked (red_collar, blue_bandana), 6 conditional.
-- PetAccessoryUI (CanvasLayer): slot-based accessory selection interface.
-  - Slot tabs for filtering accessories by equipment slot.
-  - Accessory grid showing unlocked items.
-  - Details panel with name and description.
-  - Equip/Unequip/Close buttons.
-  - Currently equipped accessory highlighted with checkmark.
-- Pet sprite overlay: PetCompanion.gd maintains overlay sprites for each slot.
-  - Connects to PetAccessoryManager.accessory_equipped/unequipped signals.
-  - _update_accessory_overlay() loads sprite from accessory data.
-- Persistence: unlocked accessories and equipped state saved to `user://pet_accessories.json`.
-- API: `get_all_accessories()`, `get_accessory(id)`, `get_accessories_by_slot(slot)`, `is_accessory_unlocked(id)`, `unlock_accessory(id)`, `equip_accessory(id)`, `unequip_slot(slot)`, `get_equipped_accessory(slot)`, `get_equipped_accessories()`, `reset_unlocks()`.
-- Signals: `accessory_unlocked(accessory_id, accessory_data)`, `accessory_equipped(slot, accessory_id)`, `accessory_unequipped(slot)`, `accessories_loaded`.
-- Scenario actions: `unlock_pet_accessory`, `equip_pet_accessory`, `unequip_pet_accessory`, `check_pet_accessory_unlocked`, `check_equipped_pet_accessories`, `check_pet_accessories`, `reset_pet_accessories`.
-- Scenario: `pet_accessory_smoke`.
-
-### 3.49 Memory management
-- MemoryManager autoload monitors memory usage and handles low memory situations.
-- Memory pressure levels: NORMAL, WARNING (256MB), CRITICAL (384MB).
-- Periodic monitoring: checks memory every 5 seconds via Timer.
-- Freeable cache system: systems can register cleanup callables via `register_freeable_cache(callable)`.
-- On CRITICAL pressure: automatically calls `free_non_essential_resources()` to clear registered caches.
-- API: `get_memory_usage_mb()`, `get_pressure_name()`, `simulate_memory_pressure(level)`, `reset_pressure()`.
-- Signals: `memory_warning_received`, `memory_freed(amount)`.
-- Scenario actions: `simulate_memory_pressure`, `check_memory`, `reset_memory_pressure`.
-- Scenario: `low_memory_smoke`.
-
-### 3.50 Feedback collection system
-- FeedbackManager autoload handles in-app feedback collection and storage.
-- Feedback data stored locally in `user://feedback_queue.json`.
-- Max queue size: 50 items (oldest removed when exceeded).
-- Feedback fields: message, category, email (optional), timestamp, version, submitted flag.
-- Categories: General, Bug, Suggestion, Other.
-- API: `submit_feedback(message, category, email)`, `get_pending_count()`, `get_all_feedback()`, `clear_all_feedback()`.
-- Stub: `upload_feedback()` for future backend integration.
-- Signals: `feedback_submitted(feedback)`, `feedback_ui_opened`, `feedback_ui_closed`.
-- FeedbackUI (CanvasLayer): modal form with category selector, message input, optional email, submit/cancel buttons.
-- Accessed via Feedback option in pause menu.
-- Scenario actions: `submit_feedback`, `check_feedback`, `clear_feedback`.
-
-### 3.51 Update notification system (stub)
-- UpdateNotificationManager autoload handles app update checks.
-- Version comparison: compares semantic version strings (major.minor.patch).
-- State stored in `user://update_check.json` with last check timestamp.
-- API: `check_for_update()`, `is_update_available()`, `get_time_since_check()`, `should_auto_check()`.
-- `simulate_update_available(version)`: For testing, simulates an available update.
-- `open_store()`: Opens App Store URL (stub).
-- Signals: `update_available(current, latest)`, `update_check_completed(needed)`, `update_check_failed(error)`.
-- UpdatePromptUI (CanvasLayer): modal popup with Update/Later buttons and version info.
-- Stub: No actual backend - for future integration.
-
-### 3.52 Patch notes display
-- PatchNotesManager autoload tracks version-based "What's New" display.
-- State stored in `user://patch_notes_state.json` with last seen version.
-- Patch notes content stored in manager's `patch_notes` Dictionary (keyed by version).
-- API: `should_show_patch_notes()`, `get_current_patch_notes()`, `mark_as_seen()`, `show_patch_notes()`, `dismiss_patch_notes()`, `reset_seen_state()`.
-- Signals: `patch_notes_shown(version)`, `patch_notes_dismissed(version)`.
-- WhatsNewUI (CanvasLayer): scrollable list of bullet points with OK button.
-- Shows automatically on first launch or version update.
-
-### 3.53 Credits roll
-- CreditsManager autoload handles end-of-game credits display.
-- CREDITS_DATA dictionary stores: title, sections (header + entries), vignettes (character + text), end_message.
-- API: `play_credits(can_skip)`, `skip_credits()`, `stop_credits()`, `is_playing()`, `get_credits_data()`.
-- Signals: `credits_started`, `credits_ended`, `credits_skipped`.
-- CreditsUI (CanvasLayer): scrolling credits with vignettes.
-  - Dark background with centered scrolling text.
-  - Section headers in gold, entries in white.
-  - Character vignettes fade in/out between scroll end and finish.
-  - Skip hint visible when can_skip is true.
-  - Press any key to skip (if allowed).
-- Music: plays "credits" track during scroll.
-- Scenario actions: `play_credits`, `skip_credits`, `check_credits`, `wait_credits_end`.
-- Scenario: `credits_render`.
-
-### 3.54 Voice acting system (stub)
-- VoiceActingManager autoload handles dialogue audio playback.
-- Audio file format: OGG Vorbis (.ogg), mono, 44.1kHz.
-- Audio ID pattern: `{character}_{scene}_{line}` (e.g., "fae_intro_001").
-- File path: `game/assets/audio/voice/{character}/{scene}/{line}.ogg`.
-- Placeholder fallback: `placeholder.ogg` used when file missing.
-- Volume control: voice_enabled, voice_volume settings.
-- API: `play_voice(audio_id)`, `stop_voice()`, `is_playing()`, `play_dialogue_voice(speaker, index, scene_id)`.
-- Signals: `voice_started(audio_id)`, `voice_finished(audio_id)`, `voice_interrupted(audio_id)`.
-- Convention docs: `docs/voice-acting-conventions.md`.
-- Note: Stub - no actual voice files included. Prepared for future VO recording.
-
-### 3.55 Sound test UI
-- SoundTestUI (CanvasLayer): jukebox for playing music and sound effects.
-- Music tab: lists all music tracks with play buttons.
-- SFX tab: lists all sound effects with play buttons.
-- Now Playing display shows currently playing track.
-- Opens via scenario action or debug menu.
-- Scenario actions: `open_sound_test`, `close_sound_test`.
-- Scenario: `sound_test_smoke`.
-
-### 3.56 Art gallery
-- ArtGalleryManager autoload manages unlockable concept art viewing.
-- GALLERY_DATA array stores art entries with id, name, category, description, path, unlock conditions.
-- Categories: characters, environments, promotional.
-- Unlock conditions: unlocked_by_default, or story_flag requirements.
-- State stored in `user://art_gallery.json`.
-- API: `get_all_art()`, `get_art_by_category(category)`, `is_art_unlocked(art_id)`, `unlock_art(art_id)`, `get_completion_percent()`.
-- Signals: `art_unlocked(art_id, art_data)`, `gallery_opened`, `gallery_closed`.
-- ArtGalleryUI (CanvasLayer): category tabs, art grid with lock icons, preview panel with zoom slider.
-- Scenario actions: `open_art_gallery`, `close_art_gallery`.
-- Scenario: `art_gallery_smoke`.
-
-### 3.57 Accessibility: Screen reader support
-- AccessibilityManager autoload manages screen reader mode and focus announcements.
-- Settings stored in `user://accessibility_settings.json`.
-- API: `announce(text)`, `register_focus(name, description)`, `clear_focus()`, `toggle_screen_reader()`, `make_accessible(control, name, description)`, `make_buttons_accessible(buttons)`, `get_current_focus_name()`, `get_recent_announcements(count)`, `reset()`.
-- Signals: `screen_reader_enabled_changed(enabled)`, `focus_changed(name, description)`, `element_announced(text)`.
-- DialogueUI announces dialogue text and choice selections when screen reader enabled.
-- PauseMenuUI announces menu opening and focused options when screen reader enabled.
-- Scenario actions: `enable_screen_reader`, `check_accessibility`, `announce`, `reset_accessibility`.
-- Scenario: `screen_reader_smoke`.
-
-### 3.58 Accessibility: Colorblind mode
-- ColorblindFilter autoload applies colorblind palette correction shaders.
-- Modes: None (0), Deuteranopia (1), Protanopia (2).
-- Shader applies color matrix transformation to simulate/correct color blindness.
-- SettingsManager stores colorblind_mode setting with persistence.
-- Signal: `colorblind_mode_changed(mode)` emitted on mode change.
-- SettingsUI provides left/right cycling for colorblind mode option.
-- API: `set_mode(mode)`, `get_mode()`, `get_mode_name()`, `cycle_mode(direction)`.
-- Filter layer 100 (above all game content).
-- Scenario actions: `set_colorblind_mode`, `check_colorblind_mode`.
-- Scenario: `colorblind_render`.
-
-### 3.59 Accessibility: Dyslexia-friendly font
-- SettingsManager stores dyslexia_font_enabled boolean setting.
-- Signal: `dyslexia_font_changed(enabled)` emitted on toggle.
-- SettingsUI provides On/Off toggle for dyslexia font option.
-- API: `set_dyslexia_font(enabled)`, `get_dyslexia_font_name()`.
-- Font setting stored in user://settings.json and persisted across sessions.
-- Scenario actions: `set_dyslexia_font`, `check_dyslexia_font`.
-- Scenario: `dyslexia_font_render`.
-
-### 3.60 Accessibility: Reduced motion mode
-- SettingsManager stores reduced_motion_enabled boolean setting.
-- Signal: `reduced_motion_changed(enabled)` emitted on toggle.
-- SettingsUI provides On/Off toggle for reduced motion option.
-- When enabled, disables screen shake and flashing effects.
-- API: `set_reduced_motion(enabled)`, `get_reduced_motion_name()`.
-- Setting stored in user://settings.json and persisted across sessions.
-- Scenario actions: `set_reduced_motion`, `check_reduced_motion`.
-- Scenario: `reduced_motion_smoke`.
-
-### 3.61 Accessibility: One-handed mode
-- SettingsManager stores one_handed_mode_enabled boolean setting.
-- Signal: `one_handed_mode_changed(enabled)` emitted on toggle.
-- SettingsUI provides On/Off toggle for one-handed mode option.
-- When enabled, TouchControlsManager switches to compact right-side layout.
-- Compact layout: hides spacers, moves joystick next to button, reduces control sizes.
-- API: `set_one_handed_mode(enabled)`, `get_one_handed_mode_name()`.
-- TouchControlsManager API: `is_one_handed_mode()`.
-- Setting stored in user://settings.json and persisted across sessions.
-- Scenario actions: `set_one_handed_mode`, `check_one_handed_mode`.
-- Scenario: `one_handed_render`.
-
-### 3.62 Speedrun mode
-- SpeedrunManager autoload tracks real-time game timer with splits.
-- SettingsManager stores speedrun_mode_enabled boolean setting.
-- Signal: `speedrun_mode_changed(enabled)` emitted on toggle.
-- SpeedrunTimerUI displays timer in top-right corner when enabled.
-- Timer API: `start_timer()`, `stop_timer()`, `reset_timer()`, `record_split(name)`.
-- Query API: `get_elapsed_time()`, `get_splits()`, `format_time(seconds)`.
-- Signals: `timer_started`, `timer_stopped(total)`, `timer_reset`, `split_recorded(name, time)`.
-- Predefined splits: forest_unlocked, clubhouse_found, villain_revealed, party_formed, demo_complete.
-- Setting stored in user://settings.json and persisted across sessions.
-- Scenario actions: `set_speedrun_mode`, `check_speedrun_mode`, `start_speedrun_timer`, `stop_speedrun_timer`, `record_split`, `check_speedrun_timer`.
-- Scenario: `speedrun_mode_smoke`.
-
-### 3.63 Secret ending system
-- SecretEndingManager autoload tracks conditions for alternate endings.
-- Secret "redemption" ending requires completing all villain backstory quests and sparing the villain.
-- Required conditions (story flags): chaos_origins_discovered, chaos_betrayal_learned, chaos_redemption_found, villain_spared.
-- Ending types: "normal" (default), "partial" (3+ conditions met), "redemption" (all conditions met).
-- hope_pendant key item is required for redemption ending dialogue option.
-- API: `is_condition_met(condition)`, `get_conditions_status()`, `get_conditions_met_count()`, `is_secret_ending_available()`, `get_ending_type()`, `spare_villain()`.
-- Signals: `secret_ending_unlocked`, `secret_condition_met(condition)`.
-- Scenario actions: `check_secret_ending`, `check_secret_conditions`, `spare_villain`, `check_hope_pendant`.
-- Scenario: `secret_ending_stub`.
-
-### 3.64 New Game Plus
-- NewGamePlusManager autoload handles NG+ mode progression.
-- Unlocked after completing the game (credits roll).
-- NG+ cycle tracked (0 = normal, 1 = NG+, 2 = NG++, etc.).
-- Carryover: tools, key items (consumables reset, story flags reset).
-- Difficulty scaling per cycle:
-  - ENEMY_STAT_MULTIPLIER: 1.25 (25% stronger per cycle).
-  - XP_BONUS_MULTIPLIER: 1.1 (10% more XP per cycle).
-  - GOLD_BONUS_MULTIPLIER: 1.2 (20% more gold per cycle).
-- API: `unlock_ng_plus()`, `is_ng_plus_unlocked()`, `get_ng_plus_cycle()`, `is_ng_plus_active()`.
-- `prepare_carryover()`: Saves current tools/items for NG+ start.
-- `start_ng_plus()`: Begins NG+ cycle with carried data.
-- `scale_enemy_stats(base_stats)`: Returns scaled stats dictionary.
-- `get_enemy_multiplier()`, `get_xp_multiplier()`, `get_gold_multiplier()`.
-- Signals: `ng_plus_unlocked`, `ng_plus_started(cycle)`.
-- Persistence: state stored in `user://ng_plus.json`.
-- Scenario actions: `unlock_ng_plus`, `check_ng_plus`, `prepare_ng_plus_carryover`, `start_ng_plus`, `reset_ng_plus`, `check_enemy_multiplier`.
-- Scenario: `new_game_plus_stub`.
-
-### 3.65 Boss rush mode
-- BossRushManager autoload handles Boss Rush challenge mode.
-- Sequential boss fights without healing between battles.
-- Boss lineup: forest_guardian, chaos_minion (expandable).
-- Timer tracking for speedrun leaderboard.
-- Local leaderboard persisted to `user://boss_rush_leaderboard.json`.
-- API: `start_boss_rush()`, `is_active()`, `get_current_boss_index()`, `get_total_bosses()`, `get_current_boss_id()`.
-- `report_boss_defeated()`: Advances to next boss or completes rush.
-- `report_defeat()`: Ends rush on player loss.
-- `get_leaderboard()`, `clear_leaderboard()`, `format_time(seconds)`.
-- Signals: `boss_rush_started`, `boss_rush_ended(victory, time, bosses_defeated)`, `boss_defeated(index, id)`, `leaderboard_updated(entries)`.
-- Scenario actions: `start_boss_rush`, `check_boss_rush`, `report_boss_defeated`, `check_boss_rush_leaderboard`, `clear_boss_rush_leaderboard`, `reset_boss_rush`.
-- Scenario: `boss_rush_stub`.
-
-### 3.66 Multiplayer co-op stub
-- MultiplayerStub autoload handles future multiplayer preparation.
-- Player state serialization: `serialize_player_state()` returns position, facing, area, inventory, story_flags.
-- Connection states: DISCONNECTED, CONNECTING, CONNECTED, HOST, ERROR.
-- Message types: PLAYER_STATE, PLAYER_ACTION, CHAT, SYNC_REQUEST, SYNC_RESPONSE, PING, PONG, AREA_CHANGE, BATTLE_INVITE, BATTLE_ACTION.
-- Network schema stored in `game/data/multiplayer/network_schema.json`.
-- API: `host_game(port)`, `join_game(host, port)`, `disconnect_game()`, `is_multiplayer_connected()`, `is_host()`.
-- `serialize_player_state()`, `deserialize_player_state(data)`: State serialization.
-- `create_message(type, payload)`, `send_message(to, msg)`, `broadcast_message(msg)`.
-- `simulate_player_join(id)`, `simulate_player_leave(id)`: Testing helpers.
-- Signals: `connection_state_changed(state)`, `player_joined(id)`, `player_left(id)`, `message_received(from, msg)`.
-- Scenario actions: `host_multiplayer`, `join_multiplayer`, `disconnect_multiplayer`, `check_multiplayer`, `serialize_player_state`, `simulate_player_join`, `simulate_player_leave`, `check_message_schema`, `reset_multiplayer`.
-- Scenario: `multiplayer_stub`.
-- Note: This is a stub - no actual networking. Prepared for future multiplayer feature.
-
-### 3.67 Community events system
-- CommunityEventManager autoload handles time-limited community events.
-- Event data stored in `game/data/events/community_events.json`.
-- Event data format:
-  - Each event has: id, name, description, type, start_timestamp, end_timestamp, goal_count, reward_gold, reward_items[].
-  - Types: collection, battle, exploration, social.
-- Time-based activation: events automatically activate when current time is between start and end timestamps.
-- Override for testing: `set_override_timestamp(timestamp)`, `clear_override_timestamp()`.
-- Player can join active events; progress tracked per-event.
-- Rewards claimable once goal_count is reached.
-- API: `get_all_events()`, `get_event(id)`, `get_active_events()`, `is_event_active(id)`.
-- `join_event(id)`: Joins player to event, returns success status.
-- `is_event_joined(id)`, `get_event_progress(id)`, `record_progress(id, amount)`.
-- `is_reward_claimed(id)`, `claim_reward(id)`: Reward handling.
-- `get_time_remaining(id)`, `format_time_remaining(seconds)`: Time utilities.
-- Signals: `event_started(event_id, event_data)`, `event_ended(event_id)`, `event_progress_updated(event_id, current, goal)`, `event_reward_claimed(event_id, reward)`, `events_refreshed(active_events)`.
-- CommunityEventUI (CanvasLayer): displays active events with progress and rewards.
-- Persistence: state stored in `user://community_events.json`.
-- Scenario actions: `set_event_timestamp`, `clear_event_timestamp`, `join_community_event`, `record_event_progress`, `claim_event_reward`, `check_community_event`, `check_active_community_events`, `reset_community_events`.
-- Scenario: `community_event_smoke`.
-- Note: This is a stub - timestamp-based activation works locally but no server sync.
-
-### 3.68 Merchandise integration (stub)
-- MerchandiseManager autoload handles external shop links.
-- Shop categories: all, apparel, plushies, accessories.
-- Category data format: name, url, description.
-- Promotional items: special bundles that may unlock in-game content.
-- Promo item format: id, name, description, url, unlocks_outfit (optional).
-- Link click tracking: history of clicked links with timestamps.
-- API: `open_shop(category)`, `open_promo_item(promo_id)`, `open_external_link(link_id, url)`.
-- `get_shop_categories()`, `get_category_data(category)`, `get_promo_items()`.
-- `is_shop_enabled()`, `set_shop_enabled(enabled)`, `get_link_history()`.
-- Signals: `shop_opened(category)`, `shop_closed`, `link_clicked(link_id, url)`.
-- Scenario actions: `open_shop`, `open_promo`, `check_merchandise`, `set_shop_enabled`, `reset_merchandise`.
-- Scenario: `merchandise_stub`.
-- Note: This is a stub - no actual commerce. Links are logged but not opened.
-
-### 3.69 Social sharing system (stub)
-- SocialSharingManager autoload handles screenshot sharing with branding.
-- Share directory: `user://shares/` for shareable images.
-- Branding overlay: semi-transparent bar at bottom of screenshots.
-- Platform enum: NATIVE, TWITTER, FACEBOOK, INSTAGRAM, CLIPBOARD.
-- API: `create_shareable_image(include_branding)`, `share_image(path, message)`, `share_current_screen(message)`, `share_photo(path, message)`.
-- `copy_to_clipboard(text)`: Copies text to system clipboard.
-- `get_default_message()`: Returns branded share message with hashtag.
-- `get_share_history()`, `clear_history()`: Share tracking.
-- `get_shareable_images()`: Lists all shareable images in share directory.
-- `cleanup_old_shares(max_age_seconds)`: Deletes old share images.
-- `get_last_shared_path()`, `is_sharing()`, `cancel_share()`, `reset()`.
-- Signals: `share_started`, `share_completed(success)`, `share_cancelled`, `shareable_image_created(path)`.
-- Scenario actions: `create_shareable_image`, `share_screen`, `share_image`, `check_sharing`, `cleanup_shares`, `reset_sharing`.
-- Scenario: `social_sharing_smoke`.
-- Note: This is a stub - no actual platform sharing. iOS share sheet integration prepared for future.
-
-## 4. Party and characters
-- Party size: 4 total (main character + 2 additional + pet).
-- Overworld: party followers are allowed; equal size and consistent spacing.
-- Optional recruitable members: Scout (ranger), Bookworm (mage) - unlocked via recruitment quests.
-- Recruitment quests: recruit_scout (forest), recruit_bookworm (library).
-
-### 4.1 Pet companion
-- PetCompanion: CharacterBody2D that follows the player at consistent spacing (~32px).
-- Follow behavior: moves towards player when distance exceeds threshold.
-- Sprites: idle (4 directions), walk cycle (4 directions x 2 frames).
-- Random idle animations: sit, scratch, yawn - triggered after ~5 seconds of standing still.
-- Pet starts in Hero House Interior, follows player between rooms.
-
-### 4.2 Pet variants and selection
-- 3 pet variants available: Maddie (cat), Buddy (dog), Nibbles (hamster).
-- Pet selection occurs at game start (after intro narration, before gameplay).
-- PetSelectionUI: CanvasLayer with pet buttons, description panel, confirm button.
-- Pet data stored in `game/data/party/party.json` under `pet_options` array.
-- Each pet has: id, name, type, description, stats (max_hp, max_mp, attack, defense, speed), skills[], sprite_path.
-- Pet skills unique per type:
-  - Cat: scratch, pounce.
-  - Dog: bark, fetch.
-  - Hamster: squeak, nibble.
-- PartyManager API:
-  - `get_pet_options()`: Returns array of available pet data.
-  - `set_active_pet(pet_id)`: Sets active pet, updates party_state.
-  - `get_active_pet()`: Returns active pet ID.
-  - `get_active_pet_data()`: Returns active pet's full data.
-- Signal: `pet_selected(pet_id)` emitted on selection.
-- Scenario actions: `check_pet_options`, `set_active_pet`, `check_active_pet`.
-
-## 5. Battle system
-
-### 5.1 Battle format (locked)
-- Classic turn-based JRPG battle screen.
-- Pre-rendered **pixel** battle backgrounds (static image to start).
-- Battles must be playable early with placeholder art.
-
-### 5.2 Battle UI (locked preferences)
-- HUD framing: enemy + party status at the top (HP/MP/status readability).
-- No cassette theming.
-- No large themed "device bar".
-- Boxes are acceptable for v0, but the UI must remain readable at iPhone landscape scale.
-
-### 5.3 Battle loop (v0)
-- Turn order determined by combatant speed (highest first).
-- Each combatant has: display_name, max_hp, current_hp, max_mp, current_mp, attack, defense, speed.
-- Player turn: command menu with Attack, Skill (placeholder), Item (placeholder), Defend, Run.
-- Attack: deals damage = attacker.attack - target.defense (minimum 1).
-- Defend: doubles effective defense until next turn.
-- Run: ends battle with "flee" result.
-- Enemy AI: attacks first alive party member.
-- Victory: all enemies defeated. Defeat: all party defeated.
-- BattleState class manages turn flow and win/loss conditions.
-- Combatant class (Resource) represents party members and enemies.
-- Party and enemy stats loaded from GameData autoload (data-driven).
-
-### 5.4 Data schemas (locked)
-All game content is data-driven via JSON files under `game/data/`:
-- `enemies/enemies.json`: Enemy definitions with id, name, max_hp, max_mp, attack, defense, speed, skills[], drops[].
-- `skills/skills.json`: Skill definitions with id, name, type, mp_cost, power, target, element.
-- `items/items.json`: Item definitions with id, name, type, effect, power, target, price.
-- `party/party.json`: Party member definitions with id, name, role, max_hp, max_mp, attack, defense, speed, skills[].
-- `biomes/<biome>.json`: Biome metadata (id, name, palette_path).
-- `encounters/<biome>.json`: Encounter tables for each biome.
-- `quests/quests.json`: Quest definitions with id, name, description, type, reward_gold, reward_items[], required_flag, completion_flag, objectives[].
-- `npcs/schedules.json`: NPC schedule definitions with npc_id, npc_name, locations (dict by phase), default_area, default_position.
-- `equipment/equipment.json`: Equipment definitions with id, name, slot (weapon/armor/accessory), attack_bonus, defense_bonus, speed_bonus, price.
-
-GameData autoload loads and caches all data on startup. Adding new content requires only JSON + sprite assets (no code changes).
-
-### 5.5.1 Content hot reload
-- GameData supports hot reload for development: `enable_hot_reload(true)`.
-- When enabled, GameData polls file timestamps every 1 second.
-- On file change, `reload_all()` clears caches and reloads all JSON data.
-- Signal `data_reloaded(category)` emitted after reload.
-- Hot reload disabled by default; intended for editor/development only.
-- Scenario actions: `enable_hot_reload`, `reload_data`, `check_hot_reload`.
-
-Content lint script (`tools/lint/lint-content.sh`) validates:
-- JSON syntax
-- Required fields per schema
-- Reference integrity (skill/item IDs referenced must exist)
-
-### 5.5 Equipment system
-- PartyManager autoload tracks equipment state per party member.
-- 3 equipment slots: weapon, armor, accessory.
-- Equipment data stored in `game/data/equipment/equipment.json`.
-- `equip_item(member_id, equip_id)`: Equips item to correct slot.
-- `unequip_slot(member_id, slot)`: Removes item from slot.
-- `get_stat_with_equipment(member_id, stat)`: Returns base stat + equipment bonuses.
-- Equipment bonuses: attack_bonus, defense_bonus, speed_bonus.
-- EquipmentUI scene allows viewing/changing equipment (stub UI).
-- Scenario actions: `equip_item`, `unequip_slot`, `check_equipment`.
-
-### 5.6 Scenario action: load_scene
-- `load_scene`: Load a scene directly by path (for testing battles without overworld trigger).
-
-## 6. Art direction and determinism
-
-### 6.1 Concept art reference
-- `docs/art/concept-reference.md` is the aesthetic guide for all asset creation.
-- Asset creators must reference this document before creating new content.
-- Concept art source files live in `docs/art/concepts/`.
-
-### 6.2 Key rule
-**All art must be normalizable and consistent.** AI outputs are treated as raw inputs; the pipeline enforces style.
-
-### 6.3 Palettes (locked)
-- Each biome has a palette.
-- There is a shared global palette for UI + skin tones + outline/ink.
-- All tiles/sprites must quantize to: biome palette ∪ global palette.
-
-### 6.4 Pixel style constraints (locked)
-- Single pixel density (no mixed-scale sprites).
-- No resampling; nearest-neighbor only.
-- Avoid noisy textures; prefer clean shapes and limited shading bands per material.
-
-### 6.5 Reproducible art tooling
-- Art shell wrappers use the `uv.lock` environment with Pillow 12.3.0.
-- Validation reads nested `colors` objects/lists or a top-level color list.
-  Metadata and `legacy_flat` do not contribute colors; malformed leaves fail.
-- Repeated `--palette` options form a union. `--biome cloverhollow` also includes
-  `global_ui_skin.palette.json`. Fully transparent pixels are excluded from RGB
-  checks; visible off-palette pixels fail.
-- Use explicit asset dimensions such as `--size 16x24`. Grid alignment is an
-  optional extra constraint, not a requirement that every sprite be 16x16.
-- Quantization requires separate input/output paths, preserves alpha, and will
-  not replace an existing output without `--force`. It supports palette unions.
-- Packing uses sorted, equally sized frames and emits an RGBA sheet plus JSON
-  `frames` entries (`file`, `x`, `y`, `width`, `height`). Empty inputs, mismatched
-  dimensions, and source/output collisions fail before writing.
-- `just validate-assets` validates selected samples, not the entire asset tree.
-  Every changed asset still needs explicit validation and in-scene review.
-- Commands and acceptance workflow are documented in
-  `docs/art/verified-pipeline.md`.
-- The playable town pack rebuilds 41 Fae frames (16x24) and nine transparent
-  building facades (48x64) from existing generators in a private temporary
-  workspace, then normalizes only that declared pack to the biome/global union.
-  Publishing requires explicit output selection and `--force` for replacement.
-- Park terrain is a reproducible set of thirteen native 16x16 tiles. Recipes
-  live in `art/recipes/park_terrain.json` and `art/recipes/playable_town.json`;
-  tests verify dimensions, palette, alpha, seams, and repeat-generation bytes.
-
-## 7. World structure (content)
-- Discrete areas/scenes are allowed (and preferred for simplicity).
-- Biomes/towns planned: Cloverhollow (main town), Bubblegum Bay, Pinecone Pass, Enchanted Forest, Forest/Clubhouse Woods, and more (8+ total).
-
-### 7.1 Cloverhollow town (v0 blockout)
-- The playable Town Center/Park/Forest Entrance slice has continuous perimeter
-  collisions with inner edges at x=16/496 and y=16/272. Portal triggers overlap
-  the interior so transitions remain reachable without openings that allow escape.
-- Town Center uses the nine normalized transparent building sprites. Park uses
-  a repeated native 16x16 grass/path/hedge tile grid instead of loose tile previews.
-- The Park pond occupies `(256,176)` through `(352,256)`. Water-flank colliders
-  leave a walkable bridge corridor from x=288 through x=320.
-- Reciprocal route spawns are clear of their triggers: Park `from_town_center`
-  is `(64,144)`, Town `from_park` is `(256,64)`, and Forest `from_park` is
-  `(256,220)`, clear of the arch artwork.
-- Town Center (Town Square): central hub connecting to other areas; fountain centerpiece, 4 trees, benches, lamps, sign, enemy spawn. Building facades: General Store, School, Arcade, Library (48x64 sprites). 3 NPC spawn markers for future NPCs. Transitions to Hero House (west), School (east-top), Arcade (east-bottom), Bubblegum Bay (south), General Store (near shop facade).
-- General Store: Interior shop where player buys items. Counter with cash register, 4 shelves with potions/supplies, display crates with produce. Shopkeeper NPC behind counter with ShopUI buy interface (potion, ether, antidote). Door transition back to Town Center. Welcome sign with shop dialogue.
-- Hero House: Fae's home exterior with 2-story cottage blockout (roof, chimney, porch, door, 4 windows), trees, fence, mailbox, flowers. Door transition zone to interior (placeholder interior scene exists).
-- Hero House Interior (Ground Floor): Kitchen area (stove, sink, table with chairs), living room area (couch, rug, bookshelf), door transition back to exterior, stairs transition to upper floor. Mom NPC in kitchen with branching dialogue (3 branches).
-- Hero House Interior (Upper Floor): Bedroom area (bed, desk with lamp, closet), bathroom area (tub, toilet, sink), interactable mirror with placeholder dialogue, stairs transition back to ground floor.
-- School: Cloverhollow Elementary exterior with school building (double doors), playground area (swing set, slide), flagpole, bike rack, benches, sign. Teacher NPC with story-gated library access. Transition to Town Center.
-- School Hall (Interior): Main hallway with lockers (6 rows), bulletin board, trophy case, principal's office door, 4 classroom doors (Rooms 101-104), club room door. Transitions to/from school exterior and club room.
-- School Classroom (Interior): Standard classroom with teacher's desk, chalkboard, clock, 2 windows, 15 student desks in 3 rows. Teacher NPC at desk with branching dialogue (3 branches) about lessons/homework. 3 classmate NPCs (unique sprites, 2 dialogue lines each) seated at desks. Transitions to/from school hall.
-- School Club Room (Interior): Shared space for after-school activities. Art Club area with 3 easels, supply table with paints, display wall with paintings. Science Corner with lab table and beakers. Art Club Leader (Lily) and Science Club Leader (Oliver) NPCs with branching dialogue about club activities. Club leaders appear during afternoon timeblock (phase 1) on weekdays only. Transitions to/from school hall.
-- Arcade: Pixel Palace Arcade exterior with facade sprite (48x64), neon-style "ARCADE" sign, arcade machines visible through window, game/highscore posters, flyers, lamps. Transition to Town Center. Door transition to interior.
-- Arcade Interior: Neon-lit interior with dark purple/blue floor and magenta/cyan accent stripes. 8 arcade cabinet props (5 variants: original, racing, fighter, puzzle, shooter), counter with snacks display, prize redemption corner with prize shelf, stuffed bunny, and ticket counter. Arcade Owner NPC (Buzz) behind counter with branching dialogue about high scores, prizes, and games. ArcadeCabinetInteractable script launches minigame scenes when configured (or shows placeholder dialogue if no minigame set). Catch-A-Star minigame: simple "catch falling items" reflex game with 30-second timer, score tracking, catcher controlled by left/right input. Returns to Arcade Interior on completion. Transitions to/from Arcade exterior.
-- Town Park: Green space with grass background, walking paths, 9 trees scattered around perimeter, pond with bridge, 4 flower beds with flowers, 2 picnic tables, 2 benches, 2 trash cans, park sign. Elder NPC sitting on bench with branching dialogue (4 branches) about town history, mysterious forest, and quest hook about strange happenings. Transitions to Town Center (west) and Forest Entrance (east via path to forest edge).
-- Library (Interior): Town library with warm wooden interior. 6 bookshelves with colorful books along walls, ladder prop for high shelves, 2 reading tables with 4 chairs, checkout desk with book stack. Librarian NPC at checkout desk with branching dialogue (4 branches) about research topics, book sections, and town history. Book lookup UI stub showing catalogue topics (placeholder for future search functionality). Library sign with welcome dialogue. Transition back to Town Center.
-- Café (Exterior): Café facade (48x64) with awning in warm red/maroon stripes, outdoor seating hints at base. Located in Town Center between Library and School facades. Transition to Café Interior.
-- Café (Interior): Cozy café interior with warm wooden floor. Counter with cash register, glass display case with pastries, 3 tables with chairs. Kitchen visible through doorway at back. Menu board on wall. Baker NPC behind counter with branching dialogue (4 branches) about pastries, secret family recipes, and placeholder recipe mechanic hook. Welcome sign with café greeting. Transition back to Town Center.
-- Town Hall (Exterior): Official-looking facade (48x64) with stone gray columns, triangular pediment, windows, double door. Located in Town Center at bottom left. Transition to Town Hall Interior.
-- Town Hall (Interior): Administrative building interior with gray-brown floor. Reception desk at center, Mayor's Office door at back right (currently closed), notice board at left with quest poster placeholders (5 colored rectangles). Waiting chairs, decorative plants, flagpole with flag. Mayor NPC (Mayor Thornwood) in formal attire with branching dialogue (5 branches) about town problems, strange creatures, quest notices, Elder's knowledge, and investigation rewards - serves as quest-giver stub. Notice board interactable showing quest postings. Transition back to Town Center.
-- Pet Shop (Exterior): Facade (48x64) with animal silhouettes on sign. Located in Town Center at upper right. Transition to Pet Shop Interior.
-- Pet Shop (Interior): Warm wooden interior with 3 animal cages along left wall, 2 food bins (food and treats) along right wall, accessory rack and toy rack at bottom. Counter with cash register. AudioStreamPlayer for ambient pet sounds (chirps, purrs). Interactable cages, food bins, and accessories. Pet Clerk NPC (Clover) behind counter with ShopUI selling pet treats, fancy collar, and squeaky toy. Transition back to Town Center.
-- Blacksmith (Exterior): Facade (48x64) with anvil sign and forge smoke hint. Located in Town Center at lower center (180, 220). Transition to Blacksmith Interior.
-- Blacksmith (Interior): Dark workshop interior with brown floor. Forge with glowing embers at left wall, anvil nearby. 2 weapon racks at right wall displaying swords and axes. Workbench in center with tools. Tool display shelves with hammers, tongs, chisels, files. Counter for shop area. All interactables with dialogue about blacksmithing craft. Blacksmith NPC (Ironhammer) behind counter with NPCDialogueTree script - 5 dialogue branches about crafting, metalwork traditions, weapons, and upgrade services (coming soon stub). Transition back to Town Center.
-- Clinic (Exterior): Facade (48x64) with red cross sign. Located in Town Center at lower right (320, 220). Transition to Clinic Interior.
-- Clinic (Interior): Clean white/light blue interior with tiled floor. Reception desk at center-top with welcome sign. 2 medicine cabinets on left wall with potions and supplies. Exam table in center-left. 3 hospital beds on right wall behind curtain partition. Waiting chairs at bottom-left. Decorative plant. Red cross sign above reception. All interactables with dialogue about clinic services. Doctor NPC (Dr. Willowmere) near reception with NPCDialogueTree script - 5 dialogue branches with health tips (sleep, diet, exercise) and party heal service stub. Transition back to Town Center.
-- Props: bench, sign, lamp, tree (16x32), fence, flowers (all 16x16 except tree).
-- Enemy: Grumpy Squirrel (non-scary, green, visible in overworld).
-- Battle background: cloverhollow_meadow.png (512x288).
-
-### 7.2 Bubblegum Bay (v0 blockout)
-- Wilderness biome: beach/bay area with pastel pink/purple palette.
-- Single area scene with sand, water, bubble props.
-- Connected to Town Center via area transition.
-- Enemy: Pink Slime (reskinned slime).
-- Battle background: bubblegum_bay.png (512x288).
-
-### 7.3 Forest Entrance (v0 blockout)
-- Transition area: connects Town Park to deeper forest areas.
-- Dark green forest background with forest edge borders (darker tree lines).
-- Central clearing for player movement between transitions.
-- Wooden arch/gate prop (32x48) at the entrance from town side.
-- Warning sign prop (16x16) with interactable dialogue about dangers ahead.
-- Props: 10 trees scattered around edges, wooden arch, warning sign.
-- Enemy: Sneaky Snake (green snake with poison bite attack, 12 HP, visible overworld enemy).
-- Transitions: to Town Park (south, "from_forest" spawn), to Forest Path (east, "from_entrance" spawn).
-- Spawn markers: default, from_park, from_forest.
-- Battle background: forest_clearing.png (512x288).
-- Scenario: `forest_entrance_render` for visual/interaction testing.
-
-### 7.4 Forest Path (v0 blockout)
-- Winding path through dense forest connecting Forest Entrance to deeper areas.
-- Very dark green forest background with dense tree borders.
-- Winding dirt path layout (not straight, curves around trees).
-- Mushroom props: small (8x8), medium (12x12), large (16x16) red-capped mushrooms.
-- Props: 15+ trees creating dense forest feel, 9 mushrooms of varying sizes.
-- Hidden alcoves: 2 small clearings off the main path for exploration rewards.
-- Interactable alcove spots with discovery dialogue.
-- Transitions: to Forest Entrance (west, "from_entrance" spawn), to Forest Deep (east, "from_path" spawn).
-- Spawn markers: default, from_entrance, from_deep.
-- Enemy: Angry Acorn (cute acorn with angry face, uses roll attack, 10 HP, visible overworld enemy).
-- Enemy: Grumpy Stump (camouflaged tree stump, high defense 8, slow but tanky, 20 HP).
-- Battle background: deep_woods.png (512x288).
-- Scenario: `forest_path_render` for visual/interaction testing.
-
-### 7.5 Clubhouse Exterior (v0 blockout)
-- Secret clubhouse in the woods, accessible from Forest Path.
-- Forest clearing background with dark green borders.
-- Large tree with treehouse structure (48x64 sprite) and rope ladder (16x48).
-- "No Adults" sign (16x16) with interactable dialogue.
-- Props: 8 trees around clearing, treehouse structure, rope ladder.
-- Interactables: rope ladder (climb dialogue), "No Adults" sign (kids only message).
-- Transitions: to Forest Path (southwest, "from_clubhouse" spawn), to Clubhouse Interior (via rope ladder).
-- Spawn markers: default, from_path, from_interior.
-- Scenario: `clubhouse_exterior_render` for visual/interaction testing.
-
-### 7.5.1 Clubhouse Interior (v0 blockout)
-- Cozy treehouse interior accessible via rope ladder from exterior.
-- Warm brown wooden floor and walls.
-- Decorative rug in center for gathering area.
-- Props: 4 pillows (pink and blue variants), snack stash box, comic book stacks, wall map.
-- Interactables: wall map (shows treasure X), snack stash (chips and candy), comics ("Super Bunny Adventures"), pillow area (club meeting spot).
-- Transitions: to Clubhouse Exterior (south, "from_interior" spawn).
-- Spawn markers: default, from_exterior.
-- Scenario: `clubhouse_interior_render` for visual/interaction testing.
-
-### 7.5.2 Hidden Grove (v0 blockout)
-- Magical hidden clearing accessible from Forest Path.
-- Very dark green forest background with dense tree borders.
-- Central fairy ring of 12 magical mushrooms forming a circle.
-- Props: 6 trees around perimeter, 12 fairy mushrooms in ring formation, 5 glowing flowers, lore scroll.
-- Interactables: fairy ring center (legend dialogue), lore scroll pickup (ancient forest lore item).
-- Transitions: to Forest Path (west, "from_grove" spawn).
-- Spawn markers: default, from_forest.
-- Battle background: grove.png (512x288).
-- Scenario: `hidden_grove_render` for visual/interaction testing.
-
-### 7.5.3 Dark Hollow (v0 blockout)
-- Very dark forest area requiring lantern tool to navigate.
-- Dark blue/black background with minimal visibility.
-- DarkAreaOverlay (CanvasModulate) applies dark tint; fades when player has lantern.
-- Props: 8 trees around perimeter, treasure chest in hidden alcove.
-- Interactables: TreasureChest (requires lantern, gives 5 ethers, sets "dark_hollow_treasure_found" flag).
-- Transitions: to Forest Path (west, "from_hollow" spawn).
-- Spawn markers: default, from_path.
-- Battle background: deep_woods.png (512x288).
-- Scenario: `dark_hollow_smoke` for lantern mechanic testing.
-
-### 7.6 Biome factory workflow
-- `tools/content/new-biome.sh <id> [name] [type]`: Scaffolds new biome with:
-  - Palette stub in `art/palettes/<id>.palette.json`
-  - Biome data in `game/data/biomes/<id>.json`
-  - Encounter table in `game/data/encounters/<id>.json`
-  - Scenario stub in `tests/scenarios/<id>_exploration_smoke.json`
-  - Checklist in `docs/biomes/<id>.md`
-- `tools/content/check-biome.sh <id>`: Validates biome completeness (palette, tileset, scene, scenario, docs).
-
-## 8. Automation and agentic workflows (non-negotiable)
-
-### 8.1 Scenario Runner
-- `wait_for_scene` waits for both scene identity and completed router transition.
-  `move_until_scene` applies real directional input with a bounded tick budget.
-- `setup_player_position` is explicitly test setup, used for isolated collision
-  fixtures, not evidence of traversing a route. Position and full rectangular
-  collision-body assertions verify numeric bounds; facing assertions also verify
-  the directional texture name. `assert_last_move_delta` verifies displacement.
-- Press actions use a configured `InputMap` key when available, with action-event
-  fallback rather than a hardcoded interaction key.
-- `town_forest_route_smoke` proves Town → Park → Forest → Park → Town, locked and
-  unlocked gate dialogue, and slot-0 save/load recovery of `(257.5,218.5)` after
-  movement away. The `forest_unlocked` flag is explicit test setup, not proof
-  of completing the quest chain.
-- `route_boundaries_smoke` verifies twelve non-portal edges and three diagonal
-  corners, including scene identity after pressure and full-body containment.
-  `park_pond_collision_smoke` verifies both blocked water flanks, sustained
-  pressure, diagonal approach, and bridge traversal. Eight-direction movement
-  and the nine-tick debounce contract have dedicated scenarios.
-- `assert_dialogue_state` verifies showing/choice-waiting state.
-- `assert_battle_hud_layout` verifies enemy text, all five command entries,
-  party rows, minimum label sizes, viewport containment, and non-overlapping
-  status/turn/log/menu bands.
-- `assert_scene` compares the current scene path to the expected `scene`.
-- `assert_player_spawn` compares the player to a named `marker_id` with a
-  one-pixel tolerance. Failed assertions add an error and fail the scenario.
-- `assert_intro_state` verifies the requested splash/title state and visible UI.
-- `assert_save_state` verifies the previous save/load/delete operation succeeded
-  and that slot existence matches `exists`.
-- Optional scenario `starting_spawn` selects the starting marker when `scene`
-  is an area. Explicit area scenarios suppress intro routing; `Main.tscn`
-  scenarios retain the normal intro.
-- Asynchronous actions run single-flight. Movement holds input through the
-  requested physics ticks, presses use mapped key/action events, and
-  rendered captures wait for frame drawing to complete.
-- Test wrappers launch Godot with `--fixed-fps 60` and private per-run `HOME`,
-  `XDG_DATA_HOME`, `XDG_CONFIG_HOME`, and `XDG_CACHE_HOME`. Read-only manifests
-  check that personal Godot user data did not change. This is macOS/Linux test
-  isolation, not a host security sandbox.
-- Artifact runs use Godot's Dummy audio driver so CI/rendered checks do not
-  require an audio device. They do not certify audible output quality.
-- Scenario RNG is seeded in the first autoload's `_init`, including seed zero.
-  Traces record `isolation_root`, actual `user_data_dir`, `fixed_fps`,
-  `physics_ticks_per_second`, `engine_version`, and `renderer` (display-server
-  name). Movement events include intermediate player positions.
-- CLI scenario wrappers require Bun for shared TypeScript evidence validation.
-  They retain logs and reject nonzero engine exits, runtime/script/parse errors,
-  invalid traces, error/noop events, and failed assertion events.
-- Trace `errors` lists runner failures and `passed` reports action-execution
-  status. Missing scenarios, invalid action lists, unknown actions, and unfinished
-  action execution are failures. Logs and error events must also be checked;
-  the trace flag alone is not gameplay acceptance.
-- Headless capture actions record `capture_skipped` with reason `headless`.
-  Rendered wrappers check capture file presence and PNG signatures; visual
-  review remains required. Explicit capture directories must be empty.
-- Scenario processes have a 120-second watchdog. `readiness_harness_smoke`
-  proves scripted action/capture execution only, not boundary or route correctness.
-- The game must support a Scenario Runner that can:
-  - load a scene/area
-  - inject deterministic inputs
-  - trigger interactions and encounters
-  - emit artifacts (trace, screenshots/frames, optional movies)
-- Supported scenario actions:
-  - `wait_frames`: Pause for N frames before continuing.
-  - `capture`: Save a screenshot with a label.
-  - `move`: Simulate directional input (left/right/up/down) for N frames.
-  - `press`: Simulate a button press for an input action (e.g., "interact").
-  - `save_game`: Save current game state (position, inventory, story flags).
-  - `load_game`: Load game state from save file.
-  - `acquire_tool`: Give a tool to the player (tool_id).
-  - `set_story_flag`: Set a story flag (flag, value).
-  - `check_tool`: Log whether player has a tool (tool_id).
-  - `check_story_flag`: Log whether a story flag is set (flag).
-
-### 8.2 Deterministic artifacts
-- Every milestone must add/update at least one Scenario Runner scenario.
-- UI/visual changes must add/update a rendered capture scenario producing deterministic frames for diffing.
-- Readiness repeatability is verified with fresh isolated runs, matching
-  intermediate movement events, and identical rendered captures on the same
-  local engine/display setup. `tests/test_repeatability.sh` is headless by
-  default; `--rendered` also compares the rendered pair.
-- This is not universal determinism: wall-clock managers, unexamined private
-  RNG sources, and cross-platform renderer differences remain outside that proof.
-
-### 8.3 Guardrails
-- Spec drift guardrail (`tools/spec/check_spec_drift.py`):
-  - CI/local check fails if `game/**`, `tools/**`, `.opencode/**`, or `project.godot` changes without `spec.md` update.
-  - Override via commit message tags: `[spec-ok]` or `[refactor]`.
-  - Override via environment: `ALLOW_SPEC_DRIFT=1`.
-  - Full documentation: `docs/working-sessions/spec-drift-guardrail.md`.
-- Visual regression diffing is required for golden scenarios.
-- Reviewed overworld, dialogue, and battle frames live in
-  `baselines/visual/<scenario_id>`. Missing/extra/empty images, dimension
-  differences, decoding/tool failures, and any pixel difference fail comparison.
-- Hosted Linux uses explicit `GODOT_RENDERING_METHOD=gl_compatibility` and a
-  separate `baselines/visual/linux-gl-compatibility/<scenario_id>` profile.
-  macOS Metal and Linux Compatibility captures are not interchangeable.
-- Artifact launchers validate optional `GODOT_RENDERING_METHOD` values
-  (`forward_plus`, `mobile`, `gl_compatibility`); unset preserves the engine
-  default. Traces record the actual `rendering_method` separately from the
-  display-server name. Invalid overrides fail before engine startup.
-- The visual suite renders all three scenarios before comparison, preserving
-  every failure while retaining complete diagnostic artifacts. Missing baselines
-  still fail, and no candidate is promoted automatically.
-- Baseline promotion requires matching successful scenario evidence and an
-  explicit `--reviewed` flag after image review. It replaces the exact image set
-  and records the source trace as `provenance.json`; CI never auto-promotes.
-
-### 8.4 Local agent tooling
-- Project-local OpenCode skills and agents carry discovery metadata and use
-  this spec rather than stale playbook assumptions for dimensions and facing.
-- Default milestone selection follows the plan's active development sequence.
-  Completing it does not implicitly authorize unrelated release/store work.
-- The old local Godot MCP snapshot remains quarantined. The `satellite` server
-  uses pinned `@satelliteoflove/godot-mcp` 4.1.11 from a locked local consumer
-  package, with lifecycle and exact Godot 4.5.1 compatibility checks.
-- Satellite is read-only. OpenCode allows only node/editor inspection, runtime
-  observation, project information, and documentation. Input, arbitrary script
-  execution, scene/node/resource mutation, and generic controls remain denied.
-- The editor addon is installed only into a physical, tool-owned temporary
-  snapshot with private import cache and user-data directories. The canonical
-  project and exports never contain the addon or its autoload. Source changes
-  require an explicit snapshot refresh; snapshot edits are never synced back.
-- `tools/agents/godot_agent_environment.py` provides snapshot, refresh, start,
-  status, and stop operations. An optional `start --scene res://game/...tscn`
-  selects the scene to inspect. Version/path/ownership checks fail closed.
-  Runtime acceptance remains with Scenario Runner inputs, assertions, traces,
-  and rendered captures; no OS-level input automation is required.
-- Optional image generation is not a prerequisite for development. Generated
-  images are source material, not automatically accepted runtime assets.
-- Art validation distinguishes transparent pixels from visible colors and
-  supports the nested biome palette plus shared global palette. Selected-sample
-  validation is not approval of the entire legacy asset tree.
-- A level is not verified by direct scene loading alone. Evidence must cover
-  movement, boundaries, transition/spawn behavior, return travel, and relevant
-  progression gates. Record untested routes explicitly.
-- Tooling findings and readiness evidence live in
-  `docs/testing/agent-tooling-audit.md`.
-- The sourced MCP shortlist and adoption criteria live in
-  `docs/testing/godot-mcp-research.md`. Optional runtime bridges are not an
-  exception to the no-OS-window-control constraint.
-- Setup commands and limits are in `docs/testing/godot-agent-environment.md`.
-  `agent_environment_smoke` verifies the canonical scene without the addon.
-- PNG critique uses `tools/agents/review-capture.ts`: an actual file attachment
-  in a private, tool-denied OpenCode session. The model is configurable with
-  `GODOT_VISION_MODEL` or `--model`; the verified default is
-  `github-copilot/gemini-3.5-flash`. The legacy hardcoded `vision` tool is denied.
-- Model descriptions alone are not a visual test oracle. Corroborate UI text
-  with OCR, layout with scene/trace assertions, and changes with exact pixel
-  comparisons. Do not infer image contents from filenames or serialized data URIs.
-
-## 9. Repo conventions
-- Source art lives under `art/` and must be reproducible (recipes + palettes).
-- Runtime assets live under `game/assets/`.
-- Game content and code live under `game/` (`res://game/...` in Godot).
+- Kids 8 to 12, family friendly. Cozy, safe, playful magic realism. Nothing
+  scary and nobody gets hurt.
+- Story source: `NOTES.md` (owner's notes) plus this section.
+
+### 1.2 Story spine
+- Fae (10) wakes up in her bedroom in Cloverhollow. Chaos starts spreading
+  through town.
+- She balances school life with stopping it, helped by Maddie (the family cat,
+  who follows her), Sue (met in Bubblegum Bay), and Jordan (met in Pinecone
+  Pass).
+- The culprit is a friend from school under a chaos spell. The hooded chaos
+  raccoon is the chaos motif.
+- Finale twist: Mom wakes Fae up. It was all a dream.
+
+### 1.3 Creative frame
+- The world is Fae's dream, painted in her own art: watercolor washes, thin
+  warm-brown ink outlines, die-cut stickers.
+- Her journal is the main menu (notes and sticker album now, map later).
+- Chaos appears as scribbles and crumpled paper over the painting. Calming it
+  restores the paint.
+- Battles calm chaos-touched critters down. Nobody is hurt.
+
+### 1.4 Pillars
+1. Concept-art fidelity: the game should look like `docs/art/concepts/`.
+2. Gentle puzzles and tool gating.
+3. Short, readable, non-violent turn-based calm-downs.
+4. Agent-buildable: every feature can be driven, inspected, stepped, and
+   screenshotted through the harness (section 11).
+
+## 2. Platforms and stack (locked)
+- Ship target: iOS (iPhone and iPad, landscape only) via Capacitor 8.
+  Development and tests run in desktop Chrome/Chromium.
+- Nintendo Switch: deferred. It would be a separate port, so keep content
+  portable (Ink, JSON, PNG).
+- Language: TypeScript with `strict`. No `any`; avoid `as` casts by modeling
+  real shapes and narrowing with type guards.
+- Tooling: Vite (dev server and build), Bun (package manager and script
+  runner), Node 24 LTS for Node-based tools (`.nvmrc`), `just` for tasks.
+- Approved npm dependencies. Anything else needs the owner's approval first,
+  then an update to this list:
+  - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8.
+  - Dev: `typescript`, `vite`, `vitest`, `@playwright/test`,
+    `@capacitor/cli` 8, `@types/bun`.
+- External tools (not npm dependencies): ImageMagick (art processing), ffmpeg,
+  Xcode 27.
+
+## 3. Architecture (locked)
+
+```
+src/core/       Pure simulation. No DOM, Pixi, timers, Date, Math.random, or I/O.
+src/render/     PixiJS view. Reads core state; never mutates it.
+src/ui/         DOM/CSS overlay: dialogue, prompts, menus, journal, HUD.
+src/platform/   Input devices, storage, audio, Capacitor glue.
+src/dev/        Dev-only harness hook (section 11). Excluded from production builds.
+src/main.ts     Composition root that wires core, render, ui, and platform.
+content/        Areas (JSON), story (Ink), fixtures (JSON), tunables (JSON).
+public/assets/  Runtime art and audio, loaded by URL.
+art/            Generation recipes and selected source images (never loaded at runtime).
+tools/          Bun scripts: art pipeline, headless sim runner.
+tests/          unit/ (Vitest), sim/ (headless scripted runs), e2e/ (Playwright).
+ios/            Capacitor iOS project (from Milestone 4).
+```
+
+### 3.1 Simulation contract
+- Fixed 60 Hz ticks: `step(world, state, input) -> { state, events }`. `world`
+  is static content (areas, tunables) loaded by the shell and passed in;
+  `input` is one tick's `ActionFrame`.
+- `state` is plain JSON-serializable data. The seeded PRNG state lives inside
+  `state`.
+- Determinism: the same world, initial state, and action frames produce the
+  same state hash in Chrome (V8) and in Bun (JavaScriptCore, the engine iOS
+  uses).
+- Core math uses only `+ - * /`, `Math.sqrt`, `Math.abs`, `min`, `max`,
+  `floor`, `ceil`, `round`, `trunc`, `sign`, and `Math.imul`. Never
+  `Math.sin`, `cos`, `tan`, `atan2`, `pow`, `**`, `exp`, `log`, or `hypot`:
+  their results can differ between JavaScript engines.
+- Real time drives ticks through an accumulator in `src/main.ts`, at most 5
+  ticks per animation frame (extra time is dropped). Rendering may
+  interpolate between ticks for presentation only.
+- Visual-only animation (walk frames, bobbing, text reveal, tweens) derives
+  from state and tick and never feeds back into the core.
+
+### 3.2 Input
+- Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
+  -1..1) plus booleans `confirm`, `cancel`, and `menu`. Button edges (pressed
+  this tick) are derived in the core from the previous frame.
+- Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
+  cancel; J opens the journal (`menu`).
+- Gamepad (standard mapping) and touch (virtual stick plus buttons) map to the
+  same frame. Touch arrives with the iOS milestone.
+
+## 4. Presentation (locked)
+- Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
+  960..1600 (4:3 to 20:9). Letterbox outside that range.
+- Canvas backing resolution: devicePixelRatio, capped at 2.
+- Painted art, not pixel art: linear filtering with mipmaps.
+- Source art is authored at 2x logical units (1 unit = 2 source pixels).
+- The camera follows the player with a small dead zone, clamps to area bounds,
+  and snaps to whole device pixels.
+- Depth: the area ground layer is always at the back; props and characters
+  y-sort by their foot baseline.
+- Texture budget: at most 96 MB of decoded textures per loaded area (UI
+  excluded), no single texture over 2048x2048, and the previous area unloads on
+  transition.
+
+## 5. Characters and animation (locked)
+- Frame-by-frame animation in 4 directions: down, up, left, right. Right may
+  mirror left until a dedicated right set exists.
+- Walk: 6 frames per direction (minimum 4). Frames advance with distance walked
+  so feet do not slide.
+- Idle: 1 to 4 frames per direction.
+- Fae is about 140 units tall (about 280 source pixels).
+- Sprite sheets: one PNG atlas plus JSON frame data per character (Pixi
+  spritesheet format). Every frame shares a feet-centered pivot.
+- Followers (Maddie) and NPCs follow the same rules. NPCs may ship idle-only.
+
+## 6. World
+- Areas are discrete. `content/areas/<id>.json` defines size, ground image(s),
+  props, walkable polygon(s), blocker polygons, triggers (doors and edges),
+  interactables, and named spawn points. JSON is canonical; Tiled may be used
+  for editing, but exported data must match this format.
+- Player collider: a circle of radius 20 units at the feet that slides along
+  blockers.
+- Walk speed: 240 units per second (tunable in `content/tunables.json`).
+- Transitions: entering a trigger fades out, loads the target area, places the
+  player at the named spawn facing the given direction, and fades in.
+- Prototype areas: `bedroom` (from `hero_house_bedroom.png`) and `plaza` (from
+  `town_center_plaza.png`).
+
+## 7. Interaction and dialogue
+- The nearest interactable in front of the player (within 60 units) shows a
+  sticker-style prompt; confirm triggers it.
+- Dialogue is Ink (`content/story/*.ink`), compiled with inkjs. Ink variables
+  are the canonical story flags; there is no separate flag system.
+- The dialogue UI is the DOM overlay in the sticker style: cream paper,
+  die-cut border, dark-brown rounded text, speaker name, and choices navigable
+  by keyboard, gamepad, and touch.
+- Player movement is frozen while dialogue is open.
+
+## 8. Calm-down battles (v0)
+- Touching a chaos-touched critter starts a battle. Battles are turn-based,
+  short (under 2 minutes), and readable.
+- Goal: fill the critter's Calm meter. Chaos bursts drain Fae's Energy. At
+  zero Energy, Fae "needs a rest" and returns to the last safe spot with
+  nothing lost.
+- Prototype actions: Soothe, Play (Maddie), Snack, Run. A timed button press
+  during an action adds a bonus; a timed press during a chaos burst softens it.
+- Outcomes depend only on state, the seeded PRNG, and inputs.
+- Winning turns the critter back to normal and awards a sticker.
+
+## 9. Journal and stickers
+- The journal is the pause menu: Notes (current goals, written from Ink) and a
+  Sticker album. The map comes later.
+- Stickers are collectibles and rewards.
+
+## 10. Save and load
+- Save data: version, area id, player position and facing, Ink state JSON,
+  inventory, stickers, PRNG state, and tick.
+- Prototype: one slot in `localStorage`. iOS persistence is revisited in the
+  iOS milestones.
+
+## 11. Harness and agent control (locked)
+- The dev hook `window.__cloverhollow` exists in dev builds and in harness
+  builds (`vite build --mode harness`). Production builds must not contain it;
+  `just build` checks this.
+- Hook API v1:
+  - `pause()` and `resume()`: stop or start real-time ticking.
+  - `step(ticks)`: pause real-time ticking if it is running, advance exactly
+    N ticks with the currently held input (queued `input()` frames first, then
+    live devices), then render once. Returns a state summary. Pausing, holding
+    real keys, then stepping gives deterministic tests with real key presses.
+  - `input(frame, ticks)`: hold an action frame for the next N ticks, paused or
+    running.
+  - `getState()`: the full JSON state.
+  - `hash()`: the deterministic state hash.
+  - `reset({ seed, fixture })`: restart from a named fixture in
+    `content/fixtures/` (test-only starting setups such as `new-game`).
+- Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
+  are the only shortcut, and they are labeled test-only.
+- Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
+  they include the DOM UI.
+- Evidence ladder: core unit tests (Vitest, no mocks), then headless sim
+  scripts (`tests/sim`, Bun, thousands of ticks in milliseconds), then
+  Playwright e2e with real keyboard input and screenshot comparison. Every
+  gameplay feature has at least one e2e test that uses real key presses.
+- Visual baselines live beside the e2e specs. Update them only after viewing
+  the new image.
+- MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
+  1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
+  (`xcrun mcpbridge`) when Xcode has the iOS project open.
+
+## 12. Art direction and pipeline
+- Style source: `docs/art/concepts/`. Watercolor washes, thin warm-brown ink
+  outlines, soft pastels, chibi proportions (head to body about 1:1.5 to 1:2),
+  and a cozy sticker UI (cream paper, die-cut borders, dark-brown rounded
+  lettering, soft drop shadows).
+- Generation: Gemini image API, called from `tools/art/` scripts with concept
+  sheets as reference images. Each kept asset has a recipe in `art/recipes/`
+  (model, prompt, reference images, date, post-processing steps).
+- Post-processing (ImageMagick): background removal, trimming, feet-baseline
+  alignment, scaling to the 2x source scale, and atlas packing.
+- Gate: the owner approves the style of the first character and the first area
+  before bulk generation.
+- Style bible: `docs/art/style-bible.md` (Milestone 3).
+
+## 13. Out of scope until the owner adds it
+Multiplayer, merch, speedrun, boss rush, New Game Plus, achievements,
+analytics, voice acting, day/night, weather, fishing and bug minigames, photo
+mode, home customization, and non-English localization. Keep player-facing
+text in Ink or JSON so it stays translatable.

@@ -1,0 +1,22 @@
+{
+  "cutouts": [
+    {
+      "id": "cabinet",
+      "file": "cabinet.webp",
+      "x": 720,
+      "y": 205
+    },
+    {
+      "id": "block-lockers",
+      "file": "block-lockers.webp",
+      "x": 1006,
+      "y": 415
+    },
+    {
+      "id": "wall-post",
+      "file": "wall-post.webp",
+      "x": 758,
+      "y": 722
+    }
+  ]
+}

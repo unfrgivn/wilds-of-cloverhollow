@@ -1,0 +1,13 @@
+{
+  "asset":"school ground",
+  "date":"2026-10-07",
+  "model":"gemini-3.1-flash-image and gemini-3-pro-image",
+  "calls":3,
+  "references":["docs/art/concepts/environments/school_interior.png","art/source/areas/kitchen/kitchen-final.png","art/source/areas/school/school-final.png"],
+  "selected":"art/source/areas/school/school-final.png",
+  "prompt_summary":"Wide closer school hallway redraw based on the previous school composition and kitchen scale reference, with bottom-left glass entrance, doors, lockers, board, artwork, cabinet, fountain, and open checkered floor.",
+  "post_processing":["Uniformly resized selected source to 2800px wide and padded with #fcfbf6 to 2800x1800 without stretching.","Split into three opaque WebP tiles at quality 88.","Recorded paper margin colour #fcfbf6 in ground.json."],
+  "measurement":{"classroomDoorHeightPx":441,"measurementBasis":"The final selected v3 source measured approximately 315px in the 2000px-wide visual coordinate space; uniform output scale is 2800/2000=1.4, yielding approximately 441px in the 2800x1800 output. This is within the 330-450 target.","textCheck":"No clearly readable words were visible; the nurse marker is a red cross."},
+  "outputs":{"tiles":["public/assets/areas/school/ground_0_0.webp","public/assets/areas/school/ground_1_0.webp","public/assets/areas/school/ground_2_0.webp"],"manifest":"public/assets/areas/school/ground.json"},
+  "owner_review":"Queued in art/review/school-grid.png and school-owner-review.png."
+}

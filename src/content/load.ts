@@ -3,10 +3,12 @@ import bedroomData from "../../content/areas/bedroom.json";
 import plazaData from "../../content/areas/plaza.json";
 import kitchenData from "../../content/areas/kitchen.json";
 import parkData from "../../content/areas/park.json";
+import schoolData from "../../content/areas/school.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
 import parkFixtureData from "../../content/fixtures/park.json";
+import schoolFixtureData from "../../content/fixtures/school.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
@@ -238,6 +240,14 @@ export function parseArea(value: unknown, file: string): Area {
       id: item.id,
       polygon: item.polygon,
       target: { area: item.target.area, spawn: item.target.spawn },
+      ...(item.requires === undefined
+        ? {}
+        : {
+            requires: {
+              variable: item.requires.variable,
+              knot: item.requires.knot,
+            },
+          }),
     })),
     interactables: (value.interactables ?? []).map((item) => ({
       id: item.id,
@@ -551,6 +561,7 @@ export function loadContent(): {
   const plaza = parseArea(plazaData, "content/areas/plaza.json");
   const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
   const park = parseArea(parkData, "content/areas/park.json");
+  const school = parseArea(schoolData, "content/areas/school.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
@@ -562,6 +573,7 @@ export function loadContent(): {
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
     plaza: parseFixture(plazaFixtureData, "content/fixtures/plaza.json"),
     park: parseFixture(parkFixtureData, "content/fixtures/park.json"),
+    school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
   };
   const areas = {
     [harness.id]: harness,
@@ -569,6 +581,7 @@ export function loadContent(): {
     [plaza.id]: plaza,
     [kitchen.id]: kitchen,
     [park.id]: park,
+    [school.id]: school,
   };
   return {
     world: {

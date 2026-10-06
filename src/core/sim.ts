@@ -15,7 +15,7 @@ import type {
   CritterCommandId,
   BattleView,
 } from "./types";
-import { createInkState, runInk } from "./ink";
+import { createInkState, inkVariable, runInk } from "./ink";
 
 export const blankInput = (): ActionFrame => ({
   move: { x: 0, y: 0 },
@@ -1119,6 +1119,24 @@ export function step(
       !pointInPolygon(state.player, item.polygon) &&
       pointInPolygon(player, item.polygon),
   );
+  // A door that needs a story variable (spec 6): while the variable isn't
+  // true, crossing in plays its knot instead of leaving. Fae still steps into
+  // the doorway, so the outside-to-inside rule plays it again only after she
+  // steps out and back in.
+  const locked =
+    trigger?.requires !== undefined &&
+    inkVariable(world.story, state.ink, trigger.requires.variable) !== true
+      ? trigger.requires
+      : undefined;
+  const door = locked === undefined ? trigger : undefined;
+  const knock =
+    locked === undefined
+      ? undefined
+      : {
+          knot: locked.knot,
+          result: runInk(world.story, state.ink, { type: "start", knot: locked.knot },
+            calmedFacts(state)),
+        };
   const critterEntry = area.critters.find(
     (item) =>
       state.critters[item.id] === "chaos" &&
@@ -1182,9 +1200,11 @@ export function step(
         moving: trigger === undefined && displacement > 0.0001,
       },
       transition:
-        trigger === undefined
+        door === undefined
           ? null
-          : { target: trigger.target, phase: "out", elapsed: 0 },
+          : { target: door.target, phase: "out", elapsed: 0 },
+      ink: knock === undefined ? state.ink : knock.result.ink,
+      dialogue: knock === undefined ? state.dialogue : dialogueState(knock.knot, knock.result),
       maddie: follower.maddie,
       trail: follower.trail,
     },

@@ -1113,6 +1113,31 @@
         "area": "park",
         "spawn": "plaza-path"
       }
+    },
+    {
+      "id": "school-path",
+      "polygon": [
+        [
+          215,
+          1000
+        ],
+        [
+          365,
+          1000
+        ],
+        [
+          365,
+          1050
+        ],
+        [
+          215,
+          1050
+        ]
+      ],
+      "target": {
+        "area": "school",
+        "spawn": "front-doors"
+      }
     }
   ],
   "interactables": [
@@ -1148,6 +1173,11 @@
     },
     "park-path": {
       "x": 1470,
+      "y": 930,
+      "facing": "up"
+    },
+    "school-path": {
+      "x": 290,
       "y": 930,
       "facing": "up"
     }

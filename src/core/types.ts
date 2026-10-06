@@ -42,6 +42,7 @@ export type Area = {
     id: string;
     polygon: Polygon;
     target: { area: string; spawn: string };
+    requires?: { variable: string; knot: string };
   }[];
   interactables: {
     id: string;

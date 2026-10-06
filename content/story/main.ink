@@ -1,6 +1,7 @@
 VAR plan = "none"
 VAR ate_breakfast = false
 VAR read_notice = false
+VAR hall_pass = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -46,6 +47,7 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{hall_pass: I have a hall pass! Time to follow the raccoon's trail. # speaker: Fae}
 {calmed("pup"): The Pond Pup is calm. A raccoon paw print points toward the school. # speaker: Fae}
 {calmed("frog") and not calmed("pup"): Purple fizz drips lead out of the plaza to Meadow Park. # speaker: Fae}
 {calmed("frog"): The Fountain Frog is calm. Something purple fizzed into his fountain. # speaker: Fae}
@@ -131,4 +133,47 @@ Somebody ate every single berry... and left purple paw prints! # speaker: Fae
 === park_sign ===
 MEADOW PARK. Please keep your pets on the path! # speaker: Sign
 {not calmed("pup"): Somebody's pet is barking by the pond. # speaker: Fae}
+-> DONE
+
+
+=== teacher ===
+{hall_pass: -> pass}
+Good morning, Fae! Class starts when the bell rings. # speaker: Ms. Maple
++ [Can I go outside for a bit?]
+    Not without a hall pass, I'm afraid. # speaker: Ms. Maple
+    Nurse Holly sometimes needs a helper... # speaker: Ms. Maple
++ [Good morning, Ms. Maple!]
+    Such lovely manners! # speaker: Ms. Maple
+- -> DONE
+
+= pass
+A hall pass? All right. Be back in time for story time! # speaker: Ms. Maple
+-> DONE
+
+=== nurse ===
+{hall_pass: -> thanks}
+Hi Fae! Is everything all right? # speaker: Nurse Holly
++ [My tummy hurts...]
+    Hmm. Your tummy sounds happy to me. Fibbing isn't very kind, Fae. # speaker: Nurse Holly
++ [I'm fine! Can I help with anything?]
+    Oh, you're a star! Could you take this note to the front office? # speaker: Nurse Holly
+    ~ hall_pass = true
+    Here's a hall pass, so nobody stops you on the way. # speaker: Nurse Holly
+- -> DONE
+
+= thanks
+Thanks for helping, Fae! # speaker: Nurse Holly
+-> DONE
+
+=== school_doors ===
+The front doors stay shut during class. # speaker: Fae
+I need a hall pass to go outside. # speaker: Fae
+-> DONE
+
+=== school_board ===
+The bulletin board: a spelling bee, a lost mitten, and a bake sale on Friday. # speaker: Fae
+-> DONE
+
+=== trophies ===
+Trophies for spelling, soccer, and the best pumpkin in Cloverhollow. # speaker: Fae
 -> DONE

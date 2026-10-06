@@ -12,5 +12,19 @@
       32,
       32
     ]
+  },
+  "teacher": {
+    "atlas": "assets/characters/teacher/teacher.json",
+    "idleTicks": [
+      200,
+      8
+    ]
+  },
+  "nurse": {
+    "atlas": "assets/characters/nurse/nurse.json",
+    "idleTicks": [
+      170,
+      8
+    ]
   }
 }

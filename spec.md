@@ -236,6 +236,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   motion is idle. The core state stores `transition: null` or
   `{ target, phase: "out" | "in", elapsed }`; the area and spawn switch at the
   boundary between phases.
+- A trigger may need a story variable: `requires: { variable, knot }`. While
+  the Ink variable isn't true, crossing in plays `knot` as a dialogue (like an
+  interaction) instead of starting a transition; Fae stands in the doorway, so
+  it plays again only after she steps out and back in. Once the variable is
+  true, it's an ordinary door. The core reads variables with
+  `inkVariable(story, ink, name)`. The school's front doors need `hall_pass`
+  during class.
 - Content validation requires trigger targets and spawns to exist, trigger
   polygons to be reachable, and every spawn to be at least twice the player
   radius outside every trigger. Door spawns face away from the doorway into
@@ -245,13 +252,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   switch the trail resets to `[slot, spawn]` and both characters are frozen.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`), `kitchen`
   (the downstairs family room), `plaza` (from `town_center_plaza.png`), and
-  `park` (Meadow Park, from `meadow_park_environment.png`). The house is wired
-  bedroom door to the kitchen's stairs, the kitchen's front door to the plaza,
-  and the plaza's house door back to the kitchen; the plaza's lower-right
-  cobbled path leads to the park, and the park's exit path back.
+  `park` (Meadow Park, from `meadow_park_environment.png`), and `school` (the
+  school hallway, from `school_interior.png`). The house is wired bedroom door
+  to the kitchen's stairs, the kitchen's front door to the plaza, and the
+  plaza's house door back to the kitchen; the plaza's lower-right cobbled path
+  leads to the park and the lower-left path to the school's front doors, and
+  each leads back.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
-- People: an area's `npcs` are `{ id, point, facing, knot, prompt }` (Mom and
+- People: an area's `npcs` are `{ id, point, facing, knot, prompt }` (Ms.
+  Maple the teacher and Nurse Holly in the school hallway; Mom and
   Oliver in the kitchen). Each is drawn from the atlas named for its id in
   `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
   ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for

@@ -400,6 +400,31 @@
       ],
       "journal": [
         "ev",
+        {
+          "VAR?": "hall_pass"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I have a hall pass! Time to follow the raccoon's trail. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         "str",
         "^pup",
         "/str",
@@ -419,7 +444,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.7"
+                "->": ".^.^.^.14"
               },
               null
             ]
@@ -457,7 +482,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.23"
+                "->": ".^.^.^.30"
               },
               null
             ]
@@ -486,7 +511,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.33"
+                "->": ".^.^.^.40"
               },
               null
             ]
@@ -511,7 +536,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.40"
+                "->": ".^.^.^.47"
               },
               null
             ]
@@ -540,7 +565,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
+                "->": ".^.^.^.58"
               },
               null
             ]
@@ -569,7 +594,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.62"
+                "->": ".^.^.^.69"
               },
               null
             ]
@@ -1031,6 +1056,241 @@
         "done",
         null
       ],
+      "teacher": [
+        [
+          "ev",
+          {
+            "VAR?": "hall_pass"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "teacher.pass"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Good morning, Fae! Class starts when the bell rings. ",
+          "#",
+          "^speaker: Ms. Maple",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Can I go outside for a bit?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Good morning, Ms. Maple!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Not without a hall pass, I'm afraid. ",
+              "#",
+              "^speaker: Ms. Maple",
+              "/#",
+              "\n",
+              "^Nurse Holly sometimes needs a helper... ",
+              "#",
+              "^speaker: Ms. Maple",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Such lovely manners! ",
+              "#",
+              "^speaker: Ms. Maple",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "pass": [
+            "^A hall pass? All right. Be back in time for story time! ",
+            "#",
+            "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "nurse": [
+        [
+          "ev",
+          {
+            "VAR?": "hall_pass"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "nurse.thanks"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Hi Fae! Is everything all right? ",
+          "#",
+          "^speaker: Nurse Holly",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^My tummy hurts...",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^I'm fine! Can I help with anything?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Hmm. Your tummy sounds happy to me. Fibbing isn't very kind, Fae. ",
+              "#",
+              "^speaker: Nurse Holly",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Oh, you're a star! Could you take this note to the front office? ",
+              "#",
+              "^speaker: Nurse Holly",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "hall_pass",
+                "re": true
+              },
+              "^Here's a hall pass, so nobody stops you on the way. ",
+              "#",
+              "^speaker: Nurse Holly",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "thanks": [
+            "^Thanks for helping, Fae! ",
+            "#",
+            "^speaker: Nurse Holly",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "school_doors": [
+        "^The front doors stay shut during class. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^I need a hall pass to go outside. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "school_board": [
+        "^The bulletin board: a spelling bee, a lost mitten, and a bake sale on Friday. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "trophies": [
+        "^Trophies for spelling, soccer, and the best pumpkin in Cloverhollow. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
       "global decl": [
         "ev",
         "str",
@@ -1046,6 +1306,10 @@
         false,
         {
           "VAR=": "read_notice"
+        },
+        false,
+        {
+          "VAR=": "hall_pass"
         },
         "/ev",
         "end",

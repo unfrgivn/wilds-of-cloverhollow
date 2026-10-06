@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadContent } from "../../src/content/load";
-import { createInkState, runInk } from "../../src/core/ink";
+import { createInkState, inkVariable, runInk } from "../../src/core/ink";
 
 describe("Ink adapter", () => {
   const content = loadContent();
@@ -16,6 +16,25 @@ describe("Ink adapter", () => {
           knot: item.knot,
         });
         expect(result.line).not.toBeNull();
+      }
+  });
+
+  it("reads story variables, and every locked door names a real variable and knot", () => {
+    const story = content.world.story;
+    const fresh = createInkState(story, 1);
+    expect(inkVariable(story, fresh, "plan")).toBe("none");
+    expect(inkVariable(story, fresh, "ate_breakfast")).toBe(false);
+    expect(inkVariable(story, fresh, "no_such_variable")).toBeUndefined();
+    const greeting = runInk(story, fresh, { type: "start", knot: "mom" });
+    const fed = runInk(story, greeting.ink, { type: "choose", index: 0 }).ink;
+    expect(inkVariable(story, fed, "ate_breakfast")).toBe(true);
+    for (const area of Object.values(content.world.areas))
+      for (const trigger of area.triggers) {
+        if (trigger.requires === undefined) continue;
+        const where = `${area.id}/${trigger.id}`;
+        expect(inkVariable(story, fresh, trigger.requires.variable), where).toBeDefined();
+        const result = runInk(story, fresh, { type: "start", knot: trigger.requires.knot });
+        expect(result.line, where).not.toBeNull();
       }
   });
 

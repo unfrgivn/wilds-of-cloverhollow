@@ -80,6 +80,7 @@ for (const item of [
   { name: "morning", fixture: "new-game" },
   { name: "frog-win", fixture: "plaza" },
   { name: "pup-win", fixture: "park" },
+  { name: "hall-pass", fixture: "school" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
@@ -89,15 +90,8 @@ for (const item of [
     // run (and on CI's software-rendered browsers, about 6x slower) that takes
     // longer than the default.
     test.setTimeout(process.env.CI ? 180_000 : 60_000);
-    const folder =
-      fixture === "new-game"
-        ? "new-game"
-        : fixture === "plaza"
-          ? "plaza"
-          : fixture === "park"
-            ? "park"
-          : "harness";
-    const path = `tests/sim/scripts/${folder}/${name}.json`;
+    // Scripts live in tests/sim/scripts/<fixture>/ (tools/sim/run-all.ts).
+    const path = `tests/sim/scripts/${fixture}/${name}.json`;
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
     await openHarness(page);
     await resetPaused(page, fixture);

@@ -1,0 +1,33 @@
+{
+  "asset": "teacher",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 2,
+  "references": [
+    "docs/art/concepts/npcs/school_staff_npcs.png"
+  ],
+  "selectedRawSources": [
+    "art/source/staff/teacher/model-sheet-raw.png",
+    "art/source/staff/teacher/blink-edit-raw.png"
+  ],
+  "scaleFactor": 0.1855,
+  "postProcessing": {
+    "key": "#FF00FF border flood fill",
+    "despill": "edge-only magenta despill at 20px matte band",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "336 source pixels",
+    "baseline": 439,
+    "atlas": "tools/art/build-staff.ts"
+  },
+  "validator": {
+    "biped": false,
+    "idleOnly": true,
+    "directions": [
+      "down",
+      "left",
+      "right"
+    ],
+    "key": "magenta"
+  },
+  "selectionReason": "The front pose is the selected base; the blink is a single generated edit processed through the identical key, crop, scale, and baseline pipeline. Left/right use generated side poses, with the teacher right frame mirrored from the left pose."
+}

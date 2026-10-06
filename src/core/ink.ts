@@ -29,6 +29,21 @@ export function createInkState(storyJson: StoryJson, seed: number): string {
   return json;
 }
 
+export function inkVariable(
+  storyJson: StoryJson,
+  inkJson: string,
+  name: string,
+): unknown {
+  const story = new Story(storyJson);
+  story.state.LoadJson(inkJson);
+  const variable = story.state.variablesState.GetVariableWithName(name);
+  if (variable === null) return undefined;
+  const text = variable.toString();
+  if (text === "true") return true;
+  if (text === "false") return false;
+  return text;
+}
+
 function line(story: Story): InkLine | null {
   const text = story.currentText ?? "";
   const currentTags = story.currentTags ?? [];

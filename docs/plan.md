@@ -207,7 +207,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   `just ios-smoke` goes round the top of the plaza to the park and back, then
   meets the frog from the right.
 
-## Milestone 14: School day
+## Milestone 14: School day **Status:** ✅ Completed (2026-10-06)
 - The school hallway (from `school_interior.png`), reached by the plaza's
   lower-left cobbled path (the road the Pond Pup points to): lockers, the
   bulletin board, the trophy cabinet, the classroom and nurse's office doors.
@@ -220,8 +220,17 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
 - Unit (the conditional door, reading story variables), a sim (earning the
   pass and leaving), cross-engine hash, e2e with real keys (locked doors, the
   conversation, leaving), reviewed baselines.
+- Notes: the puzzle is Ms. Maple's hint that Nurse Holly needs a helper; a
+  fib about a tummy ache gets a gentle no (and she asks again), an honest
+  offer gets the hall pass. "Ms. Maple" is a placeholder name (NOTES.md leaves
+  the teacher TBD). The painting took three tries: the first followed the
+  concept's close-up (doors nearly three times Fae's height), the second
+  overcorrected; the third is at the kitchen's scale. One small letter
+  fragment remains by the front doors. The first engine version kept a
+  per-trigger "blocked" list in the state; the outside-to-inside rule already
+  replays the knot only after Fae steps out, so it was removed.
 
-## Roadmap after Milestone 13 (proposed, not scheduled)
+## Roadmap after Milestone 14 (proposed, not scheduled)
 - The raccoon in the purple hood: the first story encounter with the chaos
   caster (concept `chaos_raccoon.png`), who runs off toward the park.
 - Audio: a gentle music bed per area and soft UI sounds (needs the owner's

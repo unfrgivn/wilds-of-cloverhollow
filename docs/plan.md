@@ -230,9 +230,20 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   per-trigger "blocked" list in the state; the outside-to-inside rule already
   replays the knot only after Fae steps out, so it was removed.
 
+## Milestone 15: The raccoon in the purple hood
+- With the hall pass, Fae walks out into the plaza and meets the raccoon from
+  the notice board (`chaos_raccoon.png`): he taunts her, vanishes in a puff of
+  purple fizz, and drops the password to the club in the park's tree house.
+  At the tree house the password works, and his purple hood hangs inside, a
+  clue for the next chapter.
+- Engine: people can come and go with the story. An area person may be
+  `visibleWhile` an Ink variable; hidden, they aren't drawn, can't be talked
+  to, and aren't solid. Each person's solid footprint moves from the area's
+  blockers into the person (`footprint`).
+- Unit (visibility, footprints), a sim (the raccoon scene), cross-engine
+  hash, e2e with real keys, reviewed baselines, `just ios-smoke` unchanged.
+
 ## Roadmap after Milestone 14 (proposed, not scheduled)
-- The raccoon in the purple hood: the first story encounter with the chaos
-  caster (concept `chaos_raccoon.png`), who runs off toward the park.
 - Audio: a gentle music bed per area and soft UI sounds (needs the owner's
   okay on any new dependency or paid generation).
 - Device testing and TestFlight (needs the owner: store and account actions).

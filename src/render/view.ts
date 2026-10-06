@@ -3,9 +3,12 @@ import {
   BlurFilter,
   Container,
   Graphics,
+  Rectangle,
   Sprite,
   Spritesheet,
   Text,
+  type Renderer,
+  type Texture,
 } from "pixi.js";
 import {
   hiddenFraction,
@@ -45,8 +48,7 @@ export class GameView {
   private readonly battleLayer = new Container();
   // A light cream wash over the blurred backdrop so the figures stand out.
   private readonly battleWash = new Graphics();
-  // Not clipped to the viewport, so the blur samples real painting past the
-  // canvas edges instead of fading into transparency there.
+  // Not clipped to the viewport, so the blur samples the whole painting.
   private readonly backdropBlur = new BlurFilter({
     strength: 4,
     quality: 2,
@@ -54,8 +56,10 @@ export class GameView {
     clipToViewport: false,
   });
   private battleBackdrop: { x: number; y: number; width: number; height: number } | null = null;
-  // Pixi's filters getter returns undefined until a filter is set, so track it here.
-  private backdropBlurred = false;
+  // The blurred painting, rendered once per battle (see renderBackdrop).
+  private readonly backdropSprite = new Sprite();
+  private readonly renderer: Renderer;
+  private backdropTexture: Texture | undefined;
   private readonly battleFrog = new Sprite();
   private readonly battleAura = new Sprite();
   private readonly battleFae = new Sprite();
@@ -78,8 +82,9 @@ export class GameView {
 
   constructor(
     private readonly world: World,
-    options: { debugLabel: boolean },
+    options: { debugLabel: boolean; renderer: Renderer },
   ) {
+    this.renderer = options.renderer;
     this.depth.sortableChildren = true;
     this.player.label = "fae";
     this.maddie.label = "maddie";
@@ -92,6 +97,7 @@ export class GameView {
       this.scene,
       this.viewportMask,
       this.fade,
+      this.backdropSprite,
       this.battleWash,
       this.battleLayer,
     );
@@ -381,15 +387,22 @@ export class GameView {
       width + margin - (area.width - insetX) * cover, -margin - insetX * cover);
     const y = clamp(height / 2 - focus.y * cover,
       height + margin - (area.height - insetY) * cover, -margin - insetY * cover);
-    this.scene.scale.set(cover);
-    this.scene.position.set(x, y);
-    if (!this.backdropBlurred) {
-      // Widen the viewport clip to the whole canvas. (Unassigning the mask
-      // instead would draw its white rectangle over the scene.)
-      this.viewportMask.clear().rect(0, 0, width, height).fill(0xffffff);
-      this.scene.filters = [this.backdropBlur];
-      this.backdropBlurred = true;
+    if (this.backdropTexture === undefined && this.areaView !== undefined) {
+      // Blur the painting once into a small texture: the backdrop is static,
+      // so each battle frame draws one sprite instead of a full-screen blur
+      // (slow without a GPU, costly on a phone).
+      const ground = this.areaView.ground;
+      ground.filters = [this.backdropBlur];
+      this.backdropTexture = this.renderer.generateTexture({
+        target: ground,
+        frame: new Rectangle(0, 0, area.width, area.height),
+        resolution: 0.5,
+      });
+      ground.filters = [];
+      this.backdropSprite.texture = this.backdropTexture;
     }
+    this.backdropSprite.scale.set(cover);
+    this.backdropSprite.position.set(x, y);
     this.battleBackdrop = { x, y, width: area.width * cover, height: area.height * cover };
   }
 
@@ -403,19 +416,19 @@ export class GameView {
     if (battle === null) {
       this.battleLayer.visible = false;
       this.battleWash.visible = false;
-      this.depth.visible = true;
+      this.backdropSprite.visible = false;
+      this.scene.visible = true;
       this.battleBackdrop = null;
-      if (this.backdropBlurred) {
-        this.scene.filters = [];
-        this.backdropBlurred = false;
-        // Put the viewport clip back (the battle widened it to the canvas).
-        this.drawStatic(width, height, this.staticPaper);
+      if (this.backdropTexture !== undefined) {
+        this.backdropTexture.destroy(true);
+        this.backdropTexture = undefined;
       }
       return;
     }
     this.battleLayer.visible = true;
     this.battleWash.visible = true;
-    this.depth.visible = false;
+    this.backdropSprite.visible = true;
+    this.scene.visible = false;
     this.renderBackdrop(battle.critterId, width, height);
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const x = (width - this.viewWidth * scale) / 2;
@@ -706,7 +719,7 @@ export class GameView {
                   height: 140 * scale,
                 };
               })(),
-        overworldVisible: this.depth.visible,
+        overworldVisible: this.scene.visible,
         auraAlpha: state.battle === null ? 0 : this.battleAura.alpha,
       },
     };

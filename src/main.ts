@@ -70,6 +70,7 @@ async function boot(): Promise<void> {
   commandMenu.onChoose((index) => touch.tapChoice(index));
   const view = new GameView(content.world, {
     debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
+    renderer: app.renderer,
   });
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];

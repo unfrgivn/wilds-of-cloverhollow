@@ -340,6 +340,34 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Outcomes depend only on state, the seeded PRNG, and inputs.
 - Winning turns the critter back to normal and awards a sticker.
 
+### 8.1 Battle UI layout
+- Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
+  menu, a timing ring with its grade sticker, and a reward card. The game
+  passes a full view to each `render` every frame; identical views change no
+  DOM nodes. Battle messages use the dialogue box with no speaker.
+- One stacking scale (`--z-*` in sticker.css), bottom to top: HUD, dialogue,
+  commands, choices, prompt, ring and grade, reward.
+- HUD: ENERGY (one leaf per point, spent leaves outlined) at the top left and
+  the critter's CALM meter (its name in capitals) at the top right, left of
+  the menu button, inside the safe area. It hides during the reward.
+- Commands: a 2x2 grid of sticker buttons on phones (one column from 1000 px
+  wide), right-aligned above confirm and cancel, clear of the HUD, the
+  dialogue box, and the touch buttons. The selected command is lifted and
+  green. Disabled commands are dashed and grey in explicit colours (never
+  opacity), carry a detail line such as "resting", and never emit a choice.
+- Timing ring: an SVG centred exactly on the CSS point the game passes (the
+  critter or Fae on screen). The moving ring's radius is
+  `radius * (1 - progress)` and the dashed target's is `radius * (1 - target)`.
+  The grade sticker (GREAT! green, GOOD! teal, MISS cream) sits centred 6 px
+  above the target circle.
+- Reward card: a centred die-cut card with the title, one atlas frame cropped
+  by CSS to 150 px wide, and the name. Stacked drop-shadows give the image a
+  white rim and an ink outline that follow the critter's silhouette. Asset
+  URLs are document-relative so they work on iOS.
+- `data-battle="open"` on the root hides the movement stick; confirm and cancel
+  stay. Every battle text pair measures at least 4.5:1 contrast in the gallery
+  tests.
+
 ## 9. Journal and stickers
 - The journal is the pause menu: Notes (current goals, written from Ink) and a
   Sticker album. The map comes later.

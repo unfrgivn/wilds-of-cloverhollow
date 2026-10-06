@@ -80,3 +80,7 @@
 :root[data-dialogue="open"] .touch-stick {
   display: none;
 }
+
+:root[data-battle="open"] .touch-stick {
+  display: none;
+}

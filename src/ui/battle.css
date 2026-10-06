@@ -1,0 +1,258 @@
+/* Battle stickers. Layering comes from the --z-* scale in sticker.css. */
+.battle-hud[hidden],
+.battle-commands[hidden],
+.battle-command-detail[hidden],
+.battle-grade[hidden],
+.battle-reward[hidden] {
+  display: none;
+}
+
+.battle-hud {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  pointer-events: none;
+  font-family: var(--sticker-font);
+}
+.battle-meter {
+  position: absolute;
+  top: calc(18px + var(--safe-top));
+  box-sizing: border-box;
+  min-height: 58px;
+  padding: 8px 12px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 15px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+}
+.battle-energy {
+  left: calc(20px + var(--safe-left));
+  width: 210px;
+}
+.battle-calm {
+  right: calc(78px + var(--safe-right));
+  width: min(280px, calc(100vw - 350px));
+}
+.battle-meter-label {
+  display: block;
+  color: var(--sticker-ink);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.battle-leaves {
+  display: flex;
+  gap: 4px;
+  margin-top: 7px;
+}
+.battle-leaf {
+  width: 22px;
+  height: 17px;
+}
+.battle-leaf path {
+  fill: none;
+  stroke: var(--sticker-ink);
+  stroke-width: 2;
+}
+.battle-leaf.is-full path {
+  fill: var(--sticker-green);
+}
+.battle-calm-track {
+  position: relative;
+  height: 20px;
+  margin-top: 7px;
+  overflow: hidden;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 10px;
+  background: var(--sticker-border);
+}
+.battle-calm-fill {
+  width: 0;
+  height: 100%;
+  background-color: var(--sticker-green);
+  background-image: repeating-linear-gradient(-35deg, #ffffff55 0 5px, transparent 5px 10px);
+  transition: width 180ms ease-out;
+}
+
+/* Phones get a 2x2 grid above confirm and cancel; roomier screens stack. */
+.battle-commands {
+  position: fixed;
+  right: calc(24px + var(--safe-right));
+  bottom: calc(128px + var(--safe-bottom));
+  z-index: var(--z-commands);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 246px;
+  pointer-events: auto;
+  font-family: var(--sticker-font);
+}
+@media (min-width: 1000px) {
+  .battle-commands {
+    display: flex;
+    flex-direction: column;
+    width: 230px;
+  }
+}
+.battle-command {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 2px 12px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 13px 16px 12px 15px;
+  background: var(--sticker-rim);
+  box-shadow: 0 4px 0 var(--sticker-border);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+}
+.battle-command[aria-selected="true"] {
+  background: var(--sticker-green);
+  box-shadow: 0 5px 0 var(--sticker-ink);
+  transform: translateY(-3px) rotate(-1deg);
+}
+/* Explicit colours, never opacity, so disabled text keeps its contrast. */
+.battle-command[aria-disabled="true"] {
+  border-style: dashed;
+  background: #ddd6ca;
+  box-shadow: none;
+  color: var(--sticker-ink);
+  cursor: not-allowed;
+}
+.battle-command-label {
+  display: block;
+  line-height: 1.15;
+}
+.battle-command-detail {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.battle-ring {
+  position: fixed;
+  z-index: var(--z-ring);
+  overflow: visible;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.battle-ring-rim,
+.battle-ring-ink,
+.battle-ring-target {
+  fill: none;
+  stroke-linecap: round;
+}
+.battle-ring-rim {
+  stroke: var(--sticker-rim);
+  stroke-width: 8;
+}
+.battle-ring-ink {
+  stroke: var(--sticker-ink);
+  stroke-width: 3;
+}
+.battle-ring-target {
+  stroke: var(--sticker-ink);
+  stroke-dasharray: 7 6;
+  stroke-width: 3;
+}
+/* Positioned by its bottom-centre: left = x, top = just above the target. */
+.battle-grade {
+  position: fixed;
+  z-index: var(--z-ring);
+  padding: 7px 14px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 13px;
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+  pointer-events: none;
+  transform: translate(-50%, -100%) rotate(-2deg);
+  white-space: nowrap;
+}
+.battle-grade-great {
+  background: var(--sticker-green);
+}
+.battle-grade-good {
+  background: var(--sticker-teal);
+}
+.battle-grade-miss {
+  background: var(--sticker-paper);
+}
+
+.battle-reward {
+  position: fixed;
+  top: calc(50% + var(--safe-top) / 2);
+  left: 50%;
+  z-index: var(--z-reward);
+  width: min(300px, calc(100vw - 40px));
+  box-sizing: border-box;
+  padding: 18px 20px 20px;
+  border: 6px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 22px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.battle-reward-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+/* One atlas frame, 150 px wide. The rim and ink outline are drop-shadows, so
+   they follow the critter's silhouette rather than the box. */
+.battle-reward-image {
+  width: 150px;
+  height: 150px;
+  margin: 8px auto;
+  background-repeat: no-repeat;
+  filter:
+    drop-shadow(3px 0 0 var(--sticker-rim))
+    drop-shadow(-3px 0 0 var(--sticker-rim))
+    drop-shadow(0 3px 0 var(--sticker-rim))
+    drop-shadow(0 -3px 0 var(--sticker-rim))
+    drop-shadow(1.5px 0 0 var(--sticker-ink))
+    drop-shadow(-1.5px 0 0 var(--sticker-ink))
+    drop-shadow(0 1.5px 0 var(--sticker-ink))
+    drop-shadow(0 -1.5px 0 var(--sticker-ink))
+    drop-shadow(0 4px 4px #47321f40);
+}
+.battle-reward-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+.battle-reward.is-visible {
+  animation: battle-pop 320ms ease-out;
+}
+@keyframes battle-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-calm-fill {
+    transition: none;
+  }
+  .battle-reward.is-visible {
+    animation: none;
+  }
+}

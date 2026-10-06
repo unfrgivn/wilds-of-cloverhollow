@@ -1,6 +1,13 @@
 import "../ui/sticker.css";
 import { createDialogueBox, createPrompt, type DialogueView, type PromptView } from "../ui/sticker";
 import { mountTouchControls } from "../ui/touch-controls";
+import {
+  createBattleHud,
+  createCommandMenu,
+  createRewardSticker,
+  createTimingRing,
+  type TimingRingView,
+} from "../ui/battle";
 
 const root = document.querySelector<HTMLElement>("#gallery");
 if (root === null) throw new Error("Missing gallery root");
@@ -31,16 +38,16 @@ declare global {
     __stickerGallery: {
       render: (view: DialogueView) => void;
       renderPrompt: (view: PromptView) => void;
+      renderRing: (view: TimingRingView) => void;
+      renderState: () => void;
     };
   }
 }
-window.__stickerGallery = {
-  render: (view) => dialogue.render(view),
-  renderPrompt: (view) => prompt.render(view),
-};
 const state = params.get("state") ?? "short";
-document.documentElement.toggleAttribute("data-dialogue", state !== "prompt");
-if (state !== "prompt") document.documentElement.dataset.dialogue = "open";
+const battleState = state.startsWith("battle-");
+const dialogueShown = battleState ? state === "battle-command" : state !== "prompt";
+if (battleState) document.documentElement.dataset.battle = "open";
+if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 const defaultView: DialogueView = { speaker: "Maddie", text: "The fountain is singing today!",
   revealed: 32, choices: [], selected: -1, canAdvance: true };
 const views: Record<string, DialogueView> = {
@@ -66,18 +73,51 @@ const views: Record<string, DialogueView> = {
     choices: [{ text: "Okay!" }], selected: 0, canAdvance: false },
   prompt: { speaker: null, text: "", revealed: 0, choices: [], selected: -1, canAdvance: false },
 };
-dialogue.onChoose((index) => { root.dataset.chosen = String(index); });
+const battleHud = createBattleHud(stage);
+const commands = createCommandMenu(stage);
+const ring = createTimingRing(stage);
+const reward = createRewardSticker(stage);
+commands.onChoose((index) => {
+  root.dataset.battleChosen = String(index);
+});
+dialogue.onChoose((index) => {
+  root.dataset.chosen = String(index);
+});
+const battleMessage: DialogueView = { speaker: null, text: "What should Fae do?",
+  revealed: 100, choices: [], selected: -1, canAdvance: false };
+const frogRing = { x: 600, y: 170, radius: 74, progress: .62, target: .65 };
+const faeRing = { x: 190, y: 300, radius: 66, progress: .38, target: .5 };
 function renderGalleryState(): void {
-  if (state === "prompt") {
-    dialogue.hide();
-    prompt.render({ label: "TALK", x: window.innerWidth / 2,
-      y: window.innerHeight / 2, visible: true });
-  } else {
-    const selectedView = views[state];
-    dialogue.render(selectedView === undefined ? defaultView : selectedView);
-    prompt.render({ label: "TALK", x: 100, y: 100, visible: false });
-  }
+  // The battle is over once the reward shows, so the HUD steps aside.
+  battleHud.render({ visible: battleState && state !== "battle-reward", energy: 3,
+    energyMax: 5, calm: .45,
+    critterName: "Fizzy Frog" });
+  commands.render({ visible: state === "battle-command", selected: 2, commands: [
+    { id: "soothe", label: "Soothe", detail: null, disabled: false },
+    { id: "play", label: "Play", detail: "resting", disabled: true },
+    { id: "snack", label: "Snack", detail: "×2", disabled: false },
+    { id: "run", label: "Run", detail: null, disabled: false },
+  ] });
+  ring.render({
+    ...(state === "battle-burst" ? faeRing : frogRing),
+    visible: state === "battle-timing" || state === "battle-grade" || state === "battle-burst",
+    grade: state === "battle-grade" ? "great" : null,
+  });
+  reward.render({ visible: state === "battle-reward", title: "NEW STICKER!",
+    name: "Fountain Frog", image: { src: "assets/critters/frog/frog.png",
+      frame: { x: 0, y: 512, w: 512, h: 512 }, atlas: { w: 1536, h: 1024 } } });
+  prompt.render({ label: "TALK", x: window.innerWidth / 2, y: window.innerHeight / 2,
+    visible: state === "prompt" });
+  if (!dialogueShown) dialogue.hide();
+  else if (battleState) dialogue.render(battleMessage);
+  else dialogue.render(views[state] ?? defaultView);
 }
+window.__stickerGallery = {
+  render: (view) => dialogue.render(view),
+  renderPrompt: (view) => prompt.render(view),
+  renderRing: (view) => ring.render(view),
+  renderState: renderGalleryState,
+};
 renderGalleryState();
 window.addEventListener("resize", renderGalleryState);
 void document.fonts.ready.then(() => new Promise<void>((resolve) => {

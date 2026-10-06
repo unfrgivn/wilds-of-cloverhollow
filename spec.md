@@ -116,6 +116,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   TestFlight. The display name is Cloverhollow and the web directory defaults
   to `dist`, overridable with `CLOVERHOLLOW_WEB_DIR`.
 - The iOS deployment target remains the Capacitor template default, iOS 15.0.
+- Signing (owner, 2026-10-06): the owner's Apple developer account is unpaid
+  for now, so device builds use free personal-team signing (7-day profiles,
+  up to three devices, no TestFlight) until it's paid.
   The shell is landscape-only on iPhone and iPad, uses full screen, hides the
   status bar, disables WebView scrolling and zoom, and uses `#f8edcf` as its
   background.
@@ -661,6 +664,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   labels), the battle screen (the frog centred, Fae facing him from the left,
   the blurred plaza behind), and the journal (an open book with notes and a
   sticker album; the JOURNAL button with a teal quill).
+- Approved 2026-10-06 ("for now", open to iteration): the title screen, the
+  kitchen and living room, Mom, Oliver, Meadow Park, the Zoomie Pup, the
+  school hallway (with its stray letter fragment), Ms. Maple and Nurse Holly,
+  and the raccoon in the purple hood; and all the wording the agents chose
+  for Milestones 9 to 15 (the frog's and pup's calm lines, the journal notes,
+  Mom and Oliver, the hall-pass puzzle, the raccoon and the tree house).
+  "Ms. Maple" stays as the teacher's name for now.
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

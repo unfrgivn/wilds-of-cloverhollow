@@ -253,17 +253,17 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   tail with fixed panel crops; the build now extracts whole figures.
 
 ## Roadmap after Milestone 15 (proposed, waiting on the owner)
-Chapter one ends with the purple hood's Cloverhollow School name tag. The next
-steps need the owner's decisions first (`docs/review-queue.md`, "Decisions
-only the owner can make"):
-- Who the kid in the hood is, and how Fae finds out (a school chapter).
-- Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md), once it's
-  decided whether party members follow Fae, help in battles, or both. The
-  engine already has what the areas need: painted areas, people who come and
-  go, locked doors, and generic critters.
-- Audio: a gentle music bed per area and soft UI sounds (a new dependency or
-  paid generation).
-- Device testing and TestFlight (the owner's Apple account).
+Chapter one ends with the purple hood's Cloverhollow School name tag.
+- Who the kid in the hood is, and how Fae finds out (a school chapter). Still
+  open: the owner doesn't know yet (2026-10-06).
+- Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md). Decided
+  2026-10-06: party members both follow Fae (like Maddie) and help in battles.
+  The engine already has what the areas need: painted areas, people who come
+  and go, locked doors, and generic critters; followers who fight is new.
+- Audio: later (owner, 2026-10-06).
+- Device testing: the owner's Apple developer account is unpaid for now, so
+  only free personal-team signing is available (7-day profiles, no
+  TestFlight). Paid account and TestFlight later.
 
 ## Later (not scheduled)
 Gamepad polish, and the tools from NOTES.md (lantern, lasso, flute).

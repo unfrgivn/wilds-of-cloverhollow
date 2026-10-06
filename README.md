@@ -31,6 +31,10 @@ The previous Godot pixel-art build is archived at tag `archive/godot-pixel`.
 - `just ios-smoke`: drag the touch stick in the simulator and verify that the
   player moved, using the app's live console output
 - `just ios-open`: open the iOS project in Xcode
+- `just ios-device-build`: compile the production game for a real iPhone
+  (unsigned, no phone needed)
+- `just ios-device`: sign it with your personal team and install it on the
+  iPhone plugged in over USB (copy `.env.ios.example` to `.env.ios` first)
 
 Screenshot baselines are macOS-only for now. The harness build is used by the
 Playwright suite and can be started with `bun run build:harness`.

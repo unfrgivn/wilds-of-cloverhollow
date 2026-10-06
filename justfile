@@ -1,3 +1,5 @@
+set dotenv-filename := ".env.ios"
+
 # Start the development server.
 dev:
   bun run dev
@@ -40,3 +42,12 @@ ios-open:
 ios-smoke:
   just ios-sim
   bun tools/ios/smoke.ts
+
+# Compile the production game for a real iPhone (unsigned; proves the arm64 build).
+ios-device-build:
+  bun tools/ios/device.ts
+
+# Build the production game with free personal-team signing and install it on
+# the connected iPhone. Needs CLOVERHOLLOW_TEAM_ID (see .env.ios.example).
+ios-device:
+  bun tools/ios/device.ts --install

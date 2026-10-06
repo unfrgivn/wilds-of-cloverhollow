@@ -17,6 +17,7 @@ art/scratch/
 .env
 .env.*
 !.env.example
+!.env.ios.example
 *.log
 .DS_Store
 

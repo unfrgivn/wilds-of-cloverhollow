@@ -252,18 +252,38 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   with a test that fails without the fix. The first raccoon build cut his
   tail with fixed panel crops; the build now extracts whole figures.
 
-## Roadmap after Milestone 15 (proposed, waiting on the owner)
+## Milestone 16: On the owner's iPhone **Status:** ✅ Completed (2026-10-06)
+- `just ios-device-build` builds the production web bundle (no harness hook),
+  syncs it into the native shell, and compiles the Release app for a real
+  arm64 iPhone, unsigned. `just ios-device` does the same with free
+  personal-team signing and installs and launches it on the connected phone
+  over USB (`tools/ios/device.ts`, `xcodebuild -destination
+  generic/platform=iOS -allowProvisioningUpdates`, `xcrun devicectl`).
+- The team id stays out of the repo: `.env.ios` (gitignored, loaded by `just`)
+  holds `CLOVERHOLLOW_TEAM_ID` and an optional `CLOVERHOLLOW_DEVICE`;
+  `.env.ios.example` shows the shape.
+- Evidence: the unsigned device build compiles (arm64, Info.plist bundle id
+  `com.unfrgivn.cloverhollow`, minimum iOS 15.0, no `__cloverhollow` in the
+  bundled scripts); both missing-team and no-phone cases fail with a plain
+  message, no stack trace.
+- Notes: no iPhone was attached while this was built, so the install step is
+  untested on hardware. Owner steps (once, at the Mac): sign in to Xcode >
+  Settings > Accounts, copy the Personal Team id into `.env.ios`, plug the
+  phone in, tap Trust, turn on Developer Mode, then `just ios-device`; after
+  the first install, trust the developer app under Settings > General > VPN &
+  Device Management. Free profiles last 7 days; rerun to refresh.
+
+## Roadmap after Milestone 16 (proposed, waiting on the owner)
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).
 - Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md). Decided
   2026-10-06: party members both follow Fae (like Maddie) and help in battles.
   The engine already has what the areas need: painted areas, people who come
-  and go, locked doors, and generic critters; followers who fight is new.
+  and go, locked doors, and generic critters; followers who fight is Milestone
+  17.
 - Audio: later (owner, 2026-10-06).
-- Device testing: the owner's Apple developer account is unpaid for now, so
-  only free personal-team signing is available (7-day profiles, no
-  TestFlight). Paid account and TestFlight later.
+- TestFlight and a paid developer account: later.
 
 ## Later (not scheduled)
 Gamepad polish, and the tools from NOTES.md (lantern, lasso, flute).

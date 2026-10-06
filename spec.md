@@ -119,6 +119,16 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Signing (owner, 2026-10-06): the owner's Apple developer account is unpaid
   for now, so device builds use free personal-team signing (7-day profiles,
   up to three devices, no TestFlight) until it's paid.
+- Device builds (`tools/ios/device.ts`): `just ios-device-build` builds the
+  production web bundle into `dist`, checks it for the harness hook, syncs it
+  with `CLOVERHOLLOW_WEB_DIR=dist`, and compiles the Release app for
+  `generic/platform=iOS` unsigned. `just ios-device` signs it automatically
+  with `DEVELOPMENT_TEAM=$CLOVERHOLLOW_TEAM_ID` (`-allowProvisioningUpdates`,
+  device registration allowed), then installs and launches it with `xcrun
+  devicectl` on the first connected physical iPhone, or the one named by
+  `CLOVERHOLLOW_DEVICE`. The team id lives only in the gitignored `.env.ios`,
+  which `just` loads; `.env.ios.example` documents it. Missing team or phone
+  fails with a one-paragraph message.
   The shell is landscape-only on iPhone and iPad, uses full screen, hides the
   status bar, disables WebView scrolling and zoom, and uses `#f8edcf` as its
   background.

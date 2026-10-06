@@ -85,8 +85,9 @@ for (const item of [
     page,
   }) => {
     // Replays a whole script in the browser and in Bun; under a full parallel
-    // run that can take longer than the default 30 s.
-    test.setTimeout(60_000);
+    // run (and on CI's software-rendered browsers, about 6x slower) that takes
+    // longer than the default.
+    test.setTimeout(process.env.CI ? 180_000 : 60_000);
     const folder =
       fixture === "new-game"
         ? "new-game"

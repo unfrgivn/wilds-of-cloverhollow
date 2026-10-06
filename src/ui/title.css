@@ -1,0 +1,139 @@
+.title-screen[hidden],
+.title-confirm[hidden] {
+  display: none;
+}
+
+/* The title is the top layer; the shell draws the area painting behind it. */
+.title-screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-title);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 4vh, 36px);
+  box-sizing: border-box;
+  padding: calc(16px + var(--safe-top)) calc(20px + var(--safe-right))
+    calc(16px + var(--safe-bottom)) calc(20px + var(--safe-left));
+  background: #fffaf033;
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+}
+
+/* The wordmark plate: a cream die-cut sticker, tilted a little. */
+.title-plate {
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  padding: clamp(12px, 2.6vh, 22px) clamp(22px, 4vw, 40px);
+  border: 6px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 24px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  transform: rotate(-2deg);
+}
+.title-logo {
+  margin: 0;
+  font-size: clamp(28px, min(6vw, 9vh), 56px);
+  font-weight: 900;
+  letter-spacing: .01em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+.title-clover {
+  position: absolute;
+  top: -22px;
+  right: -16px;
+  width: 44px;
+  height: 48px;
+  transform: rotate(14deg);
+}
+.title-clover-leaf {
+  fill: var(--sticker-green);
+  stroke: var(--sticker-ink);
+  stroke-width: 2;
+}
+.title-clover-stem {
+  fill: none;
+  stroke: var(--sticker-ink);
+  stroke-linecap: round;
+  stroke-width: 2.4;
+}
+
+.title-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(330px, 100%);
+}
+.title-option,
+.title-confirm-button {
+  min-height: 48px;
+  padding: 8px 16px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 14px;
+  background: var(--sticker-rim);
+  box-shadow: 0 4px 0 var(--sticker-border);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+.title-option[aria-selected="true"],
+.title-confirm-button[aria-selected="true"] {
+  background: var(--sticker-green);
+  box-shadow: 0 5px 0 var(--sticker-ink);
+  transform: translateY(-3px) rotate(-1deg);
+}
+.title-option-label {
+  display: block;
+}
+.title-option-detail {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Asking before a new game replaces the save: a modal card over a soft dim. */
+.title-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-title) + 1);
+  display: grid;
+  place-items: center;
+  background: #47321f66;
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  pointer-events: auto;
+}
+.title-confirm-card {
+  width: min(440px, calc(100vw - 60px - var(--safe-left) - var(--safe-right)));
+  box-sizing: border-box;
+  padding: 20px 22px 22px;
+  border: 6px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 22px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  text-align: center;
+}
+.title-confirm-text {
+  margin: 4px 0 18px;
+  font-size: 19px;
+  line-height: 1.35;
+}
+.title-confirm-buttons {
+  display: flex;
+  gap: 12px;
+}
+.title-confirm-button {
+  flex: 1;
+  font-size: 16px;
+}

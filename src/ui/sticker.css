@@ -6,6 +6,7 @@
 }
 
 :root {
+  --z-title: 70;
   /* One stacking scale for every sticker layer, bottom to top. */
   --z-hud: 25;
   --z-dialogue: 30;

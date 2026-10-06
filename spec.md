@@ -333,6 +333,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   low-opacity inset dashed stitch border. Labels use Nunito 800, choices use
   600, and body copy uses 400 for readable small-size text.
 
+### 7.2 Title screen layout
+- The title screen (`src/ui/title.ts`) is the top layer (`--z-title`) over the
+  area painting: the "Wilds of Cloverhollow" wordmark on a tilted cream
+  sticker plate (Nunito 900, a clover sprig in the corner), with choice-style
+  option stickers centred below it, at least 44 px tall.
+- Modes: `fresh` (no save: New game only), `continue` (a save exists:
+  Continue, with a detail line saying where Fae is and how many stickers she
+  has, then New game), and `confirm` (choosing New game over a save asks
+  "Start a new game? Your saved game will be replaced." with "Yes, start over"
+  and "No, go back", No selected by default, on a modal card over a soft dim).
+- `data-title="open"` on the root hides the touch controls; the option and
+  confirm stickers take taps directly, and keys move the selection.
+
 ## 8. Calm-down battles (v0)
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, snacks,

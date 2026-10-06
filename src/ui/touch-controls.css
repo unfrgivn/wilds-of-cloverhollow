@@ -89,6 +89,7 @@
 :root[data-journal="open"] .touch-controls {
   display: none;
 }
+:root[data-title="open"] .touch-controls { display: none; }
 .touch-menu svg {
   width: 32px;
   height: 32px;

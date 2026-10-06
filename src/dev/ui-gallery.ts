@@ -9,6 +9,7 @@ import {
   type TimingRingView,
 } from "../ui/battle";
 import { createJournal, type JournalView } from "../ui/journal";
+import { createTitleScreen, type TitleView } from "../ui/title";
 
 const root = document.querySelector<HTMLElement>("#gallery");
 if (root === null) throw new Error("Missing gallery root");
@@ -47,11 +48,13 @@ declare global {
 const state = params.get("state") ?? "short";
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
+const titleState = state.startsWith("title-");
 const dialogueShown = battleState ? state === "battle-command"
-  : state !== "prompt" && !journalState;
+  : state !== "prompt" && !journalState && !titleState;
 if (battleState) document.documentElement.dataset.battle = "open";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
+if (titleState) document.documentElement.dataset.title = "open";
 const defaultView: DialogueView = { speaker: "Maddie", text: "The fountain is singing today!",
   revealed: 32, choices: [], selected: -1, canAdvance: true };
 const views: Record<string, DialogueView> = {
@@ -82,6 +85,8 @@ const commands = createCommandMenu(stage);
 const ring = createTimingRing(stage);
 const reward = createRewardSticker(stage);
 const journal = createJournal(stage);
+const title = createTitleScreen(stage);
+title.onChoose((id) => { root.dataset.titleChosen = id; });
 journal.onClose(() => { root.dataset.journalClosed = "true"; });
 commands.onChoose((index) => {
   root.dataset.battleChosen = String(index);
@@ -94,6 +99,13 @@ const battleMessage: DialogueView = { speaker: null, text: "What should Fae do?"
 const frogRing = { x: 600, y: 170, radius: 74, progress: .62, target: .65 };
 const faeRing = { x: 190, y: 300, radius: 66, progress: .38, target: .5 };
 function renderGalleryState(): void {
+  const titleView: TitleView = { visible: titleState,
+    mode: state === "title-confirm" ? "confirm" :
+      state === "title-fresh" ? "fresh" : "continue",
+    selected: state === "title-confirm" ? "confirm-no" :
+      state === "title-fresh" ? "new-game" : "continue",
+    continueDetail: "Town plaza · 1 sticker" };
+  title.render(titleView);
   const notes = state === "journal-empty" ? [] : state === "journal-notes" ? [
     "The fountain hummed at sunset.", "Ask Maddie about the sparkle.",
     "The notice board has a new note.", "Follow the painted path north.",

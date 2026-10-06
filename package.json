@@ -9,8 +9,9 @@
     "sim": "bun tools/sim/run-all.ts",
     "sim:one": "bun tools/sim/run.ts",
     "purity": "bun tools/purity.ts",
+    "ink:check": "bun tools/ink/compile.ts --check",
     "lint": "bun tools/lint.ts",
-    "check": "bun run typecheck && bun run unit && bun run sim && bun run purity && bun run lint",
+    "check": "bun run ink:check && bun run typecheck && bun run unit && bun run sim && bun run purity && bun run lint",
     "e2e": "playwright test",
     "build": "vite build && bun tools/check-dist.ts && vite build --mode harness && bun tools/check-dist.ts --harness",
     "build:harness": "vite build --mode harness",
@@ -19,6 +20,7 @@
   "dependencies": {
     "@capacitor/core": "8.5.2",
     "@capacitor/ios": "8.5.2",
+    "inkjs": "2.4.0",
     "pixi.js": "8.22.0"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@ type Button = (typeof BUTTONS)[number];
 export class TouchInput {
   private readonly buttons = new Set<Button>();
   private readonly tapped = new Set<Button>();
+  private choice: number | undefined;
   private stickId: number | undefined;
   private origin: Point | undefined;
   private move: Point = { x: 0, y: 0 };
@@ -20,6 +21,7 @@ export class TouchInput {
       confirm: this.hasButton("confirm"),
       cancel: this.hasButton("cancel"),
       menu: this.hasButton("menu"),
+      choose: this.choice,
     };
   }
 
@@ -54,11 +56,16 @@ export class TouchInput {
   sample(): ActionFrame {
     const frame = this.frame();
     this.tapped.clear();
+    this.choice = undefined;
     return frame;
   }
 
   tapButton(button: Button): void {
     this.tapped.add(button);
+  }
+
+  tapChoice(index: number): void {
+    this.choice = index;
   }
 }
 

@@ -3,6 +3,10 @@
   "playerRadius": 20,
   "walkCycleUnits": 126,
   "doorFadeTicks": 18,
+  "interact": {
+    "range": 60,
+    "revealPerTick": 0.75
+  },
   "follow": {
     "distance": 90,
     "stop": 60,

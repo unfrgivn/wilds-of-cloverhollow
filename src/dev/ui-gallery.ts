@@ -1,5 +1,5 @@
 import "../ui/sticker.css";
-import { createDialogueBox, createPrompt, type DialogueView } from "../ui/sticker";
+import { createDialogueBox, createPrompt, type DialogueView, type PromptView } from "../ui/sticker";
 import { mountTouchControls } from "../ui/touch-controls";
 
 const root = document.querySelector<HTMLElement>("#gallery");
@@ -10,10 +10,16 @@ document.body.style.backgroundImage =
   "linear-gradient(#ffffff22, #ffffff22), url('assets/areas/plaza/ground_1_0.webp')";
 document.body.style.backgroundSize = "cover";
 const params = new URLSearchParams(window.location.search);
-let touchMounted = false;
+const insetValues = params.get("insets")?.split(",").map(Number);
+if (insetValues?.length === 4 && insetValues.every(Number.isFinite)) {
+  const [top, right, bottom, left] = insetValues;
+  document.documentElement.style.setProperty("--safe-top", `${top}px`);
+  document.documentElement.style.setProperty("--safe-right", `${right}px`);
+  document.documentElement.style.setProperty("--safe-bottom", `${bottom}px`);
+  document.documentElement.style.setProperty("--safe-left", `${left}px`);
+}
 if (params.get("touch") === "1") {
   mountTouchControls();
-  touchMounted = true;
 }
 const stage = document.createElement("div");
 stage.className = "gallery-stage";
@@ -22,14 +28,19 @@ const dialogue = createDialogueBox(stage);
 const prompt = createPrompt(stage);
 declare global {
   interface Window {
-    __stickerGallery: { render: (view: DialogueView) => void };
+    __stickerGallery: {
+      render: (view: DialogueView) => void;
+      renderPrompt: (view: PromptView) => void;
+    };
   }
 }
-window.__stickerGallery = { render: (view) => dialogue.render(view) };
+window.__stickerGallery = {
+  render: (view) => dialogue.render(view),
+  renderPrompt: (view) => prompt.render(view),
+};
 const state = params.get("state") ?? "short";
-if (touchMounted && state !== "prompt") {
-  document.querySelector<HTMLElement>(".touch-stick")?.style.setProperty("display", "none");
-}
+document.documentElement.toggleAttribute("data-dialogue", state !== "prompt");
+if (state !== "prompt") document.documentElement.dataset.dialogue = "open";
 const defaultView: DialogueView = { speaker: "Maddie", text: "The fountain is singing today!",
   revealed: 32, choices: [], selected: -1, canAdvance: true };
 const views: Record<string, DialogueView> = {
@@ -56,12 +67,19 @@ const views: Record<string, DialogueView> = {
   prompt: { speaker: null, text: "", revealed: 0, choices: [], selected: -1, canAdvance: false },
 };
 dialogue.onChoose((index) => { root.dataset.chosen = String(index); });
-if (state === "prompt") {
-  dialogue.hide();
-  prompt.render({ label: "TALK", x: window.innerWidth / 2, y: window.innerHeight / 2,
-    visible: true });
-} else {
-  const selectedView = views[state];
-  dialogue.render(selectedView === undefined ? defaultView : selectedView);
-  prompt.render({ label: "TALK", x: 100, y: 100, visible: false });
+function renderGalleryState(): void {
+  if (state === "prompt") {
+    dialogue.hide();
+    prompt.render({ label: "TALK", x: window.innerWidth / 2,
+      y: window.innerHeight / 2, visible: true });
+  } else {
+    const selectedView = views[state];
+    dialogue.render(selectedView === undefined ? defaultView : selectedView);
+    prompt.render({ label: "TALK", x: 100, y: 100, visible: false });
+  }
 }
+renderGalleryState();
+window.addEventListener("resize", renderGalleryState);
+void document.fonts.ready.then(() => new Promise<void>((resolve) => {
+  window.requestAnimationFrame(() => resolve());
+})).then(renderGalleryState);

@@ -34,3 +34,18 @@ export function followCamera(
     y: axisCamera(previous?.y, player.y, view.height, area.height, deadZone.y),
   };
 }
+
+export function worldToScreen(
+  point: Point,
+  camera: Point,
+  viewWidth: number,
+  viewHeight: number,
+  width: number,
+  height: number,
+): Point {
+  const scale = Math.min(width / viewWidth, height / viewHeight);
+  return {
+    x: (width - viewWidth * scale) / 2 + (point.x - camera.x) * scale,
+    y: (height - viewHeight * scale) / 2 + (point.y - camera.y) * scale,
+  };
+}

@@ -230,6 +230,44 @@
       }
     }
   ],
+  "interactables": [
+    {
+      "id": "window",
+      "knot": "window",
+      "point": {
+        "x": 610,
+        "y": 300
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "pillow_journal",
+      "knot": "pillow_journal",
+      "point": {
+        "x": 420,
+        "y": 405
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "desk",
+      "knot": "desk",
+      "point": {
+        "x": 330,
+        "y": 500
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "cat_bed",
+      "knot": "cat_bed",
+      "point": {
+        "x": 780,
+        "y": 560
+      },
+      "prompt": "Look"
+    }
+  ],
   "spawns": {
     "bed": {
       "x": 500,

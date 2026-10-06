@@ -17,9 +17,20 @@ if (fixture === undefined) throw new Error(`Unknown fixture "${fixtureName}"`);
 const seedIndex = process.argv.indexOf("--seed");
 const seed = seedIndex < 0 ? undefined : Number(process.argv[seedIndex + 1]);
 let state = createState(content.world, fixture, seed);
-for (const item of parsed)
-  for (let index = 0; index < item.ticks; index += 1)
+let previousDialogueLine = "";
+for (const item of parsed) {
+  for (let index = 0; index < item.ticks; index += 1) {
     state = step(content.world, state, item.frame).state;
+    if (process.argv.includes("--trace") && state.dialogue !== null) {
+      const line = `${state.dialogue.speaker ?? ""}|${state.dialogue.text}`;
+      if (line !== previousDialogueLine) {
+        console.log(`dialogue tick=${state.tick} speaker=${state.dialogue.speaker ?? ""} ` +
+          `text=${state.dialogue.text}`);
+        previousDialogueLine = line;
+      }
+    }
+  }
+}
 const result = {
   hash: stableHash(state),
   tick: state.tick,

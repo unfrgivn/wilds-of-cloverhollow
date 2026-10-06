@@ -95,6 +95,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   interpolate between ticks for presentation only.
 - Visual-only animation (walk frames, bobbing, text reveal, tweens) derives
   from state and tick and never feeds back into the core.
+- `src/core` remains pure. The sole package import exception is `inkjs` in
+  `src/core/ink.ts`; Ink is always loaded from a fresh Story per command.
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -130,15 +132,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   direct child of the root overlay and uses top/right insets, so it cannot
   overlap the action buttons. Chromium and desktop WebKit are both Playwright
   projects; WebKit has a dedicated 874x402 layout assertion.
-- Harness and development builds emit the `[cloverhollow] state` JSON line
-  with tick, area, x, y, and facing fields
-  on initial state, area/facing changes, and position changes no more than
-  four times per second. Capacitor's Debug console forwards these lines to
+- Harness and development builds emit `[cloverhollow]` JSON log lines:
+  `state` (tick, area, x, y, facing, moving, and the targeted interactable)
+  on the initial state, area, facing, movement, and target changes, and
+  position changes at most four times per second; `dialogue` (open, speaker,
+  text) on every line change; `dialogue-box` (the box's rect after it paints);
+  `layout` (the confirm, cancel, and menu rects, once); and `pointer` (each
+  press's position and target). Capacitor's Debug console forwards them to
   native stdout. Production builds contain neither the logger nor its marker.
 - `just ios-smoke` launches with `--console-pty`, resolves AXe from `AXE_PATH`,
-  PATH, or the bundled MobileBuildMCP npx cache, reads the simulator frame,
-  drags the stick, and stores the full console transcript plus before/after
-  screenshots under `$TMPDIR`. It uses no OCR or fabricated state.
+  PATH, or the bundled MobileBuildMCP npx cache, and reads the simulator frame.
+  It walks Fae to the window with short stick swipes and position feedback
+  (one swipe moves her an unpredictable 60 to 180 units), taps confirm with
+  AXe's physical tap style (the default `tapAt` never reaches the web view),
+  reads the conversation to its close, checks that the dialogue box clears
+  the buttons, walks through the door, and drags right in the plaza. It stores
+  the console transcript and screenshots under `$TMPDIR`, with no OCR or
+  fabricated state.
 
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
@@ -237,6 +247,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   source px and the painting's `paper` margin colour). The paper colour fills
   the logical viewport behind the painting; the page colour `#f8edcf` shows
   only in letterbox bars outside it.
+- Areas may define `interactables` with `{ id, knot, point, prompt }`. Each
+  point must be reachable within the interaction range.
 - Occluders: lossless cutouts of tall furniture, generated from the painting
   by `tools/art/area-occluders.ts` into the area's asset folder
   (`occluders.json` lists their unit offsets). An occluder draws over Fae while
@@ -251,14 +263,44 @@ ios/            Capacitor iOS project (from Milestone 4).
   on one phone screen); the plaza is 1750x1100 units.
 
 ## 7. Interaction and dialogue
-- The nearest interactable in front of the player (within 60 units) shows a
-  sticker-style prompt; confirm triggers it.
-- Dialogue is Ink (`content/story/*.ink`), compiled with inkjs. Ink variables
-  are the canonical story flags; there is no separate flag system.
+- Targeting: the core targets the nearest interactable within
+  `interact.range` (60 units) whose direction from Fae has a dot product of at
+  least 0.34 with her facing. The shell shows the Talk prompt sticker (the
+  interactable's `prompt` label in capitals) over that point. Nothing is
+  targeted during a door transition or while dialogue is open.
+- A confirm press (down this tick, up the previous tick) on a target starts
+  its Ink knot.
+- Dialogue is Ink (`content/story/*.ink`), compiled to committed JSON by
+  `tools/ink/compile.ts`. inkjs runs inside the core through `src/core/ink.ts`:
+  each command (start a knot, next line, choose) loads the saved Ink state,
+  runs once, and saves it again; `storySeed` comes from the game seed. Ink
+  variables are the canonical story flags; there is no separate flag system.
+  Lines name their speaker with a `# speaker: Name` tag.
+- Dialogue state machine (core):
+
+  ```
+  typing ──confirm──▶ shown (the whole line at once)
+  typing ──ticks────▶ shown (interact.revealPerTick characters per tick)
+  shown, choices    ──up/down──▶ move the selection (wraps)
+  shown, choices    ──confirm / touch choose──▶ Ink choose ▶ next line
+  shown, no choices ──confirm──▶ Ink next ▶ next line, or closed when ended
+  ```
+
+  While a line is typing, directions and choice taps are ignored. While
+  dialogue is open Fae doesn't move, doors don't fire, cancel and menu are
+  ignored (v0), and Maddie keeps settling until she sits. The press that
+  closes a dialogue cannot reopen it.
+- Shell contract: the root element has `data-dialogue="open"` while a dialogue
+  is open (CSS hides the movement stick) and loses it on close. Choices appear
+  once the line has finished typing; the advance arrow shows only on a fully
+  shown line without choices. A tap on a choice sticker reaches the core as
+  `choose: index` in that tick's action frame.
+- Ink choices are once-only by default, so every knot must still say
+  something sensible on a revisit (the window's `again` stitch remembers the
+  plan).
 - The dialogue UI is the DOM overlay in the sticker style: cream paper,
   die-cut border, dark-brown rounded text, speaker name, and choices navigable
   by keyboard, gamepad, and touch.
-- Player movement is frozen while dialogue is open.
 
 ### 7.1 Sticker UI layout
 - The dialogue sticker is anchored inside the bottom safe area, at most 900 CSS
@@ -271,6 +313,21 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Nunito's Latin variable font is shipped under OFL in
   `src/assets/fonts/nunito`. It was
   chosen for its friendly rounded forms and strong small-size legibility.
+- UI safe-area insets are centralized as `--safe-top`, `--safe-right`,
+  `--safe-bottom`, and `--safe-left`, sourced from the platform environment.
+  Dialogue, choices, prompts, and touch controls all use these variables. A
+  dialogue-open root attribute hides the virtual stick while preserving the
+  confirm, cancel, and menu buttons.
+- When touch controls are shown, the root has `data-touch="on"`, and CSS sets
+  `--touch-reserve-right` to the confirm and cancel buttons' width plus their
+  margin, the right inset, and 12 px. The dialogue box and choices end at that
+  reserve, so they never cover the buttons. It is pure CSS (no measuring in
+  JavaScript), so it follows the insets as iOS applies them; `just ios-smoke`
+  asserts it on the simulator.
+- Speaker tags are cream stickers with dark ink lettering, an ink outline,
+  light die-cut rim, and a soft shadow. Dialogue panels and TALK prompts use a
+  low-opacity inset dashed stitch border. Labels use Nunito 800, choices use
+  600, and body copy uses 400 for readable small-size text.
 
 ## 8. Calm-down battles (v0)
 - Touching a chaos-touched critter starts a battle. Battles are turn-based,
@@ -293,6 +350,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   inventory, stickers, PRNG state, and tick.
 - Prototype: one slot in `localStorage`. iOS persistence is revisited in the
   iOS milestones.
+- Save data includes the serialized Ink state string, preserving story
+  variables and choices across save/load.
 
 ## 11. Harness and agent control (locked)
 - The dev hook `window.__cloverhollow` exists in dev builds and in harness
@@ -310,6 +369,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `input(frame, ticks)`: hold an action frame for the next N ticks, paused or
     running.
   - `getState()`: the full JSON state.
+    It includes the serialized `ink` state and nullable `dialogue` state.
   - `hash()`: the deterministic state hash.
   - `reset({ seed, fixture })`: restart from a named fixture in
     `content/fixtures/` (test-only starting setups such as `new-game`), leaving
@@ -320,7 +380,10 @@ ios/            Capacitor iOS project (from Milestone 4).
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
     cache), Maddie's `hidden` fraction, the depth layer's draw order
     (`{ label, zIndex }[]`, with `fae`, `maddie`, and `occluder:<id>`), and both
-    characters' current animation and frame.
+    characters' current animation and frame, plus prompt and dialogue summaries.
+- While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
+  cancel, and menu are ignored. Confirm reveals the current line, advances it,
+  or selects the highlighted choice. Up/down edges wrap the selection.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
@@ -329,7 +392,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an
   available simulator by name, uses a line-buffered `--console-pty` stream,
-  and verifies a real rightward drag changes x by at least 50 units.
+  and verifies a native conversation, a door, and a real rightward drag that
+  changes x by at least 50 units.
 - Evidence ladder: core unit tests (Vitest, no mocks), then headless sim
   scripts (`tests/sim`, Bun, thousands of ticks in milliseconds), then
   Playwright e2e with real keyboard input and screenshot comparison. Every

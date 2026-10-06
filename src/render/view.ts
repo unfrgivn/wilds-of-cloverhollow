@@ -1,7 +1,14 @@
 import { Assets, Container, Graphics, Sprite, Spritesheet, Text } from "pixi.js";
-import { hiddenFraction, type Area, type Point, type State, type World } from "../core";
+import {
+  hiddenFraction,
+  targetInteractable,
+  type Area,
+  type Point,
+  type State,
+  type World,
+} from "../core";
 import { AreaView } from "./area-view";
-import { followCamera } from "./camera";
+import { followCamera, worldToScreen } from "./camera";
 import { selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
 import { fadeAlpha } from "./fade";
@@ -199,6 +206,16 @@ export class GameView {
     this.fade.alpha = fade;
   }
 
+  /** The Talk prompt for this frame, anchored at the target in CSS px. */
+  promptView(state: State): { visible: boolean; label: string; x: number; y: number } {
+    const target = targetInteractable(this.world, state);
+    if (target === undefined || this.previousCamera === undefined)
+      return { visible: false, label: "", x: 0, y: 0 };
+    const point = worldToScreen(target.point, this.previousCamera, this.viewWidth,
+      this.viewHeight, window.innerWidth, window.innerHeight);
+    return { visible: true, label: target.prompt.toUpperCase(), x: point.x, y: point.y };
+  }
+
   renderInfo(state: State): {
     area: string;
     drawOrder: { label: string; zIndex: number }[];
@@ -208,6 +225,15 @@ export class GameView {
     hidden: number;
     fade: number;
     cachedAreaTextures: string[];
+    prompt: { visible: boolean; label: string; x: number; y: number };
+    dialogue: {
+      open: boolean;
+      speaker: string | null;
+      revealed: number;
+      length: number;
+      choices: string[];
+      selected: number;
+    };
   } {
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     return {
@@ -226,6 +252,15 @@ export class GameView {
       fade,
       cachedAreaTextures: [...this.areaTextureUrls].filter((url) =>
         Assets.cache.has(url)),
+      prompt: this.promptView(state),
+      dialogue: {
+        open: state.dialogue !== null,
+        speaker: state.dialogue?.speaker ?? null,
+        revealed: state.dialogue?.revealed ?? 0,
+        length: state.dialogue?.text.length ?? 0,
+        choices: state.dialogue?.choices ?? [],
+        selected: state.dialogue?.selected ?? 0,
+      },
     };
   }
 }

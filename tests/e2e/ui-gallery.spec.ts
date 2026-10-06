@@ -8,12 +8,16 @@ const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
 const sizes = [phone, { width: 1180, height: 820 }, { width: 1280, height: 720 }];
 
-async function gallery(page: Page, state: string, touch = true): Promise<void> {
+async function gallery(page: Page, state: string, touch = true,
+  insets = "0,62,21,62"): Promise<void> {
   await page.setViewportSize(phone);
-  await page.goto(`/cloverhollow/ui-gallery.html?state=${state}${touch ? "&touch=1" : ""}`);
+  const query = `state=${state}&insets=${insets}${touch ? "&touch=1" : ""}`;
+  await page.goto(`/cloverhollow/ui-gallery.html?${query}`);
   await expect(page.locator(".gallery-stage")).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
-  await page.waitForTimeout(100);
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    window.requestAnimationFrame(() => resolve());
+  }));
 }
 
 function overlaps(a: DOMRect, b: DOMRect): boolean {
@@ -27,7 +31,6 @@ test.describe("sticker gallery", () => {
       await expect(page).toHaveScreenshot(`${state}.png`, {
         animations: "disabled",
         scale: "device",
-        maxDiffPixelRatio: 0.05,
       });
     });
   }
@@ -38,7 +41,6 @@ test.describe("sticker gallery", () => {
     await expect(page).toHaveScreenshot("three-choices-desktop.png", {
       animations: "disabled",
       scale: "device",
-      maxDiffPixelRatio: 0.05,
     });
   });
 
@@ -46,7 +48,10 @@ test.describe("sticker gallery", () => {
     for (const size of sizes) {
       test(`${state} geometry ${size.width}x${size.height}`, async ({ page }) => {
         await page.setViewportSize(size);
-        await page.goto(`/cloverhollow/ui-gallery.html?state=${state}&touch=1`);
+        const insets = size.width === 874 ? "0,62,21,62" :
+          size.width === 1180 ? "0,0,20,0" : "0,0,0,0";
+        await page.goto(`/cloverhollow/ui-gallery.html?state=${state}&touch=1&` +
+          `insets=${insets}`);
         const facts = await page.locator(".sticker-dialogue").evaluate((box) => {
           const intersects = (a: DOMRect, b: DOMRect): boolean =>
             a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
@@ -57,15 +62,26 @@ test.describe("sticker gallery", () => {
           const buttonRects = controls.map((button) => button.getBoundingClientRect());
           const text = box.querySelector<HTMLElement>(".sticker-text");
           const lineHeight = text === null ? 1 : parseFloat(getComputedStyle(text).lineHeight);
+          const style = getComputedStyle(document.documentElement);
+          const safe = {
+            top: parseFloat(style.getPropertyValue("--safe-top")) || 0,
+            right: parseFloat(style.getPropertyValue("--safe-right")) || 0,
+            bottom: parseFloat(style.getPropertyValue("--safe-bottom")) || 0,
+            left: parseFloat(style.getPropertyValue("--safe-left")) || 0,
+          };
+          const insideSafe = (rect: DOMRect): boolean => rect.left >= 20 + safe.left &&
+            rect.right <= innerWidth - 20 - safe.right &&
+            rect.top >= safe.top && rect.bottom <= innerHeight - 20 - safe.bottom;
           return {
-            inside: boxRect.left >= 0 && boxRect.right <= innerWidth &&
-              boxRect.top >= 0 && boxRect.bottom <= innerHeight,
+            inside: insideSafe(boxRect),
             boxOverlaps: buttonRects.some((button) => intersects(boxRect, button)),
             choiceOverlaps: choices.some((choice) => buttonRects.some((button) =>
               intersects(choice.getBoundingClientRect(), button))),
             fits: text !== null && text.scrollHeight <= text.clientHeight,
             lines: text === null ? 0 : text.clientHeight / lineHeight,
             choiceSizes: choices.map((choice) => choice.getBoundingClientRect().height),
+            stickHidden: getComputedStyle(document.querySelector(".touch-stick") ?? box).display
+              === "none",
           };
         });
         expect(facts.inside).toBe(true);
@@ -73,6 +89,7 @@ test.describe("sticker gallery", () => {
         expect(facts.choiceOverlaps).toBe(false);
         expect(facts.fits).toBe(true);
         expect(facts.choiceSizes.every((height) => height >= 44)).toBe(true);
+        expect(facts.stickHidden).toBe(true);
         if (state === "long-max") expect(facts.lines).toBeLessThanOrEqual(3.01);
       });
     }
@@ -81,26 +98,62 @@ test.describe("sticker gallery", () => {
   for (const size of sizes) {
     test(`prompt arrow tip ${size.width}x${size.height}`, async ({ page }) => {
       await page.setViewportSize(size);
-      await page.goto("/cloverhollow/ui-gallery.html?state=prompt&touch=1");
+      await page.goto(`/cloverhollow/ui-gallery.html?state=prompt&touch=1&` +
+        `insets=${size.width === 874 ? "0,62,21,62" :
+          size.width === 1180 ? "0,0,20,0" : "0,0,0,0"}`);
+      await expect(page.locator(".touch-stick")).toBeVisible();
       const facts = await page.locator(".sticker-prompt").evaluate((prompt) => {
         const arrow = prompt.querySelector<SVGElement>(".sticker-prompt-arrow");
+        const tipElement = prompt.querySelector<SVGCircleElement>(
+          ".sticker-prompt-arrow-tip");
         const label = prompt.querySelector<HTMLElement>("span");
         const arrowRect = arrow?.getBoundingClientRect();
+        const tipRect = tipElement?.getBoundingClientRect();
         const labelRect = label?.getBoundingClientRect();
         const intersects = arrowRect !== undefined && labelRect !== undefined &&
           arrowRect.left < labelRect.right && arrowRect.right > labelRect.left &&
           arrowRect.top < labelRect.bottom && arrowRect.bottom > labelRect.top;
-        const tipX = Number(prompt.dataset.tipX);
-        const tipY = Number(prompt.dataset.tipY);
-        const tip = { x: Number(prompt.dataset.tipX), y: Number(prompt.dataset.tipY) };
-        return { error: Math.max(Math.abs(tip.x - tipX), Math.abs(tip.y - tipY)),
-          tip, expected: { x: tipX, y: tipY },
-          intersectsLabel: intersects };
+        const style = getComputedStyle(document.documentElement);
+        const safe = {
+          top: parseFloat(style.getPropertyValue("--safe-top")) || 0,
+          right: parseFloat(style.getPropertyValue("--safe-right")) || 0,
+          bottom: parseFloat(style.getPropertyValue("--safe-bottom")) || 0,
+          left: parseFloat(style.getPropertyValue("--safe-left")) || 0,
+        };
+        const tip = tipRect === undefined ? { x: 0, y: 0 } :
+          { x: tipRect.left + tipRect.width / 2, y: tipRect.top + tipRect.height / 2 };
+        const requested = { x: innerWidth / 2, y: innerHeight / 2 };
+        return { error: Math.max(Math.abs(tip.x - requested.x),
+            Math.abs(tip.y - requested.y)),
+          intersectsLabel: intersects,
+          insideSafe: tip.x >= safe.left && tip.x <= innerWidth - safe.right &&
+            tip.y <= innerHeight - safe.bottom };
       });
       expect(facts.error).toBeLessThanOrEqual(2);
       expect(facts.intersectsLabel).toBe(false);
+      expect(facts.insideSafe).toBe(true);
     });
   }
+
+  test("prompt arrow clamps a top-left request", async ({ page }) => {
+    await gallery(page, "prompt");
+    await page.evaluate(() => window.__stickerGallery.renderPrompt({
+      label: "TALK", x: 0, y: 0, visible: true,
+    }));
+    await page.evaluate(() => new Promise<void>((resolve) => {
+      window.requestAnimationFrame(() => resolve());
+    }));
+    const safe = await page.locator(".sticker-prompt-arrow-tip").evaluate((tip) => {
+      const rect = tip.getBoundingClientRect();
+      const style = getComputedStyle(document.documentElement);
+      const left = parseFloat(style.getPropertyValue("--safe-left")) || 0;
+      const top = parseFloat(style.getPropertyValue("--safe-top")) || 0;
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2,
+        left, top };
+    });
+    expect(safe.x).toBeGreaterThanOrEqual(safe.left);
+    expect(safe.y).toBeGreaterThanOrEqual(safe.top);
+  });
 
   test("text pairs meet contrast targets", async ({ page }) => {
     await gallery(page, "three-choices");

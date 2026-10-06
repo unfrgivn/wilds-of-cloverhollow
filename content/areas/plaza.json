@@ -1072,6 +1072,26 @@
       }
     }
   ],
+  "interactables": [
+    {
+      "id": "notice_board",
+      "knot": "notice_board",
+      "point": {
+        "x": 500,
+        "y": 620
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "fountain",
+      "knot": "fountain",
+      "point": {
+        "x": 740,
+        "y": 560
+      },
+      "prompt": "Look"
+    }
+  ],
   "spawns": {
     "front-door": {
       "x": 450,

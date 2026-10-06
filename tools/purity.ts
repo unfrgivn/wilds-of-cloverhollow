@@ -60,6 +60,24 @@ function files(directory: string): string[] {
   });
 }
 
+export function importErrors(file: string, code: string): string[] {
+  const errors: string[] = [];
+  const pattern = new RegExp(
+    "\\bimport\\s*(?:\\(\\s*[\"']([^\"']+)[\"']\\s*\\)|" +
+      "[\"']([^\"']+)[\"']|[^;\\n]*?\\bfrom\\s+[\"']([^\"']+)[\"'])",
+    "g",
+  );
+  for (const match of code.matchAll(pattern)) {
+    const source = match[1] ?? match[2] ?? match[3];
+    if (source === undefined) continue;
+    if (source.startsWith("../"))
+      errors.push(`${file}: core imports outside core: ${source}`);
+    else if (!source.startsWith(".") && !(file.endsWith("src/core/ink.ts") && source === "inkjs"))
+      errors.push(`${file}: core package import "${source}"`);
+  }
+  return errors;
+}
+
 if (import.meta.main) {
   for (const file of files("src/core")) {
     const code = stripComments(readFileSync(file, "utf8"));
@@ -68,8 +86,8 @@ if (import.meta.main) {
       const line = code.slice(0, match.index).split("\n").length;
       throw new Error(`forbidden token "${match[0]}" in ${file}:${line}`);
     }
-    if (/from ['"]\.\.\//.test(code))
-      throw new Error(`core imports outside core: ${file}`);
+    const imports = importErrors(file, code);
+    if (imports.length > 0) throw new Error(imports[0]);
   }
   console.log("core purity: passed");
 }

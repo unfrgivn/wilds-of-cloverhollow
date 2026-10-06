@@ -25,6 +25,15 @@ export type CloverhollowHook = {
     hidden: number;
     fade: number;
     cachedAreaTextures: string[];
+    prompt: { visible: boolean; label: string; x: number; y: number };
+    dialogue: {
+      open: boolean;
+      speaker: string | null;
+      revealed: number;
+      length: number;
+      choices: string[];
+      selected: number;
+    };
   };
 };
 

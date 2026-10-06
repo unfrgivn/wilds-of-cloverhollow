@@ -1,0 +1,418 @@
+{
+  "inkVersion": 21,
+  "root": [
+    [
+      [
+        "done",
+        {
+          "#n": "g-0"
+        }
+      ],
+      null
+    ],
+    "done",
+    {
+      "window": [
+        [
+          "ev",
+          {
+            "VAR?": "plan"
+          },
+          "str",
+          "^none",
+          "/str",
+          "!=",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "window.again"
+                },
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Morning sun... and something sparkly over the plaza. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "^The fountain is fizzing pink bubbles. That's not normal. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Go see right now!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^School first, then investigate.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "ev",
+              "str",
+              "^now",
+              "/str",
+              "/ev",
+              {
+                "VAR=": "plan",
+                "re": true
+              },
+              "^Adventure first. School can wait five minutes! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "ev",
+              "str",
+              "^later",
+              "/str",
+              "/ev",
+              {
+                "VAR=": "plan",
+                "re": true
+              },
+              "^Backpack, socks, teeth. Then I'll investigate. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "again": [
+            "^The fountain is still fizzing. ",
+            "ev",
+            {
+              "VAR?": "plan"
+            },
+            "str",
+            "^now",
+            "/str",
+            "==",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ I'm going to go look!",
+                  {
+                    "->": ".^.^.^.10"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^I'll check it after school.",
+                  {
+                    "->": ".^.^.^.10"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "pillow_journal": [
+        "^My journal, right under my pillow where it belongs. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        [
+          "ev",
+          {
+            "VAR?": "plan"
+          },
+          "str",
+          "^now",
+          "/str",
+          "==",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Note to self: fizzing fountain. Go look NOW. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "plan"
+          },
+          "str",
+          "^later",
+          "/str",
+          "==",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Note to self: fizzing fountain. Check after school. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^Mom and Dad gave it to me when Oliver was born. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "done",
+        null
+      ],
+      "desk": [
+        [
+          "ev",
+          "visit",
+          1,
+          "MIN",
+          "/ev",
+          "ev",
+          "du",
+          0,
+          "==",
+          "/ev",
+          {
+            "->": ".^.s0",
+            "c": true
+          },
+          "ev",
+          "du",
+          1,
+          "==",
+          "/ev",
+          {
+            "->": ".^.s1",
+            "c": true
+          },
+          "nop",
+          {
+            "s0": [
+              "pop",
+              "^My sketchbook! I drew Maddie as a dragon yesterday.",
+              {
+                "->": ".^.^.17"
+              },
+              null
+            ],
+            "s1": [
+              "pop",
+              "^Paints, pencils, and one very chewed eraser.",
+              {
+                "->": ".^.^.17"
+              },
+              null
+            ],
+            "#f": 5
+          }
+        ],
+        "^ ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "cat_bed": [
+        "^Maddie's bed. Still warm, and full of orange fur. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "notice_board": [
+        "^CLOVERHOLLOW NEWS: The fountain is fizzing! ",
+        "#",
+        "^speaker: Notice board",
+        "/#",
+        "\n",
+        "^Has anyone seen a raccoon in a purple hood? ",
+        "#",
+        "^speaker: Notice board",
+        "/#",
+        "\n",
+        [
+          "ev",
+          {
+            "VAR?": "plan"
+          },
+          "str",
+          "^now",
+          "/str",
+          "==",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^A raccoon in a hood? I bet that's who did it. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^A raccoon... in a hood? Weird. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "done",
+        null
+      ],
+      "fountain": [
+        "^Pink bubbles... and it smells like bubblegum? ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "global decl": [
+        "ev",
+        "str",
+        "^none",
+        "/str",
+        {
+          "VAR=": "plan"
+        },
+        "/ev",
+        "end",
+        null
+      ]
+    }
+  ],
+  "listDefs": {}
+}

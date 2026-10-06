@@ -5,6 +5,7 @@ import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
 import tunableData from "../../content/tunables.json";
+import storyData from "../../content/story/main.ink.json";
 import type {
   Area,
   Direction,
@@ -49,6 +50,13 @@ function direction(value: unknown): value is Direction {
   );
 }
 
+function storyJson(value: unknown, file: string): Record<string, unknown> {
+  field(record(value), file, "story");
+  field(typeof value.inkVersion === "number", file, "story.inkVersion");
+  field(Array.isArray(value.root), file, "story.root");
+  return value;
+}
+
 function numberValue(value: Record<string, unknown>, name: string, file: string): number {
   const result = value[name];
   field(typeof result === "number", file, name);
@@ -61,10 +69,8 @@ export function parseTunables(value: unknown, file: string): Tunables {
   field(typeof value.playerRadius === "number", file, "playerRadius");
   field(typeof value.walkCycleUnits === "number", file, "walkCycleUnits");
   field(typeof value.doorFadeTicks === "number", file, "doorFadeTicks");
+  field(record(value.interact), file, "interact");
   field(record(value.follow), file, "follow");
-  const followNames = ["distance", "stop", "trailSpacing", "trailMax",
-    "catchUp", "radius", "slot", "heel", "sitDelayTicks", "settleDelayTicks",
-    "walkCycleUnits"] as const;
   const follow = value.follow;
   const followValue = (name: string): number => numberValue(follow, name, file);
   return {
@@ -72,18 +78,22 @@ export function parseTunables(value: unknown, file: string): Tunables {
     playerRadius: value.playerRadius,
     walkCycleUnits: value.walkCycleUnits,
     doorFadeTicks: value.doorFadeTicks,
+    interact: {
+      range: numberValue(value.interact, "range", file),
+      revealPerTick: numberValue(value.interact, "revealPerTick", file),
+    },
     follow: {
-      distance: followValue(followNames[0]),
-      stop: followValue(followNames[1]),
-      trailSpacing: followValue(followNames[2]),
-      trailMax: followValue(followNames[3]),
-      catchUp: followValue(followNames[4]),
-      radius: followValue(followNames[5]),
-      slot: followValue(followNames[6]),
-      heel: followValue(followNames[7]),
-      sitDelayTicks: followValue(followNames[8]),
-      settleDelayTicks: followValue(followNames[9]),
-      walkCycleUnits: followValue(followNames[10]),
+      distance: followValue("distance"),
+      stop: followValue("stop"),
+      trailSpacing: followValue("trailSpacing"),
+      trailMax: followValue("trailMax"),
+      catchUp: followValue("catchUp"),
+      radius: followValue("radius"),
+      slot: followValue("slot"),
+      heel: followValue("heel"),
+      sitDelayTicks: followValue("sitDelayTicks"),
+      settleDelayTicks: followValue("settleDelayTicks"),
+      walkCycleUnits: followValue("walkCycleUnits"),
     },
   };
 }
@@ -113,6 +123,17 @@ export function parseArea(value: unknown, file: string): Area {
     value.ground === undefined || typeof value.ground === "string",
     file,
     "ground",
+  );
+  field(
+    value.interactables === undefined ||
+      (Array.isArray(value.interactables) && value.interactables.every((item) =>
+        record(item) && typeof item.id === "string" && typeof item.knot === "string" &&
+        record(item.point) && typeof item.point.x === "number" &&
+        typeof item.point.y === "number" &&
+        (item.prompt === "Look" || item.prompt === "Talk"),
+      )),
+    file,
+    "interactables",
   );
   field(
     value.occluders === undefined ||
@@ -154,6 +175,12 @@ export function parseArea(value: unknown, file: string): Area {
       id: item.id,
       polygon: item.polygon,
       target: { area: item.target.area, spawn: item.target.spawn },
+    })),
+    interactables: (value.interactables ?? []).map((item) => ({
+      id: item.id,
+      knot: item.knot,
+      point: { x: item.point.x, y: item.point.y },
+      prompt: item.prompt,
     })),
     spawns,
   };
@@ -226,6 +253,7 @@ export function loadContent(): {
   const harness = parseArea(areaData, "content/areas/harness.json");
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
   const plaza = parseArea(plazaData, "content/areas/plaza.json");
+  const story = storyJson(storyData, "content/story/main.ink.json");
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
@@ -236,6 +264,7 @@ export function loadContent(): {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas,
+      story,
     },
     fixtures,
   };

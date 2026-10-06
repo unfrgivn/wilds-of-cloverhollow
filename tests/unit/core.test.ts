@@ -9,6 +9,7 @@ import {
   pointInPolygon,
   stableHash,
   step,
+  type State,
   type ActionFrame,
 } from "../../src/core";
 import {
@@ -218,6 +219,30 @@ describe("core", () => {
       .not.toThrow();
     expect(() => parseGroundManifest({ paper: "#fff" }, "ground.json"))
       .toThrow(/ground.json/);
+  });
+
+  it("closes every Ink conversation and can reopen it", () => {
+    for (const area of Object.values(world.areas)) {
+      for (const interactable of area.interactables) {
+        const fixtureForArea = area.id === "plaza" ? content.fixtures.plaza : newGame;
+        if (fixtureForArea === undefined) throw new Error("fixture missing");
+        let state: State = {
+          ...createState(world, fixtureForArea),
+          player: { ...interactable.point },
+          facing: "down" as const,
+        };
+        state = step(world, state, { ...none, confirm: true }).state;
+        let presses = 0;
+        for (let tick = 0; tick < 500 && state.dialogue !== null; tick += 1) {
+          const shown = state.dialogue.revealed >= state.dialogue.text.length;
+          const input = shown ? { ...none, confirm: true } : none;
+          if (shown) presses += 1;
+          state = step(world, state, input).state;
+        }
+        expect(presses, interactable.id).toBeLessThanOrEqual(20);
+        expect(state.dialogue, interactable.id).toBeNull();
+      }
+    }
   });
 
   it("fires a door only when entering its trigger", () => {

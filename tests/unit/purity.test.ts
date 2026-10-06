@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stripComments } from "../../tools/purity";
+import { importErrors, stripComments } from "../../tools/purity";
 
 describe("purity scan comment stripping", () => {
   it("blanks line and block comments but keeps code and line numbers", () => {
@@ -14,5 +14,12 @@ describe("purity scan comment stripping", () => {
   it("keeps comment markers that appear inside strings", () => {
     const source = 'const url = "http://x"; const pow = 2 ** 3;';
     expect(stripComments(source)).toBe(source);
+  });
+
+  it("allows only the Ink adapter package import", () => {
+    expect(importErrors("src/core/ink.ts", 'import { Story } from "inkjs";')).toEqual([]);
+    expect(importErrors("src/core/sim.ts", 'import "inkjs";')).toHaveLength(1);
+    expect(importErrors("src/core/sim.ts", 'const x = import("inkjs");')).toHaveLength(1);
+    expect(importErrors("src/core/sim.ts", 'import x from "../render/view";')).toHaveLength(1);
   });
 });

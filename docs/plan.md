@@ -78,7 +78,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   she follows within a distance band, crosses doors, sorts behind occluders);
   reviewed baselines; `just ios-smoke` passes.
 
-## Milestone 8: Talk with a choice
+## Milestone 8: Talk with a choice **Status:** ✅ Completed (2026-10-05)
 - Ink pipeline: `content/story/*.ink` compiled by a dev-only Bun script to
   committed JSON; `just check` fails if the JSON is stale or the story uses
   POW. The runtime ships only the inkjs engine (no compiler).
@@ -99,6 +99,16 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   board (sets up the chaos critter).
 - Unit, sim, cross-engine hash with dialogue, e2e (real keys and touch taps),
   reviewed baselines, `just ios-smoke`.
+- Notes: the dialogue is an explicit state machine (spec 7): a confirm press
+  while a line types shows all of it, and choices appear and accept input only
+  once it is shown. Ink choices are once-only, so the window has an `again`
+  stitch for revisits. Natively, AXe needs `--tap-style physical` (the default
+  `tapAt` never reaches the web view), and `just ios-smoke` walks to the window
+  with position feedback because one swipe moves Fae 60 to 180 units. The
+  simulator showed the dialogue box covering the confirm button: the reserve
+  was measured once in JavaScript before iOS applied its insets, and was capped
+  below what the buttons need. It is now pure CSS (spec 7.1), and the smoke run
+  asserts the box clears the buttons.
 
 ## Milestone 9: Calm-down battle v0
 - Art: one chaos-touched critter in chaos and calm states (owner review).

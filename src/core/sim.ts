@@ -9,6 +9,7 @@ import type {
   State,
   World,
 } from "./types";
+import { createInkState, runInk } from "./ink";
 
 export const blankInput = (): ActionFrame => ({
   move: { x: 0, y: 0 },
@@ -48,6 +49,8 @@ export function createState(
       stillTicks: 0,
     },
     trail: [slot, { x: spawn.x, y: spawn.y }],
+    ink: createInkState(world.story, seed),
+    dialogue: null,
   };
 }
 
@@ -160,6 +163,114 @@ function distance(a: Point, b: Point): number {
   const x = b.x - a.x;
   const y = b.y - a.y;
   return Math.sqrt(x * x + y * y);
+}
+
+export function targetInteractable(
+  world: World,
+  state: State,
+): Area["interactables"][number] | undefined {
+  if (state.transition !== null || state.dialogue !== null) return undefined;
+  const area = world.areas[state.area];
+  if (area === undefined) return undefined;
+  const facing = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 }, right: { x: 1, y: 0 } }[state.facing];
+  return area.interactables
+    .map((item) => {
+      const dx = item.point.x - state.player.x;
+      const dy = item.point.y - state.player.y;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      const dot = length === 0 ? 1 : (dx * facing.x + dy * facing.y) / length;
+      return { item, length, dot };
+    })
+    .filter((item) => item.length <= world.tunables.interact.range && item.dot >= 0.34)
+    .sort((a, b) => a.length - b.length)[0]?.item;
+}
+
+function dialogueState(
+  knot: string,
+  result: ReturnType<typeof runInk>,
+): State["dialogue"] {
+  return {
+    knot,
+    speaker: result.line?.speaker ?? null,
+    text: result.line?.text ?? "",
+    revealed: 0,
+    choices: result.choices,
+    selected: 0,
+    ended: result.ended,
+  };
+}
+
+/*
+ * Dialogue state machine (spec section 7). Fae is frozen throughout; Maddie
+ * keeps counting still ticks so she sits while Fae reads.
+ *
+ *   typing ──confirm──▶ shown (whole line at once)
+ *   typing ──ticks────▶ shown (revealPerTick characters per tick)
+ *   shown, choices    ──up/down──▶ move the selection (wraps)
+ *   shown, choices    ──confirm / touch choose──▶ Ink choose ▶ next line
+ *   shown, no choices ──confirm──▶ Ink next ▶ next line, or closed when ended
+ */
+function dialogueStep(
+  world: World,
+  state: State,
+  input: ActionFrame,
+): State {
+  const dialogue = state.dialogue;
+  if (dialogue === null) return state;
+  const previous = state.previousInput;
+  const confirm = input.confirm && !previous.confirm;
+  const next: State = {
+    ...state,
+    tick: state.tick + 1,
+    previousInput: { ...input },
+    maddie: {
+      ...state.maddie,
+      stillTicks: state.maddie.stillTicks + 1,
+      motion: { ...state.maddie.motion, moving: false },
+    },
+  };
+  if (dialogue.revealed < dialogue.text.length) {
+    const revealed = confirm
+      ? dialogue.text.length
+      : Math.min(
+        dialogue.text.length,
+        dialogue.revealed + world.tunables.interact.revealPerTick,
+      );
+    return { ...next, dialogue: { ...dialogue, revealed } };
+  }
+  const count = dialogue.choices.length;
+  if (count === 0) {
+    if (!confirm) return next;
+    if (dialogue.ended) return { ...next, dialogue: null };
+    const result = runInk(world.story, state.ink, { type: "next" });
+    return {
+      ...next,
+      ink: result.ink,
+      dialogue: result.line === null && result.choices.length === 0
+        ? null
+        : dialogueState(dialogue.knot, result),
+    };
+  }
+  const tapped = input.choose !== undefined && input.choose >= 0 && input.choose < count
+    ? input.choose
+    : undefined;
+  const chosen = tapped ?? (confirm ? dialogue.selected : undefined);
+  if (chosen !== undefined) {
+    const result = runInk(world.story, state.ink, { type: "choose", index: chosen });
+    return {
+      ...next,
+      ink: result.ink,
+      dialogue: result.line === null && result.choices.length === 0
+        ? null
+        : dialogueState(dialogue.knot, result),
+    };
+  }
+  const up = input.move.y < -0.5 && previous.move.y >= -0.5;
+  const down = input.move.y > 0.5 && previous.move.y <= 0.5;
+  if (!up && !down) return next;
+  const selected = (dialogue.selected + (down ? 1 : -1) + count) % count;
+  return { ...next, dialogue: { ...dialogue, selected } };
 }
 
 function segmentClear(area: Area, start: Point, end: Point): boolean {
@@ -359,6 +470,7 @@ export function step(
 ): { state: State; events: Event[] } {
   const area = world.areas[state.area];
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
+  if (state.dialogue !== null) return { state: dialogueStep(world, state, input), events: [] };
   if (state.transition !== null) {
     const transition = state.transition;
     const elapsed = transition.elapsed + 1;
@@ -405,6 +517,24 @@ export function step(
       },
       events: [],
     };
+  }
+  if (input.confirm && !state.previousInput.confirm) {
+    const target = targetInteractable(world, state);
+    if (target !== undefined) {
+      const result = runInk(world.story, state.ink, { type: "start", knot: target.knot });
+      return {
+        state: {
+          ...state,
+          tick: state.tick + 1,
+          ink: result.ink,
+          previousInput: { ...input },
+          dialogue: dialogueState(target.knot, result),
+          motion: { ...state.motion, moving: false },
+          maddie: { ...state.maddie, motion: { ...state.maddie.motion, moving: false } },
+        },
+        events: [],
+      };
+    }
   }
   const length = Math.sqrt(
     input.move.x * input.move.x + input.move.y * input.move.y,

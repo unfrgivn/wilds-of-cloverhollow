@@ -14,6 +14,7 @@ export function isActionFrame(value: unknown): value is ActionFrame {
     typeof value.confirm === "boolean" &&
     typeof value.cancel === "boolean" &&
     typeof value.menu === "boolean"
+    && (value.choose === undefined || typeof value.choose === "number")
   );
 }
 

@@ -6,6 +6,7 @@ export type ActionFrame = {
   confirm: boolean;
   cancel: boolean;
   menu: boolean;
+  choose?: number;
 };
 export type Tunables = {
   walkSpeed: number;
@@ -25,6 +26,7 @@ export type Tunables = {
     settleDelayTicks: number;
     walkCycleUnits: number;
   };
+  interact: { range: number; revealPerTick: number };
 };
 export type Spawn = Point & { facing: Direction };
 export type Area = {
@@ -40,6 +42,12 @@ export type Area = {
     polygon: Polygon;
     target: { area: string; spawn: string };
   }[];
+  interactables: {
+    id: string;
+    knot: string;
+    point: Point;
+    prompt: "Look" | "Talk";
+  }[];
   spawns: Record<string, Spawn>;
 };
 export type GroundManifest = {
@@ -49,7 +57,11 @@ export type GroundManifest = {
 export type OccluderManifest = {
   cutouts: { id: string; file: string; x: number; y: number }[];
 };
-export type World = { tunables: Tunables; areas: Record<string, Area> };
+export type World = {
+  tunables: Tunables;
+  areas: Record<string, Area>;
+  story: Record<string, unknown>;
+};
 export type Fixture = { area: string; spawn: string; seed?: number };
 export type State = {
   tick: number;
@@ -72,5 +84,15 @@ export type State = {
     stillTicks: number;
   };
   trail: Point[];
+  ink: string;
+  dialogue: {
+    knot: string;
+    speaker: string | null;
+    text: string;
+    revealed: number;
+    choices: string[];
+    selected: number;
+    ended: boolean;
+  } | null;
 };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

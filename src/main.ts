@@ -12,6 +12,7 @@ import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
 import { preventPinchZoom } from "./platform/gestures";
+import { createDialogueBox, createPrompt } from "./ui/sticker";
 
 const content = loadContent();
 const app = new Application();
@@ -35,6 +36,10 @@ async function boot(): Promise<void> {
   root.appendChild(app.canvas);
   const keyboard = new Keyboard();
   const touch = mountTouchControls();
+  const uiRoot = document.createElement("div");
+  document.body.append(uiRoot);
+  const dialogueBox = createDialogueBox(uiRoot);
+  const prompt = createPrompt(uiRoot);
   const input = createInputSource(() => {
     const keyboardFrame = keyboard.frame();
     const touchFrame = touch.sample();
@@ -46,8 +51,10 @@ async function boot(): Promise<void> {
       confirm: keyboardFrame.confirm || touchFrame.confirm,
       cancel: keyboardFrame.cancel || touchFrame.cancel,
       menu: keyboardFrame.menu || touchFrame.menu,
+      choose: touchFrame.choose,
     };
   });
+  dialogueBox.onChoose((index) => touch.tapChoice(index));
   const view = new GameView(content.world, {
     debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
   });
@@ -61,8 +68,10 @@ async function boot(): Promise<void> {
   await view.setArea(initialArea);
   let afterTick = (_next: State): void => undefined;
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-    const { createStateLogger } = await import("./dev/state-log");
-    afterTick = createStateLogger();
+    const { createStateLogger, logPointers, logTouchLayout } = await import("./dev/state-log");
+    logTouchLayout();
+    logPointers();
+     afterTick = createStateLogger(content.world);
     afterTick(state);
   }
   const render = (): void => {
@@ -72,6 +81,24 @@ async function boot(): Promise<void> {
       window.innerHeight,
       app.renderer.resolution,
     );
+    prompt.render(view.promptView(state));
+    if (state.dialogue === null) {
+      dialogueBox.hide();
+      delete document.documentElement.dataset.dialogue;
+    } else {
+      document.documentElement.dataset.dialogue = "open";
+      dialogueBox.render({
+        speaker: state.dialogue.speaker,
+        text: state.dialogue.text,
+        revealed: state.dialogue.revealed,
+        // Choices appear once the line has finished typing (spec section 7).
+        choices: state.dialogue.revealed >= state.dialogue.text.length
+          ? state.dialogue.choices.map((text) => ({ text }))
+          : [],
+        selected: state.dialogue.selected,
+        canAdvance: state.dialogue.choices.length === 0,
+      });
+    }
   };
   const tick = (frame: ActionFrame): void => {
     state = step(content.world, state, frame).state;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { followCamera } from "../../src/render/camera";
+import { followCamera, worldToScreen } from "../../src/render/camera";
 
 const view = { width: 960, height: 720 };
 const area = { width: 2000, height: 1200 };
@@ -50,5 +50,12 @@ describe("followCamera", () => {
         deadZone,
       ),
     ).toEqual({ x: -280, y: -210 });
+  });
+});
+
+describe("worldToScreen", () => {
+  it("maps through camera, scale, and letterbox", () => {
+    expect(worldToScreen({ x: 520, y: 240 }, { x: 0, y: 0 }, 960, 720, 1280, 720))
+      .toEqual({ x: 680, y: 240 });
   });
 });

@@ -42,9 +42,12 @@
 .sticker-dialogue {
   position: fixed;
   z-index: 40;
-  right: max(20px, min(var(--touch-reserve-right), 220px));
-  bottom: max(20px, env(safe-area-inset-bottom));
-  width: min(900px, calc(100vw - min(var(--touch-reserve-right), 220px) - 40px));
+  right: max(calc(20px + var(--safe-right)),
+    var(--touch-reserve-right));
+  bottom: calc(20px + var(--safe-bottom));
+  left: calc(20px + var(--safe-left));
+  width: min(900px, calc(100vw - 20px - var(--safe-left) -
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))));
   min-height: 104px;
   max-height: 140px;
   box-sizing: border-box;
@@ -68,6 +71,16 @@
   pointer-events: none;
 }
 
+.sticker-dialogue::after {
+  content: "";
+  position: absolute;
+  inset: 22px 9px 8px;
+  border: 2px dashed var(--sticker-ink);
+  border-radius: 11px;
+  opacity: .42;
+  pointer-events: none;
+}
+
 .sticker-dialogue[hidden],
 .sticker-prompt[hidden] {
   display: none;
@@ -77,11 +90,13 @@
   position: absolute;
   top: -19px;
   left: 22px;
-  padding: 4px 14px;
-  border: 2px solid var(--sticker-ink);
+  padding: 3px 14px;
+  border: 5px solid var(--sticker-rim);
   border-radius: 12px 15px 11px 14px;
-  background: var(--sticker-taupe);
-  color: var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
   font-size: var(--sticker-label-size);
   font-weight: 800;
   letter-spacing: .08em;
@@ -150,14 +165,16 @@
 
 .sticker-choices {
   position: fixed;
-  right: max(20px, min(var(--touch-reserve-right), 220px));
-  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 154px);
+  right: max(calc(20px + var(--safe-right)),
+    var(--touch-reserve-right));
+  bottom: calc(20px + var(--safe-bottom) + 154px);
   z-index: 41;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--sticker-gap);
-  width: min(360px, calc(100vw - min(var(--touch-reserve-right), 220px) - 40px));
+  width: min(360px, calc(100vw - 20px - var(--safe-left) -
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -205,6 +222,16 @@
   transform: translate(-50%, calc(-100% - 45px));
 }
 
+.sticker-prompt::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 2px dashed var(--sticker-ink);
+  border-radius: 10px;
+  opacity: .42;
+  pointer-events: none;
+}
+
 .sticker-prompt-arrow {
   position: absolute;
   left: 50%;
@@ -220,6 +247,11 @@
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.sticker-prompt-arrow-tip {
+  fill: var(--sticker-ink);
+  stroke: none;
 }
 
 .sticker-prompt-arrow-rim {

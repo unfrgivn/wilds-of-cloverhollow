@@ -105,6 +105,16 @@ export function areaConnectionErrors(
   const errors: string[] = [];
   for (const area of Object.values(areas)) {
     const reachable = reachablePositions(area, radius);
+    for (const interactable of area.interactables) {
+      const range = tunables.interact.range;
+      const reachablePoint = reachable.some((point) => {
+        const dx = point.x - interactable.point.x;
+        const dy = point.y - interactable.point.y;
+        return dx * dx + dy * dy <= range * range;
+      });
+      if (!reachablePoint)
+        errors.push(`${area.id}: interactable ${interactable.id} is unreachable`);
+    }
     for (const [name, spawn] of Object.entries(area.spawns)) {
       if (followerSlot(area, spawn, slot, maddieRadius, heel) === undefined)
         errors.push(`${area.id}: spawn ${name} has no Maddie slot`);

@@ -7,6 +7,7 @@ type Area = {
   walkable: Point[]; blockers: Point[][];
   occluders: { id: string; polygon: Point[]; baseline: number }[];
   spawns: Record<string, { x: number; y: number }>;
+  interactables: { id: string; x: number; y: number }[];
 };
 const id = process.argv[2] ?? "bedroom";
 const value: unknown = JSON.parse(readFileSync(`content/areas/${id}.json`, "utf8"));
@@ -14,11 +15,12 @@ if (typeof value !== "object" || value === null || !("width" in value) ||
     !("height" in value) || !("ground" in value) ||
     typeof value.width !== "number" || typeof value.height !== "number" ||
     typeof value.ground !== "string" || !("walkable" in value) ||
-    !("blockers" in value) || !("occluders" in value) || !("spawns" in value))
+   !("blockers" in value) || !("occluders" in value) || !("spawns" in value))
   throw new Error("invalid area");
 if (!Array.isArray(value.walkable) || !Array.isArray(value.blockers) ||
     !Array.isArray(value.occluders) || typeof value.spawns !== "object" ||
     value.spawns === null) throw new Error("invalid area shapes");
+const rawInteractables = "interactables" in value ? value.interactables : [];
 const area: Area = {
   width: value.width, height: value.height, ground: value.ground,
   walkable: value.walkable.flatMap((point: unknown): Point[] =>
@@ -42,6 +44,12 @@ const area: Area = {
     typeof item === "object" && item !== null && "x" in item && "y" in item &&
     typeof item.x === "number" && typeof item.y === "number"
       ? [[name, { x: item.x, y: item.y }]] : [])),
+  interactables: Array.isArray(rawInteractables) ? rawInteractables.flatMap((item: unknown) =>
+    typeof item === "object" && item !== null && "id" in item && "point" in item &&
+    typeof item.id === "string" && typeof item.point === "object" && item.point !== null &&
+    "x" in item.point && "y" in item.point && typeof item.point.x === "number" &&
+    typeof item.point.y === "number"
+      ? [{ id: item.id, x: item.point.x, y: item.point.y }] : []) : [],
 };
 const sourceWidth = area.width * 2;
 const sourceHeight = area.height * 2;
@@ -74,10 +82,17 @@ const baselines = area.occluders.map((item) => {
   return `<path d="M${Math.min(...xs) * 2} ${item.baseline * 2}` +
     `H${Math.max(...xs) * 2}"/>`;
 }).join("");
+const interactableMarks = area.interactables.map((item) =>
+  `<circle cx="${item.x * 2}" cy="${item.y * 2}" r="120"/>` +
+  `<circle cx="${item.x * 2}" cy="${item.y * 2}" r="12"/>` +
+  `<text x="${item.x * 2 + 18}" y="${item.y * 2}">${item.id}</text>`
+).join("");
 const svg = root + images + walkable + `<g fill="#d9484855" stroke="#a11" stroke-width="8">` +
   blockers + `</g><g fill="none" stroke="#1769aa" stroke-width="8">` + occluders +
   `</g><g fill="none" stroke="#1769aa" stroke-dasharray="18 12">` + baselines +
   `</g><g fill="#e6b800" stroke="#543" stroke-width="5">${spawnLabels}</g>` +
+  `<g fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="12 8">` +
+  `${interactableMarks}</g>` +
   `<g stroke="#ffffff66" stroke-width="2">${lines.join("")}</g></svg>`;
 mkdirSync("art/review", { recursive: true });
 const source = join("art/review", `${id}-overlay.svg`);

@@ -103,8 +103,8 @@ export function clampPromptPosition(x: number, y: number, width: number, height:
 
 function readInsets(): Insets {
   const probe = document.createElement("div");
-  probe.style.cssText = "position:fixed;inset:0;padding:env(safe-area-inset-top) " +
-    "env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);";
+  probe.style.cssText = "position:fixed;inset:0;padding:var(--safe-top) " +
+    "var(--safe-right) var(--safe-bottom) var(--safe-left);";
   document.body.append(probe);
   const style = getComputedStyle(probe);
   const parse = (value: string): number => parseFloat(value) || 0;
@@ -129,7 +129,12 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
   if (!(ink instanceof SVGPathElement)) throw new Error("Could not create prompt arrow");
   ink.classList.remove("sticker-prompt-arrow-rim");
   ink.classList.add("sticker-prompt-arrow-ink");
-  arrow.append(rim, ink);
+  const tip = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  tip.classList.add("sticker-prompt-arrow-tip");
+  tip.setAttribute("cx", "28");
+  tip.setAttribute("cy", "31");
+  tip.setAttribute("r", "1");
+  arrow.append(rim, ink, tip);
   prompt.append(label, arrow);
   root.append(prompt);
   let insets = readInsets();
@@ -138,10 +143,19 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
     label.textContent = view.label;
     prompt.hidden = !view.visible;
     if (view.visible) {
+      insets = readInsets();
       const position = clampPromptPosition(view.x, view.y, prompt.offsetWidth,
         prompt.offsetHeight + 44, window.innerWidth, window.innerHeight, insets);
       prompt.style.left = `${position.x}px`;
       prompt.style.top = `${position.y}px`;
+      arrow.style.left = "50%";
+      arrow.style.top = "100%";
+      arrow.style.transform = "translateX(-50%)";
+      const tipRect = tip.getBoundingClientRect();
+      const dx = position.x - (tipRect.left + tipRect.width / 2);
+      const dy = position.y - (tipRect.top + tipRect.height / 2);
+      arrow.style.left = `calc(50% + ${dx}px)`;
+      arrow.style.top = `calc(100% + ${dy}px)`;
       prompt.dataset.tipX = String(position.x);
       prompt.dataset.tipY = String(position.y);
     }

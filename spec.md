@@ -141,14 +141,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   press's position and target). Capacitor's Debug console forwards them to
   native stdout. Production builds contain neither the logger nor its marker.
 - `just ios-smoke` launches with `--console-pty`, resolves AXe from `AXE_PATH`,
-  PATH, or the bundled MobileBuildMCP npx cache, and reads the simulator frame.
-  It walks Fae to the window with short stick swipes and position feedback
-  (one swipe moves her an unpredictable 60 to 180 units), taps confirm with
-  AXe's physical tap style (the default `tapAt` never reaches the web view),
-  reads the conversation to its close, checks that the dialogue box clears
-  the buttons, walks through the door, and drags right in the plaza. It stores
-  the console transcript and screenshots under `$TMPDIR`, with no OCR or
-  fabricated state.
+  PATH, or the bundled MobileBuildMCP npx cache, and reads the simulator frame
+  (failing fast if it is portrait). It walks Fae to the window with short stick
+  drags and position feedback, approaching from below and never stepping left
+  (AXe sometimes releases a leftward drag late), taps confirm with `axe touch`
+  down and up, reads the conversation to its close, checks that the dialogue
+  box clears the buttons, walks left along the door's row into the plaza, and
+  drags right there. Every gesture is checked against the `pointer` log and
+  retried once; AXe's transient simulator errors are retried. It stores the
+  console transcript and screenshots under `$TMPDIR`, with no OCR or
+  fabricated state. If AXe keeps reporting that it cannot determine the
+  simulator's rotation, reboot the simulator.
 
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to

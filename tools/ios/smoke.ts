@@ -61,10 +61,23 @@ function findAxe(): string {
   return axe;
 }
 
+// AXe's simulator plumbing fails intermittently (SimulatorKit not reporting
+// the rotation it needs for landscape coordinates, or a slow automation
+// session); the same command succeeds a moment later.
+const transientAxeErrors = [
+  "Unable to determine rotated simulator orientation",
+  "Timed out creating the simulator remote automation session",
+];
+
 function runAxe(axe: string, args: string[]): string {
-  const result = spawnSync(axe, args, { encoding: "utf8" });
-  if (result.status !== 0) throw new Error(result.stderr || result.stdout);
-  return result.stdout;
+  for (let attempt = 0; ; attempt += 1) {
+    const result = spawnSync(axe, args, { encoding: "utf8" });
+    if (result.status === 0) return result.stdout;
+    const message = result.stderr || result.stdout;
+    const transient = transientAxeErrors.some((text) => message.includes(text));
+    if (attempt >= 7 || !transient) throw new Error(message);
+    spawnSync("sleep", ["2"]);
+  }
 }
 
 function readFrame(axe: string, udid: string): Frame {
@@ -155,6 +168,7 @@ async function consume(
   layouts: Layout[],
   dialogues: DialogueLog[],
   dialogueBoxes: Box[],
+  pointers: string[],
 ): Promise<void> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
@@ -175,6 +189,7 @@ async function consume(
         if (dialogue !== undefined) dialogues.push(dialogue);
         const dialogueBox = parseDialogueBox(line);
         if (dialogueBox !== undefined) dialogueBoxes.push(dialogueBox);
+        if (line.includes("[cloverhollow] pointer ")) pointers.push(line);
       }
     }
   } finally {
@@ -200,6 +215,10 @@ async function main(): Promise<void> {
   const udid = resolveUdid();
   const axe = findAxe();
   const frame = readFrame(axe, udid);
+  if (frame.width < frame.height) {
+    throw new Error(`The simulator is in portrait (${frame.width}x${frame.height}); ` +
+      "run `just ios-smoke`, which runs `just ios-sim` to rotate it first");
+  }
   const directory = join(
     process.env.TMPDIR ?? "/tmp",
     "cloverhollow-ios-smoke",
@@ -213,6 +232,7 @@ async function main(): Promise<void> {
   const layouts: Layout[] = [];
   const dialogues: DialogueLog[] = [];
   const dialogueBoxes: Box[] = [];
+  const pointers: string[] = [];
   const child = Bun.spawn({
     cmd: [
       "xcrun", "simctl", "launch", "--console-pty",
@@ -224,8 +244,8 @@ async function main(): Promise<void> {
   const stdout = child.stdout;
   const stderr = child.stderr;
   if (stdout === null || stderr === null) throw new Error("console-pty had no pipes");
-  const output = consume(stdout, transcript, states, layouts, dialogues, dialogueBoxes);
-  const errors = consume(stderr, transcript, states, layouts, dialogues, dialogueBoxes);
+  const output = consume(stdout, transcript, states, layouts, dialogues, dialogueBoxes, pointers);
+  const errors = consume(stderr, transcript, states, layouts, dialogues, dialogueBoxes, pointers);
   try {
     await waitFor(states, (items) => items.length > 0);
     const before = states[0];
@@ -234,12 +254,28 @@ async function main(): Promise<void> {
     execFileSync("xcrun", ["simctl", "io", udid, "screenshot", beforeScreenshot]);
     const startX = Math.round(frame.width * 0.17);
     const startY = Math.round(frame.height * 0.62);
-    const swipe = (endX: number, endY: number, seconds: number): void => {
-      runAxe(axe, [
-        "swipe", "--start-x", String(startX), "--start-y", String(startY),
-        "--end-x", String(Math.round(endX)), "--end-y", String(Math.round(endY)),
-        "--duration", String(seconds), "--udid", udid,
-      ]);
+    const until = async (predicate: () => boolean, milliseconds: number): Promise<boolean> => {
+      for (let waited = 0; waited < milliseconds; waited += 100) {
+        if (predicate()) return true;
+        await Bun.sleep(100);
+      }
+      return predicate();
+    };
+    // AXe occasionally drops a gesture; the pointer log shows whether it
+    // reached the web view, so retry once before failing loudly. `axe drag`
+    // sends explicit, evenly spaced moves; `axe swipe` sometimes delivers a
+    // whole gesture inside one frame, so the game never sees the stick move.
+    const drag = async (dx: number, dy: number, seconds: number): Promise<void> => {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const before = pointers.length;
+        runAxe(axe, [
+          "drag", "--start-x", String(startX), "--start-y", String(startY),
+          "--end-x", String(Math.round(startX + dx)), "--end-y", String(Math.round(startY + dy)),
+          "--duration", String(seconds), "--udid", udid,
+        ]);
+        if (await until(() => pointers.length > before, 2000)) return;
+      }
+      throw new Error("Two AXe drags in a row never reached the web view");
     };
     const latest = (): State => {
       const state = states[states.length - 1];
@@ -253,44 +289,53 @@ async function main(): Promise<void> {
         if (states.some((item) => item.tick > after && !item.moving)) return;
       }
     };
-    // One swipe moves Fae an unpredictable 60-180 units, so walk with feedback:
-    // short swipes along the axis with the larger error until `done` holds.
-    // The stick is 56 pt; a swipe of L pt over D s moves her about 2.1 * D * L units.
+    // Walk with feedback, one axis at a time, until `done` holds. Each step is
+    // a 25 pt drag over 0.6 s: about 45% stick, about 43 units, which measured
+    // consistently on the simulator. Full-stick drags vary from 77 to 128
+    // units, and a leftward drag sometimes releases late (Fae keeps walking
+    // until the next touch), so routes are built to tolerate an overshoot.
     const walkTo = async (goal: { x: number; y: number }, done: (state: State) => boolean,
-      label: string): Promise<State> => {
-      for (let attempt = 0; attempt < 16; attempt += 1) {
+      label: string, axis: "x" | "y" | "both" = "both"): Promise<State> => {
+      for (let attempt = 0; attempt < 12; attempt += 1) {
         const current = latest();
         if (done(current)) return current;
         const dx = goal.x - current.x;
         const dy = goal.y - current.y;
-        const horizontal = Math.abs(dx) >= Math.abs(dy);
-        const error = Math.abs(horizontal ? dx : dy);
-        const seconds = error < 40 ? 0.3 : 0.6;
-        const reach = Math.min(56, Math.max(20, error / (2.1 * seconds)));
-        const sign = Math.sign(horizontal ? dx : dy);
-        swipe(startX + (horizontal ? sign * reach : 0),
-          startY + (horizontal ? 0 : sign * reach), seconds);
+        const horizontal = axis === "both" ? Math.abs(dx) >= Math.abs(dy) : axis === "x";
+        const sign = Math.sign(horizontal ? dx : dy) || 1;
+        await drag(horizontal ? sign * 25 : 0, horizontal ? 0 : sign * 25, 0.6);
         await settle(current.tick);
       }
       throw new Error(`walk to ${label} did not converge: ${JSON.stringify(latest())}`);
     };
-    const tapConfirm = (): void => {
+    const tapConfirm = async (): Promise<void> => {
       const layout = layouts[layouts.length - 1];
       const confirm = layout?.confirm;
       if (confirm === null || confirm === undefined) throw new Error("No confirm layout");
-      // The default tap style uses the simulator's tapAt, which never reaches
-      // the web view as a touch; physical sends real touch down and up events.
-      runAxe(axe, ["tap", "-x", String(Math.round(confirm.x + confirm.width / 2)),
-        "-y", String(Math.round(confirm.y + confirm.height / 2)),
-        "--tap-style", "physical", "--udid", udid]);
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const before = pointers.length;
+        runAxe(axe, ["touch", "-x", String(Math.round(confirm.x + confirm.width / 2)),
+          "-y", String(Math.round(confirm.y + confirm.height / 2)),
+          "--down", "--up", "--delay", "0.1", "--udid", udid]);
+        if (await until(() => pointers.length > before, 2000)) return;
+      }
+      throw new Error("Two AXe taps in a row never reached the web view");
     };
     const lastDialogue = (): DialogueLog | undefined => dialogues[dialogues.length - 1];
     await waitFor(layouts, (items) => items.length > 0);
-    // The window is at (610, 300) on the top wall, beside the door trigger
-    // (x 465-585, y 285-335), so stand below it at y > 335.
+    // The web view drops touches for a moment after launch.
+    await Bun.sleep(3000);
+    // The window is at (610, 300) on the top wall, right beside the door trigger
+    // (x 465-585, y 285-335). Line up past the door's edge first, then walk
+    // straight up, so the route can never cut through the door.
+    // Anywhere in x 588-660 targets the window from below, so rightward steps
+    // (+43 each from x 500) land in it without a leftward correction; leftward
+    // drags are the ones AXe sometimes releases late.
+    await walkTo({ x: 612, y: 410 }, (state) => !state.moving && state.x >= 588 &&
+      state.x <= 660, "the window's column", "x");
     const atWindow = await walkTo({ x: 612, y: 345 }, (state) => state.area === "bedroom" &&
-      !state.moving && state.target === "window", "the window");
-    tapConfirm();
+      !state.moving && state.target === "window", "the window", "y");
+    await tapConfirm();
     await waitFor(dialogues, (items) => lastDialogue()?.open === true && items.length > 0);
     await Bun.sleep(1500);
     const dialogueScreenshot = join(directory, "dialogue.png");
@@ -307,37 +352,32 @@ async function main(): Promise<void> {
           JSON.stringify(button));
       }
     }
-    tapConfirm();
+    await tapConfirm();
     await waitFor(dialogues, () => lastDialogue()?.text.startsWith("The fountain") === true);
     await Bun.sleep(1500);
     const choicesScreenshot = join(directory, "dialogue-choices.png");
     execFileSync("xcrun", ["simctl", "io", udid, "screenshot", choicesScreenshot]);
-    tapConfirm();
+    await tapConfirm();
     await waitFor(dialogues, () => lastDialogue()?.text.startsWith("Adventure first") === true);
     for (let tap = 0; tap < 4 && lastDialogue()?.open !== false; tap += 1) {
       await Bun.sleep(1500);
-      tapConfirm();
-      await Bun.sleep(500);
+      await tapConfirm();
+      await until(() => lastDialogue()?.open === false, 2000);
     }
     await waitFor(dialogues, () => lastDialogue()?.open === false);
     await Bun.sleep(300);
-    await walkTo({ x: 525, y: 390 }, (state) => !state.moving &&
-      Math.abs(state.x - 525) <= 35 && state.y >= 350, "below the door");
-    runAxe(axe, [
-      "swipe", "--start-x", String(startX), "--start-y", String(startY),
-      "--end-x", String(startX), "--end-y", String(startY - 100),
-      "--duration", "2.0", "--udid", udid,
-    ]);
+    // Step up into the door trigger's band (y 285-335; safe at x >= 588), then
+    // walk left along it, straight into the door.
+    await walkTo({ x: latest().x, y: 310 }, (state) => !state.moving && state.y <= 330,
+      "the door's row", "y");
+    await walkTo({ x: 525, y: latest().y }, (state) => state.area === "plaza",
+      "through the door", "x");
     await waitFor(states, (items) => items.some((item) => item.area === "plaza"));
     const plaza = states.find((item) => item.area === "plaza");
     if (plaza === undefined) throw new Error("Plaza state line disappeared");
     const plazaScreenshot = join(directory, "plaza.png");
     execFileSync("xcrun", ["simctl", "io", udid, "screenshot", plazaScreenshot]);
-    runAxe(axe, [
-      "swipe", "--start-x", String(startX), "--start-y", String(startY),
-      "--end-x", String(startX + 80), "--end-y", String(startY),
-      "--duration", "2.0", "--udid", udid,
-    ]);
+    await drag(80, 0, 2.0);
     await waitFor(
       states,
       (items) => items.some((item) => item.tick > plaza.tick &&

@@ -45,6 +45,11 @@ export async function readState(page: Page): Promise<State> {
   return state;
 }
 
+// The time budget for long real-key flows (a whole battle, or a walk through
+// several areas). CI renders in software and runs them many times slower
+// than a laptop: the downstairs walk took over 180 s there.
+export const longFlowTimeout = process.env.CI ? 420_000 : 90_000;
+
 // Just the battle, for loops that poll it every step (the full state carries
 // the Ink JSON and is slow to ship on CI's software-rendered browsers).
 export async function readBattle(page: Page): Promise<State["battle"]> {

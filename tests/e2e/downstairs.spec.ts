@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readState, renderInfo, resetPaused, step } from "./helpers";
+import { longFlowTimeout, openHarness, readState, renderInfo, resetPaused, step } from "./helpers";
 
 // Milestone 12 contract: downstairs at home. The bedroom door leads down to
 // the kitchen, where Mom and Oliver are (area `npcs`); Mom talks, turns to
@@ -41,8 +41,7 @@ async function walk(page: Page, axis: "x" | "y", target: number): Promise<void> 
   }
 }
 
-// Long real-key walks; CI's software-rendered browsers are about 6x slower.
-test.describe.configure({ timeout: process.env.CI ? 180_000 : 60_000 });
+test.describe.configure({ timeout: longFlowTimeout });
 
 async function goDownstairs(page: Page): Promise<void> {
   await openHarness(page);

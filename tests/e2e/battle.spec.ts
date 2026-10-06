@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { readBattle, readState, renderInfo, resetPaused, step } from "./helpers";
+import { longFlowTimeout, readBattle, readState, renderInfo, resetPaused, step } from "./helpers";
 
 // One press of Enter, then a released tick so the next press is a new edge.
 async function press(page: Page): Promise<void> {
@@ -25,9 +25,7 @@ async function shown(page: Page): Promise<boolean> {
 }
 
 test.describe("frog battle", () => {
-  // Long real-key flows: every step renders a frame, and CI renders in
-  // software (its full suite runs about 6x slower than a laptop's).
-  test.setTimeout(process.env.CI ? 420_000 : 90_000);
+  test.setTimeout(longFlowTimeout);
 
   test("real keys: calm the frog, win his sticker, and talk with him", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });

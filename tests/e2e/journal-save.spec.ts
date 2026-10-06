@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readBattle, readState, resetPaused, step } from "./helpers";
+import { longFlowTimeout, openHarness, readBattle, readState, resetPaused, step } from "./helpers";
 
 // Milestone 10 contract: the journal is the pause menu (J or the journal
 // button; X, J, or its close button shut it), its notes come from Ink and its
@@ -87,8 +87,7 @@ test("touch: the journal button opens the book and its close button shuts it", a
 });
 
 test("after calming the frog, the journal shows his sticker and his note", async ({ page }) => {
-  // A whole battle with real keys; see battle.spec.ts on CI's budget.
-  test.setTimeout(process.env.CI ? 420_000 : 90_000);
+  test.setTimeout(longFlowTimeout);
   await openHarness(page);
   await resetPaused(page, "plaza");
   for (const [key, ticks] of [["ArrowDown", 25], ["ArrowLeft", 15], ["ArrowDown", 50],

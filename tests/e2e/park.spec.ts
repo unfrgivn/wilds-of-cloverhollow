@@ -1,5 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readBattle, readState, renderInfo, resetPaused, step } from "./helpers";
+import {
+  longFlowTimeout,
+  openHarness,
+  readBattle,
+  readState,
+  renderInfo,
+  resetPaused,
+  step,
+} from "./helpers";
 
 // Milestone 13 contract: Meadow Park. The plaza's lower-right cobbled path
 // leads to the park (spawn `plaza-path`, (360, 850) facing up) and the park's
@@ -7,7 +15,7 @@ import { openHarness, readBattle, readState, renderInfo, resetPaused, step } fro
 // Pup waits by the pond (880, 628): walking into him starts a battle with his
 // own content (content/critters/pup.json) and atlas.
 
-test.describe.configure({ timeout: process.env.CI ? 180_000 : 60_000 });
+test.describe.configure({ timeout: longFlowTimeout });
 
 async function hold(page: Page, key: string, ticks: number): Promise<void> {
   await page.keyboard.down(key);

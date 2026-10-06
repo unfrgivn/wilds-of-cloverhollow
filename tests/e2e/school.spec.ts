@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readState, renderInfo, resetPaused, step } from "./helpers";
+import { longFlowTimeout, openHarness, readState, renderInfo, resetPaused, step } from "./helpers";
 
 // Milestone 14 contract: school day. The `school` fixture puts Fae just inside
 // the school's front doors (600, 520) facing right. During class the doors need
@@ -9,7 +9,7 @@ import { openHarness, readState, renderInfo, resetPaused, step } from "./helpers
 // it, the doors lead to the plaza's school path (290, 930) facing up, and the
 // path leads back in.
 
-test.describe.configure({ timeout: process.env.CI ? 180_000 : 60_000 });
+test.describe.configure({ timeout: longFlowTimeout });
 
 async function hold(page: Page, key: string, ticks: number): Promise<void> {
   await page.keyboard.down(key);

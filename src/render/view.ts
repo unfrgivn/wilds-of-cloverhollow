@@ -12,6 +12,7 @@ import {
 } from "pixi.js";
 import {
   hiddenFraction,
+  npcFacing,
   targetInteractable,
   type Area,
   type Point,
@@ -79,6 +80,8 @@ export class GameView {
   private readonly areaTextureUrls = new Set<string>();
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
   private critterFrames: { id: string; frame: string }[] = [];
+  private npcSprites: { npc: Area["npcs"][number]; sprite: Sprite }[] = [];
+  private npcFrames: { id: string; frame: string; facing: string }[] = [];
 
   constructor(
     private readonly world: World,
@@ -138,6 +141,12 @@ export class GameView {
         src: assetUrl("assets/characters/maddie/maddie.json"),
         data: { textureOptions: { autoGenerateMipmaps: true } },
       }),
+      ...Object.entries(this.world.characters).map(([id, character]) =>
+        Assets.load({
+          alias: `${id}-sheet`,
+          src: assetUrl(character.atlas),
+          data: { textureOptions: { autoGenerateMipmaps: true } },
+        })),
     ]);
   }
 
@@ -159,6 +168,14 @@ export class GameView {
       aura.label = `critter:${critter.id}:aura`;
       this.depth.addChild(aura, body);
       return { id: critter.id, body, aura };
+    });
+    for (const { sprite } of this.npcSprites) sprite.destroy();
+    this.npcSprites = area.npcs.map((npc) => {
+      const sprite = new Sprite();
+      sprite.label = `npc:${npc.id}`;
+      sprite.scale.set(0.5);
+      this.depth.addChild(sprite);
+      return { npc, sprite };
     });
     this.previousCamera = undefined;
     this.staticWidth = 0;
@@ -319,6 +336,7 @@ export class GameView {
     this.setFaeTexture(state);
     this.setMaddieTexture(state);
     this.renderCritters(state);
+    this.renderNpcs(state);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
     if (this.label !== undefined)
@@ -327,6 +345,40 @@ export class GameView {
         `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     this.fade.alpha = fade;
+  }
+
+  // People in the area, y-sorted with everyone else. They face Fae while she
+  // talks to them; without a frame for that facing (Mom has no back view)
+  // they show their front. idle_down steps through the character's idleTicks.
+  private renderNpcs(state: State): void {
+    const frames: { id: string; frame: string; facing: string }[] = [];
+    for (const { npc, sprite } of this.npcSprites) {
+      const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
+      const character = this.world.characters[npc.id];
+      if (sheet === undefined || character === undefined) continue;
+      const facing = npcFacing(state, npc);
+      const wanted = `idle_${facing}`;
+      const animation = sheet.data.animations?.[wanted] !== undefined ? wanted : "idle_down";
+      const names = sheet.data.animations?.[animation] ?? [];
+      let index = 0;
+      if (animation === "idle_down" && names.length === character.idleTicks.length) {
+        const cycle = character.idleTicks.reduce((sum, ticks) => sum + ticks, 0);
+        let left = state.tick % cycle;
+        while (left >= (character.idleTicks[index] ?? cycle)) {
+          left -= character.idleTicks[index] ?? cycle;
+          index += 1;
+        }
+      }
+      const name = names[index] ?? names[0];
+      const texture = name === undefined ? undefined : sheet.textures[name];
+      if (name === undefined || texture === undefined) continue;
+      sprite.texture = texture;
+      if (texture.defaultAnchor !== undefined) sprite.anchor.copyFrom(texture.defaultAnchor);
+      sprite.position.set(npc.point.x, npc.point.y);
+      sprite.zIndex = npc.point.y;
+      frames.push({ id: npc.id, frame: name, facing });
+    }
+    this.npcFrames = frames;
   }
 
   // Overworld critters: chaos (with the pulsing aura behind) or calm, y-sorted
@@ -582,6 +634,7 @@ export class GameView {
       selected: number;
     };
     critters: { id: string; frame: string }[];
+    npcs: { id: string; frame: string; facing: string }[];
     battle: {
       phase: string | null;
       ring: { x: number; y: number; radius: number } | null;
@@ -641,6 +694,7 @@ export class GameView {
         selected: state.dialogue?.selected ?? 0,
       },
       critters: this.critterFrames,
+      npcs: this.npcFrames,
       battle: {
         phase: state.battle?.phase ?? null,
         ring:

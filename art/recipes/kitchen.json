@@ -1,0 +1,29 @@
+{
+  "asset": "kitchen ground",
+  "date": "2026-10-06",
+  "model": "gemini-3.1-flash-image and gemini-3-pro-image",
+  "calls": 2,
+  "references": [
+    "art/scratch/bedroom-approved.png",
+    "docs/art/concepts/environments/hero_house_bedroom.png",
+    "docs/art/concepts/npcs/fae_family.png"
+  ],
+  "selected": "art/source/areas/kitchen/kitchen-final.png",
+  "prompt_summary": "Strict cutaway downstairs kitchen and living room in the approved bedroom camera and watercolor-and-ink treatment, with stairs, counter and stove, fridge drawings, breakfast table, high-chair spot, sofa and rug, front door, morning window, and clear floor routes.",
+  "scale_reference": "Fae 280 source pixels, door about 400 source pixels, 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2528x1696 source to 2400px wide, then center-cropped to 2400x1520 source pixels.",
+    "Split into two opaque 1200x1520 WebP tiles at quality 88.",
+    "Recorded paper margin colour #fcfbf6 in ground.json.",
+    "Generated lossless occluder cutouts with area-occluders.ts from content/areas/kitchen.json."
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/kitchen/ground_0_0.webp",
+      "public/assets/areas/kitchen/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/kitchen/ground.json",
+    "area": "content/areas/kitchen.json"
+  },
+  "owner_review": "Queued for owner review in kitchen-owner-review.png."
+}

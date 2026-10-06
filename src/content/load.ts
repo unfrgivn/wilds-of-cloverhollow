@@ -1,16 +1,19 @@
 import areaData from "../../content/areas/harness.json";
 import bedroomData from "../../content/areas/bedroom.json";
 import plazaData from "../../content/areas/plaza.json";
+import kitchenData from "../../content/areas/kitchen.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
+import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
 import type {
   Area,
+  CharacterContent,
   Direction,
   Fixture,
   Polygon,
@@ -137,6 +140,23 @@ export function parseArea(value: unknown, file: string): Area {
     "critters",
   );
   field(
+    value.npcs === undefined ||
+      (Array.isArray(value.npcs) &&
+        value.npcs.every(
+          (item) =>
+            record(item) &&
+            typeof item.id === "string" &&
+            record(item.point) &&
+            typeof item.point.x === "number" &&
+            typeof item.point.y === "number" &&
+            direction(item.facing) &&
+            typeof item.knot === "string" &&
+            (item.prompt === "Look" || item.prompt === "Talk"),
+        )),
+    file,
+    "npcs",
+  );
+  field(
     value.triggers === undefined ||
       (Array.isArray(value.triggers) &&
         value.triggers.every(
@@ -224,6 +244,13 @@ export function parseArea(value: unknown, file: string): Area {
     critters: (value.critters ?? []).map((item) => ({
       id: item.id,
       point: { x: item.point.x, y: item.point.y },
+    })),
+    npcs: (value.npcs ?? []).map((item) => ({
+      id: item.id,
+      point: { x: item.point.x, y: item.point.y },
+      facing: item.facing,
+      knot: item.knot,
+      prompt: item.prompt,
     })),
     spawns,
   };
@@ -476,6 +503,21 @@ export function parseOccluderManifest(
   return { cutouts };
 }
 
+export function parseCharacters(value: unknown, file: string):
+  Record<string, CharacterContent> {
+  field(record(value), file, "object");
+  const characters: Record<string, CharacterContent> = {};
+  for (const [id, raw] of Object.entries(value)) {
+    field(record(raw) && typeof raw.atlas === "string", file, `${id}.atlas`);
+    const ticks = raw.idleTicks;
+    field(Array.isArray(ticks) && ticks.length > 0 &&
+      ticks.every((tick) => typeof tick === "number" && Number.isInteger(tick) && tick > 0),
+      file, `${id}.idleTicks`);
+    characters[id] = { atlas: raw.atlas, idleTicks: ticks };
+  }
+  return characters;
+}
+
 export function loadContent(): {
   world: World;
   fixtures: Record<string, Fixture>;
@@ -483,10 +525,12 @@ export function loadContent(): {
   const harness = parseArea(areaData, "content/areas/harness.json");
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
   const plaza = parseArea(plazaData, "content/areas/plaza.json");
+  const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
+  const characters = parseCharacters(charactersData, "content/characters.json");
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
@@ -496,6 +540,7 @@ export function loadContent(): {
     [harness.id]: harness,
     [bedroom.id]: bedroom,
     [plaza.id]: plaza,
+    [kitchen.id]: kitchen,
   };
   return {
     world: {
@@ -505,6 +550,7 @@ export function loadContent(): {
       critters: { [frog.id]: frog },
       battle,
       stickers,
+      characters,
     },
     fixtures,
   };

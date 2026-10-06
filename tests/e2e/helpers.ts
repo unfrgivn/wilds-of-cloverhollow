@@ -77,6 +77,7 @@ export async function renderInfo(page: Page): Promise<{
   };
   // Everything in CSS px, from the one battle layout (spec 8).
   critters: { id: string; frame: string }[];
+  npcs: { id: string; frame: string; facing: string }[];
   battle: {
     phase: string | null;
     ring: { x: number; y: number; radius: number } | null;

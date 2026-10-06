@@ -205,7 +205,7 @@
   ],
   "triggers": [
     {
-      "id": "plaza-door",
+      "id": "hall-door",
       "polygon": [
         [
           465,
@@ -225,8 +225,8 @@
         ]
       ],
       "target": {
-        "area": "plaza",
-        "spawn": "front-door"
+        "area": "kitchen",
+        "spawn": "stairs"
       }
     }
   ],

@@ -74,6 +74,10 @@ const key = keyRgb(value("key", "#FF00FF"));
 const fuzzText = value("fuzz", "18%").replace("%", "");
 const fuzz = Number(fuzzText) * 2.55;
 const despill = value("despill", "global-green");
+// --holes also keys background enclosed by the figure (a ring's hole), which a
+// flood from the border can't reach. Safe because the key is a colour the
+// subject never uses (AGENTS.md); off by default so existing builds are unchanged.
+const holes = Bun.argv.includes("--holes");
 if (input.length === 0 || output.length === 0) throw new Error("--input and --output are required");
 if (!["edge", "global-green", "none"].includes(despill)) throw new Error("Invalid --despill");
 const dimensions = await size(input);
@@ -115,6 +119,11 @@ while (queue.length > 0) {
   for (const next of neighbors) {
     if (next < 0 || next >= pixels.length) continue;
     if (Math.abs((next % dimensions.width) - x) <= 1) queue.push(next);
+  }
+}
+if (holes) {
+  for (const [index, pixel] of pixels.entries()) {
+    if (seen[index] === 0 && distance(pixel, key) <= fuzz) pixel.a = 0;
   }
 }
 const edge = edgeDistance(pixels, dimensions.width, dimensions.height);

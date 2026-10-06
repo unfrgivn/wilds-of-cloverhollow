@@ -89,9 +89,28 @@ committed. The atlas uses five columns, 384x384 source frames, a feet baseline
 at row 375, and anchor `{x: 0.5, y: 375/384}` in PixiJS v8 JSON. Right is
 omitted because the runtime mirrors the left set.
 
-`validate-sprite.ts` checks edges, connected components, green spill, baseline,
-exact animation names and counts with no unused or duplicate frames, walk area
-ratio at most 1.20, idle area ratio 0.70-1.40, blockiness at most 0.08, and
-down/up walk mirror IoU at least 0.70. Ink-aware hard-straight crop cuts are
-mandatory. Biped-only head checks are enabled by the recipe.
+`validate-sprite.ts` checks edges, connected components, key spill, key colour
+left in the sprite, baseline, exact animation names and counts with no unused
+or pixel-identical frames, walk area ratio at most 1.20, idle area ratio
+0.70-1.40, blockiness at most 0.08, and down/up walk mirror IoU at least 0.70.
+Ink-aware hard-straight crop cuts are mandatory. The recipe's `validator`
+block can only describe the sprite, never switch a check off: `biped` (head
+checks), `idleOnly` and `directions` (an NPC's animation set), and `key`
+(`green`, the default, or `magenta`), which picks the spill test:
+- green: any partly transparent pixel with green over red and blue by 12;
+- magenta: on the visible soft edge (alpha 16-240), min(red, blue) over green
+  by 40. Measured on Oliver: despilled edges peak at 33, the same frames keyed
+  without despill reach 255 (344 of 419 edge pixels over 40). Nearly opaque
+  pixels carry the costume's own colour (lavender shading), not spill.
+An opaque pixel within the key's 18% fuzz anywhere in a frame fails: that is
+an unkeyed background or an enclosed hole the border flood couldn't reach.
+
+Magenta-keyed NPCs: `key-alpha.ts --holes` also keys background enclosed by
+the figure (a ring's hole); it's safe because the key is never a subject
+colour, and off by default so existing builds stay byte-identical.
+`despill-edge.ts` removes a magenta key's spill from the 3 px alpha-edge band
+of a keyed frame by standard spill suppression (min(r, b) - g taken off red
+and blue), which leaves warm browns untouched; `key-alpha.ts`'s own magenta
+edge rule clamps red and blue to green (fine for the green frog, but it turns
+brown ink grey). Oliver builds with `bun tools/art/build-oliver.ts`.
 There are no CLI switches that disable checks.

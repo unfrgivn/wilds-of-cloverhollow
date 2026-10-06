@@ -263,14 +263,14 @@ describe("core", () => {
     expect(state.transition).not.toBeNull();
     for (let index = 0; index < world.tunables.doorFadeTicks; index += 1)
       state = step(world, state, { ...none, move: { x: 1, y: 0 } }).state;
-    expect(state.area).toBe("plaza");
-    expect(state.player).toEqual({ x: 450, y: 500 });
+    expect(state.area, "the bedroom door leads downstairs").toBe("kitchen");
+    expect(state.player).toEqual({ x: 500, y: 650 });
     expect(state.facing).toBe("right");
     expect(state.transition?.phase).toBe("in");
     for (let index = 0; index < world.tunables.doorFadeTicks; index += 1)
       state = step(world, state, { ...none, move: { x: 1, y: 0 } }).state;
     expect(state.transition).toBeNull();
-    expect(state.player.x).toBe(450);
+    expect(state.player.x).toBe(500);
   });
 
   it("rejects invalid trigger targets and spawns inside triggers", () => {

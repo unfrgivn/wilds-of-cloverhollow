@@ -17,6 +17,14 @@ type SpriteSheet = {
   animations: Record<string, string[]>;
   meta: { size: { w: number; h: number }; baseline: number };
 };
+// `key` is the chroma key the sprite was cut from (its recipe's validator.key):
+// the spill check looks for that colour's fringe at the soft alpha edge.
+type ValidatorOptions = {
+  biped: boolean;
+  idleOnly: boolean;
+  directions: string[];
+  key: "green" | "magenta";
+};
 
 function isObject(value: JsonValue | unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -103,6 +111,24 @@ async function isBiped(atlas: string): Promise<boolean> {
   if (!isObject(raw) || !isObject(raw.validator)) return false;
   return raw.validator.biped === true;
 }
+async function validatorOptions(atlas: string): Promise<ValidatorOptions> {
+  const defaults: ValidatorOptions = {
+    biped: false, idleOnly: false, directions: ["down", "left", "right"], key: "green",
+  };
+  const file = Bun.file(recipePath(atlas));
+  if (!(await file.exists())) return defaults;
+  const raw: unknown = JSON.parse(await file.text());
+  if (!isObject(raw) || !isObject(raw.validator)) return defaults;
+  const validator = raw.validator;
+  return {
+    biped: validator.biped === true,
+    idleOnly: validator.idleOnly === true,
+    directions: Array.isArray(validator.directions)
+      ? validator.directions.filter((value): value is string => typeof value === "string")
+      : defaults.directions,
+    key: validator.key === "magenta" ? "magenta" : "green",
+  };
+}
 
 function checkFrame(
   name: string,
@@ -110,6 +136,7 @@ function checkFrame(
   bytes: Uint8Array,
   baseline: number,
   includeHeadMetrics: boolean,
+  key: ValidatorOptions["key"],
 ): { errors: string[]; metrics: FrameMetrics } {
   const width = frame.sourceSize.w;
   const height = frame.sourceSize.h;
@@ -137,7 +164,21 @@ function checkFrame(
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
     if (opacity > 128) opaqueArea += 1;
-    if (green > Math.max(red, blue) + 12) errors.push("green spill");
+    // Magenta spill is measured on the visible soft edge (alpha 16-240): on
+    // Oliver's despilled frames that band peaks at min(r, b) - g = 33, and the
+    // same frames keyed without despill reach 255 (344 of 419 pixels over 40).
+    // Nearly opaque pixels carry the costume's own colour (lavender shading).
+    const spill = key === "green"
+      ? opacity < 255 && green > Math.max(red, blue) + 12
+      : opacity > 16 && opacity < 240 && Math.min(red, blue) > green + 40;
+    if (spill) errors.push(`${key} spill`);
+    // Opaque pixels still in the key colour: an unkeyed background or an
+    // enclosed hole the border flood couldn't reach (18% fuzz, as keyed).
+    const keyColour = key === "green" ? [0, 255, 0] : [255, 0, 255];
+    if (opacity > 128 && Math.max(Math.abs(red - (keyColour[0] ?? 0)),
+      Math.abs(green - (keyColour[1] ?? 0)), Math.abs(blue - (keyColour[2] ?? 0))) <= 46) {
+      errors.push(`${key} key colour left in the sprite`);
+    }
   }
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width - 1; x += 1) {
@@ -496,18 +537,21 @@ const expectedWalk = 6;
 const headOnThreshold = 0.70;
 const rawJson: unknown = JSON.parse(await Bun.file(jsonPath).text());
 const sheet = parseSheet(rawJson);
-const biped = await isBiped(atlas);
+const options = await validatorOptions(atlas);
+const biped = options.biped;
 const errors: string[] = [];
 const frameBytes = new Map<string, Uint8Array>();
 const metrics = new Map<string, FrameMetrics>();
 for (const [name, frame] of Object.entries(sheet.frames)) {
   const bytes = await pixels(atlas, frame.frame);
   frameBytes.set(name, bytes);
-  const result = checkFrame(name, frame, bytes, sheet.meta.baseline, biped);
+  const result = checkFrame(
+    name, frame, bytes, sheet.meta.baseline, biped, options.key,
+  );
   errors.push(...result.errors);
   metrics.set(name, result.metrics);
 }
-for (const direction of ["down", "up"]) {
+for (const direction of options.idleOnly ? [] : ["down", "up"]) {
   const names = sheet.animations[`walk_${direction}`] ?? [];
   const values: number[] = [];
   for (const name of names) {
@@ -533,7 +577,7 @@ for (const direction of ["down", "up"]) {
     );
   }
 }
-if (biped) for (const direction of ["down", "up", "left"]) {
+if (biped && !options.idleOnly) for (const direction of ["down", "up", "left"]) {
   const idle = metrics.get(`${direction}_idle_01`);
   if (idle === undefined || idle.headWidth === 0) continue;
   for (const name of sheet.animations[`walk_${direction}`] ?? []) {
@@ -557,9 +601,9 @@ if (biped) for (const direction of ["down", "up", "left"]) {
     }
   }
 }
-const requiredAnimations = [
-  "walk_down", "walk_up", "walk_left", "idle_down", "idle_up", "idle_left",
-];
+const requiredAnimations = options.idleOnly
+  ? options.directions.map((direction) => `idle_${direction}`)
+  : ["walk_down", "walk_up", "walk_left", "idle_down", "idle_up", "idle_left"];
 if (Object.keys(sheet.animations).sort().join(",")
   !== requiredAnimations.slice().sort().join(",")) {
   errors.push(`animations must be exactly ${requiredAnimations.join(", ")}`);
@@ -590,14 +634,14 @@ for (const [animation, names] of Object.entries(sheet.animations)) {
 const walkCounts = ["down", "up", "left"].map(
   (direction) => sheet.animations[`walk_${direction}`]?.length ?? 0,
 );
-if (new Set(walkCounts).size !== 1 || walkCounts[0] === undefined
-  || walkCounts[0] % 2 !== 0 || walkCounts[0] !== expectedWalk) {
+if (!options.idleOnly && (new Set(walkCounts).size !== 1 || walkCounts[0] === undefined
+  || walkCounts[0] % 2 !== 0 || walkCounts[0] !== expectedWalk)) {
   errors.push(
     `walk animations must all have an even count of ${expectedWalk}, `
     + `got ${walkCounts.join(",")}`,
   );
 }
-for (const direction of ["down", "up", "left"]) {
+for (const direction of options.idleOnly ? [] : ["down", "up", "left"]) {
   const walk = (sheet.animations[`walk_${direction}`] ?? [])
     .map((name) => metrics.get(name)?.opaqueArea ?? 0);
   const idle = metrics.get(`${direction}_idle_01`)?.opaqueArea ?? 0;
@@ -615,7 +659,15 @@ for (const direction of ["down", "up", "left"]) {
     errors.push(`${direction}: idle/walk opaque area ratio is outside 0.70-1.40`);
   }
 }
-for (const direction of ["down", "up", "left"]) {
+if (options.idleOnly) {
+  for (const direction of options.directions) {
+    const names = sheet.animations[`idle_${direction}`] ?? [];
+    if (names.length < 1 || names.length > 4) {
+      errors.push(`idle_${direction}: missing or invalid animation length`);
+    }
+  }
+}
+for (const direction of options.idleOnly ? [] : ["down", "up", "left"]) {
   for (const type of ["walk", "idle"]) {
     const name = `${type}_${direction}`;
     const animation = sheet.animations[name];

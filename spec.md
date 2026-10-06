@@ -243,9 +243,21 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Every area spawn must have a valid Maddie follower slot behind Fae, or on one
   of the two perpendicular sides, with Maddie's radius clearance. At a door
   switch the trail resets to `[slot, spawn]` and both characters are frozen.
-- Prototype areas: `bedroom` (from `hero_house_bedroom.png`) and `plaza` (from
-  `town_center_plaza.png`). The placeholder `harness` area stays for
-  deterministic tests (fixture `harness`).
+- Prototype areas: `bedroom` (from `hero_house_bedroom.png`), `kitchen`
+  (the downstairs family room), and `plaza` (from `town_center_plaza.png`).
+  The house is wired bedroom door to the kitchen's stairs, the kitchen's
+  front door to the plaza, and the plaza's house door back to the kitchen.
+  The placeholder `harness` area stays for deterministic tests (fixture
+  `harness`). Areas have a display `name` (the title's Continue line).
+- People: an area's `npcs` are `{ id, point, facing, knot, prompt }` (Mom and
+  Oliver in the kitchen). Each is drawn from the atlas named for its id in
+  `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
+  ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for
+  8), y-sorted with everyone else, and targeted like an interactable. While
+  Fae talks to one (the dialogue's knot is theirs), they face her along the
+  larger axis of the gap between them (`npcFacing`); otherwise they face as
+  authored. Without a frame for that facing they show their front. Their
+  footprint is an authored blocker.
 - Area paintings: opaque WebP tiles (each at most 2048x2048) at 2 source px
   per unit, listed in `public/assets/areas/<id>/ground.json` (tile offsets in
   source px and the painting's `paper` margin colour). The paper colour fills
@@ -280,6 +292,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   runs once, and saves it again; `storySeed` comes from the game seed. Ink
   variables are the canonical story flags; there is no separate flag system.
   Lines name their speaker with a `# speaker: Name` tag.
+- The Ink adapter skips blank lines (a conditional line whose condition is
+  false), and looks past blank lines after a line, so choices that follow
+  them come with that line rather than as an empty step. The story's external
+  `calmed(id)` is answered from the core's critter states for every command,
+  not only a knot's first line.
 - Dialogue state machine (core):
 
   ```
@@ -552,6 +569,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     cache), Maddie's `hidden` fraction, the depth layer's draw order
     (`{ label, zIndex }[]`, with `fae`, `maddie`, and `occluder:<id>`), and both
     characters' current animation and frame, plus prompt and dialogue summaries.
+    `npcs` lists each person in the area as `{ id, frame, facing }`.
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.

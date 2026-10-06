@@ -620,6 +620,216 @@
           "#f": 1
         }
       ],
+      "breakfast": [
+        "^Three plates, three cups, and a tiny spoon for Oliver. Breakfast is almost ready. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "fridge": [
+        "^The fridge is covered in drawings, shopping lists, and one very proud glittery family photo. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "island": [
+        "^A big bowl of pancake batter and a whole mountain of blueberries. Yum. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "oliver": [
+        "^Oliver shakes his rattle. \"Ba!\" ",
+        "#",
+        "^speaker: Oliver",
+        "/#",
+        "\n",
+        "^Mom laughs from the kitchen. ",
+        "#",
+        "^speaker: Mom",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "mom": [
+        [
+          "ev",
+          {
+            "VAR?": "ate_breakfast"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "mom.again"
+                },
+                {
+                  "->": "mom.0.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Morning, sleepyhead! Blueberry pancakes are almost ready. ",
+          "#",
+          "^speaker: Mom",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "plan"
+          },
+          "str",
+          "^now",
+          "/str",
+          "==",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ Going to look at the fountain? Breakfast first, my little adventurer. ",
+                "#",
+                "^speaker: Mom",
+                {
+                  "->": "mom.0.19"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "plan"
+          },
+          "str",
+          "^later",
+          "/str",
+          "==",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ School first, then the fountain? Very sensible. ",
+                "#",
+                "^speaker: Mom",
+                {
+                  "->": "mom.0.30"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Eat a pancake",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Give Mom a hug",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "ate_breakfast",
+                "re": true
+              },
+              "^Mmm. Perfect. Thanks, Mom! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "ate_breakfast",
+                "re": true
+              },
+              "^Aww. Now eat up, sweetie. ",
+              "#",
+              "^speaker: Mom",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "again": [
+            "^Have a good day, sweetie. Stay curious! ",
+            "#",
+            "^speaker: Mom",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -627,6 +837,10 @@
         "/str",
         {
           "VAR=": "plan"
+        },
+        false,
+        {
+          "VAR=": "ate_breakfast"
         },
         false,
         {

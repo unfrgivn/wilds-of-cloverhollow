@@ -1,25 +1,26 @@
 import { expect, test } from "@playwright/test";
 import { openHarness, renderInfo, resetPaused, step } from "./helpers";
 
-test("real keys cross bedroom and plaza doors in both directions", async ({ page }) => {
+test("real keys cross the bedroom and kitchen doors in both directions", async ({ page }) => {
   await openHarness(page);
   await resetPaused(page, "new-game");
   await page.keyboard.down("ArrowUp");
   await step(page, 20);
   await page.keyboard.up("ArrowUp");
   await step(page, 36);
-  const plaza = await page.evaluate(() => window.__cloverhollow?.getState());
-  expect(plaza?.area).toBe("plaza");
-  expect(plaza?.player).toEqual({ x: 450, y: 500 });
-  expect(plaza?.maddie).toBeDefined();
-  const plazaInfo = await renderInfo(page);
-  expect(plazaInfo.area).toBe("plaza");
-  expect(plazaInfo.drawOrder.some((item) => item.label === "maddie")).toBe(true);
-  expect(plazaInfo.cachedAreaTextures.some((url) => url.includes("bedroom")))
+  const kitchen = await page.evaluate(() => window.__cloverhollow?.getState());
+  expect(kitchen?.area).toBe("kitchen");
+  expect(kitchen?.player).toEqual({ x: 500, y: 650 });
+  expect(kitchen?.maddie).toBeDefined();
+  const kitchenInfo = await renderInfo(page);
+  expect(kitchenInfo.area).toBe("kitchen");
+  expect(kitchenInfo.drawOrder.some((item) => item.label === "maddie")).toBe(true);
+  expect(kitchenInfo.cachedAreaTextures.some((url) => url.includes("bedroom")))
     .toBe(false);
-  expect(plazaInfo.cachedAreaTextures.some((url) => url.includes("plaza")))
+  expect(kitchenInfo.cachedAreaTextures.some((url) => url.includes("kitchen")))
     .toBe(true);
 
+  // Down and left onto the first step of the stairs, back up to the bedroom.
   await page.keyboard.down("ArrowDown");
   await step(page, 5);
   await page.keyboard.up("ArrowDown");
@@ -32,7 +33,7 @@ test("real keys cross bedroom and plaza doors in both directions", async ({ page
   expect(bedroom?.player).toEqual({ x: 525, y: 380 });
   const bedroomInfo = await renderInfo(page);
   expect(bedroomInfo.area).toBe("bedroom");
-  expect(bedroomInfo.cachedAreaTextures.some((url) => url.includes("plaza")))
+  expect(bedroomInfo.cachedAreaTextures.some((url) => url.includes("kitchen")))
     .toBe(false);
   expect(bedroomInfo.cachedAreaTextures.some((url) => url.includes("bedroom")))
     .toBe(true);

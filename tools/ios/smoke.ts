@@ -578,8 +578,34 @@ async function main(): Promise<void> {
     );
     await walkTo(
       { x: 525, y: latest().y },
+      (state) => state.area === "kitchen",
+      "through the bedroom door",
+      "x",
+    );
+    // Downstairs: Fae arrives at the foot of the stairs (500, 650) facing
+    // right. Right to the sofa's left edge (it stops her at x 660), up past
+    // Mom's corner to y 510, then right to the front door. Right and up drags
+    // only; leftward drags can release late.
+    await waitFor(states, (items) => items.some((item) => item.area === "kitchen"));
+    await Bun.sleep(800);
+    const kitchenScreenshot = join(directory, "kitchen.png");
+    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", kitchenScreenshot]);
+    await walkTo(
+      { x: 680, y: latest().y },
+      (state) => !state.moving && state.x >= 650,
+      "beside the sofa",
+      "x",
+    );
+    await walkTo(
+      { x: latest().x, y: 510 },
+      (state) => !state.moving && state.y <= 520,
+      "past Mom",
+      "y",
+    );
+    await walkTo(
+      { x: 1060, y: latest().y },
       (state) => state.area === "plaza",
-      "through the door",
+      "through the front door",
       "x",
     );
     await waitFor(states, (items) =>
@@ -711,6 +737,7 @@ async function main(): Promise<void> {
     );
     console.log(`dialogue screenshot: ${dialogueScreenshot}`);
     console.log(`choices screenshot: ${choicesScreenshot}`);
+    console.log(`kitchen screenshot: ${kitchenScreenshot}`);
     console.log(`plaza screenshot: ${plazaScreenshot}`);
     console.log(`after screenshot: ${afterScreenshot}`);
     console.log(`battle screenshot: ${battleScreenshot}`);

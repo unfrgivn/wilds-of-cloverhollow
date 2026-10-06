@@ -1,4 +1,6 @@
 import type {
+  Npc,
+  Direction,
   ActionFrame,
   Area,
   Event,
@@ -211,7 +213,13 @@ export function targetInteractable(
         ]
       : [];
   });
-  return [...area.interactables, ...calmCritters]
+  const people = area.npcs.map((npc) => ({
+    id: `npc:${npc.id}`,
+    knot: npc.knot,
+    point: npc.point,
+    prompt: npc.prompt,
+  }));
+  return [...area.interactables, ...calmCritters, ...people]
     .map((item) => {
       const dx = item.point.x - state.player.x;
       const dy = item.point.y - state.player.y;
@@ -224,6 +232,23 @@ export function targetInteractable(
         item.length <= world.tunables.interact.range && item.dot >= 0.34,
     )
     .sort((a, b) => a.length - b.length)[0]?.item;
+}
+
+// The facts the story's calmed(id) answers from: each critter's state.
+export function calmedFacts(state: State): Record<string, boolean> {
+  return Object.fromEntries(
+    Object.entries(state.critters).map(([id, value]) => [id, value === "calm"]),
+  );
+}
+
+// Which way a person in the area looks: toward Fae while she talks to them
+// (along the larger axis of the gap between them), otherwise as authored.
+export function npcFacing(state: State, npc: Npc): Direction {
+  if (state.dialogue === null || state.dialogue.knot !== npc.knot) return npc.facing;
+  const dx = state.player.x - npc.point.x;
+  const dy = state.player.y - npc.point.y;
+  if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? "right" : "left";
+  return dy > 0 ? "down" : "up";
 }
 
 function battleMessage(
@@ -642,7 +667,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
   if (count === 0) {
     if (!confirm) return next;
     if (dialogue.ended) return { ...next, dialogue: null };
-    const result = runInk(world.story, state.ink, { type: "next" });
+    const result = runInk(world.story, state.ink, { type: "next" }, calmedFacts(state));
     return {
       ...next,
       ink: result.ink,
@@ -661,7 +686,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     const result = runInk(world.story, state.ink, {
       type: "choose",
       index: chosen,
-    });
+    }, calmedFacts(state));
     return {
       ...next,
       ink: result.ink,
@@ -1023,13 +1048,7 @@ export function step(
       const result = runInk(world.story, state.ink, {
         type: "start",
         knot: target.knot,
-        calmed: Object.fromEntries(
-          Object.entries(state.critters).map(([id, value]) => [
-            id,
-            value === "calm",
-          ]),
-        ),
-      });
+      }, calmedFacts(state));
       return {
         state: {
           ...state,

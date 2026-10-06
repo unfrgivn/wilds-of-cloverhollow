@@ -50,7 +50,18 @@ export type Area = {
     prompt: "Look" | "Talk";
   }[];
   critters: { id: string; point: Point }[];
+  // People standing in the area (spec 6): drawn with their own atlas, talked
+  // to like an interactable, and turned toward Fae while she talks to them.
+  // Their footprint is an authored blocker.
+  npcs: Npc[];
   spawns: Record<string, Spawn>;
+};
+export type Npc = {
+  id: string;
+  point: Point;
+  facing: Direction;
+  knot: string;
+  prompt: "Look" | "Talk";
 };
 export type GroundManifest = {
   paper: string;
@@ -72,7 +83,11 @@ export type World = {
   critters: Record<string, Critter>;
   battle: BattleContent;
   stickers: StickerCatalogue;
+  characters: Record<string, CharacterContent>;
 };
+// An area person's atlas and idle timing: ticks per idle_down frame (Mom
+// holds her smile, then blinks briefly; Oliver waves his rattle evenly).
+export type CharacterContent = { atlas: string; idleTicks: number[] };
 export type StickerCatalogue = {
   slots: number;
   catalogue: { id: string; name: string; critter: string; frame: string }[];

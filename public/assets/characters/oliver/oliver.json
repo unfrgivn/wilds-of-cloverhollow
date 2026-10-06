@@ -1,0 +1,67 @@
+{
+  "frames": {
+    "down_idle_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    },
+    "down_idle_02": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    }
+  },
+  "animations": {
+    "idle_down": [
+      "down_idle_01",
+      "down_idle_02"
+    ]
+  },
+  "meta": {
+    "image": "oliver.png",
+    "size": {
+      "w": 512,
+      "h": 256
+    },
+    "scale": "1",
+    "baseline": 247
+  }
+}

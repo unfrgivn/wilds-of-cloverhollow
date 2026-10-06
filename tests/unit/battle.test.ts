@@ -335,13 +335,11 @@ describe("calm-down battle core", () => {
     const chaos = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-      calmed: { frog: false },
-    });
+    }, { frog: false });
     const calm = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-      calmed: { frog: true },
-    });
+    }, { frog: true });
     expect(chaos.line?.text).toContain("Pink bubbles");
     expect(calm.line?.text).toBe("The bubbles are gone. The fountain sparkles like new!");
   });

@@ -1085,8 +1085,8 @@
         ]
       ],
       "target": {
-        "area": "bedroom",
-        "spawn": "door"
+        "area": "kitchen",
+        "spawn": "front-door"
       }
     }
   ],

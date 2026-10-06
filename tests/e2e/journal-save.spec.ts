@@ -122,7 +122,7 @@ test("the game saves when Fae arrives somewhere and resumes there after a reload
   await resetPaused(page, "new-game");
   await hold(page, "ArrowUp", 30);
   await step(page, 60);
-  expect((await readState(page)).area).toBe("plaza");
+  expect((await readState(page)).area, "the bedroom door leads downstairs").toBe("kitchen");
   await page.waitForFunction(() => window.__cloverhollow?.save.last() !== null);
   const saved = await page.evaluate(() => window.__cloverhollow?.save.last() ?? null);
   expect(saved?.hash).toMatch(/^[0-9a-f]{8}$/);
@@ -131,7 +131,7 @@ test("the game saves when Fae arrives somewhere and resumes there after a reload
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
   const loaded = await page.evaluate(() => window.__cloverhollow?.save.loaded() ?? null);
   expect(loaded, "the reload resumes from the save, with an identical hash").toEqual(saved);
-  expect((await readState(page)).area).toBe("plaza");
+  expect((await readState(page)).area).toBe("kitchen");
 
   await page.evaluate(() => window.__cloverhollow?.save.clear());
   await page.reload();

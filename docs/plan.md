@@ -159,6 +159,27 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   cleared from outside the app) and reaches the frog along the left flower
   box, so every drag goes right or down.
 
+## Milestone 12: Downstairs at home **Status:** ✅ Completed (2026-10-06)
+- The painted kitchen and living room between the bedroom and the plaza:
+  stairs up, the front door out, Mom by the kitchen island, baby Oliver on the
+  rug, and things to look at (breakfast, the fridge drawings, the pancake
+  batter).
+- People in areas (spec 6): drawn from their own atlas, y-sorted, solid, and
+  talked to like interactables; they face Fae while she talks to them. Mom
+  greets Fae, reacts to her morning plan, and remembers breakfast.
+- E2e with real keys (the door routes, Mom's conversation and facing, Mom
+  blocking the way), unit tests for the new rules, the door sims, and
+  `just ios-smoke` walking bedroom, kitchen, plaza.
+- Notes: built while the owner was away; the kitchen, Mom, and Oliver are
+  queued for the owner's review (`docs/review-queue.md`). The first art round
+  had geometry for an imagined layout, duplicate and mislabelled frames, an
+  Oliver with an unkeyed magenta box (hidden by a new validator exception),
+  and a blink with a magenta outline; the geometry is now measured from the
+  painting on a unit grid, Oliver is rebuilt by `tools/art/build-oliver.ts`,
+  and the validator checks each sprite's own key colour (spill and leftover
+  key pixels) with no exceptions. The Ink adapter now skips blank lines and
+  answers `calmed()` on every line.
+
 ## Later (not scheduled)
 Audio and music, gamepad polish, device testing and TestFlight, Bubblegum Bay
 and Pinecone Pass, Sue and Jordan, and tools (lantern, lasso, flute).

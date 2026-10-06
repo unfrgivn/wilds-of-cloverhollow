@@ -1,4 +1,5 @@
 VAR plan = "none"
+VAR ate_breakfast = false
 VAR read_notice = false
 EXTERNAL calmed(id)
 
@@ -64,6 +65,41 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 Ribbit! Thank you for the song, Fae. My head feels all clear now. # speaker: Fountain Frog
 Something purple fizzed into my fountain last night. It tasted like trouble! # speaker: Fountain Frog
 -> DONE
+
 = again
 Ribbit! The fountain is singing again. # speaker: Fountain Frog
 -> DONE
+
+=== breakfast ===
+Three plates, three cups, and a tiny spoon for Oliver. Breakfast is almost ready. # speaker: Fae
+-> DONE
+
+=== fridge ===
+The fridge is covered in drawings, shopping lists, and one very proud glittery family photo. # speaker: Fae
+-> DONE
+
+=== island ===
+A big bowl of pancake batter and a whole mountain of blueberries. Yum. # speaker: Fae
+-> DONE
+
+=== oliver ===
+Oliver shakes his rattle. "Ba!" # speaker: Oliver
+Mom laughs from the kitchen. # speaker: Mom
+-> DONE
+
+=== mom ===
+{ate_breakfast: -> again}
+Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
+{plan == "now": Going to look at the fountain? Breakfast first, my little adventurer. # speaker: Mom}
+{plan == "later": School first, then the fountain? Very sensible. # speaker: Mom}
+* [Eat a pancake]
+    ~ ate_breakfast = true
+    Mmm. Perfect. Thanks, Mom! # speaker: Fae
+* [Give Mom a hug]
+    ~ ate_breakfast = true
+    Aww. Now eat up, sweetie. # speaker: Mom
+- -> DONE
+= again
+Have a good day, sweetie. Stay curious! # speaker: Mom
+-> DONE
+

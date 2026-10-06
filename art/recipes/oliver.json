@@ -1,0 +1,30 @@
+{
+  "asset": "oliver",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 1,
+  "references": [
+    "docs/art/concepts/npcs/fae_family.png"
+  ],
+  "selectedRawSources": [
+    "art/source/oliver/oliver-strip.png"
+  ],
+  "sourceScaleFactor": 0.08,
+  "postProcessing": {
+    "build": "bun tools/art/build-oliver.ts (reproducible from the selected strip)",
+    "key": "each panel cropped 24 px inside the white frame the generator drew, then #FF00FF border flood, fuzz 18%, edge-only despill",
+    "mirror": "pose B (rattle down) mirrored horizontally so both frames face the same way",
+    "scale": "one uniform scale for both frames: the taller frame is 110 px (55 units)",
+    "placement": "figure bottom on baseline 247; the seated body (alpha centroid of the figure's lower half) at the canvas centre",
+    "canvas": "256x256 source pixels, 2 columns"
+  },
+  "validator": {
+    "idleOnly": true,
+    "biped": false,
+    "directions": [
+      "down"
+    ],
+    "key": "magenta"
+  },
+  "selectionReason": "The second strip keeps the approved pale blue hooded onesie and the wooden rattle in two seated poses (raised and lowered). Keyed frames measure 0.99 mean alpha inside the figure on a fully transparent background; no validator exceptions."
+}

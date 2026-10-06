@@ -1,0 +1,35 @@
+{
+  "asset": "mom",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "generationCalls": "see art/scratch/generation-log.jsonl (model sheet, two side strips, one blink edit)",
+  "references": [
+    "docs/art/concepts/npcs/fae_family.png",
+    "art/source/fae/fae-model-sheet-v2.png"
+  ],
+  "selectedRawSources": [
+    "art/source/mom/mom-model-sheet.png",
+    "art/source/mom/mom-blink-edit.png"
+  ],
+  "sourceScaleFactor": 0.1855,
+  "postProcessing": {
+    "key": "#FF00FF border flood fill, 18% fuzz",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "336 source pixels (168 units, 1.2x Fae)",
+    "baseline": 439,
+    "scaleFromModelSheet": 0.1855,
+    "frames": {
+      "down_idle_01": "the model sheet's front pose",
+      "down_idle_02": "one gemini-3-pro-image edit of the base frame's source (eyes gently closed, nothing else changed), keyed and placed with the base frame's crop, scale, and offset (mean RGB difference outside the eyes 0.33%); then tools/art/despill-edge.ts on the frame, because the edit's outline carried the magenta key (visible edge band peaked at 99, now 0; 2,815 edge pixels recoloured, alpha unchanged)",
+      "left_idle_01": "the model sheet's left-facing pose",
+      "right_idle_01": "left_idle_01 mirrored horizontally (the standard opposite-facing treatment)"
+    },
+    "atlas": "pack-atlas.ts, 4 columns, PixiJS v8"
+  },
+  "validator": {
+    "idleOnly": true,
+    "biped": false,
+    "key": "magenta"
+  },
+  "selectionReason": "The model sheet's front pose matches the family concept (brown ponytail, orange cardigan, cream patterned apron over a green dress, brown shoes). idle_down is the base smile and one blink; left and right are one turned pose and its mirror. Every validator check is on, including the magenta spill and key-colour checks."
+}

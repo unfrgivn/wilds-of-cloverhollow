@@ -1088,6 +1088,31 @@
         "area": "kitchen",
         "spawn": "front-door"
       }
+    },
+    {
+      "id": "park-path",
+      "polygon": [
+        [
+          1395,
+          1000
+        ],
+        [
+          1560,
+          1000
+        ],
+        [
+          1560,
+          1050
+        ],
+        [
+          1395,
+          1050
+        ]
+      ],
+      "target": {
+        "area": "park",
+        "spawn": "plaza-path"
+      }
     }
   ],
   "interactables": [
@@ -1119,6 +1144,11 @@
     "fountain": {
       "x": 1200,
       "y": 550,
+      "facing": "up"
+    },
+    "park-path": {
+      "x": 1470,
+      "y": 930,
       "facing": "up"
     }
   },

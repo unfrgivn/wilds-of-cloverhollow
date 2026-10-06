@@ -1,0 +1,82 @@
+{
+  "cutouts": [
+    {
+      "id": "tree-house",
+      "file": "tree-house.webp",
+      "x": 495,
+      "y": 0
+    },
+    {
+      "id": "bush-left",
+      "file": "bush-left.webp",
+      "x": 495,
+      "y": 300
+    },
+    {
+      "id": "bush-right",
+      "file": "bush-right.webp",
+      "x": 870,
+      "y": 300
+    },
+    {
+      "id": "tower",
+      "file": "tower.webp",
+      "x": 912,
+      "y": 160
+    },
+    {
+      "id": "basket",
+      "file": "basket.webp",
+      "x": 462,
+      "y": 435
+    },
+    {
+      "id": "fence-bottom",
+      "file": "fence-bottom.webp",
+      "x": 553,
+      "y": 733
+    },
+    {
+      "id": "fence-top-1",
+      "file": "fence-top-1.webp",
+      "x": 312,
+      "y": 358
+    },
+    {
+      "id": "fence-top-2",
+      "file": "fence-top-2.webp",
+      "x": 350,
+      "y": 336
+    },
+    {
+      "id": "fence-top-3",
+      "file": "fence-top-3.webp",
+      "x": 388,
+      "y": 315
+    },
+    {
+      "id": "fence-top-4",
+      "file": "fence-top-4.webp",
+      "x": 426,
+      "y": 293
+    },
+    {
+      "id": "fence-low-1",
+      "file": "fence-low-1.webp",
+      "x": 285,
+      "y": 543
+    },
+    {
+      "id": "fence-low-2",
+      "file": "fence-low-2.webp",
+      "x": 321,
+      "y": 568
+    },
+    {
+      "id": "fence-low-3",
+      "file": "fence-low-3.webp",
+      "x": 356,
+      "y": 593
+    }
+  ]
+}

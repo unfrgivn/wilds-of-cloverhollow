@@ -106,7 +106,8 @@ async function boot(): Promise<void> {
   // no core ticks run, so Continue resumes the save exactly as it was written.
   // Fixture resets (the harness) skip it.
   let titleMode: TitleMode | null = restored === null ? "fresh" : "continue";
-  let titleSelected: TitleChoiceId = restored === null ? "new-game" : "continue";
+  let titleSelected: TitleChoiceId =
+    restored === null ? "new-game" : "continue";
   const applyTitle = (input: TitleInput): void => {
     if (titleMode === null) return;
     const result = titleFlow(titleMode, titleSelected, input);
@@ -159,8 +160,12 @@ async function boot(): Promise<void> {
   let lastBattleLog = "";
   let lastBattleButtonsLog = "";
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-    const { createStateLogger, createTitleLogger, logPointers, logTouchLayout } =
-      await import("./dev/state-log");
+    const {
+      createStateLogger,
+      createTitleLogger,
+      logPointers,
+      logTouchLayout,
+    } = await import("./dev/state-log");
     logTouchLayout();
     logPointers();
     afterTick = createStateLogger(content.world);
@@ -237,16 +242,16 @@ async function boot(): Promise<void> {
       target: battle?.aim?.target ?? 0,
       grade: battle?.lastGrade ?? null,
     });
-    const frog = content.world.critters.frog;
+    const rewardCritter =
+      state.battle === null
+        ? undefined
+        : content.world.critters[state.battle.critterId];
     rewardSticker.render({
       visible: activeBattle && state.battle?.phase === "reward",
       title: "NEW STICKER!",
-      name: frog?.sticker.name ?? "",
+      name: rewardCritter?.sticker.name ?? "",
       image: {
-        src: assetUrl(
-          frog?.atlas.replace(".json", ".png") ??
-            "assets/critters/frog/frog.png",
-        ),
+        src: assetUrl(rewardCritter?.atlas.replace(".json", ".png") ?? ""),
         frame: { x: 0, y: 512, w: 512, h: 512 },
         atlas: { w: 1536, h: 1024 },
       },
@@ -271,7 +276,12 @@ async function boot(): Promise<void> {
               owned,
               image: owned
                 ? {
-                    src: assetUrl("assets/critters/frog/frog.png"),
+                    src: assetUrl(
+                      content.world.critters[sticker.critter]?.atlas.replace(
+                        ".json",
+                        ".png",
+                      ) ?? "",
+                    ),
                     frame: { x: 0, y: 512, w: 512, h: 512 },
                     atlas: { w: 1536, h: 1024 },
                   }
@@ -337,7 +347,8 @@ async function boot(): Promise<void> {
       }
       return;
     }
-    for (const button of swallowed) if (!frame[button]) swallowed.delete(button);
+    for (const button of swallowed)
+      if (!frame[button]) swallowed.delete(button);
     const input: ActionFrame = {
       ...frame,
       confirm: frame.confirm && !swallowed.has("confirm"),

@@ -244,7 +244,8 @@ export function calmedFacts(state: State): Record<string, boolean> {
 // Which way a person in the area looks: toward Fae while she talks to them
 // (along the larger axis of the gap between them), otherwise as authored.
 export function npcFacing(state: State, npc: Npc): Direction {
-  if (state.dialogue === null || state.dialogue.knot !== npc.knot) return npc.facing;
+  if (state.dialogue === null || state.dialogue.knot !== npc.knot)
+    return npc.facing;
   const dx = state.player.x - npc.point.x;
   const dy = state.player.y - npc.point.y;
   if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? "right" : "left";
@@ -314,6 +315,11 @@ export function battleView(world: World, state: State): BattleView | null {
   const critter = world.critters[battle.critterId];
   if (critter === undefined) return null;
   return {
+    critterId: critter.id,
+    critterName: critter.name,
+    battleHeight: critter.battleHeight,
+    auraCentre: critter.auraCentre,
+    bodyCentre: critter.bodyCentre,
     phase: battle.phase,
     message: battle.message,
     revealed: battle.revealed,
@@ -667,7 +673,12 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
   if (count === 0) {
     if (!confirm) return next;
     if (dialogue.ended) return { ...next, dialogue: null };
-    const result = runInk(world.story, state.ink, { type: "next" }, calmedFacts(state));
+    const result = runInk(
+      world.story,
+      state.ink,
+      { type: "next" },
+      calmedFacts(state),
+    );
     return {
       ...next,
       ink: result.ink,
@@ -683,10 +694,15 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
       : undefined;
   const chosen = tapped ?? (confirm ? dialogue.selected : undefined);
   if (chosen !== undefined) {
-    const result = runInk(world.story, state.ink, {
-      type: "choose",
-      index: chosen,
-    }, calmedFacts(state));
+    const result = runInk(
+      world.story,
+      state.ink,
+      {
+        type: "choose",
+        index: chosen,
+      },
+      calmedFacts(state),
+    );
     return {
       ...next,
       ink: result.ink,
@@ -1045,10 +1061,15 @@ export function step(
   if (input.confirm && !state.previousInput.confirm) {
     const target = targetInteractable(world, state);
     if (target !== undefined) {
-      const result = runInk(world.story, state.ink, {
-        type: "start",
-        knot: target.knot,
-      }, calmedFacts(state));
+      const result = runInk(
+        world.story,
+        state.ink,
+        {
+          type: "start",
+          knot: target.knot,
+        },
+        calmedFacts(state),
+      );
       return {
         state: {
           ...state,
@@ -1179,9 +1200,7 @@ export function stableHash(value: unknown): string {
       // copy hash the same.
       const entries = Object.entries(item)
         .filter(([, child]) => child !== undefined)
-        .sort(([a], [b]) =>
-        a < b ? -1 : a > b ? 1 : 0,
-      );
+        .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
       const body = entries
         .map(([key, child]) => `${JSON.stringify(key)}:${canonical(child)}`)
         .join(",");

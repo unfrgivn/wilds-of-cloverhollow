@@ -79,6 +79,7 @@ for (const item of [
   { name: "door-round-trip", fixture: "new-game" },
   { name: "morning", fixture: "new-game" },
   { name: "frog-win", fixture: "plaza" },
+  { name: "pup-win", fixture: "park" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
@@ -93,6 +94,8 @@ for (const item of [
         ? "new-game"
         : fixture === "plaza"
           ? "plaza"
+          : fixture === "park"
+            ? "park"
           : "harness";
     const path = `tests/sim/scripts/${folder}/${name}.json`;
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);

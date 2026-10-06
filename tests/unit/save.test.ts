@@ -30,6 +30,15 @@ describe("save format", () => {
     expect(parseSave(JSON.stringify({ version: 1, state: missingNested }), fresh)).toBeNull();
   });
 
+  it("keeps a save made before a critter existed, with that critter in chaos", () => {
+    const older: State["critters"] = { ...fresh.critters, frog: "calm" };
+    delete older.pup;
+    const restored = parseSave(JSON.stringify({ version: 1, state: { ...fresh, critters: older } }),
+      fresh);
+    expect(restored?.critters).toEqual({ ...fresh.critters, frog: "calm" });
+    expect(restored?.critters.pup).toBe("chaos");
+  });
+
   it("accepts a save taken mid-battle and mid-dialogue", () => {
     const busy = { ...fresh, dialogue: { knot: "window", speaker: "Fae", text: "Hi", revealed: 1,
       choices: [], selected: 0, ended: false } };

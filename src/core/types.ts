@@ -105,6 +105,8 @@ export type Critter = {
   name: string;
   calmName: string;
   atlas: string;
+  auraCentre: Point;
+  bodyCentre: Point;
   figureHeight: number;
   overworldHeight: number;
   battleHeight: number;
@@ -184,6 +186,11 @@ export type Battle = {
   phaseTicks: number;
 };
 export type BattleView = {
+  critterId: string;
+  critterName: string;
+  battleHeight: number;
+  auraCentre: Point;
+  bodyCentre: Point;
   phase: BattlePhase;
   message: string;
   revealed: number;

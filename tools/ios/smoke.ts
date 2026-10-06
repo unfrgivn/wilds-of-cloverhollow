@@ -177,14 +177,24 @@ function parseTitle(line: string): TitleLog | undefined {
   const match = line.match(/\[cloverhollow\] title (\{.*\})/);
   if (match?.[1] === undefined) return undefined;
   const parsed: unknown = JSON.parse(match[1]);
-  if (!record(parsed) || !(parsed.mode === null || typeof parsed.mode === "string") ||
-      !Array.isArray(parsed.options)) return undefined;
+  if (
+    !record(parsed) ||
+    !(parsed.mode === null || typeof parsed.mode === "string") ||
+    !Array.isArray(parsed.options)
+  )
+    return undefined;
   const options: (Box & { id: string })[] = [];
   for (const option of parsed.options) {
     if (!record(option)) continue;
     const id = option.id;
     if (typeof id !== "string" || !box(option) || option === null) continue;
-    options.push({ id, x: option.x, y: option.y, width: option.width, height: option.height });
+    options.push({
+      id,
+      x: option.x,
+      y: option.y,
+      width: option.width,
+      height: option.height,
+    });
   }
   return { mode: parsed.mode, options };
 }
@@ -266,22 +276,40 @@ async function waitFor<T>(
 // Waits for the title in `mode`, then taps its `id` button (axe touch
 // down/up, which reaches the web view), and waits for the title to close or
 // change mode.
-async function tapTitle(axe: string, udid: string, titles: TitleLog[], mode: string,
-  id: string): Promise<TitleLog> {
+async function tapTitle(
+  axe: string,
+  udid: string,
+  titles: TitleLog[],
+  mode: string,
+  id: string,
+): Promise<TitleLog> {
   await waitFor(titles, (items) => items[items.length - 1]?.mode === mode);
   const shown = titles[titles.length - 1];
   const option = shown?.options.find((item) => item.id === id);
   if (shown === undefined || option === undefined)
-    throw new Error(`The ${mode} title has no ${id} button: ${JSON.stringify(shown)}`);
+    throw new Error(
+      `The ${mode} title has no ${id} button: ${JSON.stringify(shown)}`,
+    );
   const before = titles.length;
   for (let attempt = 0; attempt < 2 && titles.length === before; attempt += 1) {
-    runAxe(axe, ["touch", "-x", String(Math.round(option.x + option.width / 2)),
-      "-y", String(Math.round(option.y + option.height / 2)), "--down", "--up",
-      "--delay", "0.1", "--udid", udid]);
+    runAxe(axe, [
+      "touch",
+      "-x",
+      String(Math.round(option.x + option.width / 2)),
+      "-y",
+      String(Math.round(option.y + option.height / 2)),
+      "--down",
+      "--up",
+      "--delay",
+      "0.1",
+      "--udid",
+      udid,
+    ]);
     for (let waited = 0; waited < 20 && titles.length === before; waited += 1)
       await Bun.sleep(100);
   }
-  if (titles.length === before) throw new Error(`Tapping ${id} on the title did nothing`);
+  if (titles.length === before)
+    throw new Error(`Tapping ${id} on the title did nothing`);
   return shown;
 }
 
@@ -310,8 +338,11 @@ async function main(): Promise<void> {
   // bundle wipes its data container (Capacitor Preferences keeps the save in
   // the app's UserDefaults there); `defaults delete` from outside the app
   // can't reach it.
-  const installed = execFileSync("xcrun",
-    ["simctl", "get_app_container", udid, bundleId, "app"], { encoding: "utf8" }).trim();
+  const installed = execFileSync(
+    "xcrun",
+    ["simctl", "get_app_container", udid, bundleId, "app"],
+    { encoding: "utf8" },
+  ).trim();
   const bundleCopy = join(directory, "app", basename(installed));
   mkdirSync(join(directory, "app"), { recursive: true });
   execFileSync("ditto", [installed, bundleCopy]);
@@ -366,7 +397,9 @@ async function main(): Promise<void> {
     const before = states[0];
     if (before === undefined) throw new Error("Initial state line disappeared");
     if (before.tick !== 0 || before.area !== "bedroom")
-      throw new Error(`The run didn't start from a new game: ${JSON.stringify(before)}`);
+      throw new Error(
+        `The run didn't start from a new game: ${JSON.stringify(before)}`,
+      );
     const beforeScreenshot = join(directory, "before.png");
     execFileSync("xcrun", [
       "simctl",
@@ -487,7 +520,13 @@ async function main(): Promise<void> {
     // The save was cleared, so the title offers New game only.
     await waitFor(titles, (items) => items[items.length - 1]?.mode === "fresh");
     const titleScreenshot = join(directory, "title.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", titleScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      titleScreenshot,
+    ]);
     const fresh = await tapTitle(axe, udid, titles, "fresh", "new-game");
     await waitFor(titles, (items) => items[items.length - 1]?.mode === null);
     console.log(`title: ${JSON.stringify(fresh)}`);
@@ -586,10 +625,18 @@ async function main(): Promise<void> {
     // right. Right to the sofa's left edge (it stops her at x 660), up past
     // Mom's corner to y 510, then right to the front door. Right and up drags
     // only; leftward drags can release late.
-    await waitFor(states, (items) => items.some((item) => item.area === "kitchen"));
+    await waitFor(states, (items) =>
+      items.some((item) => item.area === "kitchen"),
+    );
     await Bun.sleep(800);
     const kitchenScreenshot = join(directory, "kitchen.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", kitchenScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      kitchenScreenshot,
+    ]);
     await walkTo(
       { x: 680, y: latest().y },
       (state) => !state.moving && state.x >= 650,
@@ -651,16 +698,79 @@ async function main(): Promise<void> {
           `after=${JSON.stringify(after)}`,
       );
     }
-    // The frog is at (1000, 820) with a touch circle of radius 70. The plaza
-    // drag ends with Fae against a planter at x 583, which is over the left
-    // flower box (x 580-775, top edge y 890): walk down until it stops her
-    // (y 870 exactly, by collision, clear of the lamp post at y 805-835), then
-    // walk right along it until the battle starts (about x 951). Right and
-    // down drags only; leftward drags can release late.
+    // Go round the top of the plaza, then down into Meadow Park, never near
+    // the frog's circle. The shops along the top are blockers, and the bench
+    // below the bakery leaves one row under its corner (1030, 385), so: up,
+    // right until the bakery stops her, down past its corner, right until the
+    // arcade's slanted wall slides her under it, then down beside the planter.
+    // Checked headless from y 359, 372, and 386 (drags land at different
+    // heights): every start reaches the park the same way.
+    await walkTo(
+      { x: latest().x, y: 260 },
+      (value) => !value.moving && value.y <= 380,
+      "up around the plaza",
+      "y",
+    );
+    await walkTo(
+      { x: 1260, y: latest().y },
+      (value) => !value.moving && value.x >= 990,
+      "along the shops",
+      "x",
+    );
+    await walkTo(
+      { x: latest().x, y: 430 },
+      (value) => !value.moving && value.y >= 420,
+      "below the bakery",
+      "y",
+    );
+    await walkTo(
+      { x: 1300, y: latest().y },
+      (value) => !value.moving && value.x >= 1280,
+      "under the arcade",
+      "x",
+    );
     await walkTo(
       { x: latest().x, y: 900 },
-      (value) => !value.moving && value.y >= 865,
-      "down to the planter",
+      (value) => !value.moving && value.y >= 880,
+      "down beside the planter",
+      "y",
+    );
+    await walkTo(
+      { x: 1470, y: latest().y },
+      (value) => !value.moving && value.x >= 1450,
+      "to the park path",
+      "x",
+    );
+    await walkTo(
+      { x: latest().x, y: 1050 },
+      (value) => value.area === "park",
+      "into Meadow Park",
+      "y",
+    );
+    await waitFor(states, (items) =>
+      items.some((item) => item.area === "park"),
+    );
+    const parkScreenshot = join(directory, "park.png");
+    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", parkScreenshot]);
+    await walkTo(
+      { x: 200, y: latest().y },
+      (value) => !value.moving && value.x <= 220,
+      "across the park",
+      "x",
+    );
+    await walkTo(
+      { x: latest().x, y: 1050 },
+      (value) => value.area === "plaza",
+      "out of Meadow Park",
+      "y",
+    );
+    await waitFor(states, (items) =>
+      items.some((item) => item.area === "plaza"),
+    );
+    await walkTo(
+      { x: latest().x, y: 860 },
+      (value) => !value.moving && value.y <= 880,
+      "above the frog",
       "y",
     );
     await walkTo(
@@ -739,6 +849,7 @@ async function main(): Promise<void> {
     console.log(`choices screenshot: ${choicesScreenshot}`);
     console.log(`kitchen screenshot: ${kitchenScreenshot}`);
     console.log(`plaza screenshot: ${plazaScreenshot}`);
+    console.log(`park screenshot: ${parkScreenshot}`);
     console.log(`after screenshot: ${afterScreenshot}`);
     console.log(`battle screenshot: ${battleScreenshot}`);
     console.log(
@@ -757,14 +868,19 @@ async function main(): Promise<void> {
     await Promise.all([output, errors]);
   }
   const lastState = states[states.length - 1];
-  if (lastState === undefined) throw new Error("No state line before the relaunch");
+  if (lastState === undefined)
+    throw new Error("No state line before the relaunch");
   await relaunchCheck(axe, udid, directory, lastState);
 }
 
 // The save survives a relaunch: the app reopens exactly where Fae was, and
 // the journal button opens the journal there.
-async function relaunchCheck(axe: string, udid: string, directory: string,
-  saved: State): Promise<void> {
+async function relaunchCheck(
+  axe: string,
+  udid: string,
+  directory: string,
+  saved: State,
+): Promise<void> {
   const transcriptPath = join(directory, "relaunch-console-pty.log");
   writeFileSync(transcriptPath, "");
   const transcript = {
@@ -774,26 +890,58 @@ async function relaunchCheck(axe: string, udid: string, directory: string,
   const layouts: Layout[] = [];
   const pointers: string[] = [];
   const titles: TitleLog[] = [];
-  const unused: { dialogues: DialogueLog[]; boxes: Box[] } = { dialogues: [], boxes: [] };
+  const unused: { dialogues: DialogueLog[]; boxes: Box[] } = {
+    dialogues: [],
+    boxes: [],
+  };
   const child = Bun.spawn({
-    cmd: ["xcrun", "simctl", "launch", "--console-pty", "--terminate-running-process",
-      udid, bundleId],
+    cmd: [
+      "xcrun",
+      "simctl",
+      "launch",
+      "--console-pty",
+      "--terminate-running-process",
+      udid,
+      bundleId,
+    ],
     stdout: "pipe",
     stderr: "pipe",
   });
   if (child.stdout === null || child.stderr === null)
     throw new Error("console-pty had no pipes");
-  const output = consume(child.stdout, transcript, states, layouts, unused.dialogues,
-    unused.boxes, pointers, titles);
-  const errors = consume(child.stderr, transcript, states, layouts, unused.dialogues,
-    unused.boxes, pointers, titles);
+  const output = consume(
+    child.stdout,
+    transcript,
+    states,
+    layouts,
+    unused.dialogues,
+    unused.boxes,
+    pointers,
+    titles,
+  );
+  const errors = consume(
+    child.stderr,
+    transcript,
+    states,
+    layouts,
+    unused.dialogues,
+    unused.boxes,
+    pointers,
+    titles,
+  );
   try {
     await waitFor(states, (items) => items.length > 0);
     const first = states[0];
-    if (first === undefined || first.area !== saved.area || first.x !== saved.x ||
-        first.y !== saved.y) {
-      throw new Error(`The save didn't survive a relaunch: started at ${JSON.stringify(first)}, ` +
-        `last state before it was ${JSON.stringify(saved)}`);
+    if (
+      first === undefined ||
+      first.area !== saved.area ||
+      first.x !== saved.x ||
+      first.y !== saved.y
+    ) {
+      throw new Error(
+        `The save didn't survive a relaunch: started at ${JSON.stringify(first)}, ` +
+          `last state before it was ${JSON.stringify(saved)}`,
+      );
     }
     console.log(`relaunch: ${JSON.stringify(first)}`);
     await waitFor(layouts, (items) => items.length > 0);
@@ -803,18 +951,44 @@ async function relaunchCheck(axe: string, udid: string, directory: string,
     await waitFor(titles, (items) => items[items.length - 1]?.mode === null);
     console.log(`relaunch title: ${JSON.stringify(resumed)}`);
     const menu = layouts[layouts.length - 1]?.menu;
-    if (menu === null || menu === undefined) throw new Error("No journal button layout");
-    for (let attempt = 0; attempt < 2 && !states.some((item) => item.journal); attempt += 1) {
-      runAxe(axe, ["touch", "-x", String(Math.round(menu.x + menu.width / 2)),
-        "-y", String(Math.round(menu.y + menu.height / 2)), "--down", "--up", "--delay", "0.1",
-        "--udid", udid]);
-      for (let waited = 0; waited < 20 && !states.some((item) => item.journal); waited += 1)
+    if (menu === null || menu === undefined)
+      throw new Error("No journal button layout");
+    for (
+      let attempt = 0;
+      attempt < 2 && !states.some((item) => item.journal);
+      attempt += 1
+    ) {
+      runAxe(axe, [
+        "touch",
+        "-x",
+        String(Math.round(menu.x + menu.width / 2)),
+        "-y",
+        String(Math.round(menu.y + menu.height / 2)),
+        "--down",
+        "--up",
+        "--delay",
+        "0.1",
+        "--udid",
+        udid,
+      ]);
+      for (
+        let waited = 0;
+        waited < 20 && !states.some((item) => item.journal);
+        waited += 1
+      )
         await Bun.sleep(100);
     }
-    if (!states.some((item) => item.journal)) throw new Error("The journal didn't open");
+    if (!states.some((item) => item.journal))
+      throw new Error("The journal didn't open");
     await Bun.sleep(600);
     const journalScreenshot = join(directory, "journal.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", journalScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      journalScreenshot,
+    ]);
     console.log(`journal screenshot: ${journalScreenshot}`);
   } catch (error: unknown) {
     const lines = readFileSync(transcriptPath, "utf8").trimEnd().split("\n");

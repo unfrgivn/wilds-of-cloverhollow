@@ -75,15 +75,16 @@ export async function renderInfo(page: Page): Promise<{
     choices: string[];
     selected: number;
   };
-  // Everything in CSS px, from the one battle layout (spec 8).
   critters: { id: string; frame: string }[];
   npcs: { id: string; frame: string; facing: string }[];
+  // Everything in CSS px, from the one battle layout (spec 8).
   battle: {
     phase: string | null;
     ring: { x: number; y: number; radius: number } | null;
-    frogFrame: string;
+    // The critter in this battle and its current frame.
+    critter: { id: string; frame: string } | null;
     layout: {
-      frog: { x: number; baseline: number; height: number };
+      critter: { x: number; baseline: number; height: number };
       fae: { x: number; baseline: number; height: number };
     } | null;
     backdrop: { x: number; y: number; width: number; height: number } | null;

@@ -15,3 +15,6 @@ it in spec section 12 (art and style approvals) and remove it from this list.
 | Mom's character art (Milestone 12) | `art/review/mom-owner-review.png` (smile, blink, left, and right on cream and dark) | Shipped |
 | Oliver's character art (Milestone 12) | `art/review/oliver-owner-review.png` (rattle up and down) | Shipped |
 | Mom's and Oliver's lines, and the kitchen's Look lines (Milestone 12) | `content/story/main.ink`, knots `mom`, `oliver`, `breakfast`, `fridge`, `island` | Shipped; wording chosen by the agents |
+| Meadow Park painting (Milestone 13) | `art/review/park-owner-review.png`, `park-in-game.png`, `park-overlay.png` (walkable floor and blockers) | Shipped |
+| The Zoomie Pup, a chaos-touched puppy (Milestone 13) | `art/review/pup-owner-review.png` (every frame on cream and dark, beside the frog), `pup-battle-in-game.png`. His aura reads darker than the frog's on a dark background; in the game it sits on light backdrops | Shipped |
+| The pup's battle lines and the park's lines (Milestone 13) | `content/critters/pup.json` (`lines`), `content/story/main.ink` knots `pup_calm`, `tree_house`, `picnic`, `park_sign`, and the journal's two new notes | Shipped; wording chosen by the agents |

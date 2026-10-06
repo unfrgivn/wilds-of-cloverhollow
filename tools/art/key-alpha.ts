@@ -135,6 +135,8 @@ for (const [index, pixel] of pixels.entries()) {
   else if (key.r > 200 && key.b > 200 && key.g < 80) {
     pixel.r = Math.min(pixel.r, pixel.g);
     pixel.b = Math.min(pixel.b, pixel.g);
+  } else if (key.g > 200 && key.r < 80 && key.b < 80) {
+    pixel.g = Math.min(pixel.g, Math.max(pixel.r, pixel.b));
   }
 }
 const outputBytes = new Uint8Array(pixels.length * 4);

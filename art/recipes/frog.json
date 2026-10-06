@@ -71,6 +71,11 @@
     "matteMethods": {
       "body": "magenta-key",
       "aura": "white-lift"
+    },
+    "bodyHue": {
+      "min": 0.17,
+      "max": 0.45,
+      "minFraction": 0.3
     }
   },
   "review": [

@@ -8,9 +8,20 @@ import type { State, World } from "./types";
 export function journalNotes(world: World, state: State): string[] {
   const calmed = calmedFacts(state);
   const notes: string[] = [];
-  let result = runInk(world.story, state.ink, { type: "start", knot: "journal" }, calmed);
+  let result = runInk(
+    world.story,
+    state.ink,
+    { type: "start", knot: "journal" },
+    calmed,
+  );
   for (let count = 0; count < 20; count += 1) {
-    if (result.line !== null) notes.push(result.line.text);
+    if (
+      result.line !== null &&
+      (!result.line.text.startsWith("Purple fizz") ||
+        state.area === "park" ||
+        state.ink.includes("read_notice"))
+    )
+      notes.push(result.line.text);
     if (result.ended) break;
     result = runInk(world.story, result.ink, { type: "next" }, calmed);
   }

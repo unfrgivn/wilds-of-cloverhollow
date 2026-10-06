@@ -114,3 +114,16 @@ and blue), which leaves warm browns untouched; `key-alpha.ts`'s own magenta
 edge rule clamps red and blue to green (fine for the green frog, but it turns
 brown ink grey). Oliver builds with `bun tools/art/build-oliver.ts`.
 There are no CLI switches that disable checks.
+
+Critters (frog, pup) are checked by `tools/art/critter-check.ts --recipe <recipe>
+--atlas <png>`, which reads its frames by name from the atlas JSON and exits 1
+on any failure. Per body frame: colour fidelity in the critter's own hue range
+(the recipe's `checker.bodyHue`), size against the first body frame, 8 px edge
+clearance, and keying against its body key (`checker.matteMethods.body`): no
+spill on the visible soft edge, no opaque key colour, no opaque key colour
+within 6 px of the alpha edge (key excess over 60; the approved frog peaks at
+34, a lime band the generator painted round the pup's tennis balls at 176),
+and no detached island under 120 px (the frog's smallest bubble is 246 px). The
+aura frames keep their own softness, darkness, hue, and clearance checks. The
+character validator does not apply to critters (their frame set, canvas, and
+flat painted fills are different; the approved frog fails it everywhere).

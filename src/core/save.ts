@@ -10,12 +10,19 @@ function record(value: unknown): value is Record<string, unknown> {
 // key of `template` (a fresh game state) present with the same primitive type,
 // all the way down. Slots that are null in the template (battle, dialogue,
 // transition) may hold null or an object. Anything else is an old or broken
-// save, and the game starts fresh rather than crashing later.
+// save, and the game starts fresh rather than crashing later. The one
+// exception is content growing: see the critters merge in parseSave.
 export function parseSave(json: string, template: State): State | null {
   try {
     const value: unknown = JSON.parse(json);
-    if (!record(value) || value.version !== 1) return null;
-    return isState(value.state, template) ? value.state : null;
+    if (!record(value) || value.version !== 1 || !record(value.state)) return null;
+    // Critters added by later content start as they would in a new game, so
+    // new content never throws a save away.
+    const saved = value.state;
+    const state = record(saved.critters)
+      ? { ...saved, critters: { ...template.critters, ...saved.critters } }
+      : saved;
+    return isState(state, template) ? state : null;
   } catch {
     return null;
   }

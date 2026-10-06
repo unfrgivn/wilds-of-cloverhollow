@@ -1,0 +1,13 @@
+{
+  "asset": "park ground",
+  "date": "2026-10-06",
+  "model": "gemini-3.1-flash-image and gemini-3-pro-image",
+  "calls": 2,
+  "references": ["docs/art/concepts/environments/meadow_park_environment.png","art/scratch/plaza-ref-strip.png"],
+  "selected": "art/source/areas/park/park-final.png",
+  "prompt_summary": "Approved plaza-style Meadow Park with open bottom-left entry path, hollow treehouse, play tower, picnic blanket, pond and bridge, fences, flowers, and signposts.",
+  "scale_reference": "1500x1000 logical units at 2 source pixels per unit; tree door about 400 source pixels against Fae's 280px frame.",
+  "post_processing": ["Uniformly resized to 3000px wide and center-cropped to 3000x2000 source pixels.","Split into three opaque 1000x2000 WebP tiles at quality 88.","Paper margin colour #fcfbf6 recorded in ground.json."],
+  "outputs":{"tiles":["public/assets/areas/park/ground_0_0.webp","public/assets/areas/park/ground_1_0.webp","public/assets/areas/park/ground_2_0.webp"],"manifest":"public/assets/areas/park/ground.json"},
+  "owner_review":"Queued for review in art/review/park-grid.png and park-owner-review.png."
+}

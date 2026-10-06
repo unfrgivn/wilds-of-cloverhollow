@@ -60,15 +60,19 @@ const result = {
   tick: state.tick,
   x: state.player.x,
   y: state.player.y,
-  frog: state.critters.frog,
+  critters: state.critters,
   stickers: state.stickers,
   battle: state.battle?.phase ?? null,
   transition: state.transition?.phase ?? null,
 };
+const critterSummary = Object.entries(result.critters)
+  .map(([id, mood]) => `${id}:${mood}`)
+  .join(",");
 console.log(
   process.argv.includes("--json")
     ? JSON.stringify(result)
     : `${result.hash} tick=${result.tick} player=(${result.x},${result.y}) ` +
-      `frog=${result.frog} stickers=${result.stickers.join(",")} ` +
+      `critters=${critterSummary} ` +
+      `stickers=${result.stickers.join(",")} ` +
       `battle=${result.battle ?? "none"} transition=${result.transition ?? "none"}`,
 );

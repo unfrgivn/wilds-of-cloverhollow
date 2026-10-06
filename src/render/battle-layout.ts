@@ -1,6 +1,6 @@
 export type BattleLayout = {
   scale: number;
-  frog: { x: number; baseline: number; height: number };
+  critter: { x: number; baseline: number; height: number };
   fae: { x: number; baseline: number; height: number };
 };
 
@@ -9,16 +9,16 @@ export function battleLayout(
   height: number,
   viewWidth: number,
   viewHeight: number,
-  battleHeight: number,
+  critterHeight: number,
   faeHeight: number,
 ): BattleLayout {
   const scale = Math.min(width / viewWidth, height / viewHeight);
   return {
     scale,
-    frog: {
+    critter: {
       x: width * 0.5,
-      baseline: height * 0.42 + (battleHeight * scale) / 2,
-      height: battleHeight * scale,
+      baseline: height * 0.42 + (critterHeight * scale) / 2,
+      height: critterHeight * scale,
     },
     fae: {
       x: width * 0.22,

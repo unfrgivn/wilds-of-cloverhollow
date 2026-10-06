@@ -180,18 +180,32 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   key pixels) with no exceptions. The Ink adapter now skips blank lines and
   answers `calmed()` on every line.
 
-## Milestone 13: Meadow Park
+## Milestone 13: Meadow Park **Status:** ✅ Completed (2026-10-06)
 - A second painted outdoor area, Meadow Park (from `meadow_park_environment.png`):
   the hollow tree house, the cardboard play tower, a picnic blanket, the pond
   and its little bridge, reached from the plaza's lower-right path.
 - Critters become generic content (spec 8): a second chaos critter, the
   baseball-cap puppy from `npc_critter_set.png`, waits by the pond with his own
   battle lines and sticker; the engine has no frog-specific code left.
-- The journal album gains the puppy's sticker slot; the notice board and the
-  journal point Fae toward the park once the fountain is calm.
+- The journal album gains the puppy's sticker slot; the journal points Fae
+  toward the park once the fountain is calm.
 - Unit (generic critters with a real second critter), sims (the pup's win),
   cross-engine hash, e2e with real keys (plaza to park and back, the pup's
   battle), reviewed baselines, `just ios-smoke` through the park.
+- Notes: the pup is the "Zoomie Pup" (calm: the Pond Pup), with the frog's
+  battle numbers and his own lines; calming him turns up a tennis ball with a
+  raccoon paw print, pointing to the school road. The journal points to the
+  park once the frog is calm. Saves made before a critter existed still load
+  (the new critter starts in chaos). The park geometry is measured from the
+  painting (its walkable edge traced from the paint itself); the tree's two
+  bushes have their own occluders, or Fae standing in front of them would sort
+  behind the tree. The pup's art was fixed after the art round: a lime band the
+  generator painted round his tennis balls (keyed at 45% fuzz), a debris
+  sliver, and a bark frame that faced the other way without the chaos eyes
+  (one edit). tools/art/critter-check.ts is now a real gate (it exited 0 on
+  failures before) with keying checks shown to catch each defect.
+  `just ios-smoke` goes round the top of the plaza to the park and back, then
+  meets the frog from the right.
 
 ## Milestone 14: School day
 - The school hallway (from `school_interior.png`), reached by the plaza's

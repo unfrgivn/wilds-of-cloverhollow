@@ -3,6 +3,14 @@
   "name": "Fizzy Frog",
   "calmName": "Fountain Frog",
   "atlas": "assets/critters/frog/frog.json",
+  "auraCentre": {
+    "x": 264,
+    "y": 275
+  },
+  "bodyCentre": {
+    "x": 253,
+    "y": 311
+  },
   "figureHeight": 380,
   "overworldHeight": 70,
   "battleHeight": 190,

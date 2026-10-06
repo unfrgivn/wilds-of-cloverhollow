@@ -46,6 +46,8 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{calmed("pup"): The Pond Pup is calm. A raccoon paw print points toward the school. # speaker: Fae}
+{calmed("frog") and not calmed("pup"): Purple fizz drips lead out of the plaza to Meadow Park. # speaker: Fae}
 {calmed("frog"): The Fountain Frog is calm. Something purple fizzed into his fountain. # speaker: Fae}
 {read_notice: A raccoon in a purple hood was seen in town. # speaker: Fae}
 {plan == "now": Go see why the fountain is fizzing! # speaker: Fae}
@@ -103,3 +105,30 @@ Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
 Have a good day, sweetie. Stay curious! # speaker: Mom
 -> DONE
 
+=== pup_calm ===
+{pup_calm > 1: -> again}
+Woof! Woof! The pup flops down and wags his whole body. # speaker: Pond Pup
+He drops a soggy tennis ball at my feet. It's all purple and fizzy. # speaker: Fae
+And there's a tiny paw print on it... a raccoon paw print! # speaker: Fae
+Woof! # speaker: Pond Pup
+He's pointing his nose at the road to school. # speaker: Fae
+-> DONE
+
+= again
+Woof! The Pond Pup wants to play fetch. # speaker: Pond Pup
+-> DONE
+
+=== tree_house ===
+A tree house with a round door and a little sign: CLUB MEMBERS ONLY. # speaker: Fae
+I wonder what the password is. # speaker: Fae
+-> DONE
+
+=== picnic ===
+A picnic with sandwiches, lemonade, and a basket of berries. # speaker: Fae
+Somebody ate every single berry... and left purple paw prints! # speaker: Fae
+-> DONE
+
+=== park_sign ===
+MEADOW PARK. Please keep your pets on the path! # speaker: Sign
+{not calmed("pup"): Somebody's pet is barking by the pond. # speaker: Fae}
+-> DONE

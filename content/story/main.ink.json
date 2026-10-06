@@ -401,6 +401,73 @@
       "journal": [
         "ev",
         "str",
+        "^pup",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Pond Pup is calm. A raccoon paw print points toward the school. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^frog",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "str",
+        "^pup",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Purple fizz drips lead out of the plaza to Meadow Park. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
         "^frog",
         "/str",
         {
@@ -419,7 +486,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.7"
+                "->": ".^.^.^.33"
               },
               null
             ]
@@ -444,7 +511,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.40"
               },
               null
             ]
@@ -473,7 +540,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.25"
+                "->": ".^.^.^.51"
               },
               null
             ]
@@ -502,7 +569,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.36"
+                "->": ".^.^.^.62"
               },
               null
             ]
@@ -829,6 +896,140 @@
             null
           ]
         }
+      ],
+      "pup_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Woof! Woof! The pup flops down and wags his whole body. ",
+        "#",
+        "^speaker: Pond Pup",
+        "/#",
+        "\n",
+        "^He drops a soggy tennis ball at my feet. It's all purple and fizzy. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^And there's a tiny paw print on it... a raccoon paw print! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Woof! ",
+        "#",
+        "^speaker: Pond Pup",
+        "/#",
+        "\n",
+        "^He's pointing his nose at the road to school. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Woof! The Pond Pup wants to play fetch. ",
+            "#",
+            "^speaker: Pond Pup",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "tree_house": [
+        "^A tree house with a round door and a little sign: CLUB MEMBERS ONLY. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^I wonder what the password is. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "picnic": [
+        "^A picnic with sandwiches, lemonade, and a basket of berries. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Somebody ate every single berry... and left purple paw prints! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "park_sign": [
+        "^MEADOW PARK. Please keep your pets on the path! ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^pup",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Somebody's pet is barking by the pond. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.13"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
       ],
       "global decl": [
         "ev",

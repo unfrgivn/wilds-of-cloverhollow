@@ -164,13 +164,15 @@ function checkFrame(
     maxX = Math.max(maxX, x);
     maxY = Math.max(maxY, y);
     if (opacity > 128) opaqueArea += 1;
-    // Magenta spill is measured on the visible soft edge (alpha 16-240): on
-    // Oliver's despilled frames that band peaks at min(r, b) - g = 33, and the
-    // same frames keyed without despill reach 255 (344 of 419 pixels over 40).
-    // Nearly opaque pixels carry the costume's own colour (lavender shading).
-    const spill = key === "green"
-      ? opacity < 255 && green > Math.max(red, blue) + 12
-      : opacity > 16 && opacity < 240 && Math.min(red, blue) > green + 40;
+    // Spill is measured on the visible soft edge (alpha 16-240), where a key
+    // fringe shows; nearly opaque pixels carry the figure's own colour. Key
+    // excess over 40, calibrated on frames keyed with and without despill:
+    // magenta (Oliver) despilled peaks at min(r, b) - g = 33, undespilled
+    // reaches 255 (344 of 419 edge pixels over 40); green (the pup) despilled
+    // peaks at g - max(r, b) = 29, undespilled reaches 244 (1,520 of 2,173 over
+    // 40). The pup's olive-brown ink and his tennis balls are near-opaque.
+    const excess = key === "green" ? green - Math.max(red, blue) : Math.min(red, blue) - green;
+    const spill = opacity > 16 && opacity < 240 && excess > 40;
     if (spill) errors.push(`${key} spill`);
     // Opaque pixels still in the key colour: an unkeyed background or an
     // enclosed hole the border flood couldn't reach (18% fuzz, as keyed).

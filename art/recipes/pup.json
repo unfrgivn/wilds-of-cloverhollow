@@ -1,0 +1,61 @@
+{
+  "asset": "pup",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "validator": "tools/art/critter-check.ts --recipe art/recipes/pup.json --atlas public/assets/critters/pup/pup.png (checker block below)",
+  "selectionReason": "Brown pup with red cap contains no green, so green keying preserves the brown, tan, and red costume. Aura is white-lifted. Alpha centroids are recorded for engine placement.",
+  "checker": {
+    "note": "Run bun tools/art/build-pup.ts first; rawSources are its source crops.",
+    "bodyFrames": [
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01",
+      "calm_idle_01"
+    ],
+    "auraFrames": [
+      "chaos_aura_01"
+    ],
+    "rawSources": {
+      "chaos_idle_01": "art/scratch/pup-build-frames/source-chaos_idle_01.png",
+      "chaos_burst_01": "art/scratch/pup-build-frames/source-chaos_burst_01.png",
+      "soothed_01": "art/scratch/pup-build-frames/source-soothed_01.png",
+      "calm_idle_01": "art/scratch/pup-build-frames/source-calm_idle_01.png"
+    },
+    "matteMethods": {
+      "body": "green-key",
+      "aura": "white-lift"
+    },
+    "bodyHue": {
+      "min": 0.0,
+      "max": 0.11,
+      "minFraction": 0.6
+    },
+    "psnrThreshold": 25
+  },
+  "generationCalls": "3 for the pup (body strip, aura, bark-frame edit); see art/scratch/generation-log.jsonl",
+  "selectedRawSources": [
+    "art/source/critters/pup/body-sheet-raw.png",
+    "art/source/critters/pup/burst-edit.png",
+    "art/source/critters/pup/aura-white-raw.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-pup.ts (rebuilds the atlas byte for byte)",
+    "bodies": "chaos_idle_01, soothed_01, calm_idle_01 are the sheet's 688 px panels 0, 2, 3; chaos_burst_01 is burst-edit.png",
+    "burstEdit": "one gemini-3-pro-image edit of the sheet's bark panel, mirrored to face left like the other frames (the generated panel faced right), with the chaos spiral eyes and scribbles copied from the idle panel; nothing else changed",
+    "key": "#00FF00 border flood at 45% fuzz: the generator painted a lime band (about (106, 196, 21), 98-106 from the key) outside the tennis balls' ink outlines; the pup's own colours are all far from the key",
+    "cleanup": "at sprite size, tools/art/drop-islands.ts --min 120 (one 54 px debris sliver beside the soothed frame's ear), then tools/art/despill-edge.ts --key green --band 2",
+    "canvas": "512x512, figure 380 px tall, baseline 504, anchor (0.5, 0.984375)",
+    "aura": "white lifted to alpha, trimmed, scaled 28%, placed at (24, 40)"
+  },
+  "centroids": {
+    "calmBody": {
+      "x": 258,
+      "y": 316
+    },
+    "aura": {
+      "x": 245,
+      "y": 249
+    },
+    "unit": "frame px, alpha-weighted"
+  }
+}

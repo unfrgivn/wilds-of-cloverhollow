@@ -6,6 +6,12 @@
       "name": "Fountain Frog",
       "critter": "frog",
       "frame": "calm_idle_01"
+    },
+    {
+      "id": "pond-pup",
+      "name": "Pond Pup",
+      "critter": "pup",
+      "frame": "calm_idle_01"
     }
   ]
 }

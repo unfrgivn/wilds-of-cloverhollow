@@ -2,12 +2,15 @@ import areaData from "../../content/areas/harness.json";
 import bedroomData from "../../content/areas/bedroom.json";
 import plazaData from "../../content/areas/plaza.json";
 import kitchenData from "../../content/areas/kitchen.json";
+import parkData from "../../content/areas/park.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
+import parkFixtureData from "../../content/fixtures/park.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
+import pupData from "../../content/critters/pup.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -27,6 +30,7 @@ import type {
   BattleContent,
   CritterCommandId,
   StickerCatalogue,
+  Point,
 } from "../core";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -286,6 +290,15 @@ export function parseCritter(value: unknown, file: string): Critter {
   const name = text(value, "name");
   const calmName = text(value, "calmName");
   const atlas = text(value, "atlas");
+  const point = (key: string): Point => {
+    const item = value[key];
+    field(
+      record(item) && typeof item.x === "number" && typeof item.y === "number",
+      file,
+      key,
+    );
+    return { x: item.x, y: item.y };
+  };
   const calmKnot = text(value, "calmKnot");
   const calmPrompt = value.calmPrompt;
   field(calmPrompt === "Look" || calmPrompt === "Talk", file, "calmPrompt");
@@ -335,6 +348,8 @@ export function parseCritter(value: unknown, file: string): Critter {
     name,
     calmName,
     atlas,
+    auraCentre: point("auraCentre"),
+    bodyCentre: point("bodyCentre"),
     figureHeight: number(value, "figureHeight"),
     overworldHeight: number(value, "overworldHeight"),
     battleHeight: number(value, "battleHeight"),
@@ -503,16 +518,25 @@ export function parseOccluderManifest(
   return { cutouts };
 }
 
-export function parseCharacters(value: unknown, file: string):
-  Record<string, CharacterContent> {
+export function parseCharacters(
+  value: unknown,
+  file: string,
+): Record<string, CharacterContent> {
   field(record(value), file, "object");
   const characters: Record<string, CharacterContent> = {};
   for (const [id, raw] of Object.entries(value)) {
     field(record(raw) && typeof raw.atlas === "string", file, `${id}.atlas`);
     const ticks = raw.idleTicks;
-    field(Array.isArray(ticks) && ticks.length > 0 &&
-      ticks.every((tick) => typeof tick === "number" && Number.isInteger(tick) && tick > 0),
-      file, `${id}.idleTicks`);
+    field(
+      Array.isArray(ticks) &&
+        ticks.length > 0 &&
+        ticks.every(
+          (tick) =>
+            typeof tick === "number" && Number.isInteger(tick) && tick > 0,
+        ),
+      file,
+      `${id}.idleTicks`,
+    );
     characters[id] = { atlas: raw.atlas, idleTicks: ticks };
   }
   return characters;
@@ -526,8 +550,10 @@ export function loadContent(): {
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
   const plaza = parseArea(plazaData, "content/areas/plaza.json");
   const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
+  const park = parseArea(parkData, "content/areas/park.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
+  const pup = parseCritter(pupData, "content/critters/pup.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -535,19 +561,21 @@ export function loadContent(): {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
     plaza: parseFixture(plazaFixtureData, "content/fixtures/plaza.json"),
+    park: parseFixture(parkFixtureData, "content/fixtures/park.json"),
   };
   const areas = {
     [harness.id]: harness,
     [bedroom.id]: bedroom,
     [plaza.id]: plaza,
     [kitchen.id]: kitchen,
+    [park.id]: park,
   };
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas,
       story,
-      critters: { [frog.id]: frog },
+      critters: { [frog.id]: frog, [pup.id]: pup },
       battle,
       stickers,
       characters,

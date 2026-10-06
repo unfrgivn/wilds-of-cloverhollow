@@ -49,17 +49,22 @@ function hue(pixel: Pixel): { hue: number; saturation: number } {
   if (value < 0) value += 6;
   return { hue: value / 6, saturation: delta / high };
 }
-function greenStats(image: Image): { fraction: number; saturation: number } {
-  const subject = image.pixels.filter((pixel) => pixel.a > 0
-    && !(pixel.r > 220 && pixel.b > 220 && pixel.g < 80));
-  const green = subject.filter((pixel) => {
+// The body's colour fidelity is measured in the critter's own dominant hue
+// range (its recipe's checker.bodyHue: the frog's green, the pup's brown),
+// ignoring pixels near its body key colour.
+type HueRange = { min: number; max: number; minFraction: number };
+function hueStats(image: Image, range: HueRange, key: Pixel):
+  { fraction: number; saturation: number } {
+  const nearKey = (pixel: Pixel): boolean => Math.max(Math.abs(pixel.r - key.r),
+    Math.abs(pixel.g - key.g), Math.abs(pixel.b - key.b)) < 100;
+  const subject = image.pixels.filter((pixel) => pixel.a > 0 && !nearKey(pixel));
+  const inRange = subject.filter((pixel) => {
     const colour = hue(pixel);
-    return pixel.a > 0 && colour.hue >= 0.17 && colour.hue <= 0.45
-      && colour.saturation >= 0.25;
+    return colour.hue >= range.min && colour.hue <= range.max && colour.saturation >= 0.25;
   });
-  const fraction = green.length / Math.max(subject.length, 1);
-  const saturation = green.reduce((sum, pixel) => sum + hue(pixel).saturation, 0)
-    / Math.max(green.length, 1);
+  const fraction = inRange.length / Math.max(subject.length, 1);
+  const saturation = inRange.reduce((sum, pixel) => sum + hue(pixel).saturation, 0)
+    / Math.max(inRange.length, 1);
   return { fraction, saturation };
 }
 function bounds(image: Image): { left: number; top: number; right: number; bottom: number } {
@@ -121,17 +126,77 @@ const rawSources = object(config.rawSources); const bodyNames = Array.isArray(co
 const auraNames = Array.isArray(config.auraFrames)
   ? config.auraFrames.filter((value): value is string => typeof value === "string") : [];
 const matteMethods = object(config.matteMethods);
-const frames = bodyNames.map((name) => name);
-const frameWidth = 512; const frameHeight = 512;
-const bodyStats = frames.map((name, index) => {
-  const x = (index % 3) * frameWidth; const y = Math.floor(index / 3) * frameHeight;
+const bodyHueConfig = object(config.bodyHue);
+const bodyHue: HueRange = {
+  min: Number(bodyHueConfig?.min ?? 0.17),
+  max: Number(bodyHueConfig?.max ?? 0.45),
+  minFraction: Number(bodyHueConfig?.minFraction ?? 0.3),
+};
+const bodyKey: Pixel = matteMethods?.body === "green-key"
+  ? { r: 0, g: 255, b: 0, a: 255 }
+  : { r: 255, g: 0, b: 255, a: 255 };
+// Frames are read by name from the atlas JSON beside the image.
+const sheet = object(JSON.parse(await Bun.file(atlas.replace(/\.png$/, ".json")).text()));
+const rects = object(sheet?.frames);
+function frameImage(name: string): Image {
+  const rect = object(object(rects?.[name])?.frame);
+  const x = Number(rect?.x); const y = Number(rect?.y);
+  const width = Number(rect?.w); const height = Number(rect?.h);
+  if (![x, y, width, height].every(Number.isFinite)) throw new Error(`No frame ${name}`);
   const pixels: Pixel[] = [];
-  for (let row = 0; row < frameHeight; row += 1) {
+  for (let row = 0; row < height; row += 1) {
     const start = (y + row) * image.width + x;
-    pixels.push(...image.pixels.slice(start, start + frameWidth));
+    pixels.push(...image.pixels.slice(start, start + width));
   }
-  const frame: Image = { pixels, width: frameWidth, height: frameHeight };
-  const stats = greenStats(frame);
+  return { pixels, width, height };
+}
+const failures: string[] = [];
+function check(pass: boolean, what: string): string {
+  if (!pass) failures.push(what);
+  return pass ? "PASS" : "FAIL";
+}
+// Body pixels against the body key (18% fuzz = 46): spill on the visible soft
+// edge (alpha 16-240, key excess over 40, as validate-sprite.ts) and opaque
+// pixels still in the key colour.
+function keyExcess(pixel: Pixel): number {
+  return bodyKey.g === 255 ? pixel.g - Math.max(pixel.r, pixel.b)
+    : Math.min(pixel.r, pixel.b) - pixel.g;
+}
+// Steps (4-connected) from each pixel to the nearest fully transparent one.
+function edgeDistance(frame: Image): Uint16Array {
+  const distance = new Uint16Array(frame.pixels.length).fill(65535);
+  const queue: number[] = [];
+  frame.pixels.forEach((pixel, index) => {
+    if (pixel.a === 0) {
+      distance[index] = 0;
+      queue.push(index);
+    }
+  });
+  for (let head = 0; head < queue.length; head += 1) {
+    const index = queue[head] ?? 0;
+    const x = index % frame.width;
+    for (const next of [index - 1, index + 1, index - frame.width, index + frame.width]) {
+      if (next < 0 || next >= frame.pixels.length || Math.abs((next % frame.width) - x) > 1)
+        continue;
+      if ((distance[next] ?? 0) <= (distance[index] ?? 0) + 1) continue;
+      distance[next] = (distance[index] ?? 0) + 1;
+      queue.push(next);
+    }
+  }
+  return distance;
+}
+// Opaque key colour in the 6 px band inside the alpha edge: background the
+// generator blended into an outline (a lime band around the pup's tennis
+// balls). Measured worst key excess there: approved frog 34, pup 28; the pup
+// keyed at 18% fuzz instead of 45%, 176 (48 pixels over 60).
+function bandKey(frame: Image): number {
+  const distance = edgeDistance(frame);
+  return frame.pixels.filter((pixel, index) => pixel.a > 128
+    && (distance[index] ?? 0) <= 6 && keyExcess(pixel) > 60).length;
+}
+const bodyStats = bodyNames.map((name) => {
+  const frame = frameImage(name);
+  const stats = hueStats(frame, bodyHue, bodyKey);
   return { name, frame, stats, bounds: bounds(frame), parts: components(frame) };
 });
 const reference = bodyStats[0]?.stats;
@@ -141,28 +206,36 @@ for (const item of bodyStats) {
   const rawValue = rawSources?.[item.name];
   const rawPath = typeof rawValue === "string" ? rawValue : "";
   const raw = rawPath.length > 0 ? await readImage(rawPath) : item.frame;
-  const source = greenStats(raw);
+  const source = hueStats(raw, bodyHue, bodyKey);
   const saturationDelta = Math.abs(item.stats.saturation - source.saturation);
-  const pass = item.stats.fraction >= 0.3 && saturationDelta <= 0.08;
+  const colour = check(item.stats.fraction >= bodyHue.minFraction && saturationDelta <= 0.08,
+    `${item.name}: colour`);
   const area = bodyArea(item.frame);
-  const sizePass = referenceArea === 0 || Math.abs(area / referenceArea - 1) <= 0.15;
-  console.log(`${item.name} colour=${pass ? "PASS" : "FAIL"} size=${sizePass ? "PASS" : "FAIL"}`
-    + ` green=${item.stats.fraction.toFixed(3)}`
+  const size = check(referenceArea === 0 || Math.abs(area / referenceArea - 1) <= 0.15,
+    `${item.name}: size`);
+  const edge = item.bounds;
+  const clear = check(edge.left >= 8 && edge.top >= 8 && edge.right >= 8 && edge.bottom >= 8,
+    `${item.name}: clearance`);
+  const spill = item.frame.pixels.filter((pixel) => pixel.a > 16 && pixel.a < 240
+    && keyExcess(pixel) > 40).length;
+  const left = item.frame.pixels.filter((pixel) => pixel.a > 128
+    && Math.max(Math.abs(pixel.r - bodyKey.r), Math.abs(pixel.g - bodyKey.g),
+      Math.abs(pixel.b - bodyKey.b)) <= 46).length;
+  const debris = item.parts.filter((pixels) => pixels < 120).length;
+  const band = bandKey(item.frame);
+  const keyed = check(spill === 0 && left === 0 && debris === 0 && band === 0,
+    `${item.name}: keying`);
+  console.log(`${item.name} colour=${colour} size=${size} clearance=${clear} keying=${keyed}`
+    + ` spill=${spill} keyLeft=${left} edgeKey=${band} debris=${debris}`
+    + ` hue=${item.stats.fraction.toFixed(3)}`
     + ` sourceSat=${source.saturation.toFixed(3)}`
     + ` spriteSat=${item.stats.saturation.toFixed(3)}`
     + ` delta=${saturationDelta.toFixed(3)} bodyArea=${area}`
     + ` clearance=${JSON.stringify(item.bounds)} components=${item.parts.length}`);
 }
-for (const [auraIndex, name] of auraNames.entries()) {
-  const atlasIndex = bodyNames.length + auraIndex;
-  const x = (atlasIndex % 3) * frameWidth;
-  const y = Math.floor(atlasIndex / 3) * frameHeight;
-  const pixels: Pixel[] = [];
-  for (let row = 0; row < frameHeight; row += 1) {
-    const start = (y + row) * image.width + x;
-    pixels.push(...image.pixels.slice(start, start + frameWidth));
-  }
-  const frame: Image = { pixels, width: frameWidth, height: frameHeight };
+for (const name of auraNames) {
+  const frame = frameImage(name);
+  const pixels = frame.pixels;
   const hot = pixels.filter((pixel) => pixel.a > 0
     && pixel.r > 200 && pixel.b > 200 && pixel.g < 100).length;
   const visible = pixels.filter((pixel) => pixel.a > 0);
@@ -183,8 +256,9 @@ for (const [auraIndex, name] of auraNames.entries()) {
   const hueFraction = allowedHue / Math.max(coloured.length, 1);
   const edge = bounds(frame);
   const keyPass = matteMethods?.aura === "white-lift" || hot === 0;
-  const pass = keyPass && dark === 0 && softness >= 0.35 && hueFraction >= 0.70
-    && edge.left >= 8 && edge.top >= 8 && edge.right >= 8 && edge.bottom >= 8;
+  const pass = check(keyPass && dark === 0 && softness >= 0.35 && hueFraction >= 0.70
+    && edge.left >= 8 && edge.top >= 8 && edge.right >= 8 && edge.bottom >= 8, `${name}: aura`)
+    === "PASS";
   const keyStatus = matteMethods?.aura === "white-lift" ? "SKIP" : String(hot);
   console.log(`${name} aura=${pass ? "PASS" : "FAIL"} hotKey=${keyStatus}`
     + ` dark=${dark} darkFraction=${darkFraction.toFixed(3)}`
@@ -195,8 +269,13 @@ for (const [auraIndex, name] of auraNames.entries()) {
 const threshold = Number(config.psnrThreshold ?? 0);
 const atlasPsnr = await psnr(atlas);
 console.log(`upscale-detector threshold=${threshold}`
-  + ` atlasPSNR=${atlasPsnr.toFixed(2)} pass=${atlasPsnr >= threshold}`);
+  + ` atlasPSNR=${atlasPsnr.toFixed(2)} pass=${check(atlasPsnr >= threshold, "upscale")}`);
 const calibration = config.calibration;
 if (calibration !== undefined) console.log(`upscale-calibration=${JSON.stringify(calibration)}`);
 if (reference === undefined) throw new Error("No body frame");
-console.log(`body-reference-green=${reference.fraction.toFixed(3)}`);
+console.log(`body-reference-hue=${reference.fraction.toFixed(3)}`);
+if (failures.length > 0) {
+  console.error(`FAIL critter check: ${failures.join(", ")}`);
+  process.exit(1);
+}
+console.log("PASS critter check");

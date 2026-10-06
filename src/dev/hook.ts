@@ -39,9 +39,9 @@ export type CloverhollowHook = {
     battle: {
       phase: string | null;
       ring: { x: number; y: number; radius: number } | null;
-      frogFrame: string;
+      critter: { id: string; frame: string } | null;
       layout: {
-        frog: { x: number; baseline: number; height: number };
+        critter: { x: number; baseline: number; height: number };
         fae: { x: number; baseline: number; height: number };
       } | null;
       backdrop: { x: number; y: number; width: number; height: number } | null;

@@ -1,0 +1,12 @@
+{
+  "area": "park",
+  "pxPerUnit": 2,
+  "width": 3000,
+  "height": 2000,
+  "paper": "#fcfbf6",
+  "tiles": [
+    {"file":"ground_0_0.webp","x":0,"y":0,"width":1000,"height":2000},
+    {"file":"ground_1_0.webp","x":1000,"y":0,"width":1000,"height":2000},
+    {"file":"ground_2_0.webp","x":2000,"y":0,"width":1000,"height":2000}
+  ]
+}

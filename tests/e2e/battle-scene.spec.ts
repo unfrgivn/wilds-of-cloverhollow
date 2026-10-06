@@ -133,12 +133,12 @@ for (const size of sizes) {
     if (!layout) return;
     const scale = Math.min(size.width / viewWidth(size.width, size.height),
       size.height / viewHeight);
-    expect(Math.abs(layout.frog.height - battleHeight * scale)).toBeLessThanOrEqual(1);
-    expect(Math.abs(layout.frog.x - size.width * .5)).toBeLessThanOrEqual(size.width * .02);
-    const frogCentre = layout.frog.baseline - layout.frog.height / 2;
-    expect(Math.abs(frogCentre - size.height * .42)).toBeLessThanOrEqual(size.height * .02);
+    expect(Math.abs(layout.critter.height - battleHeight * scale)).toBeLessThanOrEqual(1);
+    expect(Math.abs(layout.critter.x - size.width * .5)).toBeLessThanOrEqual(size.width * .02);
+    const critterCentre = layout.critter.baseline - layout.critter.height / 2;
+    expect(Math.abs(critterCentre - size.height * .42)).toBeLessThanOrEqual(size.height * .02);
     expect(info.auraAlpha, "the chaos aura is clearly visible").toBeGreaterThanOrEqual(.5);
-    const frog = figureBox(layout.frog, .9);
+    const critter = figureBox(layout.critter, .9);
     const fae = figureBox(layout.fae, .6);
     const hud = await rects(page, ".battle-meter");
     const commands = await rects(page, ".battle-commands");
@@ -148,10 +148,10 @@ for (const size of sizes) {
     expect(commands.length).toBe(1);
     expect(message.length).toBe(1);
     for (const blocker of [...hud, ...commands, ...message, ...buttons]) {
-      expect(intersects(frog, blocker), `frog vs ${JSON.stringify(blocker)}`).toBe(false);
+      expect(intersects(critter, blocker), `critter vs ${JSON.stringify(blocker)}`).toBe(false);
       expect(intersects(fae, blocker), `Fae vs ${JSON.stringify(blocker)}`).toBe(false);
     }
-    for (const figure of [frog, fae]) {
+    for (const figure of [critter, fae]) {
       expect(figure.x).toBeGreaterThanOrEqual(0);
       expect(figure.y).toBeGreaterThanOrEqual(0);
       expect(figure.x + figure.width).toBeLessThanOrEqual(size.width);
@@ -164,8 +164,8 @@ for (const size of sizes) {
     const ring = (await renderInfo(page)).battle.ring;
     expect(ring, "renderInfo().battle.ring").toBeTruthy();
     if (!ring) return;
-    expect(Math.abs(ring.x - layout.frog.x)).toBeLessThanOrEqual(1);
-    expect(Math.abs(ring.y - frogCentre)).toBeLessThanOrEqual(1);
+    expect(Math.abs(ring.x - layout.critter.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(ring.y - critterCentre)).toBeLessThanOrEqual(1);
     const drawn = await page.locator(".battle-ring").evaluate((element) => {
       const rect = element.getBoundingClientRect();
       return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };

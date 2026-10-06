@@ -1,0 +1,84 @@
+{
+  "id": "pup",
+  "name": "Zoomie Pup",
+  "calmName": "Pond Pup",
+  "atlas": "assets/critters/pup/pup.json",
+  "auraCentre": {
+    "x": 245,
+    "y": 249
+  },
+  "bodyCentre": {
+    "x": 258,
+    "y": 316
+  },
+  "figureHeight": 380,
+  "overworldHeight": 66,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "snacks": 2,
+  "sticker": {
+    "id": "pond-pup",
+    "name": "Pond Pup",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "pup_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "play": {
+      "calm": 30,
+      "great": 10,
+      "good": 5,
+      "rest": 1
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A puppy in a red cap zooms out from behind the pond, barking at everything!",
+    "command": "What should Fae do?",
+    "soothe": {
+      "great": "Fae speaks softly: \"Easy, buddy.\" The pup's swirly eyes start to slow down!",
+      "good": "Fae speaks softly. The pup tilts his head and listens.",
+      "miss": "Fae tries, but the pup is too zoomy to hear much."
+    },
+    "play": {
+      "great": "Maddie bats a tennis ball across the grass. The pup races after it, tail wagging!",
+      "good": "Maddie nudges a tennis ball. The pup can't resist a sniff.",
+      "miss": "Maddie swats at a ball... and it bonks her on the nose. The pup gives a puppy grin."
+    },
+    "snack": "Fae shares a crunchy cracker. Energy up! The pup licks his lips.",
+    "playResting": "resting",
+    "burst": "The pup barks and bats a flurry of tennis balls at Fae!",
+    "burstResult": {
+      "great": "Boing, boing! Fae catches every single ball!",
+      "good": "Fae catches most of the balls!",
+      "miss": "Bonk! The balls bounce all around Fae."
+    },
+    "soothed": "The pup flops down with a happy sigh. The zoomy spell floats away!",
+    "reward": "New sticker: Pond Pup!",
+    "rest": "Fae is all tuckered out. Time for a little rest.",
+    "run": "Fae backs away slowly. The pup keeps zooming around the pond."
+  }
+}

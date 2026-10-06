@@ -27,12 +27,20 @@ import { fadeAlpha } from "./fade";
 import { battleLayout } from "./battle-layout";
 
 // Critter frames are 512 px with the feet at y 504 (docs/art/critters.md).
-// The frog's aura turns about its own centroid (264, 275), placed on the
-// body's centroid (253, 311); both were measured from the frog atlas.
-function placeAura(aura: Sprite, feet: { x: number; y: number }, scale: number): void {
-  aura.anchor.set(264 / 512, 275 / 512);
+// Aura and body centroids are measured in each critter's content atlas.
+function placeAura(
+  aura: Sprite,
+  feet: { x: number; y: number },
+  scale: number,
+  auraCentre: Point,
+  bodyCentre: Point,
+): void {
+  aura.anchor.set(auraCentre.x / 512, auraCentre.y / 512);
   aura.scale.set(scale * 1.15);
-  aura.position.set(feet.x + (253 - 256) * scale, feet.y + (311 - 504) * scale);
+  aura.position.set(
+    feet.x + (bodyCentre.x - 256) * scale,
+    feet.y + (bodyCentre.y - 504) * scale,
+  );
 }
 
 export class GameView {
@@ -56,13 +64,18 @@ export class GameView {
     resolution: 0.5,
     clipToViewport: false,
   });
-  private battleBackdrop: { x: number; y: number; width: number; height: number } | null = null;
+  private battleBackdrop: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null = null;
   // The blurred painting, rendered once per battle (see renderBackdrop).
   private readonly backdropSprite = new Sprite();
   private readonly renderer: Renderer;
   private backdropTexture: Texture | undefined;
-  private readonly battleFrog = new Sprite();
-  private readonly battleAura = new Sprite();
+  private readonly battleCritter = new Sprite();
+  private readonly battleCritterAura = new Sprite();
   private readonly battleFae = new Sprite();
   private readonly battleMaddie = new Sprite();
   private readonly label: Text | undefined;
@@ -91,8 +104,8 @@ export class GameView {
     this.depth.sortableChildren = true;
     this.player.label = "fae";
     this.maddie.label = "maddie";
-    this.battleFrog.label = "battle:frog";
-    this.battleAura.label = "battle:frog:aura";
+    this.battleCritter.label = "battle:critter";
+    this.battleCritterAura.label = "battle:critter:aura";
     this.player.scale.set(0.5);
     this.root.addChild(
       this.background,
@@ -109,8 +122,8 @@ export class GameView {
     this.depth.addChild(this.player);
     this.depth.addChild(this.maddie);
     this.battleLayer.addChild(
-      this.battleAura,
-      this.battleFrog,
+      this.battleCritterAura,
+      this.battleCritter,
       this.battleFae,
       this.battleMaddie,
     );
@@ -132,10 +145,9 @@ export class GameView {
         src: assetUrl("assets/characters/fae/fae.json"),
         data: { textureOptions: { autoGenerateMipmaps: true } },
       }),
-      Assets.load({
-        alias: "frog-sheet",
-        src: assetUrl("assets/critters/frog/frog.json"),
-      }),
+      ...Object.entries(this.world.critters).map(([id, critter]) =>
+        Assets.load({ alias: `${id}-sheet`, src: assetUrl(critter.atlas) }),
+      ),
       Assets.load({
         alias: "maddie-sheet",
         src: assetUrl("assets/characters/maddie/maddie.json"),
@@ -146,7 +158,8 @@ export class GameView {
           alias: `${id}-sheet`,
           src: assetUrl(character.atlas),
           data: { textureOptions: { autoGenerateMipmaps: true } },
-        })),
+        }),
+      ),
     ]);
   }
 
@@ -358,11 +371,18 @@ export class GameView {
       if (sheet === undefined || character === undefined) continue;
       const facing = npcFacing(state, npc);
       const wanted = `idle_${facing}`;
-      const animation = sheet.data.animations?.[wanted] !== undefined ? wanted : "idle_down";
+      const animation =
+        sheet.data.animations?.[wanted] !== undefined ? wanted : "idle_down";
       const names = sheet.data.animations?.[animation] ?? [];
       let index = 0;
-      if (animation === "idle_down" && names.length === character.idleTicks.length) {
-        const cycle = character.idleTicks.reduce((sum, ticks) => sum + ticks, 0);
+      if (
+        animation === "idle_down" &&
+        names.length === character.idleTicks.length
+      ) {
+        const cycle = character.idleTicks.reduce(
+          (sum, ticks) => sum + ticks,
+          0,
+        );
         let left = state.tick % cycle;
         while (left >= (character.idleTicks[index] ?? cycle)) {
           left -= character.idleTicks[index] ?? cycle;
@@ -373,7 +393,8 @@ export class GameView {
       const texture = name === undefined ? undefined : sheet.textures[name];
       if (name === undefined || texture === undefined) continue;
       sprite.texture = texture;
-      if (texture.defaultAnchor !== undefined) sprite.anchor.copyFrom(texture.defaultAnchor);
+      if (texture.defaultAnchor !== undefined)
+        sprite.anchor.copyFrom(texture.defaultAnchor);
       sprite.position.set(npc.point.x, npc.point.y);
       sprite.zIndex = npc.point.y;
       frames.push({ id: npc.id, frame: name, facing });
@@ -390,7 +411,8 @@ export class GameView {
       const point = area?.critters.find((item) => item.id === id)?.point;
       const content = this.world.critters[id];
       const sheet = Assets.get<Spritesheet>(`${id}-sheet`);
-      if (point === undefined || content === undefined || sheet === undefined) continue;
+      if (point === undefined || content === undefined || sheet === undefined)
+        continue;
       const calm = state.critters[id] === "calm";
       const frame = calm ? "calm_idle_01" : "chaos_idle_01";
       const texture = sheet.textures[frame];
@@ -404,7 +426,7 @@ export class GameView {
       body.zIndex = point.y;
       aura.visible = !calm;
       aura.texture = auraTexture;
-      placeAura(aura, point, scale);
+      placeAura(aura, point, scale, content.auraCentre, content.bodyCentre);
       aura.zIndex = point.y - 0.5;
       aura.alpha = 0.65 + Math.sin(state.tick / 18) * 0.2;
       aura.rotation = state.tick / 180;
@@ -419,26 +441,38 @@ export class GameView {
    * overworld zoom), centred on the critter and clamped, softly blurred. The
    * margin keeps the blur's edge fade off-screen.
    */
-  private renderBackdrop(critterId: string, width: number, height: number): void {
+  private renderBackdrop(
+    critterId: string,
+    width: number,
+    height: number,
+  ): void {
     const area = this.areaView?.area;
     if (area === undefined) return;
-    const focus = area.critters.find((item) => item.id === critterId)?.point ??
-      { x: area.width / 2, y: area.height / 2 };
+    const focus = area.critters.find((item) => item.id === critterId)
+      ?.point ?? { x: area.width / 2, y: area.height / 2 };
     // Watercolour areas fade to bare paper near their edges (the plaza by
     // about 120 units at the sides and 50 at the top and bottom), so frame
     // only the painted interior, 8% in from every side.
     const insetX = area.width * 0.08;
     const insetY = area.height * 0.08;
     const margin = 32;
-    const cover = Math.max((width + margin * 2) / (area.width - insetX * 2),
+    const cover = Math.max(
+      (width + margin * 2) / (area.width - insetX * 2),
       (height + margin * 2) / (area.height - insetY * 2),
-      Math.min(width / this.viewWidth, height / this.viewHeight));
+      Math.min(width / this.viewWidth, height / this.viewHeight),
+    );
     const clamp = (value: number, low: number, high: number): number =>
       Math.min(high, Math.max(low, value));
-    const x = clamp(width / 2 - focus.x * cover,
-      width + margin - (area.width - insetX) * cover, -margin - insetX * cover);
-    const y = clamp(height / 2 - focus.y * cover,
-      height + margin - (area.height - insetY) * cover, -margin - insetY * cover);
+    const x = clamp(
+      width / 2 - focus.x * cover,
+      width + margin - (area.width - insetX) * cover,
+      -margin - insetX * cover,
+    );
+    const y = clamp(
+      height / 2 - focus.y * cover,
+      height + margin - (area.height - insetY) * cover,
+      -margin - insetY * cover,
+    );
     if (this.backdropTexture === undefined && this.areaView !== undefined) {
       // Blur the painting once into a small texture: the backdrop is static,
       // so each battle frame draws one sprite instead of a full-screen blur
@@ -455,7 +489,12 @@ export class GameView {
     }
     this.backdropSprite.scale.set(cover);
     this.backdropSprite.position.set(x, y);
-    this.battleBackdrop = { x, y, width: area.width * cover, height: area.height * cover };
+    this.battleBackdrop = {
+      x,
+      y,
+      width: area.width * cover,
+      height: area.height * cover,
+    };
   }
 
   private renderBattle(
@@ -490,14 +529,19 @@ export class GameView {
       height,
       this.viewWidth,
       this.viewHeight,
-      this.world.critters.frog?.battleHeight ?? 190,
+      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
       140,
     );
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(x, y);
-    this.battleWash.clear().rect(0, 0, width, height).fill({ color: 0xfff6e6, alpha: 0.2 });
-    const sheet = Assets.get<Spritesheet>("frog-sheet");
-    const frogFrame =
+    this.battleWash
+      .clear()
+      .rect(0, 0, width, height)
+      .fill({ color: 0xfff6e6, alpha: 0.2 });
+    const critter = this.world.critters[battle.critterId];
+    if (critter === undefined) return;
+    const sheet = Assets.get<Spritesheet>(`${battle.critterId}-sheet`);
+    const critterFrame =
       battle.phase === "soothed"
         ? "soothed_01"
         : battle.phase === "reward"
@@ -506,25 +550,31 @@ export class GameView {
               (battle.phase === "aim" && battle.aim?.side === "fae")
             ? "chaos_burst_01"
             : "chaos_idle_01";
-    const frog = sheet.textures[frogFrame];
+    const body = sheet.textures[critterFrame];
     const aura = sheet.textures.chaos_aura_01;
-    if (frog === undefined || aura === undefined)
-      throw new Error("Missing battle frog frame");
-    this.battleFrog.texture = frog;
-    this.battleFrog.anchor.set(0.5, 504 / 512);
-    const battleHeight = this.world.critters.frog?.battleHeight ?? 190;
-    this.battleFrog.scale.set(battleHeight / 380);
-    this.battleFrog.position.set(
-      (layout.frog.x - x) / scale,
-      (layout.frog.baseline - y) / scale,
+    if (body === undefined || aura === undefined)
+      throw new Error("Missing battle critter frame");
+    this.battleCritter.texture = body;
+    this.battleCritter.anchor.set(0.5, 504 / 512);
+    const battleHeight = critter.battleHeight;
+    this.battleCritter.scale.set(battleHeight / 380);
+    this.battleCritter.position.set(
+      (layout.critter.x - x) / scale,
+      (layout.critter.baseline - y) / scale,
     );
-    this.battleAura.texture = aura;
-    placeAura(this.battleAura, this.battleFrog.position, battleHeight / 380);
-    this.battleAura.alpha =
+    this.battleCritterAura.texture = aura;
+    placeAura(
+      this.battleCritterAura,
+      this.battleCritter.position,
+      battleHeight / 380,
+      critter.auraCentre,
+      critter.bodyCentre,
+    );
+    this.battleCritterAura.alpha =
       battle.phase === "soothed"
         ? Math.max(0, 1 - battle.phaseTicks / 30)
         : 0.65 + Math.sin(state.tick / 18) * 0.2;
-    this.battleAura.rotation = state.tick / 180;
+    this.battleCritterAura.rotation = state.tick / 180;
     const faeSheet = Assets.get<Spritesheet>("fae-sheet");
     const faeFrames = faeSheet.animations.idle_up;
     const fae = faeFrames?.[0];
@@ -593,7 +643,7 @@ export class GameView {
       height,
       this.viewWidth,
       this.viewHeight,
-      this.world.critters.frog?.battleHeight ?? 190,
+      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
       140,
     );
     const centre =
@@ -604,9 +654,9 @@ export class GameView {
             radius: 0.55 * layout.fae.height,
           }
         : {
-            x: layout.frog.x,
-            y: layout.frog.baseline - layout.frog.height / 2,
-            radius: 0.55 * layout.frog.height,
+            x: layout.critter.x,
+            y: layout.critter.baseline - layout.critter.height / 2,
+            radius: 0.55 * layout.critter.height,
           };
     return {
       x: centre.x,
@@ -638,19 +688,12 @@ export class GameView {
     battle: {
       phase: string | null;
       ring: { x: number; y: number; radius: number } | null;
-      frogFrame: string;
+      critter: { id: string; frame: string } | null;
       layout: {
-        frog: { x: number; baseline: number; height: number };
+        critter: { x: number; baseline: number; height: number };
         fae: { x: number; baseline: number; height: number };
       } | null;
       backdrop: { x: number; y: number; width: number; height: number } | null;
-      frogBounds: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-      } | null;
-      faeBounds: { x: number; y: number; width: number; height: number } | null;
       overworldVisible: boolean;
       auraAlpha: number;
     };
@@ -664,9 +707,17 @@ export class GameView {
             window.innerHeight,
             this.viewWidth,
             this.viewHeight,
-            this.world.critters.frog?.battleHeight ?? 190,
+            this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ??
+              190,
             140,
           );
+    const safeLayout = state.battle === null ? undefined : layout;
+    if (state.battle !== null && safeLayout === undefined)
+      throw new Error("Battle layout missing");
+    const renderLayout = safeLayout ?? {
+      critter: { x: 0, baseline: 0, height: 0 },
+      fae: { x: 0, baseline: 0, height: 0 },
+    };
     return {
       area: this.areaView?.area.id ?? "",
       drawOrder: this.depth.children.map((child) => ({
@@ -703,78 +754,38 @@ export class GameView {
             : {
                 x:
                   state.battle.aim.side === "fae"
-                    ? layout!.fae.x
-                    : layout!.frog.x,
+                    ? renderLayout.fae.x
+                    : renderLayout.critter.x,
                 y:
                   state.battle.aim.side === "fae"
-                    ? layout!.fae.baseline - layout!.fae.height / 2
-                    : layout!.frog.baseline - layout!.frog.height / 2,
+                    ? renderLayout.fae.baseline - renderLayout.fae.height / 2
+                    : renderLayout.critter.baseline -
+                      renderLayout.critter.height / 2,
                 radius:
                   state.battle.aim.side === "fae"
-                    ? 0.55 * layout!.fae.height
-                    : 0.55 * layout!.frog.height,
+                    ? 0.55 * renderLayout.fae.height
+                    : 0.55 * renderLayout.critter.height,
               },
         layout,
         backdrop: this.battleBackdrop,
-        frogFrame:
-          state.battle === null
-            ? state.critters.frog === "calm"
-              ? "calm_idle_01"
-              : "chaos_idle_01"
-            : state.battle.phase === "soothed"
-              ? "soothed_01"
-              : state.battle.phase === "reward"
-                ? "calm_idle_01"
-                : state.battle.phase === "burst" ||
-                    (state.battle.phase === "aim" &&
-                      state.battle.aim?.side === "fae")
-                  ? "chaos_burst_01"
-                  : "chaos_idle_01",
-        frogBounds:
+        critter:
           state.battle === null
             ? null
-            : (() => {
-                const scale = Math.min(
-                  window.innerWidth / this.viewWidth,
-                  window.innerHeight / this.viewHeight,
-                );
-                return {
-                  x:
-                    (window.innerWidth - this.viewWidth * scale) / 2 +
-                    (this.viewWidth * 0.66 -
-                      (this.world.critters.frog?.battleHeight ?? 190) / 2) *
-                      scale,
-                  y:
-                    (window.innerHeight - this.viewHeight * scale) / 2 +
-                    (432 - (this.world.critters.frog?.battleHeight ?? 190)) *
-                      scale,
-                  width:
-                    (this.world.critters.frog?.battleHeight ?? 190) * scale,
-                  height:
-                    (this.world.critters.frog?.battleHeight ?? 190) * scale,
-                };
-              })(),
-        faeBounds:
-          state.battle === null
-            ? null
-            : (() => {
-                const scale = Math.min(
-                  window.innerWidth / this.viewWidth,
-                  window.innerHeight / this.viewHeight,
-                );
-                return {
-                  x:
-                    (window.innerWidth - this.viewWidth * scale) / 2 +
-                    (this.viewWidth * 0.24 - 70) * scale,
-                  y:
-                    (window.innerHeight - this.viewHeight * scale) / 2 +
-                    (640 - 140) * scale,
-                  width: 140 * scale,
-                  height: 140 * scale,
-                };
-              })(),
+            : {
+                id: state.battle.critterId,
+                frame:
+                  state.battle.phase === "soothed"
+                    ? "soothed_01"
+                    : state.battle.phase === "reward"
+                      ? "calm_idle_01"
+                      : state.battle.phase === "burst" ||
+                          (state.battle.phase === "aim" &&
+                            state.battle.aim?.side === "fae")
+                        ? "chaos_burst_01"
+                        : "chaos_idle_01",
+              },
         overworldVisible: this.scene.visible,
-        auraAlpha: state.battle === null ? 0 : this.battleAura.alpha,
+        auraAlpha: state.battle === null ? 0 : this.battleCritterAura.alpha,
       },
     };
   }

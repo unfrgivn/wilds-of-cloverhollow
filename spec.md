@@ -244,9 +244,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   of the two perpendicular sides, with Maddie's radius clearance. At a door
   switch the trail resets to `[slot, spawn]` and both characters are frozen.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`), `kitchen`
-  (the downstairs family room), and `plaza` (from `town_center_plaza.png`).
-  The house is wired bedroom door to the kitchen's stairs, the kitchen's
-  front door to the plaza, and the plaza's house door back to the kitchen.
+  (the downstairs family room), `plaza` (from `town_center_plaza.png`), and
+  `park` (Meadow Park, from `meadow_park_environment.png`). The house is wired
+  bedroom door to the kitchen's stairs, the kitchen's front door to the plaza,
+  and the plaza's house door back to the kitchen; the plaza's lower-right
+  cobbled path leads to the park, and the park's exit path back.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt }` (Mom and
@@ -387,6 +389,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   them on a fresh install and Continue after the relaunch.
 
 ## 8. Calm-down battles (v0)
+- Critters: the Fizzy Frog (the plaza fountain; calm, the Fountain Frog) and
+  the Zoomie Pup (the park pond; calm, the Pond Pup). They share the battle
+  numbers for now; each has its own lines, atlas, sticker, and calm knot.
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, snacks,
   command values, aim windows, the burst, the sticker, and the calm knot and
@@ -428,6 +433,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Overworld: each critter is drawn at its point, y-sorted with the characters
   and occluders, its figure `overworldHeight` units tall: chaos with its aura
   pulsing and turning behind it, calm without.
+- Critters are generic entries in `content/critters/<id>.json`. Each entry owns
+  its atlas, battle content, sticker, and measured `auraCentre` and
+  `bodyCentre` frame-pixel centroids. Runtime atlases use `<id>-sheet`, aura
+  placement uses those centroids, and render info names the active entry
+  `battle.critter: { id, frame }`.
 - Battle scene (render only), from one pure CSS-px layout
   (`src/render/battle-layout.ts`) at the overworld scale: the frog's figure is
   `battleHeight` units tall with its body centre at (0.5 W, 0.42 H); Fae, seen
@@ -444,7 +454,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   messages use the dialogue box with no speaker and hide when empty. Dev
   builds log `[cloverhollow] battle {phase, message}` and the command buttons'
   rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
-  backdrop rect, the ring, the frog frame, the aura alpha, and whether the
+  backdrop rect, the ring, the battle's critter (`{ id, frame }`), the aura
+  alpha, and whether the
   overworld is visible; `renderInfo().critters` lists each overworld critter's
   frame.
 
@@ -490,7 +501,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   open Fae is frozen, doors, battles, and interactions don't fire, and Maddie
   keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first
-  (the calm frog, the raccoon from the notice board, then the morning plan).
+  (the calm pup and his clue toward the school; while only the frog is calm,
+  the purple fizz leading to the park; the calm frog; the raccoon from the
+  notice board; then the morning plan).
   `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
@@ -529,7 +542,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   shape (a fresh game state: every key, the same primitive types, all the way
   down; null slots may hold null or an object). Any other version or shape
   starts a new game instead of crashing later. A change to the state's shape
-  bumps the version.
+  bumps the version. Content growing is not a shape change: a critter added
+  since the save was made starts in chaos when it loads (`parseSave` lays the
+  saved critters over the template's).
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
   a battle ends, a dialogue closes, or the journal closes. The trigger is a
   pure function of the previous and next state (`autosaveNeeded`). Fixture

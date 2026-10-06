@@ -1,13 +1,18 @@
 #!/usr/bin/env bun
-// Removes a magenta key's spill from the alpha-edge band of an already keyed
+// Removes a chroma key's spill from the alpha-edge band of an already keyed
 // RGBA frame (pixels within --band px of a transparent pixel), never from the
-// interior. Standard spill suppression: the magenta excess s = min(r, b) - g
-// is taken off red and blue, so warm colours (where blue is below green, like
-// brown ink) are left exactly as they are. key-alpha.ts's own magenta edge
-// rule clamps red and blue to green, which turns brown outlines grey; it stays
-// as is because the approved frog atlas is built with it.
+// interior. Standard spill suppression:
+// - magenta: the excess s = min(r, b) - g is taken off red and blue, so warm
+//   colours (where blue is below green, like brown ink) stay exactly as they
+//   are. key-alpha.ts's own magenta edge rule clamps red and blue to green,
+//   which turns brown outlines grey; it stays as is because the approved frog
+//   atlas is built with it.
+// - green: green is lowered to the higher of red and blue, so browns and the
+//   yellow of a tennis ball (red close to green) are barely touched, while a
+//   green halo turns into the ink tone it surrounds.
 //
-//   bun tools/art/despill-edge.ts --input frame.png --output frame.png [--band 3]
+//   bun tools/art/despill-edge.ts --input frame.png --output frame.png
+//     [--key magenta|green] [--band 3]
 export {};
 
 function value(name: string, fallback: string): string {
@@ -25,6 +30,8 @@ async function run(command: string[]): Promise<Uint8Array> {
 const input = value("input", "");
 const output = value("output", "");
 const band = Number(value("band", "3"));
+const key = value("key", "magenta");
+if (key !== "magenta" && key !== "green") throw new Error("--key must be magenta or green");
 if (input.length === 0 || output.length === 0) throw new Error("--input and --output are required");
 const size = new TextDecoder().decode(await run(["magick", "identify", "-format", "%w %h", input]));
 const [width = 0, height = 0] = size.split(" ").map(Number);
@@ -61,10 +68,16 @@ for (let index = 0; index < width * height; index += 1) {
   const red = pixels[offset] ?? 0;
   const green = pixels[offset + 1] ?? 0;
   const blue = pixels[offset + 2] ?? 0;
-  const spill = Math.min(red, blue) - green;
-  if (spill <= 0) continue;
-  pixels[offset] = red - spill;
-  pixels[offset + 2] = blue - spill;
+  if (key === "magenta") {
+    const spill = Math.min(red, blue) - green;
+    if (spill <= 0) continue;
+    pixels[offset] = red - spill;
+    pixels[offset + 2] = blue - spill;
+  } else {
+    const limit = Math.max(red, blue);
+    if (green <= limit) continue;
+    pixels[offset + 1] = limit;
+  }
   changed += 1;
 }
 const write = Bun.spawn(["magick", "-size", `${width}x${height}`, "-depth", "8", "rgba:-",
@@ -72,4 +85,4 @@ const write = Bun.spawn(["magick", "-size", `${width}x${height}`, "-depth", "8",
 write.stdin.write(pixels);
 await write.stdin.end();
 if (await write.exited !== 0) throw new Error(`Could not write ${output}`);
-console.log(`despill-edge: ${changed} edge pixels adjusted (band ${band} px)`);
+console.log(`despill-edge: ${changed} edge pixels adjusted (${key}, band ${band} px)`);

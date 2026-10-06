@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Assets, type Spritesheet } from "pixi.js";
 import {
   blankInput,
   createState,
@@ -13,6 +13,7 @@ import { Keyboard } from "./platform/keyboard";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
+import type { AtlasImage } from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createPrompt } from "./ui/sticker";
 import {
@@ -152,6 +153,28 @@ async function boot(): Promise<void> {
     return saveQueue;
   };
   await view.ready;
+  // Sticker art (the reward card and the journal album) is a CSS crop of a
+  // critter's atlas. Decode each atlas once now, so a card never paints before
+  // its image is ready (on a busy phone, or a loaded test machine).
+  await Promise.all(Object.values(content.world.critters).map(async (critter) => {
+    const atlas = new Image();
+    atlas.src = assetUrl(critter.atlas.replace(".json", ".png"));
+    await atlas.decode();
+  }));
+  // A sticker's art: its critter's atlas, cropped to the frame its content
+  // names, with the rect read from the atlas the view loaded.
+  const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
+    const critter = content.world.critters[critterId];
+    const sheet = Assets.get<Spritesheet | undefined>(`${critterId}-sheet`);
+    const rect = sheet?.data.frames[frameName]?.frame;
+    const size = sheet?.data.meta.size;
+    if (critter === undefined || rect === undefined || size === undefined) return null;
+    return {
+      src: assetUrl(critter.atlas.replace(".json", ".png")),
+      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+      atlas: { w: size.w, h: size.h },
+    };
+  };
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");
   await view.setArea(initialArea);
@@ -250,11 +273,9 @@ async function boot(): Promise<void> {
       visible: activeBattle && state.battle?.phase === "reward",
       title: "NEW STICKER!",
       name: rewardCritter?.sticker.name ?? "",
-      image: {
-        src: assetUrl(rewardCritter?.atlas.replace(".json", ".png") ?? ""),
-        frame: { x: 0, y: 512, w: 512, h: 512 },
-        atlas: { w: 1536, h: 1024 },
-      },
+      image: rewardCritter === undefined
+        ? null
+        : stickerArt(rewardCritter.id, rewardCritter.sticker.frame),
     });
     journal.render({
       visible: state.journalOpen,
@@ -274,18 +295,7 @@ async function boot(): Promise<void> {
               id: sticker.id,
               name: sticker.name,
               owned,
-              image: owned
-                ? {
-                    src: assetUrl(
-                      content.world.critters[sticker.critter]?.atlas.replace(
-                        ".json",
-                        ".png",
-                      ) ?? "",
-                    ),
-                    frame: { x: 0, y: 512, w: 512, h: 512 },
-                    atlas: { w: 1536, h: 1024 },
-                  }
-                : null,
+              image: owned ? stickerArt(sticker.critter, sticker.frame) : null,
             };
           })
         : [],

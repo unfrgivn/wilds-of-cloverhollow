@@ -43,7 +43,8 @@ export type RewardStickerView = {
   visible: boolean;
   title: string;
   name: string;
-  image: AtlasImage;
+  // Null outside a battle: the card keeps its last image while hidden.
+  image: AtlasImage | null;
 };
 
 const svgNamespace = "http://www.w3.org/2000/svg";
@@ -250,7 +251,7 @@ export function createRewardSticker(root: HTMLElement): {
       setText(title, view.title);
       setText(name, view.name);
       setAttribute(image, "aria-label", view.name);
-      applyAtlasCrop(image, view.image);
+      if (view.image !== null) applyAtlasCrop(image, view.image);
     },
   };
 }

@@ -87,7 +87,8 @@ test("touch: the journal button opens the book and its close button shuts it", a
 });
 
 test("after calming the frog, the journal shows his sticker and his note", async ({ page }) => {
-  test.setTimeout(process.env.CI ? 180_000 : 90_000);
+  // A whole battle with real keys; see battle.spec.ts on CI's budget.
+  test.setTimeout(process.env.CI ? 420_000 : 90_000);
   await openHarness(page);
   await resetPaused(page, "plaza");
   for (const [key, ticks] of [["ArrowDown", 25], ["ArrowLeft", 15], ["ArrowDown", 50],

@@ -25,8 +25,9 @@ async function shown(page: Page): Promise<boolean> {
 }
 
 test.describe("frog battle", () => {
-  // Long real-key flows; CI's software-rendered browsers are about 6x slower.
-  test.setTimeout(process.env.CI ? 180_000 : 90_000);
+  // Long real-key flows: every step renders a frame, and CI renders in
+  // software (its full suite runs about 6x slower than a laptop's).
+  test.setTimeout(process.env.CI ? 420_000 : 90_000);
 
   test("real keys: calm the frog, win his sticker, and talk with him", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });

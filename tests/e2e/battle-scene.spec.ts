@@ -125,7 +125,8 @@ for (const size of sizes) {
       const distance = Math.abs(red - 0xf8) + Math.abs(green - 0xed) + Math.abs(blue - 0xcf);
       expect(distance, "a corner shows the bare canvas").toBeGreaterThan(12);
       expect(red + green + blue, "a corner is darkened").toBeGreaterThan(420);
-      expect(corner.spread, "a corner is a flat fill, not the painting").toBeGreaterThan(1.5);
+      // A flat fill measures 0.34-0.72 here; the painting 1.31 (CI WebKit) and up.
+      expect(corner.spread, "a corner is a flat fill, not the painting").toBeGreaterThan(1);
     }
     const layout = info.layout;
     expect(layout, "renderInfo().battle.layout").toBeTruthy();

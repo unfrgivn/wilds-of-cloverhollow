@@ -216,23 +216,11 @@
   font-weight: 800;
   letter-spacing: .08em;
 }
-/* One atlas frame, 150 px wide. The rim and ink outline are drop-shadows, so
-   they follow the critter's silhouette rather than the box. */
+/* One atlas frame, 150 px wide; its height follows the frame's aspect. */
 .battle-reward-image {
   width: 150px;
-  height: 150px;
   margin: 8px auto;
   background-repeat: no-repeat;
-  filter:
-    drop-shadow(3px 0 0 var(--sticker-rim))
-    drop-shadow(-3px 0 0 var(--sticker-rim))
-    drop-shadow(0 3px 0 var(--sticker-rim))
-    drop-shadow(0 -3px 0 var(--sticker-rim))
-    drop-shadow(1.5px 0 0 var(--sticker-ink))
-    drop-shadow(-1.5px 0 0 var(--sticker-ink))
-    drop-shadow(0 1.5px 0 var(--sticker-ink))
-    drop-shadow(0 -1.5px 0 var(--sticker-ink))
-    drop-shadow(0 4px 4px #47321f40);
 }
 .battle-reward-name {
   font-size: 20px;

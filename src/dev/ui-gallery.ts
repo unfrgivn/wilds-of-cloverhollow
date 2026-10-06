@@ -8,6 +8,7 @@ import {
   createTimingRing,
   type TimingRingView,
 } from "../ui/battle";
+import { createJournal, type JournalView } from "../ui/journal";
 
 const root = document.querySelector<HTMLElement>("#gallery");
 if (root === null) throw new Error("Missing gallery root");
@@ -45,9 +46,12 @@ declare global {
 }
 const state = params.get("state") ?? "short";
 const battleState = state.startsWith("battle-");
-const dialogueShown = battleState ? state === "battle-command" : state !== "prompt";
+const journalState = state.startsWith("journal-");
+const dialogueShown = battleState ? state === "battle-command"
+  : state !== "prompt" && !journalState;
 if (battleState) document.documentElement.dataset.battle = "open";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
+if (journalState) document.documentElement.dataset.journal = "open";
 const defaultView: DialogueView = { speaker: "Maddie", text: "The fountain is singing today!",
   revealed: 32, choices: [], selected: -1, canAdvance: true };
 const views: Record<string, DialogueView> = {
@@ -77,6 +81,8 @@ const battleHud = createBattleHud(stage);
 const commands = createCommandMenu(stage);
 const ring = createTimingRing(stage);
 const reward = createRewardSticker(stage);
+const journal = createJournal(stage);
+journal.onClose(() => { root.dataset.journalClosed = "true"; });
 commands.onChoose((index) => {
   root.dataset.battleChosen = String(index);
 });
@@ -88,6 +94,21 @@ const battleMessage: DialogueView = { speaker: null, text: "What should Fae do?"
 const frogRing = { x: 600, y: 170, radius: 74, progress: .62, target: .65 };
 const faeRing = { x: 190, y: 300, radius: 66, progress: .38, target: .5 };
 function renderGalleryState(): void {
+  const notes = state === "journal-empty" ? [] : state === "journal-notes" ? [
+    "The fountain hummed at sunset.", "Ask Maddie about the sparkle.",
+    "The notice board has a new note.", "Follow the painted path north.",
+    "Keep Oliver's birthday sticker safe.",
+  ] : Array.from({ length: 14 }, (_, index) => `A fresh clue, number ${index + 1}.`);
+  const stickerIds = ["frog", "star", "leaf", "moon", "gem", "shell", "rainbow", "acorn"];
+  const stickers = stickerIds.map((id) => ({
+    id,
+    name: id === "frog" ? "Fountain Frog" : id,
+    owned: id === "frog" && state !== "journal-empty",
+    image: id === "frog" ? { src: "assets/critters/frog/frog.png",
+      frame: { x: 0, y: 512, w: 512, h: 512 }, atlas: { w: 1536, h: 1024 } } : null,
+  }));
+  const journalView: JournalView = { visible: journalState, notes, stickers };
+  journal.render(journalView);
   // The battle is over once the reward shows, so the HUD steps aside.
   battleHud.render({ visible: battleState && state !== "battle-reward", energy: 3,
     energyMax: 5, calm: .45,

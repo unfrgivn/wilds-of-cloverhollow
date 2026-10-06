@@ -9,6 +9,28 @@ const BUTTONS = [
 ] as const;
 type Button = (typeof BUTTONS)[number][0];
 
+// The concept's JOURNAL sticker: an open book with a quill.
+function journalIcon(): SVGSVGElement {
+  const namespace = "http://www.w3.org/2000/svg";
+  const icon = document.createElementNS(namespace, "svg");
+  icon.setAttribute("viewBox", "0 0 32 32");
+  icon.setAttribute("aria-hidden", "true");
+  const parts: [string, string][] = [
+    ["journal-icon-page", "M16 10 C12 7.5 7.5 7.5 4 9 V26 C7.5 24.5 12 24.5 16 27 Z"],
+    ["journal-icon-page", "M16 10 C20 7.5 24.5 7.5 28 9 V26 C24.5 24.5 20 24.5 16 27 Z"],
+    ["journal-icon-line", "M7 13.5 H13 M7 17 H13 M7 20.5 H12"],
+    ["journal-icon-quill", "M19.5 22 C22 15 25.5 8.5 30 4 C30.5 9.5 27 16.5 21 21 Z"],
+    ["journal-icon-line", "M19.5 22 L26 11"],
+  ];
+  for (const [className, shape] of parts) {
+    const path = document.createElementNS(namespace, "path");
+    path.setAttribute("class", className);
+    path.setAttribute("d", shape);
+    icon.append(path);
+  }
+  return icon;
+}
+
 export function mountTouchControls(): TouchInput {
   const input = new TouchInput();
   if (!shouldShowTouchControls()) return input;
@@ -31,8 +53,13 @@ export function mountTouchControls(): TouchInput {
     const element = document.createElement("button");
     element.className = `touch-button touch-${button}`;
     element.type = "button";
-    element.textContent = label;
     element.setAttribute("aria-label", button);
+    if (button === "menu") {
+      element.setAttribute("aria-label", "journal");
+      element.append(journalIcon());
+    } else {
+      element.textContent = label;
+    }
     element.addEventListener("pointerdown", (event) => {
       event.preventDefault();
       element.setPointerCapture(event.pointerId);

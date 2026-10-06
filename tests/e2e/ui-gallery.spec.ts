@@ -6,6 +6,7 @@ const states = ["short", "long", "long-max", "revealing", "speaker-board",
   "two-choices", "three-choices", "prompt", "touch-overlap"];
 const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
   "battle-reward"];
+const journalStates = ["journal-empty", "journal-notes", "journal-full"];
 const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
 const sizes = [phone, { width: 1180, height: 820 }, { width: 1280, height: 720 }];
@@ -39,9 +40,14 @@ const battleParts: Record<string, string[]> = {
   "battle-grade": [".battle-hud", ".battle-ring", ".battle-grade"],
   "battle-burst": [".battle-hud", ".battle-ring"],
   "battle-reward": [".battle-reward"],
+  "journal-empty": [".journal-book"],
+  "journal-notes": [".journal-book"],
+  "journal-full": [".journal-book"],
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-grade",
-  ".battle-reward", ".sticker-dialogue", ".sticker-prompt", ".touch-stick"];
+  ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
+  ".touch-confirm", ".touch-cancel", ".touch-menu"];
+const touchButtonsShown = [".touch-confirm", ".touch-cancel", ".touch-menu"];
 const frogFrames = {
   chaos_idle_01: { x: 0, y: 0, w: 512, h: 512 },
   chaos_burst_01: { x: 512, y: 0, w: 512, h: 512 },
@@ -70,6 +76,79 @@ async function samplePixels(page: Page, points: { x: number; y: number }[]): Pro
       return [data[0] ?? 0, data[1] ?? 0, data[2] ?? 0];
     });
   }, { encoded, points });
+}
+
+type Box = { x: number; y: number; width: number; height: number; right: number };
+
+// How closely the image drawn in `box` matches each frog frame, comparing only
+// each frame's interior (3+ px inside its silhouette) so a die-cut rim doesn't
+// count and the face and marks decide. `paper` is the colour behind the image.
+async function frogFrameScores(page: Page, box: Box, paper: string):
+  Promise<Record<string, number>> {
+  const encoded = (await page.screenshot({ animations: "disabled" })).toString("base64");
+  return page.evaluate(async ({ encoded, box, frames, paper }) => {
+    const load = async (src: string): Promise<HTMLImageElement> => {
+      const image = new Image();
+      image.src = src;
+      await image.decode();
+      return image;
+    };
+    const shot = await load(`data:image/png;base64,${encoded}`);
+    const atlas = await load("assets/critters/frog/frog.png");
+    const scale = shot.naturalWidth / window.innerWidth;
+    // Compare at the box's own pixel size so the screenshot isn't resampled.
+    const size = Math.round(box.width * scale);
+    const draw = (image: HTMLImageElement, x: number, y: number, w: number,
+      h: number, background: string | null): Uint8ClampedArray => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext("2d");
+      if (context === null) throw new Error("no 2d context");
+      if (background !== null) {
+        context.fillStyle = background;
+        context.fillRect(0, 0, size, size);
+      }
+      context.drawImage(image, x, y, w, h, 0, 0, size, size);
+      return context.getImageData(0, 0, size, size).data;
+    };
+    const rendered = draw(shot, box.x * scale, box.y * scale, box.width * scale,
+      box.height * scale, paper);
+    const similarity = (frame: { x: number; y: number; w: number; h: number }): number => {
+      const alpha = draw(atlas, frame.x, frame.y, frame.w, frame.h, null);
+      const expected = draw(atlas, frame.x, frame.y, frame.w, frame.h, paper);
+      const solid = (x: number, y: number): boolean => (alpha[(y * size + x) * 4 + 3] ?? 0) > 250;
+      let considered = 0;
+      let close = 0;
+      for (let y = 3; y < size - 3; y += 1) {
+        for (let x = 3; x < size - 3; x += 1) {
+          let interior = true;
+          for (let dy = -3; dy <= 3 && interior; dy += 1)
+            for (let dx = -3; dx <= 3 && interior; dx += 1) interior = solid(x + dx, y + dy);
+          if (!interior) continue;
+          considered += 1;
+          const index = (y * size + x) * 4;
+          const difference = Math.abs((rendered[index] ?? 0) - (expected[index] ?? 0)) +
+            Math.abs((rendered[index + 1] ?? 0) - (expected[index + 1] ?? 0)) +
+            Math.abs((rendered[index + 2] ?? 0) - (expected[index + 2] ?? 0));
+          if (difference <= 60) close += 1;
+        }
+      }
+      return considered === 0 ? 0 : close / considered;
+    };
+    return Object.fromEntries(Object.entries(frames)
+      .map(([name, frame]) => [name, similarity(frame)]));
+  }, { encoded, box, frames: frogFrames, paper });
+}
+
+// The calm frame must be the clear best match. Small renders keep fewer of the
+// face pixels that tell calm from soothed apart, so their bar is lower: at
+// 150 px calm scores about 0.99 against soothed 0.96; at 67 px, 0.89 to 0.87.
+function expectCalmFrog(scores: Record<string, number>, floor = .9, margin = .03): void {
+  const ranked = Object.entries(scores).sort(([, a], [, b]) => b - a);
+  expect(ranked[0]?.[0]).toBe("calm_idle_01");
+  expect(ranked[0]?.[1] ?? 0).toBeGreaterThanOrEqual(floor);
+  expect((ranked[0]?.[1] ?? 0) - (ranked[1]?.[1] ?? 0)).toBeGreaterThanOrEqual(margin);
 }
 
 type Contrast = { label: string; ratio: number; opacity: number };
@@ -114,7 +193,9 @@ function measureContrast(): Contrast[] {
     return `${element.className} "${element.textContent}"`;
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
-    ".battle-grade, .battle-reward-title, .battle-reward-name";
+    ".battle-grade, .battle-reward-title, .battle-reward-name, .journal-label, " +
+    ".journal-heading, .journal-note, .journal-empty, .journal-name, .journal-unknown, " +
+    ".journal-close";
   return [...document.querySelectorAll(selectors)]
     .filter((element) => element.getClientRects().length > 0)
     .map((element) => {
@@ -131,6 +212,162 @@ function overlaps(a: DOMRect, b: DOMRect): boolean {
 }
 
 test.describe("sticker gallery", () => {
+  for (const state of journalStates) {
+    test(`${state} journal baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
+  for (const size of sizes) {
+    for (const state of journalStates) {
+      test(`${state} journal geometry ${size.width}x${size.height}`, async ({ page }) => {
+        const insets = size.width === 874 ? "0,62,21,62" :
+          size.width === 1180 ? "0,0,20,0" : "0,0,0,0";
+        await page.setViewportSize(size);
+        await page.goto(`/cloverhollow/ui-gallery.html?state=${state}&touch=1&insets=${insets}`);
+        await page.evaluate(() => document.fonts.ready);
+        const facts = await page.evaluate(() => {
+          const style = getComputedStyle(document.documentElement);
+          const safe = (name: string): number => parseFloat(style.getPropertyValue(name)) || 0;
+          const rect = (selector: string): DOMRect | undefined =>
+            document.querySelector(selector)?.getBoundingClientRect();
+          const book = rect(".journal-book");
+          const close = rect(".journal-close");
+          const label = rect(".journal-label");
+          const notes = rect(".journal-notes-page");
+          const album = rect(".journal-stickers-page");
+          if (!book || !close || !label || !notes || !album) return null;
+          const within = (inner: DOMRect, outer: DOMRect): boolean =>
+            inner.left >= outer.left && inner.right <= outer.right &&
+            inner.top >= outer.top && inner.bottom <= outer.bottom;
+          const centre = document.elementFromPoint(book.left + book.width / 2,
+            book.top + book.height / 2);
+          return {
+            bookInside: book.left >= 20 + safe("--safe-left") &&
+              book.right <= innerWidth - 20 - safe("--safe-right") &&
+              book.top >= safe("--safe-top") &&
+              book.bottom <= innerHeight - safe("--safe-bottom"),
+            labelOnScreen: label.top >= safe("--safe-top") && label.left >= book.left,
+            closeSize: Math.min(close.width, close.height),
+            closeInside: within(close, book),
+            pagesApart: notes.right <= album.left + 1,
+            onTop: centre?.closest(".journal-book") !== null,
+          };
+        });
+        expect(facts).not.toBeNull();
+        expect(facts?.bookInside).toBe(true);
+        expect(facts?.labelOnScreen).toBe(true);
+        expect(facts?.closeSize ?? 0).toBeGreaterThanOrEqual(44);
+        expect(facts?.closeInside).toBe(true);
+        expect(facts?.pagesApart).toBe(true);
+        expect(facts?.onTop, "nothing covers the open journal").toBe(true);
+      });
+    }
+  }
+
+  test("the notes page scrolls only when the notes overflow", async ({ page }) => {
+    const overflow = async (state: string): Promise<boolean> => {
+      await gallery(page, state);
+      return page.locator(".journal-notes-page").evaluate((element) =>
+        element.scrollHeight > element.clientHeight &&
+        ["auto", "scroll"].includes(getComputedStyle(element).overflowY));
+    };
+    expect(await overflow("journal-full")).toBe(true);
+    expect(await overflow("journal-notes")).toBe(false);
+    await expect(page.locator(".journal-note")).toHaveCount(5);
+    await expect(page.locator(".journal-empty")).toBeHidden();
+    await gallery(page, "journal-empty");
+    await expect(page.locator(".journal-note")).toHaveCount(0);
+    await expect(page.locator(".journal-empty")).toHaveText("Nothing yet. Look around!");
+  });
+
+  test("the album shows the owned frog and dashed ? slots for the rest", async ({ page }) => {
+    await gallery(page, "journal-notes");
+    const owned = page.locator('.journal-slot[data-owned="true"]');
+    await expect(owned).toHaveCount(1);
+    await expect(owned.locator(".journal-name")).toHaveText("Fountain Frog");
+    await expect(owned.locator(".journal-unknown")).toBeHidden();
+    const unknown = page.locator('.journal-slot[data-owned="false"] .journal-unknown');
+    await expect(unknown).toHaveCount(7);
+    for (const slot of await unknown.all()) {
+      await expect(slot).toBeVisible();
+      await expect(slot).toHaveText("?");
+      expect(await slot.evaluate((element) => getComputedStyle(element).borderStyle))
+        .toBe("dashed");
+    }
+    await expect(page.locator('.journal-slot[data-owned="false"] .journal-name')).toHaveCount(7);
+    for (const name of await page.locator('.journal-slot[data-owned="false"] .journal-name').all())
+      await expect(name).toBeHidden();
+    const box = await owned.locator(".journal-sticker-image")
+      .evaluate((element) => element.getBoundingClientRect().toJSON());
+    expect(Math.abs(box.width - box.height)).toBeLessThanOrEqual(1);
+    const scores = await frogFrameScores(page, box, "#fbf6e9");
+    console.log(`journal sticker similarity ${JSON.stringify(scores)}`);
+    expectCalmFrog(scores, .85, .01);
+  });
+
+  test("the close button calls onClose by touch and by click", async ({ browser }) => {
+    const context = await browser.newContext({ viewport: phone, deviceScaleFactor: 2,
+      hasTouch: true });
+    const page = await context.newPage();
+    await gallery(page, "journal-notes");
+    await expect(page.locator("#gallery")).not.toHaveAttribute("data-journal-closed", "true");
+    const close = await page.locator(".journal-close").boundingBox();
+    if (close === null) throw new Error("close button is not visible");
+    await page.touchscreen.tap(close.x + close.width / 2, close.y + close.height / 2);
+    await expect(page.locator("#gallery")).toHaveAttribute("data-journal-closed", "true");
+    await context.close();
+    const desktop = await browser.newPage();
+    await gallery(desktop, "journal-notes");
+    await desktop.locator(".journal-close").click();
+    await expect(desktop.locator("#gallery")).toHaveAttribute("data-journal-closed", "true");
+    await desktop.close();
+  });
+
+  test("the menu button is the journal sticker", async ({ page }) => {
+    await gallery(page, "short");
+    const menu = page.locator(".touch-menu");
+    await expect(menu).toHaveAttribute("aria-label", "journal");
+    await expect(menu.locator("svg path.journal-icon-page")).toHaveCount(2);
+    await expect(menu.locator("svg path.journal-icon-quill")).toHaveCount(1);
+  });
+
+  test("journal text pairs meet contrast targets", async ({ page }) => {
+    const results: Contrast[] = [];
+    for (const state of ["journal-empty", "journal-notes"]) {
+      await gallery(page, state);
+      results.push(...(await page.evaluate(measureContrast))
+        .filter((result) => result.label.includes("journal")));
+    }
+    for (const result of results)
+      console.log(`${result.label}: ${result.ratio.toFixed(2)}:1, opacity ${result.opacity}`);
+    expect(results.length).toBeGreaterThanOrEqual(12);
+    for (const result of results) {
+      expect(result.ratio, result.label).toBeGreaterThanOrEqual(4.5);
+      expect(result.opacity, result.label).toBe(1);
+    }
+  });
+
+  test("identical journal renders do not churn DOM nodes", async ({ page }) => {
+    for (const state of journalStates) {
+      await gallery(page, state);
+      const records = await page.evaluate(() => {
+        const observer = new MutationObserver(() => undefined);
+        const book = document.querySelector(".journal-book");
+        if (book === null) return -1;
+        observer.observe(book, { childList: true, characterData: true, subtree: true });
+        window.__stickerGallery.renderState();
+        window.__stickerGallery.renderState();
+        const changes = observer.takeRecords().length;
+        observer.disconnect();
+        return changes;
+      });
+      expect(records, state).toBe(0);
+    }
+  });
+
   for (const state of states) {
     test(`${state} phone visual baseline`, async ({ page }) => {
       await gallery(page, state);
@@ -219,8 +456,9 @@ test.describe("sticker gallery", () => {
   for (const [state, shown] of Object.entries(battleParts)) {
     test(`${state} shows exactly its parts`, async ({ page }) => {
       await gallery(page, state);
+      const visible = state.startsWith("journal-") ? shown : [...shown, ...touchButtonsShown];
       for (const part of allBattleParts) {
-        if (shown.includes(part)) await expect(page.locator(part), part).toBeVisible();
+        if (visible.includes(part)) await expect(page.locator(part), part).toBeVisible();
         else await expect(page.locator(part), part).toBeHidden();
       }
       if (state === "battle-command") {
@@ -281,82 +519,17 @@ test.describe("sticker gallery", () => {
       .evaluate((element) => element.getBoundingClientRect().toJSON());
     expect(box.width).toBe(150);
     expect(box.height).toBe(150);
-    const encoded = (await page.screenshot({ animations: "disabled" })).toString("base64");
-    const result = await page.evaluate(async ({ encoded, box, frames }) => {
-      const load = async (src: string): Promise<HTMLImageElement> => {
-        const image = new Image();
-        image.src = src;
-        await image.decode();
-        return image;
-      };
-      const shot = await load(`data:image/png;base64,${encoded}`);
-      const atlas = await load("assets/critters/frog/frog.png");
-      const size = 150;
-      const paper = "#f7f2e3";
-      const draw = (image: HTMLImageElement, x: number, y: number, w: number,
-        h: number, background: string | null): Uint8ClampedArray => {
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const context = canvas.getContext("2d");
-        if (context === null) throw new Error("no 2d context");
-        if (background !== null) {
-          context.fillStyle = background;
-          context.fillRect(0, 0, size, size);
-        }
-        context.drawImage(image, x, y, w, h, 0, 0, size, size);
-        return context.getImageData(0, 0, size, size).data;
-      };
-      const scale = shot.naturalWidth / window.innerWidth;
-      const rendered = draw(shot, box.x * scale, box.y * scale, box.width * scale,
-        box.height * scale, paper);
-      // Compares only each frame's interior (3+ px inside its silhouette), so the
-      // drop-shadow rim doesn't count and the face and marks decide the match.
-      const similarity = (frame: { x: number; y: number; w: number; h: number }): number => {
-        const alpha = draw(atlas, frame.x, frame.y, frame.w, frame.h, null);
-        const expected = draw(atlas, frame.x, frame.y, frame.w, frame.h, paper);
-        const solid = (x: number, y: number): boolean => (alpha[(y * size + x) * 4 + 3] ?? 0) > 250;
-        let considered = 0;
-        let close = 0;
-        for (let y = 3; y < size - 3; y += 1) {
-          for (let x = 3; x < size - 3; x += 1) {
-            let interior = true;
-            for (let dy = -3; dy <= 3 && interior; dy += 1)
-              for (let dx = -3; dx <= 3 && interior; dx += 1) interior = solid(x + dx, y + dy);
-            if (!interior) continue;
-            considered += 1;
-            const index = (y * size + x) * 4;
-            const difference = Math.abs((rendered[index] ?? 0) - (expected[index] ?? 0)) +
-              Math.abs((rendered[index + 1] ?? 0) - (expected[index + 1] ?? 0)) +
-              Math.abs((rendered[index + 2] ?? 0) - (expected[index + 2] ?? 0));
-            if (difference <= 60) close += 1;
-          }
-        }
-        return considered === 0 ? 0 : close / considered;
-      };
-      const scores = Object.fromEntries(Object.entries(frames)
-        .map(([name, frame]) => [name, similarity(frame)]));
-      // The rim dilates the alpha by 3 px and the ink by 1.5 px more, so 3.75 px
-      // outside the box corners is ink if the outline follows the box and card
-      // paper if it hugs the frog.
-      const probe = document.createElement("canvas");
-      probe.width = shot.naturalWidth;
-      probe.height = shot.naturalHeight;
-      const probeContext = probe.getContext("2d");
-      if (probeContext === null) throw new Error("no 2d context");
-      probeContext.drawImage(shot, 0, 0);
-      const pixel = (x: number, y: number): number[] =>
-        [...probeContext.getImageData(Math.round(x * scale), Math.round(y * scale), 1, 1).data];
-      return { scores, corners: [pixel(box.x - 3.75, box.y + 10),
-        pixel(box.x + 10, box.y - 3.75), pixel(box.right + 3.75, box.y + 10),
-        pixel(box.right - 10, box.y - 3.75)] };
-    }, { encoded, box, frames: frogFrames });
-    console.log(`reward similarity ${JSON.stringify(result.scores)}`);
-    const scores = Object.entries(result.scores).sort(([, a], [, b]) => b - a);
-    expect(scores[0]?.[0]).toBe("calm_idle_01");
-    expect(scores[0]?.[1] ?? 0).toBeGreaterThanOrEqual(.9);
-    expect((scores[0]?.[1] ?? 0) - (scores[1]?.[1] ?? 0)).toBeGreaterThanOrEqual(.03);
-    for (const [red = 0, green = 0, blue = 0] of result.corners)
+    const scores = await frogFrameScores(page, box, "#f7f2e3");
+    console.log(`reward similarity ${JSON.stringify(scores)}`);
+    expectCalmFrog(scores);
+    // The rim dilates the alpha by 3 px and the ink by 1.5 px more, so 3.75 px
+    // outside the box corners is ink if the outline follows the box and card
+    // paper if it hugs the frog.
+    const corners = await samplePixels(page, [
+      { x: box.x - 3.75, y: box.y + 10 }, { x: box.x + 10, y: box.y - 3.75 },
+      { x: box.right + 3.75, y: box.y + 10 }, { x: box.right - 10, y: box.y - 3.75 },
+    ]);
+    for (const [red, green, blue] of corners)
       expect(red + green + blue, "no box outline at the image corners").toBeGreaterThan(600);
   });
 

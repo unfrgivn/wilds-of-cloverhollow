@@ -373,6 +373,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   Sticker album. The map comes later.
 - Stickers are collectibles and rewards.
 
+### 9.1 Journal layout
+- The journal (`src/ui/journal.ts`) is a modal open book inside the safe area,
+  above every other layer (`--z-journal`). The left page is NOTES: ruled notes
+  in the order the game passes (newest first), an empty line ("Nothing yet.
+  Look around!") when there are none, and scrolling only when they overflow.
+  The right page is the STICKERS album: a 4-column grid where owned stickers
+  show their atlas frame with a die-cut rim and their name, and unowned slots
+  are dashed `?` outlines with no name.
+- A cream JOURNAL label sits on the top edge and a close sticker (at least
+  44 px) in the top-right corner; the close button is how touch players leave.
+- `data-journal="open"` hides all touch controls while the book is open.
+- The touch menu button is the JOURNAL sticker from the concept sheet: an open
+  book with a teal quill (inline SVG, aria-label "journal").
+- Shared pieces (`src/ui/atlas.ts`, `.die-cut` in sticker.css): atlas frames
+  are cropped with percentage backgrounds, exact at any box size, and the
+  die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
+  The reward card uses both.
+
 ## 10. Save and load
 - Save data: version, area id, player position and facing, Ink state JSON,
   inventory, stickers, PRNG state, and tick.

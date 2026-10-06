@@ -14,6 +14,7 @@
   --z-prompt: 45;
   --z-ring: 50;
   --z-reward: 60;
+  --z-journal: 70;
   --sticker-font: Nunito, "Trebuchet MS", sans-serif;
   --sticker-paper: #f7f2e3;
   --sticker-rim: #fffdf7;
@@ -288,4 +289,22 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* A die-cut sticker edge that follows the image's silhouette, not its box:
+   stacked hard drop-shadows dilate the alpha into a white rim, then an ink
+   line. Set --cut and --cut-ink to scale it. */
+.die-cut {
+  --cut: 3px;
+  --cut-ink: 1.5px;
+  filter:
+    drop-shadow(var(--cut) 0 0 var(--sticker-rim))
+    drop-shadow(calc(-1 * var(--cut)) 0 0 var(--sticker-rim))
+    drop-shadow(0 var(--cut) 0 var(--sticker-rim))
+    drop-shadow(0 calc(-1 * var(--cut)) 0 var(--sticker-rim))
+    drop-shadow(var(--cut-ink) 0 0 var(--sticker-ink))
+    drop-shadow(calc(-1 * var(--cut-ink)) 0 0 var(--sticker-ink))
+    drop-shadow(0 var(--cut-ink) 0 var(--sticker-ink))
+    drop-shadow(0 calc(-1 * var(--cut-ink)) 0 var(--sticker-ink))
+    drop-shadow(0 4px 4px #47321f40);
 }

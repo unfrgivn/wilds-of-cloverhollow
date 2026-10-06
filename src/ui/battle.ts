@@ -1,4 +1,5 @@
 import "./battle.css";
+import { applyAtlasCrop, type AtlasImage } from "./atlas";
 
 export type BattleHudView = {
   visible: boolean;
@@ -38,18 +39,15 @@ export type TimingRingView = {
   grade: TimingGrade | null;
 };
 
-export type AtlasFrame = { x: number; y: number; w: number; h: number };
-
 export type RewardStickerView = {
   visible: boolean;
   title: string;
   name: string;
-  image: { src: string; frame: AtlasFrame; atlas: { w: number; h: number } };
+  image: AtlasImage;
 };
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 const leafPath = "M 2 15 C 5 2, 15 1, 22 3 C 20 12, 12 18, 2 15 M 3 14 L 19 4";
-const rewardImageWidth = 150;
 const gradeGap = 6;
 const gradeLabels: Record<TimingGrade, string> = {
   great: "GREAT!",
@@ -117,6 +115,7 @@ export function createBattleHud(root: HTMLElement): {
   track.append(fill);
   calm.append(calmLabel, track);
   hud.append(energy, calm);
+  hud.hidden = true;
   root.append(hud);
   return {
     render: (view) => {
@@ -149,6 +148,7 @@ export function createCommandMenu(root: HTMLElement): {
   const menu = element("div", "battle-commands");
   menu.setAttribute("role", "listbox");
   menu.setAttribute("aria-label", "Battle commands");
+  menu.hidden = true;
   root.append(menu);
   let choose: (index: number) => void = () => undefined;
   const buttons: CommandButton[] = [];
@@ -199,6 +199,8 @@ export function createTimingRing(root: HTMLElement): {
   ring.append(rim, ink, target);
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
+  ring.style.display = "none";
+  grade.hidden = true;
   root.append(ring, grade);
   return {
     render: (view) => {
@@ -235,10 +237,11 @@ export function createRewardSticker(root: HTMLElement): {
 } {
   const card = element("section", "battle-reward");
   const title = element("div", "battle-reward-title");
-  const image = element("div", "battle-reward-image");
+  const image = element("div", "battle-reward-image die-cut");
   image.setAttribute("role", "img");
   const name = element("div", "battle-reward-name");
   card.append(title, image, name);
+  card.hidden = true;
   root.append(card);
   return {
     render: (view) => {
@@ -247,12 +250,7 @@ export function createRewardSticker(root: HTMLElement): {
       setText(title, view.title);
       setText(name, view.name);
       setAttribute(image, "aria-label", view.name);
-      const { src, frame, atlas } = view.image;
-      const scale = rewardImageWidth / frame.w;
-      image.style.height = `${frame.h * scale}px`;
-      image.style.backgroundImage = `url("${src}")`;
-      image.style.backgroundSize = `${atlas.w * scale}px ${atlas.h * scale}px`;
-      image.style.backgroundPosition = `${-frame.x * scale}px ${-frame.y * scale}px`;
+      applyAtlasCrop(image, view.image);
     },
   };
 }

@@ -1,0 +1,122 @@
+.journal-book[hidden],
+.journal-empty[hidden],
+.journal-sticker-image[hidden],
+.journal-unknown[hidden],
+.journal-name[hidden] {
+  display: none;
+}
+
+/* A modal open book: notes on the left page, the sticker album on the right. */
+.journal-book {
+  position: fixed;
+  top: calc(50% + (var(--safe-top) - var(--safe-bottom)) / 2);
+  left: calc(50% + (var(--safe-left) - var(--safe-right)) / 2);
+  z-index: var(--z-journal);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(820px, calc(100vw - 40px - var(--safe-left) - var(--safe-right)));
+  height: min(400px, calc(100vh - 40px - var(--safe-top) - var(--safe-bottom)));
+  box-sizing: border-box;
+  padding: 18px;
+  border: 6px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 24px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  transform: translate(-50%, -50%);
+}
+.journal-page {
+  min-width: 0;
+  overflow: auto;
+  padding: 18px 18px 12px;
+  background: #fbf6e9;
+}
+/* The spine: a soft fold shadow down the middle. */
+.journal-page + .journal-page {
+  border-left: 2px solid #47321f44;
+  box-shadow: inset 8px 0 12px #47321f16;
+}
+.journal-heading {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+.journal-notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.journal-note {
+  min-height: 26px;
+  border-bottom: 1px dashed #47321f55;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+.journal-empty {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.journal-stickers {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px;
+}
+.journal-slot {
+  min-width: 0;
+  text-align: center;
+}
+.journal-sticker-image {
+  --cut: 2px;
+  --cut-ink: 1px;
+  width: 100%;
+  background-repeat: no-repeat;
+}
+.journal-unknown {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  border: 2px dashed var(--sticker-ink);
+  border-radius: 14px;
+  font-size: 24px;
+  font-weight: 800;
+}
+.journal-name {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.journal-label {
+  position: absolute;
+  top: -17px;
+  left: 28px;
+  padding: 5px 15px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  background: var(--sticker-paper);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+.journal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: 700 24px var(--sticker-font);
+}

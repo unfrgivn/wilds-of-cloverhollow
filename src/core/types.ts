@@ -31,6 +31,7 @@ export type Tunables = {
 export type Spawn = Point & { facing: Direction };
 export type Area = {
   id: string;
+  name: string;
   width: number;
   height: number;
   walkable: Polygon;

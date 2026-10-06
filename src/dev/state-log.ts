@@ -94,3 +94,25 @@ export function logTouchLayout(): void {
   }));
   console.log(`[cloverhollow] layout ${JSON.stringify(layout)}`);
 }
+
+// The title's mode and its visible buttons (CSS px), logged after paint
+// whenever the mode changes, so native tests can tap them.
+export function createTitleLogger(): (mode: string | null) => void {
+  let previous: string | null | undefined;
+  return (mode) => {
+    if (mode === previous) return;
+    previous = mode;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const options = [...document.querySelectorAll<HTMLElement>(
+        ".title-option, .title-confirm-button")]
+        .filter((element) => element.getClientRects().length > 0)
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return { id: element.dataset.id ?? "", x: Math.round(rect.x),
+            y: Math.round(rect.y), width: Math.round(rect.width),
+            height: Math.round(rect.height) };
+        });
+      console.log(`[cloverhollow] title ${JSON.stringify({ mode, options })}`);
+    }));
+  };
+}

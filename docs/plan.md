@@ -144,6 +144,21 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   one Ink knot read on a copy of the story state. Owner-approved storage
   plugin: `@capacitor/preferences`.
 
+## Milestone 11: Title screen **Status:** ✅ Completed (2026-10-06)
+- A real boot shows the sticker title over the area painting: New game with no
+  save, Continue (where Fae is, her stickers) and New game with one. Continue
+  resumes the save exactly; New game over a save asks first.
+- Keys and taps both work; harness fixtures skip the title.
+- E2e (real keys and taps), unit tests for the title flow, `just ios-smoke`
+  starts from the title.
+- Notes: the game is frozen behind the title, so Continue is the save exactly;
+  the first version wrote the title's input into the game state, which broke
+  that, and tapping Continue on a fresh title started a game. The title look
+  is queued for the owner's review (`docs/review-queue.md`). `just ios-smoke`
+  now reinstalls the app for a clean start (Capacitor Preferences can't be
+  cleared from outside the app) and reaches the frog along the left flower
+  box, so every drag goes right or down.
+
 ## Later (not scheduled)
 Audio and music, gamepad polish, device testing and TestFlight, Bubblegum Bay
 and Pinecone Pass, Sue and Jordan, and tools (lantern, lasso, flute).

@@ -53,6 +53,7 @@ export type CloverhollowHook = {
     last: () => { tick: number; hash: string } | null;
     loaded: () => { tick: number; hash: string } | null;
   };
+  boot: { title: () => "fresh" | "continue" | "confirm" | null };
 };
 
 export function installHook(deps: {
@@ -66,6 +67,7 @@ export function installHook(deps: {
   reset: (options: { seed?: number; fixture?: string }) => Promise<void>;
   renderInfo: CloverhollowHook["renderInfo"];
   save: CloverhollowHook["save"];
+  boot: CloverhollowHook["boot"];
 }): void {
   const hook: CloverhollowHook = {
     version: 1,
@@ -99,6 +101,7 @@ export function installHook(deps: {
     },
     renderInfo: deps.renderInfo,
     save: deps.save,
+    boot: deps.boot,
   };
   window.__cloverhollow = hook;
 }

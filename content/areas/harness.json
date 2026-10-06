@@ -84,5 +84,6 @@
       "y": 600,
       "facing": "down"
     }
-  }
+  },
+  "name": "Test room"
 }

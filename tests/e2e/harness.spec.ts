@@ -113,6 +113,8 @@ for (const item of [
 test("nothing renders inside wide letterbox bars", async ({ page }) => {
   await page.setViewportSize({ width: 2400, height: 720 });
   await openHarness(page);
+  // A fixture reset skips the title, which (correctly) covers the bars.
+  await resetPaused(page);
   const png = await page.screenshot();
   const background = [248, 237, 207];
   expect(await pixelAt(page, png, 0, 360)).toEqual(background);
@@ -188,6 +190,8 @@ test("WebKit keeps touch controls in separate safe-area regions", async ({
   await page.setViewportSize({ width: 874, height: 402 });
   await page.goto("/?touch=1");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  // The title hides the touch controls; a fixture reset skips it.
+  await resetPaused(page);
   const menu = await page.locator(".touch-menu").boundingBox();
   const confirm = await page.locator(".touch-confirm").boundingBox();
   const cancel = await page.locator(".touch-cancel").boundingBox();

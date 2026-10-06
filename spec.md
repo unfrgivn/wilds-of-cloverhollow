@@ -346,6 +346,29 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `data-title="open"` on the root hides the touch controls; the option and
   confirm stickers take taps directly, and keys move the selection.
 
+### 7.3 Boot and the title flow
+- A real boot builds the game state (the restored save, or a new game) and
+  opens on the title over that area's painting, with the game frozen: no core
+  ticks run while the title is up, so Continue resumes the save exactly (the
+  state hash matches). Fixture resets (the harness) skip the title.
+- The flow is a pure function in `src/shell/title-flow.ts` (mode, selection,
+  input edges or a tap) returning the next mode, selection, and action.
+  Up/down move between the options and left/right between the confirm
+  buttons; confirm picks; cancel backs out of the question. Defaults:
+  Continue with a save, New game without; "No, go back" in the question,
+  which returns to Continue.
+- Continue starts ticking the restored state as it is. New game (with no
+  save, or "Yes, start over") replaces the state with a new game and deletes
+  the old save. A button held when the title closes stays hidden from the
+  game until it is released, so the press that starts the game can't also
+  act in it. The title reads its own input edges and never writes to the
+  game state.
+- The Continue detail is the area's `name` (area JSON) and the sticker count
+  ("0 stickers", "1 sticker", "2 stickers").
+- Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
+  rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
+  them on a fresh install and Continue after the relaunch.
+
 ## 8. Calm-down battles (v0)
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, snacks,
@@ -519,6 +542,8 @@ ios/            Capacitor iOS project (from Milestone 4).
     the game paused. Returns a Promise that resolves once the fixture's area
     has loaded. The default is `new-game`; unknown names throw an error listing
     known fixtures.
+  - `boot.title()`: the title's mode (`fresh`, `continue`, `confirm`), or
+    null once the game has started.
   - `save`: `clear()` deletes the slot; `last()` is the tick and hash of the
     latest completed save write; `loaded()` is the tick and hash of the save
     restored at boot, or null for a new game.

@@ -115,6 +115,7 @@ export function parseArea(value: unknown, file: string): Area {
   field(typeof value.id === "string", file, "id");
   field(typeof value.width === "number", file, "width");
   field(typeof value.height === "number", file, "height");
+  field(typeof value.name === "string", file, "name");
   field(polygon(value.walkable), file, "walkable");
   field(
     Array.isArray(value.blockers) && value.blockers.every(polygon),
@@ -198,6 +199,7 @@ export function parseArea(value: unknown, file: string): Area {
   }
   return {
     id: value.id,
+    name: value.name,
     width: value.width,
     height: value.height,
     walkable: value.walkable,

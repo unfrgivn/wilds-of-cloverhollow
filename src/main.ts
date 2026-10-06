@@ -1,5 +1,6 @@
 import { Application } from "pixi.js";
 import {
+  blankInput,
   createState,
   drainTicks,
   step,
@@ -30,6 +31,13 @@ import {
   stableHash,
 } from "./core";
 import { Preferences } from "@capacitor/preferences";
+import { createTitleScreen, type TitleChoiceId } from "./ui/title";
+import {
+  continueDetail,
+  titleFlow,
+  type TitleInput,
+  type TitleMode,
+} from "./shell/title-flow";
 
 const content = loadContent();
 const app = new Application();
@@ -65,6 +73,7 @@ async function boot(): Promise<void> {
   const timingRing = createTimingRing(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
   const journal = createJournal(uiRoot);
+  const title = createTitleScreen(uiRoot);
   const input = createInputSource(() => {
     const keyboardFrame = keyboard.frame();
     const touchFrame = touch.sample();
@@ -93,11 +102,38 @@ async function boot(): Promise<void> {
   const saved = await Preferences.get({ key: saveKey });
   const restored = saved.value === null ? null : parseSave(saved.value, fresh);
   state = restored ?? fresh;
-  let saveLast: { tick: number; hash: string } | null = null;
+  // A real boot opens on the title (spec 7.3), with the game frozen behind it:
+  // no core ticks run, so Continue resumes the save exactly as it was written.
+  // Fixture resets (the harness) skip it.
+  let titleMode: TitleMode | null = restored === null ? "fresh" : "continue";
+  let titleSelected: TitleChoiceId = restored === null ? "new-game" : "continue";
+  const applyTitle = (input: TitleInput): void => {
+    if (titleMode === null) return;
+    const result = titleFlow(titleMode, titleSelected, input);
+    titleMode = result.mode;
+    titleSelected = result.selected;
+    if (result.action === "new-game") {
+      state = createState(content.world, initialFixture);
+      void Preferences.remove({ key: saveKey });
+      saveLast = null;
+    }
+  };
+  title.onChoose((id) =>
+    applyTitle({
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+      confirm: false,
+      cancel: false,
+      choose: id,
+    }),
+  );
   const saveLoaded =
     restored === null
       ? null
       : { tick: restored.tick, hash: stableHash(restored) };
+  let saveLast: { tick: number; hash: string } | null = saveLoaded;
   let suppressSave = false;
   let saveQueue = Promise.resolve();
   const save = (): Promise<void> => {
@@ -119,14 +155,16 @@ async function boot(): Promise<void> {
   if (initialArea === undefined) throw new Error("Missing initial area");
   await view.setArea(initialArea);
   let afterTick = (_next: State): void => undefined;
+  let logTitle = (_mode: TitleMode | null): void => undefined;
   let lastBattleLog = "";
   let lastBattleButtonsLog = "";
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-    const { createStateLogger, logPointers, logTouchLayout } =
+    const { createStateLogger, createTitleLogger, logPointers, logTouchLayout } =
       await import("./dev/state-log");
     logTouchLayout();
     logPointers();
     afterTick = createStateLogger(content.world);
+    logTitle = createTitleLogger();
     afterTick(state);
   }
   const render = (): void => {
@@ -143,6 +181,15 @@ async function boot(): Promise<void> {
     );
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
+    title.render({
+      visible: titleMode !== null,
+      mode: titleMode ?? "fresh",
+      selected: titleSelected,
+      continueDetail: continueDetail(content.world, state),
+    });
+    logTitle(titleMode);
+    if (titleMode !== null) document.documentElement.dataset.title = "open";
+    else delete document.documentElement.dataset.title;
     if (activeBattle) document.documentElement.dataset.battle = "open";
     else delete document.documentElement.dataset.battle;
     battleHud.render({
@@ -268,9 +315,37 @@ async function boot(): Promise<void> {
       });
     }
   };
+  // The title reads its own input edges from here, never from the core state.
+  let titlePrevious: ActionFrame = blankInput();
+  // Buttons held when the title closed stay hidden from the game until they're
+  // released, so the press that starts the game can't also act in it.
+  const swallowed = new Set<"confirm" | "cancel" | "menu">();
   const tick = (frame: ActionFrame): void => {
+    if (titleMode !== null) {
+      applyTitle({
+        up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
+        down: frame.move.y > 0.5 && titlePrevious.move.y <= 0.5,
+        left: frame.move.x < -0.5 && titlePrevious.move.x >= -0.5,
+        right: frame.move.x > 0.5 && titlePrevious.move.x <= 0.5,
+        confirm: frame.confirm && !titlePrevious.confirm,
+        cancel: frame.cancel && !titlePrevious.cancel,
+      });
+      titlePrevious = frame;
+      if (titleMode === null) {
+        for (const button of ["confirm", "cancel", "menu"] as const)
+          if (frame[button]) swallowed.add(button);
+      }
+      return;
+    }
+    for (const button of swallowed) if (!frame[button]) swallowed.delete(button);
+    const input: ActionFrame = {
+      ...frame,
+      confirm: frame.confirm && !swallowed.has("confirm"),
+      cancel: frame.cancel && !swallowed.has("cancel"),
+      menu: frame.menu && !swallowed.has("menu"),
+    };
     const previous = state;
-    state = step(content.world, state, frame).state;
+    state = step(content.world, state, input).state;
     if (autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const log =
@@ -359,6 +434,7 @@ async function boot(): Promise<void> {
         state = createState(content.world, fixture, options.seed);
         suppressSave = false;
         await ensureArea();
+        titleMode = null;
       },
       renderInfo: () => view.renderInfo(state),
       save: {
@@ -370,6 +446,7 @@ async function boot(): Promise<void> {
         last: () => saveLast,
         loaded: () => saveLoaded,
       },
+      boot: { title: () => titleMode },
     });
   }
 }

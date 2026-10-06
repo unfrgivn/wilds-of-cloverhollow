@@ -8,7 +8,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 const bundleId = "com.unfrgivn.cloverhollow";
 type Frame = { width: number; height: number };
@@ -171,6 +171,24 @@ function parseLayout(line: string): Layout | undefined {
   return { confirm: value.confirm, cancel: value.cancel, menu: value.menu };
 }
 
+type TitleLog = { mode: string | null; options: (Box & { id: string })[] };
+
+function parseTitle(line: string): TitleLog | undefined {
+  const match = line.match(/\[cloverhollow\] title (\{.*\})/);
+  if (match?.[1] === undefined) return undefined;
+  const parsed: unknown = JSON.parse(match[1]);
+  if (!record(parsed) || !(parsed.mode === null || typeof parsed.mode === "string") ||
+      !Array.isArray(parsed.options)) return undefined;
+  const options: (Box & { id: string })[] = [];
+  for (const option of parsed.options) {
+    if (!record(option)) continue;
+    const id = option.id;
+    if (typeof id !== "string" || !box(option) || option === null) continue;
+    options.push({ id, x: option.x, y: option.y, width: option.width, height: option.height });
+  }
+  return { mode: parsed.mode, options };
+}
+
 function parseDialogueBox(line: string): Box | undefined {
   const match = line.match(/\[cloverhollow\] dialogue-box (\{.*\})/);
   if (match?.[1] === undefined) return undefined;
@@ -200,6 +218,7 @@ async function consume(
   dialogues: DialogueLog[],
   dialogueBoxes: Box[],
   pointers: string[],
+  titles: TitleLog[] = [],
 ): Promise<void> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
@@ -221,6 +240,8 @@ async function consume(
         const dialogueBox = parseDialogueBox(line);
         if (dialogueBox !== undefined) dialogueBoxes.push(dialogueBox);
         if (line.includes("[cloverhollow] pointer ")) pointers.push(line);
+        const title = parseTitle(line);
+        if (title !== undefined) titles.push(title);
       }
     }
   } finally {
@@ -240,6 +261,28 @@ async function waitFor<T>(
     "No Cloverhollow state line arrived in 20 seconds; " +
       "is the harness build installed? run just ios-sim",
   );
+}
+
+// Waits for the title in `mode`, then taps its `id` button (axe touch
+// down/up, which reaches the web view), and waits for the title to close or
+// change mode.
+async function tapTitle(axe: string, udid: string, titles: TitleLog[], mode: string,
+  id: string): Promise<TitleLog> {
+  await waitFor(titles, (items) => items[items.length - 1]?.mode === mode);
+  const shown = titles[titles.length - 1];
+  const option = shown?.options.find((item) => item.id === id);
+  if (shown === undefined || option === undefined)
+    throw new Error(`The ${mode} title has no ${id} button: ${JSON.stringify(shown)}`);
+  const before = titles.length;
+  for (let attempt = 0; attempt < 2 && titles.length === before; attempt += 1) {
+    runAxe(axe, ["touch", "-x", String(Math.round(option.x + option.width / 2)),
+      "-y", String(Math.round(option.y + option.height / 2)), "--down", "--up",
+      "--delay", "0.1", "--udid", udid]);
+    for (let waited = 0; waited < 20 && titles.length === before; waited += 1)
+      await Bun.sleep(100);
+  }
+  if (titles.length === before) throw new Error(`Tapping ${id} on the title did nothing`);
+  return shown;
 }
 
 async function main(): Promise<void> {
@@ -263,16 +306,24 @@ async function main(): Promise<void> {
   const transcript = {
     write: (text: string): void => appendFileSync(transcriptPath, text),
   };
-  // Every run starts from a new game: stop the app and clear its save slot
-  // (Capacitor Preferences lives in the app's UserDefaults domain). Both
-  // commands fail harmlessly when there's nothing to stop or clear.
+  // Every run starts from a new game. Reinstalling the app from its own
+  // bundle wipes its data container (Capacitor Preferences keeps the save in
+  // the app's UserDefaults there); `defaults delete` from outside the app
+  // can't reach it.
+  const installed = execFileSync("xcrun",
+    ["simctl", "get_app_container", udid, bundleId, "app"], { encoding: "utf8" }).trim();
+  const bundleCopy = join(directory, "app", basename(installed));
+  mkdirSync(join(directory, "app"), { recursive: true });
+  execFileSync("ditto", [installed, bundleCopy]);
   spawnSync("xcrun", ["simctl", "terminate", udid, bundleId]);
-  spawnSync("xcrun", ["simctl", "spawn", udid, "defaults", "delete", bundleId]);
+  execFileSync("xcrun", ["simctl", "uninstall", udid, bundleId]);
+  execFileSync("xcrun", ["simctl", "install", udid, bundleCopy]);
   const states: State[] = [];
   const layouts: Layout[] = [];
   const dialogues: DialogueLog[] = [];
   const dialogueBoxes: Box[] = [];
   const pointers: string[] = [];
+  const titles: TitleLog[] = [];
   const child = Bun.spawn({
     cmd: [
       "xcrun",
@@ -298,6 +349,7 @@ async function main(): Promise<void> {
     dialogues,
     dialogueBoxes,
     pointers,
+    titles,
   );
   const errors = consume(
     stderr,
@@ -307,11 +359,14 @@ async function main(): Promise<void> {
     dialogues,
     dialogueBoxes,
     pointers,
+    titles,
   );
   try {
     await waitFor(states, (items) => items.length > 0);
     const before = states[0];
     if (before === undefined) throw new Error("Initial state line disappeared");
+    if (before.tick !== 0 || before.area !== "bedroom")
+      throw new Error(`The run didn't start from a new game: ${JSON.stringify(before)}`);
     const beforeScreenshot = join(directory, "before.png");
     execFileSync("xcrun", [
       "simctl",
@@ -385,7 +440,7 @@ async function main(): Promise<void> {
       label: string,
       axis: "x" | "y" | "both" = "both",
     ): Promise<State> => {
-      for (let attempt = 0; attempt < 12; attempt += 1) {
+      for (let attempt = 0; attempt < 16; attempt += 1) {
         const current = latest();
         if (done(current)) return current;
         const dx = goal.x - current.x;
@@ -429,6 +484,14 @@ async function main(): Promise<void> {
     await waitFor(layouts, (items) => items.length > 0);
     // The web view drops touches for a moment after launch.
     await Bun.sleep(3000);
+    // The save was cleared, so the title offers New game only.
+    await waitFor(titles, (items) => items[items.length - 1]?.mode === "fresh");
+    const titleScreenshot = join(directory, "title.png");
+    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", titleScreenshot]);
+    const fresh = await tapTitle(axe, udid, titles, "fresh", "new-game");
+    await waitFor(titles, (items) => items[items.length - 1]?.mode === null);
+    console.log(`title: ${JSON.stringify(fresh)}`);
+    console.log(`title screenshot: ${titleScreenshot}`);
     // The window is at (610, 300) on the top wall, right beside the door trigger
     // (x 465-585, y 285-335). Line up past the door's edge first, then walk
     // straight up, so the route can never cut through the door.
@@ -562,18 +625,21 @@ async function main(): Promise<void> {
           `after=${JSON.stringify(after)}`,
       );
     }
-    // Approach the frog only from below and from the right. Leftward AXe drags
-    // are intentionally avoided because they can release late on this device.
+    // The frog is at (1000, 820) with a touch circle of radius 70. The plaza
+    // drag ends with Fae against a planter at x 583, which is over the left
+    // flower box (x 580-775, top edge y 890): walk down until it stops her
+    // (y 870 exactly, by collision, clear of the lamp post at y 805-835), then
+    // walk right along it until the battle starts (about x 951). Right and
+    // down drags only; leftward drags can release late.
     await walkTo(
-      { x: after.x, y: 850 },
-      (value) => !value.moving && value.y >= 820,
-      "below the frog",
+      { x: latest().x, y: 900 },
+      (value) => !value.moving && value.y >= 865,
+      "down to the planter",
       "y",
     );
     await walkTo(
-      { x: 1000, y: 850 },
-      (value) =>
-        readFileSync(transcriptPath, "utf8").includes('"phase":"intro"'),
+      { x: 1000, y: latest().y },
+      () => readFileSync(transcriptPath, "utf8").includes('"phase":"intro"'),
       "the frog",
       "x",
     );
@@ -680,6 +746,7 @@ async function relaunchCheck(axe: string, udid: string, directory: string,
   const states: State[] = [];
   const layouts: Layout[] = [];
   const pointers: string[] = [];
+  const titles: TitleLog[] = [];
   const unused: { dialogues: DialogueLog[]; boxes: Box[] } = { dialogues: [], boxes: [] };
   const child = Bun.spawn({
     cmd: ["xcrun", "simctl", "launch", "--console-pty", "--terminate-running-process",
@@ -690,9 +757,9 @@ async function relaunchCheck(axe: string, udid: string, directory: string,
   if (child.stdout === null || child.stderr === null)
     throw new Error("console-pty had no pipes");
   const output = consume(child.stdout, transcript, states, layouts, unused.dialogues,
-    unused.boxes, pointers);
+    unused.boxes, pointers, titles);
   const errors = consume(child.stderr, transcript, states, layouts, unused.dialogues,
-    unused.boxes, pointers);
+    unused.boxes, pointers, titles);
   try {
     await waitFor(states, (items) => items.length > 0);
     const first = states[0];
@@ -704,6 +771,10 @@ async function relaunchCheck(axe: string, udid: string, directory: string,
     console.log(`relaunch: ${JSON.stringify(first)}`);
     await waitFor(layouts, (items) => items.length > 0);
     await Bun.sleep(3000);
+    // A save exists, so the title offers Continue; it resumes right there.
+    const resumed = await tapTitle(axe, udid, titles, "continue", "continue");
+    await waitFor(titles, (items) => items[items.length - 1]?.mode === null);
+    console.log(`relaunch title: ${JSON.stringify(resumed)}`);
     const menu = layouts[layouts.length - 1]?.menu;
     if (menu === null || menu === undefined) throw new Error("No journal button layout");
     for (let attempt = 0; attempt < 2 && !states.some((item) => item.journal); attempt += 1) {

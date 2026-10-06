@@ -532,7 +532,12 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Gate: the owner approves the style of the first character and the first area
   before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
   hair with bangs and a high bun, white sneakers with orange trim, journal in
-  the backpack), the bedroom at 70% scale, the town plaza, Maddie, and the Fountain Frog atlas.
+  the backpack), the bedroom at 70% scale, the town plaza, Maddie, the chaos
+  frog (chaos, burst, soothed, and calm frames plus the aura), the sticker UI
+  with the owner's tweaks (cream speaker tags, stitched borders, bolder
+  labels), the battle screen (the frog centred, Fae facing him from the left,
+  the blurred plaza behind), and the journal (an open book with notes and a
+  sticker album; the JOURNAL button with a teal quill).
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

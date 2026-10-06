@@ -21,11 +21,23 @@ import {
   createRewardSticker,
 } from "./ui/battle";
 import { assetUrl } from "./platform/assets";
+import { createJournal } from "./ui/journal";
+import {
+  journalNotes,
+  parseSave,
+  serializeSave,
+  autosaveNeeded,
+  stableHash,
+} from "./core";
+import { Preferences } from "@capacitor/preferences";
 
 const content = loadContent();
 const app = new Application();
 let state: State;
 let paused = false;
+
+// One save slot (spec 10).
+const saveKey = "cloverhollow-save";
 
 async function boot(): Promise<void> {
   preventPinchZoom();
@@ -52,6 +64,7 @@ async function boot(): Promise<void> {
   const commandMenu = createCommandMenu(uiRoot);
   const timingRing = createTimingRing(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
+  const journal = createJournal(uiRoot);
   const input = createInputSource(() => {
     const keyboardFrame = keyboard.frame();
     const touchFrame = touch.sample();
@@ -68,6 +81,7 @@ async function boot(): Promise<void> {
   });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   commandMenu.onChoose((index) => touch.tapChoice(index));
+  journal.onClose(() => touch.tapButton("cancel"));
   const view = new GameView(content.world, {
     debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
     renderer: app.renderer,
@@ -75,7 +89,31 @@ async function boot(): Promise<void> {
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
-  state = createState(content.world, initialFixture);
+  const fresh = createState(content.world, initialFixture);
+  const saved = await Preferences.get({ key: saveKey });
+  const restored = saved.value === null ? null : parseSave(saved.value, fresh);
+  state = restored ?? fresh;
+  let saveLast: { tick: number; hash: string } | null = null;
+  const saveLoaded =
+    restored === null
+      ? null
+      : { tick: restored.tick, hash: stableHash(restored) };
+  let suppressSave = false;
+  let saveQueue = Promise.resolve();
+  const save = (): Promise<void> => {
+    if (suppressSave) return Promise.resolve();
+    const snapshot = state;
+    const serialized = serializeSave(snapshot);
+    const hash = stableHash(snapshot);
+    saveQueue = saveQueue.then(async () => {
+      await Preferences.set({
+        key: saveKey,
+        value: serialized,
+      });
+      saveLast = { tick: snapshot.tick, hash };
+    });
+    return saveQueue;
+  };
   await view.ready;
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");
@@ -166,6 +204,37 @@ async function boot(): Promise<void> {
         atlas: { w: 1536, h: 1024 },
       },
     });
+    journal.render({
+      visible: state.journalOpen,
+      notes: state.journalOpen ? journalNotes(content.world, state) : [],
+      stickers: state.journalOpen
+        ? Array.from({ length: content.world.stickers.slots }, (_, index) => {
+            const sticker = content.world.stickers.catalogue[index];
+            if (sticker === undefined)
+              return {
+                id: `empty-${index}`,
+                name: "",
+                owned: false,
+                image: null,
+              };
+            const owned = state.stickers.includes(sticker.id);
+            return {
+              id: sticker.id,
+              name: sticker.name,
+              owned,
+              image: owned
+                ? {
+                    src: assetUrl("assets/critters/frog/frog.png"),
+                    frame: { x: 0, y: 512, w: 512, h: 512 },
+                    atlas: { w: 1536, h: 1024 },
+                  }
+                : null,
+            };
+          })
+        : [],
+    });
+    if (state.journalOpen) document.documentElement.dataset.journal = "open";
+    else delete document.documentElement.dataset.journal;
     if (activeBattle) dialogueBox.hide();
     if (activeBattle && (battle?.message ?? "") !== "") {
       dialogueBox.render({
@@ -200,7 +269,9 @@ async function boot(): Promise<void> {
     }
   };
   const tick = (frame: ActionFrame): void => {
+    const previous = state;
     state = step(content.world, state, frame).state;
+    if (autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const log =
         state.battle === null
@@ -284,10 +355,21 @@ async function boot(): Promise<void> {
               content.fixtures,
             ).join(", ")}`,
           );
+        suppressSave = true;
         state = createState(content.world, fixture, options.seed);
+        suppressSave = false;
         await ensureArea();
       },
       renderInfo: () => view.renderInfo(state),
+      save: {
+        clear: async () => {
+          await saveQueue;
+          await Preferences.remove({ key: saveKey });
+          saveLast = null;
+        },
+        last: () => saveLast,
+        loaded: () => saveLoaded,
+      },
     });
   }
 }

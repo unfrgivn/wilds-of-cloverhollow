@@ -1,0 +1,11 @@
+{
+  "slots": 8,
+  "catalogue": [
+    {
+      "id": "fountain-frog",
+      "name": "Fountain Frog",
+      "critter": "frog",
+      "frame": "calm_idle_01"
+    }
+  ]
+}

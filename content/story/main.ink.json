@@ -328,6 +328,13 @@
         null
       ],
       "notice_board": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "read_notice",
+          "re": true
+        },
         "^CLOVERHOLLOW NEWS: The fountain is fizzing! ",
         "#",
         "^speaker: Notice board",
@@ -361,7 +368,7 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.12"
+                "->": ".^.^.^.16"
               },
               null
             ]
@@ -380,13 +387,129 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.12"
+                "->": ".^.^.^.16"
               },
               null
             ]
           }
         ],
         "nop",
+        "\n",
+        "done",
+        null
+      ],
+      "journal": [
+        "ev",
+        "str",
+        "^frog",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Fountain Frog is calm. Something purple fizzed into his fountain. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "read_notice"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A raccoon in a purple hood was seen in town. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "plan"
+        },
+        "str",
+        "^now",
+        "/str",
+        "==",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Go see why the fountain is fizzing! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.25"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "plan"
+        },
+        "str",
+        "^later",
+        "/str",
+        "==",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Check the fizzing fountain after school. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.36"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
         "\n",
         "done",
         null
@@ -504,6 +627,10 @@
         "/str",
         {
           "VAR=": "plan"
+        },
+        false,
+        {
+          "VAR=": "read_notice"
         },
         "/ev",
         "end",

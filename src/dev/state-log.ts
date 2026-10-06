@@ -22,12 +22,13 @@ export function createStateLogger(world: World): (state: State) => void {
     const target = targetInteractable(world, state)?.id ?? null;
     const movementChanged = previousMoving !== state.motion.moving ||
       previousTarget !== target;
+    const journalChanged = previous !== undefined && previous.journalOpen !== state.journalOpen;
     if (
       first ||
       areaChanged ||
       facingChanged ||
       (positionChanged && now - lastPositionLog >= 250) || dialogueChanged ||
-      movementChanged
+      movementChanged || journalChanged
     ) {
       console.log(
         `[cloverhollow] state ${JSON.stringify({
@@ -38,6 +39,7 @@ export function createStateLogger(world: World): (state: State) => void {
           facing: state.facing,
           moving: state.motion.moving,
           target,
+          journal: state.journalOpen,
         })}`,
       );
       lastPositionLog = now;

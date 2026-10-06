@@ -66,6 +66,7 @@ export function createState(
     stickers: [],
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
+    journalOpen: false,
   };
 }
 
@@ -200,12 +201,14 @@ export function targetInteractable(
   const calmCritters = area.critters.flatMap((critter) => {
     const content = world.critters[critter.id];
     return state.critters[critter.id] === "calm" && content !== undefined
-      ? [{
-          id: `critter:${critter.id}`,
-          knot: content.calmKnot,
-          point: critter.point,
-          prompt: content.calmPrompt,
-        }]
+      ? [
+          {
+            id: `critter:${critter.id}`,
+            knot: content.calmKnot,
+            point: critter.point,
+            prompt: content.calmPrompt,
+          },
+        ]
       : [];
   });
   return [...area.interactables, ...calmCritters]
@@ -924,6 +927,42 @@ export function step(
     return { state: battleStep(world, state, input), events: [] };
   if (state.dialogue !== null)
     return { state: dialogueStep(world, state, input), events: [] };
+  const menuEdge = input.menu && !state.previousInput.menu;
+  const cancelEdge = input.cancel && !state.previousInput.cancel;
+  if (state.journalOpen) {
+    return {
+      state: {
+        ...state,
+        tick: state.tick + 1,
+        journalOpen: cancelEdge || menuEdge ? false : true,
+        previousInput: { ...input },
+        maddie: {
+          ...state.maddie,
+          stillTicks: state.maddie.stillTicks + 1,
+          motion: { ...state.maddie.motion, moving: false },
+        },
+        motion: { ...state.motion, moving: false },
+      },
+      events: [],
+    };
+  }
+  if (menuEdge && state.transition === null) {
+    return {
+      state: {
+        ...state,
+        tick: state.tick + 1,
+        journalOpen: true,
+        previousInput: { ...input },
+        motion: { ...state.motion, moving: false },
+        maddie: {
+          ...state.maddie,
+          stillTicks: state.maddie.stillTicks + 1,
+          motion: { ...state.maddie.motion, moving: false },
+        },
+      },
+      events: [],
+    };
+  }
   if (state.transition !== null) {
     const transition = state.transition;
     const elapsed = transition.elapsed + 1;
@@ -1117,7 +1156,11 @@ export function stableHash(value: unknown): string {
   const canonical = (item: unknown): string => {
     if (Array.isArray(item)) return `[${item.map(canonical).join(",")}]`;
     if (item !== null && typeof item === "object") {
-      const entries = Object.entries(item).sort(([a], [b]) =>
+      // Undefined values are skipped, as JSON does, so a state and its saved
+      // copy hash the same.
+      const entries = Object.entries(item)
+        .filter(([, child]) => child !== undefined)
+        .sort(([a], [b]) =>
         a < b ? -1 : a > b ? 1 : 0,
       );
       const body = entries

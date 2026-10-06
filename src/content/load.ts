@@ -8,6 +8,7 @@ import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
 import battleData from "../../content/battle.json";
+import stickerData from "../../content/stickers.json";
 import type {
   Area,
   Direction,
@@ -22,6 +23,7 @@ import type {
   Grade,
   BattleContent,
   CritterCommandId,
+  StickerCatalogue,
 } from "../core";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -379,6 +381,35 @@ export function parseBattleContent(
   };
 }
 
+export function parseStickers(value: unknown, file: string): StickerCatalogue {
+  field(
+    record(value) &&
+      typeof value.slots === "number" &&
+      Array.isArray(value.catalogue),
+    file,
+    "stickers",
+  );
+  field(value.slots >= 0, file, "slots");
+  const catalogue = value.catalogue.map((item, index) => {
+    field(
+      record(item) &&
+        typeof item.id === "string" &&
+        typeof item.name === "string" &&
+        typeof item.critter === "string" &&
+        typeof item.frame === "string",
+      file,
+      `catalogue.${index}`,
+    );
+    return {
+      id: item.id,
+      name: item.name,
+      critter: item.critter,
+      frame: item.frame,
+    };
+  });
+  return { slots: value.slots, catalogue };
+}
+
 export function parseFixture(value: unknown, file: string): Fixture {
   field(record(value), file, "object");
   field(typeof value.area === "string", file, "area");
@@ -453,6 +484,7 @@ export function loadContent(): {
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
+  const stickers = parseStickers(stickerData, "content/stickers.json");
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
@@ -470,6 +502,7 @@ export function loadContent(): {
       story,
       critters: { [frog.id]: frog },
       battle,
+      stickers,
     },
     fixtures,
   };

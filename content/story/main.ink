@@ -1,4 +1,5 @@
 VAR plan = "none"
+VAR read_notice = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -34,12 +35,20 @@ Maddie's bed. Still warm, and full of orange fur. # speaker: Fae
 -> DONE
 
 === notice_board ===
+~ read_notice = true
 CLOVERHOLLOW NEWS: The fountain is fizzing! # speaker: Notice board
 Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 {
 - plan == "now": A raccoon in a hood? I bet that's who did it. # speaker: Fae
 - else: A raccoon... in a hood? Weird. # speaker: Fae
 }
+-> DONE
+
+=== journal ===
+{calmed("frog"): The Fountain Frog is calm. Something purple fizzed into his fountain. # speaker: Fae}
+{read_notice: A raccoon in a purple hood was seen in town. # speaker: Fae}
+{plan == "now": Go see why the fountain is fizzing! # speaker: Fae}
+{plan == "later": Check the fizzing fountain after school. # speaker: Fae}
 -> DONE
 
 === fountain ===

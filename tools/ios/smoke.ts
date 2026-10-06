@@ -20,6 +20,7 @@ type State = {
   facing: string;
   moving: boolean;
   target: string | null;
+  journal: boolean;
 };
 type Layout = { confirm: Box | null; cancel: Box | null; menu: Box | null };
 type Box = { x: number; y: number; width: number; height: number };
@@ -133,6 +134,7 @@ function parseStates(line: string): State[] {
         y: parsed.y,
         facing: parsed.facing,
         moving: parsed.moving,
+        journal: "journal" in parsed && parsed.journal === true,
         target: parsed.target,
       },
     ];
@@ -261,6 +263,11 @@ async function main(): Promise<void> {
   const transcript = {
     write: (text: string): void => appendFileSync(transcriptPath, text),
   };
+  // Every run starts from a new game: stop the app and clear its save slot
+  // (Capacitor Preferences lives in the app's UserDefaults domain). Both
+  // commands fail harmlessly when there's nothing to stop or clear.
+  spawnSync("xcrun", ["simctl", "terminate", udid, bundleId]);
+  spawnSync("xcrun", ["simctl", "spawn", udid, "defaults", "delete", bundleId]);
   const states: State[] = [];
   const layouts: Layout[] = [];
   const dialogues: DialogueLog[] = [];
@@ -623,6 +630,7 @@ async function main(): Promise<void> {
     await tapConfirm();
     if (!readFileSync(transcriptPath, "utf8").includes('"phase":null'))
       throw new Error("Battle did not end after Run");
+    await Bun.sleep(1000);
     console.log(`before: ${JSON.stringify(before)}`);
     console.log(`plaza: ${JSON.stringify(plaza)}`);
     console.log(`after: ${JSON.stringify(after)}`);
@@ -650,6 +658,70 @@ async function main(): Promise<void> {
     const lines = readFileSync(transcriptPath, "utf8").trimEnd().split("\n");
     console.error("last console lines:");
     console.error(lines.slice(-40).join("\n"));
+    throw error;
+  } finally {
+    child.kill();
+    await Promise.all([output, errors]);
+  }
+  const lastState = states[states.length - 1];
+  if (lastState === undefined) throw new Error("No state line before the relaunch");
+  await relaunchCheck(axe, udid, directory, lastState);
+}
+
+// The save survives a relaunch: the app reopens exactly where Fae was, and
+// the journal button opens the journal there.
+async function relaunchCheck(axe: string, udid: string, directory: string,
+  saved: State): Promise<void> {
+  const transcriptPath = join(directory, "relaunch-console-pty.log");
+  writeFileSync(transcriptPath, "");
+  const transcript = {
+    write: (text: string): void => appendFileSync(transcriptPath, text),
+  };
+  const states: State[] = [];
+  const layouts: Layout[] = [];
+  const pointers: string[] = [];
+  const unused: { dialogues: DialogueLog[]; boxes: Box[] } = { dialogues: [], boxes: [] };
+  const child = Bun.spawn({
+    cmd: ["xcrun", "simctl", "launch", "--console-pty", "--terminate-running-process",
+      udid, bundleId],
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (child.stdout === null || child.stderr === null)
+    throw new Error("console-pty had no pipes");
+  const output = consume(child.stdout, transcript, states, layouts, unused.dialogues,
+    unused.boxes, pointers);
+  const errors = consume(child.stderr, transcript, states, layouts, unused.dialogues,
+    unused.boxes, pointers);
+  try {
+    await waitFor(states, (items) => items.length > 0);
+    const first = states[0];
+    if (first === undefined || first.area !== saved.area || first.x !== saved.x ||
+        first.y !== saved.y) {
+      throw new Error(`The save didn't survive a relaunch: started at ${JSON.stringify(first)}, ` +
+        `last state before it was ${JSON.stringify(saved)}`);
+    }
+    console.log(`relaunch: ${JSON.stringify(first)}`);
+    await waitFor(layouts, (items) => items.length > 0);
+    await Bun.sleep(3000);
+    const menu = layouts[layouts.length - 1]?.menu;
+    if (menu === null || menu === undefined) throw new Error("No journal button layout");
+    for (let attempt = 0; attempt < 2 && !states.some((item) => item.journal); attempt += 1) {
+      runAxe(axe, ["touch", "-x", String(Math.round(menu.x + menu.width / 2)),
+        "-y", String(Math.round(menu.y + menu.height / 2)), "--down", "--up", "--delay", "0.1",
+        "--udid", udid]);
+      for (let waited = 0; waited < 20 && !states.some((item) => item.journal); waited += 1)
+        await Bun.sleep(100);
+    }
+    if (!states.some((item) => item.journal)) throw new Error("The journal didn't open");
+    await Bun.sleep(600);
+    const journalScreenshot = join(directory, "journal.png");
+    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", journalScreenshot]);
+    console.log(`journal screenshot: ${journalScreenshot}`);
+  } catch (error: unknown) {
+    const lines = readFileSync(transcriptPath, "utf8").trimEnd().split("\n");
+    console.error("last relaunch console lines:");
+    console.error(lines.slice(-30).join("\n"));
     throw error;
   } finally {
     child.kill();

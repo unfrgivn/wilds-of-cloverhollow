@@ -70,6 +70,11 @@ export type World = {
   story: Record<string, unknown>;
   critters: Record<string, Critter>;
   battle: BattleContent;
+  stickers: StickerCatalogue;
+};
+export type StickerCatalogue = {
+  slots: number;
+  catalogue: { id: string; name: string; critter: string; frame: string }[];
 };
 export type BattleContent = {
   commands: Record<
@@ -221,5 +226,6 @@ export type State = {
   stickers: string[];
   safeSpot: { area: string; spawn: string };
   battle: Battle | null;
+  journalOpen: boolean;
 };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

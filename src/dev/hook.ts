@@ -48,6 +48,11 @@ export type CloverhollowHook = {
       auraAlpha: number;
     };
   };
+  save: {
+    clear: () => Promise<void>;
+    last: () => { tick: number; hash: string } | null;
+    loaded: () => { tick: number; hash: string } | null;
+  };
 };
 
 export function installHook(deps: {
@@ -60,6 +65,7 @@ export function installHook(deps: {
   setPaused: (paused: boolean) => void;
   reset: (options: { seed?: number; fixture?: string }) => Promise<void>;
   renderInfo: CloverhollowHook["renderInfo"];
+  save: CloverhollowHook["save"];
 }): void {
   const hook: CloverhollowHook = {
     version: 1,
@@ -92,6 +98,7 @@ export function installHook(deps: {
       deps.render();
     },
     renderInfo: deps.renderInfo,
+    save: deps.save,
   };
   window.__cloverhollow = hook;
 }

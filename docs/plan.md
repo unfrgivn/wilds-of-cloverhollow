@@ -131,13 +131,18 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   down steps only, opens the battle, checks the command buttons clear the
   touch controls, and runs away.
 
-## Milestone 10: Journal and save
+## Milestone 10: Journal and save **Status:** ✅ Completed (2026-10-05)
 - The journal is the pause menu (J or the menu button): notes written from Ink
   and a sticker album, in the sticker UI style.
 - One save slot: version plus the full game state; loading restores it exactly
   (the state hash matches).
 - E2e: play, save, reload the page, continue with an identical hash. iOS: the
   save survives an app relaunch.
+- Notes: autosave rather than a save button (kids forget to save): on
+  arrival, after battles, dialogue, and the journal. A save must match a fresh
+  state's exact shape or the game starts fresh. The journal notes come from
+  one Ink knot read on a copy of the story state. Owner-approved storage
+  plugin: `@capacitor/preferences`.
 
 ## Later (not scheduled)
 Audio and music, gamepad polish, device testing and TestFlight, Bubblegum Bay

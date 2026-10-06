@@ -20,6 +20,7 @@
   "dependencies": {
     "@capacitor/core": "8.5.2",
     "@capacitor/ios": "8.5.2",
+    "@capacitor/preferences": "8.0.1",
     "inkjs": "2.4.0",
     "pixi.js": "8.22.0"
   },

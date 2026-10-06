@@ -50,7 +50,8 @@ reference material only.
   runner), Node 24 LTS for Node-based tools (`.nvmrc`), `just` for tasks.
 - Approved npm dependencies. Anything else needs the owner's approval first,
   then an update to this list:
-  - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8.
+  - Runtime: `pixi.js` 8, `inkjs` 2, `@capacitor/core` 8, `@capacitor/ios` 8,
+    `@capacitor/preferences` 8 (the save slot; owner-approved 2026-10-05).
   - Dev: `typescript`, `vite`, `vitest`, `@playwright/test`,
     `@capacitor/cli` 8, `@types/bun`.
 - External tools (not npm dependencies): ImageMagick (art processing), ffmpeg,
@@ -430,6 +431,19 @@ ios/            Capacitor iOS project (from Milestone 4).
 - The journal is the pause menu: Notes (current goals, written from Ink) and a
   Sticker album. The map comes later.
 - Stickers are collectibles and rewards.
+- Core: `journalOpen` in state. A menu press (J or the journal button) opens
+  it when no dialogue, battle, or door transition is running; a menu or cancel
+  press (or the book's close button, which sends cancel) closes it. While it's
+  open Fae is frozen, doors, battles, and interactions don't fire, and Maddie
+  keeps settling.
+- Notes: the `journal` Ink knot lists every note that applies, newest first
+  (the calm frog, the raccoon from the notice board, then the morning plan).
+  `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
+  result, so reading the journal never changes the story.
+- Album: `content/stickers.json` (validated) holds the slot count and the
+  catalogue (id, name, the critter whose atlas holds the art, and the frame).
+  A sticker is owned when `state.stickers` has its id. The shell sets
+  `data-journal="open"` while the book is open.
 
 ### 9.1 Journal layout
 - The journal (`src/ui/journal.ts`) is a modal open book inside the safe area,
@@ -450,12 +464,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   The reward card uses both.
 
 ## 10. Save and load
-- Save data: version, area id, player position and facing, Ink state JSON,
-  inventory, stickers, PRNG state, and tick.
-- Prototype: one slot in `localStorage`. iOS persistence is revisited in the
-  iOS milestones.
-- Save data includes the serialized Ink state string, preserving story
-  variables and choices across save/load.
+- One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
+  UserDefaults on iOS (which iOS doesn't clear the way it can clear web
+  storage) and localStorage in the browser.
+- Format: `{ version: 1, state }`, the whole core state, including the
+  serialized Ink state (story variables and choices), stickers, critters, the
+  PRNG, and the tick. Loading restores it exactly: the state hash matches, and
+  `stableHash` skips undefined values (as JSON does) so a state and its saved
+  copy hash the same.
+- `parseSave(json, template)` accepts only a state with the template's exact
+  shape (a fresh game state: every key, the same primitive types, all the way
+  down; null slots may hold null or an object). Any other version or shape
+  starts a new game instead of crashing later. A change to the state's shape
+  bumps the version.
+- Autosave (the shell, never blocking a frame) when Fae arrives in an area,
+  a battle ends, a dialogue closes, or the journal closes. The trigger is a
+  pure function of the previous and next state (`autosaveNeeded`). Fixture
+  resets don't save.
+- Boot: a valid save resumes the game; otherwise a new game starts.
 
 ## 11. Harness and agent control (locked)
 - The dev hook `window.__cloverhollow` exists in dev builds and in harness
@@ -480,6 +506,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     the game paused. Returns a Promise that resolves once the fixture's area
     has loaded. The default is `new-game`; unknown names throw an error listing
     known fixtures.
+  - `save`: `clear()` deletes the slot; `last()` is the tick and hash of the
+    latest completed save write; `loaded()` is the tick and hash of the save
+    restored at boot, or null for a new game.
   - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
     cache), Maddie's `hidden` fraction, the depth layer's draw order

@@ -84,6 +84,9 @@ for (const item of [
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
     page,
   }) => {
+    // Replays a whole script in the browser and in Bun; under a full parallel
+    // run that can take longer than the default 30 s.
+    test.setTimeout(60_000);
     const folder =
       fixture === "new-game"
         ? "new-game"

@@ -45,6 +45,12 @@ export async function readState(page: Page): Promise<State> {
   return state;
 }
 
+// Just the battle, for loops that poll it every step (the full state carries
+// the Ink JSON and is slow to ship on CI's software-rendered browsers).
+export async function readBattle(page: Page): Promise<State["battle"]> {
+  return page.evaluate(() => window.__cloverhollow?.getState().battle ?? null);
+}
+
 export async function readHash(page: Page): Promise<string> {
   const hash = await page.evaluate(() => window.__cloverhollow?.hash());
   if (hash === undefined) throw new Error("hook unavailable");

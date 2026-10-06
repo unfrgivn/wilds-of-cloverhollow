@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readState, resetPaused, step } from "./helpers";
+import { openHarness, readBattle, readState, resetPaused, step } from "./helpers";
 
 // Milestone 10 contract: the journal is the pause menu (J or the journal
 // button; X, J, or its close button shut it), its notes come from Ink and its
@@ -87,14 +87,14 @@ test("touch: the journal button opens the book and its close button shuts it", a
 });
 
 test("after calming the frog, the journal shows his sticker and his note", async ({ page }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(process.env.CI ? 180_000 : 90_000);
   await openHarness(page);
   await resetPaused(page, "plaza");
   for (const [key, ticks] of [["ArrowDown", 25], ["ArrowLeft", 15], ["ArrowDown", 50],
     ["ArrowLeft", 35]] as const) await hold(page, key, ticks);
-  expect((await readState(page)).battle).not.toBeNull();
+  expect((await readBattle(page))).not.toBeNull();
   for (let action = 0; action < 150; action += 1) {
-    const battle = (await readState(page)).battle;
+    const battle = (await readBattle(page));
     if (battle === null) break;
     // Press on every aim's target tick.
     if (battle.phase === "aim" && battle.aim !== null)

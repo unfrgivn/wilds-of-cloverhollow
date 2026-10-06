@@ -66,9 +66,10 @@ async function rects(page: Page, selector: string): Promise<Rect[]> {
     }));
 }
 
-// Luminance spread in a 9x9 patch at each corner: a painted corner has
-// texture, a flat fill (bare canvas, paper, or an overlay) has almost none.
-async function cornerTexture(page: Page): Promise<number[]> {
+// One screenshot, read at the four corners: the pixel itself and the
+// luminance spread in a 9x9 patch (a painted corner has texture; a flat fill,
+// such as bare canvas, paper, or an overlay, has almost none).
+async function corners(page: Page): Promise<{ rgb: number[]; spread: number }[]> {
   const encoded = (await page.screenshot()).toString("base64");
   return page.evaluate(async (data) => {
     const image = new Image();
@@ -89,34 +90,16 @@ async function cornerTexture(page: Page): Promise<number[]> {
         values.push(.2126 * (pixels[index] ?? 0) + .7152 * (pixels[index + 1] ?? 0) +
           .0722 * (pixels[index + 2] ?? 0));
       const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-      return Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) /
+      const spread = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) /
         values.length);
+      return { rgb: [pixels[0] ?? 0, pixels[1] ?? 0, pixels[2] ?? 0], spread };
     });
-  }, encoded);
-}
-
-async function cornerPixels(page: Page): Promise<number[][]> {
-  const encoded = (await page.screenshot()).toString("base64");
-  return page.evaluate(async (data) => {
-    const image = new Image();
-    image.src = `data:image/png;base64,${data}`;
-    await image.decode();
-    const canvas = document.createElement("canvas");
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    const context = canvas.getContext("2d");
-    if (context === null) throw new Error("no 2d context");
-    context.drawImage(image, 0, 0);
-    const w = image.naturalWidth;
-    const h = image.naturalHeight;
-    return [[3, 3], [w - 4, 3], [3, h - 4], [w - 4, h - 4]].map(([x = 0, y = 0]) =>
-      [...context.getImageData(x, y, 1, 1).data].slice(0, 3));
   }, encoded);
 }
 
 for (const size of sizes) {
   test(`the ${size.name} battle scene keeps both combatants in view`, async ({ browser }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(process.env.CI ? 180_000 : 60_000);
     const context = await browser.newContext({ viewport: { width: size.width,
       height: size.height }, hasTouch: size.touch });
     const page = await context.newPage();
@@ -137,13 +120,13 @@ for (const size of sizes) {
     }
     // The canvas background is 0xf8edcf; the painting must reach every corner,
     // and stay bright like the approved mock (a dark overlay doesn't count).
-    for (const [red = 0, green = 0, blue = 0] of await cornerPixels(page)) {
+    for (const corner of await corners(page)) {
+      const [red = 0, green = 0, blue = 0] = corner.rgb;
       const distance = Math.abs(red - 0xf8) + Math.abs(green - 0xed) + Math.abs(blue - 0xcf);
       expect(distance, "a corner shows the bare canvas").toBeGreaterThan(12);
       expect(red + green + blue, "a corner is darkened").toBeGreaterThan(420);
+      expect(corner.spread, "a corner is a flat fill, not the painting").toBeGreaterThan(1.5);
     }
-    for (const spread of await cornerTexture(page))
-      expect(spread, "a corner is a flat fill, not the painting").toBeGreaterThan(1.5);
     const layout = info.layout;
     expect(layout, "renderInfo().battle.layout").toBeTruthy();
     if (!layout) return;

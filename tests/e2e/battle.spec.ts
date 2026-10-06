@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { readState, renderInfo, resetPaused, step } from "./helpers";
+import { readBattle, readState, renderInfo, resetPaused, step } from "./helpers";
 
 // One press of Enter, then a released tick so the next press is a new edge.
 async function press(page: Page): Promise<void> {
@@ -20,12 +20,13 @@ async function hold(page: Page, key: string, ticks: number): Promise<void> {
 const approach = [["ArrowDown", 25], ["ArrowLeft", 15], ["ArrowDown", 50]] as const;
 
 async function shown(page: Page): Promise<boolean> {
-  const battle = (await readState(page)).battle;
+  const battle = (await readBattle(page));
   return battle !== null && battle.revealed >= battle.message.length;
 }
 
 test.describe("frog battle", () => {
-  test.setTimeout(90_000);
+  // Long real-key flows; CI's software-rendered browsers are about 6x slower.
+  test.setTimeout(process.env.CI ? 180_000 : 90_000);
 
   test("real keys: calm the frog, win his sticker, and talk with him", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -44,7 +45,7 @@ test.describe("frog battle", () => {
 
     const seen = new Set<string>();
     for (let action = 0; action < 120; action += 1) {
-      const battle = (await readState(page)).battle;
+      const battle = (await readBattle(page));
       if (battle === null) break;
       if (battle.phase === "intro" && !seen.has("intro") && await shown(page)) {
         seen.add("intro");
@@ -68,7 +69,7 @@ test.describe("frog battle", () => {
           await expect(page).toHaveScreenshot("battle-burst.png");
         }
         // Press exactly on the target tick: GREAT every time.
-        const current = (await readState(page)).battle;
+        const current = (await readBattle(page));
         if (current?.aim) await step(page, current.aim.targetTick - current.aimTick - 1);
         await page.keyboard.down("Enter");
         await step(page, 1);
@@ -106,7 +107,7 @@ test.describe("frog battle", () => {
 
     // Walking into the calm frog starts no battle; he talks instead.
     await hold(page, "ArrowLeft", 4);
-    expect((await readState(page)).battle).toBeNull();
+    expect((await readBattle(page))).toBeNull();
     const prompt = page.locator(".sticker-prompt");
     await expect(prompt).toBeVisible();
     await expect(prompt.locator("span")).toHaveText("TALK");
@@ -146,14 +147,14 @@ test.describe("frog battle", () => {
       await step(page, 2);
     };
     for (let taps = 0; taps < 8; taps += 1) {
-      const battle = (await readState(page)).battle;
+      const battle = (await readBattle(page));
       if (battle?.phase === "command" && await shown(page)) break;
       await tap(".touch-confirm");
     }
     await expect(page.locator(".battle-command")).toHaveCount(4);
     await tap(".battle-command:has-text('Run')");
-    expect((await readState(page)).battle?.phase).toBe("run");
-    for (let taps = 0; taps < 4 && (await readState(page)).battle !== null; taps += 1)
+    expect((await readBattle(page))?.phase).toBe("run");
+    for (let taps = 0; taps < 4 && (await readBattle(page)) !== null; taps += 1)
       await tap(".touch-confirm");
     const after = await readState(page);
     expect(after.battle).toBeNull();

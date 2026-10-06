@@ -252,11 +252,18 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   with a test that fails without the fix. The first raccoon build cut his
   tail with fixed panel crops; the build now extracts whole figures.
 
-## Roadmap after Milestone 15 (proposed, not scheduled)
-- Audio: a gentle music bed per area and soft UI sounds (needs the owner's
-  okay on any new dependency or paid generation).
-- Device testing and TestFlight (needs the owner: store and account actions).
+## Roadmap after Milestone 15 (proposed, waiting on the owner)
+Chapter one ends with the purple hood's Cloverhollow School name tag. The next
+steps need the owner's decisions first (`docs/review-queue.md`, "Decisions
+only the owner can make"):
+- Who the kid in the hood is, and how Fae finds out (a school chapter).
+- Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md), once it's
+  decided whether party members follow Fae, help in battles, or both. The
+  engine already has what the areas need: painted areas, people who come and
+  go, locked doors, and generic critters.
+- Audio: a gentle music bed per area and soft UI sounds (a new dependency or
+  paid generation).
+- Device testing and TestFlight (the owner's Apple account).
 
 ## Later (not scheduled)
-Audio and music, gamepad polish, device testing and TestFlight, Bubblegum Bay
-and Pinecone Pass, Sue and Jordan, and tools (lantern, lasso, flute).
+Gamepad polish, and the tools from NOTES.md (lantern, lasso, flute).

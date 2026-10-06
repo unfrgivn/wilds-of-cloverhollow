@@ -2,8 +2,17 @@ import { expect, test, type Page } from "@playwright/test";
 import type { ActionFrame, State } from "../../src/core";
 import { readFileSync } from "node:fs";
 import { parseScript } from "../../src/content/script";
-import { openHarness, resetPaused, resume, step, queueInput, readState,
-  readHash, bunHash, pixelAt } from "./helpers";
+import {
+  openHarness,
+  resetPaused,
+  resume,
+  step,
+  queueInput,
+  readState,
+  readHash,
+  bunHash,
+  pixelAt,
+} from "./helpers";
 
 test("stepping with a held real key moves 4 units per tick", async ({
   page,
@@ -69,12 +78,18 @@ for (const item of [
   { name: "concave-corners", fixture: "harness" },
   { name: "door-round-trip", fixture: "new-game" },
   { name: "morning", fixture: "new-game" },
+  { name: "frog-win", fixture: "plaza" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
     page,
   }) => {
-    const folder = fixture === "new-game" ? "new-game" : "harness";
+    const folder =
+      fixture === "new-game"
+        ? "new-game"
+        : fixture === "plaza"
+          ? "plaza"
+          : "harness";
     const path = `tests/sim/scripts/${folder}/${name}.json`;
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
     await openHarness(page);
@@ -100,7 +115,10 @@ test("nothing renders inside wide letterbox bars", async ({ page }) => {
   expect(await pixelAt(page, png, 2399, 360)).toEqual(background);
 });
 
-test("touch stick moves and confirm taps for one tick", async ({ page, browserName }) => {
+test("touch stick moves and confirm taps for one tick", async ({
+  page,
+  browserName,
+}) => {
   test.skip(browserName !== "chromium", "CDP touch dispatch is Chromium-only");
   await page.goto("./?touch=1");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
@@ -117,12 +135,18 @@ test("touch stick moves and confirm taps for one tick", async ({ page, browserNa
   await step(page, 30);
   const moved = await readState(page);
   expect(moved.player.x).toBeGreaterThan(300);
-  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
   await client.send("Input.dispatchTouchEvent", {
     type: "touchStart",
     touchPoints: [{ x: 1160, y: 650, id: 8 }],
   });
-  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
   await step(page, 1);
   expect((await readState(page)).previousInput.confirm).toBe(true);
   await step(page, 1);
@@ -168,7 +192,8 @@ test("WebKit keeps touch controls in separate safe-area regions", async ({
   expect(confirm).not.toBeNull();
   expect(cancel).not.toBeNull();
   expect(stick).not.toBeNull();
-  if (menu === null || confirm === null || cancel === null || stick === null) return;
+  if (menu === null || confirm === null || cancel === null || stick === null)
+    return;
   expect(menu.x + menu.width).toBeGreaterThan(800);
   expect(menu.y).toBeLessThan(80);
   expect(menu.x + menu.width).toBeLessThanOrEqual(874);
@@ -181,7 +206,9 @@ test.describe("high-density screens", () => {
   // iPhones report devicePixelRatio 3; the backing store is capped at 2x.
   test.use({ deviceScaleFactor: 3 });
 
-  test("the canvas fills the viewport with a 2x backing store", async ({ page }) => {
+  test("the canvas fills the viewport with a 2x backing store", async ({
+    page,
+  }) => {
     await openHarness(page);
     const size = await page.evaluate(() => {
       const canvas = document.querySelector("canvas");

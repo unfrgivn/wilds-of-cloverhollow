@@ -1,4 +1,5 @@
 VAR plan = "none"
+EXTERNAL calmed(id)
 
 === window ===
 {plan != "none": -> again}
@@ -42,5 +43,18 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === fountain ===
-Pink bubbles... and it smells like bubblegum? # speaker: Fae
+{calmed("frog"):
+    The bubbles are gone. The fountain sparkles like new! # speaker: Fae
+- else:
+    Pink bubbles... and it smells like bubblegum? # speaker: Fae
+}
+-> DONE
+
+=== frog_calm ===
+{frog_calm > 1: -> again}
+Ribbit! Thank you for the song, Fae. My head feels all clear now. # speaker: Fountain Frog
+Something purple fizzed into my fountain last night. It tasted like trouble! # speaker: Fountain Frog
+-> DONE
+= again
+Ribbit! The fountain is singing again. # speaker: Fountain Frog
 -> DONE

@@ -34,6 +34,19 @@ export type CloverhollowHook = {
       choices: string[];
       selected: number;
     };
+    critters: { id: string; frame: string }[];
+    battle: {
+      phase: string | null;
+      ring: { x: number; y: number; radius: number } | null;
+      frogFrame: string;
+      layout: {
+        frog: { x: number; baseline: number; height: number };
+        fae: { x: number; baseline: number; height: number };
+      } | null;
+      backdrop: { x: number; y: number; width: number; height: number } | null;
+      overworldVisible: boolean;
+      auraAlpha: number;
+    };
   };
 };
 

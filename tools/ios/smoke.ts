@@ -81,17 +81,23 @@ function runAxe(axe: string, args: string[]): string {
 }
 
 function readFrame(axe: string, udid: string): Frame {
-  const parsed: unknown = JSON.parse(runAxe(axe, ["describe-ui", "--udid", udid]));
-  if (!Array.isArray(parsed)) throw new Error("AXe describe-ui returned no tree");
+  const parsed: unknown = JSON.parse(
+    runAxe(axe, ["describe-ui", "--udid", udid]),
+  );
+  if (!Array.isArray(parsed))
+    throw new Error("AXe describe-ui returned no tree");
   const root = parsed[0];
   if (typeof root !== "object" || root === null || !("frame" in root)) {
     throw new Error("AXe describe-ui did not return an application frame");
   }
   const frame = root.frame;
   if (
-    typeof frame !== "object" || frame === null ||
-    !("width" in frame) || !("height" in frame) ||
-    typeof frame.width !== "number" || typeof frame.height !== "number"
+    typeof frame !== "object" ||
+    frame === null ||
+    !("width" in frame) ||
+    !("height" in frame) ||
+    typeof frame.width !== "number" ||
+    typeof frame.height !== "number"
   ) {
     throw new Error("AXe application frame is malformed");
   }
@@ -104,23 +110,32 @@ function parseStates(line: string): State[] {
   const parsed: unknown = JSON.parse(match[1]);
   if (typeof parsed !== "object" || parsed === null) return [];
   if (
-    "tick" in parsed && typeof parsed.tick === "number" &&
-    "area" in parsed && typeof parsed.area === "string" &&
-    "x" in parsed && typeof parsed.x === "number" &&
-    "y" in parsed && typeof parsed.y === "number" &&
-    "facing" in parsed && typeof parsed.facing === "string"
-    && "moving" in parsed && typeof parsed.moving === "boolean"
-    && "target" in parsed && (parsed.target === null || typeof parsed.target === "string")
+    "tick" in parsed &&
+    typeof parsed.tick === "number" &&
+    "area" in parsed &&
+    typeof parsed.area === "string" &&
+    "x" in parsed &&
+    typeof parsed.x === "number" &&
+    "y" in parsed &&
+    typeof parsed.y === "number" &&
+    "facing" in parsed &&
+    typeof parsed.facing === "string" &&
+    "moving" in parsed &&
+    typeof parsed.moving === "boolean" &&
+    "target" in parsed &&
+    (parsed.target === null || typeof parsed.target === "string")
   ) {
-    return [{
-      tick: parsed.tick,
-      area: parsed.area,
-      x: parsed.x,
-      y: parsed.y,
-      facing: parsed.facing,
-      moving: parsed.moving,
-      target: parsed.target,
-    }];
+    return [
+      {
+        tick: parsed.tick,
+        area: parsed.area,
+        x: parsed.x,
+        y: parsed.y,
+        facing: parsed.facing,
+        moving: parsed.moving,
+        target: parsed.target,
+      },
+    ];
   }
   return [];
 }
@@ -131,15 +146,25 @@ function record(value: unknown): value is Record<string, unknown> {
 
 function box(value: unknown): value is Box | null {
   if (value === null) return true;
-  return record(value) && typeof value.x === "number" && typeof value.y === "number" &&
-    typeof value.width === "number" && typeof value.height === "number";
+  return (
+    record(value) &&
+    typeof value.x === "number" &&
+    typeof value.y === "number" &&
+    typeof value.width === "number" &&
+    typeof value.height === "number"
+  );
 }
 
 function parseLayout(line: string): Layout | undefined {
   const match = line.match(/\[cloverhollow\] layout (\{.*\})/);
   if (match === null || match[1] === undefined) return undefined;
   const value: unknown = JSON.parse(match[1]);
-  if (!record(value) || !box(value.confirm) || !box(value.cancel) || !box(value.menu))
+  if (
+    !record(value) ||
+    !box(value.confirm) ||
+    !box(value.cancel) ||
+    !box(value.menu)
+  )
     return undefined;
   return { confirm: value.confirm, cancel: value.cancel, menu: value.menu };
 }
@@ -155,9 +180,13 @@ function parseDialogue(line: string): DialogueLog | undefined {
   const match = line.match(/\[cloverhollow\] dialogue (\{.*\})/);
   if (match === null || match[1] === undefined) return undefined;
   const value: unknown = JSON.parse(match[1]);
-  if (!record(value) || typeof value.open !== "boolean" ||
-      (value.speaker !== null && typeof value.speaker !== "string") ||
-      typeof value.text !== "string") return undefined;
+  if (
+    !record(value) ||
+    typeof value.open !== "boolean" ||
+    (value.speaker !== null && typeof value.speaker !== "string") ||
+    typeof value.text !== "string"
+  )
+    return undefined;
   return { open: value.open, speaker: value.speaker, text: value.text };
 }
 
@@ -216,8 +245,10 @@ async function main(): Promise<void> {
   const axe = findAxe();
   const frame = readFrame(axe, udid);
   if (frame.width < frame.height) {
-    throw new Error(`The simulator is in portrait (${frame.width}x${frame.height}); ` +
-      "run `just ios-smoke`, which runs `just ios-sim` to rotate it first");
+    throw new Error(
+      `The simulator is in portrait (${frame.width}x${frame.height}); ` +
+        "run `just ios-smoke`, which runs `just ios-sim` to rotate it first",
+    );
   }
   const directory = join(
     process.env.TMPDIR ?? "/tmp",
@@ -227,7 +258,9 @@ async function main(): Promise<void> {
   mkdirSync(directory, { recursive: true });
   const transcriptPath = join(directory, "console-pty.log");
   writeFileSync(transcriptPath, "");
-  const transcript = { write: (text: string): void => appendFileSync(transcriptPath, text) };
+  const transcript = {
+    write: (text: string): void => appendFileSync(transcriptPath, text),
+  };
   const states: State[] = [];
   const layouts: Layout[] = [];
   const dialogues: DialogueLog[] = [];
@@ -235,26 +268,57 @@ async function main(): Promise<void> {
   const pointers: string[] = [];
   const child = Bun.spawn({
     cmd: [
-      "xcrun", "simctl", "launch", "--console-pty",
-      "--terminate-running-process", udid, bundleId,
+      "xcrun",
+      "simctl",
+      "launch",
+      "--console-pty",
+      "--terminate-running-process",
+      udid,
+      bundleId,
     ],
     stdout: "pipe",
     stderr: "pipe",
   });
   const stdout = child.stdout;
   const stderr = child.stderr;
-  if (stdout === null || stderr === null) throw new Error("console-pty had no pipes");
-  const output = consume(stdout, transcript, states, layouts, dialogues, dialogueBoxes, pointers);
-  const errors = consume(stderr, transcript, states, layouts, dialogues, dialogueBoxes, pointers);
+  if (stdout === null || stderr === null)
+    throw new Error("console-pty had no pipes");
+  const output = consume(
+    stdout,
+    transcript,
+    states,
+    layouts,
+    dialogues,
+    dialogueBoxes,
+    pointers,
+  );
+  const errors = consume(
+    stderr,
+    transcript,
+    states,
+    layouts,
+    dialogues,
+    dialogueBoxes,
+    pointers,
+  );
   try {
     await waitFor(states, (items) => items.length > 0);
     const before = states[0];
     if (before === undefined) throw new Error("Initial state line disappeared");
     const beforeScreenshot = join(directory, "before.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", beforeScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      beforeScreenshot,
+    ]);
     const startX = Math.round(frame.width * 0.17);
     const startY = Math.round(frame.height * 0.62);
-    const until = async (predicate: () => boolean, milliseconds: number): Promise<boolean> => {
+    const until = async (
+      predicate: () => boolean,
+      milliseconds: number,
+    ): Promise<boolean> => {
       for (let waited = 0; waited < milliseconds; waited += 100) {
         if (predicate()) return true;
         await Bun.sleep(100);
@@ -265,13 +329,27 @@ async function main(): Promise<void> {
     // reached the web view, so retry once before failing loudly. `axe drag`
     // sends explicit, evenly spaced moves; `axe swipe` sometimes delivers a
     // whole gesture inside one frame, so the game never sees the stick move.
-    const drag = async (dx: number, dy: number, seconds: number): Promise<void> => {
+    const drag = async (
+      dx: number,
+      dy: number,
+      seconds: number,
+    ): Promise<void> => {
       for (let attempt = 0; attempt < 2; attempt += 1) {
         const before = pointers.length;
         runAxe(axe, [
-          "drag", "--start-x", String(startX), "--start-y", String(startY),
-          "--end-x", String(Math.round(startX + dx)), "--end-y", String(Math.round(startY + dy)),
-          "--duration", String(seconds), "--udid", udid,
+          "drag",
+          "--start-x",
+          String(startX),
+          "--start-y",
+          String(startY),
+          "--end-x",
+          String(Math.round(startX + dx)),
+          "--end-y",
+          String(Math.round(startY + dy)),
+          "--duration",
+          String(seconds),
+          "--udid",
+          udid,
         ]);
         if (await until(() => pointers.length > before, 2000)) return;
       }
@@ -294,34 +372,53 @@ async function main(): Promise<void> {
     // consistently on the simulator. Full-stick drags vary from 77 to 128
     // units, and a leftward drag sometimes releases late (Fae keeps walking
     // until the next touch), so routes are built to tolerate an overshoot.
-    const walkTo = async (goal: { x: number; y: number }, done: (state: State) => boolean,
-      label: string, axis: "x" | "y" | "both" = "both"): Promise<State> => {
+    const walkTo = async (
+      goal: { x: number; y: number },
+      done: (state: State) => boolean,
+      label: string,
+      axis: "x" | "y" | "both" = "both",
+    ): Promise<State> => {
       for (let attempt = 0; attempt < 12; attempt += 1) {
         const current = latest();
         if (done(current)) return current;
         const dx = goal.x - current.x;
         const dy = goal.y - current.y;
-        const horizontal = axis === "both" ? Math.abs(dx) >= Math.abs(dy) : axis === "x";
+        const horizontal =
+          axis === "both" ? Math.abs(dx) >= Math.abs(dy) : axis === "x";
         const sign = Math.sign(horizontal ? dx : dy) || 1;
         await drag(horizontal ? sign * 25 : 0, horizontal ? 0 : sign * 25, 0.6);
         await settle(current.tick);
       }
-      throw new Error(`walk to ${label} did not converge: ${JSON.stringify(latest())}`);
+      throw new Error(
+        `walk to ${label} did not converge: ${JSON.stringify(latest())}`,
+      );
     };
     const tapConfirm = async (): Promise<void> => {
       const layout = layouts[layouts.length - 1];
       const confirm = layout?.confirm;
-      if (confirm === null || confirm === undefined) throw new Error("No confirm layout");
+      if (confirm === null || confirm === undefined)
+        throw new Error("No confirm layout");
       for (let attempt = 0; attempt < 2; attempt += 1) {
         const before = pointers.length;
-        runAxe(axe, ["touch", "-x", String(Math.round(confirm.x + confirm.width / 2)),
-          "-y", String(Math.round(confirm.y + confirm.height / 2)),
-          "--down", "--up", "--delay", "0.1", "--udid", udid]);
+        runAxe(axe, [
+          "touch",
+          "-x",
+          String(Math.round(confirm.x + confirm.width / 2)),
+          "-y",
+          String(Math.round(confirm.y + confirm.height / 2)),
+          "--down",
+          "--up",
+          "--delay",
+          "0.1",
+          "--udid",
+          udid,
+        ]);
         if (await until(() => pointers.length > before, 2000)) return;
       }
       throw new Error("Two AXe taps in a row never reached the web view");
     };
-    const lastDialogue = (): DialogueLog | undefined => dialogues[dialogues.length - 1];
+    const lastDialogue = (): DialogueLog | undefined =>
+      dialogues[dialogues.length - 1];
     await waitFor(layouts, (items) => items.length > 0);
     // The web view drops touches for a moment after launch.
     await Bun.sleep(3000);
@@ -331,34 +428,69 @@ async function main(): Promise<void> {
     // Anywhere in x 588-660 targets the window from below, so rightward steps
     // (+43 each from x 500) land in it without a leftward correction; leftward
     // drags are the ones AXe sometimes releases late.
-    await walkTo({ x: 612, y: 410 }, (state) => !state.moving && state.x >= 588 &&
-      state.x <= 660, "the window's column", "x");
-    const atWindow = await walkTo({ x: 612, y: 345 }, (state) => state.area === "bedroom" &&
-      !state.moving && state.target === "window", "the window", "y");
+    await walkTo(
+      { x: 612, y: 410 },
+      (state) => !state.moving && state.x >= 588 && state.x <= 660,
+      "the window's column",
+      "x",
+    );
+    const atWindow = await walkTo(
+      { x: 612, y: 345 },
+      (state) =>
+        state.area === "bedroom" && !state.moving && state.target === "window",
+      "the window",
+      "y",
+    );
     await tapConfirm();
-    await waitFor(dialogues, (items) => lastDialogue()?.open === true && items.length > 0);
+    await waitFor(
+      dialogues,
+      (items) => lastDialogue()?.open === true && items.length > 0,
+    );
     await Bun.sleep(1500);
     const dialogueScreenshot = join(directory, "dialogue.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", dialogueScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      dialogueScreenshot,
+    ]);
     const dialogueBox = dialogueBoxes[dialogueBoxes.length - 1];
     const controls = layouts[layouts.length - 1];
     if (dialogueBox === undefined || controls === undefined)
       throw new Error("The dialogue box or the touch layout was not logged");
-    const overlaps = (a: Box, b: Box): boolean => a.x < b.x + b.width &&
-      b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+    const overlaps = (a: Box, b: Box): boolean =>
+      a.x < b.x + b.width &&
+      b.x < a.x + a.width &&
+      a.y < b.y + b.height &&
+      b.y < a.y + a.height;
     for (const button of [controls.confirm, controls.cancel]) {
       if (button !== null && overlaps(dialogueBox, button)) {
-        throw new Error(`The dialogue box ${JSON.stringify(dialogueBox)} covers a button ` +
-          JSON.stringify(button));
+        throw new Error(
+          `The dialogue box ${JSON.stringify(dialogueBox)} covers a button ` +
+            JSON.stringify(button),
+        );
       }
     }
     await tapConfirm();
-    await waitFor(dialogues, () => lastDialogue()?.text.startsWith("The fountain") === true);
+    await waitFor(
+      dialogues,
+      () => lastDialogue()?.text.startsWith("The fountain") === true,
+    );
     await Bun.sleep(1500);
     const choicesScreenshot = join(directory, "dialogue-choices.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", choicesScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      choicesScreenshot,
+    ]);
     await tapConfirm();
-    await waitFor(dialogues, () => lastDialogue()?.text.startsWith("Adventure first") === true);
+    await waitFor(
+      dialogues,
+      () => lastDialogue()?.text.startsWith("Adventure first") === true,
+    );
     for (let tap = 0; tap < 4 && lastDialogue()?.open !== false; tap += 1) {
       await Bun.sleep(1500);
       await tapConfirm();
@@ -368,32 +500,129 @@ async function main(): Promise<void> {
     await Bun.sleep(300);
     // Step up into the door trigger's band (y 285-335; safe at x >= 588), then
     // walk left along it, straight into the door.
-    await walkTo({ x: latest().x, y: 310 }, (state) => !state.moving && state.y <= 330,
-      "the door's row", "y");
-    await walkTo({ x: 525, y: latest().y }, (state) => state.area === "plaza",
-      "through the door", "x");
-    await waitFor(states, (items) => items.some((item) => item.area === "plaza"));
+    await walkTo(
+      { x: latest().x, y: 310 },
+      (state) => !state.moving && state.y <= 330,
+      "the door's row",
+      "y",
+    );
+    await walkTo(
+      { x: 525, y: latest().y },
+      (state) => state.area === "plaza",
+      "through the door",
+      "x",
+    );
+    await waitFor(states, (items) =>
+      items.some((item) => item.area === "plaza"),
+    );
     const plaza = states.find((item) => item.area === "plaza");
     if (plaza === undefined) throw new Error("Plaza state line disappeared");
     const plazaScreenshot = join(directory, "plaza.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", plazaScreenshot]);
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      plazaScreenshot,
+    ]);
     await drag(80, 0, 2.0);
-    await waitFor(
-      states,
-      (items) => items.some((item) => item.tick > plaza.tick &&
-        item.area === "plaza" && item.x >= plaza.x + 50),
+    await waitFor(states, (items) =>
+      items.some(
+        (item) =>
+          item.tick > plaza.tick &&
+          item.area === "plaza" &&
+          item.x >= plaza.x + 50,
+      ),
     );
     const after = states[states.length - 1];
     if (after === undefined) throw new Error("Final state line disappeared");
     const afterScreenshot = join(directory, "after.png");
-    execFileSync("xcrun", ["simctl", "io", udid, "screenshot", afterScreenshot]);
-    if (after.tick <= plaza.tick || after.area !== "plaza" ||
-        after.x < plaza.x + 50 || after.facing !== "right") {
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      afterScreenshot,
+    ]);
+    if (
+      after.tick <= plaza.tick ||
+      after.area !== "plaza" ||
+      after.x < plaza.x + 50 ||
+      after.facing !== "right"
+    ) {
       throw new Error(
         `Native drag failed: before=${JSON.stringify(before)} ` +
           `after=${JSON.stringify(after)}`,
       );
     }
+    // Approach the frog only from below and from the right. Leftward AXe drags
+    // are intentionally avoided because they can release late on this device.
+    await walkTo(
+      { x: after.x, y: 850 },
+      (value) => !value.moving && value.y >= 820,
+      "below the frog",
+      "y",
+    );
+    await walkTo(
+      { x: 1000, y: 850 },
+      (value) =>
+        readFileSync(transcriptPath, "utf8").includes('"phase":"intro"'),
+      "the frog",
+      "x",
+    );
+    if (!readFileSync(transcriptPath, "utf8").includes('"phase":"intro"'))
+      throw new Error("Battle intro log did not arrive");
+    for (
+      let attempt = 0;
+      attempt < 4 &&
+      !readFileSync(transcriptPath, "utf8").includes('"phase":"command"');
+      attempt += 1
+    )
+      await tapConfirm();
+    const battleScreenshot = join(directory, "battle-command.png");
+    execFileSync("xcrun", [
+      "simctl",
+      "io",
+      udid,
+      "screenshot",
+      battleScreenshot,
+    ]);
+    const transcriptText = readFileSync(transcriptPath, "utf8");
+    const buttonMatch = transcriptText.match(
+      /\[cloverhollow\] battle-buttons (\[.*\])/,
+    );
+    if (buttonMatch?.[1] === undefined)
+      throw new Error("Battle command rects were not logged");
+    const parsedButtons: unknown = JSON.parse(buttonMatch[1]);
+    if (
+      !Array.isArray(parsedButtons) ||
+      !parsedButtons.every((item) => box(item) && item !== null)
+    )
+      throw new Error("Battle command rect log was malformed");
+    const buttons = parsedButtons;
+    const command = buttons[3];
+    if (command === undefined)
+      throw new Error("Run command rect was not logged");
+    for (const button of [controls.confirm, controls.cancel])
+      if (button !== null && overlaps(command, button))
+        throw new Error("Run overlaps touch controls");
+    runAxe(axe, [
+      "touch",
+      "-x",
+      String(Math.round(command.x + command.width / 2)),
+      "-y",
+      String(Math.round(command.y + command.height / 2)),
+      "--down",
+      "--up",
+      "--delay",
+      "0.1",
+      "--udid",
+      udid,
+    ]);
+    await tapConfirm();
+    await tapConfirm();
+    if (!readFileSync(transcriptPath, "utf8").includes('"phase":null'))
+      throw new Error("Battle did not end after Run");
     console.log(`before: ${JSON.stringify(before)}`);
     console.log(`plaza: ${JSON.stringify(plaza)}`);
     console.log(`after: ${JSON.stringify(after)}`);
@@ -402,12 +631,21 @@ async function main(): Promise<void> {
     console.log(`before screenshot: ${beforeScreenshot}`);
     console.log(`window: ${JSON.stringify(atWindow)}`);
     console.log(`dialogue: ${JSON.stringify(dialogues)}`);
-    console.log(`dialogue box: ${JSON.stringify(dialogueBoxes[0])} ` +
-      `controls: ${JSON.stringify(layouts[layouts.length - 1])}`);
+    console.log(
+      `dialogue box: ${JSON.stringify(dialogueBoxes[0])} ` +
+        `controls: ${JSON.stringify(layouts[layouts.length - 1])}`,
+    );
     console.log(`dialogue screenshot: ${dialogueScreenshot}`);
     console.log(`choices screenshot: ${choicesScreenshot}`);
     console.log(`plaza screenshot: ${plazaScreenshot}`);
     console.log(`after screenshot: ${afterScreenshot}`);
+    console.log(`battle screenshot: ${battleScreenshot}`);
+    console.log(
+      `battle lines: ${readFileSync(transcriptPath, "utf8")
+        .split("\n")
+        .filter((line) => line.includes("[cloverhollow] battle "))
+        .join("\n")}`,
+    );
   } catch (error: unknown) {
     const lines = readFileSync(transcriptPath, "utf8").trimEnd().split("\n");
     console.error("last console lines:");

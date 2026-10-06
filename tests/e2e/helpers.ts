@@ -9,7 +9,10 @@ export async function openHarness(page: Page): Promise<void> {
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
 }
 
-export async function resetPaused(page: Page, fixture = "harness"): Promise<void> {
+export async function resetPaused(
+  page: Page,
+  fixture = "harness",
+): Promise<void> {
   await page.evaluate(async (name) => {
     const hook = window.__cloverhollow;
     if (hook === undefined) throw new Error("hook unavailable");
@@ -66,6 +69,20 @@ export async function renderInfo(page: Page): Promise<{
     choices: string[];
     selected: number;
   };
+  // Everything in CSS px, from the one battle layout (spec 8).
+  critters: { id: string; frame: string }[];
+  battle: {
+    phase: string | null;
+    ring: { x: number; y: number; radius: number } | null;
+    frogFrame: string;
+    layout: {
+      frog: { x: number; baseline: number; height: number };
+      fae: { x: number; baseline: number; height: number };
+    } | null;
+    backdrop: { x: number; y: number; width: number; height: number } | null;
+    overworldVisible: boolean;
+    auraAlpha: number;
+  };
 }> {
   const info = await page.evaluate(() => window.__cloverhollow?.renderInfo());
   if (info === undefined) throw new Error("hook unavailable");
@@ -75,13 +92,26 @@ export async function renderInfo(page: Page): Promise<{
 export function bunHash(scriptPath: string, fixture = "harness"): string {
   const result = spawnSync(
     "bun",
-    ["tools/sim/run.ts", scriptPath, "--fixture", fixture, "--seed", "1", "--json"],
+    [
+      "tools/sim/run.ts",
+      scriptPath,
+      "--fixture",
+      fixture,
+      "--seed",
+      "1",
+      "--json",
+    ],
     { encoding: "utf8" },
   );
   if (result.status !== 0) throw new Error(result.stderr);
   const parsed: unknown = JSON.parse(result.stdout);
-  if (typeof parsed !== "object" || parsed === null || !("hash" in parsed) ||
-      typeof parsed.hash !== "string") throw new Error(`invalid sim output: ${result.stdout}`);
+  if (
+    typeof parsed !== "object" ||
+    parsed === null ||
+    !("hash" in parsed) ||
+    typeof parsed.hash !== "string"
+  )
+    throw new Error(`invalid sim output: ${result.stdout}`);
   return parsed.hash;
 }
 
@@ -102,7 +132,9 @@ export async function pixelAt(
       const context = canvas.getContext("2d");
       if (context === null) throw new Error("2d canvas unavailable");
       context.drawImage(image, 0, 0);
-      return Array.from(context.getImageData(input.x, input.y, 1, 1).data.slice(0, 3));
+      return Array.from(
+        context.getImageData(input.x, input.y, 1, 1).data.slice(0, 3),
+      );
     },
     { data: png.toString("base64"), x, y },
   );

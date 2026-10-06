@@ -1,0 +1,20 @@
+{
+  "commands": {
+    "soothe": {
+      "label": "Soothe",
+      "snackDetail": null
+    },
+    "play": {
+      "label": "Play",
+      "snackDetail": null
+    },
+    "snack": {
+      "label": "Snack",
+      "snackDetail": "×N"
+    },
+    "run": {
+      "label": "Run",
+      "snackDetail": null
+    }
+  }
+}

@@ -48,11 +48,18 @@ export type Area = {
     point: Point;
     prompt: "Look" | "Talk";
   }[];
+  critters: { id: string; point: Point }[];
   spawns: Record<string, Spawn>;
 };
 export type GroundManifest = {
   paper: string;
-  tiles: { file: string; x: number; y: number; width: number; height: number }[];
+  tiles: {
+    file: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }[];
 };
 export type OccluderManifest = {
   cutouts: { id: string; file: string; x: number; y: number }[];
@@ -61,6 +68,122 @@ export type World = {
   tunables: Tunables;
   areas: Record<string, Area>;
   story: Record<string, unknown>;
+  critters: Record<string, Critter>;
+  battle: BattleContent;
+};
+export type BattleContent = {
+  commands: Record<
+    CritterCommandId,
+    { label: string; snackDetail: string | null }
+  >;
+};
+export type Grade = "great" | "good" | "miss";
+export type CritterCommandId = "soothe" | "play" | "snack" | "run";
+export type Critter = {
+  id: string;
+  name: string;
+  calmName: string;
+  atlas: string;
+  figureHeight: number;
+  overworldHeight: number;
+  battleHeight: number;
+  touchRadius: number;
+  calmMax: number;
+  energyMax: number;
+  snacks: number;
+  sticker: { id: string; name: string; frame: string };
+  calmKnot: string;
+  calmPrompt: "Look" | "Talk";
+  commands: {
+    soothe: { calm: number; great: number; good: number };
+    play: { calm: number; great: number; good: number; rest: number };
+    snack: { calm: number; energy: number };
+  };
+  timing: {
+    aimTicks: number;
+    targetTick: number;
+    greatWindow: number;
+    goodWindow: number;
+  };
+  burst: {
+    ticks: number;
+    targetTick: number;
+    greatWindow: number;
+    goodWindow: number;
+    bigChance: number;
+  };
+  lines: {
+    intro: string;
+    command: string;
+    soothe: Record<Grade, string>;
+    play: Record<Grade, string>;
+    snack: string;
+    playResting: string;
+    burst: string;
+    burstResult: Record<Grade, string>;
+    soothed: string;
+    reward: string;
+    rest: string;
+    run: string;
+  };
+};
+export type BattlePhase =
+  | "intro"
+  | "command"
+  | "aim"
+  | "result"
+  | "burst"
+  | "burstResult"
+  | "soothed"
+  | "reward"
+  | "rest"
+  | "run";
+export type Battle = {
+  critterId: string;
+  entry: Point;
+  phase: BattlePhase;
+  message: string;
+  revealed: number;
+  selected: number;
+  command: "soothe" | "play" | null;
+  energy: number;
+  calm: number;
+  snacks: number;
+  rest: number;
+  aim: {
+    side: "critter" | "fae";
+    ticks: number;
+    targetTick: number;
+    greatWindow: number;
+    goodWindow: number;
+  } | null;
+  lastGrade: Grade | null;
+  rewardSticker: string | null;
+  aimTick: number;
+  phaseTicks: number;
+};
+export type BattleView = {
+  phase: BattlePhase;
+  message: string;
+  revealed: number;
+  commands: {
+    id: CritterCommandId;
+    label: string;
+    detail: string | null;
+    disabled: boolean;
+  }[];
+  selected: number;
+  energy: number;
+  energyMax: number;
+  calm: number;
+  calmMax: number;
+  aim: {
+    side: "critter" | "fae";
+    progress: number;
+    target: number;
+  } | null;
+  lastGrade: Grade | null;
+  rewardSticker: string | null;
 };
 export type Fixture = { area: string; spawn: string; seed?: number };
 export type State = {
@@ -94,5 +217,9 @@ export type State = {
     selected: number;
     ended: boolean;
   } | null;
+  critters: Record<string, "chaos" | "calm">;
+  stickers: string[];
+  safeSpot: { area: string; spawn: string };
+  battle: Battle | null;
 };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

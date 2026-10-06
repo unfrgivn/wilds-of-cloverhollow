@@ -333,15 +333,66 @@ ios/            Capacitor iOS project (from Milestone 4).
   600, and body copy uses 400 for readable small-size text.
 
 ## 8. Calm-down battles (v0)
-- Touching a chaos-touched critter starts a battle. Battles are turn-based,
-  short (under 2 minutes), and readable.
-- Goal: fill the critter's Calm meter. Chaos bursts drain Fae's Energy. At
-  zero Energy, Fae "needs a rest" and returns to the last safe spot with
-  nothing lost.
-- Prototype actions: Soothe, Play (Maddie), Snack, Run. A timed button press
-  during an action adds a bonus; a timed press during a chaos burst softens it.
-- Outcomes depend only on state, the seeded PRNG, and inputs.
-- Winning turns the critter back to normal and awards a sticker.
+- Content: `content/critters/*.json` (validated by the loader) supplies every
+  battle number and line: the touch radius, calm and energy maxima, snacks,
+  command values, aim windows, the burst, the sticker, and the calm knot and
+  prompt. Shared command labels and the Snack `×N` template live in
+  `content/battle.json`. State adds `critters` (chaos or calm), `stickers`,
+  `safeSpot`, and a nullable `battle`.
+- Start: crossing into a chaos critter's touch circle (outside on the previous
+  tick, inside now; exactly on the radius counts as inside) starts a battle and
+  records `battle.entry`, Fae's position on the tick before. A calm critter
+  never battles; it is a Talk target at its point with its `calmKnot`.
+- Flow (messages type like dialogue: a confirm press shows the whole line, the
+  next press advances):
+
+  ```
+  intro -> command --Soothe/Play--> aim (on the critter) -> result
+                   --Snack--------> result
+                   --Run----------> run -> ends at entry, facing away
+  result -> soothed -> reward -> ends: critter calm, sticker added once
+            (when calm reached calmMax)
+         -> burst -> aim (on Fae) -> burstResult -> command
+            (or rest when energy reaches 0)
+  rest -> door-style fade to safeSpot; the critter stays chaos; nothing lost
+  ```
+
+- Commands: up/down edges skip disabled commands; confirm or a touch `choose`
+  picks. The chosen command id is stored in the battle. Play rests for its
+  content turns; Snack shows its count and is disabled at zero.
+- Aim: the first confirm edge is graded by its distance in ticks from the
+  target (great window, then good); no press by the end is a miss. Soothe and
+  Play add their calm plus the grade bonus, clamped to `calmMax`. In a burst a
+  seeded PRNG draw picks base damage 1 or 2 (`bigChance`); great, good, and
+  miss deal 0, base minus 1, and base.
+- While a battle runs Fae is frozen, doors don't fire, cancel and menu are
+  ignored (v0), and Maddie keeps settling. `safeSpot` is set at new game and
+  on every area arrival.
+- Ink: the adapter binds a pure external `calmed(id)`, answered from facts the
+  core passes in. Once the frog is calm the fountain has a new line, and the
+  frog has his own talk (a first visit, then a revisit line).
+- Overworld: each critter is drawn at its point, y-sorted with the characters
+  and occluders, its figure `overworldHeight` units tall: chaos with its aura
+  pulsing and turning behind it, calm without.
+- Battle scene (render only), from one pure CSS-px layout
+  (`src/render/battle-layout.ts`) at the overworld scale: the frog's figure is
+  `battleHeight` units tall with its body centre at (0.5 W, 0.42 H); Fae, seen
+  from behind, stands with her baseline at (0.22 W, 0.57 H) and Maddie sits
+  beside her. This clears the HUD, command menu, message box, and touch
+  buttons on phones and desktops. The aura turns about its own centroid on the
+  frog's body. The timing ring is centred on the frog's (in a burst, Fae's)
+  body centre with a radius of 0.55 times the figure height.
+- Backdrop: the area painting itself, scaled so its painted interior (8% in
+  from each side, past the watercolour's paper margins) covers the canvas plus
+  a 32 px margin, centred on the critter and clamped, softly blurred, with a
+  light cream wash. The overworld characters hide during the battle.
+- Shell: `data-battle="open"` is on the root while a battle runs. Battle
+  messages use the dialogue box with no speaker and hide when empty. Dev
+  builds log `[cloverhollow] battle {phase, message}` and the command buttons'
+  rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
+  backdrop rect, the ring, the frog frame, the aura alpha, and whether the
+  overworld is visible; `renderInfo().critters` lists each overworld critter's
+  frame.
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
@@ -370,6 +421,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `data-battle="open"` on the root hides the movement stick; confirm and cancel
   stay. Every battle text pair measures at least 4.5:1 contrast in the gallery
   tests.
+- The Pixi battle scene dims the loaded area painting and presents the critter,
+  Fae, Maddie, and aura in a fixed logical composition. It is render-only. The
+  shell logs `[cloverhollow] battle` with phase and message changes, and
+  `renderInfo()` exposes the phase, timing-ring request, and critter frame.
 
 ## 9. Journal and stickers
 - The journal is the pause menu: Notes (current goals, written from Ink) and a
@@ -477,7 +532,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Gate: the owner approves the style of the first character and the first area
   before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
   hair with bangs and a high bun, white sneakers with orange trim, journal in
-  the backpack), the bedroom at 70% scale, the town plaza, and Maddie.
+  the backpack), the bedroom at 70% scale, the town plaza, Maddie, and the Fountain Frog atlas.
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

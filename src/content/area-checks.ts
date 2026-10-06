@@ -5,6 +5,7 @@ import {
   type Area,
   type Point,
   type Tunables,
+  type Critter,
 } from "../core";
 
 /**
@@ -24,6 +25,11 @@ import {
 const GRID = 5;
 const BODY_HALF_WIDTH = 25;
 const BODY_HEIGHT = 140;
+const distance = (a: Point, b: Point): number => {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+};
 
 export type HiddenPosition = Point & { coverage: number; occluders: string[] };
 
@@ -33,7 +39,8 @@ function walkable(area: Area, radius: number, point: Point): boolean {
     distanceToPolygon(point, area.walkable) >= radius &&
     area.blockers.every(
       (blocker) =>
-        !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius,
+        !pointInPolygon(point, blocker) &&
+        distanceToPolygon(point, blocker) >= radius,
     )
   );
 }
@@ -68,15 +75,26 @@ export function reachablePositions(area: Area, radius: number): Point[] {
   return reachable;
 }
 
-function bodyCoverage(area: Area, feet: Point): { coverage: number; occluders: string[] } {
-  const covering = area.occluders.filter((occluder) => feet.y < occluder.baseline);
+function bodyCoverage(
+  area: Area,
+  feet: Point,
+): { coverage: number; occluders: string[] } {
+  const covering = area.occluders.filter(
+    (occluder) => feet.y < occluder.baseline,
+  );
   const ids = new Set<string>();
   let covered = 0;
   let samples = 0;
   for (let y = feet.y - BODY_HEIGHT; y <= feet.y; y += GRID) {
-    for (let x = feet.x - BODY_HALF_WIDTH; x <= feet.x + BODY_HALF_WIDTH; x += GRID) {
+    for (
+      let x = feet.x - BODY_HALF_WIDTH;
+      x <= feet.x + BODY_HALF_WIDTH;
+      x += GRID
+    ) {
       samples += 1;
-      const occluder = covering.find((item) => pointInPolygon({ x, y }, item.polygon));
+      const occluder = covering.find((item) =>
+        pointInPolygon({ x, y }, item.polygon),
+      );
       if (occluder === undefined) continue;
       covered += 1;
       ids.add(occluder.id);
@@ -99,6 +117,7 @@ export function hiddenPositions(
 export function areaConnectionErrors(
   areas: Record<string, Area>,
   tunables: Tunables,
+  critters: Record<string, Critter> = {},
 ): string[] {
   const radius = tunables.playerRadius;
   const { slot, radius: maddieRadius, heel } = tunables.follow;
@@ -113,14 +132,54 @@ export function areaConnectionErrors(
         return dx * dx + dy * dy <= range * range;
       });
       if (!reachablePoint)
-        errors.push(`${area.id}: interactable ${interactable.id} is unreachable`);
+        errors.push(
+          `${area.id}: interactable ${interactable.id} is unreachable`,
+        );
+    }
+    for (const critter of area.critters) {
+      const config = critter.id;
+      const touchRadius = critters[critter.id]?.touchRadius ?? 70;
+      const reachableTouch = reachable.some((point) => {
+        const dx = point.x - critter.point.x;
+        const dy = point.y - critter.point.y;
+        return dx * dx + dy * dy <= touchRadius * touchRadius;
+      });
+      if (!reachableTouch)
+        errors.push(
+          `${area.id}: critter ${config} touch circle is unreachable`,
+        );
+      if (
+        area.triggers.some(
+          (trigger) =>
+            pointInPolygon(critter.point, trigger.polygon) ||
+            distanceToPolygon(critter.point, trigger.polygon) <= touchRadius,
+        )
+      )
+        errors.push(`${area.id}: critter ${config} overlaps a door trigger`);
+      if (
+        Object.values(area.spawns).some(
+          (spawn) => distance(spawn, critter.point) <= touchRadius,
+        )
+      )
+        errors.push(`${area.id}: critter ${config} overlaps a spawn`);
+      if (area.interactables.some((item) => item.id === `critter:${config}`))
+        continue;
+      if (
+        area.id === "plaza" &&
+        !reachable.some(
+          (point) => distance(point, critter.point) <= tunables.interact.range,
+        )
+      )
+        errors.push(`${area.id}: calm ${config} talk point is unreachable`);
     }
     for (const [name, spawn] of Object.entries(area.spawns)) {
       if (followerSlot(area, spawn, slot, maddieRadius, heel) === undefined)
         errors.push(`${area.id}: spawn ${name} has no Maddie slot`);
       for (const trigger of area.triggers) {
-        if (pointInPolygon(spawn, trigger.polygon) ||
-            distanceToPolygon(spawn, trigger.polygon) < radius * 2)
+        if (
+          pointInPolygon(spawn, trigger.polygon) ||
+          distanceToPolygon(spawn, trigger.polygon) < radius * 2
+        )
           errors.push(
             `${area.id}: spawn ${name} is within ${radius * 2} units of ${trigger.id}`,
           );
@@ -128,7 +187,10 @@ export function areaConnectionErrors(
     }
     for (const trigger of area.triggers) {
       const target = areas[trigger.target.area];
-      if (target === undefined || target.spawns[trigger.target.spawn] === undefined)
+      if (
+        target === undefined ||
+        target.spawns[trigger.target.spawn] === undefined
+      )
         errors.push(`${area.id}: trigger ${trigger.id} has an invalid target`);
       if (!reachable.some((point) => pointInPolygon(point, trigger.polygon)))
         errors.push(`${area.id}: trigger ${trigger.id} is unreachable`);

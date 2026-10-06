@@ -6,6 +6,8 @@ import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
+import frogData from "../../content/critters/frog.json";
+import battleData from "../../content/battle.json";
 import type {
   Area,
   Direction,
@@ -16,6 +18,10 @@ import type {
   World,
   GroundManifest,
   OccluderManifest,
+  Critter,
+  Grade,
+  BattleContent,
+  CritterCommandId,
 } from "../core";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -57,7 +63,11 @@ function storyJson(value: unknown, file: string): Record<string, unknown> {
   return value;
 }
 
-function numberValue(value: Record<string, unknown>, name: string, file: string): number {
+function numberValue(
+  value: Record<string, unknown>,
+  name: string,
+  file: string,
+): number {
   const result = value[name];
   field(typeof result === "number", file, name);
   return result;
@@ -110,12 +120,31 @@ export function parseArea(value: unknown, file: string): Area {
     "blockers",
   );
   field(
+    value.critters === undefined ||
+      (Array.isArray(value.critters) &&
+        value.critters.every(
+          (item) =>
+            record(item) &&
+            typeof item.id === "string" &&
+            record(item.point) &&
+            typeof item.point.x === "number" &&
+            typeof item.point.y === "number",
+        )),
+    file,
+    "critters",
+  );
+  field(
     value.triggers === undefined ||
-      (Array.isArray(value.triggers) && value.triggers.every((item) =>
-        record(item) && typeof item.id === "string" && polygon(item.polygon) &&
-        record(item.target) && typeof item.target.area === "string" &&
-        typeof item.target.spawn === "string",
-      )),
+      (Array.isArray(value.triggers) &&
+        value.triggers.every(
+          (item) =>
+            record(item) &&
+            typeof item.id === "string" &&
+            polygon(item.polygon) &&
+            record(item.target) &&
+            typeof item.target.area === "string" &&
+            typeof item.target.spawn === "string",
+        )),
     file,
     "triggers",
   );
@@ -126,24 +155,30 @@ export function parseArea(value: unknown, file: string): Area {
   );
   field(
     value.interactables === undefined ||
-      (Array.isArray(value.interactables) && value.interactables.every((item) =>
-        record(item) && typeof item.id === "string" && typeof item.knot === "string" &&
-        record(item.point) && typeof item.point.x === "number" &&
-        typeof item.point.y === "number" &&
-        (item.prompt === "Look" || item.prompt === "Talk"),
-      )),
+      (Array.isArray(value.interactables) &&
+        value.interactables.every(
+          (item) =>
+            record(item) &&
+            typeof item.id === "string" &&
+            typeof item.knot === "string" &&
+            record(item.point) &&
+            typeof item.point.x === "number" &&
+            typeof item.point.y === "number" &&
+            (item.prompt === "Look" || item.prompt === "Talk"),
+        )),
     file,
     "interactables",
   );
   field(
     value.occluders === undefined ||
-      (Array.isArray(value.occluders) && value.occluders.every(
-        (item) =>
-          record(item) &&
-          typeof item.id === "string" &&
-          polygon(item.polygon) &&
-          typeof item.baseline === "number",
-      )),
+      (Array.isArray(value.occluders) &&
+        value.occluders.every(
+          (item) =>
+            record(item) &&
+            typeof item.id === "string" &&
+            polygon(item.polygon) &&
+            typeof item.baseline === "number",
+        )),
     file,
     "occluders",
   );
@@ -182,7 +217,165 @@ export function parseArea(value: unknown, file: string): Area {
       point: { x: item.point.x, y: item.point.y },
       prompt: item.prompt,
     })),
+    critters: (value.critters ?? []).map((item) => ({
+      id: item.id,
+      point: { x: item.point.x, y: item.point.y },
+    })),
     spawns,
+  };
+}
+
+function gradeMap(
+  value: unknown,
+  file: string,
+  name: string,
+): Record<Grade, string> {
+  field(record(value), file, name);
+  const get = (grade: Grade): string => {
+    const item = value[grade];
+    field(typeof item === "string", file, `${name}.${grade}`);
+    return item;
+  };
+  return { great: get("great"), good: get("good"), miss: get("miss") };
+}
+
+export function parseCritter(value: unknown, file: string): Critter {
+  field(record(value), file, "object");
+  const text = (object: Record<string, unknown>, name: string): string => {
+    const item = object[name];
+    field(typeof item === "string", file, name);
+    return item;
+  };
+  const number = (object: Record<string, unknown>, name: string): number => {
+    const item = object[name];
+    field(typeof item === "number" && item >= 0, file, name);
+    return item;
+  };
+  const id = text(value, "id");
+  const name = text(value, "name");
+  const calmName = text(value, "calmName");
+  const atlas = text(value, "atlas");
+  const calmKnot = text(value, "calmKnot");
+  const calmPrompt = value.calmPrompt;
+  field(calmPrompt === "Look" || calmPrompt === "Talk", file, "calmPrompt");
+  const sticker = value.sticker;
+  field(record(sticker), file, "sticker");
+  const stickerValue = {
+    id: text(sticker, "id"),
+    name: text(sticker, "name"),
+    frame: text(sticker, "frame"),
+  };
+  const commands = value.commands;
+  field(record(commands), file, "commands");
+  const command = (
+    commandName: string,
+    keys: string[],
+  ): Record<string, number> => {
+    const raw = commands[commandName];
+    field(record(raw), file, `commands.${commandName}`);
+    return Object.fromEntries(keys.map((key) => [key, number(raw, key)]));
+  };
+  const timing = value.timing;
+  field(record(timing), file, "timing");
+  const timingValue = {
+    aimTicks: number(timing, "aimTicks"),
+    targetTick: number(timing, "targetTick"),
+    greatWindow: number(timing, "greatWindow"),
+    goodWindow: number(timing, "goodWindow"),
+  };
+  const burst = value.burst;
+  field(record(burst), file, "burst");
+  const burstValue = {
+    ticks: number(burst, "ticks"),
+    targetTick: number(burst, "targetTick"),
+    greatWindow: number(burst, "greatWindow"),
+    goodWindow: number(burst, "goodWindow"),
+    bigChance: number(burst, "bigChance"),
+  };
+  field(burstValue.bigChance <= 1, file, "burst.bigChance");
+  const lines = value.lines;
+  field(record(lines), file, "lines");
+  const line = (key: string): string => text(lines, key);
+  const sootheRaw = command("soothe", ["calm", "great", "good"]);
+  const playRaw = command("play", ["calm", "great", "good", "rest"]);
+  const snackRaw = command("snack", ["calm", "energy"]);
+  return {
+    id,
+    name,
+    calmName,
+    atlas,
+    figureHeight: number(value, "figureHeight"),
+    overworldHeight: number(value, "overworldHeight"),
+    battleHeight: number(value, "battleHeight"),
+    touchRadius: number(value, "touchRadius"),
+    calmMax: number(value, "calmMax"),
+    energyMax: number(value, "energyMax"),
+    snacks: number(value, "snacks"),
+    sticker: stickerValue,
+    calmKnot,
+    calmPrompt,
+    commands: {
+      soothe: {
+        calm: number(sootheRaw, "calm"),
+        great: number(sootheRaw, "great"),
+        good: number(sootheRaw, "good"),
+      },
+      play: {
+        calm: number(playRaw, "calm"),
+        great: number(playRaw, "great"),
+        good: number(playRaw, "good"),
+        rest: number(playRaw, "rest"),
+      },
+      snack: {
+        calm: number(snackRaw, "calm"),
+        energy: number(snackRaw, "energy"),
+      },
+    },
+    timing: timingValue,
+    burst: burstValue,
+    lines: {
+      intro: line("intro"),
+      command: line("command"),
+      soothe: gradeMap(lines.soothe, file, "lines.soothe"),
+      play: gradeMap(lines.play, file, "lines.play"),
+      snack: line("snack"),
+      playResting: line("playResting"),
+      burst: line("burst"),
+      burstResult: gradeMap(lines.burstResult, file, "lines.burstResult"),
+      soothed: line("soothed"),
+      reward: line("reward"),
+      rest: line("rest"),
+      run: line("run"),
+    },
+  };
+}
+
+export function parseBattleContent(
+  value: unknown,
+  file: string,
+): BattleContent {
+  field(record(value) && record(value.commands), file, "commands");
+  const commands = value.commands;
+  const command = (
+    id: CritterCommandId,
+  ): { label: string; snackDetail: string | null } => {
+    const raw = commands[id];
+    field(
+      record(raw) &&
+        typeof raw.label === "string" &&
+        (raw.snackDetail === null || typeof raw.snackDetail === "string"),
+      file,
+      `commands.${id}`,
+    );
+    return { label: raw.label, snackDetail: raw.snackDetail };
+  };
+  return {
+    commands: {
+      soothe: command("soothe"),
+      play: command("play"),
+      snack: command("snack"),
+      run: command("run"),
+    },
   };
 }
 
@@ -210,8 +403,10 @@ export function parseGroundManifest(
   const tiles = value.tiles.map((item, index) => {
     field(record(item), file, `tiles.${index}`);
     field(
-      typeof item.file === "string" && typeof item.x === "number" &&
-        typeof item.y === "number" && typeof item.width === "number" &&
+      typeof item.file === "string" &&
+        typeof item.x === "number" &&
+        typeof item.y === "number" &&
+        typeof item.width === "number" &&
         typeof item.height === "number",
       file,
       `tiles.${index}`,
@@ -236,8 +431,10 @@ export function parseOccluderManifest(
   const cutouts = value.cutouts.map((item, index) => {
     field(record(item), file, `cutouts.${index}`);
     field(
-      typeof item.id === "string" && typeof item.file === "string" &&
-        typeof item.x === "number" && typeof item.y === "number",
+      typeof item.id === "string" &&
+        typeof item.file === "string" &&
+        typeof item.x === "number" &&
+        typeof item.y === "number",
       file,
       `cutouts.${index}`,
     );
@@ -254,17 +451,25 @@ export function loadContent(): {
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
   const plaza = parseArea(plazaData, "content/areas/plaza.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
+  const frog = parseCritter(frogData, "content/critters/frog.json");
+  const battle = parseBattleContent(battleData, "content/battle.json");
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
     plaza: parseFixture(plazaFixtureData, "content/fixtures/plaza.json"),
   };
-  const areas = { [harness.id]: harness, [bedroom.id]: bedroom, [plaza.id]: plaza };
+  const areas = {
+    [harness.id]: harness,
+    [bedroom.id]: bedroom,
+    [plaza.id]: plaza,
+  };
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas,
       story,
+      critters: { [frog.id]: frog },
+      battle,
     },
     fixtures,
   };

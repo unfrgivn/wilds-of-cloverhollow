@@ -1,0 +1,1238 @@
+[
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 25
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 15
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 50
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 35
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 38
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 59
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  }
+]

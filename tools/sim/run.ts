@@ -18,15 +18,39 @@ const seedIndex = process.argv.indexOf("--seed");
 const seed = seedIndex < 0 ? undefined : Number(process.argv[seedIndex + 1]);
 let state = createState(content.world, fixture, seed);
 let previousDialogueLine = "";
+let previousBattleLine = "";
+let previousTransitionLine = "";
 for (const item of parsed) {
   for (let index = 0; index < item.ticks; index += 1) {
     state = step(content.world, state, item.frame).state;
     if (process.argv.includes("--trace") && state.dialogue !== null) {
       const line = `${state.dialogue.speaker ?? ""}|${state.dialogue.text}`;
       if (line !== previousDialogueLine) {
-        console.log(`dialogue tick=${state.tick} speaker=${state.dialogue.speaker ?? ""} ` +
-          `text=${state.dialogue.text}`);
+        console.log(
+          `dialogue tick=${state.tick} speaker=${state.dialogue.speaker ?? ""} ` +
+            `text=${state.dialogue.text}`,
+        );
         previousDialogueLine = line;
+      }
+    }
+    if (process.argv.includes("--trace") && state.battle !== null) {
+      const line = `${state.battle.phase}|${state.battle.message}`;
+      if (line !== previousBattleLine) {
+        console.log(
+          `battle tick=${state.tick} phase=${state.battle.phase} message=${state.battle.message}`,
+        );
+        previousBattleLine = line;
+      }
+    }
+    if (process.argv.includes("--trace")) {
+      const line =
+        state.transition === null
+          ? "none"
+          : `${state.transition.phase}:${state.area}`;
+      if (line !== previousTransitionLine) {
+        if (state.transition !== null)
+          console.log(`transition tick=${state.tick} phase=${line}`);
+        previousTransitionLine = line;
       }
     }
   }
@@ -36,9 +60,15 @@ const result = {
   tick: state.tick,
   x: state.player.x,
   y: state.player.y,
+  frog: state.critters.frog,
+  stickers: state.stickers,
+  battle: state.battle?.phase ?? null,
+  transition: state.transition?.phase ?? null,
 };
 console.log(
   process.argv.includes("--json")
     ? JSON.stringify(result)
-    : `${result.hash} tick=${result.tick} player=(${result.x},${result.y})`,
+    : `${result.hash} tick=${result.tick} player=(${result.x},${result.y}) ` +
+      `frog=${result.frog} stickers=${result.stickers.join(",")} ` +
+      `battle=${result.battle ?? "none"} transition=${result.transition ?? "none"}`,
 );

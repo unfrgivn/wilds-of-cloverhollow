@@ -392,13 +392,110 @@
         null
       ],
       "fountain": [
-        "^Pink bubbles... and it smells like bubblegum? ",
-        "#",
-        "^speaker: Fae",
-        "/#",
+        "ev",
+        "str",
+        "^frog",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^The bubbles are gone. The fountain sparkles like new! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^Pink bubbles... and it smells like bubblegum? ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         null
+      ],
+      "frog_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Ribbit! Thank you for the song, Fae. My head feels all clear now. ",
+        "#",
+        "^speaker: Fountain Frog",
+        "/#",
+        "\n",
+        "^Something purple fizzed into my fountain last night. It tasted like trouble! ",
+        "#",
+        "^speaker: Fountain Frog",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Ribbit! The fountain is singing again. ",
+            "#",
+            "^speaker: Fountain Frog",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
       ],
       "global decl": [
         "ev",

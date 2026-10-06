@@ -8,6 +8,10 @@ import type {
   Spawn,
   State,
   World,
+  Battle,
+  Grade,
+  CritterCommandId,
+  BattleView,
 } from "./types";
 import { createInkState, runInk } from "./ink";
 
@@ -28,10 +32,15 @@ export function createState(
     throw new Error(`Unknown fixture area: ${fixture.area}`);
   const spawn = area.spawns[fixture.spawn];
   if (spawn === undefined) throw new Error(`Unknown spawn: ${fixture.spawn}`);
-  const slot = followerSlot(area, spawn,
-    world.tunables.follow.slot, world.tunables.follow.radius,
-    world.tunables.follow.heel);
-  if (slot === undefined) throw new Error(`No Maddie slot for ${fixture.area}.${fixture.spawn}`);
+  const slot = followerSlot(
+    area,
+    spawn,
+    world.tunables.follow.slot,
+    world.tunables.follow.radius,
+    world.tunables.follow.heel,
+  );
+  if (slot === undefined)
+    throw new Error(`No Maddie slot for ${fixture.area}.${fixture.spawn}`);
   return {
     tick: 0,
     area: area.id,
@@ -51,6 +60,12 @@ export function createState(
     trail: [slot, { x: spawn.x, y: spawn.y }],
     ink: createInkState(world.story, seed),
     dialogue: null,
+    critters: Object.fromEntries(
+      Object.keys(world.critters).map((id) => [id, "chaos"]),
+    ),
+    stickers: [],
+    safeSpot: { area: area.id, spawn: fixture.spawn },
+    battle: null,
   };
 }
 
@@ -149,7 +164,11 @@ function pushFromPolygon(
   };
 }
 
-export function resolveCollision(point: Point, area: Area, radius: number): Point {
+export function resolveCollision(
+  point: Point,
+  area: Area,
+  radius: number,
+): Point {
   let result = point;
   for (let pass = 0; pass < 8; pass += 1) {
     result = pushFromPolygon(result, area.walkable, radius, true);
@@ -172,9 +191,24 @@ export function targetInteractable(
   if (state.transition !== null || state.dialogue !== null) return undefined;
   const area = world.areas[state.area];
   if (area === undefined) return undefined;
-  const facing = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
-    left: { x: -1, y: 0 }, right: { x: 1, y: 0 } }[state.facing];
-  return area.interactables
+  const facing = {
+    up: { x: 0, y: -1 },
+    down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 },
+    right: { x: 1, y: 0 },
+  }[state.facing];
+  const calmCritters = area.critters.flatMap((critter) => {
+    const content = world.critters[critter.id];
+    return state.critters[critter.id] === "calm" && content !== undefined
+      ? [{
+          id: `critter:${critter.id}`,
+          knot: content.calmKnot,
+          point: critter.point,
+          prompt: content.calmPrompt,
+        }]
+      : [];
+  });
+  return [...area.interactables, ...calmCritters]
     .map((item) => {
       const dx = item.point.x - state.player.x;
       const dy = item.point.y - state.player.y;
@@ -182,8 +216,374 @@ export function targetInteractable(
       const dot = length === 0 ? 1 : (dx * facing.x + dy * facing.y) / length;
       return { item, length, dot };
     })
-    .filter((item) => item.length <= world.tunables.interact.range && item.dot >= 0.34)
+    .filter(
+      (item) =>
+        item.length <= world.tunables.interact.range && item.dot >= 0.34,
+    )
     .sort((a, b) => a.length - b.length)[0]?.item;
+}
+
+function battleMessage(
+  battle: Battle,
+  text: string,
+  phase: Battle["phase"],
+): Battle {
+  return { ...battle, phase, message: text, revealed: 0, phaseTicks: 0 };
+}
+
+export function gradeAim(delta: number, great: number, good: number): Grade {
+  const absolute = Math.abs(delta);
+  return absolute <= great ? "great" : absolute <= good ? "good" : "miss";
+}
+
+export function battleCommands(
+  world: World,
+  state: State,
+): {
+  id: CritterCommandId;
+  label: string;
+  detail: string | null;
+  disabled: boolean;
+}[] {
+  const battle = state.battle;
+  if (battle === null) return [];
+  const critter = world.critters[battle.critterId];
+  if (critter === undefined) return [];
+  return [
+    {
+      id: "soothe",
+      label: world.battle.commands.soothe.label,
+      detail: null,
+      disabled: false,
+    },
+    {
+      id: "play",
+      label: world.battle.commands.play.label,
+      detail: battle.rest > 0 ? critter.lines.playResting : null,
+      disabled: battle.rest > 0,
+    },
+    {
+      id: "snack",
+      label: world.battle.commands.snack.label,
+      detail: (world.battle.commands.snack.snackDetail ?? "").replace(
+        "N",
+        String(battle.snacks),
+      ),
+      disabled: battle.snacks === 0,
+    },
+    {
+      id: "run",
+      label: world.battle.commands.run.label,
+      detail: null,
+      disabled: false,
+    },
+  ];
+}
+
+export function battleView(world: World, state: State): BattleView | null {
+  const battle = state.battle;
+  if (battle === null) return null;
+  const critter = world.critters[battle.critterId];
+  if (critter === undefined) return null;
+  return {
+    phase: battle.phase,
+    message: battle.message,
+    revealed: battle.revealed,
+    commands: battleCommands(world, state),
+    selected: battle.selected,
+    energy: battle.energy,
+    energyMax: critter.energyMax,
+    calm: battle.calm,
+    calmMax: critter.calmMax,
+    aim:
+      battle.aim === null
+        ? null
+        : {
+            side: battle.aim.side,
+            progress: battle.aimTick / battle.aim.ticks,
+            target: battle.aim.targetTick / battle.aim.ticks,
+          },
+    lastGrade: battle.lastGrade,
+    rewardSticker: battle.rewardSticker,
+  };
+}
+
+function nextCommand(
+  selected: number,
+  delta: number,
+  commands: ReturnType<typeof battleCommands>,
+): number {
+  let result = selected;
+  for (let count = 0; count < commands.length; count += 1) {
+    result = (result + delta + commands.length) % commands.length;
+    if (!commands[result]?.disabled) return result;
+  }
+  return selected;
+}
+
+function startAim(
+  battle: Battle,
+  side: "critter" | "fae",
+  ticks: number,
+  targetTick: number,
+  greatWindow: number,
+  goodWindow: number,
+): Battle {
+  return {
+    ...battle,
+    phase: "aim",
+    aim: { side, ticks, targetTick, greatWindow, goodWindow },
+    aimTick: 0,
+    phaseTicks: 0,
+    lastGrade: null,
+    message: "",
+    revealed: 0,
+  };
+}
+
+function battleStep(world: World, state: State, input: ActionFrame): State {
+  const battle = state.battle;
+  if (battle === null) return state;
+  const critter = world.critters[battle.critterId];
+  if (critter === undefined) return state;
+  const confirm = input.confirm && !state.previousInput.confirm;
+  const nextBase = {
+    ...state,
+    tick: state.tick + 1,
+    previousInput: { ...input },
+    motion: { ...state.motion, moving: false },
+    maddie: {
+      ...state.maddie,
+      stillTicks: state.maddie.stillTicks + 1,
+      motion: { ...state.maddie.motion, moving: false },
+    },
+  };
+  let next = { ...battle, phaseTicks: battle.phaseTicks + 1 };
+  if (next.revealed < next.message.length)
+    return {
+      ...nextBase,
+      battle: {
+        ...next,
+        revealed: confirm
+          ? next.message.length
+          : Math.min(
+              next.message.length,
+              next.revealed + world.tunables.interact.revealPerTick,
+            ),
+      },
+    };
+  if (
+    [
+      "intro",
+      "result",
+      "burst",
+      "burstResult",
+      "run",
+      "soothed",
+      "reward",
+      "rest",
+    ].includes(next.phase)
+  ) {
+    if (!confirm) return { ...nextBase, battle: next };
+    if (next.phase === "intro")
+      next = {
+        ...next,
+        phase: "command",
+        message: critter.lines.command,
+        revealed: 0,
+        phaseTicks: 0,
+      };
+    else if (next.phase === "result")
+      next =
+        next.calm >= critter.calmMax
+          ? battleMessage(next, critter.lines.soothed, "soothed")
+          : battleMessage(next, critter.lines.burst, "burst");
+    else if (next.phase === "burst")
+      next = startAim(
+        next,
+        "fae",
+        critter.burst.ticks,
+        critter.burst.targetTick,
+        critter.burst.greatWindow,
+        critter.burst.goodWindow,
+      );
+    else if (next.phase === "burstResult")
+      next =
+        next.energy <= 0
+          ? battleMessage(next, critter.lines.rest, "rest")
+          : {
+              ...next,
+              phase: "command",
+              message: critter.lines.command,
+              revealed: 0,
+              phaseTicks: 0,
+              rest: next.rest,
+            };
+    else if (next.phase === "soothed")
+      next = battleMessage(next, critter.lines.reward, "reward");
+    else if (next.phase === "reward")
+      return {
+        ...nextBase,
+        critters: { ...state.critters, [next.critterId]: "calm" },
+        stickers: state.stickers.includes(critter.sticker.id)
+          ? state.stickers
+          : [...state.stickers, critter.sticker.id],
+        battle: null,
+      };
+    else if (next.phase === "run")
+      return {
+        ...nextBase,
+        player: { ...next.entry },
+        facing:
+          state.facing === "up"
+            ? "down"
+            : state.facing === "down"
+              ? "up"
+              : state.facing === "left"
+                ? "right"
+                : "left",
+        battle: null,
+      };
+    else if (next.phase === "rest")
+      next = { ...next, phase: "rest", phaseTicks: next.phaseTicks };
+    if (
+      next.phase === "rest" &&
+      battle.phase === "rest" &&
+      state.transition === null
+    )
+      return {
+        ...nextBase,
+        battle: null,
+        transition: { target: state.safeSpot, phase: "out", elapsed: 0 },
+      };
+    return { ...nextBase, battle: next };
+  }
+  if (next.phase === "command") {
+    const commands = battleCommands(world, { ...state, battle: next });
+    if (input.choose !== undefined) {
+      const chosen = commands[input.choose];
+      if (chosen !== undefined && !chosen.disabled)
+        next = { ...next, selected: input.choose };
+      else return { ...nextBase, battle: next };
+    }
+    const up = input.move.y < -0.5 && state.previousInput.move.y >= -0.5;
+    const down = input.move.y > 0.5 && state.previousInput.move.y <= 0.5;
+    if (up || down)
+      return {
+        ...nextBase,
+        battle: {
+          ...next,
+          selected: nextCommand(next.selected, down ? 1 : -1, commands),
+        },
+      };
+    if (!confirm && input.choose === undefined)
+      return { ...nextBase, battle: next };
+    const chosen = commands[next.selected];
+    if (chosen === undefined || chosen.disabled)
+      return { ...nextBase, battle: next };
+    if (chosen.id === "run")
+      return {
+        ...nextBase,
+        battle: battleMessage(next, critter.lines.run, "run"),
+      };
+    if (chosen.id === "snack") {
+      const message = battleMessage(next, critter.lines.snack, "result");
+      return {
+        ...nextBase,
+        battle: {
+          ...message,
+          rest: Math.max(0, next.rest - 1),
+          snacks: next.snacks - 1,
+          energy: Math.min(
+            critter.energyMax,
+            next.energy + critter.commands.snack.energy,
+          ),
+          calm: Math.min(
+            critter.calmMax,
+            next.calm + critter.commands.snack.calm,
+          ),
+        },
+      };
+    }
+    const timing = critter.timing;
+    return {
+      ...nextBase,
+      battle: startAim(
+        {
+          ...next,
+          command: chosen.id === "play" ? "play" : "soothe",
+          rest:
+            chosen.id === "play"
+              ? critter.commands.play.rest
+              : Math.max(0, next.rest - 1),
+        },
+        "critter",
+        timing.aimTicks,
+        timing.targetTick,
+        timing.greatWindow,
+        timing.goodWindow,
+      ),
+    };
+  }
+  if (next.phase === "aim" && next.aim !== null) {
+    const aim = next.aim;
+    const press = confirm;
+    const tick = next.aimTick + 1;
+    const result: Grade | null =
+      press || tick >= aim.ticks
+        ? press
+          ? gradeAim(tick - aim.targetTick, aim.greatWindow, aim.goodWindow)
+          : "miss"
+        : null;
+    if (result === null)
+      return {
+        ...nextBase,
+        battle: {
+          ...next,
+          aimTick: tick,
+          aim: { ...aim },
+        },
+      };
+    if (aim.side === "critter") {
+      const command =
+        next.command === "play"
+          ? critter.commands.play
+          : critter.commands.soothe;
+      const bonus =
+        result === "great"
+          ? command.great
+          : result === "good"
+            ? command.good
+            : 0;
+      const calm = Math.min(critter.calmMax, next.calm + command.calm + bonus);
+      return {
+        ...nextBase,
+        battle: battleMessage(
+          {
+            ...next,
+            calm,
+            lastGrade: result,
+            rewardSticker: calm >= critter.calmMax ? critter.sticker.id : null,
+          },
+          critter.lines[next.command === "play" ? "play" : "soothe"][result],
+          "result",
+        ),
+      };
+    }
+    const random = nextRandom(nextBase);
+    const base = random[0] < critter.burst.bigChance ? 2 : 1;
+    const damage =
+      result === "great" ? 0 : result === "good" ? Math.max(0, base - 1) : base;
+    return {
+      ...random[1],
+      battle: battleMessage(
+        { ...next, energy: next.energy - damage, lastGrade: result },
+        critter.lines.burstResult[result],
+        "burstResult",
+      ),
+    };
+  }
+  return { ...nextBase, battle: next };
 }
 
 function dialogueState(
@@ -211,11 +611,7 @@ function dialogueState(
  *   shown, choices    ──confirm / touch choose──▶ Ink choose ▶ next line
  *   shown, no choices ──confirm──▶ Ink next ▶ next line, or closed when ended
  */
-function dialogueStep(
-  world: World,
-  state: State,
-  input: ActionFrame,
-): State {
+function dialogueStep(world: World, state: State, input: ActionFrame): State {
   const dialogue = state.dialogue;
   if (dialogue === null) return state;
   const previous = state.previousInput;
@@ -234,9 +630,9 @@ function dialogueStep(
     const revealed = confirm
       ? dialogue.text.length
       : Math.min(
-        dialogue.text.length,
-        dialogue.revealed + world.tunables.interact.revealPerTick,
-      );
+          dialogue.text.length,
+          dialogue.revealed + world.tunables.interact.revealPerTick,
+        );
     return { ...next, dialogue: { ...dialogue, revealed } };
   }
   const count = dialogue.choices.length;
@@ -247,23 +643,29 @@ function dialogueStep(
     return {
       ...next,
       ink: result.ink,
-      dialogue: result.line === null && result.choices.length === 0
-        ? null
-        : dialogueState(dialogue.knot, result),
+      dialogue:
+        result.line === null && result.choices.length === 0
+          ? null
+          : dialogueState(dialogue.knot, result),
     };
   }
-  const tapped = input.choose !== undefined && input.choose >= 0 && input.choose < count
-    ? input.choose
-    : undefined;
+  const tapped =
+    input.choose !== undefined && input.choose >= 0 && input.choose < count
+      ? input.choose
+      : undefined;
   const chosen = tapped ?? (confirm ? dialogue.selected : undefined);
   if (chosen !== undefined) {
-    const result = runInk(world.story, state.ink, { type: "choose", index: chosen });
+    const result = runInk(world.story, state.ink, {
+      type: "choose",
+      index: chosen,
+    });
     return {
       ...next,
       ink: result.ink,
-      dialogue: result.line === null && result.choices.length === 0
-        ? null
-        : dialogueState(dialogue.knot, result),
+      dialogue:
+        result.line === null && result.choices.length === 0
+          ? null
+          : dialogueState(dialogue.knot, result),
     };
   }
   const up = input.move.y < -0.5 && previous.move.y >= -0.5;
@@ -282,17 +684,25 @@ function segmentClear(area: Area, start: Point, end: Point): boolean {
       x: start.x + (end.x - start.x) * ratio,
       y: start.y + (end.y - start.y) * ratio,
     };
-    if (!pointInPolygon(point, area.walkable) ||
-        area.blockers.some((blocker) => pointInPolygon(point, blocker))) return false;
+    if (
+      !pointInPolygon(point, area.walkable) ||
+      area.blockers.some((blocker) => pointInPolygon(point, blocker))
+    )
+      return false;
   }
   return true;
 }
 
 function validFollowerPoint(area: Area, point: Point, radius: number): boolean {
-  return pointInPolygon(point, area.walkable) &&
+  return (
+    pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius &&
-    area.blockers.every((blocker) =>
-      !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius);
+    area.blockers.every(
+      (blocker) =>
+        !pointInPolygon(point, blocker) &&
+        distanceToPolygon(point, blocker) >= radius,
+    )
+  );
 }
 
 export function followerSlot(
@@ -332,16 +742,22 @@ export function visibleFollowerSlot(
     { x: fae.x - sign * heel, y: fae.y + 24 },
   ];
   const candidates = [...heelCandidates];
-  const direction = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
-    left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+  const direction = {
+    up: { x: 0, y: -1 },
+    down: { x: 0, y: 1 },
+    left: { x: -1, y: 0 },
+    right: { x: 1, y: 0 },
+  };
   const facings: Spawn["facing"][] = ["up", "down", "left", "right"];
   for (const facing of facings) {
     const vector = direction[facing];
     candidates.push({ x: fae.x - vector.x * slot, y: fae.y - vector.y * slot });
   }
-  return candidates.find((point) =>
-    validFollowerPoint(area, point, radius) && segmentClear(area, start, point) &&
-    hiddenFraction(point, fae) === 0,
+  return candidates.find(
+    (point) =>
+      validFollowerPoint(area, point, radius) &&
+      segmentClear(area, start, point) &&
+      hiddenFraction(point, fae) === 0,
   );
 }
 
@@ -365,35 +781,60 @@ function updateMaddie(
   const tune = world.tunables.follow;
   const trail = state.trail.slice();
   const last = trail[trail.length - 1];
-  if (playerMoved && (last === undefined || distance(last, player) >= tune.trailSpacing))
+  if (
+    playerMoved &&
+    (last === undefined || distance(last, player) >= tune.trailSpacing)
+  )
     trail.push({ ...player });
   while (trail.length > tune.trailMax) trail.shift();
   const route = [...trail, player];
   const direct = distance(state.maddie, player);
-  if (!playerMoved &&
-      state.maddie.stillTicks >= tune.settleDelayTicks &&
-      hiddenFraction(state.maddie, player) > 0.25) {
-    const slot = visibleFollowerSlot(area, player, state.maddie, tune.heel,
-      tune.slot, tune.radius);
+  if (
+    !playerMoved &&
+    state.maddie.stillTicks >= tune.settleDelayTicks &&
+    hiddenFraction(state.maddie, player) > 0.25
+  ) {
+    const slot = visibleFollowerSlot(
+      area,
+      player,
+      state.maddie,
+      tune.heel,
+      tune.slot,
+      tune.radius,
+    );
     if (slot !== undefined && segmentClear(area, state.maddie, slot)) {
       const length = distance(state.maddie, slot);
       const amount = Math.min(world.tunables.walkSpeed / 60, length);
       const ratio = length === 0 ? 0 : amount / length;
-      const position = resolveCollision({
-        x: state.maddie.x + (slot.x - state.maddie.x) * ratio,
-        y: state.maddie.y + (slot.y - state.maddie.y) * ratio,
-      }, area, tune.radius);
+      const position = resolveCollision(
+        {
+          x: state.maddie.x + (slot.x - state.maddie.x) * ratio,
+          y: state.maddie.y + (slot.y - state.maddie.y) * ratio,
+        },
+        area,
+        tune.radius,
+      );
       const dx = position.x - state.maddie.x;
       const dy = position.y - state.maddie.y;
-      const facing = Math.abs(dx) >= Math.abs(dy)
-        ? dx < 0 ? "left" : "right"
-        : dy < 0 ? "up" : "down";
+      const facing =
+        Math.abs(dx) >= Math.abs(dy)
+          ? dx < 0
+            ? "left"
+            : "right"
+          : dy < 0
+            ? "up"
+            : "down";
       const moved = distance(state.maddie, position);
       return {
         maddie: {
-          x: position.x, y: position.y, facing,
+          x: position.x,
+          y: position.y,
+          facing,
           stillTicks: state.maddie.stillTicks + 1,
-          motion: { distance: state.maddie.motion.distance + moved, moving: moved > 0.0001 },
+          motion: {
+            distance: state.maddie.motion.distance + moved,
+            moving: moved > 0.0001,
+          },
         },
         trail,
       };
@@ -401,8 +842,11 @@ function updateMaddie(
   }
   if (direct <= tune.stop && segmentClear(area, state.maddie, player)) {
     return {
-      maddie: { ...state.maddie, stillTicks: state.maddie.stillTicks + 1,
-        motion: { ...state.maddie.motion, moving: false } },
+      maddie: {
+        ...state.maddie,
+        stillTicks: state.maddie.stillTicks + 1,
+        motion: { ...state.maddie.motion, moving: false },
+      },
       trail: trail.slice(-1),
     };
   }
@@ -412,13 +856,17 @@ function updateMaddie(
     : routeLength > tune.distance;
   if (!moving) {
     return {
-      maddie: { ...state.maddie, stillTicks: state.maddie.stillTicks + 1,
-        motion: { ...state.maddie.motion, moving: false } },
+      maddie: {
+        ...state.maddie,
+        stillTicks: state.maddie.stillTicks + 1,
+        motion: { ...state.maddie.motion, moving: false },
+      },
       trail,
     };
   }
   let position = { x: state.maddie.x, y: state.maddie.y };
-  let remaining = (world.tunables.walkSpeed / 60) *
+  let remaining =
+    (world.tunables.walkSpeed / 60) *
     (routeLength > tune.distance + 40 ? tune.catchUp : 1);
   const targets = route.slice();
   while (remaining > 0 && targets.length > 0) {
@@ -442,12 +890,14 @@ function updateMaddie(
   const dx = resolved.x - state.maddie.x;
   const dy = resolved.y - state.maddie.y;
   let facing = state.maddie.facing;
-  if (Math.abs(dx) >= Math.abs(dy) && dx !== 0) facing = dx < 0 ? "left" : "right";
+  if (Math.abs(dx) >= Math.abs(dy) && dx !== 0)
+    facing = dx < 0 ? "left" : "right";
   else if (dy !== 0) facing = dy < 0 ? "up" : "down";
   const moved = Math.sqrt(dx * dx + dy * dy);
   // `route` ends with Fae's live position, which is a walking target but not a
   // breadcrumb: keep only the unconsumed breadcrumbs so the spacing holds.
-  const unvisited = targets[targets.length - 1] === player ? targets.slice(0, -1) : targets;
+  const unvisited =
+    targets[targets.length - 1] === player ? targets.slice(0, -1) : targets;
   return {
     maddie: {
       x: resolved.x,
@@ -470,7 +920,10 @@ export function step(
 ): { state: State; events: Event[] } {
   const area = world.areas[state.area];
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
-  if (state.dialogue !== null) return { state: dialogueStep(world, state, input), events: [] };
+  if (state.battle !== null)
+    return { state: battleStep(world, state, input), events: [] };
+  if (state.dialogue !== null)
+    return { state: dialogueStep(world, state, input), events: [] };
   if (state.transition !== null) {
     const transition = state.transition;
     const elapsed = transition.elapsed + 1;
@@ -480,8 +933,13 @@ export function step(
       if (targetArea === undefined) throw new Error("Unknown transition area");
       const spawn = targetArea.spawns[transition.target.spawn];
       if (spawn === undefined) throw new Error("Unknown transition spawn");
-      const slot = followerSlot(targetArea, spawn, world.tunables.follow.slot,
-        world.tunables.follow.radius, world.tunables.follow.heel);
+      const slot = followerSlot(
+        targetArea,
+        spawn,
+        world.tunables.follow.slot,
+        world.tunables.follow.radius,
+        world.tunables.follow.heel,
+      );
       if (slot === undefined) throw new Error("No Maddie transition slot");
       return {
         state: {
@@ -501,6 +959,7 @@ export function step(
             stillTicks: 0,
           },
           trail: [slot, { x: spawn.x, y: spawn.y }],
+          safeSpot: { area: targetArea.id, spawn: transition.target.spawn },
         },
         events: [],
       };
@@ -511,9 +970,10 @@ export function step(
         tick: state.tick + 1,
         previousInput: { ...input },
         motion: { ...state.motion, moving: false },
-        transition: transition.phase === "in" && elapsed >= limit
-          ? null
-          : { ...transition, elapsed },
+        transition:
+          transition.phase === "in" && elapsed >= limit
+            ? null
+            : { ...transition, elapsed },
       },
       events: [],
     };
@@ -521,7 +981,16 @@ export function step(
   if (input.confirm && !state.previousInput.confirm) {
     const target = targetInteractable(world, state);
     if (target !== undefined) {
-      const result = runInk(world.story, state.ink, { type: "start", knot: target.knot });
+      const result = runInk(world.story, state.ink, {
+        type: "start",
+        knot: target.knot,
+        calmed: Object.fromEntries(
+          Object.entries(state.critters).map(([id, value]) => [
+            id,
+            value === "calm",
+          ]),
+        ),
+      });
       return {
         state: {
           ...state,
@@ -530,7 +999,10 @@ export function step(
           previousInput: { ...input },
           dialogue: dialogueState(target.knot, result),
           motion: { ...state.motion, moving: false },
-          maddie: { ...state.maddie, motion: { ...state.maddie.motion, moving: false } },
+          maddie: {
+            ...state.maddie,
+            motion: { ...state.maddie.motion, moving: false },
+          },
         },
         events: [],
       };
@@ -563,19 +1035,62 @@ export function step(
     if (input[button] && !state.previousInput[button])
       events.push({ type: "button", button });
   }
-  const trigger = area.triggers.find((item) =>
-    !pointInPolygon(state.player, item.polygon) &&
-    pointInPolygon(player, item.polygon),
+  const trigger = area.triggers.find(
+    (item) =>
+      !pointInPolygon(state.player, item.polygon) &&
+      pointInPolygon(player, item.polygon),
   );
-  const follower = trigger === undefined
-    ? updateMaddie(world, area, state, player, displacement > 0.0001)
-    : {
-      maddie: {
-        ...state.maddie,
-        motion: { ...state.maddie.motion, moving: false },
-      },
-      trail: state.trail,
-    };
+  const critterEntry = area.critters.find(
+    (item) =>
+      state.critters[item.id] === "chaos" &&
+      distance(state.player, item.point) >
+        (world.critters[item.id]?.touchRadius ?? 0) &&
+      distance(player, item.point) <=
+        (world.critters[item.id]?.touchRadius ?? 0),
+  );
+  if (critterEntry !== undefined) {
+    const critter = world.critters[critterEntry.id];
+    if (critter !== undefined) {
+      const battle: Battle = {
+        critterId: critter.id,
+        entry: { ...state.player },
+        phase: "intro",
+        message: critter.lines.intro,
+        revealed: 0,
+        selected: 0,
+        command: null,
+        energy: critter.energyMax,
+        calm: 0,
+        snacks: critter.snacks,
+        rest: 0,
+        aim: null,
+        lastGrade: null,
+        rewardSticker: null,
+        aimTick: 0,
+        phaseTicks: 0,
+      };
+      return {
+        state: {
+          ...state,
+          tick: state.tick + 1,
+          previousInput: { ...input },
+          battle,
+          motion: { ...state.motion, moving: false },
+        },
+        events,
+      };
+    }
+  }
+  const follower =
+    trigger === undefined
+      ? updateMaddie(world, area, state, player, displacement > 0.0001)
+      : {
+          maddie: {
+            ...state.maddie,
+            motion: { ...state.maddie.motion, moving: false },
+          },
+          trail: state.trail,
+        };
   return {
     state: {
       ...state,
@@ -587,9 +1102,10 @@ export function step(
         distance: state.motion.distance + displacement,
         moving: trigger === undefined && displacement > 0.0001,
       },
-      transition: trigger === undefined
-        ? null
-        : { target: trigger.target, phase: "out", elapsed: 0 },
+      transition:
+        trigger === undefined
+          ? null
+          : { target: trigger.target, phase: "out", elapsed: 0 },
       maddie: follower.maddie,
       trail: follower.trail,
     },

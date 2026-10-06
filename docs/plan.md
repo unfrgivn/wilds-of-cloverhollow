@@ -110,14 +110,26 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   below what the buttons need. It is now pure CSS (spec 7.1), and the smoke run
   asserts the box clears the buttons.
 
-## Milestone 9: Calm-down battle v0
-- Art: one chaos-touched critter in chaos and calm states (owner review).
+## Milestone 9: Calm-down battle v0 **Status:** ✅ Completed (2026-10-05)
+- Art: the owner-approved chaos frog (chaos, burst, soothed, and calm frames,
+  plus a separate aura layer the engine pulses and turns).
 - Core battle state machine (spec 8): Calm meter, Energy, Soothe / Play
   (Maddie) / Snack / Run, timed-press windows measured in ticks, chaos bursts,
   seeded PRNG; zero Energy means a rest and a retry, never a loss of progress.
 - Winning turns the critter calm in the plaza and awards a sticker.
 - Unit (meter math, timing windows), sim (win, rest, run), cross-engine hash,
   e2e with real keys, reviewed baselines.
+- Notes: the battle UI is the sticker kit from cf210b7. The scene follows the
+  approved mock but moves the frog to the centre, because on a phone the
+  command grid owns the right side; one CSS-px layout keeps both combatants
+  clear of every DOM element at phone and desktop sizes (a contract test
+  checks it). The backdrop is the area painting itself, scaled past the
+  watercolour's paper margins and blurred, rather than a captured texture.
+  The overworld frog was missing despite an earlier report; it is drawn and
+  tested now. Player-facing strings (command labels, the calm frog's Talk
+  prompt) live in content. `just ios-smoke` walks into the frog with right and
+  down steps only, opens the battle, checks the command buttons clear the
+  touch controls, and runs away.
 
 ## Milestone 10: Journal and save
 - The journal is the pause menu (J or the menu button): notes written from Ink

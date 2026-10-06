@@ -195,6 +195,19 @@ async function boot(): Promise<void> {
     logTitle = createTitleLogger();
     afterTick(state);
   }
+  // The journal's notes come from running its Ink knot (a Story per line).
+  // They only change with the story and the critters, and the world is frozen
+  // while the journal is open, so they're computed once per change, not per
+  // frame.
+  let journalCache: { ink: string; critters: State["critters"]; notes: string[] } | null =
+    null;
+  const notesNow = (): string[] => {
+    if (journalCache === null || journalCache.ink !== state.ink ||
+        journalCache.critters !== state.critters)
+      journalCache = { ink: state.ink, critters: state.critters,
+        notes: journalNotes(content.world, state) };
+    return journalCache.notes;
+  };
   const render = (): void => {
     view.render(
       state,
@@ -279,7 +292,7 @@ async function boot(): Promise<void> {
     });
     journal.render({
       visible: state.journalOpen,
-      notes: state.journalOpen ? journalNotes(content.world, state) : [],
+      notes: state.journalOpen ? notesNow() : [],
       stickers: state.journalOpen
         ? Array.from({ length: content.world.stickers.slots }, (_, index) => {
             const sticker = content.world.stickers.catalogue[index];

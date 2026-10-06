@@ -193,9 +193,21 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   cross-engine hash, e2e with real keys (plaza to park and back, the pup's
   battle), reviewed baselines, `just ios-smoke` through the park.
 
+## Milestone 14: School day
+- The school hallway (from `school_interior.png`), reached by the plaza's
+  lower-left cobbled path (the road the Pond Pup points to): lockers, the
+  bulletin board, the trophy cabinet, the classroom and nurse's office doors.
+- Two of the school staff (`school_staff_npcs.png`) as people in the area: the
+  classroom teacher by her door, and Holly the nurse by hers.
+- The first "get out of school" puzzle (NOTES.md): during class the front
+  doors need a hall pass. Saying the right thing earns one. Engine: a door
+  trigger can require a story variable; without it, its knot plays instead
+  and Fae stays inside.
+- Unit (the conditional door, reading story variables), a sim (earning the
+  pass and leaving), cross-engine hash, e2e with real keys (locked doors, the
+  conversation, leaving), reviewed baselines.
+
 ## Roadmap after Milestone 13 (proposed, not scheduled)
-- School day: Fae's classroom and teacher, the first "get out of school"
-  puzzle (saying the right thing, finding an item), per NOTES.md.
 - The raccoon in the purple hood: the first story encounter with the chaos
   caster (concept `chaos_raccoon.png`), who runs off toward the park.
 - Audio: a gentle music bed per area and soft UI sounds (needs the owner's

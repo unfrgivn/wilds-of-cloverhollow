@@ -3,17 +3,21 @@ import type {
   Direction,
   ActionFrame,
   Area,
+  Box,
   Event,
   Fixture,
+  FollowTunables,
+  PartyContent,
+  PartyMember,
   Point,
   Polygon,
   Spawn,
   State,
   World,
   Battle,
-  Grade,
-  CritterCommandId,
   BattleView,
+  Critter,
+  Grade,
 } from "./types";
 import { createInkState, runInk } from "./ink";
 
@@ -23,6 +27,67 @@ export const blankInput = (): ActionFrame => ({
   cancel: false,
   menu: false,
 });
+
+// Fae's feet-anchored body box (spec 5): what her followers hide behind.
+export const faeBox: Box = { width: 50, height: 140 };
+
+function partyContent(world: World, id: string): PartyContent {
+  const content = world.party[id];
+  if (content === undefined) throw new Error(`Unknown party member: ${id}`);
+  return content;
+}
+
+// Where each member stands when the party is placed fresh (a new game, or a
+// door): member 0 at Fae's heel, member i at member i-1's. The chain stops at
+// the first member without a slot.
+export function partySlots(
+  area: Area,
+  fae: Point,
+  follow: FollowTunables,
+  members: PartyContent[],
+): { id: string; slot: Point | undefined }[] {
+  const slots: { id: string; slot: Point | undefined }[] = [];
+  let leader = fae;
+  let leaderBox = faeBox;
+  const taken = [fae];
+  for (const member of members) {
+    const slot = followerSlot(area, leader, follow, member.box, leaderBox, taken);
+    slots.push({ id: member.id, slot });
+    if (slot === undefined) break;
+    taken.push(slot);
+    leader = slot;
+    leaderBox = member.box;
+  }
+  return slots;
+}
+
+function spawnParty(
+  world: World,
+  area: Area,
+  spawn: Spawn,
+  ids: string[],
+): PartyMember[] {
+  const fae = { x: spawn.x, y: spawn.y };
+  const members = ids.map((id) => partyContent(world, id));
+  const slots = partySlots(area, fae, world.tunables.follow, members);
+  let leader = fae;
+  return members.map((member, index) => {
+    const slot = slots[index]?.slot;
+    if (slot === undefined)
+      throw new Error(`No ${member.id} slot at ${area.id} (${spawn.x}, ${spawn.y})`);
+    const placed = {
+      id: member.id,
+      x: slot.x,
+      y: slot.y,
+      facing: spawn.facing,
+      motion: { distance: 0, moving: false },
+      stillTicks: 0,
+      trail: [slot, leader],
+    };
+    leader = slot;
+    return placed;
+  });
+}
 
 export function createState(
   world: World,
@@ -34,15 +99,11 @@ export function createState(
     throw new Error(`Unknown fixture area: ${fixture.area}`);
   const spawn = area.spawns[fixture.spawn];
   if (spawn === undefined) throw new Error(`Unknown spawn: ${fixture.spawn}`);
-  const slot = followerSlot(
-    area,
-    spawn,
-    world.tunables.follow.slot,
-    world.tunables.follow.radius,
-    world.tunables.follow.heel,
-  );
-  if (slot === undefined)
-    throw new Error(`No Maddie slot for ${fixture.area}.${fixture.spawn}`);
+  const ids =
+    fixture.party ??
+    Object.values(world.party)
+      .filter((member) => member.start)
+      .map((member) => member.id);
   return {
     tick: 0,
     area: area.id,
@@ -52,14 +113,7 @@ export function createState(
     previousInput: blankInput(),
     motion: { distance: 0, moving: false },
     transition: null,
-    maddie: {
-      x: slot.x,
-      y: slot.y,
-      facing: spawn.facing,
-      motion: { distance: 0, moving: false },
-      stillTicks: 0,
-    },
-    trail: [slot, { x: spawn.x, y: spawn.y }],
+    party: spawnParty(world, area, spawn, ids),
     ink: createInkState(world.story, seed),
     dialogue: null,
     critters: Object.fromEntries(
@@ -290,19 +344,29 @@ export function gradeAim(delta: number, great: number, good: number): Grade {
   return absolute <= great ? "great" : absolute <= good ? "good" : "miss";
 }
 
+// Soothe, then one command per party member in party order, then Snack and
+// Run (spec 8). A friend's command rests for its content turns after use.
 export function battleCommands(
   world: World,
   state: State,
-): {
-  id: CritterCommandId;
-  label: string;
-  detail: string | null;
-  disabled: boolean;
-}[] {
+): BattleView["commands"] {
   const battle = state.battle;
   if (battle === null) return [];
   const critter = world.critters[battle.critterId];
   if (critter === undefined) return [];
+  const friends = state.party.flatMap((member) => {
+    const content = world.party[member.id];
+    if (content === undefined) return [];
+    const rest = battle.rest[content.command.id] ?? 0;
+    return [
+      {
+        id: content.command.id,
+        label: content.command.label,
+        detail: rest > 0 ? content.command.resting : null,
+        disabled: rest > 0,
+      },
+    ];
+  });
   return [
     {
       id: "soothe",
@@ -310,12 +374,7 @@ export function battleCommands(
       detail: null,
       disabled: false,
     },
-    {
-      id: "play",
-      label: world.battle.commands.play.label,
-      detail: battle.rest > 0 ? critter.lines.playResting : null,
-      disabled: battle.rest > 0,
-    },
+    ...friends,
     {
       id: "snack",
       label: world.battle.commands.snack.label,
@@ -332,6 +391,30 @@ export function battleCommands(
       disabled: false,
     },
   ];
+}
+
+// A turn passes: every resting friend is one turn closer to ready. Entries at
+// zero are dropped, so "missing" is the only way to spell "ready".
+function restTurn(rest: Battle["rest"]): Battle["rest"] {
+  return Object.fromEntries(
+    Object.entries(rest).flatMap(([id, turns]) =>
+      turns > 1 ? [[id, turns - 1]] : [],
+    ),
+  );
+}
+
+// The numbers and lines the critter-side aim resolves with: a friend's
+// command, or Soothe for anything else.
+function critterSideCommand(
+  critter: Critter,
+  command: string | null,
+): { numbers: { calm: number; great: number; good: number }; lines: Record<Grade, string> } {
+  if (command !== null) {
+    const numbers = critter.commands.friends[command];
+    const lines = critter.lines.friends[command];
+    if (numbers !== undefined && lines !== undefined) return { numbers, lines };
+  }
+  return { numbers: critter.commands.soothe, lines: critter.lines.soothe };
 }
 
 export function battleView(world: World, state: State): BattleView | null {
@@ -400,6 +483,25 @@ function startAim(
   };
 }
 
+// The party while Fae is frozen (a battle, a dialogue, the journal): nobody
+// walks, and the still ticks keep counting so Maddie sits.
+function restingParty(party: PartyMember[]): PartyMember[] {
+  return party.map((member) => ({
+    ...member,
+    stillTicks: member.stillTicks + 1,
+    motion: { ...member.motion, moving: false },
+  }));
+}
+
+// The party on a tick that interrupts walking (a door, a talk starting): the
+// walk frames stop, the still count doesn't start yet.
+function haltedParty(party: PartyMember[]): PartyMember[] {
+  return party.map((member) => ({
+    ...member,
+    motion: { ...member.motion, moving: false },
+  }));
+}
+
 function battleStep(world: World, state: State, input: ActionFrame): State {
   const battle = state.battle;
   if (battle === null) return state;
@@ -411,11 +513,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     tick: state.tick + 1,
     previousInput: { ...input },
     motion: { ...state.motion, moving: false },
-    maddie: {
-      ...state.maddie,
-      stillTicks: state.maddie.stillTicks + 1,
-      motion: { ...state.maddie.motion, moving: false },
-    },
+    party: restingParty(state.party),
   };
   let next = { ...battle, phaseTicks: battle.phaseTicks + 1 };
   if (next.revealed < next.message.length)
@@ -551,7 +649,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ...nextBase,
         battle: {
           ...message,
-          rest: Math.max(0, next.rest - 1),
+          rest: restTurn(next.rest),
           snacks: next.snacks - 1,
           energy: Math.min(
             critter.energyMax,
@@ -565,16 +663,17 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       };
     }
     const timing = critter.timing;
+    const friend = critter.commands.friends[chosen.id];
     return {
       ...nextBase,
       battle: startAim(
         {
           ...next,
-          command: chosen.id === "play" ? "play" : "soothe",
+          command: chosen.id,
           rest:
-            chosen.id === "play"
-              ? critter.commands.play.rest
-              : Math.max(0, next.rest - 1),
+            friend === undefined
+              ? restTurn(next.rest)
+              : { ...restTurn(next.rest), [chosen.id]: friend.rest },
         },
         "critter",
         timing.aimTicks,
@@ -604,17 +703,17 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         },
       };
     if (aim.side === "critter") {
-      const command =
-        next.command === "play"
-          ? critter.commands.play
-          : critter.commands.soothe;
+      const command = critterSideCommand(critter, next.command);
       const bonus =
         result === "great"
-          ? command.great
+          ? command.numbers.great
           : result === "good"
-            ? command.good
+            ? command.numbers.good
             : 0;
-      const calm = Math.min(critter.calmMax, next.calm + command.calm + bonus);
+      const calm = Math.min(
+        critter.calmMax,
+        next.calm + command.numbers.calm + bonus,
+      );
       return {
         ...nextBase,
         battle: battleMessage(
@@ -624,7 +723,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
             lastGrade: result,
             rewardSticker: calm >= critter.calmMax ? critter.sticker.id : null,
           },
-          critter.lines[next.command === "play" ? "play" : "soothe"][result],
+          command.lines[result],
           "result",
         ),
       };
@@ -679,11 +778,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     ...state,
     tick: state.tick + 1,
     previousInput: { ...input },
-    maddie: {
-      ...state.maddie,
-      stillTicks: state.maddie.stillTicks + 1,
-      motion: { ...state.maddie.motion, moving: false },
-    },
+    party: restingParty(state.party),
   };
   if (dialogue.revealed < dialogue.text.length) {
     const revealed = confirm
@@ -774,41 +869,72 @@ function validFollowerPoint(area: Area, point: Point, radius: number): boolean {
   );
 }
 
+// A follower's place when the party is placed fresh: at its leader's heel,
+// or behind it. `taken` holds the points already occupied (Fae and the
+// members ahead), which a slot must clear by two radii.
 export function followerSlot(
   area: Area,
-  spawn: Spawn,
-  slot: number,
-  radius: number,
-  heel = slot,
+  leader: Point,
+  follow: FollowTunables,
+  followerBox: Box,
+  leaderBox: Box,
+  taken: Point[] = [leader],
 ): Point | undefined {
-  return visibleFollowerSlot(area, spawn, spawn, heel, slot, radius);
+  return visibleFollowerSlot(
+    area,
+    leader,
+    leader,
+    follow,
+    followerBox,
+    leaderBox,
+    taken,
+  );
 }
 
-export function hiddenFraction(maddie: Point, fae: Point): number {
-  if (maddie.y >= fae.y) return 0;
-  const left = Math.max(maddie.x - 22, fae.x - 25);
-  const right = Math.min(maddie.x + 22, fae.x + 25);
-  const top = Math.max(maddie.y - 60, fae.y - 140);
-  const bottom = Math.min(maddie.y, fae.y);
+// How much of the follower's body box its leader's box covers, when the
+// follower's feet are north of the leader's (drawn behind). Beside or in
+// front is zero.
+export function hiddenFraction(
+  follower: Point,
+  followerBox: Box,
+  leader: Point,
+  leaderBox: Box,
+): number {
+  if (follower.y >= leader.y) return 0;
+  const left = Math.max(
+    follower.x - followerBox.width / 2,
+    leader.x - leaderBox.width / 2,
+  );
+  const right = Math.min(
+    follower.x + followerBox.width / 2,
+    leader.x + leaderBox.width / 2,
+  );
+  const top = Math.max(
+    follower.y - followerBox.height,
+    leader.y - leaderBox.height,
+  );
+  const bottom = Math.min(follower.y, leader.y);
   const width = Math.max(0, right - left);
   const height = Math.max(0, bottom - top);
-  return (width * height) / (44 * 60);
+  return (width * height) / (followerBox.width * followerBox.height);
 }
 
 export function visibleFollowerSlot(
   area: Area,
-  fae: Point,
+  leader: Point,
   start: Point,
-  heel: number,
-  slot: number,
-  radius: number,
+  follow: FollowTunables,
+  followerBox: Box,
+  leaderBox: Box,
+  taken: Point[] = [leader],
 ): Point | undefined {
-  const sign = start.x - fae.x > 0 ? 1 : -1;
+  const { heel, slot, radius } = follow;
+  const sign = start.x - leader.x > 0 ? 1 : -1;
   const heelCandidates = [
-    { x: fae.x + sign * heel, y: fae.y - 6 },
-    { x: fae.x - sign * heel, y: fae.y - 6 },
-    { x: fae.x + sign * heel, y: fae.y + 24 },
-    { x: fae.x - sign * heel, y: fae.y + 24 },
+    { x: leader.x + sign * heel, y: leader.y - 6 },
+    { x: leader.x - sign * heel, y: leader.y - 6 },
+    { x: leader.x + sign * heel, y: leader.y + 24 },
+    { x: leader.x - sign * heel, y: leader.y + 24 },
   ];
   const candidates = [...heelCandidates];
   const direction = {
@@ -820,13 +946,17 @@ export function visibleFollowerSlot(
   const facings: Spawn["facing"][] = ["up", "down", "left", "right"];
   for (const facing of facings) {
     const vector = direction[facing];
-    candidates.push({ x: fae.x - vector.x * slot, y: fae.y - vector.y * slot });
+    candidates.push({
+      x: leader.x - vector.x * slot,
+      y: leader.y - vector.y * slot,
+    });
   }
   return candidates.find(
     (point) =>
       validFollowerPoint(area, point, radius) &&
       segmentClear(area, start, point) &&
-      hiddenFraction(point, fae) === 0,
+      hiddenFraction(point, followerBox, leader, leaderBox) === 0 &&
+      taken.every((occupied) => distance(point, occupied) >= radius * 2),
   );
 }
 
@@ -840,51 +970,78 @@ function pathDistance(start: Point, points: Point[]): number {
   return total;
 }
 
-function updateMaddie(
+// Who a party member walks behind: Fae for member 0, the member ahead for the
+// rest, with the leader's body box for the visibility check.
+export function partyLeader(
+  world: World,
+  state: State,
+  index: number,
+): { point: Point; box: Box } {
+  const ahead = index > 0 ? state.party[index - 1] : undefined;
+  if (ahead === undefined) return { point: state.player, box: faeBox };
+  return {
+    point: { x: ahead.x, y: ahead.y },
+    box: partyContent(world, ahead.id).box,
+  };
+}
+
+/*
+ * One follower's tick along its leader's breadcrumb trail (spec 5). The
+ * leader is Fae (member 0) or the member ahead, already moved this tick.
+ *
+ *   leader moved      ─▶ drop a crumb every trailSpacing, cap at trailMax
+ *   settled & hidden  ─▶ walk to a visible heel slot (still ticks keep counting)
+ *   close & in sight  ─▶ stand still, keep only the newest crumb
+ *   route too short   ─▶ stand still (hysteresis: stop vs distance)
+ *   otherwise         ─▶ walk the route, faster when far behind
+ */
+function updateFollower(
   world: World,
   area: Area,
-  state: State,
-  player: Point,
-  playerMoved: boolean,
-): { maddie: State["maddie"]; trail: Point[] } {
+  member: PartyMember,
+  memberBox: Box,
+  leader: Point,
+  leaderBox: Box,
+  leaderMoved: boolean,
+): PartyMember {
   const tune = world.tunables.follow;
-  const trail = state.trail.slice();
+  const trail = member.trail.slice();
   const last = trail[trail.length - 1];
   if (
-    playerMoved &&
-    (last === undefined || distance(last, player) >= tune.trailSpacing)
+    leaderMoved &&
+    (last === undefined || distance(last, leader) >= tune.trailSpacing)
   )
-    trail.push({ ...player });
+    trail.push({ ...leader });
   while (trail.length > tune.trailMax) trail.shift();
-  const route = [...trail, player];
-  const direct = distance(state.maddie, player);
+  const route = [...trail, leader];
+  const direct = distance(member, leader);
   if (
-    !playerMoved &&
-    state.maddie.stillTicks >= tune.settleDelayTicks &&
-    hiddenFraction(state.maddie, player) > 0.25
+    !leaderMoved &&
+    member.stillTicks >= tune.settleDelayTicks &&
+    hiddenFraction(member, memberBox, leader, leaderBox) > 0.25
   ) {
     const slot = visibleFollowerSlot(
       area,
-      player,
-      state.maddie,
-      tune.heel,
-      tune.slot,
-      tune.radius,
+      leader,
+      member,
+      tune,
+      memberBox,
+      leaderBox,
     );
-    if (slot !== undefined && segmentClear(area, state.maddie, slot)) {
-      const length = distance(state.maddie, slot);
+    if (slot !== undefined && segmentClear(area, member, slot)) {
+      const length = distance(member, slot);
       const amount = Math.min(world.tunables.walkSpeed / 60, length);
       const ratio = length === 0 ? 0 : amount / length;
       const position = resolveCollision(
         {
-          x: state.maddie.x + (slot.x - state.maddie.x) * ratio,
-          y: state.maddie.y + (slot.y - state.maddie.y) * ratio,
+          x: member.x + (slot.x - member.x) * ratio,
+          y: member.y + (slot.y - member.y) * ratio,
         },
         area,
         tune.radius,
       );
-      const dx = position.x - state.maddie.x;
-      const dy = position.y - state.maddie.y;
+      const dx = position.x - member.x;
+      const dy = position.y - member.y;
       const facing =
         Math.abs(dx) >= Math.abs(dy)
           ? dx < 0
@@ -893,47 +1050,42 @@ function updateMaddie(
           : dy < 0
             ? "up"
             : "down";
-      const moved = distance(state.maddie, position);
+      const moved = distance(member, position);
       return {
-        maddie: {
-          x: position.x,
-          y: position.y,
-          facing,
-          stillTicks: state.maddie.stillTicks + 1,
-          motion: {
-            distance: state.maddie.motion.distance + moved,
-            moving: moved > 0.0001,
-          },
+        ...member,
+        x: position.x,
+        y: position.y,
+        facing,
+        stillTicks: member.stillTicks + 1,
+        motion: {
+          distance: member.motion.distance + moved,
+          moving: moved > 0.0001,
         },
         trail,
       };
     }
   }
-  if (direct <= tune.stop && segmentClear(area, state.maddie, player)) {
+  if (direct <= tune.stop && segmentClear(area, member, leader)) {
     return {
-      maddie: {
-        ...state.maddie,
-        stillTicks: state.maddie.stillTicks + 1,
-        motion: { ...state.maddie.motion, moving: false },
-      },
+      ...member,
+      stillTicks: member.stillTicks + 1,
+      motion: { ...member.motion, moving: false },
       trail: trail.slice(-1),
     };
   }
-  const routeLength = pathDistance(state.maddie, route);
-  const moving = state.maddie.motion.moving
+  const routeLength = pathDistance(member, route);
+  const moving = member.motion.moving
     ? routeLength > tune.stop
     : routeLength > tune.distance;
   if (!moving) {
     return {
-      maddie: {
-        ...state.maddie,
-        stillTicks: state.maddie.stillTicks + 1,
-        motion: { ...state.maddie.motion, moving: false },
-      },
+      ...member,
+      stillTicks: member.stillTicks + 1,
+      motion: { ...member.motion, moving: false },
       trail,
     };
   }
-  let position = { x: state.maddie.x, y: state.maddie.y };
+  let position = { x: member.x, y: member.y };
   let remaining =
     (world.tunables.walkSpeed / 60) *
     (routeLength > tune.distance + 40 ? tune.catchUp : 1);
@@ -956,30 +1108,63 @@ function updateMaddie(
     remaining = 0;
   }
   const resolved = resolveCollision(position, area, tune.radius);
-  const dx = resolved.x - state.maddie.x;
-  const dy = resolved.y - state.maddie.y;
-  let facing = state.maddie.facing;
+  const dx = resolved.x - member.x;
+  const dy = resolved.y - member.y;
+  let facing = member.facing;
   if (Math.abs(dx) >= Math.abs(dy) && dx !== 0)
     facing = dx < 0 ? "left" : "right";
   else if (dy !== 0) facing = dy < 0 ? "up" : "down";
   const moved = Math.sqrt(dx * dx + dy * dy);
-  // `route` ends with Fae's live position, which is a walking target but not a
-  // breadcrumb: keep only the unconsumed breadcrumbs so the spacing holds.
+  // `route` ends with the leader's live position, which is a walking target
+  // but not a breadcrumb: keep only the unconsumed breadcrumbs so the spacing
+  // holds.
   const unvisited =
-    targets[targets.length - 1] === player ? targets.slice(0, -1) : targets;
+    targets[targets.length - 1] === leader ? targets.slice(0, -1) : targets;
   return {
-    maddie: {
-      x: resolved.x,
-      y: resolved.y,
-      facing,
-      stillTicks: playerMoved ? 0 : state.maddie.stillTicks + 1,
-      motion: {
-        distance: state.maddie.motion.distance + moved,
-        moving: moved > 0.0001,
-      },
+    ...member,
+    x: resolved.x,
+    y: resolved.y,
+    facing,
+    stillTicks: leaderMoved ? 0 : member.stillTicks + 1,
+    motion: {
+      distance: member.motion.distance + moved,
+      moving: moved > 0.0001,
     },
     trail: unvisited,
   };
+}
+
+// The whole party's tick, in party order: each member follows the one ahead
+// as it stands after its own move this tick. Followers never collide with
+// each other, nor with Fae.
+function updateParty(
+  world: World,
+  area: Area,
+  state: State,
+  player: Point,
+  playerMoved: boolean,
+): PartyMember[] {
+  const party: PartyMember[] = [];
+  let leader = player;
+  let leaderBox = faeBox;
+  let leaderMoved = playerMoved;
+  for (const member of state.party) {
+    const content = partyContent(world, member.id);
+    const next = updateFollower(
+      world,
+      area,
+      member,
+      content.box,
+      leader,
+      leaderBox,
+      leaderMoved,
+    );
+    party.push(next);
+    leader = { x: next.x, y: next.y };
+    leaderBox = content.box;
+    leaderMoved = next.motion.moving;
+  }
+  return party;
 }
 
 export function step(
@@ -1002,11 +1187,7 @@ export function step(
         tick: state.tick + 1,
         journalOpen: cancelEdge || menuEdge ? false : true,
         previousInput: { ...input },
-        maddie: {
-          ...state.maddie,
-          stillTicks: state.maddie.stillTicks + 1,
-          motion: { ...state.maddie.motion, moving: false },
-        },
+        party: restingParty(state.party),
         motion: { ...state.motion, moving: false },
       },
       events: [],
@@ -1020,11 +1201,7 @@ export function step(
         journalOpen: true,
         previousInput: { ...input },
         motion: { ...state.motion, moving: false },
-        maddie: {
-          ...state.maddie,
-          stillTicks: state.maddie.stillTicks + 1,
-          motion: { ...state.maddie.motion, moving: false },
-        },
+        party: restingParty(state.party),
       },
       events: [],
     };
@@ -1038,14 +1215,6 @@ export function step(
       if (targetArea === undefined) throw new Error("Unknown transition area");
       const spawn = targetArea.spawns[transition.target.spawn];
       if (spawn === undefined) throw new Error("Unknown transition spawn");
-      const slot = followerSlot(
-        targetArea,
-        spawn,
-        world.tunables.follow.slot,
-        world.tunables.follow.radius,
-        world.tunables.follow.heel,
-      );
-      if (slot === undefined) throw new Error("No Maddie transition slot");
       return {
         state: {
           ...state,
@@ -1056,14 +1225,12 @@ export function step(
           previousInput: { ...input },
           motion: { ...state.motion, moving: false },
           transition: { target: transition.target, phase: "in", elapsed: 0 },
-          maddie: {
-            x: slot.x,
-            y: slot.y,
-            facing: spawn.facing,
-            motion: { distance: 0, moving: false },
-            stillTicks: 0,
-          },
-          trail: [slot, { x: spawn.x, y: spawn.y }],
+          party: spawnParty(
+            world,
+            targetArea,
+            spawn,
+            state.party.map((member) => member.id),
+          ),
           safeSpot: { area: targetArea.id, spawn: transition.target.spawn },
         },
         events: [],
@@ -1103,10 +1270,7 @@ export function step(
           previousInput: { ...input },
           dialogue: dialogueState(target.knot, result),
           motion: { ...state.motion, moving: false },
-          maddie: {
-            ...state.maddie,
-            motion: { ...state.maddie.motion, moving: false },
-          },
+          party: haltedParty(state.party),
         },
         events: [],
       };
@@ -1117,7 +1281,7 @@ export function step(
   );
   const scale = length > 1 ? 1 / length : 1;
   const speed = world.tunables.walkSpeed / 60;
-  // People who are there are solid, for Fae and for Maddie alike.
+  // People who are there are solid, for Fae and for her party alike.
   const solid = solidArea(world, state, area);
   const player = resolveCollision(
     {
@@ -1190,7 +1354,7 @@ export function step(
         energy: critter.energyMax,
         calm: 0,
         snacks: critter.snacks,
-        rest: 0,
+        rest: {},
         aim: null,
         lastGrade: null,
         rewardSticker: null,
@@ -1209,16 +1373,10 @@ export function step(
       };
     }
   }
-  const follower =
+  const party =
     trigger === undefined
-      ? updateMaddie(world, solid, state, player, displacement > 0.0001)
-      : {
-          maddie: {
-            ...state.maddie,
-            motion: { ...state.maddie.motion, moving: false },
-          },
-          trail: state.trail,
-        };
+      ? updateParty(world, solid, state, player, displacement > 0.0001)
+      : haltedParty(state.party);
   return {
     state: {
       ...state,
@@ -1239,8 +1397,7 @@ export function step(
         knock === undefined
           ? state.dialogue
           : dialogueState(knock.knot, knock.result),
-      maddie: follower.maddie,
-      trail: follower.trail,
+      party,
     },
     events,
   };

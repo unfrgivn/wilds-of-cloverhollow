@@ -92,7 +92,7 @@ describe("journal", () => {
             energy: 5,
             calm: 0,
             snacks: 2,
-            rest: 0,
+            rest: {},
             aim: null,
             lastGrade: null,
             rewardSticker: null,

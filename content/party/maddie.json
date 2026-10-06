@@ -1,0 +1,17 @@
+{
+  "id": "maddie",
+  "name": "Maddie",
+  "atlas": "assets/characters/maddie/maddie.json",
+  "box": {
+    "width": 44,
+    "height": 60
+  },
+  "walkCycleUnits": 84,
+  "sits": true,
+  "start": true,
+  "command": {
+    "id": "play",
+    "label": "Play",
+    "resting": "resting"
+  }
+}

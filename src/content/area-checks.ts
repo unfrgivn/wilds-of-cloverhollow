@@ -1,11 +1,12 @@
 import {
   distanceToPolygon,
-  followerSlot,
+  partySlots,
   pointInPolygon,
   type Area,
   type Point,
   type Tunables,
   type Critter,
+  type PartyContent,
 } from "../core";
 
 /**
@@ -118,9 +119,10 @@ export function areaConnectionErrors(
   areas: Record<string, Area>,
   tunables: Tunables,
   critters: Record<string, Critter> = {},
+  party: Record<string, PartyContent> = {},
 ): string[] {
   const radius = tunables.playerRadius;
-  const { slot, radius: maddieRadius, heel } = tunables.follow;
+  const roster = Object.values(party);
   const errors: string[] = [];
   for (const area of Object.values(areas)) {
     const reachable = reachablePositions(area, radius);
@@ -173,8 +175,10 @@ export function areaConnectionErrors(
         errors.push(`${area.id}: calm ${config} talk point is unreachable`);
     }
     for (const [name, spawn] of Object.entries(area.spawns)) {
-      if (followerSlot(area, spawn, slot, maddieRadius, heel) === undefined)
-        errors.push(`${area.id}: spawn ${name} has no Maddie slot`);
+      // The whole roster must fit behind Fae here, whoever is in the party.
+      for (const { id, slot } of partySlots(area, spawn, tunables.follow, roster))
+        if (slot === undefined)
+          errors.push(`${area.id}: spawn ${name} has no slot for ${id}`);
       for (const trigger of area.triggers) {
         if (
           pointInPolygon(spawn, trigger.polygon) ||

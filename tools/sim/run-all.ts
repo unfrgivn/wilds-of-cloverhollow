@@ -41,19 +41,21 @@ for (const folder of readdirSync(root, { withFileTypes: true })) {
             distanceToPolygon(state.player, blocker) < radius - epsilon
           )
             throw new Error(`${name}: entered a blocker at tick ${state.tick}`);
-        if (
-          !pointInPolygon(state.maddie, area.walkable) ||
-          distanceToPolygon(state.maddie, area.walkable) <
-            content.world.tunables.follow.radius - epsilon
-        )
-          throw new Error(`${name}: Maddie left the walkable floor at tick ${state.tick}`);
-        for (const blocker of area.blockers)
+        for (const member of state.party) {
           if (
-            pointInPolygon(state.maddie, blocker) ||
-            distanceToPolygon(state.maddie, blocker) <
+            !pointInPolygon(member, area.walkable) ||
+            distanceToPolygon(member, area.walkable) <
               content.world.tunables.follow.radius - epsilon
           )
-            throw new Error(`${name}: Maddie entered a blocker at tick ${state.tick}`);
+            throw new Error(`${name}: ${member.id} left the walkable floor at tick ${state.tick}`);
+          for (const blocker of area.blockers)
+            if (
+              pointInPolygon(member, blocker) ||
+              distanceToPolygon(member, blocker) <
+                content.world.tunables.follow.radius - epsilon
+            )
+              throw new Error(`${name}: ${member.id} entered a blocker at tick ${state.tick}`);
+        }
       }
     }
     console.log(`${name}: tick ${state.tick} ok`);

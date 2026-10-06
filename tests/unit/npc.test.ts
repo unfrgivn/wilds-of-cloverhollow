@@ -88,11 +88,16 @@ describe("people in areas", () => {
     // Maddie just below, too far away to stay put: she heads for Fae, and Mom
     // is in the way. She never overlaps Mom's footprint on the way.
     let state: State = inKitchen(615, 480, "down");
-    state = { ...state, maddie: { ...state.maddie, x: 615, y: 600 }, trail: [] };
+    state = {
+      ...state,
+      party: state.party.map((member) => ({ ...member, x: 615, y: 600, trail: [] })),
+    };
     const radius = world.tunables.follow.radius;
     for (let tick = 0; tick < 120; tick += 1) {
       state = step(world, state, none).state;
-      const { x, y } = state.maddie;
+      const [maddie] = state.party;
+      if (maddie === undefined) throw new Error("Maddie missing");
+      const { x, y } = maddie;
       const overlaps = x > 600 - radius && x < 630 + radius && y > 520 - radius && y < 545 + radius;
       expect(overlaps, `tick ${tick}: ${JSON.stringify({ x, y })}`).toBe(false);
     }

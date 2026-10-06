@@ -273,15 +273,54 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   the first install, trust the developer app under Settings > General > VPN &
   Device Management. Free profiles last 7 days; rerun to refresh.
 
-## Roadmap after Milestone 16 (proposed, waiting on the owner)
+## Milestone 17: Followers who fight **Status:** ✅ Completed (2026-10-06)
+- Engine: Maddie becomes member 0 of a party (spec 5). `content/party/<id>.json`
+  rosters each friend: atlas, feet-anchored body box, `walkCycleUnits`, whether
+  they sit, whether they start in the party, and one battle command. Member 0
+  follows Fae and member i follows member i-1 with the same trail algorithm,
+  each with its own breadcrumb trail; `state.maddie` and `state.trail` are
+  gone, `state.party` holds the ordered members. Sue and Jordan arrive with
+  their art later; a content-less second member proves the chain in the core
+  tests and `tools/sim/party-chain.ts`.
+- Battles compose their menu from the party: Soothe, each member's command in
+  party order, Snack, Run. Each critter answers every roster command in
+  `commands.friends` and `lines.friends`; rest is tracked per command id.
+- Save version 2. The render draws every roster member from its own atlas and
+  places the party along Fae's baseline in the battle scene; `renderInfo()`
+  reports `party`.
+- Unit (the pinned contract `tests/unit/party.test.ts`: Maddie's end state in
+  every replay script is unchanged to 1e-9; a second member spawns and chains
+  validly; the whistle command's numbers and rest), sims (every member checked
+  each tick, plus the two-member chain), e2e with real keys (`party.spec.ts`:
+  Maddie as the party in the plaza, Soothe / Play / Snack / Run in the frog's
+  menu), reviewed baselines.
+- Notes and assumptions:
+  - Maddie's overworld sprite was drawn 2x too tall: only `scale.x` was set, so
+    Pixi's default `scale.y` of 1 stretched her (the old plaza baseline shows
+    an orange smear beside Fae). The generic follower uses one uniform scale,
+    as spec 5 always said. Every baseline with Maddie in it changed and was
+    viewed; her positions are unchanged (the contract fixture pins them).
+  - A chained spawn slot must also clear Fae and the members ahead by two
+    radii; without it the second member's first heel candidate can land on
+    Fae's feet when Maddie took the right heel. Member 0's slots never came
+    within two radii of Fae, so this changes nothing for her.
+  - Battle scene spacing: member 0 keeps Maddie's spot (42 units toward the
+    critter); member i>0 stands i x 64 units on Fae's far side.
+  - Rest entries are dropped at zero, so `rest: {}` means everyone is ready.
+  - `parseSave` now checks array elements against the template's first
+    element (party members and trail points), where before any array passed.
+  - The area checks now require a chained slot for the whole roster at every
+    spawn (not just Maddie), so any party fits anywhere.
+
+## Roadmap after Milestone 17 (proposed, waiting on the owner)
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).
 - Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md). Decided
   2026-10-06: party members both follow Fae (like Maddie) and help in battles.
   The engine already has what the areas need: painted areas, people who come
-  and go, locked doors, and generic critters; followers who fight is Milestone
-  17.
+  and go, locked doors, generic critters, and (Milestone 17) a party that
+  follows and fights; each friend needs an atlas and a `content/party/` entry.
 - Audio: later (owner, 2026-10-06).
 - TestFlight and a paid developer account: later.
 

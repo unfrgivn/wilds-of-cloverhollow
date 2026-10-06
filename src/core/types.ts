@@ -8,26 +8,30 @@ export type ActionFrame = {
   menu: boolean;
   choose?: number;
 };
+export type FollowTunables = {
+  distance: number;
+  stop: number;
+  trailSpacing: number;
+  trailMax: number;
+  catchUp: number;
+  radius: number;
+  slot: number;
+  heel: number;
+  sitDelayTicks: number;
+  settleDelayTicks: number;
+};
 export type Tunables = {
   walkSpeed: number;
   playerRadius: number;
   walkCycleUnits: number;
   doorFadeTicks: number;
-  follow: {
-    distance: number;
-    stop: number;
-    trailSpacing: number;
-    trailMax: number;
-    catchUp: number;
-    radius: number;
-    slot: number;
-    heel: number;
-    sitDelayTicks: number;
-    settleDelayTicks: number;
-    walkCycleUnits: number;
-  };
+  follow: FollowTunables;
   interact: { range: number; revealPerTick: number };
 };
+// A feet-anchored body box (spec 5): `width` centred on the feet, `height`
+// rising from them. Visibility between a follower and its leader is measured
+// with these.
+export type Box = { width: number; height: number };
 export type Spawn = Point & { facing: Direction };
 export type Area = {
   id: string;
@@ -87,8 +91,23 @@ export type World = {
   battle: BattleContent;
   stickers: StickerCatalogue;
   characters: Record<string, CharacterContent>;
+  // The roster of friends who can follow Fae (spec 5), in roster order.
+  party: Record<string, PartyContent>;
   // Reads a story variable from an Ink state (createStoryReader over `story`).
   storyVariable: (ink: string, name: string) => unknown;
+};
+// A friend who walks behind Fae and brings one battle command (spec 5, 8).
+export type PartyContent = {
+  id: string;
+  name: string;
+  atlas: string;
+  box: Box;
+  walkCycleUnits: number;
+  // Sits down after sitDelayTicks still (Maddie); otherwise idles standing.
+  sits: boolean;
+  // In the party at a new game.
+  start: boolean;
+  command: { id: string; label: string; resting: string };
 };
 // An area person's atlas and idle timing: ticks per idle_down frame (Mom
 // holds her smile, then blinks briefly; Oliver waves his rattle evenly).
@@ -99,12 +118,19 @@ export type StickerCatalogue = {
 };
 export type BattleContent = {
   commands: Record<
-    CritterCommandId,
+    SharedCommandId,
     { label: string; snackDetail: string | null }
   >;
 };
 export type Grade = "great" | "good" | "miss";
-export type CritterCommandId = "soothe" | "play" | "snack" | "run";
+// The commands every battle has; the party's commands come from its roster.
+export type SharedCommandId = "soothe" | "snack" | "run";
+export type FriendCommand = {
+  calm: number;
+  great: number;
+  good: number;
+  rest: number;
+};
 export type Critter = {
   id: string;
   name: string;
@@ -124,8 +150,9 @@ export type Critter = {
   calmPrompt: "Look" | "Talk";
   commands: {
     soothe: { calm: number; great: number; good: number };
-    play: { calm: number; great: number; good: number; rest: number };
     snack: { calm: number; energy: number };
+    // Keyed by a party member's command id (spec 8).
+    friends: Record<string, FriendCommand>;
   };
   timing: {
     aimTicks: number;
@@ -144,9 +171,8 @@ export type Critter = {
     intro: string;
     command: string;
     soothe: Record<Grade, string>;
-    play: Record<Grade, string>;
+    friends: Record<string, Record<Grade, string>>;
     snack: string;
-    playResting: string;
     burst: string;
     burstResult: Record<Grade, string>;
     soothed: string;
@@ -173,11 +199,13 @@ export type Battle = {
   message: string;
   revealed: number;
   selected: number;
-  command: "soothe" | "play" | null;
+  // "soothe" or a friend's command id; null until one is chosen.
+  command: string | null;
   energy: number;
   calm: number;
   snacks: number;
-  rest: number;
+  // Turns each friend's command still rests, by command id; missing = 0.
+  rest: Record<string, number>;
   aim: {
     side: "critter" | "fae";
     ticks: number;
@@ -200,7 +228,7 @@ export type BattleView = {
   message: string;
   revealed: number;
   commands: {
-    id: CritterCommandId;
+    id: string;
     label: string;
     detail: string | null;
     disabled: boolean;
@@ -218,7 +246,20 @@ export type BattleView = {
   lastGrade: Grade | null;
   rewardSticker: string | null;
 };
-export type Fixture = { area: string; spawn: string; seed?: number };
+// `party` overrides who starts in the party (test fixtures); the default is
+// every roster member with `start: true`, in roster order.
+export type Fixture = { area: string; spawn: string; seed?: number; party?: string[] };
+// One friend in the party: member 0 follows Fae, member i follows member i-1,
+// each along its own breadcrumb trail of its leader's recent positions.
+export type PartyMember = {
+  id: string;
+  x: number;
+  y: number;
+  facing: Direction;
+  motion: { distance: number; moving: boolean };
+  stillTicks: number;
+  trail: Point[];
+};
 export type State = {
   tick: number;
   area: string;
@@ -232,14 +273,7 @@ export type State = {
     phase: "out" | "in";
     elapsed: number;
   } | null;
-  maddie: {
-    x: number;
-    y: number;
-    facing: Direction;
-    motion: { distance: number; moving: boolean };
-    stillTicks: number;
-  };
-  trail: Point[];
+  party: PartyMember[];
   ink: string;
   dialogue: {
     knot: string;

@@ -77,7 +77,8 @@
   transition: width 180ms ease-out;
 }
 
-/* Phones get a 2x2 grid above confirm and cancel; roomier screens stack. */
+/* Soothe, the party's commands, Snack, Run: phones get a two-column grid above
+   confirm and cancel (three rows with a full party); roomier screens stack. */
 .battle-commands {
   position: fixed;
   right: calc(24px + var(--safe-right));

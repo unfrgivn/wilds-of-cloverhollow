@@ -7,7 +7,7 @@ test.describe("bedroom", () => {
     await resetPaused(page, "new-game");
     const state = await page.evaluate(() => window.__cloverhollow?.getState());
     expect(state?.area).toBe("bedroom");
-    expect((await renderInfo(page)).hidden).toBe(0);
+    expect((await renderInfo(page)).party).toMatchObject([{ id: "maddie", hidden: 0 }]);
     await expect(page).toHaveScreenshot("bedroom.png");
   });
 
@@ -69,8 +69,10 @@ test.describe("bedroom", () => {
     await page.keyboard.up("ArrowRight");
     const moving = await page.evaluate(() => window.__cloverhollow?.getState());
     if (moving === undefined) throw new Error("hook unavailable");
-    const dx = moving.player.x - moving.maddie.x;
-    const dy = moving.player.y - moving.maddie.y;
+    const [maddie] = moving.party;
+    if (maddie === undefined) throw new Error("Maddie missing from the party");
+    const dx = moving.player.x - maddie.x;
+    const dy = moving.player.y - maddie.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     expect(distance).toBeGreaterThanOrEqual(50);
     expect(distance).toBeLessThanOrEqual(140);
@@ -78,8 +80,8 @@ test.describe("bedroom", () => {
     const stopped = await page.evaluate(() => window.__cloverhollow?.getState());
     if (stopped === undefined) throw new Error("hook unavailable");
     const info = await renderInfo(page);
-    expect(info.maddie.animation.startsWith("idle_")).toBe(true);
-    expect(stopped.maddie.stillTicks).toBeGreaterThanOrEqual(30);
+    expect(info.party[0]?.animation.startsWith("idle_")).toBe(true);
+    expect(stopped.party[0]?.stillTicks).toBeGreaterThanOrEqual(30);
     await resetPaused(page, "new-game");
     await page.keyboard.down("ArrowUp");
     await step(page, 30);
@@ -94,8 +96,8 @@ test.describe("bedroom", () => {
     await page.keyboard.up("ArrowDown");
     await step(page, 90);
     const settled = await renderInfo(page);
-    expect(settled.hidden).toBeLessThanOrEqual(0.25);
-    expect(settled.maddie.animation.startsWith("idle_")).toBe(true);
+    expect(settled.party[0]?.hidden).toBeLessThanOrEqual(0.25);
+    expect(settled.party[0]?.animation.startsWith("idle_")).toBe(true);
   });
 
   test("reloads areas without duplicate occluders", async ({ page }) => {

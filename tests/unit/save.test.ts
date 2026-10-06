@@ -20,20 +20,30 @@ describe("save format", () => {
   });
 
   it("rejects other versions, broken JSON, and states of another shape", () => {
-    expect(parseSave(JSON.stringify({ version: 2, state: fresh }), fresh)).toBeNull();
+    // Version 1 saves kept Maddie in `maddie` and `trail`; they start fresh.
+    expect(parseSave(JSON.stringify({ version: 1, state: fresh }), fresh)).toBeNull();
+    expect(parseSave(JSON.stringify({ version: 3, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
-    expect(parseSave(JSON.stringify({ version: 1, state: { tick: 1 } }), fresh)).toBeNull();
+    expect(parseSave(JSON.stringify({ version: 2, state: { tick: 1 } }), fresh)).toBeNull();
     const wrongType = { ...fresh, tick: "1" };
-    expect(parseSave(JSON.stringify({ version: 1, state: wrongType }), fresh)).toBeNull();
-    const { motion: _motion, ...maddieWithoutMotion } = fresh.maddie;
-    const missingNested = { ...fresh, maddie: maddieWithoutMotion };
-    expect(parseSave(JSON.stringify({ version: 1, state: missingNested }), fresh)).toBeNull();
+    expect(parseSave(JSON.stringify({ version: 2, state: wrongType }), fresh)).toBeNull();
+    const missingNested = { ...fresh, motion: { distance: 0 } };
+    expect(parseSave(JSON.stringify({ version: 2, state: missingNested }), fresh)).toBeNull();
+    // Array elements are checked against the template's first element.
+    const partyWithoutMotion = {
+      ...fresh,
+      party: fresh.party.map(({ motion: _motion, ...member }) => member),
+    };
+    expect(parseSave(JSON.stringify({ version: 2, state: partyWithoutMotion }), fresh))
+      .toBeNull();
+    const emptyParty = { ...fresh, party: [] };
+    expect(parseSave(JSON.stringify({ version: 2, state: emptyParty }), fresh)).not.toBeNull();
   });
 
   it("keeps a save made before a critter existed, with that critter in chaos", () => {
     const older: State["critters"] = { ...fresh.critters, frog: "calm" };
     delete older.pup;
-    const restored = parseSave(JSON.stringify({ version: 1, state: { ...fresh, critters: older } }),
+    const restored = parseSave(JSON.stringify({ version: 2, state: { ...fresh, critters: older } }),
       fresh);
     expect(restored?.critters).toEqual({ ...fresh.critters, frog: "calm" });
     expect(restored?.critters.pup).toBe("chaos");

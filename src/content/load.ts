@@ -16,6 +16,7 @@ import pupData from "../../content/critters/pup.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
+import maddieData from "../../content/party/maddie.json";
 import { createStoryReader } from "../core/ink";
 import type {
   Area,
@@ -31,9 +32,11 @@ import type {
   Critter,
   Grade,
   BattleContent,
-  CritterCommandId,
+  SharedCommandId,
   StickerCatalogue,
   Point,
+  PartyContent,
+  FriendCommand,
 } from "../core";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -115,7 +118,6 @@ export function parseTunables(value: unknown, file: string): Tunables {
       heel: followValue("heel"),
       sitDelayTicks: followValue("sitDelayTicks"),
       settleDelayTicks: followValue("settleDelayTicks"),
-      walkCycleUnits: followValue("walkCycleUnits"),
     },
   };
 }
@@ -359,8 +361,26 @@ export function parseCritter(value: unknown, file: string): Critter {
   field(record(lines), file, "lines");
   const line = (key: string): string => text(lines, key);
   const sootheRaw = command("soothe", ["calm", "great", "good"]);
-  const playRaw = command("play", ["calm", "great", "good", "rest"]);
   const snackRaw = command("snack", ["calm", "energy"]);
+  // One entry per party command id (spec 8); the loader checks the roster's
+  // ids are all here.
+  const friendsRaw = commands.friends;
+  field(record(friendsRaw), file, "commands.friends");
+  const friends: Record<string, FriendCommand> = {};
+  for (const [friendId, raw] of Object.entries(friendsRaw)) {
+    field(record(raw), file, `commands.friends.${friendId}`);
+    friends[friendId] = {
+      calm: number(raw, "calm"),
+      great: number(raw, "great"),
+      good: number(raw, "good"),
+      rest: number(raw, "rest"),
+    };
+  }
+  const friendLinesRaw = lines.friends;
+  field(record(friendLinesRaw), file, "lines.friends");
+  const friendLines: Record<string, Record<Grade, string>> = {};
+  for (const [friendId, raw] of Object.entries(friendLinesRaw))
+    friendLines[friendId] = gradeMap(raw, file, `lines.friends.${friendId}`);
   return {
     id,
     name,
@@ -384,16 +404,11 @@ export function parseCritter(value: unknown, file: string): Critter {
         great: number(sootheRaw, "great"),
         good: number(sootheRaw, "good"),
       },
-      play: {
-        calm: number(playRaw, "calm"),
-        great: number(playRaw, "great"),
-        good: number(playRaw, "good"),
-        rest: number(playRaw, "rest"),
-      },
       snack: {
         calm: number(snackRaw, "calm"),
         energy: number(snackRaw, "energy"),
       },
+      friends,
     },
     timing: timingValue,
     burst: burstValue,
@@ -401,9 +416,8 @@ export function parseCritter(value: unknown, file: string): Critter {
       intro: line("intro"),
       command: line("command"),
       soothe: gradeMap(lines.soothe, file, "lines.soothe"),
-      play: gradeMap(lines.play, file, "lines.play"),
+      friends: friendLines,
       snack: line("snack"),
-      playResting: line("playResting"),
       burst: line("burst"),
       burstResult: gradeMap(lines.burstResult, file, "lines.burstResult"),
       soothed: line("soothed"),
@@ -421,7 +435,7 @@ export function parseBattleContent(
   field(record(value) && record(value.commands), file, "commands");
   const commands = value.commands;
   const command = (
-    id: CritterCommandId,
+    id: SharedCommandId,
   ): { label: string; snackDetail: string | null } => {
     const raw = commands[id];
     field(
@@ -436,11 +450,71 @@ export function parseBattleContent(
   return {
     commands: {
       soothe: command("soothe"),
-      play: command("play"),
       snack: command("snack"),
       run: command("run"),
     },
   };
+}
+
+export function parsePartyMember(value: unknown, file: string): PartyContent {
+  field(record(value), file, "object");
+  const text = (object: Record<string, unknown>, name: string): string => {
+    const item = object[name];
+    field(typeof item === "string" && item !== "", file, name);
+    return item;
+  };
+  const size = (object: Record<string, unknown>, name: string): number => {
+    const item = object[name];
+    field(typeof item === "number" && item > 0, file, name);
+    return item;
+  };
+  const box = value.box;
+  field(record(box), file, "box");
+  const command = value.command;
+  field(record(command), file, "command");
+  field(typeof value.sits === "boolean", file, "sits");
+  field(typeof value.start === "boolean", file, "start");
+  return {
+    id: text(value, "id"),
+    name: text(value, "name"),
+    atlas: text(value, "atlas"),
+    box: { width: size(box, "width"), height: size(box, "height") },
+    walkCycleUnits: size(value, "walkCycleUnits"),
+    sits: value.sits,
+    start: value.start,
+    command: {
+      id: text(command, "id"),
+      label: text(command, "label"),
+      resting: text(command, "resting"),
+    },
+  };
+}
+
+// Every critter must answer every party command (numbers and lines), and no
+// party command may shadow a shared one.
+export function partyErrors(
+  party: Record<string, PartyContent>,
+  critters: Record<string, Critter>,
+): string[] {
+  const shared: SharedCommandId[] = ["soothe", "snack", "run"];
+  const errors: string[] = [];
+  const seen = new Map<string, string>();
+  for (const member of Object.values(party)) {
+    const commandId = member.command.id;
+    if (shared.some((id) => id === commandId))
+      errors.push(`party ${member.id}: command ${commandId} is a shared command`);
+    const owner = seen.get(commandId);
+    if (owner !== undefined)
+      errors.push(`party ${member.id}: command ${commandId} is also ${owner}'s`);
+    seen.set(commandId, member.id);
+    for (const critter of Object.values(critters)) {
+      if (critter.commands.friends[commandId] === undefined)
+        errors.push(`critter ${critter.id}: no commands.friends.${commandId}`);
+      if (critter.lines.friends[commandId] === undefined)
+        errors.push(`critter ${critter.id}: no lines.friends.${commandId}`);
+    }
+  }
+  return errors;
 }
 
 export function parseStickers(value: unknown, file: string): StickerCatalogue {
@@ -481,9 +555,20 @@ export function parseFixture(value: unknown, file: string): Fixture {
     file,
     "seed",
   );
-  return value.seed === undefined
-    ? { area: value.area, spawn: value.spawn }
-    : { area: value.area, spawn: value.spawn, seed: value.seed };
+  const party = value.party;
+  field(
+    party === undefined ||
+      (Array.isArray(party) &&
+        party.every((id) => typeof id === "string")),
+    file,
+    "party",
+  );
+  return {
+    area: value.area,
+    spawn: value.spawn,
+    ...(value.seed === undefined ? {} : { seed: value.seed }),
+    ...(party === undefined ? {} : { party }),
+  };
 }
 
 export function parseGroundManifest(
@@ -576,6 +661,12 @@ export function loadContent(): {
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
+  const maddie = parsePartyMember(maddieData, "content/party/maddie.json");
+  const party = { [maddie.id]: maddie };
+  const critters = { [frog.id]: frog, [pup.id]: pup };
+  const partyProblems = partyErrors(party, critters);
+  if (partyProblems.length > 0)
+    throw new Error(`content/party: ${partyProblems.join("; ")}`);
   const fixtures = {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
@@ -583,6 +674,10 @@ export function loadContent(): {
     park: parseFixture(parkFixtureData, "content/fixtures/park.json"),
     school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
   };
+  for (const [name, fixture] of Object.entries(fixtures))
+    for (const id of fixture.party ?? [])
+      if (party[id] === undefined)
+        throw new Error(`content/fixtures/${name}.json: unknown party member ${id}`);
   const areas = {
     [harness.id]: harness,
     [bedroom.id]: bedroom,
@@ -596,10 +691,11 @@ export function loadContent(): {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas,
       story,
-      critters: { [frog.id]: frog, [pup.id]: pup },
+      critters,
       battle,
       stickers,
       characters,
+      party,
       storyVariable: createStoryReader(story),
     },
     fixtures,

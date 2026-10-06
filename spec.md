@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-05 (Milestone 5 implementation)
+Last updated: 2026-10-06 (Milestone 17, followers who fight)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -66,7 +66,7 @@ src/ui/         DOM/CSS overlay: dialogue, prompts, menus, journal, HUD.
 src/platform/   Input devices, storage, audio, Capacitor glue.
 src/dev/        Dev-only harness hook (section 11). Excluded from production builds.
 src/main.ts     Composition root that wires core, render, ui, and platform.
-content/        Areas (JSON), story (Ink), fixtures (JSON), tunables (JSON).
+content/        Areas, critters, party, fixtures, tunables (JSON); story (Ink).
 public/assets/  Runtime art and audio, loaded by URL.
 art/            Generation recipes and selected source images (never loaded at runtime).
 tools/          Bun scripts: art pipeline, headless sim runner.
@@ -212,23 +212,42 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `tools/art/validate-sprite.ts` must pass for every character atlas. All of its
   checks are mandatory (no switches); biped-only head checks are enabled by
   `"validator": { "biped": true }` in the character's `art/recipes/` file.
-- Followers (Maddie) and NPCs follow the same rules. NPCs may ship idle-only.
-- Maddie follows Fae using a capped recent-position trail. The follow tunables
-  are `distance` 90, `stop` 60, `trailSpacing` 8, `trailMax` 64,
-  `catchUp` 1.15, `radius` 12, `slot` 50, `heel` 52, `settleDelayTicks` 12,
-  `sitDelayTicks` 30, and her `walkCycleUnits` 84. She uses hysteresis,
-  line-of-sight proximity stopping, her own distance-based animation, and sits
-  after the delay.
-- Visibility is measured with feet-anchored boxes: Fae is 50x140 units and
-  Maddie is 44x60 units. `hiddenFraction` is the overlap area divided by
-  Maddie's box area when her feet are north of Fae; beside or in front is zero.
-  Spawn and settling placement tries side heel slots at ±52 x and -6 y, then
-  +24 y, before the ordinary rear/perpendicular fallbacks. Heel placement must
-  be collision-valid, line-of-sight clear, and have zero hidden fraction.
-  When Fae is standing still and Maddie has been stopped for `settleDelayTicks`
-  (12) while more than 25% hidden, she walks to the first valid visible heel
-  slot. `stillTicks` keeps counting during that short walk, so she sits soon
-  after arriving. She may stay partly hidden while both are walking.
+- Followers (the party) and NPCs follow the same rules. NPCs may ship
+  idle-only.
+- The party: the friends who walk behind Fae and fight beside her. The roster
+  is `content/party/<id>.json` (validated by the loader; `world.party` keeps
+  roster order): `id`, `name`, `atlas`, the feet-anchored `box`
+  (`{ width, height }`), `walkCycleUnits`, `sits` (sits down after
+  `sitDelayTicks`; otherwise idles standing), `start` (in the party at a new
+  game), and one battle `command` (`{ id, label, resting }`, section 8).
+  Maddie is `maddie`: box 44x60, `walkCycleUnits` 84, sits, starts, command
+  `play` / "Play" / "resting". Sue and Jordan join the roster with their art.
+  `state.party` is the ordered list of members, each
+  `{ id, x, y, facing, motion, stillTicks, trail }`.
+- Chain rule: member 0 follows Fae; member i follows member i-1, with the same
+  algorithm, the leader being the member ahead *after* its own move this tick
+  (the party updates in order). Each member keeps its own breadcrumb trail of
+  its leader's recent positions. Followers never collide with Fae or with each
+  other, only with the floor, blockers, and people.
+- Each member follows its leader using a capped recent-position trail. The
+  follow tunables are `distance` 90, `stop` 60, `trailSpacing` 8, `trailMax`
+  64, `catchUp` 1.15, `radius` 12, `slot` 50, `heel` 52, `settleDelayTicks`
+  12, and `sitDelayTicks` 30; each member's `walkCycleUnits` is in its party
+  content. A member uses hysteresis, line-of-sight proximity stopping, its own
+  distance-based animation, and (if it `sits`) sits after the delay.
+- Visibility is measured with feet-anchored boxes: Fae is 50x140 units
+  (`faeBox` in the core) and each member's box comes from its content (Maddie
+  44x60). `hiddenFraction(follower, followerBox, leader, leaderBox)` is the
+  overlap area divided by the follower's box area when its feet are north of
+  its leader's; beside or in front is zero. Spawn and settling placement tries
+  side heel slots at ±52 x and -6 y, then +24 y, before the ordinary
+  rear/perpendicular fallbacks. Heel placement must be collision-valid,
+  line-of-sight clear, have zero hidden fraction, and (at a spawn) clear Fae
+  and the members ahead by two radii. When the leader is standing still and
+  the member has been stopped for `settleDelayTicks` (12) while more than 25%
+  hidden, it walks to the first valid visible heel slot. `stillTicks` keeps
+  counting during that short walk, so Maddie sits soon after arriving. A
+  member may stay partly hidden while everyone is walking.
 
 ## 6. World
 - Areas are discrete. `content/areas/<id>.json` is canonical (Tiled may be used
@@ -260,9 +279,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   polygons to be reachable, and every spawn to be at least twice the player
   radius outside every trigger. Door spawns face away from the doorway into
   their destination area. The plaza fixture starts near its fountain.
-- Every area spawn must have a valid Maddie follower slot behind Fae, or on one
-  of the two perpendicular sides, with Maddie's radius clearance. At a door
-  switch the trail resets to `[slot, spawn]` and both characters are frozen.
+- Every area spawn must have a valid slot for every roster member, chained:
+  member 0 at Fae's heel (or behind her, or on one of the two perpendicular
+  sides), member i at member i-1's, each with the follow radius clearance and
+  two radii clear of Fae and the members ahead (`partySlots`; the area checks
+  test the whole roster so any party fits). At a door switch every member is
+  placed in its slot, its trail resets to `[slot, leader]`, and everyone is
+  frozen.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`), `kitchen`
   (the downstairs family room), `plaza` (from `town_center_plaza.png`), and
   `park` (Meadow Park, from `meadow_park_environment.png`), and `school` (the
@@ -283,7 +306,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   Fae talks to one (the dialogue's knot is theirs), they face her along the
   larger axis of the gap between them (`npcFacing`); otherwise they face as
   authored. Without a frame for that facing they show their front.
-- A person's `footprint` polygon is solid, for Fae and for Maddie, like a
+- A person's `footprint` polygon is solid, for Fae and for the party, like a
   blocker. A person with `visibleWhile` (an Ink variable) is only there while
   it's true; otherwise they aren't drawn, can't be talked to, and aren't
   solid (`npcVisible`). The area checks count every footprint as solid, since
@@ -424,9 +447,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   numbers for now; each has its own lines, atlas, sticker, and calm knot.
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, snacks,
-  command values, aim windows, the burst, the sticker, and the calm knot and
-  prompt. Shared command labels and the Snack `×N` template live in
-  `content/battle.json`. State adds `critters` (chaos or calm), `stickers`,
+  command values (`commands.soothe`, `commands.snack`, and
+  `commands.friends.<command id>` with `{ calm, great, good, rest }` for every
+  party command), aim windows, the burst, the sticker, and the calm knot and
+  prompt. Lines follow the same split: `lines.soothe` and
+  `lines.friends.<command id>` are per-grade. The loader rejects a critter
+  missing a roster command (numbers or lines), and a party command whose id is
+  `soothe`, `snack`, or `run`, or another member's. The shared command labels
+  (Soothe, Snack, Run) and the Snack `×N` template live in
+  `content/battle.json`; each friend's label and resting detail live in its
+  `content/party/` entry. State adds `critters` (chaos or calm), `stickers`,
   `safeSpot`, and a nullable `battle`.
 - Start: crossing into a chaos critter's touch circle (outside on the previous
   tick, inside now; exactly on the radius counts as inside) starts a battle and
@@ -436,7 +466,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   next press advances):
 
   ```
-  intro -> command --Soothe/Play--> aim (on the critter) -> result
+  intro -> command --Soothe / a friend's command--> aim (on the critter) -> result
                    --Snack--------> result
                    --Run----------> run -> ends at entry, facing away
   result -> soothed -> reward -> ends: critter calm, sticker added once
@@ -446,17 +476,25 @@ ios/            Capacitor iOS project (from Milestone 4).
   rest -> door-style fade to safeSpot; the critter stays chaos; nothing lost
   ```
 
-- Commands: up/down edges skip disabled commands; confirm or a touch `choose`
-  picks. The chosen command id is stored in the battle. Play rests for its
-  content turns; Snack shows its count and is disabled at zero.
+- Commands are composed from the party: Soothe, then one command per party
+  member in party order (Maddie's Play), then Snack and Run
+  (`battleCommands`). Up/down edges skip disabled commands; confirm or a touch
+  `choose` picks. The chosen command id (`soothe` or a friend's id) is stored
+  in `battle.command`. `battle.rest` maps each friend's command id to the
+  turns it still rests (missing means ready): choosing a friend's command sets
+  its rest to the critter's content `rest` for it, and every command choice
+  (Soothe, Snack, or a friend's) takes one turn off every other resting
+  friend. A resting command is disabled with its member's `resting` detail.
+  Snack shows its count and is disabled at zero.
 - Aim: the first confirm edge is graded by its distance in ticks from the
   target (great window, then good); no press by the end is a miss. Soothe and
-  Play add their calm plus the grade bonus, clamped to `calmMax`. In a burst a
-  seeded PRNG draw picks base damage 1 or 2 (`bigChance`); great, good, and
-  miss deal 0, base minus 1, and base.
+  a friend's command add their calm plus the grade bonus, clamped to
+  `calmMax`, and show that command's line for the grade. In a burst a seeded
+  PRNG draw picks base damage 1 or 2 (`bigChance`); great, good, and miss deal
+  0, base minus 1, and base.
 - While a battle runs Fae is frozen, doors don't fire, cancel and menu are
-  ignored (v0), and Maddie keeps settling. `safeSpot` is set at new game and
-  on every area arrival.
+  ignored (v0), and the party keeps settling. `safeSpot` is set at new game
+  and on every area arrival.
 - Ink: the adapter binds a pure external `calmed(id)`, answered from facts the
   core passes in. Once the frog is calm the fountain has a new line, and the
   frog has his own talk (a first visit, then a revisit line).
@@ -471,9 +509,13 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Battle scene (render only), from one pure CSS-px layout
   (`src/render/battle-layout.ts`) at the overworld scale: the frog's figure is
   `battleHeight` units tall with its body centre at (0.5 W, 0.42 H); Fae, seen
-  from behind, stands with her baseline at (0.22 W, 0.57 H) and Maddie sits
-  beside her. This clears the HUD, command menu, message box, and touch
-  buttons on phones and desktops. The aura turns about its own centroid on the
+  from behind, stands with her baseline at (0.22 W, 0.57 H). The party shares
+  her baseline (`layout.party`, one point per member): member 0 is 42 units
+  toward the critter (where Maddie sits), and member i>0 stands i x 64 units
+  on Fae's far side, away from the critter. A member that `sits` shows its
+  `idle_down` frame; anyone else is seen from behind (`idle_up`). Members are
+  drawn from their own atlas at the overworld scale. This clears the HUD,
+  command menu, message box, and touch buttons on phones and desktops. The aura turns about its own centroid on the
   frog's body. The timing ring is centred on the frog's (in a burst, Fae's)
   body centre with a radius of 0.55 times the figure height.
 - Backdrop: the area painting itself, scaled so its painted interior (8% in
@@ -499,9 +541,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - HUD: ENERGY (one leaf per point, spent leaves outlined) at the top left and
   the critter's CALM meter (its name in capitals) at the top right, left of
   the menu button, inside the safe area. It hides during the reward.
-- Commands: a 2x2 grid of sticker buttons on phones (one column from 1000 px
-  wide), right-aligned above confirm and cancel, clear of the HUD, the
-  dialogue box, and the touch buttons. The selected command is lifted and
+- Commands: a two-column grid of sticker buttons on phones (one column from
+  1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
+  dialogue box, and the touch buttons. The menu grows with the party: four
+  commands with Maddie alone, up to six (three rows on a phone) with Sue and
+  Jordan; the gallery previews a bigger party with `?party=N`. The selected command is lifted and
   green. Disabled commands are dashed and grey in explicit colours (never
   opacity), carry a detail line such as "resting", and never emit a choice.
 - Timing ring: an SVG centred exactly on the CSS point the game passes (the
@@ -517,7 +561,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   stay. Every battle text pair measures at least 4.5:1 contrast in the gallery
   tests.
 - The Pixi battle scene dims the loaded area painting and presents the critter,
-  Fae, Maddie, and aura in a fixed logical composition. It is render-only. The
+  Fae, the party, and aura in a fixed logical composition. It is render-only. The
   shell logs `[cloverhollow] battle` with phase and message changes, and
   `renderInfo()` exposes the phase, timing-ring request, and critter frame.
 
@@ -528,8 +572,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Core: `journalOpen` in state. A menu press (J or the journal button) opens
   it when no dialogue, battle, or door transition is running; a menu or cancel
   press (or the book's close button, which sends cancel) closes it. While it's
-  open Fae is frozen, doors, battles, and interactions don't fire, and Maddie
-  keeps settling.
+  open Fae is frozen, doors, battles, and interactions don't fire, and the
+  party keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first
   (the calm pup and his clue toward the school; while only the frog is calm,
   the purple fizz leading to the park; the calm frog; the raccoon from the
@@ -563,15 +607,18 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 1, state }`, the whole core state, including the
-  serialized Ink state (story variables and choices), stickers, critters, the
-  PRNG, and the tick. Loading restores it exactly: the state hash matches, and
+- Format: `{ version: 2, state }`, the whole core state, including the
+  serialized Ink state (story variables and choices), the party, stickers,
+  critters, the PRNG, and the tick. Version 1 (Maddie in `maddie` and `trail`)
+  is refused and starts a new game. Loading restores it exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
 - `parseSave(json, template)` accepts only a state with the template's exact
   shape (a fresh game state: every key, the same primitive types, all the way
-  down; null slots may hold null or an object). Any other version or shape
-  starts a new game instead of crashing later. A change to the state's shape
+  down; null slots may hold null or an object; every element of an array
+  matches the template array's first element, so each party member and trail
+  point is checked). Any other version or shape starts a new game instead of
+  crashing later. A change to the state's shape
   bumps the version. Content growing is not a shape change: a critter added
   since the save was made starts in chaos when it loads (`parseSave` lays the
   saved critters over the template's).
@@ -611,10 +658,13 @@ ios/            Capacitor iOS project (from Milestone 4).
     restored at boot, or null for a new game.
   - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
-    cache), Maddie's `hidden` fraction, the depth layer's draw order
-    (`{ label, zIndex }[]`, with `fae`, `maddie`, and `occluder:<id>`), and both
-    characters' current animation and frame, plus prompt and dialogue summaries.
-    `npcs` lists each person in the area as `{ id, frame, facing }`.
+    cache), the depth layer's draw order (`{ label, zIndex }[]`, with `fae`,
+    each party member's id such as `maddie`, and `occluder:<id>`), Fae's
+    current `animation` and `frame`, `party` (each member in party order as
+    `{ id, hidden, animation, frame }`, `hidden` being its fraction behind its
+    leader), plus prompt and dialogue summaries. `npcs` lists each person in
+    the area as `{ id, frame, facing }`. `battle.layout` includes `party`, the
+    members' CSS-px points.
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.
@@ -634,10 +684,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   gameplay feature has at least one e2e test that uses real key presses.
 - Visual baselines live beside the e2e specs. Update them only after viewing
   the new image.
-- Fixtures (`content/fixtures/<name>.json`) contain `area`, `spawn`, and an
-  optional `seed`. Sim scripts live in `tests/sim/scripts/<fixture>/` and are
-  arrays of `{ frame: ActionFrame, ticks: number }` segments; `bun run sim`
-  starts each from its folder's fixture and checks collision every tick.
+- Fixtures (`content/fixtures/<name>.json`) contain `area`, `spawn`, an
+  optional `seed`, and an optional `party` (member ids, overriding the
+  roster's `start` members; test-only). Sim scripts live in
+  `tests/sim/scripts/<fixture>/` and are arrays of
+  `{ frame: ActionFrame, ticks: number }` segments; `bun run sim` starts each
+  from its folder's fixture and checks collision for Fae and every party
+  member every tick, then runs `tools/sim/party-chain.ts` (a two-member party
+  through the harness: valid, never teleporting, Maddie unchanged).
 - `new-game/chapter-one.json` plays the whole story so far from a new game
   (both battles won, every door, the conversations, the tree house); a unit
   test pins its ending and the browser and Bun must agree on its hash. It is

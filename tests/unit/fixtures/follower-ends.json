@@ -1,0 +1,254 @@
+{
+  "harness/concave-corners.json": {
+    "tick": 600,
+    "area": "harness",
+    "player": {
+      "x": 879.999,
+      "y": 660.001
+    },
+    "facing": "right",
+    "follower": {
+      "x": 817.0735283258891,
+      "y": 693.8075892197926,
+      "facing": "right",
+      "moving": true,
+      "distance": 1791.5391866262296,
+      "stillTicks": 0,
+      "trail": 10
+    }
+  },
+  "harness/harness-600.json": {
+    "tick": 600,
+    "area": "harness",
+    "player": {
+      "x": 159.99900000000002,
+      "y": 1139.999
+    },
+    "facing": "left",
+    "follower": {
+      "x": 247.08895212789776,
+      "y": 1139.999,
+      "facing": "left",
+      "moving": true,
+      "distance": 1655.54912677802,
+      "stillTicks": 0,
+      "trail": 11
+    }
+  },
+  "new-game/bedroom.json": {
+    "tick": 295,
+    "area": "bedroom",
+    "player": {
+      "x": 776.1580691786127,
+      "y": 430.1634864179314
+    },
+    "facing": "right",
+    "follower": {
+      "x": 694.7107187767913,
+      "y": 430,
+      "facing": "right",
+      "moving": true,
+      "distance": 1141.401005092053,
+      "stillTicks": 0,
+      "trail": 10
+    }
+  },
+  "new-game/chapter-one.json": {
+    "tick": 3210,
+    "area": "park",
+    "player": {
+      "x": 736,
+      "y": 502
+    },
+    "facing": "up",
+    "follower": {
+      "x": 736,
+      "y": 586.3450093132096,
+      "facing": "up",
+      "moving": false,
+      "distance": 691.011635574197,
+      "stillTicks": 17,
+      "trail": 11
+    }
+  },
+  "new-game/door-round-trip.json": {
+    "tick": 118,
+    "area": "bedroom",
+    "player": {
+      "x": 525,
+      "y": 396
+    },
+    "facing": "down",
+    "follower": {
+      "x": 473,
+      "y": 374,
+      "facing": "down",
+      "moving": false,
+      "distance": 0,
+      "stillTicks": 4,
+      "trail": 1
+    }
+  },
+  "new-game/morning.json": {
+    "tick": 569,
+    "area": "bedroom",
+    "player": {
+      "x": 450.001,
+      "y": 386
+    },
+    "facing": "down",
+    "follower": {
+      "x": 496.45625082034104,
+      "y": 339.6301599609373,
+      "facing": "left",
+      "moving": false,
+      "distance": 351.3403975886223,
+      "stillTicks": 202,
+      "trail": 6
+    }
+  },
+  "park/pup-win.json": {
+    "tick": 539,
+    "area": "park",
+    "player": {
+      "x": 812,
+      "y": 602
+    },
+    "facing": "right",
+    "follower": {
+      "x": 723.6549906867904,
+      "y": 602,
+      "facing": "right",
+      "moving": false,
+      "distance": 663.3403975886224,
+      "stillTicks": 363,
+      "trail": 11
+    }
+  },
+  "plaza/explore.json": {
+    "tick": 330,
+    "area": "plaza",
+    "player": {
+      "x": 1589.914997833817,
+      "y": 520.001
+    },
+    "facing": "up",
+    "follower": {
+      "x": 1589.914997833817,
+      "y": 585.374998454259,
+      "facing": "up",
+      "moving": true,
+      "distance": 659.2103569221262,
+      "stillTicks": 6,
+      "trail": 8
+    }
+  },
+  "plaza/frog-rest.json": {
+    "tick": 841,
+    "area": "plaza",
+    "player": {
+      "x": 1200,
+      "y": 550
+    },
+    "facing": "up",
+    "follower": {
+      "x": 1148,
+      "y": 544,
+      "facing": "up",
+      "moving": false,
+      "distance": 0,
+      "stillTicks": 99,
+      "trail": 1
+    }
+  },
+  "plaza/frog-run.json": {
+    "tick": 183,
+    "area": "plaza",
+    "player": {
+      "x": 1062.0919349233075,
+      "y": 855.0007887086954
+    },
+    "facing": "right",
+    "follower": {
+      "x": 1140,
+      "y": 847.6490793260276,
+      "facing": "down",
+      "moving": false,
+      "distance": 390.7674582227691,
+      "stillTicks": 72,
+      "trail": 10
+    }
+  },
+  "plaza/frog-win.json": {
+    "tick": 526,
+    "area": "plaza",
+    "player": {
+      "x": 1062.0919349233075,
+      "y": 855.0007887086954
+    },
+    "facing": "left",
+    "follower": {
+      "x": 1140,
+      "y": 847.6490793260276,
+      "facing": "down",
+      "moving": false,
+      "distance": 390.7674582227691,
+      "stillTicks": 415,
+      "trail": 10
+    }
+  },
+  "plaza/maddie-loop.json": {
+    "tick": 360,
+    "area": "plaza",
+    "player": {
+      "x": 1257.5926854806812,
+      "y": 410.89785494998443
+    },
+    "facing": "right",
+    "follower": {
+      "x": 1200.185841133135,
+      "y": 403.7327822506031,
+      "facing": "right",
+      "moving": false,
+      "distance": 1085.4759254189644,
+      "stillTicks": 34,
+      "trail": 1
+    }
+  },
+  "school/hall-pass.json": {
+    "tick": 816,
+    "area": "plaza",
+    "player": {
+      "x": 290,
+      "y": 930
+    },
+    "facing": "up",
+    "follower": {
+      "x": 238,
+      "y": 924,
+      "facing": "up",
+      "moving": false,
+      "distance": 0,
+      "stillTicks": 20,
+      "trail": 1
+    }
+  },
+  "school/raccoon.json": {
+    "tick": 1257,
+    "area": "plaza",
+    "player": {
+      "x": 398,
+      "y": 834
+    },
+    "facing": "up",
+    "follower": {
+      "x": 398,
+      "y": 891.2892812232087,
+      "facing": "up",
+      "moving": false,
+      "distance": 195.72635395748821,
+      "stillTicks": 20,
+      "trail": 1
+    }
+  }
+}

@@ -11,11 +11,15 @@ import {
   type Texture,
 } from "pixi.js";
 import {
+  faeBox,
   hiddenFraction,
   npcFacing,
   npcVisible,
+  partyLeader,
   targetInteractable,
   type Area,
+  type PartyContent,
+  type PartyMember,
   type Point,
   type State,
   type World,
@@ -25,7 +29,7 @@ import { followCamera, worldToScreen } from "./camera";
 import { selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
 import { fadeAlpha } from "./fade";
-import { battleLayout } from "./battle-layout";
+import { battleLayout, type BattleLayout } from "./battle-layout";
 
 // Critter frames are 512 px with the feet at y 504 (docs/art/critters.md).
 // Aura and body centroids are measured in each critter's content atlas.
@@ -53,7 +57,9 @@ export class GameView {
   private readonly scene = new Container();
   private readonly depth = new Container();
   private readonly player = new Sprite();
-  private readonly maddie = new Sprite();
+  // One overworld sprite per roster member, labelled with its id; only the
+  // members in the party are visible.
+  private readonly partySprites = new Map<string, Sprite>();
   private readonly viewportMask = new Graphics();
   private readonly battleLayer = new Container();
   // A light cream wash over the blurred backdrop so the figures stand out.
@@ -78,7 +84,7 @@ export class GameView {
   private readonly battleCritter = new Sprite();
   private readonly battleCritterAura = new Sprite();
   private readonly battleFae = new Sprite();
-  private readonly battleMaddie = new Sprite();
+  private readonly battlePartySprites = new Map<string, Sprite>();
   private readonly label: Text | undefined;
   private areaView: AreaView | undefined;
   private viewWidth = 960;
@@ -89,8 +95,7 @@ export class GameView {
   private staticPaper = 0;
   private currentAnimation = "idle_down";
   private currentFrame = 0;
-  private currentMaddieAnimation = "idle_down";
-  private currentMaddieFrame = 0;
+  private partyFrames: { id: string; animation: string; frame: number }[] = [];
   private readonly areaTextureUrls = new Set<string>();
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
   private critterFrames: { id: string; frame: string }[] = [];
@@ -104,7 +109,16 @@ export class GameView {
     this.renderer = options.renderer;
     this.depth.sortableChildren = true;
     this.player.label = "fae";
-    this.maddie.label = "maddie";
+    for (const id of Object.keys(world.party)) {
+      const sprite = new Sprite();
+      sprite.label = id;
+      sprite.visible = false;
+      this.partySprites.set(id, sprite);
+      const battleSprite = new Sprite();
+      battleSprite.label = `battle:${id}`;
+      battleSprite.visible = false;
+      this.battlePartySprites.set(id, battleSprite);
+    }
     this.battleCritter.label = "battle:critter";
     this.battleCritterAura.label = "battle:critter:aura";
     this.player.scale.set(0.5);
@@ -121,12 +135,12 @@ export class GameView {
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.depth);
     this.depth.addChild(this.player);
-    this.depth.addChild(this.maddie);
+    for (const sprite of this.partySprites.values()) this.depth.addChild(sprite);
     this.battleLayer.addChild(
       this.battleCritterAura,
       this.battleCritter,
       this.battleFae,
-      this.battleMaddie,
+      ...this.battlePartySprites.values(),
     );
     if (options.debugLabel) {
       this.label = new Text({
@@ -149,11 +163,13 @@ export class GameView {
       ...Object.entries(this.world.critters).map(([id, critter]) =>
         Assets.load({ alias: `${id}-sheet`, src: assetUrl(critter.atlas) }),
       ),
-      Assets.load({
-        alias: "maddie-sheet",
-        src: assetUrl("assets/characters/maddie/maddie.json"),
-        data: { textureOptions: { autoGenerateMipmaps: true } },
-      }),
+      ...Object.entries(this.world.party).map(([id, member]) =>
+        Assets.load({
+          alias: `${id}-sheet`,
+          src: assetUrl(member.atlas),
+          data: { textureOptions: { autoGenerateMipmaps: true } },
+        }),
+      ),
       ...Object.entries(this.world.characters).map(([id, character]) =>
         Assets.load({
           alias: `${id}-sheet`,
@@ -274,35 +290,53 @@ export class GameView {
     this.currentFrame = selection.frame;
   }
 
-  private setMaddieTexture(state: State): void {
-    const sheet = Assets.get<Spritesheet>("maddie-sheet");
-    const side = state.maddie.facing === "right" ? "left" : state.maddie.facing;
-    const mirror = state.maddie.facing === "right";
-    const sitting =
-      !state.maddie.motion.moving &&
-      state.maddie.stillTicks >= this.world.tunables.follow.sitDelayTicks;
-    const animation = sitting ? `idle_${side}` : `walk_${side}`;
+  // A party member's frame: walk frames advance with its own distance; at
+  // rest, a sitter (Maddie) keeps standing (walk frame 0) until sitDelayTicks
+  // and then sits (its idle), anyone else idles at once.
+  private setFollowerTexture(
+    sprite: Sprite,
+    member: PartyMember,
+    content: PartyContent,
+  ): { id: string; animation: string; frame: number } {
+    const sheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
+    const side = member.facing === "right" ? "left" : member.facing;
+    const mirror = member.facing === "right";
+    const resting =
+      !member.motion.moving &&
+      (!content.sits ||
+        member.stillTicks >= this.world.tunables.follow.sitDelayTicks);
+    const animation = resting ? `idle_${side}` : `walk_${side}`;
     const frames = sheet.animations[animation];
     if (frames === undefined || frames.length === 0)
-      throw new Error(`Missing Maddie animation ${animation}`);
-    const frame = sitting
-      ? 0
-      : state.maddie.motion.moving
-        ? Math.floor(
-            (state.maddie.motion.distance /
-              this.world.tunables.follow.walkCycleUnits) *
-              frames.length,
-          ) % frames.length
-        : 0;
+      throw new Error(`Missing ${member.id} animation ${animation}`);
+    const frame = member.motion.moving
+      ? Math.floor(
+          (member.motion.distance / content.walkCycleUnits) * frames.length,
+        ) % frames.length
+      : 0;
     const texture = frames[frame];
-    if (texture === undefined) throw new Error(`Missing Maddie frame ${frame}`);
-    this.maddie.texture = texture;
+    if (texture === undefined)
+      throw new Error(`Missing ${member.id} frame ${frame}`);
+    sprite.texture = texture;
     if (texture.defaultAnchor === undefined)
-      throw new Error("Maddie anchor missing");
-    this.maddie.anchor.copyFrom(texture.defaultAnchor);
-    this.maddie.scale.x = mirror ? -0.5 : 0.5;
-    this.currentMaddieAnimation = animation;
-    this.currentMaddieFrame = frame;
+      throw new Error(`${member.id} anchor missing`);
+    sprite.anchor.copyFrom(texture.defaultAnchor);
+    sprite.scale.set(mirror ? -0.5 : 0.5, 0.5);
+    return { id: member.id, animation, frame };
+  }
+
+  private renderParty(state: State): void {
+    const inParty = new Set(state.party.map((member) => member.id));
+    for (const [id, sprite] of this.partySprites)
+      sprite.visible = inParty.has(id);
+    this.partyFrames = state.party.flatMap((member) => {
+      const sprite = this.partySprites.get(member.id);
+      const content = this.world.party[member.id];
+      if (sprite === undefined || content === undefined) return [];
+      sprite.position.set(member.x, member.y);
+      sprite.zIndex = member.y;
+      return [this.setFollowerTexture(sprite, member, content)];
+    });
   }
 
   render(
@@ -345,10 +379,8 @@ export class GameView {
     this.scene.position.set(offsetX, offsetY);
     this.player.position.set(state.player.x, state.player.y);
     this.player.zIndex = state.player.y;
-    this.maddie.position.set(state.maddie.x, state.maddie.y);
-    this.maddie.zIndex = state.maddie.y;
     this.setFaeTexture(state);
-    this.setMaddieTexture(state);
+    this.renderParty(state);
     this.renderCritters(state);
     this.renderNpcs(state);
     this.renderBattle(state, width, height, resolution);
@@ -406,7 +438,7 @@ export class GameView {
   }
 
   // Overworld critters: chaos (with the pulsing aura behind) or calm, y-sorted
-  // with Fae, Maddie, and the occluders, their figures overworldHeight tall.
+  // with Fae, her party, and the occluders, their figures overworldHeight tall.
   private renderCritters(state: State): void {
     const area = this.areaView?.area;
     const frames: { id: string; frame: string }[] = [];
@@ -527,14 +559,7 @@ export class GameView {
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const x = (width - this.viewWidth * scale) / 2;
     const y = (height - this.viewHeight * scale) / 2;
-    const layout = battleLayout(
-      width,
-      height,
-      this.viewWidth,
-      this.viewHeight,
-      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
-      140,
-    );
+    const layout = this.layoutFor(state, width, height);
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(x, y);
     this.battleWash
@@ -591,21 +616,42 @@ export class GameView {
         (layout.fae.baseline - y) / scale,
       );
     }
-    const maddieSheet = Assets.get<Spritesheet>("maddie-sheet");
-    const maddieFrames = maddieSheet.animations.idle_down;
-    const maddie = maddieFrames?.[0];
-    if (maddie !== undefined) {
-      this.battleMaddie.texture = maddie;
-      if (maddie.defaultAnchor !== undefined)
-        this.battleMaddie.anchor.copyFrom(maddie.defaultAnchor);
-      this.battleMaddie.scale.set(0.5);
-      this.battleMaddie.position.set(
-        (layout.fae.x - x) / scale + 42,
-        (layout.fae.baseline - y) / scale,
-      );
-    }
+    // The party stands with Fae: a sitter (Maddie) sits facing the critter,
+    // anyone else is seen from behind like Fae.
+    const inParty = new Set(state.party.map((member) => member.id));
+    for (const [id, sprite] of this.battlePartySprites)
+      sprite.visible = inParty.has(id);
+    state.party.forEach((member, index) => {
+      const sprite = this.battlePartySprites.get(member.id);
+      const content = this.world.party[member.id];
+      const place = layout.party[index];
+      if (sprite === undefined || content === undefined || place === undefined)
+        return;
+      const memberSheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
+      const pose = content.sits ? "idle_down" : "idle_up";
+      const frame = (memberSheet.animations[pose] ?? memberSheet.animations.idle_down)?.[0];
+      if (frame === undefined) return;
+      sprite.texture = frame;
+      if (frame.defaultAnchor !== undefined)
+        sprite.anchor.copyFrom(frame.defaultAnchor);
+      sprite.scale.set(0.5);
+      sprite.position.set((place.x - x) / scale, (place.y - y) / scale);
+    });
     this.battleLayer.alpha =
       battle.phase === "intro" ? Math.min(1, battle.phaseTicks / 18) : 1;
+  }
+
+  // The one battle layout (spec 8), for the scene, the ring, and renderInfo.
+  private layoutFor(state: State, width: number, height: number): BattleLayout {
+    return battleLayout(
+      width,
+      height,
+      this.viewWidth,
+      this.viewHeight,
+      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
+      faeBox.height,
+      state.party.length,
+    );
   }
 
   /** The Talk prompt for this frame, anchored at the target in CSS px. */
@@ -641,14 +687,7 @@ export class GameView {
   ): { x: number; y: number; radius: number } | null {
     const aim = state.battle?.aim;
     if (aim === null || aim === undefined) return null;
-    const layout = battleLayout(
-      width,
-      height,
-      this.viewWidth,
-      this.viewHeight,
-      this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
-      140,
-    );
+    const layout = this.layoutFor(state, width, height);
     const centre =
       aim.side === "fae"
         ? {
@@ -673,8 +712,9 @@ export class GameView {
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
-    maddie: { animation: string; frame: number };
-    hidden: number;
+    // Each party member in party order: how hidden it is behind its leader,
+    // and its current animation and frame.
+    party: { id: string; hidden: number; animation: string; frame: number }[];
     fade: number;
     cachedAreaTextures: string[];
     prompt: { visible: boolean; label: string; x: number; y: number };
@@ -695,6 +735,7 @@ export class GameView {
       layout: {
         critter: { x: number; baseline: number; height: number };
         fae: { x: number; baseline: number; height: number };
+        party: { x: number; y: number }[];
       } | null;
       backdrop: { x: number; y: number; width: number; height: number } | null;
       overworldVisible: boolean;
@@ -705,19 +746,8 @@ export class GameView {
     const layout =
       state.battle === null
         ? null
-        : battleLayout(
-            window.innerWidth,
-            window.innerHeight,
-            this.viewWidth,
-            this.viewHeight,
-            this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ??
-              190,
-            140,
-          );
-    const safeLayout = state.battle === null ? undefined : layout;
-    if (state.battle !== null && safeLayout === undefined)
-      throw new Error("Battle layout missing");
-    const renderLayout = safeLayout ?? {
+        : this.layoutFor(state, window.innerWidth, window.innerHeight);
+    const renderLayout = layout ?? {
       critter: { x: 0, baseline: 0, height: 0 },
       fae: { x: 0, baseline: 0, height: 0 },
     };
@@ -729,11 +759,18 @@ export class GameView {
       })),
       animation: this.currentAnimation,
       frame: this.currentFrame,
-      maddie: {
-        animation: this.currentMaddieAnimation,
-        frame: this.currentMaddieFrame,
-      },
-      hidden: hiddenFraction(state.maddie, state.player),
+      party: this.partyFrames.map((frames, index) => {
+        const member = state.party[index];
+        const content = this.world.party[frames.id];
+        const leader = partyLeader(this.world, state, index);
+        return {
+          ...frames,
+          hidden:
+            member === undefined || content === undefined
+              ? 0
+              : hiddenFraction(member, content.box, leader.point, leader.box),
+        };
+      }),
       fade,
       cachedAreaTextures: [...this.areaTextureUrls].filter((url) =>
         Assets.cache.has(url),

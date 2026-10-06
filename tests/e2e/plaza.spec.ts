@@ -11,7 +11,7 @@ test("real keys cross the bedroom and kitchen doors in both directions", async (
   const kitchen = await page.evaluate(() => window.__cloverhollow?.getState());
   expect(kitchen?.area).toBe("kitchen");
   expect(kitchen?.player).toEqual({ x: 500, y: 650 });
-  expect(kitchen?.maddie).toBeDefined();
+  expect(kitchen?.party.map((member) => member.id)).toEqual(["maddie"]);
   const kitchenInfo = await renderInfo(page);
   expect(kitchenInfo.area).toBe("kitchen");
   expect(kitchenInfo.drawOrder.some((item) => item.label === "maddie")).toBe(true);

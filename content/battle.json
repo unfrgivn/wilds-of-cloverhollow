@@ -4,10 +4,6 @@
       "label": "Soothe",
       "snackDetail": null
     },
-    "play": {
-      "label": "Play",
-      "snackDetail": null
-    },
     "snack": {
       "label": "Snack",
       "snackDetail": "×N"

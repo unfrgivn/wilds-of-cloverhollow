@@ -41,7 +41,7 @@ function battleState(): State {
       energy: 5,
       calm: 0,
       snacks: 2,
-      rest: 0,
+      rest: {},
       aim: null,
       lastGrade: null,
       rewardSticker: null,
@@ -156,7 +156,7 @@ describe("calm-down battle core", () => {
 
   it("skips disabled Play and Snack commands in both menu directions", () => {
     let state = battleState();
-    state = { ...state, battle: { ...state.battle!, rest: 1, snacks: 0 } };
+    state = { ...state, battle: { ...state.battle!, rest: { play: 1 }, snacks: 0 } };
     state = step(content.world, state, { ...none, move: { x: 0, y: 1 } }).state;
     expect(state.battle?.selected).toBe(3);
     state = step(content.world, state, {
@@ -170,7 +170,7 @@ describe("calm-down battle core", () => {
     let state = battleState();
     state = step(content.world, state, { ...none, choose: 1 }).state;
     expect(state.battle?.phase).toBe("aim");
-    state = { ...battleState(), battle: { ...battleState().battle!, rest: 1 } };
+    state = { ...battleState(), battle: { ...battleState().battle!, rest: { play: 1 } } };
     expect(
       step(content.world, state, { ...none, choose: 1 }).state.battle?.phase,
     ).toBe("command");
@@ -256,16 +256,16 @@ describe("calm-down battle core", () => {
     state = step(content.world, state, { ...none, move: { x: 0, y: 1 } }).state;
     state = press(state);
     expect(state.battle?.command).toBe("play");
-    expect(state.battle?.rest).toBe(1);
+    expect(state.battle?.rest).toEqual({ play: 1 });
     expect(battleCommands(content.world, state)[1]?.disabled).toBe(true);
   });
 
   it("expires Play rest after a command turn", () => {
     let state = battleState();
-    state = { ...state, battle: { ...state.battle!, rest: 1 } };
+    state = { ...state, battle: { ...state.battle!, rest: { play: 1 } } };
     expect(battleCommands(content.world, state)[1]?.disabled).toBe(true);
     state = press(state);
-    expect(state.battle?.rest).toBe(0);
+    expect(state.battle?.rest).toEqual({});
   });
 
   it("shows the burst warning before entering the Fae aim", () => {
@@ -294,7 +294,7 @@ describe("calm-down battle core", () => {
   it("increments Maddie's settling time while Fae is frozen", () => {
     const state = battleState();
     const next = step(content.world, state, none).state;
-    expect(next.maddie.stillTicks).toBe(state.maddie.stillTicks + 1);
+    expect(next.party[0]?.stillTicks).toBe((state.party[0]?.stillTicks ?? NaN) + 1);
   });
 
   it("returns a UI-shaped derived aim and nullable details", () => {

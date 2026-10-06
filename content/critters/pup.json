@@ -31,15 +31,17 @@
       "great": 10,
       "good": 5
     },
-    "play": {
-      "calm": 30,
-      "great": 10,
-      "good": 5,
-      "rest": 1
-    },
     "snack": {
       "calm": 5,
       "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      }
     }
   },
   "timing": {
@@ -63,13 +65,14 @@
       "good": "Fae speaks softly. The pup tilts his head and listens.",
       "miss": "Fae tries, but the pup is too zoomy to hear much."
     },
-    "play": {
-      "great": "Maddie bats a tennis ball across the grass. The pup races after it, tail wagging!",
-      "good": "Maddie nudges a tennis ball. The pup can't resist a sniff.",
-      "miss": "Maddie swats at a ball... and it bonks her on the nose. The pup gives a puppy grin."
+    "friends": {
+      "play": {
+        "great": "Maddie bats a tennis ball across the grass. The pup races after it, tail wagging!",
+        "good": "Maddie nudges a tennis ball. The pup can't resist a sniff.",
+        "miss": "Maddie swats at a ball... and it bonks her on the nose. The pup gives a puppy grin."
+      }
     },
     "snack": "Fae shares a crunchy cracker. Energy up! The pup licks his lips.",
-    "playResting": "resting",
     "burst": "The pup barks and bats a flurry of tennis balls at Fae!",
     "burstResult": {
       "great": "Boing, boing! Fae catches every single ball!",

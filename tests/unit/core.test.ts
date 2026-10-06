@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import {
   createState,
   distanceToPolygon,
+  faeBox,
   followerSlot,
   hiddenFraction,
   nextRandom,
@@ -29,6 +30,8 @@ const newGame = content.fixtures["new-game"];
 if (newGame === undefined) throw new Error("new-game fixture missing");
 const area = world.areas.harness;
 if (area === undefined) throw new Error("area missing");
+const maddieBox = world.party.maddie?.box;
+if (maddieBox === undefined) throw new Error("Maddie missing from the roster");
 const none: ActionFrame = {
   move: { x: 0, y: 0 },
   confirm: false,
@@ -282,13 +285,15 @@ describe("core", () => {
       ...plaza,
       triggers: [{ ...trigger, target: { area: "missing", spawn: "x" } }],
     };
-    expect(areaConnectionErrors({ ...world.areas, plaza: badTarget }, world.tunables))
+    expect(areaConnectionErrors({ ...world.areas, plaza: badTarget }, world.tunables,
+      world.critters, world.party))
       .toContain("plaza: trigger house-front-door has an invalid target");
     const badSpawn = {
       ...plaza,
       spawns: { ...plaza.spawns, bad: { x: 350, y: 530, facing: "down" as const } },
     };
-    expect(areaConnectionErrors({ ...world.areas, plaza: badSpawn }, world.tunables))
+    expect(areaConnectionErrors({ ...world.areas, plaza: badSpawn }, world.tunables,
+      world.critters, world.party))
       .toContain("plaza: spawn bad is within 40 units of house-front-door");
   });
 
@@ -316,12 +321,14 @@ describe("core", () => {
         state = step(world, state, frame).state;
         const area = world.areas[state.area];
         if (area === undefined) throw new Error("area missing");
-        expect(pointInPolygon(state.maddie, area.walkable)).toBe(true);
-        expect(distanceToPolygon(state.maddie, area.walkable))
+        const [maddie] = state.party;
+        if (maddie === undefined) throw new Error("Maddie missing");
+        expect(pointInPolygon(maddie, area.walkable)).toBe(true);
+        expect(distanceToPolygon(maddie, area.walkable))
           .toBeGreaterThanOrEqual(world.tunables.follow.radius - 0.01);
         for (const blocker of area.blockers) {
-          expect(pointInPolygon(state.maddie, blocker)).toBe(false);
-          expect(distanceToPolygon(state.maddie, blocker))
+          expect(pointInPolygon(maddie, blocker)).toBe(false);
+          expect(distanceToPolygon(maddie, blocker))
             .toBeGreaterThanOrEqual(world.tunables.follow.radius - 0.01);
         }
       }
@@ -341,10 +348,11 @@ describe("core", () => {
     for (const [x, y, ticks] of legs) {
       for (let tick = 0; tick < ticks; tick += 1) {
         state = step(world, state, { ...none, move: { x, y } }).state;
-        expect(state.trail.length).toBeLessThanOrEqual(world.tunables.follow.trailMax);
-        for (let index = 1; index < state.trail.length; index += 1) {
-          const previous = state.trail[index - 1];
-          const current = state.trail[index];
+        const trail = state.party[0]?.trail ?? [];
+        expect(trail.length).toBeLessThanOrEqual(world.tunables.follow.trailMax);
+        for (let index = 1; index < trail.length; index += 1) {
+          const previous = trail[index - 1];
+          const current = trail[index];
           if (previous === undefined || current === undefined) continue;
           const dx = current.x - previous.x;
           const dy = current.y - previous.y;
@@ -358,37 +366,29 @@ describe("core", () => {
     const bedroom = world.areas.bedroom;
     const spawn = bedroom?.spawns.door;
     if (bedroom === undefined || spawn === undefined) throw new Error("door missing");
-    expect(followerSlot(
-      bedroom,
-      spawn,
-      world.tunables.follow.slot,
-      world.tunables.follow.radius,
-      world.tunables.follow.heel,
-    )).toBeDefined();
+    expect(followerSlot(bedroom, spawn, world.tunables.follow, maddieBox, faeBox))
+      .toBeDefined();
   });
 
   it("measures Maddie's visibility from feet-anchored body boxes", () => {
-    expect(hiddenFraction({ x: 552, y: 404 }, { x: 500, y: 410 })).toBe(0);
-    expect(hiddenFraction({ x: 500, y: 350 }, { x: 500, y: 410 })).toBeCloseTo(1);
-    expect(hiddenFraction({ x: 500, y: 420 }, { x: 500, y: 410 })).toBe(0);
+    const hidden = (maddie: { x: number; y: number }, fae: { x: number; y: number }) =>
+      hiddenFraction(maddie, maddieBox, fae, faeBox);
+    expect(hidden({ x: 552, y: 404 }, { x: 500, y: 410 })).toBe(0);
+    expect(hidden({ x: 500, y: 350 }, { x: 500, y: 410 })).toBeCloseTo(1);
+    expect(hidden({ x: 500, y: 420 }, { x: 500, y: 410 })).toBe(0);
   });
 
   it("validates all area connections with the tunable radius", () => {
-    expect(areaConnectionErrors(world.areas, world.tunables)).toEqual([]);
+    expect(areaConnectionErrors(world.areas, world.tunables, world.critters, world.party))
+      .toEqual([]);
   });
 
   it("places every spawn slot beside Fae without hiding Maddie", () => {
     for (const area of Object.values(world.areas)) {
       for (const spawn of Object.values(area.spawns)) {
-        const slot = followerSlot(
-          area,
-          spawn,
-          world.tunables.follow.slot,
-          world.tunables.follow.radius,
-          world.tunables.follow.heel,
-        );
+        const slot = followerSlot(area, spawn, world.tunables.follow, maddieBox, faeBox);
         if (slot === undefined) throw new Error(`${area.id}: slot missing`);
-        expect(hiddenFraction(slot, spawn)).toBe(0);
+        expect(hiddenFraction(slot, maddieBox, spawn, faeBox)).toBe(0);
       }
     }
   });

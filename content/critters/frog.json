@@ -31,15 +31,17 @@
       "great": 10,
       "good": 5
     },
-    "play": {
-      "calm": 30,
-      "great": 10,
-      "good": 5,
-      "rest": 1
-    },
     "snack": {
       "calm": 5,
       "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      }
     }
   },
   "timing": {
@@ -63,13 +65,14 @@
       "good": "Fae hums softly. The frog wobbles and listens.",
       "miss": "Fae hums, but the frog is too fizzy to hear much."
     },
-    "play": {
-      "great": "Maddie chases the bubbles in a happy zig-zag. The frog giggles!",
-      "good": "Maddie bats at a bubble. The frog can't help smiling.",
-      "miss": "Maddie pounces... and lands in a puddle. The frog snorts a little laugh."
+    "friends": {
+      "play": {
+        "great": "Maddie chases the bubbles in a happy zig-zag. The frog giggles!",
+        "good": "Maddie bats at a bubble. The frog can't help smiling.",
+        "miss": "Maddie pounces... and lands in a puddle. The frog snorts a little laugh."
+      }
     },
     "snack": "Fae shares a crunchy cracker. Energy up! The frog sniffs, curious.",
-    "playResting": "resting",
     "burst": "The frog puffs a stream of pink bubbles at Fae!",
     "burstResult": {
       "great": "Pop, pop, pop! Fae pops every single bubble!",

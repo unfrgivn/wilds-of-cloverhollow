@@ -17,7 +17,6 @@
     "slot": 50,
     "heel": 52,
     "sitDelayTicks": 30,
-    "settleDelayTicks": 12,
-    "walkCycleUnits": 84
+    "settleDelayTicks": 12
   }
 }

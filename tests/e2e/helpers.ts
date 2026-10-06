@@ -67,8 +67,7 @@ export async function renderInfo(page: Page): Promise<{
   drawOrder: { label: string; zIndex: number }[];
   animation: string;
   frame: number;
-  maddie: { animation: string; frame: number };
-  hidden: number;
+  party: { id: string; hidden: number; animation: string; frame: number }[];
   fade: number;
   cachedAreaTextures: string[];
   prompt: { visible: boolean; label: string; x: number; y: number };
@@ -91,6 +90,7 @@ export async function renderInfo(page: Page): Promise<{
     layout: {
       critter: { x: number; baseline: number; height: number };
       fae: { x: number; baseline: number; height: number };
+      party: { x: number; y: number }[];
     } | null;
     backdrop: { x: number; y: number; width: number; height: number } | null;
     overworldVisible: boolean;

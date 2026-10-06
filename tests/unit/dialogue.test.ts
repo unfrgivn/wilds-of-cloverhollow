@@ -105,10 +105,10 @@ describe("dialogue state machine", () => {
 
   it("keeps Maddie settling while Fae reads", () => {
     let state = open(atWindow());
-    const before = state.maddie.stillTicks;
+    const before = state.party[0]?.stillTicks ?? NaN;
     state = run(state, Array.from({ length: 10 }, () => none));
-    expect(state.maddie.stillTicks).toBe(before + 10);
-    expect(state.maddie.motion.moving).toBe(false);
+    expect(state.party[0]?.stillTicks).toBe(before + 10);
+    expect(state.party[0]?.motion.moving).toBe(false);
   });
 
   it("remembers the plan when Fae looks out of the window again", () => {

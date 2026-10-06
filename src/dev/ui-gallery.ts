@@ -125,12 +125,20 @@ function renderGalleryState(): void {
   battleHud.render({ visible: battleState && state !== "battle-reward", energy: 3,
     energyMax: 5, calm: .45,
     critterName: "Fizzy Frog" });
-  commands.render({ visible: state === "battle-command", selected: 2, commands: [
+  // `?party=N` previews a bigger party's menu: N friend commands between
+  // Soothe and Snack (two columns on phones, one from 1000 px).
+  const friends = Math.max(1, Number(params.get("party") ?? "1"));
+  const commandList = [
     { id: "soothe", label: "Soothe", detail: null, disabled: false },
     { id: "play", label: "Play", detail: "resting", disabled: true },
+    ...Array.from({ length: friends - 1 }, (_, index) => ({
+      id: `friend-${index}`, label: ["Whistle", "Dig", "Dance"][index % 3] ?? "Help",
+      detail: null, disabled: false,
+    })),
     { id: "snack", label: "Snack", detail: "×2", disabled: false },
     { id: "run", label: "Run", detail: null, disabled: false },
-  ] });
+  ];
+  commands.render({ visible: state === "battle-command", selected: 2, commands: commandList });
   ring.render({
     ...(state === "battle-burst" ? faeRing : frogRing),
     visible: state === "battle-timing" || state === "battle-grade" || state === "battle-burst",

@@ -63,8 +63,9 @@ test("the bedroom door leads down to the kitchen, where Mom and Oliver are", asy
   expect(state.area).toBe("kitchen");
   expect(state.player).toEqual({ x: 500, y: 650 });
   expect(state.facing).toBe("right");
-  expect(Math.hypot(state.maddie.x - state.player.x, state.maddie.y - state.player.y))
-    .toBeLessThan(80);
+  const [maddie] = state.party;
+  if (maddie === undefined) throw new Error("Maddie missing from the party");
+  expect(Math.hypot(maddie.x - state.player.x, maddie.y - state.player.y)).toBeLessThan(80);
   const info = await renderInfo(page);
   expect(info.npcs.map((npc) => npc.id).sort()).toEqual(["mom", "oliver"]);
   expect(info.npcs.find((npc) => npc.id === "mom")?.facing).toBe("down");

@@ -625,6 +625,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   optional `seed`. Sim scripts live in `tests/sim/scripts/<fixture>/` and are
   arrays of `{ frame: ActionFrame, ticks: number }` segments; `bun run sim`
   starts each from its folder's fixture and checks collision every tick.
+- `new-game/chapter-one.json` plays the whole story so far from a new game
+  (both battles won, every door, the conversations, the tree house); a unit
+  test pins its ending and the browser and Bun must agree on its hash. It is
+  recorded by `tools/sim/chapter-one.ts`, which plays through the core like a
+  careful player; rerun it after a story or map change (it names the step
+  that no longer fits).
 - The Playwright suite serves the harness build from the `/cloverhollow/`
   sub-path, so any root-relative asset URL fails in tests as it would on iOS.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at

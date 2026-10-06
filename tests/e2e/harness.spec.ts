@@ -3,6 +3,7 @@ import type { ActionFrame, State } from "../../src/core";
 import { readFileSync } from "node:fs";
 import { parseScript } from "../../src/content/script";
 import {
+  longFlowTimeout,
   openHarness,
   resetPaused,
   resume,
@@ -82,15 +83,15 @@ for (const item of [
   { name: "pup-win", fixture: "park" },
   { name: "hall-pass", fixture: "school" },
   { name: "raccoon", fixture: "school" },
+  { name: "chapter-one", fixture: "new-game" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
     page,
   }) => {
-    // Replays a whole script in the browser and in Bun; under a full parallel
-    // run (and on CI's software-rendered browsers, about 6x slower) that takes
-    // longer than the default.
-    test.setTimeout(process.env.CI ? 180_000 : 60_000);
+    // Replays a whole script in the browser and in Bun (chapter-one is the
+    // whole story so far).
+    test.setTimeout(longFlowTimeout);
     // Scripts live in tests/sim/scripts/<fixture>/ (tools/sim/run-all.ts).
     const path = `tests/sim/scripts/${fixture}/${name}.json`;
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);

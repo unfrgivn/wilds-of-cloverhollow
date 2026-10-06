@@ -83,6 +83,21 @@ describe("people in areas", () => {
     expect(again.line?.text).toBe("Have a good day, sweetie. Stay curious!");
   });
 
+  it("people are solid for Maddie too", () => {
+    // Fae stands just above Mom (her footprint is x 600-630, y 520-545) and
+    // Maddie just below, too far away to stay put: she heads for Fae, and Mom
+    // is in the way. She never overlaps Mom's footprint on the way.
+    let state: State = inKitchen(615, 480, "down");
+    state = { ...state, maddie: { ...state.maddie, x: 615, y: 600 }, trail: [] };
+    const radius = world.tunables.follow.radius;
+    for (let tick = 0; tick < 120; tick += 1) {
+      state = step(world, state, none).state;
+      const { x, y } = state.maddie;
+      const overlaps = x > 600 - radius && x < 630 + radius && y > 520 - radius && y < 545 + radius;
+      expect(overlaps, `tick ${tick}: ${JSON.stringify({ x, y })}`).toBe(false);
+    }
+  });
+
   it("validates the characters file", () => {
     expect(() => parseCharacters({ mom: { atlas: "a.json", idleTicks: [180, 8] } }, "c.json"))
       .not.toThrow();

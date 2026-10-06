@@ -26,5 +26,12 @@
       170,
       8
     ]
+  },
+  "raccoon": {
+    "atlas": "assets/characters/raccoon/raccoon.json",
+    "idleTicks": [
+      150,
+      10
+    ]
   }
 }

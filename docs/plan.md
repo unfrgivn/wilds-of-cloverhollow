@@ -230,7 +230,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   per-trigger "blocked" list in the state; the outside-to-inside rule already
   replays the knot only after Fae steps out, so it was removed.
 
-## Milestone 15: The raccoon in the purple hood
+## Milestone 15: The raccoon in the purple hood **Status:** ✅ Completed (2026-10-06)
 - With the hall pass, Fae walks out into the plaza and meets the raccoon from
   the notice board (`chaos_raccoon.png`): he taunts her, vanishes in a puff of
   purple fizz, and drops the password to the club in the park's tree house.
@@ -242,8 +242,17 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   blockers into the person (`footprint`).
 - Unit (visibility, footprints), a sim (the raccoon scene), cross-engine
   hash, e2e with real keys, reviewed baselines, `just ios-smoke` unchanged.
+- Notes: the raccoon appears in the plaza once Nurse Holly gives the pass,
+  blabs the password ("Fizzlesticks... Oops") whichever way Fae asks, and
+  vanishes; the tree house opens with it, and the purple hood inside has a
+  Cloverhollow School name tag, pointing at a classmate (NOTES.md: the boss is
+  a kid at Fae's school). The first engine version read a story variable by
+  building a whole Story (0.2 ms) several times a tick, left Maddie walking
+  through people, and kept drawing someone after they'd gone; each was fixed,
+  with a test that fails without the fix. The first raccoon build cut his
+  tail with fixed panel crops; the build now extracts whole figures.
 
-## Roadmap after Milestone 14 (proposed, not scheduled)
+## Roadmap after Milestone 15 (proposed, not scheduled)
 - Audio: a gentle music bed per area and soft UI sounds (needs the owner's
   okay on any new dependency or paid generation).
 - Device testing and TestFlight (needs the owner: store and account actions).

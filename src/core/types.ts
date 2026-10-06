@@ -61,8 +61,10 @@ export type Npc = {
   id: string;
   point: Point;
   facing: Direction;
+  footprint: Polygon;
   knot: string;
   prompt: "Look" | "Talk";
+  visibleWhile?: string;
 };
 export type GroundManifest = {
   paper: string;
@@ -85,6 +87,8 @@ export type World = {
   battle: BattleContent;
   stickers: StickerCatalogue;
   characters: Record<string, CharacterContent>;
+  // Reads a story variable from an Ink state (createStoryReader over `story`).
+  storyVariable: (ink: string, name: string) => unknown;
 };
 // An area person's atlas and idle timing: ticks per idle_down frame (Mom
 // holds her smile, then blinks briefly; Oliver waves his rattle evenly).

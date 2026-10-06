@@ -1,0 +1,38 @@
+{
+  "asset": "raccoon",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "generationCalls": "2 (the three-pose strip, and one blink edit of the front pose); see art/scratch/generation-log.jsonl",
+  "references": [
+    "docs/art/concepts/npcs/chaos_raccoon.png",
+    "docs/art/concepts/npcs/npc_critter_set.png"
+  ],
+  "selectedRawSources": [
+    "art/source/raccoon/model-strip-raw.png",
+    "art/source/raccoon/blink-edit-raw.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-raccoon.ts (rebuilds the atlas byte for byte)",
+    "extract": "each pose found as a whole figure by the gaps between figures (extract-strip.ts); fixed thirds of the strip cut one tail flat and left a piece of it beside the next pose",
+    "key": "#00FF00 border flood plus enclosed holes, 18% fuzz (the visible edge band peaks at a green excess of 20 to 28; 45% changed nothing that mattered)",
+    "cleanup": "at sprite size, drop-islands.ts --min 120, then despill-edge.ts --key green --band 2",
+    "canvas": "448x448, figure 252 px (about 0.9x Fae), baseline 439",
+    "frames": {
+      "down_idle_01": "the strip's front pose",
+      "down_idle_02": "the blink edit of the front pose (a smug squint)",
+      "right_idle_01": "the strip's third pose (three-quarter right, waving)",
+      "left_idle_01": "right_idle_01 mirrored"
+    }
+  },
+  "validator": {
+    "biped": false,
+    "idleOnly": true,
+    "directions": [
+      "down",
+      "left",
+      "right"
+    ],
+    "key": "green"
+  },
+  "selectionReason": "The strip matches the concept: purple patchwork hood, teal collar, spiral eyes, a big grin, a striped tail. Mischief, not menace. The second pose was unused."
+}

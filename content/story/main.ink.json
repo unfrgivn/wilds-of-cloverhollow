@@ -401,6 +401,61 @@
       "journal": [
         "ev",
         {
+          "VAR?": "club_open"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The purple hood in the tree house has a Cloverhollow School name tag. Whose is it? ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "knows_password"
+        },
+        {
+          "VAR?": "club_open"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The raccoon's club password is \"Fizzlesticks\". A club... like the tree house in the park? ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "hall_pass"
         },
         "/ev",
@@ -415,7 +470,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.21"
               },
               null
             ]
@@ -444,7 +499,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.31"
               },
               null
             ]
@@ -482,7 +537,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.30"
+                "->": ".^.^.^.47"
               },
               null
             ]
@@ -511,7 +566,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.40"
+                "->": ".^.^.^.57"
               },
               null
             ]
@@ -536,7 +591,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.47"
+                "->": ".^.^.^.64"
               },
               null
             ]
@@ -565,7 +620,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.58"
+                "->": ".^.^.^.75"
               },
               null
             ]
@@ -594,7 +649,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.69"
+                "->": ".^.^.^.86"
               },
               null
             ]
@@ -990,6 +1045,56 @@
         }
       ],
       "tree_house": [
+        "ev",
+        {
+          "VAR?": "club_open"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "knows_password"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.password"
+              },
+              {
+                "->": ".^.^.^.10"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "^A tree house with a round door and a little sign: CLUB MEMBERS ONLY. ",
         "#",
         "^speaker: Fae",
@@ -1001,7 +1106,48 @@
         "/#",
         "\n",
         "done",
-        null
+        {
+          "password": [
+            "^Fae knocks on the round door and whispers, \"Fizzlesticks!\" ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^The round door creaks open! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^Inside: comics, a beanbag, a jar of fizzy purple soda... and a purple hood on a hook. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "club_open",
+              "re": true
+            },
+            "^There's a name tag sewn inside the hood. It's from Cloverhollow School! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "again": [
+            "^The club is empty. That purple hood belongs to someone at my school... ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
       ],
       "picnic": [
         "^A picnic with sandwiches, lemonade, and a basket of berries. ",
@@ -1231,6 +1377,13 @@
                 "VAR=": "hall_pass",
                 "re": true
               },
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "raccoon_waiting",
+                "re": true
+              },
               "^Here's a hall pass, so nobody stops you on the way. ",
               "#",
               "^speaker: Nurse Holly",
@@ -1291,6 +1444,134 @@
         "done",
         null
       ],
+      "raccoon": [
+        [
+          "^Heh heh heh! So YOU'RE the one who keeps un-fizzing my critters! ",
+          "#",
+          "^speaker: Raccoon",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^frog",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "str",
+          "^pup",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ The Fizzy Frog AND the Zoomie Pup? Hmph! ",
+                "#",
+                "^speaker: Raccoon",
+                {
+                  "->": ".^.^.^.17"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "^You'll never get into my secret club. Not without the password! ",
+          "#",
+          "^speaker: Raccoon",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^What's the password?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Why are you making everything fizzy?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Ha! As if I'd tell you it's \"Fizzlesticks\"! ...Oops. ",
+              "#",
+              "^speaker: Raccoon",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Because fizzy is FUN! Way more fun than school! ",
+              "#",
+              "^speaker: Raccoon",
+              "/#",
+              "\n",
+              "^And only my club knows the magic word: \"Fizzlesticks\"! ...Oops. ",
+              "#",
+              "^speaker: Raccoon",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "knows_password",
+                "re": true
+              },
+              "ev",
+              false,
+              "/ev",
+              {
+                "VAR=": "raccoon_waiting",
+                "re": true
+              },
+              "^With a puff of purple fizz, the raccoon is gone! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "global decl": [
         "ev",
         "str",
@@ -1310,6 +1591,18 @@
         false,
         {
           "VAR=": "hall_pass"
+        },
+        false,
+        {
+          "VAR=": "raccoon_waiting"
+        },
+        false,
+        {
+          "VAR=": "knows_password"
+        },
+        false,
+        {
+          "VAR=": "club_open"
         },
         "/ev",
         "end",

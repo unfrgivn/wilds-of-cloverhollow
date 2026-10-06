@@ -29,19 +29,28 @@ export function createInkState(storyJson: StoryJson, seed: number): string {
   return json;
 }
 
-export function inkVariable(
+// A story variable's value in an Ink state: true or false for booleans, text
+// for everything else, undefined for a name the story doesn't declare.
+export function inkVariable(storyJson: StoryJson, inkJson: string, name: string): unknown {
+  return createStoryReader(storyJson)(inkJson, name);
+}
+
+// The same reads without building a Story each time (about 0.2 ms each): one
+// Story is built up front, and each read only loads the state into it and
+// never continues it. For the per-tick checks, through world.storyVariable.
+export function createStoryReader(
   storyJson: StoryJson,
-  inkJson: string,
-  name: string,
-): unknown {
+): (inkJson: string, name: string) => unknown {
   const story = new Story(storyJson);
-  story.state.LoadJson(inkJson);
-  const variable = story.state.variablesState.GetVariableWithName(name);
-  if (variable === null) return undefined;
-  const text = variable.toString();
-  if (text === "true") return true;
-  if (text === "false") return false;
-  return text;
+  return (inkJson, name) => {
+    story.state.LoadJson(inkJson);
+    const variable = story.state.variablesState.GetVariableWithName(name);
+    if (variable === null) return undefined;
+    const text = variable.toString();
+    if (text === "true") return true;
+    if (text === "false") return false;
+    return text;
+  };
 }
 
 function line(story: Story): InkLine | null {

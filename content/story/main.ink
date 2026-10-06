@@ -2,6 +2,9 @@ VAR plan = "none"
 VAR ate_breakfast = false
 VAR read_notice = false
 VAR hall_pass = false
+VAR raccoon_waiting = false
+VAR knows_password = false
+VAR club_open = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -47,6 +50,8 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{club_open: The purple hood in the tree house has a Cloverhollow School name tag. Whose is it? # speaker: Fae}
+{knows_password and not club_open: The raccoon's club password is "Fizzlesticks". A club... like the tree house in the park? # speaker: Fae}
 {hall_pass: I have a hall pass! Time to follow the raccoon's trail. # speaker: Fae}
 {calmed("pup"): The Pond Pup is calm. A raccoon paw print points toward the school. # speaker: Fae}
 {calmed("frog") and not calmed("pup"): Purple fizz drips lead out of the plaza to Meadow Park. # speaker: Fae}
@@ -121,8 +126,22 @@ Woof! The Pond Pup wants to play fetch. # speaker: Pond Pup
 -> DONE
 
 === tree_house ===
+{club_open: -> again}
+{knows_password: -> password}
 A tree house with a round door and a little sign: CLUB MEMBERS ONLY. # speaker: Fae
 I wonder what the password is. # speaker: Fae
+-> DONE
+
+= password
+Fae knocks on the round door and whispers, "Fizzlesticks!" # speaker: Fae
+The round door creaks open! # speaker: Fae
+Inside: comics, a beanbag, a jar of fizzy purple soda... and a purple hood on a hook. # speaker: Fae
+~ club_open = true
+There's a name tag sewn inside the hood. It's from Cloverhollow School! # speaker: Fae
+-> DONE
+
+= again
+The club is empty. That purple hood belongs to someone at my school... # speaker: Fae
 -> DONE
 
 === picnic ===
@@ -158,6 +177,7 @@ Hi Fae! Is everything all right? # speaker: Nurse Holly
 + [I'm fine! Can I help with anything?]
     Oh, you're a star! Could you take this note to the front office? # speaker: Nurse Holly
     ~ hall_pass = true
+    ~ raccoon_waiting = true
     Here's a hall pass, so nobody stops you on the way. # speaker: Nurse Holly
 - -> DONE
 
@@ -176,4 +196,18 @@ The bulletin board: a spelling bee, a lost mitten, and a bake sale on Friday. # 
 
 === trophies ===
 Trophies for spelling, soccer, and the best pumpkin in Cloverhollow. # speaker: Fae
+-> DONE
+
+=== raccoon ===
+Heh heh heh! So YOU'RE the one who keeps un-fizzing my critters! # speaker: Raccoon
+{calmed("frog") and calmed("pup"): The Fizzy Frog AND the Zoomie Pup? Hmph! # speaker: Raccoon}
+You'll never get into my secret club. Not without the password! # speaker: Raccoon
+* [What's the password?]
+    Ha! As if I'd tell you it's "Fizzlesticks"! ...Oops. # speaker: Raccoon
+* [Why are you making everything fizzy?]
+    Because fizzy is FUN! Way more fun than school! # speaker: Raccoon
+    And only my club knows the magic word: "Fizzlesticks"! ...Oops. # speaker: Raccoon
+- ~ knows_password = true
+~ raccoon_waiting = false
+With a puff of purple fizz, the raccoon is gone! # speaker: Fae
 -> DONE

@@ -260,16 +260,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   each leads back.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
-- People: an area's `npcs` are `{ id, point, facing, knot, prompt }` (Ms.
-  Maple the teacher and Nurse Holly in the school hallway; Mom and
-  Oliver in the kitchen). Each is drawn from the atlas named for its id in
+- People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
+  visibleWhile? }` (Ms. Maple the teacher and Nurse Holly in the school
+  hallway; Mom and Oliver in the kitchen; the raccoon in the plaza). Each is
+  drawn from the atlas named for its id in
   `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
   ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for
   8), y-sorted with everyone else, and targeted like an interactable. While
   Fae talks to one (the dialogue's knot is theirs), they face her along the
   larger axis of the gap between them (`npcFacing`); otherwise they face as
-  authored. Without a frame for that facing they show their front. Their
-  footprint is an authored blocker.
+  authored. Without a frame for that facing they show their front.
+- A person's `footprint` polygon is solid, for Fae and for Maddie, like a
+  blocker. A person with `visibleWhile` (an Ink variable) is only there while
+  it's true; otherwise they aren't drawn, can't be talked to, and aren't
+  solid (`npcVisible`). The area checks count every footprint as solid, since
+  someone may be standing there. Story variables are read per tick through
+  `world.storyVariable(ink, name)`: one Story built at load, reused for each
+  read, since building one costs about 0.2 ms.
 - Area paintings: opaque WebP tiles (each at most 2048x2048) at 2 source px
   per unit, listed in `public/assets/areas/<id>/ground.json` (tile offsets in
   source px and the painting's `paper` margin colour). The paper colour fills

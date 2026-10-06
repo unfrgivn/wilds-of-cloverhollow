@@ -13,6 +13,7 @@ import {
 import {
   hiddenFraction,
   npcFacing,
+  npcVisible,
   targetInteractable,
   type Area,
   type Point,
@@ -368,7 +369,9 @@ export class GameView {
     for (const { npc, sprite } of this.npcSprites) {
       const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
       const character = this.world.characters[npc.id];
-      if (sheet === undefined || character === undefined) continue;
+      // Someone the story has sent away isn't drawn (spec 6).
+      sprite.visible = npcVisible(this.world, state, npc);
+      if (sheet === undefined || character === undefined || !sprite.visible) continue;
       const facing = npcFacing(state, npc);
       const wanted = `idle_${facing}`;
       const animation =
@@ -720,7 +723,7 @@ export class GameView {
     };
     return {
       area: this.areaView?.area.id ?? "",
-      drawOrder: this.depth.children.map((child) => ({
+      drawOrder: this.depth.children.filter((child) => child.visible).map((child) => ({
         label: child.label,
         zIndex: child.zIndex,
       })),

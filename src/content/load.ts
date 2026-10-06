@@ -16,6 +16,7 @@ import pupData from "../../content/critters/pup.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
+import { createStoryReader } from "../core/ink";
 import type {
   Area,
   CharacterContent,
@@ -156,8 +157,11 @@ export function parseArea(value: unknown, file: string): Area {
             typeof item.point.x === "number" &&
             typeof item.point.y === "number" &&
             direction(item.facing) &&
+            polygon(item.footprint) &&
             typeof item.knot === "string" &&
-            (item.prompt === "Look" || item.prompt === "Talk"),
+            (item.prompt === "Look" || item.prompt === "Talk") &&
+            (item.visibleWhile === undefined ||
+              typeof item.visibleWhile === "string"),
         )),
     file,
     "npcs",
@@ -263,8 +267,12 @@ export function parseArea(value: unknown, file: string): Area {
       id: item.id,
       point: { x: item.point.x, y: item.point.y },
       facing: item.facing,
+      footprint: item.footprint,
       knot: item.knot,
       prompt: item.prompt,
+      ...(item.visibleWhile === undefined
+        ? {}
+        : { visibleWhile: item.visibleWhile }),
     })),
     spawns,
   };
@@ -592,6 +600,7 @@ export function loadContent(): {
       battle,
       stickers,
       characters,
+      storyVariable: createStoryReader(story),
     },
     fixtures,
   };

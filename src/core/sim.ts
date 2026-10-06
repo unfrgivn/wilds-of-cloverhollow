@@ -15,7 +15,7 @@ import type {
   CritterCommandId,
   BattleView,
 } from "./types";
-import { createInkState, inkVariable, runInk } from "./ink";
+import { createInkState, runInk } from "./ink";
 
 export const blankInput = (): ActionFrame => ({
   move: { x: 0, y: 0 },
@@ -213,12 +213,14 @@ export function targetInteractable(
         ]
       : [];
   });
-  const people = area.npcs.map((npc) => ({
-    id: `npc:${npc.id}`,
-    knot: npc.knot,
-    point: npc.point,
-    prompt: npc.prompt,
-  }));
+  const people = area.npcs
+    .filter((npc) => npcVisible(world, state, npc))
+    .map((npc) => ({
+      id: `npc:${npc.id}`,
+      knot: npc.knot,
+      point: npc.point,
+      prompt: npc.prompt,
+    }));
   return [...area.interactables, ...calmCritters, ...people]
     .map((item) => {
       const dx = item.point.x - state.player.x;
@@ -232,6 +234,29 @@ export function targetInteractable(
         item.length <= world.tunables.interact.range && item.dot >= 0.34,
     )
     .sort((a, b) => a.length - b.length)[0]?.item;
+}
+
+export function npcVisible(
+  world: World,
+  state: State,
+  npc: Area["npcs"][number],
+): boolean {
+  return (
+    npc.visibleWhile === undefined ||
+    world.storyVariable(state.ink, npc.visibleWhile) === true
+  );
+}
+
+function solidArea(world: World, state: State, area: Area): Area {
+  return {
+    ...area,
+    blockers: [
+      ...area.blockers,
+      ...area.npcs
+        .filter((npc) => npcVisible(world, state, npc))
+        .map((npc) => npc.footprint),
+    ],
+  };
 }
 
 // The facts the story's calmed(id) answers from: each critter's state.
@@ -1092,12 +1117,14 @@ export function step(
   );
   const scale = length > 1 ? 1 / length : 1;
   const speed = world.tunables.walkSpeed / 60;
+  // People who are there are solid, for Fae and for Maddie alike.
+  const solid = solidArea(world, state, area);
   const player = resolveCollision(
     {
       x: state.player.x + input.move.x * scale * speed,
       y: state.player.y + input.move.y * scale * speed,
     },
-    area,
+    solid,
     world.tunables.playerRadius,
   );
   const displacementX = player.x - state.player.x;
@@ -1125,7 +1152,7 @@ export function step(
   // steps out and back in.
   const locked =
     trigger?.requires !== undefined &&
-    inkVariable(world.story, state.ink, trigger.requires.variable) !== true
+    world.storyVariable(state.ink, trigger.requires.variable) !== true
       ? trigger.requires
       : undefined;
   const door = locked === undefined ? trigger : undefined;
@@ -1134,8 +1161,12 @@ export function step(
       ? undefined
       : {
           knot: locked.knot,
-          result: runInk(world.story, state.ink, { type: "start", knot: locked.knot },
-            calmedFacts(state)),
+          result: runInk(
+            world.story,
+            state.ink,
+            { type: "start", knot: locked.knot },
+            calmedFacts(state),
+          ),
         };
   const critterEntry = area.critters.find(
     (item) =>
@@ -1180,7 +1211,7 @@ export function step(
   }
   const follower =
     trigger === undefined
-      ? updateMaddie(world, area, state, player, displacement > 0.0001)
+      ? updateMaddie(world, solid, state, player, displacement > 0.0001)
       : {
           maddie: {
             ...state.maddie,
@@ -1204,7 +1235,10 @@ export function step(
           ? null
           : { target: door.target, phase: "out", elapsed: 0 },
       ink: knock === undefined ? state.ink : knock.result.ink,
-      dialogue: knock === undefined ? state.dialogue : dialogueState(knock.knot, knock.result),
+      dialogue:
+        knock === undefined
+          ? state.dialogue
+          : dialogueState(knock.knot, knock.result),
       maddie: follower.maddie,
       trail: follower.trail,
     },

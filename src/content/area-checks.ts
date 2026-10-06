@@ -37,7 +37,7 @@ function walkable(area: Area, radius: number, point: Point): boolean {
   return (
     pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius &&
-    area.blockers.every(
+    [...area.blockers, ...area.npcs.map((npc) => npc.footprint)].every(
       (blocker) =>
         !pointInPolygon(point, blocker) &&
         distanceToPolygon(point, blocker) >= radius,

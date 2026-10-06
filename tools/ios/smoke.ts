@@ -473,7 +473,7 @@ async function main(): Promise<void> {
       label: string,
       axis: "x" | "y" | "both" = "both",
     ): Promise<State> => {
-      for (let attempt = 0; attempt < 16; attempt += 1) {
+      for (let attempt = 0; attempt < 20; attempt += 1) {
         const current = latest();
         if (done(current)) return current;
         const dx = goal.x - current.x;
@@ -484,9 +484,11 @@ async function main(): Promise<void> {
         await drag(horizontal ? sign * 25 : 0, horizontal ? 0 : sign * 25, 0.6);
         await settle(current.tick);
       }
-      throw new Error(
-        `walk to ${label} did not converge: ${JSON.stringify(latest())}`,
-      );
+      // The last drag may be the one that arrives (sliding along a slanted
+      // wall takes many small steps).
+      const last = latest();
+      if (done(last)) return last;
+      throw new Error(`walk to ${label} did not converge: ${JSON.stringify(last)}`);
     };
     const tapConfirm = async (): Promise<void> => {
       const layout = layouts[layouts.length - 1];
@@ -767,10 +769,29 @@ async function main(): Promise<void> {
     await waitFor(states, (items) =>
       items.some((item) => item.area === "plaza"),
     );
+    // Back to the frog from the right. A drag moves about 43 units, too coarse
+    // to hold the 15-unit row between the lamp post (x 1075-1102, y 805-835)
+    // and the flower box (top y 890), so every stop is pinned by something
+    // solid: up beside the planter, left until the lamp post stops her (x
+    // 1122), down until the flower box stops her (y 870), then left along its
+    // edge into the frog's circle (about x 1050). Checked headless with
+    // drag-sized steps from two start heights.
     await walkTo(
-      { x: latest().x, y: 860 },
-      (value) => !value.moving && value.y <= 880,
-      "above the frog",
+      { x: latest().x, y: 800 },
+      (value) => !value.moving && value.y <= 845,
+      "up beside the planter",
+      "y",
+    );
+    await walkTo(
+      { x: 1000, y: latest().y },
+      (value) => !value.moving && value.x <= 1130,
+      "to the lamp post",
+      "x",
+    );
+    await walkTo(
+      { x: latest().x, y: 900 },
+      (value) => !value.moving && value.y >= 865,
+      "onto the flower box",
       "y",
     );
     await walkTo(

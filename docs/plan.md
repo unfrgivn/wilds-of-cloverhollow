@@ -180,6 +180,28 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   key pixels) with no exceptions. The Ink adapter now skips blank lines and
   answers `calmed()` on every line.
 
+## Milestone 13: Meadow Park
+- A second painted outdoor area, Meadow Park (from `meadow_park_environment.png`):
+  the hollow tree house, the cardboard play tower, a picnic blanket, the pond
+  and its little bridge, reached from the plaza's lower-right path.
+- Critters become generic content (spec 8): a second chaos critter, the
+  baseball-cap puppy from `npc_critter_set.png`, waits by the pond with his own
+  battle lines and sticker; the engine has no frog-specific code left.
+- The journal album gains the puppy's sticker slot; the notice board and the
+  journal point Fae toward the park once the fountain is calm.
+- Unit (generic critters with a real second critter), sims (the pup's win),
+  cross-engine hash, e2e with real keys (plaza to park and back, the pup's
+  battle), reviewed baselines, `just ios-smoke` through the park.
+
+## Roadmap after Milestone 13 (proposed, not scheduled)
+- School day: Fae's classroom and teacher, the first "get out of school"
+  puzzle (saying the right thing, finding an item), per NOTES.md.
+- The raccoon in the purple hood: the first story encounter with the chaos
+  caster (concept `chaos_raccoon.png`), who runs off toward the park.
+- Audio: a gentle music bed per area and soft UI sounds (needs the owner's
+  okay on any new dependency or paid generation).
+- Device testing and TestFlight (needs the owner: store and account actions).
+
 ## Later (not scheduled)
 Audio and music, gamepad polish, device testing and TestFlight, Bubblegum Bay
 and Pinecone Pass, Sue and Jordan, and tools (lantern, lasso, flute).

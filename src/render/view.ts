@@ -379,6 +379,7 @@ export class GameView {
     this.scene.position.set(offsetX, offsetY);
     this.player.position.set(state.player.x, state.player.y);
     this.player.zIndex = state.player.y;
+    loaded.fadeCanopies(state.player, state.tick);
     this.setFaeTexture(state);
     this.renderParty(state);
     this.renderCritters(state);
@@ -728,6 +729,8 @@ export class GameView {
     };
     critters: { id: string; frame: string }[];
     npcs: { id: string; frame: string; facing: string }[];
+    // Each canopy's alpha: below 1 while Fae is behind it.
+    canopies: { id: string; alpha: number }[];
     battle: {
       phase: string | null;
       ring: { x: number; y: number; radius: number } | null;
@@ -786,6 +789,7 @@ export class GameView {
       },
       critters: this.critterFrames,
       npcs: this.npcFrames,
+      canopies: this.areaView?.canopyAlphas ?? [],
       battle: {
         phase: state.battle?.phase ?? null,
         ring:

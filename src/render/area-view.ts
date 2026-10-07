@@ -1,9 +1,14 @@
 import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
-import type { Area } from "../core";
+import type { Area, Point } from "../core";
+import { bodyCover } from "../content/area-checks";
 import { parseGroundManifest, parseOccluderManifest } from "../content/load";
 import { assetUrl } from "../platform/assets";
 
 const colour = (value: string): number => parseInt(value.slice(1), 16);
+
+// A canopy fades to this alpha while Fae stands behind it, this much a tick.
+const CANOPY_ALPHA = 0.4;
+const CANOPY_STEP = 0.08;
 
 async function json(path: string): Promise<unknown> {
   const response = await fetch(assetUrl(path));
@@ -16,6 +21,8 @@ export class AreaView {
   readonly paper: number;
   private readonly textures: string[] = [];
   private readonly sprites: Sprite[] = [];
+  private readonly canopies: { occluder: Area["occluders"][number]; sprite: Sprite }[] = [];
+  private canopyTick: number | undefined;
 
   private constructor(
     readonly area: Area,
@@ -77,9 +84,32 @@ export class AreaView {
       sprite.label = `occluder:${cutout.id}`;
       sprite.zIndex = occluder.baseline;
       view.sprites.push(sprite);
+      if (occluder.canopy === true) view.canopies.push({ occluder, sprite });
       depth.addChild(sprite);
     }
     return view;
+  }
+
+  /*
+   * A canopy (a palm's crown) fades while Fae stands behind it, so she's never
+   * lost under its leaves, and eases back once she steps out (spec 6). It moves
+   * by ticks, not frames, so it fades alike at any frame rate and in the paused
+   * harness. Render-only: the core never sees it.
+   */
+  fadeCanopies(feet: Point, tick: number): void {
+    const ticks = this.canopyTick === undefined
+      ? 1
+      : Math.min(Math.max(tick - this.canopyTick, 0), 30);
+    this.canopyTick = tick;
+    for (const { occluder, sprite } of this.canopies) {
+      const behind = feet.y < occluder.baseline && bodyCover(occluder.polygon, feet) > 0.05;
+      const gap = (behind ? CANOPY_ALPHA : 1) - sprite.alpha;
+      sprite.alpha += Math.sign(gap) * Math.min(Math.abs(gap), CANOPY_STEP * ticks);
+    }
+  }
+
+  get canopyAlphas(): { id: string; alpha: number }[] {
+    return this.canopies.map(({ occluder, sprite }) => ({ id: occluder.id, alpha: sprite.alpha }));
   }
 
   async destroy(): Promise<void> {

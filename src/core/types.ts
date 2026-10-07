@@ -41,7 +41,9 @@ export type Area = {
   walkable: Polygon;
   blockers: Polygon[];
   ground?: string;
-  occluders: { id: string; polygon: Polygon; baseline: number }[];
+  // A canopy (a palm's crown, say) fades while Fae stands behind it instead of
+  // hiding her (spec 6).
+  occluders: { id: string; polygon: Polygon; baseline: number; canopy?: boolean }[];
   triggers: {
     id: string;
     polygon: Polygon;

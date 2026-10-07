@@ -16,7 +16,8 @@ import {
  * her feet point. An occluder draws over her while her feet are above
  * (north of) its baseline. We flood-fill every position the core would allow
  * from each spawn, on a 5-unit grid, and report positions where occluders
- * cover at least `maxCoverage` of the sampled body box.
+ * cover at least `maxCoverage` of the sampled body box. Canopies don't count:
+ * they fade while she's behind them (spec 6).
  *
  *        x-25   x+25
  *   y-140 +------+   <- sampled every 5 units
@@ -33,6 +34,18 @@ const distance = (a: Point, b: Point): number => {
 };
 
 export type HiddenPosition = Point & { coverage: number; occluders: string[] };
+
+// The share of Fae's body box, feet at `feet`, that lies inside `polygon`.
+export function bodyCover(polygon: Area["occluders"][number]["polygon"], feet: Point): number {
+  let covered = 0;
+  let samples = 0;
+  for (let y = feet.y - BODY_HEIGHT; y <= feet.y; y += GRID)
+    for (let x = feet.x - BODY_HALF_WIDTH; x <= feet.x + BODY_HALF_WIDTH; x += GRID) {
+      samples += 1;
+      if (pointInPolygon({ x, y }, polygon)) covered += 1;
+    }
+  return covered / samples;
+}
 
 function walkable(area: Area, radius: number, point: Point): boolean {
   return (
@@ -80,8 +93,9 @@ function bodyCoverage(
   area: Area,
   feet: Point,
 ): { coverage: number; occluders: string[] } {
+  // A canopy fades while Fae is behind it (spec 6), so it never hides her.
   const covering = area.occluders.filter(
-    (occluder) => feet.y < occluder.baseline,
+    (occluder) => occluder.canopy !== true && feet.y < occluder.baseline,
   );
   const ids = new Set<string>();
   let covered = 0;

@@ -265,7 +265,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Areas are discrete. `content/areas/<id>.json` is canonical (Tiled may be used
   for editing if its export matches): `id`, `width` and `height` in units, the
   `walkable` floor polygon, `blockers` (furniture footprints on the floor
-  plane), `occluders` (`{ id, polygon, baseline }`), named `spawns`
+  plane), `occluders` (`{ id, polygon, baseline, canopy? }`), named `spawns`
   (`{ x, y, facing }`), and optional `ground` (the folder of its painting).
   Doors arrive in Milestone 6 and interactables in Milestone 8.
 - Player collider: a circle of radius 20 units at the feet that slides along
@@ -358,9 +358,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`occluders.json` lists their unit offsets). An occluder draws over Fae while
   her feet are above (north of) its baseline. Workflow:
   `docs/art/area-authoring.md`.
+- Canopies: an occluder with `canopy: true` is a tree Fae can walk under (a
+  palm, crown and trunk cut whole, its baseline at the trunk's foot). While her
+  feet are north of its baseline and more than 5% of her body box is inside it,
+  it fades to 40% (0.08 a tick, render-only), so she's drawn behind it and
+  still seen; it eases back once she steps out. `renderInfo().canopies` reports
+  each one's alpha. Bubblegum Bay's three palms are canopies
+  (`tests/unit/canopy.test.ts`, `tests/e2e/canopy.spec.ts`).
 - Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
   spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
-  body box (50x140 units above her feet) covered by occluders.
+  body box (50x140 units above her feet) covered by occluders. Canopies don't
+  count: they fade instead.
 - Area scale rule: a standard door is about 1.4x Fae's height (about 200
   units) and furniture is proportional. Paintings are resampled uniformly to
   meet it, never stretched. The bedroom is 1050x700 units (the whole room fits

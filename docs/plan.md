@@ -407,6 +407,11 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     `tests/e2e/helpers.ts`). One round trip per segment made the chapter-one
     replay take 72 s in Chromium under load, near its 90 s budget, and the new
     bay flow timed out; now they take 9 s and 30 s.
+  - Fixed after the milestone (2026-10-07): only the palms' trunks were cut
+    out, so Fae walking north of a palm was drawn over its crown. Each palm is
+    now cut whole (crown and trunk, outlined from the painting's green fronds
+    and the old trunk outline) as a canopy that fades while she's behind it
+    (spec 6). The bay's pinned depth and paint contracts pass unchanged.
 
 ## Milestone 20: Pinecone Pass and the bus **Status:** ✅ Completed (2026-10-07)
 - Once the bluebird is calm (it pointed toward the mountains), Fae can ride

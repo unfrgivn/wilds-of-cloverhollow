@@ -159,20 +159,20 @@
     {
       "id": "palm-top-left",
       "file": "palm-top-left.webp",
-      "x": 18,
-      "y": 104
+      "x": 0,
+      "y": 0
     },
     {
       "id": "palm-bottom-left",
       "file": "palm-bottom-left.webp",
-      "x": 8,
-      "y": 796
+      "x": 0,
+      "y": 630
     },
     {
       "id": "palm-right",
       "file": "palm-right.webp",
-      "x": 1626,
-      "y": 706
+      "x": 1448,
+      "y": 615
     }
   ]
 }

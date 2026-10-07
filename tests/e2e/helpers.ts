@@ -83,6 +83,7 @@ export async function renderInfo(page: Page): Promise<{
   };
   critters: { id: string; frame: string }[];
   npcs: { id: string; frame: string; facing: string }[];
+  canopies: { id: string; alpha: number }[];
   // Everything in CSS px, from the one battle layout (spec 8).
   battle: {
     phase: string | null;

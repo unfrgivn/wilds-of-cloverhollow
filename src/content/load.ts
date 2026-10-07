@@ -219,7 +219,8 @@ export function parseArea(value: unknown, file: string): Area {
             record(item) &&
             typeof item.id === "string" &&
             polygon(item.polygon) &&
-            typeof item.baseline === "number",
+            typeof item.baseline === "number" &&
+            (item.canopy === undefined || typeof item.canopy === "boolean"),
         )),
     file,
     "occluders",
@@ -248,6 +249,7 @@ export function parseArea(value: unknown, file: string): Area {
       id: item.id,
       polygon: item.polygon,
       baseline: item.baseline,
+      ...(item.canopy === true ? { canopy: true } : {}),
     })),
     triggers: (value.triggers ?? []).map((item) => ({
       id: item.id,

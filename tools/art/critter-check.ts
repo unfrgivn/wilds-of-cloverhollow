@@ -77,6 +77,8 @@ function bounds(image: Image): { left: number; top: number; right: number; botto
     bottom: image.height - 1 - Math.max(...ys),
   };
 }
+// Alpha islands, 8-connected like tools/art/drop-islands.ts (a diagonal touch
+// is a visible connection), so a piece the cleanup keeps is never "debris".
 function components(image: Image): number[] {
   const seen = new Uint8Array(image.pixels.length); const sizes: number[] = [];
   for (let start = 0; start < seen.length; start += 1) {
@@ -85,12 +87,16 @@ function components(image: Image): number[] {
     while (queue.length > 0) {
       const index = queue.pop(); if (index === undefined) continue; count += 1;
       const x = index % image.width;
-      for (const next of [index - 1, index + 1, index - image.width, index + image.width]) {
-        if (next < 0 || next >= seen.length || seen[next] !== 0
-          || image.pixels[next]?.a === 0) continue;
-        if (Math.abs((next % image.width) - x) > 1) continue;
-        seen[next] = 1; queue.push(next);
-      }
+      const y = Math.floor(index / image.width);
+      for (let dy = -1; dy <= 1; dy += 1)
+        for (let dx = -1; dx <= 1; dx += 1) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || ny < 0 || nx >= image.width || ny >= image.height) continue;
+          const next = ny * image.width + nx;
+          if (seen[next] !== 0 || image.pixels[next]?.a === 0) continue;
+          seen[next] = 1; queue.push(next);
+        }
     }
     sizes.push(count);
   }

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   bunHash,
   longFlowTimeout,
@@ -20,6 +20,38 @@ import {
 
 test.describe.configure({ timeout: longFlowTimeout });
 
+// A light look at the game: only what the first test reads. The whole state
+// (with the story's Ink JSON) is too heavy to fetch hundreds of times a run.
+async function probe(page: Page): Promise<{
+  area: string;
+  fading: boolean;
+  facing: string;
+  player: { x: number; y: number };
+  bunny: string | undefined;
+  bunnyAt: { x: number; y: number } | null;
+  battle: { critterId: string; phase: string; shown: boolean } | null;
+}> {
+  return page.evaluate(() => {
+    const state = window.__cloverhollow?.getState();
+    if (state === undefined) throw new Error("hook unavailable");
+    const battle = state.battle;
+    const roamer = state.roamers["bunny"];
+    return {
+      area: state.area,
+      fading: state.transition !== null,
+      facing: state.facing,
+      player: { x: state.player.x, y: state.player.y },
+      bunny: state.critters["bunny"],
+      bunnyAt: roamer === undefined ? null : { x: roamer.x, y: roamer.y },
+      battle: battle === null ? null : {
+        critterId: battle.critterId,
+        phase: battle.phase,
+        shown: battle.revealed >= battle.message.length,
+      },
+    };
+  });
+}
+
 test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", async ({
   page,
 }) => {
@@ -33,8 +65,8 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
   let ranFromSquirrel = false;
   let afterRun = false;
   await playWithKeys(page, recording(path), 24, async () => {
-    const state = await readState(page);
-    if (state.area === "trail" && state.transition === null && !arrived) {
+    const state = await probe(page);
+    if (state.area === "trail" && !state.fading && !arrived) {
       arrived = true;
       expect(state.facing).toBe("right");
       await expect(page).toHaveScreenshot("trail-arrival-1280.png");
@@ -43,13 +75,11 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
       await page.setViewportSize({ width: 1280, height: 720 });
     }
     const battle = state.battle;
-    if (arrived && battle === null && state.critters.bunny === "chaos") {
-      const bunny = (await renderInfo(page)).critters.find((item) => item.id === "bunny");
-      if (bunny !== undefined)
-        bunnyGap.push(Math.hypot(bunny.x - state.player.x, bunny.y - state.player.y));
-    }
+    const bunny = state.bunnyAt;
+    if (arrived && battle === null && state.bunny === "chaos" && bunny !== null)
+      bunnyGap.push(Math.hypot(bunny.x - state.player.x, bunny.y - state.player.y));
     if (battle?.critterId === "bunny" && battle.phase === "command" && !bunnyShot &&
-      battle.revealed >= battle.message.length) {
+      battle.shown) {
       bunnyShot = true;
       await expect(page.locator(".battle-command-label"))
         .toHaveText(["Soothe", "Play", "Snack", "Run"]);

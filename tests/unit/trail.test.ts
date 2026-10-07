@@ -269,7 +269,7 @@ describe("the trail's roaming critters", () => {
       if (critter === undefined) throw new Error(`no ${id}`);
       expect(critter.atlas).toBe(`assets/critters/${id}/${id}.json`);
       expect(critter.calmKnot).toBe(`${id}_calm`);
-      expect(Object.keys(critter.commands.friends)).toEqual(["play", "cast"]);
+      expect(Object.keys(critter.commands.friends)).toEqual(["play", "cast", "juggle"]);
       const placed = trail.critters.find((item) => item.id === id);
       if (placed === undefined) throw new Error(`the ${id} isn't on the trail`);
       const roam = placed.roam?.radius ?? 0;

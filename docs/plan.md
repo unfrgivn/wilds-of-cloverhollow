@@ -518,6 +518,47 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     before them start fresh (the shape check).
   - The `trail` fixture starts on the trail's beach for the lookout run; the
     `pass` fixture is unchanged.
+## Milestone 22: Jordan **Status:** ✅ Completed (2026-10-07)
+- At Pinecone Pass, Jordan stands by the snowman, watching a fizzy Snowball
+  Hamster tear round the clearing. He joins Fae's party whatever she answers
+  and brings his battle command, Juggle (pinecones; it rests two turns,
+  "finding pinecones"), so a battle with the whole party offers six commands.
+  Calmed, the hamster says the raccoon took a secret trail you can only see at
+  night, and Jordan hands Fae his blacklight lantern (`has_lantern`).
+- A party of three fits at every spawn of every area: members after the first
+  also try wider diagonal heel slots, after the existing candidates, so no
+  earlier placement or recorded route changed.
+- Evidence: unit (`jordan.test.ts`, the replay), the recording
+  `pass-party/jordan.json` (written by `tools/sim/record-jordan.ts`) with
+  matching browser and Bun hashes, and real-key e2e (`jordan.spec.ts`: walk to
+  Jordan and talk; the party of four at the pass; the six-command battle at
+  both sizes; Juggle chosen with the arrow keys, then Soothe to the win; the
+  lantern from the calm hamster).
+- Wording for the owner: Jordan: "Whoa, watch out! That hamster's gone
+  totally fizzy!" / "It keeps throwing snowballs at everyone. Even at the
+  snowman!" / "I'm Jordan, by the way. I've hiked every trail up here."; the
+  choices "Let's calm it down together!" ("You got it! I'll keep it busy.") and
+  "Did a raccoon in a purple hood come by?" ("He zoomed past on a sled,
+  laughing his head off! Let's go after him."). The calm hamster: "Squeak!
+  Thank you. My head feels all cozy again." / "The raccoon? He ran off down a
+  secret trail. You can only see it at night..." / Fae: "A trail you can only
+  see at night?" / Jordan: "Trail markers glow under blacklight! Here, Fae,
+  take my lantern." / "Jordan hands Fae his blacklight lantern: a big round
+  purple lens on a rainbow handle."; again: "Squeak! Watch out for snowballs.
+  Hee hee." The journal: "Jordan gave me his blacklight lantern. The raccoon
+  took a secret trail you can only see in its light!" and "Jordan is on my team
+  now! He's hiked every trail on the mountain." The Snowball Hamster's battle
+  lines and every critter's Juggle lines are in `content/critters/`.
+- Notes and assumptions:
+  - Jordan stands at (1100, 700) by the snowman and the hamster at (850, 760)
+    in the clearing, off the recorded bus routes. Milestone 20's walk behind
+    the snowman now steps round him, and the pass's screenshots show them.
+  - Jordan's runs start from the `pass-party` fixture (the pass with Maddie
+    and Sue); the `pass` fixture is unchanged, so earlier runs keep their
+    party and their battle menus.
+  - Juggle has the same numbers on every critter: calm 30, great 15, good 5,
+    rest 2.
+
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
@@ -560,8 +601,7 @@ more bad guys, and the blacklight lantern, made and built while away.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its
   painting, its critters, and the roaming engine were ready first; it's the
   first trail between lands, between the bay and the pass.
-- Milestone 22, Jordan: he joins at the pass with Juggle; the hamster hiker;
-  he gives Fae the lantern.
+- Milestone 22, Jordan: done.
 - Milestone 23, the blacklight lantern: on and off; glowing secrets at the pass
   (the raccoon's paw prints, a doodle on the ski lift, and a trail marker
   pointing west through the pines toward the Whispering Woods).

@@ -47,6 +47,12 @@
         "great": 10,
         "good": 5,
         "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
       }
     }
   },
@@ -81,6 +87,11 @@
         "great": "Sue swings her ribbon bobber like a dangling acorn. The squirrel leaps for it!",
         "good": "Sue's bobber bobs past. The squirrel tilts its head.",
         "miss": "Sue's line tangles in a bush. The squirrel snickers."
+      },
+      "juggle": {
+        "great": "Jordan juggles pinecones in a high loop. The squirrel's eyes go round. Better than acorns!",
+        "good": "Jordan tosses a pinecone. The squirrel catches it with both paws.",
+        "miss": "A pinecone bonks Jordan's nose. The squirrel chatters with laughter."
       }
     },
     "snack": "Fae shares a handful of sunflower seeds. The squirrel nibbles them one by one.",

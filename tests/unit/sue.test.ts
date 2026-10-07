@@ -88,7 +88,7 @@ function compileStory(source: string): Record<string, unknown> {
 
 describe("Sue in the roster", () => {
   it("rosters Sue after Maddie: not there at the start, joins with sue_joined, brings Cast", () => {
-    expect(Object.keys(world.party)).toEqual(["maddie", "sue"]);
+    expect(Object.keys(world.party)).toEqual(["maddie", "sue", "jordan"]);
     expect(world.party["sue"]).toEqual({
       id: "sue",
       name: "Sue",
@@ -108,7 +108,7 @@ describe("Sue in the roster", () => {
 
   it("every critter answers Cast with its own gentle lines", () => {
     for (const critter of Object.values(world.critters)) {
-      expect(Object.keys(critter.commands.friends)).toEqual(["play", "cast"]);
+      expect(Object.keys(critter.commands.friends)).toEqual(["play", "cast", "juggle"]);
       expect(critter.commands.friends["cast"]).toEqual({ calm: 35, great: 10, good: 5, rest: 2 });
       const lines = critter.lines.friends["cast"];
       if (lines === undefined) throw new Error(`${critter.id} has no Cast lines`);

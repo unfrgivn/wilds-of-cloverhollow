@@ -1163,7 +1163,34 @@ export function visibleFollowerSlot(
     { x: leader.x - sign * chainedHeelX, y: leader.y + chainedHeelDown },
   ];
   const candidates = chained
-    ? [...heelCandidates, ...chainedHeelCandidates]
+    ? [
+        ...heelCandidates,
+        ...chainedHeelCandidates,
+        { x: leader.x + sign * 72, y: leader.y - 56 },
+        { x: leader.x - sign * 72, y: leader.y - 56 },
+        { x: leader.x + sign * 72, y: leader.y + 56 },
+        { x: leader.x - sign * 72, y: leader.y + 56 },
+        { x: leader.x + sign * 96, y: leader.y - 80 },
+        { x: leader.x - sign * 96, y: leader.y - 80 },
+        { x: leader.x + sign * 96, y: leader.y + 80 },
+        { x: leader.x - sign * 96, y: leader.y + 80 },
+        { x: leader.x + sign * 108, y: leader.y - 100 },
+        { x: leader.x - sign * 108, y: leader.y - 100 },
+        { x: leader.x + sign * 108, y: leader.y + 100 },
+        { x: leader.x - sign * 108, y: leader.y + 100 },
+        { x: leader.x + sign * 120, y: leader.y - 30 },
+        { x: leader.x - sign * 120, y: leader.y - 30 },
+        { x: leader.x + sign * 120, y: leader.y + 30 },
+        { x: leader.x - sign * 120, y: leader.y + 30 },
+        { x: leader.x + sign * 150, y: leader.y - 150 },
+        { x: leader.x - sign * 150, y: leader.y - 150 },
+        { x: leader.x + sign * 150, y: leader.y + 150 },
+        { x: leader.x - sign * 150, y: leader.y + 150 },
+        { x: leader.x + sign * 180, y: leader.y - 60 },
+        { x: leader.x - sign * 180, y: leader.y - 60 },
+        { x: leader.x + sign * 180, y: leader.y + 60 },
+        { x: leader.x - sign * 180, y: leader.y + 60 },
+      ]
     : heelCandidates;
   const direction = {
     up: { x: 0, y: -1 },

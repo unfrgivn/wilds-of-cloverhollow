@@ -400,6 +400,56 @@
       ],
       "journal": [
         "ev",
+        {
+          "VAR?": "has_lantern"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Jordan is on my team now! He's hiked every trail on the mountain. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         "str",
         "^bunny",
         "/str",
@@ -427,7 +477,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.12"
+                "->": ".^.^.^.26"
               },
               null
             ]
@@ -452,7 +502,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.19"
+                "->": ".^.^.^.33"
               },
               null
             ]
@@ -486,7 +536,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.32"
+                "->": ".^.^.^.46"
               },
               null
             ]
@@ -515,7 +565,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.42"
+                "->": ".^.^.^.56"
               },
               null
             ]
@@ -540,7 +590,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.49"
+                "->": ".^.^.^.63"
               },
               null
             ]
@@ -565,7 +615,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.56"
+                "->": ".^.^.^.70"
               },
               null
             ]
@@ -595,7 +645,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.66"
+                "->": ".^.^.^.80"
               },
               null
             ]
@@ -625,7 +675,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.76"
+                "->": ".^.^.^.90"
               },
               null
             ]
@@ -650,7 +700,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.83"
+                "->": ".^.^.^.97"
               },
               null
             ]
@@ -679,7 +729,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.93"
+                "->": ".^.^.^.107"
               },
               null
             ]
@@ -717,7 +767,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.109"
+                "->": ".^.^.^.123"
               },
               null
             ]
@@ -746,7 +796,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.119"
+                "->": ".^.^.^.133"
               },
               null
             ]
@@ -771,7 +821,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.126"
+                "->": ".^.^.^.140"
               },
               null
             ]
@@ -800,7 +850,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.137"
+                "->": ".^.^.^.151"
               },
               null
             ]
@@ -829,7 +879,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.148"
+                "->": ".^.^.^.162"
               },
               null
             ]
@@ -1826,6 +1876,159 @@
           "#f": 1
         }
       ],
+      "jordan": [
+        [
+          "^Whoa, watch out! That hamster's gone totally fizzy! ",
+          "#",
+          "^speaker: Jordan",
+          "/#",
+          "\n",
+          "^It keeps throwing snowballs at everyone. Even at the snowman! ",
+          "#",
+          "^speaker: Jordan",
+          "/#",
+          "\n",
+          "^I'm Jordan, by the way. I've hiked every trail up here. ",
+          "#",
+          "^speaker: Jordan",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Let's calm it down together!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Did a raccoon in a purple hood come by?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^You got it! I'll keep it busy. ",
+              "#",
+              "^speaker: Jordan",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^He zoomed past on a sled, laughing his head off! Let's go after him. ",
+              "#",
+              "^speaker: Jordan",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "jordan_joined",
+                "re": true
+              },
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
+      "hamster_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Squeak! Thank you. My head feels all cozy again. ",
+        "#",
+        "^speaker: Hiker Hamster",
+        "/#",
+        "\n",
+        "^The raccoon? He ran off down a secret trail. You can only see it at night... ",
+        "#",
+        "^speaker: Hiker Hamster",
+        "/#",
+        "\n",
+        "^A trail you can only see at night? ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Trail markers glow under blacklight! Here, Fae, take my lantern. ",
+        "#",
+        "^speaker: Jordan",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "has_lantern",
+          "re": true
+        },
+        "^Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Squeak! Watch out for snowballs. Hee hee. ",
+            "#",
+            "^speaker: Hiker Hamster",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
       "snowman": [
         "^The snowman has a carrot nose and a very serious pebble smile. ",
         "#",
@@ -2358,6 +2561,14 @@
         false,
         {
           "VAR=": "rode_bus"
+        },
+        false,
+        {
+          "VAR=": "jordan_joined"
+        },
+        false,
+        {
+          "VAR=": "has_lantern"
         },
         "/ev",
         "end",

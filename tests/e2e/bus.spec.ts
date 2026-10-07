@@ -100,11 +100,14 @@ test("Fae walks behind the snowman, and it's drawn over her", async ({ page }) =
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass");
-  // From the bus stop (930, 1015): right past the stop's sign, up beside the
-  // snowman, then right along its back (north of its base at y 660).
-  await hold(page, "ArrowRight", 38);
-  await hold(page, "ArrowUp", 94);
-  await hold(page, "ArrowRight", 18);
+  // From the bus stop (930, 1015): right past the stop's sign, up, a step
+  // left round Jordan (he stands beside the snowman, watching the hamster), up
+  // past him, then right along the snowman's back (north of its base at 660).
+  await hold(page, "ArrowRight", 34);
+  await hold(page, "ArrowUp", 54);
+  await hold(page, "ArrowLeft", 3);
+  await hold(page, "ArrowUp", 41);
+  await hold(page, "ArrowRight", 24);
   await step(page, 60);
   const state = await readState(page);
   expect(state.player.y).toBeLessThan(660);

@@ -40,6 +40,12 @@
       32
     ]
   },
+  "jordan": {
+    "atlas": "assets/characters/jordan/jordan.json",
+    "idleTicks": [
+      32
+    ]
+  },
   "bus-stop": {
     "atlas": "assets/characters/bus-stop/bus-stop.json",
     "idleTicks": [

@@ -47,6 +47,12 @@
         "great": 10,
         "good": 5,
         "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
       }
     }
   },
@@ -81,6 +87,11 @@
         "great": "Sue casts her ribbon bobber into the fountain. The frog chases the ripples, giggling!",
         "good": "Sue's bobber bobs past. The frog can't stop watching it.",
         "miss": "Sue's bobber plops into a flower box. The frog blinks... and almost smiles."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones. The frog's eyes follow every one, round and round!",
+        "good": "Jordan tosses a pinecone high. The frog watches it spin.",
+        "miss": "Jordan's pinecones bonk together and tumble. The frog snorts a bubbly laugh."
       }
     },
     "snack": "Fae shares a crunchy cracker. Energy up! The frog sniffs, curious.",

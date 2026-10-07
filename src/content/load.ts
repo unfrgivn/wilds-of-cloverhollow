@@ -16,11 +16,13 @@ import schoolFixtureData from "../../content/fixtures/school.json";
 import bayFixtureData from "../../content/fixtures/bay.json";
 import passFixtureData from "../../content/fixtures/pass.json";
 import trailFixtureData from "../../content/fixtures/trail.json";
+import passPartyFixtureData from "../../content/fixtures/pass-party.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
 import pupData from "../../content/critters/pup.json";
 import bluebirdData from "../../content/critters/bluebird.json";
+import hamsterData from "../../content/critters/hamster.json";
 import bunnyData from "../../content/critters/bunny.json";
 import squirrelData from "../../content/critters/squirrel.json";
 import charactersData from "../../content/characters.json";
@@ -28,6 +30,7 @@ import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
+import jordanData from "../../content/party/jordan.json";
 import { createInkState, createStoryReader } from "../core/ink";
 import type {
   Area,
@@ -707,6 +710,7 @@ export function loadContent(): {
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
   const bluebird = parseCritter(bluebirdData, "content/critters/bluebird.json");
+  const hamster = parseCritter(hamsterData, "content/critters/hamster.json");
   const bunny = parseCritter(bunnyData, "content/critters/bunny.json");
   const squirrel = parseCritter(squirrelData, "content/critters/squirrel.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
@@ -714,7 +718,8 @@ export function loadContent(): {
   const characters = parseCharacters(charactersData, "content/characters.json");
   const maddie = parsePartyMember(maddieData, "content/party/maddie.json");
   const sue = parsePartyMember(sueData, "content/party/sue.json");
-  const party = { [maddie.id]: maddie, [sue.id]: sue };
+  const jordan = parsePartyMember(jordanData, "content/party/jordan.json");
+  const party = { [maddie.id]: maddie, [sue.id]: sue, [jordan.id]: jordan };
   const storyVariable = createStoryReader(story);
   const initialInk = createInkState(story, 1);
   const joinProblems = partyJoinErrors(party, (name) =>
@@ -722,8 +727,14 @@ export function loadContent(): {
   );
   if (joinProblems.length > 0)
     throw new Error(`content/party: ${joinProblems.join("; ")}`);
-  const critters = { [frog.id]: frog, [pup.id]: pup, [bluebird.id]: bluebird,
-    [bunny.id]: bunny, [squirrel.id]: squirrel };
+  const critters = {
+    [frog.id]: frog,
+    [pup.id]: pup,
+    [bluebird.id]: bluebird,
+    [hamster.id]: hamster,
+    [bunny.id]: bunny,
+    [squirrel.id]: squirrel,
+  };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)
     throw new Error(`content/party: ${partyProblems.join("; ")}`);
@@ -739,6 +750,7 @@ export function loadContent(): {
     school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
     bay: parseFixture(bayFixtureData, "content/fixtures/bay.json"),
     pass: parseFixture(passFixtureData, "content/fixtures/pass.json"),
+    "pass-party": parseFixture(passPartyFixtureData, "content/fixtures/pass-party.json"),
     trail: parseFixture(trailFixtureData, "content/fixtures/trail.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))

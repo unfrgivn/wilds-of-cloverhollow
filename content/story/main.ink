@@ -7,6 +7,8 @@ VAR knows_password = false
 VAR club_open = false
 VAR sue_joined = false
 VAR rode_bus = false
+VAR jordan_joined = false
+VAR has_lantern = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -52,6 +54,8 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{has_lantern: Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! # speaker: Fae}
+{jordan_joined: Jordan is on my team now! He's hiked every trail on the mountain. # speaker: Fae}
 {calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! # speaker: Fae}
 {rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The raccoon must be up here somewhere. # speaker: Fae}
 {calmed("bluebird") and not rode_bus: The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! # speaker: Fae}
@@ -249,6 +253,31 @@ Then, fizz! I couldn't stop throwing things. # speaker: Acorn Squirrel
 -> DONE
 = again
 I'm saving my acorns for winter now. Nobody gets bonked! # speaker: Acorn Squirrel
+-> DONE
+
+=== jordan ===
+Whoa, watch out! That hamster's gone totally fizzy! # speaker: Jordan
+It keeps throwing snowballs at everyone. Even at the snowman! # speaker: Jordan
+I'm Jordan, by the way. I've hiked every trail up here. # speaker: Jordan
+* [Let's calm it down together!]
+    You got it! I'll keep it busy. # speaker: Jordan
+* [Did a raccoon in a purple hood come by?]
+    He zoomed past on a sled, laughing his head off! Let's go after him. # speaker: Jordan
+- ~ jordan_joined = true
+-> DONE
+
+=== hamster_calm ===
+{hamster_calm > 1: -> again}
+Squeak! Thank you. My head feels all cozy again. # speaker: Hiker Hamster
+The raccoon? He ran off down a secret trail. You can only see it at night... # speaker: Hiker Hamster
+A trail you can only see at night? # speaker: Fae
+Trail markers glow under blacklight! Here, Fae, take my lantern. # speaker: Jordan
+~ has_lantern = true
+Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. # speaker: Fae
+-> DONE
+
+= again
+Squeak! Watch out for snowballs. Hee hee. # speaker: Hiker Hamster
 -> DONE
 
 === snowman ===

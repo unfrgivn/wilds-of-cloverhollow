@@ -20,6 +20,12 @@
       "frame": "calm_idle_01"
     },
     {
+      "id": "hiker-hamster",
+      "name": "Hiker Hamster",
+      "critter": "hamster",
+      "frame": "calm_idle_01"
+    },
+    {
       "id": "ribbon-bunny",
       "name": "Ribbon Bunny",
       "critter": "bunny",

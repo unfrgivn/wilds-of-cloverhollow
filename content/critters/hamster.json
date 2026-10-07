@@ -1,0 +1,109 @@
+{
+  "id": "hamster",
+  "name": "Snowball Hamster",
+  "calmName": "Hiker Hamster",
+  "atlas": "assets/critters/hamster/hamster.json",
+  "auraCentre": {
+    "x": 180,
+    "y": 190
+  },
+  "bodyCentre": {
+    "x": 240,
+    "y": 315
+  },
+  "figureHeight": 380,
+  "overworldHeight": 66,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "snacks": 2,
+  "sticker": {
+    "id": "hiker-hamster",
+    "name": "Hiker Hamster",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "hamster_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy hamster bursts out of the snow with a snowball in each paw!",
+    "command": "How can Fae calm the hamster?",
+    "soothe": {
+      "great": "Fae hums a cozy campfire song. The hamster drops its snowballs!",
+      "good": "Fae hums softly. The hamster stops to listen.",
+      "miss": "The hamster is too busy packing snowballs to hear Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie pounces on a rolling snowball. The hamster squeaks with joy!",
+        "good": "Maddie bats at the snow. The hamster peeks over its backpack.",
+        "miss": "Maddie sinks into a snowdrift. The hamster giggles a tiny squeak."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber across the snow. The hamster scurries after it!",
+        "good": "Sue's bobber skips over the snow. The hamster's nose twitches.",
+        "miss": "Sue's bobber gets stuck in a snowbank. The hamster blinks."
+      },
+      "juggle": {
+        "great": "Jordan juggles pinecones in a twirling arc. The hamster's whiskers twitch in wonder!",
+        "good": "Jordan tosses a pinecone. The hamster catches it and nibbles thoughtfully.",
+        "miss": "A pinecone bounces off Jordan's boot. The hamster puffs its cheeks."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. The hamster stuffs it in its cheeks!",
+    "burst": "The hamster whirls and flings a flurry of snowballs at Fae!",
+    "burstResult": {
+      "great": "Fae ducks every single snowball!",
+      "good": "Fae dodges most of the snowballs!",
+      "miss": "Poof! Fae gets a face full of snow."
+    },
+    "soothed": "The hamster lets out a happy squeak. The fizzy spell melts away!",
+    "reward": "New sticker: Hiker Hamster!",
+    "rest": "Fae is too chilly to go on. Time to warm up.",
+    "run": "Fae tiptoes away through the snow. The hamster keeps whirling."
+  }
+}

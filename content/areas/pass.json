@@ -1101,6 +1101,43 @@
       "facing": "left"
     }
   },
-  "critters": [],
-  "npcs": []
+  "critters": [
+    {
+      "id": "hamster",
+      "point": {
+        "x": 850,
+        "y": 760
+      }
+    }
+  ],
+  "npcs": [
+    {
+      "id": "jordan",
+      "point": {
+        "x": 1100,
+        "y": 700
+      },
+      "facing": "left",
+      "knot": "jordan",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          1075,
+          660
+        ],
+        [
+          1125,
+          660
+        ],
+        [
+          1125,
+          700
+        ],
+        [
+          1075,
+          700
+        ]
+      ]
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-07 (Milestone 21, Cliffside Trail)
+Last updated: 2026-10-07 (Milestone 22, Jordan)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -228,7 +228,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `command` (`{ id, label, resting }`, section 8). Exactly one of `start: true`
   or a non-null `joins` is required, and a joins variable must be declared.
   Maddie is `maddie`: box 44x60, `walkCycleUnits` 84, sits, starts, command
-  `play` / "Play" / "resting". Sue and Jordan join the roster with their art.
+  `play` / "Play" / "resting". Sue (`cast` / "Cast" / "reeling in", joins
+  `sue_joined`) and Jordan (`juggle` / "Juggle" / "finding pinecones", joins
+  `jordan_joined`) follow in roster order. A party of three fits at every
+  spawn: members after the first also try wider diagonal heel slots, after the
+  existing candidates, so no earlier placement moves and no spawn has to.
   `state.party` is the ordered list of members, each
   `{ id, x, y, facing, motion, stillTicks, trail }`.
 - Chain rule: member 0 follows Fae; member i follows member i-1, with the same
@@ -329,6 +333,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   footprint and a `Look` prompt. The pass stop returns to `plaza.bus-stop`.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
+- At the pass, Jordan stands by the snowman (person `jordan`, knot `jordan`,
+  `Talk`) watching the Snowball Hamster, a critter loose in the clearing at
+  (850, 760). He joins whatever Fae answers (`jordan_joined`); the calm
+  hamster gets him to hand her his blacklight lantern (`has_lantern`).
 - Cliffside Trail (Milestone 21): the first trail between lands, a painted
   1750x1100 area climbing from Bubblegum Bay's south beach to Pinecone Pass's
   east path; its floor, blockers, and occluders are written by
@@ -508,10 +516,17 @@ ios/            Capacitor iOS project (from Milestone 4).
 
 ## 8. Calm-down battles (v0)
 - Critters: the Fizzy Frog (the plaza fountain; calm, the Fountain Frog), the
-  Zoomie Pup (the park pond; calm, the Pond Pup), and the Flappy Bluebird (the
+  Zoomie Pup (the park pond; calm, the Pond Pup), the Flappy Bluebird (the
   bay's sand; calm, the Bay Bluebird, whose burst kicks a gust of sand at
-  Fae). They share the battle numbers for now; each has its own lines, atlas,
-  sticker, and calm knot.
+  Fae), the Snowball Hamster (Pinecone Pass's clearing; calm, the Hiker
+  Hamster, who flings snowballs), and the Thumpy Bunny and Zippy Squirrel,
+  roaming the Cliffside Trail's meadows (calm, the Ribbon Bunny and the Acorn
+  Squirrel). They share the battle numbers for now; each has its own lines,
+  atlas, sticker, and calm knot.
+- Friend commands: Maddie's Play, Sue's Cast, and Jordan's Juggle (pinecones;
+  calm 30, great 15, good 5, rest 2 on every critter). The menu lists Soothe,
+  each member's command in party order, then Snack and Run: six with the
+  whole party, in one column on desktop and two on phones (section 8.1).
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, snacks,
   command values (`commands.soothe`, `commands.snack`, and
@@ -656,9 +671,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   press (or the book's close button, which sends cancel) closes it. While it's
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
-- Notes: the `journal` Ink knot lists every note that applies, newest first.
-  After the ride it starts with Pinecone Pass snow, lodge, cocoa, and the
-  raccoon clue; before the ride, a calm bluebird adds the exact bus note.
+- Notes: the `journal` Ink knot lists every note that applies, newest first:
+  Jordan's lantern and the secret trail only it shows; Jordan on the team;
+  the Cliffside Trail calm again (both its critters). After the ride it goes
+  on with Pinecone Pass snow, lodge, cocoa, and the raccoon clue; before the
+  ride, a calm bluebird adds the exact bus note.
   (the calm bluebird's clue toward the mountains; Sue on the team; the purple
   hood's school name tag; while the club is open and Sue hasn't joined, the
   east road to Bubblegum Bay; the club password; the hall pass; the calm pup

@@ -47,6 +47,12 @@
         "great": 10,
         "good": 5,
         "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
       }
     }
   },
@@ -81,6 +87,11 @@
         "great": "Sue casts her ribbon bobber through the clover. The bunny bounces after it!",
         "good": "Sue's bobber twirls in the breeze. The bunny's nose wiggles.",
         "miss": "Sue's bobber snags on a fern. The bunny blinks."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones. The bunny's ears bob up and down with every toss!",
+        "good": "Jordan tosses a pinecone. The bunny sniffs it, curious.",
+        "miss": "Jordan's pinecones scatter in the clover. The bunny hops right over them."
       }
     },
     "snack": "Fae shares a crunchy carrot stick. The bunny munches happily!",

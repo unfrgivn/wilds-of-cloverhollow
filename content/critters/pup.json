@@ -47,6 +47,12 @@
         "great": 10,
         "good": 5,
         "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
       }
     }
   },
@@ -81,6 +87,11 @@
         "great": "Sue casts her ribbon bobber across the grass. The pup races after it, tail wagging!",
         "good": "Sue's bobber wiggles by. The pup tilts his head and wags.",
         "miss": "Sue's bobber snags on the fence. The pup gives it a curious sniff."
+      },
+      "juggle": {
+        "great": "Jordan juggles pinecones in a big loop. The pup bounces along, tail spinning!",
+        "good": "Jordan tosses a pinecone. The pup tilts his head, ears up.",
+        "miss": "A pinecone lands on Jordan's beanie. The pup yips. Was that a giggle?"
       }
     },
     "snack": "Fae shares a crunchy cracker. Energy up! The pup licks his lips.",

@@ -1,0 +1,18 @@
+{
+  "id": "jordan",
+  "name": "Jordan",
+  "atlas": "assets/characters/jordan/jordan.json",
+  "box": {
+    "width": 50,
+    "height": 140
+  },
+  "walkCycleUnits": 126,
+  "sits": false,
+  "start": false,
+  "joins": "jordan_joined",
+  "command": {
+    "id": "juggle",
+    "label": "Juggle",
+    "resting": "finding pinecones"
+  }
+}

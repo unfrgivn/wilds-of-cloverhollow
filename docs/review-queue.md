@@ -25,3 +25,4 @@ account is unpaid, so device builds use free personal-team signing.
 | Jordan's look | His walk-cycle atlas, drawn ahead of Pinecone Pass from the owner's concept sheet and not in the game yet: `art/review/jordan-contact-sheet.png`, `jordan-lineup.png`, `jordan-walk-*.gif` |
 | Pinecone Pass painting | Drawn ahead of its milestone from the owner's concept: the bus stop where Fae arrives (bottom, left of centre), the lodge, the hot chocolate stand, the snowman, the ski lift, and an open clearing. `art/review/pass-owner-review.png` |
 | The hamster hiker | Pinecone Pass's critter, from the owner's critter sheet: `art/review/hamster-sheet-cream.png`. Not in the game yet |
+| The town bus stop | A sprite for the plaza (the star sign and a small green-roofed bench), standing between the two lower flower boxes so the approved plaza painting isn't repainted: `art/review/bus-stop-in-plaza.png` |

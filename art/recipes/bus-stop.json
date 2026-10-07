@@ -1,0 +1,42 @@
+{
+ "asset": "bus-stop",
+ "status": "owner-review-ready",
+ "model": "gemini-3-pro-image",
+ "generationCalls": "8; see art/scratch/generation-log.jsonl in the main checkout. Calls 1-4 drew a full shelter (selected first, then rejected: 204 units wide, too wide for the gap between the plaza's flower boxes). Calls 5-8 asked for a narrow sign-and-bench stop; call 5 (1791345280959) is selected.",
+ "references": [
+  "docs/art/concepts/props/bus_station.png",
+  "public/assets/areas/pass/ground_0_0.webp",
+  "public/assets/areas/pass/ground_1_0.webp"
+ ],
+ "selectedRawSources": [
+  "art/source/bus-stop/bus-stop-raw.png (generation 1791345280959)"
+ ],
+ "postProcessing": {
+  "build": "bun tools/art/build-bus-stop.ts (rebuilds the atlas byte for byte)",
+  "extract": "the complete stop was extracted as one connected component (extract-strip.ts --expected 1), never a fixed crop",
+  "key": "#FF00FF border flood plus enclosed holes, 18% fuzz",
+  "despill": "despill-edge.ts --key magenta --band 3; only the visible alpha-edge band is despilled",
+  "canvas": "448x448, figure 330 px (165 units), baseline 439",
+  "frames": {
+   "idle_down": "the selected front three-quarter town stop"
+  }
+ },
+ "measurements": {
+  "heightUnits": 154,
+  "widthUnits": 121.5,
+  "padDepthUnits": 39,
+  "scale": "figure height 308 px (154 units), so the star sign stands about 1.1x Fae",
+  "footprint": "Only the sign pole's base and the bench are solid: x -50..+54 and y -42..-20 units from the anchor (measured on the painted bases); the cobbled pad is floor."
+ },
+ "validator": {
+  "biped": false,
+  "idleOnly": true,
+  "directions": [
+   "down"
+  ],
+  "key": "magenta"
+ },
+ "selectionReason": "The selected source preserves the bus line's green canopy and round blue star sign while omitting the bus, map easel, lettering, and snow for a compact town-plaza prop.",
+ "placement": "The plaza, anchor (878, 945): the gap between the two lower flower boxes (blockers end at x 775 and start at x 985), leaving Fae 53-unit corridors on both sides and staying 33 units from every recorded replay position.",
+ "review": "art/review/bus-stop-sheet-cream.png, bus-stop-sheet-dark.png, bus-stop-in-plaza.png (gitignored)"
+}

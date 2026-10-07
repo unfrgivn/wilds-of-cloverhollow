@@ -1,5 +1,7 @@
 #!/usr/bin/env bun
-export {};
+import { spawnSync } from "node:child_process";
+import { appendFileSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 type JsonRecord = { [key: string]: JsonValue };
 type JsonValue = string | number | boolean | null | JsonValue[] | JsonRecord;
 
@@ -30,15 +32,22 @@ function safeName(value: string): string {
   return value.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 80);
 }
 
-async function appendLog(entry: JsonRecord): Promise<void> {
-  const path = "art/scratch/generation-log.jsonl";
-  let previous = "";
-  try {
-    previous = await Bun.file(path).text();
-  } catch {
-    previous = "";
-  }
-  await Bun.write(path, `${previous}${JSON.stringify(entry)}\n`);
+// Every call is logged in the main checkout's art/scratch, even when this runs
+// in a worktree under .worktrees/: removing a worktree deletes its gitignored
+// scratch, and this log is the record of paid calls. Appends are atomic, so
+// agents generating at the same time can't drop each other's entries.
+function logPath(): string {
+  const git = spawnSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
+    { encoding: "utf8" });
+  const common = git.status === 0 ? git.stdout.trim() : "";
+  const root = common.endsWith("/.git") ? dirname(common) : process.cwd();
+  return join(root, "art/scratch/generation-log.jsonl");
+}
+
+function appendLog(entry: JsonRecord): void {
+  const path = logPath();
+  mkdirSync(dirname(path), { recursive: true });
+  appendFileSync(path, `${JSON.stringify(entry)}\n`);
 }
 
 const args = parseArgs(Bun.argv.slice(2));
@@ -85,7 +94,7 @@ if (!response.ok) {
     timestamp: new Date().toISOString(), model, prompt, refs,
     outputs: [], finishReason: [], usage: null, error: message,
   };
-  await appendLog(failedLog);
+  appendLog(failedLog);
   throw new Error(`Gemini request failed: ${message}`);
 }
 if (!isRecord(payload) || !Array.isArray(payload.candidates)) {
@@ -115,6 +124,6 @@ const log = {
   timestamp: new Date().toISOString(), model, prompt, refs,
   outputs, finishReason: finish, usage,
 };
-await appendLog(log);
+appendLog(log);
 if (outputs.length === 0) throw new Error("Gemini returned no image parts");
 console.log(outputs.join("\n"));

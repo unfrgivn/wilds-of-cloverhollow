@@ -81,7 +81,9 @@ bun tools/art/validate-sprite.ts \
 
 The API script sends the key only as `x-goog-api-key`, never logs it, and appends
 one JSON line to `art/scratch/generation-log.jsonl` for every call, including
-failed calls.
+failed calls. The log always lives in the main checkout, even when the script
+runs in a worktree under `.worktrees/` (removing a worktree deletes its
+gitignored scratch), and each entry is one atomic append.
 
 Runtime keeps only `fae.png` and `fae.json`. Extracted frames live in
 `art/scratch/` and review images in `art/review/`; both are regenerable and not

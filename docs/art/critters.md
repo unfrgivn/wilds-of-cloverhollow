@@ -28,6 +28,15 @@ accepted.
 selected sources and the recipe; `bun tools/art/critter-check.ts` runs the
 critter checks configured in `art/recipes/frog.json`.
 
+Every body frame must also pass three checks that no recipe can loosen. The
+recipe's `bodyHue` range may be at most 0.3 wide (a range of 0 to 1 accepts any
+colour; the frog's is 0.28). No opaque pixel may still be either key colour,
+whichever key the frame was keyed on. And no straight edge of 16 px or more may
+be light paint: a run that is opaque on one side and clear on the other is a
+crop cutting through the figure unless its edge is dark ink. The pup's back is
+an ink outline 25 px straight, which passes. Build scripts find whole figures by
+connected components; they never crop to fixed panels or cells.
+
 Aura layers are not chroma-keyed. Purple is deliberately close to the magenta
 key and any translucent glow would make a single-key matte unreliable. The frog
 aura is lifted from white paper with colour-to-alpha: white becomes transparent

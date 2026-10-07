@@ -132,6 +132,10 @@ const bodyHue: HueRange = {
   max: Number(bodyHueConfig?.max ?? 0.45),
   minFraction: Number(bodyHueConfig?.minFraction ?? 0.3),
 };
+// A hue range wider than this says nothing about what colour the critter is
+// (0 to 1 accepts every pixel). Approved ranges: frog 0.28, pup 0.11,
+// bluebird 0.24.
+const maxHueWidth = 0.3;
 const bodyKey: Pixel = matteMethods?.body === "green-key"
   ? { r: 0, g: 255, b: 0, a: 255 }
   : { r: 255, g: 0, b: 255, a: 255 };
@@ -194,6 +198,61 @@ function bandKey(frame: Image): number {
   return frame.pixels.filter((pixel, index) => pixel.a > 128
     && (distance[index] ?? 0) <= 6 && keyExcess(pixel) > 60).length;
 }
+// Opaque pixels still in either chroma key, whichever one the body was keyed
+// on: a frame keyed on green can't keep a magenta background, and the other
+// way round (a build once keyed a magenta source on green and shipped a
+// magenta square). Neither key is a watercolour critter colour.
+function chromaLeft(frame: Image): number {
+  const near = (pixel: Pixel, key: Pixel): boolean =>
+    Math.max(Math.abs(pixel.r - key.r), Math.abs(pixel.g - key.g),
+      Math.abs(pixel.b - key.b)) <= 46;
+  const green: Pixel = { r: 0, g: 255, b: 0, a: 255 };
+  const magenta: Pixel = { r: 255, g: 0, b: 255, a: 255 };
+  return frame.pixels.filter((pixel) => pixel.a > 128
+    && (near(pixel, green) || near(pixel, magenta))).length;
+}
+// Straight hard edges where a crop cut through the figure (a build once cut
+// every hamster to the top-left of its face). A run of 16+ px that is opaque
+// on one side and clear on the other is a cut unless its edge pixels are dark
+// ink (mean luma at most 115): the pup's back is a vertical ink outline 25 px
+// long, and every crop cut on record went through light fur or the key.
+// Checked along rows and columns, over the whole figure.
+function hardCuts(frame: Image): string[] {
+  const { width, height, pixels } = frame;
+  const alpha = (x: number, y: number): number =>
+    x < 0 || y < 0 || x >= width || y >= height ? 0 : pixels[y * width + x]?.a ?? 0;
+  const luma = (x: number, y: number): number => {
+    const pixel = pixels[y * width + x];
+    return pixel === undefined ? 0 : (pixel.r + pixel.g + pixel.b) / 3;
+  };
+  const cuts: string[] = [];
+  const scan = (vertical: boolean): void => {
+    const lines = vertical ? width : height;
+    const length = vertical ? height : width;
+    for (let line = 0; line < lines; line += 1)
+      for (const side of [-1, 1]) {
+        let start = -1;
+        for (let step = 0; step <= length; step += 1) {
+          const [x, y] = vertical ? [line, step] : [step, line];
+          const [nx, ny] = vertical ? [line + side, step] : [step, line + side];
+          const continues = step < length && alpha(x, y) >= 200 && alpha(nx, ny) <= 10;
+          if (continues && start < 0) start = step;
+          if (continues || start < 0) continue;
+          if (step - start >= 16) {
+            let edge = 0;
+            for (let run = start; run < step; run += 1)
+              edge += vertical ? luma(line, run) : luma(run, line);
+            if (edge / (step - start) > 115)
+              cuts.push(`${vertical ? "x" : "y"}=${line} ${start}-${step - 1}`);
+          }
+          start = -1;
+        }
+      }
+  };
+  scan(true);
+  scan(false);
+  return cuts;
+}
 const bodyStats = bodyNames.map((name) => {
   const frame = frameImage(name);
   const stats = hueStats(frame, bodyHue, bodyKey);
@@ -202,6 +261,10 @@ const bodyStats = bodyNames.map((name) => {
 const reference = bodyStats[0]?.stats;
 const referenceArea = bodyStats[0] === undefined ? 0 : bodyArea(bodyStats[0].frame);
 console.log(`atlas=${atlas}`);
+const hueWidth = bodyHue.max - bodyHue.min;
+console.log(`bodyHue ${bodyHue.min}-${bodyHue.max} width=${hueWidth.toFixed(2)}`
+  + ` pass=${check(hueWidth > 0 && hueWidth <= maxHueWidth,
+    `bodyHue range ${hueWidth.toFixed(2)} wide (at most ${maxHueWidth})`)}`);
 for (const item of bodyStats) {
   const rawValue = rawSources?.[item.name];
   const rawPath = typeof rawValue === "string" ? rawValue : "";
@@ -223,10 +286,16 @@ for (const item of bodyStats) {
       Math.abs(pixel.b - bodyKey.b)) <= 46).length;
   const debris = item.parts.filter((pixels) => pixels < 120).length;
   const band = bandKey(item.frame);
-  const keyed = check(spill === 0 && left === 0 && debris === 0 && band === 0,
+  const chroma = chromaLeft(item.frame);
+  const keyed = check(spill === 0 && left === 0 && debris === 0 && band === 0 && chroma === 0,
     `${item.name}: keying`);
+  const cuts = hardCuts(item.frame);
+  const whole = check(cuts.length === 0,
+    `${item.name}: cut by a crop (${cuts.slice(0, 3).join(", ")})`);
   console.log(`${item.name} colour=${colour} size=${size} clearance=${clear} keying=${keyed}`
-    + ` spill=${spill} keyLeft=${left} edgeKey=${band} debris=${debris}`
+    + ` whole=${whole}`
+    + ` spill=${spill} keyLeft=${left} chromaLeft=${chroma} edgeKey=${band} debris=${debris}`
+    + ` cuts=${cuts.length}`
     + ` hue=${item.stats.fraction.toFixed(3)}`
     + ` sourceSat=${source.saturation.toFixed(3)}`
     + ` spriteSat=${item.stats.saturation.toFixed(3)}`

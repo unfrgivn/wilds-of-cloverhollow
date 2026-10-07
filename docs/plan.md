@@ -735,9 +735,18 @@ more bad guys, and the blacklight lantern, made and built while away.
     (its last run, Chromium only, had 10 failures: journal expectations were
     then updated; the rest, in battle, bus, Jordan, title, and trail specs,
     were called load and are unverified).
-  - Milestone 28, raccoons everywhere: one critter species placed many times
-    (battle art from `chaos_raccoon.png`, roaming in several lands, one
-    sticker); the talking raccoon of Milestone 15 becomes a raccoon battle
+  - Milestone 28, recurring bad guys (owner, 2026-10-07): critters become
+    species placed many times, and they respawn at random, EarthBound style.
+    Each arrival in an area rolls its chaos critters from the seeded PRNG in
+    state (so replays stay deterministic); one calmed stays calm until Fae
+    leaves the area. Every calm pays its coins (Milestone 27); the sticker
+    comes once per species. Roster to start: the six from
+    `npc_critter_set.png` (cat, pup, bunny, frog, bluebird, hamster) plus the
+    raccoon, with the squirrel and owl as extras. Cloverhollow and the park:
+    raccoons, pups, cats; the bay: frogs, bluebirds; the trail: bunnies,
+    squirrels; the pass: hamsters; the woods: owls, raccoons. Story set pieces
+    stay unique and don't respawn: the fountain frog and the grumpy gull.
+    Raccoon battle art from `chaos_raccoon.png`, and one sticker per species; the talking raccoon of Milestone 15 becomes a raccoon battle
     whose calm raccoon tells the password it overheard; every line that names
     "the raccoon" as the troublemaker, the notice board, and the hideouts
     point to "a kid in a purple hood" instead, never named.

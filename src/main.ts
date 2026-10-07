@@ -204,15 +204,19 @@ async function boot(): Promise<void> {
     afterTick(state);
   }
   // The journal's notes come from running its Ink knot (a Story per line).
-  // They only change with the story and the critters, and the world is frozen
-  // while the journal is open, so they're computed once per change, not per
-  // frame.
-  let journalCache: { ink: string; critters: State["critters"]; notes: string[] } | null =
-    null;
+  // They only change with what the story reads (its variables, the critters,
+  // and Fae's coins), and the world is frozen while the journal is open, so
+  // they're computed once per change, not per frame.
+  let journalCache: {
+    ink: string;
+    critters: State["critters"];
+    coins: number;
+    notes: string[];
+  } | null = null;
   const notesNow = (): string[] => {
     if (journalCache === null || journalCache.ink !== state.ink ||
-        journalCache.critters !== state.critters)
-      journalCache = { ink: state.ink, critters: state.critters,
+        journalCache.critters !== state.critters || journalCache.coins !== state.coins)
+      journalCache = { ink: state.ink, critters: state.critters, coins: state.coins,
         notes: journalNotes(content.world, state) };
     return journalCache.notes;
   };
@@ -330,6 +334,8 @@ async function boot(): Promise<void> {
         ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
       })),
       currentLand: content.world.areas[state.area]?.land ?? null,
+      coins: state.coins,
+      snacks: state.snacks,
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;

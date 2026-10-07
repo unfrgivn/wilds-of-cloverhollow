@@ -111,8 +111,10 @@ test("after calming the frog, the journal shows his sticker and his note", async
   await expect(page.locator('.journal-slot[data-owned="false"]')).toHaveCount(7);
   await expect(page.locator(".journal-note")).toHaveText([
     "Purple fizz drips lead out of the plaza to Meadow Park.",
+    "I have coins! The bakery in the plaza sells snacks for 5 coins.",
     "The Fountain Frog is calm. Something purple fizzed into his fountain.",
   ]);
+  await expect(page.locator(".journal-supply")).toHaveText(["Coins 8", "Snacks 2"]);
 });
 
 test("the game saves when Fae arrives somewhere and resumes there after a reload", async ({

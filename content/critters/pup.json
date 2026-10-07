@@ -17,7 +17,6 @@
   "touchRadius": 70,
   "calmMax": 100,
   "energyMax": 5,
-  "snacks": 2,
   "sticker": {
     "id": "pond-pup",
     "name": "Pond Pup",
@@ -102,8 +101,9 @@
       "miss": "Bonk! The balls bounce all around Fae."
     },
     "soothed": "The pup flops down with a happy sigh. The zoomy spell floats away!",
-    "reward": "New sticker: Pond Pup!",
+    "reward": "New sticker: Pond Pup! +8 coins.",
     "rest": "Fae is all tuckered out. Time for a little rest.",
     "run": "Fae backs away slowly. The pup keeps zooming around the pond."
-  }
+  },
+  "coins": 8
 }

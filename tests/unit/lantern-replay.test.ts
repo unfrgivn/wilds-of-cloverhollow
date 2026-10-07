@@ -16,6 +16,8 @@ describe("lantern replay", () => {
         state = step(content.world, state, segment.frame).state;
     expect(state.lantern).toBe(false);
     expect(content.world.storyVariable(state.ink, "found_old_trail")).toBe(true);
-    expect(journalNotes(content.world, state)[0]).toContain("Whispering Woods");
+    const note = journalNotes(content.world, state)
+      .find((item) => item.includes("Whispering Woods"));
+    expect(note).toContain("Whispering Woods");
   });
 });

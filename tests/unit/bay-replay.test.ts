@@ -23,6 +23,8 @@ describe("Bubblegum Bay replay", () => {
     expect(state.critters.bluebird).toBe("calm");
     expect(state.stickers).toContain("bay-bluebird");
     expect(castUsed).toBe(true);
-    expect(journalNotes(content.world, state)[0]).toMatch(/mountains/);
+    const note = journalNotes(content.world, state)
+      .find((item) => item.includes("mountains"));
+    expect(note).toMatch(/mountains/);
   });
 });

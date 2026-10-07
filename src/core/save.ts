@@ -1,6 +1,6 @@
 import type { State } from "./types";
 
-export type SaveData = { version: 3; state: State };
+export type SaveData = { version: 4; state: State };
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -17,7 +17,7 @@ function record(value: unknown): value is Record<string, unknown> {
 export function parseSave(json: string, template: State): State | null {
   try {
     const value: unknown = JSON.parse(json);
-    if (!record(value) || value.version !== 3 || !record(value.state)) return null;
+    if (!record(value) || value.version !== 4 || !record(value.state)) return null;
     // Critters added by later content start as they would in a new game, so
     // new content never throws a save away.
     const saved = value.state;
@@ -49,5 +49,5 @@ function isState(value: unknown, template: State): value is State {
 }
 
 export function serializeSave(state: State): string {
-  return JSON.stringify({ version: 3, state } satisfies SaveData);
+  return JSON.stringify({ version: 4, state } satisfies SaveData);
 }

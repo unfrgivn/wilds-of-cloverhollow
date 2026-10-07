@@ -15,6 +15,8 @@ export type JournalView = {
   stickers: JournalSticker[];
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
   currentLand: string | null;
+  coins: number;
+  snacks: number;
 };
 
 type Slot = {
@@ -72,6 +74,30 @@ function busStopIcon(): SVGSVGElement {
   return svg;
 }
 
+// Fae's supplies on the notes page's heading row: a gold coin, and a cookie
+// for her snacks, each with its count.
+function supply(kind: "coins" | "snacks", label: string): {
+  root: HTMLSpanElement;
+  count: HTMLSpanElement;
+} {
+  const root = element("span", "journal-supply");
+  setAttribute(root, "data-supply", kind);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 20 20");
+  svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML = kind === "coins"
+    ? '<circle cx="10" cy="10" r="8.2" fill="#f2c94c" stroke="#47321f" stroke-width="1.4"/>' +
+      '<circle cx="10" cy="10" r="4.6" fill="none" stroke="#c48a1c" stroke-width="1.3"/>'
+    : '<circle cx="10" cy="10" r="8.2" fill="#dba468" stroke="#47321f" stroke-width="1.4"/>' +
+      '<circle cx="7" cy="7.6" r="1.5" fill="#6b4226"/>' +
+      '<circle cx="12.8" cy="7" r="1.3" fill="#6b4226"/>' +
+      '<circle cx="11.4" cy="12.6" r="1.5" fill="#6b4226"/>' +
+      '<circle cx="6.6" cy="12.8" r="1.1" fill="#6b4226"/>';
+  const count = element("span", "journal-supply-count");
+  root.append(svg, `${label} `, count);
+  return { root, count };
+}
+
 export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   onClose: (callback: () => void) => void;
@@ -86,12 +112,18 @@ export function createJournal(root: HTMLElement): {
   close.setAttribute("aria-label", "Close journal");
   close.textContent = "×";
   const notesPage = element("section", "journal-page journal-notes-page");
+  const notesHead = element("div", "journal-notes-head");
   const notesHeading = element("h2", "journal-heading");
   notesHeading.textContent = "NOTES";
+  const supplies = element("div", "journal-supplies");
+  const coins = supply("coins", "Coins");
+  const snacks = supply("snacks", "Snacks");
+  supplies.append(coins.root, snacks.root);
+  notesHead.append(notesHeading, supplies);
   const notes = element("ul", "journal-notes");
   const empty = element("p", "journal-empty");
   empty.textContent = "Nothing yet. Look around!";
-  notesPage.append(notesHeading, notes, empty);
+  notesPage.append(notesHead, notes, empty);
   const stickersPage = element("section", "journal-page journal-stickers-page");
   const stickersHeading = element("h2", "journal-heading");
   stickersHeading.textContent = "STICKERS";
@@ -148,6 +180,8 @@ export function createJournal(root: HTMLElement): {
     },
     render: (view) => {
       book.hidden = !view.visible;
+      setText(coins.count, String(view.coins));
+      setText(snacks.count, String(view.snacks));
       if (!view.visible && wasVisible) setPage("notes");
       wasVisible = view.visible;
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));

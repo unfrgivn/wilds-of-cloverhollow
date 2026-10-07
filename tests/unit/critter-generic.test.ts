@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   battleView,
-  calmedFacts,
+  inkFacts,
   createState,
   step,
   targetInteractable,
@@ -84,7 +84,7 @@ describe("generic critter battle content", () => {
     expect(state.battle).toBeNull();
     expect(state.stickers).toEqual(["test-sticker"]);
     expect(state.critters).toMatchObject({ "test-critter": "calm", frog: "chaos" });
-    expect(calmedFacts(state)).toMatchObject({ "test-critter": true, frog: false });
+    expect(inkFacts(state).calmed).toMatchObject({ "test-critter": true, frog: false });
     // Calm now: facing it gives its calm talk, not a battle.
     const facing: State = { ...state, player: { x: 545, y: 850 }, facing: "left" };
     expect(targetInteractable(world, facing)).toMatchObject({

@@ -17,7 +17,6 @@
   "touchRadius": 70,
   "calmMax": 100,
   "energyMax": 5,
-  "snacks": 2,
   "sticker": {
     "id": "whispering-owl",
     "name": "Whispering Owl",
@@ -102,8 +101,9 @@
       "miss": "The owl startles Fae with a sharp screech!"
     },
     "soothed": "The owl whispers a wise little hoot. The fizzy spell fades away!",
-    "reward": "New sticker: Whispering Owl!",
+    "reward": "New sticker: Whispering Owl! +8 coins.",
     "rest": "Fae needs a quiet rest after that screech.",
     "run": "Fae backs away. The owl watches from a branch."
-  }
+  },
+  "coins": 8
 }

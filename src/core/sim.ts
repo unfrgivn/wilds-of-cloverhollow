@@ -20,7 +20,7 @@ import type {
   Grade,
   Roamer,
 } from "./types";
-import { createInkState, runInk } from "./ink";
+import { createInkState, runInk, type InkFacts } from "./ink";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -139,7 +139,16 @@ export function createState(
     battle: null,
     journalOpen: false,
     lantern: false,
+    coins: 0,
+    snacks: 2,
   };
+}
+
+// One snack for `price` coins, if Fae can pay (spec 7, a `buy:` line).
+export function purchaseSnack(state: State, price: number): State {
+  return price < 0 || state.coins < price
+    ? state
+    : { ...state, coins: state.coins - price, snacks: state.snacks + 1 };
 }
 
 export function nextRandom(state: State): [number, State] {
@@ -519,11 +528,15 @@ function joinReady(world: World, state: State): State {
   return party.length === state.party.length ? state : { ...state, party };
 }
 
-// The facts the story's calmed(id) answers from: each critter's state.
-export function calmedFacts(state: State): Record<string, boolean> {
-  return Object.fromEntries(
-    Object.entries(state.critters).map(([id, value]) => [id, value === "calm"]),
-  );
+// What the story's externals answer from (spec 7): calmed(id) from each
+// critter's state, coins() from Fae's purse.
+export function inkFacts(state: State): InkFacts {
+  return {
+    calmed: Object.fromEntries(
+      Object.entries(state.critters).map(([id, value]) => [id, value === "calm"]),
+    ),
+    coins: state.coins,
+  };
 }
 
 // Which way a person in the area looks: toward Fae while she talks to them
@@ -586,9 +599,9 @@ export function battleCommands(
       label: world.battle.commands.snack.label,
       detail: (world.battle.commands.snack.snackDetail ?? "").replace(
         "N",
-        String(battle.snacks),
+        String(state.snacks),
       ),
-      disabled: battle.snacks === 0,
+      disabled: state.snacks === 0,
     },
     {
       id: "run",
@@ -788,6 +801,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       return {
         ...nextBase,
         critters: { ...state.critters, [next.critterId]: "calm" },
+        coins: state.coins + critter.coins,
         stickers: state.stickers.includes(critter.sticker.id)
           ? state.stickers
           : [...state.stickers, critter.sticker.id],
@@ -879,10 +893,10 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       const message = battleMessage(next, critter.lines.snack, "result");
       return {
         ...nextBase,
+        snacks: state.snacks - 1,
         battle: {
           ...message,
           rest: restTurn(next.rest),
-          snacks: next.snacks - 1,
           energy: Math.min(
             critter.energyMax,
             next.energy + critter.commands.snack.energy,
@@ -1000,6 +1014,14 @@ function dialogueState(
   };
 }
 
+// A line tagged `buy: snack <price>` sells Fae a snack as it's shown (spec
+// 7). The loader allows no other item or price format.
+function applyBuyTag(state: State, tags: string[]): State {
+  const price = tags.map((tag) => /^buy:\s*snack\s+(\d+)$/.exec(tag.trim())?.[1])
+    .find((item) => item !== undefined);
+  return price === undefined ? state : purchaseSnack(state, Number(price));
+}
+
 function closeDialogue(state: State): State {
   const dialogue = state.dialogue;
   if (dialogue === null) return state;
@@ -1051,14 +1073,15 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
       world.story,
       state.ink,
       { type: "next" },
-      calmedFacts(state),
+      inkFacts(state),
     );
     const following = result.line === null && result.choices.length === 0
       ? null
       : dialogueState(dialogue.knot, result, dialogue.travel);
+    const advanced = applyBuyTag({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
-      ? closeDialogue({ ...next, ink: result.ink })
-      : { ...next, ink: result.ink, dialogue: following };
+      ? closeDialogue(advanced)
+      : { ...advanced, dialogue: following };
   }
   const tapped =
     input.choose !== undefined && input.choose >= 0 && input.choose < count
@@ -1073,14 +1096,15 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
         type: "choose",
         index: chosen,
       },
-      calmedFacts(state),
+      inkFacts(state),
     );
     const following = result.line === null && result.choices.length === 0
       ? null
       : dialogueState(dialogue.knot, result, dialogue.travel);
+    const advanced = applyBuyTag({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
-      ? closeDialogue({ ...next, ink: result.ink })
-      : { ...next, ink: result.ink, dialogue: following };
+      ? closeDialogue(advanced)
+      : { ...advanced, dialogue: following };
   }
   const up = input.move.y < -0.5 && previous.move.y >= -0.5;
   const down = input.move.y > 0.5 && previous.move.y <= 0.5;
@@ -1558,7 +1582,7 @@ function stepTick(
           type: "start",
           knot: target.knot,
         },
-        calmedFacts(state),
+        inkFacts(state),
       );
       return {
         state: {
@@ -1652,7 +1676,7 @@ function stepTick(
             world.story,
             state.ink,
             { type: "start", knot: locked.knot },
-            calmedFacts(state),
+            inkFacts(state),
           ),
         };
   const critterEntry = area.critters.find(
@@ -1678,7 +1702,6 @@ function stepTick(
         command: null,
         energy: critter.energyMax,
         calm: 0,
-        snacks: critter.snacks,
         rest: {},
         aim: null,
         lastGrade: null,

@@ -667,6 +667,74 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     ordinary critters' 66/70 overworld height, 190 battle height, 70 touch
     radius, 100 calm, 5 energy, and 0.3 burst chance. It has no roam entry.
 
+## Milestone 26: The Whispering Woods **Status:** ✅ Completed (2026-10-07)
+The old pine trail west of Pinecone Pass now opens only after the blacklight
+arrow is found. Fae enters a 1750x1100 green clearing with pines, oaks, ferns,
+mossy logs, mushrooms, a stream, stepping stones, and the raccoon's clubhouse
+at its north edge. The clubhouse contains purple soda bottles, comics, and a
+half-eaten fizzy cracker. With the lantern on, its wall reveals the raccoon's
+note: meet “the boss” at the Ancient Tree in the sealed Enchanted Forest.
+
+A chaos owl roams the clearing. Its commands are Soothe, Play, Cast, Juggle,
+Snack, and Run, with a screeching/swooping battle and a wise whispering calm
+knot. After the owl is calm, the clubhouse becomes Fae's club. Sue promises a
+fridge and Jordan promises a garden. Journal notes are newest first, including
+the old trail, the owl, and the clubhouse claim.
+
+## Milestone 27: Coins and shops **Status:** ✅ Completed (2026-10-07)
+- Fae carries coins and snacks (save version 4; older saves start fresh). A
+  new game has 0 coins and 2 snacks. Calming a critter pays its coins as the
+  battle ends: 8 for the ordinary critters, 25 for the grumpy gull. Snack
+  spends one of Fae's own snacks, shows how many she has, and is disabled at
+  none; critters no longer bring their own.
+- Shops: the plaza bakery (talk at its window) and Pinecone Pass's cocoa stand
+  sell a snack for 5 coins, on every visit. Ink asks `coins()`; a line tagged
+  `# buy: snack 5` takes the coins as it's shown.
+- The journal: the NOTES heading row shows two small stickers, Coins (a gold
+  coin) and Snacks (a cookie); while Fae has coins, a note sends her to the
+  bakery.
+- Evidence: unit (`coins.test.ts`: the payout, sticky shops, the short purse,
+  the snack supply, save version 4, the tag checks; `bakery-replay.test.ts`),
+  the recorded run `plaza/bakery.json` (`tools/sim/record-bakery.ts`: calm the
+  frog, buy at the bakery, eat the snack in the pup's battle) with matching
+  browser and Bun hashes, and the real-key e2e `shop.spec.ts`, which plays it
+  and shoots the bakery's choice, the selected Snack ×3, and the journal's
+  supplies at 1280x720 and 874x402.
+- Wording for the owner: the bakery, "The bakery smells like warm cinnamon
+  buns." ("Buy a snack for 5 coins": "A fresh snack, wrapped up just for
+  you!"; "Not now": "No rush! Come back when you're hungry."; short of coins:
+  "You need 5 coins for a snack. Keep exploring!"); the cocoa stand, "The
+  cocoa stand steams beside the snowy trail." ("Buy a mug of cocoa for 5
+  coins": "Here you go, a warm mug of cocoa!"; "Not now": "All right! Stay
+  cozy out there."; short: "A mug of cocoa costs 5 coins. Maybe calm a
+  critter first?"), replacing "The cocoa stand is open, but nobody's behind
+  the counter."; each reward line adds the coins ("New sticker: Fountain
+  Frog! +8 coins."); the journal note, "I have coins! The bakery in the plaza
+  sells snacks for 5 coins."
+- Notes and assumptions:
+  - Lantern finds pay no coins. The proposal had them, but Milestone 28 makes
+    every calm pay, which is plenty for snacks.
+  - The shops' choices were once-only (`*`), so each sold one snack a game,
+    and after a last 5 coins were spent the baker still said they cost 5.
+    They're sticky now, and the short line only plays when Fae is short.
+  - The journal's coin note was third person ("Fae has coins now!") on top of
+    every note; it's in Fae's voice now, just above the frog's note, where it
+    first comes true. `journalNotes` answered `coins()` only on its first
+    line (0 after), which hid it there; Ink's externals are now one value,
+    `inkFacts(state)`. The shell's journal cache refreshes on a coin change
+    too (it watched only the story and the critters).
+  - Load validation never saw a travel tag: compiled tags carry a `^` text
+    prefix. Both travel and buy tags are now read properly (`storyTags`).
+  - The local long-flow e2e budget is 180 s (it was 90): a full run in both
+    browsers took the trail walk past 90 s. Local runs use 30% of the cores
+    as workers (3 on a 10-core laptop; Playwright's default is half): five
+    software-rendering Chromiums starved each other and timed out the long
+    real-key flows, and three ran the whole suite green in 10.4 minutes.
+  - `pass/trail.json` waits 13 ticks longer on the bunny's reward, which now
+    types its coins too.
+  - New recorders share `tools/sim/recorder.ts` (navigate, talk, battle;
+    arrows and Z only, so the e2e can play them with real keys).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -724,17 +792,7 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 27, coins and shops: calmed critters and lantern finds give
     coins; the cocoa stand and the bakery sell snacks; Fae carries snacks into
     battles instead of each critter granting its own.
-    In progress (2026-10-07): branch `m27-coins`, worktree `.worktrees/m27`,
-    commit `bba8a6f`, unverified and not pushed. Done there: `coins` and
-    `snacks` in state (save version 4), one-time coin rewards, `# buy:` tags
-    with an Ink `coins()` external, the bakery and cocoa stand, the journal's
-    coins header, and `tests/unit/coins.test.ts` (336 tests pass). Missing: a
-    recorded replay (earn, buy at the bakery, use the snack) in the hash list,
-    a real-key bakery-to-battle e2e, screenshots at both sizes of the bakery
-    choice, the journal header, and the Snack button, and a green `just e2e`
-    (its last run, Chromium only, had 10 failures: journal expectations were
-    then updated; the rest, in battle, bus, Jordan, title, and trail specs,
-    were called load and are unverified).
+    Done (Milestone 27, above).
   - Milestone 28, recurring bad guys (owner, 2026-10-07): critters become
     species placed many times, and they respawn at random, EarthBound style.
     Each arrival in an area rolls its chaos critters from the seeded PRNG in
@@ -759,17 +817,3 @@ more bad guys, and the blacklight lantern, made and built while away.
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the
 clubhouse, and more mini-bosses (people under the chaos spell, NOTES.md).
-
-### Milestone 26, The Whispering Woods (2026-10-07)
-The old pine trail west of Pinecone Pass now opens only after the blacklight
-arrow is found. Fae enters a 1750x1100 green clearing with pines, oaks, ferns,
-mossy logs, mushrooms, a stream, stepping stones, and the raccoon's clubhouse
-at its north edge. The clubhouse contains purple soda bottles, comics, and a
-half-eaten fizzy cracker. With the lantern on, its wall reveals the raccoon's
-note: meet “the boss” at the Ancient Tree in the sealed Enchanted Forest.
-
-A chaos owl roams the clearing. Its commands are Soothe, Play, Cast, Juggle,
-Snack, and Run, with a screeching/swooping battle and a wise whispering calm
-knot. After the owl is calm, the clubhouse becomes Fae's club. Sue promises a
-fridge and Jordan promises a garden. Journal notes are newest first, including
-the old trail, the owl, and the clubhouse claim.

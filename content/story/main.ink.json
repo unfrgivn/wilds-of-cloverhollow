@@ -856,6 +856,33 @@
         "/#",
         "\n",
         "ev",
+        {
+          "x()": "coins"
+        },
+        0,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I have coins! The bakery in the plaza sells snacks for 5 coins. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.156"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         "str",
         "^frog",
         "/str",
@@ -875,7 +902,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.157"
+                "->": ".^.^.^.166"
               },
               null
             ]
@@ -900,7 +927,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.164"
+                "->": ".^.^.^.173"
               },
               null
             ]
@@ -929,7 +956,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.175"
+                "->": ".^.^.^.184"
               },
               null
             ]
@@ -958,7 +985,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.186"
+                "->": ".^.^.^.195"
               },
               null
             ]
@@ -2436,12 +2463,94 @@
         null
       ],
       "cocoa_stand": [
-        "^The cocoa stand is open, but nobody's behind the counter. ",
-        "#",
-        "^speaker: Fae",
-        "/#",
-        "\n",
-        "done",
+        [
+          "^The cocoa stand steams beside the snowy trail. ",
+          "#",
+          "^speaker: Cocoa seller",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          5,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^A mug of cocoa costs 5 coins. Maybe calm a critter first? ",
+                "#",
+                "^speaker: Cocoa seller",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.11"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Buy a mug of cocoa for 5 coins",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Here you go, a warm mug of cocoa! ",
+              "#",
+              "^speaker: Cocoa seller ",
+              "/#",
+              "#",
+              "^buy: snack 5",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^All right! Stay cozy out there. ",
+              "#",
+              "^speaker: Cocoa seller",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
         null
       ],
       "lodge_door": [
@@ -3091,6 +3200,97 @@
           ],
           "#f": 1
         }
+      ],
+      "bakery": [
+        [
+          "^The bakery smells like warm cinnamon buns. ",
+          "#",
+          "^speaker: Baker",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          5,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^You need 5 coins for a snack. Keep exploring! ",
+                "#",
+                "^speaker: Baker",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.11"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Buy a snack for 5 coins",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^A fresh snack, wrapped up just for you! ",
+              "#",
+              "^speaker: Baker ",
+              "/#",
+              "#",
+              "^buy: snack 5",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^No rush! Come back when you're hungry. ",
+              "#",
+              "^speaker: Baker",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        null
       ],
       "global decl": [
         "ev",

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-07 (Milestone 25, the grumpy gull)
+Last updated: 2026-10-07 (Milestone 27, coins and shops)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -450,10 +450,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   `bay_bus_stop`, `pass_bus_stop`) travelling between `plaza.bus-stop`,
   `bay.bus-stop`, and `pass.bus`: the bay once `club_open`, the pass once the
   bluebird is calm (setting `rode_bus`), home any time.
+- A line may carry `# buy: snack <price>`: as it's shown, Fae pays `price`
+  coins for one snack if she has them (`purchaseSnack`). The story's
+  `coins()` external answers her coins, so a shop only offers to sell when
+  she can pay. The shops are the plaza bakery (interactable `bakery` at
+  (1180, 420), under its window) and Pinecone Pass's cocoa stand
+  (`cocoa_stand`), 5 coins a snack. Their choices are sticky (`+`), so they
+  sell on every visit.
+- Load validation reads every tag in the compiled story (`storyTags`: a
+  tag's text follows its `#` command, and its `/#` may close in an enclosing
+  container) and rejects a travel tag naming an unknown area or spawn, and
+  any `buy` tag but `snack <digits>`.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
-  them come with that line rather than as an empty step. The story's external
-  `calmed(id)` is answered from the core's critter states for every command,
+  them come with that line rather than as an empty step. The story's
+  externals, `calmed(id)` (each critter's state) and `coins()` (Fae's
+  coins), are answered from the core's state (`inkFacts`) for every command,
   not only a knot's first line.
 - Dialogue state machine (core):
 
@@ -568,7 +580,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   each member's command in party order, then Snack and Run: six with the
   whole party, in one column on desktop and two on phones (section 8.1).
 - Content: `content/critters/*.json` (validated by the loader) supplies every
-  battle number and line: the touch radius, calm and energy maxima, snacks,
+  battle number and line: the touch radius, calm and energy maxima, the
+  `coins` it pays when calmed (8 for ordinary critters, 25 for the gull),
   command values (`commands.soothe`, `commands.snack`, and
   `commands.friends.<command id>` with `{ calm, great, good, rest }` for every
   party command), aim windows, the burst, the sticker, and the calm knot and
@@ -579,7 +592,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   (Soothe, Snack, Run) and the Snack `×N` template live in
   `content/battle.json`; each friend's label and resting detail live in its
   `content/party/` entry. State adds `critters` (chaos or calm), `stickers`,
-  `safeSpot`, `roamers`, and a nullable `battle`.
+  `safeSpot`, `roamers`, a nullable `battle`, and Fae's `coins` (0 in a new
+  game) and `snacks` (2).
 - Start: crossing into a chaos critter's touch circle (outside on the previous
   tick, inside now; exactly on the radius counts as inside) starts a battle and
   records `battle.entry`, Fae's position on the tick before. A calm critter
@@ -607,7 +621,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   its rest to the critter's content `rest` for it, and every command choice
   (Soothe, Snack, or a friend's) takes one turn off every other resting
   friend. A resting command is disabled with its member's `resting` detail.
-  Snack shows its count and is disabled at zero.
+  Snack spends one of Fae's `snacks` (gone for good, whatever happens next),
+  shows how many she has (`×N`), and is disabled at zero.
 - Aim: the first confirm edge is graded by its distance in ticks from the
   target (great window, then good); no press by the end is a miss. Soothe and
   a friend's command add their calm plus the grade bonus, clamped to
@@ -723,7 +738,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   hood's school name tag; while the club is open and Sue hasn't joined, the
   east road to Bubblegum Bay; the club password; the hall pass; the calm pup
   and his clue toward the school; while only the frog is calm, the purple fizz
-  leading to the park; the calm frog; the raccoon from the notice board; then
+  leading to the park; while Fae has coins, the bakery's snacks; the calm
+  frog; the raccoon from the notice board; then
   the morning plan).
   `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
   result, so reading the journal never changes the story.
@@ -740,6 +756,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   The right page is the STICKERS album: a 4-column grid where owned stickers
   show their atlas frame with a die-cut rim and their name, and unowned slots
   are dashed `?` outlines with no name.
+- Fae's supplies sit at the right of the NOTES heading row: two small cream
+  stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
+  a cookie (inline SVG, like the map's bus-stop sign).
 - A cream JOURNAL label sits on the top edge and a close sticker (at least
   44 px) in the top-right corner; the close button is how touch players leave.
 - Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The
@@ -756,10 +775,12 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 3, state }`, the whole core state, including the
+- Format: `{ version: 4, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
-  critters, the lantern, the PRNG, and the tick. Version 1 (Maddie in `maddie`
-  and `trail`) and version 2 (no lantern) are refused and start a new game. Loading restores it exactly: the state hash matches, and
+  critters, the lantern, coins and snacks, the PRNG, and the tick. Version 1
+  (Maddie in `maddie` and `trail`), version 2 (no lantern), and version 3 (no
+  coins or snacks) are refused and start a new game. Loading restores it
+  exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
 - `parseSave(json, template)` accepts only a state with the template's exact
@@ -846,9 +867,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   test pins its ending and the browser and Bun must agree on its hash. It is
   recorded by `tools/sim/chapter-one.ts`, which plays through the core like a
   careful player; rerun it after a story or map change (it names the step
-  that no longer fits).
+  that no longer fits). Newer recorders (`tools/sim/record-*.ts`) build on
+  `tools/sim/recorder.ts` (navigate, talk, battle), which records only arrows
+  and Z, so the e2e can play every run back with real keys.
 - The Playwright suite serves the harness build from the `/cloverhollow/`
   sub-path, so any root-relative asset URL fails in tests as it would on iOS.
+  Locally it runs on 30% of the cores: headless Chromium renders in software,
+  and more workers starve each other's GPU processes.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

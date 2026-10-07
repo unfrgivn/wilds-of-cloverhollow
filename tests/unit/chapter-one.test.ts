@@ -47,7 +47,9 @@ describe("chapter one", () => {
       plan: "now", ate_breakfast: true, hall_pass: true, raccoon_waiting: false,
       knows_password: true, club_open: true,
     });
-    expect(journalNotes(content.world, state)[0])
+    const note = journalNotes(content.world, state)
+      .find((item) => item.includes("School name tag"));
+    expect(note)
       .toBe("The purple hood in the tree house has a Cloverhollow School name tag. Whose is it?");
   });
 });

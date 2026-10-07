@@ -169,7 +169,7 @@ export type Critter = {
   touchRadius: number;
   calmMax: number;
   energyMax: number;
-  snacks: number;
+  coins: number;
   sticker: { id: string; name: string; frame: string };
   calmKnot: string;
   calmPrompt: "Look" | "Talk";
@@ -228,7 +228,6 @@ export type Battle = {
   command: string | null;
   energy: number;
   calm: number;
-  snacks: number;
   // Turns each friend's command still rests, by command id; missing = 0.
   rest: Record<string, number>;
   aim: {
@@ -317,6 +316,8 @@ export type State = {
   battle: Battle | null;
   journalOpen: boolean;
   lantern: boolean;
+  coins: number;
+  snacks: number;
   backLink?: { area: string; direction: Direction };
 };
 export type Roamer = {

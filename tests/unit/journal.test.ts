@@ -91,7 +91,6 @@ describe("journal", () => {
             command: null,
             energy: 5,
             calm: 0,
-            snacks: 2,
             rest: {},
             aim: null,
             lastGrade: null,

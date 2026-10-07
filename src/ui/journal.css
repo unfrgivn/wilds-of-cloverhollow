@@ -47,6 +47,38 @@
   font-weight: 800;
   letter-spacing: .1em;
 }
+/* NOTES on the left, Fae's coins and snacks as small stickers on the right. */
+.journal-notes-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.journal-notes-head .journal-heading {
+  margin: 0;
+}
+.journal-supplies {
+  display: flex;
+  gap: 6px;
+}
+.journal-supply {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 5px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-paper);
+  box-shadow: 0 2px 0 #47321f33;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.journal-supply svg {
+  width: 16px;
+  height: 16px;
+}
 .journal-notes {
   margin: 0;
   padding: 0;

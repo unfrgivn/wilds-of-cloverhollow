@@ -40,7 +40,6 @@ function battleState(): State {
       command: null,
       energy: 5,
       calm: 0,
-      snacks: 2,
       rest: {},
       aim: null,
       lastGrade: null,
@@ -146,8 +145,8 @@ describe("calm-down battle core", () => {
     state = press(state);
     expect(state.battle?.energy).toBe(5);
     expect(state.battle?.calm).toBe(5);
-    expect(state.battle?.snacks).toBe(1);
-    state = { ...state, battle: { ...state.battle!, snacks: 0 } };
+    expect(state.snacks).toBe(1);
+    state = { ...state, snacks: 0 };
     expect(battleCommands(content.world, state)[2]).toMatchObject({
       disabled: true,
       detail: "×0",
@@ -156,7 +155,7 @@ describe("calm-down battle core", () => {
 
   it("skips disabled Play and Snack commands in both menu directions", () => {
     let state = battleState();
-    state = { ...state, battle: { ...state.battle!, rest: { play: 1 }, snacks: 0 } };
+    state = { ...state, snacks: 0, battle: { ...state.battle!, rest: { play: 1 } } };
     state = step(content.world, state, { ...none, move: { x: 0, y: 1 } }).state;
     expect(state.battle?.selected).toBe(3);
     state = step(content.world, state, {
@@ -335,11 +334,11 @@ describe("calm-down battle core", () => {
     const chaos = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-    }, { frog: false });
+    }, { calmed: { frog: false }, coins: 0 });
     const calm = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-    }, { frog: true });
+    }, { calmed: { frog: true }, coins: 0 });
     expect(chaos.line?.text).toContain("Pink bubbles");
     expect(calm.line?.text).toBe("The bubbles are gone. The fountain sparkles like new!");
   });

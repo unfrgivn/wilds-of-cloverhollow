@@ -17,7 +17,6 @@
   "touchRadius": 70,
   "calmMax": 100,
   "energyMax": 5,
-  "snacks": 2,
   "sticker": {
     "id": "hiker-hamster",
     "name": "Hiker Hamster",
@@ -102,8 +101,9 @@
       "miss": "Poof! Fae gets a face full of snow."
     },
     "soothed": "The hamster lets out a happy squeak. The fizzy spell melts away!",
-    "reward": "New sticker: Hiker Hamster!",
+    "reward": "New sticker: Hiker Hamster! +8 coins.",
     "rest": "Fae is too chilly to go on. Time to warm up.",
     "run": "Fae tiptoes away through the snow. The hamster keeps whirling."
-  }
+  },
+  "coins": 8
 }

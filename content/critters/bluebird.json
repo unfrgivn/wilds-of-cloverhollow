@@ -17,7 +17,6 @@
   "touchRadius": 70,
   "calmMax": 100,
   "energyMax": 5,
-  "snacks": 2,
   "sticker": {
     "id": "bay-bluebird",
     "name": "Bay Bluebird",
@@ -102,8 +101,9 @@
       "miss": "Poof! Sand lands all around Fae."
     },
     "soothed": "The bluebird settles on a shell, calm and bright.",
-    "reward": "New sticker: Bay Bluebird!",
+    "reward": "New sticker: Bay Bluebird! +8 coins.",
     "rest": "Fae is tuckered out. Time for a little rest.",
     "run": "Fae backs away slowly. The bluebird keeps fluttering."
-  }
+  },
+  "coins": 8
 }

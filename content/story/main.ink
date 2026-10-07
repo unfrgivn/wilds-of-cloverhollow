@@ -12,6 +12,7 @@ VAR has_lantern = false
 VAR found_old_trail = false
 VAR clubhouse_claimed = false
 EXTERNAL calmed(id)
+EXTERNAL coins()
 
 === window ===
 {plan != "none": -> again}
@@ -72,6 +73,7 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 {hall_pass: I have a hall pass! Time to follow the raccoon's trail. # speaker: Fae}
 {calmed("pup"): The Pond Pup is calm. A raccoon paw print points toward the school. # speaker: Fae}
 {calmed("frog") and not calmed("pup"): Purple fizz drips lead out of the plaza to Meadow Park. # speaker: Fae}
+{coins() > 0: I have coins! The bakery in the plaza sells snacks for 5 coins. # speaker: Fae}
 {calmed("frog"): The Fountain Frog is calm. Something purple fizzed into his fountain. # speaker: Fae}
 {read_notice: A raccoon in a purple hood was seen in town. # speaker: Fae}
 {plan == "now": Go see why the fountain is fizzing! # speaker: Fae}
@@ -336,8 +338,16 @@ The snowman has a carrot nose and a very serious pebble smile. # speaker: Fae
 -> DONE
 
 === cocoa_stand ===
-The cocoa stand is open, but nobody's behind the counter. # speaker: Fae
--> DONE
+The cocoa stand steams beside the snowy trail. # speaker: Cocoa seller
+{coins() < 5:
+    A mug of cocoa costs 5 coins. Maybe calm a critter first? # speaker: Cocoa seller
+    -> DONE
+}
++ [Buy a mug of cocoa for 5 coins]
+    Here you go, a warm mug of cocoa! # speaker: Cocoa seller # buy: snack 5
++ [Not now]
+    All right! Stay cozy out there. # speaker: Cocoa seller
+- -> DONE
 
 === lodge_door ===
 The lodge is locked. A note says: "Back soon, gone looking for a runaway hamster." # speaker: Fae
@@ -451,3 +461,15 @@ The owl hoots wisely. "The boss waits by the Ancient Tree in the sealed forest."
 = again
 The wise owl whispers through the leaves. # speaker: Whispering Owl
 -> DONE
+
+=== bakery ===
+The bakery smells like warm cinnamon buns. # speaker: Baker
+{coins() < 5:
+    You need 5 coins for a snack. Keep exploring! # speaker: Baker
+    -> DONE
+}
++ [Buy a snack for 5 coins]
+    A fresh snack, wrapped up just for you! # speaker: Baker # buy: snack 5
++ [Not now]
+    No rush! Come back when you're hungry. # speaker: Baker
+- -> DONE

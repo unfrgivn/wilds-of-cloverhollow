@@ -53,7 +53,8 @@ test("real keys switch on the blacklight and reveal the pass trail", async ({ pa
   expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
   await page.keyboard.press("j");
   await step(page, 1);
-  await expect(page.locator(".journal-note").first()).toContainText("Whispering Woods");
+  await expect(page.locator(".journal-note").filter({ hasText: "Whispering Woods" }))
+    .toBeVisible();
 });
 
 test("touch lantern button toggles at the phone layout", async ({ page }) => {

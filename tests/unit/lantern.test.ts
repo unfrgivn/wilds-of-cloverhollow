@@ -110,10 +110,10 @@ describe("the lantern switch", () => {
     expect(state.lantern).toBe(false);
   });
 
-  it("saves the lantern (save version 3; version 2 saves start fresh)", () => {
+  it("saves the lantern (save version 4; version 2 saves start fresh)", () => {
     const state = toggle(passState({ x: 700, y: 650 }, "down", true));
     const json = serializeSave(state);
-    expect(JSON.parse(json).version).toBe(3);
+    expect(JSON.parse(json).version).toBe(4);
     expect(parseSave(json, state)?.lantern).toBe(true);
     expect(parseSave(JSON.stringify({ version: 2, state }), state)).toBeNull();
   });
@@ -169,7 +169,9 @@ describe("the pass's glowing secrets", () => {
     expect(world.storyVariable(state.ink, "found_old_trail")).toBe(false);
     state = talkThrough(state);
     expect(world.storyVariable(state.ink, "found_old_trail")).toBe(true);
-    expect(journalNotes(world, state)[0]).toMatch(/trail/i);
+    const note = journalNotes(world, state)
+      .find((item) => item.includes("Whispering Woods"));
+    expect(note).toMatch(/trail/i);
   });
 
   it("never blocks Fae: she walks right over the paw prints", () => {

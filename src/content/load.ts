@@ -89,11 +89,56 @@ function direction(value: unknown): value is Direction {
   );
 }
 
-function storyJson(value: unknown, file: string): Record<string, unknown> {
+export function parseStoryJson(value: unknown, file: string): Record<string, unknown> {
   field(record(value), file, "story");
   field(typeof value.inkVersion === "number", file, "story.inkVersion");
   field(Array.isArray(value.root), file, "story.root");
   return value;
+}
+
+// Every tag in a compiled story. Ink's JSON starts a tag with a "#" command
+// and its text ("^..."); the closing "/#" can sit in an enclosing container
+// (an inline conditional's tag closes after its branch), so a tag is the text
+// right after its "#".
+export function storyTags(story: Record<string, unknown>): string[] {
+  const tags: string[] = [];
+  const visit = (item: unknown): void => {
+    if (!Array.isArray(item)) {
+      if (record(item)) Object.values(item).forEach(visit);
+      return;
+    }
+    item.forEach((child, index) => {
+      if (child !== "#") {
+        visit(child);
+        return;
+      }
+      let text = "";
+      for (const next of item.slice(index + 1)) {
+        if (typeof next !== "string" || !next.startsWith("^")) break;
+        text += next.slice(1);
+      }
+      tags.push(text.trim());
+    });
+  };
+  visit(story.root);
+  return tags;
+}
+
+// The tags the core acts on (spec 7): `travel: <area>.<spawn>` must name a
+// spawn that exists, and `buy:` sells only `snack <price>`.
+export function storyTagErrors(tags: string[], areas: Record<string, Area>): string[] {
+  return tags.flatMap((tag) => {
+    if (tag.startsWith("travel:")) {
+      const [areaId, spawnId, ...extra] = tag.slice("travel:".length).trim().split(".");
+      const area = areaId === undefined ? undefined : areas[areaId];
+      const known = area !== undefined && spawnId !== undefined && extra.length === 0 &&
+        area.spawns[spawnId] !== undefined;
+      return known ? [] : [`unknown travel target in "${tag}"`];
+    }
+    if (tag.startsWith("buy:"))
+      return /^buy:\s*snack\s+\d+$/.test(tag) ? [] : [`invalid buy tag "${tag}"`];
+    return [];
+  });
 }
 
 function numberValue(
@@ -456,7 +501,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     touchRadius: number(value, "touchRadius"),
     calmMax: number(value, "calmMax"),
     energyMax: number(value, "energyMax"),
-    snacks: number(value, "snacks"),
+    coins: number(value, "coins"),
     sticker: stickerValue,
     calmKnot,
     calmPrompt,
@@ -779,7 +824,7 @@ export function loadContent(): {
     name: land.name,
     busStop: "busStop" in land && land.busStop === true,
   }));
-  const story = storyJson(storyData, "content/story/main.ink.json");
+  const story = parseStoryJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
   const bluebird = parseCritter(bluebirdData, "content/critters/bluebird.json");
@@ -847,29 +892,9 @@ export function loadContent(): {
     [trail.id]: trail,
     [woods.id]: woods,
   };
-  const travelTargets = new Set<string>();
-  const findTravelTags = (value: unknown): void => {
-    if (typeof value === "string") {
-      if (value.startsWith("travel:")) travelTargets.add(value.slice(7).trim());
-      return;
-    }
-    if (Array.isArray(value)) {
-      for (const item of value) findTravelTags(item);
-      return;
-    }
-    if (record(value)) {
-      for (const item of Object.values(value)) findTravelTags(item);
-    }
-  };
-  findTravelTags(story);
-  for (const target of travelTargets) {
-    const [areaId, spawnId, ...extra] = target.split(".");
-    const area = areaId === undefined ? undefined : areas[areaId];
-    if (area === undefined || spawnId === undefined || extra.length !== 0)
-      throw new Error(`content/story/main.ink: invalid travel target ${target}`);
-    if (area.spawns[spawnId] === undefined)
-      throw new Error(`content/story/main.ink: unknown travel target ${target}`);
-  }
+  const tagProblems = storyTagErrors(storyTags(story), areas);
+  if (tagProblems.length > 0)
+    throw new Error(`content/story/main.ink: ${tagProblems.join("; ")}`);
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),

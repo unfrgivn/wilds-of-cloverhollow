@@ -17,7 +17,6 @@
   "touchRadius": 85,
   "calmMax": 160,
   "energyMax": 6,
-  "snacks": 3,
   "sticker": {
     "id": "lookout-gull",
     "name": "Lookout Gull",
@@ -102,8 +101,9 @@
       "miss": "Splash! Fae gets a face full of sea spray."
     },
     "soothed": "The gull lets out a long, happy sigh. The fizzy spell blows away on the breeze!",
-    "reward": "New sticker: Lookout Gull!",
+    "reward": "New sticker: Lookout Gull! +25 coins.",
     "rest": "Fae is too windblown to go on. Time for a rest.",
     "run": "Fae backs off the lookout. The gull guards the bench."
-  }
+  },
+  "coins": 25
 }

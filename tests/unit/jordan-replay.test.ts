@@ -26,6 +26,6 @@ describe("Jordan replay", () => {
     expect(state.stickers).toContain("hiker-hamster");
     expect(world.storyVariable(state.ink, "jordan_joined")).toBe(true);
     expect(world.storyVariable(state.ink, "has_lantern")).toBe(true);
-    expect(journalNotes(world, state)[0]).toMatch(/lantern/);
+    expect(journalNotes(world, state).find((note) => note.includes("lantern"))).toBeDefined();
   });
 });

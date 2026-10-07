@@ -194,8 +194,8 @@ function measureContrast(): Contrast[] {
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
     ".battle-grade, .battle-reward-title, .battle-reward-name, .journal-label, " +
-    ".journal-heading, .journal-note, .journal-empty, .journal-name, .journal-unknown, " +
-    ".journal-close";
+    ".journal-heading, .journal-supply, .journal-note, .journal-empty, .journal-name, " +
+    ".journal-unknown, .journal-close";
   return [...document.querySelectorAll(selectors)]
     .filter((element) => element.getClientRects().length > 0)
     .map((element) => {

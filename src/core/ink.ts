@@ -67,20 +67,27 @@ function line(story: Story): InkLine | null {
   return { text: text.trim(), speaker, tags };
 }
 
-// `calmed` answers the story's external calmed(id) for every command, so a
-// knot can ask on any line, not only its first.
+// What the story's externals answer (spec 7): `calmed(id)` and `coins()`.
+// The core builds them from its state (`inkFacts`); the defaults are a new
+// game's.
+export type InkFacts = { calmed: Record<string, boolean>; coins: number };
+const newGameFacts: InkFacts = { calmed: {}, coins: 0 };
+
+// The externals are answered for every command, so a knot can ask on any
+// line, not only its first.
 export function runInk(
   storyJson: StoryJson,
   inkJson: string,
   command: InkCommand,
-  calmed: Record<string, boolean> = {},
+  facts: InkFacts = newGameFacts,
 ): InkResult {
   const story = new Story(storyJson);
   story.state.LoadJson(inkJson);
   story.BindExternalFunction(
     "calmed",
-    (id: unknown) => typeof id === "string" && calmed[id] === true,
+    (id: unknown) => typeof id === "string" && facts.calmed[id] === true,
   );
+  story.BindExternalFunction("coins", () => facts.coins);
   if (command.type === "start") story.ChoosePathString(command.knot);
   if (command.type === "choose") story.ChooseChoiceIndex(command.index);
   const blank = (output: string | null): boolean =>

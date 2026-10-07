@@ -56,6 +56,7 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 
 === journal ===
 {found_old_trail: The raccoon's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
+{calmed("gull"): The grumpy gull at the lookout was fizzy too. That raccoon gets around! # speaker: Fae}
 {has_lantern: Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! # speaker: Fae}
 {jordan_joined: Jordan is on my team now! He's hiked every trail on the mountain. # speaker: Fae}
 {calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! # speaker: Fae}
@@ -274,6 +275,16 @@ Then, fizz! I couldn't stop throwing things. # speaker: Acorn Squirrel
 -> DONE
 = again
 I'm saving my acorns for winter now. Nobody gets bonked! # speaker: Acorn Squirrel
+-> DONE
+
+=== gull_calm ===
+{gull_calm > 1: -> again}
+Squawk! Sorry about your snacks. I couldn't help myself! # speaker: Lookout Gull
+A raccoon in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! # speaker: Lookout Gull
+A fizzy cracker? Everywhere that raccoon goes, things go fizzy. # speaker: Fae
+-> DONE
+= again
+I'm keeping watch over the sea now. No more snack snatching! # speaker: Lookout Gull
 -> DONE
 
 === jordan ===

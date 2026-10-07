@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-07 (Milestone 22, Jordan)
+Last updated: 2026-10-07 (Milestone 25, the grumpy gull)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -357,7 +357,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   south edge to the trail's beach (`trail.bay`, facing up) and back
   (`bay.trail`, facing up). The bay's way requires `rode_bus` (knot
   `bay_cliff_path` while it's false). Look points: `trail-signpost`,
-  `lookout-bench`, and the pass's `pass-trail-sign`. A fizzy bunny roams the
+  `lookout-bench`, and the pass's `pass-trail-sign`. The Grumpy Gull stands at
+  (1440, 480), between the lookout rock and bench, guarding the bench until its
+  mini-boss battle is calmed. A fizzy bunny roams the
   upper meadow and a fizzy squirrel the lower one (section 8).
 - The back-link rule: after Fae arrives through a door, the trigger that leads
   straight back to the area she came from doesn't fire while she keeps holding
@@ -549,8 +551,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   Fae), the Snowball Hamster (Pinecone Pass's clearing; calm, the Hiker
   Hamster, who flings snowballs), and the Thumpy Bunny and Zippy Squirrel,
   roaming the Cliffside Trail's meadows (calm, the Ribbon Bunny and the Acorn
-  Squirrel). They share the battle numbers for now; each has its own lines,
-  atlas, sticker, and calm knot.
+  Squirrel), and the Grumpy Gull at the lookout (calm, the Lookout Gull). The
+  gull is the first mini-boss: it is larger and tougher, has no roam, and blocks
+  the route to the bench until calmed. They share the battle numbers for now; each has its own lines,
+   atlas, sticker, and calm knot.
+- Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
+  critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
+  `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
+  critters are 100), and `energyMax` 6 (ordinary critters are 5). Its burst
+  `bigChance` is 0.5 (ordinary critters are 0.3), so its gust can hit harder.
+  Its friend-command values and timing windows remain readable and fair; the
+  extra difficulty comes from its larger meter, extra energy, larger reach,
+  and stronger burst.
 - Friend commands: Maddie's Play, Sue's Cast, and Jordan's Juggle (pinecones;
   calm 30, great 15, good 5, rest 2 on every critter). The menu lists Soothe,
   each member's command in party order, then Snack and Run: six with the
@@ -707,7 +719,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   the Cliffside Trail calm again (both its critters). After the ride it goes
   on with Pinecone Pass snow, lodge, cocoa, and the raccoon clue; before the
   ride, a calm bluebird adds the exact bus note.
-  (the calm bluebird's clue toward the mountains; Sue on the team; the purple
+  (the grumpy gull at the lookout was fizzy too; the calm bluebird's clue toward the mountains; Sue on the team; the purple
   hood's school name tag; while the club is open and Sue hasn't joined, the
   east road to Bubblegum Bay; the club password; the hall pass; the calm pup
   and his clue toward the school; while only the frog is calm, the purple fizz

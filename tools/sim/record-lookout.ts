@@ -10,6 +10,7 @@
 //   bun tools/sim/record-lookout.ts > tests/sim/scripts/trail/lookout.json
 import {
   blankInput,
+  battleCommands,
   createState,
   step,
   targetInteractable,
@@ -76,8 +77,33 @@ function look(id: string): void {
   if (state.dialogue !== null) throw new Error(`${id} never finished`);
 }
 
+function battle(): void {
+  for (let count = 0; count < 1200 && state.battle !== null; count += 1) {
+    const current = state.battle;
+    if (current.phase === "command") {
+      const soothe = battleCommands(world, state).findIndex((command) => command.id === "soothe");
+      if (soothe < 0) throw new Error("gull battle has no Soothe command");
+      if (current.selected !== soothe) throw new Error("Soothe was not initially selected");
+      else { tick(frame(0, 0, true)); tick(frame()); }
+    } else if (current.phase === "aim" && current.aim !== null) {
+      while (state.battle !== null && state.battle.aimTick < current.aim.targetTick - 1)
+        tick(frame());
+      tick(frame(0, 0, true));
+      tick(frame());
+    } else {
+      tick(frame(0, 0, true));
+      tick(frame());
+    }
+  }
+  if (state.battle !== null || state.critters.gull !== "calm" ||
+      !state.stickers.includes("lookout-gull")) throw new Error("gull battle did not finish");
+}
+
 navigate({ x: 1265, y: 560 });
 for (let count = 0; count < 30; count += 1) tick(frame());
+for (let count = 0; count < 100 && state.battle === null; count += 1) tick(frame(1, 0));
+if (state.battle === null) throw new Error("the lookout gull did not meet Fae");
+battle();
 navigate({ x: 1530, y: 565 });
 tick(frame(0, -1));
 tick(frame());

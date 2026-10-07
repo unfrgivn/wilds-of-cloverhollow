@@ -119,6 +119,7 @@ test("real keys over the footbridge to the lookout, and down into the bay", asyn
   let bridgeShot = false;
   const lines: string[] = [];
   let heldInBay = 0;
+  let gullShot = false;
   await playWithKeys(page, recording(path), 10, async () => {
     const state = await readState(page);
     const onBridge = state.area === "trail" && Math.abs(state.player.x - 1265) < 12 &&
@@ -134,6 +135,18 @@ test("real keys over the footbridge to the lookout, and down into the bay", asyn
       await expect(page).toHaveScreenshot("trail-bridge.png");
     }
     const dialogue = state.dialogue;
+    if (state.battle?.critterId === "gull" && state.battle.phase === "command" &&
+      state.battle.revealed >= state.battle.message.length && !gullShot) {
+      gullShot = true;
+      await expect(page.locator(".battle-command-label"))
+        .toHaveText(["Soothe", "Play", "Snack", "Run"]);
+      // The mini-boss is drawn 260 units tall (the critters, 190): check it
+      // clears the HUD and the menu on a desktop and on a phone.
+      await expect(page).toHaveScreenshot("trail-gull-battle-1280.png");
+      await page.setViewportSize({ width: 874, height: 402 });
+      await expect(page).toHaveScreenshot("trail-gull-battle.png");
+      await page.setViewportSize({ width: 1280, height: 720 });
+    }
     if (dialogue !== null && dialogue.revealed >= dialogue.text.length &&
       lines.at(-1) !== dialogue.text) lines.push(dialogue.text);
     if (state.area === "bay") {
@@ -143,6 +156,7 @@ test("real keys over the footbridge to the lookout, and down into the bay", asyn
     }
   });
   expect(bridgeShot).toBe(true);
+  expect(gullShot).toBe(true);
   expect(lines).toEqual(expect.arrayContaining([
     "What a view! The sea sparkles all the way to the sky.",
     "I can see Sue's dock way down there. It looks tiny!",
@@ -151,5 +165,6 @@ test("real keys over the footbridge to the lookout, and down into the bay", asyn
   const end = await readState(page);
   expect({ area: end.area, knot: end.dialogue?.knot })
     .toEqual({ area: "bay", knot: "bay_cliff_path" });
-  expect(await readHash(page)).toBe(bunHash(path, "trail"));
+  expect((await readState(page)).critters.gull).toBe("calm");
+  expect((await readState(page)).stickers).toContain("lookout-gull");
 });

@@ -425,6 +425,35 @@
         "/#",
         "\n",
         "ev",
+        "str",
+        "^gull",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The grumpy gull at the lookout was fizzy too. That raccoon gets around! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         {
           "VAR?": "has_lantern"
         },
@@ -440,7 +469,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.11"
+                "->": ".^.^.^.21"
               },
               null
             ]
@@ -465,7 +494,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.18"
+                "->": ".^.^.^.28"
               },
               null
             ]
@@ -502,7 +531,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.33"
+                "->": ".^.^.^.43"
               },
               null
             ]
@@ -527,7 +556,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.40"
+                "->": ".^.^.^.50"
               },
               null
             ]
@@ -561,7 +590,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.53"
+                "->": ".^.^.^.63"
               },
               null
             ]
@@ -590,7 +619,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.63"
+                "->": ".^.^.^.73"
               },
               null
             ]
@@ -615,7 +644,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.70"
+                "->": ".^.^.^.80"
               },
               null
             ]
@@ -640,7 +669,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.77"
+                "->": ".^.^.^.87"
               },
               null
             ]
@@ -670,7 +699,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.87"
+                "->": ".^.^.^.97"
               },
               null
             ]
@@ -700,7 +729,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.97"
+                "->": ".^.^.^.107"
               },
               null
             ]
@@ -725,7 +754,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.104"
+                "->": ".^.^.^.114"
               },
               null
             ]
@@ -754,7 +783,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.114"
+                "->": ".^.^.^.124"
               },
               null
             ]
@@ -792,7 +821,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.130"
+                "->": ".^.^.^.140"
               },
               null
             ]
@@ -821,7 +850,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.150"
               },
               null
             ]
@@ -846,7 +875,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.157"
               },
               null
             ]
@@ -875,7 +904,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.158"
+                "->": ".^.^.^.168"
               },
               null
             ]
@@ -904,7 +933,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.169"
+                "->": ".^.^.^.179"
               },
               null
             ]
@@ -2054,6 +2083,63 @@
             "^I'm saving my acorns for winter now. Nobody gets bonked! ",
             "#",
             "^speaker: Acorn Squirrel",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "gull_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Squawk! Sorry about your snacks. I couldn't help myself! ",
+        "#",
+        "^speaker: Lookout Gull",
+        "/#",
+        "\n",
+        "^A raccoon in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! ",
+        "#",
+        "^speaker: Lookout Gull",
+        "/#",
+        "\n",
+        "^A fizzy cracker? Everywhere that raccoon goes, things go fizzy. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^I'm keeping watch over the sea now. No more snack snatching! ",
+            "#",
+            "^speaker: Lookout Gull",
             "/#",
             "\n",
             "done",

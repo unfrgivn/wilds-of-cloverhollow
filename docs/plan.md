@@ -627,6 +627,45 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   - Before the east road opens and while the bluebird is fizzy, the plaza's
     stop still says there's no reason to leave town.
   - `bus.test.ts`'s list of travel targets now has three.
+## Milestone 25: The grumpy gull
+- The Grumpy Gull is the first mini-boss, a large stationary chaos critter at
+  the Cliffside Trail lookout. It blocks the route from the footbridge to the
+  bench, and after its Soothe battle becomes the friendly Lookout Gull with a
+  sticker and a talk knot.
+- Evidence: `tests/unit/gull.test.ts`, the lookout replay with a Soothe battle,
+  and the real-key trail e2e screenshot at 874x402 (`trail-gull-battle.png`).
+- Wording for the owner: intro "A grumpy gull puffs up on the lookout bench. It
+  wants ALL the snacks!"; command "How can Fae calm the gull?"; Soothe great
+  "Fae hums a gentle sea shanty. The gull's feathers settle down!", good "Fae
+  hums softly. The gull tilts its head.", miss "The gull squawks right over
+  Fae's humming."; Play great "Maddie pounces after a floating feather. The
+  gull flaps along, delighted!", good "Maddie bats at a feather. The gull peers
+  down at her.", miss "Maddie chases her own tail. The gull rolls its eyes.";
+  Cast great "Sue casts her ribbon bobber out over the cliff. The gull swoops
+  after it!", good "Sue's bobber bobs in the wind. The gull's eyes follow it.",
+  miss "Sue's line catches the breeze and tangles. The gull snorts."; Juggle
+  great "Jordan juggles three pinecones. The gull catches one, very proud!",
+  good "Jordan tosses a pinecone high. The gull eyes it hungrily.", miss "A
+  pinecone bonks Jordan on the head. The gull squawks with laughter."; Snack
+  "Fae shares a whole sandwich. The gull gobbles it and looks a little less
+  grumpy."; burst "The gull flaps a huge gust of feathers and sea spray at Fae!";
+  burst results "Fae ducks under the feathers!" / "Fae dodges most of the spray!"
+  / "Splash! Fae gets a face full of sea spray."; soothed "The gull lets out a
+  long, happy sigh. The fizzy spell blows away on the breeze!"; reward "New
+  sticker: Lookout Gull!"; rest "Fae is too windblown to go on. Time for a
+  rest."; run "Fae backs off the lookout. The gull guards the bench." The calm
+  knot is "Squawk! Sorry about your snacks. I couldn't help myself!" / "A
+  raccoon in a purple hood fed me a fizzy cracker. Then I wanted ALL the
+  snacks!" / "A fizzy cracker? Everywhere that raccoon goes, things go fizzy."
+  / "I'm keeping watch over the sea now. No more snack snatching!"; the journal
+  note is "The grumpy gull at the lookout was fizzy too. That raccoon gets
+  around!"
+- Notes and assumptions:
+  - The gull is deliberately a mini-boss rather than a recoloured trail
+    critter: `overworldHeight` 110, `battleHeight` 260, `touchRadius` 85,
+    `calmMax` 160, `energyMax` 6, and burst `bigChance` 0.5, compared with
+    ordinary critters' 66/70 overworld height, 190 battle height, 70 touch
+    radius, 100 calm, 5 energy, and 0.3 burst chance. It has no roam entry.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

@@ -25,6 +25,7 @@ import bluebirdData from "../../content/critters/bluebird.json";
 import hamsterData from "../../content/critters/hamster.json";
 import bunnyData from "../../content/critters/bunny.json";
 import squirrelData from "../../content/critters/squirrel.json";
+import gullData from "../../content/critters/gull.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -782,6 +783,7 @@ export function loadContent(): {
   const hamster = parseCritter(hamsterData, "content/critters/hamster.json");
   const bunny = parseCritter(bunnyData, "content/critters/bunny.json");
   const squirrel = parseCritter(squirrelData, "content/critters/squirrel.json");
+  const gull = parseCritter(gullData, "content/critters/gull.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -803,6 +805,7 @@ export function loadContent(): {
     [hamster.id]: hamster,
     [bunny.id]: bunny,
     [squirrel.id]: squirrel,
+    [gull.id]: gull,
   };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)

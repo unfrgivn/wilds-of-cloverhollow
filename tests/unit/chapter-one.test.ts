@@ -32,6 +32,7 @@ describe("chapter one", () => {
       hamster: "chaos",
       bunny: "chaos",
       squirrel: "chaos",
+      gull: "chaos",
     });
     expect(state.stickers).toEqual(["fountain-frog", "pond-pup"]);
     expect({

@@ -36,6 +36,12 @@
       "name": "Acorn Squirrel",
       "critter": "squirrel",
       "frame": "calm_idle_01"
+    },
+    {
+      "id": "lookout-gull",
+      "name": "Lookout Gull",
+      "critter": "gull",
+      "frame": "calm_idle_01"
     }
   ]
 }

@@ -1,0 +1,82 @@
+{
+ "asset": "bunny",
+ "status": "generated-selected-owner-review",
+ "model": "gemini-3-pro-image",
+ "generationCalls": 5,
+ "date": "2026-10-06",
+ "referenceImages": [
+  "docs/art/concepts/npcs/npc_critter_set.png",
+  "docs/art/concepts/vfx/vfx_particles.png"
+ ],
+ "selectedOutputs": [
+  "art/source/critters/bunny/body-sheet-raw.png",
+  "art/source/critters/bunny/aura-white-raw.png"
+ ],
+ "scaleFactors": {
+  "chaos_idle_01": "uniform 380px target",
+  "chaos_burst_01": "uniform 380px target",
+  "soothed_01": "uniform 380px target",
+  "calm_idle_01": "uniform 380px target",
+  "chaos_aura_01": 0.2
+ },
+ "postProcessing": {
+  "keyColor": "#FF00FF",
+  "fuzz": "65% connected component matte, 18% final key",
+  "despill": "edge despill only",
+  "frameCanvas": "512x512 source px",
+  "baseline": 504,
+  "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON",
+  "cleanup": "drop-islands.ts --min 120 only; no morphology",
+  "bodySelection": "2x2 sheet, whole bodies by connected components and grid cell names"
+ },
+ "keyColourJustification": "#FF00FF is absent from the white, pink, lavender, brown, teal, and gold bunny subject colours; the green matte is removed by border flood and edge-despilled.",
+ "checker": {
+  "bodyFrames": [
+   "chaos_idle_01",
+   "chaos_burst_01",
+   "soothed_01",
+   "calm_idle_01"
+  ],
+  "auraFrames": [
+   "chaos_aura_01"
+  ],
+  "rawSources": {
+   "chaos_idle_01": "art/scratch/bunny-build-frames/source-chaos_idle_01.png",
+   "chaos_burst_01": "art/scratch/bunny-build-frames/source-chaos_burst_01.png",
+   "soothed_01": "art/scratch/bunny-build-frames/source-soothed_01.png",
+   "calm_idle_01": "art/scratch/bunny-build-frames/source-calm_idle_01.png"
+  },
+  "matteMethods": {
+   "body": "magenta-key",
+   "aura": "white-lift"
+  },
+  "bodyHue": {
+   "min": 0.0,
+   "max": 0.3,
+   "minFraction": 0.15
+  },
+  "psnrThreshold": 25
+ },
+ "measuredCentres": {
+  "auraCentre": {
+   "x": 257,
+   "y": 258
+  },
+  "bodyCentre": {
+   "x": 250,
+   "y": 326
+  }
+ },
+ "bodyHeights": {
+  "chaos_idle_01": 379,
+  "chaos_burst_01": 371,
+  "soothed_01": 377,
+  "calm_idle_01": 377
+ },
+ "review": [
+  "art/review/bunny-sheet-cream.png",
+  "art/review/bunny-sheet-dark.png",
+  "art/review/trail-critters-lineup.png"
+ ],
+ "generationCallsNote": "5 calls in the main checkout's art/scratch/generation-log.jsonl: three body sheets (2026-10-07 04:34:47, 04:35:18, 04:42:38 UTC; the last is selected) and two auras (04:35:41, 04:42:57; the last is selected)."
+}

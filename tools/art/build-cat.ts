@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// Rebuilds the raccoon atlas byte for byte from the selected raw sources.
+// Rebuilds the cat atlas byte for byte from the selected raw sources.
 //
 // The body sheet is a 2x2 grid:   chaos idle | chaos burst
 //                                 soothed    | calm idle
@@ -17,8 +17,8 @@ type Bounds = { left: number; top: number; right: number; bottom: number };
 type Component = { area: number; bounds: Bounds; centre: Point };
 type Body = { name: string; component: Component; bounds: Bounds };
 
-const frames = "art/scratch/raccoon-build-frames";
-const sheet = "art/source/critters/raccoon/body-sheet-raw.png";
+const frames = "art/scratch/cat-build-frames";
+const sheet = "art/source/critters/cat/body-sheet-raw.png";
 const keyed = `${frames}/sheet-keyed.png`;
 const size = 2048;
 const grid = [
@@ -136,7 +136,7 @@ for (const name of names) {
 
 const auraAlpha = `${frames}/aura-alpha.png`;
 const auraScaled = `${frames}/aura-scaled.png`;
-// The chaos aura is the generic purple swirl every critter shares; the raccoon
+// The chaos aura is the generic purple swirl every critter shares; the cat
 // uses the hamster's raw, lifted and placed the way build-hamster.ts does.
 await run(["bun", "tools/art/white-to-alpha.ts", "--input",
   "art/source/critters/hamster/aura-white-raw.png", "--output", auraAlpha]);
@@ -144,11 +144,11 @@ await run(["magick", auraAlpha, "-trim", "+repage", "-resize", "20%", auraScaled
 await run(["magick", "-size", "512x512", "xc:none", auraScaled, "-gravity", "center",
   "-geometry", "+0+0", "-composite", `${frames}/chaos_aura_01.png`]);
 
-await run(["mkdir", "-p", "public/assets/critters/raccoon"]);
+await run(["mkdir", "-p", "public/assets/critters/cat"]);
 const atlasNames = [...names, "chaos_aura_01"];
 await run(["magick", "montage", ...atlasNames.map((name) => `${frames}/${name}.png`),
   "-tile", "3x2", "-geometry", "512x512+0+0", "-background", "none",
-  "public/assets/critters/raccoon/raccoon.png"]);
+  "public/assets/critters/cat/cat.png"]);
 const frameData = Object.fromEntries(atlasNames.map((name, index) => [name, {
   frame: { x: (index % 3) * 512, y: Math.floor(index / 3) * 512, w: 512, h: 512 },
   rotated: false,
@@ -160,7 +160,7 @@ const frameData = Object.fromEntries(atlasNames.map((name, index) => [name, {
 const atlas = {
   frames: frameData,
   animations: Object.fromEntries(atlasNames.map((name) => [name.replace(/_01$/, ""), [name]])),
-  meta: { image: "raccoon.png", size: { w: 1536, h: 1024 }, scale: "1", baseline: 504 },
+  meta: { image: "cat.png", size: { w: 1536, h: 1024 }, scale: "1", baseline: 504 },
 };
-await Bun.write("public/assets/critters/raccoon/raccoon.json",
+await Bun.write("public/assets/critters/cat/cat.json",
   `${JSON.stringify(atlas, null, 2)}\n`);

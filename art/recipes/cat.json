@@ -1,0 +1,41 @@
+{
+  "asset": "cat",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 7,
+  "generationCallsNote": "Seven calls are accounted for: the original three sheets (1791407769735, 1791407852787, 1791408126951), three regeneration sheets this pass (1791408732420 and 1791408810678 rejected for cropping, 1791408770016 selected), and one accidental preview call (1791408840176). The shared hamster aura was reused without a new generation call.",
+  "date": "2026-10-07",
+  "referenceImages": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "public/assets/critters/pup/pup.png",
+    "public/assets/critters/hamster/hamster.png"
+  ],
+  "selectedRawSources": [
+    "art/source/critters/cat/body-sheet-raw.png",
+    "art/source/critters/hamster/aura-white-raw.png"
+  ],
+  "checker": {
+    "bodyFrames": ["chaos_idle_01", "chaos_burst_01", "soothed_01", "calm_idle_01"],
+    "auraFrames": ["chaos_aura_01"],
+    "rawSources": {
+      "chaos_idle_01": "art/scratch/cat-build-frames/source-chaos_idle_01.png",
+      "chaos_burst_01": "art/scratch/cat-build-frames/source-chaos_burst_01.png",
+      "soothed_01": "art/scratch/cat-build-frames/source-soothed_01.png",
+      "calm_idle_01": "art/scratch/cat-build-frames/source-calm_idle_01.png"
+    },
+    "matteMethods": {"body": "green-key", "aura": "white-lift"},
+    "bodyHue": {"min": 0.0, "max": 0.12, "minFraction": 0.3},
+    "psnrThreshold": 25
+  },
+  "postProcessing": {
+    "build": "bun tools/art/build-cat.ts (rebuilds the atlas byte for byte)",
+    "bodies": "The generated 2x2 sheet is segmented by connected components and named by grid cell. One uniform scale makes chaos idle 380 px tall and is applied to every body.",
+    "key": "#00FF00 border flood at 35% fuzz with enclosed holes, edge despill band 6, detached debris under 120 px dropped.",
+    "canvas": "512x512, baseline 504, anchor (0.5, 0.984375)",
+    "aura": "Shared generic chaos swirl from art/source/critters/hamster/aura-white-raw.png, white lifted, trimmed, scaled 20%, centred."
+  },
+  "measuredCentres": {"auraCentre": {"x": 256, "y": 256}, "bodyCentre": {"x": 256, "y": 314}},
+  "centroids": {"calmBody": {"x": 252, "y": 310}, "aura": {"x": 259, "y": 262}, "unit": "frame px, alpha-weighted"},
+  "bodyHeights": {"chaos_idle_01": 380, "chaos_burst_01": 445, "soothed_01": 380, "calm_idle_01": 380},
+  "review": ["art/review/cat-sheet-cream.png", "art/review/cat-sheet-dark.png", "art/review/recurring-critters-lineup.png"]
+}

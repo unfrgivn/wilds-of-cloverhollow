@@ -401,6 +401,31 @@
       "journal": [
         "ev",
         {
+          "VAR?": "found_old_trail"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The raccoon's glowing trail goes west through the pines, toward the Whispering Woods. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "has_lantern"
         },
         "/ev",
@@ -415,7 +440,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.11"
               },
               null
             ]
@@ -440,7 +465,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.11"
+                "->": ".^.^.^.18"
               },
               null
             ]
@@ -477,7 +502,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.26"
+                "->": ".^.^.^.33"
               },
               null
             ]
@@ -502,7 +527,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.33"
+                "->": ".^.^.^.40"
               },
               null
             ]
@@ -536,7 +561,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.46"
+                "->": ".^.^.^.53"
               },
               null
             ]
@@ -565,7 +590,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.56"
+                "->": ".^.^.^.63"
               },
               null
             ]
@@ -590,7 +615,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.63"
+                "->": ".^.^.^.70"
               },
               null
             ]
@@ -615,7 +640,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.70"
+                "->": ".^.^.^.77"
               },
               null
             ]
@@ -645,7 +670,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.80"
+                "->": ".^.^.^.87"
               },
               null
             ]
@@ -675,7 +700,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.90"
+                "->": ".^.^.^.97"
               },
               null
             ]
@@ -700,7 +725,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.97"
+                "->": ".^.^.^.104"
               },
               null
             ]
@@ -729,7 +754,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.107"
+                "->": ".^.^.^.114"
               },
               null
             ]
@@ -767,7 +792,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.123"
+                "->": ".^.^.^.130"
               },
               null
             ]
@@ -796,7 +821,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.133"
+                "->": ".^.^.^.140"
               },
               null
             ]
@@ -821,7 +846,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.147"
               },
               null
             ]
@@ -850,7 +875,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.151"
+                "->": ".^.^.^.158"
               },
               null
             ]
@@ -879,7 +904,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.162"
+                "->": ".^.^.^.169"
               },
               null
             ]
@@ -2015,6 +2040,11 @@
         "^speaker: Fae",
         "/#",
         "\n",
+        "^Switch it on and look around. Raccoon tracks glow! ",
+        "#",
+        "^speaker: Jordan",
+        "/#",
+        "\n",
         "done",
         {
           "again": [
@@ -2027,6 +2057,101 @@
             null
           ],
           "#f": 1
+        }
+      ],
+      "lift_note": [
+        "^Glowing raccoon doodles on the lift tower! A masked face, a swirl, and a star. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^The squiggles look like secret writing. Was the raccoon leaving a message for someone? ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "old_trail_marker": [
+        "ev",
+        {
+          "VAR?": "found_old_trail"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^A glowing arrow, painted on a tree! It points west, deep into the pines. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ That's the old pine trail! It goes all the way down to the Whispering Woods. ",
+              "#",
+              "^speaker: Jordan",
+              {
+                "->": ".^.^.^.15"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "^An old trail, hidden in the snow. You can only see it with the lantern! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "found_old_trail",
+          "re": true
+        },
+        "done",
+        {
+          "again": [
+            "^The glowing arrow still points west, toward the Whispering Woods. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
         }
       ],
       "snowman": [
@@ -2569,6 +2694,10 @@
         false,
         {
           "VAR=": "has_lantern"
+        },
+        false,
+        {
+          "VAR=": "found_old_trail"
         },
         "/ev",
         "end",

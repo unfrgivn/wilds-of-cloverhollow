@@ -16,8 +16,8 @@
         "h": 176
       },
       "sourceSize": {
-        "width": 238,
-        "height": 176
+        "w": 238,
+        "h": 176
       }
     },
     "ink_note": {
@@ -36,8 +36,8 @@
         "h": 146
       },
       "sourceSize": {
-        "width": 156,
-        "height": 146
+        "w": 156,
+        "h": 146
       }
     },
     "trail_marker": {
@@ -56,8 +56,8 @@
         "h": 171
       },
       "sourceSize": {
-        "width": 136,
-        "height": 171
+        "w": 136,
+        "h": 171
       }
     }
   },

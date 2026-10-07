@@ -560,6 +560,41 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     rest 2.
 
 
+## Milestone 23: The blacklight lantern **Status:** ✅ Completed (2026-10-07)
+- Fae's blacklight lantern, from Jordan, is drawn as the owner's concept: a
+  magnifying glass with a purple lens on a rainbow handle. L (or the touch
+  lantern button, which appears once she has it and glows while it's on)
+  switches it on and off. While it's on, the pass drops to a violet dusk and
+  what the raccoon left behind glows on top: a trail of raccoon paw prints
+  across the clearing to a glowing arrow on the west pines, and a doodle on
+  the north ski-lift tower. Reading the arrow finds the old pine trail toward
+  the Whispering Woods (`found_old_trail`), the next land.
+- Evidence: unit (`lantern.test.ts`, the replay), the recorded run
+  `pass-party/lantern.json` (`tools/sim/record-lantern.ts`: Jordan's meeting,
+  then the lantern on, the doodle, the prints, the arrow, the lantern off)
+  with matching browser and Bun hashes, and real-key e2e that plays the
+  lantern part as key presses (on, the glows drawn, both lines read, the
+  journal's note, off) and taps the touch button at phone size.
+- Wording for the owner: Jordan: "Switch it on and look around. Raccoon tracks
+  glow!"; the doodle: "Glowing raccoon doodles on the lift tower! A masked
+  face, a swirl, and a star." / "The squiggles look like secret writing. Was
+  the raccoon leaving a message for someone?"; the arrow: "A glowing arrow,
+  painted on a tree! It points west, deep into the pines." / Jordan: "That's
+  the old pine trail! It goes all the way down to the Whispering Woods." / "An
+  old trail, hidden in the snow. You can only see it with the lantern!";
+  again: "The glowing arrow still points west, toward the Whispering Woods.";
+  the journal: "The raccoon's glowing trail goes west through the pines,
+  toward the Whispering Woods."
+- Notes and assumptions:
+  - Saves are version 3; version-2 saves start fresh.
+  - The glows are light painted on black, added over a 55% violet dusk; on
+    bright snow, light added without the dusk only saturated to white.
+  - The glow atlas's frame sizes were written as `{ width, height }`, which
+    Pixi doesn't read, so no glow drew at all; `build-lantern.ts` now writes
+    `{ w, h }`. The arrow is mirrored (`flip`) so it points into the pines.
+  - The touch button's lit style set the whole `background`, erasing its icon;
+    it now sets only the colour.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -602,9 +637,7 @@ more bad guys, and the blacklight lantern, made and built while away.
   painting, its critters, and the roaming engine were ready first; it's the
   first trail between lands, between the bay and the pass.
 - Milestone 22, Jordan: done.
-- Milestone 23, the blacklight lantern: on and off; glowing secrets at the pass
-  (the raccoon's paw prints, a doodle on the ski lift, and a trail marker
-  pointing west through the pines toward the Whispering Woods).
+- Milestone 23, the blacklight lantern: done.
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the

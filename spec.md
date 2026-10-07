@@ -101,12 +101,16 @@ ios/            Capacitor iOS project (from Milestone 4).
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
-  -1..1) plus booleans `confirm`, `cancel`, and `menu`. Button edges (pressed
-  this tick) are derived in the core from the previous frame.
+  -1..1) plus booleans `confirm`, `cancel`, and `menu`, and an optional
+  `lantern` (recorded frames may omit it, so older recordings and their hashes
+  stand). Button edges (pressed this tick) are derived in the core from the
+  previous frame.
 - Taps are never lost: a key pressed since the previous tick counts as held for
   that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
-  cancel; J opens the journal (`menu`).
+  cancel; J opens the journal (`menu`); L switches the blacklight lantern on or
+  off (`lantern`). On touch, a lantern button beside the journal button
+  appears once Fae has the lantern and glows lavender while it's on.
 - Gamepad (standard mapping) and touch (virtual stick plus buttons, section
   3.2.1) map to the same frame. Gamepad support is not built yet.
 
@@ -387,6 +391,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   outline says it does. An occluder draws over Fae while
   her feet are above (north of) its baseline. Workflow:
   `docs/art/area-authoring.md`.
+- Glows (the blacklight lantern, Milestone 23): an area's `glows` are
+  `{ id, frame, point, knot?, prompt?, flip? }`, a frame of
+  `assets/glows/glows.json` (light painted on black, lifted by brightness).
+  They're never solid. While the lantern is on (`state.lantern`, switched by a
+  lantern press once `has_lantern` is true and Fae is free), the overworld
+  drops to a deep violet dusk (55%) and each glow is added on top with a
+  gentle pulse (render-only); a glow with a knot is a Look target
+  (`glow:<id>`) only then. `flip` mirrors the decal. At Pinecone Pass, three
+  raccoon paw prints lead from the clearing to a trail marker on the west
+  pines (`old_trail_marker`, which sets `found_old_trail`), and a doodle is
+  painted on the north ski-lift tower (`lift_note`). `renderInfo().lantern`
+  reports `{ on, glows }`, the ids drawn.
 - Canopies: an occluder with `canopy: true` is a tree Fae can walk under (a
   palm, crown and trunk cut whole, its baseline at the trunk's foot). While her
   feet are north of its baseline and more than 5% of her body box is inside it,
@@ -713,10 +729,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 2, state }`, the whole core state, including the
+- Format: `{ version: 3, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
-  critters, the PRNG, and the tick. Version 1 (Maddie in `maddie` and `trail`)
-  is refused and starts a new game. Loading restores it exactly: the state hash matches, and
+  critters, the lantern, the PRNG, and the tick. Version 1 (Maddie in `maddie`
+  and `trail`) and version 2 (no lantern) are refused and start a new game. Loading restores it exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
 - `parseSave(json, template)` accepts only a state with the template's exact

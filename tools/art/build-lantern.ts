@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
-// Rebuilds the lantern and white-lifted secret decals byte for byte from the
-// selected sources in art/source/lantern.
+// Rebuilds the lantern icon and its glowing secrets (painted on black, lifted by
+// brightness) byte for byte from the selected sources in art/source/lantern,
+// as PixiJS spritesheets: frame sizes are `{ w, h }`, as Pixi reads them.
 export {};
 
 type Size = { width: number; height: number };
@@ -10,7 +11,7 @@ type FrameData = {
   rotated: boolean;
   trimmed: boolean;
   spriteSourceSize: Frame;
-  sourceSize: Size;
+  sourceSize: { w: number; h: number };
 };
 
 const source = "art/source/lantern";
@@ -61,7 +62,7 @@ async function writeAtlas(
       rotated: false,
       trimmed: true,
       spriteSourceSize: { x: 0, y: 0, w: frameSize.width, h: frameSize.height },
-      sourceSize: frameSize,
+      sourceSize: { w: frameSize.width, h: frameSize.height },
     };
     x += frameSize.width;
   }

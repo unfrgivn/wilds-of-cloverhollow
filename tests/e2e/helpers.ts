@@ -84,6 +84,7 @@ export async function renderInfo(page: Page): Promise<{
   critters: { id: string; frame: string; x: number; y: number }[];
   npcs: { id: string; frame: string; facing: string }[];
   canopies: { id: string; alpha: number }[];
+  lantern: { on: boolean; glows: string[] };
   // Everything in CSS px, from the one battle layout (spec 8).
   battle: {
     phase: string | null;
@@ -176,6 +177,7 @@ function keysFor(frame: ActionFrame): string[] {
     ...(frame.move.x > 0 ? ["ArrowRight"] : frame.move.x < 0 ? ["ArrowLeft"] : []),
     ...(frame.move.y > 0 ? ["ArrowDown"] : frame.move.y < 0 ? ["ArrowUp"] : []),
     ...(frame.confirm ? ["z"] : []),
+    ...(frame.lantern ? ["l"] : []),
   ];
 }
 

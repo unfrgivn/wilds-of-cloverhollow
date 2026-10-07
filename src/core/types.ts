@@ -6,6 +6,7 @@ export type ActionFrame = {
   confirm: boolean;
   cancel: boolean;
   menu: boolean;
+  lantern?: boolean;
   choose?: number;
 };
 export type FollowTunables = {
@@ -48,6 +49,15 @@ export type Area = {
   walkable: Polygon;
   blockers: Polygon[];
   ground?: string;
+  // What the lantern shows (spec 6); `flip` mirrors the decal left to right.
+  glows: {
+    id: string;
+    frame: string;
+    point: Point;
+    knot?: string;
+    prompt?: "Look";
+    flip?: boolean;
+  }[];
   // A canopy (a palm's crown, say) fades while Fae stands behind it instead of
   // hiding her (spec 6).
   occluders: { id: string; polygon: Polygon; baseline: number; canopy?: boolean }[];
@@ -302,6 +312,7 @@ export type State = {
   safeSpot: { area: string; spawn: string };
   battle: Battle | null;
   journalOpen: boolean;
+  lantern: boolean;
   backLink?: { area: string; direction: Direction };
 };
 export type Roamer = {

@@ -215,6 +215,18 @@ export function parseArea(value: unknown, file: string): Area {
     "ground",
   );
   field(
+    (value.glows === undefined || Array.isArray(value.glows)) &&
+      (value.glows === undefined || value.glows.every(
+        (item) => record(item) && typeof item.id === "string" &&
+          typeof item.frame === "string" && record(item.point) &&
+          typeof item.point.x === "number" && typeof item.point.y === "number" &&
+          (item.knot === undefined || typeof item.knot === "string") &&
+          (item.prompt === undefined || item.prompt === "Look") &&
+          (item.flip === undefined || typeof item.flip === "boolean"),
+      )),
+    file, "glows",
+  );
+  field(
     value.interactables === undefined ||
       (Array.isArray(value.interactables) &&
         value.interactables.every(
@@ -264,6 +276,12 @@ export function parseArea(value: unknown, file: string): Area {
     walkable: value.walkable,
     blockers: value.blockers,
     ground: value.ground,
+    glows: (value.glows ?? []).map((item) => ({
+      id: item.id, frame: item.frame, point: { x: item.point.x, y: item.point.y },
+      ...(item.knot === undefined ? {} : { knot: item.knot }),
+      ...(item.prompt === undefined ? {} : { prompt: item.prompt }),
+      ...(item.flip === true ? { flip: true } : {}),
+    })),
     occluders: (value.occluders ?? []).map((item) => ({
       id: item.id,
       polygon: item.polygon,

@@ -36,6 +36,7 @@ export type CloverhollowHook = {
     critters: { id: string; frame: string; x: number; y: number }[];
     npcs: { id: string; frame: string; facing: string }[];
     canopies: { id: string; alpha: number }[];
+    lantern: { on: boolean; glows: string[] };
     battle: {
       phase: string | null;
       ring: { x: number; y: number; radius: number } | null;

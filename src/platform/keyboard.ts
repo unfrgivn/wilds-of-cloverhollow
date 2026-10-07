@@ -15,6 +15,7 @@ const GAME_KEYS = new Set([
   "KeyA",
   "KeyS",
   "KeyD",
+  "KeyL",
 ]);
 
 /**
@@ -60,6 +61,7 @@ export class Keyboard {
       confirm: has("KeyZ") || has("Space") || has("Enter"),
       cancel: has("KeyX") || has("Escape"),
       menu: has("KeyJ"),
+      lantern: has("KeyL"),
     };
     this.tapped.clear();
     return frame;

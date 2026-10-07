@@ -9,6 +9,7 @@ VAR sue_joined = false
 VAR rode_bus = false
 VAR jordan_joined = false
 VAR has_lantern = false
+VAR found_old_trail = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -54,6 +55,7 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{found_old_trail: The raccoon's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
 {has_lantern: Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! # speaker: Fae}
 {jordan_joined: Jordan is on my team now! He's hiked every trail on the mountain. # speaker: Fae}
 {calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! # speaker: Fae}
@@ -274,10 +276,27 @@ A trail you can only see at night? # speaker: Fae
 Trail markers glow under blacklight! Here, Fae, take my lantern. # speaker: Jordan
 ~ has_lantern = true
 Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. # speaker: Fae
+Switch it on and look around. Raccoon tracks glow! # speaker: Jordan
 -> DONE
 
 = again
 Squeak! Watch out for snowballs. Hee hee. # speaker: Hiker Hamster
+-> DONE
+
+=== lift_note ===
+Glowing raccoon doodles on the lift tower! A masked face, a swirl, and a star. # speaker: Fae
+The squiggles look like secret writing. Was the raccoon leaving a message for someone? # speaker: Fae
+-> DONE
+
+=== old_trail_marker ===
+{found_old_trail: -> again}
+A glowing arrow, painted on a tree! It points west, deep into the pines. # speaker: Fae
+{jordan_joined: That's the old pine trail! It goes all the way down to the Whispering Woods. # speaker: Jordan}
+An old trail, hidden in the snow. You can only see it with the lantern! # speaker: Fae
+~ found_old_trail = true
+-> DONE
+= again
+The glowing arrow still points west, toward the Whispering Woods. # speaker: Fae
 -> DONE
 
 === snowman ===

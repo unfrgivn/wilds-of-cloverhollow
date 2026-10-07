@@ -3,7 +3,7 @@ import { blankInput, type ActionFrame, type Point } from "../core";
 import { stickVector } from "./stick";
 
 const RADIUS = 56;
-const BUTTONS = ["confirm", "cancel", "menu"] as const;
+const BUTTONS = ["confirm", "cancel", "menu", "lantern"] as const;
 type Button = (typeof BUTTONS)[number];
 
 export class TouchInput {
@@ -21,6 +21,7 @@ export class TouchInput {
       confirm: this.hasButton("confirm"),
       cancel: this.hasButton("cancel"),
       menu: this.hasButton("menu"),
+      lantern: this.hasButton("lantern"),
       choose: this.choice,
     };
   }

@@ -68,6 +68,22 @@
   font-size: 22px;
 }
 
+.touch-lantern {
+  width: var(--touch-cancel-size);
+  height: var(--touch-cancel-size);
+  font-size: 24px;
+  background-image: url("../assets/items/lantern/lantern.png");
+  background-size: 70% 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.touch-lantern[hidden] { display: none; }
+.touch-lantern.is-on {
+  color: #6e4caa;
+  background-color: #eadbff;
+  box-shadow: 0 0 18px #b894f0;
+}
+
 .touch-menu {
   position: absolute;
   right: calc(20px + var(--safe-right));

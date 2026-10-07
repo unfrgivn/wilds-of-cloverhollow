@@ -86,6 +86,9 @@ async function boot(): Promise<void> {
       confirm: keyboardFrame.confirm || touchFrame.confirm,
       cancel: keyboardFrame.cancel || touchFrame.cancel,
       menu: keyboardFrame.menu || touchFrame.menu,
+      // Only while pressed: recorded frames omit it, and a frame from real keys
+      // must match the recorded one exactly (spec 3.2).
+      ...(keyboardFrame.lantern || touchFrame.lantern ? { lantern: true } : {}),
       choose: touchFrame.choose,
     };
   });
@@ -222,6 +225,11 @@ async function boot(): Promise<void> {
     );
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
+    const lanternButton = document.querySelector<HTMLButtonElement>(".touch-lantern");
+    if (lanternButton !== null) {
+      lanternButton.hidden = content.world.storyVariable(state.ink, "has_lantern") !== true;
+      lanternButton.classList.toggle("is-on", state.lantern);
+    }
     title.render({
       visible: titleMode !== null,
       mode: titleMode ?? "fresh",

@@ -27,6 +27,7 @@ export const blankInput = (): ActionFrame => ({
   confirm: false,
   cancel: false,
   menu: false,
+  lantern: false,
 });
 
 // Fae's feet-anchored body box (spec 5): what her followers hide behind.
@@ -135,6 +136,7 @@ export function createState(
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
     journalOpen: false,
+    lantern: false,
   };
 }
 
@@ -380,7 +382,7 @@ function updateRoamers(
 export function targetInteractable(
   world: World,
   state: State,
-): Area["interactables"][number] | undefined {
+): Area["interactables"][number] | Area["glows"][number] | undefined {
   if (state.transition !== null || state.dialogue !== null) return undefined;
   const area = world.areas[state.area];
   if (area === undefined) return undefined;
@@ -413,7 +415,11 @@ export function targetInteractable(
       point: npc.point,
       prompt: npc.prompt,
     }));
-  return [...area.interactables, ...calmCritters, ...people]
+  const glows = state.lantern
+    ? area.glows.filter((glow): glow is Area["glows"][number] & { knot: string } =>
+      glow.knot !== undefined).map((glow) => ({ ...glow, id: `glow:${glow.id}` }))
+    : [];
+  return [...area.interactables, ...glows, ...calmCritters, ...people]
     .map((item) => {
       const dx = item.point.x - state.player.x;
       const dy = item.point.y - state.player.y;
@@ -1453,6 +1459,7 @@ function stepTick(
     return { state: dialogueStep(world, state, input), events: [] };
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
+  const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
   if (state.journalOpen) {
     return {
       state: {
@@ -1462,6 +1469,18 @@ function stepTick(
         previousInput: { ...input },
         party: restingParty(state.party),
         motion: { ...state.motion, moving: false },
+      },
+      events: [],
+    };
+  }
+  if (lanternEdge && state.transition === null) {
+    const hasLantern = world.storyVariable(state.ink, "has_lantern") === true;
+    if (hasLantern) return {
+      state: {
+        ...state,
+        tick: state.tick + 1,
+        lantern: !state.lantern,
+        previousInput: { ...input },
       },
       events: [],
     };
@@ -1529,7 +1548,7 @@ function stepTick(
   }
   if (input.confirm && !state.previousInput.confirm) {
     const target = targetInteractable(world, state);
-    if (target !== undefined) {
+    if (target !== undefined && target.knot !== undefined) {
       const result = runInk(
         world.story,
         state.ink,

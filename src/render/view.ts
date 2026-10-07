@@ -55,6 +55,8 @@ export class GameView {
   private readonly paper = new Graphics();
   private readonly fade = new Graphics();
   private readonly scene = new Container();
+  private readonly lanternTint = new Graphics();
+  private readonly glowLayer = new Container();
   private readonly depth = new Container();
   private readonly player = new Sprite();
   // One overworld sprite per roster member, labelled with its id; only the
@@ -101,6 +103,8 @@ export class GameView {
   private critterFrames: { id: string; frame: string; x: number; y: number }[] = [];
   private npcSprites: { npc: Area["npcs"][number]; sprite: Sprite }[] = [];
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
+  private glowSprites: { id: string; sprite: Sprite }[] = [];
+  private drawnGlows: string[] = [];
 
   constructor(
     private readonly world: World,
@@ -131,6 +135,8 @@ export class GameView {
       this.backdropSprite,
       this.battleWash,
       this.battleLayer,
+      this.lanternTint,
+      this.glowLayer,
     );
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.depth);
@@ -170,6 +176,7 @@ export class GameView {
           data: { textureOptions: { autoGenerateMipmaps: true } },
         }),
       ),
+      Assets.load({ alias: "glow-sheet", src: assetUrl("assets/glows/glows.json") }),
       ...Object.entries(this.world.characters).map(([id, character]) =>
         Assets.load({
           alias: `${id}-sheet`,
@@ -185,6 +192,17 @@ export class GameView {
     if (previous !== undefined) await previous.destroy();
     const next = await AreaView.load(area, this.depth);
     this.areaView = next;
+    for (const entry of this.glowSprites) entry.sprite.destroy();
+    this.glowSprites = area.glows.map((glow) => {
+      const sprite = new Sprite();
+      sprite.label = `glow:${glow.id}`;
+      sprite.anchor.set(0.5);
+      sprite.scale.set(0.5);
+      sprite.visible = false;
+      sprite.blendMode = "add";
+      this.glowLayer.addChild(sprite);
+      return { id: glow.id, sprite };
+    });
     for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
     for (const sprite of this.critterSprites) {
@@ -377,6 +395,8 @@ export class GameView {
       Math.round((letterboxY - camera.y * scale) * resolution) / resolution;
     this.scene.scale.set(scale);
     this.scene.position.set(offsetX, offsetY);
+    this.glowLayer.scale.set(scale);
+    this.glowLayer.position.set(offsetX, offsetY);
     this.player.position.set(state.player.x, state.player.y);
     this.player.zIndex = state.player.y;
     loaded.fadeCanopies(state.player, state.tick);
@@ -384,6 +404,7 @@ export class GameView {
     this.renderParty(state);
     this.renderCritters(state);
     this.renderNpcs(state);
+    this.renderGlows(state, width, height);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
     if (this.label !== undefined)
@@ -392,6 +413,31 @@ export class GameView {
         `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     this.fade.alpha = fade;
+  }
+
+  private renderGlows(state: State, width: number, height: number): void {
+    const area = this.areaView?.area;
+    const sheet = Assets.get<Spritesheet>("glow-sheet");
+    const on = state.lantern && state.battle === null;
+    this.lanternTint.clear();
+    // Blacklight: the scene drops to a deep violet dusk so the added glows show;
+    // on bright snow, added light would only saturate to white.
+    if (on) this.lanternTint.rect(0, 0, width, height).fill({ color: 0x1d0f3a, alpha: 0.55 });
+    this.lanternTint.visible = on;
+    const drawn: string[] = [];
+    for (const { id, sprite } of this.glowSprites) {
+      const glow = area?.glows.find((item) => item.id === id);
+      const texture = glow === undefined ? undefined : sheet?.textures[glow.frame];
+      sprite.visible = on && glow !== undefined && texture !== undefined;
+      if (texture !== undefined && glow !== undefined) {
+        sprite.texture = texture;
+        sprite.position.set(glow.point.x, glow.point.y);
+        sprite.scale.set(glow.flip === true ? -0.5 : 0.5, 0.5);
+        sprite.alpha = 0.82 + Math.sin(state.tick / 24) * 0.12;
+        if (sprite.visible) drawn.push(id);
+      }
+    }
+    this.drawnGlows = drawn;
   }
 
   // People in the area, y-sorted with everyone else. They face Fae while she
@@ -685,7 +731,7 @@ export class GameView {
     );
     return {
       visible: true,
-      label: target.prompt.toUpperCase(),
+      label: (target.prompt ?? "Look").toUpperCase(),
       x: point.x,
       y: point.y,
     };
@@ -741,6 +787,7 @@ export class GameView {
     npcs: { id: string; frame: string; facing: string }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];
+    lantern: { on: boolean; glows: string[] };
     battle: {
       phase: string | null;
       ring: { x: number; y: number; radius: number } | null;
@@ -800,6 +847,7 @@ export class GameView {
       critters: this.critterFrames,
       npcs: this.npcFrames,
       canopies: this.areaView?.canopyAlphas ?? [],
+      lantern: { on: state.lantern && state.battle === null, glows: this.drawnGlows.slice() },
       battle: {
         phase: state.battle?.phase ?? null,
         ring:

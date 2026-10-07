@@ -4,6 +4,53 @@
   "width": 1750,
   "height": 1100,
   "ground": "pass",
+  "glows": [
+    {
+      "id": "paw-print-1",
+      "frame": "paw_prints",
+      "point": {
+        "x": 660,
+        "y": 760
+      }
+    },
+    {
+      "id": "paw-print-2",
+      "frame": "paw_prints",
+      "point": {
+        "x": 580,
+        "y": 785
+      }
+    },
+    {
+      "id": "paw-print-3",
+      "frame": "paw_prints",
+      "point": {
+        "x": 535,
+        "y": 805
+      }
+    },
+    {
+      "id": "lift-note",
+      "frame": "ink_note",
+      "point": {
+        "x": 746,
+        "y": 250
+      },
+      "knot": "lift_note",
+      "prompt": "Look"
+    },
+    {
+      "id": "old-trail-marker",
+      "frame": "trail_marker",
+      "point": {
+        "x": 460,
+        "y": 800
+      },
+      "knot": "old_trail_marker",
+      "prompt": "Look",
+      "flip": true
+    }
+  ],
   "walkable": [
     [
       175,

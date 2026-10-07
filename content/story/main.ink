@@ -191,28 +191,47 @@ Chirp-chirp! The bay is peaceful now. # speaker: Bay Bluebird
 -> DONE
 
 === bus_stop ===
-{not calmed("bluebird"):
+{not calmed("bluebird") and not club_open:
     The bus waits by the star sign, but there's no reason to leave town yet. # speaker: Fae
     Maybe once I find a clue that leads up the mountain. # speaker: Fae
     -> DONE
 }
-The bus to Pinecone Pass is here! # speaker: Fae
-* [All aboard!]
+The bus is here! Where to? # speaker: Fae
+* {calmed("bluebird")} [Pinecone Pass!]
     ~ rode_bus = true
     Up we go! # speaker: Fae # travel: pass.bus
+    -> DONE
+* {club_open} [Bubblegum Bay!]
+    To the beach! # speaker: Fae # travel: bay.bus-stop
     -> DONE
 * [Not yet.]
     Not yet. I'll stay in Cloverhollow a little longer. # speaker: Fae
 -> DONE
 
+=== bay_bus_stop ===
+The bus stops here on its way between the towns. Where to? # speaker: Fae
+* [Cloverhollow!]
+    Home to town! # speaker: Fae # travel: plaza.bus-stop
+    -> DONE
+* {calmed("bluebird")} [Pinecone Pass!]
+    ~ rode_bus = true
+    Up we go! # speaker: Fae # travel: pass.bus
+    -> DONE
+* [Not yet.]
+    Not yet. I want to stay at the beach a little longer. # speaker: Fae
+-> DONE
+
 === pass_bus_stop ===
-The bus is ready to roll back to Cloverhollow. # speaker: Fae
-* [All aboard!]
+The bus is ready to roll. Where to? # speaker: Fae
+* [Cloverhollow!]
     Back to town! # speaker: Fae # travel: plaza.bus-stop
+    -> DONE
+* {club_open} [Bubblegum Bay!]
+    Down to the beach! # speaker: Fae # travel: bay.bus-stop
     -> DONE
 * [Not yet.]
     Not yet. I want to look around a little more. # speaker: Fae
--> DONE
+     -> DONE
 
 === pass_sign ===
 PINECONE PASS. Trails, sledding, and the best cocoa in the mountains! # speaker: Sign

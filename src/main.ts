@@ -8,7 +8,7 @@ import {
   type State,
   battleView,
 } from "./core";
-import { loadContent } from "./content/load";
+import { loadContent, parseMapCentres } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
@@ -156,6 +156,11 @@ async function boot(): Promise<void> {
     return saveQueue;
   };
   await view.ready;
+  // Each land's centre on the painted map (the journal's MAP page).
+  const mapFile = "assets/ui/map/world-map.json";
+  const mapResponse = await fetch(assetUrl(mapFile));
+  if (!mapResponse.ok) throw new Error(`Failed to load ${mapFile}`);
+  const mapCentres = parseMapCentres(await mapResponse.json(), mapFile);
   // Sticker art (the reward card and the journal album) is a CSS crop of a
   // critter's atlas. Decode each atlas once now, so a card never paints before
   // its image is ready (on a busy phone, or a loaded test machine).
@@ -320,6 +325,11 @@ async function boot(): Promise<void> {
             };
           })
         : [],
+      lands: content.world.lands.map((land) => ({
+        ...land,
+        ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
+      })),
+      currentLand: content.world.areas[state.area]?.land ?? null,
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;

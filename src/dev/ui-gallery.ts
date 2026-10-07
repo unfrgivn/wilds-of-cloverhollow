@@ -119,7 +119,15 @@ function renderGalleryState(): void {
     image: id === "frog" ? { src: "assets/critters/frog/frog.png",
       frame: { x: 0, y: 512, w: 512, h: 512 }, atlas: { w: 1536, h: 1024 } } : null,
   }));
-  const journalView: JournalView = { visible: journalState, notes, stickers };
+  const journalView: JournalView = { visible: journalState, notes, stickers,
+    lands: [
+      { id: "cloverhollow", name: "Cloverhollow", busStop: true, x: 1224, y: 1327 },
+      { id: "bay", name: "Bubblegum Bay", busStop: true, x: 1992, y: 828 },
+      { id: "pass", name: "Pinecone Pass", busStop: true, x: 1110, y: 204 },
+      { id: "trail", name: "Cliffside Trail", busStop: false, x: 1812, y: 420 },
+      { id: "forest", name: "The Forest", busStop: false, x: 240, y: 420 },
+      { id: "enchanted", name: "The Enchanted Forest", busStop: false, x: 1156, y: 720 },
+    ], currentLand: "cloverhollow" };
   journal.render(journalView);
   // The battle is over once the reward shows, so the HUD steps aside.
   battleHud.render({ visible: battleState && state !== "battle-reward", energy: 3,

@@ -1579,6 +1579,11 @@
             "exArgs": 1
           },
           "!",
+          {
+            "VAR?": "club_open"
+          },
+          "!",
+          "&&",
           "/ev",
           [
             {
@@ -1600,7 +1605,7 @@
                 "\n",
                 "done",
                 {
-                  "->": ".^.^.^.8"
+                  "->": ".^.^.^.11"
                 },
                 null
               ]
@@ -1608,19 +1613,38 @@
           ],
           "nop",
           "\n",
-          "^The bus to Pinecone Pass is here! ",
+          "^The bus is here! Where to? ",
           "#",
           "^speaker: Fae",
           "/#",
           "\n",
           "ev",
           "str",
-          "^All aboard!",
+          "^Pinecone Pass!",
           "/str",
+          "str",
+          "^bluebird",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
           "/ev",
           {
             "*": ".^.c-0",
-            "flg": 20
+            "flg": 21
+          },
+          "ev",
+          "str",
+          "^Bubblegum Bay!",
+          "/str",
+          {
+            "VAR?": "club_open"
+          },
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 21
           },
           "ev",
           "str",
@@ -1628,7 +1652,7 @@
           "/str",
           "/ev",
           {
-            "*": ".^.c-1",
+            "*": ".^.c-2",
             "flg": 20
           },
           {
@@ -1656,7 +1680,117 @@
             ],
             "c-1": [
               "\n",
+              "^To the beach! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^travel: bay.bus-stop",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-2": [
+              "\n",
               "^Not yet. I'll stay in Cloverhollow a little longer. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ]
+          }
+        ],
+        null
+      ],
+      "bay_bus_stop": [
+        [
+          "^The bus stops here on its way between the towns. Where to? ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Cloverhollow!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Pinecone Pass!",
+          "/str",
+          "str",
+          "^bluebird",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 21
+          },
+          "ev",
+          "str",
+          "^Not yet.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Home to town! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^travel: plaza.bus-stop",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "rode_bus",
+                "re": true
+              },
+              "^Up we go! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^travel: pass.bus",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-2": [
+              "\n",
+              "^Not yet. I want to stay at the beach a little longer. ",
               "#",
               "^speaker: Fae",
               "/#",
@@ -1672,14 +1806,14 @@
       ],
       "pass_bus_stop": [
         [
-          "^The bus is ready to roll back to Cloverhollow. ",
+          "^The bus is ready to roll. Where to? ",
           "#",
           "^speaker: Fae",
           "/#",
           "\n",
           "ev",
           "str",
-          "^All aboard!",
+          "^Cloverhollow!",
           "/str",
           "/ev",
           {
@@ -1688,11 +1822,23 @@
           },
           "ev",
           "str",
+          "^Bubblegum Bay!",
+          "/str",
+          {
+            "VAR?": "club_open"
+          },
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 21
+          },
+          "ev",
+          "str",
           "^Not yet.",
           "/str",
           "/ev",
           {
-            "*": ".^.c-1",
+            "*": ".^.c-2",
             "flg": 20
           },
           {
@@ -1712,6 +1858,21 @@
               }
             ],
             "c-1": [
+              "\n",
+              "^Down to the beach! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^travel: bay.bus-stop",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-2": [
               "\n",
               "^Not yet. I want to look around a little more. ",
               "#",

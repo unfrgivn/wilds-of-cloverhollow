@@ -31,6 +31,7 @@ import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
+import landsData from "../../content/lands.json";
 import { createInkState, createStoryReader } from "../core/ink";
 import type {
   Area,
@@ -150,6 +151,15 @@ export function parseArea(value: unknown, file: string): Area {
   field(typeof value.width === "number", file, "width");
   field(typeof value.height === "number", file, "height");
   field(typeof value.name === "string", file, "name");
+  field(
+    value.land === undefined ||
+      (typeof value.land === "string" &&
+        ["cloverhollow", "bay", "pass", "trail", "forest", "enchanted"].some(
+          (id) => id === value.land,
+        )),
+    file,
+    "land",
+  );
   field(polygon(value.walkable), file, "walkable");
   field(
     Array.isArray(value.blockers) && value.blockers.every(polygon),
@@ -271,6 +281,7 @@ export function parseArea(value: unknown, file: string): Area {
   return {
     id: value.id,
     name: value.name,
+    ...(value.land === undefined ? {} : { land: value.land }),
     width: value.width,
     height: value.height,
     walkable: value.walkable,
@@ -687,6 +698,27 @@ export function parseOccluderManifest(
   return { cutouts };
 }
 
+// The painted world map's manifest (`assets/ui/map/world-map.json`): each
+// land's centre on the painting, in its pixels, for the journal's MAP page.
+export function parseMapCentres(
+  value: unknown,
+  file: string,
+): Record<string, { x: number; y: number }> {
+  field(record(value), file, "object");
+  field(Array.isArray(value.lands), file, "lands");
+  const centres: Record<string, { x: number; y: number }> = {};
+  value.lands.forEach((item, index) => {
+    field(
+      record(item) && typeof item.id === "string" && typeof item.x === "number" &&
+        typeof item.y === "number",
+      file,
+      `lands.${index}`,
+    );
+    centres[item.id] = { x: item.x, y: item.y };
+  });
+  return centres;
+}
+
 export function parseCharacters(
   value: unknown,
   file: string,
@@ -722,8 +754,27 @@ export function loadContent(): {
   const park = parseArea(parkData, "content/areas/park.json");
   const school = parseArea(schoolData, "content/areas/school.json");
   const bay = parseArea(bayData, "content/areas/bay.json");
+  Object.defineProperty(bay.spawns, "bus-stop", {
+    value: { x: 355, y: 545, facing: "down" },
+    enumerable: false,
+  });
   const pass = parseArea(passData, "content/areas/pass.json");
   const trail = parseArea(trailData, "content/areas/trail.json");
+  field(
+    Array.isArray(landsData) &&
+      landsData.every(
+        (land) =>
+          record(land) && typeof land.id === "string" && typeof land.name === "string" &&
+          (!("busStop" in land) || typeof land.busStop === "boolean"),
+      ),
+    "content/lands.json",
+    "lands",
+  );
+  const lands = landsData.map((land) => ({
+    id: land.id,
+    name: land.name,
+    busStop: "busStop" in land && land.busStop === true,
+  }));
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
@@ -813,6 +864,7 @@ export function loadContent(): {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas,
+      lands,
       story,
       critters,
       battle,

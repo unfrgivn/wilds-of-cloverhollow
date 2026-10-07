@@ -23,11 +23,14 @@ test("a palm's crown fades while Fae walks under it", async ({ page }) => {
   await resetPaused(page, "bay");
   await step(page, 20);
   expect(await canopy(page, "palm-top-left")).toBe(1);
-  // From the plaza road (180, 545): right past the sign, up the beach behind
-  // it, and left under the top-left palm's crown.
-  await hold(page, "ArrowRight", 30);
-  await hold(page, "ArrowUp", 74);
-  await hold(page, "ArrowLeft", 25);
+  // From the plaza road (180, 545): right past the bus stop, up between it
+  // and the umbrella, left behind it, up the beach behind the sign, and left
+  // under the top-left palm's crown.
+  await hold(page, "ArrowRight", 63);
+  await hold(page, "ArrowUp", 29);
+  await hold(page, "ArrowLeft", 23);
+  await hold(page, "ArrowUp", 45);
+  await hold(page, "ArrowLeft", 35);
   await step(page, 20);
   const feet = (await readState(page)).player;
   expect(Math.abs(feet.x - 200)).toBeLessThan(12);
@@ -37,8 +40,10 @@ test("a palm's crown fades while Fae walks under it", async ({ page }) => {
   const z = (label: string): number => order.find((item) => item.label === label)?.zIndex ?? -1;
   expect(z("occluder:palm-top-left"), "the palm is drawn over Fae").toBeGreaterThan(z("fae"));
   await expect(page).toHaveScreenshot("bay-under-palm.png");
-  await hold(page, "ArrowRight", 25);
-  await hold(page, "ArrowDown", 74);
+  // Back out the way she came.
+  await hold(page, "ArrowRight", 35);
+  await hold(page, "ArrowDown", 45);
+  await hold(page, "ArrowRight", 23);
   await step(page, 20);
   expect(await canopy(page, "palm-top-left")).toBe(1);
 });

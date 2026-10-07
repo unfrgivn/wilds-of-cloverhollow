@@ -5,6 +5,9 @@
 .journal-name[hidden] {
   display: none;
 }
+.journal-map-page[hidden] {
+  display: none;
+}
 
 /* A modal open book: notes on the left page, the sticker album on the right. */
 .journal-book {
@@ -108,6 +111,7 @@
 }
 .journal-close {
   position: absolute;
+  z-index: 4;
   top: 12px;
   right: 12px;
   width: 48px;
@@ -119,4 +123,87 @@
   color: var(--sticker-ink);
   cursor: pointer;
   font: 700 24px var(--sticker-font);
+}
+.journal-map-page {
+  position: absolute;
+  inset: 18px;
+  padding: 18px;
+  background: #fbf6e9;
+}
+.journal-map {
+  position: relative;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 2400 / 1610;
+  margin: 0 auto;
+  overflow: hidden;
+  background: url("/assets/ui/map/world-map.webp") center / contain no-repeat;
+}
+.journal-map-labels,
+.journal-map-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.journal-map-labels {
+  inset: 0;
+  transform: none;
+}
+.journal-map-land {
+  position: absolute;
+  min-width: max-content;
+  transform: translate(-50%, -50%);
+  color: #47321f;
+  font-size: 13px;
+  font-weight: 800;
+  text-shadow: 0 1px #fbf6e9, 1px 0 #fbf6e9, -1px 0 #fbf6e9, 0 -1px #fbf6e9;
+}
+.journal-map-star {
+  z-index: 3;
+  color: #f2c94c;
+  font-size: 30px;
+  line-height: 1;
+  -webkit-text-stroke: 1.5px #47321f;
+  text-shadow: 0 0 3px #fbf6e9, 0 2px 0 #fbf6e9;
+  animation: journal-star-bob 1.8s ease-in-out infinite;
+}
+.journal-map-stop {
+  display: inline-block;
+  width: 12px;
+  height: 18px;
+  margin-right: 3px;
+  vertical-align: -3px;
+  filter: drop-shadow(0 1px 1px #47321f88);
+}
+.journal-map-stop svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@keyframes journal-star-bob {
+  0%, 100% { margin-top: -3px; }
+  50% { margin-top: 3px; }
+}
+.journal-tab {
+  position: absolute;
+  right: -14px;
+  min-width: 52px;
+  min-height: 48px;
+  border: 3px solid var(--sticker-ink);
+  border-radius: 8px 12px 12px 8px;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: 800 10px var(--sticker-font);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+.journal-notes-tab { top: 105px; }
+.journal-map-tab { top: 164px; }
+.journal-book[data-journal-page="notes"] .journal-notes-tab,
+.journal-book[data-journal-page="map"] .journal-map-tab {
+  background: #f2d88e;
+}
+.journal-book[data-journal-page="map"] .journal-page {
+  display: none;
 }

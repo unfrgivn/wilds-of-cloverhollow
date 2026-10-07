@@ -44,6 +44,7 @@ export type Spawn = Point & { facing: Direction };
 export type Area = {
   id: string;
   name: string;
+  land?: string;
   width: number;
   height: number;
   walkable: Polygon;
@@ -105,6 +106,9 @@ export type OccluderManifest = {
 export type World = {
   tunables: Tunables;
   areas: Record<string, Area>;
+  // The lands of the painted map (content/lands.json); `busStop` when the bus
+  // line stops there.
+  lands: { id: string; name: string; busStop: boolean }[];
   story: Record<string, unknown>;
   critters: Record<string, Critter>;
   battle: BattleContent;

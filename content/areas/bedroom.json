@@ -280,5 +280,6 @@
       "facing": "down"
     }
   },
-  "name": "Fae's bedroom"
+  "name": "Fae's bedroom",
+  "land": "cloverhollow"
 }

@@ -556,9 +556,8 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   - Jordan's runs start from the `pass-party` fixture (the pass with Maddie
     and Sue); the `pass` fixture is unchanged, so earlier runs keep their
     party and their battle menus.
-  - Juggle has the same numbers on every critter: calm 30, great 15, good 5,
-    rest 2.
-
+- Juggle has the same numbers on every critter: calm 30, great 15, good 5,
+  rest 2.
 
 ## Milestone 23: The blacklight lantern **Status:** ✅ Completed (2026-10-07)
 - Fae's blacklight lantern, from Jordan, is drawn as the owner's concept: a
@@ -594,6 +593,40 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     `{ w, h }`. The arrow is mirrored (`flip`) so it points into the pines.
   - The touch button's lit style set the whole `background`, erasing its icon;
     it now sets only the colour.
+
+## Milestone 24: The bus line and the map **Status:** ✅ Completed (2026-10-07)
+- The bus is now a line through the three towns with a stop: Cloverhollow's
+  plaza, Bubblegum Bay (a new stop by the welcome sign, where the road from
+  town comes in), and Pinecone Pass. From any stop it goes to any other the
+  story has opened: the bay once the east road is open (`club_open`), the pass
+  once the bluebird has pointed Fae toward the mountains (riding there is the
+  first ride, `rode_bus`), and home any time.
+- The journal has a MAP page: the painted map of the lands, every land named
+  (the sealed Enchanted Forest as "???"), a gold star over the land Fae is in,
+  and the bus line's sign beside each stop. Bookmark tabs, or the arrow keys,
+  flip between NOTES & STICKERS and MAP; the journal opens on its notes. Every
+  area belongs to one of six lands (`content/lands.json`, `area.land`).
+- Evidence: unit (`bus-line.test.ts`: the lands, the bay's stop, every ride
+  and its story gates), and real-key e2e (`map.spec.ts`: the map at both
+  sizes, flipped by keys and by the touch bookmark; `bus-line.spec.ts`: from
+  the end of chapter one, out of the park to the plaza's stop, the ride to the
+  bay, the star at Bubblegum Bay, and the ride home).
+- Wording for the owner: the plaza: "The bus is here! Where to?" ("Pinecone
+  Pass!": "Up we go!"; "Bubblegum Bay!": "To the beach!"; "Not yet.": "Not
+  yet. I'll stay in Cloverhollow a little longer."); the bay: "The bus stops
+  here on its way between the towns. Where to?" ("Cloverhollow!": "Home to
+  town!"; "Pinecone Pass!": "Up we go!"; "Not yet.": "Not yet. I want to stay
+  at the beach a little longer."); the pass: "The bus is ready to roll. Where
+  to?" ("Cloverhollow!": "Back to town!"; "Bubblegum Bay!": "Down to the
+  beach!"; "Not yet.": "Not yet. I want to look around a little more."). These
+  replace Milestone 20's "The bus to Pinecone Pass is here!" and "The bus is
+  ready to roll back to Cloverhollow."
+- Notes and assumptions:
+  - The map page is presentation only, outside the core and saves; the land
+    centres come from the map painting's `world-map.json`.
+  - Before the east road opens and while the bluebird is fizzy, the plaza's
+    stop still says there's no reason to leave town.
+  - `bus.test.ts`'s list of travel targets now has three.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
@@ -638,6 +671,7 @@ more bad guys, and the blacklight lantern, made and built while away.
   first trail between lands, between the bay and the pass.
 - Milestone 22, Jordan: done.
 - Milestone 23, the blacklight lantern: done.
+- Milestone 24, the bus line and the map: done.
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the

@@ -274,7 +274,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 ## 6. World
 - Areas are discrete. `content/areas/<id>.json` is canonical (Tiled may be used
   for editing if its export matches): `id`, `width` and `height` in units, the
-  `walkable` floor polygon, `blockers` (furniture footprints on the floor
+  optional `land`, the `walkable` floor polygon, `blockers` (furniture footprints on the floor
   plane), `occluders` (`{ id, polygon, baseline, canopy? }`), named `spawns`
   (`{ x, y, facing }`), and optional `ground` (the folder of its painting).
   Doors arrive in Milestone 6 and interactables in Milestone 8. An area
@@ -339,6 +339,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   footprint and a `Look` prompt. The pass stop returns to `plaza.bus-stop`.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
+- The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
+  Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
+  and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
+  belongs to one. Bubblegum Bay has a bus-stop prop at (355, 505), with spawn
+  `bus-stop` at (355, 545), by the welcome sign.
 - At the pass, Jordan stands by the snowman (person `jordan`, knot `jordan`,
   `Talk`) watching the Snowball Hamster, a critter loose in the clearing at
   (850, 760). He joins whatever Fae answers (`jordan_joined`); the calm
@@ -439,7 +444,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   dialogue state through that line and its close, then starts the same 18-tick
   fade as a door, placing Fae and the party at the named spawn and autosaving
   on arrival. Load validation rejects travel tags naming an unknown area or
-  spawn.
+  spawn. The bus line (Milestone 24) is three stops' knots (`bus_stop`,
+  `bay_bus_stop`, `pass_bus_stop`) travelling between `plaza.bus-stop`,
+  `bay.bus-stop`, and `pass.bus`: the bay once `club_open`, the pass once the
+  bluebird is calm (setting `rode_bus`), home any time.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's external
@@ -683,8 +691,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `renderInfo()` exposes the phase, timing-ring request, and critter frame.
 
 ## 9. Journal and stickers
-- The journal is the pause menu: Notes (current goals, written from Ink) and a
-  Sticker album. The map comes later.
+- The journal is the pause menu: Notes (current goals, written from Ink), a
+  Sticker album, and a painted MAP page. The map labels all six lands, shows
+  `???` for the sealed Enchanted Forest, puts a bobbing gold star over Fae's
+  current land, and leads each stop's name with the bus line's sign (lands
+  with `busStop`). It is presentation only, outside the core state and saves.
 - Stickers are collectibles and rewards.
 - Core: `journalOpen` in state. A menu press (J or the journal button) opens
   it when no dialogue, battle, or door transition is running; a menu or cancel
@@ -719,6 +730,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   are dashed `?` outlines with no name.
 - A cream JOURNAL label sits on the top edge and a close sticker (at least
   44 px) in the top-right corner; the close button is how touch players leave.
+- Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The
+  journal opens on notes; ArrowLeft/ArrowRight and A/D also flip pages.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").

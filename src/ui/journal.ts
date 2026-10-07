@@ -13,6 +13,8 @@ export type JournalView = {
   /** Newest first; the game decides the order. */
   notes: string[];
   stickers: JournalSticker[];
+  lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
+  currentLand: string | null;
 };
 
 type Slot = {
@@ -21,6 +23,8 @@ type Slot = {
   unknown: HTMLDivElement;
   name: HTMLDivElement;
 };
+
+type MapLand = JournalView["lands"][number];
 
 function element<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -53,6 +57,21 @@ function addSlot(grid: HTMLElement): Slot {
   return { root, image, unknown, name };
 }
 
+// The bus line's stop sign, as on the sprite: a gold star on a blue roundel
+// atop a pole.
+function busStopIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 20 30");
+  svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML =
+    '<rect x="9" y="14" width="2" height="15" rx="1" fill="#8a8f98" stroke="#47321f" ' +
+    'stroke-width="0.8"/>' +
+    '<circle cx="10" cy="9" r="8" fill="#3f7fc0" stroke="#47321f" stroke-width="1.2"/>' +
+    '<path d="M10 3.6l1.6 3.3 3.6.5-2.6 2.5.6 3.6L10 11.8l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" ' +
+    'fill="#f2c94c" stroke="#47321f" stroke-width="0.5"/>';
+  return svg;
+}
+
 export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   onClose: (callback: () => void) => void;
@@ -78,9 +97,49 @@ export function createJournal(root: HTMLElement): {
   stickersHeading.textContent = "STICKERS";
   const grid = element("div", "journal-stickers");
   stickersPage.append(stickersHeading, grid);
-  book.append(label, close, notesPage, stickersPage);
+  const mapPage = element("section", "journal-map-page");
+  const map = element("div", "journal-map");
+  const mapLabels = element("div", "journal-map-labels");
+  const star = element("div", "journal-map-star");
+  star.textContent = "★";
+  star.setAttribute("aria-label", "You are here");
+  map.append(mapLabels, star);
+  mapPage.append(map);
+  const notesTab = element("button", "journal-tab journal-notes-tab");
+  notesTab.type = "button";
+  notesTab.textContent = "NOTES & STICKERS";
+  notesTab.setAttribute("aria-label", "Notes and stickers");
+  const mapTab = element("button", "journal-tab journal-map-tab");
+  mapTab.type = "button";
+  mapTab.textContent = "MAP";
+  mapTab.setAttribute("aria-label", "Map");
+  book.append(label, close, notesPage, stickersPage, mapPage, notesTab, mapTab);
   root.append(book);
   let onClose: () => void = () => undefined;
+  let page: "notes" | "map" = "notes";
+  let wasVisible = false;
+  let mapSignature = "";
+  const setPage = (next: "notes" | "map"): void => {
+    page = next;
+    setAttribute(book, "data-journal-page", page);
+    notesPage.hidden = page !== "notes";
+    stickersPage.hidden = page !== "notes";
+    mapPage.hidden = page !== "map";
+  };
+  notesTab.addEventListener("click", () => setPage("notes"));
+  mapTab.addEventListener("click", () => setPage("map"));
+  const keydown = (event: KeyboardEvent): void => {
+    if (book.hidden) return;
+    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
+      event.preventDefault();
+      setPage("map");
+    } else if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
+      event.preventDefault();
+      setPage("notes");
+    }
+  };
+  document.addEventListener("keydown", keydown);
+  setPage("notes");
   close.addEventListener("click", () => onClose());
   const slots: Slot[] = [];
   return {
@@ -89,6 +148,8 @@ export function createJournal(root: HTMLElement): {
     },
     render: (view) => {
       book.hidden = !view.visible;
+      if (!view.visible && wasVisible) setPage("notes");
+      wasVisible = view.visible;
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));
       while (notes.children.length > view.notes.length) notes.lastElementChild?.remove();
       view.notes.forEach((note, index) => {
@@ -111,6 +172,36 @@ export function createJournal(root: HTMLElement): {
         setAttribute(slot.image, "aria-label", sticker.name);
         applyAtlasCrop(slot.image, image);
       });
+      const nextMapSignature = view.lands
+        .map((land) => `${land.id}:${land.name}:${land.x}:${land.y}`)
+        .join("|");
+      if (nextMapSignature !== mapSignature) {
+        mapSignature = nextMapSignature;
+        mapLabels.replaceChildren();
+        view.lands.forEach((land: MapLand) => {
+          const item = element("span", "journal-map-land");
+          item.textContent = land.id === "enchanted" ? "???" : land.name;
+          item.style.left = `${(land.x / 2400) * 100}%`;
+          item.style.top = `${(land.y / 1610) * 100}%`;
+          setAttribute(item, "data-land", land.id);
+          mapLabels.append(item);
+          if (!land.busStop) return;
+          // The bus line's sign (a gold star on a blue roundel) leads the name.
+          const stop = element("span", "journal-map-stop");
+          setAttribute(stop, "data-land", land.id);
+          setAttribute(stop, "aria-label", `Bus stop: ${land.name}`);
+          stop.append(busStopIcon());
+          item.prepend(stop);
+        });
+      }
+      const here = view.lands.find((land) => land.id === view.currentLand);
+      star.hidden = here === undefined;
+      setAttribute(star, "data-land", here?.id ?? "");
+      if (here !== undefined) {
+        // Just above the land's name, so the name stays readable.
+        star.style.left = `${(here.x / 2400) * 100}%`;
+        star.style.top = `${(here.y / 1610) * 100 - 7}%`;
+      }
     },
   };
 }

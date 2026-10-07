@@ -1,0 +1,29 @@
+[
+  {
+    "id": "cloverhollow",
+    "name": "Cloverhollow",
+    "busStop": true
+  },
+  {
+    "id": "bay",
+    "name": "Bubblegum Bay",
+    "busStop": true
+  },
+  {
+    "id": "pass",
+    "name": "Pinecone Pass",
+    "busStop": true
+  },
+  {
+    "id": "trail",
+    "name": "Cliffside Trail"
+  },
+  {
+    "id": "forest",
+    "name": "The Forest"
+  },
+  {
+    "id": "enchanted",
+    "name": "The Enchanted Forest"
+  }
+]

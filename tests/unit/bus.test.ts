@@ -139,7 +139,7 @@ describe("story travel", () => {
   it("only ever sends Fae to a place that exists", () => {
     const source = readFileSync("content/story/main.ink", "utf8");
     const targets = [...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)].map((match) => match[1] ?? "");
-    expect(targets.sort()).toEqual(["pass.bus", "plaza.bus-stop"]);
+    expect([...new Set(targets)].sort()).toEqual(["bay.bus-stop", "pass.bus", "plaza.bus-stop"]);
     for (const target of targets) {
       const [area, spawn] = target.split(".");
       expect(areaFor(area ?? "").spawns[spawn ?? ""], target).toBeDefined();

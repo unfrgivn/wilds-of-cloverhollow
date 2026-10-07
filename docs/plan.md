@@ -460,6 +460,65 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   - The plaza stop is a narrow prop (121 units) because the only place no
     recorded route crosses is the gap between the lower flower boxes.
 
+## Milestone 21: The Cliffside Trail **Status:** ✅ Completed (2026-10-07)
+- The first trail between lands, walked EarthBound style: the Cliffside Trail
+  climbs from Bubblegum Bay (its beach, at the bottom) to Pinecone Pass (its
+  snowy path, at the left edge), past two meadows, a signpost, a footbridge
+  over a stream, and a lookout bench above the sea. From the pass it's always
+  open (down the east path, where the pass's signpost points); from the bay's
+  south beach it opens once Fae has ridden the bus up the mountain
+  (`rode_bus`), so the story still goes by bus first.
+- Roaming critters: an area critter with `roam: { radius }` wanders near home,
+  comes after Fae when she's within sight, a little slower than she walks
+  (wander 1.25 and chase 2.5 units a tick; she walks 4), starts a battle when
+  it touches her, leaves her alone for 240 ticks after she runs and wanders
+  home, holds still while she's busy, and stands still once calm. A chaser
+  gives up beyond its home radius plus twice its sight. A fizzy bunny roams
+  the upper meadow and a fizzy squirrel the lower one.
+- The back-link rule: after Fae arrives through a door, the way straight back
+  stays shut while she keeps holding the direction she arrived holding. The
+  bay's south edge and the trail's beach face opposite ways, so without it a
+  kid holding down would bounce between them forever.
+- Evidence: unit (`trail.test.ts`, `roam.test.ts`, both replays), two
+  recordings with matching browser and Bun hashes (`pass/trail.json`: from the
+  pass down to the bay, calming the bunny and running from the squirrel;
+  `trail/lookout.json`: over the footbridge to the bench and into the bay,
+  holding down), and real-key e2e that plays each recording as key presses and
+  checks it on the way (the arrival at both sizes, the bunny closing in, its
+  battle, the squirrel leaving Fae alone after she runs, the bridge rail drawn
+  over her feet, the bench, the bay), ending on the same hash as Bun.
+- Wording for the owner: the closed cliff path ("A sandy path climbs the
+  cliffs, way up toward the mountains." / "That's a long walk, and I don't know
+  where it goes yet."), the trail's signpost ("CLIFFSIDE TRAIL. Up: Pinecone
+  Pass. Down: Bubblegum Bay." / "Over the bridge: the lookout!"), the pass's
+  trail sign ("CLIFFSIDE TRAIL. Down the mountain to Bubblegum Bay."), the
+  bench ("What a view! The sea sparkles all the way to the sky." / "I can see
+  Sue's dock way down there. It looks tiny!"), the calm bunny ("Thank you! I
+  was hopping in circles all morning." / "A raccoon in a purple hood zipped
+  by, and everything went all fizzy!" / Fae: "That raccoon again!"; again: "The
+  clover up here is extra sweet. Want some?"), the calm squirrel ("Phew! Sorry
+  about all the acorns." / "A raccoon traded me a shiny bottle cap for my best
+  acorn." / "Then, fizz! I couldn't stop throwing things."; again: "I'm saving
+  my acorns for winter now. Nobody gets bonked!"), the journal ("The Cliffside
+  Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel
+  are calm again!"), and the Thumpy Bunny's and Zippy Squirrel's battle lines
+  in `content/critters/bunny.json` and `squirrel.json`.
+- Notes and assumptions:
+  - The trail's floor, blockers, and occluders are written by
+    `tools/art/geometry/trail.ts` from outlines on its painting. Stands of
+    trees and boulders block their whole outline, so nothing hides Fae; the
+    signpost blocks only its foot; the bridge's near rail is cut in slivers
+    drawn over her on the deck.
+  - Each trigger is a thin strip on its floor's outer edge (the pass's painting
+    ends at x 1520, with paper beyond). Arrivals face into the land: the pass's
+    east edge leads to the trail's west edge, keeping Fae's direction; the
+    bay's south edge leads to the trail's beach, turning her round, hence the
+    back-link rule.
+  - Roamers are part of the state with no save version change: saves from
+    before them start fresh (the shape check).
+  - The `trail` fixture starts on the trail's beach for the lookout run; the
+    `pass` fixture is unchanged.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -497,15 +556,15 @@ more bad guys, and the blacklight lantern, made and built while away.
   open hidden paths.
 
 ### Next milestones
-- Milestone 20, Pinecone Pass and the bus: a bus stop in the plaza; story
-  lines can send Fae somewhere (`# travel:`); the pass as a walkable area.
-- Milestone 21, Jordan: he joins at the pass with Juggle; the hamster hiker;
+- Milestone 20, Pinecone Pass and the bus: done.
+- Milestone 21, the Cliffside Trail: done. Built before Jordan because its
+  painting, its critters, and the roaming engine were ready first; it's the
+  first trail between lands, between the bay and the pass.
+- Milestone 22, Jordan: he joins at the pass with Juggle; the hamster hiker;
   he gives Fae the lantern.
-- Milestone 22, the blacklight lantern: on and off, glowing secrets, a hidden
-  path out of the pass.
-- Milestone 23, the Old Pine Trail: the first trail between lands, from the
-  pass's hidden path down toward the Whispering Woods, with roaming critters:
-  the bunny from the owner's critter sheet and a new squirrel.
+- Milestone 23, the blacklight lantern: on and off; glowing secrets at the pass
+  (the raccoon's paw prints, a doodle on the ski lift, and a trail marker
+  pointing west through the pines toward the Whispering Woods).
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the

@@ -18,5 +18,12 @@
     "heel": 52,
     "sitDelayTicks": 30,
     "settleDelayTicks": 12
+  },
+  "roam": {
+    "wanderSpeed": 1.25,
+    "chaseSpeed": 2.5,
+    "sight": 180,
+    "cooldownTicks": 240,
+    "pauseTicks": 45
   }
 }

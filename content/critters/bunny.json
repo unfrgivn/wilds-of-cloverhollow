@@ -1,0 +1,98 @@
+{
+  "id": "bunny",
+  "name": "Thumpy Bunny",
+  "calmName": "Ribbon Bunny",
+  "atlas": "assets/critters/bunny/bunny.json",
+  "auraCentre": {
+    "x": 264,
+    "y": 275
+  },
+  "bodyCentre": {
+    "x": 253,
+    "y": 311
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "snacks": 2,
+  "sticker": {
+    "id": "ribbon-bunny",
+    "name": "Ribbon Bunny",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "bunny_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy bunny bounces out of the clover, thumping its foot!",
+    "command": "How can Fae calm the bunny?",
+    "soothe": {
+      "great": "Fae hums a soft lullaby. The bunny's ears droop, all sleepy!",
+      "good": "Fae hums softly. The bunny's nose stops twitching.",
+      "miss": "The bunny is too busy thumping to hear Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie and the bunny play tag in the clover. Hop, pounce, hop!",
+        "good": "Maddie wiggles her tail. The bunny's ears perk up.",
+        "miss": "Maddie pounces on a butterfly instead. The bunny thumps, unimpressed."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber through the clover. The bunny bounces after it!",
+        "good": "Sue's bobber twirls in the breeze. The bunny's nose wiggles.",
+        "miss": "Sue's bobber snags on a fern. The bunny blinks."
+      }
+    },
+    "snack": "Fae shares a crunchy carrot stick. The bunny munches happily!",
+    "burst": "The bunny thumps so hard that twigs and dust go flying!",
+    "burstResult": {
+      "great": "Fae hops right over the flying twigs!",
+      "good": "Fae dodges most of the twigs!",
+      "miss": "Poof! Fae gets a face full of dust."
+    },
+    "soothed": "The bunny lets out a happy sigh. The fizzy spell fizzles away!",
+    "reward": "New sticker: Ribbon Bunny!",
+    "rest": "Fae is all tuckered out. Time for a rest.",
+    "run": "Fae tiptoes away through the grass. The bunny keeps thumping."
+  }
+}

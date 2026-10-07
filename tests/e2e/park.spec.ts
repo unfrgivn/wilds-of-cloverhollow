@@ -79,7 +79,7 @@ test("the plaza's lower path leads to Meadow Park, and its exit path leads back"
   expect(park.critters.pup).toBe("chaos");
   const info = await renderInfo(page);
   expect(info.area).toBe("park");
-  expect(info.critters).toEqual([{ id: "pup", frame: "chaos_idle_01" }]);
+  expect(info.critters).toEqual([{ id: "pup", frame: "chaos_idle_01", x: 880, y: 628 }]);
   expect(info.drawOrder.map((item) => item.label))
     .toEqual(expect.arrayContaining(["critter:pup", "critter:pup:aura", "maddie"]));
   expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(false);

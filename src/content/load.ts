@@ -6,6 +6,7 @@ import parkData from "../../content/areas/park.json";
 import schoolData from "../../content/areas/school.json";
 import bayData from "../../content/areas/bay.json";
 import passData from "../../content/areas/pass.json";
+import trailData from "../../content/areas/trail.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -14,11 +15,14 @@ import parkFixtureData from "../../content/fixtures/park.json";
 import schoolFixtureData from "../../content/fixtures/school.json";
 import bayFixtureData from "../../content/fixtures/bay.json";
 import passFixtureData from "../../content/fixtures/pass.json";
+import trailFixtureData from "../../content/fixtures/trail.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
 import pupData from "../../content/critters/pup.json";
 import bluebirdData from "../../content/critters/bluebird.json";
+import bunnyData from "../../content/critters/bunny.json";
+import squirrelData from "../../content/critters/squirrel.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -103,6 +107,7 @@ export function parseTunables(value: unknown, file: string): Tunables {
   field(typeof value.doorFadeTicks === "number", file, "doorFadeTicks");
   field(record(value.interact), file, "interact");
   field(record(value.follow), file, "follow");
+  field(record(value.roam), file, "roam");
   const follow = value.follow;
   const followValue = (name: string): number => numberValue(follow, name, file);
   return {
@@ -125,6 +130,13 @@ export function parseTunables(value: unknown, file: string): Tunables {
       heel: followValue("heel"),
       sitDelayTicks: followValue("sitDelayTicks"),
       settleDelayTicks: followValue("settleDelayTicks"),
+    },
+    roam: {
+      wanderSpeed: numberValue(value.roam, "wanderSpeed", file),
+      chaseSpeed: numberValue(value.roam, "chaseSpeed", file),
+      sight: numberValue(value.roam, "sight", file),
+      cooldownTicks: numberValue(value.roam, "cooldownTicks", file),
+      pauseTicks: numberValue(value.roam, "pauseTicks", file),
     },
   };
 }
@@ -149,8 +161,12 @@ export function parseArea(value: unknown, file: string): Area {
             record(item) &&
             typeof item.id === "string" &&
             record(item.point) &&
-            typeof item.point.x === "number" &&
-            typeof item.point.y === "number",
+             typeof item.point.x === "number" &&
+             typeof item.point.y === "number" &&
+             (item.roam === undefined ||
+               (record(item.roam) &&
+                 typeof item.roam.radius === "number" &&
+                 item.roam.radius > 0)),
         )),
     file,
     "critters",
@@ -268,11 +284,13 @@ export function parseArea(value: unknown, file: string): Area {
       id: item.id,
       knot: item.knot,
       point: { x: item.point.x, y: item.point.y },
+      ...(item.roam === undefined ? {} : { roam: { radius: item.roam.radius } }),
       prompt: item.prompt,
     })),
     critters: (value.critters ?? []).map((item) => ({
       id: item.id,
       point: { x: item.point.x, y: item.point.y },
+      ...(item.roam === undefined ? {} : { roam: { radius: item.roam.radius } }),
     })),
     npcs: (value.npcs ?? []).map((item) => ({
       id: item.id,
@@ -684,10 +702,13 @@ export function loadContent(): {
   const school = parseArea(schoolData, "content/areas/school.json");
   const bay = parseArea(bayData, "content/areas/bay.json");
   const pass = parseArea(passData, "content/areas/pass.json");
+  const trail = parseArea(trailData, "content/areas/trail.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
   const bluebird = parseCritter(bluebirdData, "content/critters/bluebird.json");
+  const bunny = parseCritter(bunnyData, "content/critters/bunny.json");
+  const squirrel = parseCritter(squirrelData, "content/critters/squirrel.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -701,7 +722,8 @@ export function loadContent(): {
   );
   if (joinProblems.length > 0)
     throw new Error(`content/party: ${joinProblems.join("; ")}`);
-  const critters = { [frog.id]: frog, [pup.id]: pup, [bluebird.id]: bluebird };
+  const critters = { [frog.id]: frog, [pup.id]: pup, [bluebird.id]: bluebird,
+    [bunny.id]: bunny, [squirrel.id]: squirrel };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)
     throw new Error(`content/party: ${partyProblems.join("; ")}`);
@@ -717,6 +739,7 @@ export function loadContent(): {
     school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
     bay: parseFixture(bayFixtureData, "content/fixtures/bay.json"),
     pass: parseFixture(passFixtureData, "content/fixtures/pass.json"),
+    trail: parseFixture(trailFixtureData, "content/fixtures/trail.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -731,6 +754,7 @@ export function loadContent(): {
     [school.id]: school,
     [bay.id]: bay,
     [pass.id]: pass,
+    [trail.id]: trail,
   };
   const travelTargets = new Set<string>();
   const findTravelTags = (value: unknown): void => {

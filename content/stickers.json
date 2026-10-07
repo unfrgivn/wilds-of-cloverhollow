@@ -18,6 +18,18 @@
       "name": "Bay Bluebird",
       "critter": "bluebird",
       "frame": "calm_idle_01"
+    },
+    {
+      "id": "ribbon-bunny",
+      "name": "Ribbon Bunny",
+      "critter": "bunny",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "acorn-squirrel",
+      "name": "Acorn Squirrel",
+      "critter": "squirrel",
+      "frame": "calm_idle_01"
     }
   ]
 }

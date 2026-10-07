@@ -81,7 +81,7 @@ export async function renderInfo(page: Page): Promise<{
     choices: string[];
     selected: number;
   };
-  critters: { id: string; frame: string }[];
+  critters: { id: string; frame: string; x: number; y: number }[];
   npcs: { id: string; frame: string; facing: string }[];
   canopies: { id: string; alpha: number }[];
   // Everything in CSS px, from the one battle layout (spec 8).
@@ -158,4 +158,45 @@ export async function pixelAt(
 
 export function loadScript(path: string): ReturnType<typeof parseScript> {
   return parseScript(JSON.parse(readFileSync(path, "utf8")), path);
+}
+
+// Recorded runs played as real key presses through the game's own keyboard
+// input: arrows for a frame's move, Z for its confirm, held for the frame's
+// ticks (spec 11). A run that needs other inputs can't be played this way.
+export type Segment = { frame: ActionFrame; ticks: number };
+
+export function recording(path: string): Segment[] {
+  return parseScript(JSON.parse(readFileSync(path, "utf8")), path);
+}
+
+function keysFor(frame: ActionFrame): string[] {
+  if (frame.cancel || frame.menu || frame.choose !== undefined)
+    throw new Error("this run needs more than arrows and Z");
+  return [
+    ...(frame.move.x > 0 ? ["ArrowRight"] : frame.move.x < 0 ? ["ArrowLeft"] : []),
+    ...(frame.move.y > 0 ? ["ArrowDown"] : frame.move.y < 0 ? ["ArrowUp"] : []),
+    ...(frame.confirm ? ["z"] : []),
+  ];
+}
+
+// Plays a run with real keys, pressing and releasing only what changes between
+// frames and stepping at most `chunk` ticks at a time, then calling `watch`.
+export async function playWithKeys(
+  page: Page,
+  segments: Segment[],
+  chunk: number,
+  watch: () => Promise<void>,
+): Promise<void> {
+  let held: string[] = [];
+  for (const segment of segments) {
+    const keys = keysFor(segment.frame);
+    for (const key of held) if (!keys.includes(key)) await page.keyboard.up(key);
+    for (const key of keys) if (!held.includes(key)) await page.keyboard.down(key);
+    held = keys;
+    for (let done = 0; done < segment.ticks; done += chunk) {
+      await step(page, Math.min(chunk, segment.ticks - done));
+      await watch();
+    }
+  }
+  for (const key of held) await page.keyboard.up(key);
 }

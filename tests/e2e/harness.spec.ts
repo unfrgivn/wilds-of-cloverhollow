@@ -86,6 +86,8 @@ for (const item of [
   { name: "chapter-one", fixture: "new-game" },
   { name: "bay", fixture: "bay" },
   { name: "bus", fixture: "bay" },
+  { name: "trail", fixture: "pass" },
+  { name: "lookout", fixture: "trail" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({

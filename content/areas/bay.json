@@ -2326,6 +2326,35 @@
         "area": "plaza",
         "spawn": "bay-road"
       }
+    },
+    {
+      "id": "trail",
+      "polygon": [
+        [
+          500,
+          1070
+        ],
+        [
+          1250,
+          1070
+        ],
+        [
+          1250,
+          1100
+        ],
+        [
+          500,
+          1100
+        ]
+      ],
+      "target": {
+        "area": "trail",
+        "spawn": "bay"
+      },
+      "requires": {
+        "variable": "rode_bus",
+        "knot": "bay_cliff_path"
+      }
     }
   ],
   "interactables": [
@@ -2401,6 +2430,11 @@
       "x": 180,
       "y": 545,
       "facing": "right"
+    },
+    "trail": {
+      "x": 850,
+      "y": 1000,
+      "facing": "up"
     }
   }
 }

@@ -34,7 +34,7 @@ test.describe("frog battle", () => {
     await resetPaused(page, "plaza");
     for (const [key, ticks] of approach) await hold(page, key, ticks);
     const before = await renderInfo(page);
-    expect(before.critters).toEqual([{ id: "frog", frame: "chaos_idle_01" }]);
+    expect(before.critters).toEqual([{ id: "frog", frame: "chaos_idle_01", x: 1000, y: 820 }]);
     expect(before.drawOrder.map((item) => item.label))
       .toEqual(expect.arrayContaining(["critter:frog", "critter:frog:aura"]));
     await expect(page).toHaveScreenshot("overworld-frog-chaos.png");
@@ -101,7 +101,8 @@ test.describe("frog battle", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
     expect([...seen].sort()).toEqual(["burst", "great", "intro"]);
     await step(page, 2);
-    expect((await renderInfo(page)).critters).toEqual([{ id: "frog", frame: "calm_idle_01" }]);
+    expect((await renderInfo(page)).critters)
+      .toEqual([{ id: "frog", frame: "calm_idle_01", x: 1000, y: 820 }]);
     await expect(page).toHaveScreenshot("overworld-frog-calm.png");
 
     // Walking into the calm frog starts no battle; he talks instead.

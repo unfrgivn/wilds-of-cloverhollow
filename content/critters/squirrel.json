@@ -1,0 +1,98 @@
+{
+  "id": "squirrel",
+  "name": "Zippy Squirrel",
+  "calmName": "Acorn Squirrel",
+  "atlas": "assets/critters/squirrel/squirrel.json",
+  "auraCentre": {
+    "x": 264,
+    "y": 275
+  },
+  "bodyCentre": {
+    "x": 253,
+    "y": 311
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "snacks": 2,
+  "sticker": {
+    "id": "acorn-squirrel",
+    "name": "Acorn Squirrel",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "squirrel_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy squirrel zips down a pine with an armful of acorns!",
+    "command": "How can Fae calm the squirrel?",
+    "soothe": {
+      "great": "Fae hums a slow, swaying tune. The squirrel's tail stops flicking!",
+      "good": "Fae hums softly. The squirrel peeks out from behind its tail.",
+      "miss": "The squirrel chatters too loudly to hear Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie chases the squirrel round and round a pine. They're both giggling!",
+        "good": "Maddie bats at a pinecone. The squirrel watches, tail twitching.",
+        "miss": "Maddie tries to climb a tree and slides back down. The squirrel chatters."
+      },
+      "cast": {
+        "great": "Sue swings her ribbon bobber like a dangling acorn. The squirrel leaps for it!",
+        "good": "Sue's bobber bobs past. The squirrel tilts its head.",
+        "miss": "Sue's line tangles in a bush. The squirrel snickers."
+      }
+    },
+    "snack": "Fae shares a handful of sunflower seeds. The squirrel nibbles them one by one.",
+    "burst": "The squirrel flings a flurry of acorns at Fae!",
+    "burstResult": {
+      "great": "Fae ducks every single acorn!",
+      "good": "Fae dodges most of the acorns!",
+      "miss": "Bonk! An acorn bops Fae on the head."
+    },
+    "soothed": "The squirrel flicks its tail happily. The fizzy spell fizzles away!",
+    "reward": "New sticker: Acorn Squirrel!",
+    "rest": "Fae is too dizzy from dodging acorns. Time for a rest.",
+    "run": "Fae hurries down the path. The squirrel keeps chattering."
+  }
+}

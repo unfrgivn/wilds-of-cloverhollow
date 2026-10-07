@@ -18,6 +18,7 @@ import type {
   BattleView,
   Critter,
   Grade,
+  Roamer,
 } from "./types";
 import { createInkState, runInk } from "./ink";
 
@@ -129,6 +130,7 @@ export function createState(
     critters: Object.fromEntries(
       Object.keys(world.critters).map((id) => [id, "chaos"]),
     ),
+    roamers: roamerFor(area),
     stickers: [],
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
@@ -251,6 +253,130 @@ function distance(a: Point, b: Point): number {
   return Math.sqrt(x * x + y * y);
 }
 
+function moveDirection(move: Point): Direction | undefined {
+  if (move.x === 0 && move.y === 0) return undefined;
+  if (Math.abs(move.x) >= Math.abs(move.y)) return move.x < 0 ? "left" : "right";
+  return move.y < 0 ? "up" : "down";
+}
+
+function roamerFor(area: Area): Record<string, Roamer> {
+  return Object.fromEntries(
+    area.critters.flatMap((entry) =>
+      entry.roam === undefined
+        ? []
+        : [[entry.id, {
+            x: entry.point.x,
+            y: entry.point.y,
+            home: { ...entry.point },
+            target: { ...entry.point },
+            pauseTicks: 0,
+            cooldownTicks: 0,
+            facing: "down",
+            moving: false,
+          }]],
+    ),
+  );
+}
+
+function chooseRoamTarget(
+  world: World,
+  state: State,
+  area: Area,
+  home: Point,
+  radius: number,
+): { target: Point; state: State } {
+  const first = nextRandom(state);
+  const second = nextRandom(first[1]);
+  const third = nextRandom(second[1]);
+  const rawX = first[0] * 2 - 1;
+  const rawY = second[0] * 2 - 1;
+  const length = Math.sqrt(rawX * rawX + rawY * rawY);
+  const unitX = length === 0 ? 1 : rawX / length;
+  const unitY = length === 0 ? 0 : rawY / length;
+  const targetRadius = third[0] * radius;
+  const candidate = {
+    x: home.x + unitX * targetRadius,
+    y: home.y + unitY * targetRadius,
+  };
+  const resolved = resolveCollision(candidate, area, world.tunables.follow.radius);
+  const gap = distance(home, resolved);
+  const target = gap <= radius
+    ? resolved
+    : {
+        x: home.x + (resolved.x - home.x) * radius / gap,
+        y: home.y + (resolved.y - home.y) * radius / gap,
+      };
+  return { target, state: third[1] };
+}
+
+function updateRoamers(
+  world: World,
+  state: State,
+  area: Area,
+  player: Point,
+  active: boolean,
+): { roamers: Record<string, Roamer>; rng: number } {
+  let randomState = state;
+  const result: Record<string, Roamer> = {};
+  for (const entry of area.critters) {
+    const previous = state.roamers[entry.id];
+    if (previous === undefined || entry.roam === undefined) continue;
+    const cooldownTicks = Math.max(0, previous.cooldownTicks - 1);
+    if (!active || state.critters[entry.id] === "calm") {
+      result[entry.id] = { ...previous, cooldownTicks, moving: false };
+      continue;
+    }
+    const toPlayer = distance(previous, player);
+    const leash = entry.roam.radius + world.tunables.roam.sight * 2;
+    const chasing = cooldownTicks === 0 && toPlayer <= world.tunables.roam.sight &&
+      distance(previous.home, player) <= leash;
+    let target = previous.target;
+    let pauseTicks = previous.pauseTicks;
+    if (chasing) target = player;
+    else if (cooldownTicks > 0) target = previous.home;
+    else if (pauseTicks > 0) pauseTicks -= 1;
+    else if (distance(previous, target) <= 0.5) {
+      const picked = chooseRoamTarget(
+        world,
+        randomState,
+        area,
+        previous.home,
+        entry.roam.radius,
+      );
+      target = picked.target;
+      randomState = picked.state;
+      pauseTicks = world.tunables.roam.pauseTicks;
+    }
+    const speed = chasing ? world.tunables.roam.chaseSpeed : world.tunables.roam.wanderSpeed;
+    const gap = distance(previous, target);
+    const amount = Math.min(speed, gap);
+    const candidate = gap === 0
+      ? { x: previous.x, y: previous.y }
+      : {
+          x: previous.x + (target.x - previous.x) * amount / gap,
+          y: previous.y + (target.y - previous.y) * amount / gap,
+        };
+    const position = resolveCollision(candidate, area, world.tunables.follow.radius);
+    const dx = position.x - previous.x;
+    const dy = position.y - previous.y;
+    const moved = Math.sqrt(dx * dx + dy * dy);
+    const facing = Math.abs(dx) >= Math.abs(dy)
+      ? (dx < 0 ? "left" : dx > 0 ? "right" : previous.facing)
+      : (dy < 0 ? "up" : "down");
+    result[entry.id] = {
+      ...previous,
+      x: position.x,
+      y: position.y,
+      target,
+      pauseTicks,
+      cooldownTicks,
+      facing,
+      moving: moved > 0.0001,
+    };
+  }
+  return { roamers: result, rng: randomState.rng };
+}
+
 export function targetInteractable(
   world: World,
   state: State,
@@ -266,12 +392,14 @@ export function targetInteractable(
   }[state.facing];
   const calmCritters = area.critters.flatMap((critter) => {
     const content = world.critters[critter.id];
+    const roamer = state.roamers[critter.id];
+    const point = roamer === undefined ? critter.point : { x: roamer.x, y: roamer.y };
     return state.critters[critter.id] === "calm" && content !== undefined
       ? [
           {
             id: `critter:${critter.id}`,
             knot: content.calmKnot,
-            point: critter.point,
+            point,
             prompt: content.calmPrompt,
           },
         ]
@@ -657,7 +785,22 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           : [...state.stickers, critter.sticker.id],
         battle: null,
       };
-    else if (next.phase === "run")
+    else if (next.phase === "run") {
+      const roaming = state.roamers[next.critterId];
+      if (roaming === undefined)
+        return {
+          ...nextBase,
+          player: { ...next.entry },
+          facing:
+            state.facing === "up"
+              ? "down"
+              : state.facing === "down"
+                ? "up"
+                : state.facing === "left"
+                  ? "right"
+                  : "left",
+          battle: null,
+        };
       return {
         ...nextBase,
         player: { ...next.entry },
@@ -670,7 +813,18 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
                 ? "right"
                 : "left",
         battle: null,
+        roamers: {
+          ...state.roamers,
+          [next.critterId]: {
+            ...roaming,
+            x: roaming.home.x,
+            y: roaming.home.y,
+            cooldownTicks: world.tunables.roam.cooldownTicks,
+            target: { ...roaming.home },
+          },
+        },
       };
+    }
     else if (next.phase === "rest")
       next = { ...next, phase: "rest", phaseTicks: next.phaseTicks };
     if (
@@ -1301,6 +1455,7 @@ function stepTick(
   if (state.transition !== null) {
     const transition = state.transition;
     const elapsed = transition.elapsed + 1;
+    const held = moveDirection(input.move);
     const limit = world.tunables.doorFadeTicks;
     if (transition.phase === "out" && elapsed >= limit) {
       const targetArea = world.areas[transition.target.area];
@@ -1324,6 +1479,8 @@ function stepTick(
             state.party.map((member) => member.id),
           ),
           safeSpot: { area: targetArea.id, spawn: transition.target.spawn },
+          roamers: roamerFor(targetArea),
+          backLink: held === undefined ? undefined : { area: state.area, direction: held },
         },
         events: [],
       };
@@ -1338,6 +1495,7 @@ function stepTick(
           transition.phase === "in" && elapsed >= limit
             ? null
             : { ...transition, elapsed },
+        backLink: state.backLink?.direction === held ? state.backLink : undefined,
       },
       events: [],
     };
@@ -1388,6 +1546,24 @@ function stepTick(
   const displacement = Math.sqrt(
     displacementX * displacementX + displacementY * displacementY,
   );
+  const movedRoamers = updateRoamers(
+    world,
+    state,
+    area,
+    player,
+    true,
+  );
+  const roamerEntry = area.critters.find((item) => {
+    const old = state.roamers[item.id];
+    const next = movedRoamers.roamers[item.id];
+    const content = world.critters[item.id];
+    if (old === undefined || next === undefined || content === undefined ||
+        state.critters[item.id] !== "chaos" || next.cooldownTicks > 0)
+      return false;
+    const touch = content.touchRadius;
+    return distance(state.player, old) > touch &&
+      distance(player, next) <= touch;
+  });
   let facing = state.facing;
   if (Math.abs(input.move.x) >= Math.abs(input.move.y) && input.move.x !== 0)
     facing = input.move.x < 0 ? "left" : "right";
@@ -1397,10 +1573,17 @@ function stepTick(
     if (input[button] && !state.previousInput[button])
       events.push({ type: "button", button });
   }
+  // The back-link rule (spec 6): after Fae arrives through a door, the way
+  // straight back to where she came from stays shut while she keeps holding
+  // the direction she arrived holding; letting go or turning opens it again.
+  const backLink = state.backLink?.direction === moveDirection(input.move)
+    ? state.backLink
+    : undefined;
   const trigger = area.triggers.find(
     (item) =>
       !pointInPolygon(state.player, item.polygon) &&
-      pointInPolygon(player, item.polygon),
+      pointInPolygon(player, item.polygon) &&
+      item.target.area !== backLink?.area,
   );
   // A door that needs a story variable (spec 6): while the variable isn't
   // true, crossing in plays its knot instead of leaving. Fae still steps into
@@ -1432,8 +1615,10 @@ function stepTick(
       distance(player, item.point) <=
         (world.critters[item.id]?.touchRadius ?? 0),
   );
-  if (critterEntry !== undefined) {
-    const critter = world.critters[critterEntry.id];
+  if (roamerEntry !== undefined || critterEntry !== undefined) {
+    const entry = roamerEntry ?? critterEntry;
+    if (entry === undefined) return { state, events };
+    const critter = world.critters[entry.id];
     if (critter !== undefined) {
       const battle: Battle = {
         critterId: critter.id,
@@ -1453,11 +1638,24 @@ function stepTick(
         aimTick: 0,
         phaseTicks: 0,
       };
+      const battleRoamers: Record<string, Roamer> = { ...movedRoamers.roamers };
+      if (roamerEntry !== undefined) {
+        const roaming = battleRoamers[roamerEntry.id];
+        if (roaming !== undefined)
+          battleRoamers[roamerEntry.id] = {
+            ...roaming,
+            cooldownTicks: world.tunables.roam.cooldownTicks,
+            target: { ...roaming.home },
+          };
+      }
       return {
         state: {
           ...state,
           tick: state.tick + 1,
           previousInput: { ...input },
+          ...(roamerEntry === undefined ? {} : { player }),
+          roamers: battleRoamers,
+          rng: movedRoamers.rng,
           battle,
           motion: { ...state.motion, moving: false },
         },
@@ -1489,6 +1687,9 @@ function stepTick(
           ? state.dialogue
           : dialogueState(knock.knot, knock.result),
       party,
+      roamers: movedRoamers.roamers,
+      rng: movedRoamers.rng,
+      backLink,
     };
   return { state: nextState, events };
 }
@@ -1499,7 +1700,20 @@ export function step(
   input: ActionFrame,
 ): { state: State; events: Event[] } {
   const result = stepTick(world, state, input);
-  return { ...result, state: joinReady(world, result.state) };
+  const ended = state.battle !== null && result.state.battle === null;
+  const id = state.battle?.critterId ?? "";
+  const roamer = ended ? result.state.roamers[id] : undefined;
+  let next = result.state;
+  if (roamer !== undefined) {
+    const roamers: Record<string, Roamer> = { ...result.state.roamers };
+    roamers[id] = {
+      ...roamer,
+      cooldownTicks: world.tunables.roam.cooldownTicks,
+      target: { ...roamer.home },
+    };
+    next = { ...result.state, roamers };
+  }
+  return { ...result, state: joinReady(world, next) };
 }
 
 export function stableHash(value: unknown): string {

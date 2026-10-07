@@ -197,8 +197,8 @@ describe("Bubblegum Bay follows its painting", () => {
           .toBe(false);
   });
 
-  it("has one way in, from the plaza", () => {
-    expect(Object.keys(bay.spawns)).toEqual(["plaza-road"]);
+  it("has two ways in: from the plaza and from the Cliffside Trail", () => {
+    expect(Object.keys(bay.spawns)).toEqual(["plaza-road", "trail"]);
   });
 
   it("lets Fae reach the whole beach, the dock's end, Sue, the bluebird, and every sign", () => {

@@ -1006,7 +1006,33 @@
       "baseline": 925
     }
   ],
-  "triggers": [],
+  "triggers": [
+    {
+      "id": "trail",
+      "polygon": [
+        [
+          1470,
+          795
+        ],
+        [
+          1530,
+          795
+        ],
+        [
+          1530,
+          885
+        ],
+        [
+          1470,
+          885
+        ]
+      ],
+      "target": {
+        "area": "trail",
+        "spawn": "pass"
+      }
+    }
+  ],
   "interactables": [
     {
       "id": "pass-bus-stop",
@@ -1052,6 +1078,15 @@
         "y": 455
       },
       "prompt": "Look"
+    },
+    {
+      "id": "pass-trail-sign",
+      "knot": "pass_trail_sign",
+      "point": {
+        "x": 1260,
+        "y": 765
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {
@@ -1059,6 +1094,11 @@
       "x": 930,
       "y": 1015,
       "facing": "up"
+    },
+    "trail": {
+      "x": 1420,
+      "y": 840,
+      "facing": "left"
     }
   },
   "critters": [],

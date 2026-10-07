@@ -27,6 +27,13 @@ export type Tunables = {
   doorFadeTicks: number;
   follow: FollowTunables;
   interact: { range: number; revealPerTick: number };
+  roam: {
+    wanderSpeed: number;
+    chaseSpeed: number;
+    sight: number;
+    cooldownTicks: number;
+    pauseTicks: number;
+  };
 };
 // A feet-anchored body box (spec 5): `width` centred on the feet, `height`
 // rising from them. Visibility between a follower and its leader is measured
@@ -56,7 +63,7 @@ export type Area = {
     point: Point;
     prompt: "Look" | "Talk";
   }[];
-  critters: { id: string; point: Point }[];
+  critters: { id: string; point: Point; roam?: { radius: number } }[];
   // People standing in the area (spec 6): drawn with their own atlas, talked
   // to like an interactable, and turned toward Fae while she talks to them.
   // Their footprint is an authored blocker.
@@ -290,9 +297,21 @@ export type State = {
     travel?: { area: string; spawn: string };
   } | null;
   critters: Record<string, "chaos" | "calm">;
+  roamers: Record<string, Roamer>;
   stickers: string[];
   safeSpot: { area: string; spawn: string };
   battle: Battle | null;
   journalOpen: boolean;
+  backLink?: { area: string; direction: Direction };
+};
+export type Roamer = {
+  x: number;
+  y: number;
+  home: Point;
+  target: Point;
+  pauseTicks: number;
+  cooldownTicks: number;
+  facing: Direction;
+  moving: boolean;
 };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

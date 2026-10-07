@@ -1,0 +1,112 @@
+{
+  "cutouts": [
+    {
+      "id": "pines-top",
+      "file": "pines-top.webp",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "rocks-top",
+      "file": "rocks-top.webp",
+      "x": 460,
+      "y": 70
+    },
+    {
+      "id": "pines-left",
+      "file": "pines-left.webp",
+      "x": 0,
+      "y": 230
+    },
+    {
+      "id": "boulders-left",
+      "file": "boulders-left.webp",
+      "x": 230,
+      "y": 470
+    },
+    {
+      "id": "rock-meadow-top",
+      "file": "rock-meadow-top.webp",
+      "x": 835,
+      "y": 315
+    },
+    {
+      "id": "rock-path",
+      "file": "rock-path.webp",
+      "x": 665,
+      "y": 545
+    },
+    {
+      "id": "signpost",
+      "file": "signpost.webp",
+      "x": 890,
+      "y": 450
+    },
+    {
+      "id": "pines-hill",
+      "file": "pines-hill.webp",
+      "x": 1010,
+      "y": 200
+    },
+    {
+      "id": "bench",
+      "file": "bench.webp",
+      "x": 1480,
+      "y": 380
+    },
+    {
+      "id": "rock-lookout",
+      "file": "rock-lookout.webp",
+      "x": 1385,
+      "y": 375
+    },
+    {
+      "id": "bridge-rail-1",
+      "file": "bridge-rail-1.webp",
+      "x": 1238,
+      "y": 553
+    },
+    {
+      "id": "bridge-rail-2",
+      "file": "bridge-rail-2.webp",
+      "x": 1263,
+      "y": 541
+    },
+    {
+      "id": "bridge-rail-3",
+      "file": "bridge-rail-3.webp",
+      "x": 1288,
+      "y": 528
+    },
+    {
+      "id": "bridge-rail-4",
+      "file": "bridge-rail-4.webp",
+      "x": 1313,
+      "y": 514
+    },
+    {
+      "id": "rock-ferns",
+      "file": "rock-ferns.webp",
+      "x": 1060,
+      "y": 665
+    },
+    {
+      "id": "grass-beach",
+      "file": "grass-beach.webp",
+      "x": 1560,
+      "y": 760
+    },
+    {
+      "id": "grass-bottom",
+      "file": "grass-bottom.webp",
+      "x": 965,
+      "y": 920
+    },
+    {
+      "id": "pines-bottom",
+      "file": "pines-bottom.webp",
+      "x": 0,
+      "y": 600
+    }
+  ]
+}

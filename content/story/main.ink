@@ -52,6 +52,7 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! # speaker: Fae}
 {rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The raccoon must be up here somewhere. # speaker: Fae}
 {calmed("bluebird") and not rode_bus: The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! # speaker: Fae}
 {calmed("bluebird"): The Bay Bluebird says the raccoon zipped off toward the mountains. # speaker: Fae}
@@ -209,6 +210,45 @@ The bus is ready to roll back to Cloverhollow. # speaker: Fae
 
 === pass_sign ===
 PINECONE PASS. Trails, sledding, and the best cocoa in the mountains! # speaker: Sign
+-> DONE
+
+=== bay_cliff_path ===
+A sandy path climbs the cliffs, way up toward the mountains. # speaker: Fae
+That's a long walk, and I don't know where it goes yet. # speaker: Fae
+-> DONE
+
+=== trail_signpost ===
+CLIFFSIDE TRAIL. Up: Pinecone Pass. Down: Bubblegum Bay. # speaker: Sign
+Over the bridge: the lookout! # speaker: Sign
+-> DONE
+
+=== pass_trail_sign ===
+CLIFFSIDE TRAIL. Down the mountain to Bubblegum Bay. # speaker: Sign
+-> DONE
+
+=== lookout_bench ===
+What a view! The sea sparkles all the way to the sky. # speaker: Fae
+I can see Sue's dock way down there. It looks tiny! # speaker: Fae
+-> DONE
+
+=== bunny_calm ===
+{bunny_calm > 1: -> again}
+Thank you! I was hopping in circles all morning. # speaker: Ribbon Bunny
+A raccoon in a purple hood zipped by, and everything went all fizzy! # speaker: Ribbon Bunny
+That raccoon again! # speaker: Fae
+-> DONE
+= again
+The clover up here is extra sweet. Want some? # speaker: Ribbon Bunny
+-> DONE
+
+=== squirrel_calm ===
+{squirrel_calm > 1: -> again}
+Phew! Sorry about all the acorns. # speaker: Acorn Squirrel
+A raccoon traded me a shiny bottle cap for my best acorn. # speaker: Acorn Squirrel
+Then, fizz! I couldn't stop throwing things. # speaker: Acorn Squirrel
+-> DONE
+= again
+I'm saving my acorns for winter now. Nobody gets bonked! # speaker: Acorn Squirrel
 -> DONE
 
 === snowman ===

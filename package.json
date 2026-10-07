@@ -6,7 +6,7 @@
     "dev": "vite --strictPort",
     "typecheck": "tsc --noEmit",
     "unit": "vitest run",
-    "sim": "bun tools/sim/run-all.ts && bun tools/sim/party-chain.ts && bun tools/sim/sue-join.ts",
+    "sim": "bun tools/sim/run-all.ts && bun tools/sim/party-chain.ts && bun tools/sim/sue-join.ts && bun tools/sim/roam.ts",
     "sim:one": "bun tools/sim/run.ts",
     "purity": "bun tools/purity.ts",
     "ink:check": "bun tools/ink/compile.ts --check",

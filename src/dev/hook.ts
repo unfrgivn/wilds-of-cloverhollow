@@ -33,7 +33,7 @@ export type CloverhollowHook = {
       choices: string[];
       selected: number;
     };
-    critters: { id: string; frame: string }[];
+    critters: { id: string; frame: string; x: number; y: number }[];
     npcs: { id: string; frame: string; facing: string }[];
     canopies: { id: string; alpha: number }[];
     battle: {

@@ -25,7 +25,8 @@ describe("chapter one", () => {
     expect(state.area).toBe("park");
     expect(state.battle).toBeNull();
     expect(state.dialogue).toBeNull();
-    expect(state.critters).toEqual({ frog: "calm", pup: "calm", bluebird: "chaos" });
+    expect(state.critters)
+      .toEqual({ frog: "calm", pup: "calm", bluebird: "chaos", bunny: "chaos", squirrel: "chaos" });
     expect(state.stickers).toEqual(["fountain-frog", "pond-pup"]);
     expect({
       plan: story("plan"),

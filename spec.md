@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-06 (Milestone 19, Bubblegum Bay)
+Last updated: 2026-10-07 (Milestone 21, Cliffside Trail)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -267,7 +267,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `walkable` floor polygon, `blockers` (furniture footprints on the floor
   plane), `occluders` (`{ id, polygon, baseline, canopy? }`), named `spawns`
   (`{ x, y, facing }`), and optional `ground` (the folder of its painting).
-  Doors arrive in Milestone 6 and interactables in Milestone 8.
+  Doors arrive in Milestone 6 and interactables in Milestone 8. An area
+  critter may add `roam: { radius }`; its authored point is home and
+  `state.roamers` holds its current position.
 - Player collider: a circle of radius 20 units at the feet that slides along
   blockers.
 - `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
@@ -327,6 +329,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   footprint and a `Look` prompt. The pass stop returns to `plaza.bus-stop`.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
+- Cliffside Trail (Milestone 21): the first trail between lands, a painted
+  1750x1100 area climbing from Bubblegum Bay's south beach to Pinecone Pass's
+  east path; its floor, blockers, and occluders are written by
+  `tools/art/geometry/trail.ts`. Its ways in and out are thin triggers on the
+  floor's outer edges: the pass's east edge to the trail's west edge
+  (`trail.pass`, facing right) and back (`pass.trail`, facing left); the bay's
+  south edge to the trail's beach (`trail.bay`, facing up) and back
+  (`bay.trail`, facing up). The bay's way requires `rode_bus` (knot
+  `bay_cliff_path` while it's false). Look points: `trail-signpost`,
+  `lookout-bench`, and the pass's `pass-trail-sign`. A fizzy bunny roams the
+  upper meadow and a fizzy squirrel the lower one (section 8).
+- The back-link rule: after Fae arrives through a door, the trigger that leads
+  straight back to the area she came from doesn't fire while she keeps holding
+  the direction she was walking when she left (`state.backLink`); letting go
+  or turning re-arms it. Earlier links all keep her direction, so it matters
+  only where a link turns her round (the bay's south edge and the trail's
+  beach), where a kid holding down would otherwise bounce between them.
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
   visibleWhile? }` (Ms. Maple the teacher and Nurse Holly in the school
   hallway; Mom and Oliver in the kitchen; the raccoon in the plaza). Each is
@@ -505,7 +524,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   (Soothe, Snack, Run) and the Snack `×N` template live in
   `content/battle.json`; each friend's label and resting detail live in its
   `content/party/` entry. State adds `critters` (chaos or calm), `stickers`,
-  `safeSpot`, and a nullable `battle`.
+  `safeSpot`, `roamers`, and a nullable `battle`.
 - Start: crossing into a chaos critter's touch circle (outside on the previous
   tick, inside now; exactly on the radius counts as inside) starts a battle and
   records `battle.entry`, Fae's position on the tick before. A calm critter
@@ -549,6 +568,15 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Overworld: each critter is drawn at its point, y-sorted with the characters
   and occluders, its figure `overworldHeight` units tall: chaos with its aura
   pulsing and turning behind it, calm without.
+- A roamer is drawn, sorted, and collided at its current position. While Fae is
+  free it wanders to seeded random points inside its home radius, pausing for
+  45 ticks, or chases a chaos Fae within 180 units at 2.5 units per tick.
+  Wandering is 1.25 units per tick, deliberately slower than Fae's 4 units per
+  tick. A chaser gives up beyond home plus twice sight. It stays on the floor
+  with the 12-unit follow radius. Dialogue, battles, transitions, and the
+  journal freeze it. Touch is an outside-to-inside crossing by either mover;
+  Run gives that roamer a 240-tick cooldown and sends it homeward, while rest
+  resets it on safe-spot arrival.
 - Critters are generic entries in `content/critters/<id>.json`. Each entry owns
   its atlas, battle content, sticker, and measured `auraCentre` and
   `bodyCentre` frame-pixel centroids. Runtime atlases use `<id>-sheet`, aura
@@ -581,7 +609,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   backdrop rect, the ring, the battle's critter (`{ id, frame }`), the aura
   alpha, and whether the
   overworld is visible; `renderInfo().critters` lists each overworld critter's
-  frame.
+  frame and current `{ x, y }`.
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
@@ -794,10 +822,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   for Milestones 9 to 15 (the frog's and pup's calm lines, the journal notes,
   Mom and Oliver, the hall-pass puzzle, the raccoon and the tree house).
   "Ms. Maple" stays as the teacher's name for now.
-- Waiting for the owner's review (Milestones 17 to 19, and art drawn ahead):
+- Waiting for the owner's review (Milestones 17 to 21, and art drawn ahead):
   Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay
   painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass
-  painting, and the hamster hiker (`docs/review-queue.md`).
+  painting, the hamster hiker, the bus stop, the Cliffside Trail painting, the
+  bunny and the squirrel, and the blacklight lantern and its glows
+  (`docs/review-queue.md`).
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

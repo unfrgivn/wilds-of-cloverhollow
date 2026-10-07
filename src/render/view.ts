@@ -98,7 +98,7 @@ export class GameView {
   private partyFrames: { id: string; animation: string; frame: number }[] = [];
   private readonly areaTextureUrls = new Set<string>();
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
-  private critterFrames: { id: string; frame: string }[] = [];
+  private critterFrames: { id: string; frame: string; x: number; y: number }[] = [];
   private npcSprites: { npc: Area["npcs"][number]; sprite: Sprite }[] = [];
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
 
@@ -442,9 +442,11 @@ export class GameView {
   // with Fae, her party, and the occluders, their figures overworldHeight tall.
   private renderCritters(state: State): void {
     const area = this.areaView?.area;
-    const frames: { id: string; frame: string }[] = [];
+    const frames: { id: string; frame: string; x: number; y: number }[] = [];
     for (const { id, body, aura } of this.critterSprites) {
-      const point = area?.critters.find((item) => item.id === id)?.point;
+      const authored = area?.critters.find((item) => item.id === id);
+      const roamer = state.roamers[id];
+      const point = roamer === undefined ? authored?.point : { x: roamer.x, y: roamer.y };
       const content = this.world.critters[id];
       const sheet = Assets.get<Spritesheet>(`${id}-sheet`);
       if (point === undefined || content === undefined || sheet === undefined)
@@ -458,15 +460,23 @@ export class GameView {
       body.texture = texture;
       body.anchor.set(0.5, 504 / 512);
       body.scale.set(scale);
-      body.position.set(point.x, point.y);
+      const bob = roamer?.moving === true ? Math.sin(state.tick / 4) * 3 : 0;
+      body.position.set(point.x, point.y + bob);
       body.zIndex = point.y;
+      if (roamer !== undefined) body.scale.x = roamer.facing === "right" ? -scale : scale;
       aura.visible = !calm;
       aura.texture = auraTexture;
-      placeAura(aura, point, scale, content.auraCentre, content.bodyCentre);
+      placeAura(
+        aura,
+        { x: point.x, y: point.y + bob },
+        scale,
+        content.auraCentre,
+        content.bodyCentre,
+      );
       aura.zIndex = point.y - 0.5;
       aura.alpha = 0.65 + Math.sin(state.tick / 18) * 0.2;
       aura.rotation = state.tick / 180;
-      frames.push({ id, frame });
+      frames.push({ id, frame, x: point.x, y: point.y });
     }
     this.critterFrames = frames;
   }
@@ -727,7 +737,7 @@ export class GameView {
       choices: string[];
       selected: number;
     };
-    critters: { id: string; frame: string }[];
+    critters: { id: string; frame: string; x: number; y: number }[];
     npcs: { id: string; frame: string; facing: string }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];

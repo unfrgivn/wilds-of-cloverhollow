@@ -400,6 +400,43 @@
       ],
       "journal": [
         "ev",
+        "str",
+        "^bunny",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "str",
+        "^squirrel",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         {
           "VAR?": "rode_bus"
         },
@@ -415,7 +452,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.19"
               },
               null
             ]
@@ -449,7 +486,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.17"
+                "->": ".^.^.^.32"
               },
               null
             ]
@@ -478,7 +515,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.27"
+                "->": ".^.^.^.42"
               },
               null
             ]
@@ -503,7 +540,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.34"
+                "->": ".^.^.^.49"
               },
               null
             ]
@@ -528,7 +565,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.41"
+                "->": ".^.^.^.56"
               },
               null
             ]
@@ -558,7 +595,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
+                "->": ".^.^.^.66"
               },
               null
             ]
@@ -588,7 +625,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.61"
+                "->": ".^.^.^.76"
               },
               null
             ]
@@ -613,7 +650,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.68"
+                "->": ".^.^.^.83"
               },
               null
             ]
@@ -642,7 +679,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.78"
+                "->": ".^.^.^.93"
               },
               null
             ]
@@ -680,7 +717,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.94"
+                "->": ".^.^.^.109"
               },
               null
             ]
@@ -709,7 +746,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.104"
+                "->": ".^.^.^.119"
               },
               null
             ]
@@ -734,7 +771,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.111"
+                "->": ".^.^.^.126"
               },
               null
             ]
@@ -763,7 +800,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.122"
+                "->": ".^.^.^.137"
               },
               null
             ]
@@ -792,7 +829,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.133"
+                "->": ".^.^.^.148"
               },
               null
             ]
@@ -1623,6 +1660,171 @@
         "\n",
         "done",
         null
+      ],
+      "bay_cliff_path": [
+        "^A sandy path climbs the cliffs, way up toward the mountains. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^That's a long walk, and I don't know where it goes yet. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "trail_signpost": [
+        "^CLIFFSIDE TRAIL. Up: Pinecone Pass. Down: Bubblegum Bay. ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "^Over the bridge: the lookout! ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "pass_trail_sign": [
+        "^CLIFFSIDE TRAIL. Down the mountain to Bubblegum Bay. ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "lookout_bench": [
+        "^What a view! The sea sparkles all the way to the sky. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^I can see Sue's dock way down there. It looks tiny! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "bunny_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Thank you! I was hopping in circles all morning. ",
+        "#",
+        "^speaker: Ribbon Bunny",
+        "/#",
+        "\n",
+        "^A raccoon in a purple hood zipped by, and everything went all fizzy! ",
+        "#",
+        "^speaker: Ribbon Bunny",
+        "/#",
+        "\n",
+        "^That raccoon again! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The clover up here is extra sweet. Want some? ",
+            "#",
+            "^speaker: Ribbon Bunny",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "squirrel_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Phew! Sorry about all the acorns. ",
+        "#",
+        "^speaker: Acorn Squirrel",
+        "/#",
+        "\n",
+        "^A raccoon traded me a shiny bottle cap for my best acorn. ",
+        "#",
+        "^speaker: Acorn Squirrel",
+        "/#",
+        "\n",
+        "^Then, fizz! I couldn't stop throwing things. ",
+        "#",
+        "^speaker: Acorn Squirrel",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^I'm saving my acorns for winter now. Nobody gets bonked! ",
+            "#",
+            "^speaker: Acorn Squirrel",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
       ],
       "snowman": [
         "^The snowman has a carrot nose and a very serious pebble smile. ",

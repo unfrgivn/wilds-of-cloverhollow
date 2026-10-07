@@ -79,6 +79,11 @@ bun tools/art/validate-sprite.ts \
   --json public/assets/characters/fae/fae.json
 ```
 
+Glows (light, not paint: blacklight ink, sparkles) are painted glowing on pure
+black and lifted with `bun tools/art/black-to-alpha.ts`, the counterpart of
+`white-to-alpha.ts`: alpha is a pixel's brightest channel and its colour is
+unpremultiplied, so the glow looks as painted when drawn over the scene.
+
 The API script sends the key only as `x-goog-api-key`, never logs it, and appends
 one JSON line to `art/scratch/generation-log.jsonl` for every call, including
 failed calls. The log always lives in the main checkout, even when the script

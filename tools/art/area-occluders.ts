@@ -66,15 +66,17 @@ for (const item of area.occluders) {
   const maxY = Math.ceil(Math.max(...ys));
   const width = maxX - minX;
   const height = maxY - minY;
-  const relative = points.map(([x, y]) => `${x - minX},${y - minY}`).join(" L ");
-  const mask = join(scratch, `${item.id}.svg`);
+  // The mask is the outline in white on black, its brightness made its alpha:
+  // the cut-out keeps only the painted thing, so it hides Fae only where the
+  // outline says it does. (The old SVG mask came out opaque, so every cut-out
+  // was its whole bounding box.)
+  const relative = points.map(([x, y]) => `${x - minX},${y - minY}`).join(" ");
   const output = `${item.id}.webp`;
-  writeFileSync(mask,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
-    `<path fill="white" d="M ${relative} Z"/></svg>`);
   const command = ["magick", assembled,
     "-crop", `${width}x${height}+${minX}+${minY}`, "+repage", "-alpha", "set",
-    mask, "-compose", "CopyOpacity", "-composite",
+    "(", "-size", `${width}x${height}`, "xc:black", "-fill", "white",
+    "-draw", `polygon ${relative}`, "-alpha", "copy", ")",
+    "-compose", "CopyAlpha", "-composite",
     "-define", "webp:lossless=true", join(directory, output)];
   const result = Bun.spawnSync(command, { stdout: "pipe", stderr: "pipe" });
   if (result.exitCode !== 0)

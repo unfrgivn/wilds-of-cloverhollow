@@ -382,7 +382,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   point must be reachable within the interaction range.
 - Occluders: lossless cutouts of tall furniture, generated from the painting
   by `tools/art/area-occluders.ts` into the area's asset folder
-  (`occluders.json` lists their unit offsets). An occluder draws over Fae while
+  (`occluders.json` lists their unit offsets). Each is the painting inside its
+  outline and transparent outside it, so it covers characters only where the
+  outline says it does. An occluder draws over Fae while
   her feet are above (north of) its baseline. Workflow:
   `docs/art/area-authoring.md`.
 - Canopies: an occluder with `canopy: true` is a tree Fae can walk under (a

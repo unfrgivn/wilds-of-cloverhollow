@@ -1,0 +1,58 @@
+{
+  "asset": "blacklight-lantern-and-glows",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image for the glow source paintings",
+  "generationCalls": "8 total calls for this asset; the final 3 were black-background replacements",
+  "generationCallDetails": [
+    "White-background paw study 1, rejected: four prints in a diamond.",
+    "White-background ink note, replaced in this revision.",
+    "White-background trail marker, replaced in this revision.",
+    "White-background paw study 2, rejected after review.",
+    "White-background paw study 3, replaced in this revision.",
+    "Black-background paw replacement, selected: three filled five-toed prints.",
+    "Black-background ink-note replacement, selected: masked raccoon doodle.",
+    "Black-background trail-marker replacement, selected: filled brushy arrow."
+  ],
+  "references": [
+    "docs/art/concepts/props/blacklight_lantern.png",
+    "docs/art/style-bible.md",
+    "docs/art/pipeline.md",
+    "docs/art/critters.md"
+  ],
+  "selectedRawSources": [
+    "art/source/lantern/lantern-raw.png",
+    "art/source/lantern/paw-prints-raw.png",
+    "art/source/lantern/ink-note-raw.png",
+    "art/source/lantern/trail-marker-raw.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-lantern.ts",
+    "lantern": [
+      "Split the owner concept and paint out its label before extraction.",
+      "Flood-fill the cream paper from the border with a white matte.",
+      "Key the matte with tools/art/key-alpha.ts at 8% fuzz, with no despill.",
+      "Trim, fit within 232x232, centre on 256x256, and threshold the alpha matte.",
+      "Ship one solid lantern frame; active lighting is rendered by the game."
+    ],
+    "glows": [
+      "Generate each decal as bold filled violet/lavender fluorescent watercolor on pure black.",
+      "Lift each source with tools/art/black-to-alpha.ts, using brightness as alpha.",
+      "Trim, scale within the requested approximate size, and add an 8px border.",
+      "Pack variable-size trimmed frames horizontally into glows.png with alpha preserved."
+    ],
+    "keying": "Lantern uses an opaque white-paper matte. Glows use black-to-alpha because they are light painted on black."
+  },
+  "measuredSizes": {
+    "lanternSource": "704x768 each",
+    "lanternAtlas": "256x256, one 256x256 frame",
+    "glowsAtlas": "530x176",
+    "paw_prints": "238x176 including 8px border",
+    "ink_note": "156x146 including 8px border",
+    "trail_marker": "136x171 including 8px border"
+  },
+  "review": {
+    "lanternSheet": "art/review/lantern-sheet.png",
+    "glowsOnPass": "art/review/glows-on-pass.png",
+    "notes": "The lantern is opaque and reads on both cream and dark backgrounds. The shipped glow atlas was reviewed directly over dark and in the Pinecone Pass composite; paw prints read as three filled raccoon handprints, the note as a masked raccoon doodle, and the marker as a filled brushy arrow with a star tail."
+  }
+}

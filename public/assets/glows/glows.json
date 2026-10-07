@@ -1,0 +1,83 @@
+{
+  "frames": {
+    "paw_prints": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 238,
+        "h": 176
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 238,
+        "h": 176
+      },
+      "sourceSize": {
+        "width": 238,
+        "height": 176
+      }
+    },
+    "ink_note": {
+      "frame": {
+        "x": 238,
+        "y": 0,
+        "w": 156,
+        "h": 146
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 156,
+        "h": 146
+      },
+      "sourceSize": {
+        "width": 156,
+        "height": 146
+      }
+    },
+    "trail_marker": {
+      "frame": {
+        "x": 394,
+        "y": 0,
+        "w": 136,
+        "h": 171
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 136,
+        "h": 171
+      },
+      "sourceSize": {
+        "width": 136,
+        "height": 171
+      }
+    }
+  },
+  "animations": {
+    "paw_prints": [
+      "paw_prints"
+    ],
+    "ink_note": [
+      "ink_note"
+    ],
+    "trail_marker": [
+      "trail_marker"
+    ]
+  },
+  "meta": {
+    "image": "glows.png",
+    "size": {
+      "w": 530,
+      "h": 176
+    },
+    "scale": "1"
+  }
+}

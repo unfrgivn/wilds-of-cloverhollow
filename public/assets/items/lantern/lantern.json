@@ -1,0 +1,41 @@
+{
+  "frames": {
+    "lantern": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "animations": {
+    "lantern": [
+      "lantern"
+    ]
+  },
+  "meta": {
+    "image": "lantern.png",
+    "size": {
+      "w": 256,
+      "h": 256
+    },
+    "scale": "1"
+  }
+}

@@ -23,12 +23,16 @@ export function createStateLogger(world: World): (state: State) => void {
     const movementChanged = previousMoving !== state.motion.moving ||
       previousTarget !== target;
     const journalChanged = previous !== undefined && previous.journalOpen !== state.journalOpen;
+    // A door fade: the area switches while the screen is faded out, so native
+    // tests wait for `fading: false` before they screenshot an arrival.
+    const fadeChanged = previous !== undefined &&
+      (previous.transition === null) !== (state.transition === null);
     if (
       first ||
       areaChanged ||
       facingChanged ||
       (positionChanged && now - lastPositionLog >= 250) || dialogueChanged ||
-      movementChanged || journalChanged
+      movementChanged || journalChanged || fadeChanged
     ) {
       console.log(
         `[cloverhollow] state ${JSON.stringify({
@@ -40,6 +44,7 @@ export function createStateLogger(world: World): (state: State) => void {
           moving: state.motion.moving,
           target,
           journal: state.journalOpen,
+          fading: state.transition !== null,
         })}`,
       );
       lastPositionLog = now;

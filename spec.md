@@ -147,8 +147,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   overlap the action buttons. Chromium and desktop WebKit are both Playwright
   projects; WebKit has a dedicated 874x402 layout assertion.
 - Harness and development builds emit `[cloverhollow]` JSON log lines:
-  `state` (tick, area, x, y, facing, moving, and the targeted interactable)
-  on the initial state, area, facing, movement, and target changes, and
+  `state` (tick, area, x, y, facing, moving, the targeted interactable,
+  whether the journal is open, and `fading` during a door fade) on the initial
+  state, area, facing, movement, target, journal, and fade changes, and
   position changes at most four times per second; `dialogue` (open, speaker,
   text) on every line change; `dialogue-box` (the box's rect after it paints);
   `layout` (the confirm, cancel, and menu rects, once); and `pointer` (each
@@ -165,7 +166,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   retried once; AXe's transient simulator errors are retried. It stores the
   console transcript and screenshots under `$TMPDIR`, with no OCR or
   fabricated state. If AXe keeps reporting that it cannot determine the
-  simulator's rotation, reboot the simulator.
+  simulator's rotation, reboot the simulator. Under heavy load (a concurrent
+  Playwright run) AXe's coordinate probe fails ("Unable to determine
+  coordinate mapping"), so run it on a quiet machine. Arrival screenshots wait
+  for the latest state line to be in the new area with `fading: false`; an
+  earlier version shot the plaza while the door fade still covered it.
 
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to

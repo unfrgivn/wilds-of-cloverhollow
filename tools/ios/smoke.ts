@@ -21,6 +21,7 @@ type State = {
   moving: boolean;
   target: string | null;
   journal: boolean;
+  fading: boolean;
 };
 type Layout = { confirm: Box | null; cancel: Box | null; menu: Box | null };
 type Box = { x: number; y: number; width: number; height: number };
@@ -135,6 +136,7 @@ function parseStates(line: string): State[] {
         facing: parsed.facing,
         moving: parsed.moving,
         journal: "journal" in parsed && parsed.journal === true,
+        fading: "fading" in parsed && parsed.fading === true,
         target: parsed.target,
       },
     ];
@@ -257,6 +259,15 @@ async function consume(
   } finally {
     reader.releaseLock();
   }
+}
+
+// The latest state line is in `area`, with its door fade finished: before
+// that, the screen is still faded out and drags are ignored.
+function arrived(area: string): (items: State[]) => boolean {
+  return (items) => {
+    const last = items.at(-1);
+    return last !== undefined && last.area === area && !last.fading;
+  };
 }
 
 async function waitFor<T>(
@@ -627,10 +638,7 @@ async function main(): Promise<void> {
     // right. Right to the sofa's left edge (it stops her at x 660), up past
     // Mom's corner to y 510, then right to the front door. Right and up drags
     // only; leftward drags can release late.
-    await waitFor(states, (items) =>
-      items.some((item) => item.area === "kitchen"),
-    );
-    await Bun.sleep(800);
+    await waitFor(states, arrived("kitchen"));
     const kitchenScreenshot = join(directory, "kitchen.png");
     execFileSync("xcrun", [
       "simctl",
@@ -657,9 +665,7 @@ async function main(): Promise<void> {
       "through the front door",
       "x",
     );
-    await waitFor(states, (items) =>
-      items.some((item) => item.area === "plaza"),
-    );
+    await waitFor(states, arrived("plaza"));
     const plaza = states.find((item) => item.area === "plaza");
     if (plaza === undefined) throw new Error("Plaza state line disappeared");
     const plazaScreenshot = join(directory, "plaza.png");
@@ -749,9 +755,7 @@ async function main(): Promise<void> {
       "into Meadow Park",
       "y",
     );
-    await waitFor(states, (items) =>
-      items.some((item) => item.area === "park"),
-    );
+    await waitFor(states, arrived("park"));
     const parkScreenshot = join(directory, "park.png");
     execFileSync("xcrun", ["simctl", "io", udid, "screenshot", parkScreenshot]);
     await walkTo(
@@ -766,9 +770,7 @@ async function main(): Promise<void> {
       "out of Meadow Park",
       "y",
     );
-    await waitFor(states, (items) =>
-      items.some((item) => item.area === "plaza"),
-    );
+    await waitFor(states, arrived("plaza"));
     // Back to the frog from the right. A drag moves about 43 units, too coarse
     // to hold the 15-unit row between the lamp post (x 1075-1102, y 805-835)
     // and the flower box (top y 890), so every stop is pinned by something

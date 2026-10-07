@@ -718,15 +718,16 @@ more bad guys, and the blacklight lantern, made and built while away.
     coins; the cocoa stand and the bakery sell snacks; Fae carries snacks into
     battles instead of each critter granting its own.
     In progress (2026-10-07): branch `m27-coins`, worktree `.worktrees/m27`,
-    commit `dc5ba22`, unverified and not pushed. Done there: `coins` and
+    commit `bba8a6f`, unverified and not pushed. Done there: `coins` and
     `snacks` in state (save version 4), one-time coin rewards, `# buy:` tags
     with an Ink `coins()` external, the bakery and cocoa stand, the journal's
-    coins header, `tests/unit/coins.test.ts`. Missing: unit tests for every
-    rule (pay once, buy, never below 0, the snack supply in battle, the loader's
-    `buy:` check), a recorded replay (earn, buy at the bakery, use the snack),
-    a real-key bakery e2e, screenshots of the bakery choice, the journal
-    header, and the Snack button at both sizes, and green e2e runs (Chromium
-    had 10 failures, WebKit wasn't rerun).
+    coins header, and `tests/unit/coins.test.ts` (336 tests pass). Missing: a
+    recorded replay (earn, buy at the bakery, use the snack) in the hash list,
+    a real-key bakery-to-battle e2e, screenshots at both sizes of the bakery
+    choice, the journal header, and the Snack button, and a green `just e2e`
+    (its last run, Chromium only, had 10 failures: journal expectations were
+    then updated; the rest, in battle, bus, Jordan, title, and trail specs,
+    were called load and are unverified).
   - Milestone 28, the first person under the chaos spell (a mini-boss in
     town), with an interior from `arcade_interior.png`.
   - Then the clubhouse fix-up (a fridge for snacks, the garden), once coins

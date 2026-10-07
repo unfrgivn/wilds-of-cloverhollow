@@ -1,0 +1,60 @@
+{
+  "asset": "jordan",
+  "status": "generated-validator-passing",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 14,
+  "generationBreakdown": {
+    "successfulImageCalls": 14,
+    "successfulModels": [
+      "gemini-3-pro-image"
+    ],
+    "purposes": [
+      "model sheet v1 selected",
+      "front walk v1 selected, generated as a 2x3 sheet",
+      "side walk v1 selected, right-facing and flopped for shipped left",
+      "back walk strip A v1 rejected: three-quarter turns and off-centre backpack",
+      "back walk strip B v1 rejected: three-quarter turns and off-centre backpack",
+      "back-view crop correction strip A rejected: merged figures",
+      "back-view crop correction strip B rejected: inconsistent head width",
+      "back-view crop correction strip A rejected: head width mismatch",
+      "back-view crop correction strip B rejected: blocky style and head mismatch",
+      "back-view crop correction strip B rejected: head colour and width mismatch",
+      "back-view crop correction strip B selected after matching the approved strip reference",
+      "back-view crop correction strip B selected: matched approved strip and idle proportions"
+    ]
+  },
+  "referenceImages": [
+    "docs/art/concepts/characters/character_concept_sheet_jordan.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "prompts": {
+    "modelSheet": "Three isolated full-body Jordan views on pure magenta: front, back, and profile, with rust-orange beanie, messy brown hair, orange puffer vest, cream sweater, olive cargo pants, brown hiking boots, and holographic backpack with mountain, pine, tent, and compass stickers.",
+    "walkDown": "Six isolated head-on front walk poses, contact/down/passing twice, stable Jordan costume on pure magenta.",
+    "walkUp": "Regenerated after the first strips accidentally turned three-quarter: two three-frame strips from the isolated approved back-view crop, with square shoulders, centred backpack, no cheek or face, and only arms and legs alternating.",
+    "walkLeft": "Six isolated right-facing side-profile walk poses, contact/down/passing twice, stable Jordan costume on pure magenta; flopped for shipped left direction."
+  },
+  "selectedRawSources": [
+    "art/source/jordan/jordan-model-sheet-v1.png",
+    "art/source/jordan/jordan-walk-down-strip-v1.png",
+    "art/source/jordan/jordan-back-model-crop-v1.png",
+    "art/source/jordan/jordan-walk-up-strip-v4a.png",
+    "art/source/jordan/jordan-walk-up-strip-v6b.png",
+    "art/source/jordan/jordan-walk-left-strip-v1.png"
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-jordan.ts (extracts whole connected components and rebuilds the atlas)",
+    "extract": "extract-strip.ts with connected-component extraction; generated strips include one detached horizontal artifact component, which the deterministic builder extracts and skips before selecting the six or three figures",
+    "key": "#FF00FF border flood plus enclosed holes, 18% fuzz, edge-only despill over a 12 px alpha-edge band",
+    "canvas": "384x384, figure 280 px, baseline 375",
+    "atlas": "pack-atlas.ts, 5 columns, anchor {x: 0.5, y: 0.9765625}",
+    "side": "The side walk strip was generated facing right and its six extracted frames are flopped to face left. The model sheet side view is used as drawn for left_idle_01 because validate-sprite.ts confirms it faces left as drawn.",
+    "backWalk": "The original back walk was rejected because frames swivelled into three-quarter views, visibly shifting the backpack and exposing a cheek. The approved back-view crop was extracted from the model sheet, then used to regenerate two selected three-frame strips. Every shipped frame is straight-on with a centred backpack and only limb changes.",
+    "despill": "build-jordan.ts explicitly runs despill-edge.ts with magenta and band 12 after every postprocessed frame.",
+    "idle": "Down and up idles come from the model-sheet front and back views; left idle comes from the model-sheet side view as drawn."
+  },
+  "validator": {
+    "biped": true,
+    "key": "magenta"
+  },
+  "selectionReason": "The model sheet preserves Jordan's autumn costume and backpack details at the Sue/Fae scale. The replacement back strips specifically correct the prior three-quarter shoulder swivel: all six back-walk frames are square to camera, have no cheek or face, and keep the backpack centred. The final atlas passes all mandatory sprite checks after connected-component extraction, magenta keying, and edge-only despill."
+}

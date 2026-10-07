@@ -15,12 +15,7 @@ export function journalNotes(world: World, state: State): string[] {
     calmed,
   );
   for (let count = 0; count < 20; count += 1) {
-    if (
-      result.line !== null &&
-      (!result.line.text.startsWith("Purple fizz") ||
-        state.area === "park" ||
-        state.ink.includes("read_notice"))
-    )
+    if (result.line !== null)
       notes.push(result.line.text);
     if (result.ended) break;
     result = runInk(world.story, result.ink, { type: "next" }, calmed);

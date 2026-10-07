@@ -1604,6 +1604,10 @@
         {
           "VAR=": "club_open"
         },
+        false,
+        {
+          "VAR=": "sue_joined"
+        },
         "/ev",
         "end",
         null

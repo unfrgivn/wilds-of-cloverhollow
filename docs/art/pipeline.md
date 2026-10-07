@@ -92,7 +92,10 @@ omitted because the runtime mirrors the left set.
 `validate-sprite.ts` checks edges, connected components, key spill, key colour
 left in the sprite, baseline, exact animation names and counts with no unused
 or pixel-identical frames, walk area ratio at most 1.20, idle area ratio
-0.70-1.40, blockiness at most 0.08, and down/up walk mirror IoU at least 0.70.
+0.70-1.40, blockiness at most 0.08, down/up walk mirror IoU at least 0.70,
+and a side idle that faces the way the side walk does (its head-and-torso
+colours must differ from the walk frames at least 10% more when mirrored than
+as drawn; silhouettes can't tell, a bob and a backpack are nearly symmetric).
 Ink-aware hard-straight crop cuts are mandatory. The recipe's `validator`
 block can only describe the sprite, never switch a check off: `biped` (head
 checks), `idleOnly` and `directions` (an NPC's animation set), and `key`

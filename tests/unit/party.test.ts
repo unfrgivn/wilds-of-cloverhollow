@@ -74,6 +74,7 @@ const scout: PartyContent = {
   walkCycleUnits: 84,
   sits: false,
   start: false,
+  joins: null,
   command: { id: "whistle", label: "Whistle", resting: "catching breath" },
 };
 const whistle = { calm: 25, great: 10, good: 5, rest: 2 };
@@ -117,16 +118,17 @@ describe("party content", () => {
     expect(maddie?.start).toBe(true);
     expect(maddie?.sits).toBe(true);
     expect(Object.keys(world.battle.commands).sort()).toEqual(["run", "snack", "soothe"]);
+    const rosterCommands = Object.values(world.party).map((member) => member.command.id);
     for (const critter of Object.values(world.critters)) {
-      expect(Object.keys(critter.commands.friends)).toEqual(["play"]);
-      expect(Object.keys(critter.lines.friends)).toEqual(["play"]);
+      expect(Object.keys(critter.commands.friends)).toEqual(rosterCommands);
+      expect(Object.keys(critter.lines.friends)).toEqual(rosterCommands);
     }
   });
 
-  it("starts every fixture with the roster's starting members", () => {
+  it("starts every fixture with its own party, else the roster's starting members", () => {
     for (const fixture of Object.values(content.fixtures)) {
       const state = createState(world, fixture);
-      expect(state.party.map((member) => member.id)).toEqual(["maddie"]);
+      expect(state.party.map((member) => member.id)).toEqual(fixture.party ?? ["maddie"]);
     }
   });
 });

@@ -25,6 +25,7 @@ const scout: PartyContent = {
   walkCycleUnits: 84,
   sits: false,
   start: false,
+  joins: null,
   command: { id: "whistle", label: "Whistle", resting: "catching breath" },
 };
 const whistle = { calm: 25, great: 10, good: 5, rest: 2 };

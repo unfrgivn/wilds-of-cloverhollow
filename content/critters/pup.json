@@ -41,6 +41,12 @@
         "great": 10,
         "good": 5,
         "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
       }
     }
   },
@@ -70,6 +76,11 @@
         "great": "Maddie bats a tennis ball across the grass. The pup races after it, tail wagging!",
         "good": "Maddie nudges a tennis ball. The pup can't resist a sniff.",
         "miss": "Maddie swats at a ball... and it bonks her on the nose. The pup gives a puppy grin."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber across the grass. The pup races after it, tail wagging!",
+        "good": "Sue's bobber wiggles by. The pup tilts his head and wags.",
+        "miss": "Sue's bobber snags on the fence. The pup gives it a curious sniff."
       }
     },
     "snack": "Fae shares a crunchy cracker. Energy up! The pup licks his lips.",

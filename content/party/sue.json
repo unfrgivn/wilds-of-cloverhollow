@@ -1,0 +1,18 @@
+{
+  "id": "sue",
+  "name": "Sue",
+  "atlas": "assets/characters/sue/sue.json",
+  "box": {
+    "width": 50,
+    "height": 140
+  },
+  "walkCycleUnits": 126,
+  "sits": false,
+  "start": false,
+  "joins": "sue_joined",
+  "command": {
+    "id": "cast",
+    "label": "Cast",
+    "resting": "reeling in"
+  }
+}

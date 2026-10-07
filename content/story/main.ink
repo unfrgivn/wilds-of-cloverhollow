@@ -5,6 +5,7 @@ VAR hall_pass = false
 VAR raccoon_waiting = false
 VAR knows_password = false
 VAR club_open = false
+VAR sue_joined = false
 EXTERNAL calmed(id)
 
 === window ===

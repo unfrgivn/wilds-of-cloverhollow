@@ -18,6 +18,7 @@ const bottomMargin = Number(value("bottom-margin", "8"));
 const fuzz = value("fuzz", "18%");
 const key = value("key", "#00FF00");
 const despill = value("despill", "global-green");
+const holes = Bun.argv.includes("--holes");
 const directory = output.slice(0, output.lastIndexOf("/"));
 const mkdir = Bun.spawn(["mkdir", "-p", directory]);
 if (await mkdir.exited !== 0) throw new Error(`Could not create ${directory}`);
@@ -26,6 +27,7 @@ const keyed = `${output}.keyed.png`;
 const keyProcess = Bun.spawn([
   "bun", "tools/art/key-alpha.ts", "--input", input, "--output", keyed,
   "--key", key, "--fuzz", fuzz, "--despill", despill,
+  ...(holes ? ["--holes"] : []),
 ], { stdout: "inherit", stderr: "inherit" });
 if (await keyProcess.exited !== 0) throw new Error("Keying failed");
 const command = [

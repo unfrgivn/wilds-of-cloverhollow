@@ -1,0 +1,57 @@
+{
+ "asset": "sue",
+ "status": "generated-validator-passing",
+ "model": "gemini-3-pro-image",
+ "generationCalls": 10,
+ "generationBreakdown": {
+  "successfulImageCalls": 7,
+  "successfulModels": [
+   "gemini-3-pro-image"
+  ],
+  "purposes": [
+   "model sheet v1 probe",
+   "front walk v1",
+   "back walk v1",
+   "side walk v1 rejected for five figures and wrong facing",
+   "side walk v2 rejected because figures merged",
+   "model sheet v2 selected",
+   "front walk v2 selected",
+   "side walk v3 selected",
+   "back walk strip A v2 selected",
+   "back walk strip B v2 selected"
+  ]
+ },
+ "referenceImages": [
+  "docs/art/concepts/characters/character_concept_sheet_sue.png",
+  "public/assets/characters/fae/fae.png"
+ ],
+ "prompts": {
+  "modelSheet": "Three isolated full-body front, back, and left-profile Sue views on pure magenta, with blonde bob, brown headband, teal hoodie, fish and hook patches, holographic fish/hook backpack, rolled denim shorts, mismatched red-orange and teal socks, and brown white-soled sneakers.",
+  "walkDown": "Six isolated head-on front walk poses, contact/down/passing twice, with alternating limbs and stable Sue costume on pure magenta.",
+  "walkUp": "Two three-frame strips generated from the approved model-sheet back-view crop: contact-left/down/passing and contact-right/down/passing, with the same oversized bob, short legs, dark green-teal hoodie, backpack, and mismatched socks.",
+  "walkLeft": "Six isolated right-facing side-profile walk poses, contact/down/passing twice, with backpack and stable Sue costume on pure magenta; flopped for shipped left direction."
+ },
+ "selectedRawSources": [
+  "art/source/sue/sue-model-sheet-v2.png",
+  "art/source/sue/sue-walk-down-strip-v2.png",
+  "art/source/sue/sue-walk-up-strip-v2a.png",
+  "art/source/sue/sue-walk-up-strip-v2b.png",
+  "art/source/sue/sue-walk-left-strip-v3.png"
+ ],
+ "postProcessing": {
+  "build": "bun tools/art/build-sue.ts (extracts whole connected components and rebuilds the atlas)",
+  "extract": "extract-strip.ts with connected-component extraction, expected 3 for model, 6 for front/side strips, and 3 for each back half-strip; no fixed panel crops",
+  "key": "#FF00FF border flood plus enclosed holes, 18% fuzz, edge-only despill over a 12 px alpha-edge band",
+  "canvas": "384x384, figure 280 px, baseline 375",
+  "atlas": "pack-atlas.ts, 5 columns, anchor {x: 0.5, y: 0.9765625}",
+  "side": "The side walk strip was generated facing right; its six extracted frames are flopped to face left. The model sheet's side view already faces left and is used as drawn for left_idle_01 (an earlier build flopped it too, so Sue turned around whenever she stopped; validate-sprite.ts now fails an idle_left that faces away from walk_left).",
+  "backWalk": "Two selected three-frame strips are extracted separately and concatenated in cycle order. Both were generated from the approved model-sheet back-view crop.",
+  "despill": "postprocess.ts only forwards --holes; build-sue.ts explicitly runs despill-edge.ts with magenta and band 12 after each frame, preserving other builders byte-for-byte.",
+  "idle": "Down, up, and left idles come from the corresponding model-sheet views; up_idle_01 is the approved model-sheet back view, not a walk frame."
+ },
+ "validator": {
+  "biped": true,
+  "key": "magenta"
+ },
+ "selectionReason": "V2 model sheet and regenerated front/side strips have wide gutters and extract cleanly. Two new back half-strips were generated from the approved back-view crop, restoring the oversized bob, short legs, dark hoodie, backpack, and sock placement. Up idle is the approved model-sheet back view."
+}

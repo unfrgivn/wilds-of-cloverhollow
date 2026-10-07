@@ -661,6 +661,70 @@ for (const direction of options.idleOnly ? [] : ["down", "up", "left"]) {
     errors.push(`${direction}: idle/walk opaque area ratio is outside 0.70-1.40`);
   }
 }
+// The side idle must face the way the side walk does. Mirrored, it has to look
+// clearly less like the walk frames than as drawn. This compares colour, not
+// silhouette: a bob and a backpack make a side silhouette nearly symmetric,
+// but a face and the back of a head never match. Only the upper 60% of each
+// figure counts (head and torso), since the legs change from frame to frame.
+function upperOpaque(bytes: Uint8Array, width: number, height: number): Uint8Array {
+  const mask = new Uint8Array(width * height);
+  let top = height;
+  let bottom = -1;
+  for (let y = 0; y < height; y += 1)
+    for (let x = 0; x < width; x += 1)
+      if ((bytes[(y * width + x) * 4 + 3] ?? 0) > 128) {
+        top = Math.min(top, y);
+        bottom = Math.max(bottom, y);
+      }
+  const cut = top + Math.floor((bottom - top) * 0.6);
+  for (let y = top; y < cut; y += 1)
+    for (let x = 0; x < width; x += 1)
+      if ((bytes[(y * width + x) * 4 + 3] ?? 0) > 128) mask[y * width + x] = 1;
+  return mask;
+}
+
+function colourDifference(
+  idle: Uint8Array, walk: Uint8Array, width: number, height: number, mirror: boolean,
+): number {
+  const idleMask = upperOpaque(idle, width, height);
+  const walkMask = upperOpaque(walk, width, height);
+  let total = 0;
+  let count = 0;
+  for (let y = 0; y < height; y += 1)
+    for (let x = 0; x < width; x += 1) {
+      const from = y * width + (mirror ? width - 1 - x : x);
+      const at = y * width + x;
+      if (idleMask[from] !== 1 || walkMask[at] !== 1) continue;
+      for (let channel = 0; channel < 3; channel += 1)
+        total += Math.abs((idle[from * 4 + channel] ?? 0) - (walk[at * 4 + channel] ?? 0));
+      count += 3;
+    }
+  return count === 0 ? 0 : total / count;
+}
+
+const sideFacingMargin = 1.1;
+if (!options.idleOnly) {
+  const idleName = sheet.animations.idle_left?.[0];
+  const idle = idleName === undefined ? undefined : frameBytes.get(idleName);
+  const idleFrame = idleName === undefined ? undefined : sheet.frames[idleName];
+  if (idle !== undefined && idleFrame !== undefined) {
+    const { w, h } = idleFrame.frame;
+    const walks = (sheet.animations.walk_left ?? []).flatMap((name) => {
+      const bytes = frameBytes.get(name);
+      return bytes === undefined ? [] : [bytes];
+    });
+    const mean = (mirror: boolean): number => walks.length === 0 ? 0
+      : walks.reduce((sum, walk) => sum + colourDifference(idle, walk, w, h, mirror), 0)
+        / walks.length;
+    const asDrawn = mean(false);
+    const mirrored = mean(true);
+    if (process.env.SPRITE_METRICS === "1")
+      console.error(`side facing: as drawn ${asDrawn.toFixed(1)}, mirrored ${mirrored.toFixed(1)}`);
+    if (mirrored < asDrawn * sideFacingMargin)
+      errors.push(`idle_left: faces the other way from walk_left (colour difference as drawn `
+        + `${asDrawn.toFixed(1)}, mirrored ${mirrored.toFixed(1)})`);
+  }
+}
 if (options.idleOnly) {
   for (const direction of options.directions) {
     const names = sheet.animations[`idle_${direction}`] ?? [];

@@ -110,6 +110,7 @@ test("after calming the frog, the journal shows his sticker and his note", async
     .toHaveText("Fountain Frog");
   await expect(page.locator('.journal-slot[data-owned="false"]')).toHaveCount(7);
   await expect(page.locator(".journal-note")).toHaveText([
+    "Purple fizz drips lead out of the plaza to Meadow Park.",
     "The Fountain Frog is calm. Something purple fizzed into his fountain.",
   ]);
 });

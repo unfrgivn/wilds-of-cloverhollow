@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-06 (Milestone 17, followers who fight)
+Last updated: 2026-10-06 (Milestone 18, Sue joins)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -219,7 +219,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   roster order): `id`, `name`, `atlas`, the feet-anchored `box`
   (`{ width, height }`), `walkCycleUnits`, `sits` (sits down after
   `sitDelayTicks`; otherwise idles standing), `start` (in the party at a new
-  game), and one battle `command` (`{ id, label, resting }`, section 8).
+  game), an optional `joins` Ink variable (null for starters), and one battle
+  `command` (`{ id, label, resting }`, section 8). Exactly one of `start: true`
+  or a non-null `joins` is required, and a joins variable must be declared.
   Maddie is `maddie`: box 44x60, `walkCycleUnits` 84, sits, starts, command
   `play` / "Play" / "resting". Sue and Jordan join the roster with their art.
   `state.party` is the ordered list of members, each
@@ -239,11 +241,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`faeBox` in the core) and each member's box comes from its content (Maddie
   44x60). `hiddenFraction(follower, followerBox, leader, leaderBox)` is the
   overlap area divided by the follower's box area when its feet are north of
-  its leader's; beside or in front is zero. Spawn and settling placement tries
-  side heel slots at ±52 x and -6 y, then +24 y, before the ordinary
-  rear/perpendicular fallbacks. Heel placement must be collision-valid,
-  line-of-sight clear, have zero hidden fraction, and (at a spawn) clear Fae
-  and the members ahead by two radii. When the leader is standing still and
+  its leader's; beside or in front is zero. For members after member 0, a
+  settled member also moves when it hides more than 25% of anyone ahead or is
+  hidden more than 25% by anyone ahead; the candidate must make both overlaps
+  at most 25%. Every member uses that same rule for spawn, join, and settle:
+  collision-valid, line-of-sight clear, two radii from everyone ahead, and both
+  hidden fractions at most 25%. Placement tries side heel slots at ±52 x and
+  -6 y, then +24 y, before the ordinary rear/perpendicular fallbacks. Chained
+  members additionally try diagonal heels at ±36 x with -40 y and +36 y
+  offsets, which give Sue's tall box more natural clearance. When the leader is
+  standing still and
   the member has been stopped for `settleDelayTicks` (12) while more than 25%
   hidden, it walks to the first valid visible heel slot. `stillTicks` keeps
   counting during that short walk, so Maddie sits soon after arriving. A
@@ -282,7 +289,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Every area spawn must have a valid slot for every roster member, chained:
   member 0 at Fae's heel (or behind her, or on one of the two perpendicular
   sides), member i at member i-1's, each with the follow radius clearance and
-  two radii clear of Fae and the members ahead (`partySlots`; the area checks
+  two radii clear of Fae and the members ahead (`partySlots`; member 0 retains
+  its original heel and perpendicular candidates, while chained members get
+  additional diagonal heel candidates before rear fallbacks; the area checks
   test the whole roster so any party fits). At a door switch every member is
   placed in its slot, its trail resets to `[slot, leader]`, and everyone is
   frozen.
@@ -505,7 +514,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   its atlas, battle content, sticker, and measured `auraCentre` and
   `bodyCentre` frame-pixel centroids. Runtime atlases use `<id>-sheet`, aura
   placement uses those centroids, and render info names the active entry
-  `battle.critter: { id, frame }`.
+  `battle.critter: { id, frame }`. Sue uses the generic party renderer with
+  `assets/characters/sue/sue.json`: walk animation advances from her own
+  displacement and `walkCycleUnits` (126), idle follows her facing, and right
+  mirrors left. She never sits. `renderInfo().party` reports each member's id,
+  animation, and frame, and the depth labels include `sue` when present.
 - Battle scene (render only), from one pure CSS-px layout
   (`src/render/battle-layout.ts`) at the overworld scale: the frog's figure is
   `battleHeight` units tall with its body centre at (0.5 W, 0.42 H); Fae, seen
@@ -560,6 +573,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `data-battle="open"` on the root hides the movement stick; confirm and cancel
   stay. Every battle text pair measures at least 4.5:1 contrast in the gallery
   tests.
+- `content/fixtures/plaza-party.json` is the two-member visual and battle
+  fixture: plaza fountain spawn, seed 1, party `["maddie", "sue"]`.
 - The Pixi battle scene dims the loaded area painting and presents the critter,
   Fae, the party, and aura in a fixed logical composition. It is render-only. The
   shell logs `[cloverhollow] battle` with phase and message changes, and

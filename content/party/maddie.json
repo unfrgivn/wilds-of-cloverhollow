@@ -9,6 +9,7 @@
   "walkCycleUnits": 84,
   "sits": true,
   "start": true,
+  "joins": null,
   "command": {
     "id": "play",
     "label": "Play",

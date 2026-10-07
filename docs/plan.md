@@ -312,7 +312,47 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   - The area checks now require a chained slot for the whole roster at every
     spawn (not just Maddie), so any party fits anywhere.
 
-## Roadmap after Milestone 17 (proposed, waiting on the owner)
+## Milestone 18: Sue joins **Status:** ✅ Completed (2026-10-06)
+- Sue is the second roster member. Starter/joining content validates exactly one
+  entry path and declared Ink variables; `sue_joined` adds her at the end of a
+  free tick, at her person point or a chained slot.
+- All followers use the same two-way 25% visibility and two-radius slot rule.
+  Member 0 retains its original candidate order; chained members add named
+  diagonal heel candidates for tall followers.
+- Frog and pup have Sue's Cast command and owner-requested ribbon bobber lines.
+  The journal follows Ink's conditional note rule directly. The headless
+  `sue-join` sim compiles the real story with its test knot, walks to Sue,
+  joins her, walks on, and checks the party each tick.
+- Phase 2 adds Sue's generic overworld rendering, behind-Fae battle rendering,
+  the `plaza-party` fixture, real-key e2e coverage, and reviewed screenshots at
+  1280x720 and 874x402. Owner review items are Sue's art and her Cast lines.
+- Cast wording: frog great `Sue casts her ribbon bobber into the fountain. The
+  frog chases the ripples, giggling!`; good `Sue's bobber bobs past. The frog
+  can't stop watching it.`; miss `Sue's bobber plops into a flower box. The
+  frog blinks... and almost smiles.` Pup great `Sue casts her ribbon bobber
+  across the grass. The pup races after it, tail wagging!`; good `Sue's bobber
+  wiggles by. The pup tilts his head and wags.`; miss `Sue's bobber snags on
+  the fence. The pup gives it a curious sniff.`
+- Notes and assumptions:
+  - Sue's atlas (`tools/art/build-sue.ts`, 10 generation calls) is keyed on
+    magenta, since her hoodie and one sock are teal. Her first back walk was a
+    taller, long-legged figure in a brighter hoodie; it was regenerated from the
+    model sheet's back view as two three-frame strips, like Fae's.
+  - Her first atlas also flopped the side idle, which already faced left, so
+    she turned around whenever she stopped. Silhouettes can't catch that (a bob
+    and a backpack are nearly symmetric), so `validate-sprite.ts` now compares
+    the side idle's head-and-torso colours with the side walk's, as drawn and
+    mirrored; Fae and Maddie pass it unchanged.
+  - The journal no longer hides the park note unless Fae has read the notice
+    or is in the park (it searched the saved Ink text for a variable name): the
+    note shows once the frog is calm and the pup isn't, as Ink says.
+    `journal-save.spec.ts` now expects it after the frog battle.
+  - `followerSlot` is gone; `partySlots` places any party, Maddie alone
+    included.
+  - Walking toward the camera, the party trails straight behind Fae and Maddie
+    is hidden until they stop; the e2e screenshots wait for the party to settle.
+
+## Roadmap after Milestone 18 (proposed, waiting on the owner)
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).

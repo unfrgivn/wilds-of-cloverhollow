@@ -16,3 +16,6 @@ account is unpaid, so device builds use free personal-team signing.
 | Item | Why it's waiting |
 | --- | --- |
 | Who the kid in the purple hood is | The owner doesn't know yet. Chapter one ends at the hood's Cloverhollow School name tag; the school chapter waits on this |
+| Maddie's proportions (Milestone 17) | She had been drawn twice her height since Milestone 7 (only her width was scaled); she is now the cat in her atlas. Every screenshot with her in it changed |
+| Sue's look (Milestone 18) | Her atlas, from the owner's concept sheet: `art/review/sue-contact-cream.png`, `sue-fae-lineup.png`, `sue-walk-*.gif` |
+| Sue's Cast lines (Milestone 18) | Six battle lines, in `docs/plan.md` (Milestone 18) |

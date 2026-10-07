@@ -7,6 +7,7 @@ import schoolData from "../../content/areas/school.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
+import plazaPartyFixtureData from "../../content/fixtures/plaza-party.json";
 import parkFixtureData from "../../content/fixtures/park.json";
 import schoolFixtureData from "../../content/fixtures/school.json";
 import tunableData from "../../content/tunables.json";
@@ -17,7 +18,8 @@ import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
-import { createStoryReader } from "../core/ink";
+import sueData from "../../content/party/sue.json";
+import { createInkState, createStoryReader } from "../core/ink";
 import type {
   Area,
   CharacterContent,
@@ -474,6 +476,12 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
   field(record(command), file, "command");
   field(typeof value.sits === "boolean", file, "sits");
   field(typeof value.start === "boolean", file, "start");
+  field(value.joins === null || typeof value.joins === "string", file, "joins");
+  field(
+    (value.start && value.joins === null) || (!value.start && typeof value.joins === "string"),
+    file,
+    "start/joins",
+  );
   return {
     id: text(value, "id"),
     name: text(value, "name"),
@@ -482,12 +490,24 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
     walkCycleUnits: size(value, "walkCycleUnits"),
     sits: value.sits,
     start: value.start,
+    joins: value.joins,
     command: {
       id: text(command, "id"),
       label: text(command, "label"),
       resting: text(command, "resting"),
     },
   };
+}
+
+export function partyJoinErrors(
+  party: Record<string, PartyContent>,
+  storyVariable: (name: string) => unknown,
+): string[] {
+  return Object.values(party).flatMap((member) =>
+    member.joins !== null && storyVariable(member.joins) === undefined
+      ? [`party ${member.id}: joins variable ${member.joins} is not declared`]
+      : [],
+  );
 }
 
 // Every critter must answer every party command (numbers and lines), and no
@@ -662,7 +682,15 @@ export function loadContent(): {
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
   const maddie = parsePartyMember(maddieData, "content/party/maddie.json");
-  const party = { [maddie.id]: maddie };
+  const sue = parsePartyMember(sueData, "content/party/sue.json");
+  const party = { [maddie.id]: maddie, [sue.id]: sue };
+  const storyVariable = createStoryReader(story);
+  const initialInk = createInkState(story, 1);
+  const joinProblems = partyJoinErrors(party, (name) =>
+    storyVariable(initialInk, name),
+  );
+  if (joinProblems.length > 0)
+    throw new Error(`content/party: ${joinProblems.join("; ")}`);
   const critters = { [frog.id]: frog, [pup.id]: pup };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)
@@ -671,6 +699,10 @@ export function loadContent(): {
     "new-game": parseFixture(fixtureData, "content/fixtures/new-game.json"),
     harness: parseFixture(harnessFixtureData, "content/fixtures/harness.json"),
     plaza: parseFixture(plazaFixtureData, "content/fixtures/plaza.json"),
+    "plaza-party": parseFixture(
+      plazaPartyFixtureData,
+      "content/fixtures/plaza-party.json",
+    ),
     park: parseFixture(parkFixtureData, "content/fixtures/park.json"),
     school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
   };
@@ -696,7 +728,7 @@ export function loadContent(): {
       stickers,
       characters,
       party,
-      storyVariable: createStoryReader(story),
+      storyVariable,
     },
     fixtures,
   };

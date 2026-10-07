@@ -4,7 +4,7 @@ import {
   createState,
   distanceToPolygon,
   faeBox,
-  followerSlot,
+  partySlots,
   hiddenFraction,
   nextRandom,
   pointInPolygon,
@@ -30,8 +30,9 @@ const newGame = content.fixtures["new-game"];
 if (newGame === undefined) throw new Error("new-game fixture missing");
 const area = world.areas.harness;
 if (area === undefined) throw new Error("area missing");
-const maddieBox = world.party.maddie?.box;
-if (maddieBox === undefined) throw new Error("Maddie missing from the roster");
+const maddie = world.party.maddie;
+if (maddie === undefined) throw new Error("Maddie missing from the roster");
+const maddieBox = maddie.box;
 const none: ActionFrame = {
   move: { x: 0, y: 0 },
   confirm: false,
@@ -366,7 +367,7 @@ describe("core", () => {
     const bedroom = world.areas.bedroom;
     const spawn = bedroom?.spawns.door;
     if (bedroom === undefined || spawn === undefined) throw new Error("door missing");
-    expect(followerSlot(bedroom, spawn, world.tunables.follow, maddieBox, faeBox))
+    expect(partySlots(bedroom, spawn, world.tunables.follow, [maddie])[0]?.slot)
       .toBeDefined();
   });
 
@@ -386,7 +387,7 @@ describe("core", () => {
   it("places every spawn slot beside Fae without hiding Maddie", () => {
     for (const area of Object.values(world.areas)) {
       for (const spawn of Object.values(area.spawns)) {
-        const slot = followerSlot(area, spawn, world.tunables.follow, maddieBox, faeBox);
+        const slot = partySlots(area, spawn, world.tunables.follow, [maddie])[0]?.slot;
         if (slot === undefined) throw new Error(`${area.id}: slot missing`);
         expect(hiddenFraction(slot, maddieBox, spawn, faeBox)).toBe(0);
       }

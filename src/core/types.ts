@@ -107,6 +107,8 @@ export type PartyContent = {
   sits: boolean;
   // In the party at a new game.
   start: boolean;
+  // Ink variable which adds this friend during play, or null for starters.
+  joins: string | null;
   command: { id: string; label: string; resting: string };
 };
 // An area person's atlas and idle timing: ticks per idle_down frame (Mom

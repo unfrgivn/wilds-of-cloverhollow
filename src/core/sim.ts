@@ -30,6 +30,10 @@ export const blankInput = (): ActionFrame => ({
 
 // Fae's feet-anchored body box (spec 5): what her followers hide behind.
 export const faeBox: Box = { width: 50, height: 140 };
+// Extra diagonal heels give tall chained members a visible, natural fallback.
+const chainedHeelX = 36;
+const chainedHeelUp = -40;
+const chainedHeelDown = 36;
 
 function partyContent(world: World, id: string): PartyContent {
   const content = world.party[id];
@@ -47,16 +51,22 @@ export function partySlots(
   members: PartyContent[],
 ): { id: string; slot: Point | undefined }[] {
   const slots: { id: string; slot: Point | undefined }[] = [];
+  const ahead = [{ point: fae, box: faeBox }];
   let leader = fae;
-  let leaderBox = faeBox;
-  const taken = [fae];
-  for (const member of members) {
-    const slot = followerSlot(area, leader, follow, member.box, leaderBox, taken);
+  for (const [index, member] of members.entries()) {
+    const slot = visibleFollowerSlot(
+      area,
+      leader,
+      leader,
+      follow,
+      member.box,
+      ahead,
+      index > 0,
+    );
     slots.push({ id: member.id, slot });
     if (slot === undefined) break;
-    taken.push(slot);
+    ahead.push({ point: slot, box: member.box });
     leader = slot;
-    leaderBox = member.box;
   }
   return slots;
 }
@@ -296,8 +306,9 @@ export function npcVisible(
   npc: Area["npcs"][number],
 ): boolean {
   return (
-    npc.visibleWhile === undefined ||
-    world.storyVariable(state.ink, npc.visibleWhile) === true
+    !state.party.some((member) => member.id === npc.id) &&
+    (npc.visibleWhile === undefined ||
+      world.storyVariable(state.ink, npc.visibleWhile) === true)
   );
 }
 
@@ -311,6 +322,65 @@ function solidArea(world: World, state: State, area: Area): Area {
         .map((npc) => npc.footprint),
     ],
   };
+}
+
+function joinReady(world: World, state: State): State {
+  if (
+    state.dialogue !== null ||
+    state.battle !== null ||
+    state.transition !== null ||
+    state.journalOpen
+  )
+    return state;
+  const area = world.areas[state.area];
+  if (area === undefined) return state;
+  const existing = new Set(state.party.map((member) => member.id));
+  let party = state.party.slice();
+  for (const content of Object.values(world.party)) {
+    if (
+      existing.has(content.id) ||
+      content.joins === null ||
+      world.storyVariable(state.ink, content.joins) !== true
+    )
+      continue;
+    // She steps out of the person standing here (if she's shown).
+    const person = area.npcs.find(
+      (npc) => npc.id === content.id && npcVisible(world, state, npc),
+    );
+    const last = party[party.length - 1];
+    const leader = last === undefined
+      ? { ...state.player }
+      : { x: last.x, y: last.y };
+    const ahead = [
+      { point: state.player, box: faeBox },
+      ...party.map((member) => ({
+        point: { x: member.x, y: member.y },
+        box: partyContent(world, member.id).box,
+      })),
+    ];
+    const point = person?.point ??
+      visibleFollowerSlot(
+        area,
+        leader,
+        leader,
+        world.tunables.follow,
+        content.box,
+        ahead,
+        party.length > 0,
+      );
+    if (point === undefined) continue;
+    party.push({
+      id: content.id,
+      x: point.x,
+      y: point.y,
+      facing: state.facing,
+      motion: { distance: 0, moving: false },
+      stillTicks: 0,
+      trail: [point, leader],
+    });
+    existing.add(content.id);
+  }
+  return party.length === state.party.length ? state : { ...state, party };
 }
 
 // The facts the story's calmed(id) answers from: each critter's state.
@@ -869,28 +939,6 @@ function validFollowerPoint(area: Area, point: Point, radius: number): boolean {
   );
 }
 
-// A follower's place when the party is placed fresh: at its leader's heel,
-// or behind it. `taken` holds the points already occupied (Fae and the
-// members ahead), which a slot must clear by two radii.
-export function followerSlot(
-  area: Area,
-  leader: Point,
-  follow: FollowTunables,
-  followerBox: Box,
-  leaderBox: Box,
-  taken: Point[] = [leader],
-): Point | undefined {
-  return visibleFollowerSlot(
-    area,
-    leader,
-    leader,
-    follow,
-    followerBox,
-    leaderBox,
-    taken,
-  );
-}
-
 // How much of the follower's body box its leader's box covers, when the
 // follower's feet are north of the leader's (drawn behind). Beside or in
 // front is zero.
@@ -925,8 +973,8 @@ export function visibleFollowerSlot(
   start: Point,
   follow: FollowTunables,
   followerBox: Box,
-  leaderBox: Box,
-  taken: Point[] = [leader],
+  ahead: { point: Point; box: Box }[],
+  chained = false,
 ): Point | undefined {
   const { heel, slot, radius } = follow;
   const sign = start.x - leader.x > 0 ? 1 : -1;
@@ -936,7 +984,15 @@ export function visibleFollowerSlot(
     { x: leader.x + sign * heel, y: leader.y + 24 },
     { x: leader.x - sign * heel, y: leader.y + 24 },
   ];
-  const candidates = [...heelCandidates];
+  const chainedHeelCandidates = [
+    { x: leader.x + sign * chainedHeelX, y: leader.y + chainedHeelUp },
+    { x: leader.x - sign * chainedHeelX, y: leader.y + chainedHeelUp },
+    { x: leader.x + sign * chainedHeelX, y: leader.y + chainedHeelDown },
+    { x: leader.x - sign * chainedHeelX, y: leader.y + chainedHeelDown },
+  ];
+  const candidates = chained
+    ? [...heelCandidates, ...chainedHeelCandidates]
+    : heelCandidates;
   const direction = {
     up: { x: 0, y: -1 },
     down: { x: 0, y: 1 },
@@ -951,13 +1007,20 @@ export function visibleFollowerSlot(
       y: leader.y - vector.y * slot,
     });
   }
-  return candidates.find(
-    (point) =>
-      validFollowerPoint(area, point, radius) &&
-      segmentClear(area, start, point) &&
-      hiddenFraction(point, followerBox, leader, leaderBox) === 0 &&
-      taken.every((occupied) => distance(point, occupied) >= radius * 2),
-  );
+  return candidates.find((point) => {
+    if (
+      !validFollowerPoint(area, point, radius) ||
+      !segmentClear(area, start, point) ||
+      ahead.some((person) => distance(point, person.point) < radius * 2)
+    )
+      return false;
+    return ahead.every((person) => {
+      return (
+        hiddenFraction(point, followerBox, person.point, person.box) <= 0.25 &&
+        hiddenFraction(person.point, person.box, point, followerBox) <= 0.25
+      );
+    });
+  });
 }
 
 function pathDistance(start: Point, points: Point[]): number {
@@ -1003,6 +1066,7 @@ function updateFollower(
   leader: Point,
   leaderBox: Box,
   leaderMoved: boolean,
+  ahead: { point: Point; box: Box }[],
 ): PartyMember {
   const tune = world.tunables.follow;
   const trail = member.trail.slice();
@@ -1018,7 +1082,11 @@ function updateFollower(
   if (
     !leaderMoved &&
     member.stillTicks >= tune.settleDelayTicks &&
-    hiddenFraction(member, memberBox, leader, leaderBox) > 0.25
+    ahead.some(
+      (person) =>
+        hiddenFraction(member, memberBox, person.point, person.box) > 0.25 ||
+        hiddenFraction(person.point, person.box, member, memberBox) > 0.25,
+    )
   ) {
     const slot = visibleFollowerSlot(
       area,
@@ -1026,7 +1094,8 @@ function updateFollower(
       member,
       tune,
       memberBox,
-      leaderBox,
+      ahead,
+      ahead.length > 1,
     );
     if (slot !== undefined && segmentClear(area, member, slot)) {
       const length = distance(member, slot);
@@ -1148,6 +1217,9 @@ function updateParty(
   let leader = player;
   let leaderBox = faeBox;
   let leaderMoved = playerMoved;
+  const ahead: { point: Point; box: Box }[] = [
+    { point: player, box: faeBox },
+  ];
   for (const member of state.party) {
     const content = partyContent(world, member.id);
     const next = updateFollower(
@@ -1158,16 +1230,18 @@ function updateParty(
       leader,
       leaderBox,
       leaderMoved,
+      [...ahead],
     );
     party.push(next);
     leader = { x: next.x, y: next.y };
     leaderBox = content.box;
     leaderMoved = next.motion.moving;
+    ahead.push({ point: leader, box: leaderBox });
   }
   return party;
 }
 
-export function step(
+function stepTick(
   world: World,
   state: State,
   input: ActionFrame,
@@ -1377,8 +1451,7 @@ export function step(
     trigger === undefined
       ? updateParty(world, solid, state, player, displacement > 0.0001)
       : haltedParty(state.party);
-  return {
-    state: {
+  const nextState: State = {
       ...state,
       tick: state.tick + 1,
       player,
@@ -1398,9 +1471,17 @@ export function step(
           ? state.dialogue
           : dialogueState(knock.knot, knock.result),
       party,
-    },
-    events,
-  };
+    };
+  return { state: nextState, events };
+}
+
+export function step(
+  world: World,
+  state: State,
+  input: ActionFrame,
+): { state: State; events: Event[] } {
+  const result = stepTick(world, state, input);
+  return { ...result, state: joinReady(world, result.state) };
 }
 
 export function stableHash(value: unknown): string {

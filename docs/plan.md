@@ -627,7 +627,7 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   - Before the east road opens and while the bluebird is fizzy, the plaza's
     stop still says there's no reason to leave town.
   - `bus.test.ts`'s list of travel targets now has three.
-## Milestone 25: The grumpy gull
+## Milestone 25: The grumpy gull **Status:** ✅ Completed (2026-10-07)
 - The Grumpy Gull is the first mini-boss, a large stationary chaos critter at
   the Cliffside Trail lookout. It blocks the route from the footbridge to the
   bench, and after its Soothe battle becomes the friendly Lookout Gull with a
@@ -711,7 +711,8 @@ more bad guys, and the blacklight lantern, made and built while away.
 - Milestone 22, Jordan: done.
 - Milestone 23, the blacklight lantern: done.
 - Milestone 24, the bus line and the map: done.
+- Milestone 25, the grumpy gull, the first mini-boss: done.
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the
-clubhouse, mini-bosses, the journal's map page.
+clubhouse, and more mini-bosses (people under the chaos spell, NOTES.md).

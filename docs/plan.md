@@ -408,20 +408,53 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     replay take 72 s in Chromium under load, near its 90 s budget, and the new
     bay flow timed out; now they take 9 s and 30 s.
 
-## Roadmap after Milestone 19 (proposed, waiting on the owner)
+## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).
-- Pinecone Pass and Jordan (NOTES.md): the calm bluebird points toward the
-  mountains, and Fae gets there by bus. Drawn ahead: Jordan's atlas, the Pass
-  painting (with its bus stop), and the hamster hiker (`art/recipes/jordan.json`,
-  `pass.json`, `hamster.json`). Still needed: a bus stop in town (a new sprite
-  on the plaza, so the approved painting isn't repainted) and Jordan's battle
-  command (proposed: Juggle, with pinecones). Decided 2026-10-06: party members
-  both follow Fae and help in battles; the engine needs nothing new for him
-  but a `content/party/` entry.
-- Audio: later (owner, 2026-10-06).
-- TestFlight and a paid developer account: later.
+- Audio: later (owner, 2026-10-06). TestFlight and a paid developer account:
+  later.
+
+### The world and how it's played (decided 2026-10-07, open to the owner's review)
+The owner asked for EarthBound-style decisions for travel between the lands,
+more bad guys, and the blacklight lantern, made and built while away.
+- One connected world, no separate map screen: each land is a set of painted
+  areas, and the lands are joined by trails (areas too) that Fae walks, like
+  EarthBound's roads between towns. Cloverhollow is the town; Bubblegum Bay
+  lies east; Pinecone Pass north, up the mountain; the Whispering Woods (and
+  the clubhouse) west; the Enchanted Forest in the middle, sealed until late.
+  Trails run between neighbouring lands around the ring.
+- Buses are fast travel between towns with a stop (Cloverhollow and Pinecone
+  Pass first). The journal gets a map page later: the lands visited and the
+  bus routes.
+- Bad guys are visible, never random: chaos critters wander the trails and
+  come after Fae when she's near; touching one starts a calm-down battle, and
+  a calmed critter stays calm and friendly. People can be under the chaos
+  spell too: they're the mini-bosses (NOTES.md). The raccoon in the purple
+  hood is the trickster who keeps getting away, until the kid behind it all
+  is known.
+- Each friend brings one battle command: Maddie's Play, Sue's Cast, Jordan's
+  Juggle (pinecones).
+- Tools open the world: the blacklight lantern first (below); the lasso (from
+  the PE teacher) and the flute (from the music teacher) later.
+- The blacklight lantern: the owner's concept (`blacklight_lantern.png`) draws
+  it as a magnifying glass with a purple blacklight lens, inactive and active,
+  so it's built as drawn. Jordan uses it on night hikes and gives it to Fae.
+  Switched on, it shows what the raccoon's fizz left behind: glowing purple
+  paw prints, invisible-ink notes (journal clues), and trail markers that
+  open hidden paths.
+
+### Next milestones
+- Milestone 20, Pinecone Pass and the bus: a bus stop in the plaza; story
+  lines can send Fae somewhere (`# travel:`); the pass as a walkable area.
+- Milestone 21, Jordan: he joins at the pass with Juggle; the hamster hiker;
+  he gives Fae the lantern.
+- Milestone 22, the blacklight lantern: on and off, glowing secrets, a hidden
+  path out of the pass.
+- Milestone 23, the Old Pine Trail: the first trail between lands, from the
+  pass's hidden path down toward the Whispering Woods, with roaming critters:
+  the bunny from the owner's critter sheet and a new squirrel.
 
 ## Later (not scheduled)
-Gamepad polish, and the tools from NOTES.md (lantern, lasso, flute).
+Gamepad polish, the lasso and the flute, the Whispering Woods and the
+clubhouse, mini-bosses, the journal's map page.

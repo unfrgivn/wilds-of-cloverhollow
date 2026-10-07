@@ -689,9 +689,14 @@ more bad guys, and the blacklight lantern, made and built while away.
 - Bad guys are visible, never random: chaos critters wander the trails and
   come after Fae when she's near; touching one starts a calm-down battle, and
   a calmed critter stays calm and friendly. People can be under the chaos
-  spell too: they're the mini-bosses (NOTES.md). The raccoon in the purple
-  hood is the trickster who keeps getting away, until the kid behind it all
-  is known.
+  spell too: they're the mini-bosses (NOTES.md).
+- Owner, 2026-10-07: raccoons are a recurring bad guy, a chaos critter species
+  met all over the world like the dogs and the other creatures, not a single
+  character or a boss. The kid causing the chaos is unnamed, and who it is
+  stays secret until the very end; the player may meet them earlier as an
+  ordinary kid without knowing. Until then they're only "a kid in a purple
+  hood". The game so far has one talking raccoon (Milestone 15) and calls
+  the hideouts his: that's to be reworked.
 - Each friend brings one battle command: Maddie's Play, Sue's Cast, Jordan's
   Juggle (pinecones).
 - Tools open the world: the blacklight lantern first (below); the lasso (from
@@ -728,11 +733,17 @@ more bad guys, and the blacklight lantern, made and built while away.
     (its last run, Chromium only, had 10 failures: journal expectations were
     then updated; the rest, in battle, bus, Jordan, title, and trail specs,
     were called load and are unverified).
-  - Milestone 28, the first person under the chaos spell (a mini-boss in
+  - Milestone 28, raccoons everywhere: one critter species placed many times
+    (battle art from `chaos_raccoon.png`, roaming in several lands, one
+    sticker); the talking raccoon of Milestone 15 becomes a raccoon battle
+    whose calm raccoon tells the password it overheard; every line that names
+    "the raccoon" as the troublemaker, the notice board, and the hideouts
+    point to "a kid in a purple hood" instead, never named.
+  - Milestone 29, the first person under the chaos spell (a mini-boss in
     town), with an interior from `arcade_interior.png`.
   - Then the clubhouse fix-up (a fridge for snacks, the garden), once coins
-    exist; the school chapter, the lasso, and the flute wait on the owner's
-    decision about the kid in the purple hood.
+    exist. The school chapter, the lasso, and the flute no longer wait: the
+    kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the

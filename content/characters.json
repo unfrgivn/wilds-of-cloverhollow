@@ -27,13 +27,6 @@
       8
     ]
   },
-  "raccoon": {
-    "atlas": "assets/characters/raccoon/raccoon.json",
-    "idleTicks": [
-      150,
-      10
-    ]
-  },
   "sue": {
     "atlas": "assets/characters/sue/sue.json",
     "idleTicks": [

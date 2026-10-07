@@ -49,39 +49,39 @@ Maddie's bed. Still warm, and full of orange fur. # speaker: Fae
 === notice_board ===
 ~ read_notice = true
 CLOVERHOLLOW NEWS: The fountain is fizzing! # speaker: Notice board
-Has anyone seen a raccoon in a purple hood? # speaker: Notice board
+Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling. # speaker: Notice board
 {
-- plan == "now": A raccoon in a hood? I bet that's who did it. # speaker: Fae
-- else: A raccoon... in a hood? Weird. # speaker: Fae
+- plan == "now": A kid in a purple hood? I bet that's who did it. # speaker: Fae
+- else: A kid in a purple hood, fizzing up the fountain? Weird. # speaker: Fae
 }
 -> DONE
 
 === journal ===
 {clubhouse_claimed: The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. # speaker: Fae}
-{found_old_trail: The raccoon's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
-{calmed("gull"): The grumpy gull at the lookout was fizzy too. That raccoon gets around! # speaker: Fae}
-{has_lantern: Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! # speaker: Fae}
+{found_old_trail: The hooded kid's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
+{calmed("gull"): The grumpy gull at the lookout was fizzy too. That hooded kid gets around! # speaker: Fae}
+{has_lantern: Jordan gave me his blacklight lantern. The kid in the purple hood took a secret trail you can only see in its light! # speaker: Fae}
 {jordan_joined: Jordan is on my team now! He's hiked every trail on the mountain. # speaker: Fae}
-{calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! # speaker: Fae}
-{rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The raccoon must be up here somewhere. # speaker: Fae}
+{calmed("bunny") and calmed("squirrel"): The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. I've calmed its fizzy bunnies and squirrels! # speaker: Fae}
+{rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The kid in the purple hood must be up here somewhere. # speaker: Fae}
 {calmed("bluebird") and not rode_bus: The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! # speaker: Fae}
-{calmed("bluebird"): The Bay Bluebird says the raccoon zipped off toward the mountains. # speaker: Fae}
+{calmed("bluebird"): A calm bluebird says the kid in the purple hood zipped off toward the mountains. # speaker: Fae}
 {sue_joined: Sue is on my team now! She knows every good fishing spot. # speaker: Fae}
 {club_open: The purple hood in the tree house has a Cloverhollow School name tag. Whose is it? # speaker: Fae}
 {club_open and not sue_joined: The east road leads to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. # speaker: Fae}
-{knows_password and not club_open: The raccoon's club password is "Fizzlesticks". A club... like the tree house in the park? # speaker: Fae}
-{hall_pass: I have a hall pass! Time to follow the raccoon's trail. # speaker: Fae}
-{calmed("pup"): The Pond Pup is calm. A raccoon paw print points toward the school. # speaker: Fae}
-{calmed("frog") and not calmed("pup"): Purple fizz drips lead out of the plaza to Meadow Park. # speaker: Fae}
+{knows_password and not club_open: The hooded kid's club password is "Fizzlesticks". A club... like the tree house in the park? # speaker: Fae}
+{hall_pass: I have a hall pass! Time to follow the hooded kid's trail. # speaker: Fae}
+{calmed("pup"): A calm pup found a purple thread that leads toward the school. # speaker: Fae}
+{calmed("fountain-frog") and not calmed("pup"): Purple fizz drips lead out of the plaza to Meadow Park. # speaker: Fae}
 {coins() > 0: I have coins! The bakery in the plaza sells snacks for 5 coins. # speaker: Fae}
-{calmed("frog"): The Fountain Frog is calm. Something purple fizzed into his fountain. # speaker: Fae}
-{read_notice: A raccoon in a purple hood was seen in town. # speaker: Fae}
+{calmed("fountain-frog"): The Fountain Frog is calm. Something purple fizzed into his fountain. # speaker: Fae}
+{read_notice: A kid in a purple hood was seen in town. # speaker: Fae}
 {plan == "now": Go see why the fountain is fizzing! # speaker: Fae}
 {plan == "later": Check the fizzing fountain after school. # speaker: Fae}
 -> DONE
 
 === fountain ===
-{calmed("frog"):
+{calmed("fountain-frog"):
     The bubbles are gone. The fountain sparkles like new! # speaker: Fae
 - else:
     Pink bubbles... and it smells like bubblegum? # speaker: Fae
@@ -135,7 +135,7 @@ Have a good day, sweetie. Stay curious! # speaker: Mom
 {pup_calm > 1: -> again}
 Woof! Woof! The pup flops down and wags his whole body. # speaker: Pond Pup
 He drops a soggy tennis ball at my feet. It's all purple and fizzy. # speaker: Fae
-And there's a tiny paw print on it... a raccoon paw print! # speaker: Fae
+And there's a purple thread stuck to it... from a purple hood! # speaker: Fae
 Woof! # speaker: Pond Pup
 He's pointing his nose at the road to school. # speaker: Fae
 -> DONE
@@ -170,15 +170,15 @@ Somebody ate every single berry... and left purple paw prints! # speaker: Fae
 
 === bay_road_closed ===
 The east road goes to Bubblegum Bay! # speaker: Fae
-But I want to follow the raccoon's trail first. # speaker: Fae
+But I want to follow the hooded kid's trail first. # speaker: Fae
 -> DONE
 
 === sue ===
 Whoa, hi! Careful, these planks are a little wobbly. # speaker: Sue
 I'm Sue. I fish here every day... but today the fish are all fizzy! # speaker: Sue
 And that flappy bluebird keeps kicking sand in my bait bucket. # speaker: Sue
-Wait. Purple fizz? Was it a raccoon in a hood? # speaker: Sue
-* [Yes! I'm following his trail.]
+Wait. Purple fizz? Was it a kid in a purple hood? # speaker: Sue
+* [Yes! I'm following their trail.]
     I knew it! Count me in. # speaker: Sue
 * [I think so. Want to help me find out?]
     Are you kidding? Of course! Let me grab my rod. # speaker: Sue
@@ -188,7 +188,7 @@ Wait. Purple fizz? Was it a raccoon in a hood? # speaker: Sue
 === bluebird_calm ===
 {bluebird_calm > 1: -> again}
 Chirp! Thank you, Fae. My wings feel calm again. # speaker: Bay Bluebird
-The raccoon zipped off toward the mountains! # speaker: Bay Bluebird
+A kid in a purple hood zipped off toward the mountains! # speaker: Bay Bluebird
 -> DONE
 
 = again
@@ -202,39 +202,39 @@ Chirp-chirp! The bay is peaceful now. # speaker: Bay Bluebird
     -> DONE
 }
 The bus is here! Where to? # speaker: Fae
-* {calmed("bluebird")} [Pinecone Pass!]
++ {calmed("bluebird")} [Pinecone Pass!]
     ~ rode_bus = true
     Up we go! # speaker: Fae # travel: pass.bus
     -> DONE
-* {club_open} [Bubblegum Bay!]
++ {club_open} [Bubblegum Bay!]
     To the beach! # speaker: Fae # travel: bay.bus-stop
     -> DONE
-* [Not yet.]
++ [Not yet.]
     Not yet. I'll stay in Cloverhollow a little longer. # speaker: Fae
 -> DONE
 
 === bay_bus_stop ===
 The bus stops here on its way between the towns. Where to? # speaker: Fae
-* [Cloverhollow!]
++ [Cloverhollow!]
     Home to town! # speaker: Fae # travel: plaza.bus-stop
     -> DONE
-* {calmed("bluebird")} [Pinecone Pass!]
++ {calmed("bluebird")} [Pinecone Pass!]
     ~ rode_bus = true
     Up we go! # speaker: Fae # travel: pass.bus
     -> DONE
-* [Not yet.]
++ [Not yet.]
     Not yet. I want to stay at the beach a little longer. # speaker: Fae
 -> DONE
 
 === pass_bus_stop ===
 The bus is ready to roll. Where to? # speaker: Fae
-* [Cloverhollow!]
++ [Cloverhollow!]
     Back to town! # speaker: Fae # travel: plaza.bus-stop
     -> DONE
-* {club_open} [Bubblegum Bay!]
++ {club_open} [Bubblegum Bay!]
     Down to the beach! # speaker: Fae # travel: bay.bus-stop
     -> DONE
-* [Not yet.]
++ [Not yet.]
     Not yet. I want to look around a little more. # speaker: Fae
      -> DONE
 
@@ -264,8 +264,8 @@ I can see Sue's dock way down there. It looks tiny! # speaker: Fae
 === bunny_calm ===
 {bunny_calm > 1: -> again}
 Thank you! I was hopping in circles all morning. # speaker: Ribbon Bunny
-A raccoon in a purple hood zipped by, and everything went all fizzy! # speaker: Ribbon Bunny
-That raccoon again! # speaker: Fae
+A kid in a purple hood zipped by, and everything went all fizzy! # speaker: Ribbon Bunny
+That hooded kid again! # speaker: Fae
 -> DONE
 = again
 The clover up here is extra sweet. Want some? # speaker: Ribbon Bunny
@@ -274,7 +274,7 @@ The clover up here is extra sweet. Want some? # speaker: Ribbon Bunny
 === squirrel_calm ===
 {squirrel_calm > 1: -> again}
 Phew! Sorry about all the acorns. # speaker: Acorn Squirrel
-A raccoon traded me a shiny bottle cap for my best acorn. # speaker: Acorn Squirrel
+A kid in a purple hood traded me a shiny bottle cap for my best acorn. # speaker: Acorn Squirrel
 Then, fizz! I couldn't stop throwing things. # speaker: Acorn Squirrel
 -> DONE
 = again
@@ -284,8 +284,8 @@ I'm saving my acorns for winter now. Nobody gets bonked! # speaker: Acorn Squirr
 === gull_calm ===
 {gull_calm > 1: -> again}
 Squawk! Sorry about your snacks. I couldn't help myself! # speaker: Lookout Gull
-A raccoon in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! # speaker: Lookout Gull
-A fizzy cracker? Everywhere that raccoon goes, things go fizzy. # speaker: Fae
+A kid in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! # speaker: Lookout Gull
+A fizzy cracker? Everywhere that kid goes, things go fizzy. # speaker: Fae
 -> DONE
 = again
 I'm keeping watch over the sea now. No more snack snatching! # speaker: Lookout Gull
@@ -297,20 +297,20 @@ It keeps throwing snowballs at everyone. Even at the snowman! # speaker: Jordan
 I'm Jordan, by the way. I've hiked every trail up here. # speaker: Jordan
 * [Let's calm it down together!]
     You got it! I'll keep it busy. # speaker: Jordan
-* [Did a raccoon in a purple hood come by?]
-    He zoomed past on a sled, laughing his head off! Let's go after him. # speaker: Jordan
+* [Did a kid in a purple hood come by?]
+    Somebody in a purple hood zoomed past on a sled, laughing their head off! Let's go after them. # speaker: Jordan
 - ~ jordan_joined = true
 -> DONE
 
 === hamster_calm ===
 {hamster_calm > 1: -> again}
 Squeak! Thank you. My head feels all cozy again. # speaker: Hiker Hamster
-The raccoon? He ran off down a secret trail. You can only see it at night... # speaker: Hiker Hamster
+The kid in the purple hood? They ran off down a secret trail. You can only see it at night... # speaker: Hiker Hamster
 A trail you can only see at night? # speaker: Fae
 Trail markers glow under blacklight! Here, Fae, take my lantern. # speaker: Jordan
 ~ has_lantern = true
 Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle. # speaker: Fae
-Switch it on and look around. Raccoon tracks glow! # speaker: Jordan
+Switch it on and look around. Fizzy tracks glow! # speaker: Jordan
 -> DONE
 
 = again
@@ -318,8 +318,8 @@ Squeak! Watch out for snowballs. Hee hee. # speaker: Hiker Hamster
 -> DONE
 
 === lift_note ===
-Glowing raccoon doodles on the lift tower! A masked face, a swirl, and a star. # speaker: Fae
-The squiggles look like secret writing. Was the raccoon leaving a message for someone? # speaker: Fae
+Glowing doodles on the lift tower! A masked face, a swirl, and a star. # speaker: Fae
+The squiggles look like secret writing. Was the hooded kid leaving a message for someone? # speaker: Fae
 -> DONE
 
 === old_trail_marker ===
@@ -416,18 +416,40 @@ The bulletin board: a spelling bee, a lost mitten, and a bake sale on Friday. # 
 Trophies for spelling, soccer, and the best pumpkin in Cloverhollow. # speaker: Fae
 -> DONE
 
-=== raccoon ===
-Heh heh heh! So YOU'RE the one who keeps un-fizzing my critters! # speaker: Raccoon
-{calmed("frog") and calmed("pup"): The Fizzy Frog AND the Zoomie Pup? Hmph! # speaker: Raccoon}
-You'll never get into my secret club. Not without the password! # speaker: Raccoon
-* [What's the password?]
-    Ha! As if I'd tell you it's "Fizzlesticks"! ...Oops. # speaker: Raccoon
-* [Why are you making everything fizzy?]
-    Because fizzy is FUN! Way more fun than school! # speaker: Raccoon
-    And only my club knows the magic word: "Fizzlesticks"! ...Oops. # speaker: Raccoon
-- ~ knows_password = true
+=== school_raccoon ===
+Chitter-chitter! Thanks, Fae. My head feels all clear now. # speaker: Ringtail Raccoon
+A kid in a purple hood gave me a fizzy cracker. Then I couldn't stop chattering! # speaker: Ringtail Raccoon
+I heard that kid whisper a secret word at the tree house in the park: "Fizzlesticks!" # speaker: Ringtail Raccoon
+~ knows_password = true
+A secret password for a tree house club? I have to see this! # speaker: Fae
 ~ raccoon_waiting = false
-With a puff of purple fizz, the raccoon is gone! # speaker: Fae
+The raccoon waves its striped tail and scampers off. # speaker: Fae
+-> DONE
+
+=== raccoon_calm ===
+{raccoon_calm > 1: -> again}
+Chitter! Sorry, Fae. The fizz made me grab every shiny thing in sight. # speaker: Ringtail Raccoon
+A kid in a purple hood keeps leaving fizzy crackers around. They're SO tasty. # speaker: Ringtail Raccoon
+-> DONE
+= again
+The raccoon washes a bottle cap and gives it a happy little pat. # speaker: Ringtail Raccoon
+-> DONE
+
+=== cat_calm ===
+{cat_calm > 1: -> again}
+Mrrow! Thanks, Fae. That fizz made my whiskers all twitchy. # speaker: Cozy Cat
+The cat curls around Fae's ankles, purring like a little motor. # speaker: Fae
+-> DONE
+= again
+The cat blinks slowly at Fae. That means "I like you." # speaker: Cozy Cat
+-> DONE
+
+=== beach_frog_calm ===
+{beach_frog_calm > 1: -> again}
+Ribbit! The sand feels nice and cool again. Thanks, Fae! # speaker: Beach Frog
+-> DONE
+= again
+Ribbit! The frog hops happily around a tide pool. # speaker: Beach Frog
 -> DONE
 
 === old_trail_closed ===
@@ -436,7 +458,7 @@ The pines are quiet and snowy. The old trail only appears under the lantern's gl
 
 === clubhouse ===
 {clubhouse_claimed: -> clubhouse_again}
-The raccoon's abandoned clubhouse smells like purple fizzy soda. # speaker: Fae
+Somebody's secret clubhouse! It smells like purple fizzy soda. # speaker: Fae
 Comic books are scattered beside a half-eaten fizzy cracker. # speaker: Fae
 With the lantern on, invisible ink glows across the wall: "Meet the boss at the Ancient Tree in the Enchanted Forest." # speaker: Fae
 The Enchanted Forest is sealed. Whoever the boss is, the note does not say. # speaker: Fae
@@ -455,7 +477,7 @@ The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a ga
 === owl_calm ===
 {owl_calm > 1: -> again}
 The owl whispers, "The trees remember every secret." # speaker: Whispering Owl
-The raccoon left purple fizz, comic books, and a cracker in the clubhouse. # speaker: Whispering Owl
+A kid in a purple hood left purple fizz, comic books, and a cracker in the clubhouse. # speaker: Whispering Owl
 The owl hoots wisely. "The boss waits by the Ancient Tree in the sealed forest." # speaker: Whispering Owl
 -> DONE
 = again

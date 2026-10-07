@@ -1,6 +1,6 @@
 {
-  "asset": "raccoon",
-  "status": "owner-review-ready",
+  "asset": "raccoon-npc",
+  "status": "retired (Milestone 28): the talking raccoon became a raccoon battle, and its atlas (public/assets/characters/raccoon/) left the game. Owner-approved 2026-10-06. Its build, tools/art/build-raccoon-npc.ts, is in git history before Milestone 28; the selected raw sources stay, a reference for the raccoon critter (art/recipes/raccoon.json).",
   "model": "gemini-3-pro-image",
   "generationCalls": "2 (the three-pose strip, and one blink edit of the front pose); see art/scratch/generation-log.jsonl",
   "references": [
@@ -12,7 +12,7 @@
     "art/source/raccoon/blink-edit-raw.png"
   ],
   "postProcessing": {
-    "build": "bun tools/art/build-raccoon-npc.ts (rebuilds the atlas byte for byte)",
+    "build": "tools/art/build-raccoon-npc.ts (in git history; rebuilt the atlas byte for byte)",
     "extract": "each pose found as a whole figure by the gaps between figures (extract-strip.ts); fixed thirds of the strip cut one tail flat and left a piece of it beside the next pose",
     "key": "#00FF00 border flood plus enclosed holes, 18% fuzz (the visible edge band peaks at a green excess of 20 to 28; 45% changed nothing that mattered)",
     "cleanup": "at sprite size, drop-islands.ts --min 120, then despill-edge.ts --key green --band 2",

@@ -1232,44 +1232,54 @@
   },
   "critters": [
     {
-      "id": "frog",
+      "id": "fountain-frog",
       "point": {
         "x": 1000,
         "y": 820
       }
-    }
-  ],
-  "name": "Town plaza",
-  "npcs": [
+    },
     {
-      "id": "raccoon",
+      "id": "school-raccoon",
       "point": {
         "x": 400,
         "y": 860
       },
-      "facing": "down",
-      "knot": "raccoon",
-      "prompt": "Talk",
-      "visibleWhile": "raccoon_waiting",
-      "footprint": [
-        [
-          385,
-          850
+      "visibleWhile": "raccoon_waiting"
+    }
+  ],
+  "recurring": {
+    "after": "fountain-frog",
+    "dens": [
+      {
+        "point": {
+          "x": 800,
+          "y": 395
+        },
+        "radius": 90,
+        "kinds": [
+          "raccoon",
+          "pup",
+          "cat"
         ],
-        [
-          415,
-          850
+        "chance": 0.6
+      },
+      {
+        "point": {
+          "x": 620,
+          "y": 770
+        },
+        "radius": 90,
+        "kinds": [
+          "raccoon",
+          "pup",
+          "cat"
         ],
-        [
-          415,
-          870
-        ],
-        [
-          385,
-          870
-        ]
-      ]
-    },
+        "chance": 0.6
+      }
+    ]
+  },
+  "name": "Town plaza",
+  "npcs": [
     {
       "id": "bus-stop",
       "point": {

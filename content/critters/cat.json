@@ -1,0 +1,109 @@
+{
+  "id": "cat",
+  "species": "cat",
+  "name": "Pouncy Cat",
+  "calmName": "Cozy Cat",
+  "atlas": "assets/critters/cat/cat.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 314
+  },
+  "figureHeight": 380,
+  "overworldHeight": 66,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "cozy-cat",
+    "name": "Cozy Cat",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "cat_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy cat pounces out of nowhere, its tail puffed up like a bottle brush!",
+    "command": "How can Fae calm the cat?",
+    "soothe": {
+      "great": "Fae hums a soft, purry tune. The cat's swirly eyes start to slow down!",
+      "good": "Fae hums softly. The cat's ears twitch toward her.",
+      "miss": "The cat is too busy chasing its own tail to listen."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie and the cat touch noses, then chase a leaf together!",
+        "good": "Maddie flicks her tail. The cat watches, curious.",
+        "miss": "Maddie pounces... right onto a yarn ball. The cat looks very smug."
+      },
+      "cast": {
+        "great": "Sue dangles her ribbon bobber. The cat bats it again and again, purring!",
+        "good": "Sue's bobber wiggles by. The cat crouches, wiggling too.",
+        "miss": "Sue's bobber snags on a bench. The cat yawns."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones. The cat follows every one, spellbound!",
+        "good": "Jordan tosses a pinecone. The cat's head bobs after it.",
+        "miss": "A pinecone bonks Jordan on the nose. The cat flicks its tail."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. The cat nibbles it, very politely.",
+    "burst": "The cat puffs up and bats a flurry of yarn balls at Fae!",
+    "burstResult": {
+      "great": "Fae catches every yarn ball!",
+      "good": "Fae catches most of the yarn!",
+      "miss": "Whoops! Fae gets all tangled up in yarn."
+    },
+    "soothed": "The cat curls up with a happy purr. The fizzy spell floats away!",
+    "rest": "Fae is all tuckered out. Time for a little rest.",
+    "run": "Fae tiptoes away. The cat keeps swishing its tail."
+  },
+  "coins": 8
+}

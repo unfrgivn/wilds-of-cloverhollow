@@ -82,6 +82,7 @@ for (const item of [
   { name: "frog-win", fixture: "plaza" },
   { name: "bakery", fixture: "plaza" },
   { name: "pup-win", fixture: "park" },
+  { name: "recurring", fixture: "park" },
   { name: "hall-pass", fixture: "school" },
   { name: "raccoon", fixture: "school" },
   { name: "chapter-one", fixture: "new-game" },

@@ -15,7 +15,7 @@ account is unpaid, so device builds use free personal-team signing.
 
 | Item | Why it's waiting |
 | --- | --- |
-| Who the kid in the purple hood is | Owner, 2026-10-07: unnamed, and kept secret until the very end; they may appear earlier as an ordinary kid. Raccoons are a recurring critter, not a character (rework planned as Milestone 28). The kid knows; the player doesn't. The hooded kid is glimpsed running off and talked about through the story (owner, 2026-10-07). |
+| Who the kid in the purple hood is | Owner, 2026-10-07: unnamed, and kept secret until the very end; they may appear earlier as an ordinary kid. Raccoons are a recurring critter, not a character (reworked in Milestone 28). The kid knows; the player doesn't. The hooded kid is glimpsed running off and talked about through the story (owner, 2026-10-07). |
 | Maddie's proportions (Milestone 17) | She had been drawn twice her height since Milestone 7 (only her width was scaled); she is now the cat in her atlas. Every screenshot with her in it changed |
 | Sue's look (Milestone 18) | Her atlas, from the owner's concept sheet: `art/review/sue-contact-cream.png`, `sue-fae-lineup.png`, `sue-walk-*.gif` |
 | Sue's Cast lines (Milestone 18) | Six battle lines, in `docs/plan.md` (Milestone 18) |
@@ -34,3 +34,4 @@ account is unpaid, so device builds use free personal-team signing.
 | The grumpy gull (Milestone 25) | The first mini-boss at the Cliffside Trail lookout: `art/review/gull-lineup.png`, its battle, sticker, and wording listed in `docs/plan.md` (Milestone 25) |
 | The Whispering Woods (Milestone 26) | The painting, the clubhouse, and the chaos owl's atlas. The woods is a recorded hand-authored watercolor composite (`art/recipes/woods.json`); the owl is a shared-scale atlas build (`art/recipes/owl.json`) |
 | Coins and shops (Milestone 27) | The coin payouts (8 a critter, 25 for the gull), the bakery's and the cocoa stand's lines, and the journal's Coins and Snacks stickers: `tests/e2e/shop.spec.ts-snapshots/`; the wording is listed in `docs/plan.md` (Milestone 27) |
+| Recurring bad guys (Milestone 28) | The cat's and the raccoon's battle atlases (`art/review/cat-sheet-cream.png`, `raccoon-sheet-cream.png`, `recurring-critters-lineup.png`; in the game, `tests/e2e/recurring.spec.ts-snapshots/` and `raccoon.spec.ts-snapshots/`), where each land's dens are, and the wording listed in `docs/plan.md` (Milestone 28): the school raccoon, the cats, raccoons, and beach frogs, "+8 coins!", and every line that now says "a kid in a purple hood" |

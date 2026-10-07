@@ -59,8 +59,9 @@ function chapterOneInk(): State["ink"] {
   return state.ink;
 }
 
-// Fae in front of an area's bus stop, facing it.
-function atStop(area: string, critters: State["critters"], ink?: State["ink"]): State {
+// Fae in front of an area's bus stop, facing it, with the stickers of the
+// species she has calmed (the story asks calmed() of a species).
+function atStop(area: string, stickers: string[], ink?: State["ink"]): State {
   const spawn = areaFor(area).spawns[area === "pass" ? "bus" : "bus-stop"];
   if (spawn === undefined) throw new Error(`no bus spawn in ${area}`);
   const start = createState(world, { area, spawn: area === "pass" ? "bus" : "bus-stop" });
@@ -69,7 +70,7 @@ function atStop(area: string, critters: State["critters"], ink?: State["ink"]): 
     ...start,
     player: feet,
     facing: "up",
-    critters: { ...start.critters, ...critters },
+    stickers,
     ...(ink === undefined ? {} : { ink }),
   };
 }
@@ -93,8 +94,8 @@ function ride(state: State, choice: number): { choices: string[]; state: State }
   return { choices, state };
 }
 
-const calm: State["critters"] = { frog: "calm", pup: "calm", bluebird: "calm" };
-const bluebirdFizzy: State["critters"] = { frog: "calm", pup: "calm", bluebird: "chaos" };
+const calm = ["fountain-frog", "pond-pup", "bay-bluebird"];
+const bluebirdFizzy = ["fountain-frog", "pond-pup"];
 
 describe("the lands", () => {
   it("are the six lands of the painted map, in order", () => {
@@ -172,6 +173,20 @@ describe("the bus line", () => {
     expect(home.state.transition?.target).toEqual({ area: "plaza", spawn: "bus-stop" });
     const beach = ride(atStop("pass", calm, chapterOneInk()), 1);
     expect(beach.state.transition?.target).toEqual({ area: "bay", spawn: "bus-stop" });
+  });
+
+  it("offers the same rides on every visit, however often Fae rides", () => {
+    // Ink choices are once-only unless sticky; the stops' were once-only
+    // until Milestone 28, so each ride could be taken only once a game.
+    let ink = chapterOneInk();
+    for (let trip = 0; trip < 3; trip += 1) {
+      const up = ride(atStop("plaza", calm, ink), 0);
+      expect(up.choices, `trip ${trip}`).toEqual(["Pinecone Pass!", "Bubblegum Bay!", "Not yet."]);
+      const down = ride(atStop("pass", calm, up.state.ink), 0);
+      expect(down.choices, `trip ${trip}`)
+        .toEqual(["Cloverhollow!", "Bubblegum Bay!", "Not yet."]);
+      ink = down.state.ink;
+    }
   });
 
   it("only ever sends Fae to a place that exists", () => {

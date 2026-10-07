@@ -219,7 +219,7 @@ describe("party battle commands", () => {
     return {
       ...createState(world, fixture),
       battle: {
-        critterId: "frog",
+        critterId: "fountain-frog", den: null,
         entry: { x: 500, y: 500 },
         phase: "command",
         message: "",
@@ -298,10 +298,10 @@ describe("party battle commands", () => {
 });
 
 describe("save version", () => {
-  it("writes version 4 and refuses version 2", () => {
+  it("writes version 5 and refuses version 2", () => {
     const state = createState(world, fixtureFor("new-game"));
     const json = serializeSave(state);
-    expect(JSON.parse(json).version).toBe(4);
+    expect(JSON.parse(json).version).toBe(5);
     expect(parseSave(json, state)).toEqual(state);
     expect(parseSave(JSON.stringify({ version: 2, state }), state)).toBeNull();
   });

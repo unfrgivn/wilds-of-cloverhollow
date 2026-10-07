@@ -53,9 +53,9 @@ describe("school day story", () => {
     if (fixture === undefined) throw new Error("school fixture missing");
     const before = createState(content.world, fixture);
     expect(journalNotes(content.world, before)).not.toContain(
-      "I have a hall pass! Time to follow the raccoon's trail.");
+      "I have a hall pass! Time to follow the hooded kid's trail.");
     const withPass = { ...before, ink: play(fresh, "nurse", 1).ink };
     expect(journalNotes(content.world, withPass)[0])
-      .toBe("I have a hall pass! Time to follow the raccoon's trail.");
+      .toBe("I have a hall pass! Time to follow the hooded kid's trail.");
   });
 });

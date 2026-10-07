@@ -34,9 +34,11 @@ test.describe("frog battle", () => {
     await resetPaused(page, "plaza");
     for (const [key, ticks] of approach) await hold(page, key, ticks);
     const before = await renderInfo(page);
-    expect(before.critters).toEqual([{ id: "frog", frame: "chaos_idle_01", x: 1000, y: 820 }]);
+    expect(before.critters).toEqual([
+      { id: "fountain-frog", kind: "fountain-frog", frame: "chaos_idle_01", x: 1000, y: 820 },
+    ]);
     expect(before.drawOrder.map((item) => item.label))
-      .toEqual(expect.arrayContaining(["critter:frog", "critter:frog:aura"]));
+      .toEqual(expect.arrayContaining(["critter:fountain-frog", "critter:fountain-frog:aura"]));
     await expect(page).toHaveScreenshot("overworld-frog-chaos.png");
     await hold(page, "ArrowLeft", 35);
     await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
@@ -95,14 +97,16 @@ test.describe("frog battle", () => {
 
     const after = await readState(page);
     expect(after.battle, "the battle ends").toBeNull();
-    expect(after.critters.frog).toBe("calm");
+    expect(after.critters["fountain-frog"]).toBe("calm");
     expect(after.stickers).toEqual(["fountain-frog"]);
     expect(after.player).toEqual(entry);
     await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
     expect([...seen].sort()).toEqual(["burst", "great", "intro"]);
     await step(page, 2);
     expect((await renderInfo(page)).critters)
-      .toEqual([{ id: "frog", frame: "calm_idle_01", x: 1000, y: 820 }]);
+      .toEqual([
+        { id: "fountain-frog", kind: "fountain-frog", frame: "calm_idle_01", x: 1000, y: 820 },
+      ]);
     await expect(page).toHaveScreenshot("overworld-frog-calm.png");
 
     // Walking into the calm frog starts no battle; he talks instead.
@@ -158,7 +162,7 @@ test.describe("frog battle", () => {
       await tap(".touch-confirm");
     const after = await readState(page);
     expect(after.battle).toBeNull();
-    expect(after.critters.frog).toBe("chaos");
+    expect(after.critters["fountain-frog"]).toBe("chaos");
     expect(after.player).toEqual(entry);
     await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
     await context.close();

@@ -178,16 +178,38 @@ export function areaConnectionErrors(
         )
       )
         errors.push(`${area.id}: critter ${config} overlaps a spawn`);
-      if (area.interactables.some((item) => item.id === `critter:${config}`))
-        continue;
-      if (
-        area.id === "plaza" &&
-        !reachable.some(
-          (point) => distance(point, critter.point) <= tunables.interact.range,
-        )
-      )
+      if (!reachable.some((point) => distance(point, critter.point) <= tunables.interact.range))
         errors.push(`${area.id}: calm ${config} talk point is unreachable`);
     }
+    // A den's critters start at its point (spec 6): it must be on the floor,
+    // and far enough from every spawn and door that Fae arriving there isn't
+    // in its sight, nor caught the moment she steps through.
+    area.recurring?.dens.forEach((den, index) => {
+      const touch = Math.max(...den.kinds.map((kind) => critters[kind]?.touchRadius ?? 70));
+      const clear = tunables.roam.sight + touch;
+      if (!walkable(area, tunables.follow.radius, den.point))
+        errors.push(`${area.id}: den ${index} is off the floor`);
+      for (const [name, spawn] of Object.entries(area.spawns))
+        if (distance(spawn, den.point) <= clear)
+          errors.push(`${area.id}: den ${index} is within ${clear} of spawn ${name}`);
+      for (const trigger of area.triggers)
+        if (pointInPolygon(den.point, trigger.polygon) ||
+            distanceToPolygon(den.point, trigger.polygon) <= den.radius + touch)
+          errors.push(`${area.id}: den ${index} reaches door ${trigger.id}`);
+      // Its critters must be seen: a den mostly behind scenery hides them.
+      // Samples on rings round the den, each a critter's middle (35 units
+      // above its feet), drawn behind an occluder while north of its baseline.
+      const spots = [0, den.radius / 2, den.radius].flatMap((ring) =>
+        Array.from({ length: 16 }, (_, step) => {
+          const turn = (step / 16) * 2 * Math.PI;
+          return { x: den.point.x + Math.cos(turn) * ring, y: den.point.y + Math.sin(turn) * ring };
+        }));
+      const hidden = spots.filter((spot) => area.occluders.some((occluder) =>
+        occluder.canopy !== true && spot.y < occluder.baseline &&
+        pointInPolygon({ x: spot.x, y: spot.y - 35 }, occluder.polygon)));
+      if (hidden.length > spots.length / 10)
+        errors.push(`${area.id}: den ${index} is mostly behind scenery`);
+    });
     for (const [name, spawn] of Object.entries(area.spawns)) {
       // The whole roster must fit behind Fae here, whoever is in the party.
       for (const { id, slot } of partySlots(area, spawn, tunables.follow, roster))

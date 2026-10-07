@@ -1,5 +1,6 @@
 {
   "id": "bluebird",
+  "species": "bluebird",
   "name": "Flappy Bluebird",
   "calmName": "Bay Bluebird",
   "atlas": "assets/critters/bluebird/bluebird.json",
@@ -101,7 +102,6 @@
       "miss": "Poof! Sand lands all around Fae."
     },
     "soothed": "The bluebird settles on a shell, calm and bright.",
-    "reward": "New sticker: Bay Bluebird! +8 coins.",
     "rest": "Fae is tuckered out. Time for a little rest.",
     "run": "Fae backs away slowly. The bluebird keeps fluttering."
   },

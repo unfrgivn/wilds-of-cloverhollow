@@ -96,9 +96,10 @@
   font-size: 16px;
   line-height: 1.45;
 }
+/* Ten stickers, one per species, in two rows (a phone's page fits two). */
 .journal-stickers {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 4px;
 }

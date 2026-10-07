@@ -22,7 +22,7 @@ const world: World = {
     ...base.areas,
     harness: {
       ...harness,
-      critters: [{ id: "frog", point: home, roam: { radius: 150 } }],
+      recurring: { dens: [{ point: home, radius: 150, kinds: ["frog"], chance: 1 }] },
     },
   },
 };
@@ -56,7 +56,7 @@ const scripted = (): string => {
   for (let tick = 0; tick < world.tunables.roam.cooldownTicks; tick += 1) {
     state = step(world, state, blankInput()).state;
     const area = world.areas[state.area];
-    const roamer = state.roamers.frog;
+    const roamer = state.wild[0];
     if (area === undefined || roamer === undefined || !valid(roamer, area))
       throw new Error(`roamer left floor at tick ${state.tick}`);
     if (state.battle !== null) throw new Error("roamer ignored cooldown");

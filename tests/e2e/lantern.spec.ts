@@ -44,7 +44,7 @@ test("real keys switch on the blacklight and reveal the pass trail", async ({ pa
   expect(sawOn).toBe(true);
   expect(markerShot).toBe(true);
   expect(lines).toEqual(expect.arrayContaining([
-    "Glowing raccoon doodles on the lift tower! A masked face, a swirl, and a star.",
+    "Glowing doodles on the lift tower! A masked face, a swirl, and a star.",
     "A glowing arrow, painted on a tree! It points west, deep into the pines.",
   ]));
   const end = await readState(page);

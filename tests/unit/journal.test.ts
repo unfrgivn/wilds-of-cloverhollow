@@ -82,7 +82,7 @@ describe("journal", () => {
         {
           ...state,
           battle: {
-            critterId: "frog",
+            critterId: "fountain-frog", den: null,
             entry: state.player,
             phase: "command",
             message: "",
@@ -112,12 +112,13 @@ describe("journal", () => {
     let board = runInk(story, ink, { type: "start", knot: "notice_board" });
     for (let count = 0; count < 10 && !board.ended; count += 1)
       board = runInk(story, board.ink, { type: "next" });
-    const critters: State["critters"] = { frog: "calm" };
-    const state = { ...createState(content.world, fixture), ink: board.ink, critters };
+    const fresh = createState(content.world, fixture);
+    const critters: State["critters"] = { ...fresh.critters, "fountain-frog": "calm" };
+    const state = { ...fresh, ink: board.ink, critters, stickers: ["fountain-frog"] };
     expect(journalNotes(content.world, state)).toEqual([
       "Purple fizz drips lead out of the plaza to Meadow Park.",
       "The Fountain Frog is calm. Something purple fizzed into his fountain.",
-      "A raccoon in a purple hood was seen in town.",
+      "A kid in a purple hood was seen in town.",
       "Check the fizzing fountain after school.",
     ]);
     expect(state.ink, "reading the journal never changes the story").toBe(board.ink);

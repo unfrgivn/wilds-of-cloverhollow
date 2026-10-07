@@ -6,7 +6,7 @@ import type { State, World } from "./types";
 // state. Runs on a copy of the Ink state and keeps no result, so reading the
 // journal never changes the game.
 export function journalNotes(world: World, state: State): string[] {
-  const facts = inkFacts(state);
+  const facts = inkFacts(world, state);
   const notes: string[] = [];
   let result = runInk(world.story, state.ink, { type: "start", knot: "journal" }, facts);
   for (let count = 0; count < 20; count += 1) {

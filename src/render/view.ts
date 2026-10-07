@@ -11,11 +11,13 @@ import {
   type Texture,
 } from "pixi.js";
 import {
+  battleFoe,
   faeBox,
   hiddenFraction,
   npcFacing,
   npcVisible,
   partyLeader,
+  presentCritters,
   targetInteractable,
   type Area,
   type PartyContent,
@@ -100,7 +102,10 @@ export class GameView {
   private partyFrames: { id: string; animation: string; frame: number }[] = [];
   private readonly areaTextureUrls = new Set<string>();
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
-  private critterFrames: { id: string; frame: string; x: number; y: number }[] = [];
+  private critterKeys = "";
+  // Each overworld critter: `id` is its key (a set piece's id or `wild:<den>`).
+  private critterFrames: { id: string; kind: string; frame: string; x: number; y: number }[] =
+    [];
   private npcSprites: { npc: Area["npcs"][number]; sprite: Sprite }[] = [];
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
   private glowSprites: { id: string; sprite: Sprite }[] = [];
@@ -166,9 +171,10 @@ export class GameView {
         src: assetUrl("assets/characters/fae/fae.json"),
         data: { textureOptions: { autoGenerateMipmaps: true } },
       }),
-      ...Object.entries(this.world.critters).map(([id, critter]) =>
-        Assets.load({ alias: `${id}-sheet`, src: assetUrl(critter.atlas) }),
-      ),
+      // Kinds of one species can share an atlas (the fountain frog and the
+      // bay's frogs), so critter atlases are loaded, and found, by URL.
+      ...[...new Set(Object.values(this.world.critters).map((critter) => critter.atlas))]
+        .map((atlas) => Assets.load({ alias: atlas, src: assetUrl(atlas) })),
       ...Object.entries(this.world.party).map(([id, member]) =>
         Assets.load({
           alias: `${id}-sheet`,
@@ -209,14 +215,8 @@ export class GameView {
       sprite.body.destroy();
       sprite.aura.destroy();
     }
-    this.critterSprites = area.critters.map((critter) => {
-      const body = new Sprite();
-      body.label = `critter:${critter.id}`;
-      const aura = new Sprite();
-      aura.label = `critter:${critter.id}:aura`;
-      this.depth.addChild(aura, body);
-      return { id: critter.id, body, aura };
-    });
+    this.critterSprites = [];
+    this.critterKeys = "";
     for (const { sprite } of this.npcSprites) sprite.destroy();
     this.npcSprites = area.npcs.map((npc) => {
       const sprite = new Sprite();
@@ -486,18 +486,36 @@ export class GameView {
 
   // Overworld critters: chaos (with the pulsing aura behind) or calm, y-sorted
   // with Fae, her party, and the occluders, their figures overworldHeight tall.
+  // Who is out can change in an area (a rest rolls it again, a set piece
+  // comes and goes), so the sprites follow the present critters' keys.
   private renderCritters(state: State): void {
-    const area = this.areaView?.area;
-    const frames: { id: string; frame: string; x: number; y: number }[] = [];
-    for (const { id, body, aura } of this.critterSprites) {
-      const authored = area?.critters.find((item) => item.id === id);
-      const roamer = state.roamers[id];
-      const point = roamer === undefined ? authored?.point : { x: roamer.x, y: roamer.y };
-      const content = this.world.critters[id];
-      const sheet = Assets.get<Spritesheet>(`${id}-sheet`);
-      if (point === undefined || content === undefined || sheet === undefined)
-        continue;
-      const calm = state.critters[id] === "calm";
+    const present = this.areaView === undefined ? [] : presentCritters(this.world, state);
+    const keys = present.map((critter) => `${critter.key}=${critter.kind.id}`).join("|");
+    if (keys !== this.critterKeys) {
+      this.critterKeys = keys;
+      for (const sprite of this.critterSprites) {
+        sprite.body.destroy();
+        sprite.aura.destroy();
+      }
+      this.critterSprites = present.map((critter) => {
+        const body = new Sprite();
+        body.label = `critter:${critter.key}`;
+        const aura = new Sprite();
+        aura.label = `critter:${critter.key}:aura`;
+        this.depth.addChild(aura, body);
+        return { id: critter.key, body, aura };
+      });
+    }
+    const frames: { id: string; kind: string; frame: string; x: number; y: number }[] = [];
+    for (const [index, { id, body, aura }] of this.critterSprites.entries()) {
+      const critter = present[index];
+      if (critter === undefined) continue;
+      const content = critter.kind;
+      const point = critter.point;
+      const roamer = critter.wild;
+      const sheet = Assets.get<Spritesheet>(content.atlas);
+      if (sheet === undefined) continue;
+      const calm = critter.mood === "calm";
       const frame = calm ? "calm_idle_01" : "chaos_idle_01";
       const texture = sheet.textures[frame];
       const auraTexture = sheet.textures.chaos_aura_01;
@@ -509,7 +527,7 @@ export class GameView {
       const bob = roamer?.moving === true ? Math.sin(state.tick / 4) * 3 : 0;
       body.position.set(point.x, point.y + bob);
       body.zIndex = point.y;
-      if (roamer !== undefined) body.scale.x = roamer.facing === "right" ? -scale : scale;
+      if (roamer !== null) body.scale.x = roamer.facing === "right" ? -scale : scale;
       aura.visible = !calm;
       aura.texture = auraTexture;
       placeAura(
@@ -522,7 +540,7 @@ export class GameView {
       aura.zIndex = point.y - 0.5;
       aura.alpha = 0.65 + Math.sin(state.tick / 18) * 0.2;
       aura.rotation = state.tick / 180;
-      frames.push({ id, frame, x: point.x, y: point.y });
+      frames.push({ id, kind: content.id, frame, x: point.x, y: point.y });
     }
     this.critterFrames = frames;
   }
@@ -534,14 +552,14 @@ export class GameView {
    * margin keeps the blur's edge fade off-screen.
    */
   private renderBackdrop(
-    critterId: string,
+    state: State,
     width: number,
     height: number,
   ): void {
     const area = this.areaView?.area;
     if (area === undefined) return;
-    const focus = area.critters.find((item) => item.id === critterId)
-      ?.point ?? { x: area.width / 2, y: area.height / 2 };
+    const focus = battleFoe(this.world, state)?.point ??
+      { x: area.width / 2, y: area.height / 2 };
     // Watercolour areas fade to bare paper near their edges (the plaza by
     // about 120 units at the sides and 50 at the top and bottom), so frame
     // only the painted interior, 8% in from every side.
@@ -612,7 +630,7 @@ export class GameView {
     this.battleWash.visible = true;
     this.backdropSprite.visible = true;
     this.scene.visible = false;
-    this.renderBackdrop(battle.critterId, width, height);
+    this.renderBackdrop(state, width, height);
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const x = (width - this.viewWidth * scale) / 2;
     const y = (height - this.viewHeight * scale) / 2;
@@ -625,7 +643,7 @@ export class GameView {
       .fill({ color: 0xfff6e6, alpha: 0.2 });
     const critter = this.world.critters[battle.critterId];
     if (critter === undefined) return;
-    const sheet = Assets.get<Spritesheet>(`${battle.critterId}-sheet`);
+    const sheet = Assets.get<Spritesheet>(critter.atlas);
     const critterFrame =
       battle.phase === "soothed"
         ? "soothed_01"
@@ -655,10 +673,14 @@ export class GameView {
       critter.auraCentre,
       critter.bodyCentre,
     );
+    // The aura fades as the critter is soothed, and a calm one (the reward)
+    // has none.
     this.battleCritterAura.alpha =
-      battle.phase === "soothed"
-        ? Math.max(0, 1 - battle.phaseTicks / 30)
-        : 0.65 + Math.sin(state.tick / 18) * 0.2;
+      battle.phase === "reward"
+        ? 0
+        : battle.phase === "soothed"
+          ? Math.max(0, 1 - battle.phaseTicks / 30)
+          : 0.65 + Math.sin(state.tick / 18) * 0.2;
     this.battleCritterAura.rotation = state.tick / 180;
     const faeSheet = Assets.get<Spritesheet>("fae-sheet");
     const faeFrames = faeSheet.animations.idle_up;
@@ -742,8 +764,11 @@ export class GameView {
     width: number,
     height: number,
   ): { x: number; y: number; radius: number } | null {
+    // The ring and its grade belong to the aiming; at the reward it's over
+    // (it was hidden behind the sticker card, which a coins-only reward
+    // doesn't show).
     const aim = state.battle?.aim;
-    if (aim === null || aim === undefined) return null;
+    if (aim === null || aim === undefined || state.battle?.phase === "reward") return null;
     const layout = this.layoutFor(state, width, height);
     const centre =
       aim.side === "fae"
@@ -783,7 +808,7 @@ export class GameView {
       choices: string[];
       selected: number;
     };
-    critters: { id: string; frame: string; x: number; y: number }[];
+    critters: { id: string; kind: string; frame: string; x: number; y: number }[];
     npcs: { id: string; frame: string; facing: string }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];

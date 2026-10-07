@@ -88,7 +88,8 @@ test("real keys: the frog's coins buy a bakery snack, eaten in the pup's battle"
   expect(shopShot).toBe(true);
   expect(snackShot).toBe(true);
   const end = await readState(page);
-  expect({ area: end.area, coins: end.coins, snacks: end.snacks, pup: end.critters.pup })
+  expect({ area: end.area, coins: end.coins, snacks: end.snacks,
+    pup: end.wild.find((critter) => critter.kind === "pup")?.mood })
     .toEqual({ area: "park", coins: 11, snacks: 2, pup: "calm" });
   expect(await readHash(page)).toBe(bunHash(path, "plaza"));
   await page.keyboard.press("j");

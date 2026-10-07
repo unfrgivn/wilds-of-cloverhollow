@@ -1,16 +1,28 @@
 {
-  "slots": 8,
+  "slots": 10,
   "catalogue": [
     {
       "id": "fountain-frog",
       "name": "Fountain Frog",
-      "critter": "frog",
+      "critter": "fountain-frog",
       "frame": "calm_idle_01"
     },
     {
       "id": "pond-pup",
       "name": "Pond Pup",
       "critter": "pup",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "cozy-cat",
+      "name": "Cozy Cat",
+      "critter": "cat",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "ringtail-raccoon",
+      "name": "Ringtail Raccoon",
+      "critter": "raccoon",
       "frame": "calm_idle_01"
     },
     {

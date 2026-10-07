@@ -164,16 +164,19 @@ async function boot(): Promise<void> {
   // Sticker art (the reward card and the journal album) is a CSS crop of a
   // critter's atlas. Decode each atlas once now, so a card never paints before
   // its image is ready (on a busy phone, or a loaded test machine).
-  await Promise.all(Object.values(content.world.critters).map(async (critter) => {
+  const atlases = new Set(Object.values(content.world.critters).map((critter) => critter.atlas));
+  await Promise.all([...atlases].map(async (url) => {
     const atlas = new Image();
-    atlas.src = assetUrl(critter.atlas.replace(".json", ".png"));
+    atlas.src = assetUrl(url.replace(".json", ".png"));
     await atlas.decode();
   }));
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
   const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
     const critter = content.world.critters[critterId];
-    const sheet = Assets.get<Spritesheet | undefined>(`${critterId}-sheet`);
+    const sheet = critter === undefined
+      ? undefined
+      : Assets.get<Spritesheet | undefined>(critter.atlas);
     const rect = sheet?.data.frames[frameName]?.frame;
     const size = sheet?.data.meta.size;
     if (critter === undefined || rect === undefined || size === undefined) return null;
@@ -204,20 +207,22 @@ async function boot(): Promise<void> {
     afterTick(state);
   }
   // The journal's notes come from running its Ink knot (a Story per line).
-  // They only change with what the story reads (its variables, the critters,
-  // and Fae's coins), and the world is frozen while the journal is open, so
-  // they're computed once per change, not per frame.
+  // They only change with what the story reads (its variables, the set
+  // pieces, the stickers, and Fae's coins), and the world is frozen while the
+  // journal is open, so they're computed once per change, not per frame.
   let journalCache: {
     ink: string;
     critters: State["critters"];
+    stickers: State["stickers"];
     coins: number;
     notes: string[];
   } | null = null;
   const notesNow = (): string[] => {
     if (journalCache === null || journalCache.ink !== state.ink ||
-        journalCache.critters !== state.critters || journalCache.coins !== state.coins)
-      journalCache = { ink: state.ink, critters: state.critters, coins: state.coins,
-        notes: journalNotes(content.world, state) };
+        journalCache.critters !== state.critters || journalCache.stickers !== state.stickers ||
+        journalCache.coins !== state.coins)
+      journalCache = { ink: state.ink, critters: state.critters, stickers: state.stickers,
+        coins: state.coins, notes: journalNotes(content.world, state) };
     return journalCache.notes;
   };
   const render = (): void => {
@@ -287,7 +292,7 @@ async function boot(): Promise<void> {
       window.innerHeight,
     );
     timingRing.render({
-      visible: activeBattle && battle?.aim !== null,
+      visible: ring !== null,
       x: ring?.x ?? 0,
       y: ring?.y ?? 0,
       radius: ring?.radius ?? 0,
@@ -295,12 +300,14 @@ async function boot(): Promise<void> {
       target: battle?.aim?.target ?? 0,
       grade: battle?.lastGrade ?? null,
     });
+    // The card shows a new sticker; a species already in the album only pays.
     const rewardCritter =
       state.battle === null
         ? undefined
         : content.world.critters[state.battle.critterId];
     rewardSticker.render({
-      visible: activeBattle && state.battle?.phase === "reward",
+      visible: activeBattle && state.battle?.phase === "reward" &&
+        state.battle.rewardSticker !== null,
       title: "NEW STICKER!",
       name: rewardCritter?.sticker.name ?? "",
       image: rewardCritter === undefined

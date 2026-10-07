@@ -1,5 +1,6 @@
 {
   "id": "gull",
+  "species": "gull",
   "name": "Grumpy Gull",
   "calmName": "Lookout Gull",
   "atlas": "assets/critters/gull/gull.json",
@@ -101,7 +102,6 @@
       "miss": "Splash! Fae gets a face full of sea spray."
     },
     "soothed": "The gull lets out a long, happy sigh. The fizzy spell blows away on the breeze!",
-    "reward": "New sticker: Lookout Gull! +25 coins.",
     "rest": "Fae is too windblown to go on. Time for a rest.",
     "run": "Fae backs off the lookout. The gull guards the bench."
   },

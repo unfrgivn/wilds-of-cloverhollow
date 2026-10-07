@@ -1,10 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
-import { parseScript } from "../../src/content/script";
 import {
+  bunHash,
   longFlowTimeout,
   openHarness,
-  queueScript,
+  playAfter,
+  readHash,
   readState,
   renderInfo,
   resetPaused,
@@ -32,15 +32,6 @@ async function talk(page: Page, choice = 0): Promise<void> {
   }
   throw new Error("conversation did not close");
 }
-async function bayRun(page: Page): Promise<void> {
-  const path = "tests/sim/scripts/bay/bay.json";
-  const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
-  await queueScript(page, script);
-  await step(page, script.reduce((total, segment) => total + segment.ticks, 0));
-}
-async function leaveBay(page: Page): Promise<void> {
-  await hold(page, "ArrowLeft", 272); await hold(page, "ArrowUp", 41); await step(page, 36);
-}
 async function diagonal(page: Page, first: string, second: string, ticks: number): Promise<void> {
   await page.keyboard.down(first); await page.keyboard.down(second);
   await step(page, ticks); await page.keyboard.up(second); await page.keyboard.up(first);
@@ -59,7 +50,7 @@ async function walkFromRoadToStop(page: Page): Promise<void> {
 test("the bus stop stays put while the bluebird is in chaos", async ({ page }) => {
   await openHarness(page); await resetPaused(page, "bay");
   await hold(page, "ArrowLeft", 40); await step(page, 40); await walkFromRoadToStop(page);
-  expect((await readState(page)).critters.bluebird).toBe("chaos");
+  expect((await readState(page)).stickers).not.toContain("bay-bluebird");
   await press(page);
   expect((await readState(page)).dialogue?.knot).toBe("bus_stop");
   await expect(page).toHaveScreenshot("bus-stop-plaza.png");
@@ -67,32 +58,34 @@ test("the bus stop stays put while the bluebird is in chaos", async ({ page }) =
 });
 
 test("real keys ride to Pinecone Pass and back home", async ({ page }) => {
+  // The bay run (Sue joins, a bluebird calmed), then the recorded ride
+  // (tools/sim/record-bus.ts: into town, the plaza's stop to the pass, its
+  // sign, the lodge's porch, and the bus home) played with real keys.
+  const path = "tests/sim/scripts/bay/bus.json";
   await page.setViewportSize({ width: 1280, height: 720 });
-  await openHarness(page); await resetPaused(page, "bay"); await bayRun(page); await leaveBay(page);
-  expect((await readState(page)).area).toBe("plaza");
-  await walkFromRoadToStop(page); expect((await readState(page)).dialogue).toBeNull();
-  await press(page); await talk(page, 0);
-  await step(page, 40);
-  expect((await readState(page)).area).toBe("pass");
-  await expect(page).toHaveScreenshot("pass-arrival-1280.png");
-  await page.setViewportSize({ width: 874, height: 402 });
-  await expect(page).toHaveScreenshot("pass-arrival-874.png");
-  await page.setViewportSize({ width: 1280, height: 720 });
-  await hold(page, "ArrowLeft", 65); await hold(page, "ArrowUp", 131);
-  await hold(page, "ArrowLeft", 16); await press(page); await talk(page);
-  const lodgePath = [["ArrowRight", "", 35], ["ArrowRight", "ArrowDown", 5],
-    ["ArrowRight", "", 45], ["ArrowRight", "ArrowUp", 5], ["ArrowRight", "", 5],
-    ["ArrowRight", "ArrowDown", 10], ["ArrowRight", "", 35],
-    ["ArrowRight", "ArrowDown", 10]] as const;
-  for (const [first, second, ticks] of lodgePath) {
-    if (second === "") await hold(page, first, ticks);
-    else await diagonal(page, first, second, ticks);
-  }
-  await expect(page).toHaveScreenshot("pass-lodge-porch.png");
-  await hold(page, "ArrowRight", 50); await hold(page, "ArrowDown", 60);
-  await hold(page, "ArrowDown", 40); await hold(page, "ArrowLeft", 70);
-  await press(page); await talk(page, 0); await step(page, 40);
-  expect((await readState(page)).area).toBe("plaza");
+  await openHarness(page); await resetPaused(page, "bay");
+  let arrived = false;
+  let porch = false;
+  await playAfter(page, "tests/sim/scripts/bay/bay.json", path, async () => {
+    const state = await readState(page);
+    if (state.area !== "pass" || state.transition !== null) return;
+    if (!arrived) {
+      arrived = true;
+      await expect(page).toHaveScreenshot("pass-arrival-1280.png");
+      await page.setViewportSize({ width: 874, height: 402 });
+      await expect(page).toHaveScreenshot("pass-arrival-874.png");
+      await page.setViewportSize({ width: 1280, height: 720 });
+    }
+    if (!porch && Math.hypot(state.player.x - 1180, state.player.y - 556) < 10) {
+      porch = true;
+      await expect(page).toHaveScreenshot("pass-lodge-porch.png");
+    }
+  });
+  expect({ arrived, porch }).toEqual({ arrived: true, porch: true });
+  const end = await readState(page);
+  expect({ area: end.area, player: end.player }).toEqual({ area: "plaza",
+    player: { x: 878, y: 985 } });
+  expect(await readHash(page)).toBe(bunHash(path, "bay"));
 });
 
 

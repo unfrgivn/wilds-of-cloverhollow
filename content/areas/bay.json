@@ -2386,15 +2386,32 @@
       "prompt": "Look"
     }
   ],
-  "critters": [
-    {
-      "id": "bluebird",
-      "point": {
-        "x": 1180,
-        "y": 760
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 1180,
+          "y": 760
+        },
+        "radius": 110,
+        "kinds": [
+          "bluebird"
+        ]
+      },
+      {
+        "point": {
+          "x": 640,
+          "y": 780
+        },
+        "radius": 100,
+        "kinds": [
+          "frog"
+        ],
+        "chance": 0.8
       }
-    }
-  ],
+    ]
+  },
   "npcs": [
     {
       "id": "sue",

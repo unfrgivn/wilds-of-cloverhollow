@@ -1,5 +1,6 @@
 {
   "id": "pup",
+  "species": "pup",
   "name": "Zoomie Pup",
   "calmName": "Pond Pup",
   "atlas": "assets/critters/pup/pup.json",
@@ -69,7 +70,7 @@
     "bigChance": 0.3
   },
   "lines": {
-    "intro": "A puppy in a red cap zooms out from behind the pond, barking at everything!",
+    "intro": "A puppy in a red cap zooms out of nowhere, barking at everything!",
     "command": "What should Fae do?",
     "soothe": {
       "great": "Fae speaks softly: \"Easy, buddy.\" The pup's swirly eyes start to slow down!",
@@ -101,9 +102,8 @@
       "miss": "Bonk! The balls bounce all around Fae."
     },
     "soothed": "The pup flops down with a happy sigh. The zoomy spell floats away!",
-    "reward": "New sticker: Pond Pup! +8 coins.",
     "rest": "Fae is all tuckered out. Time for a little rest.",
-    "run": "Fae backs away slowly. The pup keeps zooming around the pond."
+    "run": "Fae backs away slowly. The pup keeps zooming in circles."
   },
   "coins": 8
 }

@@ -1,5 +1,6 @@
 {
   "id": "bunny",
+  "species": "bunny",
   "name": "Thumpy Bunny",
   "calmName": "Ribbon Bunny",
   "atlas": "assets/critters/bunny/bunny.json",
@@ -101,7 +102,6 @@
       "miss": "Poof! Fae gets a face full of dust."
     },
     "soothed": "The bunny lets out a happy sigh. The fizzy spell fizzles away!",
-    "reward": "New sticker: Ribbon Bunny! +8 coins.",
     "rest": "Fae is all tuckered out. Time for a rest.",
     "run": "Fae tiptoes away through the grass. The bunny keeps thumping."
   },

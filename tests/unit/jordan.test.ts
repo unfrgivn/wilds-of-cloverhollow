@@ -10,6 +10,7 @@ import {
   targetInteractable,
   type ActionFrame,
   type Area,
+  type Den,
   type Fixture,
   type Grade,
   type Point,
@@ -19,8 +20,10 @@ import { loadContent } from "../../src/content/load";
 
 // Contract for Jordan's milestone. At Pinecone Pass, Jordan is trying to
 // catch a fizzy hamster; he joins whatever Fae says and brings Juggle. Calmed,
-// the hamster says the raccoon took a trail that only shows at night, and
-// Jordan gives Fae his blacklight lantern (`has_lantern`).
+// the hamster says the kid in the purple hood took a trail that only shows at
+// night, and Jordan gives Fae his blacklight lantern (`has_lantern`). Since
+// Milestone 28 the pass's hamsters are recurring: a den by the clearing always
+// has one out.
 
 const content = loadContent();
 const world = content.world;
@@ -106,27 +109,34 @@ describe("Jordan in the roster", () => {
   });
 });
 
+// The clearing's den: the story needs a hamster there (its talk brings the
+// lantern), so it always has one out.
+function clearingDen(): Den {
+  const den = pass.recurring?.dens[0];
+  if (den === undefined) throw new Error("the pass has no den");
+  return den;
+}
+
 describe("the hamster hiker", () => {
-  it("is a generic critter loose in the pass's clearing", () => {
+  it("is a generic critter with a den in the pass's clearing", () => {
     const critter = world.critters["hamster"];
     if (critter === undefined) throw new Error("no hamster");
     expect(critter.atlas).toBe("assets/critters/hamster/hamster.json");
     expect(critter.calmKnot).toBe("hamster_calm");
-    const placed = pass.critters.find((item) => item.id === "hamster");
-    if (placed === undefined) throw new Error("the hamster isn't at the pass");
-    expect(standable(placed.point)).toBe(true);
-    expect(placed.point.x).toBeGreaterThanOrEqual(450);
-    expect(placed.point.x).toBeLessThanOrEqual(900);
-    expect(placed.point.y).toBeGreaterThanOrEqual(560);
-    expect(placed.point.y).toBeLessThanOrEqual(760);
+    const den = clearingDen();
+    expect(den).toMatchObject({ kinds: ["hamster"], chance: 1 });
+    expect(standable(den.point)).toBe(true);
+    expect(den.point.x).toBeGreaterThanOrEqual(450);
+    expect(den.point.x).toBeLessThanOrEqual(900);
+    expect(den.point.y).toBeGreaterThanOrEqual(560);
+    expect(den.point.y).toBeLessThanOrEqual(760);
     expect(world.stickers.catalogue.some((sticker) =>
       sticker.id === critter.sticker.id && sticker.critter === "hamster")).toBe(true);
   });
 
-  it("starts in chaos in a new game", () => {
-    const fixture = content.fixtures["new-game"];
-    if (fixture === undefined) throw new Error("new-game fixture missing");
-    expect(createState(world, fixture).critters["hamster"]).toBe("chaos");
+  it("is out, in chaos, whenever Fae arrives", () => {
+    expect(atPass({ x: 930, y: 1015 }, "up", ["maddie"]).wild
+      .find((critter) => critter.den === 0)).toMatchObject({ kind: "hamster", mood: "chaos" });
   });
 });
 
@@ -138,8 +148,7 @@ describe("meeting Jordan", () => {
     expect({ knot: jordan.knot, prompt: jordan.prompt })
       .toEqual({ knot: "jordan", prompt: "Talk" });
     expect(jordan.visibleWhile).toBeUndefined();
-    const hamster = pass.critters.find((item) => item.id === "hamster");
-    if (hamster === undefined) throw new Error("no hamster");
+    const hamster = clearingDen();
     const gap = Math.hypot(jordan.point.x - hamster.point.x, jordan.point.y - hamster.point.y);
     expect(gap).toBeLessThanOrEqual(260);
     const touch = world.critters["hamster"]?.touchRadius ?? 0;
@@ -162,12 +171,12 @@ describe("meeting Jordan", () => {
 
 describe("the hamster's clue and the lantern", () => {
   it("gives Fae the lantern when she talks to the calm hamster", () => {
-    const hamster = pass.critters.find((item) => item.id === "hamster");
-    if (hamster === undefined) throw new Error("no hamster");
-    let state = atPass({ x: hamster.point.x, y: hamster.point.y + 45 }, "up",
+    const hamster = clearingDen().point;
+    let state = atPass({ x: hamster.x, y: hamster.y + 45 }, "up",
       ["maddie", "sue", "jordan"]);
-    state = { ...state, critters: { ...state.critters, hamster: "calm" } };
-    expect(targetInteractable(world, state)?.id).toBe("critter:hamster");
+    state = { ...state, wild: state.wild.map((critter) =>
+      critter.den === 0 ? { ...critter, mood: "calm" } : critter) };
+    expect(targetInteractable(world, state)?.id).toBe("critter:wild:0");
     expect(world.storyVariable(state.ink, "has_lantern")).toBe(false);
     state = talk(state, 0);
     expect(world.storyVariable(state.ink, "has_lantern")).toBe(true);

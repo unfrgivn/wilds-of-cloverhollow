@@ -5,19 +5,21 @@ import {
   longFlowTimeout,
   openHarness,
   queueScript,
+  readBattle,
   readState,
   renderInfo,
   resetPaused,
   step,
 } from "./helpers";
 
-// Milestone 15 contract: the raccoon in the purple hood. He isn't in the plaza
-// until Fae has the hall pass (Ink `raccoon_waiting`, set by Nurse Holly).
-// Earning it (the hall-pass sim's real input frames, replayed) brings her out
-// to the school path (290, 930) with him waiting up the cobbles at (400, 860).
-// He talks, gives away his club's password, and vanishes in a puff of fizz:
-// then he's gone for good (not drawn, not solid), and the journal remembers
-// the password.
+// Milestone 15 contract, a battle since Milestone 28: the school raccoon. It
+// isn't in the plaza until Fae has the hall pass (Ink `raccoon_waiting`, set
+// by Nurse Holly). Earning it (the hall-pass sim's real input frames,
+// replayed) brings her out to the school path (290, 930) with a fizzy raccoon
+// waiting up the cobbles at (400, 860). Walking into it starts a battle;
+// calmed, it says what it overheard (a kid in a purple hood whispering the
+// tree house's password) and scampers off for good. The journal remembers the
+// password.
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -33,66 +35,95 @@ async function press(page: Page, key = "z"): Promise<void> {
 }
 
 const text = (page: Page) => page.locator(".sticker-text-revealed");
-const people = async (page: Page): Promise<string[]> =>
-  (await renderInfo(page)).npcs.map((npc) => npc.id);
+const critters = async (page: Page): Promise<string[]> =>
+  (await renderInfo(page)).critters.map((critter) => critter.id);
 
-test("after the hall pass the raccoon waits in the plaza, blabs, and vanishes", async ({
+// The same moment on a desktop, then on a phone.
+async function shoot(page: Page, name: string): Promise<void> {
+  await expect(page).toHaveScreenshot(`${name}-1280.png`);
+  await page.setViewportSize({ width: 874, height: 402 });
+  await expect(page).toHaveScreenshot(`${name}-874.png`);
+  await page.setViewportSize({ width: 1280, height: 720 });
+}
+
+test("after the hall pass a fizzy raccoon waits; calmed, it tells the password", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "plaza");
-  expect(await people(page), "not before the pass").not.toContain("raccoon");
+  expect(await critters(page), "not before the pass").not.toContain("school-raccoon");
 
   await resetPaused(page, "school");
   const path = "tests/sim/scripts/school/hall-pass.json";
   const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
   await queueScript(page, script);
   await step(page, script.reduce((total, segment) => total + segment.ticks, 0));
-  let state = await readState(page);
-  expect(state.area).toBe("plaza");
-  expect(state.player).toEqual({ x: 290, y: 930 });
-  expect(await people(page)).toContain("raccoon");
-  expect((await renderInfo(page)).drawOrder.map((item) => item.label)).toContain("npc:raccoon");
+  expect((await readState(page)).player).toEqual({ x: 290, y: 930 });
+  expect((await renderInfo(page)).critters).toContainEqual(
+    { id: "school-raccoon", kind: "school-raccoon", frame: "chaos_idle_01", x: 400, y: 860 });
   await expect(page).toHaveScreenshot("raccoon-waiting.png");
 
-  // Real keys: right until under him, then up into reach.
+  // Real keys: right until under it, then up into it.
   await hold(page, "ArrowRight", 27);
   await hold(page, "ArrowUp", 4);
-  state = await readState(page);
-  expect(state.player).toEqual({ x: 398, y: 914 });
+  await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
+  expect(await readBattle(page)).toMatchObject({ critterId: "school-raccoon", den: null });
+  await step(page, 90);
+  await expect(text(page)).toHaveText(
+    "A fizzy raccoon pops out by the school path, chattering at Fae!");
+  await shoot(page, "raccoon-battle");
+
+  // Soothe every turn, each press on its target tick.
+  let rewardShot = false;
+  for (let action = 0; action < 150; action += 1) {
+    const battle = await readBattle(page);
+    if (battle === null) break;
+    if (battle.phase === "reward" && battle.revealed >= battle.message.length && !rewardShot) {
+      rewardShot = true;
+      await expect(page.locator(".battle-reward-name")).toHaveText("Ringtail Raccoon");
+      await shoot(page, "raccoon-reward");
+    }
+    if (battle.phase === "aim" && battle.aim !== null)
+      await step(page, battle.aim.targetTick - battle.aimTick - 1);
+    await page.keyboard.down("Enter");
+    await step(page, 1);
+    await page.keyboard.up("Enter");
+    await step(page, 1);
+  }
+  expect(rewardShot).toBe(true);
+  let state = await readState(page);
+  expect(state.critters["school-raccoon"]).toBe("calm");
+  expect(state.stickers).toEqual(["ringtail-raccoon"]);
+  expect(state.coins).toBe(8);
+
+  // A step closer, and it's someone to talk to.
+  await hold(page, "ArrowUp", 3);
   await expect(page.locator(".sticker-prompt span")).toHaveText("TALK");
   await press(page);
-  await expect(page.locator(".sticker-speaker")).toHaveText("RACCOON", { useInnerText: true });
-  await press(page);
-  await expect(text(page)).toHaveText(
-    "Heh heh heh! So YOU'RE the one who keeps un-fizzing my critters!");
-  expect((await renderInfo(page)).npcs.find((npc) => npc.id === "raccoon")?.facing).toBe("down");
-  await press(page);
-  await press(page);
-  await expect(text(page)).toHaveText(
-    "You'll never get into my secret club. Not without the password!");
-  await expect(page.locator(".sticker-choice"))
-    .toHaveText(["What's the password?", "Why are you making everything fizzy?"]);
-  await press(page);
-  await press(page);
-  await expect(text(page)).toHaveText("Ha! As if I'd tell you it's \"Fizzlesticks\"! ...Oops.");
-  expect(await people(page), "still here while he blabs").toContain("raccoon");
-  await press(page);
-  await press(page);
-  await expect(text(page)).toHaveText("With a puff of purple fizz, the raccoon is gone!");
-  expect(await people(page)).not.toContain("raccoon");
-  expect((await renderInfo(page)).drawOrder.map((item) => item.label), "not drawn")
-    .not.toContain("npc:raccoon");
-  await press(page);
+  await expect(page.locator(".sticker-speaker")).toHaveText("RINGTAIL RACCOON",
+    { useInnerText: true });
+  const lines: string[] = [];
+  for (let count = 0; count < 40 && (await readState(page)).dialogue !== null; count += 1) {
+    const dialogue = (await readState(page)).dialogue;
+    if (dialogue !== null && dialogue.revealed >= dialogue.text.length &&
+      lines.at(-1) !== dialogue.text) lines.push(dialogue.text);
+    await press(page);
+  }
+  expect(lines).toEqual([
+    "Chitter-chitter! Thanks, Fae. My head feels all clear now.",
+    "A kid in a purple hood gave me a fizzy cracker. Then I couldn't stop chattering!",
+    "I heard that kid whisper a secret word at the tree house in the park: \"Fizzlesticks!\"",
+    "A secret password for a tree house club? I have to see this!",
+    "The raccoon waves its striped tail and scampers off.",
+  ]);
   await expect(page.locator(".sticker-dialogue")).toBeHidden();
-
-  // Gone for good, and not solid: Fae walks up through where he stood.
-  await hold(page, "ArrowUp", 20);
-  expect((await readState(page)).player.y).toBeLessThan(850);
-  expect(await people(page)).not.toContain("raccoon");
+  expect(await critters(page), "gone for good").not.toContain("school-raccoon");
+  state = await readState(page);
+  expect(state.dialogue).toBeNull();
 
   await press(page, "j");
   await expect(page.locator(".journal-note").first()).toHaveText(
-    "The raccoon's club password is \"Fizzlesticks\". A club... like the tree house in the park?");
+    "The hooded kid's club password is \"Fizzlesticks\". " +
+    "A club... like the tree house in the park?");
 });

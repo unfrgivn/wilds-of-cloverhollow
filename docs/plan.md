@@ -735,6 +735,97 @@ the old trail, the owl, and the clubhouse claim.
   - New recorders share `tools/sim/recorder.ts` (navigate, talk, battle;
     arrows and Z only, so the e2e can play them with real keys).
 
+## Milestone 28: Recurring bad guys **Status:** ✅ Completed (2026-10-07)
+- Critters are species met all over the world, EarthBound style. An area's
+  dens roll their chaos critters fresh from the seeded PRNG every time Fae
+  arrives (a door, the bus, a rest); one she calms stays calm until she
+  leaves. Every calm pays its coins; each species gives its sticker once
+  ("+8 coins!" and no card after that). The roster: the plaza (once the
+  fountain frog is calm) and the park, raccoons, pups, and cats; Bubblegum
+  Bay, frogs and bluebirds; the Cliffside Trail, bunnies and squirrels;
+  Pinecone Pass, hamsters; the Whispering Woods, owls and raccoons. Story
+  set pieces stay unique and never respawn: the fountain frog, the grumpy
+  gull, and the school raccoon.
+- New battle art: the Pouncy Cat (an orange tabby in a blue bandana, from the
+  owner's critter sheet) and the Sneaky Raccoon (`chaos_raccoon.png`: purple
+  patchwork hood, teal cape; calm, the hood pushed back). Ten stickers now,
+  one per species.
+- The talking raccoon is now a raccoon battle by the school path: calmed, it
+  tells the password it overheard a kid in a purple hood whisper at the tree
+  house. Everything that named "the raccoon" as the troublemaker (the notice
+  board, the journal, the critters' clues, the clubhouse, Sue, Jordan, the
+  lantern) now says "a kid in a purple hood", never named.
+- Evidence: unit (`recurring.test.ts`: the roll's draws, dens' kinds and
+  chances, the quiet plaza, calm until she leaves, a rest rolls again, the
+  story's species facts, the loader and authoring checks;
+  `recurring-replay.test.ts`; the reworked `raccoon.test.ts`; every replay
+  test re-pinned), the recorded run `park/recurring.json`
+  (`tools/sim/record-recurring.ts`: a pup calmed, out and back, a fresh pup
+  calmed again) with matching browser and Bun hashes, every recording
+  re-recorded on the shared recorder, and real-key e2e (`recurring.spec.ts`:
+  the run as key presses, the return and the coins-only reward at both
+  sizes, and a cat's battle in the plaza; `raccoon.spec.ts`: the school
+  raccoon's battle, reward, and password, at both sizes).
+- Wording for the owner: the notice board, "Has anyone seen a kid in a
+  purple hood? They ran off from the fountain, giggling." ("A kid in a
+  purple hood? I bet that's who did it." / "A kid in a purple hood, fizzing
+  up the fountain? Weird."); the school raccoon, intro "A fizzy raccoon pops
+  out by the school path, chattering at Fae!", calm "Chitter-chitter!
+  Thanks, Fae. My head feels all clear now." / "A kid in a purple hood gave
+  me a fizzy cracker. Then I couldn't stop chattering!" / "I heard that kid
+  whisper a secret word at the tree house in the park: "Fizzlesticks!"" /
+  "A secret password for a tree house club? I have to see this!" / "The
+  raccoon waves its striped tail and scampers off."; the raccoons' and cats'
+  battle lines (`content/critters/raccoon.json`, `cat.json`) and calm talks
+  ("Chitter! Sorry, Fae. The fizz made me grab every shiny thing in sight."
+  / "A kid in a purple hood keeps leaving fizzy crackers around. They're SO
+  tasty."; "Mrrow! Thanks, Fae. That fizz made my whiskers all twitchy." /
+  "The cat curls around Fae's ankles, purring like a little motor."); the
+  bay's frogs ("A fizzy frog bounces across the sand, puffing pink
+  bubbles!"; calm, the Beach Frog: "Ribbit! The sand feels nice and cool
+  again. Thanks, Fae!"); the pup's clue is now "a purple thread stuck to
+  it... from a purple hood!"; the coins-only reward "+8 coins!"; and every
+  journal note and clue that said "the raccoon" (listed in the diff of
+  `content/story/main.ink`).
+- Notes and assumptions:
+  - Kinds and species: a kind is a critter's battle content
+    (`content/critters/<id>.json`); kinds of one species share its sticker.
+    The fountain frog (`fountain-frog`) and the bay's frogs (`frog`) are
+    both frogs; the school raccoon (`school-raccoon`) and the roaming ones
+    (`raccoon`) are both raccoons. The story's `calmed(name)` answers a
+    species from the stickers and a set piece from its own mood, so the bus
+    up the mountain still waits on a calm bluebird.
+  - Saves are version 5 (the state's critters changed shape).
+  - An arrival draws twice per den whatever comes out, so the PRNG's place
+    after an arrival depends only on the content. Every den the story needs
+    (the pond's pups, the bay's bluebirds, the clearing's hamsters) has
+    `chance` 1. The plaza stays quiet until the fountain frog is calm, so a
+    new game's first battle is still him.
+  - Dens are checked like spawns: on the floor, out of sight of every spawn
+    on arrival, clear of doors, and in view (one was first placed behind the
+    park's play tower, which hid its critter).
+  - The bus stops' choices were once-only, so each ride could be taken once
+    a game; they're sticky now (a test rides up and down three times).
+  - The talking raccoon's atlas left the game; its recipe and raw sources
+    stay (`art/recipes/raccoon-npc.json`). The park's 44x24 solid tuft under
+    the old pup (a footprint for a critter that stood still) is gone; pups
+    wander there now.
+  - The reward's aura and timing ring are hidden: they peeked out from
+    behind the sticker card before, and a coins-only reward has no card.
+  - Recorders all share `tools/sim/recorder.ts` now (`meet` walks into a
+    battle with a given kind, routing round the rest; `clear` calms what's
+    out before a long walk; `approach` walks up to a talk target).
+  - Real-key e2e that walked hand-written key paths through critter areas
+    now play recordings instead (`new-game/east-road.json`,
+    `new-game/bus-line.json`, `bay/bus.json`): a fresh critter can be
+    anywhere in its den, and the recorder routes round it. `playAfter`
+    (`tests/e2e/helpers.ts`) replays a run's shared start and plays the rest
+    with keys. Jordan's e2e finds the calm hamster wherever it stands.
+  - The album is five columns (ten stickers in two rows): four columns put a
+    third row past the bottom of a phone's page.
+  - The `woods` fixture's seed (26) is used now; the loader had hard-coded
+    the fixture without it.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -755,18 +846,20 @@ more bad guys, and the blacklight lantern, made and built while away.
   Pass first). The journal gets a map page later: the lands visited and the
   bus routes.
 - Bad guys are visible, never random: chaos critters wander the trails and
-  come after Fae when she's near; touching one starts a calm-down battle, and
-  a calmed critter stays calm and friendly. People can be under the chaos
-  spell too: they're the mini-bosses (NOTES.md).
+  come after Fae when she's near; touching one starts a calm-down battle.
+  Since Milestone 28 they're recurring species: an area rolls its critters
+  fresh every time Fae arrives, and a calmed one stays calm until she leaves.
+  People can be under the chaos spell too: they're the mini-bosses
+  (NOTES.md).
 - Owner, 2026-10-07: raccoons are a recurring bad guy, a chaos critter species
   met all over the world like the dogs and the other creatures, not a single
   character or a boss. The kid causing the chaos is unnamed, and who it is
   stays secret until the very end; the player may meet them earlier as an
   ordinary kid without knowing. Until then they're only "a kid in a purple
   hood". The kid knows their secret; the player doesn't. They're glimpsed
-  running off, EarthBound style, and talked about through the story. The game
-  so far has one talking raccoon (Milestone 15) and calls the hideouts his:
-  that's to be reworked.
+  running off, EarthBound style, and talked about through the story. The
+  talking raccoon (Milestone 15) and the lines that blamed "the raccoon" were
+  reworked in Milestone 28.
 - Each friend brings one battle command: Maddie's Play, Sue's Cast, Jordan's
   Juggle (pinecones).
 - Tools open the world: the blacklight lantern first (below); the lasso (from
@@ -774,9 +867,9 @@ more bad guys, and the blacklight lantern, made and built while away.
 - The blacklight lantern: the owner's concept (`blacklight_lantern.png`) draws
   it as a magnifying glass with a purple blacklight lens, inactive and active,
   so it's built as drawn. Jordan uses it on night hikes and gives it to Fae.
-  Switched on, it shows what the raccoon's fizz left behind: glowing purple
-  paw prints, invisible-ink notes (journal clues), and trail markers that
-  open hidden paths.
+  Switched on, it shows what the chaos left behind: glowing purple paw
+  prints, invisible-ink notes (journal clues), and trail markers that open
+  hidden paths.
 
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
@@ -793,21 +886,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     coins; the cocoa stand and the bakery sell snacks; Fae carries snacks into
     battles instead of each critter granting its own.
     Done (Milestone 27, above).
-  - Milestone 28, recurring bad guys (owner, 2026-10-07): critters become
-    species placed many times, and they respawn at random, EarthBound style.
-    Each arrival in an area rolls its chaos critters from the seeded PRNG in
-    state (so replays stay deterministic); one calmed stays calm until Fae
-    leaves the area. Every calm pays its coins (Milestone 27); the sticker
-    comes once per species. Roster to start: the six from
-    `npc_critter_set.png` (cat, pup, bunny, frog, bluebird, hamster) plus the
-    raccoon, with the squirrel and owl as extras. Cloverhollow and the park:
-    raccoons, pups, cats; the bay: frogs, bluebirds; the trail: bunnies,
-    squirrels; the pass: hamsters; the woods: owls, raccoons. Story set pieces
-    stay unique and don't respawn: the fountain frog and the grumpy gull.
-    Raccoon battle art from `chaos_raccoon.png`, and one sticker per species; the talking raccoon of Milestone 15 becomes a raccoon battle
-    whose calm raccoon tells the password it overheard; every line that names
-    "the raccoon" as the troublemaker, the notice board, and the hideouts
-    point to "a kid in a purple hood" instead, never named.
+  - Milestone 28, recurring bad guys: done (above).
   - Milestone 29, the first person under the chaos spell (a mini-boss in
     town), with an interior from `arcade_interior.png`.
   - Then the clubhouse fix-up (a fridge for snacks, the garden), once coins

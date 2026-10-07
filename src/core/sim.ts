@@ -18,7 +18,9 @@ import type {
   BattleView,
   Critter,
   Grade,
-  Roamer,
+  PresentCritter,
+  SetPiece,
+  Wild,
 } from "./types";
 import { createInkState, runInk, type InkFacts } from "./ink";
 
@@ -118,7 +120,7 @@ export function createState(
     Object.values(world.party)
       .filter((member) => member.start)
       .map((member) => member.id);
-  return {
+  const state: State = {
     tick: 0,
     area: area.id,
     player: { x: spawn.x, y: spawn.y },
@@ -131,9 +133,10 @@ export function createState(
     ink: createInkState(world.story, seed),
     dialogue: null,
     critters: Object.fromEntries(
-      Object.keys(world.critters).map((id) => [id, "chaos"]),
+      Object.values(world.areas).flatMap((each) => each.critters)
+        .map((piece) => [piece.id, "chaos"]),
     ),
-    roamers: roamerFor(area),
+    wild: [],
     stickers: [],
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
@@ -142,6 +145,43 @@ export function createState(
     coins: 0,
     snacks: 2,
   };
+  return { ...state, ...rollWild(world, state, area) };
+}
+
+/*
+ * The recurring critters out in an area this visit (spec 6), rolled on every
+ * arrival. Each den, in order, draws twice from the state's PRNG (is one out,
+ * and which kind), so how many draws an arrival takes depends only on the
+ * content, never on how the rolls came out. Until `after` is calm the area is
+ * quiet and draws nothing.
+ */
+export function rollWild(world: World, state: State, area: Area): Pick<State, "wild" | "rng"> {
+  const recurring = area.recurring;
+  if (recurring === undefined ||
+      (recurring.after !== undefined && inkFacts(world, state).calmed[recurring.after] !== true))
+    return { wild: [], rng: state.rng };
+  let random = state;
+  const wild: Wild[] = [];
+  recurring.dens.forEach((den, index) => {
+    const [out, drawn] = nextRandom(random);
+    const [pick, picked] = nextRandom(drawn);
+    random = picked;
+    const kind = den.kinds[Math.floor(pick * den.kinds.length)];
+    if (out >= den.chance || kind === undefined) return;
+    wild.push({
+      kind,
+      den: index,
+      mood: "chaos",
+      x: den.point.x,
+      y: den.point.y,
+      target: { ...den.point },
+      pauseTicks: 0,
+      cooldownTicks: 0,
+      facing: "down",
+      moving: false,
+    });
+  });
+  return { wild, rng: random.rng };
 }
 
 // One snack for `price` coins, if Fae can pay (spec 7, a `buy:` line).
@@ -272,25 +312,6 @@ function moveDirection(move: Point): Direction | undefined {
   return move.y < 0 ? "up" : "down";
 }
 
-function roamerFor(area: Area): Record<string, Roamer> {
-  return Object.fromEntries(
-    area.critters.flatMap((entry) =>
-      entry.roam === undefined
-        ? []
-        : [[entry.id, {
-            x: entry.point.x,
-            y: entry.point.y,
-            home: { ...entry.point },
-            target: { ...entry.point },
-            pauseTicks: 0,
-            cooldownTicks: 0,
-            facing: "down",
-            moving: false,
-          }]],
-    ),
-  );
-}
-
 function chooseRoamTarget(
   world: World,
   state: State,
@@ -322,45 +343,40 @@ function chooseRoamTarget(
   return { target, state: third[1] };
 }
 
-function updateRoamers(
+// This visit's recurring critters for one tick (spec 8): while Fae is free,
+// each chaos one wanders inside its den, pausing between seeded random
+// targets, or chases her within sight, giving up beyond its leash; one
+// cooling down (after a battle or a run) heads home. Calm ones stand still.
+function updateWild(
   world: World,
   state: State,
   area: Area,
   player: Point,
   active: boolean,
-): { roamers: Record<string, Roamer>; rng: number } {
+): Pick<State, "wild" | "rng"> {
   let randomState = state;
-  const result: Record<string, Roamer> = {};
-  for (const entry of area.critters) {
-    const previous = state.roamers[entry.id];
-    if (previous === undefined || entry.roam === undefined) continue;
+  const roam = world.tunables.roam;
+  const wild = state.wild.map((previous): Wild => {
+    const den = area.recurring?.dens[previous.den];
     const cooldownTicks = Math.max(0, previous.cooldownTicks - 1);
-    if (!active || state.critters[entry.id] === "calm") {
-      result[entry.id] = { ...previous, cooldownTicks, moving: false };
-      continue;
-    }
-    const toPlayer = distance(previous, player);
-    const leash = entry.roam.radius + world.tunables.roam.sight * 2;
-    const chasing = cooldownTicks === 0 && toPlayer <= world.tunables.roam.sight &&
-      distance(previous.home, player) <= leash;
+    if (den === undefined || !active || previous.mood === "calm")
+      return { ...previous, cooldownTicks, moving: false };
+    const home = den.point;
+    const leash = den.radius + roam.sight * 2;
+    const chasing = cooldownTicks === 0 && distance(previous, player) <= roam.sight &&
+      distance(home, player) <= leash;
     let target = previous.target;
     let pauseTicks = previous.pauseTicks;
     if (chasing) target = player;
-    else if (cooldownTicks > 0) target = previous.home;
+    else if (cooldownTicks > 0) target = home;
     else if (pauseTicks > 0) pauseTicks -= 1;
     else if (distance(previous, target) <= 0.5) {
-      const picked = chooseRoamTarget(
-        world,
-        randomState,
-        area,
-        previous.home,
-        entry.roam.radius,
-      );
+      const picked = chooseRoamTarget(world, randomState, area, home, den.radius);
       target = picked.target;
       randomState = picked.state;
-      pauseTicks = world.tunables.roam.pauseTicks;
+      pauseTicks = roam.pauseTicks;
     }
-    const speed = chasing ? world.tunables.roam.chaseSpeed : world.tunables.roam.wanderSpeed;
+    const speed = chasing ? roam.chaseSpeed : roam.wanderSpeed;
     const gap = distance(previous, target);
     const amount = Math.min(speed, gap);
     const candidate = gap === 0
@@ -376,7 +392,7 @@ function updateRoamers(
     const facing = Math.abs(dx) >= Math.abs(dy)
       ? (dx < 0 ? "left" : dx > 0 ? "right" : previous.facing)
       : (dy < 0 ? "up" : "down");
-    result[entry.id] = {
+    return {
       ...previous,
       x: position.x,
       y: position.y,
@@ -386,8 +402,58 @@ function updateRoamers(
       facing,
       moving: moved > 0.0001,
     };
-  }
-  return { roamers: result, rng: randomState.rng };
+  });
+  return { wild, rng: randomState.rng };
+}
+
+// A recurring critter heads home and leaves Fae alone for a while: after a
+// battle with it, or once she runs (spec 8).
+function sendHome(world: World, area: Area, critter: Wild, back: boolean): Wild {
+  const home = area.recurring?.dens[critter.den]?.point ?? { x: critter.x, y: critter.y };
+  return {
+    ...critter,
+    ...(back ? { x: home.x, y: home.y } : {}),
+    cooldownTicks: world.tunables.roam.cooldownTicks,
+    target: { ...home },
+  };
+}
+
+// Whether a set piece is out (spec 8): always, or while its `visibleWhile`
+// story variable is true.
+function setPieceOut(world: World, state: State, piece: SetPiece): boolean {
+  return piece.visibleWhile === undefined ||
+    world.storyVariable(state.ink, piece.visibleWhile) === true;
+}
+
+// Every critter out in Fae's area (spec 8): its set pieces that are out, then
+// this visit's recurring critters. `key` names one in targets and render
+// info: a set piece's id, or `wild:<den>`.
+export function presentCritters(world: World, state: State): PresentCritter[] {
+  const area = world.areas[state.area];
+  if (area === undefined) return [];
+  const pieces = area.critters.flatMap((piece): PresentCritter[] => {
+    const kind = world.critters[piece.id];
+    return kind === undefined || !setPieceOut(world, state, piece)
+      ? []
+      : [{ key: piece.id, kind, point: piece.point,
+          mood: state.critters[piece.id] ?? "chaos", wild: null }];
+  });
+  const wild = state.wild.flatMap((critter): PresentCritter[] => {
+    const kind = world.critters[critter.kind];
+    return kind === undefined
+      ? []
+      : [{ key: `wild:${critter.den}`, kind, point: { x: critter.x, y: critter.y },
+          mood: critter.mood, wild: critter }];
+  });
+  return [...pieces, ...wild];
+}
+
+// The critter Fae is battling, as it stands in the area.
+export function battleFoe(world: World, state: State): PresentCritter | undefined {
+  const battle = state.battle;
+  if (battle === null) return undefined;
+  const key = battle.den === null ? battle.critterId : `wild:${battle.den}`;
+  return presentCritters(world, state).find((critter) => critter.key === key);
 }
 
 export function targetInteractable(
@@ -403,21 +469,14 @@ export function targetInteractable(
     left: { x: -1, y: 0 },
     right: { x: 1, y: 0 },
   }[state.facing];
-  const calmCritters = area.critters.flatMap((critter) => {
-    const content = world.critters[critter.id];
-    const roamer = state.roamers[critter.id];
-    const point = roamer === undefined ? critter.point : { x: roamer.x, y: roamer.y };
-    return state.critters[critter.id] === "calm" && content !== undefined
-      ? [
-          {
-            id: `critter:${critter.id}`,
-            knot: content.calmKnot,
-            point,
-            prompt: content.calmPrompt,
-          },
-        ]
-      : [];
-  });
+  const calmCritters = presentCritters(world, state)
+    .filter((critter) => critter.mood === "calm")
+    .map((critter) => ({
+      id: `critter:${critter.key}`,
+      knot: critter.kind.calmKnot,
+      point: critter.point,
+      prompt: critter.kind.calmPrompt,
+    }));
   const people = area.npcs
     .filter((npc) => npcVisible(world, state, npc))
     .map((npc) => ({
@@ -528,15 +587,16 @@ function joinReady(world: World, state: State): State {
   return party.length === state.party.length ? state : { ...state, party };
 }
 
-// What the story's externals answer from (spec 7): calmed(id) from each
-// critter's state, coins() from Fae's purse.
-export function inkFacts(state: State): InkFacts {
-  return {
-    calmed: Object.fromEntries(
-      Object.entries(state.critters).map(([id, value]) => [id, value === "calm"]),
-    ),
-    coins: state.coins,
-  };
+// What the story's externals answer from (spec 7, 8): coins() from Fae's
+// purse, and calmed(name) for a species once she owns its sticker (she has
+// calmed one of them, anywhere) and for a set piece by its own mood.
+export function inkFacts(world: World, state: State): InkFacts {
+  const calmed: Record<string, boolean> = {};
+  for (const kind of Object.values(world.critters))
+    if (state.stickers.includes(kind.sticker.id)) calmed[kind.species] = true;
+  for (const area of Object.values(world.areas))
+    for (const piece of area.critters) calmed[piece.id] = state.critters[piece.id] === "calm";
+  return { calmed, coins: state.coins };
 }
 
 // Which way a person in the area looks: toward Fae while she talks to them
@@ -795,56 +855,44 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
               phaseTicks: 0,
               rest: next.rest,
             };
-    else if (next.phase === "soothed")
-      next = battleMessage(next, critter.lines.reward, "reward");
-    else if (next.phase === "reward")
+    else if (next.phase === "soothed") {
+      // Every calm pays; the sticker comes once per species (spec 8).
+      const fresh = !state.stickers.includes(critter.sticker.id);
+      const line = (fresh ? world.battle.rewards.sticker : world.battle.rewards.coins)
+        .replace("{sticker}", critter.sticker.name)
+        .replace("{coins}", String(critter.coins));
+      next = {
+        ...battleMessage(next, line, "reward"),
+        rewardSticker: fresh ? critter.sticker.id : null,
+      };
+    } else if (next.phase === "reward") {
+      const den = next.den;
       return {
         ...nextBase,
-        critters: { ...state.critters, [next.critterId]: "calm" },
+        ...(den === null
+          ? { critters: { ...state.critters, [next.critterId]: "calm" } }
+          : { wild: state.wild.map((item) =>
+              item.den === den ? { ...item, mood: "calm" } : item) }),
         coins: state.coins + critter.coins,
-        stickers: state.stickers.includes(critter.sticker.id)
+        stickers: next.rewardSticker === null
           ? state.stickers
-          : [...state.stickers, critter.sticker.id],
+          : [...state.stickers, next.rewardSticker],
         battle: null,
       };
-    else if (next.phase === "run") {
-      const roaming = state.roamers[next.critterId];
-      if (roaming === undefined)
-        return {
-          ...nextBase,
-          player: { ...next.entry },
-          facing:
-            state.facing === "up"
-              ? "down"
-              : state.facing === "down"
-                ? "up"
-                : state.facing === "left"
-                  ? "right"
-                  : "left",
-          battle: null,
-        };
+    } else if (next.phase === "run") {
+      const den = next.den;
+      const area = world.areas[state.area];
+      const away: Record<Direction, Direction> =
+        { up: "down", down: "up", left: "right", right: "left" };
       return {
         ...nextBase,
         player: { ...next.entry },
-        facing:
-          state.facing === "up"
-            ? "down"
-            : state.facing === "down"
-              ? "up"
-              : state.facing === "left"
-                ? "right"
-                : "left",
+        facing: away[state.facing],
         battle: null,
-        roamers: {
-          ...state.roamers,
-          [next.critterId]: {
-            ...roaming,
-            x: roaming.home.x,
-            y: roaming.home.y,
-            cooldownTicks: world.tunables.roam.cooldownTicks,
-            target: { ...roaming.home },
-          },
-        },
+        ...(den === null || area === undefined
+          ? {}
+          : { wild: state.wild.map((item) =>
+              item.den === den ? sendHome(world, area, item, true) : item) }),
       };
     }
     else if (next.phase === "rest")
@@ -967,7 +1015,6 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
             ...next,
             calm,
             lastGrade: result,
-            rewardSticker: calm >= critter.calmMax ? critter.sticker.id : null,
           },
           command.lines[result],
           "result",
@@ -1073,7 +1120,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
       world.story,
       state.ink,
       { type: "next" },
-      inkFacts(state),
+      inkFacts(world, state),
     );
     const following = result.line === null && result.choices.length === 0
       ? null
@@ -1096,7 +1143,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
         type: "choose",
         index: chosen,
       },
-      inkFacts(state),
+      inkFacts(world, state),
     );
     const following = result.line === null && result.choices.length === 0
       ? null
@@ -1534,28 +1581,26 @@ function stepTick(
       if (targetArea === undefined) throw new Error("Unknown transition area");
       const spawn = targetArea.spawns[transition.target.spawn];
       if (spawn === undefined) throw new Error("Unknown transition spawn");
-      return {
-        state: {
-          ...state,
-          tick: state.tick + 1,
-          area: targetArea.id,
-          player: { x: spawn.x, y: spawn.y },
-          facing: spawn.facing,
-          previousInput: { ...input },
-          motion: { ...state.motion, moving: false },
-          transition: { target: transition.target, phase: "in", elapsed: 0 },
-          party: spawnParty(
-            world,
-            targetArea,
-            spawn,
-            state.party.map((member) => member.id),
-          ),
-          safeSpot: { area: targetArea.id, spawn: transition.target.spawn },
-          roamers: roamerFor(targetArea),
-          backLink: held === undefined ? undefined : { area: state.area, direction: held },
-        },
-        events: [],
+      const arrived: State = {
+        ...state,
+        tick: state.tick + 1,
+        area: targetArea.id,
+        player: { x: spawn.x, y: spawn.y },
+        facing: spawn.facing,
+        previousInput: { ...input },
+        motion: { ...state.motion, moving: false },
+        transition: { target: transition.target, phase: "in", elapsed: 0 },
+        party: spawnParty(
+          world,
+          targetArea,
+          spawn,
+          state.party.map((member) => member.id),
+        ),
+        safeSpot: { area: targetArea.id, spawn: transition.target.spawn },
+        backLink: held === undefined ? undefined : { area: state.area, direction: held },
       };
+      // Every arrival rolls the area's critters fresh (a rest arrives too).
+      return { state: { ...arrived, ...rollWild(world, arrived, targetArea) }, events: [] };
     }
     return {
       state: {
@@ -1582,7 +1627,7 @@ function stepTick(
           type: "start",
           knot: target.knot,
         },
-        inkFacts(state),
+        inkFacts(world, state),
       );
       return {
         state: {
@@ -1618,22 +1663,14 @@ function stepTick(
   const displacement = Math.sqrt(
     displacementX * displacementX + displacementY * displacementY,
   );
-  const movedRoamers = updateRoamers(
-    world,
-    state,
-    area,
-    player,
-    true,
-  );
-  const roamerEntry = area.critters.find((item) => {
-    const old = state.roamers[item.id];
-    const next = movedRoamers.roamers[item.id];
-    const content = world.critters[item.id];
-    if (old === undefined || next === undefined || content === undefined ||
-        state.critters[item.id] !== "chaos" || next.cooldownTicks > 0)
-      return false;
-    const touch = content.touchRadius;
-    return distance(state.player, old) > touch &&
+  const moved = updateWild(world, state, area, player, true);
+  // A touch is an outside-to-inside crossing of the critter's touch circle
+  // (spec 8): by Fae or, for a recurring critter, by either of them.
+  const wildTouch = moved.wild.find((next, index) => {
+    const old = state.wild[index];
+    const touch = world.critters[next.kind]?.touchRadius;
+    return old !== undefined && touch !== undefined && next.mood === "chaos" &&
+      next.cooldownTicks === 0 && distance(state.player, old) > touch &&
       distance(player, next) <= touch;
   });
   let facing = state.facing;
@@ -1676,63 +1713,51 @@ function stepTick(
             world.story,
             state.ink,
             { type: "start", knot: locked.knot },
-            inkFacts(state),
+            inkFacts(world, state),
           ),
         };
-  const critterEntry = area.critters.find(
-    (item) =>
-      state.critters[item.id] === "chaos" &&
-      distance(state.player, item.point) >
-        (world.critters[item.id]?.touchRadius ?? 0) &&
-      distance(player, item.point) <=
-        (world.critters[item.id]?.touchRadius ?? 0),
-  );
-  if (roamerEntry !== undefined || critterEntry !== undefined) {
-    const entry = roamerEntry ?? critterEntry;
-    if (entry === undefined) return { state, events };
-    const critter = world.critters[entry.id];
-    if (critter !== undefined) {
-      const battle: Battle = {
-        critterId: critter.id,
-        entry: { ...state.player },
-        phase: "intro",
-        message: critter.lines.intro,
-        revealed: 0,
-        selected: 0,
-        command: null,
-        energy: critter.energyMax,
-        calm: 0,
-        rest: {},
-        aim: null,
-        lastGrade: null,
-        rewardSticker: null,
-        aimTick: 0,
-        phaseTicks: 0,
-      };
-      const battleRoamers: Record<string, Roamer> = { ...movedRoamers.roamers };
-      if (roamerEntry !== undefined) {
-        const roaming = battleRoamers[roamerEntry.id];
-        if (roaming !== undefined)
-          battleRoamers[roamerEntry.id] = {
-            ...roaming,
-            cooldownTicks: world.tunables.roam.cooldownTicks,
-            target: { ...roaming.home },
-          };
-      }
-      return {
-        state: {
-          ...state,
-          tick: state.tick + 1,
-          previousInput: { ...input },
-          ...(roamerEntry === undefined ? {} : { player }),
-          roamers: battleRoamers,
-          rng: movedRoamers.rng,
-          battle,
-          motion: { ...state.motion, moving: false },
-        },
-        events,
-      };
-    }
+  const pieceTouch = presentCritters(world, state).find((item) =>
+    item.wild === null && item.mood === "chaos" &&
+    distance(state.player, item.point) > item.kind.touchRadius &&
+    distance(player, item.point) <= item.kind.touchRadius);
+  const critter = wildTouch === undefined
+    ? pieceTouch?.kind
+    : world.critters[wildTouch.kind];
+  if (critter !== undefined) {
+    const battle: Battle = {
+      critterId: critter.id,
+      den: wildTouch?.den ?? null,
+      entry: { ...state.player },
+      phase: "intro",
+      message: critter.lines.intro,
+      revealed: 0,
+      selected: 0,
+      command: null,
+      energy: critter.energyMax,
+      calm: 0,
+      rest: {},
+      aim: null,
+      lastGrade: null,
+      rewardSticker: null,
+      aimTick: 0,
+      phaseTicks: 0,
+    };
+    // A recurring critter met Fae where it stood; a set piece keeps her
+    // on the tick before she reached it.
+    return {
+      state: {
+        ...state,
+        tick: state.tick + 1,
+        previousInput: { ...input },
+        ...(wildTouch === undefined ? {} : { player }),
+        wild: moved.wild.map((item) =>
+          item === wildTouch ? sendHome(world, area, item, false) : item),
+        rng: moved.rng,
+        battle,
+        motion: { ...state.motion, moving: false },
+      },
+      events,
+    };
   }
   const party =
     trigger === undefined
@@ -1758,8 +1783,8 @@ function stepTick(
           ? state.dialogue
           : dialogueState(knock.knot, knock.result),
       party,
-      roamers: movedRoamers.roamers,
-      rng: movedRoamers.rng,
+      wild: moved.wild,
+      rng: moved.rng,
       backLink,
     };
   return { state: nextState, events };
@@ -1771,20 +1796,7 @@ export function step(
   input: ActionFrame,
 ): { state: State; events: Event[] } {
   const result = stepTick(world, state, input);
-  const ended = state.battle !== null && result.state.battle === null;
-  const id = state.battle?.critterId ?? "";
-  const roamer = ended ? result.state.roamers[id] : undefined;
-  let next = result.state;
-  if (roamer !== undefined) {
-    const roamers: Record<string, Roamer> = { ...result.state.roamers };
-    roamers[id] = {
-      ...roamer,
-      cooldownTicks: world.tunables.roam.cooldownTicks,
-      target: { ...roamer.home },
-    };
-    next = { ...result.state, roamers };
-  }
-  return { ...result, state: joinReady(world, next) };
+  return { ...result, state: joinReady(world, result.state) };
 }
 
 export function stableHash(value: unknown): string {

@@ -33,35 +33,47 @@ describe("save format", () => {
   });
 
   it("rejects other versions, broken JSON, and states of another shape", () => {
-    // Version 1 saves kept Maddie in `maddie` and `trail`, and version 2 saves
-    // had no lantern; both start fresh, as does a version from the future.
-    expect(parseSave(JSON.stringify({ version: 1, state: fresh }), fresh)).toBeNull();
-    expect(parseSave(JSON.stringify({ version: 2, state: fresh }), fresh)).toBeNull();
-    expect(parseSave(JSON.stringify({ version: 5, state: fresh }), fresh)).toBeNull();
+    // Version 1 saves kept Maddie in `maddie` and `trail`, version 2 saves had
+    // no lantern, version 3 no coins, and version 4 a critter of each kind
+    // (no recurring critters); all start fresh, as does a version from the
+    // future.
+    for (const version of [1, 2, 3, 4, 6])
+      expect(parseSave(JSON.stringify({ version, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
-    expect(parseSave(JSON.stringify({ version: 3, state: { tick: 1 } }), fresh)).toBeNull();
+    expect(parseSave(JSON.stringify({ version: 5, state: { tick: 1 } }), fresh)).toBeNull();
     const wrongType = { ...fresh, tick: "1" };
-    expect(parseSave(JSON.stringify({ version: 4, state: wrongType }), fresh)).toBeNull();
+    expect(parseSave(JSON.stringify({ version: 5, state: wrongType }), fresh)).toBeNull();
     const missingNested = { ...fresh, motion: { distance: 0 } };
-    expect(parseSave(JSON.stringify({ version: 4, state: missingNested }), fresh)).toBeNull();
+    expect(parseSave(JSON.stringify({ version: 5, state: missingNested }), fresh)).toBeNull();
     // Array elements are checked against the template's first element.
     const partyWithoutMotion = {
       ...fresh,
       party: fresh.party.map(({ motion: _motion, ...member }) => member),
     };
-    expect(parseSave(JSON.stringify({ version: 4, state: partyWithoutMotion }), fresh))
+    expect(parseSave(JSON.stringify({ version: 5, state: partyWithoutMotion }), fresh))
       .toBeNull();
     const emptyParty = { ...fresh, party: [] };
-    expect(parseSave(JSON.stringify({ version: 4, state: emptyParty }), fresh)).not.toBeNull();
+    expect(parseSave(JSON.stringify({ version: 5, state: emptyParty }), fresh)).not.toBeNull();
   });
 
-  it("keeps a save made before a critter existed, with that critter in chaos", () => {
-    const older: State["critters"] = { ...fresh.critters, frog: "calm" };
-    delete older.pup;
-    const restored = parseSave(JSON.stringify({ version: 4, state: { ...fresh, critters: older } }),
+  it("checks recurring critters, which a new game's template has none of", () => {
+    const out: State["wild"][number] = { kind: "pup", den: 1, mood: "calm", x: 900, y: 600,
+      target: { x: 880, y: 600 }, pauseTicks: 3, cooldownTicks: 0, facing: "left",
+      moving: false };
+    const visiting = { ...fresh, area: "park", wild: [out] };
+    expect(parseSave(serializeSave(visiting), fresh)).toEqual(visiting);
+    const { mood: _mood, ...moodless } = out;
+    expect(parseSave(JSON.stringify({ version: 5, state: { ...visiting, wild: [moodless] } }),
+      fresh)).toBeNull();
+  });
+
+  it("keeps a save made before a set piece existed, with that set piece in chaos", () => {
+    const older: State["critters"] = { ...fresh.critters, "fountain-frog": "calm" };
+    delete older.gull;
+    const restored = parseSave(JSON.stringify({ version: 5, state: { ...fresh, critters: older } }),
       fresh);
-    expect(restored?.critters).toEqual({ ...fresh.critters, frog: "calm" });
-    expect(restored?.critters.pup).toBe("chaos");
+    expect(restored?.critters).toEqual({ ...fresh.critters, "fountain-frog": "calm" });
+    expect(restored?.critters["gull"]).toBe("chaos");
   });
 
   it("accepts a save taken mid-battle and mid-dialogue", () => {

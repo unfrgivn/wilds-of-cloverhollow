@@ -20,7 +20,8 @@ import { loadContent } from "../../src/content/load";
 // Contract for Milestone 19 (Bubblegum Bay). The plaza's east road opens once
 // the tree house club is open, and leads to the bay: a sandy cove with a dock,
 // where Sue is fishing at the far end. Whatever Fae says, Sue joins. A fizzy
-// bluebird is loose on the beach.
+// bluebird is loose on the beach (since Milestone 28, a fresh one every time
+// Fae arrives).
 
 const content = loadContent();
 const world = content.world;
@@ -83,7 +84,7 @@ function endings(ink: string, knot: string): string[] {
 }
 
 const fresh = createInkState(world.story, 1);
-const clubOpen = play(play(fresh, "raccoon", [0]), "tree_house");
+const clubOpen = play(play(fresh, "school_raccoon"), "tree_house");
 
 describe("the bay's geometry follows its painting", () => {
   const bay = areaFor("bay");
@@ -219,16 +220,19 @@ describe("Sue at the end of the dock", () => {
 describe("the fizzy bluebird", () => {
   const bay = areaFor("bay");
 
-  it("is a generic critter on the bay's sand", () => {
+  it("is a generic critter with a den of its own on the bay's sand", () => {
     const critter = world.critters["bluebird"];
     if (critter === undefined) throw new Error("no bluebird");
     expect(critter.atlas).toBe("assets/critters/bluebird/bluebird.json");
     expect(critter.auraCentre).toEqual({ x: 172, y: 189 });
     expect(critter.bodyCentre).toEqual({ x: 239, y: 316 });
-    const placed = bay.critters.find((item) => item.id === "bluebird");
-    if (placed === undefined) throw new Error("the bluebird isn't in the bay");
-    expect(standable(bay, placed.point)).toBe(true);
-    expect(placed.point.y).toBeGreaterThan(600);
+    // The story needs a bluebird (its clue opens the bus up the mountain), so
+    // its den always has one out.
+    const den = bay.recurring?.dens[0];
+    if (den === undefined) throw new Error("the bay has no den");
+    expect(den).toMatchObject({ kinds: ["bluebird"], chance: 1 });
+    expect(standable(bay, den.point)).toBe(true);
+    expect(den.point.y).toBeGreaterThan(600);
     expect(world.stickers.catalogue.some((sticker) =>
       sticker.id === critter.sticker.id && sticker.critter === "bluebird")).toBe(true);
     const start: InkCommand = { type: "start", knot: critter.calmKnot };
@@ -239,19 +243,19 @@ describe("the fizzy bluebird", () => {
       expect(critter.lines.friends["play"]?.[grade]).toMatch(/Maddie/);
   });
 
-  it("starts in chaos in a new game", () => {
-    const fixture = content.fixtures["new-game"];
-    if (fixture === undefined) throw new Error("new-game fixture missing");
-    const state = createState(world, fixture);
-    expect(state.critters["bluebird"]).toBe("chaos");
+  it("is out, in chaos, every time Fae arrives", () => {
+    const state = createState(world, { area: "bay", spawn: "plaza-road", seed: 1 });
+    expect(state.wild.find((critter) => critter.den === 0))
+      .toMatchObject({ kind: "bluebird", mood: "chaos" });
   });
 });
 
 describe("the journal", () => {
   function notes(ink: string): string[] {
     const state = createState(world, { area: "plaza", spawn: "fountain", seed: 1 });
-    const critters: State["critters"] = { frog: "calm", pup: "calm", bluebird: "chaos" };
-    return journalNotes(world, { ...state, ink, critters });
+    const critters: State["critters"] = { ...state.critters, "fountain-frog": "calm" };
+    return journalNotes(world, { ...state, ink, critters,
+      stickers: ["fountain-frog", "pond-pup"] });
   }
 
   it("points to Bubblegum Bay once the club is open, and remembers Sue once she joins", () => {

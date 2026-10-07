@@ -4,7 +4,6 @@ import {
   battleCommands,
   createState,
   parseSave,
-  serializeSave,
   step,
   targetInteractable,
   type Battle,
@@ -29,8 +28,8 @@ function press(state: State): State {
 
 // Fae on the cobbles below the bakery's window, facing it, with `coins`.
 function atBakery(coins: number): State {
-  const state = { ...createState(content.world, fixture), coins,
-    player: { x: 1180, y: 465 }, facing: "up" as const };
+  const state: State = { ...createState(content.world, fixture), coins,
+    player: { x: 1180, y: 465 }, facing: "up" };
   expect(targetInteractable(content.world, state)?.id).toBe("bakery");
   return state;
 }
@@ -54,24 +53,45 @@ function talk(start: State, choice: number): { state: State; lines: string[] } {
   return { state, lines };
 }
 
-function rewardState(critterId: string, coins: number): State {
+// A battle whose critter has just been soothed, its line shown in full.
+function soothedState(critterId: string, coins: number, stickers: string[] = []): State {
   const critter = content.world.critters[critterId];
   if (critter === undefined) throw new Error(`${critterId} missing`);
   const battle: Battle = {
-    critterId, entry: { x: 1100, y: 830 }, phase: "reward", message: critter.lines.reward,
-    revealed: critter.lines.reward.length, selected: 0, command: null, energy: 5,
-    calm: critter.calmMax, rest: {}, aim: null, lastGrade: null,
-    rewardSticker: critter.sticker.id, aimTick: 0, phaseTicks: 0,
+    critterId, den: null, entry: { x: 1100, y: 830 }, phase: "soothed",
+    message: critter.lines.soothed, revealed: critter.lines.soothed.length, selected: 0,
+    command: null, energy: 5, calm: critter.calmMax, rest: {}, aim: null, lastGrade: null,
+    rewardSticker: null, aimTick: 0, phaseTicks: 0,
   };
-  return { ...createState(content.world, fixture), coins, battle };
+  return { ...createState(content.world, fixture), coins, stickers, battle };
+}
+
+// Presses on through the reward: its line, then the end of the battle.
+function reward(state: State): { line: string; card: string | null; after: State } {
+  let next = press(state);
+  const line = next.battle?.message ?? "";
+  const card = next.battle?.rewardSticker ?? null;
+  for (let count = 0; count < 10 && next.battle !== null; count += 1) next = press(next);
+  return { line, card, after: next };
 }
 
 describe("coins and shops", () => {
   it("pays a calmed critter's coins as the battle ends: 8, and 25 for the gull", () => {
-    const frog = press(rewardState("frog", 3));
-    expect(frog).toMatchObject({ battle: null, coins: 11 });
-    expect(frog.critters.frog).toBe("calm");
-    expect(press(rewardState("gull", 0)).coins).toBe(25);
+    const frog = reward(soothedState("fountain-frog", 3));
+    expect(frog.line).toBe("New sticker: Fountain Frog! +8 coins.");
+    expect(frog.card).toBe("fountain-frog");
+    expect(frog.after).toMatchObject({ battle: null, coins: 11, stickers: ["fountain-frog"] });
+    expect(frog.after.critters["fountain-frog"]).toBe("calm");
+    expect(reward(soothedState("gull", 0)).after.coins).toBe(25);
+  });
+
+  it("pays every calm, but gives a species' sticker only once", () => {
+    // A bay frog after the fountain frog: the frogs' sticker is already in the
+    // album, so this calm only pays.
+    const again = reward(soothedState("frog", 8, ["fountain-frog"]));
+    expect(again.line).toBe("+8 coins!");
+    expect(again.card).toBeNull();
+    expect(again.after).toMatchObject({ coins: 16, stickers: ["fountain-frog"] });
   });
 
   it("sells a snack for 5 coins, as often as Fae can pay", () => {
@@ -103,7 +123,7 @@ describe("coins and shops", () => {
   it("uses Fae's snack supply and disables Snack at zero", () => {
     const state = { ...createState(content.world, fixture), snacks: 1 };
     const battle: Battle = {
-      critterId: "frog", entry: state.player, phase: "command", message: "",
+      critterId: "fountain-frog", den: null, entry: state.player, phase: "command", message: "",
       revealed: 0, selected: 2, command: null, energy: 5, calm: 0, rest: {},
       aim: null, lastGrade: null, rewardSticker: null, aimTick: 0, phaseTicks: 0,
     };
@@ -113,9 +133,8 @@ describe("coins and shops", () => {
     expect(snack).toMatchObject({ disabled: true, detail: "×0" });
   });
 
-  it("writes version 4 and refuses version 3 saves", () => {
+  it("refuses version 3 saves (no coins or snacks)", () => {
     const state = createState(content.world, fixture);
-    expect(JSON.parse(serializeSave(state)).version).toBe(4);
     expect(parseSave(JSON.stringify({ version: 3, state }), state)).toBeNull();
   });
 

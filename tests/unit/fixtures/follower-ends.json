@@ -54,21 +54,21 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 3210,
+    "tick": 3688,
     "area": "park",
     "player": {
-      "x": 736,
-      "y": 502
+      "x": 731.1269837220834,
+      "y": 514.8730162779166
     },
     "facing": "up",
     "follower": {
-      "x": 736,
-      "y": 586.3450093132096,
-      "facing": "up",
+      "x": 656.8826430346562,
+      "y": 533.1173569653438,
+      "facing": "right",
       "moving": false,
-      "distance": 691.011635574197,
-      "stillTicks": 17,
-      "trail": 11
+      "distance": 475.7400237056796,
+      "stillTicks": 18,
+      "trail": 10
     }
   },
   "new-game/door-round-trip.json": {
@@ -108,20 +108,20 @@
     }
   },
   "park/pup-win.json": {
-    "tick": 539,
+    "tick": 489,
     "area": "park",
     "player": {
-      "x": 812,
-      "y": 602
+      "x": 768.7005768508902,
+      "y": 581.2994231491098
     },
     "facing": "right",
     "follower": {
-      "x": 723.6549906867904,
-      "y": 602,
+      "x": 684.900565867818,
+      "y": 595.4415587728408,
       "facing": "right",
-      "moving": false,
-      "distance": 663.3403975886224,
-      "stillTicks": 363,
+      "moving": true,
+      "distance": 479.4051403884618,
+      "stillTicks": 359,
       "trail": 11
     }
   },
@@ -234,21 +234,21 @@
     }
   },
   "school/raccoon.json": {
-    "tick": 1257,
+    "tick": 1243,
     "area": "plaza",
     "player": {
-      "x": 398,
-      "y": 834
+      "x": 400.91168824543183,
+      "y": 897.7157287525379
     },
     "facing": "up",
     "follower": {
-      "x": 398,
-      "y": 891.2892812232087,
-      "facing": "up",
+      "x": 325.84248860846185,
+      "y": 888.558656421674,
+      "facing": "right",
       "moving": false,
-      "distance": 195.72635395748821,
-      "stillTicks": 20,
-      "trail": 1
+      "distance": 95.99999999999982,
+      "stillTicks": 22,
+      "trail": 10
     }
   }
 }

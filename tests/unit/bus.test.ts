@@ -35,17 +35,19 @@ function fixtureFor(name: string): Fixture {
   return fixture;
 }
 
-const allCalm: State["critters"] = { frog: "calm", pup: "calm", bluebird: "calm" };
+// The stickers of every species the story asks about so far.
+const allCalm = ["fountain-frog", "pond-pup", "bay-bluebird"];
 
-// Fae a few steps in front of a talk target, facing it, with the given facts.
+// Fae a few steps in front of a talk target, facing it, with the stickers of
+// the species she has calmed (the story asks calmed() of a species).
 function before(
   area: string,
   feet: { x: number; y: number },
   facing: State["facing"],
-  critters: State["critters"],
+  stickers: string[],
 ): State {
   const start = createState(world, { area, spawn: Object.keys(areaFor(area).spawns)[0] ?? "" });
-  return { ...start, player: feet, facing, critters: { ...start.critters, ...critters } };
+  return { ...start, player: feet, facing, stickers };
 }
 
 // Opens the talk with a confirm edge and presses through to its close,
@@ -90,7 +92,7 @@ describe("the town's bus stop", () => {
   });
 
   it("goes nowhere before the bluebird is calm", () => {
-    const state = before("plaza", { x: 878, y: 985 }, "up", { frog: "calm", pup: "calm" });
+    const state = before("plaza", { x: 878, y: 985 }, "up", ["fountain-frog", "pond-pup"]);
     expect(targetInteractable(world, state)?.id).toBe("npc:bus-stop");
     const { state: after, lines } = talk(state, 0);
     expect(lines.length).toBeGreaterThan(0);

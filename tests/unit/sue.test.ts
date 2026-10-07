@@ -290,10 +290,9 @@ describe("a party with Sue", () => {
 
 describe("the journal", () => {
   it("points to the park once the frog is calm, wherever Fae is and whatever she read", () => {
-    const state: State = {
-      ...createState(world, fixtureFor("plaza")),
-      critters: { frog: "calm", pup: "chaos" },
-    };
+    const fresh = createState(world, fixtureFor("plaza"));
+    const state: State = { ...fresh, critters: { ...fresh.critters, "fountain-frog": "calm" },
+      stickers: ["fountain-frog"] };
     expect(journalNotes(world, state).slice(0, 2)).toEqual([
       "Purple fizz drips lead out of the plaza to Meadow Park.",
       "The Fountain Frog is calm. Something purple fizzed into his fountain.",

@@ -111,9 +111,13 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
   expect(info.npcs.map((npc) => npc.id)).not.toContain("jordan");
   expect(info.party.map((member) => member.id)).toEqual(["maddie", "sue", "jordan"]);
 
-  // The four of them walk toward the clearing, short of the hamster.
-  await walk(page, "x", 1020);
+  // The four of them step back toward the bus stop, out of the hamster's
+  // sight (it comes after anyone within 180 units of it), and settle.
+  await walk(page, "y", 820);
+  await walk(page, "x", 1120);
   await step(page, 60);
+  state = await readState(page);
+  expect(state.battle, "nothing came after them").toBeNull();
   info = await renderInfo(page);
   expect(info.drawOrder.map((item) => item.label))
     .toEqual(expect.arrayContaining(["fae", "maddie", "sue", "jordan"]));
@@ -142,13 +146,23 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
   const juggles = await fight(page);
   expect(juggles.length).toBeGreaterThan(0);
   state = await readState(page);
-  expect(state.critters.hamster).toBe("calm");
+  expect(state.wild.find((critter) => critter.kind === "hamster")?.mood).toBe("calm");
   expect(state.stickers).toContain("hiker-hamster");
 
-  // Up to the calm hamster, facing it: it talks, and Jordan hands over the lantern.
-  await walk(page, "x", 900);
-  await hold(page, "ArrowLeft", 1);
-  await step(page, 1);
+  // Up to the calm hamster, wherever it stood when they met: Fae walks toward
+  // it until it's someone to talk to. It talks, and Jordan hands over the
+  // lantern.
+  const hamster = state.wild.find((critter) => critter.kind === "hamster");
+  if (hamster === undefined) throw new Error("no hamster");
+  const dx = hamster.x - state.player.x;
+  const dy = hamster.y - state.player.y;
+  const toward = Math.abs(dx) > Math.abs(dy)
+    ? (dx > 0 ? "ArrowRight" : "ArrowLeft")
+    : (dy > 0 ? "ArrowDown" : "ArrowUp");
+  const prompt = page.locator(".sticker-prompt");
+  for (let count = 0; count < 40 && !(await prompt.isVisible()); count += 1)
+    await hold(page, toward, 1);
+  await expect(prompt.locator("span")).toHaveText("TALK");
   const thanks = await talk(page);
   expect(thanks).toContain(
     "Jordan hands Fae his blacklight lantern: a big round purple lens on a rainbow handle.",

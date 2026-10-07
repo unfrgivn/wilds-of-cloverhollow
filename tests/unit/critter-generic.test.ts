@@ -12,7 +12,7 @@ import { loadContent } from "../../src/content/load";
 describe("generic critter battle content", () => {
   it("starts from a second content critter id and reports its atlas centroids", () => {
     const loaded = loadContent();
-    const frog = loaded.world.critters.frog;
+    const frog = loaded.world.critters["fountain-frog"];
     const area = loaded.world.areas.plaza;
     const fixture = loaded.fixtures.plaza;
     if (frog === undefined || area === undefined || fixture === undefined)
@@ -20,6 +20,7 @@ describe("generic critter battle content", () => {
     const pup = {
       ...frog,
       id: "test-critter",
+      species: "test",
       name: "Test Critter",
       calmName: "Calm Test Critter",
       sticker: { ...frog.sticker, id: "test-sticker" },
@@ -28,7 +29,7 @@ describe("generic critter battle content", () => {
     };
     const world = {
       ...loaded.world,
-      critters: { frog, "test-critter": pup },
+      critters: { "fountain-frog": frog, "test-critter": pup },
       areas: {
         ...loaded.world.areas,
         plaza: {
@@ -76,6 +77,10 @@ describe("generic critter battle content", () => {
     };
     state = step(world, state, none).state;
     state = step(world, state, { ...none, confirm: true }).state;
+    for (let count = 0; count < 400 && state.battle?.phase !== "reward"; count += 1) {
+      state = step(world, state, none).state;
+      state = step(world, state, { ...none, confirm: true }).state;
+    }
     expect(state.battle?.rewardSticker).toBe("test-sticker");
     for (let count = 0; count < 400 && state.battle !== null; count += 1) {
       state = step(world, state, none).state;
@@ -83,8 +88,10 @@ describe("generic critter battle content", () => {
     }
     expect(state.battle).toBeNull();
     expect(state.stickers).toEqual(["test-sticker"]);
-    expect(state.critters).toMatchObject({ "test-critter": "calm", frog: "chaos" });
-    expect(inkFacts(state).calmed).toMatchObject({ "test-critter": true, frog: false });
+    expect(state.critters).toMatchObject({ "test-critter": "calm", "fountain-frog": "chaos" });
+    // The set piece by its own mood, its species by the sticker.
+    expect(inkFacts(world, state).calmed)
+      .toMatchObject({ "test-critter": true, test: true, "fountain-frog": false });
     // Calm now: facing it gives its calm talk, not a battle.
     const facing: State = { ...state, player: { x: 545, y: 850 }, facing: "left" };
     expect(targetInteractable(world, facing)).toMatchObject({

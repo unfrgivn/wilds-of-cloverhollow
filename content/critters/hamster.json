@@ -1,5 +1,6 @@
 {
   "id": "hamster",
+  "species": "hamster",
   "name": "Snowball Hamster",
   "calmName": "Hiker Hamster",
   "atlas": "assets/critters/hamster/hamster.json",
@@ -101,7 +102,6 @@
       "miss": "Poof! Fae gets a face full of snow."
     },
     "soothed": "The hamster lets out a happy squeak. The fizzy spell melts away!",
-    "reward": "New sticker: Hiker Hamster! +8 coins.",
     "rest": "Fae is too chilly to go on. Time to warm up.",
     "run": "Fae tiptoes away through the snow. The hamster keeps whirling."
   },

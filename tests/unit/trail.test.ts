@@ -12,6 +12,7 @@ import {
   type Area,
   type Point,
   type State,
+  type Wild,
 } from "../../src/core";
 import { hiddenPositions } from "../../src/content/area-checks";
 import { loadContent } from "../../src/content/load";
@@ -106,9 +107,10 @@ function through(state: State, facing: State["facing"], after: number): State {
 // The story after the first bus ride up the mountain (Milestone 20).
 function riddenInk(): State["ink"] {
   const start = createState(world, { area: "plaza", spawn: "bus-stop" });
-  const critters: State["critters"] = { ...start.critters, frog: "calm", pup: "calm",
-    bluebird: "calm" };
-  let state: State = { ...start, player: { x: 878, y: 985 }, facing: "up", critters };
+  // The fountain frog, a pup, and a bluebird calmed: the bus goes up the mountain.
+  let state: State = { ...start, player: { x: 878, y: 985 }, facing: "up",
+    critters: { ...start.critters, "fountain-frog": "calm" },
+    stickers: ["fountain-frog", "pond-pup", "bay-bluebird"] };
   state = step(world, state, blankInput()).state;
   state = step(world, state, press({ confirm: true })).state;
   for (let tick = 0; tick < 600 && state.dialogue !== null; tick += 1) {
@@ -258,51 +260,56 @@ describe("the ways in and out", () => {
   });
 });
 
-describe("the trail's roaming critters", () => {
-  const meadows: [string, string, Point][] = [
-    ["bunny", "the upper meadow", { x: 650, y: 280 }],
-    ["squirrel", "the lower meadow", { x: 650, y: 760 }],
+describe("the trail's recurring critters", () => {
+  const dens = trail.recurring?.dens ?? [];
+  const meadows: [string, Point][] = [
+    ["the upper meadow", { x: 650, y: 280 }],
+    ["the lower meadow", { x: 650, y: 760 }],
   ];
-  for (const [id, where, centre] of meadows) {
-    it(`has the ${id} roaming ${where}`, () => {
+  meadows.forEach(([where, centre], index) => {
+    it(`has a den of bunnies and squirrels in ${where}`, () => {
+      const den = dens[index];
+      if (den === undefined) throw new Error(`no den ${index}`);
+      expect(den).toMatchObject({ kinds: ["bunny", "squirrel"], chance: 1 });
+      expect(den.radius).toBeGreaterThanOrEqual(80);
+      expect(den.radius).toBeLessThanOrEqual(150);
+      expect(Math.hypot(den.point.x - centre.x, den.point.y - centre.y)).toBeLessThanOrEqual(150);
+      expect(standable(trail, den.point)).toBe(true);
+    });
+  });
+  for (const id of ["bunny", "squirrel"]) {
+    it(`gives the ${id} its own atlas, commands, and sticker`, () => {
       const critter = world.critters[id];
       if (critter === undefined) throw new Error(`no ${id}`);
       expect(critter.atlas).toBe(`assets/critters/${id}/${id}.json`);
       expect(critter.calmKnot).toBe(`${id}_calm`);
       expect(Object.keys(critter.commands.friends)).toEqual(["play", "cast", "juggle"]);
-      const placed = trail.critters.find((item) => item.id === id);
-      if (placed === undefined) throw new Error(`the ${id} isn't on the trail`);
-      const roam = placed.roam?.radius ?? 0;
-      expect(roam).toBeGreaterThanOrEqual(80);
-      expect(roam).toBeLessThanOrEqual(150);
-      const fromCentre = Math.hypot(placed.point.x - centre.x, placed.point.y - centre.y);
-      expect(fromCentre).toBeLessThanOrEqual(150);
-      expect(standable(trail, placed.point)).toBe(true);
       expect(world.stickers.catalogue.some((sticker) =>
         sticker.id === critter.sticker.id && sticker.critter === id)).toBe(true);
-      const fixture = content.fixtures["new-game"];
-      if (fixture === undefined) throw new Error("new-game fixture missing");
-      expect(createState(world, fixture).critters[id]).toBe("chaos");
     });
 
-    it(`lets Fae talk to the ${id} once it's calm`, () => {
-      const placed = trail.critters.find((item) => item.id === id);
-      if (placed === undefined) throw new Error(`the ${id} isn't on the trail`);
+    it(`lets Fae talk to a calm ${id}`, () => {
+      const den = dens[0];
+      if (den === undefined) throw new Error("no den");
       const start = createState(world, { area: "trail", spawn: "pass" });
-      const critters: State["critters"] = { ...start.critters, [id]: "calm" };
-      let state: State = { ...start, critters, facing: "up",
-        player: { x: placed.point.x, y: placed.point.y + 45 } };
-      expect(targetInteractable(world, state)?.id).toBe(`critter:${id}`);
+      const calm: Wild = { kind: id, den: 0, mood: "calm", x: den.point.x, y: den.point.y,
+        target: { ...den.point }, pauseTicks: 0, cooldownTicks: 0, facing: "down",
+        moving: false };
+      let state: State = { ...start, wild: [calm], facing: "up",
+        player: { x: den.point.x, y: den.point.y + 45 } };
+      expect(targetInteractable(world, state)?.id).toBe("critter:wild:0");
       state = step(world, state, blankInput()).state;
       state = step(world, state, press({ confirm: true })).state;
       expect(state.dialogue?.knot).toBe(`${id}_calm`);
     });
   }
 
-  it("writes a journal note once both are calm", () => {
+  it("writes a journal note once Fae has calmed a bunny and a squirrel", () => {
     const start = createState(world, { area: "trail", spawn: "pass" });
-    const critters: State["critters"] = { ...start.critters, bunny: "calm", squirrel: "calm" };
-    expect(journalNotes(world, { ...start, critters })[0]).toMatch(/Cliffside Trail/);
+    expect(journalNotes(world, { ...start, stickers: ["ribbon-bunny"] }).join(" "))
+      .not.toMatch(/Cliffside Trail/);
+    expect(journalNotes(world, { ...start, stickers: ["ribbon-bunny", "acorn-squirrel"] })[0])
+      .toMatch(/Cliffside Trail/);
   });
 });
 

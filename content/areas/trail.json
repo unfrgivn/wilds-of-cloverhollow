@@ -26,26 +26,6 @@
   ],
   "critters": [
     {
-      "id": "bunny",
-      "point": {
-        "x": 650,
-        "y": 280
-      },
-      "roam": {
-        "radius": 120
-      }
-    },
-    {
-      "id": "squirrel",
-      "point": {
-        "x": 650,
-        "y": 760
-      },
-      "roam": {
-        "radius": 120
-      }
-    },
-    {
       "id": "gull",
       "point": {
         "x": 1440,
@@ -53,6 +33,32 @@
       }
     }
   ],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 650,
+          "y": 280
+        },
+        "radius": 120,
+        "kinds": [
+          "bunny",
+          "squirrel"
+        ]
+      },
+      {
+        "point": {
+          "x": 650,
+          "y": 760
+        },
+        "radius": 120,
+        "kinds": [
+          "bunny",
+          "squirrel"
+        ]
+      }
+    ]
+  },
   "npcs": [],
   "triggers": [
     {

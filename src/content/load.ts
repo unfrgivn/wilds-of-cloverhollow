@@ -18,10 +18,15 @@ import bayFixtureData from "../../content/fixtures/bay.json";
 import passFixtureData from "../../content/fixtures/pass.json";
 import trailFixtureData from "../../content/fixtures/trail.json";
 import passPartyFixtureData from "../../content/fixtures/pass-party.json";
+import woodsFixtureData from "../../content/fixtures/woods.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
+import fountainFrogData from "../../content/critters/fountain-frog.json";
 import frogData from "../../content/critters/frog.json";
 import pupData from "../../content/critters/pup.json";
+import catData from "../../content/critters/cat.json";
+import raccoonData from "../../content/critters/raccoon.json";
+import schoolRaccoonData from "../../content/critters/school-raccoon.json";
 import bluebirdData from "../../content/critters/bluebird.json";
 import hamsterData from "../../content/critters/hamster.json";
 import bunnyData from "../../content/critters/bunny.json";
@@ -55,6 +60,8 @@ import type {
   Point,
   PartyContent,
   FriendCommand,
+  Recurring,
+  Den,
 } from "../core";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -222,16 +229,14 @@ export function parseArea(value: unknown, file: string): Area {
             record(item) &&
             typeof item.id === "string" &&
             record(item.point) &&
-             typeof item.point.x === "number" &&
-             typeof item.point.y === "number" &&
-             (item.roam === undefined ||
-               (record(item.roam) &&
-                 typeof item.roam.radius === "number" &&
-                 item.roam.radius > 0)),
+            typeof item.point.x === "number" &&
+            typeof item.point.y === "number" &&
+            (item.visibleWhile === undefined || typeof item.visibleWhile === "string"),
         )),
     file,
     "critters",
   );
+  const recurring = parseRecurring(value.recurring, file);
   field(
     value.npcs === undefined ||
       (Array.isArray(value.npcs) &&
@@ -370,8 +375,9 @@ export function parseArea(value: unknown, file: string): Area {
     critters: (value.critters ?? []).map((item) => ({
       id: item.id,
       point: { x: item.point.x, y: item.point.y },
-      ...(item.roam === undefined ? {} : { roam: { radius: item.roam.radius } }),
+      ...(item.visibleWhile === undefined ? {} : { visibleWhile: item.visibleWhile }),
     })),
+    ...(recurring === undefined ? {} : { recurring }),
     npcs: (value.npcs ?? []).map((item) => ({
       id: item.id,
       point: { x: item.point.x, y: item.point.y },
@@ -384,6 +390,36 @@ export function parseArea(value: unknown, file: string): Area {
         : { visibleWhile: item.visibleWhile }),
     })),
     spawns,
+  };
+}
+
+// An area's recurring critters (spec 6): `after` (a calmed() fact) and the
+// dens, each `{ point, radius, kinds, chance? }` with `chance` in (0, 1].
+function parseRecurring(value: unknown, file: string): Recurring | undefined {
+  if (value === undefined) return undefined;
+  field(record(value), file, "recurring");
+  const after = value.after;
+  field(after === undefined || typeof after === "string", file, "recurring.after");
+  const dens = value.dens;
+  field(Array.isArray(dens) && dens.length > 0, file, "recurring.dens");
+  return {
+    ...(after === undefined ? {} : { after }),
+    dens: dens.map((den: unknown, index): Den => {
+      const name = `recurring.dens.${index}`;
+      field(record(den), file, name);
+      const point = den.point;
+      field(record(point) && typeof point.x === "number" && typeof point.y === "number",
+        file, `${name}.point`);
+      const radius = den.radius;
+      field(typeof radius === "number" && radius > 0, file, `${name}.radius`);
+      const kinds = den.kinds;
+      field(Array.isArray(kinds) && kinds.length > 0, file, `${name}.kinds`);
+      const names = kinds.filter((kind): kind is string => typeof kind === "string");
+      field(names.length === kinds.length, file, `${name}.kinds`);
+      const chance = den.chance ?? 1;
+      field(typeof chance === "number" && chance > 0 && chance <= 1, file, `${name}.chance`);
+      return { point: { x: point.x, y: point.y }, radius, kinds: names, chance };
+    }),
   };
 }
 
@@ -414,6 +450,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     return item;
   };
   const id = text(value, "id");
+  const species = text(value, "species");
   const name = text(value, "name");
   const calmName = text(value, "calmName");
   const atlas = text(value, "atlas");
@@ -490,6 +527,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     friendLines[friendId] = gradeMap(raw, file, `lines.friends.${friendId}`);
   return {
     id,
+    species,
     name,
     calmName,
     atlas,
@@ -528,7 +566,6 @@ export function parseCritter(value: unknown, file: string): Critter {
       burst: line("burst"),
       burstResult: gradeMap(lines.burstResult, file, "lines.burstResult"),
       soothed: line("soothed"),
-      reward: line("reward"),
       rest: line("rest"),
       run: line("run"),
     },
@@ -554,12 +591,20 @@ export function parseBattleContent(
     );
     return { label: raw.label, snackDetail: raw.snackDetail };
   };
+  const rewards = value.rewards;
+  field(
+    record(rewards) && typeof rewards.sticker === "string" &&
+      typeof rewards.coins === "string" && rewards.coins.includes("{coins}"),
+    file,
+    "rewards",
+  );
   return {
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),
       run: command("run"),
     },
+    rewards: { sticker: rewards.sticker, coins: rewards.coins },
   };
 }
 
@@ -638,6 +683,53 @@ export function partyErrors(
       if (critter.lines.friends[commandId] === undefined)
         errors.push(`critter ${critter.id}: no lines.friends.${commandId}`);
     }
+  }
+  return errors;
+}
+
+// Critter kinds and where they're out (spec 8): every set piece is a kind
+// placed once, dens list only the other kinds, a species has one sticker and
+// it's in the album, and `after` names a calmed() fact (a set piece or a
+// species).
+export function critterErrors(
+  areas: Record<string, Area>,
+  critters: Record<string, Critter>,
+  stickers: StickerCatalogue,
+): string[] {
+  const errors: string[] = [];
+  const placed = new Map<string, string>();
+  for (const area of Object.values(areas))
+    for (const piece of area.critters) {
+      if (critters[piece.id] === undefined)
+        errors.push(`${area.id}: set piece ${piece.id} isn't a critter kind`);
+      const other = placed.get(piece.id);
+      if (other !== undefined) errors.push(`${area.id}: set piece ${piece.id} is in ${other} too`);
+      placed.set(piece.id, area.id);
+    }
+  const species = new Map<string, string>();
+  for (const kind of Object.values(critters)) {
+    const sticker = species.get(kind.species);
+    if (sticker !== undefined && sticker !== kind.sticker.id)
+      errors.push(`critter ${kind.id}: species ${kind.species} has two stickers, ` +
+        `${sticker} and ${kind.sticker.id}`);
+    species.set(kind.species, kind.sticker.id);
+    if (!stickers.catalogue.some((entry) => entry.id === kind.sticker.id))
+      errors.push(`critter ${kind.id}: sticker ${kind.sticker.id} isn't in the album`);
+  }
+  for (const entry of stickers.catalogue)
+    if (critters[entry.critter]?.sticker.id !== entry.id)
+      errors.push(`sticker ${entry.id}: critter ${entry.critter} doesn't carry it`);
+  if (stickers.catalogue.length > stickers.slots)
+    errors.push(`stickers: ${stickers.catalogue.length} stickers for ${stickers.slots} slots`);
+  for (const area of Object.values(areas)) {
+    const after = area.recurring?.after;
+    if (after !== undefined && !placed.has(after) && !species.has(after))
+      errors.push(`${area.id}: recurring.after ${after} is neither a set piece nor a species`);
+    area.recurring?.dens.forEach((den, index) => {
+      for (const kind of den.kinds)
+        if (critters[kind] === undefined || placed.has(kind))
+          errors.push(`${area.id}: den ${index} lists ${kind}, which isn't a recurring kind`);
+    });
   }
   return errors;
 }
@@ -825,14 +917,27 @@ export function loadContent(): {
     busStop: "busStop" in land && land.busStop === true,
   }));
   const story = parseStoryJson(storyData, "content/story/main.ink.json");
-  const frog = parseCritter(frogData, "content/critters/frog.json");
-  const pup = parseCritter(pupData, "content/critters/pup.json");
-  const bluebird = parseCritter(bluebirdData, "content/critters/bluebird.json");
-  const hamster = parseCritter(hamsterData, "content/critters/hamster.json");
-  const bunny = parseCritter(bunnyData, "content/critters/bunny.json");
-  const squirrel = parseCritter(squirrelData, "content/critters/squirrel.json");
-  const gull = parseCritter(gullData, "content/critters/gull.json");
-  const owl = parseCritter(owlData, "content/critters/owl.json");
+  const critterFiles: [unknown, string][] = [
+    [fountainFrogData, "fountain-frog"],
+    [frogData, "frog"],
+    [pupData, "pup"],
+    [catData, "cat"],
+    [raccoonData, "raccoon"],
+    [schoolRaccoonData, "school-raccoon"],
+    [bluebirdData, "bluebird"],
+    [hamsterData, "hamster"],
+    [bunnyData, "bunny"],
+    [squirrelData, "squirrel"],
+    [gullData, "gull"],
+    [owlData, "owl"],
+  ];
+  const critters: Record<string, Critter> = {};
+  for (const [data, name] of critterFiles) {
+    const file = `content/critters/${name}.json`;
+    const critter = parseCritter(data, file);
+    field(critter.id === name, file, "id (it must be the file's name)");
+    critters[critter.id] = critter;
+  }
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -847,16 +952,6 @@ export function loadContent(): {
   );
   if (joinProblems.length > 0)
     throw new Error(`content/party: ${joinProblems.join("; ")}`);
-  const critters = {
-    [frog.id]: frog,
-    [pup.id]: pup,
-    [bluebird.id]: bluebird,
-    [hamster.id]: hamster,
-    [bunny.id]: bunny,
-    [squirrel.id]: squirrel,
-    [gull.id]: gull,
-    [owl.id]: owl,
-  };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)
     throw new Error(`content/party: ${partyProblems.join("; ")}`);
@@ -874,7 +969,7 @@ export function loadContent(): {
     pass: parseFixture(passFixtureData, "content/fixtures/pass.json"),
     "pass-party": parseFixture(passPartyFixtureData, "content/fixtures/pass-party.json"),
     trail: parseFixture(trailFixtureData, "content/fixtures/trail.json"),
-    woods: parseFixture({ area: "woods", spawn: "east" }, "content/fixtures/woods.json"),
+    woods: parseFixture(woodsFixtureData, "content/fixtures/woods.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -892,6 +987,9 @@ export function loadContent(): {
     [trail.id]: trail,
     [woods.id]: woods,
   };
+  const critterProblems = critterErrors(areas, critters, stickers);
+  if (critterProblems.length > 0)
+    throw new Error(`content/critters: ${critterProblems.join("; ")}`);
   const tagProblems = storyTagErrors(storyTags(story), areas);
   if (tagProblems.length > 0)
     throw new Error(`content/story/main.ink: ${tagProblems.join("; ")}`);

@@ -74,13 +74,24 @@ export type Area = {
     point: Point;
     prompt: "Look" | "Talk";
   }[];
-  critters: { id: string; point: Point; roam?: { radius: number } }[];
+  // Story set pieces (spec 8): one critter kind each, at its point, calm or
+  // chaos for the whole game (`state.critters`).
+  critters: SetPiece[];
+  // Recurring critters (spec 6): rolled at the dens on every arrival.
+  recurring?: Recurring;
   // People standing in the area (spec 6): drawn with their own atlas, talked
   // to like an interactable, and turned toward Fae while she talks to them.
   // Their footprint is an authored blocker.
   npcs: Npc[];
   spawns: Record<string, Spawn>;
 };
+// A set piece's id is its critter kind's. `visibleWhile` (an Ink variable)
+// puts it there only while it's true, as for people.
+export type SetPiece = { id: string; point: Point; visibleWhile?: string };
+// Nothing is out until `after` (a calmed() fact) is true. Each den rolls its
+// critter (one of `kinds`) with `chance` (0..1], and it wanders `radius`.
+export type Recurring = { after?: string; dens: Den[] };
+export type Den = { point: Point; radius: number; kinds: string[]; chance: number };
 export type Npc = {
   id: string;
   point: Point;
@@ -146,6 +157,9 @@ export type BattleContent = {
     SharedCommandId,
     { label: string; snackDetail: string | null }
   >;
+  // The reward line: `sticker` when the species' sticker is new, `coins`
+  // otherwise, with {sticker} and {coins} filled in (spec 8).
+  rewards: { sticker: string; coins: string };
 };
 export type Grade = "great" | "good" | "miss";
 // The commands every battle has; the party's commands come from its roster.
@@ -156,8 +170,11 @@ export type FriendCommand = {
   good: number;
   rest: number;
 };
+// A critter kind (spec 8). Kinds of one species (the fountain frog and the
+// bay's frogs) share its sticker.
 export type Critter = {
   id: string;
+  species: string;
   name: string;
   calmName: string;
   atlas: string;
@@ -201,7 +218,6 @@ export type Critter = {
     burst: string;
     burstResult: Record<Grade, string>;
     soothed: string;
-    reward: string;
     rest: string;
     run: string;
   };
@@ -218,7 +234,10 @@ export type BattlePhase =
   | "rest"
   | "run";
 export type Battle = {
+  // The critter kind; `den` is the recurring critter's den, or null for a set
+  // piece (whose id is the kind's).
   critterId: string;
+  den: number | null;
   entry: Point;
   phase: BattlePhase;
   message: string;
@@ -238,6 +257,7 @@ export type Battle = {
     goodWindow: number;
   } | null;
   lastGrade: Grade | null;
+  // Set as the reward shows: the species' sticker if it's new, else null.
   rewardSticker: string | null;
   aimTick: number;
   phaseTicks: number;
@@ -309,8 +329,10 @@ export type State = {
     ended: boolean;
     travel?: { area: string; spawn: string };
   } | null;
-  critters: Record<string, "chaos" | "calm">;
-  roamers: Record<string, Roamer>;
+  // The set pieces' moods, for the whole game.
+  critters: Record<string, Mood>;
+  // This visit's recurring critters, rolled on arrival (spec 6).
+  wild: Wild[];
   stickers: string[];
   safeSpot: { area: string; spawn: string };
   battle: Battle | null;
@@ -320,10 +342,24 @@ export type State = {
   snacks: number;
   backLink?: { area: string; direction: Direction };
 };
-export type Roamer = {
+export type Mood = "chaos" | "calm";
+// A critter out in Fae's area, set piece or recurring (`presentCritters`):
+// `key` is a set piece's id or `wild:<den>`.
+export type PresentCritter = {
+  key: string;
+  kind: Critter;
+  point: Point;
+  mood: Mood;
+  wild: Wild | null;
+};
+// A recurring critter out this visit, from its den (spec 6). It stays calm,
+// once calmed, only until Fae leaves.
+export type Wild = {
+  kind: string;
+  den: number;
+  mood: Mood;
   x: number;
   y: number;
-  home: Point;
   target: Point;
   pauseTicks: number;
   cooldownTicks: number;

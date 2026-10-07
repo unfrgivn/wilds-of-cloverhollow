@@ -11,9 +11,10 @@ import {
 
 // Milestone 13 contract: Meadow Park. The plaza's lower-right cobbled path
 // leads to the park (spawn `plaza-path`, (360, 850) facing up) and the park's
-// exit path back (plaza spawn `park-path`, (1470, 930) facing up). The Zoomie
-// Pup waits by the pond (880, 628): walking into him starts a battle with his
-// own content (content/critters/pup.json) and atlas.
+// exit path back (plaza spawn `park-path`, (1470, 930) facing up). A Zoomie
+// Pup is out by the pond (its den at (880, 600)) every time Fae arrives
+// (Milestone 28): walking into it starts a battle with the pups' own content
+// (content/critters/pup.json) and atlas.
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -76,12 +77,16 @@ test("the plaza's lower path leads to Meadow Park, and its exit path leads back"
   expect(park.area).toBe("park");
   expect(park.player).toEqual({ x: 360, y: 850 });
   expect(park.facing).toBe("up");
-  expect(park.critters.pup).toBe("chaos");
+  expect(park.wild.find((critter) => critter.den === 0))
+    .toMatchObject({ kind: "pup", mood: "chaos" });
   const info = await renderInfo(page);
   expect(info.area).toBe("park");
-  expect(info.critters).toEqual([{ id: "pup", frame: "chaos_idle_01", x: 880, y: 628 }]);
+  const pup = info.critters.find((critter) => critter.id === "wild:0");
+  expect(pup).toMatchObject({ kind: "pup", frame: "chaos_idle_01" });
+  // It has wandered a little since Fae arrived, within its den.
+  expect(Math.hypot((pup?.x ?? 0) - 880, (pup?.y ?? 0) - 600)).toBeLessThanOrEqual(90);
   expect(info.drawOrder.map((item) => item.label))
-    .toEqual(expect.arrayContaining(["critter:pup", "critter:pup:aura", "maddie"]));
+    .toEqual(expect.arrayContaining(["critter:wild:0", "critter:wild:0:aura", "maddie"]));
   expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(false);
   expect(info.cachedAreaTextures.some((url) => url.includes("park"))).toBe(true);
   await expect(page).toHaveScreenshot("park-arrival.png");
@@ -102,12 +107,12 @@ test("the Zoomie Pup's battle uses his own content, and Fae can run away", async
   await walk(page, "y", 600);
   await hold(page, "ArrowRight", 90);
   await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
-  const entry = (await readState(page)).player;
-  expect((await readState(page)).battle?.critterId).toBe("pup");
+  const met = await readBattle(page);
+  expect(met).toMatchObject({ critterId: "pup", den: 0 });
   expect((await renderInfo(page)).battle.critter).toEqual({ id: "pup", frame: "chaos_idle_01" });
   await step(page, 120);
   await expect(page.locator(".sticker-text-revealed")).toHaveText(
-    "A puppy in a red cap zooms out from behind the pond, barking at everything!");
+    "A puppy in a red cap zooms out of nowhere, barking at everything!");
   for (let count = 0; count < 10 && (await readBattle(page))?.phase !== "command"; count += 1)
     await press(page);
   expect((await readBattle(page))?.phase).toBe("command");
@@ -120,12 +125,13 @@ test("the Zoomie Pup's battle uses his own content, and Fae can run away", async
   await press(page);
   await step(page, 120);
   await expect(page.locator(".sticker-text-revealed")).toHaveText(
-    "Fae backs away slowly. The pup keeps zooming around the pond.");
+    "Fae backs away slowly. The pup keeps zooming in circles.");
   for (let count = 0; count < 10 && (await readBattle(page)) !== null; count += 1)
     await press(page);
   await expect(page.locator("html")).not.toHaveAttribute("data-battle", "open");
   const after = await readState(page);
-  expect(after.critters.pup).toBe("chaos");
+  expect(after.wild.find((critter) => critter.den === 0)?.mood).toBe("chaos");
   expect(after.stickers).toEqual([]);
-  expect(after.player).toEqual(entry);
+  // Back where she was the tick before they met.
+  expect(after.player).toEqual(met?.entry);
 });

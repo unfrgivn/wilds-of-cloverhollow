@@ -1,5 +1,6 @@
 {
   "id": "squirrel",
+  "species": "squirrel",
   "name": "Zippy Squirrel",
   "calmName": "Acorn Squirrel",
   "atlas": "assets/critters/squirrel/squirrel.json",
@@ -101,7 +102,6 @@
       "miss": "Bonk! An acorn bops Fae on the head."
     },
     "soothed": "The squirrel flicks its tail happily. The fizzy spell fizzles away!",
-    "reward": "New sticker: Acorn Squirrel! +8 coins.",
     "rest": "Fae is too dizzy from dodging acorns. Time for a rest.",
     "run": "Fae hurries down the path. The squirrel keeps chattering."
   },

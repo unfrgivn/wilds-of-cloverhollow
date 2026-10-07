@@ -82,7 +82,7 @@ export async function renderInfo(page: Page): Promise<{
     choices: string[];
     selected: number;
   };
-  critters: { id: string; frame: string; x: number; y: number }[];
+  critters: { id: string; kind: string; frame: string; x: number; y: number }[];
   npcs: { id: string; frame: string; facing: string }[];
   canopies: { id: string; alpha: number }[];
   lantern: { on: boolean; glows: string[] };
@@ -202,4 +202,31 @@ export async function playWithKeys(
     }
   }
   for (const key of held) await page.keyboard.up(key);
+}
+
+// A recording that starts with another one (east-road.json starts with
+// chapter one's run): the shared start is replayed as queued frames, and only
+// the rest is played with real keys. The recorder may have run the shared
+// run's last segment on into the rest; it's split where the start ends.
+export async function playAfter(
+  page: Page,
+  before: string,
+  path: string,
+  watch: () => Promise<void> = async () => undefined,
+): Promise<void> {
+  const start = recording(before);
+  const all = recording(path);
+  const last = start.length - 1;
+  const joined = all[last];
+  const same = start.every((segment, index) => index === last
+    ? joined !== undefined && JSON.stringify(segment.frame) === JSON.stringify(joined.frame) &&
+      joined.ticks >= segment.ticks
+    : JSON.stringify(segment) === JSON.stringify(all[index]));
+  if (!same || joined === undefined) throw new Error(`${path} doesn't start with ${before}`);
+  const carried = joined.ticks - (start[last]?.ticks ?? 0);
+  await queueScript(page, start);
+  await step(page, start.reduce((total, segment) => total + segment.ticks, 0));
+  const rest = all.slice(last + 1);
+  await playWithKeys(page,
+    carried > 0 ? [{ frame: joined.frame, ticks: carried }, ...rest] : rest, 10, watch);
 }

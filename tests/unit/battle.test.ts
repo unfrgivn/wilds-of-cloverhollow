@@ -31,7 +31,7 @@ function battleState(): State {
   return {
     ...createState(content.world, plazaFixture()),
     battle: {
-      critterId: "frog",
+      critterId: "fountain-frog", den: null,
       entry: { x: 500, y: 500 },
       phase: "command",
       message: "",
@@ -215,7 +215,7 @@ describe("calm-down battle core", () => {
       battle: { ...state.battle!, selected: 3 },
     };
     state = press(state);
-    expect(state.battle?.message).toBe(content.world.critters.frog?.lines.run);
+    expect(state.battle?.message).toBe(content.world.critters["fountain-frog"]?.lines.run);
     state = press(state);
     state = press(state);
     expect(state.battle).toBeNull();
@@ -246,7 +246,7 @@ describe("calm-down battle core", () => {
     for (let i = 0; i < content.world.tunables.doorFadeTicks * 2 + 1; i += 1)
       state = step(content.world, state, none).state;
     expect(state.area).toBe("plaza");
-    expect(state.critters.frog).toBe("chaos");
+    expect(state.critters["fountain-frog"]).toBe("chaos");
     expect(state.stickers).toEqual(["other"]);
   });
 
@@ -282,7 +282,7 @@ describe("calm-down battle core", () => {
     state = press(state);
     expect(state.battle?.phase).toBe("burst");
     expect(state.battle?.message).toBe(
-      content.world.critters.frog?.lines.burst,
+      content.world.critters["fountain-frog"]?.lines.burst,
     );
     state = press(state);
     state = press(state);
@@ -317,7 +317,7 @@ describe("calm-down battle core", () => {
     let state = battleState();
     state = {
       ...state,
-      critters: { frog: "calm" },
+      critters: { ...state.critters, "fountain-frog": "calm" },
       player: { x: 1000, y: 820 },
       facing: "right",
       battle: null,
@@ -334,11 +334,11 @@ describe("calm-down battle core", () => {
     const chaos = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-    }, { calmed: { frog: false }, coins: 0 });
+    }, { calmed: { "fountain-frog": false }, coins: 0 });
     const calm = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-    }, { calmed: { frog: true }, coins: 0 });
+    }, { calmed: { "fountain-frog": true }, coins: 0 });
     expect(chaos.line?.text).toContain("Pink bubbles");
     expect(calm.line?.text).toBe("The bubbles are gone. The fountain sparkles like new!");
   });

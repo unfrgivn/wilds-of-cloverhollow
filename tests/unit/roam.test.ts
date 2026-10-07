@@ -16,13 +16,13 @@ import {
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 
-// Contract for roaming critters (Milestone 23), EarthBound-style: a critter
-// with `roam` wanders near its home point and, in chaos, comes after Fae when
-// she's within sight, a little slower than she walks. Touching starts a battle.
-// After Fae runs away it leaves her alone for a while and wanders home. A calm
-// critter stays put, a Talk target where it stands. Roamers hold still while
-// Fae is busy (talking, battling, a door, the journal), and they start at home
-// whenever Fae arrives in their area.
+// Contract for roaming critters (Milestone 21; recurring since Milestone 28),
+// EarthBound-style: a den's critter wanders near the den and, in chaos, comes
+// after Fae when she's within sight, a little slower than she walks. Touching
+// starts a battle. After Fae runs away it leaves her alone for a while and
+// wanders home. A calm critter stays put, a Talk target where it stands.
+// Roamers hold still while Fae is busy (talking, battling, a door, the
+// journal), and they start at their den whenever Fae arrives in their area.
 
 const content = loadContent();
 const base = content.world;
@@ -32,26 +32,28 @@ const distance = (a: Point, b: Point): number => Math.hypot(a.x - b.x, a.y - b.y
 const home = { x: 600, y: 900 };
 const roamRadius = 150;
 
-function harnessWithRoamer(): World {
+function harnessWithDen(): World {
   const harness = base.areas["harness"];
   if (harness === undefined) throw new Error("no harness");
-  const critters: Area["critters"] = [{ id: "frog", point: home, roam: { radius: roamRadius } }];
-  const area: Area = { ...harness, critters };
+  const area: Area = {
+    ...harness,
+    recurring: { dens: [{ point: home, radius: roamRadius, kinds: ["frog"], chance: 1 }] },
+  };
   return { ...base, areas: { ...base.areas, harness: area } };
 }
-const world = harnessWithRoamer();
+const world = harnessWithDen();
 const tune = world.tunables.roam;
 const touch = world.critters["frog"]?.touchRadius ?? 0;
 const walkPerTick = world.tunables.walkSpeed / 60;
 
-function start(fae: Point, critter: "chaos" | "calm" = "chaos"): State {
+function start(fae: Point, mood: "chaos" | "calm" = "chaos"): State {
   const state = createState(world, { area: "harness", spawn: "start", seed: 7 });
-  return { ...state, player: fae, critters: { ...state.critters, frog: critter } };
+  return { ...state, player: fae, wild: state.wild.map((critter) => ({ ...critter, mood })) };
 }
 
 function roamer(state: State): Point {
-  const spot = state.roamers["frog"];
-  if (spot === undefined) throw new Error("the frog isn't roaming");
+  const spot = state.wild[0];
+  if (spot === undefined) throw new Error("the frog isn't out");
   return { x: spot.x, y: spot.y };
 }
 
@@ -101,7 +103,7 @@ describe("a roaming critter", () => {
       expect(distance(roamer(state), previous)).toBeLessThanOrEqual(tune.chaseSpeed + 1e-9);
       previous = roamer(state);
     }
-    expect(state.battle?.critterId).toBe("frog");
+    expect(state.battle).toMatchObject({ critterId: "frog", den: 0 });
   });
 
   it("can't catch Fae when she walks away", () => {
@@ -151,7 +153,7 @@ describe("a roaming critter", () => {
     state = { ...state, facing: "up" };
     for (let tick = 0; tick < 120; tick += 1) state = step(world, state, blankInput()).state;
     expect(roamer(state)).toEqual(home);
-    expect(targetInteractable(world, state)?.id).toBe("critter:frog");
+    expect(targetInteractable(world, state)?.id).toBe("critter:wild:0");
   });
 
   it("is deterministic", () => {
@@ -165,9 +167,12 @@ describe("a roaming critter", () => {
   });
 });
 
-describe("critters without roam", () => {
-  it("don't roam: every shipped area keeps its critters still", () => {
-    const state = createState(base, { area: "plaza", spawn: "fountain", seed: 1 });
-    expect(state.roamers).toEqual({});
+describe("set pieces", () => {
+  it("stand still: the plaza's fountain frog never roams", () => {
+    let state = createState(base, { area: "plaza", spawn: "fountain", seed: 1 });
+    expect(state.wild, "the plaza is quiet until the fountain frog is calm").toEqual([]);
+    for (let tick = 0; tick < 120; tick += 1) state = step(base, state, blankInput()).state;
+    expect(state.critters["fountain-frog"]).toBe("chaos");
+    expect(state.wild).toEqual([]);
   });
 });

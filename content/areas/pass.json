@@ -1182,15 +1182,32 @@
       "facing": "right"
     }
   },
-  "critters": [
-    {
-      "id": "hamster",
-      "point": {
-        "x": 850,
-        "y": 760
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 850,
+          "y": 760
+        },
+        "radius": 90,
+        "kinds": [
+          "hamster"
+        ]
+      },
+      {
+        "point": {
+          "x": 700,
+          "y": 330
+        },
+        "radius": 90,
+        "kinds": [
+          "hamster"
+        ],
+        "chance": 0.5
       }
-    }
-  ],
+    ]
+  },
   "npcs": [
     {
       "id": "jordan",

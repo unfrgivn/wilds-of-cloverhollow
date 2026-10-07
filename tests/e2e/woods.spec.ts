@@ -29,7 +29,7 @@ test('the recorded lantern replay reaches the clubhouse', async ({ page }) => {
   await step(page, script.reduce((total, segment) => total + segment.ticks, 0));
   const state = await page.evaluate(() => window.__cloverhollow?.getState());
   expect(state?.area).toBe('woods');
-  expect(state?.critters.owl).toBe('calm');
+  expect(state?.wild.find((critter) => critter.kind === 'owl')?.mood).toBe('calm');
   expect(state?.lantern).toBe(true);
   await expect(page).toHaveScreenshot('woods-clubhouse-lantern-1280.png');
 });

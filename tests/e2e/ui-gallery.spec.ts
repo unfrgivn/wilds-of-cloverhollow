@@ -290,14 +290,14 @@ test.describe("sticker gallery", () => {
     await expect(owned.locator(".journal-name")).toHaveText("Fountain Frog");
     await expect(owned.locator(".journal-unknown")).toBeHidden();
     const unknown = page.locator('.journal-slot[data-owned="false"] .journal-unknown');
-    await expect(unknown).toHaveCount(7);
+    await expect(unknown).toHaveCount(9);
     for (const slot of await unknown.all()) {
       await expect(slot).toBeVisible();
       await expect(slot).toHaveText("?");
       expect(await slot.evaluate((element) => getComputedStyle(element).borderStyle))
         .toBe("dashed");
     }
-    await expect(page.locator('.journal-slot[data-owned="false"] .journal-name')).toHaveCount(7);
+    await expect(page.locator('.journal-slot[data-owned="false"] .journal-name')).toHaveCount(9);
     for (const name of await page.locator('.journal-slot[data-owned="false"] .journal-name').all())
       await expect(name).toBeHidden();
     const box = await owned.locator(".journal-sticker-image")

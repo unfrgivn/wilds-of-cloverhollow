@@ -340,7 +340,7 @@
         "^speaker: Notice board",
         "/#",
         "\n",
-        "^Has anyone seen a raccoon in a purple hood? ",
+        "^Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling. ",
         "#",
         "^speaker: Notice board",
         "/#",
@@ -362,7 +362,7 @@
           {
             "b": [
               "\n",
-              "^A raccoon in a hood? I bet that's who did it. ",
+              "^A kid in a purple hood? I bet that's who did it. ",
               "#",
               "^speaker: Fae",
               "/#",
@@ -381,7 +381,7 @@
           {
             "b": [
               "\n",
-              "^A raccoon... in a hood? Weird. ",
+              "^A kid in a purple hood, fizzing up the fountain? Weird. ",
               "#",
               "^speaker: Fae",
               "/#",
@@ -436,7 +436,7 @@
           },
           {
             "b": [
-              "^ The raccoon's glowing trail goes west through the pines, toward the Whispering Woods. ",
+              "^ The hooded kid's glowing trail goes west through the pines, toward the Whispering Woods. ",
               "#",
               "^speaker: Fae",
               {
@@ -465,7 +465,7 @@
           },
           {
             "b": [
-              "^ The grumpy gull at the lookout was fizzy too. That raccoon gets around! ",
+              "^ The grumpy gull at the lookout was fizzy too. That hooded kid gets around! ",
               "#",
               "^speaker: Fae",
               {
@@ -490,7 +490,7 @@
           },
           {
             "b": [
-              "^ Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! ",
+              "^ Jordan gave me his blacklight lantern. The kid in the purple hood took a secret trail you can only see in its light! ",
               "#",
               "^speaker: Fae",
               {
@@ -552,7 +552,7 @@
           },
           {
             "b": [
-              "^ The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. Its bunny and squirrel are calm again! ",
+              "^ The Cliffside Trail runs between Pinecone Pass and Bubblegum Bay. I've calmed its fizzy bunnies and squirrels! ",
               "#",
               "^speaker: Fae",
               {
@@ -577,7 +577,7 @@
           },
           {
             "b": [
-              "^ Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The raccoon must be up here somewhere. ",
+              "^ Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The kid in the purple hood must be up here somewhere. ",
               "#",
               "^speaker: Fae",
               {
@@ -640,7 +640,7 @@
           },
           {
             "b": [
-              "^ The Bay Bluebird says the raccoon zipped off toward the mountains. ",
+              "^ A calm bluebird says the kid in the purple hood zipped off toward the mountains. ",
               "#",
               "^speaker: Fae",
               {
@@ -750,7 +750,7 @@
           },
           {
             "b": [
-              "^ The raccoon's club password is \"Fizzlesticks\". A club... like the tree house in the park? ",
+              "^ The hooded kid's club password is \"Fizzlesticks\". A club... like the tree house in the park? ",
               "#",
               "^speaker: Fae",
               {
@@ -775,7 +775,7 @@
           },
           {
             "b": [
-              "^ I have a hall pass! Time to follow the raccoon's trail. ",
+              "^ I have a hall pass! Time to follow the hooded kid's trail. ",
               "#",
               "^speaker: Fae",
               {
@@ -804,7 +804,7 @@
           },
           {
             "b": [
-              "^ The Pond Pup is calm. A raccoon paw print points toward the school. ",
+              "^ A calm pup found a purple thread that leads toward the school. ",
               "#",
               "^speaker: Fae",
               {
@@ -819,7 +819,7 @@
         "\n",
         "ev",
         "str",
-        "^frog",
+        "^fountain-frog",
         "/str",
         {
           "x()": "calmed",
@@ -884,7 +884,7 @@
         "\n",
         "ev",
         "str",
-        "^frog",
+        "^fountain-frog",
         "/str",
         {
           "x()": "calmed",
@@ -923,7 +923,7 @@
           },
           {
             "b": [
-              "^ A raccoon in a purple hood was seen in town. ",
+              "^ A kid in a purple hood was seen in town. ",
               "#",
               "^speaker: Fae",
               {
@@ -1000,7 +1000,7 @@
       "fountain": [
         "ev",
         "str",
-        "^frog",
+        "^fountain-frog",
         "/str",
         {
           "x()": "calmed",
@@ -1351,7 +1351,7 @@
         "^speaker: Fae",
         "/#",
         "\n",
-        "^And there's a tiny paw print on it... a raccoon paw print! ",
+        "^And there's a purple thread stuck to it... from a purple hood! ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -1505,7 +1505,7 @@
         "^speaker: Fae",
         "/#",
         "\n",
-        "^But I want to follow the raccoon's trail first. ",
+        "^But I want to follow the hooded kid's trail first. ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -1530,14 +1530,14 @@
           "^speaker: Sue",
           "/#",
           "\n",
-          "^Wait. Purple fizz? Was it a raccoon in a hood? ",
+          "^Wait. Purple fizz? Was it a kid in a purple hood? ",
           "#",
           "^speaker: Sue",
           "/#",
           "\n",
           "ev",
           "str",
-          "^Yes! I'm following his trail.",
+          "^Yes! I'm following their trail.",
           "/str",
           "/ev",
           {
@@ -1630,7 +1630,7 @@
         "^speaker: Bay Bluebird",
         "/#",
         "\n",
-        "^The raccoon zipped off toward the mountains! ",
+        "^A kid in a purple hood zipped off toward the mountains! ",
         "#",
         "^speaker: Bay Bluebird",
         "/#",
@@ -1713,7 +1713,7 @@
           "/ev",
           {
             "*": ".^.c-0",
-            "flg": 21
+            "flg": 5
           },
           "ev",
           "str",
@@ -1725,7 +1725,7 @@
           "/ev",
           {
             "*": ".^.c-1",
-            "flg": 21
+            "flg": 5
           },
           "ev",
           "str",
@@ -1734,7 +1734,7 @@
           "/ev",
           {
             "*": ".^.c-2",
-            "flg": 20
+            "flg": 4
           },
           {
             "c-0": [
@@ -1755,9 +1755,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ],
             "c-1": [
               "\n",
@@ -1770,9 +1768,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ],
             "c-2": [
               "\n",
@@ -1782,9 +1778,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ]
           }
         ],
@@ -1804,7 +1798,7 @@
           "/ev",
           {
             "*": ".^.c-0",
-            "flg": 20
+            "flg": 4
           },
           "ev",
           "str",
@@ -1820,7 +1814,7 @@
           "/ev",
           {
             "*": ".^.c-1",
-            "flg": 21
+            "flg": 5
           },
           "ev",
           "str",
@@ -1829,7 +1823,7 @@
           "/ev",
           {
             "*": ".^.c-2",
-            "flg": 20
+            "flg": 4
           },
           {
             "c-0": [
@@ -1843,9 +1837,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ],
             "c-1": [
               "\n",
@@ -1865,9 +1857,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ],
             "c-2": [
               "\n",
@@ -1877,9 +1867,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ]
           }
         ],
@@ -1899,7 +1887,7 @@
           "/ev",
           {
             "*": ".^.c-0",
-            "flg": 20
+            "flg": 4
           },
           "ev",
           "str",
@@ -1911,7 +1899,7 @@
           "/ev",
           {
             "*": ".^.c-1",
-            "flg": 21
+            "flg": 5
           },
           "ev",
           "str",
@@ -1920,7 +1908,7 @@
           "/ev",
           {
             "*": ".^.c-2",
-            "flg": 20
+            "flg": 4
           },
           {
             "c-0": [
@@ -1934,9 +1922,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ],
             "c-1": [
               "\n",
@@ -1949,9 +1935,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ],
             "c-2": [
               "\n",
@@ -1961,9 +1945,7 @@
               "/#",
               "\n",
               "done",
-              {
-                "#f": 5
-              }
+              null
             ]
           }
         ],
@@ -2062,12 +2044,12 @@
         "^speaker: Ribbon Bunny",
         "/#",
         "\n",
-        "^A raccoon in a purple hood zipped by, and everything went all fizzy! ",
+        "^A kid in a purple hood zipped by, and everything went all fizzy! ",
         "#",
         "^speaker: Ribbon Bunny",
         "/#",
         "\n",
-        "^That raccoon again! ",
+        "^That hooded kid again! ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -2119,7 +2101,7 @@
         "^speaker: Acorn Squirrel",
         "/#",
         "\n",
-        "^A raccoon traded me a shiny bottle cap for my best acorn. ",
+        "^A kid in a purple hood traded me a shiny bottle cap for my best acorn. ",
         "#",
         "^speaker: Acorn Squirrel",
         "/#",
@@ -2176,12 +2158,12 @@
         "^speaker: Lookout Gull",
         "/#",
         "\n",
-        "^A raccoon in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! ",
+        "^A kid in a purple hood fed me a fizzy cracker. Then I wanted ALL the snacks! ",
         "#",
         "^speaker: Lookout Gull",
         "/#",
         "\n",
-        "^A fizzy cracker? Everywhere that raccoon goes, things go fizzy. ",
+        "^A fizzy cracker? Everywhere that kid goes, things go fizzy. ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -2228,7 +2210,7 @@
           },
           "ev",
           "str",
-          "^Did a raccoon in a purple hood come by?",
+          "^Did a kid in a purple hood come by?",
           "/str",
           "/ev",
           {
@@ -2252,7 +2234,7 @@
             ],
             "c-1": [
               "\n",
-              "^He zoomed past on a sled, laughing his head off! Let's go after him. ",
+              "^Somebody in a purple hood zoomed past on a sled, laughing their head off! Let's go after them. ",
               "#",
               "^speaker: Jordan",
               "/#",
@@ -2312,7 +2294,7 @@
         "^speaker: Hiker Hamster",
         "/#",
         "\n",
-        "^The raccoon? He ran off down a secret trail. You can only see it at night... ",
+        "^The kid in the purple hood? They ran off down a secret trail. You can only see it at night... ",
         "#",
         "^speaker: Hiker Hamster",
         "/#",
@@ -2339,7 +2321,7 @@
         "^speaker: Fae",
         "/#",
         "\n",
-        "^Switch it on and look around. Raccoon tracks glow! ",
+        "^Switch it on and look around. Fizzy tracks glow! ",
         "#",
         "^speaker: Jordan",
         "/#",
@@ -2359,12 +2341,12 @@
         }
       ],
       "lift_note": [
-        "^Glowing raccoon doodles on the lift tower! A masked face, a swirl, and a star. ",
+        "^Glowing doodles on the lift tower! A masked face, a swirl, and a star. ",
         "#",
         "^speaker: Fae",
         "/#",
         "\n",
-        "^The squiggles look like secret writing. Was the raccoon leaving a message for someone? ",
+        "^The squiggles look like secret writing. Was the hooded kid leaving a message for someone? ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -2900,133 +2882,199 @@
         "done",
         null
       ],
-      "raccoon": [
+      "school_raccoon": [
+        "^Chitter-chitter! Thanks, Fae. My head feels all clear now. ",
+        "#",
+        "^speaker: Ringtail Raccoon",
+        "/#",
+        "\n",
+        "^A kid in a purple hood gave me a fizzy cracker. Then I couldn't stop chattering! ",
+        "#",
+        "^speaker: Ringtail Raccoon",
+        "/#",
+        "\n",
+        "^I heard that kid whisper a secret word at the tree house in the park: \"Fizzlesticks!\" ",
+        "#",
+        "^speaker: Ringtail Raccoon",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "knows_password",
+          "re": true
+        },
+        "^A secret password for a tree house club? I have to see this! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        false,
+        "/ev",
+        {
+          "VAR=": "raccoon_waiting",
+          "re": true
+        },
+        "^The raccoon waves its striped tail and scampers off. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "raccoon_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
         [
-          "^Heh heh heh! So YOU'RE the one who keeps un-fizzing my critters! ",
-          "#",
-          "^speaker: Raccoon",
-          "/#",
-          "\n",
-          "ev",
-          "str",
-          "^frog",
-          "/str",
           {
-            "x()": "calmed",
-            "exArgs": 1
-          },
-          "str",
-          "^pup",
-          "/str",
-          {
-            "x()": "calmed",
-            "exArgs": 1
-          },
-          "&&",
-          "/ev",
-          [
-            {
-              "->": ".^.b",
-              "c": true
-            },
-            {
-              "b": [
-                "^ The Fizzy Frog AND the Zoomie Pup? Hmph! ",
-                "#",
-                "^speaker: Raccoon",
-                {
-                  "->": ".^.^.^.17"
-                },
-                null
-              ]
-            }
-          ],
-          "nop",
-          "/#",
-          "\n",
-          "^You'll never get into my secret club. Not without the password! ",
-          "#",
-          "^speaker: Raccoon",
-          "/#",
-          "\n",
-          "ev",
-          "str",
-          "^What's the password?",
-          "/str",
-          "/ev",
-          {
-            "*": ".^.c-0",
-            "flg": 20
-          },
-          "ev",
-          "str",
-          "^Why are you making everything fizzy?",
-          "/str",
-          "/ev",
-          {
-            "*": ".^.c-1",
-            "flg": 20
+            "->": ".^.b",
+            "c": true
           },
           {
-            "c-0": [
-              "\n",
-              "^Ha! As if I'd tell you it's \"Fizzlesticks\"! ...Oops. ",
-              "#",
-              "^speaker: Raccoon",
-              "/#",
-              "\n",
+            "b": [
+              "^ ",
               {
-                "->": ".^.^.g-0"
+                "->": ".^.^.^.again"
               },
               {
-                "#f": 5
-              }
-            ],
-            "c-1": [
-              "\n",
-              "^Because fizzy is FUN! Way more fun than school! ",
-              "#",
-              "^speaker: Raccoon",
-              "/#",
-              "\n",
-              "^And only my club knows the magic word: \"Fizzlesticks\"! ...Oops. ",
-              "#",
-              "^speaker: Raccoon",
-              "/#",
-              "\n",
-              {
-                "->": ".^.^.g-0"
+                "->": ".^.^.^.6"
               },
-              {
-                "#f": 5
-              }
-            ],
-            "g-0": [
-              "ev",
-              true,
-              "/ev",
-              {
-                "VAR=": "knows_password",
-                "re": true
-              },
-              "ev",
-              false,
-              "/ev",
-              {
-                "VAR=": "raccoon_waiting",
-                "re": true
-              },
-              "^With a puff of purple fizz, the raccoon is gone! ",
-              "#",
-              "^speaker: Fae",
-              "/#",
-              "\n",
-              "done",
               null
             ]
           }
         ],
-        null
+        "nop",
+        "\n",
+        "^Chitter! Sorry, Fae. The fizz made me grab every shiny thing in sight. ",
+        "#",
+        "^speaker: Ringtail Raccoon",
+        "/#",
+        "\n",
+        "^A kid in a purple hood keeps leaving fizzy crackers around. They're SO tasty. ",
+        "#",
+        "^speaker: Ringtail Raccoon",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The raccoon washes a bottle cap and gives it a happy little pat. ",
+            "#",
+            "^speaker: Ringtail Raccoon",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "cat_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Mrrow! Thanks, Fae. That fizz made my whiskers all twitchy. ",
+        "#",
+        "^speaker: Cozy Cat",
+        "/#",
+        "\n",
+        "^The cat curls around Fae's ankles, purring like a little motor. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The cat blinks slowly at Fae. That means \"I like you.\" ",
+            "#",
+            "^speaker: Cozy Cat",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "beach_frog_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Ribbit! The sand feels nice and cool again. Thanks, Fae! ",
+        "#",
+        "^speaker: Beach Frog",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Ribbit! The frog hops happily around a tide pool. ",
+            "#",
+            "^speaker: Beach Frog",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
       ],
       "old_trail_closed": [
         "^The pines are quiet and snowy. The old trail only appears under the lantern's glow. ",
@@ -3063,7 +3111,7 @@
         ],
         "nop",
         "\n",
-        "^The raccoon's abandoned clubhouse smells like purple fizzy soda. ",
+        "^Somebody's secret clubhouse! It smells like purple fizzy soda. ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -3177,7 +3225,7 @@
         "^speaker: Whispering Owl",
         "/#",
         "\n",
-        "^The raccoon left purple fizz, comic books, and a cracker in the clubhouse. ",
+        "^A kid in a purple hood left purple fizz, comic books, and a cracker in the clubhouse. ",
         "#",
         "^speaker: Whispering Owl",
         "/#",

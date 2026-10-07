@@ -12,5 +12,9 @@
       "label": "Run",
       "snackDetail": null
     }
+  },
+  "rewards": {
+    "sticker": "New sticker: {sticker}! +{coins} coins.",
+    "coins": "+{coins} coins!"
   }
 }

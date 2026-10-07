@@ -13,12 +13,13 @@ import {
   type Area,
   type Point,
   type State,
+  type Wild,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 
 // Contract for the blacklight lantern (Milestone 23). Once Jordan has given it
 // (`has_lantern`), a lantern press switches it on or off. While it's on, an
-// area's `glows` (what the raccoon left behind, glowing under blacklight: paw
+// area's `glows` (what the chaos left behind, glowing under blacklight: paw
 // prints, invisible-ink notes, trail markers) are drawn, and those with a knot
 // can be read. They're never solid. At Pinecone Pass, prints lead to a note on
 // the ski lift's tower and a marker at the pines that reveals the old trail.
@@ -45,18 +46,19 @@ function standable(point: Point): boolean {
   );
 }
 
-// A pass state with the lantern given (via the knot that gives it).
+// A pass state with the lantern given (via the knot that gives it), every
+// hamster out calm (so none comes after Fae).
 function passState(feet: Point, facing: State["facing"], lantern: boolean): State {
   const base = createState(world, { area: "pass", spawn: "bus", seed: 1 });
   const given = world.storyVariable(base.ink, "has_lantern");
   if (given !== false) throw new Error("has_lantern should start false");
-  const critters: State["critters"] = { ...base.critters, hamster: "calm" };
-  let state: State = { ...base, player: feet, facing, critters };
+  const wild = base.wild.map((critter): Wild => ({ ...critter, mood: "calm" }));
+  let state: State = { ...base, player: feet, facing, wild };
   if (lantern) {
     // Talk to the calm hamster, which gives the lantern (Milestone 22).
-    const hamster = pass.critters.find((item) => item.id === "hamster");
+    const hamster = wild.find((critter) => critter.den === 0);
     if (hamster === undefined) throw new Error("no hamster");
-    state = { ...state, player: { x: hamster.point.x, y: hamster.point.y + 45 }, facing: "up" };
+    state = { ...state, player: { x: hamster.x, y: hamster.y + 45 }, facing: "up" };
     state = talkThrough(state);
     state = { ...state, player: feet, facing };
   }
@@ -110,10 +112,10 @@ describe("the lantern switch", () => {
     expect(state.lantern).toBe(false);
   });
 
-  it("saves the lantern (save version 4; version 2 saves start fresh)", () => {
+  it("saves the lantern (version 2 saves, without it, start fresh)", () => {
     const state = toggle(passState({ x: 700, y: 650 }, "down", true));
     const json = serializeSave(state);
-    expect(JSON.parse(json).version).toBe(4);
+    expect(JSON.parse(json).version).toBe(5);
     expect(parseSave(json, state)?.lantern).toBe(true);
     expect(parseSave(JSON.stringify({ version: 2, state }), state)).toBeNull();
   });

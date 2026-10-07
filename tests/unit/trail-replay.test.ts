@@ -18,9 +18,8 @@ describe("Cliffside Trail replay", () => {
     expect(state.area).toBe("bay");
     expect(state.dialogue?.knot).toBe("bay_cliff_path");
     expect(state.transition).toBeNull();
-    expect(state.critters.bunny).toBe("calm");
-    expect(state.critters.squirrel).toBe("chaos");
-    expect(state.stickers).toContain("ribbon-bunny");
+    // Calmed a bunny, ran from a squirrel (left behind on the trail).
+    expect(state.stickers).toEqual(["ribbon-bunny"]);
   });
 
   // tools/sim/record-lookout.ts: from the beach over the footbridge to the

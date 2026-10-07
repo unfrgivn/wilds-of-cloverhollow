@@ -1,0 +1,109 @@
+{
+  "id": "fountain-frog",
+  "species": "frog",
+  "name": "Fizzy Frog",
+  "calmName": "Fountain Frog",
+  "atlas": "assets/critters/frog/frog.json",
+  "auraCentre": {
+    "x": 264,
+    "y": 275
+  },
+  "bodyCentre": {
+    "x": 253,
+    "y": 311
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "fountain-frog",
+    "name": "Fountain Frog",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "frog_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy frog hops out of the fountain, puffing pink bubbles!",
+    "command": "What should Fae do?",
+    "soothe": {
+      "great": "Fae hums a slow, soft song. The frog's swirly eyes start to slow down!",
+      "good": "Fae hums softly. The frog wobbles and listens.",
+      "miss": "Fae hums, but the frog is too fizzy to hear much."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie chases the bubbles in a happy zig-zag. The frog giggles!",
+        "good": "Maddie bats at a bubble. The frog can't help smiling.",
+        "miss": "Maddie pounces... and lands in a puddle. The frog snorts a little laugh."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber into the fountain. The frog chases the ripples, giggling!",
+        "good": "Sue's bobber bobs past. The frog can't stop watching it.",
+        "miss": "Sue's bobber plops into a flower box. The frog blinks... and almost smiles."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones. The frog's eyes follow every one, round and round!",
+        "good": "Jordan tosses a pinecone high. The frog watches it spin.",
+        "miss": "Jordan's pinecones bonk together and tumble. The frog snorts a bubbly laugh."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. Energy up! The frog sniffs, curious.",
+    "burst": "The frog puffs a stream of pink bubbles at Fae!",
+    "burstResult": {
+      "great": "Pop, pop, pop! Fae pops every single bubble!",
+      "good": "Fae pops most of the bubbles!",
+      "miss": "Splish! The bubbles fizz all over Fae."
+    },
+    "soothed": "The frog lets out a happy croak. The fizzy spell floats away!",
+    "rest": "Fae is all tuckered out. Time for a little rest.",
+    "run": "Fae backs away slowly. The frog keeps fizzing by the fountain."
+  },
+  "coins": 8
+}

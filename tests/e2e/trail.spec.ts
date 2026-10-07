@@ -35,14 +35,14 @@ async function probe(page: Page): Promise<{
     const state = window.__cloverhollow?.getState();
     if (state === undefined) throw new Error("hook unavailable");
     const battle = state.battle;
-    const roamer = state.roamers["bunny"];
+    const bunny = state.wild.find((critter) => critter.kind === "bunny");
     return {
       area: state.area,
       fading: state.transition !== null,
       facing: state.facing,
       player: { x: state.player.x, y: state.player.y },
-      bunny: state.critters["bunny"],
-      bunnyAt: roamer === undefined ? null : { x: roamer.x, y: roamer.y },
+      bunny: bunny?.mood,
+      bunnyAt: bunny === undefined ? null : { x: bunny.x, y: bunny.y },
       battle: battle === null ? null : {
         critterId: battle.critterId,
         phase: battle.phase,
@@ -103,9 +103,8 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
   const end = await readState(page);
   expect({ area: end.area, knot: end.dialogue?.knot })
     .toEqual({ area: "bay", knot: "bay_cliff_path" });
-  expect({ bunny: end.critters.bunny, squirrel: end.critters.squirrel })
-    .toEqual({ bunny: "calm", squirrel: "chaos" });
-  expect(end.stickers).toContain("ribbon-bunny");
+  // She left the trail, so its critters are gone; the bunny's sticker stays.
+  expect(end.stickers).toEqual(["ribbon-bunny"]);
   expect(await readHash(page)).toBe(bunHash(path, "pass"));
 });
 

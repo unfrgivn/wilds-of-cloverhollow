@@ -317,18 +317,32 @@
       "prompt": "Look"
     }
   ],
-  "critters": [
-    {
-      "id": "owl",
-      "point": {
-        "x": 1120,
-        "y": 700
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 1120,
+          "y": 700
+        },
+        "radius": 180,
+        "kinds": [
+          "owl"
+        ]
       },
-      "roam": {
-        "radius": 180
+      {
+        "point": {
+          "x": 700,
+          "y": 800
+        },
+        "radius": 100,
+        "kinds": [
+          "raccoon"
+        ],
+        "chance": 0.8
       }
-    }
-  ],
+    ]
+  },
   "spawns": {
     "east": {
       "x": 1650,

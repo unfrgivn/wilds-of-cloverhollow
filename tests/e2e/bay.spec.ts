@@ -2,10 +2,13 @@ import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { parseScript } from "../../src/content/script";
 import {
+  bunHash,
   longFlowTimeout,
   openHarness,
+  playAfter,
   queueScript,
   readBattle,
+  readHash,
   readState,
   renderInfo,
   resetPaused,
@@ -99,41 +102,24 @@ test("the east road stays closed until the club is open", async ({ page }) => {
 test("after chapter one, real keys take Fae down the east road into the bay", async ({
   page,
 }) => {
+  // Chapter one's run, then the recorded walk on (tools/sim/record-east-road.ts:
+  // out of the park, the plaza's critters calmed, down the east road) played
+  // with real keys.
+  const path = "tests/sim/scripts/new-game/east-road.json";
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "new-game");
-  const path = "tests/sim/scripts/new-game/chapter-one.json";
-  const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
-  await queueScript(page, script);
-  await step(page, script.reduce((total, segment) => total + segment.ticks, 0));
-  let state = await readState(page);
-  expect(state.area, "chapter one ends at the tree house").toBe("park");
-  expect(state.dialogue).toBeNull();
-
-  // Out of Meadow Park the way she came in.
-  await walk(page, "y", 600);
-  await walk(page, "x", 480);
-  await walk(page, "y", 850);
-  await walk(page, "x", 200);
-  await walk(page, "y", 1000);
-  await step(page, 40);
-  state = await readState(page);
-  expect(state.area).toBe("plaza");
-  expect(state.player).toEqual({ x: 1470, y: 930 });
-
-  // Up under the planter, right past it, up its right side, then into the
-  // east road (its doorway starts at x 1600).
-  await walk(page, "y", 835);
-  await walk(page, "x", 1590);
-  await walk(page, "y", 560);
-  expect((await readState(page)).area).toBe("plaza");
-  await hold(page, "ArrowRight", 10);
-  await step(page, 40);
-  state = await readState(page);
-  expect(state.area).toBe("bay");
+  const areas: string[] = [];
+  await playAfter(page, "tests/sim/scripts/new-game/chapter-one.json", path, async () => {
+    const area = (await readState(page)).area;
+    if (areas.at(-1) !== area) areas.push(area);
+  });
+  expect(areas).toEqual(["park", "plaza", "bay"]);
+  const state = await readState(page);
   expect(state.player).toEqual({ x: 180, y: 545 });
   expect(state.facing).toBe("right");
   expect(state.party.map((member) => member.id)).toEqual(["maddie"]);
+  expect(await readHash(page)).toBe(bunHash(path, "new-game"));
 });
 
 test("the bay on arrival, at both sizes", async ({ page }) => {

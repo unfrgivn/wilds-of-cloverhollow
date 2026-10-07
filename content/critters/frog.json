@@ -1,7 +1,8 @@
 {
   "id": "frog",
+  "species": "frog",
   "name": "Fizzy Frog",
-  "calmName": "Fountain Frog",
+  "calmName": "Beach Frog",
   "atlas": "assets/critters/frog/frog.json",
   "auraCentre": {
     "x": 264,
@@ -22,7 +23,7 @@
     "name": "Fountain Frog",
     "frame": "calm_idle_01"
   },
-  "calmKnot": "frog_calm",
+  "calmKnot": "beach_frog_calm",
   "calmPrompt": "Talk",
   "commands": {
     "soothe": {
@@ -69,7 +70,7 @@
     "bigChance": 0.3
   },
   "lines": {
-    "intro": "A fizzy frog hops out of the fountain, puffing pink bubbles!",
+    "intro": "A fizzy frog bounces across the sand, puffing pink bubbles!",
     "command": "What should Fae do?",
     "soothe": {
       "great": "Fae hums a slow, soft song. The frog's swirly eyes start to slow down!",
@@ -83,9 +84,9 @@
         "miss": "Maddie pounces... and lands in a puddle. The frog snorts a little laugh."
       },
       "cast": {
-        "great": "Sue casts her ribbon bobber into the fountain. The frog chases the ripples, giggling!",
+        "great": "Sue casts her ribbon bobber into a tide pool. The frog chases the ripples, giggling!",
         "good": "Sue's bobber bobs past. The frog can't stop watching it.",
-        "miss": "Sue's bobber plops into a flower box. The frog blinks... and almost smiles."
+        "miss": "Sue's bobber plops into the sand. The frog blinks... and almost smiles."
       },
       "juggle": {
         "great": "Jordan juggles three pinecones. The frog's eyes follow every one, round and round!",
@@ -101,9 +102,8 @@
       "miss": "Splish! The bubbles fizz all over Fae."
     },
     "soothed": "The frog lets out a happy croak. The fizzy spell floats away!",
-    "reward": "New sticker: Fountain Frog! +8 coins.",
     "rest": "Fae is all tuckered out. Time for a little rest.",
-    "run": "Fae backs away slowly. The frog keeps fizzing by the fountain."
+    "run": "Fae backs away slowly. The frog keeps bouncing around."
   },
   "coins": 8
 }

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-07 (Milestone 27, coins and shops)
+Last updated: 2026-10-07 (Milestone 28, recurring bad guys)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -20,8 +20,11 @@ reference material only.
 - She balances school life with stopping it, helped by Maddie (the family cat,
   who follows her), Sue (met in Bubblegum Bay), and Jordan (met in Pinecone
   Pass).
-- The culprit is a friend from school under a chaos spell. The hooded chaos
-  raccoon is the chaos motif.
+- The culprit is a friend from school under a chaos spell: a kid in a purple
+  hood, never named until the very end (owner, 2026-10-07). The kid knows
+  their secret; the player doesn't. They're glimpsed running off and talked
+  about through the story. Raccoons are an ordinary chaos critter species,
+  met all over the world like the pups and the cats.
 - Finale twist: Mom wakes Fae up. It was all a dream.
 
 ### 1.3 Creative frame
@@ -277,9 +280,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   optional `land`, the `walkable` floor polygon, `blockers` (furniture footprints on the floor
   plane), `occluders` (`{ id, polygon, baseline, canopy? }`), named `spawns`
   (`{ x, y, facing }`), and optional `ground` (the folder of its painting).
-  Doors arrive in Milestone 6 and interactables in Milestone 8. An area
-  critter may add `roam: { radius }`; its authored point is home and
-  `state.roamers` holds its current position.
+  Doors arrive in Milestone 6 and interactables in Milestone 8. An area's
+  `critters` are its story set pieces and its optional `recurring` its
+  recurring critters (section 6.1).
 - Player collider: a circle of radius 20 units at the feet that slides along
   blockers.
 - `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
@@ -359,8 +362,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `bay_cliff_path` while it's false). Look points: `trail-signpost`,
   `lookout-bench`, and the pass's `pass-trail-sign`. The Grumpy Gull stands at
   (1440, 480), between the lookout rock and bench, guarding the bench until its
-  mini-boss battle is calmed. A fizzy bunny roams the
-  upper meadow and a fizzy squirrel the lower one (section 8).
+  mini-boss battle is calmed. Bunnies and squirrels roam the upper and lower
+  meadows (section 6.1).
 - The back-link rule: after Fae arrives through a door, the trigger that leads
   straight back to the area she came from doesn't fire while she keeps holding
   the direction she was walking when she left (`state.backLink`); letting go
@@ -369,7 +372,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   beach), where a kid holding down would otherwise bounce between them.
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
   visibleWhile? }` (Ms. Maple the teacher and Nurse Holly in the school
-  hallway; Mom and Oliver in the kitchen; the raccoon in the plaza). Each is
+  hallway; Mom and Oliver in the kitchen). Each is
   drawn from the atlas named for its id in
   `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
   ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for
@@ -408,7 +411,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   drops to a deep violet dusk (55%) and each glow is added on top with a
   gentle pulse (render-only); a glow with a knot is a Look target
   (`glow:<id>`) only then. `flip` mirrors the decal. At Pinecone Pass, three
-  raccoon paw prints lead from the clearing to a trail marker on the west
+  glowing paw prints lead from the clearing to a trail marker on the west
   pines (`old_trail_marker`, which sets `found_old_trail`), and a doodle is
   painted on the north ski-lift tower (`lift_note`). `renderInfo().lantern`
   reports `{ on, glows }`, the ids drawn.
@@ -427,6 +430,45 @@ ios/            Capacitor iOS project (from Milestone 4).
   units) and furniture is proportional. Paintings are resampled uniformly to
   meet it, never stretched. The bedroom is 1050x700 units (the whole room fits
   on one phone screen); the plaza is 1750x1100 units.
+
+### 6.1 Critters out in an area (Milestone 28)
+- Critters come two ways. Story set pieces are an area's `critters`,
+  `{ id, point, visibleWhile? }`: each a critter kind placed once, standing
+  still, calm or chaos for the whole game (`state.critters`, keyed by id).
+  `visibleWhile` (an Ink variable) puts one there only while it's true. The
+  set pieces are the fountain frog (plaza), the school raccoon (plaza, while
+  `raccoon_waiting`), and the grumpy gull (the trail's lookout).
+- Recurring critters, EarthBound style, are an area's `recurring`:
+  `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
+  (a door, a bus ride, a rest's fade, and the start of a game or fixture)
+  each den, in order, draws twice from the state's PRNG: is one out
+  (`chance`, default 1), and which of its `kinds`. Every den draws whatever
+  comes out, so an arrival's draws depend only on the content. Until
+  `after` (a `calmed()` fact) is true the area draws nothing and is quiet:
+  the plaza waits for the fountain frog. The ones out this visit are
+  `state.wild`: `{ kind, den, mood, x, y, target, pauseTicks,
+  cooldownTicks, facing, moving }`, starting at their den in chaos. One Fae
+  calms stays calm, a Talk target, only until she leaves; the next arrival
+  rolls the area fresh.
+- A recurring critter wanders inside its den's radius and comes after a
+  Fae within sight (section 8); its home is its den's point.
+- The starting roster (owner, 2026-10-07): Cloverhollow's plaza (after the
+  fountain frog) and the park, raccoons, pups, and cats; Bubblegum Bay,
+  frogs and bluebirds; the Cliffside Trail, bunnies and squirrels; Pinecone
+  Pass, hamsters; the Whispering Woods, owls and raccoons. A species the
+  story needs has a den of its own with `chance` 1: the park's pond (pups),
+  the bay's sand (bluebirds), and the pass's clearing (hamsters).
+- `presentCritters(world, state)` lists every critter out in Fae's area, set
+  pieces first, each with a `key` (a set piece's id, or `wild:<den>`) used
+  for its Talk target (`critter:<key>`) and its render labels and info.
+- Authoring checks (`src/content/area-checks.ts`): a den must be on the
+  floor; farther from every spawn than sight plus its kinds' touch radius,
+  so Fae never arrives in a critter's sight; clear of every door by its
+  radius plus that touch; and mostly in view (no more than a tenth of
+  sample points round it drawn behind an occluder). The loader
+  (`critterErrors`) checks that set pieces are kinds placed once, dens list
+  only the other kinds, a species has one sticker and it's in the album,
+  and `after` names a set piece or a species.
 
 ## 7. Interaction and dialogue
 - Targeting: the core targets the nearest interactable within
@@ -464,9 +506,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's
-  externals, `calmed(id)` (each critter's state) and `coins()` (Fae's
-  coins), are answered from the core's state (`inkFacts`) for every command,
-  not only a knot's first line.
+  externals, `calmed(name)` and `coins()` (Fae's coins), are answered from
+  the core's state (`inkFacts`) for every command, not only a knot's first
+  line. `calmed` answers a set piece by its id from its own mood, and a
+  species once Fae owns its sticker (she has calmed one of them, anywhere).
 - Dialogue state machine (core):
 
   ```
@@ -488,7 +531,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `choose: index` in that tick's action frame.
 - Ink choices are once-only by default, so every knot must still say
   something sensible on a revisit (the window's `again` stitch remembers the
-  plan).
+  plan). A choice offered on every visit (the shops, the bus stops, the
+  teacher and nurse) is sticky (`+`).
 - The dialogue UI is the DOM overlay in the sticker style: cream paper,
   die-cut border, dark-brown rounded text, speaker name, and choices navigable
   by keyboard, gamepad, and touch.
@@ -557,16 +601,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   them on a fresh install and Continue after the relaunch.
 
 ## 8. Calm-down battles (v0)
-- Critters: the Fizzy Frog (the plaza fountain; calm, the Fountain Frog), the
-  Zoomie Pup (the park pond; calm, the Pond Pup), the Flappy Bluebird (the
-  bay's sand; calm, the Bay Bluebird, whose burst kicks a gust of sand at
-  Fae), the Snowball Hamster (Pinecone Pass's clearing; calm, the Hiker
-  Hamster, who flings snowballs), and the Thumpy Bunny and Zippy Squirrel,
-  roaming the Cliffside Trail's meadows (calm, the Ribbon Bunny and the Acorn
-  Squirrel), and the Grumpy Gull at the lookout (calm, the Lookout Gull). The
-  gull is the first mini-boss: it is larger and tougher, has no roam, and blocks
-  the route to the bench until calmed. They share the battle numbers for now; each has its own lines,
-   atlas, sticker, and calm knot.
+- Critter kinds (`content/critters/<id>.json`, the file named for its `id`),
+  each of a `species`; kinds of one species share its sticker (spec 9). The
+  set pieces (section 6.1): the Fizzy Frog (`fountain-frog`, the plaza
+  fountain; calm, the Fountain Frog), the school raccoon (`school-raccoon`,
+  calm, the Ringtail Raccoon, who tells the club password it overheard), and
+  the Grumpy Gull at the lookout (calm, the Lookout Gull). The recurring kinds:
+  the Zoomie Pup (calm, the Pond Pup), the Pouncy Cat (the Cozy Cat, who bats
+  yarn balls), the Sneaky Raccoon (the Ringtail Raccoon, who flings bottle
+  caps), the bay's Fizzy Frog (`frog`, the fountain frog's species; calm, the
+  Beach Frog), the Flappy Bluebird (the Bay Bluebird, whose burst kicks a gust
+  of sand at Fae), the Snowball Hamster (the Hiker Hamster, who flings
+  snowballs), the Thumpy Bunny and Zippy Squirrel (the Ribbon Bunny and the
+  Acorn Squirrel), and the Screeching Owl (the Whispering Owl). The gull is
+  the first mini-boss: it is larger and tougher, stands still, and blocks the
+  route to the bench until calmed. The others share the battle numbers for
+  now; each has its own lines, atlas, sticker, and calm knot.
 - Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
   critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
@@ -591,13 +641,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   `soothe`, `snack`, or `run`, or another member's. The shared command labels
   (Soothe, Snack, Run) and the Snack `×N` template live in
   `content/battle.json`; each friend's label and resting detail live in its
-  `content/party/` entry. State adds `critters` (chaos or calm), `stickers`,
-  `safeSpot`, `roamers`, a nullable `battle`, and Fae's `coins` (0 in a new
-  game) and `snacks` (2).
+  `content/party/` entry; the reward lines, `rewards.sticker` ("New sticker:
+  {sticker}! +{coins} coins.") and `rewards.coins` ("+{coins} coins!"), in
+  `content/battle.json`. State adds `critters` (the set pieces' moods),
+  `wild` (section 6.1), `stickers`, `safeSpot`, a nullable `battle`, and
+  Fae's `coins` (0 in a new game) and `snacks` (2).
 - Start: crossing into a chaos critter's touch circle (outside on the previous
   tick, inside now; exactly on the radius counts as inside) starts a battle and
-  records `battle.entry`, Fae's position on the tick before. A calm critter
-  never battles; it is a Talk target at its point with its `calmKnot`.
+  records `battle.entry`, Fae's position on the tick before. `battle.critterId`
+  is the kind and `battle.den` the recurring critter's den, or null for a set
+  piece. A calm critter never battles; it is a Talk target where it stands
+  with its `calmKnot`.
 - Flow (messages type like dialogue: a confirm press shows the whole line, the
   next press advances):
 
@@ -605,12 +659,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   intro -> command --Soothe / a friend's command--> aim (on the critter) -> result
                    --Snack--------> result
                    --Run----------> run -> ends at entry, facing away
-  result -> soothed -> reward -> ends: critter calm, sticker added once
-            (when calm reached calmMax)
+  result -> soothed -> reward -> ends: critter calm, its coins paid, the
+            (when calm reached calmMax)     species' sticker added if new
          -> burst -> aim (on Fae) -> burstResult -> command
             (or rest when energy reaches 0)
   rest -> door-style fade to safeSpot; the critter stays chaos; nothing lost
   ```
+
+- Reward (Milestone 28): every calm pays the kind's `coins`; the species'
+  sticker comes only the first time. As the reward shows, `rewardSticker` is
+  set to the sticker if it's new (the reward card shows it, with "New
+  sticker: ... +N coins.") or null (no card; the line is "+N coins!"). The
+  reward ends the battle with the set piece's or the recurring critter's
+  mood calm. The aura and the timing ring are gone at the reward.
 
 - Commands are composed from the party: Soothe, then one command per party
   member in party order (Maddie's Play), then Snack and Run
@@ -632,26 +693,31 @@ ios/            Capacitor iOS project (from Milestone 4).
 - While a battle runs Fae is frozen, doors don't fire, cancel and menu are
   ignored (v0), and the party keeps settling. `safeSpot` is set at new game
   and on every area arrival.
-- Ink: the adapter binds a pure external `calmed(id)`, answered from facts the
-  core passes in. Once the frog is calm the fountain has a new line, and the
-  frog has his own talk (a first visit, then a revisit line).
-- Overworld: each critter is drawn at its point, y-sorted with the characters
-  and occluders, its figure `overworldHeight` units tall: chaos with its aura
-  pulsing and turning behind it, calm without.
-- A roamer is drawn, sorted, and collided at its current position. While Fae is
-  free it wanders to seeded random points inside its home radius, pausing for
-  45 ticks, or chases a chaos Fae within 180 units at 2.5 units per tick.
-  Wandering is 1.25 units per tick, deliberately slower than Fae's 4 units per
-  tick. A chaser gives up beyond home plus twice sight. It stays on the floor
-  with the 12-unit follow radius. Dialogue, battles, transitions, and the
-  journal freeze it. Touch is an outside-to-inside crossing by either mover;
-  Run gives that roamer a 240-tick cooldown and sends it homeward, while rest
-  resets it on safe-spot arrival.
-- Critters are generic entries in `content/critters/<id>.json`. Each entry owns
-  its atlas, battle content, sticker, and measured `auraCentre` and
-  `bodyCentre` frame-pixel centroids. Runtime atlases use `<id>-sheet`, aura
-  placement uses those centroids, and render info names the active entry
-  `battle.critter: { id, frame }`. Sue uses the generic party renderer with
+- Ink: the adapter binds a pure external `calmed(name)`, answered from facts
+  the core passes in (section 7). Once the fountain frog is calm the fountain
+  has a new line, and the frog has his own talk (a first visit, then a revisit
+  line). A calm recurring critter's talk is its kind's knot: the first talk
+  with any of that kind plays its story clue, later ones the revisit line.
+- Overworld: each critter is drawn where it stands, y-sorted with the
+  characters and occluders, its figure `overworldHeight` units tall: chaos
+  with its aura pulsing and turning behind it, calm without. The view keeps
+  one sprite pair per present critter (`critter:<key>`), rebuilt when who is
+  out changes.
+- A recurring critter is drawn, sorted, and collided at its current position.
+  While Fae is free it wanders to seeded random points inside its den's
+  radius, pausing for 45 ticks, or chases Fae within 180 units at 2.5 units
+  per tick. Wandering is 1.25 units per tick, deliberately slower than Fae's
+  4 units per tick. A chaser gives up beyond its den plus twice sight. It
+  stays on the floor with the 12-unit follow radius. Dialogue, battles,
+  transitions, and the journal freeze it. Touch is an outside-to-inside
+  crossing by either mover; a battle with it (and Run, which also puts it
+  back at its den) gives it a 240-tick cooldown, heading home, and an
+  arrival rolls the area fresh.
+- Critter kinds own their atlas, battle content, sticker, and measured
+  `auraCentre` and `bodyCentre` frame-pixel centroids. Kinds may share an
+  atlas (the fountain frog and the bay's frogs), so atlases load and are
+  found by their URL; aura placement uses those centroids, and render info
+  names the active kind `battle.critter: { id, frame }`. Sue uses the generic party renderer with
   `assets/characters/sue/sue.json`: walk animation advances from her own
   displacement and `walkCycleUnits` (126), idle follows her facing, and right
   mirrors left. She never sits. `renderInfo().party` reports each member's id,
@@ -670,7 +736,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   body centre with a radius of 0.55 times the figure height.
 - Backdrop: the area painting itself, scaled so its painted interior (8% in
   from each side, past the watercolour's paper margins) covers the canvas plus
-  a 32 px margin, centred on the critter and clamped, softly blurred, with a
+  a 32 px margin, centred on the critter where it stands (`battleFoe`) and
+  clamped, softly blurred, with a
   light cream wash. The overworld characters hide during the battle.
 - Shell: `data-battle="open"` is on the root while a battle runs. Battle
   messages use the dialogue box with no speaker and hide when empty. Dev
@@ -678,8 +745,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
   backdrop rect, the ring, the battle's critter (`{ id, frame }`), the aura
   alpha, and whether the
-  overworld is visible; `renderInfo().critters` lists each overworld critter's
-  frame and current `{ x, y }`.
+  overworld is visible; `renderInfo().critters` lists each overworld critter
+  as `{ id, kind, frame, x, y }`, `id` its key (section 6.1).
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
@@ -730,21 +797,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first:
-  Jordan's lantern and the secret trail only it shows; Jordan on the team;
-  the Cliffside Trail calm again (both its critters). After the ride it goes
-  on with Pinecone Pass snow, lodge, cocoa, and the raccoon clue; before the
-  ride, a calm bluebird adds the exact bus note.
-  (the grumpy gull at the lookout was fizzy too; the calm bluebird's clue toward the mountains; Sue on the team; the purple
-  hood's school name tag; while the club is open and Sue hasn't joined, the
-  east road to Bubblegum Bay; the club password; the hall pass; the calm pup
-  and his clue toward the school; while only the frog is calm, the purple fizz
-  leading to the park; while Fae has coins, the bakery's snacks; the calm
-  frog; the raccoon from the notice board; then
-  the morning plan).
+  the clubhouse claimed; the hooded kid's glowing trail toward the Whispering
+  Woods; the grumpy gull; Jordan's lantern and the secret trail only it
+  shows; Jordan on the team; the Cliffside Trail's bunnies and squirrels
+  calmed (one of each); after the ride, Pinecone Pass's snow, lodge, cocoa,
+  and the hooded kid somewhere up there; before the ride, once a bluebird is
+  calm, the bus note; a calm bluebird's clue toward the mountains; Sue on the
+  team; the purple hood's school name tag; while the club is open and Sue
+  hasn't joined, the east road to Bubblegum Bay; the club password; the hall
+  pass; a calm pup's purple thread toward the school; while only the
+  fountain frog is calm, the purple fizz leading to the park; while Fae has
+  coins, the bakery's snacks; the calm fountain frog; the kid in the purple
+  hood from the notice board; then the morning plan. The troublemaker is
+  always "a kid in a purple hood" (or "the hooded kid"), never named.
   `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
-  catalogue (id, name, the critter whose atlas holds the art, and the frame).
+  catalogue (id, name, the critter whose atlas holds the art, and the frame):
+  ten stickers, one per species, in ten slots, the town's four first.
   A sticker is owned when `state.stickers` has its id. The shell sets
   `data-journal="open"` while the book is open.
 
@@ -753,7 +823,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   above every other layer (`--z-journal`). The left page is NOTES: ruled notes
   in the order the game passes (newest first), an empty line ("Nothing yet.
   Look around!") when there are none, and scrolling only when they overflow.
-  The right page is the STICKERS album: a 4-column grid where owned stickers
+  The right page is the STICKERS album: a 5-column grid (ten slots in two
+  rows, which a phone's page fits) where owned stickers
   show their atlas frame with a die-cut rim and their name, and unowned slots
   are dashed `?` outlines with no name.
 - Fae's supplies sit at the right of the NOTES heading row: two small cream
@@ -775,23 +846,25 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 4, state }`, the whole core state, including the
+- Format: `{ version: 5, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
-  critters, the lantern, coins and snacks, the PRNG, and the tick. Version 1
-  (Maddie in `maddie` and `trail`), version 2 (no lantern), and version 3 (no
-  coins or snacks) are refused and start a new game. Loading restores it
-  exactly: the state hash matches, and
+  the set pieces' moods, this visit's recurring critters, the lantern, coins
+  and snacks, the PRNG, and the tick. Version 1 (Maddie in `maddie` and
+  `trail`), version 2 (no lantern), version 3 (no coins or snacks), and
+  version 4 (one critter of each kind, no recurring critters) are refused and
+  start a new game. Loading restores it exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
 - `parseSave(json, template)` accepts only a state with the template's exact
   shape (a fresh game state: every key, the same primitive types, all the way
   down; null slots may hold null or an object; every element of an array
   matches the template array's first element, so each party member and trail
-  point is checked). Any other version or shape starts a new game instead of
-  crashing later. A change to the state's shape
-  bumps the version. Content growing is not a shape change: a critter added
-  since the save was made starts in chaos when it loads (`parseSave` lays the
-  saved critters over the template's).
+  point is checked; a new game has no recurring critters out, so `wild` is
+  checked against a fixed shape). Any other version or shape starts a new
+  game instead of crashing later. A change to the state's shape bumps the
+  version. Content growing is not a shape change: a set piece added since the
+  save was made starts in chaos when it loads (`parseSave` lays the saved
+  critters over the template's).
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
   a battle ends, a dialogue closes, or the journal closes. The trigger is a
   pure function of the previous and next state (`autosaveNeeded`). Fixture
@@ -909,12 +982,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   for Milestones 9 to 15 (the frog's and pup's calm lines, the journal notes,
   Mom and Oliver, the hall-pass puzzle, the raccoon and the tree house).
   "Ms. Maple" stays as the teacher's name for now.
-- Waiting for the owner's review (Milestones 17 to 21, and art drawn ahead):
+- Waiting for the owner's review (Milestones 17 to 28, and art drawn ahead):
   Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay
   painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass
   painting, the hamster hiker, the bus stop, the Cliffside Trail painting, the
-  bunny and the squirrel, and the blacklight lantern and its glows
-  (`docs/review-queue.md`).
+  bunny and the squirrel, the blacklight lantern and its glows, the gull, the
+  Whispering Woods and its owl, coins and shops, and the recurring critters'
+  cat and raccoon battle atlases and wording (`docs/review-queue.md`). The
+  talking raccoon's atlas (approved 2026-10-06) left the game with the
+  talking raccoon; its recipe and raw sources stay
+  (`art/recipes/raccoon-npc.json`).
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

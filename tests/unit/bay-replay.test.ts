@@ -20,7 +20,7 @@ describe("Bubblegum Bay replay", () => {
         if (state.battle?.command === "cast") castUsed = true;
       }
     expect(state.party.map((member) => member.id)).toEqual(["maddie", "sue"]);
-    expect(state.critters.bluebird).toBe("calm");
+    expect(state.wild.find((critter) => critter.kind === "bluebird")?.mood).toBe("calm");
     expect(state.stickers).toContain("bay-bluebird");
     expect(castUsed).toBe(true);
     const note = journalNotes(content.world, state)

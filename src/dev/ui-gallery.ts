@@ -111,7 +111,8 @@ function renderGalleryState(): void {
     "The notice board has a new note.", "Follow the painted path north.",
     "Keep Oliver's birthday sticker safe.",
   ] : Array.from({ length: 14 }, (_, index) => `A fresh clue, number ${index + 1}.`);
-  const stickerIds = ["frog", "star", "leaf", "moon", "gem", "shell", "rainbow", "acorn"];
+  const stickerIds = ["frog", "star", "leaf", "moon", "gem", "shell", "rainbow", "acorn",
+    "kite", "bell"];
   const stickers = stickerIds.map((id) => ({
     id,
     name: id === "frog" ? "Fountain Frog" : id,

@@ -1,0 +1,109 @@
+{
+  "id": "school-raccoon",
+  "species": "raccoon",
+  "name": "Sneaky Raccoon",
+  "calmName": "Ringtail Raccoon",
+  "atlas": "assets/critters/raccoon/raccoon.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 314
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "ringtail-raccoon",
+    "name": "Ringtail Raccoon",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "school_raccoon",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy raccoon pops out by the school path, chattering at Fae!",
+    "command": "How can Fae calm the raccoon?",
+    "soothe": {
+      "great": "Fae hums a slow, sleepy song. The raccoon's swirly eyes start to slow down!",
+      "good": "Fae hums softly. The raccoon tilts its masked face.",
+      "miss": "The raccoon is too busy counting bottle caps to listen."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie rolls a bottle cap across the ground. The raccoon chases it, chittering happily!",
+        "good": "Maddie sniffs the raccoon's paw. It sniffs right back.",
+        "miss": "Maddie pounces on the raccoon's tail. It squeaks and hops away."
+      },
+      "cast": {
+        "great": "Sue casts a shiny lure. The raccoon catches it and spins with joy!",
+        "good": "Sue's lure glints in the sun. The raccoon's eyes follow it.",
+        "miss": "Sue's line tangles in a bush. The raccoon snickers."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones. The raccoon claps its little paws!",
+        "good": "Jordan tosses a pinecone high. The raccoon reaches for it.",
+        "miss": "A pinecone bonks Jordan on the head. The raccoon rolls with laughter."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. The raccoon washes it first, very carefully.",
+    "burst": "The raccoon flings a shower of shiny bottle caps at Fae!",
+    "burstResult": {
+      "great": "Clink, clink! Fae dodges every bottle cap!",
+      "good": "Fae dodges most of the bottle caps!",
+      "miss": "Plink! A bottle cap bounces off Fae's backpack."
+    },
+    "soothed": "The raccoon lets out a sleepy chitter. The fizzy spell floats away!",
+    "rest": "Fae is all tuckered out. Time for a little rest.",
+    "run": "Fae backs away. The raccoon chatters by the school path."
+  },
+  "coins": 8
+}

@@ -25,17 +25,16 @@ describe("chapter one", () => {
     expect(state.area).toBe("park");
     expect(state.battle).toBeNull();
     expect(state.dialogue).toBeNull();
+    // The story's set pieces: the fountain frog and the school raccoon, calmed.
     expect(state.critters).toEqual({
-      frog: "calm",
-      pup: "calm",
-      bluebird: "chaos",
-      hamster: "chaos",
-      bunny: "chaos",
-      squirrel: "chaos",
+      "fountain-frog": "calm",
+      "school-raccoon": "calm",
       gull: "chaos",
-      owl: "chaos",
     });
-    expect(state.stickers).toEqual(["fountain-frog", "pond-pup"]);
+    // And on the way: a park pup, and a cat in the plaza once the town's
+    // critters were out (Milestone 28). Every calm paid 8 coins.
+    expect(state.stickers).toEqual(["fountain-frog", "pond-pup", "ringtail-raccoon", "cozy-cat"]);
+    expect(state.coins).toBe(32);
     expect({
       plan: story("plan"),
       ate_breakfast: story("ate_breakfast"),

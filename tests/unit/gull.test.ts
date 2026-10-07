@@ -80,7 +80,6 @@ describe("the grumpy gull", () => {
 
   it("stands its ground at the lookout, by the bench", () => {
     const placed = placedGull();
-    expect(placed.roam).toBeUndefined();
     expect(placed.point.x).toBeGreaterThanOrEqual(1380);
     expect(placed.point.x).toBeLessThanOrEqual(1600);
     expect(placed.point.y).toBeGreaterThanOrEqual(420);

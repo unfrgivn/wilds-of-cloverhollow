@@ -1,0 +1,12 @@
+{
+  "width": 2400,
+  "height": 1610,
+  "lands": [
+    { "id": "cloverhollow", "name": "Cloverhollow", "x": 1224, "y": 1327 },
+    { "id": "bay", "name": "Bubblegum Bay", "x": 1992, "y": 828 },
+    { "id": "pass", "name": "Pinecone Pass", "x": 1110, "y": 204 },
+    { "id": "trail", "name": "Cliffside Trail", "x": 1812, "y": 420 },
+    { "id": "forest", "name": "The Forest", "x": 240, "y": 420 },
+    { "id": "enchanted", "name": "The Enchanted Forest", "x": 1156, "y": 720 }
+  ]
+}

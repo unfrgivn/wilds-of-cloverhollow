@@ -1,0 +1,64 @@
+{
+  "model": "gemini-3-pro-image",
+  "calls": [
+    {
+      "purpose": "Generate the full-bleed 3:2 world map with six lands around a sealed lavender-mist centre, connected roads, trails, bus road, and blank bus stop signs.",
+      "command": "GEMINI_API_KEY=... bun tools/art/gemini-image.ts --model gemini-3-pro-image --aspect-ratio 3:2 --image-size 2K --prompt <world-map prompt recorded in generation-log.jsonl> --ref docs/art/concepts/environments/town_center_plaza.png --ref docs/art/concepts/environments/pinecone_pass_environment.png --ref docs/art/concepts/environments/clubhouse_exterior.png",
+      "output": "art/scratch/1791353453256-gemini-3-pro-image-0.png",
+      "prompt": "Create a single finished 3:2 watercolor-and-ink storybook world map for a cozy children's adventure journal, viewed from above with a gentle three-quarter illustrated perspective, one connected world with no empty margin. Thin slightly irregular warm-brown ink contours, soft watercolor washes, warm cream paper ground, friendly readable landmarks, matching the supplied references. Arrange six distinct lands around a sealed mysterious center: SOUTH Cloverhollow town with several tiny cozy houses and garden fences, a recognizable circular plaza fountain, school building, meadow pond and little shops; EAST Bubblegum Bay with a crescent sandy cove, turquoise sea, wooden dock, palm trees; NORTH Pinecone Pass with snowy mountains, evergreen pines, warm ski lodge, ski lift; WEST Forest with deep green woods, cozy treehouse clubhouse and small garden; a winding Cliffside Trail climbs along the eastern coast from bay to pass and includes a tiny footbridge over a stream; a clear bus road runs from Cloverhollow north to Pinecone Pass with a small blank bus stop sign at both ends; an east road connects town to bay. Add softly painted roads, trails, and paths joining neighbouring lands in a coherent ring. CENTRE: ancient glowing tree beside a mystic pond, tiny sparkles, all surrounded by soft lavender mist and a gentle translucent sealed boundary so it reads as magical and inaccessible, not an ordinary forest. Keep every landmark small but recognizable and leave clear breathing room between lands. EarthBound-inspired connected overworld composition but entirely original watercolor children's picture-book art. No words, no letters, no numbers, no labels, no compass, no title, no symbols that resemble writing, no border, no frame, no scroll edge, no map key, no banners, no sign lettering. Paint runs fully to all image edges. Avoid photorealism, 3D rendering, pixel art, harsh black outlines, dense clutter, or cropped focal landmarks.",
+      "timestamp": "2026-10-07T06:10:53.258Z"
+    }
+  ],
+  "references": [
+    "docs/art/concepts/environments/town_center_plaza.png",
+    "docs/art/concepts/environments/pinecone_pass_environment.png",
+    "docs/art/concepts/environments/clubhouse_exterior.png"
+  ],
+  "selectedRaw": "art/source/ui/world-map-raw.png",
+  "rawDimensions": {
+    "width": 2528,
+    "height": 1696
+  },
+  "output": "public/assets/ui/map/world-map.webp",
+  "commandsFromRaw": [
+    "magick art/source/ui/world-map-raw.png -resize 2400x -quality 90 public/assets/ui/map/world-map.webp"
+  ],
+  "landCentres": [
+    {
+      "id": "cloverhollow",
+      "name": "Cloverhollow",
+      "x": 1224,
+      "y": 1327
+    },
+    {
+      "id": "bay",
+      "name": "Bubblegum Bay",
+      "x": 1992,
+      "y": 828
+    },
+    {
+      "id": "pass",
+      "name": "Pinecone Pass",
+      "x": 1110,
+      "y": 204
+    },
+    {
+      "id": "trail",
+      "name": "Cliffside Trail",
+      "x": 1812,
+      "y": 420
+    },
+    {
+      "id": "forest",
+      "name": "The Forest",
+      "x": 240,
+      "y": 420
+    },
+    {
+      "id": "enchanted",
+      "name": "The Enchanted Forest",
+      "x": 1156,
+      "y": 720
+    }
+  ]
+}

@@ -15,7 +15,7 @@ account is unpaid, so device builds use free personal-team signing.
 
 | Item | Why it's waiting |
 | --- | --- |
-| Who the kid in the purple hood is | Owner, 2026-10-07: unnamed, and kept secret until the very end; they may appear earlier as an ordinary kid. Raccoons are a recurring critter, not a character (rework planned as Milestone 28). Still open: does the kid know their own secret? Is the hooded figure ever seen in person? |
+| Who the kid in the purple hood is | Owner, 2026-10-07: unnamed, and kept secret until the very end; they may appear earlier as an ordinary kid. Raccoons are a recurring critter, not a character (rework planned as Milestone 28). The kid knows; the player doesn't. The hooded kid is glimpsed running off and talked about through the story (owner, 2026-10-07). |
 | Maddie's proportions (Milestone 17) | She had been drawn twice her height since Milestone 7 (only her width was scaled); she is now the cat in her atlas. Every screenshot with her in it changed |
 | Sue's look (Milestone 18) | Her atlas, from the owner's concept sheet: `art/review/sue-contact-cream.png`, `sue-fae-lineup.png`, `sue-walk-*.gif` |
 | Sue's Cast lines (Milestone 18) | Six battle lines, in `docs/plan.md` (Milestone 18) |

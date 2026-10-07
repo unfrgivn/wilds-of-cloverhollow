@@ -695,8 +695,10 @@ more bad guys, and the blacklight lantern, made and built while away.
   character or a boss. The kid causing the chaos is unnamed, and who it is
   stays secret until the very end; the player may meet them earlier as an
   ordinary kid without knowing. Until then they're only "a kid in a purple
-  hood". The game so far has one talking raccoon (Milestone 15) and calls
-  the hideouts his: that's to be reworked.
+  hood". The kid knows their secret; the player doesn't. They're glimpsed
+  running off, EarthBound style, and talked about through the story. The game
+  so far has one talking raccoon (Milestone 15) and calls the hideouts his:
+  that's to be reworked.
 - Each friend brings one battle command: Maddie's Play, Sue's Cast, Jordan's
   Juggle (pinecones).
 - Tools open the world: the blacklight lantern first (below); the lasso (from

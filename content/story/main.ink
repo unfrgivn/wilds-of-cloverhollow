@@ -6,6 +6,7 @@ VAR raccoon_waiting = false
 VAR knows_password = false
 VAR club_open = false
 VAR sue_joined = false
+VAR rode_bus = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -51,6 +52,8 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{rode_bus: Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The raccoon must be up here somewhere. # speaker: Fae}
+{calmed("bluebird") and not rode_bus: The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! # speaker: Fae}
 {calmed("bluebird"): The Bay Bluebird says the raccoon zipped off toward the mountains. # speaker: Fae}
 {sue_joined: Sue is on my team now! She knows every good fishing spot. # speaker: Fae}
 {club_open: The purple hood in the tree house has a Cloverhollow School name tag. Whose is it? # speaker: Fae}
@@ -179,6 +182,47 @@ The raccoon zipped off toward the mountains! # speaker: Bay Bluebird
 = again
 Chirp-chirp! The bay is peaceful now. # speaker: Bay Bluebird
 -> DONE
+
+=== bus_stop ===
+{not calmed("bluebird"):
+    The bus waits by the star sign, but there's no reason to leave town yet. # speaker: Fae
+    Maybe once I find a clue that leads up the mountain. # speaker: Fae
+    -> DONE
+}
+The bus to Pinecone Pass is here! # speaker: Fae
+* [All aboard!]
+    ~ rode_bus = true
+    Up we go! # speaker: Fae # travel: pass.bus
+    -> DONE
+* [Not yet.]
+    Not yet. I'll stay in Cloverhollow a little longer. # speaker: Fae
+-> DONE
+
+=== pass_bus_stop ===
+The bus is ready to roll back to Cloverhollow. # speaker: Fae
+* [All aboard!]
+    Back to town! # speaker: Fae # travel: plaza.bus-stop
+    -> DONE
+* [Not yet.]
+    Not yet. I want to look around a little more. # speaker: Fae
+-> DONE
+
+=== pass_sign ===
+PINECONE PASS. Trails, sledding, and the best cocoa in the mountains! # speaker: Sign
+-> DONE
+
+=== snowman ===
+The snowman has a carrot nose and a very serious pebble smile. # speaker: Fae
+-> DONE
+
+=== cocoa_stand ===
+The cocoa stand is open, but nobody's behind the counter. # speaker: Fae
+-> DONE
+
+=== lodge_door ===
+The lodge is locked. A note says: "Back soon, gone looking for a runaway hamster." # speaker: Fae
+-> DONE
+
 
 === bay_sign ===
 BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! # speaker: Sign

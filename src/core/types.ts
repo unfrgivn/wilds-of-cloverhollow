@@ -285,6 +285,7 @@ export type State = {
     choices: string[];
     selected: number;
     ended: boolean;
+    travel?: { area: string; spawn: string };
   } | null;
   critters: Record<string, "chaos" | "calm">;
   stickers: string[];

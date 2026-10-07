@@ -5,6 +5,7 @@ import kitchenData from "../../content/areas/kitchen.json";
 import parkData from "../../content/areas/park.json";
 import schoolData from "../../content/areas/school.json";
 import bayData from "../../content/areas/bay.json";
+import passData from "../../content/areas/pass.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -12,6 +13,7 @@ import plazaPartyFixtureData from "../../content/fixtures/plaza-party.json";
 import parkFixtureData from "../../content/fixtures/park.json";
 import schoolFixtureData from "../../content/fixtures/school.json";
 import bayFixtureData from "../../content/fixtures/bay.json";
+import passFixtureData from "../../content/fixtures/pass.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
@@ -679,6 +681,7 @@ export function loadContent(): {
   const park = parseArea(parkData, "content/areas/park.json");
   const school = parseArea(schoolData, "content/areas/school.json");
   const bay = parseArea(bayData, "content/areas/bay.json");
+  const pass = parseArea(passData, "content/areas/pass.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
@@ -711,6 +714,7 @@ export function loadContent(): {
     park: parseFixture(parkFixtureData, "content/fixtures/park.json"),
     school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
     bay: parseFixture(bayFixtureData, "content/fixtures/bay.json"),
+    pass: parseFixture(passFixtureData, "content/fixtures/pass.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -724,7 +728,31 @@ export function loadContent(): {
     [park.id]: park,
     [school.id]: school,
     [bay.id]: bay,
+    [pass.id]: pass,
   };
+  const travelTargets = new Set<string>();
+  const findTravelTags = (value: unknown): void => {
+    if (typeof value === "string") {
+      if (value.startsWith("travel:")) travelTargets.add(value.slice(7).trim());
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) findTravelTags(item);
+      return;
+    }
+    if (record(value)) {
+      for (const item of Object.values(value)) findTravelTags(item);
+    }
+  };
+  findTravelTags(story);
+  for (const target of travelTargets) {
+    const [areaId, spawnId, ...extra] = target.split(".");
+    const area = areaId === undefined ? undefined : areas[areaId];
+    if (area === undefined || spawnId === undefined || extra.length !== 0)
+      throw new Error(`content/story/main.ink: invalid travel target ${target}`);
+    if (area.spawns[spawnId] === undefined)
+      throw new Error(`content/story/main.ink: unknown travel target ${target}`);
+  }
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),

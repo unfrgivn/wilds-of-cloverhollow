@@ -39,5 +39,11 @@
     "idleTicks": [
       32
     ]
+  },
+  "bus-stop": {
+    "atlas": "assets/characters/bus-stop/bus-stop.json",
+    "idleTicks": [
+      32
+    ]
   }
 }

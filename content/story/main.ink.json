@@ -400,6 +400,65 @@
       ],
       "journal": [
         "ev",
+        {
+          "VAR?": "rode_bus"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The raccoon must be up here somewhere. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^bluebird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        {
+          "VAR?": "rode_bus"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The bus at the plaza's star sign goes up into the mountains, to Pinecone Pass! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.17"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         "str",
         "^bluebird",
         "/str",
@@ -419,7 +478,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.7"
+                "->": ".^.^.^.27"
               },
               null
             ]
@@ -444,7 +503,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.34"
               },
               null
             ]
@@ -469,7 +528,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.41"
               },
               null
             ]
@@ -499,7 +558,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.31"
+                "->": ".^.^.^.51"
               },
               null
             ]
@@ -529,7 +588,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.41"
+                "->": ".^.^.^.61"
               },
               null
             ]
@@ -554,7 +613,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.48"
+                "->": ".^.^.^.68"
               },
               null
             ]
@@ -583,7 +642,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.58"
+                "->": ".^.^.^.78"
               },
               null
             ]
@@ -621,7 +680,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.74"
+                "->": ".^.^.^.94"
               },
               null
             ]
@@ -650,7 +709,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.84"
+                "->": ".^.^.^.104"
               },
               null
             ]
@@ -675,7 +734,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.91"
+                "->": ".^.^.^.111"
               },
               null
             ]
@@ -704,7 +763,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.102"
+                "->": ".^.^.^.122"
               },
               null
             ]
@@ -733,7 +792,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.113"
+                "->": ".^.^.^.133"
               },
               null
             ]
@@ -1397,6 +1456,201 @@
           "#f": 1
         }
       ],
+      "bus_stop": [
+        [
+          "ev",
+          "str",
+          "^bluebird",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^The bus waits by the star sign, but there's no reason to leave town yet. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "^Maybe once I find a clue that leads up the mountain. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^The bus to Pinecone Pass is here! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^All aboard!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Not yet.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "rode_bus",
+                "re": true
+              },
+              "^Up we go! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^travel: pass.bus",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Not yet. I'll stay in Cloverhollow a little longer. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ]
+          }
+        ],
+        null
+      ],
+      "pass_bus_stop": [
+        [
+          "^The bus is ready to roll back to Cloverhollow. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^All aboard!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Not yet.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Back to town! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^travel: plaza.bus-stop",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Not yet. I want to look around a little more. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ]
+          }
+        ],
+        null
+      ],
+      "pass_sign": [
+        "^PINECONE PASS. Trails, sledding, and the best cocoa in the mountains! ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "snowman": [
+        "^The snowman has a carrot nose and a very serious pebble smile. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "cocoa_stand": [
+        "^The cocoa stand is open, but nobody's behind the counter. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "lodge_door": [
+        "^The lodge is locked. A note says: \"Back soon, gone looking for a runaway hamster.\" ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
       "bay_sign": [
         "^BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! ",
         "#",
@@ -1898,6 +2152,10 @@
         false,
         {
           "VAR=": "sue_joined"
+        },
+        false,
+        {
+          "VAR=": "rode_bus"
         },
         "/ev",
         "end",

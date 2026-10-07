@@ -321,6 +321,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   of its east end, since one baseline can't fit a diagonal rail; the far rail
   is never drawn over her (`tests/unit/bay-depth.test.ts`). Sue fishes at the
   dock's far end (a person, `npcs`, until she joins).
+- Pinecone Pass: a snowy mountain clearing with trails, a lodge, cocoa stand,
+  snowman, ski lifts, and a bus stop. Fae arrives at `pass.bus`; the plaza's
+  standing bus stop prop is an `npcs` entry at the star sign, with a solid
+  footprint and a `Look` prompt. The pass stop returns to `plaza.bus-stop`.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
@@ -333,6 +337,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   Fae talks to one (the dialogue's knot is theirs), they face her along the
   larger axis of the gap between them (`npcFacing`); otherwise they face as
   authored. Without a frame for that facing they show their front.
+  Standing props such as the plaza bus stop use the same person entry and
+  y-sorted renderer, but are props rather than people.
 - A person's `footprint` polygon is solid, for Fae and for the party, like a
   blocker. A person with `visibleWhile` (an Ink variable) is only there while
   it's true; otherwise they aren't drawn, can't be talked to, and aren't
@@ -374,6 +380,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   runs once, and saves it again; `storySeed` comes from the game seed. Ink
   variables are the canonical story flags; there is no separate flag system.
   Lines name their speaker with a `# speaker: Name` tag.
+- A line may carry `# travel: <area>.<spawn>`. The target remains in the
+  dialogue state through that line and its close, then starts the same 18-tick
+  fade as a door, placing Fae and the party at the named spawn and autosaving
+  on arrival. Load validation rejects travel tags naming an unknown area or
+  spawn.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's external
@@ -609,7 +620,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   press (or the book's close button, which sends cancel) closes it. While it's
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
-- Notes: the `journal` Ink knot lists every note that applies, newest first
+- Notes: the `journal` Ink knot lists every note that applies, newest first.
+  After the ride it starts with Pinecone Pass snow, lodge, cocoa, and the
+  raccoon clue; before the ride, a calm bluebird adds the exact bus note.
   (the calm bluebird's clue toward the mountains; Sue on the team; the purple
   hood's school name tag; while the club is open and Sue hasn't joined, the
   east road to Bubblegum Bay; the club password; the hall pass; the calm pup

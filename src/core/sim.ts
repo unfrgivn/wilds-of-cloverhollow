@@ -814,10 +814,18 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
   return { ...nextBase, battle: next };
 }
 
+// A line tagged `travel: <area>.<spawn>` sends Fae there when the
+// conversation closes; the target carries forward through the lines after it.
 function dialogueState(
   knot: string,
   result: ReturnType<typeof runInk>,
+  carried?: { area: string; spawn: string },
 ): State["dialogue"] {
+  const tag = result.line?.tags.find((item) => item.startsWith("travel:"));
+  const [area, spawn, ...rest] = tag?.slice("travel:".length).trim().split(".") ?? [];
+  const travel = area !== undefined && spawn !== undefined && rest.length === 0
+    ? { area, spawn }
+    : carried;
   return {
     knot,
     speaker: result.line?.speaker ?? null,
@@ -826,6 +834,20 @@ function dialogueState(
     choices: result.choices,
     selected: 0,
     ended: result.ended,
+    ...(travel === undefined ? {} : { travel }),
+  };
+}
+
+function closeDialogue(state: State): State {
+  const dialogue = state.dialogue;
+  if (dialogue === null) return state;
+  return {
+    ...state,
+    dialogue: null,
+    transition:
+      dialogue.travel === undefined
+        ? state.transition
+        : { target: dialogue.travel, phase: "out", elapsed: 0 },
   };
 }
 
@@ -862,21 +884,19 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
   const count = dialogue.choices.length;
   if (count === 0) {
     if (!confirm) return next;
-    if (dialogue.ended) return { ...next, dialogue: null };
+    if (dialogue.ended) return closeDialogue(next);
     const result = runInk(
       world.story,
       state.ink,
       { type: "next" },
       calmedFacts(state),
     );
-    return {
-      ...next,
-      ink: result.ink,
-      dialogue:
-        result.line === null && result.choices.length === 0
-          ? null
-          : dialogueState(dialogue.knot, result),
-    };
+    const following = result.line === null && result.choices.length === 0
+      ? null
+      : dialogueState(dialogue.knot, result, dialogue.travel);
+    return following === null
+      ? closeDialogue({ ...next, ink: result.ink })
+      : { ...next, ink: result.ink, dialogue: following };
   }
   const tapped =
     input.choose !== undefined && input.choose >= 0 && input.choose < count
@@ -893,14 +913,12 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
       },
       calmedFacts(state),
     );
-    return {
-      ...next,
-      ink: result.ink,
-      dialogue:
-        result.line === null && result.choices.length === 0
-          ? null
-          : dialogueState(dialogue.knot, result),
-    };
+    const following = result.line === null && result.choices.length === 0
+      ? null
+      : dialogueState(dialogue.knot, result, dialogue.travel);
+    return following === null
+      ? closeDialogue({ ...next, ink: result.ink })
+      : { ...next, ink: result.ink, dialogue: following };
   }
   const up = input.move.y < -0.5 && previous.move.y >= -0.5;
   const down = input.move.y > 0.5 && previous.move.y <= 0.5;

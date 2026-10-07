@@ -1,17 +1,27 @@
 #!/usr/bin/env bun
 // Maps what an area's painting shows, so tests can check the area's floor,
 // blockers, and occluders against the paint itself. The painting is cut into
-// 5x5-unit cells (10x10 source px, at 2 px per unit). Each cell takes the class
-// that at least 90% of its pixels share, else `m` (mixed: an edge):
+// 5x5-unit cells (10x10 source px, at 2 px per unit), classified by a palette
+// made for the area's ground:
 //
+// beach (Bubblegum Bay): each cell takes the class at least 90% of its pixels
+// share, else `m` (mixed: an edge).
 //   w  water, including the pale shallows (green and blue above red)
 //   s  sand or a sandy path (warm, light, smooth)
 //   o  anything else: plants, rocks, wood, props, ink lines
 //
-// Thresholds were calibrated on Bubblegum Bay's sand, path, shallows, sea,
-// dock, and props (art/recipes/bay.json).
+// snow (Pinecone Pass): snow is white like the paper margin around the
+// painting, so cells are classified by their mean colour and texture instead.
+//   p  the paper margin: 90% paper-white pixels, and joined to the image's
+//      edge through other paper cells (white snow inside the painting isn't)
+//   s  snow or a packed-snow path, lit or in lavender shade (light, smooth)
+//   o  anything else: trees, wood, stone, props, ink lines
+//
+// Thresholds were calibrated on each painting's ground, shade, paths, and
+// props (art/recipes/bay.json, art/recipes/pass.json).
 //
 //   bun tools/art/paint-map.ts bay > tests/unit/fixtures/bay-paint.json
+//   bun tools/art/paint-map.ts pass --palette snow > tests/unit/fixtures/pass-paint.json
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
@@ -44,7 +54,7 @@ function tiles(id: string): Tile[] {
   });
 }
 
-function classify(r: number, g: number, b: number): Class {
+function beachPixel(r: number, g: number, b: number): Class {
   if (g - r > 6 && b - r > -8) return "w";
   if (
     r >= 238 && g >= 218 && b >= 175 &&
@@ -55,7 +65,10 @@ function classify(r: number, g: number, b: number): Class {
 }
 
 const id = process.argv[2];
-if (id === undefined) throw new Error("usage: bun tools/art/paint-map.ts <area>");
+const paletteIndex = process.argv.indexOf("--palette");
+const palette = paletteIndex < 0 ? "beach" : process.argv[paletteIndex + 1];
+if (id === undefined || (palette !== "beach" && palette !== "snow"))
+  throw new Error("usage: bun tools/art/paint-map.ts <area> [--palette beach|snow]");
 const parts = tiles(id);
 const width = Math.max(...parts.map((tile) => tile.x + tile.width));
 const height = Math.max(...parts.map((tile) => tile.y + tile.height));
@@ -72,25 +85,96 @@ for (const tile of parts) {
       ((tile.y + row) * width + tile.x) * 3);
 }
 
+function beachCell(cellX: number, cellY: number): string {
+  const counts = { w: 0, s: 0, o: 0 };
+  for (let y = cellY * cellPx; y < (cellY + 1) * cellPx; y += 1)
+    for (let x = cellX * cellPx; x < (cellX + 1) * cellPx; x += 1) {
+      const at = (y * width + x) * 3;
+      counts[beachPixel(pixels[at] ?? 0, pixels[at + 1] ?? 0, pixels[at + 2] ?? 0)] += 1;
+    }
+  const total = cellPx * cellPx;
+  return counts.w >= total * majority ? "w"
+    : counts.s >= total * majority ? "s"
+    : counts.o >= total * majority ? "o"
+    : "m";
+}
+
+// Paper is near-white and flat: the generation's own border is 254-255 grey,
+// and the padding the raw was extended with is the margin colour #fcfbf6.
+// Snow is cream (blue below red, 239-241 at its lightest) or lavender shade,
+// never that flat white over a whole cell.
+function paperPixel(r: number, g: number, b: number): boolean {
+  const low = Math.min(r, g, b);
+  if (low >= 250 && Math.max(r, g, b) - low <= 6) return true;
+  return Math.abs(r - 252) <= 3 && Math.abs(g - 251) <= 3 && Math.abs(b - 246) <= 3;
+}
+
+function snowCell(cellX: number, cellY: number): string {
+  let paper = 0;
+  let red = 0;
+  let blue = 0;
+  let luma = 0;
+  let lumaSquares = 0;
+  for (let y = cellY * cellPx; y < (cellY + 1) * cellPx; y += 1)
+    for (let x = cellX * cellPx; x < (cellX + 1) * cellPx; x += 1) {
+      const at = (y * width + x) * 3;
+      const r = pixels[at] ?? 0;
+      const g = pixels[at + 1] ?? 0;
+      const b = pixels[at + 2] ?? 0;
+      if (paperPixel(r, g, b)) paper += 1;
+      const value = (r + g + b) / 3;
+      red += r;
+      blue += b;
+      luma += value;
+      lumaSquares += value * value;
+    }
+  const total = cellPx * cellPx;
+  if (paper >= total * majority) return "p";
+  const mean = luma / total;
+  const spread = Math.sqrt(Math.max(0, lumaSquares / total - mean * mean));
+  return mean >= 215 && spread <= 9 && (blue - red) / total <= 18 ? "s" : "o";
+}
+
 const columns = Math.floor(width / cellPx);
 const rowsCount = Math.floor(height / cellPx);
-const rows: string[] = [];
+const cells: string[][] = [];
 for (let cellY = 0; cellY < rowsCount; cellY += 1) {
-  let line = "";
-  for (let cellX = 0; cellX < columns; cellX += 1) {
-    const counts = { w: 0, s: 0, o: 0 };
-    for (let y = cellY * cellPx; y < (cellY + 1) * cellPx; y += 1)
-      for (let x = cellX * cellPx; x < (cellX + 1) * cellPx; x += 1) {
-        const at = (y * width + x) * 3;
-        counts[classify(pixels[at] ?? 0, pixels[at + 1] ?? 0, pixels[at + 2] ?? 0)] += 1;
-      }
-    const total = cellPx * cellPx;
-    line += counts.w >= total * majority ? "w"
-      : counts.s >= total * majority ? "s"
-      : counts.o >= total * majority ? "o"
-      : "m";
-  }
-  rows.push(line);
+  const line: string[] = [];
+  for (let cellX = 0; cellX < columns; cellX += 1)
+    line.push(palette === "beach" ? beachCell(cellX, cellY) : snowCell(cellX, cellY));
+  cells.push(line);
 }
+
+// Snow only: white cells not joined to the image's edge are bright snow
+// inside the painting, not its paper margin.
+if (palette === "snow") {
+  const margin = new Set<number>();
+  const queue: number[] = [];
+  for (let cellY = 0; cellY < rowsCount; cellY += 1)
+    for (let cellX = 0; cellX < columns; cellX += 1)
+      if ((cellX === 0 || cellY === 0 || cellX === columns - 1 || cellY === rowsCount - 1) &&
+        cells[cellY]?.[cellX] === "p") {
+        margin.add(cellY * columns + cellX);
+        queue.push(cellY * columns + cellX);
+      }
+  for (let index = queue.pop(); index !== undefined; index = queue.pop()) {
+    const cellX = index % columns;
+    const cellY = (index - cellX) / columns;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nextX = cellX + (dx ?? 0);
+      const nextY = cellY + (dy ?? 0);
+      const next = nextY * columns + nextX;
+      if (nextX < 0 || nextY < 0 || nextX >= columns || nextY >= rowsCount) continue;
+      if (cells[nextY]?.[nextX] !== "p" || margin.has(next)) continue;
+      margin.add(next);
+      queue.push(next);
+    }
+  }
+  cells.forEach((line, cellY) => line.forEach((value, cellX) => {
+    if (value === "p" && !margin.has(cellY * columns + cellX)) line[cellX] = "s";
+  }));
+}
+
+const rows = cells.map((line) => line.join(""));
 console.log(JSON.stringify({ area: id, cellUnits, rows }, null, 0)
   .replace('"rows":[', '"rows":[\n').replaceAll('","', '",\n"'));

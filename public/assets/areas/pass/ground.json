@@ -5,7 +5,7 @@
   "height": 2200,
   "paper": "#fcfbf6",
   "tiles": [
-    {"file": "assets/areas/pass/ground_0_0.webp", "x": 0, "y": 0, "width": 1750, "height": 2200},
-    {"file": "assets/areas/pass/ground_1_0.webp", "x": 1750, "y": 0, "width": 1750, "height": 2200}
+    {"file": "ground_0_0.webp", "x": 0, "y": 0, "width": 1750, "height": 2200},
+    {"file": "ground_1_0.webp", "x": 1750, "y": 0, "width": 1750, "height": 2200}
   ]
 }

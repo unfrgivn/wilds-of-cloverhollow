@@ -408,6 +408,53 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
     replay take 72 s in Chromium under load, near its 90 s budget, and the new
     bay flow timed out; now they take 9 s and 30 s.
 
+## Milestone 20: Pinecone Pass and the bus **Status:** ✅ Completed (2026-10-07)
+- Once the bluebird is calm (it pointed toward the mountains), Fae can ride
+  the bus from the plaza's new stop, between the two lower flower boxes, up to
+  Pinecone Pass, and back. The pass is walkable: the bus stop, the clearing,
+  the lodge (locked: its owner is out looking for a runaway hamster), the
+  cocoa stand, the snowman, the trail sign, and the ski lift as scenery.
+- Engine: a story line tagged `# travel: <area>.<spawn>` sends Fae there when
+  the conversation closes, with a door's fade, safe spot, autosave, and party
+  placement; the loader rejects a tag naming an area or spawn that doesn't
+  exist.
+- Evidence: unit (`bus.test.ts`, `travel.test.ts`, `pass-paint.test.ts`, the
+  ride's replay), the recorded ride `tests/sim/scripts/bay/bus.json` with
+  matching browser and Bun hashes, and real-key e2e (`bus.spec.ts`: the stop
+  goes nowhere before the bluebird is calm; after the bay run, out to the
+  plaza, to the stop, the ride, the pass, home; Fae behind the snowman, drawn
+  over her). The twelve plaza baselines changed only by the new stop.
+- Wording for the owner: "The bus waits by the star sign, but there's no
+  reason to leave town yet." / "Maybe once I find a clue that leads up the
+  mountain." / "The bus to Pinecone Pass is here!" ("All aboard!": "Up we
+  go!"; "Not yet.": "Not yet. I'll stay in Cloverhollow a little longer.") /
+  "The bus is ready to roll back to Cloverhollow." ("Back to town!" / "Not
+  yet. I want to look around a little more.") / Sign: "PINECONE PASS. Trails,
+  sledding, and the best cocoa in the mountains!" / "The snowman has a carrot
+  nose and a very serious pebble smile." / "The cocoa stand is open, but
+  nobody's behind the counter." / "The lodge is locked. A note says: Back
+  soon, gone looking for a runaway hamster." / Journal: "The bus at the
+  plaza's star sign goes up into the mountains, to Pinecone Pass!", then
+  "Pinecone Pass is covered in snow, with a lodge and a cocoa stand. The
+  raccoon must be up here somewhere."
+- Notes and assumptions:
+  - The pass's geometry comes from `tools/art/geometry/pass.ts`: each thing
+    standing in the painting is outlined by hand with the row its foot stands
+    on; a building, a stand of trees, or the benches block their whole
+    outline, while a sign, a post, or the snowman block only their bottom 30
+    units so Fae can walk behind them; every thing is cut out and drawn over
+    her north of its foot. `pass-paint.test.ts` checks it against the painting
+    read by `tools/art/paint-map.ts`, which gained a snow palette (snow is as
+    white as the paper margin, so cells are classed by mean colour and
+    texture, and paper only counts when it touches the image's edge).
+  - The first travel version read the target only from the tagged line, so a
+    travel line followed by any other line lost it; it now carries forward.
+  - The pass's tile manifest named its tiles with full paths, which the game
+    would have joined to the area folder and failed to load; it uses bare
+    file names like every other area.
+  - The plaza stop is a narrow prop (121 units) because the only place no
+    recorded route crosses is the gap between the lower flower boxes.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still

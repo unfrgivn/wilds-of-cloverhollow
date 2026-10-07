@@ -1,0 +1,94 @@
+{
+  "cutouts": [
+    {
+      "id": "forest-left",
+      "file": "forest-left.webp",
+      "x": 178,
+      "y": 600
+    },
+    {
+      "id": "pines-bus",
+      "file": "pines-bus.webp",
+      "x": 485,
+      "y": 892
+    },
+    {
+      "id": "pines-east",
+      "file": "pines-east.webp",
+      "x": 1365,
+      "y": 395
+    },
+    {
+      "id": "pines-north",
+      "file": "pines-north.webp",
+      "x": 975,
+      "y": 140
+    },
+    {
+      "id": "lodge",
+      "file": "lodge.webp",
+      "x": 1050,
+      "y": 165
+    },
+    {
+      "id": "cocoa-stand",
+      "file": "cocoa-stand.webp",
+      "x": 865,
+      "y": 215
+    },
+    {
+      "id": "benches",
+      "file": "benches.webp",
+      "x": 775,
+      "y": 305
+    },
+    {
+      "id": "bus-shelter-back",
+      "file": "bus-shelter-back.webp",
+      "x": 770,
+      "y": 790
+    },
+    {
+      "id": "bus-shelter-front",
+      "file": "bus-shelter-front.webp",
+      "x": 900,
+      "y": 775
+    },
+    {
+      "id": "trail-sign",
+      "file": "trail-sign.webp",
+      "x": 575,
+      "y": 345
+    },
+    {
+      "id": "lift-tower-west",
+      "file": "lift-tower-west.webp",
+      "x": 245,
+      "y": 300
+    },
+    {
+      "id": "lift-tower-north",
+      "file": "lift-tower-north.webp",
+      "x": 728,
+      "y": 150
+    },
+    {
+      "id": "snowman",
+      "file": "snowman.webp",
+      "x": 1110,
+      "y": 555
+    },
+    {
+      "id": "signpost",
+      "file": "signpost.webp",
+      "x": 1225,
+      "y": 680
+    },
+    {
+      "id": "bus-sign",
+      "file": "bus-sign.webp",
+      "x": 1000,
+      "y": 770
+    }
+  ]
+}

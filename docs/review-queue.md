@@ -26,3 +26,4 @@ account is unpaid, so device builds use free personal-team signing.
 | Pinecone Pass painting | Drawn ahead of its milestone from the owner's concept: the bus stop where Fae arrives (bottom, left of centre), the lodge, the hot chocolate stand, the snowman, the ski lift, and an open clearing. `art/review/pass-owner-review.png` |
 | The hamster hiker | Pinecone Pass's critter, from the owner's critter sheet: `art/review/hamster-sheet-cream.png`. Not in the game yet |
 | The town bus stop | A sprite for the plaza (the star sign and a small green-roofed bench), standing between the two lower flower boxes so the approved plaza painting isn't repainted: `art/review/bus-stop-in-plaza.png` |
+| The bus and Pinecone Pass (Milestone 20) | The ride, the pass's look lines, and the journal notes, listed in `docs/plan.md` (Milestone 20) |

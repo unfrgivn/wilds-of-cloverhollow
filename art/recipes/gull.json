@@ -1,0 +1,67 @@
+{
+  "asset": "gull",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 3,
+  "date": "2026-10-07",
+  "referenceImages": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+  ],
+  "selectedOutputs": [
+    "art/source/critters/gull/body-sheet-raw.png",
+    "art/source/critters/gull/aura-white-raw.png"
+  ],
+  "scaleFactors": {
+    "chaos_idle_01": "uniform 380px target",
+    "chaos_burst_01": "uniform 380px target",
+    "soothed_01": "uniform 380px target",
+    "calm_idle_01": "uniform 380px target",
+    "chaos_aura_01": 0.2
+  },
+  "postProcessing": {
+    "keyColor": "#FF00FF",
+    "fuzz": "12% paper flood fill, 65% connected component matte",
+    "despill": "edge despill only",
+    "frameCanvas": "512x512 source px",
+    "baseline": 504,
+    "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON",
+    "cleanup": "drop-islands.ts --min 120 only; no morphology",
+    "bodySelection": "2x2 sheet, whole bodies by connected components and grid cell names"
+  },
+  "keyColourJustification": "#FF00FF is absent from the gull's white, cool-grey, yellow, orange, pink, navy, purple, and teal subject colours; the generated white paper is flood-filled from the border to magenta before connected-component extraction, then edge-despilled.",
+  "checker": {
+    "bodyFrames": [
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01",
+      "calm_idle_01"
+    ],
+    "auraFrames": ["chaos_aura_01"],
+    "rawSources": {
+      "chaos_idle_01": "art/scratch/gull-build-frames/source-chaos_idle_01.png",
+      "chaos_burst_01": "art/scratch/gull-build-frames/source-chaos_burst_01.png",
+      "soothed_01": "art/scratch/gull-build-frames/source-soothed_01.png",
+      "calm_idle_01": "art/scratch/gull-build-frames/source-calm_idle_01.png"
+    },
+    "matteMethods": {"body": "magenta-key", "aura": "white-lift"},
+    "bodyHue": {"min": 0.0, "max": 0.17, "minFraction": 0.15},
+    "psnrThreshold": 25
+  },
+  "measuredCentres": {
+    "auraCentre": {"x": 259, "y": 257},
+    "bodyCentre": {"x": 261, "y": 309}
+  },
+  "bodyHeights": {
+    "chaos_idle_01": 379,
+    "chaos_burst_01": 368,
+    "soothed_01": 379,
+    "calm_idle_01": 378
+  },
+  "review": [
+    "art/review/gull-sheet-cream.png",
+    "art/review/gull-sheet-dark.png",
+    "art/review/gull-lineup.png"
+  ],
+  "generationCallsNote": "3 calls in the main checkout's art/scratch/generation-log.jsonl: one body sheet and two white-painted aura attempts on 2026-10-07; the second aura is selected."
+}

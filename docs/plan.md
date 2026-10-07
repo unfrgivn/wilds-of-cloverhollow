@@ -712,6 +712,16 @@ more bad guys, and the blacklight lantern, made and built while away.
 - Milestone 23, the blacklight lantern: done.
 - Milestone 24, the bus line and the map: done.
 - Milestone 25, the grumpy gull, the first mini-boss: done.
+- Milestone 26, the Whispering Woods: done.
+- Next (proposed 2026-10-07, EarthBound style, open to the owner):
+  - Milestone 27, coins and shops: calmed critters and lantern finds give
+    coins; the cocoa stand and the bakery sell snacks; Fae carries snacks into
+    battles instead of each critter granting its own.
+  - Milestone 28, the first person under the chaos spell (a mini-boss in
+    town), with an interior from `arcade_interior.png`.
+  - Then the clubhouse fix-up (a fridge for snacks, the garden), once coins
+    exist; the school chapter, the lasso, and the flute wait on the owner's
+    decision about the kid in the purple hood.
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the

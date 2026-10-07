@@ -1,0 +1,109 @@
+{
+  "id": "owl",
+  "name": "Screeching Owl",
+  "calmName": "Whispering Owl",
+  "atlas": "assets/critters/owl/owl.json",
+  "auraCentre": {
+    "x": 259,
+    "y": 262
+  },
+  "bodyCentre": {
+    "x": 252,
+    "y": 310
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "snacks": 2,
+  "sticker": {
+    "id": "whispering-owl",
+    "name": "Whispering Owl",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "owl_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A chaos owl screeches and swoops through the clearing!",
+    "command": "How can Fae calm the owl?",
+    "soothe": {
+      "great": "Fae whispers a quiet tune. The owl settles on a branch.",
+      "good": "Fae whispers softly. The owl blinks.",
+      "miss": "The owl screeches louder than Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie plays peekaboo behind a fern. The owl hoots along!",
+        "good": "Maddie wiggles a leaf. The owl leans closer.",
+        "miss": "Maddie pounces at a shadow. The owl flaps away."
+      },
+      "cast": {
+        "great": "Sue Sue casts a ribbon into the air. The owl swoops after it!",
+        "good": "Sue Sue twirls her ribbon. The owl watches.",
+        "miss": "Sue The ribbon tangles in a branch."
+      },
+      "juggle": {
+        "great": "Jordan Jordan juggles pinecones. The owl hoots in rhythm!",
+        "good": "Jordan Jordan tosses a pinecone. The owl tilts its head.",
+        "miss": "Jordan A pinecone drops with a thunk."
+      }
+    },
+    "snack": "Fae offers a fizzy cracker crumb. The owl nibbles carefully.",
+    "burst": "The owl screeches and dives through the ferns!",
+    "burstResult": {
+      "great": "Fae ducks beneath the swooping wings!",
+      "good": "Fae dodges the owl by a feather.",
+      "miss": "The owl startles Fae with a sharp screech!"
+    },
+    "soothed": "The owl whispers a wise little hoot. The fizzy spell fades away!",
+    "reward": "New sticker: Whispering Owl!",
+    "rest": "Fae needs a quiet rest after that screech.",
+    "run": "Fae backs away. The owl watches from a branch."
+  }
+}

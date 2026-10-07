@@ -1,0 +1,40 @@
+{
+  "cutouts": [
+    {
+      "id": "oak-west",
+      "file": "oak-west.webp",
+      "x": 110,
+      "y": 200
+    },
+    {
+      "id": "pine-west",
+      "file": "pine-west.webp",
+      "x": 300,
+      "y": 80
+    },
+    {
+      "id": "oak-east",
+      "file": "oak-east.webp",
+      "x": 1400,
+      "y": 220
+    },
+    {
+      "id": "log-west",
+      "file": "log-west.webp",
+      "x": 360,
+      "y": 680
+    },
+    {
+      "id": "log-south",
+      "file": "log-south.webp",
+      "x": 680,
+      "y": 850
+    },
+    {
+      "id": "clubhouse",
+      "file": "clubhouse.webp",
+      "x": 610,
+      "y": 110
+    }
+  ]
+}

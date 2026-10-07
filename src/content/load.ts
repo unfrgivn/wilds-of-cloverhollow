@@ -7,6 +7,7 @@ import schoolData from "../../content/areas/school.json";
 import bayData from "../../content/areas/bay.json";
 import passData from "../../content/areas/pass.json";
 import trailData from "../../content/areas/trail.json";
+import woodsData from "../../content/areas/woods.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -26,6 +27,7 @@ import hamsterData from "../../content/critters/hamster.json";
 import bunnyData from "../../content/critters/bunny.json";
 import squirrelData from "../../content/critters/squirrel.json";
 import gullData from "../../content/critters/gull.json";
+import owlData from "../../content/critters/owl.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -761,6 +763,7 @@ export function loadContent(): {
   });
   const pass = parseArea(passData, "content/areas/pass.json");
   const trail = parseArea(trailData, "content/areas/trail.json");
+  const woods = parseArea(woodsData, "content/areas/woods.json");
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -784,6 +787,7 @@ export function loadContent(): {
   const bunny = parseCritter(bunnyData, "content/critters/bunny.json");
   const squirrel = parseCritter(squirrelData, "content/critters/squirrel.json");
   const gull = parseCritter(gullData, "content/critters/gull.json");
+  const owl = parseCritter(owlData, "content/critters/owl.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -806,6 +810,7 @@ export function loadContent(): {
     [bunny.id]: bunny,
     [squirrel.id]: squirrel,
     [gull.id]: gull,
+    [owl.id]: owl,
   };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)
@@ -824,6 +829,7 @@ export function loadContent(): {
     pass: parseFixture(passFixtureData, "content/fixtures/pass.json"),
     "pass-party": parseFixture(passPartyFixtureData, "content/fixtures/pass-party.json"),
     trail: parseFixture(trailFixtureData, "content/fixtures/trail.json"),
+    woods: parseFixture({ area: "woods", spawn: "east" }, "content/fixtures/woods.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -839,6 +845,7 @@ export function loadContent(): {
     [bay.id]: bay,
     [pass.id]: pass,
     [trail.id]: trail,
+    [woods.id]: woods,
   };
   const travelTargets = new Set<string>();
   const findTravelTags = (value: unknown): void => {

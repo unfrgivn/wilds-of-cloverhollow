@@ -26,7 +26,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 type Tile = { file: string; x: number; y: number; width: number; height: number };
-type Class = "w" | "s" | "o";
+type Class = "w" | "s" | "o" | "p";
 
 const pxPerUnit = 2;
 const cellUnits = 5;
@@ -67,8 +67,8 @@ function beachPixel(r: number, g: number, b: number): Class {
 const id = process.argv[2];
 const paletteIndex = process.argv.indexOf("--palette");
 const palette = paletteIndex < 0 ? "beach" : process.argv[paletteIndex + 1];
-if (id === undefined || (palette !== "beach" && palette !== "snow"))
-  throw new Error("usage: bun tools/art/paint-map.ts <area> [--palette beach|snow]");
+if (id === undefined || (palette !== "beach" && palette !== "snow" && palette !== "woods"))
+  throw new Error("usage: bun tools/art/paint-map.ts <area> [--palette beach|snow|woods]");
 const parts = tiles(id);
 const width = Math.max(...parts.map((tile) => tile.x + tile.width));
 const height = Math.max(...parts.map((tile) => tile.y + tile.height));
@@ -86,7 +86,7 @@ for (const tile of parts) {
 }
 
 function beachCell(cellX: number, cellY: number): string {
-  const counts = { w: 0, s: 0, o: 0 };
+  const counts = { w: 0, s: 0, o: 0, p: 0 };
   for (let y = cellY * cellPx; y < (cellY + 1) * cellPx; y += 1)
     for (let x = cellX * cellPx; x < (cellX + 1) * cellPx; x += 1) {
       const at = (y * width + x) * 3;
@@ -135,19 +135,43 @@ function snowCell(cellX: number, cellY: number): string {
   return mean >= 215 && spread <= 9 && (blue - red) / total <= 18 ? "s" : "o";
 }
 
+function woodsPixel(r: number, g: number, b: number): Class {
+  if (r >= 245 && g >= 240 && b >= 230 && Math.max(r, g, b) - Math.min(r, g, b) < 35)
+    return "p";
+  return g > r * 0.92 && g > b * 1.05 && g > 105 && r > 55 ? "s" : "o";
+}
+
+function woodsCell(cellX: number, cellY: number): string {
+  let floor = 0;
+  let paper = 0;
+  let total = 0;
+  for (let y = cellY * cellPx; y < (cellY + 1) * cellPx; y += 1)
+    for (let x = cellX * cellPx; x < (cellX + 1) * cellPx; x += 1) {
+      const at = (y * width + x) * 3;
+      const kind = woodsPixel(pixels[at] ?? 0, pixels[at + 1] ?? 0, pixels[at + 2] ?? 0);
+      if (kind === "s") floor += 1;
+      if (kind === "p") paper += 1;
+      total += 1;
+    }
+  return paper >= total * majority ? "p" : floor >= total * majority ? "s" : "o";
+}
+
 const columns = Math.floor(width / cellPx);
 const rowsCount = Math.floor(height / cellPx);
 const cells: string[][] = [];
 for (let cellY = 0; cellY < rowsCount; cellY += 1) {
   const line: string[] = [];
-  for (let cellX = 0; cellX < columns; cellX += 1)
-    line.push(palette === "beach" ? beachCell(cellX, cellY) : snowCell(cellX, cellY));
+  for (let cellX = 0; cellX < columns; cellX += 1) {
+    const cell = palette === "beach" ? beachCell(cellX, cellY)
+      : palette === "snow" ? snowCell(cellX, cellY) : woodsCell(cellX, cellY);
+    line.push(cell);
+  }
   cells.push(line);
 }
 
 // Snow only: white cells not joined to the image's edge are bright snow
 // inside the painting, not its paper margin.
-if (palette === "snow") {
+if (palette === "snow" || palette === "woods") {
   const margin = new Set<number>();
   const queue: number[] = [];
   for (let cellY = 0; cellY < rowsCount; cellY += 1)
@@ -171,7 +195,8 @@ if (palette === "snow") {
     }
   }
   cells.forEach((line, cellY) => line.forEach((value, cellX) => {
-    if (value === "p" && !margin.has(cellY * columns + cellX)) line[cellX] = "s";
+    if (value === "p" && !margin.has(cellY * columns + cellX))
+      line[cellX] = palette === "woods" ? "o" : "s";
   }));
 }
 

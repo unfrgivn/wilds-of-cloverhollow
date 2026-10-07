@@ -1,0 +1,13 @@
+{
+  "asset":"woods",
+  "status":"generated-selected-owner-review",
+  "model":"gemini-3-pro-image",
+  "generationCalls":1,
+  "date":"2026-10-07",
+  "referenceImages":["public/assets/areas/park/ground_0_0.webp","public/assets/areas/bay/ground_0_0.webp","public/assets/areas/pass/ground_0_0.webp","docs/art/concepts/environments/clubhouse_exterior.png"],
+  "selectedOutputs":["art/source/areas/woods/woods-final.png"],
+  "prompt":"Finished 1750x1100 logical-unit watercolor-and-ink storybook game environment, quiet green forest clearing with pines, old oaks, ferns, mossy logs, glowing mushrooms, a stream with stepping stones, open floor, east entry path, and clubhouse at north edge with a large door; no people, animals, lettering, or signs.",
+  "tileCommand":"magick art/source/areas/woods/woods-final.png -resize 3500x2200^ -gravity center -crop 3500x2200+0+0 +repage -quality 90 art/scratch/woods-painted.webp; magick art/scratch/woods-painted.webp -crop 1750x2200+0+0 +repage -quality 90 public/assets/areas/woods/ground_0_0.webp; magick art/scratch/woods-painted.webp -crop 1750x2200+1750+0 +repage -quality 90 public/assets/areas/woods/ground_1_0.webp",
+  "paintMapCommand":"bun tools/art/paint-map.ts woods --palette woods > tests/unit/fixtures/woods-paint.json",
+  "occluderCommand":"bun tools/art/area-occluders.ts content/areas/woods.json"
+}

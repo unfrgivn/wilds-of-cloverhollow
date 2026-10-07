@@ -1,0 +1,70 @@
+{
+ "asset": "owl",
+ "status": "generated-selected-owner-review",
+ "model": "gemini-3-pro-image",
+ "generationCalls": "7 in the main checkout's art/scratch/generation-log.jsonl: 4 by the first build (its vector-traced and strip versions were rejected), then 3 regenerations of the 2x2 sheet: one removed a purple cloud painted behind the burst (a second aura in the pose), and two fixed the burst owl, which the generator kept drawing at about two-thirds size to fit a flying wingspan; the selected sheet (1791397618009) has it standing, wings up, at full size.",
+ "date": "2026-10-07",
+ "referenceImages": [
+  "docs/art/concepts/npcs/npc_critter_set.png",
+  "public/assets/critters/hamster/hamster.png"
+ ],
+ "selectedRawSources": [
+  "art/source/critters/owl/body-sheet-raw.png (generation 1791397618009)"
+ ],
+ "checker": {
+  "note": "Run bun tools/art/build-owl.ts first; rawSources are its connected-component crops of the 2x2 sheet.",
+  "bodyFrames": [
+   "chaos_idle_01",
+   "chaos_burst_01",
+   "soothed_01",
+   "calm_idle_01"
+  ],
+  "auraFrames": [
+   "chaos_aura_01"
+  ],
+  "rawSources": {
+   "chaos_idle_01": "art/scratch/owl-build-frames/source-chaos_idle_01.png",
+   "chaos_burst_01": "art/scratch/owl-build-frames/source-chaos_burst_01.png",
+   "soothed_01": "art/scratch/owl-build-frames/source-soothed_01.png",
+   "calm_idle_01": "art/scratch/owl-build-frames/source-calm_idle_01.png"
+  },
+  "matteMethods": {
+   "body": "green-key",
+   "aura": "white-lift"
+  },
+  "bodyHue": {
+   "min": 0.0,
+   "max": 0.15,
+   "minFraction": 0.3
+  },
+  "psnrThreshold": 25
+ },
+ "postProcessing": {
+  "build": "bun tools/art/build-owl.ts (rebuilds the atlas byte for byte)",
+  "bodies": "The 2x2 sheet's four figures are found whole by connected components (marks join the body in their grid cell) and named by grid cell; one scale, the one that makes the chaos idle body 380 px tall, is applied to all four.",
+  "key": "#00FF00 border flood at 35% fuzz, plus enclosed background (--holes: green trapped in the swirl marks); the calm owl's leaf is 175 from the key, far past the 89 threshold. Edge despill band 6 (the checker's edge band), debris under 120 px dropped.",
+  "canvas": "512x512, baseline 504, anchor (0.5, 0.984375)",
+  "aura": "The generic chaos swirl shared with the hamster: art/source/critters/hamster/aura-white-raw.png, white lifted, trimmed, scaled 20%, centred."
+ },
+ "measuredCentres": {
+  "auraCentre": {
+   "x": 256,
+   "y": 256
+  },
+  "bodyCentre": {
+   "x": 256,
+   "y": 314
+  }
+ },
+ "centroids": {
+  "calmBody": {
+   "x": 252,
+   "y": 310
+  },
+  "aura": {
+   "x": 259,
+   "y": 262
+  },
+  "unit": "frame px, alpha-weighted"
+ }
+}

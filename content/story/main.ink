@@ -10,6 +10,7 @@ VAR rode_bus = false
 VAR jordan_joined = false
 VAR has_lantern = false
 VAR found_old_trail = false
+VAR clubhouse_claimed = false
 EXTERNAL calmed(id)
 
 === window ===
@@ -55,6 +56,7 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{clubhouse_claimed: The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. # speaker: Fae}
 {found_old_trail: The raccoon's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
 {calmed("gull"): The grumpy gull at the lookout was fizzy too. That raccoon gets around! # speaker: Fae}
 {has_lantern: Jordan gave me his blacklight lantern. The raccoon took a secret trail you can only see in its light! # speaker: Fae}
@@ -416,4 +418,36 @@ You'll never get into my secret club. Not without the password! # speaker: Racco
 - ~ knows_password = true
 ~ raccoon_waiting = false
 With a puff of purple fizz, the raccoon is gone! # speaker: Fae
+-> DONE
+
+=== old_trail_closed ===
+The pines are quiet and snowy. The old trail only appears under the lantern's glow. # speaker: Fae
+-> DONE
+
+=== clubhouse ===
+{clubhouse_claimed: -> clubhouse_again}
+The raccoon's abandoned clubhouse smells like purple fizzy soda. # speaker: Fae
+Comic books are scattered beside a half-eaten fizzy cracker. # speaker: Fae
+With the lantern on, invisible ink glows across the wall: "Meet the boss at the Ancient Tree in the Enchanted Forest." # speaker: Fae
+The Enchanted Forest is sealed. Whoever the boss is, the note does not say. # speaker: Fae
+{calmed("owl"):
+    ~ clubhouse_claimed = true
+    Sue will fix up a fridge for the clubhouse. # speaker: Sue
+    Jordan will start a little garden outside. # speaker: Jordan
+    This is our club now! # speaker: Fae
+}
+-> DONE
+
+= clubhouse_again
+The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a garden. # speaker: Fae
+-> DONE
+
+=== owl_calm ===
+{owl_calm > 1: -> again}
+The owl whispers, "The trees remember every secret." # speaker: Whispering Owl
+The raccoon left purple fizz, comic books, and a cracker in the clubhouse. # speaker: Whispering Owl
+The owl hoots wisely. "The boss waits by the Ancient Tree in the sealed forest." # speaker: Whispering Owl
+-> DONE
+= again
+The wise owl whispers through the leaves. # speaker: Whispering Owl
 -> DONE

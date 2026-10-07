@@ -897,3 +897,15 @@ Multiplayer, merch, speedrun, boss rush, New Game Plus, achievements,
 analytics, voice acting, day/night, weather, fishing and bug minigames, photo
 mode, home customization, and non-English localization. Keep player-facing
 text in Ink or JSON so it stays translatable.
+
+### Milestone 26 additions, The Whispering Woods
+The west Pinecone Pass arrow trigger requires `found_old_trail` and leads to the
+`woods` area, whose reverse trigger returns to the pass. The Whispering Woods is
+a 1750x1100 forest clearing in the `forest` land, with a north clubhouse,
+roaming `owl`, and `clubhouse` interactable. The owl uses `owl.json`, has chaos
+screeches and swoops, a wise `owl_calm` knot, and the full Soothe, Play, Cast,
+Juggle, Snack, and Run command set. The clubhouse knot records the purple soda,
+comic books, half-eaten fizzy cracker, and lantern-revealed note about meeting
+“the boss” at the sealed Ancient Tree in the Enchanted Forest. Once the owl is
+calm it sets `clubhouse_claimed`; Sue promises a fridge and Jordan a garden.
+Journal output records the trail, owl, and clubhouse beats newest first.

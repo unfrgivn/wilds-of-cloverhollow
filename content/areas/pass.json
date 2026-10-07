@@ -1078,6 +1078,35 @@
         "area": "trail",
         "spawn": "pass"
       }
+    },
+    {
+      "id": "woods",
+      "polygon": [
+        [
+          430,
+          620
+        ],
+        [
+          500,
+          620
+        ],
+        [
+          500,
+          660
+        ],
+        [
+          430,
+          660
+        ]
+      ],
+      "requires": {
+        "variable": "found_old_trail",
+        "knot": "old_trail_closed"
+      },
+      "target": {
+        "area": "woods",
+        "spawn": "east"
+      }
     }
   ],
   "interactables": [
@@ -1146,6 +1175,11 @@
       "x": 1420,
       "y": 840,
       "facing": "left"
+    },
+    "woods": {
+      "x": 470,
+      "y": 540,
+      "facing": "right"
     }
   },
   "critters": [

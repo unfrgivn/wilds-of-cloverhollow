@@ -42,6 +42,12 @@
       "name": "Lookout Gull",
       "critter": "gull",
       "frame": "calm_idle_01"
+    },
+    {
+      "id": "whispering-owl",
+      "name": "Whispering Owl",
+      "critter": "owl",
+      "frame": "calm_idle_01"
     }
   ]
 }

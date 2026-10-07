@@ -401,6 +401,31 @@
       "journal": [
         "ev",
         {
+          "VAR?": "clubhouse_claimed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "found_old_trail"
         },
         "/ev",
@@ -415,7 +440,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.11"
               },
               null
             ]
@@ -444,7 +469,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.21"
               },
               null
             ]
@@ -469,7 +494,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.28"
               },
               null
             ]
@@ -494,7 +519,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.28"
+                "->": ".^.^.^.35"
               },
               null
             ]
@@ -531,7 +556,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.43"
+                "->": ".^.^.^.50"
               },
               null
             ]
@@ -556,7 +581,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.50"
+                "->": ".^.^.^.57"
               },
               null
             ]
@@ -590,7 +615,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.63"
+                "->": ".^.^.^.70"
               },
               null
             ]
@@ -619,7 +644,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.73"
+                "->": ".^.^.^.80"
               },
               null
             ]
@@ -644,7 +669,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.80"
+                "->": ".^.^.^.87"
               },
               null
             ]
@@ -669,7 +694,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.87"
+                "->": ".^.^.^.94"
               },
               null
             ]
@@ -699,7 +724,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.97"
+                "->": ".^.^.^.104"
               },
               null
             ]
@@ -729,7 +754,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.107"
+                "->": ".^.^.^.114"
               },
               null
             ]
@@ -754,7 +779,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.114"
+                "->": ".^.^.^.121"
               },
               null
             ]
@@ -783,7 +808,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.124"
+                "->": ".^.^.^.131"
               },
               null
             ]
@@ -821,7 +846,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.147"
               },
               null
             ]
@@ -850,7 +875,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.150"
+                "->": ".^.^.^.157"
               },
               null
             ]
@@ -875,7 +900,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.157"
+                "->": ".^.^.^.164"
               },
               null
             ]
@@ -904,7 +929,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.168"
+                "->": ".^.^.^.175"
               },
               null
             ]
@@ -933,7 +958,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.179"
+                "->": ".^.^.^.186"
               },
               null
             ]
@@ -2894,6 +2919,179 @@
         ],
         null
       ],
+      "old_trail_closed": [
+        "^The pines are quiet and snowy. The old trail only appears under the lantern's glow. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "clubhouse": [
+        "ev",
+        {
+          "VAR?": "clubhouse_claimed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.clubhouse_again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The raccoon's abandoned clubhouse smells like purple fizzy soda. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Comic books are scattered beside a half-eaten fizzy cracker. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^With the lantern on, invisible ink glows across the wall: \"Meet the boss at the Ancient Tree in the Enchanted Forest.\" ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^The Enchanted Forest is sealed. Whoever the boss is, the note does not say. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^owl",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "clubhouse_claimed",
+                "re": true
+              },
+              "^Sue will fix up a fridge for the clubhouse. ",
+              "#",
+              "^speaker: Sue",
+              "/#",
+              "\n",
+              "^Jordan will start a little garden outside. ",
+              "#",
+              "^speaker: Jordan",
+              "/#",
+              "\n",
+              "^This is our club now! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.33"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "done",
+        {
+          "clubhouse_again": [
+            "^The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a garden. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "owl_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The owl whispers, \"The trees remember every secret.\" ",
+        "#",
+        "^speaker: Whispering Owl",
+        "/#",
+        "\n",
+        "^The raccoon left purple fizz, comic books, and a cracker in the clubhouse. ",
+        "#",
+        "^speaker: Whispering Owl",
+        "/#",
+        "\n",
+        "^The owl hoots wisely. \"The boss waits by the Ancient Tree in the sealed forest.\" ",
+        "#",
+        "^speaker: Whispering Owl",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The wise owl whispers through the leaves. ",
+            "#",
+            "^speaker: Whispering Owl",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -2945,6 +3143,10 @@
         false,
         {
           "VAR=": "found_old_trail"
+        },
+        false,
+        {
+          "VAR=": "clubhouse_claimed"
         },
         "/ev",
         "end",

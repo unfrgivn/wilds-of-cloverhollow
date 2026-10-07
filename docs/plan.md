@@ -716,3 +716,17 @@ more bad guys, and the blacklight lantern, made and built while away.
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the
 clubhouse, and more mini-bosses (people under the chaos spell, NOTES.md).
+
+### Milestone 26, The Whispering Woods (2026-10-07)
+The old pine trail west of Pinecone Pass now opens only after the blacklight
+arrow is found. Fae enters a 1750x1100 green clearing with pines, oaks, ferns,
+mossy logs, mushrooms, a stream, stepping stones, and the raccoon's clubhouse
+at its north edge. The clubhouse contains purple soda bottles, comics, and a
+half-eaten fizzy cracker. With the lantern on, its wall reveals the raccoon's
+note: meet “the boss” at the Ancient Tree in the sealed Enchanted Forest.
+
+A chaos owl roams the clearing. Its commands are Soothe, Play, Cast, Juggle,
+Snack, and Run, with a screeching/swooping battle and a wise whispering calm
+knot. After the owl is calm, the clubhouse becomes Fae's club. Sue promises a
+fridge and Jordan promises a garden. Journal notes are newest first, including
+the old trail, the owl, and the clubhouse claim.

@@ -1,0 +1,70 @@
+{
+  "asset": "hamster",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 8,
+  "date": "2026-10-06",
+  "referenceImages": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+  ],
+  "selectedOutputs": [
+    "art/source/critters/hamster/chaos-raw.png",
+    "art/source/critters/hamster/burst-raw.png",
+    "art/source/critters/hamster/soothed-raw.png",
+    "art/source/critters/hamster/calm-raw.png",
+    "art/source/critters/hamster/aura-white-raw.png"
+  ],
+  "scaleFactors": {
+    "chaos_idle_01": "uniform 380px target",
+    "chaos_burst_01": "uniform 380px target",
+    "soothed_01": "uniform 380px target",
+    "calm_idle_01": "uniform 380px target",
+    "chaos_aura_01": 0.2
+  },
+  "postProcessing": {
+    "keyColor": "#00FF00",
+    "fuzz": "18%",
+    "despill": "global-green after magenta-to-green border flood conversion, then edge cleanup",
+    "frameCanvas": "512x512 source px",
+    "baseline": 504,
+    "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON",
+    "cleanup": "drop-islands.ts --min 120 only; preserves disconnected chaos swirls, stars, scribbles, and burst snowballs while removing only tiny matte debris; no morphology."
+  },
+  "checker": {
+    "bodyFrames": [
+      "calm_idle_01",
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01"
+    ],
+    "auraFrames": [
+      "chaos_aura_01"
+    ],
+    "matteMethods": {
+      "body": "green-key",
+      "aura": "white-lift"
+    },
+    "bodyHue": {
+      "min": 0.0,
+      "max": 0.3,
+      "minFraction": 0.3
+    }
+  },
+  "keyColourJustification": "#00FF00 is absent from the hamster subject; the selected raw backgrounds are magenta, which the deterministic build converts only in the background matte before green keying so the purple/teal chaos marks are not mistaken for magenta spill.",
+  "review": [
+    "art/review/hamster-sheet-cream.png",
+    "art/review/hamster-sheet-dark.png",
+    "art/review/hamster-with-pup.png"
+  ],
+  "measuredCentres": {
+    "auraCentre": {
+      "x": 256,
+      "y": 256
+    },
+    "bodyCentre": {
+      "x": 256,
+      "y": 314
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "asset": "pass ground",
+  "date": "2026-10-06",
+  "model": "gemini-3-pro-image",
+  "calls": 4,
+  "references": [
+    "docs/art/concepts/environments/pinecone_pass_environment.png",
+    "docs/art/concepts/props/bus_station.png"
+  ],
+  "selected": "art/source/areas/pass/pass-raw.png",
+  "prompt_summary": "Snowy Pinecone Pass with ski lift, lodge, open-front hot chocolate stand, bus shelter, paths, central clearing, snowman, and blank signposts.",
+  "scale_reference": "1750x1100 logical units at 2 source pixels per unit; Fae is 280 source px; lodge door measured approximately 390 source px, pines approximately 560-720 source px, benches approximately 280 source px wide.",
+  "post_processing": [
+    "Pad raw to 2528x1900 with #fcfbf6 at the bottom, resize to 3500x2200 height, and center-extend to 3500x2200.",
+    "Split into two opaque 1750x2200 WebP tiles at quality 88.",
+    "Paper margin colour #fcfbf6 recorded in ground.json."
+  ],
+  "commands": [
+    "magick art/source/areas/pass/pass-raw.png -background '#fcfbf6' -gravity south -extent 2528x1900 -resize x2200 -gravity center -extent 3500x2200 art/scratch/pass-canvas.png",
+    "magick art/scratch/pass-canvas.png -crop 1750x2200+0+0 +repage -quality 88 -define webp:lossless=false public/assets/areas/pass/ground_0_0.webp",
+    "magick art/scratch/pass-canvas.png -crop 1750x2200+1750+0 +repage -quality 88 -define webp:lossless=false public/assets/areas/pass/ground_1_0.webp"
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/pass/ground_0_0.webp",
+      "public/assets/areas/pass/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/pass/ground.json"
+  },
+  "owner_review": [
+    "art/review/pass-owner-review.png"
+  ]
+}

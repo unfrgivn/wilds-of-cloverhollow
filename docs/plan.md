@@ -356,8 +356,9 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).
-- Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md). Jordan's
-  atlas is drawn (`art/recipes/jordan.json`, `tools/art/build-jordan.ts`). Decided
+- Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md). Drawn
+  ahead: Jordan's atlas, the Pinecone Pass painting, and its hamster hiker
+  (`art/recipes/jordan.json`, `pass.json`, `hamster.json`). Decided
   2026-10-06: party members both follow Fae (like Maddie) and help in battles.
   The engine already has what the areas need: painted areas, people who come
   and go, locked doors, generic critters, and (Milestone 17) a party that

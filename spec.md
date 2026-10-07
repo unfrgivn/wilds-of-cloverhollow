@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-06 (Milestone 18, Sue joins)
+Last updated: 2026-10-06 (Milestone 19, Bubblegum Bay)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -302,12 +302,25 @@ ios/            Capacitor iOS project (from Milestone 4).
   frozen.
 - Prototype areas: `bedroom` (from `hero_house_bedroom.png`), `kitchen`
   (the downstairs family room), `plaza` (from `town_center_plaza.png`), and
-  `park` (Meadow Park, from `meadow_park_environment.png`), and `school` (the
-  school hallway, from `school_interior.png`). The house is wired bedroom door
-  to the kitchen's stairs, the kitchen's front door to the plaza, and the
-  plaza's house door back to the kitchen; the plaza's lower-right cobbled path
-  leads to the park and the lower-left path to the school's front doors, and
-  each leads back.
+  `park` (Meadow Park, from `meadow_park_environment.png`), `school` (the
+  school hallway, from `school_interior.png`), and `bay` (Bubblegum Bay, from
+  `beach_cove_environment.png`). The house is wired bedroom door to the
+  kitchen's stairs, the kitchen's front door to the plaza, and the plaza's
+  house door back to the kitchen; the plaza's lower-right cobbled path leads to
+  the park, the lower-left path to the school's front doors, and the east road
+  (its doorway at the plaza's right edge, x 1600-1625, y 500-610) to the bay,
+  and each leads back. The east road `requires` `club_open` (knot
+  `bay_road_closed`): Fae goes to the bay once the tree house club is open.
+- Bubblegum Bay: a sandy cove with a dock reaching into the water, palms, a
+  blank sign, and a picnic under an umbrella. Fae arrives on the path at the
+  left edge (spawn `plaza-road`, (180, 545) facing right). Its floor is the
+  sand and the dock's planks between the rails; it was traced against a map of
+  the painting itself (`tools/art/paint-map.ts`, checked by
+  `tests/unit/bay-paint.test.ts`). Its occluders draw the dock's near (south)
+  rail in front of Fae on the planks as 25-unit slivers, each with the baseline
+  of its east end, since one baseline can't fit a diagonal rail; the far rail
+  is never drawn over her (`tests/unit/bay-depth.test.ts`). Sue fishes at the
+  dock's far end (a person, `npcs`, until she joins).
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
@@ -456,9 +469,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   them on a fresh install and Continue after the relaunch.
 
 ## 8. Calm-down battles (v0)
-- Critters: the Fizzy Frog (the plaza fountain; calm, the Fountain Frog) and
-  the Zoomie Pup (the park pond; calm, the Pond Pup). They share the battle
-  numbers for now; each has its own lines, atlas, sticker, and calm knot.
+- Critters: the Fizzy Frog (the plaza fountain; calm, the Fountain Frog), the
+  Zoomie Pup (the park pond; calm, the Pond Pup), and the Flappy Bluebird (the
+  bay's sand; calm, the Bay Bluebird, whose burst kicks a gust of sand at
+  Fae). They share the battle numbers for now; each has its own lines, atlas,
+  sticker, and calm knot.
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, snacks,
   command values (`commands.soothe`, `commands.snack`, and
@@ -595,9 +610,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first
-  (the calm pup and his clue toward the school; while only the frog is calm,
-  the purple fizz leading to the park; the calm frog; the raccoon from the
-  notice board; then the morning plan).
+  (the calm bluebird's clue toward the mountains; Sue on the team; the purple
+  hood's school name tag; while the club is open and Sue hasn't joined, the
+  east road to Bubblegum Bay; the club password; the hall pass; the calm pup
+  and his clue toward the school; while only the frog is calm, the purple fizz
+  leading to the park; the calm frog; the raccoon from the notice board; then
+  the morning plan).
   `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
@@ -755,6 +773,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   for Milestones 9 to 15 (the frog's and pup's calm lines, the journal notes,
   Mom and Oliver, the hall-pass puzzle, the raccoon and the tree house).
   "Ms. Maple" stays as the teacher's name for now.
+- Waiting for the owner's review (Milestones 17 to 19, and art drawn ahead):
+  Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay
+  painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass
+  painting, and the hamster hiker (`docs/review-queue.md`).
 - Style bible: `docs/art/style-bible.md`.
 
 ## 13. Out of scope until the owner adds it

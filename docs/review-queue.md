@@ -19,6 +19,9 @@ account is unpaid, so device builds use free personal-team signing.
 | Maddie's proportions (Milestone 17) | She had been drawn twice her height since Milestone 7 (only her width was scaled); she is now the cat in her atlas. Every screenshot with her in it changed |
 | Sue's look (Milestone 18) | Her atlas, from the owner's concept sheet: `art/review/sue-contact-cream.png`, `sue-fae-lineup.png`, `sue-walk-*.gif` |
 | Sue's Cast lines (Milestone 18) | Six battle lines, in `docs/plan.md` (Milestone 18) |
+| Bubblegum Bay (Milestone 19) | The painting, from the owner's beach concept: `art/review/bay-owner-review.png` |
+| The bluebird (Milestone 19) | Its atlas and lines: `art/review/bluebird-sheet-cream.png`, `content/critters/bluebird.json` |
+| Sue's meeting and the bay's lines (Milestone 19) | Listed in `docs/plan.md` (Milestone 19) |
 | Jordan's look | His walk-cycle atlas, drawn ahead of Pinecone Pass from the owner's concept sheet and not in the game yet: `art/review/jordan-contact-sheet.png`, `jordan-lineup.png`, `jordan-walk-*.gif` |
 | Pinecone Pass painting | Drawn ahead of its milestone from the owner's concept: the bus stop where Fae arrives (bottom, left of centre), the lodge, the hot chocolate stand, the snowman, the ski lift, and an open clearing. `art/review/pass-owner-review.png` |
 | The hamster hiker | Pinecone Pass's critter, from the owner's critter sheet: `art/review/hamster-sheet-cream.png`. Not in the game yet |

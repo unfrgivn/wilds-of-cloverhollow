@@ -8,7 +8,7 @@ import {
   resetPaused,
   resume,
   step,
-  queueInput,
+  queueScript,
   readState,
   readHash,
   bunHash,
@@ -84,6 +84,7 @@ for (const item of [
   { name: "hall-pass", fixture: "school" },
   { name: "raccoon", fixture: "school" },
   { name: "chapter-one", fixture: "new-game" },
+  { name: "bay", fixture: "bay" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
@@ -97,8 +98,7 @@ for (const item of [
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
     await openHarness(page);
     await resetPaused(page, fixture);
-    for (const segment of script)
-      await queueInput(page, segment.frame, segment.ticks);
+    await queueScript(page, script);
     await step(
       page,
       script.reduce((total, segment) => total + segment.ticks, 0),

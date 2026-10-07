@@ -1,0 +1,178 @@
+{
+  "cutouts": [
+    {
+      "id": "rail-south-01",
+      "file": "rail-south-01.webp",
+      "x": 1000,
+      "y": 588
+    },
+    {
+      "id": "rail-south-02",
+      "file": "rail-south-02.webp",
+      "x": 1025,
+      "y": 572
+    },
+    {
+      "id": "rail-south-03",
+      "file": "rail-south-03.webp",
+      "x": 1050,
+      "y": 556
+    },
+    {
+      "id": "rail-south-04",
+      "file": "rail-south-04.webp",
+      "x": 1075,
+      "y": 540
+    },
+    {
+      "id": "rail-south-05",
+      "file": "rail-south-05.webp",
+      "x": 1100,
+      "y": 524
+    },
+    {
+      "id": "rail-south-06",
+      "file": "rail-south-06.webp",
+      "x": 1125,
+      "y": 508
+    },
+    {
+      "id": "rail-south-07",
+      "file": "rail-south-07.webp",
+      "x": 1150,
+      "y": 492
+    },
+    {
+      "id": "rail-south-08",
+      "file": "rail-south-08.webp",
+      "x": 1175,
+      "y": 476
+    },
+    {
+      "id": "rail-south-09",
+      "file": "rail-south-09.webp",
+      "x": 1200,
+      "y": 460
+    },
+    {
+      "id": "rail-south-10",
+      "file": "rail-south-10.webp",
+      "x": 1225,
+      "y": 444
+    },
+    {
+      "id": "rail-south-11",
+      "file": "rail-south-11.webp",
+      "x": 1250,
+      "y": 428
+    },
+    {
+      "id": "rail-south-12",
+      "file": "rail-south-12.webp",
+      "x": 1275,
+      "y": 412
+    },
+    {
+      "id": "rail-south-13",
+      "file": "rail-south-13.webp",
+      "x": 1300,
+      "y": 396
+    },
+    {
+      "id": "rail-south-14",
+      "file": "rail-south-14.webp",
+      "x": 1325,
+      "y": 380
+    },
+    {
+      "id": "rail-south-15",
+      "file": "rail-south-15.webp",
+      "x": 1350,
+      "y": 364
+    },
+    {
+      "id": "rail-south-16",
+      "file": "rail-south-16.webp",
+      "x": 1375,
+      "y": 348
+    },
+    {
+      "id": "rail-south-17",
+      "file": "rail-south-17.webp",
+      "x": 1400,
+      "y": 332
+    },
+    {
+      "id": "rail-south-18",
+      "file": "rail-south-18.webp",
+      "x": 1425,
+      "y": 316
+    },
+    {
+      "id": "rail-south-19",
+      "file": "rail-south-19.webp",
+      "x": 1450,
+      "y": 300
+    },
+    {
+      "id": "rail-south-20",
+      "file": "rail-south-20.webp",
+      "x": 1475,
+      "y": 283
+    },
+    {
+      "id": "rail-south-21",
+      "file": "rail-south-21.webp",
+      "x": 1500,
+      "y": 267
+    },
+    {
+      "id": "rail-south-22",
+      "file": "rail-south-22.webp",
+      "x": 1525,
+      "y": 251
+    },
+    {
+      "id": "rail-south-23",
+      "file": "rail-south-23.webp",
+      "x": 1550,
+      "y": 235
+    },
+    {
+      "id": "rail-south-24",
+      "file": "rail-south-24.webp",
+      "x": 1575,
+      "y": 226
+    },
+    {
+      "id": "umbrella",
+      "file": "umbrella.webp",
+      "x": 371,
+      "y": 178
+    },
+    {
+      "id": "sign",
+      "file": "sign.webp",
+      "x": 117,
+      "y": 300
+    },
+    {
+      "id": "palm-top-left",
+      "file": "palm-top-left.webp",
+      "x": 18,
+      "y": 104
+    },
+    {
+      "id": "palm-bottom-left",
+      "file": "palm-bottom-left.webp",
+      "x": 8,
+      "y": 796
+    },
+    {
+      "id": "palm-right",
+      "file": "palm-right.webp",
+      "x": 1626,
+      "y": 706
+    }
+  ]
+}

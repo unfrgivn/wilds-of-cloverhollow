@@ -51,7 +51,10 @@ Has anyone seen a raccoon in a purple hood? # speaker: Notice board
 -> DONE
 
 === journal ===
+{calmed("bluebird"): The Bay Bluebird says the raccoon zipped off toward the mountains. # speaker: Fae}
+{sue_joined: Sue is on my team now! She knows every good fishing spot. # speaker: Fae}
 {club_open: The purple hood in the tree house has a Cloverhollow School name tag. Whose is it? # speaker: Fae}
+{club_open and not sue_joined: The east road leads to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. # speaker: Fae}
 {knows_password and not club_open: The raccoon's club password is "Fizzlesticks". A club... like the tree house in the park? # speaker: Fae}
 {hall_pass: I have a hall pass! Time to follow the raccoon's trail. # speaker: Fae}
 {calmed("pup"): The Pond Pup is calm. A raccoon paw print points toward the school. # speaker: Fae}
@@ -148,6 +151,46 @@ The club is empty. That purple hood belongs to someone at my school... # speaker
 === picnic ===
 A picnic with sandwiches, lemonade, and a basket of berries. # speaker: Fae
 Somebody ate every single berry... and left purple paw prints! # speaker: Fae
+-> DONE
+
+=== bay_road_closed ===
+The east road goes to Bubblegum Bay! # speaker: Fae
+But I want to follow the raccoon's trail first. # speaker: Fae
+-> DONE
+
+=== sue ===
+Whoa, hi! Careful, these planks are a little wobbly. # speaker: Sue
+I'm Sue. I fish here every day... but today the fish are all fizzy! # speaker: Sue
+And that flappy bluebird keeps kicking sand in my bait bucket. # speaker: Sue
+Wait. Purple fizz? Was it a raccoon in a hood? # speaker: Sue
+* [Yes! I'm following his trail.]
+    I knew it! Count me in. # speaker: Sue
+* [I think so. Want to help me find out?]
+    Are you kidding? Of course! Let me grab my rod. # speaker: Sue
+ - ~ sue_joined = true
+-> DONE
+
+=== bluebird_calm ===
+{bluebird_calm > 1: -> again}
+Chirp! Thank you, Fae. My wings feel calm again. # speaker: Bay Bluebird
+The raccoon zipped off toward the mountains! # speaker: Bay Bluebird
+-> DONE
+
+= again
+Chirp-chirp! The bay is peaceful now. # speaker: Bay Bluebird
+-> DONE
+
+=== bay_sign ===
+BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! # speaker: Sign
+-> DONE
+
+=== bay_picnic ===
+A beach picnic: watermelon slices, a sun hat, and a sandy towel. # speaker: Fae
+{not calmed("bluebird"): Everything's covered in sand. That bluebird again! # speaker: Fae}
+-> DONE
+
+=== shells ===
+Pretty shells! They sound like tiny waves when I shake them. # speaker: Fae
 -> DONE
 
 === park_sign ===

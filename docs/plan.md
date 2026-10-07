@@ -352,17 +352,74 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   - Walking toward the camera, the party trails straight behind Fae and Maddie
     is hidden until they stop; the e2e screenshots wait for the party to settle.
 
-## Roadmap after Milestone 18 (proposed, waiting on the owner)
+## Milestone 19: Bubblegum Bay **Status:** ✅ Completed (2026-10-07)
+- Once the tree house club is open, the plaza's east road leads to Bubblegum
+  Bay (before that it plays `bay_road_closed`). Sue is fishing at the dock's
+  far end; whatever Fae answers, she joins. A fizzy bluebird is loose on the
+  sand; Fae calms it with Soothe, Maddie's Play, or Sue's Cast and wins the
+  Bay Bluebird sticker, and the calm bluebird points toward the mountains.
+- Engine: nothing new; the bay is content (an area, a person, a critter, a
+  story variable). The journal gains the bay, Sue, and the mountains.
+- Evidence: unit (`bay.test.ts`, `bay-paint.test.ts`, `bay-depth.test.ts`,
+  `bay-replay.test.ts`), the recorded run `tests/sim/scripts/bay/bay.json`
+  (Sue joins, Cast, the sticker; it replays in Bun and the browser with
+  matching hashes), and e2e with real keys (`bay.spec.ts`: the closed road,
+  chapter one replayed then walked down the east road, the dock to Sue, and
+  Cast in the bluebird battle), with viewed baselines at 1280x720 and 874x402.
+- Wording for the owner:
+  - The closed road: "The east road goes to Bubblegum Bay!" / "But I want to
+    follow the raccoon's trail first."
+  - Sue: "Whoa, hi! Careful, these planks are a little wobbly." / "I'm Sue. I
+    fish here every day... but today the fish are all fizzy!" / "And that
+    flappy bluebird keeps kicking sand in my bait bucket." / "Wait. Purple
+    fizz? Was it a raccoon in a hood?" Choices: "Yes! I'm following his
+    trail." ("I knew it! Count me in.") / "I think so. Want to help me find
+    out?" ("Are you kidding? Of course! Let me grab my rod.")
+  - The sign: "BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome!"
+    The picnic: "A beach picnic: watermelon slices, a sun hat, and a sandy
+    towel." and, until the bluebird is calm, "Everything's covered in sand.
+    That bluebird again!" The shells: "Pretty shells! They sound like tiny
+    waves when I shake them."
+  - The bluebird, calm: "Chirp! Thank you, Fae. My wings feel calm again." /
+    "The raccoon zipped off toward the mountains!", then "Chirp-chirp! The bay
+    is peaceful now." Its battle lines are in `content/critters/bluebird.json`.
+  - Journal: "The east road leads to Bubblegum Bay. The club's fizzy purple
+    soda smelled just like the fountain's bubblegum bubbles." / "Sue is on my
+    team now! She knows every good fishing spot." / "The Bay Bluebird says the
+    raccoon zipped off toward the mountains."
+- Notes and assumptions:
+  - The bay's first geometry was drawn by eye and didn't match the painting
+    (a quarter of the beach was off the floor, blockers stood on bare sand, an
+    occluder sat on the sea). It is now checked against the paint itself:
+    `tools/art/paint-map.ts` reads the painting into 5-unit cells, and two
+    contracts compare the floor, blockers, and occluders with them.
+  - The dock's near rail is drawn in 25-unit slivers, each with the baseline
+    of its east end: a diagonal object can't have one baseline that is right
+    at both ends. Blocker bands keep Fae from walking through the rails where
+    the beach meets the dock.
+  - `tests/unit/party.test.ts` pinned Maddie's end state for every replay
+    script, which forbade new scripts; it now pins the scripts it recorded and
+    allows new ones.
+  - The bluebird's first build sorted figures by centroid and named the burst
+    "idle" (and shrank it 11%); it now names each figure by its cell in the
+    generated sheet and uses one scale for all four.
+  - Browser replays queue a whole script in one round trip (`queueScript` in
+    `tests/e2e/helpers.ts`). One round trip per segment made the chapter-one
+    replay take 72 s in Chromium under load, near its 90 s budget, and the new
+    bay flow timed out; now they take 9 s and 30 s.
+
+## Roadmap after Milestone 19 (proposed, waiting on the owner)
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).
-- Bubblegum Bay and Sue, then Pinecone Pass and Jordan (NOTES.md). Drawn
-  ahead: Jordan's atlas, the Pinecone Pass painting, and its hamster hiker
-  (`art/recipes/jordan.json`, `pass.json`, `hamster.json`). Decided
-  2026-10-06: party members both follow Fae (like Maddie) and help in battles.
-  The engine already has what the areas need: painted areas, people who come
-  and go, locked doors, generic critters, and (Milestone 17) a party that
-  follows and fights; each friend needs an atlas and a `content/party/` entry.
+- Pinecone Pass and Jordan (NOTES.md): the calm bluebird points toward the
+  mountains, and Fae gets there by bus. Drawn ahead: Jordan's atlas, the Pass
+  painting (with its bus stop), and the hamster hiker (`art/recipes/jordan.json`,
+  `pass.json`, `hamster.json`). Still needed: a bus stop in town (a new sprite
+  on the plaza, so the approved painting isn't repainted) and Jordan's battle
+  command (proposed: Juggle, with pinecones). Decided 2026-10-06: party members
+  both follow Fae and help in battles; the engine needs nothing new for him
+  but a `content/party/` entry.
 - Audio: later (owner, 2026-10-06).
 - TestFlight and a paid developer account: later.
 

@@ -12,6 +12,12 @@
       "name": "Pond Pup",
       "critter": "pup",
       "frame": "calm_idle_01"
+    },
+    {
+      "id": "bay-bluebird",
+      "name": "Bay Bluebird",
+      "critter": "bluebird",
+      "frame": "calm_idle_01"
     }
   ]
 }

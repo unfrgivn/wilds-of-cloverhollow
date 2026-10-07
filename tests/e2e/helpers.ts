@@ -28,15 +28,17 @@ export async function step(page: Page, ticks: number): Promise<void> {
   await page.evaluate((count) => window.__cloverhollow?.step(count), ticks);
 }
 
-export async function queueInput(
+// Queues a whole recorded script in one round trip. A long replay has hundreds
+// of segments (chapter one has 290); one evaluate each took over a minute in
+// Chromium under load, most of a long flow's time budget.
+export async function queueScript(
   page: Page,
-  frame: ActionFrame,
-  ticks: number,
+  script: { frame: ActionFrame; ticks: number }[],
 ): Promise<void> {
-  await page.evaluate(
-    (segment) => window.__cloverhollow?.input(segment.frame, segment.ticks),
-    { frame, ticks },
-  );
+  await page.evaluate((segments) => {
+    for (const segment of segments)
+      window.__cloverhollow?.input(segment.frame, segment.ticks);
+  }, script);
 }
 
 export async function readState(page: Page): Promise<State> {

@@ -1,0 +1,60 @@
+{
+ "asset": "bluebird",
+ "status": "owner-review-ready",
+ "model": "gemini-3-pro-image",
+ "validator": "tools/art/critter-check.ts --recipe art/recipes/bluebird.json --atlas public/assets/critters/bluebird/bluebird.png (checker block below)",
+ "selectionReason": "Bluebird's dominant blue body is far from the pure green matte; green keying preserves the blue, sky belly, orange beak and feet, pink cheeks, and rainbow holographic star.",
+ "checker": {
+  "note": "Run bun tools/art/build-bluebird.ts first; rawSources are its connected-component crops from the complete body sheet.",
+  "bodyFrames": [
+   "chaos_idle_01",
+   "chaos_burst_01",
+   "soothed_01",
+   "calm_idle_01"
+  ],
+  "auraFrames": [
+   "chaos_aura_01"
+  ],
+  "rawSources": {
+   "chaos_idle_01": "art/scratch/bluebird-build-frames/source-chaos_idle_01.png",
+   "chaos_burst_01": "art/scratch/bluebird-build-frames/source-chaos_burst_01.png",
+   "soothed_01": "art/scratch/bluebird-build-frames/source-soothed_01.png",
+   "calm_idle_01": "art/scratch/bluebird-build-frames/source-calm_idle_01.png"
+  },
+  "matteMethods": {
+   "body": "green-key",
+   "aura": "white-lift"
+  },
+  "bodyHue": {
+   "min": 0.48,
+   "max": 0.72,
+   "minFraction": 0.3
+  },
+  "psnrThreshold": 25
+ },
+  "generationCalls": "3 for bluebird: two kept calls for the body sheet and white aura, plus one discarded body-sheet regeneration; its temporary generation log was deleted with the earlier worktree.",
+ "selectedRawSources": [
+  "art/source/critters/bluebird/body-sheet-raw.png",
+  "art/source/critters/bluebird/aura-white-raw.png"
+ ],
+ "postProcessing": {
+  "build": "bun tools/art/build-bluebird.ts (rebuilds the atlas byte for byte)",
+  "bodies": "The body sheet is a 2x2 grid (chaos idle, chaos burst / soothed, calm idle). Each figure is extracted whole by connected components: the four largest components are the bodies, every smaller mark (sparkles, the burst's swirls and bubbles) joins the body in its grid cell, and each body is named by its grid cell. Naming by centroid order once swapped idle and burst (the raised wings lift the burst's centroid).",
+  "key": "#00FF00 border flood at 65% fuzz, with edge despill; green is absent from the bluebird body and the rainbow star is small and non-dominant green.",
+  "cleanup": "drop-islands --min 120, then despill-edge --key green --band 2",
+  "canvas": "512x512, baseline 504, anchor (0.5, 0.984375). One scale for all four bodies, the one that makes the chaos idle body 380 px tall; measured bodies: chaos idle 379, burst 358 (crouched, wings up; swirls reach row 103), soothed 391, calm 391 (the sheet drew them about 3% larger; left as drawn).",
+  "aura": "white lifted to alpha, trimmed, scaled 32%, placed at (40, 56)"
+ },
+ "centroids": {
+  "calmBody": {
+   "x": 239,
+   "y": 316
+  },
+  "aura": {
+   "x": 172,
+   "y": 189
+  },
+  "unit": "frame px, alpha-weighted",
+  "measurementNote": "Alpha-weighted centroids of the built calm_idle_01 and chaos_aura_01 frames."
+ }
+}

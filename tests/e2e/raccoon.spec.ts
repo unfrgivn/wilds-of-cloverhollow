@@ -4,7 +4,7 @@ import { parseScript } from "../../src/content/script";
 import {
   longFlowTimeout,
   openHarness,
-  queueInput,
+  queueScript,
   readState,
   renderInfo,
   resetPaused,
@@ -47,7 +47,7 @@ test("after the hall pass the raccoon waits in the plaza, blabs, and vanishes", 
   await resetPaused(page, "school");
   const path = "tests/sim/scripts/school/hall-pass.json";
   const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
-  for (const segment of script) await queueInput(page, segment.frame, segment.ticks);
+  await queueScript(page, script);
   await step(page, script.reduce((total, segment) => total + segment.ticks, 0));
   let state = await readState(page);
   expect(state.area).toBe("plaza");

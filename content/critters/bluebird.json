@@ -1,0 +1,98 @@
+{
+  "id": "bluebird",
+  "name": "Flappy Bluebird",
+  "calmName": "Bay Bluebird",
+  "atlas": "assets/critters/bluebird/bluebird.json",
+  "auraCentre": {
+    "x": 172,
+    "y": 189
+  },
+  "bodyCentre": {
+    "x": 239,
+    "y": 316
+  },
+  "figureHeight": 380,
+  "overworldHeight": 66,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "snacks": 2,
+  "sticker": {
+    "id": "bay-bluebird",
+    "name": "Bay Bluebird",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "bluebird_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy bluebird flaps in circles, kicking up a sandy gust!",
+    "command": "How can Fae calm the flappy bird?",
+    "soothe": {
+      "great": "Fae speaks softly. The bluebird's wings slow to a gentle flutter!",
+      "good": "Fae speaks softly, and the bluebird listens for a moment.",
+      "miss": "The bluebird flaps too fast to hear Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie chases a feather. The bluebird chirps and follows!",
+        "good": "Maddie bats a feather nearby. The bluebird watches.",
+        "miss": "Maddie pounces on a shell. The bluebird flutters higher."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber. The bluebird follows its bright wiggle!",
+        "good": "Sue's bobber bobs past. The bluebird pauses to watch.",
+        "miss": "Sue's ribbon bobber flops in the sand. The bluebird keeps flapping."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. The bluebird chirps happily.",
+    "burst": "The bluebird kicks up a fizzy gust of sand!",
+    "burstResult": {
+      "great": "Fae ducks neatly under the sandy swirl!",
+      "good": "Fae brushes a little sand from her sleeve.",
+      "miss": "Poof! Sand lands all around Fae."
+    },
+    "soothed": "The bluebird settles on a shell, calm and bright.",
+    "reward": "New sticker: Bay Bluebird!",
+    "rest": "Fae is tuckered out. Time for a little rest.",
+    "run": "Fae backs away slowly. The bluebird keeps fluttering."
+  }
+}

@@ -139,8 +139,10 @@ describe("Maddie as party member 0", () => {
   );
   const ends: Record<string, (typeof followerEnds)[keyof typeof followerEnds]> = followerEnds;
 
-  it("has a recorded end state for every replay script", () => {
-    expect(scripts.sort()).toEqual(Object.keys(ends).sort());
+  // The end states were recorded before the party existed; scripts added since
+  // (a new area's run) have no "before" to match, but none may go missing.
+  it("still has every replay script whose end state was recorded", () => {
+    expect(scripts).toEqual(expect.arrayContaining(Object.keys(ends)));
   });
 
   for (const [name, end] of Object.entries(ends)) {

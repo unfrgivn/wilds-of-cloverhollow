@@ -4,16 +4,19 @@ import plazaData from "../../content/areas/plaza.json";
 import kitchenData from "../../content/areas/kitchen.json";
 import parkData from "../../content/areas/park.json";
 import schoolData from "../../content/areas/school.json";
+import bayData from "../../content/areas/bay.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
 import plazaPartyFixtureData from "../../content/fixtures/plaza-party.json";
 import parkFixtureData from "../../content/fixtures/park.json";
 import schoolFixtureData from "../../content/fixtures/school.json";
+import bayFixtureData from "../../content/fixtures/bay.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import frogData from "../../content/critters/frog.json";
 import pupData from "../../content/critters/pup.json";
+import bluebirdData from "../../content/critters/bluebird.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -675,9 +678,11 @@ export function loadContent(): {
   const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
   const park = parseArea(parkData, "content/areas/park.json");
   const school = parseArea(schoolData, "content/areas/school.json");
+  const bay = parseArea(bayData, "content/areas/bay.json");
   const story = storyJson(storyData, "content/story/main.ink.json");
   const frog = parseCritter(frogData, "content/critters/frog.json");
   const pup = parseCritter(pupData, "content/critters/pup.json");
+  const bluebird = parseCritter(bluebirdData, "content/critters/bluebird.json");
   const battle = parseBattleContent(battleData, "content/battle.json");
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -691,7 +696,7 @@ export function loadContent(): {
   );
   if (joinProblems.length > 0)
     throw new Error(`content/party: ${joinProblems.join("; ")}`);
-  const critters = { [frog.id]: frog, [pup.id]: pup };
+  const critters = { [frog.id]: frog, [pup.id]: pup, [bluebird.id]: bluebird };
   const partyProblems = partyErrors(party, critters);
   if (partyProblems.length > 0)
     throw new Error(`content/party: ${partyProblems.join("; ")}`);
@@ -705,6 +710,7 @@ export function loadContent(): {
     ),
     park: parseFixture(parkFixtureData, "content/fixtures/park.json"),
     school: parseFixture(schoolFixtureData, "content/fixtures/school.json"),
+    bay: parseFixture(bayFixtureData, "content/fixtures/bay.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -717,6 +723,7 @@ export function loadContent(): {
     [kitchen.id]: kitchen,
     [park.id]: park,
     [school.id]: school,
+    [bay.id]: bay,
   };
   return {
     world: {

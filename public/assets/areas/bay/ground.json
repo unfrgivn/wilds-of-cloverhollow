@@ -1,0 +1,11 @@
+{
+  "area": "bay",
+  "pxPerUnit": 2,
+  "width": 3500,
+  "height": 2200,
+  "paper": "#fcfbf6",
+  "tiles": [
+    {"file":"ground_0_0.webp","x":0,"y":0,"width":1750,"height":2200},
+    {"file":"ground_1_0.webp","x":1750,"y":0,"width":1750,"height":2200}
+  ]
+}

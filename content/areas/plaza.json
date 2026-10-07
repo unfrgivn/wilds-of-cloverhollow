@@ -1138,6 +1138,35 @@
         "area": "school",
         "spawn": "front-doors"
       }
+    },
+    {
+      "id": "bay-road",
+      "polygon": [
+        [
+          1600,
+          500
+        ],
+        [
+          1625,
+          500
+        ],
+        [
+          1625,
+          610
+        ],
+        [
+          1600,
+          610
+        ]
+      ],
+      "target": {
+        "area": "bay",
+        "spawn": "plaza-road"
+      },
+      "requires": {
+        "variable": "club_open",
+        "knot": "bay_road_closed"
+      }
     }
   ],
   "interactables": [
@@ -1180,6 +1209,11 @@
       "x": 290,
       "y": 930,
       "facing": "up"
+    },
+    "bay-road": {
+      "x": 1550,
+      "y": 550,
+      "facing": "left"
     }
   },
   "critters": [

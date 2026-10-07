@@ -400,6 +400,60 @@
       ],
       "journal": [
         "ev",
+        "str",
+        "^bluebird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Bay Bluebird says the raccoon zipped off toward the mountains. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Sue is on my team now! She knows every good fishing spot. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         {
           "VAR?": "club_open"
         },
@@ -415,7 +469,37 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "club_open"
+        },
+        {
+          "VAR?": "sue_joined"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The east road leads to Bubblegum Bay. The club's fizzy purple soda smelled just like the fountain's bubblegum bubbles. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.31"
               },
               null
             ]
@@ -445,7 +529,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.41"
               },
               null
             ]
@@ -470,7 +554,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.48"
               },
               null
             ]
@@ -499,7 +583,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.31"
+                "->": ".^.^.^.58"
               },
               null
             ]
@@ -537,7 +621,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.47"
+                "->": ".^.^.^.74"
               },
               null
             ]
@@ -566,7 +650,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.57"
+                "->": ".^.^.^.84"
               },
               null
             ]
@@ -591,7 +675,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.64"
+                "->": ".^.^.^.91"
               },
               null
             ]
@@ -620,7 +704,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.75"
+                "->": ".^.^.^.102"
               },
               null
             ]
@@ -649,7 +733,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.86"
+                "->": ".^.^.^.113"
               },
               null
             ]
@@ -1156,6 +1240,213 @@
         "/#",
         "\n",
         "^Somebody ate every single berry... and left purple paw prints! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "bay_road_closed": [
+        "^The east road goes to Bubblegum Bay! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^But I want to follow the raccoon's trail first. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "sue": [
+        [
+          "^Whoa, hi! Careful, these planks are a little wobbly. ",
+          "#",
+          "^speaker: Sue",
+          "/#",
+          "\n",
+          "^I'm Sue. I fish here every day... but today the fish are all fizzy! ",
+          "#",
+          "^speaker: Sue",
+          "/#",
+          "\n",
+          "^And that flappy bluebird keeps kicking sand in my bait bucket. ",
+          "#",
+          "^speaker: Sue",
+          "/#",
+          "\n",
+          "^Wait. Purple fizz? Was it a raccoon in a hood? ",
+          "#",
+          "^speaker: Sue",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Yes! I'm following his trail.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^I think so. Want to help me find out?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^I knew it! Count me in. ",
+              "#",
+              "^speaker: Sue",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Are you kidding? Of course! Let me grab my rod. ",
+              "#",
+              "^speaker: Sue",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "sue_joined",
+                "re": true
+              },
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
+      "bluebird_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Chirp! Thank you, Fae. My wings feel calm again. ",
+        "#",
+        "^speaker: Bay Bluebird",
+        "/#",
+        "\n",
+        "^The raccoon zipped off toward the mountains! ",
+        "#",
+        "^speaker: Bay Bluebird",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Chirp-chirp! The bay is peaceful now. ",
+            "#",
+            "^speaker: Bay Bluebird",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "bay_sign": [
+        "^BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! ",
+        "#",
+        "^speaker: Sign",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "bay_picnic": [
+        "^A beach picnic: watermelon slices, a sun hat, and a sandy towel. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^bluebird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Everything's covered in sand. That bluebird again! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.13"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "shells": [
+        "^Pretty shells! They sound like tiny waves when I shake them. ",
         "#",
         "^speaker: Fae",
         "/#",

@@ -35,7 +35,9 @@ whichever key the frame was keyed on. And no straight edge of 16 px or more may
 be light paint: a run that is opaque on one side and clear on the other is a
 crop cutting through the figure unless its edge is dark ink. The pup's back is
 an ink outline 25 px straight, which passes. Build scripts find whole figures by
-connected components; they never crop to fixed panels or cells.
+connected components; they never crop to fixed panels or cells. Every frame in the
+atlas must be listed in the recipe's checker as a body or an aura frame, so no
+pose ships unchecked.
 
 Aura layers are not chroma-keyed. Purple is deliberately close to the magenta
 key and any translucent glow would make a single-key matte unreliable. The frog

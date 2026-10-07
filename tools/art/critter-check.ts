@@ -148,6 +148,12 @@ const bodyKey: Pixel = matteMethods?.body === "green-key"
 // Frames are read by name from the atlas JSON beside the image.
 const sheet = object(JSON.parse(await Bun.file(atlas.replace(/\.png$/, ".json")).text()));
 const rects = object(sheet?.frames);
+// Every frame in the atlas is checked, as a body or as an aura: a recipe that
+// lists only some frames would let the rest ship unchecked (an owl's recipe
+// once listed one body frame, so its size check compared that frame with
+// itself while the other poses were drawn at a third of its size).
+const unchecked = Object.keys(rects ?? {})
+  .filter((name) => !bodyNames.includes(name) && !auraNames.includes(name));
 function frameImage(name: string): Image {
   const rect = object(object(rects?.[name])?.frame);
   const x = Number(rect?.x); const y = Number(rect?.y);
@@ -267,6 +273,7 @@ const bodyStats = bodyNames.map((name) => {
 const reference = bodyStats[0]?.stats;
 const referenceArea = bodyStats[0] === undefined ? 0 : bodyArea(bodyStats[0].frame);
 console.log(`atlas=${atlas}`);
+check(unchecked.length === 0, `frames no check covers: ${unchecked.join(", ")}`);
 const hueWidth = bodyHue.max - bodyHue.min;
 console.log(`bodyHue ${bodyHue.min}-${bodyHue.max} width=${hueWidth.toFixed(2)}`
   + ` pass=${check(hueWidth > 0 && hueWidth <= maxHueWidth,

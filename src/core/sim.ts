@@ -22,12 +22,14 @@ import type {
 } from "./types";
 import { createInkState, runInk } from "./ink";
 
+// No `lantern`: it's optional, present only while pressed, so a blank frame,
+// a recorded one, and a real key's frame all have the same shape, and a save's
+// last input matches a new game's (spec 3.2, 10).
 export const blankInput = (): ActionFrame => ({
   move: { x: 0, y: 0 },
   confirm: false,
   cancel: false,
   menu: false,
-  lantern: false,
 });
 
 // Fae's feet-anchored body box (spec 5): what her followers hide behind.

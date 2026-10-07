@@ -102,9 +102,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
   -1..1) plus booleans `confirm`, `cancel`, and `menu`, and an optional
-  `lantern` (recorded frames may omit it, so older recordings and their hashes
-  stand). Button edges (pressed this tick) are derived in the core from the
-  previous frame.
+  `lantern`, present only while it's pressed (like a touch `choose`): a blank
+  frame, a recorded one, and a real key's frame then have the same shape, so a
+  save's last input matches a new game's (section 10), and older recordings
+  and their hashes stand. Button edges (pressed this tick) are derived in the
+  core from the previous frame.
 - Taps are never lost: a key pressed since the previous tick counts as held for
   that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape

@@ -19,6 +19,19 @@ describe("save format", () => {
     expect(stableHash(restored)).toBe(stableHash(state));
   });
 
+  it("loads saves whatever the last input was: keys, a recording, the lantern held", () => {
+    // The shell sends `lantern` only while it's pressed, like `choose`, so a
+    // new game's last input must have the same shape as a real key frame;
+    // otherwise every real save is thrown away (Milestone 23 shipped that).
+    const keys: State["previousInput"] = {
+      move: { x: 1, y: 0 }, confirm: false, cancel: false, menu: false,
+    };
+    for (const previousInput of [keys, { ...keys, lantern: true }]) {
+      const state: State = { ...fresh, tick: 7, previousInput };
+      expect(parseSave(serializeSave(state), fresh)).toEqual(state);
+    }
+  });
+
   it("rejects other versions, broken JSON, and states of another shape", () => {
     // Version 1 saves kept Maddie in `maddie` and `trail`, and version 2 saves
     // had no lantern; both start fresh, as does a version from the future.

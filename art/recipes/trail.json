@@ -1,0 +1,44 @@
+{
+  "asset": "cliffside trail ground",
+  "date": "2026-10-06",
+  "status": "owner-review-ready",
+  "model": "gemini-3-pro-image",
+  "calls": 6,
+  "references": [
+    "docs/art/concepts/environments/beach_cove_environment.png",
+    "docs/art/concepts/environments/pinecone_pass_environment.png"
+  ],
+  "selected": "art/source/areas/trail/trail-raw.png",
+  "prompt_summary": "Cliffside Trail from Bubblegum Bay to Pinecone Pass: sandy bottom-right entry, broad zigzagging packed-earth trail, grassy coastal hillside, stream and footbridge, right-edge sea lookout with blank bench, blank fork sign, two open meadow pockets, and snowy pine exit at the left upper third. No people, animals, lettering, frame, or border.",
+  "scale_reference": {
+    "canvas": "1750x1100 logical units at 2 source px per unit",
+    "fae": "140 logical units / 280 source px",
+    "pines": "approximately 280-420 logical units / 560-840 source px, 2-3 Fae heights",
+    "bench": "approximately 140 logical units / 280 source px wide, about Fae width",
+    "bridge": "approximately 168 logical units / 336 source px long, 1.2 Fae heights",
+    "meadows": "two open pockets approximately 300x200 logical units",
+    "trail": "at least 110 logical units / 220 source px wide"
+  },
+  "post_processing": [
+    "The selected raw 2528x1696 generation (art/source/areas/trail/trail-raw.png) is resized and cropped once: magick art/source/areas/trail/trail-raw.png -filter Lanczos -resize 3500x -gravity center -crop 3500x2200+0+0 +repage art/scratch/trail/trail-canvas.png (a uniform 1.384x upscale, trimming 74 source px from top and bottom).",
+    "Split into two opaque 1750x2200 WebP tiles at quality 88: -crop 1750x2200+0+0 and +1750+0.",
+    "Paper margin colour #fcfbf6 recorded in ground.json."
+  ],
+  "commands": [
+    "magick art/source/areas/trail/trail-raw.png -filter Lanczos -resize 3500x -gravity center -crop 3500x2200+0+0 +repage art/scratch/trail/trail-canvas.png",
+    "magick art/scratch/trail/trail-canvas.png -crop 1750x2200+0+0 +repage -quality 88 -define webp:lossless=false public/assets/areas/trail/ground_0_0.webp",
+    "magick art/scratch/trail/trail-canvas.png -crop 1750x2200+1750+0 +repage -quality 88 -define webp:lossless=false public/assets/areas/trail/ground_1_0.webp"
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/trail/ground_0_0.webp",
+      "public/assets/areas/trail/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/trail/ground.json"
+  },
+  "owner_review": [
+    "art/review/trail-owner-review.png",
+    "art/review/trail-grid.png"
+  ],
+  "geometry": "Intentionally omitted. No content/areas JSON or occluder cut-outs are included for this painted trail asset."
+}

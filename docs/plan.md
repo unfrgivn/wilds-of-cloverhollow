@@ -1202,6 +1202,10 @@ more bad guys, and the blacklight lantern, made and built while away.
       and their tools go.
     Until Milestone 34 lands, don't start a milestone that adds or reshapes
     an area; after it, every new area is painted whole and split into a kit.
+  - Milestone 36, gamepad support (spec 3.2): in progress beside Milestones
+    33 and 34 (2026-10-08): `.worktrees/m36-gamepad`, branch `m36-gamepad`.
+    It touches input only (no areas, props, or replays) and lands whenever
+    it's ready.
   - Then: the music teacher's flute, a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

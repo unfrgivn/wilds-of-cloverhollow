@@ -1,0 +1,84 @@
+{
+  "frames": {
+    "cabinet": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 380,
+        "h": 478
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 380,
+        "h": 478
+      },
+      "sourceSize": {
+        "w": 380,
+        "h": 478
+      },
+      "anchor": {
+        "x": 0.46316,
+        "y": 0.98745
+      }
+    },
+    "block-lockers": {
+      "frame": {
+        "x": 382,
+        "y": 0,
+        "w": 300,
+        "h": 454
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 300,
+        "h": 454
+      },
+      "sourceSize": {
+        "w": 300,
+        "h": 454
+      },
+      "anchor": {
+        "x": 0.49,
+        "y": 0.9185
+      }
+    },
+    "wall-post": {
+      "frame": {
+        "x": 684,
+        "y": 0,
+        "w": 90,
+        "h": 183
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 90,
+        "h": 183
+      },
+      "sourceSize": {
+        "w": 90,
+        "h": 183
+      },
+      "anchor": {
+        "x": 0.74444,
+        "y": 0.97814
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 478
+    },
+    "scale": "1"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "frames": {
+    "bleachers": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 750,
+        "h": 605
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 750,
+        "h": 605
+      },
+      "sourceSize": {
+        "w": 750,
+        "h": 605
+      },
+      "anchor": {
+        "x": 0.49067,
+        "y": 0.92231
+      }
+    },
+    "front-benches": {
+      "frame": {
+        "x": 752,
+        "y": 0,
+        "w": 630,
+        "h": 391
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 630,
+        "h": 391
+      },
+      "sourceSize": {
+        "w": 630,
+        "h": 391
+      },
+      "anchor": {
+        "x": 0.58413,
+        "y": 0.97698
+      }
+    },
+    "ball-bin": {
+      "frame": {
+        "x": 1384,
+        "y": 0,
+        "w": 330,
+        "h": 280
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 330,
+        "h": 280
+      },
+      "sourceSize": {
+        "w": 330,
+        "h": 280
+      },
+      "anchor": {
+        "x": 0.47879,
+        "y": 1.01429
+      }
+    },
+    "blue-mats": {
+      "frame": {
+        "x": 0,
+        "y": 607,
+        "w": 410,
+        "h": 259
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 410,
+        "h": 259
+      },
+      "sourceSize": {
+        "w": 410,
+        "h": 259
+      },
+      "anchor": {
+        "x": 0.4878,
+        "y": 0.96525
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 866
+    },
+    "scale": "1"
+  }
+}

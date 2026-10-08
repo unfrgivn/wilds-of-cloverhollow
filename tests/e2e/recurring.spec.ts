@@ -111,7 +111,7 @@ test("the town's cats: one comes out in the plaza once the fountain frog is calm
   // (re-recording chapter one moves it: find it with
   // `bun tools/sim/run.ts tests/sim/scripts/new-game/chapter-one.json --trace`).
   const path = "tests/sim/scripts/new-game/chapter-one.json";
-  const met = 2869;
+  const met = 2857;
   const upTo: ReturnType<typeof recording> = [];
   let ticks = 0;
   for (const segment of recording(path)) {

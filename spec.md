@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 32, the props engine and the plaza kit)
+Last updated: 2026-10-08 (Milestone 33, the indoor kits)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -400,9 +400,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   door; spawn `door` (280, 535) facing right). People: Ms. Maple (`teacher`,
   knot `classroom_teacher`) at (850, 470) by the reading corner, Milo (knot
   `milo`) at (520, 610), and Rosie (knot `rosie`) at (270, 470) by the door.
-  Look points: `art-wall`, `cubbies`, and `reading-corner`. Each desk with its
-  chair, the teacher's desk, the beanbags, and the bookshelf are occluders
-  traced to their painted silhouettes.
+  Look points: `art-wall`, `cubbies`, and `reading-corner`. Its props
+  (section 6.2) are each desk with its chair, the teacher's desk, the cubbies,
+  the bookshelf, and the two beanbags; the strip under the wall-hung
+  chalkboard is a blocker.
 - The gym (Milestone 31): the hall's floor runs off the painting's east edge
   toward the gym. Trigger `gym-doors`, a band along that whole edge (x
   1330-1355, y 614-795), leads to `gym.door` and `requires` `pe_time` (knot
@@ -417,9 +418,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   Look point and never a trigger (it only opens from outside). Coach Ash, the
   PE teacher (`coach`, knot `coach`), stands at (560, 720). Look points:
   `hoop`, `ball-bin`, `climbing-rope`, and `back-door`. The gym pup is its set
-  piece at (850, 650), out on the court. The bleachers, the ball bin, the
-  mats, and the bench pair are blockers and occluders traced to their painted
-  silhouettes.
+  piece at (850, 650), out on the court. Its props (section 6.2) are the
+  bleachers, the ball bin (footed on its four wheels), the mats, and the
+  bench pair; blockers fill the pocket behind the mats, the gaps too narrow
+  to walk through between the bench pair, the bin, and the bleachers, and
+  the floor's front edge under the bench pair.
 - The lasso (Milestone 31) is a story item, `has_lasso`, not a button: Coach
   Ash lends it for his clipboard on the hoop and lets Fae keep it. A Look
   point's knot checks it (the gym's `hoop`), so a lasso spot needs no engine
@@ -564,6 +567,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   sprites cut from its painting, each with a ground footprint (solid), its
   own depth, and states. The ground plate is the painting with the lifted
   props and their cast shadows painted out.
+- A prop is one object, and its picture is that whole object, top to feet,
+  and nothing else. Furniture that reads as one piece is one prop (a desk and
+  its chair). Things fixed to a wall (boards, signs, windows) stay in the
+  painting: nobody walks behind them. A prop's footprint is its own ground
+  contact (from the wall to its front, for wall-backed furniture); anything
+  else solid that isn't an object (a pocket behind furniture nobody should
+  enter, a gap too narrow to walk through, a strip along a wall) is a plain
+  blocker. The authoring check `propDrawingErrors`
+  (`src/content/area-checks.ts`, run by `just check`) holds every prop to its
+  footprint: its picture covers every 5-unit column its footprint covers
+  (one may go spare at an end), except where another prop's picture stands in
+  front of it there, and in those columns reaches to within 15 units of its
+  front.
 - A catalogue, `content/props/<area>.json` (written by `tools/art/kit.ts`),
   lists the area's atlases (Pixi spritesheets in
   `public/assets/areas/<area>/props-N.json`, frames anchored at the prop's
@@ -614,6 +630,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   are painted. Its blockers are the house and the four shops; it has no
   occluders. The south-west critter den moved to (620, 810), clear of the
   arch.
+- The indoor rooms (Milestone 33) are kits too, every prop painted (nothing
+  indoors moves or changes yet; any can be lifted later): the bedroom (the
+  bed, the desk, the desk chair, the shelf, the cat bed), the kitchen (the
+  island, the dining set (the table, its four chairs, and the high chair),
+  the sofa, the stair's newel post; the banister stays in the painting, since
+  Fae never walks behind it), the school hallway (the trophy cabinet, the
+  lockers on the nurse's block, the post at the end of the low front wall),
+  the classroom, the gym, and the arcade (the five cabinets, the ticket
+  counter, the claw machine, the three gumball machines). None has
+  occluders. The kitchen's `stairs` spawn is (600, 650), facing right, so the
+  whole party fits behind Fae at the foot of the stairs.
+- An area's floor is one piece: from any spawn, Fae can walk to every other
+  (`areaConnectionErrors` reports a floor split by furniture).
 
 ## 7. Interaction and dialogue
 - Targeting: the core targets the nearest interactable within
@@ -1145,7 +1174,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   painting's; generated pixels only fill plate holes, finish a prop's parts
   hidden behind another prop, or become masks. The approved painting is kept
   in `art/source/areas/<area>/painting/`; the chosen Gemini samples in
-  `art/source/areas/<area>/kit/`, so a rebuild makes no calls.
+  `art/source/areas/<area>/kit/`, so a rebuild makes no calls. Each
+  subject's samples record the crop they came from (`crop.json`); a changed
+  crop draws its subject again. `masks` reports a subject's errors (its seed
+  or footprint outside its crop), which `pack` refuses, and warnings (its mask
+  running into its crop's edge: the object cut off, or a neighbour leaked in).
 - Gate: the owner approves the style of the first character and the first area
   before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
   hair with bangs and a high bun, white sneakers with orange trim, journal in

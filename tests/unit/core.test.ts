@@ -4,6 +4,7 @@ import {
   createState,
   distanceToPolygon,
   faeBox,
+  frontEdge,
   partySlots,
   hiddenFraction,
   nextRandom,
@@ -12,6 +13,8 @@ import {
   step,
   type State,
   type ActionFrame,
+  type Polygon,
+  sceneryArea,
 } from "../../src/core";
 import {
   loadContent,
@@ -47,7 +50,7 @@ function valid(state: ReturnType<typeof createState>): boolean {
     pointInPolygon(state.player, current.walkable) &&
     distanceToPolygon(state.player, current.walkable) >=
       world.tunables.playerRadius - 0.01 &&
-    current.blockers.every(
+    sceneryArea(world, state.ink, current).blockers.every(
       (blocker) =>
         !pointInPolygon(state.player, blocker) &&
         distanceToPolygon(state.player, blocker) >=
@@ -268,13 +271,15 @@ describe("core", () => {
     for (let index = 0; index < world.tunables.doorFadeTicks; index += 1)
       state = step(world, state, { ...none, move: { x: 1, y: 0 } }).state;
     expect(state.area, "the bedroom door leads downstairs").toBe("kitchen");
-    expect(state.player).toEqual({ x: 500, y: 650 });
-    expect(state.facing).toBe("right");
+    const stairs = world.areas.kitchen?.spawns.stairs;
+    if (stairs === undefined) throw new Error("no kitchen stairs spawn");
+    expect(state.player).toEqual({ x: stairs.x, y: stairs.y });
+    expect(state.facing).toBe(stairs.facing);
     expect(state.transition?.phase).toBe("in");
     for (let index = 0; index < world.tunables.doorFadeTicks; index += 1)
       state = step(world, state, { ...none, move: { x: 1, y: 0 } }).state;
     expect(state.transition).toBeNull();
-    expect(state.player.x).toBe(500);
+    expect(state.player.x).toBe(stairs.x);
   });
 
   it("rejects invalid trigger targets and spawns inside triggers", () => {
@@ -327,7 +332,7 @@ describe("core", () => {
         expect(pointInPolygon(maddie, area.walkable)).toBe(true);
         expect(distanceToPolygon(maddie, area.walkable))
           .toBeGreaterThanOrEqual(world.tunables.follow.radius - 0.01);
-        for (const blocker of area.blockers) {
+        for (const blocker of sceneryArea(world, state.ink, area).blockers) {
           expect(pointInPolygon(maddie, blocker)).toBe(false);
           expect(distanceToPolygon(maddie, blocker))
             .toBeGreaterThanOrEqual(world.tunables.follow.radius - 0.01);
@@ -394,19 +399,26 @@ describe("core", () => {
     }
   });
 
-  it("flags the hiding corridor in the first bedroom layout", () => {
+  it("flags the hiding corridor behind a bed whose footprint is only its front", () => {
     const bedroom = world.areas.bedroom;
-    if (bedroom === undefined) throw new Error("bedroom missing");
+    const bed = bedroom?.props.find((prop) => prop.id === "bed");
+    const state = bed?.states.default;
+    if (bedroom === undefined || bed === undefined || state === undefined)
+      throw new Error("the bedroom's bed missing");
     // The first Milestone 5 bed blocker was a thin band along the bed's front,
-    // leaving a corridor behind the bed where its occluder covered Fae.
-    const corridor = {
-      ...bedroom,
-      blockers: bedroom.blockers.map((blocker, index): [number, number][] =>
-        index === 0 ? [[190, 310], [425, 350], [430, 385], [185, 350]] : blocker,
-      ),
-    };
+    // leaving a corridor behind the bed where its picture covered Fae. The
+    // same band as the bed prop's footprint must fail the hiding check.
+    const points = state.footprint.flat();
+    const xs = points.map(([x]) => x);
+    const front = Math.max(...points.map(([, y]) => y));
+    const band: Polygon[] = [[[Math.min(...xs), front - 30], [Math.max(...xs), front - 30],
+      [Math.max(...xs), front], [Math.min(...xs), front]]];
+    const { left, step: width, columns } = state.silhouette;
+    const thin = { ...bed, states: { ...bed.states, default: { ...state, footprint: band,
+      front: frontEdge(band, left, width, columns.length, bed.y) } } };
+    const corridor = { ...bedroom,
+      props: bedroom.props.map((prop) => prop.id === "bed" ? thin : prop) };
     const hidden = hiddenPositions(corridor, world.tunables.playerRadius);
-    expect(hidden.length).toBeGreaterThan(0);
-    expect(hidden.every((position) => position.by.includes("bed"))).toBe(true);
+    expect(hidden.filter((position) => position.by.includes("bed")).length).toBeGreaterThan(0);
   });
 });

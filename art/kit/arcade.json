@@ -1,0 +1,575 @@
+{
+  "area": "arcade",
+  "subjects": [
+    {
+      "id": "cabinet-left",
+      "crop": [
+        190,
+        70,
+        145,
+        420
+      ],
+      "seed": [
+        215,
+        400
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the leftmost arcade cabinet, the mint green one with a pink diagonal stripe on its side, a cream screen and a dark lower front, whole from its top to its feet, not the pale teal cabinet beside it, and not the brick wall behind it, its string of lights, or the neon signs on it",
+      "footprint": [
+        [
+          [
+            219,
+            440
+          ],
+          [
+            279,
+            466
+          ],
+          [
+            344,
+            441
+          ],
+          [
+            284,
+            415
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 3
+      },
+      "core": 2
+    },
+    {
+      "id": "cabinet-second",
+      "crop": [
+        275,
+        55,
+        135,
+        400
+      ],
+      "seed": [
+        350,
+        420
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the second arcade cabinet from the left, the pale teal one with a cream screen and red buttons, whole from its top to its feet, not the mint cabinet on its left or the purple cabinet on its right, and not the brick wall behind it, its string of lights, or the neon signs on it",
+      "footprint": [
+        [
+          [
+            307,
+            407
+          ],
+          [
+            367,
+            433
+          ],
+          [
+            425,
+            412
+          ],
+          [
+            365,
+            386
+          ]
+        ]
+      ],
+      "front": [
+        "cabinet-left"
+      ],
+      "samples": {
+        "object": 3
+      },
+      "core": 2
+    },
+    {
+      "id": "cabinet-middle",
+      "crop": [
+        355,
+        35,
+        135,
+        390
+      ],
+      "seed": [
+        450,
+        360
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the middle purple star-decorated arcade cabinet, including its screen, controls, body and base, not the neighboring cabinets",
+      "footprint": [
+        [
+          [
+            380,
+            380
+          ],
+          [
+            440,
+            406
+          ],
+          [
+            495,
+            387
+          ],
+          [
+            435,
+            361
+          ]
+        ]
+      ],
+      "front": [
+        "cabinet-second"
+      ],
+      "samples": {
+        "object": 2
+      },
+      "core": 2
+    },
+    {
+      "id": "cabinet-fourth",
+      "crop": [
+        445,
+        185,
+        135,
+        210
+      ],
+      "seed": [
+        520,
+        330
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the lavender-blue arcade cabinet in the centre of the image, with a light blue screen and a grey lower panel, whole from its top to its feet; not the purple cabinet at the left edge of the image, not the orange cabinet on the right, and not the brick wall behind it",
+      "footprint": [
+        [
+          [
+            444,
+            356
+          ],
+          [
+            504,
+            382
+          ],
+          [
+            555,
+            365
+          ],
+          [
+            495,
+            339
+          ]
+        ]
+      ],
+      "front": [
+        "cabinet-middle"
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 2
+    },
+    {
+      "id": "cabinet-rear",
+      "crop": [
+        515,
+        10,
+        135,
+        365
+      ],
+      "seed": [
+        590,
+        320
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the rear orange arcade cabinet at the end of the row, including its screen, controls, body and base, not the ticket counter",
+      "footprint": [
+        [
+          [
+            507,
+            332
+          ],
+          [
+            567,
+            358
+          ],
+          [
+            620,
+            339
+          ],
+          [
+            560,
+            313
+          ]
+        ]
+      ],
+      "front": [
+        "cabinet-fourth"
+      ],
+      "samples": {
+        "object": 2
+      },
+      "core": 2
+    },
+    {
+      "id": "ticket-counter",
+      "crop": [
+        615,
+        75,
+        280,
+        400
+      ],
+      "seed": [
+        760,
+        300
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the prize ticket counter with its red-and-cream striped awning, wooden counter front, posts and jars, not the claw machine",
+      "footprint": [
+        [
+          [
+            659,
+            390
+          ],
+          [
+            806,
+            441
+          ],
+          [
+            864,
+            419
+          ],
+          [
+            717,
+            368
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "core": 3,
+      "solid": true
+    },
+    {
+      "id": "claw-machine",
+      "crop": [
+        840,
+        165,
+        250,
+        370
+      ],
+      "seed": [
+        950,
+        350
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the large pastel claw prize machine with its glass chamber, claw, plush prizes, control shelf and lower cabinet, not the gumball machines",
+      "footprint": [
+        [
+          [
+            861,
+            458
+          ],
+          [
+            978,
+            504
+          ],
+          [
+            1046,
+            467
+          ],
+          [
+            929,
+            421
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "front": [
+        "gumball-red"
+      ],
+      "core": 3,
+      "solid": true
+    },
+    {
+      "id": "gumball-red",
+      "crop": [
+        1000,
+        330,
+        100,
+        220
+      ],
+      "seed": [
+        1050,
+        430
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the left red gumball machine with round globe, pedestal, dispenser and base, not the claw machine or other gumballs",
+      "footprint": [
+        [
+          [
+            1069.0,
+            487.0
+          ],
+          [
+            1067.7,
+            489.7
+          ],
+          [
+            1064.0,
+            491.9
+          ],
+          [
+            1058.5,
+            493.5
+          ],
+          [
+            1052.0,
+            494.0
+          ],
+          [
+            1045.5,
+            493.5
+          ],
+          [
+            1040.0,
+            491.9
+          ],
+          [
+            1036.3,
+            489.7
+          ],
+          [
+            1035.0,
+            487.0
+          ],
+          [
+            1036.3,
+            484.3
+          ],
+          [
+            1040.0,
+            482.1
+          ],
+          [
+            1045.5,
+            480.5
+          ],
+          [
+            1052.0,
+            480.0
+          ],
+          [
+            1058.5,
+            480.5
+          ],
+          [
+            1064.0,
+            482.1
+          ],
+          [
+            1067.7,
+            484.3
+          ]
+        ]
+      ],
+      "front": [
+        "gumball-yellow"
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 2,
+      "solid": true
+    },
+    {
+      "id": "gumball-yellow",
+      "crop": [
+        1050,
+        340,
+        100,
+        220
+      ],
+      "seed": [
+        1090,
+        440
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the yellow gumball machine with round globe, pedestal, dispenser and base, not the neighboring gumballs",
+      "footprint": [
+        [
+          [
+            1099.0,
+            497.0
+          ],
+          [
+            1097.8,
+            500.1
+          ],
+          [
+            1094.3,
+            502.7
+          ],
+          [
+            1089.1,
+            504.4
+          ],
+          [
+            1083.0,
+            505.0
+          ],
+          [
+            1076.9,
+            504.4
+          ],
+          [
+            1071.7,
+            502.7
+          ],
+          [
+            1068.2,
+            500.1
+          ],
+          [
+            1067.0,
+            497.0
+          ],
+          [
+            1068.2,
+            493.9
+          ],
+          [
+            1071.7,
+            491.3
+          ],
+          [
+            1076.9,
+            489.6
+          ],
+          [
+            1083.0,
+            489.0
+          ],
+          [
+            1089.1,
+            489.6
+          ],
+          [
+            1094.3,
+            491.3
+          ],
+          [
+            1097.8,
+            493.9
+          ]
+        ]
+      ],
+      "front": [
+        "gumball-red-right"
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 2,
+      "solid": true
+    },
+    {
+      "id": "gumball-red-right",
+      "crop": [
+        1090,
+        350,
+        90,
+        220
+      ],
+      "seed": [
+        1130,
+        450
+      ],
+      "painted": true,
+      "ground": "the checkerboard arcade floor",
+      "object": "the right red gumball machine with round globe, pedestal, dispenser and base, not the neighboring gumballs",
+      "footprint": [
+        [
+          [
+            1132.0,
+            508.0
+          ],
+          [
+            1130.7,
+            511.4
+          ],
+          [
+            1127.0,
+            514.4
+          ],
+          [
+            1121.5,
+            516.3
+          ],
+          [
+            1115.0,
+            517.0
+          ],
+          [
+            1108.5,
+            516.3
+          ],
+          [
+            1103.0,
+            514.4
+          ],
+          [
+            1099.3,
+            511.4
+          ],
+          [
+            1098.0,
+            508.0
+          ],
+          [
+            1099.3,
+            504.6
+          ],
+          [
+            1103.0,
+            501.6
+          ],
+          [
+            1108.5,
+            499.7
+          ],
+          [
+            1115.0,
+            499.0
+          ],
+          [
+            1121.5,
+            499.7
+          ],
+          [
+            1127.0,
+            501.6
+          ],
+          [
+            1130.7,
+            504.6
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 2,
+      "solid": true
+    }
+  ]
+}

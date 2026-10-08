@@ -1,0 +1,132 @@
+{
+  "frames": {
+    "desk": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 593
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 593
+      },
+      "sourceSize": {
+        "w": 390,
+        "h": 593
+      },
+      "anchor": {
+        "x": 0.52308,
+        "y": 1.0253
+      }
+    },
+    "shelf": {
+      "frame": {
+        "x": 392,
+        "y": 0,
+        "w": 310,
+        "h": 538
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 310,
+        "h": 538
+      },
+      "sourceSize": {
+        "w": 310,
+        "h": 538
+      },
+      "anchor": {
+        "x": 0.56452,
+        "y": 1.00372
+      }
+    },
+    "bed": {
+      "frame": {
+        "x": 704,
+        "y": 0,
+        "w": 570,
+        "h": 413
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 570,
+        "h": 413
+      },
+      "sourceSize": {
+        "w": 570,
+        "h": 413
+      },
+      "anchor": {
+        "x": 0.48596,
+        "y": 1.01453
+      }
+    },
+    "desk-chair": {
+      "frame": {
+        "x": 1276,
+        "y": 0,
+        "w": 180,
+        "h": 354
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 180,
+        "h": 354
+      },
+      "sourceSize": {
+        "w": 180,
+        "h": 354
+      },
+      "anchor": {
+        "x": 0.61667,
+        "y": 0.99435
+      }
+    },
+    "cat-bed": {
+      "frame": {
+        "x": 1458,
+        "y": 0,
+        "w": 250,
+        "h": 212
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 212
+      },
+      "sourceSize": {
+        "w": 250,
+        "h": 212
+      },
+      "anchor": {
+        "x": 0.52,
+        "y": 1.13208
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 593
+    },
+    "scale": "1"
+  }
+}

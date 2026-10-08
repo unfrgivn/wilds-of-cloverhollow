@@ -17,6 +17,7 @@ import {
   type Point,
   type State,
   type World,
+  sceneryArea,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
@@ -59,7 +60,7 @@ function validFollowerPoint(state: State, point: Point): boolean {
   const clear = tune.radius - 0.01;
   if (!pointInPolygon(point, area.walkable)) return false;
   if (distanceToPolygon(point, area.walkable) < clear) return false;
-  return area.blockers.every(
+  return sceneryArea(world, state.ink, area).blockers.every(
     (blocker) => !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= clear,
   );
 }

@@ -1,0 +1,174 @@
+{
+  "area": "school",
+  "subjects": [
+    {
+      "id": "cabinet",
+      "crop": [
+        690,
+        170,
+        220,
+        330
+      ],
+      "seed": [
+        800,
+        380
+      ],
+      "painted": true,
+      "ground": "the checkered school hallway floor",
+      "object": "the central wooden trophy display cabinet with glass doors, shelves, trophies, lower drawers and short feet, not the wall or people",
+      "footprint": [
+        [
+          [
+            730,
+            415
+          ],
+          [
+            742,
+            433
+          ],
+          [
+            835,
+            462
+          ],
+          [
+            870,
+            458
+          ],
+          [
+            880,
+            446
+          ],
+          [
+            880,
+            365
+          ],
+          [
+            760,
+            322
+          ],
+          [
+            730,
+            322
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            745,
+            170
+          ],
+          [
+            905,
+            170
+          ],
+          [
+            905,
+            300
+          ],
+          [
+            840,
+            268
+          ],
+          [
+            745,
+            232
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "block-lockers",
+      "crop": [
+        980,
+        380,
+        210,
+        290
+      ],
+      "seed": [
+        1100,
+        560
+      ],
+      "painted": true,
+      "ground": "the checkered school hallway floor",
+      "object": "the blue and green locker block on the west face of the nurse office block, including its doors and feet, not the wall or doorway",
+      "footprint": [
+        [
+          [
+            1006,
+            590
+          ],
+          [
+            1050,
+            598
+          ],
+          [
+            1082,
+            618
+          ],
+          [
+            1140,
+            610
+          ],
+          [
+            1150,
+            600
+          ],
+          [
+            1150,
+            560
+          ],
+          [
+            1006,
+            540
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "wall-post",
+      "crop": [
+        740,
+        690,
+        70,
+        130
+      ],
+      "seed": [
+        770,
+        760
+      ],
+      "painted": true,
+      "ground": "the checkered school hallway floor",
+      "object": "the short square post at the east end of the low foreground wall, including its cap and base, not the wall or floor",
+      "footprint": [
+        [
+          [
+            758,
+            790
+          ],
+          [
+            786,
+            790
+          ],
+          [
+            786,
+            802
+          ],
+          [
+            758,
+            802
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    }
+  ]
+}

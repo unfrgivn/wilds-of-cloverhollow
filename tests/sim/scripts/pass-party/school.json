@@ -5771,7 +5771,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 105
+    "ticks": 95
   },
   {
     "frame": {
@@ -5783,7 +5783,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 3
+    "ticks": 10
   },
   {
     "frame": {
@@ -5795,7 +5795,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 103
+    "ticks": 111
   },
   {
     "frame": {
@@ -7312,30 +7312,6 @@
   {
     "frame": {
       "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 5
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 1,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 5
-  },
-  {
-    "frame": {
-      "move": {
         "x": 1,
         "y": 0
       },
@@ -7343,7 +7319,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 30
+    "ticks": 35
   },
   {
     "frame": {
@@ -7355,31 +7331,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 15
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 1,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 5
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 1,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 10
+    "ticks": 25
   },
   {
     "frame": {
@@ -7415,19 +7367,19 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 40
+    "ticks": 10
   },
   {
     "frame": {
       "move": {
         "x": 1,
-        "y": -1
+        "y": 1
       },
       "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 15
+    "ticks": 10
   },
   {
     "frame": {
@@ -7439,7 +7391,31 @@
       "cancel": false,
       "menu": false
     },
+    "ticks": 10
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
     "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 25
   },
   {
     "frame": {
@@ -7451,7 +7427,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 5
+    "ticks": 10
   },
   {
     "frame": {
@@ -7703,7 +7679,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 21
+    "ticks": 22
   },
   {
     "frame": {

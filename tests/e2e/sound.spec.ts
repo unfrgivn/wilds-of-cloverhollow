@@ -44,7 +44,7 @@ test("walking, a door, M mute, and the journal sound control use real input", as
   await hold(page, "ArrowUp", 20);
   await hold(page, "ArrowRight", 36);
   await hold(page, "ArrowDown", 5);
-  await hold(page, "ArrowLeft", 21);
+  await hold(page, "ArrowLeft", 46);
   await hold(page, "ArrowDown", 36);
   await step(page, 30);
   const doorCues = await soundLog(page);

@@ -1,0 +1,23 @@
+{
+  "area": "bedroom",
+  "pxPerUnit": 2,
+  "width": 2100,
+  "height": 1400,
+  "paper": "#fcfbf6",
+  "tiles": [
+    {
+      "file": "ground_0_0.webp",
+      "x": 0,
+      "y": 0,
+      "width": 1050,
+      "height": 1400
+    },
+    {
+      "file": "ground_1_0.webp",
+      "x": 1050,
+      "y": 0,
+      "width": 1050,
+      "height": 1400
+    }
+  ]
+}

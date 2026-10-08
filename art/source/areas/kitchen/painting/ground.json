@@ -1,0 +1,11 @@
+{
+  "area": "kitchen",
+  "pxPerUnit": 2,
+  "width": 2400,
+  "height": 1520,
+  "paper": "#fcfbf6",
+  "tiles": [
+    {"file":"ground_0_0.webp","x":0,"y":0,"width":1200,"height":1520},
+    {"file":"ground_1_0.webp","x":1200,"y":0,"width":1200,"height":1520}
+  ]
+}

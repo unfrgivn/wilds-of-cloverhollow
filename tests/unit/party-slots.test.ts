@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   distanceToPolygon,
+  everyPropFootprint,
   faeBox,
   hiddenFraction,
   partySlots,
@@ -70,7 +71,9 @@ function oldMaddieSlot(area: Area, fae: Point): Point | undefined {
 
 describe("member zero slot compatibility", () => {
   it("keeps the old zero-hidden candidate for every spawn and facing", () => {
-    for (const area of Object.values(world.areas))
+    for (const room of Object.values(world.areas)) {
+      // Props are solid for the party in every state, as in the area checks.
+      const area = { ...room, blockers: [...room.blockers, ...everyPropFootprint(room)] };
       for (const spawn of Object.values(area.spawns))
         for (const _facing of ["up", "down", "left", "right"] as const) {
           const expected = oldMaddieSlot(area, spawn);
@@ -79,5 +82,6 @@ describe("member zero slot compatibility", () => {
           const actual = partySlots(area, spawn, world.tunables.follow, [maddie])[0]?.slot;
           expect(actual, `${area.id}.${_facing}`).toEqual(expected);
         }
+    }
   });
 });

@@ -74,94 +74,6 @@
       635
     ]
   ],
-  "blockers": [
-    [
-      [
-        722,
-        305
-      ],
-      [
-        885,
-        390
-      ],
-      [
-        885,
-        468
-      ],
-      [
-        722,
-        464
-      ]
-    ]
-  ],
-  "occluders": [
-    {
-      "id": "cabinet",
-      "polygon": [
-        [
-          720,
-          205
-        ],
-        [
-          888,
-          205
-        ],
-        [
-          888,
-          472
-        ],
-        [
-          720,
-          472
-        ]
-      ],
-      "baseline": 462
-    },
-    {
-      "id": "block-lockers",
-      "polygon": [
-        [
-          1006,
-          415
-        ],
-        [
-          1158,
-          440
-        ],
-        [
-          1158,
-          645
-        ],
-        [
-          1006,
-          600
-        ]
-      ],
-      "baseline": 600
-    },
-    {
-      "id": "wall-post",
-      "polygon": [
-        [
-          758,
-          722
-        ],
-        [
-          786,
-          722
-        ],
-        [
-          786,
-          802
-        ],
-        [
-          758,
-          802
-        ]
-      ],
-      "baseline": 798
-    }
-  ],
   "triggers": [
     {
       "id": "front-doors",
@@ -376,5 +288,26 @@
       "visibleWhile": "hood_waiting"
     }
   ],
-  "land": "cloverhollow"
+  "land": "cloverhollow",
+  "props": [
+    {
+      "id": "cabinet",
+      "prop": "cabinet",
+      "x": 805,
+      "y": 462
+    },
+    {
+      "id": "block-lockers",
+      "prop": "block-lockers",
+      "x": 1078,
+      "y": 618
+    },
+    {
+      "id": "wall-post",
+      "prop": "wall-post",
+      "x": 772,
+      "y": 802
+    }
+  ],
+  "blockers": []
 }

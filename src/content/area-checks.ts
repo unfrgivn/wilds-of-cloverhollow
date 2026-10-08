@@ -1,6 +1,7 @@
 import {
   distanceToPolygon,
   everyPropFootprint,
+  frontEdge,
   propCoversPoint,
   type PropState,
   partySlots,
@@ -109,35 +110,52 @@ function near(hiders: Hiders, feet: Point, x0: number, x1: number, y0: number): 
   };
 }
 
-export function reachablePositions(area: Area, radius: number): Point[] {
+/*
+ * Every grid point Fae's feet can reach from a spawn, flooded on the 5-unit
+ * grid, grouped into the floor's connected parts: each part lists the spawns
+ * it holds. A room is one part; a room split in two (by furniture walling off
+ * a door) has a spawn whose part holds no other door.
+ */
+function reachableParts(area: Area, radius: number): { spawns: string[]; points: Point[] }[] {
   const solid = solidOf(area);
-  const seen = new Set<string>();
-  const reachable: Point[] = [];
-  for (const spawn of Object.values(area.spawns)) {
+  const seen = new Map<string, number>();
+  const parts: { spawns: string[]; points: Point[] }[] = [];
+  for (const [name, spawn] of Object.entries(area.spawns)) {
     const start = {
       x: Math.round(spawn.x / GRID) * GRID,
       y: Math.round(spawn.y / GRID) * GRID,
     };
     const key = `${start.x},${start.y}`;
-    if (seen.has(key) || !walkable(area, solid, radius, start)) continue;
-    seen.add(key);
+    const known = seen.get(key);
+    if (known !== undefined) {
+      parts[known]?.spawns.push(name);
+      continue;
+    }
+    if (!walkable(area, solid, radius, start)) continue;
+    const part = { spawns: [name], points: [] as Point[] };
+    const index = parts.push(part) - 1;
+    seen.set(key, index);
     const queue = [start];
-    for (let index = 0; index < queue.length; index += 1) {
-      const point = queue[index];
+    for (let head = 0; head < queue.length; head += 1) {
+      const point = queue[head];
       if (point === undefined) continue;
-      reachable.push(point);
+      part.points.push(point);
       for (const dx of [-GRID, 0, GRID]) {
         for (const dy of [-GRID, 0, GRID]) {
           const next = { x: point.x + dx, y: point.y + dy };
           const nextKey = `${next.x},${next.y}`;
           if (seen.has(nextKey) || !walkable(area, solid, radius, next)) continue;
-          seen.add(nextKey);
+          seen.set(nextKey, index);
           queue.push(next);
         }
       }
     }
   }
-  return reachable;
+  return parts;
+}
+
+export function reachablePositions(area: Area, radius: number): Point[] {
+  return reachableParts(area, radius).flatMap((part) => part.points);
 }
 
 function bodyCoverage(
@@ -184,6 +202,59 @@ export function hiddenPositions(
   });
 }
 
+/*
+ * Authoring check: is every prop drawn whole, standing on its footprint? Its
+ * picture must cover each 5-unit column its footprint covers (one may go
+ * spare at an end), except where another prop's picture stands in front of it
+ * there (a cabinet's side behind its neighbour's), and in those columns reach
+ * to within 15 units of the footprint's front. A crop that missed the object's
+ * foot, a mask that kept only part of it, or a footprint reaching past the
+ * object (an invisible wall, and a front edge that sorts people beside the
+ * object behind it) fails here.
+ */
+export function propDrawingErrors(area: Area): string[] {
+  const drawn = (state: PropState, x: number): [number, number][] =>
+    state.silhouette.columns[Math.floor((x - state.silhouette.left) / state.silhouette.step)]
+      ?? [];
+  const frontAt = (state: PropState, x: number): number | undefined =>
+    state.front.ys[Math.floor((x - state.silhouette.left) / state.silhouette.step)];
+  return area.props.flatMap((prop) => Object.entries(prop.states).flatMap(([name, state]) => {
+    const points = state.footprint.flat();
+    if (points.length === 0) return [];
+    const xs = points.map(([x]) => x);
+    // Another prop's picture in front of this one at x hides it there: drawn
+    // there, with its front south of this footprint's (which may run on past
+    // this prop's own picture, behind its neighbour).
+    const hidden = (x: number): boolean => area.props.some((other) => {
+      if (other.id === prop.id) return false;
+      const theirs = other.states[other.state];
+      const mine = frontEdge(state.footprint, x - state.silhouette.step / 2,
+        state.silhouette.step, 1, prop.y).ys[0];
+      const before = theirs === undefined ? undefined : frontAt(theirs, x);
+      return theirs !== undefined && drawn(theirs, x).length > 0 && mine !== undefined &&
+        before !== undefined && before > mine;
+    });
+    let bare = 0;
+    let front = -Infinity;
+    for (let x = Math.min(...xs) + state.silhouette.step / 2; x < Math.max(...xs);
+      x += state.silhouette.step) {
+      if (drawn(state, x).length === 0) {
+        if (!hidden(x)) bare += 1;
+        continue;
+      }
+      front = Math.max(front, frontAt(state, x) ?? -Infinity);
+    }
+    const foot = Math.max(...state.silhouette.columns.flat().map(([, bottom]) => bottom));
+    const at = `${area.id}: prop ${prop.id} (${name})`;
+    return [
+      ...(bare > 1 ? [`${at} has ${bare} footprint columns with nothing drawn`] : []),
+      ...(front - foot > 15
+        ? [`${at}: its picture's foot is ${Math.round(front - foot)} units above its front`]
+        : []),
+    ];
+  }));
+}
+
 export function areaConnectionErrors(
   areas: Record<string, Area>,
   tunables: Tunables,
@@ -194,7 +265,13 @@ export function areaConnectionErrors(
   const roster = Object.values(party);
   const errors: string[] = [];
   for (const area of Object.values(areas)) {
-    const reachable = reachablePositions(area, radius);
+    // One floor: from any spawn, Fae can walk to every other (and so to every
+    // door). Furniture that walls part of a room off fails here.
+    const parts = reachableParts(area, radius);
+    if (parts.length > 1)
+      errors.push(`${area.id}: its floor is split; spawns ${parts.map((part) =>
+        part.spawns.join(", ")).join(" | ")} can't reach each other`);
+    const reachable = parts.flatMap((part) => part.points);
     const hiders = hidersOf(area);
     for (const interactable of area.interactables) {
       const range = tunables.interact.range;

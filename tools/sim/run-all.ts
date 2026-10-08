@@ -4,6 +4,7 @@ import {
   createState,
   distanceToPolygon,
   pointInPolygon,
+  sceneryArea,
   step,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
@@ -28,8 +29,10 @@ for (const folder of readdirSync(root, { withFileTypes: true })) {
     for (const segment of script) {
       for (let index = 0; index < segment.ticks; index += 1) {
         state = step(content.world, state, segment.frame).state;
-        const area = content.world.areas[state.area];
-        if (area === undefined) throw new Error(`${name}: unknown area ${state.area}`);
+        const room = content.world.areas[state.area];
+        if (room === undefined) throw new Error(`${name}: unknown area ${state.area}`);
+        // Props' current footprints are solid like blockers (spec 6.2).
+        const area = sceneryArea(content.world, state.ink, room);
         if (
           !pointInPolygon(state.player, area.walkable) ||
           distanceToPolygon(state.player, area.walkable) < radius - epsilon

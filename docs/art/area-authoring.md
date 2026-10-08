@@ -15,9 +15,12 @@ painting tiles. The script writes `art/review/bedroom-overlay.png` and an SVG
 source. Inspect the full-size PNG before accepting coordinates. Green marks
 every spot Fae's feet can reach from a spawn, by the core's own collision
 rule: it must cover only open painted floor, never furniture, the floor
-behind it, or the paper outside the painting. Magenta marks the doors (each
+behind it, or the paper outside the painting. Orange marks every prop
+footprint in every state (dashed for painted props), magenta the doors (each
 band covers its whole painted door), cyan the people's footprints (none
-inside furniture), and violet each look point's interaction range. Run
+inside furniture), and violet each look point's interaction range. For a kit,
+`bun tools/art/depth-preview.ts <area>` shows Fae behind and in front of each
+prop, drawn by the renderer's rule. Run
 `bun tools/art/area-occluders.ts content/areas/bedroom.json` after changing an
 occluder. It reassembles the painting, masks and crops each silhouette, and
 writes lossless WebP cutouts plus `occluders.json` beside the ground tiles.

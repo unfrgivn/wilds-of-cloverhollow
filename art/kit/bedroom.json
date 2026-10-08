@@ -1,0 +1,253 @@
+{
+  "area": "bedroom",
+  "subjects": [
+    {
+      "id": "bed",
+      "crop": [
+        150,
+        150,
+        330,
+        270
+      ],
+      "seed": [
+        300,
+        300
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the bedroom floorboards and rug",
+      "object": "the whole wooden bed with its headboard, mattress, pillows, patchwork quilt, footboard, and posts, not the desk or chair",
+      "footprint": [
+        [
+          [
+            180,
+            290
+          ],
+          [
+            450,
+            288
+          ],
+          [
+            450,
+            375
+          ],
+          [
+            430,
+            380
+          ],
+          [
+            200,
+            365
+          ]
+        ]
+      ],
+      "solid": true
+    },
+    {
+      "id": "desk",
+      "crop": [
+        65,
+        280,
+        290,
+        330
+      ],
+      "seed": [
+        160,
+        470
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the bedroom floorboards",
+      "object": "the light wooden writing desk and everything resting on its tabletop, not the separate chair or bed",
+      "footprint": [
+        [
+          [
+            95,
+            400
+          ],
+          [
+            200,
+            400
+          ],
+          [
+            285,
+            470
+          ],
+          [
+            227,
+            625
+          ],
+          [
+            95,
+            625
+          ]
+        ]
+      ],
+      "front": [
+        "desk-chair"
+      ]
+    },
+    {
+      "id": "desk-chair",
+      "crop": [
+        210,
+        345,
+        150,
+        220
+      ],
+      "seed": [
+        285,
+        470
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the bedroom floorboards",
+      "object": "the separate wooden desk chair in front of the desk, including its back, seat, and legs, not the desk",
+      "footprint": [
+        [
+          [
+            245,
+            545
+          ],
+          [
+            255,
+            540
+          ],
+          [
+            275,
+            545
+          ],
+          [
+            305,
+            545
+          ],
+          [
+            320,
+            552
+          ],
+          [
+            315,
+            560
+          ],
+          [
+            250,
+            560
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "shelf",
+      "crop": [
+        700,
+        200,
+        300,
+        450
+      ],
+      "seed": [
+        860,
+        480
+      ],
+      "painted": true,
+      "samples": {
+        "object": 2
+      },
+      "ground": "the bedroom floorboards and wall",
+      "object": "the tall wooden shelving unit with all its books and toys, not the cat bed",
+      "footprint": [
+        [
+          [
+            795,
+            285
+          ],
+          [
+            940,
+            285
+          ],
+          [
+            940,
+            520
+          ],
+          [
+            915,
+            522
+          ],
+          [
+            840,
+            518
+          ],
+          [
+            800,
+            450
+          ]
+        ]
+      ],
+      "front": [
+        "cat-bed"
+      ],
+      "core": 3
+    },
+    {
+      "id": "cat-bed",
+      "crop": [
+        650,
+        350,
+        350,
+        330
+      ],
+      "seed": [
+        880,
+        580
+      ],
+      "painted": true,
+      "samples": {
+        "object": 2
+      },
+      "ground": "the bedroom floorboards",
+      "object": "the low purple and pale green cat bed in the foreground, not the shelf",
+      "footprint": [
+        [
+          [
+            822,
+            582
+          ],
+          [
+            850,
+            572
+          ],
+          [
+            920,
+            572
+          ],
+          [
+            945,
+            590
+          ],
+          [
+            945,
+            625
+          ],
+          [
+            905,
+            630
+          ],
+          [
+            860,
+            628
+          ],
+          [
+            825,
+            605
+          ]
+        ]
+      ],
+      "core": 3
+    }
+  ]
+}

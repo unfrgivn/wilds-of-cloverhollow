@@ -1,0 +1,264 @@
+{
+  "area": "kitchen",
+  "subjects": [
+    {
+      "id": "island",
+      "crop": [
+        390,
+        315,
+        220,
+        250
+      ],
+      "seed": [
+        500,
+        450
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the kitchen floor and the pale floor wash behind the counter",
+      "object": "the complete kitchen island sink counter, including its countertop, cabinet base, sink and faucet, not the back counter",
+      "footprint": [
+        [
+          [
+            422,
+            350
+          ],
+          [
+            575,
+            350
+          ],
+          [
+            575,
+            506
+          ],
+          [
+            422,
+            506
+          ]
+        ]
+      ],
+      "front": [
+        "newel"
+      ],
+      "exclude": [
+        [
+          [
+            390,
+            315
+          ],
+          [
+            610,
+            315
+          ],
+          [
+            610,
+            335
+          ],
+          [
+            390,
+            335
+          ]
+        ],
+        [
+          [
+            390,
+            315
+          ],
+          [
+            415,
+            315
+          ],
+          [
+            415,
+            550
+          ],
+          [
+            390,
+            550
+          ]
+        ],
+        [
+          [
+            380,
+            380
+          ],
+          [
+            413,
+            380
+          ],
+          [
+            413,
+            575
+          ],
+          [
+            380,
+            575
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "dining-set",
+      "crop": [
+        600,
+        210,
+        400,
+        390
+      ],
+      "seed": [
+        785,
+        440
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the kitchen floor and rug around the dining furniture",
+      "object": "the complete dining set: round wooden table with its pedestal and all four surrounding wooden dining chairs, including the high chair if it touches the set; no sofa, wall, or window",
+      "footprint": [
+        [
+          [
+            675,
+            352
+          ],
+          [
+            675,
+            418
+          ],
+          [
+            695,
+            420
+          ],
+          [
+            730,
+            428
+          ],
+          [
+            755,
+            450
+          ],
+          [
+            820,
+            450
+          ],
+          [
+            840,
+            428
+          ],
+          [
+            845,
+            422
+          ],
+          [
+            900,
+            420
+          ],
+          [
+            900,
+            385
+          ],
+          [
+            878,
+            352
+          ],
+          [
+            800,
+            335
+          ],
+          [
+            720,
+            338
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "sofa",
+      "crop": [
+        635,
+        430,
+        190,
+        250
+      ],
+      "seed": [
+        730,
+        580
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the kitchen floor and rug",
+      "object": "the sofa at the lower right, including its arms, cushions, and base, not the rug",
+      "footprint": [
+        [
+          [
+            684,
+            552
+          ],
+          [
+            800,
+            552
+          ],
+          [
+            808,
+            640
+          ],
+          [
+            803,
+            666
+          ],
+          [
+            692,
+            666
+          ],
+          [
+            684,
+            600
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "newel",
+      "crop": [
+        300,
+        480,
+        160,
+        250
+      ],
+      "seed": [
+        390,
+        650
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the kitchen floor and stair landing",
+      "object": "the substantial upright newel post at the foot of the stairs, not the stairs or the long banister",
+      "footprint": [
+        [
+          [
+            372,
+            638
+          ],
+          [
+            395,
+            638
+          ],
+          [
+            395,
+            705
+          ],
+          [
+            372,
+            705
+          ]
+        ]
+      ]
+    }
+  ]
+}

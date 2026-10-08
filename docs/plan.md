@@ -1119,6 +1119,71 @@ the old trail, the owl, and the clubhouse claim.
     `approach` now counts props as solid; the cat meets Fae 6 ticks sooner
     in the re-recorded chapter one.
 
+## Milestone 33: The indoor kits **Status:** ✅ Completed (2026-10-08)
+- The six indoor rooms are kits (spec 6.2), as the owner asked: the bedroom,
+  the kitchen, the school hallway, Ms. Maple's classroom, the gym, and the
+  arcade. Each piece of furniture is a prop cut from the approved painting,
+  with its own ground footprint and depth; none of the rooms has occluders
+  left, and every painting is byte for byte as it was (the props are all
+  painted, so no plate was touched).
+- What a prop is (spec 6.2, `docs/art/kit.md`): one object, whole from its
+  top to its feet, and nothing else. A desk and its chair, or a table and its
+  chairs, are one prop; things fixed to a wall (the classroom's chalkboard,
+  the kitchen's banister run) stay in the painting; a pocket nobody should
+  enter, or a gap too narrow to walk through, is a plain blocker, not part of
+  a footprint. A prop's footprint is its own floor contact, from the wall to
+  its front for wall-backed furniture.
+- Checks that hold the kits to that, all run by `just check`:
+  - `propDrawingErrors` (`src/content/area-checks.ts`): each prop's picture
+    covers every column of its footprint (where no neighbour stands in front
+    of it) and reaches to within 15 units of its front. The first indoor
+    pass failed it 38 times: pictures that were the tops of objects, a claw
+    machine cut down to a speck, a bed footprint 44 units past the bed.
+  - One floor per room (`areaConnectionErrors`): every spawn reaches every
+    other. A sofa footprint cut the kitchen in two, stairs from front door.
+  - `tools/art/kit.ts` stamps each subject's samples with the crop they came
+    from (`crop.json`): a changed crop draws its subject again, and stale
+    kept samples are passed over. `masks` reports errors (a seed or footprint
+    outside the crop), which `pack` refuses, and warnings (a mask running into
+    its crop's edge).
+  - Review tools: `tools/art/prop-frames.ts` (every packed picture on teal,
+    with its footprint and front edge), `tools/art/depth-preview.ts` (Fae
+    behind and in front of each prop, by the renderer's rule), and the area
+    overlay, which now draws prop footprints and uses the area checks' own
+    flood fill.
+- Evidence: unit (`props.test.ts`: every prop drawn whole, the drawing check
+  failing on a footprint pushed off its picture, a wall of crates splitting a
+  room; `core.test.ts`: the bedroom corridor test on the bed prop, the kitchen
+  spawn), the recorded kit walks (`tools/sim/record-kits.ts`: in each room,
+  behind a prop, in front of it, and into it) with matching browser and Bun
+  hashes, the real-key e2e `kits.spec.ts` (each walk with real keys: the prop
+  drawn over Fae behind it and under her in front), and `bedroom.spec.ts` on
+  the bed prop. The sim gate and the test helpers count props as solid.
+- Notes and assumptions:
+  - Every indoor prop is painted, not lifted: nothing indoors moves or breaks
+    yet, painted props need no generated floor, and the plates stay the
+    approved paintings. Any prop can be lifted later by giving it a hole.
+  - Gemini calls: 102 for the six rooms (the arcade 41, the classroom 15, the
+    bedroom and the kitchen 14 each, the gym and the school 9 each), most of
+    them second samples after the first crops proved too small.
+  - One worker's pass replaced six arcade and school samples with images
+    built by hand from the old occluder cutouts. They were replaced with the
+    model's real outputs, and `docs/art/kit.md` now says every kept sample is
+    the model's own.
+  - The kitchen's `stairs` spawn moved from (500, 650) to (600, 650): a third
+    party member had nowhere to stand at the old one. The door round trip's
+    walk back to the stairs is 25 ticks longer for it.
+  - The island's footprint covers its base, so its counter is no longer
+    walkable. The bed's footboard is an upright edge so a walk along the wall
+    stops square at it (the morning run's route is unchanged).
+  - Re-recorded where they cross these rooms: chapter one, the east road,
+    the bus line, the school run, and the gym; `follower-ends.json` re-pinned
+    for the bedroom, chapter one, the door round trip, and the morning.
+  - Milestone 34 (the outdoor kits) checks a footprint against its drawing in
+    `kit.ts` with a 30-unit limit; this milestone's `propDrawingErrors` holds
+    every area to 15 in `just check`. When Milestone 34 rebases, the outdoor
+    kits meet the shared check.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1272,7 +1337,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     better. Refactor everything in this manner."
     - Milestone 32, the props engine and the plaza kit: done (above).
     - Milestone 33, the indoor kits: the bedroom, the kitchen, the school
-      hall, the classroom, the gym, and the arcade.
+      hall, the classroom, the gym, and the arcade. Done (above).
     - Milestone 34, the outdoor kits: the park, Bubblegum Bay, Pinecone Pass,
       the Cliffside Trail, and the Whispering Woods.
       In progress beside Milestone 33 (2026-10-08): `.worktrees/m34`, branch

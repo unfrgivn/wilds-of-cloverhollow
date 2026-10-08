@@ -1,0 +1,108 @@
+{
+  "frames": {
+    "sofa": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 310,
+        "h": 461
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 310,
+        "h": 461
+      },
+      "sourceSize": {
+        "w": 310,
+        "h": 461
+      },
+      "anchor": {
+        "x": 0.47097,
+        "y": 0.99132
+      }
+    },
+    "dining-set": {
+      "frame": {
+        "x": 312,
+        "y": 0,
+        "w": 460,
+        "h": 375
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 460,
+        "h": 375
+      },
+      "sourceSize": {
+        "w": 460,
+        "h": 375
+      },
+      "anchor": {
+        "x": 0.51522,
+        "y": 1.01333
+      }
+    },
+    "island": {
+      "frame": {
+        "x": 774,
+        "y": 0,
+        "w": 340,
+        "h": 293
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 340,
+        "h": 293
+      },
+      "sourceSize": {
+        "w": 340,
+        "h": 293
+      },
+      "anchor": {
+        "x": 0.50294,
+        "y": 1.09215
+      }
+    },
+    "newel": {
+      "frame": {
+        "x": 1116,
+        "y": 0,
+        "w": 70,
+        "h": 260
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 70,
+        "h": 260
+      },
+      "sourceSize": {
+        "w": 70,
+        "h": 260
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.10769
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 461
+    },
+    "scale": "1"
+  }
+}

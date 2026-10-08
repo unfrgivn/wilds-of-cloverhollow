@@ -11,6 +11,7 @@ import {
   type Area,
   type Point,
   type State,
+  everyPropFootprint,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
@@ -38,7 +39,8 @@ function areaFor(id: string): Area {
 function standable(area: Area, point: Point): boolean {
   if (!pointInPolygon(point, area.walkable)) return false;
   if (distanceToPolygon(point, area.walkable) < radius) return false;
-  const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
+  const solid = [...area.blockers, ...everyPropFootprint(area),
+    ...area.npcs.map((npc) => npc.footprint)];
   return solid.every(
     (polygon) => !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius,
   );

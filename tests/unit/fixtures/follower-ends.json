@@ -39,8 +39,8 @@
     "tick": 295,
     "area": "bedroom",
     "player": {
-      "x": 776.1580691786127,
-      "y": 430.1634864179314
+      "x": 779.3843236649041,
+      "y": 430.01865685863925
     },
     "facing": "right",
     "follower": {
@@ -54,7 +54,7 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 3684,
+    "tick": 3672,
     "area": "park",
     "player": {
       "x": 731.1269837220834,
@@ -72,7 +72,7 @@
     }
   },
   "new-game/door-round-trip.json": {
-    "tick": 118,
+    "tick": 143,
     "area": "bedroom",
     "player": {
       "x": 525,
@@ -93,16 +93,16 @@
     "tick": 569,
     "area": "bedroom",
     "player": {
-      "x": 450.001,
+      "x": 470.001,
       "y": 386
     },
     "facing": "down",
     "follower": {
-      "x": 496.45625082034104,
+      "x": 516.4562508203409,
       "y": 339.6301599609373,
       "facing": "left",
       "moving": false,
-      "distance": 351.3403975886223,
+      "distance": 331.34039758862247,
       "stillTicks": 202,
       "trail": 6
     }

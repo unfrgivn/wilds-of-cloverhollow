@@ -5,7 +5,7 @@ import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
 } from "../../src/content/props";
 import {
-  areaConnectionErrors, hiddenPositions, reachablePositions,
+  areaConnectionErrors, hiddenPositions, propDrawingErrors, reachablePositions,
 } from "../../src/content/area-checks";
 import {
   createState, distanceToPolygon, faeBox, frontEdge, pointInPolygon, propCovers,
@@ -204,6 +204,25 @@ describe("props", () => {
       .toContain("harness: spawn start has no slot for maddie");
   });
 
+  it("can't split a room in two: every spawn must reach every other", () => {
+    // A room round the harness spawn, a second spawn 250 units east, and a
+    // wall of crates between them, gap by gap: one floor until the last gap.
+    const spawn = harness.spawns.start;
+    if (spawn === undefined) throw new Error("harness spawn missing");
+    const room = square(spawn.x + 125, spawn.y, 200);
+    const east = { x: spawn.x + 250, y: spawn.y, facing: "left" as const };
+    const spawns = { ...harness.spawns, east };
+    const wall = (gaps: number): Area["props"] =>
+      place(Array.from({ length: 13 - gaps }, (_, index) =>
+        ({ id: `w${index}`, prop: "crate", x: spawn.x + 125, y: spawn.y - 170 + index * 30 })));
+    const split = (gaps: number): string[] =>
+      areaConnectionErrors({ harness: { ...harness, walkable: room, spawns, props: wall(gaps) } },
+        world.tunables, world.critters, world.party).filter((error) => error.includes("split"));
+    expect(split(3)).toEqual([]);
+    expect(split(0))
+      .toEqual(["harness: its floor is split; spawns start | east can't reach each other"]);
+  });
+
   it("match their atlases: every frame there, anchored, and a whole number of columns", () => {
     for (const file of readdirSync("content/props")) {
       const content: unknown = JSON.parse(readFileSync(`content/props/${file}`, "utf8"));
@@ -233,5 +252,30 @@ describe("props", () => {
           if (state.shadow !== null) expect(frames.has(state.shadow), state.shadow).toBe(true);
         }
     }
+  });
+
+  it("are drawn whole: every prop's picture stands on its footprint", () => {
+    // A picture floating above its footprint, or a footprint reaching past its
+    // picture, in any area (spec 6.2).
+    expect(Object.values(world.areas).flatMap(propDrawingErrors)).toEqual([]);
+  });
+
+  it("fail the drawing check with a footprint off their picture", () => {
+    // The plaza's south bench, its footprint pushed 30 units forward and
+    // widened 40 units past its picture's west end.
+    const bench = plaza.props.find((prop) => prop.id === "bench-south");
+    const state = bench?.states.default;
+    if (bench === undefined || state === undefined) throw new Error("no south bench");
+    expect(propDrawingErrors({ ...plaza, props: [bench] })).toEqual([]);
+    const shifted = (state.footprint[0] ?? []).map(([x, y]): [number, number] => [x, y + 30]);
+    const wide: Polygon[] = [[...shifted,
+      [state.silhouette.left - 40, bench.y + 30], [state.silhouette.left - 40, bench.y]]];
+    const { left, step: width, columns } = state.silhouette;
+    const moved = { ...plaza, props: [{ ...bench, states: { default: { ...state,
+      footprint: wide, front: frontEdge(wide, left, width, columns.length, bench.y) } } }] };
+    expect(propDrawingErrors(moved)).toEqual([
+      expect.stringMatching(/^plaza: prop bench-south \(default\) has \d+ footprint columns/),
+      expect.stringMatching(/^plaza: prop bench-south \(default\): its picture's foot is 3\d /),
+    ]);
   });
 });

@@ -1,0 +1,932 @@
+{
+  "area": "classroom",
+  "subjects": [
+    {
+      "id": "desk-rear-left",
+      "crop": [
+        440,
+        440,
+        160,
+        170
+      ],
+      "object": "the small student desk and chair together as one classroom furniture piece",
+      "ground": "the classroom floor",
+      "seed": [
+        515,
+        530
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            480,
+            500
+          ],
+          [
+            550,
+            500
+          ],
+          [
+            550,
+            565
+          ],
+          [
+            480,
+            565
+          ]
+        ]
+      ],
+      "home": [
+        515,
+        565
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "desk-center-left",
+      "crop": [
+        550,
+        490,
+        150,
+        150
+      ],
+      "object": "the small student desk and chair together as one classroom furniture piece",
+      "ground": "the classroom floor",
+      "seed": [
+        615,
+        570
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            580,
+            535
+          ],
+          [
+            650,
+            535
+          ],
+          [
+            650,
+            605
+          ],
+          [
+            580,
+            605
+          ]
+        ]
+      ],
+      "home": [
+        615,
+        605
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "desk-rear-center",
+      "crop": [
+        660,
+        430,
+        160,
+        150
+      ],
+      "object": "the small student desk and chair together as one classroom furniture piece",
+      "ground": "the classroom floor",
+      "seed": [
+        735,
+        515
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [
+        "desk-right-center"
+      ],
+      "exclude": [
+        [
+          [
+            780,
+            505
+          ],
+          [
+            800,
+            505
+          ],
+          [
+            800,
+            520
+          ],
+          [
+            780,
+            520
+          ]
+        ]
+      ],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            700,
+            480
+          ],
+          [
+            770,
+            480
+          ],
+          [
+            770,
+            545
+          ],
+          [
+            700,
+            545
+          ]
+        ]
+      ],
+      "home": [
+        735,
+        545
+      ],
+      "samples": {
+        "object": 2
+      },
+      "states": {}
+    },
+    {
+      "id": "desk-right-center",
+      "crop": [
+        760,
+        470,
+        160,
+        160
+      ],
+      "object": "the small student desk and chair together as one classroom furniture piece",
+      "ground": "the classroom floor",
+      "seed": [
+        835,
+        550
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            800,
+            520
+          ],
+          [
+            875,
+            520
+          ],
+          [
+            875,
+            590
+          ],
+          [
+            800,
+            590
+          ]
+        ]
+      ],
+      "home": [
+        838,
+        590
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "desk-front-center",
+      "crop": [
+        640,
+        540,
+        160,
+        150
+      ],
+      "object": "the small student desk and chair together as one classroom furniture piece",
+      "ground": "the classroom floor",
+      "seed": [
+        715,
+        620
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            680,
+            590
+          ],
+          [
+            750,
+            590
+          ],
+          [
+            750,
+            655
+          ],
+          [
+            680,
+            655
+          ]
+        ]
+      ],
+      "home": [
+        715,
+        655
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "teacher-desk",
+      "crop": [
+        870,
+        330,
+        210,
+        210
+      ],
+      "object": "the teacher's wooden desk and chair together as one classroom furniture piece",
+      "ground": "the classroom floor",
+      "seed": [
+        970,
+        470
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            915,
+            445
+          ],
+          [
+            1040,
+            445
+          ],
+          [
+            1040,
+            510
+          ],
+          [
+            915,
+            510
+          ]
+        ]
+      ],
+      "home": [
+        978,
+        510
+      ],
+      "samples": {
+        "object": 2
+      },
+      "states": {}
+    },
+    {
+      "id": "cubbies",
+      "crop": [
+        430,
+        140,
+        250,
+        280
+      ],
+      "object": "the row of pastel classroom cubbies with hooks and hanging items",
+      "ground": "the classroom wall and floor",
+      "seed": [
+        550,
+        350
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            447,
+            337
+          ],
+          [
+            662,
+            337
+          ],
+          [
+            662,
+            398
+          ],
+          [
+            447,
+            398
+          ]
+        ]
+      ],
+      "home": [
+        555,
+        398
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "bookshelf",
+      "crop": [
+        710,
+        260,
+        160,
+        180
+      ],
+      "object": "the low wooden classroom bookshelf full of picture books",
+      "ground": "the classroom wall and floor",
+      "seed": [
+        780,
+        370
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [
+        [
+          [
+            710,
+            285
+          ],
+          [
+            731,
+            288
+          ],
+          [
+            728,
+            301
+          ],
+          [
+            710,
+            298
+          ]
+        ],
+        [
+          [
+            833,
+            293
+          ],
+          [
+            870,
+            307
+          ],
+          [
+            870,
+            318
+          ],
+          [
+            831,
+            303
+          ]
+        ],
+        [
+          [
+            710,
+            328
+          ],
+          [
+            718,
+            326
+          ],
+          [
+            725,
+            334
+          ],
+          [
+            725,
+            353
+          ],
+          [
+            719,
+            365
+          ],
+          [
+            710,
+            370
+          ]
+        ],
+        [
+          [
+            710,
+            377
+          ],
+          [
+            749,
+            383
+          ],
+          [
+            779,
+            401
+          ],
+          [
+            790,
+            420
+          ],
+          [
+            779,
+            440
+          ],
+          [
+            710,
+            440
+          ]
+        ],
+        [
+          [
+            824,
+            347
+          ],
+          [
+            846,
+            346
+          ],
+          [
+            864,
+            356
+          ],
+          [
+            870,
+            369
+          ],
+          [
+            870,
+            411
+          ],
+          [
+            857,
+            423
+          ],
+          [
+            838,
+            428
+          ],
+          [
+            816,
+            423
+          ],
+          [
+            798,
+            410
+          ],
+          [
+            789,
+            391
+          ],
+          [
+            793,
+            370
+          ],
+          [
+            806,
+            355
+          ]
+        ]
+      ],
+      "core": 2,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            724,
+            351
+          ],
+          [
+            841,
+            351
+          ],
+          [
+            841,
+            381
+          ],
+          [
+            724,
+            381
+          ]
+        ]
+      ],
+      "home": [
+        783,
+        381
+      ],
+      "samples": {
+        "object": 2
+      },
+      "states": {}
+    },
+    {
+      "id": "beanbag-green",
+      "crop": [
+        620,
+        280,
+        140,
+        130
+      ],
+      "object": "the green beanbag chair",
+      "ground": "the classroom floor",
+      "seed": [
+        690,
+        350
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [
+        "bookshelf"
+      ],
+      "exclude": [
+        [
+          [
+            620,
+            385
+          ],
+          [
+            640,
+            385
+          ],
+          [
+            640,
+            410
+          ],
+          [
+            620,
+            410
+          ]
+        ],
+        [
+          [
+            720,
+            385
+          ],
+          [
+            750,
+            385
+          ],
+          [
+            750,
+            410
+          ],
+          [
+            720,
+            410
+          ]
+        ],
+        [
+          [
+            639,
+            310
+          ],
+          [
+            647,
+            307
+          ],
+          [
+            649,
+            310
+          ],
+          [
+            641,
+            314
+          ]
+        ],
+        [
+          [
+            653,
+            303
+          ],
+          [
+            663,
+            302
+          ],
+          [
+            664,
+            305
+          ],
+          [
+            654,
+            306
+          ]
+        ],
+        [
+          [
+            635,
+            324
+          ],
+          [
+            641,
+            322
+          ],
+          [
+            642,
+            326
+          ],
+          [
+            636,
+            328
+          ]
+        ],
+        [
+          [
+            632,
+            334
+          ],
+          [
+            637,
+            332
+          ],
+          [
+            638,
+            338
+          ],
+          [
+            633,
+            340
+          ]
+        ],
+        [
+          [
+            632,
+            345
+          ],
+          [
+            637,
+            344
+          ],
+          [
+            637,
+            350
+          ],
+          [
+            632,
+            351
+          ]
+        ],
+        [
+          [
+            650,
+            382
+          ],
+          [
+            655,
+            385
+          ],
+          [
+            652,
+            390
+          ],
+          [
+            648,
+            387
+          ]
+        ],
+        [
+          [
+            660,
+            384
+          ],
+          [
+            665,
+            385
+          ],
+          [
+            664,
+            389
+          ],
+          [
+            659,
+            388
+          ]
+        ],
+        [
+          [
+            674,
+            384
+          ],
+          [
+            681,
+            383
+          ],
+          [
+            681,
+            387
+          ],
+          [
+            674,
+            388
+          ]
+        ],
+        [
+          [
+            693,
+            380
+          ],
+          [
+            699,
+            378
+          ],
+          [
+            701,
+            382
+          ],
+          [
+            695,
+            384
+          ]
+        ],
+        [
+          [
+            720,
+            362
+          ],
+          [
+            727,
+            360
+          ],
+          [
+            728,
+            364
+          ],
+          [
+            721,
+            367
+          ]
+        ],
+        [
+          [
+            723,
+            349
+          ],
+          [
+            728,
+            346
+          ],
+          [
+            730,
+            350
+          ],
+          [
+            725,
+            353
+          ]
+        ],
+        [
+          [
+            720,
+            333
+          ],
+          [
+            726,
+            332
+          ],
+          [
+            728,
+            335
+          ],
+          [
+            722,
+            338
+          ]
+        ]
+      ],
+      "core": 5,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            631,
+            345
+          ],
+          [
+            738,
+            345
+          ],
+          [
+            738,
+            389
+          ],
+          [
+            631,
+            389
+          ]
+        ]
+      ],
+      "home": [
+        685,
+        389
+      ],
+      "samples": {
+        "object": 2
+      },
+      "states": {}
+    },
+    {
+      "id": "beanbag-pink",
+      "crop": [
+        780,
+        330,
+        130,
+        130
+      ],
+      "object": "the pink and blue beanbag chair",
+      "ground": "the classroom floor",
+      "seed": [
+        835,
+        390
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [
+        "bookshelf"
+      ],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            789,
+            397
+          ],
+          [
+            883,
+            397
+          ],
+          [
+            883,
+            436
+          ],
+          [
+            789,
+            436
+          ]
+        ]
+      ],
+      "home": [
+        836,
+        436
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    }
+  ]
+}

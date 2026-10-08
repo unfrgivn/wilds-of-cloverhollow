@@ -14,6 +14,7 @@ import {
   type Direction,
   type Point,
   type State,
+  everyPropFootprint,
 } from "../../src/core";
 import { createInkState, inkVariable, runInk } from "../../src/core/ink";
 import { loadContent } from "../../src/content/load";
@@ -175,7 +176,7 @@ describe("Mr. Pip, the arcade keeper", () => {
     const radius = world.tunables.playerRadius;
     const standable = (feet: Point): boolean => pointInPolygon(feet, arcade.walkable) &&
       distanceToPolygon(feet, arcade.walkable) >= radius &&
-      arcade.blockers.every((polygon) =>
+      [...arcade.blockers, ...everyPropFootprint(arcade)].every((polygon) =>
         !pointInPolygon(feet, polygon) && distanceToPolygon(feet, polygon) >= radius);
     const spots: [number, number, Direction][] =
       [[0, 45, "up"], [-45, 0, "right"], [45, 0, "left"], [0, -45, "down"]];

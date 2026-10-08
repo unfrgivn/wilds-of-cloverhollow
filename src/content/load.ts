@@ -12,6 +12,12 @@ import trailData from "../../content/areas/trail.json";
 import woodsData from "../../content/areas/woods.json";
 import arcadeData from "../../content/areas/arcade.json";
 import plazaPropsData from "../../content/props/plaza.json";
+import bedroomPropsData from "../../content/props/bedroom.json";
+import kitchenPropsData from "../../content/props/kitchen.json";
+import schoolPropsData from "../../content/props/school.json";
+import classroomPropsData from "../../content/props/classroom.json";
+import gymPropsData from "../../content/props/gym.json";
+import arcadePropsData from "../../content/props/arcade.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -23,6 +29,10 @@ import passFixtureData from "../../content/fixtures/pass.json";
 import trailFixtureData from "../../content/fixtures/trail.json";
 import passPartyFixtureData from "../../content/fixtures/pass-party.json";
 import woodsFixtureData from "../../content/fixtures/woods.json";
+import kitchenFixtureData from "../../content/fixtures/kitchen.json";
+import classroomFixtureData from "../../content/fixtures/classroom.json";
+import gymFixtureData from "../../content/fixtures/gym.json";
+import arcadeFixtureData from "../../content/fixtures/arcade.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -899,14 +909,19 @@ export function loadContent(): {
   fixtures: Record<string, Fixture>;
 } {
   const harness = parseArea(areaData, "content/areas/harness.json");
-  const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
+  const bedroom = parseArea(bedroomData, "content/areas/bedroom.json",
+    parsePropCatalogue(bedroomPropsData, "content/props/bedroom.json"));
   const plaza = parseArea(plazaData, "content/areas/plaza.json",
     parsePropCatalogue(plazaPropsData, "content/props/plaza.json"));
-  const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
+  const kitchen = parseArea(kitchenData, "content/areas/kitchen.json",
+    parsePropCatalogue(kitchenPropsData, "content/props/kitchen.json"));
   const park = parseArea(parkData, "content/areas/park.json");
-  const school = parseArea(schoolData, "content/areas/school.json");
-  const classroom = parseArea(classroomData, "content/areas/classroom.json");
-  const gym = parseArea(gymData, "content/areas/gym.json");
+  const school = parseArea(schoolData, "content/areas/school.json",
+    parsePropCatalogue(schoolPropsData, "content/props/school.json"));
+  const classroom = parseArea(classroomData, "content/areas/classroom.json",
+    parsePropCatalogue(classroomPropsData, "content/props/classroom.json"));
+  const gym = parseArea(gymData, "content/areas/gym.json",
+    parsePropCatalogue(gymPropsData, "content/props/gym.json"));
   const bay = parseArea(bayData, "content/areas/bay.json");
   Object.defineProperty(bay.spawns, "bus-stop", {
     value: { x: 355, y: 545, facing: "down" },
@@ -915,7 +930,8 @@ export function loadContent(): {
   const pass = parseArea(passData, "content/areas/pass.json");
   const trail = parseArea(trailData, "content/areas/trail.json");
   const woods = parseArea(woodsData, "content/areas/woods.json");
-  const arcade = parseArea(arcadeData, "content/areas/arcade.json");
+  const arcade = parseArea(arcadeData, "content/areas/arcade.json",
+    parsePropCatalogue(arcadePropsData, "content/props/arcade.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -987,6 +1003,10 @@ export function loadContent(): {
     "pass-party": parseFixture(passPartyFixtureData, "content/fixtures/pass-party.json"),
     trail: parseFixture(trailFixtureData, "content/fixtures/trail.json"),
     woods: parseFixture(woodsFixtureData, "content/fixtures/woods.json"),
+    kitchen: parseFixture(kitchenFixtureData, "content/fixtures/kitchen.json"),
+    classroom: parseFixture(classroomFixtureData, "content/fixtures/classroom.json"),
+    gym: parseFixture(gymFixtureData, "content/fixtures/gym.json"),
+    arcade: parseFixture(arcadeFixtureData, "content/fixtures/arcade.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])

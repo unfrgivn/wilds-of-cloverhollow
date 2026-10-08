@@ -14,6 +14,7 @@ import {
   type Npc,
   type Point,
   type State,
+  everyPropFootprint,
 } from "../../src/core";
 import { createInkState, inkVariable, runInk, type InkFacts } from "../../src/core/ink";
 import { loadContent } from "../../src/content/load";
@@ -86,7 +87,8 @@ function walk(state: State, move: Point, ticks: number): State {
 // clear of its edge, every blocker, and every person's footprint.
 function standable(area: Area, point: Point): boolean {
   const radius = world.tunables.playerRadius;
-  const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
+  const solid = [...area.blockers, ...everyPropFootprint(area),
+    ...area.npcs.map((npc) => npc.footprint)];
   return pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius &&
     solid.every((polygon) =>
@@ -151,7 +153,7 @@ describe("story time", () => {
 
 describe("the classroom", () => {
   it("has Ms. Maple, Milo, and Rosie on open floor, each someone to talk to", () => {
-    const furniture = classroom.blockers;
+    const furniture = [...classroom.blockers, ...everyPropFootprint(classroom)];
     for (const someone of classroom.npcs)
       for (const [x, y] of someone.footprint)
         expect(furniture.some((polygon) => pointInPolygon({ x, y }, polygon)),

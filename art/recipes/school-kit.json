@@ -1,0 +1,55 @@
+{
+  "asset": "school-kit",
+  "date": "2026-10-08",
+  "summary": "The approved school painting split into a ground plate and 3 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "model": "gemini-3-pro-image",
+  "config": "art/kit/school.json",
+  "painting": "art/source/areas/school/painting/ground.json",
+  "commands": [
+    "bun tools/art/kit.ts school gen",
+    "bun tools/art/kit.ts school masks",
+    "bun tools/art/kit.ts school fill",
+    "bun tools/art/kit.ts school pack",
+    "bun tools/art/kit.ts school place"
+  ],
+  "prompts": {
+    "isolate": "This is a crop of a hand-painted watercolor-and-ink game map. Recolor EVERYTHING except <object> to flat solid magenta #FF00FF. That includes the ground, its cast shadow, and every other object. Keep it exactly as it is: the same pixels, position, size, outline, and colours, with its brown ink outline fully kept. Gaps between its parts that show ground must also become magenta. Output the whole image at the same framing.",
+    "isolateWithShadow": "This is a crop of a hand-painted watercolor-and-ink game map. Recolor EVERYTHING except <object>, together with its soft cast shadow on the ground, to flat solid magenta #FF00FF. That includes the ground, and every other object. Keep it and its shadow exactly as it is: the same pixels, position, size, outline, and colours, with its brown ink outline fully kept. Gaps between its parts that show ground must also become magenta. Output the whole image at the same framing.",
+    "fill": "This is a crop of a hand-painted watercolor-and-ink storybook game map seen from a 3/4 top-down view. Fill ONLY the flat magenta (#FF00FF) area so it seamlessly continues <ground> around it: the same soft watercolor washes, colours, line work, and paper texture. The filled area must be empty ground: no objects, no shadows, no new things. Keep every pixel outside the magenta area exactly as it is, in the same position and scale. Output the whole image at the same framing.",
+    "complete": "This is a crop of a hand-painted watercolor-and-ink storybook game map seen from a 3/4 top-down view. Flat magenta (#FF00FF) covers part of <object>. Redraw ONLY the magenta area: where it covers the object, continue the object so it is whole, with the same outline, shapes, materials, and colours as its visible part; where it covers anything else, continue <ground>. Keep every pixel outside the magenta area exactly as it is, in the same position and scale. Output the whole image at the same framing."
+  },
+  "kept": {
+    "folder": "art/source/areas/school/kit",
+    "samples": {
+      "cabinet": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "block-lockers": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "wall-post": [
+        "iso-1.jpg",
+        "crop.json"
+      ]
+    }
+  },
+  "plate": "Lifted props' holes inpainted locally; untouched tiles copied byte for byte, patched tiles re-encoded at WebP quality 92.",
+  "atlas": {
+    "pages": [
+      "assets/areas/school/props-0.json"
+    ],
+    "decodedMegabytes": 3.7
+  },
+  "measurements": {
+    "rebuiltVsPainting": "0.00% of the painting's pixels differ by more than 12% when the default layout is rebuilt from the kit"
+  },
+  "states": {},
+  "painted": [
+    "cabinet",
+    "block-lockers",
+    "wall-post"
+  ],
+  "lifted": []
+}

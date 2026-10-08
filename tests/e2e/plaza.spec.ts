@@ -10,7 +10,7 @@ test("real keys cross the bedroom and kitchen doors in both directions", async (
   await step(page, 36);
   const kitchen = await page.evaluate(() => window.__cloverhollow?.getState());
   expect(kitchen?.area).toBe("kitchen");
-  expect(kitchen?.player).toEqual({ x: 500, y: 650 });
+  expect(kitchen?.player).toEqual({ x: 600, y: 650 });
   expect(kitchen?.party.map((member) => member.id)).toEqual(["maddie"]);
   const kitchenInfo = await renderInfo(page);
   expect(kitchenInfo.area).toBe("kitchen");
@@ -25,7 +25,7 @@ test("real keys cross the bedroom and kitchen doors in both directions", async (
   await step(page, 5);
   await page.keyboard.up("ArrowDown");
   await page.keyboard.down("ArrowLeft");
-  await step(page, 21);
+  await step(page, 46);
   await page.keyboard.up("ArrowLeft");
   await step(page, 36);
   const bedroom = await page.evaluate(() => window.__cloverhollow?.getState());

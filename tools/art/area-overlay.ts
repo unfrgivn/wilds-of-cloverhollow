@@ -1,48 +1,28 @@
 // Draws an area's JSON over its painting for review: the floor's outline,
-// blockers (red), occluders and their baselines (blue), doors (magenta),
-// spawns (gold), look points with their reach (violet), and people's
-// footprints (cyan). Green is every spot Fae's feet can get to from a spawn:
-// on the floor and a player radius clear of its edge, every blocker, and every
-// footprint (the core's own rule). Green on furniture, behind it, or off the
-// painted floor is a geometry bug.
+// blockers (red), props' footprints in every state (orange; painted props
+// dashed), occluders and their baselines (blue), doors (magenta), spawns
+// (gold), look points with their reach (violet), and people's footprints
+// (cyan). Green is every spot Fae's feet can get to from a spawn: on the floor
+// and a player radius clear of its edge, every blocker, prop, and footprint
+// (the core's own rule). Green on furniture, behind it, or off the painted
+// floor is a geometry bug.
 //
 //   bun tools/art/area-overlay.ts <area>   (writes art/review/<area>-overlay.png)
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { distanceToPolygon, pointInPolygon, type Point, type Polygon } from "../../src/core";
-import { parseArea, parseTunables } from "../../src/content/load";
+import { everyPropFootprint, type Polygon } from "../../src/core";
+import { reachablePositions } from "../../src/content/area-checks";
+import { loadContent } from "../../src/content/load";
 
 const id = process.argv[2] ?? "bedroom";
-const file = `content/areas/${id}.json`;
-const area = parseArea(JSON.parse(readFileSync(file, "utf8")), file);
-if (area.ground === undefined) throw new Error(`${file} has no painting`);
-const radius = parseTunables(JSON.parse(readFileSync("content/tunables.json", "utf8")),
-  "content/tunables.json").playerRadius;
+const { world } = loadContent();
+const area = world.areas[id];
+if (area?.ground === undefined) throw new Error(`no painted area ${id}`);
+const radius = world.tunables.playerRadius;
 
-// Breadth-first over a 5-unit grid from every spawn.
-const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
-const standable = (point: Point): boolean => pointInPolygon(point, area.walkable) &&
-  distanceToPolygon(point, area.walkable) >= radius &&
-  solid.every((polygon) =>
-    !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius);
+// The area checks' own flood fill from every spawn, on their 5-unit grid.
+const reached = reachablePositions(area, radius);
 const cell = 5;
-const snap = (value: number): number => Math.round(value / cell) * cell;
-const around: [number, number][] = [[0, 0], [cell, 0], [-cell, 0], [0, cell], [0, -cell]];
-const reached = new Set<string>();
-const queue: Point[] = [];
-const visit = (point: Point): void => {
-  const key = `${point.x},${point.y}`;
-  if (reached.has(key) || !standable(point)) return;
-  reached.add(key);
-  queue.push(point);
-};
-for (const spawn of Object.values(area.spawns))
-  for (const [dx, dy] of around) visit({ x: snap(spawn.x) + dx, y: snap(spawn.y) + dy });
-for (let index = 0; index < queue.length; index += 1) {
-  const here = queue[index];
-  if (here !== undefined)
-    for (const [dx, dy] of around.slice(1)) visit({ x: here.x + dx, y: here.y + dy });
-}
 
 // The painting is 2 source px per unit.
 const px = (value: number): number => value * 2;
@@ -52,7 +32,7 @@ const height = px(area.height);
 const grid: string[] = [];
 for (let x = 0; x <= width; x += 100) grid.push(`<path d="M${x} 0V${height}"/>`);
 for (let y = 0; y <= height; y += 100) grid.push(`<path d="M0 ${y}H${width}"/>`);
-const reach = [...queue].map((point) =>
+const reach = reached.map((point) =>
   `M${px(point.x) - cell} ${px(point.y) - cell}h${cell * 2}v${cell * 2}h${-cell * 2}z`).join("");
 const manifest: { tiles: { file: string; x: number; y: number; width: number; height: number }[] } =
   JSON.parse(readFileSync(`public/assets/areas/${area.ground}/ground.json`, "utf8"));
@@ -79,6 +59,10 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${
     `<polygon points="${poly(area.walkable)}"/>`) +
   group('fill="#d9484855" stroke="#a11" stroke-width="8"',
     area.blockers.map((item) => `<polygon points="${poly(item)}"/>`).join("")) +
+  group('fill="#f08c0055" stroke="#b35900" stroke-width="6"',
+    area.props.map((prop) => group(prop.painted ? 'stroke-dasharray="14 8"' : "",
+      Object.values(prop.states).flatMap((state) => state.footprint)
+        .map((item) => `<polygon points="${poly(item)}"/>`).join(""))).join("")) +
   group('fill="#17c3e055" stroke="#0a7f99" stroke-width="6"',
     area.npcs.map((npc) => `<polygon points="${poly(npc.footprint)}"/>`).join("")) +
   group('fill="none" stroke="#1769aa" stroke-width="8"',
@@ -95,4 +79,4 @@ writeFileSync(source, svg);
 const output = join("art/review", `${id}-overlay.png`);
 const result = Bun.spawnSync(["magick", source, output], { stderr: "pipe" });
 if (result.exitCode !== 0) throw new Error(new TextDecoder().decode(result.stderr));
-console.log(`${output}: ${reached.size} reachable spots`);
+console.log(`${output}: ${reached.length} reachable spots`);

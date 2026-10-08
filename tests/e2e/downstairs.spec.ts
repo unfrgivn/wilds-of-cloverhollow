@@ -42,7 +42,7 @@ test("the bedroom door leads down to the kitchen, where Mom and Oliver are", asy
   await goDownstairs(page);
   const state = await readState(page);
   expect(state.area).toBe("kitchen");
-  expect(state.player).toEqual({ x: 500, y: 650 });
+  expect(state.player).toEqual({ x: 600, y: 650 });
   expect(state.facing).toBe("right");
   const [maddie] = state.party;
   if (maddie === undefined) throw new Error("Maddie missing from the party");

@@ -14,6 +14,7 @@ import {
   type Direction,
   type Point,
   type State,
+  everyPropFootprint,
 } from "../../src/core";
 import { createInkState, inkVariable, runInk, type InkFacts } from "../../src/core/ink";
 import { loadContent } from "../../src/content/load";
@@ -95,7 +96,8 @@ function walk(state: State, move: Point, ticks: number): State {
 // clear of its edge, every blocker, and every person's footprint.
 function standable(area: Area, point: Point): boolean {
   const radius = world.tunables.playerRadius;
-  const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
+  const solid = [...area.blockers, ...everyPropFootprint(area),
+    ...area.npcs.map((npc) => npc.footprint)];
   return pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius &&
     solid.every((polygon) =>
@@ -171,7 +173,8 @@ describe("the gym", () => {
     expect({ knot: coach.knot, prompt: coach.prompt }).toEqual({ knot: "coach", prompt: "Talk" });
     expect(world.characters.coach?.atlas).toBe("assets/characters/coach/coach.json");
     for (const [x, y] of coach.footprint)
-      expect(gym.blockers.some((polygon) => pointInPolygon({ x, y }, polygon)),
+      expect([...gym.blockers, ...everyPropFootprint(gym)]
+        .some((polygon) => pointInPolygon({ x, y }, polygon)),
         "Coach Ash stands inside furniture").toBe(false);
     const state = at("gym", "door", peTime);
     expect(npcVisible(world, state, coach)).toBe(true);

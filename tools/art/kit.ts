@@ -14,7 +14,10 @@
  * props, or become masks: every visible default prop pixel is the approved
  * painting's. Gemini outputs are cached in art/scratch/kit/<area>/, and pack
  * keeps the chosen ones in art/source/areas/<area>/kit/, so a rebuild from a
- * clean checkout makes no calls.
+ * clean checkout makes no calls. Each subject's samples record the crop they
+ * were drawn from (`crop.json`): when a crop changes, its subject starts over.
+ * masks and pack refuse a crop that misses its seed or its footprint, and
+ * masks warns of a mask that runs into its crop's edge (`problems`).
  *
  *   bun tools/art/kit.ts <area> gen     isolate samples for every subject
  *   bun tools/art/kit.ts <area> masks   masks, holes, art/review/kit/<area>/masks-*.png
@@ -273,12 +276,49 @@ function box(item: Subject): Box {
 
 const dir = (item: Subject): string => `${scratch}/${item.id}`;
 
+/*
+ * The crop a subject's samples were drawn from, written beside them in the
+ * scratch cache and in art/source (`crop.json`). Samples drawn from another
+ * crop are stale. The scratch cache and the kept samples are judged apart,
+ * each by its own stamp: a stale cache is cleared (and refilled from the kept
+ * samples when theirs matches), and stale kept samples are passed over, so the
+ * subject is drawn again from its new crop. A cache from before stamps is
+ * checked by its crop image; kept samples from before stamps (the plaza's) are
+ * trusted unless the cache shows the crop changed since.
+ */
+const cropStamp = (item: Subject): string => `${JSON.stringify(box(item))}\n`;
+const staleKept = new Set<string>();
+for (const item of subjects) {
+  const stamp = cropStamp(item);
+  const kept = `${sourceDir}/${item.id}/crop.json`;
+  const keptStamped = existsSync(kept);
+  if (keptStamped && readFileSync(kept, "utf8") !== stamp) staleKept.add(item.id);
+  const drawn = `${dir(item)}/crop.json`;
+  const image = `${dir(item)}/crop.png`;
+  const changed = existsSync(drawn)
+    ? readFileSync(drawn, "utf8") !== stamp
+    : existsSync(image) && !sameCrop(item, image);
+  if (changed) {
+    rmSync(dir(item), { recursive: true, force: true });
+    if (!keptStamped) staleKept.add(item.id);
+  }
+  if (staleKept.has(item.id)) console.log(`${item.id}: its crop changed, so it is drawn again`);
+}
+
+// Whether `image` is the painting under the subject's crop now.
+function sameCrop(item: Subject, image: string): boolean {
+  const { x, y, w, h } = box(item);
+  const size = im(image, "-format", "%w %h", "info:");
+  return size === `${w} ${h}` && mean(original, "-crop", `${w}x${h}+${x}+${y}`, "+repage",
+    image, "-compose", "difference", "-composite") === 0;
+}
+
 // A kept file (art/source) restored into the scratch cache; true if it exists.
 function restore(item: Subject, name: string): boolean {
   const out = `${dir(item)}/${name}`;
   if (existsSync(out)) return true;
   const kept = `${sourceDir}/${item.id}/${name}`;
-  if (!existsSync(kept)) return false;
+  if (!existsSync(kept) || staleKept.has(item.id)) return false;
   mkdirSync(dir(item), { recursive: true });
   copyFileSync(kept, out);
   return true;
@@ -326,8 +366,9 @@ let calls = 0;
 async function gemini(prompt: string, ref: string, out: string, crop: Box): Promise<void> {
   if (existsSync(out)) return;
   const kept = out.replace(scratch, sourceDir);
+  const id = out.slice(scratch.length + 1).split("/")[0] ?? "";
   mkdirSync(dirname(out), { recursive: true });
-  if (existsSync(kept)) {
+  if (existsSync(kept) && !staleKept.has(id)) {
     copyFileSync(kept, out);
     return;
   }
@@ -692,6 +733,45 @@ function holeMask(item: Subject): Mask {
   return mask;
 }
 
+/*
+ * What's wrong with a subject's crop and mask. Errors (pack refuses them): a
+ * crop that misses the subject's seed, or where it meets the ground (its
+ * footprint), so its picture can't reach its own foot. Warnings: a final mask
+ * that runs into an edge of its crop where the painting goes on. The object is
+ * cut off there, or its mask has leaked into a neighbour; that's harmless only
+ * where nobody is ever drawn behind the cut (a treetop above everyone's head),
+ * so say why in the review. Each is fixed in the config (a bigger crop, a seed
+ * on the object, an `exclude`, a neighbour in `front`), then gen and masks again.
+ */
+function problems(item: Subject): { errors: string[]; warnings: string[] } {
+  const { x, y, w, h } = box(item);
+  const inside = ([px, py]: Point): boolean =>
+    px * 2 >= x && px * 2 <= x + w && py * 2 >= y && py * 2 <= y + h;
+  const errors: string[] = [];
+  if (!inside(item.seed)) errors.push("its seed is outside its crop");
+  const missed = item.footprint.flat().filter((at) => !inside(at)).length;
+  if (missed > 0) errors.push(`${missed} of its footprint's points are outside its crop`);
+  const mask = finalMask(item);
+  const count = (at: (index: number) => number, length: number): number => {
+    let set = 0;
+    for (let index = 0; index < length; index += 1) set += mask[at(index)] ?? 0;
+    return set;
+  };
+  const edges: [string, boolean, number][] = [
+    ["top", y > 0, count((index) => index, w)],
+    ["bottom", y + h < painting.height, count((index) => (h - 1) * w + index, w)],
+    ["left", x > 0, count((index) => index * w, h)],
+    ["right", x + w < painting.width, count((index) => index * w + w - 1, h)],
+  ];
+  const warnings = edges.filter(([, open, pixels]) => open && pixels > 3)
+    .map(([side, , pixels]) => `its mask runs into its crop's ${side} edge (${pixels} px)`);
+  return { errors, warnings };
+}
+
+function report(kind: "errors" | "warnings"): string[] {
+  return subjects.flatMap((item) => problems(item)[kind].map((text) => `${item.id}: ${text}`));
+}
+
 // --- steps --------------------------------------------------------------------
 
 async function gen(): Promise<void> {
@@ -702,6 +782,7 @@ async function gen(): Promise<void> {
     const path = `${dir(item)}/crop.png`;
     if (!existsSync(path))
       im(original, "-crop", `${crop.w}x${crop.h}+${crop.x}+${crop.y}`, "+repage", path);
+    writeFileSync(`${dir(item)}/crop.json`, cropStamp(item));
     for (const n of objectSamples(item))
       jobs.push(() => gemini(isolatePrompt(item.object, false), path,
         `${dir(item)}/iso-${n}.jpg`, crop));
@@ -732,6 +813,13 @@ function masks(): void {
       "+append", `${review}/masks-${item.id}.png`);
   }
   console.log(`masks: ${subjects.length} subjects; review ${review}/masks-*.png`);
+  for (const line of report("warnings")) console.log(`  warning, ${line}`);
+  const errors = report("errors");
+  for (const line of errors) console.log(`  error, ${line}`);
+  if (errors.length > 0) {
+    console.log(`masks: ${errors.length} errors; fix the config, then gen and masks again`);
+    process.exitCode = 1;
+  }
 }
 
 const plate = `${scratch}/plate.png`;
@@ -972,6 +1060,9 @@ type CatalogueState = {
 };
 
 function pack(): void {
+  const errors = report("errors");
+  if (errors.length > 0)
+    throw new Error(`pack: the kit has errors (see masks):\n${errors.join("\n")}`);
   const frames: Frame[] = [];
   const props: Record<string, {
     canopy: boolean;
@@ -1111,7 +1202,8 @@ function pack(): void {
     rmSync(keep, { recursive: true, force: true });
     mkdirSync(keep, { recursive: true });
     for (const name of names) copyFileSync(`${dir(item)}/${name}`, `${keep}/${name}`);
-    kept[item.id] = names;
+    writeFileSync(`${keep}/crop.json`, cropStamp(item));
+    kept[item.id] = [...names, "crop.json"];
   }
   // The default layout rebuilt from the kit, against the painting.
   const rebuilt = `${review}/rebuilt.png`;

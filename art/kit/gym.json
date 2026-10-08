@@ -1,0 +1,217 @@
+{
+  "area": "gym",
+  "subjects": [
+    {
+      "id": "bleachers",
+      "crop": [
+        900,
+        300,
+        500,
+        400
+      ],
+      "object": "the long wooden tiered gym bleachers",
+      "ground": "the honey wood gym floor",
+      "seed": [
+        1150,
+        580
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [
+        "front-benches"
+      ],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            990,
+            470
+          ],
+          [
+            1350,
+            470
+          ],
+          [
+            1355,
+            652
+          ],
+          [
+            1018,
+            648
+          ]
+        ]
+      ],
+      "home": [
+        1170,
+        652
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "ball-bin",
+      "crop": [
+        640,
+        700,
+        220,
+        180
+      ],
+      "object": "the wheeled bin overflowing with red and blue bouncy balls",
+      "ground": "the honey wood gym floor",
+      "seed": [
+        740,
+        800
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            662,
+            832
+          ],
+          [
+            745,
+            805
+          ],
+          [
+            808,
+            830
+          ],
+          [
+            727,
+            860
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "blue-mats",
+      "crop": [
+        630,
+        250,
+        300,
+        220
+      ],
+      "object": "the stack of folded blue gym mats",
+      "ground": "the honey wood gym floor",
+      "seed": [
+        760,
+        370
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            675,
+            372
+          ],
+          [
+            800,
+            417
+          ],
+          [
+            867,
+            395
+          ],
+          [
+            742,
+            349
+          ]
+        ]
+      ],
+      "home": [
+        771,
+        417
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "front-benches",
+      "crop": [
+        740,
+        600,
+        380,
+        240
+      ],
+      "object": "the pair of wooden gym benches with two tiers and visible legs",
+      "ground": "the honey wood gym floor",
+      "seed": [
+        930,
+        740
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [
+        "ball-bin"
+      ],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            820,
+            770
+          ],
+          [
+            930,
+            720
+          ],
+          [
+            1035,
+            670
+          ],
+          [
+            1055,
+            708
+          ],
+          [
+            950,
+            757
+          ],
+          [
+            840,
+            808
+          ]
+        ]
+      ],
+      "home": [
+        938,
+        808
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    }
+  ]
+}

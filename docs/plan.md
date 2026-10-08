@@ -1219,6 +1219,30 @@ more bad guys, and the blacklight lantern, made and built while away.
   updated after viewing). Two were `ui-gallery` sticker tests timing out
   under load; they passed 12 of 12 repeated alone.
 
+### Sound follow-ups done (2026-10-08)
+- Unlock: the AudioContext is made at boot and resumed right away, on every
+  key, pointer, or touch, and whenever a cue plays while it isn't running.
+  A gamepad press is not a user activation in any browser (the HTML spec's
+  activation-triggering events are keys, mouse, pointer, and touchend), so on
+  the web a pad-only player still needs one key or click. The iOS app is
+  different: Capacitor sets `mediaTypesRequiringUserActionForPlayback` to
+  none, and on the iPhone 17 simulator the harness logged `audio suspended`
+  then `running` at boot with no touch, and `journal-open` played. Pads get
+  sound on iOS from the start.
+- Fixed on the way: WebKit reports `interrupted`, not `suspended`, before a
+  gesture, and the old unlock only resumed `suspended`, so WebKit (and so
+  likely iOS Safari) never started. M37's e2e only checked that cues were
+  logged; `sound.spec.ts` now checks a cue really plays after a real key,
+  on Chromium and WebKit.
+- Silent switch: kept WebKit's default `ambient` session, so the switch mutes
+  the game, as Apple suggests for non-essential game sound.
+- The journal's `♪` pill is drawn like the coin and snack pills (26 px, the
+  same border, fill, weight, and shadow) with an invisible larger hit area.
+  With `♪ off` and 999 coins the row still fits on a phone, 34 px clear of
+  the heading. Ten journal baselines were updated after viewing them.
+- Harness: `sound.state()`, plus `[cloverhollow] audio` and
+  `[cloverhollow] sound` log lines for native checks (spec 11).
+
 ### E2E suite speed (2026-10-08)
 - Cause, measured: with the game paused by the harness, Pixi still redrew
   the canvas every animation frame, in software in headless Chromium, and
@@ -1297,18 +1321,12 @@ The flute, the lasso's levers and gaps, the clubhouse fix-up, and more
 mini-bosses (people under the chaos spell, NOTES.md).
 
 Sound follow-ups from Milestone 37:
-- Gamepad audio unlock: browsers don't count a gamepad press as a user
-  gesture, so a pad-only player hears nothing until a key, click, or tap.
-  Show a one-time "press to start" on the title, or accept it on iOS where
-  the first tap unlocks.
-- iOS check: confirm on the simulator and a device that Web Audio unlocks
-  after the first tap in WKWebView, and decide whether the ring/silent
-  switch should mute the game (Web Audio's default follows it).
 - Music and ambience: a title, town, and battle theme, and quiet beds per
   land (birds, waves, wind). Needs the owner's call on the source: code
   synthesis like the effects, or a generator (paid generation needs the
   owner).
 - Footsteps by surface (grass, wood, sand) once the area kits carry ground
   data (after Milestone 34); the flute's notes with the flute milestone.
-- A volume slider beside mute, and matching the journal's `♪` pill to the
-  coin and snack counters' height and shading.
+- A volume slider beside mute.
+- iOS on a real device: the simulator check below should hold, but a phone
+  with a pad and the silent switch hasn't been tried.

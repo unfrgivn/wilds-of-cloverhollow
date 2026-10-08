@@ -202,12 +202,20 @@ ios/            Capacitor iOS project (from Milestone 4).
   timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a
   later synthesized or generated clip can replace a recipe without changing
   gameplay.
-- `src/platform/audio.ts` lazily creates Web Audio after a user gesture,
-  resumes safely when possible, and uses a moderate master gain. It synthesizes
-  short, gentle oscillator tones in code. Audio unavailable or suspended must
-  never break the game.
-- Sound is on by default. Mute is toggled by M or the Sound button inside the
-  Journal pause menu, and is stored separately under `cloverhollow-audio` in
+- `src/platform/audio.ts` creates the AudioContext at boot and resumes it at
+  every chance: right away, on each key, pointer, or touch, and whenever a cue
+  plays while it isn't running. Browsers hold it (`suspended`, or WebKit's
+  `interrupted`) until a key, click, or tap; a gamepad press is not a user
+  activation in any browser, so a pad-only player on the web hears nothing
+  until one. The iOS app's web view lets it run at once (Capacitor sets
+  `mediaTypesRequiringUserActionForPlayback` to none), so pads get sound there
+  from the start. It synthesizes short, gentle tones in code at a moderate
+  master gain. Audio unavailable or held must never break the game.
+- iOS: Web Audio keeps WebKit's default `ambient` session, so the ring/silent
+  switch mutes the game (Apple's guidance for non-essential game sound).
+- Sound is on by default. Mute is toggled by M or the `♪ on/off` pill on the
+  journal's notes heading (drawn like the coin and snack pills, with a larger
+  invisible hit area), and is stored separately under `cloverhollow-audio` in
   Capacitor Preferences, never in the save.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
@@ -1080,9 +1088,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
-- `sound.log()` returns recent read-only `{ tick, cue, played }` entries and
-  `sound.muted()` reports the separate audio preference. These are harness
-  only and are absent from production.
+- `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
+  `sound.muted()` reports the separate audio preference, and `sound.state()`
+  the AudioContext's state (`running`, `suspended`, `interrupted`, `closed`,
+  or `unavailable`). Harness builds also log `[cloverhollow] audio {state}`
+  on every state change and `[cloverhollow] sound {tick, cue, played}` per
+  cue, for native checks. These are harness only and are absent from
+  production.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

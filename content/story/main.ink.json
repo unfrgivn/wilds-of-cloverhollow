@@ -400,6 +400,95 @@
       ],
       "journal": [
         "ev",
+        {
+          "VAR?": "saw_hood"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A kid in a purple hood ran off toward the gym! They dropped a purple marker, the same purple as the Star Racer scribbles. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "story_time"
+        },
+        {
+          "VAR?": "saw_hood"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Story time! Rosie and Milo are in my class. Maybe somebody saw the kid in the purple hood. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        {
+          "VAR?": "story_time"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Ms. Maple said to be back in time for story time. Back to school! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.27"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         "str",
         "^arcade-keeper",
         "/str",
@@ -419,7 +508,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.7"
+                "->": ".^.^.^.37"
               },
               null
             ]
@@ -448,7 +537,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.17"
+                "->": ".^.^.^.47"
               },
               null
             ]
@@ -482,7 +571,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.30"
+                "->": ".^.^.^.60"
               },
               null
             ]
@@ -507,7 +596,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.37"
+                "->": ".^.^.^.67"
               },
               null
             ]
@@ -532,7 +621,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.44"
+                "->": ".^.^.^.74"
               },
               null
             ]
@@ -561,7 +650,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.54"
+                "->": ".^.^.^.84"
               },
               null
             ]
@@ -586,7 +675,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.61"
+                "->": ".^.^.^.91"
               },
               null
             ]
@@ -611,7 +700,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.68"
+                "->": ".^.^.^.98"
               },
               null
             ]
@@ -648,7 +737,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.83"
+                "->": ".^.^.^.113"
               },
               null
             ]
@@ -673,7 +762,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.90"
+                "->": ".^.^.^.120"
               },
               null
             ]
@@ -707,7 +796,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.103"
+                "->": ".^.^.^.133"
               },
               null
             ]
@@ -736,7 +825,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.113"
+                "->": ".^.^.^.143"
               },
               null
             ]
@@ -761,7 +850,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.120"
+                "->": ".^.^.^.150"
               },
               null
             ]
@@ -786,7 +875,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.127"
+                "->": ".^.^.^.157"
               },
               null
             ]
@@ -816,7 +905,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.137"
+                "->": ".^.^.^.167"
               },
               null
             ]
@@ -846,7 +935,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.177"
               },
               null
             ]
@@ -871,7 +960,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.154"
+                "->": ".^.^.^.184"
               },
               null
             ]
@@ -900,7 +989,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.164"
+                "->": ".^.^.^.194"
               },
               null
             ]
@@ -938,7 +1027,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.180"
+                "->": ".^.^.^.210"
               },
               null
             ]
@@ -965,7 +1054,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.189"
+                "->": ".^.^.^.219"
               },
               null
             ]
@@ -994,7 +1083,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.199"
+                "->": ".^.^.^.229"
               },
               null
             ]
@@ -1019,7 +1108,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.206"
+                "->": ".^.^.^.236"
               },
               null
             ]
@@ -1048,7 +1137,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.217"
+                "->": ".^.^.^.247"
               },
               null
             ]
@@ -1077,7 +1166,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.228"
+                "->": ".^.^.^.258"
               },
               null
             ]
@@ -2735,6 +2824,35 @@
       "teacher": [
         [
           "ev",
+          "str",
+          "^arcade-keeper",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "teacher.story"
+                },
+                {
+                  "->": ".^.^.^.7"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
           {
             "VAR?": "hall_pass"
           },
@@ -2751,7 +2869,7 @@
                   "->": "teacher.pass"
                 },
                 {
-                  "->": ".^.^.^.4"
+                  "->": ".^.^.^.13"
                 },
                 null
               ]
@@ -2827,8 +2945,437 @@
             "\n",
             "done",
             null
+          ],
+          "story": [
+            "^There you are, Fae! Story time is about to start. ",
+            "#",
+            "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "^Hang your backpack in your cubby and find a spot on the rug. ",
+            "#",
+            "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "story_time",
+              "re": true
+            },
+            "ev",
+            false,
+            "/ev",
+            {
+              "VAR=": "maple_in_hall",
+              "re": true
+            },
+            "^Story time! Maybe someone in my class saw the kid in the purple hood. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
           ]
         }
+      ],
+      "classroom_closed": [
+        "^The classroom door is shut. Story time hasn't started yet. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "classroom_teacher": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Today's story is about a dragon who sneezes bubbles instead of fire! ",
+        "#",
+        "^speaker: Ms. Maple",
+        "/#",
+        "\n",
+        "^Bubbles... like the fountain this morning. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Everyone in the village got very sticky. Settle in, everyone! ",
+        "#",
+        "^speaker: Ms. Maple",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Remember, Fae: a kind word can calm almost anything. ",
+            "#",
+            "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "milo": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "milo.again"
+              },
+              {
+                "->": "milo.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Fae! Did you hear? Somebody beat the Star Racer high score at the arcade! ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^I've been trying all year. And they scribbled out their initials, so nobody knows who! ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^Whoever it was must be really, REALLY good at Star Racer. ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Milo folds a paper airplane. \"This one's a Star Racer!\" ",
+            "#",
+            "^speaker: Milo",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "rosie": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "rosie.again"
+              },
+              {
+                "->": "rosie.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Psst, Fae! Somebody in a purple hood just peeked in the door! ",
+        "#",
+        "^speaker: Rosie",
+        "/#",
+        "\n",
+        "^Then they ran off down the hall. ",
+        "#",
+        "^speaker: Rosie",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "hood_waiting",
+          "re": true
+        },
+        "^A purple hood? Here, at school? I have to see! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "ev",
+            {
+              "VAR?": "saw_hood"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Did you catch them? They're SO fast. ",
+                  "#",
+                  "^speaker: Rosie",
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "saw_hood"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Hurry, Fae! They went down the hall! ",
+                  "#",
+                  "^speaker: Rosie",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "hood_glimpse": [
+        "^Hey! You in the purple hood! Wait! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        false,
+        "/ev",
+        {
+          "VAR=": "hood_waiting",
+          "re": true
+        },
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "saw_hood",
+          "re": true
+        },
+        "^The kid zips around the corner, toward the gym. So fast! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^They dropped something... a purple marker. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The same purple as the scribbled-out Star Racer initials! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.30"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "art_wall": [
+        "^The class art wall: rainbows, rockets, and a very wobbly cat. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^And a drawing of a masked face, a swirl, and a star. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lantern"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Just like the glowing doodle on the ski lift! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "^There's no name on it. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "cubbies": [
+        "^Everyone's cubby has a coat hook and a name tag. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Mine has spare socks and a drawing of Maddie as a dragon. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "reading_corner": [
+        "^A cozy reading rug, with beanbags and a shelf of picture books. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "gym_hall": [
+        "^The hall to the gym. The doors are locked during story time. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "saw_hood"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Tiny purple footprints lead right up to them... ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.9"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
       ],
       "nurse": [
         [
@@ -3698,6 +4245,22 @@
         false,
         {
           "VAR=": "clubhouse_claimed"
+        },
+        false,
+        {
+          "VAR=": "story_time"
+        },
+        true,
+        {
+          "VAR=": "maple_in_hall"
+        },
+        false,
+        {
+          "VAR=": "hood_waiting"
+        },
+        false,
+        {
+          "VAR=": "saw_hood"
         },
         "/ev",
         "end",

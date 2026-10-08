@@ -883,6 +883,72 @@ the old trail, the owl, and the clubhouse claim.
     the new arcade door, and the bus e2e's hand-written route to the stop
     goes round it now.
 
+## Milestone 30: Story time **Status:** ✅ Completed (2026-10-08)
+- The school chapter begins. Once Mr. Pip is calm ("Someone from school
+  again..."), the journal sends Fae back to school. Ms. Maple, in the
+  hallway, says story time is starting and goes into her classroom, and its
+  door, shut until then, opens.
+- Ms. Maple's classroom (a new painted room: chalkboard, the class art wall,
+  cubbies, a reading corner with beanbags, five desks, the teacher's desk).
+  Two classmates: Milo, who only knows someone beat the Star Racer high score
+  and scribbled out their initials; and Rosie, who saw a purple hood peek in
+  the door. The art wall has a nameless drawing of a masked face, a swirl,
+  and a star: the doodle the lantern showed on the ski lift.
+- Out in the hall, the kid in the purple hood is glimpsed, from behind, and
+  runs off toward the gym, dropping a purple marker (the Star Racer
+  scribbles' purple). Who they are stays a secret (owner, 2026-10-07): they
+  are seen only from behind, and no line names them.
+- Evidence: unit (`school-chapter.test.ts`: story time and Ms. Maple leaving
+  the hall, the classroom door shut then open, the classroom's people on
+  open floor and each talkable from a standable spot, the look points and the
+  art wall's lantern line, Ms. Maple's story, Milo, Rosie and the hood's
+  appearance, the glimpse and the kid leaving, nobody named, the journal),
+  the recorded run `pass-party/school.json` (`tools/sim/record-school.ts`:
+  the arcade run, then school, story time, the classroom, and the glimpse)
+  with matching browser and Bun hashes, and the real-key e2e
+  `school-chapter.spec.ts` (the classroom, the hall with the hood, and the
+  glimpse, at both sizes).
+- Wording for the owner: Ms. Maple ("There you are, Fae! Story time is about
+  to start." / "Hang your backpack in your cubby and find a spot on the
+  rug."; Fae: "Story time! Maybe someone in my class saw the kid in the
+  purple hood."); the shut door ("The classroom door is shut. Story time
+  hasn't started yet."); her story ("Today's story is about a dragon who
+  sneezes bubbles instead of fire!" / Fae: "Bubbles... like the fountain this
+  morning." / "Everyone in the village got very sticky. Settle in,
+  everyone!"; again: "Remember, Fae: a kind word can calm almost
+  anything."); Milo ("Fae! Did you hear? Somebody beat the Star Racer high
+  score at the arcade!" / "I've been trying all year. And they scribbled out
+  their initials, so nobody knows who!" / "Whoever it was must be really,
+  REALLY good at Star Racer."; again: "Milo folds a paper airplane. "This
+  one's a Star Racer!""); Rosie ("Psst, Fae! Somebody in a purple hood just
+  peeked in the door!" / "Then they ran off down the hall." / Fae: "A purple
+  hood? Here, at school? I have to see!"; again: "Hurry, Fae! They went down
+  the hall!" or "Did you catch them? They're SO fast."); the glimpse ("Hey!
+  You in the purple hood! Wait!" / "The kid zips around the corner, toward
+  the gym. So fast!" / "They dropped something... a purple marker." / "The
+  same purple as the scribbled-out Star Racer initials!"); the art wall, the
+  cubbies, the reading corner, and the gym hall ("The hall to the gym. The
+  doors are locked during story time." / "Tiny purple footprints lead right
+  up to them..."); and the journal ("Ms. Maple said to be back in time for
+  story time. Back to school!", then "Story time! Rosie and Milo are in my
+  class. Maybe somebody saw the kid in the purple hood.", then "A kid in a
+  purple hood ran off toward the gym! They dropped a purple marker, the same
+  purple as the Star Racer scribbles.").
+- Notes and assumptions:
+  - Milo and Rosie are placeholder names for the two classmates NOTES.md
+    lists as TBD; the music, art, and PE teachers and the principal are
+    still to come. The gym is next: its doors lock during story time.
+  - The hooded kid's single frame is a back view of a running kid, the hood
+    up, nothing that could identify them. They stand at the top of the east
+    hall, toward the gym, and Fae calls to them from their left, so both are
+    in view on a phone (first placed lower in the hall, the dialogue box hid
+    them).
+  - The classroom's first geometry ran its floor off the painted floor, put
+    Ms. Maple and Milo inside furniture, and gave the desks no occluders (Fae
+    was drawn over them); it was retraced and checked with a depth preview
+    (`art/review/classroom-depth.png`). The talk checks in the arcade's and
+    the classroom's tests now require a spot where Fae can actually stand.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -945,9 +1011,11 @@ more bad guys, and the blacklight lantern, made and built while away.
     Done (Milestone 27, above).
   - Milestone 28, recurring bad guys: done (above).
   - Milestone 29, the first person under the chaos spell: done (above).
-  - Then the clubhouse fix-up (a fridge for snacks, the garden), once coins
-    exist. The school chapter, the lasso, and the flute no longer wait: the
-    kid's identity is kept for the very end (owner, 2026-10-07).
+  - Milestone 30, the school chapter begins (story time): done (above).
+  - Next: the gym and the PE teacher's lasso (the school chapter goes on),
+    the music teacher's flute, and the clubhouse fix-up (a fridge for
+    snacks, the garden). The kid's identity is kept for the very end
+    (owner, 2026-10-07).
 
 ## Later (not scheduled)
 Gamepad polish, the lasso and the flute, the Whispering Woods and the

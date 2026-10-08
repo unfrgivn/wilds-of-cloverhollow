@@ -11,6 +11,10 @@ VAR jordan_joined = false
 VAR has_lantern = false
 VAR found_old_trail = false
 VAR clubhouse_claimed = false
+VAR story_time = false
+VAR maple_in_hall = true
+VAR hood_waiting = false
+VAR saw_hood = false
 EXTERNAL calmed(id)
 EXTERNAL coins()
 
@@ -57,6 +61,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{saw_hood: A kid in a purple hood ran off toward the gym! They dropped a purple marker, the same purple as the Star Racer scribbles. # speaker: Fae}
+{story_time and not saw_hood: Story time! Rosie and Milo are in my class. Maybe somebody saw the kid in the purple hood. # speaker: Fae}
+{calmed("arcade-keeper") and not story_time: Ms. Maple said to be back in time for story time. Back to school! # speaker: Fae}
 {calmed("arcade-keeper"): Mr. Pip, the arcade keeper, drank a fizzy soda from the kid in the purple hood. The spell works on people too! # speaker: Fae}
 {calmed("arcade-keeper"): The hooded kid scribbled out their initials on the Star Racer high score. Someone from school again... # speaker: Fae}
 {clubhouse_claimed and not calmed("arcade-keeper"): A note in the clubhouse said "NEXT STOP: THE ARCADE." The arcade is in the plaza, back home. # speaker: Fae}
@@ -377,6 +384,7 @@ MEADOW PARK. Please keep your pets on the path! # speaker: Sign
 
 
 === teacher ===
+{calmed("arcade-keeper"): -> story}
 {hall_pass: -> pass}
 Good morning, Fae! Class starts when the bell rings. # speaker: Ms. Maple
 + [Can I go outside for a bit?]
@@ -388,6 +396,80 @@ Good morning, Fae! Class starts when the bell rings. # speaker: Ms. Maple
 
 = pass
 A hall pass? All right. Be back in time for story time! # speaker: Ms. Maple
+-> DONE
+
+= story
+There you are, Fae! Story time is about to start. # speaker: Ms. Maple
+Hang your backpack in your cubby and find a spot on the rug. # speaker: Ms. Maple
+~ story_time = true
+~ maple_in_hall = false
+Story time! Maybe someone in my class saw the kid in the purple hood. # speaker: Fae
+-> DONE
+
+=== classroom_closed ===
+The classroom door is shut. Story time hasn't started yet. # speaker: Fae
+-> DONE
+
+=== classroom_teacher ===
+{classroom_teacher > 1: -> again}
+Today's story is about a dragon who sneezes bubbles instead of fire! # speaker: Ms. Maple
+Bubbles... like the fountain this morning. # speaker: Fae
+Everyone in the village got very sticky. Settle in, everyone! # speaker: Ms. Maple
+-> DONE
+= again
+Remember, Fae: a kind word can calm almost anything. # speaker: Ms. Maple
+-> DONE
+
+=== milo ===
+{milo > 1: -> again}
+Fae! Did you hear? Somebody beat the Star Racer high score at the arcade! # speaker: Milo
+I've been trying all year. And they scribbled out their initials, so nobody knows who! # speaker: Milo
+Whoever it was must be really, REALLY good at Star Racer. # speaker: Milo
+-> DONE
+= again
+Milo folds a paper airplane. "This one's a Star Racer!" # speaker: Milo
+-> DONE
+
+=== rosie ===
+{rosie > 1: -> again}
+Psst, Fae! Somebody in a purple hood just peeked in the door! # speaker: Rosie
+Then they ran off down the hall. # speaker: Rosie
+~ hood_waiting = true
+A purple hood? Here, at school? I have to see! # speaker: Fae
+-> DONE
+= again
+{saw_hood: Did you catch them? They're SO fast. # speaker: Rosie}
+{not saw_hood: Hurry, Fae! They went down the hall! # speaker: Rosie}
+-> DONE
+
+=== hood_glimpse ===
+Hey! You in the purple hood! Wait! # speaker: Fae
+~ hood_waiting = false
+~ saw_hood = true
+The kid zips around the corner, toward the gym. So fast! # speaker: Fae
+They dropped something... a purple marker. # speaker: Fae
+{calmed("arcade-keeper"): The same purple as the scribbled-out Star Racer initials! # speaker: Fae}
+-> DONE
+
+=== art_wall ===
+The class art wall: rainbows, rockets, and a very wobbly cat. # speaker: Fae
+And a drawing of a masked face, a swirl, and a star. # speaker: Fae
+{has_lantern: Just like the glowing doodle on the ski lift! # speaker: Fae}
+There's no name on it. # speaker: Fae
+-> DONE
+
+=== cubbies ===
+Everyone's cubby has a coat hook and a name tag. # speaker: Fae
+Mine has spare socks and a drawing of Maddie as a dragon. # speaker: Fae
+-> DONE
+
+=== reading_corner ===
+A cozy reading rug, with beanbags and a shelf of picture books. # speaker: Fae
+-> DONE
+
+=== gym_hall ===
+The hall to the gym. The doors are locked during story time. # speaker: Fae
+{saw_hood: Tiny purple footprints lead right up to them... # speaker: Fae}
 -> DONE
 
 === nurse ===

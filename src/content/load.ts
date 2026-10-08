@@ -4,6 +4,7 @@ import plazaData from "../../content/areas/plaza.json";
 import kitchenData from "../../content/areas/kitchen.json";
 import parkData from "../../content/areas/park.json";
 import schoolData from "../../content/areas/school.json";
+import classroomData from "../../content/areas/classroom.json";
 import bayData from "../../content/areas/bay.json";
 import passData from "../../content/areas/pass.json";
 import trailData from "../../content/areas/trail.json";
@@ -895,6 +896,7 @@ export function loadContent(): {
   const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
   const park = parseArea(parkData, "content/areas/park.json");
   const school = parseArea(schoolData, "content/areas/school.json");
+  const classroom = parseArea(classroomData, "content/areas/classroom.json");
   const bay = parseArea(bayData, "content/areas/bay.json");
   Object.defineProperty(bay.spawns, "bus-stop", {
     value: { x: 355, y: 545, facing: "down" },
@@ -986,6 +988,7 @@ export function loadContent(): {
     [kitchen.id]: kitchen,
     [park.id]: park,
     [school.id]: school,
+    [classroom.id]: classroom,
     [bay.id]: bay,
     [pass.id]: pass,
     [trail.id]: trail,

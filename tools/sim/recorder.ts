@@ -40,7 +40,7 @@ export function createRecorder(world: World, initial: State): {
   lantern: () => void;
   face: (direction: keyof typeof directions) => void;
   navigate: (target: Move, tolerance?: number) => void;
-  approach: (id: string) => void;
+  approach: (id: string, from?: Direction) => void;
   meet: (kind: string) => void;
   clear: () => void;
   leave: (move: Move, area: string) => void;
@@ -157,11 +157,16 @@ export function createRecorder(world: World, initial: State): {
   };
 
   // Walks to about 45 units from the talk target `id` (below it if Fae can
-  // stand there, else beside it, else above) and turns to face it.
-  const approach = (id: string): void => {
+  // stand there, else beside it, else above; or first on the side `from`,
+  // where a watcher sees them both) and turns to face it.
+  const approach = (id: string, from?: Direction): void => {
     const point = targetPoint(id);
-    const spots: [number, number, Direction][] =
-      [[0, 45, "up"], [-45, 0, "right"], [45, 0, "left"], [0, -45, "down"]];
+    const sides: Record<Direction, [number, number, Direction]> = {
+      down: [0, 45, "up"], left: [-45, 0, "right"], right: [45, 0, "left"], up: [0, -45, "down"],
+    };
+    const order: Direction[] = ["down", "left", "right", "up"];
+    const spots = (from === undefined ? order : [from, ...order.filter((side) => side !== from)])
+      .map((side) => sides[side]);
     for (const [dx, dy, facing] of spots) {
       const spot = { x: point.x + dx, y: point.y + dy };
       if (!standable(spot)) continue;

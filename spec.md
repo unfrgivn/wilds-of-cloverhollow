@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-07 (Milestone 29, the arcade keeper)
+Last updated: 2026-10-08 (Milestone 30, story time)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -352,6 +352,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   `arcade-door` (1412, 560) faces down. Mr. Pip, the arcade keeper, is its
   set piece at (820, 610). Look points: `claw-machine`, `ticket-counter`, and
   `star-racer` (a back-row cabinet).
+- Story time (Milestone 30): the school hallway's classroom door (trigger
+  `classroom-door`, the porthole door on the back-left wall) leads to
+  `classroom.door` and `requires` `story_time` (knot `classroom_closed`);
+  spawn `classroom-door` (700, 450) faces down. Ms. Maple in the hall is
+  `visibleWhile` `maple_in_hall` (she goes in at story time). The kid in the
+  purple hood (person `hooded-kid`, knot `hood_glimpse`, a single back view)
+  stands at the east end of the hall while `hood_waiting`; the `gym-hall` Look
+  point is beside them. `classroom`, "Ms. Maple's Classroom", is a 1200x800
+  painted cutaway: its floor a diamond, the door on the back-left wall
+  (trigger `door` to `school.classroom-door`, a band along the whole painted
+  door; spawn `door` (280, 535) facing right). People: Ms. Maple (`teacher`,
+  knot `classroom_teacher`) at (850, 470) by the reading corner, Milo (knot
+  `milo`) at (520, 610), and Rosie (knot `rosie`) at (270, 470) by the door.
+  Look points: `art-wall`, `cubbies`, and `reading-corner`. Each desk with its
+  chair, the teacher's desk, the beanbags, and the bookshelf are occluders
+  traced to their painted silhouettes.
 - The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
   Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
   and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
@@ -382,7 +398,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   beach), where a kid holding down would otherwise bounce between them.
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
   visibleWhile? }` (Ms. Maple the teacher and Nurse Holly in the school
-  hallway; Mom and Oliver in the kitchen). Each is
+  hallway, and the kid in the purple hood there for a moment; Ms. Maple,
+  Milo, and Rosie in the classroom; Mom and Oliver in the kitchen). Each is
   drawn from the atlas named for its id in
   `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
   ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for

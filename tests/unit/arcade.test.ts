@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   blankInput,
   createState,
+  distanceToPolygon,
   journalNotes,
+  pointInPolygon,
   presentCritters,
   step,
   targetInteractable,
@@ -170,11 +172,18 @@ describe("Mr. Pip, the arcade keeper", () => {
     if (placed === undefined) throw new Error("no keeper");
     const base = at("arcade", "door", placed.point, "up", claimed);
     const calm: State = { ...base, critters: { ...base.critters, "arcade-keeper": "calm" } };
+    const radius = world.tunables.playerRadius;
+    const standable = (feet: Point): boolean => pointInPolygon(feet, arcade.walkable) &&
+      distanceToPolygon(feet, arcade.walkable) >= radius &&
+      arcade.blockers.every((polygon) =>
+        !pointInPolygon(feet, polygon) && distanceToPolygon(feet, polygon) >= radius);
     const spots: [number, number, Direction][] =
       [[0, 45, "up"], [-45, 0, "right"], [45, 0, "left"], [0, -45, "down"]];
-    const talkable = spots.some(([dx, dy, facing]) => targetInteractable(world,
-      { ...calm, player: { x: placed.point.x + dx, y: placed.point.y + dy }, facing })?.id ===
-      "critter:arcade-keeper");
+    const talkable = spots.some(([dx, dy, facing]) => {
+      const feet = { x: placed.point.x + dx, y: placed.point.y + dy };
+      return standable(feet) && targetInteractable(world, { ...calm, player: feet, facing })?.id ===
+        "critter:arcade-keeper";
+    });
     expect(talkable).toBe(true);
   });
 });
@@ -200,8 +209,10 @@ describe("the arcade's things to look at, and the journal", () => {
         "The arcade is in the plaza, back home.");
     const calm: State = { ...base, ink: claimed,
       critters: { ...base.critters, "arcade-keeper": "calm" } };
+    // Newest first: the school chapter's "back to school" note, then his.
     const notes = journalNotes(world, calm);
-    expect(notes.slice(0, 2)).toEqual([
+    expect(notes[0]).toBe("Ms. Maple said to be back in time for story time. Back to school!");
+    expect(notes.slice(1, 3)).toEqual([
       "Mr. Pip, the arcade keeper, drank a fizzy soda from the kid in the purple hood. " +
         "The spell works on people too!",
       "The hooded kid scribbled out their initials on the Star Racer high score. " +

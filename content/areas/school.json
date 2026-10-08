@@ -191,6 +191,35 @@
         "variable": "hall_pass",
         "knot": "school_doors"
       }
+    },
+    {
+      "id": "classroom-door",
+      "polygon": [
+        [
+          590,
+          354
+        ],
+        [
+          680,
+          298
+        ],
+        [
+          696,
+          326
+        ],
+        [
+          606,
+          382
+        ]
+      ],
+      "target": {
+        "area": "classroom",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "story_time",
+        "knot": "classroom_closed"
+      }
     }
   ],
   "interactables": [
@@ -211,6 +240,15 @@
       },
       "prompt": "Look",
       "knot": "trophies"
+    },
+    {
+      "id": "gym-hall",
+      "knot": "gym_hall",
+      "point": {
+        "x": 1310,
+        "y": 700
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {
@@ -218,6 +256,11 @@
       "x": 600,
       "y": 520,
       "facing": "right"
+    },
+    "classroom-door": {
+      "x": 700,
+      "y": 450,
+      "facing": "down"
     }
   },
   "npcs": [
@@ -247,7 +290,8 @@
           625,
           415
         ]
-      ]
+      ],
+      "visibleWhile": "maple_in_hall"
     },
     {
       "id": "nurse",
@@ -276,6 +320,35 @@
           545
         ]
       ]
+    },
+    {
+      "id": "hooded-kid",
+      "point": {
+        "x": 1290,
+        "y": 640
+      },
+      "facing": "right",
+      "knot": "hood_glimpse",
+      "prompt": "Look",
+      "footprint": [
+        [
+          1275,
+          630
+        ],
+        [
+          1305,
+          630
+        ],
+        [
+          1305,
+          650
+        ],
+        [
+          1275,
+          650
+        ]
+      ],
+      "visibleWhile": "hood_waiting"
     }
   ],
   "land": "cloverhollow"

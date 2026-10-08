@@ -44,5 +44,25 @@
     "idleTicks": [
       32
     ]
+  },
+  "milo": {
+    "atlas": "assets/characters/milo/milo.json",
+    "idleTicks": [
+      150,
+      8
+    ]
+  },
+  "rosie": {
+    "atlas": "assets/characters/rosie/rosie.json",
+    "idleTicks": [
+      190,
+      8
+    ]
+  },
+  "hooded-kid": {
+    "atlas": "assets/characters/hooded-kid/hooded-kid.json",
+    "idleTicks": [
+      32
+    ]
   }
 }

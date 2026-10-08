@@ -44,6 +44,8 @@ export function createRecorder(world: World, initial: State): {
   meet: (kind: string) => void;
   clear: () => void;
   leave: (move: Move, area: string) => void;
+  through: (area: string) => void;
+  knock: (move: Move, knot: string) => void;
   talk: (id: string, choices?: number[]) => void;
   battle: (plan: string[], pause?: (state: State) => boolean) => void;
 } {
@@ -209,14 +211,27 @@ export function createRecorder(world: World, initial: State): {
       throw new Error(`never got to ${area} (in ${state.area})`);
   };
 
-  // Talks to what Fae faces, reading every line; `choices` are the options
-  // to take, in order, each picked by stepping the selection down to it after
-  // half a second's read (long enough for a watcher to see them).
-  const talk = (id: string, choices: number[] = []): void => {
-    const target = targetInteractable(world, state)?.id;
-    if (target !== id) throw new Error(`facing ${target ?? "nothing"}, not ${id}`);
+  // Through the door of the area Fae is in that leads to `area`: toward the
+  // middle of its trigger, arrows only (from its spawn side, so get there first).
+  const through = (area: string): void => {
+    const here = world.areas[state.area];
+    const door = here?.triggers.find((trigger) => trigger.target.area === area);
+    if (here === undefined || door === undefined)
+      throw new Error(`no door from ${state.area} to ${area}`);
+    const middle: Point = {
+      x: door.polygon.reduce((sum, [x]) => sum + x, 0) / door.polygon.length,
+      y: door.polygon.reduce((sum, [, y]) => sum + y, 0) / door.polygon.length,
+    };
+    const gap = { x: middle.x - state.player.x, y: middle.y - state.player.y };
+    const sign = (value: number): number => Math.abs(value) < 12 ? 0 : Math.sign(value);
+    leave({ x: sign(gap.x), y: sign(gap.y) }, area);
+  };
+
+  // Reads the open dialogue, every line; `choices` are the options to take,
+  // in order, each picked by stepping the selection down to it after half a
+  // second's read (long enough for a watcher to see them).
+  const read = (id: string, choices: number[]): void => {
     const wanted = choices.slice();
-    press();
     for (let count = 0; count < 400 && state.dialogue !== null; count += 1) {
       const dialogue = state.dialogue;
       if (dialogue.revealed < dialogue.text.length || dialogue.choices.length === 0) {
@@ -233,6 +248,25 @@ export function createRecorder(world: World, initial: State): {
     }
     if (state.dialogue !== null) throw new Error(`${id} never finished`);
     if (wanted.length > 0) throw new Error(`${id}: choices left over: ${wanted.join(",")}`);
+  };
+
+  // Talks to what Fae faces.
+  const talk = (id: string, choices: number[] = []): void => {
+    const target = targetInteractable(world, state)?.id;
+    if (target !== id) throw new Error(`facing ${target ?? "nothing"}, not ${id}`);
+    press();
+    read(id, choices);
+  };
+
+  // Holds `move` into a door that's shut until its `knot` plays, and reads it.
+  const knock = (move: Move, knot: string): void => {
+    for (let count = 0; count < 300 && state.dialogue === null; count += 1) {
+      if (state.battle !== null || state.transition !== null)
+        throw new Error(`went somewhere on the way to ${knot}`);
+      tick(frame(move));
+    }
+    if (state.dialogue?.knot !== knot) throw new Error(`${knot} never played`);
+    read(knot, []);
   };
 
   // Plays a battle to its end: the commands in `plan` first, then Soothe for
@@ -277,6 +311,8 @@ export function createRecorder(world: World, initial: State): {
     meet,
     clear,
     leave,
+    through,
+    knock,
     talk,
     battle,
   };

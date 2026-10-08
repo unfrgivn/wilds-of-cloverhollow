@@ -8,7 +8,12 @@ player should be able to walk behind the prop.
 
 Run `bun tools/art/area-overlay.ts bedroom` to draw the JSON over the two
 painting tiles. The script writes `art/review/bedroom-overlay.png` and an SVG
-source. Inspect the full-size PNG before accepting coordinates. Run
+source. Inspect the full-size PNG before accepting coordinates. Green marks
+every spot Fae's feet can reach from a spawn, by the core's own collision
+rule: it must cover only open painted floor, never furniture, the floor
+behind it, or the paper outside the painting. Magenta marks the doors (each
+band covers its whole painted door), cyan the people's footprints (none
+inside furniture), and violet each look point's interaction range. Run
 `bun tools/art/area-occluders.ts content/areas/bedroom.json` after changing an
 occluder. It reassembles the painting, masks and crops each silhouette, and
 writes lossless WebP cutouts plus `occluders.json` beside the ground tiles.

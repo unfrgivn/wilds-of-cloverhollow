@@ -27,6 +27,13 @@
       8
     ]
   },
+  "coach": {
+    "atlas": "assets/characters/coach/coach.json",
+    "idleTicks": [
+      180,
+      8
+    ]
+  },
   "sue": {
     "atlas": "assets/characters/sue/sue.json",
     "idleTicks": [

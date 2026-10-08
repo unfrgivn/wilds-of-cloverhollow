@@ -220,6 +220,35 @@
         "variable": "story_time",
         "knot": "classroom_closed"
       }
+    },
+    {
+      "id": "gym-doors",
+      "polygon": [
+        [
+          1330,
+          614
+        ],
+        [
+          1355,
+          614
+        ],
+        [
+          1355,
+          795
+        ],
+        [
+          1330,
+          795
+        ]
+      ],
+      "target": {
+        "area": "gym",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "pe_time",
+        "knot": "gym_hall"
+      }
     }
   ],
   "interactables": [
@@ -240,15 +269,6 @@
       },
       "prompt": "Look",
       "knot": "trophies"
-    },
-    {
-      "id": "gym-hall",
-      "knot": "gym_hall",
-      "point": {
-        "x": 1310,
-        "y": 700
-      },
-      "prompt": "Look"
     }
   ],
   "spawns": {
@@ -261,6 +281,11 @@
       "x": 700,
       "y": 450,
       "facing": "down"
+    },
+    "gym-doors": {
+      "x": 1250,
+      "y": 700,
+      "facing": "left"
     }
   },
   "npcs": [

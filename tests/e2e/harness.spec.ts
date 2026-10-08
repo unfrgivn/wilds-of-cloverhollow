@@ -95,6 +95,7 @@ for (const item of [
   { name: "woods", fixture: "pass-party" },
   { name: "arcade", fixture: "pass-party" },
   { name: "school", fixture: "pass-party" },
+  { name: "gym", fixture: "pass-party" },
 ]) {
   const { name, fixture } = item;
   test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({

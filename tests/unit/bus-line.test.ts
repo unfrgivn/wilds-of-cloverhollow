@@ -111,6 +111,7 @@ describe("the lands", () => {
     const lands: Record<string, string> = {
       bedroom: "cloverhollow", kitchen: "cloverhollow",
       arcade: "cloverhollow", classroom: "cloverhollow",
+      gym: "cloverhollow",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
       bay: "bay", pass: "pass", trail: "trail",
     };

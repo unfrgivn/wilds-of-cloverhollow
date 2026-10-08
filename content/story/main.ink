@@ -15,6 +15,12 @@ VAR story_time = false
 VAR maple_in_hall = true
 VAR hood_waiting = false
 VAR saw_hood = false
+VAR pe_time = false
+VAR gym_quest = false
+VAR saw_clipboard = false
+VAR has_lasso = false
+VAR found_clipboard = false
+VAR coach_thanked = false
 EXTERNAL calmed(id)
 EXTERNAL coins()
 
@@ -61,6 +67,13 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{coach_thanked: Coach Ash gave me his lasso! It can pull down things that are up high, and maybe swing across gaps too. # speaker: Fae}
+{gym_quest and not coach_thanked and calmed("gym-pup") and found_clipboard: I found Coach Ash's stopwatch and his clipboard! Back to Coach Ash. # speaker: Fae}
+{gym_quest and not calmed("gym-pup"): A fizzy pup is zooming around the gym with Coach Ash's stopwatch. # speaker: Fae}
+{gym_quest and not found_clipboard: {has_lasso:Coach Ash lent me his lasso, to get his clipboard down from the hoop.|{saw_clipboard:Coach Ash's clipboard is stuck on the basketball hoop. It's too high to reach!|Coach Ash's clipboard went flying, somewhere up high.}} # speaker: Fae}
+{gym_quest: The kid in the purple hood knocked over Coach Ash's cart, then ran out the back door to the playing field. # speaker: Fae}
+{pe_time and not gym_quest: Time for PE! The gym is at the end of the hall. # speaker: Fae}
+{saw_hood and gym_hall and not pe_time: The gym doors are locked during story time. Ms. Maple will know when it's over. # speaker: Fae}
 {saw_hood: A kid in a purple hood ran off toward the gym! They dropped a purple marker, the same purple as the Star Racer scribbles. # speaker: Fae}
 {story_time and not saw_hood: Story time! Rosie and Milo are in my class. Maybe somebody saw the kid in the purple hood. # speaker: Fae}
 {calmed("arcade-keeper") and not story_time: Ms. Maple said to be back in time for story time. Back to school! # speaker: Fae}
@@ -411,6 +424,7 @@ The classroom door is shut. Story time hasn't started yet. # speaker: Fae
 -> DONE
 
 === classroom_teacher ===
+{saw_hood and not pe_time: -> pe}
 {classroom_teacher > 1: -> again}
 Today's story is about a dragon who sneezes bubbles instead of fire! # speaker: Ms. Maple
 Bubbles... like the fountain this morning. # speaker: Fae
@@ -418,6 +432,12 @@ Everyone in the village got very sticky. Settle in, everyone! # speaker: Ms. Map
 -> DONE
 = again
 Remember, Fae: a kind word can calm almost anything. # speaker: Ms. Maple
+-> DONE
+= pe
+That's the end of our story! Time for PE, everyone. # speaker: Ms. Maple
+Coach Ash is waiting for you in the gym, at the end of the hall. # speaker: Ms. Maple
+~ pe_time = true
+The gym! That's where the kid in the purple hood was headed. # speaker: Fae
 -> DONE
 
 === milo ===
@@ -470,6 +490,84 @@ A cozy reading rug, with beanbags and a shelf of picture books. # speaker: Fae
 === gym_hall ===
 The hall to the gym. The doors are locked during story time. # speaker: Fae
 {saw_hood: Tiny purple footprints lead right up to them... # speaker: Fae}
+-> DONE
+
+=== coach ===
+{coach_thanked: -> again}
+{gym_quest: -> quest}
+TWEET! Oh, hi, Fae! Whew, what a morning. # speaker: Coach Ash
+A kid in a purple hood dashed through here and knocked over my equipment cart! # speaker: Coach Ash
+Then they ran straight out the back door, to the playing field. Fast kid! # speaker: Coach Ash
+{calmed("gym-pup"): -> watch_back}
+My clipboard went flying, and a fizzy pup ran off with my stopwatch! # speaker: Coach Ash
+* [I'll get them back!]
+    That's the spirit! # speaker: Coach Ash
+* [Did you see who it was?]
+    Nope. Just a purple hood and a cloud of dust! Can you help me find my things? # speaker: Coach Ash
+- ~ gym_quest = true
+-> DONE
+= watch_back
+Hey, you've got my stopwatch! The pup had it? Thanks, Fae! # speaker: Coach Ash
+Now if only I could find my clipboard. It went flying! # speaker: Coach Ash
+~ gym_quest = true
+-> DONE
+= quest
+{calmed("gym-pup") and found_clipboard: -> thanks}
+{saw_clipboard and not has_lasso: -> lend}
+How's the hunt going? # speaker: Coach Ash
+{not calmed("gym-pup"): That fizzy pup still has my stopwatch! Calm it down, and maybe it'll drop it. # speaker: Coach Ash}
+{not saw_clipboard: My clipboard went flying. I heard it clatter somewhere up high. # speaker: Coach Ash}
+{has_lasso and not found_clipboard: Give that lasso a twirl at the hoop! # speaker: Coach Ash}
+-> DONE
+= lend
+Up on the hoop? I can't reach that either. # speaker: Coach Ash
+Here, take my lasso! I used to rope cones with it at summer camp. # speaker: Coach Ash
+~ has_lasso = true
+Coach Ash hands Fae a lasso of twisted rainbow rope, with a wooden star on its handle. # speaker: Fae
+-> DONE
+= thanks
+My stopwatch AND my clipboard! You're a star, Fae! # speaker: Coach Ash
+~ coach_thanked = true
+Keep the lasso. It can pull down things that are up high, and swing you across gaps, too! # speaker: Coach Ash
+-> DONE
+= again
+Keep that lasso handy, Fae! And watch out for that purple hood. # speaker: Coach Ash
+-> DONE
+
+=== hoop ===
+{
+- found_clipboard:
+    The basketball hoop. Nothing stuck up there now! # speaker: Fae
+- has_lasso:
+    Fae twirls the lasso once, twice... and loops it right over the clipboard! # speaker: Fae
+    ~ found_clipboard = true
+    Got it! Coach Ash's clipboard. # speaker: Fae
+- else:
+    ~ saw_clipboard = true
+    {gym_quest:There's Coach Ash's clipboard, hooked on the rim!|There's a clipboard hooked on the rim!} It's way too high to reach. # speaker: Fae
+}
+-> DONE
+
+=== ball_bin ===
+A big bin of bouncy balls: red ones, blue ones, and one very flat one. # speaker: Fae
+-> DONE
+
+=== climbing_rope ===
+A climbing rope, all the way up to the ceiling. There's a little bell at the top! # speaker: Fae
+-> DONE
+
+=== back_door ===
+The back door to the playing field. It clicked shut behind the kid in the purple hood. # speaker: Fae
+It only opens from outside. Purple footprints lead right up to it... # speaker: Fae
+-> DONE
+
+=== gym_pup_calm ===
+{gym_pup_calm > 1: -> again}
+Woof! The pup flops down and wags its whole body. # speaker: Gym Pup
+{gym_quest:I've got Coach Ash's stopwatch back. Good pup!|It dropped a shiny stopwatch. Whose could it be?} # speaker: Fae
+-> DONE
+= again
+The pup sniffs a bouncy ball, very seriously. # speaker: Gym Pup
 -> DONE
 
 === nurse ===

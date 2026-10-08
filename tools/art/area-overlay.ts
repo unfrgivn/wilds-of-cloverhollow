@@ -1,102 +1,98 @@
+// Draws an area's JSON over its painting for review: the floor's outline,
+// blockers (red), occluders and their baselines (blue), doors (magenta),
+// spawns (gold), look points with their reach (violet), and people's
+// footprints (cyan). Green is every spot Fae's feet can get to from a spawn:
+// on the floor and a player radius clear of its edge, every blocker, and every
+// footprint (the core's own rule). Green on furniture, behind it, or off the
+// painted floor is a geometry bug.
+//
+//   bun tools/art/area-overlay.ts <area>   (writes art/review/<area>-overlay.png)
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { distanceToPolygon, pointInPolygon, type Point, type Polygon } from "../../src/core";
+import { parseArea, parseTunables } from "../../src/content/load";
 
-type Point = [number, number];
-type Area = {
-  width: number; height: number; ground: string;
-  walkable: Point[]; blockers: Point[][];
-  occluders: { id: string; polygon: Point[]; baseline: number }[];
-  spawns: Record<string, { x: number; y: number }>;
-  interactables: { id: string; x: number; y: number }[];
-};
 const id = process.argv[2] ?? "bedroom";
-const value: unknown = JSON.parse(readFileSync(`content/areas/${id}.json`, "utf8"));
-if (typeof value !== "object" || value === null || !("width" in value) ||
-    !("height" in value) || !("ground" in value) ||
-    typeof value.width !== "number" || typeof value.height !== "number" ||
-    typeof value.ground !== "string" || !("walkable" in value) ||
-   !("blockers" in value) || !("occluders" in value) || !("spawns" in value))
-  throw new Error("invalid area");
-if (!Array.isArray(value.walkable) || !Array.isArray(value.blockers) ||
-    !Array.isArray(value.occluders) || typeof value.spawns !== "object" ||
-    value.spawns === null) throw new Error("invalid area shapes");
-const rawInteractables = "interactables" in value ? value.interactables : [];
-const area: Area = {
-  width: value.width, height: value.height, ground: value.ground,
-  walkable: value.walkable.flatMap((point: unknown): Point[] =>
-    Array.isArray(point) && point.length === 2 && typeof point[0] === "number" &&
-    typeof point[1] === "number" ? [[point[0], point[1]]] : []),
-  blockers: value.blockers.flatMap((polygon: unknown): Point[][] =>
-    Array.isArray(polygon) ? [polygon.flatMap((point: unknown): Point[] =>
-      Array.isArray(point) && point.length === 2 && typeof point[0] === "number" &&
-      typeof point[1] === "number" ? [[point[0], point[1]]] : [])] : []),
-  occluders: value.occluders.flatMap((item): Area["occluders"] => {
-    if (typeof item !== "object" || item === null || !("id" in item) ||
-        typeof item.id !== "string" || !("baseline" in item) ||
-        typeof item.baseline !== "number" || !("polygon" in item) ||
-        !Array.isArray(item.polygon)) return [];
-    const polygon = item.polygon.flatMap((point: unknown): Point[] =>
-      Array.isArray(point) && point.length === 2 && typeof point[0] === "number" &&
-      typeof point[1] === "number" ? [[point[0], point[1]]] : []);
-    return [{ id: item.id, baseline: item.baseline, polygon }];
-  }),
-  spawns: Object.fromEntries(Object.entries(value.spawns).flatMap(([name, item]) =>
-    typeof item === "object" && item !== null && "x" in item && "y" in item &&
-    typeof item.x === "number" && typeof item.y === "number"
-      ? [[name, { x: item.x, y: item.y }]] : [])),
-  interactables: Array.isArray(rawInteractables) ? rawInteractables.flatMap((item: unknown) =>
-    typeof item === "object" && item !== null && "id" in item && "point" in item &&
-    typeof item.id === "string" && typeof item.point === "object" && item.point !== null &&
-    "x" in item.point && "y" in item.point && typeof item.point.x === "number" &&
-    typeof item.point.y === "number"
-      ? [{ id: item.id, x: item.point.x, y: item.point.y }] : []) : [],
+const file = `content/areas/${id}.json`;
+const area = parseArea(JSON.parse(readFileSync(file, "utf8")), file);
+if (area.ground === undefined) throw new Error(`${file} has no painting`);
+const radius = parseTunables(JSON.parse(readFileSync("content/tunables.json", "utf8")),
+  "content/tunables.json").playerRadius;
+
+// Breadth-first over a 5-unit grid from every spawn.
+const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
+const standable = (point: Point): boolean => pointInPolygon(point, area.walkable) &&
+  distanceToPolygon(point, area.walkable) >= radius &&
+  solid.every((polygon) =>
+    !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius);
+const cell = 5;
+const snap = (value: number): number => Math.round(value / cell) * cell;
+const around: [number, number][] = [[0, 0], [cell, 0], [-cell, 0], [0, cell], [0, -cell]];
+const reached = new Set<string>();
+const queue: Point[] = [];
+const visit = (point: Point): void => {
+  const key = `${point.x},${point.y}`;
+  if (reached.has(key) || !standable(point)) return;
+  reached.add(key);
+  queue.push(point);
 };
-const sourceWidth = area.width * 2;
-const sourceHeight = area.height * 2;
-const poly = (points: Point[]): string => points.map(([x, y]) => `${x * 2},${y * 2}`).join(" ");
-const lines: string[] = [];
-for (let x = 0; x <= sourceWidth; x += 100)
-  lines.push(`<path d="M${x} 0V${sourceHeight}"/>`);
-for (let y = 0; y <= sourceHeight; y += 100)
-  lines.push(`<path d="M0 ${y}H${sourceWidth}"/>`);
-const spawnLabels = Object.entries(area.spawns).map(([name, point]) =>
-  `<circle cx="${point.x * 2}" cy="${point.y * 2}" r="18"/>` +
-  `<text x="${point.x * 2 + 24}" y="${point.y * 2}">${name}</text>`
-).join("");
-const manifestPath = `public/assets/areas/${area.ground}/ground.json`;
+for (const spawn of Object.values(area.spawns))
+  for (const [dx, dy] of around) visit({ x: snap(spawn.x) + dx, y: snap(spawn.y) + dy });
+for (let index = 0; index < queue.length; index += 1) {
+  const here = queue[index];
+  if (here !== undefined)
+    for (const [dx, dy] of around.slice(1)) visit({ x: here.x + dx, y: here.y + dy });
+}
+
+// The painting is 2 source px per unit.
+const px = (value: number): number => value * 2;
+const poly = (points: Polygon): string => points.map(([x, y]) => `${px(x)},${px(y)}`).join(" ");
+const width = px(area.width);
+const height = px(area.height);
+const grid: string[] = [];
+for (let x = 0; x <= width; x += 100) grid.push(`<path d="M${x} 0V${height}"/>`);
+for (let y = 0; y <= height; y += 100) grid.push(`<path d="M0 ${y}H${width}"/>`);
+const reach = [...queue].map((point) =>
+  `M${px(point.x) - cell} ${px(point.y) - cell}h${cell * 2}v${cell * 2}h${-cell * 2}z`).join("");
 const manifest: { tiles: { file: string; x: number; y: number; width: number; height: number }[] } =
-  JSON.parse(readFileSync(manifestPath, "utf8"));
-const root = `<svg xmlns="http://www.w3.org/2000/svg" ` +
-  `width="${sourceWidth}" height="${sourceHeight}">`;
+  JSON.parse(readFileSync(`public/assets/areas/${area.ground}/ground.json`, "utf8"));
 const images = manifest.tiles.map((tile) =>
   `<image href="${process.cwd()}/public/assets/areas/${area.ground}/${tile.file}" ` +
-  `x="${tile.x}" y="${tile.y}" width="${tile.width}" height="${tile.height}"/>`
-).join("");
-const walkable = `<g fill="#49b67555" stroke="#198754" stroke-width="8">` +
-  `<polygon points="${poly(area.walkable)}"/></g>`;
-const blockers = area.blockers.map((item) => `<polygon points="${poly(item)}"/>`).join("");
-const occluders = area.occluders.map((item) =>
-  `<polygon points="${poly(item.polygon)}"/>`).join("");
+  `x="${tile.x}" y="${tile.y}" width="${tile.width}" height="${tile.height}"/>`).join("");
 const baselines = area.occluders.map((item) => {
   const xs = item.polygon.map(([x]) => x);
-  return `<path d="M${Math.min(...xs) * 2} ${item.baseline * 2}` +
-    `H${Math.max(...xs) * 2}"/>`;
+  return `<path d="M${px(Math.min(...xs))} ${px(item.baseline)}H${px(Math.max(...xs))}"/>`;
 }).join("");
-const interactableMarks = area.interactables.map((item) =>
-  `<circle cx="${item.x * 2}" cy="${item.y * 2}" r="120"/>` +
-  `<circle cx="${item.x * 2}" cy="${item.y * 2}" r="12"/>` +
-  `<text x="${item.x * 2 + 18}" y="${item.y * 2}">${item.id}</text>`
-).join("");
-const svg = root + images + walkable + `<g fill="#d9484855" stroke="#a11" stroke-width="8">` +
-  blockers + `</g><g fill="none" stroke="#1769aa" stroke-width="8">` + occluders +
-  `</g><g fill="none" stroke="#1769aa" stroke-dasharray="18 12">` + baselines +
-  `</g><g fill="#e6b800" stroke="#543" stroke-width="5">${spawnLabels}</g>` +
-  `<g fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="12 8">` +
-  `${interactableMarks}</g>` +
-  `<g stroke="#ffffff66" stroke-width="2">${lines.join("")}</g></svg>`;
+const spawns = Object.entries(area.spawns).map(([name, point]) =>
+  `<circle cx="${px(point.x)}" cy="${px(point.y)}" r="18"/>` +
+  `<text x="${px(point.x) + 24}" y="${px(point.y)}">${name}</text>`).join("");
+// A look point's circle is the interaction range (60 units).
+const looks = area.interactables.map((item) =>
+  `<circle cx="${px(item.point.x)}" cy="${px(item.point.y)}" r="120"/>` +
+  `<circle cx="${px(item.point.x)}" cy="${px(item.point.y)}" r="12"/>` +
+  `<text x="${px(item.point.x) + 18}" y="${px(item.point.y)}">${item.id}</text>`).join("");
+const group = (style: string, body: string): string => `<g ${style}>${body}</g>`;
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+  images +
+  group('fill="#2fb34a66"', `<path d="${reach}"/>`) +
+  group('fill="none" stroke="#198754" stroke-width="8"',
+    `<polygon points="${poly(area.walkable)}"/>`) +
+  group('fill="#d9484855" stroke="#a11" stroke-width="8"',
+    area.blockers.map((item) => `<polygon points="${poly(item)}"/>`).join("")) +
+  group('fill="#17c3e055" stroke="#0a7f99" stroke-width="6"',
+    area.npcs.map((npc) => `<polygon points="${poly(npc.footprint)}"/>`).join("")) +
+  group('fill="none" stroke="#1769aa" stroke-width="8"',
+    area.occluders.map((item) => `<polygon points="${poly(item.polygon)}"/>`).join("")) +
+  group('fill="none" stroke="#1769aa" stroke-dasharray="18 12"', baselines) +
+  group('fill="#e0309a44" stroke="#c0157f" stroke-width="8"',
+    area.triggers.map((item) => `<polygon points="${poly(item.polygon)}"/>`).join("")) +
+  group('fill="#e6b800" stroke="#543" stroke-width="5"', spawns) +
+  group('fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="12 8"', looks) +
+  group('stroke="#ffffff66" stroke-width="2"', grid.join("")) + "</svg>";
 mkdirSync("art/review", { recursive: true });
 const source = join("art/review", `${id}-overlay.svg`);
 writeFileSync(source, svg);
 const output = join("art/review", `${id}-overlay.png`);
 const result = Bun.spawnSync(["magick", source, output], { stderr: "pipe" });
 if (result.exitCode !== 0) throw new Error(new TextDecoder().decode(result.stderr));
+console.log(`${output}: ${reached.size} reachable spots`);

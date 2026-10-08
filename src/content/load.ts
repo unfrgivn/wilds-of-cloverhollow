@@ -5,6 +5,7 @@ import kitchenData from "../../content/areas/kitchen.json";
 import parkData from "../../content/areas/park.json";
 import schoolData from "../../content/areas/school.json";
 import classroomData from "../../content/areas/classroom.json";
+import gymData from "../../content/areas/gym.json";
 import bayData from "../../content/areas/bay.json";
 import passData from "../../content/areas/pass.json";
 import trailData from "../../content/areas/trail.json";
@@ -36,6 +37,7 @@ import squirrelData from "../../content/critters/squirrel.json";
 import gullData from "../../content/critters/gull.json";
 import owlData from "../../content/critters/owl.json";
 import arcadeKeeperData from "../../content/critters/arcade-keeper.json";
+import gymPupData from "../../content/critters/gym-pup.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -897,6 +899,7 @@ export function loadContent(): {
   const park = parseArea(parkData, "content/areas/park.json");
   const school = parseArea(schoolData, "content/areas/school.json");
   const classroom = parseArea(classroomData, "content/areas/classroom.json");
+  const gym = parseArea(gymData, "content/areas/gym.json");
   const bay = parseArea(bayData, "content/areas/bay.json");
   Object.defineProperty(bay.spawns, "bus-stop", {
     value: { x: 355, y: 545, facing: "down" },
@@ -936,6 +939,7 @@ export function loadContent(): {
     [gullData, "gull"],
     [owlData, "owl"],
     [arcadeKeeperData, "arcade-keeper"],
+    [gymPupData, "gym-pup"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -989,6 +993,7 @@ export function loadContent(): {
     [park.id]: park,
     [school.id]: school,
     [classroom.id]: classroom,
+    [gym.id]: gym,
     [bay.id]: bay,
     [pass.id]: pass,
     [trail.id]: trail,

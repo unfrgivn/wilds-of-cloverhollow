@@ -949,6 +949,99 @@ the old trail, the owl, and the clubhouse claim.
     (`art/review/classroom-depth.png`). The talk checks in the arcade's and
     the classroom's tests now require a spot where Fae can actually stand.
 
+## Milestone 31: The gym and the lasso **Status:** ✅ Completed (2026-10-08)
+- The school chapter goes on. After the glimpse of the kid in the purple
+  hood, Ms. Maple ends story time: time for PE. The gym doors at the east end
+  of the hall, locked until then, open on the school gym (a new painted room:
+  a basketball court, the hoop, a climbing rope with a bell, a bin of bouncy
+  balls, the blue mats, bleachers, and the back door to the playing field).
+- Coach Ash, the PE teacher: the kid in the purple hood dashed through,
+  knocked over his equipment cart, and ran out the back door. His stopwatch
+  and his clipboard are missing. A fizzy pup zooms round the court with the
+  stopwatch (a pup set piece with indoor lines; calmed, it drops it), and the
+  clipboard is hooked on the basketball hoop, too high to reach, so Coach Ash
+  lends Fae his lasso (twisted rainbow rope, a wooden star on its handle,
+  from the owner's tools concept). The lasso loops the clipboard down, and
+  with both back he lets her keep it: "It can pull down things that are up
+  high, and swing you across gaps, too!" (NOTES.md). The back door only opens
+  from outside; purple footprints lead to it.
+- Evidence: unit (`gym.test.ts`: PE time and Ms. Maple, the gym doors locked
+  then open and the way back, Coach Ash and the look points talkable from
+  standable spots, the gym pup a pup with the pup's sticker, clear of the door
+  and the coach, its battle and calm talk, the hunt in every order, the lasso,
+  nobody named, and the journal; `gym-replay.test.ts`), the recorded run
+  `pass-party/gym.json` (`tools/sim/record-gym.ts`: the school run, then PE,
+  the gym, the pup, the hoop, the lasso, Coach Ash's thanks, and the back
+  door) with matching browser and Bun hashes, and the real-key e2e
+  `gym.spec.ts` (arriving in the gym, the pup's battle, and the lasso, at
+  both sizes). The school run now ends by walking into the locked gym doors.
+- Wording for the owner: Ms. Maple ("That's the end of our story! Time for
+  PE, everyone." / "Coach Ash is waiting for you in the gym, at the end of
+  the hall."; Fae: "The gym! That's where the kid in the purple hood was
+  headed."); Coach Ash ("TWEET! Oh, hi, Fae! Whew, what a morning." / "A kid
+  in a purple hood dashed through here and knocked over my equipment cart!" /
+  "Then they ran straight out the back door, to the playing field. Fast
+  kid!" / "My clipboard went flying, and a fizzy pup ran off with my
+  stopwatch!"; choices "I'll get them back!" ("That's the spirit!") and "Did
+  you see who it was?" ("Nope. Just a purple hood and a cloud of dust! Can
+  you help me find my things?"); with the pup already calm: "Hey, you've got
+  my stopwatch! The pup had it? Thanks, Fae!" / "Now if only I could find my
+  clipboard. It went flying!"; the hunt: "How's the hunt going?" / "That
+  fizzy pup still has my stopwatch! Calm it down, and maybe it'll drop it." /
+  "My clipboard went flying. I heard it clatter somewhere up high." / "Give
+  that lasso a twirl at the hoop!"; the lasso: "Up on the hoop? I can't reach
+  that either." / "Here, take my lasso! I used to rope cones with it at
+  summer camp." / "Coach Ash hands Fae a lasso of twisted rainbow rope, with
+  a wooden star on its handle."; thanks: "My stopwatch AND my clipboard!
+  You're a star, Fae!" / "Keep the lasso. It can pull down things that are up
+  high, and swing you across gaps, too!"; again: "Keep that lasso handy, Fae!
+  And watch out for that purple hood."); the hoop ("There's Coach Ash's
+  clipboard, hooked on the rim! It's way too high to reach." (or "There's a
+  clipboard hooked on the rim!" before he asks) / "Fae twirls the lasso once,
+  twice... and loops it right over the clipboard!" / "Got it! Coach Ash's
+  clipboard." / "The basketball hoop. Nothing stuck up there now!"); the ball
+  bin, the climbing rope, and the back door ("The back door to the playing
+  field. It clicked shut behind the kid in the purple hood." / "It only opens
+  from outside. Purple footprints lead right up to it..."); the gym pup
+  ("A fizzy pup zooms around the gym with something shiny in its mouth!", its
+  bouncy-ball Play and burst, "The pup flops down with a happy sigh, and drops
+  what it was carrying: a shiny stopwatch!"; calm: "Woof! The pup flops down
+  and wags its whole body." / "I've got Coach Ash's stopwatch back. Good pup!"
+  or "It dropped a shiny stopwatch. Whose could it be?"); and the journal
+  ("The gym doors are locked during story time. Ms. Maple will know when it's
+  over.", "Time for PE! The gym is at the end of the hall.", the hunt's notes,
+  and "Coach Ash gave me his lasso! It can pull down things that are up high,
+  and maybe swing across gaps too.").
+- Notes and assumptions:
+  - Coach Ash is a placeholder name (the plant names of Ms. Maple and Nurse
+    Holly); his look is the PE teacher on the owner's staff sheet, drawn
+    without the lasso, stopwatch, or clipboard, since the story takes them
+    away. The gym has no concept sheet, so it was painted in the school's
+    style to sit beside the hallway and the classroom.
+  - NOTES.md has the lasso "after completing a quest" for the PE teacher. The
+    quest reuses what the game has (a set piece battle, Look points, story
+    variables) rather than a new mechanic. The lasso is a story item for now
+    (`has_lasso`, checked by the hoop's knot): no button, no prompt of its
+    own, and nothing in the world changes yet. Pulling levers and swinging
+    across gaps wait for a place that needs them.
+  - The gym pup is a pup, so it shares the Pond Pup sticker (each species
+    gives its sticker once); a Fae who already has it gets 8 coins.
+  - The hall's `gym-hall` Look point became the gym doors (a trigger along
+    the floor's east edge, like the arcade's door): the same locked line,
+    then the way in. The school run was re-recorded to walk into them.
+  - The gym's first geometry let Fae walk onto and behind the mats, gave the
+    bench pair no blocker or occluder, left the right half of the double door
+    out of its trigger, and ran the floor past the paint; a flood fill of
+    every standable spot over the painting found them, and a second pass
+    fixed them. The bench pair's occluder then reached up to 75 units above
+    the bench's painted top, over the court where the pup stands; it was
+    retraced to the bench's measured outline.
+  - So the next room's first review catches these, the area overlay
+    (`tools/art/area-overlay.ts`) now reads the area with the game's own
+    parser and also draws, in green, every spot Fae's feet can reach from a
+    spawn, plus the doors and people's footprints
+    (`docs/art/area-authoring.md`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1012,11 +1105,12 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 28, recurring bad guys: done (above).
   - Milestone 29, the first person under the chaos spell: done (above).
   - Milestone 30, the school chapter begins (story time): done (above).
-  - Next: the gym and the PE teacher's lasso (the school chapter goes on),
-    the music teacher's flute, and the clubhouse fix-up (a fridge for
-    snacks, the garden). The kid's identity is kept for the very end
-    (owner, 2026-10-07).
+  - Milestone 31, the gym and the PE teacher's lasso: done (above).
+  - Next: the music teacher's flute, a place where the lasso changes the
+    world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
+    the garden). The kid's identity is kept for the very end (owner,
+    2026-10-07).
 
 ## Later (not scheduled)
-Gamepad polish, the lasso and the flute, the Whispering Woods and the
-clubhouse, and more mini-bosses (people under the chaos spell, NOTES.md).
+Gamepad polish, the flute, the lasso's levers and gaps, the clubhouse
+fix-up, and more mini-bosses (people under the chaos spell, NOTES.md).

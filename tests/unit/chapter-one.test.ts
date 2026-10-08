@@ -31,6 +31,7 @@ describe("chapter one", () => {
       "school-raccoon": "calm",
       gull: "chaos",
       "arcade-keeper": "chaos",
+      "gym-pup": "chaos",
     });
     // And on the way: a park pup, and a cat in the plaza once the town's
     // critters were out (Milestone 28). Every calm paid 8 coins.

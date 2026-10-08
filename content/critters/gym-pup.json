@@ -1,0 +1,109 @@
+{
+  "id": "gym-pup",
+  "species": "pup",
+  "name": "Zoomie Pup",
+  "calmName": "Gym Pup",
+  "atlas": "assets/critters/pup/pup.json",
+  "auraCentre": {
+    "x": 245,
+    "y": 249
+  },
+  "bodyCentre": {
+    "x": 258,
+    "y": 316
+  },
+  "figureHeight": 380,
+  "overworldHeight": 66,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "pond-pup",
+    "name": "Pond Pup",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "gym_pup_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy pup zooms around the gym with something shiny in its mouth!",
+    "command": "What should Fae do?",
+    "soothe": {
+      "great": "Fae speaks softly: \"Easy, buddy.\" The pup's swirly eyes start to slow down!",
+      "good": "Fae speaks softly. The pup tilts his head and listens.",
+      "miss": "Fae tries, but the pup is too zoomy to hear much."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie bats a bouncy ball across the floor. The pup races after it, tail wagging!",
+        "good": "Maddie nudges a bouncy ball. The pup can't resist a sniff.",
+        "miss": "Maddie swats at a ball... and it bonks her on the nose. The pup gives a puppy grin."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber across the floor. The pup races after it, tail wagging!",
+        "good": "Sue's bobber wiggles by. The pup tilts his head and wags.",
+        "miss": "Sue's bobber snags on the bleachers. The pup gives it a curious sniff."
+      },
+      "juggle": {
+        "great": "Jordan juggles pinecones in a big loop. The pup bounces along, tail spinning!",
+        "good": "Jordan tosses a pinecone. The pup tilts his head, ears up.",
+        "miss": "A pinecone lands on Jordan's beanie. The pup yips. Was that a giggle?"
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. Energy up! The pup licks his lips.",
+    "burst": "The pup barks and bats a flurry of bouncy balls at Fae!",
+    "burstResult": {
+      "great": "Boing, boing! Fae catches every single ball!",
+      "good": "Fae catches most of the balls!",
+      "miss": "Bonk! The balls bounce all around Fae."
+    },
+    "soothed": "The pup flops down with a happy sigh, and drops what it was carrying: a shiny stopwatch!",
+    "rest": "Fae is all tuckered out. Time for a little rest.",
+    "run": "Fae backs away. The pup zooms another lap around the gym."
+  },
+  "coins": 8
+}

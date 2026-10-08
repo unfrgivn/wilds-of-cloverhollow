@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 30, story time)
+Last updated: 2026-10-08 (Milestone 31, the gym and the lasso)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -358,8 +358,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   spawn `classroom-door` (700, 450) faces down. Ms. Maple in the hall is
   `visibleWhile` `maple_in_hall` (she goes in at story time). The kid in the
   purple hood (person `hooded-kid`, knot `hood_glimpse`, a single back view)
-  stands at the east end of the hall while `hood_waiting`; the `gym-hall` Look
-  point is beside them. `classroom`, "Ms. Maple's Classroom", is a 1200x800
+  stands at the east end of the hall while `hood_waiting`, by the gym doors.
+  `classroom`, "Ms. Maple's Classroom", is a 1200x800
   painted cutaway: its floor a diamond, the door on the back-left wall
   (trigger `door` to `school.classroom-door`, a band along the whole painted
   door; spawn `door` (280, 535) facing right). People: Ms. Maple (`teacher`,
@@ -368,6 +368,27 @@ ios/            Capacitor iOS project (from Milestone 4).
   Look points: `art-wall`, `cubbies`, and `reading-corner`. Each desk with its
   chair, the teacher's desk, the beanbags, and the bookshelf are occluders
   traced to their painted silhouettes.
+- The gym (Milestone 31): the hall's floor runs off the painting's east edge
+  toward the gym. Trigger `gym-doors`, a band along that whole edge (x
+  1330-1355, y 614-795), leads to `gym.door` and `requires` `pe_time` (knot
+  `gym_hall`, the locked doors); spawn `gym-doors` (1250, 700) faces left.
+  Ms. Maple sets `pe_time` once Fae has glimpsed the hood (`saw_hood`): story
+  time is over. `gym`, "School Gym", is a 1400x900 painted cutaway in the
+  school's style (no concept sheet): a honey-wood court, double doors on the
+  back-left wall (trigger `door` to `school.gym-doors`, a slanted band along
+  the whole painted door; spawn `door` (350, 650) facing right), a basketball
+  hoop, a climbing rope with a bell, a bin of bouncy balls, the blue mats,
+  bleachers, a bench pair, and the back door to the playing field, which is a
+  Look point and never a trigger (it only opens from outside). Coach Ash, the
+  PE teacher (`coach`, knot `coach`), stands at (560, 720). Look points:
+  `hoop`, `ball-bin`, `climbing-rope`, and `back-door`. The gym pup is its set
+  piece at (850, 650), out on the court. The bleachers, the ball bin, the
+  mats, and the bench pair are blockers and occluders traced to their painted
+  silhouettes.
+- The lasso (Milestone 31) is a story item, `has_lasso`, not a button: Coach
+  Ash lends it for his clipboard on the hoop and lets Fae keep it. A Look
+  point's knot checks it (the gym's `hoop`), so a lasso spot needs no engine
+  support until one changes the world (a lever, a gap).
 - The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
   Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
   and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
@@ -399,7 +420,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
   visibleWhile? }` (Ms. Maple the teacher and Nurse Holly in the school
   hallway, and the kid in the purple hood there for a moment; Ms. Maple,
-  Milo, and Rosie in the classroom; Mom and Oliver in the kitchen). Each is
+  Milo, and Rosie in the classroom; Coach Ash in the gym; Mom and Oliver in
+  the kitchen). Each is
   drawn from the atlas named for its id in
   `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
   ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for
@@ -464,8 +486,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   still, calm or chaos for the whole game (`state.critters`, keyed by id).
   `visibleWhile` (an Ink variable) puts one there only while it's true. The
   set pieces are the fountain frog (plaza), the school raccoon (plaza, while
-  `raccoon_waiting`), the grumpy gull (the trail's lookout), and Mr. Pip, the
-  arcade keeper (the arcade).
+  `raccoon_waiting`), the grumpy gull (the trail's lookout), Mr. Pip, the
+  arcade keeper (the arcade), and the gym pup (the gym).
 - Recurring critters, EarthBound style, are an area's `recurring`:
   `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
   (a door, a bus ride, a rest's fade, and the start of a game or fixture)
@@ -633,8 +655,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   each of a `species`; kinds of one species share its sticker (spec 9). The
   set pieces (section 6.1): the Fizzy Frog (`fountain-frog`, the plaza
   fountain; calm, the Fountain Frog), the school raccoon (`school-raccoon`,
-  calm, the Ringtail Raccoon, who tells the club password it overheard), and
-  the Grumpy Gull at the lookout (calm, the Lookout Gull). The recurring kinds:
+  calm, the Ringtail Raccoon, who tells the club password it overheard), the
+  Grumpy Gull at the lookout (calm, the Lookout Gull), and the gym pup
+  (`gym-pup`, a pup with indoor lines; calm, the Gym Pup, who drops Coach
+  Ash's stopwatch; its sticker is the Pond Pup's). The recurring kinds:
   the Zoomie Pup (calm, the Pond Pup), the Pouncy Cat (the Cozy Cat, who bats
   yarn balls), the Sneaky Raccoon (the Ringtail Raccoon, who flings bottle
   caps), the bay's Fizzy Frog (`frog`, the fountain frog's species; calm, the
@@ -829,7 +853,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first:
-  once Mr. Pip is calm, his fizzy soda from the kid in the purple hood and the
+  Coach Ash's lasso, once he has his things back; while Fae hunts for them,
+  the stopwatch and the clipboard both found, the fizzy pup with his
+  stopwatch, and where the clipboard is (somewhere up high, stuck on the hoop,
+  then the lasso lent), and the kid knocking over his cart and running out
+  the back door; time for PE; the locked gym doors, once Fae has tried them,
+  until PE; the kid in the purple hood running off toward the gym; story
+  time, until the glimpse; the way back to school for story time, until it
+  starts; once Mr. Pip is calm, his fizzy soda from the kid in the purple hood and the
   scribbled-out Star Racer initials; before that, once the clubhouse is
   claimed, its note sending Fae to the arcade; the clubhouse claimed; the
   hooded kid's glowing trail toward the Whispering

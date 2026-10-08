@@ -5,8 +5,9 @@ import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 
 // The recorded school run (tools/sim/record-school.ts): from the arcade's
-// ending, back to school for story time, the classroom, and a glimpse of the
-// kid in the purple hood running off toward the gym.
+// ending, back to school for story time, the classroom, a glimpse of the kid
+// in the purple hood running off toward the gym, and the gym doors, locked
+// during story time.
 describe("school replay", () => {
   it("goes from the arcade to story time and a glimpse of the purple hood", () => {
     const content = loadContent();
@@ -33,6 +34,9 @@ describe("school replay", () => {
       .toEqual({ storyTime: true, inHall: false, waiting: false, saw: true });
     expect({ area: state.area, dialogue: state.dialogue, battle: state.battle })
       .toEqual({ area: "school", dialogue: null, battle: null });
-    expect(journalNotes(world, state)[0]).toMatch(/^A kid in a purple hood ran off/);
+    const notes = journalNotes(world, state);
+    expect(notes[0]).toBe(
+      "The gym doors are locked during story time. Ms. Maple will know when it's over.");
+    expect(notes[1]).toMatch(/^A kid in a purple hood ran off/);
   });
 });

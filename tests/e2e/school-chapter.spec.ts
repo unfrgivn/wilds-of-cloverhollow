@@ -14,8 +14,9 @@ import {
 // (`tools/sim/record-school.ts`) replays the arcade run, then plays the rest
 // with real keys: across the plaza to school, Ms. Maple (story time), the
 // classroom (Rosie, Milo, the art wall, the story), and back out to the hall,
-// where the kid in the purple hood is glimpsed and runs off toward the gym.
-// The end state must hash the same as Bun's replay of the same run.
+// where the kid in the purple hood is glimpsed and runs off toward the gym,
+// and on into the gym doors, locked during story time. The end state must
+// hash the same as Bun's replay of the same run.
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -86,6 +87,7 @@ test("real keys: story time, the classroom, and a glimpse of the purple hood", a
     "There you are, Fae! Story time is about to start.",
     "Psst, Fae! Somebody in a purple hood just peeked in the door!",
     "The kid zips around the corner, toward the gym. So fast!",
+    "The hall to the gym. The doors are locked during story time.",
   ]));
   const end = await readState(page);
   expect(end.area).toBe("school");

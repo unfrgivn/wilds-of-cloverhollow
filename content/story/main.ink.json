@@ -401,6 +401,296 @@
       "journal": [
         "ev",
         {
+          "VAR?": "coach_thanked"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Coach Ash gave me his lasso! It can pull down things that are up high, and maybe swing across gaps too. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gym_quest"
+        },
+        {
+          "VAR?": "coach_thanked"
+        },
+        "!",
+        "&&",
+        "str",
+        "^gym-pup",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "&&",
+        {
+          "VAR?": "found_clipboard"
+        },
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I found Coach Ash's stopwatch and his clipboard! Back to Coach Ash. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gym_quest"
+        },
+        "str",
+        "^gym-pup",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A fizzy pup is zooming around the gym with Coach Ash's stopwatch. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.34"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gym_quest"
+        },
+        {
+          "VAR?": "found_clipboard"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "ev",
+              {
+                "VAR?": "has_lasso"
+              },
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^Coach Ash lent me his lasso, to get his clipboard down from the hoop.",
+                    {
+                      "->": ".^.^.^.6"
+                    },
+                    null
+                  ]
+                }
+              ],
+              [
+                {
+                  "->": ".^.b"
+                },
+                {
+                  "b": [
+                    "ev",
+                    {
+                      "VAR?": "saw_clipboard"
+                    },
+                    "/ev",
+                    [
+                      {
+                        "->": ".^.b",
+                        "c": true
+                      },
+                      {
+                        "b": [
+                          "^Coach Ash's clipboard is stuck on the basketball hoop. It's too high to reach!",
+                          {
+                            "->": ".^.^.^.5"
+                          },
+                          null
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "->": ".^.b"
+                      },
+                      {
+                        "b": [
+                          "^Coach Ash's clipboard went flying, somewhere up high.",
+                          {
+                            "->": ".^.^.^.5"
+                          },
+                          null
+                        ]
+                      }
+                    ],
+                    "nop",
+                    {
+                      "->": ".^.^.^.6"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "^ ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.44"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gym_quest"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The kid in the purple hood knocked over Coach Ash's cart, then ran out the back door to the playing field. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.51"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "pe_time"
+        },
+        {
+          "VAR?": "gym_quest"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Time for PE! The gym is at the end of the hall. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.61"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "saw_hood"
+        },
+        {
+          "CNT?": "gym_hall"
+        },
+        "&&",
+        {
+          "VAR?": "pe_time"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The gym doors are locked during story time. Ms. Maple will know when it's over. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.73"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "saw_hood"
         },
         "/ev",
@@ -415,7 +705,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.80"
               },
               null
             ]
@@ -445,7 +735,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.90"
               },
               null
             ]
@@ -479,7 +769,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.27"
+                "->": ".^.^.^.103"
               },
               null
             ]
@@ -508,7 +798,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.37"
+                "->": ".^.^.^.113"
               },
               null
             ]
@@ -537,7 +827,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.47"
+                "->": ".^.^.^.123"
               },
               null
             ]
@@ -571,7 +861,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.60"
+                "->": ".^.^.^.136"
               },
               null
             ]
@@ -596,7 +886,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.67"
+                "->": ".^.^.^.143"
               },
               null
             ]
@@ -621,7 +911,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.74"
+                "->": ".^.^.^.150"
               },
               null
             ]
@@ -650,7 +940,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.84"
+                "->": ".^.^.^.160"
               },
               null
             ]
@@ -675,7 +965,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.91"
+                "->": ".^.^.^.167"
               },
               null
             ]
@@ -700,7 +990,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.98"
+                "->": ".^.^.^.174"
               },
               null
             ]
@@ -737,7 +1027,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.113"
+                "->": ".^.^.^.189"
               },
               null
             ]
@@ -762,7 +1052,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.120"
+                "->": ".^.^.^.196"
               },
               null
             ]
@@ -796,7 +1086,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.133"
+                "->": ".^.^.^.209"
               },
               null
             ]
@@ -825,7 +1115,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.143"
+                "->": ".^.^.^.219"
               },
               null
             ]
@@ -850,7 +1140,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.150"
+                "->": ".^.^.^.226"
               },
               null
             ]
@@ -875,7 +1165,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.157"
+                "->": ".^.^.^.233"
               },
               null
             ]
@@ -905,7 +1195,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.167"
+                "->": ".^.^.^.243"
               },
               null
             ]
@@ -935,7 +1225,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.177"
+                "->": ".^.^.^.253"
               },
               null
             ]
@@ -960,7 +1250,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.184"
+                "->": ".^.^.^.260"
               },
               null
             ]
@@ -989,7 +1279,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.194"
+                "->": ".^.^.^.270"
               },
               null
             ]
@@ -1027,7 +1317,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.210"
+                "->": ".^.^.^.286"
               },
               null
             ]
@@ -1054,7 +1344,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.219"
+                "->": ".^.^.^.295"
               },
               null
             ]
@@ -1083,7 +1373,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.229"
+                "->": ".^.^.^.305"
               },
               null
             ]
@@ -1108,7 +1398,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.236"
+                "->": ".^.^.^.312"
               },
               null
             ]
@@ -1137,7 +1427,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.247"
+                "->": ".^.^.^.323"
               },
               null
             ]
@@ -1166,7 +1456,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.258"
+                "->": ".^.^.^.334"
               },
               null
             ]
@@ -2993,6 +3283,36 @@
       "classroom_teacher": [
         "ev",
         {
+          "VAR?": "saw_hood"
+        },
+        {
+          "VAR?": "pe_time"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.pe"
+              },
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
           "CNT?": ".^"
         },
         1,
@@ -3010,7 +3330,7 @@
                 "->": ".^.^.^.again"
               },
               {
-                "->": ".^.^.^.6"
+                "->": ".^.^.^.15"
               },
               null
             ]
@@ -3039,6 +3359,32 @@
             "^Remember, Fae: a kind word can calm almost anything. ",
             "#",
             "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "pe": [
+            "^That's the end of our story! Time for PE, everyone. ",
+            "#",
+            "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "^Coach Ash is waiting for you in the gym, at the end of the hall. ",
+            "#",
+            "^speaker: Ms. Maple",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "pe_time",
+              "re": true
+            },
+            "^The gym! That's where the kid in the purple hood was headed. ",
+            "#",
+            "^speaker: Fae",
             "/#",
             "\n",
             "done",
@@ -3375,7 +3721,656 @@
         "/#",
         "\n",
         "done",
+        {
+          "#f": 1
+        }
+      ],
+      "coach": [
+        [
+          "ev",
+          {
+            "VAR?": "coach_thanked"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "coach.again"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "VAR?": "gym_quest"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "coach.quest"
+                },
+                {
+                  "->": ".^.^.^.10"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^TWEET! Oh, hi, Fae! Whew, what a morning. ",
+          "#",
+          "^speaker: Coach Ash",
+          "/#",
+          "\n",
+          "^A kid in a purple hood dashed through here and knocked over my equipment cart! ",
+          "#",
+          "^speaker: Coach Ash",
+          "/#",
+          "\n",
+          "^Then they ran straight out the back door, to the playing field. Fast kid! ",
+          "#",
+          "^speaker: Coach Ash",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^gym-pup",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "coach.watch_back"
+                },
+                {
+                  "->": ".^.^.^.34"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^My clipboard went flying, and a fizzy pup ran off with my stopwatch! ",
+          "#",
+          "^speaker: Coach Ash",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^I'll get them back!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Did you see who it was?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^That's the spirit! ",
+              "#",
+              "^speaker: Coach Ash",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Nope. Just a purple hood and a cloud of dust! Can you help me find my things? ",
+              "#",
+              "^speaker: Coach Ash",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gym_quest",
+                "re": true
+              },
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "watch_back": [
+            "^Hey, you've got my stopwatch! The pup had it? Thanks, Fae! ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "^Now if only I could find my clipboard. It went flying! ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "gym_quest",
+              "re": true
+            },
+            "done",
+            null
+          ],
+          "quest": [
+            "ev",
+            "str",
+            "^gym-pup",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            {
+              "VAR?": "found_clipboard"
+            },
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "coach.thanks"
+                  },
+                  {
+                    "->": ".^.^.^.9"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "saw_clipboard"
+            },
+            {
+              "VAR?": "has_lasso"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "coach.lend"
+                  },
+                  {
+                    "->": ".^.^.^.18"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^How's the hunt going? ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "ev",
+            "str",
+            "^gym-pup",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ That fizzy pup still has my stopwatch! Calm it down, and maybe it'll drop it. ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  {
+                    "->": ".^.^.^.33"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "saw_clipboard"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ My clipboard went flying. I heard it clatter somewhere up high. ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  {
+                    "->": ".^.^.^.41"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "has_lasso"
+            },
+            {
+              "VAR?": "found_clipboard"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Give that lasso a twirl at the hoop! ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  {
+                    "->": ".^.^.^.51"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "lend": [
+            "^Up on the hoop? I can't reach that either. ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "^Here, take my lasso! I used to rope cones with it at summer camp. ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "has_lasso",
+              "re": true
+            },
+            "^Coach Ash hands Fae a lasso of twisted rainbow rope, with a wooden star on its handle. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "thanks": [
+            "^My stopwatch AND my clipboard! You're a star, Fae! ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "coach_thanked",
+              "re": true
+            },
+            "^Keep the lasso. It can pull down things that are up high, and swing you across gaps, too! ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "again": [
+            "^Keep that lasso handy, Fae! And watch out for that purple hood. ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "hoop": [
+        [
+          "ev",
+          {
+            "VAR?": "found_clipboard"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^The basketball hoop. Nothing stuck up there now! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": "hoop.3"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "has_lasso"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Fae twirls the lasso once, twice... and loops it right over the clipboard! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "found_clipboard",
+                "re": true
+              },
+              "^Got it! Coach Ash's clipboard. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": "hoop.3"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "saw_clipboard",
+                "re": true
+              },
+              "ev",
+              {
+                "VAR?": "gym_quest"
+              },
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^There's Coach Ash's clipboard, hooked on the rim!",
+                    {
+                      "->": ".^.^.^.10"
+                    },
+                    null
+                  ]
+                }
+              ],
+              [
+                {
+                  "->": ".^.b"
+                },
+                {
+                  "b": [
+                    "^There's a clipboard hooked on the rim!",
+                    {
+                      "->": ".^.^.^.10"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "^ It's way too high to reach. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              {
+                "->": "hoop.3"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "done",
         null
+      ],
+      "ball_bin": [
+        "^A big bin of bouncy balls: red ones, blue ones, and one very flat one. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "climbing_rope": [
+        "^A climbing rope, all the way up to the ceiling. There's a little bell at the top! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "back_door": [
+        "^The back door to the playing field. It clicked shut behind the kid in the purple hood. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^It only opens from outside. Purple footprints lead right up to it... ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "gym_pup_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Woof! The pup flops down and wags its whole body. ",
+        "#",
+        "^speaker: Gym Pup",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gym_quest"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^I've got Coach Ash's stopwatch back. Good pup!",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^It dropped a shiny stopwatch. Whose could it be?",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "^ ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The pup sniffs a bouncy ball, very seriously. ",
+            "#",
+            "^speaker: Gym Pup",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
       ],
       "nurse": [
         [
@@ -4261,6 +5256,30 @@
         false,
         {
           "VAR=": "saw_hood"
+        },
+        false,
+        {
+          "VAR=": "pe_time"
+        },
+        false,
+        {
+          "VAR=": "gym_quest"
+        },
+        false,
+        {
+          "VAR=": "saw_clipboard"
+        },
+        false,
+        {
+          "VAR=": "has_lasso"
+        },
+        false,
+        {
+          "VAR=": "found_clipboard"
+        },
+        false,
+        {
+          "VAR=": "coach_thanked"
         },
         "/ev",
         "end",

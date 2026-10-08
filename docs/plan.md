@@ -1302,6 +1302,12 @@ more bad guys, and the blacklight lantern, made and built while away.
   a branch that re-baselines one of them should drop it.
 - `harness.spec.ts` waits for real-time movement with `expect.poll` instead
   of a fixed 500 ms sleep.
+- `harness.spec.ts` speed: measured 251 s Chromium and 54 s WebKit before;
+  sharing a page (per worker, rebooted after a failure; not serial) within
+  the reset-safe movement and deterministic-replay
+  describes, with one boot and cached area textures, brought repeat runs to
+  80 to 85 s Chromium and 20 to 23 s WebKit. Boot/title/save coverage remains
+  on fresh pages.
 - Full `just e2e`, the same 16 spec groups before and after, both under a
   load average of about 50 to 80 from parallel milestones: 21.0 minutes of
   Playwright time before, 10.1 after (388 tests, all passed; gamepad's group

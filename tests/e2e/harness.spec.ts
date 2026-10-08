@@ -15,65 +15,79 @@ import {
   pixelAt,
 } from "./helpers";
 
-test("stepping with a held real key moves 4 units per tick", async ({
-  page,
-}) => {
-  await openHarness(page);
-  await resetPaused(page);
-  await page.keyboard.down("ArrowRight");
-  await step(page, 30);
-  await page.keyboard.up("ArrowRight");
-  expect((await readState(page)).player.x).toBe(420);
-  await expect(page).toHaveScreenshot("harness.png");
+test.describe("real keyboard movement", () => {
+  let movementPage: Page;
+
+  test.beforeAll(async ({ browser }) => {
+    movementPage = await browser.newPage();
+    await openHarness(movementPage);
+  });
+
+  test.afterAll(async () => movementPage.close());
+
+  test("stepping with a held real key moves 4 units per tick", async () => {
+    await resetPaused(movementPage);
+    await movementPage.keyboard.down("ArrowRight");
+    await step(movementPage, 30);
+    await movementPage.keyboard.up("ArrowRight");
+    expect((await readState(movementPage)).player.x).toBe(420);
+    await expect(movementPage).toHaveScreenshot("harness.png");
+  });
+
+  test("a real key tap shorter than one tick still moves one tick", async () => {
+    await resetPaused(movementPage);
+    // keydown and keyup both arrive before the next tick samples the keyboard.
+    await movementPage.keyboard.press("ArrowRight");
+    await step(movementPage, 10);
+    const state = await readState(movementPage);
+    expect(state.player.x).toBe(304);
+    expect(state.facing).toBe("right");
+  });
+
+  test("holding a real key moves the player in real time", async () => {
+    await resetPaused(movementPage);
+    await resume(movementPage);
+    const before = (await readState(movementPage)).player.x;
+    await movementPage.keyboard.down("ArrowRight");
+    await expect.poll(async () => (await readState(movementPage)).player.x).toBeGreaterThan(before);
+    await movementPage.keyboard.up("ArrowRight");
+  });
+
+  test("real keys stop at the room wall, radius respected", async () => {
+    await resetPaused(movementPage);
+    // 120 ticks at 4 units per tick is far more than the 240 units to the wall.
+    await movementPage.keyboard.down("ArrowLeft");
+    await step(movementPage, 120);
+    await movementPage.keyboard.up("ArrowLeft");
+    const x = (await readState(movementPage)).player.x;
+    expect(x).toBeGreaterThanOrEqual(60);
+    expect(x).toBeLessThan(60.01);
+  });
+
+  test("real keys stop at a blocker, radius respected", async () => {
+    await resetPaused(movementPage);
+    await movementPage.keyboard.down("ArrowRight");
+    await step(movementPage, 150);
+    await movementPage.keyboard.up("ArrowRight");
+    const x = (await readState(movementPage)).player.x;
+    expect(x).toBeLessThanOrEqual(830.01);
+    expect(x).toBeGreaterThan(800);
+  });
 });
 
-test("a real key tap shorter than one tick still moves one tick", async ({
-  page,
-}) => {
-  await openHarness(page);
-  await resetPaused(page);
-  // keydown and keyup both arrive before the next tick samples the keyboard.
-  await page.keyboard.press("ArrowRight");
-  await step(page, 10);
-  const state = await readState(page);
-  expect(state.player.x).toBe(304);
-  expect(state.facing).toBe("right");
-});
+test.describe("deterministic replays", () => {
+  let replayPage: Page;
 
-test("holding a real key moves the player in real time", async ({ page }) => {
-  await openHarness(page);
-  await resetPaused(page);
-  await resume(page);
-  const before = (await readState(page)).player.x;
-  await page.keyboard.down("ArrowRight");
-  await expect.poll(async () => (await readState(page)).player.x).toBeGreaterThan(before);
-  await page.keyboard.up("ArrowRight");
-});
+  test.beforeAll(async ({ browser }) => {
+    replayPage = await browser.newPage();
+    await openHarness(replayPage);
+  });
 
-test("real keys stop at the room wall, radius respected", async ({ page }) => {
-  await openHarness(page);
-  await resetPaused(page);
-  // 120 ticks at 4 units per tick is far more than the 240 units to the wall.
-  await page.keyboard.down("ArrowLeft");
-  await step(page, 120);
-  await page.keyboard.up("ArrowLeft");
-  const x = (await readState(page)).player.x;
-  expect(x).toBeGreaterThanOrEqual(60);
-  expect(x).toBeLessThan(60.01);
-});
+  test.afterAll(async () => {
+    await replayPage.close();
+  });
 
-test("real keys stop at a blocker, radius respected", async ({ page }) => {
-  await openHarness(page);
-  await resetPaused(page);
-  await page.keyboard.down("ArrowRight");
-  await step(page, 150);
-  await page.keyboard.up("ArrowRight");
-  const x = (await readState(page)).player.x;
-  expect(x).toBeLessThanOrEqual(830.01);
-  expect(x).toBeGreaterThan(800);
-});
-
-for (const item of [
+  for (const item of [
   { name: "harness-600", fixture: "harness" },
   { name: "concave-corners", fixture: "harness" },
   { name: "door-round-trip", fixture: "new-game" },
@@ -95,29 +109,27 @@ for (const item of [
   { name: "arcade", fixture: "pass-party" },
   { name: "school", fixture: "pass-party" },
   { name: "gym", fixture: "pass-party" },
-]) {
-  const { name, fixture } = item;
-  test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async ({
-    page,
-  }) => {
-    // Replays a whole script in the browser and in Bun (chapter-one is the
-    // whole story so far).
-    test.setTimeout(longFlowTimeout);
-    // Scripts live in tests/sim/scripts/<fixture>/ (tools/sim/run-all.ts).
-    const path = `tests/sim/scripts/${fixture}/${name}.json`;
-    const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
-    await openHarness(page);
-    await resetPaused(page, fixture);
-    await queueScript(page, script);
-    await step(
-      page,
-      script.reduce((total, segment) => total + segment.ticks, 0),
-    );
-    const browserHash = await readHash(page);
-    expect(browserHash).toBe(bunHash(path, fixture));
-    console.log(`${name}: browser and Bun hash ${browserHash}`);
-  });
-}
+  ]) {
+    const { name, fixture } = item;
+    test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async () => {
+      // Replays a whole script in the browser and in Bun (chapter-one is the
+      // whole story so far).
+      test.setTimeout(longFlowTimeout);
+      // Scripts live in tests/sim/scripts/<fixture>/ (tools/sim/run-all.ts).
+      const path = `tests/sim/scripts/${fixture}/${name}.json`;
+      const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
+      await resetPaused(replayPage, fixture);
+      await queueScript(replayPage, script);
+      await step(
+        replayPage,
+        script.reduce((total, segment) => total + segment.ticks, 0),
+      );
+      const browserHash = await readHash(replayPage);
+      expect(browserHash).toBe(bunHash(path, fixture));
+      console.log(`${name}: browser and Bun hash ${browserHash}`);
+    });
+  }
+});
 
 test("nothing renders inside wide letterbox bars", async ({ page }) => {
   await page.setViewportSize({ width: 2400, height: 720 });

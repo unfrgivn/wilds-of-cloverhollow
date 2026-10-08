@@ -1106,7 +1106,25 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 29, the first person under the chaos spell: done (above).
   - Milestone 30, the school chapter begins (story time): done (above).
   - Milestone 31, the gym and the PE teacher's lasso: done (above).
-  - Next: the music teacher's flute, a place where the lasso changes the
+  - Next (owner, 2026-10-08): the area kit refactor, before anything else.
+    A test on the plaza split the approved painting into a clean ground plate
+    and prop sprites: every object Fae can walk behind or bump into is a prop
+    with its own ground footprint (its collision) and its own depth (it sorts
+    by the front edge of that footprint, column by column), its art cut from
+    the painting itself, and states such as smashed. Objects can move or
+    change without repainting the scene. The owner: "the new version is way
+    better. Refactor everything in this manner."
+    - Milestone 32, the props engine and the plaza kit: props replace the
+      plaza's occluders and blockers; the kit pipeline and its docs.
+    - Milestone 33, the indoor kits: the bedroom, the kitchen, the school
+      hall, the classroom, the gym, and the arcade.
+    - Milestone 34, the outdoor kits: the park, Bubblegum Bay, Pinecone Pass,
+      the Cliffside Trail, and the Whispering Woods.
+    - Milestone 35, occluders retired: the old cutouts, baselines, slivers,
+      and their tools go.
+    Until Milestone 34 lands, don't start a milestone that adds or reshapes
+    an area; after it, every new area is painted whole and split into a kit.
+  - Then: the music teacher's flute, a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).

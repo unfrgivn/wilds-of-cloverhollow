@@ -5,8 +5,20 @@ async function run(command: string[]): Promise<void> {
   const process = Bun.spawn(command, { stdout: "inherit", stderr: "inherit" });
   if (await process.exited !== 0) throw new Error("Command failed: " + command.join(" "));
 }
-const who = Bun.argv[Bun.argv.indexOf("--who") + 1] ?? "teacher";
-if (who !== "teacher" && who !== "nurse") throw new Error("--who must be teacher or nurse");
+const whoArgument = Bun.argv.indexOf("--who");
+const requested = whoArgument >= 0 ? Bun.argv[whoArgument + 1] : undefined;
+if (requested === undefined) {
+  for (const person of ["teacher", "nurse", "coach"]) {
+    const process = Bun.spawn(["bun", "tools/art/build-staff.ts", "--who", person], {
+      stdout: "inherit", stderr: "inherit",
+    });
+    if (await process.exited !== 0) throw new Error(`Build failed for ${person}`);
+  }
+  process.exit(0);
+}
+const who = requested;
+if (who !== "teacher" && who !== "nurse" && who !== "coach")
+  throw new Error("--who must be teacher, nurse, or coach");
 const root = "art/source/staff/" + who;
 const frames = "art/scratch/" + who + "-build-frames";
 await run(["rm", "-rf", frames]);
@@ -27,6 +39,7 @@ if (who === "teacher") {
   await run(["magick", frames + "/left_idle_01.png", "-flop", frames + "/right_idle_01.png"]);
 }
 else await processFrame(root + "/pose-2.png", "right_idle_01");
+await run(["mkdir", "-p", "public/assets/characters/" + who]);
 await run(["magick", "montage", frames + "/down_idle_01.png", frames + "/down_idle_02.png",
   frames + "/left_idle_01.png", frames + "/right_idle_01.png", "-tile", "4x1",
   "-geometry", "448x448+0+0", "-background", "none",

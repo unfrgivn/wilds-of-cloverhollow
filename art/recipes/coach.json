@@ -1,0 +1,36 @@
+{
+  "asset": "coach",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 1,
+  "generationCallsNote": "One three-view model sheet was generated and selected (1791464125096). The blink is a local closed-eye edit of the front pose, processed through the identical pipeline.",
+  "date": "2026-10-08",
+  "references": [
+    "docs/art/concepts/npcs/school_staff_npcs.png",
+    "docs/art/concepts/characters/character_concept_sheet_fae.png"
+  ],
+  "selectedRawSources": [
+    "art/source/staff/coach/model-sheet-raw.png",
+    "art/source/staff/coach/pose-0.png",
+    "art/source/staff/coach/blink-edit-raw.png",
+    "art/source/staff/coach/pose-1.png",
+    "art/source/staff/coach/pose-2.png"
+  ],
+  "scaleFactor": "uniform adult scale selected by build-staff.ts to make the front figure 336 source px",
+  "postProcessing": {
+    "key": "#FF00FF border flood fill, 18% fuzz",
+    "despill": "edge-only magenta despill at a 20px matte band, restricted to alpha-edge pixels",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "336 source pixels",
+    "baseline": 439,
+    "frames": "The front pose is down_idle_01; down_idle_02 is a local closed-eye blink edit. left_idle_01 is the sheet's left-facing side view (pose-1, its third figure) and right_idle_01 its right-facing side view (pose-2, its middle figure); neither is mirrored.",
+    "atlas": "tools/art/build-staff.ts, PixiJS v8"
+  },
+  "validator": {
+    "biped": false,
+    "idleOnly": true,
+    "directions": ["down", "left", "right"],
+    "key": "magenta"
+  },
+  "selectionReason": "The selected sheet matches the school staff concept: spiky brown hair, green tracksuit with blue panel and white stripes, whistle on a lanyard, friendly confident face, and sneakers. No lasso, stopwatch, clipboard, or other equipment is present."
+}

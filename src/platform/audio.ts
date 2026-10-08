@@ -2,11 +2,20 @@ import { Preferences } from "@capacitor/preferences";
 import type { SoundCue } from "../core";
 
 export type SoundLogEntry = { tick: number; cue: SoundCue; played: boolean };
+// WebKit adds "interrupted" (no gesture yet, or the audio session was taken)
+// to the standard states, so the DOM type doesn't cover what it reports.
+export type AudioState = "running" | "suspended" | "interrupted" | "closed" | "unavailable";
+function stateOf(audio: AudioContext | null): AudioState {
+  if (audio === null) return "unavailable";
+  const state: string = audio.state;
+  return state === "running" || state === "closed" || state === "interrupted" ? state : "suspended";
+}
 export type AudioController = {
-  play: (cue: SoundCue, tick: number) => void;
+  play: (cue: SoundCue, tick: number) => SoundLogEntry;
   toggle: () => void;
   muted: () => boolean;
   log: () => SoundLogEntry[];
+  state: () => AudioState;
 };
 
 type Timing = { offset: number; duration: number; gain: number };
@@ -83,7 +92,14 @@ const recipes: Record<SoundCue, Recipe> = {
   "battle-rest": [{ wave: "triangle", frequency: 262, offset: 0, duration: .16, gain: .07 }],
 };
 
-export function createAudio(): AudioController {
+// The context is made at boot and resumed at every chance: browsers keep it
+// suspended until a key, click, or tap (a gamepad press never counts), while
+// the iOS app's web view lets it run at once (Capacitor clears
+// `mediaTypesRequiringUserActionForPlayback`), so a pad-only player there
+// hears the game from the start. WebKit's default `ambient` session lets the
+// ring/silent switch mute it, as a game's sound should.
+export function createAudio(onStateChange: (state: AudioState) => void = () => undefined):
+  AudioController {
   let muted = false;
   let preferenceLoaded = false;
   let locallyToggled = false;
@@ -119,7 +135,11 @@ export function createAudio(): AudioController {
   };
   const unlock = (): void => {
     const audio = ensureContext();
-    if (audio !== null && audio.state === "suspended") void audio.resume();
+    // A refused resume (no gesture yet) rejects in some browsers; the next
+    // gesture or cue tries again.
+    const state = stateOf(audio);
+    if (audio !== null && state !== "running" && state !== "closed")
+      audio.resume().catch(() => undefined);
   };
   const playSegment = (audio: AudioContext, segment: Segment, start: number): void => {
     if (master === null) return;
@@ -152,13 +172,21 @@ export function createAudio(): AudioController {
   };
   const playRecipe = (cue: SoundCue): boolean => {
     if (muted) return false;
-    const audio = ensureContext();
-    if (audio === null || master === null || audio.state === "suspended") return false;
+    unlock();
+    const audio = context;
+    if (audio === null || master === null || stateOf(audio) !== "running") return false;
     const recipe = recipes[cue];
     const now = audio.currentTime;
     recipe.forEach((segment) => playSegment(audio, segment, now + segment.offset));
     return true;
   };
+  const booted = ensureContext();
+  if (booted === null) onStateChange(stateOf(booted));
+  else {
+    booted.addEventListener("statechange", () => onStateChange(stateOf(booted)));
+    onStateChange(stateOf(booted));
+    unlock();
+  }
   window.addEventListener("pointerdown", unlock, { passive: true });
   window.addEventListener("touchstart", unlock, { passive: true });
   window.addEventListener("keydown", (event) => {
@@ -172,12 +200,14 @@ export function createAudio(): AudioController {
   });
   return {
     play: (cue, tick) => {
-      const played = playRecipe(cue);
-      entries.push({ tick, cue, played });
+      const entry = { tick, cue, played: playRecipe(cue) };
+      entries.push(entry);
       if (entries.length > 120) entries.shift();
+      return entry;
     },
     toggle,
     muted: () => muted,
     log: () => entries.slice(),
+    state: () => stateOf(context),
   };
 }

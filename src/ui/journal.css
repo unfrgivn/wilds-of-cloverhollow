@@ -63,15 +63,27 @@
   align-items: center;
   gap: 6px;
 }
+/* Drawn like the supply pills beside it; the invisible ::after keeps a
+   finger-sized hit area around the small pill. */
 .journal-audio {
-  min-height: 32px;
-  padding: 2px 8px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
   border: 2px solid var(--sticker-ink);
   border-radius: 999px;
   background: var(--sticker-paper);
+  box-shadow: 0 2px 0 #47321f33;
   color: var(--sticker-ink);
-  font: 700 13px var(--sticker-font);
+  align-self: stretch;
+  font: 800 13px var(--sticker-font);
+  white-space: nowrap;
   cursor: pointer;
+}
+.journal-audio::after {
+  content: "";
+  position: absolute;
+  inset: -10px -4px;
 }
 .journal-audio.is-muted { background: #eadbff; }
 .journal-supply {

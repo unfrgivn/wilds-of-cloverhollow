@@ -65,7 +65,11 @@ export type CloverhollowHook = {
     loaded: () => { tick: number; hash: string } | null;
   };
   boot: { title: () => "fresh" | "continue" | "confirm" | null };
-  sound: { log: AudioController["log"]; muted: AudioController["muted"] };
+  sound: {
+    log: AudioController["log"];
+    muted: AudioController["muted"];
+    state: AudioController["state"];
+  };
 };
 
 export function installHook(deps: {

@@ -15,6 +15,21 @@ async function soundLog(page: Page): Promise<{
   return page.evaluate(() => window.__cloverhollow?.sound.log() ?? []);
 }
 
+test("audio waits for a real key in the browser, then cues play", async ({ page }) => {
+  await openHarness(page);
+  await resetPaused(page, "new-game");
+  const state = (): Promise<string | undefined> =>
+    page.evaluate(() => window.__cloverhollow?.sound.state());
+  // Browsers hold the context until a gesture (WebKit calls it "interrupted");
+  // the iOS app's web view doesn't.
+  expect(["suspended", "interrupted"]).toContain(await state());
+  await hold(page, "ArrowRight", 1);
+  await expect.poll(state).toBe("running");
+  await hold(page, "ArrowRight", 16);
+  expect((await soundLog(page)).some((entry) => entry.cue === "footstep" && entry.played))
+    .toBe(true);
+});
+
 test("real dialogue keys emit open, advance, and blip cues", async ({ page }) => {
   await openHarness(page);
   await resetPaused(page, "new-game");

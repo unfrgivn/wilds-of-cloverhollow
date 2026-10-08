@@ -70,7 +70,10 @@ async function boot(): Promise<void> {
   root.appendChild(app.canvas);
   const keyboard = new Keyboard();
   const gamepad = new GamepadInput();
-  const sound = createAudio();
+  const sound = createAudio((audioState) => {
+    if (import.meta.env.DEV || import.meta.env.MODE === "harness")
+      console.log(`[cloverhollow] audio ${JSON.stringify({ state: audioState })}`);
+  });
   const touch = mountTouchControls();
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);
@@ -406,7 +409,11 @@ async function boot(): Promise<void> {
     };
     const previous = state;
     state = step(content.world, state, input).state;
-    for (const cue of soundCues(previous, state)) sound.play(cue, state.tick);
+    for (const cue of soundCues(previous, state)) {
+      const played = sound.play(cue, state.tick);
+      if (import.meta.env.DEV || import.meta.env.MODE === "harness")
+        console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
+    }
     if (autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const log =
@@ -527,7 +534,7 @@ async function boot(): Promise<void> {
         last: () => saveLast,
         loaded: () => saveLoaded,
       },
-      sound: { log: sound.log, muted: sound.muted },
+      sound: { log: sound.log, muted: sound.muted, state: sound.state },
       boot: { title: () => titleMode },
     });
   }

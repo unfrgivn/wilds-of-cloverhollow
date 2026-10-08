@@ -1,0 +1,1488 @@
+{
+  "area": "plaza",
+  "subjects": [
+    {
+      "id": "bench-north",
+      "crop": [
+        778,
+        346,
+        220,
+        220
+      ],
+      "seed": [
+        887,
+        440
+      ],
+      "front": [
+        "fountain"
+      ],
+      "complete": true,
+      "shadowReach": 40,
+      "samples": {
+        "object": 1,
+        "fill": 2
+      },
+      "ground": "the pale pink plaza paving wash",
+      "object": "the wooden bench in the centre of the image together with the wooden flower box of flowers directly behind it, as one object",
+      "footprint": [
+        [
+          [
+            838,
+            438
+          ],
+          [
+            936,
+            438
+          ],
+          [
+            941,
+            446
+          ],
+          [
+            941,
+            492
+          ],
+          [
+            935,
+            499
+          ],
+          [
+            839,
+            499
+          ],
+          [
+            833,
+            492
+          ],
+          [
+            833,
+            446
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "fountain",
+      "crop": [
+        735,
+        395,
+        300,
+        300
+      ],
+      "seed": [
+        885,
+        520
+      ],
+      "solid": true,
+      "shadowReach": 40,
+      "samples": {
+        "object": 1,
+        "fill": 2
+      },
+      "ground": "the pale pink plaza paving wash inside the stone ring",
+      "object": "the round white stone fountain in the centre of the image (its wide shallow round basin of blue water and the small domed white column in the middle)",
+      "footprint": [
+        [
+          [
+            885,
+            627
+          ],
+          [
+            908.3,
+            625.2
+          ],
+          [
+            930,
+            620
+          ],
+          [
+            948.6,
+            611.8
+          ],
+          [
+            962.9,
+            601
+          ],
+          [
+            971.9,
+            588.5
+          ],
+          [
+            975,
+            575
+          ],
+          [
+            971.9,
+            561.5
+          ],
+          [
+            962.9,
+            549
+          ],
+          [
+            948.6,
+            538.2
+          ],
+          [
+            930,
+            530
+          ],
+          [
+            908.3,
+            524.8
+          ],
+          [
+            885,
+            523
+          ],
+          [
+            861.7,
+            524.8
+          ],
+          [
+            840,
+            530
+          ],
+          [
+            821.4,
+            538.2
+          ],
+          [
+            807.1,
+            549
+          ],
+          [
+            798.1,
+            561.5
+          ],
+          [
+            795,
+            575
+          ],
+          [
+            798.1,
+            588.5
+          ],
+          [
+            807.1,
+            601
+          ],
+          [
+            821.4,
+            611.8
+          ],
+          [
+            840,
+            620
+          ],
+          [
+            861.7,
+            625.2
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bench-northwest",
+      "crop": [
+        660,
+        380,
+        220,
+        220
+      ],
+      "seed": [
+        762,
+        490
+      ],
+      "shadowReach": 40,
+      "samples": {
+        "object": 1,
+        "fill": 3
+      },
+      "ground": "the pale pink plaza paving wash",
+      "object": "the single slanted wooden bench in the centre of the image (curved slatted backrest, grey legs)",
+      "footprint": [
+        [
+          [
+            722,
+            503
+          ],
+          [
+            800,
+            468
+          ],
+          [
+            820,
+            500
+          ],
+          [
+            760,
+            536
+          ],
+          [
+            733,
+            530
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bench-west",
+      "crop": [
+        576,
+        460,
+        220,
+        220
+      ],
+      "seed": [
+        712,
+        585
+      ],
+      "front": [
+        "arch-sw"
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the pale pink plaza paving wash",
+      "object": "the wooden bench in the centre of the image together with the wooden flower box of flowers attached behind it, as one object",
+      "footprint": [
+        [
+          [
+            642,
+            533
+          ],
+          [
+            690,
+            533
+          ],
+          [
+            741,
+            546
+          ],
+          [
+            741,
+            616
+          ],
+          [
+            688,
+            623
+          ],
+          [
+            644,
+            623
+          ],
+          [
+            640,
+            615
+          ],
+          [
+            640,
+            541
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bench-east",
+      "crop": [
+        970,
+        458,
+        220,
+        220
+      ],
+      "seed": [
+        1090,
+        575
+      ],
+      "front": [
+        "arch-se"
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the pale pink plaza paving wash",
+      "object": "the wooden bench in the centre of the image together with the wooden flower box of flowers attached behind it, as one object",
+      "footprint": [
+        [
+          [
+            1030,
+            546
+          ],
+          [
+            1082,
+            533
+          ],
+          [
+            1134,
+            533
+          ],
+          [
+            1139,
+            541
+          ],
+          [
+            1139,
+            616
+          ],
+          [
+            1135,
+            623
+          ],
+          [
+            1090,
+            623
+          ],
+          [
+            1030,
+            617
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bench-southeast",
+      "crop": [
+        882,
+        532,
+        256,
+        256
+      ],
+      "seed": [
+        1005,
+        668
+      ],
+      "shadowReach": 50,
+      "samples": {
+        "object": 1,
+        "fill": 2
+      },
+      "ground": "the pale pink plaza paving wash",
+      "object": "the single angled wooden bench in the middle of the image (the bench whose seat runs diagonally from lower-left to upper-right, with two grey legs and a curved backrest)",
+      "footprint": [
+        [
+          [
+            960,
+            668
+          ],
+          [
+            1060,
+            625
+          ],
+          [
+            1066,
+            652
+          ],
+          [
+            980,
+            700
+          ]
+        ]
+      ],
+      "states": {
+        "smashed": {
+          "source": "art/source/areas/plaza/kit/bench-southeast-smashed.png",
+          "width": 100,
+          "footprint": [],
+          "shadow": true,
+          "note": "gemini-3-pro-image, 2026-10-08, one of three samples; reference: the approved plaza painting. Prompt: \"Redraw exactly the attached angled wooden plaza bench as a small collapsed pile of its own planks, cozy family-friendly, with a few purple chaos scribble swirls, isolated on flat #FF00FF, no ground or shadow. Keep the same watercolor and warm-brown ink style.\" Its footprint is empty: a low pile Fae can step through."
+        }
+      }
+    },
+    {
+      "id": "bench-south",
+      "crop": [
+        769,
+        600,
+        220,
+        220
+      ],
+      "seed": [
+        880,
+        730
+      ],
+      "shadowReach": 50,
+      "samples": {
+        "object": 1,
+        "fill": 2
+      },
+      "ground": "the pale pink plaza paving wash",
+      "object": "the wooden bench in the centre of the image together with the long wooden flower box of flowers in front of it, as one object",
+      "footprint": [
+        [
+          [
+            806,
+            688
+          ],
+          [
+            948,
+            688
+          ],
+          [
+            950,
+            700
+          ],
+          [
+            950,
+            756
+          ],
+          [
+            946,
+            761
+          ],
+          [
+            808,
+            761
+          ],
+          [
+            803,
+            756
+          ],
+          [
+            803,
+            700
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "planter-southwest",
+      "crop": [
+        552,
+        832,
+        250,
+        250
+      ],
+      "seed": [
+        677,
+        960
+      ],
+      "solid": true,
+      "shadowReach": 50,
+      "samples": {
+        "object": 1,
+        "fill": 1
+      },
+      "ground": "the grass and the pale paving around it",
+      "object": "the long wooden flower box full of flowers in the centre of the image",
+      "footprint": [
+        [
+          [
+            588,
+            942
+          ],
+          [
+            602,
+            922
+          ],
+          [
+            772,
+            960
+          ],
+          [
+            772,
+            982
+          ],
+          [
+            744,
+            1027
+          ],
+          [
+            588,
+            972
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "planter-southeast",
+      "crop": [
+        960,
+        836,
+        250,
+        250
+      ],
+      "seed": [
+        1085,
+        962
+      ],
+      "solid": true,
+      "shadowReach": 50,
+      "samples": {
+        "object": 1,
+        "fill": 2
+      },
+      "ground": "the grass and the pale paving around it",
+      "object": "the long wooden flower box full of flowers in the centre of the image",
+      "footprint": [
+        [
+          [
+            1177,
+            942
+          ],
+          [
+            1163,
+            922
+          ],
+          [
+            993,
+            960
+          ],
+          [
+            993,
+            982
+          ],
+          [
+            1021,
+            1027
+          ],
+          [
+            1177,
+            972
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "flowerbed-east",
+      "crop": [
+        1306,
+        585,
+        260,
+        260
+      ],
+      "seed": [
+        1430,
+        722
+      ],
+      "solid": true,
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the cobblestone path (rounded stones with brown ink outlines) and the grass around it",
+      "object": "the large wooden flower box full of pink flowers and green leaves in the centre of the image (not the tree)",
+      "footprint": [
+        [
+          [
+            1340,
+            690
+          ],
+          [
+            1360,
+            660
+          ],
+          [
+            1530,
+            700
+          ],
+          [
+            1540,
+            760
+          ],
+          [
+            1505,
+            802
+          ],
+          [
+            1345,
+            738
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "arch-nw",
+      "crop": [
+        550,
+        245,
+        280,
+        280
+      ],
+      "seed": [
+        626,
+        462
+      ],
+      "core": 3,
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the plaza ground around it (the pale pink paving, the cobblestone paths with rounded stones and brown ink outlines, the stone ring curb, the grass, and the shop fronts behind it)",
+      "object": "the tall curved brown iron lamp arch in the centre of the image: its two legs, the curved top joining them, its lantern, and the round flower baskets hanging from it, all as one object",
+      "footprint": [
+        [
+          [
+            625,
+            490
+          ],
+          [
+            632.1,
+            488.7
+          ],
+          [
+            636.4,
+            485.2
+          ],
+          [
+            636.4,
+            480.8
+          ],
+          [
+            632.1,
+            477.3
+          ],
+          [
+            625,
+            476
+          ],
+          [
+            617.9,
+            477.3
+          ],
+          [
+            613.6,
+            480.8
+          ],
+          [
+            613.6,
+            485.2
+          ],
+          [
+            617.9,
+            488.7
+          ]
+        ],
+        [
+          [
+            757,
+            432
+          ],
+          [
+            764.1,
+            430.7
+          ],
+          [
+            768.4,
+            427.2
+          ],
+          [
+            768.4,
+            422.8
+          ],
+          [
+            764.1,
+            419.3
+          ],
+          [
+            757,
+            418
+          ],
+          [
+            749.9,
+            419.3
+          ],
+          [
+            745.6,
+            422.8
+          ],
+          [
+            745.6,
+            427.2
+          ],
+          [
+            749.9,
+            430.7
+          ]
+        ]
+      ],
+      "home": [
+        691,
+        490
+      ]
+    },
+    {
+      "id": "arch-ne",
+      "crop": [
+        938,
+        245,
+        280,
+        280
+      ],
+      "seed": [
+        1006,
+        405
+      ],
+      "core": 3,
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the plaza ground around it (the pale pink paving, the cobblestone paths with rounded stones and brown ink outlines, the stone ring curb, the grass, and the shop fronts behind it)",
+      "object": "the tall curved brown iron lamp arch in the centre of the image: its two legs, the curved top joining them, its lantern, and the round flower baskets hanging from it, all as one object",
+      "exclude": [
+        [
+          [
+            1048,
+            322
+          ],
+          [
+            1048,
+            284
+          ],
+          [
+            1057,
+            276
+          ],
+          [
+            1072,
+            268
+          ],
+          [
+            1092,
+            266
+          ],
+          [
+            1101,
+            270
+          ],
+          [
+            1101,
+            322
+          ]
+        ]
+      ],
+      "footprint": [
+        [
+          [
+            1005,
+            432
+          ],
+          [
+            1012.1,
+            430.7
+          ],
+          [
+            1016.4,
+            427.2
+          ],
+          [
+            1016.4,
+            422.8
+          ],
+          [
+            1012.1,
+            419.3
+          ],
+          [
+            1005,
+            418
+          ],
+          [
+            997.9,
+            419.3
+          ],
+          [
+            993.6,
+            422.8
+          ],
+          [
+            993.6,
+            427.2
+          ],
+          [
+            997.9,
+            430.7
+          ]
+        ],
+        [
+          [
+            1144,
+            492
+          ],
+          [
+            1151.1,
+            490.7
+          ],
+          [
+            1155.4,
+            487.2
+          ],
+          [
+            1155.4,
+            482.8
+          ],
+          [
+            1151.1,
+            479.3
+          ],
+          [
+            1144,
+            478
+          ],
+          [
+            1136.9,
+            479.3
+          ],
+          [
+            1132.6,
+            482.8
+          ],
+          [
+            1132.6,
+            487.2
+          ],
+          [
+            1136.9,
+            490.7
+          ]
+        ]
+      ],
+      "home": [
+        1075,
+        492
+      ]
+    },
+    {
+      "id": "arch-sw",
+      "crop": [
+        457,
+        503,
+        330,
+        330
+      ],
+      "seed": [
+        565,
+        676
+      ],
+      "core": 3,
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the plaza ground around it (the pale pink paving, the cobblestone paths with rounded stones and brown ink outlines, the stone ring curb, the grass, and the shop fronts behind it)",
+      "object": "the tall curved brown iron lamp arch in the centre of the image: its two legs, the curved top joining them, its lantern, and the round flower baskets hanging from it, all as one object",
+      "footprint": [
+        [
+          [
+            570,
+            704
+          ],
+          [
+            577.1,
+            702.7
+          ],
+          [
+            581.4,
+            699.2
+          ],
+          [
+            581.4,
+            694.8
+          ],
+          [
+            577.1,
+            691.3
+          ],
+          [
+            570,
+            690
+          ],
+          [
+            562.9,
+            691.3
+          ],
+          [
+            558.6,
+            694.8
+          ],
+          [
+            558.6,
+            699.2
+          ],
+          [
+            562.9,
+            702.7
+          ]
+        ],
+        [
+          [
+            693,
+            822
+          ],
+          [
+            700.1,
+            820.7
+          ],
+          [
+            704.4,
+            817.2
+          ],
+          [
+            704.4,
+            812.8
+          ],
+          [
+            700.1,
+            809.3
+          ],
+          [
+            693,
+            808
+          ],
+          [
+            685.9,
+            809.3
+          ],
+          [
+            681.6,
+            812.8
+          ],
+          [
+            681.6,
+            817.2
+          ],
+          [
+            685.9,
+            820.7
+          ]
+        ]
+      ],
+      "home": [
+        632,
+        822
+      ]
+    },
+    {
+      "id": "arch-se",
+      "crop": [
+        990,
+        503,
+        330,
+        330
+      ],
+      "seed": [
+        1220,
+        676
+      ],
+      "core": 3,
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the plaza ground around it (the pale pink paving, the cobblestone paths with rounded stones and brown ink outlines, the stone ring curb, the grass, and the shop fronts behind it)",
+      "object": "the tall curved brown iron lamp arch in the centre of the image: its two legs, the curved top joining them, its lantern, and the round flower baskets hanging from it, all as one object",
+      "footprint": [
+        [
+          [
+            1091,
+            825
+          ],
+          [
+            1098.1,
+            823.7
+          ],
+          [
+            1102.4,
+            820.2
+          ],
+          [
+            1102.4,
+            815.8
+          ],
+          [
+            1098.1,
+            812.3
+          ],
+          [
+            1091,
+            811
+          ],
+          [
+            1083.9,
+            812.3
+          ],
+          [
+            1079.6,
+            815.8
+          ],
+          [
+            1079.6,
+            820.2
+          ],
+          [
+            1083.9,
+            823.7
+          ]
+        ],
+        [
+          [
+            1219,
+            707
+          ],
+          [
+            1226.1,
+            705.7
+          ],
+          [
+            1230.4,
+            702.2
+          ],
+          [
+            1230.4,
+            697.8
+          ],
+          [
+            1226.1,
+            694.3
+          ],
+          [
+            1219,
+            693
+          ],
+          [
+            1211.9,
+            694.3
+          ],
+          [
+            1207.6,
+            697.8
+          ],
+          [
+            1207.6,
+            702.2
+          ],
+          [
+            1211.9,
+            705.7
+          ]
+        ]
+      ],
+      "home": [
+        1155,
+        825
+      ]
+    },
+    {
+      "id": "notice-board",
+      "crop": [
+        222,
+        530,
+        300,
+        300
+      ],
+      "seed": [
+        372,
+        640
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the grass, the house's flower box, and the cobbles around it",
+      "object": "the wooden notice board on two slanted posts in the centre of the image, with the papers pinned to it (not the house, the bushes, or the tree)",
+      "footprint": [
+        [
+          [
+            315.8,
+            809.2
+          ],
+          [
+            481.5,
+            727.5
+          ],
+          [
+            476.2,
+            716.8
+          ],
+          [
+            310.5,
+            798.5
+          ]
+        ]
+      ],
+      "home": [
+        396,
+        804
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "tree-west",
+      "crop": [
+        100,
+        520,
+        240,
+        380
+      ],
+      "seed": [
+        175,
+        830
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the grass and the paving",
+      "object": "the round leafy green tree at the left edge of the image, with its brown trunk (not the notice board or the bushes)",
+      "footprint": [
+        [
+          [
+            165,
+            870
+          ],
+          [
+            180,
+            868.4
+          ],
+          [
+            191,
+            864
+          ],
+          [
+            195,
+            858
+          ],
+          [
+            191,
+            852
+          ],
+          [
+            180,
+            847.6
+          ],
+          [
+            165,
+            846
+          ],
+          [
+            150,
+            847.6
+          ],
+          [
+            139,
+            852
+          ],
+          [
+            135,
+            858
+          ],
+          [
+            139,
+            864
+          ],
+          [
+            150,
+            868.4
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "tree-northeast",
+      "crop": [
+        1440,
+        160,
+        220,
+        360
+      ],
+      "seed": [
+        1575,
+        440
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the grass and the arcade wall",
+      "object": "the round leafy green tree on the right of the image, with its brown trunk (not the arcade building)",
+      "footprint": [
+        [
+          [
+            1578,
+            466
+          ],
+          [
+            1592,
+            464.4
+          ],
+          [
+            1602.2,
+            460
+          ],
+          [
+            1606,
+            454
+          ],
+          [
+            1602.2,
+            448
+          ],
+          [
+            1592,
+            443.6
+          ],
+          [
+            1578,
+            442
+          ],
+          [
+            1564,
+            443.6
+          ],
+          [
+            1553.8,
+            448
+          ],
+          [
+            1550,
+            454
+          ],
+          [
+            1553.8,
+            460
+          ],
+          [
+            1564,
+            464.4
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      }
+    },
+    {
+      "id": "tree-southeast",
+      "crop": [
+        1490,
+        590,
+        260,
+        290
+      ],
+      "seed": [
+        1612,
+        830
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the grass",
+      "object": "the leafy green tree at the right edge of the image, with its brown trunk (not the flower box or the path)",
+      "footprint": [
+        [
+          [
+            1612,
+            862
+          ],
+          [
+            1624,
+            860.7
+          ],
+          [
+            1632.8,
+            857
+          ],
+          [
+            1636,
+            852
+          ],
+          [
+            1632.8,
+            847
+          ],
+          [
+            1624,
+            843.3
+          ],
+          [
+            1612,
+            842
+          ],
+          [
+            1600,
+            843.3
+          ],
+          [
+            1591.2,
+            847
+          ],
+          [
+            1588,
+            852
+          ],
+          [
+            1591.2,
+            857
+          ],
+          [
+            1600,
+            860.7
+          ]
+        ]
+      ],
+      "core": 3,
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bush-southwest",
+      "crop": [
+        390,
+        940,
+        240,
+        160
+      ],
+      "seed": [
+        500,
+        1010
+      ],
+      "painted": true,
+      "ground": "the grass and the cobblestone path",
+      "object": "the round green bush at the bottom of the image (not the path or the flower box)",
+      "footprint": [
+        [
+          [
+            500,
+            1048
+          ],
+          [
+            543.4,
+            1046.2
+          ],
+          [
+            578.2,
+            1041.2
+          ],
+          [
+            597.5,
+            1034
+          ],
+          [
+            597.5,
+            1026
+          ],
+          [
+            578.2,
+            1018.8
+          ],
+          [
+            543.4,
+            1013.8
+          ],
+          [
+            500,
+            1012
+          ],
+          [
+            456.6,
+            1013.8
+          ],
+          [
+            421.8,
+            1018.8
+          ],
+          [
+            402.5,
+            1026
+          ],
+          [
+            402.5,
+            1034
+          ],
+          [
+            421.8,
+            1041.2
+          ],
+          [
+            456.6,
+            1046.2
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bush-southeast",
+      "crop": [
+        1140,
+        940,
+        250,
+        160
+      ],
+      "seed": [
+        1265,
+        1010
+      ],
+      "painted": true,
+      "ground": "the grass and the cobblestone path",
+      "object": "the round green bush at the bottom of the image (not the path or the flower box)",
+      "footprint": [
+        [
+          [
+            1265,
+            1050
+          ],
+          [
+            1308.4,
+            1048.2
+          ],
+          [
+            1343.2,
+            1043.2
+          ],
+          [
+            1362.5,
+            1036
+          ],
+          [
+            1362.5,
+            1028
+          ],
+          [
+            1343.2,
+            1020.8
+          ],
+          [
+            1308.4,
+            1015.8
+          ],
+          [
+            1265,
+            1014
+          ],
+          [
+            1221.6,
+            1015.8
+          ],
+          [
+            1186.8,
+            1020.8
+          ],
+          [
+            1167.5,
+            1028
+          ],
+          [
+            1167.5,
+            1036
+          ],
+          [
+            1186.8,
+            1043.2
+          ],
+          [
+            1221.6,
+            1048.2
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    }
+  ]
+}

@@ -1,12 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
-  longFlowTimeout,
-  openHarness,
-  readBattle,
-  readState,
-  renderInfo,
-  resetPaused,
-  step,
+  longFlowTimeout, openHarness, readBattle, readState, renderInfo, resetPaused, step, walk,
 } from "./helpers";
 
 // Milestone 13 contract: Meadow Park. The plaza's lower-right cobbled path
@@ -27,32 +21,6 @@ async function hold(page: Page, key: string, ticks: number): Promise<void> {
 async function press(page: Page, key = "z"): Promise<void> {
   await page.keyboard.press(key);
   await step(page, 2);
-}
-
-async function where(page: Page): Promise<{ x: number; y: number; area: string }> {
-  const place = await page.evaluate(() => {
-    const state = window.__cloverhollow?.getState();
-    return state === undefined ? null : { ...state.player, area: state.area };
-  });
-  if (place === null) throw new Error("hook unavailable");
-  return place;
-}
-
-// Walks toward a coordinate on one axis with real keys (Fae walks exactly 4
-// units a tick), stopping on arrival, when something blocks the way, or when a
-// door takes her to another area.
-async function walk(page: Page, axis: "x" | "y", target: number): Promise<void> {
-  const start = await where(page);
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    const before = await where(page);
-    if (before.area !== start.area) return;
-    const error = target - before[axis];
-    if (Math.abs(error) <= 2) return;
-    const key = axis === "x" ? (error > 0 ? "ArrowRight" : "ArrowLeft")
-      : (error > 0 ? "ArrowDown" : "ArrowUp");
-    await hold(page, key, Math.max(1, Math.min(60, Math.floor(Math.abs(error) / 4))));
-    if ((await where(page))[axis] === before[axis]) return;
-  }
 }
 
 // From the plaza fixture's fountain spawn (1200, 550): right past the lamp

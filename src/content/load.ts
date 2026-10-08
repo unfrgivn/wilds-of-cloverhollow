@@ -11,6 +11,7 @@ import passData from "../../content/areas/pass.json";
 import trailData from "../../content/areas/trail.json";
 import woodsData from "../../content/areas/woods.json";
 import arcadeData from "../../content/areas/arcade.json";
+import plazaPropsData from "../../content/props/plaza.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -46,6 +47,9 @@ import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
 import landsData from "../../content/lands.json";
 import { createInkState, createStoryReader } from "../core/ink";
+import {
+  parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
+} from "./props";
 import type {
   Area,
   CharacterContent,
@@ -205,7 +209,7 @@ export function parseTunables(value: unknown, file: string): Tunables {
   };
 }
 
-export function parseArea(value: unknown, file: string): Area {
+export function parseArea(value: unknown, file: string, catalogue?: PropCatalogue): Area {
   field(record(value), file, "object");
   field(typeof value.id === "string", file, "id");
   field(typeof value.width === "number", file, "width");
@@ -394,6 +398,8 @@ export function parseArea(value: unknown, file: string): Area {
         ? {}
         : { visibleWhile: item.visibleWhile }),
     })),
+    props: placeProps(parsePropPlacements(value.props, file), catalogue, file),
+    atlases: catalogue?.atlases ?? [],
     spawns,
   };
 }
@@ -894,7 +900,8 @@ export function loadContent(): {
 } {
   const harness = parseArea(areaData, "content/areas/harness.json");
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json");
-  const plaza = parseArea(plazaData, "content/areas/plaza.json");
+  const plaza = parseArea(plazaData, "content/areas/plaza.json",
+    parsePropCatalogue(plazaPropsData, "content/props/plaza.json"));
   const kitchen = parseArea(kitchenData, "content/areas/kitchen.json");
   const park = parseArea(parkData, "content/areas/park.json");
   const school = parseArea(schoolData, "content/areas/school.json");
@@ -1000,6 +1007,8 @@ export function loadContent(): {
     [woods.id]: woods,
     [arcade.id]: arcade,
   };
+  const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));
+  if (ruleProblems.length > 0) throw new Error(`content/areas: ${ruleProblems.join("; ")}`);
   const critterProblems = critterErrors(areas, critters, stickers);
   if (critterProblems.length > 0)
     throw new Error(`content/critters: ${critterProblems.join("; ")}`);

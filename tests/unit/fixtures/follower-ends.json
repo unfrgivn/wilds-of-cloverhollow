@@ -54,7 +54,7 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 3688,
+    "tick": 3684,
     "area": "park",
     "player": {
       "x": 731.1269837220834,
@@ -129,18 +129,18 @@
     "tick": 330,
     "area": "plaza",
     "player": {
-      "x": 1589.914997833817,
-      "y": 520.001
+      "x": 1177.7983686379346,
+      "y": 393.90328787643006
     },
     "facing": "up",
     "follower": {
-      "x": 1589.914997833817,
-      "y": 585.374998454259,
+      "x": 1175.401,
+      "y": 450.0463058446719,
       "facing": "up",
-      "moving": true,
-      "distance": 659.2103569221262,
-      "stillTicks": 6,
-      "trail": 8
+      "moving": false,
+      "distance": 915.2884306286805,
+      "stillTicks": 2,
+      "trail": 1
     }
   },
   "plaza/frog-rest.json": {
@@ -152,7 +152,7 @@
     },
     "facing": "up",
     "follower": {
-      "x": 1148,
+      "x": 1252,
       "y": 544,
       "facing": "up",
       "moving": false,
@@ -165,17 +165,17 @@
     "tick": 183,
     "area": "plaza",
     "player": {
-      "x": 1062.0919349233075,
-      "y": 855.0007887086954
+      "x": 1064,
+      "y": 850
     },
     "facing": "right",
     "follower": {
       "x": 1140,
-      "y": 847.6490793260276,
+      "y": 843.6490793260276,
       "facing": "down",
       "moving": false,
-      "distance": 390.7674582227691,
-      "stillTicks": 72,
+      "distance": 386.7674582227691,
+      "stillTicks": 73,
       "trail": 10
     }
   },
@@ -183,17 +183,17 @@
     "tick": 526,
     "area": "plaza",
     "player": {
-      "x": 1062.0919349233075,
-      "y": 855.0007887086954
+      "x": 1064,
+      "y": 850
     },
     "facing": "left",
     "follower": {
       "x": 1140,
-      "y": 847.6490793260276,
+      "y": 843.6490793260276,
       "facing": "down",
       "moving": false,
-      "distance": 390.7674582227691,
-      "stillTicks": 415,
+      "distance": 386.7674582227691,
+      "stillTicks": 416,
       "trail": 10
     }
   },
@@ -201,18 +201,18 @@
     "tick": 360,
     "area": "plaza",
     "player": {
-      "x": 1257.5926854806812,
-      "y": 410.89785494998443
+      "x": 1430.406196192288,
+      "y": 640.0626032185112
     },
     "facing": "right",
     "follower": {
-      "x": 1200.185841133135,
-      "y": 403.7327822506031,
+      "x": 1341.3297254836618,
+      "y": 643.001,
       "facing": "right",
-      "moving": false,
-      "distance": 1085.4759254189644,
-      "stillTicks": 34,
-      "trail": 1
+      "moving": true,
+      "distance": 799.0984932560305,
+      "stillTicks": 0,
+      "trail": 11
     }
   },
   "school/hall-pass.json": {

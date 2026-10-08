@@ -23,6 +23,7 @@ import type {
   Wild,
 } from "./types";
 import { createInkState, runInk, type InkFacts } from "./ink";
+import { sceneryArea } from "./props";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -79,10 +80,12 @@ export function partySlots(
 
 function spawnParty(
   world: World,
-  area: Area,
+  ink: string,
+  room: Area,
   spawn: Spawn,
   ids: string[],
 ): PartyMember[] {
+  const area = sceneryArea(world, ink, room);
   const fae = { x: spawn.x, y: spawn.y };
   const members = ids.map((id) => partyContent(world, id));
   const slots = partySlots(area, fae, world.tunables.follow, members);
@@ -120,6 +123,7 @@ export function createState(
     Object.values(world.party)
       .filter((member) => member.start)
       .map((member) => member.id);
+  const ink = createInkState(world.story, seed);
   const state: State = {
     tick: 0,
     area: area.id,
@@ -129,8 +133,8 @@ export function createState(
     previousInput: blankInput(),
     motion: { distance: 0, moving: false },
     transition: null,
-    party: spawnParty(world, area, spawn, ids),
-    ink: createInkState(world.story, seed),
+    party: spawnParty(world, ink, area, spawn, ids),
+    ink,
     dialogue: null,
     critters: Object.fromEntries(
       Object.values(world.areas).flatMap((each) => each.critters)
@@ -312,6 +316,28 @@ function moveDirection(move: Point): Direction | undefined {
   return move.y < 0 ? "up" : "down";
 }
 
+function validResolved(point: Point, area: Area, radius: number): boolean {
+  return pointInPolygon(point, area.walkable) &&
+    distanceToPolygon(point, area.walkable) >= radius - 0.01 &&
+    area.blockers.every((blocker) =>
+      !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius - 0.01);
+}
+
+/*
+ * One step from `previous` toward `candidate` (spec 6). The solver pushes out of
+ * each shape in turn; in a gap narrower than the collider those pushes fight,
+ * and it can stop inside one. Then the step slides along one axis, or stays.
+ * Where the solver succeeds (every area before props) nothing changes.
+ */
+export function resolveMove(previous: Point, candidate: Point, area: Area, radius: number): Point {
+  const resolved = resolveCollision(candidate, area, radius);
+  if (validResolved(resolved, area, radius)) return resolved;
+  const alongX = resolveCollision({ x: candidate.x, y: previous.y }, area, radius);
+  if (validResolved(alongX, area, radius)) return alongX;
+  const alongY = resolveCollision({ x: previous.x, y: candidate.y }, area, radius);
+  return validResolved(alongY, area, radius) ? alongY : previous;
+}
+
 function chooseRoamTarget(
   world: World,
   state: State,
@@ -356,6 +382,7 @@ function updateWild(
 ): Pick<State, "wild" | "rng"> {
   let randomState = state;
   const roam = world.tunables.roam;
+  const scenery = sceneryArea(world, state.ink, area);
   const wild = state.wild.map((previous): Wild => {
     const den = area.recurring?.dens[previous.den];
     const cooldownTicks = Math.max(0, previous.cooldownTicks - 1);
@@ -371,7 +398,7 @@ function updateWild(
     else if (cooldownTicks > 0) target = home;
     else if (pauseTicks > 0) pauseTicks -= 1;
     else if (distance(previous, target) <= 0.5) {
-      const picked = chooseRoamTarget(world, randomState, area, home, den.radius);
+      const picked = chooseRoamTarget(world, randomState, scenery, home, den.radius);
       target = picked.target;
       randomState = picked.state;
       pauseTicks = roam.pauseTicks;
@@ -385,7 +412,7 @@ function updateWild(
           x: previous.x + (target.x - previous.x) * amount / gap,
           y: previous.y + (target.y - previous.y) * amount / gap,
         };
-    const position = resolveCollision(candidate, area, world.tunables.follow.radius);
+    const position = resolveMove(previous, candidate, scenery, world.tunables.follow.radius);
     const dx = position.x - previous.x;
     const dy = position.y - previous.y;
     const moved = Math.sqrt(dx * dx + dy * dy);
@@ -517,10 +544,11 @@ export function npcVisible(
 }
 
 function solidArea(world: World, state: State, area: Area): Area {
+  const scenery = sceneryArea(world, state.ink, area);
   return {
-    ...area,
+    ...scenery,
     blockers: [
-      ...area.blockers,
+      ...scenery.blockers,
       ...area.npcs
         .filter((npc) => npcVisible(world, state, npc))
         .map((npc) => npc.footprint),
@@ -564,7 +592,7 @@ function joinReady(world: World, state: State): State {
     ];
     const point = person?.point ??
       visibleFollowerSlot(
-        area,
+        sceneryArea(world, state.ink, area),
         leader,
         leader,
         world.tunables.follow,
@@ -1379,7 +1407,8 @@ function updateFollower(
       const length = distance(member, slot);
       const amount = Math.min(world.tunables.walkSpeed / 60, length);
       const ratio = length === 0 ? 0 : amount / length;
-      const position = resolveCollision(
+      const position = resolveMove(
+        member,
         {
           x: member.x + (slot.x - member.x) * ratio,
           y: member.y + (slot.y - member.y) * ratio,
@@ -1454,7 +1483,7 @@ function updateFollower(
     };
     remaining = 0;
   }
-  const resolved = resolveCollision(position, area, tune.radius);
+  const resolved = resolveMove(member, position, area, tune.radius);
   const dx = resolved.x - member.x;
   const dy = resolved.y - member.y;
   let facing = member.facing;
@@ -1592,6 +1621,7 @@ function stepTick(
         transition: { target: transition.target, phase: "in", elapsed: 0 },
         party: spawnParty(
           world,
+          state.ink,
           targetArea,
           spawn,
           state.party.map((member) => member.id),
@@ -1650,7 +1680,8 @@ function stepTick(
   const speed = world.tunables.walkSpeed / 60;
   // People who are there are solid, for Fae and for her party alike.
   const solid = solidArea(world, state, area);
-  const player = resolveCollision(
+  const player = resolveMove(
+    state.player,
     {
       x: state.player.x + input.move.x * scale * speed,
       y: state.player.y + input.move.y * scale * speed,

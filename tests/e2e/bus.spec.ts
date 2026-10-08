@@ -33,15 +33,13 @@ async function talk(page: Page, choice = 0): Promise<void> {
   throw new Error("conversation did not close");
 }
 // From the east road's spawn (1550, 550) to the bus stop, facing it: a route
-// the core found (round the arcade's door, the planters, and the frog's reach).
+// the core found (tools/sim/recorder.ts `approach`, round the plaza's props and
+// the frog's reach).
 const roadToStop: [string[], number][] = [
-  [["ArrowLeft"], 100], [["ArrowLeft", "ArrowUp"], 15], [["ArrowUp"], 5],
-  [["ArrowLeft", "ArrowUp"], 5], [["ArrowLeft"], 10], [["ArrowLeft", "ArrowUp"], 5],
-  [["ArrowLeft"], 10], [["ArrowLeft", "ArrowUp"], 15], [["ArrowLeft"], 80],
-  [["ArrowLeft", "ArrowDown"], 20], [["ArrowDown"], 15], [["ArrowRight"], 5],
-  [["ArrowDown"], 35], [["ArrowRight", "ArrowDown"], 65], [["ArrowDown"], 20],
-  [["ArrowRight", "ArrowDown"], 10], [["ArrowRight"], 5], [["ArrowRight", "ArrowDown"], 15],
-  [["ArrowUp"], 1],
+  [["ArrowLeft", "ArrowUp"], 5], [["ArrowLeft"], 25], [["ArrowLeft", "ArrowDown"], 125],
+  [["ArrowLeft"], 5], [["ArrowLeft", "ArrowDown"], 10], [["ArrowLeft"], 10],
+  [["ArrowLeft", "ArrowDown"], 15], [["ArrowLeft"], 5], [["ArrowLeft", "ArrowDown"], 10],
+  [["ArrowLeft"], 5], [["ArrowUp"], 1], [[], 1],
 ];
 async function walkFromRoadToStop(page: Page): Promise<void> {
   for (const [keys, ticks] of roadToStop) {

@@ -47,6 +47,26 @@ export async function readState(page: Page): Promise<State> {
   return state;
 }
 
+// Walks toward a coordinate on one axis with real keys (Fae walks exactly 4
+// units a tick), stopping on arrival, when something stops her (a wall, a
+// battle, a conversation), or once a door takes her: the walk ends as its fade
+// starts, and the caller steps through it.
+export async function walk(page: Page, axis: "x" | "y", target: number): Promise<void> {
+  const start = await readState(page);
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    const before = await readState(page);
+    if (before.area !== start.area || before.transition !== null) return;
+    const error = target - before.player[axis];
+    if (Math.abs(error) <= 2) return;
+    const key = axis === "x" ? (error > 0 ? "ArrowRight" : "ArrowLeft")
+      : (error > 0 ? "ArrowDown" : "ArrowUp");
+    await page.keyboard.down(key);
+    await step(page, Math.max(1, Math.min(60, Math.floor(Math.abs(error) / 4))));
+    await page.keyboard.up(key);
+    if ((await readState(page)).player[axis] === before.player[axis]) return;
+  }
+}
+
 // The time budget for long real-key flows (a whole battle, or a walk through
 // several areas). CI renders in software and runs them many times slower
 // than a laptop: the downstairs walk took over 180 s there. A full local run
@@ -85,6 +105,11 @@ export async function renderInfo(page: Page): Promise<{
   critters: { id: string; kind: string; frame: string; x: number; y: number }[];
   npcs: { id: string; frame: string; facing: string }[];
   canopies: { id: string; alpha: number }[];
+  props: {
+    id: string;
+    state: string;
+    strips: { left: number; right: number; zIndex: number }[];
+  }[];
   lantern: { on: boolean; glows: string[] };
   // Everything in CSS px, from the one battle layout (spec 8).
   battle: {

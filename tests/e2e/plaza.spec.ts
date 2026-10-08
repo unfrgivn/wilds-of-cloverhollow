@@ -39,25 +39,42 @@ test("real keys cross the bedroom and kitchen doors in both directions", async (
     .toBe(true);
 });
 
-test("plaza screenshot and lamppost depth", async ({ page }) => {
+test("plaza screenshot and lamp arch depth", async ({ page }) => {
   await openHarness(page);
   await resetPaused(page, "plaza");
+  // The south-east lamp arch is a prop (spec 6.2): it draws over Fae in her
+  // column while her feet are north of its front edge there, under her after.
+  const archOverFae = async (): Promise<boolean> => {
+    const info = await renderInfo(page);
+    const state = await page.evaluate(() => window.__cloverhollow?.getState());
+    const x = state?.player.x ?? 0;
+    const fae = info.drawOrder.find((item) => item.label === "fae");
+    const strip = info.props.find((prop) => prop.id === "arch-se")?.strips
+      .find((item) => item.left <= x && x < item.right);
+    if (fae === undefined || strip === undefined) throw new Error("no fae or arch strip");
+    return strip.zIndex > fae.zIndex;
+  };
   await page.keyboard.down("ArrowDown");
   await step(page, 38);
   await page.keyboard.up("ArrowDown");
   await step(page, 60);
-  const north = await renderInfo(page);
-  const faeNorth = north.drawOrder.findIndex((item) => item.label === "fae");
-  const lamp = north.drawOrder.findIndex((item) =>
-    item.label === "occluder:lamp-lower-right");
-  expect(lamp).toBeGreaterThan(faeNorth);
+  expect(await archOverFae()).toBe(true);
   await page.keyboard.down("ArrowDown");
   await step(page, 10);
   await page.keyboard.up("ArrowDown");
-  const south = await renderInfo(page);
-  const southFae = south.drawOrder.findIndex((item) => item.label === "fae");
-  const southLamp = south.drawOrder.findIndex((item) =>
-    item.label === "occluder:lamp-lower-right");
-  expect(southFae).toBeGreaterThan(southLamp);
+  expect(await archOverFae()).toBe(false);
   await expect(page).toHaveScreenshot("plaza.png");
+});
+
+test("plaza props are solid where they meet the ground", async ({ page }) => {
+  await openHarness(page);
+  await resetPaused(page, "plaza");
+  // West from the fountain spawn into the east bench: its footprint, not a box
+  // round its whole picture, stops her at the bench's painted edge (spec 6.2).
+  await page.keyboard.down("ArrowLeft");
+  await step(page, 40);
+  await page.keyboard.up("ArrowLeft");
+  const state = await page.evaluate(() => window.__cloverhollow?.getState());
+  expect(state?.player.x).toBeCloseTo(1159, 0);
+  expect(state?.player.y).toBe(550);
 });

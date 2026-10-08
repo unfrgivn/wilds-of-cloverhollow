@@ -8,7 +8,7 @@ import {
   Spritesheet,
   Text,
   type Renderer,
-  type Texture,
+  Texture,
 } from "pixi.js";
 import {
   battleFoe,
@@ -26,7 +26,7 @@ import {
   type State,
   type World,
 } from "../core";
-import { AreaView } from "./area-view";
+import { AreaView, type Rect } from "./area-view";
 import { followCamera, worldToScreen } from "./camera";
 import { selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
@@ -229,6 +229,26 @@ export class GameView {
     this.staticWidth = 0;
   }
 
+  // Where everyone in the depth layer is drawn, in world units.
+  private figures(): Rect[] {
+    const sprites = [
+      this.player,
+      ...this.partySprites.values(),
+      ...this.npcSprites.map(({ sprite }) => sprite),
+      ...this.critterSprites.flatMap(({ body, aura }) => [body, aura]),
+    ];
+    return sprites.filter((sprite) => sprite.visible && sprite.texture !== Texture.EMPTY)
+      .map((sprite) => {
+        const width = sprite.width;
+        const height = sprite.height;
+        const anchorX = sprite.scale.x < 0 ? 1 - sprite.anchor.x : sprite.anchor.x;
+        const anchorY = sprite.scale.y < 0 ? 1 - sprite.anchor.y : sprite.anchor.y;
+        const x0 = sprite.x - anchorX * width;
+        const y0 = sprite.y - anchorY * height;
+        return { x0, y0, x1: x0 + width, y1: y0 + height };
+      });
+  }
+
   resize(width: number, height: number): void {
     this.viewWidth = Math.max(960, Math.min(1600, (720 * width) / height));
     this.viewHeight = 720;
@@ -399,11 +419,11 @@ export class GameView {
     this.glowLayer.position.set(offsetX, offsetY);
     this.player.position.set(state.player.x, state.player.y);
     this.player.zIndex = state.player.y;
-    loaded.fadeCanopies(state.player, state.tick);
     this.setFaeTexture(state);
     this.renderParty(state);
     this.renderCritters(state);
     this.renderNpcs(state);
+    loaded.update(this.world, state.ink, state.player, state.tick, this.figures());
     this.renderGlows(state, width, height);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
@@ -584,17 +604,19 @@ export class GameView {
       -margin - insetY * cover,
     );
     if (this.backdropTexture === undefined && this.areaView !== undefined) {
-      // Blur the painting once into a small texture: the backdrop is static,
-      // so each battle frame draws one sprite instead of a full-screen blur
-      // (slow without a GPU, costly on a phone).
-      const ground = this.areaView.ground;
-      ground.filters = [this.backdropBlur];
-      this.backdropTexture = this.renderer.generateTexture({
-        target: ground,
-        frame: new Rectangle(0, 0, area.width, area.height),
-        resolution: 0.5,
+      // Blur the painting (the plate with its props) once into a small
+      // texture: the backdrop is static, so each battle frame draws one sprite
+      // instead of a full-screen blur (slow without a GPU, costly on a phone).
+      this.backdropTexture = this.areaView.withScenery((ground) => {
+        ground.filters = [this.backdropBlur];
+        const texture = this.renderer.generateTexture({
+          target: ground,
+          frame: new Rectangle(0, 0, area.width, area.height),
+          resolution: 0.5,
+        });
+        ground.filters = [];
+        return texture;
       });
-      ground.filters = [];
       this.backdropSprite.texture = this.backdropTexture;
     }
     this.backdropSprite.scale.set(cover);
@@ -812,6 +834,13 @@ export class GameView {
     npcs: { id: string; frame: string; facing: string }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];
+    // Each prop's current state and its strips: world x range and the y it
+    // sorts by (spec 6).
+    props: {
+      id: string;
+      state: string;
+      strips: { left: number; right: number; zIndex: number }[];
+    }[];
     lantern: { on: boolean; glows: string[] };
     battle: {
       phase: string | null;
@@ -872,6 +901,7 @@ export class GameView {
       critters: this.critterFrames,
       npcs: this.npcFrames,
       canopies: this.areaView?.canopyAlphas ?? [],
+      props: this.areaView?.propInfo ?? [],
       lantern: { on: state.lantern && state.battle === null, glows: this.drawnGlows.slice() },
       battle: {
         phase: state.battle?.phase ?? null,

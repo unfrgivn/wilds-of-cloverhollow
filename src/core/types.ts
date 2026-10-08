@@ -83,8 +83,44 @@ export type Area = {
   // to like an interactable, and turned toward Fae while she talks to them.
   // Their footprint is an authored blocker.
   npcs: Npc[];
+  // Scenery cut from the area's painting (spec 6): every object Fae can walk
+  // behind or bump into. Resolved by the loader from the area's placements
+  // and its catalogue (`content/props/<area>.json`), in world units.
+  props: Prop[];
+  // The area's prop atlases (Pixi spritesheet JSON URLs), loaded with it.
+  atlases: string[];
   spawns: Record<string, Spawn>;
 };
+// One prop placed in an area (spec 6). Its state is `state` unless one of
+// `rules` applies: the first whose Ink variable is true wins. A painted prop is
+// also still painted on the ground plate, so it never moves or changes state.
+export type Prop = {
+  id: string;
+  kind: string;
+  x: number;
+  y: number;
+  flip: boolean;
+  canopy: boolean;
+  painted: boolean;
+  state: string;
+  rules: { state: string; while: string }[];
+  states: Record<string, PropState>;
+};
+// A prop state, in world units: the frame and its multiply shadow decal, the
+// ground footprint (solid), the front edge it sorts by, and its silhouette.
+export type PropState = {
+  frame: string;
+  shadow: string | null;
+  footprint: Polygon[];
+  front: FrontEdge;
+  silhouette: Silhouette;
+};
+// The front edge of a prop's footprint: its southmost y in every column,
+// sampled every `step` units from `left` (spec 6).
+export type FrontEdge = { left: number; step: number; ys: number[] };
+// A prop's opaque runs, `[top, bottom]` in world y, per `step`-wide column
+// from `left`.
+export type Silhouette = { left: number; step: number; columns: [number, number][][] };
 // A set piece's id is its critter kind's. `visibleWhile` (an Ink variable)
 // puts it there only while it's true, as for people.
 export type SetPiece = { id: string; point: Point; visibleWhile?: string };

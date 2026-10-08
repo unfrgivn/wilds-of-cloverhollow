@@ -9,6 +9,7 @@ import {
   distanceToPolygon,
   pointInPolygon,
   presentCritters,
+  sceneryArea,
   step,
   targetInteractable,
   type ActionFrame,
@@ -148,8 +149,9 @@ export function createRecorder(world: World, initial: State): {
     return point;
   };
   const standable = (point: Point): boolean => {
-    const area = world.areas[state.area];
-    if (area === undefined) return false;
+    const room = world.areas[state.area];
+    if (room === undefined) return false;
+    const area = sceneryArea(world, state.ink, room);
     const radius = world.tunables.playerRadius;
     const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
     return pointInPolygon(point, area.walkable) &&

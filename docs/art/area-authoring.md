@@ -1,5 +1,9 @@
 # Area authoring
 
+Areas become kits (spec 6.2): paint the area whole, get it approved, then
+split it into a ground plate and props with `tools/art/kit.ts`
+(`docs/art/kit.md`). The occluder workflow below is for areas not yet split.
+
 An area JSON uses logical units, at two source pixels per unit. Trace the
 walkable floor edge first, then add only the floor-contact footprints to
 `blockers`. A tall prop gets an `occluders` polygon covering its painted

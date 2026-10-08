@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 31, the gym and the lasso)
+Last updated: 2026-10-08 (Milestone 32, the props engine and the plaza kit)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -195,8 +195,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Source art is authored at 2x logical units (1 unit = 2 source pixels).
 - The camera follows the player with a small dead zone, clamps to area bounds,
   and snaps to whole device pixels.
-- Depth: the area ground layer is always at the back; props and characters
-  y-sort by their foot baseline.
+- Depth: the area ground layer is always at the back; characters y-sort by
+  their feet, and props sort against them column by column by the front edge
+  of their footprints (section 6.2).
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded), no single texture over 2048x2048, and the previous area unloads on
   transition. One `AreaView` (`src/render/area-view.ts`) owns an area's sprites
@@ -277,14 +278,20 @@ ios/            Capacitor iOS project (from Milestone 4).
 ## 6. World
 - Areas are discrete. `content/areas/<id>.json` is canonical (Tiled may be used
   for editing if its export matches): `id`, `width` and `height` in units, the
-  optional `land`, the `walkable` floor polygon, `blockers` (furniture footprints on the floor
-  plane), `occluders` (`{ id, polygon, baseline, canopy? }`), named `spawns`
-  (`{ x, y, facing }`), and optional `ground` (the folder of its painting).
+  optional `land`, the `walkable` floor polygon, `blockers` (floor-plane
+  footprints of walls nobody walks behind), `props` (its scenery, section
+  6.2), `occluders` (`{ id, polygon, baseline, canopy? }`, the old cutouts,
+  in areas not yet split into a kit), named `spawns` (`{ x, y, facing }`),
+  and optional `ground` (the folder of its painting or ground plate).
   Doors arrive in Milestone 6 and interactables in Milestone 8. An area's
   `critters` are its story set pieces and its optional `recurring` its
   recurring critters (section 6.1).
 - Player collider: a circle of radius 20 units at the feet that slides along
-  blockers.
+  blockers. Each step is resolved by the solver; in a gap narrower than the
+  collider, where its pushes fight and it would stop inside a shape, the step
+  slides along one axis instead, or stays put (`resolveMove`). Followers and
+  roaming critters move the same way. Where the solver succeeds the step is
+  exactly the solver's, so areas without props move as before.
 - `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
   (20), and `walkCycleUnits` (126).
 - Transitions: entering a trigger fades out, loads the target area, places the
@@ -445,7 +452,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   only in letterbox bars outside it.
 - Areas may define `interactables` with `{ id, knot, point, prompt }`. Each
   point must be reachable within the interaction range.
-- Occluders: lossless cutouts of tall furniture, generated from the painting
+- Occluders (areas not yet split into a kit, section 6.2): lossless cutouts of
+  tall furniture, generated from the painting
   by `tools/art/area-occluders.ts` into the area's asset folder
   (`occluders.json` lists their unit offsets). Each is the painting inside its
   outline and transparent outside it, so it covers characters only where the
@@ -473,8 +481,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`tests/unit/canopy.test.ts`, `tests/e2e/canopy.spec.ts`).
 - Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
   spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
-  body box (50x140 units above her feet) covered by occluders. Canopies don't
-  count: they fade instead.
+  body box (50x140 units above her feet) covered by occluders and props (in
+  any of their states). Canopies don't count: they fade instead. The checks
+  count every footprint of every prop state as solid, since the story may
+  change a state.
 - Area scale rule: a standard door is about 1.4x Fae's height (about 200
   units) and furniture is proportional. Paintings are resampled uniformly to
   meet it, never stretched. The bedroom is 1050x700 units (the whole room fits
@@ -514,11 +524,68 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Authoring checks (`src/content/area-checks.ts`): a den must be on the
   floor; farther from every spawn than sight plus its kinds' touch radius,
   so Fae never arrives in a critter's sight; clear of every door by its
-  radius plus that touch; and mostly in view (no more than a tenth of
-  sample points round it drawn behind an occluder). The loader
+  radius plus that touch; and mostly in view (of 48 sample spots on rings
+  round it, no more than a tenth with over half of a critter's body, 50 by
+  70 units, drawn behind scenery). The loader
   (`critterErrors`) checks that set pieces are kinds placed once, dens list
   only the other kinds, a species has one sticker and it's in the album,
   and `after` names a set piece or a species.
+
+### 6.2 Props and area kits (Milestone 32)
+- An area's scenery (everything Fae can walk behind or bump into) is props:
+  sprites cut from its painting, each with a ground footprint (solid), its
+  own depth, and states. The ground plate is the painting with the lifted
+  props and their cast shadows painted out.
+- A catalogue, `content/props/<area>.json` (written by `tools/art/kit.ts`),
+  lists the area's atlases (Pixi spritesheets in
+  `public/assets/areas/<area>/props-N.json`, frames anchored at the prop's
+  home point, 2 source px per unit, each a whole number of 5-unit columns
+  wide) and its props: `{ canopy, painted, home: [x, y], states }`, every
+  state `{ frame, shadow, footprint, silhouette }`. A `footprint` is a list
+  of polygons relative to home (an arch has one per leg; a pile of planks
+  none); `shadow` is a multiply decal frame or null; `silhouette` is
+  `{ left, step: 5, columns }`, each column the frame's opaque runs as
+  "top bottom ..." in units relative to home. Every prop has a `default`
+  state.
+- The area places them: `props: [{ id, prop, x, y, flip?, state?, rules? }]`.
+  `rules` are `{ state, while }`: the first whose Ink variable is true sets
+  the state, else `state` (default `default`). A `painted` prop is still on
+  the plate (its neighbours overlap it there), so it must stay at home,
+  unflipped, in its default state, with no rules. The loader resolves every
+  placement into world units and rejects unknown props or states, duplicate
+  ids, moved painted props, and rules reading undeclared Ink variables
+  (`propRuleErrors`).
+- Collision: each prop's current footprint is solid for Fae, the party, and
+  roaming critters, like a blocker (`sceneryArea`); spawning and joining
+  party slots avoid them too.
+- Depth: each prop's front edge is its footprint's southmost y in every
+  5-unit column (`frontEdge`): straight across gaps between its polygons
+  (between an arch's legs), flat past its ends, and the home y with no
+  footprint. Someone whose feet are north of the front edge in a column is
+  behind the prop there. The renderer draws each prop as vertical strips,
+  sub-textures of its frame where consecutive columns share a front y, each
+  strip sorted at that y with the characters' feet; the strips together draw
+  exactly the frame. `propCovers` measures the same rule for the checks. A
+  painted prop's strips are drawn only where they overlap someone in the
+  depth layer (the plate already shows it everywhere else), which keeps a kit
+  area as cheap to draw as its painting; `renderInfo().drawOrder` lists the
+  strips drawn.
+- Shadows are multiply decals on the ground layer, under everyone, and move
+  with their prop.
+- A canopy prop (the trees, the notice board) fades to 40% (0.08 a tick)
+  while it covers more than 5% of Fae's body box, like a canopy occluder;
+  `renderInfo().canopies` lists canopy props after canopy occluders.
+- The battle backdrop is rendered from the plate with every prop on it.
+- The plaza (Milestone 32) is a kit: 20 props (the fountain; six benches;
+  the four lamp arches, each one prop with a footprint per leg; the two
+  planters and the flowerbed; the notice board; three trees; two bushes).
+  Lifted (movable, with shadows): the fountain, the north, northwest,
+  southeast, and south benches, and the two planters; bench-north was
+  finished where the fountain hid its legs. bench-southeast has a `smashed`
+  state (a pile of planks with purple scribbles, footprint empty). The rest
+  are painted. Its blockers are the house and the four shops; it has no
+  occluders. The south-west critter den moved to (620, 810), clear of the
+  arch.
 
 ## 7. Interaction and dialogue
 - Targeting: the core targets the nearest interactable within
@@ -970,7 +1037,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
     cache), the depth layer's draw order (`{ label, zIndex }[]`, with `fae`,
-    each party member's id such as `maddie`, and `occluder:<id>`), Fae's
+    each party member's id such as `maddie`, `occluder:<id>`, and
+    `prop:<id>`, one entry per strip), `props` (each prop's `{ id, state,
+    strips }`, every strip's world `left`, `right`, and `zIndex`), Fae's
     current `animation` and `frame`, `party` (each member in party order as
     `{ id, hidden, animation, frame }`, `hidden` being its fraction behind its
     leader), plus prompt and dialogue summaries. `npcs` lists each person in
@@ -1034,6 +1103,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   segmentation by connected components, trimming, one uniform scale per strip
   (never stretched), feet-baseline alignment, and atlas packing. Commands are
   in `docs/art/pipeline.md`; area rules are in `docs/art/areas.md`.
+- Area kits (owner, 2026-10-08): an area is painted whole, approved, then
+  split into a ground plate and props by `tools/art/kit.ts`
+  (`docs/art/kit.md`). Every visible default prop pixel is the approved
+  painting's; generated pixels only fill plate holes, finish a prop's parts
+  hidden behind another prop, or become masks. The approved painting is kept
+  in `art/source/areas/<area>/painting/`; the chosen Gemini samples in
+  `art/source/areas/<area>/kit/`, so a rebuild makes no calls.
 - Gate: the owner approves the style of the first character and the first area
   before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
   hair with bangs and a high bun, white sneakers with orange trim, journal in

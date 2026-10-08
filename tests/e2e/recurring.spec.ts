@@ -107,9 +107,11 @@ test("the town's cats: one comes out in the plaza once the fountain frog is calm
 }) => {
   // Chapter one's recorded run (tools/sim/chapter-one.ts) meets a fizzy cat in
   // the plaza after the school raccoon: replay it to the moment they meet,
-  // then read the battle in with real keys.
+  // then read the battle in with real keys. `met` is the tick its intro starts
+  // (re-recording chapter one moves it: find it with
+  // `bun tools/sim/run.ts tests/sim/scripts/new-game/chapter-one.json --trace`).
   const path = "tests/sim/scripts/new-game/chapter-one.json";
-  const met = 2875;
+  const met = 2869;
   const upTo: ReturnType<typeof recording> = [];
   let ticks = 0;
   for (const segment of recording(path)) {

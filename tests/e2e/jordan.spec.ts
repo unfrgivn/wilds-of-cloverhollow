@@ -1,12 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
-  longFlowTimeout,
-  openHarness,
-  readBattle,
-  readState,
-  renderInfo,
-  resetPaused,
-  step,
+  longFlowTimeout, openHarness, readBattle, readState, renderInfo, resetPaused, step, walk,
 } from "./helpers";
 
 // Milestone 22: at Pinecone Pass, Fae meets Jordan by the snowman. He joins
@@ -25,20 +19,6 @@ async function hold(page: Page, key: string, ticks: number): Promise<void> {
 async function press(page: Page): Promise<void> {
   await page.keyboard.press("z");
   await step(page, 2);
-}
-
-// Walks toward a coordinate on one axis with real keys (4 units a tick),
-// stopping on arrival or when something stops her (a wall, a battle).
-async function walk(page: Page, axis: "x" | "y", target: number): Promise<void> {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    const before = (await readState(page)).player;
-    const error = target - before[axis];
-    if (Math.abs(error) <= 2) return;
-    const key = axis === "x" ? (error > 0 ? "ArrowRight" : "ArrowLeft")
-      : (error > 0 ? "ArrowDown" : "ArrowUp");
-    await hold(page, key, Math.max(1, Math.min(60, Math.floor(Math.abs(error) / 4))));
-    if ((await readState(page)).player[axis] === before[axis]) return;
-  }
 }
 
 // Talks to whoever Fae faces through every line, taking the first answer.

@@ -1042,6 +1042,83 @@ the old trail, the owl, and the clubhouse claim.
     spawn, plus the doors and people's footprints
     (`docs/art/area-authoring.md`).
 
+## Milestone 32: The props engine and the plaza kit **Status:** ✅ Completed (2026-10-08)
+- The owner chose the area kit (2026-10-08, after a spike on the plaza: "the
+  new version is way better. Refactor everything in this manner"). An area is
+  painted whole, approved, then split into a ground plate and props: every
+  object Fae can walk behind or bump into is a prop with its own ground
+  footprint (solid), its own depth (column by column, from the front edge of
+  its footprint), a multiply shadow decal, and states (spec 6.2).
+- Engine: props in `src/core/props.ts` (state rules from Ink, the scenery
+  area, front edges, cover) and `src/content/props.ts` (catalogues and
+  placements, resolved into world units by the loader); the renderer draws
+  each prop as strips of its frame sorted by their front edge, shadows on the
+  ground layer, canopy props fading like canopies, and the battle backdrop
+  from the plate with its props. Colliders step with `resolveMove`, which
+  slides along one axis, or stays, where a gap narrower than the collider
+  defeats the solver. The area checks count every footprint of every state as
+  solid, and the hiding and den checks include props.
+- The plaza is the first kit: 20 props (the fountain; six benches; four lamp
+  arches; two planters and the flowerbed; the notice board; three trees; two
+  bushes). Seven are lifted, with their ground painted in and their shadows
+  as decals: the fountain, the north, northwest, southeast, and south benches,
+  and the two planters. The rest are painted (they overlap a neighbour at the
+  plate). bench-southeast has a smashed state. The house and the four shops
+  stay blockers; the plaza has no occluders.
+- Pipeline: `tools/art/kit.ts` (`gen`, `masks`, `fill`, `pack`, `place`) with
+  one config per area (`art/kit/<area>.json`) and its docs
+  (`docs/art/kit.md`). The approved painting is kept in
+  `art/source/areas/plaza/painting/`, the chosen samples in
+  `art/source/areas/plaza/kit/`; a rebuild makes no Gemini calls and writes
+  byte-identical files.
+- Evidence: unit (`props.test.ts`: placing and flipping, state rules from real
+  Ink, solid only in the current state, front edges across gaps, cover
+  column by column, the narrow gap, Fae stopped by the south bench, the
+  loader's refusals, the area checks, and every catalogue frame in its atlas),
+  the re-recorded runs (below) with matching browser and Bun hashes, and the
+  real-key e2e `plaza.spec.ts` (the south-east arch over Fae north of it and
+  under her south of it; the east bench stopping her at its painted edge,
+  where the old box let her 59 units into it). Viewed in game: behind the
+  north-east arch's leg, behind the notice board (fading), the frog battle's
+  backdrop.
+- Notes and assumptions:
+  - The new rule changes nothing where it isn't used: with the plaza as it
+    was, every unit test, replay, and hash matched main.
+  - Gemini calls: 104 in the spike (kept), 18 in rejected spike passes, and
+    18 in this milestone (the new subjects' isolates and bench-north's
+    completion).
+  - bench-north is finished where the fountain hid its front legs, so it
+    stays whole when the fountain moves (the kit's `complete`).
+  - The den check measured one point (a critter's middle); a thin lamp post
+    over that point counted the critter hidden while most of it showed. It
+    now counts a spot hidden when over half a critter's body (50 by 70 units)
+    is behind scenery: the park's tower den still fails, every real den
+    passes. The south-west plaza den moved from (620, 770) to (620, 810),
+    clear of the arch.
+  - The trail check in `core.test.ts` walks south of the fountain: its loop
+    ran into the north-east arch's back leg, which is solid now.
+  - Re-recorded (their old runs no longer fit the plaza): chapter one, the
+    east road, the bus line, the bay bus, the bakery, the arcade, the school
+    run, and the gym; `follower-ends.json` re-pinned for the six scripts
+    that cross the plaza.
+  - The notice board's footprint is a bar along its foot line: its panel
+    hangs at Fae's chest height between the posts, and two post feet let her
+    walk through it. The kit docs say so for boards and signs.
+  - Drawing every painted prop over the plate made a plaza frame about 18%
+    slower in software-rendered Chromium (a 10-tick step and a state read,
+    189 ms against 160), and four long real-key flows ran past their 180 s
+    budget there. A painted prop is now drawn only where it overlaps someone:
+    the plate already shows it everywhere else. Frames cost what they did on
+    main (165 and 151 ms against 165 and 151).
+  - The plaza's decoded textures: the plate 30.8 MB and two prop pages
+    17.5 MB, under the 96 MB budget.
+  - E2E: the specs' five copies of `walk` became one shared helper, which
+    ends the walk when a door's fade starts (the caller steps through it);
+    one copy kept holding the key through the fade and walked on in the next
+    room. The bus stop route was found again with the recorder, whose
+    `approach` now counts props as solid; the cat meets Fae 6 ticks sooner
+    in the re-recorded chapter one.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1114,8 +1191,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     the painting itself, and states such as smashed. Objects can move or
     change without repainting the scene. The owner: "the new version is way
     better. Refactor everything in this manner."
-    - Milestone 32, the props engine and the plaza kit: props replace the
-      plaza's occluders and blockers; the kit pipeline and its docs.
+    - Milestone 32, the props engine and the plaza kit: done (above).
     - Milestone 33, the indoor kits: the bedroom, the kitchen, the school
       hall, the classroom, the gym, and the arcade.
     - Milestone 34, the outdoor kits: the park, Bubblegum Bay, Pinecone Pass,

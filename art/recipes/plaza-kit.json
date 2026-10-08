@@ -1,0 +1,145 @@
+{
+  "asset": "plaza-kit",
+  "date": "2026-10-08",
+  "summary": "The approved plaza painting split into a ground plate and 20 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "model": "gemini-3-pro-image",
+  "config": "art/kit/plaza.json",
+  "painting": "art/source/areas/plaza/painting/ground.json",
+  "commands": [
+    "bun tools/art/kit.ts plaza gen",
+    "bun tools/art/kit.ts plaza masks",
+    "bun tools/art/kit.ts plaza fill",
+    "bun tools/art/kit.ts plaza pack",
+    "bun tools/art/kit.ts plaza place"
+  ],
+  "prompts": {
+    "isolate": "This is a crop of a hand-painted watercolor-and-ink game map. Recolor EVERYTHING except <object> to flat solid magenta #FF00FF. That includes the ground, its cast shadow, and every other object. Keep it exactly as it is: the same pixels, position, size, outline, and colours, with its brown ink outline fully kept. Gaps between its parts that show ground must also become magenta. Output the whole image at the same framing.",
+    "isolateWithShadow": "This is a crop of a hand-painted watercolor-and-ink game map. Recolor EVERYTHING except <object>, together with its soft cast shadow on the ground, to flat solid magenta #FF00FF. That includes the ground, and every other object. Keep it and its shadow exactly as it is: the same pixels, position, size, outline, and colours, with its brown ink outline fully kept. Gaps between its parts that show ground must also become magenta. Output the whole image at the same framing.",
+    "fill": "This is a crop of a hand-painted watercolor-and-ink storybook game map seen from a 3/4 top-down view. Fill ONLY the flat magenta (#FF00FF) area so it seamlessly continues <ground> around it: the same soft watercolor washes, colours, line work, and paper texture. The filled area must be empty ground: no objects, no shadows, no new things. Keep every pixel outside the magenta area exactly as it is, in the same position and scale. Output the whole image at the same framing.",
+    "complete": "This is a crop of a hand-painted watercolor-and-ink storybook game map seen from a 3/4 top-down view. Flat magenta (#FF00FF) covers part of <object>. Redraw ONLY the magenta area: where it covers the object, continue the object so it is whole, with the same outline, shapes, materials, and colours as its visible part; where it covers anything else, continue <ground>. Keep every pixel outside the magenta area exactly as it is, in the same position and scale. Output the whole image at the same framing."
+  },
+  "kept": {
+    "folder": "art/source/areas/plaza/kit",
+    "samples": {
+      "bench-north": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-2.jpg",
+        "complete-1.jpg",
+        "completeiso-1.jpg"
+      ],
+      "fountain": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-2.jpg"
+      ],
+      "bench-northwest": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-3.jpg"
+      ],
+      "bench-west": [
+        "iso-1.jpg"
+      ],
+      "bench-east": [
+        "iso-1.jpg"
+      ],
+      "bench-southeast": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-2.jpg"
+      ],
+      "bench-south": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-2.jpg"
+      ],
+      "planter-southwest": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-1.jpg"
+      ],
+      "planter-southeast": [
+        "iso-1.jpg",
+        "shade.png",
+        "fill-2.jpg"
+      ],
+      "flowerbed-east": [
+        "iso-1.jpg"
+      ],
+      "arch-nw": [
+        "iso-1.jpg"
+      ],
+      "arch-ne": [
+        "iso-1.jpg"
+      ],
+      "arch-sw": [
+        "iso-1.jpg"
+      ],
+      "arch-se": [
+        "iso-1.jpg"
+      ],
+      "notice-board": [
+        "iso-1.jpg"
+      ],
+      "tree-west": [
+        "iso-1.jpg"
+      ],
+      "tree-northeast": [
+        "iso-2.jpg"
+      ],
+      "tree-southeast": [
+        "iso-1.jpg"
+      ],
+      "bush-southwest": [
+        "iso-1.jpg"
+      ],
+      "bush-southeast": [
+        "iso-1.jpg"
+      ]
+    }
+  },
+  "plate": "Lifted props' holes inpainted locally; untouched tiles copied byte for byte, patched tiles re-encoded at WebP quality 92.",
+  "atlas": {
+    "pages": [
+      "assets/areas/plaza/props-0.json",
+      "assets/areas/plaza/props-1.json"
+    ],
+    "decodedMegabytes": 17.5
+  },
+  "measurements": {
+    "rebuiltVsPainting": "0.66% of the painting's pixels differ by more than 12% when the default layout is rebuilt from the kit"
+  },
+  "states": {
+    "bench-southeast.smashed": {
+      "source": "art/source/areas/plaza/kit/bench-southeast-smashed.png",
+      "recipe": "gemini-3-pro-image, 2026-10-08, one of three samples; reference: the approved plaza painting. Prompt: \"Redraw exactly the attached angled wooden plaza bench as a small collapsed pile of its own planks, cozy family-friendly, with a few purple chaos scribble swirls, isolated on flat #FF00FF, no ground or shadow. Keep the same watercolor and warm-brown ink style.\" Its footprint is empty: a low pile Fae can step through.",
+      "processing": "magenta corner flood and -transparent #FF00FF, trim, uniform resize to 100 units wide, despill-edge.ts --key magenta --band 3",
+      "shadow": "a soft lavender ellipse from the frame's alpha"
+    }
+  },
+  "painted": [
+    "bench-west",
+    "bench-east",
+    "flowerbed-east",
+    "arch-nw",
+    "arch-ne",
+    "arch-sw",
+    "arch-se",
+    "notice-board",
+    "tree-west",
+    "tree-northeast",
+    "tree-southeast",
+    "bush-southwest",
+    "bush-southeast"
+  ],
+  "lifted": [
+    "bench-north",
+    "fountain",
+    "bench-northwest",
+    "bench-southeast",
+    "bench-south",
+    "planter-southwest",
+    "planter-southeast"
+  ]
+}

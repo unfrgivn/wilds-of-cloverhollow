@@ -4,3 +4,4 @@ export * from "./timing";
 export * from "./ink";
 export * from "./journal";
 export * from "./save";
+export * from "./props";

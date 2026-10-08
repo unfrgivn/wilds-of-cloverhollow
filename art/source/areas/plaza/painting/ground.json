@@ -1,0 +1,15 @@
+{
+  "area": "plaza",
+  "pxPerUnit": 2,
+  "width": 3500,
+  "height": 2200,
+  "paper": "#fcfbf6",
+  "tiles": [
+    { "file": "ground_0_0.webp", "x": 0, "y": 0, "width": 1167, "height": 1100 },
+    { "file": "ground_1_0.webp", "x": 1167, "y": 0, "width": 1167, "height": 1100 },
+    { "file": "ground_2_0.webp", "x": 2334, "y": 0, "width": 1166, "height": 1100 },
+    { "file": "ground_0_1.webp", "x": 0, "y": 1100, "width": 1167, "height": 1100 },
+    { "file": "ground_1_1.webp", "x": 1167, "y": 1100, "width": 1167, "height": 1100 },
+    { "file": "ground_2_1.webp", "x": 2334, "y": 1100, "width": 1166, "height": 1100 }
+  ]
+}

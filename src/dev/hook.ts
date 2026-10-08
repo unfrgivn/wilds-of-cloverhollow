@@ -36,6 +36,13 @@ export type CloverhollowHook = {
     critters: { id: string; kind: string; frame: string; x: number; y: number }[];
     npcs: { id: string; frame: string; facing: string }[];
     canopies: { id: string; alpha: number }[];
+    // Each prop's current state and its strips: world x range and the y it
+    // sorts by (spec 6).
+    props: {
+      id: string;
+      state: string;
+      strips: { left: number; right: number; zIndex: number }[];
+    }[];
     lantern: { on: boolean; glows: string[] };
     battle: {
       phase: string | null;

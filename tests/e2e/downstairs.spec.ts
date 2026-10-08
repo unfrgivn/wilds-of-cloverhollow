@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
-import { longFlowTimeout, openHarness, readState, renderInfo, resetPaused, step } from "./helpers";
+import {
+  longFlowTimeout, openHarness, readState, renderInfo, resetPaused, step, walk,
+} from "./helpers";
 
 // Milestone 12 contract: downstairs at home. The bedroom door leads down to
 // the kitchen, where Mom and Oliver are (area `npcs`); Mom talks, turns to
@@ -18,27 +20,6 @@ async function hold(page: Page, key: string, ticks: number): Promise<void> {
 async function press(page: Page, key = "z"): Promise<void> {
   await page.keyboard.press(key);
   await step(page, 2);
-}
-
-// Walks toward a coordinate on one axis with real keys, stopping on arrival or
-// when something blocks the way.
-async function position(page: Page): Promise<{ x: number; y: number }> {
-  const player = await page.evaluate(() => window.__cloverhollow?.getState().player);
-  if (player === undefined) throw new Error("hook unavailable");
-  return player;
-}
-
-async function walk(page: Page, axis: "x" | "y", target: number): Promise<void> {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
-    const before = (await position(page))[axis];
-    const error = target - before;
-    if (Math.abs(error) <= 2) return;
-    const key = axis === "x" ? (error > 0 ? "ArrowRight" : "ArrowLeft")
-      : (error > 0 ? "ArrowDown" : "ArrowUp");
-    // Fae walks exactly 4 units a tick, so this lands on the target.
-    await hold(page, key, Math.max(1, Math.min(60, Math.floor(Math.abs(error) / 4))));
-    if ((await position(page))[axis] === before) return;
-  }
 }
 
 test.describe.configure({ timeout: longFlowTimeout });

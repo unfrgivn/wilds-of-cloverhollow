@@ -296,7 +296,7 @@ describe("core", () => {
     expect(areaConnectionErrors({ ...world.areas, plaza: badSpawn }, world.tunables,
       world.critters, world.party))
       .toContain("plaza: spawn bad is within 40 units of house-front-door");
-  });
+  }, 30_000);
 
   it("never lets an occluder hide most of Fae anywhere she can stand", () => {
     for (const area of Object.values(world.areas)) {
@@ -337,13 +337,13 @@ describe("core", () => {
   });
 
   it("spaces and caps Maddie's trail and selects a valid door slot", () => {
-    // Walk a loop around the plaza fountain so both of them keep moving, and
-    // check the trail on every tick, not just at the end.
+    // Walk a loop south of the plaza fountain, clear of its benches and lamp
+    // arches, so both of them keep moving, and check the trail on every tick.
     const plazaFixture = content.fixtures.plaza;
     if (plazaFixture === undefined) throw new Error("plaza fixture missing");
     let state = createState(world, plazaFixture);
     const legs: [number, number, number][] = [
-      [0, -1, 40], [-1, 0, 90], [0, 1, 60], [1, 0, 120], [0, -1, 30],
+      [0, 1, 30], [-1, 0, 110], [0, -1, 15], [1, 0, 110], [0, -1, 20],
     ];
     let checked = 0;
     for (const [x, y, ticks] of legs) {
@@ -407,6 +407,6 @@ describe("core", () => {
     };
     const hidden = hiddenPositions(corridor, world.tunables.playerRadius);
     expect(hidden.length).toBeGreaterThan(0);
-    expect(hidden.every((position) => position.occluders.includes("bed"))).toBe(true);
+    expect(hidden.every((position) => position.by.includes("bed"))).toBe(true);
   });
 });

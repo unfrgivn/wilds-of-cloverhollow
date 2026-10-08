@@ -1,0 +1,31 @@
+{
+  "asset": "arcade ground",
+  "date": "2026-10-07",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 2,
+  "references": [
+    "docs/art/concepts/environments/arcade_interior.png",
+    "art/source/areas/kitchen/kitchen-final.png",
+    "art/source/areas/school/school-final.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "selected": "art/source/areas/arcade/arcade-final.png",
+  "prompt_summary": "Strict cutaway Cloverhollow arcade interior with a pastel checkerboard floor, back-left arcade cabinets, striped ticket counter and candy jars, right claw machine, gumball machines, string lights, pictorial rocket/planet/star neon, and an unmistakable lower-left door. No lettering or characters.",
+  "scale_reference": "Fae 280 source pixels, door about 400 source pixels, 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2528x1696 source to 2400px wide, then center-cropped to 2400x1600 source pixels.",
+    "Split into two opaque 1200x1600 WebP tiles at quality 88.",
+    "Recorded paper margin colour #fcfbf6 in ground.json.",
+    "Generated lossless occluder cutouts with area-occluders.ts from content/areas/arcade.json."
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/arcade/ground_0_0.webp",
+      "public/assets/areas/arcade/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/arcade/ground.json",
+    "occluders": "public/assets/areas/arcade/occluders.json",
+    "area": "content/areas/arcade.json"
+  },
+  "owner_review": "Reviewed art/review/arcade-overlay.png and art/review/arcade-phone.png."
+}

@@ -1,0 +1,109 @@
+{
+  "id": "arcade-keeper",
+  "species": "arcade-keeper",
+  "name": "Fizzy Mr. Pip",
+  "calmName": "Mr. Pip",
+  "atlas": "assets/critters/arcade-keeper/arcade-keeper.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 314
+  },
+  "figureHeight": 380,
+  "overworldHeight": 160,
+  "battleHeight": 280,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "sticker": {
+    "id": "arcade-keeper",
+    "name": "Mr. Pip",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "arcade_keeper",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.5
+  },
+  "lines": {
+    "intro": "Mr. Pip, the arcade keeper, spins round with swirly eyes. \"NOBODY beats my high scores!\"",
+    "command": "How can Fae calm Mr. Pip?",
+    "soothe": {
+      "great": "Fae hums the arcade's little jingle, slow and soft. Mr. Pip's swirly eyes start to slow down!",
+      "good": "Fae hums softly. Mr. Pip stops mashing buttons for a moment.",
+      "miss": "Mr. Pip beeps and boops right over Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie bats a ping-pong ball round and round. Mr. Pip follows it, grinning!",
+        "good": "Maddie pounces on a stray ticket. Mr. Pip chuckles.",
+        "miss": "Maddie chases a blinking light and bumps into a gumball machine. Mr. Pip snorts."
+      },
+      "cast": {
+        "great": "Sue swings her ribbon bobber like a claw machine claw. Mr. Pip cheers when it grabs a plush!",
+        "good": "Sue's bobber dangles and twirls. Mr. Pip leans in to watch.",
+        "miss": "Sue's line tangles round a joystick. Mr. Pip shakes his head."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones in a perfect loop. \"New high score!\" Mr. Pip claps.",
+        "good": "Jordan tosses a pinecone high. Mr. Pip's eyes follow it up and down.",
+        "miss": "Jordan's pinecone bonks the claw machine. Mr. Pip doesn't even look up."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. Mr. Pip munches it between button mashes.",
+    "burst": "Mr. Pip mashes every button at once. A flurry of prize tickets and tokens flies at Fae!",
+    "burstResult": {
+      "great": "Fae catches every ticket, like confetti!",
+      "good": "Fae dodges most of the tokens!",
+      "miss": "Whoosh! Fae is buried in paper tickets."
+    },
+    "soothed": "Mr. Pip blinks. The swirls fade from his eyes, and the arcade's beeping settles down.",
+    "rest": "Fae is dizzy from all the flashing lights. Time for a rest.",
+    "run": "Fae backs away. Mr. Pip keeps mashing buttons."
+  },
+  "coins": 25
+}

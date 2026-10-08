@@ -8,6 +8,7 @@ import bayData from "../../content/areas/bay.json";
 import passData from "../../content/areas/pass.json";
 import trailData from "../../content/areas/trail.json";
 import woodsData from "../../content/areas/woods.json";
+import arcadeData from "../../content/areas/arcade.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -33,6 +34,7 @@ import bunnyData from "../../content/critters/bunny.json";
 import squirrelData from "../../content/critters/squirrel.json";
 import gullData from "../../content/critters/gull.json";
 import owlData from "../../content/critters/owl.json";
+import arcadeKeeperData from "../../content/critters/arcade-keeper.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -901,6 +903,7 @@ export function loadContent(): {
   const pass = parseArea(passData, "content/areas/pass.json");
   const trail = parseArea(trailData, "content/areas/trail.json");
   const woods = parseArea(woodsData, "content/areas/woods.json");
+  const arcade = parseArea(arcadeData, "content/areas/arcade.json");
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -930,6 +933,7 @@ export function loadContent(): {
     [squirrelData, "squirrel"],
     [gullData, "gull"],
     [owlData, "owl"],
+    [arcadeKeeperData, "arcade-keeper"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -986,6 +990,7 @@ export function loadContent(): {
     [pass.id]: pass,
     [trail.id]: trail,
     [woods.id]: woods,
+    [arcade.id]: arcade,
   };
   const critterProblems = critterErrors(areas, critters, stickers);
   if (critterProblems.length > 0)

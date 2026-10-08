@@ -1,0 +1,64 @@
+{
+  "cutouts": [
+    {
+      "id": "cabinet-left",
+      "file": "cabinet-left.webp",
+      "x": 215,
+      "y": 168
+    },
+    {
+      "id": "cabinet-second",
+      "file": "cabinet-second.webp",
+      "x": 290,
+      "y": 145
+    },
+    {
+      "id": "cabinet-middle",
+      "file": "cabinet-middle.webp",
+      "x": 370,
+      "y": 124
+    },
+    {
+      "id": "cabinet-fourth",
+      "file": "cabinet-fourth.webp",
+      "x": 450,
+      "y": 104
+    },
+    {
+      "id": "cabinet-rear",
+      "file": "cabinet-rear.webp",
+      "x": 530,
+      "y": 92
+    },
+    {
+      "id": "ticket-counter",
+      "file": "ticket-counter.webp",
+      "x": 648,
+      "y": 128
+    },
+    {
+      "id": "claw-machine",
+      "file": "claw-machine.webp",
+      "x": 868,
+      "y": 212
+    },
+    {
+      "id": "gumball-red",
+      "file": "gumball-red.webp",
+      "x": 1028,
+      "y": 357
+    },
+    {
+      "id": "gumball-yellow",
+      "file": "gumball-yellow.webp",
+      "x": 1072,
+      "y": 366
+    },
+    {
+      "id": "gumball-red-right",
+      "file": "gumball-red-right.webp",
+      "x": 1110,
+      "y": 380
+    }
+  ]
+}

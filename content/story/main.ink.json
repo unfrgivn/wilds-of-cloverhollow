@@ -400,6 +400,98 @@
       ],
       "journal": [
         "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Mr. Pip, the arcade keeper, drank a fizzy soda from the kid in the purple hood. The spell works on people too! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The hooded kid scribbled out their initials on the Star Racer high score. Someone from school again... ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.17"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "clubhouse_claimed"
+        },
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A note in the clubhouse said \"NEXT STOP: THE ARCADE.\" The arcade is in the plaza, back home. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.30"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         {
           "VAR?": "clubhouse_claimed"
         },
@@ -415,7 +507,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.37"
               },
               null
             ]
@@ -440,7 +532,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.11"
+                "->": ".^.^.^.44"
               },
               null
             ]
@@ -469,7 +561,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.54"
               },
               null
             ]
@@ -494,7 +586,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.28"
+                "->": ".^.^.^.61"
               },
               null
             ]
@@ -519,7 +611,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.35"
+                "->": ".^.^.^.68"
               },
               null
             ]
@@ -556,7 +648,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.50"
+                "->": ".^.^.^.83"
               },
               null
             ]
@@ -581,7 +673,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.57"
+                "->": ".^.^.^.90"
               },
               null
             ]
@@ -615,7 +707,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.70"
+                "->": ".^.^.^.103"
               },
               null
             ]
@@ -644,7 +736,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.80"
+                "->": ".^.^.^.113"
               },
               null
             ]
@@ -669,7 +761,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.87"
+                "->": ".^.^.^.120"
               },
               null
             ]
@@ -694,7 +786,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.94"
+                "->": ".^.^.^.127"
               },
               null
             ]
@@ -724,7 +816,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.104"
+                "->": ".^.^.^.137"
               },
               null
             ]
@@ -754,7 +846,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.114"
+                "->": ".^.^.^.147"
               },
               null
             ]
@@ -779,7 +871,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.121"
+                "->": ".^.^.^.154"
               },
               null
             ]
@@ -808,7 +900,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.131"
+                "->": ".^.^.^.164"
               },
               null
             ]
@@ -846,7 +938,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.180"
               },
               null
             ]
@@ -873,7 +965,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.156"
+                "->": ".^.^.^.189"
               },
               null
             ]
@@ -902,7 +994,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.166"
+                "->": ".^.^.^.199"
               },
               null
             ]
@@ -927,7 +1019,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.173"
+                "->": ".^.^.^.206"
               },
               null
             ]
@@ -956,7 +1048,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.184"
+                "->": ".^.^.^.217"
               },
               null
             ]
@@ -985,7 +1077,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.195"
+                "->": ".^.^.^.228"
               },
               null
             ]
@@ -3170,6 +3262,16 @@
               "^speaker: Fae",
               "/#",
               "\n",
+              "^Hey, there's a note under the comics: \"NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!\" ",
+              "#",
+              "^speaker: Jordan",
+              "/#",
+              "\n",
+              "^The arcade back in Cloverhollow? We'd better hurry! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
               {
                 "->": ".^.^.^.33"
               },
@@ -3248,6 +3350,207 @@
           ],
           "#f": 1
         }
+      ],
+      "arcade_closed": [
+        "^The arcade's door is locked. A sign says BACK SOON! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Beeps and boops are coming from inside... ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "arcade_keeper": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Whoa... what happened? My head was all fizzy, like a shaken-up soda! ",
+        "#",
+        "^speaker: Mr. Pip",
+        "/#",
+        "\n",
+        "^A kid in a purple hood played every game in here this morning. ",
+        "#",
+        "^speaker: Mr. Pip",
+        "/#",
+        "\n",
+        "^They gave me a purple fizzy soda to say thanks. One sip, and all I wanted was the high score! ",
+        "#",
+        "^speaker: Mr. Pip",
+        "/#",
+        "\n",
+        "^So the fizz works on people too... ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^That kid set a new record on Star Racer, then scribbled out their initials in purple marker. Sneaky! ",
+        "#",
+        "^speaker: Mr. Pip",
+        "/#",
+        "\n",
+        "^Thank you, Fae. You and your friends can play here any time. ",
+        "#",
+        "^speaker: Mr. Pip",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Mr. Pip polishes the claw machine. \"Come back and play any time!\" ",
+            "#",
+            "^speaker: Mr. Pip",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "claw_machine": [
+        "^A claw machine full of plush critters: a frog, a pup, and a very smug raccoon. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Someday I'm going to win that raccoon. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "ticket_counter": [
+        "^Jars of candy, a ring toss prize, and a big roll of orange tickets behind the counter. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "star_racer": [
+        "^STAR RACER. HIGH SCORES! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The top score's initials are scribbled out in purple marker. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^arcade-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The screen is fizzing with purple scribbles. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
       ],
       "bakery": [
         [

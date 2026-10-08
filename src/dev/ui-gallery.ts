@@ -112,7 +112,7 @@ function renderGalleryState(): void {
     "Keep Oliver's birthday sticker safe.",
   ] : Array.from({ length: 14 }, (_, index) => `A fresh clue, number ${index + 1}.`);
   const stickerIds = ["frog", "star", "leaf", "moon", "gem", "shell", "rainbow", "acorn",
-    "kite", "bell"];
+    "kite", "bell", "cloud"];
   const stickers = stickerIds.map((id) => ({
     id,
     name: id === "frog" ? "Fountain Frog" : id,

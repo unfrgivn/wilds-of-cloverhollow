@@ -1167,6 +1167,35 @@
         "variable": "club_open",
         "knot": "bay_road_closed"
       }
+    },
+    {
+      "id": "arcade-door",
+      "polygon": [
+        [
+          1385,
+          455
+        ],
+        [
+          1440,
+          455
+        ],
+        [
+          1440,
+          500
+        ],
+        [
+          1385,
+          500
+        ]
+      ],
+      "target": {
+        "area": "arcade",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "clubhouse_claimed",
+        "knot": "arcade_closed"
+      }
     }
   ],
   "interactables": [
@@ -1223,6 +1252,11 @@
       "x": 1550,
       "y": 550,
       "facing": "left"
+    },
+    "arcade-door": {
+      "x": 1412,
+      "y": 560,
+      "facing": "down"
     },
     "bus-stop": {
       "x": 878,

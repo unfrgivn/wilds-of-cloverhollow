@@ -57,6 +57,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{calmed("arcade-keeper"): Mr. Pip, the arcade keeper, drank a fizzy soda from the kid in the purple hood. The spell works on people too! # speaker: Fae}
+{calmed("arcade-keeper"): The hooded kid scribbled out their initials on the Star Racer high score. Someone from school again... # speaker: Fae}
+{clubhouse_claimed and not calmed("arcade-keeper"): A note in the clubhouse said "NEXT STOP: THE ARCADE." The arcade is in the plaza, back home. # speaker: Fae}
 {clubhouse_claimed: The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. # speaker: Fae}
 {found_old_trail: The hooded kid's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
 {calmed("gull"): The grumpy gull at the lookout was fizzy too. That hooded kid gets around! # speaker: Fae}
@@ -467,6 +470,8 @@ The Enchanted Forest is sealed. Whoever the boss is, the note does not say. # sp
     Sue will fix up a fridge for the clubhouse. # speaker: Sue
     Jordan will start a little garden outside. # speaker: Jordan
     This is our club now! # speaker: Fae
+    Hey, there's a note under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" # speaker: Jordan
+    The arcade back in Cloverhollow? We'd better hurry! # speaker: Fae
 }
 -> DONE
 
@@ -482,6 +487,39 @@ The owl hoots wisely. "The boss waits by the Ancient Tree in the sealed forest."
 -> DONE
 = again
 The wise owl whispers through the leaves. # speaker: Whispering Owl
+-> DONE
+
+=== arcade_closed ===
+The arcade's door is locked. A sign says BACK SOON! # speaker: Fae
+Beeps and boops are coming from inside... # speaker: Fae
+-> DONE
+
+=== arcade_keeper ===
+{arcade_keeper > 1: -> again}
+Whoa... what happened? My head was all fizzy, like a shaken-up soda! # speaker: Mr. Pip
+A kid in a purple hood played every game in here this morning. # speaker: Mr. Pip
+They gave me a purple fizzy soda to say thanks. One sip, and all I wanted was the high score! # speaker: Mr. Pip
+So the fizz works on people too... # speaker: Fae
+That kid set a new record on Star Racer, then scribbled out their initials in purple marker. Sneaky! # speaker: Mr. Pip
+Thank you, Fae. You and your friends can play here any time. # speaker: Mr. Pip
+-> DONE
+= again
+Mr. Pip polishes the claw machine. "Come back and play any time!" # speaker: Mr. Pip
+-> DONE
+
+=== claw_machine ===
+A claw machine full of plush critters: a frog, a pup, and a very smug raccoon. # speaker: Fae
+{calmed("arcade-keeper"): Someday I'm going to win that raccoon. # speaker: Fae}
+-> DONE
+
+=== ticket_counter ===
+Jars of candy, a ring toss prize, and a big roll of orange tickets behind the counter. # speaker: Fae
+-> DONE
+
+=== star_racer ===
+STAR RACER. HIGH SCORES! # speaker: Fae
+{calmed("arcade-keeper"): The top score's initials are scribbled out in purple marker. # speaker: Fae}
+{not calmed("arcade-keeper"): The screen is fizzing with purple scribbles. # speaker: Fae}
 -> DONE
 
 === bakery ===

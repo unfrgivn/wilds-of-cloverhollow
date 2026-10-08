@@ -826,6 +826,63 @@ the old trail, the owl, and the clubhouse claim.
   - The `woods` fixture's seed (26) is used now; the loader had hard-coded
     the fixture without it.
 
+## Milestone 29: The arcade keeper **Status:** ✅ Completed (2026-10-07)
+- The first person under the chaos spell. Claiming the clubhouse in the
+  Whispering Woods turns up the hooded kid's note ("NEXT STOP: THE ARCADE.
+  FIZZ THE HIGH SCORES!"), and the plaza's arcade door, locked until then,
+  opens onto a painted arcade (from `arcade_interior.png`): a row of arcade
+  cabinets, the ticket counter, a claw machine, and gumball machines.
+- Mr. Pip, the arcade keeper (owner's NOTES.md "arcade operator"), stands
+  fizzy on the floor: a mini-boss set piece with the gull's numbers, 1.15x
+  Fae's height. Calmed, he pays 25 coins and his own sticker, and tells what
+  the kid in the purple hood did: a purple fizzy soda that made him want
+  only the high score, and a record on Star Racer whose initials they then
+  scribbled out. The journal notes that the spell works on people too.
+- A person is a critter kind like any other in the engine (his own species;
+  battle content, atlas, and sticker), so no new battle rules were needed.
+- Evidence: unit (`arcade.test.ts`: the clubhouse note, the locked door and
+  its opening, Mr. Pip's numbers and set piece, the battle on touch, the
+  reward and his talk, his talk point, the look points, the journal), the
+  recorded run `pass-party/arcade.json` (`tools/sim/record-arcade.ts`: the
+  woods run, back over the old trail, the bus home, the arcade, the battle,
+  and his talk) with matching browser and Bun hashes, and real-key e2e
+  (`arcade.spec.ts`: the locked door from the plaza; the run as key presses,
+  shooting the arrival, the battle, and the reward at both sizes).
+- Wording for the owner: the clubhouse's note (Jordan: "Hey, there's a note
+  under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!"" / Fae:
+  "The arcade back in Cloverhollow? We'd better hurry!"); the locked door
+  ("The arcade's door is locked. A sign says BACK SOON!" / "Beeps and boops
+  are coming from inside..."); Mr. Pip's battle (`content/critters/
+  arcade-keeper.json`: intro "Mr. Pip, the arcade keeper, spins round with
+  swirly eyes. "NOBODY beats my high scores!"", his burst of prize tickets
+  and tokens, and every command's lines); his talk ("Whoa... what happened?
+  My head was all fizzy, like a shaken-up soda!" / "A kid in a purple hood
+  played every game in here this morning." / "They gave me a purple fizzy
+  soda to say thanks. One sip, and all I wanted was the high score!" / Fae:
+  "So the fizz works on people too..." / "That kid set a new record on Star
+  Racer, then scribbled out their initials in purple marker. Sneaky!" /
+  "Thank you, Fae. You and your friends can play here any time."; again:
+  "Mr. Pip polishes the claw machine. "Come back and play any time!""); the
+  claw machine, the ticket counter, and Star Racer's lines; and the journal
+  ("A note in the clubhouse said "NEXT STOP: THE ARCADE." The arcade is in
+  the plaza, back home." then "Mr. Pip, the arcade keeper, drank a fizzy
+  soda from the kid in the purple hood. The spell works on people too!" and
+  "The hooded kid scribbled out their initials on the Star Racer high score.
+  Someone from school again...").
+- Notes and assumptions:
+  - The arcade operator was "TBD" in NOTES.md: named Mr. Pip here, a jolly
+    keeper in a striped paper hat and a teal apron full of tokens.
+  - The arcade door trigger covers the whole painted door along the wall,
+    and the spawn faces into the room.
+  - The album now has eleven stickers; it stays five columns (a sticker and
+    its name stay readable on a desktop), and a phone's page scrolls to the
+    third row, like the notes (an e2e checks the last slot can be reached).
+  - The gull's "bigger than any critter" test now compares it only with the
+    recurring kinds; Mr. Pip, also a mini-boss, is taller.
+  - `bay/bus.json` was re-recorded: its old walk through the plaza crossed
+    the new arcade door, and the bus e2e's hand-written route to the stop
+    goes round it now.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -887,8 +944,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     battles instead of each critter granting its own.
     Done (Milestone 27, above).
   - Milestone 28, recurring bad guys: done (above).
-  - Milestone 29, the first person under the chaos spell (a mini-boss in
-    town), with an interior from `arcade_interior.png`.
+  - Milestone 29, the first person under the chaos spell: done (above).
   - Then the clubhouse fix-up (a fridge for snacks, the garden), once coins
     exist. The school chapter, the lasso, and the flute no longer wait: the
     kid's identity is kept for the very end (owner, 2026-10-07).

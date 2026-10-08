@@ -32,19 +32,23 @@ async function talk(page: Page, choice = 0): Promise<void> {
   }
   throw new Error("conversation did not close");
 }
-async function diagonal(page: Page, first: string, second: string, ticks: number): Promise<void> {
-  await page.keyboard.down(first); await page.keyboard.down(second);
-  await step(page, ticks); await page.keyboard.up(second); await page.keyboard.up(first);
-}
+// From the east road's spawn (1550, 550) to the bus stop, facing it: a route
+// the core found (round the arcade's door, the planters, and the frog's reach).
+const roadToStop: [string[], number][] = [
+  [["ArrowLeft"], 100], [["ArrowLeft", "ArrowUp"], 15], [["ArrowUp"], 5],
+  [["ArrowLeft", "ArrowUp"], 5], [["ArrowLeft"], 10], [["ArrowLeft", "ArrowUp"], 5],
+  [["ArrowLeft"], 10], [["ArrowLeft", "ArrowUp"], 15], [["ArrowLeft"], 80],
+  [["ArrowLeft", "ArrowDown"], 20], [["ArrowDown"], 15], [["ArrowRight"], 5],
+  [["ArrowDown"], 35], [["ArrowRight", "ArrowDown"], 65], [["ArrowDown"], 20],
+  [["ArrowRight", "ArrowDown"], 10], [["ArrowRight"], 5], [["ArrowRight", "ArrowDown"], 15],
+  [["ArrowUp"], 1],
+];
 async function walkFromRoadToStop(page: Page): Promise<void> {
-  await hold(page, "ArrowUp", 1); await step(page, 1);
-  await diagonal(page, "ArrowLeft", "ArrowUp", 25); await hold(page, "ArrowLeft", 50);
-  await diagonal(page, "ArrowLeft", "ArrowUp", 35); await hold(page, "ArrowLeft", 135);
-  await diagonal(page, "ArrowLeft", "ArrowDown", 25); await hold(page, "ArrowDown", 40);
-  await diagonal(page, "ArrowRight", "ArrowDown", 55); await hold(page, "ArrowDown", 5);
-  await diagonal(page, "ArrowRight", "ArrowDown", 25); await hold(page, "ArrowDown", 10);
-  await diagonal(page, "ArrowRight", "ArrowDown", 10); await hold(page, "ArrowRight", 5);
-  await diagonal(page, "ArrowRight", "ArrowDown", 10); await hold(page, "ArrowUp", 1);
+  for (const [keys, ticks] of roadToStop) {
+    for (const key of keys) await page.keyboard.down(key);
+    await step(page, ticks);
+    for (const key of keys) await page.keyboard.up(key);
+  }
 }
 
 test("the bus stop stays put while the bluebird is in chaos", async ({ page }) => {

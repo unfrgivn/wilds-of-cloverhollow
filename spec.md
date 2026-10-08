@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-07 (Milestone 28, recurring bad guys)
+Last updated: 2026-10-07 (Milestone 29, the arcade keeper)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -342,6 +342,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   footprint and a `Look` prompt. The pass stop returns to `plaza.bus-stop`.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
+- The arcade (Milestone 29): `arcade`, "Cloverhollow Arcade", a 1200x800
+  painted cutaway from `arcade_interior.png` (arcade cabinets, the ticket
+  counter, a claw machine, gumball machines). Its door is on the back-left
+  wall: trigger `door` to `plaza.arcade-door`, spawn `door` (270, 535) facing
+  right. The plaza's trigger `arcade-door` (the storefront's door, x
+  1385-1440, y 455-500) leads to `arcade.door` and `requires`
+  `clubhouse_claimed` (knot `arcade_closed`, the locked door); spawn
+  `arcade-door` (1412, 560) faces down. Mr. Pip, the arcade keeper, is its
+  set piece at (820, 610). Look points: `claw-machine`, `ticket-counter`, and
+  `star-racer` (a back-row cabinet).
 - The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
   Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
   and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
@@ -437,7 +447,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   still, calm or chaos for the whole game (`state.critters`, keyed by id).
   `visibleWhile` (an Ink variable) puts one there only while it's true. The
   set pieces are the fountain frog (plaza), the school raccoon (plaza, while
-  `raccoon_waiting`), and the grumpy gull (the trail's lookout).
+  `raccoon_waiting`), the grumpy gull (the trail's lookout), and Mr. Pip, the
+  arcade keeper (the arcade).
 - Recurring critters, EarthBound style, are an area's `recurring`:
   `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
   (a door, a bus ride, a rest's fade, and the start of a game or fixture)
@@ -615,8 +626,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   snowballs), the Thumpy Bunny and Zippy Squirrel (the Ribbon Bunny and the
   Acorn Squirrel), and the Screeching Owl (the Whispering Owl). The gull is
   the first mini-boss: it is larger and tougher, stands still, and blocks the
-  route to the bench until calmed. The others share the battle numbers for
-  now; each has its own lines, atlas, sticker, and calm knot.
+  route to the bench until calmed. Mr. Pip, the arcade keeper
+  (`arcade-keeper`, his own species; calm, Mr. Pip), is the second, and the
+  first person under the chaos spell: a person is a kind like any critter,
+  with the gull's mini-boss numbers, `overworldHeight` 160 (about 1.15x Fae)
+  and `battleHeight` 280. The others share the battle numbers for now; each
+  has its own lines, atlas, sticker, and calm knot.
 - Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
   critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
@@ -797,7 +812,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first:
-  the clubhouse claimed; the hooded kid's glowing trail toward the Whispering
+  once Mr. Pip is calm, his fizzy soda from the kid in the purple hood and the
+  scribbled-out Star Racer initials; before that, once the clubhouse is
+  claimed, its note sending Fae to the arcade; the clubhouse claimed; the
+  hooded kid's glowing trail toward the Whispering
   Woods; the grumpy gull; Jordan's lantern and the secret trail only it
   shows; Jordan on the team; the Cliffside Trail's bunnies and squirrels
   calmed (one of each); after the ride, Pinecone Pass's snow, lodge, cocoa,
@@ -814,7 +832,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
   catalogue (id, name, the critter whose atlas holds the art, and the frame):
-  ten stickers, one per species, in ten slots, the town's four first.
+  eleven stickers, one per species and one per mini-boss, in eleven slots,
+  the town's four first.
   A sticker is owned when `state.stickers` has its id. The shell sets
   `data-journal="open"` while the book is open.
 
@@ -823,8 +842,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   above every other layer (`--z-journal`). The left page is NOTES: ruled notes
   in the order the game passes (newest first), an empty line ("Nothing yet.
   Look around!") when there are none, and scrolling only when they overflow.
-  The right page is the STICKERS album: a 5-column grid (ten slots in two
-  rows, which a phone's page fits) where owned stickers
+  The right page is the STICKERS album: a 5-column grid (a phone's page
+  shows two rows and scrolls to the rest, like the notes) where owned
+  stickers
   show their atlas frame with a die-cut rim and their name, and unowned slots
   are dashed `?` outlines with no name.
 - Fae's supplies sit at the right of the NOTES heading row: two small cream
@@ -987,8 +1007,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass
   painting, the hamster hiker, the bus stop, the Cliffside Trail painting, the
   bunny and the squirrel, the blacklight lantern and its glows, the gull, the
-  Whispering Woods and its owl, coins and shops, and the recurring critters'
-  cat and raccoon battle atlases and wording (`docs/review-queue.md`). The
+  Whispering Woods and its owl, coins and shops, the recurring critters'
+  cat and raccoon battle atlases and wording, and the arcade's painting and
+  Mr. Pip (`docs/review-queue.md`). The
   talking raccoon's atlas (approved 2026-10-06) left the game with the
   talking raccoon; its recipe and raw sources stay
   (`art/recipes/raccoon-npc.json`).

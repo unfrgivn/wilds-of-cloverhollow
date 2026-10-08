@@ -64,8 +64,13 @@ describe("the grumpy gull", () => {
     expect(gull.atlas).toBe("assets/critters/gull/gull.json");
     expect(gull.calmKnot).toBe("gull_calm");
     expect(Object.keys(gull.commands.friends)).toEqual(["play", "cast", "juggle"]);
+    // The ordinary critters: every kind out in a den (the other mini-boss,
+    // Mr. Pip, is a set piece like the gull).
+    const ordinary = new Set(Object.values(world.areas)
+      .flatMap((area) => area.recurring?.dens.flatMap((den) => den.kinds) ?? []));
+    expect(ordinary.size).toBeGreaterThan(5);
     for (const other of Object.values(world.critters)) {
-      if (other.id === "gull") continue;
+      if (!ordinary.has(other.id)) continue;
       expect(gull.overworldHeight, other.id).toBeGreaterThan(other.overworldHeight);
       expect(gull.battleHeight, other.id).toBeGreaterThan(other.battleHeight);
       expect(gull.touchRadius, other.id).toBeGreaterThan(other.touchRadius);

@@ -96,7 +96,8 @@
   font-size: 16px;
   line-height: 1.45;
 }
-/* Ten stickers, one per species, in two rows (a phone's page fits two). */
+/* Five to a row: big enough to read a sticker's name on a phone. A phone's
+   page shows two rows and scrolls to the rest, like the notes. */
 .journal-stickers {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

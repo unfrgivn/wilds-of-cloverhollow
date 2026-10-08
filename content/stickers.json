@@ -1,5 +1,5 @@
 {
-  "slots": 10,
+  "slots": 11,
   "catalogue": [
     {
       "id": "fountain-frog",
@@ -59,6 +59,12 @@
       "id": "whispering-owl",
       "name": "Whispering Owl",
       "critter": "owl",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "arcade-keeper",
+      "name": "Mr. Pip",
+      "critter": "arcade-keeper",
       "frame": "calm_idle_01"
     }
   ]

@@ -267,6 +267,22 @@ test.describe("sticker gallery", () => {
     }
   }
 
+  test("a phone's album scrolls to its last sticker slot", async ({ page }) => {
+    await page.setViewportSize({ width: 874, height: 402 });
+    await page.goto("/cloverhollow/ui-gallery.html?state=journal-notes&touch=1&insets=0,62,21,62");
+    await page.evaluate(() => document.fonts.ready);
+    const album = page.locator(".journal-stickers-page");
+    const last = page.locator(".journal-slot").last();
+    await last.scrollIntoViewIfNeeded();
+    const facts = await album.evaluate((element) => {
+      const slot = element.querySelector(".journal-slot:last-child")?.getBoundingClientRect();
+      const page = element.getBoundingClientRect();
+      return { scrolls: ["auto", "scroll"].includes(getComputedStyle(element).overflowY),
+        inside: slot !== undefined && slot.bottom <= page.bottom + 1 && slot.top >= page.top - 1 };
+    });
+    expect(facts).toEqual({ scrolls: true, inside: true });
+  });
+
   test("the notes page scrolls only when the notes overflow", async ({ page }) => {
     const overflow = async (state: string): Promise<boolean> => {
       await gallery(page, state);
@@ -290,14 +306,14 @@ test.describe("sticker gallery", () => {
     await expect(owned.locator(".journal-name")).toHaveText("Fountain Frog");
     await expect(owned.locator(".journal-unknown")).toBeHidden();
     const unknown = page.locator('.journal-slot[data-owned="false"] .journal-unknown');
-    await expect(unknown).toHaveCount(9);
+    await expect(unknown).toHaveCount(10);
     for (const slot of await unknown.all()) {
       await expect(slot).toBeVisible();
       await expect(slot).toHaveText("?");
       expect(await slot.evaluate((element) => getComputedStyle(element).borderStyle))
         .toBe("dashed");
     }
-    await expect(page.locator('.journal-slot[data-owned="false"] .journal-name')).toHaveCount(9);
+    await expect(page.locator('.journal-slot[data-owned="false"] .journal-name')).toHaveCount(10);
     for (const name of await page.locator('.journal-slot[data-owned="false"] .journal-name').all())
       await expect(name).toBeHidden();
     const box = await owned.locator(".journal-sticker-image")

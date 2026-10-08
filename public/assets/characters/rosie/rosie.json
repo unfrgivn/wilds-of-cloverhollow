@@ -1,0 +1,121 @@
+{
+  "frames": {
+    "down_idle_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "sourceSize": {
+        "w": 448,
+        "h": 448
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9799107142857143
+      }
+    },
+    "down_idle_02": {
+      "frame": {
+        "x": 448,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "sourceSize": {
+        "w": 448,
+        "h": 448
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9799107142857143
+      }
+    },
+    "left_idle_01": {
+      "frame": {
+        "x": 896,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "sourceSize": {
+        "w": 448,
+        "h": 448
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9799107142857143
+      }
+    },
+    "right_idle_01": {
+      "frame": {
+        "x": 1344,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "sourceSize": {
+        "w": 448,
+        "h": 448
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9799107142857143
+      }
+    }
+  },
+  "animations": {
+    "idle_down": [
+      "down_idle_01",
+      "down_idle_02"
+    ],
+    "idle_left": [
+      "left_idle_01"
+    ],
+    "idle_right": [
+      "right_idle_01"
+    ]
+  },
+  "meta": {
+    "image": "rosie.png",
+    "size": {
+      "w": 1792,
+      "h": 448
+    },
+    "scale": "1",
+    "baseline": 439
+  }
+}

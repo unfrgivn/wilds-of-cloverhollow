@@ -1,0 +1,33 @@
+{
+  "asset": "milo",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 1,
+  "generationCallsNote": "One three-view model sheet was generated (1791437143251). The blink is a local source edit of the selected front pose, processed identically; no additional generation call was needed.",
+  "date": "2026-10-08",
+  "references": [
+    "docs/art/concepts/characters/character_concept_sheet_fae.png",
+    "docs/art/concepts/characters/character_concept_sheet_sue.png",
+    "docs/art/concepts/characters/character_concept_sheet_jordan.png",
+    "docs/art/concepts/npcs/school_staff_npcs.png"
+  ],
+  "selectedRawSources": [
+    "art/source/classmates/milo/model-sheet-raw.png",
+    "art/source/classmates/milo/pose-front-raw.png",
+    "art/source/classmates/milo/blink-edit-raw.png",
+    "art/source/classmates/milo/pose-side-raw.png"
+  ],
+  "sourceScaleFactor": "uniform scale selected by build-classmates.ts to make the front body 280 source px",
+  "postProcessing": {
+    "build": "bun tools/art/build-classmates.ts (rebuilds all three atlases byte for byte)",
+    "key": "#FF00FF border flood fill, 18% fuzz",
+    "despill": "edge-only magenta despill at 20px matte band",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "280 source pixels (Fae-height child)",
+    "baseline": 439,
+    "frames": "Front model pose, local closed-eye blink edit of that pose, right-facing model pose mirrored for left, and the original right-facing pose.",
+    "atlas": "tools/art/build-classmates.ts, PixiJS v8 JSON"
+  },
+  "validator": {"biped": false, "idleOnly": true, "directions": ["down", "left", "right"], "key": "magenta"},
+  "selectionReason": "Milo's mustard rocket sweater, curly black hair, glasses, navy shorts, green sneakers, and airplane clearly separate him from Fae, Sue, and Jordan."
+}

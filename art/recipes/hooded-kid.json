@@ -1,0 +1,23 @@
+{
+  "asset": "hooded-kid",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 3,
+  "generationCallsNote": "One failed reference-path attempt produced no output, followed by two candidate calls; 1791437323208 was selected for the strict rear view, covered hands, hood, teal patch, and clean green matte. The other candidate was rejected for front/three-quarter view and exposed hands.",
+  "date": "2026-10-08",
+  "references": ["docs/art/concepts/npcs/chaos_raccoon.png", "docs/art/concepts/characters/character_concept_sheet_fae.png"],
+  "selectedRawSources": ["art/source/classmates/hooded-kid/body-raw.png"],
+  "sourceScaleFactor": "uniform scale selected by build-classmates.ts to make the child 280 source px",
+  "postProcessing": {
+    "build": "bun tools/art/build-classmates.ts (rebuilds all three atlases byte for byte)",
+    "key": "#00FF00 border flood fill, 18% fuzz",
+    "despill": "edge-only green despill at 20px matte band",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "280 source pixels",
+    "baseline": 439,
+    "frames": "One strict rear-view running pose, hood up, with no visible face, hair, skin, or identifying accessories.",
+    "atlas": "tools/art/build-classmates.ts, PixiJS v8 JSON"
+  },
+  "validator": {"biped": false, "idleOnly": true, "directions": ["down"], "key": "green"},
+  "selectionReason": "The hood is deep purple patchwork with a teal back patch and stitched seams, visibly unlike Fae's plain lavender hoodie; the rear view reveals nothing identifying."
+}

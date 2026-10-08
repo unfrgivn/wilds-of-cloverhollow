@@ -10,6 +10,7 @@ import {
 } from "./core";
 import { loadContent, parseMapCentres } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
+import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
@@ -64,6 +65,7 @@ async function boot(): Promise<void> {
   if (root === null) throw new Error("Missing #app root");
   root.appendChild(app.canvas);
   const keyboard = new Keyboard();
+  const gamepad = new GamepadInput();
   const touch = mountTouchControls();
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);
@@ -76,21 +78,7 @@ async function boot(): Promise<void> {
   const journal = createJournal(uiRoot);
   const title = createTitleScreen(uiRoot);
   const input = createInputSource(() => {
-    const keyboardFrame = keyboard.frame();
-    const touchFrame = touch.sample();
-    return {
-      move:
-        touchFrame.move.x !== 0 || touchFrame.move.y !== 0
-          ? touchFrame.move
-          : keyboardFrame.move,
-      confirm: keyboardFrame.confirm || touchFrame.confirm,
-      cancel: keyboardFrame.cancel || touchFrame.cancel,
-      menu: keyboardFrame.menu || touchFrame.menu,
-      // Only while pressed: recorded frames omit it, and a frame from real keys
-      // must match the recorded one exactly (spec 3.2).
-      ...(keyboardFrame.lantern || touchFrame.lantern ? { lantern: true } : {}),
-      choose: touchFrame.choose,
-    };
+    return combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame());
   });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   commandMenu.onChoose((index) => touch.tapChoice(index));
@@ -453,6 +441,7 @@ async function boot(): Promise<void> {
   let last = performance.now();
   let accumulator = 0;
   app.ticker.add(() => {
+    gamepad.poll();
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
@@ -487,6 +476,7 @@ async function boot(): Promise<void> {
       },
       reset: async (options) => {
         keyboard.clearTaps();
+        gamepad.clearTaps();
         const name = options.fixture ?? "new-game";
         const fixture = content.fixtures[name];
         if (fixture === undefined)

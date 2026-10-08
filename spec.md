@@ -117,9 +117,20 @@ ios/            Capacitor iOS project (from Milestone 4).
   off (`lantern`). On touch, a lantern button beside the journal button
   appears once Fae has the lantern and glows lavender while it's on.
 - Gamepad (standard mapping) and touch (virtual stick plus buttons, section
-  3.2.1) map to the same frame. Gamepad support is not built yet.
+  3.2.1) map to the same frame. The left stick uses a radial 25% dead zone,
+  rescaled so its remaining range is 0..1; d-pad directions (standard buttons
+  12..15) override the stick. A/Cross confirms, B/Circle cancels, Y/Triangle
+  or Start opens the journal, and X/Square toggles the lantern. Only
+  standard-mapping pads count; connected pads merge with button OR and first
+  non-zero movement.
+  When devices provide different movement vectors, touch wins, then keyboard,
+  then gamepad.
 
 ### 3.2.1 iOS shell decisions (Milestone 4)
+- WKWebView exposes the Gamepad API when the web view is first responder. With
+  Capacitor's default initial focus, gamepads are expected to work on iOS 18+
+  (including when focus is acquired later); support on iOS 15..17 and physical
+  hardware remains unverified.
 - Capacitor is 8.5.2 with the Swift Package Manager iOS template. The
   placeholder bundle ID is `com.unfrgivn.cloverhollow`; it may change before
   TestFlight. The display name is Cloverhollow and the web directory defaults

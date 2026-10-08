@@ -1164,6 +1164,32 @@ more bad guys, and the blacklight lantern, made and built while away.
   prints, invisible-ink notes (journal clues), and trail markers that open
   hidden paths.
 
+## Milestone 36: Gamepad support **Status:** ✅ Completed (2026-10-08)
+- Standard-mapping gamepads now share the keyboard and touch `ActionFrame`:
+  radial 25% left-stick dead zone with rescaling, d-pad priority, and the
+  standard confirm, cancel, menu, and lantern buttons. Multiple standard pads
+  merge while preserving touch movement precedence over keyboard and gamepad.
+- The imperative poller samples on every animation frame and latches button
+  presses until the next game tick, including blur and reset clearing. Pure
+  mapping, latching, and merging rules have unit coverage, and a unit test
+  runs the new game with a pad's d-pad and buttons and with the same keys:
+  the merged frames are identical and the states hash the same.
+- Browser e2e uses only an `addInitScript` device-boundary replacement for
+  `navigator.getGamepads()`, then drives the real game: stick and d-pad
+  movement, Start and B for the journal, A for a dialogue, and X for the
+  lantern, on Chromium and WebKit. No dependencies or content were added.
+- iOS: WKWebView exposes the Gamepad API when the web view is first
+  responder (WebKit bug 269292); from iOS 18 it also notices when the view
+  becomes first responder after load (WebKit PR 26444). Capacitor makes the
+  web view first responder on appear, so pads should work on iOS 18+;
+  iOS 15 to 17 and real hardware are unverified. No native setting was added.
+- Gates: `just build`, typecheck, lint, the gamepad unit tests, and the
+  gamepad e2e (12 of 12, repeated on both browsers) passed. `just check` had
+  one time-out in an area test this milestone doesn't touch, under a load
+  average of about 130 from parallel milestones; alone it passed. The full
+  `just e2e` suite was deferred by the owner (2026-10-08) for the same load
+  and still needs a run.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its
@@ -1202,15 +1228,12 @@ more bad guys, and the blacklight lantern, made and built while away.
       and their tools go.
     Until Milestone 34 lands, don't start a milestone that adds or reshapes
     an area; after it, every new area is painted whole and split into a kit.
-  - Milestone 36, gamepad support (spec 3.2): in progress beside Milestones
-    33 and 34 (2026-10-08): `.worktrees/m36-gamepad`, branch `m36-gamepad`.
-    It touches input only (no areas, props, or replays) and lands whenever
-    it's ready.
+  - Milestone 36, gamepad support (spec 3.2): done (above).
   - Then: the music teacher's flute, a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).
 
 ## Later (not scheduled)
-Gamepad polish, the flute, the lasso's levers and gaps, the clubhouse
-fix-up, and more mini-bosses (people under the chaos spell, NOTES.md).
+The flute, the lasso's levers and gaps, the clubhouse fix-up, and more
+mini-bosses (people under the chaos spell, NOTES.md).

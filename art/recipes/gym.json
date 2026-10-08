@@ -1,0 +1,32 @@
+{
+  "asset": "gym ground",
+  "date": "2026-10-08",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 1,
+  "references": [
+    "docs/art/concepts/environments/school_interior.png",
+    "art/scratch/school-assembled.png",
+    "art/source/areas/classroom/classroom-final.png",
+    "art/source/areas/arcade/arcade-final.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "selected": "art/source/areas/gym/gym-final.png",
+  "prompt_summary": "Strict cutaway School Gym in the approved Cloverhollow school watercolor-and-ink style, with honey wood court, double hallway doors, hoop, climbing rope and bell, ball bin, bleachers, blue mats, closed back door, high windows and text-free pennants. No people or critters.",
+  "scale_reference": "Fae 280 source pixels, double entrance doors about 400 source pixels, 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2528x1696 source to 2800px wide, then center-cropped to 2800x1800 source pixels.",
+    "Split into two opaque 1400x1800 WebP tiles at quality 88.",
+    "Recorded paper margin colour #fcfbf6 in ground.json.",
+    "Generated lossless occluder cutouts with area-occluders.ts from content/areas/gym.json."
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/gym/ground_0_0.webp",
+      "public/assets/areas/gym/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/gym/ground.json",
+    "occluders": "public/assets/areas/gym/occluders.json",
+    "area": "content/areas/gym.json"
+  },
+  "owner_review": "Reviewed art/review/gym-overlay.png, art/review/gym-phone.png, art/review/gym-depth.png, and art/review/school-gym-doors.png."
+}

@@ -1196,6 +1196,8 @@ more bad guys, and the blacklight lantern, made and built while away.
       hall, the classroom, the gym, and the arcade.
     - Milestone 34, the outdoor kits: the park, Bubblegum Bay, Pinecone Pass,
       the Cliffside Trail, and the Whispering Woods.
+      In progress beside Milestone 33 (2026-10-08): `.worktrees/m34`, branch
+      `m34-outdoor`; it lands after Milestone 33 and rebases onto it.
     - Milestone 35, occluders retired: the old cutouts, baselines, slivers,
       and their tools go.
     Until Milestone 34 lands, don't start a milestone that adds or reshapes

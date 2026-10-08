@@ -60,8 +60,20 @@
 }
 .journal-supplies {
   display: flex;
+  align-items: center;
   gap: 6px;
 }
+.journal-audio {
+  min-height: 32px;
+  padding: 2px 8px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  font: 700 13px var(--sticker-font);
+  cursor: pointer;
+}
+.journal-audio.is-muted { background: #eadbff; }
 .journal-supply {
   display: inline-flex;
   align-items: center;

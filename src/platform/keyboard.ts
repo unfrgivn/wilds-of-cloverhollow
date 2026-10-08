@@ -16,6 +16,7 @@ const GAME_KEYS = new Set([
   "KeyS",
   "KeyD",
   "KeyL",
+  "KeyM",
 ]);
 
 /**

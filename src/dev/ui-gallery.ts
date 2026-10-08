@@ -128,7 +128,7 @@ function renderGalleryState(): void {
       { id: "trail", name: "Cliffside Trail", busStop: false, x: 1812, y: 420 },
       { id: "forest", name: "The Forest", busStop: false, x: 240, y: 420 },
       { id: "enchanted", name: "The Enchanted Forest", busStop: false, x: 1156, y: 720 },
-    ], currentLand: "cloverhollow", coins: 8, snacks: 2 };
+    ], currentLand: "cloverhollow", coins: 8, snacks: 2, muted: false };
   journal.render(journalView);
   // The battle is over once the reward shows, so the HUD steps aside.
   battleHud.render({ visible: battleState && state !== "battle-reward", energy: 3,

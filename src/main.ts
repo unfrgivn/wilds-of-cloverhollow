@@ -7,6 +7,7 @@ import {
   type ActionFrame,
   type State,
   battleView,
+  soundCues,
 } from "./core";
 import { loadContent, parseMapCentres } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
@@ -40,6 +41,7 @@ import {
   type TitleInput,
   type TitleMode,
 } from "./shell/title-flow";
+import { createAudio } from "./platform/audio";
 
 const content = loadContent();
 const app = new Application();
@@ -66,6 +68,7 @@ async function boot(): Promise<void> {
   root.appendChild(app.canvas);
   const keyboard = new Keyboard();
   const gamepad = new GamepadInput();
+  const sound = createAudio();
   const touch = mountTouchControls();
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);
@@ -76,6 +79,7 @@ async function boot(): Promise<void> {
   const timingRing = createTimingRing(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
   const journal = createJournal(uiRoot);
+  journal.onToggleAudio(sound.toggle);
   const title = createTitleScreen(uiRoot);
   const input = createInputSource(() => {
     return combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame());
@@ -331,6 +335,7 @@ async function boot(): Promise<void> {
       currentLand: content.world.areas[state.area]?.land ?? null,
       coins: state.coins,
       snacks: state.snacks,
+      muted: sound.muted(),
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;
@@ -399,6 +404,7 @@ async function boot(): Promise<void> {
     };
     const previous = state;
     state = step(content.world, state, input).state;
+    for (const cue of soundCues(previous, state)) sound.play(cue, state.tick);
     if (autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const log =
@@ -501,6 +507,7 @@ async function boot(): Promise<void> {
         last: () => saveLast,
         loaded: () => saveLoaded,
       },
+      sound: { log: sound.log, muted: sound.muted },
       boot: { title: () => titleMode },
     });
   }

@@ -192,6 +192,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   for the latest state line to be in the new area with `fading: false`; an
   earlier version shot the plaza while the door fade still covered it.
 
+### 3.3 Gameplay sound (Milestone 37)
+- Sound effects only: no music, ambience beds, or voice. `src/core/sound.ts`
+  derives a closed set of `SoundCue` values from state diffs; it has no DOM,
+  timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a
+  later synthesized or generated clip can replace a recipe without changing
+  gameplay.
+- `src/platform/audio.ts` lazily creates Web Audio after a user gesture,
+  resumes safely when possible, and uses a moderate master gain. It synthesizes
+  short, gentle oscillator tones in code. Audio unavailable or suspended must
+  never break the game.
+- Sound is on by default. Mute is toggled by M or the Sound button inside the
+  Journal pause menu, and is stored separately under `cloverhollow-audio` in
+  Capacitor Preferences, never in the save.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -1063,6 +1076,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
+- `sound.log()` returns recent read-only `{ tick, cue, played }` entries and
+  `sound.muted()` reports the separate audio preference. These are harness
+  only and are absent from production.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

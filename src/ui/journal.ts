@@ -17,6 +17,7 @@ export type JournalView = {
   currentLand: string | null;
   coins: number;
   snacks: number;
+  muted: boolean;
 };
 
 type Slot = {
@@ -101,6 +102,7 @@ function supply(kind: "coins" | "snacks", label: string): {
 export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   onClose: (callback: () => void) => void;
+  onToggleAudio: (callback: () => void) => void;
 } {
   const book = element("section", "journal-book");
   book.setAttribute("aria-label", "Journal");
@@ -119,6 +121,10 @@ export function createJournal(root: HTMLElement): {
   const coins = supply("coins", "Coins");
   const snacks = supply("snacks", "Snacks");
   supplies.append(coins.root, snacks.root);
+  const audio = element("button", "journal-audio");
+  audio.type = "button";
+  audio.setAttribute("aria-label", "Toggle sound");
+  supplies.append(audio);
   notesHead.append(notesHeading, supplies);
   const notes = element("ul", "journal-notes");
   const empty = element("p", "journal-empty");
@@ -148,6 +154,7 @@ export function createJournal(root: HTMLElement): {
   book.append(label, close, notesPage, stickersPage, mapPage, notesTab, mapTab);
   root.append(book);
   let onClose: () => void = () => undefined;
+  let onToggleAudio: () => void = () => undefined;
   let page: "notes" | "map" = "notes";
   let wasVisible = false;
   let mapSignature = "";
@@ -173,15 +180,21 @@ export function createJournal(root: HTMLElement): {
   document.addEventListener("keydown", keydown);
   setPage("notes");
   close.addEventListener("click", () => onClose());
+  audio.addEventListener("click", () => onToggleAudio());
   const slots: Slot[] = [];
   return {
     onClose: (callback) => {
       onClose = callback;
     },
+    onToggleAudio: (callback) => {
+      onToggleAudio = callback;
+    },
     render: (view) => {
       book.hidden = !view.visible;
       setText(coins.count, String(view.coins));
       setText(snacks.count, String(view.snacks));
+      setText(audio, view.muted ? "♪ off" : "♪ on");
+      audio.classList.toggle("is-muted", view.muted);
       if (!view.visible && wasVisible) setPage("notes");
       wasVisible = view.visible;
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));

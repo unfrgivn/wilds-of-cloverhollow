@@ -1,5 +1,6 @@
 import { stableHash, type ActionFrame, type State } from "../core";
 import type { InputSource } from "../platform/input";
+import type { AudioController } from "../platform/audio";
 
 export type CloverhollowHook = {
   version: 1;
@@ -64,6 +65,7 @@ export type CloverhollowHook = {
     loaded: () => { tick: number; hash: string } | null;
   };
   boot: { title: () => "fresh" | "continue" | "confirm" | null };
+  sound: { log: AudioController["log"]; muted: AudioController["muted"] };
 };
 
 export function installHook(deps: {
@@ -78,6 +80,7 @@ export function installHook(deps: {
   renderInfo: CloverhollowHook["renderInfo"];
   save: CloverhollowHook["save"];
   boot: CloverhollowHook["boot"];
+  sound: CloverhollowHook["sound"];
 }): void {
   const hook: CloverhollowHook = {
     version: 1,
@@ -112,6 +115,7 @@ export function installHook(deps: {
     renderInfo: deps.renderInfo,
     save: deps.save,
     boot: deps.boot,
+    sound: deps.sound,
   };
   window.__cloverhollow = hook;
 }

@@ -1123,8 +1123,8 @@ the old trail, the owl, and the clubhouse claim.
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
   open: the owner doesn't know yet (2026-10-06).
-- Audio: later (owner, 2026-10-06). TestFlight and a paid developer account:
-  later.
+- Audio: sound effects landed in Milestone 37 (owner, 2026-10-08); music and
+  ambience are still later. TestFlight and a paid developer account: later.
 
 ### The world and how it's played (decided 2026-10-07, open to the owner's review)
 The owner asked for EarthBound-style decisions for travel between the lands,
@@ -1190,6 +1190,35 @@ more bad guys, and the blacklight lantern, made and built while away.
   `just e2e` suite was deferred by the owner (2026-10-08) for the same load
   and still needs a run.
 
+## Milestone 37: Gameplay sound **Status:** ✅ Completed (2026-10-08)
+- Sound effects only (owner, 2026-10-08): no music, ambience, or voice.
+  VoiceStudio was considered at the owner's suggestion and set aside: it
+  makes speech (TTS, cloning, dubbing), not sound effects, and voice acting
+  is out of scope (spec 13).
+- `soundCues(previous, next)` in `src/core/sound.ts` is a pure projection of
+  state changes, like `autosaveNeeded`; `step()`, the state shape, and the
+  save version are untouched. Cues: dialogue open, advance, close, and text
+  blips; choice move and select; journal open and close; footsteps; door and
+  arrival; coin, item, and sticker; lantern on and off; battle start,
+  command, hit, win, run, and rest (a battle that ends without calming never
+  plays the win chime).
+- `src/platform/audio.ts` synthesizes every cue with Web Audio from a
+  recipe table of short oscillator and filtered-noise segments; no files and
+  no dependency. A recipe is plain data, so a cue can later point at a clip.
+  The AudioContext unlocks on the first key, pointer, or touch.
+- Mute: M, or the `♪ on/off` button in the journal's Notes header. Stored
+  under its own Preferences key `cloverhollow-audio`, never in the save. A
+  first draft put the button in the touch HUD; it changed every phone
+  gameplay baseline (which Milestones 33 and 34 are re-baselining), so it
+  moved to the journal and only the six journal baselines changed.
+- Harness: `sound.log()` (recent `{ tick, cue, played }`) and `sound.muted()`.
+- Gates: `just check` (415 tests, sims, purity, lint) and `just build`
+  passed. The full `just e2e` suite, run in batches under a load average of
+  60 to 80 from parallel milestones: 410 of 414 passed. Two failures were the
+  shop journal baselines (`journal-supplies`, now showing the `♪` pill;
+  updated after viewing). Two were `ui-gallery` sticker tests timing out
+  under load; they passed 12 of 12 repeated alone.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its
@@ -1229,6 +1258,11 @@ more bad guys, and the blacklight lantern, made and built while away.
     Until Milestone 34 lands, don't start a milestone that adds or reshapes
     an area; after it, every new area is painted whole and split into a kit.
   - Milestone 36, gamepad support (spec 3.2): done (above).
+  - Milestone 37, gameplay sound: done. Gentle synthesized sound effects are
+    projected from core state diffs and played by the Web Audio shell. Mute is
+    a separate Capacitor preference, with M or the Sound button inside the
+    Journal pause menu.
+    The harness exposes recent cue and playback logs without changing saves.
   - Then: the music teacher's flute, a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
@@ -1237,3 +1271,20 @@ more bad guys, and the blacklight lantern, made and built while away.
 ## Later (not scheduled)
 The flute, the lasso's levers and gaps, the clubhouse fix-up, and more
 mini-bosses (people under the chaos spell, NOTES.md).
+
+Sound follow-ups from Milestone 37:
+- Gamepad audio unlock: browsers don't count a gamepad press as a user
+  gesture, so a pad-only player hears nothing until a key, click, or tap.
+  Show a one-time "press to start" on the title, or accept it on iOS where
+  the first tap unlocks.
+- iOS check: confirm on the simulator and a device that Web Audio unlocks
+  after the first tap in WKWebView, and decide whether the ring/silent
+  switch should mute the game (Web Audio's default follows it).
+- Music and ambience: a title, town, and battle theme, and quiet beds per
+  land (birds, waves, wind). Needs the owner's call on the source: code
+  synthesis like the effects, or a generator (paid generation needs the
+  owner).
+- Footsteps by surface (grass, wood, sand) once the area kits carry ground
+  data (after Milestone 34); the flute's notes with the flute milestone.
+- A volume slider beside mute, and matching the journal's `♪` pill to the
+  coin and snack counters' height and shading.

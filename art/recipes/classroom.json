@@ -1,0 +1,32 @@
+{
+  "asset": "classroom ground",
+  "date": "2026-10-08",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 1,
+  "references": [
+    "docs/art/concepts/environments/school_interior.png",
+    "art/scratch/school-assembled.png",
+    "art/source/areas/arcade/arcade-final.png",
+    "art/source/areas/kitchen/kitchen-final.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "selected": "art/source/areas/classroom/classroom-final.png",
+  "prompt_summary": "Strict cutaway Ms. Maple classroom in the approved school watercolor-and-ink style, with porthole door, windows, picture-only chalkboard, clipped children's art wall, cubbies, reading corner, desks, and teacher desk with apple. No people, animals, lettering, or numbers.",
+  "scale_reference": "Fae 280 source pixels, door about 400 source pixels, 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2528x1696 source to 2400px wide, then center-cropped to 2400x1600 source pixels.",
+    "Split into two opaque 1200x1600 WebP tiles at quality 88.",
+    "Recorded paper margin colour #fcfbf6 in ground.json.",
+    "Generated lossless occluder cutouts with area-occluders.ts from content/areas/classroom.json."
+  ],
+  "outputs": {
+    "tiles": [
+      "public/assets/areas/classroom/ground_0_0.webp",
+      "public/assets/areas/classroom/ground_1_0.webp"
+    ],
+    "manifest": "public/assets/areas/classroom/ground.json",
+    "occluders": "public/assets/areas/classroom/occluders.json",
+    "area": "content/areas/classroom.json"
+  },
+  "owner_review": "Reviewed art/review/classroom-overlay.png, art/review/classroom-phone.png, and art/review/school-door-overlay.png."
+}

@@ -117,7 +117,9 @@ test("after calming the frog, the journal shows his sticker and his note", async
   await expect(page.locator(".journal-supply")).toHaveText(["Coins 8", "Snacks 2"]);
 });
 
-test("the game saves when Fae arrives somewhere and resumes there after a reload", async ({
+test("the game saves when Fae arrives somewhere and resumes there after a reload", {
+  tag: "@smoke",
+}, async ({
   page,
 }) => {
   await openHarness(page);

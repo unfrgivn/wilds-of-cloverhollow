@@ -27,7 +27,8 @@ async function shown(page: Page): Promise<boolean> {
 test.describe("frog battle", () => {
   test.setTimeout(longFlowTimeout);
 
-  test("real keys: calm the frog, win his sticker, and talk with him", async ({ page }) => {
+  test("real keys: calm the frog, win his sticker, and talk with him", { tag: "@smoke" },
+    async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("./");
     await page.waitForFunction(() => Boolean(window.__cloverhollow));

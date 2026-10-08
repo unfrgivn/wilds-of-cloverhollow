@@ -1,4 +1,9 @@
 import { defineConfig } from "@playwright/test";
+
+const webkitSpecs = [
+  "title", "title-gallery", "ui-gallery", "journal-save", "dialogue",
+  "battle-scene", "sound", "harness", "gamepad",
+];
 export default defineConfig({
   testDir: "tests/e2e",
   timeout: process.env.CI === "true" ? 90_000 : 30_000,
@@ -24,9 +29,16 @@ export default defineConfig({
       name: "chromium",
       use: { browserName: "chromium" },
     },
+    // Chromium runs everything. WebKit (the iOS engine) runs the layout, UI,
+    // and input-device specs plus the gameplay flows tagged @smoke: core
+    // determinism across engines is already checked by the Bun hash in each
+    // flow (spec 3.1), so WebKit replaying every walk only doubled the suite.
     {
       name: "webkit",
       use: { browserName: "webkit" },
+      grep: new RegExp(
+        ["@smoke", ...webkitSpecs.map((name) => `\\b${name}\\.spec\\.ts`)].join("|"),
+      ),
     },
   ],
 });

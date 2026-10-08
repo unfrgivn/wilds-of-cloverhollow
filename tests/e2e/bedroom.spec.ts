@@ -11,7 +11,8 @@ test.describe("bedroom", () => {
     await expect(page).toHaveScreenshot("bedroom.png");
   });
 
-  test("walk animation follows real movement and stops on idle", async ({ page }) => {
+  test("walk animation follows real movement and stops on idle", { tag: "@smoke" },
+    async ({ page }) => {
     await openHarness(page);
     await resetPaused(page, "new-game");
     await page.keyboard.down("ArrowDown");

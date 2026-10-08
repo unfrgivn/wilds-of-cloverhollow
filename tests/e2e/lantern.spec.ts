@@ -57,7 +57,9 @@ test("real keys switch on the blacklight and reveal the pass trail", async ({ pa
     .toBeVisible();
 });
 
-test("touch lantern button toggles at the phone layout", async ({ page }) => {
+test("touch lantern button toggles at the phone layout", { tag: "@smoke" }, async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 874, height: 402 });
   await page.goto("./?touch=1");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));

@@ -97,6 +97,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `src/core/timing.ts` `drainTicks` function). While an area load is pending,
   the accumulator is reset and no ticks run. Rendering may
   interpolate between ticks for presentation only.
+- The shell draws the canvas from its own animation-frame callback (Pixi's
+  automatic per-frame render is removed). While the harness has the game
+  paused, it draws only after something changes: a step or reset, an area
+  load, a resize, or a pointer press. Running, it draws every frame.
 - Visual-only animation (walk frames, bobbing, text reveal, tweens) derives
   from state and tick and never feeds back into the core.
 - `src/core` remains pure. The sole package import exception is `inkjs` in
@@ -1089,6 +1093,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   scripts (`tests/sim`, Bun, thousands of ticks in milliseconds), then
   Playwright e2e with real keyboard input and screenshot comparison. Every
   gameplay feature has at least one e2e test that uses real key presses.
+- Playwright projects: Chromium runs every e2e spec. WebKit (the iOS engine)
+  runs the layout, UI, and input-device specs (title, title gallery, UI
+  gallery, journal and save, dialogue, battle scene, sound, harness, gamepad)
+  plus the gameplay flows tagged `@smoke`; each gameplay flow already checks
+  its state hash against Bun (JavaScriptCore) for cross-engine determinism.
 - Visual baselines live beside the e2e specs. Update them only after viewing
   the new image.
 - Fixtures (`content/fixtures/<name>.json`) contain `area`, `spawn`, an

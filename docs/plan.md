@@ -1219,6 +1219,30 @@ more bad guys, and the blacklight lantern, made and built while away.
   updated after viewing). Two were `ui-gallery` sticker tests timing out
   under load; they passed 12 of 12 repeated alone.
 
+### E2E suite speed (2026-10-08)
+- Cause, measured: with the game paused by the harness, Pixi still redrew
+  the canvas every animation frame, in software in headless Chromium, and
+  every Playwright command queued behind that draw. On a paused area an
+  `evaluate` took 64 ms and a key press 153 ms; with the canvas hidden,
+  0.7 and 1.5 ms. Now the shell draws from its own frame callback and, while
+  paused, only after a step, reset, area load, resize, or pointer press
+  (spec 3.1): 5 ms and 24 ms. The two trail flows went from 32 s and 48 s to
+  14 s each. Skipping the render inside `step` alone saved nothing (it was
+  tried and dropped; Hook API v1 is unchanged), and a step's own draw outside
+  an animation frame didn't reliably reach the screen in headless Chromium.
+- Owner (2026-10-08): Chromium runs every spec; WebKit runs the layout, UI,
+  and input-device specs plus five flows tagged `@smoke` (the frog battle,
+  the bedroom walk, the dialogue window, save and resume, and the touch
+  lantern). 77 WebKit baselines for flows WebKit no longer runs were deleted;
+  a branch that re-baselines one of them should drop it.
+- `harness.spec.ts` waits for real-time movement with `expect.poll` instead
+  of a fixed 500 ms sleep.
+- Full `just e2e`, the same 16 spec groups before and after, both under a
+  load average of about 50 to 80 from parallel milestones: 21.0 minutes of
+  Playwright time before, 10.1 after (388 tests, all passed; gamepad's group
+  adds 15 s). The slowest spec is now `harness.spec.ts` (62 tests, 2.8
+  minutes on both browsers), the next place to look.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its

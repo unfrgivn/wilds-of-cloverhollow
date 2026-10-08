@@ -63,6 +63,8 @@ async function boot(): Promise<void> {
     preference: "webgl",
   });
   app.renderer.background.color = 0xf8edcf;
+  // We draw from our own ticker callback (below), so Pixi's per-frame render goes.
+  app.ticker.remove(app.render, app);
   const root = document.querySelector("#app");
   if (root === null) throw new Error("Missing #app root");
   root.appendChild(app.canvas);
@@ -440,10 +442,21 @@ async function boot(): Promise<void> {
         .then(() => view.resetCamera())
         .finally(() => {
           areaLoad = undefined;
+          invalidate();
         });
     }
   };
-  window.addEventListener("resize", render);
+  // While the harness has the game paused, the frame is a pure function of a
+  // state that only `step` changes, yet software-rendered Chromium spent ~60 ms
+  // redrawing it every frame and every test command queued behind that draw
+  // (an evaluate took 64 ms, against 5 ms drawing only on change). Paused, we
+  // draw once after something changes; running, every frame as before.
+  let drawPending = true;
+  const invalidate = (): void => {
+    drawPending = true;
+  };
+  for (const type of ["resize", "pointerdown", "pointerup"])
+    window.addEventListener(type, invalidate);
   let last = performance.now();
   let accumulator = 0;
   app.ticker.add(() => {
@@ -465,7 +478,11 @@ async function boot(): Promise<void> {
         }
       }
     }
-    render();
+    if (!paused || areaLoad !== undefined || drawPending) {
+      drawPending = false;
+      render();
+      app.render();
+    }
   });
   render();
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
@@ -475,7 +492,10 @@ async function boot(): Promise<void> {
       get: () => state,
       tick,
       ensureArea,
-      render,
+      render: () => {
+        render();
+        invalidate();
+      },
       paused: () => paused,
       setPaused: (value) => {
         paused = value;

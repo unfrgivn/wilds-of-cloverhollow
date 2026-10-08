@@ -46,9 +46,8 @@ test("holding a real key moves the player in real time", async ({ page }) => {
   await resume(page);
   const before = (await readState(page)).player.x;
   await page.keyboard.down("ArrowRight");
-  await page.waitForTimeout(500);
+  await expect.poll(async () => (await readState(page)).player.x).toBeGreaterThan(before);
   await page.keyboard.up("ArrowRight");
-  expect((await readState(page)).player.x).toBeGreaterThan(before);
 });
 
 test("real keys stop at the room wall, radius respected", async ({ page }) => {

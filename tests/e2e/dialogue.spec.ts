@@ -47,7 +47,9 @@ async function dialogueAttribute(page: Page): Promise<string | undefined> {
   return page.evaluate(() => document.documentElement.dataset.dialogue);
 }
 
-test("real keys: the window, a choice, the journal, and the window again", async ({ page }) => {
+test("real keys: the window, a choice, the journal, and the window again", {
+  tag: "@smoke",
+}, async ({ page }) => {
   const { box, speaker, text, choices, prompt } = parts(page);
   await openHarness(page);
   await resetPaused(page, "new-game");

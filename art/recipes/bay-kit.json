@@ -1,7 +1,7 @@
 {
   "asset": "bay-kit",
   "date": "2026-10-09",
-  "summary": "The approved bay painting split into a ground plate and 6 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "summary": "The approved bay painting split into a ground plate and 15 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/bay.json",
   "painting": "art/source/areas/bay/painting/ground.json",
@@ -44,6 +44,42 @@
       "palm-right": [
         "iso-1.jpg",
         "crop.json"
+      ],
+      "bucket": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "driftwood-left": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "driftwood-right": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "beach-ball-top": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "beach-ball-left": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "beach-ball-right": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "spade-near": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "spade-bottom": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "picnic-basket": [
+        "iso-1.jpg",
+        "crop.json"
       ]
     }
   },
@@ -53,20 +89,31 @@
       "assets/areas/bay/props-0.json",
       "assets/areas/bay/props-1.json"
     ],
-    "decodedMegabytes": 17.8
+    "decodedMegabytes": 19.3
   },
   "measurements": {
     "rebuiltVsPainting": "0.00% of the painting's pixels differ by more than 12% when the default layout is rebuilt from the kit"
   },
   "states": {},
-  "footprintNotes": {},
+  "footprintNotes": {
+    "driftwood-left": "The diagonal log has a painted undershadow below its visible bark."
+  },
   "painted": [
     "dock-rail-south",
     "umbrella",
     "sign",
     "palm-top-left",
     "palm-bottom-left",
-    "palm-right"
+    "palm-right",
+    "bucket",
+    "driftwood-left",
+    "driftwood-right",
+    "beach-ball-top",
+    "beach-ball-left",
+    "beach-ball-right",
+    "spade-near",
+    "spade-bottom",
+    "picnic-basket"
   ],
   "lifted": []
 }

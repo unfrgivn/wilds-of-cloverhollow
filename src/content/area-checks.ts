@@ -245,6 +245,33 @@ export function propDrawingErrors(area: Area): string[] {
   }));
 }
 
+/*
+ * Authoring check: a plain blocker must not draw a prop's collision again as
+ * a box. A blocker over half or more of a prop footprint's 5-unit cells is
+ * that prop's ground contact drawn again, bigger, and its corners are
+ * invisible walls (spec 6.2). A pocket or a gap beside a footprint only meets
+ * it along an edge.
+ */
+export function propBlockerErrors(area: Area): string[] {
+  return area.blockers.flatMap((blocker, index) => area.props.flatMap((prop) => {
+    const cells = (prop.states[prop.state]?.footprint ?? []).flatMap((polygon) => {
+      const xs = polygon.map(([x]) => x);
+      const ys = polygon.map(([, y]) => y);
+      const inside: Point[] = [];
+      for (let y = Math.floor(Math.min(...ys) / GRID) * GRID + GRID / 2; y < Math.max(...ys);
+        y += GRID)
+        for (let x = Math.floor(Math.min(...xs) / GRID) * GRID + GRID / 2; x < Math.max(...xs);
+          x += GRID)
+          if (pointInPolygon({ x, y }, polygon)) inside.push({ x, y });
+      return inside;
+    });
+    const covered = cells.filter((cell) => pointInPolygon(cell, blocker)).length;
+    return cells.length > 0 && covered * 2 >= cells.length
+      ? [`${area.id}: blocker ${index} covers prop ${prop.id}'s footprint`]
+      : [];
+  }));
+}
+
 export function areaConnectionErrors(
   areas: Record<string, Area>,
   tunables: Tunables,

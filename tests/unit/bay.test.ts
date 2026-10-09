@@ -4,6 +4,7 @@ import {
   createInkState,
   createState,
   distanceToPolygon,
+  everyPropFootprint,
   journalNotes,
   pointInPolygon,
   runInk,
@@ -40,14 +41,10 @@ function standable(area: Area, point: Point): boolean {
   if (!pointInPolygon(point, area.walkable)) return false;
   if (distanceToPolygon(point, area.walkable) < radius) return false;
   return (
-    area.blockers.every(
+    [...area.blockers, ...everyPropFootprint(area)].every(
       (blocker) => !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius,
     ) && area.npcs.every((npc) => !pointInPolygon(point, npc.footprint))
   );
-}
-
-function blocked(area: Area, point: Point): boolean {
-  return area.blockers.some((blocker) => pointInPolygon(point, blocker));
 }
 
 // Plays a knot from its start to its end, taking `choices` in order (then 0).
@@ -122,15 +119,24 @@ describe("the bay's geometry follows its painting", () => {
     it(`keeps Fae out of ${what}`, () => expect(pointInPolygon(point, bay.walkable)).toBe(false));
 
   const things: [string, Point][] = [
-    ["the picnic blanket", { x: 590, y: 405 }],
     ["the sign's left post", { x: 143, y: 452 }],
     ["the sign's right post", { x: 259, y: 472 }],
     ["the driftwood log at the bottom left", { x: 330, y: 1010 }],
     ["the driftwood log at the bottom right", { x: 1380, y: 1030 }],
     ["the bucket", { x: 1093, y: 690 }],
+    ["the beach ball at the top", { x: 480, y: 116 }],
+    ["the beach ball at the left", { x: 340, y: 960 }],
+    ["the beach ball at the right", { x: 1343, y: 980 }],
+    ["the near spade", { x: 1155, y: 702 }],
+    ["the bottom spade", { x: 1178, y: 1075 }],
+    ["the picnic basket", { x: 605, y: 355 }],
   ];
   for (const [what, point] of things)
-    it(`makes ${what} solid`, () => expect(blocked(bay, point)).toBe(true));
+    it(`makes ${what} solid`, () => expect(standable(bay, point)).toBe(false));
+
+  it("leaves the picnic blanket walkable", () => {
+    expect(standable(bay, { x: 590, y: 405 })).toBe(true);
+  });
 
   it("keeps the palm's trunk at the top left solid", () => {
     expect(standable(bay, { x: 40, y: 420 })).toBe(false);

@@ -639,6 +639,87 @@
           ]
         ]
       ]
+    },
+    {
+      "id": "pond",
+      "crop": [
+        760,
+        620,
+        470,
+        260
+      ],
+      "seed": [
+        1000,
+        750
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the soft green meadow grass",
+      "object": "the complete oval park pond as one object: outer stone ring, water, and little wooden bridge; not grass, flowers, or fence",
+      "solid": true,
+      "footprint": [
+        [
+          [
+            800,
+            730
+          ],
+          [
+            830,
+            690
+          ],
+          [
+            900,
+            665
+          ],
+          [
+            980,
+            650
+          ],
+          [
+            1060,
+            655
+          ],
+          [
+            1140,
+            680
+          ],
+          [
+            1180,
+            720
+          ],
+          [
+            1180,
+            770
+          ],
+          [
+            1140,
+            810
+          ],
+          [
+            1070,
+            835
+          ],
+          [
+            980,
+            845
+          ],
+          [
+            890,
+            835
+          ],
+          [
+            820,
+            805
+          ],
+          [
+            790,
+            765
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

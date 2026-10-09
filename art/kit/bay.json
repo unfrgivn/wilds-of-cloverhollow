@@ -74,6 +74,36 @@
             1018,
             641
           ]
+        ],
+        [
+          [
+            1004,
+            648
+          ],
+          [
+            1010,
+            644
+          ],
+          [
+            1022,
+            644
+          ],
+          [
+            1028,
+            649
+          ],
+          [
+            1026,
+            657
+          ],
+          [
+            1016,
+            661
+          ],
+          [
+            1006,
+            657
+          ]
         ]
       ],
       "samples": {
@@ -226,7 +256,8 @@
             246
           ]
         ]
-      ]
+      ],
+      "canopy": true
     },
     {
       "id": "sign",
@@ -377,7 +408,8 @@
             299
           ]
         ]
-      ]
+      ],
+      "canopy": true
     },
     {
       "id": "palm-top-left",
@@ -544,6 +576,483 @@
           ]
         ]
       ]
+    },
+    {
+      "id": "bucket",
+      "crop": [
+        1020,
+        600,
+        150,
+        160
+      ],
+      "seed": [
+        1095,
+        680
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the small beach bucket, whole from rim to base, including its handle; not sand, shells, or nearby objects",
+      "footprint": [
+        [
+          [
+            1078,
+            700
+          ],
+          [
+            1112,
+            700
+          ],
+          [
+            1118,
+            714
+          ],
+          [
+            1075,
+            714
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "driftwood-left",
+      "crop": [
+        190,
+        920,
+        300,
+        180
+      ],
+      "seed": [
+        330,
+        1015
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the single diagonal driftwood log at the bottom left, whole from its upper-left cut end to its lower-right cut end, with its bark and both branch stubs; not the beach ball above it, the shells, or the sand",
+      "footprint": [
+        [
+          [
+            222,
+            975
+          ],
+          [
+            262,
+            982
+          ],
+          [
+            302,
+            1008
+          ],
+          [
+            342,
+            1035
+          ],
+          [
+            382,
+            1057
+          ],
+          [
+            422,
+            1073
+          ],
+          [
+            457,
+            1079
+          ],
+          [
+            457,
+            1099
+          ],
+          [
+            392,
+            1099
+          ],
+          [
+            362,
+            1081
+          ],
+          [
+            322,
+            1058
+          ],
+          [
+            282,
+            1029
+          ],
+          [
+            242,
+            1019
+          ],
+          [
+            222,
+            992
+          ]
+        ]
+      ],
+      "footprintNote": "The diagonal log has a painted undershadow below its visible bark.",
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "driftwood-right",
+      "crop": [
+        1210,
+        930,
+        330,
+        170
+      ],
+      "seed": [
+        1380,
+        1030
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the single diagonal driftwood log at the bottom right, whole from its lower-left cut end to its upper-right end, with its bark, knot, and branch stub; not the beach ball above it, the shell, the palm leaves, or the sand",
+      "footprint": [
+        [
+          [
+            1257,
+            1076
+          ],
+          [
+            1297,
+            1075
+          ],
+          [
+            1337,
+            1064
+          ],
+          [
+            1377,
+            1045
+          ],
+          [
+            1417,
+            1015
+          ],
+          [
+            1457,
+            1002
+          ],
+          [
+            1502,
+            992
+          ],
+          [
+            1502,
+            1009
+          ],
+          [
+            1477,
+            1026
+          ],
+          [
+            1437,
+            1047
+          ],
+          [
+            1397,
+            1067
+          ],
+          [
+            1357,
+            1091
+          ],
+          [
+            1347,
+            1097
+          ],
+          [
+            1337,
+            1099
+          ],
+          [
+            1267,
+            1099
+          ],
+          [
+            1257,
+            1093
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "beach-ball-top",
+      "crop": [
+        430,
+        45,
+        100,
+        100
+      ],
+      "seed": [
+        480,
+        95
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the small beach ball, whole and round; not sand",
+      "footprint": [
+        [
+          [
+            468,
+            106
+          ],
+          [
+            492,
+            106
+          ],
+          [
+            492,
+            116
+          ],
+          [
+            468,
+            116
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "beach-ball-left",
+      "crop": [
+        290,
+        890,
+        100,
+        100
+      ],
+      "seed": [
+        340,
+        940
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the small beach ball, whole and round; not sand or driftwood",
+      "footprint": [
+        [
+          [
+            328,
+            950
+          ],
+          [
+            352,
+            950
+          ],
+          [
+            352,
+            960
+          ],
+          [
+            328,
+            960
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "beach-ball-right",
+      "crop": [
+        1290,
+        910,
+        100,
+        100
+      ],
+      "seed": [
+        1345,
+        960
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the small beach ball, whole and round; not sand or palm",
+      "footprint": [
+        [
+          [
+            1330,
+            970
+          ],
+          [
+            1355,
+            970
+          ],
+          [
+            1355,
+            980
+          ],
+          [
+            1330,
+            980
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "spade-near",
+      "crop": [
+        1080,
+        580,
+        150,
+        160
+      ],
+      "seed": [
+        1150,
+        660
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the small beach spade stuck in the sand, whole handle and blade; not sand or bucket",
+      "footprint": [
+        [
+          [
+            1138,
+            690
+          ],
+          [
+            1168,
+            690
+          ],
+          [
+            1172,
+            702
+          ],
+          [
+            1138,
+            702
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "spade-bottom",
+      "crop": [
+        1110,
+        950,
+        150,
+        150
+      ],
+      "seed": [
+        1175,
+        1025
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the small beach spade stuck in the sand, whole handle and blade; not sand or driftwood",
+      "footprint": [
+        [
+          [
+            1160,
+            1060
+          ],
+          [
+            1190,
+            1060
+          ],
+          [
+            1195,
+            1075
+          ],
+          [
+            1160,
+            1075
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "picnic-basket",
+      "crop": [
+        530,
+        260,
+        140,
+        130
+      ],
+      "seed": [
+        600,
+        345
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sandy beach",
+      "object": "the woven picnic basket with its lid, pink trim, and arched handle, whole; not the umbrella, the checked picnic blanket, or the sand",
+      "footprint": [
+        [
+          [
+            557,
+            322
+          ],
+          [
+            567,
+            341
+          ],
+          [
+            607,
+            344
+          ],
+          [
+            637,
+            344
+          ],
+          [
+            647,
+            330
+          ],
+          [
+            647,
+            341
+          ],
+          [
+            637,
+            359
+          ],
+          [
+            617,
+            373
+          ],
+          [
+            587,
+            365
+          ],
+          [
+            567,
+            357
+          ],
+          [
+            557,
+            333
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

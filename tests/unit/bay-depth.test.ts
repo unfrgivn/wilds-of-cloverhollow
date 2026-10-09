@@ -32,18 +32,19 @@ function standable(point: Point): boolean {
 }
 
 // The share of Fae's body rows from `top` to `bottom` units above her feet
-// (on a 5-unit grid) that props draw over.
+// (on a 5-unit grid) that props draw over (only the prop `only`, if given).
 const states: { id: string; state: PropState }[] = bay.props.flatMap((prop) => {
   const state = prop.states.default;
   return state === undefined ? [] : [{ id: prop.id, state }];
 });
-function coverage(feet: Point, top = 140, bottom = 0): number {
+function coverage(feet: Point, top = 140, bottom = 0, only?: string): number {
+  const drawn = only === undefined ? states : states.filter(({ id }) => id === only);
   let covered = 0;
   let samples = 0;
   for (let y = feet.y - top; y <= feet.y - bottom; y += 5)
     for (let x = feet.x - 25; x <= feet.x + 25; x += 5) {
       samples += 1;
-      if (states.some(({ state }) => propCoversPoint(state, feet, { x, y }))) covered += 1;
+      if (drawn.some(({ state }) => propCoversPoint(state, feet, { x, y }))) covered += 1;
     }
   return covered / samples;
 }
@@ -93,7 +94,9 @@ describe("what Bubblegum Bay draws in front of Fae", () => {
         const feet = { x, y: Math.round(640 - (375 * (x - 1000)) / 585 + below) };
         if (!standable(feet)) continue;
         checked += 1;
-        expect(coverage(feet), `the beach at (${feet.x}, ${feet.y})`).toBe(0);
+        // Beside the bucket, the bucket rightly draws over her; this is the rail.
+        expect(coverage(feet, 140, 0, "dock-rail-south"), `the beach at (${feet.x}, ${feet.y})`)
+          .toBe(0);
       }
     expect(checked, "beach spots in front of the rail").toBeGreaterThanOrEqual(20);
   });

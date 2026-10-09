@@ -620,7 +620,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   (one may go spare at an end), except where another prop in front of it
   there covers its footprint's front with its own picture (a tree's crown
   high above covers nothing), and in those columns reaches to within 15 units
-  of its front.
+  of its front. Its companion `propBlockerErrors` keeps plain blockers off
+  props: a blocker over half or more of a footprint's cells is that prop's
+  collision drawn again as a box.
 - A catalogue, `content/props/<area>.json` (written by `tools/art/kit.ts`),
   lists the area's atlases (Pixi spritesheets in
   `public/assets/areas/<area>/props-N.json`, frames anchored at the prop's
@@ -683,14 +685,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   Fae at the foot of the stairs.
 - The outdoor areas (Milestone 34) are kits too, so every area is: Meadow
   Park (the tree house, the tower, two bushes, the basket, five fence runs, the
-  park sign), Bubblegum Bay (the near dock rail, the umbrella, the sign, three
-  palms), Pinecone Pass (four pine stands, the lodge, the cocoa stand, three
-  groups of benches, the bus shelter, the lift towers, the snowman, the
-  signs), the Cliffside Trail (pines, rocks, the signpost, the lookout bench,
-  the footbridge's near rail as one prop), and the Whispering Woods (its trees,
-  the tree house, three logs, two fern beds). Trees and ferns Fae walks behind
-  are canopies. Every prop is painted but the woods' south log, which is
-  lifted; the plates are the approved paintings but for its hole.
+  park sign, the pond), Bubblegum Bay (the near dock rail, the umbrella, the
+  sign, three palms, two driftwood logs, three beach balls, the bucket, two
+  spades, the picnic basket), Pinecone Pass (four pine stands, the lodge, the
+  cocoa stand, three groups of benches, the bus shelter, the lift towers, the
+  snowman, the signs), the Cliffside Trail (pines, rocks, the signpost, the
+  lookout bench, the footbridge's near rail as one prop), and the Whispering
+  Woods (its trees, the tree house, three logs, two fern beds). Trees, ferns,
+  the bay's sign and its umbrella fade while Fae is behind them (canopies).
+  Every prop is painted but the woods' south log, which is lifted; the plates
+  are the approved paintings but for its hole.
 - An area's floor is one piece: from any spawn, Fae can walk to every other
   (`areaConnectionErrors` reports a floor split by furniture).
 

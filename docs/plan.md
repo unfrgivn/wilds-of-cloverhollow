@@ -1540,15 +1540,22 @@ more bad guys, and the blacklight lantern, made and built while away.
     forest behind the clearing and the big trunks, and corridors behind the
     edge trunks keep both exits. The woods run and the runs chained from it
     (arcade, school, gym, music) are re-recorded and read the same beats.
-  - In progress (2026-10-09): the last box blockers. An audit of every
-    area's plain blockers found objects with box collision and no depth:
-    Bubblegum Bay's two logs, beach balls, bucket, spades, and picnic
-    basket; the Cliffside Trail's Milestone 21 boxes over its rocks and
-    pines (on top of their props' footprints) and its two reed clumps;
-    Meadow Park's pond (a box whose corners are walls on the grass); and the
-    east hall's drinking fountain (its blocker 40 units in front of it).
-    `.worktrees/last-blockers`, branch `last-blockers`; it touches those
-    areas, a blocker check, and the runs that cross them.
+  - A fourth fix (2026-10-09): the last box blockers over painted objects
+    are props. Bubblegum Bay's two driftwood logs, three beach balls,
+    bucket, two spades, and picnic basket stand on their own footprints (the
+    picnic blanket is walkable cloth), its sign's posts and its palm's
+    trunk are solid where they meet the sand, and the dock's end post is
+    part of the near rail; Meadow Park's pond is a prop footed along its
+    stone ring; the east hall's fountain blocker ends at its pedestal; the
+    woods' pocket behind its west log no longer redraws the log. A new
+    check, `propBlockerErrors`, refuses a blocker drawn over a prop's
+    footprint. The bay runs, re-recorded, read the same beats.
+  - Follow-up, open: the Cliffside Trail's floor and blockers come from
+    tools/art/geometry/trail.ts (Milestone 21): boxes over its rocks, pines,
+    and bench beside their props' own footprints (one, behind the hillside
+    pines, is pinned as known in `tests/unit/props.test.ts`), and its two
+    reed clumps have no props. They need the floor traced round the slope
+    and the trail run re-recorded to reach the bay.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

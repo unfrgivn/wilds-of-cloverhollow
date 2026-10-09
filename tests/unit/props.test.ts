@@ -5,7 +5,7 @@ import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
 } from "../../src/content/props";
 import {
-  areaConnectionErrors, hiddenPositions, propDrawingErrors, reachablePositions,
+  areaConnectionErrors, hiddenPositions, propBlockerErrors, propDrawingErrors, reachablePositions,
 } from "../../src/content/area-checks";
 import {
   createState, distanceToPolygon, faeBox, frontEdge, pointInPolygon, propCovers,
@@ -256,6 +256,25 @@ describe("props", () => {
 
   it("are drawn whole: every prop's picture stands on its footprint", () => {
     expect(Object.values(world.areas).flatMap(propDrawingErrors)).toEqual([]);
+  });
+
+  it("keep plain blockers off their footprints", () => {
+    // The trail's Milestone 21 boxes are a follow-up in docs/plan.md; fixing
+    // this one means deleting it here.
+    expect(Object.values(world.areas).flatMap(propBlockerErrors)).toEqual([
+      "trail: blocker 7 covers prop pines-hill's footprint",
+    ]);
+  });
+
+  it("catch a blocker drawn over a prop's footprint", () => {
+    // The woods' blocker behind log-west as it shipped: the pocket behind the
+    // log and the log's own footprint, drawn again as one shape.
+    const woods = world.areas.woods;
+    if (woods === undefined) throw new Error("woods missing");
+    const shipped: Polygon = [[315, 950], [370, 930], [470, 930], [580, 950], [675, 1000],
+      [650, 1040], [570, 1045], [460, 1035], [360, 1030]];
+    expect(propBlockerErrors({ ...woods, blockers: [shipped, ...woods.blockers.slice(1)] }))
+      .toEqual(["woods: blocker 0 covers prop log-west's footprint"]);
   });
 
   it("fail the drawing check with a footprint under a neighbour's crown", () => {

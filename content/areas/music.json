@@ -1,0 +1,167 @@
+{
+  "id": "music",
+  "name": "Music Room",
+  "land": "cloverhollow",
+  "ground": "music",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      25,
+      545
+    ],
+    [
+      601,
+      330
+    ],
+    [
+      1177,
+      509
+    ],
+    [
+      600,
+      795
+    ]
+  ],
+  "blockers": [],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          70,
+          502
+        ],
+        [
+          162,
+          465
+        ],
+        [
+          162,
+          525
+        ],
+        [
+          70,
+          562
+        ]
+      ],
+      "target": {
+        "area": "east-hall",
+        "spawn": "music-door"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 280,
+      "y": 545,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "xylophone",
+      "point": {
+        "x": 790,
+        "y": 595
+      },
+      "knot": "xylophone",
+      "prompt": "Play"
+    },
+    {
+      "id": "piano",
+      "point": {
+        "x": 580,
+        "y": 430
+      },
+      "knot": "piano",
+      "prompt": "Look"
+    },
+    {
+      "id": "song-poster",
+      "point": {
+        "x": 265,
+        "y": 480
+      },
+      "knot": "song_poster",
+      "prompt": "Look"
+    },
+    {
+      "id": "music-window",
+      "point": {
+        "x": 830,
+        "y": 425
+      },
+      "knot": "music_window",
+      "prompt": "Look"
+    },
+    {
+      "id": "instrument-shelf",
+      "point": {
+        "x": 1010,
+        "y": 560
+      },
+      "knot": "instrument_shelf",
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "music-teacher",
+      "point": {
+        "x": 735,
+        "y": 410
+      },
+      "facing": "down",
+      "knot": "music_teacher",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          720,
+          400
+        ],
+        [
+          750,
+          400
+        ],
+        [
+          750,
+          420
+        ],
+        [
+          720,
+          420
+        ]
+      ]
+    }
+  ],
+  "critters": [
+    {
+      "id": "music-bird",
+      "point": {
+        "x": 560,
+        "y": 620
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "xylophone",
+      "prop": "xylophone",
+      "x": 820,
+      "y": 578
+    },
+    {
+      "id": "piano",
+      "prop": "piano",
+      "x": 579,
+      "y": 400
+    },
+    {
+      "id": "instrument-shelf",
+      "prop": "instrument-shelf",
+      "x": 1044,
+      "y": 537
+    }
+  ]
+}

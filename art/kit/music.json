@@ -1,0 +1,182 @@
+{
+  "area": "music",
+  "subjects": [
+    {
+      "id": "xylophone",
+      "crop": [
+        560,
+        390,
+        420,
+        240
+      ],
+      "object": "the large rainbow xylophone on its low wooden stand, including red yellow green and blue bars",
+      "ground": "the classroom music-room floor",
+      "seed": [
+        740,
+        500
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            722,
+            515
+          ],
+          [
+            790,
+            488
+          ],
+          [
+            918,
+            540
+          ],
+          [
+            915,
+            552
+          ],
+          [
+            862,
+            578
+          ],
+          [
+            728,
+            525
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "piano",
+      "crop": [
+        350,
+        120,
+        360,
+        330
+      ],
+      "object": "the upright wooden piano and its bench together as one furniture piece",
+      "ground": "the music-room floor",
+      "seed": [
+        520,
+        300
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            478,
+            350
+          ],
+          [
+            560,
+            330
+          ],
+          [
+            680,
+            340
+          ],
+          [
+            680,
+            374
+          ],
+          [
+            615,
+            400
+          ],
+          [
+            585,
+            392
+          ],
+          [
+            545,
+            396
+          ],
+          [
+            485,
+            374
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "instrument-shelf",
+      "crop": [
+        800,
+        300,
+        360,
+        260
+      ],
+      "object": "the low shelf holding a tambourine drum maracas and triangle",
+      "ground": "the music-room floor",
+      "seed": [
+        1010,
+        450
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            933,
+            448
+          ],
+          [
+            965,
+            430
+          ],
+          [
+            1155,
+            488
+          ],
+          [
+            1155,
+            505
+          ],
+          [
+            1150,
+            520
+          ],
+          [
+            1108,
+            537
+          ],
+          [
+            933,
+            490
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    }
+  ]
+}

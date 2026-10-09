@@ -1,4 +1,5 @@
 import { Story } from "inkjs";
+import { isStorySound, type StorySound } from "./sound";
 
 export type InkCommand =
   | { type: "start"; knot: string }
@@ -9,6 +10,7 @@ export type InkLine = {
   text: string;
   speaker: string | null;
   tags: string[];
+  sound?: StorySound;
 };
 
 export type InkResult = {
@@ -64,7 +66,12 @@ function line(story: Story): InkLine | null {
       speaker = tag.slice("speaker:".length).trim();
     else tags.push(tag);
   }
-  return { text: text.trim(), speaker, tags };
+  const soundTag = tags.find((tag) => tag.startsWith("sound:"));
+  const sound = soundTag?.slice("sound:".length).trim();
+  return {
+    text: text.trim(), speaker, tags,
+    ...(sound !== undefined && isStorySound(sound) ? { sound } : {}),
+  };
 }
 
 // What the story's externals answer (spec 7): `calmed(id)` and `coins()`.

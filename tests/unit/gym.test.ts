@@ -125,7 +125,7 @@ describe("PE time", () => {
   ];
   const pe = [
     "That's the end of our story! Time for PE, everyone.",
-    "Coach Ash is waiting for you in the gym, at the end of the hall.",
+    "Coach Ash is waiting for you in the gym, down the east hall.",
     "The gym! That's where the kid in the purple hood was headed.",
   ];
 
@@ -149,24 +149,24 @@ describe("PE time", () => {
   });
 
   it("opens the gym doors at the hall's east end, locked before then", () => {
-    const doors = school.triggers.find((trigger) => trigger.id === "gym-doors");
+    const hall = world.areas["east-hall"];
+    if (hall === undefined) throw new Error("no east hall");
+    const doors = hall.triggers.find((trigger) => trigger.id === "gym-doors");
     expect(doors?.target).toEqual({ area: "gym", spawn: "door" });
     expect(doors?.requires).toEqual({ variable: "pe_time", knot: "gym_hall" });
     expect(school.interactables.map((item) => item.id)).not.toContain("gym-hall");
     expect(gym.triggers.map((trigger) => [trigger.id, trigger.target])).toEqual([
-      ["door", { area: "school", spawn: "gym-doors" }],
+      ["door", { area: "east-hall", spawn: "gym-doors" }],
     ]);
-    expect(school.spawns["gym-doors"]?.facing).toBe("left");
+    expect(hall.spawns["gym-doors"]?.facing).toBe("right");
     expect(gym.spawns["door"]?.facing).toBe("right");
     expect({ name: gym.name, land: gym.land })
       .toEqual({ name: "School Gym", land: "cloverhollow" });
-    // From the hall's east end, walking right into the doors.
-    const spawn = school.spawns["gym-doors"];
+    const spawn = hall.spawns["gym-doors"];
     if (spawn === undefined) throw new Error("no gym-doors spawn");
-    const locked = walk(at("school", "gym-doors", glimpsed, spawn, "right"), { x: 1, y: 0 }, 90);
-    expect(locked.dialogue).toMatchObject({ knot: "gym_hall",
-      text: "The hall to the gym. The doors are locked during story time." });
-    const open = walk(at("school", "gym-doors", peTime, spawn, "right"), { x: 1, y: 0 }, 90);
+    const locked = walk(at("east-hall", "gym-doors", glimpsed, spawn, "up"), { x: -1, y: -1 }, 90);
+    expect(locked.dialogue).toMatchObject({ knot: "gym_hall" });
+    const open = walk(at("east-hall", "gym-doors", peTime, spawn, "up"), { x: -1, y: -1 }, 90);
     expect(open.transition?.target).toEqual({ area: "gym", spawn: "door" });
   });
 
@@ -175,7 +175,7 @@ describe("PE time", () => {
     if (spawn === undefined) throw new Error("no gym door spawn");
     // Up and left from the spawn, into the doors on the back-left wall.
     const back = walk(at("gym", "door", peTime, spawn, "left"), { x: -1, y: -1 }, 120);
-    expect(back.transition?.target).toEqual({ area: "school", spawn: "gym-doors" });
+    expect(back.transition?.target).toEqual({ area: "east-hall", spawn: "gym-doors" });
   });
 });
 
@@ -320,10 +320,14 @@ describe("Coach Ash's hunt", () => {
     expect(play(roped, "coach", pupCalm).lines).toEqual([
       "My stopwatch AND my clipboard! You're a star, Fae!",
       "Keep the lasso. It can pull down things that are up high, and swing you across gaps, too!",
+      "Oh, and music's next! Ms. Willow's room is down the east hall.",
     ]);
     expect(variable(thanked, "coach_thanked")).toBe(true);
     expect(play(thanked, "coach", pupCalm).lines)
-      .toEqual(["Keep that lasso handy, Fae! And watch out for that purple hood."]);
+      .toEqual([
+        "Music is next, Fae! Ms. Willow's room is down the east hall.",
+        "Keep that lasso handy, Fae! And watch out for that purple hood.",
+      ]);
   });
 
   it("never names the kid in the purple hood", () => {
@@ -348,7 +352,7 @@ describe("the journal", () => {
     const locked = play(glimpsed, "gym_hall").ink;
     expect(notes(locked)[0]).toBe(
       "The gym doors are locked during story time. Ms. Maple will know when it's over.");
-    expect(notes(peTime)[0]).toBe("Time for PE! The gym is at the end of the hall.");
+    expect(notes(peTime)[0]).toBe("Time for PE! The gym is down the east hall.");
     expect(notes(hunting).slice(0, 3)).toEqual([
       "A fizzy pup is zooming around the gym with Coach Ash's stopwatch.",
       "Coach Ash's clipboard went flying, somewhere up high.",

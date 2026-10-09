@@ -6,6 +6,7 @@ const webkitSpecs = [
 ];
 export default defineConfig({
   testDir: "tests/e2e",
+  testMatch: ["**/*.spec.ts"],
   timeout: process.env.CI === "true" ? 90_000 : 30_000,
   // Headless Chromium renders in software (SwiftShader), each GPU process
   // taking up to three cores; the default half-the-cores workers (5 on a

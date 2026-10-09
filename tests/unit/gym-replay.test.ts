@@ -29,7 +29,7 @@ describe("gym replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => world.storyVariable(state.ink, name);
-    expect(areas.slice(-4)).toEqual(["school", "classroom", "school", "gym"]);
+    expect(areas.slice(-4)).toEqual(["classroom", "school", "east-hall", "gym"]);
     expect(knots.slice(-9)).toEqual(["gym_hall", "classroom_teacher", "coach", "gym_pup_calm",
       "hoop", "coach", "hoop", "coach", "back_door"]);
     expect(battles.filter((id) => id === "gym-pup")).toEqual(["gym-pup"]);

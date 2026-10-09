@@ -1,0 +1,109 @@
+{
+  "id": "music-bird",
+  "species": "bluebird",
+  "name": "Flappy Bluebird",
+  "calmName": "Music Bird",
+  "atlas": "assets/critters/bluebird/bluebird.json",
+  "auraCentre": {
+    "x": 172,
+    "y": 189
+  },
+  "bodyCentre": {
+    "x": 239,
+    "y": 316
+  },
+  "figureHeight": 380,
+  "overworldHeight": 66,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "bay-bluebird",
+    "name": "Bay Bluebird",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "music_bird_calm",
+  "calmPrompt": "Talk",
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "timing": {
+    "aimTicks": 60,
+    "targetTick": 39,
+    "greatWindow": 5,
+    "goodWindow": 11
+  },
+  "burst": {
+    "ticks": 60,
+    "targetTick": 45,
+    "greatWindow": 5,
+    "goodWindow": 11,
+    "bigChance": 0.3
+  },
+  "lines": {
+    "intro": "A fizzy bluebird flutters round the music room with a chime mallet in its beak!",
+    "command": "How can Fae calm the flappy bluebird?",
+    "soothe": {
+      "great": "Fae speaks softly. The bluebird's wings slow to a gentle flutter!",
+      "good": "Fae speaks softly, and the bluebird listens for a moment.",
+      "miss": "The bluebird flaps too fast to hear Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie bats a bouncy ball across the music room. The bluebird swoops after it, mallet bobbing!",
+        "good": "Maddie nudges a bouncy ball. The bluebird pauses its flutter to watch.",
+        "miss": "Maddie swats at a ball... and it bonks her on the nose. The bluebird flaps higher with the mallet."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber across the music room. The bluebird follows its bright wiggle!",
+        "good": "Sue's bobber wiggles by. The bluebird tilts its head and wags its tail feathers.",
+        "miss": "Sue's ribbon bobber snags on the instrument shelf. The bluebird keeps flapping."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones in a big loop. The bluebird hops to the rhythm, mallet in its beak!",
+        "good": "Jordan tosses a pinecone up high. The bluebird chirps, curious.",
+        "miss": "Jordan drops all three pinecones on the music room floor. The bluebird ruffles its feathers."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. The bluebird chirps happily, still holding the mallet.",
+    "burst": "The bluebird flaps hard and sends a fizzy gust through the music room!",
+    "burstResult": {
+      "great": "Fae ducks neatly under the fluttering swirl!",
+      "good": "Fae brushes a few feathers from her sleeve.",
+      "miss": "Poof! The gust scatters music sheets all around Fae."
+    },
+    "soothed": "The bluebird hops down and drops the little wooden mallet.",
+    "rest": "The bluebird settles on the piano for a little rest.",
+    "run": "Fae backs away slowly. The bluebird flutters another circle around the music room."
+  },
+  "coins": 8
+}

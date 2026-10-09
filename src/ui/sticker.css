@@ -197,6 +197,19 @@
   pointer-events: auto;
 }
 
+/* Five or more choices on a short screen sit in two columns, filled top to
+   bottom, so every one stays on screen and keeps its 44 px target. */
+@media (max-height: 560px) {
+  .sticker-choices:has(> .sticker-choice:nth-child(5)) {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(3, auto);
+    grid-auto-columns: 1fr;
+    width: min(480px, calc(100vw - 20px - var(--safe-left) -
+      max(calc(20px + var(--safe-right)), var(--touch-reserve-right))));
+  }
+}
+
 .sticker-choice {
   position: relative;
   min-height: 44px;

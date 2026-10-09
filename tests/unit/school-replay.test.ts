@@ -26,14 +26,14 @@ describe("school replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => world.storyVariable(state.ink, name);
-    expect(areas.slice(-5)).toEqual(["arcade", "plaza", "school", "classroom", "school"]);
+    expect(areas.slice(-5)).toEqual(["plaza", "school", "classroom", "school", "east-hall"]);
     expect(knots.slice(-7)).toEqual(["teacher", "rosie", "milo", "art_wall",
       "classroom_teacher", "hood_glimpse", "gym_hall"]);
     expect({ storyTime: story("story_time"), inHall: story("maple_in_hall"),
       waiting: story("hood_waiting"), saw: story("saw_hood") })
       .toEqual({ storyTime: true, inHall: false, waiting: false, saw: true });
     expect({ area: state.area, dialogue: state.dialogue, battle: state.battle })
-      .toEqual({ area: "school", dialogue: null, battle: null });
+      .toEqual({ area: "east-hall", dialogue: null, battle: null });
     const notes = journalNotes(world, state);
     expect(notes[0]).toBe(
       "The gym doors are locked during story time. Ms. Maple will know when it's over.");

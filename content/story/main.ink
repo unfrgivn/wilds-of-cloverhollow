@@ -72,7 +72,14 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {gym_quest and not calmed("gym-pup"): A fizzy pup is zooming around the gym with Coach Ash's stopwatch. # speaker: Fae}
 {gym_quest and not found_clipboard: {has_lasso:Coach Ash lent me his lasso, to get his clipboard down from the hoop.|{saw_clipboard:Coach Ash's clipboard is stuck on the basketball hoop. It's too high to reach!|Coach Ash's clipboard went flying, somewhere up high.}} # speaker: Fae}
 {gym_quest: The kid in the purple hood knocked over Coach Ash's cart, then ran out the back door to the playing field. # speaker: Fae}
-{pe_time and not gym_quest: Time for PE! The gym is at the end of the hall. # speaker: Fae}
+{has_flute: Ms. Willow gave me her very first flute! When I play it, animal friends come running. # speaker: Fae}
+{heard_bird and not has_flute: The bluebird sang a note just like the red bar. Maybe that's the song's last note! # speaker: Fae}
+{calmed("music-bird") and not has_flute: The bluebird gave back Ms. Willow's chime mallet. # speaker: Fae}
+{music_quest and not calmed("music-bird"): A bluebird took Ms. Willow's chime mallet. Maybe a kind word will calm it down. # speaker: Fae}
+{song_start and not has_flute: The class song goes red, yellow, blue... and the last note is under the purple scribbles. # speaker: Fae}
+{music_quest and not has_flute: The kid in the purple hood climbed in through the music room window and scribbled on the class song. # speaker: Fae}
+{music_time and not music_quest: Music class is next! Ms. Willow's music room is down the east hall. # speaker: Fae}
+{pe_time and not gym_quest: Time for PE! The gym is down the east hall. # speaker: Fae}
 {saw_hood and gym_hall and not pe_time: The gym doors are locked during story time. Ms. Maple will know when it's over. # speaker: Fae}
 {saw_hood: A kid in a purple hood ran off toward the gym! They dropped a purple marker, the same purple as the Star Racer scribbles. # speaker: Fae}
 {story_time and not saw_hood: Story time! Rosie and Milo are in my class. Maybe somebody saw the kid in the purple hood. # speaker: Fae}
@@ -436,7 +443,7 @@ Remember, Fae: a kind word can calm almost anything. # speaker: Ms. Maple
 -> DONE
 = pe
 That's the end of our story! Time for PE, everyone. # speaker: Ms. Maple
-Coach Ash is waiting for you in the gym, at the end of the hall. # speaker: Ms. Maple
+Coach Ash is waiting for you in the gym, down the east hall. # speaker: Ms. Maple
 ~ pe_time = true
 The gym! That's where the kid in the purple hood was headed. # speaker: Fae
 -> DONE
@@ -530,8 +537,11 @@ Coach Ash hands Fae a lasso of twisted rainbow rope, with a wooden star on its h
 My stopwatch AND my clipboard! You're a star, Fae! # speaker: Coach Ash
 ~ coach_thanked = true
 Keep the lasso. It can pull down things that are up high, and swing you across gaps, too! # speaker: Coach Ash
+~ music_time = true
+Oh, and music's next! Ms. Willow's room is down the east hall. # speaker: Coach Ash
 -> DONE
 = again
+{not music_quest: Music is next, Fae! Ms. Willow's room is down the east hall. # speaker: Coach Ash}
 Keep that lasso handy, Fae! And watch out for that purple hood. # speaker: Coach Ash
 -> DONE
 
@@ -714,3 +724,162 @@ The bakery smells like warm cinnamon buns. # speaker: Baker
 + [Not now]
     No rush! Come back when you're hungry. # speaker: Baker
 - -> DONE
+
+// The music room (Milestone 38).
+VAR music_time = false
+VAR music_quest = false
+VAR song_start = false
+VAR heard_bird = false
+VAR has_flute = false
+VAR xylophone_notes = 0
+VAR xylophone_right = true
+VAR xylophone_tune = ""
+
+=== music_closed ===
+The music room is locked. Music class is after PE. # speaker: Fae
+-> DONE
+
+=== art_room ===
+A paint palette on the door. The art room, maybe? It's locked. # speaker: Fae
+-> DONE
+
+=== music_teacher ===
+{has_flute: -> again}
+{music_quest: -> quest}
+~ music_quest = true
+Oh! Fae, come in, come in! Welcome to music class! # speaker: Ms. Willow
+I'm afraid it's been a terribly dramatic morning. # speaker: Ms. Willow
+Someone in a purple hood climbed in through my window and scribbled all over our class song! # speaker: Ms. Willow
+{calmed("music-bird"): -> mallet_back}
+And then a bluebird flew in after them and snatched my chime mallet! # speaker: Ms. Willow
+* [I'll get it back!]
+    Oh, would you? You're a dear. Gently, mind. It's only frightened. # speaker: Ms. Willow
+* [Did you see who it was?]
+    Only a purple hood, scrambling back out the window. Not so much as a hello! # speaker: Ms. Willow
+- -> song
+= mallet_back
+And you've found my chime mallet! The bluebird had it? Oh, thank you, Fae! # speaker: Ms. Willow
+-> song
+= song
+~ song_start = true
+Our class song goes red, yellow, blue... # speaker: Ms. Willow
+...and then I simply can't remember! The last note is under all those purple squiggles. # speaker: Ms. Willow
+-> DONE
+= quest
+{not calmed("music-bird"): That bluebird still has my mallet. A kind word might calm it down. # speaker: Ms. Willow}
+{calmed("music-bird"): You've got my mallet! Red, yellow, blue... and then? # speaker: Ms. Willow}
+{calmed("music-bird") and not heard_bird: That bluebird keeps singing one bright note. Have a listen! # speaker: Ms. Willow}
+{heard_bird: Try it on the xylophone! # speaker: Ms. Willow}
+-> DONE
+= again
+Play that flute whenever you need a friend, Fae! # speaker: Ms. Willow
+-> DONE
+
+=== music_bird_calm ===
+{music_bird_calm > 1: -> again}
+~ heard_bird = true
+Tweet! The bluebird puffs out its chest, very pleased with itself. # speaker: Music Bird
+It sings one bright, clear note. # speaker: Music Bird # sound: chime-red
+That note sounds just like the red bar on the xylophone! # speaker: Fae
+{music_quest:I've got Ms. Willow's chime mallet back!|A little wooden mallet. Whose could it be?} # speaker: Fae
+-> DONE
+= again
+The bluebird hums along to nothing in particular, very softly. # speaker: Music Bird
+-> DONE
+
+// The xylophone: four bars, then the song is judged. After the flute, free play.
+=== xylophone ===
+{not calmed("music-bird"): The rainbow xylophone! But there's no mallet to play it with. # speaker: Fae}
+{not calmed("music-bird"): -> DONE}
+~ xylophone_notes = 0
+~ xylophone_right = true
+{has_flute:A little tune of my own!|Which bar first?} # speaker: Fae
+-> bar
+= bar
++ [Red] -> red
++ [Yellow] -> yellow
++ [Green] -> green
++ [Blue] -> blue
++ [Stop] -> DONE
+= red
+~ xylophone_notes += 1
+{ xylophone_notes == 2 or xylophone_notes == 3:
+    ~ xylophone_right = false
+}
+{ xylophone_notes == 1 or has_flute:
+    ~ xylophone_tune = "Red"
+  - else:
+    ~ xylophone_tune = xylophone_tune + ", red"
+}
+{xylophone_tune}{has_flute or xylophone_notes == 4:!|...} # speaker: Fae # sound: chime-red
+-> next
+= yellow
+~ xylophone_notes += 1
+{ xylophone_notes != 2:
+    ~ xylophone_right = false
+}
+{ xylophone_notes == 1 or has_flute:
+    ~ xylophone_tune = "Yellow"
+  - else:
+    ~ xylophone_tune = xylophone_tune + ", yellow"
+}
+{xylophone_tune}{has_flute or xylophone_notes == 4:!|...} # speaker: Fae # sound: chime-yellow
+-> next
+= green
+~ xylophone_notes += 1
+~ xylophone_right = false
+{ xylophone_notes == 1 or has_flute:
+    ~ xylophone_tune = "Green"
+  - else:
+    ~ xylophone_tune = xylophone_tune + ", green"
+}
+{xylophone_tune}{has_flute or xylophone_notes == 4:!|...} # speaker: Fae # sound: chime-green
+-> next
+= blue
+~ xylophone_notes += 1
+{ xylophone_notes != 3:
+    ~ xylophone_right = false
+}
+{ xylophone_notes == 1 or has_flute:
+    ~ xylophone_tune = "Blue"
+  - else:
+    ~ xylophone_tune = xylophone_tune + ", blue"
+}
+{xylophone_tune}{has_flute or xylophone_notes == 4:!|...} # speaker: Fae # sound: chime-blue
+-> next
+= next
+{has_flute or xylophone_notes < 4: -> bar}
+{xylophone_right: -> song}
+Hmm. That doesn't sound like the class song. # speaker: Fae
+{not song_start: Maybe Ms. Willow knows how it goes. # speaker: Fae}
+{song_start and not heard_bird: Maybe that bluebird knows the last note. # speaker: Fae}
+-> DONE
+= song
+That's it! That's our class song! Bravo, Fae! # speaker: Ms. Willow
+You found the note the scribbles hid. Now come here, I have something for you. # speaker: Ms. Willow
+This was my very first flute, when I was just about your age. # speaker: Ms. Willow
+Ms. Willow gives Fae a little wooden flute, painted with flowers and pastel bands. # speaker: Fae
+~ has_flute = true
+~ music_quest = true
+Play it, and animal friends will come running to listen. # speaker: Ms. Willow
+Fae plays a soft little tune. # speaker: Fae # sound: flute
+-> DONE
+
+=== piano ===
+An upright piano, polished till it shines. Ms. Willow plays the class song on it. # speaker: Fae
+-> DONE
+
+=== song_poster ===
+Our class song, in big coloured dots... scribbled all over with purple marker! # speaker: Fae
+The same purple as the Star Racer scribbles. # speaker: Fae
+{not has_flute: The last note is completely hidden. # speaker: Fae}
+-> DONE
+
+=== music_window ===
+The window's wide open. That's how the kid in the purple hood got in, and out again. # speaker: Fae
+A few purple fuzzies are caught on the latch. # speaker: Fae
+-> DONE
+
+=== instrument_shelf ===
+Tambourines, maracas, a drum, and a triangle. Everything a band needs! # speaker: Fae
+-> DONE

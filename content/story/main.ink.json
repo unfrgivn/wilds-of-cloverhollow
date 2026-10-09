@@ -627,6 +627,219 @@
         "\n",
         "ev",
         {
+          "VAR?": "has_flute"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Ms. Willow gave me her very first flute! When I play it, animal friends come running. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.58"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "heard_bird"
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The bluebird sang a note just like the red bar. Maybe that's the song's last note! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.68"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^music-bird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The bluebird gave back Ms. Willow's chime mallet. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.81"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_quest"
+        },
+        "str",
+        "^music-bird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A bluebird took Ms. Willow's chime mallet. Maybe a kind word will calm it down. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.94"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "song_start"
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The class song goes red, yellow, blue... and the last note is under the purple scribbles. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.104"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_quest"
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The kid in the purple hood climbed in through the music room window and scribbled on the class song. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.114"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_time"
+        },
+        {
+          "VAR?": "music_quest"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Music class is next! Ms. Willow's music room is down the east hall. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.124"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "pe_time"
         },
         {
@@ -642,11 +855,11 @@
           },
           {
             "b": [
-              "^ Time for PE! The gym is at the end of the hall. ",
+              "^ Time for PE! The gym is down the east hall. ",
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.61"
+                "->": ".^.^.^.134"
               },
               null
             ]
@@ -680,7 +893,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.73"
+                "->": ".^.^.^.146"
               },
               null
             ]
@@ -705,7 +918,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.80"
+                "->": ".^.^.^.153"
               },
               null
             ]
@@ -735,7 +948,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.90"
+                "->": ".^.^.^.163"
               },
               null
             ]
@@ -769,7 +982,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.103"
+                "->": ".^.^.^.176"
               },
               null
             ]
@@ -798,7 +1011,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.113"
+                "->": ".^.^.^.186"
               },
               null
             ]
@@ -827,7 +1040,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.123"
+                "->": ".^.^.^.196"
               },
               null
             ]
@@ -861,7 +1074,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.136"
+                "->": ".^.^.^.209"
               },
               null
             ]
@@ -886,7 +1099,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.143"
+                "->": ".^.^.^.216"
               },
               null
             ]
@@ -911,7 +1124,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.150"
+                "->": ".^.^.^.223"
               },
               null
             ]
@@ -940,7 +1153,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.160"
+                "->": ".^.^.^.233"
               },
               null
             ]
@@ -965,7 +1178,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.167"
+                "->": ".^.^.^.240"
               },
               null
             ]
@@ -990,7 +1203,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.174"
+                "->": ".^.^.^.247"
               },
               null
             ]
@@ -1027,7 +1240,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.189"
+                "->": ".^.^.^.262"
               },
               null
             ]
@@ -1052,7 +1265,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.196"
+                "->": ".^.^.^.269"
               },
               null
             ]
@@ -1086,7 +1299,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.209"
+                "->": ".^.^.^.282"
               },
               null
             ]
@@ -1115,7 +1328,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.219"
+                "->": ".^.^.^.292"
               },
               null
             ]
@@ -1140,7 +1353,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.226"
+                "->": ".^.^.^.299"
               },
               null
             ]
@@ -1165,7 +1378,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.233"
+                "->": ".^.^.^.306"
               },
               null
             ]
@@ -1195,7 +1408,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.243"
+                "->": ".^.^.^.316"
               },
               null
             ]
@@ -1225,7 +1438,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.253"
+                "->": ".^.^.^.326"
               },
               null
             ]
@@ -1250,7 +1463,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.260"
+                "->": ".^.^.^.333"
               },
               null
             ]
@@ -1279,7 +1492,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.270"
+                "->": ".^.^.^.343"
               },
               null
             ]
@@ -1317,7 +1530,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.286"
+                "->": ".^.^.^.359"
               },
               null
             ]
@@ -1344,7 +1557,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.295"
+                "->": ".^.^.^.368"
               },
               null
             ]
@@ -1373,7 +1586,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.305"
+                "->": ".^.^.^.378"
               },
               null
             ]
@@ -1398,7 +1611,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.312"
+                "->": ".^.^.^.385"
               },
               null
             ]
@@ -1427,7 +1640,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.323"
+                "->": ".^.^.^.396"
               },
               null
             ]
@@ -1456,7 +1669,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.334"
+                "->": ".^.^.^.407"
               },
               null
             ]
@@ -3401,7 +3614,7 @@
             "^speaker: Ms. Maple",
             "/#",
             "\n",
-            "^Coach Ash is waiting for you in the gym, at the end of the hall. ",
+            "^Coach Ash is waiting for you in the gym, down the east hall. ",
             "#",
             "^speaker: Ms. Maple",
             "/#",
@@ -4141,10 +4354,48 @@
             "^speaker: Coach Ash",
             "/#",
             "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "music_time",
+              "re": true
+            },
+            "^Oh, and music's next! Ms. Willow's room is down the east hall. ",
+            "#",
+            "^speaker: Coach Ash",
+            "/#",
+            "\n",
             "done",
             null
           ],
           "again": [
+            "ev",
+            {
+              "VAR?": "music_quest"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Music is next, Fae! Ms. Willow's room is down the east hall. ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  {
+                    "->": ".^.^.^.5"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
             "^Keep that lasso handy, Fae! And watch out for that purple hood. ",
             "#",
             "^speaker: Coach Ash",
@@ -5216,6 +5467,1563 @@
         ],
         null
       ],
+      "music_closed": [
+        "^The music room is locked. Music class is after PE. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "art_room": [
+        "^A paint palette on the door. The art room, maybe? It's locked. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "music_teacher": [
+        [
+          "ev",
+          {
+            "VAR?": "has_flute"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.again"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "VAR?": "music_quest"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.quest"
+                },
+                {
+                  "->": ".^.^.^.10"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "music_quest",
+            "re": true
+          },
+          "^Oh! Fae, come in, come in! Welcome to music class! ",
+          "#",
+          "^speaker: Ms. Willow",
+          "/#",
+          "\n",
+          "^I'm afraid it's been a terribly dramatic morning. ",
+          "#",
+          "^speaker: Ms. Willow",
+          "/#",
+          "\n",
+          "^Someone in a purple hood climbed in through my window and scribbled all over our class song! ",
+          "#",
+          "^speaker: Ms. Willow",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^music-bird",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.mallet_back"
+                },
+                {
+                  "->": ".^.^.^.38"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^And then a bluebird flew in after them and snatched my chime mallet! ",
+          "#",
+          "^speaker: Ms. Willow",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^I'll get it back!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Did you see who it was?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Oh, would you? You're a dear. Gently, mind. It's only frightened. ",
+              "#",
+              "^speaker: Ms. Willow",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Only a purple hood, scrambling back out the window. Not so much as a hello! ",
+              "#",
+              "^speaker: Ms. Willow",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              {
+                "#f": 5
+              }
+            ],
+            "g-0": [
+              {
+                "->": ".^.^.^.song"
+              },
+              null
+            ]
+          }
+        ],
+        {
+          "mallet_back": [
+            "^And you've found my chime mallet! The bluebird had it? Oh, thank you, Fae! ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.song"
+            },
+            null
+          ],
+          "song": [
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "song_start",
+              "re": true
+            },
+            "^Our class song goes red, yellow, blue... ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "^...and then I simply can't remember! The last note is under all those purple squiggles. ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "quest": [
+            "ev",
+            "str",
+            "^music-bird",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ That bluebird still has my mallet. A kind word might calm it down. ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            "str",
+            "^music-bird",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ You've got my mallet! Red, yellow, blue... and then? ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  {
+                    "->": ".^.^.^.18"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            "str",
+            "^music-bird",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            {
+              "VAR?": "heard_bird"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ That bluebird keeps singing one bright note. Have a listen! ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  {
+                    "->": ".^.^.^.31"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "heard_bird"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Try it on the xylophone! ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  {
+                    "->": ".^.^.^.38"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "again": [
+            "^Play that flute whenever you need a friend, Fae! ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "music_bird_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "heard_bird",
+          "re": true
+        },
+        "^Tweet! The bluebird puffs out its chest, very pleased with itself. ",
+        "#",
+        "^speaker: Music Bird",
+        "/#",
+        "\n",
+        "^It sings one bright, clear note. ",
+        "#",
+        "^speaker: Music Bird ",
+        "/#",
+        "#",
+        "^sound: chime-red",
+        "/#",
+        "\n",
+        "^That note sounds just like the red bar on the xylophone! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_quest"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^I've got Ms. Willow's chime mallet back!",
+              {
+                "->": ".^.^.^.35"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^A little wooden mallet. Whose could it be?",
+              {
+                "->": ".^.^.^.35"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "^ ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The bluebird hums along to nothing in particular, very softly. ",
+            "#",
+            "^speaker: Music Bird",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "xylophone": [
+        "ev",
+        "str",
+        "^music-bird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The rainbow xylophone! But there's no mallet to play it with. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^music-bird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.19"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        0,
+        "/ev",
+        {
+          "VAR=": "xylophone_notes",
+          "re": true
+        },
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "xylophone_right",
+          "re": true
+        },
+        "ev",
+        {
+          "VAR?": "has_flute"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^A little tune of my own!",
+              {
+                "->": ".^.^.^.34"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^Which bar first?",
+              {
+                "->": ".^.^.^.34"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "^ ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        {
+          "->": ".^.bar"
+        },
+        {
+          "bar": [
+            [
+              "ev",
+              "str",
+              "^Red",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Yellow",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Green",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Blue",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-3",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Stop",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-4",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.red"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-1": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.yellow"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-2": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.green"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-3": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.blue"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-4": [
+                  "^ ",
+                  "done",
+                  "\n",
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "red": [
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "xylophone_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            2,
+            "==",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            3,
+            "==",
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_right",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.16"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "==",
+            {
+              "VAR?": "has_flute"
+            },
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  "str",
+                  "^Red",
+                  "/str",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.27"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "xylophone_tune"
+                  },
+                  "str",
+                  "^, red",
+                  "/str",
+                  "+",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.27"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_tune"
+            },
+            "out",
+            "/ev",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            {
+              "VAR?": "xylophone_notes"
+            },
+            4,
+            "==",
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.42"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.42"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: chime-red",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.next"
+            },
+            null
+          ],
+          "yellow": [
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "xylophone_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            2,
+            "!=",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_right",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "==",
+            {
+              "VAR?": "has_flute"
+            },
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  "str",
+                  "^Yellow",
+                  "/str",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.23"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "xylophone_tune"
+                  },
+                  "str",
+                  "^, yellow",
+                  "/str",
+                  "+",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.23"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_tune"
+            },
+            "out",
+            "/ev",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            {
+              "VAR?": "xylophone_notes"
+            },
+            4,
+            "==",
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.38"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.38"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: chime-yellow",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.next"
+            },
+            null
+          ],
+          "green": [
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "xylophone_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            false,
+            "/ev",
+            {
+              "VAR=": "xylophone_right",
+              "re": true
+            },
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "==",
+            {
+              "VAR?": "has_flute"
+            },
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  "str",
+                  "^Green",
+                  "/str",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.19"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "xylophone_tune"
+                  },
+                  "str",
+                  "^, green",
+                  "/str",
+                  "+",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.19"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_tune"
+            },
+            "out",
+            "/ev",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            {
+              "VAR?": "xylophone_notes"
+            },
+            4,
+            "==",
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.34"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.34"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: chime-green",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.next"
+            },
+            null
+          ],
+          "blue": [
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "xylophone_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            3,
+            "!=",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_right",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_notes"
+            },
+            1,
+            "==",
+            {
+              "VAR?": "has_flute"
+            },
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  "str",
+                  "^Blue",
+                  "/str",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.23"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  {
+                    "VAR?": "xylophone_tune"
+                  },
+                  "str",
+                  "^, blue",
+                  "/str",
+                  "+",
+                  "/ev",
+                  {
+                    "VAR=": "xylophone_tune",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.23"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_tune"
+            },
+            "out",
+            "/ev",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            {
+              "VAR?": "xylophone_notes"
+            },
+            4,
+            "==",
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.38"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.38"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: chime-blue",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.next"
+            },
+            null
+          ],
+          "next": [
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            {
+              "VAR?": "xylophone_notes"
+            },
+            4,
+            "<",
+            "||",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.bar"
+                  },
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "xylophone_right"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.song"
+                  },
+                  {
+                    "->": ".^.^.^.14"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^Hmm. That doesn't sound like the class song. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "song_start"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Maybe Ms. Willow knows how it goes. ",
+                  "#",
+                  "^speaker: Fae",
+                  {
+                    "->": ".^.^.^.26"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "song_start"
+            },
+            {
+              "VAR?": "heard_bird"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Maybe that bluebird knows the last note. ",
+                  "#",
+                  "^speaker: Fae",
+                  {
+                    "->": ".^.^.^.36"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "song": [
+            "^That's it! That's our class song! Bravo, Fae! ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "^You found the note the scribbles hid. Now come here, I have something for you. ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "^This was my very first flute, when I was just about your age. ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "^Ms. Willow gives Fae a little wooden flute, painted with flowers and pastel bands. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "has_flute",
+              "re": true
+            },
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "music_quest",
+              "re": true
+            },
+            "^Play it, and animal friends will come running to listen. ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "^Fae plays a soft little tune. ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: flute",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "piano": [
+        "^An upright piano, polished till it shines. Ms. Willow plays the class song on it. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "song_poster": [
+        "^Our class song, in big coloured dots... scribbled all over with purple marker! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^The same purple as the Star Racer scribbles. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The last note is completely hidden. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.15"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "music_window": [
+        "^The window's wide open. That's how the kid in the purple hood got in, and out again. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^A few purple fuzzies are caught on the latch. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "instrument_shelf": [
+        "^Tambourines, maracas, a drum, and a triangle. Everything a band needs! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
       "global decl": [
         "ev",
         "str",
@@ -5311,6 +7119,40 @@
         false,
         {
           "VAR=": "coach_thanked"
+        },
+        false,
+        {
+          "VAR=": "music_time"
+        },
+        false,
+        {
+          "VAR=": "music_quest"
+        },
+        false,
+        {
+          "VAR=": "song_start"
+        },
+        false,
+        {
+          "VAR=": "heard_bird"
+        },
+        false,
+        {
+          "VAR=": "has_flute"
+        },
+        0,
+        {
+          "VAR=": "xylophone_notes"
+        },
+        true,
+        {
+          "VAR=": "xylophone_right"
+        },
+        "str",
+        "^",
+        "/str",
+        {
+          "VAR=": "xylophone_tune"
         },
         "/ev",
         "end",

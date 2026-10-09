@@ -22,6 +22,8 @@ const rooms = [
   { room: "school", fixture: "school", prop: "cabinet" },
   { room: "classroom", fixture: "classroom", prop: "teacher-desk" },
   { room: "gym", fixture: "gym", prop: "ball-bin" },
+  { room: "east-hall", fixture: "east-hall", prop: "hall-bench" },
+  { room: "music", fixture: "music", prop: "xylophone" },
   { room: "arcade", fixture: "arcade", prop: "ticket-counter" },
 ];
 

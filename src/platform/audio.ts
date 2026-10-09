@@ -21,7 +21,8 @@ export type AudioController = {
 type Timing = { offset: number; duration: number; gain: number };
 type Segment =
   | (Timing & { wave: "noise"; lowpass: number })
-  | (Timing & { wave: "sine" | "square" | "triangle"; frequency: number; endFrequency?: number });
+  | (Timing & { wave: "sine" | "square" | "triangle"; frequency: number; endFrequency?: number;
+      vibrato?: { rate: number; depth: number } });
 type Recipe = readonly Segment[];
 
 const preferenceKey = "cloverhollow-audio";
@@ -90,6 +91,36 @@ const recipes: Record<SoundCue, Recipe> = {
     offset: 0, duration: .16, gain: .07,
   }],
   "battle-rest": [{ wave: "triangle", frequency: 262, offset: 0, duration: .16, gain: .07 }],
+  "chime-red": [
+    { wave: "sine", frequency: 523, offset: 0, duration: .28, gain: .11 },
+    { wave: "sine", frequency: 1569, offset: 0, duration: .09, gain: .027 },
+  ],
+  "chime-yellow": [
+    { wave: "sine", frequency: 659, offset: 0, duration: .28, gain: .11 },
+    { wave: "sine", frequency: 1977, offset: 0, duration: .09, gain: .027 },
+  ],
+  "chime-green": [
+    { wave: "sine", frequency: 784, offset: 0, duration: .28, gain: .11 },
+    { wave: "sine", frequency: 2352, offset: 0, duration: .09, gain: .027 },
+  ],
+  "chime-blue": [
+    { wave: "sine", frequency: 1047, offset: 0, duration: .34, gain: .12 },
+    { wave: "sine", frequency: 3141, offset: 0, duration: .11, gain: .03 },
+  ],
+  flute: [
+    { wave: "noise", lowpass: 1400, offset: 0, duration: .2, gain: .008 },
+    { wave: "sine", frequency: 784, endFrequency: 880, offset: 0, duration: .25, gain: .07,
+      vibrato: { rate: 5, depth: 2 } },
+    { wave: "noise", lowpass: 1400, offset: .23, duration: .2, gain: .008 },
+    { wave: "sine", frequency: 880, endFrequency: 988, offset: .23, duration: .25, gain: .07,
+      vibrato: { rate: 5, depth: 2 } },
+    { wave: "noise", lowpass: 1400, offset: .46, duration: .22, gain: .008 },
+    { wave: "sine", frequency: 988, endFrequency: 1175, offset: .46, duration: .27, gain: .075,
+      vibrato: { rate: 5, depth: 2 } },
+    { wave: "noise", lowpass: 1400, offset: .71, duration: .3, gain: .008 },
+    { wave: "sine", frequency: 1175, endFrequency: 1170, offset: .71, duration: .42, gain: .08,
+      vibrato: { rate: 5, depth: 3 } },
+  ],
 };
 
 // The context is made at boot and resumed at every chance: browsers keep it
@@ -166,6 +197,15 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
     oscillator.frequency.setValueAtTime(segment.frequency + jitter, start);
     if (segment.endFrequency !== undefined)
       oscillator.frequency.linearRampToValueAtTime(segment.endFrequency, end);
+    if (segment.vibrato !== undefined) {
+      const vibrato = audio.createOscillator();
+      const depth = audio.createGain();
+      vibrato.frequency.value = segment.vibrato.rate;
+      depth.gain.value = segment.vibrato.depth;
+      vibrato.connect(depth).connect(oscillator.frequency);
+      vibrato.start(start);
+      vibrato.stop(end);
+    }
     oscillator.connect(gain).connect(master);
     oscillator.start(start);
     oscillator.stop(end);

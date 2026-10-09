@@ -11,6 +11,8 @@ import passData from "../../content/areas/pass.json";
 import trailData from "../../content/areas/trail.json";
 import woodsData from "../../content/areas/woods.json";
 import arcadeData from "../../content/areas/arcade.json";
+import eastHallData from "../../content/areas/east-hall.json";
+import musicData from "../../content/areas/music.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -23,6 +25,8 @@ import bayPropsData from "../../content/props/bay.json";
 import passPropsData from "../../content/props/pass.json";
 import trailPropsData from "../../content/props/trail.json";
 import woodsPropsData from "../../content/props/woods.json";
+import eastHallPropsData from "../../content/props/east-hall.json";
+import musicPropsData from "../../content/props/music.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -37,6 +41,8 @@ import woodsFixtureData from "../../content/fixtures/woods.json";
 import kitchenFixtureData from "../../content/fixtures/kitchen.json";
 import classroomFixtureData from "../../content/fixtures/classroom.json";
 import gymFixtureData from "../../content/fixtures/gym.json";
+import eastHallFixtureData from "../../content/fixtures/east-hall.json";
+import musicFixtureData from "../../content/fixtures/music.json";
 import arcadeFixtureData from "../../content/fixtures/arcade.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
@@ -54,6 +60,7 @@ import gullData from "../../content/critters/gull.json";
 import owlData from "../../content/critters/owl.json";
 import arcadeKeeperData from "../../content/critters/arcade-keeper.json";
 import gymPupData from "../../content/critters/gym-pup.json";
+import musicBirdData from "../../content/critters/music-bird.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -62,6 +69,7 @@ import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
 import landsData from "../../content/lands.json";
 import { createInkState, createStoryReader } from "../core/ink";
+import { isStorySound } from "../core/sound";
 import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
 } from "./props";
@@ -167,6 +175,10 @@ export function storyTagErrors(tags: string[], areas: Record<string, Area>): str
     }
     if (tag.startsWith("buy:"))
       return /^buy:\s*snack\s+\d+$/.test(tag) ? [] : [`invalid buy tag "${tag}"`];
+    if (tag.startsWith("sound:")) {
+      const sound = tag.slice("sound:".length).trim();
+      return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
+    }
     return [];
   });
 }
@@ -323,7 +335,7 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
             record(item.point) &&
             typeof item.point.x === "number" &&
             typeof item.point.y === "number" &&
-            (item.prompt === "Look" || item.prompt === "Talk"),
+            (item.prompt === "Look" || item.prompt === "Play" || item.prompt === "Talk"),
         )),
     file,
     "interactables",
@@ -900,6 +912,10 @@ export function loadContent(): {
     parsePropCatalogue(woodsPropsData, "content/props/woods.json"));
   const arcade = parseArea(arcadeData, "content/areas/arcade.json",
     parsePropCatalogue(arcadePropsData, "content/props/arcade.json"));
+  const eastHall = parseArea(eastHallData, "content/areas/east-hall.json",
+    parsePropCatalogue(eastHallPropsData, "content/props/east-hall.json"));
+  const music = parseArea(musicData, "content/areas/music.json",
+    parsePropCatalogue(musicPropsData, "content/props/music.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -931,6 +947,7 @@ export function loadContent(): {
     [owlData, "owl"],
     [arcadeKeeperData, "arcade-keeper"],
     [gymPupData, "gym-pup"],
+    [musicBirdData, "music-bird"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -974,6 +991,8 @@ export function loadContent(): {
     kitchen: parseFixture(kitchenFixtureData, "content/fixtures/kitchen.json"),
     classroom: parseFixture(classroomFixtureData, "content/fixtures/classroom.json"),
     gym: parseFixture(gymFixtureData, "content/fixtures/gym.json"),
+    "east-hall": parseFixture(eastHallFixtureData, "content/fixtures/east-hall.json"),
+    music: parseFixture(musicFixtureData, "content/fixtures/music.json"),
     arcade: parseFixture(arcadeFixtureData, "content/fixtures/arcade.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
@@ -994,6 +1013,8 @@ export function loadContent(): {
     [trail.id]: trail,
     [woods.id]: woods,
     [arcade.id]: arcade,
+    [eastHall.id]: eastHall,
+    [music.id]: music,
   };
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));
   if (ruleProblems.length > 0) throw new Error(`content/areas: ${ruleProblems.join("; ")}`);

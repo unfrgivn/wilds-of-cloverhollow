@@ -1,3 +1,5 @@
+import type { StorySound } from "./sound";
+
 export type Point = { x: number; y: number };
 export type Polygon = [number, number][];
 export type Direction = "up" | "down" | "left" | "right";
@@ -69,7 +71,7 @@ export type Area = {
     id: string;
     knot: string;
     point: Point;
-    prompt: "Look" | "Talk";
+    prompt: "Look" | "Play" | "Talk";
   }[];
   // Story set pieces (spec 8): one critter kind each, at its point, calm or
   // chaos for the whole game (`state.critters`).
@@ -359,6 +361,7 @@ export type State = {
     choices: string[];
     selected: number;
     ended: boolean;
+    sound?: StorySound;
     travel?: { area: string; spawn: string };
   } | null;
   // The set pieces' moods, for the whole game.

@@ -1239,6 +1239,88 @@ the old trail, the owl, and the clubhouse claim.
   unchanged baselines; no recording changed.
 - Notes: no content, runtime art, recordings, or baselines changed.
 
+## Milestone 38: The music room and the flute **Status:** ✅ Completed (2026-10-09)
+- The school chapter goes on after PE. When Coach Ash thanks Fae, he sends
+  her to music class (`music_time`): "Oh, and music's next! Ms. Willow's room
+  is down the east hall."
+- The east hall (area `east-hall`, painted whole and split into a kit): the
+  school hall's floor ran off its east edge "toward the gym", and that
+  corridor is now a room of its own. It holds the gym's double doors (locked
+  until `pe_time`, knot `gym_hall`, as before), the music room door (locked
+  until `music_time`, knot `music_closed`), and a closed door with a palette
+  sign for later (Look point `art-room`). The hall's east edge leads into it
+  (trigger and spawn `east-hall`, in place of `gym-doors`), and the gym's door
+  leads back out into it.
+- The music room (area `music`, painted whole on the classroom's frame and
+  split into a kit): a rainbow xylophone on the rug, an upright piano with its
+  bench, a shelf of small instruments, the class song poster scribbled over in
+  purple, and the open window the kid climbed through.
+- Ms. Willow, the music teacher (a placeholder name; the owner's staff sheet:
+  curly hair, music-note earrings and scarf, her silver flute). Before class,
+  someone in a purple hood climbed in through her window, scribbled purple
+  all over the class song, and climbed back out, and a bluebird flew in after
+  them and took her chime mallet.
+- The quest:
+  - The music bird (set piece `music-bird`, a bluebird, "Flappy Bluebird" in
+    battle) flutters round the room. Calmed, it has dropped the mallet, like
+    the gym pup's stopwatch; listening to it (`heard_bird`) gives the song's
+    last note, the one under the scribbles: a bright note like the red bar.
+  - Ms. Willow remembers how the song starts: red, yellow, blue
+    (`song_start`).
+  - The xylophone (prompt `Play`) takes four bars from Red, Yellow, Green,
+    and Blue, or Stop. Each line shows the tune so far and plays its bar's
+    note; after four, the song is judged. A wrong song ends with a hint
+    toward whatever Fae is missing.
+  - Red, yellow, blue, red earns Ms. Willow's very first flute, the painted
+    wooden one from the owner's tools concept. Fae plays it once, its own
+    little melody (`has_flute`). After that the xylophone is free play.
+- The flute is a story item for now, like the lasso: no button. Calling
+  animal friends (NOTES.md) is a milestone of its own.
+- Sound: a story line may carry a `sound:` tag naming a story sound (the four
+  xylophone notes, a wooden-bar tone with an overtone; the flute, with a
+  breath of noise under it). The dialogue state carries it, and the sound
+  projection plays it when the line appears, a repeated line included.
+- Five or more dialogue choices on a short screen sit in two columns, filled
+  top to bottom: the xylophone's five ran off the top of an 874x402 phone.
+- Evidence: unit tests (`music.test.ts`: the story in every order, the song
+  right and wrong, Stop, free play, the journal, the sound projection;
+  `east-hall.test.ts`: the doors both ways and their locks; the area checks
+  and the drawing check over both rooms; the music replay), the recorded runs
+  `pass-party/school.json` and `gym.json` re-recorded through the east hall
+  and the new `pass-party/music.json` (`tools/sim/record-music.ts`: Coach
+  Ash's thanks, the east hall, Ms. Willow, the bird, the song, the flute),
+  kit walks for both rooms, and the real-key e2e `music.spec.ts` (the east
+  hall, the music room, the xylophone, and the flute at both sizes; the cue
+  log plays the bird's red note, then red, yellow, blue, red, then the flute;
+  browser and Bun hashes match). The UI gallery's five-choice state keeps
+  every choice on screen at every size, in Chromium and WebKit; without the
+  two-column rule that check fails. `just check` 435 tests, `just build`,
+  and `just e2e` (387 passed, 2 skipped). Every changed screenshot was viewed.
+- Notes and assumptions:
+  - The school hall has no free wall for another door (lockers, the notice
+    board, windows, and the nurse's door fill it), and adding one to the
+    approved painting would mean replacing something. So the corridor the
+    hall already runs into became the east hall, which has room for more
+    school rooms later (the art teacher, the principal: NOTES.md).
+  - Ms. Willow is a placeholder name, after Ms. Maple, Nurse Holly, and Coach
+    Ash. She keeps her silver flute (the staff sheet draws her with it);
+    Fae's is the wooden one from the tools concept.
+  - The music bird is a bluebird, so it shares the bluebird's sticker (each
+    species gives its sticker once).
+  - Gemini calls: 23 (the east hall's painting 7, including a repaint; the
+    music room's 2; the kits 12; Ms. Willow 2). The east hall's first painting
+    was drawn about 1.75x the hall's scale in another palette, and was
+    repainted with the hall as the first reference.
+  - Both rooms' first geometry was a rectangle over the whole painting, with
+    every prop a canopy and door triggers mid-floor; it was retraced: the
+    music room on the classroom's floor, the east hall from the walls'
+    wainscot line, column by column. Footprints are each object's base.
+  - The east hall's `west` spawn is at (260, 620), clear of the narrow wedge
+    where the floor runs off its left edge, so the whole party lines up
+    behind Fae; the kit walks start from each room's real spawn.
+  - Ms. Willow's look and name, both paintings, and the wording are in the
+    owner's review queue, with the earlier deferred reviews.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1435,13 +1517,15 @@ more bad guys, and the blacklight lantern, made and built while away.
     a separate Capacitor preference, with M or the Sound button inside the
     Journal pause menu.
     The harness exposes recent cue and playback logs without changing saves.
-  - Then: the music teacher's flute, a place where the lasso changes the
+  - Milestone 38, the music room and the flute: done (above).
+  - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).
 
 ## Later (not scheduled)
-The flute, the lasso's levers and gaps, the clubhouse fix-up, and more
+Calling animal friends with the flute, the lasso's levers and gaps, the
+clubhouse fix-up, and more
 mini-bosses (people under the chaos spell, NOTES.md).
 
 Sound follow-ups from Milestone 37:
@@ -1450,7 +1534,7 @@ Sound follow-ups from Milestone 37:
   synthesis like the effects, or a generator (paid generation needs the
   owner).
 - Footsteps by surface (grass, wood, sand) once the area kits carry ground
-  data (after Milestone 34); the flute's notes with the flute milestone.
+  data (after Milestone 34).
 - A volume slider beside mute.
 - iOS on a real device: the simulator check below should hold, but a phone
   with a pad and the silent switch hasn't been tried.

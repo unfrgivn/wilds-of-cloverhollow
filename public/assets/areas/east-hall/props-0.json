@@ -1,0 +1,60 @@
+{
+  "frames": {
+    "lockers": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 588
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 588
+      },
+      "sourceSize": {
+        "w": 390,
+        "h": 588
+      },
+      "anchor": {
+        "x": 0.50513,
+        "y": 0.9915
+      }
+    },
+    "hall-bench": {
+      "frame": {
+        "x": 392,
+        "y": 0,
+        "w": 330,
+        "h": 254
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 330,
+        "h": 254
+      },
+      "sourceSize": {
+        "w": 330,
+        "h": 254
+      },
+      "anchor": {
+        "x": 0.42424,
+        "y": 0.99213
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 588
+    },
+    "scale": "1"
+  }
+}

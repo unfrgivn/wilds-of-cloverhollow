@@ -1,0 +1,203 @@
+{
+  "id": "east-hall",
+  "name": "East Hall",
+  "land": "cloverhollow",
+  "ground": "east-hall",
+  "width": 1400,
+  "height": 800,
+  "walkable": [
+    [
+      14,
+      610
+    ],
+    [
+      100,
+      559
+    ],
+    [
+      300,
+      441
+    ],
+    [
+      632,
+      245
+    ],
+    [
+      800,
+      344
+    ],
+    [
+      1000,
+      462
+    ],
+    [
+      1160,
+      553
+    ],
+    [
+      1385,
+      420
+    ],
+    [
+      1385,
+      748
+    ],
+    [
+      255,
+      748
+    ],
+    [
+      60,
+      634
+    ]
+  ],
+  "blockers": [
+    [
+      [
+        1028,
+        478
+      ],
+      [
+        1118,
+        531
+      ],
+      [
+        1118,
+        548
+      ],
+      [
+        1028,
+        498
+      ]
+    ]
+  ],
+  "triggers": [
+    {
+      "id": "west",
+      "polygon": [
+        [
+          0,
+          560
+        ],
+        [
+          75,
+          560
+        ],
+        [
+          75,
+          690
+        ],
+        [
+          0,
+          690
+        ]
+      ],
+      "target": {
+        "area": "school",
+        "spawn": "east-hall"
+      }
+    },
+    {
+      "id": "gym-doors",
+      "polygon": [
+        [
+          95,
+          547
+        ],
+        [
+          274,
+          441
+        ],
+        [
+          274,
+          496
+        ],
+        [
+          95,
+          602
+        ]
+      ],
+      "target": {
+        "area": "gym",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "pe_time",
+        "knot": "gym_hall"
+      }
+    },
+    {
+      "id": "music-door",
+      "polygon": [
+        [
+          441,
+          343
+        ],
+        [
+          541,
+          284
+        ],
+        [
+          541,
+          339
+        ],
+        [
+          441,
+          398
+        ]
+      ],
+      "target": {
+        "area": "music",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "music_time",
+        "knot": "music_closed"
+      }
+    }
+  ],
+  "spawns": {
+    "west": {
+      "x": 260,
+      "y": 620,
+      "facing": "right"
+    },
+    "gym-doors": {
+      "x": 220,
+      "y": 575,
+      "facing": "right"
+    },
+    "music-door": {
+      "x": 500,
+      "y": 450,
+      "facing": "down"
+    }
+  },
+  "interactables": [
+    {
+      "id": "art-room",
+      "point": {
+        "x": 850,
+        "y": 405
+      },
+      "knot": "art_room",
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [],
+  "critters": [],
+  "props": [
+    {
+      "id": "hall-bench",
+      "prop": "hall-bench",
+      "x": 940,
+      "y": 512
+    },
+    {
+      "id": "lockers",
+      "prop": "lockers",
+      "x": 1265,
+      "y": 564
+    }
+  ]
+}

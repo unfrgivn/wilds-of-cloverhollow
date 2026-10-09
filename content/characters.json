@@ -71,5 +71,12 @@
     "idleTicks": [
       32
     ]
+  },
+  "music-teacher": {
+    "atlas": "assets/characters/music-teacher/music-teacher.json",
+    "idleTicks": [
+      180,
+      8
+    ]
   }
 }

@@ -26,6 +26,8 @@ const kitFixtures: Record<string, string> = {
   school: "school",
   classroom: "classroom",
   gym: "gym",
+  "east-hall": "east-hall",
+  music: "music",
   arcade: "arcade",
 };
 

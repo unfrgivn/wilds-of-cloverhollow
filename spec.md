@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 35, occluders retired)
+Last updated: 2026-10-08 (Milestone 38, the music room and the flute)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -217,6 +217,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   journal's notes heading (drawn like the coin and snack pills, with a larger
   invisible hit area), and is stored separately under `cloverhollow-audio` in
   Capacitor Preferences, never in the save.
+- Story lines may carry one of the closed `sound:` tags `chime-red`,
+  `chime-yellow`, `chime-green`, `chime-blue`, or `flute`. The tag is carried
+  by dialogue state and projected as a cue whenever that line opens or replaces
+  another line, including when the text is repeated. Unknown story sounds are
+  rejected by the content loader. The music-room recipes are synthesized
+  xylophone bars (C5, E5, G5, C6) and a short breathy rising flute call.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -411,16 +417,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   (section 6.2) are each desk with its chair, the teacher's desk, the cubbies,
   the bookshelf, and the two beanbags; the strip under the wall-hung
   chalkboard is a blocker.
-- The gym (Milestone 31): the hall's floor runs off the painting's east edge
-  toward the gym. Trigger `gym-doors`, a band along that whole edge (x
-  1330-1355, y 614-795), leads to `gym.door` and `requires` `pe_time` (knot
-  `gym_hall`, the locked doors); spawn `gym-doors` (1250, 700) faces left.
-  Ms. Maple sets `pe_time` the first time Fae talks to her in the classroom
+- The gym (Milestone 31): its double doors are in the east hall (below),
+  locked until `pe_time` (knot `gym_hall`). Ms. Maple sets `pe_time` the first time Fae talks to her in the classroom
   after glimpsing the hood (`saw_hood`): story time is over. If Fae hasn't
   heard her dragon story yet, she reads it first, in the same talk. `gym`,
   "School Gym", is a 1400x900 painted cutaway in the school's style (no
   concept sheet): a honey-wood court, double doors on the
-  back-left wall (trigger `door` to `school.gym-doors`, a slanted band along
+  back-left wall (trigger `door` to `east-hall.gym-doors`, a slanted band along
   the whole painted door; spawn `door` (350, 650) facing right), a basketball
   hoop, a climbing rope with a bell, a bin of bouncy balls, the blue mats,
   bleachers, a bench pair, and the back door to the playing field, which is a
@@ -436,6 +439,40 @@ ios/            Capacitor iOS project (from Milestone 4).
   Ash lends it for his clipboard on the hoop and lets Fae keep it. A Look
   point's knot checks it (the gym's `hoop`), so a lasso spot needs no engine
   support until one changes the world (a lever, a gap).
+- The east hall (Milestone 38): the hall's floor runs off the painting's east
+  edge into it. Trigger `east-hall`, a band along that whole edge (x
+  1330-1355, y 614-795), leads to `east-hall.west`; spawn `east-hall` (1250,
+  700) faces left. `east-hall`, "East Hall", is a 1400x800 painted corridor in
+  the hall's style. Fae comes in at its west end (trigger `west`, the wedge
+  where its floor runs off the left edge, back to `school.east-hall`; spawn
+  `west` (260, 620) facing right, so the whole party lines up behind her). On
+  its walls: the gym's double doors (trigger `gym-doors` to `gym.door`,
+  `requires` `pe_time`, knot `gym_hall`; spawn `gym-doors` (220, 575) facing
+  right), the music room door (trigger `music-door` to `music.door`,
+  `requires` `music_time`, knot `music_closed`; spawn `music-door` (500, 450)
+  facing down), and a closed door with a palette sign (Look point `art-room`).
+  Its props are the lockers and the bench; a blocker fills the pocket under
+  the wall fountain.
+- The music room (Milestone 38): `music`, "Music Room", a 1200x800 painted
+  cutaway on the classroom's frame. Its door is on the left back wall
+  (trigger `door` to `east-hall.music-door`; spawn `door` (280, 545) facing
+  right). Ms. Willow, the music teacher (`music-teacher`, knot
+  `music_teacher`), stands by the piano at (735, 410). Look points: `piano`,
+  `song-poster`, `music-window`, `instrument-shelf`, and the `xylophone`
+  (prompt `Play`). The music bird, a bluebird set piece, flutters at (560,
+  620). Its props are the xylophone, the piano with its bench, and the
+  instrument shelf.
+- The flute (Milestone 38): Coach Ash's thanks set `music_time`. Ms. Willow
+  tells Fae how the class song starts, red, yellow, blue (`song_start`); the
+  kid in the purple hood scribbled over the rest. A calm music bird has
+  dropped her mallet (`calmed("music-bird")`), and listening to it
+  (`heard_bird`) gives the last note: red. The xylophone takes four bars from
+  the choices Red, Yellow, Green, and Blue (or Stop), each line carrying its
+  bar's `sound:` tag, then judges the song: red, yellow, blue, red earns Ms.
+  Willow's very first flute, the painted wooden one (`has_flute`), which Fae
+  plays once (`sound: flute`); a wrong song ends with a hint. After that the
+  xylophone is free play. Like the lasso, the flute is a story item with no
+  button yet.
 - The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
   Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
   and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
@@ -490,8 +527,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   source px and the painting's `paper` margin colour). The paper colour fills
   the logical viewport behind the painting; the page colour `#f8edcf` shows
   only in letterbox bars outside it.
-- Areas may define `interactables` with `{ id, knot, point, prompt }`. Each
-  point must be reachable within the interaction range.
+- Areas may define `interactables` with `{ id, knot, point, prompt }`;
+  `prompt` is `Look`, or `Play` for something Fae plays (the music room's
+  xylophone). Each point must be reachable within the interaction range.
 - Glows (the blacklight lantern, Milestone 23): an area's `glows` are
   `{ id, frame, point, knot?, prompt?, flip? }`, a frame of
   `assets/glows/glows.json` (light painted on black, lifted by brightness).
@@ -741,7 +779,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - When touch controls are shown, the root has `data-touch="on"`, and CSS sets
   `--touch-reserve-right` to the confirm and cancel buttons' width plus their
   margin, the right inset, and 12 px. The dialogue box and choices end at that
-  reserve, so they never cover the buttons. It is pure CSS (no measuring in
+  reserve, so they never cover the buttons. Five or more choices on a screen
+  at most 560 px tall sit in two columns, filled top to bottom, so every
+  choice stays on screen at its 44 px height. It is pure CSS (no measuring in
   JavaScript), so it follows the insets as iOS applies them; `just ios-smoke`
   asserts it on the simulator.
 - Speaker tags are cream stickers with dark ink lettering, an ink outline,

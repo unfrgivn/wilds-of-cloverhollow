@@ -1,0 +1,84 @@
+{
+  "frames": {
+    "piano": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 420,
+        "h": 421
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 420,
+        "h": 421
+      },
+      "sourceSize": {
+        "w": 420,
+        "h": 421
+      },
+      "anchor": {
+        "x": 0.4881,
+        "y": 0.98575
+      }
+    },
+    "instrument-shelf": {
+      "frame": {
+        "x": 422,
+        "y": 0,
+        "w": 460,
+        "h": 331
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 460,
+        "h": 331
+      },
+      "sourceSize": {
+        "w": 460,
+        "h": 331
+      },
+      "anchor": {
+        "x": 0.48913,
+        "y": 1.05438
+      }
+    },
+    "xylophone": {
+      "frame": {
+        "x": 884,
+        "y": 0,
+        "w": 410,
+        "h": 237
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 410,
+        "h": 237
+      },
+      "sourceSize": {
+        "w": 410,
+        "h": 237
+      },
+      "anchor": {
+        "x": 0.48293,
+        "y": 0.9789
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 421
+    },
+    "scale": "1"
+  }
+}

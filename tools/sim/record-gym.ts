@@ -23,8 +23,10 @@ const path = "tests/sim/scripts/pass-party/school.json";
 for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
   for (let count = 0; count < segment.ticks; count += 1) play.tick(segment.frame);
 const story = (name: string): unknown => world.storyVariable(play.state().ink, name);
-if (story("saw_hood") !== true || play.state().area !== "school")
-  throw new Error("the school run didn't end in the hall after the hood");
+if (story("saw_hood") !== true || play.state().area !== "east-hall")
+  throw new Error("the school run didn't end in the east hall after the hood");
+
+play.through("school");
 
 // Back to the classroom: Ms. Maple ends story time. Time for PE!
 const outside = world.areas.school?.spawns["classroom-door"];
@@ -38,8 +40,9 @@ const inside = world.areas.classroom?.spawns["door"];
 if (inside === undefined) throw new Error("no classroom door spawn");
 play.navigate(inside, 6);
 play.through("school");
+play.through("east-hall");
 // Down the hall, through the gym doors, now open.
-const doors = world.areas.school?.spawns["gym-doors"];
+const doors = world.areas["east-hall"]?.spawns["gym-doors"];
 if (doors === undefined) throw new Error("no gym-doors spawn");
 play.navigate(doors, 6);
 play.through("gym");

@@ -1,0 +1,27 @@
+{
+  "asset": "music room painting",
+  "date": "2026-10-09",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 2,
+  "references": [
+    "docs/art/concepts/environments/school_interior.png",
+    "art/source/areas/school/school-final.png",
+    "art/source/areas/classroom/classroom-final.png",
+    "art/source/areas/gym/gym-final.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "selected": "art/source/areas/music/music-final.png",
+  "prompt_summary": "Cozy Cloverhollow elementary music room with left porthole door, rainbow xylophone, upright piano and bench, instrument shelf, purple-scribbled class-song poster, open curtained right window, rug, bunting, and open floor.",
+  "choice": "Selected the second generation after the first included a bluebird perched on the xylophone. The selected image removes the bird and people; the poster keeps abstract purple marker scribbles with no readable wording.",
+  "scale_reference": "Fae 280 source pixels; classroom door about 400 source pixels; 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2528x1696 source to 2400px wide, then center-cropped to 2400x1600 source pixels.",
+    "Stored the approved full painting as a single 2400x1600 PNG plate for the painting checkpoint.",
+    "Recorded paper colour #fcfbf6 in ground.json."
+  ],
+  "outputs": {
+    "source": "art/source/areas/music/music-final.png",
+    "plate": "public/assets/areas/music/music.png",
+    "manifest": "public/assets/areas/music/ground.json"
+  }
+}

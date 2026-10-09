@@ -8,7 +8,7 @@ async function run(command: string[]): Promise<void> {
 const whoArgument = Bun.argv.indexOf("--who");
 const requested = whoArgument >= 0 ? Bun.argv[whoArgument + 1] : undefined;
 if (requested === undefined) {
-  for (const person of ["teacher", "nurse", "coach"]) {
+    for (const person of ["teacher", "nurse", "coach", "music-teacher"]) {
     const process = Bun.spawn(["bun", "tools/art/build-staff.ts", "--who", person], {
       stdout: "inherit", stderr: "inherit",
     });
@@ -17,8 +17,8 @@ if (requested === undefined) {
   process.exit(0);
 }
 const who = requested;
-if (who !== "teacher" && who !== "nurse" && who !== "coach")
-  throw new Error("--who must be teacher, nurse, or coach");
+if (who !== "teacher" && who !== "nurse" && who !== "coach" && who !== "music-teacher")
+  throw new Error("--who must be teacher, nurse, coach, or music-teacher");
 const root = "art/source/staff/" + who;
 const frames = "art/scratch/" + who + "-build-frames";
 await run(["rm", "-rf", frames]);

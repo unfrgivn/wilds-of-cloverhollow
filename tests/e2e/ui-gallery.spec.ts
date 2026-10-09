@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 test.use({ deviceScaleFactor: 2 });
 
 const states = ["short", "long", "long-max", "revealing", "speaker-board",
-  "two-choices", "three-choices", "prompt", "touch-overlap"];
+  "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];
 const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
   "battle-reward"];
 const journalStates = ["journal-empty", "journal-notes", "journal-full"];
@@ -660,6 +660,11 @@ test.describe("sticker gallery", () => {
             fits: text !== null && text.scrollHeight <= text.clientHeight,
             lines: text === null ? 0 : text.clientHeight / lineHeight,
             choiceSizes: choices.map((choice) => choice.getBoundingClientRect().height),
+            choicesOnScreen: choices.every((choice) => {
+              const rect = choice.getBoundingClientRect();
+              return rect.top >= safe.top && rect.bottom <= innerHeight - safe.bottom &&
+                rect.left >= safe.left && rect.right <= innerWidth - safe.right;
+            }),
             stickHidden: getComputedStyle(document.querySelector(".touch-stick") ?? box).display
               === "none",
           };
@@ -669,6 +674,7 @@ test.describe("sticker gallery", () => {
         expect(facts.choiceOverlaps).toBe(false);
         expect(facts.fits).toBe(true);
         expect(facts.choiceSizes.every((height) => height >= 44)).toBe(true);
+        expect(facts.choicesOnScreen).toBe(true);
         expect(facts.stickHidden).toBe(true);
         if (state === "long-max") expect(facts.lines).toBeLessThanOrEqual(3.01);
       });

@@ -90,7 +90,7 @@ test("real keys: story time, the classroom, and a glimpse of the purple hood", a
     "The hall to the gym. The doors are locked during story time.",
   ]));
   const end = await readState(page);
-  expect(end.area).toBe("school");
+  expect(end.area).toBe("east-hall");
   expect((await renderInfo(page)).npcs.map((npc) => npc.id)).not.toContain("hooded-kid");
   expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
 });

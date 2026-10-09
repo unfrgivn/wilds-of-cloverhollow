@@ -1085,6 +1085,7 @@ function dialogueState(
     choices: result.choices,
     selected: 0,
     ended: result.ended,
+    ...(result.line?.sound === undefined ? {} : { sound: result.line.sound }),
     ...(travel === undefined ? {} : { travel }),
   };
 }

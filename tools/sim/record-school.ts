@@ -55,7 +55,11 @@ play.through("school");
 // From the kid's left, so they're both in view (the kid runs off to the right).
 play.approach("npc:hooded-kid", "left");
 play.talk("npc:hooded-kid");
-play.knock({ x: 1, y: 0 }, "gym_hall");
+play.through("east-hall");
+const gymDoors = world.areas["east-hall"]?.spawns["gym-doors"];
+if (gymDoors === undefined) throw new Error("no east-hall gym-doors spawn");
+play.navigate(gymDoors, 6);
+play.knock({ x: -1, y: 0 }, "gym_hall");
 const end = play.state();
 if (world.storyVariable(end.ink, "saw_hood") !== true) throw new Error("no glimpse of the hood");
 console.error(`school: ${end.tick} ticks, ${play.script.length} segments`);

@@ -1,0 +1,40 @@
+{
+  "asset": "music-teacher",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 2,
+  "generationCallsNote": "One three-view model sheet was generated and selected (1791516732552). The front pose blink is one local Gemini edit (1791516791804), both extracted by connected components; the selected side views are the sheet's own left and right figures.",
+  "date": "2026-10-09",
+  "references": [
+    "docs/art/concepts/npcs/school_staff_npcs.png",
+    "docs/art/concepts/characters/character_concept_sheet_fae.png"
+  ],
+  "selectedRawSources": [
+    "art/source/staff/music-teacher/model-sheet-raw.png",
+    "art/source/staff/music-teacher/pose-0.png",
+    "art/source/staff/music-teacher/blink-edit-raw.png",
+    "art/source/staff/music-teacher/pose-1.png",
+    "art/source/staff/music-teacher/pose-2.png"
+  ],
+  "generationLog": {
+    "modelSheet": "1791516732552-gemini-3-pro-image-0.png",
+    "blinkEdit": "1791516791804-gemini-3-pro-image-0.png"
+  },
+  "scaleFactor": "uniform adult scale selected by build-staff.ts to make the front figure 336 source px",
+  "postProcessing": {
+    "key": "#FF00FF border flood fill, 18% fuzz",
+    "despill": "edge-only magenta despill at a 20px matte band, restricted to alpha-edge pixels",
+    "canvas": "448x448 source pixels",
+    "figureHeight": "336 source pixels",
+    "baseline": 439,
+    "frames": "The front pose is down_idle_01; down_idle_02 is a local closed-eye blink edit. left_idle_01 is the sheet's left-facing side view and right_idle_01 its right-facing side view; neither is mirrored.",
+    "atlas": "tools/art/build-staff.ts, PixiJS v8"
+  },
+  "validator": {
+    "biped": false,
+    "idleOnly": true,
+    "directions": ["down", "left", "right"],
+    "key": "magenta"
+  },
+  "selectionReason": "The selected sheet matches the music teacher concept: curly brown hair, music-note earrings, peach sweater, music-note scarf, dark trousers, and a silver flute held in both hands in every view."
+}

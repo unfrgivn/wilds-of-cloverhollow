@@ -755,7 +755,7 @@ export class GameView {
     );
   }
 
-  /** The Talk prompt for this frame, anchored at the target in CSS px. */
+  /** The interaction prompt for this frame, anchored at the target in CSS px. */
   promptView(state: State): {
     visible: boolean;
     label: string;

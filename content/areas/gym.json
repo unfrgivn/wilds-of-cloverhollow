@@ -151,7 +151,7 @@
         ]
       ],
       "target": {
-        "area": "school",
+        "area": "east-hall",
         "spawn": "gym-doors"
       }
     }

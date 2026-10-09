@@ -1,0 +1,122 @@
+{
+  "area": "east-hall",
+  "subjects": [
+    {
+      "id": "lockers",
+      "crop": [
+        1150,
+        280,
+        250,
+        360
+      ],
+      "object": "the three school lockers standing together at the right of the image (blue, green, and blue), whole from their tops to their little feet; not the wall, the window, the drawings, or the floor",
+      "ground": "the tiled school hallway floor",
+      "seed": [
+        1230,
+        480
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            1170,
+            534
+          ],
+          [
+            1360,
+            423
+          ],
+          [
+            1360,
+            458
+          ],
+          [
+            1180,
+            564
+          ],
+          [
+            1170,
+            562
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    },
+    {
+      "id": "hall-bench",
+      "crop": [
+        840,
+        360,
+        240,
+        220
+      ],
+      "object": "the wooden hallway bench with its seat and legs",
+      "ground": "the tiled school hallway floor",
+      "seed": [
+        930,
+        470
+      ],
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [
+        [
+          [
+            840,
+            355
+          ],
+          [
+            915,
+            355
+          ],
+          [
+            915,
+            406
+          ],
+          [
+            840,
+            372
+          ]
+        ]
+      ],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [
+        [
+          [
+            872,
+            413
+          ],
+          [
+            1008,
+            488
+          ],
+          [
+            1008,
+            512
+          ],
+          [
+            872,
+            437
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "states": {}
+    }
+  ]
+}

@@ -5,7 +5,18 @@ export type SoundCue =
   | "choice-move" | "choice-select" | "journal-open" | "journal-close"
   | "footstep" | "door" | "area-arrive" | "coin" | "item" | "sticker"
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
-  | "battle-hit" | "battle-win" | "battle-run" | "battle-rest";
+  | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
+  | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
+
+export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
+
+export const storySounds: readonly StorySound[] = [
+  "chime-red", "chime-yellow", "chime-green", "chime-blue", "flute",
+];
+
+export function isStorySound(value: string): value is StorySound {
+  return storySounds.some((sound) => sound === value);
+}
 
 /** Sound is a projection of state changes, never a second game state machine. */
 export function soundCues(previous: State, next: State): SoundCue[] {
@@ -20,6 +31,10 @@ export function soundCues(previous: State, next: State): SoundCue[] {
       cues.push("dialogue-blip");
     if (oldDialogue.selected !== newDialogue.selected) cues.push("choice-move");
   }
+  if (newDialogue !== null && newDialogue.sound !== undefined &&
+      (oldDialogue === null || previous.ink !== next.ink ||
+        oldDialogue.sound !== newDialogue.sound))
+    cues.push(newDialogue.sound);
   if (oldDialogue !== null && newDialogue !== null &&
       oldDialogue.choices.length !== newDialogue.choices.length)
     cues.push("choice-select");

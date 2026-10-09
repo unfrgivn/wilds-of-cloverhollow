@@ -1,0 +1,10 @@
+{
+  "area": "east-hall",
+  "spawn": "west",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ]
+}

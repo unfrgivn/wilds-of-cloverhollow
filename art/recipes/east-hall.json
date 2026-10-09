@@ -1,0 +1,27 @@
+{
+  "asset": "east hall painting",
+  "date": "2026-10-09",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 7,
+  "references": [
+    "docs/art/concepts/environments/school_interior.png",
+    "art/source/areas/school/school-final.png",
+    "art/source/areas/classroom/classroom-final.png",
+    "art/source/areas/gym/gym-final.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "selected": "art/source/areas/east-hall/east-hall-final.png",
+  "prompt_summary": "East corridor of Cloverhollow elementary school, entering from the west, with three tall signed doors: basketball double doors, music-note classroom door, and paint-palette classroom door; lockers, bench, windows, drawings, fountain, and open floor.",
+  "choice": "The first three generations established the layout and signs but were too close to the hall or lost door signs. Three scale-correction generations followed. Selected the final generation because it keeps the hall camera, pink/salmon palette, paper border, left floor exit, and all three required door icons.",
+  "scale_reference": "Fae 280 source pixels; school doors about 400 source pixels; 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2752x1536 source by height to 2866x1600, then center-cropped to 2800x1600 source pixels.",
+    "Stored the approved full painting as a single 2800x1600 PNG plate for the painting checkpoint.",
+    "Recorded paper colour #fcfbf6 in ground.json."
+  ],
+  "outputs": {
+    "source": "art/source/areas/east-hall/east-hall-final.png",
+    "plate": "public/assets/areas/east-hall/east-hall.png",
+    "manifest": "public/assets/areas/east-hall/ground.json"
+  }
+}

@@ -134,7 +134,7 @@
       }
     },
     {
-      "id": "gym-doors",
+      "id": "east-hall",
       "polygon": [
         [
           1330,
@@ -154,12 +154,8 @@
         ]
       ],
       "target": {
-        "area": "gym",
-        "spawn": "door"
-      },
-      "requires": {
-        "variable": "pe_time",
-        "knot": "gym_hall"
+        "area": "east-hall",
+        "spawn": "west"
       }
     }
   ],
@@ -194,7 +190,7 @@
       "y": 450,
       "facing": "down"
     },
-    "gym-doors": {
+    "east-hall": {
       "x": 1250,
       "y": 700,
       "facing": "left"

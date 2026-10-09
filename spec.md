@@ -415,9 +415,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   toward the gym. Trigger `gym-doors`, a band along that whole edge (x
   1330-1355, y 614-795), leads to `gym.door` and `requires` `pe_time` (knot
   `gym_hall`, the locked doors); spawn `gym-doors` (1250, 700) faces left.
-  Ms. Maple sets `pe_time` once Fae has glimpsed the hood (`saw_hood`): story
-  time is over. `gym`, "School Gym", is a 1400x900 painted cutaway in the
-  school's style (no concept sheet): a honey-wood court, double doors on the
+  Ms. Maple sets `pe_time` the first time Fae talks to her in the classroom
+  after glimpsing the hood (`saw_hood`): story time is over. If Fae hasn't
+  heard her dragon story yet, she reads it first, in the same talk. `gym`,
+  "School Gym", is a 1400x900 painted cutaway in the school's style (no
+  concept sheet): a honey-wood court, double doors on the
   back-left wall (trigger `door` to `school.gym-doors`, a slanted band along
   the whole painted door; spawn `door` (350, 650) facing right), a basketball
   hoop, a climbing rope with a bell, a bin of bouncy balls, the blue mats,

@@ -424,11 +424,12 @@ The classroom door is shut. Story time hasn't started yet. # speaker: Fae
 -> DONE
 
 === classroom_teacher ===
-{saw_hood and not pe_time: -> pe}
+{classroom_teacher > 1 and saw_hood and not pe_time: -> pe}
 {classroom_teacher > 1: -> again}
 Today's story is about a dragon who sneezes bubbles instead of fire! # speaker: Ms. Maple
 Bubbles... like the fountain this morning. # speaker: Fae
 Everyone in the village got very sticky. Settle in, everyone! # speaker: Ms. Maple
+{saw_hood: -> pe}
 -> DONE
 = again
 Remember, Fae: a kind word can calm almost anything. # speaker: Ms. Maple

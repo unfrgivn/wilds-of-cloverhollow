@@ -118,17 +118,30 @@ function talkable(state: State, point: Point, id: string): boolean {
 }
 
 describe("PE time", () => {
+  const dragon = [
+    "Today's story is about a dragon who sneezes bubbles instead of fire!",
+    "Bubbles... like the fountain this morning.",
+    "Everyone in the village got very sticky. Settle in, everyone!",
+  ];
+  const pe = [
+    "That's the end of our story! Time for PE, everyone.",
+    "Coach Ash is waiting for you in the gym, at the end of the hall.",
+    "The gym! That's where the kid in the purple hood was headed.",
+  ];
+
   it("starts when Ms. Maple finishes the story, once Fae has glimpsed the hood", () => {
     // Before the glimpse, she reads her story as before.
-    const storyTime = play(fresh, "teacher").ink;
-    expect(play(storyTime, "classroom_teacher").lines[0])
-      .toBe("Today's story is about a dragon who sneezes bubbles instead of fire!");
+    const told = play(play(fresh, "teacher").ink, "classroom_teacher");
+    expect(told.lines).toEqual(dragon);
+    expect(variable(told.ink, "pe_time")).toBe(false);
+    // Story heard, then the glimpse: the next talk ends story time.
+    const after = play(play(play(told.ink, "rosie").ink, "hood_glimpse").ink,
+      "classroom_teacher");
+    expect(after.lines).toEqual(pe);
+    expect(variable(after.ink, "pe_time")).toBe(true);
+    // The glimpse first: she still reads her story, then ends story time.
     const { lines, ink } = play(glimpsed, "classroom_teacher");
-    expect(lines).toEqual([
-      "That's the end of our story! Time for PE, everyone.",
-      "Coach Ash is waiting for you in the gym, at the end of the hall.",
-      "The gym! That's where the kid in the purple hood was headed.",
-    ]);
+    expect(lines).toEqual([...dragon, ...pe]);
     expect(variable(ink, "pe_time")).toBe(true);
     // Once is enough: after that, her kind word.
     expect(play(ink, "classroom_teacher").lines)

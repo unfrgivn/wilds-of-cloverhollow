@@ -255,18 +255,7 @@ describe("props", () => {
   });
 
   it("are drawn whole: every prop's picture stands on its footprint", () => {
-    // A picture floating above its footprint, or a footprint reaching past its
-    // picture, in any area (spec 6.2). These four reach past their pictures and
-    // are known invisible walls: Milestone 34 kept the pass's old tested
-    // blockers as footprints so its replays walk as before, and the park's east
-    // bush overhangs by three columns. docs/plan.md lists the follow-up; fixing
-    // one means deleting it here.
-    expect(Object.values(world.areas).flatMap(propDrawingErrors)).toEqual([
-      "park: prop bush-right (default) has 15 footprint units with nothing drawn",
-      "pass: prop forest-left (default) has 35 footprint units with nothing drawn",
-      "pass: prop lodge (default) has 35 footprint units with nothing drawn",
-      "pass: prop benches (default) has 80 footprint units with nothing drawn",
-    ]);
+    expect(Object.values(world.areas).flatMap(propDrawingErrors)).toEqual([]);
   });
 
   it("fail the drawing check with a footprint under a neighbour's crown", () => {

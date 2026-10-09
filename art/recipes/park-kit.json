@@ -1,6 +1,6 @@
 {
   "asset": "park-kit",
-  "date": "2026-10-08",
+  "date": "2026-10-09",
   "summary": "The approved park painting split into a ground plate and 11 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/park.json",

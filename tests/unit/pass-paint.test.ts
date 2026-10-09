@@ -39,6 +39,8 @@ function standable(point: Point): boolean {
   if (!pointInPolygon(point, pass.walkable)) return false;
   if (distanceToPolygon(point, pass.walkable) < radius) return false;
   const solid = [...pass.blockers, ...pass.npcs.map((npc) => npc.footprint)];
+  solid.push(...pass.props.flatMap((prop) =>
+    Object.values(prop.states).flatMap((state) => state.footprint)));
   return solid.every(
     (polygon) => !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius,
   );
@@ -120,6 +122,24 @@ describe("Pinecone Pass follows its painting", () => {
         if (!near({ x, y }, 8)) missed += 1;
       }
     expect(missed / open).toBeLessThanOrEqual(0.02);
+  });
+
+  it("walls off every bench and leaves the forest alcove open", () => {
+    for (const [name, point] of [
+      ["left benches", { x: 825, y: 400 }],
+      ["front-left bench", { x: 900, y: 440 }],
+      ["front-right bench", { x: 955, y: 445 }],
+      ["back bench", { x: 810, y: 360 }],
+    ] as const)
+      expect(standable(point), name).toBe(false);
+    expect(standable({ x: 495, y: 850 })).toBe(true);
+  });
+
+  it("keeps the lodge corner in its painted prop", () => {
+    const lodge = pass.props.find((prop) => prop.id === "lodge");
+    const state = lodge?.states.default;
+    if (state === undefined) throw new Error("lodge prop missing");
+    expect(propCoversPoint(state, { x: 1465, y: 400 }, { x: 1465, y: 400 })).toBe(true);
   });
 
   const places: [string, Point][] = [

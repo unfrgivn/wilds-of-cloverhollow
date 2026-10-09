@@ -11,9 +11,14 @@ describe("lantern replay", () => {
     if (fixture === undefined) throw new Error("pass-party fixture missing");
     const path = "tests/sim/scripts/pass-party/lantern.json";
     let state = createState(content.world, fixture);
+    const knots = new Set<string>();
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
-      for (let tick = 0; tick < segment.ticks; tick += 1)
+      for (let tick = 0; tick < segment.ticks; tick += 1) {
         state = step(content.world, state, segment.frame).state;
+        if (state.dialogue !== null) knots.add(state.dialogue.knot);
+      }
+    // The doodle on the north lift tower and the arrow on the west pines.
+    expect([...knots]).toEqual(expect.arrayContaining(["lift_note", "old_trail_marker"]));
     expect(state.lantern).toBe(false);
     expect(content.world.storyVariable(state.ink, "found_old_trail")).toBe(true);
     const note = journalNotes(content.world, state)

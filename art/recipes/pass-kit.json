@@ -1,7 +1,7 @@
 {
   "asset": "pass-kit",
   "date": "2026-10-09",
-  "summary": "The approved pass painting split into a ground plate and 14 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "summary": "The approved pass painting split into a ground plate and 16 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/pass.json",
   "painting": "art/source/areas/pass/painting/ground.json",
@@ -46,6 +46,14 @@
         "crop.json"
       ],
       "benches": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "benches-front": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "bench-back": [
         "iso-1.jpg",
         "crop.json"
       ],
@@ -99,6 +107,8 @@
     "lodge",
     "cocoa-stand",
     "benches",
+    "benches-front",
+    "bench-back",
     "bus-shelter",
     "trail-sign",
     "lift-tower-west",

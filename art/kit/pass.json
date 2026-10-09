@@ -40,11 +40,11 @@
             790
           ],
           [
-            520,
-            900
+            474,
+            850
           ],
           [
-            500,
+            474,
             1000
           ],
           [
@@ -79,6 +79,10 @@
             1100
           ]
         ]
+      ],
+      "home": [
+        349,
+        1050
       ]
     },
     {
@@ -419,11 +423,11 @@
             182
           ],
           [
-            1490,
+            1478,
             330
           ],
           [
-            1470,
+            1478,
             470
           ],
           [
@@ -514,40 +518,66 @@
         ],
         [
           [
-            1450,
-            150
+            900,
+            470
           ],
           [
             1550,
-            150
+            470
           ],
           [
             1550,
-            480
+            550
           ],
           [
-            1450,
-            480
+            900,
+            550
           ]
         ],
         [
           [
-            900,
-            470
+            1390,
+            100
           ],
           [
             1550,
-            470
+            100
           ],
           [
             1550,
-            550
+            340
           ],
           [
-            900,
-            550
+            1485,
+            340
+          ],
+          [
+            1390,
+            175
+          ]
+        ],
+        [
+          [
+            1480,
+            340
+          ],
+          [
+            1550,
+            340
+          ],
+          [
+            1550,
+            480
+          ],
+          [
+            1480,
+            480
           ]
         ]
+      ],
+      "home": [
+        1270,
+        470
       ]
     },
     {
@@ -603,7 +633,7 @@
       ],
       "painted": true,
       "ground": "the packed snow around the row of wooden benches",
-      "object": "the group of four wooden benches in the centre of the pass, including their seats, backs, legs, and attached snow, as one group",
+      "object": "the left pair of wooden benches in the centre of the pass, including their seats, backs, legs, and attached snow, as one group; exclude the separate front-right pair and back-left bench",
       "footprint": [
         [
           [
@@ -611,16 +641,116 @@
             372
           ],
           [
-            980,
-            385
+            850,
+            372
           ],
           [
-            978,
-            428
+            850,
+            423
           ],
           [
             805,
-            428
+            423
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "home": [
+        893,
+        428
+      ]
+    },
+    {
+      "id": "benches-front",
+      "crop": [
+        875,
+        380,
+        125,
+        105
+      ],
+      "seed": [
+        930,
+        430
+      ],
+      "painted": true,
+      "ground": "the packed snow around the front-right pair of wooden benches",
+      "object": "the front-right pair of wooden benches, including both seats, backs, legs, and attached snow, as one group; exclude all other benches and ground",
+      "footprint": [
+        [
+          [
+            883,
+            420
+          ],
+          [
+            925,
+            420
+          ],
+          [
+            925,
+            461
+          ],
+          [
+            883,
+            461
+          ]
+        ],
+        [
+          [
+            935,
+            430
+          ],
+          [
+            974,
+            430
+          ],
+          [
+            974,
+            461
+          ],
+          [
+            935,
+            461
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bench-back",
+      "crop": [
+        750,
+        285,
+        110,
+        95
+      ],
+      "seed": [
+        810,
+        350
+      ],
+      "painted": true,
+      "ground": "the packed snow around the back-left wooden bench",
+      "object": "the single back-left wooden bench, including its seat, back, legs, and attached snow; exclude all other benches and ground",
+      "footprint": [
+        [
+          [
+            780,
+            350
+          ],
+          [
+            840,
+            350
+          ],
+          [
+            840,
+            370
+          ],
+          [
+            780,
+            370
           ]
         ]
       ],

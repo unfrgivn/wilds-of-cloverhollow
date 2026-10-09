@@ -584,6 +584,18 @@
       "prop": "bus-sign",
       "x": 1023,
       "y": 925
+    },
+    {
+      "id": "benches-front",
+      "prop": "benches-front",
+      "x": 929,
+      "y": 461
+    },
+    {
+      "id": "bench-back",
+      "prop": "bench-back",
+      "x": 810,
+      "y": 370
     }
   ]
 }

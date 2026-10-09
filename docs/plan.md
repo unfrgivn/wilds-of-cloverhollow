@@ -1518,12 +1518,21 @@ more bad guys, and the blacklight lantern, made and built while away.
     Journal pause menu.
     The harness exposes recent cue and playback logs without changing saves.
   - Milestone 38, the music room and the flute: done (above).
-  - A fix in progress (2026-10-09): the Whispering Woods' north-east log (Fae
-    can stand on it, and its footprint is a wall on the open grass south of
-    it) and its stream (Fae can walk on the water), found by auditing the
-    kits against their paintings; `.worktrees/woods-fix`, branch `woods-fix`.
-    It touches the woods' kit and area, a kit check, and the replays that
-    cross the woods.
+  - A fix (2026-10-09), found by auditing the kits against their paintings:
+    the Whispering Woods' north-east log is the whole log, solid where it lies
+    (Fae could stand on it, and its footprint was a wall on the open grass
+    south of it), and its stream is water but for the stepping-stone
+    crossing. `propDrawingErrors` now excuses a bare footprint column only
+    where a neighbour in front covers its front: a tree's crown far above had
+    hidden the log's footprint. The woods run and the runs chained from it
+    are re-recorded.
+  - Follow-up, open: four footprints still reach past their pictures, pinned
+    as known in `tests/unit/props.test.ts`: Pinecone Pass's forest-left and
+    lodge (35 units each) and benches (80), the old tested blockers it kept
+    in Milestone 34, and Meadow Park's east bush (15). Trimming them changes
+    collision where they reach, so the runs that cross them re-record. The
+    woods' floor is still Milestone 26's rectangle, so Fae can walk into the
+    forest behind the clearing (its trees fade over her).
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

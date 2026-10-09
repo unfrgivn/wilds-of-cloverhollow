@@ -2914,7 +2914,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 15
+    "ticks": 40
   },
   {
     "frame": {
@@ -2926,7 +2926,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 90
+    "ticks": 40
   },
   {
     "frame": {
@@ -2939,6 +2939,30 @@
       "menu": false
     },
     "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 25
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 15
   },
   {
     "frame": {
@@ -3449,13 +3473,49 @@
     "frame": {
       "move": {
         "x": -1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
         "y": 0
       },
       "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 221
+    "ticks": 170
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 3
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 46
   },
   {
     "frame": {

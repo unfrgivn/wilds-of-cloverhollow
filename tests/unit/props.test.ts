@@ -256,8 +256,37 @@ describe("props", () => {
 
   it("are drawn whole: every prop's picture stands on its footprint", () => {
     // A picture floating above its footprint, or a footprint reaching past its
-    // picture, in any area (spec 6.2).
-    expect(Object.values(world.areas).flatMap(propDrawingErrors)).toEqual([]);
+    // picture, in any area (spec 6.2). These four reach past their pictures and
+    // are known invisible walls: Milestone 34 kept the pass's old tested
+    // blockers as footprints so its replays walk as before, and the park's east
+    // bush overhangs by three columns. docs/plan.md lists the follow-up; fixing
+    // one means deleting it here.
+    expect(Object.values(world.areas).flatMap(propDrawingErrors)).toEqual([
+      "park: prop bush-right (default) has 15 footprint units with nothing drawn",
+      "pass: prop forest-left (default) has 35 footprint units with nothing drawn",
+      "pass: prop lodge (default) has 35 footprint units with nothing drawn",
+      "pass: prop benches (default) has 80 footprint units with nothing drawn",
+    ]);
+  });
+
+  it("fail the drawing check with a footprint under a neighbour's crown", () => {
+    // The footprint the woods' north-east log shipped with: a strip on the open
+    // grass 35 units south of the log, under tree-east's crown. Tree-east is in
+    // front there, but its picture covers the strip's front only by its trunk,
+    // so the strip's other columns are bare.
+    const woods = world.areas.woods;
+    if (woods === undefined) throw new Error("woods missing");
+    const log = woods.props.find((prop) => prop.id === "log-north");
+    const state = log?.states.default;
+    if (log === undefined || state === undefined) throw new Error("no north-east log");
+    const strip: Polygon[] = [[[1145, 490], [1190, 490], [1270, 490], [1350, 495],
+      [1380, 500], [1340, 501], [1260, 501], [1180, 497]]];
+    const { left, step, columns } = state.silhouette;
+    const shipped = { ...woods, props: woods.props.map((prop) => prop !== log ? prop : {
+      ...log, states: { default: { ...state, footprint: strip,
+        front: frontEdge(strip, left, step, columns.length, log.y) } } }) };
+    expect(propDrawingErrors(shipped)).toContainEqual(
+      expect.stringMatching(/^woods: prop log-north \(default\) has \d+ footprint units/));
   });
 
   it("fail the drawing check with a footprint off their picture", () => {
@@ -274,7 +303,7 @@ describe("props", () => {
     const moved = { ...plaza, props: [{ ...bench, states: { default: { ...state,
       footprint: wide, front: frontEdge(wide, left, width, columns.length, bench.y) } } }] };
     expect(propDrawingErrors(moved)).toEqual([
-      expect.stringMatching(/^plaza: prop bench-south \(default\) has \d+ footprint columns/),
+      expect.stringMatching(/^plaza: prop bench-south \(default\) has \d+ footprint units/),
       expect.stringMatching(/^plaza: prop bench-south \(default\): its picture's foot is 3\d /),
     ]);
   });

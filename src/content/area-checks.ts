@@ -184,12 +184,13 @@ export function hiddenPositions(
 /*
  * Authoring check: is every prop drawn whole, standing on its footprint? Its
  * picture must cover each 5-unit column its footprint covers (one may go
- * spare at an end), except where another prop's picture stands in front of it
- * there (a cabinet's side behind its neighbour's), and in those columns reach
- * to within 15 units of the footprint's front. A crop that missed the object's
- * foot, a mask that kept only part of it, or a footprint reaching past the
- * object (an invisible wall, and a front edge that sorts people beside the
- * object behind it) fails here.
+ * spare at an end), except where another prop in front of it there covers its
+ * foot with its own picture (a cabinet's side behind its neighbour's; a tree's
+ * crown high above covers nothing), and in those columns reach to within 15
+ * units of the footprint's front. A crop that missed the object's foot, a mask
+ * that kept only part of it, or a footprint reaching past the object (an
+ * invisible wall, and a front edge that sorts people beside the object behind
+ * it) fails here.
  */
 export function propDrawingErrors(area: Area): string[] {
   const drawn = (state: PropState, x: number): [number, number][] =>
@@ -197,36 +198,46 @@ export function propDrawingErrors(area: Area): string[] {
       ?? [];
   const frontAt = (state: PropState, x: number): number | undefined =>
     state.front.ys[Math.floor((x - state.silhouette.left) / state.silhouette.step)];
+  const footOf = (state: PropState): number =>
+    Math.max(...state.silhouette.columns.flat().map(([, bottom]) => bottom));
   return area.props.flatMap((prop) => Object.entries(prop.states).flatMap(([name, state]) => {
     const points = state.footprint.flat();
     if (points.length === 0) return [];
     const xs = points.map(([x]) => x);
-    // Another prop's picture in front of this one at x hides it there: drawn
-    // there, with its front south of this footprint's (which may run on past
-    // this prop's own picture, behind its neighbour).
-    const hidden = (x: number): boolean => area.props.some((other) => {
-      if (other.id === prop.id) return false;
-      const theirs = other.states[other.state];
+    // A neighbour hides this prop at x when it is in front there (its front
+    // south of this footprint's) and its picture covers this footprint's
+    // front, where this object meets the ground.
+    const hidden = (x: number): boolean => {
       const mine = frontEdge(state.footprint, x - state.silhouette.step / 2,
         state.silhouette.step, 1, prop.y).ys[0];
-      const before = theirs === undefined ? undefined : frontAt(theirs, x);
-      return theirs !== undefined && drawn(theirs, x).length > 0 && mine !== undefined &&
-        before !== undefined && before > mine;
-    });
+      if (mine === undefined) return false;
+      return area.props.some((other) => {
+        const theirs = other.states[other.state];
+        if (other.id === prop.id || theirs === undefined) return false;
+        const before = frontAt(theirs, x);
+        return before !== undefined && before > mine &&
+          drawn(theirs, x).some(([top, bottom]) => top <= mine && mine <= bottom);
+      });
+    };
     let bare = 0;
     let front = -Infinity;
     for (let x = Math.min(...xs) + state.silhouette.step / 2; x < Math.max(...xs);
       x += state.silhouette.step) {
-      if (drawn(state, x).length === 0) {
+      const own = drawn(state, x);
+      const mine = frontEdge(state.footprint, x - state.silhouette.step / 2,
+        state.silhouette.step, 1, prop.y).ys[0];
+      if (own.length === 0) {
         if (!hidden(x)) bare += 1;
         continue;
       }
+      if (mine !== undefined && footOf(state) < mine - 25) bare += 1;
       front = Math.max(front, frontAt(state, x) ?? -Infinity);
     }
     const foot = Math.max(...state.silhouette.columns.flat().map(([, bottom]) => bottom));
     const at = `${area.id}: prop ${prop.id} (${name})`;
     return [
-      ...(bare > 1 ? [`${at} has ${bare} footprint columns with nothing drawn`] : []),
+      ...(bare > 1
+        ? [`${at} has ${bare * state.silhouette.step} footprint units with nothing drawn`] : []),
       ...(front - foot > 15
         ? [`${at}: its picture's foot is ${Math.round(front - foot)} units above its front`]
         : []),

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { areaConnectionErrors, hiddenPositions } from "../../src/content/area-checks";
+import {
+  areaConnectionErrors, hiddenPositions, reachablePositions,
+} from "../../src/content/area-checks";
 import { loadContent } from "../../src/content/load";
 import { faeBox, propCovers, type Area } from "../../src/core";
 
@@ -13,8 +15,22 @@ describe("Whispering Woods area kit", () => {
     expect(area.width).toBe(1750);
     expect(area.height).toBe(1100);
     // The log-west pocket and the forest behind the tree house.
-    expect(area.blockers).toHaveLength(2);
+    expect(area.blockers).toHaveLength(4);
     expect(area.props).toHaveLength(10);
+  });
+
+  it("blocks the log and stream while leaving the stepping-stone crossing open", () => {
+    const reachable = new Set(reachablePositions(area, world.tunables.playerRadius)
+      .map(({ x, y }) => `${x},${y}`));
+    for (const point of [[1160, 420], [1190, 430], [1220, 415], [1240, 440],
+      [1280, 430], [1300, 435], [1320, 440], [1340, 445]])
+      expect(reachable.has(`${point[0]},${point[1]}`), `log ${point}`).toBe(false);
+    for (const point of [[1230, 500]])
+      expect(reachable.has(`${point[0]},${point[1]}`), `grass ${point}`).toBe(true);
+    for (const point of [[1055, 380], [940, 455], [880, 600], [820, 635], [960, 660]])
+      expect(reachable.has(`${point[0]},${point[1]}`), `water ${point}`).toBe(false);
+    expect(reachable.has("900,520")).toBe(true);
+    expect(reachable.has("1100,500")).toBe(true);
   });
 
   it("keeps every woodland prop's ground contact solid", () => {

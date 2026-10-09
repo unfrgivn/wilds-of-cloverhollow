@@ -617,9 +617,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   blocker. The authoring check `propDrawingErrors`
   (`src/content/area-checks.ts`, run by `just check`) holds every prop to its
   footprint: its picture covers every 5-unit column its footprint covers
-  (one may go spare at an end), except where another prop's picture stands in
-  front of it there, and in those columns reaches to within 15 units of its
-  front.
+  (one may go spare at an end), except where another prop in front of it
+  there covers its footprint's front with its own picture (a tree's crown
+  high above covers nothing), and in those columns reaches to within 15 units
+  of its front. Four footprints from Milestone 34 still reach past their
+  pictures and are pinned as known in `tests/unit/props.test.ts` until they
+  are fixed (`docs/plan.md`).
 - A catalogue, `content/props/<area>.json` (written by `tools/art/kit.ts`),
   lists the area's atlases (Pixi spritesheets in
   `public/assets/areas/<area>/props-N.json`, frames anchored at the prop's
@@ -1280,3 +1283,5 @@ comic books, half-eaten fizzy cracker, and lantern-revealed note about meeting
 “the boss” at the sealed Ancient Tree in the Enchanted Forest. Once the owl is
 calm it sets `clubhouse_claimed`; Sue promises a fridge and Jordan a garden.
 Journal output records the trail, owl, and clubhouse beats newest first.
+Its stream is water (blockers along its banks); Fae crosses it on the stepping
+stones.

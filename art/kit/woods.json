@@ -504,61 +504,123 @@
     {
       "id": "log-north",
       "crop": [
-        1000,
-        250,
-        500,
-        400
+        1100,
+        330,
+        300,
+        220
       ],
       "seed": [
-        1260,
-        500
+        1190,
+        425
       ],
       "samples": {
         "object": 1,
         "fill": 1
       },
       "ground": "the mossy green forest floor beside the stream",
-      "object": "the horizontal moss-covered fallen log beside the stream, including its round cut end and cast shadow, but not the stream, rocks, plants, or ground",
+      "object": "the fallen mossy log beside the stream, with its bark, moss on top, and round cut end at the left, but not the tree trunk or roots on its right, the clover, mushrooms, stream, rocks, plants, or ground",
       "footprint": [
         [
           [
-            1145,
-            490
+            1140,
+            430
           ],
           [
-            1190,
-            490
+            1170,
+            430
           ],
           [
-            1270,
-            490
-          ],
-          [
-            1350,
-            495
-          ],
-          [
-            1380,
-            500
-          ],
-          [
-            1340,
-            501
+            1210,
+            425
           ],
           [
             1260,
-            501
+            430
           ],
           [
-            1180,
-            497
+            1320,
+            438
+          ],
+          [
+            1375,
+            442
+          ],
+          [
+            1375,
+            472
+          ],
+          [
+            1320,
+            474
+          ],
+          [
+            1260,
+            468
+          ],
+          [
+            1210,
+            458
+          ],
+          [
+            1170,
+            448
+          ],
+          [
+            1140,
+            438
           ]
         ]
       ],
       "painted": true,
-      "home": [
-        1263,
-        520
+      "front": [
+        "tree-east"
+      ],
+      "core": 2,
+      "exclude": [
+        [
+          [
+            1382,
+            330
+          ],
+          [
+            1420,
+            330
+          ],
+          [
+            1420,
+            560
+          ],
+          [
+            1382,
+            560
+          ]
+        ],
+        [
+          [
+            1237,
+            530
+          ],
+          [
+            1260,
+            468
+          ],
+          [
+            1320,
+            474
+          ],
+          [
+            1382,
+            474
+          ],
+          [
+            1382,
+            560
+          ],
+          [
+            1237,
+            560
+          ]
+        ]
       ]
     },
     {

@@ -1533,6 +1533,9 @@ more bad guys, and the blacklight lantern, made and built while away.
     collision where they reach, so the runs that cross them re-record. The
     woods' floor is still Milestone 26's rectangle, so Fae can walk into the
     forest behind the clearing (its trees fade over her).
+    In progress (2026-10-09): the four footprints, `.worktrees/walls`,
+    branch `walls-fix`. It touches the pass's and the park's kits and the
+    runs that cross them.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

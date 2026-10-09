@@ -14,8 +14,9 @@ describe("Whispering Woods area kit", () => {
   it("uses the 1750x1100 painted forest plate", () => {
     expect(area.width).toBe(1750);
     expect(area.height).toBe(1100);
-    // The log-west pocket and the forest behind the tree house.
-    expect(area.blockers).toHaveLength(4);
+    // The log-west pocket and the stream. The clubhouse's old north pocket
+    // is now outside the traced clearing and needs no blocker.
+    expect(area.blockers).toHaveLength(3);
     expect(area.props).toHaveLength(10);
   });
 
@@ -31,6 +32,17 @@ describe("Whispering Woods area kit", () => {
       expect(reachable.has(`${point[0]},${point[1]}`), `water ${point}`).toBe(false);
     expect(reachable.has("900,520")).toBe(true);
     expect(reachable.has("1100,500")).toBe(true);
+  });
+
+  it("keeps the painted clearing and exits, not the surrounding forest", () => {
+    const reachable = new Set(reachablePositions(area, world.tunables.playerRadius)
+      .map(({ x, y }) => `${x},${y}`));
+    for (const point of [[900, 200], [1000, 250], [1500, 300], [220, 300],
+      [1500, 500], [1600, 400], [1650, 300], [1400, 250]])
+      expect(reachable.has(`${point[0]},${point[1]}`), `forest ${point}`).toBe(false);
+    for (const point of [[180, 540], [875, 350], [875, 520], [700, 800],
+      [1120, 700], [900, 520], [1100, 500], [1500, 700], [1650, 560]])
+      expect(reachable.has(`${point[0]},${point[1]}`), `clearing ${point}`).toBe(true);
   });
 
   it("keeps every woodland prop's ground contact solid", () => {

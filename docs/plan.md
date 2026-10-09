@@ -1535,10 +1535,11 @@ more bad guys, and the blacklight lantern, made and built while away.
     east bush ends at its leaves. The lantern run, re-recorded, goes round
     the back bench, and its replay test checks it reads the lift-tower
     doodle.
-  - Follow-up, open: the woods' floor is still Milestone 26's rectangle, so
-    Fae can walk into the forest behind the clearing (its trees fade over
-    her). In progress (2026-10-09): `.worktrees/woods-floor`, branch
-    `woods-floor`; it touches the woods' area and the runs that cross it.
+  - A third fix (2026-10-09): the woods' floor is the painted clearing, not
+    Milestone 26's rectangle. Fae stops where the painted ground meets the
+    forest behind the clearing and the big trunks, and corridors behind the
+    edge trunks keep both exits. The woods run and the runs chained from it
+    (arcade, school, gym, music) are re-recorded and read the same beats.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

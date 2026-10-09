@@ -1282,4 +1282,7 @@ comic books, half-eaten fizzy cracker, and lantern-revealed note about meeting
 calm it sets `clubhouse_claimed`; Sue promises a fridge and Jordan a garden.
 Journal output records the trail, owl, and clubhouse beats newest first.
 Its stream is water (blockers along its banks); Fae crosses it on the stepping
-stones.
+stones. Its floor is the painted clearing, one polygon round the open ground
+and the stream's banks: the forest behind the clearing, the big trunks, and
+the ground behind the clubhouse are off it, and corridors behind the edge
+trunks keep its two exits.

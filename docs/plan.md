@@ -1184,6 +1184,42 @@ the old trail, the owl, and the clubhouse claim.
     every area to 15 in `just check`. When Milestone 34 rebases, the outdoor
     kits meet the shared check.
 
+## Milestone 34: The outdoor kits **Status:** ✅ Completed (2026-10-08)
+- The five outdoor areas are kits (spec 6.2): Meadow Park, Bubblegum Bay,
+  Pinecone Pass, the Cliffside Trail, and the Whispering Woods. With
+  Milestone 33 every area is a kit and none has occluders left.
+- Each prop is its own object cut from the approved painting, footed on its
+  own ground contact, with the M33 checks (`propDrawingErrors`, one floor per
+  area, the hiding check) holding every area in `just check`. Trees and ferns
+  Fae walks behind are canopies. Every prop is painted but the woods' south
+  log, which is lifted with its ground inpainted.
+- Notable props: the bay's dock rail is one prop (`dock-rail-south`) in place
+  of 24 occluder slivers, since a prop sorts column by column along its foot;
+  the trail's footbridge is one near-rail prop (the deck and the far rail
+  stay in the painting); the pass's footprints are its old tested blockers,
+  so every pass replay walks exactly as before.
+- Evidence: the area checks and `props.test.ts` over every area; the bay's
+  depth tests and the canopy tests ported to props; the replays re-recorded
+  where they changed (the park's chapter-one chain, the trail's lookout, and
+  the lantern run) with matching browser and Bun hashes; the e2e specs that
+  named occluders (the snowman, the palm canopy, the footbridge) read prop
+  strips.
+- Notes and assumptions:
+  - Gemini calls: 123 (the woods 44, the pass 25, the bay 20, the park and
+    the trail 17 each), many of them re-isolates after crops that missed the
+    object or seeds placed on the wrong thing.
+  - `tools/art/geometry/pass.ts` and `woods.ts` are gone; `trail.ts` still
+    writes the trail's floor and blockers.
+  - Added blockers where the floor behind an object shouldn't be entered: the
+    pocket behind the park's tower, the forest behind the woods' tree house,
+    and one under the woods' west log. The park's two side fences became props
+    in place of their blockers.
+  - The woods' west and north logs stayed painted after their inpainted
+    ground failed `pack`'s fill check; the park's basket too.
+  - Owner review of every area's props is deferred (owner, 2026-10-08: "we'll
+    review everything later"): `art/review/<area>-kit-frames.png`,
+    `<area>-kit-depth.png`, `<area>-kit-overlay.png`.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1369,9 +1405,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     - Milestone 33, the indoor kits: the bedroom, the kitchen, the school
       hall, the classroom, the gym, and the arcade. Done (above).
     - Milestone 34, the outdoor kits: the park, Bubblegum Bay, Pinecone Pass,
-      the Cliffside Trail, and the Whispering Woods.
-      In progress beside Milestone 33 (2026-10-08): `.worktrees/m34`, branch
-      `m34-outdoor`; it lands after Milestone 33 and rebases onto it.
+      the Cliffside Trail, and the Whispering Woods. Done (above).
     - Milestone 35, occluders retired: the old cutouts, baselines, slivers,
       and their tools go.
     Until Milestone 34 lands, don't start a milestone that adds or reshapes

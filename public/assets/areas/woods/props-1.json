@@ -1,0 +1,60 @@
+{
+  "frames": {
+    "oak-west": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 770,
+        "h": 1286
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 770,
+        "h": 1286
+      },
+      "sourceSize": {
+        "w": 770,
+        "h": 1286
+      },
+      "anchor": {
+        "x": 0.51818,
+        "y": 0.95645
+      }
+    },
+    "tree-east": {
+      "frame": {
+        "x": 772,
+        "y": 0,
+        "w": 1250,
+        "h": 1181
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1250,
+        "h": 1181
+      },
+      "sourceSize": {
+        "w": 1250,
+        "h": 1181
+      },
+      "anchor": {
+        "x": 0.5712,
+        "y": 0.88061
+      }
+    }
+  },
+  "meta": {
+    "image": "props-1.png",
+    "size": {
+      "w": 2048,
+      "h": 1286
+    },
+    "scale": "1"
+  }
+}

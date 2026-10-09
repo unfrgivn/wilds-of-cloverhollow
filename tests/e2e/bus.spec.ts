@@ -107,8 +107,10 @@ test("Fae walks behind the snowman, and it's drawn over her", async ({ page }) =
   const state = await readState(page);
   expect(state.player.y).toBeLessThan(660);
   expect(Math.abs(state.player.x - 1152)).toBeLessThan(12);
-  const order = (await renderInfo(page)).drawOrder;
-  const z = (label: string): number => order.find((item) => item.label === label)?.zIndex ?? -1;
-  expect(z("occluder:snowman"), "the snowman is drawn over Fae").toBeGreaterThan(z("fae"));
+  const info = await renderInfo(page);
+  const fae = info.drawOrder.find((item) => item.label === "fae")?.zIndex ?? Infinity;
+  const snowman = info.props.find((prop) => prop.id === "snowman")?.strips
+    .filter((strip) => strip.left < state.player.x + 25 && strip.right > state.player.x - 25) ?? [];
+  expect(snowman.some((strip) => strip.zIndex > fae), "the snowman is drawn over Fae").toBe(true);
   await expect(page).toHaveScreenshot("pass-snowman-behind.png");
 });

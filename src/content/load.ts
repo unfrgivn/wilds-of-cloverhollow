@@ -18,6 +18,11 @@ import schoolPropsData from "../../content/props/school.json";
 import classroomPropsData from "../../content/props/classroom.json";
 import gymPropsData from "../../content/props/gym.json";
 import arcadePropsData from "../../content/props/arcade.json";
+import parkPropsData from "../../content/props/park.json";
+import bayPropsData from "../../content/props/bay.json";
+import passPropsData from "../../content/props/pass.json";
+import trailPropsData from "../../content/props/trail.json";
+import woodsPropsData from "../../content/props/woods.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -915,21 +920,26 @@ export function loadContent(): {
     parsePropCatalogue(plazaPropsData, "content/props/plaza.json"));
   const kitchen = parseArea(kitchenData, "content/areas/kitchen.json",
     parsePropCatalogue(kitchenPropsData, "content/props/kitchen.json"));
-  const park = parseArea(parkData, "content/areas/park.json");
+  const park = parseArea(parkData, "content/areas/park.json",
+    parsePropCatalogue(parkPropsData, "content/props/park.json"));
   const school = parseArea(schoolData, "content/areas/school.json",
     parsePropCatalogue(schoolPropsData, "content/props/school.json"));
   const classroom = parseArea(classroomData, "content/areas/classroom.json",
     parsePropCatalogue(classroomPropsData, "content/props/classroom.json"));
   const gym = parseArea(gymData, "content/areas/gym.json",
     parsePropCatalogue(gymPropsData, "content/props/gym.json"));
-  const bay = parseArea(bayData, "content/areas/bay.json");
+  const bay = parseArea(bayData, "content/areas/bay.json",
+    parsePropCatalogue(bayPropsData, "content/props/bay.json"));
   Object.defineProperty(bay.spawns, "bus-stop", {
     value: { x: 355, y: 545, facing: "down" },
     enumerable: false,
   });
-  const pass = parseArea(passData, "content/areas/pass.json");
-  const trail = parseArea(trailData, "content/areas/trail.json");
-  const woods = parseArea(woodsData, "content/areas/woods.json");
+  const pass = parseArea(passData, "content/areas/pass.json",
+    parsePropCatalogue(passPropsData, "content/props/pass.json"));
+  const trail = parseArea(trailData, "content/areas/trail.json",
+    parsePropCatalogue(trailPropsData, "content/props/trail.json"));
+  const woods = parseArea(woodsData, "content/areas/woods.json",
+    parsePropCatalogue(woodsPropsData, "content/props/woods.json"));
   const arcade = parseArea(arcadeData, "content/areas/arcade.json",
     parsePropCatalogue(arcadePropsData, "content/props/arcade.json"));
   field(

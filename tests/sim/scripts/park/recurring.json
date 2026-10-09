@@ -1041,7 +1041,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 10
+    "ticks": 15
   },
   {
     "frame": {
@@ -1053,7 +1053,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 9
+    "ticks": 5
   },
   {
     "frame": {
@@ -1377,7 +1377,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 110
+    "ticks": 113
   },
   {
     "frame": {

@@ -1,13 +1,16 @@
 import { readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { distanceToPolygon, pointInPolygon, type Area, type Point } from "../../src/core";
+import {
+  distanceToPolygon, everyPropFootprint, pointInPolygon, propCoversPoint, type Area, type Point,
+  type PropState,
+} from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import paint from "./fixtures/bay-paint.json";
 
-// Contract for Milestone 19: what Bubblegum Bay draws in front of Fae. An
-// occluder is drawn over her where it overlaps her body box (50 x 140 units
-// above her feet) while her feet are north of its baseline, like
-// src/content/area-checks.ts. Points are read off the painting (units).
+// Contract for Milestone 19 (props since Milestone 34): what Bubblegum Bay
+// draws in front of Fae. A prop is drawn over her where its picture overlaps
+// her body box (50 x 140 units above her feet) in a column where her feet are
+// north of its front edge (spec 6.2). Points are read off the painting (units).
 
 const world = loadContent().world;
 const radius = world.tunables.playerRadius;
@@ -22,22 +25,26 @@ const bay = bayArea();
 function standable(point: Point): boolean {
   if (!pointInPolygon(point, bay.walkable)) return false;
   if (distanceToPolygon(point, bay.walkable) < radius) return false;
-  const solid = [...bay.blockers, ...bay.npcs.map((npc) => npc.footprint)];
+  const solid = [...bay.blockers, ...everyPropFootprint(bay),
+    ...bay.npcs.map((npc) => npc.footprint)];
   return solid.every(
     (polygon) => !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius,
   );
 }
 
 // The share of Fae's body rows from `top` to `bottom` units above her feet
-// (on a 5-unit grid) that occluders draw over.
+// (on a 5-unit grid) that props draw over.
+const states: { id: string; state: PropState }[] = bay.props.flatMap((prop) => {
+  const state = prop.states.default;
+  return state === undefined ? [] : [{ id: prop.id, state }];
+});
 function coverage(feet: Point, top = 140, bottom = 0): number {
-  const covering = bay.occluders.filter((occluder) => feet.y < occluder.baseline);
   let covered = 0;
   let samples = 0;
   for (let y = feet.y - top; y <= feet.y - bottom; y += 5)
     for (let x = feet.x - 25; x <= feet.x + 25; x += 5) {
       samples += 1;
-      if (covering.some((occluder) => pointInPolygon({ x, y }, occluder.polygon))) covered += 1;
+      if (states.some(({ state }) => propCoversPoint(state, feet, { x, y }))) covered += 1;
     }
   return covered / samples;
 }
@@ -127,13 +134,11 @@ describe("what Bubblegum Bay draws in front of Fae", () => {
       expect(bestIn(x0, x1, y0, y1), name).toBeGreaterThanOrEqual(0.1);
     });
 
-  // An occluder must sit on its object, not on open beach or sea: at most a
-  // quarter of its cells may be open sand or water (a 3x3 neighbourhood all
-  // sand or all water). Counting painted cells instead fails on white
-  // canopy stripes, which read as sand. Measured: fitted umbrella, sign, and
-  // trunks 0.00-0.14; a loose box round the umbrella 0.30; round-one picnic
-  // 0.39 and the palm drawn over the sea 0.87.
-  it("cuts every occluder tight around something painted", () => {
+  // A prop must sit on its object, not on open beach or sea: at most a
+  // quarter of the cells its picture covers may be open sand or water (a 3x3
+  // neighbourhood all sand or all water). Counting painted cells instead
+  // fails on white canopy stripes, which read as sand.
+  it("cuts every prop tight around something painted", () => {
     const rows = paint.rows;
     const at = (i: number, j: number): string => rows[j]?.[i] ?? "?";
     const open = (i: number, j: number): boolean =>
@@ -142,26 +147,29 @@ describe("what Bubblegum Bay draws in front of Fae", () => {
           for (let dx = -1; dx <= 1; dx += 1) if (at(i + dx, j + dy) !== kind) return false;
         return true;
       });
-    for (const occluder of bay.occluders) {
+    for (const { id, state } of states) {
+      const { left, step, columns } = state.silhouette;
       let cells = 0;
       let bare = 0;
       rows.forEach((row, j) => {
         for (let i = 0; i < row.length; i += 1) {
-          const centre = { x: (i + 0.5) * paint.cellUnits, y: (j + 0.5) * paint.cellUnits };
-          if (!pointInPolygon(centre, occluder.polygon)) continue;
+          const x = (i + 0.5) * paint.cellUnits;
+          const y = (j + 0.5) * paint.cellUnits;
+          const column = columns[Math.floor((x - left) / step)] ?? [];
+          if (!column.some(([from, to]) => y >= from && y <= to)) continue;
           cells += 1;
           if (open(i, j)) bare += 1;
         }
       });
-      expect(cells, `${occluder.id} is smaller than a cell`).toBeGreaterThan(0);
-      expect(bare / cells, `${occluder.id} covers open beach or sea`).toBeLessThanOrEqual(0.25);
+      expect(cells, `${id} is smaller than a cell`).toBeGreaterThan(0);
+      expect(bare / cells, `${id} covers open beach or sea`).toBeLessThanOrEqual(0.25);
     }
   });
 
-  it("ships exactly the cut-outs its occluders name", () => {
-    const files = readdirSync("public/assets/areas/bay")
-      .filter((file) => file.endsWith(".webp") && !file.startsWith("ground_"))
-      .sort();
-    expect(files).toEqual(bay.occluders.map((occluder) => `${occluder.id}.webp`).sort());
+  it("ships only its plate and its prop atlases", () => {
+    const files = readdirSync("public/assets/areas/bay").filter((file) =>
+      !/^ground(_\d+_\d+\.webp|\.json)$/.test(file) && !/^props-\d+\.(png|json)$/.test(file));
+    expect(files).toEqual([]);
+    expect(bay.occluders).toEqual([]);
   });
 });

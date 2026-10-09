@@ -125,10 +125,12 @@ test("real keys over the footbridge to the lookout, and down into the bay", asyn
       Math.abs(state.player.y - 560) < 12;
     if (onBridge && !bridgeShot) {
       bridgeShot = true;
-      const order = (await renderInfo(page)).drawOrder;
-      const fae = order.find((item) => item.label === "fae")?.zIndex ?? Infinity;
-      const rail = order.filter((item) => item.label.startsWith("occluder:bridge-rail-"));
-      expect(rail.length).toBe(4);
+      const info = await renderInfo(page);
+      const fae = info.drawOrder.find((item) => item.label === "fae")?.zIndex ?? Infinity;
+      const rail = info.props.find((prop) => prop.id === "bridge-rail")?.strips
+        .filter((strip) => strip.left < state.player.x + 25 && strip.right > state.player.x - 25)
+        ?? [];
+      expect(rail.length).toBeGreaterThan(0);
       expect(rail.some((item) => item.zIndex > fae), "the near rail is drawn over her")
         .toBe(true);
       await expect(page).toHaveScreenshot("trail-bridge.png");

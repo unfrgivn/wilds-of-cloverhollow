@@ -1,0 +1,640 @@
+{
+  "area": "park",
+  "subjects": [
+    {
+      "id": "tree-house",
+      "crop": [
+        480,
+        0,
+        460,
+        480
+      ],
+      "seed": [
+        700,
+        430
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass and pale path wash",
+      "object": "the entire large hollow tree house in the centre of the crop: its broad leafy green canopy, warm brown branching trunk and roots, arched door and small window, keeping it as one continuous object; not the separate bush at either side and not the ground",
+      "footprint": [
+        [
+          [
+            580,
+            449
+          ],
+          [
+            620,
+            438
+          ],
+          [
+            690,
+            437
+          ],
+          [
+            760,
+            442
+          ],
+          [
+            835,
+            448
+          ],
+          [
+            875,
+            460
+          ],
+          [
+            870,
+            472
+          ],
+          [
+            790,
+            472
+          ],
+          [
+            700,
+            470
+          ],
+          [
+            620,
+            470
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "tower",
+      "crop": [
+        900,
+        140,
+        240,
+        450
+      ],
+      "seed": [
+        1015,
+        500
+      ],
+      "painted": true,
+      "canopy": false,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass",
+      "object": "the complete tan wooden children's play tower with its raised square walls, crenellated roof, flagpole and flag, supports, ramp and open lower passage; keep every tower part as one object, not the flowers, bushes or grass",
+      "footprint": [
+        [
+          [
+            925,
+            440
+          ],
+          [
+            1015,
+            430
+          ],
+          [
+            1112,
+            470
+          ],
+          [
+            1110,
+            525
+          ],
+          [
+            1040,
+            570
+          ],
+          [
+            1005,
+            568
+          ],
+          [
+            935,
+            530
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bush-left",
+      "crop": [
+        480,
+        280,
+        130,
+        150
+      ],
+      "seed": [
+        535,
+        370
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass",
+      "object": "the rounded leafy green bush filling the crop, including its warm ink outline and all leaves; not the large tree trunk and not grass",
+      "footprint": [
+        [
+          [
+            505,
+            392
+          ],
+          [
+            520,
+            382
+          ],
+          [
+            545,
+            380
+          ],
+          [
+            570,
+            388
+          ],
+          [
+            590,
+            402
+          ],
+          [
+            585,
+            412
+          ],
+          [
+            555,
+            416
+          ],
+          [
+            525,
+            414
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bush-right",
+      "crop": [
+        850,
+        280,
+        100,
+        160
+      ],
+      "seed": [
+        900,
+        370
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass",
+      "object": "the rounded leafy green bush filling the crop, including its warm ink outline and all leaves; not the play tower or grass",
+      "footprint": [
+        [
+          [
+            875,
+            398
+          ],
+          [
+            888,
+            388
+          ],
+          [
+            910,
+            388
+          ],
+          [
+            928,
+            400
+          ],
+          [
+            930,
+            418
+          ],
+          [
+            910,
+            422
+          ],
+          [
+            885,
+            418
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "basket",
+      "crop": [
+        450,
+        420,
+        100,
+        110
+      ],
+      "seed": [
+        500,
+        475
+      ],
+      "shadowReach": 35,
+      "ground": "the pink-and-white checkered picnic blanket, with the soft green meadow grass beyond its edges",
+      "object": "the small woven picnic basket in the centre of the crop, including its tan wicker body, curved handle, contents and soft cast shadow; not the blanket or any surrounding grass",
+      "footprint": [
+        [
+          [
+            470,
+            495
+          ],
+          [
+            480,
+            486
+          ],
+          [
+            520,
+            486
+          ],
+          [
+            535,
+            496
+          ],
+          [
+            530,
+            510
+          ],
+          [
+            475,
+            510
+          ]
+        ]
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "fence-top",
+      "crop": [
+        285,
+        270,
+        205,
+        220
+      ],
+      "seed": [
+        390,
+        410
+      ],
+      "painted": true,
+      "core": 2,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass",
+      "object": "the single diagonal low wooden fence running from lower-left to upper-right through the crop, including all posts, rails and their brown ink outlines; gaps between rails and posts are transparent, not grass",
+      "footprint": [
+        [
+          [
+            312,
+            454
+          ],
+          [
+            350,
+            432
+          ],
+          [
+            390,
+            410
+          ],
+          [
+            430,
+            389
+          ],
+          [
+            468,
+            367
+          ],
+          [
+            470,
+            381
+          ],
+          [
+            432,
+            402
+          ],
+          [
+            392,
+            423
+          ],
+          [
+            353,
+            445
+          ],
+          [
+            315,
+            466
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "fence-low",
+      "crop": [
+        260,
+        525,
+        150,
+        185
+      ],
+      "seed": [
+        335,
+        625
+      ],
+      "painted": true,
+      "core": 2,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass",
+      "object": "the single diagonal low wooden fence running from upper-left to lower-right through the crop, including all posts, rails and brown ink outlines; gaps between rails and posts are transparent, not grass",
+      "footprint": [
+        [
+          [
+            288,
+            607
+          ],
+          [
+            324,
+            632
+          ],
+          [
+            359,
+            657
+          ],
+          [
+            395,
+            682
+          ],
+          [
+            395,
+            694
+          ],
+          [
+            359,
+            669
+          ],
+          [
+            324,
+            644
+          ],
+          [
+            288,
+            619
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "fence-bottom",
+      "crop": [
+        540,
+        700,
+        270,
+        145
+      ],
+      "seed": [
+        675,
+        790
+      ],
+      "painted": true,
+      "core": 2,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass",
+      "object": "the single low wooden fence spanning the crop diagonally, including all posts, rails and brown ink outlines; gaps between rails and posts are transparent, not grass or pond",
+      "footprint": [
+        [
+          [
+            560,
+            805
+          ],
+          [
+            700,
+            832
+          ],
+          [
+            772,
+            842
+          ],
+          [
+            772,
+            848
+          ],
+          [
+            700,
+            845
+          ],
+          [
+            555,
+            822
+          ]
+        ]
+      ],
+      "exclude": [
+        [
+          [
+            640,
+            690
+          ],
+          [
+            760,
+            690
+          ],
+          [
+            760,
+            770
+          ],
+          [
+            640,
+            770
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "fence-left",
+      "crop": [
+        200,
+        430,
+        140,
+        260
+      ],
+      "seed": [
+        270,
+        555
+      ],
+      "painted": true,
+      "core": 2,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass and pale path wash",
+      "object": "the upright run of the low wooden fence in the centre of the crop, with its vertical posts, horizontal rails and warm brown ink outlines; keep the whole fence section, leave gaps between rails transparent, and exclude the grass and path",
+      "footprint": [
+        [
+          [
+            244,
+            520
+          ],
+          [
+            256,
+            518
+          ],
+          [
+            266,
+            566
+          ],
+          [
+            284,
+            600
+          ],
+          [
+            296,
+            632
+          ],
+          [
+            292,
+            646
+          ],
+          [
+            278,
+            646
+          ],
+          [
+            262,
+            606
+          ],
+          [
+            248,
+            572
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "fence-right",
+      "crop": [
+        1110,
+        360,
+        170,
+        320
+      ],
+      "seed": [
+        1180,
+        500
+      ],
+      "painted": true,
+      "core": 2,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the soft green meadow grass and pale path wash",
+      "object": "the curved wooden fence section running down the centre of the crop from upper-left toward lower-right, including all posts, rails and warm brown ink outlines; gaps between rails are transparent, not grass or path",
+      "footprint": [
+        [
+          [
+            1145,
+            438
+          ],
+          [
+            1160,
+            436
+          ],
+          [
+            1180,
+            456
+          ],
+          [
+            1210,
+            490
+          ],
+          [
+            1222,
+            530
+          ],
+          [
+            1222,
+            590
+          ],
+          [
+            1215,
+            652
+          ],
+          [
+            1200,
+            655
+          ],
+          [
+            1203,
+            590
+          ],
+          [
+            1205,
+            532
+          ],
+          [
+            1195,
+            500
+          ],
+          [
+            1170,
+            470
+          ],
+          [
+            1148,
+            452
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "park-sign",
+      "crop": [
+        150,
+        640,
+        150,
+        190
+      ],
+      "seed": [
+        220,
+        760
+      ],
+      "painted": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the pale path wash and soft green meadow grass",
+      "object": "the complete small wooden park signpost in the centre of the crop, including its two directional sign boards, vertical post, cap and warm brown ink outline; exclude the path, grass and any flowers",
+      "footprint": [
+        [
+          [
+            205,
+            808
+          ],
+          [
+            235,
+            808
+          ],
+          [
+            235,
+            820
+          ],
+          [
+            205,
+            820
+          ]
+        ]
+      ]
+    }
+  ]
+}

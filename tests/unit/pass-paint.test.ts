@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   distanceToPolygon,
+  propCoversPoint,
   pointInPolygon,
   type Area,
   type Point,
@@ -14,10 +15,9 @@ import paint from "./fixtures/pass-paint.json";
 // snow path (lit or in shade), o anything painted (trees, wood, stone, ink).
 // Rerun the tool if the painting changes.
 //
-// Depth: the painting is flat, so anything standing up in it (a sign, the
-// snowman, the bus shelter) is drawn under Fae unless an occluder cuts it out.
-// Behind a thing (her feet north of its foot), it must be drawn over her; in
-// front of it, never. Feet below are read off the painting.
+// Depth: props now carry the painted object and its front edge. Behind a thing
+// (her feet north of its foot), it must be drawn over her; in front of it,
+// never. Feet below are read off the painting.
 
 const world = loadContent().world;
 const radius = world.tunables.playerRadius;
@@ -47,13 +47,15 @@ function standable(point: Point): boolean {
 // The share of Fae's body box (50 x 140 units above her feet, on a 5-unit
 // grid) that occluders draw over, as area-checks.ts measures it.
 function coverage(feet: Point): number {
-  const covering = pass.occluders.filter((occluder) => feet.y < occluder.baseline);
+  const covering = pass.props.filter((prop) => !prop.canopy &&
+    Object.values(prop.states).some((state) => feet.y < Math.max(...state.front.ys)));
   let covered = 0;
   let samples = 0;
   for (let y = feet.y - 140; y <= feet.y; y += 5)
     for (let x = feet.x - 25; x <= feet.x + 25; x += 5) {
       samples += 1;
-      if (covering.some((occluder) => pointInPolygon({ x, y }, occluder.polygon))) covered += 1;
+      if (covering.some((prop) => Object.values(prop.states).some((state) =>
+        propCoversPoint(state, feet, { x, y })))) covered += 1;
     }
   return covered / samples;
 }

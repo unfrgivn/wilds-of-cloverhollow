@@ -1,0 +1,1035 @@
+{
+  "area": "pass",
+  "subjects": [
+    {
+      "id": "forest-left",
+      "crop": [
+        0,
+        500,
+        530,
+        600
+      ],
+      "seed": [
+        300,
+        900
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the snow and packed snow path around the evergreen trees",
+      "object": "the dense stand of overlapping evergreen trees at the left edge of the pass, including every visible trunk and branch in this stand",
+      "footprint": [
+        [
+          [
+            178,
+            606
+          ],
+          [
+            200,
+            606
+          ],
+          [
+            250,
+            620
+          ],
+          [
+            345,
+            695
+          ],
+          [
+            470,
+            790
+          ],
+          [
+            520,
+            900
+          ],
+          [
+            500,
+            1000
+          ],
+          [
+            440,
+            1050
+          ],
+          [
+            178,
+            1050
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            0,
+            500
+          ],
+          [
+            170,
+            500
+          ],
+          [
+            170,
+            1100
+          ],
+          [
+            0,
+            1100
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "pines-bus",
+      "crop": [
+        450,
+        850,
+        240,
+        220
+      ],
+      "seed": [
+        575,
+        980
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the snow around the evergreen trees",
+      "object": "the overlapping evergreen trees beside the bus shelter at the lower left, including their trunks",
+      "footprint": [
+        [
+          [
+            528,
+            913
+          ],
+          [
+            599,
+            902
+          ],
+          [
+            660,
+            1000
+          ],
+          [
+            660,
+            1050
+          ],
+          [
+            485,
+            1050
+          ],
+          [
+            485,
+            1000
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            450,
+            850
+          ],
+          [
+            690,
+            850
+          ],
+          [
+            690,
+            900
+          ],
+          [
+            450,
+            900
+          ]
+        ],
+        [
+          [
+            665,
+            850
+          ],
+          [
+            690,
+            850
+          ],
+          [
+            690,
+            1070
+          ],
+          [
+            665,
+            1070
+          ]
+        ],
+        [
+          [
+            450,
+            1055
+          ],
+          [
+            690,
+            1055
+          ],
+          [
+            690,
+            1070
+          ],
+          [
+            450,
+            1070
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "pines-east",
+      "crop": [
+        1300,
+        200,
+        300,
+        550
+      ],
+      "seed": [
+        1500,
+        550
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the snow around the evergreen trees at the east edge",
+      "object": "the dense overlapping evergreen trees along the right edge of the pass, including every visible trunk",
+      "footprint": [
+        [
+          [
+            1430,
+            505
+          ],
+          [
+            1530,
+            395
+          ],
+          [
+            1575,
+            450
+          ],
+          [
+            1575,
+            710
+          ],
+          [
+            1365,
+            710
+          ],
+          [
+            1365,
+            620
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            1300,
+            200
+          ],
+          [
+            1600,
+            200
+          ],
+          [
+            1600,
+            350
+          ],
+          [
+            1300,
+            350
+          ]
+        ],
+        [
+          [
+            1580,
+            200
+          ],
+          [
+            1600,
+            200
+          ],
+          [
+            1600,
+            750
+          ],
+          [
+            1580,
+            750
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "pines-north",
+      "crop": [
+        930,
+        0,
+        430,
+        340
+      ],
+      "seed": [
+        1130,
+        190
+      ],
+      "canopy": true,
+      "painted": true,
+      "ground": "the snow behind the lodge and kiosk",
+      "object": "the long row of overlapping evergreen trees along the north edge, including their trunks",
+      "footprint": [
+        [
+          [
+            975,
+            140
+          ],
+          [
+            1320,
+            140
+          ],
+          [
+            1320,
+            180
+          ],
+          [
+            1060,
+            240
+          ],
+          [
+            1060,
+            300
+          ],
+          [
+            975,
+            300
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            930,
+            100
+          ],
+          [
+            965,
+            100
+          ],
+          [
+            965,
+            340
+          ],
+          [
+            930,
+            340
+          ]
+        ],
+        [
+          [
+            1330,
+            100
+          ],
+          [
+            1360,
+            100
+          ],
+          [
+            1360,
+            340
+          ],
+          [
+            1330,
+            340
+          ]
+        ],
+        [
+          [
+            930,
+            100
+          ],
+          [
+            1360,
+            100
+          ],
+          [
+            1360,
+            125
+          ],
+          [
+            930,
+            125
+          ]
+        ],
+        [
+          [
+            930,
+            315
+          ],
+          [
+            1360,
+            315
+          ],
+          [
+            1360,
+            340
+          ],
+          [
+            930,
+            340
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "lodge",
+      "crop": [
+        900,
+        100,
+        650,
+        450
+      ],
+      "seed": [
+        1300,
+        350
+      ],
+      "painted": true,
+      "ground": "the snowy porch and packed snow around the lodge",
+      "object": "the large snow-covered log lodge with its roof, porch, windows, door, chimney, and all attached wooden walls, as one building",
+      "footprint": [
+        [
+          [
+            1050,
+            240
+          ],
+          [
+            1390,
+            182
+          ],
+          [
+            1490,
+            330
+          ],
+          [
+            1470,
+            470
+          ],
+          [
+            1060,
+            470
+          ],
+          [
+            1060,
+            330
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            900,
+            100
+          ],
+          [
+            1025,
+            100
+          ],
+          [
+            1025,
+            550
+          ],
+          [
+            900,
+            550
+          ]
+        ],
+        [
+          [
+            1500,
+            100
+          ],
+          [
+            1550,
+            100
+          ],
+          [
+            1550,
+            550
+          ],
+          [
+            1500,
+            550
+          ]
+        ],
+        [
+          [
+            900,
+            480
+          ],
+          [
+            1550,
+            480
+          ],
+          [
+            1550,
+            550
+          ],
+          [
+            900,
+            550
+          ]
+        ],
+        [
+          [
+            1025,
+            100
+          ],
+          [
+            1500,
+            100
+          ],
+          [
+            1500,
+            180
+          ],
+          [
+            1025,
+            180
+          ]
+        ],
+        [
+          [
+            1450,
+            150
+          ],
+          [
+            1550,
+            150
+          ],
+          [
+            1550,
+            480
+          ],
+          [
+            1450,
+            480
+          ]
+        ],
+        [
+          [
+            900,
+            470
+          ],
+          [
+            1550,
+            470
+          ],
+          [
+            1550,
+            550
+          ],
+          [
+            900,
+            550
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "cocoa-stand",
+      "crop": [
+        850,
+        200,
+        225,
+        215
+      ],
+      "seed": [
+        950,
+        330
+      ],
+      "painted": true,
+      "ground": "the packed snow around the hot chocolate stand",
+      "object": "the small wooden hot chocolate stand with its roof, counter, shelves, cups, and snow, as one object",
+      "footprint": [
+        [
+          [
+            865,
+            215
+          ],
+          [
+            1060,
+            230
+          ],
+          [
+            1050,
+            400
+          ],
+          [
+            870,
+            400
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "benches",
+      "crop": [
+        760,
+        290,
+        230,
+        180
+      ],
+      "seed": [
+        870,
+        390
+      ],
+      "painted": true,
+      "ground": "the packed snow around the row of wooden benches",
+      "object": "the group of four wooden benches in the centre of the pass, including their seats, backs, legs, and attached snow, as one group",
+      "footprint": [
+        [
+          [
+            805,
+            372
+          ],
+          [
+            980,
+            385
+          ],
+          [
+            978,
+            428
+          ],
+          [
+            805,
+            428
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bus-shelter",
+      "crop": [
+        755,
+        760,
+        245,
+        255
+      ],
+      "seed": [
+        850,
+        900
+      ],
+      "painted": true,
+      "ground": "the snow and stone paving around the bus shelter",
+      "object": "the single covered bus shelter with its green snow-covered roof, rear wall, side posts, open seating area, and bench, as one object",
+      "footprint": [
+        [
+          [
+            770,
+            860
+          ],
+          [
+            850,
+            800
+          ],
+          [
+            900,
+            790
+          ],
+          [
+            950,
+            775
+          ],
+          [
+            985,
+            815
+          ],
+          [
+            985,
+            955
+          ],
+          [
+            900,
+            955
+          ],
+          [
+            900,
+            1003
+          ],
+          [
+            780,
+            1003
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "trail-sign",
+      "crop": [
+        565,
+        335,
+        95,
+        130
+      ],
+      "seed": [
+        615,
+        380
+      ],
+      "painted": true,
+      "ground": "the snow around the trail sign",
+      "object": "the large blank wooden trail signboard and its two supporting posts",
+      "footprint": [
+        [
+          [
+            575,
+            425
+          ],
+          [
+            650,
+            425
+          ],
+          [
+            650,
+            455
+          ],
+          [
+            575,
+            455
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "lift-tower-west",
+      "crop": [
+        180,
+        240,
+        280,
+        300
+      ],
+      "seed": [
+        310,
+        350
+      ],
+      "painted": true,
+      "ground": "the snow around the chairlift tower",
+      "object": "the tall grey chairlift support tower at the west, including its crossbeam, pulleys, posts, and base",
+      "footprint": [
+        [
+          [
+            340,
+            475
+          ],
+          [
+            340,
+            505
+          ],
+          [
+            295,
+            505
+          ],
+          [
+            295,
+            475
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            180,
+            240
+          ],
+          [
+            235,
+            240
+          ],
+          [
+            235,
+            540
+          ],
+          [
+            180,
+            540
+          ]
+        ],
+        [
+          [
+            385,
+            240
+          ],
+          [
+            460,
+            240
+          ],
+          [
+            460,
+            540
+          ],
+          [
+            385,
+            540
+          ]
+        ],
+        [
+          [
+            180,
+            240
+          ],
+          [
+            460,
+            240
+          ],
+          [
+            460,
+            285
+          ],
+          [
+            180,
+            285
+          ]
+        ],
+        [
+          [
+            180,
+            240
+          ],
+          [
+            460,
+            240
+          ],
+          [
+            460,
+            360
+          ],
+          [
+            180,
+            360
+          ]
+        ],
+        [
+          [
+            180,
+            360
+          ],
+          [
+            275,
+            360
+          ],
+          [
+            275,
+            540
+          ],
+          [
+            180,
+            540
+          ]
+        ],
+        [
+          [
+            360,
+            360
+          ],
+          [
+            460,
+            360
+          ],
+          [
+            460,
+            540
+          ],
+          [
+            360,
+            540
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "lift-tower-north",
+      "crop": [
+        720,
+        140,
+        55,
+        130
+      ],
+      "seed": [
+        746,
+        200
+      ],
+      "painted": true,
+      "ground": "the snow around the narrow chairlift support",
+      "object": "the narrow grey chairlift support pole in the north, including its pulley and base",
+      "footprint": [
+        [
+          [
+            728,
+            235
+          ],
+          [
+            765,
+            235
+          ],
+          [
+            765,
+            265
+          ],
+          [
+            728,
+            265
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "snowman",
+      "crop": [
+        1100,
+        545,
+        105,
+        155
+      ],
+      "seed": [
+        1150,
+        620
+      ],
+      "painted": true,
+      "ground": "the snow around the snowman",
+      "object": "the complete friendly snowman with three snowballs, hat, scarf, face, carrot nose, and stick arms",
+      "footprint": [
+        [
+          [
+            1110,
+            660
+          ],
+          [
+            1195,
+            660
+          ],
+          [
+            1195,
+            690
+          ],
+          [
+            1110,
+            690
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "signpost",
+      "crop": [
+        1215,
+        670,
+        90,
+        140
+      ],
+      "seed": [
+        1260,
+        735
+      ],
+      "painted": true,
+      "ground": "the snow around the directional signpost",
+      "object": "the small wooden directional signboard and its single post",
+      "footprint": [
+        [
+          [
+            1225,
+            770
+          ],
+          [
+            1295,
+            770
+          ],
+          [
+            1295,
+            800
+          ],
+          [
+            1225,
+            800
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bus-sign",
+      "crop": [
+        990,
+        760,
+        65,
+        175
+      ],
+      "seed": [
+        1022,
+        840
+      ],
+      "painted": true,
+      "ground": "the snow and paving around the bus stop sign",
+      "object": "the round bus stop sign, its post, and its small snow cap",
+      "footprint": [
+        [
+          [
+            1000,
+            895
+          ],
+          [
+            1045,
+            895
+          ],
+          [
+            1045,
+            925
+          ],
+          [
+            1000,
+            925
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    }
+  ]
+}

@@ -26,7 +26,9 @@
  *   bun tools/art/kit.ts <area> place   placements for unplaced props, into the area JSON
  *   bun tools/art/kit.ts <area> grid <x0> <y0> <x1> <y1> [px per unit]
  *                                        the painting with a unit grid, for measuring
- *   bun tools/art/kit.ts <area> overlay  every footprint and home, the floor, and blockers
+ *   bun tools/art/kit.ts <area> overlay [<x0> <y0> <x1> <y1> [px per unit]]
+ *                                        every footprint and home, the floor, and blockers;
+ *                                        with a region, zoomed in over the unit grid
  */
 import { spawnSync } from "node:child_process";
 import {
@@ -34,6 +36,8 @@ import {
   statSync, writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
+import { reachablePositions } from "../../src/content/area-checks";
+import { loadContent } from "../../src/content/load";
 
 type Point = [number, number];
 type Polygon = Point[];
@@ -65,6 +69,8 @@ type Subject = {
   home: Point;
   samples: Samples;
   states: Record<string, ExtraState>;
+  // Why this footprint may disagree with its drawing (pack's footprint check).
+  footprintNote: string | undefined;
 };
 type Tile = { file: string; x: number; y: number; width: number; height: number };
 type Mask = Uint8Array;
@@ -174,6 +180,7 @@ function subject(value: unknown): Subject {
     shadowReach: typeof value.shadowReach === "number" ? value.shadowReach : 50,
     footprint,
     home: value.home === undefined ? homeOf(footprint, id) : point(value.home, `${id}.home`),
+    footprintNote: typeof value.footprintNote === "string" ? value.footprintNote : undefined,
     samples: chosen,
     states,
   };
@@ -971,6 +978,25 @@ function cut(item: Subject): void {
   const rebuilt = `${folder}/rebuilt.png`;
   im(after, flat, "-compose", "multiply", "-composite", `${folder}/frame.png`,
     "-compose", "over", "-composite", rebuilt);
+  // The ground the fill shows through in the default layout: the hole, minus
+  // this prop and every other prop drawn over it.
+  const ring = minus(minus(holeMask(item), morph(readMask(mask, w, h), w, h, 2, true)),
+    morph(others(item), w, h, 3, true));
+  writeMask(ring, w, h, `${folder}/ring.png`);
+  const share = area2(ring) / (w * h);
+  const off = share === 0 ? 0 : mean(rebuilt, `${folder}/crop.png`, "-compose",
+    "difference", "-composite", "-colorspace", "gray", "-threshold", "12%",
+    `${folder}/ring.png`, "-compose", "multiply", "-composite") / share;
+  writeFileSync(`${folder}/rebuild.json`, `${JSON.stringify({ ring: area2(ring), off })}\n`);
+  // painting | the default layout with its wrong ground pixels in red
+  const wrong = `${folder}/ring-wrong.png`;
+  im(rebuilt, `${folder}/crop.png`, "-compose", "difference", "-composite", "-colorspace",
+    "gray", "-threshold", "12%", `${folder}/ring.png`, "-compose", "multiply", "-composite",
+    wrong);
+  im(`${folder}/crop.png`, "(", rebuilt, "(", "-size", `${w}x${h}`, "xc:red", wrong, "-alpha",
+    "off", "-compose", "CopyOpacity", "-composite", ")", "-compose", "over", "-composite",
+    ")", "-resize", scale, "+append", `${review}/ring-${item.id}.png`);
+  console.log(`${item.id}: ${(off * 100).toFixed(1)}% of the ground round it rebuilds wrong`);
   const moved = `${folder}/moved.png`;
   im(after, "(", flat, "-roll", "-60+40", ")", "-compose", "multiply", "-composite",
     "(", `${folder}/frame.png`, "-roll", "-60+40", ")", "-compose", "over", "-composite", moved);
@@ -1052,6 +1078,50 @@ function writeJson(path: string, value: unknown): void {
   renameSync(temp, path);
 }
 
+/*
+ * A footprint must sit on its own drawing: the object meets the ground at the
+ * bottom of its picture. In the footprint's columns the drawing's lowest
+ * opaque point is the object's base; the footprint's south edge belongs within
+ * 30 units of it, and the footprint inside the drawing's height. A footprint
+ * that fails is on the wrong object, in front of it, or the mask lost the
+ * object's base: collision there would be an invisible wall.
+ */
+function footprintProblems(id: string, footprint: Polygon[], home: Point,
+  columns: Columns): { errors: string[]; warnings: string[] } {
+  const points = footprint.flat();
+  if (points.length === 0) return { errors: [], warnings: [] };
+  const fx0 = Math.min(...points.map(([x]) => x));
+  const fx1 = Math.max(...points.map(([x]) => x));
+  const fy0 = Math.min(...points.map(([, y]) => y));
+  const fy1 = Math.max(...points.map(([, y]) => y));
+  const drawn = columns.columns.flatMap((column, index) => {
+    const numbers = column.trim() === "" ? [] : column.trim().split(/\s+/).map(Number);
+    if (numbers.length === 0) return [];
+    const x = home[0] + columns.left + (index + 0.5) * columns.step;
+    const top = home[1] + Math.min(...numbers.filter((_, at) => at % 2 === 0));
+    const bottom = home[1] + Math.max(...numbers.filter((_, at) => at % 2 === 1));
+    return [{ x, top, bottom }];
+  });
+  const under = drawn.filter((column) => column.x >= fx0 && column.x <= fx1);
+  const at = `${id}: footprint x ${Math.round(fx0)}-${Math.round(fx1)} ` +
+    `y ${Math.round(fy0)}-${Math.round(fy1)}`;
+  if (under.length === 0)
+    return { errors: [`${at} has nothing drawn above it`], warnings: [] };
+  const base = Math.max(...under.map((column) => column.bottom));
+  const top = Math.min(...drawn.map((column) => column.top));
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  if (fy1 > base + 30)
+    errors.push(`${at}: its south edge is ${Math.round(fy1 - base)} units in front of ` +
+      `the drawing's base (y ${Math.round(base)})`);
+  if (fy0 < top)
+    errors.push(`${at}: it reaches above the drawing (top y ${Math.round(top)})`);
+  if (fy1 < base - 40)
+    warnings.push(`${at}: the drawing hangs ${Math.round(base - fy1)} units below it ` +
+      "(roots, a stray line, or the footprint is behind the base?)");
+  return { errors, warnings };
+}
+
 type CatalogueState = {
   frame: string;
   shadow: string | null;
@@ -1120,6 +1190,30 @@ function pack(): void {
     }
     props[item.id] = { canopy: item.canopy, painted: item.painted, home: item.home, states };
   }
+  const failures: string[] = [];
+  for (const item of subjects)
+    for (const [name, state] of Object.entries(props[item.id]?.states ?? {})) {
+      const world = state.footprint.map((polygon) => polygon.map(([x, y]): Point =>
+        [x + item.home[0], y + item.home[1]]));
+      const found = footprintProblems(`${item.id}.${name}`, world, item.home, state.silhouette);
+      for (const warning of found.warnings) console.log(`  warning: ${warning}`);
+      if (item.footprintNote !== undefined)
+        for (const error of found.errors)
+          console.log(`  allowed (${item.footprintNote}): ${error}`);
+      else failures.push(...found.errors);
+    }
+  for (const item of subjects) {
+    if (item.painted) continue;
+    const measured: unknown = JSON.parse(readFileSync(`${dir(item)}/rebuild.json`, "utf8"));
+    const off = isRecord(measured) && typeof measured.off === "number" ? measured.off : 1;
+    if (off > 0.08)
+      failures.push(`${item.id}: ${(off * 100).toFixed(1)}% of the ground round it rebuilds ` +
+        "wrong: its fill doesn't continue the ground (choose another samples.fill, " +
+        "describe the ground better, or leave it painted)");
+  }
+  if (failures.length > 0)
+    throw new Error("pack refused (fix a footprint or its mask, or explain it in " +
+      `footprintNote; fix a fill):\n  ${failures.join("\n  ")}`);
   // Shelf-pack every frame into 2048-wide pages.
   frames.sort((a, b) => b.h - a.h || a.name.localeCompare(b.name));
   type Placed = Frame & { x: number; y: number; page: number };
@@ -1259,6 +1353,8 @@ function pack(): void {
           `${extra.width} units wide, despill-edge.ts --key magenta --band 3`,
         shadow: extra.shadow ? "a soft lavender ellipse from the frame's alpha" : "none",
       }]))),
+    footprintNotes: Object.fromEntries(subjects.flatMap((item) =>
+      item.footprintNote === undefined ? [] : [[item.id, item.footprintNote]])),
     painted: subjects.filter((item) => item.painted).map((item) => item.id),
     lifted: subjects.filter((item) => !item.painted).map((item) => item.id),
   });
@@ -1304,12 +1400,8 @@ function render(name: string, x0: number, y0: number, x1: number, y1: number, sc
   return out;
 }
 
-// A unit grid over part of the painting: thin lines every 10 units, labelled
-// ones every 50, for measuring crops, seeds, and footprints.
-function grid(): void {
-  const [x0 = 0, y0 = 0, x1 = 0, y1 = 0, scale = 2] = Bun.argv.slice(4, 9).map(Number);
-  if (!(x1 > x0 && y1 > y0 && scale > 0))
-    throw new Error("usage: bun tools/art/kit.ts <area> grid <x0> <y0> <x1> <y1> [px per unit]");
+// Thin grid lines every 10 units over a region, labelled every 50.
+function gridLines(x0: number, y0: number, x1: number, y1: number, scale: number): string {
   const k = 1 / scale;
   let body = "";
   for (let x = Math.ceil(x0 / 10) * 10; x <= x1; x += 10) {
@@ -1328,7 +1420,49 @@ function grid(): void {
       `font-family="Helvetica" fill="#901a00" stroke="#fff" stroke-width="${2.5 * k}" ` +
       `paint-order="stroke">${y}</text>`;
   }
-  console.log(render(`grid-${x0}-${y0}`, x0, y0, x1, y1, scale, body));
+  return body;
+}
+
+function region(name: string): [number, number, number, number, number] {
+  const [x0 = 0, y0 = 0, x1 = 0, y1 = 0, scale = 2] = Bun.argv.slice(4, 9).map(Number);
+  if (!(x1 > x0 && y1 > y0 && scale > 0))
+    throw new Error(`usage: bun tools/art/kit.ts <area> ${name} <x0> <y0> <x1> <y1> [px/unit]`);
+  return [x0, y0, x1, y1, scale];
+}
+
+// A unit grid over part of the painting, for measuring crops, seeds, and footprints.
+function grid(): void {
+  const [x0, y0, x1, y1, scale] = region("grid");
+  console.log(render(`grid-${x0}-${y0}`, x0, y0, x1, y1, scale,
+    gridLines(x0, y0, x1, y1, scale)));
+}
+
+// Where Fae's feet can stand (the area checks' 5-unit reachable cells, every
+// prop state solid), as light green runs.
+function standableCells(): string {
+  const { world } = loadContent();
+  const loaded = world.areas[area];
+  if (loaded === undefined) throw new Error(`no area ${area}`);
+  const rows = new Map<number, number[]>();
+  for (const { x, y } of reachablePositions(loaded, world.tunables.playerRadius))
+    rows.set(y, [...(rows.get(y) ?? []), x]);
+  let body = "";
+  for (const [y, xs] of rows) {
+    xs.sort((a, b) => a - b);
+    let start = xs[0] ?? 0;
+    let last = start;
+    for (const x of [...xs.slice(1), Infinity]) {
+      if (x === last + 5) {
+        last = x;
+        continue;
+      }
+      body += `<rect x="${start - 2.5}" y="${y - 2.5}" width="${last - start + 5}" ` +
+        "height=\"5\" fill=\"#7cff6b\" fill-opacity=\"0.32\"/>";
+      start = x;
+      last = x;
+    }
+  }
+  return body;
 }
 
 // The whole area: the floor (green), blockers (red), every subject's
@@ -1338,8 +1472,15 @@ function overlay(): void {
   if (!isRecord(json)) throw new Error(`content/areas/${area}.json is malformed`);
   const points = (polygon: Polygon): string => polygon.map(([x, y]) => `${x},${y}`).join(" ");
   const floor = polygons([json.walkable], "walkable");
+  let standable = "";
+  try {
+    standable = standableCells();
+  } catch (error) {
+    console.log(`overlay: no standable tint (the area doesn't load: ${String(error)})`);
+  }
   const blockers = polygons(json.blockers, "blockers");
-  let body = floor.map((polygon) => `<polygon points="${points(polygon)}" fill="none" ` +
+  let body = standable + floor.map((polygon) => `<polygon points="${points(polygon)}" ` +
+    `fill="none" ` +
     `stroke="#198754" stroke-width="3"/>`).join("");
   body += blockers.map((polygon) => `<polygon points="${points(polygon)}" ` +
     `fill="#d9484840" stroke="#b00000" stroke-width="2"/>`).join("");
@@ -1353,7 +1494,13 @@ function overlay(): void {
       `font-family="Helvetica" fill="#002a80" stroke="#fff" stroke-width="2.5" ` +
       `paint-order="stroke">${item.id}</text>`;
   }
-  console.log(render("footprints", 0, 0, painting.width / 2, painting.height / 2, 1, body));
+  if (Bun.argv.length <= 4) {
+    console.log(render("footprints", 0, 0, painting.width / 2, painting.height / 2, 1, body));
+    return;
+  }
+  const [x0, y0, x1, y1, scale] = region("overlay");
+  console.log(render(`footprints-${x0}-${y0}`, x0, y0, x1, y1, scale,
+    gridLines(x0, y0, x1, y1, scale) + body));
 }
 
 if (step === "gen") await gen();

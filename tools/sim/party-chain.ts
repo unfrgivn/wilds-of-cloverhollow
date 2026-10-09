@@ -3,6 +3,7 @@ import {
   createState,
   distanceToPolygon,
   pointInPolygon,
+  sceneryArea,
   step,
   type Critter,
   type PartyContent,
@@ -64,8 +65,10 @@ for (const segment of script)
     const previous = together.party.map((member) => ({ x: member.x, y: member.y }));
     alone = step(content.world, alone, segment.frame).state;
     together = step(twoWorld, together, segment.frame).state;
-    const area = twoWorld.areas[together.area];
-    if (area === undefined) throw new Error(`unknown area ${together.area}`);
+    const room = twoWorld.areas[together.area];
+    if (room === undefined) throw new Error(`unknown area ${together.area}`);
+    // Props' current footprints are solid like blockers (spec 6.2).
+    const area = sceneryArea(twoWorld, together.ink, room);
     together.party.forEach((member, index) => {
       if (!pointInPolygon(member, area.walkable) ||
           distanceToPolygon(member, area.walkable) < radius)

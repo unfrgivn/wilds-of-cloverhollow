@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 33, the indoor kits)
+Last updated: 2026-10-08 (Milestone 34, the outdoor kits)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -374,9 +374,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   left edge (spawn `plaza-road`, (180, 545) facing right). Its floor is the
   sand and the dock's planks between the rails; it was traced against a map of
   the painting itself (`tools/art/paint-map.ts`, checked by
-  `tests/unit/bay-paint.test.ts`). Its occluders draw the dock's near (south)
-  rail in front of Fae on the planks as 25-unit slivers, each with the baseline
-  of its east end, since one baseline can't fit a diagonal rail; the far rail
+  `tests/unit/bay-paint.test.ts`). The dock's near (south) rail is one prop,
+  `dock-rail-south`, footed along its posts' feet, so it sorts column by
+  column in front of Fae on the planks; the far rail stays in the painting and
   is never drawn over her (`tests/unit/bay-depth.test.ts`). Sue fishes at the
   dock's far end (a person, `npcs`, until she joins).
 - Pinecone Pass: a snowy mountain clearing with trails, a lodge, cocoa stand,
@@ -446,8 +446,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   hamster gets him to hand her his blacklight lantern (`has_lantern`).
 - Cliffside Trail (Milestone 21): the first trail between lands, a painted
   1750x1100 area climbing from Bubblegum Bay's south beach to Pinecone Pass's
-  east path; its floor, blockers, and occluders are written by
-  `tools/art/geometry/trail.ts`. Its ways in and out are thin triggers on the
+  east path; its floor and blockers are written by
+  `tools/art/geometry/trail.ts`, its scenery is a kit (section 6.2). Its ways in and out are thin triggers on the
   floor's outer edges: the pass's east edge to the trail's west edge
   (`trail.pass`, facing right) and back (`pass.trail`, facing left); the bay's
   south edge to the trail's beach (`trail.bay`, facing up) and back
@@ -511,12 +511,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   pines (`old_trail_marker`, which sets `found_old_trail`), and a doodle is
   painted on the north ski-lift tower (`lift_note`). `renderInfo().lantern`
   reports `{ on, glows }`, the ids drawn.
-- Canopies: an occluder with `canopy: true` is a tree Fae can walk under (a
-  palm, crown and trunk cut whole, its baseline at the trunk's foot). While her
+- Canopies: an occluder or a prop with `canopy: true` is a tree Fae can walk
+  under (a palm, crown and trunk cut whole, its baseline or front edge at the
+  trunk's foot). While her
   feet are north of its baseline and more than 5% of her body box is inside it,
   it fades to 40% (0.08 a tick, render-only), so she's drawn behind it and
   still seen; it eases back once she steps out. `renderInfo().canopies` reports
-  each one's alpha. Bubblegum Bay's three palms are canopies
+  each one's alpha. Bubblegum Bay's palms are canopy props
   (`tests/unit/canopy.test.ts`, `tests/e2e/canopy.spec.ts`).
 - Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
   spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
@@ -649,6 +650,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   counter, the claw machine, the three gumball machines). None has
   occluders. The kitchen's `stairs` spawn is (600, 650), facing right, so the
   whole party fits behind Fae at the foot of the stairs.
+- The outdoor areas (Milestone 34) are kits too, so every area is: Meadow
+  Park (the tree house, the tower, two bushes, the basket, five fence runs, the
+  park sign), Bubblegum Bay (the near dock rail, the umbrella, the sign, three
+  palms), Pinecone Pass (four pine stands, the lodge, the cocoa stand, the
+  benches, the bus shelter, the lift towers, the snowman, the signs), the
+  Cliffside Trail (pines, rocks, the signpost, the lookout bench, the
+  footbridge's near rail as one prop), and the Whispering Woods (its trees,
+  the tree house, three logs, two fern beds). Trees and ferns Fae walks behind
+  are canopies. Every prop is painted but the woods' south log, which is
+  lifted; the plates are the approved paintings but for its hole. No area has
+  occluders.
 - An area's floor is one piece: from any spawn, Fae can walk to every other
   (`areaConnectionErrors` reports a floor split by furniture).
 

@@ -1618,7 +1618,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 45
+    "ticks": 35
   },
   {
     "frame": {
@@ -1630,7 +1630,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 75
+    "ticks": 55
   },
   {
     "frame": {
@@ -1654,7 +1654,31 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 5
+    "ticks": 25
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 10
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
   },
   {
     "frame": {
@@ -1810,7 +1834,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 15
+    "ticks": 20
   },
   {
     "frame": {
@@ -1822,7 +1846,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 100
+    "ticks": 25
   },
   {
     "frame": {
@@ -1834,7 +1858,31 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 4
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 70
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
   },
   {
     "frame": {
@@ -1846,7 +1894,31 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 15
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 14
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
   },
   {
     "frame": {
@@ -1859,30 +1931,6 @@
       "menu": false
     },
     "ticks": 9
-  },
-  {
-    "frame": {
-      "move": {
-        "x": -1,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 10
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 5
   },
   {
     "frame": {

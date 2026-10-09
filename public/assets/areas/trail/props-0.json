@@ -1,0 +1,300 @@
+{
+  "frames": {
+    "pines-hill": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 700,
+        "h": 944
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 700,
+        "h": 944
+      },
+      "sourceSize": {
+        "w": 700,
+        "h": 944
+      },
+      "anchor": {
+        "x": 0.48714,
+        "y": 0.61441
+      }
+    },
+    "pines-left": {
+      "frame": {
+        "x": 702,
+        "y": 0,
+        "w": 600,
+        "h": 666
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 600,
+        "h": 666
+      },
+      "sourceSize": {
+        "w": 600,
+        "h": 666
+      },
+      "anchor": {
+        "x": 0.06667,
+        "y": 1.01502
+      }
+    },
+    "pines-top": {
+      "frame": {
+        "x": 1304,
+        "y": 0,
+        "w": 740,
+        "h": 356
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 740,
+        "h": 356
+      },
+      "sourceSize": {
+        "w": 740,
+        "h": 356
+      },
+      "anchor": {
+        "x": 0.42297,
+        "y": 0.85393
+      }
+    },
+    "boulders-left": {
+      "frame": {
+        "x": 0,
+        "y": 946,
+        "w": 560,
+        "h": 316
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 560,
+        "h": 316
+      },
+      "sourceSize": {
+        "w": 560,
+        "h": 316
+      },
+      "anchor": {
+        "x": 0.35893,
+        "y": 0.85443
+      }
+    },
+    "signpost": {
+      "frame": {
+        "x": 562,
+        "y": 946,
+        "w": 170,
+        "h": 218
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 170,
+        "h": 218
+      },
+      "sourceSize": {
+        "w": 170,
+        "h": 218
+      },
+      "anchor": {
+        "x": 0.55882,
+        "y": 1.04128
+      }
+    },
+    "rock-ferns": {
+      "frame": {
+        "x": 734,
+        "y": 946,
+        "w": 440,
+        "h": 216
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 440,
+        "h": 216
+      },
+      "sourceSize": {
+        "w": 440,
+        "h": 216
+      },
+      "anchor": {
+        "x": 0.44773,
+        "y": 0.99537
+      }
+    },
+    "rocks-top": {
+      "frame": {
+        "x": 1176,
+        "y": 946,
+        "w": 430,
+        "h": 211
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 430,
+        "h": 211
+      },
+      "sourceSize": {
+        "w": 430,
+        "h": 211
+      },
+      "anchor": {
+        "x": 0.49535,
+        "y": 0.80095
+      }
+    },
+    "bench": {
+      "frame": {
+        "x": 1608,
+        "y": 946,
+        "w": 210,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 210,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 210,
+        "h": 192
+      },
+      "anchor": {
+        "x": 0.79048,
+        "y": 1.05729
+      }
+    },
+    "rock-meadow-top": {
+      "frame": {
+        "x": 0,
+        "y": 1264,
+        "w": 230,
+        "h": 187
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 230,
+        "h": 187
+      },
+      "sourceSize": {
+        "w": 230,
+        "h": 187
+      },
+      "anchor": {
+        "x": 0.32174,
+        "y": 1.02674
+      }
+    },
+    "bridge-rail": {
+      "frame": {
+        "x": 232,
+        "y": 1264,
+        "w": 230,
+        "h": 179
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 230,
+        "h": 179
+      },
+      "sourceSize": {
+        "w": 230,
+        "h": 179
+      },
+      "anchor": {
+        "x": 0.51304,
+        "y": 1.12849
+      }
+    },
+    "rock-path": {
+      "frame": {
+        "x": 464,
+        "y": 1264,
+        "w": 300,
+        "h": 150
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 300,
+        "h": 150
+      },
+      "sourceSize": {
+        "w": 300,
+        "h": 150
+      },
+      "anchor": {
+        "x": 0.52,
+        "y": 1.04
+      }
+    },
+    "rock-lookout": {
+      "frame": {
+        "x": 766,
+        "y": 1264,
+        "w": 170,
+        "h": 101
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 170,
+        "h": 101
+      },
+      "sourceSize": {
+        "w": 170,
+        "h": 101
+      },
+      "anchor": {
+        "x": 0.48235,
+        "y": 1.09901
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1451
+    },
+    "scale": "1"
+  }
+}

@@ -36,9 +36,11 @@ test("a palm's crown fades while Fae walks under it", async ({ page }) => {
   expect(Math.abs(feet.x - 200)).toBeLessThan(12);
   expect(Math.abs(feet.y - 250)).toBeLessThan(12);
   expect(await canopy(page, "palm-top-left")).toBeLessThanOrEqual(0.45);
-  const order = (await renderInfo(page)).drawOrder;
-  const z = (label: string): number => order.find((item) => item.label === label)?.zIndex ?? -1;
-  expect(z("occluder:palm-top-left"), "the palm is drawn over Fae").toBeGreaterThan(z("fae"));
+  const info = await renderInfo(page);
+  const fae = info.drawOrder.find((item) => item.label === "fae")?.zIndex ?? Infinity;
+  const palm = info.props.find((prop) => prop.id === "palm-top-left")?.strips
+    .filter((strip) => strip.left < feet.x + 25 && strip.right > feet.x - 25) ?? [];
+  expect(palm.some((strip) => strip.zIndex > fae), "the palm is drawn over Fae").toBe(true);
   await expect(page).toHaveScreenshot("bay-under-palm.png");
   // Back out the way she came.
   await hold(page, "ArrowRight", 35);

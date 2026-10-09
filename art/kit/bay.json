@@ -1,0 +1,549 @@
+{
+  "area": "bay",
+  "subjects": [
+    {
+      "id": "dock-rail-south",
+      "crop": [
+        960,
+        200,
+        660,
+        500
+      ],
+      "seed": [
+        1196,
+        520
+      ],
+      "painted": true,
+      "ground": "the sandy beach and dock boards",
+      "object": "the dock's near (front, lower-right) rope railing, ALL of it: every one of its round wooden posts along the dock's lower-right edge, from the post at the bottom-left corner of the dock all the way up to the post at the dock's top-right corner standing in the water, and the rope hanging between every pair of them. Not the plank deck, not the posts or rope along the dock's upper-left edge, not the water or sand",
+      "footprint": [
+        [
+          [
+            1015,
+            651
+          ],
+          [
+            1113,
+            597
+          ],
+          [
+            1208,
+            542
+          ],
+          [
+            1295,
+            488
+          ],
+          [
+            1383,
+            430
+          ],
+          [
+            1475,
+            373
+          ],
+          [
+            1571,
+            312
+          ],
+          [
+            1574,
+            302
+          ],
+          [
+            1478,
+            363
+          ],
+          [
+            1386,
+            420
+          ],
+          [
+            1298,
+            478
+          ],
+          [
+            1211,
+            532
+          ],
+          [
+            1116,
+            587
+          ],
+          [
+            1018,
+            641
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "core": 2
+    },
+    {
+      "id": "umbrella",
+      "crop": [
+        360,
+        170,
+        240,
+        240
+      ],
+      "seed": [
+        470,
+        250
+      ],
+      "painted": true,
+      "ground": "the sandy beach",
+      "object": "the red and white striped beach umbrella and its grey pole in the centre of the image; recolor ALL of the pale sand, the shadow on the sand, the pink checked picnic blanket, and the basket to magenta",
+      "footprint": [
+        [
+          [
+            503,
+            390
+          ],
+          [
+            517,
+            390
+          ],
+          [
+            517,
+            402
+          ],
+          [
+            503,
+            402
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 3
+      },
+      "exclude": [
+        [
+          [
+            320,
+            130
+          ],
+          [
+            640,
+            130
+          ],
+          [
+            640,
+            450
+          ],
+          [
+            320,
+            450
+          ],
+          [
+            320,
+            246
+          ],
+          [
+            364,
+            246
+          ],
+          [
+            379,
+            211
+          ],
+          [
+            414,
+            190
+          ],
+          [
+            470,
+            178
+          ],
+          [
+            522,
+            183
+          ],
+          [
+            562,
+            204
+          ],
+          [
+            585,
+            250
+          ],
+          [
+            580,
+            296
+          ],
+          [
+            546,
+            307
+          ],
+          [
+            512,
+            302
+          ],
+          [
+            500,
+            312
+          ],
+          [
+            518,
+            400
+          ],
+          [
+            503,
+            402
+          ],
+          [
+            486,
+            318
+          ],
+          [
+            470,
+            313
+          ],
+          [
+            440,
+            324
+          ],
+          [
+            404,
+            320
+          ],
+          [
+            379,
+            298
+          ],
+          [
+            365,
+            276
+          ],
+          [
+            364,
+            246
+          ],
+          [
+            320,
+            246
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "sign",
+      "crop": [
+        100,
+        290,
+        200,
+        200
+      ],
+      "seed": [
+        200,
+        360
+      ],
+      "painted": true,
+      "ground": "the sandy beach",
+      "object": "the blank wooden sign board on its two wooden posts in the centre of the image; recolor ALL of the pale sand, the shadow, the shells, and the leaves at the top edge to magenta",
+      "footprint": [
+        [
+          [
+            128,
+            454
+          ],
+          [
+            275,
+            468
+          ],
+          [
+            275,
+            480
+          ],
+          [
+            128,
+            466
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 3
+      },
+      "exclude": [
+        [
+          [
+            60,
+            250
+          ],
+          [
+            340,
+            250
+          ],
+          [
+            340,
+            530
+          ],
+          [
+            60,
+            530
+          ],
+          [
+            60,
+            299
+          ],
+          [
+            136,
+            299
+          ],
+          [
+            151,
+            299
+          ],
+          [
+            151,
+            318
+          ],
+          [
+            252,
+            331
+          ],
+          [
+            252,
+            315
+          ],
+          [
+            267,
+            315
+          ],
+          [
+            267,
+            333
+          ],
+          [
+            287,
+            336
+          ],
+          [
+            287,
+            428
+          ],
+          [
+            267,
+            425
+          ],
+          [
+            267,
+            478
+          ],
+          [
+            251,
+            478
+          ],
+          [
+            251,
+            421
+          ],
+          [
+            151,
+            410
+          ],
+          [
+            151,
+            464
+          ],
+          [
+            135,
+            464
+          ],
+          [
+            135,
+            408
+          ],
+          [
+            118,
+            406
+          ],
+          [
+            115,
+            313
+          ],
+          [
+            136,
+            312
+          ],
+          [
+            136,
+            299
+          ],
+          [
+            60,
+            299
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "palm-top-left",
+      "crop": [
+        0,
+        0,
+        340,
+        440
+      ],
+      "seed": [
+        60,
+        330
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the sandy beach",
+      "object": "the upper-left palm tree, including fronds and its entire trunk, not the sky or water",
+      "footprint": [
+        [
+          [
+            22,
+            412
+          ],
+          [
+            62,
+            412
+          ],
+          [
+            62,
+            428
+          ],
+          [
+            22,
+            428
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "palm-bottom-left",
+      "crop": [
+        0,
+        600,
+        340,
+        500
+      ],
+      "seed": [
+        50,
+        980
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the sandy beach",
+      "object": "the lower-left palm tree, including fronds and its entire trunk, not the beach or driftwood",
+      "footprint": [
+        [
+          [
+            5,
+            1078
+          ],
+          [
+            60,
+            1078
+          ],
+          [
+            60,
+            1098
+          ],
+          [
+            5,
+            1098
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "palm-right",
+      "crop": [
+        1440,
+        590,
+        310,
+        510
+      ],
+      "seed": [
+        1660,
+        880
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the sandy beach",
+      "object": "the two palm trees at the right edge of the image, their trunks and their leafy green crowns, as one object; not the sand, shells, rock, or log",
+      "footprint": [
+        [
+          [
+            1690,
+            1076
+          ],
+          [
+            1742,
+            1076
+          ],
+          [
+            1742,
+            1098
+          ],
+          [
+            1690,
+            1098
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            1440,
+            560
+          ],
+          [
+            1760,
+            560
+          ],
+          [
+            1760,
+            648
+          ],
+          [
+            1600,
+            640
+          ],
+          [
+            1440,
+            640
+          ]
+        ],
+        [
+          [
+            1400,
+            1020
+          ],
+          [
+            1520,
+            1000
+          ],
+          [
+            1560,
+            1060
+          ],
+          [
+            1560,
+            1120
+          ],
+          [
+            1400,
+            1120
+          ]
+        ]
+      ]
+    }
+  ]
+}

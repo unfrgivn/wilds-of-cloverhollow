@@ -1,0 +1,666 @@
+{
+  "area": "woods",
+  "subjects": [
+    {
+      "id": "oak-west",
+      "crop": [
+        0,
+        0,
+        500,
+        1000
+      ],
+      "seed": [
+        350,
+        620
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor",
+      "object": "the large old oak at the left, only its own trunk, roots, low branches, and crown",
+      "footprint": [
+        [
+          [
+            285,
+            590
+          ],
+          [
+            330,
+            590
+          ],
+          [
+            390,
+            590
+          ],
+          [
+            440,
+            590
+          ],
+          [
+            470,
+            600
+          ],
+          [
+            445,
+            615
+          ],
+          [
+            380,
+            615
+          ],
+          [
+            315,
+            605
+          ]
+        ]
+      ],
+      "front": [
+        "pine-west"
+      ],
+      "exclude": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            180,
+            0
+          ],
+          [
+            180,
+            1000
+          ],
+          [
+            0,
+            1000
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "pine-west",
+      "crop": [
+        0,
+        0,
+        360,
+        1000
+      ],
+      "seed": [
+        145,
+        620
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor",
+      "object": "the far-left pine tree, including only its own trunk, roots, and needle canopy",
+      "footprint": [
+        [
+          [
+            40,
+            850
+          ],
+          [
+            70,
+            840
+          ],
+          [
+            110,
+            850
+          ],
+          [
+            120,
+            880
+          ],
+          [
+            100,
+            891
+          ],
+          [
+            50,
+            885
+          ]
+        ]
+      ],
+      "front": []
+    },
+    {
+      "id": "clubhouse",
+      "crop": [
+        350,
+        0,
+        1000,
+        1000
+      ],
+      "seed": [
+        610,
+        360
+      ],
+      "painted": true,
+      "canopy": false,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor beneath the treehouse",
+      "object": "only the wooden treehouse clubhouse: roof, walls, deck, stilts, ladder, stairs, and rails, excluding all surrounding trees and ferns",
+      "footprint": [
+        [
+          [
+            470,
+            400
+          ],
+          [
+            740,
+            400
+          ],
+          [
+            740,
+            440
+          ],
+          [
+            705,
+            476
+          ],
+          [
+            640,
+            460
+          ],
+          [
+            520,
+            468
+          ],
+          [
+            470,
+            450
+          ]
+        ]
+      ],
+      "front": [
+        "oak-west",
+        "pine-west",
+        "fern-west"
+      ],
+      "exclude": [
+        [
+          [
+            350,
+            0
+          ],
+          [
+            455,
+            0
+          ],
+          [
+            455,
+            1000
+          ],
+          [
+            350,
+            1000
+          ]
+        ],
+        [
+          [
+            742,
+            0
+          ],
+          [
+            1000,
+            0
+          ],
+          [
+            1000,
+            1000
+          ],
+          [
+            742,
+            1000
+          ]
+        ],
+        [
+          [
+            455,
+            430
+          ],
+          [
+            620,
+            430
+          ],
+          [
+            620,
+            1000
+          ],
+          [
+            455,
+            1000
+          ]
+        ],
+        [
+          [
+            620,
+            500
+          ],
+          [
+            742,
+            500
+          ],
+          [
+            742,
+            1000
+          ],
+          [
+            620,
+            1000
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "tree-east",
+      "crop": [
+        980,
+        0,
+        770,
+        800
+      ],
+      "seed": [
+        1320,
+        470
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor",
+      "object": "only the single huge east tree: its trunk, exposed roots, low branches, and own crown, excluding every neighboring tree and dark line",
+      "footprint": [
+        [
+          [
+            1300,
+            480
+          ],
+          [
+            1330,
+            470
+          ],
+          [
+            1370,
+            480
+          ],
+          [
+            1400,
+            510
+          ],
+          [
+            1380,
+            520
+          ],
+          [
+            1330,
+            520
+          ],
+          [
+            1290,
+            500
+          ]
+        ]
+      ],
+      "front": [
+        "oak-east"
+      ]
+    },
+    {
+      "id": "oak-east",
+      "crop": [
+        1300,
+        0,
+        450,
+        1000
+      ],
+      "seed": [
+        1640,
+        700
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor at the right edge",
+      "object": "the far-right pine tree, only its own trunk, roots, branches, and needle crown",
+      "footprint": [
+        [
+          [
+            1595,
+            975
+          ],
+          [
+            1690,
+            970
+          ],
+          [
+            1695,
+            998
+          ],
+          [
+            1595,
+            998
+          ]
+        ]
+      ],
+      "front": [],
+      "core": 2,
+      "exclude": [
+        [
+          [
+            1300,
+            360
+          ],
+          [
+            1600,
+            360
+          ],
+          [
+            1585,
+            600
+          ],
+          [
+            1580,
+            1000
+          ],
+          [
+            1300,
+            1000
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "log-west",
+      "crop": [
+        230,
+        780,
+        520,
+        320
+      ],
+      "seed": [
+        500,
+        950
+      ],
+      "canopy": false,
+      "samples": {
+        "object": 1,
+        "fill": 1
+      },
+      "ground": "the mossy green forest floor",
+      "object": "the large fallen moss-covered log across the lower left, including its broken upright branch, bark, cut end and cast shadow, but not the forest floor or nearby mushrooms",
+      "footprint": [
+        [
+          [
+            315,
+            1010
+          ],
+          [
+            370,
+            980
+          ],
+          [
+            470,
+            970
+          ],
+          [
+            580,
+            985
+          ],
+          [
+            675,
+            1020
+          ],
+          [
+            650,
+            1040
+          ],
+          [
+            570,
+            1045
+          ],
+          [
+            460,
+            1035
+          ],
+          [
+            360,
+            1030
+          ]
+        ]
+      ],
+      "painted": true
+    },
+    {
+      "id": "log-south",
+      "crop": [
+        900,
+        700,
+        700,
+        400
+      ],
+      "seed": [
+        1230,
+        860
+      ],
+      "samples": {
+        "object": 1,
+        "fill": 1
+      },
+      "ground": "the mossy green forest floor",
+      "object": "the angled fallen moss-covered log in the lower right, including its bark, moss, cut end and cast shadow, but not the forest floor, mushrooms, or any mushroom cap edge",
+      "footprint": [
+        [
+          [
+            1100,
+            875
+          ],
+          [
+            1160,
+            850
+          ],
+          [
+            1260,
+            840
+          ],
+          [
+            1360,
+            860
+          ],
+          [
+            1390,
+            895
+          ],
+          [
+            1360,
+            910
+          ],
+          [
+            1260,
+            920
+          ],
+          [
+            1160,
+            905
+          ],
+          [
+            1110,
+            890
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "log-north",
+      "crop": [
+        1000,
+        250,
+        500,
+        400
+      ],
+      "seed": [
+        1260,
+        500
+      ],
+      "samples": {
+        "object": 1,
+        "fill": 1
+      },
+      "ground": "the mossy green forest floor beside the stream",
+      "object": "the horizontal moss-covered fallen log beside the stream, including its round cut end and cast shadow, but not the stream, rocks, plants, or ground",
+      "footprint": [
+        [
+          [
+            1145,
+            490
+          ],
+          [
+            1190,
+            490
+          ],
+          [
+            1270,
+            490
+          ],
+          [
+            1350,
+            495
+          ],
+          [
+            1380,
+            500
+          ],
+          [
+            1340,
+            501
+          ],
+          [
+            1260,
+            501
+          ],
+          [
+            1180,
+            497
+          ]
+        ]
+      ],
+      "painted": true,
+      "home": [
+        1263,
+        520
+      ]
+    },
+    {
+      "id": "fern-west",
+      "crop": [
+        0,
+        700,
+        500,
+        400
+      ],
+      "seed": [
+        190,
+        930
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor at the lower left edge",
+      "object": "the dense fern and shrub border along the lower left edge, including all leafy fronds and cropped edge foliage, but not the log or ground",
+      "footprint": [
+        [
+          [
+            80,
+            950
+          ],
+          [
+            140,
+            920
+          ],
+          [
+            230,
+            930
+          ],
+          [
+            320,
+            970
+          ],
+          [
+            350,
+            1030
+          ],
+          [
+            330,
+            1095
+          ],
+          [
+            80,
+            1095
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "fern-east",
+      "crop": [
+        1300,
+        700,
+        450,
+        400
+      ],
+      "seed": [
+        1510,
+        940
+      ],
+      "painted": true,
+      "canopy": true,
+      "samples": {
+        "object": 1
+      },
+      "ground": "the mossy green forest floor at the lower right edge",
+      "object": "the dense fern and shrub border along the lower right and bottom edge, including all leafy fronds and cropped edge foliage, but not the fallen log, mushrooms, or ground",
+      "footprint": [
+        [
+          [
+            1550,
+            900
+          ],
+          [
+            1570,
+            895
+          ],
+          [
+            1590,
+            905
+          ],
+          [
+            1595,
+            925
+          ],
+          [
+            1595,
+            937
+          ],
+          [
+            1550,
+            937
+          ]
+        ]
+      ],
+      "core": 5
+    }
+  ]
+}

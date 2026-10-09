@@ -1,0 +1,507 @@
+{
+  "area": "trail",
+  "subjects": [
+    {
+      "id": "pines-top",
+      "crop": [
+        0,
+        0,
+        460,
+        240
+      ],
+      "seed": [
+        190,
+        70
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the painted trail ground",
+      "object": "the complete pines-top prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            60,
+            140
+          ],
+          [
+            300,
+            140
+          ],
+          [
+            300,
+            152
+          ],
+          [
+            60,
+            152
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rocks-top",
+      "crop": [
+        380,
+        0,
+        270,
+        225
+      ],
+      "seed": [
+        515,
+        98
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete rocks-top prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            465,
+            125
+          ],
+          [
+            570,
+            125
+          ],
+          [
+            570,
+            137
+          ],
+          [
+            465,
+            137
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "pines-left",
+      "crop": [
+        0,
+        130,
+        180,
+        530
+      ],
+      "seed": [
+        50,
+        395
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the painted trail ground",
+      "object": "the complete pines-left prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            0,
+            560
+          ],
+          [
+            40,
+            560
+          ],
+          [
+            40,
+            572
+          ],
+          [
+            0,
+            572
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "boulders-left",
+      "crop": [
+        150,
+        370,
+        375,
+        310
+      ],
+      "seed": [
+        338,
+        525
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete boulders-left prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            230,
+            580
+          ],
+          [
+            400,
+            580
+          ],
+          [
+            400,
+            592
+          ],
+          [
+            230,
+            592
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rock-meadow-top",
+      "crop": [
+        755,
+        215,
+        260,
+        260
+      ],
+      "seed": [
+        885,
+        345
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete rock-meadow-top prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            845,
+            375
+          ],
+          [
+            900,
+            375
+          ],
+          [
+            900,
+            387
+          ],
+          [
+            845,
+            387
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rock-path",
+      "crop": [
+        585,
+        445,
+        300,
+        267
+      ],
+      "seed": [
+        735,
+        578
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete rock-path prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            685,
+            612
+          ],
+          [
+            805,
+            612
+          ],
+          [
+            805,
+            624
+          ],
+          [
+            685,
+            624
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "signpost",
+      "crop": [
+        810,
+        350,
+        245,
+        298
+      ],
+      "seed": [
+        932,
+        499
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete signpost prop, only the object and its posts/base, not stream lines, grass, rocks, or ground",
+      "footprint": [
+        [
+          [
+            925,
+            548
+          ],
+          [
+            950,
+            548
+          ],
+          [
+            950,
+            560
+          ],
+          [
+            925,
+            560
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 3
+    },
+    {
+      "id": "pines-hill",
+      "crop": [
+        930,
+        100,
+        340,
+        470
+      ],
+      "seed": [
+        1080,
+        280
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the painted trail ground",
+      "object": "the two pine trees only, their full trunks and crowns; not the rocky hillside, soil, stream, or ground",
+      "footprint": [
+        [
+          [
+            1035,
+            380
+          ],
+          [
+            1165,
+            380
+          ],
+          [
+            1165,
+            390
+          ],
+          [
+            1035,
+            390
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            930,
+            380
+          ],
+          [
+            1270,
+            380
+          ],
+          [
+            1270,
+            570
+          ],
+          [
+            930,
+            570
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bench",
+      "crop": [
+        1400,
+        280,
+        260,
+        288
+      ],
+      "seed": [
+        1530,
+        424
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete bench prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            1545,
+            468
+          ],
+          [
+            1575,
+            468
+          ],
+          [
+            1575,
+            480
+          ],
+          [
+            1545,
+            480
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rock-lookout",
+      "crop": [
+        1305,
+        275,
+        240,
+        239
+      ],
+      "seed": [
+        1425,
+        394
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete rock-lookout prop, only the object and its posts/base, not stream lines, grass, rocks, or ground",
+      "footprint": [
+        [
+          [
+            1385,
+            414
+          ],
+          [
+            1465,
+            414
+          ],
+          [
+            1465,
+            426
+          ],
+          [
+            1385,
+            426
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 3
+    },
+    {
+      "id": "rock-ferns",
+      "crop": [
+        980,
+        565,
+        360,
+        295
+      ],
+      "seed": [
+        1160,
+        712
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the painted trail ground",
+      "object": "the complete rock-ferns prop from top to its ground contact, not neighboring scenery",
+      "footprint": [
+        [
+          [
+            1080,
+            760
+          ],
+          [
+            1230,
+            760
+          ],
+          [
+            1230,
+            772
+          ],
+          [
+            1080,
+            772
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bridge-rail",
+      "crop": [
+        1170,
+        440,
+        200,
+        200
+      ],
+      "seed": [
+        1287,
+        562
+      ],
+      "object": "the near rail of the small wooden footbridge: its three front round wooden posts (bottom-left, middle, and right) and the rope rail hanging between them, along the bridge's lower edge. Not the bridge's plank deck, not the two back posts or their rope at the top of the bridge, not the stream, grass, or path",
+      "ground": "the painted trail ground",
+      "painted": true,
+      "core": 2,
+      "samples": {
+        "object": 1
+      },
+      "footprint": [
+        [
+          [
+            1232,
+            598
+          ],
+          [
+            1342,
+            548
+          ],
+          [
+            1346,
+            556
+          ],
+          [
+            1236,
+            610
+          ]
+        ]
+      ]
+    }
+  ]
+}

@@ -1537,7 +1537,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     doodle.
   - Follow-up, open: the woods' floor is still Milestone 26's rectangle, so
     Fae can walk into the forest behind the clearing (its trees fade over
-    her).
+    her). In progress (2026-10-09): `.worktrees/woods-floor`, branch
+    `woods-floor`; it touches the woods' area and the runs that cross it.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

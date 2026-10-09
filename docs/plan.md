@@ -1559,8 +1559,16 @@ more bad guys, and the blacklight lantern, made and built while away.
     and sand the boxes walled off round each thing are open. The lookout
     run, re-recorded, reads the same beats; `propBlockerErrors` reports none
     anywhere.
-  - Then: a place where the lasso changes the
-    world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
+  - Milestone 39, recess on the playing field (in progress, 2026-10-09,
+    `.worktrees/m39`, branch `m39-field`): after music class, recess opens
+    the gym's back door onto the playing field behind the school, where the
+    kid in the purple hood ran. A fizzy squirrel guards the old oak by the
+    creek; calmed, Fae loops the lasso over the oak's branch and swings
+    across (a gap), finds the hooded kid's stash, and pulls down the lever
+    high on the old footbridge's post (a lever), which lays the bridge
+    across the water. The engine gains crossings: water solid until a story
+    flag lays a way over it.
+  - Then: the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).
 

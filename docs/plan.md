@@ -1518,6 +1518,12 @@ more bad guys, and the blacklight lantern, made and built while away.
     Journal pause menu.
     The harness exposes recent cue and playback logs without changing saves.
   - Milestone 38, the music room and the flute: done (above).
+  - A fix in progress (2026-10-09): the Whispering Woods' north-east log (Fae
+    can stand on it, and its footprint is a wall on the open grass south of
+    it) and its stream (Fae can walk on the water), found by auditing the
+    kits against their paintings; `.worktrees/woods-fix`, branch `woods-fix`.
+    It touches the woods' kit and area, a kit check, and the replays that
+    cross the woods.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

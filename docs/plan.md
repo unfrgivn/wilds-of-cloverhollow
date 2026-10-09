@@ -1550,13 +1550,15 @@ more bad guys, and the blacklight lantern, made and built while away.
     woods' pocket behind its west log no longer redraws the log. A new
     check, `propBlockerErrors`, refuses a blocker drawn over a prop's
     footprint. The bay runs, re-recorded, read the same beats.
-  - Follow-up, open: the Cliffside Trail's floor and blockers come from
-    tools/art/geometry/trail.ts (Milestone 21): boxes over its rocks, pines,
-    and bench beside their props' own footprints (one, behind the hillside
-    pines, is pinned as known in `tests/unit/props.test.ts`), and its two
-    reed clumps have no props. They need the floor traced round the slope
-    and the trail run re-recorded to reach the bay. In progress
-    (2026-10-09): `.worktrees/trail-fix`, branch `trail-fix`.
+  - A fifth fix (2026-10-09): the Cliffside Trail is the last area off
+    Milestone 21's box blockers. Its rocks, boulders, bench and signpost
+    stand on footprints traced along where they meet the ground, its pines
+    on their trunks, and its two reed clumps are props that fade over Fae;
+    tools/art/geometry/trail.ts writes only the floor, now round the dense
+    snowy pines at the left edge, so the trail has no blockers. The grass
+    and sand the boxes walled off round each thing are open. The lookout
+    run, re-recorded, reads the same beats; `propBlockerErrors` reports none
+    anywhere.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

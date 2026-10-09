@@ -1,23 +1,21 @@
 #!/usr/bin/env bun
-// The Cliffside Trail's floor and blockers, outlined by hand on
-// its painting (units; 2 px each) and written into content/areas/trail.json.
-// It climbs from Bubblegum Bay (the beach at the bottom right) to Pinecone
-// Pass (the snowy pines at the top left), past two meadows, a signpost, a
-// footbridge over the stream, and a lookout bench above the sea.
+// The Cliffside Trail's floor, outlined by hand on its painting (units; 2 px
+// each) and written into content/areas/trail.json. It climbs from Bubblegum
+// Bay (the beach at the bottom right) to Pinecone Pass (the snowy pines at the
+// top left), past two meadows, a signpost, a footbridge over the stream, and a
+// lookout bench above the sea.
 //
-//   - the floor is the hillside, the meadows, the path, the beach, and the
-//     lookout, less the sea, the cliffs, the stream (crossed by the bridge),
-//     and the thick woods at the left and bottom edges;
-//   - a thing blocks its whole outline (a boulder, a stand of trees, the bench),
-//     or only its bottom 25 units (the signpost: Fae walks behind it);
+// The floor is the hillside, the meadows, the path, the beach, and the
+// lookout, less the sea, the cliffs, the stream (crossed by the bridge), and
+// the thick woods at the left and bottom edges. Every standing thing (the
+// rocks, the pines, the bench, the signpost, the reeds) is a prop in the
+// trail's kit (art/kit/trail.json), solid on its own footprint, so the area
+// has no blockers.
 //
 //   bun tools/art/geometry/trail.ts
 import { readFileSync, writeFileSync } from "node:fs";
 
 type Point = [number, number];
-// How a thing blocks: its whole outline, or its foot strip (Fae walks behind it).
-type Blocks = "whole" | "foot";
-type Thing = { id: string; foot: number; blocks: Blocks; outline: Point[] };
 
 // The walkable hillside, clockwise from the snowy path's mouth at the left edge.
 const floor: Point[] = [
@@ -43,75 +41,15 @@ const floor: Point[] = [
   // The bottom edge, west to the ferns and the pines at the bottom left.
   [1000, 1100], [800, 1100], [600, 1065], [450, 1010], [330, 960], [270, 890],
   [230, 800], [160, 715], [100, 640], [40, 600], [0, 590],
+  // Up the left edge to the foot of the dense snowy pines, round their front,
+  // and back to the edge below the snowy path's mouth.
+  [0, 560], [40, 560], [70, 520], [100, 420], [100, 300], [60, 230], [0, 230],
 ];
 
-const things: Thing[] = [
-  { id: "pines-top", foot: 160, blocks: "whole", outline: [[0, 0], [380, 0], [380, 90],
-    [300, 130], [190, 140], [60, 120], [0, 100]] },
-  { id: "rocks-top", foot: 130, blocks: "whole", outline: [[460, 90], [520, 70], [565, 85],
-    [570, 110], [520, 125], [465, 120]] },
-  { id: "pines-left", foot: 560, blocks: "whole", outline: [[0, 230], [60, 230], [100, 300],
-    [100, 420], [70, 520], [40, 560], [0, 560]] },
-  { id: "boulders-left", foot: 575, blocks: "whole", outline: [[230, 515], [310, 480],
-    [395, 470], [440, 490], [445, 540], [400, 560], [300, 580], [230, 575]] },
-  { id: "rock-meadow-top", foot: 375, blocks: "whole", outline: [[835, 345], [880, 315],
-    [925, 320], [935, 350], [900, 370], [845, 375]] },
-  { id: "rock-path", foot: 610, blocks: "whole", outline: [[665, 565], [725, 545],
-    [785, 560], [805, 600], [760, 612], [685, 612]] },
-  { id: "signpost", foot: 548, blocks: "foot", outline: [[890, 450], [975, 450],
-    [975, 500], [950, 500], [950, 548], [925, 548], [925, 500], [890, 500]] },
-  // The two pines on the hill; the nook between them and the cliff's brow is
-  // part of them (their crowns would hide Fae there).
-  { id: "pines-hill", foot: 470, blocks: "whole", outline: [[1060, 215], [1110, 200],
-    [1185, 275], [1190, 360], [1165, 420], [1165, 470], [1035, 470], [1010, 420],
-    [1040, 330]] },
-  { id: "bench", foot: 465, blocks: "whole", outline: [[1480, 385], [1520, 380],
-    [1580, 410], [1575, 450], [1545, 468], [1480, 435]] },
-  { id: "rock-lookout", foot: 412, blocks: "whole", outline: [[1385, 395], [1415, 375],
-    [1455, 378], [1465, 405], [1430, 414], [1390, 412]] },
-  { id: "rock-ferns", foot: 760, blocks: "whole", outline: [[1060, 690], [1130, 665],
-    [1240, 680], [1260, 720], [1230, 755], [1150, 760], [1080, 750]] },
-  { id: "grass-beach", foot: 900, blocks: "whole", outline: [[1560, 770], [1620, 760],
-    [1700, 780], [1750, 800], [1750, 900], [1650, 910], [1580, 880]] },
-  { id: "grass-bottom", foot: 1100, blocks: "whole", outline: [[965, 930], [1020, 920],
-    [1100, 935], [1170, 1000], [1160, 1100], [985, 1100], [970, 1030]] },
-  { id: "pines-bottom", foot: 1100, blocks: "whole", outline: [[0, 600], [100, 640],
-    [190, 750], [250, 830], [330, 940], [450, 1000], [520, 1100], [0, 1100]] },
-];
 
-function area(): Record<string, unknown> {
-  const value: unknown = JSON.parse(readFileSync("content/areas/trail.json", "utf8"));
-  if (typeof value !== "object" || value === null || Array.isArray(value))
-    throw new Error("content/areas/trail.json isn't an object");
-  return { ...value };
-}
-
-// Clips a polygon to the half-plane where `keep` is at least 0, a linear
-// function of the point (Sutherland-Hodgman, one edge).
-function clip(polygon: Point[], keep: (point: Point) => number): Point[] {
-  const out: Point[] = [];
-  polygon.forEach((current, index) => {
-    const previous = polygon[(index + polygon.length - 1) % polygon.length] ?? current;
-    const a = keep(previous);
-    const b = keep(current);
-    if ((a >= 0) !== (b >= 0)) {
-      const t = a / (a - b);
-      out.push([Math.round(previous[0] + t * (current[0] - previous[0])),
-        Math.round(previous[1] + t * (current[1] - previous[1]))]);
-    }
-    if (b >= 0) out.push(current);
-  });
-  return out;
-}
-
-const footStrip = 25;
-const blockers = things.map((thing) => thing.blocks === "whole"
-  ? thing.outline
-  : clip(thing.outline, (point) => point[1] - (thing.foot - footStrip)));
-const next = {
-  ...area(),
-  walkable: floor,
-  blockers,
-};
-writeFileSync("content/areas/trail.json", `${JSON.stringify(next, null, 2)}\n`);
-console.log(`trail: ${floor.length} floor points, ${blockers.length} blockers`);
+const value: unknown = JSON.parse(readFileSync("content/areas/trail.json", "utf8"));
+if (typeof value !== "object" || value === null || Array.isArray(value))
+  throw new Error("content/areas/trail.json isn't an object");
+writeFileSync("content/areas/trail.json",
+  `${JSON.stringify({ ...value, walkable: floor, blockers: [] }, null, 2)}\n`);
+console.log(`trail: ${floor.length} floor points, no blockers`);

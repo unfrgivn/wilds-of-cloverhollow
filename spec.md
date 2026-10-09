@@ -484,8 +484,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   hamster gets him to hand her his blacklight lantern (`has_lantern`).
 - Cliffside Trail (Milestone 21): the first trail between lands, a painted
   1750x1100 area climbing from Bubblegum Bay's south beach to Pinecone Pass's
-  east path; its floor and blockers are written by
-  `tools/art/geometry/trail.ts`, its scenery is a kit (section 6.2). Its ways in and out are thin triggers on the
+  east path; its floor is written by `tools/art/geometry/trail.ts` and every
+  standing thing on it (its rocks, pines, bench, signpost, and reeds) is a
+  kit prop, solid on its own footprint (section 6.2), so it has no blockers.
+  Its ways in and out are thin triggers on the
   floor's outer edges: the pass's east edge to the trail's west edge
   (`trail.pass`, facing right) and back (`pass.trail`, facing left); the bay's
   south edge to the trail's beach (`trail.bay`, facing up) and back
@@ -690,9 +692,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   spades, the picnic basket), Pinecone Pass (four pine stands, the lodge, the
   cocoa stand, three groups of benches, the bus shelter, the lift towers, the
   snowman, the signs), the Cliffside Trail (pines, rocks, the signpost, the
-  lookout bench, the footbridge's near rail as one prop), and the Whispering
-  Woods (its trees, the tree house, three logs, two fern beds). Trees, ferns,
-  the bay's sign and its umbrella fade while Fae is behind them (canopies).
+  lookout bench, the footbridge's near rail as one prop, two reed clumps),
+  and the Whispering Woods (its trees, the tree house, three logs, two fern
+  beds). Trees, ferns, reeds, the bay's sign and its umbrella fade while Fae
+  is behind them (canopies).
   Every prop is painted but the woods' south log, which is lifted; the plates
   are the approved paintings but for its hole.
 - An area's floor is one piece: from any spawn, Fae can walk to every other

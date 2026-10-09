@@ -1,7 +1,7 @@
 {
   "asset": "trail-kit",
   "date": "2026-10-09",
-  "summary": "The approved trail painting split into a ground plate and 12 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "summary": "The approved trail painting split into a ground plate and 14 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/trail.json",
   "painting": "art/source/areas/trail/painting/ground.json",
@@ -68,6 +68,14 @@
       "bridge-rail": [
         "iso-1.jpg",
         "crop.json"
+      ],
+      "reeds-right": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "reeds-bottom": [
+        "iso-1.jpg",
+        "crop.json"
       ]
     }
   },
@@ -76,7 +84,7 @@
     "pages": [
       "assets/areas/trail/props-0.json"
     ],
-    "decodedMegabytes": 11.3
+    "decodedMegabytes": 9.2
   },
   "measurements": {
     "rebuiltVsPainting": "0.00% of the painting's pixels differ by more than 12% when the default layout is rebuilt from the kit"
@@ -95,7 +103,9 @@
     "bench",
     "rock-lookout",
     "rock-ferns",
-    "bridge-rail"
+    "bridge-rail",
+    "reeds-right",
+    "reeds-bottom"
   ],
   "lifted": []
 }

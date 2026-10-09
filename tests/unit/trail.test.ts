@@ -1,17 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  type ActionFrame,
+  type Area,
   blankInput,
   createState,
   distanceToPolygon,
+  everyPropFootprint,
   journalNotes,
   partySlots,
+  type Point,
   pointInPolygon,
+  type State,
   step,
   targetInteractable,
-  type ActionFrame,
-  type Area,
-  type Point,
-  type State,
   type Wild,
 } from "../../src/core";
 import { hiddenPositions } from "../../src/content/area-checks";
@@ -49,7 +50,8 @@ const pass = areaFor("pass");
 function standable(area: Area, point: Point): boolean {
   if (!pointInPolygon(point, area.walkable)) return false;
   if (distanceToPolygon(point, area.walkable) < radius) return false;
-  const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
+  const solid = [...area.blockers, ...everyPropFootprint(area),
+    ...area.npcs.map((npc) => npc.footprint)];
   return solid.every(
     (polygon) => !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius,
   );
@@ -137,7 +139,7 @@ describe("the trail follows its painting", () => {
     ["the snowy path at the top left", { x: 400, y: 205 }],
     ["the path along the top", { x: 700, y: 140 }],
     ["the path's east bend", { x: 1000, y: 330 }],
-    ["the path through the middle", { x: 500, y: 500 }],
+    ["the path through the middle", { x: 540, y: 560 }],
     ["the path's west bend", { x: 300, y: 700 }],
     ["the path along the bottom", { x: 700, y: 950 }],
     ["the beach", { x: 1300, y: 850 }],
@@ -159,6 +161,50 @@ describe("the trail follows its painting", () => {
   ];
   for (const [what, point] of off)
     it(`keeps Fae out of ${what}`, () => expect(pointInPolygon(point, trail.walkable)).toBe(false));
+
+  // Every standing thing is solid where it meets the ground (its prop's
+  // footprint) and nowhere else: Milestone 21's boxes walled off the open
+  // ground round them.
+  const things: [string, Point][] = [
+    ["the small rock by the snowy pines", { x: 450, y: 140 }],
+    ["the boulders", { x: 360, y: 560 }],
+    ["the rock in the upper meadow", { x: 875, y: 365 }],
+    ["the rock by the path", { x: 735, y: 600 }],
+    ["the signpost", { x: 938, y: 550 }],
+    ["the left pine on the hill", { x: 1058, y: 480 }],
+    ["the right pine on the hill", { x: 1098, y: 470 }],
+    ["the pine by the snowy path", { x: 158, y: 418 }],
+    ["the lookout bench", { x: 1535, y: 455 }],
+    ["the rock at the lookout", { x: 1425, y: 410 }],
+    ["the rock in the ferns", { x: 1155, y: 745 }],
+    ["the reeds by the beach", { x: 1660, y: 885 }],
+    ["the reeds at the bottom", { x: 1010, y: 1058 }],
+    ["the rock in the bottom reeds", { x: 1130, y: 1055 }],
+  ];
+  for (const [what, point] of things)
+    it(`makes ${what} solid`, () => expect(standable(trail, point)).toBe(false));
+
+  const ground: [string, Point][] = [
+    ["the grass behind the boulders", { x: 310, y: 480 }],
+    ["the grass beside the upper meadow's rock", { x: 835, y: 340 }],
+    ["the grass behind the rock by the path", { x: 765, y: 555 }],
+    ["the grass beside the signpost", { x: 925, y: 520 }],
+    ["the grass behind the ferns", { x: 1155, y: 660 }],
+    ["the sand behind the reeds by the beach", { x: 1620, y: 760 }],
+    ["the sand behind the reeds at the bottom", { x: 1020, y: 920 }],
+    ["the meadow's edge by the woods at the bottom left", { x: 290, y: 880 }],
+  ];
+  for (const [what, point] of ground)
+    it(`lets Fae onto ${what}`, () => expect(standable(trail, point)).toBe(true));
+
+  it("lets Fae up the slope behind the pines on the hill, which fade over her", () => {
+    expect(standable(trail, { x: 1130, y: 465 })).toBe(true);
+    expect(trail.props.find((prop) => prop.id === "pines-hill")?.canopy).toBe(true);
+  });
+
+  it("leaves no plain blockers: the floor and the props do it all", () => {
+    expect(trail.blockers).toEqual([]);
+  });
 
   it("never lets props hide most of Fae", () => {
     expect(hiddenPositions(trail, radius)).toEqual([]);

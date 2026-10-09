@@ -259,11 +259,7 @@ describe("props", () => {
   });
 
   it("keep plain blockers off their footprints", () => {
-    // The trail's Milestone 21 boxes are a follow-up in docs/plan.md; fixing
-    // this one means deleting it here.
-    expect(Object.values(world.areas).flatMap(propBlockerErrors)).toEqual([
-      "trail: blocker 7 covers prop pines-hill's footprint",
-    ]);
+    expect(Object.values(world.areas).flatMap(propBlockerErrors)).toEqual([]);
   });
 
   it("catch a blocker drawn over a prop's footprint", () => {

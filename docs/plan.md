@@ -1540,6 +1540,15 @@ more bad guys, and the blacklight lantern, made and built while away.
     forest behind the clearing and the big trunks, and corridors behind the
     edge trunks keep both exits. The woods run and the runs chained from it
     (arcade, school, gym, music) are re-recorded and read the same beats.
+  - In progress (2026-10-09): the last box blockers. An audit of every
+    area's plain blockers found objects with box collision and no depth:
+    Bubblegum Bay's two logs, beach balls, bucket, spades, and picnic
+    basket; the Cliffside Trail's Milestone 21 boxes over its rocks and
+    pines (on top of their props' footprints) and its two reed clumps;
+    Meadow Park's pond (a box whose corners are walls on the grass); and the
+    east hall's drinking fountain (its blocker 40 units in front of it).
+    `.worktrees/last-blockers`, branch `last-blockers`; it touches those
+    areas, a blocker check, and the runs that cross them.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

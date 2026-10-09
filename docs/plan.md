@@ -1555,7 +1555,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     and bench beside their props' own footprints (one, behind the hillside
     pines, is pinned as known in `tests/unit/props.test.ts`), and its two
     reed clumps have no props. They need the floor traced round the slope
-    and the trail run re-recorded to reach the bay.
+    and the trail run re-recorded to reach the bay. In progress
+    (2026-10-09): `.worktrees/trail-fix`, branch `trail-fix`.
   - Then: a place where the lasso changes the
     world (a lever, a gap), and the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

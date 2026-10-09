@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// The Cliffside Trail's floor, blockers, and occluders, outlined by hand on
+// The Cliffside Trail's floor and blockers, outlined by hand on
 // its painting (units; 2 px each) and written into content/areas/trail.json.
 // It climbs from Bubblegum Bay (the beach at the bottom right) to Pinecone
 // Pass (the snowy pines at the top left), past two meadows, a signpost, a
@@ -9,17 +9,14 @@
 //     lookout, less the sea, the cliffs, the stream (crossed by the bridge),
 //     and the thick woods at the left and bottom edges;
 //   - a thing blocks its whole outline (a boulder, a stand of trees, the bench),
-//     only its bottom 25 units (the signpost: Fae walks behind it), or nothing
-//     (the bridge's rail, at the edge of the floor);
-//   - every thing is drawn over Fae while her feet are north of its foot.
+//     or only its bottom 25 units (the signpost: Fae walks behind it);
 //
-//   bun tools/art/geometry/trail.ts && bun tools/art/area-occluders.ts content/areas/trail.json
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+//   bun tools/art/geometry/trail.ts
+import { readFileSync, writeFileSync } from "node:fs";
 
 type Point = [number, number];
-// How a thing blocks: its whole outline, its foot strip (Fae walks behind it), or
-// not at all (a railing at the floor's edge, which the floor already keeps her inside).
-type Blocks = "whole" | "foot" | "none";
+// How a thing blocks: its whole outline, or its foot strip (Fae walks behind it).
+type Blocks = "whole" | "foot";
 type Thing = { id: string; foot: number; blocks: Blocks; outline: Point[] };
 
 // The walkable hillside, clockwise from the snowy path's mouth at the left edge.
@@ -72,16 +69,6 @@ const things: Thing[] = [
     [1580, 410], [1575, 450], [1545, 468], [1480, 435]] },
   { id: "rock-lookout", foot: 412, blocks: "whole", outline: [[1385, 395], [1415, 375],
     [1455, 378], [1465, 405], [1430, 414], [1390, 412]] },
-  // The bridge's near (south) rail and posts, in slivers along the deck's south edge,
-  // each with the baseline of its west (lower) end, like the bay's dock rail.
-  { id: "bridge-rail-1", foot: 599, blocks: "none", outline: [[1238, 565], [1263, 553],
-    [1263, 593], [1238, 605]] },
-  { id: "bridge-rail-2", foot: 587, blocks: "none", outline: [[1263, 553], [1288, 541],
-    [1288, 581], [1263, 593]] },
-  { id: "bridge-rail-3", foot: 575, blocks: "none", outline: [[1288, 541], [1313, 528],
-    [1313, 568], [1288, 581]] },
-  { id: "bridge-rail-4", foot: 562, blocks: "none", outline: [[1313, 528], [1342, 514],
-    [1342, 554], [1313, 568]] },
   { id: "rock-ferns", foot: 760, blocks: "whole", outline: [[1060, 690], [1130, 665],
     [1240, 680], [1260, 720], [1230, 755], [1150, 760], [1080, 750]] },
   { id: "grass-beach", foot: 900, blocks: "whole", outline: [[1560, 770], [1620, 760],
@@ -93,7 +80,6 @@ const things: Thing[] = [
 ];
 
 function area(): Record<string, unknown> {
-  if (!existsSync("content/areas/trail.json")) return {};
   const value: unknown = JSON.parse(readFileSync("content/areas/trail.json", "utf8"));
   if (typeof value !== "object" || value === null || Array.isArray(value))
     throw new Error("content/areas/trail.json isn't an object");
@@ -119,32 +105,13 @@ function clip(polygon: Point[], keep: (point: Point) => number): Point[] {
 }
 
 const footStrip = 25;
-const blockers = things.flatMap((thing) => thing.blocks === "none" ? []
-  : [thing.blocks === "whole"
-    ? thing.outline
-    : clip(thing.outline, (point) => point[1] - (thing.foot - footStrip))]);
-const occluders = things.map((thing) => ({
-  id: thing.id,
-  polygon: thing.outline,
-  baseline: thing.foot,
-}));
-
+const blockers = things.map((thing) => thing.blocks === "whole"
+  ? thing.outline
+  : clip(thing.outline, (point) => point[1] - (thing.foot - footStrip)));
 const next = {
-  id: "trail",
-  name: "Cliffside Trail",
-  width: 1750,
-  height: 1100,
-  ground: "trail",
-  interactables: [],
-  critters: [],
-  npcs: [],
-  triggers: [],
-  spawns: {},
   ...area(),
   walkable: floor,
   blockers,
-  occluders,
 };
 writeFileSync("content/areas/trail.json", `${JSON.stringify(next, null, 2)}\n`);
-console.log(`trail: ${floor.length} floor points, ${blockers.length} blockers, ` +
-  `${occluders.length} occluders`);
+console.log(`trail: ${floor.length} floor points, ${blockers.length} blockers`);

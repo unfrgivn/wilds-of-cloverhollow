@@ -45,7 +45,7 @@ function standable(point: Point): boolean {
 }
 
 // The share of Fae's body box (50 x 140 units above her feet, on a 5-unit
-// grid) that occluders draw over, as area-checks.ts measures it.
+// grid) that props draw over, as area-checks.ts measures it.
 function coverage(feet: Point): number {
   const covering = pass.props.filter((prop) => !prop.canopy &&
     Object.values(prop.states).some((state) => feet.y < Math.max(...state.front.ys)));
@@ -149,17 +149,22 @@ describe("Pinecone Pass follows its painting", () => {
     }
   });
 
-  it("cuts every occluder from something painted", () => {
-    for (const occluder of pass.occluders) {
+  it("cuts every prop from something painted", () => {
+    for (const prop of pass.props) {
+      const state = prop.states.default;
+      if (state === undefined) throw new Error(`${prop.id} has no default state`);
       let cells = 0;
       let things = 0;
       for (let j = 0; j < rows.length; j += 1)
         for (let i = 0; i < columns; i += 1) {
-          if (!pointInPolygon(centre(i, j), occluder.polygon)) continue;
+          const point = centre(i, j);
+          const column = state.silhouette.columns[Math.floor((point.x - state.silhouette.left) /
+            state.silhouette.step)] ?? [];
+          if (!column.some(([top, bottom]) => point.y >= top && point.y <= bottom)) continue;
           cells += 1;
           if (at(i, j) === "o") things += 1;
         }
-      expect(things / Math.max(cells, 1), `${occluder.id} is mostly bare snow`)
+      expect(things / Math.max(cells, 1), `${prop.id} is mostly bare snow`)
         .toBeGreaterThanOrEqual(0.4);
     }
   });

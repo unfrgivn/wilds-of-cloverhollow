@@ -1,16 +1,15 @@
 // Draws an area's JSON over its painting for review: the floor's outline,
 // blockers (red), props' footprints in every state (orange; painted props
-// dashed), occluders and their baselines (blue), doors (magenta), spawns
-// (gold), look points with their reach (violet), and people's footprints
-// (cyan). Green is every spot Fae's feet can get to from a spawn: on the floor
-// and a player radius clear of its edge, every blocker, prop, and footprint
-// (the core's own rule). Green on furniture, behind it, or off the painted
-// floor is a geometry bug.
+// dashed), doors (magenta), spawns (gold), look points with their reach
+// (violet), and people's footprints (cyan). Green is every spot Fae's feet can
+// get to from a spawn: on the floor and a player radius clear of its edge,
+// every blocker, prop, and footprint (the core's own rule). Green on
+// furniture, behind it, or off the painted floor is a geometry bug.
 //
 //   bun tools/art/area-overlay.ts <area>   (writes art/review/<area>-overlay.png)
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { everyPropFootprint, type Polygon } from "../../src/core";
+import type { Polygon } from "../../src/core";
 import { reachablePositions } from "../../src/content/area-checks";
 import { loadContent } from "../../src/content/load";
 
@@ -39,10 +38,6 @@ const manifest: { tiles: { file: string; x: number; y: number; width: number; he
 const images = manifest.tiles.map((tile) =>
   `<image href="${process.cwd()}/public/assets/areas/${area.ground}/${tile.file}" ` +
   `x="${tile.x}" y="${tile.y}" width="${tile.width}" height="${tile.height}"/>`).join("");
-const baselines = area.occluders.map((item) => {
-  const xs = item.polygon.map(([x]) => x);
-  return `<path d="M${px(Math.min(...xs))} ${px(item.baseline)}H${px(Math.max(...xs))}"/>`;
-}).join("");
 const spawns = Object.entries(area.spawns).map(([name, point]) =>
   `<circle cx="${px(point.x)}" cy="${px(point.y)}" r="18"/>` +
   `<text x="${px(point.x) + 24}" y="${px(point.y)}">${name}</text>`).join("");
@@ -65,9 +60,6 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${
         .map((item) => `<polygon points="${poly(item)}"/>`).join(""))).join("")) +
   group('fill="#17c3e055" stroke="#0a7f99" stroke-width="6"',
     area.npcs.map((npc) => `<polygon points="${poly(npc.footprint)}"/>`).join("")) +
-  group('fill="none" stroke="#1769aa" stroke-width="8"',
-    area.occluders.map((item) => `<polygon points="${poly(item.polygon)}"/>`).join("")) +
-  group('fill="none" stroke="#1769aa" stroke-dasharray="18 12"', baselines) +
   group('fill="#e0309a44" stroke="#c0157f" stroke-width="8"',
     area.triggers.map((item) => `<polygon points="${poly(item.polygon)}"/>`).join("")) +
   group('fill="#e6b800" stroke="#543" stroke-width="5"', spawns) +

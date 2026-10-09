@@ -170,18 +170,7 @@ describe("Bubblegum Bay follows its painting", () => {
     }
   });
 
-  it("cuts every occluder from something painted, with its baseline at its foot", () => {
-    for (const occluder of bay.occluders) {
-      const inside = cellsIn(occluder.polygon);
-      const things = inside.filter(([i, j]) => painted(i, j)).length;
-      expect(things / Math.max(inside.length, 1), `${occluder.id} covers no painted thing`)
-        .toBeGreaterThanOrEqual(0.5);
-      const ys = occluder.polygon.map(([, y]) => y);
-      expect(occluder.baseline, `${occluder.id} baseline`).toBeGreaterThanOrEqual(Math.min(...ys));
-      expect(occluder.baseline, `${occluder.id} baseline`)
-        .toBeLessThanOrEqual(Math.max(...ys) + 15);
-    }
-  });
+
 
   it("walks the whole dock, rail to rail, to its far end", () => {
     for (let s = 0.06; s <= 0.95; s += 0.08)

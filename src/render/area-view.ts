@@ -3,8 +3,7 @@ import type { Spritesheet } from "pixi.js";
 import {
   faeBox, propCovers, propStateName, type Area, type Point, type Prop, type World,
 } from "../core";
-import { bodyCover } from "../content/area-checks";
-import { parseGroundManifest, parseOccluderManifest } from "../content/load";
+import { parseGroundManifest } from "../content/load";
 import { assetUrl } from "../platform/assets";
 
 const colour = (value: string): number => parseInt(value.slice(1), 16);
@@ -92,7 +91,6 @@ export class AreaView {
   private readonly shadows = new Container();
   private readonly textures: string[] = [];
   private readonly sprites: Sprite[] = [];
-  private readonly canopies: { occluder: Area["occluders"][number]; sprite: Sprite }[] = [];
   private readonly props: PropView[] = [];
   private canopyTick: number | undefined;
 
@@ -137,30 +135,6 @@ export class AreaView {
       view.ground.addChild(sprite);
     }
     view.ground.addChild(view.shadows);
-    if (area.occluders.length > 0) {
-      const cutouts = parseOccluderManifest(
-        await json(`${root}/occluders.json`),
-        `${root}/occluders.json`,
-      );
-      for (const cutout of cutouts.cutouts) {
-        const occluder = area.occluders.find((item) => item.id === cutout.id);
-        if (occluder === undefined) continue;
-        const path = assetUrl(`${root}/${cutout.file}`);
-        const texture = await Assets.load<Texture>({
-          src: path,
-          data: { autoGenerateMipmaps: true },
-        });
-        view.textures.push(path);
-        const sprite = new Sprite(texture);
-        sprite.position.set(cutout.x, cutout.y);
-        sprite.scale.set(0.5);
-        sprite.label = `occluder:${cutout.id}`;
-        sprite.zIndex = occluder.baseline;
-        view.sprites.push(sprite);
-        if (occluder.canopy === true) view.canopies.push({ occluder, sprite });
-        depth.addChild(sprite);
-      }
-    }
     const sheets: Spritesheet[] = [];
     for (const atlas of area.atlases) {
       const path = assetUrl(atlas);
@@ -214,9 +188,6 @@ export class AreaView {
       const gap = (behind ? CANOPY_ALPHA : 1) - alpha;
       return alpha + Math.sign(gap) * Math.min(Math.abs(gap), CANOPY_STEP * ticks);
     };
-    for (const { occluder, sprite } of this.canopies)
-      sprite.alpha = ease(sprite.alpha,
-        feet.y < occluder.baseline && bodyCover(occluder.polygon, feet) > 0.05);
     for (const view of this.props) {
       const shown = propStateName(world, ink, view.prop);
       if (shown !== view.shown) {
@@ -238,11 +209,8 @@ export class AreaView {
   }
 
   get canopyAlphas(): { id: string; alpha: number }[] {
-    return [
-      ...this.canopies.map(({ occluder, sprite }) => ({ id: occluder.id, alpha: sprite.alpha })),
-      ...this.props.filter((view) => view.prop.canopy)
-        .map((view) => ({ id: view.prop.id, alpha: view.alpha })),
-    ];
+    return this.props.filter((view) => view.prop.canopy)
+      .map((view) => ({ id: view.prop.id, alpha: view.alpha }));
   }
 
   // Each prop's state and strips (world x range and sort y), for the harness.

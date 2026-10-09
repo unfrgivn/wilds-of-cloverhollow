@@ -1,4 +1,3 @@
-import { readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   distanceToPolygon, everyPropFootprint, pointInPolygon, propCoversPoint, type Area, type Point,
@@ -166,10 +165,5 @@ describe("what Bubblegum Bay draws in front of Fae", () => {
     }
   });
 
-  it("ships only its plate and its prop atlases", () => {
-    const files = readdirSync("public/assets/areas/bay").filter((file) =>
-      !/^ground(_\d+_\d+\.webp|\.json)$/.test(file) && !/^props-\d+\.(png|json)$/.test(file));
-    expect(files).toEqual([]);
-    expect(bay.occluders).toEqual([]);
-  });
+
 });

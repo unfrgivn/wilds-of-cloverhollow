@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import {
   createState,
   distanceToPolygon,
@@ -20,7 +20,6 @@ import {
   loadContent,
   parseArea,
   parseGroundManifest,
-  parseOccluderManifest,
 } from "../../src/content/load";
 import { areaConnectionErrors } from "../../src/content/area-checks";
 import { hiddenPositions } from "../../src/content/area-checks";
@@ -209,20 +208,19 @@ describe("core", () => {
     );
   });
 
-  it("ships ground tiles and generated occluder cutouts for each painted area", () => {
+  it("ships only a plate and prop atlases for each painted area", () => {
     for (const area of Object.values(world.areas)) {
       if (area.ground === undefined) continue;
       expect(existsSync(`public/assets/areas/${area.ground}/ground.json`)).toBe(true);
-      for (const occluder of area.occluders)
-        expect(existsSync(`public/assets/areas/${area.ground}/${occluder.id}.webp`))
-          .toBe(true);
+      const extra = readdirSync(`public/assets/areas/${area.ground}`).filter((file) =>
+        !/^ground_\d+_\d+\.webp$/.test(file) && file !== "ground.json" &&
+        !/^props-\d+\.(png|json)$/.test(file));
+      expect(extra, area.id).toEqual([]);
     }
   });
 
-  it("validates ground and occluder manifests", () => {
+  it("validates ground manifests", () => {
     expect(() => parseGroundManifest({ paper: "#fff", tiles: [] }, "ground.json"))
-      .not.toThrow();
-    expect(() => parseOccluderManifest({ cutouts: [] }, "occluders.json"))
       .not.toThrow();
     expect(() => parseGroundManifest({ paper: "#fff" }, "ground.json"))
       .toThrow(/ground.json/);
@@ -303,7 +301,7 @@ describe("core", () => {
       .toContain("plaza: spawn bad is within 40 units of house-front-door");
   }, 30_000);
 
-  it("never lets an occluder hide most of Fae anywhere she can stand", () => {
+  it("never lets props hide most of Fae anywhere she can stand", () => {
     for (const area of Object.values(world.areas)) {
       expect(hiddenPositions(area, world.tunables.playerRadius), area.id).toEqual([]);
     }

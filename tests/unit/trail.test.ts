@@ -160,7 +160,7 @@ describe("the trail follows its painting", () => {
   for (const [what, point] of off)
     it(`keeps Fae out of ${what}`, () => expect(pointInPolygon(point, trail.walkable)).toBe(false));
 
-  it("never lets an occluder hide most of Fae", () => {
+  it("never lets props hide most of Fae", () => {
     expect(hiddenPositions(trail, radius)).toEqual([]);
   }, 60_000);
 });

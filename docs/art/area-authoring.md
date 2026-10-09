@@ -1,14 +1,13 @@
 # Area authoring
 
-Areas become kits (spec 6.2): paint the area whole, get it approved, then
+Every area is a kit (spec 6.2): paint the area whole, get it approved, then
 split it into a ground plate and props with `tools/art/kit.ts`
-(`docs/art/kit.md`). The occluder workflow below is for areas not yet split.
+(`docs/art/kit.md` covers the scenery: props, their footprints, and depth).
 
 An area JSON uses logical units, at two source pixels per unit. Trace the
-walkable floor edge first, then add only the floor-contact footprints to
-`blockers`. A tall prop gets an `occluders` polygon covering its painted
-silhouette and a `baseline` at the feet line. Keep the blocker smaller when a
-player should be able to walk behind the prop.
+walkable floor edge first. `blockers` are for what's solid but isn't a prop:
+walls, the water's edge, pockets nobody should enter. A prop's footprint, its
+own floor contact, comes from its kit.
 
 Run `bun tools/art/area-overlay.ts bedroom` to draw the JSON over the two
 painting tiles. The script writes `art/review/bedroom-overlay.png` and an SVG
@@ -20,14 +19,7 @@ footprint in every state (dashed for painted props), magenta the doors (each
 band covers its whole painted door), cyan the people's footprints (none
 inside furniture), and violet each look point's interaction range. For a kit,
 `bun tools/art/depth-preview.ts <area>` shows Fae behind and in front of each
-prop, drawn by the renderer's rule. Run
-`bun tools/art/area-occluders.ts content/areas/bedroom.json` after changing an
-occluder. It reassembles the painting, masks and crops each silhouette, and
-writes lossless WebP cutouts plus `occluders.json` beside the ground tiles.
-Mask intermediates are written under `art/scratch/area-occluders/`; they are
-never runtime assets. Keep blockers as complete floor-contact footprints, from
-the wall edge to every visible leg or base, while occluder polygons describe
-the taller painted silhouette.
+prop, drawn by the renderer's rule.
 
 Doors are authored as `triggers` in the area JSON. The trigger polygon must be
 reachable by the player centre, while each named spawn must remain at least two

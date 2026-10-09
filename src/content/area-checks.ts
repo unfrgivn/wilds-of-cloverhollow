@@ -17,11 +17,11 @@ import {
  * Authoring check: can Fae stand somewhere scenery hides most of her?
  *
  * Fae's body is approximated by a box 50 units wide and 140 tall, standing on
- * her feet point. An occluder draws over her while her feet are above
- * (north of) its baseline. We flood-fill every position the core would allow
- * from each spawn, on a 5-unit grid, and report positions where occluders
- * cover at least `maxCoverage` of the sampled body box. Canopies don't count:
- * they fade while she's behind them (spec 6).
+ * her feet point. A prop draws over her where its picture overlaps her body
+ * box and her feet are north of its front edge. We flood-fill every position
+ * the core would allow from each spawn, on a 5-unit grid, and report positions
+ * where props cover at least `maxCoverage` of the sampled body box. Canopies
+ * don't count: they fade while she's behind them (spec 6).
  *
  *        x-25   x+25
  *   y-140 +------+   <- sampled every 5 units
@@ -38,18 +38,6 @@ const distance = (a: Point, b: Point): number => {
 };
 
 export type HiddenPosition = Point & { coverage: number; by: string[] };
-
-// The share of Fae's body box, feet at `feet`, that lies inside `polygon`.
-export function bodyCover(polygon: Area["occluders"][number]["polygon"], feet: Point): number {
-  let covered = 0;
-  let samples = 0;
-  for (let y = feet.y - BODY_HEIGHT; y <= feet.y; y += GRID)
-    for (let x = feet.x - BODY_HALF_WIDTH; x <= feet.x + BODY_HALF_WIDTH; x += GRID) {
-      samples += 1;
-      if (pointInPolygon({ x, y }, polygon)) covered += 1;
-    }
-  return covered / samples;
-}
 
 // Solid wherever someone or something may be: every person, and every
 // footprint any prop state can have.
@@ -70,20 +58,18 @@ function walkable(area: Area, solid: Area["blockers"], radius: number, point: Po
 }
 
 /*
- * What can draw over someone in an area: occluders north of whose baseline
- * they stand, and props in any of their states. Canopies fade instead
- * (spec 6), so they never hide anyone. Each prop state keeps its drawn bounds
- * and its southmost front, so a body box far from it skips it at once.
+ * What can draw over someone in an area: props in any of their states whose
+ * front edge is south of them. Canopies fade instead (spec 6), so they never
+ * hide anyone. Each prop state keeps its drawn bounds and its southmost front,
+ * so a body box far from it skips it at once.
  */
 type Hiders = {
-  occluders: Area["occluders"];
   props: { id: string; state: PropState; x0: number; x1: number; y0: number; y1: number;
     front: number }[];
 };
 
 function hidersOf(area: Area): Hiders {
   return {
-    occluders: area.occluders.filter((item) => item.canopy !== true),
     props: area.props.filter((prop) => !prop.canopy).flatMap((prop) =>
       Object.values(prop.states).map((state) => {
         const tops = state.silhouette.columns.flat().map(([top]) => top);
@@ -104,7 +90,6 @@ function hidersOf(area: Area): Hiders {
 // The hiders that could cover a box (x0..x1, y0..y1) over feet at `feet`.
 function near(hiders: Hiders, feet: Point, x0: number, x1: number, y0: number): Hiders {
   return {
-    occluders: hiders.occluders.filter((item) => feet.y < item.baseline),
     props: hiders.props.filter((item) => feet.y < item.front && item.x0 <= x1 &&
       item.x1 >= x0 && item.y0 <= feet.y && item.y1 >= y0),
   };
@@ -171,17 +156,11 @@ function bodyCoverage(
     for (let x = feet.x - box.half; x <= feet.x + box.half; x += GRID) {
       samples += 1;
       let id: string | undefined;
-      for (const item of hiders.occluders)
-        if (pointInPolygon({ x, y }, item.polygon)) {
+      for (const item of hiders.props)
+        if (propCoversPoint(item.state, feet, { x, y })) {
           id = item.id;
           break;
         }
-      if (id === undefined)
-        for (const item of hiders.props)
-          if (propCoversPoint(item.state, feet, { x, y })) {
-            id = item.id;
-            break;
-          }
       if (id === undefined) continue;
       covered += 1;
       ids.add(id);

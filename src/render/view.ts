@@ -505,7 +505,7 @@ export class GameView {
   }
 
   // Overworld critters: chaos (with the pulsing aura behind) or calm, y-sorted
-  // with Fae, her party, and the occluders, their figures overworldHeight tall.
+  // with Fae, her party, and props, their figures overworldHeight tall.
   // Who is out can change in an area (a rest rolls it again, a set piece
   // comes and goes), so the sprites follow the present critters' keys.
   private renderCritters(state: State): void {

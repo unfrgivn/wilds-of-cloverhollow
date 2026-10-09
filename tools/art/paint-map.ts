@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // Maps what an area's painting shows, so tests can check the area's floor,
-// blockers, and occluders against the paint itself. The painting is cut into
+// blockers and props against the paint itself. The painting is cut into
 // 5x5-unit cells (10x10 source px, at 2 px per unit), classified by a palette
 // made for the area's ground:
 //

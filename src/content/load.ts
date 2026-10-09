@@ -75,7 +75,6 @@ import type {
   Tunables,
   World,
   GroundManifest,
-  OccluderManifest,
   Critter,
   Grade,
   BattleContent,
@@ -329,20 +328,6 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     file,
     "interactables",
   );
-  field(
-    value.occluders === undefined ||
-      (Array.isArray(value.occluders) &&
-        value.occluders.every(
-          (item) =>
-            record(item) &&
-            typeof item.id === "string" &&
-            polygon(item.polygon) &&
-            typeof item.baseline === "number" &&
-            (item.canopy === undefined || typeof item.canopy === "boolean"),
-        )),
-    file,
-    "occluders",
-  );
   field(record(value.spawns), file, "spawns");
   const spawns: Record<string, Spawn> = {};
   for (const [name, raw] of Object.entries(value.spawns)) {
@@ -369,12 +354,6 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
       ...(item.knot === undefined ? {} : { knot: item.knot }),
       ...(item.prompt === undefined ? {} : { prompt: item.prompt }),
       ...(item.flip === true ? { flip: true } : {}),
-    })),
-    occluders: (value.occluders ?? []).map((item) => ({
-      id: item.id,
-      polygon: item.polygon,
-      baseline: item.baseline,
-      ...(item.canopy === true ? { canopy: true } : {}),
     })),
     triggers: (value.triggers ?? []).map((item) => ({
       id: item.id,
@@ -841,27 +820,6 @@ export function parseGroundManifest(
     };
   });
   return { paper: value.paper, tiles };
-}
-
-export function parseOccluderManifest(
-  value: unknown,
-  file: string,
-): OccluderManifest {
-  field(record(value), file, "object");
-  field(Array.isArray(value.cutouts), file, "cutouts");
-  const cutouts = value.cutouts.map((item, index) => {
-    field(record(item), file, `cutouts.${index}`);
-    field(
-      typeof item.id === "string" &&
-        typeof item.file === "string" &&
-        typeof item.x === "number" &&
-        typeof item.y === "number",
-      file,
-      `cutouts.${index}`,
-    );
-    return { id: item.id, file: item.file, x: item.x, y: item.y };
-  });
-  return { cutouts };
 }
 
 // The painted world map's manifest (`assets/ui/map/world-map.json`): each

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { faeBox, propCovers, type Area, type PropState } from "../../src/core";
+import { faeBox, propCovers, type Area, type Prop, type PropState } from "../../src/core";
 import { hiddenPositions } from "../../src/content/area-checks";
 import { loadContent } from "../../src/content/load";
 
@@ -24,14 +24,19 @@ describe("a canopy", () => {
     const xs = harness.walkable.map(([x]) => x);
     const ys = harness.walkable.map(([, y]) => y);
     const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-    const shade: Area["occluders"][number] = {
-      id: "shade",
-      polygon: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]],
-      baseline: y1 + 200,
+    const state: PropState = {
+      frame: "shade",
+      shadow: null,
+      footprint: [],
+      front: { left: x0, step: x1 - x0, ys: [y1 + 200] },
+      silhouette: { left: x0, step: x1 - x0, columns: [[[y0, y1]]] },
     };
-    expect(hiddenPositions({ ...harness, occluders: [shade] }, radius).length)
-      .toBeGreaterThan(0);
-    expect(hiddenPositions({ ...harness, occluders: [{ ...shade, canopy: true }] }, radius))
+    const shade: Prop = {
+      id: "shade", kind: "shade", x: 0, y: 0, flip: false, canopy: false,
+      painted: false, state: "default", rules: [], states: { default: state },
+    };
+    expect(hiddenPositions({ ...harness, props: [shade] }, radius).length).toBeGreaterThan(0);
+    expect(hiddenPositions({ ...harness, props: [{ ...shade, canopy: true }] }, radius))
       .toEqual([]);
   }, 60_000);
 });

@@ -1220,6 +1220,25 @@ the old trail, the owl, and the clubhouse claim.
     review everything later"): `art/review/<area>-kit-frames.png`,
     `<area>-kit-depth.png`, `<area>-kit-overlay.png`.
 
+## Milestone 35: Occluders retired **Status:** ✅ Completed (2026-10-08)
+- Props are the only scenery path. Gone: the area format's `occluders`, the
+  cutout manifest and its parser, the occluder halves of the hiding check and
+  of canopy fading, the renderer's cutout sprites (`occluder:<id>`),
+  `tools/art/area-occluders.ts`, and the occluder layer of
+  `tools/art/area-overlay.ts`. `tools/art/geometry/trail.ts` writes only the
+  trail's floor and blockers and reproduces `content/areas/trail.json` byte
+  for byte.
+- Tests: three tests looped over occluder lists that had been empty since
+  Milestone 34. The bay's is gone (`bay-depth` checks its props against the
+  paint map), the pass's checks every pass prop against its paint map (all at
+  or above its 0.4 threshold), and the canopy test's shade is a real canopy
+  prop. One test now holds every area's asset folder to its plate and prop
+  atlases, in place of the bay's own.
+- Evidence: `just check` (417 tests: the bay's two above are the only ones
+  gone), `just build`, and `just e2e` (376 passed, 2 skipped) against
+  unchanged baselines; no recording changed.
+- Notes: no content, runtime art, recordings, or baselines changed.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1407,7 +1426,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     - Milestone 34, the outdoor kits: the park, Bubblegum Bay, Pinecone Pass,
       the Cliffside Trail, and the Whispering Woods. Done (above).
     - Milestone 35, occluders retired: the old cutouts, baselines, slivers,
-      and their tools go.
+      and their tools go. Done (above).
     Until Milestone 34 lands, don't start a milestone that adds or reshapes
     an area; after it, every new area is painted whole and split into a kit.
   - Milestone 36, gamepad support (spec 3.2): done (above).

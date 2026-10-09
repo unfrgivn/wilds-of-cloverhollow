@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 34, the outdoor kits)
+Last updated: 2026-10-08 (Milestone 35, occluders retired)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -316,9 +316,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   for editing if its export matches): `id`, `width` and `height` in units, the
   optional `land`, the `walkable` floor polygon, `blockers` (floor-plane
   footprints of walls nobody walks behind), `props` (its scenery, section
-  6.2), `occluders` (`{ id, polygon, baseline, canopy? }`, the old cutouts,
-  in areas not yet split into a kit), named `spawns` (`{ x, y, facing }`),
-  and optional `ground` (the folder of its painting or ground plate).
+  6.2), named `spawns` (`{ x, y, facing }`), and optional `ground` (the
+  folder of its painting or ground plate).
   Doors arrive in Milestone 6 and interactables in Milestone 8. An area's
   `critters` are its story set pieces and its optional `recurring` its
   recurring critters (section 6.1).
@@ -491,14 +490,6 @@ ios/            Capacitor iOS project (from Milestone 4).
   only in letterbox bars outside it.
 - Areas may define `interactables` with `{ id, knot, point, prompt }`. Each
   point must be reachable within the interaction range.
-- Occluders (areas not yet split into a kit, section 6.2): lossless cutouts of
-  tall furniture, generated from the painting
-  by `tools/art/area-occluders.ts` into the area's asset folder
-  (`occluders.json` lists their unit offsets). Each is the painting inside its
-  outline and transparent outside it, so it covers characters only where the
-  outline says it does. An occluder draws over Fae while
-  her feet are above (north of) its baseline. Workflow:
-  `docs/art/area-authoring.md`.
 - Glows (the blacklight lantern, Milestone 23): an area's `glows` are
   `{ id, frame, point, knot?, prompt?, flip? }`, a frame of
   `assets/glows/glows.json` (light painted on black, lifted by brightness).
@@ -511,17 +502,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   pines (`old_trail_marker`, which sets `found_old_trail`), and a doodle is
   painted on the north ski-lift tower (`lift_note`). `renderInfo().lantern`
   reports `{ on, glows }`, the ids drawn.
-- Canopies: an occluder or a prop with `canopy: true` is a tree Fae can walk
-  under (a palm, crown and trunk cut whole, its baseline or front edge at the
-  trunk's foot). While her
-  feet are north of its baseline and more than 5% of her body box is inside it,
-  it fades to 40% (0.08 a tick, render-only), so she's drawn behind it and
-  still seen; it eases back once she steps out. `renderInfo().canopies` reports
-  each one's alpha. Bubblegum Bay's palms are canopy props
-  (`tests/unit/canopy.test.ts`, `tests/e2e/canopy.spec.ts`).
+- Canopies: a prop with `canopy: true` is a tree Fae can walk under (a palm,
+  crown and trunk cut whole, its front edge at the trunk's foot). While it
+  draws over more than 5% of her body box (its picture, in the columns where
+  her feet are north of its front edge), it fades to 40% (0.08 a tick,
+  render-only), so she's drawn behind it and still seen; it eases back once
+  she steps out. `renderInfo().canopies` reports each one's alpha. Bubblegum
+  Bay's palms are canopy props (`tests/unit/canopy.test.ts`,
+  `tests/e2e/canopy.spec.ts`).
 - Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
   spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
-  body box (50x140 units above her feet) covered by occluders and props (in
+  body box (50x140 units above her feet) covered by props (in
   any of their states). Canopies don't count: they fade instead. The checks
   count every footprint of every prop state as solid, since the story may
   change a state.
@@ -626,8 +617,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Shadows are multiply decals on the ground layer, under everyone, and move
   with their prop.
 - A canopy prop (the trees, the notice board) fades to 40% (0.08 a tick)
-  while it covers more than 5% of Fae's body box, like a canopy occluder;
-  `renderInfo().canopies` lists canopy props after canopy occluders.
+  while it covers more than 5% of Fae's body box; `renderInfo().canopies`
+  lists them.
 - The battle backdrop is rendered from the plate with every prop on it.
 - The plaza (Milestone 32) is a kit: 20 props (the fountain; six benches;
   the four lamp arches, each one prop with a footprint per leg; the two
@@ -636,9 +627,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   southeast, and south benches, and the two planters; bench-north was
   finished where the fountain hid its legs. bench-southeast has a `smashed`
   state (a pile of planks with purple scribbles, footprint empty). The rest
-  are painted. Its blockers are the house and the four shops; it has no
-  occluders. The south-west critter den moved to (620, 810), clear of the
-  arch.
+  are painted. Its blockers are the house and the four shops. The south-west
+  critter den moved to (620, 810), clear of the arch.
 - The indoor rooms (Milestone 33) are kits too, every prop painted (nothing
   indoors moves or changes yet; any can be lifted later): the bedroom (the
   bed, the desk, the desk chair, the shelf, the cat bed), the kitchen (the
@@ -647,9 +637,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   Fae never walks behind it), the school hallway (the trophy cabinet, the
   lockers on the nurse's block, the post at the end of the low front wall),
   the classroom, the gym, and the arcade (the five cabinets, the ticket
-  counter, the claw machine, the three gumball machines). None has
-  occluders. The kitchen's `stairs` spawn is (600, 650), facing right, so the
-  whole party fits behind Fae at the foot of the stairs.
+  counter, the claw machine, the three gumball machines). The kitchen's
+  `stairs` spawn is (600, 650), facing right, so the whole party fits behind
+  Fae at the foot of the stairs.
 - The outdoor areas (Milestone 34) are kits too, so every area is: Meadow
   Park (the tree house, the tower, two bushes, the basket, five fence runs, the
   park sign), Bubblegum Bay (the near dock rail, the umbrella, the sign, three
@@ -659,8 +649,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   footbridge's near rail as one prop), and the Whispering Woods (its trees,
   the tree house, three logs, two fern beds). Trees and ferns Fae walks behind
   are canopies. Every prop is painted but the woods' south log, which is
-  lifted; the plates are the approved paintings but for its hole. No area has
-  occluders.
+  lifted; the plates are the approved paintings but for its hole.
 - An area's floor is one piece: from any spawn, Fae can walk to every other
   (`areaConnectionErrors` reports a floor split by furniture).
 
@@ -899,7 +888,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   line). A calm recurring critter's talk is its kind's knot: the first talk
   with any of that kind plays its story clue, later ones the revisit line.
 - Overworld: each critter is drawn where it stands, y-sorted with the
-  characters and occluders, its figure `overworldHeight` units tall: chaos
+  characters and props, its figure `overworldHeight` units tall: chaos
   with its aura pulsing and turning behind it, calm without. The view keeps
   one sprite pair per present critter (`critter:<key>`), rebuilt when who is
   out changes.
@@ -1114,8 +1103,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
     cache), the depth layer's draw order (`{ label, zIndex }[]`, with `fae`,
-    each party member's id such as `maddie`, `occluder:<id>`, and
-    `prop:<id>`, one entry per strip), `props` (each prop's `{ id, state,
+    each party member's id such as `maddie`, and `prop:<id>`, one entry per
+    strip), `props` (each prop's `{ id, state,
     strips }`, every strip's world `left`, `right`, and `zIndex`), Fae's
     current `animation` and `frame`, `party` (each member in party order as
     `{ id, hidden, animation, frame }`, `hidden` being its fraction behind its

@@ -59,9 +59,6 @@ export type Area = {
     prompt?: "Look";
     flip?: boolean;
   }[];
-  // A canopy (a palm's crown, say) fades while Fae stands behind it instead of
-  // hiding her (spec 6).
-  occluders: { id: string; polygon: Polygon; baseline: number; canopy?: boolean }[];
   triggers: {
     id: string;
     polygon: Polygon;
@@ -100,6 +97,8 @@ export type Prop = {
   x: number;
   y: number;
   flip: boolean;
+  // A canopy (a palm's crown, say) fades while Fae stands behind it instead of
+  // hiding her (spec 6).
   canopy: boolean;
   painted: boolean;
   state: string;
@@ -146,9 +145,6 @@ export type GroundManifest = {
     width: number;
     height: number;
   }[];
-};
-export type OccluderManifest = {
-  cutouts: { id: string; file: string; x: number; y: number }[];
 };
 export type World = {
   tunables: Tunables;

@@ -12,7 +12,6 @@ describe("Whispering Woods area kit", () => {
   it("uses the 1750x1100 painted forest plate", () => {
     expect(area.width).toBe(1750);
     expect(area.height).toBe(1100);
-    expect(area.occluders).toEqual([]);
     // The log-west pocket and the forest behind the tree house.
     expect(area.blockers).toHaveLength(2);
     expect(area.props).toHaveLength(10);

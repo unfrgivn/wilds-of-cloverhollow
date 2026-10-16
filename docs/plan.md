@@ -1580,8 +1580,8 @@ mini-bosses (people under the chaos spell, NOTES.md).
 Sound follow-ups from Milestone 37:
 - Music and ambience: a title, town, and battle theme, and quiet beds per
   land (birds, waves, wind). Needs the owner's call on the source: code
-  synthesis like the effects, or a generator (paid generation needs the
-  owner).
+  synthesis like the effects, a generator (paid generation needs the
+  owner), or CC0 clips found through Openverse (`docs/media-sources.md`).
 - Footsteps by surface (grass, wood, sand) once the area kits carry ground
   data (after Milestone 34).
 - A volume slider beside mute.

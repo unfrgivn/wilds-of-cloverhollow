@@ -51,6 +51,8 @@ source of truth. Work comes from `docs/plan.md`.
 - Every kept generated asset has a recipe in `art/recipes/`. Runtime assets go
   in `public/assets/`. Scratch output goes in `art/scratch/` (gitignored).
 - Never overwrite owner-approved art without a new recipe.
+- Before making or generating media, search the open sources in
+  `docs/media-sources.md` (Openverse: CC0 Freesound sound effects).
 - Never alter artwork to satisfy a metric: no added noise or dither, no
   warping, no re-registering or resizing single frames. Fix the source or
   regenerate. If a metric is wrong for an asset, change the metric with

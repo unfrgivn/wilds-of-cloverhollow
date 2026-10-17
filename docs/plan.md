@@ -1376,6 +1376,73 @@ the old trail, the owl, and the clubhouse claim.
   - The playing field, its two paintings, the squirrel's lines, and the
     wording are in the owner's review queue.
 
+## Milestone 40: Battle checks **Status:** ✅ Completed (2026-10-17)
+- Battles stop being one ring for everything (owner, 2026-10-17, "I like the
+  suggestion order, work on those", from `docs/battle-ideas.md`). Every
+  Fae-side command and every burst plays a check (`battle.check`) that ends
+  in the grade the old calm and energy math already reads: the ring (Soothe,
+  Maddie's Play as her pounce, and most bursts), a charge (Sue's Cast: hold
+  confirm and let go in the green), or a beat chain (Jordan's Juggle, both
+  frogs' bubbles, the bunny's thumps: press as each one lands).
+- Friends decide how Fae calms and critters how they burst: Soothe's check is
+  in `content/battle.json`, each friend's in its party file, and a critter's
+  burst names its own (`burst.check`, with an optional bigger `burst.big`).
+  The sixteen critters' identical `timing` blocks are gone.
+- The big roll is made when a burst's check starts (one draw, before anything
+  else it generates), so a big chain shows its extra beats; a ring burst comes
+  out as before for the same seed and presses. A chain gives each press to
+  the beat whose arrival is nearest and resolves at most one beat with it, so
+  mashing misses and a late press never costs the next beat.
+- On screen: Sue's meter stands beside her, Jordan's pinecones drop into his
+  hands, the frog's pink bubbles fly at Fae, and a hint sticker hangs under
+  the party while a check waits for its first press. The beats are small
+  stickers drawn in code. Each hit pops with a new `battle-beat` sound.
+  `renderInfo().battle.check` replaces `.ring`.
+- Save: no new version. A save is only written after a battle ends, so
+  `battle` is always null in one, and `parseSave` now refuses one where it
+  isn't (spec 10).
+- Evidence: core unit tests for each check's rules, the loader's rejections,
+  the battle wiring and the burst's roll, the sounds, and the save
+  (`checks.test.ts`, `check-loader.test.ts`, `battle-wiring.test.ts`,
+  `sound.test.ts`, `save.test.ts`); every recorded run with a Cast, a Juggle,
+  a frog, or a bunny re-recorded, with the runs that start from them; a
+  recorder for the frog's win and rest (`tools/sim/record-frog.ts`), which
+  had been timed by hand; and real-key e2e: the frog's bubble chain, Sue's
+  Cast held on a key and on the touch sticker, Jordan's pinecones, and the
+  gallery's new states. Gates: `just check` (544 unit tests, every sim,
+  purity, lint), `just build`, and `just e2e` (426 passed, 2 skipped, on
+  Chromium and WebKit). Every changed screenshot was viewed: 30 differ only
+  in the harness readout's tick (checked pixel for pixel outside it), 33 by
+  the later tick's roaming critters, aura phases, and party spacing, and 10
+  are new (the frog's GREAT ring, Sue's meter, Jordan's pinecones, the
+  gallery's charge and chains).
+- Notes and assumptions:
+  - Starting numbers (spec 8): Cast holds to 44 of 60 ticks (windows 5 and
+    11), Juggle's four pinecones land 24 ticks apart, the frogs' three
+    bubbles (five when big) and the bunny's three thumps (five) have an
+    8-tick window. Every timed part fits in 180 ticks; a charge waits up to
+    180 ticks for its first press, untimed.
+  - The chain spec's window is `hitWindow`: a field named `window` would
+    have needed the core purity check to stop banning the browser global.
+  - Soothe stays the ring, and the proposal's gentle-timing setting isn't
+    built; both are the owner's open questions in `docs/battle-ideas.md`.
+  - `tools/sim/roam.ts` meant to run from its roaming frog but chose Run
+    while the prompt was still typing (ignored), so its battles had ended by
+    resting. It waits for the prompt now and really runs.
+  - The fixed follower ends (`tests/unit/fixtures/follower-ends.json`) for
+    chapter one and the frog's win and rest are refreshed. Chapter one ends
+    exactly where it did, 189 ticks later.
+  - Battle screenshots taken after a battle show a later tick in the
+    harness readout; those baselines were updated after viewing them.
+  - Found on the way: the new check overlay first left its grade sticker in
+    the page outside battles (an empty sticker in the top-left corner of
+    every screenshot); it starts hidden now. A chain also reused the last
+    chain's icons, so bubbles after pinecones would have kept the pinecone
+    drawings; a gallery test checks the switch and a shorter chain.
+  - The bay's Cast test pressed after a fixed 70 ticks; it plays the charge
+    now and checks Sue's GREAT line. The plaza cat test's pinned meeting tick
+    moved with chapter one (3011 to 3200).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1664,6 +1731,11 @@ more bad guys, and the blacklight lantern, made and built while away.
     and the chained runs' baselines were updated after viewing them; the
     new painting is in the review queue.
   - Milestone 39, recess on the playing field: done (above).
+  - Milestone 40, battle checks: done (above).
+  - Next (owner, 2026-10-17, from `docs/battle-ideas.md`): Milestone 41,
+    Catch: the nine flurry bursts become toys to catch in three lanes, the
+    toys cut from the approved burst frames (branch `m41-toys`); then
+    Milestone 42, feelings, with the next-feeling and lantern peeks.
   - Then: the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).

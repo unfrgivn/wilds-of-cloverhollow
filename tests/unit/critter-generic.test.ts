@@ -6,6 +6,7 @@ import {
   step,
   targetInteractable,
   type State,
+  createCheck,
 } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 
@@ -66,13 +67,12 @@ describe("generic critter battle content", () => {
       ...result,
       battle: {
         ...battle,
-        phase: "aim",
+        phase: "check",
         message: "",
         revealed: 0,
-        command: "soothe",
-        calm: pup.calmMax - 1,
-        aim: { side: "critter", ticks: 60, targetTick: 39, greatWindow: 5, goodWindow: 11 },
-        aimTick: 38,
+          command: "soothe",
+          calm: pup.calmMax - 1,
+          check: { ...createCheck(world.battle.commands.soothe.check, "critter"), tick: 38 },
       },
     };
     state = step(world, state, none).state;

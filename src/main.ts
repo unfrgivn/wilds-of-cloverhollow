@@ -21,7 +21,7 @@ import { createDialogueBox, createPrompt } from "./ui/sticker";
 import {
   createBattleHud,
   createCommandMenu,
-  createTimingRing,
+  createBattleCheck,
   createRewardSticker,
 } from "./ui/battle";
 import { assetUrl } from "./platform/assets";
@@ -73,7 +73,9 @@ async function boot(): Promise<void> {
   const gamepad = new GamepadInput();
   const sound = createAudio((audioState) => {
     if (import.meta.env.DEV || import.meta.env.MODE === "harness")
-      console.log(`[cloverhollow] audio ${JSON.stringify({ state: audioState })}`);
+      console.log(
+        `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
+      );
   });
   const touch = mountTouchControls();
   const uiRoot = document.createElement("div");
@@ -82,14 +84,18 @@ async function boot(): Promise<void> {
   const prompt = createPrompt(uiRoot);
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
-  const timingRing = createTimingRing(uiRoot);
+  const battleCheck = createBattleCheck(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(sound.toggle);
   journal.onSetAudioLevel((level: AudioLevel) => sound.setLevel(level));
   const title = createTitleScreen(uiRoot);
   const input = createInputSource(() => {
-    return combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame());
+    return combineInputFrames(
+      keyboard.frame(),
+      touch.sample(),
+      gamepad.frame(),
+    );
   });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   commandMenu.onChoose((index) => touch.tapChoice(index));
@@ -163,22 +169,31 @@ async function boot(): Promise<void> {
   // Sticker art (the reward card and the journal album) is a CSS crop of a
   // critter's atlas. Decode each atlas once now, so a card never paints before
   // its image is ready (on a busy phone, or a loaded test machine).
-  const atlases = new Set(Object.values(content.world.critters).map((critter) => critter.atlas));
-  await Promise.all([...atlases].map(async (url) => {
-    const atlas = new Image();
-    atlas.src = assetUrl(url.replace(".json", ".png"));
-    await atlas.decode();
-  }));
+  const atlases = new Set(
+    Object.values(content.world.critters).map((critter) => critter.atlas),
+  );
+  await Promise.all(
+    [...atlases].map(async (url) => {
+      const atlas = new Image();
+      atlas.src = assetUrl(url.replace(".json", ".png"));
+      await atlas.decode();
+    }),
+  );
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
-  const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
+  const stickerArt = (
+    critterId: string,
+    frameName: string,
+  ): AtlasImage | null => {
     const critter = content.world.critters[critterId];
-    const sheet = critter === undefined
-      ? undefined
-      : Assets.get<Spritesheet | undefined>(critter.atlas);
+    const sheet =
+      critter === undefined
+        ? undefined
+        : Assets.get<Spritesheet | undefined>(critter.atlas);
     const rect = sheet?.data.frames[frameName]?.frame;
     const size = sheet?.data.meta.size;
-    if (critter === undefined || rect === undefined || size === undefined) return null;
+    if (critter === undefined || rect === undefined || size === undefined)
+      return null;
     return {
       src: assetUrl(critter.atlas.replace(".json", ".png")),
       frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
@@ -217,11 +232,20 @@ async function boot(): Promise<void> {
     notes: string[];
   } | null = null;
   const notesNow = (): string[] => {
-    if (journalCache === null || journalCache.ink !== state.ink ||
-        journalCache.critters !== state.critters || journalCache.stickers !== state.stickers ||
-        journalCache.coins !== state.coins)
-      journalCache = { ink: state.ink, critters: state.critters, stickers: state.stickers,
-        coins: state.coins, notes: journalNotes(content.world, state) };
+    if (
+      journalCache === null ||
+      journalCache.ink !== state.ink ||
+      journalCache.critters !== state.critters ||
+      journalCache.stickers !== state.stickers ||
+      journalCache.coins !== state.coins
+    )
+      journalCache = {
+        ink: state.ink,
+        critters: state.critters,
+        stickers: state.stickers,
+        coins: state.coins,
+        notes: journalNotes(content.world, state),
+      };
     return journalCache.notes;
   };
   const render = (): void => {
@@ -238,9 +262,11 @@ async function boot(): Promise<void> {
     );
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
-    const lanternButton = document.querySelector<HTMLButtonElement>(".touch-lantern");
+    const lanternButton =
+      document.querySelector<HTMLButtonElement>(".touch-lantern");
     if (lanternButton !== null) {
-      lanternButton.hidden = content.world.storyVariable(state.ink, "has_lantern") !== true;
+      lanternButton.hidden =
+        content.world.storyVariable(state.ink, "has_lantern") !== true;
       lanternButton.classList.toggle("is-on", state.lantern);
     }
     title.render({
@@ -285,33 +311,57 @@ async function boot(): Promise<void> {
         lastBattleButtonsLog = encoded;
       }
     }
-    const ring = view.battleRingView(
+    const geometry = view.battleCheckGeometry(
       state,
       window.innerWidth,
       window.innerHeight,
     );
-    timingRing.render({
-      visible: ring !== null,
-      x: ring?.x ?? 0,
-      y: ring?.y ?? 0,
-      radius: ring?.radius ?? 0,
-      progress: battle?.aim?.progress ?? 0,
-      target: battle?.aim?.target ?? 0,
-      grade: battle?.lastGrade ?? null,
-    });
+    battleCheck.render(
+      geometry === null || battle?.check === null || battle === null
+        ? null
+        : battle.check.kind === "ring" && geometry.kind === "ring"
+          ? {
+              ...geometry,
+              progress: battle.check.progress,
+              target: battle.check.target,
+              grade: battle.lastGrade,
+              hint: battle.hint,
+            }
+          : battle.check.kind === "charge" && geometry.kind === "charge"
+            ? {
+                ...geometry,
+                fill: battle.check.fill,
+                great: battle.check.great,
+                good: battle.check.good,
+                grade: battle.lastGrade,
+                hint: battle.hint,
+              }
+            : battle.check.kind === "chain" && geometry.kind === "chain"
+              ? {
+                  ...geometry,
+                  beats: battle.check.beats,
+                  look: battle.check.look,
+                  grade: battle.lastGrade,
+                  hint: battle.hint,
+                }
+              : null,
+    );
     // The card shows a new sticker; a species already in the album only pays.
     const rewardCritter =
       state.battle === null
         ? undefined
         : content.world.critters[state.battle.critterId];
     rewardSticker.render({
-      visible: activeBattle && state.battle?.phase === "reward" &&
+      visible:
+        activeBattle &&
+        state.battle?.phase === "reward" &&
         state.battle.rewardSticker !== null,
       title: "NEW STICKER!",
       name: rewardCritter?.sticker.name ?? "",
-      image: rewardCritter === undefined
-        ? null
-        : stickerArt(rewardCritter.id, rewardCritter.sticker.frame),
+      image:
+        rewardCritter === undefined
+          ? null
+          : stickerArt(rewardCritter.id, rewardCritter.sticker.frame),
     });
     journal.render({
       visible: state.journalOpen,
@@ -537,7 +587,12 @@ async function boot(): Promise<void> {
         last: () => saveLast,
         loaded: () => saveLoaded,
       },
-      sound: { log: sound.log, muted: sound.muted, level: sound.level, state: sound.state },
+      sound: {
+        log: sound.log,
+        muted: sound.muted,
+        level: sound.level,
+        state: sound.state,
+      },
       boot: { title: () => titleMode },
     });
   }

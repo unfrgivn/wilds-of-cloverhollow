@@ -2,8 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { parseScript } from "../../src/content/script";
 import {
-  bunHash, longFlowTimeout, openHarness, playAfter, queueScript, readBattle, readHash, readState,
-  renderInfo, resetPaused, step, walk,
+  bunHash, longFlowTimeout, openHarness, playAfter, playBattleCheck, queueScript, readBattle,
+  readHash, readState, renderInfo, resetPaused, step, walk,
 } from "./helpers";
 
 // Milestone 19 contract: Bubblegum Bay. The plaza's east road stays closed
@@ -152,10 +152,13 @@ test("real keys: down the dock to Sue, she joins, and casts at the bluebird", as
   await hold(page, "ArrowDown", 1);
   expect((await readBattle(page))?.selected).toBe(2);
   await press(page);
-  const aim = await readBattle(page);
-  expect(aim?.phase).toBe("aim");
-  expect(aim?.command).toBe("cast");
-  await step(page, 70);
+  const check = await readBattle(page);
+  expect(check?.phase).toBe("check");
+  expect(check?.command).toBe("cast");
+  expect(check?.check?.kind).toBe("charge");
+  // Sue winds up on a held key and lets go in the green.
+  await playBattleCheck(page);
   await press(page);
-  await expect(text(page)).toHaveText(/^Sue/);
+  await expect(text(page)).toHaveText(
+    "Sue casts her ribbon bobber. The bluebird follows its bright wiggle!");
 });

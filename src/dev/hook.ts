@@ -1,6 +1,7 @@
 import { stableHash, type ActionFrame, type State } from "../core";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
+import type { BattleCheckInfo } from "../render/view";
 
 export type CloverhollowHook = {
   version: 1;
@@ -34,7 +35,13 @@ export type CloverhollowHook = {
       choices: string[];
       selected: number;
     };
-    critters: { id: string; kind: string; frame: string; x: number; y: number }[];
+    critters: {
+      id: string;
+      kind: string;
+      frame: string;
+      x: number;
+      y: number;
+    }[];
     npcs: { id: string; frame: string; facing: string }[];
     canopies: { id: string; alpha: number }[];
     // Each prop's current state, whether it lies flat (drawn under everyone),
@@ -48,7 +55,7 @@ export type CloverhollowHook = {
     lantern: { on: boolean; glows: string[] };
     battle: {
       phase: string | null;
-      ring: { x: number; y: number; radius: number } | null;
+      check: BattleCheckInfo | null;
       critter: { id: string; frame: string } | null;
       layout: {
         critter: { x: number; baseline: number; height: number };

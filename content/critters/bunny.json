@@ -56,18 +56,32 @@
       }
     }
   },
-  "timing": {
-    "aimTicks": 60,
-    "targetTick": 39,
-    "greatWindow": 5,
-    "goodWindow": 11
-  },
   "burst": {
-    "ticks": 60,
-    "targetTick": 45,
-    "greatWindow": 5,
-    "goodWindow": 11,
-    "bigChance": 0.3
+    "bigChance": 0.3,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        66,
+        92
+      ],
+      "look": "dust"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        62,
+        84,
+        106,
+        128
+      ],
+      "look": "dust"
+    }
   },
   "lines": {
     "intro": "A fizzy bunny bounces out of the clover, thumping its foot!",

@@ -182,7 +182,7 @@ export type PartyContent = {
   start: boolean;
   // Ink variable which adds this friend during play, or null for starters.
   joins: string | null;
-  command: { id: string; label: string; resting: string };
+  command: { id: string; label: string; resting: string; check: CheckSpec };
 };
 // An area person's atlas and idle timing: ticks per idle_down frame (Mom
 // holds her smile, then blinks briefly; Oliver waves his rattle evenly).
@@ -192,15 +192,66 @@ export type StickerCatalogue = {
   catalogue: { id: string; name: string; critter: string; frame: string }[];
 };
 export type BattleContent = {
-  commands: Record<
-    SharedCommandId,
-    { label: string; snackDetail: string | null }
-  >;
+  hints: { charge: string; chain: string };
+  commands: {
+    soothe: { label: string; check: CheckSpec };
+    snack: { label: string; snackDetail: string };
+    run: { label: string };
+  };
   // The reward line: `sticker` when the species' sticker is new, `coins`
   // otherwise, with {sticker} and {coins} filled in (spec 8).
   rewards: { sticker: string; coins: string };
 };
 export type Grade = "great" | "good" | "miss";
+// How a battle check plays (spec 8): a friend's command and Soothe name one,
+// and each critter names its burst's.
+export type RingSpec = {
+  kind: "ring";
+  ticks: number;
+  targetTick: number;
+  greatWindow: number;
+  goodWindow: number;
+};
+export type ChargeSpec = {
+  kind: "charge";
+  waitTicks: number;
+  maxTicks: number;
+  targetTick: number;
+  greatWindow: number;
+  goodWindow: number;
+};
+export type ChainLook = "pinecone" | "bubble" | "dust";
+export type ChainSpec = {
+  kind: "chain";
+  travelTicks: number;
+  hitWindow: number;
+  arrivals: number[];
+  look: ChainLook;
+};
+export type CheckSpec = RingSpec | ChargeSpec | ChainSpec;
+// "critter": Fae's side acts on the critter; "fae": the critter's burst.
+export type CheckSide = "critter" | "fae";
+export type BeatResult = "pending" | "hit" | "miss";
+// A check in play: a copy of its spec, its tick, and its own progress. `big`
+// is the burst's roll (always false on Fae's side).
+export type CheckState =
+  | { kind: "ring"; side: CheckSide; tick: number; spec: RingSpec; big: boolean }
+  | {
+      kind: "charge";
+      side: CheckSide;
+      tick: number;
+      spec: ChargeSpec;
+      held: number;
+      big: boolean;
+    }
+  | {
+      kind: "chain";
+      side: CheckSide;
+      tick: number;
+      spec: ChainSpec;
+      results: BeatResult[];
+      big: boolean;
+    };
 // The commands every battle has; the party's commands come from its roster.
 export type SharedCommandId = "soothe" | "snack" | "run";
 export type FriendCommand = {
@@ -235,18 +286,10 @@ export type Critter = {
     // Keyed by a party member's command id (spec 8).
     friends: Record<string, FriendCommand>;
   };
-  timing: {
-    aimTicks: number;
-    targetTick: number;
-    greatWindow: number;
-    goodWindow: number;
-  };
   burst: {
-    ticks: number;
-    targetTick: number;
-    greatWindow: number;
-    goodWindow: number;
     bigChance: number;
+    check: CheckSpec;
+    big?: CheckSpec;
   };
   lines: {
     intro: string;
@@ -264,7 +307,7 @@ export type Critter = {
 export type BattlePhase =
   | "intro"
   | "command"
-  | "aim"
+  | "check"
   | "result"
   | "burst"
   | "burstResult"
@@ -288,19 +331,30 @@ export type Battle = {
   calm: number;
   // Turns each friend's command still rests, by command id; missing = 0.
   rest: Record<string, number>;
-  aim: {
-    side: "critter" | "fae";
-    ticks: number;
-    targetTick: number;
-    greatWindow: number;
-    goodWindow: number;
-  } | null;
+  check: CheckState | null;
   lastGrade: Grade | null;
   // Set as the reward shows: the species' sticker if it's new, else null.
   rewardSticker: string | null;
-  aimTick: number;
   phaseTicks: number;
 };
+export type BattleCheckView =
+  | { kind: "ring"; side: CheckSide; progress: number; target: number }
+  | {
+      kind: "charge";
+      side: CheckSide;
+      actor: number | null;
+      waiting: boolean;
+      fill: number;
+      great: [number, number];
+      good: [number, number];
+    }
+  | {
+      kind: "chain";
+      side: CheckSide;
+      actor: number | null;
+      look: ChainLook;
+      beats: { appeared: boolean; progress: number; result: BeatResult }[];
+    };
 export type BattleView = {
   critterId: string;
   critterName: string;
@@ -321,11 +375,8 @@ export type BattleView = {
   energyMax: number;
   calm: number;
   calmMax: number;
-  aim: {
-    side: "critter" | "fae";
-    progress: number;
-    target: number;
-  } | null;
+  check: BattleCheckView | null;
+  hint: string | null;
   lastGrade: Grade | null;
   rewardSticker: string | null;
 };

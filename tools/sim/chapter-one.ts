@@ -4,7 +4,7 @@
 // frog, Meadow Park and a fizzy pup, the hall pass at school, the school
 // raccoon and the password it overheard, and the tree house. It plays through
 // the core like a careful player (tools/sim/recorder.ts: routes round the
-// recurring critters, a press on every aim's target tick) and prints the
+// recurring critters, every check played GREAT) and prints the
 // frames it used, so the script replays the run exactly. It fails loudly,
 // naming the step, when the story or a map no longer fits the route. Rerun it
 // after such changes:

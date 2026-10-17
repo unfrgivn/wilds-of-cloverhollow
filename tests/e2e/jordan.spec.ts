@@ -1,6 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
-  longFlowTimeout, openHarness, readBattle, readState, renderInfo, resetPaused, step, walk,
+  longFlowTimeout,
+  openHarness,
+  playBattleCheck,
+  readBattle,
+  readState,
+  renderInfo,
+  resetPaused,
+  step,
+  walk,
 } from "./helpers";
 
 // Milestone 22: at Pinecone Pass, Fae meets Jordan by the snowman. He joins
@@ -41,6 +49,7 @@ async function talk(page: Page): Promise<string[]> {
 async function fight(page: Page): Promise<string[]> {
   const results: string[] = [];
   let juggled = false;
+  let juggleShot = false;
   for (let count = 0; count < 300; count += 1) {
     const battle = await readBattle(page);
     if (battle === null) return results;
@@ -56,10 +65,14 @@ async function fight(page: Page): Promise<string[]> {
       juggled = true;
       continue;
     }
-    if (battle.phase === "aim" && battle.aim !== null) {
-      const wait = battle.aim.targetTick - 1 - battle.aimTick;
-      if (wait > 0) await step(page, wait);
-      await press(page);
+    if (battle.phase === "check" && battle.check !== null) {
+      if (!juggleShot) {
+        juggleShot = true;
+        await step(page, 20);
+        await expect(page).toHaveScreenshot("jordan-juggle-mid-chain.png");
+      }
+      await playBattleCheck(page);
+      await expect(page.locator(".battle-grade")).toHaveText("GREAT!");
       continue;
     }
     if (battle.revealed >= battle.message.length && battle.message.includes("Jordan") &&

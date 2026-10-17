@@ -5,7 +5,7 @@ test.use({ deviceScaleFactor: 2 });
 const states = ["short", "long", "long-max", "revealing", "speaker-board",
   "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];
 const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
-  "battle-reward"];
+  "battle-charge", "battle-chain", "battle-chain-burst", "battle-reward"];
 const journalStates = ["journal-empty", "journal-notes", "journal-full"];
 const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
@@ -39,12 +39,16 @@ const battleParts: Record<string, string[]> = {
   "battle-timing": [".battle-hud", ".battle-ring"],
   "battle-grade": [".battle-hud", ".battle-ring", ".battle-grade"],
   "battle-burst": [".battle-hud", ".battle-ring"],
+  "battle-charge": [".battle-hud", ".battle-charge-meter", ".battle-check-hint"],
+  "battle-chain": [".battle-hud", ".battle-chain", ".battle-check-hint"],
+  "battle-chain-burst": [".battle-hud", ".battle-chain", ".battle-check-hint"],
   "battle-reward": [".battle-reward"],
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
   "journal-full": [".journal-book"],
 };
-const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-grade",
+const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
+  ".battle-chain", ".battle-check-hint", ".battle-grade",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
   ".touch-confirm", ".touch-cancel", ".touch-menu"];
 const touchButtonsShown = [".touch-confirm", ".touch-cancel", ".touch-menu"];
@@ -193,7 +197,7 @@ function measureContrast(): Contrast[] {
     return `${element.className} "${element.textContent}"`;
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
-    ".battle-grade, .battle-reward-title, .battle-reward-name, .journal-label, " +
+  ".battle-grade, .battle-check-hint, .battle-reward-title, .battle-reward-name, .journal-label, " +
     ".journal-heading, .journal-supply, .journal-note, .journal-empty, .journal-name, " +
     ".journal-unknown, .journal-close";
   return [...document.querySelectorAll(selectors)]
@@ -593,8 +597,9 @@ test.describe("sticker gallery", () => {
     }
     await gallery(page, "battle-grade");
     for (const grade of ["good", "miss"] as const) {
-      await page.evaluate((next) => window.__stickerGallery.renderRing({ visible: true,
-        x: 600, y: 170, radius: 74, progress: .62, target: .65, grade: next }), grade);
+      await page.evaluate((next) => window.__stickerGallery.renderCheck({ kind: "ring",
+        x: 600, y: 170, radius: 74, progress: .62, target: .65, grade: next, hint: null,
+        hintAt: { x: 600, y: 260 } }), grade);
       results.push(...(await page.evaluate(measureContrast))
         .filter((result) => result.label.startsWith("grade")));
     }
@@ -607,13 +612,32 @@ test.describe("sticker gallery", () => {
     }
   });
 
+  test("a new chain draws its beats in its own look, and only as many as it has",
+    async ({ page }) => {
+      await gallery(page, "battle-chain");
+      await expect(page.locator(".battle-chain-beat:visible .battle-icon-pinecone"))
+        .toHaveCount(2);
+      const bubbles = (count: number): Promise<void> => page.evaluate((beats) =>
+        window.__stickerGallery.renderCheck({ kind: "chain", from: { x: 600, y: 170 },
+          to: { x: 190, y: 230 }, radius: 50, look: "bubble",
+          beats: Array.from({ length: beats },
+            () => ({ appeared: true, progress: 0.5, result: "pending" })),
+          grade: null, hint: null, hintAt: { x: 190, y: 300 } }), count);
+      await bubbles(2);
+      await expect(page.locator(".battle-chain-beat:visible .battle-icon-bubble")).toHaveCount(2);
+      await expect(page.locator(".battle-icon-pinecone")).toHaveCount(0);
+      await bubbles(1);
+      await expect(page.locator(".battle-chain-beat:visible")).toHaveCount(1);
+    });
+
   test("identical battle renders do not churn DOM nodes", async ({ page }) => {
     for (const state of battleStates) {
       await gallery(page, state);
       const records = await page.evaluate(() => {
         const observer = new MutationObserver(() => undefined);
         for (const part of document.querySelectorAll(
-          ".battle-hud, .battle-commands, .battle-ring, .battle-grade, .battle-reward")) {
+           ".battle-hud, .battle-commands, .battle-ring, .battle-charge-meter, .battle-chain, " +
+             ".battle-check-hint, .battle-grade, .battle-reward")) {
           observer.observe(part, { childList: true, characterData: true, subtree: true });
         }
         window.__stickerGallery.renderState();

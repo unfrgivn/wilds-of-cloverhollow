@@ -111,9 +111,62 @@ import type {
   Point,
   PartyContent,
   FriendCommand,
+  CheckSpec,
   Recurring,
   Den,
 } from "../core";
+
+// A battle check's spec (spec 8), validated by kind. Every number is an
+// integer tick count; the windows must fit inside the check.
+function checkSpec(value: unknown, file: string, name: string): CheckSpec {
+  field(record(value), file, name);
+  const kind = value.kind;
+  field(kind === "ring" || kind === "charge" || kind === "chain", file, `${name}.kind`);
+  const integer = (key: string): number => {
+    const item = value[key];
+    field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
+    return item;
+  };
+  if (kind === "ring") {
+    const ticks = integer("ticks");
+    const targetTick = integer("targetTick");
+    const greatWindow = integer("greatWindow");
+    const goodWindow = integer("goodWindow");
+    field(0 <= greatWindow && greatWindow <= goodWindow, file, `${name}.greatWindow`);
+    field(targetTick - goodWindow >= 1 && targetTick + goodWindow < ticks, file,
+      `${name}.targetTick`);
+    return { kind, ticks, targetTick, greatWindow, goodWindow };
+  }
+  if (kind === "charge") {
+    const waitTicks = integer("waitTicks");
+    const maxTicks = integer("maxTicks");
+    const targetTick = integer("targetTick");
+    const greatWindow = integer("greatWindow");
+    const goodWindow = integer("goodWindow");
+    field(waitTicks >= 1, file, `${name}.waitTicks`);
+    field(0 <= greatWindow && greatWindow <= goodWindow, file, `${name}.greatWindow`);
+    field(targetTick - goodWindow >= 1 && targetTick + goodWindow < maxTicks, file,
+      `${name}.targetTick`);
+    return { kind, waitTicks, maxTicks, targetTick, greatWindow, goodWindow };
+  }
+  const travelTicks = integer("travelTicks");
+  const hitWindow = integer("hitWindow");
+  field(travelTicks >= 1 && hitWindow >= 1, file, name);
+  const arrivals = value.arrivals;
+  field(Array.isArray(arrivals) && arrivals.length > 0 &&
+    arrivals.every((item): item is number => typeof item === "number" && Number.isInteger(item)),
+  file, `${name}.arrivals`);
+  // The first beat has room to travel in; windows never touch, so a press
+  // belongs to one beat.
+  arrivals.forEach((arrival, index) => {
+    const previous = arrivals[index - 1];
+    field(previous === undefined ? arrival >= travelTicks : arrival >= previous + 2 * hitWindow + 2,
+      file, `${name}.arrivals`);
+  });
+  const look = value.look;
+  field(look === "pinecone" || look === "bubble" || look === "dust", file, `${name}.look`);
+  return { kind, travelTicks, hitWindow, arrivals: [...arrivals], look };
+}
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -543,24 +596,17 @@ export function parseCritter(value: unknown, file: string): Critter {
     field(record(raw), file, `commands.${commandName}`);
     return Object.fromEntries(keys.map((key) => [key, number(raw, key)]));
   };
-  const timing = value.timing;
-  field(record(timing), file, "timing");
-  const timingValue = {
-    aimTicks: number(timing, "aimTicks"),
-    targetTick: number(timing, "targetTick"),
-    greatWindow: number(timing, "greatWindow"),
-    goodWindow: number(timing, "goodWindow"),
-  };
   const burst = value.burst;
   field(record(burst), file, "burst");
   const burstValue = {
-    ticks: number(burst, "ticks"),
-    targetTick: number(burst, "targetTick"),
-    greatWindow: number(burst, "greatWindow"),
-    goodWindow: number(burst, "goodWindow"),
     bigChance: number(burst, "bigChance"),
+    check: checkSpec(burst.check, file, "burst.check"),
+    ...(burst.big === undefined ? {} : { big: checkSpec(burst.big, file, "burst.big") }),
   };
   field(burstValue.bigChance <= 1, file, "burst.bigChance");
+  // A big burst plays the same kind of check, only bigger.
+  if (burstValue.big !== undefined)
+    field(burstValue.big.kind === burstValue.check.kind, file, "burst.big.kind");
   const lines = value.lines;
   field(record(lines), file, "lines");
   const line = (key: string): string => text(lines, key);
@@ -615,7 +661,6 @@ export function parseCritter(value: unknown, file: string): Critter {
       },
       friends,
     },
-    timing: timingValue,
     burst: burstValue,
     lines: {
       intro: line("intro"),
@@ -637,20 +682,29 @@ export function parseBattleContent(
   file: string,
 ): BattleContent {
   field(record(value) && record(value.commands), file, "commands");
+  const hints = value.hints;
+  field(
+    record(hints) &&
+      typeof hints.charge === "string" &&
+      typeof hints.chain === "string",
+    file,
+    "hints",
+  );
   const commands = value.commands;
-  const command = (
-    id: SharedCommandId,
-  ): { label: string; snackDetail: string | null } => {
+  function command(id: "soothe"): BattleContent["commands"]["soothe"];
+  function command(id: "snack"): BattleContent["commands"]["snack"];
+  function command(id: "run"): BattleContent["commands"]["run"];
+  function command(id: SharedCommandId): BattleContent["commands"][SharedCommandId] {
     const raw = commands[id];
-    field(
-      record(raw) &&
-        typeof raw.label === "string" &&
-        (raw.snackDetail === null || typeof raw.snackDetail === "string"),
-      file,
-      `commands.${id}`,
-    );
-    return { label: raw.label, snackDetail: raw.snackDetail };
-  };
+    field(record(raw) && typeof raw.label === "string", file, `commands.${id}`);
+    if (id === "soothe")
+      return { label: raw.label, check: checkSpec(raw.check, file, "commands.soothe.check") };
+    if (id === "snack") {
+      field(typeof raw.snackDetail === "string", file, "commands.snack.snackDetail");
+      return { label: raw.label, snackDetail: raw.snackDetail };
+    }
+    return { label: raw.label };
+  }
   const rewards = value.rewards;
   field(
     record(rewards) && typeof rewards.sticker === "string" &&
@@ -659,6 +713,7 @@ export function parseBattleContent(
     "rewards",
   );
   return {
+    hints: { charge: hints.charge, chain: hints.chain },
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),
@@ -705,6 +760,7 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
       id: text(command, "id"),
       label: text(command, "label"),
       resting: text(command, "resting"),
+      check: checkSpec(command.check, file, "command.check"),
     },
   };
 }

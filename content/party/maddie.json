@@ -13,6 +13,13 @@
   "command": {
     "id": "play",
     "label": "Play",
-    "resting": "resting"
+    "resting": "resting",
+    "check": {
+      "kind": "ring",
+      "ticks": 60,
+      "targetTick": 39,
+      "greatWindow": 5,
+      "goodWindow": 11
+    }
   }
 }

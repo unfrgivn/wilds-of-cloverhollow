@@ -64,13 +64,13 @@ test("real keys: Maddie walks the plaza as the party, and brings Play to the fro
   expect(layout?.party[0]?.y).toBe(layout?.fae.baseline);
   await expect(page).toHaveScreenshot("battle-party-commands.png");
 
-  // Down once selects Play; confirm starts its aim with Play's rest set.
+  // Down once selects Play; confirm starts its check with Play's rest set.
   await hold(page, "ArrowDown", 1);
   await step(page, 1);
   expect((await readBattle(page))?.selected).toBe(1);
   await press(page);
   const aiming = await readBattle(page);
-  expect(aiming?.phase).toBe("aim");
+  expect(aiming?.phase).toBe("check");
   expect(aiming?.command).toBe("play");
   expect(aiming?.rest).toEqual({ play: 1 });
 });

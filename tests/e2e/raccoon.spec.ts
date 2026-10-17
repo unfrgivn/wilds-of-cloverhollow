@@ -4,6 +4,7 @@ import { parseScript } from "../../src/content/script";
 import {
   longFlowTimeout,
   openHarness,
+  playBattleCheck,
   queueScript,
   readBattle,
   readState,
@@ -84,12 +85,13 @@ test("after the hall pass a fizzy raccoon waits; calmed, it tells the password",
       await expect(page.locator(".battle-reward-name")).toHaveText("Ringtail Raccoon");
       await shoot(page, "raccoon-reward");
     }
-    if (battle.phase === "aim" && battle.aim !== null)
-      await step(page, battle.aim.targetTick - battle.aimTick - 1);
-    await page.keyboard.down("Enter");
-    await step(page, 1);
-    await page.keyboard.up("Enter");
-    await step(page, 1);
+    if (battle.phase === "check" && battle.check !== null) await playBattleCheck(page);
+    else {
+      await page.keyboard.down("Enter");
+      await step(page, 1);
+      await page.keyboard.up("Enter");
+      await step(page, 1);
+    }
   }
   expect(rewardShot).toBe(true);
   let state = await readState(page);

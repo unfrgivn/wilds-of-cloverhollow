@@ -56,18 +56,32 @@
       }
     }
   },
-  "timing": {
-    "aimTicks": 60,
-    "targetTick": 39,
-    "greatWindow": 5,
-    "goodWindow": 11
-  },
   "burst": {
-    "ticks": 60,
-    "targetTick": 45,
-    "greatWindow": 5,
-    "goodWindow": 11,
-    "bigChance": 0.3
+    "bigChance": 0.3,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 40,
+      "hitWindow": 8,
+      "arrivals": [
+        44,
+        70,
+        96
+      ],
+      "look": "bubble"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 40,
+      "hitWindow": 8,
+      "arrivals": [
+        44,
+        66,
+        88,
+        110,
+        132
+      ],
+      "look": "bubble"
+    }
   },
   "lines": {
     "intro": "A fizzy frog hops out of the fountain, puffing pink bubbles!",

@@ -76,7 +76,12 @@ const scout: PartyContent = {
   sits: false,
   start: false,
   joins: null,
-  command: { id: "whistle", label: "Whistle", resting: "catching breath" },
+  command: {
+    id: "whistle",
+    label: "Whistle",
+    resting: "catching breath",
+    check: { kind: "ring", ticks: 60, targetTick: 39, greatWindow: 5, goodWindow: 11 },
+  },
 };
 const whistle = { calm: 25, great: 10, good: 5, rest: 2 };
 const whistleLines = {
@@ -115,7 +120,9 @@ describe("party content", () => {
   it("rosters Maddie from content/party with the Play command", () => {
     const maddie = world.party["maddie"];
     expect(maddie).toBeDefined();
-    expect(maddie?.command).toEqual({ id: "play", label: "Play", resting: "resting" });
+    expect(maddie?.command).toMatchObject({
+      id: "play", label: "Play", resting: "resting", check: { kind: "ring" },
+    });
     expect(maddie?.start).toBe(true);
     expect(maddie?.sits).toBe(true);
     expect(Object.keys(world.battle.commands).sort()).toEqual(["run", "snack", "soothe"]);
@@ -230,10 +237,9 @@ describe("party battle commands", () => {
         energy: 5,
         calm: 0,
         rest: {},
-        aim: null,
+      check: null,
         lastGrade: null,
         rewardSticker: null,
-        aimTick: 0,
         phaseTicks: 0,
       },
     };
@@ -278,9 +284,9 @@ describe("party battle commands", () => {
     state = advance(twoWorld, state, blankInput(), 1);
     expect(state.battle?.selected).toBe(2);
     state = advance(twoWorld, state, press({ confirm: true }), 1);
-    expect(state.battle?.phase).toBe("aim");
+    expect(state.battle?.phase).toBe("check");
     expect(state.battle?.command).toBe("whistle");
-    state = advance(twoWorld, state, blankInput(), critter.timing.targetTick - 1);
+    state = advance(twoWorld, state, blankInput(), 39 - 1);
     state = advance(twoWorld, state, press({ confirm: true }), 1);
     expect(state.battle?.phase).toBe("result");
     expect(state.battle?.lastGrade).toBe("great");

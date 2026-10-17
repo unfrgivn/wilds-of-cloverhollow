@@ -16,7 +16,11 @@ const valid = {
   sits: false,
   start: false,
   joins: "sue_joined",
-  command: { id: "cast", label: "Cast", resting: "reeling in" },
+  command: {
+    id: "cast", label: "Cast", resting: "reeling in",
+    check: { kind: "charge", waitTicks: 5, maxTicks: 60, targetTick: 20,
+      greatWindow: 2, goodWindow: 5 },
+  },
 };
 
 describe("party loader rules", () => {

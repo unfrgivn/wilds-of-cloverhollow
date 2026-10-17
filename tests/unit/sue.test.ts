@@ -90,7 +90,7 @@ function compileStory(source: string): Record<string, unknown> {
 describe("Sue in the roster", () => {
   it("rosters Sue after Maddie: not there at the start, joins with sue_joined, brings Cast", () => {
     expect(Object.keys(world.party)).toEqual(["maddie", "sue", "jordan"]);
-    expect(world.party["sue"]).toEqual({
+    expect(world.party["sue"]).toMatchObject({
       id: "sue",
       name: "Sue",
       atlas: "assets/characters/sue/sue.json",
@@ -99,7 +99,7 @@ describe("Sue in the roster", () => {
       sits: false,
       start: false,
       joins: "sue_joined",
-      command: { id: "cast", label: "Cast", resting: "reeling in" },
+       command: { id: "cast", label: "Cast", resting: "reeling in", check: { kind: "charge" } },
     });
     expect(world.party["maddie"]?.joins).toBeNull();
     const fresh = createState(world, fixtureFor("new-game"));

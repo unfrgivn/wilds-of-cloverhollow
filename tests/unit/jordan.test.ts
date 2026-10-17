@@ -72,7 +72,7 @@ function talk(state: State, choice: number): State {
 describe("Jordan in the roster", () => {
   it("rosters Jordan after Sue: joins with jordan_joined and brings Juggle", () => {
     expect(Object.keys(world.party)).toEqual(["maddie", "sue", "jordan"]);
-    expect(world.party["jordan"]).toEqual({
+    expect(world.party["jordan"]).toMatchObject({
       id: "jordan",
       name: "Jordan",
       atlas: "assets/characters/jordan/jordan.json",
@@ -81,7 +81,10 @@ describe("Jordan in the roster", () => {
       sits: false,
       start: false,
       joins: "jordan_joined",
-      command: { id: "juggle", label: "Juggle", resting: "finding pinecones" },
+      command: {
+        id: "juggle", label: "Juggle", resting: "finding pinecones",
+        check: { kind: "chain" },
+      },
     });
   });
 

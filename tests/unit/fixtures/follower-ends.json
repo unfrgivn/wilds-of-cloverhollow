@@ -54,7 +54,7 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 3826,
+    "tick": 4015,
     "area": "park",
     "player": {
       "x": 731.1269837220834,
@@ -144,7 +144,7 @@
     }
   },
   "plaza/frog-rest.json": {
-    "tick": 841,
+    "tick": 865,
     "area": "plaza",
     "player": {
       "x": 1200,
@@ -157,8 +157,8 @@
       "facing": "up",
       "moving": false,
       "distance": 0,
-      "stillTicks": 99,
-      "trail": 1
+      "stillTicks": 0,
+      "trail": 2
     }
   },
   "plaza/frog-run.json": {
@@ -180,21 +180,21 @@
     }
   },
   "plaza/frog-win.json": {
-    "tick": 526,
+    "tick": 618,
     "area": "plaza",
     "player": {
-      "x": 1064,
-      "y": 850
+      "x": 1034.5502065111666,
+      "y": 756.8772003600266
     },
     "facing": "left",
     "follower": {
-      "x": 1140,
-      "y": 843.6490793260276,
-      "facing": "down",
+      "x": 1095.1790328196394,
+      "y": 696.2483740515538,
+      "facing": "left",
       "moving": false,
-      "distance": 386.7674582227691,
-      "stillTicks": 416,
-      "trail": 10
+      "distance": 239.3749951207334,
+      "stillTicks": 548,
+      "trail": 11
     }
   },
   "plaza/maddie-loop.json": {

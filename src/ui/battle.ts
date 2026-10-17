@@ -25,19 +25,229 @@ export type CommandMenuView = {
 
 export type TimingGrade = "great" | "good" | "miss";
 
-export type TimingRingView = {
-  visible: boolean;
-  /** Ring centre in CSS px. */
-  x: number;
-  y: number;
-  /** Ring radius in CSS px at progress 0. */
-  radius: number;
-  /** 0 = full size, 1 = collapsed to the centre. */
-  progress: number;
-  /** Where the target circle sits on the same 0..1 scale. */
-  target: number;
-  grade: TimingGrade | null;
-};
+export type BattleCheckView =
+  | {
+      kind: "ring";
+      x: number;
+      y: number;
+      radius: number;
+      progress: number;
+      target: number;
+      grade: TimingGrade | null;
+      hint: string | null;
+      // The top centre of the hint sticker.
+      hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "charge";
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      fill: number;
+      great: [number, number];
+      good: [number, number];
+      grade: TimingGrade | null;
+      hint: string | null;
+      // The top centre of the hint sticker.
+      hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "chain";
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+      radius: number;
+      beats: {
+        appeared: boolean;
+        progress: number;
+        result: "pending" | "hit" | "miss";
+      }[];
+      look: "pinecone" | "bubble" | "dust";
+      grade: TimingGrade | null;
+      hint: string | null;
+      // The top centre of the hint sticker.
+      hintAt: { x: number; y: number };
+    };
+
+/** The complete check overlay, kept in one fixed DOM layer above the scene. */
+export function createBattleCheck(root: HTMLElement): {
+  render: (view: BattleCheckView | null) => void;
+} {
+  const ring = svgElement("svg", "battle-ring");
+  ring.setAttribute("aria-hidden", "true");
+  const rim = svgElement("circle", "battle-ring-rim");
+  const ink = svgElement("circle", "battle-ring-ink");
+  const target = svgElement("circle", "battle-ring-target");
+  ring.append(rim, ink, target);
+  const meter = element("div", "battle-charge-meter");
+  const fill = element("div", "battle-charge-fill");
+  const goodBand = element("div", "battle-charge-good");
+  const greatBand = element("div", "battle-charge-great");
+  const tick = element("div", "battle-charge-tick");
+  meter.append(fill, goodBand, greatBand, tick);
+  const chain = element("div", "battle-chain");
+  const chainTarget = element("div", "battle-chain-target");
+  const beats = element("div", "battle-chain-beats");
+  chain.append(chainTarget, beats);
+  const hint = element("div", "battle-check-hint");
+  const grade = element("div", "battle-grade");
+  grade.setAttribute("role", "status");
+  grade.hidden = true;
+  root.append(ring, meter, chain, hint, grade);
+  const icons: HTMLElement[] = [];
+  let iconLook: "pinecone" | "bubble" | "dust" | null = null;
+  const hide = (node: HTMLElement | SVGSVGElement, hidden: boolean): void => {
+    node.style.display = hidden ? "none" : "";
+  };
+  return {
+    render: (view) => {
+      hide(ring, view?.kind !== "ring");
+      hide(meter, view?.kind !== "charge");
+      hide(chain, view?.kind !== "chain");
+      hide(hint, view?.hint === null || view === null);
+      if (view === null) {
+        grade.hidden = true;
+        return;
+      }
+      if (view.hint !== null) {
+        setText(hint, view.hint);
+        hint.style.left = `${view.hintAt.x}px`;
+        hint.style.top = `${view.hintAt.y}px`;
+      }
+      if (view.kind === "ring") {
+        const size = view.radius * 2;
+        setAttribute(ring, "width", String(size));
+        setAttribute(ring, "height", String(size));
+        setAttribute(ring, "viewBox", `0 0 ${size} ${size}`);
+        ring.style.left = `${view.x}px`;
+        ring.style.top = `${view.y}px`;
+        const c = String(view.radius);
+        for (const node of [rim, ink, target]) {
+          setAttribute(node, "cx", c);
+          setAttribute(node, "cy", c);
+        }
+        const r = view.radius * (1 - clamp01(view.progress));
+        setAttribute(rim, "r", String(r));
+        setAttribute(ink, "r", String(r));
+        setAttribute(
+          target,
+          "r",
+          String(view.radius * (1 - clamp01(view.target))),
+        );
+        renderGrade(
+          grade,
+          view.grade,
+          view.x,
+          view.y - view.radius * (1 - view.target) - gradeGap,
+        );
+      } else if (view.kind === "charge") {
+        meter.style.left = `${view.x}px`;
+        meter.style.top = `${view.y}px`;
+        meter.style.width = `${view.width}px`;
+        meter.style.height = `${view.height}px`;
+        fill.style.height = `${clamp01(view.fill) * 100}%`;
+        goodBand.style.bottom = `${view.good[0] * 100}%`;
+        goodBand.style.height = `${(view.good[1] - view.good[0]) * 100}%`;
+        greatBand.style.bottom = `${view.great[0] * 100}%`;
+        greatBand.style.height = `${(view.great[1] - view.great[0]) * 100}%`;
+        tick.style.bottom = `${view.great[0] * 100}%`;
+        renderGrade(
+          grade,
+          view.grade,
+          view.x + view.width / 2,
+          view.y - gradeGap,
+        );
+      } else {
+        chain.style.left = "0";
+        chain.style.top = "0";
+        chainTarget.style.left = `${view.to.x}px`;
+        chainTarget.style.top = `${view.to.y}px`;
+        chainTarget.style.width = `${view.radius * 2}px`;
+        chainTarget.style.height = `${view.radius * 2}px`;
+        // A new chain may bring a different look, or fewer beats.
+        if (iconLook !== view.look) {
+          for (const icon of icons) icon.remove();
+          icons.length = 0;
+          iconLook = view.look;
+        }
+        while (icons.length < view.beats.length) {
+          const icon = element("span", "battle-chain-beat");
+          icon.append(chainIcon(view.look));
+          beats.append(icon);
+          icons.push(icon);
+        }
+        icons.forEach((icon, index) => {
+          const beat = view.beats[index];
+          icon.hidden = beat === undefined || !beat.appeared;
+          if (beat === undefined) return;
+          icon.classList.toggle("is-hit", beat.result === "hit");
+          icon.classList.toggle("is-miss", beat.result === "miss");
+          const p = clamp01(beat.progress);
+          icon.style.left = `${view.from.x + (view.to.x - view.from.x) * p}px`;
+          icon.style.top = `${view.from.y + (view.to.y - view.from.y) * p}px`;
+        });
+        renderGrade(
+          grade,
+          view.grade,
+          view.to.x,
+          view.to.y - view.radius - gradeGap,
+        );
+      }
+    },
+  };
+}
+
+function renderGrade(
+  node: HTMLElement,
+  value: TimingGrade | null,
+  x: number,
+  y: number,
+): void {
+  node.hidden = value === null;
+  if (value === null) return;
+  node.style.left = `${x}px`;
+  node.style.top = `${y}px`;
+  setAttribute(node, "class", `battle-grade battle-grade-${value}`);
+  setText(node, gradeLabels[value]);
+}
+
+// A chain beat's icon, drawn in code in the sticker style: a round pink
+// bubble with a shine (like the frog's own), a pinecone with ink scale marks,
+// a puff of dust with motion dashes.
+function chainIcon(look: "pinecone" | "bubble" | "dust"): SVGSVGElement {
+  const svg = svgElement("svg", `battle-icon battle-icon-${look}`);
+  svg.setAttribute("viewBox", "0 0 32 32");
+  svg.setAttribute("aria-hidden", "true");
+  const part = <K extends "circle" | "ellipse" | "path">(
+    tag: K,
+    className: string,
+    attributes: Record<string, string>,
+  ): void => {
+    const node = svgElement(tag, className);
+    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
+    svg.append(node);
+  };
+  if (look === "bubble") {
+    part("circle", "battle-icon-fill", { cx: "16", cy: "16", r: "13" });
+    part("ellipse", "battle-icon-shine", { cx: "11.5", cy: "10.5", rx: "4", ry: "2.6",
+      transform: "rotate(-35 11.5 10.5)" });
+    part("circle", "battle-icon-shine", { cx: "20.5", cy: "8.5", r: "1.4" });
+  } else if (look === "pinecone") {
+    part("path", "battle-icon-mark", { d: "M16 5 L17.5 1.5" });
+    part("ellipse", "battle-icon-fill", { cx: "16", cy: "17.5", rx: "9", ry: "12.5" });
+    part("path", "battle-icon-mark", {
+      d: "M9 12 Q16 16 23 12 M8 18 Q16 22.5 24 18 M10 24 Q16 27.5 22 24 " +
+        "M13 6.5 Q12 17 14.5 29 M19 6.5 Q20 17 17.5 29",
+    });
+  } else {
+    part("path", "battle-icon-fill", {
+      d: "M7 24 C2 23 2 16 8 15.5 C8 9 16 7 19 12 C23 9 30 12 28 18.5 " +
+        "C32 22 28 27 24 25.5 C21 29 11 29 7 24 Z",
+    });
+    part("path", "battle-icon-mark", { d: "M3 9 L8 11 M5 4 L10 7.5" });
+  }
+  return svg;
+}
 
 export type RewardStickerView = {
   visible: boolean;
@@ -125,12 +335,18 @@ export function createBattleHud(root: HTMLElement): {
       while (leaves.children.length < max) leaves.append(leafIcon());
       while (leaves.children.length > max) leaves.lastElementChild?.remove();
       for (let index = 0; index < leaves.children.length; index += 1) {
-        leaves.children.item(index)?.classList.toggle("is-full", index < view.energy);
+        leaves.children
+          .item(index)
+          ?.classList.toggle("is-full", index < view.energy);
       }
       setAttribute(energy, "aria-label", `Energy ${view.energy} of ${max}`);
       setText(calmLabel, view.critterName.toUpperCase());
       setAttribute(track, "aria-label", `${view.critterName} calm`);
-      setAttribute(track, "aria-valuenow", String(Math.round(clamp01(view.calm) * 100)));
+      setAttribute(
+        track,
+        "aria-valuenow",
+        String(Math.round(clamp01(view.calm) * 100)),
+      );
       fill.style.width = `${clamp01(view.calm) * 100}%`;
     },
   };
@@ -173,62 +389,24 @@ export function createCommandMenu(root: HTMLElement): {
     },
     render: (view) => {
       menu.hidden = !view.visible;
-      while (buttons.length < view.commands.length) buttons.push(addButton(buttons.length));
-      while (buttons.length > view.commands.length) buttons.pop()?.button.remove();
+      while (buttons.length < view.commands.length)
+        buttons.push(addButton(buttons.length));
+      while (buttons.length > view.commands.length)
+        buttons.pop()?.button.remove();
       view.commands.forEach((command, index) => {
         const item = buttons[index];
         if (item === undefined) return;
         setText(item.label, command.label);
         setText(item.detail, command.detail ?? "");
         item.detail.hidden = command.detail === null;
-        setAttribute(item.button, "aria-selected", String(index === view.selected));
+        setAttribute(
+          item.button,
+          "aria-selected",
+          String(index === view.selected),
+        );
         setAttribute(item.button, "aria-disabled", String(command.disabled));
         item.button.disabled = command.disabled;
       });
-    },
-  };
-}
-
-export function createTimingRing(root: HTMLElement): {
-  render: (view: TimingRingView) => void;
-} {
-  const ring = svgElement("svg", "battle-ring");
-  ring.setAttribute("aria-hidden", "true");
-  const rim = svgElement("circle", "battle-ring-rim");
-  const ink = svgElement("circle", "battle-ring-ink");
-  const target = svgElement("circle", "battle-ring-target");
-  ring.append(rim, ink, target);
-  const grade = element("div", "battle-grade");
-  grade.setAttribute("role", "status");
-  ring.style.display = "none";
-  grade.hidden = true;
-  root.append(ring, grade);
-  return {
-    render: (view) => {
-      ring.style.display = view.visible ? "" : "none";
-      const size = String(view.radius * 2);
-      setAttribute(ring, "width", size);
-      setAttribute(ring, "height", size);
-      setAttribute(ring, "viewBox", `0 0 ${size} ${size}`);
-      ring.style.left = `${view.x}px`;
-      ring.style.top = `${view.y}px`;
-      const centre = String(view.radius);
-      for (const circle of [rim, ink, target]) {
-        setAttribute(circle, "cx", centre);
-        setAttribute(circle, "cy", centre);
-      }
-      const ringRadius = String(view.radius * (1 - clamp01(view.progress)));
-      const targetRadius = view.radius * (1 - clamp01(view.target));
-      setAttribute(rim, "r", ringRadius);
-      setAttribute(ink, "r", ringRadius);
-      setAttribute(target, "r", String(targetRadius));
-      grade.hidden = !view.visible || view.grade === null;
-      if (view.grade === null) return;
-      // The grade sits centred just above the target circle.
-      grade.style.left = `${view.x}px`;
-      grade.style.top = `${view.y - targetRadius - gradeGap}px`;
-      setAttribute(grade, "class", `battle-grade battle-grade-${view.grade}`);
-      setText(grade, gradeLabels[view.grade]);
     },
   };
 }

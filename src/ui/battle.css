@@ -230,6 +230,52 @@
 .battle-reward.is-visible {
   animation: battle-pop 320ms ease-out;
 }
+.battle-charge-meter {
+  position: fixed;
+  z-index: var(--z-ring);
+  overflow: hidden;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 20px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  pointer-events: none;
+}
+.battle-charge-fill, .battle-charge-good, .battle-charge-great { position: absolute; left: 0; right: 0; }
+.battle-charge-fill { bottom: 0; height: 0; background: #e1a85b; z-index: 1; }
+.battle-charge-good { background: var(--sticker-teal); opacity: .8; z-index: 2; }
+.battle-charge-great { background: var(--sticker-green); opacity: .9; z-index: 2; }
+.battle-charge-tick { position: absolute; left: -4px; right: -4px; height: 3px; background: var(--sticker-ink); z-index: 2; }
+.battle-chain { position: fixed; inset: 0; z-index: var(--z-ring); pointer-events: none; }
+/* A cream rim round the dashed ink (like the ring's) and a soft paper fill, so
+   the target reads as a sticker over whoever it sits on. */
+.battle-chain-target { position: absolute; box-sizing: border-box; transform: translate(-50%, -50%); border: 3px dashed var(--sticker-ink); border-radius: 50%; background: rgb(247 242 227 / 0.55); box-shadow: 0 0 0 3px var(--sticker-rim); }
+.battle-chain-beats { position: absolute; inset: 0; }
+.battle-chain-beat { position: absolute; width: 34px; height: 34px; transform: translate(-50%, -50%); transition: opacity 100ms, transform 100ms; }
+.battle-chain-beat.is-hit { opacity: 0; transform: translate(-50%, -50%) scale(1.45); }
+.battle-chain-beat.is-miss { opacity: .45; filter: grayscale(1); transform: translate(-50%, -35%); }
+.battle-icon { width: 100%; height: 100%; overflow: visible; }
+.battle-icon-fill { stroke: var(--sticker-ink); stroke-width: 2; stroke-linejoin: round; }
+.battle-icon-mark { fill: none; stroke: #6d4339; stroke-width: 1.6; stroke-linecap: round; }
+.battle-icon-shine { fill: #fffaf2; stroke: none; }
+.battle-icon-pinecone .battle-icon-fill { fill: #b77a48; }
+.battle-icon-bubble .battle-icon-fill { fill: #f3a5be; }
+.battle-icon-dust .battle-icon-fill { fill: #dcc08e; }
+.battle-check-hint {
+  position: fixed;
+  z-index: var(--z-ring);
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 16px;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  font-family: var(--sticker-font);
+  font-size: 14px;
+  font-weight: 800;
+  pointer-events: none;
+}
 @keyframes battle-pop {
   from {
     opacity: 0;

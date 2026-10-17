@@ -13,6 +13,18 @@
   "command": {
     "id": "juggle",
     "label": "Juggle",
-    "resting": "finding pinecones"
+    "resting": "finding pinecones",
+    "check": {
+      "kind": "chain",
+      "travelTicks": 36,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        64,
+        88,
+        112
+      ],
+      "look": "pinecone"
+    }
   }
 }

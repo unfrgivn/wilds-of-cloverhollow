@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Records a win over a fizzy pup in Meadow Park (Milestone 13; the park's pups
 // recur since Milestone 28): from the park's path, Fae walks into the pup by
-// the pond and soothes it, a press on every aim's target tick.
+// the pond and soothes it, every check played GREAT.
 //
 //   bun tools/sim/record-pup.ts > tests/sim/scripts/park/pup-win.json
 import { createState } from "../../src/core";

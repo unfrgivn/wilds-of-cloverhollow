@@ -56,18 +56,15 @@
       }
     }
   },
-  "timing": {
-    "aimTicks": 60,
-    "targetTick": 39,
-    "greatWindow": 5,
-    "goodWindow": 11
-  },
   "burst": {
-    "ticks": 60,
-    "targetTick": 45,
-    "greatWindow": 5,
-    "goodWindow": 11,
-    "bigChance": 0.5
+    "bigChance": 0.5,
+    "check": {
+      "kind": "ring",
+      "ticks": 60,
+      "targetTick": 45,
+      "greatWindow": 5,
+      "goodWindow": 11
+    }
   },
   "lines": {
     "intro": "A grumpy gull puffs up on the lookout bench. It wants ALL the snacks!",

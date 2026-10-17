@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { createState, soundCues, step, type ActionFrame, type State } from "../../src/core";
+import {
+  createCheck,
+  createState,
+  soundCues,
+  step,
+  type ActionFrame,
+  type State,
+} from "../../src/core";
 import { loadContent } from "../../src/content/load";
 
 const content = loadContent();
@@ -43,5 +50,64 @@ describe("gameplay sound cues", () => {
     const next = step(content.world, positioned, { ...none, move: { x: -1, y: 0 } }).state;
     expect(next.battle).not.toBeNull();
     expect(soundCues(positioned, next, content.world)).toEqual(["battle-start"]);
+  });
+
+  it("emits one battle-beat per real chain hit and battle-hit on resolution", () => {
+    const fixture = content.fixtures.plaza;
+    if (fixture === undefined) throw new Error("plaza fixture missing");
+    const initial = createState(content.world, fixture);
+    const critter = content.world.critters["fountain-frog"];
+    if (critter === undefined) throw new Error("fountain frog missing");
+    const checkSpec = critter.burst.check;
+    if (checkSpec.kind !== "chain") throw new Error("fountain burst is not a chain");
+    const check = createCheck(checkSpec, "fae");
+    let state: State = {
+      ...initial,
+      battle: {
+        critterId: critter.id, den: null, entry: initial.player, phase: "check",
+        message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
+        rest: {}, check, lastGrade: null, rewardSticker: null, phaseTicks: 0,
+      },
+    };
+    let beats = 0;
+    let hits = 0;
+    for (const arrival of checkSpec.arrivals) {
+      while (state.battle?.check?.tick !== arrival - 1)
+        state = step(content.world, state, none).state;
+      const next = step(content.world, state, { ...none, confirm: true }).state;
+      const cues = soundCues(state, next, content.world);
+      beats += cues.filter((cue) => cue === "battle-beat").length;
+      hits += cues.filter((cue) => cue === "battle-hit").length;
+      state = next;
+    }
+    expect(beats).toBe(checkSpec.arrivals.length);
+    expect(hits).toBe(1);
+  });
+
+  it("emits no battle-beat for a real chain miss but still emits battle-hit", () => {
+    const fixture = content.fixtures.plaza;
+    if (fixture === undefined) throw new Error("plaza fixture missing");
+    const initial = createState(content.world, fixture);
+    const critter = content.world.critters["fountain-frog"];
+    if (critter === undefined) throw new Error("fountain frog missing");
+    const checkSpec = critter.burst.check;
+    if (checkSpec.kind !== "chain") throw new Error("fountain burst is not a chain");
+    let state: State = {
+      ...initial,
+      battle: {
+        critterId: critter.id, den: null, entry: initial.player, phase: "check",
+        message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
+        rest: {}, check: createCheck(checkSpec, "fae"), lastGrade: null,
+        rewardSticker: null, phaseTicks: 0,
+      },
+    };
+    while (state.battle?.phase === "check") {
+      const next = step(content.world, state, none).state;
+      expect(soundCues(state, next, content.world)).not.toContain("battle-beat");
+      state = next;
+    }
+    expect(state.battle?.phase).toBe("burstResult");
+    expect(soundCues({ ...state, battle: { ...state.battle!, phase: "check" } }, state,
+      content.world)).toContain("battle-hit");
   });
 });

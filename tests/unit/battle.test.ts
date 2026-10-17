@@ -6,6 +6,7 @@ import {
   gradeAim,
   step,
   targetInteractable,
+  createCheck,
   type State,
 } from "../../src/core";
 import {
@@ -41,10 +42,9 @@ function battleState(): State {
       energy: 5,
       calm: 0,
       rest: {},
-      aim: null,
+      check: null,
       lastGrade: null,
       rewardSticker: null,
-      aimTick: 0,
       phaseTicks: 0,
     },
   };
@@ -59,23 +59,22 @@ function aimState(
   calm: number,
   gradeTick: number,
 ): State {
+  const check = createCheck(
+    command === "soothe"
+      ? content.world.battle.commands.soothe.check
+      : content.world.party.maddie?.command.check ?? content.world.battle.commands.soothe.check,
+    "critter",
+  );
   return {
     ...state,
     battle: {
       ...state.battle!,
-      phase: "aim",
+      phase: "check",
       message: "",
       revealed: 0,
       command,
       calm,
-      aim: {
-        side: "critter",
-        ticks: 60,
-        targetTick: 39,
-        greatWindow: 5,
-        goodWindow: 11,
-      },
-      aimTick: gradeTick - 1,
+      check: { ...check, tick: gradeTick - 1 },
     },
   };
 }
@@ -168,7 +167,7 @@ describe("calm-down battle core", () => {
   it("touch choose starts an enabled command and ignores disabled choices", () => {
     let state = battleState();
     state = step(content.world, state, { ...none, choose: 1 }).state;
-    expect(state.battle?.phase).toBe("aim");
+    expect(state.battle?.phase).toBe("check");
     state = { ...battleState(), battle: { ...battleState().battle!, rest: { play: 1 } } };
     expect(
       step(content.world, state, { ...none, choose: 1 }).state.battle?.phase,
@@ -187,15 +186,14 @@ describe("calm-down battle core", () => {
         ...aimed,
         battle: {
           ...aimed.battle!,
-          aim: {
-            side: "fae",
-            ticks: 60,
-            targetTick: 45,
-            greatWindow: 5,
-            goodWindow: 11,
-          },
+          check: createCheck(
+            { kind: "ring", ticks: 60, targetTick: 45, greatWindow: 5, goodWindow: 11 },
+            "fae",
+            seed === 1,
+          ),
         },
       };
+      state.battle!.check = { ...state.battle!.check!, tick: gradeTick - 1 };
       return (
         step(content.world, state, { ...none, confirm: true }).state.battle
           ?.energy ?? -1
@@ -286,8 +284,8 @@ describe("calm-down battle core", () => {
     );
     state = press(state);
     state = press(state);
-    expect(state.battle?.phase).toBe("aim");
-    expect(state.battle?.aim?.side).toBe("fae");
+    expect(state.battle?.phase).toBe("check");
+    expect(state.battle?.check?.side).toBe("fae");
   });
 
   it("increments Maddie's settling time while Fae is frozen", () => {
@@ -301,7 +299,7 @@ describe("calm-down battle core", () => {
     state = press(state);
     const view = battleView(content.world, state);
     expect(view?.commands[0]?.detail).toBeNull();
-    expect(view?.aim?.side).toBe("critter");
+    expect(view?.check?.kind === "ring" ? view.check.side : null).toBe("critter");
   });
 
   it("validates battle content and critter content", () => {

@@ -1,5 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { longFlowTimeout, readBattle, readState, renderInfo, resetPaused, step } from "./helpers";
+import {
+  longFlowTimeout,
+  playBattleCheck,
+  readBattle,
+  readState,
+  renderInfo,
+  resetPaused,
+  step,
+} from "./helpers";
 
 // One press of Enter, then a released tick so the next press is a new edge.
 async function press(page: Page): Promise<void> {
@@ -55,34 +63,35 @@ test.describe("frog battle", () => {
           "A fizzy frog hops out of the fountain, puffing pink bubbles!");
         await expect(page).toHaveScreenshot("battle-intro.png");
       }
-      if (battle.phase === "aim" && battle.aim !== null) {
-        const side = battle.aim.side;
+      if (battle.phase === "check" && battle.check !== null) {
+        const side = battle.check?.side;
         if (side === "fae" && !seen.has("burst")) {
           seen.add("burst");
           await step(page, 20);
-          const ring = (await renderInfo(page)).battle.ring;
-          const layout = (await renderInfo(page)).battle.layout;
-          expect(ring && layout, "a ring and a layout during the burst").toBeTruthy();
-          if (ring && layout) {
-            expect(Math.abs(ring.x - layout.fae.x)).toBeLessThanOrEqual(1);
-            expect(Math.abs(ring.y - (layout.fae.baseline - layout.fae.height / 2)))
-              .toBeLessThanOrEqual(1);
-          }
-          await expect(page).toHaveScreenshot("battle-burst.png");
+           const check = (await renderInfo(page)).battle.check;
+           const layout = (await renderInfo(page)).battle.layout;
+           expect(check?.kind).toBe("chain");
+           expect(check?.side).toBe("fae");
+           expect(check && layout, "a chain and a layout during the burst").toBeTruthy();
+           if (check?.kind === "chain" && layout) {
+             expect(Math.abs(check.to.x - layout.fae.x)).toBeLessThanOrEqual(1);
+             expect(Math.abs(check.to.y - (layout.fae.baseline - layout.fae.height / 2)))
+               .toBeLessThanOrEqual(1);
+             expect(check.from.x).toBeCloseTo(layout.critter.x, 0);
+             expect(check.from.y).toBeCloseTo(
+               layout.critter.baseline - layout.critter.height / 2, 0);
+           }
+           await expect(page).toHaveScreenshot("battle-burst.png");
         }
         // Press exactly on the target tick: GREAT every time.
-        const current = (await readBattle(page));
-        if (current?.aim) await step(page, current.aim.targetTick - current.aimTick - 1);
-        await page.keyboard.down("Enter");
-        await step(page, 1);
-        await page.keyboard.up("Enter");
+         await playBattleCheck(page);
         await expect(page.locator(".battle-grade")).toHaveText("GREAT!");
         if (side === "critter" && !seen.has("great")) {
           seen.add("great");
           // Let the result line start typing before the picture.
           await step(page, 40);
           await expect(page.locator(".battle-grade")).toHaveText("GREAT!");
-          await expect(page).toHaveScreenshot("battle-aim.png");
+           await expect(page).toHaveScreenshot("battle-check.png");
         }
         await step(page, 1);
         continue;

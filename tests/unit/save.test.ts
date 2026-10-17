@@ -76,9 +76,13 @@ describe("save format", () => {
     expect(restored?.critters["gull"]).toBe("chaos");
   });
 
-  it("accepts a save taken mid-battle and mid-dialogue", () => {
+  it("rejects a save taken mid-battle but accepts one after battle ends", () => {
     const busy = { ...fresh, dialogue: { knot: "window", speaker: "Fae", text: "Hi", revealed: 1,
       choices: [], selected: 0, ended: false } };
-    expect(parseSave(serializeSave(busy), fresh)).not.toBeNull();
+    expect(parseSave(serializeSave({ ...busy, battle: null }), fresh)).toEqual({
+      ...busy, battle: null,
+    });
+    const inBattle = serializeSave(busy).replace('"battle":null', '"battle":{"phase":"command"}');
+    expect(parseSave(inBattle, fresh)).toBeNull();
   });
 });

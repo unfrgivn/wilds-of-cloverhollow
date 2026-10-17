@@ -8,6 +8,7 @@ export type SoundCue =
   | "door" | "area-arrive" | "coin" | "item" | "sticker"
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
   | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
+  | "battle-beat"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
 
 export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
@@ -70,6 +71,12 @@ export function soundCues(
     else if (previous.battle.phase === "rest") cues.push("battle-rest");
   }
   if (previous.battle !== null && next.battle !== null) {
+    const oldCheck = previous.battle.check;
+    const newCheck = next.battle.check;
+    if (oldCheck?.kind === "chain" && newCheck?.kind === "chain" &&
+        newCheck.results.filter((item) => item === "hit").length >
+          oldCheck.results.filter((item) => item === "hit").length)
+      cues.push("battle-beat");
     if (previous.battle.command !== next.battle.command && next.battle.command !== null)
       cues.push("battle-command");
     if (previous.battle.phase !== next.battle.phase &&

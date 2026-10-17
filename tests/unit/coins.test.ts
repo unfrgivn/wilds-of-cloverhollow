@@ -60,8 +60,9 @@ function soothedState(critterId: string, coins: number, stickers: string[] = [])
   const battle: Battle = {
     critterId, den: null, entry: { x: 1100, y: 830 }, phase: "soothed",
     message: critter.lines.soothed, revealed: critter.lines.soothed.length, selected: 0,
-    command: null, energy: 5, calm: critter.calmMax, rest: {}, aim: null, lastGrade: null,
-    rewardSticker: null, aimTick: 0, phaseTicks: 0,
+    command: null, energy: 5, calm: critter.calmMax, rest: {},
+      check: null, lastGrade: null,
+    rewardSticker: null, phaseTicks: 0,
   };
   return { ...createState(content.world, fixture), coins, stickers, battle };
 }
@@ -125,7 +126,7 @@ describe("coins and shops", () => {
     const battle: Battle = {
       critterId: "fountain-frog", den: null, entry: state.player, phase: "command", message: "",
       revealed: 0, selected: 2, command: null, energy: 5, calm: 0, rest: {},
-      aim: null, lastGrade: null, rewardSticker: null, aimTick: 0, phaseTicks: 0,
+      check: null, lastGrade: null, rewardSticker: null, phaseTicks: 0,
     };
     const used = press({ ...state, battle });
     expect(used.snacks).toBe(0);

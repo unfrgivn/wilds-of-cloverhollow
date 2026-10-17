@@ -3,6 +3,9 @@ import { readFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 import type { ActionFrame, State } from "../../src/core";
 import { parseScript } from "../../src/content/script";
+import type { CloverhollowHook } from "../../src/dev/hook";
+
+type RenderInfo = ReturnType<CloverhollowHook["renderInfo"]>;
 
 export async function openHarness(page: Page): Promise<void> {
   await page.goto("./");
@@ -79,56 +82,48 @@ export async function readBattle(page: Page): Promise<State["battle"]> {
   return page.evaluate(() => window.__cloverhollow?.getState().battle ?? null);
 }
 
+// Play the active battle check with a fresh Enter edge and the timing a careful
+// player would use. The check's tick is read after every step so this also
+// works when a screenshot or assertion has paused partway through a check.
+export async function playBattleCheck(page: Page): Promise<void> {
+  const battle = await readBattle(page);
+  const check = battle?.check;
+  if (check === null || check === undefined) throw new Error("no battle check to play");
+  if (check.kind === "ring") {
+    await step(page, check.spec.targetTick - check.tick - 1);
+    await page.keyboard.down("Enter");
+    await step(page, 1);
+    await page.keyboard.up("Enter");
+    return;
+  }
+  if (check.kind === "charge") {
+    // Charging starts on a fresh press and counts held ticks from there.
+    await page.keyboard.up("Enter");
+    await page.keyboard.down("Enter");
+    await step(page, check.spec.targetTick);
+    await page.keyboard.up("Enter");
+    await step(page, 1);
+    return;
+  }
+  for (const arrival of check.spec.arrivals) {
+    const current = await readBattle(page);
+    const active = current?.check;
+    if (active?.kind !== "chain") throw new Error("battle chain ended early");
+    await step(page, arrival - active.tick - 1);
+    await page.keyboard.down("Enter");
+    await step(page, 1);
+    await page.keyboard.up("Enter");
+  }
+}
+
 export async function readHash(page: Page): Promise<string> {
   const hash = await page.evaluate(() => window.__cloverhollow?.hash());
   if (hash === undefined) throw new Error("hook unavailable");
   return hash;
 }
 
-export async function renderInfo(page: Page): Promise<{
-  area: string;
-  drawOrder: { label: string; zIndex: number }[];
-  animation: string;
-  frame: number;
-  party: { id: string; hidden: number; animation: string; frame: number }[];
-  fade: number;
-  cachedAreaTextures: string[];
-  prompt: { visible: boolean; label: string; x: number; y: number };
-  dialogue: {
-    open: boolean;
-    speaker: string | null;
-    revealed: number;
-    length: number;
-    choices: string[];
-    selected: number;
-  };
-  critters: { id: string; kind: string; frame: string; x: number; y: number }[];
-  npcs: { id: string; frame: string; facing: string }[];
-  canopies: { id: string; alpha: number }[];
-  props: {
-    id: string;
-    state: string;
-    // A flat state lies on the ground (spec 6.2): drawn under everyone, no strips.
-    flat: boolean;
-    strips: { left: number; right: number; zIndex: number }[];
-  }[];
-  lantern: { on: boolean; glows: string[] };
-  // Everything in CSS px, from the one battle layout (spec 8).
-  battle: {
-    phase: string | null;
-    ring: { x: number; y: number; radius: number } | null;
-    // The critter in this battle and its current frame.
-    critter: { id: string; frame: string } | null;
-    layout: {
-      critter: { x: number; baseline: number; height: number };
-      fae: { x: number; baseline: number; height: number };
-      party: { x: number; y: number }[];
-    } | null;
-    backdrop: { x: number; y: number; width: number; height: number } | null;
-    overworldVisible: boolean;
-    auraAlpha: number;
-  };
-}> {
+// The hook's own render facts (src/dev/hook.ts), so the two never drift.
+export async function renderInfo(page: Page): Promise<RenderInfo> {
   const info = await page.evaluate(() => window.__cloverhollow?.renderInfo());
   if (info === undefined) throw new Error("hook unavailable");
   return info;

@@ -13,6 +13,7 @@ import {
   step,
   targetInteractable,
   type ActionFrame,
+  type CheckState,
   type Direction,
   type Point,
   type State,
@@ -272,7 +273,7 @@ export function createRecorder(world: World, initial: State): {
   };
 
   // Plays a battle to its end: the commands in `plan` first, then Soothe for
-  // the rest, every press on its target tick. `pause` holds still for half a
+  // the rest, every check GREAT (`playCheck`). `pause` holds still for half a
   // second whenever it's true of the command menu, so a watcher (the e2e)
   // can look.
   const battle = (plan: string[], pause?: (state: State) => boolean): void => {
@@ -290,13 +291,35 @@ export function createRecorder(world: World, initial: State): {
         if (pause?.(state) === true) idle(30);
         commands.shift();
         press();
-      } else if (current.phase === "aim" && current.aim !== null) {
-        while (state.battle !== null && state.battle.aimTick < current.aim.targetTick - 1)
-          tick(frame());
-        press();
+      } else if (current.phase === "check" && current.check !== null) {
+        playCheck(current.check);
       } else press();
     }
     if (state.battle !== null) throw new Error("the battle never finished");
+  };
+
+  // Plays one check like a careful player, every grade GREAT: a ring pressed
+  // on its target tick; a charge held exactly to its target, then let go; a
+  // chain pressed on each beat's arrival.
+  const playCheck = (check: CheckState): void => {
+    const live = (): CheckState | null => state.battle?.check ?? null;
+    const waitFor = (target: number): void => {
+      while ((live()?.tick ?? target) < target) tick(frame());
+    };
+    if (check.kind === "ring") {
+      waitFor(check.spec.targetTick - 1);
+      press();
+    } else if (check.kind === "charge") {
+      // The press that chose the command was let go on the tick after it.
+      for (let count = 0; count < check.spec.targetTick; count += 1)
+        tick(frame(undefined, true));
+      tick(frame());
+    } else {
+      for (const arrival of check.spec.arrivals) {
+        waitFor(arrival - 1);
+        press();
+      }
+    }
   };
 
   return {

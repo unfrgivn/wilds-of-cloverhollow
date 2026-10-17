@@ -36,6 +36,7 @@ export function parseSave(json: string, template: State): State | null {
     // Set pieces added by later content start as they would in a new game, so
     // new content never throws a save away.
     const saved = value.state;
+    if (saved.battle !== null) return null;
     const state = record(saved.critters)
       ? { ...saved, critters: { ...template.critters, ...saved.critters } }
       : saved;

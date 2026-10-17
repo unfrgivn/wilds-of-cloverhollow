@@ -56,18 +56,15 @@
       }
     }
   },
-  "timing": {
-    "aimTicks": 60,
-    "targetTick": 39,
-    "greatWindow": 5,
-    "goodWindow": 11
-  },
   "burst": {
-    "ticks": 60,
-    "targetTick": 45,
-    "greatWindow": 5,
-    "goodWindow": 11,
-    "bigChance": 0.3
+    "bigChance": 0.3,
+    "check": {
+      "kind": "ring",
+      "ticks": 60,
+      "targetTick": 45,
+      "greatWindow": 5,
+      "goodWindow": 11
+    }
   },
   "lines": {
     "intro": "A fizzy bluebird flutters round the music room with a chime mallet in its beak!",

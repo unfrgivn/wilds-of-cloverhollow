@@ -1,7 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-16 (Milestone 39, recess on the playing field; the school
-hallway is open like every other room)
+Last updated: 2026-10-17 (Milestone 40, battle checks)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -937,11 +936,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
   critters are 100), and `energyMax` 6 (ordinary critters are 5). Its burst
   `bigChance` is 0.5 (ordinary critters are 0.3), so its gust can hit harder.
-  Its friend-command values and timing windows remain readable and fair; the
-  extra difficulty comes from its larger meter, extra energy, larger reach,
-  and stronger burst.
+  Its friend-command values and checks are every critter's (a check belongs
+  to its command, not to the critter); the extra difficulty comes from its
+  larger meter, extra energy, larger reach, and stronger burst.
 - Friend commands: Maddie's Play, Sue's Cast, and Jordan's Juggle (pinecones;
-  calm 30, great 15, good 5, rest 2 on every critter). The menu lists Soothe,
+  calm 30, great 15, good 5, rest 2 on every critter). Each plays its own
+  check (Milestone 40): Play the ring (Maddie's pounce), Cast a charge (Sue
+  winds up and throws her bobber), Juggle a beat chain. The menu lists Soothe,
   each member's command in party order, then Snack and Run: six with the
   whole party, in one column on desktop and two on phones (section 8.1).
 - Content: `content/critters/*.json` (validated by the loader) supplies every
@@ -949,12 +950,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   `coins` it pays when calmed (8 for ordinary critters, 25 for the gull),
   command values (`commands.soothe`, `commands.snack`, and
   `commands.friends.<command id>` with `{ calm, great, good, rest }` for every
-  party command), aim windows, the burst, the sticker, and the calm knot and
-  prompt. Lines follow the same split: `lines.soothe` and
+  party command), the burst (`bigChance`, its `check`, and an optional `big`
+  check of the same kind), the sticker, and the calm knot and prompt. Friends
+  decide how Fae calms and critters how they burst: Soothe's check is
+  `commands.soothe.check` in `content/battle.json`, each friend's is
+  `command.check` in its `content/party/` entry, and critters carry none.
+  Lines follow the same split: `lines.soothe` and
   `lines.friends.<command id>` are per-grade. The loader rejects a critter
   missing a roster command (numbers or lines), and a party command whose id is
   `soothe`, `snack`, or `run`, or another member's. The shared command labels
-  (Soothe, Snack, Run) and the Snack `×N` template live in
+  (Soothe, Snack, Run), the Snack `×N` template, and the check hints live in
   `content/battle.json`; each friend's label and resting detail live in its
   `content/party/` entry; the reward lines, `rewards.sticker` ("New sticker:
   {sticker}! +{coins} coins.") and `rewards.coins` ("+{coins} coins!"), in
@@ -971,12 +976,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   next press advances):
 
   ```
-  intro -> command --Soothe / a friend's command--> aim (on the critter) -> result
+  intro -> command --Soothe / a friend's command--> check (on the critter) -> result
                    --Snack--------> result
                    --Run----------> run -> ends at entry, facing away
   result -> soothed -> reward -> ends: critter calm, its coins paid, the
             (when calm reached calmMax)     species' sticker added if new
-         -> burst -> aim (on Fae) -> burstResult -> command
+         -> burst -> check (on Fae) -> burstResult -> command
             (or rest when energy reaches 0)
   rest -> door-style fade to safeSpot; the critter stays chaos; nothing lost
   ```
@@ -986,7 +991,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   set to the sticker if it's new (the reward card shows it, with "New
   sticker: ... +N coins.") or null (no card; the line is "+N coins!"). The
   reward ends the battle with the set piece's or the recurring critter's
-  mood calm. The aura and the timing ring are gone at the reward.
+  mood calm. The aura and the check are gone at the reward.
 
 - Commands are composed from the party: Soothe, then one command per party
   member in party order (Maddie's Play), then Snack and Run
@@ -999,12 +1004,60 @@ ios/            Capacitor iOS project (from Milestone 4).
   friend. A resting command is disabled with its member's `resting` detail.
   Snack spends one of Fae's `snacks` (gone for good, whatever happens next),
   shows how many she has (`×N`), and is disabled at zero.
-- Aim: the first confirm edge is graded by its distance in ticks from the
-  target (great window, then good); no press by the end is a miss. Soothe and
-  a friend's command add their calm plus the grade bonus, clamped to
-  `calmMax`, and show that command's line for the grade. In a burst a seeded
-  PRNG draw picks base damage 1 or 2 (`bigChance`); great, good, and miss deal
-  0, base minus 1, and base.
+- Checks (Milestone 40): every Fae-side command (side `critter`) and every
+  burst (side `fae`) plays a check, `battle.check` (null outside one; the
+  phase is `check`): a copy of its spec plus its own progress. A check is
+  created at tick 0; each later tick adds one to its `tick`, then applies that
+  tick's input. A confirm edge is a confirm not held on the previous tick; a
+  touch `choose` is never one. Every check ends in a grade:
+  - `ring` (`ticks`, `targetTick`, `greatWindow`, `goodWindow`): the first
+    confirm edge is graded by its distance in ticks from the target (great
+    window, then good); no press by `ticks` is a miss.
+  - `charge` (`waitTicks`, `maxTicks`, `targetTick`, `greatWindow`,
+    `goodWindow`): charging starts only on a fresh confirm edge, so the press
+    that chose the command can't start it (that tick `held` is 1), and every
+    later tick with confirm still down adds one. The first tick it's let go
+    grades `held` against `targetTick` like the ring. Reaching `maxTicks` is a
+    miss (overwound), and so is no press by `waitTicks` (a press on that tick
+    still starts the charge).
+  - `chain` (`travelTicks`, `hitWindow`, `arrivals`, `look`: `pinecone`,
+    `bubble`, or `dust`): beat j lands at `arrivals[j]` and is seen travelling
+    for the `travelTicks` before. Each tick, a pending beat more than
+    `hitWindow` past its arrival is a miss; then a confirm edge goes to the
+    beat whose arrival is nearest (the earlier on a tie). If that beat is
+    pending and has appeared, it's a hit within `hitWindow` (inclusive), else
+    a miss; otherwise the press does nothing. One press resolves at most one
+    beat, so mashing misses and a late press never costs the next beat. Every
+    beat a hit grades great, at least half good, fewer a miss. Each hit plays
+    the `battle-beat` sound.
+- Soothe and a friend's command add their calm plus the grade bonus, clamped
+  to `calmMax`, and show that command's line for the grade. A burst makes one
+  seeded PRNG draw, when its check is created and before anything else it
+  generates (Milestone 41 adds lane draws after it): under `bigChance` it's
+  big, plays `burst.big` (the burst's `check` if the kind has none), and its
+  base damage is 2, else 1. Great, good, and miss deal 0, base minus 1, and
+  base.
+- Check numbers (Milestone 40): Soothe and Maddie's Play are rings of 60
+  ticks, target 39, windows 5 and 11. Sue's Cast is a charge: wait 180, max
+  60, target 44, windows 5 and 11. Jordan's Juggle is a pinecone chain:
+  travel 36, hit window 8, arrivals 40, 64, 88, 112. Both frogs' bursts are
+  bubble chains (travel 40, window 8, arrivals 44, 70, 96; big 44, 66, 88,
+  110, 132), the bunny's a dust chain (travel 30, window 8, arrivals 40, 66,
+  92; big 40, 62, 84, 106, 128); every other burst is a ring of 60 ticks,
+  target 45, windows 5 and 11. Every timed part fits in 180 ticks; a charge's
+  wait for its first press isn't timed play (the player picks the moment) and
+  gives up after its 180 ticks.
+- The loader validates every check: a known kind; integer ticks;
+  `greatWindow <= goodWindow`; the target's good window inside the ring or
+  the meter (`targetTick - goodWindow >= 1`, `targetTick + goodWindow` under
+  `ticks` or `maxTicks`); `waitTicks >= 1`; for a chain, `hitWindow >= 1`, the
+  first arrival at least `travelTicks`, each later one at least
+  `2 x hitWindow + 2` after the one before, and a known look. A `burst.big`
+  must be its burst check's kind, and every party command needs a check.
+- Hints: while a charge waits for its first press, or before a chain's first
+  beat lands, the battle view carries that kind's hint from
+  `content/battle.json` (`hints.charge`, `hints.chain`). It never uses
+  `battle.message`, whose reveal would eat a confirm press.
 - While a battle runs Fae is frozen, doors don't fire, cancel and menu are
   ignored (v0), and the party keeps settling. `safeSpot` is set at new game
   and on every area arrival.
@@ -1047,8 +1100,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   `idle_down` frame; anyone else is seen from behind (`idle_up`). Members are
   drawn from their own atlas at the overworld scale. This clears the HUD,
   command menu, message box, and touch buttons on phones and desktops. The aura turns about its own centroid on the
-  frog's body. The timing ring is centred on the frog's (in a burst, Fae's)
-  body centre with a radius of 0.55 times the figure height.
+  frog's body. Checks are drawn from the same layout (`battleCheckGeometry`):
+  a ring is centred on the critter's (in a burst, Fae's) body centre with a
+  radius of 0.55 times the figure height. A charge meter (1.1 x Fae's height
+  tall, max(22 px, 0.18 x her height) wide) stands on the acting friend's
+  baseline on the side away from the critter, its right edge 0.3 x Fae's
+  height left of them. A friend's chain drops its beats from 1.6 x Fae's
+  height above their feet into a dashed target 0.6 x her height above them
+  (radius 0.16 x her height); a burst's chain flies from the critter's body
+  centre to a dashed target on Fae's (radius 0.3 x her height). Soothe's
+  checks stand at Fae. A hint hangs just under the feet line (0.18 x Fae's
+  height below it) under its check, kept 130 px from the screen's sides.
 - Backdrop: the area painting itself, scaled so its painted interior (8% in
   from each side, past the watercolour's paper margins) covers the canvas plus
   a 32 px margin, centred on the critter where it stands (`battleFoe`) and
@@ -1058,18 +1120,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   messages use the dialogue box with no speaker and hide when empty. Dev
   builds log `[cloverhollow] battle {phase, message}` and the command buttons'
   rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
-  backdrop rect, the ring, the battle's critter (`{ id, frame }`), the aura
-  alpha, and whether the
+  backdrop rect, the check (`{ kind, side, x, y, hintAt }` plus a ring's
+  `radius`, a meter's `width` and `height`, or a chain's `from`, `to`, and
+  `radius`; `x, y` is a ring's centre, a meter's top-left, or a chain's
+  target), the battle's critter (`{ id, frame }`), the aura alpha, and whether
+  the
   overworld is visible; `renderInfo().critters` lists each overworld critter
   as `{ id, kind, frame, x, y }`, `id` its key (section 6.1).
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
-  menu, a timing ring with its grade sticker, and a reward card. The game
-  passes a full view to each `render` every frame; identical views change no
-  DOM nodes. Battle messages use the dialogue box with no speaker.
+  menu, a check overlay (a ring, a charge meter, or a beat chain) with its
+  grade sticker and hint, and a reward card. The game passes a full view to
+  each `render` every frame; identical views change no DOM nodes. Battle
+  messages use the dialogue box with no speaker.
 - One stacking scale (`--z-*` in sticker.css), bottom to top: HUD, dialogue,
-  commands, choices, prompt, ring and grade, reward.
+  commands, choices, prompt, check and grade, reward.
 - HUD: ENERGY (one leaf per point, spent leaves outlined) at the top left and
   the critter's CALM meter (its name in capitals) at the top right, left of
   the menu button, inside the safe area. It hides during the reward.
@@ -1085,6 +1151,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   `radius * (1 - progress)` and the dashed target's is `radius * (1 - target)`.
   The grade sticker (GREAT! green, GOOD! teal, MISS cream) sits centred 6 px
   above the target circle.
+- Charge meter (Milestone 40): a cream sticker capsule with a warm-brown ink
+  outline; the fill rises from the bottom as Sue winds up, over a teal good
+  band and a green great band (the GOOD!/GREAT! colours) with a tick at the
+  great band's foot. The grade sticker sits above the meter.
+- Beat chain (Milestone 40): a dashed target circle with a cream rim and a
+  soft paper fill (so it reads over whoever it sits on) and the beats in
+  flight, small inline-SVG icons drawn in code: a pinecone with ink scale
+  marks, a round pink bubble with a shine (like the frog's own), a puff of
+  dust. A hit pops (a quick grow and fade); a miss drops away grey. The grade
+  sticker sits above the target. A chain with another look redraws its
+  icons, and beats past a shorter chain's count are hidden.
+- Hint: a cream sticker label with the check's hint (section 8), shown only
+  while the view carries one.
 - Reward card: a centred die-cut card with the title, one atlas frame cropped
   by CSS to 150 px wide, and the name. Stacked drop-shadows give the image a
   white rim and an ink outline that follow the critter's silhouette. Asset
@@ -1097,7 +1176,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - The Pixi battle scene dims the loaded area painting and presents the critter,
   Fae, the party, and aura in a fixed logical composition. It is render-only. The
   shell logs `[cloverhollow] battle` with phase and message changes, and
-  `renderInfo()` exposes the phase, timing-ring request, and critter frame.
+  `renderInfo()` exposes the phase, the check's geometry, and critter frame.
 
 ## 9. Journal and stickers
 - The journal is the pause menu: Notes (current goals, written from Ink), a
@@ -1195,7 +1274,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   game instead of crashing later. A change to the state's shape bumps the
   version. Content growing is not a shape change: a set piece added since the
   save was made starts in chaos when it loads (`parseSave` lays the saved
-  critters over the template's).
+  critters over the template's). The battle slot is the one exception to
+  bumping: a save is only written after a battle has ended, so `battle` is
+  always null in a save, and `parseSave` refuses one where it isn't. The
+  battle's own shape can change without a new version (Milestone 40 did).
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
   a battle ends, a dialogue closes, or the journal closes. The trigger is a
   pure function of the previous and next state (`autosaveNeeded`). Fixture
@@ -1240,7 +1322,8 @@ ios/            Capacitor iOS project (from Milestone 4).
     `{ id, hidden, animation, frame }`, `hidden` being its fraction behind its
     leader), plus prompt and dialogue summaries. `npcs` lists each person in
     the area as `{ id, frame, facing }`. `battle.layout` includes `party`, the
-    members' CSS-px points.
+    members' CSS-px points, and `battle.check` the check's geometry
+    (section 8).
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.

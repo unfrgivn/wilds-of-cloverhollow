@@ -7,3 +7,4 @@ export * from "./journal";
 export * from "./save";
 export * from "./props";
 export * from "./sound";
+export * from "./checks";

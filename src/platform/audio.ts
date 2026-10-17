@@ -98,6 +98,7 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "noise", offset: 0, duration: .06, gain: .025, lowpass: 1200 },
     { wave: "triangle", frequency: 247, offset: .02, duration: .12, gain: .07 },
   ],
+  "battle-beat": [{ wave: "sine", frequency: 880, offset: 0, duration: .07, gain: .055 }],
   "battle-win": [
     { wave: "triangle", frequency: 523, offset: 0, duration: .12, gain: .09 },
     { wave: "triangle", frequency: 659, offset: .1, duration: .12, gain: .09 },

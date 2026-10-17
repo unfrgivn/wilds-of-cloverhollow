@@ -1,5 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { longFlowTimeout, openHarness, readBattle, readState, resetPaused, step } from "./helpers";
+import {
+  longFlowTimeout,
+  openHarness,
+  playBattleCheck,
+  readBattle,
+  readState,
+  resetPaused,
+  step,
+} from "./helpers";
 
 // Milestone 10 contract: the journal is the pause menu (J or the journal
 // button; X, J, or its close button shut it), its notes come from Ink and its
@@ -96,13 +104,13 @@ test("after calming the frog, the journal shows his sticker and his note", async
   for (let action = 0; action < 150; action += 1) {
     const battle = (await readBattle(page));
     if (battle === null) break;
-    // Press on every aim's target tick.
-    if (battle.phase === "aim" && battle.aim !== null)
-      await step(page, battle.aim.targetTick - battle.aimTick - 1);
-    await page.keyboard.down("Enter");
-    await step(page, 1);
-    await page.keyboard.up("Enter");
-    await step(page, 1);
+    if (battle.phase === "check" && battle.check !== null) await playBattleCheck(page);
+    else {
+      await page.keyboard.down("Enter");
+      await step(page, 1);
+      await page.keyboard.up("Enter");
+      await step(page, 1);
+    }
   }
   expect((await readState(page)).critters["fountain-frog"]).toBe("calm");
   await press(page, "j");

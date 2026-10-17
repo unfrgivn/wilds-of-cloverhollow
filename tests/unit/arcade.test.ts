@@ -140,8 +140,9 @@ describe("Mr. Pip, the arcade keeper", () => {
     const battle: Battle = {
       critterId: "arcade-keeper", den: null, entry: placed.point, phase: "soothed",
       message: keeper.lines.soothed, revealed: keeper.lines.soothed.length, selected: 0,
-      command: null, energy: 6, calm: keeper.calmMax, rest: {}, aim: null, lastGrade: null,
-      rewardSticker: null, aimTick: 0, phaseTicks: 0,
+      command: null, energy: 6, calm: keeper.calmMax, rest: {},
+      check: null, lastGrade: null,
+      rewardSticker: null, phaseTicks: 0,
     };
     let state: State = { ...at("arcade", "door", placed.point, "up", claimed), battle };
     const lines: string[] = [];

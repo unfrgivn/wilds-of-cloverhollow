@@ -160,18 +160,19 @@ for (const size of sizes) {
 
     // Soothe: the ring sits on the frog's body centre, and the message box steps aside.
     await press(page);
-    expect((await readState(page)).battle?.phase).toBe("aim");
-    const ring = (await renderInfo(page)).battle.ring;
-    expect(ring, "renderInfo().battle.ring").toBeTruthy();
-    if (!ring) return;
-    expect(Math.abs(ring.x - layout.critter.x)).toBeLessThanOrEqual(1);
-    expect(Math.abs(ring.y - critterCentre)).toBeLessThanOrEqual(1);
+    expect((await readState(page)).battle?.phase).toBe("check");
+     const check = (await renderInfo(page)).battle.check;
+     expect(check?.kind).toBe("ring");
+     expect(check, "renderInfo().battle.check").toBeTruthy();
+     if (check?.kind !== "ring") return;
+     expect(Math.abs(check.x - layout.critter.x)).toBeLessThanOrEqual(1);
+     expect(Math.abs(check.y - critterCentre)).toBeLessThanOrEqual(1);
     const drawn = await page.locator(".battle-ring").evaluate((element) => {
       const rect = element.getBoundingClientRect();
       return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
     });
-    expect(Math.abs(drawn.x - ring.x)).toBeLessThanOrEqual(1);
-    expect(Math.abs(drawn.y - ring.y)).toBeLessThanOrEqual(1);
+     expect(Math.abs(drawn.x - check.x)).toBeLessThanOrEqual(1);
+     expect(Math.abs(drawn.y - check.y)).toBeLessThanOrEqual(1);
     await expect(page.locator(".sticker-dialogue")).toBeHidden();
     await context.close();
   });

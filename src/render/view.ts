@@ -12,6 +12,7 @@ import {
 } from "pixi.js";
 import {
   battleFoe,
+  battleView,
   faeBox,
   hiddenFraction,
   npcFacing,
@@ -20,6 +21,7 @@ import {
   presentCritters,
   targetInteractable,
   type Area,
+  type CheckSide,
   type PartyContent,
   type PartyMember,
   type Point,
@@ -27,6 +29,18 @@ import {
   type World,
 } from "../core";
 import { AreaView, type Rect } from "./area-view";
+
+// Half the widest hint sticker, in CSS px, to keep hints on screen.
+const hintHalfWidth = 130;
+// Where a battle check is drawn, in CSS px (spec 8.1).
+// `hintAt` is where the check's hint sticker hangs (its top centre).
+export type BattleCheckGeometry =
+  | { kind: "ring"; x: number; y: number; radius: number; hintAt: Point }
+  | { kind: "charge"; x: number; y: number; width: number; height: number; hintAt: Point }
+  | { kind: "chain"; from: Point; to: Point; radius: number; hintAt: Point };
+// The check for tests (spec 11): its side and geometry, plus an anchor
+// (`x`, `y`: a ring's centre, a meter's top-left, a chain's target).
+export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number; y: number };
 import { followCamera, worldToScreen } from "./camera";
 import { selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
@@ -104,8 +118,13 @@ export class GameView {
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
   private critterKeys = "";
   // Each overworld critter: `id` is its key (a set piece's id or `wild:<den>`).
-  private critterFrames: { id: string; kind: string; frame: string; x: number; y: number }[] =
-    [];
+  private critterFrames: {
+    id: string;
+    kind: string;
+    frame: string;
+    x: number;
+    y: number;
+  }[] = [];
   private npcSprites: { npc: Area["npcs"][number]; sprite: Sprite }[] = [];
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
   private glowSprites: { id: string; sprite: Sprite }[] = [];
@@ -146,7 +165,8 @@ export class GameView {
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.depth);
     this.depth.addChild(this.player);
-    for (const sprite of this.partySprites.values()) this.depth.addChild(sprite);
+    for (const sprite of this.partySprites.values())
+      this.depth.addChild(sprite);
     this.battleLayer.addChild(
       this.battleCritterAura,
       this.battleCritter,
@@ -173,8 +193,11 @@ export class GameView {
       }),
       // Kinds of one species can share an atlas (the fountain frog and the
       // bay's frogs), so critter atlases are loaded, and found, by URL.
-      ...[...new Set(Object.values(this.world.critters).map((critter) => critter.atlas))]
-        .map((atlas) => Assets.load({ alias: atlas, src: assetUrl(atlas) })),
+      ...[
+        ...new Set(
+          Object.values(this.world.critters).map((critter) => critter.atlas),
+        ),
+      ].map((atlas) => Assets.load({ alias: atlas, src: assetUrl(atlas) })),
       ...Object.entries(this.world.party).map(([id, member]) =>
         Assets.load({
           alias: `${id}-sheet`,
@@ -182,7 +205,10 @@ export class GameView {
           data: { textureOptions: { autoGenerateMipmaps: true } },
         }),
       ),
-      Assets.load({ alias: "glow-sheet", src: assetUrl("assets/glows/glows.json") }),
+      Assets.load({
+        alias: "glow-sheet",
+        src: assetUrl("assets/glows/glows.json"),
+      }),
       ...Object.entries(this.world.characters).map(([id, character]) =>
         Assets.load({
           alias: `${id}-sheet`,
@@ -237,12 +263,15 @@ export class GameView {
       ...this.npcSprites.map(({ sprite }) => sprite),
       ...this.critterSprites.flatMap(({ body, aura }) => [body, aura]),
     ];
-    return sprites.filter((sprite) => sprite.visible && sprite.texture !== Texture.EMPTY)
+    return sprites
+      .filter((sprite) => sprite.visible && sprite.texture !== Texture.EMPTY)
       .map((sprite) => {
         const width = sprite.width;
         const height = sprite.height;
-        const anchorX = sprite.scale.x < 0 ? 1 - sprite.anchor.x : sprite.anchor.x;
-        const anchorY = sprite.scale.y < 0 ? 1 - sprite.anchor.y : sprite.anchor.y;
+        const anchorX =
+          sprite.scale.x < 0 ? 1 - sprite.anchor.x : sprite.anchor.x;
+        const anchorY =
+          sprite.scale.y < 0 ? 1 - sprite.anchor.y : sprite.anchor.y;
         const x0 = sprite.x - anchorX * width;
         const y0 = sprite.y - anchorY * height;
         return { x0, y0, x1: x0 + width, y1: y0 + height };
@@ -423,7 +452,13 @@ export class GameView {
     this.renderParty(state);
     this.renderCritters(state);
     this.renderNpcs(state);
-    loaded.update(this.world, state.ink, state.player, state.tick, this.figures());
+    loaded.update(
+      this.world,
+      state.ink,
+      state.player,
+      state.tick,
+      this.figures(),
+    );
     this.renderGlows(state, width, height);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
@@ -442,12 +477,16 @@ export class GameView {
     this.lanternTint.clear();
     // Blacklight: the scene drops to a deep violet dusk so the added glows show;
     // on bright snow, added light would only saturate to white.
-    if (on) this.lanternTint.rect(0, 0, width, height).fill({ color: 0x1d0f3a, alpha: 0.55 });
+    if (on)
+      this.lanternTint
+        .rect(0, 0, width, height)
+        .fill({ color: 0x1d0f3a, alpha: 0.55 });
     this.lanternTint.visible = on;
     const drawn: string[] = [];
     for (const { id, sprite } of this.glowSprites) {
       const glow = area?.glows.find((item) => item.id === id);
-      const texture = glow === undefined ? undefined : sheet?.textures[glow.frame];
+      const texture =
+        glow === undefined ? undefined : sheet?.textures[glow.frame];
       sprite.visible = on && glow !== undefined && texture !== undefined;
       if (texture !== undefined && glow !== undefined) {
         sprite.texture = texture;
@@ -470,7 +509,8 @@ export class GameView {
       const character = this.world.characters[npc.id];
       // Someone the story has sent away isn't drawn (spec 6).
       sprite.visible = npcVisible(this.world, state, npc);
-      if (sheet === undefined || character === undefined || !sprite.visible) continue;
+      if (sheet === undefined || character === undefined || !sprite.visible)
+        continue;
       const facing = npcFacing(state, npc);
       const wanted = `idle_${facing}`;
       const animation =
@@ -509,8 +549,11 @@ export class GameView {
   // Who is out can change in an area (a rest rolls it again, a set piece
   // comes and goes), so the sprites follow the present critters' keys.
   private renderCritters(state: State): void {
-    const present = this.areaView === undefined ? [] : presentCritters(this.world, state);
-    const keys = present.map((critter) => `${critter.key}=${critter.kind.id}`).join("|");
+    const present =
+      this.areaView === undefined ? [] : presentCritters(this.world, state);
+    const keys = present
+      .map((critter) => `${critter.key}=${critter.kind.id}`)
+      .join("|");
     if (keys !== this.critterKeys) {
       this.critterKeys = keys;
       for (const sprite of this.critterSprites) {
@@ -526,7 +569,13 @@ export class GameView {
         return { id: critter.key, body, aura };
       });
     }
-    const frames: { id: string; kind: string; frame: string; x: number; y: number }[] = [];
+    const frames: {
+      id: string;
+      kind: string;
+      frame: string;
+      x: number;
+      y: number;
+    }[] = [];
     for (const [index, { id, body, aura }] of this.critterSprites.entries()) {
       const critter = present[index];
       if (critter === undefined) continue;
@@ -547,7 +596,8 @@ export class GameView {
       const bob = roamer?.moving === true ? Math.sin(state.tick / 4) * 3 : 0;
       body.position.set(point.x, point.y + bob);
       body.zIndex = point.y;
-      if (roamer !== null) body.scale.x = roamer.facing === "right" ? -scale : scale;
+      if (roamer !== null)
+        body.scale.x = roamer.facing === "right" ? -scale : scale;
       aura.visible = !calm;
       aura.texture = auraTexture;
       placeAura(
@@ -571,15 +621,13 @@ export class GameView {
    * overworld zoom), centred on the critter and clamped, softly blurred. The
    * margin keeps the blur's edge fade off-screen.
    */
-  private renderBackdrop(
-    state: State,
-    width: number,
-    height: number,
-  ): void {
+  private renderBackdrop(state: State, width: number, height: number): void {
     const area = this.areaView?.area;
     if (area === undefined) return;
-    const focus = battleFoe(this.world, state)?.point ??
-      { x: area.width / 2, y: area.height / 2 };
+    const focus = battleFoe(this.world, state)?.point ?? {
+      x: area.width / 2,
+      y: area.height / 2,
+    };
     // Watercolour areas fade to bare paper near their edges (the plaza by
     // about 120 units at the sides and 50 at the top and bottom), so frame
     // only the painted interior, 8% in from every side.
@@ -672,7 +720,7 @@ export class GameView {
         : battle.phase === "reward"
           ? "calm_idle_01"
           : battle.phase === "burst" ||
-              (battle.phase === "aim" && battle.aim?.side === "fae")
+              (battle.phase === "check" && battle.check?.side === "fae")
             ? "chaos_burst_01"
             : "chaos_idle_01";
     const body = sheet.textures[critterFrame];
@@ -730,7 +778,8 @@ export class GameView {
         return;
       const memberSheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
       const pose = content.sits ? "idle_down" : "idle_up";
-      const frame = (memberSheet.animations[pose] ?? memberSheet.animations.idle_down)?.[0];
+      const frame = (memberSheet.animations[pose] ??
+        memberSheet.animations.idle_down)?.[0];
       if (frame === undefined) return;
       sprite.texture = frame;
       if (frame.defaultAnchor !== undefined)
@@ -781,34 +830,72 @@ export class GameView {
     };
   }
 
-  battleRingView(
-    state: State,
-    width: number,
-    height: number,
-  ): { x: number; y: number; radius: number } | null {
-    // The ring and its grade belong to the aiming; at the reward it's over
-    // (it was hidden behind the sticker card, which a coins-only reward
-    // doesn't show).
-    const aim = state.battle?.aim;
-    if (aim === null || aim === undefined || state.battle?.phase === "reward") return null;
+  // Where the battle's check is drawn, in CSS px (spec 8.1); null outside a
+  // check and at the reward (the card covers it). A ring sits on the critter,
+  // or on Fae in a burst. A friend's charge meter stands on the side away from
+  // the critter and their chain drops into their hands (Fae's own, for
+  // Soothe). A burst's chain flies from the critter to a target on Fae.
+  battleCheckGeometry(state: State, width: number, height: number): BattleCheckGeometry | null {
+    const check = battleView(this.world, state)?.check ?? null;
+    if (check === null || state.battle?.phase === "reward") return null;
     const layout = this.layoutFor(state, width, height);
-    const centre =
-      aim.side === "fae"
-        ? {
-            x: layout.fae.x,
-            y: layout.fae.baseline - layout.fae.height / 2,
-            radius: 0.55 * layout.fae.height,
-          }
+    const fae = layout.fae;
+    const faeCentre = { x: fae.x, y: fae.baseline - fae.height / 2 };
+    const critter = layout.critter;
+    const critterCentre = { x: critter.x, y: critter.baseline - critter.height / 2 };
+    // Hints hang just under the feet line, in the open ground below the
+    // party, kept on screen.
+    const hintAt = (x: number): Point => ({
+      x: Math.min(width - hintHalfWidth, Math.max(hintHalfWidth, x)),
+      y: fae.baseline + 0.18 * fae.height,
+    });
+    if (check.kind === "ring")
+      return check.side === "fae"
+        ? { kind: "ring", ...faeCentre, radius: 0.55 * fae.height, hintAt: hintAt(fae.x) }
         : {
-            x: layout.critter.x,
-            y: layout.critter.baseline - layout.critter.height / 2,
-            radius: 0.55 * layout.critter.height,
+            kind: "ring",
+            ...critterCentre,
+            radius: 0.55 * critter.height,
+            hintAt: hintAt(critter.x),
           };
+    if (check.side === "fae")
+      return {
+        kind: "chain",
+        from: critterCentre,
+        to: faeCentre,
+        radius: 0.3 * fae.height,
+        hintAt: hintAt(fae.x),
+      };
+    const feet = (check.actor === null ? undefined : layout.party[check.actor]) ??
+      { x: fae.x, y: fae.baseline };
+    if (check.kind === "chain")
+      return {
+        kind: "chain",
+        from: { x: feet.x, y: feet.y - 1.6 * fae.height },
+        to: { x: feet.x, y: feet.y - 0.6 * fae.height },
+        radius: 0.16 * fae.height,
+        hintAt: hintAt(feet.x),
+      };
+    const meterHeight = 1.1 * fae.height;
+    const meterWidth = Math.max(22, 0.18 * fae.height);
+    const meterX = feet.x - 0.3 * fae.height - meterWidth;
     return {
-      x: centre.x,
-      y: centre.y,
-      radius: centre.radius,
+      kind: "charge",
+      x: meterX,
+      y: feet.y - meterHeight,
+      width: meterWidth,
+      height: meterHeight,
+      hintAt: hintAt(meterX + meterWidth / 2),
     };
+  }
+
+  private battleCheckInfo(state: State): BattleCheckInfo | null {
+    const side = state.battle?.check?.side;
+    const geometry = this.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
+    if (side === undefined || geometry === null) return null;
+    return geometry.kind === "chain"
+      ? { ...geometry, side, x: geometry.to.x, y: geometry.to.y }
+      : { ...geometry, side };
   }
 
   renderInfo(state: State): {
@@ -830,7 +917,13 @@ export class GameView {
       choices: string[];
       selected: number;
     };
-    critters: { id: string; kind: string; frame: string; x: number; y: number }[];
+    critters: {
+      id: string;
+      kind: string;
+      frame: string;
+      x: number;
+      y: number;
+    }[];
     npcs: { id: string; frame: string; facing: string }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];
@@ -845,7 +938,7 @@ export class GameView {
     lantern: { on: boolean; glows: string[] };
     battle: {
       phase: string | null;
-      ring: { x: number; y: number; radius: number } | null;
+      check: BattleCheckInfo | null;
       critter: { id: string; frame: string } | null;
       layout: {
         critter: { x: number; baseline: number; height: number };
@@ -868,10 +961,12 @@ export class GameView {
     };
     return {
       area: this.areaView?.area.id ?? "",
-      drawOrder: this.depth.children.filter((child) => child.visible).map((child) => ({
-        label: child.label,
-        zIndex: child.zIndex,
-      })),
+      drawOrder: this.depth.children
+        .filter((child) => child.visible)
+        .map((child) => ({
+          label: child.label,
+          zIndex: child.zIndex,
+        })),
       animation: this.currentAnimation,
       frame: this.currentFrame,
       party: this.partyFrames.map((frames, index) => {
@@ -903,27 +998,13 @@ export class GameView {
       npcs: this.npcFrames,
       canopies: this.areaView?.canopyAlphas ?? [],
       props: this.areaView?.propInfo ?? [],
-      lantern: { on: state.lantern && state.battle === null, glows: this.drawnGlows.slice() },
+      lantern: {
+        on: state.lantern && state.battle === null,
+        glows: this.drawnGlows.slice(),
+      },
       battle: {
         phase: state.battle?.phase ?? null,
-        ring:
-          state.battle?.aim === null || state.battle === null
-            ? null
-            : {
-                x:
-                  state.battle.aim.side === "fae"
-                    ? renderLayout.fae.x
-                    : renderLayout.critter.x,
-                y:
-                  state.battle.aim.side === "fae"
-                    ? renderLayout.fae.baseline - renderLayout.fae.height / 2
-                    : renderLayout.critter.baseline -
-                      renderLayout.critter.height / 2,
-                radius:
-                  state.battle.aim.side === "fae"
-                    ? 0.55 * renderLayout.fae.height
-                    : 0.55 * renderLayout.critter.height,
-              },
+        check: this.battleCheckInfo(state),
         layout,
         backdrop: this.battleBackdrop,
         critter:
@@ -937,8 +1018,8 @@ export class GameView {
                     : state.battle.phase === "reward"
                       ? "calm_idle_01"
                       : state.battle.phase === "burst" ||
-                          (state.battle.phase === "aim" &&
-                            state.battle.aim?.side === "fae")
+                          (state.battle.phase === "check" &&
+                            state.battle.check?.side === "fae")
                         ? "chaos_burst_01"
                         : "chaos_idle_01",
               },

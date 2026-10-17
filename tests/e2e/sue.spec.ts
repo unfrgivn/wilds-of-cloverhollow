@@ -72,8 +72,16 @@ test.describe("Sue party member", () => {
     await hold(page, "ArrowDown", 1);
     expect((await readBattle(page))?.selected).toBe(2);
     await press(page);
-    expect((await readBattle(page))?.phase).toBe("aim");
-    await press(page);
+    expect((await readBattle(page))?.phase).toBe("check");
+    const check = await readBattle(page);
+    if (check?.check?.kind !== "charge") throw new Error("Cast did not start a charge");
+    await page.keyboard.down("Enter");
+    await step(page, Math.floor(check.check.spec.targetTick / 2));
+    await expect(page).toHaveScreenshot("sue-cast-mid-charge.png");
+    await step(page, check.check.spec.targetTick - Math.floor(check.check.spec.targetTick / 2));
+    await page.keyboard.up("Enter");
+    await step(page, 1);
+    await expect(page.locator(".battle-grade")).toHaveText("GREAT!");
     await step(page, 60);
     await expect(page.locator(".sticker-text-revealed")).toContainText("Sue");
     await expect(page.locator(".sticker-text-revealed")).toHaveText(
@@ -82,6 +90,44 @@ test.describe("Sue party member", () => {
     const cast = page.locator(".battle-command").filter({ hasText: "Cast" });
     await expect(cast).toHaveAttribute("aria-disabled", "true");
     await expect(cast).toContainText("reeling in");
+  });
+
+  test("touch: Cast holds the confirm sticker through a charge", async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 874, height: 402 },
+      hasTouch: true,
+    });
+    const page = await context.newPage();
+    await page.goto("./?touch=1");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await resetPaused(page, "plaza-party");
+    for (const [key, ticks] of approach) await hold(page, key, ticks);
+    await hold(page, "ArrowLeft", 35);
+    const tap = async (selector: string): Promise<void> => {
+      const bounds = await page.locator(selector).boundingBox();
+      if (bounds === null) throw new Error(`${selector} is not visible`);
+      await page.touchscreen.tap(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+      await step(page, 2);
+    };
+    for (let count = 0; count < 20; count += 1) {
+      const battle = await readBattle(page);
+      if (battle?.phase === "command" && battle.revealed >= battle.message.length) break;
+      await tap(".touch-confirm");
+    }
+    await tap(".battle-command:has-text('Cast')");
+    const check = await readBattle(page);
+    if (check?.check?.kind !== "charge") throw new Error("Cast did not start a charge");
+    const confirm = page.locator(".touch-confirm");
+    await confirm.dispatchEvent("pointerdown", {
+      pointerId: 1, pointerType: "touch", isPrimary: true,
+    });
+    await step(page, check.check.spec.targetTick);
+    await confirm.dispatchEvent("pointerup", {
+      pointerId: 1, pointerType: "touch", isPrimary: true,
+    });
+    await step(page, 1);
+    await expect(page.locator(".battle-grade")).toHaveText("GREAT!");
+    await context.close();
   });
 
   test("the compact battle composition fits", async ({ page }) => {

@@ -16,6 +16,9 @@ import type {
   World,
   Battle,
   BattleView,
+  CheckSide,
+  CheckSpec,
+  CheckState,
   Critter,
   Grade,
   PresentCritter,
@@ -24,6 +27,7 @@ import type {
 } from "./types";
 import { createInkState, runInk, type InkFacts } from "./ink";
 import { sceneryArea } from "./props";
+import { createCheck, stepCheck } from "./checks";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -646,11 +650,6 @@ function battleMessage(
   return { ...battle, phase, message: text, revealed: 0, phaseTicks: 0 };
 }
 
-export function gradeAim(delta: number, great: number, good: number): Grade {
-  const absolute = Math.abs(delta);
-  return absolute <= great ? "great" : absolute <= good ? "good" : "miss";
-}
-
 // Soothe, then one command per party member in party order, then Snack and
 // Run (spec 8). A friend's command rests for its content turns after use.
 export function battleCommands(
@@ -710,7 +709,7 @@ function restTurn(rest: Battle["rest"]): Battle["rest"] {
   );
 }
 
-// The numbers and lines the critter-side aim resolves with: a friend's
+// The numbers and lines a Fae-side check resolves with: a friend's
 // command, or Soothe for anything else.
 function critterSideCommand(
   critter: Critter,
@@ -729,6 +728,69 @@ export function battleView(world: World, state: State): BattleView | null {
   if (battle === null) return null;
   const critter = world.critters[battle.critterId];
   if (critter === undefined) return null;
+  const check = battle.check;
+  // The friend acting in a Fae-side check (null for Soothe and for bursts).
+  const acting =
+    check?.side === "critter"
+      ? state.party.findIndex(
+          (member) => world.party[member.id]?.command.id === battle.command,
+        )
+      : -1;
+  const actor = acting >= 0 ? acting : null;
+  const checkView: BattleView["check"] =
+    check === null
+      ? null
+      : check.kind === "ring"
+        ? {
+            kind: "ring",
+            side: check.side,
+            progress: check.tick / check.spec.ticks,
+            target: check.spec.targetTick / check.spec.ticks,
+          }
+        : check.kind === "charge"
+          ? {
+              kind: "charge",
+              side: check.side,
+              actor,
+              waiting: check.held === 0,
+              fill: check.held / check.spec.maxTicks,
+              great: [
+                (check.spec.targetTick - check.spec.greatWindow) /
+                  check.spec.maxTicks,
+                (check.spec.targetTick + check.spec.greatWindow) /
+                  check.spec.maxTicks,
+              ],
+              good: [
+                (check.spec.targetTick - check.spec.goodWindow) /
+                  check.spec.maxTicks,
+                (check.spec.targetTick + check.spec.goodWindow) /
+                  check.spec.maxTicks,
+              ],
+            }
+          : {
+              kind: "chain",
+              side: check.side,
+              actor,
+              look: check.spec.look,
+              beats: check.spec.arrivals.map((arrival, index) => ({
+                appeared: check.tick >= arrival - check.spec.travelTicks,
+                progress: Math.max(
+                  0,
+                  Math.min(
+                    1,
+                    (check.tick - (arrival - check.spec.travelTicks)) /
+                      check.spec.travelTicks,
+                  ),
+                ),
+                result: check.results[index] ?? "pending",
+              })),
+            };
+  const hint =
+    check?.kind === "charge" && check.held === 0
+      ? world.battle.hints.charge
+      : check?.kind === "chain" && check.tick < (check.spec.arrivals[0] ?? 0)
+        ? world.battle.hints.chain
+        : null;
   return {
     critterId: critter.id,
     critterName: critter.name,
@@ -744,14 +806,8 @@ export function battleView(world: World, state: State): BattleView | null {
     energyMax: critter.energyMax,
     calm: battle.calm,
     calmMax: critter.calmMax,
-    aim:
-      battle.aim === null
-        ? null
-        : {
-            side: battle.aim.side,
-            progress: battle.aimTick / battle.aim.ticks,
-            target: battle.aim.targetTick / battle.aim.ticks,
-          },
+    check: checkView,
+    hint,
     lastGrade: battle.lastGrade,
     rewardSticker: battle.rewardSticker,
   };
@@ -770,19 +826,16 @@ function nextCommand(
   return selected;
 }
 
-function startAim(
+function startCheck(
   battle: Battle,
-  side: "critter" | "fae",
-  ticks: number,
-  targetTick: number,
-  greatWindow: number,
-  goodWindow: number,
+  side: CheckSide,
+  spec: CheckSpec,
+  big = false,
 ): Battle {
   return {
     ...battle,
-    phase: "aim",
-    aim: { side, ticks, targetTick, greatWindow, goodWindow },
-    aimTick: 0,
+    phase: "check",
+    check: createCheck(spec, side, big),
     phaseTicks: 0,
     lastGrade: null,
     message: "",
@@ -862,15 +915,12 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         next.calm >= critter.calmMax
           ? battleMessage(next, critter.lines.soothed, "soothed")
           : battleMessage(next, critter.lines.burst, "burst");
-    else if (next.phase === "burst")
-      next = startAim(
-        next,
-        "fae",
-        critter.burst.ticks,
-        critter.burst.targetTick,
-        critter.burst.greatWindow,
-        critter.burst.goodWindow,
-      );
+    else if (next.phase === "burst") {
+      const random = nextRandom(nextBase);
+      const big = random[0] < critter.burst.bigChance;
+      const spec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
+      return { ...random[1], battle: startCheck(next, "fae", spec, big) };
+    }
     else if (next.phase === "burstResult")
       next =
         next.energy <= 0
@@ -984,11 +1034,15 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         },
       };
     }
-    const timing = critter.timing;
     const friend = critter.commands.friends[chosen.id];
+    const partyOwner = state.party.find(
+      (member) => world.party[member.id]?.command.id === chosen.id,
+    );
+    const friendContent =
+      partyOwner === undefined ? undefined : world.party[partyOwner.id];
     return {
       ...nextBase,
-      battle: startAim(
+      battle: startCheck(
         {
           ...next,
           command: chosen.id,
@@ -998,33 +1052,19 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
               : { ...restTurn(next.rest), [chosen.id]: friend.rest },
         },
         "critter",
-        timing.aimTicks,
-        timing.targetTick,
-        timing.greatWindow,
-        timing.goodWindow,
+        friendContent?.command.check ?? world.battle.commands.soothe.check,
       ),
     };
   }
-  if (next.phase === "aim" && next.aim !== null) {
-    const aim = next.aim;
-    const press = confirm;
-    const tick = next.aimTick + 1;
-    const result: Grade | null =
-      press || tick >= aim.ticks
-        ? press
-          ? gradeAim(tick - aim.targetTick, aim.greatWindow, aim.goodWindow)
-          : "miss"
-        : null;
-    if (result === null)
-      return {
-        ...nextBase,
-        battle: {
-          ...next,
-          aimTick: tick,
-          aim: { ...aim },
-        },
-      };
-    if (aim.side === "critter") {
+  if (next.phase === "check" && next.check !== null) {
+    const check = next.check;
+    const stepped = stepCheck(check, confirm, input.confirm);
+    const result = stepped.grade;
+    // The check stays in the battle through its result, as it ended: the
+    // last beat popped, the meter where it was let go.
+    const ended = { ...next, check: stepped.check };
+    if (result === null) return { ...nextBase, battle: ended };
+    if (check.side === "critter") {
       const command = critterSideCommand(critter, next.command);
       const bonus =
         result === "great"
@@ -1040,7 +1080,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ...nextBase,
         battle: battleMessage(
           {
-            ...next,
+            ...ended,
             calm,
             lastGrade: result,
           },
@@ -1049,14 +1089,13 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ),
       };
     }
-    const random = nextRandom(nextBase);
-    const base = random[0] < critter.burst.bigChance ? 2 : 1;
+    const base = check.big ? 2 : 1;
     const damage =
       result === "great" ? 0 : result === "good" ? Math.max(0, base - 1) : base;
     return {
-      ...random[1],
+      ...nextBase,
       battle: battleMessage(
-        { ...next, energy: next.energy - damage, lastGrade: result },
+        { ...ended, energy: next.energy - damage, lastGrade: result },
         critter.lines.burstResult[result],
         "burstResult",
       ),
@@ -1768,10 +1807,9 @@ function stepTick(
       energy: critter.energyMax,
       calm: 0,
       rest: {},
-      aim: null,
+      check: null,
       lastGrade: null,
       rewardSticker: null,
-      aimTick: 0,
       phaseTicks: 0,
     };
     // A recurring critter met Fae where it stood; a set piece keeps her

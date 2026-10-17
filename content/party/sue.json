@@ -13,6 +13,14 @@
   "command": {
     "id": "cast",
     "label": "Cast",
-    "resting": "reeling in"
+    "resting": "reeling in",
+    "check": {
+      "kind": "charge",
+      "waitTicks": 180,
+      "maxTicks": 60,
+      "targetTick": 44,
+      "greatWindow": 5,
+      "goodWindow": 11
+    }
   }
 }

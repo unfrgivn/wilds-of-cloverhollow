@@ -1,4 +1,5 @@
 import {
+  battleCommands,
   blankInput,
   createState,
   distanceToPolygon,
@@ -45,11 +46,17 @@ const scripted = (): string => {
   for (let tick = 0; tick < 200 && state.battle === null; tick += 1)
     state = step(world, state, blankInput()).state;
   if (state.battle === null) throw new Error("roamer did not start a battle");
-  for (let tick = 0; tick < 400 && state.battle?.phase !== "command"; tick += 1)
+  // Read up to the command prompt, typed out (a choice while it types is
+  // ignored), then pick Run.
+  const prompted = (): boolean => state.battle?.phase === "command" &&
+    state.battle.revealed >= state.battle.message.length;
+  for (let tick = 0; tick < 400 && !prompted(); tick += 1)
     state = step(world, state, press({ confirm: tick % 2 === 0 })).state;
-  const run = state.battle === null ? -1 : state.battle.selected + 3;
+  const run = battleCommands(world, state).findIndex((command) => command.id === "run");
+  if (!prompted() || run < 0) throw new Error("roamer battle never offered Run");
   state = step(world, state, blankInput()).state;
   state = step(world, state, press({ choose: run })).state;
+  if (state.battle?.phase !== "run") throw new Error("Run wasn't chosen");
   for (let tick = 0; tick < 400 && state.battle !== null; tick += 1)
     state = step(world, state, press({ confirm: tick % 2 === 0 })).state;
   if (state.battle !== null) throw new Error("roamer battle did not end");

@@ -1885,6 +1885,32 @@ the old trail, the owl, and the clubhouse claim.
     the wind on ArrowLeft, then leans through the second for GOOD; on touch
     it holds both with the stickers for GREAT.
 
+## Milestone 49: Lasso spots **Status:** 🚧 In progress (2026-10-17)
+- The owner asked for more places to use the lasso (2026-10-17). Coach Ash
+  says it "can pull down things that are up high"; NOTES.md: "Lasso for
+  pulling levers or swinging across gaps". Three little errands in places Fae
+  already knows, each with something stuck out of reach:
+  - Meadow Park: Rosie's kite, tangled at the top of the play tower's
+    flagpole. Lassoed down, it goes back to Rosie in the classroom, who gives
+    Fae coins for the arcade.
+  - Bubblegum Bay: a message in a bottle, wedged between the rocks past the
+    dock's end. Pulled in, it's an old treasure map; Fae digs where X marks
+    the spot, with the red spade from the beach.
+  - Pinecone Pass: the cocoa seller's scarf, blown onto a ski-lift chair.
+    Lassoed down and given back, it's cocoa on the house.
+- The stuck things are there once Fae has the lasso, so the places look as
+  they always did before it.
+- Art: each one is painted into an edit of its area's approved painting and
+  cut by the kit as an added prop: hidden until the story shows it, and no
+  hole in the plate.
+- Engine: a prop state can be hidden (nothing drawn, no footprint, hides
+  nobody), and the kit cuts `added` props.
+
+## Milestone 52: The clubhouse kitchen **Status:** 📋 Planned
+- The owner asked for it (2026-10-17). NOTES.md's clubhouse ideas: a
+  "Microwave for making dino nuggets and mac n cheese" and a "Chest to store
+  items". Designed after Milestone 49.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -2185,6 +2211,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     50, wind-ups for the gull and Mr. Pip, then Milestone 51, first touch
     and old friends. Milestone 49 is the lasso work another session has
     started.
+  - Milestone 49, lasso spots: in progress (above); then Milestone 52, the
+    clubhouse kitchen (owner, 2026-10-17).
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

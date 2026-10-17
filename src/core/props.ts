@@ -32,11 +32,14 @@ export function propState(world: World, ink: string, prop: Prop): PropState {
 // The area with its props' current footprints solid: what Fae, her party, and
 // the critters walk around. An area without props is returned as it is.
 export function sceneryArea(world: World, ink: string, area: Area): Area {
-  if (area.props.length === 0) return area;
+  const crossings = (area.crossings ?? []).filter((crossing) =>
+    world.storyVariable(ink, crossing.opens) !== true);
+  if (area.props.length === 0 && crossings.length === 0) return area;
   return {
     ...area,
     blockers: [
       ...area.blockers,
+      ...crossings.map((crossing) => crossing.polygon),
       ...area.props.flatMap((prop) => propState(world, ink, prop).footprint),
     ],
   };
@@ -101,6 +104,7 @@ export function frontEdge(
  * column's front edge. The renderer sorts the same way, strip by strip.
  */
 export function propCoversPoint(state: PropState, feet: Point, at: Point): boolean {
+  if (state.flat) return false;
   const { silhouette, front } = state;
   const index = Math.floor((at.x - silhouette.left) / silhouette.step);
   const edge = front.ys[index];
@@ -112,6 +116,7 @@ export function propCoversPoint(state: PropState, feet: Point, at: Point): boole
 // The share of a feet-anchored body box the prop draws over, sampled on a
 // 5-unit grid like the hiding check.
 export function propCovers(state: PropState, feet: Point, box: Box): number {
+  if (state.flat) return 0;
   let covered = 0;
   let samples = 0;
   for (let y = feet.y - box.height; y <= feet.y; y += 5)

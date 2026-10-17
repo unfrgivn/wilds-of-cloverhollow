@@ -13,6 +13,7 @@ import woodsData from "../../content/areas/woods.json";
 import arcadeData from "../../content/areas/arcade.json";
 import eastHallData from "../../content/areas/east-hall.json";
 import musicData from "../../content/areas/music.json";
+import fieldData from "../../content/areas/field.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -27,6 +28,7 @@ import trailPropsData from "../../content/props/trail.json";
 import woodsPropsData from "../../content/props/woods.json";
 import eastHallPropsData from "../../content/props/east-hall.json";
 import musicPropsData from "../../content/props/music.json";
+import fieldPropsData from "../../content/props/field.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -61,6 +63,7 @@ import owlData from "../../content/critters/owl.json";
 import arcadeKeeperData from "../../content/critters/arcade-keeper.json";
 import gymPupData from "../../content/critters/gym-pup.json";
 import musicBirdData from "../../content/critters/music-bird.json";
+import oakSquirrelData from "../../content/critters/oak-squirrel.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -119,6 +122,12 @@ function polygon(value: unknown): value is Polygon {
         typeof item[1] === "number",
     )
   );
+}
+
+type RawCrossing = { id: string; polygon: Polygon; opens: string };
+function rawCrossing(value: unknown): value is RawCrossing {
+  return record(value) && typeof value.id === "string" && polygon(value.polygon) &&
+    typeof value.opens === "string";
 }
 
 function direction(value: unknown): value is Direction {
@@ -257,6 +266,18 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     "blockers",
   );
   field(
+    value.crossings === undefined || (Array.isArray(value.crossings) && value.crossings.every(
+      rawCrossing,
+    )), file, "crossings",
+  );
+  const crossings: RawCrossing[] = value.crossings === undefined
+    ? [] : value.crossings.filter(rawCrossing);
+  const crossingIds = new Set<string>();
+  for (const crossing of crossings) {
+    field(!crossingIds.has(crossing.id), file, `crossings.${crossing.id} (duplicate id)`);
+    crossingIds.add(crossing.id);
+  }
+  field(
     value.critters === undefined ||
       (Array.isArray(value.critters) &&
         value.critters.every(
@@ -350,7 +371,9 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
       `spawns.${name}.position`,
     );
     field(direction(raw.facing), file, `spawns.${name}.facing`);
-    spawns[name] = { x: raw.x, y: raw.y, facing: raw.facing };
+    const x = typeof raw.x === "number" ? raw.x : 0;
+    const y = typeof raw.y === "number" ? raw.y : 0;
+    spawns[name] = { x, y, facing: raw.facing };
   }
   return {
     id: value.id,
@@ -360,6 +383,9 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     height: value.height,
     walkable: value.walkable,
     blockers: value.blockers,
+    ...(crossings.length === 0 ? {} : { crossings: crossings.map((crossing) => ({
+      id: crossing.id, polygon: crossing.polygon, opens: crossing.opens,
+    })) }),
     ground: value.ground,
     glows: (value.glows ?? []).map((item) => ({
       id: item.id, frame: item.frame, point: { x: item.point.x, y: item.point.y },
@@ -916,6 +942,8 @@ export function loadContent(): {
     parsePropCatalogue(eastHallPropsData, "content/props/east-hall.json"));
   const music = parseArea(musicData, "content/areas/music.json",
     parsePropCatalogue(musicPropsData, "content/props/music.json"));
+  const playingField = parseArea(fieldData, "content/areas/field.json",
+    parsePropCatalogue(fieldPropsData, "content/props/field.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -948,6 +976,7 @@ export function loadContent(): {
     [arcadeKeeperData, "arcade-keeper"],
     [gymPupData, "gym-pup"],
     [musicBirdData, "music-bird"],
+    [oakSquirrelData, "oak-squirrel"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -1015,6 +1044,7 @@ export function loadContent(): {
     [arcade.id]: arcade,
     [eastHall.id]: eastHall,
     [music.id]: music,
+    [playingField.id]: playingField,
   };
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));
   if (ruleProblems.length > 0) throw new Error(`content/areas: ${ruleProblems.join("; ")}`);

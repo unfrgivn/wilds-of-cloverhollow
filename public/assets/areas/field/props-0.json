@@ -1,0 +1,132 @@
+{
+  "frames": {
+    "bridge-posts": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 440,
+        "h": 957
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 440,
+        "h": 957
+      },
+      "sourceSize": {
+        "w": 440,
+        "h": 957
+      },
+      "anchor": {
+        "x": 0.54091,
+        "y": 0.99896
+      }
+    },
+    "bridge-shadow": {
+      "frame": {
+        "x": 442,
+        "y": 0,
+        "w": 430,
+        "h": 877
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 430,
+        "h": 877
+      },
+      "sourceSize": {
+        "w": 430,
+        "h": 877
+      },
+      "anchor": {
+        "x": 0.48372,
+        "y": 0.87913
+      }
+    },
+    "bridge": {
+      "frame": {
+        "x": 874,
+        "y": 0,
+        "w": 350,
+        "h": 776
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 350,
+        "h": 776
+      },
+      "sourceSize": {
+        "w": 350,
+        "h": 776
+      },
+      "anchor": {
+        "x": 0.58857,
+        "y": 0.99485
+      }
+    },
+    "oak": {
+      "frame": {
+        "x": 0,
+        "y": 959,
+        "w": 1090,
+        "h": 670
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1090,
+        "h": 670
+      },
+      "sourceSize": {
+        "w": 1090,
+        "h": 670
+      },
+      "anchor": {
+        "x": 0.36055,
+        "y": 0.97463
+      }
+    },
+    "bridge-lowered": {
+      "frame": {
+        "x": 1092,
+        "y": 959,
+        "w": 790,
+        "h": 575
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 790,
+        "h": 575
+      },
+      "sourceSize": {
+        "w": 790,
+        "h": 575
+      },
+      "anchor": {
+        "x": 0.82025,
+        "y": 0.81565
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1629
+    },
+    "scale": "1"
+  }
+}

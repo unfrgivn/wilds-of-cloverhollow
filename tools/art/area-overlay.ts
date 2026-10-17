@@ -1,5 +1,6 @@
 // Draws an area's JSON over its painting for review: the floor's outline,
-// blockers (red), props' footprints in every state (orange; painted props
+// blockers (red), crossings (light-blue dashed), props' footprints in every state
+// (orange; painted props
 // dashed), doors (magenta), spawns (gold), look points with their reach
 // (violet), and people's footprints (cyan). Green is every spot Fae's feet can
 // get to from a spawn: on the floor and a player radius clear of its edge,
@@ -54,6 +55,10 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${
     `<polygon points="${poly(area.walkable)}"/>`) +
   group('fill="#d9484855" stroke="#a11" stroke-width="8"',
     area.blockers.map((item) => `<polygon points="${poly(item)}"/>`).join("")) +
+  group('fill="none" stroke="#8ed8f8" stroke-width="8" stroke-dasharray="16 10"',
+    (area.crossings ?? []).map((item) => `<polygon points="${poly(item.polygon)}"/>` +
+      `<text x="${px(item.polygon[0]?.[0] ?? 0) + 12}" y="${px(item.polygon[0]?.[1] ?? 0)}" ` +
+      `fill="#287a9e" stroke="white" stroke-width="2">${item.opens}</text>`).join("")) +
   group('fill="#f08c0055" stroke="#b35900" stroke-width="6"',
     area.props.map((prop) => group(prop.painted ? 'stroke-dasharray="14 8"' : "",
       Object.values(prop.states).flatMap((state) => state.footprint)

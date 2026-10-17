@@ -10823,7 +10823,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 75
+    "ticks": 85
   },
   {
     "frame": {
@@ -10847,43 +10847,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
+    "ticks": 15
   },
   {
     "frame": {

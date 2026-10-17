@@ -67,9 +67,11 @@ play.talk("hoop");
 if (story("found_clipboard") !== true) throw new Error("no clipboard");
 play.approach("npc:coach");
 play.talk("npc:coach");
-// The back door the kid ran out of.
-play.approach("back-door");
-play.talk("back-door");
+// The back door the kid ran out of, shut until recess.
+const backDoor = world.areas.gym?.spawns["back-door"];
+if (backDoor === undefined) throw new Error("no gym back-door spawn");
+play.navigate(backDoor, 6);
+play.knock({ x: 0, y: -1 }, "back_door");
 const end = play.state();
 if (story("coach_thanked") !== true) throw new Error("Coach Ash never got his things");
 console.error(`gym: ${end.tick} ticks, ${play.script.length} segments`);

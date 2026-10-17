@@ -401,6 +401,363 @@
       "journal": [
         "ev",
         {
+          "VAR?": "bridge_down"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I pulled the old footbridge's lever with the lasso, and the bridge swung down across the creek! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "stash_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The hooded kid's stash is behind the old stump: purple markers, fizzy soda, and a Star Racer token. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "swung"
+        },
+        {
+          "VAR?": "bridge_down"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I swung across the creek on the lasso! There's a lever up on the old footbridge's post. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "recess"
+        },
+        "str",
+        "^oak-squirrel",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A fizzy squirrel is pelting acorns from the old oak by the creek. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.34"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "recess"
+        },
+        {
+          "VAR?": "swung"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Recess! The kid in the purple hood ran out to the playing field. The old oak's branch reaches across the creek... ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.44"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_flute"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Ms. Willow gave me her very first flute! When I play it, animal friends come running. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.51"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "heard_bird"
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The bluebird sang a note just like the red bar. Maybe that's the song's last note! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.61"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^music-bird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The bluebird gave back Ms. Willow's chime mallet. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.74"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_quest"
+        },
+        "str",
+        "^music-bird",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A bluebird took Ms. Willow's chime mallet. Maybe a kind word will calm it down. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.87"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "song_start"
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The class song goes red, yellow, blue... and the last note is under the purple scribbles. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.97"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_quest"
+        },
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The kid in the purple hood climbed in through the music room window and scribbled on the class song. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.107"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "music_time"
+        },
+        {
+          "VAR?": "music_quest"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Music class is next! Ms. Willow's music room is down the east hall. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.117"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "coach_thanked"
         },
         "/ev",
@@ -415,7 +772,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.124"
               },
               null
             ]
@@ -457,7 +814,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.141"
               },
               null
             ]
@@ -491,7 +848,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.34"
+                "->": ".^.^.^.154"
               },
               null
             ]
@@ -591,7 +948,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.44"
+                "->": ".^.^.^.164"
               },
               null
             ]
@@ -616,220 +973,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        {
-          "VAR?": "has_flute"
-        },
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ Ms. Willow gave me her very first flute! When I play it, animal friends come running. ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.58"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        {
-          "VAR?": "heard_bird"
-        },
-        {
-          "VAR?": "has_flute"
-        },
-        "!",
-        "&&",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ The bluebird sang a note just like the red bar. Maybe that's the song's last note! ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.68"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        "str",
-        "^music-bird",
-        "/str",
-        {
-          "x()": "calmed",
-          "exArgs": 1
-        },
-        {
-          "VAR?": "has_flute"
-        },
-        "!",
-        "&&",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ The bluebird gave back Ms. Willow's chime mallet. ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.81"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        {
-          "VAR?": "music_quest"
-        },
-        "str",
-        "^music-bird",
-        "/str",
-        {
-          "x()": "calmed",
-          "exArgs": 1
-        },
-        "!",
-        "&&",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ A bluebird took Ms. Willow's chime mallet. Maybe a kind word will calm it down. ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.94"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        {
-          "VAR?": "song_start"
-        },
-        {
-          "VAR?": "has_flute"
-        },
-        "!",
-        "&&",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ The class song goes red, yellow, blue... and the last note is under the purple scribbles. ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.104"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        {
-          "VAR?": "music_quest"
-        },
-        {
-          "VAR?": "has_flute"
-        },
-        "!",
-        "&&",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ The kid in the purple hood climbed in through the music room window and scribbled on the class song. ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.114"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "/#",
-        "\n",
-        "ev",
-        {
-          "VAR?": "music_time"
-        },
-        {
-          "VAR?": "music_quest"
-        },
-        "!",
-        "&&",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "^ Music class is next! Ms. Willow's music room is down the east hall. ",
-              "#",
-              "^speaker: Fae",
-              {
-                "->": ".^.^.^.124"
+                "->": ".^.^.^.171"
               },
               null
             ]
@@ -859,7 +1003,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.134"
+                "->": ".^.^.^.181"
               },
               null
             ]
@@ -893,7 +1037,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.146"
+                "->": ".^.^.^.193"
               },
               null
             ]
@@ -918,7 +1062,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.153"
+                "->": ".^.^.^.200"
               },
               null
             ]
@@ -948,7 +1092,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.163"
+                "->": ".^.^.^.210"
               },
               null
             ]
@@ -982,7 +1126,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.176"
+                "->": ".^.^.^.223"
               },
               null
             ]
@@ -1011,7 +1155,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.186"
+                "->": ".^.^.^.233"
               },
               null
             ]
@@ -1040,7 +1184,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.196"
+                "->": ".^.^.^.243"
               },
               null
             ]
@@ -1074,7 +1218,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.209"
+                "->": ".^.^.^.256"
               },
               null
             ]
@@ -1099,7 +1243,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.216"
+                "->": ".^.^.^.263"
               },
               null
             ]
@@ -1124,7 +1268,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.223"
+                "->": ".^.^.^.270"
               },
               null
             ]
@@ -1153,7 +1297,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.233"
+                "->": ".^.^.^.280"
               },
               null
             ]
@@ -1178,7 +1322,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.240"
+                "->": ".^.^.^.287"
               },
               null
             ]
@@ -1203,7 +1347,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.247"
+                "->": ".^.^.^.294"
               },
               null
             ]
@@ -1240,7 +1384,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.262"
+                "->": ".^.^.^.309"
               },
               null
             ]
@@ -1265,7 +1409,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.269"
+                "->": ".^.^.^.316"
               },
               null
             ]
@@ -1299,7 +1443,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.282"
+                "->": ".^.^.^.329"
               },
               null
             ]
@@ -1328,7 +1472,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.292"
+                "->": ".^.^.^.339"
               },
               null
             ]
@@ -1353,7 +1497,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.299"
+                "->": ".^.^.^.346"
               },
               null
             ]
@@ -1378,7 +1522,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.306"
+                "->": ".^.^.^.353"
               },
               null
             ]
@@ -1408,7 +1552,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.316"
+                "->": ".^.^.^.363"
               },
               null
             ]
@@ -1438,7 +1582,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.326"
+                "->": ".^.^.^.373"
               },
               null
             ]
@@ -1463,7 +1607,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.333"
+                "->": ".^.^.^.380"
               },
               null
             ]
@@ -1492,7 +1636,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.343"
+                "->": ".^.^.^.390"
               },
               null
             ]
@@ -1530,7 +1674,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.359"
+                "->": ".^.^.^.406"
               },
               null
             ]
@@ -1557,7 +1701,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.368"
+                "->": ".^.^.^.415"
               },
               null
             ]
@@ -1586,7 +1730,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.378"
+                "->": ".^.^.^.425"
               },
               null
             ]
@@ -1611,7 +1755,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.385"
+                "->": ".^.^.^.432"
               },
               null
             ]
@@ -1640,7 +1784,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.396"
+                "->": ".^.^.^.443"
               },
               null
             ]
@@ -1669,7 +1813,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.407"
+                "->": ".^.^.^.454"
               },
               null
             ]
@@ -4396,6 +4540,31 @@
             "nop",
             "/#",
             "\n",
+            "ev",
+            {
+              "VAR?": "recess"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Recess! I've propped the back door open. Out you go! ",
+                  "#",
+                  "^speaker: Coach Ash",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
             "^Keep that lasso handy, Fae! And watch out for that purple hood. ",
             "#",
             "^speaker: Coach Ash",
@@ -5809,6 +5978,31 @@
             "^speaker: Ms. Willow",
             "/#",
             "\n",
+            "ev",
+            {
+              "VAR?": "recess"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Now, off to recess! The playing field is out the gym's back door. ",
+                  "#",
+                  "^speaker: Ms. Willow",
+                  {
+                    "->": ".^.^.^.9"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
             "done",
             null
           ]
@@ -6947,6 +7141,23 @@
             "^sound: flute",
             "/#",
             "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "recess",
+              "re": true
+            },
+            "^Oh! There's the bell. Recess! ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
+            "^Out to the playing field with you. Coach Ash props the gym's back door open at recess. ",
+            "#",
+            "^speaker: Ms. Willow",
+            "/#",
+            "\n",
             "done",
             null
           ]
@@ -7017,6 +7228,461 @@
       ],
       "instrument_shelf": [
         "^Tambourines, maracas, a drum, and a triangle. Everything a band needs! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "oak_squirrel_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Phew! Sorry about all the acorns. ",
+        "#",
+        "^speaker: Oak Squirrel",
+        "/#",
+        "\n",
+        "^That big branch is my favourite spot. This morning a kid in a purple hood swung on it, right across the creek! ",
+        "#",
+        "^speaker: Oak Squirrel",
+        "/#",
+        "\n",
+        "^They whooped all the way over. Then, fizz! I had to throw something at everybody. ",
+        "#",
+        "^speaker: Oak Squirrel",
+        "/#",
+        "\n",
+        "^Swing across the creek on that branch... with Coach Ash's lasso! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The squirrel hugs an acorn and keeps very, very still. ",
+            "#",
+            "^speaker: Oak Squirrel",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "oak_branch": [
+        "ev",
+        "str",
+        "^oak-squirrel",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A fizzy squirrel is pelting acorns from the big branch! Nobody's getting near it like that. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^oak-squirrel",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.19"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The old oak's branch reaches right across the creek. If only I had a rope... ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.26"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.34"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "swung"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.40"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "swung",
+          "re": true
+        },
+        "^The old oak's branch reaches right across the creek. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Fae twirls Coach Ash's lasso, loops it over the branch, and gives it a good tug. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Hold on tight... WHEEEE! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^travel: field.east-bank",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Wheee! Fae swings across the creek again. ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^travel: field.east-bank",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "hood_stash": [
+        "ev",
+        {
+          "VAR?": "stash_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "stash_found",
+          "re": true
+        },
+        "^A purple backpack, tucked behind the old stump! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Purple markers... a bottle of fizzy purple soda... and a Star Racer token. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^It's the hooded kid's stash! So this is where they ran at PE. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Was that a purple hood, way down the path? ...Gone again. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The hooded kid's purple backpack. They haven't come back for it... yet. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "bridge_lever": [
+        "ev",
+        {
+          "VAR?": "bridge_down"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The lever's down, and the old footbridge is across the creek. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "bridge_down"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^A lever, way up on the old footbridge's post. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ It's much too high to reach! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.31"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Too high to reach... but not for a lasso! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Fae loops the lasso over the lever's handle and pulls with all her might. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "bridge_down",
+          "re": true
+        },
+        "^CLUNK! Creeeak... The old footbridge swings down across the creek! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Now there's a way back across. Thanks, Coach Ash! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "hopscotch": [
+        "^Fae hops the whole hopscotch on one foot, all the way to 7 and back! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "tetherball": [
+        "^Fae gives the tetherball a whack. Round and round it goes! ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -7153,6 +7819,22 @@
         "/str",
         {
           "VAR=": "xylophone_tune"
+        },
+        false,
+        {
+          "VAR=": "recess"
+        },
+        false,
+        {
+          "VAR=": "swung"
+        },
+        false,
+        {
+          "VAR=": "stash_found"
+        },
+        false,
+        {
+          "VAR=": "bridge_down"
         },
         "/ev",
         "end",

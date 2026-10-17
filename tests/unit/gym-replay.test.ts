@@ -39,6 +39,8 @@ describe("gym replay", () => {
       .toEqual({ pe: true, quest: true, lasso: true, clipboard: true, thanked: true });
     expect({ area: state.area, dialogue: state.dialogue, battle: state.battle })
       .toEqual({ area: "gym", dialogue: null, battle: null });
-    expect(journalNotes(world, state)[0]).toMatch(/^Coach Ash gave me his lasso!/);
+    const notes = journalNotes(world, state);
+    expect(notes[0]).toMatch(/^Music class is next!/);
+    expect(notes[1]).toMatch(/^Coach Ash gave me his lasso!/);
   });
 });

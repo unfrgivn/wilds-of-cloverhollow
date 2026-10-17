@@ -37,6 +37,7 @@ const catalogue: PropCatalogue = parsePropCatalogue({
       states: {
         default: { frame: "crate", shadow: null, footprint: [square(0, -10, 10)], silhouette },
         smashed: { frame: "crate-smashed", shadow: null, footprint: [], silhouette },
+        flat: { frame: "crate-flat", shadow: null, footprint: [], silhouette, flat: true },
       },
     },
     arch: {
@@ -79,6 +80,19 @@ describe("props", () => {
     expect(propStateName(world, fresh.ink, ruled)).toBe("smashed");
     expect(propState(world, fresh.ink, ruled).footprint).toEqual([]);
     expect(propStateName(world, fresh.ink, quiet)).toBe("default");
+  });
+
+  it("flat states never cover or hide anyone and leave their deck walkable", () => {
+    const [crate] = place([{ id: "a", prop: "crate", x: 100, y: 100, rules: [
+      { state: "flat", while: "maple_in_hall" },
+    ] }]);
+    if (crate === undefined) throw new Error("flat crate missing");
+    const state = propState(world, fresh.ink, crate);
+    expect(state.flat).toBe(true);
+    expect(propCoversPoint(state, { x: 100, y: 100 }, { x: 100, y: 50 })).toBe(false);
+    expect(propCovers(state, { x: 100, y: 100 }, faeBox)).toBe(0);
+    expect(hiddenPositions({ ...harness, props: [crate] }, world.tunables.playerRadius))
+      .toEqual([]);
   });
 
   it("are solid in their current state only", () => {
@@ -155,6 +169,11 @@ describe("props", () => {
     expect(() => place([{ id: "a", prop: "barrel", x: 0, y: 0 }])).toThrow("unknown prop");
     expect(() => place([{ id: "a", prop: "crate", x: 0, y: 0, state: "burnt" }]))
       .toThrow("no state burnt");
+    expect(() => parsePropCatalogue({ atlases: [], props: { crate: {
+      canopy: false, painted: false, home: [0, 0], states: {
+        default: { frame: "a", shadow: null, footprint: [square(0, 0, 1)], silhouette },
+        flat: { frame: "b", shadow: null, footprint: [square(0, 0, 1)], silhouette, flat: true },
+      } } } }, "x.json")).toThrow("flat state");
     expect(() => place([{ id: "a", prop: "crate", x: 0, y: 0 },
       { id: "a", prop: "crate", x: 9, y: 9 }])).toThrow("duplicate prop id");
     // A painted prop is still on the plate: it can't move or change.
@@ -220,6 +239,32 @@ describe("props", () => {
         world.tunables, world.critters, world.party).filter((error) => error.includes("split"));
     expect(split(3)).toEqual([]);
     expect(split(0))
+      .toEqual(["harness: its floor is split; spawns start | east can't reach each other"]);
+  });
+
+  it("lay a crossing's way open with the props its flag switches (spec 6.2)", () => {
+    // A creek across a room (a crossing that opens with maple_in_hall) and a
+    // row of crates across the creek. Crates that smash while the same flag
+    // holds are out of the way whenever the way is open, so the floor is one
+    // piece; crates switched by any other flag may still stand there.
+    const spawn = harness.spawns.start;
+    if (spawn === undefined) throw new Error("harness spawn missing");
+    const room = square(spawn.x + 125, spawn.y, 200);
+    const east = { x: spawn.x + 250, y: spawn.y, facing: "left" as const };
+    const creek: Polygon = [[spawn.x + 105, spawn.y - 200], [spawn.x + 145, spawn.y - 200],
+      [spawn.x + 145, spawn.y + 200], [spawn.x + 105, spawn.y + 200]];
+    const split = (flag: string): string[] => {
+      const row = place(Array.from({ length: 13 }, (_, index) => ({
+        id: `w${index}`, prop: "crate", x: spawn.x + 125, y: spawn.y - 170 + index * 30,
+        rules: [{ state: "smashed", while: flag }],
+      })));
+      const area = { ...harness, walkable: room, spawns: { ...harness.spawns, east },
+        crossings: [{ id: "creek", polygon: creek, opens: "maple_in_hall" }], props: row };
+      return areaConnectionErrors({ harness: area }, world.tunables, world.critters, world.party)
+        .filter((error) => error.includes("split"));
+    };
+    expect(split("maple_in_hall")).toEqual([]);
+    expect(split("story_time"))
       .toEqual(["harness: its floor is split; spawns start | east can't reach each other"]);
   });
 

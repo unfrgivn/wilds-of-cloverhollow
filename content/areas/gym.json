@@ -154,6 +154,35 @@
         "area": "east-hall",
         "spawn": "gym-doors"
       }
+    },
+    {
+      "id": "back-door",
+      "polygon": [
+        [
+          915,
+          378
+        ],
+        [
+          1003,
+          418
+        ],
+        [
+          1003,
+          455
+        ],
+        [
+          915,
+          415
+        ]
+      ],
+      "target": {
+        "area": "field",
+        "spawn": "gym"
+      },
+      "requires": {
+        "variable": "recess",
+        "knot": "back_door"
+      }
     }
   ],
   "spawns": {
@@ -161,6 +190,11 @@
       "x": 350,
       "y": 650,
       "facing": "right"
+    },
+    "back-door": {
+      "x": 960,
+      "y": 490,
+      "facing": "down"
     }
   },
   "interactables": [
@@ -189,15 +223,6 @@
         "y": 440
       },
       "knot": "climbing_rope",
-      "prompt": "Look"
-    },
-    {
-      "id": "back-door",
-      "point": {
-        "x": 930,
-        "y": 470
-      },
-      "knot": "back_door",
       "prompt": "Look"
     }
   ],

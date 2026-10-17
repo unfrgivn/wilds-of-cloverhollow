@@ -43,6 +43,7 @@ export type Tunables = {
 // with these.
 export type Box = { width: number; height: number };
 export type Spawn = Point & { facing: Direction };
+export type Crossing = { id: string; polygon: Polygon; opens: string };
 export type Area = {
   id: string;
   name: string;
@@ -51,6 +52,7 @@ export type Area = {
   height: number;
   walkable: Polygon;
   blockers: Polygon[];
+  crossings?: Crossing[];
   ground?: string;
   // What the lantern shows (spec 6); `flip` mirrors the decal left to right.
   glows: {
@@ -110,6 +112,7 @@ export type Prop = {
 // A prop state, in world units: the frame and its multiply shadow decal, the
 // ground footprint (solid), the front edge it sorts by, and its silhouette.
 export type PropState = {
+  flat: boolean;
   frame: string;
   shadow: string | null;
   footprint: Polygon[];

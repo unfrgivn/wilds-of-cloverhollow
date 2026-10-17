@@ -1321,6 +1321,61 @@ the old trail, the owl, and the clubhouse claim.
   - Ms. Willow's look and name, both paintings, and the wording are in the
     owner's review queue, with the earlier deferred reviews.
 
+## Milestone 39: Recess on the playing field **Status:** ✅ Completed (2026-10-16)
+- The school chapter goes on after music. Ms. Willow's flute rings the bell:
+  recess (`recess`). Coach Ash props the gym's back door open; it leads out to
+  the playing field behind the school (area `field`, painted whole and split
+  into a kit), where the kid in the purple hood ran at PE.
+- The lasso changes the world for the first time:
+  - A gap: a fizzy squirrel (set piece `oak-squirrel`, a squirrel) pelts
+    acorns from the old oak by the creek. Calmed, it tells how the kid swung
+    across the creek on the oak's branch, so Fae loops the lasso over it and
+    swings across (a `travel:` within the field, as often as she likes).
+  - The far bank: the hooded kid's stash behind the stump (purple markers, a
+    fizzy soda, a Star Racer token), and a glimpse that's gone again.
+  - A lever: high on the old footbridge's post, too high to reach; the lasso
+    pulls it (`bridge_down`). The footbridge swings down across the creek
+    and the lever drops, and that's the way back.
+- The engine gains crossings and flat prop states (spec 6.2): water that's
+  solid until a story flag lays a way over it, and a prop state that lies
+  on the ground (the lowered bridge), drawn under everyone. The area checks
+  walk every combination of an area's crossing flags, each prop in the
+  states its rules allow then. The kit cuts a state from a second painting
+  of the area (`stateOf`, `painting`).
+- Evidence: unit tests (`field.test.ts`: recess, the back door shut then
+  open, the crossing shut then open with real steps, the bridge and lever
+  states, the swing, the stash, the lever, the squirrel's tale, every look
+  point and the squirrel within reach, the journal, nobody named;
+  `field-replay.test.ts`; `crossings.test.ts`; a props test that the area
+  checks lay a crossing's way open with the props its flag switches, which
+  fails without them), the recorded run `pass-party/field.json`
+  (`tools/sim/record-field.ts`, on from the music run), and the real-key e2e
+  `field.spec.ts` (arriving, the squirrel's battle, the far bank, the bridge
+  coming down with its strips gone, and walking over it, at both sizes).
+  On the tree rebased onto main: `just check` (494 tests), `just build`,
+  and `just e2e` (392 passed, 2 skipped). Every new or changed screenshot
+  was viewed.
+- Notes and assumptions:
+  - The playing field has no concept sheet; it was painted in the outdoor
+    areas' style (art/recipes/field.json): one painting, an edit raising the
+    footbridge for the default state, and an edit lowering it, cut by the kit
+    into the bridge's and lever's second states. 12 painting calls and 75 kit
+    calls (art/recipes/field-kit.json).
+  - The field's first floor was traced from the painting's colours and ran
+    up into the pines and the bushes on the east bank and over the hedge;
+    it was retraced along their feet.
+  - The pocket behind the raised bridge and its back post is a blocker:
+    the raised deck and the posts would hide Fae there, and the lowered
+    deck lands beside it. The bridge's posts are a canopy: they fade while
+    Fae crosses the landing behind the front post.
+  - The kit keeps an `exclude` polygon in the plate: a lifted prop's hole
+    skips it (the lever's post and hub stay painted; only its handle lifts).
+  - The gym run now ends by walking into the shut back door; the music run
+    is re-recorded after it, the same beats.
+  - The squirrel is a squirrel, so it shares the Acorn Squirrel sticker.
+  - The playing field, its two paintings, the squirrel's lines, and the
+    wording are in the owner's review queue.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1593,21 +1648,13 @@ more bad guys, and the blacklight lantern, made and built while away.
     front doors filled the lower left of the screen, and Fae left by walking
     into its top. The hall is repainted as a cutaway with the front doors on
     a back wall; its kit, floor, doors, and the runs through it follow.
-  - Milestone 39, recess on the playing field (in progress, 2026-10-09,
-    `.worktrees/m39`, branch `m39-field`): after music class, recess opens
-    the gym's back door onto the playing field behind the school, where the
-    kid in the purple hood ran. A fizzy squirrel guards the old oak by the
-    creek; calmed, Fae loops the lasso over the oak's branch and swings
-    across (a gap), finds the hooded kid's stash, and pulls down the lever
-    high on the old footbridge's post (a lever), which lays the bridge
-    across the water. The engine gains crossings: water solid until a story
-    flag lays a way over it.
+  - Milestone 39, recess on the playing field: done (above).
   - Then: the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).
 
 ## Later (not scheduled)
-Calling animal friends with the flute, the lasso's levers and gaps, the
+Calling animal friends with the flute, more places for the lasso, the
 clubhouse fix-up, and more
 mini-bosses (people under the chaos spell, NOTES.md).
 

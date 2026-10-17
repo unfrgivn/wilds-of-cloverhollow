@@ -71,6 +71,15 @@ type Subject = {
   states: Record<string, ExtraState>;
   // Why this footprint may disagree with its drawing (pack's footprint check).
   footprintNote: string | undefined;
+  // Another painting of the area (the same size) the subject is cut from, and
+  // the prop state it becomes: a state painted in another version of the scene.
+  painting: string | undefined;
+  stateOf: { prop: string; state: string } | undefined;
+  // The state lies on the ground: drawn under everyone, never over (spec 6.2).
+  flat: boolean;
+  // Every solid piece of its isolate in its crop is the object, not only the
+  // seed's piece and those beside it (a deck cut in two by a post).
+  keepPieces: boolean;
 };
 type Tile = { file: string; x: number; y: number; width: number; height: number };
 type Mask = Uint8Array;
@@ -151,6 +160,13 @@ function subject(value: unknown): Subject {
         note: text(raw.note, `${id}.states.${name}.note`),
       };
     }
+  const stateOf = typeof value.stateOf === "string"
+    ? /^([a-z0-9-]+)\.([a-z0-9-]+)$/.exec(value.stateOf) ?? undefined
+    : undefined;
+  if (value.stateOf !== undefined && stateOf === undefined)
+    throw new Error(`${id}.stateOf must be "<prop>.<state>"`);
+  if (stateOf !== undefined && value.painted !== true)
+    throw new Error(`${id}: a state subject is painted (it never leaves a hole in the plate)`);
   const strings = (items: unknown): string[] =>
     (list(items) ?? []).filter((item): item is string => typeof item === "string");
   const count = (key: string): number | undefined => {
@@ -179,8 +195,15 @@ function subject(value: unknown): Subject {
     solid: value.solid === true,
     shadowReach: typeof value.shadowReach === "number" ? value.shadowReach : 50,
     footprint,
-    home: value.home === undefined ? homeOf(footprint, id) : point(value.home, `${id}.home`),
+    // A state subject sits at its prop's home (pack); it has none of its own.
+    home: stateOf !== undefined ? [0, 0]
+      : value.home === undefined ? homeOf(footprint, id) : point(value.home, `${id}.home`),
     footprintNote: typeof value.footprintNote === "string" ? value.footprintNote : undefined,
+    painting: typeof value.painting === "string" ? value.painting : undefined,
+    stateOf: stateOf === undefined ? undefined
+      : { prop: stateOf[1] ?? "", state: stateOf[2] ?? "" },
+    flat: value.flat === true,
+    keepPieces: value.keepPieces === true,
     samples: chosen,
     states,
   };
@@ -203,9 +226,24 @@ const rawSubjects = isRecord(rawConfig) ? list(rawConfig.subjects) : undefined;
 if (rawSubjects === undefined) throw new Error(`${configPath} needs subjects`);
 const subjects = rawSubjects.map(subject);
 const byId = new Map(subjects.map((item) => [item.id, item]));
-for (const item of subjects)
-  for (const id of item.front)
-    if (!byId.has(id)) throw new Error(`${item.id}: unknown front subject ${id}`);
+for (const item of subjects) {
+  for (const id of item.front) {
+    const other = byId.get(id);
+    if (other === undefined) throw new Error(`${item.id}: unknown front subject ${id}`);
+    if (other.painting !== item.painting)
+      throw new Error(`${item.id}: front subject ${id} is cut from another painting`);
+  }
+  if (item.stateOf === undefined) continue;
+  const target = byId.get(item.stateOf.prop);
+  if (target === undefined || target.stateOf !== undefined || target.painted)
+    throw new Error(`${item.id}: ${item.stateOf.prop} isn't a lifted prop of this kit`);
+  if (item.stateOf.state === "default" || item.stateOf.state in target.states)
+    throw new Error(`${item.id}: ${item.stateOf.prop} already has a ${item.stateOf.state} state`);
+  if (item.flat && item.footprint.length > 0)
+    throw new Error(`${item.id}: a flat state is walked on, so it has no footprint`);
+}
+const states = subjects.filter((item) => item.stateOf !== undefined);
+const props = subjects.filter((item) => item.stateOf === undefined);
 
 function readTiles(path: string): { tiles: Tile[]; width: number; height: number } {
   const json: unknown = JSON.parse(readFileSync(path, "utf8"));
@@ -251,6 +289,15 @@ if (!existsSync(original)) {
   im(...args, "-depth", "8", original);
 }
 
+// The painting a subject is cut from, checked to be the approved one's size.
+function source(item: Subject): string {
+  if (item.painting === undefined) return original;
+  const size = im(item.painting, "-format", "%w %h", "info:");
+  if (size !== `${painting.width} ${painting.height}`)
+    throw new Error(`${item.id}: ${item.painting} is ${size}, not the painting's size`);
+  return item.painting;
+}
+
 // A subject's crop in painting pixels, grown to the nearest aspect ratio
 // Gemini takes and kept inside the painting.
 function box(item: Subject): Box {
@@ -282,6 +329,10 @@ function box(item: Subject): Box {
 }
 
 const dir = (item: Subject): string => `${scratch}/${item.id}`;
+
+// How far from its seed an object's pieces may be: 12 px, or anywhere in its
+// crop for a subject that keeps every piece (a deck a post cuts in two).
+const reach = (item: Subject): number => item.keepPieces ? Infinity : 12;
 
 /*
  * The crop a subject's samples were drawn from, written beside them in the
@@ -316,7 +367,7 @@ for (const item of subjects) {
 function sameCrop(item: Subject, image: string): boolean {
   const { x, y, w, h } = box(item);
   const size = im(image, "-format", "%w %h", "info:");
-  return size === `${w} ${h}` && mean(original, "-crop", `${w}x${h}+${x}+${y}`, "+repage",
+  return size === `${w} ${h}` && mean(source(item), "-crop", `${w}x${h}+${x}+${y}`, "+repage",
     image, "-compose", "difference", "-composite") === 0;
 }
 
@@ -541,7 +592,8 @@ const both = (a: Mask, b: Mask): Mask =>
 const area2 = (mask: Mask): number => mask.reduce((sum, value) => sum + value, 0);
 
 // The object's component under the seed, plus every solid component within
-// `reach` px of it (hanging baskets on thin keyed-out chains).
+// `reach` px of it (hanging baskets on thin keyed-out chains); with an
+// infinite reach, every solid component in the crop.
 function nearSeed(mask: Mask, w: number, h: number, seed: Point, reach: number): Mask {
   const labels = new Int32Array(mask.length).fill(-1);
   let count = 0;
@@ -579,7 +631,7 @@ function nearSeed(mask: Mask, w: number, h: number, seed: Point, reach: number):
     }
   }
   const core = Uint8Array.from(labels, (label) => label === seedLabel ? 1 : 0);
-  const near = morph(core, w, h, reach, true);
+  const near = Number.isFinite(reach) ? morph(core, w, h, reach, true) : undefined;
   // Thin lines (other objects' outlines the model left) vanish when opened.
   const opened = morph(morph(mask, w, h, 2, false), w, h, 2, true);
   const solid = new Map<number, number>();
@@ -588,9 +640,9 @@ function nearSeed(mask: Mask, w: number, h: number, seed: Point, reach: number):
     if (value === 1 && label >= 0) solid.set(label, (solid.get(label) ?? 0) + 1);
   });
   const keep = new Set<number>([seedLabel]);
-  near.forEach((value, index) => {
-    const label = labels[index] ?? -1;
-    if (value === 1 && label >= 0 && (solid.get(label) ?? 0) >= 250) keep.add(label);
+  labels.forEach((label, index) => {
+    if ((near === undefined || near[index] === 1) && label >= 0 &&
+      (solid.get(label) ?? 0) >= 250) keep.add(label);
   });
   return Uint8Array.from(labels, (label) => keep.has(label) ? 1 : 0);
 }
@@ -605,17 +657,24 @@ function inside(polygon: Polygon, x: number, y: number): boolean {
   return hit;
 }
 
-// Removes the exclude polygons (world units); `solid` fills enclosed
-// background; `core` keeps only parts thicker than 2 * core + 1 px (and the
-// rim within core + 2 px of them), so neighbours' thin outlines go.
-function clean(item: Subject, input: Mask): Mask {
+// The mask without its exclude polygons (world units).
+function excluded(item: Subject, input: Mask): Mask {
   const { x, y, w, h } = box(item);
-  let mask = Uint8Array.from(input);
+  const mask = Uint8Array.from(input);
   if (item.exclude.length > 0)
     for (let row = 0; row < h; row += 1)
       for (let col = 0; col < w; col += 1)
         if (item.exclude.some((polygon) => inside(polygon, (col + x) / 2, (row + y) / 2)))
           mask[row * w + col] = 0;
+  return mask;
+}
+
+// Removes the exclude polygons (world units); `solid` fills enclosed
+// background; `core` keeps only parts thicker than 2 * core + 1 px (and the
+// rim within core + 2 px of them), so neighbours' thin outlines go.
+function clean(item: Subject, input: Mask): Mask {
+  const { w, h } = box(item);
+  let mask = excluded(item, input);
   if (item.solid) {
     const outside = new Uint8Array(w * h);
     const queue: number[] = [];
@@ -657,11 +716,11 @@ function objectMask(item: Subject, n: number): Mask {
   const out = `${dir(item)}/obj-${n}.png`;
   if (existsSync(out)) return readMask(out, w, h);
   const seed = toCrop(item, item.seed);
-  let mask = nearSeed(keyMask(rgb(`${dir(item)}/iso-${n}.jpg`, w, h)), w, h, seed, 12);
+  let mask = nearSeed(keyMask(rgb(`${dir(item)}/iso-${n}.jpg`, w, h)), w, h, seed, reach(item));
   const ink = inkMask(rgb(`${dir(item)}/crop.png`, w, h));
   mask = union(mask, both(ink, morph(mask, w, h, 3, true)));
   mask = morph(morph(mask, w, h, 1, true), w, h, 1, false);
-  mask = nearSeed(mask, w, h, seed, 12);
+  mask = nearSeed(mask, w, h, seed, reach(item));
   writeMask(mask, w, h, out);
   return mask;
 }
@@ -694,7 +753,7 @@ function finalMask(item: Subject): Mask {
     if (other === undefined) continue;
     mask = minus(mask, morph(mapInto(item, other, finalMask(other)), w, h, 1, true));
   }
-  mask = nearSeed(clean(item, mask), w, h, toCrop(item, item.seed), 12);
+  mask = nearSeed(clean(item, mask), w, h, toCrop(item, item.seed), reach(item));
   finals.set(item.id, mask);
   writeMask(mask, w, h, `${dir(item)}/final.png`);
   return mask;
@@ -705,7 +764,7 @@ function others(item: Subject, painted = false): Mask {
   const { w, h } = box(item);
   let result: Mask = new Uint8Array(w * h);
   for (const other of subjects)
-    if (other.id !== item.id && (!painted || other.painted))
+    if (other.id !== item.id && other.painting === item.painting && (!painted || other.painted))
       result = union(result, mapInto(item, other, finalMask(other)));
   return result;
 }
@@ -735,7 +794,9 @@ function holeMask(item: Subject): Mask {
   const out = `${dir(item)}/hole.png`;
   if (existsSync(out)) return readMask(out, w, h);
   const object = objectMask(item, item.samples.object ?? 1);
-  const mask = minus(morph(union(object, shades(item)), w, h, 6, true), others(item, true));
+  // What `exclude` takes away isn't the object, so it stays in the plate.
+  const grown = morph(union(object, shades(item)), w, h, 6, true);
+  const mask = minus(excluded(item, grown), others(item, true));
   writeMask(mask, w, h, out);
   return mask;
 }
@@ -788,7 +849,7 @@ async function gen(): Promise<void> {
     mkdirSync(dir(item), { recursive: true });
     const path = `${dir(item)}/crop.png`;
     if (!existsSync(path))
-      im(original, "-crop", `${crop.w}x${crop.h}+${crop.x}+${crop.y}`, "+repage", path);
+      im(source(item), "-crop", `${crop.w}x${crop.h}+${crop.x}+${crop.y}`, "+repage", path);
     writeFileSync(`${dir(item)}/crop.json`, cropStamp(item));
     for (const n of objectSamples(item))
       jobs.push(() => gemini(isolatePrompt(item.object, false), path,
@@ -1127,6 +1188,7 @@ type CatalogueState = {
   shadow: string | null;
   footprint: Polygon[];
   silhouette: Columns;
+  flat?: true;
 };
 
 function pack(): void {
@@ -1134,13 +1196,13 @@ function pack(): void {
   if (errors.length > 0)
     throw new Error(`pack: the kit has errors (see masks):\n${errors.join("\n")}`);
   const frames: Frame[] = [];
-  const props: Record<string, {
+  const catalogue: Record<string, {
     canopy: boolean;
     painted: boolean;
     home: Point;
     states: Record<string, CatalogueState>;
   }> = {};
-  for (const item of subjects) {
+  for (const item of props) {
     const body = trimmed(item.id, `${dir(item)}/frame.png`, item, item.home);
     if (body === undefined) throw new Error(`${item.id}: empty frame`);
     frames.push(body);
@@ -1188,11 +1250,30 @@ function pack(): void {
         silhouette: silhouette(frame),
       };
     }
-    props[item.id] = { canopy: item.canopy, painted: item.painted, home: item.home, states };
+    catalogue[item.id] = { canopy: item.canopy, painted: item.painted, home: item.home, states };
+  }
+  // A state painted in another version of the scene, registered by its crop
+  // against its prop's home.
+  for (const item of states) {
+    const target = item.stateOf === undefined ? undefined : byId.get(item.stateOf.prop);
+    const entry = target === undefined ? undefined : catalogue[target.id];
+    if (item.stateOf === undefined || target === undefined || entry === undefined)
+      throw new Error(`${item.id}: no prop to be a state of`);
+    const name = `${target.id}-${item.stateOf.state}`;
+    const frame = trimmed(name, `${dir(item)}/frame.png`, item, target.home);
+    if (frame === undefined) throw new Error(`${item.id}: empty frame`);
+    frames.push(frame);
+    entry.states[item.stateOf.state] = {
+      frame: name,
+      shadow: null,
+      footprint: relative(item.footprint, target.home),
+      silhouette: silhouette(frame),
+      ...(item.flat ? { flat: true } : {}),
+    };
   }
   const failures: string[] = [];
   for (const item of subjects)
-    for (const [name, state] of Object.entries(props[item.id]?.states ?? {})) {
+    for (const [name, state] of Object.entries(catalogue[item.id]?.states ?? {})) {
       const world = state.footprint.map((polygon) => polygon.map(([x, y]): Point =>
         [x + item.home[0], y + item.home[1]]));
       const found = footprintProblems(`${item.id}.${name}`, world, item.home, state.silhouette);
@@ -1265,7 +1346,7 @@ function pack(): void {
     });
     atlases.push(`assets/areas/${area}/props-${index}.json`);
   }
-  writeJson(`content/props/${area}.json`, { atlases, props });
+  writeJson(`content/props/${area}.json`, { atlases, props: catalogue });
   // The plate, in the painting's own tiles; untouched tiles are copied as they are.
   for (const tile of painting.tiles) {
     const region = `${tile.width}x${tile.height}+${tile.x}+${tile.y}`;
@@ -1301,7 +1382,7 @@ function pack(): void {
   }
   // The default layout rebuilt from the kit, against the painting.
   const rebuilt = `${review}/rebuilt.png`;
-  const order = [...subjects].sort((a, b) => a.home[1] - b.home[1]);
+  const order = [...props].sort((a, b) => a.home[1] - b.home[1]);
   const args = [plate];
   for (const item of order)
     if (existsSync(`${dir(item)}/shadow.png`) && !item.painted) {
@@ -1345,18 +1426,26 @@ function pack(): void {
       rebuiltVsPainting: `${(off * 100).toFixed(2)}% of the painting's pixels differ by ` +
         "more than 12% when the default layout is rebuilt from the kit",
     },
-    states: Object.fromEntries(subjects.flatMap((item) => Object.entries(item.states)
-      .map(([name, extra]) => [`${item.id}.${name}`, {
-        source: extra.source,
-        recipe: extra.note,
-        processing: "magenta corner flood and -transparent #FF00FF, trim, uniform resize to " +
-          `${extra.width} units wide, despill-edge.ts --key magenta --band 3`,
-        shadow: extra.shadow ? "a soft lavender ellipse from the frame's alpha" : "none",
-      }]))),
+    states: {
+      ...Object.fromEntries(subjects.flatMap((item) => Object.entries(item.states)
+        .map(([name, extra]) => [`${item.id}.${name}`, {
+          source: extra.source,
+          recipe: extra.note,
+          processing: "magenta corner flood and -transparent #FF00FF, trim, uniform resize " +
+            `to ${extra.width} units wide, despill-edge.ts --key magenta --band 3`,
+          shadow: extra.shadow ? "a soft lavender ellipse from the frame's alpha" : "none",
+        }]))),
+      ...Object.fromEntries(states.map((item) => [`${item.stateOf?.prop}.${item.stateOf?.state}`, {
+        painting: item.painting ?? "the approved painting",
+        subject: item.id,
+        processing: "cut by the kit like a subject (isolate, mask, the painting's own " +
+          `pixels), registered by its crop${item.flat ? "; flat, drawn on the ground" : ""}`,
+      }])),
+    },
     footprintNotes: Object.fromEntries(subjects.flatMap((item) =>
       item.footprintNote === undefined ? [] : [[item.id, item.footprintNote]])),
-    painted: subjects.filter((item) => item.painted).map((item) => item.id),
-    lifted: subjects.filter((item) => !item.painted).map((item) => item.id),
+    painted: props.filter((item) => item.painted).map((item) => item.id),
+    lifted: props.filter((item) => !item.painted).map((item) => item.id),
   });
   console.log(`pack: ${frames.length} frames on ${page + 1} page(s), ` +
     `${(bytes / 1048576).toFixed(1)} MB decoded; rebuilt vs painting ${(off * 100).toFixed(2)}%`);
@@ -1484,10 +1573,19 @@ function overlay(): void {
     `stroke="#198754" stroke-width="3"/>`).join("");
   body += blockers.map((polygon) => `<polygon points="${points(polygon)}" ` +
     `fill="#d9484840" stroke="#b00000" stroke-width="2"/>`).join("");
+  body += (list(json.crossings) ?? []).filter(isRecord).map((crossing) => {
+    const shape = list(crossing.polygon);
+    const label = typeof crossing.opens === "string" ? crossing.opens : "";
+    if (shape === undefined || !shape.every(isPoint)) return "";
+    return `<polygon points="${points(shape)}" fill="none" stroke="#8ed8f8" ` +
+      `stroke-width="2" stroke-dasharray="8 5"/><text x="${shape[0]?.[0] ?? 0}" ` +
+      `y="${shape[0]?.[1] ?? 0}" fill="#287a9e">${label}</text>`;
+  }).join("");
   for (const item of subjects) {
     body += item.footprint.map((polygon) => `<polygon points="${points(polygon)}" ` +
       `fill="#1769aa40" stroke="#0a3d91" stroke-width="2"` +
       `${item.painted ? ' stroke-dasharray="6 4"' : ""}/>`).join("");
+    if (item.stateOf !== undefined) continue;
     const [hx, hy] = item.home;
     body += `<circle cx="${hx}" cy="${hy}" r="4" fill="#ffd400" stroke="#000" ` +
       `stroke-width="1"/><text x="${hx + 6}" y="${hy - 4}" font-size="13" ` +

@@ -59,10 +59,14 @@ draws it again from the new crop.
 | `complete` | Finish the parts its `front` subjects hide (lifted subjects only). |
 | `solid` | Fill holes enclosed by the mask (a basin, a box). |
 | `core` | For thin objects (arches): drop parts thinner than `2 * core + 1` px, which are neighbours' outlines. |
-| `exclude` | Polygons in world units removed from the mask. |
+| `exclude` | Polygons in world units removed from the mask; they stay in the plate (a lifted prop's hole skips them). |
 | `shadowReach` | How far (px) its cast shadow may reach from it. Default 50. |
 | `samples` | The chosen samples, `{ object, fill, complete }`, once viewed. Without one, the step makes several and picks (fill) or shows them (masks). |
 | `states` | Extra states: `{ "<name>": { source, width, footprint, shadow } }`. |
+| `stateOf` | `"<prop>.<state>"`: this subject is a state of a lifted prop of the kit, cut from `painting` and registered against its prop's home (it's `painted`: it leaves no hole). |
+| `painting` | Another painting of the area, the approved one's size, to cut this subject from (the scene with the state in place). |
+| `flat` | A `stateOf` subject that lies on the ground (a lowered bridge): no footprint, drawn under everyone. |
+| `keepPieces` | Keep every solid piece of the isolate in the crop, not only the seed's and those beside it (a deck a post cuts in two). |
 
 ## What is a prop
 A prop is one object Fae can walk behind or bump into, and its picture is that

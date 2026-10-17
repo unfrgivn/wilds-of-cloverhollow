@@ -155,9 +155,12 @@ describe("PE time", () => {
     expect(doors?.target).toEqual({ area: "gym", spawn: "door" });
     expect(doors?.requires).toEqual({ variable: "pe_time", knot: "gym_hall" });
     expect(school.interactables.map((item) => item.id)).not.toContain("gym-hall");
-    expect(gym.triggers.map((trigger) => [trigger.id, trigger.target])).toEqual([
-      ["door", { area: "east-hall", spawn: "gym-doors" }],
-    ]);
+    expect(gym.triggers.map((trigger) => [trigger.id, trigger.target, trigger.requires]))
+      .toEqual([
+        ["door", { area: "east-hall", spawn: "gym-doors" }, undefined],
+        // The back door, shut until recess (Milestone 39).
+        ["back-door", { area: "field", spawn: "gym" }, { variable: "recess", knot: "back_door" }],
+      ]);
     expect(hall.spawns["gym-doors"]?.facing).toBe("right");
     expect(gym.spawns["door"]?.facing).toBe("right");
     expect({ name: gym.name, land: gym.land })
@@ -194,14 +197,12 @@ describe("the gym", () => {
     expect(talkable(state, coach.point, "npc:coach")).toBe(true);
   });
 
-  it("has the hoop, the ball bin, the climbing rope, and the back door to look at", () => {
-    expect(gym.interactables.map((item) => [item.id, item.knot, item.prompt])).toEqual(
-      expect.arrayContaining([
-        ["hoop", "hoop", "Look"],
-        ["ball-bin", "ball_bin", "Look"],
-        ["climbing-rope", "climbing_rope", "Look"],
-        ["back-door", "back_door", "Look"],
-      ]));
+  it("has the hoop, the ball bin, and the climbing rope to look at; the back door is shut", () => {
+    expect(gym.interactables.map((item) => [item.id, item.knot, item.prompt])).toEqual([
+      ["hoop", "hoop", "Look"],
+      ["ball-bin", "ball_bin", "Look"],
+      ["climbing-rope", "climbing_rope", "Look"],
+    ]);
     const state = at("gym", "door", peTime);
     for (const item of gym.interactables)
       expect(talkable(state, item.point, item.id), item.id).toBe(true);
@@ -365,9 +366,13 @@ describe("the journal", () => {
       .toBe("Coach Ash lent me his lasso, to get his clipboard down from the hoop.");
     expect(notes(roped, pupCalm)[0])
       .toBe("I found Coach Ash's stopwatch and his clipboard! Back to Coach Ash.");
+    // His thanks send Fae on to music in the same talk, so that's the newest note.
     const done = notes(thanked, pupCalm);
-    expect(done[0]).toBe("Coach Ash gave me his lasso! It can pull down things that are up high, " +
-      "and maybe swing across gaps too.");
+    expect(done.slice(0, 2)).toEqual([
+      "Music class is next! Ms. Willow's music room is down the east hall.",
+      "Coach Ash gave me his lasso! It can pull down things that are up high, " +
+        "and maybe swing across gaps too.",
+    ]);
     expect(done.join(" ")).not.toContain("Time for PE!");
     expect(done.join(" ")).not.toContain("Back to Coach Ash.");
   });

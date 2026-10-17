@@ -9,6 +9,7 @@ import type { Area, Polygon, Prop, PropState, Silhouette } from "../core";
  */
 
 type CatalogueState = {
+  flat: boolean;
   frame: string;
   shadow: string | null;
   footprint: Polygon[];
@@ -88,10 +89,15 @@ export function parsePropCatalogue(value: unknown, file: string): PropCatalogue 
       const at = `props.${id}.states.${name}`;
       if (!record(state) || typeof state.frame !== "string" ||
           !(state.shadow === null || typeof state.shadow === "string")) fail(file, at);
+      const flat = state.flat === true;
+      const footprint = polygons(state.footprint, file, `${at}.footprint`);
+      if (flat && footprint.length > 0)
+        throw new Error(`${file}: flat state ${at} must have an empty footprint`);
       states[name] = {
+        flat,
         frame: state.frame,
         shadow: state.shadow,
-        footprint: polygons(state.footprint, file, `${at}.footprint`),
+        footprint,
         silhouette: silhouette(state.silhouette, file, `${at}.silhouette`),
       };
     }
@@ -145,6 +151,7 @@ function placeState(state: CatalogueState, placement: PropPlacement): PropState 
     .map((runs) => runs.map(([top, bottom]): [number, number] =>
       [placement.y + top, placement.y + bottom]));
   return {
+    flat: state.flat,
     frame: state.frame,
     shadow: state.shadow,
     footprint,
@@ -193,7 +200,12 @@ export function propRuleErrors(
   areas: Record<string, Area>,
   variable: (name: string) => unknown,
 ): string[] {
-  return Object.values(areas).flatMap((area) => area.props.flatMap((prop) =>
-    prop.rules.filter((rule) => variable(rule.while) === undefined).map((rule) =>
-      `${area.id}: prop ${prop.id} reads undeclared Ink variable ${rule.while}`)));
+  return Object.values(areas).flatMap((area) => [
+    ...area.props.flatMap((prop) =>
+      prop.rules.filter((rule) => variable(rule.while) === undefined).map((rule) =>
+        `${area.id}: prop ${prop.id} reads undeclared Ink variable ${rule.while}`)),
+    ...(area.crossings ?? [])
+      .filter((crossing) => variable(crossing.opens) === undefined).map((crossing) =>
+      `${area.id}: crossing ${crossing.id} reads undeclared Ink variable ${crossing.opens}`),
+  ]);
 }

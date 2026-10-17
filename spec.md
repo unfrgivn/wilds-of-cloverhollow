@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-08 (Milestone 38, the music room and the flute)
+Last updated: 2026-10-16 (Milestone 39, recess on the playing field)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -434,10 +434,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   back-left wall (trigger `door` to `east-hall.gym-doors`, a slanted band along
   the whole painted door; spawn `door` (350, 650) facing right), a basketball
   hoop, a climbing rope with a bell, a bin of bouncy balls, the blue mats,
-  bleachers, a bench pair, and the back door to the playing field, which is a
-  Look point and never a trigger (it only opens from outside). Coach Ash, the
+  bleachers, a bench pair, and the back door to the playing field (trigger
+  `back-door` to `field.gym`, `requires` `recess`, knot `back_door`, the shut
+  door; spawn `back-door` (960, 490) facing down). Coach Ash, the
   PE teacher (`coach`, knot `coach`), stands at (560, 720). Look points:
-  `hoop`, `ball-bin`, `climbing-rope`, and `back-door`. The gym pup is its set
+  `hoop`, `ball-bin`, and `climbing-rope`. The gym pup is its set
   piece at (850, 650), out on the court. Its props (section 6.2) are the
   bleachers, the ball bin (footed on its four wheels), the mats, and the
   bench pair; blockers fill the pocket behind the mats, the gaps too narrow
@@ -481,6 +482,29 @@ ios/            Capacitor iOS project (from Milestone 4).
   plays once (`sound: flute`); a wrong song ends with a hint. After that the
   xylophone is free play. Like the lasso, the flute is a story item with no
   button yet.
+- Recess (Milestone 39): the flute's last line rings the bell (`recess`), and
+  Coach Ash props the gym's back door open. `field`, "Playing Field", is a
+  1650x1100 painted schoolyard behind the school (no concept sheet): the
+  school's back wall and its door (trigger `gym` to `gym.back-door`; spawn
+  `gym` (615, 365) facing down), a hopscotch, bike racks, a soccer goal, a
+  tetherball, a bench, a flowering hedge, an old oak whose branch reaches over
+  a creek, and, on the creek's far bank, an old stump and a footbridge raised
+  on its posts with a lever high on its post. Its floor is the painted ground,
+  traced from the painting; the creek is blockers, and the deck's line across
+  it is the crossing `creek` (opens with `bridge_down`, section 6.2).
+  - The oak squirrel (set piece `oak-squirrel`, a squirrel, "Fizzy Squirrel"
+    in battle) guards the oak. Calmed, it tells how the kid in the purple
+    hood swung across the creek on the branch.
+  - The gap: the Look point `oak-branch` (knot `oak_branch`) needs the
+    squirrel calm and `has_lasso`; the lasso swings Fae over the creek
+    (`swung`, `travel: field.east-bank`; spawn `east-bank` (1340, 330)),
+    as often as she likes.
+  - The far bank: the hooded kid's stash behind the stump (Look point
+    `stash`, knot `hood_stash`, `stash_found`), and the lever (Look point
+    `lever`, knot `bridge_lever`): the lasso pulls it (`bridge_down`), and
+    the bridge's and lever's rules lay the footbridge across the creek and
+    pull the lever down, opening the crossing for the way back.
+  - Also: `hopscotch` and `tetherball` to look at. Nobody names the kid.
 - The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
   Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
   and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
@@ -563,9 +587,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
   spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
   body box (50x140 units above her feet) covered by props (in
-  any of their states). Canopies don't count: they fade instead. The checks
+  any of their states). Canopies and flat states don't count. The checks
   count every footprint of every prop state as solid, since the story may
-  change a state.
+  change a state, except where a crossing's flag settles it (section 6.2).
 - Area scale rule: a standard door is about 1.4x Fae's height (about 200
   units) and furniture is proportional. Paintings are resampled uniformly to
   meet it, never stretched. The bedroom is 1050x700 units (the whole room fits
@@ -655,6 +679,28 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Collision: each prop's current footprint is solid for Fae, the party, and
   roaming critters, like a blocker (`sceneryArea`); spawning and joining
   party slots avoid them too.
+- A flat state lies on the ground (Milestone 39, the lowered footbridge): it
+  has no footprint, it's drawn on the ground layer under everyone (never in
+  strips), and it never covers or hides anyone. `renderInfo().props` reports
+  each prop's `flat`.
+- Crossings (Milestone 39): an area's `crossings` are `{ id, polygon, opens }`:
+  ground that's solid (water, say) until the Ink variable `opens` is true,
+  then walkable (`sceneryArea`), like a bridge laid over it. The area checks
+  walk every combination of an area's crossing flags as its own scenario,
+  each prop in the states its rules allow then (a rule on an open flag
+  settles the prop's state; one on a shut flag is skipped; any other rule may
+  or may not hold): look points, set pieces, and party slots must work with
+  every crossing shut, the floor must be one piece with every crossing open,
+  and nothing may hide Fae in any scenario. A spawn may not stand on a
+  crossing, a crossing may not overlap a door, and its flag must be a
+  declared Ink variable.
+- A kit subject can be a state of another (`stateOf: "<prop>.<state>"`) cut
+  from another painting of the area at the same size (`painting`), so a
+  state can be painted in place (the lowered footbridge and the pulled
+  lever, from the field painted with the bridge down); it's registered
+  against its prop's home and may be `flat`. `keepPieces` keeps every solid
+  piece of an isolate in its crop (a deck a post cuts in two). An `exclude`
+  polygon is part of neither the prop nor its hole: it stays in the plate.
 - Depth: each prop's front edge is its footprint's southmost y in every
   5-unit column (`frontEdge`): straight across gaps between its polygons
   (between an arch's legs), flat past its ends, and the home y with no

@@ -24,6 +24,7 @@ type Strip = { sprite: Sprite; left: number; right: number; top: number; bottom:
 // One prop state's art: its strips (each a slice of the frame, sorted by the
 // front edge of its columns), its whole frame, and its shadow decal.
 type StateView = {
+  flat: Sprite | undefined;
   strips: Strip[];
   frame: Texture;
   shadow: Sprite | undefined;
@@ -89,6 +90,7 @@ export class AreaView {
   readonly ground = new Container();
   readonly paper: number;
   private readonly shadows = new Container();
+  private readonly flats = new Container();
   private readonly textures: string[] = [];
   private readonly sprites: Sprite[] = [];
   private readonly props: PropView[] = [];
@@ -135,6 +137,7 @@ export class AreaView {
       view.ground.addChild(sprite);
     }
     view.ground.addChild(view.shadows);
+    view.ground.addChild(view.flats);
     const sheets: Spritesheet[] = [];
     for (const atlas of area.atlases) {
       const path = assetUrl(atlas);
@@ -148,7 +151,7 @@ export class AreaView {
       const states = new Map<string, StateView>();
       for (const [name, state] of Object.entries(prop.states)) {
         const frame = frameTexture(sheets, state.frame);
-        const strips = stateStrips(prop, name, frame);
+        const strips = state.flat ? [] : stateStrips(prop, name, frame);
         for (const { sprite } of strips) {
           sprite.visible = false;
           view.sprites.push(sprite);
@@ -163,7 +166,15 @@ export class AreaView {
           view.sprites.push(shadow);
           view.shadows.addChild(shadow);
         }
-        states.set(name, { strips, frame, shadow });
+        let flat: Sprite | undefined;
+        if (state.flat) {
+          flat = anchored(frame, prop);
+          flat.label = `prop-flat:${prop.id}`;
+          flat.visible = false;
+          view.sprites.push(flat);
+          view.flats.addChild(flat);
+        }
+        states.set(name, { flat, strips, frame, shadow });
       }
       view.props.push({ prop, states, shown: "", alpha: 1 });
     }
@@ -193,6 +204,7 @@ export class AreaView {
       if (shown !== view.shown) {
         for (const [name, state] of view.states) {
           for (const { sprite } of state.strips) sprite.visible = name === shown;
+          if (state.flat !== undefined) state.flat.visible = name === shown;
           if (state.shadow !== undefined) state.shadow.visible = name === shown;
         }
         view.shown = shown;
@@ -217,11 +229,13 @@ export class AreaView {
   get propInfo(): {
     id: string;
     state: string;
+    flat: boolean;
     strips: { left: number; right: number; zIndex: number }[];
   }[] {
     return this.props.map((view) => ({
       id: view.prop.id,
       state: view.shown,
+      flat: view.prop.states[view.shown]?.flat === true,
       strips: (view.states.get(view.shown)?.strips ?? []).map(({ sprite, left, right }) =>
         ({ left, right, zIndex: sprite.zIndex })),
     }));

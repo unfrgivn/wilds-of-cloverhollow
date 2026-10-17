@@ -1,0 +1,860 @@
+{
+  "area": "field",
+  "subjects": [
+    {
+      "id": "oak",
+      "crop": [
+        700,
+        0,
+        600,
+        420
+      ],
+      "seed": [
+        935,
+        250
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the grass and the dirt path",
+      "object": "the big old oak tree: its whole crown of green leaves, its thick brown trunk and spreading roots, and its one long low branch reaching out over the creek with the leafy clump at its tip; not the grass, the path, the paving, the creek, the reeds, the small bush, or the school wall",
+      "footprint": [
+        [
+          [
+            875,
+            332
+          ],
+          [
+            905,
+            306
+          ],
+          [
+            960,
+            300
+          ],
+          [
+            1002,
+            320
+          ],
+          [
+            1008,
+            350
+          ],
+          [
+            962,
+            364
+          ],
+          [
+            905,
+            362
+          ]
+        ]
+      ],
+      "exclude": [
+        [
+          [
+            680,
+            -10
+          ],
+          [
+            1320,
+            -10
+          ],
+          [
+            1320,
+            39
+          ],
+          [
+            680,
+            39
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "racks",
+      "crop": [
+        430,
+        250,
+        140,
+        100
+      ],
+      "seed": [
+        478,
+        300
+      ],
+      "painted": true,
+      "ground": "the paving",
+      "object": "the three bent metal bike racks standing on the paving; not the paving, the wall, or the grass",
+      "footprint": [
+        [
+          [
+            455,
+            318
+          ],
+          [
+            545,
+            296
+          ],
+          [
+            549,
+            309
+          ],
+          [
+            460,
+            331
+          ]
+        ]
+      ],
+      "core": 2
+    },
+    {
+      "id": "goal",
+      "crop": [
+        60,
+        580,
+        270,
+        310
+      ],
+      "seed": [
+        298,
+        790
+      ],
+      "painted": true,
+      "ground": "the grass and the chalk lines",
+      "object": "the small soccer goal: its white frame bars and its white net, as one object; not the grass, the chalk lines, or the hedge",
+      "footprint": [
+        [
+          [
+            105,
+            762
+          ],
+          [
+            195,
+            705
+          ],
+          [
+            302,
+            842
+          ],
+          [
+            214,
+            870
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "tetherball",
+      "crop": [
+        480,
+        700,
+        120,
+        300
+      ],
+      "seed": [
+        534,
+        850
+      ],
+      "painted": true,
+      "ground": "the grass",
+      "object": "the tetherball pole with its round grey base, its string, and its yellow ball; not the grass, the chalk lines, or the bench",
+      "footprint": [
+        [
+          [
+            505,
+            955
+          ],
+          [
+            520,
+            942
+          ],
+          [
+            550,
+            940
+          ],
+          [
+            568,
+            950
+          ],
+          [
+            566,
+            968
+          ],
+          [
+            545,
+            980
+          ],
+          [
+            515,
+            976
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      }
+    },
+    {
+      "id": "bench",
+      "crop": [
+        570,
+        800,
+        230,
+        180
+      ],
+      "seed": [
+        680,
+        880
+      ],
+      "painted": true,
+      "ground": "the grass",
+      "object": "the wooden bench: its seat planks and its legs; not the grass, the tetherball, or the creek",
+      "footprint": [
+        [
+          [
+            596,
+            915
+          ],
+          [
+            640,
+            952
+          ],
+          [
+            776,
+            892
+          ],
+          [
+            745,
+            870
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "hedge",
+      "crop": [
+        0,
+        800,
+        600,
+        300
+      ],
+      "seed": [
+        200,
+        1000
+      ],
+      "painted": true,
+      "ground": "the grass",
+      "object": "the low flowering hedge along the bottom-left edge: all its green leaves and its white, pink, orange and yellow flowers; not the grass, the goal, or the tetherball",
+      "footprint": [
+        [
+          [
+            48,
+            1050
+          ],
+          [
+            560,
+            1050
+          ],
+          [
+            560,
+            1064
+          ],
+          [
+            48,
+            1064
+          ]
+        ]
+      ],
+      "exclude": [
+        [
+          [
+            -10,
+            760
+          ],
+          [
+            48,
+            760
+          ],
+          [
+            48,
+            1110
+          ],
+          [
+            -10,
+            1110
+          ]
+        ],
+        [
+          [
+            -10,
+            1066
+          ],
+          [
+            610,
+            1066
+          ],
+          [
+            610,
+            1110
+          ],
+          [
+            -10,
+            1110
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bushes",
+      "crop": [
+        1010,
+        490,
+        160,
+        190
+      ],
+      "seed": [
+        1080,
+        600
+      ],
+      "painted": true,
+      "ground": "the grass on the creek bank",
+      "object": "the two round green bushes on the creek bank, together; not the cattails, the rock, the creek, or the grass",
+      "footprint": [
+        [
+          [
+            1040,
+            630
+          ],
+          [
+            1080,
+            615
+          ],
+          [
+            1130,
+            620
+          ],
+          [
+            1150,
+            645
+          ],
+          [
+            1130,
+            662
+          ],
+          [
+            1070,
+            665
+          ],
+          [
+            1045,
+            652
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "reeds",
+      "crop": [
+        770,
+        860,
+        160,
+        210
+      ],
+      "seed": [
+        820,
+        990
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the grass and the creek's edge",
+      "object": "the two clumps of cattails at the creek's edge: every green leaf and stem and every brown cattail head, down to where they grow out of the water; not the grass, the creek, the muddy bank, or the rocks",
+      "footprint": [],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            760,
+            1040
+          ],
+          [
+            940,
+            1030
+          ],
+          [
+            940,
+            1080
+          ],
+          [
+            760,
+            1080
+          ]
+        ]
+      ],
+      "core": 2,
+      "home": [
+        861,
+        1030
+      ]
+    },
+    {
+      "id": "stump",
+      "crop": [
+        1290,
+        270,
+        230,
+        210
+      ],
+      "seed": [
+        1400,
+        360
+      ],
+      "painted": true,
+      "ground": "the grass",
+      "object": "the big hollow tree stump with all its roots, and the purple backpack tucked against it, as one object; not the grass, the flowers, the stones, or the bushes",
+      "footprint": [
+        [
+          [
+            1300,
+            410
+          ],
+          [
+            1345,
+            385
+          ],
+          [
+            1400,
+            380
+          ],
+          [
+            1470,
+            385
+          ],
+          [
+            1508,
+            400
+          ],
+          [
+            1495,
+            440
+          ],
+          [
+            1460,
+            462
+          ],
+          [
+            1380,
+            462
+          ],
+          [
+            1330,
+            440
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bridge-posts",
+      "crop": [
+        1270,
+        520,
+        220,
+        500
+      ],
+      "seed": [
+        1312,
+        900
+      ],
+      "painted": true,
+      "ground": "the grass, the dirt, and the creek",
+      "object": "the two tall wooden posts of the drawbridge (the near one standing in the water at the left and the one on the bank at the right), the wooden crossbeam that joins their tops, and the angled brace at the foot of the right post, all as one object; not the bridge deck, the lever handle or its red knob, the round hub on the post, the creek, the grass, the dirt, or the bushes",
+      "footprint": [
+        [
+          [
+            1293,
+            986
+          ],
+          [
+            1322,
+            982
+          ],
+          [
+            1326,
+            1004
+          ],
+          [
+            1350,
+            1006
+          ],
+          [
+            1352,
+            1014
+          ],
+          [
+            1324,
+            1014
+          ],
+          [
+            1296,
+            1009
+          ]
+        ],
+        [
+          [
+            1385,
+            858
+          ],
+          [
+            1416,
+            856
+          ],
+          [
+            1420,
+            866
+          ],
+          [
+            1440,
+            866
+          ],
+          [
+            1442,
+            880
+          ],
+          [
+            1416,
+            880
+          ],
+          [
+            1388,
+            880
+          ]
+        ]
+      ],
+      "front": [
+        "lever"
+      ],
+      "core": 3,
+      "exclude": [
+        [
+          [
+            1270,
+            520
+          ],
+          [
+            1300,
+            520
+          ],
+          [
+            1300,
+            700
+          ],
+          [
+            1270,
+            700
+          ]
+        ]
+      ],
+      "canopy": true
+    },
+    {
+      "id": "lever",
+      "crop": [
+        1405,
+        650,
+        80,
+        96
+      ],
+      "seed": [
+        1460,
+        690
+      ],
+      "painted": false,
+      "ground": "the flat pale yellow-green grass wash beside the wooden post: soft, almost bare watercolour with no bushes, leaves, or detail",
+      "object": "the lever on the side of the wooden post: its thin grey handle and the round red knob on top; not the post, the round grey hub where the handle meets the post, the grass, or the bushes",
+      "footprint": [],
+      "home": [
+        1400,
+        884
+      ],
+      "front": [],
+      "exclude": [
+        [
+          [
+            1400,
+            640
+          ],
+          [
+            1446,
+            640
+          ],
+          [
+            1446,
+            690
+          ],
+          [
+            1440,
+            715
+          ],
+          [
+            1437,
+            735
+          ],
+          [
+            1433,
+            748
+          ],
+          [
+            1431,
+            748
+          ],
+          [
+            1431,
+            770
+          ],
+          [
+            1400,
+            770
+          ]
+        ]
+      ],
+      "shadowReach": 0
+    },
+    {
+      "id": "bridge",
+      "crop": [
+        1120,
+        560,
+        290,
+        470
+      ],
+      "seed": [
+        1240,
+        700
+      ],
+      "painted": false,
+      "ground": "the creek's water and its far bank",
+      "object": "the wooden drawbridge deck standing upright on its end: its wide planks and their frame, from the top corner down to its foot on the bank, including the part of it behind the tall post; not the tall posts, the crossbeam, the lever, the creek, the grass, the bank, or the dirt",
+      "front": [
+        "bridge-posts"
+      ],
+      "footprint": [
+        [
+          [
+            1253,
+            958
+          ],
+          [
+            1271,
+            968
+          ],
+          [
+            1331,
+            922
+          ],
+          [
+            1351,
+            903
+          ],
+          [
+            1374,
+            880
+          ],
+          [
+            1367,
+            873
+          ],
+          [
+            1347,
+            893
+          ],
+          [
+            1327,
+            912
+          ],
+          [
+            1271,
+            958
+          ],
+          [
+            1258,
+            950
+          ]
+        ]
+      ],
+      "keepPieces": true,
+      "exclude": [
+        [
+          [
+            1392,
+            550
+          ],
+          [
+            1430,
+            550
+          ],
+          [
+            1430,
+            1040
+          ],
+          [
+            1392,
+            1040
+          ]
+        ],
+        [
+          [
+            1110,
+            965
+          ],
+          [
+            1200,
+            995
+          ],
+          [
+            1200,
+            1040
+          ],
+          [
+            1110,
+            1040
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "lever-pulled",
+      "painting": "art/source/areas/field/field-lowered.png",
+      "stateOf": "lever.pulled",
+      "crop": [
+        1405,
+        740,
+        90,
+        100
+      ],
+      "seed": [
+        1470,
+        805
+      ],
+      "painted": true,
+      "ground": "the bushes and the grass beside the wooden post",
+      "object": "the lever on the side of the wooden post, pulled down: its thin grey handle and the round red knob at its end; not the post, the round grey hub where the handle meets the post, the grass, or the bushes",
+      "footprint": [],
+      "exclude": [
+        [
+          [
+            1400,
+            730
+          ],
+          [
+            1428,
+            730
+          ],
+          [
+            1428,
+            850
+          ],
+          [
+            1400,
+            850
+          ]
+        ],
+        [
+          [
+            1428,
+            820
+          ],
+          [
+            1500,
+            820
+          ],
+          [
+            1500,
+            850
+          ],
+          [
+            1428,
+            850
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bridge-lowered",
+      "painting": "art/source/areas/field/field-lowered.png",
+      "stateOf": "bridge.lowered",
+      "flat": true,
+      "crop": [
+        990,
+        700,
+        420,
+        320
+      ],
+      "seed": [
+        1150,
+        860
+      ],
+      "painted": true,
+      "ground": "the creek's water and its banks",
+      "object": "the wooden footbridge deck lying flat across the creek: all its planks, from the end resting on the round stones at the left to the end on the far bank at the right, including the part of it behind the tall post; not the tall posts, the crossbeam, the brace, the lever, the creek, the stones, the grass, or the dirt",
+      "footprint": [],
+      "keepPieces": true,
+      "exclude": [
+        [
+          [
+            1285,
+            690
+          ],
+          [
+            1328,
+            690
+          ],
+          [
+            1328,
+            1030
+          ],
+          [
+            1285,
+            1030
+          ]
+        ],
+        [
+          [
+            1380,
+            690
+          ],
+          [
+            1420,
+            690
+          ],
+          [
+            1420,
+            1030
+          ],
+          [
+            1380,
+            1030
+          ]
+        ],
+        [
+          [
+            1310,
+            900
+          ],
+          [
+            1360,
+            900
+          ],
+          [
+            1360,
+            1030
+          ],
+          [
+            1310,
+            1030
+          ]
+        ]
+      ]
+    }
+  ]
+}

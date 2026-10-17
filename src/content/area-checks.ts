@@ -1,8 +1,8 @@
 import {
   distanceToPolygon,
-  everyPropFootprint,
   frontEdge,
   propCoversPoint,
+  type Prop,
   type PropState,
   partySlots,
   pointInPolygon,
@@ -11,6 +11,7 @@ import {
   type Tunables,
   type Critter,
   type PartyContent,
+  type Polygon,
 } from "../core";
 
 /**
@@ -37,12 +38,95 @@ const distance = (a: Point, b: Point): number => {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
+function polygonsOverlap(first: Polygon, second: Polygon): boolean {
+  const orientation = (a: Point, b: Point, c: Point): number =>
+    (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  const crosses = (a: Point, b: Point, c: Point, d: Point): boolean => {
+    const ab = orientation(a, b, c) * orientation(a, b, d);
+    const cd = orientation(c, d, a) * orientation(c, d, b);
+    return ab <= 0 && cd <= 0;
+  };
+  for (let i = 0; i < first.length; i += 1) {
+    const a = first[i];
+    const b = first[(i + 1) % first.length];
+    if (a === undefined || b === undefined) continue;
+    for (let j = 0; j < second.length; j += 1) {
+      const c = second[j];
+      const d = second[(j + 1) % second.length];
+      if (c !== undefined && d !== undefined && crosses(
+        { x: a[0], y: a[1] }, { x: b[0], y: b[1] },
+        { x: c[0], y: c[1] }, { x: d[0], y: d[1] },
+      )) return true;
+    }
+  }
+  const point = (item: Polygon): Point => ({ x: item[0]?.[0] ?? 0, y: item[0]?.[1] ?? 0 });
+  return pointInPolygon(point(first), second) || pointInPolygon(point(second), first);
+}
+
 export type HiddenPosition = Point & { coverage: number; by: string[] };
 
-// Solid wherever someone or something may be: every person, and every
-// footprint any prop state can have.
-function solidOf(area: Area): Area["blockers"] {
-  return [...area.blockers, ...everyPropFootprint(area), ...area.npcs.map((npc) => npc.footprint)];
+/*
+ * The states of the world the checks walk (spec 6.2). A crossing's flag both
+ * opens its way over the water and switches the props whose rules read it (the
+ * bridge that lays the way down), so a spot only reachable with the way open
+ * is checked against the props as they are then, never against the raised
+ * bridge it replaces. Each assignment of an area's crossing flags is a
+ * scenario; any other rule may or may not hold in each.
+ */
+type Scenario = { flags: ReadonlySet<string>; open: ReadonlySet<string> };
+
+function scenarios(area: Area): Scenario[] {
+  const flags = new Set((area.crossings ?? []).map((crossing) => crossing.opens));
+  const names = [...flags];
+  if (names.length > 6) throw new Error(`${area.id}: too many crossing flags to check`);
+  return Array.from({ length: 2 ** names.length }, (_, bits) => ({
+    flags,
+    open: new Set(names.filter((_, index) => (bits >> index) % 2 === 1)),
+  }));
+}
+
+const closedScenario = (area: Area): Scenario =>
+  ({ flags: new Set((area.crossings ?? []).map((crossing) => crossing.opens)), open: new Set() });
+
+const openScenario = (area: Area): Scenario => {
+  const flags = new Set((area.crossings ?? []).map((crossing) => crossing.opens));
+  return { flags, open: flags };
+};
+
+// The states a prop may be in under `scenario`: the first rule that holds
+// wins (propStateName), so a rule on an open crossing flag settles it, one on
+// a shut flag is skipped, and any other rule may or may not hold. A prop no
+// crossing flag touches may be in any of its states.
+function possibleStates(prop: Prop, scenario: Scenario): PropState[] {
+  if (!prop.rules.some((rule) => scenario.flags.has(rule.while)))
+    return Object.values(prop.states);
+  const names = new Set<string>();
+  let settled = false;
+  for (const rule of prop.rules) {
+    if (prop.states[rule.state] === undefined) continue;
+    if (scenario.flags.has(rule.while)) {
+      if (!scenario.open.has(rule.while)) continue;
+      names.add(rule.state);
+      settled = true;
+      break;
+    }
+    names.add(rule.state);
+  }
+  if (!settled) names.add(prop.state);
+  return [...names].flatMap((name) => prop.states[name] ?? []);
+}
+
+// Solid wherever someone or something may be under `scenario`: every person,
+// the shut crossings, and every footprint its props' states can have.
+function solidOf(area: Area, scenario: Scenario): Area["blockers"] {
+  return [
+    ...area.blockers,
+    ...(area.crossings ?? []).filter((crossing) => !scenario.open.has(crossing.opens))
+      .map((crossing) => crossing.polygon),
+    ...area.props.flatMap((prop) =>
+      possibleStates(prop, scenario).flatMap((state) => state.footprint)),
+    ...area.npcs.map((npc) => npc.footprint),
+  ];
 }
 
 function walkable(area: Area, solid: Area["blockers"], radius: number, point: Point): boolean {
@@ -68,10 +152,12 @@ type Hiders = {
     front: number }[];
 };
 
-function hidersOf(area: Area): Hiders {
+function hidersOf(area: Area, scenario?: Scenario): Hiders {
+  const states = (prop: Prop): PropState[] =>
+    scenario === undefined ? Object.values(prop.states) : possibleStates(prop, scenario);
   return {
     props: area.props.filter((prop) => !prop.canopy).flatMap((prop) =>
-      Object.values(prop.states).map((state) => {
+      states(prop).filter((state) => !state.flat).map((state) => {
         const tops = state.silhouette.columns.flat().map(([top]) => top);
         const bottoms = state.silhouette.columns.flat().map(([, bottom]) => bottom);
         return {
@@ -101,8 +187,12 @@ function near(hiders: Hiders, feet: Point, x0: number, x1: number, y0: number): 
  * it holds. A room is one part; a room split in two (by furniture walling off
  * a door) has a spawn whose part holds no other door.
  */
-function reachableParts(area: Area, radius: number): { spawns: string[]; points: Point[] }[] {
-  const solid = solidOf(area);
+function reachableParts(
+  area: Area,
+  radius: number,
+  scenario: Scenario,
+): { spawns: string[]; points: Point[] }[] {
+  const solid = solidOf(area, scenario);
   const seen = new Map<string, number>();
   const parts: { spawns: string[]; points: Point[] }[] = [];
   for (const [name, spawn] of Object.entries(area.spawns)) {
@@ -139,8 +229,16 @@ function reachableParts(area: Area, radius: number): { spawns: string[]; points:
   return parts;
 }
 
+// Every spot Fae's feet can reach in some scenario.
 export function reachablePositions(area: Area, radius: number): Point[] {
-  return reachableParts(area, radius).flatMap((part) => part.points);
+  const seen = new Set<string>();
+  return scenarios(area).flatMap((scenario) => reachableParts(area, radius, scenario))
+    .flatMap((part) => part.points).filter((point) => {
+      const key = `${point.x},${point.y}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 function bodyCoverage(
@@ -173,12 +271,18 @@ export function hiddenPositions(
   radius: number,
   maxCoverage = 0.75,
 ): HiddenPosition[] {
-  const hiders = hidersOf(area);
   const box = { half: BODY_HALF_WIDTH, height: BODY_HEIGHT };
-  return reachablePositions(area, radius).flatMap((point) => {
-    const { coverage, by } = bodyCoverage(hiders, point, box);
-    return coverage >= maxCoverage ? [{ ...point, coverage, by }] : [];
-  });
+  const found = new Map<string, HiddenPosition>();
+  for (const scenario of scenarios(area)) {
+    const hiders = hidersOf(area, scenario);
+    for (const point of reachableParts(area, radius, scenario).flatMap((part) => part.points)) {
+      const key = `${point.x},${point.y}`;
+      if (found.has(key)) continue;
+      const { coverage, by } = bodyCoverage(hiders, point, box);
+      if (coverage >= maxCoverage) found.set(key, { ...point, coverage, by });
+    }
+  }
+  return [...found.values()];
 }
 
 /*
@@ -282,13 +386,25 @@ export function areaConnectionErrors(
   const roster = Object.values(party);
   const errors: string[] = [];
   for (const area of Object.values(areas)) {
+    for (const [name, spawn] of Object.entries(area.spawns))
+      for (const crossing of area.crossings ?? [])
+        if (pointInPolygon(spawn, crossing.polygon) ||
+            distanceToPolygon(spawn, crossing.polygon) < radius)
+          errors.push(`${area.id}: spawn ${name} overlaps crossing ${crossing.id}`);
+    for (const crossing of area.crossings ?? [])
+      for (const trigger of area.triggers)
+        if (polygonsOverlap(crossing.polygon, trigger.polygon))
+          errors.push(`${area.id}: crossing ${crossing.id} overlaps trigger ${trigger.id}`);
     // One floor: from any spawn, Fae can walk to every other (and so to every
     // door). Furniture that walls part of a room off fails here.
-    const parts = reachableParts(area, radius);
-    if (parts.length > 1)
-      errors.push(`${area.id}: its floor is split; spawns ${parts.map((part) =>
+    // Look points and set pieces must be reachable with every crossing shut;
+    // the floor must be one piece with every crossing open.
+    const before = reachableParts(area, radius, closedScenario(area));
+    const after = reachableParts(area, radius, openScenario(area));
+    if (after.length > 1)
+      errors.push(`${area.id}: its floor is split; spawns ${after.map((part) =>
         part.spawns.join(", ")).join(" | ")} can't reach each other`);
-    const reachable = parts.flatMap((part) => part.points);
+    const reachable = before.flatMap((part) => part.points);
     const hiders = hidersOf(area);
     for (const interactable of area.interactables) {
       const range = tunables.interact.range;
@@ -337,7 +453,7 @@ export function areaConnectionErrors(
     area.recurring?.dens.forEach((den, index) => {
       const touch = Math.max(...den.kinds.map((kind) => critters[kind]?.touchRadius ?? 70));
       const clear = tunables.roam.sight + touch;
-      if (!walkable(area, solidOf(area), tunables.follow.radius, den.point))
+      if (!walkable(area, solidOf(area, closedScenario(area)), tunables.follow.radius, den.point))
         errors.push(`${area.id}: den ${index} is off the floor`);
       for (const [name, spawn] of Object.entries(area.spawns))
         if (distance(spawn, den.point) <= clear)
@@ -360,7 +476,7 @@ export function areaConnectionErrors(
         errors.push(`${area.id}: den ${index} is mostly behind scenery`);
     });
     // Party slots avoid props as they do in play, here in every state at once.
-    const scenery = { ...area, blockers: [...area.blockers, ...everyPropFootprint(area)] };
+    const scenery = { ...area, blockers: solidOf(area, closedScenario(area)) };
     for (const [name, spawn] of Object.entries(area.spawns)) {
       // The whole roster must fit behind Fae here, whoever is in the party.
       for (const { id, slot } of partySlots(scenery, spawn, tunables.follow, roster))

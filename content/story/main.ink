@@ -67,11 +67,11 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
-{coach_thanked: Coach Ash gave me his lasso! It can pull down things that are up high, and maybe swing across gaps too. # speaker: Fae}
-{gym_quest and not coach_thanked and calmed("gym-pup") and found_clipboard: I found Coach Ash's stopwatch and his clipboard! Back to Coach Ash. # speaker: Fae}
-{gym_quest and not calmed("gym-pup"): A fizzy pup is zooming around the gym with Coach Ash's stopwatch. # speaker: Fae}
-{gym_quest and not found_clipboard: {has_lasso:Coach Ash lent me his lasso, to get his clipboard down from the hoop.|{saw_clipboard:Coach Ash's clipboard is stuck on the basketball hoop. It's too high to reach!|Coach Ash's clipboard went flying, somewhere up high.}} # speaker: Fae}
-{gym_quest: The kid in the purple hood knocked over Coach Ash's cart, then ran out the back door to the playing field. # speaker: Fae}
+{bridge_down: I pulled the old footbridge's lever with the lasso, and the bridge swung down across the creek! # speaker: Fae}
+{stash_found: The hooded kid's stash is behind the old stump: purple markers, fizzy soda, and a Star Racer token. # speaker: Fae}
+{swung and not bridge_down: I swung across the creek on the lasso! There's a lever up on the old footbridge's post. # speaker: Fae}
+{recess and not calmed("oak-squirrel"): A fizzy squirrel is pelting acorns from the old oak by the creek. # speaker: Fae}
+{recess and not swung: Recess! The kid in the purple hood ran out to the playing field. The old oak's branch reaches across the creek... # speaker: Fae}
 {has_flute: Ms. Willow gave me her very first flute! When I play it, animal friends come running. # speaker: Fae}
 {heard_bird and not has_flute: The bluebird sang a note just like the red bar. Maybe that's the song's last note! # speaker: Fae}
 {calmed("music-bird") and not has_flute: The bluebird gave back Ms. Willow's chime mallet. # speaker: Fae}
@@ -79,6 +79,11 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {song_start and not has_flute: The class song goes red, yellow, blue... and the last note is under the purple scribbles. # speaker: Fae}
 {music_quest and not has_flute: The kid in the purple hood climbed in through the music room window and scribbled on the class song. # speaker: Fae}
 {music_time and not music_quest: Music class is next! Ms. Willow's music room is down the east hall. # speaker: Fae}
+{coach_thanked: Coach Ash gave me his lasso! It can pull down things that are up high, and maybe swing across gaps too. # speaker: Fae}
+{gym_quest and not coach_thanked and calmed("gym-pup") and found_clipboard: I found Coach Ash's stopwatch and his clipboard! Back to Coach Ash. # speaker: Fae}
+{gym_quest and not calmed("gym-pup"): A fizzy pup is zooming around the gym with Coach Ash's stopwatch. # speaker: Fae}
+{gym_quest and not found_clipboard: {has_lasso:Coach Ash lent me his lasso, to get his clipboard down from the hoop.|{saw_clipboard:Coach Ash's clipboard is stuck on the basketball hoop. It's too high to reach!|Coach Ash's clipboard went flying, somewhere up high.}} # speaker: Fae}
+{gym_quest: The kid in the purple hood knocked over Coach Ash's cart, then ran out the back door to the playing field. # speaker: Fae}
 {pe_time and not gym_quest: Time for PE! The gym is down the east hall. # speaker: Fae}
 {saw_hood and gym_hall and not pe_time: The gym doors are locked during story time. Ms. Maple will know when it's over. # speaker: Fae}
 {saw_hood: A kid in a purple hood ran off toward the gym! They dropped a purple marker, the same purple as the Star Racer scribbles. # speaker: Fae}
@@ -542,6 +547,7 @@ Oh, and music's next! Ms. Willow's room is down the east hall. # speaker: Coach 
 -> DONE
 = again
 {not music_quest: Music is next, Fae! Ms. Willow's room is down the east hall. # speaker: Coach Ash}
+{recess: Recess! I've propped the back door open. Out you go! # speaker: Coach Ash}
 Keep that lasso handy, Fae! And watch out for that purple hood. # speaker: Coach Ash
 -> DONE
 
@@ -773,6 +779,7 @@ Our class song goes red, yellow, blue... # speaker: Ms. Willow
 -> DONE
 = again
 Play that flute whenever you need a friend, Fae! # speaker: Ms. Willow
+{recess: Now, off to recess! The playing field is out the gym's back door. # speaker: Ms. Willow}
 -> DONE
 
 === music_bird_calm ===
@@ -863,6 +870,9 @@ Ms. Willow gives Fae a little wooden flute, painted with flowers and pastel band
 ~ music_quest = true
 Play it, and animal friends will come running to listen. # speaker: Ms. Willow
 Fae plays a soft little tune. # speaker: Fae # sound: flute
+~ recess = true
+Oh! There's the bell. Recess! # speaker: Ms. Willow
+Out to the playing field with you. Coach Ash props the gym's back door open at recess. # speaker: Ms. Willow
 -> DONE
 
 === piano ===
@@ -882,4 +892,69 @@ A few purple fuzzies are caught on the latch. # speaker: Fae
 
 === instrument_shelf ===
 Tambourines, maracas, a drum, and a triangle. Everything a band needs! # speaker: Fae
+-> DONE
+
+// The playing field (Milestone 39).
+VAR recess = false
+VAR swung = false
+VAR stash_found = false
+VAR bridge_down = false
+
+=== oak_squirrel_calm ===
+{oak_squirrel_calm > 1: -> again}
+Phew! Sorry about all the acorns. # speaker: Oak Squirrel
+That big branch is my favourite spot. This morning a kid in a purple hood swung on it, right across the creek! # speaker: Oak Squirrel
+They whooped all the way over. Then, fizz! I had to throw something at everybody. # speaker: Oak Squirrel
+Swing across the creek on that branch... with Coach Ash's lasso! # speaker: Fae
+-> DONE
+= again
+The squirrel hugs an acorn and keeps very, very still. # speaker: Oak Squirrel
+-> DONE
+
+=== oak_branch ===
+{not calmed("oak-squirrel"): A fizzy squirrel is pelting acorns from the big branch! Nobody's getting near it like that. # speaker: Fae}
+{not calmed("oak-squirrel"): -> DONE}
+{not has_lasso: The old oak's branch reaches right across the creek. If only I had a rope... # speaker: Fae}
+{not has_lasso: -> DONE}
+{swung: -> again}
+~ swung = true
+The old oak's branch reaches right across the creek. # speaker: Fae
+Fae twirls Coach Ash's lasso, loops it over the branch, and gives it a good tug. # speaker: Fae
+Hold on tight... WHEEEE! # speaker: Fae # travel: field.east-bank
+-> DONE
+= again
+Wheee! Fae swings across the creek again. # speaker: Fae # travel: field.east-bank
+-> DONE
+
+=== hood_stash ===
+{stash_found: -> again}
+~ stash_found = true
+A purple backpack, tucked behind the old stump! # speaker: Fae
+Purple markers... a bottle of fizzy purple soda... and a Star Racer token. # speaker: Fae
+It's the hooded kid's stash! So this is where they ran at PE. # speaker: Fae
+Was that a purple hood, way down the path? ...Gone again. # speaker: Fae
+-> DONE
+= again
+The hooded kid's purple backpack. They haven't come back for it... yet. # speaker: Fae
+-> DONE
+
+=== bridge_lever ===
+{bridge_down: The lever's down, and the old footbridge is across the creek. # speaker: Fae}
+{bridge_down: -> DONE}
+A lever, way up on the old footbridge's post. # speaker: Fae
+{not has_lasso: It's much too high to reach! # speaker: Fae}
+{not has_lasso: -> DONE}
+Too high to reach... but not for a lasso! # speaker: Fae
+Fae loops the lasso over the lever's handle and pulls with all her might. # speaker: Fae
+~ bridge_down = true
+CLUNK! Creeeak... The old footbridge swings down across the creek! # speaker: Fae
+Now there's a way back across. Thanks, Coach Ash! # speaker: Fae
+-> DONE
+
+=== hopscotch ===
+Fae hops the whole hopscotch on one foot, all the way to 7 and back! # speaker: Fae
+-> DONE
+
+=== tetherball ===
+Fae gives the tetherball a whack. Round and round it goes! # speaker: Fae
 -> DONE

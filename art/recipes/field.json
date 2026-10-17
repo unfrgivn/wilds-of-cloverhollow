@@ -1,0 +1,58 @@
+{
+  "asset": "field painting",
+  "date": "2026-10-09",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 12,
+  "references": [
+    "art/source/areas/woods/woods-final.png",
+    "art/source/areas/park/park-final.png",
+    "the plaza painting (art/source/areas/plaza), as a reference image",
+    "art/source/areas/gym/gym-final.png"
+  ],
+  "steps": [
+    {
+      "what": "The playing field behind the school, painted whole: the school's back wall and its door, a hopscotch and bike racks, the field with a soccer goal, a tetherball, a bench, a flowering hedge, an old oak with a long branch over a creek, and on the far bank a hollow stump and a footbridge with a lever high on its post. No people, animals, or words.",
+      "calls": 4,
+      "outputs": [
+        "art/scratch/1791561884669-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791561885691-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791561887033-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791561895838-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "1791561885691"
+    },
+    {
+      "what": "An edit of the selected painting changing only the footbridge: its deck tipped up on its end against its tall post, the lever up high, nothing crossing the creek (the bridge raised, the area's default state).",
+      "calls": 4,
+      "outputs": [
+        "art/scratch/1791562735479-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791562736301-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791562738744-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791562745146-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "1791562745146, kept byte for byte as art/source/areas/field/field-final.png"
+    },
+    {
+      "what": "An edit of field-final.png changing only the footbridge: laid down across the creek, its lever pulled (the bridge_down state's painting, cut by the kit into the bridge's lowered and the lever's pulled states).",
+      "calls": 4,
+      "outputs": [
+        "art/scratch/1791563218050-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791563220140-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791563222930-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1791563224014-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "1791563224014, kept as art/source/areas/field/field-lowered.png"
+    }
+  ],
+  "post_processing": [
+    "field-final.png (5056x3392) was uniformly resized (Lanczos) to 3300x2214 and cropped 7 px from the top to 3300x2200: the approved painting's tiles (art/source/areas/field/painting/), 1650x1100 units at 2 px per unit.",
+    "field-lowered.png is 1791563224014 resized and cropped the same way (3300x2214, Lanczos, 7 px from the top), so both paintings share one frame; checked 2026-10-16: it matches that pipeline to within resampling rounding (mean 0.18, max 4 of 255), and the model's own drift from the approved painting is at most about 1.2 units, left as it is."
+  ],
+  "outputs": {
+    "source": "art/source/areas/field/field-final.png",
+    "second_painting": "art/source/areas/field/field-lowered.png",
+    "tiles": "art/source/areas/field/painting/ (the plate is written by the kit: art/recipes/field-kit.json)",
+    "area": "content/areas/field.json"
+  },
+  "owner_review": "pending (docs/review-queue.md, Milestone 39)"
+}

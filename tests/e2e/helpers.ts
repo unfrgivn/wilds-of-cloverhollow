@@ -108,6 +108,8 @@ export async function renderInfo(page: Page): Promise<{
   props: {
     id: string;
     state: string;
+    // A flat state lies on the ground (spec 6.2): drawn under everyone, no strips.
+    flat: boolean;
     strips: { left: number; right: number; zIndex: number }[];
   }[];
   lantern: { on: boolean; glows: string[] };

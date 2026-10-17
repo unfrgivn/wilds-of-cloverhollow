@@ -9,7 +9,7 @@
  * (tools/sim/record-kits.ts).
  */
 import {
-  faeBox, propCovers, propState, type Area, type Point, type PropState, type World,
+  faeBox, propCovers, propState, sceneryArea, type Area, type Point, type PropState, type World,
 } from "../../src/core";
 import { reachablePositions } from "../../src/content/area-checks";
 
@@ -42,7 +42,11 @@ export function propSpots(
   ink: string,
   allowed: (feet: Point) => boolean = () => true,
 ): PropSpots[] {
-  const reachable = reachablePositions(area, world.tunables.playerRadius).filter(allowed);
+  // Where Fae can stand with the story at `ink`: its props' footprints as
+  // they are then, and its crossings shut or open (a raised bridge is seen
+  // from the bank, never from the water it's laid over later).
+  const here: Area = { ...sceneryArea(world, ink, area), props: [], crossings: [] };
+  const reachable = reachablePositions(here, world.tunables.playerRadius).filter(allowed);
   return area.props.map((prop) => {
     const state = propState(world, ink, prop);
     const { left, step, columns } = state.silhouette;

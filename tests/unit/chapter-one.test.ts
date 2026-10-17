@@ -33,6 +33,7 @@ describe("chapter one", () => {
       "arcade-keeper": "chaos",
       "gym-pup": "chaos",
       "music-bird": "chaos",
+      "oak-squirrel": "chaos",
     });
     // And on the way: a park pup, and a cat in the plaza once the town's
     // critters were out (Milestone 28). Every calm paid 8 coins.

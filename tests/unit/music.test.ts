@@ -124,6 +124,7 @@ describe("Ms. Willow", () => {
     const flute = play(heard, "xylophone", calmBird, [0, 1, 3, 0]).ink;
     expect(play(flute, "music_teacher", calmBird).lines).toEqual([
       "Play that flute whenever you need a friend, Fae!",
+      "Now, off to recess! The playing field is out the gym's back door.",
     ]);
   });
 
@@ -186,6 +187,9 @@ describe("the xylophone", () => {
       "Ms. Willow gives Fae a little wooden flute, painted with flowers and pastel bands.",
       "Play it, and animal friends will come running to listen.",
       "Fae plays a soft little tune.",
+      // The bell: recess (Milestone 39).
+      "Oh! There's the bell. Recess!",
+      "Out to the playing field with you. Coach Ash props the gym's back door open at recess.",
     ]);
     expect(result.sounds).toEqual([
       "chime-red", "chime-yellow", "chime-blue", "chime-red", "flute",
@@ -230,8 +234,10 @@ describe("the xylophone", () => {
     const result = play(fresh, "xylophone", calmBird, [0, 1, 3, 0]);
     expect(variable(result.ink, "has_flute")).toBe(true);
     expect(variable(result.ink, "music_quest")).toBe(true);
+    expect(variable(result.ink, "recess")).toBe(true);
     expect(play(result.ink, "music_teacher", calmBird).lines).toEqual([
       "Play that flute whenever you need a friend, Fae!",
+      "Now, off to recess! The playing field is out the gym's back door.",
     ]);
   });
 });

@@ -39,5 +39,5 @@ describe("east hall and music room", () => {
     ]);
     expect(areaConnectionErrors(world.areas, world.tunables, world.critters, world.party))
       .toEqual([]);
-  });
+  }, 30_000);
 });

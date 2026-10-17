@@ -25,6 +25,7 @@ describe("a canopy", () => {
     const ys = harness.walkable.map(([, y]) => y);
     const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
     const state: PropState = {
+      flat: false,
       frame: "shade",
       shadow: null,
       footprint: [],

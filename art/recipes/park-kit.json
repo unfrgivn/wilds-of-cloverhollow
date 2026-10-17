@@ -1,7 +1,7 @@
 {
   "asset": "park-kit",
-  "date": "2026-10-09",
-  "summary": "The approved park painting split into a ground plate and 12 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "date": "2026-10-17",
+  "summary": "The approved park painting split into a ground plate and 13 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/park.json",
   "painting": "art/source/areas/park/painting/ground.json",
@@ -68,6 +68,10 @@
       "pond": [
         "iso-1.jpg",
         "crop.json"
+      ],
+      "kite": [
+        "iso-1.jpg",
+        "crop.json"
       ]
     }
   },
@@ -97,5 +101,12 @@
     "park-sign",
     "pond"
   ],
-  "lifted": []
+  "lifted": [],
+  "added": {
+    "kite": {
+      "painting": "art/source/areas/park/park-kite.png",
+      "state": "stuck",
+      "processing": "cut by the kit like a subject (isolate, mask, its painting's own pixels); hidden by default, no hole in the plate"
+    }
+  }
 }

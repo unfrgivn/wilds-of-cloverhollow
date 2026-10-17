@@ -289,6 +289,8 @@ describe("props", () => {
       }
       for (const [id, prop] of Object.entries(parsed.props))
         for (const [name, state] of Object.entries(prop.states)) {
+          // A hidden state (an added prop, not yet there) has no frame.
+          if (state.hidden) continue;
           const frame = frames.get(state.frame);
           expect(frame, `${file} ${id}.${name}`).toBeDefined();
           expect(frame?.anchor, `${file} ${id}.${name} anchor`).toBeDefined();

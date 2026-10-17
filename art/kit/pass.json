@@ -1160,6 +1160,30 @@
       "samples": {
         "object": 1
       }
+    },
+    {
+      "id": "scarf",
+      "painting": "art/source/areas/pass/pass-scarf.png",
+      "added": "stuck",
+      "crop": [
+        425,
+        315,
+        135,
+        140
+      ],
+      "seed": [
+        500,
+        360
+      ],
+      "painted": true,
+      "object": "the long red scarf with white stripes caught on the ski-lift chair: the whole scarf, both hanging ends and their fringes; not the chair, its hanger, the cable, or the snow",
+      "home": [
+        495,
+        320
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

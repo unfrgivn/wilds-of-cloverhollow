@@ -2001,26 +2001,61 @@ the old trail, the owl, and the clubhouse claim.
     the wind on ArrowLeft, then leans through the second for GOOD; on touch
     it holds both with the stickers for GREAT.
 
-## Milestone 49: Lasso spots **Status:** 🚧 In progress (2026-10-17)
+## Milestone 49: Lasso spots **Status:** ✅ Completed (2026-10-17)
 - The owner asked for more places to use the lasso (2026-10-17). Coach Ash
   says it "can pull down things that are up high"; NOTES.md: "Lasso for
   pulling levers or swinging across gaps". Three little errands in places Fae
-  already knows, each with something stuck out of reach:
-  - Meadow Park: Rosie's kite, tangled at the top of the play tower's
-    flagpole. Lassoed down, it goes back to Rosie in the classroom, who gives
-    Fae coins for the arcade.
-  - Bubblegum Bay: a message in a bottle, wedged between the rocks past the
-    dock's end. Pulled in, it's an old treasure map; Fae digs where X marks
-    the spot, with the red spade from the beach.
-  - Pinecone Pass: the cocoa seller's scarf, blown onto a ski-lift chair.
-    Lassoed down and given back, it's cocoa on the house.
-- The stuck things are there once Fae has the lasso, so the places look as
-  they always did before it.
-- Art: each one is painted into an edit of its area's approved painting and
-  cut by the kit as an added prop: hidden until the story shows it, and no
-  hole in the plate.
-- Engine: a prop state can be hidden (nothing drawn, no footprint, hides
-  nobody), and the kit cuts `added` props.
+  already knows, each with something stuck out of reach once she has the
+  lasso:
+  - Meadow Park: Rosie's kite, caught on top of the play tower and hanging
+    down its wall. Lassoed down, it goes back to Rosie in the classroom, who
+    gives Fae her six arcade coins.
+  - Bubblegum Bay: a bottle bobbing past the end of Sue's dock. Reeled in,
+    it holds an old treasure map; Fae digs between the two palms by the big
+    log and finds twenty coins.
+  - Pinecone Pass: the cocoa seller's scarf, caught on a ski-lift chair. She
+    misses it at the stand; lassoed down and given back, it's cocoa on the
+    house.
+- Before the lasso the places look and read as they always did; each stuck
+  thing appears with it and is gone once it's down. The journal tells each
+  errand from when it's seen.
+- Art: each one painted into an edit of its area's approved painting
+  (`art/recipes/lasso-spots.json`), in register with the plate (a median of
+  0 units off), and cut by the kit as an added prop.
+- Engine:
+  - A prop state can be hidden (`{ "hidden": true }` in the catalogue): no
+    frame, no footprint, covers nobody, and the checks skip it.
+  - The kit cuts `added` props: from another painting, painted (no hole),
+    hidden by default, shown in their `added` state by the area's rules.
+  - Two kit configs pin the samples their kept files are (the field's
+    isolates, the plaza's bench completion): a clean rebuild asked for
+    samples nobody kept. Every kit rebuilds with no calls, byte for byte.
+- Evidence: unit tests (`lasso.test.ts`: each errand before and after the
+  lasso, left and taken, the rewards through the core, the props' states,
+  hidden props covering nobody (fails if the hidden state draws), the area
+  checks, the catalogue's rules, and the journal), the recorded run
+  `pass-party/lasso.json` (`tools/sim/record-lasso.ts`, on from the flute
+  run: the kite; the bus up to the pass and the scarf; the trail down to the
+  bay, the bottle and the treasure; the bay road home and the kite to Rosie)
+  with its replay test, and the real-key e2e `lasso.spec.ts` (each errand's
+  moment at both sizes, each prop drawn then hidden, browser and Bun hashes
+  match; its watcher reads the props only at each errand's moments). The
+  flute run's park screenshots were updated: the kite is on the tower once
+  Fae has the lasso. Gates: `just check` (800 unit tests, the sim, core
+  purity, lint), `just build`, and `just e2e` (711 passed, 2 skipped).
+- Notes and assumptions:
+  - The kite was first painted flying from the flagpole, then snagged at
+    its tip; both read as floating over the tower in the game, so it hangs
+    down the tower's front wall, at the tower's depth.
+  - The `pass-party` chain skips chapter one, so in the run the bay road is
+    shut on the way out and the bus only goes up the mountain: the run takes
+    the trail down to the bay.
+  - `art/recipes/pass.json` says the raw pass painting was padded at the
+    bottom; the plate was padded at the top. The edit follows the plate (the
+    recipe records it).
+  - Gemini calls: 10 (6 painting edits, 4 kit isolates).
+  - The three edits, the props, and the wording are in the owner's review
+    queue.
 
 ## Milestone 50: Wind-ups **Status:** ✅ Completed (2026-10-17)
 - The owner picked wind-ups after Lean (2026-10-17, `docs/battle-ideas.md`:
@@ -2473,7 +2508,7 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 48, Lean: done (above). Next (owner, 2026-10-17): Milestone
     50, wind-ups for the gull and Mr. Pip: done (above). Then Milestone 51,
     first touch and old friends: done (above).
-  - Milestone 49, lasso spots: in progress (above); then Milestone 52, the
+  - Milestone 49, lasso spots: done (above). Then Milestone 52, the
     clubhouse kitchen (owner, 2026-10-17).
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 

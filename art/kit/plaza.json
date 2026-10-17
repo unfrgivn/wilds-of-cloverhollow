@@ -20,7 +20,8 @@
       "shadowReach": 40,
       "samples": {
         "object": 1,
-        "fill": 2
+        "fill": 2,
+        "complete": 1
       },
       "ground": "the pale pink plaza paving wash",
       "object": "the wooden bench in the centre of the image together with the wooden flower box of flowers directly behind it, as one object",

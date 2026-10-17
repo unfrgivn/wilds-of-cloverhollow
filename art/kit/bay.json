@@ -1053,6 +1053,30 @@
       "samples": {
         "object": 1
       }
+    },
+    {
+      "id": "bottle",
+      "painting": "art/source/areas/bay/bay-bottle.png",
+      "added": "bobbing",
+      "crop": [
+        1450,
+        380,
+        110,
+        140
+      ],
+      "seed": [
+        1500,
+        445
+      ],
+      "painted": true,
+      "object": "the glass bottle bobbing in the water: its cork, its clear glass with the rolled paper inside, and the little ring of ripples round it; not the open water, the dock, or its posts",
+      "home": [
+        1500,
+        520
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

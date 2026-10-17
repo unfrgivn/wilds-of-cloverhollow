@@ -333,6 +333,15 @@
         "y": 838
       },
       "prompt": "Look"
+    },
+    {
+      "id": "tower",
+      "knot": "tower",
+      "point": {
+        "x": 1040,
+        "y": 548
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {
@@ -442,6 +451,22 @@
       "prop": "pond",
       "x": 985,
       "y": 845
+    },
+    {
+      "id": "kite",
+      "prop": "kite",
+      "x": 1020,
+      "y": 570,
+      "rules": [
+        {
+          "state": "default",
+          "while": "kite_down"
+        },
+        {
+          "state": "stuck",
+          "while": "has_lasso"
+        }
+      ]
     }
   ]
 }

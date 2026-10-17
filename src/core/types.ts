@@ -121,6 +121,10 @@ export type Prop = {
 // ground footprint (solid), the front edge it sorts by, and its silhouette.
 export type PropState = {
   flat: boolean;
+  // Not there at all (an added prop's default, before the story puts it in
+  // the scene; spec 6.2): no frame, no footprint, and an empty silhouette, so
+  // it covers nobody.
+  hidden: boolean;
   frame: string;
   shadow: string | null;
   footprint: Polygon[];

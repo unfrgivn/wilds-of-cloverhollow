@@ -75,6 +75,10 @@ type Subject = {
   // the prop state it becomes: a state painted in another version of the scene.
   painting: string | undefined;
   stateOf: { prop: string; state: string } | undefined;
+  // An object the approved painting doesn't have, cut from `painting` as a
+  // prop of its own: hidden by default, and this state when the area's rules
+  // show it (spec 6.2). It leaves no hole: the plate is the painting without it.
+  added: string | undefined;
   // The state lies on the ground: drawn under everyone, never over (spec 6.2).
   flat: boolean;
   // Every solid piece of its isolate in its crop is the object, not only the
@@ -167,6 +171,14 @@ function subject(value: unknown): Subject {
     throw new Error(`${id}.stateOf must be "<prop>.<state>"`);
   if (stateOf !== undefined && value.painted !== true)
     throw new Error(`${id}: a state subject is painted (it never leaves a hole in the plate)`);
+  const added = typeof value.added === "string" ? value.added : undefined;
+  if (value.added !== undefined && (added === undefined || !/^[a-z0-9-]+$/.test(added) ||
+      added === "default"))
+    throw new Error(`${id}.added must name the state it shows as (not "default")`);
+  if (added !== undefined && (value.painting === undefined || value.painted !== true ||
+      stateOf !== undefined))
+    throw new Error(`${id}: an added prop is cut from another painting, painted (no hole), ` +
+      "and isn't a state of another prop");
   const strings = (items: unknown): string[] =>
     (list(items) ?? []).filter((item): item is string => typeof item === "string");
   const count = (key: string): number | undefined => {
@@ -202,6 +214,7 @@ function subject(value: unknown): Subject {
     painting: typeof value.painting === "string" ? value.painting : undefined,
     stateOf: stateOf === undefined ? undefined
       : { prop: stateOf[1] ?? "", state: stateOf[2] ?? "" },
+    added,
     flat: value.flat === true,
     keepPieces: value.keepPieces === true,
     samples: chosen,
@@ -1195,7 +1208,7 @@ type CatalogueState = {
   footprint: Polygon[];
   silhouette: Columns;
   flat?: true;
-};
+} | { hidden: true };
 
 function pack(): void {
   const errors = report("errors");
@@ -1216,14 +1229,17 @@ function pack(): void {
       ? undefined
       : trimmed(`${item.id}-shadow`, `${dir(item)}/shadow.png`, item, item.home);
     if (shadow !== undefined) frames.push(shadow);
-    const states: Record<string, CatalogueState> = {
-      default: {
-        frame: item.id,
-        shadow: shadow === undefined ? null : shadow.name,
-        footprint: relative(item.footprint, item.home),
-        silhouette: silhouette(body),
-      },
+    const drawn: CatalogueState = {
+      frame: item.id,
+      shadow: shadow === undefined ? null : shadow.name,
+      footprint: relative(item.footprint, item.home),
+      silhouette: silhouette(body),
+      ...(item.flat ? { flat: true } : {}),
     };
+    // An added prop isn't there until the area's rules show it.
+    const states: Record<string, CatalogueState> = item.added === undefined
+      ? { default: drawn }
+      : { default: { hidden: true }, [item.added]: drawn };
     for (const [name, extra] of Object.entries(item.states)) {
       const frameName = `${item.id}-${name}`;
       const path = `${scratch}/frames/${frameName}.png`;
@@ -1256,7 +1272,9 @@ function pack(): void {
         silhouette: silhouette(frame),
       };
     }
-    catalogue[item.id] = { canopy: item.canopy, painted: item.painted, home: item.home, states };
+    // An added prop isn't on the plate, so it's drawn whole, like a lifted one.
+    catalogue[item.id] = { canopy: item.canopy, painted: item.painted && item.added === undefined,
+      home: item.home, states };
   }
   // A state painted in another version of the scene, registered by its crop
   // against its prop's home.
@@ -1280,6 +1298,7 @@ function pack(): void {
   const failures: string[] = [];
   for (const item of subjects)
     for (const [name, state] of Object.entries(catalogue[item.id]?.states ?? {})) {
+      if ("hidden" in state) continue;
       const world = state.footprint.map((polygon) => polygon.map(([x, y]): Point =>
         [x + item.home[0], y + item.home[1]]));
       const found = footprintProblems(`${item.id}.${name}`, world, item.home, state.silhouette);
@@ -1388,7 +1407,8 @@ function pack(): void {
   }
   // The default layout rebuilt from the kit, against the painting.
   const rebuilt = `${review}/rebuilt.png`;
-  const order = [...props].sort((a, b) => a.home[1] - b.home[1]);
+  const order = props.filter((item) => item.added === undefined)
+    .sort((a, b) => a.home[1] - b.home[1]);
   const args = [plate];
   for (const item of order)
     if (existsSync(`${dir(item)}/shadow.png`) && !item.painted) {
@@ -1450,8 +1470,13 @@ function pack(): void {
     },
     footprintNotes: Object.fromEntries(subjects.flatMap((item) =>
       item.footprintNote === undefined ? [] : [[item.id, item.footprintNote]])),
-    painted: props.filter((item) => item.painted).map((item) => item.id),
+    painted: props.filter((item) => item.painted && item.added === undefined)
+      .map((item) => item.id),
     lifted: props.filter((item) => !item.painted).map((item) => item.id),
+    added: Object.fromEntries(props.flatMap((item) => item.added === undefined ? []
+      : [[item.id, { painting: item.painting, state: item.added,
+        processing: "cut by the kit like a subject (isolate, mask, its painting's own " +
+          "pixels); hidden by default, no hole in the plate" }]])),
   });
   console.log(`pack: ${frames.length} frames on ${page + 1} page(s), ` +
     `${(bytes / 1048576).toFixed(1)} MB decoded; rebuilt vs painting ${(off * 100).toFixed(2)}%`);

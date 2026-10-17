@@ -720,6 +720,30 @@
       "samples": {
         "object": 1
       }
+    },
+    {
+      "id": "kite",
+      "painting": "art/source/areas/park/park-kite.png",
+      "added": "stuck",
+      "crop": [
+        975,
+        300,
+        110,
+        290
+      ],
+      "seed": [
+        1010,
+        400
+      ],
+      "painted": true,
+      "object": "the pink and yellow diamond kite hanging on the tower's front wall: the kite, its string looped over the battlement, and its ribbon tail with the three little bows down the wall; not the tower's wall or battlements, the flagpole, the patches, the window, or the wooden beam",
+      "home": [
+        1020,
+        570
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

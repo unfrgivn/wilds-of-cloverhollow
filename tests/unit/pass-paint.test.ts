@@ -173,6 +173,9 @@ describe("Pinecone Pass follows its painting", () => {
     for (const prop of pass.props) {
       const state = prop.states.default;
       if (state === undefined) throw new Error(`${prop.id} has no default state`);
+      // An added prop (the scarf, Milestone 49) isn't in the approved painting:
+      // hidden by default, and cut from an edit of it.
+      if (state.hidden) continue;
       let cells = 0;
       let things = 0;
       for (let j = 0; j < rows.length; j += 1)

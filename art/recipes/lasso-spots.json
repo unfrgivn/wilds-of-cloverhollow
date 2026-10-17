@@ -1,0 +1,80 @@
+{
+  "asset": "lasso-spots",
+  "milestone": 49,
+  "date": "2026-10-17",
+  "summary": "Three things stuck out of reach, each painted into an edit of its area's approved painting and cut by the kit as an added prop (hidden by default; no hole in the plate): Rosie's kite on the park's play tower, a bottle past the end of Sue's dock, and the cocoa seller's scarf on a ski-lift chair.",
+  "generationSource": "Generated with Gemini as edits of the approved paintings, so the new objects share their paint, light, and registration; no open source has them in this style (docs/media-sources.md is for sounds and photos).",
+  "calls": 10,
+  "edits": [
+    {
+      "time": "2026-10-17T19:18:59.024Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/park/park-final.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: add a child's kite tangled at the very top of the stone play tower's flagpole, on the right of the picture, right beside the little tattered flag: a diamond-shaped kite in pink and sunny yellow, its string wound around the top of the pole, and its long ribbon tail with small bows hanging down the pole toward the tower's battlements. Paint the new object in the same soft watercolour with thin warm-brown ink outlines, at a believable size for the scene. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792264739022-gemini-3-pro-image-preview-0.png",
+      "note": "The first kite: a big kite flying from the top of the flagpole. Too big, and set where only Fae's head would reach it."
+    },
+    {
+      "time": "2026-10-17T19:21:41.196Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/park/park-final.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: a child's small kite is stuck at the very top of the stone play tower's flagpole, on the right of the picture: a small diamond-shaped kite in pink and sunny yellow, about the size of the little tattered flag, snagged right at the tip of the pole above the flag, its string wound tight around the top of the pole and its short ribbon tail with two little bows dangling down beside the flag. It doesn't fly: it's caught and hanging there. Paint the new object in the same soft watercolour with thin warm-brown ink outlines, at a believable size for the scene. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792264901190-gemini-3-pro-image-preview-0.png",
+      "note": "A small kite snagged at the pole's tip. In the game it sat over the tower's top and read as floating."
+    },
+    {
+      "time": "2026-10-17T20:11:17.624Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/park/park-final.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: a child's small kite is stuck on top of the stone play tower on the right of the picture: a small diamond-shaped kite in pink and sunny yellow, about as big as the tower's little arched window, snagged on the tower's battlements and hanging down over the FRONT wall of the tower, flat against the wall just below the battlements, with its string tangled round one of the battlements and its short ribbon tail with two little bows dangling down the wall. The flag and the flagpole stay exactly as they are. Paint the new object in the same soft watercolour with thin warm-brown ink outlines, at a believable size for the scene. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792267877622-gemini-3-pro-image-preview-0.png",
+      "note": "The kite hanging down the tower's front wall from a battlement: on the tower, at the tower's depth.",
+      "kept": "art/source/areas/park/park-kite.png"
+    },
+    {
+      "time": "2026-10-17T19:19:21.099Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/bay/bay-raw.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: add a glass bottle with a cork and a rolled-up paper inside, floating in the sea at the right of the picture, wedged between the two small grey rocks in the water just to the right of the far end of the wooden dock, tilted, catching the light. Paint the new object in the same soft watercolour with thin warm-brown ink outlines, at a believable size for the scene. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792264761097-gemini-3-pro-image-preview-0.png",
+      "note": "The first bottle, wedged among rocks out in the sea: far beyond reach of the dock."
+    },
+    {
+      "time": "2026-10-17T19:22:04.517Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/bay/bay-raw.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: a glass bottle with a cork and a rolled-up paper inside is bobbing in the water right beside the very end of the wooden dock, just past its far right corner post, close enough to reach from the dock: a small, tilted bottle half in the water, catching the light, with a little ring of ripples around it. Paint the new object in the same soft watercolour with thin warm-brown ink outlines, at a believable size for the scene. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792264924515-gemini-3-pro-image-preview-0.png",
+      "note": "The bottle bobbing just past the dock's end post.",
+      "kept": "art/source/areas/bay/bay-bottle.png"
+    },
+    {
+      "time": "2026-10-17T19:19:42.944Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/pass/pass-raw.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: add a long knitted scarf in red with white stripes, caught on the pink ski-lift chair (the chair hanging lowest on the cable, at the upper left): the scarf is snagged on the chair's seat and hangs down below it, its fringed ends fluttering in the wind. Paint the new object in the same soft watercolour with thin warm-brown ink outlines, at a believable size for the scene. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792264782942-gemini-3-pro-image-preview-0.png",
+      "note": "The red striped scarf caught on the pink lift chair.",
+      "kept": "art/source/areas/pass/pass-scarf.png"
+    }
+  ],
+  "kitCalls": "4 isolates, one per added prop and one again for the kite's final edit (art/recipes/park-kit.json, bay-kit.json, pass-kit.json keep them).",
+  "postProcessing": {
+    "art/source/areas/park/park-kite.png": "The park's own pipeline (art/recipes/park.json): magick <raw> -resize 3000x -gravity center -crop 3000x2000+0+0 +repage.",
+    "art/source/areas/bay/bay-bottle.png": "The bay's (art/recipes/bay.json): magick <raw> -filter Lanczos -resize 3500x -gravity center -crop 3500x2200+0+0 +repage.",
+    "art/source/areas/pass/pass-scarf.png": "The pass's: magick <raw> -background '#fcfbf6' -gravity south -extent 2528x1900 -resize x2200 -gravity center -extent 3500x2200. (art/recipes/pass.json says the pad goes at the bottom; the plate has it at the top, which is what -gravity south gives: that command reproduces the plate at a mean difference of 1.27, the tiles' WebP noise, and the bottom-padded one at 31.)",
+    "check": "Each command, run on the raw output, reproduces the kept edit with 0 differing pixels; each edit's features match its plate at a median offset of 0 units (90th percentile 1.0 to 1.2)."
+  }
+}

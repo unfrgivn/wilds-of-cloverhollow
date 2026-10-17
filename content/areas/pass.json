@@ -424,6 +424,15 @@
         "y": 765
       },
       "prompt": "Look"
+    },
+    {
+      "id": "ski-lift",
+      "knot": "ski_lift",
+      "point": {
+        "x": 500,
+        "y": 412
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {
@@ -596,6 +605,22 @@
       "prop": "bench-back",
       "x": 810,
       "y": 370
+    },
+    {
+      "id": "scarf",
+      "prop": "scarf",
+      "x": 495,
+      "y": 320,
+      "rules": [
+        {
+          "state": "default",
+          "while": "scarf_down"
+        },
+        {
+          "state": "stuck",
+          "while": "has_lasso"
+        }
+      ]
     }
   ]
 }

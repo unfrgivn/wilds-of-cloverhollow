@@ -181,7 +181,7 @@ function hidersOf(area: Area, scenario?: Scenario): Hiders {
     scenario === undefined ? Object.values(prop.states) : possibleStates(prop, scenario);
   return {
     props: area.props.filter((prop) => !prop.canopy).flatMap((prop) =>
-      states(prop).filter((state) => !state.flat).map((state) => {
+      states(prop).filter((state) => !state.flat && !state.hidden).map((state) => {
         const tops = state.silhouette.columns.flat().map(([top]) => top);
         const bottoms = state.silhouette.columns.flat().map(([, bottom]) => bottom);
         return {

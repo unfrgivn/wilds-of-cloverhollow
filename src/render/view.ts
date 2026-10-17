@@ -1053,12 +1053,14 @@ export class GameView {
     npcs: { id: string; frame: string; facing: string }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];
-    // Each prop's current state, whether it lies flat (drawn under everyone),
-    // and its strips: world x range and the y it sorts by (spec 6).
+    // Each prop's current state, whether it lies flat (drawn under everyone)
+    // or is hidden (not there), and its strips: world x range and the y it
+    // sorts by (spec 6).
     props: {
       id: string;
       state: string;
       flat: boolean;
+      hidden: boolean;
       strips: { left: number; right: number; zIndex: number }[];
     }[];
     lantern: { on: boolean; glows: string[] };

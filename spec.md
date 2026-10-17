@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 46, Boop-a-Mole)
+Last updated: 2026-10-17 (Milestone 49, lasso spots; Milestone 46, Boop-a-Mole)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -532,6 +532,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   plays once (`sound: flute`); a wrong song ends with a hint. After that the
   xylophone is free play. Like the lasso, the flute is a story item with no
   button yet.
+- Lasso spots (Milestone 49): once Fae has Coach Ash's lasso, three things
+  are stuck out of reach, each an added prop (section 6.2) shown while
+  `has_lasso` and hidden again once it's down. In Meadow Park, Rosie's kite
+  hangs on the play tower (prop `kite`, state `stuck`; look point `tower` at
+  (1040, 548)): lassoed down (`kite_seen`, `kite_down`), it goes back to Rosie
+  in the classroom, after her first talk, for her six arcade coins
+  (`kite_returned`, `gift: coins 6`). At Bubblegum Bay, a bottle bobs past the
+  dock's end (prop `bottle`, state `bobbing`; look point `dock-end` at (1540,
+  315)): reeled in (`bottle_seen`, `has_map`), it holds a treasure map, and
+  digging between the two palms by the big log (look point `palms` at (1600,
+  960)) finds twenty coins (`treasure_found`, `gift: coins 20`). At Pinecone
+  Pass, the cocoa seller's scarf is caught on a lift chair (prop `scarf`, state
+  `stuck`; look point `ski-lift` at (500, 412)); she misses it at the stand,
+  and lassoed down (`scarf_seen`, `scarf_down`) and given back, it's a mug of
+  cocoa on the house (`scarf_returned`, `gift: snack 1`). The journal tells
+  each errand from when it's seen, then how it ended. Each placement's rules
+  are `default` while its down variable, then the shown state while
+  `has_lasso`.
 - Flute friends (Milestone 47): once Fae has the flute, a calm Pond Pup's
   talk (`pup_calm`, after its first) offers Pet him and Share a snack; doing
   both, in either order, makes the pups her friends (`pup_petted`,
@@ -671,7 +689,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Hiding check (`src/content/area-checks.ts`, run by `just check`): from every
   spawn, no position reachable on a 5-unit grid may have 75% or more of Fae's
   body box (50x140 units above her feet) covered by props (in
-  any of their states). Canopies and flat states don't count. The checks
+  any of their states). Canopies, flat states, and hidden states don't count. The checks
   count every footprint of every prop state as solid, since the story may
   change a state, except where a crossing's flag settles it (section 6.2).
 - Area scale rule: a standard door is about 1.4x Fae's height (about 200
@@ -775,6 +793,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   has no footprint, it's drawn on the ground layer under everyone (never in
   strips), and it never covers or hides anyone. `renderInfo().props` reports
   each prop's `flat`.
+- A hidden state is a prop not being there (Milestone 49): in the catalogue it
+  is only `{ "hidden": true }`, with no frame, no footprint, and an empty
+  silhouette, so nothing is drawn and it covers nobody; a prop must have some
+  state that isn't hidden. `renderInfo().props` reports each prop's `hidden`.
 - Crossings (Milestone 39): an area's `crossings` are `{ id, polygon, opens }`:
   ground that's solid (water, say) until the Ink variable `opens` is true,
   then walkable (`sceneryArea`), like a bridge laid over it. The area checks
@@ -793,6 +815,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   against its prop's home and may be `flat`. `keepPieces` keeps every solid
   piece of an isolate in its crop (a deck a post cuts in two). An `exclude`
   polygon is part of neither the prop nor its hole: it stays in the plate.
+- An added prop (`added: "<state>"`, Milestone 49) is an object the approved
+  painting doesn't have, painted into an edit of it (`painting`, the same
+  size) and cut there like a painted subject: it leaves no hole, since the
+  plate is the painting without it. Its catalogue entry is hidden by default
+  and drawn in the `added` state, which the area's rules show; it's drawn
+  whole like a lifted prop (`painted` false). Rebuilding the default layout
+  leaves it out.
 - Depth: each prop's front edge is its footprint's southmost y in every
   5-unit column (`frontEdge`): straight across gaps between its polygons
   (between an arch's legs), flat past its ends, and the home y with no

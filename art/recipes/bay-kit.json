@@ -1,7 +1,7 @@
 {
   "asset": "bay-kit",
-  "date": "2026-10-09",
-  "summary": "The approved bay painting split into a ground plate and 15 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "date": "2026-10-17",
+  "summary": "The approved bay painting split into a ground plate and 16 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/bay.json",
   "painting": "art/source/areas/bay/painting/ground.json",
@@ -80,6 +80,10 @@
       "picnic-basket": [
         "iso-1.jpg",
         "crop.json"
+      ],
+      "bottle": [
+        "iso-1.jpg",
+        "crop.json"
       ]
     }
   },
@@ -115,5 +119,12 @@
     "spade-bottom",
     "picnic-basket"
   ],
-  "lifted": []
+  "lifted": [],
+  "added": {
+    "bottle": {
+      "painting": "art/source/areas/bay/bay-bottle.png",
+      "state": "bobbing",
+      "processing": "cut by the kit like a subject (isolate, mask, its painting's own pixels); hidden by default, no hole in the plate"
+    }
+  }
 }

@@ -49,6 +49,8 @@ export function propSpots(
   const reachable = reachablePositions(here, world.tunables.playerRadius).filter(allowed);
   return area.props.map((prop) => {
     const state = propState(world, ink, prop);
+    // Not there: nobody stands behind or in front of it.
+    if (state.hidden) return { id: prop.id, behind: undefined, front: undefined };
     const { left, step, columns } = state.silhouette;
     const right = left + columns.length * step;
     const top = Math.min(...columns.flat().map(([from]) => from));

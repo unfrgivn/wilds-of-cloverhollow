@@ -76,6 +76,15 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
+{kite_returned: I lassoed Rosie's kite down from the park's play tower, and she gave me her arcade coins! # speaker: Fae}
+{kite_down and not kite_returned: I got Rosie's kite down from the play tower. I should take it back to her at school. # speaker: Fae}
+{kite_seen and not kite_down: A kite is tangled on top of the park's play tower. My lasso could reach it! # speaker: Fae}
+{treasure_found: I dug up pirate treasure on the beach! # speaker: Fae}
+{has_map and not treasure_found: A bottle by Sue's dock had a treasure map in it. X marks the spot between the two palms by the big log! # speaker: Fae}
+{bottle_seen and not has_map: A bottle with a paper inside is bobbing past the end of Sue's dock. # speaker: Fae}
+{scarf_returned: I lassoed the cocoa seller's scarf off the ski lift. Free cocoa! # speaker: Fae}
+{scarf_down and not scarf_returned: I got a red scarf down from the ski lift. It smells like cocoa... # speaker: Fae}
+{scarf_seen and not scarf_down: A red scarf is caught on a ski-lift chair at Pinecone Pass. # speaker: Fae}
 {bridge_down: I pulled the old footbridge's lever with the lasso, and the bridge swung down across the creek! # speaker: Fae}
 {stash_found: The hooded kid's stash is behind the old stump: purple markers, fizzy soda, and a Star Racer token. # speaker: Fae}
 {swung and not bridge_down: I swung across the creek on the lasso! There's a lever up on the old footbridge's post. # speaker: Fae}
@@ -411,7 +420,9 @@ The snowman has a carrot nose and a very serious pebble smile. # speaker: Fae
 -> DONE
 
 === cocoa_stand ===
+{scarf_down and not scarf_returned: -> scarf}
 The cocoa stand steams beside the snowy trail. # speaker: Cocoa seller
+{has_lasso and not scarf_down: The wind blew my favourite scarf right onto the ski lift! Brrr. # speaker: Cocoa seller}
 {coins() < 5:
     A mug of cocoa costs 5 coins. Maybe calm a critter first? # speaker: Cocoa seller
     -> DONE
@@ -421,6 +432,12 @@ The cocoa stand steams beside the snowy trail. # speaker: Cocoa seller
 + [Not now]
     All right! Stay cozy out there. # speaker: Cocoa seller
 - -> DONE
+
+= scarf
+My scarf! You got it down from the ski lift? # speaker: Cocoa seller
+~ scarf_returned = true
+Thank you, Fae! A mug of cocoa, on the house. # speaker: Cocoa seller # gift: snack 1
+-> DONE
 
 === lodge_door ===
 The lodge is locked. A note says: "Back soon, gone looking for a runaway hamster." # speaker: Fae
@@ -509,8 +526,14 @@ Then they ran off down the hall. # speaker: Rosie
 A purple hood? Here, at school? I have to see! # speaker: Fae
 -> DONE
 = again
+{kite_down and not kite_returned: -> kite}
 {saw_hood: Did you catch them? They're SO fast. # speaker: Rosie}
 {not saw_hood: Hurry, Fae! They went down the hall! # speaker: Rosie}
+-> DONE
+= kite
+My kite! The wind snatched it right out of my hands at the park. # speaker: Rosie
+~ kite_returned = true
+You're the best, Fae! Here, take my arcade coins. All six of them! # speaker: Rosie # gift: coins 6
 -> DONE
 
 === hood_glimpse ===
@@ -1232,3 +1255,80 @@ The pond is cool and clear. Something glints at the bottom, out past the middle 
 = after
 The pond is cool and clear. Nothing glints at the bottom now. # speaker: Fae
 -> DONE
+
+// Lasso spots (Milestone 49): something stuck out of reach in three places
+// Fae knows, there once she has Coach Ash's lasso.
+VAR kite_seen = false
+VAR kite_down = false
+VAR kite_returned = false
+VAR bottle_seen = false
+VAR has_map = false
+VAR treasure_found = false
+VAR scarf_seen = false
+VAR scarf_down = false
+VAR scarf_returned = false
+
+=== tower ===
+{has_lasso and not kite_down: -> kite}
+The play tower, with its patched flag flapping on top. # speaker: Fae
+-> DONE
+= kite
+~ kite_seen = true
+A kite is caught on top of the play tower, hanging down the wall! # speaker: Fae
++ [Lasso it down]
+    Fae twirls the lasso once, twice... and loops it right over the kite's string. # speaker: Fae
+    ~ kite_down = true
+    A gentle tug, and the kite flutters down into Fae's arms. # speaker: Fae
+    There's a name on the crossbar, in green marker: ROSIE. Rosie from my class! # speaker: Fae
+    I'll take it back to her at school. # speaker: Fae
+    -> DONE
++ [Leave it]
+    -> DONE
+
+=== dock_end ===
+{has_lasso and not has_map: -> bottle}
+The end of Sue's dock. The water sparkles all the way to the sky. # speaker: Fae
+-> DONE
+= bottle
+~ bottle_seen = true
+A bottle is bobbing in the water past the end of the dock! There's a rolled-up paper inside. # speaker: Fae
++ [Lasso it]
+    Fae loops the lasso around the bottle's neck and reels it in, hand over hand. # speaker: Fae
+    ~ has_map = true
+    She pulls out the cork. The paper is an old treasure map! # speaker: Fae
+    Two palm trees, a big log, and an X right between them. That's the beach, by the big driftwood log! # speaker: Fae
+    -> DONE
++ [Leave it]
+    -> DONE
+
+=== palms ===
+{has_map and not treasure_found: -> dig}
+{treasure_found: The sand between the palms is all smoothed back over. # speaker: Fae}
+{not treasure_found: Two palm trees lean together beside the big driftwood log. # speaker: Fae}
+-> DONE
+= dig
+X marks the spot: right here, between the two palms! # speaker: Fae
++ [Dig]
+    Fae borrows a spade from the beach toys and digs, and digs... # speaker: Fae
+    ~ treasure_found = true
+    Clunk! A little tin chest, full of shiny gold coins! # speaker: Fae # gift: coins 20
+    Real pirate treasure! Wait till I tell Sue. # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+
+=== ski_lift ===
+{has_lasso and not scarf_down: -> scarf}
+The ski lift creaks along its cable, the empty chairs swinging. # speaker: Fae
+-> DONE
+= scarf
+~ scarf_seen = true
+A long red scarf is caught on the pink lift chair, flapping in the wind. # speaker: Fae
++ [Lasso it down]
+    Fae aims, throws... and the lasso loops right over the dangling scarf. # speaker: Fae
+    ~ scarf_down = true
+    One tug, and the scarf slips free. It's soft and warm, and it smells like cocoa. # speaker: Fae
+    -> DONE
++ [Leave it]
+    -> DONE
+

@@ -10,6 +10,7 @@ import type { Area, Polygon, Prop, PropState, Silhouette } from "../core";
 
 type CatalogueState = {
   flat: boolean;
+  hidden: boolean;
   frame: string;
   shadow: string | null;
   footprint: Polygon[];
@@ -87,6 +88,14 @@ export function parsePropCatalogue(value: unknown, file: string): PropCatalogue 
     const states: Record<string, CatalogueState> = {};
     for (const [name, state] of Object.entries(raw.states)) {
       const at = `props.${id}.states.${name}`;
+      // A hidden state is the prop not being there: only `{ "hidden": true }`.
+      if (record(state) && state.hidden === true) {
+        if (Object.keys(state).length !== 1)
+          throw new Error(`${file}: hidden state ${at} has nothing else`);
+        states[name] = { flat: false, hidden: true, frame: "", shadow: null, footprint: [],
+          silhouette: { left: 0, step: 5, columns: [] } };
+        continue;
+      }
       if (!record(state) || typeof state.frame !== "string" ||
           !(state.shadow === null || typeof state.shadow === "string")) fail(file, at);
       const flat = state.flat === true;
@@ -95,6 +104,7 @@ export function parsePropCatalogue(value: unknown, file: string): PropCatalogue 
         throw new Error(`${file}: flat state ${at} must have an empty footprint`);
       states[name] = {
         flat,
+        hidden: false,
         frame: state.frame,
         shadow: state.shadow,
         footprint,
@@ -104,6 +114,8 @@ export function parsePropCatalogue(value: unknown, file: string): PropCatalogue 
     if (states.default === undefined) fail(file, `props.${id}.states.default`);
     if (raw.painted && Object.keys(states).length > 1)
       throw new Error(`${file}: painted prop ${id} can't change state (it stays on the plate)`);
+    if (Object.values(states).every((state) => state.hidden))
+      throw new Error(`${file}: prop ${id} is never there (every state is hidden)`);
     props[id] = { canopy: raw.canopy, painted: raw.painted, home: raw.home, states };
   }
   return { atlases, props };
@@ -152,6 +164,7 @@ function placeState(state: CatalogueState, placement: PropPlacement): PropState 
       [placement.y + top, placement.y + bottom]));
   return {
     flat: state.flat,
+    hidden: state.hidden,
     frame: state.frame,
     shadow: state.shadow,
     footprint,

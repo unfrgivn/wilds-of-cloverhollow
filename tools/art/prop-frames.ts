@@ -45,6 +45,8 @@ const tiles: string[] = [];
 const notes: string[] = [];
 for (const prop of area.props)
   for (const [name, state] of Object.entries(prop.states)) {
+    // A hidden state (an added prop not yet there) has nothing to show.
+    if (state.hidden) continue;
     const frame = frames.get(state.frame);
     if (frame === undefined) throw new Error(`${prop.id}: no frame ${state.frame}`);
     // World units to frame px: the frame's anchor is the prop's home.

@@ -533,6 +533,261 @@
         "\n",
         "ev",
         {
+          "VAR?": "kite_returned"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I lassoed Rosie's kite down from the park's play tower, and she gave me her arcade coins! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.44"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "kite_down"
+        },
+        {
+          "VAR?": "kite_returned"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I got Rosie's kite down from the play tower. I should take it back to her at school. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.54"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "kite_seen"
+        },
+        {
+          "VAR?": "kite_down"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A kite is tangled on top of the park's play tower. My lasso could reach it! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.64"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "treasure_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I dug up pirate treasure on the beach! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.71"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_map"
+        },
+        {
+          "VAR?": "treasure_found"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A bottle by Sue's dock had a treasure map in it. X marks the spot between the two palms by the big log! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.81"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "bottle_seen"
+        },
+        {
+          "VAR?": "has_map"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A bottle with a paper inside is bobbing past the end of Sue's dock. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.91"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "scarf_returned"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I lassoed the cocoa seller's scarf off the ski lift. Free cocoa! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.98"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "scarf_down"
+        },
+        {
+          "VAR?": "scarf_returned"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I got a red scarf down from the ski lift. It smells like cocoa... ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.108"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "scarf_seen"
+        },
+        {
+          "VAR?": "scarf_down"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A red scarf is caught on a ski-lift chair at Pinecone Pass. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.118"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "bridge_down"
         },
         "/ev",
@@ -547,7 +802,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.44"
+                "->": ".^.^.^.125"
               },
               null
             ]
@@ -572,7 +827,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
+                "->": ".^.^.^.132"
               },
               null
             ]
@@ -602,7 +857,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.61"
+                "->": ".^.^.^.142"
               },
               null
             ]
@@ -636,7 +891,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.74"
+                "->": ".^.^.^.155"
               },
               null
             ]
@@ -666,7 +921,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.84"
+                "->": ".^.^.^.165"
               },
               null
             ]
@@ -691,7 +946,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.91"
+                "->": ".^.^.^.172"
               },
               null
             ]
@@ -721,7 +976,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.101"
+                "->": ".^.^.^.182"
               },
               null
             ]
@@ -755,7 +1010,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.114"
+                "->": ".^.^.^.195"
               },
               null
             ]
@@ -789,7 +1044,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.127"
+                "->": ".^.^.^.208"
               },
               null
             ]
@@ -819,7 +1074,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.137"
+                "->": ".^.^.^.218"
               },
               null
             ]
@@ -849,7 +1104,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.228"
               },
               null
             ]
@@ -879,7 +1134,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.157"
+                "->": ".^.^.^.238"
               },
               null
             ]
@@ -904,7 +1159,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.164"
+                "->": ".^.^.^.245"
               },
               null
             ]
@@ -946,7 +1201,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.181"
+                "->": ".^.^.^.262"
               },
               null
             ]
@@ -980,7 +1235,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.194"
+                "->": ".^.^.^.275"
               },
               null
             ]
@@ -1080,7 +1335,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.204"
+                "->": ".^.^.^.285"
               },
               null
             ]
@@ -1105,7 +1360,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.211"
+                "->": ".^.^.^.292"
               },
               null
             ]
@@ -1135,7 +1390,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.221"
+                "->": ".^.^.^.302"
               },
               null
             ]
@@ -1169,7 +1424,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.233"
+                "->": ".^.^.^.314"
               },
               null
             ]
@@ -1194,7 +1449,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.240"
+                "->": ".^.^.^.321"
               },
               null
             ]
@@ -1224,7 +1479,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.250"
+                "->": ".^.^.^.331"
               },
               null
             ]
@@ -1258,7 +1513,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.263"
+                "->": ".^.^.^.344"
               },
               null
             ]
@@ -1287,7 +1542,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.273"
+                "->": ".^.^.^.354"
               },
               null
             ]
@@ -1316,7 +1571,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.283"
+                "->": ".^.^.^.364"
               },
               null
             ]
@@ -1350,7 +1605,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.296"
+                "->": ".^.^.^.377"
               },
               null
             ]
@@ -1380,7 +1635,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.306"
+                "->": ".^.^.^.387"
               },
               null
             ]
@@ -1405,7 +1660,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.313"
+                "->": ".^.^.^.394"
               },
               null
             ]
@@ -1439,7 +1694,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.325"
+                "->": ".^.^.^.406"
               },
               null
             ]
@@ -1464,7 +1719,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.332"
+                "->": ".^.^.^.413"
               },
               null
             ]
@@ -1493,7 +1748,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.342"
+                "->": ".^.^.^.423"
               },
               null
             ]
@@ -1518,7 +1773,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.349"
+                "->": ".^.^.^.430"
               },
               null
             ]
@@ -1543,7 +1798,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.356"
+                "->": ".^.^.^.437"
               },
               null
             ]
@@ -1580,7 +1835,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.371"
+                "->": ".^.^.^.452"
               },
               null
             ]
@@ -1605,7 +1860,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.378"
+                "->": ".^.^.^.459"
               },
               null
             ]
@@ -1639,7 +1894,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.391"
+                "->": ".^.^.^.472"
               },
               null
             ]
@@ -1668,7 +1923,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.401"
+                "->": ".^.^.^.482"
               },
               null
             ]
@@ -1693,7 +1948,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.408"
+                "->": ".^.^.^.489"
               },
               null
             ]
@@ -1718,7 +1973,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.415"
+                "->": ".^.^.^.496"
               },
               null
             ]
@@ -1748,7 +2003,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.425"
+                "->": ".^.^.^.506"
               },
               null
             ]
@@ -1778,7 +2033,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.435"
+                "->": ".^.^.^.516"
               },
               null
             ]
@@ -1803,7 +2058,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.442"
+                "->": ".^.^.^.523"
               },
               null
             ]
@@ -1832,7 +2087,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.452"
+                "->": ".^.^.^.533"
               },
               null
             ]
@@ -1870,7 +2125,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.468"
+                "->": ".^.^.^.549"
               },
               null
             ]
@@ -1897,7 +2152,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.477"
+                "->": ".^.^.^.558"
               },
               null
             ]
@@ -1926,7 +2181,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.487"
+                "->": ".^.^.^.568"
               },
               null
             ]
@@ -1951,7 +2206,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.494"
+                "->": ".^.^.^.575"
               },
               null
             ]
@@ -1980,7 +2235,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.505"
+                "->": ".^.^.^.586"
               },
               null
             ]
@@ -2009,7 +2264,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.516"
+                "->": ".^.^.^.597"
               },
               null
             ]
@@ -3711,9 +3966,69 @@
       ],
       "cocoa_stand": [
         [
+          "ev",
+          {
+            "VAR?": "scarf_down"
+          },
+          {
+            "VAR?": "scarf_returned"
+          },
+          "!",
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.scarf"
+                },
+                {
+                  "->": ".^.^.^.7"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
           "^The cocoa stand steams beside the snowy trail. ",
           "#",
           "^speaker: Cocoa seller",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "has_lasso"
+          },
+          {
+            "VAR?": "scarf_down"
+          },
+          "!",
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ The wind blew my favourite scarf right onto the ski lift! Brrr. ",
+                "#",
+                "^speaker: Cocoa seller",
+                {
+                  "->": ".^.^.^.21"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
           "/#",
           "\n",
           "ev",
@@ -3738,7 +4053,7 @@
                 "\n",
                 "done",
                 {
-                  "->": ".^.^.^.11"
+                  "->": ".^.^.^.30"
                 },
                 null
               ]
@@ -3798,7 +4113,32 @@
             ]
           }
         ],
-        null
+        {
+          "scarf": [
+            "^My scarf! You got it down from the ski lift? ",
+            "#",
+            "^speaker: Cocoa seller",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "scarf_returned",
+              "re": true
+            },
+            "^Thank you, Fae! A mug of cocoa, on the house. ",
+            "#",
+            "^speaker: Cocoa seller ",
+            "/#",
+            "#",
+            "^gift: snack 1",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
       ],
       "lodge_door": [
         "^The lodge is locked. A note says: \"Back soon, gone looking for a runaway hamster.\" ",
@@ -4330,6 +4670,36 @@
           "again": [
             "ev",
             {
+              "VAR?": "kite_down"
+            },
+            {
+              "VAR?": "kite_returned"
+            },
+            "!",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "rosie.kite"
+                  },
+                  {
+                    "->": ".^.^.^.7"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
               "VAR?": "saw_hood"
             },
             "/ev",
@@ -4344,7 +4714,7 @@
                   "#",
                   "^speaker: Rosie",
                   {
-                    "->": ".^.^.^.4"
+                    "->": ".^.^.^.13"
                   },
                   null
                 ]
@@ -4370,13 +4740,37 @@
                   "#",
                   "^speaker: Rosie",
                   {
-                    "->": ".^.^.^.12"
+                    "->": ".^.^.^.21"
                   },
                   null
                 ]
               }
             ],
             "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "kite": [
+            "^My kite! The wind snatched it right out of my hands at the park. ",
+            "#",
+            "^speaker: Rosie",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "kite_returned",
+              "re": true
+            },
+            "^You're the best, Fae! Here, take my arcade coins. All six of them! ",
+            "#",
+            "^speaker: Rosie ",
+            "/#",
+            "#",
+            "^gift: coins 6",
             "/#",
             "\n",
             "done",
@@ -10030,6 +10424,484 @@
           ]
         }
       ],
+      "tower": [
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        {
+          "VAR?": "kite_down"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "tower.kite"
+              },
+              {
+                "->": "tower.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The play tower, with its patched flag flapping on top. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "kite": [
+            [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "kite_seen",
+                "re": true
+              },
+              "^A kite is caught on top of the play tower, hanging down the wall! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Lasso it down",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Leave it",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "^Fae twirls the lasso once, twice... and loops it right over the kite's string. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "kite_down",
+                    "re": true
+                  },
+                  "^A gentle tug, and the kite flutters down into Fae's arms. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "^There's a name on the crossbar, in green marker: ROSIE. Rosie from my class! ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "^I'll take it back to her at school. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ]
+        }
+      ],
+      "dock_end": [
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        {
+          "VAR?": "has_map"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.bottle"
+              },
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The end of Sue's dock. The water sparkles all the way to the sky. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "bottle": [
+            [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "bottle_seen",
+                "re": true
+              },
+              "^A bottle is bobbing in the water past the end of the dock! There's a rolled-up paper inside. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Lasso it",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Leave it",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "^Fae loops the lasso around the bottle's neck and reels it in, hand over hand. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "has_map",
+                    "re": true
+                  },
+                  "^She pulls out the cork. The paper is an old treasure map! ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "^Two palm trees, a big log, and an X right between them. That's the beach, by the big driftwood log! ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ]
+        }
+      ],
+      "palms": [
+        "ev",
+        {
+          "VAR?": "has_map"
+        },
+        {
+          "VAR?": "treasure_found"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "palms.dig"
+              },
+              {
+                "->": "palms.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "treasure_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The sand between the palms is all smoothed back over. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": "palms.13"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "treasure_found"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Two palm trees lean together beside the big driftwood log. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": "palms.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        {
+          "dig": [
+            [
+              "^X marks the spot: right here, between the two palms! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Dig",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Not now",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "^Fae borrows a spade from the beach toys and digs, and digs... ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "treasure_found",
+                    "re": true
+                  },
+                  "^Clunk! A little tin chest, full of shiny gold coins! ",
+                  "#",
+                  "^speaker: Fae ",
+                  "/#",
+                  "#",
+                  "^gift: coins 20",
+                  "/#",
+                  "\n",
+                  "^Real pirate treasure! Wait till I tell Sue. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ]
+        }
+      ],
+      "ski_lift": [
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        {
+          "VAR?": "scarf_down"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.scarf"
+              },
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The ski lift creaks along its cable, the empty chairs swinging. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "scarf": [
+            [
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "scarf_seen",
+                "re": true
+              },
+              "^A long red scarf is caught on the pink lift chair, flapping in the wind. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Lasso it down",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Leave it",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "^Fae aims, throws... and the lasso loops right over the dangling scarf. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "scarf_down",
+                    "re": true
+                  },
+                  "^One tug, and the scarf slips free. It's soft and warm, and it smells like cocoa. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ]
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -10223,6 +11095,42 @@
         false,
         {
           "VAR=": "pond_tin"
+        },
+        false,
+        {
+          "VAR=": "kite_seen"
+        },
+        false,
+        {
+          "VAR=": "kite_down"
+        },
+        false,
+        {
+          "VAR=": "kite_returned"
+        },
+        false,
+        {
+          "VAR=": "bottle_seen"
+        },
+        false,
+        {
+          "VAR=": "has_map"
+        },
+        false,
+        {
+          "VAR=": "treasure_found"
+        },
+        false,
+        {
+          "VAR=": "scarf_seen"
+        },
+        false,
+        {
+          "VAR=": "scarf_down"
+        },
+        false,
+        {
+          "VAR=": "scarf_returned"
         },
         "/ev",
         "end",

@@ -33,9 +33,11 @@ function standable(point: Point): boolean {
 
 // The share of Fae's body rows from `top` to `bottom` units above her feet
 // (on a 5-unit grid) that props draw over (only the prop `only`, if given).
+// The props as the approved painting has them: an added prop (the bottle,
+// Milestone 49) is hidden by default, since the painting doesn't have it.
 const states: { id: string; state: PropState }[] = bay.props.flatMap((prop) => {
   const state = prop.states.default;
-  return state === undefined ? [] : [{ id: prop.id, state }];
+  return state === undefined || state.hidden ? [] : [{ id: prop.id, state }];
 });
 function coverage(feet: Point, top = 140, bottom = 0, only?: string): number {
   const drawn = only === undefined ? states : states.filter(({ id }) => id === only);

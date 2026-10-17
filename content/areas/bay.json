@@ -186,6 +186,24 @@
         "y": 880
       },
       "prompt": "Look"
+    },
+    {
+      "id": "dock-end",
+      "knot": "dock_end",
+      "point": {
+        "x": 1540,
+        "y": 315
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "palms",
+      "knot": "palms",
+      "point": {
+        "x": 1600,
+        "y": 960
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],
@@ -375,6 +393,22 @@
       "prop": "picnic-basket",
       "x": 602,
       "y": 373
+    },
+    {
+      "id": "bottle",
+      "prop": "bottle",
+      "x": 1500,
+      "y": 520,
+      "rules": [
+        {
+          "state": "default",
+          "while": "has_map"
+        },
+        {
+          "state": "bobbing",
+          "while": "has_lasso"
+        }
+      ]
     }
   ]
 }

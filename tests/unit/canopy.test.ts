@@ -26,6 +26,7 @@ describe("a canopy", () => {
     const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
     const state: PropState = {
       flat: false,
+      hidden: false,
       frame: "shade",
       shadow: null,
       footprint: [],

@@ -68,7 +68,10 @@
             39
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "racks",
@@ -105,7 +108,10 @@
           ]
         ]
       ],
-      "core": 2
+      "core": 2,
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "goal",
@@ -141,7 +147,10 @@
             870
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "tetherball",
@@ -228,7 +237,10 @@
             870
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "hedge",
@@ -302,7 +314,10 @@
             1110
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "bushes",
@@ -350,7 +365,10 @@
             652
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "reeds",
@@ -452,7 +470,10 @@
             440
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "bridge-posts",
@@ -555,7 +576,10 @@
           ]
         ]
       ],
-      "canopy": true
+      "canopy": true,
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "lever",
@@ -618,7 +642,11 @@
           ]
         ]
       ],
-      "shadowReach": 0
+      "shadowReach": 0,
+      "samples": {
+        "object": 1,
+        "fill": 1
+      }
     },
     {
       "id": "bridge",
@@ -720,7 +748,11 @@
             1040
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1,
+        "fill": 1
+      }
     },
     {
       "id": "lever-pulled",
@@ -777,7 +809,10 @@
             850
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     },
     {
       "id": "bridge-lowered",
@@ -854,7 +889,10 @@
             1030
           ]
         ]
-      ]
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

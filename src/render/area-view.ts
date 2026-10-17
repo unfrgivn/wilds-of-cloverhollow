@@ -26,7 +26,8 @@ type Strip = { sprite: Sprite; left: number; right: number; top: number; bottom:
 type StateView = {
   flat: Sprite | undefined;
   strips: Strip[];
-  frame: Texture;
+  // Undefined for a hidden state: there's nothing to draw.
+  frame: Texture | undefined;
   shadow: Sprite | undefined;
 };
 type PropView = { prop: Prop; states: Map<string, StateView>; shown: string; alpha: number };
@@ -150,6 +151,10 @@ export class AreaView {
     for (const prop of area.props) {
       const states = new Map<string, StateView>();
       for (const [name, state] of Object.entries(prop.states)) {
+        if (state.hidden) {
+          states.set(name, { flat: undefined, strips: [], frame: undefined, shadow: undefined });
+          continue;
+        }
         const frame = frameTexture(sheets, state.frame);
         const strips = state.flat ? [] : stateStrips(prop, name, frame);
         for (const { sprite } of strips) {
@@ -230,12 +235,14 @@ export class AreaView {
     id: string;
     state: string;
     flat: boolean;
+    hidden: boolean;
     strips: { left: number; right: number; zIndex: number }[];
   }[] {
     return this.props.map((view) => ({
       id: view.prop.id,
       state: view.shown,
       flat: view.prop.states[view.shown]?.flat === true,
+      hidden: view.prop.states[view.shown]?.hidden === true,
       strips: (view.states.get(view.shown)?.strips ?? []).map(({ sprite, left, right }) =>
         ({ left, right, zIndex: sprite.zIndex })),
     }));
@@ -249,8 +256,8 @@ export class AreaView {
     const scenery = new Container();
     const order = [...this.props].sort((a, b) => a.prop.y - b.prop.y);
     for (const view of order) {
-      const state = view.states.get(view.shown);
-      if (state !== undefined) scenery.addChild(anchored(state.frame, view.prop));
+      const frame = view.states.get(view.shown)?.frame;
+      if (frame !== undefined) scenery.addChild(anchored(frame, view.prop));
     }
     this.ground.addChild(scenery);
     try {

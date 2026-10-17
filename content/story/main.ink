@@ -67,6 +67,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
+{garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
 {bridge_down: I pulled the old footbridge's lever with the lasso, and the bridge swung down across the creek! # speaker: Fae}
 {stash_found: The hooded kid's stash is behind the old stump: purple markers, fizzy soda, and a Star Racer token. # speaker: Fae}
 {swung and not bridge_down: I swung across the creek on the lasso! There's a lever up on the old footbridge's post. # speaker: Fae}
@@ -92,7 +94,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {calmed("arcade-keeper"): Mr. Pip, the arcade keeper, drank a fizzy soda from the kid in the purple hood. The spell works on people too! # speaker: Fae}
 {calmed("arcade-keeper"): The hooded kid scribbled out their initials on the Star Racer high score. Someone from school again... # speaker: Fae}
 {clubhouse_claimed and not calmed("arcade-keeper"): A note in the clubhouse said "NEXT STOP: THE ARCADE." The arcade is in the plaza, back home. # speaker: Fae}
-{clubhouse_claimed: The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. # speaker: Fae}
+{garden_planted and not garden_ripe: Jordan planted strawberries on the clubhouse deck. Every critter I calm helps them grow. # speaker: Fae}
+{fridge_fixed: Sue fixed the clubhouse's old mini fridge. It's cold and humming! # speaker: Fae}
+{clubhouse_claimed and not (fridge_fixed and garden_planted): The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. # speaker: Fae}
 {found_old_trail: The hooded kid's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
 {calmed("gull"): The grumpy gull at the lookout was fizzy too. That hooded kid gets around! # speaker: Fae}
 {has_lantern: Jordan gave me his blacklight lantern. The kid in the purple hood took a secret trail you can only see in its light! # speaker: Fae}
@@ -673,7 +677,8 @@ The Enchanted Forest is sealed. Whoever the boss is, the note does not say. # sp
 -> DONE
 
 = clubhouse_again
-The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a garden. # speaker: Fae
+{not (fridge_fixed and garden_planted): The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a garden. Up the ladder! # speaker: Fae}
+{fridge_fixed and garden_planted: Our clubhouse! The fridge hums, and strawberries grow on the deck. # speaker: Fae}
 -> DONE
 
 === owl_calm ===
@@ -957,4 +962,97 @@ Fae hops the whole hopscotch on one foot, all the way to 7 and back! # speaker: 
 
 === tetherball ===
 Fae gives the tetherball a whack. Round and round it goes! # speaker: Fae
+-> DONE
+
+// The clubhouse fix-up (Milestone 43).
+VAR fridge_fixed = false
+VAR fridge_baskets = 0
+VAR garden_planted = false
+VAR garden_calms = 0
+VAR garden_sprouted = false
+VAR garden_ripe = false
+
+// The core runs this after every calm (spec 7). It only counts: it never
+// prints. The garden sprouts after one calm and ripens after three.
+=== on_calm ===
+{ garden_planted and not garden_ripe:
+    ~ garden_calms += 1
+    { garden_calms >= 1:
+        ~ garden_sprouted = true
+    }
+    { garden_calms >= 3:
+        ~ garden_ripe = true
+    }
+}
+-> DONE
+
+=== club_fridge ===
+{fridge_fixed: -> stocked}
+An old mini fridge. It's dark inside, and as warm as toast. # speaker: Fae
+Leave it to me! I keep the cooler on my dad's boat running. # speaker: Sue
+Sue wiggles the plug, gives the door a bump with her hip, and... # speaker: Fae
+~ fridge_fixed = true
+Hummmm! The little fridge shivers, and a cool glow comes on inside. # speaker: Fae
+Ta-da! Cold and humming. Now the club needs something to keep in it. # speaker: Sue
+{not garden_planted: Jordan, didn't you bring seeds? # speaker: Sue}
+-> DONE
+= stocked
+{fridge_baskets == 0 and not garden_planted: The fridge hums away, nice and cold. It's empty. # speaker: Fae}
+{fridge_baskets == 0 and garden_planted: The fridge hums away, nice and cold. Strawberries from the deck will keep in here. # speaker: Fae}
+{fridge_baskets == 0: -> DONE}
+The fridge is full of cold strawberries from the deck! # speaker: Fae
++ [Take them]
+    -> take
++ [Leave them]
+    They'll keep. # speaker: Fae
+    -> DONE
+= take
+~ fridge_baskets -= 1
+Fae packs three strawberry snacks into her backpack. # speaker: Fae # gift: snack 3
+{fridge_baskets > 0: -> take}
+Snacks for the road! Critters love strawberries. # speaker: Jordan
+-> DONE
+
+=== club_ladder ===
+A ladder up to somebody's secret clubhouse. It smells like purple fizzy soda up there. # speaker: Fae
+It isn't ours to climb into... yet. # speaker: Fae
+-> DONE
+
+=== club_comics ===
+A stack of comics about a superhero cat. Somebody read them over and over: the corners are all soft. # speaker: Fae
+-> DONE
+
+=== club_bottles ===
+Empty bottles of fizzy purple soda, left behind by the kid in the purple hood. # speaker: Fae
+{not (fridge_fixed and garden_planted): Let's keep our clubhouse soda-free! # speaker: Sue}
+-> DONE
+
+=== club_garden ===
+{garden_ripe: -> ripe}
+{garden_sprouted: -> growing}
+{garden_planted: -> planted}
+Long wooden planter boxes, full of soil, with nothing growing. # speaker: Fae
+Perfect! I saved strawberry seeds all the way from the pass. # speaker: Jordan
+Jordan pokes the seeds into the soil, one by one, and marks each row with a stick. # speaker: Fae
+~ garden_planted = true
+My grandma says a garden grows best when everything around it is calm. # speaker: Jordan
+Then let's calm some critters! Every one we calm, the garden will grow a little. # speaker: Fae
+-> DONE
+= planted
+The seeds are tucked in. Calm a critter, and they'll sprout! # speaker: Jordan
+-> DONE
+= growing
+Little green leaves, and tiny white flowers! # speaker: Fae
+{garden_calms <= 1: Two more calm critters, and there'll be strawberries. # speaker: Jordan}
+{garden_calms == 2: One more calm critter, and there'll be strawberries! # speaker: Jordan}
+-> DONE
+= ripe
+Ripe strawberries, red and juicy! # speaker: Fae
+{not fridge_fixed: The fridge isn't working yet. Let's ask Sue to fix it, so they stay fresh! # speaker: Jordan}
+{not fridge_fixed: -> DONE}
+Fae and Jordan fill a whole basket, and tuck it into the fridge. # speaker: Fae
+~ fridge_baskets += 1
+~ garden_ripe = false
+~ garden_calms = 1
+The plants are still growing. Two more calm critters, and there'll be more! # speaker: Jordan
 -> DONE

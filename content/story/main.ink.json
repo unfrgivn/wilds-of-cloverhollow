@@ -401,6 +401,58 @@
       "journal": [
         "ev",
         {
+          "VAR?": "fridge_baskets"
+        },
+        0,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ There are cold strawberries in the clubhouse fridge: snacks for the road! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_ripe"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The strawberries on the clubhouse deck are ripe! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.13"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "bridge_down"
         },
         "/ev",
@@ -415,7 +467,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.20"
               },
               null
             ]
@@ -440,7 +492,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.11"
+                "->": ".^.^.^.27"
               },
               null
             ]
@@ -470,7 +522,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.37"
               },
               null
             ]
@@ -504,7 +556,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.34"
+                "->": ".^.^.^.50"
               },
               null
             ]
@@ -534,7 +586,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.44"
+                "->": ".^.^.^.60"
               },
               null
             ]
@@ -559,7 +611,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
+                "->": ".^.^.^.67"
               },
               null
             ]
@@ -589,7 +641,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.61"
+                "->": ".^.^.^.77"
               },
               null
             ]
@@ -623,7 +675,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.74"
+                "->": ".^.^.^.90"
               },
               null
             ]
@@ -657,7 +709,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.87"
+                "->": ".^.^.^.103"
               },
               null
             ]
@@ -687,7 +739,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.97"
+                "->": ".^.^.^.113"
               },
               null
             ]
@@ -717,7 +769,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.107"
+                "->": ".^.^.^.123"
               },
               null
             ]
@@ -747,7 +799,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.117"
+                "->": ".^.^.^.133"
               },
               null
             ]
@@ -772,7 +824,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.124"
+                "->": ".^.^.^.140"
               },
               null
             ]
@@ -814,7 +866,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.141"
+                "->": ".^.^.^.157"
               },
               null
             ]
@@ -848,7 +900,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.154"
+                "->": ".^.^.^.170"
               },
               null
             ]
@@ -948,7 +1000,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.164"
+                "->": ".^.^.^.180"
               },
               null
             ]
@@ -973,7 +1025,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.171"
+                "->": ".^.^.^.187"
               },
               null
             ]
@@ -1003,7 +1055,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.181"
+                "->": ".^.^.^.197"
               },
               null
             ]
@@ -1037,7 +1089,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.193"
+                "->": ".^.^.^.209"
               },
               null
             ]
@@ -1062,7 +1114,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.200"
+                "->": ".^.^.^.216"
               },
               null
             ]
@@ -1092,7 +1144,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.210"
+                "->": ".^.^.^.226"
               },
               null
             ]
@@ -1126,7 +1178,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.223"
+                "->": ".^.^.^.239"
               },
               null
             ]
@@ -1155,7 +1207,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.233"
+                "->": ".^.^.^.249"
               },
               null
             ]
@@ -1184,7 +1236,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.243"
+                "->": ".^.^.^.259"
               },
               null
             ]
@@ -1218,7 +1270,62 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.256"
+                "->": ".^.^.^.272"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_planted"
+        },
+        {
+          "VAR?": "garden_ripe"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Jordan planted strawberries on the clubhouse deck. Every critter I calm helps them grow. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.282"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "fridge_fixed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Sue fixed the clubhouse's old mini fridge. It's cold and humming! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.289"
               },
               null
             ]
@@ -1231,6 +1338,15 @@
         {
           "VAR?": "clubhouse_claimed"
         },
+        {
+          "VAR?": "fridge_fixed"
+        },
+        {
+          "VAR?": "garden_planted"
+        },
+        "&&",
+        "!",
+        "&&",
         "/ev",
         [
           {
@@ -1243,7 +1359,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.263"
+                "->": ".^.^.^.301"
               },
               null
             ]
@@ -1268,7 +1384,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.270"
+                "->": ".^.^.^.308"
               },
               null
             ]
@@ -1297,7 +1413,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.280"
+                "->": ".^.^.^.318"
               },
               null
             ]
@@ -1322,7 +1438,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.287"
+                "->": ".^.^.^.325"
               },
               null
             ]
@@ -1347,7 +1463,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.294"
+                "->": ".^.^.^.332"
               },
               null
             ]
@@ -1384,7 +1500,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.309"
+                "->": ".^.^.^.347"
               },
               null
             ]
@@ -1409,7 +1525,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.316"
+                "->": ".^.^.^.354"
               },
               null
             ]
@@ -1443,7 +1559,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.329"
+                "->": ".^.^.^.367"
               },
               null
             ]
@@ -1472,7 +1588,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.339"
+                "->": ".^.^.^.377"
               },
               null
             ]
@@ -1497,7 +1613,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.346"
+                "->": ".^.^.^.384"
               },
               null
             ]
@@ -1522,7 +1638,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.353"
+                "->": ".^.^.^.391"
               },
               null
             ]
@@ -1552,7 +1668,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.363"
+                "->": ".^.^.^.401"
               },
               null
             ]
@@ -1582,7 +1698,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.373"
+                "->": ".^.^.^.411"
               },
               null
             ]
@@ -1607,7 +1723,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.380"
+                "->": ".^.^.^.418"
               },
               null
             ]
@@ -1636,7 +1752,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.390"
+                "->": ".^.^.^.428"
               },
               null
             ]
@@ -1674,7 +1790,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.406"
+                "->": ".^.^.^.444"
               },
               null
             ]
@@ -1701,7 +1817,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.415"
+                "->": ".^.^.^.453"
               },
               null
             ]
@@ -1730,7 +1846,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.425"
+                "->": ".^.^.^.463"
               },
               null
             ]
@@ -1755,7 +1871,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.432"
+                "->": ".^.^.^.470"
               },
               null
             ]
@@ -1784,7 +1900,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.443"
+                "->": ".^.^.^.481"
               },
               null
             ]
@@ -1813,7 +1929,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.454"
+                "->": ".^.^.^.492"
               },
               null
             ]
@@ -5277,9 +5393,63 @@
         "done",
         {
           "clubhouse_again": [
-            "^The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a garden. ",
-            "#",
-            "^speaker: Fae",
+            "ev",
+            {
+              "VAR?": "fridge_fixed"
+            },
+            {
+              "VAR?": "garden_planted"
+            },
+            "&&",
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ The clubhouse is ours now. Sue is planning a fridge, and Jordan is planning a garden. Up the ladder! ",
+                  "#",
+                  "^speaker: Fae",
+                  {
+                    "->": ".^.^.^.7"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "fridge_fixed"
+            },
+            {
+              "VAR?": "garden_planted"
+            },
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Our clubhouse! The fridge hums, and strawberries grow on the deck. ",
+                  "#",
+                  "^speaker: Fae",
+                  {
+                    "->": ".^.^.^.16"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "/#",
             "\n",
             "done",
@@ -7690,6 +7860,728 @@
         "done",
         null
       ],
+      "on_calm": [
+        "ev",
+        {
+          "VAR?": "garden_planted"
+        },
+        {
+          "VAR?": "garden_ripe"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "garden_calms"
+              },
+              1,
+              "+",
+              {
+                "VAR=": "garden_calms",
+                "re": true
+              },
+              "/ev",
+              "ev",
+              {
+                "VAR?": "garden_calms"
+              },
+              1,
+              ">=",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "\n",
+                    "ev",
+                    true,
+                    "/ev",
+                    {
+                      "VAR=": "garden_sprouted",
+                      "re": true
+                    },
+                    {
+                      "->": ".^.^.^.13"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "\n",
+              "ev",
+              {
+                "VAR?": "garden_calms"
+              },
+              3,
+              ">=",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "\n",
+                    "ev",
+                    true,
+                    "/ev",
+                    {
+                      "VAR=": "garden_ripe",
+                      "re": true
+                    },
+                    {
+                      "->": ".^.^.^.21"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "\n",
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "done",
+        null
+      ],
+      "club_fridge": [
+        "ev",
+        {
+          "VAR?": "fridge_fixed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.stocked"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^An old mini fridge. It's dark inside, and as warm as toast. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Leave it to me! I keep the cooler on my dad's boat running. ",
+        "#",
+        "^speaker: Sue",
+        "/#",
+        "\n",
+        "^Sue wiggles the plug, gives the door a bump with her hip, and... ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "fridge_fixed",
+          "re": true
+        },
+        "^Hummmm! The little fridge shivers, and a cool glow comes on inside. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Ta-da! Cold and humming. Now the club needs something to keep in it. ",
+        "#",
+        "^speaker: Sue",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_planted"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Jordan, didn't you bring seeds? ",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.40"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        {
+          "stocked": [
+            [
+              "ev",
+              {
+                "VAR?": "fridge_baskets"
+              },
+              0,
+              "==",
+              {
+                "VAR?": "garden_planted"
+              },
+              "!",
+              "&&",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ The fridge hums away, nice and cold. It's empty. ",
+                    "#",
+                    "^speaker: Fae",
+                    {
+                      "->": ".^.^.^.9"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "/#",
+              "\n",
+              "ev",
+              {
+                "VAR?": "fridge_baskets"
+              },
+              0,
+              "==",
+              {
+                "VAR?": "garden_planted"
+              },
+              "&&",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ The fridge hums away, nice and cold. Strawberries from the deck will keep in here. ",
+                    "#",
+                    "^speaker: Fae",
+                    {
+                      "->": ".^.^.^.20"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "/#",
+              "\n",
+              "ev",
+              {
+                "VAR?": "fridge_baskets"
+              },
+              0,
+              "==",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ ",
+                    "done",
+                    {
+                      "->": ".^.^.^.29"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "\n",
+              "^The fridge is full of cold strawberries from the deck! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Take them",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Leave them",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  {
+                    "->": ".^.^.^.^.take"
+                  },
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "^They'll keep. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "take": [
+            "ev",
+            {
+              "VAR?": "fridge_baskets"
+            },
+            1,
+            "-",
+            {
+              "VAR=": "fridge_baskets",
+              "re": true
+            },
+            "/ev",
+            "^Fae packs three strawberry snacks into her backpack. ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^gift: snack 3",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "fridge_baskets"
+            },
+            0,
+            ">",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^"
+                  },
+                  {
+                    "->": ".^.^.^.20"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^Snacks for the road! Critters love strawberries. ",
+            "#",
+            "^speaker: Jordan",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "club_ladder": [
+        "^A ladder up to somebody's secret clubhouse. It smells like purple fizzy soda up there. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^It isn't ours to climb into... yet. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_comics": [
+        "^A stack of comics about a superhero cat. Somebody read them over and over: the corners are all soft. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_bottles": [
+        "^Empty bottles of fizzy purple soda, left behind by the kid in the purple hood. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "fridge_fixed"
+        },
+        {
+          "VAR?": "garden_planted"
+        },
+        "&&",
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Let's keep our clubhouse soda-free! ",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "club_garden": [
+        "ev",
+        {
+          "VAR?": "garden_ripe"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.ripe"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_sprouted"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.growing"
+              },
+              {
+                "->": ".^.^.^.10"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "garden_planted"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.planted"
+              },
+              {
+                "->": ".^.^.^.16"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Long wooden planter boxes, full of soil, with nothing growing. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Perfect! I saved strawberry seeds all the way from the pass. ",
+        "#",
+        "^speaker: Jordan",
+        "/#",
+        "\n",
+        "^Jordan pokes the seeds into the soil, one by one, and marks each row with a stick. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "garden_planted",
+          "re": true
+        },
+        "^My grandma says a garden grows best when everything around it is calm. ",
+        "#",
+        "^speaker: Jordan",
+        "/#",
+        "\n",
+        "^Then let's calm some critters! Every one we calm, the garden will grow a little. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "planted": [
+            "^The seeds are tucked in. Calm a critter, and they'll sprout! ",
+            "#",
+            "^speaker: Jordan",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "growing": [
+            "^Little green leaves, and tiny white flowers! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "garden_calms"
+            },
+            1,
+            "<=",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ Two more calm critters, and there'll be strawberries. ",
+                  "#",
+                  "^speaker: Jordan",
+                  {
+                    "->": ".^.^.^.11"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "garden_calms"
+            },
+            2,
+            "==",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ One more calm critter, and there'll be strawberries! ",
+                  "#",
+                  "^speaker: Jordan",
+                  {
+                    "->": ".^.^.^.20"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "ripe": [
+            "^Ripe strawberries, red and juicy! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "fridge_fixed"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ The fridge isn't working yet. Let's ask Sue to fix it, so they stay fresh! ",
+                  "#",
+                  "^speaker: Jordan",
+                  {
+                    "->": ".^.^.^.10"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "fridge_fixed"
+            },
+            "!",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  "done",
+                  {
+                    "->": ".^.^.^.18"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^Fae and Jordan fill a whole basket, and tuck it into the fridge. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "fridge_baskets"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "fridge_baskets",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            false,
+            "/ev",
+            {
+              "VAR=": "garden_ripe",
+              "re": true
+            },
+            "ev",
+            1,
+            "/ev",
+            {
+              "VAR=": "garden_calms",
+              "re": true
+            },
+            "^The plants are still growing. Two more calm critters, and there'll be more! ",
+            "#",
+            "^speaker: Jordan",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -7835,6 +8727,30 @@
         false,
         {
           "VAR=": "bridge_down"
+        },
+        false,
+        {
+          "VAR=": "fridge_fixed"
+        },
+        0,
+        {
+          "VAR=": "fridge_baskets"
+        },
+        false,
+        {
+          "VAR=": "garden_planted"
+        },
+        0,
+        {
+          "VAR=": "garden_calms"
+        },
+        false,
+        {
+          "VAR=": "garden_sprouted"
+        },
+        false,
+        {
+          "VAR=": "garden_ripe"
         },
         "/ev",
         "end",

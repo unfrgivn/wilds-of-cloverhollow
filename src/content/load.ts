@@ -14,6 +14,7 @@ import arcadeData from "../../content/areas/arcade.json";
 import eastHallData from "../../content/areas/east-hall.json";
 import musicData from "../../content/areas/music.json";
 import fieldData from "../../content/areas/field.json";
+import clubhouseData from "../../content/areas/clubhouse.json";
 import harnessSurfaceData from "../../content/surfaces/harness.json";
 import bedroomSurfaceData from "../../content/surfaces/bedroom.json";
 import plazaSurfaceData from "../../content/surfaces/plaza.json";
@@ -30,6 +31,7 @@ import arcadeSurfaceData from "../../content/surfaces/arcade.json";
 import eastHallSurfaceData from "../../content/surfaces/east-hall.json";
 import musicSurfaceData from "../../content/surfaces/music.json";
 import fieldSurfaceData from "../../content/surfaces/field.json";
+import clubhouseSurfaceData from "../../content/surfaces/clubhouse.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -45,6 +47,7 @@ import woodsPropsData from "../../content/props/woods.json";
 import eastHallPropsData from "../../content/props/east-hall.json";
 import musicPropsData from "../../content/props/music.json";
 import fieldPropsData from "../../content/props/field.json";
+import clubhousePropsData from "../../content/props/clubhouse.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -60,6 +63,7 @@ import kitchenFixtureData from "../../content/fixtures/kitchen.json";
 import classroomFixtureData from "../../content/fixtures/classroom.json";
 import gymFixtureData from "../../content/fixtures/gym.json";
 import eastHallFixtureData from "../../content/fixtures/east-hall.json";
+import clubhouseFixtureData from "../../content/fixtures/clubhouse.json";
 import musicFixtureData from "../../content/fixtures/music.json";
 import arcadeFixtureData from "../../content/fixtures/arcade.json";
 import tunableData from "../../content/tunables.json";
@@ -272,6 +276,8 @@ export function storyTagErrors(tags: string[], areas: Record<string, Area>): str
     }
     if (tag.startsWith("buy:"))
       return /^buy:\s*snack\s+\d+$/.test(tag) ? [] : [`invalid buy tag "${tag}"`];
+    if (tag.startsWith("gift:"))
+      return /^gift:\s*snack\s+[1-9]\d*$/.test(tag) ? [] : [`invalid gift tag "${tag}"`];
     if (tag.startsWith("sound:")) {
       const sound = tag.slice("sound:".length).trim();
       return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
@@ -1053,6 +1059,8 @@ export function loadContent(): {
     parsePropCatalogue(musicPropsData, "content/props/music.json"));
   const playingField = parseArea(fieldData, "content/areas/field.json",
     parsePropCatalogue(fieldPropsData, "content/props/field.json"));
+  const clubhouse = parseArea(clubhouseData, "content/areas/clubhouse.json",
+    parsePropCatalogue(clubhousePropsData, "content/props/clubhouse.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -1130,6 +1138,7 @@ export function loadContent(): {
     classroom: parseFixture(classroomFixtureData, "content/fixtures/classroom.json"),
     gym: parseFixture(gymFixtureData, "content/fixtures/gym.json"),
     "east-hall": parseFixture(eastHallFixtureData, "content/fixtures/east-hall.json"),
+    clubhouse: parseFixture(clubhouseFixtureData, "content/fixtures/clubhouse.json"),
     music: parseFixture(musicFixtureData, "content/fixtures/music.json"),
     arcade: parseFixture(arcadeFixtureData, "content/fixtures/arcade.json"),
   };
@@ -1154,6 +1163,7 @@ export function loadContent(): {
     [eastHall.id]: eastHall,
     [music.id]: music,
     [playingField.id]: playingField,
+    [clubhouse.id]: clubhouse,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -1161,7 +1171,7 @@ export function loadContent(): {
     classroom: classroomSurfaceData, gym: gymSurfaceData, bay: baySurfaceData,
     pass: passSurfaceData, trail: trailSurfaceData, woods: woodsSurfaceData,
     arcade: arcadeSurfaceData, "east-hall": eastHallSurfaceData, music: musicSurfaceData,
-    field: fieldSurfaceData,
+    field: fieldSurfaceData, clubhouse: clubhouseSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));

@@ -196,6 +196,35 @@
         "area": "pass",
         "spawn": "woods"
       }
+    },
+    {
+      "id": "clubhouse",
+      "polygon": [
+        [
+          692,
+          482
+        ],
+        [
+          748,
+          456
+        ],
+        [
+          768,
+          488
+        ],
+        [
+          712,
+          514
+        ]
+      ],
+      "target": {
+        "area": "clubhouse",
+        "spawn": "ladder"
+      },
+      "requires": {
+        "variable": "clubhouse_claimed",
+        "knot": "club_ladder"
+      }
     }
   ],
   "interactables": [
@@ -245,6 +274,11 @@
       "x": 180,
       "y": 540,
       "facing": "right"
+    },
+    "clubhouse": {
+      "x": 735,
+      "y": 548,
+      "facing": "down"
     }
   },
   "npcs": [],

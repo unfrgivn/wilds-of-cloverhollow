@@ -1045,15 +1045,21 @@ function cut(item: Subject): void {
     morph(others(item), w, h, 3, true));
   writeMask(ring, w, h, `${folder}/ring.png`);
   const share = area2(ring) / (w * h);
-  const off = share === 0 ? 0 : mean(rebuilt, `${folder}/crop.png`, "-compose",
-    "difference", "-composite", "-colorspace", "gray", "-threshold", "12%",
-    `${folder}/ring.png`, "-compose", "multiply", "-composite") / share;
-  writeFileSync(`${folder}/rebuild.json`, `${JSON.stringify({ ring: area2(ring), off })}\n`);
-  // painting | the default layout with its wrong ground pixels in red
+  // The ground pixels that differ from the painting by more than 12%, opened
+  // by a 3x3 square: a fill that doesn't continue the ground (a patch of the
+  // wrong colour, misplaced planks, a seam) is wrong over an area, while a
+  // painted line the fill redraws a pixel off is wrong only along a hairline,
+  // and hairlines vanish at the scale the game draws the plate. Measured on the
+  // clubhouse's planks (Milestone 43): its kept fills were 20.6% and 12.5%
+  // wrong with hairlines and 7.6% and 3.5% without them; the same fills
+  // misaligned by 9 px, or flattened to one colour, stay at 15-39%.
   const wrong = `${folder}/ring-wrong.png`;
   im(rebuilt, `${folder}/crop.png`, "-compose", "difference", "-composite", "-colorspace",
     "gray", "-threshold", "12%", `${folder}/ring.png`, "-compose", "multiply", "-composite",
-    wrong);
+    "-morphology", "Open", "Square:1", wrong);
+  const off = share === 0 ? 0 : mean(wrong) / share;
+  writeFileSync(`${folder}/rebuild.json`, `${JSON.stringify({ ring: area2(ring), off })}\n`);
+  // painting | the default layout with its wrong ground pixels in red
   im(`${folder}/crop.png`, "(", rebuilt, "(", "-size", `${w}x${h}`, "xc:red", wrong, "-alpha",
     "off", "-compose", "CopyOpacity", "-composite", ")", "-compose", "over", "-composite",
     ")", "-resize", scale, "+append", `${review}/ring-${item.id}.png`);

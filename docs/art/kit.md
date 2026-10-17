@@ -123,6 +123,11 @@ View every image in `art/review/kit/<area>/` before packing:
 
 - `masks-<id>.png`: the samples, the final mask, the hole;
 - `proof-<id>.png`: painting, plate, rebuilt, moved, cutout;
+- `ring-<id>.png`: a lifted prop's ground in the default layout, the pixels
+  its fill rebuilds wrong in red. `pack` refuses more than 8% wrong: pixels
+  over 12% off the painting, less hairlines (opened by a 3x3 square), since a
+  painted line redrawn a pixel off doesn't show, while a patch of the wrong
+  colour or misplaced planks does;
 - `complete-<id>.png`: the input and each completion;
 - `rebuilt-vs-painting.png` and `plate.png`.
 

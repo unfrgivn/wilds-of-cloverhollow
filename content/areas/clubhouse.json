@@ -1,0 +1,195 @@
+{
+  "id": "clubhouse",
+  "name": "Clubhouse",
+  "land": "forest",
+  "ground": "clubhouse",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      291,
+      429
+    ],
+    [
+      595,
+      295
+    ],
+    [
+      972,
+      468
+    ],
+    [
+      866,
+      516
+    ],
+    [
+      740,
+      581
+    ],
+    [
+      705,
+      628
+    ],
+    [
+      563,
+      552
+    ],
+    [
+      587,
+      500
+    ],
+    [
+      476,
+      552
+    ],
+    [
+      370,
+      606
+    ],
+    [
+      270,
+      552
+    ],
+    [
+      164,
+      498
+    ],
+    [
+      247,
+      446
+    ]
+  ],
+  "blockers": [],
+  "triggers": [
+    {
+      "id": "ladder",
+      "polygon": [
+        [
+          599,
+          500
+        ],
+        [
+          725,
+          573
+        ],
+        [
+          697,
+          621
+        ],
+        [
+          571,
+          548
+        ]
+      ],
+      "target": {
+        "area": "woods",
+        "spawn": "clubhouse"
+      }
+    }
+  ],
+  "spawns": {
+    "ladder": {
+      "x": 687,
+      "y": 493,
+      "facing": "up"
+    }
+  },
+  "interactables": [
+    {
+      "id": "club-fridge",
+      "point": {
+        "x": 585,
+        "y": 390
+      },
+      "knot": "club_fridge",
+      "prompt": "Look"
+    },
+    {
+      "id": "club-garden",
+      "point": {
+        "x": 800,
+        "y": 565
+      },
+      "knot": "club_garden",
+      "prompt": "Look"
+    },
+    {
+      "id": "comics",
+      "point": {
+        "x": 742,
+        "y": 418
+      },
+      "knot": "club_comics",
+      "prompt": "Look"
+    },
+    {
+      "id": "bottles",
+      "point": {
+        "x": 470,
+        "y": 375
+      },
+      "knot": "club_bottles",
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [],
+  "critters": [],
+  "props": [
+    {
+      "id": "fridge",
+      "prop": "fridge",
+      "x": 586,
+      "y": 366,
+      "rules": [
+        {
+          "state": "fixed",
+          "while": "fridge_fixed"
+        }
+      ]
+    },
+    {
+      "id": "crate",
+      "prop": "crate",
+      "x": 742,
+      "y": 406
+    },
+    {
+      "id": "beanbag",
+      "prop": "beanbag",
+      "x": 869,
+      "y": 456
+    },
+    {
+      "id": "rail-sw",
+      "prop": "rail-sw",
+      "x": 376,
+      "y": 606
+    },
+    {
+      "id": "rail-se",
+      "prop": "rail-se",
+      "x": 779,
+      "y": 685
+    },
+    {
+      "id": "garden",
+      "prop": "garden",
+      "x": 795,
+      "y": 720,
+      "rules": [
+        {
+          "state": "ripe",
+          "while": "garden_ripe"
+        },
+        {
+          "state": "growing",
+          "while": "garden_sprouted"
+        },
+        {
+          "state": "planted",
+          "while": "garden_planted"
+        }
+      ]
+    }
+  ]
+}

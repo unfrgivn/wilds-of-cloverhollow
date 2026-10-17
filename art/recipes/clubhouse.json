@@ -1,0 +1,39 @@
+{
+  "asset": "clubhouse painting and seasonal edits",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 6,
+  "references": [
+    "art/source/areas/music/music-final.png",
+    "art/source/areas/woods/woods-final.png",
+    "docs/art/concepts/environments/clubhouse_exterior.png",
+    "public/assets/characters/fae/fae.png"
+  ],
+  "selected": "art/source/areas/clubhouse/clubhouse-final.png",
+  "prompt_summary": "Weathered Whispering Woods clubhouse interior in the approved music-room cutaway style, with open deck, centered ladder, rope rails, bare planters, dark open fridge, beanbag, crate table, purple bottles, drawings, string lights, round window, shelf, and open floor.",
+  "choice": "The first sample had a light fridge and text-like comic marks. The second corrected the fridge to dark and switched off, and was used as the base because it retained the room composition while removing readable text. Three exact-frame seasonal edits were generated from that selected base.",
+  "generation_source_note": "Generated painting is appropriate for this hand-painted game environment; open media sources are for sounds/photos, not this bespoke watercolor scene.",
+  "scale_reference": "Fae 280 source pixels; classroom-style door/window scale from the approved music room.",
+  "post_processing": [
+    "The base (2528x1696) was resized with Lanczos to 2400x1610 and cropped 5 px from the top to 2400x1600: the painting's tiles (art/source/areas/clubhouse/painting/), 1200x800 units at 2 px per unit.",
+    "The three edits went through exactly the same resize and crop, and are kept at that size (2400x1600 PNG), like the field's second painting: the kit cuts the fridge's and the garden's other states from them (art/kit/clubhouse.json, painting).",
+    "Registration, measured 2026-10-17 by matching features against the base: median 0 units everywhere; at most 1.1 units (fixed), 1.4 (growing), and 1.7 (ripe) at the 90th percentile. Left as it is."
+  ],
+  "outputs": {
+    "source": "art/source/areas/clubhouse/clubhouse-final.png",
+    "second_paintings": [
+      "art/source/areas/clubhouse/clubhouse-fixed.png",
+      "art/source/areas/clubhouse/clubhouse-growing.png",
+      "art/source/areas/clubhouse/clubhouse-ripe.png"
+    ],
+    "tiles": "art/source/areas/clubhouse/painting/ (the plate is written by the kit)",
+    "area": "content/areas/clubhouse.json"
+  },
+  "drift_review": "Pixel-colour drift outside the edited regions (the edits repaint the light and texture) is not registration: the features match the base (post_processing).",
+  "raw_outputs": {
+    "art/source/areas/clubhouse/clubhouse-final.png": "1792240328198-gemini-3-pro-image-preview-0.png (kept byte for byte; the second of two samples)",
+    "art/source/areas/clubhouse/clubhouse-fixed.png": "1792240418608-gemini-3-pro-image-preview-0.png, an edit of the base",
+    "art/source/areas/clubhouse/clubhouse-growing.png": "1792240458642-gemini-3-pro-image-preview-0.png, an edit of the fixed edit",
+    "art/source/areas/clubhouse/clubhouse-ripe.png": "1792240487143-gemini-3-pro-image-preview-0.png, an edit of the growing edit"
+  }
+}

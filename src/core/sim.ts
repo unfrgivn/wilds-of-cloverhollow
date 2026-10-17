@@ -25,7 +25,7 @@ import type {
   SetPiece,
   Wild,
 } from "./types";
-import { createInkState, runInk, type InkFacts } from "./ink";
+import { createInkState, runInk, storyHasKnot, type InkFacts } from "./ink";
 import { sceneryArea } from "./props";
 import {
   checkHint,
@@ -910,7 +910,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       };
     } else if (next.phase === "reward") {
       const den = next.den;
-      return {
+      return afterCalm(world, {
         ...nextBase,
         ...(den === null
           ? { critters: { ...state.critters, [next.critterId]: "calm" } }
@@ -921,7 +921,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           ? state.stickers
           : [...state.stickers, next.rewardSticker],
         battle: null,
-      };
+      });
     } else if (next.phase === "run") {
       const den = next.den;
       const area = world.areas[state.area];
@@ -1098,12 +1098,35 @@ function dialogueState(
   };
 }
 
-// A line tagged `buy: snack <price>` sells Fae a snack as it's shown (spec
-// 7). The loader allows no other item or price format.
-function applyBuyTag(state: State, tags: string[]): State {
-  const price = tags.map((tag) => /^buy:\s*snack\s+(\d+)$/.exec(tag.trim())?.[1])
-    .find((item) => item !== undefined);
-  return price === undefined ? state : purchaseSnack(state, Number(price));
+// A line's item tags act as it's shown (spec 7): `buy: snack <price>` sells
+// Fae a snack, and `gift: snack <count>` gives her snacks (the clubhouse
+// fridge). The loader allows no other item or format.
+function applyItemTags(state: State, tags: string[]): State {
+  let next = state;
+  for (const tag of tags) {
+    const price = /^buy:\s*snack\s+(\d+)$/.exec(tag.trim())?.[1];
+    if (price !== undefined) next = purchaseSnack(next, Number(price));
+    const count = /^gift:\s*snack\s+(\d+)$/.exec(tag.trim())?.[1];
+    if (count !== undefined) next = { ...next, snacks: next.snacks + Number(count) };
+  }
+  return next;
+}
+
+/*
+ * The story hears about every calm (spec 7): after a battle ends in a calm,
+ * the core runs the story's `on_calm` knot, if it has one, with the facts as
+ * they are now. The knot only updates variables (the clubhouse garden counts
+ * calms); one that prints a line or offers a choice changes nothing.
+ */
+export const CALM_HOOK = "on_calm";
+
+function afterCalm(world: World, state: State): State {
+  if (!storyHasKnot(world.story, CALM_HOOK)) return state;
+  const result = runInk(world.story, state.ink, { type: "start", knot: CALM_HOOK },
+    inkFacts(world, state));
+  return result.line === null && result.choices.length === 0 && result.ended
+    ? { ...state, ink: result.ink }
+    : state;
 }
 
 function closeDialogue(state: State): State {
@@ -1162,7 +1185,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     const following = result.line === null && result.choices.length === 0
       ? null
       : dialogueState(dialogue.knot, result, dialogue.travel);
-    const advanced = applyBuyTag({ ...next, ink: result.ink }, result.line?.tags ?? []);
+    const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(advanced)
       : { ...advanced, dialogue: following };
@@ -1185,7 +1208,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     const following = result.line === null && result.choices.length === 0
       ? null
       : dialogueState(dialogue.knot, result, dialogue.travel);
-    const advanced = applyBuyTag({ ...next, ink: result.ink }, result.line?.tags ?? []);
+    const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(advanced)
       : { ...advanced, dialogue: following };
@@ -1669,7 +1692,7 @@ function stepTick(
         inkFacts(world, state),
       );
       return {
-        state: {
+        state: applyItemTags({
           ...state,
           tick: state.tick + 1,
           ink: result.ink,
@@ -1677,7 +1700,7 @@ function stepTick(
           dialogue: dialogueState(target.knot, result),
           motion: { ...state.motion, moving: false },
           party: haltedParty(state.party),
-        },
+        }, result.line?.tags ?? []),
         events: [],
       };
     }
@@ -1826,7 +1849,12 @@ function stepTick(
       rng: moved.rng,
       backLink,
     };
-  return { state: nextState, events };
+  return {
+    state: knock === undefined
+      ? nextState
+      : applyItemTags(nextState, knock.result.line?.tags ?? []),
+    events,
+  };
 }
 
 export function step(

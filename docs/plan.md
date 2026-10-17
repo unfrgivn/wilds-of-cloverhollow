@@ -1506,6 +1506,70 @@ the old trail, the owl, and the clubhouse claim.
     all three lanes, so the keys and the stickers are each tested high,
     middle, and low.
 
+## Milestone 43: The clubhouse fix-up **Status:** ✅ Completed (2026-10-17)
+- Sue and Jordan keep the promises they made when the Whispering Woods
+  clubhouse became Fae's club (Milestone 26): a fridge for snacks, and a
+  garden (NOTES.md: the clubhouse ideas).
+- Inside the clubhouse (area `clubhouse`, painted whole and split into a
+  kit): once the club is claimed, the tree house's ladder in the woods is a
+  door (trigger `clubhouse`, `requires` `clubhouse_claimed`, knot
+  `club_ladder`: "It isn't ours to climb into... yet."). The room is a
+  cutaway of the tree house's one room and its deck: plank walls, the round
+  window, string lights, the beanbag, a crate table with comics, the kid's
+  purple soda bottles, an old mini fridge, and three planter boxes along the
+  deck's railing. The ladder's top in the deck leads back down.
+- Sue fixes the fridge (`fridge_fixed`): dark and warm until she bumps it
+  back to life. Jordan plants strawberries (`garden_planted`): "a garden
+  grows best when everything around it is calm." Every calm after that,
+  anywhere, grows it: one sprouts it, three ripen it. Ripe strawberries go
+  into the fridge a basket at a time (once it works), and each basket is
+  three snacks. The plants keep growing: two more calms ripen them again.
+- The fridge's fixed look and the garden's planted, growing, and ripe looks
+  are prop states cut from three more paintings of the room (spec 6.2).
+- Engine:
+  - The calm hook: after every calm the core runs the story's `on_calm`
+    knot silently (spec 7), so the story can count calms.
+  - A `gift: snack <count>` line tag gives Fae snacks as the line is shown,
+    like `buy:`. Item tags now apply on a conversation's opening line and
+    a locked door's too.
+  - The kit's fill check ignores hairline differences (spec 6.2,
+    `docs/art/kit.md`): a painted line redrawn a pixel off doesn't show,
+    while a wrong patch still fails.
+- Evidence: unit tests (`clubhouse.test.ts`: the fridge, the garden's stages
+  and their prop states, the calm hook through a real battle (it fails with
+  the hook off), the gift tag through the core's own dialogue, the opening
+  line included (fails without it), the snacks, the ladder shut then open and
+  back down, the journal, and the area checks; `clubhouse-replay.test.ts`),
+  the recorded run `pass-party/clubhouse.json`
+  (`tools/sim/record-clubhouse.ts`, on from the woods run: the lantern off,
+  the fix-up, calms in the woods, climbing up and back down for fresh
+  critters, until the strawberries are ripe, the picking, and the snacks), and
+  its real-key e2e `clubhouse.spec.ts` (arriving, the fridge humming, the
+  garden growing and ripe, the snacks, at both sizes; the props' states in
+  order; browser and Bun hashes match). Gates: `just check` (582 unit tests,
+  the sim, purity, lint), `just build`, and `just e2e` (440 passed, 2
+  skipped).
+- Notes and assumptions:
+  - Growth by calms, not by time: spec 13 keeps day and night out of scope,
+    and every calm already pays, so the garden is a gentle bonus (two calms,
+    three snacks) rather than a farm.
+  - The fix-up is story beats, not decorating: spec 13 keeps home
+    customization out of scope.
+  - No existing run changes: the woods run ends where it did, and the ladder
+    door is off its path. The clubhouse run branches from the woods run's
+    end (like the arcade run), so the chain to the field doesn't move.
+  - The old fridge and the garden are lifted (their states change); the
+    crate, the beanbag, and the rope railing are painted. The ladder's hole
+    is the floor's notch between the two runs of railing.
+  - The kit's fill check counted every pixel over 12% off, so the fills of
+    the clubhouse's planks, whose painted lines the model redraws a pixel off,
+    failed at 20.6% and 12.5% though they continue the planks. Opened by a
+    3x3 square, they measure 5.3% and 3.6%; the same fills misaligned by 9
+    px or flattened to one colour measure 15-39%, so wrong fills still fail.
+  - Gemini calls: 37 (the painting and its three edits 6; the kit 31).
+  - The clubhouse, its four paintings, the props, and the wording are in
+    the owner's review queue.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1798,13 +1862,12 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Next (owner, 2026-10-17, from `docs/battle-ideas.md`): Milestone 41,
     Catch: done (above). Then Milestone 42, feelings, with the next-feeling
     and lantern peeks.
-  - Then: the clubhouse fix-up (a fridge for snacks,
-    the garden). The kid's identity is kept for the very end (owner,
-    2026-10-07).
+  - Milestone 43, the clubhouse fix-up: done (above).
+  - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)
-Calling animal friends with the flute, more places for the lasso, the
-clubhouse fix-up, and more
+Calling animal friends with the flute, more places for the lasso, more for
+the clubhouse (NOTES.md: a chest, a microwave), and more
 mini-bosses (people under the chaos spell, NOTES.md).
 
 Sound follow-ups from Milestone 37:

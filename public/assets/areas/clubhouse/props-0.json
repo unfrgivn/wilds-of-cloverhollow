@@ -1,0 +1,156 @@
+{
+  "frames": {
+    "rail-se": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 860,
+        "h": 621
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 860,
+        "h": 621
+      },
+      "sourceSize": {
+        "w": 860,
+        "h": 621
+      },
+      "anchor": {
+        "x": 0.49767,
+        "y": 0.98229
+      }
+    },
+    "garden-shadow": {
+      "frame": {
+        "x": 862,
+        "y": 0,
+        "w": 1000,
+        "h": 604
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1000,
+        "h": 604
+      },
+      "sourceSize": {
+        "w": 1000,
+        "h": 604
+      },
+      "anchor": {
+        "x": 0.448,
+        "y": 0.92715
+      }
+    },
+    "garden-growing": {
+      "frame": {
+        "x": 0,
+        "y": 623,
+        "w": 970,
+        "h": 590
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 970,
+        "h": 590
+      },
+      "sourceSize": {
+        "w": 970,
+        "h": 590
+      },
+      "anchor": {
+        "x": 0.44536,
+        "y": 0.97288
+      }
+    },
+    "garden-ripe": {
+      "frame": {
+        "x": 972,
+        "y": 623,
+        "w": 880,
+        "h": 590
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 880,
+        "h": 590
+      },
+      "sourceSize": {
+        "w": 880,
+        "h": 590
+      },
+      "anchor": {
+        "x": 0.49091,
+        "y": 0.97288
+      }
+    },
+    "garden": {
+      "frame": {
+        "x": 0,
+        "y": 1215,
+        "w": 970,
+        "h": 580
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 970,
+        "h": 580
+      },
+      "sourceSize": {
+        "w": 970,
+        "h": 580
+      },
+      "anchor": {
+        "x": 0.44433,
+        "y": 0.93621
+      }
+    },
+    "garden-planted": {
+      "frame": {
+        "x": 972,
+        "y": 1215,
+        "w": 970,
+        "h": 555
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 970,
+        "h": 555
+      },
+      "sourceSize": {
+        "w": 970,
+        "h": 555
+      },
+      "anchor": {
+        "x": 0.44536,
+        "y": 0.97117
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1795
+    },
+    "scale": "1"
+  }
+}

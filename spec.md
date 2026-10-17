@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 41, Catch)
+Last updated: 2026-10-17 (Milestone 43, the clubhouse fix-up)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -497,6 +497,28 @@ ios/            Capacitor iOS project (from Milestone 4).
   plays once (`sound: flute`); a wrong song ends with a hint. After that the
   xylophone is free play. Like the lasso, the flute is a story item with no
   button yet.
+- The clubhouse (Milestone 43): `clubhouse`, "Clubhouse", in the `forest` land,
+  is a 1200x800 painted cutaway of the Whispering Woods tree house's one room
+  and its deck. The ladder at the tree house's front in the woods is a door
+  (trigger `clubhouse` to `clubhouse.ladder`, `requires` `clubhouse_claimed`,
+  knot `club_ladder`; the woods' spawn `clubhouse` (735, 548) faces down).
+  Inside, the ladder's top in the deck's hole leads back down (trigger
+  `ladder` to `woods.clubhouse`; spawn `ladder` (687, 493) facing up). Its
+  floor is the plank floor and the deck inside the rope railing. Its props
+  are the old mini fridge, the crate table with its comics, the beanbag, the
+  two runs of rope railing, and the three planter boxes as one prop, the
+  garden. Look points: `club-fridge` (knot `club_fridge`), `club-garden`
+  (`club_garden`), `comics`, and `bottles` (the kid's purple soda bottles).
+- The fix-up (Milestone 43): the fridge's `fixed` state (while
+  `fridge_fixed`) and the garden's `planted`, `growing`, and `ripe` states
+  (while `garden_planted`, `garden_sprouted`, and `garden_ripe`; the ripest
+  that holds wins) are cut from three more paintings of the room. Sue fixes
+  the fridge; Jordan plants strawberries. Through the calm hook (section 7)
+  every calm after the planting grows the garden: one sprouts it, three ripen
+  it, and a ripe garden waits to be picked. Picked (once the fridge works), a
+  basket goes into the fridge (`fridge_baskets`) and the plants are left one
+  calm along, so two more calms ripen them again. Each basket is three snacks
+  (`gift: snack 3`), all taken at once.
 - Recess (Milestone 39): the flute's last line rings the bell (`recess`), and
   Coach Ash props the gym's back door open. `field`, "Playing Field", is a
   1650x1100 painted schoolyard behind the school (no concept sheet): the
@@ -805,10 +827,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   (1180, 420), under its window) and Pinecone Pass's cocoa stand
   (`cocoa_stand`), 5 coins a snack. Their choices are sticky (`+`), so they
   sell on every visit.
+- A line may carry `# gift: snack <count>`: as it's shown, Fae gets `count`
+  snacks for free (the clubhouse fridge, Milestone 43). Item tags (`buy`,
+  `gift`) act on every line they're on, a conversation's opening line and a
+  locked door's included.
 - Load validation reads every tag in the compiled story (`storyTags`: a
   tag's text follows its `#` command, and its `/#` may close in an enclosing
-  container) and rejects a travel tag naming an unknown area or spawn, and
-  any `buy` tag but `snack <digits>`.
+  container) and rejects a travel tag naming an unknown area or spawn, any
+  `buy` tag but `snack <digits>`, and any `gift` tag but `snack <count>`
+  with a count of 1 or more.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's
@@ -816,6 +843,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   the core's state (`inkFacts`) for every command, not only a knot's first
   line. `calmed` answers a set piece by its id from its own mood, and a
   species once Fae owns its sticker (she has calmed one of them, anywhere).
+- The calm hook (Milestone 43): after every battle that ends in a calm (the
+  reward's last confirm), the core runs the story's `on_calm` knot, if it has
+  one, with the facts as they are then, and keeps the variables it sets. It
+  must print nothing: a hook that prints a line or offers a choice changes
+  nothing. The story uses it to count calms for the clubhouse garden.
 - Dialogue state machine (core):
 
   ```
@@ -1225,8 +1257,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   open Fae is frozen, doors, battles, and interactions don't fire, and the
   party keeps settling.
 - Notes: the `journal` Ink knot lists every note that applies, newest first:
-  Coach Ash's lasso, once he has his things back; while Fae hunts for them,
-  the stopwatch and the clipboard both found, the fizzy pup with his
+  on top, what's waiting at the clubhouse (cold strawberries in the fridge,
+  then the ripe garden; Milestone 43); the playing field's footbridge laid
+  down, the hooded kid's stash, the swing across the creek and the lever up
+  on the post, the fizzy squirrel, and recess (Milestone 39); Ms. Willow's
+  flute, the bluebird's note, the mallet given back, the bird with the
+  mallet, how the class song starts, the scribbled song, and music next
+  (Milestone 38); Coach Ash's lasso, once he has his things back; while Fae
+  hunts for them, the stopwatch and the clipboard both found, the fizzy pup with his
   stopwatch, and where the clipboard is (somewhere up high, stuck on the hoop,
   then the lasso lent), and the kid knocking over his cart and running out
   the back door; time for PE; the locked gym doors, once Fae has tried them,
@@ -1234,7 +1272,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   time, until the glimpse; the way back to school for story time, until it
   starts; once Mr. Pip is calm, his fizzy soda from the kid in the purple hood and the
   scribbled-out Star Racer initials; before that, once the clubhouse is
-  claimed, its note sending Fae to the arcade; the clubhouse claimed; the
+  claimed, its note sending Fae to the arcade; the garden planted and the
+  fridge fixed (Milestone 43), else the clubhouse claimed; the
   hooded kid's glowing trail toward the Whispering
   Woods; the grumpy gull; Jordan's lantern and the secret trail only it
   shows; Jordan on the team; the Cliffside Trail's bunnies and squirrels

@@ -1,0 +1,919 @@
+{
+  "area": "clubhouse",
+  "subjects": [
+    {
+      "id": "fridge",
+      "crop": [
+        515,
+        150,
+        160,
+        225
+      ],
+      "seed": [
+        560,
+        250
+      ],
+      "painted": false,
+      "ground": "the clubhouse's weathered wooden plank walls meeting in the back corner, and the wooden plank floor in front of them, in the same soft watercolour and warm brown ink",
+      "object": "the old pastel mini fridge standing in the back corner: its rounded body, its open door on the right with the shelves inside it, and its little feet; not the walls, the floor, the bottles, the drawings, or the string lights",
+      "footprint": [
+        [
+          [
+            532,
+            330
+          ],
+          [
+            595,
+            302
+          ],
+          [
+            640,
+            324
+          ],
+          [
+            640,
+            346
+          ],
+          [
+            578,
+            366
+          ],
+          [
+            532,
+            350
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1,
+        "fill": 1
+      }
+    },
+    {
+      "id": "fridge-fixed",
+      "painting": "art/source/areas/clubhouse/clubhouse-fixed.png",
+      "stateOf": "fridge.fixed",
+      "crop": [
+        515,
+        150,
+        160,
+        225
+      ],
+      "seed": [
+        560,
+        250
+      ],
+      "painted": true,
+      "ground": "the clubhouse's weathered wooden plank walls meeting in the back corner, and the wooden plank floor in front of them, in the same soft watercolour and warm brown ink",
+      "object": "the pastel mini fridge in the back corner with its door shut: its rounded body, the shut door with its handle, the magnets and the little drawing on the door, its soft cool glow, and its little feet; not the walls, the floor, the bottles, the drawings on the wall, or the string lights",
+      "footprint": [
+        [
+          [
+            532,
+            330
+          ],
+          [
+            595,
+            302
+          ],
+          [
+            640,
+            324
+          ],
+          [
+            640,
+            346
+          ],
+          [
+            578,
+            366
+          ],
+          [
+            532,
+            350
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "garden",
+      "crop": [
+        565,
+        440,
+        500,
+        300
+      ],
+      "seed": [
+        650,
+        700
+      ],
+      "painted": false,
+      "keepPieces": true,
+      "ground": "the wooden planks along the deck's front edge, the deck's edge, and the soft cream paper wash beyond it, in the same soft watercolour and warm brown ink",
+      "object": "the three long wooden planter boxes along the deck's front edge, full of plain dark soil: every board of all three boxes and the soil in them; not the rope railing, its round posts, the deck's planks, the ladder, or the paper background",
+      "footprint": [
+        [
+          [
+            586,
+            676
+          ],
+          [
+            690,
+            622
+          ],
+          [
+            716,
+            634
+          ],
+          [
+            716,
+            668
+          ],
+          [
+            612,
+            720
+          ],
+          [
+            586,
+            708
+          ]
+        ],
+        [
+          [
+            738,
+            600
+          ],
+          [
+            842,
+            548
+          ],
+          [
+            866,
+            558
+          ],
+          [
+            866,
+            590
+          ],
+          [
+            760,
+            642
+          ],
+          [
+            738,
+            630
+          ]
+        ],
+        [
+          [
+            884,
+            526
+          ],
+          [
+            986,
+            476
+          ],
+          [
+            1004,
+            486
+          ],
+          [
+            1004,
+            512
+          ],
+          [
+            904,
+            562
+          ],
+          [
+            884,
+            552
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1,
+        "fill": 3
+      },
+      "shadowReach": 16,
+      "core": 2
+    },
+    {
+      "id": "garden-planted",
+      "painting": "art/source/areas/clubhouse/clubhouse-fixed.png",
+      "stateOf": "garden.planted",
+      "crop": [
+        565,
+        420,
+        500,
+        320
+      ],
+      "seed": [
+        650,
+        700
+      ],
+      "painted": true,
+      "keepPieces": true,
+      "ground": "the wooden planks along the deck's front edge, the deck's edge, and the soft cream paper wash beyond it, in the same soft watercolour and warm brown ink",
+      "object": "the three long wooden planter boxes along the deck's front edge, their soil with the little wooden seed markers poking up: every board of all three boxes, the soil, and the markers; not the rope railing, its round posts, the deck's planks, the ladder, or the paper background",
+      "footprint": [
+        [
+          [
+            586,
+            676
+          ],
+          [
+            690,
+            622
+          ],
+          [
+            716,
+            634
+          ],
+          [
+            716,
+            668
+          ],
+          [
+            612,
+            720
+          ],
+          [
+            586,
+            708
+          ]
+        ],
+        [
+          [
+            738,
+            600
+          ],
+          [
+            842,
+            548
+          ],
+          [
+            866,
+            558
+          ],
+          [
+            866,
+            590
+          ],
+          [
+            760,
+            642
+          ],
+          [
+            738,
+            630
+          ]
+        ],
+        [
+          [
+            884,
+            526
+          ],
+          [
+            986,
+            476
+          ],
+          [
+            1004,
+            486
+          ],
+          [
+            1004,
+            512
+          ],
+          [
+            904,
+            562
+          ],
+          [
+            884,
+            552
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            560,
+            752
+          ],
+          [
+            1012,
+            508
+          ],
+          [
+            1012,
+            770
+          ],
+          [
+            560,
+            770
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "garden-growing",
+      "painting": "art/source/areas/clubhouse/clubhouse-growing.png",
+      "stateOf": "garden.growing",
+      "crop": [
+        565,
+        420,
+        500,
+        320
+      ],
+      "seed": [
+        650,
+        700
+      ],
+      "painted": true,
+      "keepPieces": true,
+      "ground": "the wooden planks along the deck's front edge, the deck's edge, and the soft cream paper wash beyond it, in the same soft watercolour and warm brown ink",
+      "object": "the three long wooden planter boxes along the deck's front edge with the leafy green strawberry plants and their small white flowers growing in them: every board of all three boxes and every leaf and flower; not the rope railing, its round posts, the deck's planks, the ladder, or the paper background",
+      "footprint": [
+        [
+          [
+            586,
+            676
+          ],
+          [
+            690,
+            622
+          ],
+          [
+            716,
+            634
+          ],
+          [
+            716,
+            668
+          ],
+          [
+            612,
+            720
+          ],
+          [
+            586,
+            708
+          ]
+        ],
+        [
+          [
+            738,
+            600
+          ],
+          [
+            842,
+            548
+          ],
+          [
+            866,
+            558
+          ],
+          [
+            866,
+            590
+          ],
+          [
+            760,
+            642
+          ],
+          [
+            738,
+            630
+          ]
+        ],
+        [
+          [
+            884,
+            526
+          ],
+          [
+            986,
+            476
+          ],
+          [
+            1004,
+            486
+          ],
+          [
+            1004,
+            512
+          ],
+          [
+            904,
+            562
+          ],
+          [
+            884,
+            552
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      },
+      "exclude": [
+        [
+          [
+            560,
+            752
+          ],
+          [
+            1012,
+            508
+          ],
+          [
+            1012,
+            770
+          ],
+          [
+            560,
+            770
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "garden-ripe",
+      "painting": "art/source/areas/clubhouse/clubhouse-ripe.png",
+      "stateOf": "garden.ripe",
+      "crop": [
+        565,
+        420,
+        500,
+        320
+      ],
+      "seed": [
+        650,
+        700
+      ],
+      "painted": true,
+      "keepPieces": true,
+      "ground": "the wooden planks along the deck's front edge, the deck's edge, and the soft cream paper wash beyond it, in the same soft watercolour and warm brown ink",
+      "object": "the three long wooden planter boxes along the deck's front edge with the leafy strawberry plants and their bright red ripe strawberries: every board of all three boxes, every leaf, and every strawberry; not the rope railing, its round posts, the deck's planks, the ladder, or the paper background",
+      "footprint": [
+        [
+          [
+            586,
+            676
+          ],
+          [
+            690,
+            622
+          ],
+          [
+            716,
+            634
+          ],
+          [
+            716,
+            668
+          ],
+          [
+            612,
+            720
+          ],
+          [
+            586,
+            708
+          ]
+        ],
+        [
+          [
+            738,
+            600
+          ],
+          [
+            842,
+            548
+          ],
+          [
+            866,
+            558
+          ],
+          [
+            866,
+            590
+          ],
+          [
+            760,
+            642
+          ],
+          [
+            738,
+            630
+          ]
+        ],
+        [
+          [
+            884,
+            526
+          ],
+          [
+            986,
+            476
+          ],
+          [
+            1004,
+            486
+          ],
+          [
+            1004,
+            512
+          ],
+          [
+            904,
+            562
+          ],
+          [
+            884,
+            552
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            560,
+            752
+          ],
+          [
+            1012,
+            508
+          ],
+          [
+            1070,
+            508
+          ],
+          [
+            1070,
+            770
+          ],
+          [
+            560,
+            770
+          ]
+        ],
+        [
+          [
+            1016,
+            400
+          ],
+          [
+            1070,
+            400
+          ],
+          [
+            1070,
+            770
+          ],
+          [
+            1016,
+            770
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "crate",
+      "crop": [
+        675,
+        285,
+        140,
+        135
+      ],
+      "seed": [
+        720,
+        385
+      ],
+      "painted": true,
+      "object": "the wooden crate used as a table, with the comic books on top: its slatted sides, its top, and the comics; not the wall, the floor, the bottle on the floor, or the beanbag",
+      "footprint": [
+        [
+          [
+            688,
+            382
+          ],
+          [
+            742,
+            357
+          ],
+          [
+            796,
+            381
+          ],
+          [
+            744,
+            406
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "beanbag",
+      "crop": [
+        775,
+        315,
+        190,
+        160
+      ],
+      "seed": [
+        860,
+        395
+      ],
+      "painted": true,
+      "object": "the big squashy beanbag against the wall: all of it, down to where it sags onto the floor; not the wall, the shelf, the rope railing or its posts, or the floor",
+      "footprint": [
+        [
+          [
+            792,
+            425
+          ],
+          [
+            815,
+            402
+          ],
+          [
+            870,
+            392
+          ],
+          [
+            925,
+            402
+          ],
+          [
+            946,
+            425
+          ],
+          [
+            925,
+            448
+          ],
+          [
+            870,
+            456
+          ],
+          [
+            812,
+            450
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rail-sw",
+      "crop": [
+        140,
+        380,
+        460,
+        240
+      ],
+      "seed": [
+        476,
+        520
+      ],
+      "painted": true,
+      "object": "the rope railing along the deck's left front edges: its five round wooden posts and the thick ropes looped between them; not the deck's planks, the ladder hole, the wall, or the thick wooden corner beam of the wall",
+      "exclude": [
+        [
+          [
+            178,
+            370
+          ],
+          [
+            296,
+            370
+          ],
+          [
+            296,
+            452
+          ],
+          [
+            262,
+            452
+          ],
+          [
+            200,
+            428
+          ],
+          [
+            178,
+            425
+          ]
+        ]
+      ],
+      "footprint": [
+        [
+          [
+            153,
+            488
+          ],
+          [
+            177,
+            488
+          ],
+          [
+            177,
+            498
+          ],
+          [
+            153,
+            498
+          ]
+        ],
+        [
+          [
+            258,
+            542
+          ],
+          [
+            282,
+            542
+          ],
+          [
+            282,
+            552
+          ],
+          [
+            258,
+            552
+          ]
+        ],
+        [
+          [
+            358,
+            596
+          ],
+          [
+            382,
+            596
+          ],
+          [
+            382,
+            606
+          ],
+          [
+            358,
+            606
+          ]
+        ],
+        [
+          [
+            464,
+            542
+          ],
+          [
+            488,
+            542
+          ],
+          [
+            488,
+            552
+          ],
+          [
+            464,
+            552
+          ]
+        ],
+        [
+          [
+            575,
+            490
+          ],
+          [
+            599,
+            490
+          ],
+          [
+            599,
+            500
+          ],
+          [
+            575,
+            500
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rail-se",
+      "crop": [
+        560,
+        380,
+        440,
+        330
+      ],
+      "seed": [
+        866,
+        470
+      ],
+      "painted": true,
+      "front": [
+        "garden"
+      ],
+      "object": "the rope railing along the deck's right front edge: its four round wooden posts and the thick ropes looped between them; not the planter boxes, the deck's planks, the ladder, the beanbag, or the wall",
+      "footprint": [
+        [
+          [
+            572,
+            675
+          ],
+          [
+            596,
+            675
+          ],
+          [
+            596,
+            685
+          ],
+          [
+            572,
+            685
+          ]
+        ],
+        [
+          [
+            728,
+            571
+          ],
+          [
+            752,
+            571
+          ],
+          [
+            752,
+            581
+          ],
+          [
+            728,
+            581
+          ]
+        ],
+        [
+          [
+            854,
+            506
+          ],
+          [
+            878,
+            506
+          ],
+          [
+            878,
+            516
+          ],
+          [
+            854,
+            516
+          ]
+        ],
+        [
+          [
+            961,
+            455
+          ],
+          [
+            985,
+            455
+          ],
+          [
+            985,
+            465
+          ],
+          [
+            961,
+            465
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      },
+      "core": 2
+    }
+  ]
+}

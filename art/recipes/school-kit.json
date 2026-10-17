@@ -1,7 +1,7 @@
 {
   "asset": "school-kit",
-  "date": "2026-10-08",
-  "summary": "The approved school painting split into a ground plate and 3 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "date": "2026-10-17",
+  "summary": "The approved school painting split into a ground plate and 2 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/school.json",
   "painting": "art/source/areas/school/painting/ground.json",
@@ -28,10 +28,6 @@
       "block-lockers": [
         "iso-1.jpg",
         "crop.json"
-      ],
-      "wall-post": [
-        "iso-1.jpg",
-        "crop.json"
       ]
     }
   },
@@ -46,10 +42,10 @@
     "rebuiltVsPainting": "0.00% of the painting's pixels differ by more than 12% when the default layout is rebuilt from the kit"
   },
   "states": {},
+  "footprintNotes": {},
   "painted": [
     "cabinet",
-    "block-lockers",
-    "wall-post"
+    "block-lockers"
   ],
   "lifted": []
 }

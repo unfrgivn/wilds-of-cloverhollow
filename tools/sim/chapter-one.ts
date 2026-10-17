@@ -45,11 +45,13 @@ play.navigate({ x: 300, y: 925 });
 play.leave(down, "plaza");
 play.navigate({ x: 290, y: 965 });
 play.leave(down, "school");
-// Nurse Holly's hall pass, for an offer of help.
+// Nurse Holly's hall pass, for an offer of help; then out the front doors.
 play.approach("npc:nurse");
 play.talk("npc:nurse", [1]);
-play.navigate({ x: 600, y: 560 });
-play.leave(left, "plaza");
+const doors = world.areas.school?.spawns["front-doors"];
+if (doors === undefined) throw new Error("no school front-doors spawn");
+play.navigate(doors, 6);
+play.through("plaza");
 // The school raccoon, calmed, tells the password it overheard. The town's
 // critters are out now; calm them before crossing the plaza.
 play.meet("school-raccoon");

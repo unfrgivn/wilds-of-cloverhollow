@@ -49,3 +49,18 @@
 - For the phone review, use a 1565x720 logical viewport (3130x1440 source px)
   and render it at 1748x804. Keep the house door in the crop because it is the
   most important transition and scale anchor.
+
+## School hallway
+
+- Put every door on a back or side wall, and say "no front wall" in the
+  prompt. The first hall prompt asked for the entrance "on the bottom-left
+  wall", and the model built a low front wall across the lower left of the
+  screen for it: the only room Fae left by walking into a wall's top. It was
+  repainted open on 2026-10-16 (`art/recipes/school.json`).
+- To move a door without redrawing the room, edit the approved painting with
+  it as the first reference and name every object that must stay. The model
+  kept the hall's right half pixel-aligned (registration offset 0, 0), so its
+  floor, props, and doors there kept their coordinates.
+- Give the model a door it already drew in this building as the size ruler
+  (the east hall's gym doors). Asked for doors "as tall as the classroom
+  door", it drew them with a transom as high as the wall.

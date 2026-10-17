@@ -54,7 +54,7 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 3672,
+    "tick": 3826,
     "area": "park",
     "player": {
       "x": 731.1269837220834,
@@ -216,7 +216,7 @@
     }
   },
   "school/hall-pass.json": {
-    "tick": 816,
+    "tick": 558,
     "area": "plaza",
     "player": {
       "x": 290,
@@ -229,12 +229,12 @@
       "facing": "up",
       "moving": false,
       "distance": 0,
-      "stillTicks": 20,
+      "stillTicks": 40,
       "trail": 1
     }
   },
   "school/raccoon.json": {
-    "tick": 1243,
+    "tick": 985,
     "area": "plaza",
     "player": {
       "x": 400.91168824543183,

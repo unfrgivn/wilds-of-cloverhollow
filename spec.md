@@ -1,6 +1,7 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-16 (Milestone 39, recess on the playing field)
+Last updated: 2026-10-16 (Milestone 39, recess on the playing field; the school
+hallway is open like every other room)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -391,6 +392,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   (its doorway at the plaza's right edge, x 1600-1625, y 500-610) to the bay,
   and each leads back. The east road `requires` `club_open` (knot
   `bay_road_closed`): Fae goes to the bay once the tree house club is open.
+- Every room is an open cutaway, a diorama with no front wall: its doors
+  stand on its back and side walls, or its floor runs off the painting's
+  edge. The school hallway's front doors are glass double doors at the left
+  end of its back-left wall (trigger `front-doors`, a band along the whole
+  painted door, to `plaza.school-path`; spawn `front-doors` (290, 625)
+  facing down, by the doormat).
 - Bubblegum Bay: a sandy cove with a dock reaching into the water, palms, a
   blank sign, and a picnic under an umbrella. Fae arrives on the path at the
   left edge (spawn `plaza-road`, (180, 545) facing right). Its floor is the
@@ -748,8 +755,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   bed, the desk, the desk chair, the shelf, the cat bed), the kitchen (the
   island, the dining set (the table, its four chairs, and the high chair),
   the sofa, the stair's newel post; the banister stays in the painting, since
-  Fae never walks behind it), the school hallway (the trophy cabinet, the
-  lockers on the nurse's block, the post at the end of the low front wall),
+  Fae never walks behind it), the school hallway (the trophy cabinet and the
+  lockers on the nurse's block),
   the classroom, the gym, and the arcade (the five cabinets, the ticket
   counter, the claw machine, the three gumball machines). The kitchen's
   `stairs` spawn is (600, 650), facing right, so the whole party fits behind
@@ -1341,7 +1348,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   bunny and the squirrel, the blacklight lantern and its glows, the gull, the
   Whispering Woods and its owl, coins and shops, the recurring critters'
   cat and raccoon battle atlases and wording, and the arcade's painting and
-  Mr. Pip (`docs/review-queue.md`). The
+  Mr. Pip (`docs/review-queue.md`). Also waiting: the school hallway
+  repainted open (2026-10-16), its low front wall gone and its front doors
+  on the back-left wall (`art/recipes/school.json`). The
   talking raccoon's atlas (approved 2026-10-06) left the game with the
   talking raccoon; its recipe and raw sources stay
   (`art/recipes/raccoon-npc.json`).

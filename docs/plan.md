@@ -1642,12 +1642,27 @@ more bad guys, and the blacklight lantern, made and built while away.
     and sand the boxes walled off round each thing are open. The lookout
     run, re-recorded, reads the same beats; `propBlockerErrors` reports none
     anywhere.
-  - A sixth fix (owner, 2026-10-16; in progress, `.worktrees/school-open`,
-    branch `school-open`): the school hall is open like every other room.
-    It was the one painting with a front wall: the low wall with the glass
-    front doors filled the lower left of the screen, and Fae left by walking
-    into its top. The hall is repainted as a cutaway with the front doors on
-    a back wall; its kit, floor, doors, and the runs through it follow.
+  - A sixth fix (owner, 2026-10-16): the school hall is open like every
+    other room. It was the one painting with a front wall: a low wall with
+    the glass front doors across the lower left of the screen, and Fae left
+    by walking into its top. The approved painting was edited (8 Gemini
+    calls, `art/recipes/school.json`): the wall is gone, the floor runs to a
+    floor-slab edge like the classroom's, and the front doors stand at the
+    left end of the back-left wall, about 1.2x the classroom door. The
+    right half of the hall kept its layout to the pixel, so everything
+    there stayed where it was. The kit was re-split with no calls (the
+    wall's post went with the wall), the floor and the door band were
+    traced on the new paint, and the `front-doors` spawn is (290, 625)
+    facing down, by the doormat. Every run through the hall was
+    re-recorded and reads the same beats; the hall-pass run, hand-written
+    since Milestone 14, has a recorder now (`tools/sim/record-hall-pass.ts`).
+    On the way: the field run's recorder, as committed with Milestone 39,
+    failed before the stash on main (the spot below it sits 19.2 units from
+    the floor's edge, under the collider's 20, so `approach` passes it
+    over); it walks to that spot itself now, and on main's own chain it
+    records a run of main's length again (9339 ticks). The hall's baselines
+    and the chained runs' baselines were updated after viewing them; the
+    new painting is in the review queue.
   - Milestone 39, recess on the playing field: done (above).
   - Then: the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,

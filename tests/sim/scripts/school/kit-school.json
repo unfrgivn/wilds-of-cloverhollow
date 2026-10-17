@@ -2,14 +2,14 @@
   {
     "frame": {
       "move": {
-        "x": 0,
+        "x": 1,
         "y": -1
       },
       "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 5
+    "ticks": 45
   },
   {
     "frame": {
@@ -21,7 +21,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 60
+    "ticks": 110
   },
   {
     "frame": {
@@ -33,7 +33,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 15
+    "ticks": 10
   },
   {
     "frame": {
@@ -45,7 +45,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 9
+    "ticks": 8
   },
   {
     "frame": {
@@ -69,25 +69,13 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 5
-  },
-  {
-    "frame": {
-      "move": {
-        "x": -1,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
     "ticks": 10
   },
   {
     "frame": {
       "move": {
         "x": -1,
-        "y": -1
+        "y": 0
       },
       "confirm": false,
       "cancel": false,

@@ -47,30 +47,6 @@
         "x": 0.49,
         "y": 0.9185
       }
-    },
-    "wall-post": {
-      "frame": {
-        "x": 684,
-        "y": 0,
-        "w": 90,
-        "h": 183
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 90,
-        "h": 183
-      },
-      "sourceSize": {
-        "w": 90,
-        "h": 183
-      },
-      "anchor": {
-        "x": 0.74444,
-        "y": 0.97814
-      }
     }
   },
   "meta": {

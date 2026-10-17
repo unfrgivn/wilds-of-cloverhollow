@@ -130,45 +130,6 @@
       "samples": {
         "object": 1
       }
-    },
-    {
-      "id": "wall-post",
-      "crop": [
-        740,
-        690,
-        70,
-        130
-      ],
-      "seed": [
-        770,
-        760
-      ],
-      "painted": true,
-      "ground": "the checkered school hallway floor",
-      "object": "the short square post at the east end of the low foreground wall, including its cap and base, not the wall or floor",
-      "footprint": [
-        [
-          [
-            758,
-            790
-          ],
-          [
-            786,
-            790
-          ],
-          [
-            786,
-            802
-          ],
-          [
-            758,
-            802
-          ]
-        ]
-      ],
-      "samples": {
-        "object": 1
-      }
     }
   ]
 }

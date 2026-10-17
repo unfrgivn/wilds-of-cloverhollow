@@ -6004,18 +6004,6 @@
   {
     "frame": {
       "move": {
-        "x": -1,
-        "y": -1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 5
-  },
-  {
-    "frame": {
-      "move": {
         "x": 1,
         "y": -1
       },
@@ -6023,7 +6011,19 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 18
+    "ticks": 60
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 44
   },
   {
     "frame": {

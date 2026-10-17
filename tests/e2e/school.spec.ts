@@ -3,13 +3,13 @@ import {
   longFlowTimeout, openHarness, readState, renderInfo, resetPaused, step, walk,
 } from "./helpers";
 
-// Milestone 14 contract: school day. The `school` fixture puts Fae just inside
-// the school's front doors (600, 520) facing right. During class the doors need
-// a hall pass (Ink `hall_pass`): without it they play `school_doors` and Fae
-// stays in. Ms. Maple (the teacher) hints that Nurse Holly needs a helper;
-// fibbing to the nurse gets a gentle no, offering to help gets the pass. With
-// it, the doors lead to the plaza's school path (290, 930) facing up, and the
-// path leads back in.
+// Milestone 14 contract: school day. The `school` fixture puts Fae by the
+// school's front doors, on the hall's back-left wall, at (290, 625) facing
+// down. During class the doors need a hall pass (Ink `hall_pass`): without
+// it they play `school_doors` and Fae stays in. Ms. Maple (the teacher)
+// hints that Nurse Holly needs a helper; fibbing to the nurse gets a gentle
+// no, offering to help gets the pass. With it, the doors lead to the plaza's
+// school path (290, 930) facing up, and the path leads back in.
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -47,9 +47,8 @@ test("without a hall pass the front doors stay shut; Nurse Holly gives one for h
     .toEqual(expect.arrayContaining(["npc:teacher", "npc:nurse", "maddie"]));
   await expect(page).toHaveScreenshot("school-arrival.png");
 
-  // The doors: shut.
-  await walk(page, "x", 500);
-  await walk(page, "y", 600);
+  // The doors on the back-left wall: shut.
+  await walk(page, "x", 100);
   let state = await readState(page);
   expect(state.area).toBe("school");
   expect(state.transition).toBeNull();
@@ -109,7 +108,7 @@ test("without a hall pass the front doors stay shut; Nurse Holly gives one for h
   await talkThrough(page);
 
   // With the pass: out to the plaza, and back in.
-  await walk(page, "x", 400);
+  await walk(page, "x", 100);
   await step(page, 40);
   state = await readState(page);
   expect(state.area).toBe("plaza");
@@ -119,6 +118,6 @@ test("without a hall pass the front doors stay shut; Nurse Holly gives one for h
   await step(page, 40);
   state = await readState(page);
   expect(state.area).toBe("school");
-  expect(state.player).toEqual({ x: 600, y: 520 });
-  expect(state.facing).toBe("right");
+  expect(state.player).toEqual({ x: 290, y: 625 });
+  expect(state.facing).toBe("down");
 });

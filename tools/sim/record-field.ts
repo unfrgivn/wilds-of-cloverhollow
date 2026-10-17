@@ -48,7 +48,11 @@ play.idle(60);
 const landed = play.state();
 if (landed.area !== "field" || landed.player.x < 1250)
   throw new Error(`the swing didn't cross the creek: ${JSON.stringify(landed.player)}`);
-play.approach("stash");
+// The stash from below. approach() passes that spot over: it's 19.2 units from
+// the floor's edge, under the collider's 20, so Fae stops against the edge,
+// still within reach.
+play.navigate({ x: 1455, y: 520 }, 6);
+play.face("up");
 play.talk("stash");
 play.approach("lever");
 play.talk("lever");

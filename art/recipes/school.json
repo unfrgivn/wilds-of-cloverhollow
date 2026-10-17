@@ -1,13 +1,42 @@
 {
-  "asset":"school ground",
-  "date":"2026-10-07",
-  "model":"gemini-3.1-flash-image and gemini-3-pro-image",
-  "calls":3,
-  "references":["docs/art/concepts/environments/school_interior.png","art/source/areas/kitchen/kitchen-final.png","art/source/areas/school/school-final.png"],
-  "selected":"art/source/areas/school/school-final.png",
-  "prompt_summary":"Wide closer school hallway redraw based on the previous school composition and kitchen scale reference, with bottom-left glass entrance, doors, lockers, board, artwork, cabinet, fountain, and open checkered floor.",
-  "post_processing":["Uniformly resized selected source to 2800px wide and padded with #fcfbf6 to 2800x1800 without stretching.","Split into three opaque WebP tiles at quality 88.","Recorded paper margin colour #fcfbf6 in ground.json."],
-  "measurement":{"classroomDoorHeightPx":441,"measurementBasis":"The final selected v3 source measured approximately 315px in the 2000px-wide visual coordinate space; uniform output scale is 2800/2000=1.4, yielding approximately 441px in the 2800x1800 output. This is within the 330-450 target.","textCheck":"No clearly readable words were visible; the nurse marker is a red cross."},
-  "outputs":{"tiles":["public/assets/areas/school/ground_0_0.webp","public/assets/areas/school/ground_1_0.webp","public/assets/areas/school/ground_2_0.webp"],"manifest":"public/assets/areas/school/ground.json"},
-  "owner_review":"Queued in art/review/school-grid.png and school-owner-review.png."
+  "asset": "school ground",
+  "date": "2026-10-16",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 8,
+  "references": [
+    "art/source/areas/school/school-final.png",
+    "art/source/areas/east-hall/east-hall-final.png",
+    "art/source/areas/classroom/classroom-final.png"
+  ],
+  "selected": "art/source/areas/school/school-open.png",
+  "prompt": "Edit the FIRST attached image, the approved Cloverhollow school hallway painting. Keep it the same painting: the same camera, framing, scale, watercolor-and-ink style, colours, and paper border, and every object exactly where it is: the clipped children's drawings, the notice board, the classroom door with its round window, the drinking fountain alcove, the trophy cabinet, the nurse's door with its red cross, the lockers and arched window on the right, the floor running off the right edge, and the glimpse of the next hall at the top right.\n\nChange only two things.\n\n1. Make the hallway an open cutaway, like a dollhouse diorama: remove the low front wall in the lower-left foreground entirely (its cream face, the glass doors in it, the little sign, its dark top edge, and the post at its right end). Continue the grey-and-cream checkerboard floor toward the viewer in the same tile grid, out to the floor's clean front edge, a thin floor slab in warm-brown ink, with plain cream paper beyond it, the way the THIRD attached image (the classroom) is drawn.\n\n2. Move the school's front entrance onto the back-left wall. At its far-left end, in place of the arched window, paint glass-paned wooden double doors like the gym doors at the left end of the SECOND attached image (the east hall of the same school), at the same size relative to the wall: each door leaf only as tall as the classroom door with the round window, no taller, standing on the floor, with plain wall above them, daylight and a little greenery through the glass, push bars, and a doormat in front. Keep the lockers that fit between the doors and the notice board.\n\nNo people, animals, lettering, numbers, logos, or UI.",
+  "prompt_summary": "An edit of the approved school hallway (school-final.png): the low front wall with the glass front doors, the only front wall in any room, is gone, the checkered floor runs to a floor-slab edge like the classroom's, and the glass double front doors stand on the back-left wall in place of its arched window, a little taller than the classroom door, with a doormat.",
+  "replaces": {
+    "painting": "art/source/areas/school/school-final.png (2026-10-06, approved for now that day)",
+    "why": "Owner, 2026-10-16: the hall was the only scene whose entrance was blocked by a wall instead of open like a diorama. Its 2026-10-06 prompts asked for the entrance 'on the bottom-left wall', which the model drew as a low front wall across the lower left of the screen."
+  },
+  "choice": "Eight calls. The first two (the old hall and the classroom as references) opened the front well but drew the front doors with a tall transom, as high as the wall; four repaints asking for smaller doors kept the transom. The last two added the east hall's gym doors as the size reference and drew plain double doors. Selected the second of those: the right half of the hall keeps the old painting's layout to the pixel (registration offset 0, 0), and the wall by the doors is clear. The other squeezed a lone locker in beside the doors, one more prop for nothing in the story.",
+  "scale_reference": "Fae 280 source pixels; the classroom door about 400 source pixels at 2800 px wide; 2 source pixels per logical unit.",
+  "post_processing": [
+    "Uniformly resized the selected 2752x1536 output to 2800x1563 and centred it on #fcfbf6 paper at 2800x1800, the same resize and padding as the replaced painting, so every unchanged object keeps its coordinates.",
+    "Split into three opaque WebP tiles at quality 88 (933, 933, and 934 px wide) as before.",
+    "Re-split into the kit (art/recipes/school-kit.json): the cabinet and the nurse block's lockers, cut from this painting; the low wall's post is gone with the wall."
+  ],
+  "measurement": {
+    "frontDoorHeightPx": 472,
+    "classroomDoorHeightPx": 394,
+    "measurementBasis": "In the shipped 2800x1800 painting, on the unit grid (tools/art/kit.ts school grid): each door's frame from its foot to its head along its left jamb. The front doors are 236 units (y 383 to 619 at x 100) and the classroom door 197 (y 148 to 345 at x 575), so the school's double entrance is about 1.2x a classroom door and 1.7x Fae.",
+    "textCheck": "No readable words: the notice board's papers are squiggles and the nurse's sign is blank, as before."
+  },
+  "outputs": {
+    "source": "art/source/areas/school/school-open.png",
+    "tiles": [
+      "art/source/areas/school/painting/ground_0_0.webp",
+      "art/source/areas/school/painting/ground_1_0.webp",
+      "art/source/areas/school/painting/ground_2_0.webp"
+    ],
+    "manifest": "art/source/areas/school/painting/ground.json",
+    "area": "content/areas/school.json"
+  },
+  "owner_review": "Queued in docs/review-queue.md: art/review/school-overlay.png (the floor, doors, and spawns over the painting)."
 }

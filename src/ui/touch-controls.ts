@@ -1,3 +1,4 @@
+import type { Point } from "../core";
 import { shouldShowTouchControls, TouchInput } from "../platform/touch";
 import "./touch-controls.css";
 
@@ -10,6 +11,9 @@ const BUTTONS = [
   ["flute", "♪"],
 ] as const;
 type Button = (typeof BUTTONS)[number][0];
+// One of a check's arrow stickers: its class suffix, glyph, name, and the
+// stick direction it holds.
+type Arrow = { side: string; label: string; name: string; direction: Point };
 
 // The concept's JOURNAL sticker: an open book with a quill.
 function journalIcon(): SVGSVGElement {
@@ -83,28 +87,40 @@ export function mountTouchControls(): TouchInput {
     (button === "menu" ? root : buttons).append(element);
   };
   for (const [button, label] of BUTTONS) createButton(button, label);
-  // A catch's arrows (spec 8.1): shown only while one is in play, they hold
-  // the catch high or low; letting go returns it to the middle.
-  const reach = document.createElement("div");
-  reach.className = "touch-reach";
-  for (const [direction, label, name] of [[-1, "▲", "reach up"], [1, "▼", "reach down"]] as const) {
-    const arrow = document.createElement("button");
-    arrow.className = `touch-button touch-reach-${direction < 0 ? "up" : "down"}`;
-    arrow.type = "button";
-    arrow.textContent = label;
-    arrow.setAttribute("aria-label", name);
-    arrow.addEventListener("pointerdown", (event) => {
-      event.preventDefault();
-      arrow.setPointerCapture(event.pointerId);
-      input.setReach(direction);
-    });
-    const release = (): void => input.setReach(0);
-    arrow.addEventListener("pointerup", release);
-    arrow.addEventListener("pointercancel", release);
-    arrow.addEventListener("lostpointercapture", release);
-    reach.append(arrow);
-  }
-  root.append(reach);
+  // A check's arrows (spec 8.1), shown only while one is in play: a catch's
+  // hold it high or low, a lean's lean Fae back or forward. Letting go
+  // returns the catch to the middle and stops the lean.
+  const arrowGroup = (group: string, arrows: readonly Arrow[]): void => {
+    const box = document.createElement("div");
+    box.className = group;
+    for (const { side, label, name, direction } of arrows) {
+      const arrow = document.createElement("button");
+      arrow.className = `touch-button ${group}-${side}`;
+      arrow.type = "button";
+      arrow.textContent = label;
+      arrow.setAttribute("aria-label", name);
+      arrow.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        arrow.setPointerCapture(event.pointerId);
+        input.holdArrow(direction);
+      });
+      const release = (): void => input.releaseArrow(direction);
+      arrow.addEventListener("pointerup", release);
+      arrow.addEventListener("pointercancel", release);
+      arrow.addEventListener("lostpointercapture", release);
+      box.append(arrow);
+    }
+    root.append(box);
+  };
+  arrowGroup("touch-reach", [
+    { side: "up", label: "▲", name: "reach up", direction: { x: 0, y: -1 } },
+    { side: "down", label: "▼", name: "reach down", direction: { x: 0, y: 1 } },
+  ]);
+  // U+FE0E keeps the triangles text, not emoji, on iOS.
+  arrowGroup("touch-lean", [
+    { side: "back", label: "◀\uFE0E", name: "lean back", direction: { x: -1, y: 0 } },
+    { side: "forward", label: "▶\uFE0E", name: "lean forward", direction: { x: 1, y: 0 } },
+  ]);
   const releaseStick = (event: PointerEvent): void => {
     input.endStick(event);
     stick.style.removeProperty("left");

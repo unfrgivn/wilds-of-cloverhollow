@@ -36,6 +36,12 @@ function critter(): Record<string, unknown> {
 }
 
 function ringCritter(): Record<string, unknown> {
+  const value = content.world.critters.owl;
+  if (value === undefined) throw new Error("owl missing");
+  return clone(value);
+}
+
+function leanCritter(): Record<string, unknown> {
   const value = content.world.critters.bluebird;
   if (value === undefined) throw new Error("bluebird missing");
   return clone(value);
@@ -73,9 +79,7 @@ describe("battle check content validation", () => {
     ["targetTick", 2, /targetTick/],
     ["targetTick", 59, /targetTick/],
   ])("rejects an invalid ring %s with its field", (field, value, fieldPattern) => {
-    const raw = content.world.critters.bluebird;
-    if (raw === undefined) throw new Error("pup missing");
-    const valueCopy = clone(raw);
+    const valueCopy = ringCritter();
     const check = nested(valueCopy, "burst", "check");
     if (field === "greatWindow") {
       check.greatWindow = value;
@@ -83,8 +87,8 @@ describe("battle check content validation", () => {
     } else {
       check.targetTick = value;
     }
-      expect(() => parseCritter(valueCopy, "critters/bluebird.json"))
-      .toThrow(new RegExp(`critters/bluebird\\.json.*${fieldPattern.source}`));
+    expect(() => parseCritter(valueCopy, "critters/owl.json"))
+      .toThrow(new RegExp(`critters/owl\\.json.*${fieldPattern.source}`));
   });
 
   it("rejects a charge target past maxTicks and waitTicks below one", () => {
@@ -184,6 +188,51 @@ describe("battle check content validation", () => {
     check.arrivals = [54];
     check.toys = ["toy"];
     expect(() => parsePartyMember(value, "party/maddie.json"))
+      .toThrow(/party\/maddie\.json.*command\.check\.kind/);
+  });
+
+  it.each([
+    ["no puff time", (check: Record<string, unknown>) => { check.puffTicks = 0; },
+      /burst\.check\.puffTicks/],
+    ["no settling", (check: Record<string, unknown>) => { check.spring = 0; },
+      /burst\.check\.spring/],
+    ["a puff on the first tick", (check: Record<string, unknown>) => {
+      check.starts = [0, 116];
+    }, /burst\.check\.starts/],
+    ["overlapping puffs", (check: Record<string, unknown>) => {
+      check.starts = [44, 99];
+    }, /burst\.check\.starts/],
+    ["garbled starts", (check: Record<string, unknown>) => { check.starts = [44, "bad"]; },
+      /burst\.check\.starts/],
+    ["no forces", (check: Record<string, unknown>) => { check.forces = []; },
+      /burst\.check\.forces/],
+    ["a still puff", (check: Record<string, unknown>) => { check.forces = [0, 3]; },
+      /burst\.check\.forces/],
+    ["a puff too strong to lean against", (check: Record<string, unknown>) => {
+      check.forces = [2, 5];
+    }, /burst\.check\.forces/],
+  ])("rejects a lean with %s and names its field", (_name, change, field) => {
+    const value = leanCritter();
+    change(nested(value, "burst", "check"));
+    expect(() => parseCritter(value, "critters/bluebird.json"))
+      .toThrow(new RegExp(`critters/bluebird\\.json.*${field.source}`));
+  });
+
+  it("accepts lean puffs that blow back to back", () => {
+    const value = leanCritter();
+    nested(value, "burst", "check").starts = [44, 100];
+    expect(() => parseCritter(value, "critters/bluebird.json")).not.toThrow();
+  });
+
+  it("rejects a lean as Soothe's or a party command's check", () => {
+    const lean = { kind: "lean", puffTicks: 56, starts: [44], forces: [2], steer: 5, spring: 3 };
+    const battle = clone(content.world.battle);
+    nested(battle, "commands", "soothe").check = lean;
+    expect(() => parseBattleContent(battle, "battle.json"))
+      .toThrow(/battle\.json.*commands\.soothe\.check\.kind/);
+    const member = partyMember();
+    nested(member, "command").check = lean;
+    expect(() => parsePartyMember(member, "party/maddie.json"))
       .toThrow(/party\/maddie\.json.*command\.check\.kind/);
   });
 

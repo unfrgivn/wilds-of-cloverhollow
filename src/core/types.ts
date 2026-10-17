@@ -253,7 +253,7 @@ export type StickerCatalogue = {
 export type BattleContent = {
   // The sprite atlas of the toys a catch throws (Milestone 41).
   toyAtlas: string;
-  hints: { charge: string; chain: string; catch: string };
+  hints: { charge: string; chain: string; catch: string; lean: string };
   commands: {
     soothe: { label: string; check: CheckSpec };
     snack: { label: string; snackDetail: string };
@@ -304,7 +304,20 @@ export type CatchSpec = {
   arrivals: number[];
   toys: string[];
 };
-export type CheckSpec = RingSpec | ChargeSpec | ChainSpec | CatchSpec;
+// A burst's gusts to lean into (Milestone 48): puff j blows from `starts[j]`
+// for `puffTicks`, pushing Fae's balance toward her back by a force drawn
+// from `forces` when the burst starts. Leaning moves it `steer` a tick; with
+// no gust and no lean it settles back `spring` a tick. The balance runs from
+// -100 to 100; reaching either end in a puff loses that puff.
+export type LeanSpec = {
+  kind: "lean";
+  puffTicks: number;
+  starts: number[];
+  forces: number[];
+  steer: number;
+  spring: number;
+};
+export type CheckSpec = RingSpec | ChargeSpec | ChainSpec | CatchSpec | LeanSpec;
 // "critter": Fae's side acts on the critter; "fae": the critter's burst.
 export type CheckSide = "critter" | "fae";
 export type BeatResult = "pending" | "hit" | "miss";
@@ -337,6 +350,18 @@ export type CheckState =
       spec: CatchSpec;
       lanes: number[];
       catcher: number;
+      results: BeatResult[];
+      big: boolean;
+    }
+  // `strengths` per puff (drawn); `balance` -100 (blown over backward) to
+  // 100 (leaned over forward), 0 standing straight.
+  | {
+      kind: "lean";
+      side: CheckSide;
+      tick: number;
+      spec: LeanSpec;
+      strengths: number[];
+      balance: number;
       results: BeatResult[];
       big: boolean;
     };
@@ -464,6 +489,15 @@ export type BattleCheckView =
         frame: string;
         result: BeatResult;
       }[];
+    }
+  // `balance` -1 (blown over backward) to 1 (leaned over forward); `puffs` in
+  // order: blowing now, how far through its time (0..1), how hard it pushes
+  // next to Fae's lean (0..1), and how it went.
+  | {
+      kind: "lean";
+      side: CheckSide;
+      balance: number;
+      puffs: { blowing: boolean; progress: number; force: number; result: BeatResult }[];
     };
 export type BattleView = {
   critterId: string;

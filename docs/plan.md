@@ -1815,6 +1815,76 @@ the old trail, the owl, and the clubhouse claim.
   - The sprite, the flute's and the pond's lines, and the ♪ glyph (text, not
     art) are in the owner's review queue.
 
+## Milestone 48: Lean **Status:** ✅ Completed (2026-10-17)
+- The owner picked Lean next, then wind-ups, then first touch and old
+  friends (2026-10-17, `docs/battle-ideas.md`). The three gust bursts become
+  a lean: the bluebird's sandy swirl, the music-room bluebird's fluttering
+  one, and the gull's feathers and sea spray. Puffs push Fae's balance back,
+  and the player leans with left and right to keep a star in the green
+  middle of a track over her head; too far either way in a puff and she
+  tips over, losing it. A new check kind, `lean` (spec 8), with no button:
+  the stick or arrows lean her, right being forward into the wind. Every
+  puff held is great, half good, like a chain, and each held puff plays
+  `battle-beat`.
+- A normal burst blows two 56-tick puffs, each gentle (force 2) or strong
+  (3); a big one blows three strong 36-tick puffs. A burst draws its big
+  roll first, then one force per puff, like a catch's lanes. Only the owl's
+  burst is still a ring (its Peekaboo needs a look-away frame).
+- The track, the star, the puff dots, and the wind's swooshes are drawn in
+  code in the sticker style; nothing is generated. On touch, two arrow
+  stickers (◀ ▶) stand where the stick would while a lean is in play
+  (`data-check="lean"`). `TouchInput` now holds an arrow's direction for
+  the catch's arrows and the lean's alike, and lifting one never lets go of
+  the other if a second finger holds it.
+- The gust bursts' lines said Fae ducked or dodged; they say she leans now
+  (the misses already fit).
+- Evidence: core unit tests for the lean's rules (the push, steer, and
+  settling; losing at either end; holding a whole puff; the grades, the
+  view, the hint, the stick, and the draws), the burst's draw order and
+  damage, the loader, and the sound (`checks.test.ts`,
+  `battle-wiring.test.ts`, `check-loader.test.ts`, `sound.test.ts`); every
+  recorded run meeting a gust critter re-recorded with the runs that start
+  from them; real-key e2e (`lean.spec.ts`: the bay's bluebird lean on held
+  arrow keys, and the arrow stickers on touch at 874x402 with a notch) and
+  the gallery's lean state. Gates, rebased on Milestone 44: `just check`
+  (684 unit tests, every sim, purity, lint), `just build`, and `just e2e`
+  (559 passed, 2 skipped, on Chromium and WebKit). Every changed screenshot
+  was viewed: 14 differ only in the harness readout's tick (checked pixel
+  for pixel outside it), 15 by the later tick's roaming critters, feelings,
+  and party spacing (two hamsters roam the pass by the lodge porch now, and
+  the flute run's battle is a Pouncy Cat where it was a Zoomie Pup), and 8
+  are new (the lean mid-puff and its GOOD on keys, on both engines; the hint
+  and a puff on touch; the gallery's lean on both engines).
+- Notes and assumptions:
+  - Tuning, swept headless against the real core with simple player models:
+    doing nothing loses every puff (MISS); leaning forward blindly through
+    every puff tips her over forward (MISS on a normal burst, GOOD on a big
+    one); a player reading the star an eighth of a second late holds them
+    all (GREAT), and one twice as slow who waits until the star is well off
+    centre holds half a normal burst (GOOD) and a whole big one. Every
+    force is under her lean (the loader checks it), so a puff can always be
+    held. The owner may want it gentler; the numbers are content.
+  - Fae has no hat, so the idea's hat became her balance, shown as a star.
+    The hint is "Hold left or right to balance!": 30 characters, inside the
+    260 px hint stickers are kept to.
+  - The balance runs from -100 to 100 in whole numbers. A lost puff stops
+    blowing and stands her straight, so each puff is a fresh try; leaning
+    outside a puff can't lose anything (the star just stops at the end).
+  - Right is forward: battles are staged side-on with the critter on the
+    right, and the swooshes blow in from it.
+  - The grade hangs over Fae's head, under the track; over the track it
+    would meet the HUD on a phone.
+  - Every timed part fits in 180 ticks (spec 8): a normal lean ends on tick
+    171, and a big one on 179, its puffs 14 ticks apart rather than 16.
+  - The puff draws follow the big roll in the same PRNG, so every later roll
+    in a run that meets a gust shifts. The bay and bus runs, the lookout,
+    and the music, field, and flute chain were re-recorded; the recorder
+    leans back toward straight whenever she's 5 or more off, on arrows only.
+  - The e2e plays the bay run's first burst, a normal lean of two gentle
+    puffs: on real keys it lets the first puff push her, tips her over with
+    the wind on ArrowLeft, then leans through the second for GOOD; on touch
+    it holds both with the stickers for GREAT.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -2111,6 +2181,9 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 47, flute friends: done (above).
   - Milestone 44, the claw machine: done (above). Then Milestones 45 and 46,
     skee-ball and the prize counter, and Boop-a-Mole.
+  - Milestone 48, Lean: done (above). Next (owner, 2026-10-17): Milestone
+    49, wind-ups for the gull and Mr. Pip, then Milestone 50, first touch
+    and old friends.
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

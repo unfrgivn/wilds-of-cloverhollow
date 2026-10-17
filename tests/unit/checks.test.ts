@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { createCheck, laneFromDraw, laneFromStick, stepCheck } from "../../src/core/checks";
-import type { CheckSpec, CheckState } from "../../src/core";
+import {
+  checkDraws,
+  checkHint,
+  createCheck,
+  laneFromDraw,
+  laneFromStick,
+  leanFromStick,
+  pickFromDraw,
+  stepCheck,
+  viewCheck,
+  type Lean,
+} from "../../src/core/checks";
+import type { CheckSpec, CheckState, LeanSpec } from "../../src/core";
 
 const ring: CheckSpec = {
   kind: "ring", ticks: 20, targetTick: 10, greatWindow: 2, goodWindow: 4,
@@ -21,8 +32,8 @@ function advance(
   held = false,
 ): { check: CheckState; grade: string | null } {
   while (state.tick < tick - 1)
-    state = stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1 }).check;
-  return stepCheck(state, { confirmEdge: edge, confirmHeld: held, lane: 1 });
+    state = stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1, lean: 0 }).check;
+  return stepCheck(state, { confirmEdge: edge, confirmHeld: held, lane: 1, lean: 0 });
 }
 
 function edgeAt(state: CheckState, tick: number): { check: CheckState; grade: string | null } {
@@ -64,20 +75,26 @@ describe("battle check rules", () => {
 
   it("does not start a charge from the command-choosing confirm edge", () => {
     let state = createCheck(charge, "critter");
-    ({ check: state } = stepCheck(state, { confirmEdge: true, confirmHeld: true, lane: 1 }));
+    ({ check: state } = stepCheck(state, {
+      confirmEdge: true, confirmHeld: true, lane: 1, lean: 0,
+    }));
     expect(chargeHeld(state)).toBe(1);
   });
 
   it("requires a fresh press after holding through a charge", () => {
     let state = createCheck(charge, "critter");
-    ({ check: state } = stepCheck(state, { confirmEdge: false, confirmHeld: true, lane: 1 }));
-    ({ check: state } = stepCheck(state, { confirmEdge: false, confirmHeld: true, lane: 1 }));
+    ({ check: state } = stepCheck(state, {
+      confirmEdge: false, confirmHeld: true, lane: 1, lean: 0,
+    }));
+    ({ check: state } = stepCheck(state, {
+      confirmEdge: false, confirmHeld: true, lane: 1, lean: 0,
+    }));
     expect(chargeHeld(state)).toBe(0);
     expect(stepCheck(state, {
-      confirmEdge: false, confirmHeld: false, lane: 1,
+      confirmEdge: false, confirmHeld: false, lane: 1, lean: 0,
     }).grade).toBeNull();
     expect(chargeHeld(stepCheck(state, {
-      confirmEdge: true, confirmHeld: true, lane: 1,
+      confirmEdge: true, confirmHeld: true, lane: 1, lean: 0,
     }).check)).toBe(1);
   });
 
@@ -165,8 +182,8 @@ describe("catch check rules", () => {
     lane: number,
   ): { check: CheckState; grade: string | null } {
     while (state.tick < tick - 1)
-      state = stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1 }).check;
-    return stepCheck(state, { confirmEdge: false, confirmHeld: false, lane });
+      state = stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1, lean: 0 }).check;
+    return stepCheck(state, { confirmEdge: false, confirmHeld: false, lane, lean: 0 });
   }
 
   it("catches every toy in its lane and grades all hits great", () => {
@@ -222,5 +239,138 @@ describe("catch check rules", () => {
     expect(laneFromDraw(0.3333)).toBe(0);
     expect(laneFromDraw(0.6667)).toBe(2);
     expect(laneFromDraw(0.9999)).toBe(2);
+  });
+});
+
+describe("lean check rules", () => {
+  // Two short puffs: ticks 3 to 12 and 20 to 29.
+  const lean: LeanSpec = {
+    kind: "lean", puffTicks: 10, starts: [3, 20], forces: [2, 3], steer: 5, spring: 3,
+  };
+  const hints = { charge: "charge", chain: "chain", catch: "catch", lean: "lean" };
+
+  function leanStep(state: CheckState, way: Lean): { check: CheckState; grade: string | null } {
+    return stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1, lean: way });
+  }
+
+  function steps(state: CheckState, count: number, way: Lean): CheckState {
+    for (let index = 0; index < count; index += 1) state = leanStep(state, way).check;
+    return state;
+  }
+
+  function leaning(state: CheckState): { balance: number; results: string[] } {
+    if (state.kind !== "lean") throw new Error("expected lean check");
+    return { balance: state.balance, results: state.results };
+  }
+
+  it("pushes Fae back by each puff's drawn force and leans her by steer", () => {
+    let state = createCheck(lean, "fae", false, [2, 3]);
+    expect(state).toMatchObject({ strengths: [2, 3], balance: 0, results: ["pending", "pending"] });
+    state = steps(state, 2, 0);
+    expect(leaning(state).balance).toBe(0);
+    state = steps(state, 1, 0);
+    expect(leaning(state).balance).toBe(-2);
+    state = steps(state, 1, 1);
+    expect(leaning(state).balance).toBe(1);
+    state = steps(state, 1, -1);
+    expect(leaning(state).balance).toBe(-6);
+  });
+
+  it("settles back toward straight by spring between puffs, never past it", () => {
+    const settle = (way: Lean): number[] => {
+      let state = steps(createCheck({ ...lean, starts: [50] }, "fae", false, [2]), 2, way);
+      const balances = [leaning(state).balance];
+      for (let index = 0; index < 5; index += 1) {
+        state = leanStep(state, 0).check;
+        balances.push(leaning(state).balance);
+      }
+      return balances;
+    };
+    expect(settle(1)).toEqual([10, 7, 4, 1, 0, 0]);
+    expect(settle(-1)).toEqual([-10, -7, -4, -1, 0, 0]);
+  });
+
+  it("stops a lean at the end outside a puff without losing anything", () => {
+    const state = steps(createCheck({ ...lean, starts: [50] }, "fae", false, [2]), 30, 1);
+    expect(leaning(state)).toEqual({ balance: 100, results: ["pending"] });
+  });
+
+  it("loses a puff at either end, stops its push, and stands Fae straight", () => {
+    const long: LeanSpec = { ...lean, puffTicks: 60, starts: [1, 61] };
+    let back = steps(createCheck(long, "fae", false, [3, 3]), 33, 0);
+    expect(leaning(back)).toEqual({ balance: -99, results: ["pending", "pending"] });
+    back = steps(back, 1, 0);
+    expect(leaning(back)).toEqual({ balance: 0, results: ["miss", "pending"] });
+    back = steps(back, 26, 0);
+    expect(leaning(back).balance).toBe(0);
+    // Leaning forward the whole time beats a gentle puff by 3 a tick: over.
+    let forward = steps(createCheck(long, "fae", false, [2, 2]), 33, 1);
+    expect(leaning(forward).balance).toBe(99);
+    forward = steps(forward, 1, 1);
+    expect(leaning(forward)).toEqual({ balance: 0, results: ["miss", "pending"] });
+  });
+
+  it("holds a puff that blows its whole time, on its last tick", () => {
+    let state = steps(createCheck(lean, "fae", false, [2, 3]), 11, 0);
+    expect(leaning(state)).toEqual({ balance: -18, results: ["pending", "pending"] });
+    const held = leanStep(state, 0);
+    expect(leaning(held.check)).toEqual({ balance: -20, results: ["hit", "pending"] });
+    expect(held.grade).toBeNull();
+    state = steps(held.check, 16, 0);
+    expect(leaning(state).results).toEqual(["hit", "pending"]);
+    const last = leanStep(state, 0);
+    expect(leaning(last.check).results).toEqual(["hit", "hit"]);
+    expect(last.grade).toBe("great");
+  });
+
+  it("grades half the puffs held as good", () => {
+    const long: LeanSpec = { ...lean, puffTicks: 40, starts: [1, 41] };
+    let state = steps(createCheck(long, "fae", false, [2, 2]), 34, 1);
+    expect(leaning(state).results).toEqual(["miss", "pending"]);
+    let result = leanStep(state, 0);
+    while (result.grade === null) result = leanStep(result.check, 0);
+    expect(leaning(result.check).results).toEqual(["miss", "hit"]);
+    expect(result.grade).toBe("good");
+  });
+
+  it("shows the balance and each puff, and the hint only before the first", () => {
+    const fresh = createCheck(lean, "fae", false, [2, 3]);
+    expect(checkHint(fresh, hints)).toBe("lean");
+    expect(checkHint(steps(fresh, 2, 0), hints)).toBe("lean");
+    const blowing = steps(fresh, 3, 0);
+    expect(checkHint(blowing, hints)).toBeNull();
+    expect(viewCheck(blowing, null)).toEqual({
+      kind: "lean",
+      side: "fae",
+      balance: -0.02,
+      puffs: [
+        { blowing: true, progress: 0, force: 0.4, result: "pending" },
+        { blowing: false, progress: 0, force: 0.6, result: "pending" },
+      ],
+    });
+    const after = steps(blowing, 12, 0);
+    expect(viewCheck(after, null)).toMatchObject({
+      puffs: [
+        { blowing: false, progress: 1, result: "hit" },
+        { blowing: false, progress: 0, result: "pending" },
+      ],
+    });
+  });
+
+  it("maps the stick to a lean, right forward into the wind", () => {
+    expect(leanFromStick(-0.5001)).toBe(-1);
+    expect(leanFromStick(-0.5)).toBe(0);
+    expect(leanFromStick(0.5)).toBe(0);
+    expect(leanFromStick(0.5001)).toBe(1);
+  });
+
+  it("draws once per catch toy or lean puff, picking each force as likely", () => {
+    const catchSpec: CheckSpec = {
+      kind: "catch", travelTicks: 5, arrivals: [10, 18, 26, 34], toys: ["ball"],
+    };
+    expect([ring, charge, chain, catchSpec, lean].map(checkDraws)).toEqual([0, 0, 0, 4, 2]);
+    expect([0, 0.4999, 0.5, 0.9999].map((value) => pickFromDraw(lean, value)))
+      .toEqual([2, 2, 3, 3]);
+    expect(pickFromDraw(catchSpec, 0.9999)).toBe(2);
   });
 });

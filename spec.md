@@ -1124,13 +1124,29 @@ ios/            Capacitor iOS project (from Milestone 4).
     else missed. Every toy caught grades great, at least half good, fewer a
     miss, like a chain, and each catch plays `battle-beat`. `toys` are frames
     of the toy atlas (`content/battle.json` `toyAtlas`), thrown in turn.
+  - `lean` (Milestone 48; `puffTicks`, `starts`, `forces`, `steer`,
+    `spring`): only a burst's. A gust's puffs push Fae's balance, which runs
+    from -100 (blown over backward) to 100 (leaned over forward) and starts
+    straight at 0. Puff j blows from `starts[j]` for `puffTicks` at the force
+    in `strengths[j]`, drawn when the burst starts. No button: each tick the
+    puff in play (one still pending) pushes her back by its force, and the
+    stick or arrows lean her by `steer`, forward into the wind past 0.5
+    (right, toward the critter) or back past -0.5; with no puff in play and
+    no lean she settles back toward 0 by `spring`, never past it. The balance
+    stays within -100 and 100. Reaching either end in a puff loses it: it
+    stops blowing and she stands straight again. A puff that blows its whole
+    time is held, on its last tick. Every puff held grades great, at least
+    half good, fewer a miss, like a chain, and each held puff plays
+    `battle-beat`.
 - Soothe and a friend's command add their calm plus the grade bonus, clamped
   to `calmMax`, and show that command's line for the grade. A burst's check
   starts with seeded PRNG draws, in this order: first the big roll (under
   `bigChance` it's big, plays `burst.big`, or the burst's `check` if the kind
-  has none, and its base damage is 2, else 1), then for a catch one draw per
-  toy, `min(2, floor(value x 3))` its lane. Ring and chain bursts make the
-  one draw. Great, good, and miss deal 0, base minus 1, and base.
+  has none, and its base damage is 2, else 1), then one draw per catch toy,
+  `min(2, floor(value x 3))` its lane, or per lean puff, `forces[min(n - 1,
+  floor(value x n))]` its force (with n forces, each as likely). Ring and
+  chain bursts make the one draw. Great, good, and miss deal 0, base minus 1,
+  and base.
 - Check numbers (Milestone 40): Soothe and Maddie's Play are rings of 60
   ticks, target 39, windows 5 and 11. Sue's Cast is a charge: wait 180, max
   60, target 44, windows 5 and 11. Jordan's Juggle is a pinecone chain:
@@ -1142,10 +1158,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   Pouncy Cat yarn, both squirrels acorns, the hamster snowballs, both
   raccoons bottle caps, and Mr. Pip tickets and tokens; four toys land at 54,
   78, 102, and 126 (travel 50), six when big at 54, 74, 94, 114, 134, and 154.
-  The rest (the bluebirds, the gull, and the owl) are rings of 60 ticks,
-  target 45, windows 5 and 11. Every timed part fits in 180 ticks; a charge's
-  wait for its first press isn't timed play (the player picks the moment) and
-  gives up after its 180 ticks.
+  The three gusts (both bluebirds and the gull) are leans (Milestone 48): two
+  puffs of 56 ticks from 44 and 116, each force 2 or 3; big, three of 36
+  ticks from 44, 94, and 144, all force 3; steer 5 and spring 3. Left alone,
+  a puff blows her over; leaning blindly through it tips her over the other
+  way; leaning back toward straight holds it. The owl's is a ring of 60
+  ticks, target 45, windows 5 and 11. Every timed part fits in 180 ticks; a
+  charge's wait for its first press isn't timed play (the player picks the
+  moment) and gives up after its 180 ticks.
 - The loader validates every check: a known kind; integer ticks;
   `greatWindow <= goodWindow`; the target's good window inside the ring or
   the meter (`targetTick - goodWindow >= 1`, `targetTick + goodWindow` under
@@ -1153,12 +1173,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   first arrival at least `travelTicks`, each later one at least
   `2 x hitWindow + 2` after the one before, and a known look; for a catch,
   the first arrival at least `travelTicks`, each later one at least 8 after
-  the one before, and at least one toy. A `burst.big` must be its burst
+  the one before, and at least one toy; for a lean, `puffTicks` and `spring`
+  at least 1, the first start at least 1 and each later one at least
+  `puffTicks` after the one before (one puff at a time), and one or more
+  forces, each at least 1 and under `steer`. A `burst.big` must be its burst
   check's kind, every party command needs a check, and neither Soothe's nor
-  a friend's may be a catch.
-- Hints: while a charge waits for its first press, or before a chain's first
-  beat or a catch's first toy lands, the battle view carries that kind's hint
-  from `content/battle.json` (`hints.charge`, `hints.chain`, `hints.catch`).
+  a friend's may be a catch or a lean.
+- Hints: while a charge waits for its first press, before a chain's first
+  beat or a catch's first toy lands, or before a lean's first puff blows, the
+  battle view carries that kind's hint from `content/battle.json`
+  (`hints.charge`, `hints.chain`, `hints.catch`, `hints.lean`).
   It never uses `battle.message`, whose reveal would eat a confirm press.
 - Feelings (Milestone 42): once two friends fight beside Fae, each bringing
   a battle command (Sue's arrival; a party member without one doesn't
@@ -1240,10 +1264,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   height above her feet, its catch 0.7 x her height in front of her (radius
   0.2 x her height); toys set out from 0.35 x the critter's height in front
   of the critter and are drawn at the critter's own scale, since they were
-  cut from its art. A hint hangs just under the feet line (0.18 x Fae's
-  height below it) under its check, kept 130 px from the screen's sides; a
-  catch's hangs midway between the catch and the critter, clear of the touch
-  arrows on a notched phone.
+  cut from its art. A lean's track (1.6 x Fae's height wide, max(12 px,
+  0.12 x her height) tall) is centred over her, 1.45 x her height above her
+  feet: just over her bun, which stands about 1.3 x her height, and under the
+  HUD. Its swooshes are max(56 px, 0.6 x her height) long, in four rows 1.05,
+  0.8, 0.55, and 0.3 x her height above her feet, each setting out centred 1
+  x her height in front of her and drifting its own length toward her. A
+  hint hangs just under the feet line (0.18 x Fae's height below it) under
+  its check, kept 130 px from the screen's sides; a catch's hangs midway
+  between the catch and the critter, and a lean's midway between Fae and the
+  critter, clear of the touch arrows on a notched phone.
 - Backdrop: the area painting itself, scaled so its painted interior (8% in
   from each side, past the watercolour's paper margins) covers the canvas plus
   a 32 px margin, centred on the critter where it stands (`battleFoe`) and
@@ -1255,17 +1285,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
   backdrop rect, the check (`{ kind, side, x, y, hintAt }` plus a ring's
   `radius`, a meter's `width` and `height`, a chain's `from`, `to`, and
-  `radius`, or a catch's `lanes`, `fromX`, `catcherX`, `radius`, and
-  `toyScale`; `x, y` is a ring's centre, a meter's top-left, a chain's
-  target, or the catch where it is), the battle's critter (`{ id, frame }`),
+  `radius`, a catch's `lanes`, `fromX`, `catcherX`, `radius`, and
+  `toyScale`, or a lean's `track` (`{ x, y, width, height }`, its centre and
+  size) and `wind` (`{ x, rows, length }`); `x, y` is a ring's centre, a
+  meter's top-left, a chain's target, the catch where it is, or a lean's
+  star where it is), the battle's critter (`{ id, frame }`),
   the aura alpha, and whether the
   overworld is visible; `renderInfo().critters` lists each overworld critter
   as `{ id, kind, frame, x, y }`, `id` its key (section 6.1).
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
-  menu, a check overlay (a ring, a charge meter, a beat chain, or a catch)
-  with its
+  menu, a check overlay (a ring, a charge meter, a beat chain, a catch, or a
+  lean) with its
   grade sticker and hint, and a reward card. The game passes a full view to
   each `render` every frame; identical views change no DOM nodes. Battle
   messages use the dialogue box with no speaker.
@@ -1302,6 +1334,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   the toy atlas in flight along their lanes; a caught toy pops into the
   catch (a quick grow and fade), a missed one sails on past Fae and fades.
   The grade sticker sits above the catch.
+- Lean (Milestone 48): a sticker track, green in its middle half and coral
+  in its outer tenths where Fae tips over, with a butter-yellow star riding
+  on it at her balance (-1 at the left end, 1 at the right). A dot per puff
+  sits over the track: teal and larger while it blows, green once held, grey
+  once lost. While a puff blows, swooshes (ink streaks on a cream rim, curled
+  at the end nearest Fae, at the ring's stroke weight) drift in at her and
+  fade, each three times over a puff: three rows, all four when the puff's
+  force is at least half her lean. The grade sticker hangs over her head,
+  just under the track, since above it would meet the HUD on a phone. All of
+  it is drawn in code; nothing is generated.
 - Feelings (Milestone 42): a thought cloud (a cream sticker) floats in the
   open ground between Fae's party and the critter (`battleFeelingAnchor`:
   centred between 0.45 x Fae's height past her and the critter's aura edge,
@@ -1324,12 +1366,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   white rim and an ink outline that follow the critter's silhouette. Asset
   URLs are document-relative so they work on iOS.
 - `data-battle="open"` on the root hides the movement stick; confirm and cancel
-  stay. While a catch is in play the shell sets `data-check="catch"`, and two
-  arrow stickers (up above down, the cancel button's size) stand where the
-  stick would: held, they point the catch high or low, as the stick or
-  arrows would; let go, it returns to the middle. Outside a catch the shell
-  lets go of them, so one held as the catch ends never walks Fae on. Every
-  battle text pair measures at least 4.5:1 contrast in the gallery tests.
+  stay. While a catch or a lean is in play the shell sets `data-check` to its
+  kind, and two arrow stickers (the cancel button's size) stand where the
+  stick would: a catch's up above down, held, point the catch high or low;
+  a lean's back beside forward (left and right) lean Fae, as the stick or
+  arrows would. Let go, the catch returns to the middle and the lean stops;
+  lifting one arrow never lets go of the other if a second finger holds it.
+  Outside a catch or a lean the shell lets go of them, so one held as the
+  check ends never walks Fae on. Every battle text pair measures at least
+  4.5:1 contrast in the gallery tests.
 - `content/fixtures/plaza-party.json` is the two-member visual and battle
   fixture: plaza fountain spawn, seed 1, party `["maddie", "sue"]`.
 - The Pixi battle scene dims the loaded area painting and presents the critter,

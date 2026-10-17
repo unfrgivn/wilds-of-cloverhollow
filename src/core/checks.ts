@@ -8,19 +8,32 @@ import type {
   Grade,
 } from "./types";
 
+// Which way Fae leans: back (-1), neither, or forward into the wind (1).
+export type Lean = -1 | 0 | 1;
+
 // What one tick of input means to a check: a fresh confirm press, confirm
-// held, and the catch lane the stick or arrows point at.
-export type CheckInput = { confirmEdge: boolean; confirmHeld: boolean; lane: number };
+// held, the catch lane the stick or arrows point at, and the way they lean.
+export type CheckInput = {
+  confirmEdge: boolean;
+  confirmHeld: boolean;
+  lane: number;
+  lean: Lean;
+};
+
+// Fae's balance in a lean runs from -100 (blown over backward) to 100
+// (leaned over forward); 0 is standing straight.
+const balanceEnd = 100;
 
 /**
- * Creates the tick-zero state for a check. A catch needs its toys' lanes,
- * drawn by the caller from the seeded PRNG (`laneFromDraw`).
+ * Creates the tick-zero state for a check. A catch's toys need their lanes
+ * and a lean's puffs their forces, picked by the caller from the seeded PRNG
+ * (`checkDraws`, `pickFromDraw`).
  */
 export function createCheck(
   spec: CheckSpec,
   side: CheckSide,
   big = false,
-  lanes: number[] = [],
+  picks: number[] = [],
 ): CheckState {
   if (spec.kind === "ring")
     return { kind: "ring", side, tick: 0, spec: { ...spec }, big };
@@ -32,9 +45,20 @@ export function createCheck(
       side,
       tick: 0,
       spec: { ...spec, arrivals: [...spec.arrivals], toys: [...spec.toys] },
-      lanes: spec.arrivals.map((_, index) => lanes[index] ?? 1),
+      lanes: spec.arrivals.map((_, index) => picks[index] ?? 1),
       catcher: 1,
       results: spec.arrivals.map(() => "pending"),
+      big,
+    };
+  if (spec.kind === "lean")
+    return {
+      kind: "lean",
+      side,
+      tick: 0,
+      spec: { ...spec, starts: [...spec.starts], forces: [...spec.forces] },
+      strengths: spec.starts.map((_, index) => picks[index] ?? spec.forces[0] ?? 0),
+      balance: 0,
+      results: spec.starts.map(() => "pending"),
       big,
     };
   return {
@@ -68,6 +92,7 @@ export function stepCheck(
   if (check.kind === "charge")
     return stepCharge(check, tick, input.confirmEdge, input.confirmHeld);
   if (check.kind === "catch") return stepCatch(check, tick, input.lane);
+  if (check.kind === "lean") return stepLean(check, tick, input.lean);
   return stepChain(check, tick, input.confirmEdge);
 }
 
@@ -157,14 +182,76 @@ export function stepCatch(
   return { check: { ...check, tick, catcher: lane, results }, grade: gradeHits(results) };
 }
 
+/**
+ * Blows the puff in play (one still pending), then leans Fae the way the
+ * player holds; with no puff and no lean she settles back toward straight.
+ * Reaching either end in a puff loses it: the puff stops and she stands
+ * straight again. A puff that blows its whole time without that is held.
+ *
+ *   -100 <-- a puff pushes her back --- 0 --- leaning pulls her forward --> 100
+ *   blown over                       straight                   leaned over
+ */
+export function stepLean(
+  check: Extract<CheckState, { kind: "lean" }>,
+  tick: number,
+  lean: Lean,
+): { check: CheckState; grade: Grade | null } {
+  const { puffTicks, starts, steer, spring } = check.spec;
+  const puff = starts.findIndex((start, index) =>
+    check.results[index] === "pending" && tick >= start && tick < start + puffTicks);
+  const force = puff < 0 ? 0 : (check.strengths[puff] ?? 0);
+  const settling = puff < 0 && lean === 0;
+  const moved = settling
+    ? check.balance - Math.sign(check.balance) * Math.min(spring, Math.abs(check.balance))
+    : check.balance - force + lean * steer;
+  const balance = Math.max(-balanceEnd, Math.min(balanceEnd, moved));
+  const over = puff >= 0 && Math.abs(balance) >= balanceEnd;
+  const results = check.results.map((result, index): BeatResult =>
+    index !== puff
+      ? result
+      : over
+        ? "miss"
+        : tick === (starts[index] ?? 0) + puffTicks - 1
+          ? "hit"
+          : result);
+  return {
+    check: { ...check, tick, balance: over ? 0 : balance, results },
+    grade: gradeHits(results),
+  };
+}
+
 /** The catch lane a stick or arrow points at: 0 high, 1 middle, 2 low. */
 export function laneFromStick(moveY: number): number {
   return moveY < -0.5 ? 0 : moveY > 0.5 ? 2 : 1;
 }
 
+/** Which way a stick or arrow leans Fae: right is forward, into the wind. */
+export function leanFromStick(moveX: number): Lean {
+  return moveX < -0.5 ? -1 : moveX > 0.5 ? 1 : 0;
+}
+
 /** A toy's lane from one seeded PRNG draw in 0..1, spread over the three. */
 export function laneFromDraw(value: number): number {
   return Math.min(2, Math.floor(value * 3));
+}
+
+/** How many seeded draws a check takes as it starts: one per catch toy or lean puff. */
+export function checkDraws(spec: CheckSpec): number {
+  return spec.kind === "catch"
+    ? spec.arrivals.length
+    : spec.kind === "lean"
+      ? spec.starts.length
+      : 0;
+}
+
+/**
+ * What one draw in 0..1 picks: a lean puff's force (each of `forces` as
+ * likely), or a catch toy's lane.
+ */
+export function pickFromDraw(spec: CheckSpec, value: number): number {
+  if (spec.kind !== "lean") return laneFromDraw(value);
+  const index = Math.min(spec.forces.length - 1, Math.floor(value * spec.forces.length));
+  return spec.forces[index] ?? 0;
 }
 
 /** A thing in flight: 0 when it appears, 1 as it lands (clamped). */
@@ -210,6 +297,24 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
         result: check.results[index] ?? "pending",
       })),
     };
+  if (check.kind === "lean") {
+    const { starts, puffTicks, steer } = check.spec;
+    return {
+      kind: "lean",
+      side: check.side,
+      balance: check.balance / balanceEnd,
+      puffs: starts.map((start, index) => {
+        const result = check.results[index] ?? "pending";
+        return {
+          // A pending puff resolves by its last tick, so started is blowing.
+          blowing: result === "pending" && check.tick >= start,
+          progress: Math.max(0, Math.min(1, (check.tick - start) / puffTicks)),
+          force: (check.strengths[index] ?? 0) / steer,
+          result,
+        };
+      }),
+    };
+  }
   return {
     kind: "chain",
     side: check.side,
@@ -225,16 +330,19 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
 
 /**
  * The hint while a check waits for the player: a charge before its first
- * press, a chain or catch before its first landing.
+ * press, a chain or catch before its first landing, a lean before its first
+ * puff.
  */
 export function checkHint(check: CheckState, hints: BattleContent["hints"]): string | null {
   if (check.kind === "charge") return check.held === 0 ? hints.charge : null;
   if (check.kind === "chain" || check.kind === "catch")
     return check.tick < (check.spec.arrivals[0] ?? 0) ? hints[check.kind] : null;
+  if (check.kind === "lean")
+    return check.tick < (check.spec.starts[0] ?? 0) ? hints.lean : null;
   return null;
 }
 
-/** A finished chain or catch: every one a hit is great, half good. */
+/** A finished chain, catch, or lean: every one a hit is great, half good. */
 function gradeHits(results: BeatResult[]): Grade | null {
   if (results.some((result) => result === "pending")) return null;
   const hits = results.filter((result) => result === "hit").length;

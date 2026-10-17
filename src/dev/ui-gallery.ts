@@ -74,8 +74,9 @@ const dialogueShown = battleState
   : state !== "prompt" && !journalState && !titleState &&
     (!arcadeState || state === "arcade-result");
 if (battleState) document.documentElement.dataset.battle = "open";
-// A catch shows its touch arrows (spec 8.1).
+// A catch or a lean shows its touch arrows (spec 8.1).
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
+if (state === "battle-lean") document.documentElement.dataset.check = "lean";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
 if (arcadeState) document.documentElement.dataset.arcade = "open";
@@ -440,6 +441,21 @@ function renderGalleryState(): void {
       grade: null,
       hint: "Hold up or down to catch each one!",
       hintAt: { x: 405, y: 280 },
+    },
+    // The phone's real lean (Fae at x 190, feet at 229, 78 px tall): the
+    // first puff held, the second, a strong one, pushing her back.
+    "battle-lean": {
+      kind: "lean",
+      track: { x: 190, y: 116, width: 125, height: 12 },
+      balance: -0.32,
+      wind: { x: 268, rows: [147, 167, 186, 206], length: 56 },
+      puffs: [
+        { blowing: false, progress: 1, force: 0.4, result: "hit" },
+        { blowing: true, progress: 0.45, force: 0.6, result: "pending" },
+      ],
+      grade: null,
+      hint: null,
+      hintAt: { x: 315, y: 243 },
     },
   };
   check.render(galleryChecks[state] ?? null);

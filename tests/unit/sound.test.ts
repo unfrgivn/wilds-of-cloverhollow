@@ -142,4 +142,37 @@ describe("gameplay sound cues", () => {
     }
     expect(beats).toBe(pup.burst.check.arrivals.length - 1);
   });
+
+  it("emits one battle-beat per held puff and none for a lost one", () => {
+    const fixture = content.fixtures.plaza;
+    const bluebird = content.world.critters.bluebird;
+    if (fixture === undefined || bluebird === undefined || bluebird.burst.check.kind !== "lean")
+      throw new Error("lean fixtures missing");
+    const initial = createState(content.world, fixture);
+    let state: State = {
+      ...initial,
+      battle: {
+        critterId: bluebird.id, den: null, entry: initial.player, phase: "check",
+        message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
+        rest: {}, check: createCheck(bluebird.burst.check, "fae", false, [2, 3]),
+        lastGrade: null, feelings: [], answered: false, lanternPeek: false,
+        rewardSticker: null, phaseTicks: 0,
+      },
+    };
+    // The first puff blows Fae over; through the second she leans back
+    // toward straight.
+    let beats = 0;
+    while (state.battle?.phase === "check") {
+      const check = state.battle.check;
+      const leaning = check?.kind === "lean" && check.results[0] !== "pending";
+      const balance = check?.kind === "lean" ? check.balance : 0;
+      const x = !leaning ? 0 : balance <= -5 ? 1 : balance >= 5 ? -1 : 0;
+      const next = step(content.world, state, { ...none, move: { x, y: 0 } }).state;
+      beats += soundCues(state, next, content.world)
+        .filter((cue) => cue === "battle-beat").length;
+      state = next;
+    }
+    expect(state.battle?.check).toMatchObject({ results: ["miss", "hit"] });
+    expect(beats).toBe(1);
+  });
 });

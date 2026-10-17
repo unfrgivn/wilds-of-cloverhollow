@@ -310,7 +310,8 @@ export function createRecorder(world: World, initial: State): {
   // Plays one check like a careful player, every grade GREAT: a ring pressed
   // on its target tick; a charge held exactly to its target, then let go; a
   // chain pressed on each beat's arrival; a catch held in each toy's lane
-  // (up high, nothing for the middle, down low) as it lands.
+  // (up high, nothing for the middle, down low) as it lands; a lean leaned
+  // back toward straight whenever Fae is 5 or more off.
   const playCheck = (check: CheckState): void => {
     const live = (): CheckState | null => state.battle?.check ?? null;
     const waitFor = (target: number): void => {
@@ -330,6 +331,12 @@ export function createRecorder(world: World, initial: State): {
         if (next < 0) break;
         const lane = current.lanes[next] ?? 1;
         tick(frame(lane === 0 ? directions.up : lane === 2 ? directions.down : undefined));
+      }
+    } else if (check.kind === "lean") {
+      for (let current = live(); current?.kind === "lean"; current = live()) {
+        if (!current.results.includes("pending")) break;
+        const { balance } = current;
+        tick(frame(balance <= -5 ? directions.right : balance >= 5 ? directions.left : undefined));
       }
     } else {
       for (const arrival of check.spec.arrivals) {

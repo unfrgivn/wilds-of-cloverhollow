@@ -109,6 +109,26 @@ export type BattleCheckView =
       hint: string | null;
       // The top centre of the hint sticker.
       hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "lean";
+      // The balance track's centre and size, and Fae's balance on it: -1
+      // blown over backward (left), 1 leaned over forward (right).
+      track: { x: number; y: number; width: number; height: number };
+      balance: number;
+      // Where each swoosh sets out, one height per row, and its length.
+      wind: { x: number; rows: number[]; length: number };
+      puffs: {
+        blowing: boolean;
+        progress: number;
+        // How hard it pushes next to Fae's lean, 0..1.
+        force: number;
+        result: "pending" | "hit" | "miss";
+      }[];
+      grade: TimingGrade | null;
+      hint: string | null;
+      // The top centre of the hint sticker.
+      hintAt: { x: number; y: number };
     };
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
@@ -137,13 +157,22 @@ export function createBattleCheck(root: HTMLElement): {
   const catcher = element("div", "battle-catch-ring");
   const toys = element("div", "battle-catch-toys");
   catchLayer.append(...laneDots, catcher, toys);
+  // A lean: swooshes blowing in at Fae, the balance track with the star on
+  // it, and a dot per puff above the track.
+  const leanLayer = element("div", "battle-lean");
+  const swooshes = [0, 1, 2, 3].map(() => swooshIcon());
+  const track = element("div", "battle-lean-track");
+  const star = starIcon();
+  const puffDots = element("div", "battle-lean-puffs");
+  leanLayer.append(...swooshes, track, star, puffDots);
   const hint = element("div", "battle-check-hint");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
   grade.hidden = true;
-  root.append(ring, meter, chain, catchLayer, hint, grade);
+  root.append(ring, meter, chain, catchLayer, leanLayer, hint, grade);
   const icons: HTMLElement[] = [];
   const toyNodes: { node: HTMLElement; src: string }[] = [];
+  const dotNodes: HTMLElement[] = [];
   let iconLook: "pinecone" | "bubble" | "dust" | null = null;
   const hide = (node: HTMLElement | SVGSVGElement, hidden: boolean): void => {
     node.style.display = hidden ? "none" : "";
@@ -154,6 +183,7 @@ export function createBattleCheck(root: HTMLElement): {
       hide(meter, view?.kind !== "charge");
       hide(chain, view?.kind !== "chain");
       hide(catchLayer, view?.kind !== "catch");
+      hide(leanLayer, view?.kind !== "lean");
       hide(hint, view?.hint === null || view === null);
       if (view === null) {
         grade.hidden = true;
@@ -247,6 +277,48 @@ export function createBattleCheck(root: HTMLElement): {
           view.catcherX,
           laneY(view.catcher) - view.radius - gradeGap,
         );
+      } else if (view.kind === "lean") {
+        const { x, y, width, height } = view.track;
+        track.style.left = `${x}px`;
+        track.style.top = `${y}px`;
+        track.style.width = `${width}px`;
+        track.style.height = `${height}px`;
+        setAttribute(star, "width", String(2 * height));
+        setAttribute(star, "height", String(2 * height));
+        star.style.left = `${x + Math.max(-1, Math.min(1, view.balance)) * width / 2}px`;
+        star.style.top = `${y}px`;
+        while (dotNodes.length < view.puffs.length) {
+          const dot = element("span", "battle-lean-puff");
+          puffDots.append(dot);
+          dotNodes.push(dot);
+        }
+        dotNodes.forEach((dot, index) => {
+          const puff = view.puffs[index];
+          dot.hidden = puff === undefined;
+          if (puff === undefined) return;
+          dot.classList.toggle("is-blowing", puff.blowing);
+          dot.classList.toggle("is-hit", puff.result === "hit");
+          dot.classList.toggle("is-miss", puff.result === "miss");
+          dot.style.left = `${x + (index - (view.puffs.length - 1) / 2) * puffSpacing}px`;
+          dot.style.top = `${y - height / 2 - puffGap}px`;
+        });
+        // The puff blowing now: three swooshes, four when it pushes harder,
+        // each drifting its length in toward Fae and fading as it goes.
+        const blowing = view.puffs.find((puff) => puff.blowing);
+        const rows = blowing === undefined ? 0 : blowing.force >= 0.5 ? 4 : 3;
+        swooshes.forEach((swoosh, row) => {
+          const rowY = view.wind.rows[row];
+          hide(swoosh, blowing === undefined || row >= rows || rowY === undefined);
+          if (blowing === undefined || rowY === undefined) return;
+          const phase = (blowing.progress * swooshCycles + row * 0.29) % 1;
+          setAttribute(swoosh, "width", String(view.wind.length));
+          setAttribute(swoosh, "height", String(view.wind.length / 3));
+          swoosh.style.left = `${view.wind.x - phase * view.wind.length}px`;
+          swoosh.style.top = `${rowY}px`;
+          swoosh.style.opacity = String(Math.sin(Math.PI * phase));
+        });
+        // Over Fae's head: above the track it would run into the HUD.
+        renderGrade(grade, view.grade, x, y + 3 * height);
       } else {
         chain.style.left = "0";
         chain.style.top = "0";
@@ -339,6 +411,36 @@ function chainIcon(look: "pinecone" | "bubble" | "dust"): SVGSVGElement {
   return svg;
 }
 
+// A lean's star, drawn in code in the sticker style: butter yellow with an
+// ink edge, on a cream rim.
+function starIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-lean-star");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const shape = "M12 1.6 L14.8 8.7 L22.5 9.2 L16.6 14.1 L18.5 21.5 L12 17.4 L5.5 21.5 " +
+    "L7.4 14.1 L1.5 9.2 L9.2 8.7 Z";
+  for (const className of ["battle-lean-star-rim", "battle-lean-star-fill"]) {
+    const path = svgElement("path", className);
+    path.setAttribute("d", shape);
+    svg.append(path);
+  }
+  return svg;
+}
+
+// A swoosh of wind: a streak that curls up at its leading end, ink on a
+// cream rim.
+function swooshIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-lean-swoosh");
+  svg.setAttribute("viewBox", "0 0 60 20");
+  svg.setAttribute("aria-hidden", "true");
+  for (const className of ["battle-lean-swoosh-rim", "battle-lean-swoosh-ink"]) {
+    const path = svgElement("path", className);
+    path.setAttribute("d", "M58 15 H25 C12 15 4 8 9 3.5 C13 0 21 2 19.5 8.5");
+    svg.append(path);
+  }
+  return svg;
+}
+
 export type RewardStickerView = {
   visible: boolean;
   title: string;
@@ -350,6 +452,11 @@ export type RewardStickerView = {
 const svgNamespace = "http://www.w3.org/2000/svg";
 const leafPath = "M 2 15 C 5 2, 15 1, 22 3 C 20 12, 12 18, 2 15 M 3 14 L 19 4";
 const gradeGap = 6;
+// A lean's puff dots: their spacing, and how far over the track they sit.
+const puffSpacing = 18;
+const puffGap = 10;
+// How many times each swoosh drifts in over one puff.
+const swooshCycles = 3;
 const gradeLabels: Record<TimingGrade, string> = {
   great: "GREAT!",
   good: "GOOD!",

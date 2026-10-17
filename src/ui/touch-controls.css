@@ -113,19 +113,21 @@
   display: none;
 }
 
-/* A catch's arrows stand where the stick would, up above down, only while a
-   catch is in play (spec 8.1). */
-.touch-reach {
+/* A check's arrows stand where the stick would, only while it is in play
+   (spec 8.1): a catch's up above down, a lean's back beside forward. */
+.touch-reach,
+.touch-lean {
   position: absolute;
   left: calc(20px + var(--safe-left));
   bottom: calc(20px + var(--safe-bottom));
   display: none;
-  flex-direction: column;
   gap: var(--touch-gap);
   pointer-events: auto;
 }
-:root[data-check="catch"] .touch-reach { display: flex; }
-.touch-reach .touch-button {
+.touch-reach { flex-direction: column; }
+:root[data-check="catch"] .touch-reach,
+:root[data-check="lean"] .touch-lean { display: flex; }
+:is(.touch-reach, .touch-lean) .touch-button {
   width: var(--touch-cancel-size);
   height: var(--touch-cancel-size);
   font-size: 22px;

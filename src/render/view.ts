@@ -50,10 +50,19 @@ export type BattleCheckGeometry =
       radius: number;
       toyScale: number;
       hintAt: Point;
+    }
+  // A lean: the balance track above Fae's head (its centre and size), and
+  // the wind's swooshes in front of her (where each sets out, one height per
+  // row, and how long each is; it drifts its own length toward her).
+  | {
+      kind: "lean";
+      track: { x: number; y: number; width: number; height: number };
+      wind: { x: number; rows: number[]; length: number };
+      hintAt: Point;
     };
 // The check for tests (spec 11): its side and geometry, plus an anchor
 // (`x`, `y`: a ring's centre, a meter's top-left, a chain's target, the
-// catch where it is).
+// catch where it is, a lean's star where it is).
 export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number; y: number };
 import { followCamera, worldToScreen } from "./camera";
 import { selectFaeAnimation } from "./animation";
@@ -907,6 +916,26 @@ export class GameView {
         hintAt: hintAt((fae.x + 0.7 * fae.height + critter.x) / 2),
       };
     }
+    // Fae's figure stands about 1.3 heights tall: the track rides just over
+    // her bun, under the HUD, and the swooshes blow along her front.
+    if (check.kind === "lean")
+      return {
+        kind: "lean",
+        track: {
+          x: fae.x,
+          y: fae.baseline - 1.45 * fae.height,
+          width: 1.6 * fae.height,
+          height: Math.max(12, 0.12 * fae.height),
+        },
+        wind: {
+          x: fae.x + fae.height,
+          rows: [1.05, 0.8, 0.55, 0.3].map((share) => fae.baseline - share * fae.height),
+          length: Math.max(56, 0.6 * fae.height),
+        },
+        // Midway between Fae and the critter, like a catch's: clear of the
+        // touch arrows bottom left.
+        hintAt: hintAt((fae.x + critter.x) / 2),
+      };
     if (check.side === "fae")
       return {
         kind: "chain",
@@ -961,6 +990,12 @@ export class GameView {
       const lane = check.kind === "catch" ? check.catcher : 1;
       const y = geometry.lanes[lane] ?? geometry.lanes[1];
       return { ...geometry, side, x: geometry.catcherX, y };
+    }
+    if (geometry.kind === "lean") {
+      const view = battleView(this.world, state)?.check;
+      const balance = view?.kind === "lean" ? view.balance : 0;
+      const { track } = geometry;
+      return { ...geometry, side, x: track.x + balance * track.width / 2, y: track.y };
     }
     return { ...geometry, side };
   }

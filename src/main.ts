@@ -246,6 +246,8 @@ async function boot(): Promise<void> {
           };
         }),
       };
+    if (check.kind === "lean" && geometry.kind === "lean")
+      return { ...geometry, ...shared, balance: check.balance, puffs: check.puffs };
     return null;
   };
   const stickerArt = (
@@ -366,13 +368,14 @@ async function boot(): Promise<void> {
     else delete document.documentElement.dataset.title;
     if (activeBattle) document.documentElement.dataset.battle = "open";
     else delete document.documentElement.dataset.battle;
-    // Which check is in play (spec 8.1): a catch shows its touch arrows.
+    // Which check is in play (spec 8.1): a catch or a lean shows its touch
+    // arrows.
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;
-    // An arrow held as the catch ends is hidden mid-press and may never see
-    // its pointer lifted: outside a catch, it lets go.
-    if (checkKind !== "catch") touch.setReach(0);
+    // An arrow held as a catch or lean ends is hidden mid-press and may never
+    // see its pointer lifted: outside one, it lets go.
+    if (checkKind !== "catch" && checkKind !== "lean") touch.releaseArrows();
     battleHud.render({
       visible: activeBattle && state.battle?.phase !== "reward",
       energy: battle?.energy ?? 0,

@@ -29,10 +29,12 @@ import type {
 import { createInkState, runInk, storyHasKnot, type InkFacts } from "./ink";
 import { sceneryArea } from "./props";
 import {
+  checkDraws,
   checkHint,
   createCheck,
-  laneFromDraw,
   laneFromStick,
+  leanFromStick,
+  pickFromDraw,
   stepCheck,
   viewCheck,
 } from "./checks";
@@ -848,12 +850,12 @@ function startCheck(
   side: CheckSide,
   spec: CheckSpec,
   big = false,
-  lanes: number[] = [],
+  picks: number[] = [],
 ): Battle {
   return {
     ...battle,
     phase: "check",
-    check: createCheck(spec, side, big, lanes),
+    check: createCheck(spec, side, big, picks),
     phaseTicks: 0,
     lastGrade: null,
     message: "",
@@ -943,19 +945,19 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           ? battleMessage(next, critter.lines.soothed, "soothed")
           : battleMessage(next, critter.lines.burst, "burst");
     else if (next.phase === "burst") {
-      // The big roll first, then (for a catch) one draw per toy's lane.
+      // The big roll first, then one draw per catch toy (its lane) or lean
+      // puff (its force).
       const random = nextRandom(nextBase);
       const big = random[0] < critter.burst.bigChance;
       const spec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
       let rolled = random[1];
-      const lanes: number[] = [];
-      if (spec.kind === "catch")
-        for (const _arrival of spec.arrivals) {
-          const [value, after] = nextRandom(rolled);
-          lanes.push(laneFromDraw(value));
-          rolled = after;
-        }
-      return { ...rolled, battle: startCheck(next, "fae", spec, big, lanes) };
+      const picks: number[] = [];
+      for (let item = 0; item < checkDraws(spec); item += 1) {
+        const [value, after] = nextRandom(rolled);
+        picks.push(pickFromDraw(spec, value));
+        rolled = after;
+      }
+      return { ...rolled, battle: startCheck(next, "fae", spec, big, picks) };
     }
     else if (next.phase === "burstResult") {
       if (next.energy <= 0) next = battleMessage(next, critter.lines.rest, "rest");
@@ -1118,6 +1120,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       confirmEdge: confirm,
       confirmHeld: input.confirm,
       lane: laneFromStick(input.move.y),
+      lean: leanFromStick(input.move.x),
     });
     const result = stepped.grade;
     // The check stays in the battle through its result, as it ended: the

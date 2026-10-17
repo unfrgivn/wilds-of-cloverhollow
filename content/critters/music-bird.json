@@ -64,11 +64,32 @@
   "burst": {
     "bigChance": 0.3,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "lean",
+      "puffTicks": 56,
+      "starts": [
+        44,
+        116
+      ],
+      "forces": [
+        2,
+        3
+      ],
+      "steer": 5,
+      "spring": 3
+    },
+    "big": {
+      "kind": "lean",
+      "puffTicks": 36,
+      "starts": [
+        44,
+        94,
+        144
+      ],
+      "forces": [
+        3
+      ],
+      "steer": 5,
+      "spring": 3
     }
   },
   "lines": {
@@ -99,8 +120,8 @@
     "snack": "Fae shares a crunchy cracker. The bluebird chirps happily, still holding the mallet.",
     "burst": "The bluebird flaps hard and sends a fizzy gust through the music room!",
     "burstResult": {
-      "great": "Fae ducks neatly under the fluttering swirl!",
-      "good": "Fae brushes a few feathers from her sleeve.",
+      "great": "Fae leans into the fluttering swirl and stays put!",
+      "good": "Fae wobbles, and a few feathers land on her sleeve.",
       "miss": "Poof! The gust scatters music sheets all around Fae."
     },
     "soothed": "The bluebird hops down and drops the little wooden mallet.",

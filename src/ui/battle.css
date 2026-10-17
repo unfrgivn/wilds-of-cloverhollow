@@ -263,6 +263,35 @@
 /* Caught: a quick pop into the catch. Missed: on past Fae, fading. */
 .battle-catch-toy.is-hit { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
 .battle-catch-toy.is-miss { opacity: 0; transform: translate(-150%, -50%); transition: opacity 400ms, transform 400ms; }
+/* A lean (Milestone 48): a sticker track, green in the middle and coral at
+   the ends where Fae tips over, the star riding on it, a dot per puff above
+   it, and swooshes blowing in at her. */
+.battle-lean { position: fixed; inset: 0; z-index: var(--z-ring); pointer-events: none; }
+.battle-lean-track {
+  position: absolute;
+  box-sizing: border-box;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f0a08a 0 10%, var(--sticker-paper) 10% 25%,
+    var(--sticker-green) 25% 75%, var(--sticker-paper) 75% 90%, #f0a08a 90%);
+  box-shadow: var(--sticker-shadow);
+}
+.battle-lean-star { position: absolute; overflow: visible; transform: translate(-50%, -50%); }
+.battle-lean-star-rim { fill: none; stroke: var(--sticker-rim); stroke-width: 5; stroke-linejoin: round; }
+.battle-lean-star-fill { fill: #f6cf4f; stroke: var(--sticker-ink); stroke-width: 1.8; stroke-linejoin: round; }
+.battle-lean-puffs { position: absolute; inset: 0; }
+.battle-lean-puff { position: absolute; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; background: var(--sticker-rim); box-shadow: 0 0 0 2px var(--sticker-ink); transition: transform 100ms; }
+.battle-lean-puff[hidden] { display: none; }
+.battle-lean-puff.is-blowing { background: var(--sticker-teal); transform: translate(-50%, -50%) scale(1.3); }
+.battle-lean-puff.is-hit { background: var(--sticker-green); }
+.battle-lean-puff.is-miss { background: var(--sticker-taupe); opacity: .6; }
+.battle-lean-swoosh { position: absolute; overflow: visible; transform: translate(-50%, -50%); }
+/* Strokes keep the ring's sticker weight at every size. */
+.battle-lean-swoosh path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.battle-lean-swoosh-rim { stroke: var(--sticker-rim); stroke-width: 7; }
+.battle-lean-swoosh-ink { stroke: var(--sticker-ink); stroke-width: 2.6; }
 .battle-icon { width: 100%; height: 100%; overflow: visible; }
 .battle-icon-fill { stroke: var(--sticker-ink); stroke-width: 2; stroke-linejoin: round; }
 .battle-icon-mark { fill: none; stroke: #6d4339; stroke-width: 1.6; stroke-linecap: round; }

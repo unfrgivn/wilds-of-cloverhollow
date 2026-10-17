@@ -13,14 +13,16 @@ export class TouchInput {
   private stickId: number | undefined;
   private origin: Point | undefined;
   private move: Point = { x: 0, y: 0 };
-  // A catch's arrow stickers (-1 up, 1 down) while one is held; the stick
-  // is hidden in battle, so the two never fight.
-  private reach = 0;
+  // A check's arrow sticker while one is held (a catch's up or down, a
+  // lean's back or forward), as a step along one axis; the stick is hidden
+  // in battle, so the two never fight.
+  private arrow: Point = { x: 0, y: 0 };
 
   frame(): ActionFrame {
+    const arrowHeld = this.arrow.x !== 0 || this.arrow.y !== 0;
     return {
       ...blankInput(),
-      move: this.stickId === undefined && this.reach !== 0 ? { x: 0, y: this.reach } : this.move,
+      move: this.stickId === undefined && arrowHeld ? this.arrow : this.move,
       confirm: this.hasButton("confirm"),
       cancel: this.hasButton("cancel"),
       menu: this.hasButton("menu"),
@@ -73,9 +75,20 @@ export class TouchInput {
     this.choice = index;
   }
 
-  /** Holds a catch arrow (-1 up, 1 down); 0 lets go. */
-  setReach(direction: number): void {
-    this.reach = Math.sign(direction);
+  /** Holds a check's arrow: a step along one axis, like the stick's. */
+  holdArrow(direction: Point): void {
+    this.arrow = { x: Math.sign(direction.x), y: Math.sign(direction.y) };
+  }
+
+  /** Lets go of an arrow, unless another finger has since held a different one. */
+  releaseArrow(direction: Point): void {
+    if (this.arrow.x === Math.sign(direction.x) && this.arrow.y === Math.sign(direction.y))
+      this.releaseArrows();
+  }
+
+  /** Lets go of every arrow, as the shell does outside a catch or a lean. */
+  releaseArrows(): void {
+    this.arrow = { x: 0, y: 0 };
   }
 }
 

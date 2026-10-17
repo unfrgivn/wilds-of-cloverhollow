@@ -76,7 +76,8 @@ export function soundCues(
     else if (previous.battle.phase === "rest") cues.push("battle-rest");
   }
   if (previous.battle !== null && next.battle !== null) {
-    // A beat popped or a toy caught (a new check starts back at none).
+    // A beat popped, a toy caught, or a puff held (a new check starts back
+    // at none).
     if (hits(next.battle.check) > hits(previous.battle.check)) cues.push("battle-beat");
     if (previous.battle.command !== next.battle.command && next.battle.command !== null)
       cues.push("battle-command");
@@ -95,9 +96,10 @@ export function soundCues(
   return cues;
 }
 
-// How many beats or toys a chain or catch has hit so far; other checks none.
+// How many beats, toys, or puffs a chain, catch, or lean has hit so far;
+// other checks none.
 function hits(check: CheckState | null): number {
-  return check?.kind === "chain" || check?.kind === "catch"
+  return check?.kind === "chain" || check?.kind === "catch" || check?.kind === "lean"
     ? check.results.filter((result) => result === "hit").length
     : 0;
 }

@@ -133,12 +133,19 @@ import type {
 function checkSpec(value: unknown, file: string, name: string): CheckSpec {
   field(record(value), file, name);
   const kind = value.kind;
-  field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch", file,
-    `${name}.kind`);
+  field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch" ||
+    kind === "lean", file, `${name}.kind`);
   const integer = (key: string): number => {
     const item = value[key];
     field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
     return item;
+  };
+  const integers = (key: string): number[] => {
+    const items = value[key];
+    field(Array.isArray(items) && items.length > 0 &&
+      items.every((item): item is number => typeof item === "number" && Number.isInteger(item)),
+    file, `${name}.${key}`);
+    return [...items];
   };
   if (kind === "ring") {
     const ticks = integer("ticks");
@@ -162,12 +169,27 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
       `${name}.targetTick`);
     return { kind, waitTicks, maxTicks, targetTick, greatWindow, goodWindow };
   }
+  if (kind === "lean") {
+    const puffTicks = integer("puffTicks");
+    const steer = integer("steer");
+    const spring = integer("spring");
+    const starts = integers("starts");
+    const forces = integers("forces");
+    field(puffTicks >= 1, file, `${name}.puffTicks`);
+    field(spring >= 1, file, `${name}.spring`);
+    // One puff blows at a time, the first after a moment to read the hint.
+    starts.forEach((start, index) => {
+      const previous = starts[index - 1];
+      field(previous === undefined ? start >= 1 : start >= previous + puffTicks, file,
+        `${name}.starts`);
+    });
+    // Every puff pushes, and Fae can always lean harder than it.
+    field(forces.every((force) => force >= 1 && force < steer), file, `${name}.forces`);
+    return { kind, puffTicks, starts, forces, steer, spring };
+  }
   const travelTicks = integer("travelTicks");
   field(travelTicks >= 1, file, `${name}.travelTicks`);
-  const arrivals = value.arrivals;
-  field(Array.isArray(arrivals) && arrivals.length > 0 &&
-    arrivals.every((item): item is number => typeof item === "number" && Number.isInteger(item)),
-  file, `${name}.arrivals`);
+  const arrivals = integers("arrivals");
   // The first one has room to travel in. A chain's windows never touch, so a
   // press belongs to one beat; a catch's toys land at least 8 ticks apart.
   const hitWindow = kind === "chain" ? integer("hitWindow") : 0;
@@ -183,18 +205,19 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
     field(Array.isArray(toys) && toys.length > 0 &&
       toys.every((item): item is string => typeof item === "string" && item.length > 0),
     file, `${name}.toys`);
-    return { kind, travelTicks, arrivals: [...arrivals], toys: [...toys] };
+    return { kind, travelTicks, arrivals, toys: [...toys] };
   }
   const look = value.look;
   field(look === "pinecone" || look === "bubble" || look === "dust", file, `${name}.look`);
-  return { kind, travelTicks, hitWindow, arrivals: [...arrivals], look };
+  return { kind, travelTicks, hitWindow, arrivals, look };
 }
 
-// Soothe's and a friend's check: a catch is only ever a burst's, since its
-// lanes come from the burst's roll (spec 8).
+// Soothe's and a friend's check: a catch or a lean is only ever a burst's,
+// since its toys' lanes and its puffs' forces come from the burst's roll
+// (spec 8).
 function faeSideCheck(value: unknown, file: string, name: string): CheckSpec {
   const spec = checkSpec(value, file, name);
-  field(spec.kind !== "catch", file, `${name}.kind`);
+  field(spec.kind !== "catch" && spec.kind !== "lean", file, `${name}.kind`);
   return spec;
 }
 
@@ -886,7 +909,8 @@ export function parseBattleContent(
     record(hints) &&
       typeof hints.charge === "string" &&
       typeof hints.chain === "string" &&
-      typeof hints.catch === "string",
+      typeof hints.catch === "string" &&
+      typeof hints.lean === "string",
     file,
     "hints",
   );
@@ -928,7 +952,7 @@ export function parseBattleContent(
     file, "feelingBonus");
   return {
     toyAtlas,
-    hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch },
+    hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean },
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),

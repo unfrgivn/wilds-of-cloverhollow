@@ -64,11 +64,32 @@
   "burst": {
     "bigChance": 0.5,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "lean",
+      "puffTicks": 56,
+      "starts": [
+        44,
+        116
+      ],
+      "forces": [
+        2,
+        3
+      ],
+      "steer": 5,
+      "spring": 3
+    },
+    "big": {
+      "kind": "lean",
+      "puffTicks": 36,
+      "starts": [
+        44,
+        94,
+        144
+      ],
+      "forces": [
+        3
+      ],
+      "steer": 5,
+      "spring": 3
     }
   },
   "lines": {
@@ -99,8 +120,8 @@
     "snack": "Fae shares a whole sandwich. The gull gobbles it and looks a little less grumpy.",
     "burst": "The gull flaps a huge gust of feathers and sea spray at Fae!",
     "burstResult": {
-      "great": "Fae ducks under the feathers!",
-      "good": "Fae dodges most of the spray!",
+      "great": "Fae leans into the gust and holds her ground!",
+      "good": "Fae wobbles in the spray, but stays on her feet!",
       "miss": "Splash! Fae gets a face full of sea spray."
     },
     "soothed": "The gull lets out a long, happy sigh. The fizzy spell blows away on the breeze!",

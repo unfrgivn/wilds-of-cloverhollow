@@ -127,6 +127,26 @@ export async function playBattleCheck(page: Page): Promise<void> {
     if (held !== null) await page.keyboard.up(held);
     return;
   }
+  if (check.kind === "lean") {
+    // Lean back toward straight on real arrows whenever she's 5 or more off:
+    // right is forward, into the wind.
+    let held: string | null = null;
+    for (let active = check; ; ) {
+      if (!active.results.includes("pending")) break;
+      const key = active.balance <= -5 ? "ArrowRight" : active.balance >= 5 ? "ArrowLeft" : null;
+      if (held !== key) {
+        if (held !== null) await page.keyboard.up(held);
+        if (key !== null) await page.keyboard.down(key);
+        held = key;
+      }
+      await step(page, 1);
+      const current = (await readBattle(page))?.check;
+      if (current?.kind !== "lean") break;
+      active = current;
+    }
+    if (held !== null) await page.keyboard.up(held);
+    return;
+  }
   for (const arrival of check.spec.arrivals) {
     const current = await readBattle(page);
     const active = current?.check;

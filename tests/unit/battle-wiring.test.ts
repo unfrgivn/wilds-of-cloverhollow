@@ -95,7 +95,7 @@ describe("battle check wiring", () => {
     const state = battleState("plaza-party");
     const before: State = {
       ...state,
-      battle: { ...state.battle!, critterId: "bluebird", phase: "burst" },
+      battle: { ...state.battle!, critterId: "owl", phase: "burst" },
       rng: 1000,
     };
     let current = step(content.world, before, { ...blankInput(), confirm: true }).state;
@@ -122,6 +122,62 @@ describe("battle check wiring", () => {
     for (const _toy of pup.burst.big.arrivals) expected = nextRng(expected);
     expect(after.rng).toBe(expected);
     expect(after.battle?.check).toMatchObject({ kind: "catch", spec: pup.burst.big });
+  });
+
+  it("creates a bluebird lean with one PRNG draw per puff (a force) after its big roll", () => {
+    const bluebird = content.world.critters.bluebird;
+    if (bluebird === undefined) throw new Error("bluebird missing");
+    for (const rng of [1000, 1]) {
+      const before: State = {
+        ...battleState("plaza-party", "bluebird"),
+        rng,
+        battle: { ...battleState("plaza-party", "bluebird").battle!, phase: "burst" },
+      };
+      const after = step(content.world, before, { ...blankInput(), confirm: true }).state;
+      let expected = nextRng(before.rng);
+      const big = expected / 4294967296 < bluebird.burst.bigChance;
+      const spec = big ? bluebird.burst.big : bluebird.burst.check;
+      if (spec?.kind !== "lean") throw new Error("bluebird lean missing");
+      const strengths = spec.starts.map(() => {
+        expected = nextRng(expected);
+        return spec.forces[Math.floor(expected / 4294967296 * spec.forces.length)];
+      });
+      expect(after.rng).toBe(expected);
+      expect(after.battle?.check).toMatchObject({ kind: "lean", spec, strengths, balance: 0, big });
+    }
+  });
+
+  it("charges two energy for a big lean Fae never leans into", () => {
+    let state: State = {
+      ...battleState("plaza-party", "bluebird"),
+      rng: 1,
+      battle: { ...battleState("plaza-party", "bluebird").battle!, phase: "burst" },
+    };
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    expect(state.battle?.check).toMatchObject({ kind: "lean", big: true });
+    while (state.battle?.phase === "check") state = step(content.world, state, blankInput()).state;
+    expect(state.battle?.check).toMatchObject({ results: ["miss", "miss", "miss"] });
+    expect(state.battle?.lastGrade).toBe("miss");
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    expect(state.battle?.energy).toBe(3);
+  });
+
+  it("holds every bluebird puff leaning back toward straight, costing nothing", () => {
+    let state: State = {
+      ...battleState("plaza-party", "bluebird"),
+      rng: 1000,
+      battle: { ...battleState("plaza-party", "bluebird").battle!, phase: "burst" },
+    };
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    while (state.battle?.phase === "check") {
+      const check = state.battle.check;
+      const balance = check?.kind === "lean" ? check.balance : 0;
+      const x = balance <= -5 ? 1 : balance >= 5 ? -1 : 0;
+      state = step(content.world, state, { ...blankInput(), move: { x, y: 0 } }).state;
+    }
+    expect(state.battle?.lastGrade).toBe("great");
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    expect(state.battle?.energy).toBe(5);
   });
 
   it("charges two energy for missing every catch toy", () => {

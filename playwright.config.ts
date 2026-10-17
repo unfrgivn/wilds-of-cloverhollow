@@ -9,9 +9,9 @@ export default defineConfig({
   testMatch: ["**/*.spec.ts"],
   timeout: process.env.CI === "true" ? 90_000 : 30_000,
   // Headless Chromium renders in software (SwiftShader), each GPU process
-  // taking up to three cores; the default half-the-cores workers (5 on a
-  // 10-core laptop) starved them and timed out the long real-key flows.
-  workers: process.env.CI === "true" ? undefined : "30%",
+  // taking up to three cores. One CI worker prevents concurrent Chromium
+  // processes from starving each other's GPU work on the four-vCPU runner.
+  workers: process.env.CI === "true" ? 1 : "30%",
   expect: { timeout: 10_000 },
   webServer: {
     command:

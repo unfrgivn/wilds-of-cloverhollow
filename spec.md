@@ -1222,8 +1222,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   and Z, so the e2e can play every run back with real keys.
 - The Playwright suite serves the harness build from the `/cloverhollow/`
   sub-path, so any root-relative asset URL fails in tests as it would on iOS.
-  Locally it runs on 30% of the cores: headless Chromium renders in software,
-  and more workers starve each other's GPU processes.
+   Locally it runs on 30% of the cores; CI runs one worker because headless
+   Chromium renders in software and concurrent workers starve each other's GPU
+   processes on the four-vCPU runner.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

@@ -1475,6 +1475,34 @@ more bad guys, and the blacklight lantern, made and built while away.
   adds 15 s). The slowest spec is now `harness.spec.ts` (62 tests, 2.8
   minutes on both browsers), the next place to look.
 
+### E2E suite speed (2026-10-16)
+- CI's four-vCPU runner was still using Playwright's default two workers. A
+  SwiftShader Chromium GPU process can consume up to three cores, so the two
+  long real-key flows contended nondeterministically: the passing main run
+  (38983110375) took 30.3 minutes total, while the failing run (37955770187)
+  took 52.5 minutes and timed out gym at 420 seconds. In the failing run, the
+  gym flow's harness replay completed at 16:26:57, but its real-key flow did
+  not complete until 16:53:18; the competing music flow was 6.5 minutes and
+  gym was 7.0 minutes in Playwright's slow-file report. The same run reported
+  11.0 minutes for the harness file and 7.9 minutes for the bay file.
+- CI uses one Playwright worker per shard and two GitHub Actions shards. This
+  preserves every real key press, screenshot, and Bun hash comparison while
+  removing GPU contention without serializing the whole suite; the local
+  worker setting remains 30% of cores. A first one-worker, unsharded trial
+  (38986390097) was cancelled after it exceeded the historical 30-minute fast
+  run without producing results. The first green sharded CI run must record
+  per-flow timings and total wall time here.
+- The sharded green run (38989196393) completed both long real-key flows and
+  all 387 tests: shard 2 took 7m34s (170 tests), shard 1 took 22m57s (217
+  tests), so the wall-time critical path was 22m57s. Gym's browser/Bun replay
+  hash completed at 01:08:41 on shard 2 and 01:16:16 on shard 1; both gym and
+  music real-key tests passed on the sharded run, each below the 420-second
+  limit. Compared with the passing two-worker run's 30.3m total and the
+  failing two-worker run's 52.5m total, two isolated shards improve wall time
+  while removing the contention that caused the timeout. The canceled
+  unsharded trial reached 36m51s without completing, so it is not used as an
+  after measurement.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its

@@ -4,6 +4,9 @@ on: [push, pull_request]
 jobs:
   check:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -15,4 +18,4 @@ jobs:
       - run: bun run build
       - run: bunx playwright install --with-deps chromium webkit
       # Screenshot baselines are macOS-only for now.
-      - run: bunx playwright test --ignore-snapshots
+      - run: bunx playwright test --ignore-snapshots --shard=${{ matrix.shard }}/2

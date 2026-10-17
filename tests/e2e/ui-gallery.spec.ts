@@ -237,7 +237,10 @@ test.describe("sticker gallery", () => {
           const close = rect(".journal-close");
           const label = rect(".journal-label");
           const notes = rect(".journal-notes-page");
-          const headingItems = [...document.querySelectorAll(".journal-notes-head > *")]
+          const headingControls = [...document.querySelectorAll(
+            ".journal-notes-head .journal-heading, .journal-supply, .journal-audio, " +
+              ".journal-volume",
+          )]
             .map((element) => element.getBoundingClientRect());
           const album = rect(".journal-stickers-page");
           if (!book || !close || !label || !notes || !album) return null;
@@ -258,7 +261,7 @@ test.describe("sticker gallery", () => {
             closeSize: Math.min(close.width, close.height),
             closeInside: within(close, book),
             pagesApart: notes.right <= album.left + 1,
-            headingItemsInside: headingItems.every((item) => headingInside(item, notes)),
+            headingControlsInside: headingControls.every((item) => headingInside(item, notes)),
             onTop: centre?.closest(".journal-book") !== null,
           };
         });
@@ -268,7 +271,8 @@ test.describe("sticker gallery", () => {
         expect(facts?.closeSize ?? 0).toBeGreaterThanOrEqual(44);
         expect(facts?.closeInside).toBe(true);
         expect(facts?.pagesApart).toBe(true);
-        expect(facts?.headingItemsInside, "notes heading stays inside the notes page").toBe(true);
+        expect(facts?.headingControlsInside,
+          "notes heading controls stay inside the notes page").toBe(true);
         expect(facts?.onTop, "nothing covers the open journal").toBe(true);
       });
     }

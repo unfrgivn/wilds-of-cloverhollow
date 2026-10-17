@@ -1090,7 +1090,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
   a cookie (inline SVG, like the map's bus-stop sign).
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
-  fits the heading row at 874x402, including with `♪ off` and 999 coins.
+  fits the heading row at 874x402, including with `♪ off` and 999 coins. At
+  narrow widths, the supplies wrap beneath NOTES so every control remains
+  inside the page without overlapping its neighbors.
 - A cream JOURNAL label sits on the top edge and a close sticker (at least
   44 px) in the top-right corner; the close button is how touch players leave.
 - Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The

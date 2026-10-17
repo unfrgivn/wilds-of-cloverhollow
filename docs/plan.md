@@ -1621,8 +1621,9 @@ Sound follow-ups from Milestone 37:
 - A volume control beside mute: done in the volume follow-up (2026-10-16).
   Four chunky steps, 25% through 100%, use the existing master gain path and
   live beside the mute pill. One 44 CSS-pixel sticker control cycles the steps,
-  so every level has a full-size, non-overlapping touch target while the row
-  still fits the phone and larger journal layouts. The preference remains
+  so every level has a full-size, non-overlapping touch target. On narrow
+  journal pages, the supplies wrap beneath NOTES; larger layouts keep them on
+  the heading row. The preference remains
   outside the save; the old mute-only boolean loads at 100%. There is
   deliberately no zero step, keeping mute independent and making unmuting
   restore the chosen level.

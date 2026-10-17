@@ -126,6 +126,20 @@
   font-weight: 800;
   text-align: right;
 }
+@media (max-width: 900px) {
+  .journal-notes-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding-right: 4px;
+  }
+  .journal-notes-head .journal-heading {
+    flex-basis: 100%;
+  }
+  .journal-supplies {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
 .journal-supply {
   display: inline-flex;
   align-items: center;

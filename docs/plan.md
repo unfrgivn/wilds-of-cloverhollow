@@ -1559,6 +1559,12 @@ more bad guys, and the blacklight lantern, made and built while away.
     and sand the boxes walled off round each thing are open. The lookout
     run, re-recorded, reads the same beats; `propBlockerErrors` reports none
     anywhere.
+  - A sixth fix (owner, 2026-10-16; in progress, `.worktrees/school-open`,
+    branch `school-open`): the school hall is open like every other room.
+    It was the one painting with a front wall: the low wall with the glass
+    front doors filled the lower left of the screen, and Fae left by walking
+    into its top. The hall is repainted as a cutaway with the front doors on
+    a back wall; its kit, floor, doors, and the runs through it follow.
   - Milestone 39, recess on the playing field (in progress, 2026-10-09,
     `.worktrees/m39`, branch `m39-field`): after music class, recess opens
     the gym's back door onto the playing field behind the school, where the

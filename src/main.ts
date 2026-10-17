@@ -9,8 +9,9 @@ import {
   type State,
   battleView,
   soundCues,
+  arcadeView,
 } from "./core";
-import { loadContent, parseMapCentres } from "./content/load";
+import { loadContent, parseClawCalibration, parseMapCentres } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
@@ -29,6 +30,7 @@ import {
 } from "./ui/battle";
 import { assetUrl } from "./platform/assets";
 import { createJournal } from "./ui/journal";
+import { createArcade } from "./ui/arcade";
 import {
   journalNotes,
   parseSave,
@@ -184,6 +186,22 @@ async function boot(): Promise<void> {
       await atlas.decode();
     }),
   );
+  const prizeSheet = await Assets.load<Spritesheet>(
+    assetUrl(content.world.arcade.atlas),
+  );
+  const prizeImage = new Image();
+  prizeImage.src = assetUrl(
+    content.world.arcade.atlas.replace(".json", ".png"),
+  );
+  await prizeImage.decode();
+  // The claw machine's painting and its calibration (spec 8.2).
+  const calibrationFile = "assets/arcade/claw-machine.json";
+  const calibrationResponse = await fetch(assetUrl(calibrationFile));
+  if (!calibrationResponse.ok) throw new Error(`Failed to load ${calibrationFile}`);
+  const calibration = parseClawCalibration(await calibrationResponse.json(), calibrationFile);
+  const cabinet = new Image();
+  cabinet.src = assetUrl(`assets/arcade/${calibration.image}`);
+  await cabinet.decode();
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
   // A toy a catch throws: a crop of the toy atlas (spec 8.1).
@@ -249,6 +267,18 @@ async function boot(): Promise<void> {
       atlas: { w: size.w, h: size.h },
     };
   };
+  // A prize's art: its frame in the prize atlas (spec 8.2).
+  const prizeArt = (frameName: string): AtlasImage | null => {
+    const rect = prizeSheet.data.frames[frameName]?.frame;
+    const size = prizeSheet.data.meta.size;
+    if (rect === undefined || size === undefined) return null;
+    return {
+      src: assetUrl(content.world.arcade.atlas.replace(".json", ".png")),
+      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+      atlas: { w: size.w, h: size.h },
+    };
+  };
+  const arcade = createArcade(uiRoot, prizeArt, calibration, cabinet.src);
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");
   await view.setArea(initialArea);
@@ -298,6 +328,10 @@ async function boot(): Promise<void> {
     return journalCache.notes;
   };
   const render = (): void => {
+    const arcadeState = arcadeView(content.world, state);
+    arcade.render(arcadeState);
+    if (arcadeState !== null) document.documentElement.dataset.arcade = "open";
+    else delete document.documentElement.dataset.arcade;
     view.render(
       state,
       window.innerWidth,
@@ -305,7 +339,7 @@ async function boot(): Promise<void> {
       app.renderer.resolution,
     );
     prompt.render(
-      state.battle === null
+      state.battle === null && state.arcade === null
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
     );
@@ -386,18 +420,32 @@ async function boot(): Promise<void> {
       state.battle === null
         ? undefined
         : content.world.critters[state.battle.critterId];
-    rewardSticker.render({
-      visible:
-        activeBattle &&
-        state.battle?.phase === "reward" &&
-        state.battle.rewardSticker !== null,
-      title: "NEW STICKER!",
-      name: rewardCritter?.sticker.name ?? "",
-      image:
-        rewardCritter === undefined
-          ? null
-          : stickerArt(rewardCritter.id, rewardCritter.sticker.frame),
-    });
+    const battleReward =
+      activeBattle &&
+      state.battle?.phase === "reward" &&
+      state.battle.rewardSticker !== null;
+    // One reward card: a battle's new sticker, else a prize won at the arcade.
+    const arcadePrize = battleReward ? null : arcadeState?.prize ?? null;
+    rewardSticker.render(
+      battleReward
+        ? {
+            visible: true,
+            title: "NEW STICKER!",
+            name: rewardCritter?.sticker.name ?? "",
+            image:
+              rewardCritter === undefined
+                ? null
+                : stickerArt(rewardCritter.id, rewardCritter.sticker.frame),
+          }
+        : arcadePrize !== null
+          ? {
+              visible: true,
+              title: arcadePrize.title,
+              name: arcadePrize.name,
+              image: prizeArt(arcadePrize.frame),
+            }
+          : { visible: false, title: "", name: "", image: null },
+    );
     journal.render({
       visible: state.journalOpen,
       notes: state.journalOpen ? notesNow() : [],
@@ -420,6 +468,16 @@ async function boot(): Promise<void> {
             };
           })
         : [],
+      prizes: state.journalOpen
+        ? content.world.arcade.prizes.map((prize) => ({
+            id: prize.id,
+            name: prize.name,
+            owned: state.prizes.includes(prize.id),
+            image: state.prizes.includes(prize.id)
+              ? prizeArt(prize.frame)
+              : null,
+          }))
+        : [],
       lands: content.world.lands.map((land) => ({
         ...land,
         ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
@@ -432,7 +490,11 @@ async function boot(): Promise<void> {
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;
-    if (activeBattle) dialogueBox.hide();
+    if (
+      activeBattle ||
+      (arcadeState !== null && arcadeState.phase !== "result")
+    )
+      dialogueBox.hide();
     if (activeBattle && (battle?.message ?? "") !== "") {
       dialogueBox.render({
         speaker: null,
@@ -446,6 +508,16 @@ async function boot(): Promise<void> {
     } else if (activeBattle) {
       dialogueBox.hide();
       delete document.documentElement.dataset.dialogue;
+    } else if (arcadeState !== null && arcadeState.phase === "result") {
+      document.documentElement.dataset.dialogue = "open";
+      dialogueBox.render({
+        speaker: null,
+        text: arcadeState.message,
+        revealed: arcadeState.revealed,
+        choices: [],
+        selected: -1,
+        canAdvance: arcadeState.revealed >= arcadeState.message.length,
+      });
     } else if (state.dialogue === null) {
       dialogueBox.hide();
       delete document.documentElement.dataset.dialogue;
@@ -612,7 +684,7 @@ async function boot(): Promise<void> {
         await ensureArea();
         titleMode = null;
       },
-      renderInfo: () => view.renderInfo(state),
+      renderInfo: () => ({ ...view.renderInfo(state), arcade: arcade.info() }),
       save: {
         clear: async () => {
           await saveQueue;

@@ -1,5 +1,6 @@
 import type { StorySound } from "./sound";
 import type { SurfaceMap } from "./surfaces";
+import type { ArcadeGame, ArcadeGameId } from "./arcade";
 
 export type Point = { x: number; y: number };
 export type Polygon = [number, number][];
@@ -169,6 +170,56 @@ export type World = {
   party: Record<string, PartyContent>;
   // Reads a story variable from an Ink state (createStoryReader over `story`).
   storyVariable: (ink: string, name: string) => unknown;
+  arcade: ArcadeContent;
+};
+export type ArcadeContent = {
+  // The prize atlas (Pixi spritesheet JSON), one frame per prize.
+  atlas: string;
+  claw: ClawContent;
+  prizes: { id: string; name: string; frame: string }[];
+};
+// The claw machine (spec 8.2), in floor units: x runs left to right across the
+// box, z from the front glass to the back wall.
+export type ClawContent = {
+  box: { width: number; depth: number };
+  railLeft: number;
+  railRight: number;
+  depthFront: number;
+  depthBack: number;
+  reach: number;
+  speed: number;
+  dropTicks: number;
+  grabTicks: number;
+  liftTicks: number;
+  releaseTicks: number;
+  heap: HeapPlush[];
+  lines: {
+    slide: string;
+    push: string;
+    won: string;
+    missed: string;
+    stuck: string;
+    prizeTitle: string;
+  };
+};
+// A plush in the heap: where it sits on the floor, how high in the pile
+// (0 on the floor), and the plushes it rests on, one level down.
+export type HeapPlush = { prize: string; x: number; z: number; level: number; on: string[] };
+// The painted claw machine's front (`public/assets/arcade/claw-machine.json`,
+// spec 8.2), measured in the image's pixels: the window's opening, the box
+// floor's front and back edges, where the ceiling meets the front glass and
+// the back wall, the prize chute's mouth (four corners), and the blank plate.
+export type ClawCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  glass: { x: number; y: number; w: number; h: number; radius: number };
+  floor: {
+    front: { y: number; left: number; right: number };
+    back: { y: number; left: number; right: number };
+  };
+  ceiling: { front: { y: number }; back: { y: number } };
+  chute: { mouth: [number, number][] };
+  plate: { x: number; y: number; w: number; h: number };
 };
 // A friend who walks behind Fae and brings one battle command (spec 5, 8).
 export type PartyContent = {
@@ -489,6 +540,7 @@ export type State = {
     ended: boolean;
     sound?: StorySound;
     travel?: { area: string; spawn: string };
+    play?: { game: ArcadeGameId; price: number };
   } | null;
   // The set pieces' moods, for the whole game.
   critters: Record<string, Mood>;
@@ -497,6 +549,8 @@ export type State = {
   stickers: string[];
   safeSpot: { area: string; spawn: string };
   battle: Battle | null;
+  arcade: ArcadeGame | null;
+  prizes: string[];
   journalOpen: boolean;
   lantern: boolean;
   coins: number;

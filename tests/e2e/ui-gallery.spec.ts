@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { clawGalleryStates } from "../../src/dev/claw-gallery";
+import { bunClawLayout } from "./helpers";
 
 test.use({ deviceScaleFactor: 2 });
 
@@ -13,12 +15,13 @@ const phone = { width: 874, height: 402 };
 const sizes = [phone, { width: 1180, height: 820 }, { width: 1280, height: 720 }];
 
 async function gallery(page: Page, state: string, touch = true,
-  insets = "0,62,21,62"): Promise<void> {
-  await page.setViewportSize(phone);
+  insets = "0,62,21,62", size = phone): Promise<void> {
+  await page.setViewportSize(size);
   const query = `state=${state}&insets=${insets}${touch ? "&touch=1" : ""}`;
   await page.goto(`/cloverhollow/ui-gallery.html?${query}`);
   await expect(page.locator(".gallery-stage")).toBeVisible();
-  await page.evaluate(() => document.fonts.ready);
+  // Fonts, the claw machine's painting, and the plushes decoded.
+  await expect(page.locator("#gallery[data-ready='true']")).toHaveCount(1);
   await page.evaluate(() => new Promise<void>((resolve) => {
     window.requestAnimationFrame(() => resolve());
   }));
@@ -50,6 +53,8 @@ const battleParts: Record<string, string[]> = {
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
   "journal-full": [".journal-book"],
+  ...Object.fromEntries(clawGalleryStates.map((state) => [state,
+    state === "arcade-result" ? [".battle-reward", ".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-check-hint", ".battle-grade", ".touch-reach",
@@ -217,11 +222,133 @@ function measureContrast(): Contrast[] {
     });
 }
 
-function overlaps(a: DOMRect, b: DOMRect): boolean {
-  return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+type Rect = { x: number; y: number; width: number; height: number };
+function overlaps(a: Rect, b: Rect): boolean {
+  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height &&
+    a.y + a.height > b.y;
 }
 
 test.describe("sticker gallery", () => {
+  // The claw machine as drawn is its layout (spec 8.2): every plush, the claw,
+  // the glass, the chute, and the plate where layoutClaw puts them, from the
+  // same real game states, on a phone and a desktop, in both engines. The
+  // layout's own geometry is checked in tests/unit/claw-layout.test.ts.
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of clawGalleryStates) {
+      test(`${state} claw machine as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const insets = size.width === 874 ? "0,62,21,62" : "0,0,0,0";
+        await gallery(page, state, true, insets, size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | null): { x: number; y: number; width: number;
+            height: number } => {
+            if (element === null) throw new Error("missing a part of the claw machine");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const layer = (element: Element): number => Number(getComputedStyle(element).zIndex) - 1;
+          const machine = document.querySelector<HTMLElement>(".arcade-machine");
+          const claw = document.querySelector(".arcade-claw");
+          const text = document.querySelector<HTMLElement>(".arcade-plate-text");
+          const marker = document.querySelector<HTMLElement>(".arcade-marker");
+          if (machine === null || claw === null || text === null)
+            throw new Error("the claw machine isn't drawn");
+          const shown = (selector: string): Element | null => {
+            const element = document.querySelector(selector);
+            return element !== null && element.getClientRects().length > 0 ? element : null;
+          };
+          const reward = shown(".battle-reward");
+          const dialogue = shown(".sticker-dialogue");
+          const atDialogue = dialogue === null ? null : document.elementFromPoint(
+            box(dialogue).x + box(dialogue).width / 2, box(dialogue).y + box(dialogue).height / 2);
+          return {
+            scale: Number(machine.dataset.scale),
+            machine: box(machine),
+            glass: box(document.querySelector(".arcade-glass")),
+            chute: box(document.querySelector(".arcade-chute")),
+            plate: box(document.querySelector(".arcade-plate")),
+            text: { box: box(text), fits: text.scrollWidth <= text.clientWidth + 1 },
+            claw: { box: box(claw), layer: layer(claw),
+              closed: claw.classList.contains("is-closed") },
+            marker: marker === null || marker.hidden ? null
+              : { box: box(marker), layer: layer(marker) },
+            plushes: [...document.querySelectorAll<HTMLElement>(".arcade-plush")].map((item) => ({
+              id: item.dataset.id ?? "", box: box(item), layer: layer(item),
+              clip: getComputedStyle(item).clipPath, tug: item.classList.contains("is-tug"),
+            })),
+            reward: reward === null ? null : box(reward),
+            dialogue: dialogue === null ? null : box(dialogue),
+            dialogueOnTop: dialogue !== null && atDialogue !== null &&
+              dialogue.contains(atDialogue),
+            buttons: [box(document.querySelector(".touch-confirm")),
+              box(document.querySelector(".touch-cancel"))],
+          };
+        });
+        const layout = bunClawLayout(state, drawn.scale);
+        const near = (actual: number, expected: number, label: string): void => {
+          expect(Math.abs(actual - expected), `${label}: ${actual} vs ${expected}`)
+            .toBeLessThanOrEqual(1);
+        };
+        const placed = (actual: { x: number; y: number; width: number; height: number },
+          expected: { x: number; y: number; width: number; height: number }, label: string):
+          void => {
+          near(actual.x - drawn.machine.x, expected.x, `${label} x`);
+          near(actual.y - drawn.machine.y, expected.y, `${label} y`);
+          near(actual.width, expected.width, `${label} width`);
+          near(actual.height, expected.height, `${label} height`);
+        };
+        near(drawn.machine.width, layout.width, "cabinet width");
+        near(drawn.machine.height, layout.height, "cabinet height");
+        placed(drawn.glass, layout.glass, "glass");
+        placed(drawn.chute, layout.chute, "chute");
+        placed(drawn.plate, layout.plate, "plate");
+        expect(drawn.plushes.map((item) => item.id).sort())
+          .toEqual(layout.plushes.map((item) => item.id).sort());
+        for (const expected of layout.plushes) {
+          const actual = drawn.plushes.find((item) => item.id === expected.id);
+          if (actual === undefined) throw new Error(`${expected.id} isn't drawn`);
+          placed(actual.box, { x: expected.x, y: expected.y, width: expected.size,
+            height: expected.size }, expected.id);
+          expect(actual.layer, `${expected.id} layer`).toBe(expected.layer);
+          expect(actual.tug, `${expected.id} tugged`).toBe(expected.tug);
+          // inset(top right bottom left): the bottom is the share gone into the chute.
+          const clip = actual.clip.match(/-?[0-9.]+/g)?.map(Number) ?? [];
+          near(clip[2] ?? 0, expected.hidden, `${expected.id} hidden`);
+        }
+        placed(drawn.claw.box, { x: layout.claw.x - Math.round(layout.claw.size / 2),
+          y: layout.claw.tip - layout.claw.size, width: layout.claw.size,
+          height: layout.claw.size }, "claw");
+        expect(drawn.claw.layer, "claw layer").toBe(layout.claw.layer);
+        expect(drawn.claw.closed).toBe(!layout.claw.open);
+        expect(drawn.marker === null, "marker shown").toBe(layout.marker === null);
+        if (drawn.marker !== null && layout.marker !== null) {
+          placed(drawn.marker.box, layout.marker, "marker");
+          expect(drawn.marker.layer, "marker layer").toBe(layout.marker.layer);
+        }
+        // The plate's lettering fits on the plate: no line runs over, and the
+        // lines sit inside it.
+        expect(drawn.text.fits, "plate text fits").toBe(true);
+        expect(drawn.text.box.x).toBeGreaterThanOrEqual(drawn.plate.x - 1);
+        expect(drawn.text.box.x + drawn.text.box.width)
+          .toBeLessThanOrEqual(drawn.plate.x + drawn.plate.width + 1);
+        expect(drawn.text.box.y).toBeGreaterThanOrEqual(drawn.plate.y - 1);
+        expect(drawn.text.box.y + drawn.text.box.height)
+          .toBeLessThanOrEqual(drawn.plate.y + drawn.plate.height + 1);
+        // The prize card and the line that reads it out stay clear of each other
+        // and of the touch buttons, and the dialogue box is over the cabinet.
+        if (state === "arcade-result") {
+          if (drawn.reward === null || drawn.dialogue === null)
+            throw new Error("the result shows the prize card and the line");
+          expect(overlaps(drawn.reward, drawn.dialogue)).toBe(false);
+          for (const button of drawn.buttons) {
+            expect(overlaps(drawn.reward, button)).toBe(false);
+            expect(overlaps(drawn.dialogue, button)).toBe(false);
+          }
+          expect(drawn.dialogueOnTop).toBe(true);
+        }
+      });
+    }
+  }
+
   for (const state of journalStates) {
     test(`${state} journal baseline`, async ({ page }) => {
       await gallery(page, state);
@@ -322,11 +449,13 @@ test.describe("sticker gallery", () => {
 
   test("the album shows the owned frog and dashed ? slots for the rest", async ({ page }) => {
     await gallery(page, "journal-notes");
-    const owned = page.locator('.journal-slot[data-owned="true"]');
+    const owned = page.locator(
+      '.journal-stickers:not(.journal-prizes) .journal-slot[data-owned="true"]');
     await expect(owned).toHaveCount(1);
     await expect(owned.locator(".journal-name")).toHaveText("Fountain Frog");
     await expect(owned.locator(".journal-unknown")).toBeHidden();
-    const unknown = page.locator('.journal-slot[data-owned="false"] .journal-unknown');
+    const unknown = page.locator(
+      '.journal-stickers:not(.journal-prizes) .journal-slot[data-owned="false"] .journal-unknown');
     await expect(unknown).toHaveCount(10);
     for (const slot of await unknown.all()) {
       await expect(slot).toBeVisible();
@@ -334,8 +463,10 @@ test.describe("sticker gallery", () => {
       expect(await slot.evaluate((element) => getComputedStyle(element).borderStyle))
         .toBe("dashed");
     }
-    await expect(page.locator('.journal-slot[data-owned="false"] .journal-name')).toHaveCount(10);
-    for (const name of await page.locator('.journal-slot[data-owned="false"] .journal-name').all())
+    const names = page.locator(
+      '.journal-stickers:not(.journal-prizes) .journal-slot[data-owned="false"] .journal-name');
+    await expect(names).toHaveCount(10);
+    for (const name of await names.all())
       await expect(name).toBeHidden();
     const box = await owned.locator(".journal-sticker-image")
       .evaluate((element) => element.getBoundingClientRect().toJSON());
@@ -419,6 +550,37 @@ test.describe("sticker gallery", () => {
     test(`${state} phone visual baseline`, async ({ page }) => {
       await gallery(page, state);
       await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
+  for (const state of clawGalleryStates) {
+    test(`${state} phone visual baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
+  for (const state of ["arcade-ready", "arcade-result"]) {
+    test(`${state} desktop visual baseline`, async ({ page }) => {
+      await gallery(page, state, false, "0,0,0,0", { width: 1280, height: 720 });
+      await expect(page).toHaveScreenshot(`${state}-desktop.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
+  for (const [name, size, insets] of [
+    ["phone", phone, "0,62,21,62"],
+    ["desktop", { width: 1280, height: 720 }, "0,0,0,0"],
+  ] as const) {
+    test(`journal prizes shelf ${name} screenshot`, async ({ page }) => {
+      await page.setViewportSize(size);
+      await page.goto(`/cloverhollow/ui-gallery.html?state=journal-prizes&touch=1&` +
+        `insets=${insets}`);
+      await page.evaluate(() => document.fonts.ready);
+      await page.locator(".journal-prizes").scrollIntoViewIfNeeded();
+      await expect(page).toHaveScreenshot(`journal-prizes-${name}.png`, {
         animations: "disabled", scale: "device",
       });
     });

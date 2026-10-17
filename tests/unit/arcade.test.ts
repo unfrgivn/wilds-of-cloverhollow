@@ -45,13 +45,15 @@ function play(ink: string, knot: string, calmed: Record<string, boolean> = {}): 
   ink: string;
 } {
   const lines: string[] = [];
-  let result = runInk(story, ink, { type: "start", knot }, { calmed, coins: 0, snacks: 0 });
+  const facts = { calmed, coins: 0, snacks: 0, prizes: [],
+    plushesLeft: world.arcade.claw.heap.length };
+  let result = runInk(story, ink, { type: "start", knot }, facts);
   for (let count = 0; count < 30; count += 1) {
     if (result.line !== null) lines.push(result.line.text);
     if (result.ended) break;
     result = result.choices.length > 0
-      ? runInk(story, result.ink, { type: "choose", index: 0 }, { calmed, coins: 0, snacks: 0 })
-      : runInk(story, result.ink, { type: "next" }, { calmed, coins: 0, snacks: 0 });
+      ? runInk(story, result.ink, { type: "choose", index: 0 }, facts)
+      : runInk(story, result.ink, { type: "next" }, facts);
   }
   return { lines, ink: result.ink };
 }
@@ -195,7 +197,7 @@ describe("the arcade's things to look at, and the journal", () => {
   it("has the claw machine, the ticket counter, and Star Racer", () => {
     expect(arcade.interactables.map((item) => [item.id, item.knot, item.prompt])).toEqual(
       expect.arrayContaining([
-        ["claw-machine", "claw_machine", "Look"],
+        ["claw-machine", "claw_machine", "Play"],
         ["ticket-counter", "ticket_counter", "Look"],
         ["star-racer", "star_racer", "Look"],
       ]));

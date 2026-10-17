@@ -1,0 +1,26 @@
+{
+  "asset": "painted straight-on claw machine front",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 7,
+  "references": [
+    "docs/art/concepts/props/arcade_props.png",
+    "docs/art/concepts/environments/arcade_interior.png",
+    "art/source/areas/arcade/kit/claw-machine/iso-2.jpg",
+    "art/source/areas/arcade/arcade-final.png"
+  ],
+  "selected": "art/source/arcade/claw-machine-front-raw.png",
+  "prompt_summary": "The exact existing straight-on landscape composition restyled as a Cloverhollow watercolor prop: blank lilac header, wide symmetric mint glass interior, one-point floor and ceiling, front-left prize chute, teal control ledge, left joystick and right button. Empty box, no claw, rail, plushes, or text.",
+  "key_colour": "paper margin sampled from border; removed by border-connected flood fill",
+  "post_processing": [
+    "Used two Gemini image-editing passes with the previous straight-on machine as the exact composition reference and the arcade room/concept as style references; selected the second pass because its measured floor and ceiling edges preserve the corrected common vanishing point.",
+    "The selected 2400x1792 output is retained in art/source/arcade/claw-machine-front-raw.png.",
+    "tools/art/build-claw-machine.ts flood-fills the border paper with 8% fuzz, trims the transparent margin, despills only antialiased pixels within three pixels of the alpha edge, resizes to 1600px wide, and encodes WebP quality 90 with alpha.",
+    "No opaque fill is used in the calibration overlay; its floor grid uses s = 941/1377 and t = u / (s + (1-s)u)."
+  ],
+  "outputs": { "image": "public/assets/arcade/claw-machine.webp", "calibration": "public/assets/arcade/claw-machine.json", "rebuild": "tools/art/build-claw-machine.ts" },
+  "owner_review": {
+    "viewed": ["art/review/claw-machine-overlay.png", "art/review/claw-style-compare.png"],
+    "note": "The restyled machine reads as watercolor with soft pigment variation, paper texture, and warm-brown hand ink. The style comparison shows it belongs with the arcade painting and plush line, though the plush outlines remain slightly stronger than the machine's delicate contours."
+  }
+}

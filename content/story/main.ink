@@ -24,6 +24,8 @@ VAR coach_thanked = false
 EXTERNAL calmed(id)
 EXTERNAL coins()
 EXTERNAL snacks()
+EXTERNAL won(id)
+EXTERNAL plushesLeft()
 
 === window ===
 {plan != "none": -> again}
@@ -741,8 +743,35 @@ Mr. Pip polishes the claw machine. "Come back and play any time!" # speaker: Mr.
 -> DONE
 
 === claw_machine ===
-A claw machine full of plush critters: a frog, a pup, and a very smug raccoon. # speaker: Fae
-{calmed("arcade-keeper"): Someday I'm going to win that raccoon. # speaker: Fae}
+{not calmed("arcade-keeper"):
+    The machine is all fizzy with purple scribbles. # speaker: Fae
+    I'd better calm Mr. Pip first. # speaker: Fae
+    -> DONE
+}
+{plushesLeft() == 0:
+    The claw machine is empty. I won every plush! # speaker: Fae
+    -> DONE
+}
+{won("raccoon-plush"):
+    That smug raccoon plush is all mine now. Ha! # speaker: Fae
+- else:
+    {plushesLeft() == 1:
+        Just one plush left, and it's the very smug raccoon. # speaker: Fae
+    - else:
+        A claw machine full of plush critters, and one very smug raccoon. # speaker: Fae
+    }
+    Someday I'm going to win that raccoon. # speaker: Fae
+}
+{coins() < 2:
+    I need 2 coins to play. # speaker: Fae
+    -> DONE
+}
++ [Play for 2 coins] # play: claw 2
+    Hold tight! # speaker: Fae
+    -> DONE
++ [Not now]
+    Maybe another time. # speaker: Fae
+    -> DONE
 -> DONE
 
 === ticket_counter ===

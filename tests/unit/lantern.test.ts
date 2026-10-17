@@ -115,7 +115,7 @@ describe("the lantern switch", () => {
   it("saves the lantern (version 2 saves, without it, start fresh)", () => {
     const state = toggle(passState({ x: 700, y: 650 }, "down", true));
     const json = serializeSave(state);
-    expect(JSON.parse(json).version).toBe(5);
+    expect(JSON.parse(json).version).toBe(6);
     expect(parseSave(json, state)?.lantern).toBe(true);
     expect(parseSave(JSON.stringify({ version: 2, state }), state)).toBeNull();
   });

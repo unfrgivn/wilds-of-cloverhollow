@@ -7,6 +7,7 @@ export function createStateLogger(world: World): (state: State) => void {
   let previousDialogue = "";
   let previousMoving: boolean | undefined;
   let previousTarget: string | null | undefined;
+  let previousArcade = "";
   return (state: State): void => {
     const areaChanged = previous !== undefined && state.area !== previous.area;
     const facingChanged = previous !== undefined && state.facing !== previous.facing;
@@ -23,6 +24,9 @@ export function createStateLogger(world: World): (state: State) => void {
     const movementChanged = previousMoving !== state.motion.moving ||
       previousTarget !== target;
     const journalChanged = previous !== undefined && previous.journalOpen !== state.journalOpen;
+    const arcadeKey = state.arcade === null ? "closed" :
+      `${state.arcade.phase}|${state.arcade.message}`;
+    const arcadeChanged = arcadeKey !== previousArcade;
     // A door fade: the area switches while the screen is faded out, so native
     // tests wait for `fading: false` before they screenshot an arrival.
     const fadeChanged = previous !== undefined &&
@@ -32,7 +36,7 @@ export function createStateLogger(world: World): (state: State) => void {
       areaChanged ||
       facingChanged ||
       (positionChanged && now - lastPositionLog >= 250) || dialogueChanged ||
-      movementChanged || journalChanged || fadeChanged
+      movementChanged || journalChanged || fadeChanged || arcadeChanged
     ) {
       console.log(
         `[cloverhollow] state ${JSON.stringify({
@@ -49,6 +53,12 @@ export function createStateLogger(world: World): (state: State) => void {
       );
       lastPositionLog = now;
       first = false;
+    }
+    if (arcadeChanged) {
+      console.log(`[cloverhollow] arcade ${JSON.stringify({
+        phase: state.arcade?.phase ?? null, message: state.arcade?.message ?? "",
+      })}`);
+      previousArcade = arcadeKey;
     }
     if (dialogueChanged) {
       console.log(`[cloverhollow] dialogue ${JSON.stringify({

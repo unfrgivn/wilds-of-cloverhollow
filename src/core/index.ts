@@ -10,3 +10,4 @@ export * from "./sound";
 export * from "./checks";
 export * from "./feelings";
 export * from "./party";
+export * from "./arcade";

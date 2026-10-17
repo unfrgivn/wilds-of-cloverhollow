@@ -1,0 +1,102 @@
+{
+  "claw": {
+    "box": {
+      "width": 1000,
+      "depth": 460
+    },
+    "railLeft": 185,
+    "railRight": 940,
+    "depthFront": 140,
+    "depthBack": 420,
+    "speed": 4,
+    "reach": 48,
+    "dropTicks": 40,
+    "grabTicks": 14,
+    "liftTicks": 40,
+    "releaseTicks": 20,
+    "heap": [
+      {
+        "prize": "frog-plush",
+        "x": 420,
+        "z": 190,
+        "level": 0,
+        "on": []
+      },
+      {
+        "prize": "cat-plush",
+        "x": 560,
+        "z": 170,
+        "level": 0,
+        "on": []
+      },
+      {
+        "prize": "hamster-plush",
+        "x": 720,
+        "z": 190,
+        "level": 0,
+        "on": []
+      },
+      {
+        "prize": "owl-plush",
+        "x": 330,
+        "z": 330,
+        "level": 0,
+        "on": []
+      },
+      {
+        "prize": "raccoon-plush",
+        "x": 640,
+        "z": 370,
+        "level": 0,
+        "on": []
+      },
+      {
+        "prize": "bunny-plush",
+        "x": 410,
+        "z": 265,
+        "level": 1,
+        "on": [
+          "frog-plush",
+          "owl-plush"
+        ]
+      },
+      {
+        "prize": "squirrel-plush",
+        "x": 540,
+        "z": 295,
+        "level": 1,
+        "on": [
+          "raccoon-plush"
+        ]
+      },
+      {
+        "prize": "bluebird-plush",
+        "x": 750,
+        "z": 290,
+        "level": 1,
+        "on": [
+          "hamster-plush",
+          "raccoon-plush"
+        ]
+      },
+      {
+        "prize": "pup-plush",
+        "x": 480,
+        "z": 275,
+        "level": 2,
+        "on": [
+          "bunny-plush",
+          "squirrel-plush"
+        ]
+      }
+    ],
+    "lines": {
+      "slide": "Hold to slide the claw. Let go to stop it!",
+      "push": "Hold to push it back. Let go to drop it!",
+      "won": "You won the {prize}!",
+      "missed": "So close! The claw came up empty.",
+      "stuck": "It's stuck under the others!",
+      "prizeTitle": "NEW PRIZE!"
+    }
+  }
+}

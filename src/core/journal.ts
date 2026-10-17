@@ -23,6 +23,7 @@ export function autosaveNeeded(previous: State, next: State): boolean {
     (previous.area !== next.area && next.transition === null) ||
     (previous.transition?.phase === "in" && next.transition === null) ||
     (previous.battle !== null && next.battle === null) ||
+    (previous.arcade !== null && next.arcade === null) ||
     (previous.dialogue !== null && next.dialogue === null) ||
     (previous.journalOpen && !next.journalOpen)
   );

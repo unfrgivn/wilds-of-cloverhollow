@@ -1,0 +1,258 @@
+{
+  "frames": {
+    "frog-plush": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "pup-plush": {
+      "frame": {
+        "x": 320,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "raccoon-plush": {
+      "frame": {
+        "x": 640,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "cat-plush": {
+      "frame": {
+        "x": 0,
+        "y": 320,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "bunny-plush": {
+      "frame": {
+        "x": 320,
+        "y": 320,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "bluebird-plush": {
+      "frame": {
+        "x": 640,
+        "y": 320,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "hamster-plush": {
+      "frame": {
+        "x": 0,
+        "y": 640,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "squirrel-plush": {
+      "frame": {
+        "x": 320,
+        "y": 640,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "owl-plush": {
+      "frame": {
+        "x": 640,
+        "y": 640,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    }
+  },
+  "animations": {
+    "frog-plush": [
+      "frog-plush"
+    ],
+    "pup-plush": [
+      "pup-plush"
+    ],
+    "raccoon-plush": [
+      "raccoon-plush"
+    ],
+    "cat-plush": [
+      "cat-plush"
+    ],
+    "bunny-plush": [
+      "bunny-plush"
+    ],
+    "bluebird-plush": [
+      "bluebird-plush"
+    ],
+    "hamster-plush": [
+      "hamster-plush"
+    ],
+    "squirrel-plush": [
+      "squirrel-plush"
+    ],
+    "owl-plush": [
+      "owl-plush"
+    ]
+  },
+  "meta": {
+    "image": "prizes.png",
+    "size": {
+      "w": 960,
+      "h": 960
+    },
+    "scale": "1",
+    "baseline": 300
+  }
+}

@@ -9,6 +9,7 @@ export type SoundCue =
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
   | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
   | "battle-beat"
+  | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
 
 export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
@@ -82,6 +83,14 @@ export function soundCues(
     if (previous.battle.phase !== next.battle.phase &&
         (next.battle.phase === "result" || next.battle.phase === "burstResult"))
       cues.push("battle-hit");
+  }
+  if (previous.arcade?.phase !== next.arcade?.phase) {
+    const phase = next.arcade?.phase;
+    if (phase === "sliding" || phase === "pushing") cues.push("claw-move");
+    if (phase === "dropping") cues.push("claw-drop");
+    if (phase === "lifting")
+      cues.push(next.arcade?.outcome === "grabbed" ? "claw-grab" : "claw-miss");
+    if (phase === "result" && next.arcade?.outcome === "grabbed") cues.push("prize-won");
   }
   return cues;
 }

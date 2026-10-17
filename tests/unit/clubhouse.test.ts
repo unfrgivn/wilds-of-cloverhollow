@@ -27,9 +27,10 @@ import { loadContent, storyTagErrors } from "../../src/content/load";
 const content = loadContent();
 const world = content.world;
 const story = world.story;
-const quiet: InkFacts = { calmed: {}, coins: 0, snacks: 0 };
+const quiet: InkFacts = { calmed: {}, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 };
 // The clubhouse is claimed once the woods' owl is calm (Milestone 26).
-const owlCalm: InkFacts = { calmed: { owl: true }, coins: 0, snacks: 0 };
+const owlCalm: InkFacts =
+  { calmed: { owl: true }, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 };
 const press = (frame: Partial<ActionFrame>): ActionFrame => ({ ...blankInput(), ...frame });
 
 type Played = { lines: string[]; tags: string[][]; ink: string };

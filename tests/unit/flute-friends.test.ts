@@ -41,7 +41,7 @@ const world = content.world;
 const story = world.story;
 const press = (frame: Partial<ActionFrame>): ActionFrame => ({ ...blankInput(), ...frame });
 const facts = (snacks: number, calmed: Record<string, boolean> = {}): InkFacts =>
-  ({ calmed, coins: 0, snacks });
+  ({ calmed, coins: 0, snacks, prizes: [], plushesLeft: 0 });
 
 type Played = { lines: string[]; tags: string[][]; choices: string[][]; ink: string };
 function play(ink: string, knot: string, choices: number[] = [], with_ = facts(0)): Played {

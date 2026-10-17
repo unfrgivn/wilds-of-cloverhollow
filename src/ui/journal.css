@@ -208,6 +208,13 @@
   font-weight: 600;
   line-height: 1.1;
 }
+.journal-prizes-heading {
+  margin: 18px 0 5px;
+  border-top: 2px dashed #47321f55;
+  padding-top: 12px;
+  font-size: 14px;
+  letter-spacing: .1em;
+}
 .journal-label {
   position: absolute;
   top: -17px;

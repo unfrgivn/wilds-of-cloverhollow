@@ -38,6 +38,7 @@ import {
 } from "./checks";
 import { answers, feelingFromDraw, feelingsOn } from "./feelings";
 import { battleParty } from "./party";
+import { openClaw, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -158,6 +159,8 @@ export function createState(
     stickers: [],
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
+    arcade: null,
+    prizes: [],
     journalOpen: false,
     lantern: false,
     coins: 0,
@@ -673,7 +676,11 @@ export function inkFacts(world: World, state: State): InkFacts {
     if (state.stickers.includes(kind.sticker.id)) calmed[kind.species] = true;
   for (const area of Object.values(world.areas))
     for (const piece of area.critters) calmed[piece.id] = state.critters[piece.id] === "calm";
-  return { calmed, coins: state.coins, snacks: state.snacks };
+  return {
+    calmed, coins: state.coins, snacks: state.snacks, prizes: state.prizes,
+    plushesLeft: world.arcade.claw.heap.filter((plush) => !state.prizes.includes(plush.prize))
+      .length,
+  };
 }
 
 // Which way a person in the area looks: toward Fae while she talks to them
@@ -1164,8 +1171,15 @@ function dialogueState(
   knot: string,
   result: ReturnType<typeof runInk>,
   carried?: { area: string; spawn: string },
+  carriedPlay?: { game: ArcadeGameId; price: number },
 ): State["dialogue"] {
   const tag = result.line?.tags.find((item) => item.startsWith("travel:"));
+  const play = result.line?.tags.map((item) =>
+    /^play:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(item.trim())).find((item) => item !== null);
+  let playValue = carriedPlay;
+  const game = play?.[1];
+  if (game !== undefined && isArcadeGameId(game))
+    playValue = { game, price: Number(play?.[2]) };
   const [area, spawn, ...rest] = tag?.slice("travel:".length).trim().split(".") ?? [];
   const travel = area !== undefined && spawn !== undefined && rest.length === 0
     ? { area, spawn }
@@ -1180,6 +1194,7 @@ function dialogueState(
     ended: result.ended,
     ...(result.line?.sound === undefined ? {} : { sound: result.line.sound }),
     ...(travel === undefined ? {} : { travel }),
+    ...(playValue === undefined ? {} : { play: playValue }),
   };
 }
 
@@ -1237,15 +1252,18 @@ function openTalk(world: World, state: State, input: ActionFrame, knot: string):
 
 export const FLUTE_KNOT = "flute";
 
-function closeDialogue(state: State): State {
+function closeDialogue(world: World, state: State): State {
   const dialogue = state.dialogue;
   if (dialogue === null) return state;
+  const price = dialogue.play;
+  const opened = price?.game === "claw" && state.arcade === null && state.coins >= price.price
+    ? openClaw(world, state, price.price) : state;
   return {
-    ...state,
+    ...opened,
     dialogue: null,
     transition:
       dialogue.travel === undefined
-        ? state.transition
+        ? opened.transition
         : { target: dialogue.travel, phase: "out", elapsed: 0 },
   };
 }
@@ -1283,7 +1301,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
   const count = dialogue.choices.length;
   if (count === 0) {
     if (!confirm) return next;
-    if (dialogue.ended) return closeDialogue(next);
+    if (dialogue.ended) return closeDialogue(world, next);
     const result = runInk(
       world.story,
       state.ink,
@@ -1292,10 +1310,10 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     );
     const following = result.line === null && result.choices.length === 0
       ? null
-      : dialogueState(dialogue.knot, result, dialogue.travel);
+      : dialogueState(dialogue.knot, result, dialogue.travel, dialogue.play);
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
-      ? closeDialogue(advanced)
+      ? closeDialogue(world, advanced)
       : { ...advanced, dialogue: following };
   }
   const tapped =
@@ -1315,10 +1333,10 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     );
     const following = result.line === null && result.choices.length === 0
       ? null
-      : dialogueState(dialogue.knot, result, dialogue.travel);
+      : dialogueState(dialogue.knot, result, dialogue.travel, dialogue.play);
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
-      ? closeDialogue(advanced)
+      ? closeDialogue(world, advanced)
       : { ...advanced, dialogue: following };
   }
   const up = input.move.y < -0.5 && previous.move.y >= -0.5;
@@ -1697,6 +1715,11 @@ function stepTick(
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
   if (state.battle !== null)
     return { state: battleStep(world, state, input), events: [] };
+  if (state.arcade !== null) {
+    const nextBase = { ...state, tick: state.tick + 1, previousInput: { ...input },
+      motion: { ...state.motion, moving: false }, party: restingParty(state.party) };
+    return { state: { ...nextBase, ...stepArcade(world, state, input) }, events: [] };
+  }
   if (state.dialogue !== null)
     return { state: dialogueStep(world, state, input), events: [] };
   const menuEdge = input.menu && !state.previousInput.menu;

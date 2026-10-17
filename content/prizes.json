@@ -1,0 +1,50 @@
+{
+  "atlas": "assets/prizes/prizes.json",
+  "catalogue": [
+    {
+      "id": "frog-plush",
+      "name": "Frog Plush",
+      "frame": "frog-plush"
+    },
+    {
+      "id": "pup-plush",
+      "name": "Pup Plush",
+      "frame": "pup-plush"
+    },
+    {
+      "id": "raccoon-plush",
+      "name": "Smug Raccoon Plush",
+      "frame": "raccoon-plush"
+    },
+    {
+      "id": "cat-plush",
+      "name": "Cat Plush",
+      "frame": "cat-plush"
+    },
+    {
+      "id": "bunny-plush",
+      "name": "Bunny Plush",
+      "frame": "bunny-plush"
+    },
+    {
+      "id": "bluebird-plush",
+      "name": "Bluebird Plush",
+      "frame": "bluebird-plush"
+    },
+    {
+      "id": "hamster-plush",
+      "name": "Hamster Plush",
+      "frame": "hamster-plush"
+    },
+    {
+      "id": "squirrel-plush",
+      "name": "Squirrel Plush",
+      "frame": "squirrel-plush"
+    },
+    {
+      "id": "owl-plush",
+      "name": "Owl Plush",
+      "frame": "owl-plush"
+    }
+  ]
+}

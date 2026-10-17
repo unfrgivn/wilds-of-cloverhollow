@@ -644,10 +644,12 @@ export class GameView {
   private renderBackdrop(state: State, width: number, height: number): void {
     const area = this.areaView?.area;
     if (area === undefined) return;
-    const focus = battleFoe(this.world, state)?.point ?? {
-      x: area.width / 2,
-      y: area.height / 2,
-    };
+    // A battle centres on its critter; the claw machine on Fae, who stands at it.
+    const focus = battleFoe(this.world, state)?.point ??
+      (state.arcade !== null ? state.player : undefined) ?? {
+        x: area.width / 2,
+        y: area.height / 2,
+      };
     // Watercolour areas fade to bare paper near their edges (the plaza by
     // about 120 units at the sides and 50 at the top and bottom), so frame
     // only the painted interior, 8% in from every side.
@@ -704,7 +706,8 @@ export class GameView {
     resolution: number,
   ): void {
     const battle = state.battle;
-    if (battle === null) {
+    const arcade = state.arcade;
+    if (battle === null && arcade === null) {
       this.battleLayer.visible = false;
       this.battleWash.visible = false;
       this.backdropSprite.visible = false;
@@ -716,7 +719,7 @@ export class GameView {
       }
       return;
     }
-    this.battleLayer.visible = true;
+    this.battleLayer.visible = battle !== null;
     this.battleWash.visible = true;
     this.backdropSprite.visible = true;
     this.scene.visible = false;
@@ -724,6 +727,13 @@ export class GameView {
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const x = (width - this.viewWidth * scale) / 2;
     const y = (height - this.viewHeight * scale) / 2;
+    // The claw machine's close-up is DOM over the blurred room: no battle
+    // figures, and a lighter wash.
+    if (arcade !== null) {
+      this.battleWash.clear().rect(0, 0, width, height).fill({ color: 0xfff6e6, alpha: 0.28 });
+      return;
+    }
+    if (battle === null) return;
     const layout = this.layoutFor(state, width, height);
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(x, y);

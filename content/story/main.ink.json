@@ -5922,41 +5922,249 @@
         }
       ],
       "claw_machine": [
-        "^A claw machine full of plush critters: a frog, a pup, and a very smug raccoon. ",
-        "#",
-        "^speaker: Fae",
-        "/#",
-        "\n",
-        "ev",
-        "str",
-        "^arcade-keeper",
-        "/str",
-        {
-          "x()": "calmed",
-          "exArgs": 1
-        },
-        "/ev",
         [
+          "ev",
+          "str",
+          "^arcade-keeper",
+          "/str",
           {
-            "->": ".^.b",
-            "c": true
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^The machine is all fizzy with purple scribbles. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "^I'd better calm Mr. Pip first. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "x()": "plushesLeft"
+          },
+          0,
+          "==",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^The claw machine is empty. I won every plush! ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.16"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^raccoon-plush",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^That smug raccoon plush is all mine now. Ha! ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.26"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "ev",
+                {
+                  "x()": "plushesLeft"
+                },
+                1,
+                "==",
+                "/ev",
+                [
+                  {
+                    "->": ".^.b",
+                    "c": true
+                  },
+                  {
+                    "b": [
+                      "\n",
+                      "^Just one plush left, and it's the very smug raccoon. ",
+                      "#",
+                      "^speaker: Fae",
+                      "/#",
+                      "\n",
+                      {
+                        "->": ".^.^.^.8"
+                      },
+                      null
+                    ]
+                  }
+                ],
+                [
+                  {
+                    "->": ".^.b"
+                  },
+                  {
+                    "b": [
+                      "\n",
+                      "^A claw machine full of plush critters, and one very smug raccoon. ",
+                      "#",
+                      "^speaker: Fae",
+                      "/#",
+                      "\n",
+                      {
+                        "->": ".^.^.^.8"
+                      },
+                      null
+                    ]
+                  }
+                ],
+                "nop",
+                "\n",
+                "^Someday I'm going to win that raccoon. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.26"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          2,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^I need 2 coins to play. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.34"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Play for 2 coins",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
           },
           {
-            "b": [
-              "^ Someday I'm going to win that raccoon. ",
+            "c-0": [
+              "^ ",
+              "#",
+              "^play: claw 2",
+              "/#",
+              "\n",
+              "^Hold tight! ",
               "#",
               "^speaker: Fae",
-              {
-                "->": ".^.^.^.12"
-              },
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Maybe another time. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              "done",
               null
             ]
           }
         ],
-        "nop",
-        "/#",
-        "\n",
-        "done",
         null
       ],
       "ticket_counter": [

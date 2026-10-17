@@ -1,0 +1,204 @@
+/* The claw machine close-up (spec 8.2). The painted cabinet fills the safe
+   area left of the touch buttons; everything inside its glass is placed by
+   layoutClaw in whole pixels. It is the bottom of the UI stack (--z-hud): the
+   dialogue box, the reward card, the touch buttons, and the journal draw over
+   it. */
+.arcade-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 46 px at the top keeps the harness's tick readout (spec 4) in view. */
+  padding: calc(var(--safe-top) + 46px)
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))
+    calc(var(--safe-bottom) + 10px) calc(20px + var(--safe-left));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--sticker-font);
+  color: var(--sticker-ink);
+}
+.arcade-overlay[hidden] {
+  display: none;
+}
+.arcade-machine {
+  position: relative;
+  flex: none;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 8px 14px #47321f33);
+}
+
+/* Inside the glass. Back to front: the plushes, the claw, and the cable by
+   their layers, then the gantry along the ceiling, then the glass's shine. */
+.arcade-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.arcade-plush,
+.arcade-cable,
+.arcade-claw,
+.arcade-glass,
+.arcade-chute,
+.arcade-plate {
+  position: absolute;
+}
+.arcade-plush-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  transform-origin: 50% 93.75%;
+}
+/* A soft shadow where a plush stands on the floor, under its base row. */
+.arcade-plush.is-floor::before {
+  content: "";
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  top: 88%;
+  height: 11%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #47321f38, #47321f00);
+}
+/* Held down by another plush: the claw tugs at it, and it won't come free. */
+.arcade-plush.is-tug .arcade-plush-image {
+  transform: translateY(-2%) rotate(-6deg);
+}
+/* Where the claw would come down while Fae aims: its catch zone. */
+.arcade-marker {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px dashed #47321fb3;
+  border-radius: 50%;
+  background: #f49ab452;
+}
+.arcade-marker[hidden] {
+  display: none;
+}
+.arcade-cable {
+  border-radius: 2px;
+  background: var(--sticker-ink);
+}
+.arcade-claw {
+  overflow: visible;
+}
+.arcade-claw-head {
+  fill: #f49ab4;
+  stroke: var(--sticker-ink);
+  stroke-width: 5;
+}
+.arcade-claw-collar {
+  fill: #73bdb5;
+  stroke: var(--sticker-ink);
+  stroke-width: 4;
+}
+.arcade-prong-ink,
+.arcade-prong {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.arcade-prong-ink {
+  stroke: var(--sticker-ink);
+  stroke-width: 11;
+}
+.arcade-prong {
+  stroke: #e6ded6;
+  stroke-width: 5;
+}
+.arcade-prongs-curled,
+.arcade-claw.is-closed .arcade-prongs-spread {
+  display: none;
+}
+.arcade-claw.is-closed .arcade-prongs-curled {
+  display: inline;
+}
+.arcade-gantry {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  overflow: visible;
+}
+.arcade-rail-ink,
+.arcade-crossbar-ink {
+  stroke: var(--sticker-ink);
+  stroke-linecap: round;
+}
+.arcade-rail {
+  stroke: #e98da6;
+  stroke-linecap: round;
+}
+.arcade-crossbar {
+  stroke: #73bdb5;
+  stroke-linecap: round;
+}
+.arcade-carriage {
+  fill: #f49ab4;
+  stroke: var(--sticker-ink);
+  stroke-width: 3;
+}
+.arcade-reflections {
+  position: absolute;
+  inset: 0;
+  z-index: 1001;
+  background: linear-gradient(112deg, #fff0 0 14%, #ffffff30 14% 21%, #fff0 21% 25%,
+    #ffffff1f 25% 28%, #fff0 28%);
+}
+
+/* Markers the harness and the tests measure: the glass's opening and the
+   chute's mouth, both already painted. */
+.arcade-glass,
+.arcade-chute {
+  pointer-events: none;
+}
+
+/* The blank lilac plate, lettered like a marquee. */
+.arcade-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+  box-sizing: border-box;
+}
+.arcade-plate-text {
+  max-width: 100%;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: .06em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--sticker-ink);
+  overflow-wrap: normal;
+}
+.arcade-plate:not(.is-hint) .arcade-plate-text {
+  letter-spacing: .3em;
+}
+
+/* The prize card is the battle reward card, set high over the cabinet and
+   clear of the dialogue box that reads the prize out. Its own
+   translate(-50%, -50%) stays (the pop animation uses it), so `top` places
+   its centre. */
+:root[data-arcade="open"] .battle-reward {
+  top: calc(var(--safe-top) + 144px);
+  left: calc((20px + var(--safe-left) + 100vw -
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))) / 2);
+}
+@media (max-height: 500px) {
+  :root[data-arcade="open"] .battle-reward {
+    top: calc(var(--safe-top) + 100px);
+    width: 190px;
+    padding: 8px 12px 10px;
+  }
+  :root[data-arcade="open"] .battle-reward-image {
+    width: 100px;
+    margin: 4px auto;
+  }
+  :root[data-arcade="open"] .battle-reward-name {
+    font-size: 18px;
+  }
+}

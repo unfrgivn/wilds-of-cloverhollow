@@ -2,6 +2,7 @@ import { stableHash, type ActionFrame, type State } from "../core";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
 import type { BattleCheckInfo } from "../render/view";
+import type { ArcadeInfo } from "../ui/arcade";
 
 export type CloverhollowHook = {
   version: 1;
@@ -66,6 +67,7 @@ export type CloverhollowHook = {
       overworldVisible: boolean;
       auraAlpha: number;
     };
+    arcade: ArcadeInfo | null;
   };
   save: {
     clear: () => Promise<void>;

@@ -295,6 +295,10 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   Maddie as the party in the plaza, Soothe / Play / Snack / Run in the frog's
   menu), reviewed baselines.
 - Notes and assumptions:
+  - Milestone 44 uses a 1000 by 460 logical heap floor, nine authored plushes
+    in three levels, and the raccoon is freed only after the squirrel and
+    bluebird are won. The claw's two holds use separate x and z phases; the
+    painted-box UI is being redone by the UI worker.
   - Maddie's overworld sprite was drawn 2x too tall: only `scale.x` was set, so
     Pixi's default `scale.y` of 1 stretched her (the old plaza baseline shows
     an orange smear beside Fae). The generic follower uses one uniform scale,
@@ -1638,6 +1642,115 @@ the old trail, the owl, and the clubhouse claim.
   - The clubhouse, its four paintings, the props, and the wording are in
     the owner's review queue.
 
+## Milestone 44: The claw machine **Status:** ✅ Completed (2026-10-17)
+- The arcade's games start working. NOTES.md asks for an arcade "with
+  playable mini-games like skee-ball, whack-a-mole, claw machine", and Mr.
+  Pip tells Fae she can "play here any time", but until now there was
+  nothing to play. Milestones 44 to 46 build the three games. The claw
+  machine is first because it already stands in the painting.
+- Once Mr. Pip is calm, the claw machine (`claw-machine`, prompt Play)
+  offers "Play for 2 coins" when Fae has them, a sticky choice like the
+  bakery's. Before he's calm the machine is fizzing with purple scribbles. A
+  line tagged `play: claw 2` opens the game when the conversation closes and
+  takes the coins then, the way a `travel:` line waits for the close.
+- The game (owner, 2026-10-17: "more 3d with animals piled on top of each
+  other, not a linear lineup"; then two holds, more plushes, and a painted
+  inside): a close-up of the machine over the blurred arcade, its glass box
+  painted in perspective, with nine plush critters heaped in it in three
+  layers: the frog, the pup, and the very smug raccoon, with a cat, a bunny, a
+  bluebird, a hamster, a squirrel, and an owl. The claw works like a real one,
+  in two holds (Z, the confirm button, or A): hold and it slides right, let go
+  and it stops; hold again and it moves back into the box, let go and it
+  drops. It comes down on whatever is on top of the heap there and grabs the
+  topmost plush within its reach, unless another plush rests on that one
+  ("It's stuck under the others!"). Then it lifts, carries the plush back over
+  the chute at the front left, and drops it. The raccoon lies at the back,
+  under others, so it is won last. Only a fresh press starts each hold, so
+  the press that closed the conversation can't. No mashing, no timer, no
+  random draw: where Fae lets go, twice, decides it.
+- Prizes: a won plush leaves the heap for good and joins Fae's prizes
+  (`state.prizes`). The journal's sticker page gains a PRIZES shelf under
+  the album that works like the stickers: the plush with a die-cut rim and
+  its name, or a dashed `?`. New story externals, `won(prize)` and
+  `plushesLeft()`, let lines notice (an empty machine, the raccoon last, and
+  "Someday I'm going to win that raccoon" answered).
+- Engine: a nullable `state.arcade` game slot beside `battle`. While a game
+  runs Fae is frozen, doors, cancel, and menu are ignored, and the party
+  keeps settling. The result line uses the dialogue box with no speaker, a
+  game's end autosaves, and the root carries `data-arcade="open"`. Dev logs
+  and `renderInfo().arcade` (the claw, the plushes, and the chute, in CSS px)
+  are there for tests. Numbers and lines live in `content/arcade.json`, the
+  prize catalogue in `content/prizes.json`, and the plush art in one atlas
+  (`public/assets/prizes/`). New sound cues: the claw starting, dropping,
+  grabbing or missing, and a prize won.
+- Saves go to version 6 (the arcade slot and the prizes). A version-5 save is
+  upgraded (no game running, no prizes) instead of refused, so saves made
+  since Milestone 28, the owner's phone among them, carry on. A save is never
+  written mid-game.
+- Evidence: unit tests for the rules (`tests/unit/claw.test.ts`:
+  both holds, the reach edge for every plush, topmost and nearest, stuck,
+  the whole heap won in the order it comes free through real steps, the
+  result, the view, the cues, the Ink lines, the loader, the freeze, the
+  autosave; the save tests), for the layout (`tests/unit/claw-layout.test.ts`),
+  and the gallery's real game states, checked against the layout in both
+  engines at a phone's and a desktop's size; the recorded run
+  `arcade/claw.json` (`tools/sim/record-claw.ts`: Mr. Pip calmed, then stuck on
+  the raccoon, the pup won, a miss in the bare back corner, and the cat won)
+  with its replay test (`claw-replay.test.ts`, every result line, the 2 coins
+  each game, and every cue), and its real-key e2e (`claw.spec.ts`: the
+  close-up, the tug, and the prize card at both sizes, the end state hashing
+  the same as Bun's; and the pup won with two holds of the touch confirm
+  sticker, in both engines). Every screenshot was viewed.
+- Notes and assumptions:
+  - Started on the first Milestone 40 commit while its recordings were being
+    regenerated, and rebased onto the final Milestone 40 (`536cf977`).
+  - The owner's decisions, taken as defaults and open to review: 2 coins a
+    play; plushes are collectibles with no gameplay effect; nine plushes, then
+    the machine is empty for good; the games open once Mr. Pip is calm. The
+    owner then asked (2026-10-17) for "more 3d with animals piled on top of
+    each other, not a linear lineup", and chose the two holds, more critter
+    plushes, and a painted inside.
+  - Art, 12 Gemini calls in all: the nine plushes from two sheets
+    (`art/recipes/prizes.json`), cut whole by connected component onto a
+    shared baseline, an enclosed pocket of key colour in the squirrel's tail
+    cleared; and the machine's front, first painted at three-quarters (which
+    would have made the claw slide diagonally), then straight on, then
+    repainted in watercolour keeping its geometry
+    (`art/recipes/claw-machine.json`). Its floor and ceiling meet at one
+    vanishing point within about a pixel.
+  - The heap's floor positions and the plush size were chosen by compositing
+    the plushes on the painting: the floor's front half is in front of the
+    chute, so the claw's travel starts at (185, 140), over it.
+  - Drawing order is plain depth (nearer covers farther). An order that drew
+    a plush over the ones it rests on put a buried frog in front of the claw
+    at some spots and behind it at others; plain depth never contradicts.
+  - The heap's order: the pup, the cat, and the bluebird are free at the
+    start; the raccoon only once the squirrel and the bluebird are won.
+
+## Milestone 45: Skee-ball and the prize counter **Status:** 📋 Planned
+- A skee-ball lane joins the arcade on its open front floor: a new prop
+  painted from the owner's props concept
+  (`docs/art/concepts/props/arcade_props.png`), with the rest of the painting
+  unchanged.
+- Five balls a game, 2 coins. Each roll takes two presses: an arrow sweeps
+  across the lane and a press sets the aim, then a hold-and-let-go meter
+  sets the power (Milestone 40's charge). Aim and power decide the ring: 10
+  to 50, and the corner 100s for a perfect roll at the edge.
+- Tickets: the score pays tickets (`state.tickets`, a Tickets pill beside
+  Coins and Snacks), and the ticket counter trades them for prizes (a
+  `trade:` line tag, like `buy:`) that go on the PRIZES shelf.
+- For the owner: tickets as their own currency, the price list, and the
+  prizes.
+
+## Milestone 46: Boop-a-Mole **Status:** 📋 Planned
+- Whack-a-mole, gently: one of the five cabinets is Boop-a-Mole. Moles pop
+  from five holes in a plus, and Fae boops their noses with a squeaky hammer
+  (arrows, and Z for the middle; on touch, tap the hole). Nobody gets hurt:
+  they giggle and pop back down. A short round pays tickets.
+- It's the Whack check from `docs/battle-ideas.md`, played as an arcade game
+  first; Mr. Pip's battle could borrow it later.
+- For the owner: the name, and which cabinet.
+
 ## Milestone 47: Flute friends **Status:** ✅ Completed (2026-10-17)
 - The owner picked flute friends next (2026-10-17). NOTES.md: the flute
   "calls animal friends to your side like cute kitties and puppies"; Fae has
@@ -1995,8 +2108,9 @@ more bad guys, and the blacklight lantern, made and built while away.
     Catch: done (above). Then Milestone 42, feelings: done (above). The
     rest of `docs/battle-ideas.md` stays unscheduled until the owner picks.
   - Milestone 43, the clubhouse fix-up: done (above).
-  - Milestone 47, flute friends: done (above). Milestones 44 to 46, the
-    arcade games, are in progress in another session.
+  - Milestone 47, flute friends: done (above).
+  - Milestone 44, the claw machine: done (above). Then Milestones 45 and 46,
+    skee-ball and the prize counter, and Boop-a-Mole.
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

@@ -75,6 +75,10 @@
   right: calc(300px + var(--safe-right));
   width: min(620px, calc(100vw - 320px - var(--safe-left) - var(--safe-right)));
 }
+:root[data-arcade="open"] .touch-stick,
+:root[data-arcade="open"] .sticker-prompt {
+  display: none;
+}
 
 .sticker-dialogue::before,
 .sticker-choice::before {

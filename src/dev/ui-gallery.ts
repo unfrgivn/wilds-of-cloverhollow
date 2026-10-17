@@ -18,7 +18,12 @@ import {
   type TimingGrade,
 } from "../ui/battle";
 import { createJournal, type JournalView } from "../ui/journal";
+import { createArcade } from "../ui/arcade";
 import { createTitleScreen, type TitleView } from "../ui/title";
+import { loadContent, parseClawCalibration } from "../content/load";
+import { clawGalleryView } from "./claw-gallery";
+import calibrationData from "../../public/assets/arcade/claw-machine.json";
+import prizeAtlas from "../../public/assets/prizes/prizes.json";
 
 const root = document.querySelector<HTMLElement>("#gallery");
 if (root === null) throw new Error("Missing gallery root");
@@ -55,17 +60,25 @@ declare global {
   }
 }
 const state = params.get("state") ?? "short";
+// The claw machine's states come from real game states (src/dev/claw-gallery.ts).
+const content = loadContent();
+const arcadeFixture = content.fixtures.arcade;
+if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
+const clawView = clawGalleryView(content.world, arcadeFixture, state);
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
+const arcadeState = state.startsWith("arcade-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings"
-  : state !== "prompt" && !journalState && !titleState;
+  : state !== "prompt" && !journalState && !titleState &&
+    (!arcadeState || state === "arcade-result");
 if (battleState) document.documentElement.dataset.battle = "open";
 // A catch shows its touch arrows (spec 8.1).
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
+if (arcadeState) document.documentElement.dataset.arcade = "open";
 if (titleState) document.documentElement.dataset.title = "open";
 const defaultView: DialogueView = {
   speaker: "Maddie",
@@ -168,6 +181,21 @@ const check = createBattleCheck(stage);
 const feelingBubble = createFeelingBubble(stage);
 const reward = createRewardSticker(stage);
 const journal = createJournal(stage);
+// A prize's art: its frame in the prize atlas.
+const prizeFrames = new Map(
+  Object.entries(prizeAtlas.frames).map(([name, entry]) => [name, entry.frame]),
+);
+const galleryPrizeArt = (frame: string): AtlasImage | null => {
+  const rect = prizeFrames.get(frame);
+  return rect === undefined ? null : {
+    src: "assets/prizes/prizes.png",
+    frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+    atlas: { w: prizeAtlas.meta.size.w, h: prizeAtlas.meta.size.h },
+  };
+};
+const calibrationFile = "public/assets/arcade/claw-machine.json";
+const arcade = createArcade(stage, galleryPrizeArt,
+  parseClawCalibration(calibrationData, calibrationFile), "assets/arcade/claw-machine.webp");
 const title = createTitleScreen(stage);
 title.onChoose((id) => {
   root.dataset.titleChosen = id;
@@ -280,6 +308,14 @@ function renderGalleryState(): void {
     snacks: 2,
     muted: false,
     level: 1,
+    // Every prize in the catalogue; outside the empty journal, the frog and
+    // the pup are won.
+    prizes: content.world.arcade.prizes.map((prize) => {
+      const owned = state !== "journal-empty" &&
+        (prize.id === "frog-plush" || prize.id === "pup-plush");
+      return { id: prize.id, name: prize.name, owned,
+        image: owned ? galleryPrizeArt(prize.frame) : null };
+    }),
   };
   journal.render(journalView);
   // The battle is over once the reward shows, so the HUD steps aside.
@@ -407,7 +443,10 @@ function renderGalleryState(): void {
     },
   };
   check.render(galleryChecks[state] ?? null);
-  reward.render({
+  const prize = clawView?.prize ?? null;
+  reward.render(prize !== null ? {
+    visible: true, title: prize.title, name: prize.name, image: galleryPrizeArt(prize.frame),
+  } : {
     visible: state === "battle-reward",
     title: "NEW STICKER!",
     name: "Fountain Frog",
@@ -417,6 +456,7 @@ function renderGalleryState(): void {
       atlas: { w: 1536, h: 1024 },
     },
   });
+  arcade.render(clawView);
   prompt.render({
     label: "TALK",
     x: window.innerWidth / 2,
@@ -425,6 +465,15 @@ function renderGalleryState(): void {
   });
   if (!dialogueShown) dialogue.hide();
   else if (battleState) dialogue.render(battleMessage);
+  else if (clawView !== null)
+    dialogue.render({
+      speaker: null,
+      text: clawView.message,
+      revealed: clawView.revealed,
+      choices: [],
+      selected: -1,
+      canAdvance: true,
+    });
   else dialogue.render(views[state] ?? defaultView);
 }
 window.__stickerGallery = {
@@ -435,11 +484,23 @@ window.__stickerGallery = {
 };
 renderGalleryState();
 window.addEventListener("resize", renderGalleryState);
-void document.fonts.ready
+// The claw machine's painting and the plushes are CSS backgrounds, which
+// neither the fonts nor a frame wait for: decode them, then mark the page
+// ready for its screenshots.
+const decoded = (src: string): Promise<void> => {
+  const image = new Image();
+  image.src = src;
+  return image.decode();
+};
+void Promise.all([document.fonts.ready, decoded("assets/arcade/claw-machine.webp"),
+  decoded("assets/prizes/prizes.png")])
   .then(
     () =>
       new Promise<void>((resolve) => {
         window.requestAnimationFrame(() => resolve());
       }),
   )
-  .then(renderGalleryState);
+  .then(() => {
+    renderGalleryState();
+    root.dataset.ready = "true";
+  });

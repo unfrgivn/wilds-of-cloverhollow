@@ -275,3 +275,55 @@ export async function playAfter(
   await playWithKeys(page,
     carried > 0 ? [{ frame: joined.frame, ticks: carried }, ...rest] : rest, 10, watch);
 }
+
+type Rect = { x: number; y: number; width: number; height: number };
+// The claw machine's layout for a gallery state (spec 8.2), the parts the
+// e2e tests compare with what's drawn.
+export type ExpectedClaw = {
+  width: number;
+  height: number;
+  glass: Rect;
+  chute: Rect;
+  plate: Rect;
+  claw: { x: number; tip: number; size: number; open: boolean; layer: number };
+  marker: (Rect & { layer: number }) | null;
+  plushes: {
+    id: string;
+    x: number;
+    y: number;
+    size: number;
+    layer: number;
+    hidden: number;
+    tug: boolean;
+  }[];
+};
+
+function record(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function numbers(value: unknown, keys: string[]): value is Record<string, number> {
+  return record(value) && keys.every((key) => typeof value[key] === "number");
+}
+
+function expectedClaw(value: unknown): value is ExpectedClaw {
+  const rect = ["x", "y", "width", "height"];
+  return numbers(value, ["width", "height"]) && record(value) &&
+    numbers(value.glass, rect) && numbers(value.chute, rect) && numbers(value.plate, rect) &&
+    numbers(value.claw, ["x", "tip", "size", "layer"]) && record(value.claw) &&
+    typeof value.claw.open === "boolean" &&
+    (value.marker === null || numbers(value.marker, [...rect, "layer"])) &&
+    Array.isArray(value.plushes) &&
+    value.plushes.every((plush) => numbers(plush, ["x", "y", "size", "layer", "hidden"]) &&
+      record(plush) && typeof plush.id === "string" && typeof plush.tug === "boolean");
+}
+
+// Asks Bun for the layout (tools/claw-layout.ts): Node can't load the content.
+export function bunClawLayout(state: string, scale: number): ExpectedClaw {
+  const result = spawnSync("bun", ["tools/claw-layout.ts", state, String(scale)],
+    { encoding: "utf8" });
+  if (result.status !== 0) throw new Error(result.stderr);
+  const parsed: unknown = JSON.parse(result.stdout);
+  if (!expectedClaw(parsed)) throw new Error(`invalid claw layout: ${result.stdout}`);
+  return parsed;
+}

@@ -3,6 +3,9 @@ import { createState, stableHash, type State } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseSave, serializeSave } from "../../src/core/save";
 
+const record = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
 describe("save format", () => {
   const content = loadContent();
   const fixture = content.fixtures["new-game"];
@@ -37,7 +40,7 @@ describe("save format", () => {
     // no lantern, version 3 no coins, and version 4 a critter of each kind
     // (no recurring critters); all start fresh, as does a version from the
     // future.
-    for (const version of [1, 2, 3, 4, 6])
+    for (const version of [1, 2, 3, 4, 7])
       expect(parseSave(JSON.stringify({ version, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
     expect(parseSave(JSON.stringify({ version: 5, state: { tick: 1 } }), fresh)).toBeNull();
@@ -54,6 +57,27 @@ describe("save format", () => {
       .toBeNull();
     const emptyParty = { ...fresh, party: [] };
     expect(parseSave(JSON.stringify({ version: 5, state: emptyParty }), fresh)).not.toBeNull();
+  });
+
+  it("upgrades a version-5 save without arcade fields", () => {
+    const oldStateValue: unknown = JSON.parse(JSON.stringify(fresh));
+    if (!record(oldStateValue))
+      throw new Error("state is not an object");
+    const oldState = oldStateValue;
+    delete oldState.arcade;
+    delete oldState.prizes;
+    const restored = parseSave(JSON.stringify({ version: 5, state: oldState }), fresh);
+    expect(restored?.arcade).toBeNull();
+    expect(restored?.prizes).toEqual([]);
+  });
+
+  it("round trips version 6 and refuses an active arcade game", () => {
+    expect(parseSave(serializeSave(fresh), fresh)).toEqual(fresh);
+    const active: State = { ...fresh, arcade: {
+      game: "claw", phase: "sliding", phaseTicks: 1, x: 64, z: 40,
+      target: null, outcome: null, message: "", revealed: 0,
+    } };
+    expect(parseSave(serializeSave(active), fresh)).toBeNull();
   });
 
   it("checks recurring critters, which a new game's template has none of", () => {

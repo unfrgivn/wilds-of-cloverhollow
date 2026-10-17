@@ -9,12 +9,14 @@ export type JournalSticker = {
   owned: boolean;
   image: AtlasImage | null;
 };
+export type JournalPrize = JournalSticker;
 
 export type JournalView = {
   visible: boolean;
   /** Newest first; the game decides the order. */
   notes: string[];
   stickers: JournalSticker[];
+  prizes: JournalPrize[];
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
   currentLand: string | null;
   coins: number;
@@ -144,7 +146,10 @@ export function createJournal(root: HTMLElement): {
   const stickersHeading = element("h2", "journal-heading");
   stickersHeading.textContent = "STICKERS";
   const grid = element("div", "journal-stickers");
-  stickersPage.append(stickersHeading, grid);
+  const prizesHeading = element("h3", "journal-prizes-heading");
+  prizesHeading.textContent = "PRIZES";
+  const prizesGrid = element("div", "journal-stickers journal-prizes");
+  stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
   const mapPage = element("section", "journal-map-page");
   const map = element("div", "journal-map");
   const mapLabels = element("div", "journal-map-labels");
@@ -222,6 +227,7 @@ export function createJournal(root: HTMLElement): {
     }
   });
   const slots: Slot[] = [];
+  const prizeSlots: Slot[] = [];
   return {
     onClose: (callback) => {
       onClose = callback;
@@ -265,6 +271,22 @@ export function createJournal(root: HTMLElement): {
         if (image === null) return;
         setAttribute(slot.image, "aria-label", sticker.name);
         applyAtlasCrop(slot.image, image);
+      });
+      while (prizeSlots.length < view.prizes.length) prizeSlots.push(addSlot(prizesGrid));
+      while (prizeSlots.length > view.prizes.length) prizeSlots.pop()?.root.remove();
+      view.prizes.forEach((prize, index) => {
+        const slot = prizeSlots[index];
+        if (slot === undefined) return;
+        const image = prize.owned ? prize.image : null;
+        slot.image.hidden = image === null;
+        slot.unknown.hidden = image !== null;
+        slot.name.hidden = image === null;
+        setText(slot.name, image === null ? "" : prize.name);
+        setAttribute(slot.root, "data-owned", String(image !== null));
+        if (image !== null) {
+          setAttribute(slot.image, "aria-label", prize.name);
+          applyAtlasCrop(slot.image, image);
+        }
       });
       const nextMapSignature = view.lands
         .map((land) => `${land.id}:${land.name}:${land.x}:${land.y}`)

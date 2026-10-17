@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 47, flute friends; Milestone 42, feelings)
+Last updated: 2026-10-17 (Milestone 44, the claw machine)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -207,7 +207,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   derives a closed set of `SoundCue` values from state diffs; it has no DOM,
   timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a
   later synthesized or generated clip can replace a recipe without changing
-  gameplay.
+  gameplay. Arcade transitions add `claw-move`, `claw-drop`, `claw-grab`,
+  `claw-miss`, and `prize-won`.
 - `src/platform/audio.ts` creates the AudioContext at boot and resumes it at
   every chance: right away, on each key, pointer, or touch, and whenever a cue
   plays while it isn't running. Browsers hold it (`suspended`, or WebKit's
@@ -446,7 +447,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   1385-1440, y 455-500) leads to `arcade.door` and `requires`
   `clubhouse_claimed` (knot `arcade_closed`, the locked door); spawn
   `arcade-door` (1412, 560) faces down. Mr. Pip, the arcade keeper, is its
-  set piece at (820, 610). Look points: `claw-machine`, `ticket-counter`, and
+  set piece at (820, 610). Look points: `claw-machine` (prompt `Play`),
+  `ticket-counter`, and
   `star-racer` (a back-row cabinet).
 - Story time (Milestone 30): the school hallway's classroom door (trigger
   `classroom-door`, the porthole door on the back-left wall) leads to
@@ -875,13 +877,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   tag's text follows its `#` command, and its `/#` may close in an enclosing
   container) and rejects a travel tag naming an unknown area or spawn, any
   `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>` or
-  `coins <count>`, and any `feed` tag but `snack <count>`, each count 1 or
-  more.
+  `coins <count>`, any `feed` tag but `snack <count>`, each count 1 or more,
+  and any `play` tag but `<game> <digits>` naming an arcade game (`claw`).
+- A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
+  it to its close, and then, if Fae has the coins, she pays them and the game
+  opens (spec 8.2). It is the one place a game's price is set.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's
-  externals, `calmed(name)`, `coins()` (Fae's coins), and `snacks()` (her
-  snacks, Milestone 47), are answered from
+  externals, `calmed(name)`, `coins()` (Fae's coins), `snacks()` (her
+  snacks, Milestone 47), `won(prize)` (a prize she has won), and
+  `plushesLeft()` (how many plushes are still in the claw machine), are
+  answered from
   the core's state (`inkFacts`) for every command, not only a knot's first
   line. `calmed` answers a set piece by its id from its own mood, and a
   species once Fae owns its sticker (she has calmed one of them, anywhere).
@@ -1408,22 +1415,117 @@ ios/            Capacitor iOS project (from Milestone 4).
   book with a teal quill (inline SVG, aria-label "journal").
 - Shared pieces (`src/ui/atlas.ts`, `.die-cut` in sticker.css): atlas frames
   are cropped with percentage backgrounds, exact at any box size, and the
-  die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
-  The reward card uses both.
+   die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
+   The reward card uses both.
+- The STICKERS page continues below the album with a PRIZES shelf from
+  `world.arcade.prizes`. Owned plushes use the prize atlas frame, die-cut rim,
+  and name; unowned prizes are dashed `?` slots without names. The shelf is
+  part of the page scroll on phones.
+  The shelf has nine slots for the claw machine catalogue.
+
+### 8.2 Arcade games (Milestone 44)
+- The claw machine, once Mr. Pip is calm (`calmed("arcade-keeper")`): a line
+  tagged `play: claw <price>` (2 coins) opens it when the conversation closes,
+  paying the price then; too few coins at the close opens nothing.
+  `state.arcade` is the game in play or null, and `state.prizes` the prizes
+  won, in order.
+- Content (`content/arcade.json`, validated by `parseArcade`): the box's floor
+  is 1000 wide (x, left to right) by 460 deep (z, from the front glass to the
+  back wall). The claw travels x 185..940 and z 140..420; its home, (185, 140),
+  is over the prize chute, out of reach of every plush. Speed 4 units a tick on
+  either axis, reach 48, and drop, grab, lift, and release last 40, 14, 40, and
+  20 ticks. The heap is nine plushes, each `{ prize, x, z, level, on }`: level
+  0 on the floor (`on` empty), level n resting on plushes one level down within
+  three reaches (`on` names them). Today: the frog, the cat, the hamster, the
+  owl, and the raccoon on the floor; the bunny on the frog and the owl, the
+  squirrel on the raccoon, the bluebird on the hamster and the raccoon; and
+  the pup on top, on the bunny and the squirrel. So the pup, the cat, and the
+  bluebird are free at the start, and the raccoon only once the squirrel and
+  the bluebird are won. The prize catalogue and its atlas are `content/prizes.json`.
+- The claw takes two holds; only a fresh confirm press starts each:
+  ```
+  ready --press--> sliding --let go / rail end--> aiming --press--> pushing
+  pushing --let go / back wall--> dropping --> grabbing --> lifting
+  lifting --> returning --home, over the chute--> releasing --> result
+  result --press (show it all)--> shown --press--> closed
+  ```
+  Each held tick slides x (then pushes z) by the speed, up to the end; the tick
+  it's let go doesn't move. When grabbing ends, the claw closes on the topmost
+  plush in reach (squared floor distance at most reach squared): the highest
+  level, then the nearest, then content order. If another plush still in the
+  heap rests on it, it's stuck and stays; otherwise it's won, carried home, and
+  dropped into the chute. Returning moves both axes home by the speed a tick.
+  The result line (`won` with the prize's name, `stuck`, or `missed`) types
+  like dialogue. A won prize joins `state.prizes` once and leaves the heap.
+- `arcadeView` is logical: the box, the travel, the reach, the claw (x, z,
+  `drop` 0..1, `stop` the plush levels it comes down to, open or closed), the
+  plushes still in the heap (x, z, level, held, `tug` for a stuck one being
+  pulled, `fall` 0..1 into the chute), the hint (`slide` in ready, `push` in
+  aiming), the result line, and the prize won.
+- The close-up (`src/ui/arcade.ts`, laid out by `layoutClaw` in
+  `src/ui/claw-layout.ts`) is a painting of the machine's front with its glass
+  box in one-point perspective (`public/assets/arcade/claw-machine.webp`) and
+  its calibration in the painting's pixels (`claw-machine.json`, validated by
+  `parseClawCalibration`): the window, the floor's front and back edges, where
+  the ceiling meets the glass and the back wall, the chute's mouth, and the
+  blank plate. The cabinet is as large as the safe area left of the touch
+  buttons allows, keeping its shape, and draws under the dialogue box, the
+  reward card, the touch buttons, and the journal (`--z-hud`).
+- The floor in perspective: a depth share u of the box lies a share
+  t = u / (s + (1 - s) u) up the painted floor, s being the back edge's width
+  over the front's; the floor's edges, the ceiling, and a plush's size all
+  follow t. A plush's box (its 320 px atlas frame, its base on row 300) is
+  0.28 of the floor's width at its depth, standing at its spot on the floor
+  and 0.45 of a box higher a level. Everything is drawn back to front by
+  depth, the higher level first at the same depth, so whatever is nearer
+  covers whatever is farther. The claw is half a box, its cable and the
+  gantry (two rails along the ceiling's sides, the crossbar at the claw's
+  depth, the carriage on it) drawn over the ceiling; dropping, its prong tips
+  go down to the bare floor, or 0.3 of a box into the top of the plush it
+  lands on. A held plush hangs by its head between the closed prongs and, in
+  releasing, sinks into the chute's mouth, cut off at its front edge. A stuck
+  plush tilts while the claw pulls at it. While Fae aims, a dashed pink
+  ellipse as wide as the reach marks where the claw would come down. The hint
+  is lettered on the plate (CLAW when there's none), on two balanced lines
+  when it's long.
+- The result line uses the shared speakerless dialogue box, and a prize won
+  shows on the shared battle reward card (`prizeTitle` "NEW PRIZE!", the plush,
+  its name), set high over the cabinet, clear of the dialogue box and the
+  touch buttons. The backdrop is the blurred arcade, focused on Fae.
+- The gallery's claw states are real game states (`src/dev/claw-gallery.ts`):
+  ready, aiming, pushing, grabbing, lifting, a tug, releasing, and the result.
+  `tests/unit/claw-layout.test.ts` checks the layout itself (the floor's
+  corners, the shortening with depth, the claw's home over the chute, every
+  plush on its level, nearer over farther, the claw over what's behind it and
+  under what's in front, on a grid across the box), and the gallery e2e checks
+  the DOM is that layout within a pixel, at 874x402 and 1280x720 in both
+  engines (`tools/claw-layout.ts` gives Node the layout from Bun). The
+  recorded run `arcade/claw.json` (`tools/sim/record-claw.ts`, from the
+  `arcade` fixture) calms Mr. Pip and plays four games, stuck on the raccoon,
+  the pup won, a miss in the bare back corner, and the cat won; `claw.spec.ts`
+  plays it with real keys and its state must hash the same as Bun's replay,
+  and wins the pup with two holds of the touch confirm sticker on a phone, in
+  both engines.
+- While a game runs, Fae, doors, triggers, targeting, the menu, the journal,
+  and cancel are ignored, and the party settles as in battle. A game's end
+  autosaves. Cues: `claw-move` (each hold starts), `claw-drop`, `claw-grab`
+  or `claw-miss` (stuck or empty), and `prize-won`.
 
 ## 10. Save and load
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 5, state }`, the whole core state, including the
+- Format: `{ version: 6, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
   the set pieces' moods, this visit's recurring critters, the lantern, coins
-  and snacks, the PRNG, and the tick. Version 1 (Maddie in `maddie` and
+  and snacks, the PRNG, the tick, arcade state, and prizes. Version 1 (Maddie in `maddie` and
   `trail`), version 2 (no lantern), version 3 (no coins or snacks), and
   version 4 (one critter of each kind, no recurring critters) are refused and
   start a new game. Loading restores it exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
+- Version 5 saves upgrade to version 6 with `arcade: null` and `prizes: []`.
+  Version 4 and older, and any mid-game save, are refused.
 - `parseSave(json, template)` accepts only a state with the template's exact
   shape (a fresh game state: every key, the same primitive types, all the way
   down; null slots may hold null or an object; every element of an array
@@ -1438,7 +1540,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   always null in a save, and `parseSave` refuses one where it isn't. The
   battle's own shape can change without a new version (Milestone 40 did).
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
-  a battle ends, a dialogue closes, or the journal closes. The trigger is a
+  a battle or arcade game ends, a dialogue closes, or the journal closes. The trigger is a
   pure function of the previous and next state (`autosaveNeeded`). Fixture
   resets don't save.
 - Boot: a valid save resumes the game; otherwise a new game starts.
@@ -1490,6 +1592,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
+- `renderInfo().arcade` is null outside a claw game, otherwise the close-up as
+  drawn, in CSS px: `{ phase, machine, glass, plate, chute, claw: { x, y,
+  open }, plushes: [{ id, x, y, size, held }] }`, the claw's `y` its prong
+  tips and each plush's `x, y` where it stands (its base point), read back
+  from the DOM. Harness builds log `[cloverhollow] arcade { phase, message }`
+  when either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, `sound.level()`
   reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), and

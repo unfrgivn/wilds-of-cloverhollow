@@ -10,8 +10,9 @@ import { loadContent, storyTagErrors } from "../../src/content/load";
 const content = loadContent();
 const world = content.world;
 const story = world.story;
-const quiet: InkFacts = { calmed: {}, coins: 0, snacks: 0 };
-const calmBird: InkFacts = { calmed: { "music-bird": true }, coins: 0, snacks: 0 };
+const quiet: InkFacts = { calmed: {}, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 };
+const calmBird: InkFacts =
+  { calmed: { "music-bird": true }, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 };
 
 type Played = { lines: string[]; sounds: string[]; ink: string };
 function play(

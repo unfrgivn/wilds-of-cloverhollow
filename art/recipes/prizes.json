@@ -1,0 +1,57 @@
+{
+  "asset": "claw machine plush prizes",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 4,
+  "references": [
+    "public/assets/critters/frog/frog.json (calm_idle_01)",
+    "public/assets/critters/pup/pup.json (calm_idle_01)",
+    "public/assets/critters/raccoon/raccoon.json (calm_idle_01)",
+    "public/assets/critters/cat/cat.json (calm_idle_01)",
+    "public/assets/critters/bunny/bunny.json (calm_idle_01)",
+    "public/assets/critters/bluebird/bluebird.json (calm_idle_01)",
+    "public/assets/critters/hamster/hamster.json (calm_idle_01)",
+    "public/assets/critters/squirrel/squirrel.json (calm_idle_01)",
+    "public/assets/critters/owl/owl.json (calm_idle_01)",
+    "docs/art/concepts/props/arcade_props.png",
+    "docs/art/concepts/environments/arcade_interior.png"
+  ],
+  "selected": ["art/source/prizes/prizes-sheet-raw.png", "art/source/prizes/plushes-six-sheet-raw.png"],
+  "prompt_summary": "The original royal-blue three-plush sheet plus a final 2K nine-cell sheet on #D400A8 magenta, whose bottom two rows provide separate cat, bunny, bluebird, hamster, squirrel, and owl plushes matching the established stitched watercolor toy line.",
+  "post_processing": [
+    "Removed the border-connected #0000FF matte from the complete 2048x2048 sheet with a 48-level RGB distance threshold before segmentation.",
+    "Despilled blue JPEG contamination only within the eight-pixel visible alpha rim; no interior colour correction, dither, warping, or per-frame registration.",
+    "Found the three whole plush components with 8-connected alpha components and assigned them by centroid x, preserving the raccoon's connected tail.",
+    "Applied one uniform 40% scale to all three trimmed components, centred each on a 320x320 transparent frame, and placed its lowest opaque row at row 300.",
+    "Packed the three untrimmed full-size frames into a 3-column PixiJS atlas and recorded baseline 300."
+    ,"The new sheet used one uniform 40% scale, matching the first sheet's 40% factor; its six source components had comparable native proportions and the resulting bounding heights fit the same 8px-cleared 320px frames.",
+    "An initial six-cell generation had pale-pink contamination and an ambiguous hamster, so it was discarded. The final generation explicitly requested a 3x3 sheet with the established first row and a clear hamster; build-prizes.ts cuts only its bottom two rows.",
+    "The final generator output used a uniform #D400A8-like matte. build-prizes.ts flood-fills each cell from its border colours (52-level RGB max distance), then keeps the largest connected plush component; no subject pixels are globally recoloured.",
+    "Packed nine untrimmed full-size frames in a deterministic 3x3 atlas with baseline 300."
+  ],
+  "outputs": {
+    "atlas": "public/assets/prizes/prizes.png",
+    "manifest": "public/assets/prizes/prizes.json",
+    "frames": [
+      "frog-plush",
+      "pup-plush",
+      "raccoon-plush",
+      "cat-plush",
+      "bunny-plush",
+      "bluebird-plush",
+      "hamster-plush",
+      "squirrel-plush",
+      "owl-plush"
+    ],
+    "rebuild": "tools/art/build-prizes.ts"
+  },
+  "owner_review": {
+    "viewed": [
+      "art/review/prizes-nine-cream.png",
+      "art/review/prizes-nine-dark.png",
+      "art/review/prizes-nine-lineup.png",
+      "art/review/claw-heap-mock.png"
+    ],
+    "note": "The nine toys read as a cohesive plush line. Cream and dark reviews showed clean silhouettes without visible matte halos. The lineup is at in-game scale beside Fae's idle_down frame; the seated prizes are intentionally broader than Fae. The heap mock shows three overlapping depth layers."
+  }
+}

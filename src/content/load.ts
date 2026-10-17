@@ -15,6 +15,9 @@ import eastHallData from "../../content/areas/east-hall.json";
 import musicData from "../../content/areas/music.json";
 import fieldData from "../../content/areas/field.json";
 import clubhouseData from "../../content/areas/clubhouse.json";
+import arcadeGameData from "../../content/arcade.json";
+import prizesData from "../../content/prizes.json";
+import { isArcadeGameId } from "../core/arcade";
 import harnessSurfaceData from "../../content/surfaces/harness.json";
 import bedroomSurfaceData from "../../content/surfaces/bedroom.json";
 import plazaSurfaceData from "../../content/surfaces/plaza.json";
@@ -120,6 +123,9 @@ import type {
   FeelingId,
   Recurring,
   Den,
+  ArcadeContent,
+  ClawCalibration,
+  HeapPlush,
 } from "../core";
 
 // A battle check's spec (spec 8), validated by kind. Every number is an
@@ -282,12 +288,176 @@ export function storyTagErrors(tags: string[], areas: Record<string, Area>): str
       return /^gift:\s*(snack|coins)\s+[1-9]\d*$/.test(tag) ? [] : [`invalid gift tag "${tag}"`];
     if (tag.startsWith("feed:"))
       return /^feed:\s*snack\s+[1-9]\d*$/.test(tag) ? [] : [`invalid feed tag "${tag}"`];
+    if (tag.startsWith("play:")) {
+      const match = /^play:\s*([a-z][a-z0-9-]*)\s+\d+$/.exec(tag);
+      return match !== null && isArcadeGameId(match[1] ?? "")
+        ? [] : [`invalid play tag "${tag}"`];
+    }
     if (tag.startsWith("sound:")) {
       const sound = tag.slice("sound:".length).trim();
       return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
     }
     return [];
   });
+}
+
+function list(value: unknown): value is unknown[] {
+  return Array.isArray(value);
+}
+
+function strings(value: unknown): value is string[] {
+  return list(value) && value.every((item) => typeof item === "string");
+}
+
+// The prize catalogue (content/prizes.json): its atlas and one entry a prize.
+function parsePrizes(value: unknown): ArcadeContent["prizes"] {
+  const file = "content/prizes.json";
+  field(record(value) && typeof value.atlas === "string" && value.atlas.endsWith(".json") &&
+    list(value.catalogue), file, "atlas or catalogue");
+  const prizes: ArcadeContent["prizes"] = [];
+  for (const item of value.catalogue) {
+    field(record(item) && typeof item.id === "string" && typeof item.name === "string" &&
+      typeof item.frame === "string", file, "catalogue entry");
+    field(!prizes.some((prize) => prize.id === item.id), file, `duplicate prize ${item.id}`);
+    prizes.push({ id: item.id, name: item.name, frame: item.frame });
+  }
+  return prizes;
+}
+
+// The claw machine (content/arcade.json, spec 8.2): the box, the claw's
+// travel, its numbers, the heap, and the lines.
+export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent {
+  const file = "content/arcade.json";
+  field(record(prizesValue) && typeof prizesValue.atlas === "string",
+    "content/prizes.json", "atlas");
+  const prizes = parsePrizes(prizesValue);
+  field(record(value) && record(value.claw), file, "claw");
+  const claw = value.claw;
+  const integer = (
+    source: Record<string, unknown>,
+    name: string,
+    minimum: number,
+    label = `claw.${name}`,
+  ): number => {
+    const item = source[name];
+    field(typeof item === "number" && Number.isInteger(item) && item >= minimum, file, label);
+    return item;
+  };
+  field(record(claw.box), file, "claw.box");
+  const box = {
+    width: integer(claw.box, "width", 1, "claw.box.width"),
+    depth: integer(claw.box, "depth", 1, "claw.box.depth"),
+  };
+  const railLeft = integer(claw, "railLeft", 0);
+  const railRight = integer(claw, "railRight", 0);
+  field(railLeft < railRight && railRight <= box.width, file, "claw rail");
+  const depthFront = integer(claw, "depthFront", 0);
+  const depthBack = integer(claw, "depthBack", 0);
+  field(depthFront < depthBack && depthBack <= box.depth, file, "claw depth");
+  const reach = integer(claw, "reach", 1);
+  field(list(claw.heap) && claw.heap.length > 0, file, "claw.heap");
+  const heap: HeapPlush[] = claw.heap.map((item, index) => {
+    const label = `claw.heap[${index}]`;
+    field(record(item) && typeof item.prize === "string" && strings(item.on), file, label);
+    field(prizes.some((prize) => prize.id === item.prize), file, `${label}.prize`);
+    const x = integer(item, "x", railLeft, `${label}.x`);
+    const z = integer(item, "z", depthFront, `${label}.z`);
+    field(x <= railRight && z <= depthBack, file, `${label} position`);
+    const level = integer(item, "level", 0, `${label}.level`);
+    return { prize: item.prize, x, z, level, on: item.on };
+  });
+  heap.forEach((plush, index) => {
+    const label = `claw.heap[${index}]`;
+    field(heap.findIndex((other) => other.prize === plush.prize) === index, file,
+      `${label}: duplicate prize`);
+    field(plush.level === 0 ? plush.on.length === 0 : plush.on.length > 0, file,
+      `${label}.on: a plush on the floor rests on nothing, one above on something`);
+    for (const id of plush.on) {
+      const under = heap.find((other) => other.prize === id);
+      const near = under !== undefined &&
+        (plush.x - under.x) * (plush.x - under.x) + (plush.z - under.z) * (plush.z - under.z) <=
+          9 * reach * reach;
+      field(under !== undefined && under.level === plush.level - 1 && near, file,
+        `${label}.on: ${id} is not one level down within three reaches`);
+    }
+    // The claw rests over the chute; nothing in the heap may be in reach there.
+    field((railLeft - plush.x) * (railLeft - plush.x) +
+      (depthFront - plush.z) * (depthFront - plush.z) > reach * reach, file,
+      `${label}: in reach of the chute`);
+  });
+  const lines = claw.lines;
+  field(record(lines) && typeof lines.slide === "string" && typeof lines.push === "string" &&
+    typeof lines.won === "string" && lines.won.includes("{prize}") &&
+    typeof lines.missed === "string" && typeof lines.stuck === "string" &&
+    typeof lines.prizeTitle === "string", file, "claw.lines");
+  return {
+    atlas: prizesValue.atlas,
+    claw: {
+      box, railLeft, railRight, depthFront, depthBack, reach,
+      speed: integer(claw, "speed", 1),
+      dropTicks: integer(claw, "dropTicks", 1),
+      grabTicks: integer(claw, "grabTicks", 1),
+      liftTicks: integer(claw, "liftTicks", 1),
+      releaseTicks: integer(claw, "releaseTicks", 1),
+      heap,
+      lines: {
+        slide: lines.slide, push: lines.push, won: lines.won, missed: lines.missed,
+        stuck: lines.stuck, prizeTitle: lines.prizeTitle,
+      },
+    },
+    prizes,
+  };
+}
+
+// The claw machine painting's calibration (spec 8.2): every number finite,
+// the window and the plate inside the image, the floor's back edge above and
+// narrower than its front, the ceiling meeting the glass above the back wall,
+// and the chute's mouth four points on the floor.
+export function parseClawCalibration(value: unknown, file: string): ClawCalibration {
+  const number = (item: unknown): item is number =>
+    typeof item === "number" && Number.isFinite(item);
+  type Box = { x: number; y: number; w: number; h: number };
+  const rect = (item: unknown): item is Box =>
+    record(item) && number(item.x) && number(item.y) && number(item.w) && number(item.h) &&
+    item.w > 0 && item.h > 0;
+  const edge = (item: unknown): item is { y: number; left: number; right: number } =>
+    record(item) && number(item.y) && number(item.left) && number(item.right) &&
+    item.left < item.right;
+  const level = (item: unknown): item is { y: number } => record(item) && number(item.y);
+  const point = (item: unknown): item is [number, number] =>
+    list(item) && item.length === 2 && number(item[0]) && number(item[1]);
+  field(record(value) && typeof value.image === "string", file, "image");
+  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
+  const size = { w: value.size.w, h: value.size.h };
+  const inside = (box: Box): boolean =>
+    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const rounded = (item: unknown): item is Box & { radius: number } =>
+    record(item) && number(item.radius) && item.radius >= 0 && rect(item);
+  field(rounded(value.glass) && inside(value.glass), file, "glass");
+  field(rect(value.plate) && inside(value.plate), file, "plate");
+  field(record(value.floor) && edge(value.floor.front) && edge(value.floor.back) &&
+    value.floor.back.y < value.floor.front.y &&
+    value.floor.back.right - value.floor.back.left <
+      value.floor.front.right - value.floor.front.left, file, "floor");
+  field(record(value.ceiling) && level(value.ceiling.front) && level(value.ceiling.back) &&
+    value.ceiling.front.y < value.ceiling.back.y &&
+    value.ceiling.back.y < value.floor.back.y, file, "ceiling");
+  field(record(value.chute) && list(value.chute.mouth) && value.chute.mouth.length === 4 &&
+    value.chute.mouth.every(point), file, "chute.mouth");
+  const glass = value.glass;
+  const plate = value.plate;
+  return {
+    image: value.image,
+    size,
+    glass: { x: glass.x, y: glass.y, w: glass.w, h: glass.h, radius: glass.radius },
+    floor: {
+      front: { ...value.floor.front },
+      back: { ...value.floor.back },
+    },
+    ceiling: { front: { y: value.ceiling.front.y }, back: { y: value.ceiling.back.y } },
+    chute: { mouth: value.chute.mouth.map(([x, y]) => [x, y]) },
+    plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
+  };
 }
 
 function numberValue(
@@ -1169,6 +1339,7 @@ export function loadContent(): {
     critters[critter.id] = critter;
   }
   const battle = parseBattleContent(battleData, "content/battle.json");
+  const arcadeGames = parseArcade(arcadeGameData, prizesData);
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
   const maddie = parsePartyMember(maddieData, "content/party/maddie.json");
@@ -1264,6 +1435,7 @@ export function loadContent(): {
       characters,
       party,
       storyVariable,
+      arcade: arcadeGames,
     },
     fixtures,
   };

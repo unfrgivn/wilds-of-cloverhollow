@@ -1,8 +1,8 @@
 {
-  "asset": "claw machine plush prizes",
+  "asset": "ticket counter prize atlas",
   "date": "2026-10-17",
   "model": "gemini-3-pro-image-preview",
-  "calls": 4,
+  "calls": 5,
   "references": [
     "public/assets/critters/frog/frog.json (calm_idle_01)",
     "public/assets/critters/pup/pup.json (calm_idle_01)",
@@ -16,8 +16,8 @@
     "docs/art/concepts/props/arcade_props.png",
     "docs/art/concepts/environments/arcade_interior.png"
   ],
-  "selected": ["art/source/prizes/prizes-sheet-raw.png", "art/source/prizes/plushes-six-sheet-raw.png"],
-  "prompt_summary": "The original royal-blue three-plush sheet plus a final 2K nine-cell sheet on #D400A8 magenta, whose bottom two rows provide separate cat, bunny, bluebird, hamster, squirrel, and owl plushes matching the established stitched watercolor toy line.",
+  "selected": ["art/source/prizes/prizes-sheet-raw.png", "art/source/prizes/plushes-six-sheet-raw.png", "art/source/prizes/arcade-four-sheet-raw.png"],
+  "prompt_summary": "The existing nine plushes plus a 2x2 #D400A8 sheet containing a rainbow pinwheel, star bouncy ball, toy rocket, and connected arcade-cabinet keychain.",
   "post_processing": [
     "Removed the border-connected #0000FF matte from the complete 2048x2048 sheet with a 48-level RGB distance threshold before segmentation.",
     "Despilled blue JPEG contamination only within the eight-pixel visible alpha rim; no interior colour correction, dither, warping, or per-frame registration.",
@@ -27,7 +27,9 @@
     ,"The new sheet used one uniform 40% scale, matching the first sheet's 40% factor; its six source components had comparable native proportions and the resulting bounding heights fit the same 8px-cleared 320px frames.",
     "An initial six-cell generation had pale-pink contamination and an ambiguous hamster, so it was discarded. The final generation explicitly requested a 3x3 sheet with the established first row and a clear hamster; build-prizes.ts cuts only its bottom two rows.",
     "The final generator output used a uniform #D400A8-like matte. build-prizes.ts flood-fills each cell from its border colours (52-level RGB max distance), then keeps the largest connected plush component; no subject pixels are globally recoloured.",
-    "Packed nine untrimmed full-size frames in a deterministic 3x3 atlas with baseline 300."
+    "The final 2x2 generated sheet was flood-keyed from its border at 70 RGB distance, enclosed key pockets were cleared, and the four largest connected components were extracted in reading order.",
+    "The four new components were uniformly scaled to 28% of their source crop, packed into 320x320 untrimmed frames with baseline 300 and 8px edge clearance. Key-coloured alpha pixels were cleared only in the four new frames, including alpha-1 edge contamination.",
+    "Packed thirteen untrimmed full-size frames in a deterministic 4-column atlas."
   ],
   "outputs": {
     "atlas": "public/assets/prizes/prizes.png",
@@ -41,9 +43,14 @@
       "bluebird-plush",
       "hamster-plush",
       "squirrel-plush",
-      "owl-plush"
+      "owl-plush",
+      "pinwheel",
+      "bouncy-ball",
+      "toy-rocket",
+      "star-racer-keychain"
     ],
-    "rebuild": "tools/art/build-prizes.ts"
+    "rebuild": "tools/art/build-prizes.ts",
+    "key": "#D400A8, selected because it is absent from the intended subjects; per-frame leftover key-coloured opaque pixels: 0 for all 13 frames"
   },
   "owner_review": {
     "viewed": [
@@ -52,6 +59,6 @@
       "art/review/prizes-nine-lineup.png",
       "art/review/claw-heap-mock.png"
     ],
-    "note": "The nine toys read as a cohesive plush line. Cream and dark reviews showed clean silhouettes without visible matte halos. The lineup is at in-game scale beside Fae's idle_down frame; the seated prizes are intentionally broader than Fae. The heap mock shows three overlapping depth layers."
+    "note": "The nine original frames are pixel-identical to the prior atlas. The four additions read as a cohesive watercolor toy line, with clean silhouettes and no visible matte halos on cream or dark reviews."
   }
 }

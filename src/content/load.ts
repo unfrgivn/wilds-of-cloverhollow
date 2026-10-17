@@ -125,7 +125,10 @@ import type {
   Den,
   ArcadeContent,
   ClawCalibration,
+  CounterContent,
   HeapPlush,
+  SkeeCalibration,
+  SkeeContent,
   WindUp,
 } from "../core";
 
@@ -297,7 +300,13 @@ export function storyTags(story: Record<string, unknown>): string[] {
 
 // The tags the core acts on (spec 7): `travel: <area>.<spawn>` must name a
 // spawn that exists, and `buy:` sells only `snack <price>`.
-export function storyTagErrors(tags: string[], areas: Record<string, Area>): string[] {
+// Every tag the story uses, checked (spec 7). `prices` are the ticket
+// counter's: a `trade` tag must name one of its prizes at its price.
+export function storyTagErrors(
+  tags: string[],
+  areas: Record<string, Area>,
+  prices: Record<string, number> = {},
+): string[] {
   return tags.flatMap((tag) => {
     if (tag.startsWith("travel:")) {
       const [areaId, spawnId, ...extra] = tag.slice("travel:".length).trim().split(".");
@@ -316,6 +325,12 @@ export function storyTagErrors(tags: string[], areas: Record<string, Area>): str
       const match = /^play:\s*([a-z][a-z0-9-]*)\s+\d+$/.exec(tag);
       return match !== null && isArcadeGameId(match[1] ?? "")
         ? [] : [`invalid play tag "${tag}"`];
+    }
+    if (tag.startsWith("trade:")) {
+      const match = /^trade:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
+      const price = match === null ? undefined : prices[match[1] ?? ""];
+      return price !== undefined && price === Number(match?.[2])
+        ? [] : [`invalid trade tag "${tag}" (not a counter prize at its price)`];
     }
     if (tag.startsWith("sound:")) {
       const sound = tag.slice("sound:".length).trim();
@@ -429,8 +444,118 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
         stuck: lines.stuck, prizeTitle: lines.prizeTitle,
       },
     },
+    skee: parseSkee(value.skee, file),
+    counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
   };
+}
+
+function integerIn(
+  source: Record<string, unknown>,
+  name: string,
+  minimum: number,
+  file: string,
+  label: string,
+): number {
+  const item = source[name];
+  field(typeof item === "number" && Number.isInteger(item) && item >= minimum, file, label);
+  return item;
+}
+
+// Skee-ball (spec 8.2): integers throughout; the arrow turns exactly at the
+// board's edges; held to the end of the meter, the ball flies off the top; the
+// rings smallest first, the outer one on the board; the corner holes on the
+// board and clear of the rings; every ball scores at least the floor.
+function parseSkee(value: unknown, file: string): SkeeContent {
+  field(record(value), file, "skee");
+  const integer = (source: Record<string, unknown>, name: string, minimum: number,
+    label = `skee.${name}`): number => integerIn(source, name, minimum, file, label);
+  field(record(value.board), file, "skee.board");
+  const board = {
+    width: integer(value.board, "width", 2, "skee.board.width"),
+    height: integer(value.board, "height", 1, "skee.board.height"),
+  };
+  const edge = board.width / 2;
+  const sweepStep = integer(value, "sweepStep", 1);
+  field(Number.isInteger(edge) && edge % sweepStep === 0, file,
+    "skee.sweepStep (the arrow must turn exactly at the board's edges)");
+  const powerStep = integer(value, "powerStep", 1);
+  const powerTicks = integer(value, "powerTicks", 2);
+  field(powerTicks * powerStep > board.height, file,
+    "skee.powerTicks (held to the end, the ball must fly off the top)");
+  field(record(value.centre), file, "skee.centre");
+  const centre = {
+    x: integer(value.centre, "x", -edge, "skee.centre.x"),
+    y: integer(value.centre, "y", 0, "skee.centre.y"),
+  };
+  field(list(value.rings) && value.rings.length > 0, file, "skee.rings");
+  const rings = value.rings.map((ring, index) => {
+    field(record(ring), file, `skee.rings[${index}]`);
+    return {
+      points: integer(ring, "points", 1, `skee.rings[${index}].points`),
+      radius: integer(ring, "radius", 1, `skee.rings[${index}].radius`),
+    };
+  });
+  rings.forEach((ring, index) => {
+    const inside = rings[index - 1];
+    field(inside === undefined || inside.radius < ring.radius, file,
+      `skee.rings[${index}] (rings go from the smallest out)`);
+  });
+  const outer = rings.at(-1);
+  field(outer !== undefined && centre.x - outer.radius >= -edge &&
+    centre.x + outer.radius <= edge && centre.y - outer.radius >= 0 &&
+    centre.y + outer.radius <= board.height, file, "skee.rings (the outer ring is on the board)");
+  field(record(value.corners), file, "skee.corners");
+  const corners = {
+    points: integer(value.corners, "points", 1, "skee.corners.points"),
+    x: integer(value.corners, "x", 1, "skee.corners.x"),
+    y: integer(value.corners, "y", 0, "skee.corners.y"),
+    radius: integer(value.corners, "radius", 1, "skee.corners.radius"),
+  };
+  const clear = [-corners.x, corners.x].every((x) =>
+    (x - centre.x) * (x - centre.x) + (corners.y - centre.y) * (corners.y - centre.y) >
+      (outer.radius + corners.radius) * (outer.radius + corners.radius));
+  field(corners.x + corners.radius <= edge && corners.y - corners.radius >= 0 &&
+    corners.y + corners.radius <= board.height && clear, file,
+  "skee.corners (on the board, clear of the rings)");
+  const lines = value.lines;
+  field(record(lines) && typeof lines.aim === "string" && typeof lines.power === "string" &&
+    typeof lines.result === "string" && lines.result.includes("{score}") &&
+    lines.result.includes("{tickets}"), file, "skee.lines");
+  return {
+    balls: integer(value, "balls", 1),
+    board, sweepStep, powerStep, powerTicks,
+    rollTicks: integer(value, "rollTicks", 1),
+    hopTicks: integer(value, "hopTicks", 1),
+    scoreTicks: integer(value, "scoreTicks", 1),
+    centre, rings, corners,
+    floor: integer(value, "floor", 1),
+    pointsPerTicket: integer(value, "pointsPerTicket", 1),
+    lines: { aim: lines.aim, power: lines.power, result: lines.result },
+  };
+}
+
+// The ticket counter: prizes from the catalogue, each once, never one of the
+// claw machine's plushes, each at a price of at least one ticket.
+function parseCounter(
+  value: unknown,
+  file: string,
+  prizes: ArcadeContent["prizes"],
+  heap: HeapPlush[],
+): CounterContent {
+  field(record(value) && list(value.prizes) && value.prizes.length > 0, file, "counter.prizes");
+  const items = value.prizes.map((item, index) => {
+    const label = `counter.prizes[${index}]`;
+    field(record(item) && typeof item.prize === "string" &&
+      prizes.some((prize) => prize.id === item.prize), file, `${label}.prize`);
+    field(!heap.some((plush) => plush.prize === item.prize), file,
+      `${label} (the claw machine's plushes aren't sold)`);
+    return { prize: item.prize, price: integerIn(item, "price", 1, file, `${label}.price`) };
+  });
+  items.forEach((item, index) =>
+    field(items.findIndex((other) => other.prize === item.prize) === index, file,
+      `counter.prizes[${index}] (a duplicate prize)`));
+  return { prizes: items };
 }
 
 // The claw machine painting's calibration (spec 8.2): every number finite,
@@ -481,6 +606,43 @@ export function parseClawCalibration(value: unknown, file: string): ClawCalibrat
     ceiling: { front: { y: value.ceiling.front.y }, back: { y: value.ceiling.back.y } },
     chute: { mouth: value.chute.mouth.map(([x, y]) => [x, y]) },
     plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
+  };
+}
+
+// The skee-ball painting's calibration (spec 8.2): every number finite; the
+// lane narrowing from its foot up to the hump; the board above the hump; the
+// board and the plate inside the image, apart.
+export function parseSkeeCalibration(value: unknown, file: string): SkeeCalibration {
+  const number = (item: unknown): item is number =>
+    typeof item === "number" && Number.isFinite(item);
+  type Box = { x: number; y: number; w: number; h: number };
+  const rect = (item: unknown): item is Box =>
+    record(item) && number(item.x) && number(item.y) && number(item.w) && number(item.h) &&
+    item.w > 0 && item.h > 0;
+  const edge = (item: unknown): item is { y: number; left: number; right: number } =>
+    record(item) && number(item.y) && number(item.left) && number(item.right) &&
+    item.left < item.right;
+  field(record(value) && typeof value.image === "string", file, "image");
+  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
+  const size = { w: value.size.w, h: value.size.h };
+  const inside = (box: Box): boolean =>
+    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const apart = (a: Box, b: Box): boolean =>
+    a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
+  field(record(value.lane) && edge(value.lane.near) && edge(value.lane.far) &&
+    value.lane.far.y < value.lane.near.y &&
+    value.lane.far.right - value.lane.far.left < value.lane.near.right - value.lane.near.left,
+  file, "lane");
+  const { board, plate } = value;
+  field(rect(board) && inside(board) && board.y + board.h <= value.lane.far.y, file, "board");
+  field(rect(plate) && inside(plate) && apart(plate, board), file, "plate");
+  const copy = (box: Box): Box => ({ x: box.x, y: box.y, w: box.w, h: box.h });
+  return {
+    image: value.image,
+    size,
+    lane: { near: { ...value.lane.near }, far: { ...value.lane.far } },
+    board: copy(board),
+    plate: copy(plate),
   };
 }
 
@@ -1478,7 +1640,8 @@ export function loadContent(): {
   const critterProblems = critterErrors(areas, critters, stickers);
   if (critterProblems.length > 0)
     throw new Error(`content/critters: ${critterProblems.join("; ")}`);
-  const tagProblems = storyTagErrors(storyTags(story), areas);
+  const tagProblems = storyTagErrors(storyTags(story), areas, Object.fromEntries(
+    arcadeGames.counter.prizes.map((item) => [item.prize, item.price])));
   if (tagProblems.length > 0)
     throw new Error(`content/story/main.ink: ${tagProblems.join("; ")}`);
   return {

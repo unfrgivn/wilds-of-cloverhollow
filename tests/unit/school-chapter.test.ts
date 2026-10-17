@@ -47,7 +47,8 @@ function person(area: Area, id: string): Npc {
 }
 
 const pipCalm: InkFacts =
-  { calmed: { "arcade-keeper": true }, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 };
+  { calmed: { "arcade-keeper": true }, coins: 0, snacks: 0, prizes: [], plushesLeft: 0,
+    tickets: 0 };
 const fresh = createInkState(story, 1);
 
 // Plays a knot to its end (the first choice at any choice), returning its
@@ -117,7 +118,7 @@ describe("story time", () => {
   it("starts once Mr. Pip is calm: Ms. Maple sends Fae in and goes in herself", () => {
     // Before the arcade, chapter one's teacher.
     expect(play(fresh, "teacher",
-      { calmed: {}, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 }).lines[0])
+      { calmed: {}, coins: 0, snacks: 0, prizes: [], plushesLeft: 0, tickets: 0 }).lines[0])
       .toBe("Good morning, Fae! Class starts when the bell rings.");
     const { lines } = play(fresh, "teacher");
     expect(lines).toEqual([
@@ -178,7 +179,7 @@ describe("the classroom", () => {
         ["reading-corner", "reading_corner", "Look"],
       ]));
     const wall = play(storyTime, "art_wall",
-      { calmed: {}, coins: 0, snacks: 0, prizes: [], plushesLeft: 0 }).lines;
+      { calmed: {}, coins: 0, snacks: 0, prizes: [], plushesLeft: 0, tickets: 0 }).lines;
     expect(wall).toEqual([
       "The class art wall: rainbows, rockets, and a very wobbly cat.",
       "And a drawing of a masked face, a swirl, and a star.",

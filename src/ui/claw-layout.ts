@@ -1,4 +1,4 @@
-import type { ArcadeView, ClawCalibration } from "../core";
+import type { ClawCalibration, ClawView } from "../core";
 
 // How the claw machine close-up is drawn (spec 8.2). Sizes are shares of a
 // plush's box: the square frame each plush is painted in (320 px in the atlas).
@@ -133,7 +133,7 @@ function markerAt(
 // The close-up in CSS px, relative to the cabinet's top-left corner, from the
 // core's view and the painting's calibration at `scale`.
 export function layoutClaw(
-  view: ArcadeView,
+  view: ClawView,
   calibration: ClawCalibration,
   scale: number,
 ): ClawLayout {

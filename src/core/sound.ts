@@ -10,6 +10,7 @@ export type SoundCue =
   | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
   | "battle-beat"
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
+  | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
 
 export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
@@ -26,7 +27,7 @@ export function isStorySound(value: string): value is StorySound {
 export function soundCues(
   previous: State,
   next: State,
-  world: Pick<World, "surfaces">,
+  world: Pick<World, "surfaces" | "arcade">,
 ): SoundCue[] {
   const cues: SoundCue[] = [];
   const oldDialogue = previous.dialogue;
@@ -85,13 +86,22 @@ export function soundCues(
         (next.battle.phase === "result" || next.battle.phase === "burstResult"))
       cues.push("battle-hit");
   }
-  if (previous.arcade?.phase !== next.arcade?.phase) {
-    const phase = next.arcade?.phase;
-    if (phase === "sliding" || phase === "pushing") cues.push("claw-move");
-    if (phase === "dropping") cues.push("claw-drop");
-    if (phase === "lifting")
-      cues.push(next.arcade?.outcome === "grabbed" ? "claw-grab" : "claw-miss");
-    if (phase === "result" && next.arcade?.outcome === "grabbed") cues.push("prize-won");
+  const game = next.arcade;
+  if (game !== null && previous.arcade?.phase !== game.phase) {
+    if (game.game === "claw") {
+      if (game.phase === "sliding" || game.phase === "pushing") cues.push("claw-move");
+      if (game.phase === "dropping") cues.push("claw-drop");
+      if (game.phase === "lifting")
+        cues.push(game.outcome === "grabbed" ? "claw-grab" : "claw-miss");
+      if (game.phase === "result" && game.outcome === "grabbed") cues.push("prize-won");
+    } else {
+      if (game.phase === "winding") cues.push("skee-aim");
+      if (game.phase === "rolling") cues.push("skee-roll");
+      if (game.phase === "scored")
+        cues.push(game.throws.at(-1)?.points === world.arcade.skee.corners.points
+          ? "skee-hundred" : "skee-score");
+      if (game.phase === "result") cues.push("tickets-won");
+    }
   }
   return cues;
 }

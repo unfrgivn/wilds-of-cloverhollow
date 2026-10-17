@@ -47,7 +47,7 @@ const gym = areaFor("gym");
 
 const calm = (...ids: string[]): InkFacts =>
   ({ calmed: Object.fromEntries(ids.map((id) => [id, true])), coins: 0, snacks: 0, prizes: [],
-    plushesLeft: 0 });
+    plushesLeft: 0, tickets: 0 });
 const before = calm("arcade-keeper", "gym-pup", "music-bird");
 const squirrelCalm = calm("arcade-keeper", "gym-pup", "music-bird", "oak-squirrel");
 

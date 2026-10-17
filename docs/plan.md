@@ -1727,20 +1727,86 @@ the old trail, the owl, and the clubhouse claim.
   - The heap's order: the pup, the cat, and the bluebird are free at the
     start; the raccoon only once the squirrel and the bluebird are won.
 
-## Milestone 45: Skee-ball and the prize counter **Status:** 📋 Planned
-- A skee-ball lane joins the arcade on its open front floor: a new prop
-  painted from the owner's props concept
-  (`docs/art/concepts/props/arcade_props.png`), with the rest of the painting
-  unchanged.
-- Five balls a game, 2 coins. Each roll takes two presses: an arrow sweeps
-  across the lane and a press sets the aim, then a hold-and-let-go meter
-  sets the power (Milestone 40's charge). Aim and power decide the ring: 10
-  to 50, and the corner 100s for a perfect roll at the edge.
-- Tickets: the score pays tickets (`state.tickets`, a Tickets pill beside
-  Coins and Snacks), and the ticket counter trades them for prizes (a
-  `trade:` line tag, like `buy:`) that go on the PRIZES shelf.
-- For the owner: tickets as their own currency, the price list, and the
-  prizes.
+## Milestone 45: Skee-ball and the prize counter **Status:** ✅ Completed (2026-10-17)
+- The owner said yes to skee-ball next (2026-10-17). A skee-ball lane joins
+  the arcade on the open floor at the front left, below the door's path: its
+  hood at the upper left, facing the room, and its foot toward the front
+  corner. It's painted into the room by an edit confined to that floor (every
+  other pixel kept), then cut out by the kit as a prop Fae walks round and
+  behind, like the cabinets. Once Mr. Pip is calm it offers "Play for 2 coins"
+  (`play: skee 2`) at its foot (`skee-ball`, prompt Play).
+- The game is a close-up looking up the lane from its foot, painted like the
+  claw machine: the lane, its side rails, the hump, and a plain target board
+  under a blank marquee. The rings, their numbers, the arrow, the ghost of the
+  meter, the ball, and the score are drawn in code, so what's drawn is exactly
+  what scores. It shows the hood and the upper half of the lane, large enough
+  for the target to read on a phone.
+- Five balls a game. Each ball takes two presses. An arrow sweeps back and
+  forth across the lane, and a press sets the aim. Then hold to wind up, and
+  let go to roll: while it's held, a ghost ball climbs the board to where the
+  ball would land, and held too long it flies off the top (red). The ball
+  rolls up the lane, hops the hump, and drops into a ring: 50 in the middle,
+  then 40, 30, and 20 round it, two 100 holes in the top corners, and 10 for
+  everything else, so every ball scores. Its target lights and its points pop
+  up. Aim decides left and right, the hold how far up. No timer, no random
+  draw.
+- Tickets: a game pays its score over 10 in tickets (`state.tickets`), shown
+  in a pill on the journal's PRIZES heading. Mr. Pip runs the ticket counter:
+  once he's calm it trades tickets for four prizes for the PRIZES shelf, a
+  rainbow pinwheel (20 tickets), a star bouncy ball (30), a toy rocket (50),
+  and a Star Racer keychain (80), each once. A line tagged `trade: <prize>
+  <price>` pays the tickets and gives the prize as it's shown, like `buy:`;
+  the loader holds every trade to the counter's own prices.
+- Saves go to version 7 (the tickets). Version-5 and version-6 saves are
+  upgraded.
+- Evidence: unit tests for the rules (`tests/unit/skee.test.ts`: the sweep and
+  its turns, a fresh press for the aim and for the hold, the meter and its
+  end, every ring's and corner's edge, too hard, a five-ball game opened
+  through the real conversation and played through real steps, the view at
+  each phase, the cues of a whole game, the freeze, the loader, the trade
+  tag), for the counter (`tests/unit/counter.test.ts`: before Mr. Pip is
+  calm, no tickets, each prize offered at exactly its price, every prize
+  bought with real key presses, the champ line), for the save (version 7,
+  and version 5 and 6 upgraded), and for the layout
+  (`tests/unit/skee-layout.test.ts`); the gallery's real game states checked
+  against the layout in both engines at a phone's and a desktop's size; the
+  recorded run `arcade/skee.json` (`tools/sim/record-skee.ts`: Mr. Pip calmed,
+  then 50, a corner's 100, one too hard, 40, and 20, so 22 tickets, and the
+  pinwheel traded for 20) with its replay test (`skee-replay.test.ts`: every
+  ball, the result line, the 2 coins, the tickets paid once, and every cue);
+  and its real-key e2e (`skee.spec.ts`: the close-up, the corner lit, and the
+  result at both sizes, the end state hashing the same as Bun's; and a 50
+  rolled with a tap and a hold of the touch confirm sticker, in both
+  engines). Every screenshot was viewed.
+- Notes and assumptions:
+  - The owner's decisions, taken as defaults and open to review: 2 coins a
+    game; tickets are the score over 10; the four prizes and their prices;
+    Mr. Pip runs the counter; where the lane stands.
+  - The rules live in `src/core/skee.ts`, the claw's in `src/core/claw.ts`;
+    `src/core/arcade.ts` opens, steps, and views whichever game is open. The
+    close-ups split the same way in `src/ui/`, and one tool
+    (`tools/arcade-layout.ts`) gives the e2e tests either game's layout.
+  - The close-up first showed the whole painting, and on a phone the board
+    was too small for its numbers; it now shows the hood and the upper half of
+    the lane (`skeeFrame`). The painting's dark score slot sat on a rail at an
+    angle, so the score is a sticker in the paper beside the hood instead.
+  - Art, 15 Gemini calls in all (the generation log), 4 of them kept: the
+    close-up (1 call, `art/recipes/skee-lane.json`; its cut-out first leaked
+    into the pale lane, and is now kept whole between the rails), the four
+    counter prizes (1 call, `art/recipes/prizes.json`), and the room's lane
+    (7 edit calls and 6 isolate calls over three passes,
+    `art/recipes/skee-ball-room-edit.json`).
+    The first two passes painted the lane half off the floor's front edge
+    (the region they were given ran along it), out of register, with its
+    hood clipped and floor in its cut; none of their pixels are kept. The
+    kept lane was painted over a flat-colour block-out at a measured spot,
+    registered by searching scale and offset over the floor around it (the
+    model widens a crop to 3:2), and composited as the object plus only the
+    darker pixels of its shadow, so no repainted floor came in. The kit
+    rebuilds it from a clean checkout with no calls and no change. The five
+    props on the untouched tile stay pixel-identical, and the five cabinets
+    differ only by the patched tile's re-encode noise.
+  - The lane isn't a canopy: nowhere Fae can stand does it hide her.
 
 ## Milestone 46: Boop-a-Mole **Status:** 📋 Planned
 - Whack-a-mole, gently: one of the five cabinets is Boop-a-Mole. Moles pop

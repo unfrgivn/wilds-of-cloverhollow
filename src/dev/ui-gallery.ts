@@ -21,9 +21,11 @@ import {
 import { createJournal, type JournalView } from "../ui/journal";
 import { createArcade } from "../ui/arcade";
 import { createTitleScreen, type TitleView } from "../ui/title";
-import { loadContent, parseClawCalibration } from "../content/load";
+import { loadContent, parseClawCalibration, parseSkeeCalibration } from "../content/load";
 import { clawGalleryView } from "./claw-gallery";
+import { skeeGalleryView } from "./skee-gallery";
 import calibrationData from "../../public/assets/arcade/claw-machine.json";
+import skeeCalibrationData from "../../public/assets/arcade/skee-lane.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
 
 const root = document.querySelector<HTMLElement>("#gallery");
@@ -66,14 +68,16 @@ const content = loadContent();
 const arcadeFixture = content.fixtures.arcade;
 if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
 const clawView = clawGalleryView(content.world, arcadeFixture, state);
+const skeeView = skeeGalleryView(content.world, arcadeFixture, state);
+const gameView = clawView ?? skeeView;
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
-const arcadeState = state.startsWith("arcade-");
+const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup"
   : state !== "prompt" && !journalState && !titleState &&
-    (!arcadeState || state === "arcade-result");
+    (!arcadeState || state === "arcade-result" || state === "skee-result");
 if (battleState) document.documentElement.dataset.battle = "open";
 // A catch or a lean shows its touch arrows (spec 8.1).
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
@@ -196,9 +200,13 @@ const galleryPrizeArt = (frame: string): AtlasImage | null => {
     atlas: { w: prizeAtlas.meta.size.w, h: prizeAtlas.meta.size.h },
   };
 };
-const calibrationFile = "public/assets/arcade/claw-machine.json";
-const arcade = createArcade(stage, galleryPrizeArt,
-  parseClawCalibration(calibrationData, calibrationFile), "assets/arcade/claw-machine.webp");
+const arcade = createArcade(stage, galleryPrizeArt, {
+  calibration: parseClawCalibration(calibrationData, "public/assets/arcade/claw-machine.json"),
+  image: "assets/arcade/claw-machine.webp",
+}, {
+  calibration: parseSkeeCalibration(skeeCalibrationData, "public/assets/arcade/skee-lane.json"),
+  image: "assets/arcade/skee-lane.webp",
+});
 const title = createTitleScreen(stage);
 title.onChoose((id) => {
   root.dataset.titleChosen = id;
@@ -312,6 +320,7 @@ function renderGalleryState(): void {
     ],
     currentLand: "cloverhollow",
     coins: 8,
+    tickets: state === "journal-empty" ? 0 : 23,
     snacks: 2,
     muted: false,
     level: 1,
@@ -492,7 +501,7 @@ function renderGalleryState(): void {
       atlas: { w: 1536, h: 1024 },
     },
   });
-  arcade.render(clawView);
+  arcade.render(gameView);
   prompt.render({
     label: "TALK",
     x: window.innerWidth / 2,
@@ -501,11 +510,11 @@ function renderGalleryState(): void {
   });
   if (!dialogueShown) dialogue.hide();
   else if (battleState) dialogue.render(state === "battle-windup" ? windUpMessage : battleMessage);
-  else if (clawView !== null)
+  else if (gameView !== null)
     dialogue.render({
       speaker: null,
-      text: clawView.message,
-      revealed: clawView.revealed,
+      text: gameView.message,
+      revealed: gameView.revealed,
       choices: [],
       selected: -1,
       canAdvance: true,
@@ -529,7 +538,7 @@ const decoded = (src: string): Promise<void> => {
   return image.decode();
 };
 void Promise.all([document.fonts.ready, decoded("assets/arcade/claw-machine.webp"),
-  decoded("assets/prizes/prizes.png")])
+  decoded("assets/arcade/skee-lane.webp"), decoded("assets/prizes/prizes.png")])
   .then(
     () =>
       new Promise<void>((resolve) => {

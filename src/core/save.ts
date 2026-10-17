@@ -1,6 +1,6 @@
 import type { State, Wild } from "./types";
 
-export type SaveData = { version: 6; state: State };
+export type SaveData = { version: 7; state: State };
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -32,11 +32,19 @@ const wildShape: Wild = {
 export function parseSave(json: string, template: State): State | null {
   try {
     const value: unknown = JSON.parse(json);
-    if (!record(value) || (value.version !== 5 && value.version !== 6) || !record(value.state))
-      return null;
+    if (!record(value) || typeof value.version !== "number" || !record(value.state)) return null;
+    // Older saves since Milestone 28 carry on: version 5 had no arcade game or
+    // prizes, version 6 no tickets.
+    const upgrades: Record<number, Record<string, unknown>> = {
+      5: { arcade: null, prizes: [], tickets: 0 },
+      6: { tickets: 0 },
+      7: {},
+    };
+    const added = upgrades[value.version];
+    if (added === undefined) return null;
     // Set pieces added by later content start as they would in a new game, so
     // new content never throws a save away.
-    const saved = value.version === 5 ? { ...value.state, arcade: null, prizes: [] } : value.state;
+    const saved = { ...value.state, ...added };
     if (saved.battle !== null || saved.arcade !== null) return null;
     const state = record(saved.critters)
       ? { ...saved, critters: { ...template.critters, ...saved.critters } }
@@ -67,5 +75,5 @@ function isState(value: unknown, template: State): value is State {
 }
 
 export function serializeSave(state: State): string {
-  return JSON.stringify({ version: 6, state } satisfies SaveData);
+  return JSON.stringify({ version: 7, state } satisfies SaveData);
 }

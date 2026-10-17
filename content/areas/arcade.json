@@ -88,6 +88,15 @@
       },
       "knot": "star_racer",
       "prompt": "Look"
+    },
+    {
+      "id": "skee-ball",
+      "knot": "skee_ball",
+      "point": {
+        "x": 552,
+        "y": 712
+      },
+      "prompt": "Play"
     }
   ],
   "critters": [
@@ -159,6 +168,12 @@
       "prop": "gumball-red-right",
       "x": 1115,
       "y": 517
+    },
+    {
+      "id": "skee-ball",
+      "prop": "skee-ball",
+      "x": 445,
+      "y": 725
     }
   ],
   "blockers": []

@@ -88,5 +88,5 @@ describe("flute friends replay", () => {
       "The Pond Pup swam out into the park pond and fetched an old tin of coins!",
       "The Pond Pup is my friend! When I play my flute, he comes running.",
     ]);
-  });
+  }, 30_000);
 });

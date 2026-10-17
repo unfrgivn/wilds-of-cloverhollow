@@ -40,7 +40,7 @@ describe("save format", () => {
     // no lantern, version 3 no coins, and version 4 a critter of each kind
     // (no recurring critters); all start fresh, as does a version from the
     // future.
-    for (const version of [1, 2, 3, 4, 7])
+    for (const version of [1, 2, 3, 4, 8])
       expect(parseSave(JSON.stringify({ version, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
     expect(parseSave(JSON.stringify({ version: 5, state: { tick: 1 } }), fresh)).toBeNull();
@@ -66,13 +66,27 @@ describe("save format", () => {
     const oldState = oldStateValue;
     delete oldState.arcade;
     delete oldState.prizes;
+    delete oldState.tickets;
     const restored = parseSave(JSON.stringify({ version: 5, state: oldState }), fresh);
     expect(restored?.arcade).toBeNull();
     expect(restored?.prizes).toEqual([]);
+    expect(restored?.tickets).toBe(0);
   });
 
-  it("round trips version 6 and refuses an active arcade game", () => {
+  it("upgrades a version-6 save, from before tickets, keeping its prizes", () => {
+    const oldStateValue: unknown = JSON.parse(JSON.stringify({ ...fresh, prizes: ["pup-plush"] }));
+    if (!record(oldStateValue))
+      throw new Error("state is not an object");
+    delete oldStateValue.tickets;
+    const restored = parseSave(JSON.stringify({ version: 6, state: oldStateValue }), fresh);
+    expect(restored?.prizes).toEqual(["pup-plush"]);
+    expect(restored?.tickets).toBe(0);
+  });
+
+  it("round trips version 7 and refuses an active arcade game", () => {
     expect(parseSave(serializeSave(fresh), fresh)).toEqual(fresh);
+    const rich: State = { ...fresh, tickets: 12, prizes: ["pinwheel"] };
+    expect(parseSave(serializeSave(rich), fresh)).toEqual(rich);
     const active: State = { ...fresh, arcade: {
       game: "claw", phase: "sliding", phaseTicks: 1, x: 64, z: 40,
       target: null, outcome: null, message: "", revealed: 0,

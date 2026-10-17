@@ -1,0 +1,59 @@
+{
+  "asset": "The arcade painting with a skee-ball lane on its front-left floor (Milestone 45)",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 7,
+  "calls_note": "Seven edit calls over three passes; the kept output is the third pass's only call. Earlier passes painted the lane half off the floor or were composited out of register, and none of their pixels are kept. The kit drew six isolate samples of the lane over the three passes (in the generation log); one is kept.",
+  "references": [
+    "art/source/areas/arcade/painting/ at 9997b8fd (the approved painting)",
+    "art/source/areas/arcade/skee-edit-blockout.png (the painting's crop x 400..1400, y 880..1580 source px, with a flat-colour block-out of the lane)"
+  ],
+  "prompt": "Repaint only the flat-colour block-out in a close crop as a finished child-sized skee-ball lane in Cloverhollow watercolor and warm-brown ink. Keep exact position, outline, perspective, teal deck, yellow rails and purple hood; add cream target face with concentric rings and dark center; soft contact shadows; no text or numbers.",
+  "aspect_ratio": "3:2",
+  "blockout": {
+    "contact": [
+      [
+        310,
+        618
+      ],
+      [
+        364,
+        592
+      ],
+      [
+        579,
+        698
+      ],
+      [
+        525,
+        725
+      ]
+    ],
+    "hood": "the first 50 units at the upper-left end, 75 tall; the deck 30 tall at the hood, 15 at the foot; area units, a point h tall drawn at (x, y - h)"
+  },
+  "raw": "art/source/areas/arcade/skee-edit-raw.jpg (2528x1696)",
+  "registration": {
+    "transform": "crop (x, y) = raw (2.4268 (x - 500) + 1264 - 22.5, 2.4268 (y - 350) + 848 + 0.75): a uniform scale about the centres, found by searching scale and offset for the least difference over floor away from the lane",
+    "floor_away_from_the_lane": "median 1.5/255, p95 10.1, mean 3.27 (the model repainted the corner of the cabinet at the crop's top left); a width-fit, top-aligned placing differs there by mean 15.2"
+  },
+  "mask": {
+    "file": "art/source/areas/arcade/skee-edit-alpha.png",
+    "object": "colour distance to the painting above 30 (after a 1 px blur), within 90 px of the block-out; the pieces touching the block-out, closed (3 px), holes filled, opened (2 px), the largest kept; feathered 0.8 px",
+    "shadow": "a 22 px band round the object, only where the output is darker than the painting: weight (darker - 2) / 14, blurred 2 px; lighter repainted floor is never taken",
+    "extent": "x 531..1188, y 945..1529 source px, all in tile 0"
+  },
+  "composite": "painting = approved x (1 - alpha) + registered x alpha",
+  "encode": {
+    "tile_0": "encoded once, WebP quality 92 (the kit's setting for a patched tile). Outside the edit it differs from the approved tile by mean 1.48, max 14; re-encoding the approved tile once at q92 differs by mean 1.47, max 13.",
+    "tile_1": "byte-identical to the approved tile"
+  },
+  "kit": "Subject skee-ball in art/kit/arcade.json (painted, solid), isolate sample 1 of 2, footprint the block-out's contact (it follows the painted deck's foot). Packed from the kept samples: the other ten frames keep their sizes; the five on tile 1 are pixel-identical and the cabinets differ by re-encode noise only (on cream at most mean 0.89/255, alpha mean 0.06). The hiding check finds no spot even without a canopy, so the lane is solid furniture like the cabinets.",
+  "outputs": [
+    "art/source/areas/arcade/painting/ground_0_0.webp",
+    "public/assets/areas/arcade/ground_0_0.webp",
+    "public/assets/areas/arcade/props-0.png",
+    "public/assets/areas/arcade/props-0.json",
+    "content/props/arcade.json"
+  ],
+  "owner_review": "pending: docs/review-queue.md"
+}

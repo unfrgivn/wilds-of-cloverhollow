@@ -17,6 +17,16 @@ export const cookieMarkup =
   '<circle cx="11.4" cy="12.6" r="1.5" fill="#6b4226"/>' +
   '<circle cx="6.6" cy="12.8" r="1.1" fill="#6b4226"/>';
 
+// An orange arcade ticket with notched ends: Fae's tickets (spec 9.1).
+export const ticketMarkup =
+  '<path d="M2 5.2 L18 5.2 L18 8.2 A1.8 1.8 0 0 0 18 11.8 L18 14.8 L2 14.8 L2 11.8 ' +
+  'A1.8 1.8 0 0 0 2 8.2 Z" fill="#f4a259" stroke="#47321f" stroke-width="1.4" ' +
+  'stroke-linejoin="round"/>' +
+  '<path d="M7 7.4 L7 12.6" stroke="#47321f" stroke-width="1" stroke-dasharray="1.2 1.2"/>' +
+  '<path d="M11.6 7.6 L12.4 9.3 L14.2 9.5 L12.9 10.7 L13.2 12.5 L11.6 11.6 L10 12.5 ' +
+  'L10.3 10.7 L9 9.5 L10.8 9.3 Z" fill="#fff3c4" stroke="#47321f" stroke-width=".8" ' +
+  'stroke-linejoin="round"/>';
+
 // What a chaos critter feels (spec 8.1): zoomy a lightning bolt, curious a
 // question mark, bored a flat little face, grumpy a storm cloud, and hungry
 // the snack it wants.

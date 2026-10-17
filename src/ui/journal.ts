@@ -1,6 +1,6 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import { coinMarkup, cookieMarkup } from "./icons";
+import { coinMarkup, cookieMarkup, ticketMarkup } from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 
 export type JournalSticker = {
@@ -20,6 +20,7 @@ export type JournalView = {
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
   currentLand: string | null;
   coins: number;
+  tickets: number;
   snacks: number;
   muted: boolean;
   level: AudioLevel;
@@ -80,19 +81,22 @@ function busStopIcon(): SVGSVGElement {
   return svg;
 }
 
-// Fae's supplies on the notes page's heading row: a gold coin, and a cookie
-// for her snacks, each with its count.
-function supply(kind: "coins" | "snacks", label: string): {
+// Fae's supplies, each a pill with its count: a gold coin and a cookie for
+// her snacks on the notes page's heading row (`journal-supply`), and her
+// tickets on the PRIZES heading (`journal-tickets`, the same pill).
+function supply(kind: "coins" | "snacks" | "tickets", label: string): {
   root: HTMLSpanElement;
   count: HTMLSpanElement;
 } {
-  const root = element("span", "journal-supply");
+  const pill = kind === "tickets" ? "journal-tickets" : "journal-supply";
+  const root = element("span", pill);
   setAttribute(root, "data-supply", kind);
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
   svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML = kind === "coins" ? coinMarkup : cookieMarkup;
-  const count = element("span", "journal-supply-count");
+  svg.innerHTML = kind === "coins" ? coinMarkup
+    : kind === "snacks" ? cookieMarkup : ticketMarkup;
+  const count = element("span", `${pill}-count`);
   root.append(svg, `${label} `, count);
   return { root, count };
 }
@@ -147,7 +151,9 @@ export function createJournal(root: HTMLElement): {
   stickersHeading.textContent = "STICKERS";
   const grid = element("div", "journal-stickers");
   const prizesHeading = element("h3", "journal-prizes-heading");
-  prizesHeading.textContent = "PRIZES";
+  prizesHeading.append("PRIZES");
+  const tickets = supply("tickets", "Tickets");
+  prizesHeading.append(tickets.root);
   const prizesGrid = element("div", "journal-stickers journal-prizes");
   stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
   const mapPage = element("section", "journal-map-page");
@@ -241,6 +247,7 @@ export function createJournal(root: HTMLElement): {
     render: (view) => {
       book.hidden = !view.visible;
       setText(coins.count, String(view.coins));
+      setText(tickets.count, String(view.tickets));
       setText(snacks.count, String(view.snacks));
       setText(audio, view.muted ? "♪ off" : "♪ on");
       audio.classList.toggle("is-muted", view.muted);

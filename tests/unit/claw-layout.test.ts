@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
-  arcadeView,
+  clawView,
   createState,
-  openClaw,
-  type ArcadeView,
+  newClaw,
   type ClawGame,
+  type ClawView,
   type State,
 } from "../../src/core";
 import { loadContent, parseClawCalibration } from "../../src/content/load";
@@ -34,13 +34,11 @@ const scales = [0.24, 0.37, 0.5];
 
 // One open game to vary: states are plain data, and building one (its Ink
 // story included) for every view would cost seconds.
-const open: State = openClaw(world, { ...createState(world, fixture), coins: 2 }, 2);
-const viewOf = (changes: Partial<ClawGame>, state = open): ArcadeView => {
-  const game = state.arcade;
-  if (game === null) throw new Error("the claw machine didn't open");
-  const view = arcadeView(world, { ...state, arcade: { ...game, ...changes } });
-  if (view === null) throw new Error("no view of an open game");
-  return view;
+const game: ClawGame = newClaw(claw);
+const open: State = { ...createState(world, fixture), arcade: game };
+const viewOf = (changes: Partial<ClawGame>, state = open): ClawView => {
+  const changed = { ...game, ...changes };
+  return clawView(world, { ...state, arcade: changed }, changed);
 };
 const plushIn = (layout: ClawLayout, id: string): PlushLayout => {
   const found = layout.plushes.find((item) => item.id === id);
@@ -188,7 +186,7 @@ describe("the heap as laid out", () => {
 describe("the claw as laid out", () => {
   // The claw dropping, halfway and all the way, onto every plush in the heap,
   // and over bare floor at the back.
-  const drops = (): { label: string; view: ArcadeView }[] => [
+  const drops = (): { label: string; view: ClawView }[] => [
     ...claw.heap.flatMap((plush) => [0.5, 1].map((drop) => ({
       label: `${plush.prize} at drop ${drop}`,
       view: viewOf({ phase: drop === 1 ? "grabbing" : "dropping", x: plush.x, z: plush.z,
@@ -199,8 +197,8 @@ describe("the claw as laid out", () => {
   ];
   // The claw up, halfway down, and all the way down, everywhere it can go on
   // a grid across the box: between plushes as well as on them.
-  const everywhere = (): { label: string; view: ArcadeView }[] => {
-    const spots: { label: string; view: ArcadeView }[] = [];
+  const everywhere = (): { label: string; view: ClawView }[] => {
+    const spots: { label: string; view: ClawView }[] = [];
     for (let x = claw.railLeft; x <= claw.railRight; x += 10 * claw.speed)
       for (let z = claw.depthFront; z <= claw.depthBack; z += 5 * claw.speed)
         for (const drop of [0, 0.5, 1])

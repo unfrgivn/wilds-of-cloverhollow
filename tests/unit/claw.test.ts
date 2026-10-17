@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  arcadeView, heldDown, openClaw, stepArcade, topPlush,
-  type ArcadeGame, type ClawGame,
-} from "../../src/core/arcade";
-import {
-  blankInput, createState, step, type ActionFrame, type State,
+  blankInput, clawView, createState, heldDown, openArcade, step, stepArcade, topPlush,
+  type ActionFrame, type ArcadeGame, type ClawGame, type ClawView, type State,
 } from "../../src/core";
 import { loadContent, parseArcade, storyTagErrors } from "../../src/content/load";
 import arcadeJson from "../../content/arcade.json";
@@ -33,6 +30,14 @@ const withGame = (value: ClawGame, prizes: string[] = []): State => ({
 const tick = (state: State, input: ActionFrame): State => ({
   ...state, ...stepArcade(world, state, input), previousInput: input,
 });
+// The claw game a state holds: these tests play only the claw machine.
+const clawIn = (state: State): ClawGame => {
+  if (state.arcade?.game !== "claw") throw new Error("no claw game in play");
+  return state.arcade;
+};
+const viewOf = (state: State): ClawView => clawView(world, state, clawIn(state));
+const openClaw = (state: State, price: number): State =>
+  openArcade(world, state, "claw", price);
 const record = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 const arcadeCopy = (): Record<string, unknown> => {
@@ -62,7 +67,7 @@ const plushAt = (value: Record<string, unknown>, index: number): Record<string, 
 };
 const facts = (prizes: string[] = [], coins = 2): InkFacts => ({
   calmed: { "arcade-keeper": true }, coins, snacks: 0, prizes,
-  plushesLeft: claw.heap.filter((item) => !prizes.includes(item.prize)).length,
+  plushesLeft: claw.heap.filter((item) => !prizes.includes(item.prize)).length, tickets: 0,
 });
 const knot = (prizeList: string[], coins: number, calm = true):
   { lines: string[]; choices: string[] } => {
@@ -157,10 +162,10 @@ describe("claw machine movement", () => {
     expect(tick(state, frame(true)).arcade?.phase).toBe("ready");
     state = tick({ ...state, previousInput: frame(false) }, frame(true));
     expect(state.arcade).toMatchObject({ phase: "sliding", x: claw.railLeft });
-    const start = state.arcade?.x ?? claw.railLeft;
+    const start = clawIn(state).x ?? claw.railLeft;
     for (let count = 0; count < 3; count += 1) state = tick(state, frame(true));
-    expect(state.arcade?.x).toBe(start + claw.speed * 3);
-    const beforeRelease = state.arcade?.x;
+    expect(clawIn(state).x).toBe(start + claw.speed * 3);
+    const beforeRelease = clawIn(state).x;
     state = tick(state, frame(false));
     expect(state.arcade).toMatchObject({ phase: "aiming", x: beforeRelease });
   });
@@ -170,8 +175,8 @@ describe("claw machine movement", () => {
     state = tick(state, frame(true));
     expect(state.arcade).toMatchObject({ phase: "pushing", z: claw.depthFront });
     for (let count = 0; count < 2; count += 1) state = tick(state, frame(true));
-    expect(state.arcade?.z).toBe(claw.depthFront + claw.speed * 2);
-    const beforeRelease = state.arcade?.z;
+    expect(clawIn(state).z).toBe(claw.depthFront + claw.speed * 2);
+    const beforeRelease = clawIn(state).z;
     state = tick(state, frame(false));
     expect(state.arcade).toMatchObject({ phase: "dropping", z: beforeRelease });
     const atWall = withGame(game("pushing", { z: claw.depthBack - claw.speed }));
@@ -202,8 +207,8 @@ describe("claw timing and targets", () => {
       }));
       const next = tick(state, frame());
       const target = topPlush(claw, state, plush.x, plush.z);
-      expect(next.arcade?.target).toBe(target?.prize ?? null);
-      expect(next.arcade?.outcome).toBe(target === null ? "empty"
+      expect(clawIn(next).target).toBe(target?.prize ?? null);
+      expect(clawIn(next).outcome).toBe(target === null ? "empty"
         : heldDown(claw, state, target.prize) ? "stuck" : "grabbed");
     }
   });
@@ -310,7 +315,7 @@ describe("claw result and view", () => {
     const raccoon = claw.heap.find((item) => item.prize === "raccoon-plush");
     if (raccoon === undefined) throw new Error("raccoon is missing");
     const stuck = playToResult(
-      openClaw(world, { ...state, coins: 30 }, 2), raccoon,
+      openClaw({ ...state, coins: 30 }, 2), raccoon,
     );
     expect(stuck.message).toBe(claw.lines.stuck);
     expect(stuck.state.prizes).toEqual([]);
@@ -320,7 +325,7 @@ describe("claw result and view", () => {
       const available = claw.heap.find((item) => !state.prizes.includes(item.prize) &&
         !heldDown(claw, state, item.prize));
       if (available === undefined) throw new Error("heap has no available plush");
-      const opened = openClaw(world, state, 2);
+      const opened = openClaw(state, 2);
       const played = playToResult(opened, available);
       if (Math.abs(played.stop.x - available.x) > claw.reach)
         throw new Error(`stop x ${played.stop.x} missed ${available.prize} at ${available.x}`);
@@ -346,13 +351,13 @@ describe("claw result and view", () => {
     const bunny = claw.heap.find((item) => item.prize === "bunny-plush");
     if (cat === undefined || bunny === undefined) throw new Error("heap is incomplete");
     const grabbed = playToResult(
-      openClaw(world, { ...createState(world, arcadeFixture), coins: 2 }, 2), cat,
+      openClaw({ ...createState(world, arcadeFixture), coins: 2 }, 2), cat,
     );
     expect(grabbed.cues).toEqual([
       "claw-move", "claw-move", "claw-drop", "claw-grab", "prize-won",
     ]);
     const stuck = playToResult(
-      openClaw(world, { ...createState(world, arcadeFixture), coins: 2 }, 2), bunny,
+      openClaw({ ...createState(world, arcadeFixture), coins: 2 }, 2), bunny,
     );
     expect(stuck.cues).toEqual(["claw-move", "claw-move", "claw-drop", "claw-miss"]);
     expect(stuck.message).toBe(claw.lines.stuck);
@@ -369,7 +374,7 @@ describe("claw result and view", () => {
     expect(emptySpot).not.toBeNull();
     if (emptySpot === null) throw new Error("no empty floor spot exists");
     const empty = playToResult(
-      openClaw(world, { ...createState(world, arcadeFixture), coins: 2 }, 2), emptySpot,
+      openClaw({ ...createState(world, arcadeFixture), coins: 2 }, 2), emptySpot,
     );
     expect(empty.cues).toEqual(["claw-move", "claw-move", "claw-drop", "claw-miss"]);
     expect(empty.message).toBe(claw.lines.missed);
@@ -399,25 +404,25 @@ describe("claw result and view", () => {
   });
 
   it("projects boundary values, hints, stop height, tug, and falling", () => {
-    const ready = arcadeView(world, withGame(game("ready")));
+    const ready = viewOf(withGame(game("ready")));
     expect(ready?.hint).toBe(claw.lines.slide);
     expect(ready?.claw.open).toBe(true);
-    const dropping = arcadeView(world, withGame(game("dropping", {
+    const dropping = viewOf(withGame(game("dropping", {
       phaseTicks: claw.dropTicks - 1, x: claw.heap[0]?.x ?? claw.railLeft,
       z: claw.heap[0]?.z ?? claw.depthFront,
     })));
     expect(dropping?.claw.drop).toBe((claw.dropTicks - 1) / claw.dropTicks);
     expect(dropping?.claw.stop).toBe(1);
-    const held = arcadeView(world, withGame(game("releasing", {
+    const held = viewOf(withGame(game("releasing", {
       phaseTicks: claw.releaseTicks / 2, target: "frog-plush", outcome: "grabbed",
     })));
     const frog = held?.plushes.find((item) => item.id === "frog-plush");
     expect(frog).toMatchObject({ held: true, x: claw.railLeft, z: claw.depthFront,
       fall: .5, tug: false });
-    const stuck = arcadeView(world, withGame(game("lifting", {
+    const stuck = viewOf(withGame(game("lifting", {
       target: "bunny-plush", outcome: "stuck" })));
     expect(stuck?.plushes.find((item) => item.id === "bunny-plush")?.tug).toBe(true);
-    expect(arcadeView(world, withGame(game("aiming")))?.hint).toBe(claw.lines.push);
+    expect(viewOf(withGame(game("aiming")))?.hint).toBe(claw.lines.push);
   });
 
   it("emits the exact cues for a real transition sequence", () => {
@@ -493,7 +498,7 @@ describe("claw content and Ink integration", () => {
     ];
     for (const value of cases) expect(() => parseArcade(value, prizesJson)).toThrow();
     expect(storyTagErrors(["play: claw 2"], world.areas)).toEqual([]);
-    expect(storyTagErrors(["play: claw", "play: skee 2", "play: claw two"], world.areas))
+    expect(storyTagErrors(["play: claw", "play: hoops 2", "play: claw two"], world.areas))
       .toHaveLength(3);
   });
 

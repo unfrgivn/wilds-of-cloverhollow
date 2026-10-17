@@ -46,7 +46,7 @@ function play(ink: string, knot: string, calmed: Record<string, boolean> = {}): 
 } {
   const lines: string[] = [];
   const facts = { calmed, coins: 0, snacks: 0, prizes: [],
-    plushesLeft: world.arcade.claw.heap.length };
+    plushesLeft: world.arcade.claw.heap.length, tickets: 0 };
   let result = runInk(story, ink, { type: "start", knot }, facts);
   for (let count = 0; count < 30; count += 1) {
     if (result.line !== null) lines.push(result.line.text);

@@ -85,9 +85,10 @@ function line(story: Story): InkLine | null {
 }
 
 // What the story's externals answer (spec 7): `calmed(id)`, `coins()`,
-// `snacks()`, `won(prize)`, and `plushesLeft()`. The core builds them from its
-// state (`inkFacts`). The defaults are a new game's (two snacks, nothing won)
-// for knots that don't ask about the claw machine, whose heap is content.
+// `snacks()`, `won(prize)`, `plushesLeft()`, and `tickets()`. The core builds
+// them from its state (`inkFacts`). The defaults are a new game's (two snacks,
+// nothing won) for knots that don't ask about the claw machine, whose heap is
+// content.
 export type InkFacts = {
   calmed: Record<string, boolean>;
   coins: number;
@@ -95,8 +96,10 @@ export type InkFacts = {
   prizes: string[];
   // How many plushes are still in the claw machine.
   plushesLeft: number;
+  tickets: number;
 };
-const newGameFacts: InkFacts = { calmed: {}, coins: 0, snacks: 2, prizes: [], plushesLeft: 0 };
+const newGameFacts: InkFacts =
+  { calmed: {}, coins: 0, snacks: 2, prizes: [], plushesLeft: 0, tickets: 0 };
 
 // The externals are answered for every command, so a knot can ask on any
 // line, not only its first.
@@ -119,6 +122,7 @@ export function runInk(
     (id: unknown) => typeof id === "string" && facts.prizes.includes(id),
   );
   story.BindExternalFunction("plushesLeft", () => facts.plushesLeft);
+  story.BindExternalFunction("tickets", () => facts.tickets);
   if (command.type === "start") story.ChoosePathString(command.knot);
   if (command.type === "choose") story.ChooseChoiceIndex(command.index);
   const blank = (output: string | null): boolean =>

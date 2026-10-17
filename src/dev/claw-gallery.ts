@@ -1,11 +1,11 @@
 import {
-  arcadeView,
   blankInput,
+  clawView,
   createState,
-  openClaw,
-  stepArcade,
-  type ArcadeView,
+  newClaw,
+  stepClaw,
   type ClawGame,
+  type ClawView,
   type Fixture,
   type HeapPlush,
   type World,
@@ -26,7 +26,7 @@ export const clawGalleryStates = [
   "arcade-result",
 ] as const;
 
-export function clawGalleryView(world: World, fixture: Fixture, name: string): ArcadeView | null {
+export function clawGalleryView(world: World, fixture: Fixture, name: string): ClawView | null {
   const claw = world.arcade.claw;
   const plush = (prize: string): HeapPlush => {
     const found = claw.heap.find((item) => item.prize === prize);
@@ -35,11 +35,12 @@ export function clawGalleryView(world: World, fixture: Fixture, name: string): A
   };
   const pup = plush("pup-plush");
   const frog = plush("frog-plush");
-  const opened = openClaw(world, { ...createState(world, fixture), coins: 2 }, 2);
-  const game = opened.arcade;
-  if (game === null) throw new Error("the claw machine didn't open");
-  const view = (changes: Partial<ClawGame>): ArcadeView | null =>
-    arcadeView(world, { ...opened, arcade: { ...game, ...changes } });
+  const game = newClaw(claw);
+  const opened = { ...createState(world, fixture), arcade: game };
+  const view = (changes: Partial<ClawGame>): ClawView => {
+    const changed = { ...game, ...changes };
+    return clawView(world, { ...opened, arcade: changed }, changed);
+  };
   const overPup = { x: pup.x, z: pup.z };
   switch (name) {
     case "arcade-ready":
@@ -65,10 +66,10 @@ export function clawGalleryView(world: World, fixture: Fixture, name: string): A
       // The last tick of the drop into the chute, played by the core.
       const releasing: ClawGame = { ...game, phase: "releasing",
         phaseTicks: claw.releaseTicks - 1, target: pup.prize, outcome: "grabbed" };
-      const result = stepArcade(world, { ...opened, arcade: releasing }, blankInput());
-      const shown = result.arcade === null ? null
-        : { ...result.arcade, revealed: result.arcade.message.length };
-      return arcadeView(world, { ...opened, prizes: result.prizes, arcade: shown });
+      const result = stepClaw(world, { ...opened, arcade: releasing }, releasing, blankInput());
+      if (result.arcade?.game !== "claw") throw new Error("the claw game closed early");
+      const shown = { ...result.arcade, revealed: result.arcade.message.length };
+      return clawView(world, { ...opened, prizes: result.prizes, arcade: shown }, shown);
     }
     default:
       return null;

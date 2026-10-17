@@ -146,7 +146,9 @@ describe("coins and shops", () => {
   it("reads the story's tags and rejects bad shop items and travel targets", () => {
     const tags = storyTags(content.world.story);
     expect(tags).toEqual(expect.arrayContaining(["buy: snack 5", "travel: pass.bus"]));
-    expect(storyTagErrors(tags, content.world.areas)).toEqual([]);
+    const prices = Object.fromEntries(
+      content.world.arcade.counter.prizes.map((item) => [item.prize, item.price]));
+    expect(storyTagErrors(tags, content.world.areas, prices)).toEqual([]);
     expect(storyTagErrors(
       ["buy: cake 5", "buy: snack nope", "travel: pass.nowhere", "travel: moon.bus"],
       content.world.areas,

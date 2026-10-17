@@ -338,12 +338,64 @@ function expectedClaw(value: unknown): value is ExpectedClaw {
       record(plush) && typeof plush.id === "string" && typeof plush.tug === "boolean");
 }
 
-// Asks Bun for the layout (tools/claw-layout.ts): Node can't load the content.
-export function bunClawLayout(state: string, scale: number): ExpectedClaw {
-  const result = spawnSync("bun", ["tools/claw-layout.ts", state, String(scale)],
+// Asks Bun for a close-up's layout (tools/arcade-layout.ts): Node can't load
+// the content.
+function bunArcadeLayout(game: "claw" | "skee", state: string, scale: number): unknown {
+  const result = spawnSync("bun", ["tools/arcade-layout.ts", game, state, String(scale)],
     { encoding: "utf8" });
   if (result.status !== 0) throw new Error(result.stderr);
   const parsed: unknown = JSON.parse(result.stdout);
-  if (!expectedClaw(parsed)) throw new Error(`invalid claw layout: ${result.stdout}`);
+  return parsed;
+}
+
+export function bunClawLayout(state: string, scale: number): ExpectedClaw {
+  const parsed = bunArcadeLayout("claw", state, scale);
+  if (!expectedClaw(parsed)) throw new Error(`invalid claw layout for ${state}`);
+  return parsed;
+}
+
+type Disc = { cx: number; cy: number; rx: number; ry: number; points: number; lit: boolean };
+// Skee-ball's layout for a gallery state, the parts the e2e tests compare with
+// what's drawn.
+export type ExpectedSkee = {
+  width: number;
+  height: number;
+  frame: Rect;
+  board: Rect;
+  plate: Rect;
+  hud: { x: number; y: number };
+  rings: Disc[];
+  corners: Disc[];
+  floor: { x: number; y: number; points: number; lit: boolean };
+  arrow: { x: number; y: number; angle: number; length: number; set: boolean } | null;
+  ghost: { x: number; y: number; radius: number; over: boolean } | null;
+  ball: { x: number; y: number; radius: number } | null;
+  pop: { x: number; y: number; points: number } | null;
+};
+
+function disc(value: unknown): value is Disc {
+  return numbers(value, ["cx", "cy", "rx", "ry", "points"]) && record(value) &&
+    typeof value.lit === "boolean";
+}
+
+function expectedSkee(value: unknown): value is ExpectedSkee {
+  const rect = ["x", "y", "width", "height"];
+  const nullOr = (item: unknown, keys: string[], flag?: string): boolean => item === null ||
+    (numbers(item, keys) && (flag === undefined || (record(item) &&
+      typeof item[flag] === "boolean")));
+  return numbers(value, ["width", "height"]) && record(value) && numbers(value.frame, rect) &&
+    numbers(value.board, rect) && numbers(value.plate, rect) && numbers(value.hud, ["x", "y"]) &&
+    Array.isArray(value.rings) && value.rings.every(disc) &&
+    Array.isArray(value.corners) && value.corners.every(disc) &&
+    numbers(value.floor, ["x", "y", "points"]) && record(value.floor) &&
+    typeof value.floor.lit === "boolean" &&
+    nullOr(value.arrow, ["x", "y", "angle", "length"], "set") &&
+    nullOr(value.ghost, ["x", "y", "radius"], "over") &&
+    nullOr(value.ball, ["x", "y", "radius"]) && nullOr(value.pop, ["x", "y", "points"]);
+}
+
+export function bunSkeeLayout(state: string, scale: number): ExpectedSkee {
+  const parsed = bunArcadeLayout("skee", state, scale);
+  if (!expectedSkee(parsed)) throw new Error(`invalid skee-ball layout for ${state}`);
   return parsed;
 }

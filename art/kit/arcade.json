@@ -570,6 +570,46 @@
       },
       "core": 2,
       "solid": true
+    },
+    {
+      "id": "skee-ball",
+      "crop": [
+        250,
+        460,
+        360,
+        320
+      ],
+      "seed": [
+        465,
+        650
+      ],
+      "painted": true,
+      "solid": true,
+      "ground": "the lilac and cream checkerboard arcade floor",
+      "object": "the child-sized skee-ball lane standing on the checkerboard floor: its tall purple hood at the upper left, with a cream target of brown rings and a dark centre hole between two yellow posts, and its long teal ramp with yellow side rails and a purple base running down to its small purple foot end at the lower right; keep the whole lane and nothing else, not the checkerboard floor around it or under it, not its soft shadow on the floor, not the floor's front edge, and not the cabinet at the top left",
+      "footprint": [
+        [
+          [
+            310,
+            618
+          ],
+          [
+            364,
+            592
+          ],
+          [
+            579,
+            698
+          ],
+          [
+            525,
+            725
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

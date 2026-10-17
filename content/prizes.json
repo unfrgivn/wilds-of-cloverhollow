@@ -45,6 +45,26 @@
       "id": "owl-plush",
       "name": "Owl Plush",
       "frame": "owl-plush"
+    },
+    {
+      "id": "pinwheel",
+      "name": "Rainbow Pinwheel",
+      "frame": "pinwheel"
+    },
+    {
+      "id": "bouncy-ball",
+      "name": "Star Bouncy Ball",
+      "frame": "bouncy-ball"
+    },
+    {
+      "id": "toy-rocket",
+      "name": "Toy Rocket",
+      "frame": "toy-rocket"
+    },
+    {
+      "id": "star-racer-keychain",
+      "name": "Star Racer Keychain",
+      "frame": "star-racer-keychain"
     }
   ]
 }

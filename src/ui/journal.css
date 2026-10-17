@@ -140,7 +140,8 @@
     justify-content: flex-start;
   }
 }
-.journal-supply {
+.journal-supply,
+.journal-tickets {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -153,7 +154,8 @@
   font-weight: 800;
   white-space: nowrap;
 }
-.journal-supply svg {
+.journal-supply svg,
+.journal-tickets svg {
   width: 14px;
   height: 14px;
 }
@@ -209,11 +211,17 @@
   line-height: 1.1;
 }
 .journal-prizes-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 18px 0 5px;
   border-top: 2px dashed #47321f55;
   padding-top: 12px;
   font-size: 14px;
   letter-spacing: .1em;
+}
+.journal-prizes-heading .journal-tickets {
+  letter-spacing: normal;
 }
 .journal-label {
   position: absolute;

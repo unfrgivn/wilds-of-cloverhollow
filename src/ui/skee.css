@@ -1,0 +1,204 @@
+/* The skee-ball close-up (spec 8.2). Like the claw machine's, the painted
+   cabinet fills the safe area left of the touch buttons and sits at the
+   bottom of the UI stack (--z-hud); everything on it is placed by layoutSkee
+   in whole pixels. */
+.skee-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 46 px at the top keeps the harness's tick readout (spec 4) in view. */
+  padding: calc(var(--safe-top) + 46px)
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))
+    calc(var(--safe-bottom) + 10px) calc(20px + var(--safe-left));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--sticker-font);
+  color: var(--sticker-ink);
+}
+.skee-overlay[hidden] {
+  display: none;
+}
+/* The frame shows part of the painting (skeeFrame): the hood and the upper
+   lane, the lane fading out below. Inside it, the whole painting is moved so
+   that part shows. */
+.skee-frame {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 80%, transparent);
+}
+.skee-machine {
+  position: absolute;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.skee-board,
+.skee-plate,
+.skee-hud,
+.skee-arrow,
+.skee-ghost,
+.skee-ball,
+.skee-pop {
+  position: absolute;
+}
+.skee-board {
+  pointer-events: none;
+}
+
+/* The target, drawn over the painted board: pastel collars with ink rims,
+   the 50 and the corners dark holes, each band's points lettered on it. */
+.skee-target {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.skee-collar {
+  stroke: var(--sticker-ink);
+  stroke-width: 2.5;
+}
+.skee-ring:nth-of-type(4n + 1) {
+  fill: #b9e3d6;
+}
+.skee-ring:nth-of-type(4n + 2) {
+  fill: #d8c9ec;
+}
+.skee-ring:nth-of-type(4n + 3) {
+  fill: #f8d3b8;
+}
+.skee-ring:nth-of-type(4n) {
+  fill: #f5b8c8;
+}
+.skee-collar.is-hole {
+  fill: #5a4033;
+  stroke-width: 3;
+}
+.skee-corner {
+  fill: #5a4033;
+}
+.skee-collar.is-lit {
+  stroke: #ffe36e;
+  stroke-width: 6;
+  filter: drop-shadow(0 0 6px #ffe36e);
+}
+.skee-label {
+  fill: var(--sticker-ink);
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke;
+  stroke: #fffdf7;
+  stroke-width: 3px;
+}
+.skee-label.is-lit {
+  fill: #b5480f;
+}
+
+/* The arrow at the foot of the lane: cream while it sweeps, green once set. */
+.skee-arrow {
+  z-index: 3;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+.skee-arrow.is-hidden {
+  display: none;
+}
+.skee-arrow-shape {
+  fill: #fffdf7;
+  stroke: var(--sticker-ink);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+.skee-arrow.is-set .skee-arrow-shape {
+  fill: #7fd08a;
+}
+
+/* Where the ball would land now, while Fae winds up; red past the top. */
+.skee-ghost {
+  z-index: 2;
+  box-sizing: border-box;
+  border: 3px dashed var(--sticker-ink);
+  border-radius: 50%;
+  background: #ffffffaa;
+}
+.skee-ghost.is-over {
+  border-color: #c0392b;
+  background: #f5a3a3aa;
+}
+.skee-ghost[hidden],
+.skee-ball[hidden],
+.skee-pop[hidden],
+.skee-hud[hidden] {
+  display: none;
+}
+
+/* The ball: a little wooden ball with an ink rim. */
+.skee-ball {
+  z-index: 4;
+  box-sizing: border-box;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fbe7c6, #d9a066 55%, #a8683a);
+}
+
+/* The blank marquee, lettered with the hint, and the score panel's screen. */
+.skee-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+  box-sizing: border-box;
+}
+.skee-plate-text {
+  max-width: 100%;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: .06em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--sticker-ink);
+}
+.skee-plate:not(.is-hint) .skee-plate-text {
+  letter-spacing: .14em;
+  white-space: nowrap;
+}
+/* The score, a sticker in the empty paper left of the hood: the points so
+   far, and a dot a ball (filled for those still to roll). */
+.skee-hud {
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 12px 7px;
+  background: var(--sticker-paper);
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  box-shadow: var(--sticker-shadow);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.skee-balls {
+  letter-spacing: .2em;
+  color: #b5480f;
+}
+
+/* The points a ball scores, popping up over its hole. */
+.skee-pop {
+  z-index: 6;
+  transform: translate(-50%, -100%);
+  padding: 2px 10px 3px;
+  background: #ffe36e;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 900;
+  white-space: nowrap;
+}

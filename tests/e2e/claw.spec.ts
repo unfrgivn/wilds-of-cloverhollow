@@ -34,7 +34,7 @@ async function probe(page: Page): Promise<{
     const game = state.arcade;
     return {
       phase: game?.phase ?? null,
-      outcome: game?.outcome ?? null,
+      outcome: game?.game === "claw" ? game.outcome : null,
       // The result line is all shown (the line is empty before the result).
       typed: game?.phase === "result" && game.revealed >= game.message.length,
       prizes: state.prizes,
@@ -63,7 +63,7 @@ test("real keys: Mr. Pip calmed, then the claw machine's four games", async ({ p
       // The close-up drawn over the room: the whole heap, the claw home over
       // the chute, the slide hint on the plate, and the overworld hidden.
       const info = await renderInfo(page);
-      if (info.arcade === null) throw new Error("the claw machine isn't drawn");
+      if (info.arcade?.game !== "claw") throw new Error("the claw machine isn't drawn");
       expect(info.arcade.plushes).toHaveLength(9);
       expect(info.battle.overworldVisible).toBe(false);
       await expect(page.locator(".arcade-plate-text"))
@@ -128,7 +128,7 @@ test("touch: two holds on the confirm sticker win the pup @smoke", async ({ brow
   // lifts first (spec 8.2, only a fresh press starts a hold).
   await step(page, 1);
   const game = (await readState(page)).arcade;
-  if (game === null) throw new Error("the claw machine didn't open");
+  if (game?.game !== "claw") throw new Error("the claw machine didn't open");
   const { speed, pup } = clawNumbers();
   const confirm = page.locator(".touch-confirm");
   await expect(confirm).toBeVisible();

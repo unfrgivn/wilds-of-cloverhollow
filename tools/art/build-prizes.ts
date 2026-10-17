@@ -11,17 +11,19 @@ type Component = { area: number; sumX: number; pixels: number[]; bounds: Bounds 
 const source = "art/source/prizes/prizes-sheet-raw.png";
 const scratch = "art/scratch/prizes-build";
 const names = ["frog-plush", "pup-plush", "raccoon-plush"];
-const newNames = [
-  "cat-plush", "bunny-plush", "bluebird-plush", "hamster-plush", "squirrel-plush", "owl-plush",
-];
+const newNames = ["cat-plush", "bunny-plush", "bluebird-plush", "hamster-plush",
+  "squirrel-plush", "owl-plush",
+  "pinwheel", "bouncy-ball", "toy-rocket", "star-racer-keychain"];
 const sourceSize = 2048;
 const width = 320;
 const height = 320;
 const baseline = 300;
 const scalePercent = 40;
+const arcadeScalePercent = 28;
 const key = { r: 0, g: 0, b: 255 };
 const keyDistance = 48;
 const newSource = "art/source/prizes/plushes-six-sheet-raw.png";
+const arcadeSource = "art/source/prizes/arcade-four-sheet-raw.png";
 
 async function run(command: string[], stdin?: Uint8Array): Promise<Uint8Array> {
   const child = Bun.spawn(command, {
@@ -280,6 +282,12 @@ const cells = [
   { left: 682, top: 1365, right: 1365, bottom: 2048 },
   { left: 1365, top: 1365, right: 2048, bottom: 2048 },
 ];
+const arcadeCells = [
+  { left: 0, top: 0, right: 1024, bottom: 1024 },
+  { left: 1024, top: 0, right: 2048, bottom: 1024 },
+  { left: 0, top: 1024, right: 1024, bottom: 2048 },
+  { left: 1024, top: 1024, right: 2048, bottom: 2048 },
+];
 function colourDistance(left: Rgba, right: Rgba): number {
   return Math.max(Math.abs(left.r - right.r), Math.abs(left.g - right.g),
     Math.abs(left.b - right.b));
@@ -378,12 +386,83 @@ for (const [cellIndex, cell] of cells.entries()) {
     "-geometry", `+${x}+${y}`, "-composite", "-define", "png:color-type=6", framePath]);
   framePaths.push(framePath);
 }
+const arcadeRaw = await run(["magick", arcadeSource, "-alpha", "on", "-depth", "8", "rgba:-"]);
+const arcadePixels: Rgba[] = [];
+for (let index = 0; index < sourceSize * sourceSize; index += 1) {
+  const offset = index * 4;
+  arcadePixels.push({ r: arcadeRaw[offset] ?? 0, g: arcadeRaw[offset + 1] ?? 0,
+    b: arcadeRaw[offset + 2] ?? 0, a: arcadeRaw[offset + 3] ?? 255 });
+}
+for (const [cellIndex, cell] of arcadeCells.entries()) {
+  const cellWidth = cell.right - cell.left, cellHeight = cell.bottom - cell.top;
+  const cellPixels: Rgba[] = [];
+  for (let y = cell.top; y < cell.bottom; y += 1) for (let x = cell.left; x < cell.right; x += 1)
+    cellPixels.push({ ...(arcadePixels[y * sourceSize + x] ?? { r: 0, g: 0, b: 0, a: 0 }) });
+  const seed = { r: 212, g: 0, b: 168 };
+  const isKey = (pixel: Rgba): boolean => Math.max(
+    Math.abs(pixel.r - seed.r), Math.abs(pixel.g - seed.g), Math.abs(pixel.b - seed.b)) <= 70;
+  const queue: number[] = [];
+  for (let y = 0; y < cellHeight; y += 1) queue.push(y * cellWidth, y * cellWidth + cellWidth - 1);
+  for (let x = 0; x < cellWidth; x += 1) queue.push(x, (cellHeight - 1) * cellWidth + x);
+  const removed = new Uint8Array(cellPixels.length);
+  while (queue.length) {
+    const index = queue.pop();
+    if (index === undefined) continue;
+    const pixel = cellPixels[index] ?? { r: 0, g: 0, b: 0, a: 0 };
+    if (removed[index] || !isKey(pixel)) continue;
+    removed[index] = 1;
+    const clearedPixel = cellPixels[index]; if (clearedPixel) clearedPixel.a = 0;
+    for (const next of neighbours4(index, cellWidth, cellPixels.length)) queue.push(next);
+  }
+  clearEnclosedKeyPockets(cellPixels, cellWidth, cellHeight, isKey, () => undefined);
+  const seen = new Uint8Array(cellPixels.length); let best: number[] = [];
+  let bounds: Bounds = { left: cellWidth, top: cellHeight, right: 0, bottom: 0 };
+  for (let start = 0; start < cellPixels.length; start += 1) {
+    if (seen[start] || (cellPixels[start]?.a ?? 0) <= 127) continue;
+    const pending = [start], members: number[] = [];
+    const box: Bounds = { left: cellWidth, top: cellHeight, right: 0, bottom: 0 };
+    seen[start] = 1;
+    while (pending.length) {
+      const index = pending.pop(); if (index === undefined) continue; members.push(index);
+      const x = index % cellWidth, y = Math.floor(index / cellWidth);
+      box.left = Math.min(box.left, x); box.top = Math.min(box.top, y);
+      box.right = Math.max(box.right, x + 1); box.bottom = Math.max(box.bottom, y + 1);
+      for (const next of neighbours8(index, cellWidth, cellHeight))
+        if (!seen[next] && (cellPixels[next]?.a ?? 0) > 127) { seen[next] = 1; pending.push(next); }
+    }
+    if (members.length > best.length) { best = members; bounds = box; }
+  }
+  const cropWidth = bounds.right - bounds.left, cropHeight = bounds.bottom - bounds.top;
+  const crop: Rgba[] = Array.from({ length: cropWidth * cropHeight },
+    () => ({ r: 0, g: 0, b: 0, a: 0 }));
+  for (const index of best) {
+    const x = index % cellWidth, y = Math.floor(index / cellWidth);
+    crop[(y - bounds.top) * cropWidth + x - bounds.left] = { ...(cellPixels[index] as Rgba) };
+  }
+  const name = newNames[cellIndex + 6];
+  if (name === undefined) throw new Error(`Missing arcade prize ${cellIndex}`);
+  const keyedPath = `${scratch}/${name}-keyed.png`;
+  const resizedPath = `${scratch}/${name}-resized.png`, framePath = `${scratch}/${name}.png`;
+  await writeRgba(keyedPath, crop, cropWidth, cropHeight);
+  await run(["magick", keyedPath, "-trim", "+repage", "-resize", `${arcadeScalePercent}%`,
+    "-define", "png:color-type=6", resizedPath]);
+  const dimensions = await run(["magick", "identify", "-format", "%wx%h", resizedPath]);
+  const dimensionParts = new TextDecoder().decode(dimensions).trim().split("x").map(Number);
+  const sw = dimensionParts[0] ?? NaN, sh = dimensionParts[1] ?? NaN;
+  if (!Number.isInteger(sw) || !Number.isInteger(sh) || sw > width - 16 || sh > baseline - 8)
+    throw new Error(`${name} does not fit`);
+  await run(["magick", "-size", `${width}x${height}`, "xc:none", resizedPath,
+    "-geometry", `+${Math.floor((width - sw) / 2)}+${baseline - sh + 1}`, "-composite",
+    "-alpha", "on", "-fuzz", "8%", "-fill", "none", "-opaque", "#D400A8",
+    "-channel", "A", "-threshold", "1%", "+channel", "-define", "png:color-type=6", framePath]);
+  framePaths.push(framePath);
+}
 const allNames = [...names, ...newNames];
-await run(["magick", "montage", ...framePaths, "-tile", "3x3",
+await run(["magick", "montage", ...framePaths, "-tile", "4x4",
   "-geometry", `${width}x${height}+0+0`,
   "-background", "none", "-alpha", "on", "public/assets/prizes/prizes.png"]);
 const frameData = Object.fromEntries(allNames.map((name, index) => [name, {
-  frame: { x: (index % 3) * width, y: Math.floor(index / 3) * height, w: width, h: height },
+  frame: { x: (index % 4) * width, y: Math.floor(index / 4) * height, w: width, h: height },
   rotated: false, trimmed: false,
   spriteSourceSize: { x: 0, y: 0, w: width, h: height }, sourceSize: { w: width, h: height },
   anchor: { x: 0.5, y: baseline / height },
@@ -391,6 +470,6 @@ const frameData = Object.fromEntries(allNames.map((name, index) => [name, {
 const atlas = {
   frames: frameData,
   animations: Object.fromEntries(allNames.map((name) => [name, [name]])),
-  meta: { image: "prizes.png", size: { w: width * 3, h: height * 3 }, scale: "1", baseline },
+  meta: { image: "prizes.png", size: { w: width * 4, h: height * 4 }, scale: "1", baseline },
 };
 await Bun.write("public/assets/prizes/prizes.json", `${JSON.stringify(atlas, null, 2)}\n`);

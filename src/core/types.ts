@@ -176,8 +176,34 @@ export type ArcadeContent = {
   // The prize atlas (Pixi spritesheet JSON), one frame per prize.
   atlas: string;
   claw: ClawContent;
+  skee: SkeeContent;
+  counter: CounterContent;
   prizes: { id: string; name: string; frame: string }[];
 };
+// Skee-ball (spec 8.2), on a target board `width` wide (x from -width/2 to
+// width/2) and `height` tall (y from 0, just past the hump, up to the top).
+// The rings are circles round `centre`, smallest first; the corner holes sit
+// at (-x, y) and (x, y); `floor` is what a ball scores anywhere else.
+export type SkeeContent = {
+  balls: number;
+  board: { width: number; height: number };
+  // Board units the arrow moves each tick while aiming, and the ball travels
+  // up the board for each tick the press is held, up to `powerTicks`.
+  sweepStep: number;
+  powerStep: number;
+  powerTicks: number;
+  rollTicks: number;
+  hopTicks: number;
+  scoreTicks: number;
+  centre: { x: number; y: number };
+  rings: { points: number; radius: number }[];
+  corners: { points: number; x: number; y: number; radius: number };
+  floor: number;
+  pointsPerTicket: number;
+  lines: { aim: string; power: string; result: string };
+};
+// The ticket counter's prizes and what each costs in tickets.
+export type CounterContent = { prizes: { prize: string; price: number }[] };
 // The claw machine (spec 8.2), in floor units: x runs left to right across the
 // box, z from the front glass to the back wall.
 export type ClawContent = {
@@ -219,6 +245,20 @@ export type ClawCalibration = {
   };
   ceiling: { front: { y: number }; back: { y: number } };
   chute: { mouth: [number, number][] };
+  plate: { x: number; y: number; w: number; h: number };
+};
+// The painted skee-ball close-up (`public/assets/arcade/skee-lane.json`, spec
+// 8.2), in the image's pixels: the lane's playing surface at its foot (`near`)
+// and where it meets the hump (`far`), the flat target board's face, and the
+// blank marquee plate.
+export type SkeeCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  lane: {
+    near: { y: number; left: number; right: number };
+    far: { y: number; left: number; right: number };
+  };
+  board: { x: number; y: number; w: number; h: number };
   plate: { x: number; y: number; w: number; h: number };
 };
 // A friend who walks behind Fae and brings one battle command (spec 5, 8).
@@ -608,12 +648,15 @@ export type State = {
   battle: Battle | null;
   arcade: ArcadeGame | null;
   prizes: string[];
+  tickets: number;
   journalOpen: boolean;
   lantern: boolean;
   coins: number;
   snacks: number;
   backLink?: { area: string; direction: Direction };
 };
+// What a tick of an arcade game changes: the game itself and what it pays out.
+export type ArcadeOwned = Pick<State, "arcade" | "prizes" | "tickets">;
 export type Mood = "chaos" | "calm";
 // A critter out in Fae's area, set piece or recurring (`presentCritters`):
 // `key` is a set piece's id or `wild:<den>`.

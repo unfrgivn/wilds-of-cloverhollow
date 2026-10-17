@@ -11,7 +11,12 @@ import {
   soundCues,
   arcadeView,
 } from "./core";
-import { loadContent, parseClawCalibration, parseMapCentres } from "./content/load";
+import {
+  loadContent,
+  parseClawCalibration,
+  parseMapCentres,
+  parseSkeeCalibration,
+} from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
@@ -196,14 +201,24 @@ async function boot(): Promise<void> {
     content.world.arcade.atlas.replace(".json", ".png"),
   );
   await prizeImage.decode();
-  // The claw machine's painting and its calibration (spec 8.2).
-  const calibrationFile = "assets/arcade/claw-machine.json";
-  const calibrationResponse = await fetch(assetUrl(calibrationFile));
-  if (!calibrationResponse.ok) throw new Error(`Failed to load ${calibrationFile}`);
-  const calibration = parseClawCalibration(await calibrationResponse.json(), calibrationFile);
-  const cabinet = new Image();
-  cabinet.src = assetUrl(`assets/arcade/${calibration.image}`);
-  await cabinet.decode();
+  // The arcade games' paintings and their calibrations (spec 8.2), each
+  // decoded before its close-up can open.
+  const painting = async <T extends { image: string }>(
+    file: string,
+    parse: (value: unknown, file: string) => T,
+  ): Promise<{ calibration: T; image: string }> => {
+    const response = await fetch(assetUrl(file));
+    if (!response.ok) throw new Error(`Failed to load ${file}`);
+    const calibration = parse(await response.json(), file);
+    const image = new Image();
+    image.src = assetUrl(`assets/arcade/${calibration.image}`);
+    await image.decode();
+    return { calibration, image: image.src };
+  };
+  const [clawPainting, skeePainting] = await Promise.all([
+    painting("assets/arcade/claw-machine.json", parseClawCalibration),
+    painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
+  ]);
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
   // A toy a catch throws: a crop of the toy atlas (spec 8.1).
@@ -282,7 +297,7 @@ async function boot(): Promise<void> {
       atlas: { w: size.w, h: size.h },
     };
   };
-  const arcade = createArcade(uiRoot, prizeArt, calibration, cabinet.src);
+  const arcade = createArcade(uiRoot, prizeArt, clawPainting, skeePainting);
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");
   await view.setArea(initialArea);
@@ -434,7 +449,7 @@ async function boot(): Promise<void> {
       state.battle?.phase === "reward" &&
       state.battle.rewardSticker !== null;
     // One reward card: a battle's new sticker, else a prize won at the arcade.
-    const arcadePrize = battleReward ? null : arcadeState?.prize ?? null;
+    const arcadePrize = battleReward || arcadeState?.game !== "claw" ? null : arcadeState.prize;
     rewardSticker.render(
       battleReward
         ? {
@@ -494,6 +509,7 @@ async function boot(): Promise<void> {
       currentLand: content.world.areas[state.area]?.land ?? null,
       coins: state.coins,
       snacks: state.snacks,
+      tickets: state.tickets,
       muted: sound.muted(),
       level: sound.level(),
     });

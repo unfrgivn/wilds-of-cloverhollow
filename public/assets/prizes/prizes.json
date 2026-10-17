@@ -74,8 +74,8 @@
     },
     "cat-plush": {
       "frame": {
-        "x": 0,
-        "y": 320,
+        "x": 960,
+        "y": 0,
         "w": 320,
         "h": 320
       },
@@ -98,7 +98,7 @@
     },
     "bunny-plush": {
       "frame": {
-        "x": 320,
+        "x": 0,
         "y": 320,
         "w": 320,
         "h": 320
@@ -122,7 +122,7 @@
     },
     "bluebird-plush": {
       "frame": {
-        "x": 640,
+        "x": 320,
         "y": 320,
         "w": 320,
         "h": 320
@@ -146,6 +146,54 @@
     },
     "hamster-plush": {
       "frame": {
+        "x": 640,
+        "y": 320,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "squirrel-plush": {
+      "frame": {
+        "x": 960,
+        "y": 320,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "owl-plush": {
+      "frame": {
         "x": 0,
         "y": 640,
         "w": 320,
@@ -168,7 +216,7 @@
         "y": 0.9375
       }
     },
-    "squirrel-plush": {
+    "pinwheel": {
       "frame": {
         "x": 320,
         "y": 640,
@@ -192,10 +240,58 @@
         "y": 0.9375
       }
     },
-    "owl-plush": {
+    "bouncy-ball": {
       "frame": {
         "x": 640,
         "y": 640,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "toy-rocket": {
+      "frame": {
+        "x": 960,
+        "y": 640,
+        "w": 320,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9375
+      }
+    },
+    "star-racer-keychain": {
+      "frame": {
+        "x": 0,
+        "y": 960,
         "w": 320,
         "h": 320
       },
@@ -244,13 +340,25 @@
     ],
     "owl-plush": [
       "owl-plush"
+    ],
+    "pinwheel": [
+      "pinwheel"
+    ],
+    "bouncy-ball": [
+      "bouncy-ball"
+    ],
+    "toy-rocket": [
+      "toy-rocket"
+    ],
+    "star-racer-keychain": [
+      "star-racer-keychain"
     ]
   },
   "meta": {
     "image": "prizes.png",
     "size": {
-      "w": 960,
-      "h": 960
+      "w": 1280,
+      "h": 1280
     },
     "scale": "1",
     "baseline": 300

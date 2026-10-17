@@ -98,5 +98,73 @@
       "stuck": "It's stuck under the others!",
       "prizeTitle": "NEW PRIZE!"
     }
+  },
+  "skee": {
+    "balls": 5,
+    "board": {
+      "width": 600,
+      "height": 400
+    },
+    "sweepStep": 6,
+    "powerStep": 8,
+    "powerTicks": 55,
+    "rollTicks": 45,
+    "hopTicks": 15,
+    "scoreTicks": 40,
+    "centre": {
+      "x": 0,
+      "y": 230
+    },
+    "rings": [
+      {
+        "points": 50,
+        "radius": 40
+      },
+      {
+        "points": 40,
+        "radius": 80
+      },
+      {
+        "points": 30,
+        "radius": 120
+      },
+      {
+        "points": 20,
+        "radius": 160
+      }
+    ],
+    "corners": {
+      "points": 100,
+      "x": 240,
+      "y": 360,
+      "radius": 32
+    },
+    "floor": 10,
+    "pointsPerTicket": 10,
+    "lines": {
+      "aim": "Press to aim the ball!",
+      "power": "Hold to wind up. Let go to roll!",
+      "result": "You scored {score}! +{tickets} tickets."
+    }
+  },
+  "counter": {
+    "prizes": [
+      {
+        "prize": "pinwheel",
+        "price": 20
+      },
+      {
+        "prize": "bouncy-ball",
+        "price": 30
+      },
+      {
+        "prize": "toy-rocket",
+        "price": 50
+      },
+      {
+        "prize": "star-racer-keychain",
+        "price": 80
+      }
+    ]
   }
 }

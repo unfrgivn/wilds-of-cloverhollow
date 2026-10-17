@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
-import { bunClawLayout } from "./helpers";
+import { skeeGalleryStates } from "../../src/dev/skee-gallery";
+import { bunClawLayout, bunSkeeLayout } from "./helpers";
 
 test.use({ deviceScaleFactor: 2 });
 
@@ -57,6 +58,8 @@ const battleParts: Record<string, string[]> = {
   "journal-full": [".journal-book"],
   ...Object.fromEntries(clawGalleryStates.map((state) => [state,
     state === "arcade-result" ? [".battle-reward", ".sticker-dialogue"] : []])),
+  ...Object.fromEntries(skeeGalleryStates.map((state) => [state,
+    state === "skee-result" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-check-hint", ".battle-grade",
@@ -212,8 +215,8 @@ function measureContrast(): Contrast[] {
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
   ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
     ".battle-reward-name, .journal-label, " +
-    ".journal-heading, .journal-supply, .journal-note, .journal-empty, .journal-name, " +
-    ".journal-unknown, .journal-close";
+    ".journal-heading, .journal-supply, .journal-tickets, .journal-note, .journal-empty, " +
+    ".journal-name, .journal-unknown, .journal-close";
   return [...document.querySelectorAll(selectors)]
     .filter((element) => element.getClientRects().length > 0)
     .map((element) => {
@@ -352,6 +355,169 @@ test.describe("sticker gallery", () => {
     }
   }
 
+  // Skee-ball as drawn is its layout (spec 8.2): the frame on the painting,
+  // the board, the plate, the score, the target's rings and holes, the arrow,
+  // the ghost, the ball, and its points, from the same real game states, on a
+  // phone and a desktop, in both engines. The layout's own geometry is checked
+  // in tests/unit/skee-layout.test.ts.
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of skeeGalleryStates) {
+      test(`${state} skee-ball as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const insets = size.width === 874 ? "0,62,21,62" : "0,0,0,0";
+        await gallery(page, state, true, insets, size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | Range | null): { x: number; y: number;
+            width: number; height: number } => {
+            if (element === null) throw new Error("missing a part of skee-ball");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const shown = (selector: string): HTMLElement | null => {
+            const element = document.querySelector<HTMLElement>(selector);
+            return element !== null && element.getClientRects().length > 0 ? element : null;
+          };
+          const machine = document.querySelector<HTMLElement>(".skee-machine");
+          const text = document.querySelector<HTMLElement>(".skee-plate-text");
+          if (machine === null || text === null) throw new Error("skee-ball isn't drawn");
+          // The lettering's own glyphs, not its box (letter spacing trails past
+          // a box's edge).
+          const range = document.createRange();
+          range.selectNodeContents(text);
+          const glyphs = box(range);
+          const number = (element: Element, name: string): number =>
+            Number(element.getAttribute(name));
+          const ellipses = (selector: string): { cx: number; cy: number; rx: number;
+            ry: number; lit: boolean }[] =>
+            [...document.querySelectorAll(selector)].map((item) => ({
+              cx: number(item, "cx"), cy: number(item, "cy"), rx: number(item, "rx"),
+              ry: number(item, "ry"), lit: item.classList.contains("is-lit"),
+            }));
+          const arrow = document.querySelector<SVGElement>(".skee-arrow:not(.is-hidden)");
+          const ghost = shown(".skee-ghost");
+          const ball = shown(".skee-ball");
+          const pop = shown(".skee-pop");
+          const hud = shown(".skee-hud");
+          const dialogue = shown(".sticker-dialogue");
+          const atDialogue = dialogue === null ? null : document.elementFromPoint(
+            box(dialogue).x + box(dialogue).width / 2,
+            box(dialogue).y + box(dialogue).height / 2);
+          return {
+            scale: Number(machine.dataset.scale),
+            machine: box(machine),
+            frame: box(document.querySelector(".skee-frame")),
+            target: box(document.querySelector(".skee-target")),
+            board: box(document.querySelector(".skee-board")),
+            plate: box(document.querySelector(".skee-plate")),
+            text: glyphs,
+            hud: hud === null ? null : box(hud),
+            rings: ellipses(".skee-ring"),
+            corners: ellipses(".skee-corner"),
+            arrow: arrow === null ? null : {
+              left: Number.parseFloat(arrow.style.left),
+              top: Number.parseFloat(arrow.style.top),
+              width: Number.parseFloat(arrow.style.width),
+              height: Number.parseFloat(arrow.style.height),
+              set: arrow.classList.contains("is-set"),
+            },
+            ghost: ghost === null ? null
+              : { box: box(ghost), over: ghost.classList.contains("is-over") },
+            ball: ball === null ? null : box(ball),
+            pop: pop === null ? null : {
+              left: Number.parseFloat(pop.style.left),
+              top: Number.parseFloat(pop.style.top),
+              text: pop.textContent ?? "",
+            },
+            dialogue: dialogue === null ? null : box(dialogue),
+            dialogueOnTop: dialogue !== null && atDialogue !== null &&
+              dialogue.contains(atDialogue),
+            buttons: [box(document.querySelector(".touch-confirm")),
+              box(document.querySelector(".touch-cancel")),
+              box(document.querySelector(".touch-menu"))],
+          };
+        });
+        const layout = bunSkeeLayout(state, drawn.scale);
+        const near = (actual: number, expected: number, label: string): void => {
+          expect(Math.abs(actual - expected), `${label}: ${actual} vs ${expected}`)
+            .toBeLessThanOrEqual(1);
+        };
+        const origin = { x: drawn.machine.x, y: drawn.machine.y };
+        const placed = (actual: Rect, expected: Rect, label: string): void => {
+          near(actual.x - origin.x, expected.x, `${label} x`);
+          near(actual.y - origin.y, expected.y, `${label} y`);
+          near(actual.width, expected.width, `${label} width`);
+          near(actual.height, expected.height, `${label} height`);
+        };
+        const disc = (point: { x: number; y: number; radius: number }): Rect => ({
+          x: point.x - point.radius, y: point.y - point.radius,
+          width: 2 * point.radius, height: 2 * point.radius,
+        });
+        near(drawn.machine.width, layout.width, "painting width");
+        near(drawn.machine.height, layout.height, "painting height");
+        placed(drawn.frame, layout.frame, "frame");
+        placed(drawn.target, { x: 0, y: 0, width: layout.width, height: layout.height },
+          "target");
+        placed(drawn.board, layout.board, "board");
+        placed(drawn.plate, layout.plate, "plate");
+        expect(drawn.hud === null, "score shown").toBe(state === "skee-result");
+        if (drawn.hud !== null) {
+          near(drawn.hud.x - origin.x, layout.hud.x, "score x");
+          near(drawn.hud.y - origin.y, layout.hud.y, "score y");
+        }
+        // The target: every ring and hole where the layout puts it, lit as it says.
+        const targets: [typeof drawn.rings, typeof layout.rings][] =
+          [[drawn.rings, layout.rings], [drawn.corners, layout.corners]];
+        for (const [actual, expected] of targets) {
+          expect(actual).toHaveLength(expected.length);
+          actual.forEach((item, index) => {
+            const want = expected[index];
+            if (want === undefined) throw new Error("a target is missing");
+            expect(item).toEqual({ cx: want.cx, cy: want.cy, rx: want.rx, ry: want.ry,
+              lit: want.lit });
+          });
+        }
+        // The arrow, the ghost, the ball, and the points: shown when the layout
+        // has them, where it puts them.
+        expect(drawn.arrow === null, "arrow shown").toBe(layout.arrow === null);
+        if (drawn.arrow !== null && layout.arrow !== null) {
+          near(drawn.arrow.left + drawn.arrow.width / 2, layout.arrow.x, "arrow x");
+          near(drawn.arrow.top + drawn.arrow.height, layout.arrow.y, "arrow y");
+          near(drawn.arrow.height, layout.arrow.length, "arrow length");
+          expect(drawn.arrow.set).toBe(layout.arrow.set);
+        }
+        expect(drawn.ghost === null, "ghost shown").toBe(layout.ghost === null);
+        if (drawn.ghost !== null && layout.ghost !== null) {
+          placed(drawn.ghost.box, disc(layout.ghost), "ghost");
+          expect(drawn.ghost.over).toBe(layout.ghost.over);
+        }
+        expect(drawn.ball === null, "ball shown").toBe(layout.ball === null);
+        if (drawn.ball !== null && layout.ball !== null)
+          placed(drawn.ball, disc(layout.ball), "ball");
+        expect(drawn.pop === null, "points shown").toBe(layout.pop === null);
+        if (drawn.pop !== null && layout.pop !== null) {
+          near(drawn.pop.left, layout.pop.x, "points x");
+          near(drawn.pop.top, layout.pop.y, "points y");
+          expect(drawn.pop.text).toBe(`+${layout.pop.points}`);
+        }
+        // The lettering fits on the plate, and the close-up stays clear of the
+        // touch buttons; in the result, the line reads over it.
+        expect(drawn.text.width, "the plate is lettered").toBeGreaterThan(0);
+        expect(drawn.text.x).toBeGreaterThanOrEqual(drawn.plate.x - 1);
+        expect(drawn.text.x + drawn.text.width)
+          .toBeLessThanOrEqual(drawn.plate.x + drawn.plate.width + 1);
+        expect(drawn.text.y).toBeGreaterThanOrEqual(drawn.plate.y - 1);
+        expect(drawn.text.y + drawn.text.height)
+          .toBeLessThanOrEqual(drawn.plate.y + drawn.plate.height + 1);
+        for (const button of drawn.buttons) expect(overlaps(drawn.frame, button)).toBe(false);
+        if (state === "skee-result") {
+          if (drawn.dialogue === null) throw new Error("the result line isn't shown");
+          expect(drawn.dialogueOnTop).toBe(true);
+          for (const button of drawn.buttons)
+            expect(overlaps(drawn.dialogue, button)).toBe(false);
+        }
+      });
+    }
+  }
+
   for (const state of journalStates) {
     test(`${state} journal baseline`, async ({ page }) => {
       await gallery(page, state);
@@ -422,11 +588,13 @@ test.describe("sticker gallery", () => {
     await page.setViewportSize({ width: 874, height: 402 });
     await page.goto("/cloverhollow/ui-gallery.html?state=journal-notes&touch=1&insets=0,62,21,62");
     await page.evaluate(() => document.fonts.ready);
+    // The album's own slots, not the PRIZES shelf's below it.
     const album = page.locator(".journal-stickers-page");
-    const last = page.locator(".journal-slot").last();
+    const last = page.locator(".journal-stickers:not(.journal-prizes) .journal-slot").last();
     await last.scrollIntoViewIfNeeded();
     const facts = await album.evaluate((element) => {
-      const slot = element.querySelector(".journal-slot:last-child")?.getBoundingClientRect();
+      const slot = element.querySelector(
+        ".journal-stickers:not(.journal-prizes) .journal-slot:last-child")?.getBoundingClientRect();
       const page = element.getBoundingClientRect();
       return { scrolls: ["auto", "scroll"].includes(getComputedStyle(element).overflowY),
         inside: slot !== undefined && slot.bottom <= page.bottom + 1 && slot.top >= page.top - 1 };
@@ -565,7 +733,15 @@ test.describe("sticker gallery", () => {
       });
     });
   }
-  for (const state of ["arcade-ready", "arcade-result"]) {
+  for (const state of skeeGalleryStates) {
+    test(`${state} phone visual baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
+  for (const state of ["arcade-ready", "arcade-result", "skee-aiming", "skee-result"]) {
     test(`${state} desktop visual baseline`, async ({ page }) => {
       await gallery(page, state, false, "0,0,0,0", { width: 1280, height: 720 });
       await expect(page).toHaveScreenshot(`${state}-desktop.png`, {

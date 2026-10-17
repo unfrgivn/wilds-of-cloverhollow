@@ -48,7 +48,7 @@ import {
   windUpStarts,
 } from "./feelings";
 import { battleParty } from "./party";
-import { openClaw, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
+import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -171,6 +171,7 @@ export function createState(
     battle: null,
     arcade: null,
     prizes: [],
+    tickets: 0,
     journalOpen: false,
     lantern: false,
     coins: 0,
@@ -753,6 +754,7 @@ export function inkFacts(world: World, state: State): InkFacts {
     for (const piece of area.critters) calmed[piece.id] = state.critters[piece.id] === "calm";
   return {
     calmed, coins: state.coins, snacks: state.snacks, prizes: state.prizes,
+    tickets: state.tickets,
     plushesLeft: world.arcade.claw.heap.filter((plush) => !state.prizes.includes(plush.prize))
       .length,
   };
@@ -1305,8 +1307,9 @@ function dialogueState(
 // A line's item tags act as it's shown (spec 7): `buy: snack <price>` sells
 // Fae a snack; `gift: snack <count>` and `gift: coins <count>` give her snacks
 // (the clubhouse fridge) or coins (the pond's tin); `feed: snack <count>` gives
-// snacks away (a treat for a friend), never below none. The loader allows no
-// other item or format.
+// snacks away (a treat for a friend), never below none; `trade: <prize>
+// <price>` buys a prize at the ticket counter. The loader allows no other item
+// or format.
 function applyItemTags(state: State, tags: string[]): State {
   let next = state;
   for (const raw of tags) {
@@ -1318,6 +1321,12 @@ function applyItemTags(state: State, tags: string[]): State {
     if (gift?.[1] === "coins") next = { ...next, coins: next.coins + Number(gift[2]) };
     const fed = /^feed:\s*snack\s+(\d+)$/.exec(tag)?.[1];
     if (fed !== undefined) next = { ...next, snacks: Math.max(0, next.snacks - Number(fed)) };
+    // A prize from the ticket counter, if Fae has the tickets and not the prize.
+    const trade = /^trade:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
+    const prize = trade?.[1];
+    const tickets = Number(trade?.[2]);
+    if (prize !== undefined && next.tickets >= tickets && !next.prizes.includes(prize))
+      next = { ...next, tickets: next.tickets - tickets, prizes: [...next.prizes, prize] };
   }
   return next;
 }
@@ -1359,9 +1368,9 @@ export const FLUTE_KNOT = "flute";
 function closeDialogue(world: World, state: State): State {
   const dialogue = state.dialogue;
   if (dialogue === null) return state;
-  const price = dialogue.play;
-  const opened = price?.game === "claw" && state.arcade === null && state.coins >= price.price
-    ? openClaw(world, state, price.price) : state;
+  const play = dialogue.play;
+  const opened = play !== undefined && state.arcade === null && state.coins >= play.price
+    ? openArcade(world, state, play.game, play.price) : state;
   return {
     ...opened,
     dialogue: null,

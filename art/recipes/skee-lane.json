@@ -1,0 +1,13 @@
+{
+  "asset": "skee-ball close-up",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 1,
+  "references": ["public/assets/arcade/claw-machine.webp", "docs/art/concepts/props/arcade_props.png", "docs/art/concepts/environments/arcade_interior.png"],
+  "prompt_summary": "Straight-on symmetric child-sized skee-ball lane in one-point perspective, teal surface, yellow rails, purple hood, blank light target board, blank yellow marquee, blank dark score panel, no rings, holes, numbers, text, balls, or people, matching the claw-machine watercolor style.",
+  "raw": "art/source/arcade/skee-lane-raw.png",
+  "post_processing": ["Built a protect barrier between the measured outer rail outlines from the hump to the bottom edge before corner flood-fill", "Flood-filled only the connected cream paper margin from all four corners at 10% fuzz; no subject recolouring", "Unioned the protected lane trapezoid into the alpha mask, then despill-safe alpha composited and converted to WebP at quality 88"],
+  "outputs": ["public/assets/arcade/skee-lane.webp", "public/assets/arcade/skee-lane.json", "tools/art/build-skee-lane.ts"],
+  "calibration_method": "Measured on the runtime pixel image and checked with art/review/skee-lane-overlay.png. Near/far lane edges converge at x=1200, the image centre. Board is above far.y; plate and panel are disjoint from board.",
+  "owner_review": {"viewed": ["art/review/skee-lane-overlay.png", "art/review/skee-style-compare.png"]}
+}

@@ -6167,13 +6167,489 @@
         ],
         null
       ],
+      "skee_ball": [
+        [
+          "ev",
+          "str",
+          "^arcade-keeper",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^The skee-ball lane is all fizzy with purple scribbles. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "^I'd better calm Mr. Pip first. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^A skee-ball lane! Roll the balls into the rings for tickets. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          2,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^I need 2 coins to play. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.21"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Play for 2 coins",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "^ ",
+              "#",
+              "^play: skee 2",
+              "/#",
+              "\n",
+              "^Here goes! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Maybe another time. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "ticket_counter": [
-        "^Jars of candy, a ring toss prize, and a big roll of orange tickets behind the counter. ",
-        "#",
-        "^speaker: Fae",
-        "/#",
-        "\n",
-        "done",
+        [
+          "ev",
+          "str",
+          "^arcade-keeper",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Jars of candy, a ring toss prize, and a big roll of orange tickets behind the counter. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^pinwheel",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "str",
+          "^bouncy-ball",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "&&",
+          "str",
+          "^toy-rocket",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "&&",
+          "str",
+          "^star-racer-keychain",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^You've won every prize on my counter. You're an arcade champ! ",
+                "#",
+                "^speaker: Mr. Pip",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.32"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^pinwheel",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "!",
+          {
+            "x()": "tickets"
+          },
+          20,
+          ">=",
+          "&&",
+          "/ev",
+          {
+            "temp=": "pinwheel"
+          },
+          "\n",
+          "ev",
+          "str",
+          "^bouncy-ball",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "!",
+          {
+            "x()": "tickets"
+          },
+          30,
+          ">=",
+          "&&",
+          "/ev",
+          {
+            "temp=": "ball"
+          },
+          "\n",
+          "ev",
+          "str",
+          "^toy-rocket",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "!",
+          {
+            "x()": "tickets"
+          },
+          50,
+          ">=",
+          "&&",
+          "/ev",
+          {
+            "temp=": "rocket"
+          },
+          "\n",
+          "ev",
+          "str",
+          "^star-racer-keychain",
+          "/str",
+          {
+            "x()": "won",
+            "exArgs": 1
+          },
+          "!",
+          {
+            "x()": "tickets"
+          },
+          80,
+          ">=",
+          "&&",
+          "/ev",
+          {
+            "temp=": "keychain"
+          },
+          "\n",
+          "ev",
+          {
+            "VAR?": "pinwheel"
+          },
+          {
+            "VAR?": "ball"
+          },
+          "||",
+          {
+            "VAR?": "rocket"
+          },
+          "||",
+          {
+            "VAR?": "keychain"
+          },
+          "||",
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^You have ",
+                "ev",
+                {
+                  "x()": "tickets"
+                },
+                "out",
+                "/ev",
+                "^ tickets. Skee-ball pays more! ",
+                "#",
+                "^speaker: Mr. Pip",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.97"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Tickets for prizes! What'll it be? ",
+          "#",
+          "^speaker: Mr. Pip",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Rainbow Pinwheel, 20 tickets",
+          "/str",
+          {
+            "VAR?": "pinwheel"
+          },
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Star Bouncy Ball, 30 tickets",
+          "/str",
+          {
+            "VAR?": "ball"
+          },
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Toy Rocket, 50 tickets",
+          "/str",
+          {
+            "VAR?": "rocket"
+          },
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Star Racer Keychain, 80 tickets",
+          "/str",
+          {
+            "VAR?": "keychain"
+          },
+          "/ev",
+          {
+            "*": ".^.c-3",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-4",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^A rainbow pinwheel. Blow on it and it spins! ",
+              "#",
+              "^speaker: Mr. Pip ",
+              "/#",
+              "#",
+              "^trade: pinwheel 20",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^A star bouncy ball. It bounces higher than you! ",
+              "#",
+              "^speaker: Mr. Pip ",
+              "/#",
+              "#",
+              "^trade: bouncy-ball 30",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-2": [
+              "\n",
+              "^A toy rocket, just like the one on my wall. ",
+              "#",
+              "^speaker: Mr. Pip ",
+              "/#",
+              "#",
+              "^trade: toy-rocket 50",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-3": [
+              "\n",
+              "^A Star Racer keychain. Only champs get these! ",
+              "#",
+              "^speaker: Mr. Pip ",
+              "/#",
+              "#",
+              "^trade: star-racer-keychain 80",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-4": [
+              "\n",
+              "^Come back any time! ",
+              "#",
+              "^speaker: Mr. Pip",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
         null
       ],
       "star_racer": [

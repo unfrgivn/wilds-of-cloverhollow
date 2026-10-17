@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 44, the claw machine)
+Last updated: 2026-10-17 (Milestone 45, skee-ball and the prize counter)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -208,7 +208,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a
   later synthesized or generated clip can replace a recipe without changing
   gameplay. Arcade transitions add `claw-move`, `claw-drop`, `claw-grab`,
-  `claw-miss`, and `prize-won`.
+  `claw-miss`, and `prize-won` for the claw machine, and `skee-aim`,
+  `skee-roll`, `skee-score`, `skee-hundred`, and `tickets-won` for skee-ball.
 - `src/platform/audio.ts` creates the AudioContext at boot and resumes it at
   every chance: right away, on each key, pointer, or touch, and whenever a cue
   plays while it isn't running. Browsers hold it (`suspended`, or WebKit's
@@ -448,8 +449,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   `clubhouse_claimed` (knot `arcade_closed`, the locked door); spawn
   `arcade-door` (1412, 560) faces down. Mr. Pip, the arcade keeper, is its
   set piece at (820, 610). Look points: `claw-machine` (prompt `Play`),
-  `ticket-counter`, and
-  `star-racer` (a back-row cabinet).
+  `ticket-counter`, `star-racer` (a back-row cabinet), and `skee-ball` (prompt
+  `Play`, at (552, 712), the foot of the lane). The skee-ball lane (Milestone
+  45) stands on the open floor at the front left, its hood at the upper left
+  and its foot toward the room's front corner: painted into the room by an
+  edit confined to that floor (`art/recipes/skee-ball-room-edit.json`), then
+  cut by the kit like the cabinets.
 - Story time (Milestone 30): the school hallway's classroom door (trigger
   `classroom-door`, the porthole door on the back-left wall) leads to
   `classroom.door` and `requires` `story_time` (knot `classroom_closed`);
@@ -818,7 +823,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   Fae never walks behind it), the school hallway (the trophy cabinet and the
   lockers on the nurse's block),
   the classroom, the gym, and the arcade (the five cabinets, the ticket
-  counter, the claw machine, the three gumball machines). The kitchen's
+  counter, the claw machine, the three gumball machines, and, since Milestone
+  45, the skee-ball lane). The kitchen's
   `stairs` spawn is (600, 650), facing right, so the whole party fits behind
   Fae at the foot of the stairs.
 - The outdoor areas (Milestone 34) are kits too, so every area is: Meadow
@@ -882,13 +888,18 @@ ios/            Capacitor iOS project (from Milestone 4).
 - A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
   it to its close, and then, if Fae has the coins, she pays them and the game
   opens (spec 8.2). It is the one place a game's price is set.
+- A line may carry `# trade: <prize> <price>` (Milestone 45): as it's shown,
+  Fae pays `price` tickets for the prize if she has them and hasn't won it,
+  and it joins `state.prizes`. The loader allows only the ticket counter's
+  prizes at their content prices (`storyTagErrors` is given the counter's
+  prices), so the story's offers can't drift from the counter's.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's
   externals, `calmed(name)`, `coins()` (Fae's coins), `snacks()` (her
-  snacks, Milestone 47), `won(prize)` (a prize she has won), and
-  `plushesLeft()` (how many plushes are still in the claw machine), are
-  answered from
+  snacks, Milestone 47), `won(prize)` (a prize she has won),
+  `plushesLeft()` (how many plushes are still in the claw machine), and
+  `tickets()` (her tickets, Milestone 45), are answered from
   the core's state (`inkFacts`) for every command, not only a knot's first
   line. `calmed` answers a set piece by its id from its own mood, and a
   species once Fae owns its sticker (she has calmed one of them, anywhere).
@@ -1508,20 +1519,24 @@ ios/            Capacitor iOS project (from Milestone 4).
    die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
    The reward card uses both.
 - The STICKERS page continues below the album with a PRIZES shelf from
-  `world.arcade.prizes`. Owned plushes use the prize atlas frame, die-cut rim,
+  `world.arcade.prizes`. Owned prizes use the prize atlas frame, die-cut rim,
   and name; unowned prizes are dashed `?` slots without names. The shelf is
   part of the page scroll on phones.
-  The shelf has nine slots for the claw machine catalogue.
+  The shelf has a slot a prize: the claw machine's nine plushes, then the
+  ticket counter's four toys. The PRIZES heading carries Fae's tickets in a
+  pill like the notes page's Coins and Snacks (an orange ticket and the
+  count, Milestone 45).
 
-### 8.2 Arcade games (Milestone 44)
-- The claw machine, once Mr. Pip is calm (`calmed("arcade-keeper")`): a line
-  tagged `play: claw <price>` (2 coins) opens it when the conversation closes,
-  paying the price then; too few coins at the close opens nothing.
-  `state.arcade` is the game in play or null, and `state.prizes` the prizes
-  won, in order.
-- Content (`content/arcade.json`, validated by `parseArcade`): the box's floor
-  is 1000 wide (x, left to right) by 460 deep (z, from the front glass to the
-  back wall). The claw travels x 185..940 and z 140..420; its home, (185, 140),
+### 8.2 Arcade games (Milestones 44 and 45)
+- The claw machine and skee-ball, once Mr. Pip is calm
+  (`calmed("arcade-keeper")`): a line tagged `play: <game> <price>` (`claw` or
+  `skee`, 2 coins each) opens the game when the conversation closes, paying
+  the price then; too few coins at the close opens nothing. `state.arcade` is
+  the game in play (`game: "claw" | "skee"`) or null, `state.prizes` the
+  prizes won, in order, and `state.tickets` Fae's tickets (Milestone 45).
+- The claw machine's content (`claw` in `content/arcade.json`, validated by
+  `parseArcade`): the box's floor is 1000 wide (x, left to right) by 460 deep
+  (z, from the front glass to the back wall). The claw travels x 185..940 and z 140..420; its home, (185, 140),
   is over the prize chute, out of reach of every plush. Speed 4 units a tick on
   either axis, reach 48, and drop, grab, lift, and release last 40, 14, 40, and
   20 ticks. The heap is nine plushes, each `{ prize, x, z, level, on }`: level
@@ -1547,13 +1562,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   dropped into the chute. Returning moves both axes home by the speed a tick.
   The result line (`won` with the prize's name, `stuck`, or `missed`) types
   like dialogue. A won prize joins `state.prizes` once and leaves the heap.
-- `arcadeView` is logical: the box, the travel, the reach, the claw (x, z,
+- `clawView` (`arcadeView` gives the open game's view) is logical: the box,
+  the travel, the reach, the claw (x, z,
   `drop` 0..1, `stop` the plush levels it comes down to, open or closed), the
   plushes still in the heap (x, z, level, held, `tug` for a stuck one being
   pulled, `fall` 0..1 into the chute), the hint (`slide` in ready, `push` in
   aiming), the result line, and the prize won.
-- The close-up (`src/ui/arcade.ts`, laid out by `layoutClaw` in
-  `src/ui/claw-layout.ts`) is a painting of the machine's front with its glass
+- The close-up (`src/ui/claw.ts`, laid out by `layoutClaw` in
+  `src/ui/claw-layout.ts`; `src/ui/arcade.ts` hands each game's view to its
+  own close-up) is a painting of the machine's front with its glass
   box in one-point perspective (`public/assets/arcade/claw-machine.webp`) and
   its calibration in the painting's pixels (`claw-machine.json`, validated by
   `parseClawCalibration`): the window, the floor's front and back edges, where
@@ -1589,7 +1606,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   plush on its level, nearer over farther, the claw over what's behind it and
   under what's in front, on a grid across the box), and the gallery e2e checks
   the DOM is that layout within a pixel, at 874x402 and 1280x720 in both
-  engines (`tools/claw-layout.ts` gives Node the layout from Bun). The
+  engines (`tools/arcade-layout.ts` gives Node either game's layout from
+  Bun). The
   recorded run `arcade/claw.json` (`tools/sim/record-claw.ts`, from the
   `arcade` fixture) calms Mr. Pip and plays four games, stuck on the raccoon,
   the pup won, a miss in the bare back corner, and the cat won; `claw.spec.ts`
@@ -1598,24 +1616,105 @@ ios/            Capacitor iOS project (from Milestone 4).
   both engines.
 - While a game runs, Fae, doors, triggers, targeting, the menu, the journal,
   and cancel are ignored, and the party settles as in battle. A game's end
-  autosaves. Cues: `claw-move` (each hold starts), `claw-drop`, `claw-grab`
-  or `claw-miss` (stuck or empty), and `prize-won`.
+  autosaves. The claw's cues: `claw-move` (each hold starts), `claw-drop`,
+  `claw-grab` or `claw-miss` (stuck or empty), and `prize-won`.
+- Skee-ball (Milestone 45): the lane on the arcade's floor (spec 6), `play:
+  skee 2`. Its content (`skee` in `content/arcade.json`, validated by
+  `parseArcade`): five balls; a target board 600 wide (x -300..300) and 400
+  tall (y up from the hump); rings round (0, 230) of radius 40, 80, 120, and
+  160 for 50, 40, 30, and 20; two corner holes at (±240, 360), radius 32, for
+  100; and the floor's pocket, 10, everywhere else. The arrow moves 6 a tick
+  (`sweepStep`); each tick the press is held sends the ball 8 further up
+  (`powerStep`), for at most 55 ticks (440, past the top). A ball rolls 45
+  ticks, hops the hump in 15, and sits in its hole 40. A game pays its score
+  over 10 in tickets, rounded down.
+- Five balls, each in two presses; only a fresh confirm press starts each:
+  ```
+  aiming --press--> winding --press--> powering --let go / held to the end--> rolling
+  rolling --> hopping --> scored --balls left--> aiming
+  scored --the last ball--> result --press (show it all)--> shown --press--> closed
+  ```
+  The arrow starts at the board's left edge sweeping right, and turns exactly
+  at each edge; the press that sets it doesn't move it. Powering counts the
+  ticks held from 1; the tick it's let go rolls with the count as it is, and
+  reaching the end rolls at once. The ball lands at (aim, held × `powerStep`):
+  past the top, the floor's pocket; else a corner hole, else the smallest ring
+  round the centre it's in (edges included), else the floor (`skeeZone`,
+  `skeePoints`). After the last ball, the result line ("You scored {score}!
+  +{tickets} tickets.") types like dialogue, and the tickets join
+  `state.tickets` once. No timer and no random draw: aim decides left and
+  right, the hold how far up.
+- The loader checks: integers throughout; the arrow turns exactly at the
+  board's edges; held to the end, the ball flies off the top; the rings grow
+  outward, the outer one on the board; the corner holes on the board and clear
+  of the rings; the floor at least 1; the result line has `{score}` and
+  `{tickets}`.
+- `skeeView` is logical: the board, its rings, corners, and floor; the arrow's
+  aim; the meter while winding up (`fill` 0..1, and `top`, where on it the
+  board's top falls); the ball in play (where it lands, its stage, rolling,
+  hopping, or landed, how far along, its zone and points); the balls left;
+  the score of the balls landed; the hint (`aim` while aiming, `power` winding
+  up); and the result line.
+- The close-up (`src/ui/skee.ts`, laid out by `layoutSkee` in
+  `src/ui/skee-layout.ts`) is a painting looking up the lane from its foot in
+  one-point perspective (`public/assets/arcade/skee-lane.webp`), calibrated in
+  its pixels (`skee-lane.json`, validated by `parseSkeeCalibration`): the
+  lane's surface at its foot and at the hump, the target board's flat face,
+  and the blank marquee plate. It shows the hood and the upper half of the
+  lane (`skeeFrame`: the middle 75% of the painting's width, from just above
+  the plate down to halfway up the lane, fading out below), as large as the
+  safe area left of the touch buttons allows, under the same UI as the claw.
+- On it, the lane is a plane in one-point perspective like the claw machine's
+  floor. The board's face is seen straight on, at one scale both ways (the
+  board fits the face, its foot on the face's bottom edge), so the rings are
+  round. The rings and holes are drawn in code (pastel collars with ink rims;
+  the 50 and the corners dark holes; each band's points lettered on it), so
+  what's drawn is exactly what scores. The arrow stands 0.58 up the lane at
+  the aim, pointing up it, cream while it sweeps and green once set. Winding
+  up, a dashed ghost ball shows where the ball would land now, red past the
+  top. The ball sets off from the arrow, rolls up the lane (shrinking with
+  it), hops the hump in an arc, and sinks into its hole, or, rolled too hard,
+  drops from the top into the floor's pocket; its target lights, and its
+  points pop up over it. A score sticker (SCORE, and a dot a ball, filled for
+  those still to roll) sits in the paper left of the hood; the hint is
+  lettered on the marquee (SKEE-BALL when there's none). The result line uses
+  the shared speakerless dialogue box; tickets have no reward card.
+- The gallery's skee-ball states are real game states scored by the core
+  (`src/dev/skee-gallery.ts`): aiming, powering, over (wound past the top),
+  rolling, hopping, fifty, corner, and the result.
+  `tests/unit/skee-layout.test.ts` checks the layout itself (the lane's
+  corners and its shortening, a round target on the board, the ball's way
+  from the arrow without a jump at any stage, landing where the core scores
+  it and lighting that target and no other, the ghost, the arrow, and the
+  frame keeping every part in view), and the gallery e2e checks the DOM is
+  that layout within a pixel at 874x402 and 1280x720 in both engines.
+- Skee-ball's cues: `skee-aim` (the aim set), `skee-roll`, `skee-score` (or
+  `skee-hundred` in a corner hole), and `tickets-won` at the result.
+- The ticket counter (Milestone 45): Mr. Pip runs it once he's calm. Its
+  prizes (`counter` in `content/arcade.json`) are the rainbow pinwheel (20
+  tickets), the star bouncy ball (30), the toy rocket (50), and the Star Racer
+  keychain (80): catalogue prizes, never a claw plush, each once, each at least
+  a ticket. `ticket_counter` offers each while Fae has its price and hasn't
+  won it, its line tagged `trade: <prize> <price>` (spec 7). With nothing she
+  can pay for, Mr. Pip says how many tickets she has; with all four won, that
+  she's a champ.
 
 ## 10. Save and load
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 6, state }`, the whole core state, including the
+- Format: `{ version: 7, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
   the set pieces' moods, this visit's recurring critters, the lantern, coins
-  and snacks, the PRNG, the tick, arcade state, and prizes. Version 1 (Maddie in `maddie` and
+  and snacks, the PRNG, the tick, arcade state, prizes, and tickets. Version 1 (Maddie in `maddie` and
   `trail`), version 2 (no lantern), version 3 (no coins or snacks), and
   version 4 (one critter of each kind, no recurring critters) are refused and
   start a new game. Loading restores it exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
-- Version 5 saves upgrade to version 6 with `arcade: null` and `prizes: []`.
-  Version 4 and older, and any mid-game save, are refused.
+- Older saves upgrade: version 5 with `arcade: null`, `prizes: []`, and
+  `tickets: 0`; version 6 with `tickets: 0` (Milestone 45). Version 4 and
+  older, a version from the future, and any mid-game save are refused.
 - `parseSave(json, template)` accepts only a state with the template's exact
   shape (a fresh game state: every key, the same primitive types, all the way
   down; null slots may hold null or an object; every element of an array
@@ -1682,11 +1781,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   are the only shortcut, and they are labeled test-only.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
-- `renderInfo().arcade` is null outside a claw game, otherwise the close-up as
-  drawn, in CSS px: `{ phase, machine, glass, plate, chute, claw: { x, y,
-  open }, plushes: [{ id, x, y, size, held }] }`, the claw's `y` its prong
-  tips and each plush's `x, y` where it stands (its base point), read back
-  from the DOM. Harness builds log `[cloverhollow] arcade { phase, message }`
+- `renderInfo().arcade` is null outside an arcade game, otherwise the open
+  game's close-up as drawn, in CSS px, read back from the DOM. The claw:
+  `{ game: "claw", phase, machine, glass, plate, chute, claw: { x, y, open },
+  plushes: [{ id, x, y, size, held }] }`, the claw's `y` its prong tips and
+  each plush's `x, y` where it stands (its base point). Skee-ball: `{ game:
+  "skee", phase, machine (the whole painting), frame (the part shown), board,
+  plate, hud, arrow: { x, y, set } | null, ghost: { x, y, over } | null,
+  ball: { x, y, radius } | null, lit: { points, side } | null, pop: { x, y,
+  text } | null, score }`, the arrow's `x, y` its foot, and `lit.side` -1 or
+  1 for a corner hole (0 for the rest). Harness builds log `[cloverhollow] arcade { phase, message }`
   when either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, `sound.level()`

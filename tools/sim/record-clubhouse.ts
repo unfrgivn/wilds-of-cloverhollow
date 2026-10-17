@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Records the clubhouse fix-up (Milestone 43), on from the woods run, where
 // the club was just claimed: the lantern off, up the ladder, Sue fixes the old
-// mini fridge and Jordan plants strawberries; down in the woods, Fae calms the
+// fridge and Jordan plants strawberries; down in the woods, Fae calms the
 // critters out there (each calm grows the garden), going up and back down for
 // fresh ones, until the strawberries are ripe; then up again to pick them into
 // the fridge and pack the fridge's snacks.

@@ -95,7 +95,7 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {calmed("arcade-keeper"): The hooded kid scribbled out their initials on the Star Racer high score. Someone from school again... # speaker: Fae}
 {clubhouse_claimed and not calmed("arcade-keeper"): A note in the clubhouse said "NEXT STOP: THE ARCADE." The arcade is in the plaza, back home. # speaker: Fae}
 {garden_planted and not garden_ripe: Jordan planted strawberries on the clubhouse deck. Every critter I calm helps them grow. # speaker: Fae}
-{fridge_fixed: Sue fixed the clubhouse's old mini fridge. It's cold and humming! # speaker: Fae}
+{fridge_fixed: Sue fixed the clubhouse's old fridge. It's cold and humming! # speaker: Fae}
 {clubhouse_claimed and not (fridge_fixed and garden_planted): The Whispering Woods clubhouse is ours. Sue will fix a fridge, and Jordan will grow a garden. # speaker: Fae}
 {found_old_trail: The hooded kid's glowing trail goes west through the pines, toward the Whispering Woods. # speaker: Fae}
 {calmed("gull"): The grumpy gull at the lookout was fizzy too. That hooded kid gets around! # speaker: Fae}
@@ -988,11 +988,11 @@ VAR garden_ripe = false
 
 === club_fridge ===
 {fridge_fixed: -> stocked}
-An old mini fridge. It's dark inside, and as warm as toast. # speaker: Fae
+An old fridge with its door hanging open. Inside, it's as warm as toast. # speaker: Fae
 Leave it to me! I keep the cooler on my dad's boat running. # speaker: Sue
 Sue wiggles the plug, gives the door a bump with her hip, and... # speaker: Fae
 ~ fridge_fixed = true
-Hummmm! The little fridge shivers, and a cool glow comes on inside. # speaker: Fae
+Hummmm! The door clicks shut, the old fridge shivers, and a cool glow comes on. # speaker: Fae
 Ta-da! Cold and humming. Now the club needs something to keep in it. # speaker: Sue
 {not garden_planted: Jordan, didn't you bring seeds? # speaker: Sue}
 -> DONE

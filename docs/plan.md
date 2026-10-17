@@ -1516,11 +1516,12 @@ the old trail, the owl, and the clubhouse claim.
   `club_ladder`: "It isn't ours to climb into... yet."). The room is a
   cutaway of the tree house's one room and its deck: plank walls, the round
   window, string lights, the beanbag, a crate table with comics, the kid's
-  purple soda bottles, an old mini fridge, and three planter boxes along the
+  purple soda bottles, an old fridge, and three planter boxes along the
   deck's railing. The ladder's top in the deck leads back down.
-- Sue fixes the fridge (`fridge_fixed`): dark and warm until she bumps it
-  back to life. Jordan plants strawberries (`garden_planted`): "a garden
-  grows best when everything around it is calm." Every calm after that,
+- Sue fixes the fridge (`fridge_fixed`): its door hangs open and it's warm
+  inside until her hip bumps it shut and back to life. Jordan plants
+  strawberries (`garden_planted`): "a garden grows best when everything
+  around it is calm." Every calm after that,
   anywhere, grows it: one sprouts it, three ripen it. Ripe strawberries go
   into the fridge a basket at a time (once it works), and each basket is
   three snacks. The plants keep growing: two more calms ripen them again.

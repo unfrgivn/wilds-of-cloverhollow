@@ -505,7 +505,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   Inside, the ladder's top in the deck's hole leads back down (trigger
   `ladder` to `woods.clubhouse`; spawn `ladder` (687, 493) facing up). Its
   floor is the plank floor and the deck inside the rope railing. Its props
-  are the old mini fridge, the crate table with its comics, the beanbag, the
+  are the old fridge, the crate table with its comics, the beanbag, the
   two runs of rope railing, and the three planter boxes as one prop, the
   garden. Look points: `club-fridge` (knot `club_fridge`), `club-garden`
   (`club_garden`), `comics`, and `bottles` (the kid's purple soda bottles).

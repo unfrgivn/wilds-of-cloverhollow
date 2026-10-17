@@ -18,7 +18,7 @@ import { areaConnectionErrors, hiddenPositions } from "../../src/content/area-ch
 import { loadContent, storyTagErrors } from "../../src/content/load";
 
 // Contract for Milestone 43, the clubhouse fix-up. Sue fixes the clubhouse's
-// old mini fridge; Jordan plants strawberries on the deck. The garden grows
+// old fridge; Jordan plants strawberries on the deck. The garden grows
 // as Fae calms critters anywhere (the story's `on_calm` hook, run by the core
 // after every calm): one calm sprouts it, three ripen it. Ripe strawberries go
 // into the fridge a basket at a time, and each basket is three snacks
@@ -67,10 +67,10 @@ describe("Sue's fridge", () => {
   it("is fixed with a bump of Sue's hip", () => {
     const fix = play(claimed, "club_fridge");
     expect(fix.lines).toEqual([
-      "An old mini fridge. It's dark inside, and as warm as toast.",
+      "An old fridge with its door hanging open. Inside, it's as warm as toast.",
       "Leave it to me! I keep the cooler on my dad's boat running.",
       "Sue wiggles the plug, gives the door a bump with her hip, and...",
-      "Hummmm! The little fridge shivers, and a cool glow comes on inside.",
+      "Hummmm! The door clicks shut, the old fridge shivers, and a cool glow comes on.",
       "Ta-da! Cold and humming. Now the club needs something to keep in it.",
       "Jordan, didn't you bring seeds?",
     ]);
@@ -271,7 +271,7 @@ describe("the journal", () => {
     const growing = calm(planted);
     expect(notes(growing)).toEqual(expect.arrayContaining([
       "Jordan planted strawberries on the clubhouse deck. Every critter I calm helps them grow.",
-      "Sue fixed the clubhouse's old mini fridge. It's cold and humming!",
+      "Sue fixed the clubhouse's old fridge. It's cold and humming!",
     ]));
     expect(notes(growing).join(" ")).not.toContain("Sue will fix a fridge");
     const ripe = calm(calm(growing));

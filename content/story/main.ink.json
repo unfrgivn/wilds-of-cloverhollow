@@ -1321,7 +1321,7 @@
           },
           {
             "b": [
-              "^ Sue fixed the clubhouse's old mini fridge. It's cold and humming! ",
+              "^ Sue fixed the clubhouse's old fridge. It's cold and humming! ",
               "#",
               "^speaker: Fae",
               {
@@ -7990,7 +7990,7 @@
         ],
         "nop",
         "\n",
-        "^An old mini fridge. It's dark inside, and as warm as toast. ",
+        "^An old fridge with its door hanging open. Inside, it's as warm as toast. ",
         "#",
         "^speaker: Fae",
         "/#",
@@ -8012,7 +8012,7 @@
           "VAR=": "fridge_fixed",
           "re": true
         },
-        "^Hummmm! The little fridge shivers, and a cool glow comes on inside. ",
+        "^Hummmm! The door clicks shut, the old fridge shivers, and a cool glow comes on. ",
         "#",
         "^speaker: Fae",
         "/#",

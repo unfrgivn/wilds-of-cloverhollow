@@ -1,0 +1,16 @@
+{
+  "id": "pond-pup",
+  "name": "Pond Pup",
+  "atlas": "assets/characters/pond-pup/pond-pup.json",
+  "box": {
+    "width": 44,
+    "height": 56
+  },
+  "walkCycleUnits": 84,
+  "sits": true,
+  "start": false,
+  "joins": "pup_with_me",
+  "flute": true,
+  "critter": "pup",
+  "command": null
+}

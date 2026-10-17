@@ -1,0 +1,295 @@
+{
+  "asset": "pond-pup",
+  "milestone": 47,
+  "status": "validator-passing; owner review pending",
+  "summary": "The Pond Pup as a walking follower (a flute friend): the calm pup critter's design (public/assets/critters/pup/, calm_idle_01) drawn as Maddie's six animations at Maddie's scale.",
+  "generationSource": "Generated with Gemini: a character in the game's own painted style, which no open source has (docs/media-sources.md is for sounds and photos).",
+  "references": [
+    "public/assets/critters/pup/pup.png (calm_idle_01, soothed_01): his look",
+    "public/assets/characters/maddie/maddie.png: scale and framing",
+    "art/source/maddie/ walk strips: the strip layout, for the first two walk calls"
+  ],
+  "calls": 25,
+  "callNotes": "25 calls: 16 by the first worker (one failed with an unsupported reference and returned no image), 9 in the revision. The kept sources are the model's own outputs, byte for byte.",
+  "sources": {
+    "art/source/pond-pup/model-sheet.png": "His model sheet: front standing, back, left side, sitting front, three-quarter. The idles are its back (idle_up), side (idle_left), and sitting front (idle_down) figures.",
+    "art/source/pond-pup/front-sheet.png": "walk_down: head-on trot, two rows of the same cycle; the bottom row's six (figures 7-12) step right paw up and high, then left paw up, high, and down, evenly. Prompted with the back walk as the build to match (an earlier head-on strip drew him tall and leggy, so the down idle, his sit, read 1.62x the walk's area) and a head-on frame as the view (earlier strips turned three-quarter, mirror IoU 0.67).",
+    "art/source/pond-pup/back-grid.png": "walk_up: back view, a 3x2 grid read row by row; tail wagging, hind paws stepping.",
+    "art/source/pond-pup/left-strip.png": "walk_left: from the first worker's sheet, its six left-facing frames in sheet order (figures 3-8; figure 2 faces right, and figure 1, before it, isn't part of the run)."
+  },
+  "postProcessing": [
+    "tools/art/build-pond-pup.ts rebuilds the atlas byte for byte from the four sources.",
+    "tools/art/extract-figures.ts cuts each sheet into whole figures: the largest connected components of the keyed sheet, read row by row, each written on the key colour alone. A figure is never cropped, and a faded copy the model drew above a figure (the front sheets did) stays out.",
+    "Key #00FF00 (he is brown, cream, red, and pink), key-alpha with holes; despill on the 2 px alpha edge only.",
+    "One uniform scale per sheet (postprocess.ts --scale-percent): the model sheet at 13.3% stands him about 100 px (50 units, Maddie's height); each walk sheet's factor puts its tallest frame at the model sheet's height for that view (front 16.30%, back 13.13%, side 34.53%). No frame is resized, re-registered, or warped on its own.",
+    "256x256 frames, feet on row 247 (8 px bottom margin), anchor {x: 0.5, y: 247/256}; pack-atlas.ts, six columns."
+  ],
+  "measured": {
+    "standing": "100 px tall (50 units); Maddie's down idle 98 px, down walk 110 px",
+    "sitting": "102 px",
+    "areaRatios": "idle/walk down 1.27, up 1.02, left 0.93 (Maddie: 1.27, 1.10, 0.70)",
+    "mirrorIoU": "walk_down 0.88, walk_up 0.88 (Maddie: 0.87, 0.82)"
+  },
+  "validator": {
+    "biped": false,
+    "key": "green"
+  },
+  "validatorOutput": "PASS sprite validator: all frames, animations, edges, components, spill, and baseline checks passed",
+  "callLog": [
+    {
+      "time": "2026-10-17T15:36:16.219Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "public/assets/critters/pup/pup.png",
+        "public/assets/characters/maddie/maddie.png",
+        "docs/art/style-bible.md"
+      ],
+      "prompt": "Create a clean character reference sheet for the Pond Pup follower in the established Cloverhollow watercolor-and-ink style. Use the attached approved calm pup frames as exact character design reference and Maddie as exact companion scale/framing reference. Show exactly five isolated full-body views on a flat pure green #00FF00 background: standing down, standing up/back, standing left profile facing LEFT, sitting down facing camera, plus one small three-quarter standing reference only if it does not duplicate. The pup is a chunky little brown puppy, darker-brown floppy ears, dark patch over one eye, red-and-white baseball cap, pink cheeks, cream muzzle/chest/paws, short upturned tail. Watercolor washes, thin warm-brown ink, no ground shadow, full body with breathing room, no text, no extra animals, no duplicate limbs.",
+      "output": null,
+      "error": "Unable to process input image. Please retry or report in https://developers.generativeai.google/guide/troubleshooting"
+    },
+    {
+      "time": "2026-10-17T15:36:42.324Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "public/assets/critters/pup/pup.png",
+        "public/assets/characters/maddie/maddie.png"
+      ],
+      "prompt": "Create a clean character reference sheet for the Pond Pup follower in the established Cloverhollow watercolor-and-ink style. Use the attached approved calm pup frames as exact character design reference and Maddie as exact companion scale/framing reference. Show exactly five isolated full-body views on a flat pure green #00FF00 background: standing down, standing up/back, standing left profile facing LEFT, sitting down facing camera, plus one small three-quarter standing reference only if it does not duplicate. The pup is a chunky little brown puppy, darker-brown floppy ears, dark patch over one eye, red-and-white baseball cap, pink cheeks, cream muzzle/chest/paws, short upturned tail. Watercolor washes, thin warm-brown ink, no ground shadow, full body with breathing room, no text, no extra animals, no duplicate limbs.",
+      "output": "1792251402322-gemini-3-pro-image-0.png",
+      "kept": "art/source/pond-pup/model-sheet.png"
+    },
+    {
+      "time": "2026-10-17T15:37:34.841Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "Create a six-frame horizontal animation strip of the Pond Pup from the attached reference sheet, on a flat pure green #00FF00 background. Exactly six evenly spaced full-body frames, same scale and baseline, no overlap, no text. A real gentle trot: alternating legs, subtle body bob, floppy ears and short upturned tail move, red-and-white cap remains identical. Direction: down. For down, trot toward camera with face visible. For up, trot away with cap/ears/tail from behind and no face. For left, clean left-facing side profile, muzzle points LEFT. Watercolor-and-ink, warm brown outlines, no shadow, no extra animals or limbs.",
+      "output": "1792251454840-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:37:58.289Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "Create a six-frame horizontal animation strip of the Pond Pup from the attached reference sheet, on a flat pure green #00FF00 background. Exactly six evenly spaced full-body frames, same scale and baseline, no overlap, no text. A real gentle trot: alternating legs, subtle body bob, floppy ears and short upturned tail move, red-and-white cap remains identical. Direction: up. For down, trot toward camera with face visible. For up, trot away with cap/ears/tail from behind and no face. For left, clean left-facing side profile, muzzle points LEFT. Watercolor-and-ink, warm brown outlines, no shadow, no extra animals or limbs.",
+      "output": "1792251478288-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:38:22.075Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "Create a six-frame horizontal animation strip of the Pond Pup from the attached reference sheet, on a flat pure green #00FF00 background. Exactly six evenly spaced full-body frames, same scale and baseline, no overlap, no text. A real gentle trot: alternating legs, subtle body bob, floppy ears and short upturned tail move, red-and-white cap remains identical. Direction: left. For down, trot toward camera with face visible. For up, trot away with cap/ears/tail from behind and no face. For left, clean left-facing side profile, muzzle points LEFT. Watercolor-and-ink, warm brown outlines, no shadow, no extra animals or limbs.",
+      "output": "1792251502074-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:39:46.167Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "SINGLE HORIZONTAL ROW ONLY: exactly six evenly spaced animation frames, no second row, no collage, no model sheet. Pond Pup from attached reference, all six frames facing down, identical scale and feet baseline on pure green #00FF00. A sequential trot cycle with six different alternating leg poses; body bobs slightly, ears and upturned tail move. No other viewpoints, no front/back turns.   Show the face in every frame, walking toward camera. No text, shadows, overlap, cropping, extra animals or limbs.",
+      "output": "1792251586166-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:40:12.557Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "SINGLE HORIZONTAL ROW ONLY: exactly six evenly spaced animation frames, no second row, no collage, no model sheet. Pond Pup from attached reference, all six frames facing up, identical scale and feet baseline on pure green #00FF00. A sequential trot cycle with six different alternating leg poses; body bobs slightly, ears and upturned tail move. No other viewpoints, no front/back turns.  Show only the back in every frame, walking away, no face.  No text, shadows, overlap, cropping, extra animals or limbs.",
+      "output": "1792251612556-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:40:46.691Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "SINGLE HORIZONTAL ROW ONLY: exactly six evenly spaced animation frames, no second row, no collage, no model sheet. Pond Pup from attached reference, all six frames facing left, identical scale and feet baseline on pure green #00FF00. A sequential trot cycle with six different alternating leg poses; body bobs slightly, ears and upturned tail move. No other viewpoints, no front/back turns. Muzzle points LEFT in every frame.   No text, shadows, overlap, cropping, extra animals or limbs.",
+      "output": "1792251646690-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:42:06.088Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "ONE SINGLE HORIZONTAL ROW of EXACTLY SIX, not eight, full-body Pond Pup frames. Every frame is the SAME LEFT-FACING SIDE PROFILE: muzzle points left, only one visible eye patch, red-and-white baseball cap clearly visible in every frame. This is a sequential trot: contact, passing, contact, opposite passing, contact, passing with alternating legs, subtle bob, ears and short upturned tail moving. Same scale and feet baseline, separated by wide green gutters. Pure #00FF00 background, no second row, no collage, no text, no other viewpoint, no animals, no limbs outside body.",
+      "output": "1792251726086-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:42:56.236Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "Sprite sheet, not a concept sheet: exactly six equal cells in ONE horizontal row, six and only six. The same Pond Pup walks TOWARD camera in all cells, frontal down-facing view. Show a clear six-step trot with alternating front/rear legs, subtle body bob and ear movement. Identical red-white cap, brown floppy ears, eye patch, cream muzzle/paws, short tail. Wide pure green background gutters, full body never cropped, no second row, no turn, no side or rear views, no text.",
+      "output": "1792251776227-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:43:40.435Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "Exactly six separate equal-size cells in one single horizontal row. Same Pond Pup in a LEFT-facing side profile in every cell, muzzle points left, red-white baseball cap visible every time. Six sequential trot poses with alternating legs, moving ears and tail. Pure green #00FF00 background, full body, no second row, no extra viewpoints, no text, no animals, no cropping.",
+      "output": "1792251820434-gemini-3-pro-image-0.png",
+      "kept": "art/source/pond-pup/left-strip.png"
+    },
+    {
+      "time": "2026-10-17T15:47:15.833Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792251402322-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "Use the approved Pond Pup reference. Generate exactly six full-body frames in one horizontal row, all front-facing walking toward camera. Count six panels explicitly: frame 1 contact, 2 passing, 3 contact, 4 passing, 5 contact, 6 passing. Same red-white cap, brown dog, cream paws, no turns or side/back views, alternating legs, subtle bob and ear motion. Pure green background with wide gutters, no second row, no text, no extra limbs.",
+      "output": "1792252035832-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:51:53.043Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "public/assets/critters/pup/pup.png",
+        "public/assets/characters/maddie/maddie.png"
+      ],
+      "prompt": "Make a single reference sheet for one Pond Pup companion, using the attached calm pup and Maddie only for design and scale. Exactly three large isolated views on pure green #00FF00: LEFT column a sitting FRONT view for idle_down, CENTER a standing BACK view for idle_up with no face, RIGHT a standing LEFT side profile facing left for idle_left. Whole figure visible from cap/ears to paws/tail with generous transparent-green margin above and around, no clipping. Same chunky brown puppy, dark floppy ears, fixed dark eye patch, red-white baseball cap, cream muzzle/chest/paws, pink cheeks, short upturned tail. No text, no extra poses, no other animals.",
+      "output": "1792252313041-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:52:39.617Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792252313041-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "One single horizontal row of exactly six front-facing Pond Pup trot frames. All six face the camera, same fixed red-white cap and dark eye patch on same eye, same scale and baseline, whole dog with generous green margin. Six sequential contact/passing leg poses, alternating trot, small ear/body bob, no turns, no duplicates, no second row, no text, no other figures. Pure #00FF00 background.",
+      "output": "1792252359616-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:53:34.697Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792252313041-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "One single horizontal row of exactly six rear-facing Pond Pup trot frames. All six face away from camera with red-white cap, dark ears, tail, no face. Same scale and baseline, whole figure with green margins, sequential alternating trot poses, no second row, no extra figures, no text. Pure #00FF00 background.",
+      "output": "1792252414696-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T15:54:23.299Z",
+      "model": "gemini-3-pro-image",
+      "refs": [
+        "art/scratch/1792252313041-gemini-3-pro-image-0.png",
+        "public/assets/critters/pup/pup.png"
+      ],
+      "prompt": "One single horizontal row of exactly six LEFT-facing side-profile Pond Pup trot frames. Muzzle points left in every frame, red-white cap and dark eye patch consistent, same scale and baseline, whole body, alternating legs, moving ears and upturned tail. No second row, no extra figures, no text, pure #00FF00 background.",
+      "output": "1792252463298-gemini-3-pro-image-0.png"
+    },
+    {
+      "time": "2026-10-17T16:03:57.241Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "../../art/source/maddie/maddie-walk-down-v2-a.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames in ONE horizontal row, evenly spaced, on a flat solid pure green (#00FF00) background with nothing else on it. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. In every frame he trots STRAIGHT TOWARD the viewer, square to the camera, like the sitting front view on his sheet but standing and walking: we see his face head-on, both ears, the whole cap, both front legs and paws. The six frames are one smooth trot cycle: his front paws take turns stepping forward, his ears bounce, his head bobs a little. Same size and the same height in every frame, standing on one invisible baseline. The whole puppy is inside each frame, with clear space above his cap. No ground, no shadows, no text, no other characters. The SECOND reference image (a different character) only shows the strip layout to follow: do not copy its look.",
+      "output": "1792253037238-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:04:22.520Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "../../art/source/maddie/maddie-walk-up-b.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames in ONE horizontal row, evenly spaced, on a flat solid pure green (#00FF00) background with nothing else on it. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. In every frame he trots STRAIGHT AWAY from the viewer, square to the camera, like the back view on his sheet: we see the back of his head and the back of the red cap with its strap, both floppy ears from behind, his back, his tail up, and both hind legs and paws; never his face. The six frames are one smooth trot cycle: his hind paws take turns stepping, his tail wags from side to side, his ears bounce. Same size and the same height in every frame, standing on one invisible baseline. The whole puppy is inside each frame, with clear space above his cap. No ground, no shadows, no text, no other characters. The SECOND reference image (a different character) only shows the strip layout to follow: do not copy its look.",
+      "output": "1792253062519-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:05:38.915Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame walk animation for a cozy hand-painted children's game. The character is the little brown puppy in the reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. In every frame he trots STRAIGHT TOWARD the viewer, square to the camera, like the sitting front view on his sheet but standing and walking: we see his face head-on, both ears, the whole cap, both front legs and paws. The six frames are one smooth trot cycle: his front paws take turns stepping forward, his ears bounce, his head bobs a little. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each puppy centred in its own cell with plenty of green around it, on one flat solid pure green (#00FF00) background. No grid lines, no borders, no labels. Draw each puppy exactly once: no faded copies, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Same size in every frame. The whole puppy fits in each cell, with clear space above his cap.",
+      "output": "1792253138913-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:06:01.639Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame walk animation for a cozy hand-painted children's game. The character is the little brown puppy in the reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. In every frame he trots STRAIGHT AWAY from the viewer, square to the camera, like the back view on his sheet: we see the back of his head and the back of the red cap with its strap, both floppy ears from behind, his back, his tail up, and both hind legs and paws; never his face. The six frames are one smooth trot cycle: his hind paws take turns stepping, his tail wags from side to side, his ears bounce. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each puppy centred in its own cell with plenty of green around it, on one flat solid pure green (#00FF00) background. No grid lines, no borders, no labels. Draw each puppy exactly once: no faded copies, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Same size in every frame. The whole puppy fits in each cell, with clear space above his cap.",
+      "output": "1792253161637-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/pond-pup/back-grid.png"
+    },
+    {
+      "time": "2026-10-17T16:07:34.864Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "art/scratch/pond-pup-front-pose.png"
+      ],
+      "prompt": "Make a six-frame walk animation for a cozy hand-painted children's game. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. The SECOND reference image shows exactly the pose for every frame: he walks STRAIGHT TOWARD the viewer, square to the camera, his face head-on, both ears and the whole cap showing, never turned to the side. Keep that head-on view in all six frames. The six frames are one smooth trot cycle, seen from the front: his left front paw steps forward, then both paws are under him, then his right front paw steps forward, then both under him, and so on, his ears bouncing and his head bobbing a little. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each puppy centred in its own cell with plenty of green around it, on one flat solid pure green (#00FF00) background. No grid lines, no borders, no labels. Draw each puppy exactly once: no faded copies, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Same size in every frame. The whole puppy fits in each cell, with clear space above his cap.",
+      "output": "1792253254862-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:08:56.149Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "art/scratch/pond-pup-front-pose.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced, on one flat solid pure green (#00FF00) background. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. The SECOND reference image shows exactly his pose: he walks STRAIGHT TOWARD the viewer, square to the camera, his face head-on, both ears and the whole cap showing. Keep that head-on view in all six frames, never turned to the side. The six frames are one smooth trot cycle seen from the front: his front paws take turns stepping forward, his ears bounce, his head bobs a little. Same size and the same height in every frame, standing on one invisible baseline. Draw each puppy exactly once: NO faded copies above or behind them, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Leave the green above and below the row empty.",
+      "output": "1792253336148-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:15:40.316Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "art/scratch/pond-pup-headon.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced, on one flat solid pure green (#00FF00) background. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. In all six frames he faces us EXACTLY like the SECOND reference image: perfectly head-on and symmetrical, his body pointing straight at us, so his tail is hidden behind him; the cap, the face, and the chest stay centred and square to us. He is walking toward us: only his legs move. In turn, one front paw lifts and steps toward us while the other stays down, then the other; his ears swing a little, the same way on both sides. Same size and the same height in every frame, standing on one invisible baseline. Draw each puppy exactly once: NO faded copies above or behind them, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Leave the green above and below the row empty.",
+      "output": "1792253740315-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:17:27.160Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "art/scratch/pond-pup-headon2.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced, on one flat solid pure green (#00FF00) background. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. In all six frames he faces us EXACTLY like the SECOND reference image: perfectly head-on and symmetrical, his body pointing straight at us; the cap, the face, and the chest stay centred and square to us. He walks toward us, and his two front paws take turns, like this: frame 1, both front paws on the ground; frame 2, the paw on the LEFT side of the picture lifts a little; frame 3, that same LEFT-side paw is lifted high, bent at the wrist; frame 4, both front paws on the ground again; frame 5, the paw on the RIGHT side of the picture lifts a little; frame 6, that RIGHT-side paw is lifted high, bent at the wrist. His head bobs down a little when a paw is high. Same size in every frame, standing on one invisible baseline. Draw each puppy exactly once: NO faded copies above or behind them, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Leave the green above and below the row empty.",
+      "output": "1792253847158-gemini-3-pro-image-preview-0.png"
+    },
+    {
+      "time": "2026-10-17T16:21:01.201Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/pond-pup/model-sheet.png",
+        "art/scratch/pond-pup-back-pose.png",
+        "art/scratch/pond-pup-headon2.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced, on one flat solid pure green (#00FF00) background. The character is the little brown puppy in the FIRST reference image (his model sheet): a chunky brown puppy with big dark-brown floppy ears, a soft dark grey-brown patch around one eye (the eye on the left side of the picture when he faces us), pink cheeks, a cream muzzle, a cream chest and cream paws, a short upturned tail, and a red baseball cap with a white front panel. Copy his face, colours, proportions and the soft watercolour with warm brown ink outlines exactly. No purple, no spirals, no sparkles. He walks STRAIGHT TOWARD us, perfectly head-on and symmetrical like the THIRD reference image, but with the SECOND reference image's build: the second image is the same puppy walking AWAY from us, and the front view must be its mirror twin, just as short, wide, chubby and low as he is from behind there, with the same short stubby legs. So: a big round head and round tummy, short stumpy legs, wide floppy ears, not tall or leggy. His two front paws take turns: frame 1, both paws down; frame 2, the paw on the LEFT side of the picture lifts a little; frame 3, that LEFT-side paw lifts higher; frame 4, both down; frame 5, the paw on the RIGHT side of the picture lifts a little; frame 6, that RIGHT-side paw lifts higher. Same size in every frame, standing on one invisible baseline. Draw each puppy exactly once: NO faded copies above or behind them, no ghosting, no motion trails, no reflections, no shadows, no ground, no text, no other characters. Leave the green above and below the row empty.",
+      "output": "1792254061199-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/pond-pup/front-sheet.png"
+    }
+  ]
+}

@@ -84,11 +84,11 @@ function line(story: Story): InkLine | null {
   };
 }
 
-// What the story's externals answer (spec 7): `calmed(id)` and `coins()`.
-// The core builds them from its state (`inkFacts`); the defaults are a new
-// game's.
-export type InkFacts = { calmed: Record<string, boolean>; coins: number };
-const newGameFacts: InkFacts = { calmed: {}, coins: 0 };
+// What the story's externals answer (spec 7): `calmed(id)`, `coins()`, and
+// `snacks()`. The core builds them from its state (`inkFacts`); the defaults
+// are a new game's (it starts with two snacks).
+export type InkFacts = { calmed: Record<string, boolean>; coins: number; snacks: number };
+const newGameFacts: InkFacts = { calmed: {}, coins: 0, snacks: 2 };
 
 // The externals are answered for every command, so a knot can ask on any
 // line, not only its first.
@@ -105,6 +105,7 @@ export function runInk(
     (id: unknown) => typeof id === "string" && facts.calmed[id] === true,
   );
   story.BindExternalFunction("coins", () => facts.coins);
+  story.BindExternalFunction("snacks", () => facts.snacks);
   if (command.type === "start") story.ChoosePathString(command.knot);
   if (command.type === "choose") story.ChooseChoiceIndex(command.index);
   const blank = (output: string | null): boolean =>

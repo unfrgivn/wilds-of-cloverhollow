@@ -1638,39 +1638,69 @@ the old trail, the owl, and the clubhouse claim.
   - The clubhouse, its four paintings, the props, and the wording are in
     the owner's review queue.
 
-## Milestone 47: Flute friends **Status:** 🚧 In progress (2026-10-17)
+## Milestone 47: Flute friends **Status:** ✅ Completed (2026-10-17)
 - The owner picked flute friends next (2026-10-17). NOTES.md: the flute
   "calls animal friends to your side like cute kitties and puppies"; Fae has
   to "build a bond with the animals by feeding them treats and petting them";
   "specific animals have specific abilities that help in puzzles". The
   journal has promised it since Milestone 38: "When I play it, animal friends
   come running."
-- The bond: once Fae has the flute, a calm Pond Pup (the plaza's and the
-  park's recurring pups) can be petted and given a snack (a treat: the
-  bakery's, or the clubhouse garden's strawberries). Both, and the pups are
-  her friends (`pup_friend`).
-- The flute is a tool, like the lantern: F (the gamepad's Y, a touch button
-  once she has it) plays it. Its knot, `flute`, calls a friend to Fae's side or
-  sends it home (`pup_with_me`). Before she has a friend, nobody comes, yet.
+- The bond: once Fae has the flute, a calm Pond Pup's talk (after his first,
+  the purple-thread tale) offers Pet him and Share a snack (the bakery's, or
+  the clubhouse garden's strawberries). Both, in either order, and the pups
+  are her friends (`pup_friend`); without a snack, Fae says where to get one.
+- The flute is a tool, like the lantern: F, the gamepad's right shoulder
+  (RB/R1; Y already opens the journal), or a ♪ touch button beside the
+  lantern's once she has it. It plays the `flute` knot, which calls the Pond
+  Pup (`pup_with_me`) or sends him home. Before she has a friend, "Nobody
+  comes... yet."
 - A flute friend follows Fae like the party (party content `flute: true`,
-  with no battle command) and goes through doors with her. It sits out
-  battles: friends who help in battles are the battle ideas' "flute friends",
-  later.
-- The Pond Pup swims. In the park, something glints at the bottom of the pond,
-  out of reach. With the Pond Pup at her side, Fae says "Fetch!", and he
-  paddles out and dives for it: an old tin of coins, left for whoever finds
-  it.
-- Art: the Pond Pup as a follower, a walking sprite in the critter's calm
-  design (the brown pup in the red cap), made like Maddie's.
+  `command: null`) and goes through doors with her; it's the only member who
+  leaves (its variable false). It sits battles out: it gives no command and
+  isn't drawn in the battle scene. Called where a calm pup is, it's that pup
+  who comes along: he steps out of the area into the party (`critter: "pup"`).
+- The Pond Pup swims: in the park, something glints at the bottom of the
+  pond, out of reach (look point `pond`, its south rim). With him along,
+  "Fetch, boy!", and he dives for an old tin of twelve coins, once.
+- Art: the Pond Pup as a follower (`public/assets/characters/pond-pup/`),
+  the calm pup's design in Maddie's six animations at her scale.
 - Engine:
-  - `ActionFrame.flute`, optional like `lantern`.
-  - The story's `snacks()` external; a `feed: snack <n>` line tag (Fae gives
-    snacks away) and `gift: coins <n>`.
-  - A flute friend joins when its `joins` variable is true and leaves when it
-    isn't; it gives no battle command and isn't drawn in battles.
+  - `ActionFrame.flute`, optional like `lantern`: keyboard F, the gamepad's
+    button 5, the touch ♪. The tool buttons step aside while a conversation
+    or a battle is open.
+  - The story's `snacks()` external; `feed: snack <n>` (Fae gives snacks
+    away, never below none) and `gift: coins <n>` line tags.
+  - `battleParty`: the members with a battle command.
+  - `tools/art/extract-figures.ts` cuts a generated sheet into whole
+    figures (the largest connected components, read row by row, each on the
+    key colour alone), so a figure is never cropped and a faded copy the
+    model drew above one stays out.
+- Evidence: unit tests (`flute-friends.test.ts`: the bond in either order,
+  no snack, the snack taken through the core, the flute on F and not before,
+  a held F playing once, calling and sending home, the friend joining,
+  following, and leaving by its variable, the calm pup stepping out (fails
+  with it off), a chaos pup staying, sitting battles out, the pond and its
+  coins through the core, the journal, the content rules, and the gamepad's
+  button), the recorded run `pass-party/flute.json`
+  (`tools/sim/record-flute.ts`, on from the field run: out of school with
+  the nurse's hall pass, the park's pup calmed and befriended, the flute, a
+  battle he sits out, the tin, and home) with its replay test, and
+  the real-key e2e `flute.spec.ts` (the bond, following, the battle without
+  him, the pond, at both sizes; the touch ♪ button and the tools stepping
+  aside, in Chromium and WebKit; browser and Bun hashes match). Gates:
+  `just check` (619 unit tests, the sim, purity, lint), `just build`, and
+  `just e2e` (470 passed, 2 skipped; then the touch test on WebKit too).
 - Notes and assumptions:
   - The Pond Pup is the first friend. The Cozy Cat comes later: it looks like
     Maddie (an orange cat in blue), so it waits for an ability of its own.
+  - Flute friends in battles stay the battle ideas' "flute friends", for the
+    battle session.
+  - The run leaves school by the nurse's hall pass, the way chapter one does,
+    since the flute comes at recess; the field run is unchanged.
+  - Gemini calls: 25, all for the sprite (16 by the first worker, 9 in the
+    revision; one failed). The kept sources are the model's own outputs.
+  - The sprite, the flute's and the pond's lines, and the ♪ glyph (text, not
+    art) are in the owner's review queue.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
@@ -1965,8 +1995,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     Catch: done (above). Then Milestone 42, feelings: done (above). The
     rest of `docs/battle-ideas.md` stays unscheduled until the owner picks.
   - Milestone 43, the clubhouse fix-up: done (above).
-  - Milestone 47, flute friends: in progress (above). Milestones 44 to 46,
-    the arcade games, are in progress in another session.
+  - Milestone 47, flute friends: done (above). Milestones 44 to 46, the
+    arcade games, are in progress in another session.
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

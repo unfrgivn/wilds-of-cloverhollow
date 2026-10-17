@@ -78,6 +78,18 @@
   background-repeat: no-repeat;
 }
 .touch-lantern[hidden] { display: none; }
+.touch-flute {
+  width: var(--touch-cancel-size);
+  height: var(--touch-cancel-size);
+  font-size: 26px;
+}
+.touch-flute[hidden] { display: none; }
+/* The tools do nothing in a conversation or a battle (spec 3.2), so they step
+   aside: the dialogue reserves room for confirm and cancel only. */
+:root[data-dialogue="open"] :is(.touch-lantern, .touch-flute),
+:root[data-battle="open"] :is(.touch-lantern, .touch-flute) {
+  display: none;
+}
 .touch-lantern.is-on {
   color: #6e4caa;
   background-color: #eadbff;

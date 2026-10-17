@@ -223,6 +223,7 @@ function keysFor(frame: ActionFrame): string[] {
     ...(frame.move.y > 0 ? ["ArrowDown"] : frame.move.y < 0 ? ["ArrowUp"] : []),
     ...(frame.confirm ? ["z"] : []),
     ...(frame.lantern ? ["l"] : []),
+    ...(frame.flute ? ["f"] : []),
   ];
 }
 

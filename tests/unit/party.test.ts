@@ -76,6 +76,8 @@ const scout: PartyContent = {
   sits: false,
   start: false,
   joins: null,
+  flute: false,
+  critter: null,
   command: {
     id: "whistle",
     label: "Whistle",
@@ -126,7 +128,9 @@ describe("party content", () => {
     expect(maddie?.start).toBe(true);
     expect(maddie?.sits).toBe(true);
     expect(Object.keys(world.battle.commands).sort()).toEqual(["run", "snack", "soothe"]);
-    const rosterCommands = Object.values(world.party).map((member) => member.command.id);
+    // Flute friends have no battle command (spec 5).
+    const rosterCommands = Object.values(world.party)
+      .flatMap((member) => member.command === null ? [] : [member.command.id]);
     for (const critter of Object.values(world.critters)) {
       expect(Object.keys(critter.commands.friends)).toEqual(rosterCommands);
       expect(Object.keys(critter.lines.friends)).toEqual(rosterCommands);

@@ -10,6 +10,7 @@ export type ActionFrame = {
   cancel: boolean;
   menu: boolean;
   lantern?: boolean;
+  flute?: boolean;
   choose?: number;
 };
 export type FollowTunables = {
@@ -182,7 +183,14 @@ export type PartyContent = {
   start: boolean;
   // Ink variable which adds this friend during play, or null for starters.
   joins: string | null;
-  command: { id: string; label: string; resting: string; check: CheckSpec };
+  // A flute friend (an animal Fae calls with her flute): it leaves again when
+  // its joins variable isn't true, and it sits battles out (spec 5).
+  flute: boolean;
+  // The recurring critter kind a flute friend is: called while a calm one is
+  // out in Fae's area, it's that one who comes (null for everyone else).
+  critter: string | null;
+  // Its battle command, or null for a flute friend.
+  command: { id: string; label: string; resting: string; check: CheckSpec } | null;
 };
 // An area person's atlas and idle timing: ticks per idle_down frame (Mom
 // holds her smile, then blinks briefly; Oliver waves his rattle evenly).

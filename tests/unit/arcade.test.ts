@@ -45,13 +45,13 @@ function play(ink: string, knot: string, calmed: Record<string, boolean> = {}): 
   ink: string;
 } {
   const lines: string[] = [];
-  let result = runInk(story, ink, { type: "start", knot }, { calmed, coins: 0 });
+  let result = runInk(story, ink, { type: "start", knot }, { calmed, coins: 0, snacks: 0 });
   for (let count = 0; count < 30; count += 1) {
     if (result.line !== null) lines.push(result.line.text);
     if (result.ended) break;
     result = result.choices.length > 0
-      ? runInk(story, result.ink, { type: "choose", index: 0 }, { calmed, coins: 0 })
-      : runInk(story, result.ink, { type: "next" }, { calmed, coins: 0 });
+      ? runInk(story, result.ink, { type: "choose", index: 0 }, { calmed, coins: 0, snacks: 0 })
+      : runInk(story, result.ink, { type: "next" }, { calmed, coins: 0, snacks: 0 });
   }
   return { lines, ink: result.ink };
 }

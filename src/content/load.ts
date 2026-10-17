@@ -90,6 +90,7 @@ import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
+import pondPupData from "../../content/party/pond-pup.json";
 import landsData from "../../content/lands.json";
 import { createInkState, createStoryReader } from "../core/ink";
 import { isStorySound } from "../core/sound";
@@ -278,7 +279,9 @@ export function storyTagErrors(tags: string[], areas: Record<string, Area>): str
     if (tag.startsWith("buy:"))
       return /^buy:\s*snack\s+\d+$/.test(tag) ? [] : [`invalid buy tag "${tag}"`];
     if (tag.startsWith("gift:"))
-      return /^gift:\s*snack\s+[1-9]\d*$/.test(tag) ? [] : [`invalid gift tag "${tag}"`];
+      return /^gift:\s*(snack|coins)\s+[1-9]\d*$/.test(tag) ? [] : [`invalid gift tag "${tag}"`];
+    if (tag.startsWith("feed:"))
+      return /^feed:\s*snack\s+[1-9]\d*$/.test(tag) ? [] : [`invalid feed tag "${tag}"`];
     if (tag.startsWith("sound:")) {
       const sound = tag.slice("sound:".length).trim();
       return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
@@ -791,7 +794,9 @@ export function feelingErrors(
   battle: BattleContent,
   party: Record<string, PartyContent>,
 ): string[] {
-  const commands = ["soothe", "snack", ...Object.values(party).map((member) => member.command.id)];
+  const friends = Object.values(party)
+    .flatMap((member) => member.command === null ? [] : [member.command.id]);
+  const commands = ["soothe", "snack", ...friends];
   return Object.entries(battle.feelings).flatMap(([id, feeling]) =>
     commands.includes(feeling.answer)
       ? []
@@ -813,8 +818,14 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
   };
   const box = value.box;
   field(record(box), file, "box");
+  const flute = value.flute ?? false;
+  field(typeof flute === "boolean", file, "flute");
   const command = value.command;
-  field(record(command), file, "command");
+  // A flute friend has no battle command; everyone else has one.
+  field(flute ? command === null : record(command), file, "command");
+  field(!flute || typeof value.joins === "string", file, "flute/joins");
+  const critter = value.critter ?? null;
+  field(critter === null || (flute && typeof critter === "string"), file, "critter");
   field(typeof value.sits === "boolean", file, "sits");
   field(typeof value.start === "boolean", file, "start");
   field(value.joins === null || typeof value.joins === "string", file, "joins");
@@ -832,12 +843,16 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
     sits: value.sits,
     start: value.start,
     joins: value.joins,
-    command: {
-      id: text(command, "id"),
-      label: text(command, "label"),
-      resting: text(command, "resting"),
-      check: faeSideCheck(command.check, file, "command.check"),
-    },
+    flute,
+    critter,
+    command: record(command)
+      ? {
+          id: text(command, "id"),
+          label: text(command, "label"),
+          resting: text(command, "resting"),
+          check: faeSideCheck(command.check, file, "command.check"),
+        }
+      : null,
   };
 }
 
@@ -862,6 +877,9 @@ export function partyErrors(
   const errors: string[] = [];
   const seen = new Map<string, string>();
   for (const member of Object.values(party)) {
+    if (member.critter !== null && critters[member.critter] === undefined)
+      errors.push(`party ${member.id}: no critter ${member.critter}`);
+    if (member.command === null) continue;
     const commandId = member.command.id;
     if (shared.some((id) => id === commandId))
       errors.push(`party ${member.id}: command ${commandId} is a shared command`);
@@ -1156,7 +1174,10 @@ export function loadContent(): {
   const maddie = parsePartyMember(maddieData, "content/party/maddie.json");
   const sue = parsePartyMember(sueData, "content/party/sue.json");
   const jordan = parsePartyMember(jordanData, "content/party/jordan.json");
-  const party = { [maddie.id]: maddie, [sue.id]: sue, [jordan.id]: jordan };
+  const pondPup = parsePartyMember(pondPupData, "content/party/pond-pup.json");
+  const party = {
+    [maddie.id]: maddie, [sue.id]: sue, [jordan.id]: jordan, [pondPup.id]: pondPup,
+  };
   const storyVariable = createStoryReader(story);
   const initialInk = createInkState(story, 1);
   const joinProblems = partyJoinErrors(party, (name) =>

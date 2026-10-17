@@ -40,6 +40,7 @@ export function createRecorder(world: World, initial: State): {
   hold: (move: Move, ticks: number) => void;
   press: () => void;
   lantern: () => void;
+  flute: (choices?: number[]) => void;
   face: (direction: keyof typeof directions) => void;
   navigate: (target: Move, tolerance?: number) => void;
   approach: (id: string, from?: Direction) => void;
@@ -253,6 +254,14 @@ export function createRecorder(world: World, initial: State): {
     if (wanted.length > 0) throw new Error(`${id}: choices left over: ${wanted.join(",")}`);
   };
 
+  // F down for a tick, then up: the flute plays its knot (Milestone 47), read
+  // through with `choices`.
+  const flute = (choices: number[] = []): void => {
+    tick({ ...frame(), flute: true });
+    if (state.dialogue?.knot !== "flute") throw new Error("the flute didn't play");
+    read("flute", choices);
+  };
+
   // Talks to what Fae faces.
   const talk = (id: string, choices: number[] = []): void => {
     const target = targetInteractable(world, state)?.id;
@@ -338,6 +347,7 @@ export function createRecorder(world: World, initial: State): {
     hold,
     press,
     lantern,
+    flute,
     face,
     navigate,
     approach,

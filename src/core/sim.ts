@@ -37,6 +37,7 @@ import {
   viewCheck,
 } from "./checks";
 import { answers, feelingFromDraw, feelingsOn } from "./feelings";
+import { battleParty } from "./party";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -597,8 +598,16 @@ function joinReady(world: World, state: State): State {
     return state;
   const area = world.areas[state.area];
   if (area === undefined) return state;
-  const existing = new Set(state.party.map((member) => member.id));
-  let party = state.party.slice();
+  // A flute friend goes home once its variable isn't true (sent home by the
+  // flute); everyone else, once with Fae, stays.
+  const staying = state.party.filter((member) => {
+    const content = world.party[member.id];
+    return content === undefined || !content.flute || content.joins === null ||
+      world.storyVariable(state.ink, content.joins) === true;
+  });
+  const existing = new Set(staying.map((member) => member.id));
+  let party = staying.slice();
+  let wild = state.wild;
   for (const content of Object.values(world.party)) {
     if (
       existing.has(content.id) ||
@@ -606,10 +615,16 @@ function joinReady(world: World, state: State): State {
       world.storyVariable(state.ink, content.joins) !== true
     )
       continue;
-    // She steps out of the person standing here (if she's shown).
+    // She steps out of the person standing here (if she's shown). A flute
+    // friend called while a calm one of its kind is out here is that one: the
+    // nearest steps out of the area into the party (spec 5).
     const person = area.npcs.find(
       (npc) => npc.id === content.id && npcVisible(world, state, npc),
     );
+    const near = (item: Wild): number => distance(state.player, item);
+    const critter = content.critter === null ? undefined : wild
+      .filter((item) => item.kind === content.critter && item.mood === "calm")
+      .sort((a, b) => near(a) - near(b))[0];
     const last = party[party.length - 1];
     const leader = last === undefined
       ? { ...state.player }
@@ -621,7 +636,7 @@ function joinReady(world: World, state: State): State {
         box: partyContent(world, member.id).box,
       })),
     ];
-    const point = person?.point ??
+    const point = critter ?? person?.point ??
       visibleFollowerSlot(
         sceneryArea(world, state.ink, area),
         leader,
@@ -632,6 +647,7 @@ function joinReady(world: World, state: State): State {
         party.length > 0,
       );
     if (point === undefined) continue;
+    if (critter !== undefined) wild = wild.filter((item) => item !== critter);
     party.push({
       id: content.id,
       x: point.x,
@@ -643,7 +659,9 @@ function joinReady(world: World, state: State): State {
     });
     existing.add(content.id);
   }
-  return party.length === state.party.length ? state : { ...state, party };
+  return party.length === state.party.length && staying.length === state.party.length
+    ? state
+    : { ...state, party, wild };
 }
 
 // What the story's externals answer from (spec 7, 8): coins() from Fae's
@@ -655,7 +673,7 @@ export function inkFacts(world: World, state: State): InkFacts {
     if (state.stickers.includes(kind.sticker.id)) calmed[kind.species] = true;
   for (const area of Object.values(world.areas))
     for (const piece of area.critters) calmed[piece.id] = state.critters[piece.id] === "calm";
-  return { calmed, coins: state.coins };
+  return { calmed, coins: state.coins, snacks: state.snacks };
 }
 
 // Which way a person in the area looks: toward Fae while she talks to them
@@ -690,17 +708,17 @@ export function battleCommands(
   // This turn's feeling, on the command that answers it (its badge).
   const now = battle.feelings[0] ?? null;
   const feeling = (id: string): FeelingId | null => (answers(world, now, id) ? now : null);
-  const friends = state.party.flatMap((member) => {
-    const content = world.party[member.id];
-    if (content === undefined) return [];
-    const rest = battle.rest[content.command.id] ?? 0;
+  const friends = battleParty(world, state.party).flatMap((member) => {
+    const command = world.party[member.id]?.command;
+    if (command === undefined || command === null) return [];
+    const rest = battle.rest[command.id] ?? 0;
     return [
       {
-        id: content.command.id,
-        label: content.command.label,
-        detail: rest > 0 ? content.command.resting : null,
+        id: command.id,
+        label: command.label,
+        detail: rest > 0 ? command.resting : null,
         disabled: rest > 0,
-        feeling: feeling(content.command.id),
+        feeling: feeling(command.id),
       },
     ];
   });
@@ -763,8 +781,8 @@ export function battleView(world: World, state: State): BattleView | null {
   // The friend acting in a Fae-side check (null for Soothe and for bursts).
   const acting =
     check?.side === "critter"
-      ? state.party.findIndex(
-          (member) => world.party[member.id]?.command.id === battle.command,
+      ? battleParty(world, state.party).findIndex(
+          (member) => world.party[member.id]?.command?.id === battle.command,
         )
       : -1;
   const actor = acting >= 0 ? acting : null;
@@ -1066,7 +1084,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     }
     const friend = critter.commands.friends[chosen.id];
     const partyOwner = state.party.find(
-      (member) => world.party[member.id]?.command.id === chosen.id,
+      (member) => world.party[member.id]?.command?.id === chosen.id,
     );
     const friendContent =
       partyOwner === undefined ? undefined : world.party[partyOwner.id];
@@ -1083,7 +1101,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
               : { ...restTurn(next.rest), [chosen.id]: friend.rest },
         },
         "critter",
-        friendContent?.command.check ?? world.battle.commands.soothe.check,
+        friendContent?.command?.check ?? world.battle.commands.soothe.check,
       ),
     };
   }
@@ -1166,15 +1184,21 @@ function dialogueState(
 }
 
 // A line's item tags act as it's shown (spec 7): `buy: snack <price>` sells
-// Fae a snack, and `gift: snack <count>` gives her snacks (the clubhouse
-// fridge). The loader allows no other item or format.
+// Fae a snack; `gift: snack <count>` and `gift: coins <count>` give her snacks
+// (the clubhouse fridge) or coins (the pond's tin); `feed: snack <count>` gives
+// snacks away (a treat for a friend), never below none. The loader allows no
+// other item or format.
 function applyItemTags(state: State, tags: string[]): State {
   let next = state;
-  for (const tag of tags) {
-    const price = /^buy:\s*snack\s+(\d+)$/.exec(tag.trim())?.[1];
+  for (const raw of tags) {
+    const tag = raw.trim();
+    const price = /^buy:\s*snack\s+(\d+)$/.exec(tag)?.[1];
     if (price !== undefined) next = purchaseSnack(next, Number(price));
-    const count = /^gift:\s*snack\s+(\d+)$/.exec(tag.trim())?.[1];
-    if (count !== undefined) next = { ...next, snacks: next.snacks + Number(count) };
+    const gift = /^gift:\s*(snack|coins)\s+(\d+)$/.exec(tag);
+    if (gift?.[1] === "snack") next = { ...next, snacks: next.snacks + Number(gift[2]) };
+    if (gift?.[1] === "coins") next = { ...next, coins: next.coins + Number(gift[2]) };
+    const fed = /^feed:\s*snack\s+(\d+)$/.exec(tag)?.[1];
+    if (fed !== undefined) next = { ...next, snacks: Math.max(0, next.snacks - Number(fed)) };
   }
   return next;
 }
@@ -1195,6 +1219,23 @@ function afterCalm(world: World, state: State): State {
     ? { ...state, ink: result.ink }
     : state;
 }
+
+// Opens a conversation at `knot`: a look point's, a person's, or the flute's.
+// Its opening line's item tags act at once (spec 7).
+function openTalk(world: World, state: State, input: ActionFrame, knot: string): State {
+  const result = runInk(world.story, state.ink, { type: "start", knot }, inkFacts(world, state));
+  return applyItemTags({
+    ...state,
+    tick: state.tick + 1,
+    ink: result.ink,
+    previousInput: { ...input },
+    dialogue: dialogueState(knot, result),
+    motion: { ...state.motion, moving: false },
+    party: haltedParty(state.party),
+  }, result.line?.tags ?? []);
+}
+
+export const FLUTE_KNOT = "flute";
 
 function closeDialogue(state: State): State {
   const dialogue = state.dialogue;
@@ -1661,6 +1702,7 @@ function stepTick(
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
   const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
+  const fluteEdge = input.flute === true && state.previousInput.flute !== true;
   if (state.journalOpen) {
     return {
       state: {
@@ -1686,6 +1728,11 @@ function stepTick(
       events: [],
     };
   }
+  // The flute plays its own knot: a friend called, or sent home (spec 5).
+  if (fluteEdge && state.transition === null &&
+      world.storyVariable(state.ink, "has_flute") === true &&
+      storyHasKnot(world.story, FLUTE_KNOT))
+    return { state: openTalk(world, state, input, FLUTE_KNOT), events: [] };
   if (menuEdge && state.transition === null) {
     return {
       state: {
@@ -1748,29 +1795,8 @@ function stepTick(
   }
   if (input.confirm && !state.previousInput.confirm) {
     const target = targetInteractable(world, state);
-    if (target !== undefined && target.knot !== undefined) {
-      const result = runInk(
-        world.story,
-        state.ink,
-        {
-          type: "start",
-          knot: target.knot,
-        },
-        inkFacts(world, state),
-      );
-      return {
-        state: applyItemTags({
-          ...state,
-          tick: state.tick + 1,
-          ink: result.ink,
-          previousInput: { ...input },
-          dialogue: dialogueState(target.knot, result),
-          motion: { ...state.motion, moving: false },
-          party: haltedParty(state.party),
-        }, result.line?.tags ?? []),
-        events: [],
-      };
-    }
+    if (target !== undefined && target.knot !== undefined)
+      return { state: openTalk(world, state, input, target.knot), events: [] };
   }
   const length = Math.sqrt(
     input.move.x * input.move.x + input.move.y * input.move.y,

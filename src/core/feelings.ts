@@ -1,3 +1,4 @@
+import { battleParty } from "./party";
 import type { Critter, FeelingId, State, World } from "./types";
 
 // Feelings (spec 8, Milestone 42). Once a second friend fights beside Fae, a
@@ -12,15 +13,15 @@ import type { Critter, FeelingId, State, World } from "./types";
  * doesn't count.
  */
 export function feelingsOn(world: World, state: State): boolean {
-  return state.party
-    .filter((member) => world.party[member.id]?.command !== undefined).length >= 2;
+  return battleParty(world, state.party).length >= 2;
 }
 
 /** Whether Fae has the command that answers a feeling now (and a snack to give). */
 function answerable(world: World, state: State, answer: string): boolean {
   if (answer === "soothe") return true;
   if (answer === "snack") return state.snacks > 0;
-  return state.party.some((member) => world.party[member.id]?.command.id === answer);
+  return battleParty(world, state.party)
+    .some((member) => world.party[member.id]?.command?.id === answer);
 }
 
 /**

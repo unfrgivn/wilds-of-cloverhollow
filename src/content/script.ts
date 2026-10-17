@@ -15,6 +15,7 @@ export function isActionFrame(value: unknown): value is ActionFrame {
     typeof value.cancel === "boolean" &&
     typeof value.menu === "boolean"
     && (value.lantern === undefined || typeof value.lantern === "boolean")
+    && (value.flute === undefined || typeof value.flute === "boolean")
     && (value.choose === undefined || typeof value.choose === "number")
   );
 }

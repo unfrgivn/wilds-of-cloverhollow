@@ -7,6 +7,7 @@ const BUTTONS = [
   ["cancel", "×"],
   ["menu", "☰"],
   ["lantern", "✦"],
+  ["flute", "♪"],
 ] as const;
 type Button = (typeof BUTTONS)[number][0];
 
@@ -63,6 +64,10 @@ export function mountTouchControls(): TouchInput {
       element.hidden = true;
       element.setAttribute("aria-label", "lantern");
       element.classList.add("touch-lantern");
+    } else if (button === "flute") {
+      element.textContent = label;
+      element.hidden = true;
+      element.setAttribute("aria-label", "flute");
     } else {
       element.textContent = label;
     }

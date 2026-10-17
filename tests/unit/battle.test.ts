@@ -65,7 +65,7 @@ function aimState(
   const check = createCheck(
     command === "soothe"
       ? content.world.battle.commands.soothe.check
-      : content.world.party.maddie?.command.check ?? content.world.battle.commands.soothe.check,
+      : content.world.party.maddie?.command?.check ?? content.world.battle.commands.soothe.check,
     "critter",
   );
   return {
@@ -335,11 +335,11 @@ describe("calm-down battle core", () => {
     const chaos = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-    }, { calmed: { "fountain-frog": false }, coins: 0 });
+    }, { calmed: { "fountain-frog": false }, coins: 0, snacks: 0 });
     const calm = runInk(content.world.story, ink, {
       type: "start",
       knot: "fountain",
-    }, { calmed: { "fountain-frog": true }, coins: 0 });
+    }, { calmed: { "fountain-frog": true }, coins: 0, snacks: 0 });
     expect(chaos.line?.text).toContain("Pink bubbles");
     expect(calm.line?.text).toBe("The bubbles are gone. The fountain sparkles like new!");
   });

@@ -23,6 +23,7 @@ VAR found_clipboard = false
 VAR coach_thanked = false
 EXTERNAL calmed(id)
 EXTERNAL coins()
+EXTERNAL snacks()
 
 === window ===
 {plan != "none": -> again}
@@ -67,6 +68,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{pond_tin: The Pond Pup swam out into the park pond and fetched an old tin of coins! # speaker: Fae}
+{pond_seen and not pond_tin: Something glints at the bottom of the park pond, too far out to reach. # speaker: Fae}
+{pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
 {bridge_down: I pulled the old footbridge's lever with the lasso, and the bridge swung down across the creek! # speaker: Fae}
@@ -180,7 +184,34 @@ He's pointing his nose at the road to school. # speaker: Fae
 -> DONE
 
 = again
+{pup_friend: -> friend}
 Woof! The Pond Pup wants to play fetch. # speaker: Pond Pup
+{has_flute: -> bond}
+-> DONE
+// A pat and a treat make a friend (NOTES.md), in either order.
+= bond
++ {not pup_petted} [Pet him]
+    ~ pup_petted = true
+    Fae scratches behind his floppy ears. His back leg thumps the ground. # speaker: Fae
++ {not pup_fed} [Share a snack]
+    {snacks() == 0:
+        I'm out of snacks. The bakery sells them, and the clubhouse garden grows strawberries. # speaker: Fae
+        -> DONE
+    }
+    ~ pup_fed = true
+    Fae shares a snack. Crunch, crunch, gone! He licks her nose. # speaker: Fae # feed: snack 1
++ [Wave bye]
+    Woof! # speaker: Pond Pup
+    -> DONE
+- {pup_petted and pup_fed: -> befriend}
+-> bond
+= befriend
+~ pup_friend = true
+The Pond Pup's tail wags so hard that his whole body wiggles. # speaker: Fae
+He's my friend now! When I play my flute, he'll come running. # speaker: Fae
+-> DONE
+= friend
+Woof! This pup wags at me like we're old friends. Word gets around! # speaker: Fae
 -> DONE
 
 === tree_house ===
@@ -1055,4 +1086,53 @@ Fae and Jordan fill a whole basket, and tuck it into the fridge. # speaker: Fae
 ~ garden_ripe = false
 ~ garden_calms = 1
 The plants are still growing. Two more calm critters, and there'll be more! # speaker: Jordan
+-> DONE
+
+// Flute friends (Milestone 47).
+VAR pup_petted = false
+VAR pup_fed = false
+VAR pup_friend = false
+VAR pup_with_me = false
+VAR pond_seen = false
+VAR pond_tin = false
+
+// The flute (F) plays this: a friend called to Fae's side, or sent home.
+=== flute ===
+Fae plays a little tune on her painted flute. # speaker: Fae # sound: flute
+{not pup_friend: -> nobody}
+{pup_with_me: -> along}
++ [Call the Pond Pup]
+    ~ pup_with_me = true
+    Woof! Woof! The Pond Pup comes running! # speaker: Pond Pup
+    -> DONE
++ [Just play]
+    -> DONE
+= along
++ [Send the Pond Pup home]
+    ~ pup_with_me = false
+    Good boy! The Pond Pup trots off home, wagging. # speaker: Fae
+    -> DONE
++ [Just play]
+    -> DONE
+= nobody
+Nobody comes... yet. Animal friends come running, Ms. Willow said. I need to make one first! # speaker: Fae
+-> DONE
+
+// The park pond: the Pond Pup swims (Milestone 47).
+=== pond ===
+{pond_tin: -> after}
+~ pond_seen = true
+The pond is cool and clear. Something glints at the bottom, out past the middle rock. # speaker: Fae
+{not pup_with_me: It's too far to reach, and too cold to wade in. # speaker: Fae}
+{not pup_with_me: -> DONE}
++ [Fetch, boy!]
+    Splash! The Pond Pup paddles out past the rock and dives. # speaker: Fae
+    ~ pond_tin = true
+    He swims back with an old tin in his mouth. Inside: twelve shiny coins, and a note that says "For whoever finds this!" # speaker: Fae # gift: coins 12
+    Good boy! Pond Pups really can swim. # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The pond is cool and clear. Nothing glints at the bottom now. # speaker: Fae
 -> DONE

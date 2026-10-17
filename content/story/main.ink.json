@@ -401,6 +401,86 @@
       "journal": [
         "ev",
         {
+          "VAR?": "pond_tin"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Pond Pup swam out into the park pond and fetched an old tin of coins! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "pond_seen"
+        },
+        {
+          "VAR?": "pond_tin"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Something glints at the bottom of the park pond, too far out to reach. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "pup_friend"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Pond Pup is my friend! When I play my flute, he comes running. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "fridge_baskets"
         },
         0,
@@ -417,7 +497,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.6"
+                "->": ".^.^.^.30"
               },
               null
             ]
@@ -442,7 +522,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.13"
+                "->": ".^.^.^.37"
               },
               null
             ]
@@ -467,7 +547,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.20"
+                "->": ".^.^.^.44"
               },
               null
             ]
@@ -492,7 +572,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.27"
+                "->": ".^.^.^.51"
               },
               null
             ]
@@ -522,7 +602,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.37"
+                "->": ".^.^.^.61"
               },
               null
             ]
@@ -556,7 +636,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.50"
+                "->": ".^.^.^.74"
               },
               null
             ]
@@ -586,7 +666,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.60"
+                "->": ".^.^.^.84"
               },
               null
             ]
@@ -611,7 +691,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.67"
+                "->": ".^.^.^.91"
               },
               null
             ]
@@ -641,7 +721,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.77"
+                "->": ".^.^.^.101"
               },
               null
             ]
@@ -675,7 +755,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.90"
+                "->": ".^.^.^.114"
               },
               null
             ]
@@ -709,7 +789,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.103"
+                "->": ".^.^.^.127"
               },
               null
             ]
@@ -739,7 +819,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.113"
+                "->": ".^.^.^.137"
               },
               null
             ]
@@ -769,7 +849,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.123"
+                "->": ".^.^.^.147"
               },
               null
             ]
@@ -799,7 +879,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.133"
+                "->": ".^.^.^.157"
               },
               null
             ]
@@ -824,7 +904,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.164"
               },
               null
             ]
@@ -866,7 +946,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.157"
+                "->": ".^.^.^.181"
               },
               null
             ]
@@ -900,7 +980,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.170"
+                "->": ".^.^.^.194"
               },
               null
             ]
@@ -1000,7 +1080,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.180"
+                "->": ".^.^.^.204"
               },
               null
             ]
@@ -1025,7 +1105,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.187"
+                "->": ".^.^.^.211"
               },
               null
             ]
@@ -1055,7 +1135,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.197"
+                "->": ".^.^.^.221"
               },
               null
             ]
@@ -1089,7 +1169,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.209"
+                "->": ".^.^.^.233"
               },
               null
             ]
@@ -1114,7 +1194,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.216"
+                "->": ".^.^.^.240"
               },
               null
             ]
@@ -1144,7 +1224,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.226"
+                "->": ".^.^.^.250"
               },
               null
             ]
@@ -1178,7 +1258,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.239"
+                "->": ".^.^.^.263"
               },
               null
             ]
@@ -1207,7 +1287,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.249"
+                "->": ".^.^.^.273"
               },
               null
             ]
@@ -1236,7 +1316,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.259"
+                "->": ".^.^.^.283"
               },
               null
             ]
@@ -1270,7 +1350,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.272"
+                "->": ".^.^.^.296"
               },
               null
             ]
@@ -1300,7 +1380,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.282"
+                "->": ".^.^.^.306"
               },
               null
             ]
@@ -1325,7 +1405,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.289"
+                "->": ".^.^.^.313"
               },
               null
             ]
@@ -1359,7 +1439,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.301"
+                "->": ".^.^.^.325"
               },
               null
             ]
@@ -1384,7 +1464,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.308"
+                "->": ".^.^.^.332"
               },
               null
             ]
@@ -1413,7 +1493,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.318"
+                "->": ".^.^.^.342"
               },
               null
             ]
@@ -1438,7 +1518,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.325"
+                "->": ".^.^.^.349"
               },
               null
             ]
@@ -1463,7 +1543,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.332"
+                "->": ".^.^.^.356"
               },
               null
             ]
@@ -1500,7 +1580,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.347"
+                "->": ".^.^.^.371"
               },
               null
             ]
@@ -1525,7 +1605,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.354"
+                "->": ".^.^.^.378"
               },
               null
             ]
@@ -1559,7 +1639,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.367"
+                "->": ".^.^.^.391"
               },
               null
             ]
@@ -1588,7 +1668,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.377"
+                "->": ".^.^.^.401"
               },
               null
             ]
@@ -1613,7 +1693,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.384"
+                "->": ".^.^.^.408"
               },
               null
             ]
@@ -1638,7 +1718,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.391"
+                "->": ".^.^.^.415"
               },
               null
             ]
@@ -1668,7 +1748,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.401"
+                "->": ".^.^.^.425"
               },
               null
             ]
@@ -1698,7 +1778,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.411"
+                "->": ".^.^.^.435"
               },
               null
             ]
@@ -1723,7 +1803,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.418"
+                "->": ".^.^.^.442"
               },
               null
             ]
@@ -1752,7 +1832,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.428"
+                "->": ".^.^.^.452"
               },
               null
             ]
@@ -1790,7 +1870,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.444"
+                "->": ".^.^.^.468"
               },
               null
             ]
@@ -1817,7 +1897,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.453"
+                "->": ".^.^.^.477"
               },
               null
             ]
@@ -1846,7 +1926,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.463"
+                "->": ".^.^.^.487"
               },
               null
             ]
@@ -1871,7 +1951,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.470"
+                "->": ".^.^.^.494"
               },
               null
             ]
@@ -1900,7 +1980,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.481"
+                "->": ".^.^.^.505"
               },
               null
             ]
@@ -1929,7 +2009,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.492"
+                "->": ".^.^.^.516"
               },
               null
             ]
@@ -2313,9 +2393,250 @@
         "done",
         {
           "again": [
+            "ev",
+            {
+              "VAR?": "pup_friend"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "pup_calm.friend"
+                  },
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
             "^Woof! The Pond Pup wants to play fetch. ",
             "#",
             "^speaker: Pond Pup",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "pup_calm.bond"
+                  },
+                  {
+                    "->": ".^.^.^.15"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "done",
+            null
+          ],
+          "bond": [
+            [
+              "ev",
+              "str",
+              "^Pet him",
+              "/str",
+              {
+                "VAR?": "pup_petted"
+              },
+              "!",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Share a snack",
+              "/str",
+              {
+                "VAR?": "pup_fed"
+              },
+              "!",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Wave bye",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "pup_petted",
+                    "re": true
+                  },
+                  "^Fae scratches behind his floppy ears. His back leg thumps the ground. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "ev",
+                  {
+                    "x()": "snacks"
+                  },
+                  0,
+                  "==",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "\n",
+                        "^I'm out of snacks. The bakery sells them, and the clubhouse garden grows strawberries. ",
+                        "#",
+                        "^speaker: Fae",
+                        "/#",
+                        "\n",
+                        "done",
+                        {
+                          "->": ".^.^.^.7"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "pup_fed",
+                    "re": true
+                  },
+                  "^Fae shares a snack. Crunch, crunch, gone! He licks her nose. ",
+                  "#",
+                  "^speaker: Fae ",
+                  "/#",
+                  "#",
+                  "^feed: snack 1",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "c-2": [
+                  "\n",
+                  "^Woof! ",
+                  "#",
+                  "^speaker: Pond Pup",
+                  "/#",
+                  "\n",
+                  "done",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "g-0": [
+                  "ev",
+                  {
+                    "VAR?": "pup_petted"
+                  },
+                  {
+                    "VAR?": "pup_fed"
+                  },
+                  "&&",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "^ ",
+                        {
+                          "->": "pup_calm.befriend"
+                        },
+                        {
+                          "->": ".^.^.^.6"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "\n",
+                  {
+                    "->": ".^.^.^"
+                  },
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "befriend": [
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "pup_friend",
+              "re": true
+            },
+            "^The Pond Pup's tail wags so hard that his whole body wiggles. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^He's my friend now! When I play my flute, he'll come running. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "friend": [
+            "^Woof! This pup wags at me like we're old friends. Word gets around! ",
+            "#",
+            "^speaker: Fae",
             "/#",
             "\n",
             "done",
@@ -8582,6 +8903,326 @@
           ]
         }
       ],
+      "flute": [
+        [
+          "^Fae plays a little tune on her painted flute. ",
+          "#",
+          "^speaker: Fae ",
+          "/#",
+          "#",
+          "^sound: flute",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_friend"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "flute.nobody"
+                },
+                {
+                  "->": ".^.^.^.13"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "flute.along"
+                },
+                {
+                  "->": ".^.^.^.19"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Call the Pond Pup",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Just play",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "pup_with_me",
+                "re": true
+              },
+              "^Woof! Woof! The Pond Pup comes running! ",
+              "#",
+              "^speaker: Pond Pup",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "along": [
+            [
+              "ev",
+              "str",
+              "^Send the Pond Pup home",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Just play",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "pup_with_me",
+                    "re": true
+                  },
+                  "^Good boy! The Pond Pup trots off home, wagging. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "nobody": [
+            "^Nobody comes... yet. Animal friends come running, Ms. Willow said. I need to make one first! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "pond": [
+        [
+          "ev",
+          {
+            "VAR?": "pond_tin"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "pond.after"
+                },
+                {
+                  "->": "pond.0.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "pond_seen",
+            "re": true
+          },
+          "^The pond is cool and clear. Something glints at the bottom, out past the middle rock. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ It's too far to reach, and too cold to wade in. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": "pond.0.20"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": "pond.0.28"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Fetch, boy!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Splash! The Pond Pup paddles out past the rock and dives. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "pond_tin",
+                "re": true
+              },
+              "^He swims back with an old tin in his mouth. Inside: twelve shiny coins, and a note that says \"For whoever finds this!\" ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^gift: coins 12",
+              "/#",
+              "\n",
+              "^Good boy! Pond Pups really can swim. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The pond is cool and clear. Nothing glints at the bottom now. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -8751,6 +9392,30 @@
         false,
         {
           "VAR=": "garden_ripe"
+        },
+        false,
+        {
+          "VAR=": "pup_petted"
+        },
+        false,
+        {
+          "VAR=": "pup_fed"
+        },
+        false,
+        {
+          "VAR=": "pup_friend"
+        },
+        false,
+        {
+          "VAR=": "pup_with_me"
+        },
+        false,
+        {
+          "VAR=": "pond_seen"
+        },
+        false,
+        {
+          "VAR=": "pond_tin"
         },
         "/ev",
         "end",

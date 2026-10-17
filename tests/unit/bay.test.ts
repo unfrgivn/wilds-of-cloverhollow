@@ -242,7 +242,8 @@ describe("the fizzy bluebird", () => {
     expect(world.stickers.catalogue.some((sticker) =>
       sticker.id === critter.sticker.id && sticker.critter === "bluebird")).toBe(true);
     const start: InkCommand = { type: "start", knot: critter.calmKnot };
-    const calm = runInk(world.story, fresh, start, { calmed: { bluebird: true }, coins: 0 });
+    const calm = runInk(world.story, fresh, start,
+      { calmed: { bluebird: true }, coins: 0, snacks: 0 });
     expect(calm.line?.text.length ?? 0).toBeGreaterThan(0);
     const grades: Grade[] = ["great", "good", "miss"];
     for (const grade of grades)

@@ -35,6 +35,7 @@ function padFrame(pad: StandardGamepad): ActionFrame {
     cancel: pressed(pad, 1),
     menu: pressed(pad, 3) || pressed(pad, 9),
     ...(pressed(pad, 2) ? { lantern: true } : {}),
+    ...(pressed(pad, 5) ? { flute: true } : {}),
   };
 }
 
@@ -49,6 +50,7 @@ export function gamepadFrame(pads: readonly StandardGamepad[]): ActionFrame {
     frame.cancel ||= next.cancel;
     frame.menu ||= next.menu;
     if (next.lantern) frame.lantern = true;
+    if (next.flute) frame.flute = true;
   }
   return frame;
 }
@@ -69,6 +71,7 @@ export function combineInputFrames(
     // Only while pressed: recorded frames omit it, and a frame from real keys
     // must match the recorded one exactly (spec 3.2).
     ...(keyboard.lantern || touch.lantern || gamepad.lantern ? { lantern: true } : {}),
+    ...(keyboard.flute || touch.flute || gamepad.flute ? { flute: true } : {}),
     choose: touch.choose,
   };
 }
@@ -82,6 +85,7 @@ export class GamepadLatch {
     this.tapped.cancel ||= frame.cancel;
     this.tapped.menu ||= frame.menu;
     if (frame.lantern) this.tapped.lantern = true;
+    if (frame.flute) this.tapped.flute = true;
     this.current = frame;
   }
 
@@ -96,6 +100,7 @@ export class GamepadLatch {
       cancel: this.current.cancel || this.tapped.cancel,
       menu: this.current.menu || this.tapped.menu,
       ...(this.current.lantern || this.tapped.lantern ? { lantern: true } : {}),
+      ...(this.current.flute || this.tapped.flute ? { flute: true } : {}),
     };
     this.clearTaps();
     return result;

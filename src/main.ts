@@ -318,6 +318,9 @@ async function boot(): Promise<void> {
         content.world.storyVariable(state.ink, "has_lantern") !== true;
       lanternButton.classList.toggle("is-on", state.lantern);
     }
+    const fluteButton = document.querySelector<HTMLButtonElement>(".touch-flute");
+    if (fluteButton !== null)
+      fluteButton.hidden = content.world.storyVariable(state.ink, "has_flute") !== true;
     title.render({
       visible: titleMode !== null,
       mode: titleMode ?? "fresh",

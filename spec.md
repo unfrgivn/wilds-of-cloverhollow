@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 42, feelings; Milestone 43, the clubhouse fix-up)
+Last updated: 2026-10-17 (Milestone 47, flute friends; Milestone 42, feelings)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -108,8 +108,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
-  -1..1) plus booleans `confirm`, `cancel`, and `menu`, and an optional
-  `lantern`, present only while it's pressed (like a touch `choose`): a blank
+  -1..1) plus booleans `confirm`, `cancel`, and `menu`, and optional
+  `lantern` and `flute`, each present only while pressed (like a touch
+  `choose`): a blank
   frame, a recorded one, and a real key's frame then have the same shape, so a
   save's last input matches a new game's (section 10), and older recordings
   and their hashes stand. Button edges (pressed this tick) are derived in the
@@ -118,13 +119,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
   cancel; J opens the journal (`menu`); L switches the blacklight lantern on or
-  off (`lantern`). On touch, a lantern button beside the journal button
-  appears once Fae has the lantern and glows lavender while it's on.
+  off (`lantern`); F plays the flute (`flute`, Milestone 47). On touch, a
+  lantern button beside the journal button appears once Fae has the lantern
+  and glows lavender while it's on, and a ♪ flute button beside it once she
+  has the flute. The tool buttons step aside while a conversation or a battle
+  is open: the tools do nothing then, and the dialogue reserves room for
+  confirm and cancel only.
 - Gamepad (standard mapping) and touch (virtual stick plus buttons, section
   3.2.1) map to the same frame. The left stick uses a radial 25% dead zone,
   rescaled so its remaining range is 0..1; d-pad directions (standard buttons
   12..15) override the stick. A/Cross confirms, B/Circle cancels, Y/Triangle
-  or Start opens the journal, and X/Square toggles the lantern. Only
+  or Start opens the journal, X/Square toggles the lantern, and the right
+  shoulder (RB/R1, standard button 5) plays the flute. Only
   standard-mapping pads count; connected pads merge with button OR and first
   non-zero movement.
   When devices provide different movement vectors, touch wins, then keyboard,
@@ -283,6 +289,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   frames (128x128 units), feet baseline at row 247 (anchor
   `{x: 0.5, y: 247/256}`), the same six animation names. She stands about 50
   units tall and sits about 65; one uniform scale covers every pose.
+- The Pond Pup's atlas (`public/assets/characters/pond-pup/`, Milestone 47):
+  Maddie's frame contract (256x256, baseline 247, the same six animation
+  names). He stands about 50 units tall, sits about 51, and his idle down is
+  sitting. Built by `tools/art/build-pond-pup.ts` from whole figures
+  (`tools/art/extract-figures.ts`), one scale per source sheet.
 - `tools/art/validate-sprite.ts` must pass for every character atlas. All of its
   checks are mandatory (no switches); biped-only head checks are enabled by
   `"validator": { "biped": true }` in the character's `art/recipes/` file.
@@ -293,8 +304,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   roster order): `id`, `name`, `atlas`, the feet-anchored `box`
   (`{ width, height }`), `walkCycleUnits`, `sits` (sits down after
   `sitDelayTicks`; otherwise idles standing), `start` (in the party at a new
-  game), an optional `joins` Ink variable (null for starters), and one battle
-  `command` (`{ id, label, resting }`, section 8). Exactly one of `start: true`
+  game), an optional `joins` Ink variable (null for starters), an optional
+  `flute` (a flute friend, below), and one battle `command` (`{ id, label,
+  resting }`, section 8; null for a flute friend). Exactly one of `start: true`
   or a non-null `joins` is required, and a joins variable must be declared.
   Maddie is `maddie`: box 44x60, `walkCycleUnits` 84, sits, starts, command
   `play` / "Play" / "resting". Sue (`cast` / "Cast" / "reeling in", joins
@@ -304,6 +316,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   existing candidates, so no earlier placement moves and no spawn has to.
   `state.party` is the ordered list of members, each
   `{ id, x, y, facing, motion, stillTicks, trail }`.
+- Flute friends (Milestone 47): a roster member with `flute: true` is an
+  animal friend Fae calls with her flute. It has `command: null` (no battle
+  command) and a `joins` variable, and it's the only kind of member that
+  leaves: while its variable isn't true, it's out of the party. It sits
+  battles out: the battle party (`battleParty`) is the members with a
+  command, so it gives no command and isn't drawn in the battle scene. A
+  flute friend may name the recurring critter kind it is (`critter`, a
+  critter id): joining while a calm one of that kind is out in Fae's area,
+  the nearest steps out of the area into the party, where it stood (it
+  leaves `state.wild` for the visit); otherwise it comes from a follower
+  slot, like anyone joining. The Pond Pup is `pond-pup` ("Pond Pup"): box
+  44x56, `walkCycleUnits` 84, sits, joins `pup_with_me`, critter `pup`, last
+  in the roster.
 - Chain rule: member 0 follows Fae; member i follows member i-1, with the same
   algorithm, the leader being the member ahead *after* its own move this tick
   (the party updates in order). Each member keeps its own breadcrumb trail of
@@ -497,6 +522,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   plays once (`sound: flute`); a wrong song ends with a hint. After that the
   xylophone is free play. Like the lasso, the flute is a story item with no
   button yet.
+- Flute friends (Milestone 47): once Fae has the flute, a calm Pond Pup's
+  talk (`pup_calm`, after its first) offers Pet him and Share a snack; doing
+  both, in either order, makes the pups her friends (`pup_petted`,
+  `pup_fed`, `pup_friend`; a snack shared is `feed: snack 1`, and without one
+  Fae says where snacks come from). Then a calm pup greets her as an old
+  friend. The `flute` knot calls the Pond Pup (`pup_with_me`, so he joins)
+  or sends him home; before she has a friend, nobody comes, yet. The park's
+  pond is a look point (`pond` at (930, 838), its south rim): something
+  glints at the bottom (`pond_seen`), out of reach; with the Pond Pup along,
+  "Fetch, boy!" sends him swimming for an old tin of twelve coins
+  (`pond_tin`, `gift: coins 12`), once. The journal tells of the tin, the
+  glint until then, and the friend, on top.
 - The clubhouse (Milestone 43): `clubhouse`, "Clubhouse", in the `forest` land,
   is a 1200x800 painted cutaway of the Whispering Woods tree house's one room
   and its deck. The ladder at the tree house's front in the woods is a door
@@ -828,21 +865,29 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`cocoa_stand`), 5 coins a snack. Their choices are sticky (`+`), so they
   sell on every visit.
 - A line may carry `# gift: snack <count>`: as it's shown, Fae gets `count`
-  snacks for free (the clubhouse fridge, Milestone 43). Item tags (`buy`,
-  `gift`) act on every line they're on, a conversation's opening line and a
-  locked door's included.
+  snacks for free (the clubhouse fridge, Milestone 43). `# gift: coins
+  <count>` gives her coins (the pond's tin, Milestone 47), and `# feed: snack
+  <count>` gives snacks away (a treat for an animal friend), never below
+  none; the story only offers it when `snacks()` says she has one. Item tags
+  (`buy`, `gift`, `feed`) act on every line they're on, a conversation's
+  opening line and a locked door's included.
 - Load validation reads every tag in the compiled story (`storyTags`: a
   tag's text follows its `#` command, and its `/#` may close in an enclosing
   container) and rejects a travel tag naming an unknown area or spawn, any
-  `buy` tag but `snack <digits>`, and any `gift` tag but `snack <count>`
-  with a count of 1 or more.
+  `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>` or
+  `coins <count>`, and any `feed` tag but `snack <count>`, each count 1 or
+  more.
 - The Ink adapter skips blank lines (a conditional line whose condition is
   false), and looks past blank lines after a line, so choices that follow
   them come with that line rather than as an empty step. The story's
-  externals, `calmed(name)` and `coins()` (Fae's coins), are answered from
+  externals, `calmed(name)`, `coins()` (Fae's coins), and `snacks()` (her
+  snacks, Milestone 47), are answered from
   the core's state (`inkFacts`) for every command, not only a knot's first
   line. `calmed` answers a set piece by its id from its own mood, and a
   species once Fae owns its sticker (she has calmed one of them, anywhere).
+- The flute (Milestone 47): a flute press, once `has_flute` is true and Fae is
+  free (no dialogue, battle, journal, or door), opens the story's `flute` knot
+  like a talk. Its first line plays the `flute` story sound.
 - The calm hook (Milestone 43): after every battle that ends in a calm (the
   reward's last confirm), the core runs the story's `on_calm` knot, if it has
   one, with the facts as they are then, and keeps the variables it sets. It

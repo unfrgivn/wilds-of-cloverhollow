@@ -324,6 +324,15 @@
       },
       "prompt": "Look",
       "knot": "park_sign"
+    },
+    {
+      "id": "pond",
+      "knot": "pond",
+      "point": {
+        "x": 930,
+        "y": 838
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {

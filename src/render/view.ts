@@ -12,6 +12,7 @@ import {
 } from "pixi.js";
 import {
   battleFoe,
+  battleParty,
   battleView,
   faeBox,
   hiddenFraction,
@@ -785,11 +786,12 @@ export class GameView {
       );
     }
     // The party stands with Fae: a sitter (Maddie) sits facing the critter,
-    // anyone else is seen from behind like Fae.
-    const inParty = new Set(state.party.map((member) => member.id));
+    // anyone else is seen from behind like Fae. Flute friends sit it out.
+    const fighting = battleParty(this.world, state.party);
+    const inParty = new Set(fighting.map((member) => member.id));
     for (const [id, sprite] of this.battlePartySprites)
       sprite.visible = inParty.has(id);
-    state.party.forEach((member, index) => {
+    fighting.forEach((member, index) => {
       const sprite = this.battlePartySprites.get(member.id);
       const content = this.world.party[member.id];
       const place = layout.party[index];
@@ -819,7 +821,7 @@ export class GameView {
       this.viewHeight,
       this.world.critters[state.battle?.critterId ?? ""]?.battleHeight ?? 190,
       faeBox.height,
-      state.party.length,
+      battleParty(this.world, state.party).length,
     );
   }
 

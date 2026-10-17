@@ -27,6 +27,8 @@ const scout: PartyContent = {
   sits: false,
   start: false,
   joins: null,
+  flute: false,
+  critter: null,
   command: {
     id: "whistle", label: "Whistle", resting: "catching breath",
     check: { kind: "ring", ticks: 60, targetTick: 39, greatWindow: 5, goodWindow: 11 },

@@ -197,7 +197,6 @@ ios/            Capacitor iOS project (from Milestone 4).
   earlier version shot the plaza while the door fade still covered it.
 
 ### 3.3 Gameplay sound (Milestone 37)
-- Footstep cues use the loaded world surface maps, so every moving step is named `footstep-<surface>`; unknown area maps are load errors, never silent grass defaults.
 - Sound effects only: no music, ambience beds, or voice. `src/core/sound.ts`
   derives a closed set of `SoundCue` values from state diffs; it has no DOM,
   timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a

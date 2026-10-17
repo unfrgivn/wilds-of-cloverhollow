@@ -1668,8 +1668,8 @@ Sound follow-ups from Milestone 37:
   `content/surfaces/<area>.json` registered by `src/content/load.ts`. A missing
   map is a load error naming that path and the registration file, rather than a
   silent grass default. Footstep cues are synthesized recipes for now; clips
-  are pending the owner's pick from the candidates below. The plaza is all
-  stone because it is a paved square.
+  are pending the owner's pick from the candidates in `docs/review-queue.md`.
+  The plaza is all stone because it is a paved square.
 - A volume control beside mute: done in the volume follow-up (2026-10-16).
   Four chunky steps, 25% through 100%, use the existing master gain path and
   live beside the mute pill. One 44 CSS-pixel sticker control cycles the steps,

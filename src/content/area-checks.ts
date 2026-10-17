@@ -129,15 +129,39 @@ function solidOf(area: Area, scenario: Scenario): Area["blockers"] {
   ];
 }
 
+// A point more than `radius` outside a polygon's bounding box is neither inside
+// it nor within `radius` of it, so the exact tests only run near the polygon.
+// Flood fills ask this of every solid polygon at every grid point.
+type Box = { minX: number; minY: number; maxX: number; maxY: number };
+const boxes = new WeakMap<Polygon, Box>();
+
+function boxOf(polygon: Polygon): Box {
+  const known = boxes.get(polygon);
+  if (known !== undefined) return known;
+  const box = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+  for (const [x, y] of polygon) {
+    box.minX = Math.min(box.minX, x);
+    box.minY = Math.min(box.minY, y);
+    box.maxX = Math.max(box.maxX, x);
+    box.maxY = Math.max(box.maxY, y);
+  }
+  boxes.set(polygon, box);
+  return box;
+}
+
+function clearOf(polygon: Polygon, radius: number, point: Point): boolean {
+  const box = boxOf(polygon);
+  if (point.x < box.minX - radius || point.x > box.maxX + radius ||
+      point.y < box.minY - radius || point.y > box.maxY + radius)
+    return true;
+  return !pointInPolygon(point, polygon) && distanceToPolygon(point, polygon) >= radius;
+}
+
 function walkable(area: Area, solid: Area["blockers"], radius: number, point: Point): boolean {
   return (
     pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius &&
-    solid.every(
-      (blocker) =>
-        !pointInPolygon(point, blocker) &&
-        distanceToPolygon(point, blocker) >= radius,
-    )
+    solid.every((blocker) => clearOf(blocker, radius, point))
   );
 }
 
@@ -400,7 +424,9 @@ export function areaConnectionErrors(
     // Look points and set pieces must be reachable with every crossing shut;
     // the floor must be one piece with every crossing open.
     const before = reachableParts(area, radius, closedScenario(area));
-    const after = reachableParts(area, radius, openScenario(area));
+    // Without crossings both scenarios are the same, so the floor is filled once.
+    const after = (area.crossings ?? []).length === 0
+      ? before : reachableParts(area, radius, openScenario(area));
     if (after.length > 1)
       errors.push(`${area.id}: its floor is split; spawns ${after.map((part) =>
         part.spawns.join(", ")).join(" | ")} can't reach each other`);

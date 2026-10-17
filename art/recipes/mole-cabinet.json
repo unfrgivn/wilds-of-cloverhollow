@@ -1,0 +1,25 @@
+{
+  "asset": "Boop-a-Mole cabinet close-up",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 3,
+  "references": [
+    "public/assets/arcade/claw-machine.webp",
+    "public/assets/arcade/skee-lane.webp",
+    "docs/art/concepts/props/arcade_props.png",
+    "docs/art/concepts/environments/arcade_interior.png"
+  ],
+  "selected": "art/source/arcade/mole-cabinet-front-raw.png",
+  "prompt_summary": "Fully visible mint-green arcade cabinet, blank pale marquee, pink diagonal stripe, and exactly five dark raised-rim holes in a perspective plus arrangement; no text, moles, hammer, or people.",
+  "key_colour": "pale paper margin; removed by border-connected flood fill",
+  "post_processing": [
+    "Selected the third generation after visual inspection confirmed five complete holes and a full uncropped silhouette.",
+    "tools/art/build-mole-cabinet.ts flood-fills only the connected paper margin, trims it, and encodes a 1600px-wide WebP with alpha; cabinet holes remain opaque dark paint.",
+    "Rebuilt twice with identical output hash."
+  ],
+  "outputs": { "image": "public/assets/arcade/mole-cabinet.webp", "calibration": "public/assets/arcade/mole-cabinet.json", "rebuild": "tools/art/build-mole-cabinet.ts" },
+  "owner_review": {
+    "viewed": ["art/review/mole-cabinet-overlay.png", "art/review/mole-style-compare.png"],
+    "note": "Overlay confirms the five openings and blank plate. The comparison reads as one watercolor arcade prop set with the existing claw and skee-lane paintings."
+  }
+}

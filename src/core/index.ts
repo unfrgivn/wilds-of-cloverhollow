@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./surfaces";
 export * from "./sim";
+export * from "./random";
 export * from "./timing";
 export * from "./ink";
 export * from "./journal";
@@ -14,3 +15,4 @@ export * from "./arcade";
 export * from "./claw";
 export * from "./skee";
 export * from "./encounter";
+export * from "./mole";

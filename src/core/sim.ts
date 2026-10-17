@@ -50,6 +50,7 @@ import {
 import { battleParty } from "./party";
 import { firstTouch, nextNotice, noticed, oldFriend } from "./encounter";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
+import { nextRandom } from "./random";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -224,11 +225,6 @@ export function purchaseSnack(state: State, price: number): State {
   return price < 0 || state.coins < price
     ? state
     : { ...state, coins: state.coins - price, snacks: state.snacks + 1 };
-}
-
-export function nextRandom(state: State): [number, State] {
-  const next = (Math.imul(state.rng, 1664525) + 1013904223) >>> 0;
-  return [next / 4294967296, { ...state, rng: next }];
 }
 
 // Draws `count` feelings for a battle's critter, one PRNG value each, in

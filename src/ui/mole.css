@@ -1,0 +1,164 @@
+/* The Boop-a-Mole close-up (spec 8.2). Like the other arcade close-ups, the
+   painted cabinet fills the safe area left of the touch buttons and sits at
+   the bottom of the UI stack (--z-hud); everything on it is placed by
+   layoutMole in whole pixels. Only the holes take taps. */
+.mole-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 46 px at the top keeps the harness's tick readout (spec 4) in view. */
+  padding: calc(var(--safe-top) + 46px)
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))
+    calc(var(--safe-bottom) + 10px) calc(20px + var(--safe-left));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--sticker-font);
+  color: var(--sticker-ink);
+}
+.mole-overlay[hidden] {
+  display: none;
+}
+/* The machine is the part of the painting shown (moleFrame). The painting is
+   its own layer, sized and moved by layoutMole, the cabinet's front cut off
+   below the near hole and faded out (from --fade); the stickers on it aren't
+   faded. */
+.mole-machine {
+  position: relative;
+  flex: none;
+}
+.mole-paint {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  mask-image: linear-gradient(to bottom, #000 var(--fade), transparent);
+  filter: drop-shadow(0 8px 14px #47321f33);
+}
+.mole-plate,
+.mole-hud,
+.mole-key,
+.mole-hole,
+.mole-hit,
+.mole-hammer,
+.mole-pop {
+  position: absolute;
+}
+
+/* A hole: its box clipped to what shows above the deck (layoutMole's path),
+   the mole sliding up inside it. */
+.mole-sprite {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+}
+.mole-sprite[hidden] {
+  display: none;
+}
+.mole-hit {
+  z-index: 4;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The squeaky hammer, turning about its head's centre as it lifts away. */
+.mole-hammer {
+  z-index: 5;
+  overflow: visible;
+  transform-origin: 40% 76%;
+  pointer-events: none;
+}
+.mole-hammer.is-hidden {
+  display: none;
+}
+
+/* "Boop!" over a wincing mole. */
+.mole-pop {
+  z-index: 6;
+  transform: translate(-50%, -100%);
+  padding: 2px 10px 3px;
+  background: #ffe36e;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 900;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.mole-pop[hidden],
+.mole-hud[hidden] {
+  display: none;
+}
+
+/* The blank marquee, lettered with the hint or the game's name. */
+.mole-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+  box-sizing: border-box;
+}
+.mole-plate-text {
+  max-width: 100%;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: .06em;
+  text-align: center;
+  text-wrap: balance;
+}
+.mole-plate:not(.is-hint) .mole-plate-text {
+  letter-spacing: .14em;
+  white-space: nowrap;
+}
+
+/* The key that boops each hole, a little cap beside it; touch players tap
+   the hole itself, so there they're hidden. */
+.mole-key {
+  z-index: 3;
+  transform: translate(-100%, -50%);
+  min-width: 1.4em;
+  padding: 1px 4px 2px;
+  background: var(--sticker-paper);
+  border: 2px solid var(--sticker-ink);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 #47321f55;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  pointer-events: none;
+}
+:root[data-touch="on"] .mole-key {
+  display: none;
+}
+
+/* The score: boops so far and moles still to come, just left of the
+   marquee. */
+.mole-hud {
+  z-index: 5;
+  transform: translateX(-100%);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 12px 7px;
+  background: var(--sticker-paper);
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  box-shadow: var(--sticker-shadow);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.mole-left {
+  color: #b5480f;
+}

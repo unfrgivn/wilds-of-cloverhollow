@@ -1,6 +1,7 @@
 import type { StorySound } from "./sound";
 import type { SurfaceMap } from "./surfaces";
 import type { ArcadeGame, ArcadeGameId } from "./arcade";
+import type { MoleHole } from "./mole";
 
 export type Point = { x: number; y: number };
 export type Polygon = [number, number][];
@@ -181,6 +182,7 @@ export type ArcadeContent = {
   atlas: string;
   claw: ClawContent;
   skee: SkeeContent;
+  mole: MoleContent;
   counter: CounterContent;
   prizes: { id: string; name: string; frame: string }[];
 };
@@ -205,6 +207,24 @@ export type SkeeContent = {
   floor: number;
   pointsPerTicket: number;
   lines: { aim: string; power: string; result: string };
+};
+// Boop-a-Mole (spec 8.2): `moles` a round, one at a time, from holes drawn
+// when it opens. After `readyTicks`, each mole rises over `riseTicks`, stays
+// up from `upFirst` ticks (the first mole) down to `upLast` (the last), and
+// ducks over `duckTicks`; booped, it winces and giggles for `boopTicks` first.
+// `gapTicks` pass between moles; the hammer shows for `hammerTicks`.
+export type MoleContent = {
+  moles: number;
+  readyTicks: number;
+  riseTicks: number;
+  upFirst: number;
+  upLast: number;
+  duckTicks: number;
+  boopTicks: number;
+  gapTicks: number;
+  hammerTicks: number;
+  ticketsPerBoop: number;
+  lines: { ready: string; boop: string; result: string };
 };
 // The ticket counter's prizes and what each costs in tickets.
 export type CounterContent = { prizes: { prize: string; price: number }[] };
@@ -264,6 +284,15 @@ export type SkeeCalibration = {
   };
   board: { x: number; y: number; w: number; h: number };
   plate: { x: number; y: number; w: number; h: number };
+};
+// The painted Boop-a-Mole cabinet (`public/assets/arcade/mole-cabinet.json`,
+// spec 8.2), in the image's pixels: the blank marquee plate, and each hole's
+// opening, the ellipse where its dark inside meets the rim.
+export type MoleCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  plate: { x: number; y: number; w: number; h: number };
+  holes: Record<MoleHole, { cx: number; cy: number; rx: number; ry: number }>;
 };
 // A friend who walks behind Fae and brings one battle command (spec 5, 8).
 export type PartyContent = {

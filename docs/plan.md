@@ -1808,14 +1808,64 @@ the old trail, the owl, and the clubhouse claim.
     differ only by the patched tile's re-encode noise.
   - The lane isn't a canopy: nowhere Fae can stand does it hide her.
 
-## Milestone 46: Boop-a-Mole **Status:** 📋 Planned
-- Whack-a-mole, gently: one of the five cabinets is Boop-a-Mole. Moles pop
-  from five holes in a plus, and Fae boops their noses with a squeaky hammer
-  (arrows, and Z for the middle; on touch, tap the hole). Nobody gets hurt:
-  they giggle and pop back down. A short round pays tickets.
-- It's the Whack check from `docs/battle-ideas.md`, played as an arcade game
-  first; Mr. Pip's battle could borrow it later.
-- For the owner: the name, and which cabinet.
+## Milestone 46: Boop-a-Mole **Status:** ✅ Completed (2026-10-17)
+- Whack-a-mole, gently, on the arcade's first cabinet (`cabinet-left`, the
+  mint one with the pink stripe, beside the door): once Mr. Pip is calm it
+  offers "Play for 2 coins" (`play: mole 2`, interactable `boop-a-mole`,
+  prompt Play). Nobody gets hurt: a booped mole squeezes its eyes shut,
+  giggles, and ducks back down.
+- The game is a close-up of the cabinet's deck from where Fae stands, painted
+  like the claw machine and the skee-ball lane: five holes in a plus in
+  one-point perspective under a blank marquee. The moles (three frames: up,
+  booped, giggling) rise out of the holes, the near rim hiding their waists,
+  and a squeaky toy hammer (drawn in code) boops them on the head.
+- A round is 16 moles, one at a time. Each rises over 8 ticks, stays up for
+  a window that shrinks from 64 ticks to 32 across the round, and ducks over
+  8; 16 ticks pass between moles, after a 60-tick "Get ready!". Which hole
+  each mole comes from is drawn from the game's random generator as the round
+  opens (never the same hole twice in a row) and kept with the game, so a
+  replay is exact. A fresh press of an arrow boops that hole, and Z the
+  middle; on touch, tap the hole (each hole's key is lettered beside it for
+  keyboards). Booping an empty hole only squeaks, and a missed mole just
+  ducks: nothing is ever lost.
+- Tickets: 2 a boop (32 for a perfect round), paid at the result, for the
+  ticket counter.
+- Evidence: unit tests for the rules (`tests/unit/mole.test.ts`: the draw and
+  the generator, ready, each hole's input and the order when pressed
+  together, an unbooped mole's whole life, the window from first to last,
+  boops while rising and up, the window's edges, squeaks, the hammer's
+  fading, the result paid once, a whole round opened through the real
+  conversation and played through real steps, the view, the cues, the
+  freeze, the loader, and the story), for the layout
+  (`tests/unit/mole-layout.test.ts`), and the gallery's real round states
+  checked against the layout in both engines at a phone's size (touch) and a
+  desktop's (keys); the recorded run `arcade/mole.json`
+  (`tools/sim/record-mole.ts`: Mr. Pip calmed, then fourteen moles booped,
+  one while still rising, two let go, and two squeaks) with its replay test
+  (`mole-replay.test.ts`: the result line, the 2 coins, the 28 tickets paid
+  once, what each boop hit, and every cue); and its real-key e2e
+  (`mole.spec.ts`: a mole up with the keys, a boop, and the result at both
+  sizes, the end state hashing the same as Bun's; and two moles booped with
+  quick taps on their holes on a phone, a finger landing on the hole, in both
+  engines). Every screenshot was viewed.
+- Notes and assumptions:
+  - The owner's decisions, taken as defaults and open to review: the name
+    Boop-a-Mole; the first cabinet; 2 coins a round; 16 moles; 2 tickets a
+    boop; one mole at a time.
+  - The generator's step (`nextRandom`) moved from `sim.ts` to its own
+    `src/core/random.ts`, so `arcade.ts` can draw a round without importing
+    the simulation that imports it.
+  - The close-up first showed the whole painting with the score over the
+    marquee; it now shows the deck down past the near hole (`moleFrame`),
+    the score beside the marquee, and the key caps by the holes, since
+    keyboard players can't tell which arrow is which hole otherwise. The
+    hammer strikes the top of the head, so the wince shows.
+  - A tap on an outer hole holds its arrow; a tap shorter than a frame used
+    to vanish (arrows had no latch, unlike buttons). Touch input now keeps a
+    tapped arrow for the next frame, as it does a tapped button.
+  - Art, 5 Gemini calls (the generation log), all kept but two cabinet
+    drafts: the cabinet's close-up (3 calls, `art/recipes/mole-cabinet.json`)
+    and the three moles (2 calls, `art/recipes/moles.json`).
 
 ## Milestone 47: Flute friends **Status:** ✅ Completed (2026-10-17)
 - The owner picked flute friends next (2026-10-17). NOTES.md: the flute

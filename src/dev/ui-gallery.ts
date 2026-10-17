@@ -21,11 +21,16 @@ import {
 import { createJournal, type JournalView } from "../ui/journal";
 import { createArcade } from "../ui/arcade";
 import { createTitleScreen, type TitleView } from "../ui/title";
-import { loadContent, parseClawCalibration, parseSkeeCalibration } from "../content/load";
+import {
+  loadContent, parseClawCalibration, parseMoleCalibration, parseSkeeCalibration,
+} from "../content/load";
 import { clawGalleryView } from "./claw-gallery";
+import { moleGalleryView } from "./mole-gallery";
 import { skeeGalleryView } from "./skee-gallery";
 import calibrationData from "../../public/assets/arcade/claw-machine.json";
 import skeeCalibrationData from "../../public/assets/arcade/skee-lane.json";
+import moleCalibrationData from "../../public/assets/arcade/mole-cabinet.json";
+import moleAtlas from "../../public/assets/arcade/moles.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
 
 const root = document.querySelector<HTMLElement>("#gallery");
@@ -69,15 +74,18 @@ const arcadeFixture = content.fixtures.arcade;
 if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
 const clawView = clawGalleryView(content.world, arcadeFixture, state);
 const skeeView = skeeGalleryView(content.world, arcadeFixture, state);
-const gameView = clawView ?? skeeView;
+const moleView = moleGalleryView(content.world, arcadeFixture, state);
+const gameView = clawView ?? skeeView ?? moleView;
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
-const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-");
+const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
+  state.startsWith("mole-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup"
   : state !== "prompt" && !journalState && !titleState &&
-    (!arcadeState || state === "arcade-result" || state === "skee-result");
+    (!arcadeState || state === "arcade-result" || state === "skee-result" ||
+      state === "mole-result");
 if (battleState) document.documentElement.dataset.battle = "open";
 // A catch or a lean shows its touch arrows (spec 8.1).
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
@@ -200,12 +208,30 @@ const galleryPrizeArt = (frame: string): AtlasImage | null => {
     atlas: { w: prizeAtlas.meta.size.w, h: prizeAtlas.meta.size.h },
   };
 };
+// A mole's art: its frame in the moles' atlas.
+const moleFrames = new Map(
+  Object.entries(moleAtlas.frames).map(([name, entry]) => [name, entry.frame]),
+);
+const galleryMoleArt = (frame: string): AtlasImage | null => {
+  const rect = moleFrames.get(frame);
+  return rect === undefined ? null : {
+    src: "assets/arcade/moles.png",
+    frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+    atlas: { w: moleAtlas.meta.size.w, h: moleAtlas.meta.size.h },
+  };
+};
 const arcade = createArcade(stage, galleryPrizeArt, {
   calibration: parseClawCalibration(calibrationData, "public/assets/arcade/claw-machine.json"),
   image: "assets/arcade/claw-machine.webp",
 }, {
   calibration: parseSkeeCalibration(skeeCalibrationData, "public/assets/arcade/skee-lane.json"),
   image: "assets/arcade/skee-lane.webp",
+}, {
+  calibration: parseMoleCalibration(moleCalibrationData, "public/assets/arcade/mole-cabinet.json"),
+  image: "assets/arcade/mole-cabinet.webp",
+  art: galleryMoleArt,
+  // The gallery's states are fixed: a tap on a hole has nothing to play.
+  onHole: () => undefined,
 });
 const title = createTitleScreen(stage);
 title.onChoose((id) => {
@@ -538,7 +564,8 @@ const decoded = (src: string): Promise<void> => {
   return image.decode();
 };
 void Promise.all([document.fonts.ready, decoded("assets/arcade/claw-machine.webp"),
-  decoded("assets/arcade/skee-lane.webp"), decoded("assets/prizes/prizes.png")])
+  decoded("assets/arcade/skee-lane.webp"), decoded("assets/arcade/mole-cabinet.webp"),
+  decoded("assets/arcade/moles.png"), decoded("assets/prizes/prizes.png")])
   .then(
     () =>
       new Promise<void>((resolve) => {

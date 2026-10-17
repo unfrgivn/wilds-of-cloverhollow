@@ -6290,6 +6290,129 @@
         ],
         null
       ],
+      "boop_a_mole": [
+        [
+          "ev",
+          "str",
+          "^arcade-keeper",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^The Boop-a-Mole cabinet is all fizzy with purple scribbles. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "^I'd better calm Mr. Pip first. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Boop-a-Mole! Little moles pop up, and you boop their noses. Gently! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          2,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^I need 2 coins to play. ",
+                "#",
+                "^speaker: Fae",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.21"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Play for 2 coins",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "^ ",
+              "#",
+              "^play: mole 2",
+              "/#",
+              "\n",
+              "^Boop time! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Maybe another time. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "ticket_counter": [
         [
           "ev",

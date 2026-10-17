@@ -1,7 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
+import { moleGalleryStates } from "../../src/dev/mole-gallery";
 import { skeeGalleryStates } from "../../src/dev/skee-gallery";
-import { bunClawLayout, bunSkeeLayout } from "./helpers";
+import { bunClawLayout, bunMoleLayout, bunSkeeLayout } from "./helpers";
 
 test.use({ deviceScaleFactor: 2 });
 
@@ -60,6 +61,8 @@ const battleParts: Record<string, string[]> = {
     state === "arcade-result" ? [".battle-reward", ".sticker-dialogue"] : []])),
   ...Object.fromEntries(skeeGalleryStates.map((state) => [state,
     state === "skee-result" ? [".sticker-dialogue"] : []])),
+  ...Object.fromEntries(moleGalleryStates.map((state) => [state,
+    state === "mole-result" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-check-hint", ".battle-grade",
@@ -518,6 +521,152 @@ test.describe("sticker gallery", () => {
     }
   }
 
+  // Boop-a-Mole as drawn is its layout (spec 8.2): the shown part of the
+  // painting, the plate, the score, each hole's box and clip, its mole and
+  // face, the hammer, and Boop!, from the same real round's states, on a phone
+  // (touch: the holes are the targets, so no keys) and a desktop (the keys),
+  // in both engines. The layout's own geometry is checked in
+  // tests/unit/mole-layout.test.ts.
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of moleGalleryStates) {
+      test(`${state} Boop-a-Mole as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const touch = size.width === 874;
+        await gallery(page, state, touch, touch ? "0,62,21,62" : "0,0,0,0", size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | null): { x: number; y: number; width: number;
+            height: number } => {
+            if (element === null) throw new Error("missing a part of Boop-a-Mole");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const shown = (element: Element | null): boolean =>
+            element !== null && element.getClientRects().length > 0;
+          const machine = document.querySelector<HTMLElement>(".mole-machine");
+          const paint = document.querySelector<HTMLElement>(".mole-paint");
+          if (machine === null || paint === null) throw new Error("Boop-a-Mole isn't drawn");
+          const hud = document.querySelector(".mole-hud");
+          const hammer = document.querySelector<SVGElement>(".mole-hammer:not(.is-hidden)");
+          const pop = document.querySelector<HTMLElement>(".mole-pop");
+          const dialogue = document.querySelector(".sticker-dialogue");
+          const at = dialogue !== null && shown(dialogue) ? document.elementFromPoint(
+            box(dialogue).x + box(dialogue).width / 2,
+            box(dialogue).y + box(dialogue).height / 2) : null;
+          return {
+            scale: Number(machine.dataset.scale),
+            machine: box(machine),
+            background: { size: paint.style.backgroundSize,
+              position: paint.style.backgroundPosition },
+            plate: box(document.querySelector(".mole-plate")),
+            hud: shown(hud) ? box(hud) : null,
+            holes: [...document.querySelectorAll<HTMLElement>(".mole-hole")].map((hole) => {
+              const sprite = hole.querySelector<HTMLElement>(".mole-sprite");
+              return {
+                hole: hole.dataset.hole ?? "", box: box(hole), clip: hole.style.clipPath,
+                mole: sprite === null || !shown(sprite) ? null
+                  : { face: sprite.dataset.face ?? "", transform: sprite.style.transform },
+              };
+            }),
+            keys: [...document.querySelectorAll<HTMLElement>(".mole-key")].map((key) => ({
+              text: key.textContent ?? "", shown: shown(key),
+              box: shown(key) ? box(key) : null,
+            })),
+            hits: [...document.querySelectorAll(".mole-hit")].map((hit) => box(hit)),
+            hammer: hammer === null ? null : {
+              left: Number.parseFloat(hammer.style.left),
+              top: Number.parseFloat(hammer.style.top),
+              width: Number.parseFloat(hammer.style.width),
+            },
+            pop: pop === null || !shown(pop) ? null : {
+              left: Number.parseFloat(pop.style.left), top: Number.parseFloat(pop.style.top),
+            },
+            dialogue: dialogue !== null && shown(dialogue) ? box(dialogue) : null,
+            dialogueOnTop: dialogue !== null && at !== null && dialogue.contains(at),
+            buttons: [...document.querySelectorAll(".touch-confirm, .touch-cancel, .touch-menu")]
+              .filter((button) => shown(button)).map((button) => box(button)),
+          };
+        });
+        const layout = bunMoleLayout(state, drawn.scale);
+        const near = (actual: number, expected: number, label: string): void => {
+          expect(Math.abs(actual - expected), `${label}: ${actual} vs ${expected}`)
+            .toBeLessThanOrEqual(1);
+        };
+        const origin = { x: drawn.machine.x, y: drawn.machine.y };
+        const placed = (actual: Rect, expected: Rect, label: string): void => {
+          near(actual.x - origin.x, expected.x, `${label} x`);
+          near(actual.y - origin.y, expected.y, `${label} y`);
+          near(actual.width, expected.width, `${label} width`);
+          near(actual.height, expected.height, `${label} height`);
+        };
+        near(drawn.machine.width, layout.width, "shown width");
+        near(drawn.machine.height, layout.height, "shown height");
+        expect(drawn.background).toEqual({
+          size: `${layout.painting.width}px ${layout.painting.height}px`,
+          position: `0px ${layout.painting.y}px`,
+        });
+        placed(drawn.plate, layout.plate, "plate");
+        expect(drawn.hud === null, "score shown").toBe(state === "mole-result");
+        if (drawn.hud !== null) {
+          near(drawn.hud.x + drawn.hud.width - origin.x, layout.hud.x, "score's right edge");
+          near(drawn.hud.y - origin.y, layout.hud.y, "score y");
+        }
+        // Every hole where the layout puts it, clipped as it says, its mole (or
+        // none) with its face, sunk as far as it says.
+        expect(drawn.holes.map((item) => item.hole)).toEqual(layout.holes.map((item) =>
+          item.hole));
+        layout.holes.forEach((want, index) => {
+          const item = drawn.holes[index];
+          if (item === undefined) throw new Error(`hole ${want.hole} isn't drawn`);
+          placed(item.box, want.box, `${want.hole} box`);
+          // Browsers read a path back with their own spacing.
+          const bare = (text: string): string => text.replace(/\s+/g, "");
+          expect(bare(item.clip)).toBe(bare(`path("${want.clip}")`));
+          expect(item.mole === null, `${want.hole} mole shown`).toBe(want.mole === null);
+          if (item.mole !== null && want.mole !== null) {
+            expect(item.mole.face).toBe(want.mole.face);
+            expect(item.mole.transform).toBe(`translateY(${want.mole.drop}px)`);
+          }
+          // Its tap target: centred on the hole, at least 48 px each way.
+          const hit = drawn.hits[index];
+          if (hit === undefined) throw new Error(`hole ${want.hole} has no target`);
+          near(hit.x + hit.width / 2 - origin.x, want.cx, `${want.hole} target x`);
+          near(hit.y + hit.height / 2 - origin.y, want.cy, `${want.hole} target y`);
+          expect(Math.min(hit.width, hit.height)).toBeGreaterThanOrEqual(48);
+          // Its key: shown with a keyboard, just left of the hole; not on touch.
+          const key = drawn.keys[index];
+          if (key === undefined) throw new Error(`hole ${want.hole} has no key`);
+          expect(key.text).toBe(want.key.label);
+          expect(key.shown, `${want.hole} key shown`).toBe(!touch);
+          if (key.box !== null) {
+            near(key.box.x + key.box.width - origin.x, want.key.x, `${want.hole} key x`);
+            near(key.box.y + key.box.height / 2 - origin.y, want.key.y, `${want.hole} key y`);
+          }
+        });
+        expect(drawn.hammer === null, "hammer shown").toBe(layout.hammer === null);
+        if (drawn.hammer !== null && layout.hammer !== null) {
+          near(drawn.hammer.left + Math.round(drawn.hammer.width * 0.4), layout.hammer.x,
+            "hammer x");
+          near(drawn.hammer.top + Math.round(drawn.hammer.width * 0.76), layout.hammer.y,
+            "hammer y");
+          near(drawn.hammer.width, layout.hammer.length, "hammer size");
+        }
+        expect(drawn.pop === null, "Boop! shown").toBe(layout.pop === null);
+        if (drawn.pop !== null && layout.pop !== null) {
+          near(drawn.pop.left, layout.pop.x, "Boop! x");
+          near(drawn.pop.top, layout.pop.y, "Boop! y");
+        }
+        // Clear of the touch buttons; in the result, the line reads over it.
+        for (const button of drawn.buttons)
+          expect(overlaps(drawn.machine, button)).toBe(false);
+        if (state === "mole-result") {
+          if (drawn.dialogue === null) throw new Error("the result line isn't shown");
+          expect(drawn.dialogueOnTop).toBe(true);
+          for (const button of drawn.buttons)
+            expect(overlaps(drawn.dialogue, button)).toBe(false);
+        }
+      });
+    }
+  }
+
   for (const state of journalStates) {
     test(`${state} journal baseline`, async ({ page }) => {
       await gallery(page, state);
@@ -741,7 +890,16 @@ test.describe("sticker gallery", () => {
       });
     });
   }
-  for (const state of ["arcade-ready", "arcade-result", "skee-aiming", "skee-result"]) {
+  for (const state of moleGalleryStates) {
+    test(`${state} phone visual baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
+  for (const state of ["arcade-ready", "arcade-result", "skee-aiming", "skee-result", "mole-up",
+    "mole-result"]) {
     test(`${state} desktop visual baseline`, async ({ page }) => {
       await gallery(page, state, false, "0,0,0,0", { width: 1280, height: 720 });
       await expect(page).toHaveScreenshot(`${state}-desktop.png`, {

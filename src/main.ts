@@ -6,6 +6,8 @@ import {
   step,
   type ActionFrame,
   type BattleView,
+  type MoleHole,
+  type Point,
   type State,
   battleView,
   soundCues,
@@ -15,6 +17,7 @@ import {
   loadContent,
   parseClawCalibration,
   parseMapCentres,
+  parseMoleCalibration,
   parseSkeeCalibration,
 } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
@@ -202,6 +205,12 @@ async function boot(): Promise<void> {
     content.world.arcade.atlas.replace(".json", ".png"),
   );
   await prizeImage.decode();
+  // The moles' frames (spec 8.2), decoded before Boop-a-Mole can open.
+  const moleAtlas = "assets/arcade/moles.json";
+  const moleSheet = await Assets.load<Spritesheet>(assetUrl(moleAtlas));
+  const moleImage = new Image();
+  moleImage.src = assetUrl(moleAtlas.replace(".json", ".png"));
+  await moleImage.decode();
   // The arcade games' paintings and their calibrations (spec 8.2), each
   // decoded before its close-up can open.
   const painting = async <T extends { image: string }>(
@@ -216,9 +225,10 @@ async function boot(): Promise<void> {
     await image.decode();
     return { calibration, image: image.src };
   };
-  const [clawPainting, skeePainting] = await Promise.all([
+  const [clawPainting, skeePainting, molePainting] = await Promise.all([
     painting("assets/arcade/claw-machine.json", parseClawCalibration),
     painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
+    painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
   ]);
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
@@ -268,37 +278,49 @@ async function boot(): Promise<void> {
       return { ...geometry, ...shared, balance: check.balance, puffs: check.puffs };
     return null;
   };
-  const stickerArt = (
-    critterId: string,
+  // A frame of a loaded atlas (`file`, its PNG beside it) as the DOM draws it.
+  const sheetFrame = (
+    sheet: Spritesheet | undefined,
+    file: string,
     frameName: string,
   ): AtlasImage | null => {
-    const critter = content.world.critters[critterId];
-    const sheet =
-      critter === undefined
-        ? undefined
-        : Assets.get<Spritesheet | undefined>(critter.atlas);
     const rect = sheet?.data.frames[frameName]?.frame;
     const size = sheet?.data.meta.size;
-    if (critter === undefined || rect === undefined || size === undefined)
-      return null;
-    return {
-      src: assetUrl(critter.atlas.replace(".json", ".png")),
-      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
-      atlas: { w: size.w, h: size.h },
-    };
-  };
-  // A prize's art: its frame in the prize atlas (spec 8.2).
-  const prizeArt = (frameName: string): AtlasImage | null => {
-    const rect = prizeSheet.data.frames[frameName]?.frame;
-    const size = prizeSheet.data.meta.size;
     if (rect === undefined || size === undefined) return null;
     return {
-      src: assetUrl(content.world.arcade.atlas.replace(".json", ".png")),
+      src: assetUrl(file.replace(".json", ".png")),
       frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
       atlas: { w: size.w, h: size.h },
     };
   };
-  const arcade = createArcade(uiRoot, prizeArt, clawPainting, skeePainting);
+  const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
+    const critter = content.world.critters[critterId];
+    return critter === undefined ? null : sheetFrame(
+      Assets.get<Spritesheet | undefined>(critter.atlas), critter.atlas, frameName);
+  };
+  // A prize's art: its frame in the prize atlas (spec 8.2).
+  const prizeArt = (frameName: string): AtlasImage | null =>
+    sheetFrame(prizeSheet, content.world.arcade.atlas, frameName);
+  // Each hole of Boop-a-Mole is a touch target (spec 8.2): the outer four
+  // hold their arrow, and the middle the confirm button, while pressed; a tap
+  // counts however quickly it lifts.
+  const holeArrows: Record<Exclude<MoleHole, "middle">, Point> = {
+    up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
+  };
+  const onHole = (hole: MoleHole, down: boolean): void => {
+    if (hole === "middle") {
+      touch.setButton("confirm", down);
+      if (down) touch.tapButton("confirm");
+    } else if (down) {
+      touch.holdArrow(holeArrows[hole]);
+      touch.tapArrow(holeArrows[hole]);
+    } else touch.releaseArrow(holeArrows[hole]);
+  };
+  const arcade = createArcade(uiRoot, prizeArt, clawPainting, skeePainting, {
+    ...molePainting,
+    art: (frameName) => sheetFrame(moleSheet, moleAtlas, frameName),
+    onHole,
+  });
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");
   await view.setArea(initialArea);
@@ -393,9 +415,11 @@ async function boot(): Promise<void> {
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;
-    // An arrow held as a catch or lean ends is hidden mid-press and may never
-    // see its pointer lifted: outside one, it lets go.
-    if (checkKind !== "catch" && checkKind !== "lean") touch.releaseArrows();
+    // An arrow held as a catch, a lean, or a round of Boop-a-Mole ends is
+    // hidden mid-press and may never see its pointer lifted: outside one, it
+    // lets go.
+    if (checkKind !== "catch" && checkKind !== "lean" && state.arcade?.game !== "mole")
+      touch.releaseArrows();
     battleHud.render({
       visible: activeBattle && state.battle?.phase !== "reward",
       energy: battle?.energy ?? 0,

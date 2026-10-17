@@ -340,7 +340,8 @@ function expectedClaw(value: unknown): value is ExpectedClaw {
 
 // Asks Bun for a close-up's layout (tools/arcade-layout.ts): Node can't load
 // the content.
-function bunArcadeLayout(game: "claw" | "skee", state: string, scale: number): unknown {
+function bunArcadeLayout(game: "claw" | "skee" | "mole", state: string, scale: number):
+  unknown {
   const result = spawnSync("bun", ["tools/arcade-layout.ts", game, state, String(scale)],
     { encoding: "utf8" });
   if (result.status !== 0) throw new Error(result.stderr);
@@ -397,5 +398,47 @@ function expectedSkee(value: unknown): value is ExpectedSkee {
 export function bunSkeeLayout(state: string, scale: number): ExpectedSkee {
   const parsed = bunArcadeLayout("skee", state, scale);
   if (!expectedSkee(parsed)) throw new Error(`invalid skee-ball layout for ${state}`);
+  return parsed;
+}
+
+// Boop-a-Mole's layout for a gallery state, the parts the e2e tests compare
+// with what's drawn.
+export type ExpectedMole = {
+  width: number;
+  height: number;
+  painting: { width: number; height: number; y: number };
+  plate: Rect;
+  hud: { x: number; y: number };
+  holes: {
+    hole: string;
+    cx: number;
+    cy: number;
+    box: Rect;
+    clip: string;
+    mole: { drop: number; face: string } | null;
+    key: { x: number; y: number; label: string };
+  }[];
+  hammer: { x: number; y: number; angle: number; length: number; opacity: number } | null;
+  pop: { x: number; y: number } | null;
+};
+
+function expectedMole(value: unknown): value is ExpectedMole {
+  const rect = ["x", "y", "width", "height"];
+  const hole = (item: unknown): boolean => record(item) && typeof item.hole === "string" &&
+    numbers(item, ["cx", "cy"]) && numbers(item.box, rect) && typeof item.clip === "string" &&
+    (item.mole === null || (numbers(item.mole, ["drop"]) && record(item.mole) &&
+      typeof item.mole.face === "string")) &&
+    numbers(item.key, ["x", "y"]) && record(item.key) && typeof item.key.label === "string";
+  return numbers(value, ["width", "height"]) && record(value) &&
+    numbers(value.painting, ["width", "height", "y"]) && numbers(value.plate, rect) &&
+    numbers(value.hud, ["x", "y"]) && Array.isArray(value.holes) && value.holes.every(hole) &&
+    (value.hammer === null ||
+      numbers(value.hammer, ["x", "y", "angle", "length", "opacity"])) &&
+    (value.pop === null || numbers(value.pop, ["x", "y"]));
+}
+
+export function bunMoleLayout(state: string, scale: number): ExpectedMole {
+  const parsed = bunArcadeLayout("mole", state, scale);
+  if (!expectedMole(parsed)) throw new Error(`invalid Boop-a-Mole layout for ${state}`);
   return parsed;
 }

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 45, skee-ball and the prize counter)
+Last updated: 2026-10-17 (Milestone 46, Boop-a-Mole)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -209,7 +209,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   later synthesized or generated clip can replace a recipe without changing
   gameplay. Arcade transitions add `claw-move`, `claw-drop`, `claw-grab`,
   `claw-miss`, and `prize-won` for the claw machine, and `skee-aim`,
-  `skee-roll`, `skee-score`, `skee-hundred`, and `tickets-won` for skee-ball.
+  `skee-roll`, `skee-score`, `skee-hundred`, and `tickets-won` for skee-ball,
+  and `mole-pop`, `mole-boop`, and `mole-whiff` for Boop-a-Mole.
 - `src/platform/audio.ts` creates the AudioContext at boot and resumes it at
   every chance: right away, on each key, pointer, or touch, and whenever a cue
   plays while it isn't running. Browsers hold it (`suspended`, or WebKit's
@@ -449,7 +450,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `clubhouse_claimed` (knot `arcade_closed`, the locked door); spawn
   `arcade-door` (1412, 560) faces down. Mr. Pip, the arcade keeper, is its
   set piece at (820, 610). Look points: `claw-machine` (prompt `Play`),
-  `ticket-counter`, `star-racer` (a back-row cabinet), and `skee-ball` (prompt
+  `ticket-counter`, `star-racer` (a back-row cabinet), `boop-a-mole` (prompt
+  `Play`, at (290, 462), the front of the first cabinet, Milestone 46), and
+  `skee-ball` (prompt
   `Play`, at (552, 712), the foot of the lane). The skee-ball lane (Milestone
   45) stands on the open floor at the front left, its hood at the upper left
   and its foot toward the room's front corner: painted into the room by an
@@ -1462,8 +1465,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   a lean's back beside forward (left and right) lean Fae, as the stick or
   arrows would. Let go, the catch returns to the middle and the lean stops;
   lifting one arrow never lets go of the other if a second finger holds it.
-  Outside a catch or a lean the shell lets go of them, so one held as the
-  check ends never walks Fae on. Every battle text pair measures at least
+  Outside a catch, a lean, or a round of Boop-a-Mole the shell lets go of
+  them, so one held as the check ends never walks Fae on. A round of
+  Boop-a-Mole takes taps on its holes instead (spec 8.2): the outer four hold
+  their arrow and the middle the confirm button while pressed, and, like a
+  tapped button, a tapped arrow counts for the next frame however quickly it
+  lifts. Every battle text pair measures at least
   4.5:1 contrast in the gallery tests.
 - `content/fixtures/plaza-party.json` is the two-member visual and battle
   fixture: plaza fountain spawn, seed 1, party `["maddie", "sue"]`.
@@ -1561,13 +1568,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   pill like the notes page's Coins and Snacks (an orange ticket and the
   count, Milestone 45).
 
-### 8.2 Arcade games (Milestones 44 and 45)
-- The claw machine and skee-ball, once Mr. Pip is calm
-  (`calmed("arcade-keeper")`): a line tagged `play: <game> <price>` (`claw` or
-  `skee`, 2 coins each) opens the game when the conversation closes, paying
-  the price then; too few coins at the close opens nothing. `state.arcade` is
-  the game in play (`game: "claw" | "skee"`) or null, `state.prizes` the
-  prizes won, in order, and `state.tickets` Fae's tickets (Milestone 45).
+### 8.2 Arcade games (Milestones 44 to 46)
+- The claw machine, skee-ball, and Boop-a-Mole, once Mr. Pip is calm
+  (`calmed("arcade-keeper")`): a line tagged `play: <game> <price>` (`claw`,
+  `skee`, or `mole`, 2 coins each) opens the game when the conversation
+  closes, paying the price then; too few coins at the close opens nothing.
+  `state.arcade` is the game in play (`game: "claw" | "skee" | "mole"`) or
+  null, `state.prizes` the prizes won, in order, and `state.tickets` Fae's
+  tickets (Milestone 45). `src/core/arcade.ts` opens, steps, and views
+  whichever is open; each game's rules are their own module (`claw.ts`,
+  `skee.ts`, `mole.ts`).
 - The claw machine's content (`claw` in `content/arcade.json`, validated by
   `parseArcade`): the box's floor is 1000 wide (x, left to right) by 460 deep
   (z, from the front glass to the back wall). The claw travels x 185..940 and z 140..420; its home, (185, 140),
@@ -1732,6 +1742,77 @@ ios/            Capacitor iOS project (from Milestone 4).
   won it, its line tagged `trade: <prize> <price>` (spec 7). With nothing she
   can pay for, Mr. Pip says how many tickets she has; with all four won, that
   she's a champ.
+- Boop-a-Mole (Milestone 46): the first cabinet, `play: mole 2`. Its content
+  (`mole` in `content/arcade.json`, validated by `parseArcade`): 16 moles a
+  round, one at a time, after a 60-tick "Get ready!". Each rises over 8
+  ticks, stays up for a window that shrinks from 64 ticks (the first mole)
+  to 32 (the last) in even steps (`moleWindow`), and ducks over 8; booped,
+  it winces and giggles for 24 ticks first, then ducks giggling; 16 ticks
+  pass between moles. A round pays 2 tickets a boop. The loader checks
+  positive integers, at least two moles, a window that shrinks or holds, a
+  boop of at least two ticks (both faces show), and a result line with
+  `{booped}`, `{moles}`, and `{tickets}`.
+- The round's holes are drawn as it opens, one draw of the game's random
+  generator a mole (`nextRandom`, `src/core/random.ts`), each among the five
+  holes but the last mole's, so no hole comes twice in a row; the order is
+  kept with the game, so a replay is exact. A fresh press (down now, not on
+  the previous tick) of an arrow boops that hole, and of Z the middle; two at
+  once, the middle, then up, down, left, right (`moleHole`). A swing at the
+  mole's hole while it's rising or up boops it; at any other hole, or once
+  it's booped or ducking, the hammer only squeaks. Nothing is ever lost.
+  ```
+  ready --readyTicks--> playing --the last mole down--> result
+  result --press (show it all)--> shown --press--> closed
+  a mole: rising --> up --its window--> ducking --> waiting --gapTicks--> the next
+          rising or up --boop--> booped --> giggling --> waiting
+  ```
+  After the last mole, the result line ("You booped {booped} of {moles}
+  moles! +{tickets} tickets.") types like dialogue, and the tickets join
+  `state.tickets` once.
+- `moleView` is logical: each hole and the mole in it, if one's out (how far
+  risen, 0 to 1, and its face: up, booped for the first half of the boop,
+  then giggle), the hammer's swing (its hole, how far through, and whether
+  it booped), the boops, the moles still to come, the hint (`ready`, then
+  `boop`), and the result line.
+- The close-up (`src/ui/mole.ts`, laid out by `layoutMole` in
+  `src/ui/mole-layout.ts`) is a painting of the cabinet's deck seen from
+  where Fae stands, its five holes in a plus in one-point perspective under a
+  blank marquee (`public/assets/arcade/mole-cabinet.webp`), calibrated in its
+  pixels (`mole-cabinet.json`, validated by `parseMoleCalibration`: the
+  plate, and each hole's opening, the ellipse where its dark inside meets the
+  rim). It shows the painting's whole width from just above the marquee to
+  past the near hole (`moleFrame`), the cabinet's front faded out, as large as
+  the safe area left of the touch buttons allows.
+- A mole is a frame of `public/assets/arcade/moles.json` (`mole-up`,
+  `mole-booped`, `mole-giggle`: its upper body cut straight at the waist on
+  the frame's last row), 2.1 times its hole's rx on a side, standing with its
+  waist on the hole's near rim. Its box is clipped to everything above the
+  hole's centre line plus the opening's lower half, so it rises out of the
+  hole and the near rim hides its waist; rising and ducking slide it down
+  inside the box. The squeaky hammer (drawn in code) comes down on the top of
+  the mole's head, then lifts, turns back, and fades over `hammerTicks`;
+  "Boop!" pops up over a wincing mole. With a keyboard, each hole's key (↑ ←
+  Z → ↓) is lettered on a little cap just left of it; on touch the holes
+  themselves are the targets (at least 48 px each way), so the caps are
+  hidden. A score sticker (BOOPS, MOLES still to come) sits just left of the
+  marquee, which is lettered with the hint (BOOP-A-MOLE when there's none).
+  The result line uses the shared speakerless dialogue box.
+- The gallery's Boop-a-Mole states are a real round's (`src/dev/mole-gallery.ts`):
+  ready, rising, up, booped, giggling, a squeak at an empty hole, and the
+  result. `tests/unit/mole-layout.test.ts` checks the layout itself (each
+  mole standing in its hole with its waist on the rim, rising and ducking,
+  the hammer on its head, Boop!, the keys, and the frame keeping every hole
+  and risen mole in view), and the gallery e2e checks the DOM is that layout
+  within a pixel at 874x402 (touch) and 1280x720 (keys) in both engines,
+  `tools/arcade-layout.ts` giving Node the layout from Bun. The recorded run
+  `arcade/mole.json` (`tools/sim/record-mole.ts`, from the `arcade` fixture)
+  calms Mr. Pip and plays a round: fourteen moles booped (one while still
+  rising), two let go, and two squeaks; `mole.spec.ts` plays it with real
+  keys and its state must hash the same as Bun's replay, and boops two moles
+  with quick taps on their holes on a phone, in both engines.
+- Boop-a-Mole's cues: `mole-pop` as each mole starts rising, `mole-boop` or
+  `mole-whiff` (a squeak) as the hammer lands, and `tickets-won` at the
+  result.
 
 ## 10. Save and load
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
@@ -1830,8 +1911,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   plate, hud, arrow: { x, y, set } | null, ghost: { x, y, over } | null,
   ball: { x, y, radius } | null, lit: { points, side } | null, pop: { x, y,
   text } | null, score }`, the arrow's `x, y` its foot, and `lit.side` -1 or
-  1 for a corner hole (0 for the rest). Harness builds log `[cloverhollow] arcade { phase, message }`
-  when either value changes.
+  1 for a corner hole (0 for the rest). Boop-a-Mole: `{ game: "mole", phase,
+  machine (the part shown), plate, hud | null, holes: [{ hole, x, y, mole: {
+  face, drop } | null }], hammer: { x, y } | null, pop: { x, y, text } | null,
+  score }`, each hole's `x, y` its centre and a mole's `drop` how far below
+  its full rise it is. Harness builds log `[cloverhollow] arcade { phase,
+  message }` when either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, `sound.level()`
   reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), and

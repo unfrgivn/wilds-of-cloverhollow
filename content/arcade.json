@@ -147,6 +147,23 @@
       "result": "You scored {score}! +{tickets} tickets."
     }
   },
+  "mole": {
+    "moles": 16,
+    "readyTicks": 60,
+    "riseTicks": 8,
+    "upFirst": 64,
+    "upLast": 32,
+    "duckTicks": 8,
+    "boopTicks": 24,
+    "gapTicks": 16,
+    "hammerTicks": 12,
+    "ticketsPerBoop": 2,
+    "lines": {
+      "ready": "Get ready!",
+      "boop": "Boop the moles before they duck!",
+      "result": "You booped {booped} of {moles} moles! +{tickets} tickets."
+    }
+  },
   "counter": {
     "prizes": [
       {

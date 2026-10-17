@@ -18,6 +18,7 @@ import clubhouseData from "../../content/areas/clubhouse.json";
 import arcadeGameData from "../../content/arcade.json";
 import prizesData from "../../content/prizes.json";
 import { isArcadeGameId } from "../core/arcade";
+import type { MoleHole } from "../core/mole";
 import harnessSurfaceData from "../../content/surfaces/harness.json";
 import bedroomSurfaceData from "../../content/surfaces/bedroom.json";
 import plazaSurfaceData from "../../content/surfaces/plaza.json";
@@ -127,6 +128,8 @@ import type {
   ClawCalibration,
   CounterContent,
   HeapPlush,
+  MoleCalibration,
+  MoleContent,
   SkeeCalibration,
   SkeeContent,
   WindUp,
@@ -445,6 +448,7 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
       },
     },
     skee: parseSkee(value.skee, file),
+    mole: parseMole(value.mole, file),
     counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
   };
@@ -535,6 +539,36 @@ function parseSkee(value: unknown, file: string): SkeeContent {
   };
 }
 
+// Boop-a-Mole (spec 8.2): positive integers throughout, at least two moles, a
+// window that shrinks (or holds) across the round, a boop long enough to show
+// both faces, and a result line with `{booped}`, `{moles}`, and `{tickets}`.
+function parseMole(value: unknown, file: string): MoleContent {
+  field(record(value), file, "mole");
+  const integer = (name: string, minimum = 1): number =>
+    integerIn(value, name, minimum, file, `mole.${name}`);
+  const upFirst = integer("upFirst");
+  const upLast = integer("upLast");
+  field(upLast <= upFirst, file, "mole.upLast (the window shrinks across the round)");
+  const lines = value.lines;
+  field(record(lines) && typeof lines.ready === "string" && typeof lines.boop === "string" &&
+    typeof lines.result === "string" && ["{booped}", "{moles}", "{tickets}"]
+    .every((part) => typeof lines.result === "string" && lines.result.includes(part)),
+  file, "mole.lines");
+  return {
+    moles: integer("moles", 2),
+    readyTicks: integer("readyTicks"),
+    riseTicks: integer("riseTicks"),
+    upFirst,
+    upLast,
+    duckTicks: integer("duckTicks"),
+    boopTicks: integer("boopTicks", 2),
+    gapTicks: integer("gapTicks"),
+    hammerTicks: integer("hammerTicks"),
+    ticketsPerBoop: integer("ticketsPerBoop"),
+    lines: { ready: lines.ready, boop: lines.boop, result: lines.result },
+  };
+}
+
 // The ticket counter: prizes from the catalogue, each once, never one of the
 // claw machine's plushes, each at a price of at least one ticket.
 function parseCounter(
@@ -606,6 +640,53 @@ export function parseClawCalibration(value: unknown, file: string): ClawCalibrat
     ceiling: { front: { y: value.ceiling.front.y }, back: { y: value.ceiling.back.y } },
     chute: { mouth: value.chute.mouth.map(([x, y]) => [x, y]) },
     plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
+  };
+}
+
+// The Boop-a-Mole painting's calibration (spec 8.2): every number finite, the
+// plate and every hole inside the image, the holes in a plus (far over middle
+// over near, left of middle left of right), and no hole's box touching
+// another's or the plate.
+export function parseMoleCalibration(value: unknown, file: string): MoleCalibration {
+  const number = (item: unknown): item is number =>
+    typeof item === "number" && Number.isFinite(item);
+  type Box = { x: number; y: number; w: number; h: number };
+  type Hole = { cx: number; cy: number; rx: number; ry: number };
+  field(record(value) && typeof value.image === "string", file, "image");
+  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
+  const size = { w: value.size.w, h: value.size.h };
+  const inside = (box: Box): boolean =>
+    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const apart = (a: Box, b: Box): boolean =>
+    a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
+  const rect = (item: unknown): item is Box =>
+    record(item) && number(item.x) && number(item.y) && number(item.w) && number(item.h) &&
+    item.w > 0 && item.h > 0;
+  const plate = value.plate;
+  field(rect(plate) && inside(plate), file, "plate");
+  field(record(value.holes), file, "holes");
+  const holes = value.holes;
+  const hole = (name: MoleHole): Hole => {
+    const item = holes[name];
+    field(record(item) && number(item.cx) && number(item.cy) && number(item.rx) &&
+      number(item.ry) && item.rx > 0 && item.ry > 0, file, `holes.${name}`);
+    return { cx: item.cx, cy: item.cy, rx: item.rx, ry: item.ry };
+  };
+  const all = { up: hole("up"), left: hole("left"), middle: hole("middle"),
+    right: hole("right"), down: hole("down") };
+  const box = (item: Hole): Box =>
+    ({ x: item.cx - item.rx, y: item.cy - item.ry, w: 2 * item.rx, h: 2 * item.ry });
+  const boxes = Object.values(all).map(box);
+  field(boxes.every((item) => inside(item) && apart(item, plate)) &&
+    boxes.every((item, index) => boxes.slice(index + 1).every((other) => apart(item, other))) &&
+    all.up.cy < all.middle.cy && all.middle.cy < all.down.cy &&
+    all.left.cx < all.middle.cx && all.middle.cx < all.right.cx,
+  file, "holes (a plus, each inside the image, none touching another or the plate)");
+  return {
+    image: value.image,
+    size,
+    plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
+    holes: all,
   };
 }
 

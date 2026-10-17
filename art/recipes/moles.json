@@ -1,0 +1,24 @@
+{
+  "asset": "Boop-a-Mole three-frame upper-body sprite atlas",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 2,
+  "references": [
+    "public/assets/characters/pond-pup/pond-pup.png",
+    "public/assets/characters/maddie/maddie.png"
+  ],
+  "selected": "art/source/moles/moles-sheet-raw.png",
+  "prompt_summary": "Three identical chibi mole upper-body frames on clean magenta: curious open-eyed mole-up, happy squeezed-eye mole-booped, and laughing open-mouth mole-giggle, all flat-cut at the waist.",
+  "key_colour": "#FF00FF magenta, absent from the mole palette",
+  "post_processing": [
+    "Selected the second generation after visual inspection removed divider lines and stray marks.",
+    "tools/art/build-moles.ts crops the three 800px source columns, keys the magenta with 22% fuzz, trims, scales into 320x320 transparent frames, and packs a Pixi-compatible 960x320 atlas.",
+    "Chroma key is removed with border-connected transparency; visible edge despill is limited to the keyed alpha edge by the ImageMagick transparent operation.",
+    "Rebuilt twice with identical output hash."
+  ],
+  "outputs": { "atlas": "public/assets/arcade/moles.png", "metadata": "public/assets/arcade/moles.json", "rebuild": "tools/art/build-moles.ts" },
+  "owner_review": {
+    "viewed": ["art/review/moles-cream.png", "art/review/moles-dark.png", "art/review/moles-in-holes.png"],
+    "note": "The frames read as one friendly mole with readable expression changes; the in-hole composite shows the lower cut and rim relationship at all five calibrated scales."
+  }
+}

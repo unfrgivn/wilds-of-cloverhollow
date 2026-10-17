@@ -794,6 +794,25 @@ A skee-ball lane! Roll the balls into the rings for tickets. # speaker: Fae
     -> DONE
 -> DONE
 
+=== boop_a_mole ===
+{not calmed("arcade-keeper"):
+    The Boop-a-Mole cabinet is all fizzy with purple scribbles. # speaker: Fae
+    I'd better calm Mr. Pip first. # speaker: Fae
+    -> DONE
+}
+Boop-a-Mole! Little moles pop up, and you boop their noses. Gently! # speaker: Fae
+{coins() < 2:
+    I need 2 coins to play. # speaker: Fae
+    -> DONE
+}
++ [Play for 2 coins] # play: mole 2
+    Boop time! # speaker: Fae
+    -> DONE
++ [Not now]
+    Maybe another time. # speaker: Fae
+    -> DONE
+-> DONE
+
 // Mr. Pip runs the ticket counter once he's calm (Milestone 45): each prize
 // is offered while Fae can pay for it and hasn't won it.
 === ticket_counter ===

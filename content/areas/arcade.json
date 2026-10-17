@@ -97,6 +97,15 @@
         "y": 712
       },
       "prompt": "Play"
+    },
+    {
+      "id": "boop-a-mole",
+      "knot": "boop_a_mole",
+      "point": {
+        "x": 290,
+        "y": 462
+      },
+      "prompt": "Play"
     }
   ],
   "critters": [

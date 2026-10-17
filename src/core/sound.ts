@@ -11,6 +11,7 @@ export type SoundCue =
   | "battle-beat"
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
   | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
+  | "mole-pop" | "mole-boop" | "mole-whiff"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
 
 export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
@@ -87,21 +88,29 @@ export function soundCues(
       cues.push("battle-hit");
   }
   const game = next.arcade;
-  if (game !== null && previous.arcade?.phase !== game.phase) {
-    if (game.game === "claw") {
-      if (game.phase === "sliding" || game.phase === "pushing") cues.push("claw-move");
-      if (game.phase === "dropping") cues.push("claw-drop");
-      if (game.phase === "lifting")
-        cues.push(game.outcome === "grabbed" ? "claw-grab" : "claw-miss");
-      if (game.phase === "result" && game.outcome === "grabbed") cues.push("prize-won");
-    } else {
-      if (game.phase === "winding") cues.push("skee-aim");
-      if (game.phase === "rolling") cues.push("skee-roll");
-      if (game.phase === "scored")
-        cues.push(game.throws.at(-1)?.points === world.arcade.skee.corners.points
-          ? "skee-hundred" : "skee-score");
-      if (game.phase === "result") cues.push("tickets-won");
-    }
+  const newPhase = game !== null && previous.arcade?.phase !== game.phase;
+  if (game?.game === "claw" && newPhase) {
+    if (game.phase === "sliding" || game.phase === "pushing") cues.push("claw-move");
+    if (game.phase === "dropping") cues.push("claw-drop");
+    if (game.phase === "lifting")
+      cues.push(game.outcome === "grabbed" ? "claw-grab" : "claw-miss");
+    if (game.phase === "result" && game.outcome === "grabbed") cues.push("prize-won");
+  }
+  if (game?.game === "skee" && newPhase) {
+    if (game.phase === "winding") cues.push("skee-aim");
+    if (game.phase === "rolling") cues.push("skee-roll");
+    if (game.phase === "scored")
+      cues.push(game.throws.at(-1)?.points === world.arcade.skee.corners.points
+        ? "skee-hundred" : "skee-score");
+    if (game.phase === "result") cues.push("tickets-won");
+  }
+  // Boop-a-Mole: a mole pops up the tick it starts rising, and the hammer's
+  // swing boops or squeaks the tick it lands.
+  if (game?.game === "mole") {
+    if (game.phase === "playing" && game.stage === "rising" && game.stageTicks === 0)
+      cues.push("mole-pop");
+    if (game.hammer?.ticks === 0) cues.push(game.hammer.hit ? "mole-boop" : "mole-whiff");
+    if (game.phase === "result" && newPhase) cues.push("tickets-won");
   }
   return cues;
 }

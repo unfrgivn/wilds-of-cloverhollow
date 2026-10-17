@@ -3,8 +3,8 @@
 Status: proposals, 2026-10-16. Owner, 2026-10-17: the suggested order is
 approved, and Milestones 40 (battle checks), 41 (Catch), and 42 (feelings)
 built it; `spec.md` section 8 says what they do. Next the owner picked Lean
-(built in Milestone 48), then wind-ups for the two mini-bosses (Milestone 49),
-then first touch and old friends (Milestone 50). The rest of this page stays
+(built in Milestone 48), then wind-ups for the two mini-bosses (Milestone 50),
+then first touch and old friends (Milestone 51). The rest of this page stays
 unscheduled.
 
 Before Milestone 40, every action in a calm-down battle was the same skill

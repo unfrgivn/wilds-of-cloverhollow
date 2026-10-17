@@ -2182,8 +2182,9 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 44, the claw machine: done (above). Then Milestones 45 and 46,
     skee-ball and the prize counter, and Boop-a-Mole.
   - Milestone 48, Lean: done (above). Next (owner, 2026-10-17): Milestone
-    49, wind-ups for the gull and Mr. Pip, then Milestone 50, first touch
-    and old friends.
+    50, wind-ups for the gull and Mr. Pip, then Milestone 51, first touch
+    and old friends. Milestone 49 is the lasso work another session has
+    started.
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

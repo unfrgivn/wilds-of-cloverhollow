@@ -73,9 +73,9 @@ describe("music story sound projection", () => {
       ink: "three",
       dialogue: dialogueState("A flute call.", "flute"),
     };
-    expect(soundCues(base, first)).toContain("chime-red");
-    expect(soundCues(first, next)).toContain("chime-red");
-    expect(soundCues(next, repeated)).toContain("flute");
+    expect(soundCues(base, first, content.world)).toContain("chime-red");
+    expect(soundCues(first, next, content.world)).toContain("chime-red");
+    expect(soundCues(next, repeated, content.world)).toContain("flute");
   });
 
   it("rejects an unknown story sound", () => {

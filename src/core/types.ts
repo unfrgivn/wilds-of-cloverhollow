@@ -1,4 +1,5 @@
 import type { StorySound } from "./sound";
+import type { SurfaceMap } from "./surfaces";
 
 export type Point = { x: number; y: number };
 export type Polygon = [number, number][];
@@ -154,6 +155,7 @@ export type GroundManifest = {
 export type World = {
   tunables: Tunables;
   areas: Record<string, Area>;
+  surfaces: Record<string, SurfaceMap>;
   // The lands of the painted map (content/lands.json); `busStop` when the bus
   // line stops there.
   lands: { id: string; name: string; busStop: boolean }[];

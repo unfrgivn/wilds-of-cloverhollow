@@ -412,7 +412,7 @@ async function boot(): Promise<void> {
     };
     const previous = state;
     state = step(content.world, state, input).state;
-    for (const cue of soundCues(previous, state)) {
+    for (const cue of soundCues(previous, state, content.world)) {
       const played = sound.play(cue, state.tick);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);

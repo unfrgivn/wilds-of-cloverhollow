@@ -1663,8 +1663,13 @@ Sound follow-ups from Milestone 37:
   land (birds, waves, wind). Needs the owner's call on the source: code
   synthesis like the effects, a generator (paid generation needs the
   owner), or CC0 clips found through Openverse (`docs/media-sources.md`).
-- Footsteps by surface (grass, wood, sand) once the area kits carry ground
-  data (after Milestone 34).
+- Footsteps by surface: done (2026-10-16). Every loaded area uses the closed
+  surface set (grass, sand, wood, snow, stone, tile, and carpet), with maps in
+  `content/surfaces/<area>.json` registered by `src/content/load.ts`. A missing
+  map is a load error naming that path and the registration file, rather than a
+  silent grass default. Footstep cues are synthesized recipes for now; clips
+  are pending the owner's pick from the candidates below. The plaza is all
+  stone because it is a paved square.
 - A volume control beside mute: done in the volume follow-up (2026-10-16).
   Four chunky steps, 25% through 100%, use the existing master gain path and
   live beside the mute pill. One 44 CSS-pixel sticker control cycles the steps,

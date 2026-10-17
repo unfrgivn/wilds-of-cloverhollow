@@ -26,7 +26,7 @@ test("audio waits for a real key in the browser, then cues play", async ({ page 
   await hold(page, "ArrowRight", 1);
   await expect.poll(state).toBe("running");
   await hold(page, "ArrowRight", 16);
-  expect((await soundLog(page)).some((entry) => entry.cue.startsWith("footstep") && entry.played))
+  expect((await soundLog(page)).some((entry) => entry.cue === "footstep-carpet" && entry.played))
     .toBe(true);
 });
 
@@ -54,7 +54,7 @@ test("walking, a door, M mute, and the journal sound control use real input", as
   await openHarness(page);
   await resetPaused(page, "new-game");
   await hold(page, "ArrowRight", 16);
-  expect((await soundLog(page)).some((entry) => entry.cue.startsWith("footstep"))).toBe(true);
+  expect((await soundLog(page)).some((entry) => entry.cue === "footstep-carpet")).toBe(true);
 
   await hold(page, "ArrowUp", 20);
   await hold(page, "ArrowRight", 36);
@@ -70,7 +70,7 @@ test("walking, a door, M mute, and the journal sound control use real input", as
   await hold(page, "ArrowRight", 16);
   const mutedCues = await soundLog(page);
   expect(await page.evaluate(() => window.__cloverhollow?.sound.muted())).toBe(true);
-  expect(mutedCues.some((entry) => entry.cue.startsWith("footstep") && !entry.played)).toBe(true);
+  expect(mutedCues.some((entry) => entry.cue === "footstep-carpet" && !entry.played)).toBe(true);
 
   await page.keyboard.down("j");
   await step(page, 1);

@@ -14,6 +14,22 @@ import arcadeData from "../../content/areas/arcade.json";
 import eastHallData from "../../content/areas/east-hall.json";
 import musicData from "../../content/areas/music.json";
 import fieldData from "../../content/areas/field.json";
+import harnessSurfaceData from "../../content/surfaces/harness.json";
+import bedroomSurfaceData from "../../content/surfaces/bedroom.json";
+import plazaSurfaceData from "../../content/surfaces/plaza.json";
+import kitchenSurfaceData from "../../content/surfaces/kitchen.json";
+import parkSurfaceData from "../../content/surfaces/park.json";
+import schoolSurfaceData from "../../content/surfaces/school.json";
+import classroomSurfaceData from "../../content/surfaces/classroom.json";
+import gymSurfaceData from "../../content/surfaces/gym.json";
+import baySurfaceData from "../../content/surfaces/bay.json";
+import passSurfaceData from "../../content/surfaces/pass.json";
+import trailSurfaceData from "../../content/surfaces/trail.json";
+import woodsSurfaceData from "../../content/surfaces/woods.json";
+import arcadeSurfaceData from "../../content/surfaces/arcade.json";
+import eastHallSurfaceData from "../../content/surfaces/east-hall.json";
+import musicSurfaceData from "../../content/surfaces/music.json";
+import fieldSurfaceData from "../../content/surfaces/field.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -76,6 +92,7 @@ import { isStorySound } from "../core/sound";
 import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
 } from "./props";
+import { parseSurfaceMap } from "./surfaces";
 import type {
   Area,
   CharacterContent,
@@ -905,6 +922,20 @@ export function parseCharacters(
   return characters;
 }
 
+export function completeSurfaceMaps(
+  areas: Record<string, Area>, data: Record<string, unknown>,
+): Record<string, import("../core").SurfaceMap> {
+  const result: Record<string, import("../core").SurfaceMap> = {};
+  for (const area of Object.values(areas)) {
+    const path = `content/surfaces/${area.id}.json`;
+    const value = data[area.id];
+    if (value === undefined)
+      throw new Error(`${path} is missing; it must be registered in src/content/load.ts`);
+    result[area.id] = parseSurfaceMap(value, path, area.width, area.height);
+  }
+  return result;
+}
+
 export function loadContent(): {
   world: World;
   fixtures: Record<string, Fixture>;
@@ -1046,6 +1077,15 @@ export function loadContent(): {
     [music.id]: music,
     [playingField.id]: playingField,
   };
+  const surfaceData: Record<string, unknown> = {
+    harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
+    kitchen: kitchenSurfaceData, park: parkSurfaceData, school: schoolSurfaceData,
+    classroom: classroomSurfaceData, gym: gymSurfaceData, bay: baySurfaceData,
+    pass: passSurfaceData, trail: trailSurfaceData, woods: woodsSurfaceData,
+    arcade: arcadeSurfaceData, "east-hall": eastHallSurfaceData, music: musicSurfaceData,
+    field: fieldSurfaceData,
+  };
+  const surfaces = completeSurfaceMaps(areas, surfaceData);
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));
   if (ruleProblems.length > 0) throw new Error(`content/areas: ${ruleProblems.join("; ")}`);
   const critterProblems = critterErrors(areas, critters, stickers);
@@ -1058,6 +1098,7 @@ export function loadContent(): {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
       areas,
+      surfaces,
       lands,
       story,
       critters,

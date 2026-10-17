@@ -14,12 +14,12 @@ describe("gameplay sound cues", () => {
     const start = createState(content.world, content.fixtures["new-game"] ?? harness);
     const positioned: State = { ...start, player: { x: 610, y: 345 }, facing: "up" };
     const opened = step(content.world, positioned, { ...none, confirm: true }).state;
-    expect(soundCues(positioned, opened)).toContain("dialogue-open");
+    expect(soundCues(positioned, opened, content.world)).toContain("dialogue-open");
     const typed = step(content.world, step(content.world, opened, none).state, none).state;
-    expect(soundCues(opened, typed)).toContain("dialogue-blip");
+    expect(soundCues(opened, typed, content.world)).toContain("dialogue-blip");
     const journalStart = createState(content.world, content.fixtures["new-game"] ?? harness);
     const journal = step(content.world, journalStart, { ...none, menu: true }).state;
-    expect(soundCues(journalStart, journal)).toEqual(["journal-open"]);
+    expect(soundCues(journalStart, journal, content.world)).toEqual(["journal-open"]);
   });
 
   it("uses real movement steps for a throttled footstep and does not repeat while still", () => {
@@ -27,14 +27,14 @@ describe("gameplay sound cues", () => {
     let cues: string[] = [];
     for (let index = 0; index < 16; index += 1) {
       const next = step(content.world, state, right).state;
-      cues = [...cues, ...soundCues(state, next)];
+      cues = [...cues, ...soundCues(state, next, content.world)];
       state = next;
     }
-    expect(cues.filter((cue) => cue === "footstep")).toHaveLength(2);
+    expect(cues).toEqual(["footstep-grass", "footstep-grass"]);
     const stopped = step(content.world, state, none).state;
-    expect(soundCues(state, stopped)).toEqual([]);
+    expect(soundCues(state, stopped, content.world)).toEqual([]);
     const held = step(content.world, stopped, none).state;
-    expect(soundCues(stopped, held)).toEqual([]);
+    expect(soundCues(stopped, held, content.world)).toEqual([]);
   });
 
   it("starts a battle from a real step into a critter", () => {
@@ -42,6 +42,6 @@ describe("gameplay sound cues", () => {
     const positioned: State = { ...initial, player: { x: 1080, y: 820 }, facing: "left" };
     const next = step(content.world, positioned, { ...none, move: { x: -1, y: 0 } }).state;
     expect(next.battle).not.toBeNull();
-    expect(soundCues(positioned, next)).toEqual(["battle-start"]);
+    expect(soundCues(positioned, next, content.world)).toEqual(["battle-start"]);
   });
 });

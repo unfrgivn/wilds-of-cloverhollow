@@ -197,6 +197,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   earlier version shot the plaza while the door fade still covered it.
 
 ### 3.3 Gameplay sound (Milestone 37)
+- Footstep cues use the loaded world surface maps, so every moving step is named `footstep-<surface>`; unknown area maps are load errors, never silent grass defaults.
 - Sound effects only: no music, ambience beds, or voice. `src/core/sound.ts`
   derives a closed set of `SoundCue` values from state diffs; it has no DOM,
   timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a
@@ -231,6 +232,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   another line, including when the text is repeated. Unknown story sounds are
   rejected by the content loader. The music-room recipes are synthesized
   xylophone bars (C5, E5, G5, C6) and a short breathy rising flute call.
+- Footsteps use a closed surface set (`grass`, `sand`, `wood`, `snow`, `stone`,
+  `tile`, `carpet`). Each area has a required `content/surfaces/<area>.json`
+  with a default and first-match polygon regions in area units. The loader
+  rejects unknown surfaces, malformed or out-of-bounds polygons, and a missing
+  file throws an error naming `content/surfaces/<id>.json` and directing registration
+  in `src/content/load.ts`. Surface lookup is pure and footstep cues are
+  `footstep-<surface>`; the current platform recipes are synthesized and remain
+  replaceable by clips pending the owner's pick. The plaza's default is stone,
+  because it is a paved square.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -676,6 +686,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   placement into world units and rejects unknown props or states, duplicate
   ids, moved painted props, and rules reading undeclared Ink variables
   (`propRuleErrors`).
+- Surface maps live beside props in `content/surfaces/<area>.json`: `{ default,
+  precedence: "first", regions: [{ surface, polygon }] }`. `default` and each
+  region's `surface` are from the closed set in section 3.3. Regions are tested
+  in file order, polygons must have at least three finite points and stay inside
+  the area's bounds, and every loaded area, including `harness`, has a file
+  registered in `src/content/load.ts`.
 - Collision: each prop's current footprint is solid for Fae, the party, and
   roaming critters, like a blocker (`sceneryArea`); spawning and joining
   party slots avoid them too.

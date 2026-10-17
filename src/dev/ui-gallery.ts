@@ -13,6 +13,7 @@ import {
   createRewardSticker,
   createBattleCheck,
   createFeelingBubble,
+  createWindUpBubbles,
   type BattleCheckView,
   type BattleCommand,
   type TimingGrade,
@@ -70,7 +71,7 @@ const journalState = state.startsWith("journal-");
 const arcadeState = state.startsWith("arcade-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
-  ? state === "battle-command" || state === "battle-feelings"
+  ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup"
   : state !== "prompt" && !journalState && !titleState &&
     (!arcadeState || state === "arcade-result");
 if (battleState) document.documentElement.dataset.battle = "open";
@@ -180,6 +181,7 @@ const battleHud = createBattleHud(stage);
 const commands = createCommandMenu(stage);
 const check = createBattleCheck(stage);
 const feelingBubble = createFeelingBubble(stage);
+const windUpBubbles = createWindUpBubbles(stage);
 const reward = createRewardSticker(stage);
 const journal = createJournal(stage);
 // A prize's art: its frame in the prize atlas.
@@ -218,6 +220,10 @@ const battleMessage: DialogueView = {
   choices: [],
   selected: -1,
   canAdvance: false,
+};
+const windUpMessage: DialogueView = {
+  ...battleMessage,
+  text: "The gull puffs up bigger and bigger! It's feeling everything at once!",
 };
 const frogRing = { x: 600, y: 170, radius: 74, progress: 0.62, target: 0.65 };
 const faeRing = { x: 190, y: 300, radius: 66, progress: 0.38, target: 0.5 };
@@ -325,7 +331,7 @@ function renderGalleryState(): void {
     energy: 3,
     energyMax: 5,
     calm: 0.45,
-    critterName: "Fizzy Frog",
+    critterName: state === "battle-windup" ? "Grumpy Gull" : "Fizzy Frog",
   });
   // `?party=N` previews a bigger party's menu: N friend commands between
   // Soothe and Snack (two columns on phones, one from 1000 px).
@@ -351,11 +357,21 @@ function renderGalleryState(): void {
     { id: "snack", label: "Snack", detail: "×2", disabled: false, feeling: null },
     { id: "run", label: "Run", detail: null, disabled: false, feeling: null },
   ];
+  // A gull winding up, grumpy and hungry at once: Soothe and Snack wear the
+  // bubbles' badges.
+  const windUpCommands: BattleCommand[] = [
+    { id: "soothe", label: "Soothe", detail: null, disabled: false, feeling: "grumpy" },
+    { id: "play", label: "Play", detail: null, disabled: false, feeling: null },
+    { id: "cast", label: "Cast", detail: "reeling in", disabled: true, feeling: null },
+    { id: "snack", label: "Snack", detail: "×2", disabled: false, feeling: "hungry" },
+    { id: "run", label: "Run", detail: null, disabled: false, feeling: null },
+  ];
   const feelings = state === "battle-feelings";
+  const windUp = state === "battle-windup";
   commands.render({
-    visible: state === "battle-command" || feelings,
-    selected: feelings ? 1 : 2,
-    commands: feelings ? feelingCommands : commandList,
+    visible: state === "battle-command" || feelings || windUp,
+    selected: feelings ? 1 : windUp ? 0 : 2,
+    commands: feelings ? feelingCommands : windUp ? windUpCommands : commandList,
   });
   // Between the party (left) and the frog (centre), as the game places it.
   const cloudAt = { x: Math.round(innerWidth * 0.36), y: 96 };
@@ -366,6 +382,10 @@ function renderGalleryState(): void {
       ? { now: { id: "zoomy", label: "Zoomy" }, next: "curious", later: null, answered: true,
         ...cloudAt }
       : null);
+  windUpBubbles.render(windUp
+    ? { bubbles: [{ id: "grumpy", label: "Grumpy", popped: false },
+      { id: "hungry", label: "Hungry", popped: false }], ...cloudAt }
+    : null);
   // Rings go through the game's own check overlay, like every other check.
   const ringCheck = (ring: typeof frogRing, grade: TimingGrade | null): BattleCheckView => ({
     kind: "ring",
@@ -480,7 +500,7 @@ function renderGalleryState(): void {
     visible: state === "prompt",
   });
   if (!dialogueShown) dialogue.hide();
-  else if (battleState) dialogue.render(battleMessage);
+  else if (battleState) dialogue.render(state === "battle-windup" ? windUpMessage : battleMessage);
   else if (clawView !== null)
     dialogue.render({
       speaker: null,

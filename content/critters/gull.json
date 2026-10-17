@@ -92,6 +92,16 @@
       "spring": 3
     }
   },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "The gull puffs up bigger and bigger! It's feeling everything at once!",
+      "puffing": "The gull puffs up even bigger!",
+      "fizzle": "Pfft! The gull's big gust fizzles into a tiny breeze."
+    }
+  },
   "lines": {
     "intro": "A grumpy gull puffs up on the lookout bench. It wants ALL the snacks!",
     "command": "How can Fae calm the gull?",

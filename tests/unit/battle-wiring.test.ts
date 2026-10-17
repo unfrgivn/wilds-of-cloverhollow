@@ -18,6 +18,7 @@ function battleState(fixtureName: string, critterId = "fountain-frog"): State {
     critterId, den: null, entry: state.player, phase: "command",
     message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
     rest: {}, check: null, lastGrade: null, feelings: [], answered: false, lanternPeek: false,
+    turn: 1, windUp: null,
     rewardSticker: null, phaseTicks: 0,
   };
   return { ...state, battle };

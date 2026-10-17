@@ -126,6 +126,7 @@ import type {
   ArcadeContent,
   ClawCalibration,
   HeapPlush,
+  WindUp,
 } from "../core";
 
 // A battle check's spec (spec 8), validated by kind. Every number is an
@@ -831,6 +832,7 @@ export function parseCritter(value: unknown, file: string): Critter {
   const lines = value.lines;
   field(record(lines), file, "lines");
   const line = (key: string): string => text(lines, key);
+  const feelings = critterFeelings(value.feelings, file);
   const sootheRaw = command("soothe", ["calm", "great", "good"]);
   const snackRaw = command("snack", ["calm", "energy"]);
   // One entry per party command id (spec 8); the loader checks the roster's
@@ -870,7 +872,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     sticker: stickerValue,
     calmKnot,
     calmPrompt,
-    feelings: critterFeelings(value.feelings, file),
+    feelings,
     commands: {
       soothe: {
         calm: number(sootheRaw, "calm"),
@@ -884,6 +886,7 @@ export function parseCritter(value: unknown, file: string): Critter {
       friends,
     },
     burst: burstValue,
+    windUp: critterWindUp(value.windUp, file, feelings.length),
     lines: {
       intro: line("intro"),
       command: line("command"),
@@ -980,6 +983,38 @@ function critterFeelings(value: unknown, file: string): FeelingId[] {
   field(Array.isArray(value) && value.length > 0 && value.every(isFeelingId) &&
     new Set(value).size === value.length, file, "feelings");
   return [...value];
+}
+
+// A mini-boss's wind-up (spec 8, Milestone 50), or null without one: never on
+// the first turn, at least one plain turn between two, and no more bubbles
+// than the kind has feelings.
+function critterWindUp(value: unknown, file: string, feelings: number): WindUp | null {
+  if (value === undefined || value === null) return null;
+  field(record(value), file, "windUp");
+  const integer = (key: string): number => {
+    const item = value[key];
+    field(typeof item === "number" && Number.isInteger(item), file, `windUp.${key}`);
+    return item;
+  };
+  const start = integer("start");
+  const every = integer("every");
+  const bubbles = integer("bubbles");
+  field(start >= 2, file, "windUp.start");
+  field(bubbles >= 1 && bubbles <= feelings, file, "windUp.bubbles");
+  field(every > bubbles, file, "windUp.every");
+  const lines = value.lines;
+  field(record(lines), file, "windUp.lines");
+  const line = (key: string): string => {
+    const item = lines[key];
+    field(typeof item === "string" && item.length > 0, file, `windUp.lines.${key}`);
+    return item;
+  };
+  return {
+    start,
+    every,
+    bubbles,
+    lines: { start: line("start"), puffing: line("puffing"), fizzle: line("fizzle") },
+  };
 }
 
 // Every feeling's answer is a command Fae can have: Soothe, Snack, or a

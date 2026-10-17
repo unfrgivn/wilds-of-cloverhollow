@@ -38,7 +38,15 @@ import {
   stepCheck,
   viewCheck,
 } from "./checks";
-import { answers, feelingFromDraw, feelingsOn } from "./feelings";
+import {
+  answers,
+  bubbleAnswered,
+  feelingFromDraw,
+  feelingsOn,
+  openFeelings,
+  pickFeeling,
+  windUpStarts,
+} from "./feelings";
 import { battleParty } from "./party";
 import { openClaw, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 
@@ -235,6 +243,71 @@ function drawFeelings(
     rolled = after;
   }
   return [drawn, rolled];
+}
+
+// Draws a wind-up's bubbles (spec 8): one PRNG value each, picked evenly from
+// the kind's feelings Fae can answer that it isn't showing yet, until there
+// are `count` or none are left.
+function drawWindUp(
+  world: World,
+  state: State,
+  critter: Critter,
+  count: number,
+): [FeelingId[], State] {
+  let open = openFeelings(world, state, critter);
+  let rolled = state;
+  const drawn: FeelingId[] = [];
+  while (drawn.length < count && open.length > 0) {
+    const [value, after] = nextRandom(rolled);
+    const feeling = pickFeeling(open, value);
+    if (feeling === null) break;
+    drawn.push(feeling);
+    open = open.filter((item) => item !== feeling);
+    rolled = after;
+  }
+  return [drawn, rolled];
+}
+
+// A message that isn't the check's own result: the check and its grade go.
+function moveOn(battle: Battle, text: string, phase: Battle["phase"]): Battle {
+  return { ...battleMessage(battle, text, phase), check: null, lastGrade: null };
+}
+
+// A new turn (spec 8). A wind-up puffs on, or starts on its turn with its
+// bubbles drawn while the feelings wait; otherwise the feelings move up one
+// and one more is drawn.
+function nextTurn(world: World, state: State, battle: Battle, critter: Critter): State {
+  const turn = battle.turn + 1;
+  const fresh = { ...moveOn(battle, critter.lines.command, "command"), turn, answered: false };
+  const going = battle.windUp;
+  if (going !== null && going.left > 1)
+    return {
+      ...state,
+      battle: {
+        ...fresh,
+        message: critter.windUp?.lines.puffing ?? critter.lines.command,
+        windUp: { ...going, left: going.left - 1 },
+      },
+    };
+  if (critter.windUp !== null && windUpStarts(critter.windUp, turn)) {
+    const [feelings, rolled] = drawWindUp(world, state, critter, critter.windUp.bubbles);
+    if (feelings.length > 0)
+      return {
+        ...rolled,
+        battle: {
+          ...fresh,
+          message: critter.windUp.lines.start,
+          windUp: { feelings, popped: feelings.map(() => false), left: feelings.length },
+        },
+      };
+  }
+  const [drawn, rolled] = battle.feelings.length === 0
+    ? [[], state]
+    : drawFeelings(world, state, critter, 1);
+  return {
+    ...rolled,
+    battle: { ...fresh, windUp: null, feelings: [...battle.feelings.slice(1), ...drawn] },
+  };
 }
 
 function vertex(polygon: Polygon, index: number): [number, number] {
@@ -714,9 +787,14 @@ export function battleCommands(
   if (battle === null) return [];
   const critter = world.critters[battle.critterId];
   if (critter === undefined) return [];
-  // This turn's feeling, on the command that answers it (its badge).
-  const now = battle.feelings[0] ?? null;
-  const feeling = (id: string): FeelingId | null => (answers(world, now, id) ? now : null);
+  // What the critter feels, on the command that answers it (its badge):
+  // this turn's feeling, or each of a wind-up's bubbles not yet popped.
+  const going = battle.windUp;
+  const showing = going === null
+    ? [battle.feelings[0] ?? null]
+    : going.feelings.filter((_, index) => going.popped[index] !== true);
+  const feeling = (id: string): FeelingId | null =>
+    showing.find((item) => answers(world, item, id)) ?? null;
   const friends = battleParty(world, state.party).flatMap((member) => {
     const command = world.party[member.id]?.command;
     if (command === undefined || command === null) return [];
@@ -798,10 +876,21 @@ export function battleView(world: World, state: State): BattleView | null {
   const checkView = check === null ? null : viewCheck(check, actor);
   const hint = check === null ? null : checkHint(check, world.battle.hints);
   // The bubble shows in the menu, and over the result (with its heart, if
-  // the choice answered it); never over a check, which needs the room.
+  // the choice answered it); never over a check, which needs the room. A
+  // wind-up's bubbles take its place.
   const [now = null, coming = null, after = null] = battle.feelings;
-  const feelings = battle.feelings.length > 0 &&
-      (battle.phase === "command" || battle.phase === "result")
+  const shown = battle.phase === "command" || battle.phase === "result";
+  const going = battle.windUp;
+  const windUp = going !== null && shown
+    ? {
+        bubbles: going.feelings.map((id, index) => ({
+          id,
+          label: world.battle.feelings[id].label,
+          popped: going.popped[index] === true,
+        })),
+      }
+    : null;
+  const feelings = going === null && battle.feelings.length > 0 && shown
     ? {
         now: now === null ? null : { id: now, label: world.battle.feelings[now].label },
         next: coming,
@@ -827,6 +916,8 @@ export function battleView(world: World, state: State): BattleView | null {
     check: checkView,
     hint,
     feelings,
+    windUp,
+    puff: going === null ? 0 : going.feelings.length - going.left + 1,
     lastGrade: battle.lastGrade,
     rewardSticker: battle.rewardSticker,
   };
@@ -915,6 +1006,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       "result",
       "burst",
       "burstResult",
+      "fizzle",
       "run",
       "soothed",
       "reward",
@@ -939,47 +1031,48 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         },
       };
     }
-    else if (next.phase === "result")
-      next =
-        next.calm >= critter.calmMax
-          ? battleMessage(next, critter.lines.soothed, "soothed")
-          : battleMessage(next, critter.lines.burst, "burst");
+    else if (next.phase === "result") {
+      // Calm enough, it's soothed, any wind-up over with it. In a wind-up it
+      // puffs on with no burst until its last turn; then, every bubble
+      // popped, it fizzles, else it lets go (spec 8).
+      const going = next.windUp;
+      if (next.calm >= critter.calmMax)
+        next = { ...moveOn(next, critter.lines.soothed, "soothed"), windUp: null };
+      else if (going !== null && going.left > 1) return nextTurn(world, nextBase, next, critter);
+      else if (going !== null && going.popped.every((popped) => popped))
+        next = {
+          ...moveOn(next, critter.windUp?.lines.fizzle ?? critter.lines.burst, "fizzle"),
+          windUp: null,
+        };
+      else next = moveOn(next, critter.lines.burst, "burst");
+    }
     else if (next.phase === "burst") {
-      // The big roll first, then one draw per catch toy (its lane) or lean
-      // puff (its force).
-      const random = nextRandom(nextBase);
-      const big = random[0] < critter.burst.bigChance;
+      // After a wind-up its size is set: big if nothing was popped, else
+      // small. Otherwise the big roll comes first. Then one draw per catch
+      // toy (its lane) or lean puff (its force).
+      const letGo = next.windUp;
+      const [roll, afterRoll]: [number, State] =
+        letGo === null ? nextRandom(nextBase) : [1, nextBase];
+      const big = letGo === null
+        ? roll < critter.burst.bigChance
+        : letGo.popped.every((popped) => !popped);
       const spec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
-      let rolled = random[1];
+      let rolled = afterRoll;
       const picks: number[] = [];
       for (let item = 0; item < checkDraws(spec); item += 1) {
         const [value, after] = nextRandom(rolled);
         picks.push(pickFromDraw(spec, value));
         rolled = after;
       }
-      return { ...rolled, battle: startCheck(next, "fae", spec, big, picks) };
+      return {
+        ...rolled,
+        battle: { ...startCheck(next, "fae", spec, big, picks), windUp: null },
+      };
     }
-    else if (next.phase === "burstResult") {
-      if (next.energy <= 0) next = battleMessage(next, critter.lines.rest, "rest");
-      else {
-        // A new turn: the feelings move up one, and one more is drawn.
-        const [drawn, rolled] = next.feelings.length === 0
-          ? [[], nextBase]
-          : drawFeelings(world, nextBase, critter, 1);
-        return {
-          ...rolled,
-          battle: {
-            ...next,
-            phase: "command",
-            message: critter.lines.command,
-            revealed: 0,
-            phaseTicks: 0,
-            feelings: [...next.feelings.slice(1), ...drawn],
-            answered: false,
-          },
-        };
-      }
-    }
+    else if (next.phase === "burstResult" && next.energy <= 0)
+      next = moveOn(next, critter.lines.rest, "rest");
+    else if (next.phase === "burstResult" || next.phase === "fizzle")
+      return nextTurn(world, nextBase, next, critter);
     else if (next.phase === "soothed") {
       // Every calm pays; the sticker comes once per species (spec 8).
       const fresh = !state.stickers.includes(critter.sticker.id);
@@ -1036,9 +1129,9 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
   }
   if (next.phase === "command") {
     // The lantern, once Fae has it, shows the turn-after feeling too, for the
-    // rest of the battle (spec 8).
+    // rest of the battle (spec 8); not in a wind-up, whose bubbles hide it.
     const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
-    if (lanternEdge && !next.lanternPeek && next.feelings.length > 0 &&
+    if (lanternEdge && !next.lanternPeek && next.feelings.length > 0 && next.windUp === null &&
         world.storyVariable(state.ink, "has_lantern") === true)
       return { ...nextBase, battle: { ...next, lanternPeek: true } };
     const commands = battleCommands(world, { ...state, battle: next });
@@ -1068,8 +1161,14 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ...nextBase,
         battle: battleMessage(next, critter.lines.run, "run"),
       };
-    // Whether this turn's choice answers what the critter feels.
-    const answered = answers(world, next.feelings[0], chosen.id);
+    // Whether this turn's choice answers what the critter feels: this
+    // turn's feeling, or in a wind-up the first bubble it pops.
+    const going = next.windUp;
+    const pop = going === null ? -1 : bubbleAnswered(world, going, chosen.id);
+    const answered = going === null ? answers(world, next.feelings[0], chosen.id) : pop >= 0;
+    const windUp = going === null || pop < 0
+      ? going
+      : { ...going, popped: going.popped.map((popped, index) => popped || index === pop) };
     if (chosen.id === "snack") {
       const message = battleMessage(next, critter.lines.snack, "result");
       return {
@@ -1078,6 +1177,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         battle: {
           ...message,
           answered,
+          windUp,
           rest: restTurn(next.rest),
           energy: Math.min(
             critter.energyMax,
@@ -1104,6 +1204,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           ...next,
           command: chosen.id,
           answered,
+          windUp,
           rest:
             friend === undefined
               ? restTurn(next.rest)
@@ -1923,6 +2024,8 @@ function stepTick(
       feelings: [],
       answered: false,
       lanternPeek: false,
+      turn: 1,
+      windUp: null,
       rewardSticker: null,
       phaseTicks: 0,
     };

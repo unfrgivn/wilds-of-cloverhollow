@@ -282,7 +282,8 @@ export function createRecorder(world: World, initial: State): {
   };
 
   // Plays a battle to its end: the commands in `plan` first, then Soothe for
-  // the rest, every check GREAT (`playCheck`). `pause` holds still for half a
+  // the rest, except that in a wind-up it pops a bubble when a ready command
+  // can; every check GREAT (`playCheck`). `pause` holds still for half a
   // second whenever it's true of the command menu, so a watcher (the e2e)
   // can look.
   const battle = (plan: string[], pause?: (state: State) => boolean): void => {
@@ -290,7 +291,9 @@ export function createRecorder(world: World, initial: State): {
     for (let count = 0; count < 2000 && state.battle !== null; count += 1) {
       const current = state.battle;
       if (current.phase === "command" && current.revealed >= current.message.length) {
-        const wanted = commands[0] ?? "soothe";
+        const popper = current.windUp === null ? undefined : battleCommands(world, state)
+          .find((item) => item.feeling !== null && !item.disabled)?.id;
+        const wanted = commands[0] ?? popper ?? "soothe";
         const index = battleCommands(world, state).findIndex((item) => item.id === wanted);
         if (index < 0) throw new Error(`no ${wanted} command in this battle`);
         if (state.battle.selected !== index) {

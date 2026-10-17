@@ -3,9 +3,9 @@
 Status: proposals, 2026-10-16. Owner, 2026-10-17: the suggested order is
 approved, and Milestones 40 (battle checks), 41 (Catch), and 42 (feelings)
 built it; `spec.md` section 8 says what they do. Next the owner picked Lean
-(built in Milestone 48), then wind-ups for the two mini-bosses (Milestone 50),
-then first touch and old friends (Milestone 51). The rest of this page stays
-unscheduled.
+(built in Milestone 48), then wind-ups for the two mini-bosses (built in
+Milestone 50), then first touch and old friends (Milestone 51). The rest of
+this page stays unscheduled.
 
 Before Milestone 40, every action in a calm-down battle was the same skill
 check: press confirm when the shrinking ring meets the dashed circle. Soothe,
@@ -131,7 +131,8 @@ teaches the idea before the park pup's Catch adds moving.
    matching command pops one. Pop them all before it lets go and the gust
    fizzles; pop some and it's smaller. Friend rest timers become planning, and
    the gull and Mr. Pip get a shape of their own instead of bigger numbers.
-   Borrowed from Sea of Stars' locks.
+   Borrowed from Sea of Stars' locks. Built in Milestone 50, the bubbles
+   showing feelings (answered as ever) rather than friends' icons.
 3. **Talk, for people.** People under the spell (Mr. Pip now, more later) get a
    Talk command: two or three Ink choices, graded by which one Fae picks. It
    reuses the dialogue choices and Ink, matches NOTES.md's "saying the right

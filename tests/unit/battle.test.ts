@@ -48,6 +48,7 @@ function battleState(): State {
       feelings: [],
       answered: false,
       lanternPeek: false,
+      turn: 1, windUp: null,
       phaseTicks: 0,
     },
   };

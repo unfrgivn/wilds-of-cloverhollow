@@ -406,6 +406,10 @@ export type Critter = {
     check: CheckSpec;
     big?: CheckSpec;
   };
+  // A mini-boss's wind-up (Milestone 50), or null: from turn `start`, then
+  // every `every` turns, it puffs up for `bubbles` turns, feeling that many
+  // things at once; its lines start it, carry it on, and end it popped.
+  windUp: WindUp | null;
   lines: {
     intro: string;
     command: string;
@@ -419,6 +423,12 @@ export type Critter = {
     run: string;
   };
 };
+export type WindUp = {
+  start: number;
+  every: number;
+  bubbles: number;
+  lines: { start: string; puffing: string; fizzle: string };
+};
 export type BattlePhase =
   | "intro"
   | "command"
@@ -426,6 +436,8 @@ export type BattlePhase =
   | "result"
   | "burst"
   | "burstResult"
+  // A wind-up popped all over: the critter lets go of nothing (Milestone 50).
+  | "fizzle"
   | "soothed"
   | "reward"
   | "rest"
@@ -456,6 +468,12 @@ export type Battle = {
   answered: boolean;
   // The lantern has shown the turn-after feeling, for the rest of the battle.
   lanternPeek: boolean;
+  // The turn, from 1 (Milestone 50).
+  turn: number;
+  // A mini-boss puffed up (Milestone 50): the feelings it shows at once,
+  // which are popped, and the turns left before it lets go (this one too).
+  // `feelings` wait meanwhile.
+  windUp: { feelings: FeelingId[]; popped: boolean[]; left: number } | null;
   // Set as the reward shows: the species' sticker if it's new, else null.
   rewardSticker: string | null;
   phaseTicks: number;
@@ -524,7 +542,7 @@ export type BattleView = {
   check: BattleCheckView | null;
   hint: string | null;
   // The critter's feelings to show (spec 8.1), or null when there's none to
-  // show: off, or outside the command menu and its result.
+  // show: off, during a wind-up, or outside the command menu and its result.
   feelings: {
     now: { id: FeelingId; label: string } | null;
     next: FeelingId | null;
@@ -532,6 +550,11 @@ export type BattleView = {
     later: FeelingId | null;
     answered: boolean;
   } | null;
+  // A wind-up's bubbles (Milestone 50), in the command menu and its result;
+  // else null. `puff` counts its turns so far (1 on the first), 0 outside
+  // one, for the critter to swell by.
+  windUp: { bubbles: { id: FeelingId; label: string; popped: boolean }[] } | null;
+  puff: number;
   lastGrade: Grade | null;
   rewardSticker: string | null;
 };

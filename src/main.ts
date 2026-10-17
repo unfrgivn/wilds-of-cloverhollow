@@ -25,6 +25,7 @@ import {
   createCommandMenu,
   createBattleCheck,
   createFeelingBubble,
+  createWindUpBubbles,
   createRewardSticker,
   type BattleCheckView as BattleCheckOverlayView,
 } from "./ui/battle";
@@ -91,6 +92,7 @@ async function boot(): Promise<void> {
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
   const feelingBubble = createFeelingBubble(uiRoot);
+  const windUpBubbles = createWindUpBubbles(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(sound.toggle);
@@ -395,6 +397,10 @@ async function boot(): Promise<void> {
     feelingBubble.render(battle === null || battle.feelings === null || feelingAt === null
       ? null
       : { ...battle.feelings, ...feelingAt });
+    // A mini-boss's wind-up shows its bubbles there instead (Milestone 50).
+    windUpBubbles.render(battle === null || battle.windUp === null || feelingAt === null
+      ? null
+      : { ...battle.windUp, ...feelingAt });
     if (
       activeBattle &&
       state.battle?.phase === "command" &&

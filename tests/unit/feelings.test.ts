@@ -24,6 +24,7 @@ function introState(fixtureName: string): State {
     message: "intro", revealed: 5, selected: 0, command: null, energy: 5, calm: 0,
     rest: {}, check: null, lastGrade: null, feelings: [], answered: false,
     lanternPeek: false, rewardSticker: null, phaseTicks: 0,
+    turn: 1, windUp: null,
   };
   return { ...state, battle };
 }
@@ -185,6 +186,7 @@ describe("battle feelings", () => {
       message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
       rest: {}, check: null, lastGrade: null, feelings: ["grumpy", "hungry", "zoomy"],
       answered: false, lanternPeek: false, rewardSticker: null, phaseTicks: 0,
+      turn: 1, windUp: null,
     };
     const before = { ...state, battle, lantern: false };
     const after = step(content.world, before, { ...blankInput(), lantern: true }).state;

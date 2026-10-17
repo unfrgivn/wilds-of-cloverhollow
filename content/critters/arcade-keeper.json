@@ -102,6 +102,16 @@
       ]
     }
   },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Mr. Pip huffs and puffs, bigger and bigger! He's feeling everything at once!",
+      "puffing": "Mr. Pip huffs and puffs even bigger!",
+      "fizzle": "Pfft! Mr. Pip runs out of puff, and not one ticket flies."
+    }
+  },
   "lines": {
     "intro": "Mr. Pip, the arcade keeper, spins round with swirly eyes. \"NOBODY beats my high scores!\"",
     "command": "How can Fae calm Mr. Pip?",

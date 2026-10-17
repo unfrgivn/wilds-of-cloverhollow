@@ -1906,6 +1906,73 @@ the old trail, the owl, and the clubhouse claim.
 - Engine: a prop state can be hidden (nothing drawn, no footprint, hides
   nobody), and the kit cuts `added` props.
 
+## Milestone 50: Wind-ups **Status:** ✅ Completed (2026-10-17)
+- The owner picked wind-ups after Lean (2026-10-17, `docs/battle-ideas.md`:
+  "Wind-ups, for mini-bosses", after Sea of Stars' locks). The gull and Mr.
+  Pip, the two mini-bosses, get a shape of their own: on turn 2, then every
+  third turn, one puffs up for two turns, feeling two things at once. The
+  feelings float as bubbles where the thought cloud would, and each command
+  that answers one pops it, with the feeling bonus as ever. No burst comes
+  between the two turns; then it lets go: everything popped, it fizzles with
+  no burst at all; some, a small burst; none, a big one. No roll either way.
+- The bubbles are feelings Fae already reads (Milestone 42's icons and
+  badges), drawn like a turn's but all different, from those she can answer.
+  The ordinary feelings wait meanwhile, so the turn after shows the one the
+  trail promised. A mini-boss winds up beside Maddie alone too, when
+  ordinary feelings are off.
+- Rest timers become planning: Mr. Pip's run juggles on turn 1, so Jordan
+  is still resting when the wind-up's bored bubble needs him, and the small
+  burst comes.
+- Fixed on the way: a check stayed in the battle after its own result, so
+  the last burst's ring, catch, or lean, with its GREAT, hung over the next
+  turn's menu (and a command's check over the burst's line). Any other
+  message or a new turn now clears the check and its grade.
+- Evidence: core unit tests for the wind-up's rules (`wind-up.test.ts`: the
+  schedule, the draws and their PRNG order, popping and the bonus, the
+  badges, puffing on with no burst, fizzling, letting go big or small with
+  no roll, the view and the swell's `puff`, a soothed critter done winding
+  up, the lantern dark in a wind-up, the last check and grade cleared, and
+  the loader), every recorded run meeting a mini-boss re-recorded with the
+  runs that start from them; real-key e2e (`windup.spec.ts`: the lookout's
+  gull popped by Soothe then Snack until its gust fizzles, and the bubbles
+  clear of everything on a notched phone and an iPhone SE) and the
+  gallery's wind-up state. Gates: `just check` (710 unit tests, every sim,
+  purity, lint), `just build`, and `just e2e` (573 passed, 2 skipped, on
+  Chromium and WebKit). Every changed screenshot was viewed: 32 differ only
+  in the harness readout's tick (31 checked pixel for pixel outside it; the
+  claw's stuck shot also shimmers at most 6/255 in the blurred room behind
+  the glass, with the claw game's state and Fae's spot identical), 18 by
+  the later tick's roaming critters, feelings, and party spacing (the
+  flute run's battle is a Zoomie Pup where it was a Pouncy Cat), and 8 are
+  new (the wind-up's menu and a popped bubble on both engines, the phones
+  at 874 and 667, and the gallery's wind-up on both engines).
+- Notes and assumptions:
+  - Two bubbles for both, so a wind-up lasts two turns, and `every` 3 leaves
+    a plain turn between. The bubbles are feelings rather than the idea's
+    ball, bobber, and pinecone: kids already read feelings and their badges,
+    and Soothe and Snack can answer them too.
+  - A bubble pops as its command is chosen, like answering a feeling, so
+    the bonus lands with the check whatever its grade.
+  - A critter soothed mid-wind-up is done winding up (the lookout's gull is
+    calmed during its second), so it's its own size through its sigh and the
+    reward. The lantern does nothing during a wind-up, since the cloud it
+    peeks into is hidden.
+  - The critter swells 6% a wind-up turn, breathing a little: a runtime scale
+    of the approved art, like the aura's turn, not an edit to it.
+  - Lines (in the review queue): the gull "puffs up bigger and bigger! It's
+    feeling everything at once!", "puffs up even bigger!", and "Pfft! The
+    gull's big gust fizzles into a tiny breeze."; Mr. Pip "huffs and puffs,
+    bigger and bigger! He's feeling everything at once!", "huffs and puffs
+    even bigger!", and "Pfft! Mr. Pip runs out of puff, and not one ticket
+    flies."
+  - The recorder's careful player pops a bubble when a ready command can,
+    once its plan is spent: the lookout's gull fizzles its first wind-up
+    (Soothe, then Snack). The lookout, the claw run, and the pass-party
+    chain from the arcade on were re-recorded; the claw replay's end tick
+    moved from 3199 to 3066.
+  - Bubbles are 52 px at 720 px wide and under: at 64 px the row reached
+    over Fae's head on an iPhone SE.
+
 ## Milestone 52: The clubhouse kitchen **Status:** 📋 Planned
 - The owner asked for it (2026-10-17). NOTES.md's clubhouse ideas: a
   "Microwave for making dino nuggets and mac n cheese" and a "Chest to store
@@ -2208,9 +2275,8 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 44, the claw machine: done (above). Then Milestones 45 and 46,
     skee-ball and the prize counter, and Boop-a-Mole.
   - Milestone 48, Lean: done (above). Next (owner, 2026-10-17): Milestone
-    50, wind-ups for the gull and Mr. Pip, then Milestone 51, first touch
-    and old friends. Milestone 49 is the lasso work another session has
-    started.
+    50, wind-ups for the gull and Mr. Pip: done (above). Then Milestone 51,
+    first touch and old friends.
   - Milestone 49, lasso spots: in progress (above); then Milestone 52, the
     clubhouse kitchen (owner, 2026-10-17).
   - The kid's identity is kept for the very end (owner, 2026-10-07).

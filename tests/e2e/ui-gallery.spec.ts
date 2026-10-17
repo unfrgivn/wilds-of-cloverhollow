@@ -8,7 +8,7 @@ const states = ["short", "long", "long-max", "revealing", "speaker-board",
   "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];
 const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
   "battle-charge", "battle-chain", "battle-chain-burst", "battle-catch", "battle-lean",
-  "battle-reward", "battle-feelings", "battle-feelings-heart"];
+  "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup"];
 const journalStates = ["journal-empty", "journal-notes", "journal-full"];
 const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
@@ -50,6 +50,7 @@ const battleParts: Record<string, string[]> = {
   "battle-lean": [".battle-hud", ".battle-lean", ".touch-lean"],
   "battle-feelings": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-feeling"],
   "battle-feelings-heart": [".battle-hud", ".battle-feeling", ".battle-feeling-heart"],
+  "battle-windup": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-windup"],
   "battle-reward": [".battle-reward"],
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
@@ -60,7 +61,7 @@ const battleParts: Record<string, string[]> = {
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-check-hint", ".battle-grade",
   ".touch-reach", ".touch-lean",
-  ".battle-feeling", ".battle-feeling-heart",
+  ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
   ".touch-confirm", ".touch-cancel", ".touch-menu"];
 const touchButtonsShown = [".touch-confirm", ".touch-cancel", ".touch-menu"];
@@ -818,6 +819,7 @@ test.describe("sticker gallery", () => {
         for (const part of document.querySelectorAll(
            ".battle-hud, .battle-commands, .battle-ring, .battle-charge-meter, .battle-chain, " +
              ".battle-catch, .battle-lean, .battle-check-hint, .battle-feeling, .battle-grade, " +
+             ".battle-windup, " +
              ".battle-reward")) {
           observer.observe(part, { childList: true, characterData: true, subtree: true });
         }

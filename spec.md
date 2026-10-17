@@ -1022,7 +1022,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `bigChance` is 0.5 (ordinary critters are 0.3), so its gust can hit harder.
   Its friend-command values and checks are every critter's (a check belongs
   to its command, not to the critter); the extra difficulty comes from its
-  larger meter, extra energy, larger reach, and stronger burst.
+  larger meter, extra energy, larger reach, and stronger burst, and from its
+  wind-ups (Milestone 50, below), which Mr. Pip shares.
 - Friend commands: Maddie's Play, Sue's Cast, and Jordan's Juggle (pinecones;
   calm 30, great 15, good 5, rest 2 on every critter). Each plays its own
   check (Milestone 40): Play the ring (Maddie's pounce), Cast a charge (Sue
@@ -1068,6 +1069,8 @@ ios/            Capacitor iOS project (from Milestone 4).
             (when calm reached calmMax)     species' sticker added if new
          -> burst -> check (on Fae) -> burstResult -> command
             (or rest when energy reaches 0)
+         -> command (a wind-up puffing on: no burst)
+         -> fizzle -> command (a wind-up's last turn, every bubble popped)
   rest -> door-style fade to safeSpot; the critter stays chaos; nothing lost
   ```
 
@@ -1090,8 +1093,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   Snack spends one of Fae's `snacks` (gone for good, whatever happens next),
   shows how many she has (`×N`), and is disabled at zero.
 - Checks (Milestone 40): every Fae-side command (side `critter`) and every
-  burst (side `fae`) plays a check, `battle.check` (null outside one; the
-  phase is `check`): a copy of its spec plus its own progress. A check is
+  burst (side `fae`) plays a check, `battle.check` (the phase is `check`): a
+  copy of its spec plus its own progress. It stays as it ended, with its
+  grade, through its own result message, and goes (with `lastGrade`) when any
+  other message or a new turn starts; before Milestone 50 it lingered over
+  the next turn's menu. A check is
   created at tick 0; each later tick adds one to its `tick`, then applies that
   tick's input. A confirm edge is a confirm not held on the previous tick; a
   touch `choose` is never one. Every check ends in a grade:
@@ -1142,11 +1148,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   to `calmMax`, and show that command's line for the grade. A burst's check
   starts with seeded PRNG draws, in this order: first the big roll (under
   `bigChance` it's big, plays `burst.big`, or the burst's `check` if the kind
-  has none, and its base damage is 2, else 1), then one draw per catch toy,
+  has none, and its base damage is 2, else 1; after a wind-up there's no
+  roll, as its pops set the size), then one draw per catch toy,
   `min(2, floor(value x 3))` its lane, or per lean puff, `forces[min(n - 1,
   floor(value x n))]` its force (with n forces, each as likely). Ring and
-  chain bursts make the one draw. Great, good, and miss deal 0, base minus 1,
-  and base.
+  chain bursts make the one draw (none after a wind-up). Great, good, and
+  miss deal 0, base minus 1, and base.
 - Check numbers (Milestone 40): Soothe and Maddie's Play are rings of 60
   ticks, target 39, windows 5 and 11. Sue's Cast is a charge: wait 180, max
   60, target 44, windows 5 and 11. Jordan's Juggle is a pinecone chain:
@@ -1199,8 +1206,8 @@ ios/            Capacitor iOS project (from Milestone 4).
     order; at each new turn's menu (after a burst, with energy left) the row
     moves up one and one more is drawn. A value picks from the kind's
     feelings Fae can answer at that moment, spread evenly
-    (`min(n - 1, floor(value x n))`). These are the only draws outside a
-    burst's.
+    (`min(n - 1, floor(value x n))`). These and a wind-up's are the only
+    draws outside a burst's.
   - Choosing a command sets `battle.answered` when it answers this turn's
     feeling. An answered Snack adds the bonus to its calm at once; Soothe or
     a friend's command adds it when its check resolves, whatever the grade.
@@ -1209,6 +1216,35 @@ ios/            Capacitor iOS project (from Milestone 4).
     sticker) in the command menu shows the turn after's feeling too, for the
     rest of the battle (`battle.lanternPeek`); it draws nothing, leaves the
     overworld lantern as it was, and plays `lantern-on`.
+- Wind-ups (Milestone 50): a mini-boss (`windUp` in its kind: `start`,
+  `every`, `bubbles`, and `lines.start`, `lines.puffing`, `lines.fizzle`)
+  puffs up on turn `start`, then every `every` turns, feeling several things
+  at once. The gull and Mr. Pip start on turn 2, every 3 turns, with 2
+  bubbles. `battle.turn` counts turns from 1; `battle.windUp` holds the
+  bubbles' feelings, which are popped, and the turns `left` (this one too).
+  - Starting: as that turn's menu opens, `bubbles` feelings are drawn, all
+    different, from the kind's feelings Fae can answer then: one seeded
+    value each, picked evenly from those not yet drawn, fewer if fewer are
+    open (no wind-up if none are). It lasts a turn per bubble. Its menu says
+    `lines.start`, later turns `lines.puffing`. Meanwhile `battle.feelings`
+    waits: no move, no draw, and the cloud gives way to the bubbles. Wind-ups
+    don't need feelings on: a mini-boss winds up beside Maddie alone.
+  - Popping: a chosen command pops the first bubble not yet popped that it
+    answers, which counts as answering (the feeling bonus); one that answers
+    none earns nothing extra. Each command answering a bubble not yet popped
+    wears its badge.
+  - No burst comes between wind-up turns: after a result the next turn's
+    menu opens. After the last turn's result it lets go: every bubble popped,
+    it fizzles (phase `fizzle`, `lines.fizzle`, no burst) and the next turn
+    comes; otherwise its burst follows with no big roll, big if nothing was
+    popped, else small. Either way the feelings move up one on the next
+    ordinary turn, as at any new turn, and the wind-up is over. Soothed
+    mid-wind-up, it's over too.
+  - The lantern does nothing during a wind-up: its bubbles show what the
+    critter feels, and the cloud it would peek into is hidden.
+  - The loader checks a wind-up never starts on turn 1, leaves a plain turn
+    between two (`every > bubbles`), shows no more bubbles than the kind has
+    feelings, and has all three lines.
 - While a battle runs Fae is frozen, doors don't fire, cancel and menu are
   ignored (v0), and the party keeps settling. `safeSpot` is set at new game
   and on every area arrival.
@@ -1359,6 +1395,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`src/ui/icons.ts`, shared with the journal's coin and cookie): zoomy a
   lightning bolt, curious a question mark, bored a flat little face, grumpy
   a storm cloud, hungry a cookie.
+- Wind-ups (Milestone 50): in the menu and over its result, where the cloud
+  would float (the same anchor, kept below the HUD), a row of round bubbles
+  (64 px; 52 px at 720 px wide and under, so the row keeps to about the
+  cloud's width on an iPhone SE): cream-rimmed stickers tinted sky blue with
+  a shine, every other one a little lower, each with a feeling's icon and
+  label. A popped one bursts (a quick swell and fade) into a faint dashed
+  ring. The critter swells from its feet, 6% a wind-up turn (`puff`),
+  breathing a little as it puffs, aura and all, and is its own size again as
+  it lets go or fizzles.
 - Hint: a cream sticker label with the check's hint (section 8), shown only
   while the view carries one.
 - Reward card: a centred die-cut card with the title, one atlas frame cropped

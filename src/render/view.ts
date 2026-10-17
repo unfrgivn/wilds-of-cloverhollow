@@ -768,8 +768,12 @@ export class GameView {
       throw new Error("Missing battle critter frame");
     this.battleCritter.texture = body;
     this.battleCritter.anchor.set(0.5, 504 / 512);
-    const battleHeight = critter.battleHeight;
-    this.battleCritter.scale.set(battleHeight / 380);
+    // A wind-up swells the critter from its feet, 6% a turn, breathing a
+    // little as it puffs (spec 8.1); the aura swells with it.
+    const puff = battleView(this.world, state)?.puff ?? 0;
+    const swell = puff === 0 ? 1 : 1 + 0.06 * puff + 0.012 * Math.sin(state.tick / 7);
+    const critterScale = critter.battleHeight / 380 * swell;
+    this.battleCritter.scale.set(critterScale);
     this.battleCritter.position.set(
       (layout.critter.x - x) / scale,
       (layout.critter.baseline - y) / scale,
@@ -778,7 +782,7 @@ export class GameView {
     placeAura(
       this.battleCritterAura,
       this.battleCritter.position,
-      battleHeight / 380,
+      critterScale,
       critter.auraCentre,
       critter.bodyCentre,
     );

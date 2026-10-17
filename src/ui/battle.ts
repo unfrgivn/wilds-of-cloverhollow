@@ -671,6 +671,58 @@ export function createFeelingBubble(root: HTMLElement): {
   };
 }
 
+// A mini-boss's wind-up (spec 8.1, Milestone 50): the feelings it shows at
+// once, as round bubbles where the thought cloud would float, each popped or
+// not; null hides them.
+export type WindUpView = {
+  bubbles: { id: FeelingId; label: string; popped: boolean }[];
+  // Where the row's top centre would like to be, in CSS px; CSS keeps it
+  // below the HUD, like the cloud.
+  x: number;
+  y: number;
+} | null;
+
+/**
+ * A wind-up's bubbles: a feeling and its label in each, and a popped one a
+ * faint dashed ring, so it's plain which are left to answer.
+ */
+export function createWindUpBubbles(root: HTMLElement): {
+  render: (view: WindUpView) => void;
+} {
+  const row = element("div", "battle-windup");
+  row.hidden = true;
+  root.append(row);
+  const bubbles: { node: HTMLElement; icon: HTMLElement; label: HTMLElement;
+    feeling: FeelingId | null }[] = [];
+  return {
+    render: (view) => {
+      row.hidden = view === null || view.bubbles.length === 0;
+      if (view === null) return;
+      row.style.left = `${view.x}px`;
+      row.style.setProperty("--feeling-y", `${view.y}px`);
+      while (bubbles.length < view.bubbles.length) {
+        const node = element("div", "battle-windup-bubble");
+        const iconSlot = element("span", "battle-windup-icon");
+        const label = element("span", "battle-windup-label");
+        node.append(iconSlot, label);
+        row.append(node);
+        bubbles.push({ node, icon: iconSlot, label, feeling: null });
+      }
+      bubbles.forEach((bubble, index) => {
+        const item = view.bubbles[index];
+        bubble.node.hidden = item === undefined;
+        if (item === undefined) return;
+        if (bubble.feeling !== item.id) {
+          drawFeeling(bubble.icon, item.id);
+          bubble.feeling = item.id;
+        }
+        setText(bubble.label, item.label);
+        bubble.node.classList.toggle("is-popped", item.popped);
+      });
+    },
+  };
+}
+
 export function createRewardSticker(root: HTMLElement): {
   render: (view: RewardStickerView) => void;
 } {

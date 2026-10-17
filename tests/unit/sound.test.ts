@@ -67,6 +67,7 @@ describe("gameplay sound cues", () => {
         critterId: critter.id, den: null, entry: initial.player, phase: "check",
         message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
         rest: {}, check, lastGrade: null, feelings: [], answered: false, lanternPeek: false,
+        turn: 1, windUp: null,
         rewardSticker: null, phaseTicks: 0,
       },
     };
@@ -100,6 +101,7 @@ describe("gameplay sound cues", () => {
         message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
         rest: {}, check: createCheck(checkSpec, "fae"), lastGrade: null,
         feelings: [], answered: false, lanternPeek: false,
+        turn: 1, windUp: null,
         rewardSticker: null, phaseTicks: 0,
       },
     };
@@ -126,6 +128,7 @@ describe("gameplay sound cues", () => {
         critterId: pup.id, den: null, entry: initial.player, phase: "check",
         message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
         rest: {}, check, lastGrade: null, feelings: [], answered: false, lanternPeek: false,
+        turn: 1, windUp: null,
         rewardSticker: null, phaseTicks: 0,
       },
     };
@@ -156,6 +159,7 @@ describe("gameplay sound cues", () => {
         message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
         rest: {}, check: createCheck(bluebird.burst.check, "fae", false, [2, 3]),
         lastGrade: null, feelings: [], answered: false, lanternPeek: false,
+        turn: 1, windUp: null,
         rewardSticker: null, phaseTicks: 0,
       },
     };

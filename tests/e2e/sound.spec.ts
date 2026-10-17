@@ -19,14 +19,14 @@ test("audio waits for a real key in the browser, then cues play", async ({ page 
   await openHarness(page);
   await resetPaused(page, "new-game");
   const state = (): Promise<string | undefined> =>
-    page.evaluate(() => window.__cloverhollow?.sound.state().state);
+    page.evaluate(() => window.__cloverhollow?.sound.state());
   // Browsers hold the context until a gesture (WebKit calls it "interrupted");
   // the iOS app's web view doesn't.
   expect(["suspended", "interrupted"]).toContain(await state());
   await hold(page, "ArrowRight", 1);
   await expect.poll(state).toBe("running");
   await hold(page, "ArrowRight", 16);
-  expect((await soundLog(page)).some((entry) => entry.cue === "footstep" && entry.played))
+  expect((await soundLog(page)).some((entry) => entry.cue.startsWith("footstep") && entry.played))
     .toBe(true);
 });
 
@@ -54,7 +54,7 @@ test("walking, a door, M mute, and the journal sound control use real input", as
   await openHarness(page);
   await resetPaused(page, "new-game");
   await hold(page, "ArrowRight", 16);
-  expect((await soundLog(page)).some((entry) => entry.cue === "footstep")).toBe(true);
+  expect((await soundLog(page)).some((entry) => entry.cue.startsWith("footstep"))).toBe(true);
 
   await hold(page, "ArrowUp", 20);
   await hold(page, "ArrowRight", 36);
@@ -70,7 +70,7 @@ test("walking, a door, M mute, and the journal sound control use real input", as
   await hold(page, "ArrowRight", 16);
   const mutedCues = await soundLog(page);
   expect(await page.evaluate(() => window.__cloverhollow?.sound.muted())).toBe(true);
-  expect(mutedCues.some((entry) => entry.cue === "footstep" && !entry.played)).toBe(true);
+  expect(mutedCues.some((entry) => entry.cue.startsWith("footstep") && !entry.played)).toBe(true);
 
   await page.keyboard.down("j");
   await step(page, 1);
@@ -98,28 +98,55 @@ test("volume changes, persists, and plays a cue at a lower level", async ({ page
   const slider = page.locator(".journal-volume-slider");
   await expect(slider).toBeVisible();
   await slider.focus();
-  await page.keyboard.press("ArrowLeft");
-  expect(await page.evaluate(() => window.__cloverhollow?.sound.state().level)).toBe(0.75);
-  await slider.click({ position: { x: 2, y: 8 } });
-  const selectedLevel = await page.evaluate(() => window.__cloverhollow?.sound.state().level);
-  expect([0.25, 0.5, 0.75]).toContain(selectedLevel);
+  await page.keyboard.press("Home");
+  expect(await page.evaluate(() => window.__cloverhollow?.sound.level())).toBe(0.25);
+  await page.keyboard.press("ArrowRight");
+  expect(await page.evaluate(() => window.__cloverhollow?.sound.level())).toBe(0.5);
+  await slider.click();
+  const selectedLevel = await page.evaluate(() => window.__cloverhollow?.sound.level());
+  expect(selectedLevel).toBe(0.75);
   await page.keyboard.press("z");
-  await expect.poll(() => page.evaluate(() => window.__cloverhollow?.sound.state().state))
+  await expect.poll(() => page.evaluate(() => window.__cloverhollow?.sound.state()))
     .toBe("running");
   await page.keyboard.down("j");
   await step(page, 1);
   await page.keyboard.up("j");
   await step(page, 1);
+  await page.evaluate(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  });
   await hold(page, "ArrowRight", 16);
   expect((await soundLog(page)).some((entry) =>
     entry.cue === "journal-close" && entry.played)).toBe(true);
   await page.keyboard.press("m");
   expect(await page.evaluate(() => window.__cloverhollow?.sound.muted())).toBe(true);
+  expect(await page.evaluate(() => window.__cloverhollow?.sound.level())).toBe(selectedLevel);
   await page.keyboard.press("m");
-  const restoredLevel = await page.evaluate(() => window.__cloverhollow?.sound.state().level);
-  expect([0.25, 0.5, 0.75, 1]).toContain(restoredLevel);
+  const restoredLevel = await page.evaluate(() => window.__cloverhollow?.sound.level());
+  expect(restoredLevel).toBe(selectedLevel);
   await page.reload();
   await expect.poll(() =>
-    page.evaluate(() => window.__cloverhollow?.sound.state().level)).toBe(restoredLevel);
+    page.evaluate(() => window.__cloverhollow?.sound.level())).toBe(restoredLevel);
   await expect.poll(() => page.evaluate(() => window.__cloverhollow?.sound.muted())).toBe(false);
+});
+
+test.describe("volume touch", () => {
+  test.use({ hasTouch: true });
+
+  test("real taps reach every volume level", async ({ page }) => {
+    await openHarness(page);
+    await resetPaused(page, "new-game");
+    await page.keyboard.down("j");
+    await step(page, 1);
+    await page.keyboard.up("j");
+    await step(page, 1);
+    const volume = page.locator(".journal-volume-slider");
+    await volume.focus();
+    await page.keyboard.press("End");
+    for (const expected of [0.25, 0.5, 0.75, 1]) {
+      await volume.tap();
+      expect(await page.evaluate(() => window.__cloverhollow?.sound.level())).toBe(expected);
+    }
+  });
 });

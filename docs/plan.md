@@ -1582,16 +1582,15 @@ Sound follow-ups from Milestone 37:
   land (birds, waves, wind). Needs the owner's call on the source: code
   synthesis like the effects, a generator (paid generation needs the
   owner), or CC0 clips found through Openverse (`docs/media-sources.md`).
-- Footsteps by surface: done (2026-10-16). Required per-area surface maps keep
-  painting-derived defaults and first-match regions separate from area geometry;
-  pure lookup drives `footstep-<surface>` cues. The closed set covers grass,
-  sand, wood, snow, stone, tile, and carpet. Maps are conservative where a
-  painting has no distinct ground boundary, and the owner can replace the
-  synthesized recipes after choosing a CC0 clip.
-- A volume slider beside mute: done in the volume follow-up (2026-10-16).
+- Footsteps by surface (grass, wood, sand) once the area kits carry ground
+  data (after Milestone 34).
+- A volume control beside mute: done in the volume follow-up (2026-10-16).
   Four chunky steps, 25% through 100%, use the existing master gain path and
-  live beside the mute pill. The preference remains outside the save; the old
-  mute-only boolean loads at 100%. There is deliberately no zero step, keeping
-  mute independent and making unmuting restore the chosen level.
+  live beside the mute pill. One 44 CSS-pixel sticker control cycles the steps,
+  so every level has a full-size, non-overlapping touch target while the row
+  still fits the phone and larger journal layouts. The preference remains
+  outside the save; the old mute-only boolean loads at 100%. There is
+  deliberately no zero step, keeping mute independent and making unmuting
+  restore the chosen level.
 - iOS on a real device: the simulator check below should hold, but a phone
   with a pad and the silent switch hasn't been tried.

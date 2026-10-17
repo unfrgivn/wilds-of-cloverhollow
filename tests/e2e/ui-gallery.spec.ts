@@ -237,10 +237,15 @@ test.describe("sticker gallery", () => {
           const close = rect(".journal-close");
           const label = rect(".journal-label");
           const notes = rect(".journal-notes-page");
+          const headingItems = [...document.querySelectorAll(".journal-notes-head > *")]
+            .map((element) => element.getBoundingClientRect());
           const album = rect(".journal-stickers-page");
           if (!book || !close || !label || !notes || !album) return null;
           const within = (inner: DOMRect, outer: DOMRect): boolean =>
             inner.left >= outer.left && inner.right <= outer.right &&
+            inner.top >= outer.top && inner.bottom <= outer.bottom;
+          const headingInside = (inner: DOMRect, outer: DOMRect): boolean =>
+            inner.left >= outer.left + 4 && inner.right <= outer.right - 4 &&
             inner.top >= outer.top && inner.bottom <= outer.bottom;
           const centre = document.elementFromPoint(book.left + book.width / 2,
             book.top + book.height / 2);
@@ -253,6 +258,7 @@ test.describe("sticker gallery", () => {
             closeSize: Math.min(close.width, close.height),
             closeInside: within(close, book),
             pagesApart: notes.right <= album.left + 1,
+            headingItemsInside: headingItems.every((item) => headingInside(item, notes)),
             onTop: centre?.closest(".journal-book") !== null,
           };
         });
@@ -262,6 +268,7 @@ test.describe("sticker gallery", () => {
         expect(facts?.closeSize ?? 0).toBeGreaterThanOrEqual(44);
         expect(facts?.closeInside).toBe(true);
         expect(facts?.pagesApart).toBe(true);
+        expect(facts?.headingItemsInside, "notes heading stays inside the notes page").toBe(true);
         expect(facts?.onTop, "nothing covers the open journal").toBe(true);
       });
     }

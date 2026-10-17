@@ -24,7 +24,7 @@ export type AudioController = {
   setLevel: (level: AudioLevel) => void;
   level: () => AudioLevel;
   log: () => SoundLogEntry[];
-  state: () => { state: AudioState; level: AudioLevel };
+  state: () => AudioState;
 };
 
 type Timing = { offset: number; duration: number; gain: number };
@@ -173,10 +173,13 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
     locallyChanged = true;
     if (preferenceLoaded) persist();
   };
-  const setLevel = (next: AudioLevel): void => {
+  const applyLevel = (next: AudioLevel): void => {
     level = next;
-    locallyChanged = true;
     if (master !== null) master.gain.value = gainForAudioLevel(level);
+  };
+  const setLevel = (next: AudioLevel): void => {
+    locallyChanged = true;
+    applyLevel(next);
     if (preferenceLoaded) persist();
   };
   const ensureContext = (): AudioContext | null => {
@@ -264,7 +267,7 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
     else {
       const preferences = readAudioPreferences(value);
       muted = preferences.muted;
-      setLevel(preferences.level);
+      applyLevel(preferences.level);
     }
   });
   return {
@@ -279,6 +282,6 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
     setLevel,
     level: () => level,
     log: () => entries.slice(),
-    state: () => ({ state: stateOf(context), level }),
+    state: () => stateOf(context),
   };
 }

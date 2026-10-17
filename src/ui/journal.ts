@@ -1,6 +1,6 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import type { AudioLevel } from "../platform/audio-settings";
+import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 
 export type JournalSticker = {
   id: string;
@@ -130,14 +130,16 @@ export function createJournal(root: HTMLElement): {
   supplies.append(audio);
   const volumeLabel = element("label", "journal-volume");
   volumeLabel.setAttribute("aria-label", "Sound volume");
-  const volume = element("input", "journal-volume-slider");
-  volume.type = "range";
-  volume.min = "25";
-  volume.max = "100";
-  volume.step = "25";
+  const volume = element("button", "journal-volume-slider");
+  volume.type = "button";
+  volume.setAttribute("role", "slider");
   volume.setAttribute("aria-label", "Sound volume");
+  volume.setAttribute("aria-valuemin", "25");
+  volume.setAttribute("aria-valuemax", "100");
+  volume.setAttribute("aria-valuestep", "25");
   const volumeValue = element("span", "journal-volume-value");
-  volumeLabel.append(volume, volumeValue);
+  volume.append(volumeValue);
+  volumeLabel.append(volume);
   supplies.append(volumeLabel);
   notesHead.append(notesHeading, supplies);
   const notes = element("ul", "journal-notes");
@@ -184,7 +186,7 @@ export function createJournal(root: HTMLElement): {
   mapTab.addEventListener("click", () => setPage("map"));
   const keydown = (event: KeyboardEvent): void => {
     if (book.hidden) return;
-    if (event.target instanceof HTMLInputElement) return;
+    if (event.target === volume) return;
     if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
       event.preventDefault();
       setPage("map");
@@ -197,23 +199,32 @@ export function createJournal(root: HTMLElement): {
   setPage("notes");
   close.addEventListener("click", () => onClose());
   audio.addEventListener("click", () => onToggleAudio());
-  volume.addEventListener("input", () => {
-    const levels: Record<number, AudioLevel> = { 25: 0.25, 50: 0.5, 75: 0.75, 100: 1 };
-    const next = levels[Number(volume.value)];
-    if (next !== undefined) onSetAudioLevel(next);
-  });
+  const setVolume = (next: AudioLevel): void => {
+    const percent = String(next * 100);
+    setAttribute(volume, "aria-valuenow", percent);
+    setAttribute(volume, "aria-valuetext", `${percent}%`);
+    setText(volumeValue, `${percent}%`);
+    onSetAudioLevel(next);
+  };
+  const changeVolume = (direction: -1 | 1): void => {
+    const current = Number(volume.getAttribute("aria-valuenow"));
+    const index = AUDIO_LEVELS.findIndex((candidate) => candidate * 100 === current);
+    const nextIndex = (index + direction + AUDIO_LEVELS.length) % AUDIO_LEVELS.length;
+    const next = AUDIO_LEVELS[nextIndex];
+    if (next === undefined) return;
+    setVolume(next);
+  };
+  volume.addEventListener("click", () => changeVolume(1));
   volume.addEventListener("keydown", (event) => {
-    const values = [25, 50, 75, 100];
-    const current = values.indexOf(Number(volume.value));
-    const next = event.key === "ArrowLeft" || event.key === "ArrowDown"
-      ? Math.max(0, current - 1)
-      : event.key === "ArrowRight" || event.key === "ArrowUp"
-        ? Math.min(values.length - 1, current + 1)
-        : event.key === "Home" ? 0 : event.key === "End" ? values.length - 1 : -1;
-    if (next >= 0) {
+    if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
       event.preventDefault();
-      volume.value = String(values[next]);
-      volume.dispatchEvent(new Event("input", { bubbles: true }));
+      changeVolume(-1);
+    } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+      event.preventDefault();
+      changeVolume(1);
+    } else if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      setVolume(event.key === "Home" ? AUDIO_LEVELS[0] : AUDIO_LEVELS[3]);
     }
   });
   const slots: Slot[] = [];
@@ -234,7 +245,8 @@ export function createJournal(root: HTMLElement): {
       setText(audio, view.muted ? "♪ off" : "♪ on");
       audio.classList.toggle("is-muted", view.muted);
       const volumePercent = Math.round(view.level * 100);
-      volume.value = String(volumePercent);
+      setAttribute(volume, "aria-valuenow", String(volumePercent));
+      setAttribute(volume, "aria-valuetext", `${volumePercent}%`);
       setText(volumeValue, `${volumePercent}%`);
       if (!view.visible && wasVisible) setPage("notes");
       wasVisible = view.visible;

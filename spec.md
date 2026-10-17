@@ -217,11 +217,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   journal's notes heading (drawn like the coin and snack pills, with a larger
   invisible hit area), and is stored separately under `cloverhollow-audio` in
   Capacitor Preferences, never in the save.
-- A four-step volume slider (25%, 50%, 75%, 100%) sits beside the mute pill in
-  the notes heading. It is accessible by keyboard, touch, and mouse, with a
-  visible value. 100% keeps the existing moderate master gain. There is no
-  zero step, so mute stays an independent choice and unmuting restores the
-  selected level. The old boolean-only preference shape loads at 100%.
+- A four-step volume control (25%, 50%, 75%, 100%) sits beside the mute pill
+  in the notes heading. It is a sticker-style 44 CSS-pixel control with a
+  slider role: taps/clicks cycle through the levels, and arrows, Home, and End
+  work from the keyboard without stealing the journal's page-flip arrows. Its
+  visible value is accessible by keyboard, touch, and mouse. 100% keeps the
+  existing moderate master gain. There is no zero step, so mute stays an
+  independent choice and unmuting restores the selected level. The old
+  boolean-only preference shape loads at 100%.
 - Story lines may carry one of the closed `sound:` tags `chime-red`,
   `chime-yellow`, `chime-green`, `chime-blue`, or `flute`. The tag is carried
   by dialogue state and projected as a cue whenever that line opens or replaces
@@ -1186,10 +1189,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
-  `sound.muted()` reports the separate audio preference, and `sound.state()`
-  returns `{ state, level }`, where `level` is (`0.25`, `0.5`, `0.75`, or `1`)
-  and `state` is the AudioContext's state (`running`, `suspended`,
-  `interrupted`, `closed`, or `unavailable`). Harness builds also log
+  `sound.muted()` reports the separate audio preference, `sound.level()`
+  reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), and
+  `sound.state()` returns the AudioContext's state string (`running`,
+  `suspended`, `interrupted`, `closed`, or `unavailable`). Harness builds also log
   `[cloverhollow] audio {state}`
   on every state change and `[cloverhollow] sound {tick, cue, played}` per
   cue, for native checks. These are harness only and are absent from

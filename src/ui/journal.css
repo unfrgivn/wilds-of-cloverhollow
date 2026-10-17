@@ -53,6 +53,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  padding-right: 20px;
+  box-sizing: border-box;
   margin: 0 0 10px;
 }
 .journal-notes-head .journal-heading {
@@ -77,6 +79,7 @@
   box-shadow: 0 2px 0 #47321f33;
   color: var(--sticker-ink);
   align-self: stretch;
+  min-height: 44px;
   font: 800 11px var(--sticker-font);
   white-space: nowrap;
   cursor: pointer;
@@ -84,16 +87,16 @@
 .journal-audio::after {
   content: "";
   position: absolute;
-  inset: -10px -4px;
+  inset: -2px 0;
 }
 .journal-audio.is-muted { background: #eadbff; }
 .journal-volume {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  min-width: 64px;
-  padding: 2px 3px;
+  min-width: 56px;
+  min-height: 44px;
+  padding: 0 4px;
   border: 2px solid var(--sticker-ink);
   border-radius: 999px;
   background: var(--sticker-paper);
@@ -102,18 +105,24 @@
 .journal-volume::after {
   content: "";
   position: absolute;
-  inset: -10px -4px;
-  pointer-events: none;
+  display: none;
 }
 .journal-volume-slider {
-  width: 36px;
-  min-width: 0;
-  accent-color: #e2a63d;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sticker-ink);
+  font: inherit;
   cursor: pointer;
 }
 .journal-volume-value {
-  min-width: 20px;
-  font-size: 10px;
+  min-width: 44px;
+  font-size: 11px;
   font-weight: 800;
   text-align: right;
 }

@@ -19,6 +19,29 @@
       "label": "Run"
     }
   },
+  "feelings": {
+    "zoomy": {
+      "label": "Zoomy",
+      "answer": "play"
+    },
+    "curious": {
+      "label": "Curious",
+      "answer": "cast"
+    },
+    "bored": {
+      "label": "Bored",
+      "answer": "juggle"
+    },
+    "grumpy": {
+      "label": "Grumpy",
+      "answer": "soothe"
+    },
+    "hungry": {
+      "label": "Hungry",
+      "answer": "snack"
+    }
+  },
+  "feelingBonus": 15,
   "rewards": {
     "sticker": "New sticker: {sticker}! +{coins} coins.",
     "coins": "+{coins} coins!"

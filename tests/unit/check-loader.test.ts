@@ -4,6 +4,7 @@ import {
   parseBattleContent,
   parseCritter,
   parsePartyMember,
+  feelingErrors,
 } from "../../src/content/load";
 
 const content = loadContent();
@@ -214,5 +215,53 @@ describe("battle check content validation", () => {
     delete hints.catch;
     expect(() => parseBattleContent(noCatchHint, "battle.json"))
       .toThrow(/battle\.json.*hints/);
+  });
+
+  it("rejects missing or unknown feelings and names the field", () => {
+    const missing = clone(content.world.battle);
+    delete nested(missing, "feelings").zoomy;
+    expect(() => parseBattleContent(missing, "battle.json"))
+      .toThrow(/battle\.json.*feelings\.zoomy/);
+
+    const unknown = clone(content.world.battle);
+    nested(unknown, "feelings").glad = { label: "Glad", answer: "soothe" };
+    expect(() => parseBattleContent(unknown, "battle.json"))
+      .toThrow(/battle\.json.*feelings/);
+  });
+
+  it("rejects empty feeling labels and invalid feeling bonuses", () => {
+    const empty = clone(content.world.battle);
+    nested(empty, "feelings", "zoomy").label = "";
+    expect(() => parseBattleContent(empty, "battle.json"))
+      .toThrow(/battle\.json.*feelings\.zoomy/);
+
+    for (const bonus of [-1, 1.5]) {
+      const value = clone(content.world.battle);
+      value.feelingBonus = bonus;
+      expect(() => parseBattleContent(value, "battle.json"))
+        .toThrow(/battle\.json.*feelingBonus/);
+    }
+  });
+
+  it("reports run and unknown feeling answers through feelingErrors", () => {
+    for (const answer of ["run", "unknown"]) {
+      const value = clone(content.world.battle);
+      nested(value, "feelings", "zoomy").answer = answer;
+      const battle = parseBattleContent(value, "battle.json");
+      expect(feelingErrors(battle, content.world.party)).toEqual([
+        expect.stringContaining("feelings.zoomy.answer"),
+      ]);
+    }
+  });
+
+  it.each([
+    ["empty", []],
+    ["unknown", ["glad"]],
+    ["repeated", ["zoomy", "zoomy"]],
+  ])("rejects a critter with %s feelings", (_name, feelings) => {
+    const value = critter();
+    value.feelings = feelings;
+    expect(() => parseCritter(value, "critters/frog.json"))
+      .toThrow(/critters\/frog\.json.*feelings/);
   });
 });

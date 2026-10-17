@@ -53,6 +53,10 @@ export function soundCues(
       (previous.transition?.phase === "in" && next.transition === null))
     cues.push("area-arrive");
   if (!previous.lantern && next.lantern) cues.push("lantern-on");
+  // The lantern's peek at a battle's feelings sounds like switching it on.
+  if (previous.battle !== null && next.battle !== null &&
+      !previous.battle.lanternPeek && next.battle.lanternPeek)
+    cues.push("lantern-on");
   if (previous.lantern && !next.lantern) cues.push("lantern-off");
   if (next.coins > previous.coins) cues.push("coin");
   if (next.snacks > previous.snacks) cues.push("item");

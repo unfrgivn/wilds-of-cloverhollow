@@ -1506,6 +1506,73 @@ the old trail, the owl, and the clubhouse claim.
     all three lanes, so the keys and the stickers are each tested high,
     middle, and low.
 
+## Milestone 42: Feelings **Status:** ✅ Completed (2026-10-17)
+- The menu becomes a choice (owner, 2026-10-17, `docs/battle-ideas.md`):
+  once Sue has joined, a chaos critter shows what it feels each turn in a
+  thought cloud (zoomy, curious, bored, grumpy, or hungry), and the command
+  that answers it (Play, Cast, Juggle, Soothe, or Snack) wears the feeling as
+  a badge and is worth 15 more calm. The next turn's feeling rides in the
+  cloud's trail of thought dots, so a player can save Sue for the curious
+  turn; the lantern, once Fae has it, shows the one after too.
+- Each kind lists the three feelings it can have (`feelings`): the pups and
+  squirrels zoomy and hungry, the cats and raccoons curious, the owl and the
+  gull grumpy, Mr. Pip bored. A feeling Fae can't answer now never shows:
+  without Sue no curious, without Jordan no bored, without a snack no hungry.
+- The draws (spec 8): three as the intro ends, then one at each new turn's
+  menu, from the same seeded PRNG. With feelings off (Maddie alone) nothing
+  is drawn, so every battle before Sue joins plays exactly as it did.
+- The thought cloud first sat in the HUD row, between the ENERGY and CALM
+  stickers: on a 667 px iPhone SE, or with a notch, that band is 70 px wide
+  or less, and the cloud overran CALM. It floats in the open ground between
+  the party and the critter now (`battleFeelingAnchor`), placed from the
+  battle layout, and was checked at 667, 812, 852, 874, and 1280 px wide.
+- The journal's coin and cookie moved into `src/ui/icons.ts` with the feeling
+  icons, so hungry is the same cookie as Fae's snacks.
+- Evidence: core unit tests (`feelings.test.ts`: off with Maddie alone and
+  no draws; the three draws and each one's pick; the availability filter;
+  the turn boundary; the bonus for Snack, Soothe, and a friend's command,
+  on a miss too, clamped; the badges; the view by phase; the lantern peek
+  with a real lantern from Jordan's run, its sound, and the overworld
+  lantern untouched; `check-loader.test.ts`: the content's rejections);
+  every recorded run re-recorded; real-key e2e (`feelings.spec.ts`: the
+  frog curious, Cast badged and answered with a held key for 60 calm, and no
+  feelings with Maddie alone; the lantern's peek on a real L in the woods
+  owl's battle; the cloud clear of the HUD, the commands, the message, and
+  the touch buttons on a notched 874 px phone and a 667 px iPhone SE); and
+  the gallery's feeling states at both sizes. Gates, on the tree rebased
+  onto Milestone 43: `just check` (599 unit tests, every sim, purity, lint),
+  `just build`, and `just e2e` (468 passed, 2 skipped, on Chromium and
+  WebKit; the battle flows run again after counting only fighting friends). Every changed screenshot was viewed: 28 differ only in the
+  harness readout's tick (checked pixel for pixel outside it; 10 of them the
+  clubhouse run's, which reaches the same screens 307 ticks sooner), 34 by
+  the battles' new clouds and badges and the later runs' ticks, roaming
+  critters, and idle frames, and 11 are new (the frog's menu and answered
+  turn on both browsers, the lantern's peek, the two phone clouds, and the
+  gallery's feeling states).
+- Notes and assumptions:
+  - The bonus is a flat 15, not the proposal's "half again the base": half
+    of Snack's 5 calm would have been 2, too small to notice for the turn a
+    hungry critter wants a snack.
+  - Feelings start with two fighting friends, not on an Ink flag: the
+    fixtures and the story agree (Sue is the second), and no story variable
+    is read in battle for it. Only friends with a battle command count, so
+    Milestone 47's flute friends, who follow Fae with no command, won't
+    switch feelings on beside Maddie alone.
+  - Run answers nothing; the loader refuses a feeling answered by a command
+    Fae can never have.
+  - The peek costs nothing and lasts the battle; pressing again does
+    nothing. With feelings off the lantern does nothing in battle.
+  - A feeling is drawn up to two turns before it shows, from what Fae could
+    answer then. So a critter can still be hungry after her last snack, or
+    curious while Sue rests: the answering command wears the badge,
+    disabled. That's kept on purpose: it says what the critter wants even
+    when Fae can't give it, and the trail shows it coming.
+  - Milestone 43 (the clubhouse fix-up) landed on main while this was
+    built, so it was rebased onto it. The clubhouse run starts from the
+    woods run, whose battles feelings change, so it was re-recorded on top
+    of the new woods run along with every other chain, and the gates ran on
+    the merged tree.
+
 ## Milestone 43: The clubhouse fix-up **Status:** ✅ Completed (2026-10-17)
 - Sue and Jordan keep the promises they made when the Whispering Woods
   clubhouse became Fae's club (Milestone 26): a fridge for snacks, and a
@@ -1895,8 +1962,8 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 39, recess on the playing field: done (above).
   - Milestone 40, battle checks: done (above).
   - Next (owner, 2026-10-17, from `docs/battle-ideas.md`): Milestone 41,
-    Catch: done (above). Then Milestone 42, feelings, with the next-feeling
-    and lantern peeks.
+    Catch: done (above). Then Milestone 42, feelings: done (above). The
+    rest of `docs/battle-ideas.md` stays unscheduled until the owner picks.
   - Milestone 43, the clubhouse fix-up: done (above).
   - Milestone 47, flute friends: in progress (above). Milestones 44 to 46,
     the arcade games, are in progress in another session.

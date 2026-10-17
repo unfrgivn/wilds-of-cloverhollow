@@ -25,6 +25,11 @@
   },
   "calmKnot": "bunny_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "hungry",
+    "grumpy"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

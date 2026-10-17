@@ -142,6 +142,7 @@ describe("Mr. Pip, the arcade keeper", () => {
       message: keeper.lines.soothed, revealed: keeper.lines.soothed.length, selected: 0,
       command: null, energy: 6, calm: keeper.calmMax, rest: {},
       check: null, lastGrade: null,
+      feelings: [], answered: false, lanternPeek: false,
       rewardSticker: null, phaseTicks: 0,
     };
     let state: State = { ...at("arcade", "door", placed.point, "up", claimed), battle };

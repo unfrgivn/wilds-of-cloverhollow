@@ -23,6 +23,7 @@ import {
   createBattleHud,
   createCommandMenu,
   createBattleCheck,
+  createFeelingBubble,
   createRewardSticker,
   type BattleCheckView as BattleCheckOverlayView,
 } from "./ui/battle";
@@ -87,6 +88,7 @@ async function boot(): Promise<void> {
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
+  const feelingBubble = createFeelingBubble(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(sound.toggle);
@@ -348,6 +350,11 @@ async function boot(): Promise<void> {
       commands: battle?.commands ?? [],
       selected: battle?.selected ?? 0,
     });
+    // What the critter feels (spec 8.1), in the menu and over its result.
+    const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
+    feelingBubble.render(battle === null || battle.feelings === null || feelingAt === null
+      ? null
+      : { ...battle.feelings, ...feelingAt });
     if (
       activeBattle &&
       state.battle?.phase === "command" &&

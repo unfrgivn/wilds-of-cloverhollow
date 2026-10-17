@@ -200,10 +200,16 @@ export type BattleContent = {
     snack: { label: string; snackDetail: string };
     run: { label: string };
   };
+  // What a critter can feel (Milestone 42): each feeling's label and the
+  // command id that answers it, and the calm an answered feeling adds.
+  feelings: Record<FeelingId, { label: string; answer: string }>;
+  feelingBonus: number;
   // The reward line: `sticker` when the species' sticker is new, `coins`
   // otherwise, with {sticker} and {coins} filled in (spec 8).
   rewards: { sticker: string; coins: string };
 };
+// The closed set of feelings (spec 8); each has an icon drawn in code.
+export type FeelingId = "zoomy" | "curious" | "bored" | "grumpy" | "hungry";
 export type Grade = "great" | "good" | "miss";
 // How a battle check plays (spec 8): a friend's command and Soothe name one,
 // and each critter names its burst's.
@@ -303,6 +309,8 @@ export type Critter = {
   sticker: { id: string; name: string; frame: string };
   calmKnot: string;
   calmPrompt: "Look" | "Talk";
+  // What this kind can feel in battle (Milestone 42).
+  feelings: FeelingId[];
   commands: {
     soothe: { calm: number; great: number; good: number };
     snack: { calm: number; energy: number };
@@ -356,6 +364,14 @@ export type Battle = {
   rest: Record<string, number>;
   check: CheckState | null;
   lastGrade: Grade | null;
+  // What the critter feels this turn, next turn, and the turn after
+  // (Milestone 42): null where nothing it can feel has an answer; empty while
+  // feelings are off (a party of one).
+  feelings: (FeelingId | null)[];
+  // The command chosen this turn answers this turn's feeling.
+  answered: boolean;
+  // The lantern has shown the turn-after feeling, for the rest of the battle.
+  lanternPeek: boolean;
   // Set as the reward shows: the species' sticker if it's new, else null.
   rewardSticker: string | null;
   phaseTicks: number;
@@ -404,6 +420,8 @@ export type BattleView = {
     label: string;
     detail: string | null;
     disabled: boolean;
+    // The feeling this command answers this turn, if any (its badge).
+    feeling: FeelingId | null;
   }[];
   selected: number;
   energy: number;
@@ -412,6 +430,15 @@ export type BattleView = {
   calmMax: number;
   check: BattleCheckView | null;
   hint: string | null;
+  // The critter's feelings to show (spec 8.1), or null when there's none to
+  // show: off, or outside the command menu and its result.
+  feelings: {
+    now: { id: FeelingId; label: string } | null;
+    next: FeelingId | null;
+    // Only once the lantern has peeked.
+    later: FeelingId | null;
+    answered: boolean;
+  } | null;
   lastGrade: Grade | null;
   rewardSticker: string | null;
 };

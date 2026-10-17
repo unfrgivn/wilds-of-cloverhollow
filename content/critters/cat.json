@@ -25,6 +25,11 @@
   },
   "calmKnot": "cat_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "curious",
+    "grumpy",
+    "bored"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

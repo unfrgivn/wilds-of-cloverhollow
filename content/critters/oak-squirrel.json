@@ -25,6 +25,11 @@
   },
   "calmKnot": "oak_squirrel_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "hungry",
+    "curious"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

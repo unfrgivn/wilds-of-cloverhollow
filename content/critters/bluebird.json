@@ -25,6 +25,11 @@
   },
   "calmKnot": "bluebird_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "curious",
+    "grumpy"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

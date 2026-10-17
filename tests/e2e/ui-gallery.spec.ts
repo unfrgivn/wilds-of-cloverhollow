@@ -5,7 +5,8 @@ test.use({ deviceScaleFactor: 2 });
 const states = ["short", "long", "long-max", "revealing", "speaker-board",
   "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];
 const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
-  "battle-charge", "battle-chain", "battle-chain-burst", "battle-catch", "battle-reward"];
+  "battle-charge", "battle-chain", "battle-chain-burst", "battle-catch", "battle-reward",
+  "battle-feelings", "battle-feelings-heart"];
 const journalStates = ["journal-empty", "journal-notes", "journal-full"];
 const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
@@ -43,6 +44,8 @@ const battleParts: Record<string, string[]> = {
   "battle-chain": [".battle-hud", ".battle-chain", ".battle-check-hint"],
   "battle-chain-burst": [".battle-hud", ".battle-chain", ".battle-check-hint"],
   "battle-catch": [".battle-hud", ".battle-catch", ".battle-check-hint", ".touch-reach"],
+  "battle-feelings": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-feeling"],
+  "battle-feelings-heart": [".battle-hud", ".battle-feeling", ".battle-feeling-heart"],
   "battle-reward": [".battle-reward"],
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
@@ -50,6 +53,7 @@ const battleParts: Record<string, string[]> = {
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-check-hint", ".battle-grade", ".touch-reach",
+  ".battle-feeling", ".battle-feeling-heart",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
   ".touch-confirm", ".touch-cancel", ".touch-menu"];
 const touchButtonsShown = [".touch-confirm", ".touch-cancel", ".touch-menu"];
@@ -198,7 +202,8 @@ function measureContrast(): Contrast[] {
     return `${element.className} "${element.textContent}"`;
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
-  ".battle-grade, .battle-check-hint, .battle-reward-title, .battle-reward-name, .journal-label, " +
+  ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
+    ".battle-reward-name, .journal-label, " +
     ".journal-heading, .journal-supply, .journal-note, .journal-empty, .journal-name, " +
     ".journal-unknown, .journal-close";
   return [...document.querySelectorAll(selectors)]
@@ -592,7 +597,7 @@ test.describe("sticker gallery", () => {
 
   test("battle text pairs meet contrast targets", async ({ page }) => {
     const results: Contrast[] = [];
-    for (const state of ["battle-command", "battle-grade", "battle-reward"]) {
+    for (const state of ["battle-command", "battle-grade", "battle-reward", "battle-feelings"]) {
       await gallery(page, state);
       results.push(...await page.evaluate(measureContrast));
     }
@@ -631,6 +636,16 @@ test.describe("sticker gallery", () => {
       await expect(page.locator(".battle-chain-beat:visible")).toHaveCount(1);
     });
 
+  test("only the command that answers the feeling wears its badge", async ({ page }) => {
+    await gallery(page, "battle-feelings");
+    const badged = page.locator(".battle-command:has(.battle-command-badge:not([hidden]))");
+    await expect(badged).toHaveCount(1);
+    await expect(badged.locator(".battle-command-label")).toHaveText("Play");
+    // The lantern's peek rides in the smallest dot, glowing.
+    await expect(page.locator(".battle-feeling-later")).toHaveClass(/is-peeked/);
+    await expect(page.locator(".battle-feeling-later .battle-icon")).toHaveCount(1);
+  });
+
   test("identical battle renders do not churn DOM nodes", async ({ page }) => {
     for (const state of battleStates) {
       await gallery(page, state);
@@ -638,7 +653,8 @@ test.describe("sticker gallery", () => {
         const observer = new MutationObserver(() => undefined);
         for (const part of document.querySelectorAll(
            ".battle-hud, .battle-commands, .battle-ring, .battle-charge-meter, .battle-chain, " +
-             ".battle-catch, .battle-check-hint, .battle-grade, .battle-reward")) {
+             ".battle-catch, .battle-check-hint, .battle-feeling, .battle-grade, " +
+             ".battle-reward")) {
           observer.observe(part, { childList: true, characterData: true, subtree: true });
         }
         window.__stickerGallery.renderState();

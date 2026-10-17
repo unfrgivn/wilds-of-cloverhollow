@@ -25,6 +25,11 @@
   },
   "calmKnot": "raccoon_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "curious",
+    "hungry",
+    "grumpy"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

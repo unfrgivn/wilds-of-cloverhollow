@@ -1,5 +1,6 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { coinMarkup, cookieMarkup } from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 
 export type JournalSticker = {
@@ -88,14 +89,7 @@ function supply(kind: "coins" | "snacks", label: string): {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
   svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML = kind === "coins"
-    ? '<circle cx="10" cy="10" r="8.2" fill="#f2c94c" stroke="#47321f" stroke-width="1.4"/>' +
-      '<circle cx="10" cy="10" r="4.6" fill="none" stroke="#c48a1c" stroke-width="1.3"/>'
-    : '<circle cx="10" cy="10" r="8.2" fill="#dba468" stroke="#47321f" stroke-width="1.4"/>' +
-      '<circle cx="7" cy="7.6" r="1.5" fill="#6b4226"/>' +
-      '<circle cx="12.8" cy="7" r="1.3" fill="#6b4226"/>' +
-      '<circle cx="11.4" cy="12.6" r="1.5" fill="#6b4226"/>' +
-      '<circle cx="6.6" cy="12.8" r="1.1" fill="#6b4226"/>';
+  svg.innerHTML = kind === "coins" ? coinMarkup : cookieMarkup;
   const count = element("span", "journal-supply-count");
   root.append(svg, `${label} `, count);
   return { root, count };

@@ -240,6 +240,9 @@ describe("party battle commands", () => {
       check: null,
         lastGrade: null,
         rewardSticker: null,
+        feelings: [],
+        answered: false,
+        lanternPeek: false,
         phaseTicks: 0,
       },
     };

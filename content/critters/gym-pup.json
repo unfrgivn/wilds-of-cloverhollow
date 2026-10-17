@@ -25,6 +25,11 @@
   },
   "calmKnot": "gym_pup_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "bored",
+    "hungry"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

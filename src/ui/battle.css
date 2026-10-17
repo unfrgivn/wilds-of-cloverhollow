@@ -300,3 +300,87 @@
     animation: none;
   }
 }
+
+/* A command's feeling badge (Milestone 42): this turn's feeling, on the
+   command that answers it, at the button's top-right corner. */
+.battle-command { position: relative; }
+.battle-command-badge {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--sticker-rim);
+  box-shadow: 0 0 0 2px var(--sticker-ink);
+}
+.battle-command-badge[hidden] { display: none; }
+
+/* The critter's thought cloud (Milestone 42) floats in the open ground
+   between Fae's party and the critter, centred on the x the game passes. Its
+   top sits where the game asks, but never higher than just below the HUD
+   stickers (top 18px, at most 70px tall with their outline). The trail of
+   thought dots leads down and right, to the critter. */
+.battle-feeling {
+  position: fixed;
+  top: max(calc(96px + var(--safe-top)), var(--feeling-y, 0px));
+  z-index: var(--z-hud);
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-family: var(--sticker-font);
+}
+.battle-feeling[hidden],
+.battle-feeling [hidden] { display: none; }
+.battle-feeling-cloud {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  box-sizing: border-box;
+  padding: 5px 12px 6px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 24px 28px 26px 22px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+}
+.battle-feeling-icon { width: 28px; height: 28px; }
+.battle-feeling-label { font-size: 15px; font-weight: 800; line-height: 1; }
+.battle-feeling-heart {
+  position: absolute;
+  top: -13px;
+  right: -13px;
+  width: 26px;
+  height: 26px;
+  animation: battle-feeling-pop 260ms ease-out;
+}
+@keyframes battle-feeling-pop {
+  from { transform: scale(0.3); }
+  70% { transform: scale(1.25); }
+  to { transform: scale(1); }
+}
+/* The trail: the next turn's feeling in the middle dot; the turn after's in
+   the smallest once the lantern has peeked (glowing lavender, like the
+   lantern), else it's an empty thought dot. */
+.battle-feeling-dot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--sticker-paper);
+  box-shadow: 0 0 0 2px var(--sticker-ink);
+}
+.battle-feeling-next { right: -16px; bottom: -26px; width: 30px; height: 30px; }
+.battle-feeling-later { right: -38px; bottom: -48px; width: 22px; height: 22px; }
+.battle-feeling-next .battle-feeling-dot-icon { width: 20px; height: 20px; }
+.battle-feeling-later .battle-feeling-dot-icon { width: 15px; height: 15px; }
+.battle-feeling-later.is-peeked { box-shadow: 0 0 0 2px var(--sticker-ink), 0 0 0 4px #eadbff,
+  0 0 10px 4px #b894f0; }
+.battle-feeling .battle-icon,
+.battle-command-badge .battle-icon { display: block; width: 100%; height: 100%; }

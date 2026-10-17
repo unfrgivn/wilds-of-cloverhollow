@@ -12,7 +12,9 @@ import {
   createCommandMenu,
   createRewardSticker,
   createBattleCheck,
+  createFeelingBubble,
   type BattleCheckView,
+  type BattleCommand,
   type TimingGrade,
 } from "../ui/battle";
 import { createJournal, type JournalView } from "../ui/journal";
@@ -57,7 +59,7 @@ const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
-  ? state === "battle-command"
+  ? state === "battle-command" || state === "battle-feelings"
   : state !== "prompt" && !journalState && !titleState;
 if (battleState) document.documentElement.dataset.battle = "open";
 // A catch shows its touch arrows (spec 8.1).
@@ -163,6 +165,7 @@ const views: Record<string, DialogueView> = {
 const battleHud = createBattleHud(stage);
 const commands = createCommandMenu(stage);
 const check = createBattleCheck(stage);
+const feelingBubble = createFeelingBubble(stage);
 const reward = createRewardSticker(stage);
 const journal = createJournal(stage);
 const title = createTitleScreen(stage);
@@ -290,23 +293,42 @@ function renderGalleryState(): void {
   // `?party=N` previews a bigger party's menu: N friend commands between
   // Soothe and Snack (two columns on phones, one from 1000 px).
   const friends = Math.max(1, Number(params.get("party") ?? "1"));
-  const commandList = [
-    { id: "soothe", label: "Soothe", detail: null, disabled: false },
-    { id: "play", label: "Play", detail: "resting", disabled: true },
+  const commandList: BattleCommand[] = [
+    { id: "soothe", label: "Soothe", detail: null, disabled: false, feeling: null },
+    { id: "play", label: "Play", detail: "resting", disabled: true, feeling: null },
     ...Array.from({ length: friends - 1 }, (_, index) => ({
       id: `friend-${index}`,
       label: ["Whistle", "Dig", "Dance"][index % 3] ?? "Help",
       detail: null,
       disabled: false,
+      feeling: null,
     })),
-    { id: "snack", label: "Snack", detail: "×2", disabled: false },
-    { id: "run", label: "Run", detail: null, disabled: false },
+    { id: "snack", label: "Snack", detail: "×2", disabled: false, feeling: null },
+    { id: "run", label: "Run", detail: null, disabled: false, feeling: null },
   ];
+  // A zoomy critter: Play wears its badge, Sue rests; the lantern has peeked.
+  const feelingCommands: BattleCommand[] = [
+    { id: "soothe", label: "Soothe", detail: null, disabled: false, feeling: null },
+    { id: "play", label: "Play", detail: null, disabled: false, feeling: "zoomy" },
+    { id: "cast", label: "Cast", detail: "reeling in", disabled: true, feeling: null },
+    { id: "snack", label: "Snack", detail: "×2", disabled: false, feeling: null },
+    { id: "run", label: "Run", detail: null, disabled: false, feeling: null },
+  ];
+  const feelings = state === "battle-feelings";
   commands.render({
-    visible: state === "battle-command",
-    selected: 2,
-    commands: commandList,
+    visible: state === "battle-command" || feelings,
+    selected: feelings ? 1 : 2,
+    commands: feelings ? feelingCommands : commandList,
   });
+  // Between the party (left) and the frog (centre), as the game places it.
+  const cloudAt = { x: Math.round(innerWidth * 0.36), y: 96 };
+  feelingBubble.render(feelings
+    ? { now: { id: "zoomy", label: "Zoomy" }, next: "curious", later: "hungry", answered: false,
+      ...cloudAt }
+    : state === "battle-feelings-heart"
+      ? { now: { id: "zoomy", label: "Zoomy" }, next: "curious", later: null, answered: true,
+        ...cloudAt }
+      : null);
   // Rings go through the game's own check overlay, like every other check.
   const ringCheck = (ring: typeof frogRing, grade: TimingGrade | null): BattleCheckView => ({
     kind: "ring",

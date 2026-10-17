@@ -8,3 +8,4 @@ export * from "./save";
 export * from "./props";
 export * from "./sound";
 export * from "./checks";
+export * from "./feelings";

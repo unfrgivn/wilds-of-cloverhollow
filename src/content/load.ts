@@ -116,6 +116,7 @@ import type {
   PartyContent,
   FriendCommand,
   CheckSpec,
+  FeelingId,
   Recurring,
   Den,
 } from "../core";
@@ -673,6 +674,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     sticker: stickerValue,
     calmKnot,
     calmPrompt,
+    feelings: critterFeelings(value.feelings, file),
     commands: {
       soothe: {
         calm: number(sootheRaw, "calm"),
@@ -739,6 +741,18 @@ export function parseBattleContent(
   );
   const toyAtlas = value.toyAtlas;
   field(typeof toyAtlas === "string" && toyAtlas.endsWith(".json"), file, "toyAtlas");
+  // All five feelings, each with its label and the command that answers it.
+  const feelings = value.feelings;
+  field(record(feelings) && Object.keys(feelings).every(isFeelingId), file, "feelings");
+  const feeling = (id: FeelingId): { label: string; answer: string } => {
+    const raw = feelings[id];
+    field(record(raw) && typeof raw.label === "string" && raw.label !== "" &&
+      typeof raw.answer === "string", file, `feelings.${id}`);
+    return { label: raw.label, answer: raw.answer };
+  };
+  const feelingBonus = value.feelingBonus;
+  field(typeof feelingBonus === "number" && Number.isInteger(feelingBonus) && feelingBonus >= 0,
+    file, "feelingBonus");
   return {
     toyAtlas,
     hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch },
@@ -747,8 +761,42 @@ export function parseBattleContent(
       snack: command("snack"),
       run: command("run"),
     },
+    feelings: {
+      zoomy: feeling("zoomy"),
+      curious: feeling("curious"),
+      bored: feeling("bored"),
+      grumpy: feeling("grumpy"),
+      hungry: feeling("hungry"),
+    },
+    feelingBonus,
     rewards: { sticker: rewards.sticker, coins: rewards.coins },
   };
+}
+
+const feelingIds: FeelingId[] = ["zoomy", "curious", "bored", "grumpy", "hungry"];
+function isFeelingId(value: unknown): value is FeelingId {
+  return feelingIds.some((id) => id === value);
+}
+
+// A critter kind's feelings (spec 8): one or more, none twice.
+function critterFeelings(value: unknown, file: string): FeelingId[] {
+  field(Array.isArray(value) && value.length > 0 && value.every(isFeelingId) &&
+    new Set(value).size === value.length, file, "feelings");
+  return [...value];
+}
+
+// Every feeling's answer is a command Fae can have: Soothe, Snack, or a
+// friend's (spec 8). Run answers nothing.
+export function feelingErrors(
+  battle: BattleContent,
+  party: Record<string, PartyContent>,
+): string[] {
+  const commands = ["soothe", "snack", ...Object.values(party).map((member) => member.command.id)];
+  return Object.entries(battle.feelings).flatMap(([id, feeling]) =>
+    commands.includes(feeling.answer)
+      ? []
+      : [`content/battle.json: feelings.${id}.answer ${feeling.answer} isn't Soothe, ` +
+        "Snack, or a friend's command"]);
 }
 
 export function parsePartyMember(value: unknown, file: string): PartyContent {
@@ -1116,7 +1164,7 @@ export function loadContent(): {
   );
   if (joinProblems.length > 0)
     throw new Error(`content/party: ${joinProblems.join("; ")}`);
-  const partyProblems = partyErrors(party, critters);
+  const partyProblems = [...partyErrors(party, critters), ...feelingErrors(battle, party)];
   if (partyProblems.length > 0)
     throw new Error(`content/party: ${partyProblems.join("; ")}`);
   const fixtures = {

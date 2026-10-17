@@ -25,6 +25,11 @@
   },
   "calmKnot": "music_bird_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "curious",
+    "bored"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

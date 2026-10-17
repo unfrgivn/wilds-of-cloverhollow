@@ -25,6 +25,11 @@
   },
   "calmKnot": "gull_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "grumpy",
+    "hungry",
+    "bored"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

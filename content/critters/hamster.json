@@ -25,6 +25,11 @@
   },
   "calmKnot": "hamster_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "hungry",
+    "zoomy",
+    "bored"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

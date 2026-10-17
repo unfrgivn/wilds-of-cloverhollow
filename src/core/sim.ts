@@ -20,6 +20,7 @@ import type {
   CheckSpec,
   CheckState,
   Critter,
+  FeelingId,
   Grade,
   PresentCritter,
   SetPiece,
@@ -35,6 +36,7 @@ import {
   stepCheck,
   viewCheck,
 } from "./checks";
+import { answers, feelingFromDraw, feelingsOn } from "./feelings";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -209,6 +211,24 @@ export function purchaseSnack(state: State, price: number): State {
 export function nextRandom(state: State): [number, State] {
   const next = (Math.imul(state.rng, 1664525) + 1013904223) >>> 0;
   return [next / 4294967296, { ...state, rng: next }];
+}
+
+// Draws `count` feelings for a battle's critter, one PRNG value each, in
+// order (spec 8).
+function drawFeelings(
+  world: World,
+  state: State,
+  critter: Critter,
+  count: number,
+): [(FeelingId | null)[], State] {
+  let rolled = state;
+  const drawn: (FeelingId | null)[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const [value, after] = nextRandom(rolled);
+    drawn.push(feelingFromDraw(world, rolled, critter, value));
+    rolled = after;
+  }
+  return [drawn, rolled];
 }
 
 function vertex(polygon: Polygon, index: number): [number, number] {
@@ -667,6 +687,9 @@ export function battleCommands(
   if (battle === null) return [];
   const critter = world.critters[battle.critterId];
   if (critter === undefined) return [];
+  // This turn's feeling, on the command that answers it (its badge).
+  const now = battle.feelings[0] ?? null;
+  const feeling = (id: string): FeelingId | null => (answers(world, now, id) ? now : null);
   const friends = state.party.flatMap((member) => {
     const content = world.party[member.id];
     if (content === undefined) return [];
@@ -677,6 +700,7 @@ export function battleCommands(
         label: content.command.label,
         detail: rest > 0 ? content.command.resting : null,
         disabled: rest > 0,
+        feeling: feeling(content.command.id),
       },
     ];
   });
@@ -686,22 +710,22 @@ export function battleCommands(
       label: world.battle.commands.soothe.label,
       detail: null,
       disabled: false,
+      feeling: feeling("soothe"),
     },
     ...friends,
     {
       id: "snack",
       label: world.battle.commands.snack.label,
-      detail: (world.battle.commands.snack.snackDetail ?? "").replace(
-        "N",
-        String(state.snacks),
-      ),
+      detail: world.battle.commands.snack.snackDetail.replace("N", String(state.snacks)),
       disabled: state.snacks === 0,
+      feeling: feeling("snack"),
     },
     {
       id: "run",
       label: world.battle.commands.run.label,
       detail: null,
       disabled: false,
+      feeling: null,
     },
   ];
 }
@@ -746,6 +770,18 @@ export function battleView(world: World, state: State): BattleView | null {
   const actor = acting >= 0 ? acting : null;
   const checkView = check === null ? null : viewCheck(check, actor);
   const hint = check === null ? null : checkHint(check, world.battle.hints);
+  // The bubble shows in the menu, and over the result (with its heart, if
+  // the choice answered it); never over a check, which needs the room.
+  const [now = null, coming = null, after = null] = battle.feelings;
+  const feelings = battle.feelings.length > 0 &&
+      (battle.phase === "command" || battle.phase === "result")
+    ? {
+        now: now === null ? null : { id: now, label: world.battle.feelings[now].label },
+        next: coming,
+        later: battle.lanternPeek ? after : null,
+        answered: battle.answered,
+      }
+    : null;
   return {
     critterId: critter.id,
     critterName: critter.name,
@@ -763,6 +799,7 @@ export function battleView(world: World, state: State): BattleView | null {
     calmMax: critter.calmMax,
     check: checkView,
     hint,
+    feelings,
     lastGrade: battle.lastGrade,
     rewardSticker: battle.rewardSticker,
   };
@@ -858,14 +895,23 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     ].includes(next.phase)
   ) {
     if (!confirm) return { ...nextBase, battle: next };
-    if (next.phase === "intro")
-      next = {
-        ...next,
-        phase: "command",
-        message: critter.lines.command,
-        revealed: 0,
-        phaseTicks: 0,
+    if (next.phase === "intro") {
+      // The first turn: three feelings in a row, once a friend has joined.
+      const [feelings, rolled] = feelingsOn(world, state)
+        ? drawFeelings(world, nextBase, critter, 3)
+        : [[], nextBase];
+      return {
+        ...rolled,
+        battle: {
+          ...next,
+          phase: "command",
+          message: critter.lines.command,
+          revealed: 0,
+          phaseTicks: 0,
+          feelings,
+        },
       };
+    }
     else if (next.phase === "result")
       next =
         next.calm >= critter.calmMax
@@ -886,18 +932,27 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         }
       return { ...rolled, battle: startCheck(next, "fae", spec, big, lanes) };
     }
-    else if (next.phase === "burstResult")
-      next =
-        next.energy <= 0
-          ? battleMessage(next, critter.lines.rest, "rest")
-          : {
-              ...next,
-              phase: "command",
-              message: critter.lines.command,
-              revealed: 0,
-              phaseTicks: 0,
-              rest: next.rest,
-            };
+    else if (next.phase === "burstResult") {
+      if (next.energy <= 0) next = battleMessage(next, critter.lines.rest, "rest");
+      else {
+        // A new turn: the feelings move up one, and one more is drawn.
+        const [drawn, rolled] = next.feelings.length === 0
+          ? [[], nextBase]
+          : drawFeelings(world, nextBase, critter, 1);
+        return {
+          ...rolled,
+          battle: {
+            ...next,
+            phase: "command",
+            message: critter.lines.command,
+            revealed: 0,
+            phaseTicks: 0,
+            feelings: [...next.feelings.slice(1), ...drawn],
+            answered: false,
+          },
+        };
+      }
+    }
     else if (next.phase === "soothed") {
       // Every calm pays; the sticker comes once per species (spec 8).
       const fresh = !state.stickers.includes(critter.sticker.id);
@@ -953,6 +1008,12 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     return { ...nextBase, battle: next };
   }
   if (next.phase === "command") {
+    // The lantern, once Fae has it, shows the turn-after feeling too, for the
+    // rest of the battle (spec 8).
+    const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
+    if (lanternEdge && !next.lanternPeek && next.feelings.length > 0 &&
+        world.storyVariable(state.ink, "has_lantern") === true)
+      return { ...nextBase, battle: { ...next, lanternPeek: true } };
     const commands = battleCommands(world, { ...state, battle: next });
     if (input.choose !== undefined) {
       const chosen = commands[input.choose];
@@ -980,6 +1041,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ...nextBase,
         battle: battleMessage(next, critter.lines.run, "run"),
       };
+    // Whether this turn's choice answers what the critter feels.
+    const answered = answers(world, next.feelings[0], chosen.id);
     if (chosen.id === "snack") {
       const message = battleMessage(next, critter.lines.snack, "result");
       return {
@@ -987,6 +1050,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         snacks: state.snacks - 1,
         battle: {
           ...message,
+          answered,
           rest: restTurn(next.rest),
           energy: Math.min(
             critter.energyMax,
@@ -994,7 +1058,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           ),
           calm: Math.min(
             critter.calmMax,
-            next.calm + critter.commands.snack.calm,
+            next.calm + critter.commands.snack.calm +
+              (answered ? world.battle.feelingBonus : 0),
           ),
         },
       };
@@ -1011,6 +1076,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         {
           ...next,
           command: chosen.id,
+          answered,
           rest:
             friend === undefined
               ? restTurn(next.rest)
@@ -1043,7 +1109,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
             : 0;
       const calm = Math.min(
         critter.calmMax,
-        next.calm + command.numbers.calm + bonus,
+        next.calm + command.numbers.calm + bonus +
+          (next.answered ? world.battle.feelingBonus : 0),
       );
       return {
         ...nextBase,
@@ -1801,6 +1868,9 @@ function stepTick(
       rest: {},
       check: null,
       lastGrade: null,
+      feelings: [],
+      answered: false,
+      lanternPeek: false,
       rewardSticker: null,
       phaseTicks: 0,
     };

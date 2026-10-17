@@ -25,6 +25,11 @@
   },
   "calmKnot": "owl_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "grumpy",
+    "curious",
+    "bored"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

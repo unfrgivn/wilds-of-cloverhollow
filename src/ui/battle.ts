@@ -1,5 +1,7 @@
 import "./battle.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { feelingMarkup, heartMarkup, icon } from "./icons";
+import type { FeelingId } from "../core";
 
 export type BattleHudView = {
   visible: boolean;
@@ -15,6 +17,8 @@ export type BattleCommand = {
   label: string;
   detail: string | null;
   disabled: boolean;
+  // The feeling this command answers this turn, shown as a badge.
+  feeling: FeelingId | null;
 };
 
 export type CommandMenuView = {
@@ -22,6 +26,20 @@ export type CommandMenuView = {
   commands: BattleCommand[];
   selected: number;
 };
+
+// What the critter feels (spec 8.1): this turn's, with its label; the next
+// turn's; the turn after's once the lantern has peeked; whether this turn's
+// choice answered it; and where its cloud floats.
+export type FeelingBubbleView = {
+  now: { id: FeelingId; label: string } | null;
+  next: FeelingId | null;
+  later: FeelingId | null;
+  answered: boolean;
+  // Where the cloud's top centre would like to be, in CSS px; CSS keeps it
+  // below the HUD.
+  x: number;
+  y: number;
+} | null;
 
 export type TimingGrade = "great" | "good" | "miss";
 
@@ -428,6 +446,8 @@ type CommandButton = {
   button: HTMLButtonElement;
   label: HTMLSpanElement;
   detail: HTMLElement;
+  // The feeling badge drawn now, so it's redrawn only when it changes.
+  badge: { node: HTMLSpanElement; feeling: FeelingId | null };
 };
 
 export function createCommandMenu(root: HTMLElement): {
@@ -447,13 +467,15 @@ export function createCommandMenu(root: HTMLElement): {
     button.setAttribute("role", "option");
     const label = element("span", "battle-command-label");
     const detail = element("small", "battle-command-detail");
-    button.append(label, detail);
+    const badge = element("span", "battle-command-badge");
+    badge.hidden = true;
+    button.append(label, detail, badge);
     // Disabled buttons never fire click; the check keeps that explicit.
     button.addEventListener("click", () => {
       if (!button.disabled) choose(index);
     });
     menu.append(button);
-    return { button, label, detail };
+    return { button, label, detail, badge: { node: badge, feeling: null } };
   };
   return {
     onChoose: (callback) => {
@@ -478,7 +500,66 @@ export function createCommandMenu(root: HTMLElement): {
         );
         setAttribute(item.button, "aria-disabled", String(command.disabled));
         item.button.disabled = command.disabled;
+        if (item.badge.feeling !== command.feeling) {
+          drawFeeling(item.badge.node, command.feeling);
+          item.badge.feeling = command.feeling;
+        }
       });
+    },
+  };
+}
+
+/** Draws a feeling's icon into its slot, or empties and hides the slot. */
+function drawFeeling(slot: HTMLElement, feeling: FeelingId | null): void {
+  slot.hidden = feeling === null;
+  slot.replaceChildren(...(feeling === null ? [] : [icon(feelingMarkup[feeling], "battle-icon")]));
+}
+
+/**
+ * The critter's thought cloud (spec 8.1): this turn's feeling, big, with its
+ * label, and a trail of thought dots down toward the critter carrying what's
+ * coming: the next turn's feeling in the middle dot and, once the lantern has
+ * peeked, the one after in the smallest. A heart pops when this turn's
+ * choice answered it.
+ */
+export function createFeelingBubble(root: HTMLElement): {
+  render: (view: FeelingBubbleView) => void;
+} {
+  const bubble = element("div", "battle-feeling");
+  const cloud = element("div", "battle-feeling-cloud");
+  const nowIcon = element("span", "battle-feeling-icon");
+  const label = element("span", "battle-feeling-label");
+  const heart = element("span", "battle-feeling-heart");
+  heart.append(icon(heartMarkup, "battle-icon"));
+  cloud.append(nowIcon, label, heart);
+  const nextDot = element("span", "battle-feeling-dot battle-feeling-next");
+  const laterDot = element("span", "battle-feeling-dot battle-feeling-later");
+  const nextIcon = element("span", "battle-feeling-dot-icon");
+  const laterIcon = element("span", "battle-feeling-dot-icon");
+  nextDot.append(nextIcon);
+  laterDot.append(laterIcon);
+  bubble.append(cloud, nextDot, laterDot);
+  bubble.hidden = true;
+  root.append(bubble);
+  // What each icon slot shows now, so icons are redrawn only on change.
+  const drawn = new Map<HTMLElement, FeelingId | null>();
+  const show = (slot: HTMLElement, feeling: FeelingId | null): void => {
+    if (drawn.has(slot) && drawn.get(slot) === feeling) return;
+    drawFeeling(slot, feeling);
+    drawn.set(slot, feeling);
+  };
+  return {
+    render: (view) => {
+      bubble.hidden = view === null || view.now === null;
+      if (view === null || view.now === null) return;
+      bubble.style.left = `${view.x}px`;
+      bubble.style.setProperty("--feeling-y", `${view.y}px`);
+      show(nowIcon, view.now.id);
+      setText(label, view.now.label);
+      show(nextIcon, view.next);
+      show(laterIcon, view.later);
+      laterDot.classList.toggle("is-peeked", view.later !== null);
+      heart.hidden = !view.answered;
     },
   };
 }

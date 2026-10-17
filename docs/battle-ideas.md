@@ -1,9 +1,9 @@
 # Battle mechanic ideas
 
 Status: proposals, 2026-10-16. Owner, 2026-10-17: the suggested order is
-approved. Milestones 40 (battle checks), 41 (Catch), and 42 (feelings) are
-scheduled in `docs/plan.md`; what they build is specified in `spec.md` as each
-lands. The rest of this page stays unscheduled.
+approved, and Milestones 40 (battle checks), 41 (Catch), and 42 (feelings)
+built it; `spec.md` section 8 says what they do. The rest of this page stays
+unscheduled.
 
 Before Milestone 40, every action in a calm-down battle was the same skill
 check: press confirm when the shrinking ring meets the dashed circle. Soothe,
@@ -122,6 +122,8 @@ teaches the idea before the park pup's Catch adds moving.
    hungry critter. Feelings could start once Sue joins, so the first battles
    stay simple. This is the cheapest way to make the menu a decision.
    ("Mood" already means chaos or calm in the code, hence "feelings".)
+   Built in Milestone 42, with a flat 15 calm for a match instead of half
+   again the base, and the next feelings riding in the cloud's thought dots.
 2. **Wind-ups, for mini-bosses.** The gull spends a turn puffing up, and two or
    three bubbles over it show icons: a ball, a bobber, a pinecone. Each
    matching command pops one. Pop them all before it lets go and the gust

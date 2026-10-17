@@ -25,6 +25,11 @@
   },
   "calmKnot": "arcade_keeper",
   "calmPrompt": "Talk",
+  "feelings": [
+    "bored",
+    "grumpy",
+    "curious"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

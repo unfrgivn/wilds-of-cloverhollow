@@ -25,6 +25,11 @@
   },
   "calmKnot": "beach_frog_calm",
   "calmPrompt": "Talk",
+  "feelings": [
+    "bored",
+    "curious",
+    "zoomy"
+  ],
   "commands": {
     "soothe": {
       "calm": 20,

@@ -926,6 +926,19 @@ export class GameView {
     };
   }
 
+  // Where the critter's thought cloud floats (spec 8.1), in CSS px: centred
+  // in the open ground between Fae's party (Maddie sits on her near side)
+  // and the critter's aura, its top just above the critter's head. The shell
+  // keeps it below the HUD.
+  battleFeelingAnchor(state: State, width: number, height: number): Point | null {
+    if (state.battle === null) return null;
+    const layout = this.layoutFor(state, width, height);
+    const nearSide = layout.fae.x + 0.45 * layout.fae.height;
+    const auraEdge = layout.critter.x - 0.62 * layout.critter.height;
+    const critterTop = layout.critter.baseline - layout.critter.height;
+    return { x: (nearSide + auraEdge) / 2, y: critterTop - 0.4 * layout.fae.height };
+  }
+
   private battleCheckInfo(state: State): BattleCheckInfo | null {
     const check = state.battle?.check ?? null;
     const geometry = this.battleCheckGeometry(state, window.innerWidth, window.innerHeight);

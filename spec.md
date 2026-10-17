@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 43, the clubhouse fix-up)
+Last updated: 2026-10-17 (Milestone 42, feelings; Milestone 43, the clubhouse fix-up)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -991,7 +991,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `lines.friends.<command id>` are per-grade. The loader rejects a critter
   missing a roster command (numbers or lines), and a party command whose id is
   `soothe`, `snack`, or `run`, or another member's. The shared command labels
-  (Soothe, Snack, Run), the Snack `×N` template, and the check hints live in
+  (Soothe, Snack, Run), the Snack `×N` template, the check hints, and the
+  feelings live in
   `content/battle.json`; each friend's label and resting detail live in its
   `content/party/` entry; the reward lines, `rewards.sticker` ("New sticker:
   {sticker}! +{coins} coins.") and `rewards.coins` ("+{coins} coins!"), in
@@ -1107,6 +1108,31 @@ ios/            Capacitor iOS project (from Milestone 4).
   beat or a catch's first toy lands, the battle view carries that kind's hint
   from `content/battle.json` (`hints.charge`, `hints.chain`, `hints.catch`).
   It never uses `battle.message`, whose reveal would eat a confirm press.
+- Feelings (Milestone 42): once two friends fight beside Fae, each bringing
+  a battle command (Sue's arrival; a party member without one doesn't
+  count), a chaos critter shows what it feels each turn, and the command that
+  answers it is worth `feelingBonus` (15) more calm. `content/battle.json`
+  `feelings` maps the closed set to a label and its answer: zoomy, Play;
+  curious, Cast; bored, Juggle; grumpy, Soothe; hungry, Snack. Each kind
+  lists the feelings it can have (`feelings`, one or more, none twice; every
+  kind has one Soothe, Play, or Cast answers). `battle.feelings` holds this
+  turn's, the next turn's, and the one after (null where nothing it can feel
+  has an answer Fae has now: that friend in the party, or a snack for
+  hungry); `[]` while feelings are off, which draws nothing.
+  - Draws: as the intro ends, three seeded PRNG values, one per feeling in
+    order; at each new turn's menu (after a burst, with energy left) the row
+    moves up one and one more is drawn. A value picks from the kind's
+    feelings Fae can answer at that moment, spread evenly
+    (`min(n - 1, floor(value x n))`). These are the only draws outside a
+    burst's.
+  - Choosing a command sets `battle.answered` when it answers this turn's
+    feeling. An answered Snack adds the bonus to its calm at once; Soothe or
+    a friend's command adds it when its check resolves, whatever the grade.
+    Calm stays clamped to `calmMax`. A new turn clears `answered`.
+  - The lantern: once Fae has it, its button (L, X/Square, or the lantern
+    sticker) in the command menu shows the turn after's feeling too, for the
+    rest of the battle (`battle.lanternPeek`); it draws nothing, leaves the
+    overworld lantern as it was, and plays `lantern-on`.
 - While a battle runs Fae is frozen, doors don't fire, cancel and menu are
   ignored (v0), and the party keeps settling. `safeSpot` is set at new game
   and on every area arrival.
@@ -1224,6 +1250,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   the toy atlas in flight along their lanes; a caught toy pops into the
   catch (a quick grow and fade), a missed one sails on past Fae and fades.
   The grade sticker sits above the catch.
+- Feelings (Milestone 42): a thought cloud (a cream sticker) floats in the
+  open ground between Fae's party and the critter (`battleFeelingAnchor`:
+  centred between 0.45 x Fae's height past her and the critter's aura edge,
+  0.62 x its height before it; its top 0.4 x Fae's height above the
+  critter's head, but never higher than 96 px below the safe top, clear of
+  the HUD). It shows this turn's feeling, big, with its label, and a trail of
+  thought dots down toward the critter: the next turn's feeling in the
+  middle dot and, once the lantern has peeked, the one after in the smallest,
+  glowing lavender like the lantern. It shows in the menu and over the
+  result, where a heart pops if the choice answered it; it steps aside for
+  checks. The command that answers this turn's feeling wears the feeling as
+  a small round badge on its top-right corner. The icons are drawn in code
+  (`src/ui/icons.ts`, shared with the journal's coin and cookie): zoomy a
+  lightning bolt, curious a question mark, bored a flat little face, grumpy
+  a storm cloud, hungry a cookie.
 - Hint: a cream sticker label with the check's hint (section 8), shown only
   while the view carries one.
 - Reward card: a centred die-cut card with the title, one atlas frame cropped

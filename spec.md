@@ -1544,6 +1544,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   for Milestones 9 to 15 (the frog's and pup's calm lines, the journal notes,
   Mom and Oliver, the hall-pass puzzle, the raccoon and the tree house).
   "Ms. Maple" stays as the teacher's name for now.
+- Approved 2026-10-17: the thrown toys a catch throws (Milestone 41), cut
+  from the critters' burst frames (`art/review/toys-sheet.png`).
 - Waiting for the owner's review (Milestones 17 to 28, and art drawn ahead):
   Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay
   painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass

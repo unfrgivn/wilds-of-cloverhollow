@@ -228,6 +228,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   another line, including when the text is repeated. Unknown story sounds are
   rejected by the content loader. The music-room recipes are synthesized
   xylophone bars (C5, E5, G5, C6) and a short breathy rising flute call.
+- Footsteps use a closed surface set (`grass`, `sand`, `wood`, `snow`, `stone`,
+  `tile`, `carpet`). Each area has a required `content/surfaces/<area>.json`
+  with a default and first-match polygon regions in area units. The loader
+  rejects unknown surfaces, malformed or out-of-bounds polygons, and a missing
+  file names the exact path. Surface lookup is pure and footstep cues are
+  `footstep-<surface>`; synthesized recipes remain replaceable by clips.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -649,6 +655,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   placement into world units and rejects unknown props or states, duplicate
   ids, moved painted props, and rules reading undeclared Ink variables
   (`propRuleErrors`).
+- Surface maps live beside props in `content/surfaces/<area>.json`: `{ default,
+  precedence: "first", regions: [{ surface, polygon }] }`. Regions are tested
+  in file order, polygons must have at least three points and stay inside the
+  area's bounds, and every loaded area, including `harness`, has a file.
 - Collision: each prop's current footprint is solid for Fae, the party, and
   roaming critters, like a blocker (`sceneryArea`); spawning and joining
   party slots avoid them too.

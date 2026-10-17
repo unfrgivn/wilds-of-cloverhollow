@@ -1582,8 +1582,12 @@ Sound follow-ups from Milestone 37:
   land (birds, waves, wind). Needs the owner's call on the source: code
   synthesis like the effects, a generator (paid generation needs the
   owner), or CC0 clips found through Openverse (`docs/media-sources.md`).
-- Footsteps by surface (grass, wood, sand) once the area kits carry ground
-  data (after Milestone 34).
+- Footsteps by surface: done (2026-10-16). Required per-area surface maps keep
+  painting-derived defaults and first-match regions separate from area geometry;
+  pure lookup drives `footstep-<surface>` cues. The closed set covers grass,
+  sand, wood, snow, stone, tile, and carpet. Maps are conservative where a
+  painting has no distinct ground boundary, and the owner can replace the
+  synthesized recipes after choosing a CC0 clip.
 - A volume slider beside mute: done in the volume follow-up (2026-10-16).
   Four chunky steps, 25% through 100%, use the existing master gain path and
   live beside the mute pill. The preference remains outside the save; the old

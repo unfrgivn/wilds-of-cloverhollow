@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./surfaces";
 export * from "./sim";
 export * from "./timing";
 export * from "./ink";

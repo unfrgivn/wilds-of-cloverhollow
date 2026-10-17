@@ -1,9 +1,10 @@
-import type { State } from "./types";
+import type { Point, State } from "./types";
+import type { Surface } from "./surfaces";
 
 export type SoundCue =
   | "dialogue-open" | "dialogue-advance" | "dialogue-blip" | "dialogue-close"
   | "choice-move" | "choice-select" | "journal-open" | "journal-close"
-  | "footstep" | "door" | "area-arrive" | "coin" | "item" | "sticker"
+  | "footstep" | `footstep-${Surface}` | "door" | "area-arrive" | "coin" | "item" | "sticker"
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
   | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
@@ -19,7 +20,11 @@ export function isStorySound(value: string): value is StorySound {
 }
 
 /** Sound is a projection of state changes, never a second game state machine. */
-export function soundCues(previous: State, next: State): SoundCue[] {
+export function soundCues(
+  previous: State,
+  next: State,
+  surfaceAt?: (area: string, point: Point) => Surface,
+): SoundCue[] {
   const cues: SoundCue[] = [];
   const oldDialogue = previous.dialogue;
   const newDialogue = next.dialogue;
@@ -51,7 +56,8 @@ export function soundCues(previous: State, next: State): SoundCue[] {
   if (next.snacks > previous.snacks) cues.push("item");
   if (next.stickers.length > previous.stickers.length) cues.push("sticker");
   if (next.motion.moving && next.motion.distance > previous.motion.distance && next.tick % 8 === 0)
-    cues.push("footstep");
+    cues.push(surfaceAt === undefined
+      ? "footstep" : `footstep-${surfaceAt(next.area, next.player)}`);
 
   if (previous.battle === null && next.battle !== null) cues.push("battle-start");
   if (previous.battle !== null && next.battle === null) {

@@ -1,4 +1,5 @@
 import type { StorySound } from "./sound";
+import type { SurfaceMap } from "./surfaces";
 
 export type Point = { x: number; y: number };
 export type Polygon = [number, number][];
@@ -49,6 +50,7 @@ export type Area = {
   land?: string;
   width: number;
   height: number;
+  surfaces: SurfaceMap;
   walkable: Polygon;
   blockers: Polygon[];
   ground?: string;

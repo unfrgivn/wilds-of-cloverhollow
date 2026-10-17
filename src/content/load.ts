@@ -121,7 +121,8 @@ import type {
 function checkSpec(value: unknown, file: string, name: string): CheckSpec {
   field(record(value), file, name);
   const kind = value.kind;
-  field(kind === "ring" || kind === "charge" || kind === "chain", file, `${name}.kind`);
+  field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch", file,
+    `${name}.kind`);
   const integer = (key: string): number => {
     const item = value[key];
     field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
@@ -150,22 +151,39 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
     return { kind, waitTicks, maxTicks, targetTick, greatWindow, goodWindow };
   }
   const travelTicks = integer("travelTicks");
-  const hitWindow = integer("hitWindow");
-  field(travelTicks >= 1 && hitWindow >= 1, file, name);
+  field(travelTicks >= 1, file, `${name}.travelTicks`);
   const arrivals = value.arrivals;
   field(Array.isArray(arrivals) && arrivals.length > 0 &&
     arrivals.every((item): item is number => typeof item === "number" && Number.isInteger(item)),
   file, `${name}.arrivals`);
-  // The first beat has room to travel in; windows never touch, so a press
-  // belongs to one beat.
+  // The first one has room to travel in. A chain's windows never touch, so a
+  // press belongs to one beat; a catch's toys land at least 8 ticks apart.
+  const hitWindow = kind === "chain" ? integer("hitWindow") : 0;
+  if (kind === "chain") field(hitWindow >= 1, file, `${name}.hitWindow`);
+  const gap = kind === "chain" ? 2 * hitWindow + 2 : 8;
   arrivals.forEach((arrival, index) => {
     const previous = arrivals[index - 1];
-    field(previous === undefined ? arrival >= travelTicks : arrival >= previous + 2 * hitWindow + 2,
+    field(previous === undefined ? arrival >= travelTicks : arrival >= previous + gap,
       file, `${name}.arrivals`);
   });
+  if (kind === "catch") {
+    const toys = value.toys;
+    field(Array.isArray(toys) && toys.length > 0 &&
+      toys.every((item): item is string => typeof item === "string" && item.length > 0),
+    file, `${name}.toys`);
+    return { kind, travelTicks, arrivals: [...arrivals], toys: [...toys] };
+  }
   const look = value.look;
   field(look === "pinecone" || look === "bubble" || look === "dust", file, `${name}.look`);
   return { kind, travelTicks, hitWindow, arrivals: [...arrivals], look };
+}
+
+// Soothe's and a friend's check: a catch is only ever a burst's, since its
+// lanes come from the burst's roll (spec 8).
+function faeSideCheck(value: unknown, file: string, name: string): CheckSpec {
+  const spec = checkSpec(value, file, name);
+  field(spec.kind !== "catch", file, `${name}.kind`);
+  return spec;
 }
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -686,7 +704,8 @@ export function parseBattleContent(
   field(
     record(hints) &&
       typeof hints.charge === "string" &&
-      typeof hints.chain === "string",
+      typeof hints.chain === "string" &&
+      typeof hints.catch === "string",
     file,
     "hints",
   );
@@ -698,7 +717,7 @@ export function parseBattleContent(
     const raw = commands[id];
     field(record(raw) && typeof raw.label === "string", file, `commands.${id}`);
     if (id === "soothe")
-      return { label: raw.label, check: checkSpec(raw.check, file, "commands.soothe.check") };
+      return { label: raw.label, check: faeSideCheck(raw.check, file, "commands.soothe.check") };
     if (id === "snack") {
       field(typeof raw.snackDetail === "string", file, "commands.snack.snackDetail");
       return { label: raw.label, snackDetail: raw.snackDetail };
@@ -712,8 +731,11 @@ export function parseBattleContent(
     file,
     "rewards",
   );
+  const toyAtlas = value.toyAtlas;
+  field(typeof toyAtlas === "string" && toyAtlas.endsWith(".json"), file, "toyAtlas");
   return {
-    hints: { charge: hints.charge, chain: hints.chain },
+    toyAtlas,
+    hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch },
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),
@@ -760,7 +782,7 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
       id: text(command, "id"),
       label: text(command, "label"),
       resting: text(command, "resting"),
-      check: checkSpec(command.check, file, "command.check"),
+      check: faeSideCheck(command.check, file, "command.check"),
     },
   };
 }

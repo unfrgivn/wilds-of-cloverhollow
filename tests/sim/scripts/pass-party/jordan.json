@@ -693,31 +693,43 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 44
+    "ticks": 74
   },
   {
     "frame": {
       "move": {
         "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
+        "y": 1
       },
       "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 1
+    "ticks": 20
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 20
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 40
   },
   {
     "frame": {
@@ -1005,19 +1017,19 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 44
+    "ticks": 1
   },
   {
     "frame": {
       "move": {
         "x": 0,
-        "y": 0
+        "y": 1
       },
-      "confirm": true,
+      "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 1
+    "ticks": 53
   },
   {
     "frame": {
@@ -1029,7 +1041,19 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 1
+    "ticks": 24
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 48
   },
   {
     "frame": {

@@ -67,6 +67,30 @@ export type BattleCheckView =
       hint: string | null;
       // The top centre of the hint sticker.
       hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "catch";
+      // The three lanes' heights, high to low.
+      lanes: [number, number, number];
+      fromX: number;
+      catcherX: number;
+      radius: number;
+      // The lane the catch is in now.
+      catcher: number;
+      toys: {
+        appeared: boolean;
+        progress: number;
+        lane: number;
+        result: "pending" | "hit" | "miss";
+        // The toy's crop and its size in CSS px; null if the atlas isn't in.
+        image: AtlasImage | null;
+        width: number;
+        height: number;
+      }[];
+      grade: TimingGrade | null;
+      hint: string | null;
+      // The top centre of the hint sticker.
+      hintAt: { x: number; y: number };
     };
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
@@ -89,12 +113,19 @@ export function createBattleCheck(root: HTMLElement): {
   const chainTarget = element("div", "battle-chain-target");
   const beats = element("div", "battle-chain-beats");
   chain.append(chainTarget, beats);
+  // A catch: three lane dots, the catch circle, and the toys in flight.
+  const catchLayer = element("div", "battle-catch");
+  const laneDots = [0, 1, 2].map(() => element("span", "battle-catch-lane"));
+  const catcher = element("div", "battle-catch-ring");
+  const toys = element("div", "battle-catch-toys");
+  catchLayer.append(...laneDots, catcher, toys);
   const hint = element("div", "battle-check-hint");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
   grade.hidden = true;
-  root.append(ring, meter, chain, hint, grade);
+  root.append(ring, meter, chain, catchLayer, hint, grade);
   const icons: HTMLElement[] = [];
+  const toyNodes: { node: HTMLElement; src: string }[] = [];
   let iconLook: "pinecone" | "bubble" | "dust" | null = null;
   const hide = (node: HTMLElement | SVGSVGElement, hidden: boolean): void => {
     node.style.display = hidden ? "none" : "";
@@ -104,6 +135,7 @@ export function createBattleCheck(root: HTMLElement): {
       hide(ring, view?.kind !== "ring");
       hide(meter, view?.kind !== "charge");
       hide(chain, view?.kind !== "chain");
+      hide(catchLayer, view?.kind !== "catch");
       hide(hint, view?.hint === null || view === null);
       if (view === null) {
         grade.hidden = true;
@@ -156,6 +188,46 @@ export function createBattleCheck(root: HTMLElement): {
           view.grade,
           view.x + view.width / 2,
           view.y - gradeGap,
+        );
+      } else if (view.kind === "catch") {
+        const laneY = (lane: number): number => view.lanes[lane] ?? view.lanes[1];
+        laneDots.forEach((dot, lane) => {
+          dot.style.left = `${view.catcherX}px`;
+          dot.style.top = `${laneY(lane)}px`;
+        });
+        catcher.style.left = `${view.catcherX}px`;
+        catcher.style.top = `${laneY(view.catcher)}px`;
+        catcher.style.width = `${view.radius * 2}px`;
+        catcher.style.height = `${view.radius * 2}px`;
+        while (toyNodes.length < view.toys.length) {
+          const node = element("span", "battle-catch-toy");
+          node.setAttribute("aria-hidden", "true");
+          toys.append(node);
+          toyNodes.push({ node, src: "" });
+        }
+        toyNodes.forEach((item, index) => {
+          const toy = view.toys[index];
+          item.node.hidden = toy === undefined || !toy.appeared || toy.image === null;
+          if (toy === undefined || toy.image === null) return;
+          // A new battle's toys may be another critter's: crop only on change.
+          const key = `${toy.image.src}#${toy.image.frame.x},${toy.image.frame.y}`;
+          if (item.src !== key) {
+            applyAtlasCrop(item.node, toy.image);
+            item.src = key;
+          }
+          item.node.classList.toggle("is-hit", toy.result === "hit");
+          item.node.classList.toggle("is-miss", toy.result === "miss");
+          item.node.style.width = `${toy.width}px`;
+          item.node.style.height = `${toy.height}px`;
+          const p = clamp01(toy.progress);
+          item.node.style.left = `${view.fromX + (view.catcherX - view.fromX) * p}px`;
+          item.node.style.top = `${laneY(toy.lane)}px`;
+        });
+        renderGrade(
+          grade,
+          view.grade,
+          view.catcherX,
+          laneY(view.catcher) - view.radius - gradeGap,
         );
       } else {
         chain.style.left = "0";

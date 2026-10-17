@@ -78,6 +78,28 @@ export function mountTouchControls(): TouchInput {
     (button === "menu" ? root : buttons).append(element);
   };
   for (const [button, label] of BUTTONS) createButton(button, label);
+  // A catch's arrows (spec 8.1): shown only while one is in play, they hold
+  // the catch high or low; letting go returns it to the middle.
+  const reach = document.createElement("div");
+  reach.className = "touch-reach";
+  for (const [direction, label, name] of [[-1, "▲", "reach up"], [1, "▼", "reach down"]] as const) {
+    const arrow = document.createElement("button");
+    arrow.className = `touch-button touch-reach-${direction < 0 ? "up" : "down"}`;
+    arrow.type = "button";
+    arrow.textContent = label;
+    arrow.setAttribute("aria-label", name);
+    arrow.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      arrow.setPointerCapture(event.pointerId);
+      input.setReach(direction);
+    });
+    const release = (): void => input.setReach(0);
+    arrow.addEventListener("pointerup", release);
+    arrow.addEventListener("pointercancel", release);
+    arrow.addEventListener("lostpointercapture", release);
+    reach.append(arrow);
+  }
+  root.append(reach);
   const releaseStick = (event: PointerEvent): void => {
     input.endStick(event);
     stick.style.removeProperty("left");

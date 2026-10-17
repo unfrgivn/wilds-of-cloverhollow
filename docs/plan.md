@@ -1443,6 +1443,69 @@ the old trail, the owl, and the clubhouse claim.
     now and checks Sue's GREAT line. The plaza cat test's pinned meeting tick
     moved with chapter one (3011 to 3200).
 
+## Milestone 41: Catch **Status:** ✅ Completed (2026-10-17)
+- The nine "flurry" bursts become something to catch (owner, 2026-10-17,
+  `docs/battle-ideas.md`): tennis balls (the Zoomie Pup and the gym pup),
+  yarn (the Pouncy Cat), acorns (both squirrels), snowballs (the hamster),
+  bottle caps (both raccoons), and tickets and tokens (Mr. Pip) fly at Fae in
+  three lanes, and she holds up, nothing, or down to have her catch in each
+  toy's lane as it lands. No button: a new check kind, `catch`, reads the
+  stick or arrows (spec 8). Every toy caught is great, half good, like a
+  chain, and each catch plays `battle-beat`.
+- The big burst is now something the player sees: four toys, or six when
+  the roll comes up big (base damage 2, as before). A burst draws its big
+  roll first, then one lane per toy, so ring and chain bursts draw exactly
+  what they did.
+- The toys are cut from the approved critters' burst frames, pixel for pixel
+  (no generation; `art/recipes/toys.json`, `tools/art/build-toys.ts`), into
+  one atlas the battle overlay crops, drawn at the critter's own scale. The
+  build fails unless the atlas is RGBA and every toy equals its source: the
+  first cut wrote a greyscale atlas, every toy grey, which its byte-identical
+  rebuild check had only proved reproducible.
+- On touch the stick is hidden in battle, so two arrow stickers stand in its
+  place while a catch is in play (`data-check="catch"`). The shell lets go of
+  them outside a catch, so an arrow held as the catch ends can't walk Fae
+  off in the overworld.
+- The squirrels', hamster's, and raccoons' burst lines said Fae ducked or
+  dodged; they say she catches now. Mr. Pip's good line too.
+- Evidence: core unit tests for the catch's rules, the lanes, the burst's
+  draw order and damage, the loader, the content (every toy frame exists),
+  and the sound (`checks.test.ts`, `battle-wiring.test.ts`,
+  `check-loader.test.ts`, `catch-content.test.ts`, `sound.test.ts`); every
+  recorded run meeting a flurry critter re-recorded, with the runs that start
+  from them, the recorder catching each toy in its lane on arrows only;
+  real-key e2e (`catch.spec.ts`: a pup's catch on held arrow keys, and the
+  arrow stickers on touch at 874x402) and the gallery's catch state. Gates:
+  `just check` (565 unit tests, every sim, purity, lint), `just build`, and
+  `just e2e` (439 passed, 2 skipped, on Chromium and WebKit). Every changed
+  screenshot was viewed: 24 differ only in the harness readout's tick
+  (checked pixel for pixel outside it), 28 by the later tick's roaming
+  critters, aura phases, and party spacing (the plaza cat battle by its
+  blurred backdrop, read from the bus-line run now), and 7 are new (the
+  catch mid-flight on keys and on touch, the hint clear of the arrows, and
+  the gallery's catch).
+- Notes and assumptions:
+  - Lanes are heights, not left and right: the battle is staged side-on,
+    toys flying right to left from the critter to Fae, so three heights read
+    at a glance where left and right spots wouldn't until a toy landed.
+  - Toys land 24 ticks apart (20 when big), 50 ticks in flight: time to see
+    each one's lane and move. A catch ends by tick 154.
+  - The first toy can't land before its 50 ticks of flight, and the hint
+    ("Hold up or down to catch each one!") shows until it does. It hangs
+    midway between the catch and the critter: first drawn under Fae, it sat
+    behind the touch arrows on a notched iPhone, where the arrows stand past
+    the safe-area inset. `catch.spec.ts` emulates that notch and checks the
+    hint clears both arrows.
+  - The lane draws follow the big roll in the same PRNG, so every later
+    roll in a run shifts. Chapter one's plaza now rolls two raccoons where it
+    rolled a cat (Fae calms both: 40 coins, three stickers); the cat battle
+    test reads the bus-line run instead, which still meets one. The runs that
+    never meet a flurry critter (the bay, the bus, the trail, the hall pass,
+    the lookout, the frog's win and rest) re-recorded byte for byte.
+  - The e2e plays the pup run's second catch, a big one whose six toys use
+    all three lanes, so the keys and the stickers are each tested high,
+    middle, and low.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out (a school chapter). Still
@@ -1733,9 +1796,8 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 39, recess on the playing field: done (above).
   - Milestone 40, battle checks: done (above).
   - Next (owner, 2026-10-17, from `docs/battle-ideas.md`): Milestone 41,
-    Catch: the nine flurry bursts become toys to catch in three lanes, the
-    toys cut from the approved burst frames (branch `m41-toys`); then
-    Milestone 42, feelings, with the next-feeling and lantern peeks.
+    Catch: done (above). Then Milestone 42, feelings, with the next-feeling
+    and lantern peeks.
   - Then: the clubhouse fix-up (a fridge for snacks,
     the garden). The kid's identity is kept for the very end (owner,
     2026-10-07).

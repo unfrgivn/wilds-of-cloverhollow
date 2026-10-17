@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 40, battle checks)
+Last updated: 2026-10-17 (Milestone 41, Catch)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -1030,20 +1030,34 @@ ios/            Capacitor iOS project (from Milestone 4).
     beat, so mashing misses and a late press never costs the next beat. Every
     beat a hit grades great, at least half good, fewer a miss. Each hit plays
     the `battle-beat` sound.
+  - `catch` (Milestone 41; `travelTicks`, `arrivals`, `toys`): only a burst's.
+    Toys fly at Fae in three lanes (0 high, 1 middle, 2 low), toy j landing
+    at `arrivals[j]` in `lanes[j]`, drawn when the burst starts. No button:
+    each tick the catch first moves to the lane the stick or arrows point at
+    (up past -0.5 high, down past 0.5 low, else the middle), then every
+    pending toy landing on that tick is caught if the catch is in its lane,
+    else missed. Every toy caught grades great, at least half good, fewer a
+    miss, like a chain, and each catch plays `battle-beat`. `toys` are frames
+    of the toy atlas (`content/battle.json` `toyAtlas`), thrown in turn.
 - Soothe and a friend's command add their calm plus the grade bonus, clamped
-  to `calmMax`, and show that command's line for the grade. A burst makes one
-  seeded PRNG draw, when its check is created and before anything else it
-  generates (Milestone 41 adds lane draws after it): under `bigChance` it's
-  big, plays `burst.big` (the burst's `check` if the kind has none), and its
-  base damage is 2, else 1. Great, good, and miss deal 0, base minus 1, and
-  base.
+  to `calmMax`, and show that command's line for the grade. A burst's check
+  starts with seeded PRNG draws, in this order: first the big roll (under
+  `bigChance` it's big, plays `burst.big`, or the burst's `check` if the kind
+  has none, and its base damage is 2, else 1), then for a catch one draw per
+  toy, `min(2, floor(value x 3))` its lane. Ring and chain bursts make the
+  one draw. Great, good, and miss deal 0, base minus 1, and base.
 - Check numbers (Milestone 40): Soothe and Maddie's Play are rings of 60
   ticks, target 39, windows 5 and 11. Sue's Cast is a charge: wait 180, max
   60, target 44, windows 5 and 11. Jordan's Juggle is a pinecone chain:
   travel 36, hit window 8, arrivals 40, 64, 88, 112. Both frogs' bursts are
   bubble chains (travel 40, window 8, arrivals 44, 70, 96; big 44, 66, 88,
   110, 132), the bunny's a dust chain (travel 30, window 8, arrivals 40, 66,
-  92; big 40, 62, 84, 106, 128); every other burst is a ring of 60 ticks,
+  92; big 40, 62, 84, 106, 128). The nine flurry bursts are catches
+  (Milestone 41): the Zoomie Pup and the gym pup throw tennis balls, the
+  Pouncy Cat yarn, both squirrels acorns, the hamster snowballs, both
+  raccoons bottle caps, and Mr. Pip tickets and tokens; four toys land at 54,
+  78, 102, and 126 (travel 50), six when big at 54, 74, 94, 114, 134, and 154.
+  The rest (the bluebirds, the gull, and the owl) are rings of 60 ticks,
   target 45, windows 5 and 11. Every timed part fits in 180 ticks; a charge's
   wait for its first press isn't timed play (the player picks the moment) and
   gives up after its 180 ticks.
@@ -1052,12 +1066,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   the meter (`targetTick - goodWindow >= 1`, `targetTick + goodWindow` under
   `ticks` or `maxTicks`); `waitTicks >= 1`; for a chain, `hitWindow >= 1`, the
   first arrival at least `travelTicks`, each later one at least
-  `2 x hitWindow + 2` after the one before, and a known look. A `burst.big`
-  must be its burst check's kind, and every party command needs a check.
+  `2 x hitWindow + 2` after the one before, and a known look; for a catch,
+  the first arrival at least `travelTicks`, each later one at least 8 after
+  the one before, and at least one toy. A `burst.big` must be its burst
+  check's kind, every party command needs a check, and neither Soothe's nor
+  a friend's may be a catch.
 - Hints: while a charge waits for its first press, or before a chain's first
-  beat lands, the battle view carries that kind's hint from
-  `content/battle.json` (`hints.charge`, `hints.chain`). It never uses
-  `battle.message`, whose reveal would eat a confirm press.
+  beat or a catch's first toy lands, the battle view carries that kind's hint
+  from `content/battle.json` (`hints.charge`, `hints.chain`, `hints.catch`).
+  It never uses `battle.message`, whose reveal would eat a confirm press.
 - While a battle runs Fae is frozen, doors don't fire, cancel and menu are
   ignored (v0), and the party keeps settling. `safeSpot` is set at new game
   and on every area arrival.
@@ -1109,8 +1126,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   height above their feet into a dashed target 0.6 x her height above them
   (radius 0.16 x her height); a burst's chain flies from the critter's body
   centre to a dashed target on Fae's (radius 0.3 x her height). Soothe's
-  checks stand at Fae. A hint hangs just under the feet line (0.18 x Fae's
-  height below it) under its check, kept 130 px from the screen's sides.
+  checks stand at Fae. A catch's three lanes are 1.05, 0.55, and 0.1 x Fae's
+  height above her feet, its catch 0.7 x her height in front of her (radius
+  0.2 x her height); toys set out from 0.35 x the critter's height in front
+  of the critter and are drawn at the critter's own scale, since they were
+  cut from its art. A hint hangs just under the feet line (0.18 x Fae's
+  height below it) under its check, kept 130 px from the screen's sides; a
+  catch's hangs midway between the catch and the critter, clear of the touch
+  arrows on a notched phone.
 - Backdrop: the area painting itself, scaled so its painted interior (8% in
   from each side, past the watercolour's paper margins) covers the canvas plus
   a 32 px margin, centred on the critter where it stands (`battleFoe`) and
@@ -1121,16 +1144,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   builds log `[cloverhollow] battle {phase, message}` and the command buttons'
   rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
   backdrop rect, the check (`{ kind, side, x, y, hintAt }` plus a ring's
-  `radius`, a meter's `width` and `height`, or a chain's `from`, `to`, and
-  `radius`; `x, y` is a ring's centre, a meter's top-left, or a chain's
-  target), the battle's critter (`{ id, frame }`), the aura alpha, and whether
-  the
+  `radius`, a meter's `width` and `height`, a chain's `from`, `to`, and
+  `radius`, or a catch's `lanes`, `fromX`, `catcherX`, `radius`, and
+  `toyScale`; `x, y` is a ring's centre, a meter's top-left, a chain's
+  target, or the catch where it is), the battle's critter (`{ id, frame }`),
+  the aura alpha, and whether the
   overworld is visible; `renderInfo().critters` lists each overworld critter
   as `{ id, kind, frame, x, y }`, `id` its key (section 6.1).
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
-  menu, a check overlay (a ring, a charge meter, or a beat chain) with its
+  menu, a check overlay (a ring, a charge meter, a beat chain, or a catch)
+  with its
   grade sticker and hint, and a reward card. The game passes a full view to
   each `render` every frame; identical views change no DOM nodes. Battle
   messages use the dialogue box with no speaker.
@@ -1162,6 +1187,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   dust. A hit pops (a quick grow and fade); a miss drops away grey. The grade
   sticker sits above the target. A chain with another look redraws its
   icons, and beats past a shorter chain's count are hidden.
+- Catch (Milestone 41): small ink dots mark the three lanes, and the catch
+  is the beat chain's sticker target, sliding between them. Toys are crops of
+  the toy atlas in flight along their lanes; a caught toy pops into the
+  catch (a quick grow and fade), a missed one sails on past Fae and fades.
+  The grade sticker sits above the catch.
 - Hint: a cream sticker label with the check's hint (section 8), shown only
   while the view carries one.
 - Reward card: a centred die-cut card with the title, one atlas frame cropped
@@ -1169,8 +1199,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   white rim and an ink outline that follow the critter's silhouette. Asset
   URLs are document-relative so they work on iOS.
 - `data-battle="open"` on the root hides the movement stick; confirm and cancel
-  stay. Every battle text pair measures at least 4.5:1 contrast in the gallery
-  tests.
+  stay. While a catch is in play the shell sets `data-check="catch"`, and two
+  arrow stickers (up above down, the cancel button's size) stand where the
+  stick would: held, they point the catch high or low, as the stick or
+  arrows would; let go, it returns to the middle. Outside a catch the shell
+  lets go of them, so one held as the catch ends never walks Fae on. Every
+  battle text pair measures at least 4.5:1 contrast in the gallery tests.
 - `content/fixtures/plaza-party.json` is the two-member visual and battle
   fixture: plaza fountain spawn, seed 1, party `["maddie", "sue"]`.
 - The Pixi battle scene dims the loaded area painting and presents the critter,
@@ -1408,6 +1442,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   crop draws its subject again. `masks` reports a subject's errors (its seed
   or footprint outside its crop), which `pack` refuses, and warnings (its mask
   running into its crop's edge: the object cut off, or a neighbour leaked in).
+- Toys (Milestone 41): the atlas a catch throws (`public/assets/battle/toys/`)
+  is cut, pixel for pixel, from the approved critters' `chaos_burst_01`
+  frames, which already draw them as separate islands: tennis balls, yarn,
+  acorns, snowballs, bottle caps, tickets, and tokens. No generation:
+  `tools/art/build-toys.ts` rebuilds it from `art/recipes/toys.json`, and
+  fails unless the atlas is RGBA and every toy equals its source pixels.
 - Gate: the owner approves the style of the first character and the first area
   before bulk generation. Approved 2026-10-05: Fae v2 (larger chibi head, messy
   hair with bangs and a high bun, white sneakers with orange trim, journal in

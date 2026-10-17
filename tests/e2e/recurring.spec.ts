@@ -105,13 +105,15 @@ test("real keys: a calmed pup is gone after a trip out, a fresh one pays again",
 test("the town's cats: one comes out in the plaza once the fountain frog is calm", async ({
   page,
 }) => {
-  // Chapter one's recorded run (tools/sim/chapter-one.ts) meets a fizzy cat in
-  // the plaza after the school raccoon: replay it to the moment they meet,
-  // then read the battle in with real keys. `met` is the tick its intro starts
-  // (re-recording chapter one moves it: find it with
-  // `bun tools/sim/run.ts tests/sim/scripts/new-game/chapter-one.json --trace`).
-  const path = "tests/sim/scripts/new-game/chapter-one.json";
-  const met = 3200;
+  // The bus-line run (tools/sim/record-bus-line.ts, which starts with chapter
+  // one's) meets a fizzy cat in the plaza on its way to the bus: replay it to
+  // the moment they meet, then read the battle in with real keys. `met` is the
+  // tick its intro starts (re-recording moves it: find it with
+  // `bun tools/sim/run.ts tests/sim/scripts/new-game/bus-line.json --trace`).
+  // Chapter one itself met a cat here until Milestone 41's catch lanes drew
+  // from the same PRNG, and the plaza rolled raccoons instead.
+  const path = "tests/sim/scripts/new-game/bus-line.json";
+  const met = 5941;
   const upTo: ReturnType<typeof recording> = [];
   let ticks = 0;
   for (const segment of recording(path)) {

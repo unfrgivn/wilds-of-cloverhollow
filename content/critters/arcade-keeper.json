@@ -59,11 +59,42 @@
   "burst": {
     "bigChance": 0.5,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "ticket-01",
+        "token-01",
+        "ticket-02",
+        "token-02",
+        "ticket-03",
+        "token-03"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "ticket-01",
+        "token-01",
+        "ticket-02",
+        "token-02",
+        "ticket-03",
+        "token-03"
+      ]
     }
   },
   "lines": {
@@ -95,7 +126,7 @@
     "burst": "Mr. Pip mashes every button at once. A flurry of prize tickets and tokens flies at Fae!",
     "burstResult": {
       "great": "Fae catches every ticket, like confetti!",
-      "good": "Fae dodges most of the tokens!",
+      "good": "Fae catches most of the tokens!",
       "miss": "Whoosh! Fae is buried in paper tickets."
     },
     "soothed": "Mr. Pip blinks. The swirls fade from his eyes, and the arcade's beeping settles down.",

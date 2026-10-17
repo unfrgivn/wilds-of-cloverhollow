@@ -5,6 +5,7 @@ import {
   drainTicks,
   step,
   type ActionFrame,
+  type BattleView,
   type State,
   battleView,
   soundCues,
@@ -14,7 +15,7 @@ import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
-import { GameView } from "./render/view";
+import { GameView, type BattleCheckGeometry } from "./render/view";
 import type { AtlasImage } from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createPrompt } from "./ui/sticker";
@@ -23,6 +24,7 @@ import {
   createCommandMenu,
   createBattleCheck,
   createRewardSticker,
+  type BattleCheckView as BattleCheckOverlayView,
 } from "./ui/battle";
 import { assetUrl } from "./platform/assets";
 import { createJournal } from "./ui/journal";
@@ -169,9 +171,10 @@ async function boot(): Promise<void> {
   // Sticker art (the reward card and the journal album) is a CSS crop of a
   // critter's atlas. Decode each atlas once now, so a card never paints before
   // its image is ready (on a busy phone, or a loaded test machine).
-  const atlases = new Set(
-    Object.values(content.world.critters).map((critter) => critter.atlas),
-  );
+  const atlases = new Set([
+    ...Object.values(content.world.critters).map((critter) => critter.atlas),
+    content.world.battle.toyAtlas,
+  ]);
   await Promise.all(
     [...atlases].map(async (url) => {
       const atlas = new Image();
@@ -181,6 +184,50 @@ async function boot(): Promise<void> {
   );
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
+  // A toy a catch throws: a crop of the toy atlas (spec 8.1).
+  const toyArt = (frameName: string): AtlasImage | null => {
+    const atlas = content.world.battle.toyAtlas;
+    const sheet = Assets.get<Spritesheet | undefined>(atlas);
+    const rect = sheet?.data.frames[frameName]?.frame;
+    const size = sheet?.data.meta.size;
+    if (rect === undefined || size === undefined) return null;
+    return {
+      src: assetUrl(atlas.replace(".json", ".png")),
+      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+      atlas: { w: size.w, h: size.h },
+    };
+  };
+  // The check overlay's view: the core's check with its place on screen.
+  const checkOverlay = (
+    battle: BattleView | null,
+    geometry: BattleCheckGeometry | null,
+  ): BattleCheckOverlayView | null => {
+    const check = battle?.check ?? null;
+    if (battle === null || check === null || geometry === null) return null;
+    const shared = { grade: battle.lastGrade, hint: battle.hint };
+    if (check.kind === "ring" && geometry.kind === "ring")
+      return { ...geometry, ...shared, progress: check.progress, target: check.target };
+    if (check.kind === "charge" && geometry.kind === "charge")
+      return { ...geometry, ...shared, fill: check.fill, great: check.great, good: check.good };
+    if (check.kind === "chain" && geometry.kind === "chain")
+      return { ...geometry, ...shared, beats: check.beats, look: check.look };
+    if (check.kind === "catch" && geometry.kind === "catch")
+      return {
+        ...geometry,
+        ...shared,
+        catcher: check.catcher,
+        toys: check.toys.map((toy) => {
+          const image = toyArt(toy.frame);
+          return {
+            ...toy,
+            image,
+            width: (image?.frame.w ?? 0) * geometry.toyScale,
+            height: (image?.frame.h ?? 0) * geometry.toyScale,
+          };
+        }),
+      };
+    return null;
+  };
   const stickerArt = (
     critterId: string,
     frameName: string,
@@ -280,6 +327,13 @@ async function boot(): Promise<void> {
     else delete document.documentElement.dataset.title;
     if (activeBattle) document.documentElement.dataset.battle = "open";
     else delete document.documentElement.dataset.battle;
+    // Which check is in play (spec 8.1): a catch shows its touch arrows.
+    const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
+    if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
+    else delete document.documentElement.dataset.check;
+    // An arrow held as the catch ends is hidden mid-press and may never see
+    // its pointer lifted: outside a catch, it lets go.
+    if (checkKind !== "catch") touch.setReach(0);
     battleHud.render({
       visible: activeBattle && state.battle?.phase !== "reward",
       energy: battle?.energy ?? 0,
@@ -316,36 +370,7 @@ async function boot(): Promise<void> {
       window.innerWidth,
       window.innerHeight,
     );
-    battleCheck.render(
-      geometry === null || battle?.check === null || battle === null
-        ? null
-        : battle.check.kind === "ring" && geometry.kind === "ring"
-          ? {
-              ...geometry,
-              progress: battle.check.progress,
-              target: battle.check.target,
-              grade: battle.lastGrade,
-              hint: battle.hint,
-            }
-          : battle.check.kind === "charge" && geometry.kind === "charge"
-            ? {
-                ...geometry,
-                fill: battle.check.fill,
-                great: battle.check.great,
-                good: battle.check.good,
-                grade: battle.lastGrade,
-                hint: battle.hint,
-              }
-            : battle.check.kind === "chain" && geometry.kind === "chain"
-              ? {
-                  ...geometry,
-                  beats: battle.check.beats,
-                  look: battle.check.look,
-                  grade: battle.lastGrade,
-                  hint: battle.hint,
-                }
-              : null,
-    );
+    battleCheck.render(checkOverlay(battle, geometry));
     // The card shows a new sticker; a species already in the album only pays.
     const rewardCritter =
       state.battle === null

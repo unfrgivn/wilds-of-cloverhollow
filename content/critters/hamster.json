@@ -59,11 +59,34 @@
   "burst": {
     "bigChance": 0.3,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "snowball-01",
+        "snowball-02"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "snowball-01",
+        "snowball-02"
+      ]
     }
   },
   "lines": {
@@ -94,8 +117,8 @@
     "snack": "Fae shares a crunchy cracker. The hamster stuffs it in its cheeks!",
     "burst": "The hamster whirls and flings a flurry of snowballs at Fae!",
     "burstResult": {
-      "great": "Fae ducks every single snowball!",
-      "good": "Fae dodges most of the snowballs!",
+      "great": "Fae catches every single snowball!",
+      "good": "Fae catches most of the snowballs!",
       "miss": "Poof! Fae gets a face full of snow."
     },
     "soothed": "The hamster lets out a happy squeak. The fizzy spell melts away!",

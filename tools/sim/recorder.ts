@@ -300,7 +300,8 @@ export function createRecorder(world: World, initial: State): {
 
   // Plays one check like a careful player, every grade GREAT: a ring pressed
   // on its target tick; a charge held exactly to its target, then let go; a
-  // chain pressed on each beat's arrival.
+  // chain pressed on each beat's arrival; a catch held in each toy's lane
+  // (up high, nothing for the middle, down low) as it lands.
   const playCheck = (check: CheckState): void => {
     const live = (): CheckState | null => state.battle?.check ?? null;
     const waitFor = (target: number): void => {
@@ -314,6 +315,13 @@ export function createRecorder(world: World, initial: State): {
       for (let count = 0; count < check.spec.targetTick; count += 1)
         tick(frame(undefined, true));
       tick(frame());
+    } else if (check.kind === "catch") {
+      for (let current = live(); current?.kind === "catch"; current = live()) {
+        const next = current.results.indexOf("pending");
+        if (next < 0) break;
+        const lane = current.lanes[next] ?? 1;
+        tick(frame(lane === 0 ? directions.up : lane === 2 ? directions.down : undefined));
+      }
     } else {
       for (const arrival of check.spec.arrivals) {
         waitFor(arrival - 1);

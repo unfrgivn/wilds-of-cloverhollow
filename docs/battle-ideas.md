@@ -48,7 +48,7 @@ into), and a feeling over the critter's head makes the menu a choice.
 | Ring (today) | Press as the rings meet | Z; confirm | Maddie's Play (her pounce) |
 | Charge | Hold Z, let go while the meter is in the green | hold Z; hold confirm | Sue's Cast: wind up, throw the bobber |
 | Beat chain | Three to five things arrive one after another; press as each lands | Z per beat; confirm | Jordan's Juggle, frog bubbles, bunny thumps |
-| Catch | Toys fly at Fae in three lanes; slide her backpack under each | left/right; two arrow stickers | the nine "flurry" bursts |
+| Catch | Toys fly at Fae in three lanes (high, middle, low); hold her catch in each toy's lane as it lands (built in Milestone 41) | up/down; two arrow stickers | the nine "flurry" bursts |
 | Lean | A gust shoves a wobbling needle; hold the other way to keep Fae's hat on | hold left/right; two arrow stickers | the gust bursts |
 | Pet | Three or four arrows show on the critter; press them in order before the timer runs out (no precision timing) | arrows; four arrow stickers | Soothe, as a no-reflex default |
 | Echo | The critter hums three to five notes on the music room's four chimes; play them back (up red, right yellow, down green, left blue) | arrows; four chime stickers | the flute, songbirds |

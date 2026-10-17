@@ -10,12 +10,12 @@ import { loadContent } from "../../src/content/load";
 
 const content = loadContent();
 
-function battleState(fixtureName: string): State {
+function battleState(fixtureName: string, critterId = "fountain-frog"): State {
   const fixture = content.fixtures[fixtureName];
   if (fixture === undefined) throw new Error(`${fixtureName} fixture missing`);
   const state = createState(content.world, fixture);
   const battle: Battle = {
-    critterId: "fountain-frog", den: null, entry: state.player, phase: "command",
+    critterId, den: null, entry: state.player, phase: "command",
     message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
     rest: {}, check: null, lastGrade: null, rewardSticker: null, phaseTicks: 0,
   };
@@ -24,6 +24,10 @@ function battleState(fixtureName: string): State {
 
 function choose(state: State, index: number): State {
   return step(content.world, state, { ...blankInput(), choose: index }).state;
+}
+
+function nextRng(rng: number): number {
+  return (Math.imul(rng, 1664525) + 1013904223) >>> 0;
 }
 
 describe("battle check wiring", () => {
@@ -90,7 +94,7 @@ describe("battle check wiring", () => {
     const state = battleState("plaza-party");
     const before: State = {
       ...state,
-      battle: { ...state.battle!, critterId: "pup", phase: "burst" },
+      battle: { ...state.battle!, critterId: "bluebird", phase: "burst" },
       rng: 1000,
     };
     let current = step(content.world, before, { ...blankInput(), confirm: true }).state;
@@ -100,5 +104,75 @@ describe("battle check wiring", () => {
     expect(current.battle?.lastGrade).toBe("miss");
     current = step(content.world, current, { ...blankInput(), confirm: true }).state;
     expect(current.battle?.energy).toBe(4);
+  });
+
+  it("creates a big pup catch with one PRNG draw per toy after its big roll", () => {
+    const before: State = {
+      ...battleState("plaza-party", "pup"),
+      rng: 1,
+      battle: { ...battleState("plaza-party", "pup").battle!, phase: "burst" },
+    };
+    const after = step(content.world, before, { ...blankInput(), confirm: true }).state;
+    const pup = content.world.critters.pup;
+    if (pup === undefined || pup.burst.big?.kind !== "catch") throw new Error("pup catch missing");
+    let expected = nextRng(before.rng);
+    const bigValue = expected / 4294967296;
+    expect(bigValue).toBeLessThan(pup.burst.bigChance);
+    for (const _toy of pup.burst.big.arrivals) expected = nextRng(expected);
+    expect(after.rng).toBe(expected);
+    expect(after.battle?.check).toMatchObject({ kind: "catch", spec: pup.burst.big });
+  });
+
+  it("charges two energy for missing every catch toy", () => {
+    let state: State = {
+      ...battleState("plaza-party", "pup"),
+      rng: 1,
+      battle: { ...battleState("plaza-party", "pup").battle!, phase: "burst" },
+    };
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    while (state.battle?.phase === "check") {
+      const check = state.battle.check;
+      const pending = check?.kind === "catch"
+        ? check.results.findIndex((result) => result === "pending")
+        : -1;
+      const lane = check?.kind === "catch" && pending >= 0
+        ? ((check.lanes[pending] ?? 0) + 1) % 3
+        : 1;
+      state = step(content.world, state, { ...blankInput(), move: { x: 0, y: lane - 1 } }).state;
+    }
+    expect(state.battle?.lastGrade).toBe("miss");
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    expect(state.battle?.energy).toBe(3);
+  });
+
+  it("catches every pup toy in its rolled lane without spending energy", () => {
+    let state: State = {
+      ...battleState("plaza-party", "pup"),
+      rng: 1,
+      battle: { ...battleState("plaza-party", "pup").battle!, phase: "burst" },
+    };
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    const check = state.battle?.check;
+    if (check === null || check === undefined || check.kind !== "catch")
+      throw new Error("catch check missing");
+    for (const [index, arrival] of check.spec.arrivals.entries()) {
+      const lane = check.lanes[index];
+      if (lane === undefined) throw new Error("catch lane missing");
+      while (state.battle?.check?.tick !== arrival - 1)
+        state = step(content.world, state, { ...blankInput(), move: { x: 0, y: lane - 1 } }).state;
+      state = step(content.world, state, { ...blankInput(), move: { x: 0, y: lane - 1 } }).state;
+    }
+    expect(state.battle?.lastGrade).toBe("great");
+    state = step(content.world, state, { ...blankInput(), confirm: true }).state;
+    expect(state.battle?.energy).toBe(5);
+  });
+
+  it("keeps frog and bunny bursts to one PRNG draw", () => {
+    for (const critterId of ["fountain-frog", "bunny"]) {
+      const base = battleState("plaza-party", critterId);
+      const before: State = { ...base, rng: 1, battle: { ...base.battle!, phase: "burst" } };
+      const after = step(content.world, before, { ...blankInput(), confirm: true }).state;
+      expect(after.rng).toBe(nextRng(before.rng));
+    }
   });
 });

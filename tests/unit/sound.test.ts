@@ -110,4 +110,33 @@ describe("gameplay sound cues", () => {
     expect(soundCues({ ...state, battle: { ...state.battle!, phase: "check" } }, state,
       content.world)).toContain("battle-hit");
   });
+
+  it("emits one battle-beat per caught toy and none for a missed toy", () => {
+    const fixture = content.fixtures.plaza;
+    const pup = content.world.critters.pup;
+    if (fixture === undefined || pup === undefined || pup.burst.check.kind !== "catch")
+      throw new Error("catch fixtures missing");
+    const initial = createState(content.world, fixture);
+    const check = createCheck(pup.burst.check, "fae", false, [0, 1, 2, 0]);
+    let state: State = {
+      ...initial,
+      battle: {
+        critterId: pup.id, den: null, entry: initial.player, phase: "check",
+        message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
+        rest: {}, check, lastGrade: null, rewardSticker: null, phaseTicks: 0,
+      },
+    };
+    let beats = 0;
+    for (const [index, arrival] of pup.burst.check.arrivals.entries()) {
+      const lane = index === 0 ? 1 : (check.kind === "catch" ? check.lanes[index] : undefined);
+      if (lane === undefined) throw new Error("catch lane missing");
+      while (state.battle?.check?.tick !== arrival - 1)
+        state = step(content.world, state, { ...none, move: { x: 0, y: lane - 1 } }).state;
+      const next = step(content.world, state, { ...none, move: { x: 0, y: lane - 1 } }).state;
+      beats += soundCues(state, next, content.world)
+        .filter((cue) => cue === "battle-beat").length;
+      state = next;
+    }
+    expect(beats).toBe(pup.burst.check.arrivals.length - 1);
+  });
 });

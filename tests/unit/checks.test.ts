@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCheck, stepCheck } from "../../src/core/checks";
+import { createCheck, laneFromDraw, laneFromStick, stepCheck } from "../../src/core/checks";
 import type { CheckSpec, CheckState } from "../../src/core";
 
 const ring: CheckSpec = {
@@ -20,8 +20,9 @@ function advance(
   edge = false,
   held = false,
 ): { check: CheckState; grade: string | null } {
-  while (state.tick < tick - 1) state = stepCheck(state, false, false).check;
-  return stepCheck(state, edge, held);
+  while (state.tick < tick - 1)
+    state = stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1 }).check;
+  return stepCheck(state, { confirmEdge: edge, confirmHeld: held, lane: 1 });
 }
 
 function edgeAt(state: CheckState, tick: number): { check: CheckState; grade: string | null } {
@@ -63,17 +64,21 @@ describe("battle check rules", () => {
 
   it("does not start a charge from the command-choosing confirm edge", () => {
     let state = createCheck(charge, "critter");
-    ({ check: state } = stepCheck(state, true, true));
+    ({ check: state } = stepCheck(state, { confirmEdge: true, confirmHeld: true, lane: 1 }));
     expect(chargeHeld(state)).toBe(1);
   });
 
   it("requires a fresh press after holding through a charge", () => {
     let state = createCheck(charge, "critter");
-    ({ check: state } = stepCheck(state, false, true));
-    ({ check: state } = stepCheck(state, false, true));
+    ({ check: state } = stepCheck(state, { confirmEdge: false, confirmHeld: true, lane: 1 }));
+    ({ check: state } = stepCheck(state, { confirmEdge: false, confirmHeld: true, lane: 1 }));
     expect(chargeHeld(state)).toBe(0);
-    expect(stepCheck(state, false, false).grade).toBeNull();
-    expect(chargeHeld(stepCheck(state, true, true).check)).toBe(1);
+    expect(stepCheck(state, {
+      confirmEdge: false, confirmHeld: false, lane: 1,
+    }).grade).toBeNull();
+    expect(chargeHeld(stepCheck(state, {
+      confirmEdge: true, confirmHeld: true, lane: 1,
+    }).check)).toBe(1);
   });
 
   it("misses an untouched charge at waitTicks but accepts an edge on waitTicks", () => {
@@ -146,5 +151,76 @@ describe("battle check rules", () => {
     };
     const state = edgeAt(createCheck(spec, "critter"), 8).check;
     expect(chainResults(state)).toEqual(["hit", "pending"]);
+  });
+});
+
+describe("catch check rules", () => {
+  const catchSpec: CheckSpec = {
+    kind: "catch", travelTicks: 2, arrivals: [3, 11, 19], toys: ["ball", "duck"],
+  };
+
+  function catchAt(
+    state: CheckState,
+    tick: number,
+    lane: number,
+  ): { check: CheckState; grade: string | null } {
+    while (state.tick < tick - 1)
+      state = stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1 }).check;
+    return stepCheck(state, { confirmEdge: false, confirmHeld: false, lane });
+  }
+
+  it("catches every toy in its lane and grades all hits great", () => {
+    let state = createCheck(catchSpec, "critter", false, [0, 1, 2]);
+    state = catchAt(state, 3, 0).check;
+    state = catchAt(state, 11, 1).check;
+    const result = catchAt(state, 19, 2);
+
+    expect(result.grade).toBe("great");
+    expect(result.check.kind === "catch" ? result.check.results : []).toEqual([
+      "hit", "hit", "hit",
+    ]);
+  });
+
+  it("grades at least half the toys good", () => {
+    let state = createCheck(catchSpec, "critter", false, [0, 0, 2]);
+    state = catchAt(state, 3, 0).check;
+    state = catchAt(state, 11, 0).check;
+    expect(catchAt(state, 19, 0).grade).toBe("good");
+  });
+
+  it("grades fewer than half the toys miss", () => {
+    let state = createCheck(catchSpec, "critter", false, [0, 1, 2]);
+    state = catchAt(state, 3, 1).check;
+    state = catchAt(state, 11, 0).check;
+    expect(catchAt(state, 19, 1).grade).toBe("miss");
+  });
+
+  it("resolves toys on their arrival tick and requires the lane that tick", () => {
+    let state = createCheck(catchSpec, "critter", false, [0, 2, 1]);
+    state = catchAt(state, 2, 0).check;
+    expect(state.kind === "catch" ? state.results : []).toEqual(["pending", "pending", "pending"]);
+    state = catchAt(state, 3, 1).check;
+    expect(state.kind === "catch" ? state.results[0] : "pending").toBe("miss");
+  });
+
+  it("follows the stick on the same tick as an arrival", () => {
+    const state = createCheck(catchSpec, "critter", false, [2, 1, 0]);
+    const result = catchAt(state, 3, 2);
+
+    expect(result.check.kind === "catch" ? result.check.results[0] : "pending").toBe("hit");
+  });
+
+  it("maps stick thresholds to high, middle, and low lanes", () => {
+    expect(laneFromStick(-0.5001)).toBe(0);
+    expect(laneFromStick(-0.5)).toBe(1);
+    expect(laneFromStick(0.5)).toBe(1);
+    expect(laneFromStick(0.5001)).toBe(2);
+  });
+
+  it("maps draw boundaries to the three lanes", () => {
+    expect(laneFromDraw(0)).toBe(0);
+    expect(laneFromDraw(0.3333)).toBe(0);
+    expect(laneFromDraw(0.6667)).toBe(2);
+    expect(laneFromDraw(0.9999)).toBe(2);
   });
 });

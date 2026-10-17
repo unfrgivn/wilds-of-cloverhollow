@@ -1,4 +1,4 @@
-import type { State, World } from "./types";
+import type { CheckState, State, World } from "./types";
 import { surfaceAt } from "./surfaces";
 
 export type SoundCue =
@@ -71,12 +71,8 @@ export function soundCues(
     else if (previous.battle.phase === "rest") cues.push("battle-rest");
   }
   if (previous.battle !== null && next.battle !== null) {
-    const oldCheck = previous.battle.check;
-    const newCheck = next.battle.check;
-    if (oldCheck?.kind === "chain" && newCheck?.kind === "chain" &&
-        newCheck.results.filter((item) => item === "hit").length >
-          oldCheck.results.filter((item) => item === "hit").length)
-      cues.push("battle-beat");
+    // A beat popped or a toy caught (a new check starts back at none).
+    if (hits(next.battle.check) > hits(previous.battle.check)) cues.push("battle-beat");
     if (previous.battle.command !== next.battle.command && next.battle.command !== null)
       cues.push("battle-command");
     if (previous.battle.phase !== next.battle.phase &&
@@ -84,4 +80,11 @@ export function soundCues(
       cues.push("battle-hit");
   }
   return cues;
+}
+
+// How many beats or toys a chain or catch has hit so far; other checks none.
+function hits(check: CheckState | null): number {
+  return check?.kind === "chain" || check?.kind === "catch"
+    ? check.results.filter((result) => result === "hit").length
+    : 0;
 }

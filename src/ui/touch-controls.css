@@ -101,6 +101,24 @@
   display: none;
 }
 
+/* A catch's arrows stand where the stick would, up above down, only while a
+   catch is in play (spec 8.1). */
+.touch-reach {
+  position: absolute;
+  left: calc(20px + var(--safe-left));
+  bottom: calc(20px + var(--safe-bottom));
+  display: none;
+  flex-direction: column;
+  gap: var(--touch-gap);
+  pointer-events: auto;
+}
+:root[data-check="catch"] .touch-reach { display: flex; }
+.touch-reach .touch-button {
+  width: var(--touch-cancel-size);
+  height: var(--touch-cancel-size);
+  font-size: 22px;
+}
+
 /* The journal is modal and closes with its own button. */
 :root[data-journal="open"] .touch-controls {
   display: none;

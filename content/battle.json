@@ -1,4 +1,5 @@
 {
+  "toyAtlas": "assets/battle/toys/toys.json",
   "commands": {
     "soothe": {
       "label": "Soothe",
@@ -24,6 +25,7 @@
   },
   "hints": {
     "charge": "Hold, then let go in the green!",
-    "chain": "Press as each one lands!"
+    "chain": "Press as each one lands!",
+    "catch": "Hold up or down to catch each one!"
   }
 }

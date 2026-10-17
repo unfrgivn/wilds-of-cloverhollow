@@ -59,11 +59,38 @@
   "burst": {
     "bigChance": 0.3,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "acorn-01",
+        "acorn-02",
+        "acorn-03",
+        "acorn-04"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "acorn-01",
+        "acorn-02",
+        "acorn-03",
+        "acorn-04"
+      ]
     }
   },
   "lines": {
@@ -94,8 +121,8 @@
     "snack": "Fae shares a handful of sunflower seeds. The squirrel nibbles them one by one.",
     "burst": "The squirrel flings a flurry of acorns at Fae!",
     "burstResult": {
-      "great": "Fae ducks every single acorn!",
-      "good": "Fae dodges most of the acorns!",
+      "great": "Fae catches every single acorn!",
+      "good": "Fae catches most of the acorns!",
       "miss": "Bonk! An acorn bops Fae on the head."
     },
     "soothed": "The squirrel flicks its tail happily. The fizzy spell fizzles away!",

@@ -37,9 +37,22 @@ const hintHalfWidth = 130;
 export type BattleCheckGeometry =
   | { kind: "ring"; x: number; y: number; radius: number; hintAt: Point }
   | { kind: "charge"; x: number; y: number; width: number; height: number; hintAt: Point }
-  | { kind: "chain"; from: Point; to: Point; radius: number; hintAt: Point };
+  | { kind: "chain"; from: Point; to: Point; radius: number; hintAt: Point }
+  // A catch: the three lanes' heights (high, middle, low), where toys set
+  // out and where the catch stands, its radius, and the toys' scale (CSS px
+  // per toy-atlas pixel: the critter's own, since they were cut from it).
+  | {
+      kind: "catch";
+      lanes: [number, number, number];
+      fromX: number;
+      catcherX: number;
+      radius: number;
+      toyScale: number;
+      hintAt: Point;
+    };
 // The check for tests (spec 11): its side and geometry, plus an anchor
-// (`x`, `y`: a ring's centre, a meter's top-left, a chain's target).
+// (`x`, `y`: a ring's centre, a meter's top-left, a chain's target, the
+// catch where it is).
 export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number; y: number };
 import { followCamera, worldToScreen } from "./camera";
 import { selectFaeAnimation } from "./animation";
@@ -208,6 +221,12 @@ export class GameView {
       Assets.load({
         alias: "glow-sheet",
         src: assetUrl("assets/glows/glows.json"),
+      }),
+      // The toys a catch throws are cropped from this sheet by the DOM
+      // overlay, which reads their frames here.
+      Assets.load({
+        alias: this.world.battle.toyAtlas,
+        src: assetUrl(this.world.battle.toyAtlas),
       }),
       ...Object.entries(this.world.characters).map(([id, character]) =>
         Assets.load({
@@ -858,6 +877,24 @@ export class GameView {
             radius: 0.55 * critter.height,
             hintAt: hintAt(critter.x),
           };
+    if (check.kind === "catch") {
+      const figure = this.world.critters[state.battle?.critterId ?? ""]?.figureHeight ?? 1;
+      return {
+        kind: "catch",
+        lanes: [
+          fae.baseline - 1.05 * fae.height,
+          fae.baseline - 0.55 * fae.height,
+          fae.baseline - 0.1 * fae.height,
+        ],
+        fromX: critter.x - 0.35 * critter.height,
+        catcherX: fae.x + 0.7 * fae.height,
+        radius: 0.2 * fae.height,
+        toyScale: critter.height / figure,
+        // Midway between the catch and the critter: the open ground clear of
+        // the touch arrows (bottom left, past the notch inset) and confirm.
+        hintAt: hintAt((fae.x + 0.7 * fae.height + critter.x) / 2),
+      };
+    }
     if (check.side === "fae")
       return {
         kind: "chain",
@@ -890,12 +927,17 @@ export class GameView {
   }
 
   private battleCheckInfo(state: State): BattleCheckInfo | null {
-    const side = state.battle?.check?.side;
+    const check = state.battle?.check ?? null;
     const geometry = this.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
-    if (side === undefined || geometry === null) return null;
-    return geometry.kind === "chain"
-      ? { ...geometry, side, x: geometry.to.x, y: geometry.to.y }
-      : { ...geometry, side };
+    if (check === null || geometry === null) return null;
+    const side = check.side;
+    if (geometry.kind === "chain") return { ...geometry, side, x: geometry.to.x, y: geometry.to.y };
+    if (geometry.kind === "catch") {
+      const lane = check.kind === "catch" ? check.catcher : 1;
+      const y = geometry.lanes[lane] ?? geometry.lanes[1];
+      return { ...geometry, side, x: geometry.catcherX, y };
+    }
+    return { ...geometry, side };
   }
 
   renderInfo(state: State): {

@@ -34,6 +34,18 @@ function critter(): Record<string, unknown> {
   return clone(value);
 }
 
+function ringCritter(): Record<string, unknown> {
+  const value = content.world.critters.bluebird;
+  if (value === undefined) throw new Error("bluebird missing");
+  return clone(value);
+}
+
+function catchCritter(): Record<string, unknown> {
+  const value = content.world.critters.pup;
+  if (value === undefined) throw new Error("pup missing");
+  return clone(value);
+}
+
 function partyMember(): Record<string, unknown> {
   const value = content.world.party.maddie;
   if (value === undefined) throw new Error("Maddie missing");
@@ -60,7 +72,7 @@ describe("battle check content validation", () => {
     ["targetTick", 2, /targetTick/],
     ["targetTick", 59, /targetTick/],
   ])("rejects an invalid ring %s with its field", (field, value, fieldPattern) => {
-    const raw = content.world.critters.pup;
+    const raw = content.world.critters.bluebird;
     if (raw === undefined) throw new Error("pup missing");
     const valueCopy = clone(raw);
     const check = nested(valueCopy, "burst", "check");
@@ -70,8 +82,8 @@ describe("battle check content validation", () => {
     } else {
       check.targetTick = value;
     }
-    expect(() => parseCritter(valueCopy, "critters/pup.json"))
-      .toThrow(new RegExp(`critters/pup\\.json.*${fieldPattern.source}`));
+      expect(() => parseCritter(valueCopy, "critters/bluebird.json"))
+      .toThrow(new RegExp(`critters/bluebird\\.json.*${fieldPattern.source}`));
   });
 
   it("rejects a charge target past maxTicks and waitTicks below one", () => {
@@ -107,7 +119,7 @@ describe("battle check content validation", () => {
   });
 
   it("rejects a big burst of a different kind", () => {
-    const value = critter();
+    const value = catchCritter();
     const big = nested(value, "burst", "big");
     big.kind = "ring";
     big.ticks = 60;
@@ -116,6 +128,62 @@ describe("battle check content validation", () => {
     big.goodWindow = 11;
     expect(() => parseCritter(value, "critters/fountain-frog.json"))
       .toThrow(/critters\/fountain-frog\.json.*burst\.big\.kind/);
+  });
+
+  it.each([
+    ["garbled arrivals", (check: Record<string, unknown>) => {
+      check.arrivals = [54, "bad"];
+    }, /burst\.check\.arrivals/],
+    ["arrival before travel", (check: Record<string, unknown>) => {
+      check.arrivals = [49, 58];
+    }, /burst\.check\.arrivals/],
+    ["seven tick gap", (check: Record<string, unknown>) => {
+      check.arrivals = [54, 61];
+    }, /burst\.check\.arrivals/],
+    ["empty toys", (check: Record<string, unknown>) => { check.toys = []; },
+      /burst\.check\.toys/],
+  ])("rejects a catch with %s and names its field", (_name, change, field) => {
+    const value = critter();
+    const check = nested(value, "burst", "check");
+    check.kind = "catch";
+    check.travelTicks = 50;
+    check.arrivals = [54, 62];
+    check.toys = ["toy"];
+    change(check);
+    expect(() => parseCritter(value, "critters/pup.json"))
+      .toThrow(new RegExp(`critters/pup\\.json.*${field.source}`));
+  });
+
+  it("accepts a catch gap of exactly eight ticks", () => {
+    const value = catchCritter();
+    const check = nested(value, "burst", "check");
+    check.kind = "catch";
+    check.travelTicks = 50;
+    check.arrivals = [54, 62];
+    check.toys = ["toy"];
+    expect(() => parseCritter(value, "critters/pup.json")).not.toThrow();
+  });
+
+  it("rejects a catch as Soothe's check", () => {
+    const value = clone(content.world.battle);
+    const check = nested(nested(value, "commands"), "soothe", "check");
+    check.kind = "catch";
+    check.travelTicks = 50;
+    check.arrivals = [54];
+    check.toys = ["toy"];
+    expect(() => parseBattleContent(value, "battle.json"))
+      .toThrow(/battle\.json.*commands\.soothe\.check\.kind/);
+  });
+
+  it("rejects a catch as a party command's check", () => {
+    const value = partyMember();
+    const check = nested(value, "command", "check");
+    check.kind = "catch";
+    check.travelTicks = 50;
+    check.arrivals = [54];
+    check.toys = ["toy"];
+    expect(() => parsePartyMember(value, "party/maddie.json"))
+      .toThrow(/party\/maddie\.json.*command\.check\.kind/);
   });
 
   it("rejects a party command without a check", () => {
@@ -135,5 +203,16 @@ describe("battle check content validation", () => {
     delete nested(noCheck, "commands", "soothe").check;
     expect(() => parseBattleContent(noCheck, "battle.json"))
       .toThrow(/battle\.json.*commands\.soothe\.check/);
+
+    const noAtlas = clone(raw);
+    delete noAtlas.toyAtlas;
+    expect(() => parseBattleContent(noAtlas, "battle.json"))
+      .toThrow(/battle\.json.*toyAtlas/);
+
+    const noCatchHint = clone(raw);
+    const hints = nested(noCatchHint, "hints");
+    delete hints.catch;
+    expect(() => parseBattleContent(noCatchHint, "battle.json"))
+      .toThrow(/battle\.json.*hints/);
   });
 });

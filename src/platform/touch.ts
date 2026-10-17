@@ -13,11 +13,14 @@ export class TouchInput {
   private stickId: number | undefined;
   private origin: Point | undefined;
   private move: Point = { x: 0, y: 0 };
+  // A catch's arrow stickers (-1 up, 1 down) while one is held; the stick
+  // is hidden in battle, so the two never fight.
+  private reach = 0;
 
   frame(): ActionFrame {
     return {
       ...blankInput(),
-      move: this.move,
+      move: this.stickId === undefined && this.reach !== 0 ? { x: 0, y: this.reach } : this.move,
       confirm: this.hasButton("confirm"),
       cancel: this.hasButton("cancel"),
       menu: this.hasButton("menu"),
@@ -67,6 +70,11 @@ export class TouchInput {
 
   tapChoice(index: number): void {
     this.choice = index;
+  }
+
+  /** Holds a catch arrow (-1 up, 1 down); 0 lets go. */
+  setReach(direction: number): void {
+    this.reach = Math.sign(direction);
   }
 }
 

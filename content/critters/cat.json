@@ -59,11 +59,38 @@
   "burst": {
     "bigChance": 0.3,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "yarn-teal-01",
+        "yarn-pink-01",
+        "yarn-purple-01",
+        "yarn-blue-01"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "yarn-teal-01",
+        "yarn-pink-01",
+        "yarn-purple-01",
+        "yarn-blue-01"
+      ]
     }
   },
   "lines": {

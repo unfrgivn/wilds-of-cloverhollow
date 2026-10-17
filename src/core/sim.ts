@@ -27,7 +27,14 @@ import type {
 } from "./types";
 import { createInkState, runInk, type InkFacts } from "./ink";
 import { sceneryArea } from "./props";
-import { createCheck, stepCheck } from "./checks";
+import {
+  checkHint,
+  createCheck,
+  laneFromDraw,
+  laneFromStick,
+  stepCheck,
+  viewCheck,
+} from "./checks";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
 // a recorded one, and a real key's frame all have the same shape, and a save's
@@ -737,60 +744,8 @@ export function battleView(world: World, state: State): BattleView | null {
         )
       : -1;
   const actor = acting >= 0 ? acting : null;
-  const checkView: BattleView["check"] =
-    check === null
-      ? null
-      : check.kind === "ring"
-        ? {
-            kind: "ring",
-            side: check.side,
-            progress: check.tick / check.spec.ticks,
-            target: check.spec.targetTick / check.spec.ticks,
-          }
-        : check.kind === "charge"
-          ? {
-              kind: "charge",
-              side: check.side,
-              actor,
-              waiting: check.held === 0,
-              fill: check.held / check.spec.maxTicks,
-              great: [
-                (check.spec.targetTick - check.spec.greatWindow) /
-                  check.spec.maxTicks,
-                (check.spec.targetTick + check.spec.greatWindow) /
-                  check.spec.maxTicks,
-              ],
-              good: [
-                (check.spec.targetTick - check.spec.goodWindow) /
-                  check.spec.maxTicks,
-                (check.spec.targetTick + check.spec.goodWindow) /
-                  check.spec.maxTicks,
-              ],
-            }
-          : {
-              kind: "chain",
-              side: check.side,
-              actor,
-              look: check.spec.look,
-              beats: check.spec.arrivals.map((arrival, index) => ({
-                appeared: check.tick >= arrival - check.spec.travelTicks,
-                progress: Math.max(
-                  0,
-                  Math.min(
-                    1,
-                    (check.tick - (arrival - check.spec.travelTicks)) /
-                      check.spec.travelTicks,
-                  ),
-                ),
-                result: check.results[index] ?? "pending",
-              })),
-            };
-  const hint =
-    check?.kind === "charge" && check.held === 0
-      ? world.battle.hints.charge
-      : check?.kind === "chain" && check.tick < (check.spec.arrivals[0] ?? 0)
-        ? world.battle.hints.chain
-        : null;
+  const checkView = check === null ? null : viewCheck(check, actor);
+  const hint = check === null ? null : checkHint(check, world.battle.hints);
   return {
     critterId: critter.id,
     critterName: critter.name,
@@ -831,11 +786,12 @@ function startCheck(
   side: CheckSide,
   spec: CheckSpec,
   big = false,
+  lanes: number[] = [],
 ): Battle {
   return {
     ...battle,
     phase: "check",
-    check: createCheck(spec, side, big),
+    check: createCheck(spec, side, big, lanes),
     phaseTicks: 0,
     lastGrade: null,
     message: "",
@@ -916,10 +872,19 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           ? battleMessage(next, critter.lines.soothed, "soothed")
           : battleMessage(next, critter.lines.burst, "burst");
     else if (next.phase === "burst") {
+      // The big roll first, then (for a catch) one draw per toy's lane.
       const random = nextRandom(nextBase);
       const big = random[0] < critter.burst.bigChance;
       const spec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
-      return { ...random[1], battle: startCheck(next, "fae", spec, big) };
+      let rolled = random[1];
+      const lanes: number[] = [];
+      if (spec.kind === "catch")
+        for (const _arrival of spec.arrivals) {
+          const [value, after] = nextRandom(rolled);
+          lanes.push(laneFromDraw(value));
+          rolled = after;
+        }
+      return { ...rolled, battle: startCheck(next, "fae", spec, big, lanes) };
     }
     else if (next.phase === "burstResult")
       next =
@@ -1058,7 +1023,11 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
   }
   if (next.phase === "check" && next.check !== null) {
     const check = next.check;
-    const stepped = stepCheck(check, confirm, input.confirm);
+    const stepped = stepCheck(check, {
+      confirmEdge: confirm,
+      confirmHeld: input.confirm,
+      lane: laneFromStick(input.move.y),
+    });
     const result = stepped.grade;
     // The check stays in the battle through its result, as it ended: the
     // last beat popped, the meter where it was let go.

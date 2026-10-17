@@ -59,11 +59,38 @@
   "burst": {
     "bigChance": 0.3,
     "check": {
-      "kind": "ring",
-      "ticks": 60,
-      "targetTick": 45,
-      "greatWindow": 5,
-      "goodWindow": 11
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "bottle-cap-01",
+        "bottle-cap-02",
+        "bottle-cap-03",
+        "bottle-cap-04"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "bottle-cap-01",
+        "bottle-cap-02",
+        "bottle-cap-03",
+        "bottle-cap-04"
+      ]
     }
   },
   "lines": {
@@ -94,8 +121,8 @@
     "snack": "Fae shares a crunchy cracker. The raccoon washes it first, very carefully.",
     "burst": "The raccoon flings a shower of shiny bottle caps at Fae!",
     "burstResult": {
-      "great": "Clink, clink! Fae dodges every bottle cap!",
-      "good": "Fae dodges most of the bottle caps!",
+      "great": "Clink, clink! Fae catches every bottle cap!",
+      "good": "Fae catches most of the bottle caps!",
       "miss": "Plink! A bottle cap bounces off Fae's backpack."
     },
     "soothed": "The raccoon lets out a sleepy chitter. The fizzy spell floats away!",

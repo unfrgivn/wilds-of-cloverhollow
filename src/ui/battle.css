@@ -254,6 +254,15 @@
 .battle-chain-beat { position: absolute; width: 34px; height: 34px; transform: translate(-50%, -50%); transition: opacity 100ms, transform 100ms; }
 .battle-chain-beat.is-hit { opacity: 0; transform: translate(-50%, -50%) scale(1.45); }
 .battle-chain-beat.is-miss { opacity: .45; filter: grayscale(1); transform: translate(-50%, -35%); }
+/* A catch (Milestone 41): the catch circle wears the chain target's sticker
+   look; small ink dots mark the three lanes it moves between. */
+.battle-catch { position: fixed; inset: 0; z-index: var(--z-ring); pointer-events: none; }
+.battle-catch-lane { position: absolute; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%; background: var(--sticker-rim); box-shadow: 0 0 0 2px var(--sticker-ink); }
+.battle-catch-ring { position: absolute; box-sizing: border-box; transform: translate(-50%, -50%); border: 3px dashed var(--sticker-ink); border-radius: 50%; background: rgb(247 242 227 / 0.55); box-shadow: 0 0 0 3px var(--sticker-rim); transition: top 70ms ease-out; }
+.battle-catch-toy { position: absolute; transform: translate(-50%, -50%); background-repeat: no-repeat; transition: opacity 120ms, transform 120ms; }
+/* Caught: a quick pop into the catch. Missed: on past Fae, fading. */
+.battle-catch-toy.is-hit { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
+.battle-catch-toy.is-miss { opacity: 0; transform: translate(-150%, -50%); transition: opacity 400ms, transform 400ms; }
 .battle-icon { width: 100%; height: 100%; overflow: visible; }
 .battle-icon-fill { stroke: var(--sticker-ink); stroke-width: 2; stroke-linejoin: round; }
 .battle-icon-mark { fill: none; stroke: #6d4339; stroke-width: 1.6; stroke-linecap: round; }

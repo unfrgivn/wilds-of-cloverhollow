@@ -105,6 +105,28 @@ export async function playBattleCheck(page: Page): Promise<void> {
     await step(page, 1);
     return;
   }
+  if (check.kind === "catch") {
+    // Hold each toy's lane on real arrows as it lands: up high, nothing for
+    // the middle, down low.
+    let held: string | null = null;
+    for (const [index, arrival] of check.spec.arrivals.entries()) {
+      const current = await readBattle(page);
+      const active = current?.check;
+      if (active?.kind !== "catch") throw new Error("the catch ended early");
+      // A toy that landed already (the test played part of the catch).
+      if (arrival <= active.tick) continue;
+      const lane = check.lanes[index] ?? 1;
+      const key = lane === 0 ? "ArrowUp" : lane === 2 ? "ArrowDown" : null;
+      if (held !== key) {
+        if (held !== null) await page.keyboard.up(held);
+        if (key !== null) await page.keyboard.down(key);
+        held = key;
+      }
+      await step(page, arrival - active.tick);
+    }
+    if (held !== null) await page.keyboard.up(held);
+    return;
+  }
   for (const arrival of check.spec.arrivals) {
     const current = await readBattle(page);
     const active = current?.check;

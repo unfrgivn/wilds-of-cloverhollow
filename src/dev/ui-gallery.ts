@@ -6,6 +6,7 @@ import {
   type PromptView,
 } from "../ui/sticker";
 import { mountTouchControls } from "../ui/touch-controls";
+import type { AtlasImage } from "../ui/atlas";
 import {
   createBattleHud,
   createCommandMenu,
@@ -59,6 +60,8 @@ const dialogueShown = battleState
   ? state === "battle-command"
   : state !== "prompt" && !journalState && !titleState;
 if (battleState) document.documentElement.dataset.battle = "open";
+// A catch shows its touch arrows (spec 8.1).
+if (state === "battle-catch") document.documentElement.dataset.check = "catch";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
 if (titleState) document.documentElement.dataset.title = "open";
@@ -312,6 +315,12 @@ function renderGalleryState(): void {
     hint: null,
     hintAt: { x: ring.x, y: ring.y + ring.radius + 16 },
   });
+  // The pup's two tennis balls in the toy atlas (assets/battle/toys).
+  const tennisBall = (index: 0 | 1): AtlasImage => ({
+    src: "assets/battle/toys/toys.png",
+    frame: index === 0 ? { x: 0, y: 0, w: 69, h: 73 } : { x: 128, y: 0, w: 71, h: 72 },
+    atlas: { w: 760, h: 552 },
+  });
   const galleryChecks: Record<string, BattleCheckView> = {
     "battle-timing": ringCheck(frogRing, null),
     "battle-grade": ringCheck(frogRing, "great"),
@@ -356,6 +365,23 @@ function renderGalleryState(): void {
       grade: null,
       hint: "Press as each one lands!",
       hintAt: { x: 190, y: 300 },
+    },
+    "battle-catch": {
+      kind: "catch",
+      lanes: [150, 200, 250],
+      fromX: 560,
+      catcherX: 250,
+      radius: 22,
+      catcher: 1,
+      toys: [
+        { appeared: true, progress: 0.82, lane: 1, result: "pending", image: tennisBall(0),
+          width: 31, height: 33 },
+        { appeared: true, progress: 0.4, lane: 0, result: "pending", image: tennisBall(1),
+          width: 32, height: 32 },
+      ],
+      grade: null,
+      hint: "Hold up or down to catch each one!",
+      hintAt: { x: 405, y: 280 },
     },
   };
   check.render(galleryChecks[state] ?? null);

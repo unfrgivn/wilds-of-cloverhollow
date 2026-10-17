@@ -192,7 +192,9 @@ export type StickerCatalogue = {
   catalogue: { id: string; name: string; critter: string; frame: string }[];
 };
 export type BattleContent = {
-  hints: { charge: string; chain: string };
+  // The sprite atlas of the toys a catch throws (Milestone 41).
+  toyAtlas: string;
+  hints: { charge: string; chain: string; catch: string };
   commands: {
     soothe: { label: string; check: CheckSpec };
     snack: { label: string; snackDetail: string };
@@ -228,7 +230,16 @@ export type ChainSpec = {
   arrivals: number[];
   look: ChainLook;
 };
-export type CheckSpec = RingSpec | ChargeSpec | ChainSpec;
+// A burst's toys to catch (Milestone 41): toy j lands at `arrivals[j]` in a
+// lane drawn when the burst starts; `toys` are frames of the toy atlas, used
+// in turn.
+export type CatchSpec = {
+  kind: "catch";
+  travelTicks: number;
+  arrivals: number[];
+  toys: string[];
+};
+export type CheckSpec = RingSpec | ChargeSpec | ChainSpec | CatchSpec;
 // "critter": Fae's side acts on the critter; "fae": the critter's burst.
 export type CheckSide = "critter" | "fae";
 export type BeatResult = "pending" | "hit" | "miss";
@@ -249,6 +260,18 @@ export type CheckState =
       side: CheckSide;
       tick: number;
       spec: ChainSpec;
+      results: BeatResult[];
+      big: boolean;
+    }
+  // `lanes` (0 high, 1 middle, 2 low) per toy; `catcher` the lane Fae's
+  // catch is in this tick.
+  | {
+      kind: "catch";
+      side: CheckSide;
+      tick: number;
+      spec: CatchSpec;
+      lanes: number[];
+      catcher: number;
       results: BeatResult[];
       big: boolean;
     };
@@ -354,6 +377,18 @@ export type BattleCheckView =
       actor: number | null;
       look: ChainLook;
       beats: { appeared: boolean; progress: number; result: BeatResult }[];
+    }
+  | {
+      kind: "catch";
+      side: CheckSide;
+      catcher: number;
+      toys: {
+        appeared: boolean;
+        progress: number;
+        lane: number;
+        frame: string;
+        result: BeatResult;
+      }[];
     };
 export type BattleView = {
   critterId: string;

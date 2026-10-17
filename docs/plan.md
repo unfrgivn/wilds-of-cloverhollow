@@ -1584,6 +1584,10 @@ Sound follow-ups from Milestone 37:
   owner), or CC0 clips found through Openverse (`docs/media-sources.md`).
 - Footsteps by surface (grass, wood, sand) once the area kits carry ground
   data (after Milestone 34).
-- A volume slider beside mute.
+- A volume slider beside mute: done in the volume follow-up (2026-10-16).
+  Four chunky steps, 25% through 100%, use the existing master gain path and
+  live beside the mute pill. The preference remains outside the save; the old
+  mute-only boolean loads at 100%. There is deliberately no zero step, keeping
+  mute independent and making unmuting restore the chosen level.
 - iOS on a real device: the simulator check below should hold, but a phone
   with a pad and the silent switch hasn't been tried.

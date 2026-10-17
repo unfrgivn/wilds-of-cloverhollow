@@ -217,6 +217,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   journal's notes heading (drawn like the coin and snack pills, with a larger
   invisible hit area), and is stored separately under `cloverhollow-audio` in
   Capacitor Preferences, never in the save.
+- A four-step volume slider (25%, 50%, 75%, 100%) sits beside the mute pill in
+  the notes heading. It is accessible by keyboard, touch, and mouse, with a
+  visible value. 100% keeps the existing moderate master gain. There is no
+  zero step, so mute stays an independent choice and unmuting restores the
+  selected level. The old boolean-only preference shape loads at 100%.
 - Story lines may carry one of the closed `sound:` tags `chime-red`,
   `chime-yellow`, `chime-green`, `chime-blue`, or `flute`. The tag is carried
   by dialogue state and projected as a cue whenever that line opens or replaces
@@ -1081,6 +1086,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Fae's supplies sit at the right of the NOTES heading row: two small cream
   stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
   a cookie (inline SVG, like the map's bus-stop sign).
+- A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
+  fits the heading row at 874x402, including with `♪ off` and 999 coins.
 - A cream JOURNAL label sits on the top edge and a close sticker (at least
   44 px) in the top-right corner; the close button is how touch players leave.
 - Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The
@@ -1170,8 +1177,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   they include the DOM UI.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, and `sound.state()`
-  the AudioContext's state (`running`, `suspended`, `interrupted`, `closed`,
-  or `unavailable`). Harness builds also log `[cloverhollow] audio {state}`
+  returns `{ state, level }`, where `level` is (`0.25`, `0.5`, `0.75`, or `1`)
+  and `state` is the AudioContext's state (`running`, `suspended`,
+  `interrupted`, `closed`, or `unavailable`). Harness builds also log
+  `[cloverhollow] audio {state}`
   on every state change and `[cloverhollow] sound {tick, cue, played}` per
   cue, for native checks. These are harness only and are absent from
   production.

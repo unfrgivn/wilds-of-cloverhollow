@@ -1,5 +1,12 @@
 import { Preferences } from "@capacitor/preferences";
 import type { SoundCue } from "../core";
+import {
+  DEFAULT_AUDIO_LEVEL,
+  gainForAudioLevel,
+  readAudioPreferences,
+  writeAudioPreferences,
+  type AudioLevel,
+} from "./audio-settings";
 
 export type SoundLogEntry = { tick: number; cue: SoundCue; played: boolean };
 // WebKit adds "interrupted" (no gesture yet, or the audio session was taken)
@@ -14,8 +21,10 @@ export type AudioController = {
   play: (cue: SoundCue, tick: number) => SoundLogEntry;
   toggle: () => void;
   muted: () => boolean;
+  setLevel: (level: AudioLevel) => void;
+  level: () => AudioLevel;
   log: () => SoundLogEntry[];
-  state: () => AudioState;
+  state: () => { state: AudioState; level: AudioLevel };
 };
 
 type Timing = { offset: number; duration: number; gain: number };
@@ -132,8 +141,10 @@ const recipes: Record<SoundCue, Recipe> = {
 export function createAudio(onStateChange: (state: AudioState) => void = () => undefined):
   AudioController {
   let muted = false;
+  let level: AudioLevel = DEFAULT_AUDIO_LEVEL;
   let preferenceLoaded = false;
-  let locallyToggled = false;
+  let locallyChanged = false;
+  let preferenceWrite = Promise.resolve();
   let context: AudioContext | null = null;
   let master: GainNode | null = null;
   let noise: AudioBuffer | null = null;
@@ -147,11 +158,18 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
   };
   const entries: SoundLogEntry[] = [];
   const persist = (): void => {
-    void Preferences.set({ key: preferenceKey, value: JSON.stringify(muted) });
+    const value = writeAudioPreferences({ muted, level });
+    preferenceWrite = preferenceWrite.then(() => Preferences.set({ key: preferenceKey, value }));
   };
   const toggle = (): void => {
     muted = !muted;
-    locallyToggled = true;
+    locallyChanged = true;
+    if (preferenceLoaded) persist();
+  };
+  const setLevel = (next: AudioLevel): void => {
+    level = next;
+    locallyChanged = true;
+    if (master !== null) master.gain.value = gainForAudioLevel(level);
     if (preferenceLoaded) persist();
   };
   const ensureContext = (): AudioContext | null => {
@@ -160,7 +178,7 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
     if (Constructor === undefined) return null;
     context = new Constructor();
     master = context.createGain();
-    master.gain.value = .18;
+    master.gain.value = gainForAudioLevel(level);
     master.connect(context.destination);
     return context;
   };
@@ -235,8 +253,12 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
   });
   void Preferences.get({ key: preferenceKey }).then(({ value }) => {
     preferenceLoaded = true;
-    if (locallyToggled) persist();
-    else if (value !== null) muted = value === "true";
+    if (locallyChanged) persist();
+    else {
+      const preferences = readAudioPreferences(value);
+      muted = preferences.muted;
+      setLevel(preferences.level);
+    }
   });
   return {
     play: (cue, tick) => {
@@ -247,7 +269,9 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
     },
     toggle,
     muted: () => muted,
+    setLevel,
+    level: () => level,
     log: () => entries.slice(),
-    state: () => stateOf(context),
+    state: () => ({ state: stateOf(context), level }),
   };
 }

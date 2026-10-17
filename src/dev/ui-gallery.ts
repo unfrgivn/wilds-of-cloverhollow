@@ -91,6 +91,7 @@ const journal = createJournal(stage);
 const title = createTitleScreen(stage);
 title.onChoose((id) => { root.dataset.titleChosen = id; });
 journal.onClose(() => { root.dataset.journalClosed = "true"; });
+journal.onSetAudioLevel(() => undefined);
 commands.onChoose((index) => {
   root.dataset.battleChosen = String(index);
 });
@@ -131,7 +132,7 @@ function renderGalleryState(): void {
       { id: "trail", name: "Cliffside Trail", busStop: false, x: 1812, y: 420 },
       { id: "forest", name: "The Forest", busStop: false, x: 240, y: 420 },
       { id: "enchanted", name: "The Enchanted Forest", busStop: false, x: 1156, y: 720 },
-    ], currentLand: "cloverhollow", coins: 8, snacks: 2, muted: false };
+    ], currentLand: "cloverhollow", coins: 8, snacks: 2, muted: false, level: 1 };
   journal.render(journalView);
   // The battle is over once the reward shows, so the HUD steps aside.
   battleHud.render({ visible: battleState && state !== "battle-reward", energy: 3,

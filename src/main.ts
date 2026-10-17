@@ -42,6 +42,7 @@ import {
   type TitleMode,
 } from "./shell/title-flow";
 import { createAudio } from "./platform/audio";
+import type { AudioLevel } from "./platform/audio-settings";
 
 const content = loadContent();
 const app = new Application();
@@ -85,6 +86,7 @@ async function boot(): Promise<void> {
   const rewardSticker = createRewardSticker(uiRoot);
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(sound.toggle);
+  journal.onSetAudioLevel((level: AudioLevel) => sound.setLevel(level));
   const title = createTitleScreen(uiRoot);
   const input = createInputSource(() => {
     return combineInputFrames(keyboard.frame(), touch.sample(), gamepad.frame());
@@ -341,6 +343,7 @@ async function boot(): Promise<void> {
       coins: state.coins,
       snacks: state.snacks,
       muted: sound.muted(),
+      level: sound.level(),
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;
@@ -534,7 +537,7 @@ async function boot(): Promise<void> {
         last: () => saveLast,
         loaded: () => saveLoaded,
       },
-      sound: { log: sound.log, muted: sound.muted, state: sound.state },
+      sound: { log: sound.log, muted: sound.muted, level: sound.level, state: sound.state },
       boot: { title: () => titleMode },
     });
   }

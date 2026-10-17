@@ -1,5 +1,6 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import type { AudioLevel } from "../platform/audio-settings";
 
 export type JournalSticker = {
   id: string;
@@ -18,6 +19,7 @@ export type JournalView = {
   coins: number;
   snacks: number;
   muted: boolean;
+  level: AudioLevel;
 };
 
 type Slot = {
@@ -103,6 +105,7 @@ export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   onClose: (callback: () => void) => void;
   onToggleAudio: (callback: () => void) => void;
+  onSetAudioLevel: (callback: (level: AudioLevel) => void) => void;
 } {
   const book = element("section", "journal-book");
   book.setAttribute("aria-label", "Journal");
@@ -125,6 +128,17 @@ export function createJournal(root: HTMLElement): {
   audio.type = "button";
   audio.setAttribute("aria-label", "Toggle sound");
   supplies.append(audio);
+  const volumeLabel = element("label", "journal-volume");
+  volumeLabel.setAttribute("aria-label", "Sound volume");
+  const volume = element("input", "journal-volume-slider");
+  volume.type = "range";
+  volume.min = "25";
+  volume.max = "100";
+  volume.step = "25";
+  volume.setAttribute("aria-label", "Sound volume");
+  const volumeValue = element("span", "journal-volume-value");
+  volumeLabel.append(volume, volumeValue);
+  supplies.append(volumeLabel);
   notesHead.append(notesHeading, supplies);
   const notes = element("ul", "journal-notes");
   const empty = element("p", "journal-empty");
@@ -155,6 +169,7 @@ export function createJournal(root: HTMLElement): {
   root.append(book);
   let onClose: () => void = () => undefined;
   let onToggleAudio: () => void = () => undefined;
+  let onSetAudioLevel: (level: AudioLevel) => void = () => undefined;
   let page: "notes" | "map" = "notes";
   let wasVisible = false;
   let mapSignature = "";
@@ -169,6 +184,7 @@ export function createJournal(root: HTMLElement): {
   mapTab.addEventListener("click", () => setPage("map"));
   const keydown = (event: KeyboardEvent): void => {
     if (book.hidden) return;
+    if (event.target instanceof HTMLInputElement) return;
     if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
       event.preventDefault();
       setPage("map");
@@ -181,6 +197,25 @@ export function createJournal(root: HTMLElement): {
   setPage("notes");
   close.addEventListener("click", () => onClose());
   audio.addEventListener("click", () => onToggleAudio());
+  volume.addEventListener("input", () => {
+    const levels: Record<number, AudioLevel> = { 25: 0.25, 50: 0.5, 75: 0.75, 100: 1 };
+    const next = levels[Number(volume.value)];
+    if (next !== undefined) onSetAudioLevel(next);
+  });
+  volume.addEventListener("keydown", (event) => {
+    const values = [25, 50, 75, 100];
+    const current = values.indexOf(Number(volume.value));
+    const next = event.key === "ArrowLeft" || event.key === "ArrowDown"
+      ? Math.max(0, current - 1)
+      : event.key === "ArrowRight" || event.key === "ArrowUp"
+        ? Math.min(values.length - 1, current + 1)
+        : event.key === "Home" ? 0 : event.key === "End" ? values.length - 1 : -1;
+    if (next >= 0) {
+      event.preventDefault();
+      volume.value = String(values[next]);
+      volume.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
   const slots: Slot[] = [];
   return {
     onClose: (callback) => {
@@ -189,12 +224,18 @@ export function createJournal(root: HTMLElement): {
     onToggleAudio: (callback) => {
       onToggleAudio = callback;
     },
+    onSetAudioLevel: (callback) => {
+      onSetAudioLevel = callback;
+    },
     render: (view) => {
       book.hidden = !view.visible;
       setText(coins.count, String(view.coins));
       setText(snacks.count, String(view.snacks));
       setText(audio, view.muted ? "♪ off" : "♪ on");
       audio.classList.toggle("is-muted", view.muted);
+      const volumePercent = Math.round(view.level * 100);
+      volume.value = String(volumePercent);
+      setText(volumeValue, `${volumePercent}%`);
       if (!view.visible && wasVisible) setPage("notes");
       wasVisible = view.visible;
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));

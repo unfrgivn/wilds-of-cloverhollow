@@ -19,7 +19,7 @@ test("audio waits for a real key in the browser, then cues play", async ({ page 
   await openHarness(page);
   await resetPaused(page, "new-game");
   const state = (): Promise<string | undefined> =>
-    page.evaluate(() => window.__cloverhollow?.sound.state());
+    page.evaluate(() => window.__cloverhollow?.sound.state().state);
   // Browsers hold the context until a gesture (WebKit calls it "interrupted");
   // the iOS app's web view doesn't.
   expect(["suspended", "interrupted"]).toContain(await state());
@@ -86,4 +86,40 @@ test("walking, a door, M mute, and the journal sound control use real input", as
   await step(page, 1);
   await expect(page.locator(".journal-book")).toBeHidden();
   expect((await readState(page)).journalOpen).toBe(false);
+});
+
+test("volume changes, persists, and plays a cue at a lower level", async ({ page }) => {
+  await openHarness(page);
+  await resetPaused(page, "new-game");
+  await page.keyboard.down("j");
+  await step(page, 1);
+  await page.keyboard.up("j");
+  await step(page, 1);
+  const slider = page.locator(".journal-volume-slider");
+  await expect(slider).toBeVisible();
+  await slider.focus();
+  await page.keyboard.press("ArrowLeft");
+  expect(await page.evaluate(() => window.__cloverhollow?.sound.state().level)).toBe(0.75);
+  await slider.click({ position: { x: 2, y: 8 } });
+  const selectedLevel = await page.evaluate(() => window.__cloverhollow?.sound.state().level);
+  expect([0.25, 0.5, 0.75]).toContain(selectedLevel);
+  await page.keyboard.press("z");
+  await expect.poll(() => page.evaluate(() => window.__cloverhollow?.sound.state().state))
+    .toBe("running");
+  await page.keyboard.down("j");
+  await step(page, 1);
+  await page.keyboard.up("j");
+  await step(page, 1);
+  await hold(page, "ArrowRight", 16);
+  expect((await soundLog(page)).some((entry) =>
+    entry.cue === "journal-close" && entry.played)).toBe(true);
+  await page.keyboard.press("m");
+  expect(await page.evaluate(() => window.__cloverhollow?.sound.muted())).toBe(true);
+  await page.keyboard.press("m");
+  const restoredLevel = await page.evaluate(() => window.__cloverhollow?.sound.state().level);
+  expect([0.25, 0.5, 0.75, 1]).toContain(restoredLevel);
+  await page.reload();
+  await expect.poll(() =>
+    page.evaluate(() => window.__cloverhollow?.sound.state().level)).toBe(restoredLevel);
+  await expect.poll(() => page.evaluate(() => window.__cloverhollow?.sound.muted())).toBe(false);
 });

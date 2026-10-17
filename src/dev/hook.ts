@@ -68,6 +68,7 @@ export type CloverhollowHook = {
   sound: {
     log: AudioController["log"];
     muted: AudioController["muted"];
+    level: AudioController["level"];
     state: AudioController["state"];
   };
 };

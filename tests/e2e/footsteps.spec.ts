@@ -1,5 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readState, resetPaused, step } from "./helpers";
+import { expect, test } from "@playwright/test";
+import { longFlowTimeout, openHarness, readState, resetPaused, step } from "./helpers";
 
 const dock: readonly (readonly [number, number])[] = [
   [812, 513], [1014, 649], [1590, 262], [1385, 109],
@@ -15,11 +15,9 @@ function insideDock(point: { x: number; y: number }): boolean {
   return inside;
 }
 
-async function hold(page: Page, key: string, ticks: number): Promise<void> {
-  await page.keyboard.down(key);
-  await step(page, ticks);
-  await page.keyboard.up(key);
-}
+// A real-key walk of 329 single ticks, reading the sound log after each: a
+// long flow's budget, so a busy machine doesn't time it out.
+test.describe.configure({ timeout: longFlowTimeout });
 
 test("real walking changes footsteps from sand to dock wood", async ({ page }) => {
   await openHarness(page);

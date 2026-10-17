@@ -2039,6 +2039,86 @@ the old trail, the owl, and the clubhouse claim.
   - Bubbles are 52 px at 720 px wide and under: at 64 px the row reached
     over Fae's head on an iPhone SE.
 
+## Milestone 51: First touch and old friends **Status:** ✅ Completed (2026-10-17)
+- The owner picked these after wind-ups (2026-10-17, `docs/battle-ideas.md`,
+  "EarthBound style: sneak up on a critter for a head start, and species
+  you've calmed three times calm on sight").
+- Noticing: a recurring critter used to chase Fae the moment she was in its
+  sight (180 units), more than twice its touch (70), so none could ever be
+  reached unaware. Now one takes 45 ticks (3/4 of a second) to notice her: a
+  "?" sticker over its head meanwhile, then a "!" that pops as it gives
+  chase. Out of its sight, it forgets her.
+- First touch: Fae reaching one before it notices her surprises it, and the
+  battle opens a quarter calm ("The Zoomie Pup didn't see Fae coming! It's a
+  little calmer already."). One that has noticed her and reaches her while
+  she isn't walking at it catches her: it bursts first, on turn 0, before
+  her first command ("The Zoomie Pup pounces before Fae is ready!"). Set
+  pieces always open plainly.
+- Old friends: every calm counts for its species (`state.calms`). Once Fae
+  has calmed three of a species, a recurring one remembers her: touching it
+  opens soothed ("The Zoomie Pup remembers Fae and calms right down!") and
+  pays its coins.
+- Saves are version 8 (Milestone 45 took 7 for its tickets). Saves from
+  version 5 on upgrade: their calm counts start from then, and their
+  roaming critters haven't noticed anyone.
+- Evidence: core unit tests for the new rules (`encounter.test.ts`: the
+  notice count and its marks, chasing only once noticed, who gets the jump,
+  the head start, the caught opening's burst and its turn 1 with the
+  feelings unmoved, a set piece's plain opening, old friends calming on
+  touch and paying, and every calm counted; mutation-checked, each of six
+  broken rules caught), the version 6 to 7 save upgrade (`save.test.ts`),
+  and the recurring replay's fourth pup; every recorded run re-recorded,
+  since critters wander differently once they don't chase on sight, and the
+  recurring run extended to old friends; real-key e2e (`encounter.spec.ts`:
+  a dash at the park's pup before it notices her, and standing in its sight
+  through "?" and "!" until it pounces and bursts first; `recurring.spec.ts`
+  the old friend, hashing the same as Bun). Gates, rebased on Milestone
+  45: `just check` (757 unit tests, every sim, purity, lint), `just build`,
+  and `just e2e` (647 passed, 2 skipped, on Chromium and WebKit).
+  Every changed screenshot was viewed: 31 differ only in the harness
+  readout's tick (checked pixel for pixel outside it), 66 by the
+  re-recorded runs' later ticks, party spacing, rolls, and feelings (and the
+  hamster opening a quarter calm, Fae reaching it first), and 7 are new (the
+  "?", the "!", and the head start on Chromium, the "?" and the head start
+  on WebKit, and the old-friend pup at 1280 and 874). Milestone 45 changed
+  seven of the same baselines (the arcade's arrival, Mr. Pip's battle and
+  reward, and the shop's journal); they were made again on top of it and
+  viewed again (two differ only in the readout).
+- Notes and assumptions:
+  - 45 ticks, not 30: with 30, even a straight dash at the pond's pup from
+    the edge of its sight got there just after it noticed (110 units at 4 a
+    tick is 27.5 ticks, and it wanders); with 45 a dash wins, even after a
+    15-tick pause, and standing about still gets caught.
+  - "Not walking at it" is any step whose dot product with the way to it
+    isn't positive: standing, walking away, or sideways. Chasers (2.5 a
+    tick) can't catch Fae walking away (4), so being caught means she stood
+    or dawdled.
+  - The head start is a flat 25 calm (`firstTouch.surprise`, a quarter of
+    an ordinary critter's 100) rather than a share of each kind's
+    `calmMax`; it never fills the meter.
+  - The marks are DOM stickers placed over each critter's head
+    (`noticeMarks`), only while Fae walks free.
+  - The recurring run gained two more trips to the plaza: a third pup
+    calmed, and the fourth an old friend, so a recorded run and its
+    real-key e2e cover old friends.
+  - Saves were going to start fresh (the option the owner picked said so);
+    saves since version 5 already upgrade, so version 8 upgrades them
+    too.
+  - The runs with no roaming critter about (the hall pass, the school
+    raccoon, the lookout, the frog's win and rest, and the claw) re-recorded
+    byte for byte; the other 19 changed.
+  - Chapter one's plaza rolls a cat again (two raccoons since Milestone
+    41): 32 coins and four stickers. The plaza cat e2e reads the first cat
+    the bus-line run meets, in its chapter-one stretch.
+  - Two e2e walks met their critters differently: the park's pup test now
+    stands until the "!" and walks at it (a plain opening), and Jordan's
+    steers at the hamster all the way (a head start).
+  - The four longest pass-party replays get 20 s, like the canopy and
+    clubhouse tests: under load from other sessions they ran past the
+    default 5 s. So does the footsteps e2e walk (a long flow's budget),
+    which also loses a helper it never called. No critter notices Fae on
+    that walk, before or after this milestone.
+
 ## Milestone 52: The clubhouse kitchen **Status:** 📋 Planned
 - The owner asked for it (2026-10-17). NOTES.md's clubhouse ideas: a
   "Microwave for making dino nuggets and mac n cheese" and a "Chest to store
@@ -2342,7 +2422,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     skee-ball and the prize counter, and Boop-a-Mole.
   - Milestone 48, Lean: done (above). Next (owner, 2026-10-17): Milestone
     50, wind-ups for the gull and Mr. Pip: done (above). Then Milestone 51,
-    first touch and old friends.
+    first touch and old friends: done (above).
   - Milestone 49, lasso spots: in progress (above); then Milestone 52, the
     clubhouse kitchen (owner, 2026-10-17).
   - The kid's identity is kept for the very end (owner, 2026-10-07).

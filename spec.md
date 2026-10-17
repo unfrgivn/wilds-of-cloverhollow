@@ -693,11 +693,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `after` (a `calmed()` fact) is true the area draws nothing and is quiet:
   the plaza waits for the fountain frog. The ones out this visit are
   `state.wild`: `{ kind, den, mood, x, y, target, pauseTicks,
-  cooldownTicks, facing, moving }`, starting at their den in chaos. One Fae
+  cooldownTicks, facing, moving, notice }`, starting at their den in chaos,
+  `notice` 0. One Fae
   calms stays calm, a Talk target, only until she leaves; the next arrival
   rolls the area fresh.
 - A recurring critter wanders inside its den's radius and comes after a
-  Fae within sight (section 8); its home is its den's point.
+  Fae it has noticed in its sight (section 8); its home is its den's
+  point.
 - The starting roster (owner, 2026-10-07): Cloverhollow's plaza (after the
   fountain frog) and the park, raccoons, pups, and cats; Bubblegum Bay,
   frogs and bluebirds; the Cliffside Trail, bunnies and squirrels; Pinecone
@@ -1076,6 +1078,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   intro -> command --Soothe / a friend's command--> check (on the critter) -> result
                    --Snack--------> result
                    --Run----------> run -> ends at entry, facing away
+  intro -> burst (turn 0: a recurring critter that caught Fae bursts first)
+  soothed (at once: a recurring old friend) -> reward
   result -> soothed -> reward -> ends: critter calm, its coins paid, the
             (when calm reached calmMax)     species' sticker added if new
          -> burst -> check (on Fae) -> burstResult -> command
@@ -1271,14 +1275,38 @@ ios/            Capacitor iOS project (from Milestone 4).
   out changes.
 - A recurring critter is drawn, sorted, and collided at its current position.
   While Fae is free it wanders to seeded random points inside its den's
-  radius, pausing for 45 ticks, or chases Fae within 180 units at 2.5 units
-  per tick. Wandering is 1.25 units per tick, deliberately slower than Fae's
-  4 units per tick. A chaser gives up beyond its den plus twice sight. It
+  radius, pausing for 45 ticks, or chases Fae at 2.5 units per tick once it
+  has noticed her. Wandering is 1.25 units per tick, deliberately slower
+  than Fae's 4 units per tick.
+- Noticing (Milestone 51): Fae is in a critter's sight within 180 units of
+  it (and within its den plus twice sight, its leash; never while it cools
+  down). Each tick she is, its `notice` counts one more, up to `noticeTicks`
+  plus `alertTicks` (30 and 30); the first tick she isn't, it's 0 again. It
+  has noticed her, and chases, from `noticeTicks`. A chaser gives up when she
+  leaves its sight or its leash. It
   stays on the floor with the 12-unit follow radius. Dialogue, battles,
   transitions, and the journal freeze it. Touch is an outside-to-inside
   crossing by either mover; a battle with it (and Run, which also puts it
-  back at its den) gives it a 240-tick cooldown, heading home, and an
-  arrival rolls the area fresh.
+  back at its den) gives it a 240-tick cooldown, heading home, with its
+  `notice` back to 0, and an arrival rolls the area fresh.
+- First touch (Milestone 51): as a recurring critter meets Fae, whoever got
+  the jump shows in the opening. She surprised it if it hadn't noticed her
+  yet: the battle opens with `firstTouch.surprise` calm (25; never all of
+  `calmMax`) and `firstTouch.lines.surprised`. It caught her if it had, and
+  she wasn't walking toward it (standing, or any step whose dot product with
+  the way to it isn't positive): the battle opens on turn 0 with
+  `firstTouch.lines.caught`, and its intro leads to its burst (the intro's
+  feelings drawn as ever) before turn 1's menu, whose feelings are the ones
+  drawn, unmoved. Otherwise it opens plainly with the kind's intro. The
+  lines name the kind (`{name}`): "The Zoomie Pup didn't see Fae coming!
+  It's a little calmer already." and "The Zoomie Pup pounces before Fae is
+  ready!" A set piece always opens plainly.
+- Old friends (Milestone 51): `state.calms` counts every calm by species
+  (set pieces too) as its reward ends the battle. Once Fae has calmed
+  `oldFriends.calms` (3) of a species, a recurring critter of it calms on
+  touch: the battle opens soothed, its calm full, with `oldFriends.line`
+  ("The Zoomie Pup remembers Fae and calms right down!"), then pays its
+  coins as any reward does. Set pieces always battle.
 - Critter kinds own their atlas, battle content, sticker, and measured
   `auraCentre` and `bodyCentre` frame-pixel centroids. Kinds may share an
   atlas (the fountain frog and the bay's frogs), so atlases load and are
@@ -1417,6 +1445,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   it lets go or fizzles.
 - Hint: a cream sticker label with the check's hint (section 8), shown only
   while the view carries one.
+- Marks (Milestone 51): over a chaos recurring critter that has Fae in its
+  sight, a small round sticker (28 px, cream rim, ink outline) hangs 6
+  units over its head: "?" in cream until it notices her, then "!" in
+  butter yellow, popping in, for `alertTicks`. Only while she walks free:
+  none in a battle, a talk, the arcade, the journal, or a door's fade. They
+  sit under every other sticker.
 - Reward card: a centred die-cut card with the title, one atlas frame cropped
   by CSS to 150 px wide, and the name. Stacked drop-shadows give the image a
   white rim and an ink outline that follow the critter's silhouette. Asset
@@ -1703,18 +1737,22 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 7, state }`, the whole core state, including the
+- Format: `{ version: 8, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
-  the set pieces' moods, this visit's recurring critters, the lantern, coins
-  and snacks, the PRNG, the tick, arcade state, prizes, and tickets. Version 1 (Maddie in `maddie` and
+  the set pieces' moods, this visit's recurring critters, the calm counts,
+  the lantern, coins and snacks, the PRNG, the tick, arcade state, prizes,
+  and tickets. Version 1 (Maddie in `maddie` and
   `trail`), version 2 (no lantern), version 3 (no coins or snacks), and
   version 4 (one critter of each kind, no recurring critters) are refused and
   start a new game. Loading restores it exactly: the state hash matches, and
   `stableHash` skips undefined values (as JSON does) so a state and its saved
   copy hash the same.
-- Older saves upgrade: version 5 with `arcade: null`, `prizes: []`, and
-  `tickets: 0`; version 6 with `tickets: 0` (Milestone 45). Version 4 and
-  older, a version from the future, and any mid-game save are refused.
+- Older saves upgrade, gaining what later versions added as a new game
+  starts it: version 5 `arcade: null`, `prizes: []`, `tickets: 0`, and
+  `calms: {}`; version 6 `tickets: 0` and `calms: {}` (Milestone 45); version
+  7 `calms: {}` (counted from then on). Before version 8 every recurring
+  critter gains `notice: 0` (Milestone 51). Version 4 and older, a version
+  from the future, and any mid-game save are refused.
 - `parseSave(json, template)` accepts only a state with the template's exact
   shape (a fresh game state: every key, the same primitive types, all the way
   down; null slots may hold null or an object; every element of an array
@@ -1773,7 +1811,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     leader), plus prompt and dialogue summaries. `npcs` lists each person in
     the area as `{ id, frame, facing }`. `battle.layout` includes `party`, the
     members' CSS-px points, and `battle.check` the check's geometry
-    (section 8).
+    (section 8). `marks` lists the recurring critters' "?" and "!" as
+    `{ key, mark, x, y }`, each at its sticker's bottom centre in CSS px
+    (Milestone 51).
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.

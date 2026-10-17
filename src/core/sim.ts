@@ -48,6 +48,7 @@ import {
   windUpStarts,
 } from "./feelings";
 import { battleParty } from "./party";
+import { firstTouch, nextNotice, noticed, oldFriend } from "./encounter";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
@@ -166,6 +167,7 @@ export function createState(
         .map((piece) => [piece.id, "chaos"]),
     ),
     wild: [],
+    calms: {},
     stickers: [],
     safeSpot: { area: area.id, spawn: fixture.spawn },
     battle: null,
@@ -211,6 +213,7 @@ export function rollWild(world: World, state: State, area: Area): Pick<State, "w
       cooldownTicks: 0,
       facing: "down",
       moving: false,
+      notice: 0,
     });
   });
   return { wild, rng: random.rng };
@@ -280,6 +283,8 @@ function moveOn(battle: Battle, text: string, phase: Battle["phase"]): Battle {
 function nextTurn(world: World, state: State, battle: Battle, critter: Critter): State {
   const turn = battle.turn + 1;
   const fresh = { ...moveOn(battle, critter.lines.command, "command"), turn, answered: false };
+  // After a caught opening's burst, turn 1's feelings are the first drawn.
+  if (battle.turn === 0) return { ...state, battle: fresh };
   const going = battle.windUp;
   if (going !== null && going.left > 1)
     return {
@@ -482,8 +487,9 @@ function chooseRoamTarget(
 
 // This visit's recurring critters for one tick (spec 8): while Fae is free,
 // each chaos one wanders inside its den, pausing between seeded random
-// targets, or chases her within sight, giving up beyond its leash; one
-// cooling down (after a battle or a run) heads home. Calm ones stand still.
+// targets, or chases her once it has noticed her in its sight (Milestone 51),
+// giving up beyond its leash; one cooling down (after a battle or a run)
+// heads home. Calm ones stand still.
 function updateWild(
   world: World,
   state: State,
@@ -501,8 +507,10 @@ function updateWild(
       return { ...previous, cooldownTicks, moving: false };
     const home = den.point;
     const leash = den.radius + roam.sight * 2;
-    const chasing = cooldownTicks === 0 && distance(previous, player) <= roam.sight &&
+    const inSight = cooldownTicks === 0 && distance(previous, player) <= roam.sight &&
       distance(home, player) <= leash;
+    const notice = nextNotice(previous, inSight, roam);
+    const chasing = noticed({ ...previous, notice }, roam);
     let target = previous.target;
     let pauseTicks = previous.pauseTicks;
     if (chasing) target = player;
@@ -539,6 +547,7 @@ function updateWild(
       cooldownTicks,
       facing,
       moving: moved > 0.0001,
+      notice,
     };
   });
   return { wild, rng: randomState.rng };
@@ -553,6 +562,7 @@ function sendHome(world: World, area: Area, critter: Wild, back: boolean): Wild 
     ...(back ? { x: home.x, y: home.y } : {}),
     cooldownTicks: world.tunables.roam.cooldownTicks,
     target: { ...home },
+    notice: 0,
   };
 }
 
@@ -1017,21 +1027,15 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
   ) {
     if (!confirm) return { ...nextBase, battle: next };
     if (next.phase === "intro") {
-      // The first turn: three feelings in a row, once a friend has joined.
+      // The first turn: three feelings in a row, once a friend has joined. A
+      // critter that caught Fae bursts first, on turn 0 (Milestone 51).
       const [feelings, rolled] = feelingsOn(world, state)
         ? drawFeelings(world, nextBase, critter, 3)
         : [[], nextBase];
-      return {
-        ...rolled,
-        battle: {
-          ...next,
-          phase: "command",
-          message: critter.lines.command,
-          revealed: 0,
-          phaseTicks: 0,
-          feelings,
-        },
-      };
+      const opening = next.turn === 0
+        ? moveOn(next, critter.lines.burst, "burst")
+        : moveOn(next, critter.lines.command, "command");
+      return { ...rolled, battle: { ...opening, feelings } };
     }
     else if (next.phase === "result") {
       // Calm enough, it's soothed, any wind-up over with it. In a wind-up it
@@ -1094,6 +1098,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           : { wild: state.wild.map((item) =>
               item.den === den ? { ...item, mood: "calm" } : item) }),
         coins: state.coins + critter.coins,
+        calms: { ...state.calms, [critter.species]: (state.calms[critter.species] ?? 0) + 1 },
         stickers: next.rewardSticker === null
           ? state.stickers
           : [...state.stickers, next.rewardSticker],
@@ -2016,24 +2021,41 @@ function stepTick(
     ? pieceTouch?.kind
     : world.critters[wildTouch.kind];
   if (critter !== undefined) {
+    // Meeting a recurring critter (Milestone 51): one of a species Fae knows
+    // well calms at once, soothed and paid; else whoever got the jump shows
+    // in the opening. A set piece always opens plainly.
+    const friend = wildTouch !== undefined && oldFriend(world, state, critter);
+    const jump = wildTouch === undefined
+      ? "even"
+      : firstTouch(wildTouch, world.tunables.roam, state.player, player);
+    const named = (line: string): string => line.replace("{name}", critter.name);
+    const { firstTouch: touchContent, oldFriends } = world.battle;
     const battle: Battle = {
       critterId: critter.id,
       den: wildTouch?.den ?? null,
       entry: { ...state.player },
-      phase: "intro",
-      message: critter.lines.intro,
+      phase: friend ? "soothed" : "intro",
+      message: friend
+        ? named(oldFriends.line)
+        : jump === "even"
+          ? critter.lines.intro
+          : named(touchContent.lines[jump]),
       revealed: 0,
       selected: 0,
       command: null,
       energy: critter.energyMax,
-      calm: 0,
+      calm: friend
+        ? critter.calmMax
+        : jump === "surprised"
+          ? Math.min(critter.calmMax - 1, touchContent.surprise)
+          : 0,
       rest: {},
       check: null,
       lastGrade: null,
       feelings: [],
       answered: false,
       lanternPeek: false,
-      turn: 1,
+      turn: !friend && jump === "caught" ? 0 : 1,
       windUp: null,
       rewardSticker: null,
       phaseTicks: 0,

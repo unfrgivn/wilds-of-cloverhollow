@@ -21,6 +21,7 @@ import {
   partyLeader,
   presentCritters,
   targetInteractable,
+  wildMarks,
   type Area,
   type CheckSide,
   type PartyContent,
@@ -874,6 +875,25 @@ export class GameView {
     };
   }
 
+  /**
+   * The recurring critters' "?" and "!" (spec 8.1), each at the bottom
+   * centre of where it hangs, just over the critter's head, in CSS px. None
+   * outside free walking (a battle, a talk, the journal, a door's fade).
+   */
+  noticeMarks(state: State): { key: string; mark: "?" | "!"; x: number; y: number }[] {
+    const camera = this.previousCamera;
+    if (camera === undefined || state.battle !== null || state.dialogue !== null ||
+      state.arcade !== null || state.journalOpen || state.transition !== null) return [];
+    return wildMarks(this.world, state).flatMap((item) => {
+      const kind = this.world.critters[item.kind];
+      if (kind === undefined) return [];
+      const head = { x: item.point.x, y: item.point.y - kind.overworldHeight - 6 };
+      const point = worldToScreen(head, camera, this.viewWidth, this.viewHeight,
+        window.innerWidth, window.innerHeight);
+      return [{ key: item.key, mark: item.mark, x: point.x, y: point.y }];
+    });
+  }
+
   // Where the battle's check is drawn, in CSS px (spec 8.1); null outside a
   // check and at the reward (the card covers it). A ring sits on the critter,
   // or on Fae in a burst. A friend's charge meter stands on the side away from
@@ -1042,6 +1062,8 @@ export class GameView {
       strips: { left: number; right: number; zIndex: number }[];
     }[];
     lantern: { on: boolean; glows: string[] };
+    // The recurring critters' "?" and "!" over their heads (Milestone 51).
+    marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     battle: {
       phase: string | null;
       check: BattleCheckInfo | null;
@@ -1108,6 +1130,7 @@ export class GameView {
         on: state.lantern && state.battle === null,
         glows: this.drawnGlows.slice(),
       },
+      marks: this.noticeMarks(state),
       battle: {
         phase: state.battle?.phase ?? null,
         check: this.battleCheckInfo(state),

@@ -340,7 +340,7 @@ describe("the trail's recurring critters", () => {
       const start = createState(world, { area: "trail", spawn: "pass" });
       const calm: Wild = { kind: id, den: 0, mood: "calm", x: den.point.x, y: den.point.y,
         target: { ...den.point }, pauseTicks: 0, cooldownTicks: 0, facing: "down",
-        moving: false };
+        moving: false, notice: 0 };
       let state: State = { ...start, wild: [calm], facing: "up",
         player: { x: den.point.x, y: den.point.y + 45 } };
       expect(targetInteractable(world, state)?.id).toBe("critter:wild:0");

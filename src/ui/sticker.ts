@@ -161,3 +161,42 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
     }
   } };
 }
+
+// A recurring critter's mark (spec 8.1, Milestone 51): "?" while it hasn't
+// noticed Fae in its sight, "!" as it does and gives chase. Each hangs by its
+// bottom centre at `x`, `y`, in CSS px.
+export type NoticeMarkView = { key: string; mark: "?" | "!"; x: number; y: number };
+
+export function createNoticeMarks(root: HTMLElement): {
+  render: (marks: NoticeMarkView[]) => void;
+} {
+  const layer = document.createElement("div");
+  layer.className = "notice-marks";
+  layer.setAttribute("aria-hidden", "true");
+  root.append(layer);
+  // One sticker per critter, kept while its mark shows so "!" pops once.
+  const shown = new Map<string, HTMLElement>();
+  return {
+    render: (marks) => {
+      const keys = new Set(marks.map((item) => item.key));
+      for (const [key, node] of shown)
+        if (!keys.has(key)) {
+          node.remove();
+          shown.delete(key);
+        }
+      for (const item of marks) {
+        let node = shown.get(item.key);
+        if (node === undefined) {
+          node = document.createElement("span");
+          layer.append(node);
+          shown.set(item.key, node);
+        }
+        const className = `notice-mark ${item.mark === "!" ? "is-alert" : "is-wondering"}`;
+        if (node.className !== className) node.className = className;
+        if (node.textContent !== item.mark) node.textContent = item.mark;
+        node.style.left = `${item.x}px`;
+        node.style.top = `${item.y}px`;
+      }
+    },
+  };
+}

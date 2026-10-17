@@ -6,12 +6,12 @@ import {
 
 // Milestone 48: a gust burst is a lean. The bay's recorded bluebird battle
 // (tools/sim/record-bay.ts) is replayed to the tick its first burst starts, a
-// normal lean (two gentle puffs), then the lean is played with real arrow
-// keys, or on touch with the arrow stickers. `leaning` is that tick
-// (re-recording the run moves it: find it with
+// normal lean (a gentle puff, then a strong one), then the lean is played
+// with real arrow keys, or on touch with the arrow stickers. `leaning` is
+// that tick (re-recording the run moves it: find it with
 // `bun tools/sim/run.ts tests/sim/scripts/bay/bay.json --fixture bay --trace`).
 const path = "tests/sim/scripts/bay/bay.json";
-const leaning = 647;
+const leaning = 652;
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -34,7 +34,7 @@ async function toTheLean(page: Page): Promise<void> {
   if (check?.kind !== "lean") throw new Error("no lean");
   expect(check.tick).toBe(0);
   expect(check.big).toBe(false);
-  expect(check.strengths).toEqual([2, 2]);
+  expect(check.strengths).toEqual([2, 3]);
 }
 
 async function leanCheck(page: Page): Promise<{ tick: number; balance: number;

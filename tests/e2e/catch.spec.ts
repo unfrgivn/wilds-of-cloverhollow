@@ -12,7 +12,7 @@ import {
 // `bun tools/sim/run.ts tests/sim/scripts/park/pup-win.json --fixture park
 // --trace`).
 const path = "tests/sim/scripts/park/pup-win.json";
-const caught = 364;
+const caught = 389;
 
 test.describe.configure({ timeout: longFlowTimeout });
 

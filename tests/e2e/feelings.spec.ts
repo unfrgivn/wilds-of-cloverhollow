@@ -161,7 +161,7 @@ test("Maddie alone: no feelings, no badges", async ({ page }) => {
 // typed out (re-recording moves it: find it with `bun tools/sim/run.ts
 // tests/sim/scripts/pass-party/woods.json --fixture pass-party --trace`).
 const woods = "tests/sim/scripts/pass-party/woods.json";
-const menu = 1057;
+const menu = 920;
 
 test("real keys: L peeks at the owl's turn-after feeling", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });

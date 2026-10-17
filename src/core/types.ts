@@ -39,6 +39,10 @@ export type Tunables = {
     sight: number;
     cooldownTicks: number;
     pauseTicks: number;
+    // Milestone 51: in sight this long, a critter notices Fae and gives
+    // chase; its "!" shows `alertTicks` more.
+    noticeTicks: number;
+    alertTicks: number;
   };
 };
 // A feet-anchored body box (spec 5): `width` centred on the feet, `height`
@@ -303,6 +307,12 @@ export type BattleContent = {
   // command id that answers it, and the calm an answered feeling adds.
   feelings: Record<FeelingId, { label: string; answer: string }>;
   feelingBonus: number;
+  // Who got the jump on a recurring critter (Milestone 51): the calm Fae
+  // starts with when she surprised it, and the intro lines, with {name}.
+  firstTouch: { surprise: number; lines: { surprised: string; caught: string } };
+  // Once Fae has calmed `calms` of a species, a recurring one calms on touch
+  // with `line` (Milestone 51), its {name} filled in.
+  oldFriends: { calms: number; line: string };
   // The reward line: `sticker` when the species' sticker is new, `coins`
   // otherwise, with {sticker} and {coins} filled in (spec 8).
   rewards: { sticker: string; coins: string };
@@ -508,7 +518,8 @@ export type Battle = {
   answered: boolean;
   // The lantern has shown the turn-after feeling, for the rest of the battle.
   lanternPeek: boolean;
-  // The turn, from 1 (Milestone 50).
+  // The turn, from 1 (Milestone 50); 0 while a critter that caught Fae
+  // bursts first (Milestone 51).
   turn: number;
   // A mini-boss puffed up (Milestone 50): the feelings it shows at once,
   // which are popped, and the turns left before it lets go (this one too).
@@ -643,6 +654,8 @@ export type State = {
   critters: Record<string, Mood>;
   // This visit's recurring critters, rolled on arrival (spec 6).
   wild: Wild[];
+  // How many of each species Fae has calmed (Milestone 51), by species.
+  calms: Record<string, number>;
   stickers: string[];
   safeSpot: { area: string; spawn: string };
   battle: Battle | null;
@@ -680,5 +693,13 @@ export type Wild = {
   cooldownTicks: number;
   facing: Direction;
   moving: boolean;
+  // Ticks Fae has been in its sight, from 0 (Milestone 51): it chases from
+  // `roam.noticeTicks`, and counts on to `noticeTicks + alertTicks`.
+  notice: number;
 };
+// Who got the jump on a recurring critter as it met Fae (Milestone 51).
+export type FirstTouch = "surprised" | "caught" | "even";
+// A recurring critter's mark over its head (Milestone 51): "?" while it
+// hasn't noticed Fae in its sight, "!" just after it has.
+export type WildMark = { key: string; kind: string; point: Point; mark: "?" | "!" };
 export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };

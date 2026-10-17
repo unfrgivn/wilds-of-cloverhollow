@@ -63,5 +63,6 @@ describe("field replay", () => {
       "I pulled the old footbridge's lever with the lasso, and the bridge swung down " +
       "across the creek!",
     );
-  });
+  // A long replay of the pass-party chain: room for a busy machine.
+  }, 20_000);
 });

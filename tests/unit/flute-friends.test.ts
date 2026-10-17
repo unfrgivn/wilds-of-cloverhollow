@@ -243,7 +243,7 @@ describe("a flute friend", () => {
     if (park === undefined || spawn === undefined) throw new Error("no park");
     const at = { x: spawn.x + 120, y: spawn.y - 60 };
     const pup: Wild = { kind: "pup", den: 0, mood: "calm", ...at, target: at, pauseTicks: 0,
-      cooldownTicks: 0, facing: "down", moving: false };
+      cooldownTicks: 0, facing: "down", moving: false, notice: 0 };
     const inPark = { area: "park", spawn: "plaza-path", seed: 1, party: ["maddie", "sue"] };
     const start: State = { ...createState(world, inPark), ink: befriended, wild: [pup] };
     expect(presentCritters(world, start).map((critter) => critter.key)).toEqual(["wild:0"]);

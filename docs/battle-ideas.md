@@ -4,8 +4,8 @@ Status: proposals, 2026-10-16. Owner, 2026-10-17: the suggested order is
 approved, and Milestones 40 (battle checks), 41 (Catch), and 42 (feelings)
 built it; `spec.md` section 8 says what they do. Next the owner picked Lean
 (built in Milestone 48), then wind-ups for the two mini-bosses (built in
-Milestone 50), then first touch and old friends (Milestone 51). The rest of
-this page stays unscheduled.
+Milestone 50), then first touch and old friends (built in Milestone 51). The
+rest of this page stays unscheduled.
 
 Before Milestone 40, every action in a calm-down battle was the same skill
 check: press confirm when the shrinking ring meets the dashed circle. Soothe,
@@ -159,11 +159,15 @@ Tools command instead of growing the grid.
    isn't chasing her, the battle opens with it surprised: a calm head start. If
    a chaser reaches her while she's walking away, it bursts first. The core
    already knows Fae's facing, the critter's position, and whether it's in
-   chase range.
+   chase range. Built in Milestone 51, with one change: critters chased
+   anything in sight at once, so none could be reached unaware. Now one takes
+   half a second to notice Fae ("?", then "!"), and getting to it first
+   starts the battle a quarter calm.
 2. **Old friends** (EarthBound's instant win). Once Fae has calmed three of a
    species, a new chaos one of that species calms on touch with one line and
    pays its coins. Recurring critters stop being a chore late in the game.
-   Needs a per-species count in state.
+   Needs a per-species count in state. Built in Milestone 51 (save version
+   8; older saves upgrade, their counts starting from then).
 3. **Flute friends** (NOTES.md: the flute calls animal friends, who help in
    battles). A calmed species can be called once per battle: the Pond Pup
    fetches (calm), the Cozy Cat yawns (the next burst is smaller). It ties the

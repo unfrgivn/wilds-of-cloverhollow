@@ -326,3 +326,36 @@
     drop-shadow(0 calc(-1 * var(--cut-ink)) 0 var(--sticker-ink))
     drop-shadow(0 4px 4px #47321f40);
 }
+
+/* A recurring critter's "?" and "!" (Milestone 51): small round stickers over
+   its head, under every other sticker. "?" is quiet cream; "!" is butter
+   yellow and pops as the critter notices Fae. */
+.notice-marks { position: fixed; inset: 0; z-index: var(--z-hud); pointer-events: none; }
+:root[data-battle="open"] .notice-marks,
+:root[data-journal="open"] .notice-marks { display: none; }
+.notice-mark {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  font: 900 17px/1 var(--sticker-font);
+  transform: translate(-50%, -100%);
+}
+.notice-mark.is-alert {
+  background: #f6cf4f;
+  animation: notice-pop 220ms ease-out;
+}
+@keyframes notice-pop {
+  from { transform: translate(-50%, -100%) scale(0.3); }
+  70% { transform: translate(-50%, -100%) scale(1.25); }
+  to { transform: translate(-50%, -100%) scale(1); }
+}

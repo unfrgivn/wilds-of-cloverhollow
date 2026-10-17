@@ -694,6 +694,8 @@ export function parseTunables(value: unknown, file: string): Tunables {
       sight: numberValue(value.roam, "sight", file),
       cooldownTicks: numberValue(value.roam, "cooldownTicks", file),
       pauseTicks: numberValue(value.roam, "pauseTicks", file),
+      noticeTicks: numberValue(value.roam, "noticeTicks", file),
+      alertTicks: numberValue(value.roam, "alertTicks", file),
     },
   };
 }
@@ -1115,6 +1117,22 @@ export function parseBattleContent(
   const feelingBonus = value.feelingBonus;
   field(typeof feelingBonus === "number" && Number.isInteger(feelingBonus) && feelingBonus >= 0,
     file, "feelingBonus");
+  // Meeting a recurring critter (Milestone 51): lines that name it, the calm
+  // a surprise is worth, and how many calms make a species old friends.
+  const named = (raw: unknown, name: string): string => {
+    field(typeof raw === "string" && raw.includes("{name}"), file, name);
+    return raw;
+  };
+  const touch = value.firstTouch;
+  field(record(touch) && record(touch.lines), file, "firstTouch");
+  const surprise = touch.surprise;
+  field(typeof surprise === "number" && Number.isInteger(surprise) && surprise > 0, file,
+    "firstTouch.surprise");
+  const friends = value.oldFriends;
+  field(record(friends), file, "oldFriends");
+  const calms = friends.calms;
+  field(typeof calms === "number" && Number.isInteger(calms) && calms >= 1, file,
+    "oldFriends.calms");
   return {
     toyAtlas,
     hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean },
@@ -1131,6 +1149,14 @@ export function parseBattleContent(
       hungry: feeling("hungry"),
     },
     feelingBonus,
+    firstTouch: {
+      surprise,
+      lines: {
+        surprised: named(touch.lines.surprised, "firstTouch.lines.surprised"),
+        caught: named(touch.lines.caught, "firstTouch.lines.caught"),
+      },
+    },
+    oldFriends: { calms, line: named(friends.line, "oldFriends.line") },
     rewards: { sticker: rewards.sticker, coins: rewards.coins },
   };
 }

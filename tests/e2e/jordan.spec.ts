@@ -105,7 +105,8 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
   expect(info.party.map((member) => member.id)).toEqual(["maddie", "sue", "jordan"]);
 
   // The four of them step back toward the bus stop, out of the hamster's
-  // sight (it comes after anyone within 180 units of it), and settle.
+  // sight (it comes after anyone it notices within 180 units of it), and
+  // settle.
   await walk(page, "y", 820);
   await walk(page, "x", 1120);
   await step(page, 60);
@@ -116,10 +117,33 @@ test("Fae meets Jordan, Juggle calms the hamster, and he gives her his lantern",
     .toEqual(expect.arrayContaining(["fae", "maddie", "sue", "jordan"]));
   await expect(page).toHaveScreenshot("pass-party-of-four.png");
 
-  // Into the hamster's reach: the battle has six commands.
-  await walk(page, "x", 850);
+  // Into the hamster's reach: the battle has six commands. Fae steers at it
+  // all the way, so it can't catch her first (Milestone 51) and the battle
+  // opens on her menu.
+  const keys = { x: "", y: "" };
+  for (let count = 0; count < 200 && (await readBattle(page)) === null; count += 1) {
+    const where = await page.evaluate(() => {
+      const state = window.__cloverhollow?.getState();
+      const hamster = state?.wild.find((critter) => critter.kind === "hamster");
+      return state === undefined || hamster === undefined ? null
+        : { dx: hamster.x - state.player.x, dy: hamster.y - state.player.y };
+    });
+    if (where === null) throw new Error("no hamster out");
+    const want = {
+      x: Math.abs(where.dx) < 4 ? "" : where.dx < 0 ? "ArrowLeft" : "ArrowRight",
+      y: Math.abs(where.dy) < 4 ? "" : where.dy < 0 ? "ArrowUp" : "ArrowDown",
+    };
+    for (const axis of ["x", "y"] as const) {
+      if (keys[axis] === want[axis]) continue;
+      if (keys[axis] !== "") await page.keyboard.up(keys[axis]);
+      if (want[axis] !== "") await page.keyboard.down(want[axis]);
+      keys[axis] = want[axis];
+    }
+    await step(page, 1);
+  }
+  for (const key of [keys.x, keys.y]) if (key !== "") await page.keyboard.up(key);
   await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
-  expect((await readBattle(page))?.critterId).toBe("hamster");
+  expect((await readBattle(page))).toMatchObject({ critterId: "hamster", turn: 1 });
   for (let count = 0; count < 20; count += 1) {
     const battle = await readBattle(page);
     if (battle?.phase === "command" && battle.revealed >= battle.message.length) break;

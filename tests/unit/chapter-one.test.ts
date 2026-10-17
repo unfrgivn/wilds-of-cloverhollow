@@ -35,12 +35,13 @@ describe("chapter one", () => {
       "music-bird": "chaos",
       "oak-squirrel": "chaos",
     });
-    // And on the way: a park pup, and two raccoons in the plaza once the
-    // town's critters were out (Milestone 28; a cat until Milestone 41's
-    // catch lanes drew from the same PRNG). Every calm paid 8 coins; the
-    // raccoons share the school raccoon's sticker.
-    expect(state.stickers).toEqual(["fountain-frog", "pond-pup", "ringtail-raccoon"]);
-    expect(state.coins).toBe(40);
+    // And on the way: a park pup, and a cat in the plaza once the town's
+    // critters were out (Milestone 28; two raccoons until Milestone 51's
+    // noticing changed how the critters wander). Fae got to both before they
+    // noticed her. Every calm paid 8 coins and counts for its species.
+    expect(state.stickers).toEqual(["fountain-frog", "pond-pup", "ringtail-raccoon", "cozy-cat"]);
+    expect(state.coins).toBe(32);
+    expect(state.calms).toEqual({ frog: 1, pup: 1, raccoon: 1, cat: 1 });
     expect({
       plan: story("plan"),
       ate_breakfast: story("ate_breakfast"),

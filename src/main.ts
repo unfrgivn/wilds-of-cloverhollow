@@ -24,7 +24,7 @@ import { mountTouchControls } from "./ui/touch-controls";
 import { GameView, type BattleCheckGeometry } from "./render/view";
 import type { AtlasImage } from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
-import { createDialogueBox, createPrompt } from "./ui/sticker";
+import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import {
   createBattleHud,
   createCommandMenu,
@@ -93,6 +93,7 @@ async function boot(): Promise<void> {
   document.body.append(uiRoot);
   const dialogueBox = createDialogueBox(uiRoot);
   const prompt = createPrompt(uiRoot);
+  const noticeMarks = createNoticeMarks(uiRoot);
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
@@ -362,6 +363,8 @@ async function boot(): Promise<void> {
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
     );
+    // The recurring critters' "?" and "!" (Milestone 51).
+    noticeMarks.render(view.noticeMarks(state));
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
     const lanternButton =

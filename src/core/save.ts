@@ -1,6 +1,6 @@
 import type { State, Wild } from "./types";
 
-export type SaveData = { version: 7; state: State };
+export type SaveData = { version: 8; state: State };
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -19,6 +19,7 @@ const wildShape: Wild = {
   cooldownTicks: 0,
   facing: "down",
   moving: false,
+  notice: 0,
 };
 
 // A save is accepted only if it has exactly the shape of a real state: every
@@ -33,19 +34,25 @@ export function parseSave(json: string, template: State): State | null {
   try {
     const value: unknown = JSON.parse(json);
     if (!record(value) || typeof value.version !== "number" || !record(value.state)) return null;
-    // Older saves since Milestone 28 carry on: version 5 had no arcade game or
-    // prizes, version 6 no tickets.
+    // Older saves since Milestone 28 carry on, gaining what later versions
+    // added as a new game starts it: version 5 had no arcade game or prizes,
+    // version 6 no tickets, version 7 no calm counts (they count from then on).
     const upgrades: Record<number, Record<string, unknown>> = {
-      5: { arcade: null, prizes: [], tickets: 0 },
-      6: { tickets: 0 },
-      7: {},
+      5: { arcade: null, prizes: [], tickets: 0, calms: {} },
+      6: { tickets: 0, calms: {} },
+      7: { calms: {} },
+      8: {},
     };
     const added = upgrades[value.version];
     if (added === undefined) return null;
+    const saved: Record<string, unknown> = {
+      ...value.state,
+      ...added,
+      ...(value.version < 8 ? { wild: unnoticed(value.state.wild) } : {}),
+    };
+    if (saved.battle !== null || saved.arcade !== null) return null;
     // Set pieces added by later content start as they would in a new game, so
     // new content never throws a save away.
-    const saved = { ...value.state, ...added };
-    if (saved.battle !== null || saved.arcade !== null) return null;
     const state = record(saved.critters)
       ? { ...saved, critters: { ...template.critters, ...saved.critters } }
       : saved;
@@ -53,6 +60,14 @@ export function parseSave(json: string, template: State): State | null {
   } catch {
     return null;
   }
+}
+
+// Before version 8 no recurring critter had a notice count: none had
+// noticed Fae.
+function unnoticed(wild: unknown): unknown {
+  return Array.isArray(wild)
+    ? wild.map((item: unknown) => (record(item) ? { ...item, notice: 0 } : item))
+    : wild;
 }
 
 function sameShape(template: unknown, value: unknown): boolean {
@@ -75,5 +90,5 @@ function isState(value: unknown, template: State): value is State {
 }
 
 export function serializeSave(state: State): string {
-  return JSON.stringify({ version: 7, state } satisfies SaveData);
+  return JSON.stringify({ version: 8, state } satisfies SaveData);
 }

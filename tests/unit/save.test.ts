@@ -40,7 +40,7 @@ describe("save format", () => {
     // no lantern, version 3 no coins, and version 4 a critter of each kind
     // (no recurring critters); all start fresh, as does a version from the
     // future.
-    for (const version of [1, 2, 3, 4, 8])
+    for (const version of [1, 2, 3, 4, 9])
       expect(parseSave(JSON.stringify({ version, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
     expect(parseSave(JSON.stringify({ version: 5, state: { tick: 1 } }), fresh)).toBeNull();
@@ -83,7 +83,18 @@ describe("save format", () => {
     expect(restored?.tickets).toBe(0);
   });
 
-  it("round trips version 7 and refuses an active arcade game", () => {
+  it("upgrades a version-7 save: calms counted from now, and no critter noticing Fae", () => {
+    const out: State["wild"][number] = { kind: "pup", den: 1, mood: "chaos", x: 900, y: 600,
+      target: { x: 880, y: 600 }, pauseTicks: 3, cooldownTicks: 0, facing: "left",
+      moving: false, notice: 12 };
+    const { notice: _notice, ...unaware } = out;
+    const { calms: _calms, ...older } = { ...fresh, area: "park", wild: [unaware] };
+    const restored = parseSave(JSON.stringify({ version: 7, state: older }), fresh);
+    expect(restored?.calms).toEqual({});
+    expect(restored?.wild).toEqual([{ ...out, notice: 0 }]);
+  });
+
+  it("round trips version 8 and refuses an active arcade game", () => {
     expect(parseSave(serializeSave(fresh), fresh)).toEqual(fresh);
     const rich: State = { ...fresh, tickets: 12, prizes: ["pinwheel"] };
     expect(parseSave(serializeSave(rich), fresh)).toEqual(rich);
@@ -97,7 +108,7 @@ describe("save format", () => {
   it("checks recurring critters, which a new game's template has none of", () => {
     const out: State["wild"][number] = { kind: "pup", den: 1, mood: "calm", x: 900, y: 600,
       target: { x: 880, y: 600 }, pauseTicks: 3, cooldownTicks: 0, facing: "left",
-      moving: false };
+      moving: false, notice: 0 };
     const visiting = { ...fresh, area: "park", wild: [out] };
     expect(parseSave(serializeSave(visiting), fresh)).toEqual(visiting);
     const { mood: _mood, ...moodless } = out;

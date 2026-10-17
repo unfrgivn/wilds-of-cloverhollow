@@ -24,6 +24,8 @@
     "chaseSpeed": 2.5,
     "sight": 180,
     "cooldownTicks": 240,
-    "pauseTicks": 45
+    "pauseTicks": 45,
+    "noticeTicks": 45,
+    "alertTicks": 30
   }
 }

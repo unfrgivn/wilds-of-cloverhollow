@@ -8,7 +8,8 @@ import {
 // exit path back (plaza spawn `park-path`, (1470, 930) facing up). A Zoomie
 // Pup is out by the pond (its den at (880, 600)) every time Fae arrives
 // (Milestone 28): walking into it starts a battle with the pups' own content
-// (content/critters/pup.json) and atlas.
+// (content/critters/pup.json) and atlas. It takes a moment to notice her in
+// its sight (Milestone 51): "?" over it, then "!".
 
 test.describe.configure({ timeout: longFlowTimeout });
 
@@ -21,6 +22,19 @@ async function hold(page: Page, key: string, ticks: number): Promise<void> {
 async function press(page: Page, key = "z"): Promise<void> {
   await page.keyboard.press(key);
   await step(page, 2);
+}
+
+// Steps a tick at a time, holding whatever keys are down, until `done`.
+async function until(page: Page, done: () => Promise<boolean>): Promise<void> {
+  for (let count = 0; count < 300; count += 1) {
+    if (await done()) return;
+    await step(page, 1);
+  }
+  throw new Error("never got there");
+}
+
+async function pupMark(page: Page): Promise<string | null> {
+  return (await renderInfo(page)).marks.find((item) => item.key === "wild:0")?.mark ?? null;
 }
 
 // From the plaza fixture's fountain spawn (1200, 550): right past the lamp
@@ -73,7 +87,15 @@ test("the Zoomie Pup's battle uses his own content, and Fae can run away", async
   await toThePark(page);
   await walk(page, "x", 480);
   await walk(page, "y", 600);
-  await hold(page, "ArrowRight", 90);
+  // Into the pup's sight, then stand until it notices her. Walking at it as
+  // it comes, neither got the jump: it opens with its own intro.
+  await page.keyboard.down("ArrowRight");
+  await until(page, async () => (await pupMark(page)) !== null);
+  await page.keyboard.up("ArrowRight");
+  await until(page, async () => (await pupMark(page)) === "!");
+  await page.keyboard.down("ArrowRight");
+  await until(page, async () => (await readBattle(page)) !== null);
+  await page.keyboard.up("ArrowRight");
   await expect(page.locator("html")).toHaveAttribute("data-battle", "open");
   const met = await readBattle(page);
   expect(met).toMatchObject({ critterId: "pup", den: 0 });

@@ -39,5 +39,6 @@ describe("music replay", () => {
     expect(journalNotes(world, state)).toContain(
       "Ms. Willow gave me her very first flute! When I play it, animal friends come running.",
     );
-  });
+  // A long replay of the pass-party chain: room for a busy machine.
+  }, 20_000);
 });

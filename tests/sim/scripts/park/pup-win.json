@@ -9,7 +9,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 90
+    "ticks": 85
   },
   {
     "frame": {
@@ -21,7 +21,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 35
+    "ticks": 65
   },
   {
     "frame": {

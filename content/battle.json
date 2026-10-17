@@ -42,6 +42,17 @@
     }
   },
   "feelingBonus": 15,
+  "firstTouch": {
+    "surprise": 25,
+    "lines": {
+      "surprised": "The {name} didn't see Fae coming! It's a little calmer already.",
+      "caught": "The {name} pounces before Fae is ready!"
+    }
+  },
+  "oldFriends": {
+    "calms": 3,
+    "line": "The {name} remembers Fae and calms right down!"
+  },
   "rewards": {
     "sticker": "New sticker: {sticker}! +{coins} coins.",
     "coins": "+{coins} coins!"

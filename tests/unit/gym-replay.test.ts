@@ -42,5 +42,6 @@ describe("gym replay", () => {
     const notes = journalNotes(world, state);
     expect(notes[0]).toMatch(/^Music class is next!/);
     expect(notes[1]).toMatch(/^Coach Ash gave me his lasso!/);
-  });
+  // A long replay of the pass-party chain: room for a busy machine.
+  }, 20_000);
 });

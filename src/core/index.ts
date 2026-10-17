@@ -13,3 +13,4 @@ export * from "./party";
 export * from "./arcade";
 export * from "./claw";
 export * from "./skee";
+export * from "./encounter";

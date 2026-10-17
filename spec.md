@@ -214,9 +214,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - iOS: Web Audio keeps WebKit's default `ambient` session, so the ring/silent
   switch mutes the game (Apple's guidance for non-essential game sound).
 - Sound is on by default. Mute is toggled by M or the `♪ on/off` pill on the
-  journal's notes heading (drawn like the coin and snack pills, with a larger
-  invisible hit area), and is stored separately under `cloverhollow-audio` in
-  Capacitor Preferences, never in the save.
+  journal's notes heading (a 44 px sticker pill, drawn taller than the coin
+  and snack pills because it is a control), and is stored separately under
+  `cloverhollow-audio` in Capacitor Preferences, never in the save.
 - A four-step volume control (25%, 50%, 75%, 100%) sits beside the mute pill
   in the notes heading. It is a sticker-style 44 CSS-pixel control with a
   slider role: taps/clicks cycle through the levels, and arrows, Home, and End

@@ -66,8 +66,8 @@
   min-width: 0;
   gap: 3px;
 }
-/* Drawn like the supply pills beside it; the invisible ::after keeps a
-   finger-sized hit area around the small pill. */
+/* A control, so it's drawn finger-sized (44 px tall), taller than the supply
+   pills beside it, which only show counts. */
 .journal-audio {
   position: relative;
   display: inline-flex;

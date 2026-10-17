@@ -51,13 +51,6 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "triangle", frequency: 330, offset: .08, duration: .14, gain: .08 },
   ],
   footstep: [{ wave: "noise", offset: 0, duration: .045, gain: .025, lowpass: 900 }],
-  "footstep-grass": [{ wave: "noise", offset: 0, duration: .045, gain: .023, lowpass: 1050 }],
-  "footstep-sand": [{ wave: "noise", offset: 0, duration: .055, gain: .023, lowpass: 650 }],
-  "footstep-wood": [{ wave: "noise", offset: 0, duration: .04, gain: .025, lowpass: 1700 }],
-  "footstep-snow": [{ wave: "noise", offset: 0, duration: .065, gain: .022, lowpass: 420 }],
-  "footstep-stone": [{ wave: "noise", offset: 0, duration: .035, gain: .023, lowpass: 2200 }],
-  "footstep-tile": [{ wave: "noise", offset: 0, duration: .038, gain: .023, lowpass: 1900 }],
-  "footstep-carpet": [{ wave: "noise", offset: 0, duration: .06, gain: .02, lowpass: 500 }],
   door: [{
     wave: "triangle", frequency: 440, endFrequency: 220,
     offset: 0, duration: .22, gain: .1,

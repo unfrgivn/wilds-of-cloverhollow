@@ -8,7 +8,6 @@ import {
   type State,
   battleView,
   soundCues,
-  surfaceAt,
 } from "./core";
 import { loadContent, parseMapCentres } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
@@ -413,10 +412,7 @@ async function boot(): Promise<void> {
     };
     const previous = state;
     state = step(content.world, state, input).state;
-    for (const cue of soundCues(previous, state, (area, point) => {
-      const current = content.world.areas[area];
-      return current === undefined ? "grass" : surfaceAt(current.surfaces, point);
-    })) {
+    for (const cue of soundCues(previous, state)) {
       const played = sound.play(cue, state.tick);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);

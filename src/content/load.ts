@@ -27,21 +27,6 @@ import trailPropsData from "../../content/props/trail.json";
 import woodsPropsData from "../../content/props/woods.json";
 import eastHallPropsData from "../../content/props/east-hall.json";
 import musicPropsData from "../../content/props/music.json";
-import harnessSurfaceData from "../../content/surfaces/harness.json";
-import bedroomSurfaceData from "../../content/surfaces/bedroom.json";
-import plazaSurfaceData from "../../content/surfaces/plaza.json";
-import kitchenSurfaceData from "../../content/surfaces/kitchen.json";
-import parkSurfaceData from "../../content/surfaces/park.json";
-import schoolSurfaceData from "../../content/surfaces/school.json";
-import classroomSurfaceData from "../../content/surfaces/classroom.json";
-import gymSurfaceData from "../../content/surfaces/gym.json";
-import baySurfaceData from "../../content/surfaces/bay.json";
-import passSurfaceData from "../../content/surfaces/pass.json";
-import trailSurfaceData from "../../content/surfaces/trail.json";
-import woodsSurfaceData from "../../content/surfaces/woods.json";
-import arcadeSurfaceData from "../../content/surfaces/arcade.json";
-import eastHallSurfaceData from "../../content/surfaces/east-hall.json";
-import musicSurfaceData from "../../content/surfaces/music.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -88,7 +73,6 @@ import { isStorySound } from "../core/sound";
 import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
 } from "./props";
-import { parseSurfaceMap } from "./surfaces";
 import type {
   Area,
   CharacterContent,
@@ -251,12 +235,7 @@ export function parseTunables(value: unknown, file: string): Tunables {
   };
 }
 
-export function parseArea(
-  value: unknown,
-  file: string,
-  catalogue?: PropCatalogue,
-  surfaces?: Area["surfaces"],
-): Area {
+export function parseArea(value: unknown, file: string, catalogue?: PropCatalogue): Area {
   field(record(value), file, "object");
   field(typeof value.id === "string", file, "id");
   field(typeof value.width === "number", file, "width");
@@ -379,7 +358,6 @@ export function parseArea(
     ...(value.land === undefined ? {} : { land: value.land }),
     width: value.width,
     height: value.height,
-    surfaces: surfaces ?? { default: "grass", precedence: "first", regions: [] },
     walkable: value.walkable,
     blockers: value.blockers,
     ground: value.ground,
@@ -905,71 +883,39 @@ export function loadContent(): {
   world: World;
   fixtures: Record<string, Fixture>;
 } {
-  const surfaceFor = (data: unknown, file: string, area: { width: number; height: number }) =>
-    parseSurfaceMap(data, file, area.width, area.height);
-  const harness = parseArea(
-    areaData, "content/areas/harness.json", undefined,
-    surfaceFor(harnessSurfaceData, "content/surfaces/harness.json", areaData));
-  const bedroom = parseArea(
-    bedroomData, "content/areas/bedroom.json",
-    parsePropCatalogue(bedroomPropsData, "content/props/bedroom.json"),
-    surfaceFor(bedroomSurfaceData, "content/surfaces/bedroom.json", bedroomData));
-  const plaza = parseArea(
-    plazaData, "content/areas/plaza.json",
-    parsePropCatalogue(plazaPropsData, "content/props/plaza.json"),
-    surfaceFor(plazaSurfaceData, "content/surfaces/plaza.json", plazaData));
-  const kitchen = parseArea(
-    kitchenData, "content/areas/kitchen.json",
-    parsePropCatalogue(kitchenPropsData, "content/props/kitchen.json"),
-    surfaceFor(kitchenSurfaceData, "content/surfaces/kitchen.json", kitchenData));
-  const park = parseArea(
-    parkData, "content/areas/park.json",
-    parsePropCatalogue(parkPropsData, "content/props/park.json"),
-    surfaceFor(parkSurfaceData, "content/surfaces/park.json", parkData));
-  const school = parseArea(
-    schoolData, "content/areas/school.json",
-    parsePropCatalogue(schoolPropsData, "content/props/school.json"),
-    surfaceFor(schoolSurfaceData, "content/surfaces/school.json", schoolData));
-  const classroom = parseArea(
-    classroomData, "content/areas/classroom.json",
-    parsePropCatalogue(classroomPropsData, "content/props/classroom.json"),
-    surfaceFor(classroomSurfaceData, "content/surfaces/classroom.json", classroomData));
-  const gym = parseArea(
-    gymData, "content/areas/gym.json",
-    parsePropCatalogue(gymPropsData, "content/props/gym.json"),
-    surfaceFor(gymSurfaceData, "content/surfaces/gym.json", gymData));
-  const bay = parseArea(
-    bayData, "content/areas/bay.json",
-    parsePropCatalogue(bayPropsData, "content/props/bay.json"),
-    surfaceFor(baySurfaceData, "content/surfaces/bay.json", bayData));
+  const harness = parseArea(areaData, "content/areas/harness.json");
+  const bedroom = parseArea(bedroomData, "content/areas/bedroom.json",
+    parsePropCatalogue(bedroomPropsData, "content/props/bedroom.json"));
+  const plaza = parseArea(plazaData, "content/areas/plaza.json",
+    parsePropCatalogue(plazaPropsData, "content/props/plaza.json"));
+  const kitchen = parseArea(kitchenData, "content/areas/kitchen.json",
+    parsePropCatalogue(kitchenPropsData, "content/props/kitchen.json"));
+  const park = parseArea(parkData, "content/areas/park.json",
+    parsePropCatalogue(parkPropsData, "content/props/park.json"));
+  const school = parseArea(schoolData, "content/areas/school.json",
+    parsePropCatalogue(schoolPropsData, "content/props/school.json"));
+  const classroom = parseArea(classroomData, "content/areas/classroom.json",
+    parsePropCatalogue(classroomPropsData, "content/props/classroom.json"));
+  const gym = parseArea(gymData, "content/areas/gym.json",
+    parsePropCatalogue(gymPropsData, "content/props/gym.json"));
+  const bay = parseArea(bayData, "content/areas/bay.json",
+    parsePropCatalogue(bayPropsData, "content/props/bay.json"));
   Object.defineProperty(bay.spawns, "bus-stop", {
     value: { x: 355, y: 545, facing: "down" },
     enumerable: false,
   });
-  const pass = parseArea(
-    passData, "content/areas/pass.json",
-    parsePropCatalogue(passPropsData, "content/props/pass.json"),
-    surfaceFor(passSurfaceData, "content/surfaces/pass.json", passData));
-  const trail = parseArea(
-    trailData, "content/areas/trail.json",
-    parsePropCatalogue(trailPropsData, "content/props/trail.json"),
-    surfaceFor(trailSurfaceData, "content/surfaces/trail.json", trailData));
-  const woods = parseArea(
-    woodsData, "content/areas/woods.json",
-    parsePropCatalogue(woodsPropsData, "content/props/woods.json"),
-    surfaceFor(woodsSurfaceData, "content/surfaces/woods.json", woodsData));
-  const arcade = parseArea(
-    arcadeData, "content/areas/arcade.json",
-    parsePropCatalogue(arcadePropsData, "content/props/arcade.json"),
-    surfaceFor(arcadeSurfaceData, "content/surfaces/arcade.json", arcadeData));
-  const eastHall = parseArea(
-    eastHallData, "content/areas/east-hall.json",
-    parsePropCatalogue(eastHallPropsData, "content/props/east-hall.json"),
-    surfaceFor(eastHallSurfaceData, "content/surfaces/east-hall.json", eastHallData));
-  const music = parseArea(
-    musicData, "content/areas/music.json",
-    parsePropCatalogue(musicPropsData, "content/props/music.json"),
-    surfaceFor(musicSurfaceData, "content/surfaces/music.json", musicData));
+  const pass = parseArea(passData, "content/areas/pass.json",
+    parsePropCatalogue(passPropsData, "content/props/pass.json"));
+  const trail = parseArea(trailData, "content/areas/trail.json",
+    parsePropCatalogue(trailPropsData, "content/props/trail.json"));
+  const woods = parseArea(woodsData, "content/areas/woods.json",
+    parsePropCatalogue(woodsPropsData, "content/props/woods.json"));
+  const arcade = parseArea(arcadeData, "content/areas/arcade.json",
+    parsePropCatalogue(arcadePropsData, "content/props/arcade.json"));
+  const eastHall = parseArea(eastHallData, "content/areas/east-hall.json",
+    parsePropCatalogue(eastHallPropsData, "content/props/east-hall.json"));
+  const music = parseArea(musicData, "content/areas/music.json",
+    parsePropCatalogue(musicPropsData, "content/props/music.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(

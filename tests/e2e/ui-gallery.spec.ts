@@ -18,6 +18,7 @@ const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle
   "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup",
   "battle-trace", "battle-trace-mid", "battle-trace-dry", "battle-talk", "battle-talk-reply"];
 const journalStates = ["journal-empty", "journal-notes", "journal-full"];
+const creditsStates = ["credits", "credits-short"];
 const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
 const sizes = [phone, { width: 1180, height: 820 }, { width: 1280, height: 720 }];
@@ -252,6 +253,96 @@ function overlaps(a: Rect, b: Rect): boolean {
 }
 
 test.describe("sticker gallery", () => {
+  for (const size of sizes) {
+    for (const state of creditsStates) {
+      test(`credits ${state} fits ${size.width}x${size.height}`, async ({ page }) => {
+        await gallery(page, state, true, size.width === 874 ? "0,62,21,62" : "0,0,0,0", size);
+        const metrics = await page.evaluate(() => {
+          const screen = document.querySelector<HTMLElement>(".credits-screen");
+          if (screen === null) throw new Error("credits screen missing");
+          const rect = screen.getBoundingClientRect();
+          const elements = [...screen.querySelectorAll<HTMLElement>("h1, .credits-entry, p")];
+          const stickers = [...screen.querySelectorAll<HTMLElement>(".credits-entry")];
+          const confirmButton = document.querySelector<HTMLElement>(".touch-confirm");
+          return {
+            visible: !screen.hidden,
+            scrolls: screen.scrollHeight > screen.clientHeight,
+            inside: elements.every((item) => {
+              const box = item.getBoundingClientRect();
+              return box.left >= rect.left && box.right <= rect.right &&
+                box.top >= rect.top && box.bottom <= rect.bottom;
+            }),
+            bodySize: Math.min(...[...screen.querySelectorAll<HTMLElement>(
+              ".credits-entry-name, p")]
+              .map((item) => Number.parseFloat(getComputedStyle(item).fontSize))),
+            confirm: (() => {
+              const button = confirmButton;
+              if (button === null) return null;
+              const box = button.getBoundingClientRect();
+              return {
+                visible: box.width > 0 && box.height > 0,
+                size: Math.min(box.width, box.height),
+              };
+            })(),
+            clear: confirmButton === null || stickers.every((item) => {
+              const a = item.getBoundingClientRect();
+              const b = confirmButton.getBoundingClientRect();
+              return a.right <= b.left || a.left >= b.right ||
+                a.bottom <= b.top || a.top >= b.bottom;
+            }),
+            controlsHidden: [".touch-stick", ".touch-menu", ".touch-cancel"]
+              .every((selector) =>
+                document.querySelector<HTMLElement>(selector)?.getClientRects().length === 0),
+            thanks: (() => {
+              const item = screen.querySelector<HTMLElement>(".credits-thanks");
+              return item === null ? null : item.getBoundingClientRect();
+            })(),
+            sections: (() => {
+              const rect = (selector: string): DOMRect | null => {
+                const item = screen.querySelector<HTMLElement>(selector);
+                return item === null ? null : item.getBoundingClientRect();
+              };
+              return {
+                lastFriend: rect(".credits-entry-friends:last-of-type"),
+                firstMet: rect(".credits-entry-met"),
+                heading: rect("h2:not([hidden]) + ul + h2"),
+              };
+            })(),
+          };
+        });
+        expect(metrics.visible).toBe(true);
+        expect(metrics.inside || metrics.scrolls).toBe(true);
+        expect(metrics.bodySize).toBeGreaterThanOrEqual(18);
+        expect(metrics.confirm?.visible).toBe(true);
+        expect(metrics.confirm?.size).toBeGreaterThanOrEqual(44);
+        expect(metrics.clear).toBe(true);
+        expect(metrics.controlsHidden).toBe(true);
+        expect(metrics.thanks).not.toBeNull();
+        expect(metrics.sections.lastFriend).not.toBeNull();
+        expect(metrics.sections.firstMet).not.toBeNull();
+        expect(metrics.sections.heading).not.toBeNull();
+        expect(metrics.sections.heading?.top ?? 0)
+          .toBeGreaterThan(metrics.sections.lastFriend?.bottom ?? 0);
+        expect(metrics.sections.firstMet?.top ?? 0)
+          .toBeGreaterThan(metrics.sections.heading?.bottom ?? 0);
+        if (size.height >= 720) {
+          expect(metrics.scrolls).toBe(false);
+          expect(metrics.thanks?.bottom ?? 0).toBeLessThanOrEqual(size.height);
+        }
+        await expect(page.locator(".credits-screen h1")).toHaveText("THE END");
+        await expect(page.locator(".credits-entry").first()).toBeVisible();
+        // The largest credits: every friend Fae can make, and the whole catalogue.
+        if (state === "credits") {
+          await expect(page.locator(".credits-entry-friends .credits-entry-name"))
+            .toHaveText(["Maddie", "Sue", "Jordan", "Pond Pup", "Acorn Squirrel"]);
+          await expect(page.locator(".credits-entry-met")).toHaveCount(13);
+        }
+        await expect(page).toHaveScreenshot(`${state}-${size.width}x${size.height}.png`, {
+          animations: "disabled", scale: "device",
+        });
+      });
+    }
+  }
   // The claw machine as drawn is its layout (spec 8.2): every plush, the claw,
   // the glass, the chute, and the plate where layoutClaw puts them, from the
   // same real game states, on a phone and a desktop, in both engines. The

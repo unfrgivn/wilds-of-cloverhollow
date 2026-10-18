@@ -10,6 +10,7 @@
   "sits": true,
   "start": false,
   "joins": "squirrel_with_me",
+  "befriended": "squirrel_friend",
   "flute": true,
   "critter": "squirrel",
   "command": null

@@ -10,6 +10,7 @@
   "sits": true,
   "start": false,
   "joins": "pup_with_me",
+  "befriended": "pup_friend",
   "flute": true,
   "critter": "pup",
   "command": null

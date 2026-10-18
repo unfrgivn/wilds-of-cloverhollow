@@ -179,6 +179,7 @@ export function createState(
     lantern: false,
     coins: 0,
     snacks: 2,
+    finale: null,
   };
   return { ...state, ...rollWild(world, state, area) };
 }
@@ -712,6 +713,7 @@ function solidArea(world: World, state: State, area: Area): Area {
 
 function joinReady(world: World, state: State): State {
   if (
+    state.finale !== null ||
     state.dialogue !== null ||
     state.battle !== null ||
     state.transition !== null ||
@@ -1469,6 +1471,8 @@ function dialogueState(
   const play = result.line?.tags.map((item) =>
     /^play:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(item.trim())).find((item) => item !== null);
   let playValue = carriedPlay;
+  const ending = result.line?.tags.includes("ending") || false;
+  const credits = result.line?.tags.includes("credits") || false;
   const game = play?.[1];
   if (game !== undefined && isArcadeGameId(game))
     playValue = { game, price: Number(play?.[2]) };
@@ -1487,6 +1491,8 @@ function dialogueState(
     ...(result.line?.sound === undefined ? {} : { sound: result.line.sound }),
     ...(travel === undefined ? {} : { travel }),
     ...(playValue === undefined ? {} : { play: playValue }),
+    ...(ending ? { ending: true } : {}),
+    ...(credits ? { credits: true } : {}),
   };
 }
 
@@ -1549,22 +1555,71 @@ function openTalk(world: World, state: State, input: ActionFrame, knot: string):
   }, result.line?.tags ?? []);
 }
 
+export function startDialogue(world: World, state: State, knot: string): State {
+  return openTalk(world, state, blankInput(), knot);
+}
+
 export const FLUTE_KNOT = "flute";
 
-function closeDialogue(world: World, state: State): State {
+function closeDialogue(world: World, state: State): { state: State; events: Event[] } {
   const dialogue = state.dialogue;
-  if (dialogue === null) return state;
+  if (dialogue === null) return { state, events: [] };
   const play = dialogue.play;
   const opened = play !== undefined && state.arcade === null && state.coins >= play.price
     ? openArcade(world, state, play.game, play.price) : state;
-  return {
+  if (dialogue.ending === true) {
+    const snapshot: State = {
+      ...state,
+      dialogue: null,
+      transition: null,
+      battle: null,
+      arcade: null,
+      finale: null,
+    };
+    const bedroom = world.areas.bedroom;
+    const spawn = bedroom?.spawns.bed;
+    if (bedroom === undefined || spawn === undefined)
+      throw new Error("Ending content invariant missing bedroom bed spawn");
+    if (!storyHasKnot(world.story, "morning_start"))
+      throw new Error("Ending content invariant missing morning_start knot");
+    if (!storyHasKnot(world.story, "mom"))
+      throw new Error("Ending content invariant missing mom knot");
+    const morningInk = runInk(
+      world.story,
+      snapshot.ink,
+      { type: "start", knot: "morning_start" },
+      inkFacts(world, snapshot),
+    ).ink;
+    const live = {
+      ...snapshot,
+      area: "bedroom",
+      player: { x: spawn.x, y: spawn.y },
+      facing: spawn.facing,
+      safeSpot: { area: "bedroom", spawn: "bed" },
+      party: spawnParty(world, morningInk, bedroom, spawn, ["maddie"]),
+      ink: morningInk,
+      finale: "morning" as const,
+      dialogue: null,
+    };
+    const wake = runInk(
+      world.story,
+      live.ink,
+      { type: "start", knot: "mom" },
+      inkFacts(world, live),
+    );
+    const morning = { ...live, ink: wake.ink, dialogue: dialogueState("mom", wake) };
+    return { state: morning, events: [{ type: "ending-save", state: snapshot }] };
+  }
+  if (dialogue.credits === true)
+    return { state: { ...state, dialogue: null, finale: "credits" }, events: [] };
+  return { state: {
     ...opened,
     dialogue: null,
     transition:
       dialogue.travel === undefined
         ? opened.transition
         : { target: dialogue.travel, phase: "out", elapsed: 0 },
-  };
+  }, events: [] };
 }
 
 /*
@@ -1577,9 +1632,13 @@ function closeDialogue(world: World, state: State): State {
  *   shown, choices    ──confirm / touch choose──▶ Ink choose ▶ next line
  *   shown, no choices ──confirm──▶ Ink next ▶ next line, or closed when ended
  */
-function dialogueStep(world: World, state: State, input: ActionFrame): State {
+function dialogueStep(
+  world: World,
+  state: State,
+  input: ActionFrame,
+): { state: State; events: Event[] } {
   const dialogue = state.dialogue;
-  if (dialogue === null) return state;
+  if (dialogue === null) return { state, events: [] };
   const previous = state.previousInput;
   const confirm = input.confirm && !previous.confirm;
   const next: State = {
@@ -1595,11 +1654,11 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
           dialogue.text.length,
           dialogue.revealed + world.tunables.interact.revealPerTick,
         );
-    return { ...next, dialogue: { ...dialogue, revealed } };
+    return { state: { ...next, dialogue: { ...dialogue, revealed } }, events: [] };
   }
   const count = dialogue.choices.length;
   if (count === 0) {
-    if (!confirm) return next;
+    if (!confirm) return { state: next, events: [] };
     if (dialogue.ended) return closeDialogue(world, next);
     const result = runInk(
       world.story,
@@ -1613,7 +1672,7 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(world, advanced)
-      : { ...advanced, dialogue: following };
+      : { state: { ...advanced, dialogue: following }, events: [] };
   }
   const tapped =
     input.choose !== undefined && input.choose >= 0 && input.choose < count
@@ -1636,13 +1695,13 @@ function dialogueStep(world: World, state: State, input: ActionFrame): State {
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
       ? closeDialogue(world, advanced)
-      : { ...advanced, dialogue: following };
+      : { state: { ...advanced, dialogue: following }, events: [] };
   }
   const up = input.move.y < -0.5 && previous.move.y >= -0.5;
   const down = input.move.y > 0.5 && previous.move.y <= 0.5;
-  if (!up && !down) return next;
+  if (!up && !down) return { state: next, events: [] };
   const selected = (dialogue.selected + (down ? 1 : -1) + count) % count;
-  return { ...next, dialogue: { ...dialogue, selected } };
+  return { state: { ...next, dialogue: { ...dialogue, selected } }, events: [] };
 }
 
 function segmentClear(area: Area, start: Point, end: Point): boolean {
@@ -2010,6 +2069,17 @@ function stepTick(
   state: State,
   input: ActionFrame,
 ): { state: State; events: Event[] } {
+  if (state.finale === "credits")
+    return {
+      state: {
+        ...state,
+        tick: state.tick + 1,
+        previousInput: { ...input },
+        motion: { ...state.motion, moving: false },
+        party: restingParty(state.party),
+      },
+      events: [],
+    };
   const area = world.areas[state.area];
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
   if (state.battle !== null)
@@ -2020,7 +2090,7 @@ function stepTick(
     return { state: { ...nextBase, ...stepArcade(world, state, input) }, events: [] };
   }
   if (state.dialogue !== null)
-    return { state: dialogueStep(world, state, input), events: [] };
+    return dialogueStep(world, state, input);
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
   const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
@@ -2038,7 +2108,7 @@ function stepTick(
       events: [],
     };
   }
-  if (lanternEdge && state.transition === null) {
+  if (lanternEdge && state.finale === null && state.transition === null) {
     const hasLantern = world.storyVariable(state.ink, "has_lantern") === true;
     if (hasLantern) return {
       state: {
@@ -2051,7 +2121,7 @@ function stepTick(
     };
   }
   // The flute plays its own knot: a friend called, or sent home (spec 5).
-  if (fluteEdge && state.transition === null &&
+  if (fluteEdge && state.finale === null && state.transition === null &&
       world.storyVariable(state.ink, "has_flute") === true &&
       storyHasKnot(world.story, FLUTE_KNOT))
     return { state: openTalk(world, state, input, FLUTE_KNOT), events: [] };

@@ -399,6 +399,9 @@ export function storyTagErrors(
       return price !== undefined && price === Number(match?.[2])
         ? [] : [`invalid trade tag "${tag}" (not a counter prize at its price)`];
     }
+    if (tag === "ending" || tag === "credits") return [];
+    if (tag.startsWith("ending") || tag.startsWith("credits"))
+      return [`invalid finale tag "${tag}"`];
     if (tag.startsWith("sound:")) {
       const sound = tag.slice("sound:".length).trim();
       return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
@@ -430,6 +433,20 @@ export function talkErrors(
     }
     return errors;
   });
+}
+
+export function endingContentErrors(
+  story: Record<string, unknown>,
+  areas: Record<string, Area>,
+): string[] {
+  if (!storyTags(story).includes("ending")) return [];
+  const bedroom = areas.bedroom;
+  return [
+    ...(bedroom === undefined ? ["ending requires area bedroom"] : []),
+    ...(bedroom?.spawns.bed === undefined ? ["ending requires bedroom spawn bed"] : []),
+    ...(storyHasKnot(story, "morning_start") ? [] : ["ending requires morning_start knot"]),
+    ...(storyHasKnot(story, "mom") ? [] : ["ending requires mom knot"]),
+  ];
 }
 
 function list(value: unknown): value is unknown[] {
@@ -1562,6 +1579,11 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
   field(typeof value.sits === "boolean", file, "sits");
   field(typeof value.start === "boolean", file, "start");
   field(value.joins === null || typeof value.joins === "string", file, "joins");
+  field(value.befriended === undefined || typeof value.befriended === "string",
+    file, "befriended");
+  // A flute friend's `joins` only says it's following right now; whether it's
+  // Fae's friend at all (the credits) is its own variable.
+  field(!flute || typeof value.befriended === "string", file, "flute/befriended");
   field(
     (value.start && value.joins === null) || (!value.start && typeof value.joins === "string"),
     file,
@@ -1576,6 +1598,7 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
     sits: value.sits,
     start: value.start,
     joins: value.joins,
+    ...(value.befriended === undefined ? {} : { befriended: value.befriended }),
     flute,
     critter,
     command: record(command)
@@ -1594,9 +1617,12 @@ export function partyJoinErrors(
   storyVariable: (name: string) => unknown,
 ): string[] {
   return Object.values(party).flatMap((member) =>
-    member.joins !== null && storyVariable(member.joins) === undefined
-      ? [`party ${member.id}: joins variable ${member.joins} is not declared`]
-      : [],
+    [
+      ...(member.joins !== null && storyVariable(member.joins) === undefined
+        ? [`party ${member.id}: joins variable ${member.joins} is not declared`] : []),
+      ...(member.befriended !== undefined && storyVariable(member.befriended) === undefined
+        ? [`party ${member.id}: befriended variable ${member.befriended} is not declared`] : []),
+    ],
   );
 }
 
@@ -2006,6 +2032,9 @@ export function loadContent(): {
   const talkProblems = talkErrors(story, initialInk, Object.values(critters));
   if (talkProblems.length > 0)
     throw new Error(`content/critters: ${talkProblems.join("; ")}`);
+  const endingProblems = endingContentErrors(story, areas);
+  if (endingProblems.length > 0)
+    throw new Error(`content/story/main.ink: ${endingProblems.join("; ")}`);
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-18 (Milestones 53, 54, 55, 57, and 58)
+Last updated: 2026-10-18 (Milestones 53 to 58, and 60)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -33,7 +33,7 @@ reference material only.
   kid's scribbles back) and then Talk (she reaches him with what the clues
   say).
 - Finale twist: Mom wakes Fae up. It was all a dream. A short playable
-  morning follows (Milo comes to the door in a purple hoodie), then the
+  morning follows (Milo waits by the front door in a purple hoodie), then the
   credits and the title; Continue returns to the dream, the forest calm.
 
 ### 1.3 Creative frame
@@ -329,6 +329,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`{ width, height }`), `walkCycleUnits`, `sits` (sits down after
   `sitDelayTicks`; otherwise idles standing), `start` (in the party at a new
   game), an optional `joins` Ink variable (null for starters), an optional
+  `befriended` Ink variable (true once the member is Fae's friend, where that
+  differs from following her: a flute friend's `joins` is true only while it
+  follows, so every flute friend names one and the loader refuses one
+  without; the credits read it, section 7.4), an optional
   `flute` (a flute friend, below), and one battle `command` (`{ id, label,
   resting }`, section 8; null for a flute friend). Exactly one of `start: true`
   or a non-null `joins` is required, and a joins variable must be declared.
@@ -339,7 +343,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   spawn: members after the first also try wider diagonal heel slots, after the
   existing candidates, so no earlier placement moves and no spawn has to.
   `state.party` is the ordered list of members, each
-  `{ id, x, y, facing, motion, stillTicks, trail }`.
+  `{ id, x, y, facing, motion, stillTicks, trail }`. No one joins while
+  `finale` isn't null: the morning's party is Maddie alone (section 7.4),
+  though the dream's join variables are still true.
 - Flute friends (Milestone 47): a roster member with `flute: true` is an
   animal friend Fae calls with her flute. It has `command: null` (no battle
   command) and a `joins` variable, and it's the only kind of member that
@@ -351,11 +357,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   the nearest steps out of the area into the party, where it stood (it
   leaves `state.wild` for the visit); otherwise it comes from a follower
   slot, like anyone joining. The Pond Pup is `pond-pup` ("Pond Pup"): box
-  44x56, `walkCycleUnits` 84, sits, joins `pup_with_me`, critter `pup`. After
+  44x56, `walkCycleUnits` 84, sits, joins `pup_with_me`, befriended
+  `pup_friend`, critter `pup`. After
   him, the Acorn Squirrel is `acorn-squirrel` ("Acorn Squirrel", Milestone
   60): box 40x56, `walkCycleUnits` 72, sits, joins `squirrel_with_me`,
-  critter `squirrel`, last in the roster. Both can come along at once: the
-  whole roster fits behind Fae at every spawn (the area checks).
+  befriended `squirrel_friend`, critter `squirrel`, last in the roster. Both
+  can come along at once: the whole roster fits behind Fae at every spawn
+  (the area checks).
 - Chain rule: member 0 follows Fae; member i follows member i-1, with the same
   algorithm, the leader being the member ahead *after* its own move this tick
   (the party updates in order). Each member keeps its own breadcrumb trail of
@@ -443,6 +451,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   (its doorway at the plaza's right edge, x 1600-1625, y 500-610) to the bay,
   and each leads back. The east road `requires` `club_open` (knot
   `bay_road_closed`): Fae goes to the bay once the tree house club is open.
+  The kitchen's front door `requires` `dreaming` (knot
+  `front_door_morning_notice`), so it's shut only in the morning (section
+  7.4).
 - Every room is an open cutaway, a diorama with no front wall: its doors
   stand on its back and side walls, or its floor runs off the painting's
   edge. The school hallway's front doors are glass double doors at the left
@@ -1046,6 +1057,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   `bay_bus_stop`, `pass_bus_stop`) travelling between `plaza.bus-stop`,
   `bay.bus-stop`, and `pass.bus`: the bay once `club_open`, the pass once the
   bluebird is calm (setting `rode_bus`), home any time.
+- The finale tags (Milestone 56) take no argument (load validation refuses
+  one) and act as their line's dialogue closes. `# ending` (the last line of
+  `tree_ending`) emits an `ending-save` event carrying the dream as it stands,
+  dialogue closed and `finale` null, then wakes Fae: `finale` becomes
+  `morning`, she is in the bedroom at `bed` (her safe spot too) with Maddie
+  alone, `morning_start` sets `awake` and clears `dreaming`, and Mom's `mom`
+  knot opens. `# credits` (the last line of `front_door_morning`) sets
+  `finale` to `credits`. A story with `# ending` must have the bedroom, its
+  `bed` spawn, and the `morning_start` and `mom` knots (load validation). The
+  morning and the credits are section 7.4.
 - A line may carry `# buy: snack <price>`: as it's shown, Fae pays `price`
   coins for one snack if she has them (`purchaseSnack`). The story's
   `coins()` external answers her coins, so a shop only offers to sell when
@@ -1178,11 +1199,54 @@ ios/            Capacitor iOS project (from Milestone 4).
   game until it is released, so the press that starts the game can't also
   act in it. The title reads its own input edges and never writes to the
   game state.
+- After the credits, the title opens in `continue` mode over the dream
+  (section 7.4).
 - The Continue detail is the area's `name` (area JSON) and the sticker count
   ("0 stickers", "1 sticker", "2 stickers").
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
   rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
   them on a fresh install and Continue after the relaunch.
+
+### 7.4 The wake-up and the credits (Milestone 56)
+- `state.finale` is `null` in the dream, `morning` once the ending wakes Fae,
+  and `credits` once Milo's last line closes (section 7's finale tags).
+- Milo's talk after the calm-down (`milo_calm.again`, under the restored
+  Ancient Tree) offers [Watch the tree glow], which plays `tree_ending`, and
+  [Not yet]. Both are sticky (`+`), so after Continue the ending can be
+  watched again.
+- The morning is small and playable. Fae and Maddie are alone (no one joins,
+  section 5). Mom wakes her in the bedroom, where she shows only while
+  `awake`; she's in the kitchen too, as in the dream. Talked to again,
+  upstairs or down, Mom sends Fae to Milo (`mom.morning_again`). Downstairs,
+  Milo (`milo-hoodie`, shown only while `awake`) waits in his purple hoodie by
+  the front door. That door needs `dreaming` (section 6), so in the morning it
+  plays `front_door_morning_notice` instead of opening; in the dream it still
+  leads to the plaza. The lantern and the flute do nothing. Talking to Milo
+  plays `front_door_morning`.
+- From the wake-up on, nothing is saved: `autosaveNeeded` is false while
+  `finale` isn't null (section 10). The `ending-save` event's snapshot is the
+  save; the shell writes it and keeps it for the credits.
+- The credits (`src/ui/credits.ts`) are a paper sheet over everything: "THE
+  END", FRIENDS, MET ALONG THE WAY, and "Thank you for playing!", from
+  `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
+  starts with Fae or whose `befriended` (else `joins`) variable is true, in
+  roster order, on the frame `down_idle_01`. MET is each sticker in
+  `state.stickers`, by its name, on its critter's atlas at the sticker's
+  frame. Each entry is a small sticker over its name; the names and the
+  thanks are at least 18 px. At 1180x820 and 1280x720 the largest credits
+  (every friend and the whole catalogue) fit without scrolling; on a phone the
+  sheet scrolls. On touch only the confirm button shows, at least 44 px and
+  clear of the entries.
+- The shell steps the core on every credits tick, and the core holds the
+  world still (only the tick, the previous input, and the resting pose
+  change), so the ticks and their input stay a replay's.
+- A confirm counts after a 12-tick beat (`CREDITS_BEAT_TICKS`,
+  `creditsConfirmAllowed`), so a press still down from Milo's last line can't
+  skip the credits. It puts the kept snapshot back as the state, with no core
+  tick, and opens the title in `continue` mode over it: Continue resumes the
+  dream at the save's exact hash, as a later boot does. The credits only
+  follow an ending in the same session (the morning is never saved), so
+  closing them without a snapshot is a bug and throws.
 
 ## 8. Calm-down battles (v0)
 - Talk phases: a critter kind may carry `talk` (`label`, the command's name;
@@ -2110,7 +2174,7 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 8, state }`, the whole core state, including the
+- Format: `{ version: 9, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
   the set pieces' moods, this visit's recurring critters, the calm counts,
   the lantern, coins and snacks, the PRNG, the tick, arcade state, prizes,
@@ -2123,7 +2187,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Older saves upgrade, gaining what later versions added as a new game
   starts it: version 5 `arcade: null`, `prizes: []`, `tickets: 0`, and
   `calms: {}`; version 6 `tickets: 0` and `calms: {}` (Milestone 45); version
-  7 `calms: {}` (counted from then on). Before version 8 every recurring
+  7 `calms: {}` (counted from then on); version 8 `finale: null` (Milestone
+  56). Before version 8 every recurring
   critter gains `notice: 0` (Milestone 51). Version 4 and older, a version
   from the future, and any mid-game save are refused.
 - `parseSave(json, template)` accepts only a state with the template's exact
@@ -2139,10 +2204,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   bumping: a save is only written after a battle has ended, so `battle` is
   always null in a save, and `parseSave` refuses one where it isn't. The
   battle's own shape can change without a new version (Milestone 40 did).
+  Nothing is saved in the morning or the credits either, so `parseSave`
+  refuses a save whose `finale` isn't null (Milestone 56).
 - Autosave (the shell, never blocking a frame) when Fae arrives in an area,
-  a battle or arcade game ends, a dialogue closes, or the journal closes. The trigger is a
-  pure function of the previous and next state (`autosaveNeeded`). Fixture
-  resets don't save.
+  a battle or arcade game ends, a dialogue closes, or the journal closes. The
+  trigger is a pure function of the previous and next state
+  (`autosaveNeeded`), and it is false while `finale` isn't null: the dream's
+  last save is the ending's snapshot (section 7.4). Fixture resets don't save.
 - Boot: a valid save resumes the game; otherwise a new game starts.
 
 ## 11. Harness and agent control (locked)
@@ -2182,16 +2250,19 @@ ios/            Capacitor iOS project (from Milestone 4).
     current `animation` and `frame`, `party` (each member in party order as
     `{ id, hidden, animation, frame }`, `hidden` being its fraction behind its
     leader), plus prompt and dialogue summaries. `npcs` lists each person in
-  the area as `{ id, frame, facing }`. `ambient` lists current flyers as
-  `{ id, x, y, frame }` in world units, and is empty for an area without
-  flyers. `battle.layout` includes `party`, the
+    the area as `{ id, frame, facing }`. `ambient` lists current flyers as
+    `{ id, x, y, frame }` in world units, and is empty for an area without
+    flyers. `battle.layout` includes `party`, the
     members' CSS-px points, and `battle.check` the check's geometry
     (section 8). For Trace it is `{ kind: "trace", rect: { x, y, width,
     height }, brush: { x, y }, points: [{ x, y }], checkpoint, hintAt }`, all
     coordinates in CSS px except the brush and points, which are in the
     authored 0..1000 square. `marks` lists the recurring critters' "?" and "!" as
     `{ key, mark, x, y }`, each at its sticker's bottom centre in CSS px
-    (Milestone 51).
+    (Milestone 51). `finale` is the core's `finale` (`null`, `morning`, or
+    `credits`); `credits` is `{ entries }` while the credits show (each
+    `{ section, name, image }`, from `creditEntries`, section 7.4), otherwise
+    null (Milestone 56).
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.

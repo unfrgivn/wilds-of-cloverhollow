@@ -8,6 +8,19 @@ export type AtlasImage = {
   atlas: { w: number; h: number };
 };
 
+export type AtlasJson = {
+  frames: Record<string, { frame: AtlasFrame }>;
+  meta: { size?: { w: number; h: number } };
+};
+
+export function atlasImage(sheet: AtlasJson, src: string, frameName: string): AtlasImage {
+  const frame = sheet.frames[frameName]?.frame;
+  if (frame === undefined) throw new Error(`Unknown atlas frame: ${frameName}`);
+  const size = sheet.meta.size;
+  if (size === undefined) throw new Error("Atlas is missing its size");
+  return { src, frame, atlas: size };
+}
+
 /*
  * Percentages keep the crop exact at any box size, as long as the box has the
  * frame's aspect ratio. background-position p% lines up the image's p% point

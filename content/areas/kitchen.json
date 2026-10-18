@@ -83,6 +83,10 @@
       "target": {
         "area": "plaza",
         "spawn": "front-door"
+      },
+      "requires": {
+        "variable": "dreaming",
+        "knot": "front_door_morning_notice"
       }
     }
   ],
@@ -153,6 +157,35 @@
         [
           600,
           545
+        ]
+      ]
+    },
+    {
+      "id": "milo-hoodie",
+      "point": {
+        "x": 950,
+        "y": 500
+      },
+      "facing": "left",
+      "knot": "front_door_morning",
+      "prompt": "Talk",
+      "visibleWhile": "awake",
+      "footprint": [
+        [
+          930,
+          480
+        ],
+        [
+          970,
+          480
+        ],
+        [
+          970,
+          520
+        ],
+        [
+          930,
+          520
         ]
       ]
     },

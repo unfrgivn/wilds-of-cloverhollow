@@ -1,0 +1,91 @@
+.credits-screen {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 12px;
+  overflow-y: auto;
+  padding: max(24px, var(--safe-top))
+    max(24px, calc(var(--touch-reserve-right, 0px) + var(--safe-right)))
+    calc(124px + var(--safe-bottom)) max(24px, var(--safe-left));
+  background: #f8edcf;
+  color: #4b3027;
+  text-align: center;
+  font-family: Nunito, sans-serif;
+}
+.credits-screen[hidden], .credits-screen h2[hidden] { display: none; }
+.credits-title {
+  margin: 8px 0 14px;
+  padding: 8px 34px 12px;
+  transform: rotate(-2deg);
+  border: 3px solid #8f654e;
+  border-radius: 18px;
+  background: #fff8e8;
+  box-shadow: 6px 7px 0 #c69b72;
+  font-size: clamp(42px, 9vw, 84px);
+  line-height: 1;
+}
+.credits-screen h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  letter-spacing: .08em;
+}
+.credits-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.credits-entry {
+  display: grid;
+  justify-items: center;
+  width: 128px;
+  min-height: 132px;
+  padding: 8px 8px 10px;
+  border: 3px solid #8f654e;
+  border-radius: 18px;
+  background: #fff8e8;
+  box-shadow: 4px 5px 0 #c69b72;
+}
+.credits-entry-image {
+  width: 82px;
+  height: 76px;
+  background-repeat: no-repeat;
+  background-color: transparent;
+}
+.credits-entry-name {
+  align-self: end;
+  font-size: 18px;
+  line-height: 1.1;
+}
+.credits-thanks {
+  margin: 12px 0 0;
+  padding: 10px 20px;
+  border: 3px solid #8f654e;
+  border-radius: 18px;
+  background: #fff8e8;
+  box-shadow: 4px 5px 0 #c69b72;
+  font-size: 22px;
+}
+:root[data-credits="open"] .touch-stick,
+:root[data-credits="open"] .touch-menu,
+:root[data-credits="open"] .touch-cancel,
+:root[data-credits="open"] .touch-lantern,
+:root[data-credits="open"] .touch-flute { display: none; }
+@media (min-width: 1000px) {
+  .credits-title { margin: 0 0 2px; padding: 5px 24px 7px; font-size: 52px; }
+  .credits-screen { gap: 4px; padding-bottom: calc(94px + var(--safe-bottom)); }
+  .credits-screen h2 { margin-top: 2px; }
+  .credits-list { max-width: 760px; gap: 8px; }
+  .credits-entry { width: 96px; min-height: 78px; padding: 3px 5px 5px; border-width: 2px; border-radius: 14px; box-shadow: 3px 4px 0 #c69b72; }
+  .credits-entry-image { width: 52px; height: 48px; }
+  .credits-entry-name { font-size: 18px; }
+  .credits-thanks { margin-top: 2px; padding: 5px 14px; font-size: 18px; }
+}

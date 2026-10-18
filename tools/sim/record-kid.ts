@@ -22,7 +22,7 @@ play.battle([
 ], undefined, [0, 1, 0]);
 play.approach("critter:hooded-kid");
 play.talk("critter:hooded-kid");
-play.talk("critter:hooded-kid");
+play.talk("critter:hooded-kid", [1]);
 
 const end = play.state();
 if (end.area !== "enchanted" || end.dialogue !== null || end.battle !== null)

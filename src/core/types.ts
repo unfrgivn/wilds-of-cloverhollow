@@ -341,6 +341,7 @@ export type PartyContent = {
   start: boolean;
   // Ink variable which adds this friend during play, or null for starters.
   joins: string | null;
+  befriended?: string;
   // A flute friend (an animal Fae calls with her flute): it leaves again when
   // its joins variable isn't true, and it sits battles out (spec 5).
   flute: boolean;
@@ -767,6 +768,8 @@ export type State = {
     sound?: StorySound;
     travel?: { area: string; spawn: string };
     play?: { game: ArcadeGameId; price: number };
+    ending?: true;
+    credits?: true;
   } | null;
   // The set pieces' moods, for the whole game.
   critters: Record<string, Mood>;
@@ -784,6 +787,7 @@ export type State = {
   lantern: boolean;
   coins: number;
   snacks: number;
+  finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
 };
 // What a tick of an arcade game changes: the game itself and what it pays out.
@@ -822,4 +826,6 @@ export type FirstTouch = "surprised" | "caught" | "even";
 // A recurring critter's mark over its head (Milestone 51): "?" while it
 // hasn't noticed Fae in its sight, "!" just after it has.
 export type WildMark = { key: string; kind: string; point: Point; mark: "?" | "!" };
-export type Event = { type: "button"; button: "confirm" | "cancel" | "menu" };
+export type Event =
+  | { type: "button"; button: "confirm" | "cancel" | "menu" }
+  | { type: "ending-save"; state: State };

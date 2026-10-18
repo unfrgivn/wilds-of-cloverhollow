@@ -27,6 +27,7 @@ export function journalNotes(world: World, state: State): string[] {
 }
 
 export function autosaveNeeded(previous: State, next: State): boolean {
+  if (previous.finale !== null || next.finale !== null) return false;
   return (
     (previous.area !== next.area && next.transition === null) ||
     (previous.transition?.phase === "in" && next.transition === null) ||

@@ -122,9 +122,12 @@ test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" }, async 
     restored: true,
   });
   expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
-  expect(await readState(page)).toMatchObject({ area: "enchanted", dialogue: null });
+  // Milo's second talk ends on "Not yet": the dream goes on (the ending's run,
+  // which starts with this one, takes the other answer).
+  expect(await readState(page))
+    .toMatchObject({ area: "enchanted", dialogue: null, finale: null });
   await expect(page.locator(".sticker-text-revealed")).toHaveText(
-    "The Ancient Tree is glowing again. It's so pretty now.");
+    "Not yet. We can stay here a little longer.");
 });
 
 test("a finger paints the kid's scribble back on a notched phone", async ({ browser }) => {

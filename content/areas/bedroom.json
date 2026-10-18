@@ -98,6 +98,37 @@
       "facing": "down"
     }
   },
+  "npcs": [
+    {
+      "id": "mom",
+      "point": {
+        "x": 525,
+        "y": 315
+      },
+      "facing": "down",
+      "knot": "mom",
+      "prompt": "Talk",
+      "visibleWhile": "awake",
+      "footprint": [
+        [
+          505,
+          295
+        ],
+        [
+          545,
+          295
+        ],
+        [
+          545,
+          325
+        ],
+        [
+          505,
+          325
+        ]
+      ]
+    }
+  ],
   "name": "Fae's bedroom",
   "land": "cloverhollow",
   "props": [

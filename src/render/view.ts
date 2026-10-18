@@ -22,8 +22,10 @@ import {
   presentCritters,
   targetInteractable,
   wildMarks,
+  creditEntries,
   type Area,
   type CheckSide,
+  type CreditEntry,
   type PartyContent,
   type PartyMember,
   type Point,
@@ -1098,6 +1100,8 @@ export class GameView {
 
   renderInfo(state: State): {
     area: string;
+    finale: State["finale"];
+    credits: { entries: CreditEntry[] } | null;
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;
@@ -1171,6 +1175,10 @@ export class GameView {
     };
     return {
       area: this.areaView?.area.id ?? "",
+      finale: state.finale,
+      credits: state.finale === "credits"
+        ? { entries: creditEntries(this.world, state) }
+        : null,
       drawOrder: this.depth.children
         .filter((child) => child.visible)
         .map((child) => ({

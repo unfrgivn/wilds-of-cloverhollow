@@ -21,6 +21,8 @@ export type CloverhollowHook = {
   reset: (options?: { seed?: number; fixture?: string }) => Promise<void>;
   renderInfo: () => {
     area: string;
+    finale: State["finale"];
+    credits: { entries: { section: "friends" | "met"; name: string }[] } | null;
     drawOrder: { label: string; zIndex: number }[];
     animation: string;
     frame: number;

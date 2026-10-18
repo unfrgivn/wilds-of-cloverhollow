@@ -23,6 +23,8 @@ VAR saw_clipboard = false
 VAR has_lasso = false
 VAR found_clipboard = false
 VAR coach_thanked = false
+VAR dreaming = true
+VAR awake = false
 EXTERNAL calmed(id)
 EXTERNAL coins()
 EXTERNAL snacks()
@@ -46,12 +48,16 @@ The fountain is still fizzing. {plan == "now": I'm going to go look!|I'll check 
 -> DONE
 
 === pillow_journal ===
+{awake: -> morning_journal}
 My journal, right under my pillow where it belongs. # speaker: Fae
 {
 - plan == "now": Note to self: fizzing fountain. Go look NOW. # speaker: Fae
 - plan == "later": Note to self: fizzing fountain. Check after school. # speaker: Fae
 - else: Mom and Dad gave it to me when Oliver was born. # speaker: Fae
 }
+-> DONE
+= morning_journal
+My journal is full of drawings from the dream. # speaker: Fae
 -> DONE
 
 === desk ===
@@ -195,11 +201,16 @@ A big bowl of pancake batter and a whole mountain of blueberries. Yum. # speaker
 -> DONE
 
 === oliver ===
+{awake: -> morning_oliver}
 Oliver shakes his rattle. "Ba!" # speaker: Oliver
 Mom laughs from the kitchen. # speaker: Mom
 -> DONE
+= morning_oliver
+Oliver giggles and points at the fridge drawings. They look like the forest, the fairies, and a purple scribble. # speaker: Fae
+-> DONE
 
 === mom ===
+{awake: -> morning}
 {clubhouse_claimed and not has_microwave: -> kitchen}
 {ate_breakfast: -> again}
 Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
@@ -215,6 +226,19 @@ Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
 = again
 Have a good day, sweetie. Stay curious! # speaker: Mom
 -> DONE
+= morning
+// Mom wakes Fae once; after that, upstairs or down, she sends her to Milo.
+{morning > 1: -> morning_again}
+Fae! Wake up, sleepyhead! You'll be late for school! # speaker: Mom
+...Mom? But the forest... and Milo... it was all a dream? # speaker: Fae
+Breakfast is on the table. Pancakes! # speaker: Mom
+Oh, and your friend Milo is downstairs! # speaker: Mom
+You two will have fun walking to school together! # speaker: Mom
+-> DONE
+= morning_again
+Milo's waiting by the front door, sweetie. Have fun at school! # speaker: Mom
+-> DONE
+
 = kitchen
 Fae! A little bird told me you and your friends have a clubhouse now. # speaker: Mom
 Every clubhouse needs a kitchen. Take my old microwave! # speaker: Mom
@@ -223,6 +247,28 @@ Every clubhouse needs a kitchen. Take my old microwave! # speaker: Mom
 And the old toy chest from the hall, for your treasures. # speaker: Mom
 Thanks, Mom! Jordan and Sue can help me carry them up the ladder. # speaker: Fae
 There are dino nuggets and mac n cheese in the freezer. Take a box whenever you like! # speaker: Mom
+-> DONE
+
+=== morning_start ===
+~ dreaming = false
+~ awake = true
+-> DONE
+
+=== front_door_morning ===
+Morning, Fae! Your mom let me in. # speaker: Milo
+Hi! Want to walk to school together? I had the WEIRDEST dream... # speaker: Milo
+With a purple hood? # speaker: Fae
+How did you know?! # speaker: Milo
+Maybe some dreams are better when you share them. # speaker: Fae # credits
+-> DONE
+
+=== front_door_morning_notice ===
+Milo's right here. I should say hi first! # speaker: Fae
+-> DONE
+
+=== tree_ending ===
+The Ancient Tree glows brighter and brighter. # speaker: Fae
+Everything goes soft and white. # speaker: Fae # ending
 -> DONE
 
 === pup_calm ===
@@ -1702,6 +1748,13 @@ I always notice you, Milo. You're my friend. # speaker: Fae
 -> DONE
 = again
 The Ancient Tree is glowing again. It's so pretty now. # speaker: Fae
+// Sticky: the dream save is taken as the ending starts, so Continue comes back
+// here with the ending ready to watch again.
++ [Watch the tree glow]
+    It's like it's... waking up? # speaker: Milo
+    -> tree_ending
++ [Not yet]
+    Not yet. We can stay here a little longer. # speaker: Fae
 -> DONE
 
 // A second flute friend (Milestone 60): the Acorn Squirrel climbs.

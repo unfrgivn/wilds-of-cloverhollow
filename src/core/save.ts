@@ -1,6 +1,6 @@
 import type { State, Wild } from "./types";
 
-export type SaveData = { version: 8; state: State };
+export type SaveData = { version: 9; state: State };
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -41,7 +41,8 @@ export function parseSave(json: string, template: State): State | null {
       5: { arcade: null, prizes: [], tickets: 0, calms: {} },
       6: { tickets: 0, calms: {} },
       7: { calms: {} },
-      8: {},
+      8: { finale: null },
+      9: {},
     };
     const added = upgrades[value.version];
     if (added === undefined) return null;
@@ -50,7 +51,7 @@ export function parseSave(json: string, template: State): State | null {
       ...added,
       ...(value.version < 8 ? { wild: unnoticed(value.state.wild) } : {}),
     };
-    if (saved.battle !== null || saved.arcade !== null) return null;
+    if (saved.battle !== null || saved.arcade !== null || saved.finale !== null) return null;
     // Set pieces added by later content start as they would in a new game, so
     // new content never throws a save away.
     const state = record(saved.critters)
@@ -90,5 +91,5 @@ function isState(value: unknown, template: State): value is State {
 }
 
 export function serializeSave(state: State): string {
-  return JSON.stringify({ version: 8, state } satisfies SaveData);
+  return JSON.stringify({ version: 9, state } satisfies SaveData);
 }

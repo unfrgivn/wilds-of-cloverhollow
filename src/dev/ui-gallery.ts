@@ -23,10 +23,13 @@ import {
 import { createJournal, type JournalView } from "../ui/journal";
 import { createArcade } from "../ui/arcade";
 import { createTitleScreen, type TitleView } from "../ui/title";
+import { createCredits } from "../ui/credits";
 import {
   loadContent, parseClawCalibration, parseCookCalibration, parseMoleCalibration,
   parseSkeeCalibration,
 } from "../content/load";
+import { createState, creditEntries, inkFacts, runInk } from "../core";
+import { atlasImage, type AtlasJson } from "../ui/atlas";
 import { clawGalleryView } from "./claw-gallery";
 import type { BattleTalk } from "../core";
 import { cookGalleryView } from "./cook-gallery";
@@ -63,6 +66,7 @@ const stage = document.createElement("div");
 stage.className = "gallery-stage";
 root.append(stage);
 const dialogue = createDialogueBox(stage);
+const credits = createCredits(root);
 const prompt = createPrompt(stage);
 declare global {
   interface Window {
@@ -75,8 +79,52 @@ declare global {
   }
 }
 const state = params.get("state") ?? "short";
+const creditsState = state === "credits" || state === "credits-short";
 // The claw machine's states come from real game states (src/dev/claw-gallery.ts).
 const content = loadContent();
+const creditsFixture = content.fixtures["new-game"];
+if (creditsFixture === undefined) throw new Error("Missing new-game fixture");
+const creditsBase = createState(content.world, creditsFixture);
+const atlasFiles = {
+  ...import.meta.glob<AtlasJson>("../../public/assets/characters/*/*.json",
+    { eager: true, import: "default" }),
+  ...import.meta.glob<AtlasJson>("../../public/assets/critters/*/*.json",
+    { eager: true, import: "default" }),
+};
+const joinedInk = (ink: string, knot: string): string => {
+  let result = runInk(content.world.story, ink, { type: "start", knot },
+    inkFacts(content.world, { ...creditsBase, ink }));
+  for (let index = 0; index < 20; index += 1) {
+    if (result.choices.length > 0)
+      return runInk(content.world.story, result.ink,
+        { type: "choose", index: 0 },
+        inkFacts(content.world, { ...creditsBase, ink: result.ink })).ink;
+    if (result.ended) return result.ink;
+    result = runInk(content.world.story, result.ink, { type: "next" },
+      inkFacts(content.world, { ...creditsBase, ink: result.ink }));
+  }
+  throw new Error(`Could not complete gallery knot ${knot}`);
+};
+// The largest credits: every friend Fae can make (Sue and Jordan join, and both
+// flute friends are befriended) and every sticker in the catalogue.
+const joinedState = state === "credits"
+  ? { ...creditsBase, ink: ["sue", "jordan", "pup_calm.befriend", "squirrel_calm.befriend"]
+      .reduce(joinedInk, creditsBase.ink) }
+  : creditsBase;
+const creditsGameState = {
+  ...joinedState,
+  finale: "credits" as const,
+  stickers: state === "credits-short"
+    ? ["fountain-frog"]
+    : content.world.stickers.catalogue.map((sticker) => sticker.id),
+};
+const creditsEntries = creditEntries(content.world, creditsGameState);
+const creditImage = (image: { atlas: string; frame: string }) => {
+  const key = Object.keys(atlasFiles).find((path) => path.endsWith(image.atlas));
+  const sheet = key === undefined ? undefined : atlasFiles[key];
+  if (sheet === undefined) throw new Error(`Missing gallery atlas ${image.atlas}`);
+  return atlasImage(sheet, image.atlas.replace(".json", ".png"), image.frame);
+};
 const arcadeFixture = content.fixtures.arcade;
 if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
 const clawView = clawGalleryView(content.world, arcadeFixture, state);
@@ -92,7 +140,7 @@ const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup" ||
     state === "battle-talk" || state === "battle-talk-reply"
-  : state !== "prompt" && !journalState && !titleState &&
+  : state !== "prompt" && !journalState && !titleState && !creditsState &&
     (!arcadeState || state === "arcade-result" || state === "skee-result" ||
       state === "mole-result" || state === "cook-result" || state === "cook-burnt");
 if (battleState) document.documentElement.dataset.battle = "open";
@@ -614,6 +662,12 @@ function renderGalleryState(): void {
       atlas: { w: 1536, h: 1024 },
     },
   });
+  credits.render({
+    visible: creditsState,
+    entries: creditsEntries.map((entry) => ({ ...entry, image: creditImage(entry.image) })),
+  });
+  if (creditsState) document.documentElement.dataset.credits = "open";
+  else delete document.documentElement.dataset.credits;
   arcade.render(gameView);
   prompt.render({
     label: "TALK",

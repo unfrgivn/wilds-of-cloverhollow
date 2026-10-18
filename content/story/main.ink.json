@@ -177,6 +177,31 @@
         }
       ],
       "pillow_journal": [
+        "ev",
+        {
+          "VAR?": "awake"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.morning_journal"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "^My journal, right under my pillow where it belongs. ",
         "#",
         "^speaker: Fae",
@@ -205,7 +230,7 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.8"
+                "->": ".^.^.^.14"
               },
               null
             ]
@@ -234,7 +259,7 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.8"
+                "->": ".^.^.^.14"
               },
               null
             ]
@@ -253,7 +278,7 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.8"
+                "->": ".^.^.^.14"
               },
               null
             ]
@@ -262,7 +287,17 @@
         "nop",
         "\n",
         "done",
-        null
+        {
+          "morning_journal": [
+            "^My journal is full of drawings from the dream. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
       ],
       "desk": [
         [
@@ -2977,6 +3012,31 @@
         null
       ],
       "oliver": [
+        "ev",
+        {
+          "VAR?": "awake"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": "oliver.morning_oliver"
+              },
+              {
+                "->": "oliver.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "^Oliver shakes his rattle. \"Ba!\" ",
         "#",
         "^speaker: Oliver",
@@ -2988,10 +3048,45 @@
         "/#",
         "\n",
         "done",
-        null
+        {
+          "morning_oliver": [
+            "^Oliver giggles and points at the fridge drawings. They look like the forest, the fairies, and a purple scribble. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
       ],
       "mom": [
         [
+          "ev",
+          {
+            "VAR?": "awake"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "mom.morning"
+                },
+                {
+                  "->": "mom.0.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
           "ev",
           {
             "VAR?": "clubhouse_claimed"
@@ -3014,7 +3109,7 @@
                   "->": "mom.kitchen"
                 },
                 {
-                  "->": "mom.0.7"
+                  "->": "mom.0.13"
                 },
                 null
               ]
@@ -3039,7 +3134,7 @@
                   "->": "mom.again"
                 },
                 {
-                  "->": "mom.0.13"
+                  "->": "mom.0.19"
                 },
                 null
               ]
@@ -3072,7 +3167,7 @@
                 "#",
                 "^speaker: Mom",
                 {
-                  "->": "mom.0.28"
+                  "->": "mom.0.34"
                 },
                 null
               ]
@@ -3101,7 +3196,7 @@
                 "#",
                 "^speaker: Mom",
                 {
-                  "->": "mom.0.39"
+                  "->": "mom.0.45"
                 },
                 null
               ]
@@ -3187,6 +3282,73 @@
             "done",
             null
           ],
+          "morning": [
+            "ev",
+            {
+              "CNT?": ".^"
+            },
+            1,
+            ">",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": "mom.morning_again"
+                  },
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^Fae! Wake up, sleepyhead! You'll be late for school! ",
+            "#",
+            "^speaker: Mom",
+            "/#",
+            "\n",
+            "^...Mom? But the forest... and Milo... it was all a dream? ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^Breakfast is on the table. Pancakes! ",
+            "#",
+            "^speaker: Mom",
+            "/#",
+            "\n",
+            "^Oh, and your friend Milo is downstairs! ",
+            "#",
+            "^speaker: Mom",
+            "/#",
+            "\n",
+            "^You two will have fun walking to school together! ",
+            "#",
+            "^speaker: Mom",
+            "/#",
+            "\n",
+            "done",
+            {
+              "#f": 1
+            }
+          ],
+          "morning_again": [
+            "^Milo's waiting by the front door, sweetie. Have fun at school! ",
+            "#",
+            "^speaker: Mom",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
           "kitchen": [
             "^Fae! A little bird told me you and your friends have a clubhouse now. ",
             "#",
@@ -3231,6 +3393,82 @@
             null
           ]
         }
+      ],
+      "morning_start": [
+        "ev",
+        false,
+        "/ev",
+        {
+          "VAR=": "dreaming",
+          "re": true
+        },
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "awake",
+          "re": true
+        },
+        "done",
+        null
+      ],
+      "front_door_morning": [
+        "^Morning, Fae! Your mom let me in. ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^Hi! Want to walk to school together? I had the WEIRDEST dream... ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^With a purple hood? ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^How did you know?! ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^Maybe some dreams are better when you share them. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^credits",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "front_door_morning_notice": [
+        "^Milo's right here. I should say hi first! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "tree_ending": [
+        "^The Ancient Tree glows brighter and brighter. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Everything goes soft and white. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^ending",
+        "/#",
+        "\n",
+        "done",
+        null
       ],
       "pup_calm": [
         "ev",
@@ -14025,12 +14263,55 @@
         "done",
         {
           "again": [
-            "^The Ancient Tree is glowing again. It's so pretty now. ",
-            "#",
-            "^speaker: Fae",
-            "/#",
-            "\n",
-            "done",
+            [
+              "^The Ancient Tree is glowing again. It's so pretty now. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Watch the tree glow",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Not yet",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "^It's like it's... waking up? ",
+                  "#",
+                  "^speaker: Milo",
+                  "/#",
+                  "\n",
+                  {
+                    "->": "tree_ending"
+                  },
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "^Not yet. We can stay here a little longer. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
             null
           ]
         }
@@ -14321,6 +14602,14 @@
         false,
         {
           "VAR=": "coach_thanked"
+        },
+        true,
+        {
+          "VAR=": "dreaming"
+        },
+        false,
+        {
+          "VAR=": "awake"
         },
         false,
         {

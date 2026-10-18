@@ -2585,29 +2585,105 @@ the old trail, the owl, and the clubhouse claim.
     MILO! He wished to be the best at everything, and the fizz got out of
     hand."
 
-## Milestone 56: Wake up **Status:** 📋 Planned
-- The end (spec 1.2; owner, 2026-10-17: a wake-up morning). Under the
-  restored Ancient Tree, a last talk with Milo: the tree glows brighter and
-  brighter and everything goes soft and white (a line tag, `# ending`). The
-  game autosaves the dream first, so the save is the restored forest with
-  the ending ready to play again.
-- Fae wakes in her bed, in morning light. Mom at the door: "Fae! Wake up,
-  sleepyhead! You'll be late for school!" A short playable morning, the
-  dream's echoes in real life: Maddie is just a cat (she follows and meows);
-  Sue and Jordan aren't there; downstairs, pancakes, Oliver, and the fridge
-  drawings; the journal under her pillow. Nothing autosaves in the morning.
-- At the front door, Milo, in a purple hoodie, with a paper plane: "Hi, Fae!
-  Want to walk to school together? I had the WEIRDEST dream..." Fae: "With a
-  purple hood?" Milo: "How did you know?!" Then THE END, the credits (the
-  friends, people, and critters Fae met, as stickers, and "Thank you for
-  playing!"), and the title. Continue goes back into the dream: the forest
-  calm, every sticker and prize still there to finish, and the tree ready to
-  play the ending again.
-- Evidence: core unit tests (the ending tag and its save, the morning's
-  people and party, no autosave in the morning, the credits, the title
-  after), a recorded run (the ending, the morning, Milo, the credits), and a
-  real-key e2e (the morning at both sizes, the credits, the title, and
-  Continue back in the forest; on WebKit too, tagged `@smoke`).
+## Milestone 56: Wake up **Status:** ✅ Completed (2026-10-18)
+- The end (spec 1.2 and 7.4; owner, 2026-10-17: a wake-up morning). Under the
+  restored Ancient Tree, Milo's talk offers [Watch the tree glow] or [Not
+  yet]. Watching, the tree glows brighter and brighter and everything goes
+  soft and white (a line tag, `# ending`). The game saves the dream first, so
+  the save is the forest, calm, with the ending ready to watch again.
+- Fae wakes in her bed, Mom at the bedroom door: "Fae! Wake up, sleepyhead!
+  You'll be late for school!" A short playable morning, the dream's echoes in
+  real life: Maddie is just a cat; Sue and Jordan aren't there; downstairs,
+  pancakes, Oliver, and the fridge drawings; the journal under her pillow,
+  full of drawings from the dream. Nothing autosaves, the lantern and the
+  flute stay quiet, and the front door waits for Milo.
+- By the front door, Milo, in a purple hoodie: "Morning, Fae! Your mom let me
+  in." He had the WEIRDEST dream. Fae: "With a purple hood?" Milo: "How did
+  you know?!" Then THE END: the credits as stickers (the friends Fae made,
+  everyone she met, and "Thank you for playing!"), and the title. Continue
+  goes back into the dream: the forest calm, every sticker and prize still
+  there to finish.
+- Evidence:
+  - Core unit tests, `finale.test.ts`: the save's upgrade and refusals; the
+    ending's one snapshot and the morning it opens; no autosave in the
+    morning; the credits' entries, a flute friend credited once befriended
+    and not just for following, and the loader's `flute/befriended` rule; the
+    credits' beat and their still world; the morning's people, stairs, and
+    front door (real steps, against the dream's open one); and Mom's second
+    talk.
+  - The recorded run `pass-party/ending.json` (`tools/sim/record-ending.ts`,
+    on from the kid run): Milo's talk, the ending and its one save, the
+    wake-up, the morning down to Milo, and the credits, 19,337 ticks; its
+    replay test, `ending-replay.test.ts`. The kid run now answers Milo's
+    second talk [Not yet] (`kid.json`, 19,070 ticks).
+  - The e2e `ending.spec.ts`: real keys from Milo's choice through the
+    credits on Chromium and WebKit (`@smoke`), ending on Bun's hash, with
+    screenshots at 1280x720 and 874x402 of the choice, the morning, the
+    kitchen, the credits, and the title. A press as the credits open doesn't
+    skip them, the save after them is the dream's, and Continue resumes the
+    dream's exact hash, in the session and after a reload. The gallery's
+    credits, the largest (every friend Fae can make and the whole catalogue)
+    and the shortest, at three sizes in both engines.
+- Gates: `just check` (109 test files, 934 tests, 55 recorded runs, purity,
+  lint) and `just build` passed. The full `just e2e` ran 831 tests on
+  Chromium and WebKit: 828 passed, 2 skipped, and 1 failed, `sound.spec.ts`'s
+  first test on Chromium, which found the audio already running before a key.
+  Nothing here touches sound; it passed in the full run before, and 6 times
+  out of 6 alone.
+- Notes and assumptions:
+  - Gemini calls: none. Milo's hoodie atlas is Milestone 55's.
+  - The ending's snapshot is the dream as it stands: the forest and its safe
+    spot. It never uses the invalid `enchanted/tree` spawn.
+  - A story with `# ending` must have the bedroom, its `bed` spawn,
+    `morning_start`, and `mom` (load validation); the core throws rather than
+    fall back.
+  - Milo's choices under the tree are sticky, so after Continue the ending
+    can be watched again. The kid run picks [Not yet]; the ending's run, which
+    starts with it, picks [Watch the tree glow].
+  - No one joins while `finale` isn't null. Without that, Jordan rejoined the
+    morning's party (`jordan_joined` stays true), and the ending's replay
+    fails.
+  - The credits step the core every tick, and the core holds the world still,
+    so the browser's ticks and hash stay Bun's through them. Closing the
+    credits with no dream snapshot throws instead of starting over.
+  - Every flute friend names `befriended`, and the loader refuses one without:
+    the Pond Pup's `pup_friend`, and the Acorn Squirrel's `squirrel_friend`
+    (Milestone 60 landed while this was built).
+  - Mom wakes Fae once; talked to again, upstairs or down, she sends her to
+    Milo. Before, both Moms replayed the whole wake-up.
+  - The credits rebuild their lists only when the entries change (they were
+    rebuilt every frame), and the shell builds the entries only while they
+    show.
+  - Sue isn't in the recorded run's credits: the `pass-party` fixture puts
+    her in the party without `sue_joined`, and the credits follow the story.
+  - Found in review: the snapshot's invalid safe spot, silent content
+    fallbacks, the credits' touch controls, friends missing from the credits,
+    whole sprite sheets drawn as credit stickers, and a ternary with two
+    identical branches.
+  - For the owner's review: Milo's two hoodies (the battle sheet's two-tone
+    patchwork, the morning's calmer one).
+- Wording for the owner:
+  - `tree_ending`: "The Ancient Tree glows brighter and brighter." /
+    "Everything goes soft and white."
+  - Milo's new `again`: "The Ancient Tree is glowing again. It's so pretty
+    now." / [Watch the tree glow] "It's like it's... waking up?" / [Not yet]
+    "Not yet. We can stay here a little longer."
+  - Wake-up: "Fae! Wake up, sleepyhead! You'll be late for school!" /
+    "...Mom? But the forest... and Milo... it was all a dream?" / "Breakfast
+    is on the table. Pancakes!" / "Oh, and your friend Milo is downstairs!" /
+    "You two will have fun walking to school together!"
+  - Mom, talked to again: "Milo's waiting by the front door, sweetie. Have
+    fun at school!"
+  - Bedroom journal: "My journal is full of drawings from the dream."
+  - Oliver: "Oliver giggles and points at the fridge drawings. They look like
+    the forest, the fairies, and a purple scribble."
+  - Front-door notice: "Milo's right here. I should say hi first!"
+  - `front_door_morning`: "Morning, Fae! Your mom let me in." / "Hi! Want to
+    walk to school together? I had the WEIRDEST dream..." / "With a purple
+    hood?" / "How did you know?!" / "Maybe some dreams are better when you
+    share them."
+  - Credits: "THE END" / "FRIENDS" / "MET ALONG THE WAY" / "Thank you for
+    playing!"
 
 ## Milestone 57: The lodge keeper **Status:** ✅ Completed (2026-10-17)
 - The owner picked more people under the chaos spell (2026-10-17; NOTES.md's

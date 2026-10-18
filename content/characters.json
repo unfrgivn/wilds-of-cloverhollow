@@ -59,6 +59,13 @@
       8
     ]
   },
+  "milo-hoodie": {
+    "atlas": "assets/characters/milo-hoodie/milo-hoodie.json",
+    "idleTicks": [
+      150,
+      8
+    ]
+  },
   "rosie": {
     "atlas": "assets/characters/rosie/rosie.json",
     "idleTicks": [

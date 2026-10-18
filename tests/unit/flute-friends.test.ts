@@ -358,7 +358,7 @@ describe("the content rules", () => {
   const pup = {
     id: "pup", name: "Pup", atlas: "a.json", box: { width: 40, height: 50 },
     walkCycleUnits: 84, sits: true, start: false, joins: "pup_with_me", flute: true,
-    command: null,
+    befriended: "pup_friend", command: null,
   };
   const command = { id: "bark", label: "Bark", resting: "napping",
     check: { kind: "ring", ticks: 60, targetTick: 39, greatWindow: 5, goodWindow: 11 } };

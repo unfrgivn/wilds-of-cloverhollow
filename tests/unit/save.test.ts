@@ -40,7 +40,7 @@ describe("save format", () => {
     // no lantern, version 3 no coins, and version 4 a critter of each kind
     // (no recurring critters); all start fresh, as does a version from the
     // future.
-    for (const version of [1, 2, 3, 4, 9])
+    for (const version of [1, 2, 3, 4, 10])
       expect(parseSave(JSON.stringify({ version, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
     expect(parseSave(JSON.stringify({ version: 5, state: { tick: 1 } }), fresh)).toBeNull();

@@ -13,6 +13,7 @@ import {
   soundCues,
   arcadeView,
   mapLandName,
+  creditEntries,
 } from "./core";
 import {
   loadContent,
@@ -27,7 +28,7 @@ import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView, type BattleCheckGeometry } from "./render/view";
-import type { AtlasImage } from "./ui/atlas";
+import { atlasImage, type AtlasImage } from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import {
@@ -53,12 +54,14 @@ import {
 } from "./core";
 import { Preferences } from "@capacitor/preferences";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
+import { createCredits } from "./ui/credits";
 import {
   continueDetail,
   titleFlow,
   type TitleInput,
   type TitleMode,
 } from "./shell/title-flow";
+import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAudio } from "./platform/audio";
 import type { AudioLevel } from "./platform/audio-settings";
 
@@ -111,6 +114,7 @@ async function boot(): Promise<void> {
   journal.onToggleAudio(sound.toggle);
   journal.onSetAudioLevel((level: AudioLevel) => sound.setLevel(level));
   const title = createTitleScreen(uiRoot);
+  const credits = createCredits(uiRoot);
   const input = createInputSource(() => {
     return combineInputFrames(
       keyboard.frame(),
@@ -167,9 +171,8 @@ async function boot(): Promise<void> {
   let saveLast: { tick: number; hash: string } | null = saveLoaded;
   let suppressSave = false;
   let saveQueue = Promise.resolve();
-  const save = (): Promise<void> => {
+  const saveState = (snapshot: State): Promise<void> => {
     if (suppressSave) return Promise.resolve();
-    const snapshot = state;
     const serialized = serializeSave(snapshot);
     const hash = stableHash(snapshot);
     saveQueue = saveQueue.then(async () => {
@@ -181,6 +184,7 @@ async function boot(): Promise<void> {
     });
     return saveQueue;
   };
+  const save = (): Promise<void> => saveState(state);
   await view.ready;
   // Each land's centre on the painted map (the journal's MAP page).
   const mapFile = "assets/ui/map/world-map.json";
@@ -298,14 +302,8 @@ async function boot(): Promise<void> {
     file: string,
     frameName: string,
   ): AtlasImage | null => {
-    const rect = sheet?.data.frames[frameName]?.frame;
-    const size = sheet?.data.meta.size;
-    if (rect === undefined || size === undefined) return null;
-    return {
-      src: assetUrl(file.replace(".json", ".png")),
-      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
-      atlas: { w: size.w, h: size.h },
-    };
+    if (sheet === undefined) return null;
+    return atlasImage(sheet.data, assetUrl(file.replace(".json", ".png")), frameName);
   };
   const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
     const critter = content.world.critters[critterId];
@@ -423,9 +421,25 @@ async function boot(): Promise<void> {
       selected: titleSelected,
       continueDetail: continueDetail(content.world, state),
     });
+    const creditsOpen = state.finale === "credits";
+    credits.render({
+      visible: creditsOpen,
+      entries: creditsOpen
+        ? creditEntries(content.world, state).map((entry) => ({
+            ...entry,
+            image: sheetFrame(
+              Assets.get<Spritesheet | undefined>(entry.image.atlas),
+              entry.image.atlas,
+              entry.image.frame,
+            ),
+          }))
+        : [],
+    });
     logTitle(titleMode);
     if (titleMode !== null) document.documentElement.dataset.title = "open";
     else delete document.documentElement.dataset.title;
+    if (state.finale === "credits") document.documentElement.dataset.credits = "open";
+    else delete document.documentElement.dataset.credits;
     if (activeBattle) document.documentElement.dataset.battle = "open";
     else delete document.documentElement.dataset.battle;
     if (battle?.talk !== null && battle?.talk !== undefined)
@@ -619,6 +633,9 @@ async function boot(): Promise<void> {
   };
   // The title reads its own input edges from here, never from the core state.
   let titlePrevious: ActionFrame = blankInput();
+  let lastFinale: State["finale"] = null;
+  let endingSnapshot: State | null = null;
+  let creditsTicks = 0;
   // Buttons held when the title closed stay hidden from the game until they're
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
@@ -647,8 +664,38 @@ async function boot(): Promise<void> {
       cancel: frame.cancel && !swallowed.has("cancel"),
       menu: frame.menu && !swallowed.has("menu"),
     };
+    if (state.finale === "credits") {
+      creditsTicks += 1;
+      if (creditsConfirmAllowed(
+        creditsTicks,
+        input.confirm && !state.previousInput.confirm,
+      )) {
+        // The credits follow the ending in the same session (the morning is
+        // never saved), so the dream it saved is always here to wake back into.
+        if (endingSnapshot === null)
+          throw new Error("the credits closed with no dream to go back to");
+        state = endingSnapshot;
+        titleMode = "continue";
+        titleSelected = "continue";
+        return;
+      }
+    }
+    // The credits step the core like any other tick: it holds the world still
+    // (spec 7.4), and the tick and its input stay the same as a replay's.
     const previous = state;
-    state = step(content.world, state, input).state;
+    const stepped = step(content.world, state, input);
+    state = stepped.state;
+    if (state.finale !== lastFinale) {
+      if (import.meta.env.DEV || import.meta.env.MODE === "harness")
+        console.log(`[cloverhollow] finale ${state.finale ?? "null"}`);
+      lastFinale = state.finale;
+      if (state.finale === "credits") creditsTicks = 0;
+    }
+    for (const event of stepped.events)
+      if (event.type === "ending-save") {
+        endingSnapshot = event.state;
+        void saveState(event.state);
+      }
     for (const cue of soundCues(previous, state, content.world)) {
       const played = sound.play(cue, state.tick);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")

@@ -73,6 +73,8 @@ export function combineInputFrames(
     ...(keyboard.lantern || touch.lantern || gamepad.lantern ? { lantern: true } : {}),
     ...(keyboard.flute || touch.flute || gamepad.flute ? { flute: true } : {}),
     choose: touch.choose,
+    // A finger on a trace (spec 3.2): only touch has one, and only while down.
+    ...(touch.pointer === undefined ? {} : { pointer: touch.pointer }),
   };
 }
 

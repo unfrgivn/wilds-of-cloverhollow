@@ -49,6 +49,11 @@ export function mountTouchControls(): TouchInput {
   const stick = document.createElement("div");
   stick.className = "touch-stick";
   root.append(stick);
+  const trace = document.createElement("div");
+  trace.className = "touch-trace";
+  trace.hidden = true;
+  root.append(trace);
+  input.setTraceRect(undefined);
   const buttons = document.createElement("div");
   buttons.className = "touch-buttons";
   root.append(buttons);
@@ -138,6 +143,25 @@ export function mountTouchControls(): TouchInput {
   root.addEventListener("pointermove", (event) => input.moveStick(event));
   root.addEventListener("pointerup", releaseStick);
   root.addEventListener("pointercancel", releaseStick);
+  trace.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    trace.setPointerCapture(event.pointerId);
+    input.beginTrace(event);
+  });
+  trace.addEventListener("pointermove", (event) => input.moveTrace(event));
+  const releaseTrace = (event: PointerEvent): void => input.endTrace(event);
+  trace.addEventListener("pointerup", releaseTrace);
+  trace.addEventListener("pointercancel", releaseTrace);
+  trace.addEventListener("lostpointercapture", releaseTrace);
+  input.setTraceElement = (rect: {
+    x: number; y: number; width: number; height: number;
+  } | undefined): void => {
+    trace.hidden = rect === undefined;
+    if (rect === undefined) { input.setTraceRect(undefined); return; }
+    input.setTraceRect(rect);
+    trace.style.left = `${rect.x}px`; trace.style.top = `${rect.y}px`;
+    trace.style.width = `${rect.width}px`; trace.style.height = `${rect.height}px`;
+  };
   document.body.append(root);
   return input;
 }

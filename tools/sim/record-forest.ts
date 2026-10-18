@@ -25,16 +25,11 @@ play.approach("mystic-pond");
 play.talk("mystic-pond");
 play.approach("ancient-tree");
 play.talk("ancient-tree");
-play.approach("npc:hooded-kid-front");
-play.talk("npc:hooded-kid-front");
-play.approach("npc:hooded-kid-front");
-play.talk("npc:hooded-kid-front");
 
 const end = play.state();
 if (end.area !== "enchanted" || end.dialogue !== null)
   throw new Error("forest run did not end in the forest with dialogue closed");
-if (world.storyVariable(end.ink, "heard_wish") !== true ||
-  world.storyVariable(end.ink, "saw_tree_kid") !== true)
+if (world.storyVariable(end.ink, "heard_wish") !== true)
   throw new Error("forest story did not advance");
 console.error(`forest: ${end.tick} ticks, ${play.script.length} segments, in ${end.area}`);
 console.log(JSON.stringify(play.script, null, 2));

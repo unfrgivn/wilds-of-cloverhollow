@@ -1,6 +1,12 @@
 {
-  "slots": 12,
+  "slots": 13,
   "catalogue": [
+    {
+      "id": "hooded-kid",
+      "name": "Milo",
+      "critter": "hooded-kid",
+      "frame": "calm_idle_01"
+    },
     {
       "id": "fountain-frog",
       "name": "Fountain Frog",

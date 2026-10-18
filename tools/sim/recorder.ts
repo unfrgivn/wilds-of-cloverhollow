@@ -50,7 +50,7 @@ export function createRecorder(world: World, initial: State): {
   through: (area: string) => void;
   knock: (move: Move, knot: string) => void;
   talk: (id: string, choices?: number[]) => void;
-  battle: (plan: string[], pause?: (state: State) => boolean) => void;
+   battle: (plan: string[], pause?: (state: State) => boolean, talkChoices?: number[]) => void;
 } {
   let state = initial;
   const script: Segment[] = [];
@@ -286,16 +286,31 @@ export function createRecorder(world: World, initial: State): {
   // can; every check GREAT (`playCheck`). `pause` holds still for half a
   // second whenever it's true of the command menu, so a watcher (the e2e)
   // can look.
-  const battle = (plan: string[], pause?: (state: State) => boolean): void => {
+  const battle = (plan: string[], pause?: (state: State) => boolean,
+    talkChoices: number[] = []): void => {
     const commands = plan.slice();
     for (let count = 0; count < 2000 && state.battle !== null; count += 1) {
       const current = state.battle;
-      if (current.phase === "command" && current.revealed >= current.message.length) {
+      if (current.phase === "talk") {
+        if (current.revealed < current.message.length || current.talk?.choices.length === 0) {
+          press();
+          continue;
+        }
+        const choice = talkChoices.shift() ?? 0;
+        while (state.battle?.phase === "talk" && state.battle.talk?.selected !== choice)
+          nudge(directions.down);
+        press();
+      } else if (current.phase === "command" && current.revealed >= current.message.length) {
         const popper = current.windUp === null ? undefined : battleCommands(world, state)
           .find((item) => item.feeling !== null && !item.disabled)?.id;
-        const wanted = commands[0] ?? popper ?? "soothe";
-        const index = battleCommands(world, state).findIndex((item) => item.id === wanted);
-        if (index < 0) throw new Error(`no ${wanted} command in this battle`);
+        const available = battleCommands(world, state);
+        while (commands.length > 0 &&
+          !available.some((item) => item.id === commands[0])) commands.shift();
+        const wanted = commands[0] ?? (current.talkMode ? "talk" : popper ?? "soothe");
+        const index = available.findIndex((item) => item.id === wanted);
+        if (index < 0)
+          throw new Error(
+            `no ${wanted} command in this battle (calm ${current.calm}, talk ${current.talkMode})`);
         if (state.battle.selected !== index) {
           nudge(directions.down);
           continue;
@@ -340,6 +355,19 @@ export function createRecorder(world: World, initial: State): {
         if (!current.results.includes("pending")) break;
         const { balance } = current;
         tick(frame(balance <= -5 ? directions.right : balance >= 5 ? directions.left : undefined));
+      }
+    } else if (check.kind === "trace") {
+      for (let current = live(); current?.kind === "trace"; current = live()) {
+        if (!current.results.includes("pending")) break;
+        const target = current.path.points[current.checkpoint];
+        if (target === undefined) break;
+        const dx = target.x - current.brush.x;
+        const dy = target.y - current.brush.y;
+        const near = Math.sqrt(dx * dx + dy * dy) <= current.spec.reachRadius;
+        const move = near ? { x: 0, y: 0 } : {
+          x: Math.sign(dx), y: Math.sign(dy),
+        };
+        tick(frame(move));
       }
     } else {
       for (const arrival of check.spec.arrivals) {

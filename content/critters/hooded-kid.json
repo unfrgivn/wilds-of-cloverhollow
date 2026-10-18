@@ -1,0 +1,336 @@
+{
+  "id": "hooded-kid",
+  "species": "hooded-kid",
+  "name": "Fizzy Kid",
+  "calmName": "Milo",
+  "atlas": "assets/critters/hooded-kid/hooded-kid.json",
+  "auraCentre": {
+    "x": 259,
+    "y": 261.87
+  },
+  "bodyCentre": {
+    "x": 242.83,
+    "y": 299.94
+  },
+  "figureHeight": 380,
+  "overworldHeight": 140,
+  "battleHeight": 280,
+  "touchRadius": 95,
+  "calmMax": 200,
+  "energyMax": 6,
+  "coins": 40,
+  "sticker": {
+    "id": "hooded-kid",
+    "name": "Milo",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "milo_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "curious",
+    "bored",
+    "grumpy"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.5,
+    "check": {
+      "kind": "trace",
+      "dryTicks": 180,
+      "brushSpeed": 20,
+      "reachRadius": 105,
+      "paths": [
+        {
+          "id": "swirl",
+          "points": [
+            {
+              "x": 500,
+              "y": 60
+            },
+            {
+              "x": 890,
+              "y": 500
+            },
+            {
+              "x": 500,
+              "y": 840
+            },
+            {
+              "x": 210,
+              "y": 500
+            },
+            {
+              "x": 500,
+              "y": 255
+            },
+            {
+              "x": 700,
+              "y": 500
+            }
+          ]
+        },
+        {
+          "id": "star",
+          "points": [
+            {
+              "x": 500,
+              "y": 310
+            },
+            {
+              "x": 623,
+              "y": 690
+            },
+            {
+              "x": 300,
+              "y": 455
+            },
+            {
+              "x": 700,
+              "y": 455
+            },
+            {
+              "x": 377,
+              "y": 690
+            },
+            {
+              "x": 500,
+              "y": 310
+            }
+          ]
+        },
+        {
+          "id": "heart",
+          "points": [
+            {
+              "x": 500,
+              "y": 780
+            },
+            {
+              "x": 180,
+              "y": 350
+            },
+            {
+              "x": 320,
+              "y": 160
+            },
+            {
+              "x": 500,
+              "y": 330
+            },
+            {
+              "x": 680,
+              "y": 160
+            },
+            {
+              "x": 820,
+              "y": 350
+            },
+            {
+              "x": 500,
+              "y": 780
+            }
+          ]
+        },
+        {
+          "id": "zigzag",
+          "points": [
+            {
+              "x": 150,
+              "y": 350
+            },
+            {
+              "x": 325,
+              "y": 650
+            },
+            {
+              "x": 500,
+              "y": 350
+            },
+            {
+              "x": 675,
+              "y": 650
+            },
+            {
+              "x": 850,
+              "y": 350
+            }
+          ]
+        }
+      ]
+    },
+    "big": {
+      "kind": "trace",
+      "dryTicks": 180,
+      "brushSpeed": 20,
+      "reachRadius": 105,
+      "paths": [
+        {
+          "id": "double-loop",
+          "points": [
+            {
+              "x": 900,
+              "y": 500
+            },
+            {
+              "x": 689,
+              "y": 633
+            },
+            {
+              "x": 500,
+              "y": 500
+            },
+            {
+              "x": 311,
+              "y": 367
+            },
+            {
+              "x": 100,
+              "y": 500
+            },
+            {
+              "x": 311,
+              "y": 633
+            },
+            {
+              "x": 500,
+              "y": 500
+            },
+            {
+              "x": 689,
+              "y": 367
+            },
+            {
+              "x": 900,
+              "y": 500
+            }
+          ]
+        },
+        {
+          "id": "long-zigzag",
+          "points": [
+            {
+              "x": 100,
+              "y": 330
+            },
+            {
+              "x": 233,
+              "y": 690
+            },
+            {
+              "x": 367,
+              "y": 330
+            },
+            {
+              "x": 500,
+              "y": 690
+            },
+            {
+              "x": 633,
+              "y": 330
+            },
+            {
+              "x": 767,
+              "y": 690
+            },
+            {
+              "x": 900,
+              "y": 330
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "The kid scribbles faster and faster! The purple fizz is swirling everywhere!",
+      "puffing": "The kid's purple scribble grows even bigger!",
+      "fizzle": "The purple scribble fades. Not one splash got through."
+    }
+  },
+  "talk": {
+    "label": "Talk",
+    "prompt": "The kid stops scribbling... and listens.",
+    "talkAt": 100,
+    "knots": [
+      "kid_talk_1",
+      "kid_talk_2",
+      "kid_talk_3"
+    ],
+    "calm": {
+      "great": 35,
+      "good": 25,
+      "miss": 20
+    }
+  },
+  "canRun": false,
+  "lines": {
+    "intro": "So you found my secret forest, Fae! Nobody can stop the BOSS!",
+    "command": "How can Fae calm the kid in the purple hood?",
+    "soothe": {
+      "great": "Fae hums a soft tune. The kid's scribbles slow to a gentle swirl!",
+      "good": "Fae hums softly. The kid pauses to listen for a moment.",
+      "miss": "The kid scribbles right over Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie bats a purple paper star through the air. The kid laughs!",
+        "good": "Maddie pounces on a scribbled star. The kid smiles.",
+        "miss": "Maddie chases a star and skids in a bright purple squiggle."
+      },
+      "cast": {
+        "great": "Sue's ribbon paints a rainbow around the scribble. The kid cheers!",
+        "good": "Sue's ribbon twirls around the purple fizz. The kid leans closer.",
+        "miss": "Sue's ribbon catches a scribble and tangles. The kid giggles."
+      },
+      "juggle": {
+        "great": "Jordan juggles three paper stars in a perfect loop. The kid claps!",
+        "good": "Jordan tosses a paper star high. The kid watches it drift down.",
+        "miss": "Jordan's paper star flutters into a purple swirl."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. The kid munches between scribbles.",
+    "burst": "The kid scribbles a giant purple squiggle in the air!",
+    "burstResult": {
+      "great": "Fae paints the scribble back into soft watercolour!",
+      "good": "Fae paints most of the scribble back into watercolour.",
+      "miss": "The purple scribble poofs into harmless fizzy dots."
+    },
+    "soothed": "The purple hood slips back... It's Milo!",
+    "rest": "Fae takes a little rest while the purple fizz settles.",
+    "run": "There is nowhere to run, but the kid gives Fae a little wave."
+  }
+}

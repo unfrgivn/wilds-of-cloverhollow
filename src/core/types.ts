@@ -14,6 +14,7 @@ export type ActionFrame = {
   lantern?: boolean;
   flute?: boolean;
   choose?: number;
+  pointer?: { x: number; y: number };
 };
 export type FollowTunables = {
   distance: number;
@@ -359,7 +360,7 @@ export type StickerCatalogue = {
 export type BattleContent = {
   // The sprite atlas of the toys a catch throws (Milestone 41).
   toyAtlas: string;
-  hints: { charge: string; chain: string; catch: string; lean: string };
+  hints: { charge: string; chain: string; catch: string; lean: string; trace: string };
   commands: {
     soothe: { label: string; check: CheckSpec };
     snack: { label: string; snackDetail: string };
@@ -382,6 +383,17 @@ export type BattleContent = {
 // The closed set of feelings (spec 8); each has an icon drawn in code.
 export type FeelingId = "zoomy" | "curious" | "bored" | "grumpy" | "hungry";
 export type Grade = "great" | "good" | "miss";
+export type BattleTalk = {
+  knot: string;
+  turn: number;
+  speaker: string | null;
+  text: string;
+  revealed: number;
+  choices: string[];
+  selected: number;
+  ended: boolean;
+  grade: Grade | null;
+};
 // How a battle check plays (spec 8): a friend's command and Soothe name one,
 // and each critter names its burst's.
 export type RingSpec = {
@@ -429,7 +441,16 @@ export type LeanSpec = {
   steer: number;
   spring: number;
 };
-export type CheckSpec = RingSpec | ChargeSpec | ChainSpec | CatchSpec | LeanSpec;
+export type TracePoint = { x: number; y: number };
+export type TracePath = { id: string; points: TracePoint[] };
+export type TraceSpec = {
+  kind: "trace";
+  dryTicks: number;
+  brushSpeed: number;
+  reachRadius: number;
+  paths: TracePath[];
+};
+export type CheckSpec = RingSpec | ChargeSpec | ChainSpec | CatchSpec | LeanSpec | TraceSpec;
 // "critter": Fae's side acts on the critter; "fae": the critter's burst.
 export type CheckSide = "critter" | "fae";
 export type BeatResult = "pending" | "hit" | "miss";
@@ -474,6 +495,17 @@ export type CheckState =
       spec: LeanSpec;
       strengths: number[];
       balance: number;
+      results: BeatResult[];
+      big: boolean;
+    }
+  | {
+      kind: "trace";
+      side: CheckSide;
+      tick: number;
+      spec: TraceSpec;
+      path: TracePath;
+      checkpoint: number;
+      brush: TracePoint;
       results: BeatResult[];
       big: boolean;
     };
@@ -522,6 +554,16 @@ export type Critter = {
   // every `every` turns, it puffs up for `bubbles` turns, feeling that many
   // things at once; its lines start it, carry it on, and end it popped.
   windUp: WindUp | null;
+  talk: {
+    label: string;
+    // The battle's line while Talk is the only command (the kid stops
+    // scribbling and listens).
+    prompt: string;
+    talkAt: number;
+    knots: [string, string, string];
+    calm: Record<Grade, number>;
+  } | null;
+  canRun: boolean;
   lines: {
     intro: string;
     command: string;
@@ -546,6 +588,7 @@ export type BattlePhase =
   | "command"
   | "check"
   | "result"
+  | "talk"
   | "burst"
   | "burstResult"
   // A wind-up popped all over: the critter lets go of nothing (Milestone 50).
@@ -587,6 +630,9 @@ export type Battle = {
   // which are popped, and the turns left before it lets go (this one too).
   // `feelings` wait meanwhile.
   windUp: { feelings: FeelingId[]; popped: boolean[]; left: number } | null;
+  talkMode?: boolean;
+  talk?: BattleTalk | null;
+  talkTurns?: number;
   // Set as the reward shows: the species' sticker if it's new, else null.
   rewardSticker: string | null;
   phaseTicks: number;
@@ -629,6 +675,15 @@ export type BattleCheckView =
       side: CheckSide;
       balance: number;
       puffs: { blowing: boolean; progress: number; force: number; result: BeatResult }[];
+    }
+  | {
+      kind: "trace";
+      side: CheckSide;
+      brush: TracePoint;
+      path: TracePath;
+      checkpoint: number;
+      results: BeatResult[];
+      dry: number;
     };
 export type BattleView = {
   critterId: string;
@@ -670,6 +725,7 @@ export type BattleView = {
   puff: number;
   lastGrade: Grade | null;
   rewardSticker: string | null;
+  talk: BattleTalk | null;
 };
 // `party` overrides who starts in the party (test fixtures); the default is
 // every roster member with `start: true`, in roster order.

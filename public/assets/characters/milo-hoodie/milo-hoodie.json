@@ -1,8 +1,32 @@
 {
   "frames": {
-    "idle_down_01": {
+    "down_idle_01": {
       "frame": {
         "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 448,
+        "h": 448
+      },
+      "sourceSize": {
+        "w": 448,
+        "h": 448
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.9799107142857143
+      }
+    },
+    "down_idle_02": {
+      "frame": {
+        "x": 448,
         "y": 0,
         "w": 448,
         "h": 448
@@ -27,13 +51,14 @@
   },
   "animations": {
     "idle_down": [
-      "idle_down_01"
+      "down_idle_01",
+      "down_idle_02"
     ]
   },
   "meta": {
-    "image": "hooded-kid-front.png",
+    "image": "milo-hoodie.png",
     "size": {
-      "w": 448,
+      "w": 896,
       "h": 448
     },
     "scale": "1",

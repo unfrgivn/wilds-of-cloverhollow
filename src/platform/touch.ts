@@ -5,8 +5,19 @@ import { stickVector } from "./stick";
 const RADIUS = 56;
 const BUTTONS = ["confirm", "cancel", "menu", "lantern", "flute"] as const;
 type Button = (typeof BUTTONS)[number];
+export type TraceRect = { x: number; y: number; width: number; height: number };
+
+/** Maps a CSS pointer position into the check's authored 0..1000 square. */
+export function tracePointer(point: Point, rect: TraceRect): Point {
+  const clamp = (value: number): number => Math.max(0, Math.min(1000, value));
+  return {
+    x: Math.round(clamp((point.x - rect.x) / rect.width * 1000)),
+    y: Math.round(clamp((point.y - rect.y) / rect.height * 1000)),
+  };
+}
 
 export class TouchInput {
+  setTraceElement: (rect: TraceRect | undefined) => void = () => undefined;
   private readonly buttons = new Set<Button>();
   private readonly tapped = new Set<Button>();
   private choice: number | undefined;
@@ -20,6 +31,10 @@ export class TouchInput {
   // An arrow tapped since the last sample: like a tapped button, it counts
   // for the next frame even if let go before it.
   private arrowTap: Point | undefined;
+  private traceId: number | undefined;
+  private traceRect: TraceRect | undefined;
+  private tracePoint: Point | undefined;
+  private traceTap: Point | undefined;
 
   frame(): ActionFrame {
     const arrowHeld = this.arrow.x !== 0 || this.arrow.y !== 0;
@@ -27,6 +42,7 @@ export class TouchInput {
     return {
       ...blankInput(),
       move: this.stickId === undefined && arrow !== undefined ? arrow : this.move,
+      pointer: this.traceId === undefined ? this.traceTap : this.tracePoint,
       confirm: this.hasButton("confirm"),
       cancel: this.hasButton("cancel"),
       menu: this.hasButton("menu"),
@@ -59,6 +75,24 @@ export class TouchInput {
     this.move = { x: 0, y: 0 };
   }
 
+  setTraceRect(rect: TraceRect | undefined): void { this.traceRect = rect; }
+  beginTrace(event: PointerEvent): void {
+    if (this.traceId !== undefined || this.traceRect === undefined) return;
+    this.traceId = event.pointerId;
+    this.traceTap = undefined;
+    this.tracePoint = tracePointer({ x: event.clientX, y: event.clientY }, this.traceRect);
+  }
+  moveTrace(event: PointerEvent): void {
+    if (event.pointerId !== this.traceId || this.traceRect === undefined) return;
+    this.tracePoint = tracePointer({ x: event.clientX, y: event.clientY }, this.traceRect);
+  }
+  endTrace(event: PointerEvent): void {
+    if (event.pointerId !== this.traceId) return;
+    this.traceTap = this.tracePoint;
+    this.traceId = undefined;
+    this.tracePoint = undefined;
+  }
+
   setButton(button: Button, pressed: boolean): void {
     if (pressed) this.buttons.add(button);
     else this.buttons.delete(button);
@@ -68,6 +102,7 @@ export class TouchInput {
     const frame = this.frame();
     this.tapped.clear();
     this.arrowTap = undefined;
+    this.traceTap = undefined;
     this.choice = undefined;
     return frame;
   }

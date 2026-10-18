@@ -18,6 +18,8 @@ export type CheckInput = {
   confirmHeld: boolean;
   lane: number;
   lean: Lean;
+  pointer?: { x: number; y: number };
+  move?: { x: number; y: number };
 };
 
 // Fae's balance in a lean runs from -100 (blown over backward) to 100
@@ -61,6 +63,21 @@ export function createCheck(
       results: spec.starts.map(() => "pending"),
       big,
     };
+  if (spec.kind === "trace") {
+    const path = spec.paths[picks[0] ?? 0] ?? spec.paths[0] ?? { id: "", points: [] };
+    const points = path?.points ?? [];
+    return {
+      kind: "trace",
+      side,
+      tick: 0,
+      spec: { ...spec, paths: spec.paths.map((item) => ({ ...item, points: [...item.points] })) },
+      path: { ...path, points: [...points] },
+      checkpoint: 0,
+      brush: { ...(points[0] ?? { x: 0, y: 0 }) },
+      results: points.map(() => "pending"),
+      big,
+    };
+  }
   return {
     kind: "chain",
     side,
@@ -93,7 +110,59 @@ export function stepCheck(
     return stepCharge(check, tick, input.confirmEdge, input.confirmHeld);
   if (check.kind === "catch") return stepCatch(check, tick, input.lane);
   if (check.kind === "lean") return stepLean(check, tick, input.lean);
+  if (check.kind === "trace") return stepTrace(check, tick, input.pointer, input.move);
   return stepChain(check, tick, input.confirmEdge);
+}
+
+function distance(x: number, y: number): number {
+  return Math.sqrt(x * x + y * y);
+}
+
+export function stepTrace(
+  check: Extract<CheckState, { kind: "trace" }>,
+  tick: number,
+  pointer: { x: number; y: number } | undefined,
+  move: { x: number; y: number } | undefined,
+): { check: CheckState; grade: Grade | null } {
+  const results = [...check.results];
+  let checkpoint = check.checkpoint;
+  // The brush is authored on the first point, so the first point is resolved
+  // on the first tick even if the player's first movement leaves it.
+  const startedAtFirst = checkpoint === 0 && results[0] === "pending";
+  if (startedAtFirst) {
+    results[0] = "hit";
+    checkpoint = 1;
+  }
+  const target = pointer ?? move ?? { x: 0, y: 0 };
+  const dx = target.x - check.brush.x;
+  const dy = target.y - check.brush.y;
+  const magnitude = pointer === undefined ? distance(target.x, target.y) : distance(dx, dy);
+  const scale = magnitude === 0 ? 0 : pointer === undefined
+    ? (magnitude > 1 ? 1 / magnitude : 1) * check.spec.brushSpeed
+    : Math.min(check.spec.brushSpeed, magnitude) / magnitude;
+  const nextBrush = pointer === undefined
+    ? { x: check.brush.x + target.x * scale, y: check.brush.y + target.y * scale }
+    : { x: check.brush.x + dx * scale, y: check.brush.y + dy * scale };
+  const brush = {
+    x: Math.max(0, Math.min(1000, nextBrush.x)),
+    y: Math.max(0, Math.min(1000, nextBrush.y)),
+  };
+  if (!startedAtFirst && results.some((result) => result === "pending") &&
+      checkpoint < check.path.points.length) {
+    const point = check.path.points[checkpoint];
+    if (point !== undefined &&
+        distance(brush.x - point.x, brush.y - point.y) <= check.spec.reachRadius) {
+      results[checkpoint] = "hit";
+      checkpoint += 1;
+    }
+  }
+  const dried = tick >= check.spec.dryTicks;
+  if (dried) {
+    for (let index = 0; index < results.length; index += 1)
+      if (results[index] === "pending") results[index] = "miss";
+  }
+  const grade = results.some((result) => result === "pending") ? null : gradeHits(results);
+  return { check: { ...check, tick, brush, checkpoint, results }, grade };
 }
 
 /** Grades charge release, timeout, and overwind without accepting menu input. */
@@ -241,6 +310,8 @@ export function checkDraws(spec: CheckSpec): number {
     ? spec.arrivals.length
     : spec.kind === "lean"
       ? spec.starts.length
+      : spec.kind === "trace"
+        ? 1
       : 0;
 }
 
@@ -249,6 +320,8 @@ export function checkDraws(spec: CheckSpec): number {
  * likely), or a catch toy's lane.
  */
 export function pickFromDraw(spec: CheckSpec, value: number): number {
+  if (spec.kind === "trace")
+    return Math.min(spec.paths.length - 1, Math.floor(value * spec.paths.length));
   if (spec.kind !== "lean") return laneFromDraw(value);
   const index = Math.min(spec.forces.length - 1, Math.floor(value * spec.forces.length));
   return spec.forces[index] ?? 0;
@@ -315,6 +388,16 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
       }),
     };
   }
+  if (check.kind === "trace")
+    return {
+      kind: "trace",
+      side: check.side,
+      brush: check.brush,
+      path: check.path,
+      checkpoint: check.checkpoint,
+      results: check.results,
+      dry: Math.max(0, Math.min(1, check.tick / check.spec.dryTicks)),
+    };
   return {
     kind: "chain",
     side: check.side,
@@ -339,6 +422,7 @@ export function checkHint(check: CheckState, hints: BattleContent["hints"]): str
     return check.tick < (check.spec.arrivals[0] ?? 0) ? hints[check.kind] : null;
   if (check.kind === "lean")
     return check.tick < (check.spec.starts[0] ?? 0) ? hints.lean : null;
+  if (check.kind === "trace") return check.results[1] === "pending" ? hints.trace : null;
   return null;
 }
 

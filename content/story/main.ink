@@ -73,7 +73,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
-{saw_tree_kid: The kid in the purple hood is waiting under the Ancient Tree. They called it THEIR secret forest... and they knew my name! # speaker: Fae}
+{heard_wish and not calmed("hooded-kid"): The kid in the purple hood is waiting under the Ancient Tree. Their wish made all this fizz! # speaker: Fae}
+{calmed("hooded-kid"): The kid in the purple hood was MILO! He wished to be the best at everything, and the fizz got out of hand. # speaker: Fae}
 {heard_wish: The fairies told me the Ancient Tree dreams the whole land, and a wish made the Mystic Pond fizz purple. # speaker: Fae}
 {seal_open: The bell-flower seal opened, and a warm forest glow shone beyond the stones. # speaker: Fae}
 {rope_bridge: I pulled the old rope bridge across the misty gully with my lasso. # speaker: Fae}
@@ -816,10 +817,49 @@ So the fizz works on people too... # speaker: Fae
 That kid set a new record on Star Racer, then scribbled out their initials in purple marker. Sneaky! # speaker: Mr. Pip
 Thank you, Fae. You and your friends can play here any time. # speaker: Mr. Pip
 -> DONE
+
 = again
 Mr. Pip polishes the claw machine. "Come back and play any time!" # speaker: Mr. Pip
 -> DONE
 
+=== kid_talk_1 ===
+You don't even know who I am! # speaker: Hooded Kid
+* [You beat the Star Racer high score, then scribbled out your initials.]
+    ...You figured THAT out? # speaker: Hooded Kid # grade: great
+    -> DONE
+* [You left a Star Racer token in your stash.]
+    Maybe. Lots of kids play Star Racer. # speaker: Hooded Kid # grade: good
+    -> DONE
+* [You're the boss of the whole forest!]
+    Ha! I WISH. ...Wait. That's kind of what I wished for. # speaker: Hooded Kid # grade: miss
+    -> DONE
+-> DONE
+
+=== kid_talk_2 ===
+Nobody ever notices me anyway... # speaker: Hooded Kid
+* [I notice you! The paper planes, the star doodles...]
+    You... you saw those? # speaker: Hooded Kid # grade: great
+    -> DONE
+* [Everybody noticed the scribbles.]
+    That's not the same thing. # speaker: Hooded Kid # grade: good
+    -> DONE
+* [Maybe nobody likes purple?]
+    Hey! Purple is the BEST color. # speaker: Hooded Kid # grade: miss
+    -> DONE
+-> DONE
+
+=== kid_talk_3 ===
+So go on, Fae. Who am I? # speaker: Hooded Kid
+* [Milo?]
+    ...Yeah. It's me. # speaker: Hooded Kid # grade: great
+    -> DONE
+* [Someone from my class.]
+    Warmer... but who? # speaker: Hooded Kid # grade: good
+    -> DONE
+* [Rosie?]
+    Nope! Rosie's way better at kites than me. # speaker: Hooded Kid # grade: miss
+    -> DONE
+-> DONE
 === claw_machine ===
 {not calmed("arcade-keeper"):
     The machine is all fizzy with purple scribbles. # speaker: Fae
@@ -1125,7 +1165,7 @@ VAR mist_notes = 0
 VAR mist_right = true
 VAR mist_tune = ""
 VAR heard_wish = false
-VAR saw_tree_kid = false
+VAR milo_revealed = false
 
 === oak_squirrel_calm ===
 {oak_squirrel_calm > 1: -> again}
@@ -1281,6 +1321,9 @@ VAR garden_ripe = false
 // The core runs this after every calm (spec 7). It only counts: it never
 // prints. The garden sprouts after one calm and ripens after three.
 === on_calm ===
+{calmed("hooded-kid"):
+    ~ forest_fizzy = false
+}
 { garden_planted and not garden_ripe:
     ~ garden_calms += 1
     { garden_calms >= 1:
@@ -1611,13 +1654,17 @@ The Ancient Tree is older than every tree, even the trees that think they are ve
 Hee hee! The pond bubbles made my shoes go squeak. # speaker: Peach Fairy
 -> DONE
 
-=== forest_kid ===
-{ saw_tree_kid: -> again }
-~ saw_tree_kid = true
-So you found my secret forest, Fae! # speaker: Hooded Kid
-Nobody can stop the BOSS. Not even you! # speaker: Hooded Kid
-We'll see about that! # speaker: Fae
+=== milo_calm ===
+{ milo_revealed: -> again }
+~ milo_revealed = true
+Fae... it's me. I'm really sorry about all the scribbles. # speaker: Milo
+My paper plane flew into the mist, so I followed it. I found this forest and wished at the Mystic Pond to be the best at everything, even Star Racer. # speaker: Milo
+I drank from the pond, and the fizz got out of hand. Fizz-fast, I could zip from our classroom to the hall and back before anyone noticed. That's how I peeked in, then sat back down. # speaker: Milo
+I only wanted to be noticed. # speaker: Milo
+I always notice you, Milo. You're my friend. # speaker: Fae
+{sue_joined: Sue gives Milo a small wave. "We noticed you too." # speaker: Sue}
+{jordan_joined: Jordan smiles. "You don't have to be the best at everything." # speaker: Jordan}
 -> DONE
 = again
-You again? The BOSS is busy, Fae! # speaker: Hooded Kid
+The Ancient Tree is glowing again. It's so pretty now. # speaker: Fae
 -> DONE

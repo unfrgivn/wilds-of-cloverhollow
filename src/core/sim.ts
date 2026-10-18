@@ -278,7 +278,13 @@ function moveOn(battle: Battle, text: string, phase: Battle["phase"]): Battle {
 // and one more is drawn.
 function nextTurn(world: World, state: State, battle: Battle, critter: Critter): State {
   const turn = battle.turn + 1;
-  const fresh = { ...moveOn(battle, critter.lines.command, "command"), turn, answered: false };
+  const talk = critter.talk;
+  const talkMode = talk !== null && battle.calm >= talk.talkAt;
+  if (talkMode && talk === null) throw new Error(`Critter ${critter.id} has no Talk content`);
+  const label = talkMode ? talk.prompt : critter.lines.command;
+  const fresh = { ...moveOn(battle, label, "command"), turn, answered: false, talkMode };
+  if (talkMode)
+    return { ...state, battle: { ...fresh, feelings: [], windUp: null } };
   // After a caught opening's burst, turn 1's feelings are the first drawn.
   if (battle.turn === 0) return { ...state, battle: fresh };
   const going = battle.windUp;
@@ -795,6 +801,12 @@ export function battleCommands(
   if (battle === null) return [];
   const critter = world.critters[battle.critterId];
   if (critter === undefined) return [];
+  const talkMode = battle.talkMode === true ||
+    (critter.talk !== null && battle.calm >= critter.talk.talkAt);
+  if (talkMode && critter.talk !== null)
+    return [{
+      id: "talk", label: critter.talk.label, detail: null, disabled: false, feeling: null,
+    }];
   // What the critter feels, on the command that answers it (its badge):
   // this turn's feeling, or each of a wind-up's bubbles not yet popped.
   const going = battle.windUp;
@@ -833,13 +845,13 @@ export function battleCommands(
       disabled: state.snacks === 0,
       feeling: feeling("snack"),
     },
-    {
+    ...(critter.canRun ? [{
       id: "run",
       label: world.battle.commands.run.label,
       detail: null,
       disabled: false,
       feeling: null,
-    },
+    }] : []),
   ];
 }
 
@@ -928,6 +940,7 @@ export function battleView(world: World, state: State): BattleView | null {
     puff: going === null ? 0 : going.feelings.length - going.left + 1,
     lastGrade: battle.lastGrade,
     rewardSticker: battle.rewardSticker,
+    talk: battle.talk ?? null,
   };
 }
 
@@ -960,6 +973,42 @@ function startCheck(
     message: "",
     revealed: 0,
   };
+}
+
+function talkLine(
+  result: ReturnType<typeof runInk>,
+  previous: NonNullable<Battle["talk"]> | null,
+): NonNullable<Battle["talk"]> {
+  const line = result.line;
+  return {
+    knot: previous?.knot ?? "",
+    turn: previous?.turn ?? 0,
+    speaker: line?.speaker ?? null,
+    text: line?.text ?? "",
+    revealed: 0,
+    choices: result.choices,
+    selected: 0,
+    ended: result.ended,
+    grade: null,
+  };
+}
+
+function taggedGrade(result: ReturnType<typeof runInk>): Grade | null {
+  const tag = result.line?.tags.find((item) => /^grade:\s*(great|good|miss)\s*$/.test(item.trim()));
+  const grade = tag?.trim().slice("grade:".length).trim();
+  return grade === "great" || grade === "good" || grade === "miss" ? grade : null;
+}
+
+function talkContent(critter: Critter): NonNullable<Critter["talk"]> {
+  if (critter.talk === null) throw new Error(`Critter ${critter.id} has no Talk content`);
+  return critter.talk;
+}
+
+// A kind with Talk content cannot be soothed by ordinary commands before its
+// questions are answered. The final graded answer is the only thing that may
+// fill the last point of its meter.
+function calmLimit(critter: Critter): number {
+  return critter.talk === null ? critter.calmMax : critter.calmMax - 1;
 }
 
 // The party while Fae is frozen (a battle, a dialogue, the journal): nobody
@@ -995,6 +1044,71 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     party: restingParty(state.party),
   };
   let next = { ...battle, phaseTicks: battle.phaseTicks + 1 };
+  if (next.phase === "talk" && next.talk !== undefined && next.talk !== null) {
+    const talk = next.talk;
+    if (talk.revealed < talk.text.length)
+      return {
+        ...nextBase,
+        battle: {
+          ...next,
+          talk: {
+            ...talk,
+            revealed: confirm
+              ? talk.text.length
+              : Math.min(talk.text.length, talk.revealed + world.tunables.interact.revealPerTick),
+          },
+        },
+      };
+    const count = talk.choices.length;
+    const tapped = input.choose !== undefined && input.choose >= 0 && input.choose < count
+      ? input.choose : undefined;
+    const chosen = tapped ?? (confirm && count > 0 ? talk.selected : undefined);
+    if (chosen !== undefined) {
+      const result = runInk(
+        world.story, state.ink, { type: "choose", index: chosen }, inkFacts(world, state),
+      );
+      const grade = taggedGrade(result);
+      const amount = grade === null ? 0 : talkContent(critter).calm[grade];
+      const completedTalk = talk.turn === talkContent(critter).knots.length - 1;
+      const updated = { ...talkLine(result, talk), knot: talk.knot, turn: talk.turn, grade };
+      return {
+        ...nextBase,
+        ink: result.ink,
+        battle: {
+          ...next,
+          talk: updated,
+          calm: completedTalk ? critter.calmMax : Math.min(
+            calmLimit(critter), next.calm + amount,
+          ),
+          lastGrade: grade,
+        },
+      };
+    }
+    if (count > 0) {
+      const up = input.move.y < -0.5 && state.previousInput.move.y >= -0.5;
+      const down = input.move.y > 0.5 && state.previousInput.move.y <= 0.5;
+      if (up || down)
+        return {
+          ...nextBase,
+          battle: {
+            ...next,
+            talk: { ...talk, selected: (talk.selected + (down ? 1 : -1) + count) % count },
+          },
+        };
+      return { ...nextBase, battle: next };
+    }
+    if (!confirm) return { ...nextBase, battle: next };
+    const result = runInk(world.story, state.ink, { type: "next" }, inkFacts(world, state));
+    if (result.line !== null || result.choices.length > 0)
+      return { ...nextBase, ink: result.ink, battle: { ...next, talk: talkLine(result, talk) } };
+    const completed = { ...next, talk: null, lastGrade: talk.grade };
+    if (completed.calm >= critter.calmMax)
+      return {
+        ...nextBase,
+        battle: moveOn({ ...completed, talkMode: false }, critter.lines.soothed, "soothed"),
+      };
+    return nextTurn(world, nextBase, { ...completed, phase: "command" }, critter);
+  }
   if (next.revealed < next.message.length)
     return {
       ...nextBase,
@@ -1025,13 +1139,17 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     if (next.phase === "intro") {
       // The first turn: three feelings in a row, once a friend has joined. A
       // critter that caught Fae bursts first, on turn 0 (Milestone 51).
-      const [feelings, rolled] = feelingsOn(world, state)
+      const talkValue = critter.talk;
+      const talkMode = talkValue !== null && next.calm >= talkValue.talkAt;
+      if (talkMode && talkValue === null)
+        throw new Error(`Critter ${critter.id} has no Talk content`);
+      const [feelings, rolled] = !talkMode && feelingsOn(world, state)
         ? drawFeelings(world, nextBase, critter, 3)
         : [[], nextBase];
       const opening = next.turn === 0
         ? moveOn(next, critter.lines.burst, "burst")
-        : moveOn(next, critter.lines.command, "command");
-      return { ...rolled, battle: { ...opening, feelings } };
+        : moveOn(next, talkMode ? talkValue.prompt : critter.lines.command, "command");
+      return { ...rolled, battle: { ...opening, feelings: talkMode ? [] : feelings, talkMode } };
     }
     else if (next.phase === "result") {
       // Calm enough, it's soothed, any wind-up over with it. In a wind-up it
@@ -1164,6 +1282,40 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ...nextBase,
         battle: battleMessage(next, critter.lines.run, "run"),
       };
+    if (chosen.id === "talk" && critter.talk !== null) {
+      const content = talkContent(critter);
+      const turn = next.talkTurns ?? 0;
+      const knot = content.knots[turn];
+      if (knot === undefined)
+        throw new Error(`Talk turn ${turn} is out of range for ${critter.id}`);
+      const result = runInk(
+        world.story, state.ink, { type: "start", knot }, inkFacts(world, state),
+      );
+      return {
+        ...nextBase,
+        ink: result.ink,
+        battle: {
+          ...next,
+          phase: "talk",
+          message: "",
+          revealed: 0,
+          talk: {
+            ...talkLine(result, {
+              knot, turn, speaker: null, text: "", revealed: 0, choices: [], selected: 0,
+              ended: false, grade: null,
+            }),
+            knot,
+            turn,
+          },
+          check: null,
+          feelings: [],
+          windUp: null,
+          talkMode: true,
+          talkTurns: turn + 1,
+          phaseTicks: 0,
+        },
+      };
+    }
     // Whether this turn's choice answers what the critter feels: this
     // turn's feeling, or in a wind-up the first bubble it pops.
     const going = next.windUp;
@@ -1187,7 +1339,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
             next.energy + critter.commands.snack.energy,
           ),
           calm: Math.min(
-            critter.calmMax,
+            calmLimit(critter),
             next.calm + critter.commands.snack.calm +
               (answered ? world.battle.feelingBonus : 0),
           ),
@@ -1225,6 +1377,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       confirmHeld: input.confirm,
       lane: laneFromStick(input.move.y),
       lean: leanFromStick(input.move.x),
+      move: input.move,
+      pointer: input.pointer,
     });
     const result = stepped.grade;
     // The check stays in the battle through its result, as it ended: the
@@ -1240,7 +1394,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
             ? command.numbers.good
             : 0;
       const calm = Math.min(
-        critter.calmMax,
+        calmLimit(critter),
         next.calm + command.numbers.calm + bonus +
           (next.answered ? world.battle.feelingBonus : 0),
       );
@@ -2053,6 +2207,9 @@ function stepTick(
       lanternPeek: false,
       turn: !friend && jump === "caught" ? 0 : 1,
       windUp: null,
+      talkMode: false,
+      talk: null,
+      talkTurns: 0,
       rewardSticker: null,
       phaseTicks: 0,
     };

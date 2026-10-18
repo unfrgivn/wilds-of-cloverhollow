@@ -17,7 +17,16 @@ export function isActionFrame(value: unknown): value is ActionFrame {
     && (value.lantern === undefined || typeof value.lantern === "boolean")
     && (value.flute === undefined || typeof value.flute === "boolean")
     && (value.choose === undefined || typeof value.choose === "number")
+    && (value.pointer === undefined || pointer(value.pointer))
   );
+}
+
+function pointer(value: unknown): value is { x: number; y: number } {
+  if (!record(value)) return false;
+  const x = value.x;
+  const y = value.y;
+  return typeof x === "number" && typeof y === "number" && Number.isInteger(x) &&
+    Number.isInteger(y) && x >= 0 && x <= 1000 && y >= 0 && y <= 1000;
 }
 
 export function parseScript(

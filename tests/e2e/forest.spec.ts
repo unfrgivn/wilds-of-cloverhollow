@@ -23,7 +23,6 @@ test("real keys explore the Enchanted Forest", async ({ page }) => {
   };
   let arrived = false;
   let lore = false;
-  let taunt = false;
   await playAfter(page, "tests/sim/scripts/pass-party/mist.json", path, async () => {
     const state = await readState(page);
     const info = await renderInfo(page);
@@ -31,8 +30,9 @@ test("real keys explore the Enchanted Forest", async ({ page }) => {
       arrived = true;
       expect(info.ambient).toHaveLength(7);
       expect(info.npcs.map((npc) => npc.id)).toEqual(expect.arrayContaining([
-        "hooded-kid-front", "fairy-lavender", "fairy-mint", "fairy-sky", "fairy-peach",
+        "fairy-lavender", "fairy-mint", "fairy-sky", "fairy-peach",
       ]));
+      expect(info.critters.map((critter) => critter.kind)).toContain("hooded-kid");
       expect(info.props.find((prop) => prop.id === "tree-scribbles"))
         .toMatchObject({ state: "fizzy", hidden: false });
       expect(info.props.find((prop) => prop.id === "pond-fizz"))
@@ -46,14 +46,7 @@ test("real keys explore the Enchanted Forest", async ({ page }) => {
       expect(state.dialogue.text).toContain("Ancient Tree dreams");
       await take("forest-lavender-lore");
     }
-    if (!taunt && state.dialogue?.knot === "forest_kid" &&
-      state.dialogue.revealed >= state.dialogue.text.length) {
-      taunt = true;
-      expect(state.dialogue.text).toContain("secret forest");
-      expect(info.area).toBe("enchanted");
-      await take("forest-kid-taunt");
-    }
   });
-  expect({ arrived, lore, taunt }).toEqual({ arrived: true, lore: true, taunt: true });
+  expect({ arrived, lore }).toEqual({ arrived: true, lore: true });
   expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
 });

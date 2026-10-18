@@ -437,34 +437,6 @@
   ],
   "npcs": [
     {
-      "id": "hooded-kid-front",
-      "point": {
-        "x": 1130,
-        "y": 730
-      },
-      "facing": "down",
-      "knot": "forest_kid",
-      "prompt": "Talk",
-      "footprint": [
-        [
-          1115,
-          720
-        ],
-        [
-          1145,
-          720
-        ],
-        [
-          1145,
-          740
-        ],
-        [
-          1115,
-          740
-        ]
-      ]
-    },
-    {
       "id": "fairy-lavender",
       "point": {
         "x": 850,
@@ -577,7 +549,15 @@
       ]
     }
   ],
-  "critters": [],
+  "critters": [
+    {
+      "id": "hooded-kid",
+      "point": {
+        "x": 1130,
+        "y": 730
+      }
+    }
+  ],
   "props": [
     {
       "id": "stone-lower-right",

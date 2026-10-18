@@ -1,7 +1,30 @@
 import "./battle.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { feelingMarkup, heartMarkup, icon } from "./icons";
-import type { FeelingId } from "../core";
+import type { BattleTalk, FeelingId } from "../core";
+import type { DialogueView } from "./sticker";
+
+/** Project battle Talk's core dialogue state onto the shared sticker dialogue. */
+export function battleTalkDialogueView(talk: BattleTalk): DialogueView {
+  const complete = talk.revealed >= talk.text.length;
+  return {
+    speaker: talk.speaker,
+    text: talk.text,
+    revealed: talk.revealed,
+    choices: complete ? talk.choices.map((text) => ({ text })) : [],
+    selected: talk.selected,
+    canAdvance: complete && talk.choices.length === 0,
+  };
+}
+
+/**
+ * While a Talk question's answers are on screen the HUD steps aside (spec
+ * 8.1): on a phone the band between it and the dialogue box is too short for
+ * three 44 px answers, and the meter only moves once an answer is picked.
+ */
+export function talkChoicesShown(talk: BattleTalk | null): boolean {
+  return talk !== null && talk.choices.length > 0 && talk.revealed >= talk.text.length;
+}
 
 export type BattleHudView = {
   visible: boolean;
@@ -129,6 +152,18 @@ export type BattleCheckView =
       hint: string | null;
       // The top centre of the hint sticker.
       hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "trace";
+      rect: { x: number; y: number; width: number; height: number };
+      brush: { x: number; y: number };
+      points: { x: number; y: number }[];
+      checkpoint: number;
+      dry: number;
+      results: ("pending" | "hit" | "miss")[];
+      grade: TimingGrade | null;
+      hint: string | null;
+      hintAt: { x: number; y: number };
     };
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
@@ -165,11 +200,21 @@ export function createBattleCheck(root: HTMLElement): {
   const star = starIcon();
   const puffDots = element("div", "battle-lean-puffs");
   leanLayer.append(...swooshes, track, star, puffDots);
+  const traceLayer = element("div", "battle-trace");
+  const traceSvg = svgElement("svg", "battle-trace-svg");
+  const tracePath = svgElement("path", "battle-trace-path");
+  const tracePaint = svgElement("path", "battle-trace-paint");
+  // The paint goes over the purple scribble: Fae paints it back.
+  traceSvg.append(tracePath, tracePaint);
+  const traceDots = element("div", "battle-trace-dots");
+  const traceBrush = element("div", "battle-trace-brush");
+  const traceDry = element("div", "battle-trace-dry");
+  traceLayer.append(traceSvg, traceDots, traceBrush, traceDry);
   const hint = element("div", "battle-check-hint");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
   grade.hidden = true;
-  root.append(ring, meter, chain, catchLayer, leanLayer, hint, grade);
+  root.append(ring, meter, chain, catchLayer, leanLayer, traceLayer, hint, grade);
   const icons: HTMLElement[] = [];
   const toyNodes: { node: HTMLElement; src: string }[] = [];
   const dotNodes: HTMLElement[] = [];
@@ -184,6 +229,7 @@ export function createBattleCheck(root: HTMLElement): {
       hide(chain, view?.kind !== "chain");
       hide(catchLayer, view?.kind !== "catch");
       hide(leanLayer, view?.kind !== "lean");
+      hide(traceLayer, view?.kind !== "trace");
       hide(hint, view?.hint === null || view === null);
       if (view === null) {
         grade.hidden = true;
@@ -319,6 +365,39 @@ export function createBattleCheck(root: HTMLElement): {
         });
         // Over Fae's head: above the track it would run into the HUD.
         renderGrade(grade, view.grade, x, y + 3 * height);
+      } else if (view.kind === "trace") {
+        const { rect } = view;
+        traceLayer.style.left = `${rect.x}px`; traceLayer.style.top = `${rect.y}px`;
+        traceLayer.style.width = `${rect.width}px`; traceLayer.style.height = `${rect.height}px`;
+        traceSvg.setAttribute("viewBox", "0 0 1000 1000");
+        const pathData = (points: { x: number; y: number }[]): string =>
+          points.map((point, index) => `${index === 0 ? "M" : "L"}${point.x} ${point.y}`)
+            .join(" ");
+        const d = pathData(view.points);
+        tracePath.setAttribute("d", d);
+        // Painted from the start through every point reached, up to the brush.
+        const painted = pathData([...view.points.slice(0, Math.max(1, view.checkpoint)),
+          view.brush]);
+        tracePaint.setAttribute("d", painted);
+        while (traceDots.children.length < view.points.length)
+          traceDots.append(element("span", "battle-trace-dot"));
+        // A shorter scribble after a longer one leaves no stale dots behind.
+        while (traceDots.children.length > view.points.length)
+          traceDots.lastElementChild?.remove();
+        [...traceDots.querySelectorAll<HTMLElement>(".battle-trace-dot")].forEach((dot, index) => {
+          const point = view.points[index]; if (point === undefined) return;
+          dot.style.left = `${point.x / 10}%`; dot.style.top = `${point.y / 10}%`;
+          dot.classList.toggle("is-next", index === view.checkpoint);
+          dot.classList.toggle("is-hit", view.results[index] === "hit");
+          dot.classList.toggle("is-miss", view.results[index] === "miss");
+        });
+        traceBrush.style.left = `${view.brush.x / 10}%`;
+        traceBrush.style.top = `${view.brush.y / 10}%`;
+        traceDry.style.setProperty("--dry", String(view.dry));
+        // On the notched phone the HUD occupies the band immediately above the
+        // square, so a completed grade hangs just inside the paper, not over
+        // the calm meter.
+        renderGrade(grade, view.grade, rect.x + rect.width / 2, rect.y + 52);
       } else {
         chain.style.left = "0";
         chain.style.top = "0";

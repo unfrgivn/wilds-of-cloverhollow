@@ -267,6 +267,18 @@
    the ends where Fae tips over, the star riding on it, a dot per puff above
    it, and swooshes blowing in at her. */
 .battle-lean { position: fixed; inset: 0; z-index: var(--z-ring); pointer-events: none; }
+.battle-trace { position: fixed; z-index: var(--z-ring); pointer-events: none; }
+.battle-trace-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.battle-trace-path, .battle-trace-paint { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.battle-trace-path { stroke: #6e4caa; stroke-width: 42; opacity: .9; }
+.battle-trace-paint { stroke: #f4bccd; stroke-width: 54; opacity: .94; filter: blur(1.5px); }
+.battle-trace-dot { position: absolute; width: 18px; height: 18px; transform: translate(-50%, -50%); border: 3px solid #513b32; border-radius: 50%; background: #fff4d6; box-shadow: 0 0 0 4px #fff4d688; }
+.battle-trace-dot.is-hit { background: #68b99d; }
+.battle-trace-dot.is-miss { background: #ddd6ca; }
+.battle-trace-dot.is-next { animation: trace-pulse 900ms ease-in-out infinite; }
+.battle-trace-brush { position: absolute; width: 30px; height: 30px; transform: translate(-50%, -50%) rotate(-35deg); border: 5px solid #513b32; border-radius: 55% 45% 50% 40%; background: #d58a9e; box-shadow: 12px 8px 0 -4px #b98155; }
+.battle-trace-dry { position: absolute; right: 12px; bottom: 12px; width: 22px; height: 22px; border: 4px solid #513b32; border-radius: 50%; background: conic-gradient(#e9c85b calc(var(--dry) * 1turn), #fff4d6 0); }
+@keyframes trace-pulse { 50% { transform: translate(-50%, -50%) scale(1.35); } }
 .battle-lean-track {
   position: absolute;
   box-sizing: border-box;

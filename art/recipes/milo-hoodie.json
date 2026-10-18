@@ -1,0 +1,8 @@
+{
+  "asset": "milo-hoodie", "milestone": 55, "status": "generated-selected-owner-review", "model": "gemini-3-pro-image", "generationCalls": 1,
+  "generationCallsNote": "One two-pose strip call, 1792331302225, selected. Two extracted frames provide idle_down and blink.", "date": "2026-10-18",
+  "references": ["art/source/classmates/milo/model-sheet-raw.png", "art/source/critters/hooded-kid/body-sheet-raw.png"], "prompt": "Full prompt recorded in the shared generation log for output 1792331302225-gemini-3-pro-image-0.png.",
+  "selectedRawSources": ["art/source/classmates/milo-hoodie/idle-down-raw.png", "art/source/classmates/milo-hoodie/blink-raw.png"],
+  "postProcessing": {"build": "extract-strip expected 2, postprocess to 448x448 with figure-height 280 and baseline 439, edge-only magenta despill band 20, montage", "key": "#FF00FF border flood at 18% fuzz", "keyReason": "Magenta is absent from Milo's purple, teal, navy, black, peach, and brown subject palette.", "canvas": "448x448 source pixels, baseline 439, feet-anchored", "frames": "idle_down open eyes and idle_down blink closed eyes"},
+  "validator": {"biped": false, "idleOnly": true, "directions": ["down"], "key": "magenta"}
+}

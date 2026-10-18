@@ -23,6 +23,9 @@ type Body = { name: string; component: Component; bounds: Bounds };
 
 const id = Bun.argv[2] ?? "";
 if (!/^[a-z][a-z0-9-]*$/.test(id)) throw new Error("usage: build-person.ts <id>");
+const key = Bun.argv.find((arg) => arg.startsWith("--key="))?.slice("--key=".length) ?? "#FF00FF";
+if (!/^#[0-9A-Fa-f]{6}$/.test(key)) throw new Error("--key must be a six-digit hex colour");
+const despillKey = key.toUpperCase() === "#00FF00" ? "green" : "magenta";
 const frames = `art/scratch/${id}-build-frames`;
 const sheet = `art/source/critters/${id}/body-sheet-raw.png`;
 const keyed = `${frames}/sheet-keyed.png`;
@@ -94,7 +97,7 @@ function cellName(point: Point): string {
 await run(["rm", "-rf", frames]);
 await run(["mkdir", "-p", frames]);
 await run(["bun", "tools/art/key-alpha.ts", "--input", sheet, "--output", keyed,
-  "--key", "#FF00FF", "--fuzz", "35%", "--despill", "edge", "--holes"]);
+  "--key", key, "--fuzz", "35%", "--despill", "edge", "--holes"]);
 const alpha = await output(["magick", keyed, "-alpha", "extract", "-threshold", "1%",
   "-depth", "8", "gray:-"]);
 await Bun.file(keyed).delete();
@@ -132,12 +135,12 @@ for (const name of names) {
   const frame = `${frames}/${name}.png`;
   await run(["bun", "tools/art/postprocess.ts", "--input", source, "--output", frame,
     "--width", "512", "--height", "512", "--scale-percent", scalePercent,
-    "--bottom-margin", "8", "--key", "#FF00FF", "--fuzz", "35%", "--despill", "edge",
+    "--bottom-margin", "8", "--key", key, "--fuzz", "35%", "--despill", "edge",
     "--holes"]);
   await run(["bun", "tools/art/drop-islands.ts", "--input", frame, "--output", frame,
     "--min", "120"]);
   await run(["bun", "tools/art/despill-edge.ts", "--input", frame, "--output", frame,
-    "--key", "magenta", "--band", "6"]);
+    "--key", despillKey, "--band", "6"]);
 }
 
 const auraAlpha = `${frames}/aura-alpha.png`;

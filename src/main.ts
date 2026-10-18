@@ -37,6 +37,8 @@ import {
   createFeelingBubble,
   createWindUpBubbles,
   createRewardSticker,
+  battleTalkDialogueView,
+  talkChoicesShown,
   type BattleCheckView as BattleCheckOverlayView,
 } from "./ui/battle";
 import { assetUrl } from "./platform/assets";
@@ -285,6 +287,9 @@ async function boot(): Promise<void> {
       };
     if (check.kind === "lean" && geometry.kind === "lean")
       return { ...geometry, ...shared, balance: check.balance, puffs: check.puffs };
+    if (check.kind === "trace" && geometry.kind === "trace")
+      return { ...geometry, ...shared, brush: check.brush, points: check.path.points,
+        checkpoint: check.checkpoint, results: check.results, dry: check.dry };
     return null;
   };
   // A frame of a loaded atlas (`file`, its PNG beside it) as the DOM draws it.
@@ -339,6 +344,7 @@ async function boot(): Promise<void> {
   let afterTick = (_next: State): void => undefined;
   let logTitle = (_mode: TitleMode | null): void => undefined;
   let lastBattleLog = "";
+  let lastBattleTalkLog = "";
   let lastBattleButtonsLog = "";
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const {
@@ -422,6 +428,9 @@ async function boot(): Promise<void> {
     else delete document.documentElement.dataset.title;
     if (activeBattle) document.documentElement.dataset.battle = "open";
     else delete document.documentElement.dataset.battle;
+    if (battle?.talk !== null && battle?.talk !== undefined)
+      document.documentElement.dataset.talk = "open";
+    else delete document.documentElement.dataset.talk;
     // Which check is in play (spec 8.1): a catch or a lean shows its touch
     // arrows.
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
@@ -433,7 +442,8 @@ async function boot(): Promise<void> {
     if (checkKind !== "catch" && checkKind !== "lean" && state.arcade?.game !== "mole")
       touch.releaseArrows();
     battleHud.render({
-      visible: activeBattle && state.battle?.phase !== "reward",
+      visible: activeBattle && state.battle?.phase !== "reward" &&
+        !talkChoicesShown(battle?.talk ?? null),
       energy: battle?.energy ?? 0,
       energyMax: battle?.energyMax ?? 0,
       calm: battle === null ? 0 : battle.calm / Math.max(1, battle.calmMax),
@@ -442,7 +452,7 @@ async function boot(): Promise<void> {
         : "",
     });
     commandMenu.render({
-      visible: activeBattle && state.battle?.phase === "command",
+      visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
       commands: battle?.commands ?? [],
       selected: battle?.selected ?? 0,
     });
@@ -477,6 +487,7 @@ async function boot(): Promise<void> {
       window.innerWidth,
       window.innerHeight,
     );
+    touch.setTraceElement(geometry?.kind === "trace" ? geometry.rect : undefined);
     battleCheck.render(checkOverlay(battle, geometry));
     // The card shows a new sticker; a species already in the album only pays.
     const rewardCritter =
@@ -561,7 +572,10 @@ async function boot(): Promise<void> {
       (arcadeState !== null && arcadeState.phase !== "result")
     )
       dialogueBox.hide();
-    if (activeBattle && (battle?.message ?? "") !== "") {
+    if (activeBattle && battle?.talk !== null && battle?.talk !== undefined) {
+      dialogueBox.render(battleTalkDialogueView(battle.talk));
+      document.documentElement.dataset.dialogue = "open";
+    } else if (activeBattle && (battle?.message ?? "") !== "") {
       dialogueBox.render({
         speaker: null,
         text: battle?.message ?? "",
@@ -653,6 +667,20 @@ async function boot(): Promise<void> {
         };
         console.log(`[cloverhollow] battle ${JSON.stringify(payload)}`);
         lastBattleLog = log;
+      }
+      const talk = state.battle?.talk ?? null;
+      const talkLog = talk === null
+        ? "closed"
+        : `${talk.speaker ?? ""}|${talk.choices.join("|")}`;
+      if (talkLog !== lastBattleTalkLog) {
+        if (talk !== null)
+          console.log(
+            `[cloverhollow] battle-talk ${JSON.stringify({
+              speaker: talk.speaker,
+              choices: talk.choices,
+            })}`,
+          );
+        lastBattleTalkLog = talkLog;
       }
     }
     afterTick(state);

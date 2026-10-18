@@ -11,7 +11,8 @@ const states = ["short", "long", "long-max", "revealing", "speaker-board",
   "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];
 const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
   "battle-charge", "battle-chain", "battle-chain-burst", "battle-catch", "battle-lean",
-  "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup"];
+  "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup",
+  "battle-trace", "battle-trace-mid", "battle-trace-dry", "battle-talk", "battle-talk-reply"];
 const journalStates = ["journal-empty", "journal-notes", "journal-full"];
 const dialogueStates = states.filter((state) => state !== "prompt");
 const phone = { width: 874, height: 402 };
@@ -51,9 +52,14 @@ const battleParts: Record<string, string[]> = {
   "battle-chain-burst": [".battle-hud", ".battle-chain", ".battle-check-hint"],
   "battle-catch": [".battle-hud", ".battle-catch", ".battle-check-hint", ".touch-reach"],
   "battle-lean": [".battle-hud", ".battle-lean", ".touch-lean"],
+  "battle-trace": [".battle-hud", ".battle-trace", ".battle-check-hint"],
+  "battle-trace-mid": [".battle-hud", ".battle-trace"],
+  "battle-trace-dry": [".battle-hud", ".battle-trace", ".battle-grade"],
   "battle-feelings": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-feeling"],
   "battle-feelings-heart": [".battle-hud", ".battle-feeling", ".battle-feeling-heart"],
   "battle-windup": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-windup"],
+  "battle-talk": [".sticker-dialogue"],
+  "battle-talk-reply": [".battle-hud", ".sticker-dialogue"],
   "battle-reward": [".battle-reward"],
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
@@ -68,7 +74,8 @@ const battleParts: Record<string, string[]> = {
     state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
-  ".battle-chain", ".battle-catch", ".battle-lean", ".battle-check-hint", ".battle-grade",
+  ".battle-chain", ".battle-catch", ".battle-lean", ".battle-trace",
+  ".battle-check-hint", ".battle-grade",
   ".touch-reach", ".touch-lean",
   ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
@@ -1034,12 +1041,15 @@ test.describe("sticker gallery", () => {
           const dialogue = document.querySelector<HTMLElement>(".sticker-dialogue");
           const commands = [...document.querySelectorAll<HTMLElement>(".battle-command")]
             .filter((item) => item.getBoundingClientRect().width > 0);
+          const choices = [...document.querySelectorAll<HTMLElement>(".sticker-choice")]
+            .filter((item) => item.getBoundingClientRect().width > 0);
           const controls = [...document.querySelectorAll<HTMLElement>(
             ".touch-confirm, .touch-cancel, .touch-menu")];
           const intersects = (a: DOMRect, b: DOMRect): boolean =>
             a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
           const commandRects = commands.map((item) => item.getBoundingClientRect());
           const hudRects = hud.map((item) => item.getBoundingClientRect());
+          const choiceRects = choices.map((item) => item.getBoundingClientRect());
           const grade = document.querySelector<HTMLElement>(".battle-grade");
           const gradeRect = grade === null || grade.hidden ? null : grade.getBoundingClientRect();
           return { hudInside: hud.every((item) => inside(item.getBoundingClientRect())),
@@ -1051,9 +1061,15 @@ test.describe("sticker gallery", () => {
             hudMenuOverlap: menu !== null && hud.some((item) => intersects(
               item.getBoundingClientRect(), menu.getBoundingClientRect())),
             commandInside: commandRects.length === 0 || commandRects.every(inside),
-            commandOverlap: commandRects.some((rect) => controls.some((button) =>
-              intersects(rect, button.getBoundingClientRect()))),
-            dialogueOverlap: dialogue !== null && !dialogue.hidden && commandRects.some((rect) =>
+             commandOverlap: commandRects.some((rect) => controls.some((button) =>
+               intersects(rect, button.getBoundingClientRect()))),
+             choicesInside: choices.length === 0 || choiceRects.every(inside),
+             choicesTouchSized: choiceRects.every((rect) => rect.height >= 44),
+              choicesClear: choiceRects.every((rect) => !controls.some((button) =>
+                intersects(rect, button.getBoundingClientRect()))),
+              choicesHudClear: choiceRects.every((rect) =>
+                !hudRects.some((meter) => intersects(rect, meter))),
+             dialogueOverlap: dialogue !== null && !dialogue.hidden && commandRects.some((rect) =>
               intersects(rect, dialogue.getBoundingClientRect())),
             stickHidden: getComputedStyle(document.querySelector(".touch-stick") ??
               document.body).display === "none",
@@ -1070,6 +1086,12 @@ test.describe("sticker gallery", () => {
         expect(facts.gradeHudOverlap).toBe(false);
         expect(facts.commandInside).toBe(true);
         expect(facts.commandOverlap).toBe(false);
+        if (state === "battle-talk") {
+          expect(facts.choicesInside).toBe(true);
+          expect(facts.choicesTouchSized).toBe(true);
+          expect(facts.choicesClear).toBe(true);
+          expect(facts.choicesHudClear).toBe(true);
+        }
         expect(facts.dialogueOverlap).toBe(false);
         expect(facts.stickHidden).toBe(true);
         expect(facts.rewardInside).toBe(true);
@@ -1240,7 +1262,8 @@ test.describe("sticker gallery", () => {
         const observer = new MutationObserver(() => undefined);
         for (const part of document.querySelectorAll(
            ".battle-hud, .battle-commands, .battle-ring, .battle-charge-meter, .battle-chain, " +
-             ".battle-catch, .battle-lean, .battle-check-hint, .battle-feeling, .battle-grade, " +
+             ".battle-catch, .battle-lean, .battle-trace, .battle-check-hint, " +
+             ".battle-feeling, .battle-grade, " +
              ".battle-windup, " +
              ".battle-reward")) {
           observer.observe(part, { childList: true, characterData: true, subtree: true });

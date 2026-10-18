@@ -60,6 +60,14 @@ export type BattleCheckGeometry =
       track: { x: number; y: number; width: number; height: number };
       wind: { x: number; rows: number[]; length: number };
       hintAt: Point;
+    }
+  | {
+      kind: "trace";
+      rect: { x: number; y: number; width: number; height: number };
+      brush: Point;
+      points: Point[];
+      checkpoint: number;
+      hintAt: Point;
     };
 // The check for tests (spec 11): its side and geometry, plus an anchor
 // (`x`, `y`: a ring's centre, a meter's top-left, a chain's target, the
@@ -1004,7 +1012,7 @@ export class GameView {
         // touch arrows bottom left.
         hintAt: hintAt((fae.x + critter.x) / 2),
       };
-    if (check.side === "fae")
+    if (check.side === "fae" && check.kind !== "trace")
       return {
         kind: "chain",
         from: critterCentre,
@@ -1012,6 +1020,19 @@ export class GameView {
         radius: 0.3 * fae.height,
         hintAt: hintAt(fae.x),
       };
+    if (check.kind === "trace") {
+      const size = Math.min(360, Math.max(180, height - 150), width * 0.42);
+      const x = Math.max(88, Math.min(width - size - 250, (fae.x + critter.x) / 2 - size / 2));
+      const y = Math.max(88, Math.min(height - size - 92, fae.baseline - fae.height - size * 0.08));
+      return {
+        kind: "trace",
+        rect: { x, y, width: size, height: size },
+        brush: check.brush,
+        points: check.path.points,
+        checkpoint: check.checkpoint,
+        hintAt: hintAt(x + size / 2),
+      };
+    }
     const feet = (check.actor === null ? undefined : layout.party[check.actor]) ??
       { x: fae.x, y: fae.baseline };
     if (check.kind === "chain")
@@ -1065,6 +1086,13 @@ export class GameView {
       const { track } = geometry;
       return { ...geometry, side, x: track.x + balance * track.width / 2, y: track.y };
     }
+    if (geometry.kind === "trace")
+      return {
+        ...geometry,
+        side,
+        x: geometry.rect.x + geometry.rect.width * geometry.brush.x / 1000,
+        y: geometry.rect.y + geometry.rect.height * geometry.brush.y / 1000,
+      };
     return { ...geometry, side };
   }
 
@@ -1113,6 +1141,13 @@ export class GameView {
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     battle: {
       phase: string | null;
+      talk: {
+        speaker: string | null;
+        text: string;
+        revealed: number;
+        choices: string[];
+        selected: number;
+      } | null;
       check: BattleCheckInfo | null;
       critter: { id: string; frame: string } | null;
       layout: {
@@ -1181,6 +1216,15 @@ export class GameView {
       marks: this.noticeMarks(state),
       battle: {
         phase: state.battle?.phase ?? null,
+        talk: state.battle?.talk === null || state.battle?.talk === undefined
+          ? null
+          : {
+              speaker: state.battle.talk.speaker,
+              text: state.battle.talk.text,
+              revealed: state.battle.talk.revealed,
+              choices: state.battle.talk.choices.slice(),
+              selected: state.battle.talk.selected,
+            },
         check: this.battleCheckInfo(state),
         layout,
         backdrop: this.battleBackdrop,

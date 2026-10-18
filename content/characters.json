@@ -72,12 +72,6 @@
       32
     ]
   },
-  "hooded-kid-front": {
-    "atlas": "assets/characters/hooded-kid-front/hooded-kid-front.json",
-    "idleTicks": [
-      32
-    ]
-  },
   "fairy-lavender": {
     "atlas": "assets/characters/fairy-lavender/fairy-lavender.json",
     "idleTicks": [

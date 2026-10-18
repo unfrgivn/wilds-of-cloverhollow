@@ -35,6 +35,7 @@
   box-shadow: 0 4px 8px #513b3240;
   pointer-events: auto;
 }
+.touch-trace { position: fixed; z-index: 2; touch-action: none; pointer-events: auto; }
 
 .touch-buttons {
   position: absolute;

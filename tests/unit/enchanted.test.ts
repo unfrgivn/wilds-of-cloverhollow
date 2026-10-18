@@ -88,16 +88,16 @@ describe("The Enchanted Forest floor", () => {
     expect(world.storyVariable(talk("fairy_lavender"), "heard_wish")).toBe(true);
   });
 
-  it("remembers the forest kid's taunt and keeps his name secret", () => {
-    const first = lines("forest_kid");
-    expect(first.join(" ")).toContain("secret forest");
-    expect(first.join(" ")).toContain("BOSS");
-    expect(first.join(" ")).not.toContain("Milo");
-    const secondInk = talk("forest_kid");
-    const second = lines("forest_kid", secondInk);
-    expect(second).toEqual(["You again? The BOSS is busy, Fae!"]);
-    expect(second.join(" ")).not.toContain("Milo");
-    expect(world.storyVariable(secondInk, "saw_tree_kid")).toBe(true);
+  it("places the hooded kid as a battle set piece and keeps the reveal in its calm knot", () => {
+    const kid = world.critters["hooded-kid"];
+    expect(kid?.calmKnot).toBe("milo_calm");
+    expect(kid?.sticker.name).toBe("Milo");
+    expect(area.critters).toEqual([{ id: "hooded-kid", point: { x: 1130, y: 730 } }]);
+    expect(area.npcs.some((npc) => npc.id === "hooded-kid-front")).toBe(false);
+    const reveal = lines("milo_calm");
+    expect(reveal.join(" ")).toContain("I'm really sorry about all the scribbles");
+    expect(reveal.join(" ")).toContain("paper plane");
+    expect(reveal.join(" ")).toContain("I always notice you, Milo");
   });
 
   it("changes the pond and tree looks after the wish lore", () => {

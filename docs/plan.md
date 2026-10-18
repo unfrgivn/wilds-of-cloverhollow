@@ -2444,50 +2444,146 @@ the old trail, the owl, and the clubhouse claim.
   - Journal: "The kid in the purple hood is waiting under the Ancient Tree. They called it THEIR secret forest... and they knew my name!"
   - Journal: "The fairies told me the Ancient Tree dreams the whole land, and a wish made the Mystic Pond fizz purple."
 
-## Milestone 55: The kid in the purple hood **Status:** 📋 Planned
-- The last calm-down, in two parts (owner, 2026-10-17: Trace, then Talk).
-  Talking to the kid under the Ancient Tree ends on a line tagged
-  `# battle: <set piece>`, and the battle opens as the conversation closes,
-  the way a `travel:` line waits for the close. The kid is a person kind and
-  the biggest mini-boss: wind-ups like the gull's and Mr. Pip's, and no Run
-  ("Fae won't run away. Not this time.").
-- Part 1, Trace (`docs/battle-ideas.md`): the kid's bursts are scribbles, a
-  giant purple swirl, star, heart, or zigzag over the scene, and Fae paints
-  them back. A new check kind, `trace`: a dotted shape over the scribble that
-  she brushes along, checkpoint by checkpoint, before the paint dries (under
-  180 ticks, spec 8). The stick or arrows steer the brush; on touch a finger
-  draws, through a new optional `pointer` in the action frame (spec 3.2;
-  owner, 2026-10-17), present only while a finger is on the trace and given
-  in the check's own coordinates. The brush follows it at a capped speed, so
-  a tap ahead still has to travel the line. Every checkpoint reached is
-  great, half good, fewer a miss, like a chain, and each plays
-  `battle-beat`. The shape is a seeded draw from the kind's list; a big burst
-  draws a longer one. The dots and the paint are drawn in code.
-- Part 2, Talk: once the meter is half full, the kid stops scribbling and
-  listens, and the menu gains Talk: two or three things Fae could say, as
-  choices, from what the story has shown (the Star Racer high score and its
-  scribbled-out initials, the Star Racer token in the stash, the purple
-  marker, the masked face, swirl, and star on the class art wall, Milo's
-  paper plane). Each is graded by a tag on its line, and the kid answers. No
-  bursts in part 2, so nothing needs quick fingers; a wrong guess ("Rosie?")
-  is a gentle miss that still calms a little.
-- Calmed, the hood falls back: it's Milo. He chased his paper plane into the
-  mist, found the forest, wished at the Mystic Pond to be the best at
-  everything, drank, and fizzed; fizz-fast, he slipped from the classroom to
-  the hall and back. He only wanted to be noticed. Fae: "I always notice you,
-  Milo. You're my friend." The scribbles wash off, the pond clears, the
-  fairies dance (`forest_restored`), and Milo stays by the tree.
-- Art: the kid's battle atlas, from Milo's model sheet and the hooded kid's
-  back view (chaos, the hood up and a mischievous grin in its shadow; burst,
-  scribbling with a giant purple marker; soothed, the hood slipping back;
-  calm, Milo in the purple hoodie, sheepish), and Milo's overworld figure in
-  the hoodie, hood down.
-- Evidence: core unit tests (the trace's steering, a finger, drying, grades,
-  and draws; Talk's grades from the story and its turns; the two parts; no
-  Run; the `battle:` tag and its loader check; the reveal), the recorded
-  battle on arrows only, and real-key e2e (a trace on keys, a trace drawn by
-  touch on a phone in Chromium and WebKit, a Talk, and the reveal, at both
-  sizes).
+## Milestone 55: The kid in the purple hood **Status:** ✅ Completed (2026-10-18)
+- The last calm-down (owner, 2026-10-17: Trace, then Talk). The kid in the
+  purple hood is the Enchanted Forest's set piece `hooded-kid`, under the
+  Ancient Tree at (1130, 730), drawn from his battle atlas (`chaos_idle`: the
+  hood low, a giant purple marker; calm, `calm_idle`: Milo). Walking into him
+  opens the battle, and his taunt is its intro: "So you found my secret forest,
+  Fae! Nobody can stop the BOSS!" He replaces Milestone 54's front-view person
+  and its `forest_kid` taunt.
+- The biggest mini-boss: calm 200, six energy leaves, 40 coins, touch radius
+  95, Fae's height on the overworld (140; he's a classmate) and 280 in battle.
+  Wind-ups like the gull's and Mr. Pip's (turn 2, then every 3, two bubbles),
+  feelings curious, bored, and grumpy, and no Run (`canRun: false`).
+- Part 1, Trace: his bursts are purple scribbles, and Fae paints them back
+  (spec 8). A swirl, a star, a heart, or a zigzag; a big burst, an infinity
+  loop or a long zigzag. Arrows or a stick steer the brush; on touch a finger
+  draws, through the action frame's optional `pointer` (0 to 1000 in the
+  trace's square, only while the finger is down). Each dot reached is a hit:
+  all of them great, half good. Reach 105, brush speed 20, and 180 ticks
+  before the paint dries.
+- Part 2, Talk: from half calm (100) he stops scribbling ("The kid stops
+  scribbling... and listens."): no bursts, wind-ups, or feelings, and Talk is
+  the only command. Three questions (`kid_talk_1` to `kid_talk_3`), each with a
+  right, a partly right, and a wrong answer, graded by its `# grade:` tag (35,
+  25, and 20 calm). The meter can't fill before the last question, and the last
+  one fills it whatever the answer, so the reveal always comes through talking
+  and nobody gets stuck. The answers are the dialogue's choice stickers; the
+  HUD steps aside while they're on screen.
+- Calmed: "The purple hood slips back... It's Milo!" The reward is the Milo
+  sticker (the album has 13 slots) and 40 coins. The calm hook (`on_calm`)
+  clears `forest_fizzy`, so the scribbles and the fizzing pond vanish as the
+  battle ends. Milo stays under the tree. His talk (`milo_calm`) tells how it
+  happened, then "The Ancient Tree is glowing again." Milestone 56 adds the
+  ending there.
+- Evidence:
+  - Core unit tests: `trace.test.ts` (the check's rules and the pointer's
+    parsing), `check-loader.test.ts` (every rejection), `kid-trace-tuning.test.ts`
+    (the player models below), `talk.test.ts` (Talk's rules through real steps,
+    the listening line, every answer graded once, and the turn bug below),
+    `battle-view.test.ts` (Talk's projection and the HUD rule),
+    `enchanted.test.ts` (the set piece, the reveal, the forest restored),
+    `touch.test.ts` (the finger's mapping), and `gamepad.test.ts` (the finger
+    through the device merge).
+  - The recorded run `pass-party/kid.json` (`tools/sim/record-kid.ts`, on from
+    the forest run): both parts of the battle, the answers GREAT, GOOD, and
+    GREAT, the reveal, the reward, and Milo's talk twice, 19,034 ticks; its
+    replay test, `kid-replay.test.ts`.
+  - The e2e `kid.spec.ts`: real keys through the whole battle on Chromium and
+    WebKit (`@smoke`), ending on Bun's hash, with screenshots at 1280x720 and
+    874x402 of the opening, a scribble mid-paint, Talk's answers, the reveal,
+    and the forest restored; a finger painting his first scribble on a notched
+    phone (every dot, GREAT, through the real pointer); and a tap picking an
+    answer (GOOD). The gallery's trace and Talk states, with layout checks in
+    both engines.
+- Gates: `just check` (105 test files, 902 tests, every recorded run, purity,
+  lint) and `just build` passed. The full `just e2e` passed 809 tests with 2
+  skipped, and failed 5: two journal tests on both engines still counted 12
+  album slots (Milo's sticker makes 13; they read the count from
+  `content/stickers.json` now), and WebKit's `journal-sound` baseline, which
+  changed only by the 13th slot (viewed, and diffed: every changed pixel is in
+  that slot). Both spec files then passed in full on Chromium and WebKit (18
+  tests).
+- Notes and assumptions:
+  - Gemini calls: 5. The hooded kid's first sheet and Milo's hoodie strip, 2;
+    the kid's sheet again on green, 3, two of them rejected. The first sheet was
+    keyed on magenta, his own hue: the thin purple scribbles lost their colour
+    to the despill. A script-swapped green copy was made and never kept.
+  - A set piece, not a `# battle:` tag: walking into him opens the battle, as
+    with Mr. Pip, and his taunt is its intro, so no new dialogue-close action
+    was needed.
+  - The trace was tuned against the real core with player models on arrows (a
+    careful player, an eighth and a quarter of a second late), a finger, and
+    one who does nothing. Careful and finger players get GREAT on every
+    scribble, an eighth late GREAT, a quarter late at least GOOD on the normal
+    ones, and nothing MISS. The first tuning flattened the swirl into a diamond
+    and the star into a pentagon; they were redrawn as a spiral, a pentagram,
+    and an infinity loop.
+  - Talk's lines were rewritten in review, kinder, and answering what the kid
+    says.
+  - Found in review, each with a test that fails without its fix: the first
+    Talk asked the last question (it counted battle turns); the scribble's
+    overlay never drew in the real game (only in the gallery), and the e2e had
+    read only its geometry; a finger never reached the game (the device merge
+    dropped `pointer`), and the touch test had passed on the arrow player's
+    help; Talk's turns opened with the button's name ("Talk") as their line;
+    the answers covered the HUD on a phone; and the Talk lines showed their
+    quote marks.
+  - The front view (Milestone 54) left the runtime; its recipe and raw source
+    stay, like the talking raccoon's (Milestone 28).
+  - The battle sheet's hoodie is a two-tone patchwork; Milo's morning hoodie
+    (Milestone 56) is calmer. For the owner's review.
+- Wording for the owner:
+  - Battle (`content/critters/hooded-kid.json`): the intro "So you found my
+    secret forest, Fae! Nobody can stop the BOSS!"; the menu "How can Fae calm
+    the kid in the purple hood?", and in Talk "The kid stops scribbling... and
+    listens."; Soothe "Fae hums a soft tune. The kid's scribbles slow to a
+    gentle swirl!" / "Fae hums softly. The kid pauses to listen for a moment."
+    / "The kid scribbles right over Fae's humming."; Play "Maddie bats a
+    purple paper star through the air. The kid laughs!" / "Maddie pounces on a
+    scribbled star. The kid smiles." / "Maddie chases a star and skids in a
+    bright purple squiggle."; Cast "Sue's ribbon paints a rainbow around the
+    scribble. The kid cheers!" / "Sue's ribbon twirls around the purple fizz.
+    The kid leans closer." / "Sue's ribbon catches a scribble and tangles. The
+    kid giggles."; Juggle "Jordan juggles three paper stars in a perfect loop.
+    The kid claps!" / "Jordan tosses a paper star high. The kid watches it
+    drift down." / "Jordan's paper star flutters into a purple swirl."; Snack
+    "Fae shares a crunchy cracker. The kid munches between scribbles."; the
+    burst "The kid scribbles a giant purple squiggle in the air!", then "Fae
+    paints the scribble back into soft watercolour!" / "Fae paints most of the
+    scribble back into watercolour." / "The purple scribble poofs into
+    harmless fizzy dots."; the wind-up "The kid scribbles faster and faster!
+    The purple fizz is swirling everywhere!", "The kid's purple scribble grows
+    even bigger!", "The purple scribble fades. Not one splash got through.";
+    rest "Fae takes a little rest while the purple fizz settles."; soothed
+    "The purple hood slips back... It's Milo!"
+  - Talk 1: "You don't even know who I am!" [You beat the Star Racer high
+    score, then scribbled out your initials.] "...You figured THAT out?" /
+    [You left a Star Racer token in your stash.] "Maybe. Lots of kids play
+    Star Racer." / [You're the boss of the whole forest!] "Ha! I WISH.
+    ...Wait. That's kind of what I wished for."
+  - Talk 2: "Nobody ever notices me anyway..." [I notice you! The paper
+    planes, the star doodles...] "You... you saw those?" / [Everybody noticed
+    the scribbles.] "That's not the same thing." / [Maybe nobody likes
+    purple?] "Hey! Purple is the BEST color."
+  - Talk 3: "So go on, Fae. Who am I?" [Milo?] "...Yeah. It's me." / [Someone
+    from my class.] "Warmer... but who?" / [Rosie?] "Nope! Rosie's way better
+    at kites than me."
+  - Milo (`milo_calm`): "Fae... it's me. I'm really sorry about all the
+    scribbles." / "My paper plane flew into the mist, so I followed it. I found
+    this forest and wished at the Mystic Pond to be the best at everything,
+    even Star Racer." / "I drank from the pond, and the fizz got out of hand.
+    Fizz-fast, I could zip from our classroom to the hall and back before
+    anyone noticed. That's how I peeked in, then sat back down." / "I only
+    wanted to be noticed." / Fae: "I always notice you, Milo. You're my
+    friend." / Sue: "Sue gives Milo a small wave. "We noticed you too."" /
+    Jordan: "Jordan smiles. "You don't have to be the best at everything."";
+    again, Fae: "The Ancient Tree is glowing again. It's so pretty now."
+  - Journal: "The kid in the purple hood is waiting under the Ancient Tree.
+    Their wish made all this fizz!", then "The kid in the purple hood was
+    MILO! He wished to be the best at everything, and the fizz got out of
+    hand."
 
 ## Milestone 56: Wake up **Status:** 📋 Planned
 - The end (spec 1.2; owner, 2026-10-17: a wake-up morning). Under the

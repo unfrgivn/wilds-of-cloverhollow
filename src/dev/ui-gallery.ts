@@ -14,6 +14,8 @@ import {
   createBattleCheck,
   createFeelingBubble,
   createWindUpBubbles,
+  battleTalkDialogueView,
+  talkChoicesShown,
   type BattleCheckView,
   type BattleCommand,
   type TimingGrade,
@@ -26,6 +28,7 @@ import {
   parseSkeeCalibration,
 } from "../content/load";
 import { clawGalleryView } from "./claw-gallery";
+import type { BattleTalk } from "../core";
 import { cookGalleryView } from "./cook-gallery";
 import { moleGalleryView } from "./mole-gallery";
 import { skeeGalleryView } from "./skee-gallery";
@@ -87,14 +90,18 @@ const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
   state.startsWith("mole-") || state.startsWith("cook-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
-  ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup"
+  ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup" ||
+    state === "battle-talk" || state === "battle-talk-reply"
   : state !== "prompt" && !journalState && !titleState &&
     (!arcadeState || state === "arcade-result" || state === "skee-result" ||
       state === "mole-result" || state === "cook-result" || state === "cook-burnt");
 if (battleState) document.documentElement.dataset.battle = "open";
+if (state === "battle-talk" || state === "battle-talk-reply")
+  document.documentElement.dataset.talk = "open";
 // A catch or a lean shows its touch arrows (spec 8.1).
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
 if (state === "battle-lean") document.documentElement.dataset.check = "lean";
+if (state.startsWith("battle-trace")) document.documentElement.dataset.check = "trace";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
 if (arcadeState) document.documentElement.dataset.arcade = "open";
@@ -275,6 +282,36 @@ const windUpMessage: DialogueView = {
   ...battleMessage,
   text: "The gull puffs up bigger and bigger! It's feeling everything at once!",
 };
+// Talk's two moments, as the core holds them (the lines are kid_talk_2's),
+// projected through the game's own view.
+const talkQuestion: BattleTalk = {
+  knot: "kid_talk_2",
+  turn: 1,
+  speaker: "Hooded Kid",
+  text: "Nobody ever notices me anyway...",
+  revealed: 100,
+  choices: [
+    "I notice you! The paper planes, the star doodles...",
+    "Everybody noticed the scribbles.",
+    "Maybe nobody likes purple?",
+  ],
+  selected: 1,
+  ended: false,
+  grade: null,
+};
+const talkReply: BattleTalk = {
+  knot: "kid_talk_2",
+  turn: 1,
+  speaker: "Hooded Kid",
+  text: "You... you saw those?",
+  revealed: 9,
+  choices: [],
+  selected: 0,
+  ended: false,
+  grade: "great",
+};
+const galleryTalk = state === "battle-talk" ? talkQuestion
+  : state === "battle-talk-reply" ? talkReply : null;
 const frogRing = { x: 600, y: 170, radius: 74, progress: 0.62, target: 0.65 };
 const faeRing = { x: 190, y: 300, radius: 66, progress: 0.38, target: 0.5 };
 function renderGalleryState(): void {
@@ -378,9 +415,10 @@ function renderGalleryState(): void {
     }),
   };
   journal.render(journalView);
-  // The battle is over once the reward shows, so the HUD steps aside.
+  // The battle is over once the reward shows, so the HUD steps aside; it does
+  // too while a Talk question's answers are on screen.
   battleHud.render({
-    visible: battleState && state !== "battle-reward",
+    visible: battleState && state !== "battle-reward" && !talkChoicesShown(galleryTalk),
     energy: 3,
     energyMax: 5,
     calm: 0.45,
@@ -530,6 +568,37 @@ function renderGalleryState(): void {
       hint: null,
       hintAt: { x: 315, y: 243 },
     },
+    "battle-trace": {
+      kind: "trace",
+      rect: { x: 330, y: 96, width: 300, height: 300 },
+      brush: { x: 180, y: 180 },
+      points: [{ x: 120, y: 160 }, { x: 330, y: 180 }, { x: 520, y: 370 },
+        { x: 730, y: 250 }, { x: 870, y: 700 }],
+      checkpoint: 0, dry: .18,
+      results: ["pending", "pending", "pending", "pending", "pending"],
+      grade: null, hint: "Trace the purple scribble before the paint dries!",
+      hintAt: { x: 480, y: 410 },
+    },
+    "battle-trace-mid": {
+      kind: "trace",
+      rect: { x: 330, y: 96, width: 300, height: 300 },
+      brush: { x: 520, y: 370 },
+      points: [{ x: 120, y: 160 }, { x: 330, y: 180 }, { x: 520, y: 370 },
+        { x: 730, y: 250 }, { x: 870, y: 700 }],
+      checkpoint: 3, dry: .52,
+      results: ["hit", "hit", "hit", "pending", "pending"],
+      grade: null, hint: null, hintAt: { x: 480, y: 410 },
+    },
+    "battle-trace-dry": {
+      kind: "trace",
+      rect: { x: 330, y: 96, width: 300, height: 300 },
+      brush: { x: 730, y: 250 },
+      points: [{ x: 120, y: 160 }, { x: 330, y: 180 }, { x: 520, y: 370 },
+        { x: 730, y: 250 }, { x: 870, y: 700 }],
+      checkpoint: 4, dry: 1,
+      results: ["hit", "hit", "hit", "hit", "miss"],
+      grade: "good", hint: null, hintAt: { x: 480, y: 410 },
+    },
   };
   check.render(galleryChecks[state] ?? null);
   const prize = clawView?.prize ?? null;
@@ -553,7 +622,10 @@ function renderGalleryState(): void {
     visible: state === "prompt",
   });
   if (!dialogueShown) dialogue.hide();
-  else if (battleState) dialogue.render(state === "battle-windup" ? windUpMessage : battleMessage);
+  else if (battleState) dialogue.render(
+    state === "battle-windup" ? windUpMessage :
+      galleryTalk !== null ? battleTalkDialogueView(galleryTalk) : battleMessage,
+  );
   else if (gameView !== null)
     dialogue.render({
       speaker: null,

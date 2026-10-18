@@ -53,6 +53,15 @@ function catchCritter(): Record<string, unknown> {
   return clone(value);
 }
 
+function trace(): Record<string, unknown> {
+  return {
+    kind: "trace", dryTicks: 50, brushSpeed: 10, reachRadius: 1,
+    paths: [{ id: "path", points: [
+      { x: 0, y: 0 }, { x: 10, y: 0 }, { x: 20, y: 0 }, { x: 30, y: 0 },
+    ] }],
+  };
+}
+
 function partyMember(): Record<string, unknown> {
   const value = content.world.party.maddie;
   if (value === undefined) throw new Error("Maddie missing");
@@ -236,6 +245,59 @@ describe("battle check content validation", () => {
       .toThrow(/party\/maddie\.json.*command\.check\.kind/);
   });
 
+  it.each([
+    ["fewer than four points", (check: Record<string, unknown>) => {
+      check.paths = [{ id: "path", points: [{ x: 0, y: 0 }] }];
+    }, /burst\.check\.paths\[0\]\.points/],
+    ["a point outside the square", (check: Record<string, unknown>) => {
+      check.paths = [{ id: "path", points: [
+        { x: 0, y: 0 }, { x: 10, y: 0 }, { x: 20, y: 0 }, { x: 1001, y: 0 },
+      ] }];
+    }, /burst\.check\.paths\[0\]\.points\[3\]/],
+    ["a fractional point", (check: Record<string, unknown>) => {
+      check.paths = [{ id: "path", points: [
+        { x: 0, y: 0 }, { x: 10, y: 0 }, { x: 20, y: 0 }, { x: 30.5, y: 0 },
+      ] }];
+    }, /burst\.check\.paths\[0\]\.points\[3\]/],
+    ["consecutive points too close", (check: Record<string, unknown>) => {
+      check.reachRadius = 6;
+    }, /burst\.check\.paths\[0\]\.points/],
+    ["zero radius", (check: Record<string, unknown>) => {
+      check.reachRadius = 0;
+    }, /burst\.check\.reachRadius/],
+    ["zero speed", (check: Record<string, unknown>) => {
+      check.brushSpeed = 0;
+    }, /burst\.check\.brushSpeed/],
+    ["dry ticks below one", (check: Record<string, unknown>) => {
+      check.dryTicks = 0;
+    }, /burst\.check\.dryTicks/],
+    ["dry ticks above 180", (check: Record<string, unknown>) => {
+      check.dryTicks = 181;
+    }, /burst\.check\.dryTicks/],
+    ["path too long", (check: Record<string, unknown>) => {
+      check.dryTicks = 1;
+    }, /burst\.check\.paths\[0\]/],
+    ["no paths", (check: Record<string, unknown>) => { check.paths = []; }, /burst\.check\.paths/],
+  ])("rejects Trace with %s", (_name, change, field) => {
+    const value = critter();
+    const check = nested(value, "burst", "check");
+    Object.assign(check, trace());
+    change(check);
+    expect(() => parseCritter(value, "critters/frog.json"))
+      .toThrow(new RegExp(`critters/frog\\.json.*${field.source}`));
+  });
+
+  it("rejects Trace as Soothe's or a party command's check", () => {
+    const soothe = clone(content.world.battle);
+    nested(soothe, "commands", "soothe").check = trace();
+    expect(() => parseBattleContent(soothe, "battle.json"))
+      .toThrow(/battle\.json.*commands\.soothe\.check\.kind/);
+    const member = partyMember();
+    nested(member, "command").check = trace();
+    expect(() => parsePartyMember(member, "party/maddie.json"))
+      .toThrow(/party\/maddie\.json.*command\.check\.kind/);
+  });
+
   it("rejects a party command without a check", () => {
     const value = partyMember();
     delete nested(value, "command").check;
@@ -263,6 +325,10 @@ describe("battle check content validation", () => {
     const hints = nested(noCatchHint, "hints");
     delete hints.catch;
     expect(() => parseBattleContent(noCatchHint, "battle.json"))
+      .toThrow(/battle\.json.*hints/);
+    const noTraceHint = clone(raw);
+    delete nested(noTraceHint, "hints").trace;
+    expect(() => parseBattleContent(noTraceHint, "battle.json"))
       .toThrow(/battle\.json.*hints/);
   });
 

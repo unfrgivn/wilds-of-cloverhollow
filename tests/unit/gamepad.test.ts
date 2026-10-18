@@ -76,6 +76,15 @@ describe("gamepad taps and input merging", () => {
     });
   });
 
+  it("carries a finger on a trace, and only while it's down", () => {
+    const finger = { ...blankInput(), pointer: { x: 250, y: 600 } };
+    expect(combineInputFrames(blankInput(), finger, blankInput()).pointer)
+      .toEqual({ x: 250, y: 600 });
+    // No finger, no key: a key frame matches a recorded one exactly (spec 3.2).
+    expect("pointer" in combineInputFrames(blankInput(), blankInput(), blankInput()))
+      .toBe(false);
+  });
+
   it("drives the sim exactly like the same keys", () => {
     // Live frames always go through the merge, so compare what the sim sees:
     // a pad's d-pad and buttons against the keyboard's frame for those keys.

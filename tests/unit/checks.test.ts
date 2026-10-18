@@ -247,7 +247,7 @@ describe("lean check rules", () => {
   const lean: LeanSpec = {
     kind: "lean", puffTicks: 10, starts: [3, 20], forces: [2, 3], steer: 5, spring: 3,
   };
-  const hints = { charge: "charge", chain: "chain", catch: "catch", lean: "lean" };
+  const hints = { charge: "charge", chain: "chain", catch: "catch", lean: "lean", trace: "trace" };
 
   function leanStep(state: CheckState, way: Lean): { check: CheckState; grade: string | null } {
     return stepCheck(state, { confirmEdge: false, confirmHeld: false, lane: 1, lean: way });

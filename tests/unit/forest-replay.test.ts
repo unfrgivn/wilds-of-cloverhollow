@@ -19,14 +19,14 @@ describe("forest replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(18648);
+    expect(state.tick).toBe(18569);
     expect(state.area).toBe("enchanted");
     expect(state.dialogue).toBeNull();
     expect(knots).toEqual(expect.arrayContaining([
-      "fairy_lavender", "mystic_pond", "ancient_tree", "forest_kid",
+      "fairy_lavender", "mystic_pond", "ancient_tree",
     ]));
-    expect({ seal: story("seal_open"), wish: story("heard_wish"), kid: story("saw_tree_kid"),
-      fizzy: story("forest_fizzy") }).toEqual({ seal: true, wish: true, kid: true, fizzy: true });
+    expect({ seal: story("seal_open"), wish: story("heard_wish"),
+      fizzy: story("forest_fizzy") }).toEqual({ seal: true, wish: true, fizzy: true });
     const area = content.world.areas.enchanted;
     if (area === undefined) throw new Error("enchanted area missing");
     const states = Object.fromEntries(["tree-scribbles", "pond-fizz"].map((id) => {

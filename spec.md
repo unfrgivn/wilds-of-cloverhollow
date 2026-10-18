@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-18 (Milestones 53, 54, 57, and 58)
+Last updated: 2026-10-18 (Milestones 53, 54, 55, 57, and 58)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -122,7 +122,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   `choose`): a blank
   frame, a recorded one, and a real key's frame then have the same shape, so a
   save's last input matches a new game's (section 10), and older recordings
-  and their hashes stand. Button edges (pressed this tick) are derived in the
+  and their hashes stand. A trace check may additionally carry
+  `pointer: { x, y }`, integer coordinates from 0 through 1000 in the trace
+  square, only while a finger is down; `blankInput()` has no pointer. Only
+  touch supplies it, and the device merge (`combineInputFrames`) passes it on
+  untouched. Button
+  edges (pressed this tick) are derived in the
   core from the previous frame.
 - Taps are never lost: a key pressed since the previous tick counts as held for
   that tick, even if it was already released.
@@ -610,12 +615,12 @@ ios/            Capacitor iOS project (from Milestone 4).
    Forest", in the `enchanted` land, 1650x1100 units. Its `mist` spawn is the
    forest side of the seal. Its `mist-door` trigger returns to `mist.forest`.
    The Misty Path's `forest` trigger leads here and requires `seal_open`.
- - The forest has the hooded kid in front view and four fairies: lavender, mint,
+  - The forest has the hooded-kid battle set piece and four fairies: lavender, mint,
    sky, and peach. The lavender fairy's `fairy_lavender` knot alone sets
    `heard_wish`. The pond and Ancient Tree are look points, with their after-
-   lore lines unlocked by that variable. The kid's `forest_kid` knot sets
-   `saw_tree_kid` and has a short `again` line on later talks. No line names
-   the kid. Seven ambient entries draw the butterflies and fairy lights from
+    lore lines unlocked by that variable. Walking into the kid starts its battle;
+    its calm `milo_calm` knot reveals Milo and has a short `again` line on later
+    talks. No line before the soothed reveal names Milo. Seven ambient entries draw the butterflies and fairy lights from
    the tick, and `renderInfo().ambient` exposes the seven current flyers.
  - The forest's `forest_fizzy` variable starts true. `tree-scribbles`, the
    scribbled stones, and `pond-fizz` are chaos overlays with restored default
@@ -1155,6 +1160,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   them on a fresh install and Continue after the relaunch.
 
 ## 8. Calm-down battles (v0)
+- Talk phases: a critter kind may carry `talk` (`label`, the command's name;
+  `prompt`, the battle's line while Talk is the only command; `talkAt`; three
+  Ink knots; and great/good/miss calm amounts) and `canRun` (default true).
+  Once calm reaches `talkAt`, the command menu contains only Talk, under the
+  `prompt` line, with no burst,
+  wind-up, feelings, or PRNG draws. Talk uses a battle-local dialogue state,
+  including typed speaker text, wrapped choices, touch selection, and a grade
+  tag on each selected Ink response. The grade adds its configured calm and
+  the three knots play once in turn order. While any Talk knot remains, a kind
+  with Talk content is clamped to `calmMax - 1`, including ordinary battle
+  commands before `talkAt`; its final graded Talk response fills the meter to
+  `calmMax` regardless of grade. Every Talk knot therefore plays.
 - Critter kinds (`content/critters/<id>.json`, the file named for its `id`),
   each of a `species`; kinds of one species share its sticker (spec 9). The
   set pieces (section 6.1): the Fizzy Frog (`fountain-frog`, the plaza
@@ -1190,6 +1207,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   to its command, not to the critter); the extra difficulty comes from its
   larger meter, extra energy, larger reach, and stronger burst, and from its
   wind-ups (Milestone 50, below), which Mr. Pip shares.
+- The hooded kid (`hooded-kid`) is the finale set piece under the Ancient Tree.
+  It has `calmMax` 200, `energyMax` 6, `touchRadius` 95, and pays 40 coins.
+  It cannot run. Its Trace tuning is `reachRadius` 105, `brushSpeed` 20, and
+  `dryTicks` 180. Its Talk starts at `talkAt` 100, always plays all three
+  knots, and the final knot fills the meter. The three Talk grades add 35, 25,
+  or 20 calm. Its battle atlas contains the chaos, burst, soothed, and calm
+  looks. The battle reward is Milo's sticker.
 - Friend commands: Maddie's Play, Sue's Cast, and Jordan's Juggle (pinecones;
   calm 30, great 15, good 5, rest 2 on every critter). Each plays its own
   check (Milestone 40): Play the ring (Maddie's pounce), Cast a charge (Sue
@@ -1298,6 +1322,16 @@ ios/            Capacitor iOS project (from Milestone 4).
     else missed. Every toy caught grades great, at least half good, fewer a
     miss, like a chain, and each catch plays `battle-beat`. `toys` are frames
     of the toy atlas (`content/battle.json` `toyAtlas`), thrown in turn.
+  - `trace` (Milestone 55; `dryTicks`, `brushSpeed`, `reachRadius`, and
+    authored paths of at least four integer points in the 0..1000 square): the
+    brush starts on the first point, which is hit on the first tick, then moves
+    at most `brushSpeed` toward the pointer, or by the stick vector capped at
+    length 1 and scaled by `brushSpeed` (so a light tilt moves slowly and a
+    diagonal is no faster than straight). It is clamped to the square and
+    reaches at most one next point
+    per tick within `reachRadius`. At `dryTicks`, unresolved points miss. All
+    hits grade great, at least half good, fewer miss, and every hit plays
+    `battle-beat`.
   - `lean` (Milestone 48; `puffTicks`, `starts`, `forces`, `steer`,
     `spring`): only a burst's. A gust's puffs push Fae's balance, which runs
     from -100 (blown over backward) to 100 (leaned over forward) and starts
@@ -1359,7 +1393,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Hints: while a charge waits for its first press, before a chain's first
   beat or a catch's first toy lands, or before a lean's first puff blows, the
   battle view carries that kind's hint from `content/battle.json`
-  (`hints.charge`, `hints.chain`, `hints.catch`, `hints.lean`).
+  (`hints.charge`, `hints.chain`, `hints.catch`, `hints.lean`, and
+  `hints.trace`). A trace hint is shown while its second checkpoint is pending.
   It never uses `battle.message`, whose reveal would eat a confirm press.
 - Feelings (Milestone 42): once two friends fight beside Fae, each bringing
   a battle command (Sue's arrival; a party member without one doesn't
@@ -1511,7 +1546,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   clamped, softly blurred, with a
   light cream wash. The overworld characters hide during the battle.
 - Shell: `data-battle="open"` is on the root while a battle runs. Battle
-  messages use the dialogue box with no speaker and hide when empty. Dev
+  messages use the dialogue box with no speaker and hide when empty. While
+  `battle.talk` is non-null, that same box is a dialogue with its speaker,
+  typed line, advance arrow when the line has no choices, and the shared choice
+  stickers once the line is revealed. The command menu is hidden while a Talk
+  line is open, and the HUD while a question's answers are on screen
+  (`talkChoicesShown`): on a phone the band above the dialogue box is too short
+  for the answers and the meters, and the calm meter only moves once an answer
+  is picked. Talk choices use the same keyboard, gamepad, and touch
+  selection as ordinary dialogue. Dev builds log
+  `[cloverhollow] battle-talk {speaker, choices}` when those values change.
+  Dev
   builds log `[cloverhollow] battle {phase, message}` and the command buttons'
   rects. `renderInfo().battle` reports, in CSS px, the layout, the drawn
   backdrop rect, the check (`{ kind, side, x, y, hintAt }` plus a ring's
@@ -1524,6 +1569,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   the aura alpha, and whether the
   overworld is visible; `renderInfo().critters` lists each overworld critter
   as `{ id, kind, frame, x, y }`, `id` its key (section 6.1).
+  `renderInfo().battle.talk` is null outside Talk, otherwise
+  `{ speaker, text, revealed, choices, selected }`.
 
 ### 8.1 Battle UI layout
 - Battle UI is the sticker DOM layer (`src/ui/battle.ts`): a HUD, a command
@@ -1575,6 +1622,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   force is at least half her lean. The grade sticker hangs over her head,
   just under the track, since above it would meet the HUD on a phone. All of
   it is drawn in code; nothing is generated.
+- Trace (Milestone 55): a square authored in 0..1000 coordinates sits in the
+  open ground between Fae and the critter, clear of the HUD, menu, message box,
+  and touch buttons. The purple marker scribble is a thick wobbly path with
+  dotted checkpoints, a pastel painted trail, a brush tip, and a drying ring.
+  The next checkpoint pulses, hits fill teal, and misses remain empty/grey, so
+  colour is never the only cue. A finger maps to the square while held; its
+  pointer is separate from the movement stick. The square is centred and sized
+  by `battleCheckGeometry` for desktop and notched phone safe areas.
+- The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
+  and leaves Milo calm under the tree. The sticker catalogue has 13 slots,
+  including the Milo sticker. The front-view NPC art is no longer loaded by
+  the runtime. Its raw source and recipe remain in `art/source/` and
+  `art/recipes/` for provenance.
 - Feelings (Milestone 42): a thought cloud (a cream sticker) floats in the
   open ground between Fae's party and the critter (`battleFeelingAnchor`:
   centred between 0.45 x Fae's height past her and the critter's aura edge,
@@ -2101,7 +2161,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `{ id, x, y, frame }` in world units, and is empty for an area without
   flyers. `battle.layout` includes `party`, the
     members' CSS-px points, and `battle.check` the check's geometry
-    (section 8). `marks` lists the recurring critters' "?" and "!" as
+    (section 8). For Trace it is `{ kind: "trace", rect: { x, y, width,
+    height }, brush: { x, y }, points: [{ x, y }], checkpoint, hintAt }`, all
+    coordinates in CSS px except the brush and points, which are in the
+    authored 0..1000 square. `marks` lists the recurring critters' "?" and "!" as
     `{ key, mark, x, y }`, each at its sticker's bottom centre in CSS px
     (Milestone 51).
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,

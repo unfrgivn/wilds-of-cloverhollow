@@ -156,6 +156,37 @@ export async function playBattleCheck(page: Page): Promise<void> {
     if (held !== null) await page.keyboard.up(held);
     return;
   }
+  if (check.kind === "trace") {
+    let heldX: string | null = null;
+    let heldY: string | null = null;
+    for (let active = check; ; ) {
+      if (!active.results.includes("pending")) break;
+      const target = active.path.points[active.checkpoint];
+      if (target === undefined) break;
+      const dx = target.x - active.brush.x;
+      const dy = target.y - active.brush.y;
+      const near = Math.sqrt(dx * dx + dy * dy) <= active.spec.reachRadius;
+      const nextX = near || dx === 0 ? null : dx < 0 ? "ArrowLeft" : "ArrowRight";
+      const nextY = near || dy === 0 ? null : dy < 0 ? "ArrowUp" : "ArrowDown";
+      if (heldX !== nextX) {
+        if (heldX !== null) await page.keyboard.up(heldX);
+        if (nextX !== null) await page.keyboard.down(nextX);
+        heldX = nextX;
+      }
+      if (heldY !== nextY) {
+        if (heldY !== null) await page.keyboard.up(heldY);
+        if (nextY !== null) await page.keyboard.down(nextY);
+        heldY = nextY;
+      }
+      await step(page, 1);
+      const current = (await readBattle(page))?.check;
+      if (current?.kind !== "trace") break;
+      active = current;
+    }
+    if (heldX !== null) await page.keyboard.up(heldX);
+    if (heldY !== null) await page.keyboard.up(heldY);
+    return;
+  }
   for (const arrival of check.spec.arrivals) {
     const current = await readBattle(page);
     const active = current?.check;

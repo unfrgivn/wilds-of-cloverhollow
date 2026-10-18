@@ -121,7 +121,8 @@ export function soundCues(
 // How many beats, toys, or puffs a chain, catch, or lean has hit so far;
 // other checks none.
 function hits(check: CheckState | null): number {
-  return check?.kind === "chain" || check?.kind === "catch" || check?.kind === "lean"
+  return check?.kind === "chain" || check?.kind === "catch" ||
+    check?.kind === "lean" || check?.kind === "trace"
     ? check.results.filter((result) => result === "hit").length
     : 0;
 }

@@ -35,6 +35,7 @@ describe("chapter one", () => {
       "gym-pup": "chaos",
       "music-bird": "chaos",
       "oak-squirrel": "chaos",
+      "hooded-kid": "chaos",
     });
     // And on the way: a park pup, and a cat in the plaza once the town's
     // critters were out (Milestone 28; two raccoons until Milestone 51's

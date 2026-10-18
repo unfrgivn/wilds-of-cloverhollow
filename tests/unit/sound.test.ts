@@ -86,6 +86,40 @@ describe("gameplay sound cues", () => {
     expect(hits).toBe(1);
   });
 
+  it("emits one battle-beat per Trace hit through real battle steps", () => {
+    const fixture = content.fixtures.plaza;
+    if (fixture === undefined) throw new Error("plaza fixture missing");
+    const initial = createState(content.world, fixture);
+    const critter = content.world.critters["fountain-frog"];
+    if (critter === undefined) throw new Error("fountain frog missing");
+    const trace = {
+      kind: "trace" as const, dryTicks: 20, brushSpeed: 100, reachRadius: 5,
+      paths: [{ id: "sound", points: [
+        { x: 100, y: 100 }, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 },
+      ] }],
+    };
+    let state: State = {
+      ...initial,
+      battle: {
+        critterId: critter.id, den: null, entry: initial.player, phase: "check",
+        message: "", revealed: 0, selected: 0, command: null, energy: 5, calm: 0,
+        rest: {}, check: createCheck(trace, "fae"), lastGrade: null, feelings: [],
+        answered: false, lanternPeek: false, turn: 1, windUp: null,
+        rewardSticker: null, phaseTicks: 0,
+      },
+    };
+    let beats = 0;
+    for (const pointer of [undefined, { x: 200, y: 100 }, { x: 300, y: 100 }, { x: 400, y: 100 }]) {
+      const next = step(
+        content.world, state, pointer === undefined ? none : { ...none, pointer },
+      ).state;
+      beats += soundCues(state, next, content.world)
+        .filter((cue) => cue === "battle-beat").length;
+      state = next;
+    }
+    expect(beats).toBe(4);
+  });
+
   it("emits no battle-beat for a real chain miss but still emits battle-hit", () => {
     const fixture = content.fixtures.plaza;
     if (fixture === undefined) throw new Error("plaza fixture missing");

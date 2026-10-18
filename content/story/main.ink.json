@@ -401,7 +401,45 @@
       "journal": [
         "ev",
         {
-          "VAR?": "saw_tree_kid"
+          "VAR?": "heard_wish"
+        },
+        "str",
+        "^hooded-kid",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The kid in the purple hood is waiting under the Ancient Tree. Their wish made all this fizz! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.10"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        "str",
+        "^hooded-kid",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
         },
         "/ev",
         [
@@ -411,11 +449,11 @@
           },
           {
             "b": [
-              "^ The kid in the purple hood is waiting under the Ancient Tree. They called it THEIR secret forest... and they knew my name! ",
+              "^ The kid in the purple hood was MILO! He wished to be the best at everything, and the fizz got out of hand. ",
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.20"
               },
               null
             ]
@@ -440,7 +478,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.11"
+                "->": ".^.^.^.27"
               },
               null
             ]
@@ -465,7 +503,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.18"
+                "->": ".^.^.^.34"
               },
               null
             ]
@@ -490,7 +528,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.25"
+                "->": ".^.^.^.41"
               },
               null
             ]
@@ -515,7 +553,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.32"
+                "->": ".^.^.^.48"
               },
               null
             ]
@@ -540,7 +578,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.39"
+                "->": ".^.^.^.55"
               },
               null
             ]
@@ -570,7 +608,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.49"
+                "->": ".^.^.^.65"
               },
               null
             ]
@@ -595,7 +633,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.56"
+                "->": ".^.^.^.72"
               },
               null
             ]
@@ -622,7 +660,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.65"
+                "->": ".^.^.^.81"
               },
               null
             ]
@@ -647,7 +685,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.72"
+                "->": ".^.^.^.88"
               },
               null
             ]
@@ -676,7 +714,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.82"
+                "->": ".^.^.^.98"
               },
               null
             ]
@@ -710,7 +748,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.95"
+                "->": ".^.^.^.111"
               },
               null
             ]
@@ -735,7 +773,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.102"
+                "->": ".^.^.^.118"
               },
               null
             ]
@@ -760,7 +798,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.109"
+                "->": ".^.^.^.125"
               },
               null
             ]
@@ -794,7 +832,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.121"
+                "->": ".^.^.^.137"
               },
               null
             ]
@@ -819,7 +857,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.128"
+                "->": ".^.^.^.144"
               },
               null
             ]
@@ -844,7 +882,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.135"
+                "->": ".^.^.^.151"
               },
               null
             ]
@@ -874,7 +912,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.145"
+                "->": ".^.^.^.161"
               },
               null
             ]
@@ -904,7 +942,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.155"
+                "->": ".^.^.^.171"
               },
               null
             ]
@@ -929,7 +967,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.162"
+                "->": ".^.^.^.178"
               },
               null
             ]
@@ -959,7 +997,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.172"
+                "->": ".^.^.^.188"
               },
               null
             ]
@@ -989,7 +1027,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.182"
+                "->": ".^.^.^.198"
               },
               null
             ]
@@ -1014,7 +1052,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.189"
+                "->": ".^.^.^.205"
               },
               null
             ]
@@ -1044,7 +1082,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.199"
+                "->": ".^.^.^.215"
               },
               null
             ]
@@ -1074,7 +1112,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.209"
+                "->": ".^.^.^.225"
               },
               null
             ]
@@ -1099,7 +1137,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.216"
+                "->": ".^.^.^.232"
               },
               null
             ]
@@ -1124,7 +1162,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.223"
+                "->": ".^.^.^.239"
               },
               null
             ]
@@ -1154,7 +1192,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.233"
+                "->": ".^.^.^.249"
               },
               null
             ]
@@ -1188,7 +1226,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.246"
+                "->": ".^.^.^.262"
               },
               null
             ]
@@ -1218,7 +1256,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.256"
+                "->": ".^.^.^.272"
               },
               null
             ]
@@ -1243,7 +1281,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.263"
+                "->": ".^.^.^.279"
               },
               null
             ]
@@ -1273,7 +1311,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.273"
+                "->": ".^.^.^.289"
               },
               null
             ]
@@ -1307,7 +1345,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.286"
+                "->": ".^.^.^.302"
               },
               null
             ]
@@ -1341,7 +1379,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.299"
+                "->": ".^.^.^.315"
               },
               null
             ]
@@ -1371,7 +1409,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.309"
+                "->": ".^.^.^.325"
               },
               null
             ]
@@ -1401,7 +1439,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.319"
+                "->": ".^.^.^.335"
               },
               null
             ]
@@ -1431,7 +1469,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.329"
+                "->": ".^.^.^.345"
               },
               null
             ]
@@ -1456,7 +1494,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.336"
+                "->": ".^.^.^.352"
               },
               null
             ]
@@ -1498,7 +1536,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.353"
+                "->": ".^.^.^.369"
               },
               null
             ]
@@ -1532,7 +1570,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.366"
+                "->": ".^.^.^.382"
               },
               null
             ]
@@ -1632,7 +1670,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.376"
+                "->": ".^.^.^.392"
               },
               null
             ]
@@ -1657,7 +1695,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.383"
+                "->": ".^.^.^.399"
               },
               null
             ]
@@ -1687,7 +1725,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.393"
+                "->": ".^.^.^.409"
               },
               null
             ]
@@ -1721,7 +1759,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.405"
+                "->": ".^.^.^.421"
               },
               null
             ]
@@ -1746,7 +1784,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.412"
+                "->": ".^.^.^.428"
               },
               null
             ]
@@ -1776,7 +1814,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.422"
+                "->": ".^.^.^.438"
               },
               null
             ]
@@ -1810,7 +1848,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.435"
+                "->": ".^.^.^.451"
               },
               null
             ]
@@ -1839,7 +1877,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.445"
+                "->": ".^.^.^.461"
               },
               null
             ]
@@ -1868,7 +1906,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.455"
+                "->": ".^.^.^.471"
               },
               null
             ]
@@ -1902,7 +1940,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.468"
+                "->": ".^.^.^.484"
               },
               null
             ]
@@ -1932,7 +1970,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.478"
+                "->": ".^.^.^.494"
               },
               null
             ]
@@ -1957,7 +1995,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.485"
+                "->": ".^.^.^.501"
               },
               null
             ]
@@ -1991,7 +2029,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.497"
+                "->": ".^.^.^.513"
               },
               null
             ]
@@ -2016,7 +2054,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.504"
+                "->": ".^.^.^.520"
               },
               null
             ]
@@ -2045,7 +2083,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.514"
+                "->": ".^.^.^.530"
               },
               null
             ]
@@ -2070,7 +2108,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.521"
+                "->": ".^.^.^.537"
               },
               null
             ]
@@ -2095,7 +2133,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.528"
+                "->": ".^.^.^.544"
               },
               null
             ]
@@ -2132,7 +2170,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.543"
+                "->": ".^.^.^.559"
               },
               null
             ]
@@ -2157,7 +2195,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.550"
+                "->": ".^.^.^.566"
               },
               null
             ]
@@ -2191,7 +2229,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.563"
+                "->": ".^.^.^.579"
               },
               null
             ]
@@ -2220,7 +2258,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.573"
+                "->": ".^.^.^.589"
               },
               null
             ]
@@ -2245,7 +2283,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.580"
+                "->": ".^.^.^.596"
               },
               null
             ]
@@ -2270,7 +2308,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.587"
+                "->": ".^.^.^.603"
               },
               null
             ]
@@ -2300,7 +2338,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.597"
+                "->": ".^.^.^.613"
               },
               null
             ]
@@ -2330,7 +2368,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.607"
+                "->": ".^.^.^.623"
               },
               null
             ]
@@ -2355,7 +2393,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.614"
+                "->": ".^.^.^.630"
               },
               null
             ]
@@ -2384,7 +2422,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.624"
+                "->": ".^.^.^.640"
               },
               null
             ]
@@ -2422,7 +2460,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.640"
+                "->": ".^.^.^.656"
               },
               null
             ]
@@ -2449,7 +2487,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.649"
+                "->": ".^.^.^.665"
               },
               null
             ]
@@ -2478,7 +2516,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.659"
+                "->": ".^.^.^.675"
               },
               null
             ]
@@ -2503,7 +2541,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.666"
+                "->": ".^.^.^.682"
               },
               null
             ]
@@ -2532,7 +2570,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.677"
+                "->": ".^.^.^.693"
               },
               null
             ]
@@ -2561,7 +2599,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.688"
+                "->": ".^.^.^.704"
               },
               null
             ]
@@ -6971,6 +7009,261 @@
           "#f": 1
         }
       ],
+      "kid_talk_1": [
+        [
+          "^You don't even know who I am! ",
+          "#",
+          "^speaker: Hooded Kid",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^You beat the Star Racer high score, then scribbled out your initials.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^You left a Star Racer token in your stash.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^You're the boss of the whole forest!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^...You figured THAT out? ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: great",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Maybe. Lots of kids play Star Racer. ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: good",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-2": [
+              "\n",
+              "^Ha! I WISH. ...Wait. That's kind of what I wished for. ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: miss",
+              "/#",
+              "\n",
+              "done",
+              "done",
+              {
+                "#f": 5
+              }
+            ]
+          }
+        ],
+        null
+      ],
+      "kid_talk_2": [
+        [
+          "^Nobody ever notices me anyway... ",
+          "#",
+          "^speaker: Hooded Kid",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^I notice you! The paper planes, the star doodles...",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Everybody noticed the scribbles.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Maybe nobody likes purple?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^You... you saw those? ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: great",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^That's not the same thing. ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: good",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-2": [
+              "\n",
+              "^Hey! Purple is the BEST color. ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: miss",
+              "/#",
+              "\n",
+              "done",
+              "done",
+              {
+                "#f": 5
+              }
+            ]
+          }
+        ],
+        null
+      ],
+      "kid_talk_3": [
+        [
+          "^So go on, Fae. Who am I? ",
+          "#",
+          "^speaker: Hooded Kid",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Milo?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Someone from my class.",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 20
+          },
+          "ev",
+          "str",
+          "^Rosie?",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 20
+          },
+          {
+            "c-0": [
+              "\n",
+              "^...Yeah. It's me. ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: great",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-1": [
+              "\n",
+              "^Warmer... but who? ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: good",
+              "/#",
+              "\n",
+              "done",
+              {
+                "#f": 5
+              }
+            ],
+            "c-2": [
+              "\n",
+              "^Nope! Rosie's way better at kites than me. ",
+              "#",
+              "^speaker: Hooded Kid ",
+              "/#",
+              "#",
+              "^grade: miss",
+              "/#",
+              "\n",
+              "done",
+              "done",
+              {
+                "#f": 5
+              }
+            ]
+          }
+        ],
+        null
+      ],
       "claw_machine": [
         [
           "ev",
@@ -10955,6 +11248,39 @@
       ],
       "on_calm": [
         "ev",
+        "str",
+        "^hooded-kid",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              false,
+              "/ev",
+              {
+                "VAR=": "forest_fizzy",
+                "re": true
+              },
+              {
+                "->": ".^.^.^.7"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
         {
           "VAR?": "garden_planted"
         },
@@ -11046,7 +11372,7 @@
               "nop",
               "\n",
               {
-                "->": ".^.^.^.7"
+                "->": ".^.^.^.16"
               },
               null
             ]
@@ -13210,10 +13536,10 @@
         "done",
         null
       ],
-      "forest_kid": [
+      "milo_calm": [
         "ev",
         {
-          "VAR?": "saw_tree_kid"
+          "VAR?": "milo_revealed"
         },
         "/ev",
         [
@@ -13240,30 +13566,90 @@
         true,
         "/ev",
         {
-          "VAR=": "saw_tree_kid",
+          "VAR=": "milo_revealed",
           "re": true
         },
-        "^So you found my secret forest, Fae! ",
+        "^Fae... it's me. I'm really sorry about all the scribbles. ",
         "#",
-        "^speaker: Hooded Kid",
+        "^speaker: Milo",
         "/#",
         "\n",
-        "^Nobody can stop the BOSS. Not even you! ",
+        "^My paper plane flew into the mist, so I followed it. I found this forest and wished at the Mystic Pond to be the best at everything, even Star Racer. ",
         "#",
-        "^speaker: Hooded Kid",
+        "^speaker: Milo",
         "/#",
         "\n",
-        "^We'll see about that! ",
+        "^I drank from the pond, and the fizz got out of hand. Fizz-fast, I could zip from our classroom to the hall and back before anyone noticed. That's how I peeked in, then sat back down. ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^I only wanted to be noticed. ",
+        "#",
+        "^speaker: Milo",
+        "/#",
+        "\n",
+        "^I always notice you, Milo. You're my friend. ",
         "#",
         "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Sue gives Milo a small wave. \"We noticed you too.\" ",
+              "#",
+              "^speaker: Sue",
+              {
+                "->": ".^.^.^.39"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "jordan_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Jordan smiles. \"You don't have to be the best at everything.\" ",
+              "#",
+              "^speaker: Jordan",
+              {
+                "->": ".^.^.^.46"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "/#",
         "\n",
         "done",
         {
           "again": [
-            "^You again? The BOSS is busy, Fae! ",
+            "^The Ancient Tree is glowing again. It's so pretty now. ",
             "#",
-            "^speaker: Hooded Kid",
+            "^speaker: Fae",
             "/#",
             "\n",
             "done",
@@ -13453,7 +13839,7 @@
         },
         false,
         {
-          "VAR=": "saw_tree_kid"
+          "VAR=": "milo_revealed"
         },
         false,
         {

@@ -99,6 +99,7 @@ import lodgeKeeperData from "../../content/critters/lodge-keeper.json";
 import gymPupData from "../../content/critters/gym-pup.json";
 import musicBirdData from "../../content/critters/music-bird.json";
 import oakSquirrelData from "../../content/critters/oak-squirrel.json";
+import hoodedKidData from "../../content/critters/hooded-kid.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import stickerData from "../../content/stickers.json";
@@ -107,7 +108,7 @@ import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
 import pondPupData from "../../content/party/pond-pup.json";
 import landsData from "../../content/lands.json";
-import { createInkState, createStoryReader } from "../core/ink";
+import { createInkState, createStoryReader, runInk, storyHasKnot } from "../core/ink";
 import { isStorySound } from "../core/sound";
 import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
@@ -157,7 +158,7 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
   field(record(value), file, name);
   const kind = value.kind;
   field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch" ||
-    kind === "lean", file, `${name}.kind`);
+    kind === "lean" || kind === "trace", file, `${name}.kind`);
   const integer = (key: string): number => {
     const item = value[key];
     field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
@@ -210,6 +211,48 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
     field(forces.every((force) => force >= 1 && force < steer), file, `${name}.forces`);
     return { kind, puffTicks, starts, forces, steer, spring };
   }
+  if (kind === "trace") {
+    const dryTicks = integer("dryTicks");
+    const brushSpeed = value.brushSpeed;
+    const reachRadius = value.reachRadius;
+    field(typeof brushSpeed === "number" && brushSpeed > 0, file, `${name}.brushSpeed`);
+    field(typeof reachRadius === "number" && reachRadius > 0, file, `${name}.reachRadius`);
+    field(dryTicks >= 1 && dryTicks <= 180, file, `${name}.dryTicks`);
+    const rawPaths = value.paths;
+    field(Array.isArray(rawPaths) && rawPaths.length > 0, file, `${name}.paths`);
+    const paths = rawPaths.map((rawPath, pathIndex) => {
+      if (!record(rawPath)) throw new Error(`${file}: invalid ${name}.paths[${pathIndex}]`);
+      field(typeof rawPath.id === "string" && rawPath.id.length > 0, file,
+        `${name}.paths[${pathIndex}]`);
+      const rawPoints = rawPath.points;
+      if (!Array.isArray(rawPoints) || rawPoints.length < 4)
+        throw new Error(`${file}: invalid ${name}.paths[${pathIndex}].points`);
+      const points = rawPoints.map((rawPoint, pointIndex) => {
+        if (!record(rawPoint))
+          throw new Error(`${file}: invalid ${name}.paths[${pathIndex}].points[${pointIndex}]`);
+        const x = rawPoint.x;
+        const y = rawPoint.y;
+        field(typeof x === "number" && typeof y === "number" && Number.isInteger(x) &&
+          Number.isInteger(y) && x >= 0 && x <= 1000 && y >= 0 && y <= 1000,
+          file, `${name}.paths[${pathIndex}].points[${pointIndex}]`);
+        return { x, y };
+      });
+      let length = 0;
+      points.forEach((point, pointIndex) => {
+        const previous = points[pointIndex - 1];
+        if (previous !== undefined) {
+          const dx = point.x - previous.x;
+          const dy = point.y - previous.y;
+          const segment = Math.sqrt(dx * dx + dy * dy);
+          field(segment >= 2 * reachRadius, file, `${name}.paths[${pathIndex}].points`);
+          length += segment;
+        }
+      });
+      field(length / brushSpeed <= dryTicks * 0.7, file, `${name}.paths[${pathIndex}]`);
+      return { id: rawPath.id, points };
+    });
+    return { kind, dryTicks, brushSpeed, reachRadius, paths };
+  }
   const travelTicks = integer("travelTicks");
   field(travelTicks >= 1, file, `${name}.travelTicks`);
   const arrivals = integers("arrivals");
@@ -240,7 +283,8 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
 // (spec 8).
 function faeSideCheck(value: unknown, file: string, name: string): CheckSpec {
   const spec = checkSpec(value, file, name);
-  field(spec.kind !== "catch" && spec.kind !== "lean", file, `${name}.kind`);
+  field(spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace", file,
+    `${name}.kind`);
   return spec;
 }
 
@@ -327,6 +371,9 @@ export function storyTagErrors(
   prices: Record<string, number> = {},
 ): string[] {
   return tags.flatMap((tag) => {
+    if (tag.startsWith("grade:"))
+      return /^(great|good|miss)$/.test(tag.slice("grade:".length).trim())
+        ? [] : [`invalid grade tag "${tag}"`];
     if (tag.startsWith("travel:")) {
       const [areaId, spawnId, ...extra] = tag.slice("travel:".length).trim().split(".");
       const area = areaId === undefined ? undefined : areas[areaId];
@@ -356,6 +403,31 @@ export function storyTagErrors(
       return isStorySound(sound) ? [] : [`unknown sound in "${tag}"`];
     }
     return [];
+  });
+}
+
+export function talkErrors(
+  story: Record<string, unknown>, ink: string, critters: Critter[],
+): string[] {
+  return critters.flatMap((critter) => {
+    if (critter.talk === null) return [];
+    const errors: string[] = [];
+    for (const knot of critter.talk.knots) {
+      if (!storyHasKnot(story, knot)) {
+        errors.push(`critter ${critter.id}: unknown talk knot ${knot}`);
+        continue;
+      }
+      const opening = runInk(story, ink, { type: "start", knot });
+      opening.choices.forEach((_, index) => {
+        const answer = runInk(story, opening.ink, { type: "choose", index });
+        const grades = answer.line?.tags.filter(
+          (tag) => /^grade:\s*(great|good|miss)\s*$/.test(tag.trim()),
+        ) ?? [];
+        if (grades.length !== 1)
+          errors.push(`critter ${critter.id}: ${knot} choice ${index} must have exactly one grade`);
+      });
+    }
+    return errors;
   });
 }
 
@@ -1194,6 +1266,48 @@ export function parseCritter(value: unknown, file: string): Critter {
   field(record(lines), file, "lines");
   const line = (key: string): string => text(lines, key);
   const feelings = critterFeelings(value.feelings, file);
+  const talkRaw = value.talk;
+  let talk: Critter["talk"] = null;
+  if (talkRaw !== undefined && talkRaw !== null) {
+    field(record(talkRaw) && record(talkRaw.calm) && Array.isArray(talkRaw.knots), file, "talk");
+    if (!record(talkRaw) || !record(talkRaw.calm) || !Array.isArray(talkRaw.knots))
+      throw new Error(`${file}: invalid talk`);
+    const knots = talkRaw.knots;
+    field(
+      knots.length === 3 && knots.every((item) => typeof item === "string" && item.length > 0),
+      file, "talk.knots",
+    );
+    const calm = talkRaw.calm;
+    const calmValue = (grade: Grade): number => {
+      const item = calm[grade];
+      field(
+        typeof item === "number" && Number.isInteger(item) && item > 0,
+        file, `talk.calm.${grade}`,
+      );
+      return item;
+    };
+    const values = { great: calmValue("great"), good: calmValue("good"), miss: calmValue("miss") };
+    field(values.great >= values.good && values.good >= values.miss, file, "talk.calm order");
+    const talkAtValue = talkRaw.talkAt;
+    field(
+      typeof talkAtValue === "number" && Number.isInteger(talkAtValue) && talkAtValue > 0 &&
+        talkAtValue < number(value, "calmMax"), file, "talk.talkAt",
+    );
+    const talkAt = typeof talkAtValue === "number" ? talkAtValue : 0;
+    talk = {
+      label: typeof talkRaw.label === "string"
+        ? talkRaw.label
+        : (field(false, file, "talk.label"), "Talk"),
+      prompt: typeof talkRaw.prompt === "string" && talkRaw.prompt.length > 0
+        ? talkRaw.prompt
+        : (field(false, file, "talk.prompt"), ""),
+      talkAt,
+      knots: [knots[0] ?? "", knots[1] ?? "", knots[2] ?? ""],
+      calm: values,
+    };
+  }
+  const canRun = value.canRun ?? true;
+  field(typeof canRun === "boolean", file, "canRun");
   const sootheRaw = command("soothe", ["calm", "great", "good"]);
   const snackRaw = command("snack", ["calm", "energy"]);
   // One entry per party command id (spec 8); the loader checks the roster's
@@ -1248,6 +1362,8 @@ export function parseCritter(value: unknown, file: string): Critter {
     },
     burst: burstValue,
     windUp: critterWindUp(value.windUp, file, feelings.length),
+    talk,
+    canRun,
     lines: {
       intro: line("intro"),
       command: line("command"),
@@ -1274,7 +1390,8 @@ export function parseBattleContent(
       typeof hints.charge === "string" &&
       typeof hints.chain === "string" &&
       typeof hints.catch === "string" &&
-      typeof hints.lean === "string",
+      typeof hints.lean === "string" &&
+      typeof hints.trace === "string",
     file,
     "hints",
   );
@@ -1332,7 +1449,8 @@ export function parseBattleContent(
     "oldFriends.calms");
   return {
     toyAtlas,
-    hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean },
+    hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean,
+      trace: hints.trace },
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),
@@ -1781,6 +1899,7 @@ export function loadContent(): {
     [gymPupData, "gym-pup"],
     [musicBirdData, "music-bird"],
     [oakSquirrelData, "oak-squirrel"],
+    [hoodedKidData, "hooded-kid"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -1880,6 +1999,9 @@ export function loadContent(): {
     arcadeGames.counter.prizes.map((item) => [item.prize, item.price])));
   if (tagProblems.length > 0)
     throw new Error(`content/story/main.ink: ${tagProblems.join("; ")}`);
+  const talkProblems = talkErrors(story, initialInk, Object.values(critters));
+  if (talkProblems.length > 0)
+    throw new Error(`content/critters: ${talkProblems.join("; ")}`);
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),

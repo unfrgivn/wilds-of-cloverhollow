@@ -32,13 +32,15 @@ jobs:
 
   # Chromium on macOS runners: they have a GPU (Apple's paravirtual Metal
   # device), where the gameplay flows run five to six times faster than in
-  # Linux's software renderer, and its screenshots match the baselines.
+  # Linux's software renderer, and its screenshots match the baselines. Each
+  # shard checks out only its own specs' baselines (all of them are most of a
+  # checkout); the PNGs, not their folders, are left out so they can be added.
   chromium:
     runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     name: chromium ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v4
@@ -48,13 +50,16 @@ jobs:
             /*
             !/art/
             !/docs/
-            !/tests/e2e/*-snapshots/*-webkit-*.png
+            !/tests/e2e/*-snapshots/*.png
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.5
       - run: bun install --frozen-lockfile
       - run: bunx playwright install chromium
       - run: bun tools/ci/shard.ts chromium ${{ matrix.shard }}/${{ strategy.job-total }} shard.txt
+      - run: >-
+          awk -F ' › ' '{ print "/tests/e2e/" $2 "-snapshots/*-chromium-darwin.png" }' shard.txt
+          | sort -u | xargs git sparse-checkout add
       - run: bunx playwright test --project=chromium --test-list shard.txt --reporter=dot,json
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: report.json
@@ -80,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     name: webkit ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v4

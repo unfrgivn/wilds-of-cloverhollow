@@ -2118,9 +2118,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   already does) and the suite runs on half the cores.
 - CI (`.github/workflows/ci.yml`) skips pushes of only docs, art sources, and
   Markdown, and checks out only what runs. One Linux job runs `check` and
-  `build`. Chromium runs on three macOS runners, which have a GPU (Apple's
+  `build`. Chromium runs on four macOS runners, which have a GPU (Apple's
   paravirtual Metal device) and match the Chromium baselines, so CI compares
-  its screenshots. WebKit runs on three Linux runners and leaves its
+  its screenshots (each runner checks out only its own specs' baselines).
+  WebKit runs on four Linux runners and leaves its
   screenshots to local runs: WebKit draws text and images with the operating
   system's libraries, so its baselines hold for the macOS they were drawn on.
   Each shard runs one worker. `tools/ci/shard.ts` splits each project by the

@@ -2210,10 +2210,144 @@ the old trail, the owl, and the clubhouse claim.
   "Microwave for making dino nuggets and mac n cheese" and a "Chest to store
   items". Designed after Milestone 49.
 
+## Milestone 53: Into the mist **Status:** 📋 Planned
+- The finale begins. The owner decided it (2026-10-17): the kid in the purple
+  hood is Milo, unmasked only at the very end; Fae's three tools unseal the
+  Enchanted Forest; the last calm-down is Trace, then Talk; and the dream
+  ends in a wake-up morning. Milestones 53 to 56 build it, in that order.
+- The way in: at recess Fae found the kid's stash on the playing field's far
+  bank ("Was that a purple hood, way down the path? ...Gone again."). That
+  dirt path, past the footbridge, runs off the field's east edge; once
+  `stash_found` it leads on (a trigger along the floor's east edge, to the
+  new area).
+- The Misty Path (area `mist`, land `enchanted`, painted whole and split into
+  a kit; there's no concept sheet, so it follows the world map's lavender
+  mist round the sealed centre, in the woods' and the field's style): a
+  woodland path running into a lavender mist as thick as cotton candy. Each
+  of Fae's tools opens one stretch, in order:
+  - The lantern: the mist swallows the path. With the lantern on, glowing
+    flowers show where it goes, and reading the last one (`found_mist_way`)
+    lays glowing stepping stones through the mist: a crossing, its mist prop
+    in a parted state cut from a second painting (spec 6.2).
+  - The lasso: a misty gully, its old rope bridge rolled up on the far side.
+    The lasso loops the far post and pulls the bridge across (`rope_bridge`),
+    a crossing that stays open both ways.
+  - The flute: the seal, a wall of shimmering mist between two mossy standing
+    stones hung with red, yellow, green, and blue flower bells, humming a
+    tune with notes missing. Fae plays it back on the flute note by note,
+    like the xylophone (prompt `Play`, each note its own flute sound). The
+    class song, red, yellow, blue, red, rings every bell and the mist parts
+    (`seal_open`, the seal's open state); a wrong tune ends with a hint
+    toward the class song. The forest beyond opens in Milestone 54.
+- The map names the Enchanted Forest once Fae has walked into it ("???"
+  until then). The journal tells each stretch as it opens.
+- Evidence: core unit tests (each stretch shut, then open with real steps;
+  the tune right and wrong; the journal; the map's name; the area checks
+  with every crossing), a recorded run on from the latest chained run (to the
+  field's far bank, down the path, and through the three stretches to the
+  open seal) with its replay test and matching browser and Bun hashes, and a
+  real-key e2e of each tool's moment at both sizes.
+
+## Milestone 54: The Enchanted Forest **Status:** 📋 Planned
+- Past the parted seal (a door, `requires` `seal_open`): the Enchanted Forest
+  (area `enchanted`, land `enchanted`, painted whole and split into a kit),
+  the glowing Ancient Tree beside the Mystic Pond in a ring of lavender mist,
+  from the world map's centre (NOTES.md: "Mystic Pond", "Ancient Tree",
+  "Fairies and butterflies floating around").
+- The chaos is strongest here: purple scribbles over the tree's bark and the
+  stones, and the pond fizzing purple like the kid's soda. They are props
+  with a restored state, cut from a second painting of the forest made whole,
+  for the finale (`forest_restored`, Milestone 55).
+- Fairies and butterflies drift about: an area's ambient flyers, drawn from a
+  small atlas on looping paths from the tick (render only, spec 3.1). One
+  fairy talks: the Ancient Tree dreams the whole land, and the Mystic Pond
+  grants wishes, until a kid in a purple hood made one, drank from it, and
+  everything went fizzy. The pond itself (a Look point) fizzes purple, just
+  like the soda.
+- The kid in the purple hood waits under the Ancient Tree, seen from the
+  front at last, the hood pulled low so their face stays in shadow (a new
+  front view; nothing names them). Talking to them plays a taunt ("So you
+  found my secret forest. Nobody can stop the BOSS!"); the calm-down is
+  Milestone 55.
+- Evidence: core unit tests (the door shut then open, the forest's people and
+  look points within reach, the props' states, the flyers' content, the
+  journal), a recorded run on from Milestone 53's (into the forest, the
+  fairy, the pond, the taunt), and a real-key e2e at both sizes.
+
+## Milestone 55: The kid in the purple hood **Status:** 📋 Planned
+- The last calm-down, in two parts (owner, 2026-10-17: Trace, then Talk).
+  Talking to the kid under the Ancient Tree ends on a line tagged
+  `# battle: <set piece>`, and the battle opens as the conversation closes,
+  the way a `travel:` line waits for the close. The kid is a person kind and
+  the biggest mini-boss: wind-ups like the gull's and Mr. Pip's, and no Run
+  ("Fae won't run away. Not this time.").
+- Part 1, Trace (`docs/battle-ideas.md`): the kid's bursts are scribbles, a
+  giant purple swirl, star, heart, or zigzag over the scene, and Fae paints
+  them back. A new check kind, `trace`: a dotted shape over the scribble that
+  she brushes along, checkpoint by checkpoint, before the paint dries (under
+  180 ticks, spec 8). The stick or arrows steer the brush; on touch a finger
+  draws, through a new optional `pointer` in the action frame (spec 3.2;
+  owner, 2026-10-17), present only while a finger is on the trace and given
+  in the check's own coordinates. The brush follows it at a capped speed, so
+  a tap ahead still has to travel the line. Every checkpoint reached is
+  great, half good, fewer a miss, like a chain, and each plays
+  `battle-beat`. The shape is a seeded draw from the kind's list; a big burst
+  draws a longer one. The dots and the paint are drawn in code.
+- Part 2, Talk: once the meter is half full, the kid stops scribbling and
+  listens, and the menu gains Talk: two or three things Fae could say, as
+  choices, from what the story has shown (the Star Racer high score and its
+  scribbled-out initials, the Star Racer token in the stash, the purple
+  marker, the masked face, swirl, and star on the class art wall, Milo's
+  paper plane). Each is graded by a tag on its line, and the kid answers. No
+  bursts in part 2, so nothing needs quick fingers; a wrong guess ("Rosie?")
+  is a gentle miss that still calms a little.
+- Calmed, the hood falls back: it's Milo. He chased his paper plane into the
+  mist, found the forest, wished at the Mystic Pond to be the best at
+  everything, drank, and fizzed; fizz-fast, he slipped from the classroom to
+  the hall and back. He only wanted to be noticed. Fae: "I always notice you,
+  Milo. You're my friend." The scribbles wash off, the pond clears, the
+  fairies dance (`forest_restored`), and Milo stays by the tree.
+- Art: the kid's battle atlas, from Milo's model sheet and the hooded kid's
+  back view (chaos, the hood up and a mischievous grin in its shadow; burst,
+  scribbling with a giant purple marker; soothed, the hood slipping back;
+  calm, Milo in the purple hoodie, sheepish), and Milo's overworld figure in
+  the hoodie, hood down.
+- Evidence: core unit tests (the trace's steering, a finger, drying, grades,
+  and draws; Talk's grades from the story and its turns; the two parts; no
+  Run; the `battle:` tag and its loader check; the reveal), the recorded
+  battle on arrows only, and real-key e2e (a trace on keys, a trace drawn by
+  touch on a phone in Chromium and WebKit, a Talk, and the reveal, at both
+  sizes).
+
+## Milestone 56: Wake up **Status:** 📋 Planned
+- The end (spec 1.2; owner, 2026-10-17: a wake-up morning). Under the
+  restored Ancient Tree, a last talk with Milo: the tree glows brighter and
+  brighter and everything goes soft and white (a line tag, `# ending`). The
+  game autosaves the dream first, so the save is the restored forest with
+  the ending ready to play again.
+- Fae wakes in her bed, in morning light. Mom at the door: "Fae! Wake up,
+  sleepyhead! You'll be late for school!" A short playable morning, the
+  dream's echoes in real life: Maddie is just a cat (she follows and meows);
+  Sue and Jordan aren't there; downstairs, pancakes, Oliver, and the fridge
+  drawings; the journal under her pillow. Nothing autosaves in the morning.
+- At the front door, Milo, in a purple hoodie, with a paper plane: "Hi, Fae!
+  Want to walk to school together? I had the WEIRDEST dream..." Fae: "With a
+  purple hood?" Milo: "How did you know?!" Then THE END, the credits (the
+  friends, people, and critters Fae met, as stickers, and "Thank you for
+  playing!"), and the title. Continue goes back into the dream: the forest
+  calm, every sticker and prize still there to finish, and the tree ready to
+  play the ending again.
+- Evidence: core unit tests (the ending tag and its save, the morning's
+  people and party, no autosave in the morning, the credits, the title
+  after), a recorded run (the ending, the morning, Milo, the credits), and a
+  real-key e2e (the morning at both sizes, the credits, the title, and
+  Continue back in the forest; on WebKit too, tagged `@smoke`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
-- Who the kid in the hood is, and how Fae finds out (a school chapter). Still
-  open: the owner doesn't know yet (2026-10-06).
+- Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
+  hood falls in the finale's calm-down (owner, 2026-10-17; Milestones 53 to
+  56).
 - Audio: sound effects landed in Milestone 37 (owner, 2026-10-08); music and
   ambience are still later. TestFlight and a paid developer account: later.
 

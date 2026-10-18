@@ -4,8 +4,9 @@ Status: proposals, 2026-10-16. Owner, 2026-10-17: the suggested order is
 approved, and Milestones 40 (battle checks), 41 (Catch), and 42 (feelings)
 built it; `spec.md` section 8 says what they do. Next the owner picked Lean
 (built in Milestone 48), then wind-ups for the two mini-bosses (built in
-Milestone 50), then first touch and old friends (built in Milestone 51). The
-rest of this page stays unscheduled.
+Milestone 50), then first touch and old friends (built in Milestone 51). For
+the finale's calm-down the owner picked Trace, then Talk (2026-10-17,
+Milestone 55). The rest of this page stays unscheduled.
 
 Before Milestone 40, every action in a calm-down battle was the same skill
 check: press confirm when the shrinking ring meets the dashed circle. Soothe,
@@ -226,4 +227,5 @@ What this touches:
 4. On iPhone, directional checks need on-screen arrows in battle: two arrow
    stickers beside confirm, or the stick shown only during the check?
 5. Is finger tracing worth a new optional `pointer` field in `ActionFrame`?
-   Only Trace needs it.
+   Only Trace needs it. Answered (owner, 2026-10-17): yes. Trace, then Talk,
+   is the finale's calm-down with the kid in the purple hood (Milestone 55).

@@ -21,11 +21,20 @@ reference material only.
   who follows her), Sue (met in Bubblegum Bay), and Jordan (met in Pinecone
   Pass).
 - The culprit is a friend from school under a chaos spell: a kid in a purple
-  hood, never named until the very end (owner, 2026-10-07). The kid knows
-  their secret; the player doesn't. They're glimpsed running off and talked
-  about through the story. Raccoons are an ordinary chaos critter species,
-  met all over the world like the pups and the cats.
-- Finale twist: Mom wakes Fae up. It was all a dream.
+  hood, never named until the very end (owner, 2026-10-07). The kid is Milo,
+  Fae's classmate (owner, 2026-10-17), and no line names him until the hood
+  falls in the finale's calm-down. The kid knows their secret; the player
+  doesn't. They're glimpsed running off and talked about through the story.
+  Raccoons are an ordinary chaos critter species, met all over the world like
+  the pups and the cats.
+- The finale (owner, 2026-10-17; `docs/plan.md`, Milestones 53 to 56): Fae's
+  three tools (the lantern, the lasso, and the flute) unseal the Enchanted
+  Forest, and the calm-down under the Ancient Tree is Trace (she paints the
+  kid's scribbles back) and then Talk (she reaches him with what the clues
+  say).
+- Finale twist: Mom wakes Fae up. It was all a dream. A short playable
+  morning follows (Milo comes to the door in a purple hoodie), then the
+  credits and the title; Continue returns to the dream, the forest calm.
 
 ### 1.3 Creative frame
 - The world is Fae's dream, painted in her own art: watercolor washes, thin

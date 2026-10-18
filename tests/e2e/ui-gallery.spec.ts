@@ -6,6 +6,10 @@ import { skeeGalleryStates } from "../../src/dev/skee-gallery";
 import { bunClawLayout, bunMoleLayout, bunSkeeLayout } from "./helpers";
 
 test.use({ deviceScaleFactor: 2 });
+// Every test loads its own page, so the gallery spreads across workers: in
+// order on one, its 263 tests kept that worker busy for about 2.4 minutes
+// after every other worker had finished.
+test.describe.configure({ mode: "parallel" });
 
 const states = ["short", "long", "long-max", "revealing", "speaker-board",
   "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];

@@ -2513,6 +2513,24 @@ the old trail, the owl, and the clubhouse claim.
   - The sheet, the room, the door, the snowballs, and the wording are in the
     owner's review queue.
 
+## Milestone 60: A second flute friend **Status:** 🚧 In progress (2026-10-18)
+- The owner picked a second flute friend (2026-10-18). NOTES.md: the flute
+  "calls animal friends to your side", a bond is built "by feeding them
+  treats and petting them", and "specific animals have specific abilities
+  that help in puzzles and battles". The Pond Pup swims; the second friend
+  climbs.
+- The Acorn Squirrel, the Cliffside Trail's recurring squirrel: once Fae has
+  the flute, a calm one's later talks offer a chin scratch and a snack, and
+  both make a friend (`squirrel_friend`), the way the pup's bond works. The
+  flute then calls either friend, or both, and sends either home.
+- His ability: in the Whispering Woods, high in the big west oak, is a dark
+  knothole that rattles in the wind, too small for Fae's hand and too deep
+  for the lasso. With the squirrel along, he scampers up and in, and comes
+  back with a golden acorn (a keepsake for the clubhouse chest) and a pile of
+  hazelnuts (snacks).
+- Art: his follower atlas (hopping toward, away, and to the side, and his
+  idles), built like the Pond Pup's.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
@@ -2984,6 +3002,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     clubhouse kitchen (owner, 2026-10-17): done (above).
   - Milestone 57, the lodge keeper: done (above), the first of more people
     under the chaos spell (owner, 2026-10-17).
+  - Milestone 60, a second flute friend: in progress (above; owner,
+    2026-10-18).
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

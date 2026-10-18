@@ -71,9 +71,10 @@ export async function walk(page: Page, axis: "x" | "y", target: number): Promise
 }
 
 // The time budget for long real-key flows (a whole battle, or a walk through
-// several areas). CI renders in software and runs them many times slower
-// than a laptop: the downstairs walk took over 180 s there. A full local run
-// (both browsers, five workers) took the trail walk past 90 s.
+// several areas). Software rendering runs them many times slower than a GPU
+// (WebKit's on CI's Linux runners): the downstairs walk once took over 180 s
+// on CI. A full local run (both browsers, five workers) took the trail walk
+// past 90 s.
 export const longFlowTimeout = process.env.CI ? 420_000 : 180_000;
 
 // Just the battle, for loops that poll it every step (the full state carries

@@ -1,14 +1,27 @@
 name: CI
-on: [push, pull_request]
+# Docs, art sources, and prose don't run: a push of only those skips CI.
+on:
+  push:
+    paths-ignore: ["docs/**", "art/**", "**/*.md"]
+  pull_request:
+    paths-ignore: ["docs/**", "art/**", "**/*.md"]
 
+# Every job checks out only what runs (sparse): art/, docs/, and the screenshot
+# baselines are most of the repository (about 750 MB of 800), and a full
+# checkout took 30 to 45 s. The e2e shards split each Playwright project by
+# recorded running time (tools/ci/shard.ts, tests/e2e/timings.json).
 jobs:
   check:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/art/
+            !/docs/
+            !/tests/e2e/*-snapshots/
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.5
@@ -16,6 +29,88 @@ jobs:
       # Same commands as `just check` and `just build`.
       - run: bun run check
       - run: bun run build
-      - run: bunx playwright install --with-deps chromium webkit
-      # Screenshot baselines are macOS-only for now.
-      - run: bunx playwright test --ignore-snapshots --shard=${{ matrix.shard }}/2
+
+  # Chromium on macOS runners: they have a GPU (Apple's paravirtual Metal
+  # device), where the gameplay flows run five to six times faster than in
+  # Linux's software renderer, and its screenshots match the baselines.
+  chromium:
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    name: chromium ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/art/
+            !/docs/
+            !/tests/e2e/*-snapshots/*-webkit-*.png
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.5
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install chromium
+      - run: bun tools/ci/shard.ts chromium ${{ matrix.shard }}/${{ strategy.job-total }} shard.txt
+      - run: bunx playwright test --project=chromium --test-list shard.txt --reporter=dot,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: report.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report-chromium-${{ matrix.shard }}
+          path: report.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-chromium-${{ matrix.shard }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # WebKit on Linux runners, which are plentiful (macOS allows five jobs at a
+  # time). Its screenshots are compared locally (playwright.config.ts).
+  webkit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    name: webkit ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/art/
+            !/docs/
+            !/tests/e2e/*-snapshots/
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.5
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps webkit
+      - run: bun tools/ci/shard.ts webkit ${{ matrix.shard }}/${{ strategy.job-total }} shard.txt
+      - run: bunx playwright test --project=webkit --test-list shard.txt --reporter=dot,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: report.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report-webkit-${{ matrix.shard }}
+          path: report.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-webkit-${{ matrix.shard }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14

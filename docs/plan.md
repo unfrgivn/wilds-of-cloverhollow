@@ -2740,6 +2740,43 @@ more bad guys, and the blacklight lantern, made and built while away.
   AGENTS.md says to run the full gates once per milestone and only what the
   change touches while working.
 
+### CI speed (2026-10-17)
+- CI took 25 to 75 minutes a push. Playwright's `--shard` splits by test
+  count in file order, so the first of two Linux shards got every Chromium
+  gameplay flow (72 minutes against 7), and both shards repeated `check` and
+  `build`. A full checkout (about 800 MB, mostly `art/` and the screenshot
+  baselines) took 30 to 45 s, and pushes of only docs ran everything (10 of
+  the last 39 commits on main).
+- Probes on GitHub's free runners, one worker, the lasso and music flows:
+  Linux x64 (SwiftShader's Subzero backend) 1.7 and 1.3 minutes; the same
+  with MSAA off 1.5 and 1.1; Linux arm64 1.2 minutes and 57 s; macOS 15 in
+  SwiftShader 20.5 and 11.4 s; macOS 15 on Metal ("Apple Paravirtual
+  device") 16.5 and 10.5 s. On the three-core macOS runner a second or third
+  worker made each test 1.5 to 2.7 times slower: the whole suite took 16.8
+  minutes on two workers and 15.1 on three.
+- Every Chromium baseline matched on the macOS runners' GPU, so CI compares
+  Chromium's screenshots. Four WebKit baselines differed by 2 to 19 pixels
+  (macOS 15 there, 27 here), so CI leaves WebKit's screenshots to local runs.
+- CI now: one Linux job for `check` and `build`, Chromium on three macOS
+  runners, WebKit on three Linux runners, one worker each, sparse checkouts
+  (3 to 5 s on Linux; about 25 s on macOS, which needs Chromium's
+  baselines), and no run for a push of only docs, art sources, or Markdown.
+- `tools/ci/shard.ts` plans each project's shards from the seconds per spec
+  file recorded in CI's own reports (`tests/e2e/timings.json`, written by
+  `tools/ci/timings.ts`). A file's tests stay together and in order: split
+  per test, the phone battle scene's WebKit check ran first in a fresh
+  browser on Linux and measured a corner spread of 0.68 (a flat fill) both
+  times, where after the desktop one it passes. Why is still open.
+- First green run: 5 minutes 37 s from push to the last job (`check` 81 s,
+  Chromium 231 to 329 s, WebKit 228 to 326 s, on timings from the macOS
+  probe). With CI's own timings the plan evens out at about 220 s of tests
+  per Chromium shard and 197 s per WebKit shard.
+- The area-connection unit check (about 1 s of geometry over 18 areas) hit
+  Vitest's 5 s default under a load average of 120; like the other
+  whole-world checks it now has a 30 s budget.
+- Next: `ui-gallery.spec.ts` is 172 s of Chromium's 660 and 248 s of WebKit's
+  592 on CI, and each of its tests loads a fresh page.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its

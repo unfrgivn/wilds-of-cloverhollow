@@ -2829,11 +2829,39 @@ more bad guys, and the blacklight lantern, made and built while away.
   Chromium 231 to 329 s, WebKit 228 to 326 s, on timings from the macOS
   probe). With CI's own timings the plan evens out at about 220 s of tests
   per Chromium shard and 197 s per WebKit shard.
+- Four shards a project (165 and 148 s of tests each), with each Chromium
+  shard fetching only its own specs' baselines (a 6 s checkout plus 11 s,
+  against 26 s for all of them): 3 minutes 39 s from push to the last job.
+  Four of the five macOS jobs GitHub allows at once; a second run that
+  overlaps waits for a free one.
 - The area-connection unit check (about 1 s of geometry over 18 areas) hit
   Vitest's 5 s default under a load average of 120; like the other
   whole-world checks it now has a 30 s budget.
+- Five shards a project took 4 minutes 0 s with no other run going: no
+  faster than four, because shard times spread wider (WebKit 154 to 238 s)
+  and fixed costs repeat per shard. Five is also every macOS job GitHub
+  allows at once: a run that overlapped another queued its Chromium shards
+  for 3 to 4.5 minutes. Back to four.
+- Browser downloads are cached until a dependency changes: Chromium's install
+  went from 13 s to 2 s (after a 3 to 7 s restore), WebKit's from about 40 s
+  to 27 s (its system libraries still install).
+- Timings are per test now. Cut by test count, `harness.spec.ts` put its
+  heavy browser and Bun replays in one WebKit run (71 s against 42 planned)
+  and its light checks in another (13 s against 38); cut by recorded time,
+  runs come out even.
+- With all of it, a run took 3 minutes 53 s (jobs 148 to 224 s). Each test
+  ran within a few seconds of its record, but whole shards ran faster or
+  slower with their runner: two WebKit shards finished their tests in 101
+  and 103 s against 159 planned, two Chromium shards in 162 and 182 s
+  against 147. The plan is down at the runners' own spread.
+- Unit tests get a 30 s default budget (`vitest.config.ts`). Milestone 53's
+  mist journal test passed here and timed out at Vitest's 5 s default on CI's
+  four-core runner, turning main red; 17 test files had already added
+  budgets by hand after the same failure.
 - Next: `ui-gallery.spec.ts` is 172 s of Chromium's 660 and 248 s of WebKit's
-  592 on CI, and each of its tests loads a fresh page.
+  592 on CI, and each of its tests loads a fresh page. A context shared per
+  worker cut a gallery load from 481 to 121 ms in WebKit and from 304 to
+  219 ms in Chromium (locally).
 
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.

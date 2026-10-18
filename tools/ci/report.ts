@@ -7,7 +7,7 @@ export type ReportSpec = { title: string; file: string; tests: ReportTest[] };
 export type ReportSuite = { title: string; suites?: ReportSuite[]; specs?: ReportSpec[] };
 
 export type Test = { project: string; file: string; titles: string[]; seconds: number };
-// Seconds per test file and project, keyed by `fileKey`.
+// Seconds per test, keyed by `listLine`.
 export type Timings = Record<string, number>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -69,4 +69,10 @@ export function reportTests(files: ReportSuite[]): Test[] {
 
 export function fileKey(test: Pick<Test, "project" | "file">): string {
   return `[${test.project}] ${test.file}`;
+}
+
+// One line of Playwright's --test-list format; tests/e2e/timings.json keys its
+// seconds by it.
+export function listLine(test: Pick<Test, "project" | "file" | "titles">): string {
+  return [`[${test.project}]`, test.file, ...test.titles].join(" › ");
 }

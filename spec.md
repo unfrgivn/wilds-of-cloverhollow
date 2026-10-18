@@ -2144,14 +2144,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   `build`. Chromium runs on four macOS runners, which have a GPU (Apple's
   paravirtual Metal device) and match the Chromium baselines, so CI compares
   its screenshots (each runner checks out only its own specs' baselines).
-  WebKit runs on four Linux runners and leaves its
-  screenshots to local runs: WebKit draws text and images with the operating
-  system's libraries, so its baselines hold for the macOS they were drawn on.
-  Each shard runs one worker. `tools/ci/shard.ts` splits each project by the
-  recorded seconds per spec file in `tests/e2e/timings.json`, keeping a
-  file's tests together and in order (only a file longer than half a shard
-  splits, into runs in order); `tools/ci/timings.ts` refreshes the record
-  from a green run's reports.
+  WebKit runs on four Linux runners and leaves its screenshots to local runs:
+  WebKit draws text and images with the operating system's libraries, so its
+  baselines hold for the macOS they were drawn on. Each shard runs one
+  worker. `tools/ci/shard.ts` splits each project by the recorded seconds per
+  test in `tests/e2e/timings.json`, keeping a file's tests together and in
+  order (only a file longer than half a shard is cut, into runs of about
+  equal time in order); `tools/ci/timings.ts` refreshes the record from a
+  green run's reports.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

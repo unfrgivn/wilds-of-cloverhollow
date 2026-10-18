@@ -12,6 +12,8 @@ VAR has_lantern = false
 VAR found_old_trail = false
 VAR clubhouse_claimed = false
 VAR story_time = false
+// Milestone 55's calm-down clears the forest's painted chaos overlays.
+VAR forest_fizzy = true
 VAR maple_in_hall = true
 VAR hood_waiting = false
 VAR saw_hood = false
@@ -71,6 +73,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{saw_tree_kid: The kid in the purple hood is waiting under the Ancient Tree. They called it THEIR secret forest... and they knew my name! # speaker: Fae}
+{heard_wish: The fairies told me the Ancient Tree dreams the whole land, and a wish made the Mystic Pond fizz purple. # speaker: Fae}
 {seal_open: The bell-flower seal opened, and a warm forest glow shone beyond the stones. # speaker: Fae}
 {rope_bridge: I pulled the old rope bridge across the misty gully with my lasso. # speaker: Fae}
 {found_mist_way: Bluebells lit stepping stones through the mist, one hop at a time! # speaker: Fae}
@@ -1120,6 +1124,8 @@ VAR seal_open = false
 VAR mist_notes = 0
 VAR mist_right = true
 VAR mist_tune = ""
+VAR heard_wish = false
+VAR saw_tree_kid = false
 
 === oak_squirrel_calm ===
 {oak_squirrel_calm > 1: -> again}
@@ -1575,3 +1581,43 @@ A little wooden house by the fire. Inside, a round hamster is curled up fast asl
 That must be Biscuit! He's snoring tiny squeaks. # speaker: Fae
 -> DONE
 
+=== mystic_pond ===
+The Mystic Pond is fizzing purple, just like the clubhouse soda. # speaker: Fae
+{heard_wish: This is where wishes come true. The fairies said someone drank from it after making a wish. # speaker: Fae}
+-> DONE
+
+=== ancient_tree ===
+Purple scribbles are all over the Ancient Tree's bark. # speaker: Fae
+It looks tired. # speaker: Fae
+{heard_wish: If it's dreaming the whole land, it can't dream properly with all this fizz. # speaker: Fae}
+-> DONE
+
+=== fairy_lavender ===
+~ heard_wish = true
+This is the Enchanted Forest. The Ancient Tree dreams the whole land. # speaker: Lavender Fairy
+The Mystic Pond grants wishes. A kid in a purple hood made a wish and drank from it. # speaker: Lavender Fairy
+Then everything went fizzy and purple, with scribbles everywhere. The Ancient Tree can't dream properly with all that fizz! # speaker: Lavender Fairy
+-> DONE
+
+=== fairy_mint ===
+The butterflies keep tickling my wings. I keep telling them, "Again!" # speaker: Mint Fairy
+-> DONE
+
+=== fairy_sky ===
+The Ancient Tree is older than every tree, even the trees that think they are very old. # speaker: Sky Fairy
+-> DONE
+
+=== fairy_peach ===
+Hee hee! The pond bubbles made my shoes go squeak. # speaker: Peach Fairy
+-> DONE
+
+=== forest_kid ===
+{ saw_tree_kid: -> again }
+~ saw_tree_kid = true
+So you found my secret forest, Fae! # speaker: Hooded Kid
+Nobody can stop the BOSS. Not even you! # speaker: Hooded Kid
+We'll see about that! # speaker: Fae
+-> DONE
+= again
+You again? The BOSS is busy, Fae! # speaker: Hooded Kid
+-> DONE

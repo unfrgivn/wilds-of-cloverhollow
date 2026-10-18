@@ -117,6 +117,7 @@ describe("the lands", () => {
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
       bay: "bay", pass: "pass", trail: "trail", mist: "enchanted",
+      enchanted: "enchanted",
     };
     for (const area of Object.values(world.areas)) {
       if (area.id === "harness") {

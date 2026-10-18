@@ -72,6 +72,36 @@
       32
     ]
   },
+  "hooded-kid-front": {
+    "atlas": "assets/characters/hooded-kid-front/hooded-kid-front.json",
+    "idleTicks": [
+      32
+    ]
+  },
+  "fairy-lavender": {
+    "atlas": "assets/characters/fairy-lavender/fairy-lavender.json",
+    "idleTicks": [
+      32
+    ]
+  },
+  "fairy-mint": {
+    "atlas": "assets/characters/fairy-mint/fairy-mint.json",
+    "idleTicks": [
+      32
+    ]
+  },
+  "fairy-sky": {
+    "atlas": "assets/characters/fairy-sky/fairy-sky.json",
+    "idleTicks": [
+      32
+    ]
+  },
+  "fairy-peach": {
+    "atlas": "assets/characters/fairy-peach/fairy-peach.json",
+    "idleTicks": [
+      32
+    ]
+  },
   "music-teacher": {
     "atlas": "assets/characters/music-teacher/music-teacher.json",
     "idleTicks": [

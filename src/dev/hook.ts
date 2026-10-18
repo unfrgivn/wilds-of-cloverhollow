@@ -44,6 +44,7 @@ export type CloverhollowHook = {
       y: number;
     }[];
     npcs: { id: string; frame: string; facing: string }[];
+    ambient: { id: string; x: number; y: number; frame: number }[];
     canopies: { id: string; alpha: number }[];
     // Each prop's current state, whether it lies flat (drawn under everyone)
     // or is hidden (not there), and its strips: world x range and the y it

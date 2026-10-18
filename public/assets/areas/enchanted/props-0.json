@@ -1,0 +1,156 @@
+{
+  "frames": {
+    "tree-scribbles": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 1390,
+        "h": 1332
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1390,
+        "h": 1332
+      },
+      "sourceSize": {
+        "w": 1390,
+        "h": 1332
+      },
+      "anchor": {
+        "x": 0.43741,
+        "y": 1.02703
+      }
+    },
+    "pond-fizz": {
+      "frame": {
+        "x": 0,
+        "y": 1334,
+        "w": 680,
+        "h": 416
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 680,
+        "h": 416
+      },
+      "sourceSize": {
+        "w": 680,
+        "h": 416
+      },
+      "anchor": {
+        "x": 0.39412,
+        "y": 1.1851
+      }
+    },
+    "stone-lower-right-scribbles": {
+      "frame": {
+        "x": 682,
+        "y": 1334,
+        "w": 180,
+        "h": 365
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 180,
+        "h": 365
+      },
+      "sourceSize": {
+        "w": 180,
+        "h": 365
+      },
+      "anchor": {
+        "x": 0.24444,
+        "y": 0.86027
+      }
+    },
+    "stone-left-scribbles": {
+      "frame": {
+        "x": 864,
+        "y": 1334,
+        "w": 160,
+        "h": 344
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 344
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 344
+      },
+      "anchor": {
+        "x": 0.425,
+        "y": 1.09593
+      }
+    },
+    "stone-lower-right": {
+      "frame": {
+        "x": 1026,
+        "y": 1334,
+        "w": 210,
+        "h": 340
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 210,
+        "h": 340
+      },
+      "sourceSize": {
+        "w": 210,
+        "h": 340
+      },
+      "anchor": {
+        "x": 0.54762,
+        "y": 0.99412
+      }
+    },
+    "stone-upper-scribbles": {
+      "frame": {
+        "x": 1238,
+        "y": 1334,
+        "w": 160,
+        "h": 181
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 181
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 181
+      },
+      "anchor": {
+        "x": 0.58125,
+        "y": 1.37569
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1750
+    },
+    "scale": "1"
+  }
+}

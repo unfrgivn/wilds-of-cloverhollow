@@ -1,0 +1,96 @@
+{
+  "area": "enchanted",
+  "subjects": [
+    {
+      "id": "stone-lower-right",
+      "crop": [1260, 770, 125, 330],
+      "seed": [1315, 900],
+      "painted": true,
+      "canopy": false,
+      "ground": "the dark mossy forest floor",
+      "object": "the complete tall mossy standing stone at the lower-right edge, including its visible body, moss, and warm-brown ink outline continuing to the bottom edge; not the bluebells, flowers, or ground",
+      "home": [1322, 957],
+      "footprint": [[[1290, 945], [1360, 945], [1360, 957], [1290, 957]]]
+    },
+    {
+      "id": "tree-scribbles",
+      "crop": [600, 0, 850, 800],
+      "seed": [1040, 450],
+      "home": [1060, 750],
+      "painted": true,
+      "key": "bright",
+      "canopy": false,
+      "flat": true,
+      "added": "fizzy",
+      "painting": "art/source/areas/enchanted/enchanted-chaos-registered-3300.png",
+      "ground": "the Ancient Tree's bark and mossy roots",
+      "object": "only the bold purple child-marker scribbles, loops, swirls, and zigzags drawn over the Ancient Tree's trunk and exposed roots, with only the exact bark beneath each mark needed to make the overlay composite cleanly; not the tree, leaves, flowers, stones, pond, or ground"
+    },
+    {
+      "id": "stone-upper-scribbles",
+      "crop": [690, 225, 115, 155],
+      "seed": [745, 300],
+      "home": [745, 380],
+      "painted": true,
+      "key": "bright",
+      "canopy": false,
+      "flat": true,
+      "added": "fizzy",
+      "painting": "art/source/areas/enchanted/enchanted-chaos-registered-3300.png",
+      "ground": "the mossy standing stone",
+      "object": "only the purple marker scribbles over the upper-center standing stone, with as much of its own stone colour beneath the marks as needed for a clean overlay; not the surrounding flowers, ground, or trees",
+      "samples": { "object": 2 }
+    },
+    {
+      "id": "stone-left-scribbles",
+      "crop": [245, 475, 125, 225],
+      "seed": [295, 590],
+      "home": [300, 700],
+      "painted": true,
+      "key": "bright",
+      "canopy": false,
+      "flat": true,
+      "added": "fizzy",
+      "painting": "art/source/areas/enchanted/enchanted-chaos-registered-3300.png",
+      "ground": "the mossy standing stone",
+      "object": "only the purple marker scribbles over the left foreground standing stone, with as much of its own stone colour beneath the marks as needed for a clean overlay; not the bluebells, ground, or trees"
+    },
+    {
+      "id": "stone-lower-right-scribbles",
+      "crop": [1260, 770, 125, 330],
+      "seed": [1315, 900],
+      "home": [1322, 957],
+      "painted": true,
+      "key": "bright",
+      "canopy": false,
+      "flat": false,
+      "added": "fizzy",
+      "painting": "art/source/areas/enchanted/enchanted-chaos-registered-3300.png",
+      "ground": "the mossy standing stone",
+      "object": "only the purple marker scribbles over the lower-right standing stone, with as much of its own stone colour beneath the marks as needed for a clean overlay; not the bluebells, flowers, ground, or trees",
+      "samples": { "object": 2 }
+    },
+    {
+      "id": "pond-fizz",
+      "crop": [400, 670, 470, 310],
+      "seed": [620, 800],
+      "home": [620, 980],
+      "painted": true,
+      "flat": true,
+      "key": "bright",
+      "canopy": false,
+      "added": "fizzy",
+      "painting": "art/source/areas/enchanted/enchanted-chaos-registered-3300.png",
+      "exclude": [
+        [[490, 685], [770, 685], [770, 704], [490, 704]],
+        [[760, 685], [830, 685], [830, 735], [760, 735]],
+        [[410, 730], [435, 730], [435, 900], [410, 900]],
+        [[490, 940], [810, 940], [810, 960], [490, 960]],
+        [[820, 735], [850, 735], [850, 905], [820, 905]]
+      ],
+      "ground": "only the lavender pond water inside its existing warm-brown rim; keep the rim, bank, lily pads, stepping stones, and surrounding grass out",
+      "object": "only the fizzy purple grape-soda water and pale purple foam bubbles inside the Mystic Pond's existing rim, preserving the rim line and all lily pads and rocks as transparent; not the pond bank, trees, flowers, or ground",
+      "samples": { "object": 1 }
+    }
+  ]
+}

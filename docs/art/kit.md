@@ -76,6 +76,7 @@ drawn after the edit: its samples come from the painting as it is.
 | `painting` | Another painting of the area, the approved one's size, to cut this subject from (the scene with the state in place). |
 | `flat` | A `stateOf` subject that lies on the ground (a lowered bridge): no footprint, drawn under everyone. |
 | `keepPieces` | Keep every solid piece of the isolate in the crop, not only the seed's and those beside it (a deck a post cuts in two). |
+| `key` | Optional mask key mode. Omit it for the original magenta key; use `"bright"` only for a subject whose dark purple paint must remain in the mask. |
 
 ## What is a prop
 A prop is one object Fae can walk behind or bump into, and its picture is that

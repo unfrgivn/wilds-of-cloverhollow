@@ -17,6 +17,8 @@ import fieldData from "../../content/areas/field.json";
 import clubhouseData from "../../content/areas/clubhouse.json";
 import lodgeData from "../../content/areas/lodge.json";
 import mistData from "../../content/areas/mist.json";
+import enchantedData from "../../content/areas/enchanted.json";
+import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
 import prizesData from "../../content/prizes.json";
 import { isArcadeGameId } from "../core/arcade";
@@ -40,6 +42,7 @@ import fieldSurfaceData from "../../content/surfaces/field.json";
 import clubhouseSurfaceData from "../../content/surfaces/clubhouse.json";
 import lodgeSurfaceData from "../../content/surfaces/lodge.json";
 import mistSurfaceData from "../../content/surfaces/mist.json";
+import enchantedSurfaceData from "../../content/surfaces/enchanted.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -110,6 +113,7 @@ import {
   parsePropCatalogue, parsePropPlacements, placeProps, propRuleErrors, type PropCatalogue,
 } from "./props";
 import { parseSurfaceMap } from "./surfaces";
+import { parseAmbient, setAreaAmbient } from "./ambient";
 import type {
   Area,
   CharacterContent,
@@ -1022,7 +1026,7 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     const y = typeof raw.y === "number" ? raw.y : 0;
     spawns[name] = { x, y, facing: raw.facing };
   }
-  return {
+  const area: Area = {
     id: value.id,
     name: value.name,
     ...(value.land === undefined ? {} : { land: value.land }),
@@ -1081,6 +1085,8 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
     atlases: catalogue?.atlases ?? [],
     spawns,
   };
+  setAreaAmbient(area, parseAmbient(value.ambient, file, value.width, value.height));
+  return area;
 }
 
 // An area's recurring critters (spec 6): `after` (a calmed() fact) and the
@@ -1739,6 +1745,8 @@ export function loadContent(): {
     parsePropCatalogue(lodgePropsData, "content/props/lodge.json"));
   const mist = parseArea(mistData, "content/areas/mist.json",
     parsePropCatalogue(mistPropsData, "content/props/mist.json"));
+  const enchanted = parseArea(enchantedData, "content/areas/enchanted.json",
+    parsePropCatalogue(enchantedPropsData, "content/props/enchanted.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -1850,6 +1858,7 @@ export function loadContent(): {
     [clubhouse.id]: clubhouse,
     [lodge.id]: lodge,
     [mist.id]: mist,
+    [enchanted.id]: enchanted,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -1859,6 +1868,7 @@ export function loadContent(): {
     arcade: arcadeSurfaceData, "east-hall": eastHallSurfaceData, music: musicSurfaceData,
     field: fieldSurfaceData, clubhouse: clubhouseSurfaceData, lodge: lodgeSurfaceData,
     mist: mistSurfaceData,
+    enchanted: enchantedSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));

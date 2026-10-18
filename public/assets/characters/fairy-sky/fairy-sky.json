@@ -1,0 +1,42 @@
+{
+  "frames": {
+    "idle_down_01": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.96484375
+      }
+    }
+  },
+  "animations": {
+    "idle_down": [
+      "idle_down_01"
+    ]
+  },
+  "meta": {
+    "image": "fairy-sky.png",
+    "size": {
+      "w": 256,
+      "h": 256
+    },
+    "scale": "1",
+    "baseline": 247
+  }
+}

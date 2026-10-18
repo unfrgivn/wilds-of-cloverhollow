@@ -1,0 +1,118 @@
+{
+  "asset": "The Enchanted Forest paintings",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image",
+  "calls": 6,
+  "references": [
+    "art/source/areas/mist/mist-final.png",
+    "art/source/areas/woods/woods-final.png",
+    "art/scratch/enchanted-map-crop.png"
+  ],
+  "steps": [
+    {
+      "what": "Four 4K 3:2 base candidates for The Enchanted Forest: a left-edge lavender-mist entrance, open central glade, Ancient Tree at right, Mystic Pond lower-left of center, and a ring of dreamy trees and mist. No people, animals, fairies, butterflies, words, signs, or UI.",
+      "prompt": "Create a single 4K 3:2 environment painting for a cozy family-friendly watercolor-and-ink game. Gentle three-quarter top-down view, no characters, animals, fairies, butterflies, words, letters, signs, or UI. This is The Enchanted Forest, a dreamy finale glade. The west edge is the only entrance: a soft lavender-mist path enters at the LEFT edge around mid-height, open and walkable. Wide open central clearing of faintly glowing grass and moss, fairy rings of mushrooms, bluebells, lavender and pale pink glowing flowers, sparse mossy standing stones near edges, tiny sparkles. Keep center and ground before the main tree completely open. Enormous gnarled Ancient Tree on center-right, trunk around 55-80% width, teal-green glowing leaves, canopy filling upper right, twisted roots spreading forward, a few lantern-like blossoms. Round sparkling Mystic Pond lower-left of center with lily pads and stepping stones, reflections, walkable space between pond and tree. Ring of tall dreamy trees and lavender mist around all edges, no other paths. Match the supplied Misty Path and Woods references exactly: thin warm-brown ink, soft watercolor washes, warm paper, gentle upper-left light, no black outlines, no glossy 3D, no photorealism, no gradients. Make the scene compositionally clear and calm, with the huge tree and pond echoing the supplied world-map crop.",
+      "prompts": [
+        "Base prompt above, emphasizing the pond lower-left and massive roots spreading into the clearing.",
+        "Base prompt above, emphasizing a clear single left-edge entry, broad unobstructed centre, and pond not blocking the play space.",
+        "Base prompt above, emphasizing the map-crop Ancient Tree and round pond mood, with a continuous-looking perimeter ring.",
+        "Base prompt above, emphasizing the tree at right, pond at lower-left, airy centre, and lavender mist framing every edge."
+      ],
+      "calls": 4,
+      "outputs": [
+        "art/scratch/1792288039760-gemini-3-pro-image-0.png",
+        "art/scratch/1792288080469-gemini-3-pro-image-0.png",
+        "art/scratch/1792288134510-gemini-3-pro-image-0.png",
+        "art/scratch/1792288176549-gemini-3-pro-image-0.png"
+      ],
+      "selected": "1792288134510, viewed and selected for the clearest left entry, open centre, pond, tree, and perimeter ring"
+    },
+    {
+      "what": "Edit the selected base, adding only the finale chaos: bold purple child-marker scribbles over the Ancient Tree trunk and roots and standing stones, a fizzing purple grape-soda pond with bubbles, and dimmer teal leaves. Preserve every other part of the scene.",
+      "prompt": "EDIT THE FIRST ATTACHED IMAGE, preserving the base painting everywhere except the requested chaos overlays. Return the same full 3:2 canvas, no crop. Add only: bold hand-drawn purple marker scribbles, loops, swirls, zigzags like a child's purple marker over the Ancient Tree's trunk and exposed roots and over the mossy standing stones; turn only the Mystic Pond water into fizzing purple grape soda with bubbles and violet foam; dim the Ancient Tree's teal leaves slightly. Keep every other tree, flower, stone, path, mist, grass, pond rim, lily pad, root shape, and composition as close pixel-for-pixel as possible. The marks must be distinct paint-on-top overlays suitable for cutting as props later, not a redrawn scene. No new characters, animals, fairies, butterflies, words, letters, signs, or UI.",
+      "calls": 1,
+      "outputs": [
+        "art/scratch/1792288246990-gemini-3-pro-image-0.png"
+      ],
+      "selected": "viewed; the requested scribbles, fizzy pond, and dimmed leaves read, but some clean stones remained"
+    },
+    {
+      "what": "Edit the chaos painting only, preserving existing chaos and the base scene, adding purple child-marker loops and zigzags to remaining visible clean standing stones.",
+      "prompt": "EDIT ONLY THE CHAOS PAINTING IN THE FIRST ATTACHED IMAGE. Preserve every existing purple scribble, fizzy purple pond, dimmed leaves, and every other pixel as closely as possible. Add a few bold purple child-marker loops and zigzags only onto the remaining clearly visible mossy standing stones in the central/lower clearing that are still clean. Do not alter grass, flowers, roots, trunk, pond, trees, path, mist, or composition. No words, letters, characters, animals, fairies, butterflies, or UI. Return the same full 3:2 canvas.",
+      "calls": 1,
+      "outputs": [
+        "art/scratch/1792288311201-gemini-3-pro-image-0.png"
+      ],
+      "selected": "viewed and kept; scribbles cover trunk, roots, and multiple stones, and the pond is visibly fizzy purple (only its registered 3300 px version is kept)"
+    }
+  ],
+  "post_processing": [
+    "The selected base 1792288134510 is kept at 5056x3392 as enchanted-final.png. The base and the chaos edit 1792288311201 were each uniformly Lanczos-resized to 3300x2214 and cropped 7 px from the top to 3300x2200, 1650x1100 units at 2 px per unit. The base's resize is the approved painting's tiles (art/source/areas/enchanted/painting/; the kit's plate). The chaos edit's resize was then registered (below) and kept as enchanted-chaos-registered-3300.png; the raw edit and its unregistered resize are not kept, as the playing field keeps only its resized second painting.",
+    "art/review/enchanted-scale.png composites the approved Fae down-idle frame at 2 px per unit in the open clearing, beside the pond, and in front of the Ancient Tree roots.",
+    "Registration check over broad unedited edge regions found the chaos painting is translated about (+3,+3) px relative to the approved plate. The registered source applies one uniform (-3,-3) px translation; residual mean absolute channel difference is 12.99/255 (median 6.67/255) in that check region. The remaining colour drift is from the edit repainting watercolor texture, not a per-region warp; no cleaner uniform offset was found."
+  ],
+  "outputs": {
+    "source": "art/source/areas/enchanted/enchanted-final.png",
+    "painting_tiles": "art/source/areas/enchanted/painting/ (the approved painting at 3300x2200)",
+    "registered_second_painting_3300": "art/source/areas/enchanted/enchanted-chaos-registered-3300.png",
+    "area": "content/areas/enchanted.json (floor: tools/art/geometry/enchanted.ts; kit: art/kit/enchanted.json)"
+  },
+  "geometry_review": {
+    "path_entry_left_y_units": [
+      325,
+      450
+    ],
+    "open_ground_box_units": [
+      215,
+      325,
+      1500,
+      1060
+    ],
+    "pond_box_units": [
+      415,
+      700,
+      850,
+      955
+    ],
+    "tree_trunk_box_units": [
+      950,
+      135,
+      1325,
+      745
+    ],
+    "roots_front_edge_units": [
+      990,
+      730,
+      1310,
+      750
+    ],
+    "open_spot_in_front_of_roots_units": [
+      875,
+      740,
+      1275,
+      890
+    ],
+    "standing_stone_boxes_units": [
+      [
+        715,
+        240,
+        785,
+        390
+      ],
+      [
+        267.5,
+        505,
+        335,
+        650
+      ],
+      [
+        1290,
+        785,
+        1380,
+        975
+      ]
+    ],
+    "chaos_scribbles": "Purple marker overlays cover the Ancient Tree trunk and exposed roots, plus the upper-center, left-middle, center-left/lower, and lower-right standing stones. The Mystic Pond water is purple and bubbly; the tree canopy is dimmed."
+  },
+  "owner_review": "pending"
+}

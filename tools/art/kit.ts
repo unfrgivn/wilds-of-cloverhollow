@@ -84,6 +84,9 @@ type Subject = {
   // Every solid piece of its isolate in its crop is the object, not only the
   // seed's piece and those beside it (a deck cut in two by a post).
   keepPieces: boolean;
+  // Generated overlays may opt into a narrower key so dark purple subject paint
+  // remains in the mask.
+  key: "default" | "bright";
 };
 type Tile = { file: string; x: number; y: number; width: number; height: number };
 type Mask = Uint8Array;
@@ -217,6 +220,7 @@ function subject(value: unknown): Subject {
     added,
     flat: value.flat === true,
     keepPieces: value.keepPieces === true,
+    key: value.key === "bright" ? "bright" : "default",
     samples: chosen,
     states,
   };
@@ -534,7 +538,7 @@ function writeMask(mask: Mask, w: number, h: number, out: string): void {
 // on neighbours' outlines: hue 274..324 degrees with HSL saturation >= 0.45.
 // The approved paintings have no saturated magenta; pinks sit near 345.
 // With `shade`, the darkened key the model leaves for a kept shadow counts too.
-function keyMask(bytes: Uint8Array, shade = false): Mask {
+function keyMask(bytes: Uint8Array, shade = false, mode: "default" | "bright" = "default"): Mask {
   const mask = new Uint8Array(bytes.length / 3);
   for (let index = 0; index < mask.length; index += 1) {
     const r = (bytes[index * 3] ?? 0) / 255;
@@ -551,7 +555,8 @@ function keyMask(bytes: Uint8Array, shade = false): Mask {
       else if (high === g) hue = (b - r) / chroma + 2;
       else hue = (r - g) / chroma + 4;
     }
-    const magenta = hue * 60 >= 274 && hue * 60 <= 324 && saturation >= 0.45;
+    const magenta = hue * 60 >= 274 && hue * 60 <= 324 && saturation >= 0.45 &&
+      (mode === "bright" ? r > 0.74 && b > 0.74 && g < 0.35 : true);
     const key = saturation >= 0.9 && light >= 0.44;
     const shadow = shade && magenta && !key && light >= 0.33;
     mask[index] = magenta && !shadow ? 0 : 1;
@@ -744,7 +749,8 @@ function objectMask(item: Subject, n: number): Mask {
   if (fresh(out, [`${dir(item)}/crop.png`, `${dir(item)}/iso-${n}.jpg`]))
     return readMask(out, w, h);
   const seed = toCrop(item, item.seed);
-  let mask = nearSeed(keyMask(rgb(`${dir(item)}/iso-${n}.jpg`, w, h)), w, h, seed, reach(item));
+  let mask = nearSeed(keyMask(rgb(`${dir(item)}/iso-${n}.jpg`, w, h), false, item.key),
+    w, h, seed, reach(item));
   const ink = inkMask(rgb(`${dir(item)}/crop.png`, w, h));
   mask = union(mask, both(ink, morph(mask, w, h, 3, true)));
   mask = morph(morph(mask, w, h, 1, true), w, h, 1, false);
@@ -807,7 +813,7 @@ function shades(item: Subject): Mask {
   let shade: Mask = new Uint8Array(w * h);
   for (const n of [1, 2]) {
     // Opening by 3 px drops neighbours' tinted outlines; shadows are blobs.
-    const keyed = keyMask(rgb(`${dir(item)}/shadow-${n}.jpg`, w, h), true);
+    const keyed = keyMask(rgb(`${dir(item)}/shadow-${n}.jpg`, w, h), true, item.key);
     const opened = morph(morph(keyed, w, h, 3, false), w, h, 3, true);
     shade = union(shade, both(nearSeed(union(opened, object), w, h, seed, 12), reach));
   }

@@ -1,0 +1,12 @@
+{
+  "asset": "hooded-kid-front",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 1,
+  "date": "2026-10-17",
+  "references": ["art/source/classmates/hooded-kid/body-raw.png", "art/source/fae/fae-model-sheet-v2.png"],
+  "selectedRawSources": ["art/source/classmates/hooded-kid-front/front-raw.png"],
+  "promptNotes": "Front view of the existing hooded kid. Purple patchwork hood with teal patch, hood pulled low into soft shadow, no glasses, hair, eyes, or identifying facial features; same shorts, leggings, sneakers and proportions as the rear view.",
+  "postProcessing": { "build": "bun tools/art/build-hooded-kid-front.ts", "key": "#00FF00 border flood fill, 18% fuzz", "despill": "edge-only green despill", "canvas": "448x448 source pixels", "figureHeight": "280 source pixels", "baseline": 439 },
+  "validator": { "biped": false, "idleOnly": true, "directions": ["down"], "key": "green" }
+}

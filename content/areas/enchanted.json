@@ -1,0 +1,657 @@
+{
+  "id": "enchanted",
+  "name": "The Enchanted Forest",
+  "land": "enchanted",
+  "ground": "enchanted",
+  "ambient": [
+    {
+      "id": "pink-glade",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          420,
+          390
+        ],
+        [
+          700,
+          350
+        ],
+        [
+          820,
+          520
+        ],
+        [
+          600,
+          560
+        ]
+      ],
+      "loopTicks": 420,
+      "phase": 0,
+      "frameTicks": 9,
+      "size": 20
+    },
+    {
+      "id": "pink-pond",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          860,
+          600
+        ],
+        [
+          1030,
+          570
+        ],
+        [
+          1190,
+          650
+        ],
+        [
+          1050,
+          750
+        ]
+      ],
+      "loopTicks": 510,
+      "phase": 113,
+      "frameTicks": 11,
+      "size": 20
+    },
+    {
+      "id": "blue-pond",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          760,
+          720
+        ],
+        [
+          900,
+          820
+        ],
+        [
+          1110,
+          820
+        ],
+        [
+          1190,
+          700
+        ]
+      ],
+      "loopTicks": 600,
+      "phase": 247,
+      "frameTicks": 13,
+      "size": 20
+    },
+    {
+      "id": "blue-lanterns",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          1260,
+          400
+        ],
+        [
+          1450,
+          380
+        ],
+        [
+          1510,
+          560
+        ],
+        [
+          1370,
+          620
+        ]
+      ],
+      "loopTicks": 540,
+      "phase": 71,
+      "frameTicks": 10,
+      "size": 20
+    },
+    {
+      "id": "fairy-root",
+      "animation": "fairy_light",
+      "path": [
+        [
+          1280,
+          300
+        ],
+        [
+          1420,
+          260
+        ],
+        [
+          1510,
+          400
+        ],
+        [
+          1370,
+          470
+        ]
+      ],
+      "loopTicks": 360,
+      "phase": 39,
+      "frameTicks": 17,
+      "size": 14
+    },
+    {
+      "id": "fairy-pond",
+      "animation": "fairy_light",
+      "path": [
+        [
+          620,
+          250
+        ],
+        [
+          760,
+          220
+        ],
+        [
+          850,
+          330
+        ],
+        [
+          700,
+          380
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 181,
+      "frameTicks": 15,
+      "size": 14
+    },
+    {
+      "id": "fairy-glade",
+      "animation": "fairy_light",
+      "path": [
+        [
+          300,
+          600
+        ],
+        [
+          480,
+          570
+        ],
+        [
+          600,
+          700
+        ],
+        [
+          400,
+          760
+        ]
+      ],
+      "loopTicks": 450,
+      "phase": 302,
+      "frameTicks": 19,
+      "size": 14
+    }
+  ],
+  "width": 1650,
+  "height": 1100,
+  "walkable": [
+    [
+      210,
+      330
+    ],
+    [
+      300,
+      330
+    ],
+    [
+      430,
+      350
+    ],
+    [
+      480,
+      450
+    ],
+    [
+      760,
+      450
+    ],
+    [
+      820,
+      560
+    ],
+    [
+      900,
+      620
+    ],
+    [
+      1000,
+      620
+    ],
+    [
+      1030,
+      700
+    ],
+    [
+      1080,
+      720
+    ],
+    [
+      1130,
+      700
+    ],
+    [
+      1160,
+      620
+    ],
+    [
+      1160,
+      700
+    ],
+    [
+      1200,
+      730
+    ],
+    [
+      1250,
+      700
+    ],
+    [
+      1280,
+      680
+    ],
+    [
+      1420,
+      700
+    ],
+    [
+      1400,
+      700
+    ],
+    [
+      1400,
+      760
+    ],
+    [
+      1450,
+      780
+    ],
+    [
+      1450,
+      950
+    ],
+    [
+      1400,
+      950
+    ],
+    [
+      1400,
+      800
+    ],
+    [
+      1300,
+      800
+    ],
+    [
+      1300,
+      850
+    ],
+    [
+      1250,
+      850
+    ],
+    [
+      1250,
+      950
+    ],
+    [
+      1180,
+      950
+    ],
+    [
+      1180,
+      850
+    ],
+    [
+      900,
+      850
+    ],
+    [
+      850,
+      950
+    ],
+    [
+      850,
+      700
+    ],
+    [
+      820,
+      680
+    ],
+    [
+      400,
+      680
+    ],
+    [
+      400,
+      950
+    ],
+    [
+      330,
+      900
+    ],
+    [
+      220,
+      850
+    ],
+    [
+      200,
+      760
+    ],
+    [
+      240,
+      700
+    ],
+    [
+      250,
+      680
+    ],
+    [
+      340,
+      700
+    ],
+    [
+      400,
+      680
+    ],
+    [
+      420,
+      650
+    ],
+    [
+      400,
+      620
+    ],
+    [
+      400,
+      540
+    ],
+    [
+      350,
+      520
+    ],
+    [
+      330,
+      520
+    ],
+    [
+      250,
+      500
+    ],
+    [
+      230,
+      460
+    ]
+  ],
+  "blockers": [],
+  "triggers": [
+    {
+      "id": "mist-door",
+      "polygon": [
+        [
+          200,
+          330
+        ],
+        [
+          280,
+          330
+        ],
+        [
+          280,
+          365
+        ],
+        [
+          210,
+          365
+        ]
+      ],
+      "target": {
+        "area": "mist",
+        "spawn": "forest"
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "id": "mystic-pond",
+      "point": {
+        "x": 620,
+        "y": 680
+      },
+      "knot": "mystic_pond",
+      "prompt": "Look"
+    },
+    {
+      "id": "ancient-tree",
+      "point": {
+        "x": 960,
+        "y": 650
+      },
+      "knot": "ancient_tree",
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "hooded-kid-front",
+      "point": {
+        "x": 1130,
+        "y": 730
+      },
+      "facing": "down",
+      "knot": "forest_kid",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          1115,
+          720
+        ],
+        [
+          1145,
+          720
+        ],
+        [
+          1145,
+          740
+        ],
+        [
+          1115,
+          740
+        ]
+      ]
+    },
+    {
+      "id": "fairy-lavender",
+      "point": {
+        "x": 850,
+        "y": 620
+      },
+      "facing": "down",
+      "knot": "fairy_lavender",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          838,
+          610
+        ],
+        [
+          862,
+          610
+        ],
+        [
+          862,
+          630
+        ],
+        [
+          838,
+          630
+        ]
+      ]
+    },
+    {
+      "id": "fairy-mint",
+      "point": {
+        "x": 450,
+        "y": 560
+      },
+      "facing": "down",
+      "knot": "fairy_mint",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          438,
+          550
+        ],
+        [
+          462,
+          550
+        ],
+        [
+          462,
+          570
+        ],
+        [
+          438,
+          570
+        ]
+      ]
+    },
+    {
+      "id": "fairy-sky",
+      "point": {
+        "x": 650,
+        "y": 500
+      },
+      "facing": "down",
+      "knot": "fairy_sky",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          638,
+          490
+        ],
+        [
+          662,
+          490
+        ],
+        [
+          662,
+          510
+        ],
+        [
+          638,
+          510
+        ]
+      ]
+    },
+    {
+      "id": "fairy-peach",
+      "point": {
+        "x": 1350,
+        "y": 650
+      },
+      "facing": "down",
+      "knot": "fairy_peach",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          1338,
+          640
+        ],
+        [
+          1362,
+          640
+        ],
+        [
+          1362,
+          660
+        ],
+        [
+          1338,
+          660
+        ]
+      ]
+    }
+  ],
+  "critters": [],
+  "props": [
+    {
+      "id": "stone-lower-right",
+      "prop": "stone-lower-right",
+      "x": 1322,
+      "y": 957
+    },
+    {
+      "id": "tree-scribbles",
+      "prop": "tree-scribbles",
+      "x": 1060,
+      "y": 750,
+      "rules": [
+        {
+          "state": "fizzy",
+          "while": "forest_fizzy"
+        }
+      ]
+    },
+    {
+      "id": "stone-upper-scribbles",
+      "prop": "stone-upper-scribbles",
+      "x": 745,
+      "y": 380,
+      "rules": [
+        {
+          "state": "fizzy",
+          "while": "forest_fizzy"
+        }
+      ]
+    },
+    {
+      "id": "stone-left-scribbles",
+      "prop": "stone-left-scribbles",
+      "x": 300,
+      "y": 700,
+      "rules": [
+        {
+          "state": "fizzy",
+          "while": "forest_fizzy"
+        }
+      ]
+    },
+    {
+      "id": "stone-lower-right-scribbles",
+      "prop": "stone-lower-right-scribbles",
+      "x": 1315,
+      "y": 1100,
+      "rules": [
+        {
+          "state": "fizzy",
+          "while": "forest_fizzy"
+        }
+      ]
+    },
+    {
+      "id": "pond-fizz",
+      "prop": "pond-fizz",
+      "x": 620,
+      "y": 980,
+      "rules": [
+        {
+          "state": "fizzy",
+          "while": "forest_fizzy"
+        }
+      ]
+    }
+  ],
+  "atlases": [],
+  "spawns": {
+    "mist": {
+      "x": 300,
+      "y": 410,
+      "facing": "right"
+    }
+  }
+}

@@ -2369,16 +2369,18 @@ the old trail, the owl, and the clubhouse claim.
   - "I pulled the old rope bridge across the misty gully with my lasso."
   - "Bluebells lit stepping stones through the mist, one hop at a time!"
 
-## Milestone 54: The Enchanted Forest **Status:** 📋 Planned
+## Milestone 54: The Enchanted Forest **Status:** ✅ Completed (2026-10-18)
 - Past the parted seal (a door, `requires` `seal_open`): the Enchanted Forest
   (area `enchanted`, land `enchanted`, painted whole and split into a kit),
   the glowing Ancient Tree beside the Mystic Pond in a ring of lavender mist,
   from the world map's centre (NOTES.md: "Mystic Pond", "Ancient Tree",
   "Fairies and butterflies floating around").
 - The chaos is strongest here: purple scribbles over the tree's bark and the
-  stones, and the pond fizzing purple like the kid's soda. They are props
-  with a restored state, cut from a second painting of the forest made whole,
-  for the finale (`forest_restored`, Milestone 55).
+  stones, and the pond fizzing purple like the kid's soda. The approved
+  painting is the forest made whole (the plate); the chaos is added props cut
+  from a second painting of it under the spell, shown while `forest_fizzy`
+  (true from a new game). Milestone 55's calm-down clears it, and the overlays
+  vanish.
 - Fairies and butterflies drift about: an area's ambient flyers, drawn from a
   small atlas on looping paths from the tick (render only, spec 3.1). One
   fairy talks: the Ancient Tree dreams the whole land, and the Mystic Pond
@@ -2390,10 +2392,57 @@ the old trail, the owl, and the clubhouse claim.
   front view; nothing names them). Talking to them plays a taunt ("So you
   found my secret forest. Nobody can stop the BOSS!"); the calm-down is
   Milestone 55.
-- Evidence: core unit tests (the door shut then open, the forest's people and
-  look points within reach, the props' states, the flyers' content, the
-  journal), a recorded run on from Milestone 53's (into the forest, the
-  fairy, the pond, the taunt), and a real-key e2e at both sizes.
+- Built: the `enchanted` area is 1650x1100, with its traced floor, forest-side
+  spawn, two-way door, tree, pond, four fairies, hooded kid, and seven ambient
+  flyers. The forest kit includes the lower-right stone and chaos overlays.
+- Built: the lavender fairy alone records the wish. The pond and tree looks
+  change after that lore. The kid records `saw_tree_kid` and has the repeat
+  taunt. `forest_fizzy` starts true.
+- Evidence: `tests/unit/enchanted.test.ts` covers the two-way door, floor,
+  props, story variables, look points, journal, and area checks.
+- Evidence: `tests/unit/forest-replay.test.ts` covers the chained run's knots,
+  story variables, overlay states, end area, and pinned 18,648 tick count.
+- Evidence: `tools/sim/record-forest.ts` records from `pass-party/mist.json`;
+  `tests/sim/scripts/pass-party/forest.json` is replayed by `just sim`.
+- Evidence: `tests/e2e/forest.spec.ts` uses real keys, compares the browser
+  hash with Bun, checks `renderInfo()` area, overlays, ambient flyers, and
+  people, and captures both viewport sizes at arrival, lore, and taunt.
+- Gates: `just check` passed: 100 test files and 865 tests, all simulations,
+  purity, and lint. `just build` passed production and harness hook checks.
+  The final full `CLOVERHOLLOW_E2E_PORT=4194 just e2e` run passed 760 tests
+  with 2 skipped and no failures in 4.7 minutes. The new Chromium e2e timing
+  entry was recorded from that run; WebKit does not select this screenshot spec.
+- Notes and assumptions:
+  - Gemini calls: 41, six paintings, four characters, and 31 kit calls.
+  - The chaos painting registered with one translation, (-3, -3) px, and its
+    residual. The scribbled boulders were invented by the model, not cut.
+  - The fairy sheet contains four fairies. It is not an animation.
+  - The tree is a plate because nobody stands behind it. It had been a canopy
+    with an empty footprint, which drew Fae behind the roots. A test pins this.
+  - The key option is scoped and opt-in. It does not change other assets.
+  - Milestone 55 clears `forest_fizzy` during the kid's calm-down.
+  - Kept art: the raw approved painting, its tiles, and the registered chaos
+    painting. The raw chaos edit and the unregistered resizes aren't kept (as
+    the playing field keeps only its resized second painting), and the
+    fairies' first four-frame atlas left with the split into four fairies.
+- Wording for the owner:
+  - "This is the Enchanted Forest. The Ancient Tree dreams the whole land."
+  - "The Mystic Pond grants wishes. A kid in a purple hood made a wish and drank from it."
+  - "Then everything went fizzy and purple, with scribbles everywhere. The Ancient Tree can't dream properly with all that fizz!"
+  - "The Mystic Pond is fizzing purple, just like the clubhouse soda."
+  - "This is where wishes come true. The fairies said someone drank from it after making a wish."
+  - "Purple scribbles are all over the Ancient Tree's bark."
+  - "It looks tired."
+  - "If it's dreaming the whole land, it can't dream properly with all this fizz."
+  - "So you found my secret forest, Fae!"
+  - "Nobody can stop the BOSS. Not even you!"
+  - "We'll see about that!"
+  - "You again? The BOSS is busy, Fae!"
+  - "The butterflies keep tickling my wings. I keep telling them, \"Again!\""
+  - "The Ancient Tree is older than every tree, even the trees that think they are very old."
+  - "Hee hee! The pond bubbles made my shoes go squeak."
+  - Journal: "The kid in the purple hood is waiting under the Ancient Tree. They called it THEIR secret forest... and they knew my name!"
+  - Journal: "The fairies told me the Ancient Tree dreams the whole land, and a wish made the Mystic Pond fizz purple."
 
 ## Milestone 55: The kid in the purple hood **Status:** 📋 Planned
 - The last calm-down, in two parts (owner, 2026-10-17: Trace, then Talk).

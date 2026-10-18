@@ -1,0 +1,12 @@
+{
+  "asset": "ambient",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 1,
+  "date": "2026-10-17",
+  "references": ["docs/art/concepts/vfx/vfx_particles.png"],
+  "selectedRawSources": ["art/source/ambient/ambient-raw.png"],
+  "promptNotes": "Two wing frames each for pink and blue butterflies and two tiny warm fairy-light frames, painted on black for black-to-alpha lifting. Ambient sprites are rendered by the engine later.",
+  "postProcessing": { "build": "bun tools/art/build-ambient.ts", "matte": "black-to-alpha", "canvas": "96x96 source pixels", "atlas": "6 columns, 96x96 frames" },
+  "frames": ["butterfly-pink-0", "butterfly-pink-1", "butterfly-blue-0", "butterfly-blue-1", "fairy-light-0", "fairy-light-1"]
+}

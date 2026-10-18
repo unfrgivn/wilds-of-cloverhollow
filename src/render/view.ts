@@ -70,6 +70,8 @@ import { selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
 import { fadeAlpha } from "./fade";
 import { battleLayout, type BattleLayout } from "./battle-layout";
+import { ambientFor, type AmbientFlyer } from "../content/ambient";
+import { flyerAt } from "./ambient";
 
 // Critter frames are 512 px with the feet at y 504 (docs/art/critters.md).
 // Aura and body centroids are measured in each critter's content atlas.
@@ -98,6 +100,7 @@ export class GameView {
   private readonly lanternTint = new Graphics();
   private readonly glowLayer = new Container();
   private readonly depth = new Container();
+  private readonly ambientLayer = new Container();
   private readonly player = new Sprite();
   // One overworld sprite per roster member, labelled with its id; only the
   // members in the party are visible.
@@ -153,6 +156,8 @@ export class GameView {
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
   private glowSprites: { id: string; sprite: Sprite }[] = [];
   private drawnGlows: string[] = [];
+  private ambientSprites: { flyer: AmbientFlyer; sprite: Sprite }[] = [];
+  private ambientFrames: { id: string; x: number; y: number; frame: number }[] = [];
 
   constructor(
     private readonly world: World,
@@ -188,6 +193,7 @@ export class GameView {
     );
     this.scene.mask = this.viewportMask;
     this.scene.addChild(this.depth);
+    this.scene.addChild(this.ambientLayer);
     this.depth.addChild(this.player);
     for (const sprite of this.partySprites.values())
       this.depth.addChild(sprite);
@@ -233,6 +239,10 @@ export class GameView {
         alias: "glow-sheet",
         src: assetUrl("assets/glows/glows.json"),
       }),
+      Assets.load({
+        alias: "ambient-sheet",
+        src: assetUrl("assets/ambient/ambient.json"),
+      }),
       // The toys a catch throws are cropped from this sheet by the DOM
       // overlay, which reads their frames here.
       Assets.load({
@@ -264,6 +274,14 @@ export class GameView {
       sprite.blendMode = "add";
       this.glowLayer.addChild(sprite);
       return { id: glow.id, sprite };
+    });
+    for (const entry of this.ambientSprites) entry.sprite.destroy();
+    this.ambientSprites = ambientFor(area).map((flyer) => {
+      const sprite = new Sprite();
+      sprite.label = `ambient:${flyer.id}`;
+      sprite.anchor.set(0.5);
+      this.ambientLayer.addChild(sprite);
+      return { flyer, sprite };
     });
     for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
@@ -482,6 +500,7 @@ export class GameView {
     this.renderParty(state);
     this.renderCritters(state);
     this.renderNpcs(state);
+    this.renderAmbient(state);
     loaded.update(
       this.world,
       state.ink,
@@ -527,6 +546,31 @@ export class GameView {
       }
     }
     this.drawnGlows = drawn;
+  }
+
+  private renderAmbient(state: State): void {
+    const sheet = Assets.get<Spritesheet>("ambient-sheet");
+    const visible = state.battle === null;
+    if (!visible) {
+      for (const { sprite } of this.ambientSprites) sprite.visible = false;
+      this.ambientFrames = [];
+      return;
+    }
+    const frames: { id: string; x: number; y: number; frame: number }[] = [];
+    for (const { flyer, sprite } of this.ambientSprites) {
+      const position = flyerAt(flyer, state.tick);
+      const names = sheet?.data.animations?.[flyer.animation] ?? [];
+      const frameName = names[position.frame] ?? names[0];
+      const texture = frameName === undefined ? undefined : sheet?.textures[frameName];
+      sprite.visible = texture !== undefined;
+      if (texture === undefined) continue;
+      sprite.texture = texture;
+      sprite.position.set(position.x, position.y);
+      const scale = flyer.size / 96;
+      sprite.scale.set(position.flip ? -scale : scale, scale);
+      frames.push({ id: flyer.id, x: position.x, y: position.y, frame: position.frame });
+    }
+    this.ambientFrames = frames;
   }
 
   // People in the area, y-sorted with everyone else. They face Fae while she
@@ -1051,6 +1095,7 @@ export class GameView {
       y: number;
     }[];
     npcs: { id: string; frame: string; facing: string }[];
+    ambient: { id: string; x: number; y: number; frame: number }[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];
     // Each prop's current state, whether it lies flat (drawn under everyone)
@@ -1126,6 +1171,7 @@ export class GameView {
       },
       critters: this.critterFrames,
       npcs: this.npcFrames,
+      ambient: this.ambientFrames,
       canopies: this.areaView?.canopyAlphas ?? [],
       props: this.areaView?.propInfo ?? [],
       lantern: {

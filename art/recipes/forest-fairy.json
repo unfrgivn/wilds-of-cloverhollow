@@ -1,0 +1,12 @@
+{
+  "asset": "forest-fairy-people",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 2,
+  "date": "2026-10-17",
+  "references": ["docs/art/concepts/characters/character_concept_sheet_fae.png", "art/source/fae/fae-model-sheet-v2.png"],
+  "selectedRawSources": ["art/source/forest-fairy/idle-grid-raw.png"],
+  "promptNotes": "Four tiny friendly forest fairy idle poses, flower-petal dresses, pastel wings in flutter variations, no background aura so the green matte keys cleanly. Gentle hover bob is baked into the four poses.",
+  "postProcessing": { "build": "bun tools/art/build-forest-fairy.ts", "key": "#00FF00 border flood fill, 25% fuzz", "despill": "edge-only green despill", "canvas": "256x256 source pixels", "figureHeight": "120 source pixels", "baseline": 247, "outputs": ["fairy-lavender", "fairy-mint", "fairy-sky", "fairy-peach"] },
+  "validator": { "biped": false, "idleOnly": true, "directions": ["down"], "key": "green" }
+}

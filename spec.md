@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestones 53, 57, and 58)
+Last updated: 2026-10-18 (Milestones 53, 54, 57, and 58)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -603,6 +603,29 @@ ios/            Capacitor iOS project (from Milestone 4).
   `seal_open` and shows the open seal for Milestone 54. The journal tells each
   stretch as it opens. The map shows Enchanted Forest as `???` until Fae finds
   the Misty Path or enters that land.
+ - The Misty Path's east arch mouth extends the walkable floor to x 1350 around
+   y 530 to 625. Its thin `forest` trigger leads to `enchanted.mist` and requires
+   `seal_open`, playing `mist_seal` while the seal is shut.
+ - The Enchanted Forest (Milestone 54) is area `enchanted`, named "The Enchanted
+   Forest", in the `enchanted` land, 1650x1100 units. Its `mist` spawn is the
+   forest side of the seal. Its `mist-door` trigger returns to `mist.forest`.
+   The Misty Path's `forest` trigger leads here and requires `seal_open`.
+ - The forest has the hooded kid in front view and four fairies: lavender, mint,
+   sky, and peach. The lavender fairy's `fairy_lavender` knot alone sets
+   `heard_wish`. The pond and Ancient Tree are look points, with their after-
+   lore lines unlocked by that variable. The kid's `forest_kid` knot sets
+   `saw_tree_kid` and has a short `again` line on later talks. No line names
+   the kid. Seven ambient entries draw the butterflies and fairy lights from
+   the tick, and `renderInfo().ambient` exposes the seven current flyers.
+ - The forest's `forest_fizzy` variable starts true. `tree-scribbles`, the
+   scribbled stones, and `pond-fizz` are chaos overlays with restored default
+   states. Milestone 55 clears `forest_fizzy` as part of the calm-down.
+ - The forest kit includes the painted lower-right stone and the chaos overlays
+   as added props. Props use `flat` where nobody can stand behind what they are
+   painted on. The scoped opt-in `"key": "bright"` selects dark-purple paint's
+   bright key colour; it is not a global art-pipeline setting.
+ - The forest journal notes cover the fairies, the fizzy pond, the dreaming tree,
+   and the kid's secret forest, newest first as each clue is found.
 - Flute friends (Milestone 47): once Fae has the flute, a calm Pond Pup's
   talk (`pup_calm`, after its first) offers Pet him and Share a snack; doing
   both, in either order, makes the pups her friends (`pup_petted`,
@@ -752,6 +775,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   pines (`old_trail_marker`, which sets `found_old_trail`), and a doodle is
   painted on the north ski-lift tower (`lift_note`). `renderInfo().lantern`
   reports `{ on, glows }`, the ids drawn.
+- Ambient flyers (Milestone 54): an area may define `ambient` as flyers with
+  `{ id, animation, path, loopTicks, phase, frameTicks, size }`. `path` is a
+  closed loop of at least three in-bounds `[x, y]` world points; `loopTicks`
+  and `phase` are integers with `loopTicks >= 120` and `0 <= phase <
+  loopTicks`, `frameTicks` is an integer of at least 1, and `size` is the
+  drawn height in world units. Animations are names in
+  `public/assets/ambient/ambient.json`. Flyers move at constant arc-length
+  speed with a small render-only bob, change atlas frames at `frameTicks`, and
+  mirror while travelling left. They draw above overworld figures and props,
+  below the fade, dusk tint, and glows, and are hidden in battles. They never
+  enter simulation state, hashes, or saves.
 - Canopies: a prop with `canopy: true` is a tree Fae can walk under (a palm,
   crown and trunk cut whole, its front edge at the trunk's foot). While it
   draws over more than 5% of her body box (its picture, in the columns where
@@ -2061,7 +2095,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     current `animation` and `frame`, `party` (each member in party order as
     `{ id, hidden, animation, frame }`, `hidden` being its fraction behind its
     leader), plus prompt and dialogue summaries. `npcs` lists each person in
-    the area as `{ id, frame, facing }`. `battle.layout` includes `party`, the
+  the area as `{ id, frame, facing }`. `ambient` lists current flyers as
+  `{ id, x, y, frame }` in world units, and is empty for an area without
+  flyers. `battle.layout` includes `party`, the
     members' CSS-px points, and `battle.check` the check's geometry
     (section 8). `marks` lists the recurring critters' "?" and "!" as
     `{ key, mark, x, y }`, each at its sticker's bottom centre in CSS px

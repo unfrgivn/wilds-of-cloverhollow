@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 57, the lodge keeper)
+Last updated: 2026-10-17 (Milestone 58, the arcade nearer its concept; Milestone 57, the lodge keeper)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -461,12 +461,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   set piece at (820, 610). Look points: `claw-machine` (prompt `Play`),
   `ticket-counter`, `star-racer` (a back-row cabinet), `boop-a-mole` (prompt
   `Play`, at (290, 462), the front of the first cabinet, Milestone 46), and
-  `skee-ball` (prompt
-  `Play`, at (552, 712), the foot of the lane). The skee-ball lane (Milestone
-  45) stands on the open floor at the front left, its hood at the upper left
-  and its foot toward the room's front corner: painted into the room by an
-  edit confined to that floor (`art/recipes/skee-ball-room-edit.json`), then
-  cut by the kit like the cabinets.
+  `skee-ball` (prompt `Play`, at (552, 712), the foot of the lane). The
+  skee-ball lane (Milestone 45) stands on the open floor at the front left,
+  its hood at the upper left and its foot toward the room's front corner:
+  painted into the room by an edit confined to that floor
+  (`art/recipes/skee-ball-room-edit.json`), then cut by the kit like the
+  cabinets. Since Milestone 58 the room is nearer its concept
+  (`art/recipes/arcade-concept-edits.json`): neon "ARCADE" (pink) and "PLAY"
+  (teal) on its walls, "TICKETS" on the counter and "CLAW" on the claw
+  machine, a purple cabinet with a neon rocket on its side near the front
+  corner (`rocket-cabinet`, look point `rocket-cabinet` at (685, 707), prompt
+  `Look`, facing the front left), and a red gumball machine beside the claw
+  machine (`gumball-red-front`). Both stand where no recorded walk goes
+  (their footprints keep 45 units from every walk), so no run changed. The
+  concept's middle row of cabinets waits: it stands on every walk through the
+  room, which the pass-party chain replays.
 - Story time (Milestone 30): the school hallway's classroom door (trigger
   `classroom-door`, the porthole door on the back-left wall) leads to
   `classroom.door` and `requires` `story_time` (knot `classroom_closed`);
@@ -887,9 +896,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   strips drawn.
 - Shadows are multiply decals on the ground layer, under everyone, and move
   with their prop.
-- A canopy prop (the trees, the notice board) fades to 40% (0.08 a tick)
-  while it covers more than 5% of Fae's body box; `renderInfo().canopies`
-  lists them.
+- A canopy prop (the trees, the notice board, the arcade's rocket cabinet)
+  fades to 40% (0.08 a tick) while it covers more than 5% of Fae's body box;
+  `renderInfo().canopies` lists them.
 - The battle backdrop is rendered from the plate with every prop on it.
 - The plaza (Milestone 32) is a kit: 20 props (the fountain; six benches;
   the four lamp arches, each one prop with a footprint per leg; the two
@@ -909,7 +918,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   lockers on the nurse's block),
   the classroom, the gym, and the arcade (the five cabinets, the ticket
   counter, the claw machine, the three gumball machines, and, since Milestone
-  45, the skee-ball lane). The kitchen's
+  45, the skee-ball lane; since Milestone 58, the rocket cabinet and a fourth
+  gumball machine). The kitchen's
   `stairs` spawn is (600, 650), facing right, so the whole party fits behind
   Fae at the foot of the stairs.
 - The outdoor areas (Milestone 34) are kits too, so every area is: Meadow

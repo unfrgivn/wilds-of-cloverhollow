@@ -41,6 +41,15 @@ they were drawn from (`crop.json`, kept with them): change a crop and that
 subject's cache is cleared and its kept samples passed over, so the next `gen`
 draws it again from the new crop.
 
+Editing the approved painting (a new prop painted into the room, lettering on
+a prop): the cached assembled painting is rebuilt whenever a tile is newer
+than it, `gen` takes every subject's crop afresh from the painting, and a
+mask is made again whenever it's older than the crop or sample it's made
+from, so `pack` cuts every frame from the edited painting while the samples
+stay cached (they're valid while each object is where it was). A local
+rebuild then matches a clean checkout's byte for byte. A NEW subject must be
+drawn after the edit: its samples come from the painting as it is.
+
 ## The config: `art/kit/<area>.json`
 `{ "area": "<id>", "subjects": [...] }`. A subject:
 

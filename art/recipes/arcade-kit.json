@@ -1,7 +1,7 @@
 {
   "asset": "arcade-kit",
-  "date": "2026-10-17",
-  "summary": "The approved arcade painting split into a ground plate and 11 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "date": "2026-10-18",
+  "summary": "The approved arcade painting split into a ground plate and 13 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/arcade.json",
   "painting": "art/source/areas/arcade/painting/ground.json",
@@ -64,6 +64,14 @@
       "skee-ball": [
         "iso-1.jpg",
         "crop.json"
+      ],
+      "rocket-cabinet": [
+        "iso-2.jpg",
+        "crop.json"
+      ],
+      "gumball-red-front": [
+        "iso-2.jpg",
+        "crop.json"
       ]
     }
   },
@@ -90,7 +98,10 @@
     "gumball-red",
     "gumball-yellow",
     "gumball-red-right",
-    "skee-ball"
+    "skee-ball",
+    "rocket-cabinet",
+    "gumball-red-front"
   ],
-  "lifted": []
+  "lifted": [],
+  "added": {}
 }

@@ -294,8 +294,13 @@ function im(...args: string[]): string {
 const mean = (...args: string[]): number =>
   Number(im(...args, "-format", "%[fx:mean]", "info:"));
 
+// The painting assembled from its tiles. It's cached, so it's rebuilt whenever a
+// tile is newer than the cache: an edited painting (a new prop painted in) must
+// never be cut as the old one.
 const original = `${scratch}/original.png`;
-if (!existsSync(original)) {
+const tilesChanged = (): boolean => painting.tiles.some((tile) =>
+  statSync(`${paintingDir}/${tile.file}`).mtimeMs > statSync(original).mtimeMs);
+if (!existsSync(original) || tilesChanged()) {
   const args = ["-size", `${painting.width}x${painting.height}`, "xc:#fcfbf6"];
   for (const tile of painting.tiles)
     args.push(`${paintingDir}/${tile.file}`, "-geometry", `+${tile.x}+${tile.y}`, "-composite");
@@ -723,11 +728,21 @@ function clean(item: Subject, input: Mask): Mask {
 const objectSamples = (item: Subject): number[] =>
   item.samples.object === undefined ? [1, 2] : [item.samples.object];
 
+// A cached mask, if it was made after everything it's made from: the painting
+// under the crop is taken afresh each run, so a mask kept from before an edit
+// to the painting is made again.
+function fresh(out: string, inputs: string[]): boolean {
+  if (!existsSync(out)) return false;
+  const made = statSync(out).mtimeMs;
+  return inputs.every((input) => !existsSync(input) || statSync(input).mtimeMs <= made);
+}
+
 // The model softens ink lines; the painting's own dark ink within 3 px comes back.
 function objectMask(item: Subject, n: number): Mask {
   const { w, h } = box(item);
   const out = `${dir(item)}/obj-${n}.png`;
-  if (existsSync(out)) return readMask(out, w, h);
+  if (fresh(out, [`${dir(item)}/crop.png`, `${dir(item)}/iso-${n}.jpg`]))
+    return readMask(out, w, h);
   const seed = toCrop(item, item.seed);
   let mask = nearSeed(keyMask(rgb(`${dir(item)}/iso-${n}.jpg`, w, h)), w, h, seed, reach(item));
   const ink = inkMask(rgb(`${dir(item)}/crop.png`, w, h));
@@ -805,7 +820,7 @@ function shades(item: Subject): Mask {
 function holeMask(item: Subject): Mask {
   const { w, h } = box(item);
   const out = `${dir(item)}/hole.png`;
-  if (existsSync(out)) return readMask(out, w, h);
+  if (fresh(out, [`${dir(item)}/obj-${item.samples.object ?? 1}.png`])) return readMask(out, w, h);
   const object = objectMask(item, item.samples.object ?? 1);
   // What `exclude` takes away isn't the object, so it stays in the plate.
   const grown = morph(union(object, shades(item)), w, h, 6, true);
@@ -860,9 +875,12 @@ async function gen(): Promise<void> {
   for (const item of subjects) {
     const crop = box(item);
     mkdirSync(dir(item), { recursive: true });
+    // The painting under the crop, always taken afresh: its masks and samples
+    // stay valid while the object in it is where it was, but its pixels are cut
+    // into the frame, so an edit to the painting (lettering on a prop, the
+    // patched tile's re-encode) must reach it.
     const path = `${dir(item)}/crop.png`;
-    if (!existsSync(path))
-      im(source(item), "-crop", `${crop.w}x${crop.h}+${crop.x}+${crop.y}`, "+repage", path);
+    im(source(item), "-crop", `${crop.w}x${crop.h}+${crop.x}+${crop.y}`, "+repage", path);
     writeFileSync(`${dir(item)}/crop.json`, cropStamp(item));
     for (const n of objectSamples(item))
       jobs.push(() => gemini(isolatePrompt(item.object, false), path,

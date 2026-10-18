@@ -293,7 +293,8 @@
         "object": 2
       },
       "front": [
-        "gumball-red"
+        "gumball-red",
+        "gumball-red-front"
       ],
       "core": 3,
       "solid": true
@@ -609,6 +610,87 @@
       ],
       "samples": {
         "object": 1
+      }
+    },
+    {
+      "id": "rocket-cabinet",
+      "crop": [
+        600,
+        500,
+        190,
+        250
+      ],
+      "seed": [
+        708,
+        650
+      ],
+      "painted": true,
+      "canopy": true,
+      "solid": true,
+      "ground": "the lilac and cream checkerboard arcade floor",
+      "object": "the small purple arcade cabinet standing alone on the checkerboard floor: its lilac marquee, its dark screen with tiny stars and a rocket, its sloped control panel with a red joystick and round buttons, its coin door, and the glowing pink neon rocket outline with a teal round window on its right side; keep the whole cabinet, top to feet, and nothing else, not the floor around or under it, and not its soft shadow on the floor",
+      "footprint": [
+        [
+          [
+            659,
+            699
+          ],
+          [
+            700,
+            719
+          ],
+          [
+            745,
+            697
+          ],
+          [
+            704,
+            677
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
+      }
+    },
+    {
+      "id": "gumball-red-front",
+      "crop": [
+        945,
+        410,
+        110,
+        150
+      ],
+      "seed": [
+        998,
+        470
+      ],
+      "painted": true,
+      "solid": true,
+      "ground": "the lilac and cream checkerboard arcade floor",
+      "object": "the red gumball machine standing on the floor in front of the claw machine: its round clear glass globe full of colourful gumballs, its red cap, its red body with a silver coin slot and chute, and its short white base; keep the whole machine, top to base, and nothing else, not the claw machine behind it, not the gumball machines on stands beside it, not the floor, and not its shadow",
+      "footprint": [
+        [
+          [
+            985,
+            528
+          ],
+          [
+            998,
+            535
+          ],
+          [
+            1012,
+            528
+          ],
+          [
+            998,
+            520
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 2
       }
     }
   ]

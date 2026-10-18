@@ -2501,6 +2501,76 @@ more bad guys, and the blacklight lantern, made and built while away.
   prints, invisible-ink notes (journal clues), and trail markers that open
   hidden paths.
 
+## Milestone 58: The arcade, nearer its concept **Status:** ✅ Completed (2026-10-17)
+- The owner chose arcade polish next (2026-10-17): bring the room closer to
+  its concept (`docs/art/concepts/environments/arcade_interior.png`), which has
+  neon words on its walls, lettered machines, more machines on the floor,
+  and a middle row of cabinets.
+- Neon "ARCADE" in pink on the left wall beside the door, and "PLAY" in teal
+  on the right wall above the claw machine, beside the neon rocket, planet,
+  and stars already there. The counter has a yellow "TICKETS" board and the
+  claw machine "CLAW" on its top band.
+- On the open floor, where no recorded walk goes: a purple cabinet like the
+  concept's, its screen showing a little rocket and a neon rocket on its side,
+  near the room's front corner (`rocket-cabinet`, a canopy that fades while
+  Fae is behind it, look point at its front); and a red gumball machine
+  beside the claw machine, next to the three on stands. The cabinet has a
+  line before Mr. Pip is calm
+  and one after. The back-row Star Racer cabinet stays as it is: its
+  scribbled-out high score is a clue in the finale (Milestone 55).
+- Not yet: the concept's middle row of four cabinets. It stands where every
+  walk through the arcade goes, so it changes the arcade's recorded run and,
+  through the pass-party chain (woods, arcade, school, gym, music, field,
+  flute, lasso, kitchen), every run after it. The finale (Milestones 53 to
+  56) is recording runs on from that chain now, so the row waits for the
+  finale to land, and then the chain is re-recorded once.
+- Evidence: every recorded run replays unchanged (`bun run sim`, 47 runs)
+  and the area checks pass (nothing hides Fae; the cabinet is a canopy); the
+  new run `arcade/rocket.json` (`tools/sim/record-rocket.ts`: the cabinet
+  looked at fizzy, Mr. Pip calmed, looked at again) with its replay test and
+  its real-key e2e (`rocket.spec.ts`, the room at both sizes, hashing the
+  same as Bun's); the kit rebuilt from a clean checkout with no calls and no
+  change; the older props re-cut with their sizes and alpha unchanged, the
+  claw machine and counter by their lettering, the rest by re-encode noise
+  (on cream at most 0.87/255); every word read at 3x; and the room's
+  screenshots viewed.
+- Notes and assumptions:
+  - The owner's to review: the signs' words, the new cabinet's and gumball
+    machine's places, and what the cabinet becomes (Milestone 59).
+  - Planned as Milestone 53 and renumbered 58 at merge: the owner's finale
+    took Milestones 53 to 56 while this was in progress.
+  - The first art pass (the worker's) was redone: the model had redrawn the
+    whole top of the room for the words, and one transform can't register a
+    redrawing, so the walls came back nearly unreadable; its cabinet was a
+    tall, flat block. Each word was then painted in its own small crop (the
+    model keeps a small crop's composition), and the cabinet redrawn over a
+    box block-out with its marquee, screen, and controls. The gumball machine
+    (red, not the plan's yellow, to match the three by the wall) was painted
+    in front of the claw machine first, where it stood between Mr. Pip and
+    the claw machine in every arcade screenshot, so it was painted again
+    beside the claw machine.
+  - Three kit caches went stale after a painting edit, found because the
+    lettering didn't reach the frames: the assembled painting, each subject's
+    crop, and each subject's object and hole masks were only made when
+    missing, so an edited painting was cut as the old one (new subjects'
+    samples showed bare floor, and a local rebuild didn't match a clean
+    checkout's). The painting and crops are now taken afresh each run, and a
+    mask is made again when it's older than what it's made from
+    (`tools/art/kit.ts`, `docs/art/kit.md`). A clean checkout now rebuilds
+    the arcade byte for byte with no calls.
+  - Art, 21 Gemini calls (the generation log): 6 edits (4 kept) and 15 kit
+    isolates (2 kept); `art/recipes/arcade-concept-edits.json`.
+
+## Milestone 59: A fourth arcade game **Status:** 📋 Planned
+- A fourth game on the new rocket cabinet (Milestone 58): a short, gentle
+  space race for 2 coins, steering a little rocket between lanes to catch
+  stars and slip past space rocks, paying tickets a star. Built like the
+  other games: a painted close-up of the cabinet's screen, rules in the core,
+  a recorded run, and real-key and touch e2e.
+- The back-row Star Racer cabinet stays as it is: its scribbled-out high
+  score and the Star Racer token are clues in the finale (Milestone 55).
+- For the owner: the game and its name.
+
 ## Milestone 36: Gamepad support **Status:** ✅ Completed (2026-10-08)
 - Standard-mapping gamepads now share the keyboard and touch `ActionFrame`:
   radial 25% left-stick dead zone with rescaling, d-pad priority, and the

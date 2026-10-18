@@ -1,0 +1,84 @@
+{
+  "asset": "The arcade nearer its concept: neon ARCADE and PLAY, TICKETS and CLAW, a rocket cabinet, and a fourth gumball machine (Milestone 58)",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 21,
+  "calls_note": "21 calls in the generation log: 6 edits (4 kept: the cabinet, ARCADE, PLAY with CLAW and TICKETS, and the gumball machine; the first art pass's two edits were redone) and 15 kit isolates (2 kept: one each for the cabinet and the gumball machine; the rest were the first pass's, four drawn from a stale cached painting before the kit fix, and the gumball's first place, moved off the walk).",
+  "method": "Each edit: a crop of the approved painting (at e10dd213) with a flat-colour block-out of what's added at its exact place; one call repainting the block-out in the room's style; the output registered by searching a uniform scale and offset for the least difference over the crop away from the edit (median difference there reported BEFORE compositing); then only the new thing composited.",
+  "edits": [
+    {
+      "name": "the rocket cabinet",
+      "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade floor, with one flat-colour block-out added: a small purple arcade cabinet standing on the checkerboard. Repaint ONLY that block-out as a finished, cute arcade cabinet in the painting's soft watercolour and thin warm-brown ink style: a purple cabinet whose front (the face toward the lower left) has a pale lit marquee, a dark screen with tiny pixel stars and a little rocket on it, a sloped control panel with a joystick and round buttons, and a coin door below; on its right side, a glowing neon rocket outline in pink with a teal round window. Keep the cabinet's exact position, outline, size, and perspective, standing on the same tiles. Give it a soft contact shadow on the floor. Change nothing else: every floor tile, every line, the skee-ball lane, and the claw machine stay exactly as they are, pixel for pixel. No text anywhere.",
+      "aspect_ratio": "3:2",
+      "crop_px": [
+        875,
+        900,
+        1050,
+        700
+      ],
+      "blockout": "art/source/areas/arcade/concept-edits/front2-blockout.png: a box on the contact (659,699) (700,719) (745,697) (704,677) in area units, 140 tall, its front face toward the front left",
+      "registration": "scale 2.4228, offset (0, 0); away from the edit: median 1.07/255, p95 7.6, mean 2.19",
+      "mask": "art/source/areas/arcade/concept-edits/front2-alpha.png: as the gumball's, one piece"
+    },
+    {
+      "name": "neon ARCADE on the left wall",
+      "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade, with one flat-colour block-out word added: ARCADE. Repaint ONLY that word as a finished glowing neon-tube sign mounted on the brick wall, in the painting's soft watercolour and thin warm-brown ink style: pink glass tubes tracing each letter, a soft pink glow on the bricks right around them. Keep the word's exact position, size, slant, and spelling, A R C A D E. Change nothing else: the bricks, the mortar lines, the string lights, the door, the cabinets, the neon rocket and star stay exactly as they are, pixel for pixel. No other text.",
+      "aspect_ratio": "3:2",
+      "crop_px": [
+        70,
+        280,
+        720,
+        480
+      ],
+      "blockout": "art/source/areas/arcade/concept-edits/arcade-blockout.png: the word in Arial Rounded Bold, 56 px tall, sheared to the wall's slope (-0.295)",
+      "registration": "scale 3.5333, offset (0, 0); away from the edit: median 2.28/255, p95 13.9; every 120 px tile matched best unshifted",
+      "mask": "art/source/areas/arcade/concept-edits/arcade-alpha.png: strong differences in the word's window, merged into clusters, filled, plus only the lighter pixels of the glow in an 18 px band"
+    },
+    {
+      "name": "neon PLAY, and CLAW and TICKETS lettered",
+      "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade, with three flat-colour block-out words added. Repaint ONLY those words as finished art in the painting's soft watercolour and thin warm-brown ink style, keeping each word's exact position, size, slant, and spelling: PLAY as a glowing teal neon-tube sign on the brick wall, teal glass tubes tracing each letter with a soft teal glow on the bricks around them; CLAW lettered in purple on the claw machine's lilac top band, like a printed sign; TICKETS lettered in dark brown on the small yellow board on the ticket counter's front, like a painted wooden sign. Change nothing else: the bricks, mortar lines, string lights, stars, the awning, the jars, the counter, and the claw machine stay exactly as they are, pixel for pixel. No other text.",
+      "aspect_ratio": "3:2",
+      "crop_px": [
+        1230,
+        210,
+        1050,
+        700
+      ],
+      "blockout": "art/source/areas/arcade/concept-edits/right-blockout.png",
+      "registration": "scale 2.4226, offset (0, 0); away from the edit: median 2.61/255, p95 16.1; every 120 px tile matched best unshifted",
+      "mask": "art/source/areas/arcade/concept-edits/right-alpha.png: per word, strong differences in its window (TICKETS's window ends before the jars), clusters filled; PLAY's glow as ARCADE's (14 px)"
+    },
+    {
+      "name": "the gumball machine beside the claw machine",
+      "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade, with one flat-colour block-out added: a small gumball machine standing on the checkerboard floor in front of the claw machine. Repaint ONLY that block-out as a finished, cute red gumball machine in the painting's soft watercolour and thin warm-brown ink style, like the three gumball machines against the wall: a round clear glass globe full of colourful gumballs, a red cap, a red body with a silver coin slot and a little chute, on a short white base standing on the floor. Keep its exact position, outline, size, and perspective, standing on the same tile. Give it a soft contact shadow on the floor. Change nothing else: every floor tile, every line, the claw machine, the three gumball machines, and the bricks stay exactly as they are, pixel for pixel. No text anywhere.",
+      "aspect_ratio": "3:2",
+      "crop_px": [
+        1350,
+        700,
+        1050,
+        700
+      ],
+      "blockout": "art/source/areas/arcade/concept-edits/front3-blockout.png: the machine on the contact (985,528) (998,535) (1012,528) (998,520) in area units, drawn over the room with the other edits in",
+      "registration": "against the room with the other edits in: scale 2.423, offset (0, 0); away from the edit: median 1.38/255, p95 12.4, mean 3.24",
+      "mask": "art/source/areas/arcade/concept-edits/front3-alpha.png: strong differences within 40 px of the block-out, filled, one piece; washes outside it that only got yellower stripped; only even darkening for its shadow"
+    }
+  ],
+  "spelling": "ARCADE, PLAY, CLAW, and TICKETS read correctly at 3x (viewed).",
+  "encode": {
+    "tiles": "Every edit applied to the decoded approved painting, then each tile encoded once at WebP quality 92 (the kit's setting for a patched tile).",
+    "tile_0": "outside the edits: mean 0.55, max 16 against the approved tile; one q92 re-encode of it: mean 0.56, max 13",
+    "tile_1": "outside the edits: mean 1.46, max 14; one q92 re-encode: mean 1.45, max 14"
+  },
+  "kit": "Subjects rocket-cabinet (painted, canopy, isolate sample 2) and gumball-red-front (painted, sample 2) in art/kit/arcade.json, their footprints traced on the painted contacts; the claw machine lists the gumball machine in front of it, so its frame leaves it out. A clean checkout rebuilds every output byte for byte with no calls. Every older frame keeps its alpha; the claw machine and the counter change by their lettering (and the claw machine by the gumball cut from it), the rest by re-encode noise only.",
+  "outputs": [
+    "art/kit/arcade.json",
+    "art/source/areas/arcade/painting/ground_0_0.webp",
+    "art/source/areas/arcade/painting/ground_1_0.webp",
+    "content/props/arcade.json",
+    "public/assets/areas/arcade/ground_0_0.webp",
+    "public/assets/areas/arcade/ground_1_0.webp",
+    "public/assets/areas/arcade/props-0.json",
+    "public/assets/areas/arcade/props-0.png"
+  ],
+  "owner_review": "pending: docs/review-queue.md"
+}

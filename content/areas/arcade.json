@@ -106,6 +106,15 @@
         "y": 462
       },
       "prompt": "Play"
+    },
+    {
+      "id": "rocket-cabinet",
+      "knot": "rocket_cabinet",
+      "point": {
+        "x": 685,
+        "y": 707
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [
@@ -183,6 +192,18 @@
       "prop": "skee-ball",
       "x": 445,
       "y": 725
+    },
+    {
+      "id": "rocket-cabinet",
+      "prop": "rocket-cabinet",
+      "x": 702,
+      "y": 719
+    },
+    {
+      "id": "gumball-red-front",
+      "prop": "gumball-red-front",
+      "x": 999,
+      "y": 535
     }
   ],
   "blockers": []

@@ -350,7 +350,8 @@ export function closestPointOnPolygon(
   point: Point,
   polygon: Polygon,
 ): { point: Point; distance: number } {
-  let bestPoint = { x: vertex(polygon, 0)[0], y: vertex(polygon, 0)[1] };
+  let bestX = vertex(polygon, 0)[0];
+  let bestY = vertex(polygon, 0)[1];
   let best = Infinity;
   for (let index = 0; index < polygon.length; index += 1) {
     const start = vertex(polygon, index);
@@ -363,22 +364,47 @@ export function closestPointOnPolygon(
         ? 0
         : ((point.x - start[0]) * dx + (point.y - start[1]) * dy) / length;
     const t = Math.max(0, Math.min(1, projection));
-    const nearest = { x: start[0] + dx * t, y: start[1] + dy * t };
-    const differenceX = point.x - nearest.x;
-    const differenceY = point.y - nearest.y;
+    const nearestX = start[0] + dx * t;
+    const nearestY = start[1] + dy * t;
+    const differenceX = point.x - nearestX;
+    const differenceY = point.y - nearestY;
     const distance = Math.sqrt(
       differenceX * differenceX + differenceY * differenceY,
     );
     if (distance < best) {
       best = distance;
-      bestPoint = nearest;
+      bestX = nearestX;
+      bestY = nearestY;
     }
   }
-  return { point: bestPoint, distance: best };
+  return { point: { x: bestX, y: bestY }, distance: best };
 }
 
 export function distanceToPolygon(point: Point, polygon: Polygon): number {
   return closestPointOnPolygon(point, polygon).distance;
+}
+
+// Each polygon's bounding box. Polygons are content and never change, so a
+// box is worked out once per polygon.
+const boxes = new WeakMap<Polygon, { left: number; top: number; right: number; bottom: number }>();
+
+// Whether `point` lies more than `reach` outside the polygon's bounding box:
+// then it's outside the polygon and further than `reach` from every edge, and
+// the full tests below would leave it alone.
+function beyond(point: Point, polygon: Polygon, reach: number): boolean {
+  let box = boxes.get(polygon);
+  if (box === undefined) {
+    box = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
+    for (const [x, y] of polygon) {
+      box.left = Math.min(box.left, x);
+      box.top = Math.min(box.top, y);
+      box.right = Math.max(box.right, x);
+      box.bottom = Math.max(box.bottom, y);
+    }
+    boxes.set(polygon, box);
+  }
+  return point.x < box.left - reach || point.x > box.right + reach ||
+    point.y < box.top - reach || point.y > box.bottom + reach;
 }
 
 function pushFromPolygon(
@@ -387,6 +413,7 @@ function pushFromPolygon(
   radius: number,
   keepInside: boolean,
 ): Point {
+  if (!keepInside && beyond(point, polygon, radius)) return point;
   const inside = pointInPolygon(point, polygon);
   const closest = closestPointOnPolygon(point, polygon);
   const dx = point.x - closest.point.x;
@@ -415,9 +442,13 @@ export function resolveCollision(
 ): Point {
   let result = point;
   for (let pass = 0; pass < 8; pass += 1) {
+    const before = result;
     result = pushFromPolygon(result, area.walkable, radius, true);
     for (const blocker of area.blockers)
       result = pushFromPolygon(result, blocker, radius, false);
+    // A pass depends only on where it starts: one that moves nothing leaves
+    // every later pass nothing to move.
+    if (Object.is(result.x, before.x) && Object.is(result.y, before.y)) break;
   }
   return result;
 }
@@ -437,8 +468,8 @@ function moveDirection(move: Point): Direction | undefined {
 function validResolved(point: Point, area: Area, radius: number): boolean {
   return pointInPolygon(point, area.walkable) &&
     distanceToPolygon(point, area.walkable) >= radius - 0.01 &&
-    area.blockers.every((blocker) =>
-      !pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius - 0.01);
+    area.blockers.every((blocker) => beyond(point, blocker, radius) ||
+      (!pointInPolygon(point, blocker) && distanceToPolygon(point, blocker) >= radius - 0.01));
 }
 
 /*

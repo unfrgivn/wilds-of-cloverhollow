@@ -43,8 +43,15 @@ export function storyHasKnot(storyJson: StoryJson, name: string): boolean {
 
 // A story variable's value in an Ink state: true or false for booleans, text
 // for everything else, undefined for a name the story doesn't declare.
+const readers = new WeakMap<StoryJson, (inkJson: string, name: string) => unknown>();
+
 export function inkVariable(storyJson: StoryJson, inkJson: string, name: string): unknown {
-  return createStoryReader(storyJson)(inkJson, name);
+  let read = readers.get(storyJson);
+  if (read === undefined) {
+    read = createStoryReader(storyJson);
+    readers.set(storyJson, read);
+  }
+  return read(inkJson, name);
 }
 
 // The same reads without building a Story each time (about 0.2 ms each): one
@@ -106,6 +113,34 @@ export type InkFacts = {
 const newGameFacts: InkFacts =
   { calmed: {}, coins: 0, snacks: 2, prizes: [], plushesLeft: 0, tickets: 0 };
 
+// One Story per compiled story: building one from the compiled JSON took
+// 2.2 ms, most of a command's time. Each command resets it to a new Story's
+// state (0.05 ms) before loading its own, and the externals answer that
+// command's facts.
+type Runner = { story: Story; facts: InkFacts };
+const runners = new WeakMap<StoryJson, Runner>();
+
+function runner(storyJson: StoryJson): Runner {
+  const cached = runners.get(storyJson);
+  if (cached !== undefined) return cached;
+  const made: Runner = { story: new Story(storyJson), facts: newGameFacts };
+  const { story } = made;
+  story.BindExternalFunction(
+    "calmed",
+    (id: unknown) => typeof id === "string" && made.facts.calmed[id] === true,
+  );
+  story.BindExternalFunction("coins", () => made.facts.coins);
+  story.BindExternalFunction("snacks", () => made.facts.snacks);
+  story.BindExternalFunction(
+    "won",
+    (id: unknown) => typeof id === "string" && made.facts.prizes.includes(id),
+  );
+  story.BindExternalFunction("plushesLeft", () => made.facts.plushesLeft);
+  story.BindExternalFunction("tickets", () => made.facts.tickets);
+  runners.set(storyJson, made);
+  return made;
+}
+
 // The externals are answered for every command, so a knot can ask on any
 // line, not only its first.
 export function runInk(
@@ -114,20 +149,11 @@ export function runInk(
   command: InkCommand,
   facts: InkFacts = newGameFacts,
 ): InkResult {
-  const story = new Story(storyJson);
+  const run = runner(storyJson);
+  run.facts = facts;
+  const { story } = run;
+  story.ResetState();
   story.state.LoadJson(inkJson);
-  story.BindExternalFunction(
-    "calmed",
-    (id: unknown) => typeof id === "string" && facts.calmed[id] === true,
-  );
-  story.BindExternalFunction("coins", () => facts.coins);
-  story.BindExternalFunction("snacks", () => facts.snacks);
-  story.BindExternalFunction(
-    "won",
-    (id: unknown) => typeof id === "string" && facts.prizes.includes(id),
-  );
-  story.BindExternalFunction("plushesLeft", () => facts.plushesLeft);
-  story.BindExternalFunction("tickets", () => facts.tickets);
   if (command.type === "start") story.ChoosePathString(command.knot);
   if (command.type === "choose") story.ChooseChoiceIndex(command.index);
   const blank = (output: string | null): boolean =>

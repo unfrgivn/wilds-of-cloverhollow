@@ -2405,14 +2405,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   "Ms. Maple" stays as the teacher's name for now.
 - Approved 2026-10-17: the thrown toys a catch throws (Milestone 41), cut
   from the critters' burst frames (`art/review/toys-sheet.png`).
+- Approved 2026-10-18: the arcade's painting as Milestone 61 rearranged it
+  (`art/review/m61-room.png`), with the neon words Milestone 58 painted into
+  it ("ARCADE", "PLAY", "TICKETS", "CLAW").
 - Waiting for the owner's review (Milestones 17 to 28, and art drawn ahead):
   Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay
   painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass
   painting, the hamster hiker, the bus stop, the Cliffside Trail painting, the
   bunny and the squirrel, the blacklight lantern and its glows, the gull, the
   Whispering Woods and its owl, coins and shops, the recurring critters'
-  cat and raccoon battle atlases and wording, and the arcade's painting and
-  Mr. Pip (`docs/review-queue.md`). Also waiting: the school hallway
+  cat and raccoon battle atlases and wording, and Mr. Pip
+  (`docs/review-queue.md`). Also waiting: the school hallway
   repainted open (2026-10-16), its low front wall gone and its front doors
   on the back-left wall (`art/recipes/school.json`). The
   talking raccoon's atlas (approved 2026-10-06) left the game with the

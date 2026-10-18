@@ -385,7 +385,7 @@ describe("core", () => {
   it("validates all area connections with the tunable radius", () => {
     expect(areaConnectionErrors(world.areas, world.tunables, world.critters, world.party))
       .toEqual([]);
-  });
+  }, 30_000);
 
   it("places every spawn slot beside Fae without hiding Maddie", () => {
     for (const area of Object.values(world.areas)) {

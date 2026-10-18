@@ -188,6 +188,7 @@ export type ArcadeContent = {
   claw: ClawContent;
   skee: SkeeContent;
   mole: MoleContent;
+  comet: CometContent;
   cook: CookContent;
   counter: CounterContent;
   prizes: { id: string; name: string; frame: string }[];
@@ -231,6 +232,21 @@ export type MoleContent = {
   hammerTicks: number;
   ticketsPerBoop: number;
   lines: { ready: string; boop: string; result: string };
+};
+// Comet Cruise (spec 8.2): a fixed seeded field of falling stars and rocks.
+export type CometContent = {
+  stars: number;
+  rocks: number;
+  readyTicks: number;
+  gapTicks: number;
+  travelFirst: number;
+  travelLast: number;
+  passTicks: number;
+  flashTicks: number;
+  moveTicks: number;
+  wobbleTicks: number;
+  ticketsPerStar: number;
+  lines: { ready: string; play: string; result: string };
 };
 // The ticket counter's prizes and what each costs in tickets.
 export type CounterContent = { prizes: { prize: string; price: number }[] };
@@ -327,6 +343,14 @@ export type MoleCalibration = {
   size: { w: number; h: number };
   plate: { x: number; y: number; w: number; h: number };
   holes: Record<MoleHole, { cx: number; cy: number; rx: number; ry: number }>;
+};
+export type CometCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  marquee: { x: number; y: number; w: number; h: number };
+  screen: { x: number; y: number; w: number; h: number };
+  field: { x: number; y: number; w: number; h: number };
+  deck: { x: number; y: number; w: number; h: number };
 };
 // A friend who walks behind Fae and brings one battle command (spec 5, 8).
 export type PartyContent = {

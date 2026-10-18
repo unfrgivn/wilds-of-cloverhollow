@@ -106,6 +106,15 @@
         "y": 462
       },
       "prompt": "Play"
+    },
+    {
+      "id": "comet-cruise",
+      "knot": "comet_cruise",
+      "point": {
+        "x": 366,
+        "y": 433
+      },
+      "prompt": "Play"
     }
   ],
   "critters": [

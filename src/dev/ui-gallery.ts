@@ -26,6 +26,7 @@ import { createTitleScreen, type TitleView } from "../ui/title";
 import { createCredits } from "../ui/credits";
 import {
   loadContent, parseClawCalibration, parseCookCalibration, parseMoleCalibration,
+  parseCometCalibration,
   parseSkeeCalibration,
 } from "../content/load";
 import { createState, creditEntries, inkFacts, runInk } from "../core";
@@ -34,13 +35,16 @@ import { clawGalleryView } from "./claw-gallery";
 import type { BattleTalk } from "../core";
 import { cookGalleryView } from "./cook-gallery";
 import { moleGalleryView } from "./mole-gallery";
+import { cometGalleryView } from "./comet-gallery";
 import { skeeGalleryView } from "./skee-gallery";
 import calibrationData from "../../public/assets/arcade/claw-machine.json";
 import skeeCalibrationData from "../../public/assets/arcade/skee-lane.json";
 import moleCalibrationData from "../../public/assets/arcade/mole-cabinet.json";
+import cometCalibrationData from "../../public/assets/arcade/comet-cabinet.json";
 import cookCalibrationData from "../../public/assets/arcade/microwave.json";
 import foodAtlas from "../../public/assets/arcade/cook-food.json";
 import moleAtlas from "../../public/assets/arcade/moles.json";
+import cometAtlas from "../../public/assets/arcade/comet.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
 
 const root = document.querySelector<HTMLElement>("#gallery");
@@ -130,19 +134,21 @@ if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
 const clawView = clawGalleryView(content.world, arcadeFixture, state);
 const skeeView = skeeGalleryView(content.world, arcadeFixture, state);
 const moleView = moleGalleryView(content.world, arcadeFixture, state);
+const cometView = cometGalleryView(content.world, arcadeFixture, state);
 const cookView = cookGalleryView(content.world, arcadeFixture, state);
-const gameView = clawView ?? skeeView ?? moleView ?? cookView;
+const gameView = clawView ?? skeeView ?? moleView ?? cometView ?? cookView;
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
 const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
-  state.startsWith("mole-") || state.startsWith("cook-");
+  state.startsWith("mole-") || state.startsWith("comet-") || state.startsWith("cook-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup" ||
     state === "battle-talk" || state === "battle-talk-reply"
   : state !== "prompt" && !journalState && !titleState && !creditsState &&
     (!arcadeState || state === "arcade-result" || state === "skee-result" ||
-      state === "mole-result" || state === "cook-result" || state === "cook-burnt");
+    state === "mole-result" || state === "comet-result" || state === "cook-result" ||
+    state === "cook-burnt");
 if (battleState) document.documentElement.dataset.battle = "open";
 if (state === "battle-talk" || state === "battle-talk-reply")
   document.documentElement.dataset.talk = "open";
@@ -153,6 +159,7 @@ if (state.startsWith("battle-trace")) document.documentElement.dataset.check = "
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
 if (arcadeState) document.documentElement.dataset.arcade = "open";
+if (gameView !== null) document.documentElement.dataset.arcadeGame = gameView.game;
 if (titleState) document.documentElement.dataset.title = "open";
 const defaultView: DialogueView = {
   speaker: "Maddie",
@@ -280,6 +287,16 @@ const galleryMoleArt = (frame: string): AtlasImage | null => {
     atlas: { w: moleAtlas.meta.size.w, h: moleAtlas.meta.size.h },
   };
 };
+const cometFrames = new Map(
+  Object.entries(cometAtlas.frames).map(([name, entry]) => [name, entry.frame]),
+);
+const galleryCometArt = (frame: string): AtlasImage | null => {
+  const rect = cometFrames.get(frame);
+  return rect === undefined ? null : {
+    src: "assets/arcade/comet.png", frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+    atlas: { w: cometAtlas.meta.size.w, h: cometAtlas.meta.size.h },
+  };
+};
 const arcade = createArcade(stage, galleryPrizeArt, {
   calibration: parseClawCalibration(calibrationData, "public/assets/arcade/claw-machine.json"),
   image: "assets/arcade/claw-machine.webp",
@@ -292,6 +309,11 @@ const arcade = createArcade(stage, galleryPrizeArt, {
   art: galleryMoleArt,
   // The gallery's states are fixed: a tap on a hole has nothing to play.
   onHole: () => undefined,
+}, {
+  calibration: parseCometCalibration(cometCalibrationData,
+    "public/assets/arcade/comet-cabinet.json"),
+  image: "assets/arcade/comet-cabinet.webp",
+  art: galleryCometArt,
 }, {
   calibration: parseCookCalibration(cookCalibrationData, "public/assets/arcade/microwave.json"),
   image: "assets/arcade/microwave.webp",
@@ -700,12 +722,13 @@ window.__stickerGallery = {
 renderGalleryState();
 window.addEventListener("resize", renderGalleryState);
 // The arcade's paintings and atlases are CSS backgrounds, which neither the
-// fonts nor a frame wait for: decode the ones this state shows (all seven
-// took Chromium about 0.1 s a page, in every state), then mark the page ready
-// for its screenshots.
+// fonts nor a frame wait for: decode the ones this state shows (the first
+// seven, all at once, took Chromium about 0.1 s a page, in every state), then
+// mark the page ready for its screenshots.
 const arcadeArt = ["assets/arcade/claw-machine.webp", "assets/arcade/skee-lane.webp",
   "assets/arcade/mole-cabinet.webp", "assets/arcade/moles.png", "assets/prizes/prizes.png",
-  "assets/arcade/microwave.webp", "assets/arcade/cook-food.png"];
+  "assets/arcade/microwave.webp", "assets/arcade/cook-food.png",
+  "assets/arcade/comet-cabinet.webp", "assets/arcade/comet.png"];
 const backgrounds = [...document.body.querySelectorAll<HTMLElement>("*")]
   .filter((element) => element.checkVisibility())
   .map((element) => getComputedStyle(element).backgroundImage);

@@ -12,6 +12,7 @@ export type SoundCue =
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
   | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
   | "mole-pop" | "mole-boop" | "mole-whiff"
+  | "comet-move" | "comet-star" | "comet-bump"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
   | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue";
 
@@ -113,6 +114,13 @@ export function soundCues(
     if (game.phase === "playing" && game.stage === "rising" && game.stageTicks === 0)
       cues.push("mole-pop");
     if (game.hammer?.ticks === 0) cues.push(game.hammer.hit ? "mole-boop" : "mole-whiff");
+    if (game.phase === "result" && newPhase) cues.push("tickets-won");
+  }
+  if (game?.game === "comet") {
+    const was = previous.arcade?.game === "comet" ? previous.arcade : null;
+    if (was !== null && game.lane !== was.lane) cues.push("comet-move");
+    if (was !== null && game.caught > was.caught) cues.push("comet-star");
+    if (was !== null && game.bumps > was.bumps) cues.push("comet-bump");
     if (game.phase === "result" && newPhase) cues.push("tickets-won");
   }
   return cues;

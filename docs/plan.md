@@ -2958,18 +2958,65 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Art, 21 Gemini calls (the generation log): 6 edits (4 kept) and 15 kit
     isolates (2 kept); `art/recipes/arcade-concept-edits.json`.
 
-## Milestone 59: A fourth arcade game **Status:** 🚧 In progress (2026-10-18)
-- A fourth game on the teal cabinet beside Boop-a-Mole (`cabinet-second`;
-  the rocket cabinet it was planned for went in Milestone 61): a short, gentle
-  space race for 2 coins, steering a little rocket between lanes to catch
-  stars and slip past space rocks, paying tickets a star. Built like the
-  other games: a painted close-up of the cabinet's screen, rules in the core,
-  a recorded run, and real-key and touch e2e.
-- Working name: Comet Cruise. Three lanes, like Catch's; left and right
-  move the rocket a lane a press.
+## Milestone 59: A fourth arcade game **Status:** ✅ Completed (2026-10-18)
+- Comet Cruise, on the teal cabinet beside Boop-a-Mole's (`cabinet-second`;
+  the rocket cabinet it was first planned for went in Milestone 61): 2 coins
+  a run, once Mr. Pip is calm. A little rocket at the foot of the cabinet's
+  screen steers between three lanes, catching the stars and slipping past
+  the space rocks that come down them; a star pays 2 tickets. A rock only
+  bumps it: the rocket wobbles and can't steer for a moment. Nothing is ever
+  lost, and a run never ends early.
+- A run is 16 stars and 8 rocks, drawn as it opens from the game's random
+  generator (a star first, never two rocks in a row, never the same lane
+  twice running), one setting off every 48 ticks, each coming down faster
+  than the one before (96 ticks to 60): about 20 seconds, like a round of
+  Boop-a-Mole. A fresh left or right press moves the rocket a lane; it
+  slides there, leaning into the turn.
+- The close-up: a painting of the teal cabinet's front (its screen dark
+  glass, a blank marquee, a stick and two buttons), with the run drawn in
+  code on the screen in perspective and painted sprites: the rocket in four
+  poses, a star and its sparkle, a rock and its puff. On a phone, left and
+  right arrow stickers steer, where the stick would be, like Lean's.
 - The back-row Star Racer cabinet stays as it is: its scribbled-out high
   score and the Star Racer token are clues in the finale (Milestone 55).
-- For the owner: the game and its name.
+- Evidence: the rules' unit tests (`tests/unit/comet.test.ts`: the draw, the
+  travel, the moves, the slide and lean, catches, bumps, passing, the end
+  and its result, the cues, and the loader), the close-up's layout
+  (`comet-layout.test.ts`, on the real calibration and a real run) and
+  calibration (`comet-calibration.test.ts`). The recorded run
+  `arcade/comet.json` (`tools/sim/record-comet.ts`, 2047 ticks) calms Mr.
+  Pip and plays a run: 14 of 16 stars caught, 2 let go, 1 rock bumped, 28
+  tickets paid once (`comet-replay.test.ts`). `comet.spec.ts` plays it with
+  real keys, hashing the same as Bun's replay, and on a phone steers by
+  quick taps on the arrow stickers to a star outside the middle lane, in
+  both engines. The gallery's six states, each a real run's, are laid out
+  within a pixel of the layout at 874x402 and 1280x720 in both engines.
+  `just check` (112 test files, 978 tests; `bun run sim`, 53 runs) and
+  `just build` passed, and so did the full `just e2e` (883 tests on both
+  browsers, 2 browser-only skips; 201 WebKit tests that lost the test
+  server late in the first run passed when run again). 22 new baselines (6
+  of the real-key run, 16 of the gallery), each viewed before it was kept;
+  no existing baseline changed.
+- Notes and assumptions:
+  - For the owner: the game and its name, its numbers (2 coins; 16 stars and
+    8 rocks; 2 tickets a star, so 32 at best; the travel from 96 ticks to
+    60; a 24-tick wobble), its lines (`comet_cruise` in
+    `content/story/main.ink`, and `comet` in `content/arcade.json`), and
+    the art.
+  - Art, 5 Gemini calls (the generation log), all kept as sources: the
+    cabinet, 2 (one used), and the sprites, 2 sheets (one used) and an edit
+    taking the used sheet's star glow away. It had been painted over the
+    magenta and came out pink, which keying can't separate; a glow, if
+    wanted, can be drawn in code. `art/recipes/comet-cabinet.json` and
+    `comet-sprites.json`. Openverse had nothing for either.
+  - Fae's look point is the cabinet's front, (366, 433); every recorded run
+    replays unchanged.
+  - On touch the close-up keeps clear of its arrows at the bottom left
+    (`--touch-reserve-left`, like the right buttons' reserve), so the
+    cabinet sits a little right of centre there.
+  - The new tests' timings come with CI's next record
+    (`tests/e2e/timings.json`); until then the sharder weighs each at its
+    project's median, as for Milestone 60's.
 
 ## Milestone 61: The arcade, rearranged **Status:** ✅ Completed (2026-10-18)
 - The owner rearranged the arcade (2026-10-18) from mockups built from the
@@ -3489,6 +3536,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     under the chaos spell (owner, 2026-10-17).
   - Milestone 60, a second flute friend: done (above; owner, 2026-10-18).
   - Milestone 61, the arcade rearranged: done (above; owner, 2026-10-18).
+  - Milestone 59, a fourth arcade game (Comet Cruise): done (above).
   - Milestone 62, Clover Hills: in progress (above; owner, 2026-10-18).
   - A fix (2026-10-18): the journal's map page still wrote "???" for the
     Enchanted Forest whatever its view said, so the map rule Milestone 53

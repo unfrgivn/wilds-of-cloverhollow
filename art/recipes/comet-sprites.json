@@ -1,0 +1,32 @@
+{
+  "asset": "Comet Cruise sprites: the rocket, a star, a space rock",
+  "date": "2026-10-18",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 3,
+  "generation_log": "art/scratch/generation-log.jsonl in the main checkout, lines 1028 and 1029 (two sheets) and 1030 (the edit)",
+  "open_sources": "Openverse, CC0 images, 2026-10-18: \"cute rocket star sprite watercolor\" found nothing.",
+  "references": [
+    "art/source/moles/moles-sheet-raw.png (the moles' sheet, for its style)"
+  ],
+  "selected": "art/source/arcade/comet-sprites-raw.png",
+  "prompt_summary": "Eight watercolor-and-ink sprites in four columns and two rows on flat magenta: a cream rocket with a red nose cone and fins, a sky-blue porthole, and a small flame, straight, tilted left, tilted right, and wobbling with motion lines and tiny circling stars; a plump golden star; a burst of golden sparkles; a lumpy warm-grey cratered space rock; a soft puff of pale cream dust.",
+  "key_colour": "#FF00FF magenta, absent from the sprites' palette",
+  "post_processing": [
+    "Two sheets; sheet A (line 1029, kept as art/source/arcade/comet-sprites-before-edit-raw.png) selected after a visual review: the brief's small flame and clearer wobble lines.",
+    "Its star's soft glow was painted over the magenta and came out pink, which keying can't separate; one edit (line 1030) took the glow away and left the rest of the sheet as it was (other cells' mean difference 2 to 4 levels). That edit is the source. A glow, if wanted, is drawn in code.",
+    "tools/art/build-comet-sprites.ts keys each cell's magenta at 22% fuzz like the moles, takes the spill off the 3px alpha-edge band only (despill-edge.ts), trims, scales all eight by one factor so the rocket keeps its size in every pose, and centres them in 256px frames of a 1024x512 atlas with centre anchors.",
+    "Left as painted: a faint 1 to 2 px pink edge on parts of the star, visible only magnified (the reviewer called it unobtrusive at game size), and the rocket fins' dark crimson outline.",
+    "Rebuilt twice with identical output hash."
+  ],
+  "outputs": {
+    "atlas": "public/assets/arcade/comet.png",
+    "frames": "public/assets/arcade/comet.json",
+    "rebuild": "tools/art/build-comet-sprites.ts"
+  },
+  "owner_review": {
+    "viewed": [
+      "art/review/m59-comet-sprites.png"
+    ],
+    "note": "For the owner: the rocket, the star, the rock, and their sparkle and puff."
+  }
+}

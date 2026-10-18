@@ -15,6 +15,13 @@
     var(--touch-gap) + var(--touch-cancel-size) + 12px);
 }
 
+/* Room Comet Cruise's arrows take at the bottom left while it's open (spec
+   8.2), so its close-up keeps clear of them. */
+:root[data-touch="on"][data-arcade-game="comet"] {
+  --touch-reserve-left: calc(20px + var(--safe-left) + 2 * var(--touch-cancel-size) +
+    var(--touch-gap) + 12px);
+}
+
 .touch-controls {
   position: fixed;
   inset: 0;
@@ -114,10 +121,16 @@
   display: none;
 }
 
+:root[data-arcade-game="comet"] .touch-stick {
+  display: none;
+}
+
 /* A check's arrows stand where the stick would, only while it is in play
-   (spec 8.1): a catch's up above down, a lean's back beside forward. */
+   (spec 8.1): a catch's up above down, a lean's back beside forward. Comet
+   Cruise's left and right stand there too while it's open (spec 8.2). */
 .touch-reach,
-.touch-lean {
+.touch-lean,
+.touch-comet {
   position: absolute;
   left: calc(20px + var(--safe-left));
   bottom: calc(20px + var(--safe-bottom));
@@ -127,8 +140,11 @@
 }
 .touch-reach { flex-direction: column; }
 :root[data-check="catch"] .touch-reach,
-:root[data-check="lean"] .touch-lean { display: flex; }
-:is(.touch-reach, .touch-lean) .touch-button {
+:root[data-check="lean"] .touch-lean,
+:root[data-arcade-game="comet"] .touch-comet { display: flex; }
+/* Comet Cruise's result line is read with confirm alone. */
+:root[data-dialogue="open"] .touch-comet { display: none; }
+:is(.touch-reach, .touch-lean, .touch-comet) .touch-button {
   width: var(--touch-cancel-size);
   height: var(--touch-cancel-size);
   font-size: 22px;

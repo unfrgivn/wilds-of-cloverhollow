@@ -1,0 +1,204 @@
+{
+  "frames": {
+    "rocket": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "rocket-left": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "rocket-right": {
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "rocket-wobble": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "star": {
+      "frame": {
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "star-sparkle": {
+      "frame": {
+        "x": 256,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "rock": {
+      "frame": {
+        "x": 512,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "rock-puff": {
+      "frame": {
+        "x": 768,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 256
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "image": "comet.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1024,
+      "h": 512
+    }
+  }
+}

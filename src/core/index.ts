@@ -17,4 +17,5 @@ export * from "./skee";
 export * from "./cook";
 export * from "./encounter";
 export * from "./mole";
+export * from "./comet";
 export * from "./credits";

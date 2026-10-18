@@ -94,8 +94,10 @@ export function mountTouchControls(): TouchInput {
   for (const [button, label] of BUTTONS) createButton(button, label);
   // A check's arrows (spec 8.1), shown only while one is in play: a catch's
   // hold it high or low, a lean's lean Fae back or forward. Letting go
-  // returns the catch to the middle and stops the lean.
-  const arrowGroup = (group: string, arrows: readonly Arrow[]): void => {
+  // returns the catch to the middle and stops the lean. Comet Cruise's
+  // (spec 8.2) move the rocket a lane a press, so a tap quicker than a frame
+  // counts too.
+  const arrowGroup = (group: string, arrows: readonly Arrow[], tap = false): void => {
     const box = document.createElement("div");
     box.className = group;
     for (const { side, label, name, direction } of arrows) {
@@ -108,6 +110,7 @@ export function mountTouchControls(): TouchInput {
         event.preventDefault();
         arrow.setPointerCapture(event.pointerId);
         input.holdArrow(direction);
+        if (tap) input.tapArrow(direction);
       });
       const release = (): void => input.releaseArrow(direction);
       arrow.addEventListener("pointerup", release);
@@ -126,6 +129,10 @@ export function mountTouchControls(): TouchInput {
     { side: "back", label: "◀\uFE0E", name: "lean back", direction: { x: -1, y: 0 } },
     { side: "forward", label: "▶\uFE0E", name: "lean forward", direction: { x: 1, y: 0 } },
   ]);
+  arrowGroup("touch-comet", [
+    { side: "left", label: "◀\uFE0E", name: "move left", direction: { x: -1, y: 0 } },
+    { side: "right", label: "▶\uFE0E", name: "move right", direction: { x: 1, y: 0 } },
+  ], true);
   const releaseStick = (event: PointerEvent): void => {
     input.endStick(event);
     stick.style.removeProperty("left");

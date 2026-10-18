@@ -6,9 +6,11 @@
 //   bun tools/arcade-layout.ts claw arcade-ready 0.26
 //   bun tools/arcade-layout.ts skee skee-fifty 0.3
 //   bun tools/arcade-layout.ts mole mole-up 0.3
+//   bun tools/arcade-layout.ts comet comet-coming 0.3
 import { readFileSync } from "node:fs";
 import {
   loadContent, parseClawCalibration, parseMoleCalibration, parseSkeeCalibration,
+  parseCometCalibration,
 } from "../src/content/load";
 import { clawGalleryView } from "../src/dev/claw-gallery";
 import { moleGalleryView } from "../src/dev/mole-gallery";
@@ -16,12 +18,17 @@ import { skeeGalleryView } from "../src/dev/skee-gallery";
 import { layoutClaw } from "../src/ui/claw-layout";
 import { layoutMole } from "../src/ui/mole-layout";
 import { layoutSkee } from "../src/ui/skee-layout";
+import { cometGalleryView } from "../src/dev/comet-gallery";
+import { layoutComet } from "../src/ui/comet-layout";
 
 const [game, state, scaleText] = process.argv.slice(2);
 const scale = Number(scaleText);
-if ((game !== "claw" && game !== "skee" && game !== "mole") || state === undefined ||
+if ((game !== "claw" && game !== "skee" && game !== "mole" && game !== "comet") ||
+  state === undefined ||
   !(scale > 0))
-  throw new Error("usage: bun tools/arcade-layout.ts <claw|skee|mole> <gallery state> <scale>");
+  throw new Error(
+    "usage: bun tools/arcade-layout.ts <claw|skee|mole|comet> <gallery state> <scale>",
+  );
 const { world, fixtures } = loadContent();
 const fixture = fixtures.arcade;
 if (fixture === undefined) throw new Error("missing the arcade fixture");
@@ -36,9 +43,14 @@ if (game === "claw") {
   if (view === null) throw new Error(`no skee-ball gallery state ${state}`);
   const file = "public/assets/arcade/skee-lane.json";
   console.log(JSON.stringify(layoutSkee(view, parseSkeeCalibration(json(file), file), scale)));
-} else {
+} else if (game === "mole") {
   const view = moleGalleryView(world, fixture, state);
   if (view === null) throw new Error(`no Boop-a-Mole gallery state ${state}`);
   const file = "public/assets/arcade/mole-cabinet.json";
   console.log(JSON.stringify(layoutMole(view, parseMoleCalibration(json(file), file), scale)));
+} else {
+  const view = cometGalleryView(world, fixture, state);
+  if (view === null) throw new Error(`no Comet Cruise gallery state ${state}`);
+  const file = "public/assets/arcade/comet-cabinet.json";
+  console.log(JSON.stringify(layoutComet(view, parseCometCalibration(json(file), file), scale)));
 }

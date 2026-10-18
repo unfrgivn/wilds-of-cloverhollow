@@ -1,9 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
+import { cometGalleryStates } from "../../src/dev/comet-gallery";
 import { cookGalleryStates } from "../../src/dev/cook-gallery";
 import { moleGalleryStates } from "../../src/dev/mole-gallery";
 import { skeeGalleryStates } from "../../src/dev/skee-gallery";
-import { bunClawLayout, bunMoleLayout, bunSkeeLayout } from "./helpers";
+import { bunClawLayout, bunCometLayout, bunMoleLayout, bunSkeeLayout } from "./helpers";
 
 test.use({ deviceScaleFactor: 2 });
 // Every test loads its own page, so the gallery spreads across workers: in
@@ -78,13 +79,17 @@ const battleParts: Record<string, string[]> = {
     state === "skee-result" ? [".sticker-dialogue"] : []])),
   ...Object.fromEntries(moleGalleryStates.map((state) => [state,
     state === "mole-result" ? [".sticker-dialogue"] : []])),
+  // Comet Cruise steers by the arrows where the stick would be; its result is
+  // read with confirm alone.
+  ...Object.fromEntries(cometGalleryStates.map((state) => [state,
+    state === "comet-result" ? [".sticker-dialogue"] : [".touch-comet"]])),
   ...Object.fromEntries(cookGalleryStates.map((state) => [state,
     state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-trace",
   ".battle-check-hint", ".battle-grade",
-  ".touch-reach", ".touch-lean",
+  ".touch-reach", ".touch-lean", ".touch-comet",
   ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
   ".touch-confirm", ".touch-cancel", ".touch-menu"];
@@ -775,6 +780,136 @@ test.describe("sticker gallery", () => {
     }
   }
 
+  // Comet Cruise (spec 8.2), from a real run's states, on a phone and a
+  // desktop, in both engines: the painting, the marquee, the score, and the
+  // field where the layout puts them, the rocket and each one on the screen
+  // in it with its frame and how solid it is, the keys' caps with a keyboard
+  // only, the arrows on touch, all clear of the touch buttons, and in the
+  // result, the line over it all. The layout's own geometry is checked in
+  // tests/unit/comet-layout.test.ts.
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of cometGalleryStates) {
+      test(`${state} Comet Cruise as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const touch = size.width === 874;
+        await gallery(page, state, touch, touch ? "0,62,21,62" : "0,0,0,0", size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | null): { x: number; y: number; width: number;
+            height: number } => {
+            if (element === null) throw new Error("missing a part of Comet Cruise");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const shown = (element: Element | null): boolean =>
+            element !== null && element.getClientRects().length > 0;
+          const machine = document.querySelector<HTMLElement>(".comet-machine");
+          const paint = document.querySelector<HTMLElement>(".comet-paint");
+          const field = document.querySelector<HTMLElement>(".comet-field");
+          const rocket = document.querySelector<HTMLElement>(".comet-rocket");
+          if (machine === null || paint === null || field === null || rocket === null)
+            throw new Error("Comet Cruise isn't drawn");
+          const sprite = (element: HTMLElement): { box: { x: number; y: number;
+            width: number; height: number }; frame: string; opacity: number } =>
+            ({ box: box(element), frame: element.dataset.frame ?? "",
+              opacity: Number(element.style.opacity) });
+          const hud = document.querySelector(".comet-hud");
+          const dialogue = document.querySelector(".sticker-dialogue");
+          const at = dialogue !== null && shown(dialogue) ? document.elementFromPoint(
+            box(dialogue).x + box(dialogue).width / 2,
+            box(dialogue).y + box(dialogue).height / 2) : null;
+          return {
+            scale: Number(machine.dataset.scale),
+            machine: box(machine),
+            background: { size: paint.style.backgroundSize,
+              position: paint.style.backgroundPosition },
+            marquee: box(document.querySelector(".comet-marquee")),
+            hud: shown(hud) ? box(hud) : null,
+            field: box(field),
+            rocket: sprite(rocket),
+            objects: [...document.querySelectorAll<HTMLElement>(".comet-object")]
+              .filter((item) => shown(item)).map(sprite),
+            keys: [...document.querySelectorAll<HTMLElement>(".comet-key")].map((key) => ({
+              text: key.textContent ?? "", shown: shown(key),
+              box: shown(key) ? box(key) : null,
+            })),
+            arrows: [...document.querySelectorAll(".touch-comet .touch-button")]
+              .filter((arrow) => shown(arrow)).map((arrow) => box(arrow)),
+            stick: shown(document.querySelector(".touch-stick")),
+            dialogue: dialogue !== null && shown(dialogue) ? box(dialogue) : null,
+            dialogueOnTop: dialogue !== null && at !== null && dialogue.contains(at),
+            buttons: [...document.querySelectorAll(".touch-confirm, .touch-cancel, .touch-menu")]
+              .filter((button) => shown(button)).map((button) => box(button)),
+          };
+        });
+        const layout = bunCometLayout(state, drawn.scale);
+        const near = (actual: number, expected: number, label: string): void => {
+          expect(Math.abs(actual - expected), `${label}: ${actual} vs ${expected}`)
+            .toBeLessThanOrEqual(1);
+        };
+        const placed = (actual: Rect, expected: Rect, label: string,
+          origin: { x: number; y: number }): void => {
+          near(actual.x - origin.x, expected.x, `${label} x`);
+          near(actual.y - origin.y, expected.y, `${label} y`);
+          near(actual.width, expected.width, `${label} width`);
+          near(actual.height, expected.height, `${label} height`);
+        };
+        const origin = { x: drawn.machine.x, y: drawn.machine.y };
+        near(drawn.machine.width, layout.width, "shown width");
+        near(drawn.machine.height, layout.height, "shown height");
+        expect(drawn.background).toEqual({
+          size: `${layout.painting.width}px ${layout.painting.height}px`,
+          position: `0px ${layout.painting.y}px`,
+        });
+        placed(drawn.marquee, layout.marquee, "marquee", origin);
+        expect(drawn.hud === null, "score shown").toBe(state === "comet-result");
+        if (drawn.hud !== null) {
+          near(drawn.hud.x + drawn.hud.width - origin.x, layout.hud.x, "score's right edge");
+          near(drawn.hud.y - origin.y, layout.hud.y, "score y");
+        }
+        placed(drawn.field, layout.field, "field", origin);
+        // The rocket and each one on the screen, in the field's px.
+        const inField = { x: drawn.field.x, y: drawn.field.y };
+        placed(drawn.rocket.box, layout.rocket, "rocket", inField);
+        expect(drawn.rocket.frame).toBe(layout.rocket.frame);
+        expect(drawn.objects.map((item) => item.frame))
+          .toEqual(layout.objects.map((item) => item.frame));
+        layout.objects.forEach((want, index) => {
+          const item = drawn.objects[index];
+          if (item === undefined) throw new Error(`object ${index} isn't drawn`);
+          placed(item.box, want, `${want.frame} ${index}`, inField);
+          expect(Math.abs(item.opacity - want.opacity)).toBeLessThanOrEqual(0.001);
+        });
+        // The keys: with a keyboard, a cap either side of the screen at the
+        // rocket's row; on touch, none, and the arrows where the stick would be.
+        expect(drawn.keys.map((key) => key.text)).toEqual(layout.keys.map((key) => key.label));
+        layout.keys.forEach((want, index) => {
+          const key = drawn.keys[index];
+          if (key === undefined) throw new Error(`key ${want.label} isn't drawn`);
+          expect(key.shown, `${want.label} key shown`).toBe(!touch);
+          if (key.box === null) return;
+          const edge = want.side === "left" ? key.box.x + key.box.width : key.box.x;
+          near(edge - origin.x, want.x, `${want.label} key x`);
+          near(key.box.y + key.box.height / 2 - origin.y, want.y, `${want.label} key y`);
+        });
+        const arrows = touch && state !== "comet-result";
+        expect(drawn.arrows).toHaveLength(arrows ? 2 : 0);
+        for (const arrow of drawn.arrows) {
+          expect(Math.min(arrow.width, arrow.height)).toBeGreaterThanOrEqual(48);
+          expect(overlaps(drawn.machine, arrow)).toBe(false);
+        }
+        if (touch) expect(drawn.stick, "the stick, hidden").toBe(false);
+        // Clear of the touch buttons; in the result, the line reads over it.
+        for (const button of drawn.buttons)
+          expect(overlaps(drawn.machine, button)).toBe(false);
+        if (state === "comet-result") {
+          if (drawn.dialogue === null) throw new Error("the result line isn't shown");
+          expect(drawn.dialogueOnTop).toBe(true);
+          for (const button of drawn.buttons)
+            expect(overlaps(drawn.dialogue, button)).toBe(false);
+        }
+      });
+    }
+  }
+
   // The clubhouse microwave (spec 8.2), from the same real game states, on a
   // phone and a desktop, in both engines: the microwave in the safe area and
   // clear of the touch buttons, the glass in it, the timer's and the hint's
@@ -1083,6 +1218,14 @@ test.describe("sticker gallery", () => {
       });
     });
   }
+  for (const state of cometGalleryStates) {
+    test(`${state} phone visual baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
   for (const state of cookGalleryStates) {
     test(`${state} phone visual baseline`, async ({ page }) => {
       await gallery(page, state);
@@ -1092,7 +1235,7 @@ test.describe("sticker gallery", () => {
     });
   }
   for (const state of ["arcade-ready", "arcade-result", "skee-aiming", "skee-result", "mole-up",
-    "mole-result", "cook-ready", "cook-result"]) {
+    "mole-result", "comet-coming", "comet-result", "cook-ready", "cook-result"]) {
     test(`${state} desktop visual baseline`, async ({ page }) => {
       await gallery(page, state, false, "0,0,0,0", { width: 1280, height: 720 });
       await expect(page).toHaveScreenshot(`${state}-desktop.png`, {

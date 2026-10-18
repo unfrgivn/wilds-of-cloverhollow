@@ -492,8 +492,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   points: `claw-machine` (prompt `Play`, at (908, 477), the left of its
   front, clear of the lane), `ticket-counter`, `star-racer` (a back-row
   cabinet), `boop-a-mole` (prompt `Play`, at (290, 462), the front of the
-  first cabinet, Milestone 46), and `skee-ball` (prompt `Play`, at (850,
-  593), on the lane's foot near its left corner, so Fae plays from its left).
+  first cabinet, Milestone 46), `comet-cruise` (prompt `Play`, at (366,
+  433), the front of the teal second cabinet, Milestone 59), and `skee-ball`
+  (prompt `Play`, at (850, 593), on the lane's foot near its left corner, so
+  Fae plays from its left).
   Since Milestone 58 the room is nearer its concept
   (`art/recipes/arcade-concept-edits.json`): neon "ARCADE" (pink) and "PLAY"
   (teal) on its walls, "TICKETS" on the counter and "CLAW" on the claw
@@ -1164,7 +1166,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - When touch controls are shown, the root has `data-touch="on"`, and CSS sets
   `--touch-reserve-right` to the confirm and cancel buttons' width plus their
   margin, the right inset, and 12 px. The dialogue box and choices end at that
-  reserve, so they never cover the buttons. Five or more choices on a screen
+  reserve, so they never cover the buttons. While Comet Cruise is open,
+  `--touch-reserve-left` is the room its two arrows take at the bottom left,
+  and its close-up keeps clear of it. Five or more choices on a screen
   at most 560 px tall sit in two columns, filled top to bottom, so every
   choice stays on screen at its 44 px height. It is pure CSS (no measuring in
   JavaScript), so it follows the insets as iOS applies them; `just ios-smoke`
@@ -1878,16 +1882,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   pill like the notes page's Coins and Snacks (an orange ticket and the
   count, Milestone 45).
 
-### 8.2 Arcade games (Milestones 44 to 46) and the clubhouse microwave (52)
-- The claw machine, skee-ball, and Boop-a-Mole, once Mr. Pip is calm
-  (`calmed("arcade-keeper")`): a line tagged `play: <game> <price>` (`claw`,
-  `skee`, or `mole`, 2 coins each) opens the game when the conversation
-  closes, paying the price then; too few coins at the close opens nothing.
-  `state.arcade` is the game in play (`game: "claw" | "skee" | "mole"`) or
-  null, `state.prizes` the prizes won, in order, and `state.tickets` Fae's
-  tickets (Milestone 45). `src/core/arcade.ts` opens, steps, and views
-  whichever is open; each game's rules are their own module (`claw.ts`,
-  `skee.ts`, `mole.ts`).
+### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
+- The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip
+  is calm (`calmed("arcade-keeper")`): a line tagged `play: <game> <price>`
+  (`claw`, `skee`, `mole`, or `comet`, 2 coins each) opens the game when the
+  conversation closes, paying the price then; too few coins at the close
+  opens nothing. `state.arcade` is the game in play (`game: "claw" | "skee" |
+  "mole" | "comet"`) or null, `state.prizes` the prizes won, in order, and
+  `state.tickets` Fae's tickets (Milestone 45). `src/core/arcade.ts` opens,
+  steps, and views whichever is open; each game's rules are their own module
+  (`claw.ts`, `skee.ts`, `mole.ts`, `comet.ts`).
 - The claw machine's content (`claw` in `content/arcade.json`, validated by
   `parseArcade`): the box's floor is 1000 wide (x, left to right) by 460 deep
   (z, from the front glass to the back wall). The claw travels x 185..940 and z 140..420; its home, (185, 140),
@@ -2123,6 +2127,102 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Boop-a-Mole's cues: `mole-pop` as each mole starts rising, `mole-boop` or
   `mole-whiff` (a squeak) as the hammer lands, and `tickets-won` at the
   result.
+- Comet Cruise (Milestone 59): the teal cabinet beside Boop-a-Mole's
+  (`cabinet-second`), `play: comet 2`. A little rocket at the foot of the
+  cabinet's screen steers between three lanes, catching the stars and
+  slipping past the space rocks that come down them. Its content (`comet` in
+  `content/arcade.json`, validated by `parseArcade`): 16 stars and 8 rocks a
+  run, after a 60-tick "Get ready!". One sets off every 48 ticks
+  (`gapTicks`), and each takes from 96 ticks (the first) down to 60 (the
+  last), in even steps (`cometTravel`, like `moleWindow`), to come down to
+  the rocket's row. A star that reaches the rocket's lane there is caught and
+  pays 2 tickets; a rock there bumps the rocket, which wobbles for 24 ticks
+  and can't steer. Anything else goes on past for 24 ticks (`passTicks`) and
+  leaves the screen. Nothing is ever lost, and the run never ends early. The
+  loader checks positive integers, at least one star, no more rocks than
+  stars, a travel that shrinks or holds, a pass at least as long as a catch's
+  sparkle (`flashTicks`, 16), and a result line with `{stars}`, `{total}`,
+  and `{tickets}`.
+- The run is drawn as it opens, by the game's random generator
+  (`nextRandom`, `src/core/random.ts`): first where the rocks go, one draw a
+  rock among the places after a star not yet taken, so a run starts with a
+  star and no two rocks come in a row; then each one's lane, one draw each,
+  among all three for the first and the two the one before isn't in for the
+  rest. The run is kept with the game, so a replay is exact. A fresh press
+  (down now, not on the previous tick) of left or right moves the rocket a
+  lane that way, to the edge and no further, before anything reaches its row
+  that tick; it slides there over 6 ticks (`moveTicks`), leaning into the
+  turn. While it wobbles, presses do nothing; up, down, and confirm do
+  nothing in a run.
+  ```
+  ready --readyTicks--> playing --the last one past--> result
+  result --press (show it all)--> shown --press--> closed
+  one: coming --its travel--> at the rocket's row --> caught (a star in its lane)
+       | bumped (a rock in its lane) | passing --passTicks--> gone
+  ```
+  The run ends `passTicks` after the last one reaches the rocket's row. Then
+  the result line ("You caught {stars} of {total} stars! +{tickets}
+  tickets.") types like dialogue, and the tickets join `state.tickets` once.
+- `cometView` is logical: the rocket (where it is across the lanes, 0 to 2,
+  as it slides; which way it leans; how far through a wobble, 0 to 1), each
+  one on the screen (star or rock, its lane, how far down, 0 at the screen's
+  top and 1 at the rocket's row, more while it passes, and, caught or
+  bumped, how far through its sparkle or puff), the stars caught, how many
+  are still to come, the hint (`ready`, then `play`), and the result line.
+- The close-up (`src/ui/comet.ts`, laid out by `layoutComet` in
+  `src/ui/comet-layout.ts`) is a painting of the teal cabinet's front seen
+  from where Fae stands: a blank marquee over the screen in its bezel, and
+  the deck's stick and buttons below (`public/assets/arcade/comet-cabinet.webp`),
+  calibrated in its pixels (`comet-cabinet.json`, validated by
+  `parseCometCalibration`): the marquee; the screen, the box of its dark
+  glass (a CRT's, its corners rounded and its edges bulging); the field, the
+  largest box wholly inside the glass, where the run is drawn; and the deck,
+  the stick and buttons. It shows the painting's whole width from a sixth of
+  the marquee's height above it to the deck's foot, its top and bottom 6%
+  faded out (the painted wing tips are cut flat), as large as the safe area
+  left of the touch buttons allows (`cometFrame`).
+- The run is drawn in code on the field, over the glass's own dark blue: a
+  scatter of tiny stars at fixed places, and the two lines between the
+  lanes, faint and dotted, in one-point perspective toward a point half the
+  field's height above its top centre. The rocket's row is at 78% of the
+  field's height, its three lanes centred at a sixth, a half, and five
+  sixths of the field's width there. One coming down is on its lane's line,
+  `progress` of the way from the field's top to the row, at 0.4 + 0.6 ×
+  `progress` of its full size; a frame is 26% of the field's width at full
+  size, so the rocket stands clear of the field's foot. Passing, it goes on
+  down the same line, fading out between the row and the field's foot, and
+  is clipped there. The rocket stands on its row at its `position` across the lanes:
+  `rocket-left` or `rocket-right` while it leans that way, `rocket-wobble`
+  while it wobbles. A caught star shows `star-sparkle` and a bumped rock
+  `rock-puff`, on the row, fading out with their `flash`.
+- The rocket, the stars, and the rocks are frames of
+  `public/assets/arcade/comet.json` (`rocket`, `rocket-left`, `rocket-right`,
+  `rocket-wobble`, `star`, `star-sparkle`, `rock`, `rock-puff`), each centred
+  on its place. With a keyboard, ← and → are lettered on little caps on the
+  cabinet's teal sides either side of the screen, level with the rocket's
+  row. On touch the caps are hidden, and left and right arrow stickers stand
+  where the stick would, like Lean's (spec 8.1), at least 48 px each way: the
+  stick is hidden while the game is open and the arrows while its result
+  reads, and a tap quicker than a frame moves the rocket too. A score sticker
+  (STARS caught, LEFT still to come) sits just left of the marquee, which is
+  lettered with the hint (COMET CRUISE when there's none). The result line
+  uses the shared speakerless dialogue box.
+- The gallery's Comet Cruise states are a real run's (`src/dev/comet-gallery.ts`):
+  ready, coming (a star and a rock on the screen), sliding a lane, a star
+  caught, a bump, and the result. `tests/unit/comet-layout.test.ts` checks
+  the layout itself (each one in its lane and growing, the rocket on its row,
+  the caps, and the frame keeping the screen in view), and the gallery e2e
+  checks the DOM is that layout within a pixel at 874x402 (touch) and
+  1280x720 (keys) in both engines, `tools/arcade-layout.ts` giving Node the
+  layout from Bun. The recorded run `arcade/comet.json`
+  (`tools/sim/record-comet.ts`, from the `arcade` fixture) calms Mr. Pip and
+  plays a run: fourteen stars caught, two let go, and one rock bumped;
+  `comet.spec.ts` plays it with real keys and its state must hash the same as
+  Bun's replay, and steers by the arrow stickers on a phone to catch a star,
+  in both engines.
+- Comet Cruise's cues: `comet-move` as the rocket changes lanes,
+  `comet-star` as it catches one, `comet-bump` as a rock bumps it, and
+  `tickets-won` at the result.
 - The clubhouse microwave's cooking game (Milestone 52) opens the same way,
   from the clubhouse fridge's look point with a box of Mom's in hand:
   `play: cook-nuggets 0` or `play: cook-mac 0`, free. `state.arcade` is then
@@ -2291,7 +2391,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   machine (the part shown), plate, hud | null, holes: [{ hole, x, y, mole: {
   face, drop } | null }], hammer: { x, y } | null, pop: { x, y, text } | null,
   score }`, each hole's `x, y` its centre and a mole's `drop` how far below
-  its full rise it is. The microwave: `{ game: "cook", phase, machine,
+  its full rise it is. Comet Cruise: `{ game: "comet", phase, machine (the
+  part shown), field, marquee, hud | null, rocket: { x, y, frame }, objects:
+  [{ kind, x, y, frame, opacity }], keys (the caps shown), score }`, each
+  `x, y` a centre. The microwave: `{ game: "cook", phase, machine,
   glass, food, display, front, frost, darkness, light, wisps, smoke }`,
   `front` the fridge's lettering ("" in the result) and `frost` its frost's
   opacity. Harness builds log `[cloverhollow] arcade { phase, message }` when

@@ -1006,6 +1006,25 @@ Boop-a-Mole! Little moles pop up, and you boop their noses. Gently! # speaker: F
     -> DONE
 -> DONE
 
+=== comet_cruise ===
+{not calmed("arcade-keeper"):
+    The Comet Cruise cabinet is all fizzy with purple scribbles. # speaker: Fae
+    I'd better calm Mr. Pip first. # speaker: Fae
+    -> DONE
+}
+Comet Cruise! Steer the little rocket, catch the stars, and slip past the space rocks. # speaker: Fae
+{coins() < 2:
+    I need 2 coins to play. # speaker: Fae
+    -> DONE
+}
++ [Play for 2 coins] # play: comet 2
+    Blast off! # speaker: Fae
+    -> DONE
++ [Not now]
+    Maybe another time. # speaker: Fae
+    -> DONE
+-> DONE
+
 // Mr. Pip runs the ticket counter once he's calm (Milestone 45): each prize
 // is offered while Fae can pay for it and hasn't won it.
 === ticket_counter ===

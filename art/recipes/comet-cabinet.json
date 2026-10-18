@@ -1,0 +1,34 @@
+{
+  "asset": "Comet Cruise cabinet close-up",
+  "date": "2026-10-18",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 2,
+  "generation_log": "art/scratch/generation-log.jsonl in the main checkout, lines 1026 and 1027",
+  "open_sources": "Openverse, CC0 images, 2026-10-18: \"arcade cabinet watercolor\" found nothing.",
+  "references": [
+    "art/source/areas/arcade/kit/cabinet-second/iso-3.jpg (the teal cabinet as the arcade painting has it)",
+    "public/assets/arcade/mole-cabinet.webp (the Boop-a-Mole close-up, its sibling)",
+    "public/assets/arcade/claw-machine.webp"
+  ],
+  "selected": "art/source/arcade/comet-cabinet-front-raw.png",
+  "prompt_summary": "The arcade's teal cabinet seen straight on at a child's eye level, as a companion to the mole and claw close-ups: a blank pale marquee, a large screen of plain, very dark navy glass in a rounded bezel, and a sloped deck with a red ball-top joystick and two round buttons; the teal body and trim of the room's cabinet; pale paper around it; no text, game graphics, or characters.",
+  "key_colour": "pale paper margin; removed by flood fills seeded on every run of paper along the image's border",
+  "post_processing": [
+    "Two generations; candidate A (line 1027) selected after a visual review: closer to the mole close-up's proportions, a 4:3-ish screen, and a balanced deck.",
+    "tools/art/build-comet-cabinet.ts flood-fills the paper from every run of paper along the border at 8% fuzz (the cabinet runs off the bottom and its side wings reach the top, so one piece of the margin is trapped between the wings), trims, and encodes a 1600px-wide WebP with alpha. The fills stop at the ink outline; the paper showing inside it, where a wash stops short of the line, stays.",
+    "The generation cut the side wings' tips flat at its top edge; the close-up is framed from just above the marquee, so they don't show.",
+    "public/assets/arcade/comet-cabinet.json was measured on the WebP: the marquee (its cream panel), the screen (the dark glass's box; the glass is a CRT shape, its corners rounded about 275 px and its top and bottom bulging), the field (the largest box wholly inside the glass, where the run is drawn), and the deck (the joystick and both buttons, padded 20 px).",
+    "Rebuilt twice with identical output hash."
+  ],
+  "outputs": {
+    "image": "public/assets/arcade/comet-cabinet.webp",
+    "calibration": "public/assets/arcade/comet-cabinet.json",
+    "rebuild": "tools/art/build-comet-cabinet.ts"
+  },
+  "owner_review": {
+    "viewed": [
+      "art/review/m59-comet-cabinet.png"
+    ],
+    "note": "For the owner: the cabinet and its close-up."
+  }
+}

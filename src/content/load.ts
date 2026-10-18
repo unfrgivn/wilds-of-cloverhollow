@@ -143,11 +143,13 @@ import type {
   CounterContent,
   HeapPlush,
   MoleCalibration,
+  CometCalibration,
   CookCalibration,
   CookContent,
   CookDish,
   CookZone,
   MoleContent,
+  CometContent,
   SkeeCalibration,
   SkeeContent,
   WindUp,
@@ -555,6 +557,7 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
     },
     skee: parseSkee(value.skee, file),
     mole: parseMole(value.mole, file),
+    comet: parseComet(value.comet, file),
     cook: parseCook(value.cook, file),
     counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
@@ -718,6 +721,32 @@ function parseMole(value: unknown, file: string): MoleContent {
     ticketsPerBoop: integer("ticketsPerBoop"),
     lines: { ready: lines.ready, boop: lines.boop, result: lines.result },
   };
+}
+
+function parseComet(value: unknown, file: string): CometContent {
+  field(record(value), file, "comet");
+  const integer = (name: string, minimum = 1): number =>
+    integerIn(value, name, minimum, file, `comet.${name}`);
+  const lines = value.lines;
+  field(record(lines) && typeof lines.ready === "string" && typeof lines.play === "string" &&
+    typeof lines.result === "string" && ["{stars}", "{total}", "{tickets}"]
+      .every((part) => typeof lines.result === "string" && lines.result.includes(part)),
+    file, "comet.lines");
+  const ready = typeof lines.ready === "string" ? lines.ready : "";
+  const play = typeof lines.play === "string" ? lines.play : "";
+  const result = typeof lines.result === "string" ? lines.result : "";
+  const stars = integer("stars");
+  const rocks = integer("rocks");
+  const travelFirst = integer("travelFirst");
+  const travelLast = integer("travelLast");
+  field(stars >= rocks, file, "comet.stars");
+  field(travelLast <= travelFirst, file, "comet.travelLast");
+  field(integer("passTicks") >= integer("flashTicks"), file, "comet.passTicks");
+  return { stars, rocks, readyTicks: integer("readyTicks"), gapTicks: integer("gapTicks"),
+    travelFirst, travelLast, passTicks: integer("passTicks"), flashTicks: integer("flashTicks"),
+    moveTicks: integer("moveTicks"), wobbleTicks: integer("wobbleTicks"),
+    ticketsPerStar: integer("ticketsPerStar"),
+    lines: { ready, play, result } };
 }
 
 // The ticket counter: prizes from the catalogue, each once, never one of the
@@ -892,6 +921,35 @@ export function parseMoleCalibration(value: unknown, file: string): MoleCalibrat
     plate: { x: plate.x, y: plate.y, w: plate.w, h: plate.h },
     holes: all,
   };
+}
+
+export function parseCometCalibration(value: unknown, file: string): CometCalibration {
+  const number = (item: unknown): item is number =>
+    typeof item === "number" && Number.isInteger(item) && Number.isFinite(item);
+  type Box = { x: number; y: number; w: number; h: number };
+  const rect = (item: unknown): item is Box => record(item) && number(item.x) && number(item.y) &&
+    number(item.w) && number(item.h) && item.w > 0 && item.h > 0;
+  field(record(value) && typeof value.image === "string", file, "image");
+  field(record(value.size) && number(value.size.w) && number(value.size.h) &&
+    value.size.w > 0 && value.size.h > 0, file, "size");
+  const size = { w: value.size.w, h: value.size.h };
+  const inside = (box: Box): boolean => box.x >= 0 && box.y >= 0 &&
+    box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const parseBox = (name: "marquee" | "screen" | "field" | "deck"): Box => {
+    const box = value[name];
+    field(rect(box) && inside(box), file, name);
+    return box;
+  };
+  const marquee = parseBox("marquee");
+  const screen = parseBox("screen");
+  const fieldBox = parseBox("field");
+  const deck = parseBox("deck");
+  field(fieldBox.x >= screen.x && fieldBox.y >= screen.y &&
+    fieldBox.x + fieldBox.w <= screen.x + screen.w &&
+    fieldBox.y + fieldBox.h <= screen.y + screen.h, file, "field (inside screen)");
+  field(marquee.y + marquee.h <= screen.y, file, "marquee (above screen)");
+  field(deck.y >= screen.y + screen.h, file, "deck (below screen)");
+  return { image: value.image, size, marquee, screen, field: fieldBox, deck };
 }
 
 // The skee-ball painting's calibration (spec 8.2): every number finite; the

@@ -22,6 +22,7 @@ import {
   parseMoleCalibration,
   parseCookCalibration,
   parseSkeeCalibration,
+  parseCometCalibration,
 } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
@@ -228,6 +229,8 @@ async function boot(): Promise<void> {
   const foodImage = new Image();
   foodImage.src = assetUrl(foodAtlas.replace(".json", ".png"));
   await foodImage.decode();
+  const cometAtlas = "assets/arcade/comet.json";
+  const cometSheet = await Assets.load<Spritesheet>(assetUrl(cometAtlas));
   // The arcade games' paintings and their calibrations (spec 8.2), each
   // decoded before its close-up can open.
   const painting = async <T extends { image: string }>(
@@ -242,12 +245,14 @@ async function boot(): Promise<void> {
     await image.decode();
     return { calibration, image: image.src };
   };
-  const [clawPainting, skeePainting, molePainting, cookPainting] = await Promise.all([
-    painting("assets/arcade/claw-machine.json", parseClawCalibration),
-    painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
-    painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
-    painting("assets/arcade/microwave.json", parseCookCalibration),
-  ]);
+  const [clawPainting, skeePainting, molePainting, cometPainting, cookPainting] =
+    await Promise.all([
+      painting("assets/arcade/claw-machine.json", parseClawCalibration),
+      painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
+      painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
+      painting("assets/arcade/comet-cabinet.json", parseCometCalibration),
+      painting("assets/arcade/microwave.json", parseCookCalibration),
+    ]);
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
   // A toy a catch throws: a crop of the toy atlas (spec 8.1).
@@ -336,6 +341,9 @@ async function boot(): Promise<void> {
     art: (frameName) => sheetFrame(moleSheet, moleAtlas, frameName),
     onHole,
   }, {
+    ...cometPainting,
+    art: (frameName) => sheetFrame(cometSheet, cometAtlas, frameName),
+  }, {
     ...cookPainting,
     art: (frameName) => sheetFrame(foodSheet, foodAtlas, frameName),
   });
@@ -393,6 +401,9 @@ async function boot(): Promise<void> {
     arcade.render(arcadeState);
     if (arcadeState !== null) document.documentElement.dataset.arcade = "open";
     else delete document.documentElement.dataset.arcade;
+    // Which game is open: Comet Cruise's steers by the touch arrows.
+    if (state.arcade !== null) document.documentElement.dataset.arcadeGame = state.arcade.game;
+    else delete document.documentElement.dataset.arcadeGame;
     view.render(
       state,
       window.innerWidth,
@@ -453,10 +464,11 @@ async function boot(): Promise<void> {
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;
-    // An arrow held as a catch, a lean, or a round of Boop-a-Mole ends is
-    // hidden mid-press and may never see its pointer lifted: outside one, it
-    // lets go.
-    if (checkKind !== "catch" && checkKind !== "lean" && state.arcade?.game !== "mole")
+    // An arrow held as a catch, a lean, or a round of Boop-a-Mole or Comet
+    // Cruise ends is hidden mid-press and may never see its pointer lifted:
+    // outside one, it lets go.
+    if (checkKind !== "catch" && checkKind !== "lean" && state.arcade?.game !== "mole" &&
+        state.arcade?.game !== "comet")
       touch.releaseArrows();
     battleHud.render({
       visible: activeBattle && state.battle?.phase !== "reward" &&

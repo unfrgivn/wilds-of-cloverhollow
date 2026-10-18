@@ -380,7 +380,8 @@ function expectedClaw(value: unknown): value is ExpectedClaw {
 
 // Asks Bun for a close-up's layout (tools/arcade-layout.ts): Node can't load
 // the content.
-function bunArcadeLayout(game: "claw" | "skee" | "mole", state: string, scale: number):
+function bunArcadeLayout(game: "claw" | "skee" | "mole" | "comet", state: string,
+  scale: number):
   unknown {
   const result = spawnSync("bun", ["tools/arcade-layout.ts", game, state, String(scale)],
     { encoding: "utf8" });
@@ -480,5 +481,39 @@ function expectedMole(value: unknown): value is ExpectedMole {
 export function bunMoleLayout(state: string, scale: number): ExpectedMole {
   const parsed = bunArcadeLayout("mole", state, scale);
   if (!expectedMole(parsed)) throw new Error(`invalid Boop-a-Mole layout for ${state}`);
+  return parsed;
+}
+
+// Comet Cruise's layout for a gallery state, the parts the e2e tests compare
+// with what's drawn. The rocket and the objects are in the field's px.
+type CometSprite = Rect & { frame: string; opacity: number };
+export type ExpectedComet = {
+  width: number;
+  height: number;
+  painting: { width: number; height: number; y: number };
+  marquee: Rect;
+  hud: { x: number; y: number };
+  field: Rect;
+  rocket: CometSprite;
+  objects: (CometSprite & { kind: string })[];
+  keys: { x: number; y: number; label: string; side: string }[];
+};
+
+function expectedComet(value: unknown): value is ExpectedComet {
+  const rect = ["x", "y", "width", "height"];
+  const sprite = (item: unknown): boolean => numbers(item, [...rect, "opacity"]) &&
+    record(item) && typeof item.frame === "string";
+  return numbers(value, ["width", "height"]) && record(value) &&
+    numbers(value.painting, ["width", "height", "y"]) && numbers(value.marquee, rect) &&
+    numbers(value.hud, ["x", "y"]) && numbers(value.field, rect) && sprite(value.rocket) &&
+    Array.isArray(value.objects) && value.objects.every((item) => sprite(item) &&
+      record(item) && typeof item.kind === "string") &&
+    Array.isArray(value.keys) && value.keys.every((item) => numbers(item, ["x", "y"]) &&
+      record(item) && typeof item.label === "string" && typeof item.side === "string");
+}
+
+export function bunCometLayout(state: string, scale: number): ExpectedComet {
+  const parsed = bunArcadeLayout("comet", state, scale);
+  if (!expectedComet(parsed)) throw new Error(`invalid Comet Cruise layout for ${state}`);
   return parsed;
 }

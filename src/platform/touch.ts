@@ -133,7 +133,7 @@ export class TouchInput {
   }
 
   /** Lets go of every arrow, taps included, as the shell does outside a catch, a lean,
-   * or a round of Boop-a-Mole. */
+   * or a round of Boop-a-Mole or Comet Cruise. */
   releaseArrows(): void {
     this.arrow = { x: 0, y: 0 };
     this.arrowTap = undefined;

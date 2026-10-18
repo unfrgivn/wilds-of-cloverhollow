@@ -1,0 +1,156 @@
+/* The Comet Cruise close-up (spec 8.2). Like the other arcade close-ups, the
+   painted cabinet fills the safe area left of the touch buttons and sits at
+   the bottom of the UI stack (--z-hud); everything on it is placed by
+   layoutComet in whole pixels. It takes no taps: on touch, the arrow
+   stickers steer (touch-controls). */
+.comet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 46 px at the top keeps the harness's tick readout (spec 4) in view. */
+  padding: calc(var(--safe-top) + 46px)
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))
+    calc(var(--safe-bottom) + 10px)
+    max(calc(20px + var(--safe-left)), var(--touch-reserve-left, 0px));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--sticker-font);
+  color: var(--sticker-ink);
+}
+.comet-overlay[hidden] {
+  display: none;
+}
+/* The machine is the part of the painting shown (cometFrame). The painting is
+   its own layer, sized and moved by layoutComet, faded out at the top and the
+   bottom (--fade: the wing tips are cut flat); the stickers on it aren't
+   faded. */
+.comet-machine {
+  position: relative;
+  flex: none;
+}
+.comet-paint {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--fade),
+    #000 calc(100% - var(--fade)), transparent);
+  filter: drop-shadow(0 8px 14px #47321f33);
+}
+.comet-marquee,
+.comet-hud,
+.comet-key,
+.comet-field {
+  position: absolute;
+}
+
+/* The screen: the run drawn over the painted glass, clipped to its field. */
+.comet-field {
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 6px;
+}
+.comet-twinkle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff5d6;
+  opacity: .7;
+}
+.comet-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.comet-lines line {
+  stroke: #b9dff0;
+  stroke-opacity: .45;
+  stroke-width: 2;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+}
+.comet-sprite {
+  position: absolute;
+  background-repeat: no-repeat;
+}
+.comet-sprite[hidden] {
+  display: none;
+}
+
+/* The blank marquee, lettered with the hint or the game's name. */
+.comet-marquee {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+  box-sizing: border-box;
+}
+.comet-marquee-text {
+  max-width: 100%;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: .06em;
+  text-align: center;
+  text-wrap: balance;
+}
+.comet-marquee:not(.is-hint) .comet-marquee-text {
+  letter-spacing: .14em;
+  white-space: nowrap;
+}
+
+/* The keys that steer, little caps on the cabinet's sides beside the
+   screen; touch players use the arrow stickers, so there they're hidden. */
+.comet-key {
+  z-index: 3;
+  min-width: 1.4em;
+  padding: 1px 5px 2px;
+  background: var(--sticker-paper);
+  border: 2px solid var(--sticker-ink);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 #47321f55;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  pointer-events: none;
+}
+.comet-key.is-left {
+  transform: translate(-100%, -50%);
+}
+.comet-key.is-right {
+  transform: translate(0, -50%);
+}
+:root[data-touch="on"] .comet-key {
+  display: none;
+}
+
+/* The score: stars caught and stars still to come, just left of the
+   marquee. */
+.comet-hud {
+  z-index: 5;
+  transform: translateX(-100%);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 12px 7px;
+  background: var(--sticker-paper);
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  box-shadow: var(--sticker-shadow);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+.comet-hud[hidden] {
+  display: none;
+}
+.comet-left {
+  color: #b5480f;
+}

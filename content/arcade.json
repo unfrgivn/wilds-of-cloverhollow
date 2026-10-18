@@ -164,6 +164,24 @@
       "result": "You booped {booped} of {moles} moles! +{tickets} tickets."
     }
   },
+  "comet": {
+    "stars": 16,
+    "rocks": 8,
+    "readyTicks": 60,
+    "gapTicks": 48,
+    "travelFirst": 96,
+    "travelLast": 60,
+    "passTicks": 24,
+    "flashTicks": 16,
+    "moveTicks": 6,
+    "wobbleTicks": 24,
+    "ticketsPerStar": 2,
+    "lines": {
+      "ready": "Get ready!",
+      "play": "Catch the stars and slip past the space rocks!",
+      "result": "You caught {stars} of {total} stars! +{tickets} tickets."
+    }
+  },
   "counter": {
     "prizes": [
       {

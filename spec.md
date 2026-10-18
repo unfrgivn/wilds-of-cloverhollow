@@ -1202,7 +1202,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   chain bursts make the one draw (none after a wind-up). Great, good, and
   miss deal 0, base minus 1, and base.
 - Check numbers (Milestone 40): Soothe and Maddie's Play are rings of 60
-  ticks, target 39, windows 5 and 11. Sue's Cast is a charge: wait 180, max
+  ticks, target 39, windows 5 and 11. Soothe stays the ring (owner,
+  2026-10-17), not the no-timing Pet the battle ideas proposed. Sue's Cast is a charge: wait 180, max
   60, target 44, windows 5 and 11. Jordan's Juggle is a pinecone chain:
   travel 36, hit window 8, arrivals 40, 64, 88, 112. Both frogs' bursts are
   bubble chains (travel 40, window 8, arrivals 44, 70, 96; big 44, 66, 88,

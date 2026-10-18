@@ -1428,8 +1428,9 @@ the old trail, the owl, and the clubhouse claim.
     180 ticks for its first press, untimed.
   - The chain spec's window is `hitWindow`: a field named `window` would
     have needed the core purity check to stop banning the browser global.
-  - Soothe stays the ring, and the proposal's gentle-timing setting isn't
-    built; both are the owner's open questions in `docs/battle-ideas.md`.
+  - Soothe stays the ring (the owner confirmed it, 2026-10-17), and the
+    proposal's gentle-timing setting isn't built; it is still an open
+    question in `docs/battle-ideas.md`.
   - `tools/sim/roam.ts` meant to run from its roaming frog but chose Run
     while the prompt was still typing (ignored), so its battles had ended by
     resting. It waits for the prompt now and really runs.

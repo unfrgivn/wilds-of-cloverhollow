@@ -52,7 +52,7 @@ into), and a feeling over the critter's head makes the menu a choice.
 | Beat chain | Three to five things arrive one after another; press as each lands | Z per beat; confirm | Jordan's Juggle, frog bubbles, bunny thumps |
 | Catch | Toys fly at Fae in three lanes (high, middle, low); hold her catch in each toy's lane as it lands (built in Milestone 41) | up/down; two arrow stickers | the nine "flurry" bursts |
 | Lean | A gust shoves a wobbling needle; hold the other way to keep Fae's hat on (built in Milestone 48: a star on a balance track over her head, since Fae has no hat; too far either way tips her over) | hold left/right; two arrow stickers | the gust bursts |
-| Pet | Three or four arrows show on the critter; press them in order before the timer runs out (no precision timing) | arrows; four arrow stickers | Soothe, as a no-reflex default |
+| Pet | Three or four arrows show on the critter; press them in order before the timer runs out (no precision timing) | arrows; four arrow stickers | Soothe, as a no-reflex default (owner, 2026-10-17: no, Soothe stays the ring) |
 | Echo | The critter hums three to five notes on the music room's four chimes; play them back (up red, right yellow, down green, left blue) | arrows; four chime stickers | the flute, songbirds |
 | Peekaboo | Tiptoe (hold Z) while the critter looks away, freeze when it turns back | hold Z; hold confirm | the owl's stare |
 | Which one? | The critter ducks under one of three cups, they shuffle, pick its cup | left/right, Z; tap a cup | raccoons and squirrels (they stash things) |
@@ -80,7 +80,8 @@ Notes on the strongest ones:
   burst frames already draw them as separate islands, so they can be cut out
   rather than generated) and two touch arrow stickers.
 - **Pet, Echo, Which one?, and Talk** need no reflexes. Pet as Soothe would
-  give younger players a way to do well without precise timing.
+  give younger players a way to do well without precise timing; the owner
+  kept Soothe as the ring (2026-10-17), and a missed one still calms.
 - **Peekaboo, Which one?, and Whack** each suit one critter or person, so they
   work best as that critter's burst or a mini-boss's signature, not as general
   commands.
@@ -217,7 +218,9 @@ What this touches:
 1. Is "friends decide how Fae calms, critters decide how they burst" the right
    split, or should each critter define everything?
 2. Should Soothe stay the ring, or become Pet so there's always a no-timing
-   option?
+   option? Answered (owner, 2026-10-17): Soothe stays the ring. If
+   playtesting shows younger players struggling, the gentle-timing setting
+   (question 3) comes first.
 3. A "gentle timing" setting (wider windows, slower toys), stored like mute,
    outside the save?
 4. On iPhone, directional checks need on-screen arrows in battle: two arrow

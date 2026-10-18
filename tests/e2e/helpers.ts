@@ -31,6 +31,14 @@ export async function step(page: Page, ticks: number): Promise<void> {
   await page.evaluate((count) => window.__cloverhollow?.step(count), ticks);
 }
 
+// Opens the journal on its MAP page with real keys: J, then the right arrow.
+export async function openMap(page: Page): Promise<void> {
+  await page.keyboard.press("j");
+  await step(page, 2);
+  await page.keyboard.press("ArrowRight");
+  await step(page, 2);
+}
+
 // Queues a whole recorded script in one round trip. A long replay has hundreds
 // of segments (chapter one has 290); one evaluate each took over a minute in
 // Chromium under load, most of a long flow's time budget.

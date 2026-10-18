@@ -2,18 +2,12 @@ import { expect, test } from "@playwright/test";
 import {
   longFlowTimeout,
   openHarness,
+  openMap,
   resetPaused,
   step,
 } from "./helpers";
 
 test.describe.configure({ timeout: longFlowTimeout });
-
-async function openMap(page: Parameters<typeof openHarness>[0]): Promise<void> {
-  await page.keyboard.press("j");
-  await step(page, 2);
-  await page.keyboard.press("ArrowRight");
-  await step(page, 2);
-}
 
 test("the journal map names every land and marks Cloverhollow", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });

@@ -3053,7 +3053,14 @@ more bad guys, and the blacklight lantern, made and built while away.
     under the chaos spell (owner, 2026-10-17).
   - Milestone 60, a second flute friend: in progress (above; owner,
     2026-10-18).
-  - The kid's identity is kept for the very end (owner, 2026-10-07).
+  - A fix (2026-10-18): the journal's map page still wrote "???" for the
+    Enchanted Forest whatever its view said, so the map rule Milestone 53
+    added (named once the Misty Path is found or Fae is in the land) never
+    showed. The page shows the view's name now, and the Misty Path e2e ends
+    by opening the map and checking it names the forest (it fails without
+    the fix). The gallery's view says "???", so no baseline changed.
+  - The kid's identity is kept for the very end (owner, 2026-10-07); the
+    owner chose Milo for the finale (2026-10-17, Milestones 53 to 56).
 
 ## Later (not scheduled)
 More people under the chaos spell (NOTES.md: more mini-bosses), after the

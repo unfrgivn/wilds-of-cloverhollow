@@ -1638,7 +1638,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `???` for the sealed Enchanted Forest until Fae finds the Misty Path or enters
   that land, puts a bobbing gold star over Fae's current land, and leads each
   stop's name with the bus line's sign (lands with `busStop`). It is
-  presentation only, outside the core state and saves.
+  presentation only, outside the core state and saves. The journal's view
+  carries each land's display name (`mapLandName` in `src/core/journal.ts`,
+  `???` while the forest is sealed), and the page shows it as given.
 - Stickers are collectibles and rewards.
 - Core: `journalOpen` in state. A menu press (J or the journal button) opens
   it when no dialogue, battle, or door transition is running; a menu or cancel

@@ -303,7 +303,7 @@ export function createJournal(root: HTMLElement): {
         mapLabels.replaceChildren();
         view.lands.forEach((land: MapLand) => {
           const item = element("span", "journal-map-land");
-          item.textContent = land.id === "enchanted" ? "???" : land.name;
+          item.textContent = land.name;
           item.style.left = `${(land.x / 2400) * 100}%`;
           item.style.top = `${(land.y / 1610) * 100}%`;
           setAttribute(item, "data-land", land.id);

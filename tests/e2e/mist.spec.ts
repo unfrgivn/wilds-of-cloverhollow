@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import {
-  bunHash, longFlowTimeout, openHarness, playAfter, readHash, readState,
+  bunHash, longFlowTimeout, openHarness, openMap, playAfter, readHash, readState,
   renderInfo, resetPaused,
 } from "./helpers";
 
@@ -89,4 +89,10 @@ test("real keys cross the Misty Path and open the seal", async ({ page }) => {
     opened: true,
   });
   expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+
+  // The way through the mist is found, and Fae stands in the Enchanted
+  // Forest's land: the map names it now ("???" before, spec 9).
+  await openMap(page);
+  await expect(page.locator('.journal-map-land[data-land="enchanted"]'))
+    .toHaveText("The Enchanted Forest");
 });

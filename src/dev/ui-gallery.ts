@@ -354,7 +354,9 @@ function renderGalleryState(): void {
       { id: "forest", name: "The Forest", busStop: false, x: 240, y: 420 },
       {
         id: "enchanted",
-        name: "The Enchanted Forest",
+        // The view carries each land's display name (`mapLandName`): the
+        // gallery's journal shows the forest still sealed.
+        name: "???",
         busStop: false,
         x: 1156,
         y: 720,

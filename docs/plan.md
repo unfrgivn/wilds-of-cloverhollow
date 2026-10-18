@@ -2811,6 +2811,47 @@ the old trail, the owl, and the clubhouse claim.
   the route was picked without asking which one. A road from the plaza to
   the bay was set aside because the finale's recorded runs walk that edge.
 
+## Milestone 63: The art teacher **Status:** 🚧 In progress (2026-10-18)
+- The owner asked for more mini-bosses (2026-10-18; NOTES.md: more
+  mini-bosses, people and animals under the chaos spell). The owner's school
+  staff concept sheet (`docs/art/concepts/npcs/school_staff_npcs.png`) draws
+  five teachers. Four are in the game; the fifth, the art teacher, never
+  appears, and the east hall's art room door has only ever said it's locked.
+  No recorded run reads that door.
+- Once Fae has found the hooded kid's stash (purple markers, fizzy soda, and a
+  Star Racer token), purple paint seeps under the art room door. Reading it
+  then brings the art teacher out, fizzy from one sip of the purple soda and
+  painting wild purple swirls: "NOBODY touches MY paints!" Until a player
+  reads the door after the stash, the hall is as it was.
+- She's a person under the spell, a set piece like Mr. Pip and Mrs. Flurry,
+  drawn from the concept sheet: short brown hair, a rainbow bandana, a striped
+  shirt under paint-spattered overalls, and a giant brush. Her bursts are
+  paint swirls that Fae brushes back into shapes before the paint dries
+  (Trace, Milestone 55), in shapes of her own, with feelings and a wind-up (a
+  giant paint bucket).
+- Calmed, she says the kid in the purple hood borrowed every purple marker
+  and left her a fizzy soda, and she opens the art room: a new room, painted
+  whole and split into a kit, with look points (the easels, the class art
+  wall, the empty purple marker box). Her sticker joins the album.
+- Evidence: unit tests for the door, the set piece, her battle content and
+  trace shapes (against the player models), her talk, and the room; a
+  recorded run on from the stash, with its replay test; and a real-key e2e at
+  both sizes, in both engines.
+- For the owner: her name (Ms. Rowan, a tree, like Ms. Maple, Ms. Willow,
+  Coach Ash, and Nurse Holly), her lines, her sheet, and the room.
+
+## Milestone 64: The lifeguard **Status:** 📋 Planned
+- Bubblegum Bay, Sue's land, has no one under the spell, and someone left a
+  picnic there: watermelon slices, a sun hat, and a sandy towel. No recorded
+  run reads it.
+- Once Sue has joined, reading the picnic brings out its owner, the bay's
+  lifeguard, fizzy and blowing her whistle at everyone: "NOBODY splashes on
+  MY beach!" A set piece like Mrs. Flurry: beach balls to catch (cut from the
+  bay's painted ones), feelings, and a wind-up (a giant beach ball). Calmed,
+  she shares her watermelon (snacks), and her sticker joins the album.
+- For the owner: her name, her look (drawn to Mrs. Flurry's sheet; the
+  concepts have no lifeguard), and her lines.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
@@ -3460,7 +3501,8 @@ more bad guys, and the blacklight lantern, made and built while away.
 
 ## Later (not scheduled)
 More people under the chaos spell (NOTES.md: more mini-bosses), after the
-lodge keeper (Milestone 57). Flute friends (the Pond Pup and the Acorn
+lodge keeper (Milestone 57): the art teacher and the lifeguard are next
+(Milestones 63 and 64). Flute friends (the Pond Pup and the Acorn
 Squirrel), the lasso's places, and the clubhouse's chest and microwave are
 done (Milestones 47, 60, 49, and 52).
 

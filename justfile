@@ -8,17 +8,18 @@ dev:
 check:
   bun run check
 
-# Run unit tests.
-unit:
-  bun run unit
+# Run unit tests. Arguments go to Vitest: `just unit tests/unit/bay.test.ts`.
+unit *args:
+  bun run unit {{args}}
 
 # Run all deterministic simulations.
 sim:
   bun run sim
 
-# Run browser end-to-end tests.
-e2e:
-  bun run e2e
+# Run browser end-to-end tests. Arguments go to Playwright:
+# `just e2e bay.spec --project=chromium`, `just e2e --last-failed`.
+e2e *args:
+  bun run e2e {{args}}
 
 # Build production and harness bundles and check both hook directions.
 build:

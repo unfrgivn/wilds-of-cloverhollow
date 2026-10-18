@@ -2610,6 +2610,38 @@ more bad guys, and the blacklight lantern, made and built while away.
   unsharded trial reached 36m51s without completing, so it is not used as an
   after measurement.
 
+### E2E suite speed (2026-10-17)
+- Headless Chromium renders WebGL in software (SwiftShader) even on a Mac,
+  and that was most of the local e2e time: a paused `step(1)` took 160 ms,
+  against 1 ms on the GPU (same harness, same moment, load average 146).
+  Each SwiftShader GPU process took about three cores, so worktrees running
+  e2e at the same time starved each other (load averages of 100 to 260 while
+  this was measured).
+- Chromium now launches with `--use-angle=metal` on macOS. WebKit already
+  drew on the GPU, and CI keeps SwiftShader. The same 16 gameplay tests on 3
+  workers took 238 s and 880 CPU-seconds in software, and 43 s and 89
+  CPU-seconds on Metal.
+- 63 Chromium baselines differed, by 1 to 610 pixels, all at edges:
+  anti-aliasing, and resampling (a scaled sticker's outline is crisper on the
+  GPU). Each was viewed (old, new, and diff, at up to 4x) before it was
+  replaced, and each passed at least twice more unchanged. Every other
+  baseline passes as it was. A branch with Chromium baselines drawn in
+  software redraws them after rebasing.
+- Local runs use half the cores (5 workers here; it was 30%): the Chromium
+  project took 193 s on 5 workers and 297 s on 3 under the same load.
+- Full `just e2e` after: 758 tests (414 Chromium, 344 WebKit) in 4.6
+  minutes on 5 workers, all passed; the slowest test is lasso's at 19 s. On
+  2026-10-08, 388 tests took 10.1 minutes.
+- `createStoryReader` (`src/core/ink.ts`) loads an Ink state only when it
+  differs from the last one it read. Replaying every sim script made 185,187
+  `LoadJson` calls (1.7 a tick, about 40% of `step`) before and 1,838 after.
+  `bun run sim` went from 22.6 s to 8.2 s, the unit tests use 12% less CPU,
+  and every hash is unchanged. The game's own tick saves the same work.
+- `just e2e` and `just unit` pass arguments through
+  (`just e2e bay.spec --project=chromium`, `just e2e --last-failed`), and
+  AGENTS.md says to run the full gates once per milestone and only what the
+  change touches while working.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its

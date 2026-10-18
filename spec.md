@@ -2055,7 +2055,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   plus the gameplay flows tagged `@smoke`; each gameplay flow already checks
   its state hash against Bun (JavaScriptCore) for cross-engine determinism.
 - Visual baselines live beside the e2e specs. Update them only after viewing
-  the new image.
+  the new image. Chromium's are drawn on a Mac's GPU through Metal; one drawn
+  by the software renderer differs at a few edge pixels and is redrawn (and
+  viewed) like any other change.
 - Fixtures (`content/fixtures/<name>.json`) contain `area`, `spawn`, an
   optional `seed`, and an optional `party` (member ids, overriding the
   roster's `start` members; test-only). Sim scripts live in
@@ -2074,9 +2076,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   and Z, so the e2e can play every run back with real keys.
 - The Playwright suite serves the harness build from the `/cloverhollow/`
   sub-path, so any root-relative asset URL fails in tests as it would on iOS.
-   Locally it runs on 30% of the cores; CI runs one worker because headless
-   Chromium renders in software and concurrent workers starve each other's GPU
-   processes on the four-vCPU runner.
+  Locally, Chromium draws on the Mac's GPU (`--use-angle=metal`; WebKit
+  already does) and the suite runs on half the cores. CI's Linux runner has
+  no GPU, so headless Chromium renders in software there (SwiftShader): CI
+  runs one worker per shard, because concurrent workers starve each other's
+  GPU processes on the four-vCPU runner, and ignores screenshots.
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

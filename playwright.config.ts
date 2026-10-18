@@ -8,10 +8,12 @@ export default defineConfig({
   testDir: "tests/e2e",
   testMatch: ["**/*.spec.ts"],
   timeout: process.env.CI === "true" ? 90_000 : 30_000,
-  // Headless Chromium renders in software (SwiftShader), each GPU process
-  // taking up to three cores. One CI worker prevents concurrent Chromium
-  // processes from starving each other's GPU work on the four-vCPU runner.
-  workers: process.env.CI === "true" ? 1 : "30%",
+  // CI's Linux runner has no GPU, so headless Chromium renders in software
+  // (SwiftShader), each GPU process taking up to three cores: one worker per
+  // shard keeps them from starving each other on the four-vCPU runner. A Mac
+  // draws on its GPU (the chromium project below), so local runs use half the
+  // cores.
+  workers: process.env.CI === "true" ? 1 : "50%",
   expect: { timeout: 10_000 },
   webServer: {
     command:
@@ -28,7 +30,14 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { browserName: "chromium" },
+      use: {
+        browserName: "chromium",
+        // On a Mac, WebGL draws on the GPU through Metal, and the screenshot
+        // baselines are drawn that way. Headless Chromium otherwise renders
+        // in software (SwiftShader): every step's draw cost 60 to 160 ms of
+        // CPU, and its GPU processes starved everything else on the machine.
+        launchOptions: process.platform === "darwin" ? { args: ["--use-angle=metal"] } : {},
+      },
     },
     // Chromium runs everything. WebKit (the iOS engine) runs the layout, UI,
     // and input-device specs plus the gameplay flows tagged @smoke: core

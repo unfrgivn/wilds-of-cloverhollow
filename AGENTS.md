@@ -37,6 +37,12 @@ source of truth. Work comes from `docs/plan.md`.
 - `just build`: production build; fails if the dev hook leaks into it.
 - `just ios-sim`: from Milestone 4, for milestones touching iOS.
 
+Run the gates in full once, before the milestone's commit. While working, run
+only what the change touches: one spec on Chromium
+(`just e2e bay.spec --project=chromium`), one test file
+(`just unit tests/unit/bay.test.ts`), or the last run's failures
+(`just e2e --last-failed`). Don't rerun a full gate to check a one-spec fix.
+
 ## Agent tooling
 - Chrome DevTools MCP (project `opencode.json`) opens an isolated Chrome at
   1280x720. Drive the game with real key presses and the `window.__cloverhollow`

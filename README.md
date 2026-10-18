@@ -36,5 +36,6 @@ The previous Godot pixel-art build is archived at tag `archive/godot-pixel`.
 - `just ios-device`: sign it with your personal team and install it on the
   iPhone plugged in over USB (copy `.env.ios.example` to `.env.ios` first)
 
-Screenshot baselines are macOS-only for now. The harness build is used by the
-Playwright suite and can be started with `bun run build:harness`.
+Screenshot baselines are macOS-only for now: Chromium's are drawn on the Mac's
+GPU. The harness build is used by the Playwright suite and can be started with
+`bun run build:harness`.

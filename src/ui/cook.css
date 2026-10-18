@@ -1,0 +1,115 @@
+/* The clubhouse microwave's close-up (spec 8.2). Like skee-ball's, the painting
+   fills the safe area left of the touch buttons and sits at the bottom of the
+   UI stack (--z-hud); everything on it is placed by layoutCook in whole
+   pixels. */
+.cook-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 46 px at the top keeps the harness's tick readout (spec 4) in view. */
+  padding: calc(var(--safe-top) + 46px)
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))
+    calc(var(--safe-bottom) + 10px) calc(20px + var(--safe-left));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--sticker-font);
+  color: var(--sticker-ink);
+}
+.cook-overlay[hidden] {
+  display: none;
+}
+.cook-machine {
+  position: relative;
+  flex: none;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.cook-glass,
+.cook-display,
+.cook-button,
+.cook-front {
+  position: absolute;
+}
+
+/* Behind the glass: the dish, its frost, the light, the puffs, and a sheen. */
+.cook-glass {
+  overflow: hidden;
+}
+.cook-food,
+.cook-frost,
+.cook-light,
+.cook-wisp,
+.cook-sheen {
+  position: absolute;
+  background-repeat: no-repeat;
+}
+/* The dish's frost: its own shape in white, fading as it thaws. */
+.cook-frost {
+  filter: brightness(0) invert(1);
+}
+/* Off, the inside is dim; on, a warm glow fills it. */
+.cook-light {
+  inset: 0;
+  background: rgb(36 30 52 / 30%);
+}
+.cook-light.is-on {
+  background: radial-gradient(ellipse at 50% 70%, rgb(255 226 150 / 45%),
+    rgb(255 196 92 / 18%) 70%);
+  mix-blend-mode: screen;
+}
+.cook-wisp {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 85%), rgb(255 255 255 / 0%) 70%);
+}
+.cook-wisp.is-smoke {
+  background: radial-gradient(circle, rgb(74 70 78 / 90%), rgb(74 70 78 / 0%) 70%);
+}
+.cook-wisp[hidden] {
+  display: none;
+}
+/* Two soft streaks of light across the glass, over everything inside. */
+.cook-sheen {
+  inset: 0;
+  background: linear-gradient(115deg, transparent 18%, rgb(255 255 255 / 16%) 22%,
+    transparent 30%, transparent 58%, rgb(255 255 255 / 10%) 62%, transparent 68%);
+}
+
+/* The timer's display: green digits that glow. */
+.cook-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #9dffb0;
+  text-shadow: 0 0 6px rgb(120 255 150 / 75%);
+}
+/* The start button, pressed in while it's held. */
+.cook-button {
+  border-radius: 50%;
+}
+.cook-button.is-held {
+  background: radial-gradient(circle at 50% 60%, rgb(60 50 40 / 34%),
+    rgb(60 50 40 / 12%) 70%);
+  box-shadow: inset 0 3px 6px rgb(40 30 20 / 45%);
+}
+
+/* The hint, lettered on the fridge's front in cream sticker ink. */
+.cook-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cook-front[hidden] {
+  display: none;
+}
+.cook-front-text {
+  white-space: nowrap;
+  font-weight: 900;
+  color: #fff6dc;
+  text-shadow: 0 2px 0 rgb(20 24 50 / 70%);
+}

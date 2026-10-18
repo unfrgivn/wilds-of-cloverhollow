@@ -2205,10 +2205,73 @@ the old trail, the owl, and the clubhouse claim.
     which also loses a helper it never called. No critter notices Fae on
     that walk, before or after this milestone.
 
-## Milestone 52: The clubhouse kitchen **Status:** 📋 Planned
-- The owner asked for it (2026-10-17). NOTES.md's clubhouse ideas: a
-  "Microwave for making dino nuggets and mac n cheese" and a "Chest to store
-  items". Designed after Milestone 49.
+## Milestone 52: The clubhouse kitchen **Status:** ✅ Completed (2026-10-17)
+- The owner asked for it (2026-10-17), and chose (2026-10-17): cooking as a
+  little game like skee-ball, and the chest as a keepsake chest. NOTES.md's
+  clubhouse ideas: a "Microwave for making dino nuggets and mac n cheese" and
+  a "Chest to store items".
+- Once the club is claimed, Mom gives it her old microwave and her old toy
+  chest, the first thing she says. They're in the clubhouse from then on: the
+  microwave on top of the fridge, the chest on the floor under the drawings.
+  Mom's freezer (the kitchen fridge) has dino nuggets and mac n cheese, a box
+  at a time.
+- Cooking: with a box, the clubhouse fridge offers to cook it (or to open the
+  fridge as ever), and the microwave's close-up opens, free. A press starts
+  it and holding keeps it going; let go when it's golden. The box says 1:00
+  for the nuggets and 1:30 for the mac n cheese, and the timer runs fast (30
+  seconds a real second). Within 10 seconds of the box's time is golden,
+  three snacks; a bit under or over, two; burnt, one ("Extra crispy...").
+  Let go while it's still frozen and it waits for the next hold; held to
+  twice the box's time, the microwave stops itself. The food frosts, warms,
+  steams, browns, and smokes by how long it's cooked, so what's drawn is
+  what's judged.
+- The keepsake chest shows what Fae has found, oldest first, read from what
+  the story already knows (no earlier line changes): the purple thread from
+  the pup's ball, the note from under the comics, the purple marker the
+  hooded kid dropped, the Star Racer token, the pond's tin, the treasure map,
+  and a bow from Rosie's kite.
+- Art (`art/recipes/clubhouse-kitchen.json`, `microwave.json`,
+  `cook-food.json`): the microwave and the chest painted into an edit of the
+  clubhouse painting and cut as added props (Milestone 49); the close-up of the
+  microwave on the fridge; and the two dishes, painted as cooked just right.
+- Evidence: unit tests (`cook.test.ts`: every way out and its pay and line,
+  the golden window's edges, the frozen pause and resume, the stop, the view,
+  the content's and the calibration's errors; `cook-layout.test.ts`;
+  `kitchen.test.ts`: Mom's gift, the freezer a box at a time, the chest's
+  keepsakes, the props, the story opening the game through the core, and the
+  journal), the recorded run `pass-party/kitchen.json`
+  (`tools/sim/record-kitchen.ts`, on from the lasso run: home to Mom and the
+  freezer, the bus up the mountain, the old trail, the clubhouse, the nuggets
+  cooked golden, the chest) with its replay test, the gallery's five cooking
+  states (phone and desktop baselines and layout checks, in both engines), and
+  the real-key e2e `kitchen.spec.ts` (five moments at both sizes, the
+  close-up as drawn while it cooks, and the browser's and Bun's hashes
+  match). Gates: the first full run passed `just build` and `just e2e`
+  (756 passed, 2 skipped), but `just check`'s core purity refused the
+  calibration's field `window` (the browser's global): renamed `glass`. Then
+  `just check` (825 unit tests, the sim, core purity, lint) and `just build`
+  passed, and so did every spec the rename touches: the cooking gallery
+  states in both engines (44 passed) and the kitchen, arcade, claw, skee, and
+  mole specs (12 passed).
+- Notes and assumptions:
+  - The microwave sits on the fridge (a mini fridge's top is where it goes),
+    so cooking shares the fridge's look point instead of crowding a second one
+    beside it. The chest comes with it, from Mom, so the clubhouse's earlier
+    screenshots don't change.
+  - The hint (and then the box's time) is lettered on the fridge's front under
+    the microwave; on a phone it's small but clear.
+  - One box at a time keeps cooking from being a free snack machine: each
+    cook is a trip home, and makes three snacks at most.
+  - The pass-party chain skips breakfast, so after Mom's gift she says good
+    morning there; in a real game she says it at breakfast first.
+  - A delegated first try at the game deleted Boop-a-Mole (Milestone 46) from
+    the framework while adding cooking; it was thrown away whole, and the game
+    built on the framework as it is.
+  - Gemini calls: 11 (one painting edit, two kit isolates, the close-up, and
+    seven for the food: four of them before the angle and the floor came out
+    right).
+  - The edit, the props, the close-up, the dishes, the cooking numbers, and
+    the wording are in the owner's review queue.
 
 ## Milestone 53: Into the mist **Status:** 📋 Planned
 - The finale begins. The owner decided it (2026-10-17): the kid in the purple
@@ -2644,7 +2707,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     50, wind-ups for the gull and Mr. Pip: done (above). Then Milestone 51,
     first touch and old friends: done (above).
   - Milestone 49, lasso spots: done (above). Then Milestone 52, the
-    clubhouse kitchen (owner, 2026-10-17).
+    clubhouse kitchen (owner, 2026-10-17): done (above).
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

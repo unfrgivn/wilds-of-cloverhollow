@@ -1,0 +1,60 @@
+{
+  "frames": {
+    "nuggets": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 512,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.975
+      }
+    },
+    "mac": {
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 320
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 320
+      },
+      "sourceSize": {
+        "w": 512,
+        "h": 320
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.975
+      }
+    }
+  },
+  "meta": {
+    "image": "cook-food.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1024,
+      "h": 320
+    }
+  }
+}

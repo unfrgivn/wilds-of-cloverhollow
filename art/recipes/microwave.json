@@ -1,0 +1,25 @@
+{
+  "asset": "microwave close-up",
+  "milestone": 52,
+  "date": "2026-10-17",
+  "summary": "The cooking game's close-up: Mom's microwave, straight on, on the clubhouse's navy fridge, its glass empty but for the turntable, its display and button blank: the food, the timer, and the hint are drawn in code.",
+  "generationSource": "Generated with Gemini from the clubhouse edit's microwave (a crop) and the arcade close-ups for their style; no open source has it in this style.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-10-17T23:32:45.605Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "/private/var/folders/vh/53q4qxpx6jd37xysdw6ngzg40000gn/T/opencode/m52/microwave-ref.png",
+        "public/assets/arcade/claw-machine.webp",
+        "public/assets/arcade/skee-lane.webp"
+      ],
+      "prompt": "A close-up, straight-on front view of the same small old retro microwave oven as in the first reference image: a cream body with rounded corners, a mint-green door frame, a little yellow handle, and a narrow control panel on its right. Paint it in exactly the soft watercolour and thin warm-brown ink style of the other two references (an arcade claw machine and a skee-ball lane). The microwave is centred and fills most of the picture's width, seen straight from the front at eye level, so its front is a flat rectangle. Its door takes the left two thirds: a big glass window with rounded corners; through the glass the inside is dim and empty, except for a round glass turntable plate lying flat near the bottom of the inside, seen from just above, with nothing on it. The control panel on the right has, from top to bottom: a small blank dark display window, completely empty; a round dial with no marks; and one big round button with no symbol. The microwave stands on the flat top of a dark navy-blue fridge, whose top runs across the bottom of the picture. Plain cream paper background around it. No text, letters, numbers, digits, or logos anywhere; no food; no people.",
+      "output": "1792279965604-gemini-3-pro-image-preview-0.png",
+      "note": "Kept as it came: the turntable, the dark display, the dial, and the button all blank.",
+      "kept": "art/source/arcade/microwave-front-raw.png"
+    }
+  ],
+  "postProcessing": "tools/art/build-microwave.ts: the paper margin flood-filled to transparent from the top-left corner (8% fuzz), trimmed, and resized to 1600 px wide (WebP, quality 90); the fridge runs off the bottom edge and stays. Rebuilt twice with the same hash.",
+  "calibration": "public/assets/arcade/microwave.json, measured on the runtime image: the glass from its mint frame (scanned along the middle row and column), the turntable's rim, the display, and the button (Hough circles), checked on an overlay; the fridge's front from its navy rows (y 865 down; its top edge at y 932)."
+}

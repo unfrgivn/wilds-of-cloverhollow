@@ -129,6 +129,10 @@ import type {
   CounterContent,
   HeapPlush,
   MoleCalibration,
+  CookCalibration,
+  CookContent,
+  CookDish,
+  CookZone,
   MoleContent,
   SkeeCalibration,
   SkeeContent,
@@ -449,6 +453,7 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
     },
     skee: parseSkee(value.skee, file),
     mole: parseMole(value.mole, file),
+    cook: parseCook(value.cook, file),
     counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
   };
@@ -536,6 +541,50 @@ function parseSkee(value: unknown, file: string): SkeeContent {
     floor: integer(value, "floor", 1),
     pointsPerTicket: integer(value, "pointsPerTicket", 1),
     lines: { aim: lines.aim, power: lines.power, result: lines.result },
+  };
+}
+
+// The clubhouse microwave (spec 8.2): positive integers throughout; each dish
+// frozen, then under, golden, and over in turn before it burns, and stopped
+// after that; every way out pays a snack or more, and says how many; the start
+// line names the box's `{time}`.
+function parseCook(value: unknown, file: string): CookContent {
+  field(record(value), file, "cook");
+  const integer = (source: Record<string, unknown>, name: string, minimum: number,
+    label = `cook.${name}`): number => integerIn(source, name, minimum, file, label);
+  const golden = integer(value, "golden", 1);
+  field(record(value.dishes), file, "cook.dishes");
+  const dishes = value.dishes;
+  const dish = (name: CookDish): CookContent["dishes"][CookDish] => {
+    const item = dishes[name];
+    field(record(item) && typeof item.label === "string" && item.label !== "", file,
+      `cook.dishes.${name}`);
+    const at = (key: string): number => integer(item, key, 1, `cook.dishes.${name}.${key}`);
+    const [time, frozen, burnt, stop] = [at("time"), at("frozen"), at("burnt"), at("stop")];
+    field(frozen < time - golden && time + golden < burnt && burnt < stop, file,
+      `cook.dishes.${name} (frozen, then under, golden, and over, then burnt, then the stop)`);
+    return { label: item.label, time, frozen, burnt, stop };
+  };
+  field(record(value.snacks), file, "cook.snacks");
+  const snacks = value.snacks;
+  const paid = (zone: CookZone): number => integer(snacks, zone, 1, `cook.snacks.${zone}`);
+  const lines = value.lines;
+  field(record(lines) && typeof lines.start === "string" && lines.start.includes("{time}") &&
+    typeof lines.frozen === "string", file, "cook.lines");
+  const said = (zone: CookZone): string => {
+    const line = lines[zone];
+    field(typeof line === "string" && line.includes("{snacks}"), file, `cook.lines.${zone}`);
+    return line;
+  };
+  return {
+    ticksPerSecond: integer(value, "ticksPerSecond", 1),
+    golden,
+    dishes: { nuggets: dish("nuggets"), mac: dish("mac") },
+    snacks: { under: paid("under"), golden: paid("golden"), over: paid("over"),
+      burnt: paid("burnt") },
+    dingTicks: integer(value, "dingTicks", 1),
+    lines: { start: lines.start, frozen: lines.frozen, under: said("under"),
+      golden: said("golden"), over: said("over"), burnt: said("burnt") },
   };
 }
 
@@ -647,6 +696,59 @@ export function parseClawCalibration(value: unknown, file: string): ClawCalibrat
 // plate and every hole inside the image, the holes in a plus (far over middle
 // over near, left of middle left of right), and no hole's box touching
 // another's or the plate.
+// The microwave's close-up: every part inside the image; the turntable inside
+// the glass; the display and the button clear of the glass; the fridge's front
+// below everything else.
+export function parseCookCalibration(value: unknown, file: string): CookCalibration {
+  const number = (item: unknown): item is number =>
+    typeof item === "number" && Number.isFinite(item);
+  type Box = { x: number; y: number; w: number; h: number };
+  field(record(value) && typeof value.image === "string", file, "image");
+  field(record(value.size) && number(value.size.w) && number(value.size.h), file, "size");
+  const size = { w: value.size.w, h: value.size.h };
+  const inside = (box: Box, within: Box = { x: 0, y: 0, ...size }): boolean =>
+    box.x >= within.x && box.y >= within.y && box.x + box.w <= within.x + within.w &&
+    box.y + box.h <= within.y + within.h;
+  const apart = (a: Box, b: Box): boolean =>
+    a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y;
+  const rect = (item: unknown, name: string): Box => {
+    field(record(item) && number(item.x) && number(item.y) && number(item.w) &&
+      number(item.h) && item.w > 0 && item.h > 0, file, name);
+    const box = { x: item.x, y: item.y, w: item.w, h: item.h };
+    field(inside(box), file, `${name} (inside the image)`);
+    return box;
+  };
+  const glass = rect(value.glass, "glass");
+  const radius = record(value.glass) ? value.glass.r : undefined;
+  field(number(radius) && radius >= 0 && 2 * radius <= Math.min(glass.w, glass.h), file,
+    "glass.r");
+  const plate = value.plate;
+  field(record(plate) && number(plate.cx) && number(plate.cy) && number(plate.rx) &&
+    number(plate.ry) && plate.rx > 0 && plate.ry > 0 && inside({ x: plate.cx - plate.rx,
+    y: plate.cy - plate.ry, w: 2 * plate.rx, h: 2 * plate.ry }, glass), file,
+  "plate (inside the glass)");
+  const display = rect(value.display, "display");
+  const button = value.button;
+  field(record(button) && number(button.cx) && number(button.cy) && number(button.r) &&
+    button.r > 0, file, "button");
+  const buttonBox = { x: button.cx - button.r, y: button.cy - button.r, w: 2 * button.r,
+    h: 2 * button.r };
+  field(inside(buttonBox) && apart(buttonBox, glass) && apart(display, glass) &&
+    apart(display, buttonBox), file, "display and button (clear of the glass and each other)");
+  const front = rect(value.front, "front");
+  field([glass, display, buttonBox].every((box) => box.y + box.h <= front.y), file,
+    "front (below the glass, the display, and the button)");
+  return {
+    image: value.image,
+    size,
+    glass: { ...glass, r: radius },
+    plate: { cx: plate.cx, cy: plate.cy, rx: plate.rx, ry: plate.ry },
+    display,
+    button: { cx: button.cx, cy: button.cy, r: button.r },
+    front,
+  };
+}
+
 export function parseMoleCalibration(value: unknown, file: string): MoleCalibration {
   const number = (item: unknown): item is number =>
     typeof item === "number" && Number.isFinite(item);

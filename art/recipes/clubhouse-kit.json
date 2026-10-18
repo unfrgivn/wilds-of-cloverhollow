@@ -1,7 +1,7 @@
 {
   "asset": "clubhouse-kit",
   "date": "2026-10-17",
-  "summary": "The approved clubhouse painting split into a ground plate and 10 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
+  "summary": "The approved clubhouse painting split into a ground plate and 12 props. Every visible default prop pixel is the painting's; generated pixels only fill plate holes, finish parts hidden behind other props, or become masks.",
   "model": "gemini-3-pro-image",
   "config": "art/kit/clubhouse.json",
   "painting": "art/source/areas/clubhouse/painting/ground.json",
@@ -64,6 +64,14 @@
       "rail-se": [
         "iso-1.jpg",
         "crop.json"
+      ],
+      "microwave": [
+        "iso-1.jpg",
+        "crop.json"
+      ],
+      "chest": [
+        "iso-1.jpg",
+        "crop.json"
       ]
     }
   },
@@ -110,5 +118,17 @@
   "lifted": [
     "fridge",
     "garden"
-  ]
+  ],
+  "added": {
+    "microwave": {
+      "painting": "art/source/areas/clubhouse/clubhouse-kitchen.png",
+      "state": "there",
+      "processing": "cut by the kit like a subject (isolate, mask, its painting's own pixels); hidden by default, no hole in the plate"
+    },
+    "chest": {
+      "painting": "art/source/areas/clubhouse/clubhouse-kitchen.png",
+      "state": "there",
+      "processing": "cut by the kit like a subject (isolate, mask, its painting's own pixels); hidden by default, no hole in the plate"
+    }
+  }
 }

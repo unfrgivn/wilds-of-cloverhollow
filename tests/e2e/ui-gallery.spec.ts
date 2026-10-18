@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
+import { cookGalleryStates } from "../../src/dev/cook-gallery";
 import { moleGalleryStates } from "../../src/dev/mole-gallery";
 import { skeeGalleryStates } from "../../src/dev/skee-gallery";
 import { bunClawLayout, bunMoleLayout, bunSkeeLayout } from "./helpers";
@@ -63,6 +64,8 @@ const battleParts: Record<string, string[]> = {
     state === "skee-result" ? [".sticker-dialogue"] : []])),
   ...Object.fromEntries(moleGalleryStates.map((state) => [state,
     state === "mole-result" ? [".sticker-dialogue"] : []])),
+  ...Object.fromEntries(cookGalleryStates.map((state) => [state,
+    state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-check-hint", ".battle-grade",
@@ -667,6 +670,83 @@ test.describe("sticker gallery", () => {
     }
   }
 
+  // The clubhouse microwave (spec 8.2), from the same real game states, on a
+  // phone and a desktop, in both engines: the microwave in the safe area and
+  // clear of the touch buttons, the glass in it, the timer's and the hint's
+  // glyphs inside their boxes, and in a result, the line over it all. The
+  // layout's own geometry is checked in tests/unit/cook-layout.test.ts.
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of cookGalleryStates) {
+      test(`${state} microwave as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const insets = size.width === 874 ? "0,62,21,62" : "0,0,0,0";
+        await gallery(page, state, true, insets, size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | Range | null): { x: number; y: number;
+            width: number; height: number } => {
+            if (element === null) throw new Error("missing a part of the microwave");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const glyphs = (selector: string): ReturnType<typeof box> | null => {
+            const node = document.querySelector(selector);
+            if (node === null || node.getClientRects().length === 0) return null;
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            return box(range);
+          };
+          const dialogue = document.querySelector(".sticker-dialogue");
+          const shownDialogue = dialogue !== null && dialogue.getClientRects().length > 0
+            ? dialogue : null;
+          const atDialogue = shownDialogue === null ? null : document.elementFromPoint(
+            box(shownDialogue).x + box(shownDialogue).width / 2,
+            box(shownDialogue).y + box(shownDialogue).height / 2);
+          return {
+            viewport: { width: window.innerWidth, height: window.innerHeight },
+            machine: box(document.querySelector(".cook-machine")),
+            glass: box(document.querySelector(".cook-glass")),
+            display: box(document.querySelector(".cook-display")),
+            displayText: glyphs(".cook-display"),
+            front: box(document.querySelector(".cook-front")),
+            frontText: glyphs(".cook-front-text"),
+            dialogue: shownDialogue === null ? null : box(shownDialogue),
+            dialogueOnTop: shownDialogue !== null && atDialogue !== null &&
+              shownDialogue.contains(atDialogue),
+            buttons: [box(document.querySelector(".touch-confirm")),
+              box(document.querySelector(".touch-cancel")),
+              box(document.querySelector(".touch-menu"))],
+          };
+        });
+        type Rect = { x: number; y: number; width: number; height: number };
+        const within = (inner: Rect, outer: Rect, label: string): void => {
+          expect(inner.x, `${label} left`).toBeGreaterThanOrEqual(outer.x - 0.5);
+          expect(inner.y, `${label} top`).toBeGreaterThanOrEqual(outer.y - 0.5);
+          expect(inner.x + inner.width, `${label} right`)
+            .toBeLessThanOrEqual(outer.x + outer.width + 0.5);
+          expect(inner.y + inner.height, `${label} bottom`)
+            .toBeLessThanOrEqual(outer.y + outer.height + 0.5);
+        };
+        within(drawn.machine, { x: 0, y: 0, ...drawn.viewport }, "the microwave");
+        within(drawn.glass, drawn.machine, "the glass");
+        if (drawn.displayText === null) throw new Error("the timer isn't shown");
+        within(drawn.displayText, drawn.display, "the timer's digits");
+        const result = state === "cook-result" || state === "cook-burnt";
+        if (!result) {
+          if (drawn.frontText === null) throw new Error("the hint isn't shown");
+          within(drawn.frontText, drawn.front, "the hint's glyphs");
+          expect(drawn.frontText.height, "the hint's size").toBeGreaterThanOrEqual(9);
+        }
+        for (const button of drawn.buttons)
+          expect(overlaps(drawn.machine, button)).toBe(false);
+        if (result) {
+          if (drawn.dialogue === null) throw new Error("the result line isn't shown");
+          expect(drawn.dialogueOnTop).toBe(true);
+          for (const button of drawn.buttons)
+            expect(overlaps(drawn.dialogue, button)).toBe(false);
+        } else expect(drawn.dialogue).toBeNull();
+      });
+    }
+  }
+
   for (const state of journalStates) {
     test(`${state} journal baseline`, async ({ page }) => {
       await gallery(page, state);
@@ -898,8 +978,16 @@ test.describe("sticker gallery", () => {
       });
     });
   }
+  for (const state of cookGalleryStates) {
+    test(`${state} phone visual baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
   for (const state of ["arcade-ready", "arcade-result", "skee-aiming", "skee-result", "mole-up",
-    "mole-result"]) {
+    "mole-result", "cook-ready", "cook-result"]) {
     test(`${state} desktop visual baseline`, async ({ page }) => {
       await gallery(page, state, false, "0,0,0,0", { width: 1280, height: 720 });
       await expect(page).toHaveScreenshot(`${state}-desktop.png`, {

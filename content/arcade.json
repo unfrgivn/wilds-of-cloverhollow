@@ -183,5 +183,40 @@
         "price": 80
       }
     ]
+  },
+  "cook": {
+    "ticksPerSecond": 2,
+    "golden": 10,
+    "dishes": {
+      "nuggets": {
+        "label": "Dino nuggets",
+        "time": 60,
+        "frozen": 30,
+        "burnt": 96,
+        "stop": 120
+      },
+      "mac": {
+        "label": "Mac n cheese",
+        "time": 90,
+        "frozen": 45,
+        "burnt": 144,
+        "stop": 180
+      }
+    },
+    "snacks": {
+      "under": 2,
+      "golden": 3,
+      "over": 2,
+      "burnt": 1
+    },
+    "dingTicks": 40,
+    "lines": {
+      "start": "The box says {time}. Hold to cook, and let go when it's golden!",
+      "frozen": "Still frozen in the middle! Hold to cook it some more.",
+      "under": "A little cold in the middle, but yummy! Snacks +{snacks}.",
+      "golden": "DING! Golden and perfect! Snacks +{snacks}.",
+      "over": "A little crispy, but yummy! Snacks +{snacks}.",
+      "burnt": "DING! Extra crispy... Snacks +{snacks}."
+    }
   }
 }

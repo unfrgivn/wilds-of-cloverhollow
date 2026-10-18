@@ -1,0 +1,86 @@
+{
+  "asset": "cook-food",
+  "milestone": 52,
+  "date": "2026-10-17",
+  "summary": "Mom's two dishes for the microwave's turntable: a plate of dino nuggets and a bowl of mac n cheese, painted as cooked just right (the game frosts and darkens them).",
+  "generationSource": "Generated with Gemini; no open source has them in this style.",
+  "calls": 7,
+  "edits": [
+    {
+      "time": "2026-10-17T23:35:09.699Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/arcade/microwave-front-raw.png"
+      ],
+      "prompt": "Two separate dishes, each drawn exactly once, far apart, on a flat, plain, bright magenta (#FF00FF) background. On the left: a small round white plate with five golden dinosaur-shaped chicken nuggets on it (a T. rex, a stegosaurus, a long-neck, a triceratops, and a pterodactyl), cooked just right, crispy and golden. On the right: a small round white bowl full of golden, cheesy macaroni, cooked just right. Both are seen from slightly above, at the same angle as the glass plate inside the microwave in the reference, and painted in its same soft watercolour with thin warm-brown ink outlines. Nothing else: no shadows on the background, no table, no steam, no faded copies, no text.",
+      "output": "1792280109698-gemini-3-pro-image-preview-0.png",
+      "note": "Both dishes on one sheet, seen from straight above: wrong for the turntable, seen almost edge on; and it copied the reference's navy fridge under them."
+    },
+    {
+      "time": "2026-10-17T23:36:06.472Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/scratch/1792280109698-gemini-3-pro-image-preview-0.png",
+        "art/source/arcade/microwave-front-raw.png"
+      ],
+      "prompt": "Repaint the two dishes from the first reference (the plate of dinosaur nuggets and the bowl of macaroni and cheese), the same food in the same soft watercolour with thin warm-brown ink outlines, but seen from the front and only a little above, like looking straight into the microwave in the second reference: the plate and the bowl rest flat on a table you see nearly edge-on, so the plate is a wide, thin oval and the bowl's rim is a flat oval. The five dinosaur nuggets are piled on the plate, a few leaning up against each other so their dinosaur shapes (a T. rex, a stegosaurus, a long-neck, a triceratops, a pterodactyl) face the viewer. The macaroni is heaped up a little above the bowl's rim. Each dish drawn exactly once, far apart, on a flat, plain, bright magenta (#FF00FF) background that fills the whole picture. Nothing else: no microwave, no fridge, no table, no shadows on the background, no steam, no faded copies, no text.",
+      "output": "1792280166470-gemini-3-pro-image-preview-0.png",
+      "note": "Asked for a low angle with the first sheet as the reference: it copied the sheet."
+    },
+    {
+      "time": "2026-10-17T23:36:55.546Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "public/assets/arcade/claw-machine.webp",
+        "public/assets/arcade/skee-lane.webp"
+      ],
+      "prompt": "A small white plate with a little pile of golden dinosaur-shaped chicken nuggets, seen from the side at eye level, only a little above the plate: the plate is a thin, flat oval, about five times wider than it is tall, and the nuggets stand up in a pile on it, leaning against each other, so their dinosaur shapes face the viewer: a T. rex, a stegosaurus, a long-neck, a triceratops. Cooked just right, crispy and golden. Painted in exactly the soft watercolour with thin warm-brown ink outlines of the two reference pictures (an arcade claw machine and a skee-ball lane). Drawn exactly once, alone in the middle of a flat, plain, bright magenta (#FF00FF) background that fills the whole picture. Nothing else: no table, no shadow on the background, no steam, no faded copies, no text.",
+      "output": "1792280215544-gemini-3-pro-image-preview-0.png",
+      "note": "The nuggets standing on a thin oval plate, at the turntable's angle. It painted a faded skee-lane floor under the plate, joined to it by a glow; cut at a 50% key, the plate comes away alone (tools/art/build-cook-food.ts).",
+      "kept": "art/source/cook/nuggets-raw.png"
+    },
+    {
+      "time": "2026-10-17T23:37:15.958Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "public/assets/arcade/claw-machine.webp",
+        "public/assets/arcade/skee-lane.webp"
+      ],
+      "prompt": "A small round white bowl full of golden, cheesy macaroni, heaped up a little above the rim, seen from the side at eye level, only a little above the bowl: you see the bowl's round side, and its rim is a flat oval, much wider than tall. Cooked just right. Painted in exactly the soft watercolour with thin warm-brown ink outlines of the two reference pictures (an arcade claw machine and a skee-ball lane). Drawn exactly once, alone in the middle of a flat, plain, bright magenta (#FF00FF) background that fills the whole picture. Nothing else: no table, no shadow on the background, no steam, no faded copies, no text.",
+      "output": "1792280235956-gemini-3-pro-image-preview-0.png",
+      "note": "The bowl side on, at the turntable's angle, but on the same faded floor, which no key separates from it."
+    },
+    {
+      "time": "2026-10-17T23:38:38.778Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/scratch/1792280215544-gemini-3-pro-image-preview-0.png"
+      ],
+      "prompt": "Keep the plate and its dinosaur nuggets EXACTLY as they are: the same size and position, every line and colour. Change only the background: remove the pale glowing floor with the yellow and teal stripes at the bottom of the picture, and the pale white glow under the dish, and fill all of it with the same flat, plain, bright magenta (#FF00FF) as the rest of the background, right up to the dish's own edge. The whole background is one flat magenta; nothing else changes.",
+      "output": "1792280318776-gemini-3-pro-image-preview-0.png",
+      "note": "An edit asking for the floor to be removed: unchanged."
+    },
+    {
+      "time": "2026-10-17T23:38:59.587Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/scratch/1792280235956-gemini-3-pro-image-preview-0.png"
+      ],
+      "prompt": "Keep the bowl and its macaroni EXACTLY as they are: the same size and position, every line and colour. Change only the background: remove the pale glowing floor with the yellow and teal stripes at the bottom of the picture, and the pale white glow under the dish, and fill all of it with the same flat, plain, bright magenta (#FF00FF) as the rest of the background, right up to the dish's own edge. The whole background is one flat magenta; nothing else changes.",
+      "output": "1792280339585-gemini-3-pro-image-preview-0.png",
+      "note": "The same for the bowl: unchanged."
+    },
+    {
+      "time": "2026-10-17T23:41:59.907Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "/private/var/folders/vh/53q4qxpx6jd37xysdw6ngzg40000gn/T/opencode/m52/z-nuggets-50/raw-01.png"
+      ],
+      "prompt": "A small round white bowl full of golden, cheesy macaroni, heaped up a little above the rim, painted in exactly the same soft watercolour with thin warm-brown ink outlines as the reference plate of dinosaur nuggets, and seen from the same low angle, side on and only a little above: you see the bowl's round side, and its rim is a flat oval, much wider than it is tall. About as wide as the reference plate is. Cooked just right. Drawn exactly once, alone in the middle of a flat, plain, bright magenta (#FF00FF) background that fills the whole picture, with magenta all around it, below it too. Nothing else: no plate, no nuggets, no table or floor, no shadow on the background, no steam, no faded copies, no text.",
+      "output": "1792280519905-gemini-3-pro-image-preview-0.png",
+      "note": "The bowl again, styled on the nuggets' clean cut-out (on magenta): alone, whole, and clear of the sheet's edges.",
+      "kept": "art/source/cook/mac-raw.png"
+    }
+  ],
+  "postProcessing": "tools/art/build-cook-food.ts: each dish cut whole (extract-figures.ts; the nuggets at a 50% key, the bowl at 18%), keyed with its holes (the gaps between the nuggets, the T. rex's mouth), despilled along the alpha edge only (despill-edge.ts, magenta: warm browns kept), scaled (24.3%, 17.0%) into 512x320 cells with the foot 8 px up, and set side by side (public/assets/arcade/cook-food.png and .json). No magenta pixel is left; rebuilt twice with the same hashes."
+}

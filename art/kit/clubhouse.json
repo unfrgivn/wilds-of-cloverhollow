@@ -914,6 +914,70 @@
         "object": 1
       },
       "core": 2
+    },
+    {
+      "id": "microwave",
+      "painting": "art/source/areas/clubhouse/clubhouse-kitchen.png",
+      "added": "there",
+      "crop": [
+        528,
+        110,
+        120,
+        110
+      ],
+      "seed": [
+        590,
+        175
+      ],
+      "painted": true,
+      "object": "the small cream retro microwave with the mint-green door on top of the fridge: its body, its door and dark window, its handle, and its control panel; not the fridge under it, the string lights, the drawing on the wall, or the wall",
+      "home": [
+        586,
+        367
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "chest",
+      "painting": "art/source/areas/clubhouse/clubhouse-kitchen.png",
+      "added": "there",
+      "crop": [
+        300,
+        315,
+        165,
+        150
+      ],
+      "seed": [
+        400,
+        410
+      ],
+      "painted": true,
+      "object": "the honey-coloured wooden toy chest with the rounded lid, the brass corners, and the brass latch, standing on the floor, with the soft shadow right under it on the floorboards; not the wall, the drawings, the bottles, or the open floor around it",
+      "footprint": [
+        [
+          [
+            315,
+            424
+          ],
+          [
+            365,
+            451
+          ],
+          [
+            450,
+            414
+          ],
+          [
+            400,
+            387
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
     }
   ]
 }

@@ -18,6 +18,7 @@ import {
   parseClawCalibration,
   parseMapCentres,
   parseMoleCalibration,
+  parseCookCalibration,
   parseSkeeCalibration,
 } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
@@ -211,6 +212,12 @@ async function boot(): Promise<void> {
   const moleImage = new Image();
   moleImage.src = assetUrl(moleAtlas.replace(".json", ".png"));
   await moleImage.decode();
+  // Mom's dishes for the clubhouse microwave (spec 8.2).
+  const foodAtlas = "assets/arcade/cook-food.json";
+  const foodSheet = await Assets.load<Spritesheet>(assetUrl(foodAtlas));
+  const foodImage = new Image();
+  foodImage.src = assetUrl(foodAtlas.replace(".json", ".png"));
+  await foodImage.decode();
   // The arcade games' paintings and their calibrations (spec 8.2), each
   // decoded before its close-up can open.
   const painting = async <T extends { image: string }>(
@@ -225,10 +232,11 @@ async function boot(): Promise<void> {
     await image.decode();
     return { calibration, image: image.src };
   };
-  const [clawPainting, skeePainting, molePainting] = await Promise.all([
+  const [clawPainting, skeePainting, molePainting, cookPainting] = await Promise.all([
     painting("assets/arcade/claw-machine.json", parseClawCalibration),
     painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
     painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
+    painting("assets/arcade/microwave.json", parseCookCalibration),
   ]);
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
@@ -320,6 +328,9 @@ async function boot(): Promise<void> {
     ...molePainting,
     art: (frameName) => sheetFrame(moleSheet, moleAtlas, frameName),
     onHole,
+  }, {
+    ...cookPainting,
+    art: (frameName) => sheetFrame(foodSheet, foodAtlas, frameName),
   });
   const initialArea = content.world.areas[state.area];
   if (initialArea === undefined) throw new Error("Missing initial area");

@@ -120,9 +120,33 @@
         "y": 0.85965
       }
     },
-    "crate": {
+    "chest": {
       "frame": {
         "x": 392,
+        "y": 430,
+        "w": 300,
+        "h": 264
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 300,
+        "h": 264
+      },
+      "sourceSize": {
+        "w": 300,
+        "h": 264
+      },
+      "anchor": {
+        "x": 0.48,
+        "y": 0.96212
+      }
+    },
+    "crate": {
+      "frame": {
+        "x": 694,
         "y": 430,
         "w": 290,
         "h": 260
@@ -142,6 +166,30 @@
       "anchor": {
         "x": 0.46207,
         "y": 0.86538
+      }
+    },
+    "microwave": {
+      "frame": {
+        "x": 986,
+        "y": 430,
+        "w": 220,
+        "h": 179
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 220,
+        "h": 179
+      },
+      "sourceSize": {
+        "w": 220,
+        "h": 179
+      },
+      "anchor": {
+        "x": 0.47273,
+        "y": 2.74302
       }
     }
   },

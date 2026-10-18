@@ -187,6 +187,7 @@ export type ArcadeContent = {
   claw: ClawContent;
   skee: SkeeContent;
   mole: MoleContent;
+  cook: CookContent;
   counter: CounterContent;
   prizes: { id: string; name: string; frame: string }[];
 };
@@ -292,6 +293,34 @@ export type SkeeCalibration = {
 // The painted Boop-a-Mole cabinet (`public/assets/arcade/mole-cabinet.json`,
 // spec 8.2), in the image's pixels: the blank marquee plate, and each hole's
 // opening, the ellipse where its dark inside meets the rim.
+// The clubhouse microwave's cooking game (spec 8.2). A dish's `time` is its
+// box's, in microwave seconds, each `ticksPerSecond` ticks long. Let go before
+// `frozen` and it's still frozen (the next hold cooks on); within `golden`
+// seconds of `time` it's golden; from `burnt` on it's burnt; at `stop` the
+// microwave stops itself. What each pays (`snacks`), and what each says.
+export type CookDish = "nuggets" | "mac";
+export type CookZone = "under" | "golden" | "over" | "burnt";
+export type CookContent = {
+  ticksPerSecond: number;
+  golden: number;
+  dishes: Record<CookDish,
+    { label: string; time: number; frozen: number; burnt: number; stop: number }>;
+  snacks: Record<CookZone, number>;
+  dingTicks: number;
+  lines: { start: string; frozen: string } & Record<CookZone, string>;
+};
+// The microwave's close-up (public/assets/arcade/microwave.json), in its
+// image's pixels: the door's glass, the turntable's rim inside it, the timer's
+// display, the start button, and the fridge's front under it.
+export type CookCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  glass: { x: number; y: number; w: number; h: number; r: number };
+  plate: { cx: number; cy: number; rx: number; ry: number };
+  display: { x: number; y: number; w: number; h: number };
+  button: { cx: number; cy: number; r: number };
+  front: { x: number; y: number; w: number; h: number };
+};
 export type MoleCalibration = {
   image: string;
   size: { w: number; h: number };
@@ -703,6 +732,8 @@ export type State = {
 };
 // What a tick of an arcade game changes: the game itself and what it pays out.
 export type ArcadeOwned = Pick<State, "arcade" | "prizes" | "tickets">;
+// A tick of any of them: the cooking game pays snacks too.
+export type ArcadeStep = ArcadeOwned & Pick<State, "snacks">;
 export type Mood = "chaos" | "calm";
 // A critter out in Fae's area, set piece or recurring (`presentCritters`):
 // `key` is a set piece's id or `wild:<den>`.

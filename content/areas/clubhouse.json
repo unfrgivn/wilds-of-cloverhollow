@@ -130,6 +130,15 @@
       },
       "knot": "club_bottles",
       "prompt": "Look"
+    },
+    {
+      "id": "chest",
+      "knot": "club_chest",
+      "point": {
+        "x": 410,
+        "y": 452
+      },
+      "prompt": "Look"
     }
   ],
   "npcs": [],
@@ -188,6 +197,30 @@
         {
           "state": "planted",
           "while": "garden_planted"
+        }
+      ]
+    },
+    {
+      "id": "microwave",
+      "prop": "microwave",
+      "x": 586,
+      "y": 367,
+      "rules": [
+        {
+          "state": "there",
+          "while": "has_microwave"
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "prop": "chest",
+      "x": 383,
+      "y": 451,
+      "rules": [
+        {
+          "state": "there",
+          "while": "has_chest"
         }
       ]
     }

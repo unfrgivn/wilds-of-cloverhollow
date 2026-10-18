@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 49, lasso spots; Milestone 46, Boop-a-Mole)
+Last updated: 2026-10-17 (Milestone 52, the clubhouse kitchen)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -541,6 +541,26 @@ ios/            Capacitor iOS project (from Milestone 4).
   plays once (`sound: flute`); a wrong song ends with a hint. After that the
   xylophone is free play. Like the lasso, the flute is a story item with no
   button yet.
+- The clubhouse kitchen (Milestone 52): once the club is claimed, Mom gives it
+  her old microwave and her old toy chest, first thing when Fae talks to her
+  (`mom.kitchen`: `has_microwave`, `has_chest`). Both are added props in the
+  clubhouse (section 6.2), cut from an edit of its painting
+  (`clubhouse-kitchen.png`): the microwave on the fridge (prop `microwave`,
+  sorted just in front of it) and the chest on the floor under the drawings
+  (prop `chest`, solid), each `there` while its variable. Once the microwave's
+  given, Mom's freezer (the kitchen's `fridge` look point) gives a box at a
+  time: dino nuggets (`has_nuggets`) or mac n cheese (`has_mac`). With a box,
+  the clubhouse fridge's look point offers to cook it (`play: cook-nuggets 0`
+  or `play: cook-mac 0`, the cooking game, section 8.2; the box used up,
+  `meals_cooked` up by one) or to open the fridge as ever. The chest's look
+  point (`chest` at (410, 452); the drawings on the wall before the chest
+  comes) shows what Fae has found, oldest first, each from the variable that
+  says she found it: the pup's purple thread (`pup_calm`), the note from under
+  the comics (always: the club is claimed), the hooded kid's marker
+  (`saw_hood`), the Star Racer token (`stash_found`), the pond's tin
+  (`pond_tin`), the treasure map (`has_map`), and a bow from Rosie's kite
+  (`kite_returned`). The journal tells of the freezer, the box in hand, and
+  the chest.
 - Lasso spots (Milestone 49): once Fae has Coach Ash's lasso, three things
   are stuck out of reach, each an added prop (section 6.2) shown while
   `has_lasso` and hidden again once it's down. In Meadow Park, Rosie's kite
@@ -1607,7 +1627,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   pill like the notes page's Coins and Snacks (an orange ticket and the
   count, Milestone 45).
 
-### 8.2 Arcade games (Milestones 44 to 46)
+### 8.2 Arcade games (Milestones 44 to 46) and the clubhouse microwave (52)
 - The claw machine, skee-ball, and Boop-a-Mole, once Mr. Pip is calm
   (`calmed("arcade-keeper")`): a line tagged `play: <game> <price>` (`claw`,
   `skee`, or `mole`, 2 coins each) opens the game when the conversation
@@ -1852,6 +1872,57 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Boop-a-Mole's cues: `mole-pop` as each mole starts rising, `mole-boop` or
   `mole-whiff` (a squeak) as the hammer lands, and `tickets-won` at the
   result.
+- The clubhouse microwave's cooking game (Milestone 52) opens the same way,
+  from the clubhouse fridge's look point with a box of Mom's in hand:
+  `play: cook-nuggets 0` or `play: cook-mac 0`, free. `state.arcade` is then
+  `{ game: "cook", dish: "nuggets" | "mac", phase, phaseTicks, cooked,
+  message, revealed }` (`src/core/cook.ts`). A step returns what the game owns
+  and Fae's snacks (`ArcadeStep`); only cooking changes the snacks.
+- Its rules: `ready` until a press starts it (`cooking`); each tick the press
+  is held, `cooked` goes up by one. Let go still frozen (`cooked` under the
+  dish's `frozen` seconds) and it's `paused`, the frozen line showing, until a
+  press cooks on from there. Let go later, or hold to the dish's `stop` (the
+  microwave stops itself), and it dings (`ding`, `dingTicks`), then the
+  `result`: how it came out pays its snacks into Fae's backpack and its line
+  types out (a press shows it all; the next closes it). How it came out, at
+  `cooked / ticksPerSecond` seconds: `burnt` from the dish's `burnt` on, else
+  `golden` within `golden` seconds of its `time` (the box's), else `under` or
+  `over`. No clock but the stop, no random draw: where Fae lets go decides it.
+- Its content (`cook` in `content/arcade.json`, validated by `parseArcade`):
+  `ticksPerSecond` 2 (the timer runs 30 seconds a real second), `golden` 10,
+  the dishes (Dino nuggets: `time` 60, `frozen` 30, `burnt` 96, `stop` 120;
+  Mac n cheese: 90, 45, 144, 180), the `snacks` each way pays (under 2, golden
+  3, over 2, burnt 1), `dingTicks` 40, and the `lines` (`start` with the box's
+  `{time}`, `frozen`, and one per way out with `{snacks}`). Whole numbers;
+  each dish frozen, then under, golden, and over, then burnt, then the stop;
+  every way out pays at least one.
+- Its view (`cookView`): the dish's `label`, the `display` (m:ss of the
+  seconds cooked) and `boxTime`, how the food looks (`frost` 1 to 0 by the
+  frozen time; `steam` from then; `darkness` 0 to 1 from golden's end to
+  burnt; `smoke` once burnt), `cooking` (the light on, the button held),
+  `cooked`, the `zone` once it's dinged, the `hint` (the start line while
+  ready, the frozen line while paused), and the message.
+- The close-up (`src/ui/cook.ts`, laid out by `layoutCook`): the painted
+  microwave on the clubhouse's navy fridge (`public/assets/arcade/
+  microwave.webp`, 1600x1048, cut by `tools/art/build-microwave.ts`), fit to
+  the safe area like skee-ball's. Its calibration (`microwave.json`, read by
+  `parseCookCalibration`), in the image's pixels: the door's `glass` (with its
+  corner radius `r`), the turntable's rim (`plate`), the `display`,
+  the start `button`, and the fridge's `front`. Mom's dish
+  (`public/assets/arcade/cook-food.json`: `nuggets` and `mac`, 512x320 cells
+  anchored at the dish's foot, cut by `tools/art/build-cook-food.ts`) stands on
+  the turntable at (plate.cx, plate.cy + 0.4 plate.ry), clipped to the glass;
+  its frost is its own shape in white at 0.7 of `frost`; overcooking darkens
+  it (brightness 1 - 0.62d, sepia 0.35d); the inside is dim with the light off
+  and glows warm while it cooks; four puffs rise from it by the ticks cooked
+  (steam, or smoke once burnt), never by a clock; and a sheen crosses the
+  glass. The timer shows in green LCD digits, the button is pressed in while
+  held, and the fridge's front is lettered with the hint, or the box and its
+  time ("Dino nuggets · Heat 1:00"); in the result the line shows in the
+  dialogue box instead.
+- Its gallery states (`src/dev/cook-gallery.ts`), each a real game state the
+  core cooked: `cook-ready`, `cook-golden` (cooking at the box's minute),
+  `cook-frozen`, `cook-result` (mac n cheese, golden), and `cook-burnt`.
 
 ## 10. Save and load
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
@@ -1954,8 +2025,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   machine (the part shown), plate, hud | null, holes: [{ hole, x, y, mole: {
   face, drop } | null }], hammer: { x, y } | null, pop: { x, y, text } | null,
   score }`, each hole's `x, y` its centre and a mole's `drop` how far below
-  its full rise it is. Harness builds log `[cloverhollow] arcade { phase,
-  message }` when either value changes.
+  its full rise it is. The microwave: `{ game: "cook", phase, machine,
+  glass, food, display, front, frost, darkness, light, wisps, smoke }`,
+  `front` the fridge's lettering ("" in the result) and `frost` its frost's
+  opacity. Harness builds log `[cloverhollow] arcade { phase, message }` when
+  either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, `sound.level()`
   reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), and

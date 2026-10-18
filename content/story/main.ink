@@ -76,6 +76,10 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
+{has_nuggets: I've got a box of dino nuggets. To the clubhouse microwave! # speaker: Fae}
+{has_mac: I've got a box of mac n cheese. To the clubhouse microwave! # speaker: Fae}
+{has_microwave and not (has_nuggets or has_mac): Mom's freezer has dino nuggets and mac n cheese for the clubhouse microwave. # speaker: Fae}
+{has_chest: Mom gave our club her old toy chest. My treasures from my adventures are in it! # speaker: Fae}
 {kite_returned: I lassoed Rosie's kite down from the park's play tower, and she gave me her arcade coins! # speaker: Fae}
 {kite_down and not kite_returned: I got Rosie's kite down from the play tower. I should take it back to her at school. # speaker: Fae}
 {kite_seen and not kite_down: A kite is tangled on top of the park's play tower. My lasso could reach it! # speaker: Fae}
@@ -158,8 +162,20 @@ Three plates, three cups, and a tiny spoon for Oliver. Breakfast is almost ready
 -> DONE
 
 === fridge ===
+{has_microwave and not (has_nuggets or has_mac): -> freezer}
+{has_nuggets or has_mac: I've already got a box for the clubhouse microwave. # speaker: Fae}
 The fridge is covered in drawings, shopping lists, and one very proud glittery family photo. # speaker: Fae
 -> DONE
+= freezer
+The freezer's full of dino nuggets and mac n cheese! # speaker: Fae
++ [Take the dino nuggets]
+    ~ has_nuggets = true
+    A box of dino nuggets. Off to the clubhouse microwave! # speaker: Fae
++ [Take the mac n cheese]
+    ~ has_mac = true
+    A box of mac n cheese. Off to the clubhouse microwave! # speaker: Fae
++ [Leave them]
+- -> DONE
 
 === island ===
 A big bowl of pancake batter and a whole mountain of blueberries. Yum. # speaker: Fae
@@ -171,6 +187,7 @@ Mom laughs from the kitchen. # speaker: Mom
 -> DONE
 
 === mom ===
+{clubhouse_claimed and not has_microwave: -> kitchen}
 {ate_breakfast: -> again}
 Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
 {plan == "now": Going to look at the fountain? Breakfast first, my little adventurer. # speaker: Mom}
@@ -184,6 +201,15 @@ Morning, sleepyhead! Blueberry pancakes are almost ready. # speaker: Mom
 - -> DONE
 = again
 Have a good day, sweetie. Stay curious! # speaker: Mom
+-> DONE
+= kitchen
+Fae! A little bird told me you and your friends have a clubhouse now. # speaker: Mom
+Every clubhouse needs a kitchen. Take my old microwave! # speaker: Mom
+~ has_microwave = true
+~ has_chest = true
+And the old toy chest from the hall, for your treasures. # speaker: Mom
+Thanks, Mom! Jordan and Sue can help me carry them up the ladder. # speaker: Fae
+There are dino nuggets and mac n cheese in the freezer. Take a box whenever you like! # speaker: Mom
 -> DONE
 
 === pup_calm ===
@@ -1137,6 +1163,9 @@ VAR garden_ripe = false
 -> DONE
 
 === club_fridge ===
+{has_nuggets or has_mac: -> cook}
+- (club_door)
+{has_microwave and not (has_nuggets or has_mac) and meals_cooked == 0: Mom's microwave is up on top. With a box from her freezer, I can cook! # speaker: Fae}
 {fridge_fixed: -> stocked}
 An old fridge with its door hanging open. Inside, it's as warm as toast. # speaker: Fae
 Leave it to me! I keep the cooler on my dad's boat running. # speaker: Sue
@@ -1156,6 +1185,20 @@ The fridge is full of cold strawberries from the deck! # speaker: Fae
 + [Leave them]
     They'll keep. # speaker: Fae
     -> DONE
+= cook
+Mom's microwave is up on top of the fridge, ready to go! # speaker: Fae
++ {has_nuggets} [Cook the dino nuggets]
+    ~ has_nuggets = false
+    ~ meals_cooked += 1
+    In go the dino nuggets! # speaker: Fae # play: cook-nuggets 0
+    -> DONE
++ {has_mac} [Cook the mac n cheese]
+    ~ has_mac = false
+    ~ meals_cooked += 1
+    In goes the mac n cheese! # speaker: Fae # play: cook-mac 0
+    -> DONE
++ [Open the fridge]
+    -> club_fridge.club_door
 = take
 ~ fridge_baskets -= 1
 Fae packs three strawberry snacks into her backpack. # speaker: Fae # gift: snack 3
@@ -1332,3 +1375,28 @@ A long red scarf is caught on the pink lift chair, flapping in the wind. # speak
 + [Leave it]
     -> DONE
 
+
+// The clubhouse kitchen (Milestone 52): Mom's old microwave on the fridge, her
+// freezer's boxes to cook in it, and her old toy chest for Fae's treasures.
+VAR has_microwave = false
+VAR has_chest = false
+VAR has_nuggets = false
+VAR has_mac = false
+VAR meals_cooked = 0
+
+// What Fae keeps, oldest first, each from when the story says she found it.
+=== club_chest ===
+{not has_chest: -> drawings}
+Fae lifts the lid of the old toy chest. Everything she's found on her adventures is in here! # speaker: Fae
+{pup_calm: The purple thread from the Pond Pup's tennis ball. It came from a purple hood! # speaker: Fae}
+The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" # speaker: Fae
+{saw_hood: The purple marker the hooded kid dropped at school. # speaker: Fae}
+{stash_found: The Star Racer token from the hooded kid's stash. I'll give it back when I find them! # speaker: Fae}
+{pond_tin: The old tin the Pond Pup fetched out of the park pond. # speaker: Fae}
+{has_map: The treasure map from the bottle by Sue's dock. X marked the spot! # speaker: Fae}
+{kite_returned: A bow from the tail of Rosie's kite. She gave it to me for getting it down! # speaker: Fae}
+Fae closes the lid gently. # speaker: Fae
+-> DONE
+= drawings
+Drawings pinned to the wall: a kid with a big smile, and hearts and flowers. # speaker: Fae
+-> DONE

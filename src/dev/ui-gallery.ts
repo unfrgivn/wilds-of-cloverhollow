@@ -22,14 +22,18 @@ import { createJournal, type JournalView } from "../ui/journal";
 import { createArcade } from "../ui/arcade";
 import { createTitleScreen, type TitleView } from "../ui/title";
 import {
-  loadContent, parseClawCalibration, parseMoleCalibration, parseSkeeCalibration,
+  loadContent, parseClawCalibration, parseCookCalibration, parseMoleCalibration,
+  parseSkeeCalibration,
 } from "../content/load";
 import { clawGalleryView } from "./claw-gallery";
+import { cookGalleryView } from "./cook-gallery";
 import { moleGalleryView } from "./mole-gallery";
 import { skeeGalleryView } from "./skee-gallery";
 import calibrationData from "../../public/assets/arcade/claw-machine.json";
 import skeeCalibrationData from "../../public/assets/arcade/skee-lane.json";
 import moleCalibrationData from "../../public/assets/arcade/mole-cabinet.json";
+import cookCalibrationData from "../../public/assets/arcade/microwave.json";
+import foodAtlas from "../../public/assets/arcade/cook-food.json";
 import moleAtlas from "../../public/assets/arcade/moles.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
 
@@ -75,17 +79,18 @@ if (arcadeFixture === undefined) throw new Error("Missing the arcade fixture");
 const clawView = clawGalleryView(content.world, arcadeFixture, state);
 const skeeView = skeeGalleryView(content.world, arcadeFixture, state);
 const moleView = moleGalleryView(content.world, arcadeFixture, state);
-const gameView = clawView ?? skeeView ?? moleView;
+const cookView = cookGalleryView(content.world, arcadeFixture, state);
+const gameView = clawView ?? skeeView ?? moleView ?? cookView;
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
 const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
-  state.startsWith("mole-");
+  state.startsWith("mole-") || state.startsWith("cook-");
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup"
   : state !== "prompt" && !journalState && !titleState &&
     (!arcadeState || state === "arcade-result" || state === "skee-result" ||
-      state === "mole-result");
+      state === "mole-result" || state === "cook-result" || state === "cook-burnt");
 if (battleState) document.documentElement.dataset.battle = "open";
 // A catch or a lean shows its touch arrows (spec 8.1).
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
@@ -232,6 +237,17 @@ const arcade = createArcade(stage, galleryPrizeArt, {
   art: galleryMoleArt,
   // The gallery's states are fixed: a tap on a hole has nothing to play.
   onHole: () => undefined,
+}, {
+  calibration: parseCookCalibration(cookCalibrationData, "public/assets/arcade/microwave.json"),
+  image: "assets/arcade/microwave.webp",
+  art: (frame) => {
+    const rect = Object.entries(foodAtlas.frames).find(([name]) => name === frame)?.[1].frame;
+    return rect === undefined ? null : {
+      src: "assets/arcade/cook-food.png",
+      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+      atlas: { w: foodAtlas.meta.size.w, h: foodAtlas.meta.size.h },
+    };
+  },
 });
 const title = createTitleScreen(stage);
 title.onChoose((id) => {
@@ -565,7 +581,8 @@ const decoded = (src: string): Promise<void> => {
 };
 void Promise.all([document.fonts.ready, decoded("assets/arcade/claw-machine.webp"),
   decoded("assets/arcade/skee-lane.webp"), decoded("assets/arcade/mole-cabinet.webp"),
-  decoded("assets/arcade/moles.png"), decoded("assets/prizes/prizes.png")])
+  decoded("assets/arcade/moles.png"), decoded("assets/prizes/prizes.png"),
+  decoded("assets/arcade/microwave.webp"), decoded("assets/arcade/cook-food.png")])
   .then(
     () =>
       new Promise<void>((resolve) => {

@@ -1,0 +1,23 @@
+{
+  "asset": "clubhouse-kitchen",
+  "milestone": 52,
+  "date": "2026-10-17",
+  "summary": "The clubhouse painting with Mom's old microwave on the fridge and her old toy chest under the drawings, cut by the kit as two added props (art/kit/clubhouse.json: `microwave` and `chest`, hidden until Mom gives them).",
+  "generationSource": "Generated with Gemini as an edit of the approved painting, so the new objects share its paint, light, and registration.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-10-17T23:28:20.110Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/clubhouse/clubhouse-final.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a tree-house clubhouse room in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position: the fridge, its open door, the purple bottles, the drawings, the string lights, the crate, the beanbag, the rails, and the planters all stay exactly as they are. Change only these two things: (1) a small, old, rounded retro microwave oven sitting squarely on the flat top of the dark navy mini fridge in the back corner: cream-coloured with a mint-green door frame, a dark glass window, and a narrow control panel on its right with a little round dial. It's a little narrower than the fridge's top, so the fridge's top edge shows on either side of it. (2) an old wooden toy chest on the floor against the left wall, right under the two children's drawings, to the left of the purple bottles: a small chest of warm honey-coloured wood with a rounded lid, two brass corner straps, and a little brass latch, its lid closed, its back against the wall, its bottom flat on the floorboards with a soft shadow under it. It's about as tall as the purple bottles. Paint the new objects in the same soft watercolour with thin warm-brown ink outlines and the same light, at a believable size for the room. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792279700107-gemini-3-pro-image-preview-0.png",
+      "note": "Both objects as asked; the rest of the painting in register (features matched to the plate at a median offset of 0 units, 90th percentile 1.0).",
+      "kept": "art/source/areas/clubhouse/clubhouse-kitchen.png"
+    }
+  ],
+  "postProcessing": "The clubhouse painting's own pipeline (art/recipes/clubhouse.json): magick <raw> -filter Lanczos -resize 2400x1610! -crop 2400x1600+0+5 +repage. Run on the raw output it reproduces the kept file with 0 differing pixels; run on the approved painting it reproduces the plate at a mean difference of 1.6, the tiles' WebP noise.",
+  "kitCalls": "2 isolates, one per prop (art/recipes/clubhouse-kit.json keeps them)."
+}

@@ -16,6 +16,14 @@ async function soundLog(page: Page): Promise<{
 }
 
 test("audio waits for a real key in the browser, then cues play", async ({ page }) => {
+  // Chromium runs each of Playwright's evaluates as a user gesture, so an audio
+  // context made after the first one would start running on its own. Every
+  // script comes late here, as from a busy server: sound must start before the
+  // page has loaded (spec 3.3), not once the renderer's chunks arrive.
+  await page.route("**/*.js", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await route.continue();
+  });
   await openHarness(page);
   await resetPaused(page, "new-game");
   const state = (): Promise<string | undefined> =>

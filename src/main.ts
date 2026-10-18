@@ -75,6 +75,15 @@ const saveKey = "cloverhollow-save";
 
 async function boot(): Promise<void> {
   preventPinchZoom();
+  // Sound starts first, before anything awaits (spec 3.3): its context and its
+  // key, pointer, and touch listeners exist before the page finishes loading,
+  // so only a gesture made after that can have unlocked it.
+  const sound = createAudio((audioState) => {
+    if (import.meta.env.DEV || import.meta.env.MODE === "harness")
+      console.log(
+        `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
+      );
+  });
   await app.init({
     resizeTo: window,
     backgroundColor: 0xf8edcf,
@@ -92,12 +101,6 @@ async function boot(): Promise<void> {
   root.appendChild(app.canvas);
   const keyboard = new Keyboard();
   const gamepad = new GamepadInput();
-  const sound = createAudio((audioState) => {
-    if (import.meta.env.DEV || import.meta.env.MODE === "harness")
-      console.log(
-        `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
-      );
-  });
   const touch = mountTouchControls();
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);

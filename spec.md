@@ -225,15 +225,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   `claw-miss`, and `prize-won` for the claw machine, and `skee-aim`,
   `skee-roll`, `skee-score`, `skee-hundred`, and `tickets-won` for skee-ball,
   and `mole-pop`, `mole-boop`, and `mole-whiff` for Boop-a-Mole.
-- `src/platform/audio.ts` creates the AudioContext at boot and resumes it at
-  every chance: right away, on each key, pointer, or touch, and whenever a cue
-  plays while it isn't running. Browsers hold it (`suspended`, or WebKit's
-  `interrupted`) until a key, click, or tap; a gamepad press is not a user
-  activation in any browser, so a pad-only player on the web hears nothing
-  until one. The iOS app's web view lets it run at once (Capacitor sets
-  `mediaTypesRequiringUserActionForPlayback` to none), so pads get sound there
-  from the start. It synthesizes short, gentle tones in code at a moderate
-  master gain. Audio unavailable or held must never break the game.
+- `src/platform/audio.ts` creates the AudioContext first thing at boot,
+  before anything awaits, and resumes it at every chance: right away, on each
+  key, pointer, or touch, and whenever a cue plays while it isn't running.
+  Browsers hold it (`suspended`, or WebKit's `interrupted`) until a key,
+  click, or tap; a gamepad press is not a user activation in any browser, so a
+  pad-only player on the web hears nothing until one. The iOS app's web view
+  lets it run at once (Capacitor sets `mediaTypesRequiringUserActionForPlayback`
+  to none), so pads get sound there from the start. It synthesizes short,
+  gentle tones in code at a moderate master gain. Audio unavailable or held
+  must never break the game. The context exists before the page has loaded:
+  Playwright runs each evaluate in Chromium as a user gesture, and a context
+  made after one would start without a key (`sound.spec.ts` slows every
+  script to check).
 - iOS: Web Audio keeps WebKit's default `ambient` session, so the ring/silent
   switch mutes the game (Apple's guidance for non-essential game sound).
 - Sound is on by default. Mute is toggled by M or the `♪ on/off` pill on the

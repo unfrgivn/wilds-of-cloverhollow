@@ -3062,6 +3062,16 @@ more bad guys, and the blacklight lantern, made and built while away.
   the heading. Ten journal baselines were updated after viewing them.
 - Harness: `sound.state()`, plus `[cloverhollow] audio` and
   `[cloverhollow] sound` log lines for native checks (spec 11).
+- A fix (2026-10-18): the first `sound.spec.ts` test sometimes found the
+  audio already running before any key, on Chromium in a loaded full run.
+  Playwright runs each evaluate in Chromium as a user gesture, and the shell
+  made the AudioContext only after the renderer's `app.init`, which waits on
+  chunks from the preview server; when they came late, the harness's first
+  evaluate came first, and a context made after it starts running. Sound now
+  starts first in boot, before anything awaits, so its context exists before
+  the page has loaded (spec 3.3). The test now slows every script by 200 ms,
+  as a busy server would: with sound made after `app.init` it fails 6 runs in
+  6, and it passes in both browsers.
 
 ### E2E suite speed (2026-10-08)
 - Cause, measured: with the game paused by the harness, Pixi still redrew

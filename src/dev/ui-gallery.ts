@@ -699,18 +699,23 @@ window.__stickerGallery = {
 };
 renderGalleryState();
 window.addEventListener("resize", renderGalleryState);
-// The claw machine's painting and the plushes are CSS backgrounds, which
-// neither the fonts nor a frame wait for: decode them, then mark the page
-// ready for its screenshots.
+// The arcade's paintings and atlases are CSS backgrounds, which neither the
+// fonts nor a frame wait for: decode the ones this state shows (all seven
+// took Chromium about 0.1 s a page, in every state), then mark the page ready
+// for its screenshots.
+const arcadeArt = ["assets/arcade/claw-machine.webp", "assets/arcade/skee-lane.webp",
+  "assets/arcade/mole-cabinet.webp", "assets/arcade/moles.png", "assets/prizes/prizes.png",
+  "assets/arcade/microwave.webp", "assets/arcade/cook-food.png"];
+const backgrounds = [...document.body.querySelectorAll<HTMLElement>("*")]
+  .filter((element) => element.checkVisibility())
+  .map((element) => getComputedStyle(element).backgroundImage);
 const decoded = (src: string): Promise<void> => {
   const image = new Image();
   image.src = src;
   return image.decode();
 };
-void Promise.all([document.fonts.ready, decoded("assets/arcade/claw-machine.webp"),
-  decoded("assets/arcade/skee-lane.webp"), decoded("assets/arcade/mole-cabinet.webp"),
-  decoded("assets/arcade/moles.png"), decoded("assets/prizes/prizes.png"),
-  decoded("assets/arcade/microwave.webp"), decoded("assets/arcade/cook-food.png")])
+void Promise.all([document.fonts.ready, ...arcadeArt
+  .filter((src) => backgrounds.some((image) => image.includes(src))).map(decoded)])
   .then(
     () =>
       new Promise<void>((resolve) => {

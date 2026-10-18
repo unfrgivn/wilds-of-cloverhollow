@@ -28,17 +28,20 @@ async function gallery(page: Page, state: string, touch = true,
   await page.setViewportSize(size);
   const query = `state=${state}&insets=${insets}${touch ? "&touch=1" : ""}`;
   await page.goto(`/cloverhollow/ui-gallery.html?${query}`);
+  // Fonts and the arcade art the state shows, decoded. A wait for a function
+  // checks every frame; an expect or a locator's wait retried later.
+  await page.waitForFunction(() => document.querySelector("#gallery[data-ready='true']") !== null);
   await expect(page.locator(".gallery-stage")).toBeVisible();
-  // Fonts, the claw machine's painting, and the plushes decoded.
-  await expect(page.locator("#gallery[data-ready='true']")).toHaveCount(1);
-  await page.evaluate(() => new Promise<void>((resolve) => {
-    window.requestAnimationFrame(() => resolve());
-  }));
-  // Measure the settled layout, not a pop-in halfway through. Looping
-  // animations (the advance arrow's bob) never finish, so skip them.
-  await page.evaluate(() => Promise.all(document.getAnimations()
-    .filter((item) => item.effect?.getComputedTiming().iterations !== Infinity)
-    .map((item) => item.finished)));
+  // A frame later, measure the settled layout, not a pop-in halfway through.
+  // Looping animations (the advance arrow's bob) never finish, so skip them.
+  await page.evaluate(async () => {
+    await new Promise<void>((resolve) => {
+      window.requestAnimationFrame(() => resolve());
+    });
+    await Promise.all(document.getAnimations()
+      .filter((item) => item.effect?.getComputedTiming().iterations !== Infinity)
+      .map((item) => item.finished));
+  });
 }
 
 type Rgb = [number, number, number];

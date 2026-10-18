@@ -3255,9 +3255,7 @@ more bad guys, and the blacklight lantern, made and built while away.
   saves WebKit about 0.2 s a test, each page being its own web process, but
   WebKit's shards aren't CI's slowest, and a page that already holds Nunito
   letters the mole marquee differently, see Later); Vitest's `isolate: false`
-  (within noise); loading only a step's last area instead of each one it
-  passes (2 to 3 s a long flow now, against new risk to screenshots: each
-  load recentres the camera, and renders between loads start animations).
+  (within noise).
 - CI's runners differ in speed by half again: two Chromium shards ran the
   same tests at 1.4 and 1.5 times their recorded seconds. A run is bounded
   by its slowest runner, and the record is now each test's mean over
@@ -3274,6 +3272,36 @@ more bad guys, and the blacklight lantern, made and built while away.
   time goes (browser calls, expects, and fixtures by kind, and the test code
   between): `STEP_PROFILE=out.json bunx playwright test <specs>
   --project=chromium --workers=1 --reporter=dot,./tools/ci/step-profile.ts`.
+
+### Test speed, the owner's go-ahead (2026-10-18)
+- The hook's `step` loads only the area it ends in (spec 11, changed with
+  the owner's go-ahead). A replay of chapter one's run before a flow loaded
+  and dropped every room on the way. The view depends on its history in two
+  places, the camera (a dead zone it follows) and a canopy's fading alpha,
+  and loading an area rebuilds both; so a step that left its first area at
+  any tick loads its last afresh, and every screenshot and hash is
+  unchanged. The 31 specs that replay a recorded run, and two that walk
+  through doors, took 21% less test time locally (222 and 257 s against 292
+  and 312, interleaved).
+- The UI gallery decodes only the arcade art its state shows (it decoded all
+  seven paintings and atlases on every load, about 0.1 s in Chromium), and
+  `gallery()` waits for its page with a check every frame (on the old page,
+  an expect found it about 50 ms later). Chromium's gallery took 100 s
+  against 124 at one worker; WebKit's was ready within about 40 ms of
+  loading already and didn't change.
+- CI: a newer push cancels the run it overtakes on the same branch (a
+  second run had waited 2.5 minutes for macOS runners); Chromium has five
+  shards and WebKit six (each WebKit job spends about 40 s installing system
+  libraries); and a Chromium shard fetches its baselines in the background
+  while its browser restores. `just timings` refreshes the shard record.
+- Not done: switching gallery states inside one page instead of reloading
+  it. The page would carry what one state leaves to the next, the kind of
+  difference the mole marquee showed, for about the time the faster waits
+  above already saved.
+- WebKit's Trace and Talk run of the kid takes about 50 s on CI against 6 s
+  on a Mac: it steps 10 ticks at a time with real keys, and each of its
+  about 200 steps draws a frame in Linux WebKit's software renderer. Fewer
+  steps would move the moments its screenshots are taken, so it stays.
 
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.

@@ -25,6 +25,11 @@ e2e *args:
 build:
   bun run build
 
+# Refresh tests/e2e/timings.json, the seconds per test that CI's shards are
+# planned from, with the mean of the last green CI runs on main (needs `gh`).
+timings runs="3":
+  bun tools/ci/timings.ts --last {{runs}}
+
 # Build the harness and sync it into the native shell.
 ios-sync:
   bun run build:harness

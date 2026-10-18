@@ -1,0 +1,66 @@
+{
+  "asset": "The arcade rearranged: the skee-ball lane in the back-right corner, one big red gumball machine at the front corner, and the rocket cabinet and the other gumball machines gone (Milestone 61)",
+  "date": "2026-10-18",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 4,
+  "calls_note": "4 calls in the generation log, all kept: 2 edits (the lane and the gumball machine) and 2 kit isolates (one each for them).",
+  "method": "First the removals, with no calls: the painting at Milestone 58 (220ce01d) takes the approved painting's pixels (48ec25ce, the same tiles as 9997b8fd) wherever the Milestone 45 lane, the Milestone 58 rocket cabinet, or the Milestone 58 gumball machine beside the claw machine was composited. Then each edit, on that painting: a crop with a flat-colour block-out of what's added at its exact place; one call repainting the block-out in the room's style; the output registered by searching a uniform scale and offset for the least difference over the crop away from the edit (median difference there reported BEFORE compositing); then only the new thing composited.",
+  "restore": {
+    "mask": "art/source/areas/arcade/rearranged/restore-alpha.png: the three composites' alphas (art/source/areas/arcade/skee-edit-alpha.png, concept-edits/front2-alpha.png at (875, 900), and concept-edits/front3-alpha.png at (1350, 700), painting px) merged and grown 4 px",
+    "seam": "just outside it, the Milestone 58 painting differs from the approved one by re-encode noise only: median 0.23/255, max 7.1"
+  },
+  "edits": [
+    {
+      "name": "the skee-ball lane in the back-right corner",
+      "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade, with one flat-colour block-out added in the room's right corner: a child-sized skee-ball lane whose tall purple hood stands with its back against the brick wall, and whose long teal ramp runs from it toward the lower left. The second image shows this skee-ball lane's design. Repaint ONLY the block-out as that finished skee-ball lane in the painting's soft watercolour and thin warm-brown ink style: the tall rounded purple hood, its cream target face with brown rings and a dark centre hole between two yellow posts, facing the lower left; the long teal ramp with yellow side rails on a purple base, sloping down to a small purple foot end at the lower left. Keep the block-out's exact position, outline, size, and perspective, standing on the same floor tiles, with a soft contact shadow on the floor. The soft blurred smudge on the wall and floor around the hood's top and right is where three gumball machines on stands were taken away: there, paint the brick wall, the wall's base, the floor tiles, and the claw machine's right side exactly as they continue around it, with no gumball machines anywhere. Change nothing else: every floor tile, every line, the claw machine, the ticket counter, the bricks, the stars, and the string lights stay exactly as they are, pixel for pixel. No text anywhere.",
+      "aspect_ratio": "3:2",
+      "crop_px": [
+        1350,
+        600,
+        1050,
+        700
+      ],
+      "references": [
+        "art/source/areas/arcade/rearranged/lane-blockout.png",
+        "art/source/areas/arcade/rearranged/lane-design.png: the Milestone 45 lane as painted (painting px x 473..1312, y 930..1489 at 220ce01d), mirrored left to right, flat cream (251, 245, 234) outside its composite alpha"
+      ],
+      "blockout": "lane-blockout.png: 240 long and 60 wide, like the Milestone 45 lane; its long sides along the painted tiles' up-right lines (slope -0.462), its foot along their down-right lines (0.43), the hood's back edge on the wall's base (y = 415.2 + 0.31 (x - 862)); the hood the first 50, 75 tall; the deck 30 tall at the hood and 15 at the foot; contact (1077.7, 482.1) (1135, 499.8) (914.9, 606.4) (859.8, 582.7) in area units. The three gumball machines on stands it stands over were inpainted (Telea) to a soft smudge for the model to repaint.",
+      "raw": "art/source/areas/arcade/rearranged/lane-raw.jpg (2528x1696)",
+      "registration": "scale 2.4229, offset (0, 0); away from the edit: median 1.58/255, p95 17.3, mean 4.48 (the model repainted the claw machine's right side, where the stands stood)",
+      "mask": "art/source/areas/arcade/rearranged/lane-alpha.png: strong differences (above 30 after a 1 px blur) within 90 px of the block-out (the model drew the hood taller and the foot about 30 units longer), the pieces touching it, closed, filled, opened, washes outside it that only got yellower stripped, feathered 0.8 px; the stands' place (their frames, grown 4 px) forced in and feathered 3 px, so the repainted wall meets the old one; only even darkening for its shadow (a 30 px band). One piece, area x 826..1144, y 351..614."
+    },
+    {
+      "name": "the red gumball machine at the front corner",
+      "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade floor, with one flat-colour block-out added near the floor's front corner: a red gumball machine standing on the checkerboard. Repaint ONLY that block-out as a finished, cute red gumball machine in the painting's soft watercolour and thin warm-brown ink style: a round clear glass globe full of colourful gumballs, a red cap on top, a red pedestal body, and a short white base standing on the floor. It faces away from us, into the room, so we see its back: from this side the red body is smooth and plain all the way down. Keep its exact position, outline, size, and perspective, standing on the same tiles. Give it a soft contact shadow on the floor. Change nothing else: every floor tile, every line, and the floor's front edge stay exactly as they are, pixel for pixel. No text anywhere.",
+      "aspect_ratio": "3:2",
+      "crop_px": [
+        675,
+        900,
+        1050,
+        700
+      ],
+      "blockout": "art/source/areas/arcade/rearranged/gumball-blockout.png: the Milestone 58 gumball machine's silhouette 1.4 times (kid height), its base's contact centre on (600, 742) on the front corner's bisector; flat parts by row: red cap, glass globe with a few gumballs, plain red body (seen from behind, no coin plate), white base; area x 566.5..631.5, y 610.5..750",
+      "raw": "art/source/areas/arcade/rearranged/gumball-raw.jpg (2528x1696)",
+      "registration": "scale 2.4229, offset (0, 0); away from the edit: median 1.13/255, p95 7.6, mean 2.23",
+      "mask": "art/source/areas/arcade/rearranged/gumball-alpha.png: strong differences within 40 px of the block-out, filled, one piece (area x 566..636, y 610..756); washes outside it that only got yellower stripped; only even darkening for its shadow"
+    }
+  ],
+  "views": "Viewed: the room whole (it matches the approved layout mockup), the lane's seams at the claw machine, at the wall, and at its foot, and the gumball machine on the floor, each before and after at 2x.",
+  "encode": {
+    "tiles": "The removals and both edits applied to the decoded Milestone 58 painting, then each tile encoded once at WebP quality 92 (method 6), the kit's setting for a patched tile.",
+    "outside": "outside the removals and the edits (an 8 px margin), against Milestone 58's tiles: median 0/255, p99 4, max 19; the q92 round trip: median 0, p99 5 (tile 0) and 7 (tile 1)"
+  },
+  "kit": "Subjects skee-ball (a new crop; isolate sample 1; footprint traced on its mask's foot: (827, 584) (895, 611.5) (1125, 499) (1068, 479); exclude polygons drop three thin lines the isolate kept: the claw machine's bottom ink line, a thin upright line on the wall above the hood, and the wall's base line right of the hood) and gumball-machine (new; sample 1; footprint an ellipse at (600, 740), 25 by 10.5) in art/kit/arcade.json. gumball-red, gumball-yellow, gumball-red-right, rocket-cabinet, and gumball-red-front are removed with their kept samples. The claw machine lists the lane in front of it. Its kept isolate stands: its crop didn't change, and where the old stands and the floor gumball machine cut it, no reachable spot is behind it. 9 frames on one page, each one piece; the default layout rebuilds the painting with 0.00% of its pixels off. The gumball machine covers at most 57% of Fae (the hiding check flags 75%), so it isn't a canopy.",
+  "outputs": [
+    "art/kit/arcade.json",
+    "art/source/areas/arcade/painting/ground_0_0.webp",
+    "art/source/areas/arcade/painting/ground_1_0.webp",
+    "content/areas/arcade.json",
+    "content/props/arcade.json",
+    "public/assets/areas/arcade/ground_0_0.webp",
+    "public/assets/areas/arcade/ground_1_0.webp",
+    "public/assets/areas/arcade/props-0.json",
+    "public/assets/areas/arcade/props-0.png"
+  ],
+  "owner_review": "pending: docs/review-queue.md"
+}

@@ -268,7 +268,7 @@
       ],
       "painted": true,
       "ground": "the checkerboard arcade floor",
-      "object": "the large pastel claw prize machine with its glass chamber, claw, plush prizes, control shelf and lower cabinet, not the gumball machines",
+      "object": "the large pastel claw prize machine with its glass chamber, claw, plush prizes, control shelf and lower cabinet, not the skee-ball lane in front of its right side",
       "footprint": [
         [
           [
@@ -293,405 +293,235 @@
         "object": 2
       },
       "front": [
-        "gumball-red",
-        "gumball-red-front"
+        "skee-ball"
       ],
       "core": 3,
       "solid": true
     },
     {
-      "id": "gumball-red",
-      "crop": [
-        1000,
-        330,
-        100,
-        220
-      ],
-      "seed": [
-        1050,
-        430
-      ],
-      "painted": true,
-      "ground": "the checkerboard arcade floor",
-      "object": "the left red gumball machine with round globe, pedestal, dispenser and base, not the claw machine or other gumballs",
-      "footprint": [
-        [
-          [
-            1069.0,
-            487.0
-          ],
-          [
-            1067.7,
-            489.7
-          ],
-          [
-            1064.0,
-            491.9
-          ],
-          [
-            1058.5,
-            493.5
-          ],
-          [
-            1052.0,
-            494.0
-          ],
-          [
-            1045.5,
-            493.5
-          ],
-          [
-            1040.0,
-            491.9
-          ],
-          [
-            1036.3,
-            489.7
-          ],
-          [
-            1035.0,
-            487.0
-          ],
-          [
-            1036.3,
-            484.3
-          ],
-          [
-            1040.0,
-            482.1
-          ],
-          [
-            1045.5,
-            480.5
-          ],
-          [
-            1052.0,
-            480.0
-          ],
-          [
-            1058.5,
-            480.5
-          ],
-          [
-            1064.0,
-            482.1
-          ],
-          [
-            1067.7,
-            484.3
-          ]
-        ]
-      ],
-      "front": [
-        "gumball-yellow"
-      ],
-      "samples": {
-        "object": 1
-      },
-      "core": 2,
-      "solid": true
-    },
-    {
-      "id": "gumball-yellow",
-      "crop": [
-        1050,
-        340,
-        100,
-        220
-      ],
-      "seed": [
-        1090,
-        440
-      ],
-      "painted": true,
-      "ground": "the checkerboard arcade floor",
-      "object": "the yellow gumball machine with round globe, pedestal, dispenser and base, not the neighboring gumballs",
-      "footprint": [
-        [
-          [
-            1099.0,
-            497.0
-          ],
-          [
-            1097.8,
-            500.1
-          ],
-          [
-            1094.3,
-            502.7
-          ],
-          [
-            1089.1,
-            504.4
-          ],
-          [
-            1083.0,
-            505.0
-          ],
-          [
-            1076.9,
-            504.4
-          ],
-          [
-            1071.7,
-            502.7
-          ],
-          [
-            1068.2,
-            500.1
-          ],
-          [
-            1067.0,
-            497.0
-          ],
-          [
-            1068.2,
-            493.9
-          ],
-          [
-            1071.7,
-            491.3
-          ],
-          [
-            1076.9,
-            489.6
-          ],
-          [
-            1083.0,
-            489.0
-          ],
-          [
-            1089.1,
-            489.6
-          ],
-          [
-            1094.3,
-            491.3
-          ],
-          [
-            1097.8,
-            493.9
-          ]
-        ]
-      ],
-      "front": [
-        "gumball-red-right"
-      ],
-      "samples": {
-        "object": 1
-      },
-      "core": 2,
-      "solid": true
-    },
-    {
-      "id": "gumball-red-right",
-      "crop": [
-        1090,
-        350,
-        90,
-        220
-      ],
-      "seed": [
-        1130,
-        450
-      ],
-      "painted": true,
-      "ground": "the checkerboard arcade floor",
-      "object": "the right red gumball machine with round globe, pedestal, dispenser and base, not the neighboring gumballs",
-      "footprint": [
-        [
-          [
-            1132.0,
-            508.0
-          ],
-          [
-            1130.7,
-            511.4
-          ],
-          [
-            1127.0,
-            514.4
-          ],
-          [
-            1121.5,
-            516.3
-          ],
-          [
-            1115.0,
-            517.0
-          ],
-          [
-            1108.5,
-            516.3
-          ],
-          [
-            1103.0,
-            514.4
-          ],
-          [
-            1099.3,
-            511.4
-          ],
-          [
-            1098.0,
-            508.0
-          ],
-          [
-            1099.3,
-            504.6
-          ],
-          [
-            1103.0,
-            501.6
-          ],
-          [
-            1108.5,
-            499.7
-          ],
-          [
-            1115.0,
-            499.0
-          ],
-          [
-            1121.5,
-            499.7
-          ],
-          [
-            1127.0,
-            501.6
-          ],
-          [
-            1130.7,
-            504.6
-          ]
-        ]
-      ],
-      "samples": {
-        "object": 1
-      },
-      "core": 2,
-      "solid": true
-    },
-    {
       "id": "skee-ball",
       "crop": [
-        250,
-        460,
-        360,
-        320
+        815,
+        335,
+        345,
+        295
       ],
       "seed": [
-        465,
-        650
+        950,
+        545
       ],
       "painted": true,
       "solid": true,
       "ground": "the lilac and cream checkerboard arcade floor",
-      "object": "the child-sized skee-ball lane standing on the checkerboard floor: its tall purple hood at the upper left, with a cream target of brown rings and a dark centre hole between two yellow posts, and its long teal ramp with yellow side rails and a purple base running down to its small purple foot end at the lower right; keep the whole lane and nothing else, not the checkerboard floor around it or under it, not its soft shadow on the floor, not the floor's front edge, and not the cabinet at the top left",
+      "object": "the child-sized skee-ball lane standing in the corner: its tall rounded purple hood against the brick wall at the upper right, with a cream target of brown rings and a dark centre hole between two yellow posts, and its long teal ramp with yellow side rails and a purple base running down to its small purple foot end at the lower left; keep the whole lane and nothing else, not the claw machine behind it, not the brick wall, not the checkerboard floor around it or under it, and not its soft shadow on the floor",
       "footprint": [
         [
           [
-            310,
-            618
+            827,
+            584
           ],
           [
-            364,
-            592
+            895,
+            611.5
           ],
           [
-            579,
-            698
+            1125,
+            499
           ],
           [
-            525,
-            725
+            1068,
+            479
           ]
         ]
       ],
       "samples": {
         "object": 1
-      }
-    },
-    {
-      "id": "rocket-cabinet",
-      "crop": [
-        600,
-        500,
-        190,
-        250
-      ],
-      "seed": [
-        708,
-        650
-      ],
-      "painted": true,
-      "canopy": true,
-      "solid": true,
-      "ground": "the lilac and cream checkerboard arcade floor",
-      "object": "the small purple arcade cabinet standing alone on the checkerboard floor: its lilac marquee, its dark screen with tiny stars and a rocket, its sloped control panel with a red joystick and round buttons, its coin door, and the glowing pink neon rocket outline with a teal round window on its right side; keep the whole cabinet, top to feet, and nothing else, not the floor around or under it, and not its soft shadow on the floor",
-      "footprint": [
+      },
+      "exclude": [
         [
           [
-            659,
-            699
+            850,
+            425
           ],
           [
-            700,
-            719
+            961,
+            425
           ],
           [
-            745,
-            697
+            961,
+            495.5
           ],
           [
-            704,
-            677
+            950,
+            495
+          ],
+          [
+            940,
+            492.5
+          ],
+          [
+            930,
+            489
+          ],
+          [
+            920,
+            485
+          ],
+          [
+            910,
+            481.5
+          ],
+          [
+            900,
+            478
+          ],
+          [
+            890,
+            475
+          ],
+          [
+            880,
+            470.5
+          ],
+          [
+            870,
+            467
+          ],
+          [
+            860,
+            463
+          ],
+          [
+            850,
+            463
           ]
-        ]
-      ],
-      "samples": {
-        "object": 2
-      }
-    },
-    {
-      "id": "gumball-red-front",
-      "crop": [
-        945,
-        410,
-        110,
-        150
-      ],
-      "seed": [
-        998,
-        470
-      ],
-      "painted": true,
-      "solid": true,
-      "ground": "the lilac and cream checkerboard arcade floor",
-      "object": "the red gumball machine standing on the floor in front of the claw machine: its round clear glass globe full of colourful gumballs, its red cap, its red body with a silver coin slot and chute, and its short white base; keep the whole machine, top to base, and nothing else, not the claw machine behind it, not the gumball machines on stands beside it, not the floor, and not its shadow",
-      "footprint": [
+        ],
         [
           [
-            985,
-            528
+            1046,
+            325
           ],
           [
-            998,
-            535
+            1056,
+            325
           ],
           [
-            1012,
-            528
+            1056,
+            351.5
           ],
           [
-            998,
+            1046,
+            351.5
+          ]
+        ],
+        [
+          [
+            1127,
+            480
+          ],
+          [
+            1180,
+            480
+          ],
+          [
+            1180,
+            520
+          ],
+          [
+            1127,
             520
           ]
         ]
+      ]
+    },
+    {
+      "id": "gumball-machine",
+      "crop": [
+        550,
+        600,
+        105,
+        175
+      ],
+      "seed": [
+        600,
+        690
+      ],
+      "painted": true,
+      "solid": true,
+      "ground": "the lilac and cream checkerboard arcade floor",
+      "object": "the big red gumball machine standing alone on the checkerboard floor near its front corner, seen from behind: its round clear glass globe full of colourful gumballs, its red cap, its plain red body, and its short white base; keep the whole machine, top to base, and nothing else, not the floor around or under it, not the floor's front edge, and not its soft shadow on the floor",
+      "footprint": [
+        [
+          [
+            625,
+            740
+          ],
+          [
+            623.1,
+            744
+          ],
+          [
+            617.7,
+            747.4
+          ],
+          [
+            609.6,
+            749.7
+          ],
+          [
+            600,
+            750.5
+          ],
+          [
+            590.4,
+            749.7
+          ],
+          [
+            582.3,
+            747.4
+          ],
+          [
+            576.9,
+            744
+          ],
+          [
+            575,
+            740
+          ],
+          [
+            576.9,
+            736
+          ],
+          [
+            582.3,
+            732.6
+          ],
+          [
+            590.4,
+            730.3
+          ],
+          [
+            600,
+            729.5
+          ],
+          [
+            609.6,
+            730.3
+          ],
+          [
+            617.7,
+            732.6
+          ],
+          [
+            623.1,
+            736
+          ]
+        ]
       ],
       "samples": {
-        "object": 2
-      }
+        "object": 1
+      },
+      "core": 2
     }
   ]
 }

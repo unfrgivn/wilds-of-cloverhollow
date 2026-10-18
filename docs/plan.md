@@ -2906,19 +2906,81 @@ more bad guys, and the blacklight lantern, made and built while away.
   score and the Star Racer token are clues in the finale (Milestone 55).
 - For the owner: the game and its name.
 
-## Milestone 61: The arcade, rearranged **Status:** 🚧 In progress (2026-10-18)
+## Milestone 61: The arcade, rearranged **Status:** ✅ Completed (2026-10-18)
 - The owner rearranged the arcade (2026-10-18) from mockups built from the
-  room's own sprites: one gumball machine, not four; the skee-ball lane and
-  the rocket cabinet no longer standing awkwardly on the front floor.
-- The skee-ball lane moves to the right corner, its hood against the back
-  wall where the three gumball machines on stands were, rolling out toward
-  the room. One red gumball machine, larger, stands in the floor's front
-  corner facing into the room (its back to the camera). The rocket cabinet
-  goes: it was only ever looked at, and the painted cabinets look better
-  without it. Mr. Pip stands at the back, left of the ticket counter. The
-  middle of the floor stays open.
+  room's own sprites (the sixth approved): one gumball machine, not four; the
+  skee-ball lane and the rocket cabinet no longer standing awkwardly on the
+  front floor.
+- The skee-ball lane stands in the room's right corner, its hood against the
+  back wall in front of the claw machine's right side, where the three
+  gumball machines on stands were, rolling out toward the middle of the room.
+  Fae plays it from its left (look point `skee-ball` at (850, 593)). One red
+  gumball machine, larger than the old ones, stands in the floor's front
+  corner facing into the room (its plain back to the camera); it has no look
+  point. The rocket cabinet goes: it was only ever looked at, and the painted
+  cabinets look better without it. Its knot, recorded run, replay test, and
+  e2e go with it. Mr. Pip stands at the back, left of the ticket counter, at
+  (630, 392). The middle of the floor stays open.
+- The claw machine's look point moves to (908, 477), the left of its front:
+  the lane's back is too close to the old spot below it for Fae to stand.
+- Art: the Milestone 58 painting takes the approved painting's pixels back
+  wherever the old lane, the rocket cabinet, and the gumball machine beside
+  the claw machine were (no calls). Then two edits, each a crop with a
+  flat-colour block-out at its exact place and one call: the lane (its
+  design the Milestone 45 lane, mirrored; the model also repainted the wall,
+  floor, and the claw machine's side where the stands were) and the gumball
+  machine (the Milestone 58 machine's silhouette 1.4 times, seen from
+  behind). The kit cuts the new lane and gumball machine (one isolate each)
+  and drops the five removed props. The lane's isolate kept three thin lines
+  that aren't the lane (the claw machine's bottom ink line, an upright line
+  on the wall, and the wall's base line); exclude polygons cut them. The
+  first would have drawn across Fae between the claw machine and the lane.
 - Every recorded run through the arcade is recorded again, since Mr. Pip
-  moves.
+  moved: the arcade's own (claw, skee-ball, Boop-a-Mole, the kit walk) and
+  the pass-party chain from the arcade on (arcade, school, gym, music, field,
+  flute, lasso, kitchen, squirrel, mist, forest, kid, and Milestone 56's
+  ending). Each reads the same beats; only the replay tests' tick pins
+  changed. The chain's runs end sooner (the arcade by 52 ticks, school to
+  squirrel by 111, mist by 94, forest to the ending by 101), and the arcade's
+  own moved by 91 fewer to 37 more. The kit walk now goes behind the
+  skee-ball lane: the counter's hiding spot is in Mr. Pip's touch circle, and
+  there's no room to stand in front of the gumball machine.
+- Evidence: `just check` passed (108 test files and 933 tests; `bun run
+  sim`, 52 runs), and so did `just build` and the full `just e2e` (828 tests
+  on both browsers, 2 browser-only skips). 143 baselines changed (123
+  Chromium, 20 WebKit), and each was viewed before it was replaced: the
+  arcade's against the approved mockup, the rest as old and new crops of what
+  changed. Outside the arcade only later moments that now come sooner
+  changed: the harness's tick label, idle frames, critters along their paths,
+  and, at the Misty Path's seal, a camera 25 pixels lower. The arcade's area
+  checks pass, and from a clean checkout its kit rebuilds with no calls and
+  no changes. `rocket.spec.ts` and its two baselines are gone.
+- Notes and assumptions:
+  - The owner's to review: the room (`art/review/m61-room.png`) and its
+    screenshots.
+  - Numbered 61, not 59: Milestone 60 (a second flute friend) landed while
+    this was in progress. Milestone 59 (a fourth game) now goes on the teal
+    cabinet beside Boop-a-Mole.
+  - Milestone 56 (Wake up) landed while this was in progress too: its kid
+    recorder and its new ending run were run again on the new chain.
+  - The changed baselines were viewed by a second model (the multimodal
+    reviewer): late in this milestone the agent's own image reads came back
+    empty (it couldn't read a probe image of a random number), and the
+    reviewer read three such probes exactly. One label it read was 17 ticks
+    off; the replay settled it.
+  - Mr. Pip's right side is behind the counter's left end, as in the
+    approved mockup. About (595, 396) would clear the counter, but he would
+    cover the Star Racer cabinet (a finale clue) and his touch circle would
+    reach its look point.
+  - The gumball machine covers at most 57% of Fae standing behind it (the
+    hiding check flags 75%), so it isn't a canopy.
+  - The claw machine keeps its isolate: its crop didn't change, and nothing
+    can stand behind it where the old stands and gumball machine notched it.
+  - The Milestone 45 recipe is retired, and the Milestone 58 recipe marks its
+    rocket cabinet and gumball machine edits removed. Their raw outputs,
+    block-outs, and masks stay; the masks outline what was put back.
+  - Art, 4 Gemini calls (the generation log), all kept: 2 edits and 2 kit
+    isolates; `art/recipes/arcade-rearranged.json`.
 
 ## Milestone 36: Gamepad support **Status:** ✅ Completed (2026-10-08)
 - Standard-mapping gamepads now share the keyboard and touch `ActionFrame`:
@@ -3323,6 +3385,7 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Milestone 57, the lodge keeper: done (above), the first of more people
     under the chaos spell (owner, 2026-10-17).
   - Milestone 60, a second flute friend: done (above; owner, 2026-10-18).
+  - Milestone 61, the arcade rearranged: done (above; owner, 2026-10-18).
   - A fix (2026-10-18): the journal's map page still wrote "???" for the
     Enchanted Forest whatever its view said, so the map rule Milestone 53
     added (named once the Misty Path is found or Fae is in the land) never

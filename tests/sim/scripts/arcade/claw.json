@@ -2,6 +2,30 @@
   {
     "frame": {
       "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 20
+  },
+  {
+    "frame": {
+      "move": {
         "x": 1,
         "y": 0
       },
@@ -9,13 +33,73 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 120
+    "ticks": 5
   },
   {
     "frame": {
       "move": {
         "x": 1,
-        "y": 1
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 15
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 20
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
       },
       "confirm": false,
       "cancel": false,
@@ -1263,6 +1347,18 @@
     "frame": {
       "move": {
         "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 65
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
         "y": -1
       },
       "confirm": false,
@@ -1275,13 +1371,49 @@
     "frame": {
       "move": {
         "x": 1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 10
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
         "y": 0
       },
       "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 38
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 10
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
   },
   {
     "frame": {
@@ -1574,6 +1706,18 @@
   {
     "frame": {
       "move": {
+        "x": -1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
         "x": 0,
         "y": -1
       },
@@ -1852,6 +1996,18 @@
       "move": {
         "x": 0,
         "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
       },
       "confirm": false,
       "cancel": false,

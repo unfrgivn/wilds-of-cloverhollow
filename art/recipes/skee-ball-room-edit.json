@@ -1,5 +1,6 @@
 {
   "asset": "The arcade painting with a skee-ball lane on its front-left floor (Milestone 45)",
+  "status": "retired (Milestone 61): the lane moved to the back-right corner and was painted there anew (art/recipes/arcade-rearranged.json); this one's pixels left the painting, its floor put back to the approved painting's. Its raw output, block-out, and mask stay; the mask outlines what Milestone 61 put back.",
   "date": "2026-10-17",
   "model": "gemini-3-pro-image-preview",
   "calls": 7,

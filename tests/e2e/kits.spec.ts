@@ -24,7 +24,7 @@ const rooms = [
   { room: "gym", fixture: "gym", prop: "ball-bin" },
   { room: "east-hall", fixture: "east-hall", prop: "hall-bench" },
   { room: "music", fixture: "music", prop: "xylophone" },
-  { room: "arcade", fixture: "arcade", prop: "ticket-counter" },
+  { room: "arcade", fixture: "arcade", prop: "skee-ball" },
 ];
 
 // Whether the prop is drawn over Fae: of its strips across her body (50 units

@@ -56,7 +56,7 @@ const ball = (aim: number, hold: number): void => {
   for (let count = 0; count < 200 && game().phase === "scored"; count += 1) play.idle(1);
 };
 
-play.approach("skee-ball", "right");
+play.approach("skee-ball", "left");
 play.talk("skee-ball", [0]);
 if (game().phase !== "aiming") throw new Error("skee-ball didn't open");
 const centre = skee.centre;

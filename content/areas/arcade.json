@@ -65,8 +65,8 @@
     {
       "id": "claw-machine",
       "point": {
-        "x": 930,
-        "y": 485
+        "x": 908,
+        "y": 477
       },
       "knot": "claw_machine",
       "prompt": "Play"
@@ -93,8 +93,8 @@
       "id": "skee-ball",
       "knot": "skee_ball",
       "point": {
-        "x": 552,
-        "y": 712
+        "x": 850,
+        "y": 593
       },
       "prompt": "Play"
     },
@@ -106,23 +106,14 @@
         "y": 462
       },
       "prompt": "Play"
-    },
-    {
-      "id": "rocket-cabinet",
-      "knot": "rocket_cabinet",
-      "point": {
-        "x": 685,
-        "y": 707
-      },
-      "prompt": "Look"
     }
   ],
   "critters": [
     {
       "id": "arcade-keeper",
       "point": {
-        "x": 820,
-        "y": 610
+        "x": 630,
+        "y": 392
       }
     }
   ],
@@ -170,40 +161,16 @@
       "y": 504
     },
     {
-      "id": "gumball-red",
-      "prop": "gumball-red",
-      "x": 1052,
-      "y": 494
-    },
-    {
-      "id": "gumball-yellow",
-      "prop": "gumball-yellow",
-      "x": 1083,
-      "y": 505
-    },
-    {
-      "id": "gumball-red-right",
-      "prop": "gumball-red-right",
-      "x": 1115,
-      "y": 517
-    },
-    {
       "id": "skee-ball",
       "prop": "skee-ball",
-      "x": 445,
-      "y": 725
+      "x": 976,
+      "y": 612
     },
     {
-      "id": "rocket-cabinet",
-      "prop": "rocket-cabinet",
-      "x": 702,
-      "y": 719
-    },
-    {
-      "id": "gumball-red-front",
-      "prop": "gumball-red-front",
-      "x": 999,
-      "y": 535
+      "id": "gumball-machine",
+      "prop": "gumball-machine",
+      "x": 600,
+      "y": 751
     }
   ],
   "blockers": []

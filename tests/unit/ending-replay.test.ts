@@ -38,7 +38,7 @@ describe("the ending's recording", () => {
         if (kitchen === null && state.finale === "morning" && state.area === "kitchen" &&
           state.transition === null) kitchen = state;
       }
-    expect(state.tick).toBe(19337);
+    expect(state.tick).toBe(19236);
 
     // One save at the dream's end: the forest as it is, Milo calm, no fizz.
     expect(snapshots).toHaveLength(1);

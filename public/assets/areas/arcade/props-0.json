@@ -29,7 +29,7 @@
         "x": 462,
         "y": 0,
         "w": 390,
-        "h": 585
+        "h": 571
       },
       "rotated": false,
       "trimmed": false,
@@ -37,44 +37,44 @@
         "x": 0,
         "y": 0,
         "w": 390,
-        "h": 585
+        "h": 571
       },
       "sourceSize": {
         "w": 390,
-        "h": 585
+        "h": 571
       },
       "anchor": {
         "x": 0.47692,
-        "y": 1
+        "y": 1.02452
       }
     },
     "skee-ball": {
       "frame": {
         "x": 854,
         "y": 0,
-        "w": 560,
-        "h": 486
+        "w": 620,
+        "h": 527
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 560,
-        "h": 486
+        "w": 620,
+        "h": 527
       },
       "sourceSize": {
-        "w": 560,
-        "h": 486
+        "w": 620,
+        "h": 527
       },
       "anchor": {
-        "x": 0.49464,
-        "y": 0.99383
+        "x": 0.49194,
+        "y": 0.99431
       }
     },
     "cabinet-left": {
       "frame": {
-        "x": 1416,
+        "x": 1476,
         "y": 0,
         "w": 280,
         "h": 420
@@ -98,7 +98,7 @@
     },
     "cabinet-second": {
       "frame": {
-        "x": 1698,
+        "x": 1758,
         "y": 0,
         "w": 230,
         "h": 388
@@ -120,33 +120,9 @@
         "y": 0.99227
       }
     },
-    "rocket-cabinet": {
-      "frame": {
-        "x": 0,
-        "y": 624,
-        "w": 210,
-        "h": 373
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 210,
-        "h": 373
-      },
-      "sourceSize": {
-        "w": 210,
-        "h": 373
-      },
-      "anchor": {
-        "x": 0.5381,
-        "y": 0.98391
-      }
-    },
     "cabinet-middle": {
       "frame": {
-        "x": 212,
+        "x": 0,
         "y": 624,
         "w": 190,
         "h": 371
@@ -170,7 +146,7 @@
     },
     "cabinet-fourth": {
       "frame": {
-        "x": 404,
+        "x": 192,
         "y": 624,
         "w": 210,
         "h": 364
@@ -194,7 +170,7 @@
     },
     "cabinet-rear": {
       "frame": {
-        "x": 616,
+        "x": 404,
         "y": 624,
         "w": 200,
         "h": 351
@@ -216,100 +192,28 @@
         "y": 0.99145
       }
     },
-    "gumball-red": {
+    "gumball-machine": {
       "frame": {
-        "x": 818,
+        "x": 606,
         "y": 624,
-        "w": 90,
-        "h": 275
+        "w": 140,
+        "h": 287
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 90,
-        "h": 275
+        "w": 140,
+        "h": 287
       },
       "sourceSize": {
-        "w": 90,
-        "h": 275
+        "w": 140,
+        "h": 287
       },
       "anchor": {
-        "x": 0.52222,
-        "y": 0.97818
-      }
-    },
-    "gumball-red-right": {
-      "frame": {
-        "x": 910,
-        "y": 624,
-        "w": 100,
-        "h": 273
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 100,
-        "h": 273
-      },
-      "sourceSize": {
-        "w": 100,
-        "h": 273
-      },
-      "anchor": {
-        "x": 0.48,
-        "y": 0.9707
-      }
-    },
-    "gumball-yellow": {
-      "frame": {
-        "x": 1012,
-        "y": 624,
-        "w": 100,
-        "h": 272
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 100,
-        "h": 272
-      },
-      "sourceSize": {
-        "w": 100,
-        "h": 272
-      },
-      "anchor": {
-        "x": 0.49,
-        "y": 0.97059
-      }
-    },
-    "gumball-red-front": {
-      "frame": {
-        "x": 1114,
-        "y": 624,
-        "w": 100,
-        "h": 206
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 100,
-        "h": 206
-      },
-      "sourceSize": {
-        "w": 100,
-        "h": 206
-      },
-      "anchor": {
-        "x": 0.58,
-        "y": 1
+        "x": 0.5,
+        "y": 0.98606
       }
     }
   },
@@ -317,7 +221,7 @@
     "image": "props-0.png",
     "size": {
       "w": 2048,
-      "h": 997
+      "h": 995
     },
     "scale": "1"
   }

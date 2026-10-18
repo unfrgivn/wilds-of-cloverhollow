@@ -3335,7 +3335,19 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 43
+    "ticks": 48
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 20
   },
   {
     "frame": {
@@ -3347,13 +3359,73 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 120
+    "ticks": 5
   },
   {
     "frame": {
       "move": {
         "x": 1,
-        "y": 1
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 15
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 20
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 0
       },
       "confirm": false,
       "cancel": false,
@@ -4492,20 +4564,8 @@
   {
     "frame": {
       "move": {
-        "x": -1,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 5
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
+        "x": 1,
+        "y": -1
       },
       "confirm": false,
       "cancel": false,
@@ -4517,379 +4577,7 @@
     "frame": {
       "move": {
         "x": 1,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 25
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": -1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
         "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": -1,
-        "y": -1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 60
-  },
-  {
-    "frame": {
-      "move": {
-        "x": -1,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 95
-  },
-  {
-    "frame": {
-      "move": {
-        "x": -1,
-        "y": -1
       },
       "confirm": false,
       "cancel": false,
@@ -4900,6 +4588,366 @@
   {
     "frame": {
       "move": {
+        "x": 1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 8
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 65
+  },
+  {
+    "frame": {
+      "move": {
         "x": -1,
         "y": 1
       },
@@ -4907,7 +4955,43 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 111
+    "ticks": 5
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 20
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 15
+  },
+  {
+    "frame": {
+      "move": {
+        "x": -1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 112
   },
   {
     "frame": {
@@ -23847,7 +23931,907 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 127
+    "ticks": 128
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 1,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 14
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": -1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 1
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 31
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": false,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
+  },
+  {
+    "frame": {
+      "move": {
+        "x": 0,
+        "y": 0
+      },
+      "confirm": true,
+      "cancel": false,
+      "menu": false
+    },
+    "ticks": 1
   },
   {
     "frame": {
@@ -23865,385 +24849,13 @@
     "frame": {
       "move": {
         "x": 1,
-        "y": 0
+        "y": -1
       },
       "confirm": false,
       "cancel": false,
       "menu": false
     },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
+    "ticks": 43
   },
   {
     "frame": {
@@ -24255,487 +24867,7 @@
       "cancel": false,
       "menu": false
     },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 1
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 31
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": true,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 0,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 1
-  },
-  {
-    "frame": {
-      "move": {
-        "x": 1,
-        "y": 0
-      },
-      "confirm": false,
-      "cancel": false,
-      "menu": false
-    },
-    "ticks": 80
+    "ticks": 30
   },
   {
     "frame": {

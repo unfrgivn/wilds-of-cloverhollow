@@ -8745,48 +8745,6 @@
         "done",
         null
       ],
-      "rocket_cabinet": [
-        "ev",
-        "str",
-        "^arcade-keeper",
-        "/str",
-        {
-          "x()": "calmed",
-          "exArgs": 1
-        },
-        "!",
-        "/ev",
-        [
-          {
-            "->": ".^.b",
-            "c": true
-          },
-          {
-            "b": [
-              "\n",
-              "^A purple cabinet with a rocket on its side, all fizzy with purple scribbles. ",
-              "#",
-              "^speaker: Fae",
-              "/#",
-              "\n",
-              "done",
-              {
-                "->": ".^.^.^.8"
-              },
-              null
-            ]
-          }
-        ],
-        "nop",
-        "\n",
-        "^A purple cabinet with a neon rocket on its side. Stars twinkle across its screen. ",
-        "#",
-        "^speaker: Fae",
-        "/#",
-        "\n",
-        "done",
-        null
-      ],
       "bakery": [
         [
           "^The bakery smells like warm cinnamon buns. ",

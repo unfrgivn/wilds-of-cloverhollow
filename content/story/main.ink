@@ -1044,16 +1044,6 @@ STAR RACER. HIGH SCORES! # speaker: Fae
 {not calmed("arcade-keeper"): The screen is fizzing with purple scribbles. # speaker: Fae}
 -> DONE
 
-// The purple cabinet at the front of the arcade (Milestone 58), with a neon
-// rocket on its side.
-=== rocket_cabinet ===
-{not calmed("arcade-keeper"):
-    A purple cabinet with a rocket on its side, all fizzy with purple scribbles. # speaker: Fae
-    -> DONE
-}
-A purple cabinet with a neon rocket on its side. Stars twinkle across its screen. # speaker: Fae
--> DONE
-
 === bakery ===
 The bakery smells like warm cinnamon buns. # speaker: Baker
 {coins() < 5:

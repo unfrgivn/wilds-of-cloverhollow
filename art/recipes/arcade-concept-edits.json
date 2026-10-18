@@ -1,5 +1,6 @@
 {
   "asset": "The arcade nearer its concept: neon ARCADE and PLAY, TICKETS and CLAW, a rocket cabinet, and a fourth gumball machine (Milestone 58)",
+  "status": "partly retired (Milestone 61): the rocket cabinet and the gumball machine beside the claw machine left the painting, their floor put back to the approved painting's (art/recipes/arcade-rearranged.json), and their kit subjects went with them; ARCADE, PLAY, CLAW, and TICKETS stay. The removed edits' raw outputs, block-outs, and masks stay; their masks outline what Milestone 61 put back.",
   "date": "2026-10-17",
   "model": "gemini-3-pro-image-preview",
   "calls": 21,
@@ -8,6 +9,7 @@
   "edits": [
     {
       "name": "the rocket cabinet",
+      "status": "removed (Milestone 61)",
       "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade floor, with one flat-colour block-out added: a small purple arcade cabinet standing on the checkerboard. Repaint ONLY that block-out as a finished, cute arcade cabinet in the painting's soft watercolour and thin warm-brown ink style: a purple cabinet whose front (the face toward the lower left) has a pale lit marquee, a dark screen with tiny pixel stars and a little rocket on it, a sloped control panel with a joystick and round buttons, and a coin door below; on its right side, a glowing neon rocket outline in pink with a teal round window. Keep the cabinet's exact position, outline, size, and perspective, standing on the same tiles. Give it a soft contact shadow on the floor. Change nothing else: every floor tile, every line, the skee-ball lane, and the claw machine stay exactly as they are, pixel for pixel. No text anywhere.",
       "aspect_ratio": "3:2",
       "crop_px": [
@@ -50,6 +52,7 @@
     },
     {
       "name": "the gumball machine beside the claw machine",
+      "status": "removed (Milestone 61)",
       "prompt": "This is a crop of an approved hand-painted watercolour game painting of a cozy arcade, with one flat-colour block-out added: a small gumball machine standing on the checkerboard floor in front of the claw machine. Repaint ONLY that block-out as a finished, cute red gumball machine in the painting's soft watercolour and thin warm-brown ink style, like the three gumball machines against the wall: a round clear glass globe full of colourful gumballs, a red cap, a red body with a silver coin slot and a little chute, on a short white base standing on the floor. Keep its exact position, outline, size, and perspective, standing on the same tile. Give it a soft contact shadow on the floor. Change nothing else: every floor tile, every line, the claw machine, the three gumball machines, and the bricks stay exactly as they are, pixel for pixel. No text anywhere.",
       "aspect_ratio": "3:2",
       "crop_px": [

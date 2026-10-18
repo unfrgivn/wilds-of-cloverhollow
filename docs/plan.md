@@ -2783,7 +2783,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     isolates (2 kept); `art/recipes/arcade-concept-edits.json`.
 
 ## Milestone 59: A fourth arcade game **Status:** 📋 Planned
-- A fourth game on the new rocket cabinet (Milestone 58): a short, gentle
+- A fourth game on the teal cabinet beside Boop-a-Mole (`cabinet-second`;
+  the rocket cabinet it was planned for goes in Milestone 61): a short, gentle
   space race for 2 coins, steering a little rocket between lanes to catch
   stars and slip past space rocks, paying tickets a star. Built like the
   other games: a painted close-up of the cabinet's screen, rules in the core,
@@ -2791,6 +2792,20 @@ more bad guys, and the blacklight lantern, made and built while away.
 - The back-row Star Racer cabinet stays as it is: its scribbled-out high
   score and the Star Racer token are clues in the finale (Milestone 55).
 - For the owner: the game and its name.
+
+## Milestone 61: The arcade, rearranged **Status:** 🚧 In progress (2026-10-18)
+- The owner rearranged the arcade (2026-10-18) from mockups built from the
+  room's own sprites: one gumball machine, not four; the skee-ball lane and
+  the rocket cabinet no longer standing awkwardly on the front floor.
+- The skee-ball lane moves to the right corner, its hood against the back
+  wall where the three gumball machines on stands were, rolling out toward
+  the room. One red gumball machine, larger, stands in the floor's front
+  corner facing into the room (its back to the camera). The rocket cabinet
+  goes: it was only ever looked at, and the painted cabinets look better
+  without it. Mr. Pip stands at the back, left of the ticket counter. The
+  middle of the floor stays open.
+- Every recorded run through the arcade is recorded again, since Mr. Pip
+  moves.
 
 ## Milestone 36: Gamepad support **Status:** ✅ Completed (2026-10-08)
 - Standard-mapping gamepads now share the keyboard and touch `ActionFrame`:

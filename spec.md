@@ -2276,8 +2276,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   worker. `tools/ci/shard.ts` splits each project by the recorded seconds per
   test in `tests/e2e/timings.json`, keeping a file's tests together and in
   order (only a file longer than half a shard is cut, into runs of about
-  equal time in order); `tools/ci/timings.ts` refreshes the record from a
-  green run's reports.
+  equal time in order); `tools/ci/timings.ts` refreshes the record from green
+  runs' reports, each test's mean over them (runners differ by half again in
+  speed).
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

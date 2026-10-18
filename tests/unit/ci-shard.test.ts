@@ -91,6 +91,12 @@ describe("CI timings", () => {
     });
   });
 
+  it("averages a test over several runs' reports", () => {
+    const tests = reportTests(parseReport(report));
+    const slower = tests.map((each) => ({ ...each, seconds: each.seconds * 2 }));
+    expect(testTimings([...tests, ...slower])["[chromium] › bay.spec.ts › arrive"]).toBe(2.3);
+  });
+
   it("rejects what isn't a Playwright report or a timings file", () => {
     expect(() => parseReport(JSON.stringify({ suites: [{ specs: [] }] }))).toThrow();
     expect(() => parseTimings(JSON.stringify({ "[chromium] › a.spec.ts › a": "10" }))).toThrow();

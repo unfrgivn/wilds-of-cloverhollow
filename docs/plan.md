@@ -3078,6 +3078,53 @@ more bad guys, and the blacklight lantern, made and built while away.
   worker cut a gallery load from 481 to 121 ms in WebKit and from 304 to
   219 ms in Chromium (locally).
 
+### Test speed (2026-10-18)
+- A tick of the core spent about 45% in collision and 27% building Ink
+  stories (profile of a kitchen replay). `resolveCollision` ran 8 passes over
+  the floor and every blocker for Fae and each follower; a pass depends only
+  on where it starts, so one that moves nothing now ends it, and a blocker
+  whose bounding box is out of reach is skipped (the full test would leave
+  the point alone), and the closest-point scan no longer allocates per edge.
+  `runInk` built a Story from the compiled JSON per command (2.2 ms); one is
+  kept per story and reset to a new Story's state (0.1 ms with the load).
+- Proof it changes nothing: every sim script's state hash every 250 ticks
+  (50 scripts, 166,837 ticks) is identical before and after. Replaying them
+  all took 9.9 to 11.1 s and now 1.6 to 1.7 s, interleaved runs at one load.
+  `bun run sim` went from 12.0 to 13.5 s to 3.4 to 3.8 s; CI's `check` job ran
+  its tests in 39 s against 88.
+- The long e2e flows lost a quarter to two fifths of their time locally
+  (lasso 18.7 to 11.3 s, kitchen 17.3 to 11.7, music 14.7 to 9.6): both the
+  browser's replay and Bun's hash replay run the core.
+- `ui-gallery.spec.ts` runs in parallel mode: in order on one worker, its 263
+  tests per browser kept that worker busy 2.4 minutes after the other four
+  had finished. With that and the faster core, a full local `just e2e` went
+  from 261 s to 206 s, every worker ending within 2 s of the others.
+- Tried and dropped: a browser context shared per worker for the gallery (a
+  bare page load went from 481 to 121 ms in WebKit, but whole tests in A/B
+  runs were within noise in both browsers); one page shared per worker (it
+  saves WebKit about 0.2 s a test, each page being its own web process, but
+  WebKit's shards aren't CI's slowest, and a page that already holds Nunito
+  letters the mole marquee differently, see Later); Vitest's `isolate: false`
+  (within noise); loading only a step's last area instead of each one it
+  passes (2 to 3 s a long flow now, against new risk to screenshots: each
+  load recentres the camera, and renders between loads start animations).
+- CI's runners differ in speed by half again: two Chromium shards ran the
+  same tests at 1.4 and 1.5 times their recorded seconds. A run is bounded
+  by its slowest runner, and the record is now each test's mean over
+  several runs (three, for now).
+- On CI, an A/B on one runner per job (each shard's tests with the old code
+  and the new, alternating which went first): specs that run the core took
+  20 to 58% less time in both browsers (Chromium bedroom 16.0 to 6.7 s, bus
+  15.4 to 8.1, harness 31.7 to 24.0; WebKit harness 34.7 to 24.3). Whole
+  shards stayed within noise: the first run pays a cold start in its first
+  test, and a macOS runner's second run went up to a quarter slower.
+  WebKit on GitHub's arm64 Linux runners took 1.9 times as long as on x64,
+  so it stays on x64.
+- `tools/ci/step-profile.ts` is a Playwright reporter that sums where e2e
+  time goes (browser calls, expects, and fixtures by kind, and the test code
+  between): `STEP_PROFILE=out.json bunx playwright test <specs>
+  --project=chromium --workers=1 --reporter=dot,./tools/ci/step-profile.ts`.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its
@@ -3238,3 +3285,17 @@ Sound follow-ups from Milestone 37:
   restore the chosen level.
 - iOS on a real device: the simulator check below should hold, but a phone
   with a pad and the silent switch hasn't been tried.
+
+Found by the test speed work (2026-10-18):
+- The gallery's mole screenshots fit the marquee hint with the fallback
+  font's metrics, where the game fits it with Nunito's (on the phone layout,
+  20 px against 19 px). `createMole` (`src/ui/mole.ts`) fits the marquee
+  text once, in a draw, and `render` skips the draw while the size and view
+  are unchanged. On a cold gallery load Nunito isn't usable yet at the first
+  draw (`font-display: swap`), and the gallery's redraw after
+  `document.fonts.ready` is skipped. A page that already holds Nunito, like
+  the game long after the title, fits it with Nunito (seven Chromium mole
+  baselines failed on such a page; WebKit's matched). Fix: draw again when
+  fonts finish loading (say, clear `lastKey` on `document.fonts`'
+  `loadingdone`), then redraw whichever mole baselines change, after
+  viewing them.

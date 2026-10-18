@@ -2852,6 +2852,97 @@ the old trail, the owl, and the clubhouse claim.
 - For the owner: her name, her look (drawn to Mrs. Flurry's sheet; the
   concepts have no lifeguard), and her lines.
 
+## Milestone 65: QA mode and the save library **Status:** 🚧 In progress (2026-10-18)
+- The owner asked for a way to playtest later stages without playing from
+  the start (2026-10-18): a library of QA saves, a debug mode that jumps to
+  one, no autosave while testing, and QA saves kept apart from the player's
+  save. Spec section 11 changes with it: fixtures stop being the only
+  shortcut. QA mode is in dev and harness builds only (the browser and the
+  iOS simulator), like the hook (owner, 2026-10-18).
+- Save packs: `content/qa/saves/<id>.json`, each a save in the current
+  format, listed in `content/qa/saves.json` (an id, a label, a short note,
+  the fixture and recorded run it came from, its tick, and whether it is
+  interim). `tools/qa/build-saves.ts` replays the runs and cuts each pack
+  where the game itself would autosave (`autosaveNeeded`), so every pack is
+  a save a playthrough wrote. A unit test fails when a pack goes stale: each
+  must load with `parseSave` and hash the same as its run replayed to its
+  tick. The fix is rerunning the tool.
+- Real packs come from the runs that start at a new game: chapter one (such
+  as after breakfast, after the fountain frog, and the tree house) and the
+  east road (arriving in Bubblegum Bay). Interim packs come from the ends of
+  the `pass-party` runs (Jordan, the lantern, the woods, the school chapter,
+  the lasso, the flute, the clubhouse, the kitchen, the arcade, the lodge,
+  the mist, the forest, and the kid before the ending), labelled in the menu
+  as starting from the shortcut that skips chapter one and Sue's joining
+  (owner, 2026-10-18). Milestone 68 replaces them.
+- QA mode: on the title, Q (or a long press on the logo) opens a QA menu of
+  the packs, and `?qa=<id>` boots straight into one. The title looks as it
+  does in production. While testing, a QA badge names the pack, nothing
+  autosaves, and the player's save is never read or written. Reload or
+  relaunch to leave.
+- `just build` fails if QA mode or a pack reaches the production bundle, or
+  if the harness bundle lacks it.
+- Evidence: unit tests (pack freshness and the QA flow), a real-key e2e (Q
+  on the title, a pack picked with the arrows and Z, a door walked through,
+  the player's save unchanged byte for byte and no autosave written; `?qa=`
+  boots the pack with its badge), the menu and the badge screenshotted and
+  viewed, and the menu on the iOS simulator.
+
+## Milestone 66: Experience and levels **Status:** 📋 Planned (a proposal for the owner's review)
+- The owner asked for experience and levels (2026-10-18), for the cheat
+  console (Milestone 67) to edit. The game has neither, so this adds them as
+  gameplay first. Nothing here is built until the owner approves it.
+- XP: every calm pays XP the way it pays coins, from the critter's content:
+  10 for an ordinary critter, 40 for a mini-boss (the gull, Mr. Pip, Mrs.
+  Flurry, and those after them), and 60 for the hooded kid. Old friends,
+  calmed on touch, pay theirs too. The reward line gains it ("+8 coins, +10
+  XP!").
+- Levels: Fae's level is read from her XP through a table in
+  `content/levels.json`, from level 1 at 0 XP to level 10 at about what a
+  full playthrough earns. Only XP is saved, so the two can't disagree.
+- What a level does: each level past the first adds 1 calm to Soothe and the
+  friends' commands, and levels 4 and 8 add an energy leaf, both from the
+  table. Talk and Snack stay as they are, so the finale plays the same.
+  Battles get a little shorter as Fae grows: the late game gets gentler for
+  younger players, and the calm-downs stay short (pillar 3).
+- Shown: a level-up line after the reward ("Fae reached level 3! Calming
+  comes easier.") with its own sound, and a Level pill with an XP bar on the
+  journal's notes page beside Coins and Snacks.
+- Save version 10: older saves upgrade with 0 XP, counted from then on, as
+  calm counts were in version 7.
+- Cost: once Fae levels, every recorded battle plays differently, so the
+  runs are re-recorded, their pins and the QA packs regenerated, and the
+  battle screenshots redrawn and viewed.
+- For the owner: the names (XP and Level, or something gentler), the
+  numbers, and the level-up line.
+
+## Milestone 67: The cheat console **Status:** 📋 Planned
+- In QA mode only (Milestone 65): the backtick key, or a tap on the QA
+  badge, opens a console. It sets XP and level (a level sets XP to its
+  threshold), coins, snacks, tickets, prizes, stickers, and the tools Fae
+  carries (the lantern, the lasso, the flute, and the map, which are story
+  variables such as `has_lasso`); `help` lists the commands.
+- `save <name>` keeps the current state in a QA-only slot, listed in the QA
+  menu and never the player's; `export` shows it as a save file to attach
+  to a bug report or add to the library.
+- Still left out: teleporting, eval, and setting any other story variable.
+- The commands are pure functions with unit tests, and the console is a
+  thin shell over them. A real-key e2e types commands and checks the
+  journal.
+
+## Milestone 68: The golden path **Status:** 📋 Planned
+- One recorded run from a new game to the credits, the recorders chained in
+  story order (chapter one, the bay and Sue, the bus and Jordan, the
+  lantern, the woods, the school chapter, and on to the kid and the ending),
+  each picking up where the last stopped.
+- The QA library's interim packs give way to packs cut from it at each
+  story beat.
+- The late-game runs and their tests leave the `pass-party` fixture. It put
+  Sue in the party without `sue_joined` (she's missing from the credits) and
+  skipped chapter one (the fountain frog still in chaos at the credits, the
+  bay road shut) and breakfast. The credits' screenshots change: Sue joins
+  them.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

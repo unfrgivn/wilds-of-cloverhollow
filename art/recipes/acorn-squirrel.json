@@ -1,0 +1,382 @@
+{
+  "asset": "acorn-squirrel",
+  "milestone": 60,
+  "status": "validator-passing; owner review pending",
+  "summary": "The Acorn Squirrel as a hopping follower (the second flute friend): the trail squirrel critter's design (public/assets/critters/squirrel/, calm_idle_01) drawn as a follower's six animations, a little under Maddie's size.",
+  "generationSource": "Generated with Gemini: a character in the game's own painted style, which no open source has (docs/media-sources.md is for sounds and photos).",
+  "references": [
+    "public/assets/critters/squirrel/squirrel.png (calm_idle_01): his look",
+    "art/source/pond-pup/model-sheet.png: the follower style and size, for the model sheet",
+    "art/source/pond-pup/back-grid.png: the grid layout, for call 8"
+  ],
+  "referenceNotes": {
+    "scratch:": "Temporary crops in the session's scratch folder, made from images listed here and keyed on green with a 60 px border unless noted.",
+    "scratch:squirrel-calm-ref.png": "calm_idle_01 from the squirrel critter atlas, on white.",
+    "scratch:side-left-ref.png": "The model sheet's figure 3 (his left side).",
+    "scratch:back-ref.png": "The model sheet's figure 2 (his back).",
+    "scratch:headon-ref.png": "Call 9's figure.",
+    "scratch:back-pose-ref.png": "Call 11's figure 1.",
+    "scratch:front-allfours-ref.png": "The model sheet's figure 4 (standing, facing us).",
+    "scratch:back-allfours-ref.png": "Call 15's figure 1.",
+    "scratch:af-front-ref.png": "Call 18's figure.",
+    "scratch:af-back-ref.png": "Call 19's figure.",
+    "scratch:upright-front-ref.png": "Call 14's figure 3.",
+    "art/source/acorn-squirrel/back-strip.png": "At calls 23 and 24 already the kept back strip (call 21).",
+    "art/source/acorn-squirrel/front-strip.png": "At call 25, call 24's output (since replaced by call 25's)."
+  },
+  "calls": 25,
+  "callNotes": "25 calls, none failed. The hop toward the camera took 13 of them: each strip failed a validator check (a three-quarter turn, the head changing size, the silhouette area changing more than 1.20x) or couldn't be cut apart, until call 25. The kept sources are the model's own outputs, byte for byte.",
+  "sources": {
+    "art/source/acorn-squirrel/model-sheet.png": "His model sheet: sitting up facing us, his back, his left side on all fours, and standing facing us. The idles are the first three (idle_down, idle_up, idle_left); the fourth is unused.",
+    "art/source/acorn-squirrel/front-strip.png": "walk_down: six upright hops toward us in a row, a small bob, the tail a plume behind his head.",
+    "art/source/acorn-squirrel/back-strip.png": "walk_up: six upright hops away in a row, from directly behind.",
+    "art/source/acorn-squirrel/left-grid.png": "walk_left: one bound on all fours, a 3x2 grid read row by row."
+  },
+  "postProcessing": [
+    "tools/art/build-acorn-squirrel.ts rebuilds the atlas byte for byte from the four sources.",
+    "tools/art/extract-figures.ts cuts each sheet into whole figures, read row by row; a figure is never cropped.",
+    "Key #00FF00 (he is red-brown, cream, pink, and acorn brown), key-alpha with holes; despill on the 2 px alpha edge only.",
+    "One uniform scale per sheet (postprocess.ts --scale-percent). The model sheet at 10.5% sits him 91 px tall (45 units). Each walk sheet's factor brings its acorn cap, measured across the outline, to the model sheet's cap from the same side (front 123 px, back 132, side 92): front 12.18% (cap 106), back 9.00% (cap 155), side 16.84% (cap 58). No frame is resized, re-registered, or warped on its own.",
+    "256x256 frames, feet on row 247 (8 px bottom margin), anchor {x: 0.5, y: 247/256}; pack-atlas.ts, six columns."
+  ],
+  "measured": {
+    "sitting": "91 px tall (45 units), his idle down; Maddie stands about 50 units, the Pond Pup 50",
+    "hopping": "toward us 121-127 px (his tail over his head), away 97-106 px, to the side 85-122 px",
+    "areaRatios": "idle/walk down 0.84, up 0.99, left 0.92; walk spread down 1.11, up 1.12, left 1.09",
+    "mirrorIoU": "walk_down 0.92, walk_up 0.96"
+  },
+  "validator": {
+    "biped": false,
+    "key": "green"
+  },
+  "validatorOutput": "PASS sprite validator: all frames, animations, edges, components, spill, and baseline checks passed",
+  "callLog": [
+    {
+      "call": 1,
+      "time": "2026-10-18T13:51:20.620Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:squirrel-calm-ref.png",
+        "art/source/pond-pup/model-sheet.png"
+      ],
+      "prompt": "Create a clean character reference sheet for a follower character in a cozy hand-painted children's game, in exactly the style of the SECOND reference image (the little puppy's model sheet): the same soft watercolour washes with thin warm-brown ink outlines, the same chibi proportions, and the same size of figure. The character is the squirrel in the FIRST reference image, copied exactly: a little red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat on his head. He is about as tall as the puppy, including his tail. Show exactly four isolated full-body views, spread out in one row with lots of space between them, on a flat solid pure green (#00FF00) background: 1) sitting up on his haunches facing the camera, paws held together at his chest, tail curled up behind him; 2) seen from directly behind, sitting up, the back of his head and acorn cap, his back, and his big tail curling up in the middle; 3) standing on all fours in a side profile facing LEFT, nose pointing left, tail arched up behind him over his back; 4) standing on all fours facing the camera. Draw each squirrel exactly once: NO faded copies, no shadows on the background, no ground, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331480619-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/acorn-squirrel/model-sheet.png",
+      "note": "His model sheet, first try: sitting up facing us, his back, his left side, and standing facing us."
+    },
+    {
+      "call": 2,
+      "time": "2026-10-18T13:52:18.466Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a sprite animation strip for a cozy hand-painted children's game: SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. The character is the little squirrel in the reference image (his model sheet): a red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat. Copy his face, colours, proportions and the soft watercolour with thin warm-brown ink outlines exactly, at the same size as on his sheet. In every frame he is in a side profile facing LEFT, exactly like the third figure on his sheet: nose pointing left, acorn cap on his head, tail behind him on the right. The six frames are one smooth bounding hop, the way a squirrel scampers along the ground: 1) crouched low, gathering; 2) hind legs pushing off, body stretching forward; 3) fully stretched out, front paws reaching ahead; 4) front paws touching down; 5) hind paws swinging in under him; 6) gathered again, just before the next bound. His tail floats and bounces up and down behind him through the hop. In every frame at least one paw touches the same flat ground line, so all six stand on one level. Draw each squirrel exactly once: NO faded copies, no motion lines, no dust, no shadows, no ground drawn, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331538464-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Left hop strip: every squirrel faced right, seven in two rows, ground lines under the feet."
+    },
+    {
+      "call": 3,
+      "time": "2026-10-18T13:53:41.283Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png",
+        "scratch:side-left-ref.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game. The character is the little squirrel in the FIRST reference image (his model sheet): a red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat. Copy his face, colours, proportions and the soft watercolour with thin warm-brown ink outlines exactly, at the same size as on his sheet. In EVERY frame he faces exactly the same way as the SECOND reference image: a side profile with his nose pointing to the LEFT edge of the picture and his tail on the RIGHT. The six frames are one smooth bounding hop, the way a squirrel scampers along the ground: 1) crouched low, gathering; 2) hind legs pushing off, body stretching forward to the left; 3) fully stretched out in the air, front paws reaching ahead to the left; 4) front paws touching down; 5) hind paws swinging in under him; 6) gathered again, just before the next bound. His tail floats and bounces up and down behind him through the hop. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each squirrel centred in its own cell with plenty of empty space all around it, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no grid lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331621281-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/acorn-squirrel/left-grid.png",
+      "note": "Left hop as a 3x2 grid, the sheet's side figure as the facing: six frames, one bound."
+    },
+    {
+      "call": 4,
+      "time": "2026-10-18T13:54:46.871Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png",
+        "scratch:back-ref.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game. The character is the little squirrel in the FIRST reference image (his model sheet): a red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat. Copy his colours, proportions and the soft watercolour with thin warm-brown ink outlines exactly, at the same size as on his sheet. In EVERY frame he hops STRAIGHT AWAY from the viewer, square to the camera, exactly like the SECOND reference image (his back view): we see the back of his head and the back of his acorn cap, both ears from behind, his back, and his big bushy tail held up in the middle; never his face. The six frames are one smooth bounding hop away from us: 1) crouched low, gathering; 2) hind legs pushing off, his body rising; 3) up in the air, stretched, hind paws trailing; 4) front paws touching down; 5) hind paws swinging in under him; 6) gathered again. His tail bounces up and down through the hop and sways a little from side to side. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each squirrel centred in its own cell with plenty of empty space all around it, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no grid lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331686870-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away: turned three-quarter (walk mirror IoU 0.57)."
+    },
+    {
+      "call": 5,
+      "time": "2026-10-18T13:55:13.339Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png",
+        "scratch:front-ref.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game. The character is the little squirrel in the FIRST reference image (his model sheet): a red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat. Copy his colours, proportions and the soft watercolour with thin warm-brown ink outlines exactly, at the same size as on his sheet. In EVERY frame he hops STRAIGHT TOWARD the viewer, head-on and symmetrical, exactly like the SECOND reference image (him on all fours facing us): his face, both eyes, his pink cheeks and his acorn cap face us, and his big bushy tail sticks up behind his head. The six frames are one smooth bounding hop toward us: 1) crouched low, gathering; 2) hind legs pushing off, his body rising; 3) up in the air, front paws reaching toward us; 4) front paws touching down; 5) hind paws swinging in under him; 6) gathered again. His tail bounces up and down behind him through the hop. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each squirrel centred in its own cell with plenty of empty space all around it, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no grid lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331713337-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us: tail off to one side, frames turning (mirror 0.63)."
+    },
+    {
+      "call": 6,
+      "time": "2026-10-18T13:56:49.079Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png",
+        "scratch:back-ref.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game. The character is the little squirrel in the FIRST reference image (his model sheet): a red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat. Copy his colours, proportions and the soft watercolour with thin warm-brown ink outlines exactly, at the same size as on his sheet. In EVERY frame he is seen from DIRECTLY BEHIND, perfectly square to the camera and symmetrical, exactly like the SECOND reference image (his back view): the back of his head and the back of his acorn cap in the middle, both ears from behind, his back, and his big bushy tail standing straight up in the middle of his back, its curl at the top. Never his face, never his side, never turned to the left or right. The six frames are one hop cycle, bouncing straight up and down on the spot: 1) crouched low, all four paws on the ground; 2) hind legs pushing off, body rising; 3) up in the air, all paws off the ground; 4) coming down, front paws reaching for the ground; 5) landing, all four paws down; 6) crouched low again. His tail bounces a little up and down with each hop, but always stays standing straight up in the middle. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each squirrel centred in its own cell with plenty of empty space all around it, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no grid lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331809077-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, on the spot: three-quarter, tail to the right (mirror 0.62)."
+    },
+    {
+      "call": 7,
+      "time": "2026-10-18T13:57:13.907Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png",
+        "scratch:back-ref.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game. The character is the little squirrel in the FIRST reference image (his model sheet): a red-brown squirrel with a cream belly, cream muzzle and cream inner ears, pink cheeks, shiny black eyes, a huge bushy curly red-brown tail with a cream underside, and a brown acorn cap worn like a little hat. Copy his colours, proportions and the soft watercolour with thin warm-brown ink outlines exactly, at the same size as on his sheet. In EVERY frame he faces the camera HEAD-ON, perfectly square and symmetrical: his face in the middle, both eyes, both pink cheeks, his acorn cap in the middle of his head, his cream belly, and his big bushy tail standing straight up behind him in the middle, rising above his head and showing on both sides of it equally, its curl at the top. The SECOND reference image shows where his tail stands, seen from behind; here we see him from the front, with the tail in the same place behind him. Never turned to the left or right, never his side. The six frames are one hop cycle, bouncing straight up and down on the spot: 1) crouched low, all four paws on the ground; 2) hind legs pushing off, body rising; 3) up in the air, all paws off the ground; 4) coming down, front paws reaching for the ground; 5) landing, all four paws down; 6) crouched low again. His tail bounces a little up and down with each hop, but always stays standing straight up in the middle. Lay the six frames out as a grid of three columns and two rows, read left to right, top row first, each squirrel centred in its own cell with plenty of empty space all around it, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no grid lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792331833905-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, on the spot: three-quarter (mirror 0.51)."
+    },
+    {
+      "call": 8,
+      "time": "2026-10-18T13:59:38.517Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:back-ref.png",
+        "art/source/pond-pup/back-grid.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation of the squirrel in the FIRST reference image, seen from DIRECTLY BEHIND exactly as he is there: perfectly square to the camera and symmetrical left to right, the back of his head with his acorn cap in the middle, both ears from behind, his round back, and his big bushy tail rising straight up the MIDDLE of his back with its curl at the top, so his left and right sides look the same. Copy his colours, proportions, and the soft watercolour with thin warm-brown ink outlines exactly (the THIRD reference image is his whole model sheet). The SECOND reference image is a puppy hopping away from the camera the same way: lay the frames out just like it, a grid of three columns and two rows, read left to right, top row first. The six frames are one hop cycle, bouncing up and down on the spot as he hops away from us: 1) crouched low, all four paws on the ground; 2) hind legs pushing off, body rising; 3) up in the air, hind paws showing below him; 4) coming down; 5) landing, all paws down; 6) crouched low again. His tail stays in the middle and bounces a little with each hop. Each squirrel centred in its own cell with plenty of empty space round it, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no grid lines, no text, no puppies or other animals, nothing cropped at the edges, never his face or his side.",
+      "output": "1792331978513-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, with the pup's back grid as the layout: still three-quarter (mirror 0.52)."
+    },
+    {
+      "call": 9,
+      "time": "2026-10-18T14:01:12.950Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/model-sheet.png",
+        "scratch:back-ref.png"
+      ],
+      "prompt": "Draw exactly ONE squirrel, the one in the FIRST reference image (his model sheet), copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines. He faces the camera HEAD-ON and is perfectly symmetrical, left side mirroring right side: standing on all four paws, his face in the middle, both eyes, both pink cheeks, his acorn cap in the middle of his head, his cream chest, his two front paws side by side. His big bushy tail rises STRAIGHT UP behind him, exactly in the middle, showing above his head and the same amount on both sides of it, its curl at the very top, like a plume. The SECOND reference image shows the tail standing in the middle the same way, seen from behind. Centred, with plenty of space around him, on one flat solid pure green (#00FF00) background. No faded copies, no shadows, no ground line, no text, nothing else.",
+      "output": "1792332072948-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "One head-on figure, his tail a plume in the middle (mirror 0.93): the view reference for the next front strip."
+    },
+    {
+      "call": 10,
+      "time": "2026-10-18T14:02:06.551Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:headon-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a four-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the SECOND reference image is his whole model sheet). In every frame he faces the camera HEAD-ON exactly as in the first reference: his face in the middle, both eyes and both cheeks, his big bushy tail standing straight up behind him in the middle like a plume. Lay out FOUR frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no text, no other animals, nothing cropped at the edges. In EVERY frame he stays perfectly symmetrical, left side mirroring right side, never turned to either side. The four frames are one little hop on the spot: 1) squashed down low, crouched, ready to spring; 2) springing up, stretched tall; 3) in the air, all four paws off the ground, a little higher than the others; 4) landing, paws touching down. His tail bounces with each hop but always stays standing straight up in the middle.",
+      "output": "1792332126549-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, four frames (mirror 0.92): the validator wants six; a reference for call 14."
+    },
+    {
+      "call": 11,
+      "time": "2026-10-18T14:02:30.475Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:back-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a four-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the SECOND reference image is his whole model sheet). In every frame he is seen from DIRECTLY BEHIND exactly as in the first reference: the back of his head with his acorn cap in the middle, both ears from behind, his round back, and his big bushy tail rising up the middle of his back with its curl at the top. Never his face, never his side. Lay out FOUR frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no dust, no text, no other animals, nothing cropped at the edges. In EVERY frame he stays perfectly symmetrical, left side mirroring right side, never turned to either side. The four frames are one little hop on the spot: 1) squashed down low, crouched, ready to spring; 2) springing up, stretched tall; 3) in the air, all four paws off the ground, a little higher than the others; 4) landing, paws touching down. His tail bounces with each hop but always stays standing straight up in the middle.",
+      "output": "1792332150473-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, four frames (mirror 0.74): the tail swung aside after frame 1; frame 1 became the back pose reference."
+    },
+    {
+      "call": 12,
+      "time": "2026-10-18T14:03:49.368Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:back-pose-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a four-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the SECOND reference image is his whole model sheet). In EVERY frame he keeps EXACTLY the first reference's compact pose and view, seen from directly behind: the back of his head with his acorn cap in the middle, both ears from behind, his round back, and his big bushy tail curled up the MIDDLE of his back, its cream underside showing down the middle. He never stands up tall, never turns, and his tail never moves to the side: perfectly symmetrical, left side mirroring right side, in all four frames. The four frames are one little bounce on the spot, only his height above the ground changing: 1) squashed down a little, crouched; 2) springing up, slightly stretched; 3) in the air, a little higher than the others, his hind paws showing below him; 4) landing, paws touching down. Lay out the four frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792332229367-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, four frames (mirror 0.84): a small cross drawn on the cream under his tail in frames 2 and 3."
+    },
+    {
+      "call": 13,
+      "time": "2026-10-18T14:05:33.654Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:back-pose-ref.png",
+        "art/scratch/1792332126549-gemini-3-pro-image-preview-0.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a four-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the THIRD reference image is his whole model sheet). The SECOND reference image is the same four-frame hop seen from the FRONT: draw exactly that hop, frame for frame, but seen from DIRECTLY BEHIND, like the first reference: 1) crouched low and round, as in the first reference; 2) sitting up tall on his hind legs; 3) up in the air, a little higher, his hind paws dangling below him; 4) crouched low and round again. In every frame: the back of his head with his acorn cap in the middle, both ears from behind, his back, and his big bushy tail curled up the MIDDLE of his back, perfectly symmetrical, left side mirroring right side, never turned. His fur is plain everywhere: the cream underside of his tail and his rump have NO marks, no dots, no crosses, no lines, no symbols. Lay out the four frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no other animals, nothing cropped at the edges.",
+      "output": "1792332333653-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, four frames (mirror 0.92), plain fur: four only; a reference for call 15."
+    },
+    {
+      "call": 14,
+      "time": "2026-10-18T14:06:54.342Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/scratch/1792332126549-gemini-3-pro-image-preview-0.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image (a four-frame strip of the same hop), copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the SECOND reference image is his whole model sheet). In every frame he faces the camera HEAD-ON exactly as in the first reference: his face in the middle, both eyes and both cheeks, his big bushy tail standing straight up behind him in the middle like a plume. Lay out SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no other animals, nothing cropped at the edges. In EVERY frame he stays perfectly symmetrical, left side mirroring right side, never turned. His fur is plain: no marks, dots, crosses or symbols anywhere. The six frames are one smooth hop on the spot: 1) crouched low and round; 2) rising, starting to stretch up; 3) sitting up tall on his hind legs; 4) up in the air, a little higher, his hind paws below him; 5) coming down, paws reaching for the ground; 6) landing, crouching low again.",
+      "output": "1792332414339-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, six frames (mirror 0.92): his head about 18% bigger in the crouches (frames 1 and 6), walk areas 1.43x apart; frame 3 became the upright front reference."
+    },
+    {
+      "call": 15,
+      "time": "2026-10-18T14:07:17.568Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/scratch/1792332333653-gemini-3-pro-image-preview-0.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image (a four-frame strip of the same hop, seen from behind), copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the SECOND reference image is his whole model sheet). In every frame he is seen from DIRECTLY BEHIND exactly as in the first reference: the back of his head with his acorn cap in the middle, both ears from behind, his back, and his big bushy tail curled up the MIDDLE of his back with its cream underside showing. Never his face, never his side. Lay out SIX frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no other animals, nothing cropped at the edges. In EVERY frame he stays perfectly symmetrical, left side mirroring right side, never turned. His fur is plain: no marks, dots, crosses or symbols anywhere. The six frames are one smooth hop on the spot: 1) crouched low and round; 2) rising, starting to stretch up; 3) sitting up tall on his hind legs; 4) up in the air, a little higher, his hind paws below him; 5) coming down, paws reaching for the ground; 6) landing, crouching low again.",
+      "output": "1792332437566-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, six frames (mirror 0.90): walk areas 1.25x apart, over the 1.20 limit; frame 1 became the reference for call 17."
+    },
+    {
+      "call": 16,
+      "time": "2026-10-18T14:10:28.604Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:front-allfours-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the SECOND reference image is his whole model sheet). In every frame he faces the camera HEAD-ON exactly as in the first reference, hopping toward us: his face in the middle, both eyes and both cheeks, his acorn cap in the middle. The six frames are one small, gentle hop forward on all four paws, like a squirrel bounding along: 1) on all four paws, just like the first reference; 2) front paws lifting a little off the ground; 3) a small hop, all four paws just off the ground, his body only a little higher; 4) front paws touching down; 5) hind paws touching down; 6) on all four paws again. He never sits up and never stands tall: his body keeps the same size, the same roundness, and the same silhouette in all six frames, and only bobs up and down a little. His tail keeps EXACTLY the same size and shape in every frame, standing up behind him in the middle, and only bobs with his body. Lay out the six frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Perfectly symmetrical, left side mirroring right side, in every frame. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no marks or symbols on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792332628601-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, a small bound on all fours: turned three-quarter (mirror 0.65)."
+    },
+    {
+      "call": 17,
+      "time": "2026-10-18T14:10:51.777Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:back-allfours-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the SECOND reference image is his whole model sheet). In every frame he is seen from DIRECTLY BEHIND exactly as in the first reference, hopping away from us: the back of his head with his acorn cap in the middle, both ears from behind, his round back, and his big bushy tail curled up the middle of his back with its cream underside showing. Never his face, never his side. The six frames are one small, gentle hop forward on all four paws, like a squirrel bounding along: 1) on all four paws, just like the first reference; 2) front paws lifting a little off the ground; 3) a small hop, all four paws just off the ground, his body only a little higher; 4) front paws touching down; 5) hind paws touching down; 6) on all four paws again. He never sits up and never stands tall: his body keeps the same size, the same roundness, and the same silhouette in all six frames, and only bobs up and down a little. His tail keeps EXACTLY the same size and shape in every frame, standing up behind him in the middle, and only bobs with his body. Lay out the six frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Perfectly symmetrical, left side mirroring right side, in every frame. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no marks or symbols on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792332651771-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop away, a small bound on all fours: the figures touched and could not be cut apart."
+    },
+    {
+      "call": 18,
+      "time": "2026-10-18T14:17:11.568Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:headon-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Draw the squirrel in the FIRST reference image again, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the SECOND reference image is his whole model sheet). Now he stands on ALL FOUR PAWS, low to the ground, facing the camera HEAD-ON and perfectly symmetrical, left side mirroring right side: his face in the middle looking at us, both eyes, both cheeks, his acorn cap in the middle, his two front paws side by side on the ground in front of his chest, his body behind them, and his big bushy tail rising straight up behind him in the middle, above and behind his head, its curl at the top, the same plume as in the first reference. Centred, with plenty of space around him, on one flat solid pure green (#00FF00) background. Draw exactly ONE squirrel: no faded copies, no shadows, no ground line, no text, no marks or symbols on his fur, nothing else.",
+      "output": "1792333031564-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "One figure on all fours, head-on (mirror 1.00): a reference."
+    },
+    {
+      "call": 19,
+      "time": "2026-10-18T14:17:37.121Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:back-allfours-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Draw the squirrel in the FIRST reference image again, copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the SECOND reference image is his whole model sheet). Now he stands on ALL FOUR PAWS, low to the ground, seen from DIRECTLY BEHIND and perfectly symmetrical, left side mirroring right side: the back of his head with his acorn cap in the middle and both ears from behind at the front, his round back, his two hind paws on the ground at the back, and his big bushy tail rising straight up the middle of his back from his rump, its curl at the top, its cream underside facing us. Never his face. Centred, with plenty of space around him, on one flat solid pure green (#00FF00) background. Draw exactly ONE squirrel: no faded copies, no shadows, no ground line, no text, no marks or symbols on his fur, nothing else.",
+      "output": "1792333057120-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "One figure on all fours from behind (mirror 0.98): the reference for call 21."
+    },
+    {
+      "call": 20,
+      "time": "2026-10-18T14:18:58.943Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:af-front-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the SECOND reference image is his whole model sheet). In every frame he faces the camera HEAD-ON exactly as in the first reference, bounding toward us: his face in the middle, both eyes and both cheeks, and his big bushy tail rising behind him in the middle as the same plume. The six frames are one small bound on all four paws, the way a squirrel scampers: 1) on all four paws, just like the first reference; 2) front paws lifting off the ground, his front rising a little; 3) a small hop, all four paws just off the ground, his whole body a little higher; 4) front paws touching down; 5) hind paws touching down; 6) on all four paws, crouched a little. In every frame his body, head, and tail keep EXACTLY the first reference's size, shape, and pose: his tail never spreads wider, never shrinks, never moves to one side; only his height above the ground and his paws change. Perfectly symmetrical, left side mirroring right side, in every frame. Lay out the six frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no marks or symbols on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792333138940-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us from call 18: five figures, two of them sitting up."
+    },
+    {
+      "call": 21,
+      "time": "2026-10-18T14:19:22.841Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:af-back-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the SECOND reference image is his whole model sheet). In every frame he is seen from DIRECTLY BEHIND exactly as in the first reference, bounding away from us: the back of his head with his acorn cap in the middle, both ears from behind, his round back, and his big bushy tail rising up the middle of his back with its curl at the top. Never his face, never his side. The six frames are one small bound on all four paws, the way a squirrel scampers: 1) on all four paws, just like the first reference; 2) front paws lifting off the ground, his front rising a little; 3) a small hop, all four paws just off the ground, his whole body a little higher; 4) front paws touching down; 5) hind paws touching down; 6) on all four paws, crouched a little. In every frame his body, head, and tail keep EXACTLY the first reference's size, shape, and pose: his tail never spreads wider, never shrinks, never moves to one side; only his height above the ground and his paws change. Perfectly symmetrical, left side mirroring right side, in every frame. Lay out the six frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no marks or symbols on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792333162838-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/acorn-squirrel/back-strip.png",
+      "note": "Hop away: six upright hops from directly behind (mirror 0.96, walk areas 1.14x)."
+    },
+    {
+      "call": 22,
+      "time": "2026-10-18T14:21:27.005Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:af-front-ref.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines (the SECOND reference image is his whole model sheet). EXACTLY SIX squirrels, laid out as a grid of three columns and two rows, read left to right, top row first, each centred in its own cell with plenty of empty space all around it. In EVERY frame he keeps EXACTLY the first reference's pose: on all four paws, low to the ground, facing the camera head-on, his face in the middle, his big bushy tail rising straight up behind him in the middle as the same plume, the same size. He never sits up, never stands tall, never turns. The six frames are one small bound toward us: 1) on all four paws, exactly the first reference; 2) front paws just lifting; 3) all four paws just off the ground, his whole body a little higher; 4) front paws touching down; 5) hind paws touching down; 6) on all four paws, crouched a little. Only his height above the ground and his paws change. Perfectly symmetrical, left side mirroring right side, in every frame. One flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no grid lines, no text, no marks on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792333287003-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, a 3x2 grid from call 18: six copies of one pose, no hop."
+    },
+    {
+      "call": 23,
+      "time": "2026-10-18T14:22:54.683Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:af-front-ref.png",
+        "art/source/acorn-squirrel/back-strip.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the THIRD reference image is his whole model sheet). The SECOND reference image is the same squirrel's six-frame hop seen from BEHIND: draw exactly that hop, frame for frame, the same paws in the same places at the same heights, but seen from the FRONT, head-on, like the first reference: his face in the middle, both eyes and cheeks, his acorn cap in the middle, his big bushy tail rising straight up behind him in the middle as a plume. The frames must clearly differ from each other: in frame 2 his front paws are lifted up off the ground in front of his chest; in frame 3 he is up in the air, all four paws off the ground, his hind paws dangling, his whole body higher; in frames 4 and 5 his paws reach down and touch the ground; frame 6 is crouched. His tail keeps the same size in every frame. Perfectly symmetrical, left side mirroring right side, in every frame. Lay out the six frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no marks on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792333374682-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, the kept back strip's hop seen from the front (mirror 0.99): walk areas 1.34x apart as he stretches up."
+    },
+    {
+      "call": 24,
+      "time": "2026-10-18T14:24:54.546Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "scratch:upright-front-ref.png",
+        "art/source/acorn-squirrel/back-strip.png",
+        "art/source/acorn-squirrel/model-sheet.png"
+      ],
+      "prompt": "Make a six-frame hop animation for a cozy hand-painted children's game, of the squirrel in the FIRST reference image, copied exactly: his face, colours, proportions, acorn cap, and the soft watercolour with thin warm-brown ink outlines, at the same size as there (the THIRD reference image is his whole model sheet). In EVERY frame he stands up on his hind legs facing the camera HEAD-ON, exactly as in the first reference: his face in the middle, both eyes and cheeks, his paws at his chest, his cream tummy, and his big bushy tail standing straight up behind him in the middle, the same size and shape in every frame. The SECOND reference image is the same squirrel's six-frame hop seen from BEHIND, standing up the same way in every frame: draw exactly that hop, frame for frame, the same feet at the same heights, but seen from the front. He never drops down onto all fours, never crouches into a ball, and his tail never spreads wide: he stays upright and the same size in all six frames, only bobbing up and down a little, his feet lifting off the ground in the middle frames. Perfectly symmetrical, left side mirroring right side, in every frame. Lay out the six frames side by side in ONE horizontal row across the middle of the picture, evenly spaced with clear space between them, on one flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, NO ground line, no shadows, no motion lines, no text, no marks on his fur, no other animals, nothing cropped at the edges.",
+      "output": "1792333494544-gemini-3-pro-image-preview-0.png",
+      "kept": null,
+      "note": "Hop toward us, upright like the back strip: neighbouring tails touched, so the six could not be cut apart; the reference for call 25."
+    },
+    {
+      "call": 25,
+      "time": "2026-10-18T15:02:09.186Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/acorn-squirrel/front-strip.png"
+      ],
+      "prompt": "Redraw the reference image, six squirrels in a row, keeping EVERY squirrel exactly as it is: the same pose, size, colours, lines, and watercolour, frame for frame. Change only the spacing: make each squirrel a little smaller, about 85% of its size, and spread the six out evenly across the picture so that there is clear green background between every pair, so no two squirrels or tails touch or overlap anywhere. One flat solid pure green (#00FF00) background. Draw each squirrel exactly once: NO faded copies, no shadows, no ground line, no text, nothing else.",
+      "output": "1792335729184-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/acorn-squirrel/front-strip.png",
+      "note": "Call 24's strip redrawn a little smaller and spaced out, every pose kept (mirror 0.92, walk areas 1.09x)."
+    }
+  ]
+}

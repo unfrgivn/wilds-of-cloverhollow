@@ -564,6 +564,86 @@
         "\n",
         "ev",
         {
+          "VAR?": "acorn_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Acorn Squirrel climbed the big oak in the woods and found a golden acorn in its knothole! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.55"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "knothole_seen"
+        },
+        {
+          "VAR?": "acorn_found"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ There's a knothole high up the big oak in the woods. Something rattles inside! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.65"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "squirrel_friend"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Acorn Squirrel is my friend! When I play my flute, he comes scampering. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.72"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "pond_tin"
         },
         "/ev",
@@ -578,7 +658,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.55"
+                "->": ".^.^.^.79"
               },
               null
             ]
@@ -608,7 +688,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.65"
+                "->": ".^.^.^.89"
               },
               null
             ]
@@ -633,7 +713,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.72"
+                "->": ".^.^.^.96"
               },
               null
             ]
@@ -660,7 +740,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.81"
+                "->": ".^.^.^.105"
               },
               null
             ]
@@ -685,7 +765,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.88"
+                "->": ".^.^.^.112"
               },
               null
             ]
@@ -714,7 +794,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.98"
+                "->": ".^.^.^.122"
               },
               null
             ]
@@ -748,7 +828,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.111"
+                "->": ".^.^.^.135"
               },
               null
             ]
@@ -773,7 +853,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.118"
+                "->": ".^.^.^.142"
               },
               null
             ]
@@ -798,7 +878,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.125"
+                "->": ".^.^.^.149"
               },
               null
             ]
@@ -832,7 +912,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.137"
+                "->": ".^.^.^.161"
               },
               null
             ]
@@ -857,7 +937,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.144"
+                "->": ".^.^.^.168"
               },
               null
             ]
@@ -882,7 +962,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.151"
+                "->": ".^.^.^.175"
               },
               null
             ]
@@ -912,7 +992,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.161"
+                "->": ".^.^.^.185"
               },
               null
             ]
@@ -942,7 +1022,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.171"
+                "->": ".^.^.^.195"
               },
               null
             ]
@@ -967,7 +1047,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.178"
+                "->": ".^.^.^.202"
               },
               null
             ]
@@ -997,7 +1077,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.188"
+                "->": ".^.^.^.212"
               },
               null
             ]
@@ -1027,7 +1107,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.198"
+                "->": ".^.^.^.222"
               },
               null
             ]
@@ -1052,7 +1132,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.205"
+                "->": ".^.^.^.229"
               },
               null
             ]
@@ -1082,7 +1162,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.215"
+                "->": ".^.^.^.239"
               },
               null
             ]
@@ -1112,7 +1192,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.225"
+                "->": ".^.^.^.249"
               },
               null
             ]
@@ -1137,7 +1217,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.232"
+                "->": ".^.^.^.256"
               },
               null
             ]
@@ -1162,7 +1242,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.239"
+                "->": ".^.^.^.263"
               },
               null
             ]
@@ -1192,7 +1272,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.249"
+                "->": ".^.^.^.273"
               },
               null
             ]
@@ -1226,7 +1306,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.262"
+                "->": ".^.^.^.286"
               },
               null
             ]
@@ -1256,7 +1336,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.272"
+                "->": ".^.^.^.296"
               },
               null
             ]
@@ -1281,7 +1361,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.279"
+                "->": ".^.^.^.303"
               },
               null
             ]
@@ -1311,7 +1391,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.289"
+                "->": ".^.^.^.313"
               },
               null
             ]
@@ -1345,7 +1425,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.302"
+                "->": ".^.^.^.326"
               },
               null
             ]
@@ -1379,7 +1459,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.315"
+                "->": ".^.^.^.339"
               },
               null
             ]
@@ -1409,7 +1489,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.325"
+                "->": ".^.^.^.349"
               },
               null
             ]
@@ -1439,7 +1519,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.335"
+                "->": ".^.^.^.359"
               },
               null
             ]
@@ -1469,7 +1549,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.345"
+                "->": ".^.^.^.369"
               },
               null
             ]
@@ -1494,7 +1574,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.352"
+                "->": ".^.^.^.376"
               },
               null
             ]
@@ -1536,7 +1616,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.369"
+                "->": ".^.^.^.393"
               },
               null
             ]
@@ -1570,7 +1650,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.382"
+                "->": ".^.^.^.406"
               },
               null
             ]
@@ -1670,7 +1750,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.392"
+                "->": ".^.^.^.416"
               },
               null
             ]
@@ -1695,7 +1775,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.399"
+                "->": ".^.^.^.423"
               },
               null
             ]
@@ -1725,7 +1805,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.409"
+                "->": ".^.^.^.433"
               },
               null
             ]
@@ -1759,7 +1839,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.421"
+                "->": ".^.^.^.445"
               },
               null
             ]
@@ -1784,7 +1864,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.428"
+                "->": ".^.^.^.452"
               },
               null
             ]
@@ -1814,7 +1894,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.438"
+                "->": ".^.^.^.462"
               },
               null
             ]
@@ -1848,7 +1928,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.451"
+                "->": ".^.^.^.475"
               },
               null
             ]
@@ -1877,7 +1957,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.461"
+                "->": ".^.^.^.485"
               },
               null
             ]
@@ -1906,7 +1986,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.471"
+                "->": ".^.^.^.495"
               },
               null
             ]
@@ -1940,7 +2020,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.484"
+                "->": ".^.^.^.508"
               },
               null
             ]
@@ -1970,7 +2050,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.494"
+                "->": ".^.^.^.518"
               },
               null
             ]
@@ -1995,7 +2075,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.501"
+                "->": ".^.^.^.525"
               },
               null
             ]
@@ -2029,7 +2109,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.513"
+                "->": ".^.^.^.537"
               },
               null
             ]
@@ -2054,7 +2134,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.520"
+                "->": ".^.^.^.544"
               },
               null
             ]
@@ -2083,7 +2163,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.530"
+                "->": ".^.^.^.554"
               },
               null
             ]
@@ -2108,7 +2188,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.537"
+                "->": ".^.^.^.561"
               },
               null
             ]
@@ -2133,7 +2213,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.544"
+                "->": ".^.^.^.568"
               },
               null
             ]
@@ -2170,7 +2250,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.559"
+                "->": ".^.^.^.583"
               },
               null
             ]
@@ -2195,7 +2275,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.566"
+                "->": ".^.^.^.590"
               },
               null
             ]
@@ -2229,7 +2309,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.579"
+                "->": ".^.^.^.603"
               },
               null
             ]
@@ -2258,7 +2338,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.589"
+                "->": ".^.^.^.613"
               },
               null
             ]
@@ -2283,7 +2363,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.596"
+                "->": ".^.^.^.620"
               },
               null
             ]
@@ -2308,7 +2388,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.603"
+                "->": ".^.^.^.627"
               },
               null
             ]
@@ -2338,7 +2418,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.613"
+                "->": ".^.^.^.637"
               },
               null
             ]
@@ -2368,7 +2448,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.623"
+                "->": ".^.^.^.647"
               },
               null
             ]
@@ -2393,7 +2473,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.630"
+                "->": ".^.^.^.654"
               },
               null
             ]
@@ -2422,7 +2502,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.640"
+                "->": ".^.^.^.664"
               },
               null
             ]
@@ -2460,7 +2540,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.656"
+                "->": ".^.^.^.680"
               },
               null
             ]
@@ -2487,7 +2567,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.665"
+                "->": ".^.^.^.689"
               },
               null
             ]
@@ -2516,7 +2596,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.675"
+                "->": ".^.^.^.699"
               },
               null
             ]
@@ -2541,7 +2621,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.682"
+                "->": ".^.^.^.706"
               },
               null
             ]
@@ -2570,7 +2650,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.693"
+                "->": ".^.^.^.717"
               },
               null
             ]
@@ -2599,7 +2679,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.704"
+                "->": ".^.^.^.728"
               },
               null
             ]
@@ -4194,9 +4274,250 @@
         "done",
         {
           "again": [
+            "ev",
+            {
+              "VAR?": "squirrel_friend"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.friend"
+                  },
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
             "^I'm saving my acorns for winter now. Nobody gets bonked! ",
             "#",
             "^speaker: Acorn Squirrel",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.bond"
+                  },
+                  {
+                    "->": ".^.^.^.15"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "done",
+            null
+          ],
+          "bond": [
+            [
+              "ev",
+              "str",
+              "^Scratch his chin",
+              "/str",
+              {
+                "VAR?": "squirrel_petted"
+              },
+              "!",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Share a snack",
+              "/str",
+              {
+                "VAR?": "squirrel_fed"
+              },
+              "!",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Wave bye",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "squirrel_petted",
+                    "re": true
+                  },
+                  "^Fae scratches under his chin. His eyes go all squinty and happy. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "ev",
+                  {
+                    "x()": "snacks"
+                  },
+                  0,
+                  "==",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "\n",
+                        "^I'm out of snacks. The bakery sells them, and the clubhouse garden grows strawberries. ",
+                        "#",
+                        "^speaker: Fae",
+                        "/#",
+                        "\n",
+                        "done",
+                        {
+                          "->": ".^.^.^.7"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "squirrel_fed",
+                    "re": true
+                  },
+                  "^Fae shares a snack. He stuffs it all in his cheeks at once! ",
+                  "#",
+                  "^speaker: Fae ",
+                  "/#",
+                  "#",
+                  "^feed: snack 1",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "c-2": [
+                  "\n",
+                  "^Chitter! ",
+                  "#",
+                  "^speaker: Acorn Squirrel",
+                  "/#",
+                  "\n",
+                  "done",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "g-0": [
+                  "ev",
+                  {
+                    "VAR?": "squirrel_petted"
+                  },
+                  {
+                    "VAR?": "squirrel_fed"
+                  },
+                  "&&",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "^ ",
+                        {
+                          "->": ".^.^.^.^.^.^.befriend"
+                        },
+                        {
+                          "->": ".^.^.^.6"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "\n",
+                  {
+                    "->": ".^.^.^"
+                  },
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "befriend": [
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "squirrel_friend",
+              "re": true
+            },
+            "^The Acorn Squirrel hops right up onto Fae's shoe and chitters. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^He's my friend now! When I play my flute, he'll come scampering. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "friend": [
+            "^Chitter! This squirrel flicks his tail at me like we're old friends. Word gets around! ",
+            "#",
+            "^speaker: Fae",
             "/#",
             "\n",
             "done",
@@ -12206,6 +12527,10 @@
           {
             "VAR?": "pup_friend"
           },
+          {
+            "VAR?": "squirrel_friend"
+          },
+          "||",
           "!",
           "/ev",
           [
@@ -12220,32 +12545,7 @@
                   "->": "flute.nobody"
                 },
                 {
-                  "->": ".^.^.^.13"
-                },
-                null
-              ]
-            }
-          ],
-          "nop",
-          "\n",
-          "ev",
-          {
-            "VAR?": "pup_with_me"
-          },
-          "/ev",
-          [
-            {
-              "->": ".^.b",
-              "c": true
-            },
-            {
-              "b": [
-                "^ ",
-                {
-                  "->": "flute.along"
-                },
-                {
-                  "->": ".^.^.^.19"
+                  "->": ".^.^.^.15"
                 },
                 null
               ]
@@ -12257,10 +12557,59 @@
           "str",
           "^Call the Pond Pup",
           "/str",
+          {
+            "VAR?": "pup_friend"
+          },
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "&&",
           "/ev",
           {
             "*": ".^.c-0",
-            "flg": 4
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Send the Pond Pup home",
+          "/str",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Call the Acorn Squirrel",
+          "/str",
+          {
+            "VAR?": "squirrel_friend"
+          },
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "!",
+          "&&",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Send the Acorn Squirrel home",
+          "/str",
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "/ev",
+          {
+            "*": ".^.c-3",
+            "flg": 5
           },
           "ev",
           "str",
@@ -12268,7 +12617,7 @@
           "/str",
           "/ev",
           {
-            "*": ".^.c-1",
+            "*": ".^.c-4",
             "flg": 4
           },
           {
@@ -12291,59 +12640,63 @@
             ],
             "c-1": [
               "\n",
+              "ev",
+              false,
+              "/ev",
+              {
+                "VAR=": "pup_with_me",
+                "re": true
+              },
+              "^Good boy! The Pond Pup trots off home, wagging. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-2": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "squirrel_with_me",
+                "re": true
+              },
+              "^Chitter-chitter! The Acorn Squirrel scampers down a tree and hops along! ",
+              "#",
+              "^speaker: Acorn Squirrel",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-3": [
+              "\n",
+              "ev",
+              false,
+              "/ev",
+              {
+                "VAR=": "squirrel_with_me",
+                "re": true
+              },
+              "^Off you go! The Acorn Squirrel bounds away, his tail bouncing. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-4": [
+              "\n",
               "done",
               null
             ]
           }
         ],
         {
-          "along": [
-            [
-              "ev",
-              "str",
-              "^Send the Pond Pup home",
-              "/str",
-              "/ev",
-              {
-                "*": ".^.c-0",
-                "flg": 4
-              },
-              "ev",
-              "str",
-              "^Just play",
-              "/str",
-              "/ev",
-              {
-                "*": ".^.c-1",
-                "flg": 4
-              },
-              {
-                "c-0": [
-                  "\n",
-                  "ev",
-                  false,
-                  "/ev",
-                  {
-                    "VAR=": "pup_with_me",
-                    "re": true
-                  },
-                  "^Good boy! The Pond Pup trots off home, wagging. ",
-                  "#",
-                  "^speaker: Fae",
-                  "/#",
-                  "\n",
-                  "done",
-                  null
-                ],
-                "c-1": [
-                  "\n",
-                  "done",
-                  null
-                ]
-              }
-            ],
-            null
-          ],
           "nobody": [
             "^Nobody comes... yet. Animal friends come running, Ms. Willow said. I need to make one first! ",
             "#",
@@ -13177,6 +13530,31 @@
         "nop",
         "/#",
         "\n",
+        "ev",
+        {
+          "VAR?": "acorn_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The golden acorn from the knothole in the big oak. The Acorn Squirrel found it! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.63"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
         "^Fae closes the lid gently. ",
         "#",
         "^speaker: Fae",
@@ -13657,6 +14035,193 @@
           ]
         }
       ],
+      "oak_knothole": [
+        [
+          "ev",
+          {
+            "VAR?": "acorn_found"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.after"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "knothole_seen",
+            "re": true
+          },
+          "^High up the big oak, there's a dark knothole. Something rattles inside it when the wind blows. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ It's much too high to climb, and too small for my hand. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.20"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "!",
+          {
+            "VAR?": "has_lasso"
+          },
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ My lasso can't get inside a hole, either. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.30"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.38"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Up you go!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Chitter! The Acorn Squirrel zips up the trunk and pops into the knothole. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "acorn_found",
+                "re": true
+              },
+              "^He scampers back down with a golden acorn, and a whole pile of hazelnuts! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^gift: snack 3",
+              "/#",
+              "\n",
+              "^A golden acorn! It shines like a little sun. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The knothole high up the big oak is empty now. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -13956,6 +14521,30 @@
         false,
         {
           "VAR=": "lodge_cocoa_had"
+        },
+        false,
+        {
+          "VAR=": "squirrel_petted"
+        },
+        false,
+        {
+          "VAR=": "squirrel_fed"
+        },
+        false,
+        {
+          "VAR=": "squirrel_friend"
+        },
+        false,
+        {
+          "VAR=": "squirrel_with_me"
+        },
+        false,
+        {
+          "VAR=": "knothole_seen"
+        },
+        false,
+        {
+          "VAR=": "acorn_found"
         },
         "/ev",
         "end",

@@ -79,6 +79,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {seal_open: The bell-flower seal opened, and a warm forest glow shone beyond the stones. # speaker: Fae}
 {rope_bridge: I pulled the old rope bridge across the misty gully with my lasso. # speaker: Fae}
 {found_mist_way: Bluebells lit stepping stones through the mist, one hop at a time! # speaker: Fae}
+{acorn_found: The Acorn Squirrel climbed the big oak in the woods and found a golden acorn in its knothole! # speaker: Fae}
+{knothole_seen and not acorn_found: There's a knothole high up the big oak in the woods. Something rattles inside! # speaker: Fae}
+{squirrel_friend: The Acorn Squirrel is my friend! When I play my flute, he comes scampering. # speaker: Fae}
 {pond_tin: The Pond Pup swam out into the park pond and fetched an old tin of coins! # speaker: Fae}
 {pond_seen and not pond_tin: Something glints at the bottom of the park pond, too far out to reach. # speaker: Fae}
 {pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
@@ -396,7 +399,34 @@ A kid in a purple hood traded me a shiny bottle cap for my best acorn. # speaker
 Then, fizz! I couldn't stop throwing things. # speaker: Acorn Squirrel
 -> DONE
 = again
+{squirrel_friend: -> friend}
 I'm saving my acorns for winter now. Nobody gets bonked! # speaker: Acorn Squirrel
+{has_flute: -> bond}
+-> DONE
+// A chin scratch and a treat make a friend (Milestone 60), in either order.
+= bond
++ {not squirrel_petted} [Scratch his chin]
+    ~ squirrel_petted = true
+    Fae scratches under his chin. His eyes go all squinty and happy. # speaker: Fae
++ {not squirrel_fed} [Share a snack]
+    {snacks() == 0:
+        I'm out of snacks. The bakery sells them, and the clubhouse garden grows strawberries. # speaker: Fae
+        -> DONE
+    }
+    ~ squirrel_fed = true
+    Fae shares a snack. He stuffs it all in his cheeks at once! # speaker: Fae # feed: snack 1
++ [Wave bye]
+    Chitter! # speaker: Acorn Squirrel
+    -> DONE
+- {squirrel_petted and squirrel_fed: -> befriend}
+-> bond
+= befriend
+~ squirrel_friend = true
+The Acorn Squirrel hops right up onto Fae's shoe and chitters. # speaker: Fae
+He's my friend now! When I play my flute, he'll come scampering. # speaker: Fae
+-> DONE
+= friend
+Chitter! This squirrel flicks his tail at me like we're old friends. Word gets around! # speaker: Fae
 -> DONE
 
 === gull_calm ===
@@ -1434,18 +1464,22 @@ VAR pond_tin = false
 // The flute (F) plays this: a friend called to Fae's side, or sent home.
 === flute ===
 Fae plays a little tune on her painted flute. # speaker: Fae # sound: flute
-{not pup_friend: -> nobody}
-{pup_with_me: -> along}
-+ [Call the Pond Pup]
+{not (pup_friend or squirrel_friend): -> nobody}
++ {pup_friend and not pup_with_me} [Call the Pond Pup]
     ~ pup_with_me = true
     Woof! Woof! The Pond Pup comes running! # speaker: Pond Pup
     -> DONE
-+ [Just play]
-    -> DONE
-= along
-+ [Send the Pond Pup home]
++ {pup_with_me} [Send the Pond Pup home]
     ~ pup_with_me = false
     Good boy! The Pond Pup trots off home, wagging. # speaker: Fae
+    -> DONE
++ {squirrel_friend and not squirrel_with_me} [Call the Acorn Squirrel]
+    ~ squirrel_with_me = true
+    Chitter-chitter! The Acorn Squirrel scampers down a tree and hops along! # speaker: Acorn Squirrel
+    -> DONE
++ {squirrel_with_me} [Send the Acorn Squirrel home]
+    ~ squirrel_with_me = false
+    Off you go! The Acorn Squirrel bounds away, his tail bouncing. # speaker: Fae
     -> DONE
 + [Just play]
     -> DONE
@@ -1568,6 +1602,7 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {pond_tin: The old tin the Pond Pup fetched out of the park pond. # speaker: Fae}
 {has_map: The treasure map from the bottle by Sue's dock. X marked the spot! # speaker: Fae}
 {kite_returned: A bow from the tail of Rosie's kite. She gave it to me for getting it down! # speaker: Fae}
+{acorn_found: The golden acorn from the knothole in the big oak. The Acorn Squirrel found it! # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -1667,4 +1702,32 @@ I always notice you, Milo. You're my friend. # speaker: Fae
 -> DONE
 = again
 The Ancient Tree is glowing again. It's so pretty now. # speaker: Fae
+-> DONE
+
+// A second flute friend (Milestone 60): the Acorn Squirrel climbs.
+VAR squirrel_petted = false
+VAR squirrel_fed = false
+VAR squirrel_friend = false
+VAR squirrel_with_me = false
+VAR knothole_seen = false
+VAR acorn_found = false
+
+// The knothole high up the Whispering Woods' big west oak.
+=== oak_knothole ===
+{acorn_found: -> after}
+~ knothole_seen = true
+High up the big oak, there's a dark knothole. Something rattles inside it when the wind blows. # speaker: Fae
+{not squirrel_with_me: It's much too high to climb, and too small for my hand. # speaker: Fae}
+{not squirrel_with_me and has_lasso: My lasso can't get inside a hole, either. # speaker: Fae}
+{not squirrel_with_me: -> DONE}
++ [Up you go!]
+    Chitter! The Acorn Squirrel zips up the trunk and pops into the knothole. # speaker: Fae
+    ~ acorn_found = true
+    He scampers back down with a golden acorn, and a whole pile of hazelnuts! # speaker: Fae # gift: snack 3
+    A golden acorn! It shines like a little sun. # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The knothole high up the big oak is empty now. # speaker: Fae
 -> DONE

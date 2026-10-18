@@ -236,6 +236,15 @@
         "y": 520
       },
       "prompt": "Look"
+    },
+    {
+      "id": "knothole",
+      "knot": "oak_knothole",
+      "point": {
+        "x": 400,
+        "y": 635
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],

@@ -1,0 +1,16 @@
+{
+  "id": "acorn-squirrel",
+  "name": "Acorn Squirrel",
+  "atlas": "assets/characters/acorn-squirrel/acorn-squirrel.json",
+  "box": {
+    "width": 40,
+    "height": 56
+  },
+  "walkCycleUnits": 72,
+  "sits": true,
+  "start": false,
+  "joins": "squirrel_with_me",
+  "flute": true,
+  "critter": "squirrel",
+  "command": null
+}

@@ -311,6 +311,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   names). He stands about 50 units tall, sits about 51, and his idle down is
   sitting. Built by `tools/art/build-pond-pup.ts` from whole figures
   (`tools/art/extract-figures.ts`), one scale per source sheet.
+- The Acorn Squirrel's atlas (`public/assets/characters/acorn-squirrel/`,
+  Milestone 60): the same frame contract. His walks are hops: upright toward
+  and away from the camera, a bound on all fours to the side. He sits about
+  46 units tall (his idle down is sitting up) and stands about 62 hopping
+  toward the camera, his tail over his head. Built by
+  `tools/art/build-acorn-squirrel.ts` the pup's way, one scale per source
+  sheet, chosen so his acorn cap is one size from every side.
 - `tools/art/validate-sprite.ts` must pass for every character atlas. All of its
   checks are mandatory (no switches); biped-only head checks are enabled by
   `"validator": { "biped": true }` in the character's `art/recipes/` file.
@@ -344,8 +351,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   the nearest steps out of the area into the party, where it stood (it
   leaves `state.wild` for the visit); otherwise it comes from a follower
   slot, like anyone joining. The Pond Pup is `pond-pup` ("Pond Pup"): box
-  44x56, `walkCycleUnits` 84, sits, joins `pup_with_me`, critter `pup`, last
-  in the roster.
+  44x56, `walkCycleUnits` 84, sits, joins `pup_with_me`, critter `pup`. After
+  him, the Acorn Squirrel is `acorn-squirrel` ("Acorn Squirrel", Milestone
+  60): box 40x56, `walkCycleUnits` 72, sits, joins `squirrel_with_me`,
+  critter `squirrel`, last in the roster. Both can come along at once: the
+  whole roster fits behind Fae at every spawn (the area checks).
 - Chain rule: member 0 follows Fae; member i follows member i-1, with the same
   algorithm, the leader being the member ahead *after* its own move this tick
   (the party updates in order). Each member keeps its own breadcrumb trail of
@@ -572,9 +582,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   says she found it: the pup's purple thread (`pup_calm`), the note from under
   the comics (always: the club is claimed), the hooded kid's marker
   (`saw_hood`), the Star Racer token (`stash_found`), the pond's tin
-  (`pond_tin`), the treasure map (`has_map`), and a bow from Rosie's kite
-  (`kite_returned`). The journal tells of the freezer, the box in hand, and
-  the chest.
+  (`pond_tin`), the treasure map (`has_map`), a bow from Rosie's kite
+  (`kite_returned`), and the golden acorn (`acorn_found`, Milestone 60). The
+  journal tells of the freezer, the box in hand, and the chest.
 - Lasso spots (Milestone 49): once Fae has Coach Ash's lasso, three things
   are stuck out of reach, each an added prop (section 6.2) shown while
   `has_lasso` and hidden again once it's down. In Meadow Park, Rosie's kite
@@ -643,6 +653,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   "Fetch, boy!" sends him swimming for an old tin of twelve coins
   (`pond_tin`, `gift: coins 12`), once. The journal tells of the tin, the
   glint until then, and the friend, on top.
+- A second flute friend (Milestone 60): the Acorn Squirrel, the Cliffside
+  Trail's recurring squirrel, bonds the pup's way. Once Fae has the flute, a
+  calm squirrel's talk (`squirrel_calm`, after its first) offers Scratch his
+  chin and Share a snack; both, in either order, make him her friend
+  (`squirrel_petted`, `squirrel_fed`, `squirrel_friend`). Then a calm
+  squirrel greets her as an old friend. The `flute` knot offers a call or a
+  send-home for each friend (the pup's, then the squirrel's, then Just play),
+  so with only the pup a friend its choices are what they were, and both
+  can come along at once. In the Whispering Woods, the big west oak's painted
+  knothole has a look point at the oak's foot (`knothole` at (400, 635)):
+  something rattles inside (`knothole_seen`), too high to climb and too small
+  for a hand, and no place for a lasso; with the Acorn Squirrel along, "Up
+  you go!" sends him up for a golden acorn and a pile of hazelnuts
+  (`acorn_found`, `gift: snack 3`), once. The journal tells of the acorn, the
+  knothole until then, and the friend, above the pup's notes.
 - The lodge keeper (Milestone 57): once Fae has calmed a hamster at Pinecone
   Pass (`calmed("hamster")`, its sticker), the lodge's note leads on
   (`lodge_door.back`): a snowball whizzes past, and its keeper, Mrs. Flurry,

@@ -107,6 +107,7 @@ import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
 import pondPupData from "../../content/party/pond-pup.json";
+import acornSquirrelData from "../../content/party/acorn-squirrel.json";
 import landsData from "../../content/lands.json";
 import { createInkState, createStoryReader, runInk, storyHasKnot } from "../core/ink";
 import { isStorySound } from "../core/sound";
@@ -1916,8 +1917,11 @@ export function loadContent(): {
   const sue = parsePartyMember(sueData, "content/party/sue.json");
   const jordan = parsePartyMember(jordanData, "content/party/jordan.json");
   const pondPup = parsePartyMember(pondPupData, "content/party/pond-pup.json");
+  const acornSquirrel = parsePartyMember(acornSquirrelData,
+    "content/party/acorn-squirrel.json");
   const party = {
     [maddie.id]: maddie, [sue.id]: sue, [jordan.id]: jordan, [pondPup.id]: pondPup,
+    [acornSquirrel.id]: acornSquirrel,
   };
   const storyVariable = createStoryReader(story);
   const initialInk = createInkState(story, 1);

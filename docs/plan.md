@@ -2658,7 +2658,7 @@ the old trail, the owl, and the clubhouse claim.
   - The sheet, the room, the door, the snowballs, and the wording are in the
     owner's review queue.
 
-## Milestone 60: A second flute friend **Status:** 🚧 In progress (2026-10-18)
+## Milestone 60: A second flute friend **Status:** ✅ Completed (2026-10-18)
 - The owner picked a second flute friend (2026-10-18). NOTES.md: the flute
   "calls animal friends to your side", a bond is built "by feeding them
   treats and petting them", and "specific animals have specific abilities
@@ -2667,14 +2667,51 @@ the old trail, the owl, and the clubhouse claim.
 - The Acorn Squirrel, the Cliffside Trail's recurring squirrel: once Fae has
   the flute, a calm one's later talks offer a chin scratch and a snack, and
   both make a friend (`squirrel_friend`), the way the pup's bond works. The
-  flute then calls either friend, or both, and sends either home.
-- His ability: in the Whispering Woods, high in the big west oak, is a dark
-  knothole that rattles in the wind, too small for Fae's hand and too deep
-  for the lasso. With the squirrel along, he scampers up and in, and comes
-  back with a golden acorn (a keepsake for the clubhouse chest) and a pile of
-  hazelnuts (snacks).
-- Art: his follower atlas (hopping toward, away, and to the side, and his
-  idles), built like the Pond Pup's.
+  flute then calls either friend, or both, and sends either home. With only
+  the pup a friend, its choices are what they were, so no earlier recorded
+  run changes.
+- His ability: in the Whispering Woods, high up the big west oak, is a dark
+  knothole (already in the painting) that rattles in the wind, too small for
+  Fae's hand and no place for the lasso. With the squirrel along, he scampers
+  up and in, and comes back with a golden acorn (a keepsake for the clubhouse
+  chest) and a pile of hazelnuts (three snacks). Its look point is at the
+  oak's foot; no painting changed.
+- Art (`art/recipes/acorn-squirrel.json`): his follower atlas, hopping
+  upright toward and away from the camera and bounding on all fours to the
+  side, with his idles (sitting up, his back, his side), built by
+  `tools/art/build-acorn-squirrel.ts` the Pond Pup's way. Every sprite
+  validator check passes as it stands.
+- Evidence: unit tests (`squirrel-friend.test.ts`: the bond before and after
+  the flute, in either order, without a snack, and the old-friend greeting;
+  the flute with one friend and with two, both along at once; his roster
+  entry, a calm trail squirrel stepping into the party, and sitting battles
+  out; the knothole without him, with him, and empty after; its look point
+  and the area checks; the journal), the recorded run
+  `pass-party/squirrel.json` (`tools/sim/record-squirrel.ts`, on from the
+  kitchen run: to the trail, a squirrel calmed, his tale and the bond, the
+  flute, and back to the woods' knothole) with its replay test, and the
+  real-key e2e `squirrel.spec.ts` (four moments at both sizes, him hopping
+  along among them; the browser's and Bun's hashes match). The roster now
+  ends with him, so the Sue and Jordan roster tests list him. Gates, on the
+  tree rebased onto Milestone 55 (54 and 55 landed while this was built):
+  `just check` (916 unit tests, the sim, core purity, lint), `just build`,
+  and `just e2e` (815 passed, 2 skipped).
+- Notes and assumptions:
+  - He's a he, like the pup. His bond's lines are his own; his tale is the
+    trail squirrels' (the bottle cap and the acorns).
+  - Both friends can come along at once: the whole roster fits behind Fae at
+    every spawn (the area checks), and the flute offers each friend's call.
+  - The look point is text only, like the pond's glint: the knothole is
+    painted high on the oak and is off screen while Fae stands at its foot.
+  - His hop toward the camera took 13 of the art's 25 calls; the strips
+    turned three-quarter, changed his head's size, or changed his outline
+    more than 1.20x. The owner agreed to waive the head-on symmetry check for
+    the last of them (call 24), but its squirrels touched and couldn't be
+    cut apart. Its spaced-out redraw (call 25) keeps every pose and passes
+    every check, so nothing was waived.
+  - Gemini calls: 25, all for the sprite, none failed.
+  - The sprite, his size, the knothole, the reward, and the wording are in
+    the owner's review queue.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
@@ -3162,8 +3199,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     clubhouse kitchen (owner, 2026-10-17): done (above).
   - Milestone 57, the lodge keeper: done (above), the first of more people
     under the chaos spell (owner, 2026-10-17).
-  - Milestone 60, a second flute friend: in progress (above; owner,
-    2026-10-18).
+  - Milestone 60, a second flute friend: done (above; owner, 2026-10-18).
   - A fix (2026-10-18): the journal's map page still wrote "???" for the
     Enchanted Forest whatever its view said, so the map rule Milestone 53
     added (named once the Misty Path is found or Fae is in the land) never
@@ -3175,8 +3211,9 @@ more bad guys, and the blacklight lantern, made and built while away.
 
 ## Later (not scheduled)
 More people under the chaos spell (NOTES.md: more mini-bosses), after the
-lodge keeper (Milestone 57). Flute friends, the lasso's places, and the
-clubhouse's chest and microwave are done (Milestones 47, 49, and 52).
+lodge keeper (Milestone 57). Flute friends (the Pond Pup and the Acorn
+Squirrel), the lasso's places, and the clubhouse's chest and microwave are
+done (Milestones 47, 60, 49, and 52).
 
 Sound follow-ups from Milestone 37:
 - Music and ambience: a title, town, and battle theme, and quiet beds per

@@ -2526,6 +2526,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Approved 2026-10-18: the arcade's painting as Milestone 61 rearranged it
   (`art/review/m61-room.jpg`), with the neon words Milestone 58 painted into
   it ("ARCADE", "PLAY", "TICKETS", "CLAW").
+- Approved 2026-10-18: Comet Cruise (Milestone 59) as built: its name,
+  numbers, lines, the teal cabinet's close-up, and the rocket, star, and rock
+  (`art/review/m59-comet-cabinet.jpg`, `m59-comet-sprites.jpg`).
 - Waiting for the owner's review (Milestones 17 to 28, and art drawn ahead):
   Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay
   painting, the bluebird and its lines, Jordan's atlas, the Pinecone Pass

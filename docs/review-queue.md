@@ -19,6 +19,12 @@ Reviewed 2026-10-18: the arcade as Milestone 61 rearranged it is approved
 (`art/review/m61-room.jpg`), and with it the arcade's painting as it now
 stands, Milestone 58's neon words included.
 
+Reviewed 2026-10-18: Comet Cruise (Milestone 59) is approved as built: its
+name, its numbers (2 coins; 16 stars and 8 rocks in about 20 seconds; a rock
+only wobbles the rocket; 2 tickets a star), its lines, and its art
+(`art/review/m59-comet-cabinet.jpg`, `m59-comet-sprites.jpg`,
+`m59-comet-game.jpg`).
+
 ## Still open
 
 | Item | Why it's waiting |
@@ -83,4 +89,3 @@ stands, Milestone 58's neon words included.
 | The kid in the purple hood (Milestone 55) | The kid's battle sheet, hooded and revealed (`public/assets/critters/hooded-kid/`; `art/recipes/hooded-kid-battle.json`), Milo in his hoodie (`public/assets/characters/milo-hoodie/`), the two hoodies' looks (the battle sheet's two-tone patchwork, the morning's calmer one), the scribble shapes and the painted trail, Talk's answers on screen, the trace's tuning, and the wording in `docs/plan.md` (Milestone 55). Review the snapshots in `tests/e2e/kid.spec.ts-snapshots/` and `ui-gallery.spec.ts-snapshots/battle-trace-*` and `battle-talk-*`. |
 | A second flute friend (Milestone 60) | The Acorn Squirrel's follower sprite, hopping upright toward and away from the camera and bounding on all fours to the side (`public/assets/characters/acorn-squirrel/`; `art/recipes/acorn-squirrel.json`; `art/review/m60-acorn-squirrel.jpg` beside Maddie and the Pond Pup); his size (sitting about 45 units, a little under Maddie; about 62 hopping toward the camera, his tail over his head); both friends coming along at once; the knothole (text only, in the painted oak); the golden acorn and three hazelnuts; the wording in `content/story/main.ink` (`squirrel_calm.bond`, `.befriend`, `.friend`, `flute`, `oak_knothole`, the chest's and the journal's lines); in the game, `tests/e2e/squirrel.spec.ts-snapshots/` |
 | Wake up (Milestone 56) | The morning: Fae and Maddie, Mom at the bedroom door, and Milo in his calmer hoodie by the kitchen's front door (the hoodie's second look, beside the battle sheet's patchwork). The credits sheet: THE END, FRIENDS, MET ALONG THE WAY, and "Thank you for playing!", each entry a sticker on one frame (friends on `down_idle_01`, critters on their sticker's frame), and on a phone, a sheet that scrolls. Milo's choices under the tree ([Watch the tree glow], [Not yet]), and the wording in `docs/plan.md` (Milestone 56). In the game, `tests/e2e/ending.spec.ts-snapshots/` and `ui-gallery.spec.ts-snapshots/credits-*` |
-| Comet Cruise (Milestone 59) | The defaults taken (the name; the teal cabinet; 2 coins a run; 16 stars and 8 rocks in three lanes; 2 tickets a star; a bump only wobbles) in `docs/plan.md`. The art: the cabinet's close-up (`art/recipes/comet-cabinet.json`; `art/review/m59-comet-cabinet.jpg`) and the rocket, star, and rock (`art/recipes/comet-sprites.json`; `art/review/m59-comet-sprites.jpg`). The code-drawn night, lanes, caps, and score sticker; the run's feel (`comet` in `content/arcade.json`); the lines (`comet_cruise` in `content/story/main.ink`, `content/arcade.json`); in the game, `tests/e2e/comet.spec.ts-snapshots/` and `ui-gallery.spec.ts-snapshots/comet-*` |

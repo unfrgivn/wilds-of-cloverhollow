@@ -2998,11 +2998,11 @@ more bad guys, and the blacklight lantern, made and built while away.
   of the real-key run, 16 of the gallery), each viewed before it was kept;
   no existing baseline changed.
 - Notes and assumptions:
-  - For the owner: the game and its name, its numbers (2 coins; 16 stars and
-    8 rocks; 2 tickets a star, so 32 at best; the travel from 96 ticks to
-    60; a 24-tick wobble), its lines (`comet_cruise` in
-    `content/story/main.ink`, and `comet` in `content/arcade.json`), and
-    the art.
+  - Approved by the owner (2026-10-18) as built: the game and its name, its
+    numbers (2 coins; 16 stars and 8 rocks; 2 tickets a star, so 32 at
+    best; the travel from 96 ticks to 60; a 24-tick wobble), its lines
+    (`comet_cruise` in `content/story/main.ink`, and `comet` in
+    `content/arcade.json`), and the art.
   - Art, 5 Gemini calls (the generation log), all kept as sources: the
     cabinet, 2 (one used), and the sprites, 2 sheets (one used) and an edit
     taking the used sheet's star glow away. It had been painted over the

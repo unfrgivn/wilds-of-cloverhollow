@@ -48,14 +48,19 @@ export function inkVariable(storyJson: StoryJson, inkJson: string, name: string)
 }
 
 // The same reads without building a Story each time (about 0.2 ms each): one
-// Story is built up front, and each read only loads the state into it and
-// never continues it. For the per-tick checks, through world.storyVariable.
+// Story is built up front and never continued. A state is only loaded when it
+// differs from the last one read: a tick reads the same state many times, and
+// loading it is most of the read.
 export function createStoryReader(
   storyJson: StoryJson,
 ): (inkJson: string, name: string) => unknown {
   const story = new Story(storyJson);
+  let loaded: string | undefined;
   return (inkJson, name) => {
-    story.state.LoadJson(inkJson);
+    if (inkJson !== loaded) {
+      story.state.LoadJson(inkJson);
+      loaded = inkJson;
+    }
     const variable = story.state.variablesState.GetVariableWithName(name);
     if (variable === null) return undefined;
     const text = variable.toString();

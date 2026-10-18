@@ -6,7 +6,7 @@
 // Longest first, each spec file goes to the lightest shard, so every shard
 // computes the same plan.
 //
-//   bun tools/ci/shard.ts <project> <shard>/<total> <test-list file>
+//   bun tools/ci/shard.ts <project> <shard>/<total> <test-list file> [--macos | --linux]
 //   bunx playwright test --project=<project> --test-list <test-list file>
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -83,15 +83,33 @@ function listProject(project: string): Test[] {
   return reportTests(parseReport(listed.stdout)).filter((test) => test.project === project);
 }
 
+// Chromium's spec files that CI runs on Linux runners rather than the Macs
+// (macOS allows five jobs at a time). They compare no screenshot (the
+// baselines are drawn on a Mac; one that takes a screenshot fails on Linux,
+// for want of a baseline) and draw little, so Linux's software renderer is no
+// slower for them. A gameplay spec draws a frame each step: the footsteps walk
+// took 62 s on Linux against 3 s on a Mac.
+export const linuxSpecs = new Set(["ui-gallery-checks.spec.ts"]);
+
+export function onRunner(tests: Test[], runner: "macos" | "linux"): Test[] {
+  return tests.filter((test) => linuxSpecs.has(test.file) === (runner === "linux"));
+}
+
+const usage = "usage: bun tools/ci/shard.ts <project> <shard>/<total> <test-list file> " +
+  "[--macos | --linux]";
+
 if (import.meta.main) {
-  const [project, shardArg, out] = Bun.argv.slice(2);
+  const [project, shardArg, out, runner] = Bun.argv.slice(2);
   const [shard, total] = (shardArg ?? "").split("/").map(Number);
   if (project === undefined || out === undefined || shard === undefined ||
     total === undefined || !Number.isInteger(shard) || !Number.isInteger(total) ||
-    shard < 1 || shard > total)
-    throw new Error("usage: bun tools/ci/shard.ts <project> <shard>/<total> <test-list file>");
+    shard < 1 || shard > total ||
+    (runner !== undefined && runner !== "--macos" && runner !== "--linux"))
+    throw new Error(usage);
   const timings = parseTimings(readFileSync("tests/e2e/timings.json", "utf8"));
-  const tests = listProject(project);
+  const listed = listProject(project);
+  const tests = runner === undefined ? listed
+    : onRunner(listed, runner === "--linux" ? "linux" : "macos");
   const mine = plan(tests, timings, total)[shard - 1] ?? { tests: [], seconds: 0 };
   writeFileSync(out, mine.tests.map((test) => `${listLine(test)}\n`).join(""));
   console.log(`${project} shard ${shard}/${total}: ${mine.tests.length} of ${tests.length} ` +

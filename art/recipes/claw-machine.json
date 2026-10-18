@@ -20,7 +20,7 @@
   ],
   "outputs": { "image": "public/assets/arcade/claw-machine.webp", "calibration": "public/assets/arcade/claw-machine.json", "rebuild": "tools/art/build-claw-machine.ts" },
   "owner_review": {
-    "viewed": ["art/review/claw-machine-overlay.png", "art/review/claw-style-compare.png"],
+    "viewed": ["art/review/claw-machine-overlay.jpg", "art/review/claw-style-compare.jpg"],
     "note": "The restyled machine reads as watercolor with soft pigment variation, paper texture, and warm-brown hand ink. The style comparison shows it belongs with the arcade painting and plush line, though the plush outlines remain slightly stronger than the machine's delicate contours."
   }
 }

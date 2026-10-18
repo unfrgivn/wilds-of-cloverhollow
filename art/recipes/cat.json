@@ -37,5 +37,5 @@
   "measuredCentres": {"auraCentre": {"x": 256, "y": 256}, "bodyCentre": {"x": 256, "y": 314}},
   "centroids": {"calmBody": {"x": 252, "y": 310}, "aura": {"x": 259, "y": 262}, "unit": "frame px, alpha-weighted"},
   "bodyHeights": {"chaos_idle_01": 380, "chaos_burst_01": 445, "soothed_01": 380, "calm_idle_01": 380},
-  "review": ["art/review/cat-sheet-cream.png", "art/review/cat-sheet-dark.png", "art/review/recurring-critters-lineup.png"]
+  "review": ["art/review/cat-sheet-cream.jpg", "art/review/cat-sheet-dark.png", "art/review/recurring-critters-lineup.jpg"]
 }

@@ -10,8 +10,9 @@ walls, the water's edge, pockets nobody should enter. A prop's footprint, its
 own floor contact, comes from its kit.
 
 Run `bun tools/art/area-overlay.ts bedroom` to draw the JSON over the two
-painting tiles. The script writes `art/review/bedroom-overlay.png` and an SVG
-source. Inspect the full-size PNG before accepting coordinates. Green marks
+painting tiles. The script writes `art/review/bedroom-overlay.jpg` (its SVG
+source stays in `art/scratch/`). Inspect it at full size before accepting
+coordinates. Green marks
 every spot Fae's feet can reach from a spawn, by the core's own collision
 rule: it must cover only open painted floor, never furniture, the floor
 behind it, or the paper outside the painting. Orange marks every prop

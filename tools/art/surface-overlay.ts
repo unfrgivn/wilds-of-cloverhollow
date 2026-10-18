@@ -15,6 +15,7 @@ const colours: Record<string, string> = {
 const px = (value: number): number => value * 2;
 const poly = (points: Polygon): string => points.map(([x, y]) => `${px(x)},${px(y)}`).join(" ");
 mkdirSync("art/review", { recursive: true });
+mkdirSync("art/scratch", { recursive: true });
 for (const area of areas) {
   if (area === undefined) continue;
   const images = area.ground === undefined ? "" : (() => {
@@ -55,10 +56,12 @@ for (const area of areas) {
     `<rect x="12" y="12" width="480" ` +
     `height="48" fill="#fff9"/><text x="24" y="46" font-size="28">default: ` +
     `${surfaceMap.default}; regions: first</text>${regions}</svg>`;
-  const source = join("art/review", `${area.id}-surfaces.svg`);
-  const output = join("art/review", `${area.id}-surfaces.png`);
+  // The SVG names the painting by local path; it stays in scratch.
+  const source = join("art/scratch", `${area.id}-surfaces.svg`);
+  const output = join("art/review", `${area.id}-surfaces.jpg`);
   writeFileSync(source, svg);
-  const result = Bun.spawnSync(["magick", source, output], { stderr: "pipe" });
+  const result = Bun.spawnSync(["magick", source, "-background", "#f5f1e0", "-alpha", "remove",
+    "-quality", "90", output], { stderr: "pipe" });
   if (result.exitCode !== 0) throw new Error(new TextDecoder().decode(result.stderr));
   console.log(output);
 }

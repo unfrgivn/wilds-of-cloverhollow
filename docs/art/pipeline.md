@@ -62,7 +62,7 @@ bun tools/art/pack-atlas.ts --input art/scratch/fae-frames \
 # 5. Make the owner-review image on cream and dark backgrounds, including the
 # 0.56x phone row.
 bun tools/art/contact-sheet.ts --input art/scratch/fae-frames \
-  --output art/review/fae-contact-sheet.png --frame-width 384 --frame-height 384
+  --output art/review/fae-contact-sheet.jpg --frame-width 384 --frame-height 384
 
 # 6. Review motion at about 10 fps.
 for direction in down up left; do

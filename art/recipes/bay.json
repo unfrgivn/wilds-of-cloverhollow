@@ -29,6 +29,6 @@
   ],
   "manifest": "public/assets/areas/bay/ground.json"
  },
- "owner_review": "art/review/bay-owner-review.png and bay-grid.png (gitignored)",
+ "owner_review": "art/review/bay-owner-review.jpg and bay-grid.png",
  "geometry": "Authored by hand against the painting, like the other areas, and checked against the paint itself: tools/art/paint-map.ts reads the tiles into a 5-unit map (water, sand, painted things, edges; tests/unit/fixtures/bay-paint.json). tests/unit/bay-paint.test.ts requires no open water inside the floor, at most 2% of open sand off it or under blockers, every blocker on something painted, and the dock walkable rail to rail. tests/unit/bay-depth.test.ts requires the near (south) rail drawn over Fae on the dock and never over her on the beach (25-unit rail slivers, each with the baseline of its east end, since one baseline can't fit a diagonal rail), the far rail never over her, the umbrella, sign, and palm trunks over her behind them, and every occluder on its object. The floor excludes the rock piles along the top (x 200-550) and at the right; blockers stand on the trunk feet, sign posts, picnic, umbrella shade, bucket, beach balls, logs, and the dock's rail where the beach meets it."
 }

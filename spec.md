@@ -2479,8 +2479,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `tools/art/gemini-image.ts` with concept sheets as reference images. Each
   kept asset has a recipe in `art/recipes/` (model, prompt, reference images,
   date, post-processing steps). Selected raw outputs live in `art/source/`;
-  scratch frames (`art/scratch/`) and review images (`art/review/`) are
-  regenerable and not committed.
+  scratch frames (`art/scratch/`) are regenerable and not committed. Review
+  images (`art/review/`) are committed with the work they review, as JPEG
+  of a few MB at most: many are one-off composites, and an uncommitted
+  folder of them was lost once (2026-10-18). Only the kit tool's mask dumps
+  (`art/review/kit/`) stay out.
 - Post-processing (ImageMagick): background key-out and despill, strip
   segmentation by connected components, trimming, one uniform scale per strip
   (never stretched), feet-baseline alignment, and atlas packing. Commands are
@@ -2519,9 +2522,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   Mom and Oliver, the hall-pass puzzle, the raccoon and the tree house).
   "Ms. Maple" stays as the teacher's name for now.
 - Approved 2026-10-17: the thrown toys a catch throws (Milestone 41), cut
-  from the critters' burst frames (`art/review/toys-sheet.png`).
+  from the critters' burst frames (`art/review/toys-sheet.jpg`).
 - Approved 2026-10-18: the arcade's painting as Milestone 61 rearranged it
-  (`art/review/m61-room.png`), with the neon words Milestone 58 painted into
+  (`art/review/m61-room.jpg`), with the neon words Milestone 58 painted into
   it ("ARCADE", "PLAY", "TICKETS", "CLAW").
 - Waiting for the owner's review (Milestones 17 to 28, and art drawn ahead):
   Maddie at her true proportions, Sue's atlas and lines, the Bubblegum Bay

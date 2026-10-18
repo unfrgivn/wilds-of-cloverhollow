@@ -37,7 +37,7 @@
     "manifest": "public/assets/areas/trail/ground.json"
   },
   "owner_review": [
-    "art/review/trail-owner-review.png",
+    "art/review/trail-owner-review.jpg",
     "art/review/trail-grid.png"
   ],
   "geometry": "Intentionally omitted. No content/areas JSON or occluder cut-outs are included for this painted trail asset."

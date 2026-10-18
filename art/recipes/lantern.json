@@ -51,8 +51,8 @@
     "trail_marker": "136x171 including 8px border"
   },
   "review": {
-    "lanternSheet": "art/review/lantern-sheet.png",
-    "glowsOnPass": "art/review/glows-on-pass.png",
+    "lanternSheet": "art/review/lantern-sheet.jpg",
+    "glowsOnPass": "art/review/glows-on-pass.jpg",
     "notes": "The lantern is opaque and reads on both cream and dark backgrounds. The shipped glow atlas was reviewed directly over dark and in the Pinecone Pass composite; paw prints read as three filled raccoon handprints, the note as a masked raccoon doodle, and the marker as a filled brushy arrow with a star tail."
   }
 }

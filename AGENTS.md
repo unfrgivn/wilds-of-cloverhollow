@@ -56,6 +56,10 @@ only what the change touches: one spec on Chromium
   `docs/art/style-bible.md`.
 - Every kept generated asset has a recipe in `art/recipes/`. Runtime assets go
   in `public/assets/`. Scratch output goes in `art/scratch/` (gitignored).
+- Review images go in `art/review/` and are committed with the work they
+  review: they're often one-offs, and an uncommitted folder of them was lost
+  once. Write them as JPEG (quality about 90, a few MB at most). Never delete
+  one, even after it's approved; the review queue's history points at them.
 - Never overwrite owner-approved art without a new recipe.
 - Before making or generating media, search the open sources in
   `docs/media-sources.md` (Openverse: CC0 Freesound sound effects).

@@ -19,7 +19,7 @@
   ],
   "outputs": { "image": "public/assets/arcade/mole-cabinet.webp", "calibration": "public/assets/arcade/mole-cabinet.json", "rebuild": "tools/art/build-mole-cabinet.ts" },
   "owner_review": {
-    "viewed": ["art/review/mole-cabinet-overlay.png", "art/review/mole-style-compare.png"],
+    "viewed": ["art/review/mole-cabinet-overlay.jpg", "art/review/mole-style-compare.jpg"],
     "note": "Overlay confirms the five openings and blank plate. The comparison reads as one watercolor arcade prop set with the existing claw and skee-lane paintings."
   }
 }

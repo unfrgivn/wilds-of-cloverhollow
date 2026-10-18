@@ -38,5 +38,5 @@
  },
  "selectionReason": "The selected source preserves the bus line's green canopy and round blue star sign while omitting the bus, map easel, lettering, and snow for a compact town-plaza prop.",
  "placement": "The plaza, anchor (878, 945): the gap between the two lower flower boxes (blockers end at x 775 and start at x 985), leaving Fae 53-unit corridors on both sides and staying 33 units from every recorded replay position.",
- "review": "art/review/bus-stop-sheet-cream.png, bus-stop-sheet-dark.png, bus-stop-in-plaza.png (gitignored)"
+ "review": "art/review/bus-stop-sheet-cream.png, bus-stop-sheet-dark.png, bus-stop-in-plaza.jpg"
 }

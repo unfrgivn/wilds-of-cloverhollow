@@ -23,5 +23,6 @@ art/scratch/
 
 .derived-data/
 
-# Regenerable art review images
-art/review/
+# The kit tool's mask dumps (tools/art/kit.ts), rewritten on every run. The
+# rest of art/review/ is committed: review images are often one-offs.
+art/review/kit/

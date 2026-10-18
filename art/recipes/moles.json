@@ -18,7 +18,7 @@
   ],
   "outputs": { "atlas": "public/assets/arcade/moles.png", "metadata": "public/assets/arcade/moles.json", "rebuild": "tools/art/build-moles.ts" },
   "owner_review": {
-    "viewed": ["art/review/moles-cream.png", "art/review/moles-dark.png", "art/review/moles-in-holes.png"],
+    "viewed": ["art/review/moles-cream.jpg", "art/review/moles-dark.png", "art/review/moles-in-holes.jpg"],
     "note": "The frames read as one friendly mole with readable expression changes; the in-hole composite shows the lower cut and rim relationship at all five calibrated scales."
   }
 }

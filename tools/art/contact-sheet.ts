@@ -7,7 +7,7 @@ function value(name: string, fallback: string): string {
 }
 
 const input = value("input", "art/scratch/fae-frames");
-const output = value("output", "art/review/fae-contact-sheet.png");
+const output = value("output", "art/review/fae-contact-sheet.jpg");
 const frameWidth = value("frame-width", "384");
 const frameHeight = value("frame-height", "384");
 const files = (
@@ -16,12 +16,15 @@ const files = (
 if (files.length === 0) throw new Error(`No frames in ${input}`);
 
 const directory = output.slice(0, output.lastIndexOf("/"));
-const mkdir = Bun.spawn(["mkdir", "-p", directory]);
+const mkdir = Bun.spawn(["mkdir", "-p", directory, "art/scratch"]);
 if (await mkdir.exited !== 0) throw new Error(`Could not create ${directory}`);
 const paths = files.map((file) => `${input}/${file}`);
-const full = `${output}.full.png`;
-const dark = `${output}.dark.png`;
-const phone = `${output}.phone.png`;
+// The three sheets are kept lossless in the scratch folder; only the one
+// they make together goes to the review folder.
+const name = output.slice(output.lastIndexOf("/") + 1).replace(/\.[a-z]+$/, "");
+const full = `art/scratch/${name}.full.png`;
+const dark = `art/scratch/${name}.dark.png`;
+const phone = `art/scratch/${name}.phone.png`;
 
 const fullProcess = Bun.spawn(
   [
@@ -55,7 +58,7 @@ const phoneProcess = Bun.spawn(
 if (await phoneProcess.exited !== 0) throw new Error("Phone contact sheet failed");
 
 const append = Bun.spawn(
-  ["magick", full, dark, phone, "-background", "#F5F1E0", "-append", output],
+  ["magick", full, dark, phone, "-background", "#F5F1E0", "-append", "-quality", "90", output],
   { stdout: "inherit", stderr: "inherit" },
 );
 if (await append.exited !== 0) throw new Error("Contact sheet append failed");

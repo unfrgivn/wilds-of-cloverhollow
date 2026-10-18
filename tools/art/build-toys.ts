@@ -262,7 +262,7 @@ await command(["magick", "-size", "1200x20", "xc:#F5F1E0", "art/scratch/toys-bui
 await command([
   "magick", "art/scratch/toys-build/toy-sheet.png", "art/scratch/toys-build/rule.png",
   "art/scratch/toys-build/toy-sheet-small.png", "art/scratch/toys-build/source-sheet.png",
-  "-append", "-background", "#F5F1E0", "art/review/toys-sheet.png",
+  "-append", "-background", "#F5F1E0", "-quality", "90", "art/review/toys-sheet.jpg",
 ]);
 console.log(`Built ${toys.length} toys in ${atlasWidth}x${atlasHeight} atlas`);
 console.log(labels.join("\n"));

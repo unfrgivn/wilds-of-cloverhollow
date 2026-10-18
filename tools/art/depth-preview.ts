@@ -9,7 +9,7 @@
  * behind, or under one she stands in front of. A canopy prop over her is drawn
  * faded to 40%, as it settles in the game.
  *
- *   bun tools/art/depth-preview.ts <area> [x,y ...]   (art/review/<area>-depth.png)
+ *   bun tools/art/depth-preview.ts <area> [x,y ...]   (art/review/<area>-depth.jpg)
  */
 import { mkdirSync, readFileSync } from "node:fs";
 import {
@@ -64,7 +64,9 @@ function faeFrame(): Frame {
   return frame;
 }
 const fae = faeFrame();
-const props = area.props.map((prop) => ({ prop, state: propState(world, ink, prop) }));
+// A hidden prop (one the story hasn't put in the scene yet) draws nothing.
+const props = area.props.map((prop) => ({ prop, state: propState(world, ink, prop) }))
+  .filter(({ state }) => !state.hidden);
 
 function tiles(): Tile[] {
   const given = process.argv.slice(3).map((text) => {
@@ -170,8 +172,9 @@ const rows: string[] = [];
 for (let index = 0; index < files.length; index += 4)
   rows.push("(", ...files.slice(index, index + 4), "+append", ")");
 mkdirSync("art/review", { recursive: true });
-const output = `art/review/${id}-depth.png`;
-const sheet = Bun.spawnSync(["magick", ...rows, "-background", "white", "-append", output],
+const output = `art/review/${id}-depth.jpg`;
+const sheet = Bun.spawnSync(["magick", ...rows, "-background", "white", "-append", "-quality",
+  "90", output],
   { stderr: "pipe" });
 if (sheet.exitCode !== 0) throw new Error(new TextDecoder().decode(sheet.stderr));
 for (const tile of all) console.log(`${tile.label} at (${tile.feet.x}, ${tile.feet.y})`);

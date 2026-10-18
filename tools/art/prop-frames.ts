@@ -10,7 +10,7 @@
  * far, in units, the picture reaches past its front at most (`over`) and how
  * far it stops short of it (`short`), in the footprint's columns.
  *
- *   bun tools/art/prop-frames.ts <area>   (art/review/<area>-frames.png)
+ *   bun tools/art/prop-frames.ts <area>   (art/review/<area>-frames.jpg)
  */
 import { mkdirSync, readFileSync } from "node:fs";
 import { loadContent } from "../../src/content/load";
@@ -96,9 +96,9 @@ for (let index = 0; index < tiles.length; index += 5)
   rows.push("(", ...tiles.slice(index, index + 5), "-background", "white", "-gravity", "south",
     "+append", ")");
 mkdirSync("art/review", { recursive: true });
-const output = `art/review/${id}-frames.png`;
+const output = `art/review/${id}-frames.jpg`;
 const sheet = Bun.spawnSync(["magick", ...rows, "-background", "white", "-gravity", "west",
-  "-append", output], { stderr: "pipe" });
+  "-append", "-quality", "90", output], { stderr: "pipe" });
 if (sheet.exitCode !== 0) throw new Error(new TextDecoder().decode(sheet.stderr));
 for (const note of notes) console.log(note);
 console.log(`${output}: ${tiles.length} frames`);

@@ -74,9 +74,9 @@
   "calm_idle_01": 377
  },
  "review": [
-  "art/review/bunny-sheet-cream.png",
+  "art/review/bunny-sheet-cream.jpg",
   "art/review/bunny-sheet-dark.png",
-  "art/review/trail-critters-lineup.png"
+  "art/review/trail-critters-lineup.jpg"
  ],
  "generationCallsNote": "5 calls in the main checkout's art/scratch/generation-log.jsonl: three body sheets (2026-10-07 04:34:47, 04:35:18, 04:42:38 UTC; the last is selected) and two auras (04:35:41, 04:42:57; the last is selected)."
 }

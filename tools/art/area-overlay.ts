@@ -7,7 +7,7 @@
 // every blocker, prop, and footprint (the core's own rule). Green on
 // furniture, behind it, or off the painted floor is a geometry bug.
 //
-//   bun tools/art/area-overlay.ts <area>   (writes art/review/<area>-overlay.png)
+//   bun tools/art/area-overlay.ts <area>   (writes art/review/<area>-overlay.jpg)
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Polygon } from "../../src/core";
@@ -71,9 +71,13 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${
   group('fill="none" stroke="#7c3aed" stroke-width="4" stroke-dasharray="12 8"', looks) +
   group('stroke="#ffffff66" stroke-width="2"', grid.join("")) + "</svg>";
 mkdirSync("art/review", { recursive: true });
-const source = join("art/review", `${id}-overlay.svg`);
+mkdirSync("art/scratch", { recursive: true });
+// The SVG names the painting's tiles by local path, so it stays in scratch;
+// only the JPEG made from it is a review image.
+const source = join("art/scratch", `${id}-overlay.svg`);
 writeFileSync(source, svg);
-const output = join("art/review", `${id}-overlay.png`);
-const result = Bun.spawnSync(["magick", source, output], { stderr: "pipe" });
+const output = join("art/review", `${id}-overlay.jpg`);
+const result = Bun.spawnSync(["magick", source, "-background", "#f5f1e0", "-alpha", "remove",
+  "-quality", "90", output], { stderr: "pipe" });
 if (result.exitCode !== 0) throw new Error(new TextDecoder().decode(result.stderr));
 console.log(`${output}: ${reached.length} reachable spots`);

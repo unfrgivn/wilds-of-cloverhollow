@@ -9,5 +9,5 @@
   "post_processing": ["Built a protect barrier between the measured outer rail outlines from the hump to the bottom edge before corner flood-fill", "Flood-filled only the connected cream paper margin from all four corners at 10% fuzz; no subject recolouring", "Unioned the protected lane trapezoid into the alpha mask, then despill-safe alpha composited and converted to WebP at quality 88"],
   "outputs": ["public/assets/arcade/skee-lane.webp", "public/assets/arcade/skee-lane.json", "tools/art/build-skee-lane.ts"],
   "calibration_method": "Measured on the runtime pixel image and checked with art/review/skee-lane-overlay.png. Near/far lane edges converge at x=1200, the image centre. Board is above far.y; plate and panel are disjoint from board.",
-  "owner_review": {"viewed": ["art/review/skee-lane-overlay.png", "art/review/skee-style-compare.png"]}
+  "owner_review": {"viewed": ["art/review/skee-lane-overlay.jpg", "art/review/skee-style-compare.jpg"]}
 }

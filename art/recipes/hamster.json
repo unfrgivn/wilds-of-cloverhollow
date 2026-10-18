@@ -53,7 +53,7 @@
   },
   "keyColourJustification": "#00FF00 is absent from the hamster subject; the selected raw backgrounds are magenta, which the deterministic build converts only in the background matte before green keying so the purple/teal chaos marks are not mistaken for magenta spill.",
   "review": [
-    "art/review/hamster-sheet-cream.png",
+    "art/review/hamster-sheet-cream.jpg",
     "art/review/hamster-sheet-dark.png",
     "art/review/hamster-with-pup.png"
   ],

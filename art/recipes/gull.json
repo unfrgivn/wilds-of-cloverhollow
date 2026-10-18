@@ -61,7 +61,7 @@
   "review": [
     "art/review/gull-sheet-cream.png",
     "art/review/gull-sheet-dark.png",
-    "art/review/gull-lineup.png"
+    "art/review/gull-lineup.jpg"
   ],
   "generationCallsNote": "3 calls in the main checkout's art/scratch/generation-log.jsonl: one body sheet and two white-painted aura attempts on 2026-10-07; the second aura is selected."
 }

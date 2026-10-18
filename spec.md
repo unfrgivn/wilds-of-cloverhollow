@@ -1213,6 +1213,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   game state.
 - After the credits, the title opens in `continue` mode over the dream
   (section 7.4).
+- In dev and harness builds only, Q on the title opens the QA save library. A
+  long press on the logo does the same on touch. `?qa=<id>` boots that named
+  pack directly; unknown ids show an error listing the known ids. The title's
+  production appearance is unchanged. QA mode is left by reload or relaunch.
 - The Continue detail is the area's `name` (area JSON) and the sticker count
   ("0 stickers", "1 sticker", "2 stickers").
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
@@ -2320,6 +2324,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`autosaveNeeded`), and it is false while `finale` isn't null: the dream's
   last save is the ending's snapshot (section 7.4). Fixture resets don't save.
 - Boot: a valid save resumes the game; otherwise a new game starts.
+- QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
+  packs are separate files in the dev/harness-only save library; movement,
+  doors, and ending events cannot change the player's slot.
 
 ## 11. Harness and agent control (locked)
 - The dev hook `window.__cloverhollow` exists in dev builds and in harness
@@ -2349,6 +2356,8 @@ ios/            Capacitor iOS project (from Milestone 4).
     known fixtures.
   - `boot.title()`: the title's mode (`fresh`, `continue`, `confirm`), or
     null once the game has started.
+  - `qa.active()` reports whether a QA pack is loaded, and `qa.packs()` lists
+    the dev/harness-only pack metadata.
   - `save`: `clear()` deletes the slot; `last()` is the tick and hash of the
     latest completed save write; `loaded()` is the tick and hash of the save
     restored at boot, or null for a new game.
@@ -2378,7 +2387,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
-  are the only shortcut, and they are labeled test-only.
+  and QA save packs are the labeled test-only shortcuts; teleporting, eval, and
+  arbitrary flag setting remain absent.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
 - `renderInfo().arcade` is null outside an arcade game, otherwise the open
@@ -2423,7 +2433,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   gameplay feature has at least one e2e test that uses real key presses.
 - Playwright projects: Chromium runs every e2e spec. WebKit (the iOS engine)
   runs the layout, UI, and input-device specs (title, title gallery, UI
-  gallery, journal and save, dialogue, battle scene, sound, harness, gamepad)
+  gallery, journal and save, dialogue, battle scene, sound, harness, gamepad,
+  and QA)
   plus the gameplay flows tagged `@smoke`; each gameplay flow already checks
   its state hash against Bun (JavaScriptCore) for cross-engine determinism.
 - Visual baselines live beside the e2e specs. Update them only after viewing

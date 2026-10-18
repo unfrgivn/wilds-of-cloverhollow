@@ -2852,7 +2852,7 @@ the old trail, the owl, and the clubhouse claim.
 - For the owner: her name, her look (drawn to Mrs. Flurry's sheet; the
   concepts have no lifeguard), and her lines.
 
-## Milestone 65: QA mode and the save library **Status:** 🚧 In progress (2026-10-18)
+## Milestone 65: QA mode and the save library **Status:** ✅ Completed (2026-10-18)
 - The owner asked for a way to playtest later stages without playing from
   the start (2026-10-18): a library of QA saves, a debug mode that jumps to
   one, no autosave while testing, and QA saves kept apart from the player's
@@ -2887,6 +2887,12 @@ the old trail, the owl, and the clubhouse claim.
   the player's save unchanged byte for byte and no autosave written; `?qa=`
   boots the pack with its badge), the menu and the badge screenshotted and
   viewed, and the menu on the iOS simulator.
+- Gates and notes (2026-10-18): Q was free in the input map, so it is the
+  keyboard entry, alongside a logo long press and `?qa=<id>`. The library has
+  four real packs from the new-game chapter-one/east-road runs and seventeen
+  interim packs from the pass-party runs, each cut at a valid autosave. QA
+  content is loaded only by the dev/harness dynamic module, keeping the player
+  slot untouched and autosaves disabled.
 
 ## Milestone 66: Experience and levels **Status:** 📋 Planned (a proposal for the owner's review)
 - The owner asked for experience and levels (2026-10-18), for the cheat

@@ -15,6 +15,7 @@ const containsHook =
   text.includes("__cloverhollow") || text.includes("window.__cloverhollow");
 const containsStateLog = text.includes("[cloverhollow] state");
 const containsGallery = text.includes("Cloverhollow sticker gallery");
+const containsQa = text.includes("QA save library") && text.includes("shortcut-jordan");
 if (process.argv.includes("--harness") ? !containsHook : containsHook) {
   throw new Error(
     process.argv.includes("--harness")
@@ -33,6 +34,12 @@ if (process.argv.includes("--harness") ? !containsGallery : containsGallery) {
   throw new Error(process.argv.includes("--harness")
     ? "harness gallery missing" : "gallery leaked into production");
 }
+if (process.argv.includes("--harness") ? !containsQa : containsQa)
+  throw new Error(
+    process.argv.includes("--harness")
+      ? "harness QA library missing"
+      : "QA mode leaked into production",
+  );
 console.log(
   process.argv.includes("--harness")
     ? "harness hook presence check: passed"

@@ -3,6 +3,7 @@ import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
 import type { BattleCheckInfo } from "../render/view";
 import type { ArcadeInfo } from "../ui/arcade";
+import type { QaPack } from "./qa";
 
 export type CloverhollowHook = {
   version: 1;
@@ -82,6 +83,7 @@ export type CloverhollowHook = {
     loaded: () => { tick: number; hash: string } | null;
   };
   boot: { title: () => "fresh" | "continue" | "confirm" | null };
+  qa: { active: () => boolean; packs: () => QaPack[] };
   sound: {
     log: AudioController["log"];
     muted: AudioController["muted"];
@@ -102,6 +104,7 @@ export function installHook(deps: {
   renderInfo: CloverhollowHook["renderInfo"];
   save: CloverhollowHook["save"];
   boot: CloverhollowHook["boot"];
+  qa: CloverhollowHook["qa"];
   sound: CloverhollowHook["sound"];
 }): void {
   const hook: CloverhollowHook = {
@@ -145,6 +148,7 @@ export function installHook(deps: {
     renderInfo: deps.renderInfo,
     save: deps.save,
     boot: deps.boot,
+    qa: deps.qa,
     sound: deps.sound,
   };
   window.__cloverhollow = hook;

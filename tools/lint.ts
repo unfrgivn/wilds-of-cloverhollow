@@ -27,7 +27,7 @@ for (const file of sourceFiles.filter((item) => item.endsWith(".ts"))) {
   });
 }
 for (const file of [...files("content"), ...files("tests/sim/scripts")].filter(
-  (item) => item.endsWith(".json"),
+  (item) => item.endsWith(".json") && !item.includes("content/qa/saves/"),
 )) {
   const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
   const expected = `${JSON.stringify(parsed, null, 2)}\n`;

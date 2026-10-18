@@ -65,6 +65,8 @@ import {
 import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAudio } from "./platform/audio";
 import type { AudioLevel } from "./platform/audio-settings";
+import { qaFlow } from "./shell/qa-flow";
+import type { PackState } from "./dev/qa";
 
 const content = loadContent();
 const app = new Application();
@@ -76,6 +78,18 @@ const saveKey = "cloverhollow-save";
 
 async function boot(): Promise<void> {
   preventPinchZoom();
+  const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
+  const qaTools = qaEnabled ? await import("./dev/qa") : null;
+  const qaPacks: PackState[] = qaTools?.loadQaPacks() ?? [];
+  let qaUrlPack: PackState | null = null;
+  let qaError: string | null = null;
+  if (qaTools !== null) {
+    try {
+      qaUrlPack = qaTools.qaPackFromUrl(qaPacks, window.location.search);
+    } catch (error: unknown) {
+      qaError = error instanceof Error ? error.message : String(error);
+    }
+  }
   // Sound starts first, before anything awaits (spec 3.3): its context and its
   // key, pointer, and touch listeners exist before the page finishes loading,
   // so only a gesture made after that can have unlocked it.
@@ -118,6 +132,9 @@ async function boot(): Promise<void> {
   journal.onToggleAudio(sound.toggle);
   journal.onSetAudioLevel((level: AudioLevel) => sound.setLevel(level));
   const title = createTitleScreen(uiRoot);
+  const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaPacks);
+  const qaBadge = qaTools === null ? null : qaTools.createQaBadge(uiRoot);
+  if (qaTools !== null && qaError !== null) qaTools.createQaError(uiRoot, qaError);
   const credits = createCredits(uiRoot);
   const input = createInputSource(() => {
     return combineInputFrames(
@@ -125,6 +142,28 @@ async function boot(): Promise<void> {
       touch.sample(),
       gamepad.frame(),
     );
+  });
+  const openQa = (): void => {
+    if (qaTools === null || qaPacks.length === 0 || titleMode === null) return;
+    qaReturnMode = titleMode;
+    qaMenuOpen = true;
+  };
+  title.onQa(openQa);
+  if (qaEnabled)
+    window.addEventListener("keydown", (event) => {
+      if (event.code === "KeyQ") {
+        event.preventDefault();
+        openQa();
+      }
+    });
+  qaMenu?.onChoose((item) => {
+    qaActivePack = item;
+    const loaded = parseSave(item.save, fresh);
+    if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
+    state = loaded;
+    qaMenuOpen = false;
+    titleMode = null;
+    paused = false;
   });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   commandMenu.onChoose((index) => touch.tapChoice(index));
@@ -137,13 +176,21 @@ async function boot(): Promise<void> {
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
   const fresh = createState(content.world, initialFixture);
-  const saved = await Preferences.get({ key: saveKey });
-  const restored = saved.value === null ? null : parseSave(saved.value, fresh);
+  const saved = qaUrlPack === null ? await Preferences.get({ key: saveKey }) : { value: null };
+  const restored = qaUrlPack === null
+    ? saved.value === null ? null : parseSave(saved.value, fresh)
+    : parseSave(qaUrlPack.save, fresh);
   state = restored ?? fresh;
   // A real boot opens on the title (spec 7.3), with the game frozen behind it:
   // no core ticks run, so Continue resumes the save exactly as it was written.
   // Fixture resets (the harness) skip it.
-  let titleMode: TitleMode | null = restored === null ? "fresh" : "continue";
+  let titleMode: TitleMode | null = qaError !== null ? null : qaUrlPack === null
+    ? restored === null ? "fresh" : "continue"
+    : null;
+  let qaMenuOpen = false;
+  let qaActivePack: PackState | null = qaUrlPack;
+  let qaSelected = 0;
+  let qaReturnMode: TitleMode = restored === null ? "fresh" : "continue";
   let titleSelected: TitleChoiceId =
     restored === null ? "new-game" : "continue";
   const applyTitle = (input: TitleInput): void => {
@@ -430,11 +477,13 @@ async function boot(): Promise<void> {
     if (fluteButton !== null)
       fluteButton.hidden = content.world.storyVariable(state.ink, "has_flute") !== true;
     title.render({
-      visible: titleMode !== null,
+      visible: titleMode !== null && !qaMenuOpen,
       mode: titleMode ?? "fresh",
       selected: titleSelected,
       continueDetail: continueDetail(content.world, state),
     });
+    qaMenu?.render(qaMenuOpen, qaSelected);
+    qaBadge?.render(qaActivePack?.pack ?? null);
     const creditsOpen = state.finale === "credits";
     credits.render({
       visible: creditsOpen,
@@ -655,6 +704,32 @@ async function boot(): Promise<void> {
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
   const tick = (frame: ActionFrame): void => {
+    if (qaMenuOpen) {
+      const result = qaFlow(qaPacks.length, qaSelected, {
+        up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
+        down: frame.move.y > 0.5 && titlePrevious.move.y <= 0.5,
+        confirm: frame.confirm && !titlePrevious.confirm,
+        cancel: frame.cancel && !titlePrevious.cancel,
+      });
+      qaSelected = result.selected;
+      if (!result.open) {
+        qaMenuOpen = false;
+        titleMode = qaReturnMode;
+        qaActivePack = null;
+      }
+      if (result.action !== null) {
+        const chosen = qaPacks[result.action];
+        if (chosen === undefined) throw new Error("QA selection disappeared");
+        const loaded = parseSave(chosen.save, fresh);
+        if (loaded === null) throw new Error(`QA save ${chosen.pack.id} is invalid`);
+        state = loaded;
+        qaActivePack = chosen;
+        qaMenuOpen = false;
+        paused = false;
+      }
+      titlePrevious = frame;
+      return;
+    }
     if (titleMode !== null) {
       applyTitle({
         up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
@@ -709,14 +784,14 @@ async function boot(): Promise<void> {
     for (const event of stepped.events)
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
-        void saveState(event.state);
+        if (qaActivePack === null) void saveState(event.state);
       }
     for (const cue of soundCues(previous, state, content.world)) {
       const played = sound.play(cue, state.tick);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
     }
-    if (autosaveNeeded(previous, state)) void save();
+    if (qaActivePack === null && autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const log =
         state.battle === null
@@ -843,14 +918,19 @@ async function boot(): Promise<void> {
         titleMode = null;
       },
       renderInfo: () => ({ ...view.renderInfo(state), arcade: arcade.info() }),
+      qa: {
+        active: () => qaActivePack !== null,
+        packs: () => qaPacks.map((item) => item.pack),
+      },
       save: {
         clear: async () => {
+          if (qaActivePack !== null) return;
           await saveQueue;
           await Preferences.remove({ key: saveKey });
           saveLast = null;
         },
         last: () => saveLast,
-        loaded: () => saveLoaded,
+       loaded: () => qaActivePack === null ? saveLoaded : null,
       },
       sound: {
         log: sound.log,

@@ -71,14 +71,26 @@ function optionButton(className: string, id: TitleChoiceId, label: string,
 export function createTitleScreen(root: HTMLElement): {
   render: (view: TitleView) => void;
   onChoose: (callback: (id: TitleChoiceId) => void) => void;
+  onQa: (callback: () => void) => void;
 } {
   let choose: (id: TitleChoiceId) => void = () => undefined;
+  let qa: () => void = () => undefined;
   const chooseLater = (id: TitleChoiceId): void => choose(id);
   const screen = element("main", "title-screen");
   screen.hidden = true;
   const plate = element("div", "title-plate");
   const logo = element("h1", "title-logo");
   logo.textContent = "Wilds of Cloverhollow";
+  let longPress: number | undefined;
+  logo.addEventListener("pointerdown", () => { longPress = window.setTimeout(() => qa(), 650); });
+  logo.addEventListener("pointerup", () => {
+    if (longPress !== undefined) window.clearTimeout(longPress);
+    longPress = undefined;
+  });
+  logo.addEventListener("pointerleave", () => {
+    if (longPress !== undefined) window.clearTimeout(longPress);
+    longPress = undefined;
+  });
   plate.append(logo, cloverIcon());
   const options = element("div", "title-options");
   options.setAttribute("role", "listbox");
@@ -111,6 +123,7 @@ export function createTitleScreen(root: HTMLElement): {
     onChoose: (callback) => {
       choose = callback;
     },
+    onQa: (callback) => { qa = callback; },
     render: (view) => {
       screen.hidden = !view.visible;
       confirm.hidden = !view.visible || view.mode !== "confirm";

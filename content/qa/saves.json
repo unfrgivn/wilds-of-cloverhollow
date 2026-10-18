@@ -1,0 +1,191 @@
+[
+  {
+    "id": "breakfast",
+    "label": "After breakfast",
+    "note": "A new game, just after Fae leaves home.",
+    "fixture": "new-game",
+    "run": "new-game/chapter-one.json",
+    "tick": 3981,
+    "interim": false
+  },
+  {
+    "id": "fountain-frog",
+    "label": "After the fountain frog",
+    "note": "The first calm-down is complete.",
+    "fixture": "new-game",
+    "run": "new-game/chapter-one.json",
+    "tick": 4419,
+    "interim": false
+  },
+  {
+    "id": "tree-house",
+    "label": "At the tree house",
+    "note": "New game, at the end of chapter one.",
+    "fixture": "new-game",
+    "run": "new-game/chapter-one.json",
+    "tick": 4419,
+    "interim": false
+  },
+  {
+    "id": "bubblegum-bay",
+    "label": "Arriving in Bubblegum Bay",
+    "note": "New game, stepping onto the bay road.",
+    "fixture": "new-game",
+    "run": "new-game/east-road.json",
+    "tick": 5564,
+    "interim": false
+  },
+  {
+    "id": "shortcut-jordan",
+    "label": "Jordan shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/jordan.json",
+    "tick": 568,
+    "interim": true
+  },
+  {
+    "id": "shortcut-lantern",
+    "label": "Lantern shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/lantern.json",
+    "tick": 894,
+    "interim": true
+  },
+  {
+    "id": "shortcut-woods",
+    "label": "Woods shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/woods.json",
+    "tick": 1258,
+    "interim": true
+  },
+  {
+    "id": "shortcut-school",
+    "label": "School shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/school.json",
+    "tick": 4293,
+    "interim": true
+  },
+  {
+    "id": "shortcut-gym",
+    "label": "Gym shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/gym.json",
+    "tick": 6569,
+    "interim": true
+  },
+  {
+    "id": "shortcut-music",
+    "label": "Music shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/music.json",
+    "tick": 8187,
+    "interim": true
+  },
+  {
+    "id": "shortcut-field",
+    "label": "Field shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/field.json",
+    "tick": 9804,
+    "interim": true
+  },
+  {
+    "id": "shortcut-clubhouse",
+    "label": "Clubhouse shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/clubhouse.json",
+    "tick": 3272,
+    "interim": true
+  },
+  {
+    "id": "shortcut-kitchen",
+    "label": "Kitchen shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/kitchen.json",
+    "tick": 18111,
+    "interim": true
+  },
+  {
+    "id": "shortcut-arcade",
+    "label": "Arcade shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/arcade.json",
+    "tick": 2607,
+    "interim": true
+  },
+  {
+    "id": "shortcut-lodge",
+    "label": "Lodge shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/lodge.json",
+    "tick": 1878,
+    "interim": true
+  },
+  {
+    "id": "shortcut-squirrel",
+    "label": "Squirrel shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/squirrel.json",
+    "tick": 20379,
+    "interim": true
+  },
+  {
+    "id": "shortcut-mist",
+    "label": "Mist shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/mist.json",
+    "tick": 18069,
+    "interim": true
+  },
+  {
+    "id": "shortcut-forest",
+    "label": "Forest shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/forest.json",
+    "tick": 18467,
+    "interim": true
+  },
+  {
+    "id": "shortcut-kid",
+    "label": "Kid shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/kid.json",
+    "tick": 18968,
+    "interim": true
+  },
+  {
+    "id": "shortcut-flute",
+    "label": "Flute shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/flute.json",
+    "tick": 12479,
+    "interim": true
+  },
+  {
+    "id": "shortcut-lasso",
+    "label": "Lasso shortcut",
+    "note": "Starts from the shortcut that skips chapter one and Sue's joining.",
+    "fixture": "pass-party",
+    "run": "pass-party/lasso.json",
+    "tick": 16079,
+    "interim": true
+  }
+]

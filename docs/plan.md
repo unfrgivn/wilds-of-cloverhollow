@@ -2789,6 +2789,28 @@ the old trail, the owl, and the clubhouse claim.
   - The sprite, his size, the knothole, the reward, and the wording are in
     the owner's review queue.
 
+## Milestone 62: Clover Hills **Status:** 🚧 In progress (2026-10-18)
+- The owner asked for more open world between the towns, to explore and to
+  meet bad guys on the way (2026-10-18). NOTES.md lists meadows and hills,
+  and wants more casual enemies, mostly animals under the chaos spell, in
+  light battles that aren't scary.
+- Clover Hills (a working name): a new outdoor land, painted whole and split
+  into a kit, between Meadow Park and the Whispering Woods. The park's
+  meadow runs out east into the hills, and the hills' path climbs north to
+  the woods' south clearing. That closes a ring (Cloverhollow, the bay, the
+  trail, the pass, the woods, the hills, and home), and the woods and the
+  clubhouse get a way home that doesn't go round by the bay.
+- Its bad guys recur like the trail's: rolled fresh each time Fae arrives,
+  calm until she leaves, coins for every calm, and each kind's sticker once.
+  One or two new kinds join some old ones.
+- A small secret at a lookout, for a flute friend's ability.
+- Both new doors go where no recorded run walks; every town edge and the bus
+  stay as they are. The hills get no bus stop, and their journal map label
+  stays hidden until Fae has been there.
+- Assumption: the owner said "keep going" twice after asking for this, so
+  the route was picked without asking which one. A road from the plaza to
+  the bay was set aside because the finale's recorded runs walk that edge.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
@@ -3426,6 +3448,7 @@ more bad guys, and the blacklight lantern, made and built while away.
     under the chaos spell (owner, 2026-10-17).
   - Milestone 60, a second flute friend: done (above; owner, 2026-10-18).
   - Milestone 61, the arcade rearranged: done (above; owner, 2026-10-18).
+  - Milestone 62, Clover Hills: in progress (above; owner, 2026-10-18).
   - A fix (2026-10-18): the journal's map page still wrote "???" for the
     Enchanted Forest whatever its view said, so the map rule Milestone 53
     added (named once the Misty Path is found or Fae is in the land) never

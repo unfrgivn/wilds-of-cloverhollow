@@ -94,7 +94,7 @@ export function installHook(deps: {
   input: InputSource;
   get: () => State;
   tick: (frame: ActionFrame) => void;
-  ensureArea: () => Promise<void>;
+  ensureArea: (fresh?: boolean) => Promise<void>;
   render: () => void;
   paused: () => boolean;
   setPaused: (paused: boolean) => void;
@@ -112,10 +112,18 @@ export function installHook(deps: {
     step: async (ticks) => {
       deps.setPaused(true);
       await deps.ensureArea();
+      // Only the area the step ends in is loaded (spec 11): a replay through
+      // a dozen doors loaded and dropped every room on the way. If the step
+      // left its first area at any tick, even to come back, the last area is
+      // loaded afresh, which leaves the view and camera as loading each one
+      // in turn did.
+      const first = deps.get().area;
+      let moved = false;
       for (let index = 0; index < Math.max(0, ticks); index += 1) {
         deps.tick(deps.input.next());
-        await deps.ensureArea();
+        if (deps.get().area !== first) moved = true;
       }
+      await deps.ensureArea(moved);
       deps.render();
       const state = deps.get();
       return {

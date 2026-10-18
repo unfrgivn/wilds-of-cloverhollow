@@ -738,8 +738,9 @@ async function boot(): Promise<void> {
   let areaLoad: Promise<void> | undefined;
   // Loads whatever area the state is in. If a load for an older target is still
   // in flight, waits for it and checks again, so callers always end up with the
-  // current area loaded.
-  const ensureArea = async (): Promise<void> => {
+  // current area loaded. `fresh` loads it again even if it's the one shown.
+  const ensureArea = async (fresh = false): Promise<void> => {
+    let reload = fresh;
     for (;;) {
       if (areaLoad !== undefined) {
         await areaLoad;
@@ -747,7 +748,8 @@ async function boot(): Promise<void> {
       }
       const area = content.world.areas[state.area];
       if (area === undefined) throw new Error(`Unknown area ${state.area}`);
-      if (view.loadedAreaId() === area.id) return;
+      if (!reload && view.loadedAreaId() === area.id) return;
+      reload = false;
       areaLoad = view
         .setArea(area)
         .then(() => view.resetCamera())

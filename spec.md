@@ -2228,9 +2228,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   - `pause()` and `resume()`: stop or start real-time ticking.
   - `step(ticks)` returns a Promise. It pauses real-time ticking if it is
     running, advances exactly N ticks with the currently held input (queued
-    `input()` frames first, then live devices), awaits area loads between ticks,
-    then renders once. Pausing, holding real keys, then stepping gives
-    deterministic tests with real key presses.
+    `input()` frames first, then live devices), loads the area it ends in,
+    then renders once. It loads no area it only passes through (owner,
+    2026-10-18): if it left its first area at any tick, the last is loaded
+    afresh, so the view and camera are what loading each area in turn would
+    leave. Pausing, holding real keys, then stepping gives deterministic
+    tests with real key presses.
   - `input(frame, ticks)`: hold an action frame for the next N ticks, paused or
     running.
   - `getState()`: the full JSON state.

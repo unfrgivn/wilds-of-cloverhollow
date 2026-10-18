@@ -169,6 +169,26 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "sine", frequency: 1175, endFrequency: 1170, offset: .71, duration: .42, gain: .08,
       vibrato: { rate: 5, depth: 3 } },
   ],
+  "flute-red": [
+    { wave: "noise", lowpass: 1400, offset: 0, duration: .16, gain: .008 },
+    { wave: "sine", frequency: 523, endFrequency: 540, offset: 0, duration: .22, gain: .065,
+      vibrato: { rate: 5, depth: 2 } },
+  ],
+  "flute-yellow": [
+    { wave: "noise", lowpass: 1400, offset: 0, duration: .16, gain: .008 },
+    { wave: "sine", frequency: 659, endFrequency: 680, offset: 0, duration: .22, gain: .065,
+      vibrato: { rate: 5, depth: 2 } },
+  ],
+  "flute-green": [
+    { wave: "noise", lowpass: 1400, offset: 0, duration: .16, gain: .008 },
+    { wave: "sine", frequency: 784, endFrequency: 800, offset: 0, duration: .22, gain: .065,
+      vibrato: { rate: 5, depth: 2 } },
+  ],
+  "flute-blue": [
+    { wave: "noise", lowpass: 1400, offset: 0, duration: .16, gain: .008 },
+    { wave: "sine", frequency: 1047, endFrequency: 1060, offset: 0, duration: .25, gain: .07,
+      vibrato: { rate: 5, depth: 2 } },
+  ],
 };
 
 // The context is made at boot and resumed at every chance: browsers keep it

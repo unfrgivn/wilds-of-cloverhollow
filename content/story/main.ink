@@ -71,6 +71,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{seal_open: The bell-flower seal opened, and a warm forest glow shone beyond the stones. # speaker: Fae}
+{rope_bridge: I pulled the old rope bridge across the misty gully with my lasso. # speaker: Fae}
+{found_mist_way: Bluebells lit stepping stones through the mist, one hop at a time! # speaker: Fae}
 {pond_tin: The Pond Pup swam out into the park pond and fetched an old tin of coins! # speaker: Fae}
 {pond_seen and not pond_tin: Something glints at the bottom of the park pond, too far out to reach. # speaker: Fae}
 {pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
@@ -1111,6 +1114,12 @@ VAR recess = false
 VAR swung = false
 VAR stash_found = false
 VAR bridge_down = false
+VAR found_mist_way = false
+VAR rope_bridge = false
+VAR seal_open = false
+VAR mist_notes = 0
+VAR mist_right = true
+VAR mist_tune = ""
 
 === oak_squirrel_calm ===
 {oak_squirrel_calm > 1: -> again}
@@ -1161,6 +1170,90 @@ Fae loops the lasso over the lever's handle and pulls with all her might. # spea
 ~ bridge_down = true
 CLUNK! Creeeak... The old footbridge swings down across the creek! # speaker: Fae
 Now there's a way back across. Thanks, Coach Ash! # speaker: Fae
+-> DONE
+
+
+=== mist_closed ===
+A little dirt path winds off between the misty trees. Something purple is tucked beside the old stump. # speaker: Fae
+-> DONE
+
+=== mist_flowers ===
+{found_mist_way: -> again}
+The bluebells glow in a little line toward the lavender mist. # speaker: Fae
+They are showing stepping stones! I can hop across, one stone at a time. # speaker: Fae
+~ found_mist_way = true
+Fae hops across the mist, stone by stone. # speaker: Fae # travel: mist.stones
+-> DONE
+= again
+The bluebells still glow along the safe path through the mist. # speaker: Fae
+-> DONE
+
+=== mist_band ===
+{found_mist_way: The stepping stones are glowing in the mist. I can follow them now!|The lavender mist is too thick to see through. Maybe something can show me the way.} # speaker: Fae
+-> DONE
+
+=== gully_bridge ===
+{rope_bridge: The old rope bridge is pulled across the gully now. # speaker: Fae}
+{rope_bridge: -> DONE}
+The gully is deep and misty, with two little posts on this side. # speaker: Fae
+{not has_lasso: The far posts have a rolled-up bridge. If only I had a rope! # speaker: Fae}
+{not has_lasso: -> DONE}
+Fae loops her lasso over the far post and pulls. # speaker: Fae
+~ rope_bridge = true
+The old rope bridge rolls across the gully with a soft creak. Now there is a way through! # speaker: Fae
+-> DONE
+
+=== mist_seal ===
+{seal_open: The forest glows warmly beyond the bell-flower arch. # speaker: Fae}
+{seal_open: -> DONE}
+{not has_flute: Three bell flowers hum softly: red, yellow-green, and blue. Some notes are missing... what song are they waiting for? # speaker: Fae}
+{not has_flute: -> DONE}
+~ mist_notes = 0
+~ mist_right = true
+~ mist_tune = ""
+The bell flowers are waiting for a tune. The class song colours might help! # speaker: Fae
+-> mist_bells
+= mist_bells
++ [Red] -> mist_red
++ [Yellow] -> mist_yellow
++ [Green] -> mist_green
++ [Blue] -> mist_blue
++ [Stop] -> DONE
+= mist_red
+~ mist_notes += 1
+{mist_notes != 1 and mist_notes != 4:
+    ~ mist_right = false
+}
+A red bell flower rings{mist_notes == 4:!|...} # speaker: Fae # sound: flute-red
+-> mist_next
+= mist_yellow
+~ mist_notes += 1
+{mist_notes != 2:
+    ~ mist_right = false
+}
+A yellow-green bell flower rings{mist_notes == 4:!|...} # speaker: Fae # sound: flute-yellow
+-> mist_next
+= mist_green
+~ mist_notes += 1
+~ mist_right = false
+Fae plays a green note. No bell answers. # speaker: Fae # sound: flute-green
+-> mist_next
+= mist_blue
+~ mist_notes += 1
+{mist_notes != 3:
+    ~ mist_right = false
+}
+A blue bell flower rings{mist_notes == 4:!|...} # speaker: Fae # sound: flute-blue
+-> mist_next
+= mist_next
+{mist_notes < 4: -> mist_bells}
+{mist_right:
+  That's it! Red, yellow, blue, red! The bell flowers ring together. # speaker: Fae
+  The mist wall parts, and a warm forest glow shines through the arch. # speaker: Fae
+  ~ seal_open = true
+- else:
+  The bells give a gentle wobble. They only ring for a song I already know... # speaker: Fae
+}
 -> DONE
 
 === hopscotch ===

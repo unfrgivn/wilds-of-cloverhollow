@@ -16,6 +16,7 @@ import musicData from "../../content/areas/music.json";
 import fieldData from "../../content/areas/field.json";
 import clubhouseData from "../../content/areas/clubhouse.json";
 import lodgeData from "../../content/areas/lodge.json";
+import mistData from "../../content/areas/mist.json";
 import arcadeGameData from "../../content/arcade.json";
 import prizesData from "../../content/prizes.json";
 import { isArcadeGameId } from "../core/arcade";
@@ -38,6 +39,7 @@ import musicSurfaceData from "../../content/surfaces/music.json";
 import fieldSurfaceData from "../../content/surfaces/field.json";
 import clubhouseSurfaceData from "../../content/surfaces/clubhouse.json";
 import lodgeSurfaceData from "../../content/surfaces/lodge.json";
+import mistSurfaceData from "../../content/surfaces/mist.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -55,6 +57,7 @@ import musicPropsData from "../../content/props/music.json";
 import fieldPropsData from "../../content/props/field.json";
 import clubhousePropsData from "../../content/props/clubhouse.json";
 import lodgePropsData from "../../content/props/lodge.json";
+import mistPropsData from "../../content/props/mist.json";
 import fixtureData from "../../content/fixtures/new-game.json";
 import harnessFixtureData from "../../content/fixtures/harness.json";
 import plazaFixtureData from "../../content/fixtures/plaza.json";
@@ -1734,6 +1737,8 @@ export function loadContent(): {
     parsePropCatalogue(clubhousePropsData, "content/props/clubhouse.json"));
   const lodge = parseArea(lodgeData, "content/areas/lodge.json",
     parsePropCatalogue(lodgePropsData, "content/props/lodge.json"));
+  const mist = parseArea(mistData, "content/areas/mist.json",
+    parsePropCatalogue(mistPropsData, "content/props/mist.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -1844,6 +1849,7 @@ export function loadContent(): {
     [playingField.id]: playingField,
     [clubhouse.id]: clubhouse,
     [lodge.id]: lodge,
+    [mist.id]: mist,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -1852,6 +1858,7 @@ export function loadContent(): {
     pass: passSurfaceData, trail: trailSurfaceData, woods: woodsSurfaceData,
     arcade: arcadeSurfaceData, "east-hall": eastHallSurfaceData, music: musicSurfaceData,
     field: fieldSurfaceData, clubhouse: clubhouseSurfaceData, lodge: lodgeSurfaceData,
+    mist: mistSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));

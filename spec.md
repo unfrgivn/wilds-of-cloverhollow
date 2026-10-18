@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 58, the arcade nearer its concept; Milestone 57, the lodge keeper)
+Last updated: 2026-10-17 (Milestones 53, 57, and 58)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -588,6 +588,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   each errand from when it's seen, then how it ended. Each placement's rules
   are `default` while its down variable, then the shown state while
   `has_lasso`.
+- The Misty Path (Milestone 53) is area `mist`, named "Misty Path", in the
+  `enchanted` land, 1650x1100 units. Its `field`, `stones`, and `forest` spawns
+  are the field path, stepping-stone landing, and forest side of the seal. Its
+  field trigger returns to `field.mist`. The `mist-band` crossing opens with
+  `found_mist_way`, and `gully` opens with `rope_bridge`. Four bluebell glows
+  lead to `mist_flowers`; reading the last one sets `found_mist_way` and uses a
+  `travel:` line to move Fae to `mist.stones`. Look points are `mist-band`,
+  `gully-posts`, and `seal`; the gully point pulls the bridge with `has_lasso`.
+- The seal has red, yellow-green, and blue bell flowers. Its choices are Red,
+  Yellow, Green, Blue, and Stop. The class song is red, yellow, blue, red. A
+  wrong tune gives a hint. The four note lines carry `flute-red`,
+  `flute-yellow`, `flute-green`, and `flute-blue`; the right tune sets
+  `seal_open` and shows the open seal for Milestone 54. The journal tells each
+  stretch as it opens. The map shows Enchanted Forest as `???` until Fae finds
+  the Misty Path or enters that land.
 - Flute friends (Milestone 47): once Fae has the flute, a calm Pond Pup's
   talk (`pup_calm`, after its first) offers Pet him and Share a snack; doing
   both, in either order, makes the pups her friends (`pup_petted`,
@@ -882,6 +897,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   and drawn in the `added` state, which the area's rules show; it's drawn
   whole like a lifted prop (`painted` false). Rebuilding the default layout
   leaves it out.
+- The Misty Path kit (Milestone 53) uses painted canopies and solids from its
+  whole painting, plus a lifted rope bridge. The bridge's `across` state is a
+  flat bridge from the second painting and is shown while `rope_bridge`.
+  `mist-stones` and `seal-open` are added props from that second painting,
+  hidden until `found_mist_way` and `seal_open` respectively. Only ink-outlined
+  objects are taken from the second painting; its colour cast is not treated as
+  new scenery.
 - Depth: each prop's front edge is its footprint's southmost y in every
   5-unit column (`frontEdge`): straight across gaps between its polygons
   (between an arch's legs), flat past its ends, and the home y with no
@@ -1579,9 +1601,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 ## 9. Journal and stickers
 - The journal is the pause menu: Notes (current goals, written from Ink), a
   Sticker album, and a painted MAP page. The map labels all six lands, shows
-  `???` for the sealed Enchanted Forest, puts a bobbing gold star over Fae's
-  current land, and leads each stop's name with the bus line's sign (lands
-  with `busStop`). It is presentation only, outside the core state and saves.
+  `???` for the sealed Enchanted Forest until Fae finds the Misty Path or enters
+  that land, puts a bobbing gold star over Fae's current land, and leads each
+  stop's name with the bus line's sign (lands with `busStop`). It is
+  presentation only, outside the core state and saves.
 - Stickers are collectibles and rewards.
 - Core: `journalOpen` in state. A menu press (J or the journal button) opens
   it when no dialogue, battle, or door transition is running; a menu or cancel

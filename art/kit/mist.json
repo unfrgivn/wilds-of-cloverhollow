@@ -1,0 +1,459 @@
+{
+  "area": "mist",
+  "subjects": [
+    {
+      "id": "pine-west",
+      "crop": [
+        400,
+        830,
+        190,
+        270
+      ],
+      "seed": [
+        500,
+        980
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the dark mossy forest floor",
+      "object": "the complete foreground pine tree at the bottom west of the plateau, its needles, trunk and roots; not the other pine, fern bed, or ground",
+      "footprint": [
+        [
+          [
+            455,
+            1070
+          ],
+          [
+            480,
+            1060
+          ],
+          [
+            535,
+            1060
+          ],
+          [
+            560,
+            1085
+          ],
+          [
+            550,
+            1100
+          ],
+          [
+            470,
+            1100
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "pine-middle",
+      "crop": [
+        650,
+        830,
+        230,
+        270
+      ],
+      "seed": [
+        770,
+        1000
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the dark mossy forest floor",
+      "object": "the complete foreground pine tree at the bottom east of the plateau, its needles, trunk and roots; not the fern bed, other pines, or ground",
+      "footprint": [
+        [
+          [
+            720,
+            1070
+          ],
+          [
+            745,
+            1060
+          ],
+          [
+            815,
+            1060
+          ],
+          [
+            850,
+            1085
+          ],
+          [
+            835,
+            1100
+          ],
+          [
+            735,
+            1100
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "fern-middle",
+      "crop": [
+        530,
+        820,
+        190,
+        180
+      ],
+      "seed": [
+        620,
+        920
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the dark mossy forest floor",
+      "object": "the complete fern bed between the two foreground pines, including all fronds and ink outlines; not the pines or ground",
+      "footprint": [
+        [
+          [
+            555,
+            970
+          ],
+          [
+            580,
+            960
+          ],
+          [
+            670,
+            960
+          ],
+          [
+            700,
+            980
+          ],
+          [
+            675,
+            990
+          ],
+          [
+            575,
+            990
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "pine-east",
+      "crop": [
+        1370,
+        820,
+        280,
+        280
+      ],
+      "seed": [
+        1510,
+        1000
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the dark mossy forest floor",
+      "object": "the complete large foreground pine at the far east bottom edge, including needles, trunk and roots; not the fern bed or ground",
+      "footprint": [
+        [
+          [
+            1545,
+            1062
+          ],
+          [
+            1615,
+            1062
+          ],
+          [
+            1615,
+            1070
+          ],
+          [
+            1545,
+            1070
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "fern-east",
+      "crop": [
+        1180,
+        820,
+        190,
+        190
+      ],
+      "seed": [
+        1270,
+        920
+      ],
+      "painted": true,
+      "canopy": true,
+      "ground": "the dark mossy forest floor",
+      "object": "the complete fern bed along the lower east clearing, all fronds and ink outlines; not the pine or ground",
+      "footprint": [
+        [
+          [
+            1210,
+            980
+          ],
+          [
+            1240,
+            970
+          ],
+          [
+            1330,
+            970
+          ],
+          [
+            1350,
+            990
+          ],
+          [
+            1335,
+            1000
+          ],
+          [
+            1225,
+            1000
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "standing-stone",
+      "crop": [
+        1380,
+        430,
+        200,
+        430
+      ],
+      "seed": [
+        1470,
+        650
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the pale mossy path and forest floor",
+      "object": "the complete lower standing stone beside the east path, including its mossy rock body and dark ink outline; not the path or plants",
+      "footprint": [
+        [
+          [
+            1440,
+            815
+          ],
+          [
+            1465,
+            805
+          ],
+          [
+            1510,
+            808
+          ],
+          [
+            1530,
+            820
+          ],
+          [
+            1505,
+            825
+          ],
+          [
+            1450,
+            823
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "bridge-posts",
+      "crop": [
+        730,
+        420,
+        280,
+        270
+      ],
+      "seed": [
+        780,
+        500
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the mossy path and gully rim",
+      "object": "the four wooden rope bridge posts and their attached rope fittings on both gully rims, as one bridge hardware object; not the path or gully",
+      "footprint": [
+        [
+          [
+            760,
+            520
+          ],
+          [
+            785,
+            520
+          ],
+          [
+            785,
+            529
+          ],
+          [
+            760,
+            529
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rope-bridge",
+      "crop": [
+        980,
+        490,
+        110,
+        180
+      ],
+      "seed": [
+        1025,
+        570
+      ],
+      "painted": false,
+      "canopy": false,
+      "ground": "the pale path and gully rim",
+      "object": "the rolled-up rope bridge on the east rim, including its bundled planks, ropes, and ink outline; not the path or posts",
+      "footprint": [
+        [
+          [
+            1010,
+            625
+          ],
+          [
+            1025,
+            620
+          ],
+          [
+            1045,
+            622
+          ],
+          [
+            1055,
+            638
+          ],
+          [
+            1030,
+            640
+          ],
+          [
+            1015,
+            635
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "rope-bridge-across",
+      "painting": "art/source/areas/mist/mist-open-3300.png",
+      "stateOf": "rope-bridge.across",
+      "flat": true,
+      "crop": [
+        700,
+        350,
+        450,
+        400
+      ],
+      "seed": [
+        850,
+        550
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the pale path and gully crossing",
+      "object": "the laid rope bridge spanning the gully, with its four posts, wooden planks, side ropes and ink outlines; not the gully or surrounding forest",
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "mist-stones",
+      "painting": "art/source/areas/mist/mist-open-3300.png",
+      "added": "found",
+      "flat": true,
+      "home": [
+        550,
+        600
+      ],
+      "crop": [
+        250,
+        480,
+        600,
+        180
+      ],
+      "seed": [
+        500,
+        560
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the pale path through the mist",
+      "object": "only the round glowing stepping stones placed across the path, each with its ink outline and soft glow; not the path, mist, flowers, or plants",
+      "keepPieces": true,
+      "exclude": [
+        [
+          [700, 430],
+          [850, 430],
+          [850, 700],
+          [700, 700]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "seal-open",
+      "painting": "art/source/areas/mist/mist-open-3300.png",
+      "crop": [
+        1200,
+        150,
+        350,
+        600
+      ],
+      "seed": [
+        1370,
+        400
+      ],
+      "painted": true,
+      "canopy": false,
+      "ground": "the open path and warm glow beyond the arch",
+      "object": "the clear open arch interior showing the pale path and warm glow beyond it; not the vine arch, flowers, standing stones, or trees",
+      "samples": {
+        "object": 1
+      },
+      "added": "open",
+      "flat": true,
+      "home": [
+        1370,
+        640
+      ]
+    }
+  ]
+}

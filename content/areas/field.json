@@ -1606,6 +1606,35 @@
         "area": "gym",
         "spawn": "back-door"
       }
+    },
+    {
+      "id": "mist",
+      "polygon": [
+        [
+          1560,
+          870
+        ],
+        [
+          1590,
+          870
+        ],
+        [
+          1590,
+          1040
+        ],
+        [
+          1560,
+          1040
+        ]
+      ],
+      "requires": {
+        "variable": "stash_found",
+        "knot": "mist_closed"
+      },
+      "target": {
+        "area": "mist",
+        "spawn": "field"
+      }
     }
   ],
   "spawns": {
@@ -1618,6 +1647,11 @@
       "x": 1340,
       "y": 330,
       "facing": "down"
+    },
+    "mist": {
+      "x": 1500,
+      "y": 950,
+      "facing": "left"
     }
   },
   "interactables": [

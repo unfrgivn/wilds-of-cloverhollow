@@ -142,7 +142,7 @@ describe("story travel", () => {
     const source = readFileSync("content/story/main.ink", "utf8");
     const targets = [...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)].map((match) => match[1] ?? "");
     expect([...new Set(targets)].sort())
-      .toEqual(["bay.bus-stop", "field.east-bank", "pass.bus", "plaza.bus-stop"]);
+      .toEqual(["bay.bus-stop", "field.east-bank", "mist.stones", "pass.bus", "plaza.bus-stop"]);
     for (const target of targets) {
       const [area, spawn] = target.split(".");
       expect(areaFor(area ?? "").spawns[spawn ?? ""], target).toBeDefined();

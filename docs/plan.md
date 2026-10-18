@@ -2273,7 +2273,7 @@ the old trail, the owl, and the clubhouse claim.
   - The edit, the props, the close-up, the dishes, the cooking numbers, and
     the wording are in the owner's review queue.
 
-## Milestone 53: Into the mist **Status:** 📋 Planned
+## Milestone 53: Into the mist **Status:** ✅ Completed (2026-10-17)
 - The finale begins. The owner decided it (2026-10-17): the kid in the purple
   hood is Milo, unmasked only at the very end; Fae's three tools unseal the
   Enchanted Forest; the last calm-down is Trace, then Talk; and the dream
@@ -2289,27 +2289,85 @@ the old trail, the owl, and the clubhouse claim.
   woodland path running into a lavender mist as thick as cotton candy. Each
   of Fae's tools opens one stretch, in order:
   - The lantern: the mist swallows the path. With the lantern on, glowing
-    flowers show where it goes, and reading the last one (`found_mist_way`)
-    lays glowing stepping stones through the mist: a crossing, its mist prop
-    in a parted state cut from a second painting (spec 6.2).
+    bluebells show where it goes, and reading the last one (`found_mist_way`)
+    lights stepping stones through the mist (a crossing; the stones are an
+    added prop cut from a second painting, spec 6.2), and Fae hops across
+    them to the `stones` spawn.
   - The lasso: a misty gully, its old rope bridge rolled up on the far side.
     The lasso loops the far post and pulls the bridge across (`rope_bridge`),
     a crossing that stays open both ways.
   - The flute: the seal, a wall of shimmering mist between two mossy standing
-    stones hung with red, yellow, green, and blue flower bells, humming a
+    stones hung with red, yellow-green, and blue flower bells, humming a
     tune with notes missing. Fae plays it back on the flute note by note,
     like the xylophone (prompt `Play`, each note its own flute sound). The
     class song, red, yellow, blue, red, rings every bell and the mist parts
-    (`seal_open`, the seal's open state); a wrong tune ends with a hint
-    toward the class song. The forest beyond opens in Milestone 54.
-- The map names the Enchanted Forest once Fae has walked into it ("???"
-  until then). The journal tells each stretch as it opens.
+    (`seal_open`; the open arch is an added prop from the second painting);
+    a wrong tune ends with a hint toward the class song. The forest beyond
+    opens in Milestone 54.
+- The map shows the Enchanted Forest as "???" until Fae finds the Misty Path or
+  enters that land. The journal tells each stretch as it opens.
 - Evidence: core unit tests (each stretch shut, then open with real steps;
   the tune right and wrong; the journal; the map's name; the area checks
   with every crossing), a recorded run on from the latest chained run (to the
   field's far bank, down the path, and through the three stretches to the
   open seal) with its replay test and matching browser and Bun hashes, and a
   real-key e2e of each tool's moment at both sizes.
+- Evidence details: `tests/unit/mist.test.ts` covers the door, crossings, glows,
+  look points, flute tune, journal, map rule, and area checks. The replay test
+  covers the 18,164-tick run, all three knots, prop states, and four flute
+  sounds. `tests/e2e/mist.spec.ts` uses real keys, compares the browser hash
+  with Bun, checks `renderInfo()` prop states, and captures both viewport sizes
+  for arrival, lantern, stones, bridge, note choices, and the open seal.
+- Gates: `just check` passed: 97 test files and 852 tests, all simulations,
+  purity, and lint. `just build` passed production and harness hook checks.
+  The final full `CLOVERHOLLOW_E2E_PORT=4193 just e2e` run passed 759 tests with
+  2 skipped and no failures in 4.5 minutes.
+- Notes and assumptions:
+  - The lantern beat hops Fae across (`travel:` to `stones`), because the area
+    checks need every look point reachable from a spawn with every crossing
+    shut, following the field's `east-bank` pattern.
+  - `forest` is the spawn Milestone 54's door will use.
+  - The bells came out three, red, yellow-green, and blue, exactly the class
+    song's colours, so green is the wrong note.
+  - The open seal and stones are added props from a second painting with a
+    colour cast. Only ink-outlined objects were taken from it. The mushroom
+    patch is south of the floor's edge instead of a prop.
+  - The floor is hand-traced in `tools/art/geometry/mist.ts`. Gemini calls were
+    91 total, 8 for the paintings and glow flowers and 83 for the kit. Its
+    first strategy lifted the scenery and its fills failed. The painted redo
+    reused the cache with 0 new calls.
+  - This review fixed the glow frames' transparency and added a build check for
+    transparent corners, low mean alpha, and an unchanged old atlas region.
+    The stepping-stone isolate now keeps every stone and excludes the posts,
+    rope, planks, and path-edge ink.
+  - The full-size seal crop showed no obvious seam or red fringe in play. It is
+    at `art/review/mist-seal-open-crop.png` on the review machine.
+- Wording for the owner:
+  - "A little dirt path winds off between the misty trees. Something purple is tucked beside the old stump."
+  - "The bluebells glow in a little line toward the lavender mist."
+  - "They are showing stepping stones! I can hop across, one stone at a time."
+  - "Fae hops across the mist, stone by stone."
+  - "The bluebells still glow along the safe path through the mist."
+  - "The stepping stones are glowing in the mist. I can follow them now!"
+  - "The lavender mist is too thick to see through. Maybe something can show me the way."
+  - "The gully is deep and misty, with two little posts on this side."
+  - "The far posts have a rolled-up bridge. If only I had a rope!"
+  - "Fae loops her lasso over the far post and pulls."
+  - "The old rope bridge rolls across the gully with a soft creak. Now there is a way through!"
+  - "The old rope bridge is pulled across the gully now."
+  - "The forest glows warmly beyond the bell-flower arch."
+  - "Three bell flowers hum softly: red, yellow-green, and blue. Some notes are missing... what song are they waiting for?"
+  - "The bell flowers are waiting for a tune. The class song colours might help!"
+  - "A red bell flower rings!" / "A red bell flower rings..."
+  - "A yellow-green bell flower rings!" / "A yellow-green bell flower rings..."
+  - "Fae plays a green note. No bell answers."
+  - "A blue bell flower rings!" / "A blue bell flower rings..."
+  - "That's it! Red, yellow, blue, red! The bell flowers ring together."
+  - "The mist wall parts, and a warm forest glow shines through the arch."
+  - "The bells give a gentle wobble. They only ring for a song I already know..."
+  - "The bell-flower seal opened, and a warm forest glow shone beyond the stones."
+  - "I pulled the old rope bridge across the misty gully with my lasso."
+  - "Bluebells lit stepping stones through the mist, one hop at a time!"
 
 ## Milestone 54: The Enchanted Forest **Status:** 📋 Planned
 - Past the parted seal (a door, `requires` `seal_open`): the Enchanted Forest

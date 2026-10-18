@@ -12,6 +12,7 @@ import {
   battleView,
   soundCues,
   arcadeView,
+  mapLandName,
 } from "./core";
 import {
   loadContent,
@@ -542,6 +543,8 @@ async function boot(): Promise<void> {
         : [],
       lands: content.world.lands.map((land) => ({
         ...land,
+        name: mapLandName(land, content.world.areas[state.area]?.land ?? null,
+          content.world.storyVariable(state.ink, "found_mist_way") === true),
         ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
       })),
       currentLand: content.world.areas[state.area]?.land ?? null,

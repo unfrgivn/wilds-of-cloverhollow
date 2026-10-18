@@ -116,10 +116,18 @@ describe("the lands", () => {
       "east-hall": "cloverhollow", music: "cloverhollow",
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
-      bay: "bay", pass: "pass", trail: "trail",
+      bay: "bay", pass: "pass", trail: "trail", mist: "enchanted",
     };
-    for (const area of Object.values(world.areas))
-      expect(area.land, area.id).toBe(area.id === "harness" ? undefined : lands[area.id]);
+    for (const area of Object.values(world.areas)) {
+      if (area.id === "harness") {
+        expect(area.land, area.id).toBeUndefined();
+        continue;
+      }
+      // An area missing from this table fails here, so a new area can't slip
+      // through without a land (undefined would otherwise equal undefined).
+      expect(lands[area.id], `${area.id} is missing from this table`).toBeDefined();
+      expect(area.land, area.id).toBe(lands[area.id]);
+    }
   });
 
   it("each have a centre on the painted map", () => {
@@ -199,7 +207,9 @@ describe("the bus line", () => {
     const targets = [...new Set([...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)]
       .map((match) => match[1] ?? ""))].sort();
     // The buses, and the old oak's branch across the playing field's creek.
-    expect(targets).toEqual(["bay.bus-stop", "field.east-bank", "pass.bus", "plaza.bus-stop"]);
+    expect(targets).toEqual([
+      "bay.bus-stop", "field.east-bank", "mist.stones", "pass.bus", "plaza.bus-stop",
+    ]);
     for (const target of targets) {
       const [area, spawn] = target.split(".");
       expect(areaFor(area ?? "").spawns[spawn ?? ""], target).toBeDefined();

@@ -1,0 +1,16 @@
+{
+  "asset": "Misty Path bluebell blacklight glows",
+  "date": "2026-10-17",
+  "model": "gemini-3-pro-image",
+  "calls": 1,
+  "source": "art/scratch/1792284829040-gemini-3-pro-image-0.png",
+  "prompt": "Four separate bluebell flowers on pure black, luminous watercolor-and-ink blacklight strokes, no scene or text.",
+  "processing": [
+    "Crop the 2048x2048 2x2 source into four 1024x1024 quadrants.",
+    "Run black-to-alpha.ts on each quadrant.",
+    "Trim, resize to 112x112, center in a 128x128 transparent frame.",
+    "Append the four 128x128 frames after the existing 530x176 glow atlas using tools/art/build-mist-glows.ts. Existing atlas pixels were checked with ImageMagick compare: absolute error 0 (byte-identical pixel values) over the original 530x176 region."
+  ],
+  "outputs": ["public/assets/glows/glows.png", "public/assets/glows/glows.json"],
+  "frames": ["bluebell_1", "bluebell_2", "bluebell_3", "bluebell_4"]
+}

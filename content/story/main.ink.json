@@ -401,6 +401,81 @@
       "journal": [
         "ev",
         {
+          "VAR?": "seal_open"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The bell-flower seal opened, and a warm forest glow shone beyond the stones. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "rope_bridge"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I pulled the old rope bridge across the misty gully with my lasso. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "found_mist_way"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Bluebells lit stepping stones through the mist, one hop at a time! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "pond_tin"
         },
         "/ev",
@@ -415,7 +490,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.25"
               },
               null
             ]
@@ -445,7 +520,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.35"
               },
               null
             ]
@@ -470,7 +545,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.21"
+                "->": ".^.^.^.42"
               },
               null
             ]
@@ -497,7 +572,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.30"
+                "->": ".^.^.^.51"
               },
               null
             ]
@@ -522,7 +597,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.37"
+                "->": ".^.^.^.58"
               },
               null
             ]
@@ -551,7 +626,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.47"
+                "->": ".^.^.^.68"
               },
               null
             ]
@@ -585,7 +660,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.60"
+                "->": ".^.^.^.81"
               },
               null
             ]
@@ -610,7 +685,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.67"
+                "->": ".^.^.^.88"
               },
               null
             ]
@@ -635,7 +710,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.74"
+                "->": ".^.^.^.95"
               },
               null
             ]
@@ -669,7 +744,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.86"
+                "->": ".^.^.^.107"
               },
               null
             ]
@@ -694,7 +769,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.93"
+                "->": ".^.^.^.114"
               },
               null
             ]
@@ -719,7 +794,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.100"
+                "->": ".^.^.^.121"
               },
               null
             ]
@@ -749,7 +824,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.110"
+                "->": ".^.^.^.131"
               },
               null
             ]
@@ -779,7 +854,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.120"
+                "->": ".^.^.^.141"
               },
               null
             ]
@@ -804,7 +879,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.127"
+                "->": ".^.^.^.148"
               },
               null
             ]
@@ -834,7 +909,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.137"
+                "->": ".^.^.^.158"
               },
               null
             ]
@@ -864,7 +939,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.168"
               },
               null
             ]
@@ -889,7 +964,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.154"
+                "->": ".^.^.^.175"
               },
               null
             ]
@@ -919,7 +994,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.164"
+                "->": ".^.^.^.185"
               },
               null
             ]
@@ -949,7 +1024,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.174"
+                "->": ".^.^.^.195"
               },
               null
             ]
@@ -974,7 +1049,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.181"
+                "->": ".^.^.^.202"
               },
               null
             ]
@@ -999,7 +1074,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.188"
+                "->": ".^.^.^.209"
               },
               null
             ]
@@ -1029,7 +1104,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.198"
+                "->": ".^.^.^.219"
               },
               null
             ]
@@ -1063,7 +1138,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.211"
+                "->": ".^.^.^.232"
               },
               null
             ]
@@ -1093,7 +1168,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.221"
+                "->": ".^.^.^.242"
               },
               null
             ]
@@ -1118,7 +1193,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.228"
+                "->": ".^.^.^.249"
               },
               null
             ]
@@ -1148,7 +1223,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.238"
+                "->": ".^.^.^.259"
               },
               null
             ]
@@ -1182,7 +1257,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.251"
+                "->": ".^.^.^.272"
               },
               null
             ]
@@ -1216,7 +1291,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.264"
+                "->": ".^.^.^.285"
               },
               null
             ]
@@ -1246,7 +1321,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.274"
+                "->": ".^.^.^.295"
               },
               null
             ]
@@ -1276,7 +1351,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.284"
+                "->": ".^.^.^.305"
               },
               null
             ]
@@ -1306,7 +1381,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.294"
+                "->": ".^.^.^.315"
               },
               null
             ]
@@ -1331,7 +1406,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.301"
+                "->": ".^.^.^.322"
               },
               null
             ]
@@ -1373,7 +1448,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.318"
+                "->": ".^.^.^.339"
               },
               null
             ]
@@ -1407,7 +1482,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.331"
+                "->": ".^.^.^.352"
               },
               null
             ]
@@ -1507,7 +1582,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.341"
+                "->": ".^.^.^.362"
               },
               null
             ]
@@ -1532,7 +1607,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.348"
+                "->": ".^.^.^.369"
               },
               null
             ]
@@ -1562,7 +1637,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.358"
+                "->": ".^.^.^.379"
               },
               null
             ]
@@ -1596,7 +1671,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.370"
+                "->": ".^.^.^.391"
               },
               null
             ]
@@ -1621,7 +1696,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.377"
+                "->": ".^.^.^.398"
               },
               null
             ]
@@ -1651,7 +1726,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.387"
+                "->": ".^.^.^.408"
               },
               null
             ]
@@ -1685,7 +1760,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.400"
+                "->": ".^.^.^.421"
               },
               null
             ]
@@ -1714,7 +1789,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.410"
+                "->": ".^.^.^.431"
               },
               null
             ]
@@ -1743,7 +1818,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.420"
+                "->": ".^.^.^.441"
               },
               null
             ]
@@ -1777,7 +1852,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.433"
+                "->": ".^.^.^.454"
               },
               null
             ]
@@ -1807,7 +1882,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.443"
+                "->": ".^.^.^.464"
               },
               null
             ]
@@ -1832,7 +1907,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.450"
+                "->": ".^.^.^.471"
               },
               null
             ]
@@ -1866,7 +1941,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.462"
+                "->": ".^.^.^.483"
               },
               null
             ]
@@ -1891,7 +1966,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.469"
+                "->": ".^.^.^.490"
               },
               null
             ]
@@ -1920,7 +1995,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.479"
+                "->": ".^.^.^.500"
               },
               null
             ]
@@ -1945,7 +2020,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.486"
+                "->": ".^.^.^.507"
               },
               null
             ]
@@ -1970,7 +2045,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.493"
+                "->": ".^.^.^.514"
               },
               null
             ]
@@ -2007,7 +2082,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.508"
+                "->": ".^.^.^.529"
               },
               null
             ]
@@ -2032,7 +2107,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.515"
+                "->": ".^.^.^.536"
               },
               null
             ]
@@ -2066,7 +2141,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.528"
+                "->": ".^.^.^.549"
               },
               null
             ]
@@ -2095,7 +2170,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.538"
+                "->": ".^.^.^.559"
               },
               null
             ]
@@ -2120,7 +2195,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.545"
+                "->": ".^.^.^.566"
               },
               null
             ]
@@ -2145,7 +2220,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.552"
+                "->": ".^.^.^.573"
               },
               null
             ]
@@ -2175,7 +2250,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.562"
+                "->": ".^.^.^.583"
               },
               null
             ]
@@ -2205,7 +2280,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.572"
+                "->": ".^.^.^.593"
               },
               null
             ]
@@ -2230,7 +2305,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.579"
+                "->": ".^.^.^.600"
               },
               null
             ]
@@ -2259,7 +2334,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.589"
+                "->": ".^.^.^.610"
               },
               null
             ]
@@ -2297,7 +2372,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.605"
+                "->": ".^.^.^.626"
               },
               null
             ]
@@ -2324,7 +2399,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.614"
+                "->": ".^.^.^.635"
               },
               null
             ]
@@ -2353,7 +2428,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.624"
+                "->": ".^.^.^.645"
               },
               null
             ]
@@ -2378,7 +2453,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.631"
+                "->": ".^.^.^.652"
               },
               null
             ]
@@ -2407,7 +2482,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.642"
+                "->": ".^.^.^.663"
               },
               null
             ]
@@ -2436,7 +2511,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.653"
+                "->": ".^.^.^.674"
               },
               null
             ]
@@ -9937,6 +10012,879 @@
         "done",
         null
       ],
+      "mist_closed": [
+        "^A little dirt path winds off between the misty trees. Something purple is tucked beside the old stump. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "mist_flowers": [
+        "ev",
+        {
+          "VAR?": "found_mist_way"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The bluebells glow in a little line toward the lavender mist. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^They are showing stepping stones! I can hop across, one stone at a time. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "found_mist_way",
+          "re": true
+        },
+        "^Fae hops across the mist, stone by stone. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^travel: mist.stones",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The bluebells still glow along the safe path through the mist. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "mist_band": [
+        "ev",
+        {
+          "VAR?": "found_mist_way"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The stepping stones are glowing in the mist. I can follow them now!",
+              {
+                "->": ".^.^.^.5"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "^The lavender mist is too thick to see through. Maybe something can show me the way.",
+              {
+                "->": ".^.^.^.5"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "^ ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "gully_bridge": [
+        "ev",
+        {
+          "VAR?": "rope_bridge"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The old rope bridge is pulled across the gully now. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "rope_bridge"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The gully is deep and misty, with two little posts on this side. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The far posts have a rolled-up bridge. If only I had a rope! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_lasso"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.31"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Fae loops her lasso over the far post and pulls. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "rope_bridge",
+          "re": true
+        },
+        "^The old rope bridge rolls across the gully with a soft creak. Now there is a way through! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "mist_seal": [
+        "ev",
+        {
+          "VAR?": "seal_open"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The forest glows warmly beyond the bell-flower arch. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "seal_open"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.11"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Three bell flowers hum softly: red, yellow-green, and blue. Some notes are missing... what song are they waiting for? ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "has_flute"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.26"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        0,
+        "/ev",
+        {
+          "VAR=": "mist_notes",
+          "re": true
+        },
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "mist_right",
+          "re": true
+        },
+        "ev",
+        "str",
+        "^",
+        "/str",
+        "/ev",
+        {
+          "VAR=": "mist_tune",
+          "re": true
+        },
+        "^The bell flowers are waiting for a tune. The class song colours might help! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        {
+          "->": ".^.mist_bells"
+        },
+        {
+          "mist_bells": [
+            [
+              "ev",
+              "str",
+              "^Red",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Yellow",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Green",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Blue",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-3",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Stop",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-4",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.mist_red"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-1": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.mist_yellow"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-2": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.mist_green"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-3": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.mist_blue"
+                  },
+                  "\n",
+                  null
+                ],
+                "c-4": [
+                  "^ ",
+                  "done",
+                  "\n",
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "mist_red": [
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "mist_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            1,
+            "!=",
+            {
+              "VAR?": "mist_notes"
+            },
+            4,
+            "!=",
+            "&&",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "mist_right",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.16"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^A red bell flower rings",
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            4,
+            "==",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.26"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.26"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: flute-red",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.mist_next"
+            },
+            null
+          ],
+          "mist_yellow": [
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "mist_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            2,
+            "!=",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "mist_right",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^A yellow-green bell flower rings",
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            4,
+            "==",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.22"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.22"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: flute-yellow",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.mist_next"
+            },
+            null
+          ],
+          "mist_green": [
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "mist_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            false,
+            "/ev",
+            {
+              "VAR=": "mist_right",
+              "re": true
+            },
+            "^Fae plays a green note. No bell answers. ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: flute-green",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.mist_next"
+            },
+            null
+          ],
+          "mist_blue": [
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            1,
+            "+",
+            {
+              "VAR=": "mist_notes",
+              "re": true
+            },
+            "/ev",
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            3,
+            "!=",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "ev",
+                  false,
+                  "/ev",
+                  {
+                    "VAR=": "mist_right",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "^A blue bell flower rings",
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            4,
+            "==",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^!",
+                  {
+                    "->": ".^.^.^.22"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "^...",
+                  {
+                    "->": ".^.^.^.22"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "^ ",
+            "#",
+            "^speaker: Fae ",
+            "/#",
+            "#",
+            "^sound: flute-blue",
+            "/#",
+            "\n",
+            {
+              "->": ".^.^.mist_next"
+            },
+            null
+          ],
+          "mist_next": [
+            "ev",
+            {
+              "VAR?": "mist_notes"
+            },
+            4,
+            "<",
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.mist_bells"
+                  },
+                  {
+                    "->": ".^.^.^.6"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "ev",
+            {
+              "VAR?": "mist_right"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^That's it! Red, yellow, blue, red! The bell flowers ring together. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "^The mist wall parts, and a warm forest glow shines through the arch. ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "seal_open",
+                    "re": true
+                  },
+                  {
+                    "->": ".^.^.^.13"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^The bells give a gentle wobble. They only ring for a song I already know... ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.13"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
       "hopscotch": [
         "^Fae hops the whole hopscotch on one foot, all the way to 7 and back! ",
         "#",
@@ -12231,6 +13179,32 @@
         false,
         {
           "VAR=": "bridge_down"
+        },
+        false,
+        {
+          "VAR=": "found_mist_way"
+        },
+        false,
+        {
+          "VAR=": "rope_bridge"
+        },
+        false,
+        {
+          "VAR=": "seal_open"
+        },
+        0,
+        {
+          "VAR=": "mist_notes"
+        },
+        true,
+        {
+          "VAR=": "mist_right"
+        },
+        "str",
+        "^",
+        "/str",
+        {
+          "VAR=": "mist_tune"
         },
         false,
         {

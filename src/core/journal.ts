@@ -2,6 +2,14 @@ import { runInk } from "./ink";
 import { inkFacts } from "./sim";
 import type { State, World } from "./types";
 
+export function mapLandName(
+  land: { id: string; name: string }, currentLand: string | null, foundMistWay: boolean,
+): string {
+  return land.id === "enchanted" && currentLand !== "enchanted" && !foundMistWay
+    ? "???"
+    : land.name;
+}
+
 // Fae's notes, newest first: the `journal` knot's lines for the current story
 // state. Runs on a copy of the Ink state and keeps no result, so reading the
 // journal never changes the game.

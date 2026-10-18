@@ -12,12 +12,15 @@ export type SoundCue =
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
   | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
   | "mole-pop" | "mole-boop" | "mole-whiff"
-  | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
+  | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
+  | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue";
 
-export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute";
+export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
+  | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue";
 
 export const storySounds: readonly StorySound[] = [
   "chime-red", "chime-yellow", "chime-green", "chime-blue", "flute",
+  "flute-red", "flute-yellow", "flute-green", "flute-blue",
 ];
 
 export function isStorySound(value: string): value is StorySound {

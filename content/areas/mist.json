@@ -1,0 +1,433 @@
+{
+  "id": "mist",
+  "name": "Misty Path",
+  "land": "enchanted",
+  "width": 1650,
+  "height": 1100,
+  "ground": "mist",
+  "walkable": [
+    [
+      0,
+      440
+    ],
+    [
+      36,
+      440
+    ],
+    [
+      150,
+      430
+    ],
+    [
+      160,
+      380
+    ],
+    [
+      250,
+      355
+    ],
+    [
+      360,
+      350
+    ],
+    [
+      390,
+      380
+    ],
+    [
+      390,
+      515
+    ],
+    [
+      505,
+      525
+    ],
+    [
+      505,
+      410
+    ],
+    [
+      790,
+      410
+    ],
+    [
+      800,
+      515
+    ],
+    [
+      940,
+      510
+    ],
+    [
+      940,
+      310
+    ],
+    [
+      1210,
+      305
+    ],
+    [
+      1215,
+      440
+    ],
+    [
+      1300,
+      485
+    ],
+    [
+      1310,
+      500
+    ],
+    [
+      1310,
+      640
+    ],
+    [
+      1315,
+      640
+    ],
+    [
+      1430,
+      645
+    ],
+    [
+      1440,
+      700
+    ],
+    [
+      1430,
+      800
+    ],
+    [
+      1400,
+      850
+    ],
+    [
+      1200,
+      870
+    ],
+    [
+      960,
+      870
+    ],
+    [
+      960,
+      650
+    ],
+    [
+      940,
+      640
+    ],
+    [
+      800,
+      645
+    ],
+    [
+      785,
+      710
+    ],
+    [
+      515,
+      710
+    ],
+    [
+      505,
+      645
+    ],
+    [
+      390,
+      625
+    ],
+    [
+      390,
+      700
+    ],
+    [
+      385,
+      830
+    ],
+    [
+      380,
+      830
+    ],
+    [
+      300,
+      880
+    ],
+    [
+      260,
+      860
+    ],
+    [
+      200,
+      820
+    ],
+    [
+      150,
+      780
+    ],
+    [
+      210,
+      720
+    ],
+    [
+      215,
+      600
+    ],
+    [
+      180,
+      540
+    ],
+    [
+      100,
+      530
+    ],
+    [
+      36,
+      525
+    ],
+    [
+      0,
+      525
+    ]
+  ],
+  "blockers": [],
+  "crossings": [
+    {
+      "id": "mist-band",
+      "polygon": [
+        [
+          380,
+          505
+        ],
+        [
+          515,
+          505
+        ],
+        [
+          515,
+          655
+        ],
+        [
+          380,
+          655
+        ]
+      ],
+      "opens": "found_mist_way"
+    },
+    {
+      "id": "gully",
+      "polygon": [
+        [
+          795,
+          505
+        ],
+        [
+          945,
+          505
+        ],
+        [
+          945,
+          650
+        ],
+        [
+          795,
+          650
+        ]
+      ],
+      "opens": "rope_bridge"
+    }
+  ],
+  "glows": [
+    {
+      "id": "mist-flower-1",
+      "frame": "bluebell_1",
+      "point": {
+        "x": 150,
+        "y": 470
+      }
+    },
+    {
+      "id": "mist-flower-2",
+      "frame": "bluebell_2",
+      "point": {
+        "x": 230,
+        "y": 500
+      }
+    },
+    {
+      "id": "mist-flower-3",
+      "frame": "bluebell_3",
+      "point": {
+        "x": 300,
+        "y": 540
+      }
+    },
+    {
+      "id": "mist-flower-4",
+      "frame": "bluebell_4",
+      "point": {
+        "x": 365,
+        "y": 570
+      },
+      "knot": "mist_flowers",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "field",
+      "polygon": [
+        [
+          0,
+          440
+        ],
+        [
+          40,
+          440
+        ],
+        [
+          40,
+          525
+        ],
+        [
+          0,
+          525
+        ]
+      ],
+      "target": {
+        "area": "field",
+        "spawn": "mist"
+      }
+    }
+  ],
+  "interactables": [
+    {
+      "id": "mist-band",
+      "point": {
+        "x": 385,
+        "y": 575
+      },
+      "knot": "mist_band",
+      "prompt": "Look"
+    },
+    {
+      "id": "gully-posts",
+      "point": {
+        "x": 790,
+        "y": 580
+      },
+      "knot": "gully_bridge",
+      "prompt": "Look"
+    },
+    {
+      "id": "seal",
+      "point": {
+        "x": 1315,
+        "y": 565
+      },
+      "knot": "mist_seal",
+      "prompt": "Play"
+    }
+  ],
+  "critters": [],
+  "npcs": [],
+  "props": [
+    {
+      "id": "pine-west",
+      "prop": "pine-west",
+      "x": 508,
+      "y": 1100
+    },
+    {
+      "id": "pine-middle",
+      "prop": "pine-middle",
+      "x": 785,
+      "y": 1100
+    },
+    {
+      "id": "fern-middle",
+      "prop": "fern-middle",
+      "x": 628,
+      "y": 990
+    },
+    {
+      "id": "pine-east",
+      "prop": "pine-east",
+      "x": 1580,
+      "y": 1070
+    },
+    {
+      "id": "fern-east",
+      "prop": "fern-east",
+      "x": 1280,
+      "y": 1000
+    },
+    {
+      "id": "standing-stone",
+      "prop": "standing-stone",
+      "x": 1485,
+      "y": 825
+    },
+    {
+      "id": "bridge-posts",
+      "prop": "bridge-posts",
+      "x": 773,
+      "y": 529
+    },
+    {
+      "id": "rope-bridge",
+      "prop": "rope-bridge",
+      "x": 1035,
+      "y": 655,
+      "rules": [
+        {
+          "state": "across",
+          "while": "rope_bridge"
+        }
+      ]
+    },
+    {
+      "id": "mist-stones",
+      "prop": "mist-stones",
+      "x": 550,
+      "y": 600,
+      "rules": [
+        {
+          "state": "found",
+          "while": "found_mist_way"
+        }
+      ]
+    },
+    {
+      "id": "seal-open",
+      "prop": "seal-open",
+      "x": 1370,
+      "y": 640,
+      "rules": [
+        {
+          "state": "open",
+          "while": "seal_open"
+        }
+      ]
+    }
+  ],
+  "atlases": [],
+  "spawns": {
+    "field": {
+      "x": 190,
+      "y": 482,
+      "facing": "right"
+    },
+    "stones": {
+      "x": 630,
+      "y": 585,
+      "facing": "right"
+    },
+    "forest": {
+      "x": 1180,
+      "y": 570,
+      "facing": "left"
+    }
+  }
+}

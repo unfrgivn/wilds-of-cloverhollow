@@ -59,6 +59,86 @@
         "w": 136,
         "h": 171
       }
+    },
+    "bluebell_1": {
+      "frame": {
+        "x": 530,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      }
+    },
+    "bluebell_2": {
+      "frame": {
+        "x": 658,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      }
+    },
+    "bluebell_3": {
+      "frame": {
+        "x": 786,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      }
+    },
+    "bluebell_4": {
+      "frame": {
+        "x": 914,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      }
     }
   },
   "animations": {
@@ -70,12 +150,18 @@
     ],
     "trail_marker": [
       "trail_marker"
+    ],
+    "bluebells": [
+      "bluebell_1",
+      "bluebell_2",
+      "bluebell_3",
+      "bluebell_4"
     ]
   },
   "meta": {
     "image": "glows.png",
     "size": {
-      "w": 530,
+      "w": 1042,
       "h": 176
     },
     "scale": "1"

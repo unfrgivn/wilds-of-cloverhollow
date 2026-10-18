@@ -31,6 +31,7 @@ describe("chapter one", () => {
       "school-raccoon": "calm",
       gull: "chaos",
       "arcade-keeper": "chaos",
+      "lodge-keeper": "chaos",
       "gym-pup": "chaos",
       "music-bird": "chaos",
       "oak-squirrel": "chaos",

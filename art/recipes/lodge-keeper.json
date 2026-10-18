@@ -1,0 +1,26 @@
+{
+  "asset": "lodge-keeper",
+  "milestone": 57,
+  "date": "2026-10-17",
+  "summary": "Mrs. Flurry, the lodge keeper, the second person under the chaos spell: a 2x2 body sheet (chaos idle, a snowball up; the throw, three snowballs flying; soothed, a snowball dropped; calm, waving with cocoa), drawn to Mr. Pip's sheet.",
+  "generationSource": "Generated with Gemini from Mr. Pip's body sheet (for the style, size, and the swirly eyes) and the school staff concept sheet.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-10-18T00:58:01.438Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/critters/arcade-keeper/body-sheet-raw.png",
+        "docs/art/concepts/npcs/school_staff_npcs.png"
+      ],
+      "prompt": "A 2x2 character sheet of a NEW character, drawn in exactly the style of the first reference: the same chibi proportions with a big head, the same soft watercolour with thin warm-brown ink outlines, and the same size of figure in each cell. The character: the keeper of a snowy mountain ski lodge, a cheerful grandmotherly lady with rosy cheeks and round glasses, grey hair in a bun under a red knitted pom-pom hat, a cozy cream sweater with a red-and-green snowflake band, a dark green quilted vest, brown trousers, and chunky snow boots. Flat, plain, bright magenta (#FF00FF) background. Each figure drawn exactly once, whole, standing, facing the viewer, one per cell: TOP LEFT, under a fizzy spell: purple swirly eyes behind her glasses like the first reference's top-left figure, a wild toothy grin, wisps of hair sticking out, holding a snowball up in one hand ready to throw, a few tiny purple fizz sparkles round her head. TOP RIGHT, mid-throw: both arms flinging, swirly eyes, laughing, and three round white snowballs flying away from her, each one separate, not touching her or each other. BOTTOM LEFT, calming down: sleepy half-closed eyes, a dazed sheepish smile, a snowball dropped by her boots. BOTTOM RIGHT, her friendly self: kind normal eyes behind her glasses, a warm smile, waving one hand and holding a steaming mug of cocoa in the other. No text, no shadows on the background, no faded copies, nothing else.",
+      "output": "1792285081436-gemini-3-pro-image-preview-0.png",
+      "note": "Kept as it came: four poses, one each, whole, on magenta.",
+      "kept": "art/source/critters/lodge-keeper/body-sheet-raw.png"
+    }
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-person.ts lodge-keeper (Mr. Pip's builder, made general: it rebuilds his atlas byte for byte too). Bodies 380 px, the shared hamster aura. Rebuilt twice with the same hash.",
+    "snowballs": "Her throw's three snowballs are cut by tools/art/build-toys.ts (art/recipes/toys.json, source `lodge-keeper`) as snowball-05 to 07; the hamster's four and every other toy stay byte for byte the same."
+  }
+}

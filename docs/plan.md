@@ -2406,26 +2406,54 @@ the old trail, the owl, and the clubhouse claim.
   real-key e2e (the morning at both sizes, the credits, the title, and
   Continue back in the forest; on WebKit too, tagged `@smoke`).
 
-## Milestone 57: The lodge keeper **Status:** 🚧 In progress (2026-10-17)
+## Milestone 57: The lodge keeper **Status:** ✅ Completed (2026-10-17)
 - The owner picked more people under the chaos spell (2026-10-17; NOTES.md's
   last unscheduled idea, more mini-bosses), starting with Pinecone Pass's
   lodge, locked since the pass was built: "Back soon, gone looking for a
   runaway hamster."
-- Once Fae has calmed a hamster (who warns her to watch out for snowballs),
-  the note leads on: reading it, a snowball whizzes past. The lodge keeper is
-  back (`keeper_back`), fizzy from one sip of the hooded kid's purple soda,
-  like Mr. Pip, and flinging snowballs from her porch. No earlier recorded
-  run reads the note, so the pass looks as it always did until then.
-- She's a person under the spell, a set piece like Mr. Pip, with her own
-  battle: her feelings, a wind-up (a giant snowball), and snowballs to catch
-  as her bursts. Calmed, she remembers the soda and the kid in the purple
-  hood, unlocks the lodge (`lodge_open`), and invites everyone in to warm up.
-- The lodge: a new room, painted whole and split into a kit like the
-  clubhouse: a cozy ski lodge with a crackling fire, armchairs, skis on the
-  wall, a pot of cocoa, and a guestbook. Her name waits for the owner.
-- Art: her battle atlas (Mr. Pip's frames; the hamsters' aura shared), the
-  snowballs cut from her throw like the thrown toys, the lodge's door open (an
-  added prop, Milestone 49), and the lodge room.
+- Once Fae has calmed a hamster at the pass (who warns her to watch out for
+  snowballs), the note leads on: a snowball whizzes past, and the lodge
+  keeper, Mrs. Flurry, is home and fizzy from one sip of the hooded kid's
+  purple soda, like Mr. Pip, flinging snowballs from her porch. No earlier
+  recorded run reads the note after a hamster's calmed, so the pass looks as
+  it always did until then.
+- She's a person under the spell, a set piece like Mr. Pip, with Mr. Pip's
+  numbers and friend commands, her own feelings (zoomy, grumpy, hungry), a
+  wind-up (a giant snowball), and snowballs to catch, cut from her throw.
+  Calmed, she tells of her runaway hamster, Biscuit (home all by himself,
+  calm: the hamster Fae calmed), and the kid in the purple hood, and opens
+  her lodge; its door stands open on the firelit inside.
+- The lodge, a new room painted whole and split into a kit like the
+  clubhouse: the fire; a pot of cocoa (one mug to take along); the guestbook,
+  where somebody signed in purple marker and scribbled it out, a paper plane
+  doodled in the corner (a clue toward Milo, kept quiet); and Biscuit, asleep.
+- Art (`art/recipes/lodge-keeper.json`, `lodge.json`, `pass-lodge-open.json`):
+  her body sheet, drawn to Mr. Pip's; the lodge room; and the pass with the
+  door open, cut as an added prop (Milestone 49). Mr. Pip's atlas builder is
+  now `tools/art/build-person.ts <id>`, for every person under the spell (his
+  atlas rebuilds byte for byte).
+- Evidence: unit tests (`lodge-keeper.test.ts`: the note before and after a
+  hamster, her porch and battle content, her calm talk opening the lodge, the
+  door's trigger, the room's look points and their lines, the area checks,
+  and the journal), the recorded run `pass-party/lodge.json`
+  (`tools/sim/record-lodge.ts`, on from Jordan's run: the note, the battle,
+  her talk, and in through the door to the fire, the cocoa, and Biscuit) with
+  its replay test, and the real-key e2e `lodge.spec.ts` (four moments at both
+  sizes, the battle at its first menu, and the browser's and Bun's hashes
+  match). Mrs. Flurry's sticker adds a twelfth album slot: the journal
+  spec's slot counts and four journal screenshots were updated (one more
+  "?" each). Gates: `just check` (835 unit tests, the sim, core purity,
+  lint), `just build`, and `just e2e` (750 passed, 2 skipped; the 7 that
+  failed were those slot counts and screenshots, then passed: 19 of 19 in
+  the three specs, both engines).
+- Notes and assumptions:
+  - Her name, Mrs. Flurry, and Biscuit's are placeholders for the owner,
+    like Mr. Pip's.
+  - Her friend-command lines are her own; her numbers are Mr. Pip's.
+  - Gemini calls: 10 (her sheet, the lodge room, the door edit, and seven kit
+    isolates).
+  - The sheet, the room, the door, the snowballs, and the wording are in the
+    owner's review queue.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
@@ -2761,8 +2789,8 @@ more bad guys, and the blacklight lantern, made and built while away.
     first touch and old friends: done (above).
   - Milestone 49, lasso spots: done (above). Then Milestone 52, the
     clubhouse kitchen (owner, 2026-10-17): done (above).
-  - Milestone 57, the lodge keeper: in progress (above), the first of more
-    people under the chaos spell (owner, 2026-10-17).
+  - Milestone 57, the lodge keeper: done (above), the first of more people
+    under the chaos spell (owner, 2026-10-17).
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)

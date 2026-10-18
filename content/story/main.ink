@@ -76,6 +76,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
+{calmed("lodge-keeper"): I calmed Mrs. Flurry, the lodge keeper at Pinecone Pass. Her lodge is open, and the fire's lit! # speaker: Fae}
+{keeper_back and not calmed("lodge-keeper"): The lodge keeper at Pinecone Pass is fizzy, and flinging snowballs from her porch! # speaker: Fae}
 {has_nuggets: I've got a box of dino nuggets. To the clubhouse microwave! # speaker: Fae}
 {has_mac: I've got a box of mac n cheese. To the clubhouse microwave! # speaker: Fae}
 {has_microwave and not (has_nuggets or has_mac): Mom's freezer has dino nuggets and mac n cheese for the clubhouse microwave. # speaker: Fae}
@@ -466,7 +468,26 @@ Thank you, Fae! A mug of cocoa, on the house. # speaker: Cocoa seller # gift: sn
 -> DONE
 
 === lodge_door ===
+{lodge_open: -> open}
+{keeper_back: -> fizzy}
+{calmed("hamster"): -> back}
 The lodge is locked. A note says: "Back soon, gone looking for a runaway hamster." # speaker: Fae
+-> DONE
+// Once a hamster's been calmed (the one who warns of snowballs), the keeper's
+// home, and under the spell (Milestone 57).
+= back
+The lodge is locked. A note says: "Back soon, gone looking for a runaway hamster." # speaker: Fae
+A runaway hamster? We calmed a hamster up here! # speaker: Fae
+WHOOSH! A snowball whizzes right past Fae's ear. # speaker: Fae
+~ keeper_back = true
+Hee hee hee! NOBODY gets in MY lodge! # speaker: Lodge keeper
+It's the lodge keeper, and she's all fizzy! # speaker: Fae
+-> DONE
+= fizzy
+The lodge is locked tight. The lodge keeper is out on her porch, flinging snowballs! # speaker: Fae
+-> DONE
+= open
+The lodge door is open. Warm air and the smell of cocoa drift out. # speaker: Fae
 -> DONE
 
 
@@ -1400,3 +1421,54 @@ Fae closes the lid gently. # speaker: Fae
 = drawings
 Drawings pinned to the wall: a kid with a big smile, and hearts and flowers. # speaker: Fae
 -> DONE
+
+// The lodge keeper (Milestone 57): home from looking for her runaway hamster,
+// fizzy from the hooded kid's soda, until Fae calms her.
+VAR keeper_back = false
+VAR lodge_open = false
+
+=== lodge_keeper ===
+{lodge_keeper > 1: -> again}
+Oh my stars... what happened? My head was all fizzy, like a shaken-up soda! # speaker: Mrs. Flurry
+My hamster Biscuit ran off this morning. While I was out looking for him, a kid in a purple hood gave me a fizzy purple soda. # speaker: Mrs. Flurry
+One sip, and I didn't want ANYONE in my lodge. I'm so sorry about the snowballs, dears! # speaker: Mrs. Flurry
+Biscuit came home all by himself, calm as can be. Somebody must have been kind to him. # speaker: Mrs. Flurry
+That was us! # speaker: Fae
+~ lodge_open = true
+Then come in, come in, all of you! Warm up by the fire. # speaker: Mrs. Flurry
+-> DONE
+= again
+Mrs. Flurry sweeps the snow off her porch. "The fire's lit, dears. Come in and warm up!" # speaker: Mrs. Flurry
+-> DONE
+
+// Inside the lodge (Milestone 57).
+VAR lodge_cocoa_had = false
+
+=== lodge_fire ===
+The fire crackles and pops. Fae holds her hands out to it. Toasty! # speaker: Fae
+Now THIS is how you warm up after a snowball fight. # speaker: Jordan
+-> DONE
+
+=== lodge_cocoa ===
+{lodge_cocoa_had: -> again}
+A big copper pot of cocoa, with little marshmallows bobbing on top. # speaker: Fae
+A note on the lid says: "Help yourselves, dears! Mrs. F." # speaker: Fae
+~ lodge_cocoa_had = true
+Fae pours a mug of cocoa to take along. # speaker: Fae # gift: snack 1
+-> DONE
+= again
+The cocoa pot is still warm. Mmm, marshmallows. # speaker: Fae
+-> DONE
+
+=== lodge_guestbook ===
+The lodge's guestbook, full of happy skiers' names. # speaker: Fae
+On today's page, somebody signed in purple marker, then scribbled their name out. # speaker: Fae
+There's a little paper plane doodled in the corner. # speaker: Fae
+{saw_hood: The same purple as the marker the hooded kid dropped at school... # speaker: Fae}
+-> DONE
+
+=== lodge_hamster ===
+A little wooden house by the fire. Inside, a round hamster is curled up fast asleep. # speaker: Fae
+That must be Biscuit! He's snoring tiny squeaks. # speaker: Fae
+-> DONE
+

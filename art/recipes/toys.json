@@ -9,8 +9,16 @@
       "atlas": "public/assets/critters/pup/pup.png",
       "frame": "chaos_burst_01",
       "seeds": [
-        { "name": "tennis-ball-01", "x": 109, "y": 369 },
-        { "name": "tennis-ball-02", "x": 398, "y": 198 }
+        {
+          "name": "tennis-ball-01",
+          "x": 109,
+          "y": 369
+        },
+        {
+          "name": "tennis-ball-02",
+          "x": 398,
+          "y": 198
+        }
       ]
     },
     {
@@ -18,10 +26,26 @@
       "atlas": "public/assets/critters/cat/cat.png",
       "frame": "chaos_burst_01",
       "seeds": [
-        { "name": "yarn-teal-01", "x": 113, "y": 196 },
-        { "name": "yarn-purple-01", "x": 68, "y": 379 },
-        { "name": "yarn-pink-01", "x": 442, "y": 318 },
-        { "name": "yarn-blue-01", "x": 352, "y": 448 }
+        {
+          "name": "yarn-teal-01",
+          "x": 113,
+          "y": 196
+        },
+        {
+          "name": "yarn-purple-01",
+          "x": 68,
+          "y": 379
+        },
+        {
+          "name": "yarn-pink-01",
+          "x": 442,
+          "y": 318
+        },
+        {
+          "name": "yarn-blue-01",
+          "x": 352,
+          "y": 448
+        }
       ]
     },
     {
@@ -29,10 +53,26 @@
       "atlas": "public/assets/critters/squirrel/squirrel.png",
       "frame": "chaos_burst_01",
       "seeds": [
-        { "name": "acorn-01", "x": 58, "y": 358 },
-        { "name": "acorn-02", "x": 38, "y": 477 },
-        { "name": "acorn-03", "x": 90, "y": 423 },
-        { "name": "acorn-04", "x": 163, "y": 452 }
+        {
+          "name": "acorn-01",
+          "x": 58,
+          "y": 358
+        },
+        {
+          "name": "acorn-02",
+          "x": 38,
+          "y": 477
+        },
+        {
+          "name": "acorn-03",
+          "x": 90,
+          "y": 423
+        },
+        {
+          "name": "acorn-04",
+          "x": 163,
+          "y": 452
+        }
       ]
     },
     {
@@ -40,10 +80,26 @@
       "atlas": "public/assets/critters/hamster/hamster.png",
       "frame": "chaos_burst_01",
       "seeds": [
-        { "name": "snowball-01", "x": 54, "y": 382 },
-        { "name": "snowball-02", "x": 443, "y": 233 },
-        { "name": "snowball-03", "x": 467, "y": 276 },
-        { "name": "snowball-04", "x": 89, "y": 419 }
+        {
+          "name": "snowball-01",
+          "x": 54,
+          "y": 382
+        },
+        {
+          "name": "snowball-02",
+          "x": 443,
+          "y": 233
+        },
+        {
+          "name": "snowball-03",
+          "x": 467,
+          "y": 276
+        },
+        {
+          "name": "snowball-04",
+          "x": 89,
+          "y": 419
+        }
       ]
     },
     {
@@ -51,10 +107,26 @@
       "atlas": "public/assets/critters/raccoon/raccoon.png",
       "frame": "chaos_burst_01",
       "seeds": [
-        { "name": "bottle-cap-01", "x": 424, "y": 158 },
-        { "name": "bottle-cap-02", "x": 382, "y": 156 },
-        { "name": "bottle-cap-03", "x": 393, "y": 208 },
-        { "name": "bottle-cap-04", "x": 435, "y": 221 }
+        {
+          "name": "bottle-cap-01",
+          "x": 424,
+          "y": 158
+        },
+        {
+          "name": "bottle-cap-02",
+          "x": 382,
+          "y": 156
+        },
+        {
+          "name": "bottle-cap-03",
+          "x": 393,
+          "y": 208
+        },
+        {
+          "name": "bottle-cap-04",
+          "x": 435,
+          "y": 221
+        }
       ]
     },
     {
@@ -62,14 +134,68 @@
       "atlas": "public/assets/critters/arcade-keeper/arcade-keeper.png",
       "frame": "chaos_burst_01",
       "seeds": [
-        { "name": "ticket-01", "x": 96, "y": 216 },
-        { "name": "ticket-02", "x": 419, "y": 235 },
-        { "name": "ticket-03", "x": 398, "y": 365 },
-        { "name": "ticket-04", "x": 112, "y": 389 },
-        { "name": "token-01", "x": 129, "y": 154 },
-        { "name": "token-02", "x": 325, "y": 148 },
-        { "name": "token-03", "x": 82, "y": 334 },
-        { "name": "token-04", "x": 370, "y": 206 }
+        {
+          "name": "ticket-01",
+          "x": 96,
+          "y": 216
+        },
+        {
+          "name": "ticket-02",
+          "x": 419,
+          "y": 235
+        },
+        {
+          "name": "ticket-03",
+          "x": 398,
+          "y": 365
+        },
+        {
+          "name": "ticket-04",
+          "x": 112,
+          "y": 389
+        },
+        {
+          "name": "token-01",
+          "x": 129,
+          "y": 154
+        },
+        {
+          "name": "token-02",
+          "x": 325,
+          "y": 148
+        },
+        {
+          "name": "token-03",
+          "x": 82,
+          "y": 334
+        },
+        {
+          "name": "token-04",
+          "x": 370,
+          "y": 206
+        }
+      ]
+    },
+    {
+      "name": "lodge-keeper",
+      "atlas": "public/assets/critters/lodge-keeper/lodge-keeper.png",
+      "frame": "chaos_burst_01",
+      "seeds": [
+        {
+          "name": "snowball-05",
+          "x": 330,
+          "y": 170
+        },
+        {
+          "name": "snowball-06",
+          "x": 403,
+          "y": 225
+        },
+        {
+          "name": "snowball-07",
+          "x": 382,
+          "y": 379
+        }
       ]
     }
   ],

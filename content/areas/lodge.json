@@ -1,0 +1,143 @@
+{
+  "id": "lodge",
+  "name": "Mountain Lodge",
+  "land": "pass",
+  "ground": "lodge",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      70,
+      548
+    ],
+    [
+      600,
+      318
+    ],
+    [
+      1150,
+      508
+    ],
+    [
+      600,
+      772
+    ],
+    [
+      70,
+      560
+    ]
+  ],
+  "blockers": [],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          105,
+          525
+        ],
+        [
+          215,
+          478
+        ],
+        [
+          215,
+          520
+        ],
+        [
+          105,
+          560
+        ]
+      ],
+      "target": {
+        "area": "pass",
+        "spawn": "lodge"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 270,
+      "y": 540,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "fire",
+      "knot": "lodge_fire",
+      "point": {
+        "x": 880,
+        "y": 470
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "cocoa",
+      "knot": "lodge_cocoa",
+      "point": {
+        "x": 470,
+        "y": 440
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "guestbook",
+      "knot": "lodge_guestbook",
+      "point": {
+        "x": 620,
+        "y": 385
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "hamster-house",
+      "knot": "lodge_hamster",
+      "point": {
+        "x": 1030,
+        "y": 515
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [],
+  "critters": [],
+  "props": [
+    {
+      "id": "counter",
+      "prop": "counter",
+      "x": 514,
+      "y": 447
+    },
+    {
+      "id": "fireplace",
+      "prop": "fireplace",
+      "x": 907,
+      "y": 488
+    },
+    {
+      "id": "armchair-left",
+      "prop": "armchair-left",
+      "x": 677,
+      "y": 540
+    },
+    {
+      "id": "side-table",
+      "prop": "side-table",
+      "x": 765,
+      "y": 557
+    },
+    {
+      "id": "armchair-right",
+      "prop": "armchair-right",
+      "x": 870,
+      "y": 610
+    },
+    {
+      "id": "hamster-house",
+      "prop": "hamster-house",
+      "x": 1067,
+      "y": 532
+    }
+  ]
+}

@@ -368,6 +368,35 @@
         "area": "woods",
         "spawn": "east"
       }
+    },
+    {
+      "id": "lodge",
+      "polygon": [
+        [
+          1165,
+          482
+        ],
+        [
+          1225,
+          482
+        ],
+        [
+          1225,
+          502
+        ],
+        [
+          1165,
+          502
+        ]
+      ],
+      "target": {
+        "area": "lodge",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "lodge_open",
+        "knot": "lodge_door"
+      }
     }
   ],
   "interactables": [
@@ -450,9 +479,23 @@
       "x": 470,
       "y": 540,
       "facing": "right"
+    },
+    "lodge": {
+      "x": 1195,
+      "y": 545,
+      "facing": "down"
     }
   },
-  "critters": [],
+  "critters": [
+    {
+      "id": "lodge-keeper",
+      "point": {
+        "x": 1300,
+        "y": 590
+      },
+      "visibleWhile": "keeper_back"
+    }
+  ],
   "recurring": {
     "dens": [
       {
@@ -619,6 +662,18 @@
         {
           "state": "stuck",
           "while": "has_lasso"
+        }
+      ]
+    },
+    {
+      "id": "lodge-door",
+      "prop": "lodge-door",
+      "x": 1195,
+      "y": 503,
+      "rules": [
+        {
+          "state": "open",
+          "while": "lodge_open"
         }
       ]
     }

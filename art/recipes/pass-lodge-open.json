@@ -1,0 +1,23 @@
+{
+  "asset": "pass-lodge-open",
+  "milestone": 57,
+  "date": "2026-10-17",
+  "summary": "The pass painting with the lodge's door open on its firelit inside, cut by the kit as the added prop `lodge-door` (hidden until the lodge opens).",
+  "generationSource": "Generated with Gemini as an edit of the approved pass painting.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-10-18T01:29:45.593Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/pass/pass-raw.png"
+      ],
+      "prompt": "This is a finished hand-painted watercolour-and-ink painting of a place in a cozy children's game. Keep the whole painting EXACTLY as it is: the same composition and framing, every object, colour, line, and the paper border, at exactly the same size and position. Change only one thing: the log lodge's front door, on its porch in the upper right of the picture (the tall wooden door with the round knob, under the snowy little roof, between two golden windows), now stands wide open: the door swung inward out of sight, so the doorway shows the warm, firelit inside of the lodge, glowing orange-gold, with a soft spill of warm light across the porch boards in front of it. The doorway's frame, the snowy roof over it, the windows, and the porch stay exactly as they are. Paint it in the same soft watercolour with thin warm-brown ink outlines. No people, no animals, no text or letters. Output the whole image at the same framing.",
+      "output": "1792286985591-gemini-3-pro-image-preview-0.png",
+      "note": "The door swung in on the glowing inside; the rest of the painting in register (a median of 0 units off, 90th percentile 1.24).",
+      "kept": "art/source/areas/pass/pass-lodge-open.png"
+    }
+  ],
+  "postProcessing": "The pass's pipeline (art/recipes/lasso-spots.json): magick <raw> -background '#fcfbf6' -gravity south -extent 2528x1900 -resize x2200 -gravity center -extent 3500x2200; it reproduces the kept file with 0 differing pixels.",
+  "kitCalls": "1 isolate (art/recipes/pass-kit.json keeps it)."
+}

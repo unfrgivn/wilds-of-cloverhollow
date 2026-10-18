@@ -1,0 +1,27 @@
+{
+  "asset": "lodge ground",
+  "milestone": 57,
+  "date": "2026-10-17",
+  "summary": "The Pinecone Pass lodge's one room in the music room's cutaway style: log walls, the counter with the cocoa pot and guestbook, the stone fireplace with crossed skis, two armchairs and a side table, a braided rug, Biscuit's house, and the door.",
+  "generationSource": "Generated with Gemini from the approved music room (the cutaway style and camera), the pass painting's lodge (its outside), and the clubhouse room.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-10-18T01:08:53.409Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/areas/music/music-final.png",
+        "/private/var/folders/vh/53q4qxpx6jd37xysdw6ngzg40000gn/T/opencode/m57/lodge-ext-ref.png",
+        "art/source/areas/clubhouse/clubhouse-final.png"
+      ],
+      "prompt": "The inside of the snowy mountain ski lodge from the second reference (a log cabin with warm golden windows), painted as a game room in EXACTLY the cutaway style, framing, size, and camera of the first reference: the same three-quarter view from above, the room drawn as an open box with its two back walls and its floor, cut away at the front, standing on cream paper, in the same soft watercolour with thin warm-brown ink outlines. The walls are honey-coloured round logs, and the floor is warm wooden planks with a big round red-and-cream braided rug in the middle. Against the back walls: a big stone fireplace with a crackling fire, on the right part of the back wall; a pair of crossed old wooden skis and poles hung on the wall; a window with snow on its sill and pine trees outside; a long wooden counter on the left with a big copper pot of cocoa, mugs on hooks, and a guestbook; two cozy armchairs facing the fire with a small round table between them; a little wooden hamster house on the floor by the fireplace; a coat rack with scarves. The front door is in the left wall near the front, a wooden door like the lodge's, closed, its threshold on the floor so someone can walk in. Leave the middle of the floor open to walk around. Warm, cozy, firelit light. No people, no animals, no text or letters.",
+      "output": "1792285733407-gemini-3-pro-image-preview-0.png",
+      "note": "Kept as it came.",
+      "kept": "art/source/areas/lodge/lodge-final.png"
+    }
+  ],
+  "postProcessing": [
+    "The clubhouse's pipeline: resized with Lanczos to 2400x1610 and cropped 5 px from the top to 2400x1600; split into two 1200x1600 WebP tiles at quality 92 (art/source/areas/lodge/painting/); both tiles reproduce byte for byte from the raw.",
+    "Split into a kit (art/kit/lodge.json): six painted props, one isolate each."
+  ]
+}

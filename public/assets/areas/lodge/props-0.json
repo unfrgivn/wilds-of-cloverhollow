@@ -1,0 +1,156 @@
+{
+  "frames": {
+    "fireplace": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 520,
+        "h": 800
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 520,
+        "h": 800
+      },
+      "sourceSize": {
+        "w": 520,
+        "h": 800
+      },
+      "anchor": {
+        "x": 0.47692,
+        "y": 0.98
+      }
+    },
+    "counter": {
+      "frame": {
+        "x": 522,
+        "y": 0,
+        "w": 670,
+        "h": 422
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 670,
+        "h": 422
+      },
+      "sourceSize": {
+        "w": 670,
+        "h": 422
+      },
+      "anchor": {
+        "x": 0.48955,
+        "y": 0.96919
+      }
+    },
+    "armchair-left": {
+      "frame": {
+        "x": 1194,
+        "y": 0,
+        "w": 320,
+        "h": 321
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 321
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 321
+      },
+      "anchor": {
+        "x": 0.49375,
+        "y": 0.98131
+      }
+    },
+    "armchair-right": {
+      "frame": {
+        "x": 1516,
+        "y": 0,
+        "w": 310,
+        "h": 310
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 310,
+        "h": 310
+      },
+      "sourceSize": {
+        "w": 310,
+        "h": 310
+      },
+      "anchor": {
+        "x": 0.4871,
+        "y": 0.96129
+      }
+    },
+    "hamster-house": {
+      "frame": {
+        "x": 0,
+        "y": 802,
+        "w": 290,
+        "h": 255
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 290,
+        "h": 255
+      },
+      "sourceSize": {
+        "w": 290,
+        "h": 255
+      },
+      "anchor": {
+        "x": 0.49655,
+        "y": 1.0549
+      }
+    },
+    "side-table": {
+      "frame": {
+        "x": 292,
+        "y": 802,
+        "w": 170,
+        "h": 211
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 170,
+        "h": 211
+      },
+      "sourceSize": {
+        "w": 170,
+        "h": 211
+      },
+      "anchor": {
+        "x": 0.47059,
+        "y": 0.92417
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1057
+    },
+    "scale": "1"
+  }
+}

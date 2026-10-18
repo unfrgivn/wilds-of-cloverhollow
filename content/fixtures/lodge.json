@@ -1,0 +1,10 @@
+{
+  "area": "lodge",
+  "spawn": "door",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ]
+}

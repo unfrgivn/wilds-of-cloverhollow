@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-17 (Milestone 52, the clubhouse kitchen)
+Last updated: 2026-10-17 (Milestone 57, the lodge keeper)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -591,6 +591,27 @@ ios/            Capacitor iOS project (from Milestone 4).
   "Fetch, boy!" sends him swimming for an old tin of twelve coins
   (`pond_tin`, `gift: coins 12`), once. The journal tells of the tin, the
   glint until then, and the friend, on top.
+- The lodge keeper (Milestone 57): once Fae has calmed a hamster at Pinecone
+  Pass (`calmed("hamster")`, its sticker), the lodge's note leads on
+  (`lodge_door.back`): a snowball whizzes past, and its keeper, Mrs. Flurry,
+  is home and fizzy (`keeper_back`), a set piece on her porch. Calmed, she
+  tells of her runaway hamster Biscuit and the hooded kid's soda, and opens
+  the lodge (`lodge_open`): its door is open (the pass's added prop
+  `lodge-door`, state `open`, cut from `pass-lodge-open.png`), and walking
+  into it (trigger `lodge`, `requires` `lodge_open`, knot `lodge_door`; spawn
+  `lodge` (1195, 545) facing down) goes in. The journal tells of her fizzy,
+  then calm.
+- The lodge (Milestone 57): `lodge`, "Mountain Lodge", in the `pass` land, a
+  1200x800 painted cutaway of the log lodge's one room, split into a kit (a
+  counter with the cocoa pot and the guestbook, the stone fireplace, two
+  armchairs and a side table, and Biscuit's house; all painted). Its door, in
+  the left wall, leads back out (trigger `door` to `pass.lodge`; spawn `door`
+  (270, 540) facing right). Look points: the fire (`lodge_fire`), the cocoa
+  (`lodge_cocoa`: one mug to take along, `gift: snack 1`, once), the
+  guestbook (`lodge_guestbook`: a name signed in purple marker and scribbled
+  out, and a paper plane doodled in the corner), and Biscuit asleep
+  (`lodge_hamster`). Its floor is wood, and its fixture `lodge` stands at the
+  door with the whole party.
 - The clubhouse (Milestone 43): `clubhouse`, "Clubhouse", in the `forest` land,
   is a 1200x800 painted cutaway of the Whispering Woods tree house's one room
   and its deck. The ladder at the tree house's front in the woods is a door
@@ -733,7 +754,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `visibleWhile` (an Ink variable) puts one there only while it's true. The
   set pieces are the fountain frog (plaza), the school raccoon (plaza, while
   `raccoon_waiting`), the grumpy gull (the trail's lookout), Mr. Pip, the
-  arcade keeper (the arcade), and the gym pup (the gym).
+  arcade keeper (the arcade), the gym pup (the gym), and Mrs. Flurry, the
+  lodge keeper (the pass, on her porch at (1300, 590), while `keeper_back`).
 - Recurring critters, EarthBound style, are an area's `recurring`:
   `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
   (a door, a bus ride, a rest's fade, and the start of a game or fixture)
@@ -1088,7 +1110,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   first person under the chaos spell: a person is a kind like any critter,
   with the gull's mini-boss numbers, `overworldHeight` 160 (about 1.15x Fae)
   and `battleHeight` 280. The others share the battle numbers for now; each
-  has its own lines, atlas, sticker, and calm knot.
+  has its own lines, atlas, sticker, and calm knot. Mrs. Flurry, the lodge
+  keeper (`lodge-keeper`, Milestone 57; feelings zoomy, grumpy, hungry; 25
+  coins), is the second person, with Mr. Pip's numbers, friend commands, and
+  wind-up (a giant snowball), and snowballs to catch. Each person's battle
+  atlas is built by `tools/art/build-person.ts <id>` from one 2x2 body sheet.
 - Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
   critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
@@ -1240,7 +1266,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   92; big 40, 62, 84, 106, 128). The nine flurry bursts are catches
   (Milestone 41): the Zoomie Pup and the gym pup throw tennis balls, the
   Pouncy Cat yarn, both squirrels acorns, the hamster snowballs, both
-  raccoons bottle caps, and Mr. Pip tickets and tokens; four toys land at 54,
+  raccoons bottle caps, Mr. Pip tickets and tokens, and Mrs. Flurry her own
+  snowballs (`snowball-05` to `07`, cut from her throw); four toys land at 54,
   78, 102, and 126 (travel 50), six when big at 54, 74, 94, 114, 134, and 154.
   The three gusts (both bluebirds and the gull) are leans (Milestone 48): two
   puffs of 56 ticks from 44 and 116, each force 2 or 3; big, three of 36
@@ -1296,9 +1323,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Wind-ups (Milestone 50): a mini-boss (`windUp` in its kind: `start`,
   `every`, `bubbles`, and `lines.start`, `lines.puffing`, `lines.fizzle`)
   puffs up on turn `start`, then every `every` turns, feeling several things
-  at once. The gull and Mr. Pip start on turn 2, every 3 turns, with 2
-  bubbles. `battle.turn` counts turns from 1; `battle.windUp` holds the
-  bubbles' feelings, which are popped, and the turns `left` (this one too).
+  at once. The gull, Mr. Pip, and Mrs. Flurry start on turn 2, every 3
+  turns, with 2 bubbles. `battle.turn` counts turns from 1; `battle.windUp`
+  holds the bubbles' feelings, which are popped, and the turns `left` (this
+  one too).
   - Starting: as that turn's menu opens, `bubbles` feelings are drawn, all
     different, from the kind's feelings Fae can answer then: one seeded
     value each, picked evenly from those not yet drawn, fewer if fewer are

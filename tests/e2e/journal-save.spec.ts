@@ -55,7 +55,7 @@ test("J opens the journal over a frozen world, and X or J closes it", async ({ p
   ]);
   const unowned = page.locator(
     '.journal-stickers:not(.journal-prizes) .journal-slot[data-owned="false"]');
-  await expect(unowned).toHaveCount(11);
+  await expect(unowned).toHaveCount(12);
   await hold(page, "ArrowRight", 12);
   expect((await readState(page)).player, "the world is frozen while the journal is open")
     .toEqual(before);
@@ -123,7 +123,7 @@ test("after calming the frog, the journal shows his sticker and his note", async
     '.journal-stickers:not(.journal-prizes) .journal-slot[data-owned="false"]');
   await expect(ownedNames)
     .toHaveText("Fountain Frog");
-  await expect(unowned).toHaveCount(10);
+  await expect(unowned).toHaveCount(11);
   await expect(page.locator(".journal-note")).toHaveText([
     "Purple fizz drips lead out of the plaza to Meadow Park.",
     "I have coins! The bakery in the plaza sells snacks for 5 coins.",

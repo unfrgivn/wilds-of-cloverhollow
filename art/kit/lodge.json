@@ -1,0 +1,233 @@
+{
+  "area": "lodge",
+  "subjects": [
+    {
+      "id": "counter",
+      "crop": [
+        350,
+        245,
+        330,
+        215
+      ],
+      "seed": [
+        500,
+        395
+      ],
+      "painted": true,
+      "object": "the long wooden counter: its top, its slatted front and end, and on it the copper pot of cocoa with its ladle, the two mugs, and the open guestbook; not the log walls, the mugs on the wall hooks, the scarves, or the floor",
+      "footprint": [
+        [
+          [
+            370,
+            413
+          ],
+          [
+            590,
+            330
+          ],
+          [
+            657,
+            362
+          ],
+          [
+            437,
+            447
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "fireplace",
+      "crop": [
+        775,
+        95,
+        265,
+        400
+      ],
+      "seed": [
+        920,
+        330
+      ],
+      "painted": true,
+      "object": "the stone fireplace: the chimney up the wall, the wooden mantel, the crossed skis and poles hung on the chimney, the fire, and the stone hearth on the floor; not the log walls, the window, or the floor",
+      "footprint": [
+        [
+          [
+            783,
+            410
+          ],
+          [
+            845,
+            382
+          ],
+          [
+            1030,
+            452
+          ],
+          [
+            967,
+            488
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "armchair-left",
+      "crop": [
+        595,
+        375,
+        165,
+        175
+      ],
+      "seed": [
+        640,
+        440
+      ],
+      "painted": true,
+      "object": "the armchair on the left, facing the fire: all of it, its back, arms, seat, and little wooden feet; not the side table, the other armchair, the rug, or the floor",
+      "footprint": [
+        [
+          [
+            603,
+            500
+          ],
+          [
+            660,
+            470
+          ],
+          [
+            750,
+            505
+          ],
+          [
+            688,
+            540
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "side-table",
+      "crop": [
+        725,
+        460,
+        80,
+        105
+      ],
+      "seed": [
+        765,
+        478
+      ],
+      "painted": true,
+      "object": "the small round wooden side table between the armchairs: its round top and its legs; not the armchairs, the hearth, or the floor",
+      "footprint": [
+        [
+          [
+            735,
+            540
+          ],
+          [
+            765,
+            525
+          ],
+          [
+            795,
+            540
+          ],
+          [
+            765,
+            557
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "armchair-right",
+      "crop": [
+        795,
+        455,
+        155,
+        160
+      ],
+      "seed": [
+        850,
+        510
+      ],
+      "painted": true,
+      "object": "the armchair on the right, facing the fire: all of it, its back, arms, seat, and little wooden feet; not the side table, the other armchair, the hearth, or the floor",
+      "footprint": [
+        [
+          [
+            805,
+            585
+          ],
+          [
+            860,
+            555
+          ],
+          [
+            935,
+            575
+          ],
+          [
+            880,
+            610
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    },
+    {
+      "id": "hamster-house",
+      "crop": [
+        995,
+        400,
+        140,
+        135
+      ],
+      "seed": [
+        1060,
+        470
+      ],
+      "painted": true,
+      "object": "the little wooden hamster house on the floor: its roof, its walls, and its round doorway; not the log walls or the floor",
+      "footprint": [
+        [
+          [
+            1003,
+            478
+          ],
+          [
+            1050,
+            450
+          ],
+          [
+            1130,
+            490
+          ],
+          [
+            1080,
+            532
+          ]
+        ]
+      ],
+      "samples": {
+        "object": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "id": "lodge-keeper",
+  "species": "lodge-keeper",
+  "name": "Fizzy Mrs. Flurry",
+  "calmName": "Mrs. Flurry",
+  "atlas": "assets/critters/lodge-keeper/lodge-keeper.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 314
+  },
+  "figureHeight": 380,
+  "overworldHeight": 160,
+  "battleHeight": 280,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "sticker": {
+    "id": "lodge-keeper",
+    "name": "Mrs. Flurry",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "lodge_keeper",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "grumpy",
+    "hungry"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.5,
+    "check": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "snowball-05",
+        "snowball-06",
+        "snowball-07"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "snowball-05",
+        "snowball-06",
+        "snowball-07"
+      ]
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Mrs. Flurry packs a snowball, bigger and bigger! She's feeling everything at once!",
+      "puffing": "Mrs. Flurry's snowball gets even bigger!",
+      "fizzle": "Flump! The giant snowball crumbles, and not one flies."
+    }
+  },
+  "lines": {
+    "intro": "Mrs. Flurry, the lodge keeper, spins round with swirly eyes. \"NOBODY gets in MY lodge!\"",
+    "command": "How can Fae calm Mrs. Flurry?",
+    "soothe": {
+      "great": "Fae hums a cozy fireside song, slow and soft. Mrs. Flurry's swirly eyes start to slow down!",
+      "good": "Fae hums softly. Mrs. Flurry stops packing snowballs for a moment.",
+      "miss": "Mrs. Flurry cackles right over Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie chases a snowflake round and round. Mrs. Flurry follows it, giggling!",
+        "good": "Maddie pounces on a pom-pom. Mrs. Flurry chuckles.",
+        "miss": "Maddie skids on the ice and tumbles into a snowbank. Mrs. Flurry snorts."
+      },
+      "cast": {
+        "great": "Sue swings her ribbon bobber like a ski-lift chair. Mrs. Flurry cheers as it loops the loop!",
+        "good": "Sue's bobber twirls in the falling snow. Mrs. Flurry leans in to watch.",
+        "miss": "Sue's line tangles in a pine branch. Mrs. Flurry shakes her head."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pinecones in a perfect loop. \"Bravo!\" Mrs. Flurry claps.",
+        "good": "Jordan tosses a pinecone high. Mrs. Flurry's eyes follow it up and down.",
+        "miss": "Jordan's pinecone plops into a snowbank. Mrs. Flurry doesn't even look."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. Mrs. Flurry munches it between snowballs.",
+    "burst": "Mrs. Flurry winds up and flings a flurry of snowballs at Fae!",
+    "burstResult": {
+      "great": "Fae catches every snowball, like a pro!",
+      "good": "Fae catches most of the snowballs!",
+      "miss": "Splat! Fae is covered in snow from her hat to her boots."
+    },
+    "soothed": "Mrs. Flurry blinks. The swirls fade from her eyes, and the snowball slips from her hand.",
+    "rest": "Fae is shivering from all the snow. Time for a rest.",
+    "run": "Fae backs away. Mrs. Flurry packs another snowball."
+  },
+  "coins": 25
+}

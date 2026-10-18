@@ -532,6 +532,69 @@
         "/#",
         "\n",
         "ev",
+        "str",
+        "^lodge-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I calmed Mrs. Flurry, the lodge keeper at Pinecone Pass. Her lodge is open, and the fire's lit! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.47"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "keeper_back"
+        },
+        "str",
+        "^lodge-keeper",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The lodge keeper at Pinecone Pass is fizzy, and flinging snowballs from her porch! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.60"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
         {
           "VAR?": "has_nuggets"
         },
@@ -547,7 +610,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.44"
+                "->": ".^.^.^.67"
               },
               null
             ]
@@ -572,7 +635,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.51"
+                "->": ".^.^.^.74"
               },
               null
             ]
@@ -606,7 +669,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.63"
+                "->": ".^.^.^.86"
               },
               null
             ]
@@ -631,7 +694,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.70"
+                "->": ".^.^.^.93"
               },
               null
             ]
@@ -656,7 +719,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.77"
+                "->": ".^.^.^.100"
               },
               null
             ]
@@ -686,7 +749,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.87"
+                "->": ".^.^.^.110"
               },
               null
             ]
@@ -716,7 +779,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.97"
+                "->": ".^.^.^.120"
               },
               null
             ]
@@ -741,7 +804,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.104"
+                "->": ".^.^.^.127"
               },
               null
             ]
@@ -771,7 +834,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.114"
+                "->": ".^.^.^.137"
               },
               null
             ]
@@ -801,7 +864,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.124"
+                "->": ".^.^.^.147"
               },
               null
             ]
@@ -826,7 +889,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.131"
+                "->": ".^.^.^.154"
               },
               null
             ]
@@ -856,7 +919,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.141"
+                "->": ".^.^.^.164"
               },
               null
             ]
@@ -886,7 +949,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.151"
+                "->": ".^.^.^.174"
               },
               null
             ]
@@ -911,7 +974,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.158"
+                "->": ".^.^.^.181"
               },
               null
             ]
@@ -936,7 +999,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.165"
+                "->": ".^.^.^.188"
               },
               null
             ]
@@ -966,7 +1029,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.175"
+                "->": ".^.^.^.198"
               },
               null
             ]
@@ -1000,7 +1063,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.188"
+                "->": ".^.^.^.211"
               },
               null
             ]
@@ -1030,7 +1093,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.198"
+                "->": ".^.^.^.221"
               },
               null
             ]
@@ -1055,7 +1118,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.205"
+                "->": ".^.^.^.228"
               },
               null
             ]
@@ -1085,7 +1148,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.215"
+                "->": ".^.^.^.238"
               },
               null
             ]
@@ -1119,7 +1182,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.228"
+                "->": ".^.^.^.251"
               },
               null
             ]
@@ -1153,7 +1216,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.241"
+                "->": ".^.^.^.264"
               },
               null
             ]
@@ -1183,7 +1246,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.251"
+                "->": ".^.^.^.274"
               },
               null
             ]
@@ -1213,7 +1276,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.261"
+                "->": ".^.^.^.284"
               },
               null
             ]
@@ -1243,7 +1306,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.271"
+                "->": ".^.^.^.294"
               },
               null
             ]
@@ -1268,7 +1331,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.278"
+                "->": ".^.^.^.301"
               },
               null
             ]
@@ -1310,7 +1373,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.295"
+                "->": ".^.^.^.318"
               },
               null
             ]
@@ -1344,7 +1407,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.308"
+                "->": ".^.^.^.331"
               },
               null
             ]
@@ -1444,7 +1507,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.318"
+                "->": ".^.^.^.341"
               },
               null
             ]
@@ -1469,7 +1532,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.325"
+                "->": ".^.^.^.348"
               },
               null
             ]
@@ -1499,7 +1562,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.335"
+                "->": ".^.^.^.358"
               },
               null
             ]
@@ -1533,7 +1596,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.347"
+                "->": ".^.^.^.370"
               },
               null
             ]
@@ -1558,7 +1621,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.354"
+                "->": ".^.^.^.377"
               },
               null
             ]
@@ -1588,7 +1651,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.364"
+                "->": ".^.^.^.387"
               },
               null
             ]
@@ -1622,7 +1685,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.377"
+                "->": ".^.^.^.400"
               },
               null
             ]
@@ -1651,7 +1714,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.387"
+                "->": ".^.^.^.410"
               },
               null
             ]
@@ -1680,7 +1743,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.397"
+                "->": ".^.^.^.420"
               },
               null
             ]
@@ -1714,7 +1777,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.410"
+                "->": ".^.^.^.433"
               },
               null
             ]
@@ -1744,7 +1807,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.420"
+                "->": ".^.^.^.443"
               },
               null
             ]
@@ -1769,7 +1832,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.427"
+                "->": ".^.^.^.450"
               },
               null
             ]
@@ -1803,7 +1866,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.439"
+                "->": ".^.^.^.462"
               },
               null
             ]
@@ -1828,7 +1891,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.446"
+                "->": ".^.^.^.469"
               },
               null
             ]
@@ -1857,7 +1920,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.456"
+                "->": ".^.^.^.479"
               },
               null
             ]
@@ -1882,7 +1945,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.463"
+                "->": ".^.^.^.486"
               },
               null
             ]
@@ -1907,7 +1970,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.470"
+                "->": ".^.^.^.493"
               },
               null
             ]
@@ -1944,7 +2007,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.485"
+                "->": ".^.^.^.508"
               },
               null
             ]
@@ -1969,7 +2032,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.492"
+                "->": ".^.^.^.515"
               },
               null
             ]
@@ -2003,7 +2066,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.505"
+                "->": ".^.^.^.528"
               },
               null
             ]
@@ -2032,7 +2095,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.515"
+                "->": ".^.^.^.538"
               },
               null
             ]
@@ -2057,7 +2120,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.522"
+                "->": ".^.^.^.545"
               },
               null
             ]
@@ -2082,7 +2145,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.529"
+                "->": ".^.^.^.552"
               },
               null
             ]
@@ -2112,7 +2175,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.539"
+                "->": ".^.^.^.562"
               },
               null
             ]
@@ -2142,7 +2205,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.549"
+                "->": ".^.^.^.572"
               },
               null
             ]
@@ -2167,7 +2230,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.556"
+                "->": ".^.^.^.579"
               },
               null
             ]
@@ -2196,7 +2259,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.566"
+                "->": ".^.^.^.589"
               },
               null
             ]
@@ -2234,7 +2297,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.582"
+                "->": ".^.^.^.605"
               },
               null
             ]
@@ -2261,7 +2324,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.591"
+                "->": ".^.^.^.614"
               },
               null
             ]
@@ -2290,7 +2353,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.601"
+                "->": ".^.^.^.624"
               },
               null
             ]
@@ -2315,7 +2378,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.608"
+                "->": ".^.^.^.631"
               },
               null
             ]
@@ -2344,7 +2407,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.619"
+                "->": ".^.^.^.642"
               },
               null
             ]
@@ -2373,7 +2436,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.630"
+                "->": ".^.^.^.653"
               },
               null
             ]
@@ -4475,13 +4538,147 @@
         }
       ],
       "lodge_door": [
+        "ev",
+        {
+          "VAR?": "lodge_open"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.open"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "keeper_back"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.fizzy"
+              },
+              {
+                "->": ".^.^.^.10"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        "str",
+        "^hamster",
+        "/str",
+        {
+          "x()": "calmed",
+          "exArgs": 1
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.back"
+              },
+              {
+                "->": ".^.^.^.19"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "^The lodge is locked. A note says: \"Back soon, gone looking for a runaway hamster.\" ",
         "#",
         "^speaker: Fae",
         "/#",
         "\n",
         "done",
-        null
+        {
+          "back": [
+            "^The lodge is locked. A note says: \"Back soon, gone looking for a runaway hamster.\" ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^A runaway hamster? We calmed a hamster up here! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^WHOOSH! A snowball whizzes right past Fae's ear. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "keeper_back",
+              "re": true
+            },
+            "^Hee hee hee! NOBODY gets in MY lodge! ",
+            "#",
+            "^speaker: Lodge keeper",
+            "/#",
+            "\n",
+            "^It's the lodge keeper, and she's all fizzy! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "fizzy": [
+            "^The lodge is locked tight. The lodge keeper is out on her porch, flinging snowballs! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "open": [
+            "^The lodge door is open. Warm air and the smell of cocoa drift out. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
       ],
       "bay_sign": [
         "^BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! ",
@@ -11632,6 +11829,221 @@
           ]
         }
       ],
+      "lodge_keeper": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Oh my stars... what happened? My head was all fizzy, like a shaken-up soda! ",
+        "#",
+        "^speaker: Mrs. Flurry",
+        "/#",
+        "\n",
+        "^My hamster Biscuit ran off this morning. While I was out looking for him, a kid in a purple hood gave me a fizzy purple soda. ",
+        "#",
+        "^speaker: Mrs. Flurry",
+        "/#",
+        "\n",
+        "^One sip, and I didn't want ANYONE in my lodge. I'm so sorry about the snowballs, dears! ",
+        "#",
+        "^speaker: Mrs. Flurry",
+        "/#",
+        "\n",
+        "^Biscuit came home all by himself, calm as can be. Somebody must have been kind to him. ",
+        "#",
+        "^speaker: Mrs. Flurry",
+        "/#",
+        "\n",
+        "^That was us! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "lodge_open",
+          "re": true
+        },
+        "^Then come in, come in, all of you! Warm up by the fire. ",
+        "#",
+        "^speaker: Mrs. Flurry",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Mrs. Flurry sweeps the snow off her porch. \"The fire's lit, dears. Come in and warm up!\" ",
+            "#",
+            "^speaker: Mrs. Flurry",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "lodge_fire": [
+        "^The fire crackles and pops. Fae holds her hands out to it. Toasty! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Now THIS is how you warm up after a snowball fight. ",
+        "#",
+        "^speaker: Jordan",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "lodge_cocoa": [
+        "ev",
+        {
+          "VAR?": "lodge_cocoa_had"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^A big copper pot of cocoa, with little marshmallows bobbing on top. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^A note on the lid says: \"Help yourselves, dears! Mrs. F.\" ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "lodge_cocoa_had",
+          "re": true
+        },
+        "^Fae pours a mug of cocoa to take along. ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^gift: snack 1",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The cocoa pot is still warm. Mmm, marshmallows. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "lodge_guestbook": [
+        "^The lodge's guestbook, full of happy skiers' names. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^On today's page, somebody signed in purple marker, then scribbled their name out. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^There's a little paper plane doodled in the corner. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "saw_hood"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The same purple as the marker the hooded kid dropped at school... ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.19"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "lodge_hamster": [
+        "^A little wooden house by the fire. Inside, a round hamster is curled up fast asleep. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^That must be Biscuit! He's snoring tiny squeaks. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
       "global decl": [
         "ev",
         "str",
@@ -11881,6 +12293,18 @@
         0,
         {
           "VAR=": "meals_cooked"
+        },
+        false,
+        {
+          "VAR=": "keeper_back"
+        },
+        false,
+        {
+          "VAR=": "lodge_open"
+        },
+        false,
+        {
+          "VAR=": "lodge_cocoa_had"
         },
         "/ev",
         "end",

@@ -1184,6 +1184,68 @@
       "samples": {
         "object": 1
       }
+    },
+    {
+      "id": "lodge-door",
+      "painting": "art/source/areas/pass/pass-lodge-open.png",
+      "added": "open",
+      "crop": [
+        1160,
+        368,
+        80,
+        135
+      ],
+      "seed": [
+        1215,
+        430
+      ],
+      "painted": true,
+      "object": "the lodge's open doorway: the door swung inward, the warm glowing inside, and the frame round it with the snowy little roof over it, down to the sill on the porch boards; not the log walls beside it, the windows, or the porch",
+      "home": [
+        1195,
+        503
+      ],
+      "samples": {
+        "object": 1
+      },
+      "exclude": [
+        [
+          [
+            1160,
+            368
+          ],
+          [
+            1164,
+            368
+          ],
+          [
+            1164,
+            503
+          ],
+          [
+            1160,
+            503
+          ]
+        ],
+        [
+          [
+            1229,
+            395
+          ],
+          [
+            1240,
+            395
+          ],
+          [
+            1240,
+            503
+          ],
+          [
+            1229,
+            503
+          ]
+        ]
+      ]
     }
   ]
 }

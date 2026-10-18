@@ -1,5 +1,5 @@
 {
-  "slots": 11,
+  "slots": 12,
   "catalogue": [
     {
       "id": "fountain-frog",
@@ -65,6 +65,12 @@
       "id": "arcade-keeper",
       "name": "Mr. Pip",
       "critter": "arcade-keeper",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "lodge-keeper",
+      "name": "Mrs. Flurry",
+      "critter": "lodge-keeper",
       "frame": "calm_idle_01"
     }
   ]

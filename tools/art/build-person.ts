@@ -1,15 +1,19 @@
 #!/usr/bin/env bun
-// Rebuilds the arcade-keeper atlas byte for byte from the selected raw sources.
+// Rebuilds a person under the chaos spell's battle atlas byte for byte from
+// their selected body sheet (Mr. Pip, the lodge keeper):
 //
-// The body sheet is a 2x2 grid:   chaos idle | chaos burst
-//                                 soothed    | calm idle
+//   bun tools/art/build-person.ts <id>
+//
+// art/source/critters/<id>/body-sheet-raw.png, 2048 px square, is a 2x2 grid
+// on magenta:   chaos idle | chaos burst
+//               soothed    | calm idle
 // Each figure is found whole by connected components: the four largest are
-// the bodies, and every smaller mark (the burst's swirls and bubbles, the
-// sparkles) belongs to the body in its grid cell. A body is named by its grid
-// cell, never by sorting centroids (the burst's raised wings lift its centroid
-// above the idle bird's, which once swapped the two). One scale, the one that
-// makes the chaos idle body 380 px tall, is applied to every figure, so the
-// bird keeps its size from pose to pose.
+// the bodies, and every smaller mark (a burst's flying things, the sparkles)
+// belongs to the body in its grid cell. A body is named by its grid cell,
+// never by sorting centroids (a burst's raised arms lift its centroid). One
+// scale, the one that makes the chaos idle body 380 px tall, is applied to
+// every figure, so they keep their size from pose to pose. The atlas goes to
+// public/assets/critters/<id>/<id>.png and .json.
 export {};
 
 type Point = { x: number; y: number };
@@ -17,8 +21,10 @@ type Bounds = { left: number; top: number; right: number; bottom: number };
 type Component = { area: number; bounds: Bounds; centre: Point };
 type Body = { name: string; component: Component; bounds: Bounds };
 
-const frames = "art/scratch/arcade-keeper-build-frames";
-const sheet = "art/source/critters/arcade-keeper/body-sheet-raw.png";
+const id = Bun.argv[2] ?? "";
+if (!/^[a-z][a-z0-9-]*$/.test(id)) throw new Error("usage: build-person.ts <id>");
+const frames = `art/scratch/${id}-build-frames`;
+const sheet = `art/source/critters/${id}/body-sheet-raw.png`;
 const keyed = `${frames}/sheet-keyed.png`;
 const size = 2048;
 const grid = [
@@ -136,8 +142,8 @@ for (const name of names) {
 
 const auraAlpha = `${frames}/aura-alpha.png`;
 const auraScaled = `${frames}/aura-scaled.png`;
-// The chaos aura is the generic purple swirl every critter shares; the arcade-keeper
-// uses the hamster's raw, lifted and placed the way build-hamster.ts does.
+// The chaos aura is the generic purple swirl every critter shares: the hamster's
+// raw, lifted and placed the way build-hamster.ts does.
 await run(["bun", "tools/art/white-to-alpha.ts", "--input",
   "art/source/critters/hamster/aura-white-raw.png", "--output", auraAlpha]);
 await run(["magick", auraAlpha, "-trim", "+repage", "-resize", "20%", auraScaled]);
@@ -147,7 +153,7 @@ await run(["magick", "-size", "512x512", "xc:none", auraScaled, "-gravity", "cen
 const atlasNames = [...names, "chaos_aura_01"];
 await run(["magick", "montage", ...atlasNames.map((name) => `${frames}/${name}.png`),
   "-tile", "3x2", "-geometry", "512x512+0+0", "-background", "none",
-  "public/assets/critters/arcade-keeper/arcade-keeper.png"]);
+  `public/assets/critters/${id}/${id}.png`]);
 const frameData = Object.fromEntries(atlasNames.map((name, index) => [name, {
   frame: { x: (index % 3) * 512, y: Math.floor(index / 3) * 512, w: 512, h: 512 },
   rotated: false,
@@ -159,7 +165,6 @@ const frameData = Object.fromEntries(atlasNames.map((name, index) => [name, {
 const atlas = {
   frames: frameData,
   animations: Object.fromEntries(atlasNames.map((name) => [name.replace(/_01$/, ""), [name]])),
-  meta: { image: "arcade-keeper.png", size: { w: 1536, h: 1024 }, scale: "1", baseline: 504 },
+  meta: { image: `${id}.png`, size: { w: 1536, h: 1024 }, scale: "1", baseline: 504 },
 };
-await Bun.write("public/assets/critters/arcade-keeper/arcade-keeper.json",
-  `${JSON.stringify(atlas, null, 2)}\n`);
+await Bun.write(`public/assets/critters/${id}/${id}.json`, `${JSON.stringify(atlas, null, 2)}\n`);

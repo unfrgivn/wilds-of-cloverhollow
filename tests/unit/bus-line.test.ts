@@ -114,7 +114,7 @@ describe("the lands", () => {
       bedroom: "cloverhollow", kitchen: "cloverhollow",
       arcade: "cloverhollow", classroom: "cloverhollow",
       "east-hall": "cloverhollow", music: "cloverhollow",
-      gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest",
+      gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
       bay: "bay", pass: "pass", trail: "trail",
     };

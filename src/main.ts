@@ -236,48 +236,38 @@ async function boot(): Promise<void> {
   qaMenu?.onCancel(() => {
     qaMenuOpen = false; qaActivePack = null; titleMode = qaReturnMode;
   });
-  await view.ready;
   // Each land's centre on the painted map (the journal's MAP page).
-  const mapFile = "assets/ui/map/world-map.json";
-  const mapResponse = await fetch(assetUrl(mapFile));
-  if (!mapResponse.ok) throw new Error(`Failed to load ${mapFile}`);
-  const mapCentres = parseMapCentres(await mapResponse.json(), mapFile);
+  const loadMapCentres = async () => {
+    const mapFile = "assets/ui/map/world-map.json";
+    const response = await fetch(assetUrl(mapFile));
+    if (!response.ok) throw new Error(`Failed to load ${mapFile}`);
+    return parseMapCentres(await response.json(), mapFile);
+  };
+  // Art the DOM draws is decoded before the game starts, so it never paints
+  // before its image is ready (on a busy phone, or a loaded test machine). An
+  // atlas Pixi loads as well is decoded after Pixi's load of it: in WebKit,
+  // when Pixi fetched the file second, the DOM drew a copy never decoded.
+  const decode = async (file: string): Promise<void> => {
+    const image = new Image();
+    image.src = assetUrl(file);
+    await image.decode();
+  };
+  // An atlas the DOM crops: its frames, then its PNG decoded.
+  const domAtlas = async (file: string): Promise<Spritesheet> => {
+    const sheet = await Assets.load<Spritesheet>(assetUrl(file));
+    await decode(file.replace(".json", ".png"));
+    return sheet;
+  };
   // Sticker art (the reward card and the journal album) is a CSS crop of a
-  // critter's atlas. Decode each atlas once now, so a card never paints before
-  // its image is ready (on a busy phone, or a loaded test machine).
+  // critter's atlas, which the view loads.
   const atlases = new Set([
     ...Object.values(content.world.critters).map((critter) => critter.atlas),
     content.world.battle.toyAtlas,
   ]);
-  await Promise.all(
-    [...atlases].map(async (url) => {
-      const atlas = new Image();
-      atlas.src = assetUrl(url.replace(".json", ".png"));
-      await atlas.decode();
-    }),
-  );
-  const prizeSheet = await Assets.load<Spritesheet>(
-    assetUrl(content.world.arcade.atlas),
-  );
-  const prizeImage = new Image();
-  prizeImage.src = assetUrl(
-    content.world.arcade.atlas.replace(".json", ".png"),
-  );
-  await prizeImage.decode();
-  // The moles' frames (spec 8.2), decoded before Boop-a-Mole can open.
+  // The moles' frames and Mom's dishes for the clubhouse microwave (spec 8.2).
   const moleAtlas = "assets/arcade/moles.json";
-  const moleSheet = await Assets.load<Spritesheet>(assetUrl(moleAtlas));
-  const moleImage = new Image();
-  moleImage.src = assetUrl(moleAtlas.replace(".json", ".png"));
-  await moleImage.decode();
-  // Mom's dishes for the clubhouse microwave (spec 8.2).
   const foodAtlas = "assets/arcade/cook-food.json";
-  const foodSheet = await Assets.load<Spritesheet>(assetUrl(foodAtlas));
-  const foodImage = new Image();
-  foodImage.src = assetUrl(foodAtlas.replace(".json", ".png"));
-  await foodImage.decode();
   const cometAtlas = "assets/arcade/comet.json";
-  const cometSheet = await Assets.load<Spritesheet>(assetUrl(cometAtlas));
   // The arcade games' paintings and their calibrations (spec 8.2), each
   // decoded before its close-up can open.
   const painting = async <T extends { image: string }>(
@@ -292,14 +282,37 @@ async function boot(): Promise<void> {
     await image.decode();
     return { calibration, image: image.src };
   };
-  const [clawPainting, skeePainting, molePainting, cometPainting, cookPainting] =
-    await Promise.all([
+  // These load at once (in turn, a boot took the sum of them): only the first
+  // area and the sticker art wait, on the view's own sheets.
+  const [
+    mapCentres,
+    prizeSheet,
+    moleSheet,
+    foodSheet,
+    cometSheet,
+    [clawPainting, skeePainting, molePainting, cometPainting, cookPainting],
+  ] = await Promise.all([
+    loadMapCentres(),
+    domAtlas(content.world.arcade.atlas),
+    domAtlas(moleAtlas),
+    domAtlas(foodAtlas),
+    Assets.load<Spritesheet>(assetUrl(cometAtlas)),
+    Promise.all([
       painting("assets/arcade/claw-machine.json", parseClawCalibration),
       painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
       painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
       painting("assets/arcade/comet-cabinet.json", parseCometCalibration),
       painting("assets/arcade/microwave.json", parseCookCalibration),
-    ]);
+    ]),
+    view.ready.then(async () => {
+      const initialArea = content.world.areas[state.area];
+      if (initialArea === undefined) throw new Error("Missing initial area");
+      await Promise.all([
+        view.setArea(initialArea),
+        ...[...atlases].map((url) => decode(url.replace(".json", ".png"))),
+      ]);
+    }),
+  ]);
   // A sticker's art: its critter's atlas, cropped to the frame its content
   // names, with the rect read from the atlas the view loaded.
   // A toy a catch throws: a crop of the toy atlas (spec 8.1).
@@ -394,9 +407,6 @@ async function boot(): Promise<void> {
     ...cookPainting,
     art: (frameName) => sheetFrame(foodSheet, foodAtlas, frameName),
   });
-  const initialArea = content.world.areas[state.area];
-  if (initialArea === undefined) throw new Error("Missing initial area");
-  await view.setArea(initialArea);
   let afterTick = (_next: State): void => undefined;
   let logTitle = (_mode: TitleMode | null): void => undefined;
   let lastBattleLog = "";

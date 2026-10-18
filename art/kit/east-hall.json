@@ -117,6 +117,39 @@
         "object": 1
       },
       "states": {}
+    },
+    {
+      "id": "art-room-door",
+      "crop": [
+        760,
+        280,
+        180,
+        180
+      ],
+      "seed": [
+        850,
+        405
+      ],
+      "object": "the east hall art-room door and its doorway, showing the open door state",
+      "ground": "the school hallway wall and floor",
+      "painted": true,
+      "canopy": false,
+      "complete": false,
+      "front": [],
+      "exclude": [],
+      "core": 0,
+      "solid": false,
+      "shadowReach": 40,
+      "footprint": [],
+      "home": [
+        850,
+        405
+      ],
+      "samples": {},
+      "states": {},
+      "painting": "art/source/areas/east-hall/east-hall-art-open.png",
+      "added": "open",
+      "flat": false
     }
   ]
 }

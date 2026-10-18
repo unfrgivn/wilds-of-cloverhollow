@@ -33,6 +33,8 @@ EXTERNAL plushesLeft()
 EXTERNAL tickets()
 VAR lifeguard_back = false
 
+VAR art_teacher_out = false
+VAR art_open = false
 === window ===
 {plan != "none": -> again}
 Morning sun... and something sparkly over the plaza. # speaker: Fae
@@ -95,6 +97,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
 {calmed("lodge-keeper"): I calmed Mrs. Flurry, the lodge keeper at Pinecone Pass. Her lodge is open, and the fire's lit! # speaker: Fae}
+{calmed("art-teacher"): I calmed Ms. Rowan, the art teacher. Her room is open, and every purple marker is missing! # speaker: Fae}
+{art_teacher_out and not calmed("art-teacher"): Ms. Rowan is fizzy in the east hall, swishing wild purple paint. # speaker: Fae}
 {keeper_back and not calmed("lodge-keeper"): The lodge keeper at Pinecone Pass is fizzy, and flinging snowballs from her porch! # speaker: Fae}
 {calmed("lifeguard"): I calmed Ms. Coral, the lifeguard at Bubblegum Bay. She shared her watermelon! # speaker: Fae}
 {lifeguard_back and not calmed("lifeguard"): The lifeguard at Bubblegum Bay is fizzy, and blowing her whistle at everyone! # speaker: Fae}
@@ -1127,8 +1131,47 @@ VAR xylophone_tune = ""
 The music room is locked. Music class is after PE. # speaker: Fae
 -> DONE
 
+
 === art_room ===
+{art_open: -> open}
+{art_teacher_out: -> out}
+{stash_found: -> paint}
 A paint palette on the door. The art room, maybe? It's locked. # speaker: Fae
+-> DONE
+= paint
+Purple paint seeps under the door. A paintbrush clatters, and a teacher steps into the hall! # speaker: Fae
+~ art_teacher_out = true
+-> DONE
+= out
+The door's still locked, and Ms. Rowan is swishing purple paint all over the hall! # speaker: Fae
+-> DONE
+= open
+The art room door stands open. It smells like paint and glue sticks! # speaker: Fae
+-> DONE
+
+=== art_teacher ===
+{art_teacher > 1: -> again}
+Thank goodness! My head feels clear, and my paintbrush feels like mine again. # speaker: Ms. Rowan
+The kid in the purple hood left me one sip of fizzy purple soda. It made me fizzy too! # speaker: Ms. Rowan
+And they borrowed every purple marker in my box. I hope they bring them back. # speaker: Ms. Rowan
+Come in, Fae. The art room is open! # speaker: Ms. Rowan
+~ art_open = true
+-> DONE
+= again
+Welcome back, Fae! The easels are ready for you. # speaker: Ms. Rowan
+-> DONE
+
+=== art_easels ===
+Three easels, three blank canvases, and enough paint to make a rainbow. # speaker: Fae
+-> DONE
+=== art_paintings ===
+The class art wall is covered with bright paintings. A drying rack wobbles beside it. # speaker: Fae
+-> DONE
+=== art_sink ===
+The sink is full of painty water. Ms. Rowan says brushes need a rinse right away! # speaker: Fae
+-> DONE
+=== art_markers ===
+An empty purple marker box. Every single purple marker is gone. # speaker: Fae
 -> DONE
 
 === music_teacher ===

@@ -1,0 +1,184 @@
+{
+  "id": "art-room",
+  "name": "Art Room",
+  "land": "cloverhollow",
+  "ground": "art-room",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      600,
+      183
+    ],
+    [
+      1160,
+      509
+    ],
+    [
+      581,
+      795
+    ],
+    [
+      52,
+      538
+    ]
+  ],
+  "blockers": [
+    [
+      [
+        500,
+        248
+      ],
+      [
+        620,
+        183
+      ],
+      [
+        670,
+        348
+      ],
+      [
+        602,
+        380
+      ],
+      [
+        535,
+        360
+      ]
+    ],
+    [
+      [
+        772,
+        283
+      ],
+      [
+        957,
+        391
+      ],
+      [
+        957,
+        442
+      ],
+      [
+        772,
+        407
+      ],
+      [
+        772,
+        348
+      ]
+    ],
+    [
+      [
+        885,
+        430
+      ],
+      [
+        925,
+        430
+      ],
+      [
+        925,
+        455
+      ],
+      [
+        885,
+        455
+      ]
+    ]
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          84,
+          520
+        ],
+        [
+          205,
+          478
+        ],
+        [
+          205,
+          535
+        ],
+        [
+          84,
+          575
+        ]
+      ],
+      "target": {
+        "area": "east-hall",
+        "spawn": "art-room"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 270,
+      "y": 540,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "easels",
+      "knot": "art_easels",
+      "point": {
+        "x": 925,
+        "y": 555
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "art-wall",
+      "knot": "art_paintings",
+      "point": {
+        "x": 350,
+        "y": 350
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "sink",
+      "knot": "art_sink",
+      "point": {
+        "x": 720,
+        "y": 340
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "marker-box",
+      "knot": "art_markers",
+      "point": {
+        "x": 808,
+        "y": 600
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [],
+  "critters": [],
+  "props": [
+    {
+      "id": "easels",
+      "prop": "easels",
+      "x": 875,
+      "y": 505
+    },
+    {
+      "id": "work-table",
+      "prop": "work-table",
+      "x": 570,
+      "y": 615
+    },
+    {
+      "id": "supply-shelves",
+      "prop": "supply-shelves",
+      "x": 1055,
+      "y": 465
+    }
+  ]
+}

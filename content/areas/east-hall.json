@@ -154,6 +154,35 @@
         "variable": "music_time",
         "knot": "music_closed"
       }
+    },
+    {
+      "id": "art-door",
+      "polygon": [
+        [
+          800,
+          360
+        ],
+        [
+          900,
+          330
+        ],
+        [
+          900,
+          390
+        ],
+        [
+          800,
+          420
+        ]
+      ],
+      "target": {
+        "area": "art-room",
+        "spawn": "door"
+      },
+      "requires": {
+        "variable": "art_open",
+        "knot": "art_room"
+      }
     }
   ],
   "spawns": {
@@ -171,6 +200,11 @@
       "x": 500,
       "y": 450,
       "facing": "down"
+    },
+    "art-room": {
+      "x": 760,
+      "y": 380,
+      "facing": "right"
     }
   },
   "interactables": [
@@ -185,7 +219,16 @@
     }
   ],
   "npcs": [],
-  "critters": [],
+  "critters": [
+    {
+      "id": "art-teacher",
+      "point": {
+        "x": 1040,
+        "y": 500
+      },
+      "visibleWhile": "art_teacher_out"
+    }
+  ],
   "props": [
     {
       "id": "hall-bench",
@@ -198,6 +241,18 @@
       "prop": "lockers",
       "x": 1265,
       "y": 564
+    },
+    {
+      "id": "art-room-door",
+      "prop": "art-room-door",
+      "x": 850,
+      "y": 405,
+      "rules": [
+        {
+          "state": "open",
+          "while": "art_open"
+        }
+      ]
     }
   ]
 }

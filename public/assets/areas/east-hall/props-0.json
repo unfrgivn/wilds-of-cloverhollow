@@ -24,9 +24,33 @@
         "y": 0.9915
       }
     },
-    "hall-bench": {
+    "art-room-door": {
       "frame": {
         "x": 392,
+        "y": 0,
+        "w": 340,
+        "h": 364
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 340,
+        "h": 364
+      },
+      "sourceSize": {
+        "w": 340,
+        "h": 364
+      },
+      "anchor": {
+        "x": 0.52941,
+        "y": 0.68681
+      }
+    },
+    "hall-bench": {
+      "frame": {
+        "x": 734,
         "y": 0,
         "w": 330,
         "h": 254

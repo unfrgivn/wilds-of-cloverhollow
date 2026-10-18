@@ -20,6 +20,7 @@ import mistData from "../../content/areas/mist.json";
 import enchantedData from "../../content/areas/enchanted.json";
 import hillsData from "../../content/areas/hills.json";
 import hillsPropsData from "../../content/props/hills.json";
+import artRoomData from "../../content/areas/art-room.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
 import prizesData from "../../content/prizes.json";
@@ -46,6 +47,7 @@ import lodgeSurfaceData from "../../content/surfaces/lodge.json";
 import mistSurfaceData from "../../content/surfaces/mist.json";
 import enchantedSurfaceData from "../../content/surfaces/enchanted.json";
 import hillsSurfaceData from "../../content/surfaces/hills.json";
+import artRoomSurfaceData from "../../content/surfaces/art-room.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -61,6 +63,7 @@ import woodsPropsData from "../../content/props/woods.json";
 import eastHallPropsData from "../../content/props/east-hall.json";
 import musicPropsData from "../../content/props/music.json";
 import fieldPropsData from "../../content/props/field.json";
+import artRoomPropsData from "../../content/props/art-room.json";
 import clubhousePropsData from "../../content/props/clubhouse.json";
 import lodgePropsData from "../../content/props/lodge.json";
 import mistPropsData from "../../content/props/mist.json";
@@ -111,6 +114,7 @@ import gymPupData from "../../content/critters/gym-pup.json";
 import musicBirdData from "../../content/critters/music-bird.json";
 import oakSquirrelData from "../../content/critters/oak-squirrel.json";
 import hoodedKidData from "../../content/critters/hooded-kid.json";
+import artTeacherData from "../../content/critters/art-teacher.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import levelsData from "../../content/levels.json";
@@ -2041,6 +2045,8 @@ export function loadContent(): {
     parsePropCatalogue(enchantedPropsData, "content/props/enchanted.json"));
   const hills = parseArea(hillsData, "content/areas/hills.json",
     parsePropCatalogue(hillsPropsData, "content/props/hills.json"));
+  const artRoom = parseArea(artRoomData, "content/areas/art-room.json",
+    parsePropCatalogue(artRoomPropsData, "content/props/art-room.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
@@ -2081,6 +2087,7 @@ export function loadContent(): {
     [musicBirdData, "music-bird"],
     [oakSquirrelData, "oak-squirrel"],
     [hoodedKidData, "hooded-kid"],
+    [artTeacherData, "art-teacher"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -2172,6 +2179,7 @@ export function loadContent(): {
     [playingField.id]: playingField,
     [clubhouse.id]: clubhouse,
     [lodge.id]: lodge,
+    [artRoom.id]: artRoom,
     [mist.id]: mist,
     [enchanted.id]: enchanted,
     [hills.id]: hills,
@@ -2186,6 +2194,7 @@ export function loadContent(): {
     mist: mistSurfaceData,
     enchanted: enchantedSurfaceData,
     hills: hillsSurfaceData,
+    "art-room": artRoomSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));

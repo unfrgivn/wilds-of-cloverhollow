@@ -1,6 +1,7 @@
 {
   "[chromium] › arcade.spec.ts › real keys: home from the woods, into the arcade, and Mr. Pip calmed": 10,
   "[chromium] › arcade.spec.ts › the arcade's door is locked until the clubhouse is claimed": 7.1,
+  "[chromium] › art.spec.ts › real keys: paint under the door, Trace, and the open art room @smoke": 4.9,
   "[chromium] › battle-scene.spec.ts › the desktop battle scene keeps both combatants in view": 2.5,
   "[chromium] › battle-scene.spec.ts › the phone battle scene keeps both combatants in view": 2,
   "[chromium] › battle.spec.ts › frog battle › real keys: calm the frog, win his sticker, and talk with him": 5.2,
@@ -488,6 +489,7 @@
   "[chromium] › windup.spec.ts › the wind-up's bubbles clear everything at 874x402": 1.9,
   "[chromium] › woods.spec.ts › real keys enter the Whispering Woods and meet its owl": 2.8,
   "[chromium] › woods.spec.ts › the recorded lantern replay reaches the clubhouse": 2.6,
+  "[webkit] › art.spec.ts › real keys: paint under the door, Trace, and the open art room @smoke": 7,
   "[webkit] › battle-scene.spec.ts › the desktop battle scene keeps both combatants in view": 11.8,
   "[webkit] › battle-scene.spec.ts › the phone battle scene keeps both combatants in view": 4.9,
   "[webkit] › battle.spec.ts › frog battle › real keys: calm the frog, win his sticker, and talk with him": 11.8,

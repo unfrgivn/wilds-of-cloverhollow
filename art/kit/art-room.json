@@ -1,0 +1,167 @@
+{
+  "area": "art-room",
+  "subjects": [
+    {
+      "id": "easels",
+      "crop": [
+        755,
+        300,
+        260,
+        260
+      ],
+      "seed": [
+        875,
+        505
+      ],
+      "painted": false,
+      "canopy": false,
+      "object": "the two wooden easels and their canvases, including all legs and feet, not the floor, shadows, or the nearby cabinet",
+      "ground": "the painted floor wash",
+      "footprint": [
+        [
+          [
+            835,
+            530
+          ],
+          [
+            875,
+            545
+          ],
+          [
+            890,
+            520
+          ],
+          [
+            875,
+            450
+          ],
+          [
+            850,
+            450
+          ]
+        ],
+        [
+          [
+            920,
+            525
+          ],
+          [
+            975,
+            545
+          ],
+          [
+            1000,
+            520
+          ],
+          [
+            980,
+            450
+          ],
+          [
+            940,
+            450
+          ]
+        ]
+      ],
+      "home": [
+        875,
+        505
+      ],
+      "samples": {
+        "object": 1,
+        "fill": 3
+      }
+    },
+    {
+      "id": "work-table",
+      "crop": [
+        398.5,
+        350,
+        530,
+        340
+      ],
+      "seed": [
+        570,
+        615
+      ],
+      "painted": true,
+      "canopy": false,
+      "keepPieces": true,
+      "solid": true,
+      "object": "the whole wooden work table, including its tabletop, apron, every leg and foot, and the open cardboard box sitting on top of it; not the floor, shadows, or nearby easels",
+      "ground": "the painted floor wash",
+      "footprint": [
+        [
+          [
+              433,
+              560
+          ],
+          [
+              666,
+              469
+          ],
+          [
+              875,
+              565
+          ],
+          [
+            678,
+            685
+          ]
+        ]
+      ],
+      "home": [
+        570,
+        615
+      ],
+      "samples": {
+        "object": 1
+      },
+      "footprintNote": "Whole table base, from the occluded north foot through the west, south, and east feet; the box is elevated on the tabletop and has no separate floor footprint."
+    },
+    {
+      "id": "supply-shelves",
+      "crop": [
+        950,
+        163.5,
+        210,
+        373.5
+      ],
+      "seed": [
+        1055,
+        523
+      ],
+      "painted": true,
+      "canopy": false,
+      "object": "the tall supply shelves and cabinet, including its sides, shelves, contents, and feet, not the wall or floor",
+      "ground": "the painted floor wash",
+      "footprint": [
+        [
+          [
+            970,
+            480
+          ],
+          [
+            1100,
+            535
+          ],
+          [
+            1155,
+            510
+          ],
+          [
+            1020,
+            455
+          ]
+        ]
+      ],
+      "home": [
+        1055,
+        465
+      ],
+      "samples": {
+        "object": 1
+      }
+    }
+  ]
+}

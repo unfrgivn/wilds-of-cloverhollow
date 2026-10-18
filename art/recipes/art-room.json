@@ -1,0 +1,13 @@
+{
+  "asset": "art-room ground",
+  "milestone": 63,
+  "date": "2026-10-18",
+  "summary": "Original bright primary-school art room in the established cutaway watercolor-and-ink style, with easels, work table, sink and drying rack, painting wall, supply shelves, north hall door, and an open empty marker box.",
+  "generationSource": "Generated with Gemini from the approved classroom and lodge paintings as style and camera references.",
+  "calls": 2,
+  "edits": [{"model":"gemini-3-pro-image-preview","refs":["art/source/areas/classroom/classroom-final.png","art/source/areas/lodge/lodge-final.png"],"prompt":"Original bright primary-school art room in the established cutaway watercolor-and-ink style, with easels, work table, sink and drying rack, painting wall, supply shelves, north hall door, and an open empty marker box.","kept":"art/source/areas/art-room/art-room-final.png"}],
+  "postProcessing": ["Resized and center-cropped to 2400x1600; split into two 1200x1600 WebP ground tiles at quality 92.","Split into a kit with depth props for easels and the work table; supply shelves remain painted because the generated plate fill failed validation."],
+  "review": [
+    "art/review/m63-art-room.jpg"
+  ]
+}

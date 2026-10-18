@@ -17,6 +17,7 @@ const routes = [
   ["pass-party", "pass-party/arcade.json", "arcade-keeper"],
   ["pass-party", "pass-party/music.json", "music-bird"],
   ["pass-party", "pass-party/field.json", "oak-squirrel"],
+  ["pass-party", "pass-party/art.json", "art-teacher"],
   ["pass-party", "pass-party/forest.json", "owl"],
   ["pass-party", "pass-party/kid.json", "hooded-kid"],
 ] as const;

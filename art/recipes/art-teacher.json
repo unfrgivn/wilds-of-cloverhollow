@@ -1,0 +1,89 @@
+{
+  "asset": "art-teacher",
+  "milestone": 63,
+  "date": "2026-10-18",
+  "summary": "Ms. Rowan, the art teacher, a 2x2 battle body sheet with purple-paint chaos poses: chaos idle, brush burst, soothed, and calm idle.",
+  "generationSource": "Generated with Gemini from Mr. Pip's body sheet for the shared chibi watercolor style, scale, and chaos eyes, plus an isolated crop of the owner's school staff concept containing only the Art Teacher.",
+  "calls": 8,
+  "edits": [
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "2x2 Ms. Rowan art-teacher sheet in Mr. Pip's watercolor chibi style, brown bangs, rainbow headband, striped shirt, blue paint-splattered overalls, brown shoes, oversized brush, four chaos/burst/soothed/calm poses, green key background, purple paint, no green.",
+      "output": "1792361210082-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: a lime-green dizzy mark remained in the soothed cell."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "Repeated green-safe Rowan sheet with no green on subject, purple effects, and an oversized brush in every pose.",
+      "output": "1792361262578-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: green/olive/teal remained, and the calm figure replaced the brush with a palette."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "Strict no-green Rowan sheet with a giant brush in all four cells and consistent female character identity.",
+      "output": "1792361315983-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: facial identity was inconsistent, and cyan/teal splatters plus green edge bleed remained."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "Female clean-shaven Rowan, no green-family subject colors, giant brush in every cell, four distinct poses, flat green background.",
+      "output": "1792361356584-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: background had black panel dividers and green fringe/holes despite otherwise correct design."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "Professional flat-background Rowan source sheet with no dividers, no green on subject, and giant brush in every pose.",
+      "output": "1792361497599-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: soothed-cell dizzy marks were green/mint, calm brush was undersized, and a detached orange artifact appeared."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "No-green-family Rowan sheet with same-size giant brushes in all four cells, purple/grey dizzy marks, and no detached artifacts.",
+      "output": "1792361556909-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: lime/teal remained in bandana and dizzy marks."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/arcade-keeper/body-sheet-raw.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "Final Rowan atlas with a red/orange/yellow/royal-blue/purple bandana, no green-family subject pixels, four complete female figures, giant purple-painted brush in every pose, uninterrupted pure green key background, and the required chaos, burst, soothed, and calm poses.",
+      "output": "1792361602727-gemini-3-pro-image-preview-0.png",
+      "note": "Kept after raw-sheet review and built-frame review. The builder's holes pass removes the enclosed background pocket and island cleanup removes tiny detached artifacts; final frames had no green fringe or holes."
+    },
+    {
+      "time": "2026-10-18",
+      "model": "gemini-3-pro-image-preview",
+      "refs": ["art/source/critters/art-teacher/body-sheet-raw-v1.png", "art/source/critters/art-teacher/concept-crop.png"],
+      "prompt": "Edit the kept Rowan sheet in place, changing only two things: remove the three orange ticket stubs from the bottom-left soothed cell, and restore the tied rainbow bandana knot/bow from the concept crop on top of her head in all four cells. Preserve every other pose, face, colour, position, effect, brush, cell layout, and the flat #00FF00 background exactly.",
+      "output": "1792362071129-gemini-3-pro-image-preview-0.png",
+      "note": "Kept. The soothed floor is clean and the tied bandana knot is restored in all four cells. Side-by-side review found no unrelated identity or style drift."
+    }
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-person.ts art-teacher --key=#00FF00",
+    "key": "#00FF00",
+    "despill": "green edge-only despill, with holes enabled; no interior recolouring or pixel editing",
+    "hashCheck": {
+      "algorithm": "SHA-256",
+      "first": "97426726b3d4de2431a804cc91b8d74182c4683e746d301880fc980433fcb4ac",
+      "second": "97426726b3d4de2431a804cc91b8d74182c4683e746d301880fc980433fcb4ac",
+      "equal": true
+    }
+  },
+  "review": [
+    "art/review/m63-rowan.jpg",
+    "art/review/m63-shapes.jpg"
+  ]
+}

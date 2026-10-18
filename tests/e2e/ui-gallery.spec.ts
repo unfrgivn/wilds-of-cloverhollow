@@ -100,7 +100,7 @@ test.describe("sticker gallery", () => {
         if (state === "credits") {
           await expect(page.locator(".credits-entry-friends .credits-entry-name"))
             .toHaveText(["Maddie", "Sue", "Jordan", "Pond Pup", "Acorn Squirrel"]);
-          await expect(page.locator(".credits-entry-met")).toHaveCount(16);
+          await expect(page.locator(".credits-entry-met")).toHaveCount(17);
         }
         await expect(page).toHaveScreenshot(`${state}-${size.width}x${size.height}.png`, {
           animations: "disabled", scale: "device",

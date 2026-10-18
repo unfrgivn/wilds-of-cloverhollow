@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-18 (Milestones 53 to 58, 60, and 64)
+Last updated: 2026-10-18 (Milestones 53 to 58, 60, 63, and 64)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -560,9 +560,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `requires` `pe_time`, knot `gym_hall`; spawn `gym-doors` (220, 575) facing
   right), the music room door (trigger `music-door` to `music.door`,
   `requires` `music_time`, knot `music_closed`; spawn `music-door` (500, 450)
-  facing down), and a closed door with a palette sign (Look point `art-room`).
-  Its props are the lockers and the bench; a blocker fills the pocket under
-  the wall fountain.
+  facing down), and the art room's door with a palette sign (Look point
+  `art-room`, knot `art_room`; once open, trigger `art-door` to
+  `art-room.door`, `requires` `art_open`, knot `art_room`; spawn `art-room`
+  (760, 380) facing right). Its props are the lockers, the bench, and the art
+  room's door (`art-room-door`, hidden by default and `open` while `art_open`,
+  cut from `east-hall-art-open.png`, with no footprint); a blocker fills the
+  pocket under the wall fountain.
 - The music room (Milestone 38): `music`, "Music Room", a 1200x800 painted
   cutaway on the classroom's frame. Its door is on the left back wall
   (trigger `door` to `east-hall.music-door`; spawn `door` (280, 545) facing
@@ -696,6 +700,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   into it (trigger `lodge`, `requires` `lodge_open`, knot `lodge_door`; spawn
   `lodge` (1195, 545) facing down) goes in. The journal tells of her fizzy,
   then calm.
+- The art teacher (Milestone 63): once Fae has found the hooded kid's stash
+  (`stash_found`), purple paint seeps under the art room door
+  (`art_room.paint`), and reading it brings the art teacher, Ms. Rowan, out
+  into the east hall, fizzy (`art_teacher_out`), a set piece. Calmed, she
+  tells of the hooded kid's soda and the borrowed purple markers, and opens
+  the art room (`art_open`): its door stands open, and walking into it goes
+  in. She stays in the hall, calm; later talks get her `again` line. The
+  journal tells of her fizzy ("Ms. Rowan is fizzy in the east hall, swishing
+  wild purple paint."), then calm ("I calmed Ms. Rowan, the art teacher. Her
+  room is open, and every purple marker is missing!").
 - The lodge (Milestone 57): `lodge`, "Mountain Lodge", in the `pass` land, a
   1200x800 painted cutaway of the log lodge's one room, split into a kit (a
   counter with the cocoa pot and the guestbook, the stone fireplace, two
@@ -714,6 +728,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   it always has. Calmed, she tells of the hooded kid's soda and shares her
   watermelon (`gift: snack 3`, once); the picnic then has its shared line
   (`bay_picnic.shared`). The journal tells of her fizzy, then calm.
+- The art room (Milestone 63): `art-room`, "Art Room", in the
+  `cloverhollow` land, a 1200x800 painted cutaway in the school's style,
+  split into a three-prop kit: the two easels are lifted, with a shadow; the
+  work table, with the empty marker box on it, and the supply shelves stay
+  painted. Blockers hold the drying rack and the low cubbies, back to the
+  wall, and the floor just behind the easels; the sink hangs on the wall over
+  open floor. Its floor is tile with a carpet rug. Its door, in the left wall,
+  leads back out (trigger `door` to
+  `east-hall.art-room`; spawn `door` (270, 540) facing right). Look points are
+  the easels (`art_easels`), the class art wall (`art_paintings`), the sink
+  (`art_sink`), and the empty purple marker box (`art_markers`).
 - The clubhouse (Milestone 43): `clubhouse`, "Clubhouse", in the `forest` land,
   is a 1200x800 painted cutaway of the Whispering Woods tree house's one room
   and its deck. The ladder at the tree house's front in the woods is a door
@@ -883,9 +908,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   set pieces are the fountain frog (plaza), the school raccoon (plaza, while
   `raccoon_waiting`), the grumpy gull (the trail's lookout), Mr. Pip, the
   arcade keeper (the arcade), the gym pup (the gym), Mrs. Flurry, the lodge
-  keeper (the pass, on her porch at (1300, 590), while `keeper_back`), and
-  Ms. Coral, the lifeguard (the bay, on the sand by the dock approach at (760,
-  590), while `lifeguard_back`).
+  keeper (the pass, on her porch at (1300, 590), while `keeper_back`), Ms.
+  Coral, the lifeguard (the bay, on the sand by the dock approach at (760,
+  590), while `lifeguard_back`), and Ms. Rowan, the art teacher (the east
+  hall, at (1040, 500), while `art_teacher_out`).
 - Recurring critters, EarthBound style, are an area's `recurring`:
   `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
   (a door, a bus ride, a rest's fade, and the start of a game or fixture)
@@ -1063,6 +1089,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   is behind them (canopies).
   Every prop is painted but the woods' south log, which is lifted; the plates
   are the approved paintings but for its hole.
+  The art room (Milestone 63) is also a kit: its two easels are lifted with a
+  shadow, while its work table and supply shelves stay painted; the drying rack
+  and the low cubbies are blockers. The table stays painted because a lifted
+  table showed its plate's fill round its legs and papers; painted, the room
+  is the approved painting pixel for pixel, and the table's silhouette (its
+  top and everything on it) still hides Fae behind it.
 - An area's floor is one piece: from any spawn, Fae can walk to every other
   (`areaConnectionErrors` reports a floor split by furniture).
 
@@ -1333,8 +1365,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`lifeguard`, Milestone 64; feelings grumpy, hungry, curious; 25 coins), is
   the third person, with Mr. Pip's numbers and friend commands, a wind-up (a
   giant beach ball), and beach balls to catch, cut from the bay's painting and
-  drawn at her `toyScale` (0.5). Each person's battle atlas is built by
-  `tools/art/build-person.ts <id>` from one 2x2 body sheet.
+  drawn at her `toyScale` (0.5). Ms. Rowan, the art teacher (`art-teacher`,
+  Milestone 63; feelings curious, zoomy, grumpy; 25 coins), is the fourth
+  person, with Mrs. Flurry's numbers and a wind-up (a giant paint bucket); her
+  bursts are Trace, not catches, and she has no Talk phase. Snack costs one
+  snack and restores 2 energy, as for the other person battles. Each person's
+  battle atlas is built by `tools/art/build-person.ts <id>` from one 2x2 body
+  sheet.
 - Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
   critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
@@ -1359,7 +1396,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   whole party, in one column on desktop and two on phones (section 8.1).
 - Content: `content/critters/*.json` (validated by the loader) supplies every
   battle number and line: the touch radius, calm and energy maxima, the
-  `coins` it pays when calmed (8 for ordinary critters, 25 for the gull),
+  `coins` it pays when calmed (8 for ordinary critters, 25 for the gull and
+  the people under the chaos spell, 40 for the kid in the purple hood),
   command values (`commands.soothe`, `commands.snack`, and
   `commands.friends.<command id>` with `{ calm, great, good, rest }` for every
   party command), the burst (`bigChance`, its `check`, and an optional `big`
@@ -1568,7 +1606,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Wind-ups (Milestone 50): a mini-boss (`windUp` in its kind: `start`,
   `every`, `bubbles`, and `lines.start`, `lines.puffing`, `lines.fizzle`)
   puffs up on turn `start`, then every `every` turns, feeling several things
-  at once. The gull, Mr. Pip, and Mrs. Flurry start on turn 2, every 3
+  at once. The gull, Mr. Pip, Mrs. Flurry, and Ms. Rowan start on turn 2,
+  every 3
   turns, with 2 bubbles. `battle.turn` counts turns from 1; `battle.windUp`
   holds the bubbles' feelings, which are popped, and the turns `left` (this
   one too).
@@ -1778,8 +1817,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   colour is never the only cue. A finger maps to the square while held; its
   pointer is separate from the movement stick. The square is centred and sized
   by `battleCheckGeometry` for desktop and notched phone safe areas.
+  Ms. Rowan's Trace paths are `flower`, `spiral`, and `rainbow`; her big paths
+  are `big-flower` and `big-rainbow`. They use the kid's tuning:
+  `brushSpeed` 20, `reachRadius` 105, and `dryTicks` 180. The flower reads as
+  a four-petal flower or a star.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
-  and leaves Milo calm under the tree. The sticker catalogue has 13 slots,
+  and leaves Milo calm under the tree. The sticker catalogue has 17 slots,
   including the Milo sticker. The front-view NPC art is no longer loaded by
   the runtime. Its raw source and recipe remain in `art/source/` and
   `art/recipes/` for provenance.
@@ -1904,8 +1947,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
   catalogue (id, name, the critter whose atlas holds the art, and the frame):
-  sixteen stickers, one per species and one per mini-boss, in sixteen slots,
-  the town's four first.
+  seventeen stickers, one per species and one per mini-boss, in seventeen
+  slots, the town's four first.
   A sticker is owned when `state.stickers` has its id. The shell sets
   `data-journal="open"` while the book is open.
 

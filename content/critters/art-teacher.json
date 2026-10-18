@@ -1,0 +1,304 @@
+{
+  "id": "art-teacher",
+  "species": "art-teacher",
+  "name": "Fizzy Ms. Rowan",
+  "calmName": "Ms. Rowan",
+  "atlas": "assets/critters/art-teacher/art-teacher.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 314
+  },
+  "figureHeight": 380,
+  "overworldHeight": 160,
+  "battleHeight": 280,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "sticker": {
+    "id": "art-teacher",
+    "name": "Ms. Rowan",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "art_teacher",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "curious",
+    "zoomy",
+    "grumpy"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.5,
+    "check": {
+      "kind": "trace",
+      "dryTicks": 180,
+      "brushSpeed": 20,
+      "reachRadius": 105,
+      "paths": [
+        {
+          "id": "flower",
+          "points": [
+            {
+              "x": 500,
+              "y": 120
+            },
+            {
+              "x": 650,
+              "y": 350
+            },
+            {
+              "x": 880,
+              "y": 500
+            },
+            {
+              "x": 650,
+              "y": 650
+            },
+            {
+              "x": 500,
+              "y": 880
+            },
+            {
+              "x": 350,
+              "y": 650
+            },
+            {
+              "x": 120,
+              "y": 500
+            },
+            {
+              "x": 350,
+              "y": 350
+            },
+            {
+              "x": 500,
+              "y": 120
+            }
+          ]
+        },
+        {
+          "id": "spiral",
+          "points": [
+            {
+              "x": 500,
+              "y": 500
+            },
+            {
+              "x": 500,
+              "y": 160
+            },
+            {
+              "x": 840,
+              "y": 300
+            },
+            {
+              "x": 760,
+              "y": 720
+            },
+            {
+              "x": 300,
+              "y": 840
+            },
+            {
+              "x": 160,
+              "y": 400
+            }
+          ]
+        },
+        {
+          "id": "rainbow",
+          "points": [
+            {
+              "x": 100,
+              "y": 780
+            },
+            {
+              "x": 180,
+              "y": 500
+            },
+            {
+              "x": 300,
+              "y": 300
+            },
+            {
+              "x": 500,
+              "y": 200
+            },
+            {
+              "x": 700,
+              "y": 300
+            },
+            {
+              "x": 820,
+              "y": 500
+            },
+            {
+              "x": 900,
+              "y": 780
+            }
+          ]
+        }
+      ]
+    },
+    "big": {
+      "kind": "trace",
+      "dryTicks": 180,
+      "brushSpeed": 20,
+      "reachRadius": 105,
+      "paths": [
+        {
+          "id": "big-flower",
+          "points": [
+            {
+              "x": 500,
+              "y": 90
+            },
+            {
+              "x": 650,
+              "y": 350
+            },
+            {
+              "x": 910,
+              "y": 500
+            },
+            {
+              "x": 650,
+              "y": 650
+            },
+            {
+              "x": 500,
+              "y": 910
+            },
+            {
+              "x": 350,
+              "y": 650
+            },
+            {
+              "x": 90,
+              "y": 500
+            },
+            {
+              "x": 350,
+              "y": 350
+            }
+          ]
+        },
+        {
+          "id": "big-rainbow",
+          "points": [
+            {
+              "x": 80,
+              "y": 850
+            },
+            {
+              "x": 160,
+              "y": 550
+            },
+            {
+              "x": 300,
+              "y": 300
+            },
+            {
+              "x": 500,
+              "y": 140
+            },
+            {
+              "x": 700,
+              "y": 300
+            },
+            {
+              "x": 840,
+              "y": 550
+            },
+            {
+              "x": 920,
+              "y": 850
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Ms. Rowan fills a giant paint bucket. It's getting fuller and fuller!",
+      "puffing": "The giant paint bucket sloshes higher!",
+      "fizzle": "Pop-pop! Fae pops every paint bubble, and the bucket fizzles."
+    }
+  },
+  "lines": {
+    "intro": "Ms. Rowan whirls around with swirly eyes. \"NOBODY touches MY paints!\"",
+    "command": "How can Fae calm Ms. Rowan?",
+    "soothe": {
+      "great": "Fae hums a quiet painting song. Ms. Rowan's swirls slow down!",
+      "good": "Fae hums softly. Ms. Rowan puts down her brush for a moment.",
+      "miss": "Ms. Rowan paints a purple zigzag right over Fae's song."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie chases a paint bubble. Ms. Rowan laughs!",
+        "good": "Maddie bats a paint bubble across the floor.",
+        "miss": "Maddie gets a blue pawprint on her nose."
+      },
+      "cast": {
+        "great": "Sue's ribbon makes a rainbow loop. Ms. Rowan claps!",
+        "good": "Sue's ribbon twirls through the painty air.",
+        "miss": "Sue's ribbon tangles in a paintbrush."
+      },
+      "juggle": {
+        "great": "Jordan juggles three paint pots in a perfect loop. \"Beautiful!\"",
+        "good": "Jordan tosses a paint pot high, and Ms. Rowan watches.",
+        "miss": "Jordan drops a paint pot with a purple splodge."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. Ms. Rowan nibbles between brushstrokes.",
+    "burst": "Wild purple paint swirls at Fae! Brush it back before it dries!",
+    "burstResult": {
+      "great": "Fae brushes every purple swirl back into a picture!",
+      "good": "Fae brushes most of the paint into shapes!",
+      "miss": "Splat! Purple paint dots Fae's shoes."
+    },
+    "soothed": "Ms. Rowan blinks. The swirls fade from her eyes, and her brush lowers.",
+    "rest": "Fae's arms are tired from painting. Time for a rest.",
+    "run": "Fae backs away. Ms. Rowan swirls another purple stroke."
+  },
+  "coins": 25,
+  "level": 8
+}

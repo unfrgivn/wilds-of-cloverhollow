@@ -1,0 +1,12 @@
+{
+  "asset":"east-hall art-room open door",
+  "milestone":63,
+  "date":"2026-10-18",
+  "generationSource":"Generated with Gemini as a localized edit of the approved east-hall painting.",
+  "calls":1,
+  "edits":[{"model":"gemini-3-pro-image-preview","refs":["art/source/areas/east-hall/east-hall-final.png"],"prompt":"Keep the entire east hall identical and change only the art-room door near (850,405) to open inward with a warm art-room glimpse and light spill.","kept":"art/source/areas/east-hall/east-hall-art-open.png"}],
+  "postProcessing":"Resized the generated edit to the east-hall 2800x1600 source canvas and registered it as the added open prop state; closed state remains hidden so the original ground is byte-identical.",
+  "review": [
+    "art/review/m63-hall-door.jpg"
+  ]
+}

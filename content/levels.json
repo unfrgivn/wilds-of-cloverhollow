@@ -244,6 +244,13 @@
       "bigBurst": 3,
       "xp": 50
     },
+    "art-teacher": {
+      "level": 8,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 80
+    },
     "arcade-keeper": {
       "level": 7,
       "calmMax": 200,

@@ -1,0 +1,108 @@
+{
+  "frames": {
+    "supply-shelves": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 420,
+        "h": 703
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 420,
+        "h": 703
+      },
+      "sourceSize": {
+        "w": 420,
+        "h": 703
+      },
+      "anchor": {
+        "x": 0.49048,
+        "y": 0.82219
+      }
+    },
+    "work-table": {
+      "frame": {
+        "x": 422,
+        "y": 0,
+        "w": 1000,
+        "h": 614
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 1000,
+        "h": 614
+      },
+      "sourceSize": {
+        "w": 1000,
+        "h": 614
+      },
+      "anchor": {
+        "x": 0.285,
+        "y": 0.72964
+      }
+    },
+    "easels-shadow": {
+      "frame": {
+        "x": 1424,
+        "y": 0,
+        "w": 530,
+        "h": 524
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 530,
+        "h": 524
+      },
+      "sourceSize": {
+        "w": 530,
+        "h": 524
+      },
+      "anchor": {
+        "x": 0.45283,
+        "y": 0.78244
+      }
+    },
+    "easels": {
+      "frame": {
+        "x": 0,
+        "y": 705,
+        "w": 530,
+        "h": 517
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 530,
+        "h": 517
+      },
+      "sourceSize": {
+        "w": 530,
+        "h": 517
+      },
+      "anchor": {
+        "x": 0.45283,
+        "y": 0.79304
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1222
+    },
+    "scale": "1"
+  }
+}

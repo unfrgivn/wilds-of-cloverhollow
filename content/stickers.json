@@ -1,5 +1,5 @@
 {
-  "slots": 16,
+  "slots": 17,
   "catalogue": [
     {
       "id": "hooded-kid",
@@ -95,6 +95,12 @@
       "id": "meadow-hedgehog",
       "name": "Meadow Hedgehog",
       "critter": "hedgehog",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "art-teacher",
+      "name": "Ms. Rowan",
+      "critter": "art-teacher",
       "frame": "calm_idle_01"
     }
   ]

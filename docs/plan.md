@@ -2832,34 +2832,70 @@ the old trail, the owl, and the clubhouse claim.
   meadows; and the hills door uses the park's northeast gap by the play tower
   and signpost rather than changing the park's existing town edges.
 
-## Milestone 63: The art teacher **Status:** 🚧 In progress (2026-10-18)
+## Milestone 63: The art teacher **Status:** ✅ Completed (2026-10-18)
 - The owner asked for more mini-bosses (2026-10-18; NOTES.md: more
   mini-bosses, people and animals under the chaos spell). The owner's school
   staff concept sheet (`docs/art/concepts/npcs/school_staff_npcs.png`) draws
   five teachers. Four are in the game; the fifth, the art teacher, never
   appears, and the east hall's art room door has only ever said it's locked.
   No recorded run reads that door.
-- Once Fae has found the hooded kid's stash (purple markers, fizzy soda, and a
-  Star Racer token), purple paint seeps under the art room door. Reading it
-  then brings the art teacher out, fizzy from one sip of the purple soda and
-  painting wild purple swirls: "NOBODY touches MY paints!" Until a player
-  reads the door after the stash, the hall is as it was.
+- Once Fae has found the hooded kid's stash, purple paint seeps under the art
+  room door. Reading it then brings the art teacher, Ms. Rowan, out, fizzy
+  from one sip of the purple soda and swishing purple paint. Until a player
+  reads the door after the stash, the hall is as it was, so no earlier
+  recorded run changes.
 - She's a person under the spell, a set piece like Mr. Pip and Mrs. Flurry,
-  drawn from the concept sheet: short brown hair, a rainbow bandana, a striped
-  shirt under paint-spattered overalls, and a giant brush. Her bursts are
-  paint swirls that Fae brushes back into shapes before the paint dries
-  (Trace, Milestone 55), in shapes of her own, with feelings and a wind-up (a
-  giant paint bucket).
-- Calmed, she says the kid in the purple hood borrowed every purple marker
-  and left her a fizzy soda, and she opens the art room: a new room, painted
-  whole and split into a kit, with look points (the easels, the class art
-  wall, the empty purple marker box). Her sticker joins the album.
-- Evidence: unit tests for the door, the set piece, her battle content and
-  trace shapes (against the player models), her talk, and the room; a
-  recorded run on from the stash, with its replay test; and a real-key e2e at
-  both sizes, in both engines.
-- For the owner: her name (Ms. Rowan, a tree, like Ms. Maple, Ms. Willow,
-  Coach Ash, and Nurse Holly), her lines, her sheet, and the room.
+  with Mrs. Flurry's numbers, her own feelings (curious, zoomy, grumpy), and
+  a wind-up (a giant paint bucket). Her bursts are Trace (Milestone 55) in
+  shapes of her own: a flower, a spiral, and a rainbow, and a big flower and
+  a big rainbow when big. Talk stays the hooded kid's. Calmed, she says the
+  kid in the purple hood left her a sip of fizzy soda and borrowed every
+  purple marker, and opens the art room. She stays in the hall, calm, with a
+  line of her own for later talks.
+- The art room is a new room painted whole and split into a three-prop kit:
+  the two easels are lifted, and the work table (the marker box on it) and the
+  supply shelves stay painted. The drying rack and the low cubbies are
+  blockers; the sink hangs on the wall. Its door is in the left wall. Look
+  points are the easels, the class art wall, the sink, and the empty purple
+  marker box, each on the floor in front of what it describes, so Fae reads it
+  standing before it. In the hall, the door stands open. Her sticker adds a
+  seventeenth album slot, after Milestone 62's two and Milestone 64's.
+- Art (`art/recipes/art-teacher.json`, `art-room.json`, `art-room-kit.json`,
+  `east-hall-art-open.json`, `east-hall-kit.json`): her body sheet, drawn to
+  Mrs. Flurry's from the concept sheet and built by
+  `tools/art/build-person.ts art-teacher --key=#00FF00`; the room; and the
+  hall with the door open.
+- Evidence: `tests/unit/art-teacher.test.ts`;
+  `tests/unit/art-teacher-trace.test.ts`, with the shared player model
+  `tests/unit/trace-players.ts`, which `kid-trace-tuning.test.ts` now uses too;
+  the recorded run `tests/sim/scripts/pass-party/art.json`, which continues
+  from `field.json`, with `tests/unit/art-replay.test.ts`; and
+  `tests/e2e/art.spec.ts`, using real keys in Chromium and WebKit at 1280x720
+  and 874x402.
+- Notes and assumptions:
+  - Her name, Ms. Rowan, is a placeholder for the owner, a tree like Ms.
+    Maple, Ms. Willow, Coach Ash, and Nurse Holly.
+  - Changes from the concept: no green on her (her splatters are orange,
+    purple, yellow, and royal blue), and her brush's paint is purple, not
+    magenta.
+  - She never names Milo; his name stays the finale's.
+  - Her level is 8, Mrs. Flurry's row in `content/levels.json`, added when
+    Milestone 66 landed first. Fae ends the field at level 5 and reaches 6
+    calming her, a gap of 2, the most the balance check allows a named
+    encounter; `tools/sim/balance.ts` checks it on the art room's run.
+  - The flower reads as a four-petal flower or a star.
+  - The work table stays painted. The first kit cut it short, so Fae could
+    stand on its end and in the box; a whole lifted table then showed its
+    plate's fill round the legs and papers. Painted, the room is the approved
+    painting pixel for pixel.
+  - Gemini calls: 40, plus one rejected for a bad aspect ratio. Her sheet took
+    8; the room's painting 2 and the hall's open door 1; the room's kit 27 (15
+    isolates and 12 fills) and the hall's kit 2. The whole-table cut took 6 of
+    the kit's calls, and its 3 fills went unused once the table stayed
+    painted. The working tally said 22: the first kit `gen` timed out before
+    printing its 11 calls, and the rerun found their samples ready.
+  - The sheet, her shapes, the room, the door, and the wording are in the
+    owner's review queue.
 
 ## Milestone 64: The lifeguard **Status:** ✅ Completed (2026-10-18)
 - Bubblegum Bay, Sue's land, has no one under the spell, and someone left a

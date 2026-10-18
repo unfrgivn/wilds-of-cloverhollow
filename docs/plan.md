@@ -2406,6 +2406,27 @@ the old trail, the owl, and the clubhouse claim.
   real-key e2e (the morning at both sizes, the credits, the title, and
   Continue back in the forest; on WebKit too, tagged `@smoke`).
 
+## Milestone 57: The lodge keeper **Status:** 🚧 In progress (2026-10-17)
+- The owner picked more people under the chaos spell (2026-10-17; NOTES.md's
+  last unscheduled idea, more mini-bosses), starting with Pinecone Pass's
+  lodge, locked since the pass was built: "Back soon, gone looking for a
+  runaway hamster."
+- Once Fae has calmed a hamster (who warns her to watch out for snowballs),
+  the note leads on: reading it, a snowball whizzes past. The lodge keeper is
+  back (`keeper_back`), fizzy from one sip of the hooded kid's purple soda,
+  like Mr. Pip, and flinging snowballs from her porch. No earlier recorded
+  run reads the note, so the pass looks as it always did until then.
+- She's a person under the spell, a set piece like Mr. Pip, with her own
+  battle: her feelings, a wind-up (a giant snowball), and snowballs to catch
+  as her bursts. Calmed, she remembers the soda and the kid in the purple
+  hood, unlocks the lodge (`lodge_open`), and invites everyone in to warm up.
+- The lodge: a new room, painted whole and split into a kit like the
+  clubhouse: a cozy ski lodge with a crackling fire, armchairs, skis on the
+  wall, a pot of cocoa, and a guestbook. Her name waits for the owner.
+- Art: her battle atlas (Mr. Pip's frames; the hamsters' aura shared), the
+  snowballs cut from her throw like the thrown toys, the lodge's door open (an
+  added prop, Milestone 49), and the lodge room.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
@@ -2708,12 +2729,14 @@ more bad guys, and the blacklight lantern, made and built while away.
     first touch and old friends: done (above).
   - Milestone 49, lasso spots: done (above). Then Milestone 52, the
     clubhouse kitchen (owner, 2026-10-17): done (above).
+  - Milestone 57, the lodge keeper: in progress (above), the first of more
+    people under the chaos spell (owner, 2026-10-17).
   - The kid's identity is kept for the very end (owner, 2026-10-07).
 
 ## Later (not scheduled)
-Calling animal friends with the flute, more places for the lasso, more for
-the clubhouse (NOTES.md: a chest, a microwave), and more
-mini-bosses (people under the chaos spell, NOTES.md).
+More people under the chaos spell (NOTES.md: more mini-bosses), after the
+lodge keeper (Milestone 57). Flute friends, the lasso's places, and the
+clubhouse's chest and microwave are done (Milestones 47, 49, and 52).
 
 Sound follow-ups from Milestone 37:
 - Music and ambience: a title, town, and battle theme, and quiet beds per

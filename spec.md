@@ -1157,7 +1157,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   least 7:1 contrast against the paper.
 - Nunito's Latin variable font is shipped under OFL in
   `src/assets/fonts/nunito`. It was
-  chosen for its friendly rounded forms and strong small-size legibility.
+  chosen for its friendly rounded forms and strong small-size legibility. It
+  loads with `font-display: swap`, so text measured to fit (an arcade
+  close-up's marquee, the fridge's front) is measured again when the page's
+  fonts finish loading: measured before, it was fitted to the fallback font.
 - UI safe-area insets are centralized as `--safe-top`, `--safe-right`,
   `--safe-bottom`, and `--safe-left`, sourced from the platform environment.
   Dialogue, choices, prompts, and touch controls all use these variables. A

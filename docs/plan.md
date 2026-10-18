@@ -3363,9 +3363,9 @@ more bad guys, and the blacklight lantern, made and built while away.
   bare page load went from 481 to 121 ms in WebKit, but whole tests in A/B
   runs were within noise in both browsers); one page shared per worker (it
   saves WebKit about 0.2 s a test, each page being its own web process, but
-  WebKit's shards aren't CI's slowest, and a page that already holds Nunito
-  letters the mole marquee differently, see Later); Vitest's `isolate: false`
-  (within noise).
+  WebKit's shards aren't CI's slowest, and a page that already held Nunito
+  lettered the mole marquee differently, a bug since fixed); Vitest's
+  `isolate: false` (within noise).
 - CI's runners differ in speed by half again: two Chromium shards ran the
   same tests at 1.4 and 1.5 times their recorded seconds. A run is bounded
   by its slowest runner, and the record is now each test's mean over
@@ -3412,6 +3412,20 @@ more bad guys, and the blacklight lantern, made and built while away.
   on a Mac: it steps 10 ticks at a time with real keys, and each of its
   about 200 steps draws a frame in Linux WebKit's software renderer. Fewer
   steps would move the moments its screenshots are taken, so it stays.
+- A fix (2026-10-18): Boop-a-Mole, skee-ball, Comet Cruise, and the cooking
+  game size a hint to fit its plate (a marquee, the fridge's front) in a
+  draw, and skip the draw while the size and view are unchanged. On a cold
+  load Nunito isn't usable at the first draw (`font-display: swap`), so a
+  hint kept the size that fit the fallback font: on the phone layout the
+  mole's was 20 px where Nunito fits 19, and on the desktop its result line
+  ran past the plate at 54 px where Nunito fits 49. In the game the title
+  has usually loaded Nunito before a close-up opens, but not on a slow
+  connection. Each now draws again when the page's fonts finish loading
+  (spec 7.1). Nine mole and seven comet Chromium gallery baselines changed,
+  only in the marquee, and were updated after viewing them (the mole's were
+  drawn before Chromium used Metal, so they were drawn again whole, matching
+  the old ones elsewhere within the screenshot tolerance). Skee-ball's, the
+  cooking game's, and WebKit's didn't change.
 
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
@@ -3577,17 +3591,3 @@ Sound follow-ups from Milestone 37:
   restore the chosen level.
 - iOS on a real device: the simulator check below should hold, but a phone
   with a pad and the silent switch hasn't been tried.
-
-Found by the test speed work (2026-10-18):
-- The gallery's mole screenshots fit the marquee hint with the fallback
-  font's metrics, where the game fits it with Nunito's (on the phone layout,
-  20 px against 19 px). `createMole` (`src/ui/mole.ts`) fits the marquee
-  text once, in a draw, and `render` skips the draw while the size and view
-  are unchanged. On a cold gallery load Nunito isn't usable yet at the first
-  draw (`font-display: swap`), and the gallery's redraw after
-  `document.fonts.ready` is skipped. A page that already holds Nunito, like
-  the game long after the title, fits it with Nunito (seven Chromium mole
-  baselines failed on such a page; WebKit's matched). Fix: draw again when
-  fonts finish loading (say, clear `lastKey` on `document.fonts`'
-  `loadingdone`), then redraw whichever mole baselines change, after
-  viewing them.

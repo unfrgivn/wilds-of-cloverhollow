@@ -131,6 +131,11 @@ export function createCook(
     if (room < 1) setStyle(frontText, "font-size", `${Math.max(9, Math.floor(tall * room))}px`);
     front.hidden = view.phase === "result";
   };
+  // The front was measured in whatever font was usable, and Nunito swaps in
+  // when it loads (spec 7.1): what's shown is drawn again then.
+  document.fonts.addEventListener("loadingdone", () => {
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+  });
 
   return {
     render: (view) => {

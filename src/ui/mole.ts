@@ -186,6 +186,11 @@ export function createMole(
       setStyle(pop, "top", `${layout.pop.y}px`);
     }
   };
+  // The marquee was measured in whatever font was usable, and Nunito swaps in
+  // when it loads (spec 7.1): what's shown is drawn again then.
+  document.fonts.addEventListener("loadingdone", () => {
+    if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
+  });
 
   return {
     render: (view) => {

@@ -2895,13 +2895,15 @@ more bad guys, and the blacklight lantern, made and built while away.
   - Art, 21 Gemini calls (the generation log): 6 edits (4 kept) and 15 kit
     isolates (2 kept); `art/recipes/arcade-concept-edits.json`.
 
-## Milestone 59: A fourth arcade game **Status:** 📋 Planned
+## Milestone 59: A fourth arcade game **Status:** 🚧 In progress (2026-10-18)
 - A fourth game on the teal cabinet beside Boop-a-Mole (`cabinet-second`;
-  the rocket cabinet it was planned for goes in Milestone 61): a short, gentle
+  the rocket cabinet it was planned for went in Milestone 61): a short, gentle
   space race for 2 coins, steering a little rocket between lanes to catch
   stars and slip past space rocks, paying tickets a star. Built like the
   other games: a painted close-up of the cabinet's screen, rules in the core,
   a recorded run, and real-key and touch e2e.
+- Working name: Comet Cruise. Three lanes, like Catch's; left and right
+  move the rocket a lane a press.
 - The back-row Star Racer cabinet stays as it is: its scribbled-out high
   score and the Star Racer token are clues in the finale (Milestone 55).
 - For the owner: the game and its name.

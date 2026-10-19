@@ -2922,7 +2922,7 @@ the old trail, the owl, and the clubhouse claim.
   by story progression. QA content is loaded only by the dev/harness dynamic
   module, keeping the player slot untouched and autosaves disabled.
 
-## Milestone 66: Experience and levels **Status:** 📋 Planned (design approved by the owner, 2026-10-18)
+## Milestone 66: Experience and levels **Status:** 🚧 In progress (2026-10-18; design approved by the owner)
 - The owner (2026-10-18): it works like a normal RPG. Experience raises the
   level, each level takes more XP than the last, harder critters pay more XP,
   and levels raise the stats. On screen: XP, Level, and the stats Power,

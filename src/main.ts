@@ -78,6 +78,15 @@ const saveKey = "cloverhollow-save";
 
 async function boot(): Promise<void> {
   preventPinchZoom();
+  // Sound starts first, before anything awaits (spec 3.3): its context and its
+  // key, pointer, and touch listeners exist before the page finishes loading,
+  // so only a gesture made after that can have unlocked it.
+  const sound = createAudio((audioState) => {
+    if (import.meta.env.DEV || import.meta.env.MODE === "harness")
+      console.log(
+        `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
+      );
+  });
   const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
   const qaTools = qaEnabled ? await import("./dev/qa") : null;
   const qaPacks: PackState[] = qaTools?.loadQaPacks() ?? [];
@@ -90,15 +99,6 @@ async function boot(): Promise<void> {
       qaError = error instanceof Error ? error.message : String(error);
     }
   }
-  // Sound starts first, before anything awaits (spec 3.3): its context and its
-  // key, pointer, and touch listeners exist before the page finishes loading,
-  // so only a gesture made after that can have unlocked it.
-  const sound = createAudio((audioState) => {
-    if (import.meta.env.DEV || import.meta.env.MODE === "harness")
-      console.log(
-        `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
-      );
-  });
   await app.init({
     resizeTo: window,
     backgroundColor: 0xf8edcf,

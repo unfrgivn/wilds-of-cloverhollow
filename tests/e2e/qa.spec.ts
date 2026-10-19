@@ -14,7 +14,7 @@ test(
   await step(page, 2);
   await expect(page.locator(".qa-menu")).toBeVisible();
   if (testInfo.project.name === "chromium")
-    await expect(page).toHaveScreenshot("qa-menu.png", { maxDiffPixelRatio: 0.02 });
+    await expect(page).toHaveScreenshot("qa-menu.png");
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("z");
   await step(page, 2);
@@ -51,13 +51,16 @@ test("a picked QA pack keeps the real-time loop running", async ({ page }) => {
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("z");
   await expect(page.locator(".qa-badge")).toBeVisible();
+  // Ticks wait while the picked pack's area loads, so wait for the loop itself
+  // to run before walking: a fixed hold could end before the area is ready.
+  const picked = await readState(page);
+  await expect.poll(async () => (await readState(page)).tick, { timeout: 10_000 })
+    .toBeGreaterThan(picked.tick);
   const before = await readState(page);
   await page.keyboard.down("ArrowRight");
-  await page.waitForTimeout(1500);
+  await expect.poll(async () => (await readState(page)).player.x, { timeout: 10_000 })
+    .toBeGreaterThan(before.player.x);
   await page.keyboard.up("ArrowRight");
-  const after = await readState(page);
-  expect(after.tick).toBeGreaterThan(before.tick);
-  expect(after.player.x).toBeGreaterThan(before.player.x);
 });
 
 test("the QA menu keeps Back to title visible on a phone viewport", async ({ page }) => {

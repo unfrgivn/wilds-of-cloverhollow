@@ -38,6 +38,7 @@ const content = loadContent();
 const outDir = "content/qa/saves";
 mkdirSync(outDir, { recursive: true });
 const manifest: ManifestPack[] = [];
+const statesById = new Map<string, State>();
 const bytes = new Set<string>();
 const origins = new Set<string>();
 const replayCache = new Map<string, { states: State[]; final: State }>();
@@ -83,14 +84,29 @@ const areaNames: Record<string, string> = {
   music: "the music room",
   enchanted: "the Enchanted Forest", field: "the field",
 };
-const nextBeats: Record<string, string> = {
-  jordan: "the lantern", lantern: "the woods", woods: "the school chapter", school: "the gym",
-  gym: "the music room", music: "the field", field: "the clubhouse", clubhouse: "the kitchen",
-  kitchen: "the arcade", arcade: "the lodge", lodge: "the squirrel trail", squirrel: "the mist",
-  mist: "the Enchanted Forest", forest: "the kid", kid: "the flute and lasso beats",
-  flute: "the lasso beat", lasso: "the ending",
-};
-function noteFor(spec: PackSpec, state: State): string {
+function progressionKey(state: State): [number, number, number, number, number, number] {
+  const variable = (name: string): number =>
+    content.world.storyVariable(state.ink, name) === true ? 1 : 0;
+  return [
+    variable("has_lantern"), variable("has_lasso"), variable("has_flute"),
+    state.stickers.length, state.coins, state.tick,
+  ];
+}
+function compareProgression(a: State, b: State): number {
+  const left = progressionKey(a);
+  const right = progressionKey(b);
+  for (let index = 0; index < left.length; index += 1) {
+    const leftValue = left[index];
+    const rightValue = right[index];
+    if (leftValue !== rightValue) return (leftValue ?? 0) - (rightValue ?? 0);
+  }
+  return 0;
+}
+function nextText(next: ManifestPack | undefined): string {
+  if (next === undefined) return "the ending";
+  return `the ${next.label.replace(/ shortcut$/, "").toLowerCase()}`;
+}
+function noteFor(spec: PackSpec, state: State, next: ManifestPack | undefined): string {
   if (!spec.interim) {
     if (spec.id === "breakfast")
       return "In the kitchen, just after Fae eats breakfast and leaves the table.";
@@ -100,20 +116,22 @@ function noteFor(spec: PackSpec, state: State): string {
       return "At the tree house, with chapter one complete; Bubblegum Bay is next.";
     return "On the road into Bubblegum Bay, ready to explore the new lands.";
   }
-  const party = state.party.length === 0
+  const partyNames = state.party.map((member) =>
+    content.world.party[member.id]?.name ?? member.id);
+  const party = partyNames.length === 0
     ? "Fae alone"
-    : `Fae with ${state.party.map((member) => member.id).join(", ")}`;
+    : `Fae with ${partyNames.map((name, index) => index === 0 ? name :
+      index === partyNames.length - 1 ? `and ${name}` : name)
+      .join(partyNames.length > 2 ? ", " : " ")}`;
   const tools = [
     content.world.storyVariable(state.ink, "has_lantern") === true ? "lantern" : "no lantern",
     content.world.storyVariable(state.ink, "has_lasso") === true ? "lasso" : "no lasso",
     content.world.storyVariable(state.ink, "has_flute") === true ? "flute" : "no flute",
   ].join(", ");
-  const run = spec.run.replace("pass-party/", "").replace(".json", "");
-  const next = nextBeats[run] ?? "the next story beat";
   const stickerCount = `${state.stickers.length} sticker${state.stickers.length === 1 ? "" : "s"}`;
   const location = areaNames[state.area] ?? state.area;
   return `Starts from the pass-party shortcut in ${location}, ${party}; ` +
-    `holds ${tools}, ${stickerCount}, and ${state.coins} coins. Next: ${next}.`;
+    `holds ${tools}, ${stickerCount}, and ${state.coins} coins. Next: ${nextText(next)}.`;
 }
 
 function replay(spec: PackSpec): { states: State[]; final: State } {
@@ -161,11 +179,33 @@ for (const spec of specs) {
     throw new Error(`Duplicate QA pack ${spec.id}`);
   bytes.add(serialized); origins.add(`${spec.run}:${tick}`);
   writeFileSync(`${outDir}/${spec.id}.json`, serialized);
+  statesById.set(spec.id, state);
   manifest.push({
-    id: spec.id, label: spec.label, note: noteFor(spec, state), fixture: spec.fixture,
+    id: spec.id, label: spec.label, note: "", fixture: spec.fixture,
     run: spec.run, tick, interim: spec.interim, hash: stableHash(state),
   });
 }
+const real = manifest.filter((pack) => !pack.interim);
+const interim = manifest.filter((pack) => pack.interim)
+  .sort((a, b) => compareProgression(
+    statesById.get(a.id) ?? (() => { throw new Error(`State missing for ${a.id}`); })(),
+    statesById.get(b.id) ?? (() => { throw new Error(`State missing for ${b.id}`); })(),
+  ));
+const ordered = [...real, ...interim];
+for (let index = 1; index < interim.length; index += 1) {
+  const previous = statesById.get(interim[index - 1]?.id ?? "");
+  const current = statesById.get(interim[index]?.id ?? "");
+  if (previous === undefined || current === undefined || compareProgression(previous, current) > 0)
+    throw new Error("QA interim manifest is not monotonic by progression key");
+}
+for (let index = 0; index < ordered.length; index += 1) {
+  const pack = ordered[index];
+  if (pack === undefined) throw new Error(`QA manifest missing entry ${index}`);
+  const state = statesById.get(pack.id);
+  if (state === undefined) throw new Error(`State missing for ${pack.id}`);
+  pack.note = noteFor(pack, state, pack.interim ? ordered[index + 1] : undefined);
+}
+manifest.splice(0, manifest.length, ...ordered);
 writeFileSync("content/qa/saves.json", `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(`wrote ${manifest.length} QA saves`);
 for (const pack of manifest) console.log(`${pack.id} tick=${pack.tick} run=${pack.run}`);

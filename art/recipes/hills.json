@@ -1,0 +1,23 @@
+{
+  "asset": "hills",
+  "date": "2026-10-18",
+  "summary": "Selected Clover Hills hand-painted whole map, split into a ground plate and six depth-sorted outdoor props. The broad path, lookout, flowers, and stepping stones remain painted into the ground plate.",
+  "model": "gemini-3-pro-image",
+  "source": "art/source/areas/hills/hills-final.png",
+  "config": "art/kit/hills.json",
+  "painting": "art/source/areas/hills/painting/ground.json",
+  "commands": [
+    "resize/crop selected painting to 3300x2200",
+    "tile into ground_0_0.webp and ground_1_0.webp",
+    "bun tools/art/kit.ts hills gen",
+    "bun tools/art/kit.ts hills masks",
+    "bun tools/art/kit.ts hills fill",
+    "bun tools/art/kit.ts hills pack",
+    "bun tools/art/kit.ts hills place"
+  ],
+  "subjects": ["great-oak", "left-edge-trees", "ridge-wall", "lower-wall", "meadow-boulders", "hairpin-boulders"],
+  "kept": {
+    "folder": "art/source/areas/hills/painting"
+  },
+  "notes": "Twelve isolate calls were made for the six painted subjects, with six additional calls after crop revisions. No fill calls were needed because every subject remains painted. The lookout, path, flowers, and stepping stones remain flat by design."
+}

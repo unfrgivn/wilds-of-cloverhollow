@@ -118,9 +118,12 @@ describe("Misty Path content", () => {
   it("names the Enchanted Forest only after the way is found or reached", () => {
     const enchanted = world.lands.find((land) => land.id === "enchanted");
     if (enchanted === undefined) throw new Error("enchanted land missing");
-    expect(mapLandName(enchanted, "cloverhollow", false)).toBe("???");
-    expect(mapLandName(enchanted, "cloverhollow", true)).toBe("The Enchanted Forest");
-    expect(mapLandName(enchanted, "enchanted", false)).toBe("The Enchanted Forest");
+    expect(mapLandName(enchanted, "cloverhollow", () => false)).toBe("???");
+    expect(mapLandName(enchanted, "cloverhollow", () => true)).toBe("The Enchanted Forest");
+    expect(mapLandName(enchanted, "enchanted", () => false)).toBe("The Enchanted Forest");
+    const bay = world.lands.find((land) => land.id === "bay");
+    if (bay === undefined) throw new Error("bay land missing");
+    expect(mapLandName(bay, "cloverhollow", () => false)).toBe("Bubblegum Bay");
   });
 });
 

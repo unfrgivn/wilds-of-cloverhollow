@@ -1,0 +1,70 @@
+{
+  "asset": "hedgehog",
+  "status": "generated-selected-owner-review",
+  "model": "gemini-3-pro-image",
+  "generationCalls": 7,
+  "date": "2026-10-18",
+  "referenceImages": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+  ],
+  "selectedOutputs": [
+    "art/source/critters/hedgehog/chaos-raw.png",
+    "art/source/critters/hedgehog/burst-raw.png",
+    "art/source/critters/hedgehog/soothed-raw.png",
+    "art/source/critters/hedgehog/calm-raw.png",
+    "art/source/critters/hedgehog/aura-white-raw.png"
+  ],
+  "scaleFactors": {
+    "chaos_idle_01": "uniform 380px target",
+    "chaos_burst_01": "uniform 380px target",
+    "soothed_01": "uniform 380px target",
+    "calm_idle_01": "uniform 380px target",
+    "chaos_aura_01": 0.2
+  },
+  "postProcessing": {
+    "keyColor": "#FF00FF",
+    "fuzz": "65%",
+    "despill": "edge-only magenta despill on the alpha boundary",
+    "frameCanvas": "512x512 source px",
+    "baseline": 504,
+    "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON",
+    "cleanup": "drop-islands.ts --min 120 only; preserves disconnected chaos swirls, stars, scribbles, and burst snowballs while removing only tiny matte debris; no morphology."
+  },
+  "checker": {
+    "bodyFrames": [
+      "calm_idle_01",
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01"
+    ],
+    "auraFrames": [
+      "chaos_aura_01"
+    ],
+    "matteMethods": {
+    "body": "magenta-key",
+      "aura": "white-lift"
+    },
+    "bodyHue": {
+      "min": 0.02,
+      "max": 0.18,
+      "minFraction": 0
+    }
+  },
+  "keyColourJustification": "#FF00FF is absent from the hedgehog subject; raw magenta backgrounds are keyed directly and despilled only along the alpha edge.",
+  "review": [
+    "art/review/hedgehog-sheet-cream.png",
+    "art/review/hedgehog-sheet-dark.png",
+    "art/review/hedgehog-lineup.png"
+  ],
+  "measuredCentres": {
+    "auraCentre": {
+      "x": 256,
+      "y": 256
+    },
+    "bodyCentre": {
+      "x": 256,
+      "y": 314
+    }
+  }
+}

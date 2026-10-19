@@ -1,0 +1,12 @@
+{
+  "area": "hills",
+  "spawn": "woods",
+  "seed": 1,
+  "party": [
+    "acorn-squirrel"
+  ],
+  "variables": {
+    "squirrel_friend": true,
+    "squirrel_with_me": true
+  }
+}

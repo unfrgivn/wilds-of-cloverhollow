@@ -208,5 +208,15 @@
     "tick": 18926,
     "interim": true,
     "hash": "648f4fbd"
+  },
+  {
+    "id": "hills-lookout",
+    "label": "Fae in Clover Hills at the lookout",
+    "note": "At the hills lookout with the Acorn Squirrel in the party, ready to inspect its cache.",
+    "fixture": "hills-lookout-qa",
+    "run": "hills/hills-lookout.json",
+    "tick": 0,
+    "interim": true,
+    "hash": "39ff3271"
   }
 ]

@@ -170,7 +170,7 @@ export type World = {
   surfaces: Record<string, SurfaceMap>;
   // The lands of the painted map (content/lands.json); `busStop` when the bus
   // line stops there.
-  lands: { id: string; name: string; busStop: boolean }[];
+  lands: { id: string; name: string; busStop: boolean; revealVariable?: string }[];
   story: Record<string, unknown>;
   critters: Record<string, Critter>;
   battle: BattleContent;
@@ -754,7 +754,10 @@ export type BattleView = {
 };
 // `party` overrides who starts in the party (test fixtures); the default is
 // every roster member with `start: true`, in roster order.
-export type Fixture = { area: string; spawn: string; seed?: number; party?: string[] };
+export type Fixture = {
+  area: string; spawn: string; seed?: number; party?: string[];
+  variables?: Record<string, boolean>;
+};
 // One friend in the party: member 0 follows Fae, member i follows member i-1,
 // each along its own breadcrumb trail of its leader's recent positions.
 export type PartyMember = {

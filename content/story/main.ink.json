@@ -4979,6 +4979,120 @@
           "#f": 1
         }
       ],
+      "lamb_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Baa! Thank you. My hooves feel steady again. ",
+        "#",
+        "^speaker: Clover Lamb",
+        "/#",
+        "\n",
+        "^A kid in a purple hood bounced past, and everything went fizzy! ",
+        "#",
+        "^speaker: Clover Lamb",
+        "/#",
+        "\n",
+        "^That hooded kid again! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^The clover up here is extra sweet. Want some? ",
+            "#",
+            "^speaker: Clover Lamb",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "hedgehog_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Thank you. My quills feel cozy again. ",
+        "#",
+        "^speaker: Meadow Hedgehog",
+        "/#",
+        "\n",
+        "^A kid in a purple hood left a fizzy crumb by the meadow. ",
+        "#",
+        "^speaker: Meadow Hedgehog",
+        "/#",
+        "\n",
+        "^A fizzy crumb? That sounds familiar. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^My daisy is still tucked safely in my hat. ",
+            "#",
+            "^speaker: Meadow Hedgehog",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
       "lift_note": [
         "^Glowing doodles on the lift tower! A masked face, a swirl, and a star. ",
         "#",
@@ -10558,6 +10672,116 @@
         "done",
         null
       ],
+      "arrive_hills": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "visited_hills",
+          "re": true
+        },
+        "done",
+        null
+      ],
+      "hills_lookout": [
+        "ev",
+        {
+          "VAR?": "lookout_cache_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The lookout is quiet and sunny. The Acorn Squirrel has already found the little cache. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "squirrel_with_me"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The lookout is quiet and sunny. A few wildflowers nod in the breeze. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.12"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "squirrel_with_me"
+        },
+        "!",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              "done",
+              {
+                "->": ".^.^.^.20"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^The Acorn Squirrel scampers behind a stone and returns with a tiny tin. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "lookout_cache_found",
+          "re": true
+        },
+        "^The lookout cache has two sweet treats! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^gift: snack 2",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
       "oak_squirrel_calm": [
         "ev",
         {
@@ -14745,6 +14969,14 @@
         false,
         {
           "VAR=": "found_mist_way"
+        },
+        false,
+        {
+          "VAR=": "visited_hills"
+        },
+        false,
+        {
+          "VAR=": "lookout_cache_found"
         },
         false,
         {

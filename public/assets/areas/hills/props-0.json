@@ -1,0 +1,156 @@
+{
+  "frames": {
+    "left-edge-trees": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 890,
+        "h": 895
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 890,
+        "h": 895
+      },
+      "sourceSize": {
+        "w": 890,
+        "h": 895
+      },
+      "anchor": {
+        "x": 0.18202,
+        "y": 0.98212
+      }
+    },
+    "great-oak": {
+      "frame": {
+        "x": 892,
+        "y": 0,
+        "w": 670,
+        "h": 646
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 670,
+        "h": 646
+      },
+      "sourceSize": {
+        "w": 670,
+        "h": 646
+      },
+      "anchor": {
+        "x": 0.4597,
+        "y": 1.04025
+      }
+    },
+    "lower-wall": {
+      "frame": {
+        "x": 1564,
+        "y": 0,
+        "w": 280,
+        "h": 263
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 280,
+        "h": 263
+      },
+      "sourceSize": {
+        "w": 280,
+        "h": 263
+      },
+      "anchor": {
+        "x": 0.49643,
+        "y": 1.0038
+      }
+    },
+    "ridge-wall": {
+      "frame": {
+        "x": 0,
+        "y": 897,
+        "w": 330,
+        "h": 123
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 330,
+        "h": 123
+      },
+      "sourceSize": {
+        "w": 330,
+        "h": 123
+      },
+      "anchor": {
+        "x": 0.39394,
+        "y": 1.28455
+      }
+    },
+    "hairpin-boulders": {
+      "frame": {
+        "x": 332,
+        "y": 897,
+        "w": 310,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 310,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 310,
+        "h": 122
+      },
+      "anchor": {
+        "x": 0.44194,
+        "y": 1.13115
+      }
+    },
+    "meadow-boulders": {
+      "frame": {
+        "x": 644,
+        "y": 897,
+        "w": 230,
+        "h": 83
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 230,
+        "h": 83
+      },
+      "sourceSize": {
+        "w": 230,
+        "h": 83
+      },
+      "anchor": {
+        "x": 0.44783,
+        "y": 0.9759
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 1020
+    },
+    "scale": "1"
+  }
+}

@@ -24,6 +24,12 @@
   },
   {
     "id": "enchanted",
-    "name": "The Enchanted Forest"
+    "name": "The Enchanted Forest",
+    "revealVariable": "found_mist_way"
+  },
+  {
+    "id": "hills",
+    "name": "Clover Hills",
+    "revealVariable": "visited_hills"
   }
 ]

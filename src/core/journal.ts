@@ -3,9 +3,12 @@ import { inkFacts } from "./sim";
 import type { State, World } from "./types";
 
 export function mapLandName(
-  land: { id: string; name: string }, currentLand: string | null, foundMistWay: boolean,
+  land: { id: string; name: string; revealVariable?: string },
+  currentLand: string | null,
+  isSet: (variable: string) => boolean,
 ): string {
-  return land.id === "enchanted" && currentLand !== "enchanted" && !foundMistWay
+  return (land.revealVariable !== undefined && currentLand !== land.id &&
+    !isSet(land.revealVariable))
     ? "???"
     : land.name;
 }

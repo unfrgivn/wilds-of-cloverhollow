@@ -26,7 +26,7 @@ import type {
   SetPiece,
   Wild,
 } from "./types";
-import { createInkState, runInk, storyHasKnot, type InkFacts } from "./ink";
+import { createInkState, runInk, setInkVariables, storyHasKnot, type InkFacts } from "./ink";
 import { sceneryArea } from "./props";
 import {
   checkDraws,
@@ -150,7 +150,9 @@ export function createState(
     Object.values(world.party)
       .filter((member) => member.start)
       .map((member) => member.id);
-  const ink = createInkState(world.story, seed);
+  const ink = setInkVariables(
+    createInkState(world.story, seed), fixture.variables ?? {},
+  );
   const state: State = {
     tick: 0,
     area: area.id,
@@ -1531,6 +1533,16 @@ function applyItemTags(state: State, tags: string[]): State {
  */
 export const CALM_HOOK = "on_calm";
 
+function afterArrival(world: World, state: State): State {
+  const area = world.areas[state.area];
+  if (area?.land !== "hills" || !storyHasKnot(world.story, "arrive_hills")) return state;
+  const result = runInk(world.story, state.ink, { type: "start", knot: "arrive_hills" },
+    inkFacts(world, state));
+  return result.line === null && result.choices.length === 0 && result.ended
+    ? { ...state, ink: result.ink }
+    : state;
+}
+
 function afterCalm(world: World, state: State): State {
   if (!storyHasKnot(world.story, CALM_HOOK)) return state;
   const result = runInk(world.story, state.ink, { type: "start", knot: CALM_HOOK },
@@ -2168,7 +2180,8 @@ function stepTick(
         backLink: held === undefined ? undefined : { area: state.area, direction: held },
       };
       // Every arrival rolls the area's critters fresh (a rest arrives too).
-      return { state: { ...arrived, ...rollWild(world, arrived, targetArea) }, events: [] };
+      const revealed = afterArrival(world, arrived);
+      return { state: { ...revealed, ...rollWild(world, revealed, targetArea) }, events: [] };
     }
     return {
       state: {

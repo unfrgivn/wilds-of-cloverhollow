@@ -511,6 +511,26 @@ Switch it on and look around. Fizzy tracks glow! # speaker: Jordan
 Squeak! Watch out for snowballs. Hee hee. # speaker: Hiker Hamster
 -> DONE
 
+=== lamb_calm ===
+{lamb_calm > 1: -> again}
+Baa! Thank you. My hooves feel steady again. # speaker: Clover Lamb
+A kid in a purple hood bounced past, and everything went fizzy! # speaker: Clover Lamb
+That hooded kid again! # speaker: Fae
+-> DONE
+= again
+The clover up here is extra sweet. Want some? # speaker: Clover Lamb
+-> DONE
+
+=== hedgehog_calm ===
+{hedgehog_calm > 1: -> again}
+Thank you. My quills feel cozy again. # speaker: Meadow Hedgehog
+A kid in a purple hood left a fizzy crumb by the meadow. # speaker: Meadow Hedgehog
+A fizzy crumb? That sounds familiar. # speaker: Fae
+-> DONE
+= again
+My daisy is still tucked safely in my hat. # speaker: Meadow Hedgehog
+-> DONE
+
 === lift_note ===
 Glowing doodles on the lift tower! A masked face, a swirl, and a star. # speaker: Fae
 The squiggles look like secret writing. Was the hooded kid leaving a message for someone? # speaker: Fae
@@ -1244,6 +1264,22 @@ VAR swung = false
 VAR stash_found = false
 VAR bridge_down = false
 VAR found_mist_way = false
+VAR visited_hills = false
+
+=== arrive_hills ===
+~ visited_hills = true
+-> DONE
+
+VAR lookout_cache_found = false
+
+=== hills_lookout ===
+{lookout_cache_found: The lookout is quiet and sunny. The Acorn Squirrel has already found the little cache. # speaker: Fae}
+{not squirrel_with_me: The lookout is quiet and sunny. A few wildflowers nod in the breeze. # speaker: Fae}
+{not squirrel_with_me: -> DONE}
+The Acorn Squirrel scampers behind a stone and returns with a tiny tin. # speaker: Fae
+~ lookout_cache_found = true
+The lookout cache has two sweet treats! # speaker: Fae # gift: snack 2
+-> DONE
 VAR rope_bridge = false
 VAR seal_open = false
 VAR mist_notes = 0

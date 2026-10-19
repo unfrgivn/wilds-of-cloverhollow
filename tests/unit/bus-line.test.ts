@@ -100,12 +100,12 @@ const calm = ["fountain-frog", "pond-pup", "bay-bluebird"];
 const bluebirdFizzy = ["fountain-frog", "pond-pup"];
 
 describe("the lands", () => {
-  it("are the six lands of the painted map, in order", () => {
+  it("are the seven lands of the painted map, in order", () => {
     expect(world.lands.map((land) => land.id))
-      .toEqual(["cloverhollow", "bay", "pass", "trail", "forest", "enchanted"]);
+      .toEqual(["cloverhollow", "bay", "pass", "trail", "forest", "enchanted", "hills"]);
     expect(world.lands.map((land) => land.name)).toEqual([
       "Cloverhollow", "Bubblegum Bay", "Pinecone Pass", "Cliffside Trail", "The Forest",
-      "The Enchanted Forest",
+      "The Enchanted Forest", "Clover Hills",
     ]);
   });
 
@@ -117,7 +117,7 @@ describe("the lands", () => {
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
       bay: "bay", pass: "pass", trail: "trail", mist: "enchanted",
-      enchanted: "enchanted",
+      enchanted: "enchanted", hills: "hills",
     };
     for (const area of Object.values(world.areas)) {
       if (area.id === "harness") {

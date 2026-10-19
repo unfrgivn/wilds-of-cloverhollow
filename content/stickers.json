@@ -1,5 +1,5 @@
 {
-  "slots": 13,
+  "slots": 15,
   "catalogue": [
     {
       "id": "hooded-kid",
@@ -77,6 +77,18 @@
       "id": "lodge-keeper",
       "name": "Mrs. Flurry",
       "critter": "lodge-keeper",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "clover-lamb",
+      "name": "Clover Lamb",
+      "critter": "lamb",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "meadow-hedgehog",
+      "name": "Meadow Hedgehog",
+      "critter": "hedgehog",
       "frame": "calm_idle_01"
     }
   ]

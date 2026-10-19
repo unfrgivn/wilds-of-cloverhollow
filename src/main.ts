@@ -643,7 +643,7 @@ async function boot(): Promise<void> {
       lands: content.world.lands.map((land) => ({
         ...land,
         name: mapLandName(land, content.world.areas[state.area]?.land ?? null,
-          content.world.storyVariable(state.ink, "found_mist_way") === true),
+          (variable) => content.world.storyVariable(state.ink, variable) === true),
         ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
       })),
       currentLand: content.world.areas[state.area]?.land ?? null,

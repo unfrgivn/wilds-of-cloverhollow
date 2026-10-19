@@ -2789,7 +2789,7 @@ the old trail, the owl, and the clubhouse claim.
   - The sprite, his size, the knothole, the reward, and the wording are in
     the owner's review queue.
 
-## Milestone 62: Clover Hills **Status:** 🚧 In progress (2026-10-18)
+## Milestone 62: Clover Hills **Status:** ✅ Completed (2026-10-18)
 - The owner asked for more open world between the towns, to explore and to
   meet bad guys on the way (2026-10-18). NOTES.md lists meadows and hills,
   and wants more casual enemies, mostly animals under the chaos spell, in
@@ -2810,6 +2810,27 @@ the old trail, the owl, and the clubhouse claim.
 - Assumption: the owner said "keep going" twice after asking for this, so
   the route was picked without asking which one. A road from the plaza to
   the bay was set aside because the finale's recorded runs walk that edge.
+- Built and wired the Clover Hills painting and six-piece depth-sorted kit,
+  including the lamb and hedgehog sheets. The painted walkable ground was
+  traced from the painting; its west park door sits on the park's northeast
+  gap by the play tower and signpost, and its north door leads to the woods.
+  Hills has no bus stop. The lower meadow den rolls lamb, hedgehog, and bunny;
+  the upper den rolls squirrel and raccoon. The lookout's flute friend is the
+  Acorn Squirrel, who climbs for two snacks.
+- Map labels are data-driven through each land's `revealVariable`; lands with
+  no reveal variable are always known. Hills uses `visited_hills`, set on its
+  silent arrival hook, so its label survives leaving and save/load. Footsteps
+  use sand on the dirt path and stone at the lookout.
+- Evidence: core unit tests for the land, doors, dens, surfaces, and map label;
+  the recurring hills simulation; real-key hills e2e coverage for both doors,
+  recurrence, the lookout with and without the Acorn Squirrel (using the
+  labeled `hills-lookout` QA save pack), and map reveal;
+  and the viewed review captures in `art/review/` (including the hills
+  painting/kit, the lamb and hedgehog sheets, and the lookout).
+- Assumptions recorded for the owner: lamb and hedgehog are the new kinds,
+  alongside bunny, squirrel, and raccoon; den placement follows the painted
+  meadows; and the hills door uses the park's northeast gap by the play tower
+  and signpost rather than changing the park's existing town edges.
 
 ## Milestone 63: The art teacher **Status:** 🚧 In progress (2026-10-18)
 - The owner asked for more mini-bosses (2026-10-18; NOTES.md: more

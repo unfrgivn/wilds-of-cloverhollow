@@ -752,11 +752,26 @@ ios/            Capacitor iOS project (from Milestone 4).
     the bridge's and lever's rules lay the footbridge across the creek and
     pull the lever down, opening the crossing for the way back.
   - Also: `hopscotch` and `tetherball` to look at. Nobody names the kid.
-- The six painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
+- The seven painted lands are `cloverhollow` (Cloverhollow), `bay` (Bubblegum
   Bay), `pass` (Pinecone Pass), `trail` (Cliffside Trail), `forest` (The Forest),
-  and `enchanted` (The Enchanted Forest), in that order. Every non-harness area
-  belongs to one. Bubblegum Bay has a bus-stop prop at (355, 505), with spawn
-  `bus-stop` at (355, 545), by the welcome sign.
+  `enchanted` (The Enchanted Forest), and `hills` (Clover Hills), in that order.
+  Every non-harness area belongs to one. Bubblegum Bay has a bus-stop prop at
+  (355, 505), with spawn `bus-stop` at (355, 545), by the welcome sign. Clover
+  Hills has no bus stop and its map label is hidden until Fae first arrives there,
+  then remains revealed in saves and after she leaves. Its west door is on the painted
+  path at the left edge and its north door is on the path exit at x=1000..1080; the
+  return spawns are on those paths, at (180,650) from the park and (1040,180) from
+  the woods. The painted lookout cache is by the oak's stepping stones at (1130,345).
+  Its open meadow ground is traced from the painting and its den rolls the new lamb
+  and hedgehog kinds alongside bunny at (450,850), plus a second den of squirrels
+  and raccoons at (700,200). The lookout cache is the Acorn Squirrel's secret: with
+  Fae's flute friend along, he climbs and returns two snacks; without him it is only
+  a view. The dirt path sounds like sand and the lookout's stepping stones sound like
+  stone. These recurring encounters use the same arrival rolls, calm rewards, stickers,
+  and temporary calm state as the trail. Map labels are data-driven: lands with no
+  `revealVariable` are always known, while Hills uses `visited_hills` and reveals on
+  its silent arrival hook. The Hills doors are the painted park gap by the play tower
+  and signpost and the north path exit to the woods; there is no bus stop.
 - At the pass, Jordan stands by the snowman (person `jordan`, knot `jordan`,
   `Talk`) watching the Snowball Hamster, a critter loose in the clearing at
   (850, 760). He joins whatever Fae answers (`jordan_joined`); the calm
@@ -1803,9 +1818,10 @@ ios/            Capacitor iOS project (from Milestone 4).
 
 ## 9. Journal and stickers
 - The journal is the pause menu: Notes (current goals, written from Ink), a
-  Sticker album, and a painted MAP page. The map labels all six lands, shows
-  `???` for the sealed Enchanted Forest until Fae finds the Misty Path or enters
-  that land, puts a bobbing gold star over Fae's current land, and leads each
+  Sticker album, and a painted MAP page. The map labels all seven lands, shows
+  `???` only for lands with an unmet `revealVariable` (currently the Hills and
+  sealed Enchanted Forest), puts a bobbing gold star over Fae's current land,
+  and leads each
   stop's name with the bus line's sign (lands with `busStop`). It is
   presentation only, outside the core state and saves. The journal's view
   carries each land's display name (`mapLandName` in `src/core/journal.ts`,
@@ -2448,8 +2464,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   by the software renderer differs at a few edge pixels and is redrawn (and
   viewed) like any other change.
 - Fixtures (`content/fixtures/<name>.json`) contain `area`, `spawn`, an
-  optional `seed`, and an optional `party` (member ids, overriding the
-  roster's `start` members; test-only). Sim scripts live in
+  optional `seed`, an optional `party` (member ids, overriding the
+  roster's `start` members; test-only), and optional declared boolean
+  `variables` for deterministic QA fixtures. Sim scripts live in
   `tests/sim/scripts/<fixture>/` and are arrays of
   `{ frame: ActionFrame, ticks: number }` segments; `bun run sim` starts each
   from its folder's fixture and checks collision for Fae and every party

@@ -31,6 +31,20 @@ export function createInkState(storyJson: StoryJson, seed: number): string {
   return json;
 }
 
+export function setInkVariables(inkJson: string, variables: Record<string, boolean>): string {
+  const value: unknown = JSON.parse(inkJson);
+  if (typeof value !== "object" || value === null || Array.isArray(value))
+    throw new Error("Ink state was not an object");
+  const root: Record<string, unknown> = Object.fromEntries(Object.entries(value));
+  const current = root.variablesState;
+  if (typeof current !== "object" || current === null || Array.isArray(current))
+    throw new Error("Ink variables were not an object");
+  const state: Record<string, unknown> = Object.fromEntries(Object.entries(current));
+  for (const [name, enabled] of Object.entries(variables)) state[name] = enabled;
+  root.variablesState = state;
+  return JSON.stringify(root);
+}
+
 // Whether the compiled story has a top-level knot `name`: its root's last
 // element holds the knots by name.
 export function storyHasKnot(storyJson: StoryJson, name: string): boolean {

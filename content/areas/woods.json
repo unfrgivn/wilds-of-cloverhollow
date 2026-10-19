@@ -225,6 +225,31 @@
         "variable": "clubhouse_claimed",
         "knot": "club_ladder"
       }
+    },
+    {
+      "id": "hills",
+      "polygon": [
+        [
+          650,
+          1020
+        ],
+        [
+          850,
+          1020
+        ],
+        [
+          850,
+          1100
+        ],
+        [
+          650,
+          1100
+        ]
+      ],
+      "target": {
+        "area": "hills",
+        "spawn": "woods"
+      }
     }
   ],
   "interactables": [
@@ -288,6 +313,11 @@
       "x": 735,
       "y": 548,
       "facing": "down"
+    },
+    "hills": {
+      "x": 950,
+      "y": 950,
+      "facing": "up"
     }
   },
   "npcs": [],

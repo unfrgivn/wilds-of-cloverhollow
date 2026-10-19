@@ -1,0 +1,111 @@
+{
+  "id": "hedgehog",
+  "species": "hedgehog",
+  "name": "Prickly Hedgehog",
+  "calmName": "Meadow Hedgehog",
+  "atlas": "assets/critters/hedgehog/hedgehog.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 320
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "meadow-hedgehog",
+    "name": "Meadow Hedgehog",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "hedgehog_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "grumpy",
+    "curious",
+    "hungry"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.3,
+    "check": {
+      "kind": "ring",
+      "ticks": 60,
+      "targetTick": 45,
+      "greatWindow": 5,
+      "goodWindow": 11
+    }
+  },
+  "lines": {
+    "intro": "A fizzy hedgehog waddles out of the meadow, quills all a-twinkle!",
+    "command": "How can Fae calm the hedgehog?",
+    "soothe": {
+      "great": "Fae whispers a quiet tune. The hedgehog curls up peacefully.",
+      "good": "Fae whispers softly. The hedgehog blinks beneath its hat.",
+      "miss": "The hedgehog grumbles louder than Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie plays peekaboo behind a fern. The hedgehog uncurls!",
+        "good": "Maddie wiggles a leaf. The hedgehog peeks out.",
+        "miss": "Maddie pounces at a shadow. The hedgehog curls tight."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon through the meadow. The hedgehog follows it!",
+        "good": "Sue twirls her ribbon. The hedgehog watches.",
+        "miss": "Sue’s ribbon tangles in a daisy. The hedgehog blinks."
+      },
+      "juggle": {
+        "great": "Jordan juggles pinecones. The hedgehog hoots in rhythm!",
+        "good": "Jordan tosses a pinecone. The hedgehog sniffs it.",
+        "miss": "Jordan drops a pinecone with a thunk. The hedgehog grumbles."
+      }
+    },
+    "snack": "Fae offers a fizzy cracker crumb. The hedgehog nibbles carefully.",
+    "burst": "The hedgehog curls and sends a ring of fizzy quills through the meadow!",
+    "burstResult": {
+      "great": "Fae steps neatly through the ring!",
+      "good": "Fae dodges the prickliest quills!",
+      "miss": "Ouch! Fae gets a poke from a fizzy quill."
+    },
+    "soothed": "The hedgehog gives a sleepy snuffle. The fizzy spell fades away!",
+    "rest": "Fae needs a quiet rest after those prickles.",
+    "run": "Fae backs away through the meadow. The hedgehog watches."
+  },
+  "coins": 8
+}

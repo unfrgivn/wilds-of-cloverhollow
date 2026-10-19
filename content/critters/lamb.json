@@ -1,0 +1,128 @@
+{
+  "id": "lamb",
+  "species": "lamb",
+  "name": "Bouncy Lamb",
+  "calmName": "Clover Lamb",
+  "atlas": "assets/critters/lamb/lamb.json",
+  "auraCentre": {
+    "x": 256,
+    "y": 256
+  },
+  "bodyCentre": {
+    "x": 256,
+    "y": 320
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "clover-lamb",
+    "name": "Clover Lamb",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "lamb_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "hungry",
+    "bored"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.3,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        66,
+        92
+      ],
+      "look": "dust"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        62,
+        84,
+        106,
+        128
+      ],
+      "look": "dust"
+    }
+  },
+  "lines": {
+    "intro": "A fizzy lamb bounds out of the clover, bells jingling!",
+    "command": "How can Fae calm the lamb?",
+    "soothe": {
+      "great": "Fae hums a soft lullaby. The lamb settles into the clover.",
+      "good": "Fae hums softly. The lamb slows its bouncing.",
+      "miss": "The lamb is too busy bouncing to hear Fae."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie plays tag through the clover. The lamb bounds after her!",
+        "good": "Maddie wiggles a leaf. The lamb gives a happy hop.",
+        "miss": "Maddie trips over a clover patch. The lamb keeps bouncing."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber over the clover. The lamb chases it!",
+        "good": "Sue twirls her bobber. The lamb watches with bright eyes.",
+        "miss": "Sue’s bobber snags on a stem. The lamb blinks."
+      },
+      "juggle": {
+        "great": "Jordan juggles pinecones. The lamb hops in rhythm!",
+        "good": "Jordan tosses a pinecone. The lamb sniffs it.",
+        "miss": "Jordan drops a pinecone with a thunk. The lamb keeps hopping."
+      }
+    },
+    "snack": "Fae shares a crunchy clover biscuit. The lamb munches happily!",
+    "burst": "The lamb bounds in a dizzy chain, sending clover petals everywhere!",
+    "burstResult": {
+      "great": "Fae hops over every flying clover petal!",
+      "good": "Fae dodges most of the petals!",
+      "miss": "Poof! Fae gets a face full of clover."
+    },
+    "soothed": "The lamb gives a tiny bell jingle. The fizzy spell melts away!",
+    "rest": "Fae is all tuckered out. Time for a rest.",
+    "run": "Fae tiptoes away through the grass. The lamb keeps bouncing."
+  },
+  "coins": 8
+}

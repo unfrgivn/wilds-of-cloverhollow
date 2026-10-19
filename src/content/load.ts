@@ -18,6 +18,8 @@ import clubhouseData from "../../content/areas/clubhouse.json";
 import lodgeData from "../../content/areas/lodge.json";
 import mistData from "../../content/areas/mist.json";
 import enchantedData from "../../content/areas/enchanted.json";
+import hillsData from "../../content/areas/hills.json";
+import hillsPropsData from "../../content/props/hills.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
 import prizesData from "../../content/prizes.json";
@@ -43,6 +45,7 @@ import clubhouseSurfaceData from "../../content/surfaces/clubhouse.json";
 import lodgeSurfaceData from "../../content/surfaces/lodge.json";
 import mistSurfaceData from "../../content/surfaces/mist.json";
 import enchantedSurfaceData from "../../content/surfaces/enchanted.json";
+import hillsSurfaceData from "../../content/surfaces/hills.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
 import kitchenPropsData from "../../content/props/kitchen.json";
@@ -70,8 +73,13 @@ import schoolFixtureData from "../../content/fixtures/school.json";
 import bayFixtureData from "../../content/fixtures/bay.json";
 import passFixtureData from "../../content/fixtures/pass.json";
 import trailFixtureData from "../../content/fixtures/trail.json";
+import hillsFixtureData from "../../content/fixtures/hills.json";
 import passPartyFixtureData from "../../content/fixtures/pass-party.json";
 import woodsFixtureData from "../../content/fixtures/woods.json";
+import parkEastFixtureData from "../../content/fixtures/park-east.json";
+import hillsNorthFixtureData from "../../content/fixtures/hills-north.json";
+import hillsCalmFixtureData from "../../content/fixtures/hills-calm.json";
+import hillsLookoutQaFixtureData from "../../content/fixtures/hills-lookout-qa.json";
 import kitchenFixtureData from "../../content/fixtures/kitchen.json";
 import classroomFixtureData from "../../content/fixtures/classroom.json";
 import gymFixtureData from "../../content/fixtures/gym.json";
@@ -91,6 +99,8 @@ import schoolRaccoonData from "../../content/critters/school-raccoon.json";
 import bluebirdData from "../../content/critters/bluebird.json";
 import hamsterData from "../../content/critters/hamster.json";
 import bunnyData from "../../content/critters/bunny.json";
+import lambData from "../../content/critters/lamb.json";
+import hedgehogData from "../../content/critters/hedgehog.json";
 import squirrelData from "../../content/critters/squirrel.json";
 import gullData from "../../content/critters/gull.json";
 import owlData from "../../content/critters/owl.json";
@@ -1052,7 +1062,7 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
   field(
     value.land === undefined ||
       (typeof value.land === "string" &&
-        ["cloverhollow", "bay", "pass", "trail", "forest", "enchanted"].some(
+        ["cloverhollow", "bay", "pass", "trail", "forest", "enchanted", "hills"].some(
           (id) => id === value.land,
         )),
     file,
@@ -1807,11 +1817,28 @@ export function parseFixture(value: unknown, file: string): Fixture {
     file,
     "party",
   );
+  const variables = value.variables;
+  field(
+    variables === undefined ||
+      (record(variables) &&
+        Object.values(variables).every((enabled) => typeof enabled === "boolean")),
+    file,
+    "variables",
+  );
+  const parsedVariables: Record<string, boolean> = {};
+  if (record(variables)) {
+    for (const [name, enabled] of Object.entries(variables)) {
+      if (typeof enabled === "boolean") parsedVariables[name] = enabled;
+    }
+  }
   return {
     area: value.area,
     spawn: value.spawn,
     ...(value.seed === undefined ? {} : { seed: value.seed }),
     ...(party === undefined ? {} : { party }),
+    ...(variables === undefined
+      ? {}
+      : { variables: parsedVariables }),
   };
 }
 
@@ -1950,12 +1977,15 @@ export function loadContent(): {
     parsePropCatalogue(mistPropsData, "content/props/mist.json"));
   const enchanted = parseArea(enchantedData, "content/areas/enchanted.json",
     parsePropCatalogue(enchantedPropsData, "content/props/enchanted.json"));
+  const hills = parseArea(hillsData, "content/areas/hills.json",
+    parsePropCatalogue(hillsPropsData, "content/props/hills.json"));
   field(
     Array.isArray(landsData) &&
       landsData.every(
         (land) =>
           record(land) && typeof land.id === "string" && typeof land.name === "string" &&
-          (!("busStop" in land) || typeof land.busStop === "boolean"),
+          (!("busStop" in land) || typeof land.busStop === "boolean") &&
+          (!("revealVariable" in land) || typeof land.revealVariable === "string"),
       ),
     "content/lands.json",
     "lands",
@@ -1964,6 +1994,7 @@ export function loadContent(): {
     id: land.id,
     name: land.name,
     busStop: "busStop" in land && land.busStop === true,
+    ...(typeof land.revealVariable === "string" ? { revealVariable: land.revealVariable } : {}),
   }));
   const story = parseStoryJson(storyData, "content/story/main.ink.json");
   const critterFiles: [unknown, string][] = [
@@ -1976,6 +2007,8 @@ export function loadContent(): {
     [bluebirdData, "bluebird"],
     [hamsterData, "hamster"],
     [bunnyData, "bunny"],
+    [lambData, "lamb"],
+    [hedgehogData, "hedgehog"],
     [squirrelData, "squirrel"],
     [gullData, "gull"],
     [owlData, "owl"],
@@ -2031,7 +2064,15 @@ export function loadContent(): {
     pass: parseFixture(passFixtureData, "content/fixtures/pass.json"),
     "pass-party": parseFixture(passPartyFixtureData, "content/fixtures/pass-party.json"),
     trail: parseFixture(trailFixtureData, "content/fixtures/trail.json"),
+    hills: parseFixture(hillsFixtureData, "content/fixtures/hills.json"),
     woods: parseFixture(woodsFixtureData, "content/fixtures/woods.json"),
+    "park-east": parseFixture(parkEastFixtureData, "content/fixtures/park-east.json"),
+    "hills-north": parseFixture(hillsNorthFixtureData, "content/fixtures/hills-north.json"),
+    "hills-calm": parseFixture(hillsCalmFixtureData, "content/fixtures/hills-calm.json"),
+    "hills-lookout-qa": parseFixture(
+      hillsLookoutQaFixtureData,
+      "content/fixtures/hills-lookout-qa.json",
+    ),
     kitchen: parseFixture(kitchenFixtureData, "content/fixtures/kitchen.json"),
     classroom: parseFixture(classroomFixtureData, "content/fixtures/classroom.json"),
     gym: parseFixture(gymFixtureData, "content/fixtures/gym.json"),
@@ -2066,6 +2107,7 @@ export function loadContent(): {
     [lodge.id]: lodge,
     [mist.id]: mist,
     [enchanted.id]: enchanted,
+    [hills.id]: hills,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -2076,6 +2118,7 @@ export function loadContent(): {
     field: fieldSurfaceData, clubhouse: clubhouseSurfaceData, lodge: lodgeSurfaceData,
     mist: mistSurfaceData,
     enchanted: enchantedSurfaceData,
+    hills: hillsSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);
   const ruleProblems = propRuleErrors(areas, (name) => storyVariable(initialInk, name));

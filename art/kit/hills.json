@@ -1,0 +1,74 @@
+{
+  "area": "hills",
+  "subjects": [
+    {
+      "id": "great-oak",
+      "crop": [1000, 0, 500, 520],
+      "seed": [1230, 270],
+      "home": [1240, 390],
+      "painted": true,
+      "canopy": true,
+      "ground": "the soft green meadow grass",
+      "object": "the complete large hilltop oak in the upper-right: its entire leafy crown, brown trunk, branching roots, and warm ink outline down to the ground; not the stone wall, boulder, flowers, or grass",
+      "samples": {"object": 2},
+      "footprint": [[[1165, 365], [1200, 355], [1270, 357], [1320, 375], [1310, 390], [1190, 390]]]
+    },
+    {
+      "id": "left-edge-trees",
+      "crop": [0, 0, 600, 1050],
+      "seed": [95, 470],
+      "home": [105, 530],
+      "painted": true,
+      "canopy": true,
+      "ground": "the soft green meadow grass",
+      "object": "the tall trees and leafy edge foliage along the far left border, including their visible trunks, roots, and crowns; not the path, flowers, or open grass",
+      "samples": {"object": 2},
+      "footprint": [[[35, 500], [70, 495], [105, 500], [125, 520], [115, 530], [35, 530]]]
+    },
+    {
+      "id": "ridge-wall",
+      "crop": [820, 370, 240, 150],
+      "seed": [930, 435],
+      "home": [930, 500],
+      "painted": true,
+      "canopy": false,
+      "ground": "the green meadow grass beside the path",
+      "object": "the complete low dry-stone wall crossing the upper path bend, including every stone and its warm ink outline; not the path, flowers, or grass",
+      "footprint": [[[860, 465], [1000, 465], [1000, 490], [860, 490]]]
+    },
+    {
+      "id": "lower-wall",
+      "crop": [1070, 470, 220, 220],
+      "seed": [1150, 560],
+      "home": [1190, 620],
+      "painted": true,
+      "canopy": false,
+      "ground": "the green meadow grass beside the path",
+      "object": "the complete low dry-stone wall stepping along the lower hairpin bend, including its stacked stones and warm ink outline; not the path, flowers, or grass",
+      "samples": {"object": 2},
+      "footprint": [[[1120, 505], [1260, 595], [1260, 620], [1120, 530]]]
+    },
+    {
+      "id": "meadow-boulders",
+      "crop": [390, 290, 150, 130],
+      "seed": [455, 350],
+      "home": [455, 398],
+      "painted": true,
+      "canopy": false,
+      "ground": "the soft green meadow grass",
+      "object": "the complete pair of rounded standing boulders in the upper meadow, including their mossy faces and dark ink outlines; not flowers or grass",
+      "footprint": [[[420, 370], [505, 370], [505, 398], [420, 398]]]
+    },
+    {
+      "id": "hairpin-boulders",
+      "crop": [960, 700, 180, 180],
+      "seed": [1030, 790],
+      "home": [1040, 850],
+      "painted": true,
+      "canopy": false,
+      "ground": "the soft green meadow grass",
+      "object": "the complete standalone boulder pair inside the lower hairpin, including their mossy rock faces and dark ink outlines; not the path, flowers, or grass",
+      "footprint": [[[1000, 835], [1065, 835], [1065, 855], [1000, 855]]]
+    }
+  ]
+}

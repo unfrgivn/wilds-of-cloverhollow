@@ -21,13 +21,15 @@ test("the journal map names every land and marks Cloverhollow", async ({ page })
     "Cloverhollow",
     "Bubblegum Bay",
     "Pinecone Pass",
-    "Cliffside Trail",
-    "The Forest",
-    "???",
+      "Cliffside Trail",
+      "The Forest",
+      "???",
+      "???",
   ]);
   await expect(page.locator(".journal-map-star"))
     .toHaveAttribute("data-land", "cloverhollow");
   await expect(page.locator(".journal-map-star")).toBeVisible();
+  await page.screenshot({ path: "art/review/m62-map-labels.jpeg", type: "jpeg", quality: 90 });
   const stops = page.locator(".journal-map-stop");
   await expect(stops).toHaveCount(3);
   expect(await stops.evaluateAll((items) => items.map((item) => item.getAttribute("data-land"))))

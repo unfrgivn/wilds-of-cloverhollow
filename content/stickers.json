@@ -1,5 +1,5 @@
 {
-  "slots": 15,
+  "slots": 16,
   "catalogue": [
     {
       "id": "hooded-kid",
@@ -77,6 +77,12 @@
       "id": "lodge-keeper",
       "name": "Mrs. Flurry",
       "critter": "lodge-keeper",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "lifeguard",
+      "name": "Ms. Coral",
+      "critter": "lifeguard",
       "frame": "calm_idle_01"
     },
     {

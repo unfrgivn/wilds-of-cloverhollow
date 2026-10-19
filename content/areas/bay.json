@@ -206,7 +206,16 @@
       "prompt": "Look"
     }
   ],
-  "critters": [],
+  "critters": [
+    {
+      "id": "lifeguard",
+      "point": {
+        "x": 760,
+        "y": 590
+      },
+      "visibleWhile": "lifeguard_back"
+    }
+  ],
   "recurring": {
     "dens": [
       {

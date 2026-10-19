@@ -553,6 +553,7 @@ export type Critter = {
   auraCentre: Point;
   bodyCentre: Point;
   figureHeight: number;
+  toyScale: number;
   overworldHeight: number;
   battleHeight: number;
   touchRadius: number;

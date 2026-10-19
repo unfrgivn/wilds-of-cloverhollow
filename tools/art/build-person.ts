@@ -154,6 +154,7 @@ await run(["magick", "-size", "512x512", "xc:none", auraScaled, "-gravity", "cen
   "-geometry", "+0+0", "-composite", `${frames}/chaos_aura_01.png`]);
 
 const atlasNames = [...names, "chaos_aura_01"];
+await run(["mkdir", "-p", `public/assets/critters/${id}`]);
 await run(["magick", "montage", ...atlasNames.map((name) => `${frames}/${name}.png`),
   "-tile", "3x2", "-geometry", "512x512+0+0", "-background", "none",
   `public/assets/critters/${id}/${id}.png`]);

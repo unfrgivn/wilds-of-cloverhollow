@@ -1,6 +1,6 @@
 {
   "model": null,
-  "date": "2026-10-17",
+  "date": "2026-10-18",
   "threshold": 8,
   "padding": 4,
   "sources": [
@@ -195,6 +195,42 @@
           "name": "snowball-07",
           "x": 382,
           "y": 379
+        }
+      ]
+    },
+    {
+      "name": "bay-beach-ball-left",
+      "atlas": "public/assets/areas/bay/props-1.png",
+      "frame": "beach-ball-left",
+      "seeds": [
+        {
+          "name": "beach-ball-01",
+          "x": 70,
+          "y": 68
+        }
+      ]
+    },
+    {
+      "name": "bay-beach-ball-right",
+      "atlas": "public/assets/areas/bay/props-1.png",
+      "frame": "beach-ball-right",
+      "seeds": [
+        {
+          "name": "beach-ball-02",
+          "x": 70,
+          "y": 67
+        }
+      ]
+    },
+    {
+      "name": "bay-beach-ball-top",
+      "atlas": "public/assets/areas/bay/props-1.png",
+      "frame": "beach-ball-top",
+      "seeds": [
+        {
+          "name": "beach-ball-03",
+          "x": 60,
+          "y": 57
         }
       ]
     }

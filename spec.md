@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-18 (Milestones 53 to 58, and 60)
+Last updated: 2026-10-18 (Milestones 53 to 58, 60, and 64)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -707,6 +707,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   out, and a paper plane doodled in the corner), and Biscuit asleep
   (`lodge_hamster`). Its floor is wood, and its fixture `lodge` stands at the
   door with the whole party.
+- The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
+  picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
+  owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),
+  a set piece on the sand by the dock approach. Until then the picnic reads as
+  it always has. Calmed, she tells of the hooded kid's soda and shares her
+  watermelon (`gift: snack 3`, once); the picnic then has its shared line
+  (`bay_picnic.shared`). The journal tells of her fizzy, then calm.
 - The clubhouse (Milestone 43): `clubhouse`, "Clubhouse", in the `forest` land,
   is a 1200x800 painted cutaway of the Whispering Woods tree house's one room
   and its deck. The ladder at the tree house's front in the woods is a door
@@ -875,8 +882,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `visibleWhile` (an Ink variable) puts one there only while it's true. The
   set pieces are the fountain frog (plaza), the school raccoon (plaza, while
   `raccoon_waiting`), the grumpy gull (the trail's lookout), Mr. Pip, the
-  arcade keeper (the arcade), the gym pup (the gym), and Mrs. Flurry, the
-  lodge keeper (the pass, on her porch at (1300, 590), while `keeper_back`).
+  arcade keeper (the arcade), the gym pup (the gym), Mrs. Flurry, the lodge
+  keeper (the pass, on her porch at (1300, 590), while `keeper_back`), and
+  Ms. Coral, the lifeguard (the bay, on the sand by the dock approach at (760,
+  590), while `lifeguard_back`).
 - Recurring critters, EarthBound style, are an area's `recurring`:
   `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
   (a door, a bus ride, a rest's fade, and the start of a game or fixture)
@@ -1320,8 +1329,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   has its own lines, atlas, sticker, and calm knot. Mrs. Flurry, the lodge
   keeper (`lodge-keeper`, Milestone 57; feelings zoomy, grumpy, hungry; 25
   coins), is the second person, with Mr. Pip's numbers, friend commands, and
-  wind-up (a giant snowball), and snowballs to catch. Each person's battle
-  atlas is built by `tools/art/build-person.ts <id>` from one 2x2 body sheet.
+  wind-up (a giant snowball), and snowballs to catch. Ms. Coral, the lifeguard
+  (`lifeguard`, Milestone 64; feelings grumpy, hungry, curious; 25 coins), is
+  the third person, with Mr. Pip's numbers and friend commands, a wind-up (a
+  giant beach ball), and beach balls to catch, cut from the bay's painting and
+  drawn at her `toyScale` (0.5). Each person's battle atlas is built by
+  `tools/art/build-person.ts <id>` from one 2x2 body sheet.
 - Mini-boss numbers: the Grumpy Gull has `overworldHeight` 110 (ordinary
   critters are 66 or 70), `battleHeight` 260 (ordinary critters are 190),
   `touchRadius` 85 (ordinary critters are 70), `calmMax` 160 (ordinary
@@ -1623,7 +1636,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   ("The Zoomie Pup remembers Fae and calms right down!"), then pays its
   coins as any reward does. Set pieces always battle.
 - Critter kinds own their atlas, battle content, sticker, and measured
-  `auraCentre` and `bodyCentre` frame-pixel centroids. Kinds may share an
+  `auraCentre` and `bodyCentre` frame-pixel centroids, and may set a
+  `toyScale` (a number above 0, 1 unless set; section 8.1). Kinds may share an
   atlas (the fountain frog and the bay's frogs), so atlases load and are
   found by their URL; aura placement uses those centroids, and render info
   names the active kind `battle.critter: { id, frame }`. Sue uses the generic party renderer with
@@ -1653,8 +1667,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   checks stand at Fae. A catch's three lanes are 1.05, 0.55, and 0.1 x Fae's
   height above her feet, its catch 0.7 x her height in front of her (radius
   0.2 x her height); toys set out from 0.35 x the critter's height in front
-  of the critter and are drawn at the critter's own scale, since they were
-  cut from its art. A lean's track (1.6 x Fae's height wide, max(12 px,
+  of the critter and are drawn at the critter's own scale (most were cut from
+  its art) times its kind's `toyScale`: the lifeguard's beach balls, cut from
+  the bay's painting, are drawn at 0.5, about 50 battle units across.
+  A lean's track (1.6 x Fae's height wide, max(12 px,
   0.12 x her height) tall) is centred over her, 1.45 x her height above her
   feet: just over her bun, which stands about 1.3 x her height, and under the
   HUD. Its swooshes are max(56 px, 0.6 x her height) long, in four rows 1.05,
@@ -1867,7 +1883,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
   catalogue (id, name, the critter whose atlas holds the art, and the frame):
-  eleven stickers, one per species and one per mini-boss, in eleven slots,
+  sixteen stickers, one per species and one per mini-boss, in sixteen slots,
   the town's four first.
   A sticker is owned when `state.stickers` has its id. The shell sets
   `data-journal="open"` while the book is open.
@@ -2547,7 +2563,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Toys (Milestone 41): the atlas a catch throws (`public/assets/battle/toys/`)
   is cut, pixel for pixel, from the approved critters' `chaos_burst_01`
   frames, which already draw them as separate islands: tennis balls, yarn,
-  acorns, snowballs, bottle caps, tickets, and tokens. No generation:
+  acorns, snowballs, bottle caps, tickets, and tokens; and the lifeguard's
+  beach balls from the bay's painted ones (its `props-1` atlas, Milestone 64).
+  No generation:
   `tools/art/build-toys.ts` rebuilds it from `art/recipes/toys.json`, and
   fails unless the atlas is RGBA and every toy equals its source pixels.
 - Gate: the owner approves the style of the first character and the first area

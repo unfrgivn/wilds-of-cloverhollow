@@ -18,7 +18,7 @@ describe("hills critters", () => {
   });
 
   it("keeps both new stickers inside the expanded catalogue", () => {
-    expect(content.world.stickers.slots).toBe(15);
+    expect(content.world.stickers.slots).toBe(16);
     expect(content.world.stickers.catalogue.map((sticker) => sticker.id)).toEqual(
       expect.arrayContaining(["clover-lamb", "meadow-hedgehog"]),
     );

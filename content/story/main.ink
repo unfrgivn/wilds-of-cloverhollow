@@ -31,6 +31,7 @@ EXTERNAL snacks()
 EXTERNAL won(id)
 EXTERNAL plushesLeft()
 EXTERNAL tickets()
+VAR lifeguard_back = false
 
 === window ===
 {plan != "none": -> again}
@@ -95,6 +96,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
 {calmed("lodge-keeper"): I calmed Mrs. Flurry, the lodge keeper at Pinecone Pass. Her lodge is open, and the fire's lit! # speaker: Fae}
 {keeper_back and not calmed("lodge-keeper"): The lodge keeper at Pinecone Pass is fizzy, and flinging snowballs from her porch! # speaker: Fae}
+{calmed("lifeguard"): I calmed Ms. Coral, the lifeguard at Bubblegum Bay. She shared her watermelon! # speaker: Fae}
+{lifeguard_back and not calmed("lifeguard"): The lifeguard at Bubblegum Bay is fizzy, and blowing her whistle at everyone! # speaker: Fae}
 {has_nuggets: I've got a box of dino nuggets. To the clubhouse microwave! # speaker: Fae}
 {has_mac: I've got a box of mac n cheese. To the clubhouse microwave! # speaker: Fae}
 {has_microwave and not (has_nuggets or has_mac): Mom's freezer has dino nuggets and mac n cheese for the clubhouse microwave. # speaker: Fae}
@@ -600,8 +603,23 @@ BUBBLEGUM BAY. Fishing, splashing, and sandcastles welcome! # speaker: Sign
 -> DONE
 
 === bay_picnic ===
+{calmed("lifeguard"): -> shared}
+{lifeguard_back: -> fizzy}
+{sue_joined: -> back}
 A beach picnic: watermelon slices, a sun hat, and a sandy towel. # speaker: Fae
 {not calmed("bluebird"): Everything's covered in sand. That bluebird again! # speaker: Fae}
+-> DONE
+= back
+A sharp whistle cuts across the bay. "TWEEEET!" # speaker: Fae
+~ lifeguard_back = true
+"NOBODY splashes on MY beach!" # speaker: Lifeguard
+It's the lifeguard, and she's all fizzy! # speaker: Fae
+-> DONE
+= fizzy
+The lifeguard is out by the dock, blowing her whistle at everyone! # speaker: Fae
+-> DONE
+= shared
+The picnic is peaceful now. Ms. Coral shared her watermelon with everyone! # speaker: Fae
 -> DONE
 
 === shells ===
@@ -1717,6 +1735,17 @@ Then come in, come in, all of you! Warm up by the fire. # speaker: Mrs. Flurry
 -> DONE
 = again
 Mrs. Flurry sweeps the snow off her porch. "The fire's lit, dears. Come in and warm up!" # speaker: Mrs. Flurry
+-> DONE
+
+=== lifeguard ===
+{lifeguard > 1: -> again}
+WHOA, kiddos! My head was all fizzy, like a shaken-up soda! # speaker: Ms. Coral
+One sip of a fizzy purple soda from a kid in a purple hood, and I blew my whistle at everybody on my beach. # speaker: Ms. Coral
+Sorry about the whistle blast, kiddos! # speaker: Ms. Coral
+Here, share my watermelon. # speaker: Ms. Coral # gift: snack 3
+-> DONE
+= again
+Ms. Coral smiles and checks the beach. "All clear, kiddos!" # speaker: Ms. Coral
 -> DONE
 
 // Inside the lodge (Milestone 57).

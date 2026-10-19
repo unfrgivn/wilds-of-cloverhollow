@@ -46,6 +46,7 @@ import foodAtlas from "../../public/assets/arcade/cook-food.json";
 import moleAtlas from "../../public/assets/arcade/moles.json";
 import cometAtlas from "../../public/assets/arcade/comet.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
+import toysJson from "../../public/assets/battle/toys/toys.json";
 
 const root = document.querySelector<HTMLElement>("#gallery");
 if (root === null) throw new Error("Missing gallery root");
@@ -556,11 +557,11 @@ function renderGalleryState(): void {
     hintAt: { x: ring.x, y: ring.y + ring.radius + 16 },
   });
   // The pup's two tennis balls in the toy atlas (assets/battle/toys).
-  const tennisBall = (index: 0 | 1): AtlasImage => ({
-    src: "assets/battle/toys/toys.png",
-    frame: index === 0 ? { x: 0, y: 0, w: 69, h: 73 } : { x: 128, y: 0, w: 71, h: 72 },
-    atlas: { w: 760, h: 552 },
-  });
+  const tennisBall = (index: 0 | 1): AtlasImage => atlasImage(
+    toysJson,
+    "assets/battle/toys/toys.png",
+    index === 0 ? "tennis-ball-01" : "tennis-ball-02",
+  );
   const galleryChecks: Record<string, BattleCheckView> = {
     "battle-timing": ringCheck(frogRing, null),
     "battle-grade": ringCheck(frogRing, "great"),

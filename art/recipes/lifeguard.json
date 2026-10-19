@@ -1,0 +1,37 @@
+{
+  "asset": "lifeguard",
+  "milestone": 64,
+  "date": "2026-10-18",
+  "summary": "Ms. Coral, Bubblegum Bay's lifeguard, a grown-up woman under the chaos spell: a 2x2 body sheet (chaos idle, a beach ball up; the throw, beach balls flying; soothed, a ball dropped; calm, waving with watermelon), drawn to Mrs. Flurry's sheet.",
+  "generationSource": "Generated with Gemini from Mrs. Flurry's raw body sheet for the watercolor style, size, and swirly eyes, and the school staff concept sheet for adult proportions.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-10-18T01:56:49.570Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "art/source/critters/lodge-keeper/body-sheet-raw.png",
+        "docs/art/concepts/npcs/school_staff_npcs.png"
+      ],
+      "prompt": "A 2x2 character sheet of a NEW character, drawn in exactly the style of the first reference: the same chibi proportions with a big head, the same soft watercolour with thin warm-brown ink outlines, and the same size of figure in each cell. The character is Ms. Coral, a grown-up woman lifeguard at a cheerful family-friendly watercolor beach bay. Classic friendly lifeguard look: red swimsuit with a red lifeguard top, pale warm skin, sandy brown wavy hair tied back, a teal visor pushed up on her head, a whistle on a teal lanyard in her mouth, simple sandals, no sun hat. Use a restrained warm pastel palette and absolutely no pink or magenta anywhere in the character or props; the plain background must be bright flat magenta (#FF00FF) for keying, but beach balls must use only coral-red, butter yellow, teal, sky blue, and cream, never pink or magenta. Each figure drawn exactly once, whole, standing, facing the viewer, one per cell: TOP LEFT, under a fizzy chaos spell: purple swirly eyes, fizzy swirls and tiny purple sparkles around her head, whistle in her mouth, holding one beach ball up in one hand, wild but friendly grin. TOP RIGHT, chaos burst: hurling beach balls with both arms, a few separate beach balls flying in the air around her like a snowball throw, purple swirly eyes, same outfit. BOTTOM LEFT, soothed: beach ball dropped beside her sandals, dazed sleepy half-closed eyes and sheepish smile, same outfit. BOTTOM RIGHT, calm and friendly: normal kind eyes, smiling and waving with a slice of watermelon in the other hand, same outfit. Match the reference style, adult proportions, figure height, thin warm-brown outline weight, and soft watercolor washes. Plain flat magenta background only. No text, no labels, no shadows on the background, no faded copies, no extra figures, no cropped feet, no pink or magenta on the subject.",
+      "output": "1792375009570-gemini-3-pro-image-preview-0.png",
+      "note": "Kept as generated: four whole poses on a flat magenta key. Purple chaos eyes and watermelon coral are intentional character details; the beach balls contain no magenta.",
+      "kept": "art/source/critters/lifeguard/body-sheet-raw.png"
+    }
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-person.ts lifeguard. The shared person builder keys magenta, drops detached islands under 120 px, despills the alpha edge, scales the chaos idle body to 380 px, and adds the shared hamster aura.",
+    "canvas": "1536x1024 atlas, six 512x512 frames, baseline 504, anchor (0.5, 0.984375).",
+    "measuredCentres": {
+      "bodyCentre": { "x": 235.11, "y": 297.43 },
+      "bodyCentreMethod": "mean opaque-pixel centroid across the four generated body frames",
+      "auraCentre": { "x": 258.76, "y": 260.55 }
+    },
+    "bodyHeights": {
+      "chaos_idle_01": 380,
+      "chaos_burst_01": 380,
+      "soothed_01": 380,
+      "calm_idle_01": 380
+    }
+  }
+}

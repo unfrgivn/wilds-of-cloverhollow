@@ -5,7 +5,7 @@ import { loadContent } from "../../src/content/load";
 const content = loadContent();
 const flurryCritters = [
   "pup", "gym-pup", "cat", "squirrel", "oak-squirrel", "hamster",
-  "raccoon", "school-raccoon", "arcade-keeper", "lodge-keeper",
+  "raccoon", "school-raccoon", "arcade-keeper", "lodge-keeper", "lifeguard",
 ];
 
 function record(value: unknown): value is Record<string, unknown> {

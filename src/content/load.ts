@@ -106,6 +106,7 @@ import gullData from "../../content/critters/gull.json";
 import owlData from "../../content/critters/owl.json";
 import arcadeKeeperData from "../../content/critters/arcade-keeper.json";
 import lodgeKeeperData from "../../content/critters/lodge-keeper.json";
+import lifeguardData from "../../content/critters/lifeguard.json";
 import gymPupData from "../../content/critters/gym-pup.json";
 import musicBirdData from "../../content/critters/music-bird.json";
 import oakSquirrelData from "../../content/critters/oak-squirrel.json";
@@ -1303,6 +1304,11 @@ export function parseCritter(value: unknown, file: string): Critter {
     field(typeof item === "number" && item >= 0, file, name);
     return item;
   };
+  const toyScale = value.toyScale === undefined ? 1 : value.toyScale;
+  field(
+    typeof toyScale === "number" && Number.isFinite(toyScale) && toyScale > 0,
+    file, "toyScale",
+  );
   const id = text(value, "id");
   const species = text(value, "species");
   const name = text(value, "name");
@@ -1424,6 +1430,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     auraCentre: point("auraCentre"),
     bodyCentre: point("bodyCentre"),
     figureHeight: number(value, "figureHeight"),
+    toyScale,
     overworldHeight: number(value, "overworldHeight"),
     battleHeight: number(value, "battleHeight"),
     touchRadius: number(value, "touchRadius"),
@@ -2014,6 +2021,7 @@ export function loadContent(): {
     [owlData, "owl"],
     [arcadeKeeperData, "arcade-keeper"],
     [lodgeKeeperData, "lodge-keeper"],
+    [lifeguardData, "lifeguard"],
     [gymPupData, "gym-pup"],
     [musicBirdData, "music-bird"],
     [oakSquirrelData, "oak-squirrel"],

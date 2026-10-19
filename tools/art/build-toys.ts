@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 export {};
-// Cut isolated toy islands from the approved critter burst frames. The source
-// pixels are copied byte-for-byte; only the alpha outside the chosen island
-// is cleared and transparent padding is added.
+// Cut isolated toy islands from approved atlas frames. The source pixels are
+// copied byte-for-byte; only the alpha outside the chosen island is cleared
+// and transparent padding is added.
 
 type Seed = { name: string; x: number; y: number };
 type Source = { name: string; atlas: string; frame: string; seeds: Seed[] };

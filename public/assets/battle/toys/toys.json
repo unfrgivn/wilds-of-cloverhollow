@@ -26,7 +26,7 @@
     },
     "tennis-ball-02": {
       "frame": {
-        "x": 128,
+        "x": 148,
         "y": 0,
         "w": 71,
         "h": 72
@@ -50,7 +50,7 @@
     },
     "yarn-teal-01": {
       "frame": {
-        "x": 256,
+        "x": 296,
         "y": 0,
         "w": 64,
         "h": 64
@@ -74,7 +74,7 @@
     },
     "yarn-purple-01": {
       "frame": {
-        "x": 384,
+        "x": 444,
         "y": 0,
         "w": 64,
         "h": 101
@@ -98,7 +98,7 @@
     },
     "yarn-pink-01": {
       "frame": {
-        "x": 512,
+        "x": 592,
         "y": 0,
         "w": 61,
         "h": 104
@@ -122,7 +122,7 @@
     },
     "yarn-blue-01": {
       "frame": {
-        "x": 640,
+        "x": 740,
         "y": 0,
         "w": 120,
         "h": 70
@@ -147,7 +147,7 @@
     "acorn-01": {
       "frame": {
         "x": 0,
-        "y": 112,
+        "y": 149,
         "w": 68,
         "h": 62
       },
@@ -170,8 +170,8 @@
     },
     "acorn-02": {
       "frame": {
-        "x": 128,
-        "y": 112,
+        "x": 148,
+        "y": 149,
         "w": 64,
         "h": 62
       },
@@ -194,8 +194,8 @@
     },
     "acorn-03": {
       "frame": {
-        "x": 256,
-        "y": 112,
+        "x": 296,
+        "y": 149,
         "w": 65,
         "h": 63
       },
@@ -218,8 +218,8 @@
     },
     "acorn-04": {
       "frame": {
-        "x": 384,
-        "y": 112,
+        "x": 444,
+        "y": 149,
         "w": 61,
         "h": 76
       },
@@ -242,8 +242,8 @@
     },
     "snowball-01": {
       "frame": {
-        "x": 512,
-        "y": 112,
+        "x": 592,
+        "y": 149,
         "w": 53,
         "h": 53
       },
@@ -266,8 +266,8 @@
     },
     "snowball-02": {
       "frame": {
-        "x": 640,
-        "y": 112,
+        "x": 740,
+        "y": 149,
         "w": 51,
         "h": 51
       },
@@ -291,7 +291,7 @@
     "snowball-03": {
       "frame": {
         "x": 0,
-        "y": 224,
+        "y": 298,
         "w": 31,
         "h": 31
       },
@@ -314,8 +314,8 @@
     },
     "snowball-04": {
       "frame": {
-        "x": 128,
-        "y": 224,
+        "x": 148,
+        "y": 298,
         "w": 35,
         "h": 33
       },
@@ -338,8 +338,8 @@
     },
     "bottle-cap-01": {
       "frame": {
-        "x": 256,
-        "y": 224,
+        "x": 296,
+        "y": 298,
         "w": 43,
         "h": 42
       },
@@ -362,8 +362,8 @@
     },
     "bottle-cap-02": {
       "frame": {
-        "x": 384,
-        "y": 224,
+        "x": 444,
+        "y": 298,
         "w": 36,
         "h": 49
       },
@@ -386,8 +386,8 @@
     },
     "bottle-cap-03": {
       "frame": {
-        "x": 512,
-        "y": 224,
+        "x": 592,
+        "y": 298,
         "w": 42,
         "h": 42
       },
@@ -410,8 +410,8 @@
     },
     "bottle-cap-04": {
       "frame": {
-        "x": 640,
-        "y": 224,
+        "x": 740,
+        "y": 298,
         "w": 47,
         "h": 33
       },
@@ -435,7 +435,7 @@
     "ticket-01": {
       "frame": {
         "x": 0,
-        "y": 336,
+        "y": 447,
         "w": 69,
         "h": 64
       },
@@ -458,8 +458,8 @@
     },
     "ticket-02": {
       "frame": {
-        "x": 128,
-        "y": 336,
+        "x": 148,
+        "y": 447,
         "w": 53,
         "h": 68
       },
@@ -482,8 +482,8 @@
     },
     "ticket-03": {
       "frame": {
-        "x": 256,
-        "y": 336,
+        "x": 296,
+        "y": 447,
         "w": 65,
         "h": 58
       },
@@ -506,8 +506,8 @@
     },
     "ticket-04": {
       "frame": {
-        "x": 384,
-        "y": 336,
+        "x": 444,
+        "y": 447,
         "w": 68,
         "h": 63
       },
@@ -530,8 +530,8 @@
     },
     "token-01": {
       "frame": {
-        "x": 512,
-        "y": 336,
+        "x": 592,
+        "y": 447,
         "w": 40,
         "h": 41
       },
@@ -554,8 +554,8 @@
     },
     "token-02": {
       "frame": {
-        "x": 640,
-        "y": 336,
+        "x": 740,
+        "y": 447,
         "w": 42,
         "h": 39
       },
@@ -579,7 +579,7 @@
     "token-03": {
       "frame": {
         "x": 0,
-        "y": 448,
+        "y": 596,
         "w": 41,
         "h": 39
       },
@@ -602,8 +602,8 @@
     },
     "token-04": {
       "frame": {
-        "x": 128,
-        "y": 448,
+        "x": 148,
+        "y": 596,
         "w": 42,
         "h": 39
       },
@@ -626,8 +626,8 @@
     },
     "snowball-05": {
       "frame": {
-        "x": 256,
-        "y": 448,
+        "x": 296,
+        "y": 596,
         "w": 52,
         "h": 51
       },
@@ -650,8 +650,8 @@
     },
     "snowball-06": {
       "frame": {
-        "x": 384,
-        "y": 448,
+        "x": 444,
+        "y": 596,
         "w": 59,
         "h": 58
       },
@@ -674,8 +674,8 @@
     },
     "snowball-07": {
       "frame": {
-        "x": 512,
-        "y": 448,
+        "x": 592,
+        "y": 596,
         "w": 56,
         "h": 55
       },
@@ -695,14 +695,86 @@
         "x": 0.5,
         "y": 0.5
       }
+    },
+    "beach-ball-01": {
+      "frame": {
+        "x": 740,
+        "y": 596,
+        "w": 139,
+        "h": 141
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 139,
+        "h": 141
+      },
+      "sourceSize": {
+        "w": 139,
+        "h": 141
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "beach-ball-02": {
+      "frame": {
+        "x": 0,
+        "y": 745,
+        "w": 140,
+        "h": 139
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 140,
+        "h": 139
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 139
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "beach-ball-03": {
+      "frame": {
+        "x": 148,
+        "y": 745,
+        "w": 119,
+        "h": 118
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 119,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 119,
+        "h": 118
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
     }
   },
   "animations": {},
   "meta": {
     "image": "toys.png",
     "size": {
-      "w": 760,
-      "h": 552
+      "w": 880,
+      "h": 886
     },
     "scale": "1",
     "sources": {
@@ -733,6 +805,18 @@
       "lodge-keeper": {
         "atlas": "public/assets/critters/lodge-keeper/lodge-keeper.png",
         "frame": "chaos_burst_01"
+      },
+      "bay-beach-ball-left": {
+        "atlas": "public/assets/areas/bay/props-1.png",
+        "frame": "beach-ball-left"
+      },
+      "bay-beach-ball-right": {
+        "atlas": "public/assets/areas/bay/props-1.png",
+        "frame": "beach-ball-right"
+      },
+      "bay-beach-ball-top": {
+        "atlas": "public/assets/areas/bay/props-1.png",
+        "frame": "beach-ball-top"
       }
     },
     "frameSources": {
@@ -764,7 +848,10 @@
       "token-04": "arcade-keeper",
       "snowball-05": "lodge-keeper",
       "snowball-06": "lodge-keeper",
-      "snowball-07": "lodge-keeper"
+      "snowball-07": "lodge-keeper",
+      "beach-ball-01": "bay-beach-ball-left",
+      "beach-ball-02": "bay-beach-ball-right",
+      "beach-ball-03": "bay-beach-ball-top"
     }
   }
 }

@@ -313,8 +313,6 @@ async function boot(): Promise<void> {
       ]);
     }),
   ]);
-  // A sticker's art: its critter's atlas, cropped to the frame its content
-  // names, with the rect read from the atlas the view loaded.
   // A toy a catch throws: a crop of the toy atlas (spec 8.1).
   const toyArt = (frameName: string): AtlasImage | null => {
     const atlas = content.world.battle.toyAtlas;

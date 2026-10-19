@@ -7,7 +7,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 189,
     "interim": false,
-    "hash": "f9470b5f"
+    "hash": "46a33d14"
   },
   {
     "id": "fountain-frog",
@@ -17,7 +17,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 1045,
     "interim": false,
-    "hash": "8551e452"
+    "hash": "d39e8abd"
   },
   {
     "id": "tree-house",
@@ -27,7 +27,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 4419,
     "interim": false,
-    "hash": "1bbcb906"
+    "hash": "dcd3847b"
   },
   {
     "id": "bubblegum-bay",
@@ -37,7 +37,7 @@
     "run": "new-game/east-road.json",
     "tick": 5564,
     "interim": false,
-    "hash": "a702a838"
+    "hash": "aef26755"
   },
   {
     "id": "shortcut-jordan",
@@ -47,7 +47,7 @@
     "run": "pass-party/jordan.json",
     "tick": 143,
     "interim": true,
-    "hash": "506d3d53"
+    "hash": "2a9b04f0"
   },
   {
     "id": "shortcut-lantern",
@@ -57,7 +57,7 @@
     "run": "pass-party/lantern.json",
     "tick": 568,
     "interim": true,
-    "hash": "b4592859"
+    "hash": "49468b54"
   },
   {
     "id": "shortcut-woods",
@@ -67,7 +67,7 @@
     "run": "pass-party/woods.json",
     "tick": 1073,
     "interim": true,
-    "hash": "18df1f4b"
+    "hash": "6e40bc80"
   },
   {
     "id": "shortcut-arcade",
@@ -77,7 +77,7 @@
     "run": "pass-party/arcade.json",
     "tick": 2034,
     "interim": true,
-    "hash": "785fd332"
+    "hash": "14a2d0a9"
   },
   {
     "id": "shortcut-lodge",
@@ -87,7 +87,7 @@
     "run": "pass-party/lodge.json",
     "tick": 1421,
     "interim": true,
-    "hash": "d762c3f4"
+    "hash": "c97c5135"
   },
   {
     "id": "shortcut-school",
@@ -97,7 +97,7 @@
     "run": "pass-party/school.json",
     "tick": 4249,
     "interim": true,
-    "hash": "050ff97f"
+    "hash": "1d38ccfa"
   },
   {
     "id": "shortcut-clubhouse",
@@ -107,7 +107,7 @@
     "run": "pass-party/clubhouse.json",
     "tick": 3121,
     "interim": true,
-    "hash": "9a09d791"
+    "hash": "a19e6bea"
   },
   {
     "id": "shortcut-gym",
@@ -117,7 +117,7 @@
     "run": "pass-party/gym.json",
     "tick": 6225,
     "interim": true,
-    "hash": "b40a0212"
+    "hash": "fa8318f9"
   },
   {
     "id": "shortcut-music",
@@ -127,7 +127,7 @@
     "run": "pass-party/music.json",
     "tick": 8187,
     "interim": true,
-    "hash": "cb0ac83e"
+    "hash": "38fb3957"
   },
   {
     "id": "shortcut-field",
@@ -137,7 +137,7 @@
     "run": "pass-party/field.json",
     "tick": 8777,
     "interim": true,
-    "hash": "1fc0ec6f"
+    "hash": "00c51e26"
   },
   {
     "id": "shortcut-squirrel",
@@ -147,7 +147,7 @@
     "run": "pass-party/squirrel.json",
     "tick": 9430,
     "interim": true,
-    "hash": "bd6027d1"
+    "hash": "452d81e0"
   },
   {
     "id": "shortcut-flute",
@@ -157,7 +157,7 @@
     "run": "pass-party/flute.json",
     "tick": 11228,
     "interim": true,
-    "hash": "19322464"
+    "hash": "32dfa64f"
   },
   {
     "id": "shortcut-lasso",
@@ -167,7 +167,7 @@
     "run": "pass-party/lasso.json",
     "tick": 16063,
     "interim": true,
-    "hash": "560b0b8a"
+    "hash": "2f145031"
   },
   {
     "id": "shortcut-mist",
@@ -177,7 +177,7 @@
     "run": "pass-party/mist.json",
     "tick": 17444,
     "interim": true,
-    "hash": "fe185c5f"
+    "hash": "b620b2b6"
   },
   {
     "id": "shortcut-kitchen",
@@ -187,7 +187,7 @@
     "run": "pass-party/kitchen.json",
     "tick": 17685,
     "interim": true,
-    "hash": "3378ad75"
+    "hash": "658798f8"
   },
   {
     "id": "shortcut-forest",
@@ -197,7 +197,7 @@
     "run": "pass-party/forest.json",
     "tick": 18113,
     "interim": true,
-    "hash": "234c1749"
+    "hash": "933ae1fa"
   },
   {
     "id": "shortcut-kid",
@@ -207,7 +207,7 @@
     "run": "pass-party/kid.json",
     "tick": 18926,
     "interim": true,
-    "hash": "648f4fbd"
+    "hash": "b361ec18"
   },
   {
     "id": "hills-lookout",
@@ -217,6 +217,6 @@
     "run": "hills/hills-lookout.json",
     "tick": 0,
     "interim": true,
-    "hash": "39ff3271"
+    "hash": "fc6f5ae8"
   }
 ]

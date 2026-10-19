@@ -44,7 +44,7 @@ export type BattleCheckGeometry =
   | { kind: "chain"; from: Point; to: Point; radius: number; hintAt: Point }
   // A catch: the three lanes' heights (high, middle, low), where toys set
   // out and where the catch stands, its radius, and the toys' scale (CSS px
-  // per toy-atlas pixel: the critter's own, since they were cut from it).
+  // per toy-atlas pixel: the critter's scale times its optional kind toyScale).
   | {
       kind: "catch";
       lanes: [number, number, number];
@@ -988,7 +988,8 @@ export class GameView {
         fromX: critter.x - 0.35 * critter.height,
         catcherX: fae.x + 0.7 * fae.height,
         radius: 0.2 * fae.height,
-        toyScale: critter.height / figure,
+        toyScale: (critter.height / figure) *
+           (this.world.critters[state.battle?.critterId ?? ""]?.toyScale ?? 1),
         // Midway between the catch and the critter: the open ground clear of
         // the touch arrows (bottom left, past the notch inset) and confirm.
         hintAt: hintAt((fae.x + 0.7 * fae.height + critter.x) / 2),

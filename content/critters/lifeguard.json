@@ -1,0 +1,147 @@
+{
+  "id": "lifeguard",
+  "species": "lifeguard",
+  "name": "Fizzy Ms. Coral",
+  "calmName": "Ms. Coral",
+  "atlas": "assets/critters/lifeguard/lifeguard.json",
+  "auraCentre": {
+    "x": 258.76,
+    "y": 260.55
+  },
+  "bodyCentre": {
+    "x": 235.11,
+    "y": 297.43
+  },
+  "figureHeight": 380,
+  "overworldHeight": 160,
+  "battleHeight": 280,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "sticker": {
+    "id": "lifeguard",
+    "name": "Ms. Coral",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "lifeguard",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "grumpy",
+    "hungry",
+    "curious"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.5,
+    "check": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        78,
+        102,
+        126
+      ],
+      "toys": [
+        "beach-ball-01",
+        "beach-ball-02",
+        "beach-ball-03"
+      ]
+    },
+    "big": {
+      "kind": "catch",
+      "travelTicks": 50,
+      "arrivals": [
+        54,
+        74,
+        94,
+        114,
+        134,
+        154
+      ],
+      "toys": [
+        "beach-ball-01",
+        "beach-ball-02",
+        "beach-ball-03"
+      ]
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Ms. Coral packs a beach ball, bigger and bigger! She's feeling everything at once!",
+      "puffing": "Ms. Coral's beach ball gets even bigger!",
+      "fizzle": "Plop! The giant beach ball deflates, and not one flies."
+    }
+  },
+  "lines": {
+    "intro": "Ms. Coral, the lifeguard, spins round with swirly eyes. \"NOBODY splashes on MY beach!\"",
+    "command": "How can Fae calm Ms. Coral?",
+    "soothe": {
+      "great": "Fae blows a gentle whistle tune. Ms. Coral's swirly eyes start to slow down!",
+      "good": "Fae hums softly. Ms. Coral stops blowing her whistle for a moment.",
+      "miss": "Ms. Coral blows her whistle right over Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie rolls a beach ball back. Ms. Coral follows it, giggling!",
+        "good": "Maddie nudges a beach ball. Ms. Coral chuckles.",
+        "miss": "Maddie slips in the sand. Ms. Coral snorts."
+      },
+      "cast": {
+        "great": "Sue swings her ribbon bobber like a lasso. Ms. Coral cheers as it loops the loop!",
+        "good": "Sue's bobber twirls over the sand. Ms. Coral leans in to watch.",
+        "miss": "Sue's line tangles on the dock. Ms. Coral shakes her head."
+      },
+      "juggle": {
+        "great": "Jordan juggles three beach balls in a perfect loop. \"Bravo!\" Ms. Coral claps.",
+        "good": "Jordan tosses a beach ball high. Ms. Coral's eyes follow it up and down.",
+        "miss": "Jordan's beach ball plops in the sand. Ms. Coral doesn't even look."
+      }
+    },
+    "snack": "Fae shares a crunchy cracker. Ms. Coral munches it between whistles.",
+    "burst": "Ms. Coral winds up and sends a storm of beach balls at Fae!",
+    "burstResult": {
+      "great": "Fae catches every beach ball, like a pro!",
+      "good": "Fae catches most of the beach balls!",
+      "miss": "Plop! Beach balls bounce all around Fae."
+    },
+    "soothed": "Ms. Coral blinks. The swirls fade from her eyes, and the whistle slips from her hand.",
+    "rest": "Fae is worn out from all the splashing. Time for a rest.",
+    "run": "Fae backs away. Ms. Coral packs another beach ball."
+  },
+  "coins": 25,
+  "toyScale": 0.5
+}

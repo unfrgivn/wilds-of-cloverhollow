@@ -2861,7 +2861,7 @@ the old trail, the owl, and the clubhouse claim.
 - For the owner: her name (Ms. Rowan, a tree, like Ms. Maple, Ms. Willow,
   Coach Ash, and Nurse Holly), her lines, her sheet, and the room.
 
-## Milestone 64: The lifeguard **Status:** 🚧 In progress (2026-10-18)
+## Milestone 64: The lifeguard **Status:** ✅ Completed (2026-10-18)
 - Bubblegum Bay, Sue's land, has no one under the spell, and someone left a
   picnic there: watermelon slices, a sun hat, and a sandy towel. No recorded
   run reads it.
@@ -2872,6 +2872,33 @@ the old trail, the owl, and the clubhouse claim.
   she shares her watermelon (snacks), and her sticker joins the album.
 - For the owner: her name, her look (drawn to Mrs. Flurry's sheet; the
   concepts have no lifeguard), and her lines.
+- Evidence: unit tests for the picnic, the set piece, her battle content and
+  toys, and her talk; a recorded run on from the bay's, with its replay test;
+  and a real-key e2e at both sizes, in both engines (tagged `@smoke`, so
+  WebKit runs it too).
+- Gates and notes (2026-10-18):
+  - Her spot, (760, 590), is open sand by the dock approach, clear of props.
+    It is 163 from the picnic, more than its 60 read range plus her 85 touch
+    radius, so reading the picnic never starts the battle; Fae walks to her.
+    It is 225 from the frog den.
+  - Ms. Coral is a placeholder name. Her feelings: grumpy (the whistle;
+    Soothe), hungry (her watermelon; Snack), and curious (Sue's Cast, in
+    Sue's land): one answer for each of the bay party's commands, and not
+    Mrs. Flurry's trio. Calming her gives 3 snacks, once.
+  - The beach balls are cut from the bay's painting at its own size, so the
+    critter's own scale would draw them about 100 battle units across. A kind
+    now sets an optional `toyScale` (1 unless set), typed by the loader; it
+    was chosen over atlas metadata, which Pixi types loosely. Hers is 0.5:
+    about 50 battle units across in the catch screenshots.
+  - Her centres are the measured centroids (aura (258.76, 260.55), body
+    (235.11, 297.43)); her aura sits on her body in the catch screenshots.
+  - No new QA pack; the packs were regenerated because the story changed.
+    Milestone 66 gives her a level.
+  - Art: 1 Gemini call, none failed. For the owner: the flying balls in her
+    burst pose are drawn smaller than the one she holds, and her swimsuit is
+    a muted coral red.
+  - Gates: `just check` (117 files, 995 tests), `just e2e` (908 passed, 2
+    skipped), and `just build` passed.
 
 ## Milestone 65: QA mode and the save library **Status:** ✅ Completed (2026-10-18)
 - The owner asked for a way to playtest later stages without playing from
@@ -3801,7 +3828,7 @@ more bad guys, and the blacklight lantern, made and built while away.
 
 ## Later (not scheduled)
 More people under the chaos spell (NOTES.md: more mini-bosses), after the
-lodge keeper (Milestone 57): the art teacher and the lifeguard are next
+lodge keeper (Milestone 57): the art teacher is next
 (Milestones 63 and 64). Flute friends (the Pond Pup and the Acorn
 Squirrel), the lasso's places, and the clubhouse's chest and microwave are
 done (Milestones 47, 60, 49, and 52).

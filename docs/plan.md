@@ -2840,7 +2840,7 @@ the old trail, the owl, and the clubhouse claim.
 - For the owner: her name (Ms. Rowan, a tree, like Ms. Maple, Ms. Willow,
   Coach Ash, and Nurse Holly), her lines, her sheet, and the room.
 
-## Milestone 64: The lifeguard **Status:** 📋 Planned
+## Milestone 64: The lifeguard **Status:** 🚧 In progress (2026-10-18)
 - Bubblegum Bay, Sue's land, has no one under the spell, and someone left a
   picnic there: watermelon slices, a sun hat, and a sandy towel. No recorded
   run reads it.

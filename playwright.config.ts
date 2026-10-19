@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 const webkitSpecs = [
-  "title", "title-gallery", "ui-gallery", "journal-save", "dialogue",
+  "title", "title-gallery", "ui-gallery", "ui-gallery-checks", "journal-save", "dialogue",
   "battle-scene", "sound", "harness", "gamepad", "qa",
 ];
 export default defineConfig({

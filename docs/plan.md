@@ -3531,6 +3531,39 @@ more bad guys, and the blacklight lantern, made and built while away.
   the old ones elsewhere within the screenshot tolerance). Skee-ball's, the
   cooking game's, and WebKit's didn't change.
 
+### Test speed, round five (2026-10-18)
+- Where CI's time went, by a step profile on CI (run 39175095090): a fresh
+  page per test was 36% of Chromium's test time and 57% of WebKit's. After
+  its page loaded, a gameplay test waited 0.9 s (Chromium) and 1.4 s
+  (WebKit) for the game to boot; Chromium's screenshots were another 21%.
+- The UI gallery's checks (236 tests of layout, contrast, and input that
+  compare no screenshot) are in `ui-gallery-checks.spec.ts`, and CI runs
+  them on two Linux runners (`linuxSpecs` in `tools/ci/shard.ts`): 84 s
+  there against 99 s on the Macs, which keep the screenshots. A gameplay
+  spec without screenshots stays on a Mac: Linux's software renderer draws
+  every step, and the footsteps walk took 62 s there against 3 s.
+- WebKit runs in eight shards, and its system libraries' downloads (114 MB)
+  are cached per runner image: the install took 20 s against 39.
+- Tried and held back: the boot loading its art at once rather than in turn
+  (the view's sheets, the map, the sticker atlases' decodes, each arcade
+  atlas, the paintings, the first area; local branch `speed-5-boot`). Cold
+  loads reached the hook in 458 ms against 623 in Chromium and 584 against
+  671 in WebKit, but WebKit's ending credits then failed their screenshot in
+  26 runs of 56 against 2 of 32 with the boot in turn (`--repeat-each`, four
+  workers, interleaved, on a loaded machine). Both fail the same way, a few
+  speckled pixels in the stickers, so the order of the boot's decodes sets
+  how often main's credits flake shows. With an atlas decoded while Pixi
+  fetched the same file, it failed 8 runs in 8.
+- With that boot change too, a branch run took 3 min 18 s (run 39178621466):
+  Linux's Chromium shards 65 to 70 s, WebKit's 94 to 146 s, and the Macs 124
+  to 190 s. On the same plan the Macs ran at 0.68 to 1.09 times their
+  record, and each one's first test ran 3 to 10 s over (the first page's
+  boot), so the slowest Mac still sets the time.
+- Not done: the concurrent boot, until the credits' stickers draw the same
+  way every time; building the harness before the tests start (2.7 s of a
+  shard); replaying Bun's hashes beside the browser rather than after it (46
+  s of Chromium's gameplay time on CI); a warm-up for each Mac's first page.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its

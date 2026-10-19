@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { listLine, parseReport, parseTimings, reportTests, type Test }
   from "../../tools/ci/report";
-import { plan, units, weigh } from "../../tools/ci/shard";
+import { onRunner, plan, units, weigh } from "../../tools/ci/shard";
 import { testTimings } from "../../tools/ci/timings";
 
 function test(project: string, file: string, ...titles: string[]): Test {
@@ -58,6 +58,15 @@ describe("CI shard plan", () => {
   it("writes Playwright's --test-list lines", () => {
     expect(listLine(test("webkit", "ui-gallery.spec.ts", "sticker gallery", "journal-full")))
       .toBe("[webkit] › ui-gallery.spec.ts › sticker gallery › journal-full");
+  });
+
+  it("runs only the listed spec files on Linux, and every other on a Mac", () => {
+    const tests = [test("chromium", "ui-gallery-checks.spec.ts", "sticker gallery", "a"),
+      test("chromium", "footsteps.spec.ts", "b"), test("chromium", "ui-gallery.spec.ts", "c")];
+    expect(onRunner(tests, "linux").map((each) => each.file))
+      .toEqual(["ui-gallery-checks.spec.ts"]);
+    expect(onRunner(tests, "macos").map((each) => each.file))
+      .toEqual(["footsteps.spec.ts", "ui-gallery.spec.ts"]);
   });
 });
 

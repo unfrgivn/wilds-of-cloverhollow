@@ -50,6 +50,14 @@ only what the change touches: one spec on Chromium
 - MobileBuildMCP builds, runs, taps, and screenshots the iOS Simulator.
 - Xcode MCP (`xcrun mcpbridge`) only works while Xcode has the iOS project
   open; it is disabled in `opencode.json` until needed.
+- Never open an image with `read`. In OpenCode 2.0.32 it reaches the model as
+  base64 text it can't see, about 350k tokens for a 300 KB JPEG, so two or
+  three reads fill the context and the session can no longer compact. Look
+  with the `vision` tool instead (through `execute` if it isn't listed
+  directly): a tight crop, as a JPEG at most 1400 px on its long side, and a
+  specific question. Call characters game sprites (a prompt describing a girl
+  was blocked). Its model misreads dense overlays and grids, so check its
+  answers against numbers before acting on them.
 
 ## Art
 - Style source: `docs/art/concepts/`. Rules: spec section 12 and

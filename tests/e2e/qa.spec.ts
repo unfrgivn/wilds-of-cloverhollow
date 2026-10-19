@@ -104,7 +104,25 @@ test("touch long press opens QA and touch pick loads a pack", async ({ page }) =
   await page.goto("./");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
   const logo = page.locator(".title-logo");
+  // A tap is not a long press: its release leaves the title as it is.
+  await page.evaluate(async () => {
+    const title = document.querySelector(".title-logo");
+    if (title === null) throw new Error("The title has no logo");
+    title.dispatchEvent(new PointerEvent("pointerdown", { pointerType: "touch", bubbles: true }));
+    title.dispatchEvent(new PointerEvent("pointerup", { pointerType: "touch", bubbles: true }));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+  await expect(page.locator(".qa-menu")).toBeHidden();
   await logo.dispatchEvent("pointerdown", { pointerType: "touch" });
+  // A long task across the press's 650 ms mark, like the first frame after the
+  // area art loads on a slow GPU: the release can run before the overdue
+  // timer, so the release itself has to count as the long press.
+  await page.evaluate(() => {
+    window.setTimeout(() => {
+      const end = performance.now() + 200;
+      while (performance.now() < end) continue;
+    }, 600);
+  });
   await page.waitForTimeout(700);
   await logo.dispatchEvent("pointerup", { pointerType: "touch" });
   await expect(page.locator(".qa-menu")).toBeVisible();

@@ -81,16 +81,27 @@ export function createTitleScreen(root: HTMLElement): {
   const plate = element("div", "title-plate");
   const logo = element("h1", "title-logo");
   logo.textContent = "Wilds of Cloverhollow";
-  let longPress: number | undefined;
-  logo.addEventListener("pointerdown", () => { longPress = window.setTimeout(() => qa(), 650); });
-  logo.addEventListener("pointerup", () => {
-    if (longPress !== undefined) window.clearTimeout(longPress);
-    longPress = undefined;
+  // A long press on the logo opens the QA library. The timer opens it with the
+  // finger still down; the release opens it too once the press has lasted long
+  // enough, because a busy main thread can run the release before an overdue
+  // timer, which would otherwise cancel it.
+  const longPressMs = 650;
+  let press: { at: number; timer: number } | null = null;
+  const endPress = (): void => {
+    if (press !== null) window.clearTimeout(press.timer);
+    press = null;
+  };
+  logo.addEventListener("pointerdown", (event) => {
+    endPress();
+    const timer = window.setTimeout(() => { press = null; qa(); }, longPressMs);
+    press = { at: event.timeStamp, timer };
   });
-  logo.addEventListener("pointerleave", () => {
-    if (longPress !== undefined) window.clearTimeout(longPress);
-    longPress = undefined;
+  logo.addEventListener("pointerup", (event) => {
+    const held = press !== null && event.timeStamp - press.at >= longPressMs;
+    endPress();
+    if (held) qa();
   });
+  logo.addEventListener("pointerleave", endPress);
   plate.append(logo, cloverIcon());
   const options = element("div", "title-options");
   options.setAttribute("role", "listbox");

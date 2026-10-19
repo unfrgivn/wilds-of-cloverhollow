@@ -2957,6 +2957,13 @@ the old trail, the owl, and the clubhouse claim.
   The seventeen `pass-party` packs remain explicitly interim and are ordered
   by story progression. QA content is loaded only by the dev/harness dynamic
   module, keeping the player slot untouched and autosaves disabled.
+- The long press raced its own timer (2026-10-18): CI run `39195712818`
+  failed the touch test on Chromium because a long task across the 650 ms
+  mark let the release run before the overdue timer, and the release cancelled
+  it. A slow phone can do the same. The release now opens the library too when
+  the press lasted 650 ms by its events' timestamps. The test holds a 200 ms
+  long task across that mark (it failed three times in three before the fix)
+  and checks that a tap still leaves the title alone.
 
 ## Milestone 66: Experience and levels **Status:** ✅ Completed (2026-10-18)
 - The owner (2026-10-18): it works like a normal RPG. Experience raises the

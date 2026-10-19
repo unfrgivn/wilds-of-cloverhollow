@@ -3624,9 +3624,11 @@ more bad guys, and the blacklight lantern, made and built while away.
   warm-up costs more than it saves unless it overlaps other work, and a Mac
   job has only a few seconds of setup left once its browser restores: not
   done.
-- To do: refresh `tests/e2e/timings.json` (`just timings`) once main has three
-  green runs on this layout; the Linux shards are still planned from Mac
-  times.
+- Landed on main in 2 min 49 s (run 39187244899); the Macs took 103 to 157 s
+  and WebKit 110 to 167 s, unevenly split. `just timings` then refreshed the
+  record from that run and the two before it (all on this layout): the
+  slowest WebKit shard is planned at 89 s of tests against 126, the slowest
+  Mac at 114 against 121.
 - The QA milestone's timings refresh (cad6f7c0) was made from runs before the
   gallery's checks moved to their own spec, so their 472 timings went back
   under `ui-gallery.spec.ts` and the planner weighed each check at its

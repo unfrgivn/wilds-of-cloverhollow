@@ -43,6 +43,33 @@ test(
   },
 );
 
+test("a picked QA pack keeps the real-time loop running", async ({ page }) => {
+  await page.goto("./");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  await page.keyboard.press("q");
+  await expect(page.locator(".qa-menu")).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("z");
+  await expect(page.locator(".qa-badge")).toBeVisible();
+  const before = await readState(page);
+  await page.keyboard.down("ArrowRight");
+  await page.waitForTimeout(1500);
+  await page.keyboard.up("ArrowRight");
+  const after = await readState(page);
+  expect(after.tick).toBeGreaterThan(before.tick);
+  expect(after.player.x).toBeGreaterThan(before.player.x);
+});
+
+test("the QA menu keeps Back to title visible on a phone viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 874, height: 402 });
+  await page.goto("./");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  await page.keyboard.press("q");
+  await expect(page.locator(".qa-menu")).toBeVisible();
+  await expect(page.locator(".qa-back")).toBeVisible();
+  await expect(page.locator(".qa-back")).toBeInViewport();
+});
+
 test("a QA URL boots the named pack and shows its badge", async ({ page }) => {
   await page.goto("./?qa=shortcut-jordan");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));

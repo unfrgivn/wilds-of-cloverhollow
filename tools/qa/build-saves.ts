@@ -29,7 +29,7 @@ const specs: PackSpec[] = [
     "clubhouse", "kitchen", "arcade", "lodge", "squirrel", "mist", "forest",
     "kid", "flute", "lasso"].map((run) => ({
     id: `shortcut-${run}`, label: `${run[0]?.toUpperCase() ?? ""}${run.slice(1)} shortcut`,
-    note: `Starts from the pass-party shortcut, at the ${run} beat; continue from here.`,
+    note: "",
     fixture: "pass-party", run: `pass-party/${run}.json`, interim: true,
   })),
 ];
@@ -74,6 +74,48 @@ function stateAt(states: State[], index: number): State {
   return state;
 }
 
+const areaNames: Record<string, string> = {
+  plaza: "the plaza", kitchen: "the kitchen", bedroom: "the bedroom", park: "the park",
+  pass: "Pinecone Pass",
+  school: "the school", classroom: "the classroom", gym: "the gym", bay: "Bubblegum Bay",
+  woods: "the Whispering Woods", "east-hall": "the east hall", clubhouse: "the clubhouse",
+  arcade: "the arcade", lodge: "the lodge", squirrel: "the squirrel trail", mist: "the mist trail",
+  music: "the music room",
+  enchanted: "the Enchanted Forest", field: "the field",
+};
+const nextBeats: Record<string, string> = {
+  jordan: "the lantern", lantern: "the woods", woods: "the school chapter", school: "the gym",
+  gym: "the music room", music: "the field", field: "the clubhouse", clubhouse: "the kitchen",
+  kitchen: "the arcade", arcade: "the lodge", lodge: "the squirrel trail", squirrel: "the mist",
+  mist: "the Enchanted Forest", forest: "the kid", kid: "the flute and lasso beats",
+  flute: "the lasso beat", lasso: "the ending",
+};
+function noteFor(spec: PackSpec, state: State): string {
+  if (!spec.interim) {
+    if (spec.id === "breakfast")
+      return "In the kitchen, just after Fae eats breakfast and leaves the table.";
+    if (spec.id === "fountain-frog")
+      return "In the plaza, after the fountain frog is calm; the school is next.";
+    if (spec.id === "tree-house")
+      return "At the tree house, with chapter one complete; Bubblegum Bay is next.";
+    return "On the road into Bubblegum Bay, ready to explore the new lands.";
+  }
+  const party = state.party.length === 0
+    ? "Fae alone"
+    : `Fae with ${state.party.map((member) => member.id).join(", ")}`;
+  const tools = [
+    content.world.storyVariable(state.ink, "has_lantern") === true ? "lantern" : "no lantern",
+    content.world.storyVariable(state.ink, "has_lasso") === true ? "lasso" : "no lasso",
+    content.world.storyVariable(state.ink, "has_flute") === true ? "flute" : "no flute",
+  ].join(", ");
+  const run = spec.run.replace("pass-party/", "").replace(".json", "");
+  const next = nextBeats[run] ?? "the next story beat";
+  const stickerCount = `${state.stickers.length} sticker${state.stickers.length === 1 ? "" : "s"}`;
+  const location = areaNames[state.area] ?? state.area;
+  return `Starts from the pass-party shortcut in ${location}, ${party}; ` +
+    `holds ${tools}, ${stickerCount}, and ${state.coins} coins. Next: ${next}.`;
+}
+
 function replay(spec: PackSpec): { states: State[]; final: State } {
   const key = `${spec.fixture}/${spec.run}`;
   const cached = replayCache.get(key);
@@ -100,9 +142,8 @@ for (const spec of specs) {
   let tick = requested;
   let foundAutosave = false;
   while (tick <= states.length - 1) {
-    const previous = stateAt(states, tick - 1);
     const current = stateAt(states, tick);
-    if (tick > 0 && autosaveNeeded(previous, current) && current.battle === null &&
+    if (tick > 0 && autosaveNeeded(stateAt(states, tick - 1), current) && current.battle === null &&
       current.arcade === null && current.finale === null) {
       foundAutosave = true;
       break;
@@ -121,7 +162,7 @@ for (const spec of specs) {
   bytes.add(serialized); origins.add(`${spec.run}:${tick}`);
   writeFileSync(`${outDir}/${spec.id}.json`, serialized);
   manifest.push({
-    id: spec.id, label: spec.label, note: spec.note, fixture: spec.fixture,
+    id: spec.id, label: spec.label, note: noteFor(spec, state), fixture: spec.fixture,
     run: spec.run, tick, interim: spec.interim, hash: stableHash(state),
   });
 }

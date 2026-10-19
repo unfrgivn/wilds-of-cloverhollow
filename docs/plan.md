@@ -2882,18 +2882,24 @@ the old trail, the owl, and the clubhouse claim.
   relaunch to leave.
 - `just build` fails if QA mode or a pack reaches the production bundle, or
   if the harness bundle lacks it.
-- Evidence: unit tests (pack freshness and the QA flow), Chromium and WebKit
-  real-input e2e coverage (Q on the title, a pack picked with the arrows and
-  Z, movement, save-slot preservation, cancellation, an unknown id, a touch
-  long press and pick, and a fixture reset), the menu and badge screenshotted
-  and viewed, reviewed JPEG evidence in `art/review/`, and the menu and pack
-  pick on the iOS simulator.
-- Gates and notes (2026-10-18): Q was free in the input map, so it is the
-  keyboard entry, alongside a logo long press and `?qa=<id>`. The library has
-  four real packs from the new-game chapter-one/east-road runs and seventeen
-  interim packs from the pass-party runs, each cut at a valid autosave. QA
-  content is loaded only by the dev/harness dynamic module, keeping the player
-  slot untouched and autosaves disabled.
+- Evidence: unit tests (pack freshness, URL validation, and the QA flow),
+  Chromium and WebKit real-input e2e coverage for keyboard selection, movement,
+  real-time ticking after a pick, save-slot preservation, cancellation, an
+  unknown id, touch long press and pick, fixture reset, and the visible Back to
+  title control at phone size. The Chromium menu and badge baselines and their
+  reviewed JPEGs were captured and viewed. The iOS simulator was built and
+  launched for this pass; its touch menu/pick evidence remains pending because
+  the available simulator snapshot did not expose the web-view logo or menu
+  controls as actionable elements.
+- Gates and notes (2026-10-18): the first push (`bec40b06`) went out with the
+  gate red; CI run `39178771039` failed 64 tests. Hotfix `e2520a6d` added the
+  `[hidden]` rule and initialized sound before the QA import. This fix pass
+  also fixed the frozen real-time loop after a pack pick. The four real packs
+  are cut at breakfast tick 189 in the kitchen, the fountain frog at tick 1045
+  in the plaza, the tree house at tick 4419, and Bubblegum Bay at tick 5564.
+  The seventeen `pass-party` packs remain explicitly interim and are ordered
+  by story progression. QA content is loaded only by the dev/harness dynamic
+  module, keeping the player slot untouched and autosaves disabled.
 
 ## Milestone 66: Experience and levels **Status:** 📋 Planned (a proposal for the owner's review)
 - The owner asked for experience and levels (2026-10-18), for the cheat

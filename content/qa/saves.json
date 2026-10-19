@@ -2,7 +2,7 @@
   {
     "id": "breakfast",
     "label": "After breakfast",
-    "note": "A new game, just after Fae leaves home.",
+    "note": "In the kitchen, just after Fae eats breakfast and leaves the table.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
     "tick": 189,
@@ -12,7 +12,7 @@
   {
     "id": "fountain-frog",
     "label": "After the fountain frog",
-    "note": "In the plaza, after the fountain frog's first calm-down; the school is next.",
+    "note": "In the plaza, after the fountain frog is calm; the school is next.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
     "tick": 1045,
@@ -42,7 +42,7 @@
   {
     "id": "shortcut-jordan",
     "label": "Jordan shortcut",
-    "note": "Starts from the pass-party shortcut, at the jordan beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in Pinecone Pass, Fae with maddie, sue, jordan; holds no lantern, no lasso, no flute, 0 stickers, and 0 coins. Next: the lantern.",
     "fixture": "pass-party",
     "run": "pass-party/jordan.json",
     "tick": 143,
@@ -52,7 +52,7 @@
   {
     "id": "shortcut-lantern",
     "label": "Lantern shortcut",
-    "note": "Starts from the pass-party shortcut, at the lantern beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in Pinecone Pass, Fae with maddie, sue, jordan; holds lantern, no lasso, no flute, 1 sticker, and 8 coins. Next: the woods.",
     "fixture": "pass-party",
     "run": "pass-party/lantern.json",
     "tick": 568,
@@ -62,7 +62,7 @@
   {
     "id": "shortcut-woods",
     "label": "Woods shortcut",
-    "note": "Starts from the pass-party shortcut, at the woods beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the Whispering Woods, Fae with maddie, sue, jordan; holds lantern, no lasso, no flute, 2 stickers, and 16 coins. Next: the school chapter.",
     "fixture": "pass-party",
     "run": "pass-party/woods.json",
     "tick": 1073,
@@ -72,7 +72,7 @@
   {
     "id": "shortcut-school",
     "label": "School shortcut",
-    "note": "Starts from the pass-party shortcut, at the school beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the east hall, Fae with maddie, sue, jordan; holds lantern, no lasso, no flute, 3 stickers, and 41 coins. Next: the gym.",
     "fixture": "pass-party",
     "run": "pass-party/school.json",
     "tick": 4249,
@@ -82,7 +82,7 @@
   {
     "id": "shortcut-gym",
     "label": "Gym shortcut",
-    "note": "Starts from the pass-party shortcut, at the gym beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the gym, Fae with maddie, sue, jordan; holds lantern, lasso, no flute, 4 stickers, and 49 coins. Next: the music room.",
     "fixture": "pass-party",
     "run": "pass-party/gym.json",
     "tick": 6225,
@@ -92,7 +92,7 @@
   {
     "id": "shortcut-music",
     "label": "Music shortcut",
-    "note": "Starts from the pass-party shortcut, at the music beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the music room, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 5 stickers, and 57 coins. Next: the field.",
     "fixture": "pass-party",
     "run": "pass-party/music.json",
     "tick": 8187,
@@ -102,7 +102,7 @@
   {
     "id": "shortcut-field",
     "label": "Field shortcut",
-    "note": "Starts from the pass-party shortcut, at the field beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the field, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 5 stickers, and 57 coins. Next: the clubhouse.",
     "fixture": "pass-party",
     "run": "pass-party/field.json",
     "tick": 8777,
@@ -112,7 +112,7 @@
   {
     "id": "shortcut-clubhouse",
     "label": "Clubhouse shortcut",
-    "note": "Starts from the pass-party shortcut, at the clubhouse beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the clubhouse, Fae with maddie, sue, jordan; holds lantern, no lasso, no flute, 3 stickers, and 48 coins. Next: the kitchen.",
     "fixture": "pass-party",
     "run": "pass-party/clubhouse.json",
     "tick": 3121,
@@ -122,7 +122,7 @@
   {
     "id": "shortcut-kitchen",
     "label": "Kitchen shortcut",
-    "note": "Starts from the pass-party shortcut, at the kitchen beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the clubhouse, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 7 stickers, and 119 coins. Next: the arcade.",
     "fixture": "pass-party",
     "run": "pass-party/kitchen.json",
     "tick": 17685,
@@ -132,7 +132,7 @@
   {
     "id": "shortcut-arcade",
     "label": "Arcade shortcut",
-    "note": "Starts from the pass-party shortcut, at the arcade beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the arcade, Fae with maddie, sue, jordan; holds lantern, no lasso, no flute, 2 stickers, and 16 coins. Next: the lodge.",
     "fixture": "pass-party",
     "run": "pass-party/arcade.json",
     "tick": 2034,
@@ -142,7 +142,7 @@
   {
     "id": "shortcut-lodge",
     "label": "Lodge shortcut",
-    "note": "Starts from the pass-party shortcut, at the lodge beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the lodge, Fae with maddie, sue, jordan; holds lantern, no lasso, no flute, 2 stickers, and 33 coins. Next: the squirrel trail.",
     "fixture": "pass-party",
     "run": "pass-party/lodge.json",
     "tick": 1421,
@@ -152,7 +152,7 @@
   {
     "id": "shortcut-squirrel",
     "label": "Squirrel shortcut",
-    "note": "Starts from the pass-party shortcut, at the squirrel beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the field, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 6 stickers, and 65 coins. Next: the mist.",
     "fixture": "pass-party",
     "run": "pass-party/squirrel.json",
     "tick": 9430,
@@ -162,7 +162,7 @@
   {
     "id": "shortcut-mist",
     "label": "Mist shortcut",
-    "note": "Starts from the pass-party shortcut, at the mist beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the mist trail, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 7 stickers, and 119 coins. Next: the Enchanted Forest.",
     "fixture": "pass-party",
     "run": "pass-party/mist.json",
     "tick": 17444,
@@ -172,7 +172,7 @@
   {
     "id": "shortcut-forest",
     "label": "Forest shortcut",
-    "note": "Starts from the pass-party shortcut, at the forest beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the Enchanted Forest, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 7 stickers, and 119 coins. Next: the kid.",
     "fixture": "pass-party",
     "run": "pass-party/forest.json",
     "tick": 18113,
@@ -182,7 +182,7 @@
   {
     "id": "shortcut-kid",
     "label": "Kid shortcut",
-    "note": "Starts from the pass-party shortcut, at the kid beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the Enchanted Forest, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 8 stickers, and 159 coins. Next: the flute and lasso beats.",
     "fixture": "pass-party",
     "run": "pass-party/kid.json",
     "tick": 18926,
@@ -192,7 +192,7 @@
   {
     "id": "shortcut-flute",
     "label": "Flute shortcut",
-    "note": "Starts from the pass-party shortcut, at the flute beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the park, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 6 stickers, and 65 coins. Next: the lasso beat.",
     "fixture": "pass-party",
     "run": "pass-party/flute.json",
     "tick": 11228,
@@ -202,7 +202,7 @@
   {
     "id": "shortcut-lasso",
     "label": "Lasso shortcut",
-    "note": "Starts from the pass-party shortcut, at the lasso beat; continue from here.",
+    "note": "Starts from the pass-party shortcut in the classroom, Fae with maddie, sue, jordan; holds lantern, lasso, flute, 7 stickers, and 113 coins. Next: the ending.",
     "fixture": "pass-party",
     "run": "pass-party/lasso.json",
     "tick": 16063,

@@ -220,7 +220,7 @@ async function boot(): Promise<void> {
   const pickQa = (item: PackState): void => {
     const loaded = parseSave(item.save, fresh);
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
-    state = loaded; qaActivePack = item; qaMenuOpen = false; titleMode = null; paused = true;
+    state = loaded; qaActivePack = item; qaMenuOpen = false; titleMode = null;
     qaJustPicked = true;
     swallowed.add("confirm");
   };

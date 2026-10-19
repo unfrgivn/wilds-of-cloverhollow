@@ -2474,20 +2474,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   runners, which have a GPU (Apple's paravirtual Metal device) and match the
   Chromium baselines, so CI compares its screenshots (each runner checks out
   only its own specs' baselines, in the background while its browser
-  restores). The spec files listed in `tools/ci/shard.ts` (the UI gallery's
-  checks, `ui-gallery-checks.spec.ts`) compare no screenshot and draw little,
-  so Chromium runs them on two Linux runners instead (macOS allows five jobs
-  at a time); a gameplay spec stays on the Macs, as Linux's software renderer
-  draws its every step. WebKit runs on eight Linux runners, with the
-  downloads of its system libraries cached per runner image, and leaves its
-  screenshots to local runs: WebKit draws text and images with the operating
-  system's libraries, so its baselines hold for the macOS they were drawn on.
-  Each shard runs one worker. `tools/ci/shard.ts` splits each project by the
-  recorded seconds per test in `tests/e2e/timings.json`, keeping a file's
-  tests together and in order (only a file longer than half a shard is cut,
-  into runs of about equal time in order); `just timings` refreshes the record
-  from the last three green runs on main, each test's mean over them (runners
-  differ by half again in speed).
+  restores). Chromium's jobs install only its headless shell, the browser
+  headless runs launch. The spec files listed in `tools/ci/shard.ts` (the UI
+  gallery's checks, `ui-gallery-checks.spec.ts`) compare no screenshot and
+  draw little, so Chromium runs them on two Linux runners instead (macOS
+  allows five jobs at a time); a gameplay spec stays on the Macs, as Linux's
+  software renderer draws its every step. WebKit runs on eight Linux runners,
+  with the downloads of its system libraries cached per runner image, and
+  leaves its screenshots to local runs: WebKit draws text and images with the
+  operating system's libraries, so its baselines hold for the macOS they were
+  drawn on. Each shard runs one worker. `tools/ci/shard.ts` splits each
+  project by the recorded seconds per test in `tests/e2e/timings.json`,
+  keeping a file's tests together and in order (only a file longer than half
+  a shard is cut, into runs of about equal time in order); `just timings`
+  refreshes the record from the last three green runs on main, each test's
+  mean over them (runners differ by half again in speed).
 - MCP (project `opencode.json`): Chrome DevTools MCP on an isolated Chrome at
   1280x720, MobileBuildMCP for the iOS Simulator, and Xcode MCP
   (`xcrun mcpbridge`) when Xcode has the iOS project open.

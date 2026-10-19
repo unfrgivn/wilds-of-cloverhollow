@@ -72,12 +72,14 @@ jobs:
           ( set +e; xargs git sparse-checkout add < baselines.txt; echo $? > baselines.status ) \
             > baselines.log 2>&1 < /dev/null &
       # Browser downloads, kept until a dependency changes (`playwright
-      # install` skips what's there).
+      # install` skips what's there). Headless runs launch only Chromium's
+      # headless shell, so the full browser isn't installed (86 MB to restore
+      # against 251).
       - uses: actions/cache@v4
         with:
           path: ~/Library/Caches/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-${{ hashFiles('bun.lock') }}
-      - run: bunx playwright install chromium
+          key: playwright-${{ runner.os }}-chromium-shell-${{ hashFiles('bun.lock') }}
+      - run: bunx playwright install --only-shell chromium
       - name: Wait for the baselines
         run: |
           for _ in $(seq 600); do [ -f baselines.status ] && break; sleep 0.2; done
@@ -130,8 +132,8 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-${{ hashFiles('bun.lock') }}
-      - run: bunx playwright install chromium
+          key: playwright-${{ runner.os }}-chromium-shell-${{ hashFiles('bun.lock') }}
+      - run: bunx playwright install --only-shell chromium
       - run: bun tools/ci/shard.ts chromium ${{ matrix.shard }}/${{ strategy.job-total }} shard.txt --linux
       - run: bunx playwright test --project=chromium --test-list shard.txt --reporter=dot,json
         env:

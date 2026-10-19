@@ -25,6 +25,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: the fridge, the garden, the calms, and the snacks", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/clubhouse.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -75,5 +76,5 @@ test("real keys: the fridge, the garden, the calms, and the snacks", async ({ pa
   ]);
   const end = await readState(page);
   expect({ area: end.area, snacks: end.snacks }).toEqual({ area: "clubhouse", snacks: 5 });
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

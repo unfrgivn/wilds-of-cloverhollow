@@ -21,6 +21,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: Ms. Willow, the music bird, the song, and the flute", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/music.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -66,5 +67,5 @@ test("real keys: Ms. Willow, the music bird, the song, and the flute", async ({ 
   ]);
   const end = await readState(page);
   expect(end.area).toBe("music");
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

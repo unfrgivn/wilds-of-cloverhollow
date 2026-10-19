@@ -27,6 +27,7 @@ async function screenshots(page: Page, name: string): Promise<void> {
 
 test("real keys wake Fae from the dream, and Continue returns to it",
   { tag: "@smoke" }, async ({ page }) => {
+    const expectedHash = bunHash(path, "pass-party");
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await page.evaluate(() => window.__cloverhollow?.save.clear());
@@ -70,7 +71,7 @@ test("real keys wake Fae from the dream, and Continue returns to it",
         await take("kitchen");
       }
     });
-    expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+    expect(await readHash(page)).toBe(await expectedHash);
     expect(shots).toEqual(new Set(["milo-choice", "morning", "kitchen"]));
 
     // The credits: the dream's friends and everyone Fae met, as stickers.

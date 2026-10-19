@@ -27,6 +27,7 @@ test("real keys: a squirrel befriended, called by the flute, and up the big oak"
   page,
 }) => {
   const path = "tests/sim/scripts/pass-party/squirrel.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -66,5 +67,5 @@ test("real keys: a squirrel befriended, called by the flute, and up the big oak"
   const end = await readState(page);
   expect([end.area, end.party.map((member) => member.id).at(-1)])
     .toEqual(["woods", "acorn-squirrel"]);
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

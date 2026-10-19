@@ -83,6 +83,7 @@ test("real keys: Mr. Pip calmed, a game of skee-ball, and a prize for tickets", 
   page,
 }) => {
   const path = "tests/sim/scripts/arcade/skee.json";
+  const expectedHash = bunHash(path, "arcade");
   const { corner } = skeeNumbers();
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
@@ -125,7 +126,7 @@ test("real keys: Mr. Pip calmed, a game of skee-ball, and a prize for tickets", 
   const end = await readState(page);
   expect({ arcade: end.arcade, prizes: end.prizes, tickets: end.tickets, coins: end.coins })
     .toEqual({ arcade: null, prizes: ["pinwheel"], tickets: 2, coins: 23 });
-  expect(await readHash(page)).toBe(bunHash(path, "arcade"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 // On a phone, a tap on the confirm sticker sets the aim and a hold on it rolls

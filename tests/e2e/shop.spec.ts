@@ -59,6 +59,7 @@ test("real keys: the frog's coins buy a bakery snack, eaten in the pup's battle"
   page,
 }) => {
   const path = "tests/sim/scripts/plaza/bakery.json";
+  const expectedHash = bunHash(path, "plaza");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "plaza");
@@ -91,7 +92,7 @@ test("real keys: the frog's coins buy a bakery snack, eaten in the pup's battle"
   expect({ area: end.area, coins: end.coins, snacks: end.snacks,
     pup: end.wild.find((critter) => critter.kind === "pup")?.mood })
     .toEqual({ area: "park", coins: 11, snacks: 2, pup: "calm" });
-  expect(await readHash(page)).toBe(bunHash(path, "plaza"));
+  expect(await readHash(page)).toBe(await expectedHash);
   await page.keyboard.press("j");
   await step(page, 1);
   await expect(page.locator(".journal-supply")).toHaveText(["Coins 11", "Snacks 2"]);

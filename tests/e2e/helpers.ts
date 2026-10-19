@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 import type { ActionFrame, State } from "../../src/core";
@@ -211,30 +211,48 @@ export async function renderInfo(page: Page): Promise<RenderInfo> {
   return info;
 }
 
-export function bunHash(scriptPath: string, fixture = "harness"): string {
-  const result = spawnSync(
-    "bun",
-    [
-      "tools/sim/run.ts",
-      scriptPath,
-      "--fixture",
-      fixture,
-      "--seed",
-      "1",
-      "--json",
-    ],
-    { encoding: "utf8" },
-  );
-  if (result.status !== 0) throw new Error(result.stderr);
-  const parsed: unknown = JSON.parse(result.stdout);
-  if (
-    typeof parsed !== "object" ||
-    parsed === null ||
-    !("hash" in parsed) ||
-    typeof parsed.hash !== "string"
-  )
-    throw new Error(`invalid sim output: ${result.stdout}`);
-  return parsed.hash;
+export function bunHash(scriptPath: string, fixture = "harness"): Promise<string> {
+  const hash = new Promise<string>((resolve, reject) => {
+    execFile(
+      "bun",
+      [
+        "tools/sim/run.ts",
+        scriptPath,
+        "--fixture",
+        fixture,
+        "--seed",
+        "1",
+        "--json",
+      ],
+      { encoding: "utf8" },
+      (error, stdout, stderr) => {
+        if (error !== null) {
+          reject(new Error(stderr || error.message));
+          return;
+        }
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(stdout);
+        } catch (error: unknown) {
+          reject(error instanceof Error ? error : new Error(String(error)));
+          return;
+        }
+        if (
+          typeof parsed !== "object" ||
+          parsed === null ||
+          !("hash" in parsed) ||
+          typeof parsed.hash !== "string"
+        ) {
+          reject(new Error(`invalid sim output: ${stdout}`));
+          return;
+        }
+        resolve(parsed.hash);
+      },
+    );
+  });
+  // Tests may fail before comparison, so prevent an abandoned replay rejection.
+  hash.catch(() => undefined);
+  return hash;
 }
 
 export async function pixelAt(

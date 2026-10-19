@@ -23,6 +23,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: the lodge keeper home and fizzy, calmed, and her lodge", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/lodge.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -52,5 +53,5 @@ test("real keys: the lodge keeper home and fizzy, calmed, and her lodge", async 
   expect([...shot]).toEqual(moments.map(([, name]) => name));
   const end = await readState(page);
   expect([end.area, end.critters["lodge-keeper"]]).toEqual(["lodge", "calm"]);
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

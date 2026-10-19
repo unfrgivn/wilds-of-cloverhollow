@@ -72,6 +72,7 @@ test("the arcade's door is locked until the clubhouse is claimed", async ({ page
 
 test("real keys: home from the woods, into the arcade, and Mr. Pip calmed", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/arcade.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -110,5 +111,5 @@ test("real keys: home from the woods, into the arcade, and Mr. Pip calmed", asyn
   expect({ area: end.area, keeper: end.critters["arcade-keeper"] })
     .toEqual({ area: "arcade", keeper: "calm" });
   expect(end.stickers).toContain("arcade-keeper");
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

@@ -42,6 +42,7 @@ async function propOverFae(page: Page, prop: string): Promise<boolean> {
 for (const { room, fixture, prop } of rooms)
   test(`real keys: behind, in front of, and into the ${room}'s ${prop}`, async ({ page }) => {
     const path = `tests/sim/scripts/${fixture}/kit-${room}.json`;
+    const expectedHash = bunHash(path, fixture);
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, fixture);
@@ -58,5 +59,5 @@ for (const { room, fixture, prop } of rooms)
     }
     expect(stops.slice(0, 2)).toEqual([true, false]);
     expect((await readState(page)).area).toBe(room);
-    expect(await readHash(page)).toBe(bunHash(path, fixture));
+    expect(await readHash(page)).toBe(await expectedHash);
   });

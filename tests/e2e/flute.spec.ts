@@ -30,6 +30,7 @@ test("real keys: a pat and a snack, the flute, a friend along, and the pond", as
   page,
 }) => {
   const path = "tests/sim/scripts/pass-party/flute.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -81,7 +82,7 @@ test("real keys: a pat and a snack, the flute, a friend along, and the pond", as
   ]);
   const end = await readState(page);
   expect({ area: end.area, party: end.party.length }).toEqual({ area: "park", party: 3 });
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 test("the touch flute button plays the flute, and steps aside while she talks", {

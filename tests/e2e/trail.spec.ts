@@ -56,6 +56,7 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
   page,
 }) => {
   const path = "tests/sim/scripts/pass/trail.json";
+  const expectedHash = bunHash(path, "pass");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass");
@@ -105,7 +106,7 @@ test("real keys from Pinecone Pass down the Cliffside Trail to Bubblegum Bay", a
     .toEqual({ area: "bay", knot: "bay_cliff_path" });
   // She left the trail, so its critters are gone; the bunny's sticker stays.
   expect(end.stickers).toEqual(["ribbon-bunny"]);
-  expect(await readHash(page)).toBe(bunHash(path, "pass"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 test("real keys over the footbridge to the lookout, and down into the bay", async ({

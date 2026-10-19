@@ -27,6 +27,7 @@ test("real keys: Mom's microwave and chest, the nuggets cooked golden, the keeps
   page,
 }) => {
   const path = "tests/sim/scripts/pass-party/kitchen.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -67,5 +68,5 @@ test("real keys: Mom's microwave and chest, the nuggets cooked golden, the keeps
   expect(cooking).toMatchObject({ front: "Dino nuggets · Heat 1:00", light: true, wisps: 4 });
   const end = await readState(page);
   expect([end.area, end.snacks]).toEqual(["clubhouse", 5]);
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

@@ -117,6 +117,7 @@ test.describe("deterministic replays", () => {
       test.setTimeout(longFlowTimeout);
       // Scripts live in tests/sim/scripts/<fixture>/ (tools/sim/run-all.ts).
       const path = `tests/sim/scripts/${fixture}/${name}.json`;
+      const expectedHash = bunHash(path, fixture);
       const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
       await resetPaused(replayPage, fixture);
       await queueScript(replayPage, script);
@@ -125,7 +126,7 @@ test.describe("deterministic replays", () => {
         script.reduce((total, segment) => total + segment.ticks, 0),
       );
       const browserHash = await readHash(replayPage);
-      expect(browserHash).toBe(bunHash(path, fixture));
+      expect(browserHash).toBe(await expectedHash);
       console.log(`${name}: browser and Bun hash ${browserHash}`);
     });
   }

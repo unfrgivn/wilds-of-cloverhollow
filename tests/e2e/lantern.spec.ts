@@ -8,6 +8,7 @@ test.describe.configure({ timeout: longFlowTimeout });
 
 test("real keys switch on the blacklight and reveal the pass trail", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/lantern.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -50,7 +51,7 @@ test("real keys switch on the blacklight and reveal the pass trail", async ({ pa
   const end = await readState(page);
   expect(end.lantern).toBe(false);
   expect(await renderInfo(page)).toMatchObject({ lantern: { on: false, glows: [] } });
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
   await page.keyboard.press("j");
   await step(page, 1);
   await expect(page.locator(".journal-note").filter({ hasText: "Whispering Woods" }))

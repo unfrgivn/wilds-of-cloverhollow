@@ -59,6 +59,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 test("real keys: a calmed pup is gone after a trip out, a fresh one pays, the fourth is a friend",
   async ({ page }) => {
     const path = "tests/sim/scripts/park/recurring.json";
+    const expectedHash = bunHash(path, "park");
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await resetPaused(page, "park");
@@ -113,7 +114,7 @@ test("real keys: a calmed pup is gone after a trip out, a fresh one pays, the fo
     const end = await readState(page);
     expect({ coins: end.coins, stickers: end.stickers, calms: end.calms })
       .toEqual({ coins: 32, stickers: ["pond-pup"], calms: { pup: 4 } });
-    expect(await readHash(page)).toBe(bunHash(path, "park"));
+    expect(await readHash(page)).toBe(await expectedHash);
   });
 
 test("the town's cats: one comes out in the plaza once the fountain frog is calm", async ({

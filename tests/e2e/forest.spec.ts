@@ -8,6 +8,7 @@ test.describe.configure({ timeout: longFlowTimeout });
 
 test("real keys explore the Enchanted Forest", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/forest.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -48,5 +49,5 @@ test("real keys explore the Enchanted Forest", async ({ page }) => {
     }
   });
   expect({ arrived, lore }).toEqual({ arrived: true, lore: true });
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

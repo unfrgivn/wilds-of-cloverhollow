@@ -26,6 +26,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: the squirrel, the swing, the stash, and the footbridge", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/field.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -78,5 +79,5 @@ test("real keys: the squirrel, the swing, the stash, and the footbridge", async 
   const end = await readState(page);
   expect(end.area).toBe("field");
   expect(end.player.x).toBeLessThan(1000);
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

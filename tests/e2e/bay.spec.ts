@@ -70,6 +70,7 @@ test("after chapter one, real keys take Fae down the east road into the bay", as
   // out of the park, the plaza's critters calmed, down the east road) played
   // with real keys.
   const path = "tests/sim/scripts/new-game/east-road.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "new-game");
@@ -83,7 +84,7 @@ test("after chapter one, real keys take Fae down the east road into the bay", as
   expect(state.player).toEqual({ x: 180, y: 545 });
   expect(state.facing).toBe("right");
   expect(state.party.map((member) => member.id)).toEqual(["maddie"]);
-  expect(await readHash(page)).toBe(bunHash(path, "new-game"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 test("the bay on arrival, at both sizes", async ({ page }) => {

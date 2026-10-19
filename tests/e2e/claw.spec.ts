@@ -52,6 +52,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: Mr. Pip calmed, then the claw machine's four games", async ({ page }) => {
   const path = "tests/sim/scripts/arcade/claw.json";
+  const expectedHash = bunHash(path, "arcade");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "arcade");
@@ -89,7 +90,7 @@ test("real keys: Mr. Pip calmed, then the claw machine's four games", async ({ p
   const end = await readState(page);
   expect({ arcade: end.arcade, prizes: end.prizes, coins: end.coins })
     .toEqual({ arcade: null, prizes: ["pup-plush", "cat-plush"], coins: 17 });
-  expect(await readHash(page)).toBe(bunHash(path, "arcade"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 // The claw's numbers and the pup's spot, from content/arcade.json (Node can't

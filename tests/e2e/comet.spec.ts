@@ -60,6 +60,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: Mr. Pip calmed, then a run of Comet Cruise", async ({ page }) => {
   const path = "tests/sim/scripts/arcade/comet.json";
+  const expectedHash = bunHash(path, "arcade");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "arcade");
@@ -103,7 +104,7 @@ test("real keys: Mr. Pip calmed, then a run of Comet Cruise", async ({ page }) =
   const end = await readState(page);
   expect({ arcade: end.arcade, tickets: end.tickets, coins: end.coins })
     .toEqual({ arcade: null, tickets: 28, coins: 23 });
-  expect(await readHash(page)).toBe(bunHash(path, "arcade"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 // On a phone, Fae steers with the arrow stickers where the stick would be:

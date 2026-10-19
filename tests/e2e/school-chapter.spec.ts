@@ -51,6 +51,7 @@ test("real keys: story time, the classroom, and a glimpse of the purple hood", a
   page,
 }) => {
   const path = "tests/sim/scripts/pass-party/school.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -92,5 +93,5 @@ test("real keys: story time, the classroom, and a glimpse of the purple hood", a
   const end = await readState(page);
   expect(end.area).toBe("east-hall");
   expect((await renderInfo(page)).npcs.map((npc) => npc.id)).not.toContain("hooded-kid");
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

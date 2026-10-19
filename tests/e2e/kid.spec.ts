@@ -45,6 +45,7 @@ async function phone(page: Page): Promise<void> {
 }
 
 test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" }, async ({ page }) => {
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -121,7 +122,7 @@ test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" }, async 
     opening: true, menu: true, trace: true, talk: true, reveal: true, reward: true,
     restored: true,
   });
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
   // Milo's second talk ends on "Not yet": the dream goes on (the ending's run,
   // which starts with this one, takes the other answer).
   expect(await readState(page))

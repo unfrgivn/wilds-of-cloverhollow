@@ -64,6 +64,7 @@ test("real keys ride to Pinecone Pass and back home", async ({ page }) => {
   // (tools/sim/record-bus.ts: into town, the plaza's stop to the pass, its
   // sign, the lodge's porch, and the bus home) played with real keys.
   const path = "tests/sim/scripts/bay/bus.json";
+  const expectedHash = bunHash(path, "bay");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page); await resetPaused(page, "bay");
   let arrived = false;
@@ -87,7 +88,7 @@ test("real keys ride to Pinecone Pass and back home", async ({ page }) => {
   const end = await readState(page);
   expect({ area: end.area, player: end.player }).toEqual({ area: "plaza",
     player: { x: 878, y: 985 } });
-  expect(await readHash(page)).toBe(bunHash(path, "bay"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });
 
 

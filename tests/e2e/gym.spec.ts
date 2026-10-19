@@ -52,6 +52,7 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: PE, Coach Ash's stopwatch and clipboard, and the lasso", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/gym.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -98,5 +99,5 @@ test("real keys: PE, Coach Ash's stopwatch and clipboard, and the lasso", async 
   const end = await readState(page);
   expect({ area: end.area, pup: end.critters["gym-pup"] }).toEqual({ area: "gym", pup: "calm" });
   expect(end.stickers).toContain("pond-pup");
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

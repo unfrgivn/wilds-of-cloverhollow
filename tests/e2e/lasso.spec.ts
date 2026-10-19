@@ -28,6 +28,7 @@ test("real keys: the kite, the scarf, the bottle and the treasure, and Rosie", a
   page,
 }) => {
   const path = "tests/sim/scripts/pass-party/lasso.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -75,5 +76,5 @@ test("real keys: the kite, the scarf, the bottle and the treasure, and Rosie", a
   });
   const end = await readState(page);
   expect(end.area).toBe("classroom");
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 });

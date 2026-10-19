@@ -8,6 +8,7 @@ test.describe.configure({ timeout: longFlowTimeout });
 
 test("real keys cross the Misty Path and open the seal", async ({ page }) => {
   const path = "tests/sim/scripts/pass-party/mist.json";
+  const expectedHash = bunHash(path, "pass-party");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, "pass-party");
@@ -88,7 +89,7 @@ test("real keys cross the Misty Path and open the seal", async ({ page }) => {
     notes: true,
     opened: true,
   });
-  expect(await readHash(page)).toBe(bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await expectedHash);
 
   // The way through the mist is found, and Fae stands in the Enchanted
   // Forest's land: the map names it now ("???" before, spec 9).

@@ -2887,15 +2887,20 @@ the old trail, the owl, and the clubhouse claim.
   where the game itself would autosave (`autosaveNeeded`), so every pack is
   a save a playthrough wrote. A unit test fails when a pack goes stale: each
   must load with `parseSave` and hash the same as its run replayed to its
-  tick. The fix is rerunning the tool.
+  tick. The fix is rerunning the tool. The tool is the only writer: `just
+  check` runs it with `--check`, which fails on a hand-made, edited, or
+  orphaned pack (2026-10-18, after Milestone 62 wrote `hills-lookout` by hand
+  and a rerun would have dropped it). Setup packs, a QA fixture's first tick,
+  are its third kind, listed last; `hills-lookout` is the first.
 - Real packs come from the runs that start at a new game: chapter one (such
   as after breakfast, after the fountain frog, and the tree house) and the
-  east road (arriving in Bubblegum Bay). Interim packs come from the ends of
-  the `pass-party` runs (Jordan, the lantern, the woods, the school chapter,
-  the lasso, the flute, the clubhouse, the kitchen, the arcade, the lodge,
-  the mist, the forest, and the kid before the ending), labelled in the menu
-  as starting from the shortcut that skips chapter one and Sue's joining
-  (owner, 2026-10-18). Milestone 68 replaces them.
+  east road (arriving in Bubblegum Bay). Interim packs come from the 17
+  `pass-party` runs, each cut after its beat, in story order: Jordan, the
+  lantern, the woods, the arcade, the lodge, the school, the clubhouse, the
+  gym, the music room, the field, the squirrel, the flute, the lasso, the
+  mist, the kitchen, the forest, and the kid before the ending. The menu
+  labels them as starting from the shortcut that skips chapter one and Sue's
+  joining (owner, 2026-10-18). Milestone 68 replaces them.
 - QA mode: on the title, Q (or a long press on the logo) opens a QA menu of
   the packs, and `?qa=<id>` boots straight into one. The title looks as it
   does in production. While testing, a QA badge names the pack, nothing

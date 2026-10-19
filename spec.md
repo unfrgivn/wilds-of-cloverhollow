@@ -2349,6 +2349,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   doors, and ending events cannot change the player's slot. The QA menu can be
   cancelled back to the prior title mode, and a harness fixture reset clears
   the active pack and badge.
+- `tools/qa/build-saves.ts` is the only writer of the save library: it cuts
+  story and shortcut packs from recorded runs and setup packs from a QA
+  fixture's first tick. `just check` fails when a pack or
+  `content/qa/saves.json` differs from what it writes, or when a pack file has
+  no spec there.
 
 ## 11. Harness and agent control (locked)
 - The dev hook `window.__cloverhollow` exists in dev builds and in harness

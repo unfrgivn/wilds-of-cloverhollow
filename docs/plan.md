@@ -3593,6 +3593,46 @@ more bad guys, and the blacklight lantern, made and built while away.
   shard); replaying Bun's hashes beside the browser rather than after it (46
   s of Chromium's gameplay time on CI); a warm-up for each Mac's first page.
 
+### Test speed, round six (2026-10-18)
+- Round five's landing run on main took 2 min 55 s (run 39182600050), with
+  its new caches still empty.
+- The WebKit credits flake, found: WebKit paints a new layer's first frame
+  with asynchronous decoding, and a large image an element hasn't drawn
+  before is decoded at the size it's drawn unless a whole decode is ready.
+  That copy resamples a little differently from a whole one, which every
+  later paint uses. The credits sheet is a new layer each time it opens, so
+  each sticker took one path or the other by whether its atlas's decoded
+  data had survived garbage collection and memory pressure (the boot decodes
+  the critters' atlases; nothing decoded the friends'). Only the 1280 shot
+  failed: the resize before the 874 one repaints from a whole decode.
+- The credits now decode their atlases, hold them while they're up, and show
+  the stickers together once that's done. The 1280 WebKit baseline held one
+  mix of the two paths; it's replaced by the whole-decode render, which 12
+  runs in 12 drew byte for byte at load 105 to 182 (viewed; the gallery's
+  WebKit credits baselines already held it). With the concurrent boot, the
+  ending passed 12 runs in 12 at load 127 to 149, against 26 failures in 56
+  before, so round five's boot lands now.
+- Chromium's jobs install only the headless shell, the browser headless runs
+  launch: 86 MB to restore against 251 (9 to 10 s on a Mac).
+- The e2e specs start Bun's hash replay as a test starts and await it where
+  it's compared, so it runs beside the browser instead of after it (about 46
+  s of the Macs' Chromium time in round five's profile).
+- A warm-up for each Mac's first page, measured on a probe branch (run
+  39184811593): of three cold launches in turn, the first took 10.9 and 7.4
+  s and the later ones 3.2 to 5.7 s, and after them the shard's first test
+  ran 3.5 and 2.9 s faster. The cold start is shared between launches, but a
+  warm-up costs more than it saves unless it overlaps other work, and a Mac
+  job has only a few seconds of setup left once its browser restores: not
+  done.
+- To do: refresh `tests/e2e/timings.json` (`just timings`) once main has three
+  green runs on this layout; the Linux shards are still planned from Mac
+  times.
+- The QA milestone's timings refresh (cad6f7c0) was made from runs before the
+  gallery's checks moved to their own spec, so their 472 timings went back
+  under `ui-gallery.spec.ts` and the planner weighed each check at its
+  project's median; they're renamed again. Its merge (5aa95098) also dropped
+  `ui-gallery-checks` from `webkitSpecs`, which 4214d630 put back.
+
 ### Next milestones
 - Milestone 20, Pinecone Pass and the bus: done.
 - Milestone 21, the Cliffside Trail: done. Built before Jordan because its

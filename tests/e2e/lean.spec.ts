@@ -99,7 +99,7 @@ test("real keys: a puff left alone pushes Fae back, and leaning with it tips her
     expect(done?.check).toMatchObject({ results: ["miss", "hit"] });
     expect(done?.phase).toBe("burstResult");
     expect(done?.lastGrade).toBe("good");
-    expect(done?.energy).toBe(start.energy);
+    expect(done?.energy).toBe(start.energy - 1);
     // GOOD hangs over Fae's head, the lost puff's dot grey and the held one
     // green.
     await expect(page.locator(".battle-grade")).toHaveText("GOOD!");

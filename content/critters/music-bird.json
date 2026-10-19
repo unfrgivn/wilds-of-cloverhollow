@@ -128,5 +128,6 @@
     "rest": "The bluebird settles on the piano for a little rest.",
     "run": "Fae backs away slowly. The bluebird flutters another circle around the music room."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 6
 }

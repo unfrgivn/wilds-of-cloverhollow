@@ -8,6 +8,7 @@ export const states = ["short", "long", "long-max", "revealing", "speaker-board"
 export const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
   "battle-charge", "battle-chain", "battle-chain-burst", "battle-catch", "battle-lean",
   "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup",
+  "battle-level-up",
   "battle-trace", "battle-trace-mid", "battle-trace-dry", "battle-talk", "battle-talk-reply"];
 export const journalStates = ["journal-empty", "journal-notes", "journal-full"];
 export const phone = { width: 874, height: 402 };

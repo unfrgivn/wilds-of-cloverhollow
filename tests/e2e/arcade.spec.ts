@@ -92,7 +92,7 @@ test("real keys: home from the woods, into the arcade, and Mr. Pip calmed", asyn
     if (!battleShot && state.battle?.phase === "command" && state.battle.shown) {
       battleShot = true;
       await expect(page.locator(".battle-meter-label").last())
-        .toHaveText("FIZZY MR. PIP", { useInnerText: true });
+        .toHaveText("LV 7 · FIZZY MR. PIP", { useInnerText: true });
       await shoot(page, "arcade-keeper-battle");
     }
     if (!rewardShot && state.battle?.phase === "reward" && state.battle.shown) {

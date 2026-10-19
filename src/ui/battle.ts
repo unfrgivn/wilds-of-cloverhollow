@@ -30,6 +30,7 @@ export type BattleHudView = {
   visible: boolean;
   energy: number;
   energyMax: number;
+  level: number;
   /** 0..1 */
   calm: number;
   critterName: string;
@@ -591,7 +592,9 @@ export function createBattleHud(root: HTMLElement): {
   const energyLabel = element("span", "battle-meter-label");
   energyLabel.textContent = "ENERGY";
   const leaves = element("div", "battle-leaves");
-  energy.append(energyLabel, leaves);
+  const count = element("span", "battle-leaf-count");
+  count.hidden = true;
+  energy.append(energyLabel, leaves, count);
   const calm = element("section", "battle-meter battle-calm");
   const calmLabel = element("span", "battle-meter-label");
   const track = element("div", "battle-calm-track");
@@ -616,6 +619,9 @@ export function createBattleHud(root: HTMLElement): {
           ?.classList.toggle("is-full", index < view.energy);
       }
       setAttribute(energy, "aria-label", `Energy ${view.energy} of ${max}`);
+      setText(energyLabel, `ENERGY  Lv ${view.level}`);
+      count.hidden = max <= 10;
+      setText(count, String(max));
       setText(calmLabel, view.critterName.toUpperCase());
       setAttribute(track, "aria-label", `${view.critterName} calm`);
       setAttribute(

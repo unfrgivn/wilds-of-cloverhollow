@@ -39,8 +39,8 @@ describe("recurring critters replay", () => {
     expect(seen).toEqual(["park: chaos pup", "park: calm pup", ...visit, ...visit, ...visit]);
     expect(openings).toHaveLength(4);
     expect(openings.at(-1)).toBe("soothed: The Zoomie Pup remembers Fae and calms right down!");
-    expect(rewards).toEqual(["New sticker: Pond Pup! +8 coins.", "+8 coins!", "+8 coins!",
-      "+8 coins!"]);
+    expect(rewards).toEqual(["New sticker: Pond Pup! +8 coins, +20 XP!", "+8 coins, +20 XP!",
+      "+8 coins, +20 XP!", "+8 coins, +20 XP!"]);
     expect({ coins: state.coins, stickers: state.stickers, calms: state.calms })
       .toEqual({ coins: 32, stickers: ["pond-pup"], calms: { pup: 4 } });
   });

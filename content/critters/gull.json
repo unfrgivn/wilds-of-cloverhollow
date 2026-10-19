@@ -138,5 +138,6 @@
     "rest": "Fae is too windblown to go on. Time for a rest.",
     "run": "Fae backs off the lookout. The gull guards the bench."
   },
-  "coins": 25
+  "coins": 25,
+  "level": 6
 }

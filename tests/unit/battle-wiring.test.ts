@@ -105,7 +105,7 @@ describe("battle check wiring", () => {
       current = step(content.world, current, blankInput()).state;
     expect(current.battle?.lastGrade).toBe("miss");
     current = step(content.world, current, { ...blankInput(), confirm: true }).state;
-    expect(current.battle?.energy).toBe(4);
+    expect(current.battle?.energy).toBe(3);
   });
 
   it("creates a big pup catch with one PRNG draw per toy after its big roll", () => {
@@ -160,7 +160,7 @@ describe("battle check wiring", () => {
     expect(state.battle?.check).toMatchObject({ results: ["miss", "miss", "miss"] });
     expect(state.battle?.lastGrade).toBe("miss");
     state = step(content.world, state, { ...blankInput(), confirm: true }).state;
-    expect(state.battle?.energy).toBe(3);
+    expect(state.battle?.energy).toBe(2);
   });
 
   it("holds every bluebird puff leaning back toward straight, costing nothing", () => {

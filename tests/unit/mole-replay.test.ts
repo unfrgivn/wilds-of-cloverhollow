@@ -56,7 +56,7 @@ describe("Boop-a-Mole replay", () => {
       tick: state.tick, area: state.area, arcade: state.arcade, dialogue: state.dialogue,
       tickets: state.tickets, coins: state.coins, keeper: state.critters["arcade-keeper"],
     }).toEqual({
-      tick: 1974, area: "arcade", arcade: null, dialogue: null, tickets: 28, coins: 23,
+      tick: 2154, area: "arcade", arcade: null, dialogue: null, tickets: 28, coins: 23,
       keeper: "calm",
     });
   });

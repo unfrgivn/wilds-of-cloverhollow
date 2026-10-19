@@ -2958,7 +2958,7 @@ the old trail, the owl, and the clubhouse claim.
   by story progression. QA content is loaded only by the dev/harness dynamic
   module, keeping the player slot untouched and autosaves disabled.
 
-## Milestone 66: Experience and levels **Status:** 🚧 In progress (2026-10-18; design approved by the owner)
+## Milestone 66: Experience and levels **Status:** ✅ Completed (2026-10-18)
 - The owner (2026-10-18): it works like a normal RPG. Experience raises the
   level, each level takes more XP than the last, harder critters pay more XP,
   and levels raise the stats. On screen: XP, Level, and the stats Power,
@@ -2969,7 +2969,13 @@ the old trail, the owl, and the clubhouse claim.
   areas and tuned by the balance sim: the town 1 to 3 (the fountain frog 1),
   the bay 4 to 5, the lookout gull 6, the pass and woods 6 to 7, Mrs. Flurry 8,
   Mr. Pip 9, the school's gym pup and music bird 9 to 10, the field 10 to 11,
-  and the hooded kid 14. A critter's level sets, through `content/levels.json`,
+  and the hooded kid 14. Final tuned levels are fountain frog 2 (1), pup 2
+  (2), cat 2 (2), raccoon 3 (3), school raccoon 3 (3), frog 4 (4), bluebird 5
+  (5), gull 6 (6), bunny 6 (6), squirrel 7 (7), hamster 6 (6), owl 7 (7),
+  lamb 2 (2), hedgehog 3 (3), lodge keeper 8 (8), lifeguard 5 (4 to 5), Mr.
+  Pip 7 (9), gym pup 9 (9), music bird 6 (9 to 10), oak squirrel 6 (10 to 11),
+  and hooded kid 8 (14). Parenthesized values are the starting points above.
+  A critter's level sets, through `content/levels.json`,
   its calm meter (`calmMax`), its burst strength, and its XP; mini-bosses keep
   their bigger meter and burst chance on top. This replaces the shared numbers
   every ordinary critter has today.
@@ -3013,6 +3019,20 @@ the old trail, the owl, and the clubhouse claim.
 - Cost: every recorded battle plays differently, so the runs are re-recorded,
   their pins and the QA packs regenerated, and the battle screenshots redrawn
   and viewed. Milestone 67's console then sets each member's XP or level.
+- Delivery notes (2026-10-18): built the XP curve, per-member XP and level stats,
+  level-aware critters, v10 save upgrade, reward and journal presentation, and
+  the real-key checks. The balance sim replays a careful route that calms each
+  recurring critter that chases Fae once per visit: Fae reaches level 3 with 90
+  XP after chapter one, level 3 with 110 XP at the bay, level 5 with 340 XP at
+  the arcade, level 5 with 490 XP in music, level 6 with 600 XP in the forest,
+  and level 7 with 920 XP after the hooded kid. Ordinary critters are within
+  one level on arrival; named encounters are at most two levels ahead, with no
+  chapter-end exemption. This is the assumption behind “about a level.”
+  Equal-level Soothe takes 5, 4, 3, and 3 commands at levels 1, 5, 9, and 14.
+  Recurring ordinary critters still pay XP for grinding. Assumptions are Magic
+  +1 per 4 levels, per-command Power, and Guard from level 6 onward. Evidence
+  is the balance sim, unit tests, real-key level tests, regenerated replays and
+  QA packs, and viewed battle baselines at phone and desktop sizes.
 
 ## Milestone 67: The cheat console **Status:** 📋 Planned
 - In QA mode only (Milestone 65): the backtick key, or a tap on the QA

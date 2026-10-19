@@ -134,5 +134,6 @@
     "rest": "Fae is too dizzy from dodging acorns. Time for a rest.",
     "run": "Fae hurries down the path. The squirrel keeps chattering."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 7
 }

@@ -25,6 +25,12 @@ only wobbles the rocket; 2 tickets a star), its lines, and its art
 (`art/review/m59-comet-cabinet.jpg`, `m59-comet-sprites.jpg`,
 `m59-comet-game.jpg`).
 
+Reviewed 2026-10-18: Milestone 66's level plates, XP reward, level-up notice,
+journal stats, and numbered-leaf HUD are captured in
+`art/review/m66-battle-plate.jpeg`, `m66-reward-xp.jpeg`, `m66-level-up.jpeg`,
+`m66-journal-stats.jpeg`, and `m66-hud-leaves.jpeg`. The refreshed battle and
+journal gallery baselines were viewed at phone and desktop sizes.
+
 ## Still open
 
 | Item | Why it's waiting |

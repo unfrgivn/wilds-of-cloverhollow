@@ -142,5 +142,6 @@
     "rest": "Fae is shivering from all the snow. Time for a rest.",
     "run": "Fae backs away. Mrs. Flurry packs another snowball."
   },
-  "coins": 25
+  "coins": 25,
+  "level": 8
 }

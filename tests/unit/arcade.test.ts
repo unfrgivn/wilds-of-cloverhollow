@@ -156,7 +156,7 @@ describe("Mr. Pip, the arcade keeper", () => {
         lines.push(state.battle.message);
       state = step(world, state, blankInput()).state;
     }
-    expect(lines).toEqual(["New sticker: Mr. Pip! +25 coins."]);
+    expect(lines).toEqual(["New sticker: Mr. Pip! +25 coins, +210 XP!"]);
     expect({ coins: state.coins, stickers: state.stickers, mood: state.critters["arcade-keeper"] })
       .toEqual({ coins: 25, stickers: ["arcade-keeper"], mood: "calm" });
     const talk = play(state.ink, "arcade_keeper", { "arcade-keeper": true });

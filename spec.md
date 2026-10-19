@@ -1483,16 +1483,23 @@ ios/            Capacitor iOS project (from Milestone 4).
     time is held, on its last tick. Every puff held grades great, at least
     half good, fewer a miss, like a chain, and each held puff plays
     `battle-beat`.
-- Soothe and a friend's command add their calm plus the grade bonus, clamped
-  to `calmMax`, and show that command's line for the grade. A burst's check
+- Every critter kind has a content `level`; `content/levels.json` maps it to
+  `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
+  use the actor's Power (20 at level 1, +2 per level), with Magic (+1) on great
+  and good timing, clamped to `calmMax`. Fae earns every calm; a friend earns it
+  only when that friend's command was used. A burst's check
   starts with seeded PRNG draws, in this order: first the big roll (under
   `bigChance` it's big, plays `burst.big`, or the burst's `check` if the kind
-  has none, and its base damage is 2, else 1; after a wind-up there's no
+  has none; after a wind-up there's no
   roll, as its pops set the size), then one draw per catch toy,
   `min(2, floor(value x 3))` its lane, or per lean puff, `forces[min(n - 1,
   floor(value x n))]` its force (with n forces, each as likely). Ring and
   chain bursts make the one draw (none after a wind-up). Great, good, and
-  miss deal 0, base minus 1, and base.
+ miss deal 0, base minus 1, and base, less Fae's Guard (one per five levels),
+ except a miss always costs at least one leaf. Great timing costs zero.
+  `levels.json` stores cumulative XP thresholds through level 99 (level 2 is
+  20 XP, level 5 is 339 XP, level 10 is 2,200 XP), command Power and Magic,
+  Life (5 at level 1, +1 every 3 levels), and Guard (1 every 5 levels).
 - Check numbers (Milestone 40): Soothe and Maddie's Play are rings of 60
   ticks, target 39, windows 5 and 11. Soothe stays the ring (owner,
   2026-10-17), not the no-timing Pet the battle ideas proposed. Sue's Cast is a charge: wait 180, max
@@ -1721,9 +1728,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   messages use the dialogue box with no speaker.
 - One stacking scale (`--z-*` in sticker.css), bottom to top: HUD, dialogue,
   commands, choices, prompt, check and grade, reward.
-- HUD: ENERGY (one leaf per point, spent leaves outlined) at the top left and
-  the critter's CALM meter (its name in capitals) at the top right, left of
-  the menu button, inside the safe area. It hides during the reward.
+- HUD: ENERGY (one leaf per point, spent leaves outlined, with a count once the
+  total is above 10) at the top left and the critter's CALM meter (its level and
+  name in capitals) at the top right, left of the menu button, inside the safe
+  area. It hides during the reward.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. The menu grows with the party: four
@@ -1811,6 +1819,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   by CSS to 150 px wide, and the name. Stacked drop-shadows give the image a
   white rim and an ink outline that follow the critter's silhouette. Asset
   URLs are document-relative so they work on iOS.
+- Reward messages include the coin and XP payout. A level-up message names the
+  member and new level with its stat gains, and plays the level-up cue. The
+  critter plate shows `Lv N`, the journal shows each member's XP bar and stats,
+  and the battle leaves show a number after ten leaves.
 - `data-battle="open"` on the root hides the movement stick; confirm and cancel
   stay. While a catch or a lean is in play the shell sets `data-check` to its
   kind, and two arrow stickers (the cancel button's size) stand where the
@@ -1833,6 +1845,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   `renderInfo()` exposes the phase, the check's geometry, and critter frame.
 
 ## 9. Journal and stickers
+- Experience is saved as XP for Fae and each party member. A member's level is
+  read from `content/levels.json` (cap 99), and the journal presents level, XP
+ progress, Power, Magic, Life (5 at level 1, +1 every 3 levels), and Guard;
+ friends show their Power and Magic command stats.
+- The Milestone 66 balance route is deliberately careful rather than a grind:
+  Fae calms each recurring critter that chases her once per visit on the story
+  route. The headless balance check requires ordinary area critters to be within
+  one level of Fae on arrival, and named encounters (mini-bosses and the hooded
+  kid) to be no more than two levels ahead. There are no chapter-end exemptions.
 - The journal is the pause menu: Notes (current goals, written from Ink), a
   Sticker album, and a painted MAP page. The map labels all seven lands, shows
   `???` only for lands with an unmet `revealVariable` (currently the Hills and
@@ -2322,11 +2343,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
   storage) and localStorage in the browser.
-- Format: `{ version: 9, state }`, the whole core state, including the
+- Format: `{ version: 10, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
   the set pieces' moods, this visit's recurring critters, the calm counts,
   the lantern, coins and snacks, the PRNG, the tick, arcade state, prizes,
-  and tickets. Version 1 (Maddie in `maddie` and
+  XP and the party's XP are included. Version 1 (Maddie in `maddie` and
   `trail`), version 2 (no lantern), version 3 (no coins or snacks), and
   version 4 (one critter of each kind, no recurring critters) are refused and
   start a new game. Loading restores it exactly: the state hash matches, and
@@ -2336,7 +2357,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   starts it: version 5 `arcade: null`, `prizes: []`, `tickets: 0`, and
   `calms: {}`; version 6 `tickets: 0` and `calms: {}` (Milestone 45); version
   7 `calms: {}` (counted from then on); version 8 `finale: null` (Milestone
-  56). Before version 8 every recurring
+  56). Version 9 upgrades calm counts to XP using the current critter table and
+  starts friends at Fae's resulting level. Before version 8 every recurring
   critter gains `notice: 0` (Milestone 51). Version 4 and older, a version
   from the future, and any mid-game save are refused.
 - `parseSave(json, template)` accepts only a state with the template's exact

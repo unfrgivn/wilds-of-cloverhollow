@@ -124,5 +124,6 @@
     "rest": "Fae is all tuckered out. Time for a little rest.",
     "run": "Fae backs away slowly. The frog keeps bouncing around."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 4
 }

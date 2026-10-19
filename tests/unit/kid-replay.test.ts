@@ -25,7 +25,7 @@ describe("hooded kid replay", () => {
           grades.push(grade);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(18969);
+    expect(state.tick).toBe(19977);
     expect(state.area).toBe("enchanted");
     expect(state.dialogue).toBeNull();
     expect(state.battle).toBeNull();

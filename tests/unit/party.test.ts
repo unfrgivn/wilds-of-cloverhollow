@@ -299,7 +299,7 @@ describe("party battle commands", () => {
     expect(state.battle?.phase).toBe("result");
     expect(state.battle?.lastGrade).toBe("great");
     expect(state.battle?.calm).toBe(
-      Math.min(critter.calmMax, calmBefore + whistle.calm + whistle.great),
+      Math.min(critter.calmMax, calmBefore + whistle.calm + 1),
     );
     expect(state.battle?.message).toBe(whistleLines.great);
     state = toCommandMenu(twoWorld, advance(twoWorld, state, blankInput(), 1));
@@ -313,10 +313,10 @@ describe("party battle commands", () => {
 });
 
 describe("save version", () => {
-  it("writes version 8 and refuses version 2", () => {
+  it("writes version 10 and refuses version 2", () => {
     const state = createState(world, fixtureFor("new-game"));
     const json = serializeSave(state);
-    expect(JSON.parse(json).version).toBe(9);
+    expect(JSON.parse(json).version).toBe(10);
     expect(parseSave(json, state)).toEqual(state);
     expect(parseSave(JSON.stringify({ version: 2, state }), state)).toBeNull();
   });

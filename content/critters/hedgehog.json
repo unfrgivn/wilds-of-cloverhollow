@@ -107,5 +107,6 @@
     "rest": "Fae needs a quiet rest after those prickles.",
     "run": "Fae backs away through the meadow. The hedgehog watches."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 3
 }

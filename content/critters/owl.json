@@ -107,5 +107,6 @@
     "rest": "Fae needs a quiet rest after that screech.",
     "run": "Fae backs away. The owl watches from a branch."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 7
 }

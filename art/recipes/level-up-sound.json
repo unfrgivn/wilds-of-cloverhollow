@@ -1,0 +1,10 @@
+{
+  "asset": "level-up cue",
+  "source": "Web Audio oscillator recipe, following spec 3.3's existing generated cues",
+  "license": "Original project code",
+  "recipe": [
+    { "wave": "triangle", "frequency": 523, "offset": 0, "duration": 0.1, "gain": 0.1 },
+    { "wave": "triangle", "frequency": 659, "offset": 0.09, "duration": 0.1, "gain": 0.1 },
+    { "wave": "triangle", "frequency": 784, "offset": 0.18, "duration": 0.18, "gain": 0.11 }
+  ]
+}

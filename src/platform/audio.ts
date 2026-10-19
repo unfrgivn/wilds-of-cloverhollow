@@ -93,6 +93,11 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "triangle", frequency: 220, endFrequency: 440, offset: 0, duration: .24, gain: .1 },
     { wave: "sine", frequency: 660, offset: .2, duration: .12, gain: .06 },
   ],
+  "level-up": [
+    { wave: "triangle", frequency: 523, offset: 0, duration: .1, gain: .1 },
+    { wave: "triangle", frequency: 659, offset: .09, duration: .1, gain: .1 },
+    { wave: "triangle", frequency: 784, offset: .18, duration: .18, gain: .11 },
+  ],
   "battle-command": [{ wave: "triangle", frequency: 494, offset: 0, duration: .1, gain: .09 }],
   "battle-hit": [
     { wave: "noise", offset: 0, duration: .06, gain: .025, lowpass: 1200 },

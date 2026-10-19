@@ -109,13 +109,13 @@ describe("calm-down battle core", () => {
         ...none,
         confirm: true,
       }).state.battle?.calm,
-    ).toBe(30);
+    ).toBe(21);
     expect(
       step(content.world, aimState(battleState(), "soothe", 0, 45), {
         ...none,
         confirm: true,
       }).state.battle?.calm,
-    ).toBe(25);
+    ).toBe(21);
     expect(
       step(content.world, aimState(battleState(), "soothe", 0, 51), {
         ...none,
@@ -127,13 +127,13 @@ describe("calm-down battle core", () => {
         ...none,
         confirm: true,
       }).state.battle?.calm,
-    ).toBe(40);
+    ).toBe(31);
     expect(
       step(content.world, aimState(battleState(), "play", 0, 45), {
         ...none,
         confirm: true,
       }).state.battle?.calm,
-    ).toBe(35);
+    ).toBe(31);
     expect(
       step(content.world, aimState(battleState(), "play", 0, 51), {
         ...none,

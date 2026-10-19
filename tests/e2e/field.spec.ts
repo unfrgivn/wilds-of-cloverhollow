@@ -48,7 +48,7 @@ test("real keys: the squirrel, the swing, the stash, and the footbridge", async 
         battle.revealed >= battle.message.length) {
       battleShot = true;
       await expect(page.locator(".battle-meter-label").last())
-        .toHaveText("FIZZY SQUIRREL", { useInnerText: true });
+        .toHaveText("LV 6 · FIZZY SQUIRREL", { useInnerText: true });
       await shoot(page, "field-squirrel-battle");
     }
     if (state.dialogue?.knot === "oak_branch") swungFrom = Math.min(swungFrom, state.player.x);

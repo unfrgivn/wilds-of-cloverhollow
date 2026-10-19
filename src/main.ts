@@ -14,6 +14,9 @@ import {
   arcadeView,
   mapLandName,
   creditEntries,
+  levelForXp,
+  levelUpLine,
+  statsForCommand,
 } from "./core";
 import {
   loadContent,
@@ -70,7 +73,8 @@ import type { PackState } from "./dev/qa";
 
 const content = loadContent();
 const app = new Application();
-let state: State;
+  let state: State;
+  let levelUpNotice: string | null = null;
 let paused = false;
 
 // One save slot (spec 10).
@@ -157,8 +161,12 @@ async function boot(): Promise<void> {
   const saved = qaUrlPack === null && qaError === null
     ? await Preferences.get({ key: saveKey }) : { value: null };
   const restored = qaUrlPack === null
-    ? saved.value === null ? null : parseSave(saved.value, fresh)
-    : parseSave(qaUrlPack.save, fresh);
+    ? saved.value === null ? null : parseSave(saved.value, fresh,
+      Object.fromEntries(Object.values(content.world.critters).map((kind) => [kind.species,
+        content.world.levels.critters[kind.id]?.xp ?? 0])), content.world.levels.thresholds)
+    : parseSave(qaUrlPack.save, fresh, Object.fromEntries(Object.values(content.world.critters).map(
+      (kind) => [kind.species, content.world.levels.critters[kind.id]?.xp ?? 0])),
+    content.world.levels.thresholds);
   state = restored ?? fresh;
   // A real boot opens on the title (spec 7.3), with the game frozen behind it:
   // no core ticks run, so Continue resumes the save exactly as it was written.
@@ -218,7 +226,9 @@ async function boot(): Promise<void> {
   };
   const save = (): Promise<void> => saveState(state);
   const pickQa = (item: PackState): void => {
-    const loaded = parseSave(item.save, fresh);
+    const loaded = parseSave(item.save, fresh,
+      Object.fromEntries(Object.values(content.world.critters).map((kind) => [kind.species,
+        content.world.levels.critters[kind.id]?.xp ?? 0])), content.world.levels.thresholds);
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
     state = loaded; qaActivePack = item; qaMenuOpen = false; titleMode = null;
     qaJustPicked = true;
@@ -532,9 +542,13 @@ async function boot(): Promise<void> {
         !talkChoicesShown(battle?.talk ?? null),
       energy: battle?.energy ?? 0,
       energyMax: battle?.energyMax ?? 0,
+      level: activeBattle
+        ? (content.world.critters[state.battle?.critterId ?? ""]?.level ?? 1)
+        : 1,
       calm: battle === null ? 0 : battle.calm / Math.max(1, battle.calmMax),
       critterName: activeBattle
-        ? (content.world.critters[state.battle?.critterId ?? ""]?.name ?? "")
+        ? `Lv ${content.world.critters[state.battle?.critterId ?? ""]?.level ?? 1} · ` +
+          `${content.world.critters[state.battle?.critterId ?? ""]?.name ?? ""}`
         : "",
     });
     commandMenu.render({
@@ -650,6 +664,24 @@ async function boot(): Promise<void> {
       tickets: state.tickets,
       muted: sound.muted(),
       level: sound.level(),
+      members: [
+        { id: "fae", name: "Fae", level: levelForXp(content.world.levels, state.xp), xp: state.xp,
+          startXp: content.world.levels.thresholds[
+            levelForXp(content.world.levels, state.xp) - 1] ?? 0,
+          nextXp: content.world.levels.thresholds[
+            levelForXp(content.world.levels, state.xp)] ?? state.xp,
+          stats: statsForCommand(content.world.levels, "soothe",
+            levelForXp(content.world.levels, state.xp)), friend: false },
+        ...state.party.map((member) => {
+          const party = content.world.party[member.id];
+          const level = levelForXp(content.world.levels, member.xp);
+          return { id: member.id, name: party?.name ?? member.id, level, xp: member.xp,
+            startXp: content.world.levels.thresholds[level - 1] ?? 0,
+            nextXp: content.world.levels.thresholds[level] ?? member.xp,
+            stats: statsForCommand(content.world.levels, party?.command?.id ?? "soothe", level),
+            friend: true };
+        }),
+      ],
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;
@@ -658,7 +690,11 @@ async function boot(): Promise<void> {
       (arcadeState !== null && arcadeState.phase !== "result")
     )
       dialogueBox.hide();
-    if (activeBattle && battle?.talk !== null && battle?.talk !== undefined) {
+    if (levelUpNotice !== null) {
+      dialogueBox.render({ speaker: null, text: levelUpNotice, revealed: levelUpNotice.length,
+        choices: [], selected: -1, canAdvance: true });
+      document.documentElement.dataset.dialogue = "open";
+    } else if (activeBattle && battle?.talk !== null && battle?.talk !== undefined) {
       dialogueBox.render(battleTalkDialogueView(battle.talk));
       document.documentElement.dataset.dialogue = "open";
     } else if (activeBattle && (battle?.message ?? "") !== "") {
@@ -762,6 +798,8 @@ async function boot(): Promise<void> {
       cancel: frame.cancel && !swallowed.has("cancel"),
       menu: frame.menu && !swallowed.has("menu"),
     };
+    if (levelUpNotice !== null && input.confirm && !state.previousInput.confirm)
+      levelUpNotice = null;
     if (state.finale === "credits") {
       creditsTicks += 1;
       if (creditsConfirmAllowed(
@@ -789,11 +827,17 @@ async function boot(): Promise<void> {
       lastFinale = state.finale;
       if (state.finale === "credits") creditsTicks = 0;
     }
-    for (const event of stepped.events)
+    for (const event of stepped.events) {
+      if (event.type === "level-up") {
+        const friend = event.member !== "fae";
+        const name = friend ? (content.world.party[event.member]?.name ?? event.member) : "Fae";
+        levelUpNotice = levelUpLine(name, event.from, event.to, event.deltas, friend);
+      }
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
         if (qaActivePack === null && !qaBlocked) void saveState(event.state);
       }
+    }
     for (const cue of soundCues(previous, state, content.world)) {
       const played = sound.play(cue, state.tick);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")

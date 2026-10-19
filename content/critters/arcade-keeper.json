@@ -148,5 +148,6 @@
     "rest": "Fae is dizzy from all the flashing lights. Time for a rest.",
     "run": "Fae backs away. Mr. Pip keeps mashing buttons."
   },
-  "coins": 25
+  "coins": 25,
+  "level": 7
 }

@@ -48,6 +48,13 @@
   gap: 4px;
   margin-top: 7px;
 }
+.battle-leaf-count {
+  align-self: center;
+  margin-left: 4px;
+  color: var(--sticker-ink);
+  font-size: 16px;
+  font-weight: 800;
+}
 .battle-leaf {
   width: 22px;
   height: 17px;

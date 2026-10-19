@@ -54,7 +54,7 @@
     }
   },
   "new-game/chapter-one.json": {
-    "tick": 4420,
+    "tick": 5143,
     "area": "park",
     "player": {
       "x": 731.1269837220834,
@@ -108,7 +108,7 @@
     }
   },
   "park/pup-win.json": {
-    "tick": 810,
+    "tick": 990,
     "area": "park",
     "player": {
       "x": 874.5584412271592,
@@ -121,7 +121,7 @@
       "facing": "right",
       "moving": true,
       "distance": 579.5431528569441,
-      "stillTicks": 655,
+      "stillTicks": 834,
       "trail": 11
     }
   },
@@ -180,7 +180,7 @@
     }
   },
   "plaza/frog-win.json": {
-    "tick": 618,
+    "tick": 769,
     "area": "plaza",
     "player": {
       "x": 1034.5502065111666,
@@ -193,7 +193,7 @@
       "facing": "left",
       "moving": false,
       "distance": 239.3749951207334,
-      "stillTicks": 548,
+      "stillTicks": 698,
       "trail": 11
     }
   },
@@ -234,7 +234,7 @@
     }
   },
   "school/raccoon.json": {
-    "tick": 1253,
+    "tick": 1433,
     "area": "plaza",
     "player": {
       "x": 400.91168824543183,

@@ -181,6 +181,7 @@ export type World = {
   // Reads a story variable from an Ink state (createStoryReader over `story`).
   storyVariable: (ink: string, name: string) => unknown;
   arcade: ArcadeContent;
+  levels: import("./levels").LevelContent;
 };
 export type ArcadeContent = {
   // The prize atlas (Pixi spritesheet JSON), one frame per prize.
@@ -546,6 +547,7 @@ export type FriendCommand = {
 // bay's frogs) share its sticker.
 export type Critter = {
   id: string;
+  level: number;
   species: string;
   name: string;
   calmName: string;
@@ -763,6 +765,7 @@ export type Fixture = {
 // each along its own breadcrumb trail of its leader's recent positions.
 export type PartyMember = {
   id: string;
+  xp: number;
   x: number;
   y: number;
   facing: Direction;
@@ -784,6 +787,7 @@ export type State = {
     elapsed: number;
   } | null;
   party: PartyMember[];
+  xp: number;
   ink: string;
   dialogue: {
     knot: string;
@@ -856,4 +860,6 @@ export type FirstTouch = "surprised" | "caught" | "even";
 export type WildMark = { key: string; kind: string; point: Point; mark: "?" | "!" };
 export type Event =
   | { type: "button"; button: "confirm" | "cancel" | "menu" }
+  | { type: "level-up"; member: string; from: number; to: number;
+      deltas: { power: number; magic: number; life: number; guard: number } }
   | { type: "ending-save"; state: State };

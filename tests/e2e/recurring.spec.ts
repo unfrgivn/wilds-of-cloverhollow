@@ -100,7 +100,7 @@ test("real keys: a calmed pup is gone after a trip out, a fresh one pays, the fo
         if (rewards.length === 1) await expect(card).toBeVisible();
         else {
           await expect(card, "no new sticker, so no card").toBeHidden();
-          await expect(page.locator(".sticker-text-revealed")).toHaveText("+8 coins!");
+          await expect(page.locator(".sticker-text-revealed")).toHaveText("+8 coins, +20 XP!");
           if (rewards.length === 2) await shoot(page, "pup-coins-only");
         }
       }
@@ -109,8 +109,8 @@ test("real keys: a calmed pup is gone after a trip out, a fresh one pays, the fo
     // The plaza is quiet until its fountain frog is calm.
     const visit = ["plaza: no pup", "park: chaos pup", "park: calm pup"];
     expect(pups).toEqual(["park: chaos pup", "park: calm pup", ...visit, ...visit, ...visit]);
-    expect(rewards).toEqual(["New sticker: Pond Pup! +8 coins.", "+8 coins!", "+8 coins!",
-      "+8 coins!"]);
+    expect(rewards).toEqual(["New sticker: Pond Pup! +8 coins, +20 XP!", "+8 coins, +20 XP!",
+      "+8 coins, +20 XP!", "+8 coins, +20 XP!"]);
     const end = await readState(page);
     expect({ coins: end.coins, stickers: end.stickers, calms: end.calms })
       .toEqual({ coins: 32, stickers: ["pond-pup"], calms: { pup: 4 } });
@@ -126,7 +126,7 @@ test("the town's cats: one comes out in the plaza once the fountain frog is calm
   // `met` is the tick its intro starts (re-recording moves it: find it with
   // `bun tools/sim/run.ts tests/sim/scripts/new-game/bus-line.json --trace`).
   const path = "tests/sim/scripts/new-game/bus-line.json";
-  const met = 3535;
+  const met = 5553;
   const upTo: ReturnType<typeof recording> = [];
   let ticks = 0;
   for (const segment of recording(path)) {
@@ -149,6 +149,6 @@ test("the town's cats: one comes out in the plaza once the fountain frog is calm
   expect((await readState(page)).battle?.phase).toBe("command");
   expect((await renderInfo(page)).battle.critter).toEqual({ id: "cat", frame: "chaos_idle_01" });
   await expect(page.locator(".battle-meter-label").last())
-    .toHaveText("POUNCY CAT", { useInnerText: true });
+    .toHaveText("LV 2 · POUNCY CAT", { useInnerText: true });
   await shoot(page, "plaza-cat-battle");
 });

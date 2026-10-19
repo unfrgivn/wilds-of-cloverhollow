@@ -128,5 +128,6 @@
     "rest": "Fae is tuckered out. Time for a little rest.",
     "run": "Fae backs away slowly. The bluebird keeps fluttering."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 5
 }

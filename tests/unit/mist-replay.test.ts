@@ -22,7 +22,7 @@ describe("mist replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(18070);
+    expect(state.tick).toBe(19066);
     expect(state.area).toBe("mist");
     expect(state.dialogue).toBeNull();
     expect(knots).toEqual(expect.arrayContaining(["mist_flowers", "gully_bridge", "mist_seal"]));

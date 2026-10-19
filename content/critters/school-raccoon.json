@@ -134,5 +134,6 @@
     "rest": "Fae is all tuckered out. Time for a little rest.",
     "run": "Fae backs away. The raccoon chatters by the school path."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 3
 }

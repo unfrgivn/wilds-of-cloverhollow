@@ -130,5 +130,6 @@
     "rest": "Fae is too chilly to go on. Time to warm up.",
     "run": "Fae tiptoes away through the snow. The hamster keeps whirling."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 6
 }

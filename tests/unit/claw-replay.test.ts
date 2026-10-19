@@ -42,7 +42,7 @@ describe("claw machine replay", () => {
       tick: state.tick, area: state.area, arcade: state.arcade, dialogue: state.dialogue,
       prizes: state.prizes, coins: state.coins, keeper: state.critters["arcade-keeper"],
     }).toEqual({
-      tick: 3085, area: "arcade", arcade: null, dialogue: null,
+      tick: 3265, area: "arcade", arcade: null, dialogue: null,
       prizes: ["pup-plush", "cat-plush"], coins: 17, keeper: "calm",
     });
     expect(state.stickers).toContain("arcade-keeper");

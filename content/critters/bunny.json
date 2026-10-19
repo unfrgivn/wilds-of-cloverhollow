@@ -124,5 +124,6 @@
     "rest": "Fae is all tuckered out. Time for a rest.",
     "run": "Fae tiptoes away through the grass. The bunny keeps thumping."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 6
 }

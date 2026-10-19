@@ -113,6 +113,7 @@ import oakSquirrelData from "../../content/critters/oak-squirrel.json";
 import hoodedKidData from "../../content/critters/hooded-kid.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
+import levelsData from "../../content/levels.json";
 import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
@@ -164,6 +165,7 @@ import type {
   SkeeCalibration,
   SkeeContent,
   WindUp,
+  LevelContent,
 } from "../core";
 
 // A battle check's spec (spec 8), validated by kind. Every number is an
@@ -1310,6 +1312,8 @@ export function parseCritter(value: unknown, file: string): Critter {
     file, "toyScale",
   );
   const id = text(value, "id");
+  const level = number(value, "level");
+  field(Number.isInteger(level) && level >= 1 && level <= 99, file, "level");
   const species = text(value, "species");
   const name = text(value, "name");
   const calmName = text(value, "calmName");
@@ -1423,6 +1427,7 @@ export function parseCritter(value: unknown, file: string): Critter {
     friendLines[friendId] = gradeMap(raw, file, `lines.friends.${friendId}`);
   return {
     id,
+    level,
     species,
     name,
     calmName,
@@ -1937,10 +1942,60 @@ export function completeSurfaceMaps(
   return result;
 }
 
+function parseLevels(value: unknown, file: string): LevelContent {
+  field(record(value), file, "object");
+  const rawThresholds = value.thresholds;
+  field(Array.isArray(rawThresholds) && rawThresholds.length === 99 &&
+    rawThresholds.every((item) => typeof item === "number" && Number.isInteger(item) && item >= 0),
+    file, "thresholds");
+  const rawStats = value.stats;
+  field(record(rawStats), file, "stats");
+  const stat = (name: string): number => {
+    const item = rawStats[name];
+    field(typeof item === "number" && Number.isInteger(item) && item >= 0, file, `stats.${name}`);
+    return item;
+  };
+  const rawCritters = value.critters;
+  field(record(rawCritters), file, "critters");
+  const critters: LevelContent["critters"] = {};
+  for (const [id, raw] of Object.entries(rawCritters)) {
+    field(record(raw), file, `critters.${id}`);
+    const integer = (name: string): number => {
+      const item = raw[name];
+      field(typeof item === "number" && Number.isInteger(item) && item >= 0, file,
+        `critters.${id}.${name}`);
+      return item;
+    };
+    const level = integer("level");
+    field(level >= 1 && level <= 99, file, `critters.${id}.level`);
+    critters[id] = { level, calmMax: integer("calmMax"), burst: integer("burst"),
+      bigBurst: integer("bigBurst"), xp: integer("xp") };
+  }
+  const rawCommands = rawStats.commands;
+  field(record(rawCommands), file, "stats.commands");
+  const commands: LevelContent["stats"]["commands"] = {};
+  for (const [id, raw] of Object.entries(rawCommands)) {
+    field(record(raw), file, `stats.commands.${id}`);
+    const number = (name: string): number => {
+      const item = raw[name];
+      field(typeof item === "number" && Number.isInteger(item) && item >= 0, file,
+        `stats.commands.${id}.${name}`);
+      return item;
+    };
+    commands[id] = { powerBase: number("powerBase"), powerPerLevel: number("powerPerLevel"),
+      magicBase: number("magicBase"), magicPerLevel: number("magicPerLevel") };
+  }
+  return { thresholds: [...rawThresholds], stats: {
+    lifeBase: stat("lifeBase"), lifeEvery: stat("lifeEvery"), guardEvery: stat("guardEvery"),
+    commands,
+  }, critters };
+}
+
 export function loadContent(): {
   world: World;
   fixtures: Record<string, Fixture>;
 } {
+  const levels = parseLevels(levelsData, "content/levels.json");
   const harness = parseArea(areaData, "content/areas/harness.json");
   const bedroom = parseArea(bedroomData, "content/areas/bedroom.json",
     parsePropCatalogue(bedroomPropsData, "content/props/bedroom.json"));
@@ -2032,6 +2087,10 @@ export function loadContent(): {
     const file = `content/critters/${name}.json`;
     const critter = parseCritter(data, file);
     field(critter.id === name, file, "id (it must be the file's name)");
+    const levelData = levels.critters[critter.id];
+    field(levelData !== undefined, file, "missing level table entry");
+    if (levelData !== undefined)
+      field(levelData.level === critter.level, file, "level must match content/levels.json");
     critters[critter.id] = critter;
   }
   const battle = parseBattleContent(battleData, "content/battle.json");
@@ -2158,6 +2217,7 @@ export function loadContent(): {
       party,
       storyVariable,
       arcade: arcadeGames,
+      levels,
     },
     fixtures,
   };

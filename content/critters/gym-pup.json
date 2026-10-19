@@ -130,5 +130,6 @@
     "rest": "Fae is all tuckered out. Time for a little rest.",
     "run": "Fae backs away. The pup zooms another lap around the gym."
   },
-  "coins": 8
+  "coins": 8,
+  "level": 9
 }

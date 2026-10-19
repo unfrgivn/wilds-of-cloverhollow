@@ -82,8 +82,8 @@ test("real keys: the frog is curious, Cast answers it, and the bonus lands", { t
     const result = await readBattle(page);
     expect(result?.phase).toBe("result");
     expect(result?.lastGrade).toBe("great");
-    // Cast's 35 and its GREAT 10, and the answered feeling's 15.
-    expect(result?.calm).toBe(60);
+    // Cast's 35, level-1 Magic +1, and the answered feeling's 15.
+    expect(result?.calm).toBe(51);
     await expect(cloud).toBeVisible();
     await expect(page.locator(".battle-feeling-heart")).toBeVisible();
     await step(page, 60);
@@ -161,7 +161,7 @@ test("Maddie alone: no feelings, no badges", async ({ page }) => {
 // typed out (re-recording moves it: find it with `bun tools/sim/run.ts
 // tests/sim/scripts/pass-party/woods.json --fixture pass-party --trace`).
 const woods = "tests/sim/scripts/pass-party/woods.json";
-const menu = 920;
+const menu = 1118;
 
 test("real keys: L peeks at the owl's turn-after feeling", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });

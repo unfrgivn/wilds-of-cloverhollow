@@ -1,4 +1,5 @@
 import type { CheckState, State, World } from "./types";
+import { levelForXp } from "./levels";
 import { surfaceAt } from "./surfaces";
 
 export type SoundCue =
@@ -9,6 +10,7 @@ export type SoundCue =
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
   | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
   | "battle-beat"
+  | "level-up"
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
   | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
   | "mole-pop" | "mole-boop" | "mole-whiff"
@@ -32,7 +34,7 @@ export function isStorySound(value: string): value is StorySound {
 export function soundCues(
   previous: State,
   next: State,
-  world: Pick<World, "surfaces" | "arcade">,
+  world: Pick<World, "surfaces" | "arcade" | "levels">,
 ): SoundCue[] {
   const cues: SoundCue[] = [];
   const oldDialogue = previous.dialogue;
@@ -68,6 +70,12 @@ export function soundCues(
   if (next.coins > previous.coins) cues.push("coin");
   if (next.snacks > previous.snacks) cues.push("item");
   if (next.stickers.length > previous.stickers.length) cues.push("sticker");
+  if (levelForXp(world.levels, next.xp) > levelForXp(world.levels, previous.xp) ||
+      next.party.some((member) => {
+        const old = previous.party.find((candidate) => candidate.id === member.id);
+        return old !== undefined && levelForXp(world.levels, member.xp) >
+          levelForXp(world.levels, old.xp);
+      })) cues.push("level-up");
   if (next.motion.moving && next.motion.distance > previous.motion.distance &&
       next.tick % 8 === 0) {
     const map = world.surfaces[next.area];

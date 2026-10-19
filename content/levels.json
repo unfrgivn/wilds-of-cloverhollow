@@ -1,0 +1,283 @@
+{
+  "thresholds": [
+    0,
+    20,
+    76,
+    179,
+    339,
+    562,
+    855,
+    1225,
+    1677,
+    2200,
+    2849,
+    3578,
+    4409,
+    5346,
+    6393,
+    7554,
+    8834,
+    10235,
+    11762,
+    13418,
+    15206,
+    17130,
+    19193,
+    21399,
+    23750,
+    26250,
+    28901,
+    31706,
+    34669,
+    37792,
+    41078,
+    44530,
+    48150,
+    51941,
+    55906,
+    60047,
+    64367,
+    68868,
+    73552,
+    78423,
+    83482,
+    88732,
+    94175,
+    99814,
+    105651,
+    111688,
+    117927,
+    124371,
+    131022,
+    137882,
+    144953,
+    152237,
+    159736,
+    167452,
+    175388,
+    183545,
+    191926,
+    200532,
+    209366,
+    218429,
+    227724,
+    237252,
+    247015,
+    257015,
+    267255,
+    277735,
+    288458,
+    299426,
+    310640,
+    322103,
+    333816,
+    345781,
+    357999,
+    370473,
+    383204,
+    396194,
+    409445,
+    422958,
+    436735,
+    450778,
+    465088,
+    479668,
+    494518,
+    509641,
+    525038,
+    540711,
+    556661,
+    572890,
+    589400,
+    606192,
+    623268,
+    640629,
+    658277,
+    676214,
+    694441,
+    712959,
+    731771,
+    750877,
+    770280
+  ],
+  "stats": {
+    "lifeBase": 5,
+    "lifeEvery": 3,
+    "guardEvery": 5,
+    "commands": {
+      "soothe": {
+        "powerBase": 20,
+        "powerPerLevel": 2,
+        "magicBase": 1,
+        "magicPerLevel": 4
+      },
+      "play": {
+        "powerBase": 25,
+        "powerPerLevel": 2,
+        "magicBase": 1,
+        "magicPerLevel": 4
+      },
+      "cast": {
+        "powerBase": 30,
+        "powerPerLevel": 3,
+        "magicBase": 1,
+        "magicPerLevel": 4
+      },
+      "juggle": {
+        "powerBase": 30,
+        "powerPerLevel": 3,
+        "magicBase": 1,
+        "magicPerLevel": 4
+      }
+    }
+  },
+  "critters": {
+    "fountain-frog": {
+      "level": 2,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 20
+    },
+    "pup": {
+      "level": 2,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 20
+    },
+    "cat": {
+      "level": 2,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 20
+    },
+    "raccoon": {
+      "level": 3,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 30
+    },
+    "school-raccoon": {
+      "level": 3,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 30
+    },
+    "frog": {
+      "level": 4,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 40
+    },
+    "bluebird": {
+      "level": 5,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 50
+    },
+    "gull": {
+      "level": 6,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 60
+    },
+    "bunny": {
+      "level": 6,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 60
+    },
+    "squirrel": {
+      "level": 7,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 70
+    },
+    "hamster": {
+      "level": 6,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 60
+    },
+    "owl": {
+      "level": 7,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 70
+    },
+    "lamb": {
+      "level": 2,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 20
+    },
+    "hedgehog": {
+      "level": 3,
+      "calmMax": 100,
+      "burst": 1,
+      "bigBurst": 2,
+      "xp": 30
+    },
+    "lodge-keeper": {
+      "level": 8,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 80
+    },
+    "lifeguard": {
+      "level": 5,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 50
+    },
+    "arcade-keeper": {
+      "level": 7,
+      "calmMax": 200,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 70
+    },
+    "gym-pup": {
+      "level": 9,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 90
+    },
+    "music-bird": {
+      "level": 6,
+      "calmMax": 100,
+      "burst": 3,
+      "bigBurst": 4,
+      "xp": 60
+    },
+    "oak-squirrel": {
+      "level": 6,
+      "calmMax": 100,
+      "burst": 3,
+      "bigBurst": 4,
+      "xp": 60
+    },
+    "hooded-kid": {
+      "level": 8,
+      "calmMax": 200,
+      "burst": 4,
+      "bigBurst": 5,
+      "xp": 80
+    }
+  }
+}

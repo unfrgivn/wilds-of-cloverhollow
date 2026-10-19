@@ -55,7 +55,7 @@ describe("skee-ball replay", () => {
       prizes: state.prizes, tickets: state.tickets, coins: state.coins,
       keeper: state.critters["arcade-keeper"],
     }).toEqual({
-      tick: 2032, area: "arcade", arcade: null, dialogue: null, prizes: ["pinwheel"],
+      tick: 2212, area: "arcade", arcade: null, dialogue: null, prizes: ["pinwheel"],
       tickets: 2, coins: 23, keeper: "calm",
     });
   });

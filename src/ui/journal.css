@@ -5,6 +5,22 @@
 .journal-name[hidden] {
   display: none;
 }
+.journal-members { display: grid; gap: 8px; margin-top: 16px; }
+.journal-member { padding: 8px 10px; border: 2px solid var(--sticker-ink); border-radius: 10px; background: #fffaf2; }
+.journal-member-name { display: inline; margin: 0 8px 0 0; font-size: 16px; }
+.journal-member-level { display: inline; font-size: 14px; font-weight: 800; }
+.journal-xp { position: relative; height: 18px; margin: 6px 0 4px; overflow: hidden; border: 2px solid var(--sticker-ink); border-radius: 9px; background: #ddd6ca; font-size: 11px; font-weight: 800; line-height: 14px; text-align: center; }
+.journal-xp-fill { position: absolute; inset: 0 auto 0 0; background: var(--sticker-green); }
+.journal-xp span { position: relative; }
+.journal-member-stats { font-size: 12px; line-height: 1.3; }
+@media (max-height: 500px) {
+  .journal-page { padding: 10px 12px 8px; }
+  .journal-members { gap: 4px; margin-top: 8px; }
+  .journal-member { padding: 5px 8px; }
+  .journal-xp { height: 15px; margin: 3px 0; line-height: 11px; }
+  .journal-notes-head { margin-bottom: 4px; }
+  .journal-audio, .journal-volume, .journal-volume-slider { min-height: 36px; }
+}
 .journal-map-page[hidden] {
   display: none;
 }

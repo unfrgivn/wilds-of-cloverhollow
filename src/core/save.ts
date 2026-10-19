@@ -1,6 +1,7 @@
 import type { State, Wild } from "./types";
+import { levelForXp } from "./levels";
 
-export type SaveData = { version: 9; state: State };
+export type SaveData = { version: 10; state: State };
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -30,7 +31,8 @@ const wildShape: Wild = {
 // the recurring critters against `wildShape`. Anything else is an old or
 // broken save, and the game starts fresh rather than crashing later. The one
 // exception is content growing: see the critters merge in parseSave.
-export function parseSave(json: string, template: State): State | null {
+export function parseSave(json: string, template: State,
+  experienceBySpecies: Record<string, number> = {}, thresholds: number[] = [0]): State | null {
   try {
     const value: unknown = JSON.parse(json);
     if (!record(value) || typeof value.version !== "number" || !record(value.state)) return null;
@@ -42,13 +44,30 @@ export function parseSave(json: string, template: State): State | null {
       6: { tickets: 0, calms: {} },
       7: { calms: {} },
       8: { finale: null },
-      9: {},
+      9: { xp: 0 },
+      10: {},
     };
     const added = upgrades[value.version];
     if (added === undefined) return null;
+    const earned = record(value.state.calms)
+      ? Object.entries(value.state.calms).reduce((total, [species, count]) =>
+        total + (typeof count === "number" && Number.isInteger(count) && count > 0
+          ? count * (experienceBySpecies[species] ?? 0) : 0), 0)
+      : 0;
+    const upgradedXp = value.version < 10 ? earned
+      : typeof value.state.xp === "number" ? value.state.xp : -1;
+    const faeLevel = levelForXp({ thresholds, stats: { lifeBase: 0, lifeEvery: 1, guardEvery: 1,
+      commands: { soothe: { powerBase: 0, powerPerLevel: 0, magicBase: 0, magicPerLevel: 1 } } },
+      critters: {} }, upgradedXp);
+    const friendXp = thresholds[Math.max(0, Math.min(thresholds.length - 1, faeLevel - 1))] ?? 0;
+    const oldParty = Array.isArray(value.state.party) ? value.state.party : [];
     const saved: Record<string, unknown> = {
       ...value.state,
       ...added,
+      ...(value.version < 10 ? {
+        xp: upgradedXp,
+        party: oldParty.map((member) => record(member) ? { ...member, xp: friendXp } : member),
+      } : {}),
       ...(value.version < 8 ? { wild: unnoticed(value.state.wild) } : {}),
     };
     if (saved.battle !== null || saved.arcade !== null || saved.finale !== null) return null;
@@ -91,5 +110,5 @@ function isState(value: unknown, template: State): value is State {
 }
 
 export function serializeSave(state: State): string {
-  return JSON.stringify({ version: 9, state } satisfies SaveData);
+  return JSON.stringify({ version: 10, state } satisfies SaveData);
 }

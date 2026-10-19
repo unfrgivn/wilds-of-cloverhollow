@@ -49,6 +49,7 @@ import {
 } from "./feelings";
 import { battleParty } from "./party";
 import { firstTouch, nextNotice, noticed, oldFriend } from "./encounter";
+import { burstDamage, calmExperience, levelForXp, levelUpDelta, statsForCommand } from "./levels";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 import { nextRandom } from "./random";
 
@@ -123,6 +124,7 @@ function spawnParty(
       throw new Error(`No ${member.id} slot at ${area.id} (${spawn.x}, ${spawn.y})`);
     const placed = {
       id: member.id,
+      xp: 0,
       x: slot.x,
       y: slot.y,
       facing: spawn.facing,
@@ -163,6 +165,7 @@ export function createState(
     motion: { distance: 0, moving: false },
     transition: null,
     party: spawnParty(world, ink, area, spawn, ids),
+    xp: 0,
     ink,
     dialogue: null,
     critters: Object.fromEntries(
@@ -776,6 +779,8 @@ function joinReady(world: World, state: State): State {
     if (critter !== undefined) wild = wild.filter((item) => item !== critter);
     party.push({
       id: content.id,
+      xp: state.xp === 0 ? 0 : world.levels.thresholds[Math.max(0,
+        Math.min(98, levelForXp(world.levels, state.xp) - 1))] ?? 0,
       x: point.x,
       y: point.y,
       facing: state.facing,
@@ -1231,15 +1236,20 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     else if (next.phase === "soothed") {
       // Every calm pays; the sticker comes once per species (spec 8).
       const fresh = !state.stickers.includes(critter.sticker.id);
-      const line = (fresh ? world.battle.rewards.sticker : world.battle.rewards.coins)
+      const xp = calmExperience(world.levels, critter.id, critter.windUp !== null,
+        critter.id === "hooded-kid");
+      let line = (fresh ? world.battle.rewards.sticker : world.battle.rewards.coins)
         .replace("{sticker}", critter.sticker.name)
         .replace("{coins}", String(critter.coins));
+      line = `${line.replace(/[.!]$/, "")}, +${xp} XP!`;
       next = {
         ...battleMessage(next, line, "reward"),
         rewardSticker: fresh ? critter.sticker.id : null,
       };
     } else if (next.phase === "reward") {
       const den = next.den;
+      const xp = calmExperience(world.levels, critter.id, critter.windUp !== null,
+        critter.id === "hooded-kid");
       return afterCalm(world, {
         ...nextBase,
         ...(den === null
@@ -1247,6 +1257,10 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
           : { wild: state.wild.map((item) =>
               item.den === den ? { ...item, mood: "calm" } : item) }),
         coins: state.coins + critter.coins,
+        xp: state.xp + xp,
+        party: state.party.map((member) => member.id === state.party.find((candidate) =>
+          world.party[candidate.id]?.command?.id === next.command)?.id
+          ? { ...member, xp: member.xp + xp } : member),
         calms: { ...state.calms, [critter.species]: (state.calms[critter.species] ?? 0) + 1 },
         stickers: next.rewardSticker === null
           ? state.stickers
@@ -1422,6 +1436,10 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     if (result === null) return { ...nextBase, battle: ended };
     if (check.side === "critter") {
       const command = critterSideCommand(critter, next.command);
+      const owner = next.command === null ? undefined : state.party.find((member) =>
+        world.party[member.id]?.command?.id === next.command);
+      const actorStats = statsForCommand(world.levels, next.command ?? "soothe",
+        levelForXp(world.levels, owner?.xp ?? state.xp));
       const bonus =
         result === "great"
           ? command.numbers.great
@@ -1430,7 +1448,9 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
             : 0;
       const calm = Math.min(
         calmLimit(critter),
-        next.calm + command.numbers.calm + bonus +
+        next.calm + (next.command === "soothe" || next.command === null
+          ? actorStats.power : command.numbers.calm) +
+          (bonus > 0 ? actorStats.magic : 0) +
           (next.answered ? world.battle.feelingBonus : 0),
       );
       return {
@@ -1446,9 +1466,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
         ),
       };
     }
-    const base = check.big ? 2 : 1;
-    const damage =
-      result === "great" ? 0 : result === "good" ? Math.max(0, base - 1) : base;
+    const damage = burstDamage(world.levels, critter.id, result, check.big,
+      statsForCommand(world.levels, "soothe", levelForXp(world.levels, state.xp)).guard);
     return {
       ...nextBase,
       battle: battleMessage(
@@ -2386,7 +2405,44 @@ export function step(
   input: ActionFrame,
 ): { state: State; events: Event[] } {
   const result = stepTick(world, state, input);
-  return { ...result, state: joinReady(world, result.state) };
+  const joined = joinReady(world, result.state);
+  const events = [...result.events];
+  const addLevelEvent = (member: string, beforeXp: number, afterXp: number): void => {
+    const delta = levelUpDelta(world.levels, beforeXp, afterXp);
+    if (delta.levels === 0) return;
+    events.push({ type: "level-up", member, from: delta.before, to: delta.after,
+      deltas: {
+        power: delta.afterStats.power - delta.beforeStats.power,
+        magic: delta.afterStats.magic - delta.beforeStats.magic,
+        life: delta.afterStats.life - delta.beforeStats.life,
+        guard: delta.afterStats.guard - delta.beforeStats.guard,
+      } });
+  };
+  addLevelEvent("fae", state.xp, joined.xp);
+  for (const member of joined.party) {
+    const before = state.party.find((item) => item.id === member.id)?.xp;
+    if (before !== undefined) addLevelEvent(member.id, before, member.xp);
+  }
+  return { state: joined, events };
+}
+
+export function levelUpEvents(world: World, before: State, after: State): Event[] {
+  const events: Event[] = [];
+  const add = (member: string, previousXp: number, nextXp: number): void => {
+    const delta = levelUpDelta(world.levels, previousXp, nextXp);
+    if (delta.levels === 0) return;
+    events.push({ type: "level-up", member, from: delta.before, to: delta.after,
+      deltas: { power: delta.afterStats.power - delta.beforeStats.power,
+        magic: delta.afterStats.magic - delta.beforeStats.magic,
+        life: delta.afterStats.life - delta.beforeStats.life,
+        guard: delta.afterStats.guard - delta.beforeStats.guard } });
+  };
+  add("fae", before.xp, after.xp);
+  for (const member of after.party) {
+    const previous = before.party.find((item) => item.id === member.id);
+    if (previous !== undefined) add(member.id, previous.xp, member.xp);
+  }
+  return events;
 }
 
 export function stableHash(value: unknown): string {

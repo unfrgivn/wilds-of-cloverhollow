@@ -81,7 +81,7 @@ function reward(state: State): { line: string; card: string | null; after: State
 describe("coins and shops", () => {
   it("pays a calmed critter's coins as the battle ends: 8, and 25 for the gull", () => {
     const frog = reward(soothedState("fountain-frog", 3));
-    expect(frog.line).toBe("New sticker: Fountain Frog! +8 coins.");
+    expect(frog.line).toBe("New sticker: Fountain Frog! +8 coins, +20 XP!");
     expect(frog.card).toBe("fountain-frog");
     expect(frog.after).toMatchObject({ battle: null, coins: 11, stickers: ["fountain-frog"] });
     expect(frog.after.critters["fountain-frog"]).toBe("calm");
@@ -92,7 +92,7 @@ describe("coins and shops", () => {
     // A bay frog after the fountain frog: the frogs' sticker is already in the
     // album, so this calm only pays.
     const again = reward(soothedState("frog", 8, ["fountain-frog"]));
-    expect(again.line).toBe("+8 coins!");
+    expect(again.line).toBe("+8 coins, +40 XP!");
     expect(again.card).toBeNull();
     expect(again.after).toMatchObject({ coins: 16, stickers: ["fountain-frog"] });
   });

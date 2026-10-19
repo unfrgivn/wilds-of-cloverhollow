@@ -39,7 +39,7 @@ const battleParts: Record<string, string[]> = {
   "battle-windup": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-windup"],
   "battle-talk": [".sticker-dialogue"],
   "battle-talk-reply": [".battle-hud", ".sticker-dialogue"],
-  "battle-reward": [".battle-reward"],
+  "battle-reward": [".battle-reward", ".sticker-dialogue"],
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
   "journal-full": [".journal-book"],
@@ -954,7 +954,7 @@ test.describe("sticker gallery", () => {
         ["auto", "scroll"].includes(getComputedStyle(element).overflowY));
     };
     expect(await overflow("journal-full")).toBe(true);
-    expect(await overflow("journal-notes")).toBe(false);
+    expect(await overflow("journal-notes")).toBe(true);
     await expect(page.locator(".journal-note")).toHaveCount(5);
     await expect(page.locator(".journal-empty")).toBeHidden();
     await gallery(page, "journal-empty");

@@ -73,7 +73,7 @@ test("real keys: PE, Coach Ash's stopwatch and clipboard, and the lasso", async 
     if (!battleShot && state.battle?.phase === "command" && state.battle.shown) {
       battleShot = true;
       await expect(page.locator(".battle-meter-label").last())
-        .toHaveText("ZOOMIE PUP", { useInnerText: true });
+        .toHaveText("LV 9 · ZOOMIE PUP", { useInnerText: true });
       await shoot(page, "gym-pup-battle");
     }
     const dialogue = state.dialogue;

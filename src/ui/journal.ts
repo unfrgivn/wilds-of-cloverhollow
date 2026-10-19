@@ -2,6 +2,7 @@ import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { coinMarkup, cookieMarkup, ticketMarkup } from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
+import type { LevelStats } from "../core/levels";
 
 export type JournalSticker = {
   id: string;
@@ -24,6 +25,8 @@ export type JournalView = {
   snacks: number;
   muted: boolean;
   level: AudioLevel;
+  members: { id: string; name: string; level: number; xp: number; startXp: number;
+    nextXp: number; stats: LevelStats; friend: boolean }[];
 };
 
 type Slot = {
@@ -145,7 +148,8 @@ export function createJournal(root: HTMLElement): {
   const notes = element("ul", "journal-notes");
   const empty = element("p", "journal-empty");
   empty.textContent = "Nothing yet. Look around!";
-  notesPage.append(notesHead, notes, empty);
+  const members = element("div", "journal-members");
+  notesPage.append(notesHead, members, notes, empty);
   const stickersPage = element("section", "journal-page journal-stickers-page");
   const stickersHeading = element("h2", "journal-heading");
   stickersHeading.textContent = "STICKERS";
@@ -264,6 +268,35 @@ export function createJournal(root: HTMLElement): {
         if (item !== null) setText(item, note);
       });
       empty.hidden = view.notes.length > 0;
+      while (members.children.length < view.members.length) {
+        const card = element("article", "journal-member");
+        card.append(element("h3", "journal-member-name"), element("div", "journal-member-level"),
+          element("div", "journal-xp"), element("div", "journal-member-stats"));
+        members.append(card);
+      }
+      while (members.children.length > view.members.length) members.lastElementChild?.remove();
+      view.members.forEach((member, index) => {
+        const card = members.children.item(index);
+        if (!(card instanceof HTMLElement)) return;
+        const name = card.children.item(0);
+        const level = card.children.item(1);
+        const xp = card.children.item(2);
+        const stats = card.children.item(3);
+        if (!(name instanceof HTMLElement) || !(level instanceof HTMLElement) ||
+            !(xp instanceof HTMLElement) || !(stats instanceof HTMLElement)) return;
+        setText(name, member.name);
+        setText(level, `Lv ${member.level}`);
+        const progress = member.nextXp <= member.xp ? 1 :
+          Math.max(0, Math.min(1, (member.xp - member.startXp) /
+            Math.max(1, member.nextXp - member.startXp)));
+        const xpMarkup = `<div class="journal-xp-fill" style="width:${progress * 100}%"></div>` +
+          `<span>${member.xp} XP</span>`;
+        if (xp.innerHTML !== xpMarkup) xp.innerHTML = xpMarkup;
+        setText(stats, member.friend
+          ? `Power ${member.stats.power} · Magic ${member.stats.magic}`
+          : `Power ${member.stats.power} · Magic ${member.stats.magic} · ` +
+            `Life ${member.stats.life} · Guard ${member.stats.guard}`);
+      });
       while (slots.length < view.stickers.length) slots.push(addSlot(grid));
       while (slots.length > view.stickers.length) slots.pop()?.root.remove();
       view.stickers.forEach((sticker, index) => {

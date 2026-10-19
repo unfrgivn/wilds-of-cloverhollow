@@ -145,7 +145,8 @@ const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup" ||
-    state === "battle-talk" || state === "battle-talk-reply"
+    state === "battle-talk" || state === "battle-talk-reply" || state === "battle-level-up" ||
+    state === "battle-reward"
   : state !== "prompt" && !journalState && !titleState && !creditsState &&
     (!arcadeState || state === "arcade-result" || state === "skee-result" ||
     state === "mole-result" || state === "comet-result" || state === "cook-result" ||
@@ -343,7 +344,9 @@ dialogue.onChoose((index) => {
 });
 const battleMessage: DialogueView = {
   speaker: null,
-  text: "What should Fae do?",
+  text: state === "battle-reward" ? "+8 coins, +40 XP!" :
+    state === "battle-level-up" ? "Fae reached level 5! Power +2, Magic +1, Life +1." :
+      "What should Fae do?",
   revealed: 100,
   choices: [],
   selected: -1,
@@ -476,6 +479,12 @@ function renderGalleryState(): void {
     snacks: 2,
     muted: false,
     level: 1,
+    members: [
+      { id: "fae", name: "Fae", level: 5, xp: 360, startXp: 340, nextXp: 464,
+        stats: { power: 28, magic: 2, life: 6, guard: 0 }, friend: false },
+      { id: "maddie", name: "Maddie", level: 5, xp: 360, startXp: 340, nextXp: 464,
+        stats: { power: 33, magic: 2, life: 6, guard: 0 }, friend: true },
+    ],
     // Every prize in the catalogue; outside the empty journal, the frog and
     // the pup are won.
     prizes: content.world.arcade.prizes.map((prize) => {
@@ -491,7 +500,8 @@ function renderGalleryState(): void {
   battleHud.render({
     visible: battleState && state !== "battle-reward" && !talkChoicesShown(galleryTalk),
     energy: 3,
-    energyMax: 5,
+    energyMax: state === "battle-windup" ? 12 : 5,
+    level: state === "battle-windup" ? 6 : 1,
     calm: 0.45,
     critterName: state === "battle-windup" ? "Grumpy Gull" : "Fizzy Frog",
   });

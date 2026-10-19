@@ -7,7 +7,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 189,
     "interim": false,
-    "hash": "46a33d14"
+    "hash": "3714147c"
   },
   {
     "id": "fountain-frog",
@@ -15,9 +15,9 @@
     "note": "In the plaza, after the fountain frog is calm; the school is next.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
-    "tick": 1045,
+    "tick": 1196,
     "interim": false,
-    "hash": "d39e8abd"
+    "hash": "d7c01f62"
   },
   {
     "id": "tree-house",
@@ -25,9 +25,9 @@
     "note": "At the tree house, with chapter one complete; Bubblegum Bay is next.",
     "fixture": "new-game",
     "run": "new-game/chapter-one.json",
-    "tick": 4419,
+    "tick": 5142,
     "interim": false,
-    "hash": "dcd3847b"
+    "hash": "4c7a758f"
   },
   {
     "id": "bubblegum-bay",
@@ -35,9 +35,9 @@
     "note": "On the road into Bubblegum Bay, ready to explore the new lands.",
     "fixture": "new-game",
     "run": "new-game/east-road.json",
-    "tick": 5564,
+    "tick": 6204,
     "interim": false,
-    "hash": "aef26755"
+    "hash": "00f9df18"
   },
   {
     "id": "shortcut-jordan",
@@ -47,7 +47,7 @@
     "run": "pass-party/jordan.json",
     "tick": 143,
     "interim": true,
-    "hash": "2a9b04f0"
+    "hash": "c28a39b8"
   },
   {
     "id": "shortcut-lantern",
@@ -55,9 +55,9 @@
     "note": "Starts from the pass-party shortcut in Pinecone Pass, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 1 sticker, and 8 coins. Next: the woods.",
     "fixture": "pass-party",
     "run": "pass-party/lantern.json",
-    "tick": 568,
+    "tick": 776,
     "interim": true,
-    "hash": "49468b54"
+    "hash": "f40fb97a"
   },
   {
     "id": "shortcut-woods",
@@ -65,9 +65,9 @@
     "note": "Starts from the pass-party shortcut in the Whispering Woods, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 2 stickers, and 16 coins. Next: the arcade.",
     "fixture": "pass-party",
     "run": "pass-party/woods.json",
-    "tick": 1073,
+    "tick": 1371,
     "interim": true,
-    "hash": "6e40bc80"
+    "hash": "953123df"
   },
   {
     "id": "shortcut-arcade",
@@ -75,39 +75,39 @@
     "note": "Starts from the pass-party shortcut in the arcade, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 2 stickers, and 16 coins. Next: the lodge.",
     "fixture": "pass-party",
     "run": "pass-party/arcade.json",
-    "tick": 2034,
+    "tick": 2331,
     "interim": true,
-    "hash": "14a2d0a9"
+    "hash": "01fde873"
   },
   {
     "id": "shortcut-lodge",
     "label": "Lodge shortcut",
-    "note": "Starts from the pass-party shortcut in the lodge, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 2 stickers, and 33 coins. Next: the school.",
+    "note": "Starts from the pass-party shortcut in the lodge, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 2 stickers, and 33 coins. Next: the clubhouse.",
     "fixture": "pass-party",
     "run": "pass-party/lodge.json",
-    "tick": 1421,
+    "tick": 1829,
     "interim": true,
-    "hash": "c97c5135"
-  },
-  {
-    "id": "shortcut-school",
-    "label": "School shortcut",
-    "note": "Starts from the pass-party shortcut in the east hall, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 3 stickers, and 41 coins. Next: the clubhouse.",
-    "fixture": "pass-party",
-    "run": "pass-party/school.json",
-    "tick": 4249,
-    "interim": true,
-    "hash": "1d38ccfa"
+    "hash": "46728a5d"
   },
   {
     "id": "shortcut-clubhouse",
     "label": "Clubhouse shortcut",
-    "note": "Starts from the pass-party shortcut in the clubhouse, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 3 stickers, and 48 coins. Next: the gym.",
+    "note": "Starts from the pass-party shortcut in the clubhouse, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 3 stickers, and 32 coins. Next: the school.",
     "fixture": "pass-party",
     "run": "pass-party/clubhouse.json",
-    "tick": 3121,
+    "tick": 2680,
     "interim": true,
-    "hash": "a19e6bea"
+    "hash": "269dfddb"
+  },
+  {
+    "id": "shortcut-school",
+    "label": "School shortcut",
+    "note": "Starts from the pass-party shortcut in the east hall, Fae with Maddie, Sue, and Jordan; holds lantern, no lasso, no flute, 3 stickers, and 41 coins. Next: the gym.",
+    "fixture": "pass-party",
+    "run": "pass-party/school.json",
+    "tick": 4893,
+    "interim": true,
+    "hash": "a56c962f"
   },
   {
     "id": "shortcut-gym",
@@ -115,9 +115,9 @@
     "note": "Starts from the pass-party shortcut in the gym, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, no flute, 4 stickers, and 49 coins. Next: the music.",
     "fixture": "pass-party",
     "run": "pass-party/gym.json",
-    "tick": 6225,
+    "tick": 7105,
     "interim": true,
-    "hash": "fa8318f9"
+    "hash": "54de5e59"
   },
   {
     "id": "shortcut-music",
@@ -125,9 +125,9 @@
     "note": "Starts from the pass-party shortcut in the music room, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 5 stickers, and 57 coins. Next: the field.",
     "fixture": "pass-party",
     "run": "pass-party/music.json",
-    "tick": 8187,
+    "tick": 9067,
     "interim": true,
-    "hash": "38fb3957"
+    "hash": "28de1ae3"
   },
   {
     "id": "shortcut-field",
@@ -135,9 +135,9 @@
     "note": "Starts from the pass-party shortcut in the field, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 5 stickers, and 57 coins. Next: the squirrel.",
     "fixture": "pass-party",
     "run": "pass-party/field.json",
-    "tick": 8777,
+    "tick": 9657,
     "interim": true,
-    "hash": "00c51e26"
+    "hash": "74ae148b"
   },
   {
     "id": "shortcut-squirrel",
@@ -145,9 +145,9 @@
     "note": "Starts from the pass-party shortcut in the field, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 6 stickers, and 65 coins. Next: the flute.",
     "fixture": "pass-party",
     "run": "pass-party/squirrel.json",
-    "tick": 9430,
+    "tick": 10366,
     "interim": true,
-    "hash": "452d81e0"
+    "hash": "a7d26704"
   },
   {
     "id": "shortcut-flute",
@@ -155,9 +155,9 @@
     "note": "Starts from the pass-party shortcut in the park, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 6 stickers, and 65 coins. Next: the lasso.",
     "fixture": "pass-party",
     "run": "pass-party/flute.json",
-    "tick": 11228,
+    "tick": 12164,
     "interim": true,
-    "hash": "32dfa64f"
+    "hash": "a92eb745"
   },
   {
     "id": "shortcut-lasso",
@@ -165,9 +165,9 @@
     "note": "Starts from the pass-party shortcut in the classroom, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 7 stickers, and 113 coins. Next: the mist.",
     "fixture": "pass-party",
     "run": "pass-party/lasso.json",
-    "tick": 16063,
+    "tick": 17059,
     "interim": true,
-    "hash": "2f145031"
+    "hash": "1a87dcf8"
   },
   {
     "id": "shortcut-mist",
@@ -175,9 +175,9 @@
     "note": "Starts from the pass-party shortcut in the mist trail, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 7 stickers, and 119 coins. Next: the kitchen.",
     "fixture": "pass-party",
     "run": "pass-party/mist.json",
-    "tick": 17444,
+    "tick": 18440,
     "interim": true,
-    "hash": "b620b2b6"
+    "hash": "c8343928"
   },
   {
     "id": "shortcut-kitchen",
@@ -185,9 +185,9 @@
     "note": "Starts from the pass-party shortcut in the clubhouse, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 7 stickers, and 119 coins. Next: the forest.",
     "fixture": "pass-party",
     "run": "pass-party/kitchen.json",
-    "tick": 17685,
+    "tick": 18681,
     "interim": true,
-    "hash": "658798f8"
+    "hash": "bb347722"
   },
   {
     "id": "shortcut-forest",
@@ -195,9 +195,9 @@
     "note": "Starts from the pass-party shortcut in the Enchanted Forest, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 7 stickers, and 119 coins. Next: the kid.",
     "fixture": "pass-party",
     "run": "pass-party/forest.json",
-    "tick": 18113,
+    "tick": 19109,
     "interim": true,
-    "hash": "933ae1fa"
+    "hash": "bd951cef"
   },
   {
     "id": "shortcut-kid",
@@ -205,9 +205,9 @@
     "note": "Starts from the pass-party shortcut in the Enchanted Forest, Fae with Maddie, Sue, and Jordan; holds lantern, lasso, flute, 8 stickers, and 159 coins. Next: the ending.",
     "fixture": "pass-party",
     "run": "pass-party/kid.json",
-    "tick": 18926,
+    "tick": 19934,
     "interim": true,
-    "hash": "b361ec18"
+    "hash": "1f835f13"
   },
   {
     "id": "hills-lookout",
@@ -217,6 +217,6 @@
     "run": "hills/hills-lookout.json",
     "tick": 0,
     "interim": true,
-    "hash": "fc6f5ae8"
+    "hash": "2a34d738"
   }
 ]

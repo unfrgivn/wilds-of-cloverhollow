@@ -40,7 +40,7 @@ describe("save format", () => {
     // no lantern, version 3 no coins, and version 4 a critter of each kind
     // (no recurring critters); all start fresh, as does a version from the
     // future.
-    for (const version of [1, 2, 3, 4, 10])
+    for (const version of [1, 2, 3, 4, 11])
       expect(parseSave(JSON.stringify({ version, state: fresh }), fresh)).toBeNull();
     expect(parseSave("not json", fresh)).toBeNull();
     expect(parseSave(JSON.stringify({ version: 5, state: { tick: 1 } }), fresh)).toBeNull();
@@ -94,7 +94,7 @@ describe("save format", () => {
     expect(restored?.wild).toEqual([{ ...out, notice: 0 }]);
   });
 
-  it("round trips version 8 and refuses an active arcade game", () => {
+  it("round trips version 10 and refuses an active arcade game", () => {
     expect(parseSave(serializeSave(fresh), fresh)).toEqual(fresh);
     const rich: State = { ...fresh, tickets: 12, prizes: ["pinwheel"] };
     expect(parseSave(serializeSave(rich), fresh)).toEqual(rich);

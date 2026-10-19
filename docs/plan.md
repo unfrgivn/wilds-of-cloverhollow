@@ -2901,40 +2901,69 @@ the old trail, the owl, and the clubhouse claim.
   by story progression. QA content is loaded only by the dev/harness dynamic
   module, keeping the player slot untouched and autosaves disabled.
 
-## Milestone 66: Experience and levels **Status:** 📋 Planned (a proposal for the owner's review)
-- The owner asked for experience and levels (2026-10-18), for the cheat
-  console (Milestone 67) to edit. The game has neither, so this adds them as
-  gameplay first. Nothing here is built until the owner approves it.
-- XP: every calm pays XP the way it pays coins, from the critter's content:
-  10 for an ordinary critter, 40 for a mini-boss (the gull, Mr. Pip, Mrs.
-  Flurry, and those after them), and 60 for the hooded kid. Old friends,
-  calmed on touch, pay theirs too. The reward line gains it ("+8 coins, +10
-  XP!").
-- Levels: Fae's level is read from her XP through a table in
-  `content/levels.json`, from level 1 at 0 XP to level 10 at about what a
-  full playthrough earns. Only XP is saved, so the two can't disagree.
-- What a level does: each level past the first adds 1 calm to Soothe and the
-  friends' commands, and levels 4 and 8 add an energy leaf, both from the
-  table. Talk and Snack stay as they are, so the finale plays the same.
-  Battles get a little shorter as Fae grows: the late game gets gentler for
-  younger players, and the calm-downs stay short (pillar 3).
-- Shown: a level-up line after the reward ("Fae reached level 3! Calming
-  comes easier.") with its own sound, and a Level pill with an XP bar on the
-  journal's notes page beside Coins and Snacks.
-- Save version 10: older saves upgrade with 0 XP, counted from then on, as
-  calm counts were in version 7.
-- Cost: once Fae levels, every recorded battle plays differently, so the
-  runs are re-recorded, their pins and the QA packs regenerated, and the
-  battle screenshots redrawn and viewed.
-- For the owner: the names (XP and Level, or something gentler), the
-  numbers, and the level-up line.
+## Milestone 66: Experience and levels **Status:** 📋 Planned (design approved by the owner, 2026-10-18)
+- The owner (2026-10-18): it works like a normal RPG. Experience raises the
+  level, each level takes more XP than the last, harder critters pay more XP,
+  and levels raise the stats. On screen: XP, Level, and the stats Power,
+  Magic, Life, and Guard. The level cap is 99. Each party member levels
+  separately. Build it after Milestone 65.
+- Critter levels: every critter kind gets a `level` in its content, set by
+  where it lives in the story. Starting points, checked against the real spawn
+  areas and tuned by the balance sim: the town 1 to 3 (the fountain frog 1),
+  the bay 4 to 5, the lookout gull 6, the pass and woods 6 to 7, Mrs. Flurry 8,
+  Mr. Pip 9, the school's gym pup and music bird 9 to 10, the field 10 to 11,
+  and the hooded kid 14. A critter's level sets, through `content/levels.json`,
+  its calm meter (`calmMax`), its burst strength, and its XP; mini-bosses keep
+  their bigger meter and burst chance on top. This replaces the shared numbers
+  every ordinary critter has today.
+- XP: a calm pays `10 x level` XP (mini-bosses x3, the hooded kid x4), shown
+  with the coins ("+8 coins, +40 XP!"). Old friends, calmed on touch, pay
+  theirs too.
+- Levels: a member's level is read from their XP through the table in
+  `content/levels.json`. Level L to L+1 costs about `20 x L^1.5` XP (level 2 at
+  20 XP, level 5 at about 340, level 10 at about 2,200), up to level 99. Only
+  XP is saved, so level and XP can't disagree.
+- Who earns: Fae earns every calm's XP. A friend earns a battle's XP when their
+  command was used in it, so the friends Fae leans on grow fastest. A friend
+  who joins starts at the start of Fae's current level.
+- Stats, all from the table and tuned by the balance sim:
+  - Power: the calm a member's own command adds (Fae's Soothe, Maddie's Play,
+    Sue's Cast, Jordan's Juggle); Soothe is 20 at level 1, +2 a level.
+  - Magic: extra calm on great and good timing for that command.
+  - Life: Fae's leaves, 5 at level 1 and +1 every 3 levels.
+  - Guard: softens Fae's burst hits, 1 point every 5 levels; great timing
+    still costs nothing and a miss still costs at least 1 leaf.
+  - Friends show Power and Magic. Life and Guard are Fae's, since bursts only
+    reach her. Leaves keep the battle notes' rule (no damage, no knockouts):
+    at 0 Fae rests at a safe spot and loses nothing.
+- Burst strength by critter level: base 1 (big 2) at levels 1 to 4, 2 (3) at 5
+  to 9, and 3 (4) from 10; great, good, and miss still deal 0, base minus 1,
+  and base, less Guard.
+- Shown: "Lv N" on the critter's name plate; XP on the reward line; a level-up
+  line and sound for each member who levels ("Fae reached level 5! Power +2,
+  Magic +1, Life +1."); the journal shows each member's level, XP bar, and
+  stats; past 10 leaves the battle HUD shows a number beside the leaves.
+- Save version 10: older saves upgrade with the XP their recorded calm counts
+  already earned, at the new per-critter XP, so a late save doesn't start at
+  level 1 against level-10 critters; friends start at Fae's resulting level.
+- Balance: a headless sim plays the story with a careful-player strategy and
+  checks that Fae reaches each area within about a level of its critters, and
+  that a battle at an equal level takes about as many commands as today's (3
+  to 5). Grinding recurring critters still helps, as in a normal RPG.
+- Evidence: core unit tests (the XP curve, stats, burst strength, who earns,
+  the save upgrade), the balance sim, a real-key e2e (a calm pays XP, a
+  level-up line, the journal's stats), and screenshots viewed.
+- Cost: every recorded battle plays differently, so the runs are re-recorded,
+  their pins and the QA packs regenerated, and the battle screenshots redrawn
+  and viewed. Milestone 67's console then sets each member's XP or level.
 
 ## Milestone 67: The cheat console **Status:** 📋 Planned
 - In QA mode only (Milestone 65): the backtick key, or a tap on the QA
-  badge, opens a console. It sets XP and level (a level sets XP to its
-  threshold), coins, snacks, tickets, prizes, stickers, and the tools Fae
-  carries (the lantern, the lasso, the flute, and the map, which are story
-  variables such as `has_lasso`); `help` lists the commands.
+  badge, opens a console. It sets each party member's XP or level (up to
+  99; a level sets XP to its threshold), coins, snacks, tickets, prizes,
+  stickers, and the tools Fae carries (the lantern, the lasso, the flute,
+  and the map, which are story variables such as `has_lasso`); `help`
+  lists the commands.
 - `save <name>` keeps the current state in a QA-only slot, listed in the QA
   menu and never the player's; `export` shows it as a save file to attach
   to a bug report or add to the library.

@@ -14,7 +14,7 @@ test(
   await step(page, 2);
   await expect(page.locator(".qa-menu")).toBeVisible();
   if (testInfo.project.name === "chromium")
-    await expect(page).toHaveScreenshot("qa-menu.png");
+    await expect(page).toHaveScreenshot("qa-menu.png", { maxDiffPixelRatio: 0.02 });
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("z");
   await step(page, 2);

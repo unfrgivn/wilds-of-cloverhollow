@@ -2913,10 +2913,14 @@ the old trail, the owl, and the clubhouse claim.
   real-time ticking after a pick, save-slot preservation, cancellation, an
   unknown id, touch long press and pick, fixture reset, and the visible Back to
   title control at phone size. The Chromium menu and badge baselines and their
-  reviewed JPEGs were captured and viewed. The iOS simulator was built and
-  launched for this pass; its touch menu/pick evidence remains pending because
-  the available simulator snapshot did not expose the web-view logo or menu
-  controls as actionable elements.
+  reviewed JPEGs were captured and viewed. On the iPhone 17 simulator (iOS
+  27.0) the harness built, installed, and launched with the QA module in its
+  bundle, and the title logged as it does in the browser. The touch check
+  (long press, pick, badge) is still pending, blocked by tooling: Xcode 27.1
+  ships no Simulator.app (DeviceHub replaces it, and `open -a Simulator` in
+  `tools/ios/run.ts` fails quietly), and AXe 1.8.0, bundled with
+  MobileBuildMCP, reports success while no touch or hardware button reaches
+  the device. `just ios-smoke` can't run on this machine either (2026-10-18).
 - Gates and notes (2026-10-18): the first push (`bec40b06`) went out with the
   gate red; CI run `39178771039` failed 64 tests. Hotfix `e2520a6d` added the
   `[hidden]` rule and initialized sound before the QA import. This fix pass

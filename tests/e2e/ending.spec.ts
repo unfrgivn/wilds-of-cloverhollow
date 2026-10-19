@@ -84,6 +84,8 @@ test("real keys wake Fae from the dream, and Continue returns to it",
       .map((entry) => entry.name)).toEqual(["Maddie", "Jordan", "Pond Pup"]);
     expect(credits?.entries.map((entry) => entry.name)).toContain("Milo");
     await expect(page.locator(".credits-screen")).toBeVisible();
+    // The stickers show once their atlases are decoded.
+    await expect(page.locator(".credits-entry-image").first()).toBeVisible();
     await take("credits");
     // Nothing in the morning or the credits wrote the save slot: it still
     // holds the dream.

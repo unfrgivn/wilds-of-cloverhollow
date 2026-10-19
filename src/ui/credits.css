@@ -60,6 +60,7 @@
   background-repeat: no-repeat;
   background-color: transparent;
 }
+.credits-screen[data-stickers="decoding"] .credits-entry-image { visibility: hidden; }
 .credits-entry-name {
   align-self: end;
   font-size: 18px;

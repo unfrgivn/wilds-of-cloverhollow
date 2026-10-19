@@ -31,9 +31,15 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
   // The list is rebuilt only when what it shows changes: the shell renders
   // every frame while the credits are up, and they hold still.
   let shown = "";
+  // The stickers' atlases, decoded and held while the credits are up.
+  let atlases: HTMLImageElement[] = [];
   return { render: (view) => {
     screen.hidden = !view.visible;
-    if (!view.visible) return;
+    if (!view.visible) {
+      shown = "";
+      atlases = [];
+      return;
+    }
     const key = JSON.stringify(view.entries);
     if (key === shown) return;
     shown = key;
@@ -56,5 +62,21 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
       .map(renderEntry));
     metList.replaceChildren(...view.entries.filter((entry) => entry.section === "met")
       .map(renderEntry));
+    // The stickers show once their atlases are decoded. A new layer's first
+    // paint in WebKit decodes a large image at the size it's drawn unless a
+    // whole decode is ready, and that copy resamples a little differently from
+    // the whole one every later paint draws (and pops in when it's done).
+    const sources = new Set(view.entries.flatMap((entry) =>
+      entry.image === null ? [] : [entry.image.src]));
+    const decoding = [...sources].map((src) => {
+      const image = new Image();
+      image.src = src;
+      return image;
+    });
+    atlases = decoding;
+    screen.dataset.stickers = "decoding";
+    void Promise.allSettled(decoding.map((image) => image.decode())).then(() => {
+      if (atlases === decoding) screen.dataset.stickers = "ready";
+    });
   } };
 }

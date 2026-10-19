@@ -1251,11 +1251,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
   roster order, on the frame `down_idle_01`. MET is each sticker in
   `state.stickers`, by its name, on its critter's atlas at the sticker's
-  frame. Each entry is a small sticker over its name; the names and the
-  thanks are at least 18 px. At 1180x820 and 1280x720 the largest credits
-  (every friend and the whole catalogue) fit without scrolling; on a phone the
-  sheet scrolls. On touch only the confirm button shows, at least 44 px and
-  clear of the entries.
+  frame. Each entry is a small sticker over its name; the stickers show
+  together, once their atlases are decoded (decoded whole, WebKit draws them
+  the same way every time). The names and the thanks are at least 18 px. At
+  1180x820 and 1280x720 the largest credits (every friend and the whole
+  catalogue) fit without scrolling; on a phone the sheet scrolls. On touch
+  only the confirm button shows, at least 44 px and clear of the entries.
 - The shell steps the core on every credits tick, and the core holds the
   world still (only the tick, the previous input, and the resting pose
   change), so the ticks and their input stay a replay's.

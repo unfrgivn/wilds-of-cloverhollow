@@ -94,7 +94,8 @@ test.describe("sticker gallery", () => {
           expect(metrics.thanks?.bottom ?? 0).toBeLessThanOrEqual(size.height);
         }
         await expect(page.locator(".credits-screen h1")).toHaveText("THE END");
-        await expect(page.locator(".credits-entry").first()).toBeVisible();
+        // The stickers show once their atlases are decoded.
+        await expect(page.locator(".credits-entry-image").first()).toBeVisible();
         // The largest credits: every friend Fae can make, and the whole catalogue.
         if (state === "credits") {
           await expect(page.locator(".credits-entry-friends .credits-entry-name"))

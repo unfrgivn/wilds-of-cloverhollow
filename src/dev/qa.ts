@@ -1,7 +1,7 @@
 import "../ui/qa.css";
 export type QaPack = {
   id: string; label: string; note: string; fixture: string; run: string;
-  tick: number; interim: boolean;
+  tick: number; interim: boolean; hash: string;
 };
 type RawModule = string | Record<string, unknown>;
 export type PackState = { pack: QaPack; save: string };
@@ -19,13 +19,16 @@ function isPack(item: unknown): item is QaPack {
   return typeof value.id === "string" && typeof value.label === "string" &&
     typeof value.note === "string" && typeof value.fixture === "string" &&
     typeof value.run === "string" && typeof value.tick === "number" &&
-    typeof value.interim === "boolean";
+    typeof value.interim === "boolean" && typeof value.hash === "string";
 }
 
 function readMetadata(): QaPack[] {
   const value = Object.values(metadata)[0];
   if (!Array.isArray(value)) throw new Error("QA save manifest is not an array");
-  return value.filter(isPack);
+  return value.map((item, index) => {
+    if (!isPack(item)) throw new Error(`Invalid QA save manifest entry ${index}`);
+    return item;
+  });
 }
 
 function rawString(value: RawModule | undefined): string | null {
@@ -64,8 +67,10 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export function createQaMenu(root: HTMLElement, packs: PackState[]): {
   render: (visible: boolean, selected: number) => void;
   onChoose: (callback: (pack: PackState) => void) => void;
+  onCancel: (callback: () => void) => void;
 } {
   let choose: (pack: PackState) => void = () => undefined;
+  let cancel: () => void = () => undefined;
   const menu = el("main", "qa-menu");
   menu.hidden = true; menu.setAttribute("aria-label", "QA save library");
   const card = el("div", "qa-card");
@@ -78,14 +83,17 @@ export function createQaMenu(root: HTMLElement, packs: PackState[]): {
     const label = el("strong", "qa-option-label");
     label.textContent = item.pack.label;
     const note = el("small", "qa-option-note");
-    note.textContent = item.pack.interim ? `${item.pack.note} (shortcut)` : item.pack.note;
+    note.textContent = item.pack.note;
     button.append(label, note);
     button.addEventListener("click", () => choose(item));
     list.append(button); return button;
   });
   card.append(heading, list); menu.append(card); root.append(menu);
+  const back = el("button", "qa-back"); back.type = "button"; back.textContent = "Back to title";
+  back.addEventListener("click", () => cancel()); card.append(back);
   return {
     onChoose: (callback) => { choose = callback; },
+    onCancel: (callback) => { cancel = callback; },
     render: (visible, selected) => {
       menu.hidden = !visible;
       buttons.forEach((button, index) => button.setAttribute(

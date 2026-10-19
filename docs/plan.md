@@ -2882,11 +2882,12 @@ the old trail, the owl, and the clubhouse claim.
   relaunch to leave.
 - `just build` fails if QA mode or a pack reaches the production bundle, or
   if the harness bundle lacks it.
-- Evidence: unit tests (pack freshness and the QA flow), a real-key e2e (Q
-  on the title, a pack picked with the arrows and Z, a door walked through,
-  the player's save unchanged byte for byte and no autosave written; `?qa=`
-  boots the pack with its badge), the menu and the badge screenshotted and
-  viewed, and the menu on the iOS simulator.
+- Evidence: unit tests (pack freshness and the QA flow), Chromium and WebKit
+  real-input e2e coverage (Q on the title, a pack picked with the arrows and
+  Z, movement, save-slot preservation, cancellation, an unknown id, a touch
+  long press and pick, and a fixture reset), the menu and badge screenshotted
+  and viewed, reviewed JPEG evidence in `art/review/`, and the menu and pack
+  pick on the iOS simulator.
 - Gates and notes (2026-10-18): Q was free in the input map, so it is the
   keyboard entry, alongside a logo long press and `?qa=<id>`. The library has
   four real packs from the new-game chapter-one/east-road runs and seventeen

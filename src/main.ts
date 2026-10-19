@@ -143,28 +143,6 @@ async function boot(): Promise<void> {
       gamepad.frame(),
     );
   });
-  const openQa = (): void => {
-    if (qaTools === null || qaPacks.length === 0 || titleMode === null) return;
-    qaReturnMode = titleMode;
-    qaMenuOpen = true;
-  };
-  title.onQa(openQa);
-  if (qaEnabled)
-    window.addEventListener("keydown", (event) => {
-      if (event.code === "KeyQ") {
-        event.preventDefault();
-        openQa();
-      }
-    });
-  qaMenu?.onChoose((item) => {
-    qaActivePack = item;
-    const loaded = parseSave(item.save, fresh);
-    if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
-    state = loaded;
-    qaMenuOpen = false;
-    titleMode = null;
-    paused = false;
-  });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   commandMenu.onChoose((index) => touch.tapChoice(index));
   journal.onClose(() => touch.tapButton("cancel"));
@@ -176,7 +154,8 @@ async function boot(): Promise<void> {
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
   const fresh = createState(content.world, initialFixture);
-  const saved = qaUrlPack === null ? await Preferences.get({ key: saveKey }) : { value: null };
+  const saved = qaUrlPack === null && qaError === null
+    ? await Preferences.get({ key: saveKey }) : { value: null };
   const restored = qaUrlPack === null
     ? saved.value === null ? null : parseSave(saved.value, fresh)
     : parseSave(qaUrlPack.save, fresh);
@@ -189,12 +168,14 @@ async function boot(): Promise<void> {
     : null;
   let qaMenuOpen = false;
   let qaActivePack: PackState | null = qaUrlPack;
+  const qaBlocked = qaError !== null;
+  let qaJustPicked = false;
   let qaSelected = 0;
   let qaReturnMode: TitleMode = restored === null ? "fresh" : "continue";
   let titleSelected: TitleChoiceId =
     restored === null ? "new-game" : "continue";
   const applyTitle = (input: TitleInput): void => {
-    if (titleMode === null) return;
+    if (titleMode === null || qaBlocked || qaActivePack !== null) return;
     const result = titleFlow(titleMode, titleSelected, input);
     titleMode = result.mode;
     titleSelected = result.selected;
@@ -223,7 +204,7 @@ async function boot(): Promise<void> {
   let suppressSave = false;
   let saveQueue = Promise.resolve();
   const saveState = (snapshot: State): Promise<void> => {
-    if (suppressSave) return Promise.resolve();
+    if (suppressSave || qaBlocked || qaActivePack !== null) return Promise.resolve();
     const serialized = serializeSave(snapshot);
     const hash = stableHash(snapshot);
     saveQueue = saveQueue.then(async () => {
@@ -236,6 +217,25 @@ async function boot(): Promise<void> {
     return saveQueue;
   };
   const save = (): Promise<void> => saveState(state);
+  const pickQa = (item: PackState): void => {
+    const loaded = parseSave(item.save, fresh);
+    if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
+    state = loaded; qaActivePack = item; qaMenuOpen = false; titleMode = null; paused = true;
+    qaJustPicked = true;
+    swallowed.add("confirm");
+  };
+  const openQa = (): void => {
+    if (qaTools === null || qaBlocked || qaPacks.length === 0 || titleMode === null) return;
+    qaReturnMode = titleMode; qaMenuOpen = true;
+  };
+  title.onQa(openQa);
+  if (qaEnabled) window.addEventListener("keydown", (event) => {
+    if (event.code === "KeyQ") { event.preventDefault(); openQa(); }
+  });
+  qaMenu?.onChoose(pickQa);
+  qaMenu?.onCancel(() => {
+    qaMenuOpen = false; qaActivePack = null; titleMode = qaReturnMode;
+  });
   await view.ready;
   // Each land's centre on the painted map (the journal's MAP page).
   const mapFile = "assets/ui/map/world-map.json";
@@ -704,6 +704,7 @@ async function boot(): Promise<void> {
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
   const tick = (frame: ActionFrame): void => {
+    if (qaJustPicked) { qaJustPicked = false; titlePrevious = frame; return; }
     if (qaMenuOpen) {
       const result = qaFlow(qaPacks.length, qaSelected, {
         up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
@@ -720,13 +721,12 @@ async function boot(): Promise<void> {
       if (result.action !== null) {
         const chosen = qaPacks[result.action];
         if (chosen === undefined) throw new Error("QA selection disappeared");
-        const loaded = parseSave(chosen.save, fresh);
-        if (loaded === null) throw new Error(`QA save ${chosen.pack.id} is invalid`);
-        state = loaded;
-        qaActivePack = chosen;
-        qaMenuOpen = false;
-        paused = false;
+        pickQa(chosen);
       }
+      titlePrevious = frame;
+      return;
+    }
+    if (qaBlocked) {
       titlePrevious = frame;
       return;
     }
@@ -784,14 +784,14 @@ async function boot(): Promise<void> {
     for (const event of stepped.events)
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
-        if (qaActivePack === null) void saveState(event.state);
+        if (qaActivePack === null && !qaBlocked) void saveState(event.state);
       }
     for (const cue of soundCues(previous, state, content.world)) {
       const played = sound.play(cue, state.tick);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
     }
-    if (qaActivePack === null && autosaveNeeded(previous, state)) void save();
+    if (qaActivePack === null && !qaBlocked && autosaveNeeded(previous, state)) void save();
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const log =
         state.battle === null
@@ -916,6 +916,10 @@ async function boot(): Promise<void> {
         suppressSave = false;
         await ensureArea();
         titleMode = null;
+        qaMenuOpen = false;
+        qaActivePack = null;
+        qaJustPicked = false;
+        swallowed.clear();
       },
       renderInfo: () => ({ ...view.renderInfo(state), arcade: arcade.info() }),
       qa: {
@@ -924,13 +928,13 @@ async function boot(): Promise<void> {
       },
       save: {
         clear: async () => {
-          if (qaActivePack !== null) return;
+          if (qaActivePack !== null || qaBlocked) return;
           await saveQueue;
           await Preferences.remove({ key: saveKey });
           saveLast = null;
         },
         last: () => saveLast,
-       loaded: () => qaActivePack === null ? saveLoaded : null,
+        loaded: () => qaActivePack === null && !qaBlocked ? saveLoaded : null,
       },
       sound: {
         log: sound.log,

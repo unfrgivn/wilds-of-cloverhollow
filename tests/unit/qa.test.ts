@@ -4,6 +4,7 @@ import { createState, parseSave, stableHash, step } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 import { qaFlow } from "../../src/shell/qa-flow";
+import { qaPackFromUrl, type PackState } from "../../src/dev/qa";
 
 describe("QA menu flow", () => {
   it("wraps, confirms, and cancels without changing the selected pack", () => {
@@ -13,6 +14,19 @@ describe("QA menu flow", () => {
       .toEqual({ open: true, selected: 0, action: 0 });
     expect(qaFlow(3, 1, { up: false, down: false, confirm: false, cancel: true }))
       .toEqual({ open: false, selected: 1, action: null });
+  });
+
+  it("resolves a known URL pack and rejects unknown IDs", () => {
+    const packs: PackState[] = [{
+      pack: {
+        id: "sample", label: "Sample", note: "Test", fixture: "new-game",
+        run: "new-game/chapter-one.json", tick: 1, interim: false, hash: "hash",
+      },
+      save: "save",
+    }];
+    expect(qaPackFromUrl(packs, "?qa=sample")).toBe(packs[0]);
+    expect(() => qaPackFromUrl(packs, "?qa=missing"))
+      .toThrow("Known saves: sample");
   });
 });
 

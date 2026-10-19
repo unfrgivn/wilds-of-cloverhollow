@@ -1215,8 +1215,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   (section 7.4).
 - In dev and harness builds only, Q on the title opens the QA save library. A
   long press on the logo does the same on touch. `?qa=<id>` boots that named
-  pack directly; unknown ids show an error listing the known ids. The title's
-  production appearance is unchanged. QA mode is left by reload or relaunch.
+  pack directly; unknown ids show an error listing the known ids and freeze
+  without reading the player's save. The title's production appearance is
+  unchanged. The menu can be cancelled back to the prior title mode, and a
+  harness fixture reset clears the active pack and badge. QA mode is also left
+  by reload or relaunch.
 - The Continue detail is the area's `name` (area JSON) and the sticker count
   ("0 stickers", "1 sticker", "2 stickers").
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
@@ -2326,7 +2329,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Boot: a valid save resumes the game; otherwise a new game starts.
 - QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
   packs are separate files in the dev/harness-only save library; movement,
-  doors, and ending events cannot change the player's slot.
+  doors, and ending events cannot change the player's slot. The QA menu can be
+  cancelled back to the prior title mode, and a harness fixture reset clears
+  the active pack and badge.
 
 ## 11. Harness and agent control (locked)
 - The dev hook `window.__cloverhollow` exists in dev builds and in harness

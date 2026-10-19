@@ -5,5 +5,6 @@
 .qa-list { display: grid; gap: 10px; }
 .qa-option { display: grid; gap: 3px; padding: 12px 16px; color: #5d3e30; text-align: left; border: 3px solid #d4a36d; border-radius: 18px; background: #fffdf1; font: inherit; cursor: pointer; }
 .qa-option[aria-selected="true"] { border-color: #7eaa70; background: #e6f0cc; box-shadow: 0 3px 0 #7eaa70; }
+.qa-back { margin: 16px auto 0; display: block; padding: 8px 16px; border: 2px solid #6b4937; border-radius: 14px; background: #fffdf1; color: #5d3e30; font: inherit; }
 .qa-option-note { color: #806554; }
 .qa-badge { position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 6px 14px; border: 2px solid #6b4937; border-radius: 999px; background: #fff6db; color: #5d3e30; font-weight: 700; pointer-events: none; }

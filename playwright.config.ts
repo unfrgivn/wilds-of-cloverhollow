@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 const webkitSpecs = [
   "title", "title-gallery", "ui-gallery", "journal-save", "dialogue",
-  "battle-scene", "sound", "harness", "gamepad",
+  "battle-scene", "sound", "harness", "gamepad", "qa",
 ];
 export default defineConfig({
   testDir: "tests/e2e",

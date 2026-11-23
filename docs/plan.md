@@ -3962,7 +3962,11 @@ more bad guys, and the blacklight lantern, made and built while away.
     fade, pause in the same task) so the prefetch fires and its mid-fade
     assertions stay deterministic; six repeats pass unchanged. The game's
     real door crossings are untouched, and the residency the door commit
-    added is the swap machinery's, which no step bypasses.
+    added is the swap machinery's, which no step bypasses. CI's rerun on the
+    fix is green (run 45232245264): the kid's webkit shard dropped from
+    8.4 minutes with the timeout to 2.2, and the shard record is refreshed
+    from that run (`just timings`, one report; the older green runs predate
+    the e2e-report artifacts).
   - The kid's identity is kept for the very end (owner, 2026-10-07); the
     owner chose Milo for the finale (2026-10-17, Milestones 53 to 56).
 

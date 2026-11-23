@@ -8,16 +8,16 @@ describe("art teacher replay", () => {
   it("finds Ms. Rowan, opens the art room, and reads its four look points", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const field = parseScript(JSON.parse(readFileSync(
-      "tests/sim/scripts/pass-party/field.json", "utf8")), "field.json");
+      "tests/sim/scripts/new-game/golden-field.json", "utf8")), "field.json");
     const fieldEnd = field.reduce((sum, segment) => sum + segment.ticks, 0);
     const areas: string[] = [];
     const knots: string[] = [];
     const battles: string[] = [];
-    const path = "tests/sim/scripts/pass-party/art.json";
+    const path = "tests/sim/scripts/new-game/golden-art.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;
@@ -36,7 +36,7 @@ describe("art teacher replay", () => {
     expect({ stash: story("stash_found"), out: story("art_teacher_out"), open: story("art_open") })
       .toEqual({ stash: true, out: true, open: true });
     expect(state.stickers).toContain("art-teacher");
-    expect(state.coins).toBe(90);
+    expect(state.coins).toBe(146);
     expect({ area: state.area, dialogue: state.dialogue, battle: state.battle })
       .toEqual({ area: "art-room", dialogue: null, battle: null });
   }, 30_000);

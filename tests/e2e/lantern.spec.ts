@@ -7,12 +7,12 @@ import {
 test.describe.configure({ timeout: longFlowTimeout });
 
 test("real keys switch on the blacklight and reveal the pass trail", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/lantern.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-lantern.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
-  const jordanPath = "tests/sim/scripts/pass-party/jordan.json";
+  await resetPaused(page, "new-game");
+  const jordanPath = "tests/sim/scripts/new-game/golden-jordan.json";
   const jordan = recording(jordanPath);
   await queueScript(page, jordan);
   await step(page, jordan.reduce((sum, segment) => sum + segment.ticks, 0));
@@ -64,8 +64,8 @@ test("touch lantern button toggles at the phone layout", { tag: "@smoke" }, asyn
   await page.setViewportSize({ width: 874, height: 402 });
   await page.goto("./?touch=1");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
-  await resetPaused(page, "pass-party");
-  const jordan = recording("tests/sim/scripts/pass-party/jordan.json");
+  await resetPaused(page, "new-game");
+  const jordan = recording("tests/sim/scripts/new-game/golden-jordan.json");
   await queueScript(page, jordan);
   await step(page, jordan.reduce((sum, segment) => sum + segment.ticks, 0));
   const button = page.locator(".touch-lantern");

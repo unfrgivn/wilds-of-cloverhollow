@@ -7,9 +7,9 @@ import { parseScript } from "../../src/content/script";
 describe("lantern replay", () => {
   it("reads the pass secrets and ends with the lantern off", () => {
     const content = loadContent();
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/lantern.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-lantern.json";
     let state = createState(content.world, fixture);
     const knots = new Set<string>();
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))

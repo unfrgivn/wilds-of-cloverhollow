@@ -7,11 +7,11 @@ import {
 test.describe.configure({ timeout: longFlowTimeout });
 
 test("real keys explore the Enchanted Forest", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/forest.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-forest.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
 
   const shot = new Set<string>();
   const take = async (name: string): Promise<void> => {
@@ -24,7 +24,7 @@ test("real keys explore the Enchanted Forest", async ({ page }) => {
   };
   let arrived = false;
   let lore = false;
-  await playAfter(page, "tests/sim/scripts/pass-party/mist.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-mist.json", path, async () => {
     const state = await readState(page);
     const info = await renderInfo(page);
     if (!arrived && state.area === "enchanted" && state.transition === null) {

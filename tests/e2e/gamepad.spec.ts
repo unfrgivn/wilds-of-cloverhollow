@@ -95,8 +95,8 @@ test("A starts the window dialogue and X toggles the lantern", async ({ page }) 
   await pressPad(page, 0);
   await expect(page.locator(".sticker-dialogue")).toBeVisible();
 
-  await resetPaused(page, "pass-party");
-  const jordan = recording("tests/sim/scripts/pass-party/jordan.json");
+  await resetPaused(page, "new-game");
+  const jordan = recording("tests/sim/scripts/new-game/golden-jordan.json");
   await queueScript(page, jordan);
   await step(page, jordan.reduce((ticks, segment) => ticks + segment.ticks, 0));
   const before = await readState(page);

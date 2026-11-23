@@ -173,9 +173,9 @@ describe("battle feelings", () => {
   });
 
   it("peeks the later feeling with the real lantern and never consumes a draw", () => {
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/jordan.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-jordan.json";
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
     let state = createState(content.world, fixture);
     for (const segment of script)

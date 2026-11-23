@@ -12,11 +12,11 @@ describe("lodge replay", () => {
   it("brings the keeper home, calms her, and goes into her lodge", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const jordan = parseScript(JSON.parse(readFileSync(
-      "tests/sim/scripts/pass-party/jordan.json", "utf8")), "jordan.json");
+      "tests/sim/scripts/new-game/golden-jordan.json", "utf8")), "jordan.json");
     const jordanEnd = jordan.reduce((sum, segment) => sum + segment.ticks, 0);
     const areas: string[] = [];
     const knots: string[] = [];
@@ -24,7 +24,7 @@ describe("lodge replay", () => {
     const door: string[] = [];
     const prop = world.areas.pass?.props.find((item) => item.id === "lodge-door");
     if (prop === undefined) throw new Error("no lodge door");
-    const path = "tests/sim/scripts/pass-party/lodge.json";
+    const path = "tests/sim/scripts/new-game/golden-lodge.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;

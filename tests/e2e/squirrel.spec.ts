@@ -26,11 +26,11 @@ async function shoot(page: Page, name: string): Promise<void> {
 test("real keys: a squirrel befriended, called by the flute, and up the big oak", async ({
   page,
 }) => {
-  const path = "tests/sim/scripts/pass-party/squirrel.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-squirrel.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const moments: [string, string][] = [
     ["I'm saving my acorns for winter now.", "squirrel-bond"],
     ["Fae plays a little tune", "squirrel-flute"],
@@ -39,7 +39,7 @@ test("real keys: a squirrel befriended, called by the flute, and up the big oak"
   const shot = new Set<string>();
   // The squirrel's frames while he follows: hop frames, then his sit.
   const hops = new Set<string>();
-  await playAfter(page, "tests/sim/scripts/pass-party/kitchen.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-kitchen.json", path, async () => {
     const state = await readState(page);
     const following = state.party.some((member) => member.id === "acorn-squirrel") &&
       state.dialogue === null && state.transition === null && state.battle === null;

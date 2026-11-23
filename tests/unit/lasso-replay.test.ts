@@ -13,18 +13,18 @@ describe("lasso replay", () => {
   it("brings down the kite, the scarf, and the bottle, and finds the treasure", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const flute = parseScript(JSON.parse(readFileSync(
-      "tests/sim/scripts/pass-party/flute.json", "utf8")), "flute.json");
+      "tests/sim/scripts/new-game/golden-flute.json", "utf8")), "flute.json");
     const fluteEnd = flute.reduce((sum, segment) => sum + segment.ticks, 0);
     const areas: string[] = [];
     const knots: string[] = [];
     const paid: { knot: string | undefined; coins: number; snacks: number }[] = [];
     const shown: Record<string, string[]> = { kite: [], bottle: [], scarf: [] };
     const where: Record<string, string> = { kite: "park", bottle: "bay", scarf: "pass" };
-    const path = "tests/sim/scripts/pass-party/lasso.json";
+    const path = "tests/sim/scripts/new-game/golden-lasso.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;

@@ -26,11 +26,11 @@ async function shoot(page: Page, name: string): Promise<void> {
 test("real keys: Mom's microwave and chest, the nuggets cooked golden, the keepsakes", async ({
   page,
 }) => {
-  const path = "tests/sim/scripts/pass-party/kitchen.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-kitchen.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const moments: [string, string][] = [
     ["Every clubhouse needs a kitchen", "kitchen-mom"],
     ["Mom's microwave is up on top of the fridge", "kitchen-clubhouse"],
@@ -40,7 +40,7 @@ test("real keys: Mom's microwave and chest, the nuggets cooked golden, the keeps
   const shot = new Set<string>();
   // The close-up as drawn while it cooks, near the box's minute.
   let cooking: { display: string; front: string; light: boolean; wisps: number } | null = null;
-  await playAfter(page, "tests/sim/scripts/pass-party/lasso.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-lasso.json", path, async () => {
     const state = await readState(page);
     const open = state.arcade?.game === "cook" ? state.arcade : null;
     if (open !== null && open.phase === "cooking" && open.cooked >= 110 && cooking === null) {

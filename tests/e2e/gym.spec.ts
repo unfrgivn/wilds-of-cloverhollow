@@ -51,16 +51,16 @@ async function shoot(page: Page, name: string): Promise<void> {
 }
 
 test("real keys: PE, Coach Ash's stopwatch and clipboard, and the lasso", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/gym.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-gym.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   let arrived = false;
   let battleShot = false;
   let lassoShot = false;
   const lines: string[] = [];
-  await playAfter(page, "tests/sim/scripts/pass-party/school.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-school.json", path, async () => {
     const state = await probe(page);
     if (!arrived && state.area === "gym" && !state.fading) {
       arrived = true;

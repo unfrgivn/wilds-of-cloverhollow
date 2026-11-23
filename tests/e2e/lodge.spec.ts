@@ -22,11 +22,11 @@ async function shoot(page: Page, name: string): Promise<void> {
 }
 
 test("real keys: the lodge keeper home and fizzy, calmed, and her lodge", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/lodge.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-lodge.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const moments: [string, string][] = [
     ["WHOOSH! A snowball", "lodge-snowball"],
     ["How can Fae calm Mrs. Flurry?", "lodge-battle"],
@@ -34,7 +34,7 @@ test("real keys: the lodge keeper home and fizzy, calmed, and her lodge", async 
     ["The fire crackles", "lodge-inside"],
   ];
   const shot = new Set<string>();
-  await playAfter(page, "tests/sim/scripts/pass-party/jordan.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-jordan.json", path, async () => {
     const state = await readState(page);
     // The battle at its first command menu: its scene has faded in by then.
     const battle = state.battle;

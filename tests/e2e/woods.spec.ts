@@ -23,8 +23,8 @@ test('real keys enter the Whispering Woods and meet its owl', async ({ page }) =
 test('the recorded lantern replay reaches the clubhouse', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, 'pass-party');
-  const script = recording('tests/sim/scripts/pass-party/woods.json');
+  await resetPaused(page, 'new-game');
+  const script = recording('tests/sim/scripts/new-game/golden-woods.json');
   await queueScript(page, script);
   await step(page, script.reduce((total, segment) => total + segment.ticks, 0));
   const state = await page.evaluate(() => window.__cloverhollow?.getState());

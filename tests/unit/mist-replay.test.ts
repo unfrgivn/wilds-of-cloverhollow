@@ -7,10 +7,10 @@ import { parseScript } from "../../src/content/script";
 describe("mist replay", () => {
   it("crosses the band and gully and opens the seal", () => {
     const content = loadContent();
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(content.world, fixture);
-    const path = "tests/sim/scripts/pass-party/mist.json";
+    const path = "tests/sim/scripts/new-game/golden-mist.json";
     const knots: string[] = [];
     const sounds: string[] = [];
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
@@ -22,7 +22,7 @@ describe("mist replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(19066);
+    expect(state.tick).toBe(26480);
     expect(state.area).toBe("mist");
     expect(state.dialogue).toBeNull();
     expect(knots).toEqual(expect.arrayContaining(["mist_flowers", "gully_bridge", "mist_seal"]));

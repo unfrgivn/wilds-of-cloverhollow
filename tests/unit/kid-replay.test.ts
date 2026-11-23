@@ -7,10 +7,10 @@ import { parseScript } from "../../src/content/script";
 describe("hooded kid replay", () => {
   it("traces, talks, reveals Milo, and restores the forest", () => {
     const content = loadContent();
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(content.world, fixture);
-    const path = "tests/sim/scripts/pass-party/kid.json";
+    const path = "tests/sim/scripts/new-game/golden-kid.json";
     const knots: string[] = [];
     const grades: string[] = [];
     const messages = new Set<string>();
@@ -25,7 +25,7 @@ describe("hooded kid replay", () => {
           grades.push(grade);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(19977);
+    expect(state.tick).toBe(27383);
     expect(state.area).toBe("enchanted");
     expect(state.dialogue).toBeNull();
     expect(state.battle).toBeNull();
@@ -38,7 +38,7 @@ describe("hooded kid replay", () => {
     expect(messages.has("Talk")).toBe(false);
     expect(state.critters["hooded-kid"]).toBe("calm");
     expect(state.stickers).toContain("hooded-kid");
-    expect(state.coins).toBe(159);
+    expect(state.coins).toBe(215);
     expect(story("forest_fizzy")).toBe(false);
     expect(state.player).toEqual({ x: 1125.3605536091736, y: 775.5211655955634 });
     const area = content.world.areas.enchanted;

@@ -50,16 +50,16 @@ async function shoot(page: Page, name: string): Promise<void> {
 test("real keys: story time, the classroom, and a glimpse of the purple hood", async ({
   page,
 }) => {
-  const path = "tests/sim/scripts/pass-party/school.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-school.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   let inClassroom = false;
   let hoodShot = false;
   let glimpseShot = false;
   const lines: string[] = [];
-  await playAfter(page, "tests/sim/scripts/pass-party/arcade.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-arcade.json", path, async () => {
     const state = await probe(page);
     if (!inClassroom && state.area === "classroom" && !state.fading) {
       inClassroom = true;

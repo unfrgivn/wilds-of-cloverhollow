@@ -12,18 +12,18 @@ describe("kitchen replay", () => {
   it("gets the microwave and the chest, cooks the nuggets golden, and opens the chest", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const lasso = parseScript(JSON.parse(readFileSync(
-      "tests/sim/scripts/pass-party/lasso.json", "utf8")), "lasso.json");
+      "tests/sim/scripts/new-game/golden-lasso.json", "utf8")), "lasso.json");
     const lassoEnd = lasso.reduce((sum, segment) => sum + segment.ticks, 0);
     const areas: string[] = [];
     const knots: string[] = [];
     const microwave: string[] = [];
     const paid: { phase: string | null; snacks: number }[] = [];
     let chest: string[] = [];
-    const path = "tests/sim/scripts/pass-party/kitchen.json";
+    const path = "tests/sim/scripts/new-game/golden-kitchen.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;

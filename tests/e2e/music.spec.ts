@@ -20,16 +20,16 @@ async function shoot(page: Page, name: string): Promise<void> {
 }
 
 test("real keys: Ms. Willow, the music bird, the song, and the flute", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/music.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-music.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   let hallShot = false;
   let musicShot = false;
   let xylophoneShot = false;
   let fluteShot = false;
-  await playAfter(page, "tests/sim/scripts/pass-party/gym.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-gym.json", path, async () => {
     const state = await readState(page);
     if (!hallShot && state.area === "east-hall" && state.transition === null) {
       hallShot = true;

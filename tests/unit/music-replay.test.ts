@@ -8,9 +8,9 @@ describe("music replay", () => {
   it("replays the east hall, bird, song, and flute run", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/music.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-music.json";
     let state: State = createState(world, fixture);
     const areas: string[] = [];
     const knots: string[] = [];
@@ -39,6 +39,6 @@ describe("music replay", () => {
     expect(journalNotes(world, state)).toContain(
       "Ms. Willow gave me her very first flute! When I play it, animal friends come running.",
     );
-  // A long replay of the pass-party chain: room for a busy machine.
+  // A long replay of the golden chain: room for a busy machine.
   }, 20_000);
 });

@@ -29,18 +29,18 @@ async function shoot(page: Page, name: string): Promise<void> {
 test("real keys: a pat and a snack, the flute, a friend along, and the pond", async ({
   page,
 }) => {
-  const path = "tests/sim/scripts/pass-party/flute.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-flute.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   let bondShot = false;
   let joined: number | null = null;
   let followShot = false;
   let battleShot = false;
   let pondShot = false;
   const parties: string[] = [];
-  await playAfter(page, "tests/sim/scripts/pass-party/field.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-field.json", path, async () => {
     const state = await readState(page);
     const party = state.party.map((member) => member.id).join(",");
     if (parties.at(-1) !== party) parties.push(party);
@@ -91,8 +91,8 @@ test("the touch flute button plays the flute, and steps aside while she talks", 
   await page.setViewportSize({ width: 874, height: 402 });
   await page.goto("./?touch=1");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
-  await resetPaused(page, "pass-party");
-  const field = recording("tests/sim/scripts/pass-party/field.json");
+  await resetPaused(page, "new-game");
+  const field = recording("tests/sim/scripts/new-game/golden-field.json");
   await queueScript(page, field);
   await step(page, field.reduce((sum, segment) => sum + segment.ticks, 0));
   const flute = page.locator(".touch-flute");

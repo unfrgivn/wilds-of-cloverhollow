@@ -7,11 +7,11 @@ import {
 test.describe.configure({ timeout: longFlowTimeout });
 
 test("real keys cross the Misty Path and open the seal", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/mist.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-mist.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
 
   const shot = new Set<string>();
   const take = async (name: string): Promise<void> => {
@@ -36,7 +36,7 @@ test("real keys cross the Misty Path and open the seal", async ({ page }) => {
   let bridge = false;
   let notes = false;
   let opened = false;
-  await playAfter(page, "tests/sim/scripts/pass-party/lasso.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-lasso.json", path, async () => {
     const state = await readState(page);
     const info = await renderInfo(page);
     if (!arrived && state.area === "mist" && state.transition === null) {

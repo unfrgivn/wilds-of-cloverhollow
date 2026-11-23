@@ -5,21 +5,21 @@ import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 
 // Replay the careful-player routes used by the story, then compare the Fae
-// level with the local encounter. The independent pass-party fixture is useful
-// here: it makes each checkpoint deterministic and exposes the XP earned by
-// that chapter without relying on a save or a browser.
+// level with the local encounter. The golden-path runs (Milestone 68) make
+// each checkpoint the honest playthrough's own state, from a new game to the
+// kid, exposing the XP that chapter really earns.
 const content = loadContent();
 const routes = [
   ["new-game", "new-game/chapter-one.json", "fountain-frog"],
   ["new-game", "new-game/east-road.json", "frog"],
   ["bay", "bay/lifeguard.json", "lifeguard"],
-  ["pass-party", "pass-party/jordan.json", "raccoon"],
-  ["pass-party", "pass-party/arcade.json", "arcade-keeper"],
-  ["pass-party", "pass-party/music.json", "music-bird"],
-  ["pass-party", "pass-party/field.json", "oak-squirrel"],
-  ["pass-party", "pass-party/art.json", "art-teacher"],
-  ["pass-party", "pass-party/forest.json", "owl"],
-  ["pass-party", "pass-party/kid.json", "hooded-kid"],
+  ["new-game", "new-game/golden-jordan.json", "raccoon"],
+  ["new-game", "new-game/golden-arcade.json", "arcade-keeper"],
+  ["new-game", "new-game/golden-music.json", "music-bird"],
+  ["new-game", "new-game/golden-field.json", "oak-squirrel"],
+  ["new-game", "new-game/golden-art.json", "art-teacher"],
+  ["new-game", "new-game/golden-forest.json", "owl"],
+  ["new-game", "new-game/golden-kid.json", "hooded-kid"],
 ] as const;
 
 for (const [fixtureName, path, critterId] of routes) {

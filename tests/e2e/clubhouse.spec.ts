@@ -24,18 +24,18 @@ async function shoot(page: Page, name: string): Promise<void> {
 }
 
 test("real keys: the fridge, the garden, the calms, and the snacks", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/clubhouse.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-clubhouse.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const states: string[] = [];
   let arrived = false;
   let fixedShot = false;
   let growingShot = false;
   let ripeShot = false;
   let snacksShot = false;
-  await playAfter(page, "tests/sim/scripts/pass-party/woods.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-woods.json", path, async () => {
     const state = await readState(page);
     if (state.area !== "clubhouse" || state.transition !== null) return;
     const props = (await renderInfo(page)).props;

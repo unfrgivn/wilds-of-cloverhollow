@@ -13,10 +13,10 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 test("real keys: paint under the door, Trace, and the open art room", { tag: "@smoke" },
   async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/art.json";
+  const path = "tests/sim/scripts/new-game/golden-art.json";
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const moments: [string, string][] = [
     ["Purple paint seeps under the door.", "art-paint"],
     ["How can Fae calm", "art-battle"],
@@ -26,7 +26,7 @@ test("real keys: paint under the door, Trace, and the open art room", { tag: "@s
   let roomShot = false;
   let markerRead = false;
   let tableShot = false;
-  await playAfter(page, "tests/sim/scripts/pass-party/field.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-field.json", path, async () => {
     const state = await readState(page);
     const dialogue = state.dialogue;
     if (dialogue?.knot === "art_markers") markerRead = true;
@@ -62,5 +62,5 @@ test("real keys: paint under the door, Trace, and the open art room", { tag: "@s
   expect(tableShot).toBe(true);
   const end = await readState(page);
   expect(end.area).toBe("art-room");
-  expect(await readHash(page)).toBe(await bunHash(path, "pass-party"));
+  expect(await readHash(page)).toBe(await bunHash(path, "new-game"));
 });

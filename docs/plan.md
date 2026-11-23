@@ -3151,7 +3151,7 @@ the old trail, the owl, and the clubhouse claim.
   checks, and the full `just e2e` passed 930 with 2 skipped in 4.5 minutes
   on Chromium and WebKit.
 
-## Milestone 68: The golden path **Status:** 📋 Planned
+## Milestone 68: The golden path **Status:** ✅ Completed (2026-11-23)
 - One recorded run from a new game to the credits, the recorders chained in
   story order (chapter one, the bay and Sue, the bus and Jordan, the
   lantern, the woods, the school chapter, and on to the kid and the ending),
@@ -3163,6 +3163,61 @@ the old trail, the owl, and the clubhouse claim.
   skipped chapter one (the fountain frog still in chaos at the credits, the
   bay road shut) and breakfast. The credits' screenshots change: Sue joins
   them.
+- The chain (tools/sim/record-golden-*.ts, scripts in
+  tests/sim/scripts/new-game/): 21 links rooted at the new-game fixture, each
+  replaying its predecessor's script and playing its own beats: bay 7,325
+  ticks (Sue joins for real), jordan 9,402 (the bus up; the only new travel
+  authoring), lantern 9,736, woods 10,108, lodge 10,926, arcade 11,456,
+  clubhouse 12,583, school 13,140, gym 15,444, music 17,054, field 18,836,
+  flute 20,899, art 20,726, lasso 24,490, kitchen 26,526, mist 26,480,
+  squirrel 28,787, forest 26,878, kid 27,383, ending 27,650 (the credits).
+  Every golden link ends exactly where its pass-party counterpart ended, so
+  each successor's beats transferred unmodified; the chain keeps the runs'
+  tree shape (lantern, woods, and lodge branch from Jordan's link, and the
+  ending's branch runs through the mist rather than the kitchen), with
+  every root-to-leaf path one continuous new-game story.
+- Verified at the credits: Sue is among the friends (Maddie, Sue, Jordan,
+  Pond Pup; the ending e2e asserted her absence before), the fountain frog
+  is calm, breakfast was eaten, and the hall pass was earned in chapter one.
+- Found and fixed: the golden chain already earned the hall pass in chapter
+  one, so the flute link cannot re-ask Nurse Holly (her knot offers no
+  choices the second time; the recorder failed loudly on it). Fae leaves
+  school by the front doors the pass opens, and the flute replay's knots
+  lost "nurse".
+- The QA library: 23 packs. The 17 interim shortcut packs are gone (with
+  their "Starts from the pass-party shortcut" notes and the shortcut sorting
+  machinery in tools/qa/build-saves.ts), replaced by golden story packs cut
+  at each beat in story order, plus a new "Sue joins at the bay" pack for
+  the golden head. Pack ids changed (shortcut-jordan became jordan), so the
+  QA URL is ?qa=jordan.
+- The tests: 17 replay tests re-pointed at the golden scripts (tick pins
+  moved with the longer chain: kid 19,977 to 27,383, mist 19,066 to 26,480,
+  forest 19,464 to 26,878, ending 20,244 to 27,650; coin pins: kid 159 to
+  215, art 90 to 146; the flute knots lost the nurse). The e2e flows'
+  playAfter, bunHash, and recording references moved to golden scripts;
+  harness's cross-engine replays list the golden runs. jordan.spec keeps
+  the pass-party fixture deliberately, as a mechanics state like the battle
+  unit tests that boot it (the pass-party fixture itself stays, for
+  party-chain and battle setups). The feelings spec's owl-menu tick moved
+  (1,118 to 9,699, found with the spec's own trace recipe).
+- Baselines: 178 changed. About 130 differ only in the harness readout's
+  tick and small scene shifts (roaming critters, party spacing), checked
+  pixel for pixel outside the readout. The credits, title, and kid shots
+  carry the intended content: Sue joins the credits' friends, the title's
+  Continue reads "The Enchanted Forest · 10 stickers", the kid's level plate
+  reads his golden level. About 21 wholesale-changed scene shots (a different
+  camera or Fae position from re-rolled critters; the lantern dusk's mean
+  colour unchanged to 2 in 765) are old-vs-new composites in
+  art/review/m68-baselines/ for the owner's eyeball: the image-analysis
+  provider was down all day (HTTP 403 on every call), so no agent has viewed
+  them, and Milestone 67's three console baselines await the same viewing.
+- The balance sim replays the golden checkpoints: Fae is within a level or
+  two at every step (level 3 and 90 XP after chapter one, level 7 and 1,100
+  XP at the kid; gaps -1 to +2, the kid one under).
+- Gates: `just check` passed (typecheck, 122 unit files / 1021 tests, every
+  sim, `qa:check` 23 packs, purity, lint), `just build` passed, and the full
+  `just e2e` passed 929 with 2 skipped in 3.9 minutes on Chromium and WebKit
+  (the same 931-test list as main before it, checked by stashing the tree).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

@@ -13,13 +13,13 @@ describe("clubhouse replay", () => {
   it("fixes the fridge, grows the garden by calming critters, and packs the snacks", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const areas: string[] = [];
     const knots: string[] = [];
     const calmsAfterBattles: unknown[] = [];
-    const path = "tests/sim/scripts/pass-party/clubhouse.json";
+    const path = "tests/sim/scripts/new-game/golden-clubhouse.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;

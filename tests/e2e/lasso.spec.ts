@@ -27,11 +27,11 @@ async function shoot(page: Page, name: string): Promise<void> {
 test("real keys: the kite, the scarf, the bottle and the treasure, and Rosie", async ({
   page,
 }) => {
-  const path = "tests/sim/scripts/pass-party/lasso.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-lasso.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const moments: [string, string][] = [
     ["A kite is caught", "lasso-kite"],
     ["A long red scarf is caught", "lasso-scarf"],
@@ -52,7 +52,7 @@ test("real keys: the kite, the scarf, the bottle and the treasure, and Rosie", a
       : `${prop.state}${prop.hidden ? " (hidden)" : ""}`);
   };
   let open: string | null = null;
-  await playAfter(page, "tests/sim/scripts/pass-party/flute.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-flute.json", path, async () => {
     const state = await readState(page);
     const knot = state.dialogue?.knot ?? null;
     const closed = open === null ? undefined : errands[open];

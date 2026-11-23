@@ -9,8 +9,8 @@ import {
 // credits, the title, and Continue back into the dream, all with real keys.
 test.describe.configure({ timeout: longFlowTimeout });
 
-const kid = "tests/sim/scripts/pass-party/kid.json";
-const path = "tests/sim/scripts/pass-party/ending.json";
+const kid = "tests/sim/scripts/new-game/golden-kid.json";
+const path = "tests/sim/scripts/new-game/golden-ending.json";
 
 type SaveMark = { tick: number; hash: string } | null;
 const lastSave = async (page: Page): Promise<SaveMark> =>
@@ -27,11 +27,11 @@ async function screenshots(page: Page, name: string): Promise<void> {
 
 test("real keys wake Fae from the dream, and Continue returns to it",
   { tag: "@smoke" }, async ({ page }) => {
-    const expectedHash = bunHash(path, "pass-party");
+    const expectedHash = bunHash(path, "new-game");
     await page.setViewportSize({ width: 1280, height: 720 });
     await openHarness(page);
     await page.evaluate(() => window.__cloverhollow?.save.clear());
-    await resetPaused(page, "pass-party");
+    await resetPaused(page, "new-game");
     const shots = new Set<string>();
     const take = async (name: string): Promise<void> => {
       if (shots.has(name)) return;
@@ -74,15 +74,14 @@ test("real keys wake Fae from the dream, and Continue returns to it",
     expect(await readHash(page)).toBe(await expectedHash);
     expect(shots).toEqual(new Set(["milo-choice", "morning", "kitchen"]));
 
-    // The credits: the dream's friends and everyone Fae met, as stickers.
-    // (This chain's fixture puts Sue in the party without her joining, so
-    // she isn't one of its friends.)
+    // The credits: the dream's friends and everyone Fae met, as stickers. The
+    // golden path joined Sue through the story, so she's one of its friends.
     expect(await readState(page)).toMatchObject({
       area: "kitchen", finale: "credits", dialogue: null,
     });
     const credits = (await renderInfo(page)).credits;
     expect(credits?.entries.filter((entry) => entry.section === "friends")
-      .map((entry) => entry.name)).toEqual(["Maddie", "Jordan", "Pond Pup"]);
+      .map((entry) => entry.name)).toEqual(["Maddie", "Sue", "Jordan", "Pond Pup"]);
     expect(credits?.entries.map((entry) => entry.name)).toContain("Milo");
     await expect(page.locator(".credits-screen")).toBeVisible();
     // The stickers show once their atlases are decoded.
@@ -106,7 +105,7 @@ test("real keys wake Fae from the dream, and Continue returns to it",
     await expect(page.locator(".credits-screen")).toBeHidden();
     await expect(page.locator(".title-option-label")).toHaveText(["Continue", "New game"]);
     await expect(page.locator(".title-option-detail"))
-      .toHaveText("The Enchanted Forest · 8 stickers");
+      .toHaveText("The Enchanted Forest · 10 stickers");
     await take("title");
 
     // Continue: the title closes without a core tick, on exactly the dream.

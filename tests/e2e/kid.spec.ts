@@ -6,8 +6,8 @@ import {
 
 test.describe.configure({ timeout: longFlowTimeout });
 
-const forest = "tests/sim/scripts/pass-party/forest.json";
-const path = "tests/sim/scripts/pass-party/kid.json";
+const forest = "tests/sim/scripts/new-game/golden-forest.json";
+const path = "tests/sim/scripts/new-game/golden-kid.json";
 
 async function screenshots(page: Page, name: string): Promise<void> {
   await expect(page).toHaveScreenshot(`${name}-1280.png`);
@@ -41,14 +41,14 @@ async function phone(page: Page): Promise<void> {
     for (const [side, size] of [["left", 59], ["right", 59], ["bottom", 21]] as const)
       document.documentElement.style.setProperty(`--safe-${side}`, `${size}px`);
   });
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
 }
 
 test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" }, async ({ page }) => {
-  const expectedHash = bunHash(path, "pass-party");
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const shots = new Set<string>();
   const take = async (name: string): Promise<void> => {
     if (shots.has(name)) return;

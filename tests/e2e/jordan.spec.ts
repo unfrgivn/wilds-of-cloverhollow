@@ -14,7 +14,8 @@ import {
 // Milestone 22: at Pinecone Pass, Fae meets Jordan by the snowman. He joins
 // whatever she answers and brings Juggle, so the hamster's battle menu has six
 // commands. Calmed, the hamster gets Jordan to hand Fae his blacklight lantern.
-// Real keys throughout (the recorded run is `pass-party/jordan.json`).
+// Real keys throughout, from the pass-party mechanics state (the golden run
+// is new-game/golden-jordan.json).
 
 test.describe.configure({ timeout: longFlowTimeout });
 

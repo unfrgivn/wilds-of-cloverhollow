@@ -7,10 +7,10 @@ import { parseScript } from "../../src/content/script";
 describe("forest replay", () => {
   it("opens the forest and records its story beats", () => {
     const content = loadContent();
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(content.world, fixture);
-    const path = "tests/sim/scripts/pass-party/forest.json";
+    const path = "tests/sim/scripts/new-game/golden-forest.json";
     const knots: string[] = [];
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
@@ -19,7 +19,7 @@ describe("forest replay", () => {
         if (knot !== undefined && knots.at(-1) !== knot) knots.push(knot);
       }
     const story = (name: string): unknown => content.world.storyVariable(state.ink, name);
-    expect(state.tick).toBe(19464);
+    expect(state.tick).toBe(26878);
     expect(state.area).toBe("enchanted");
     expect(state.dialogue).toBeNull();
     expect(knots).toEqual(expect.arrayContaining([

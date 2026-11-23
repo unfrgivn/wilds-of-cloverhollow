@@ -33,10 +33,10 @@ function lines(knot: string, ink = createInkState(world.story, 1)): string[] {
   throw new Error(`${knot} didn't end`);
 }
 function openedMist(): State {
-  const fixture = content.fixtures["pass-party"];
-  if (fixture === undefined) throw new Error("pass-party fixture missing");
+  const fixture = content.fixtures["new-game"];
+  if (fixture === undefined) throw new Error("new-game fixture missing");
   let state = createState(world, fixture);
-  const path = "tests/sim/scripts/pass-party/mist.json";
+  const path = "tests/sim/scripts/new-game/golden-mist.json";
   for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
     for (let tick = 0; tick < segment.ticks; tick += 1)
       state = step(world, state, segment.frame).state;

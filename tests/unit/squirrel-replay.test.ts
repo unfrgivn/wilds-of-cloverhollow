@@ -12,18 +12,18 @@ describe("squirrel replay", () => {
   it("befriends a trail squirrel, calls him, and finds the golden acorn", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const kitchen = parseScript(JSON.parse(readFileSync(
-      "tests/sim/scripts/pass-party/kitchen.json", "utf8")), "kitchen.json");
+      "tests/sim/scripts/new-game/golden-kitchen.json", "utf8")), "kitchen.json");
     const kitchenEnd = kitchen.reduce((sum, segment) => sum + segment.ticks, 0);
     const areas: string[] = [];
     const knots: string[] = [];
     const battles: string[] = [];
     const joined: string[] = [];
     const paid: { knot: string | undefined; snacks: number }[] = [];
-    const path = "tests/sim/scripts/pass-party/squirrel.json";
+    const path = "tests/sim/scripts/new-game/golden-squirrel.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;

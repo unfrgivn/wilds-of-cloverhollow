@@ -4,7 +4,7 @@ import { createState, journalNotes, step, type State } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 
-// The recorded school run (tools/sim/record-school.ts): from the arcade's
+// The recorded school run (tools/sim/record-golden-school.ts): from the arcade's
 // ending, back to school for story time, the classroom, a glimpse of the kid
 // in the purple hood running off toward the gym, and the gym doors, locked
 // during story time.
@@ -12,9 +12,9 @@ describe("school replay", () => {
   it("goes from the arcade to story time and a glimpse of the purple hood", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/school.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-school.json";
     let state: State = createState(world, fixture);
     const areas: string[] = [];
     const knots: string[] = [];

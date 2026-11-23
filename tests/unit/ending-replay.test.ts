@@ -14,9 +14,9 @@ describe("the ending's recording", () => {
   it("saves the dream once, wakes Fae, and closes on the credits", () => {
     const content = loadContent();
     const { world } = content;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/ending.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-ending.json";
     let state: State = createState(world, fixture);
     const snapshots: State[] = [];
     let wake: State | null = null;
@@ -38,7 +38,7 @@ describe("the ending's recording", () => {
         if (kitchen === null && state.finale === "morning" && state.area === "kitchen" &&
           state.transition === null) kitchen = state;
       }
-    expect(state.tick).toBe(20244);
+    expect(state.tick).toBe(27650);
 
     // One save at the dream's end: the forest as it is, Milo calm, no fizz.
     expect(snapshots).toHaveLength(1);

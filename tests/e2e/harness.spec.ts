@@ -103,12 +103,12 @@ test.describe("deterministic replays", () => {
   { name: "bus", fixture: "bay" },
   { name: "trail", fixture: "pass" },
   { name: "lookout", fixture: "trail" },
-  { name: "jordan", fixture: "pass-party" },
-  { name: "lantern", fixture: "pass-party" },
-  { name: "woods", fixture: "pass-party" },
-  { name: "arcade", fixture: "pass-party" },
-  { name: "school", fixture: "pass-party" },
-  { name: "gym", fixture: "pass-party" },
+  { name: "golden-jordan", fixture: "new-game" },
+  { name: "golden-lantern", fixture: "new-game" },
+  { name: "golden-woods", fixture: "new-game" },
+  { name: "golden-arcade", fixture: "new-game" },
+  { name: "golden-school", fixture: "new-game" },
+  { name: "golden-gym", fixture: "new-game" },
   ]) {
     const { name, fixture } = item;
     test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async () => {

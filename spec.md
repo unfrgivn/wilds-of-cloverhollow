@@ -2441,7 +2441,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   slots under `cloverhollow-qa-save:<name>`, indexed by
   `cloverhollow-qa-slots`, never inside the player's key.
 - `tools/qa/build-saves.ts` is the only writer of the save library: it cuts
-  story and shortcut packs from recorded runs and setup packs from a QA
+  story packs from the golden path's recorded runs (Milestone 68, one
+  continuous story from a new game to the credits) and setup packs from a QA
   fixture's first tick. `just check` fails when a pack or
   `content/qa/saves.json` differs from what it writes, or when a pack file has
   no spec there.

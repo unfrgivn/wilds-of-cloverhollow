@@ -4,7 +4,7 @@ import { createState, journalNotes, step, type State } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 
-// The recorded gym run (tools/sim/record-gym.ts): from the school run's end
+// The recorded gym run (tools/sim/record-golden-gym.ts): from the school run's end
 // at the locked gym doors, back to Ms. Maple (time for PE), through the gym
 // doors to Coach Ash, the fizzy pup with his stopwatch, the clipboard on the
 // hoop, his lasso, and the back door the kid in the purple hood ran out of.
@@ -12,9 +12,9 @@ describe("gym replay", () => {
   it("goes from story time to PE, Coach Ash's hunt, and the lasso", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/gym.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-gym.json";
     let state: State = createState(world, fixture);
     const areas: string[] = [];
     const knots: string[] = [];
@@ -42,6 +42,6 @@ describe("gym replay", () => {
     const notes = journalNotes(world, state);
     expect(notes[0]).toMatch(/^Music class is next!/);
     expect(notes[1]).toMatch(/^Coach Ash gave me his lasso!/);
-  // A long replay of the pass-party chain: room for a busy machine.
+  // A long replay of the golden chain: room for a busy machine.
   }, 20_000);
 });

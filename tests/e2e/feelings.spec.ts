@@ -159,14 +159,14 @@ test("Maddie alone: no feelings, no badges", async ({ page }) => {
 // The woods run (tools/sim/record-woods.ts) meets the owl with Jordan's
 // lantern in Fae's backpack. `menu` is the tick the owl's command line has
 // typed out (re-recording moves it: find it with `bun tools/sim/run.ts
-// tests/sim/scripts/pass-party/woods.json --fixture pass-party --trace`).
-const woods = "tests/sim/scripts/pass-party/woods.json";
-const menu = 1118;
+// tests/sim/scripts/new-game/golden-woods.json --fixture new-game --trace`).
+const woods = "tests/sim/scripts/new-game/golden-woods.json";
+const menu = 9699;
 
 test("real keys: L peeks at the owl's turn-after feeling", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   const upTo: ReturnType<typeof recording> = [];
   let ticks = 0;
   for (const segment of recording(woods)) {

@@ -21,11 +21,11 @@ describe("flute friends replay", () => {
   it("befriends the Pond Pup, calls him, fetches the tin, and sends him home", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const field = parseScript(JSON.parse(readFileSync(
-      "tests/sim/scripts/pass-party/field.json", "utf8")), "field.json");
+      "tests/sim/scripts/new-game/golden-field.json", "utf8")), "field.json");
     const fieldEnd = field.reduce((sum, segment) => sum + segment.ticks, 0);
     const areas: string[] = [];
     const knots: string[] = [];
@@ -38,7 +38,7 @@ describe("flute friends replay", () => {
     let calmPups: { before: number; after: number } | null = null;
     const calm = (at: State): number => presentCritters(world, at)
       .filter((critter) => critter.kind.id === "pup" && critter.mood === "calm").length;
-    const path = "tests/sim/scripts/pass-party/flute.json";
+    const path = "tests/sim/scripts/new-game/golden-flute.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;
@@ -66,7 +66,7 @@ describe("flute friends replay", () => {
     const story = (name: string): unknown => world.storyVariable(state.ink, name);
     expect(areas.slice(0, 6)).toEqual(["field", "gym", "east-hall", "school", "plaza", "park"]);
     expect(areas.at(-1)).toBe("park");
-    expect(knots).toEqual(["nurse", "pup_calm", "pup_calm", "flute", "pond", "flute"]);
+    expect(knots).toEqual(["pup_calm", "pup_calm", "flute", "pond", "flute"]);
     expect(parties).toEqual(["maddie,sue,jordan", "maddie,sue,jordan,pond-pup",
       "maddie,sue,jordan"]);
     // The calm pup Fae befriended is the one who came: he stepped out of the park.

@@ -71,16 +71,16 @@ test("the arcade's door is locked until the clubhouse is claimed", async ({ page
 });
 
 test("real keys: home from the woods, into the arcade, and Mr. Pip calmed", async ({ page }) => {
-  const path = "tests/sim/scripts/pass-party/arcade.json";
-  const expectedHash = bunHash(path, "pass-party");
+  const path = "tests/sim/scripts/new-game/golden-arcade.json";
+  const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
-  await resetPaused(page, "pass-party");
+  await resetPaused(page, "new-game");
   let arrived = false;
   let battleShot = false;
   let rewardShot = false;
   const talk: string[] = [];
-  await playAfter(page, "tests/sim/scripts/pass-party/woods.json", path, async () => {
+  await playAfter(page, "tests/sim/scripts/new-game/golden-woods.json", path, async () => {
     const state = await probe(page);
     if (!arrived && state.area === "arcade" && !state.fading) {
       arrived = true;

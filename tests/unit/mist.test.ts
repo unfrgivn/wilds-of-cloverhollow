@@ -17,8 +17,8 @@ const facts: InkFacts = {
 const press = (frame: Partial<ActionFrame>): ActionFrame => ({ ...blankInput(), ...frame });
 
 function replay(path: string, until?: string): State {
-  const fixture = content.fixtures["pass-party"];
-  if (fixture === undefined) throw new Error("pass-party fixture missing");
+  const fixture = content.fixtures["new-game"];
+  if (fixture === undefined) throw new Error("new-game fixture missing");
   let state = createState(world, fixture);
   for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path)) {
     for (let tick = 0; tick < segment.ticks; tick += 1) {
@@ -128,8 +128,8 @@ describe("Misty Path content", () => {
 });
 
 describe("Misty Path rules through the core", () => {
-  const fieldRun = "tests/sim/scripts/pass-party/field.json";
-  const lassoRun = "tests/sim/scripts/pass-party/lasso.json";
+  const fieldRun = "tests/sim/scripts/new-game/golden-field.json";
+  const lassoRun = "tests/sim/scripts/new-game/golden-lasso.json";
 
   it("keeps the field door shut until the stash is found, and returns", () => {
     const beforeStash = atPoint(replay(fieldRun, "hood_stash"), { x: 1550, y: 950 }, "right");
@@ -237,8 +237,8 @@ describe("Misty Path rules through the core", () => {
 
   it("adds the Misty Path journal notes newest first as each rule advances", () => {
     const flowers = journalNotes(world,
-      replay("tests/sim/scripts/pass-party/mist.json", "gully_bridge"));
-    const final = journalNotes(world, replay("tests/sim/scripts/pass-party/mist.json"));
+      replay("tests/sim/scripts/new-game/golden-mist.json", "gully_bridge"));
+    const final = journalNotes(world, replay("tests/sim/scripts/new-game/golden-mist.json"));
     expect(flowers[0]).toContain("stepping stones");
     expect(final.slice(0, 3)).toEqual([
       "The bell-flower seal opened, and a warm forest glow shone beyond the stones.",

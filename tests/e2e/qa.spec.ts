@@ -110,9 +110,9 @@ test("the QA menu keeps Back to title visible on a phone viewport", async ({ pag
 });
 
 test("a QA URL boots the named pack and shows its badge", async ({ page }) => {
-  await page.goto("./?qa=shortcut-jordan");
+  await page.goto("./?qa=jordan");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
-  await expect(page.locator(".qa-badge")).toContainText("Jordan shortcut");
+  await expect(page.locator(".qa-badge")).toContainText("Jordan at Pinecone Pass");
   expect(await page.evaluate(() => window.__cloverhollow?.qa.active())).toBe(true);
 });
 
@@ -202,7 +202,7 @@ test(
     await page.addInitScript(() => {
       localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
     });
-    await pickPaused(page, "Jordan shortcut");
+    await pickPaused(page, "Jordan at Pinecone Pass");
     const saveLast = await page.evaluate(() => window.__cloverhollow?.save.last() ?? null);
     await page.keyboard.press("`");
     await expect(page.locator(".qa-console")).toBeVisible();
@@ -263,7 +263,7 @@ test("the console saves QA-only slots the QA menu lists and reloads", async ({ p
   await page.addInitScript(() => {
     localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
   });
-  await page.goto("./?qa=shortcut-jordan");
+  await page.goto("./?qa=jordan");
   await page.waitForFunction(() => Boolean(window.__cloverhollow));
   await page.keyboard.press("`");
   await expect(page.locator(".qa-console")).toBeVisible();
@@ -297,7 +297,7 @@ test("the console saves QA-only slots the QA menu lists and reloads", async ({ p
 
 test("tapping the QA badge opens the console on a phone", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 874, height: 402 });
-  await pickPaused(page, "Jordan shortcut");
+  await pickPaused(page, "Jordan at Pinecone Pass");
   await expect(page.locator(".qa-badge")).toBeVisible();
   await page.evaluate(() => {
     const badge = document.querySelector(".qa-badge");
@@ -315,7 +315,7 @@ test("tapping the QA badge opens the console on a phone", async ({ page }, testI
 });
 
 test("export shows the save file in the console", async ({ page }, testInfo) => {
-  await pickPaused(page, "Jordan shortcut");
+  await pickPaused(page, "Jordan at Pinecone Pass");
   await page.keyboard.press("`");
   await expect(page.locator(".qa-console")).toBeVisible();
   await expect(page.locator(".qa-console-input")).toBeFocused();

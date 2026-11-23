@@ -4,16 +4,16 @@ import { createState, journalNotes, step } from "../../src/core";
 import { loadContent } from "../../src/content/load";
 import { parseScript } from "../../src/content/script";
 
-// The recorded meeting with Jordan (`tools/sim/record-jordan.ts`): from the
+// The recorded meeting with Jordan (`tools/sim/record-golden-jordan.ts`): from the
 // pass's bus stop with Maddie and Sue, Jordan joins, Juggle helps calm the
 // hamster, and the calm hamster gets Jordan to hand Fae his lantern.
 describe("Jordan replay", () => {
   it("ends with Jordan in the party, the hamster calm, and the lantern", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
-    const path = "tests/sim/scripts/pass-party/jordan.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-jordan.json";
     const script = parseScript(JSON.parse(readFileSync(path, "utf8")), path);
     let state = createState(world, fixture);
     for (const segment of script)

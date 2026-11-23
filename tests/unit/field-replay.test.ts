@@ -12,8 +12,8 @@ describe("field replay", () => {
   it("swings across the creek, finds the stash, and walks back over the bridge", () => {
     const content = loadContent();
     const world = content.world;
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let state: State = createState(world, fixture);
     const areas: string[] = [];
     const knots: string[] = [];
@@ -21,7 +21,7 @@ describe("field replay", () => {
     let swungFrom: number | undefined;
     let landedAt: number | undefined;
     // The run holds every run chained before it, from the fixture on.
-    const path = "tests/sim/scripts/pass-party/field.json";
+    const path = "tests/sim/scripts/new-game/golden-field.json";
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1) {
         const before = state;
@@ -63,6 +63,6 @@ describe("field replay", () => {
       "I pulled the old footbridge's lever with the lasso, and the bridge swung down " +
       "across the creek!",
     );
-  // A long replay of the pass-party chain: room for a busy machine.
+  // A long replay of the golden chain: room for a busy machine.
   }, 20_000);
 });

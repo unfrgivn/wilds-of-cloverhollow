@@ -411,9 +411,9 @@ describe("a wind-up's end", () => {
 
   it("leaves the lantern dark while a wind-up's bubbles show", () => {
     // Jordan's run ends with the lantern in Fae's backpack.
-    const path = "tests/sim/scripts/pass-party/jordan.json";
-    const fixture = content.fixtures["pass-party"];
-    if (fixture === undefined) throw new Error("pass-party fixture missing");
+    const path = "tests/sim/scripts/new-game/golden-jordan.json";
+    const fixture = content.fixtures["new-game"];
+    if (fixture === undefined) throw new Error("new-game fixture missing");
     let lit = createState(content.world, fixture);
     for (const segment of parseScript(JSON.parse(readFileSync(path, "utf8")), path))
       for (let tick = 0; tick < segment.ticks; tick += 1)

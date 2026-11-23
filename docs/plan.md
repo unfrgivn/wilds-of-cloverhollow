@@ -3219,6 +3219,36 @@ the old trail, the owl, and the clubhouse claim.
   `just e2e` passed 929 with 2 skipped in 3.9 minutes on Chromium and WebKit
   (the same 931-test list as main before it, checked by stashing the tree).
 
+## Milestone 69: More bad guys (in progress)
+- The owner asked for more mini-bosses and casual enemies (2026-11-23;
+  NOTES.md: "Need to add more mini-bosses and casual enemies", mostly people
+  and animals under the chaos spell).
+- Two new casual species where the lands are thinnest: a crab for Bubblegum
+  Bay (the bay rolls only frogs and bluebirds) and a penguin for Pinecone
+  Pass (the pass rolls only hamsters). Each: a full atlas, battle lines for
+  every party command, its own calm knot, its sticker once, 8 coins, and a
+  level near its neighbours'.
+- One new people mini-boss: the school's principal, fizzy from the purple
+  soda, called out by a new hall interactable (a stray megaphone) that no
+  recorded run reads. A set piece like Ms. Rowan and Ms. Coral: Mrs. Flurry's
+  numbers, his own feelings, a wind-up, and bursts of his own. Calmed: 25
+  coins, his sticker, and a journal note. His name is a placeholder until the
+  owner picks one.
+- The golden chain must not move: each new den is appended last in its
+  area's dens (`rollWild` draws two values per den in array order whatever
+  the outcome, so every existing roll is unchanged) and placed where no
+  recorded run walks, with the megaphone and the principal off those paths
+  too. The pinned replay tests are the guard; if any pinned hash shifts,
+  stop and find out why before touching a pin.
+- Evidence: unit tests (the new species' content and the appended dens, the
+  principal's set piece and gating), recorded runs from the golden
+  checkpoints (the crab, the penguin, the principal) with replay tests and
+  matching browser and Bun hashes, real-key e2e at both sizes, and committed
+  review captures.
+- Gates: `just check` (with the QA packs regenerated through
+  `tools/qa/build-saves.ts` after the story grows, never by hand), `just
+  e2e`, `just build`. No iOS changes.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

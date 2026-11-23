@@ -285,10 +285,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
-  excluded), no single texture over 2048x2048, and the previous area unloads on
-  transition. One `AreaView` (`src/render/area-view.ts`) owns an area's sprites
-  and textures; swapping areas destroys them and unloads the textures, and the
-  game neither ticks nor renders until the new area has loaded.
+  excluded) and no single texture over 2048x2048. One `AreaView`
+  (`src/render/area-view.ts`) owns an area's sprites; swapping areas destroys
+  them, and the game neither ticks nor renders until the new area has loaded.
+  The area just left stays resident and the area two crossings back unloads on
+  transition, a bounded current + previous pair, so the way back through a
+  door is a cache hit instead of a reload (owner, 2026-11-23: every door
+  crossing held a paper-white screen for the whole target reload).
 
 ## 5. Characters and animation (locked)
 - Frame-by-frame animation in 4 directions: down, up, left, right. Right may
@@ -417,7 +420,9 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `content/tunables.json`: `walkSpeed` (240 units per second), `playerRadius`
   (20), and `walkCycleUnits` (126).
 - Transitions: entering a trigger fades out, loads the target area, places the
-  player at the named spawn facing the given direction, and fades in.
+  player at the named spawn facing the given direction, and fades in. The
+  target's art is prefetched as the fade-out begins and its tiles and prop
+  atlases load concurrently, so the fade covers the load.
 - Area triggers use `{ id, polygon, target: { area, spawn } }`. A trigger fires
   only when the player centre crosses from outside to inside. During the
   `doorFadeTicks` (18 ticks) fade-out and fade-in phases, input is ignored and

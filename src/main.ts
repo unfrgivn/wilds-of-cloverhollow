@@ -747,6 +747,9 @@ async function boot(): Promise<void> {
   // Buttons held when the title closed stay hidden from the game until they're
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
+  // The area a door's fade-out is warming. Cleared when the transition ends or
+  // the game resets, so every crossing prefetches exactly once.
+  let prefetchedTarget: string | undefined;
   const tick = (frame: ActionFrame): void => {
     if (qaJustPicked) { qaJustPicked = false; titlePrevious = frame; return; }
     if (qaMenuOpen) {
@@ -821,6 +824,19 @@ async function boot(): Promise<void> {
     const previous = state;
     const stepped = step(content.world, state, input);
     state = stepped.state;
+    // A door's fade-out knows where it's going: warm that area's art while the
+    // fade still covers the screen, so the arrival isn't a white wait on the
+    // load (spec 4, transitions).
+    if (state.transition === null) prefetchedTarget = undefined;
+    else {
+      const target =
+        state.transition.phase === "out" ? state.transition.target.area : undefined;
+      if (target !== undefined && target !== prefetchedTarget) {
+        const targetArea = content.world.areas[target];
+        if (targetArea !== undefined) view.prefetch(targetArea);
+        prefetchedTarget = target;
+      }
+    }
     if (state.finale !== lastFinale) {
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] finale ${state.finale ?? "null"}`);
@@ -966,6 +982,7 @@ async function boot(): Promise<void> {
         suppressSave = true;
         state = createState(content.world, fixture, options.seed);
         suppressSave = false;
+        prefetchedTarget = undefined;
         await ensureArea();
         titleMode = null;
         qaMenuOpen = false;

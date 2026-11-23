@@ -69,7 +69,9 @@ test("the plaza's lower path leads to Meadow Park, and its exit path leads back"
   expect(Math.hypot((pup?.x ?? 0) - 880, (pup?.y ?? 0) - 600)).toBeLessThanOrEqual(90);
   expect(info.drawOrder.map((item) => item.label))
     .toEqual(expect.arrayContaining(["critter:wild:0", "critter:wild:0:aura", "maddie"]));
-  expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(false);
+  // The plaza just left stays resident: the park's exit path back to it is a
+  // cache hit.
+  expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(true);
   expect(info.cachedAreaTextures.some((url) => url.includes("park"))).toBe(true);
   await expect(page).toHaveScreenshot("park-arrival.png");
 

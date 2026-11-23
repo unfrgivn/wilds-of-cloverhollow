@@ -18,6 +18,26 @@ async function json(path: string): Promise<unknown> {
   return response.json();
 }
 
+// One asset's cache key and its load, with the options that kind of asset
+// loads with. `load` and `prefetch` share these, so a prefetched area is
+// exactly what loading it later finds (Pixi keeps one in-flight parse per
+// URL either way).
+function tileLoad(root: string, file: string): { path: string; load: Promise<Texture> } {
+  const path = assetUrl(`${root}/${file}`);
+  return { path, load: Assets.load<Texture>({ src: path, data: { autoGenerateMipmaps: true } }) };
+}
+
+function atlasLoad(atlas: string): { path: string; load: Promise<Spritesheet> } {
+  const path = assetUrl(atlas);
+  return {
+    path,
+    load: Assets.load<Spritesheet>({
+      src: path,
+      data: { textureOptions: { autoGenerateMipmaps: true } },
+    }),
+  };
+}
+
 // A box in world units.
 export type Rect = { x0: number; y0: number; x1: number; y1: number };
 type Strip = { sprite: Sprite; left: number; right: number; top: number; bottom: number };
@@ -124,30 +144,25 @@ export class AreaView {
       `${root}/ground.json`,
     );
     const view = new AreaView(area, colour(manifest.paper));
-    for (const tile of manifest.tiles) {
-      const path = assetUrl(`${root}/${tile.file}`);
-      const texture = await Assets.load<Texture>({
-        src: path,
-        data: { autoGenerateMipmaps: true },
-      });
-      view.textures.push(path);
-      const sprite = new Sprite(texture);
+    // Every tile and atlas starts loading at once: a door crossing shouldn't
+    // wait on a chain of round trips. Each load is joined to its tile up
+    // front, so collecting them keeps the manifest's order (the sprite
+    // layering and `textures`, the cache keys the View keeps tabs on)
+    // without indexing.
+    const tileLoads = manifest.tiles.map((tile) => ({ tile, ...tileLoad(root, tile.file) }));
+    const atlasLoads = area.atlases.map((atlas) => atlasLoad(atlas));
+    for (const { tile, path, load } of tileLoads) {
+      const sprite = new Sprite(await load);
       sprite.position.set(tile.x / 2, tile.y / 2);
       sprite.scale.set(0.5);
       view.sprites.push(sprite);
       view.ground.addChild(sprite);
+      view.textures.push(path);
     }
     view.ground.addChild(view.shadows);
     view.ground.addChild(view.flats);
-    const sheets: Spritesheet[] = [];
-    for (const atlas of area.atlases) {
-      const path = assetUrl(atlas);
-      sheets.push(await Assets.load<Spritesheet>({
-        src: path,
-        data: { textureOptions: { autoGenerateMipmaps: true } },
-      }));
-      view.textures.push(path);
-    }
+    const sheets = await Promise.all(atlasLoads.map((atlas) => atlas.load));
+    for (const atlas of atlasLoads) view.textures.push(atlas.path);
     for (const prop of area.props) {
       const states = new Map<string, StateView>();
       for (const [name, state] of Object.entries(prop.states)) {
@@ -184,6 +199,27 @@ export class AreaView {
       view.props.push({ prop, states, shown: "", alpha: 1 });
     }
     return view;
+  }
+
+  /*
+   * Warms the Assets cache for an area's art with the same loads `load`
+   * performs, building nothing, and returns the warmed URLs. A door's
+   * fade-out starts this for the area it leads to, so the fade covers the
+   * fetch and decode instead of the arrival waiting on them (spec 4).
+   */
+  static async prefetch(area: Area): Promise<string[]> {
+    if (area.ground === undefined) return [];
+    const root = `assets/areas/${area.ground}`;
+    const manifest = parseGroundManifest(
+      await json(`${root}/ground.json`),
+      `${root}/ground.json`,
+    );
+    const tileLoads = manifest.tiles.map((tile) => tileLoad(root, tile.file));
+    const atlasLoads = area.atlases.map((atlas) => atlasLoad(atlas));
+    await Promise.all(
+      [...tileLoads, ...atlasLoads].map((entry) => entry.load),
+    );
+    return [...tileLoads, ...atlasLoads].map((entry) => entry.path);
   }
 
   /*
@@ -268,7 +304,10 @@ export class AreaView {
     }
   }
 
-  async destroy(): Promise<void> {
+  // The view's sprites and cut strips go; its textures stay in the Assets
+  // cache, so the door back reloads from memory. The View unloads the area
+  // two crossings back when a new one arrives.
+  destroy(): void {
     const slices = this.props.flatMap((view) => [...view.states.values()]
       .flatMap((state) => state.strips.map(({ sprite }) => sprite.texture)));
     for (const sprite of this.sprites) {
@@ -278,7 +317,5 @@ export class AreaView {
     // The strips' sub-textures, not the atlas pages they slice.
     for (const texture of slices) texture.destroy();
     this.ground.destroy({ children: true });
-    const unique = [...new Set(this.textures)];
-    await Promise.all(unique.map((path) => Assets.unload(path)));
   }
 }

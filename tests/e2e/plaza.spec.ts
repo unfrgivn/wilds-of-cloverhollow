@@ -15,8 +15,10 @@ test("real keys cross the bedroom and kitchen doors in both directions", async (
   const kitchenInfo = await renderInfo(page);
   expect(kitchenInfo.area).toBe("kitchen");
   expect(kitchenInfo.drawOrder.some((item) => item.label === "maddie")).toBe(true);
+  // The area just left stays resident (a bounded current + previous pair), so
+  // the door back to the bedroom is a cache hit, not a reload.
   expect(kitchenInfo.cachedAreaTextures.some((url) => url.includes("bedroom")))
-    .toBe(false);
+    .toBe(true);
   expect(kitchenInfo.cachedAreaTextures.some((url) => url.includes("kitchen")))
     .toBe(true);
 
@@ -33,8 +35,9 @@ test("real keys cross the bedroom and kitchen doors in both directions", async (
   expect(bedroom?.player).toEqual({ x: 525, y: 380 });
   const bedroomInfo = await renderInfo(page);
   expect(bedroomInfo.area).toBe("bedroom");
+  // Same back: the kitchen's art is still resident behind the bedroom.
   expect(bedroomInfo.cachedAreaTextures.some((url) => url.includes("kitchen")))
-    .toBe(false);
+    .toBe(true);
   expect(bedroomInfo.cachedAreaTextures.some((url) => url.includes("bedroom")))
     .toBe(true);
 });

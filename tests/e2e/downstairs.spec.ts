@@ -106,6 +106,13 @@ test("the front door leads to the plaza and back, and the stairs lead up", async
   let state = await readState(page);
   expect(state.area).toBe("plaza");
   expect(state.player).toEqual({ x: 450, y: 500 });
+  // Texture residency (spec 4, texture budget): the areas the game keeps are
+  // the one it's in and the one just left. The bedroom, two crossings back,
+  // has unloaded.
+  let info = await renderInfo(page);
+  expect(info.cachedAreaTextures.some((url) => url.includes("bedroom"))).toBe(false);
+  expect(info.cachedAreaTextures.some((url) => url.includes("kitchen"))).toBe(true);
+  expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(true);
 
   await walk(page, "y", 545);
   await walk(page, "x", 330);
@@ -114,6 +121,10 @@ test("the front door leads to the plaza and back, and the stairs lead up", async
   expect(state.area).toBe("kitchen");
   expect(state.player).toEqual({ x: 965, y: 560 });
   expect(state.facing).toBe("left");
+  // The way back through the house door found the kitchen still resident.
+  info = await renderInfo(page);
+  expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(true);
+  expect(info.cachedAreaTextures.some((url) => url.includes("kitchen"))).toBe(true);
 
   await walk(page, "y", 510);
   await walk(page, "x", 655);
@@ -123,4 +134,39 @@ test("the front door leads to the plaza and back, and the stairs lead up", async
   state = await readState(page);
   expect(state.area).toBe("bedroom");
   expect(state.player).toEqual({ x: 525, y: 380 });
+  // The plaza, two crossings back now, unloaded on the stairs' arrival.
+  info = await renderInfo(page);
+  expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(false);
+  expect(info.cachedAreaTextures.some((url) => url.includes("kitchen"))).toBe(true);
+  expect(info.cachedAreaTextures.some((url) => url.includes("bedroom"))).toBe(true);
+});
+
+test("a door's fade-out warms the area it leads to before the swap", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await openHarness(page);
+  await resetPaused(page, "new-game");
+  // Walk to the bedroom door a tick at a time, so the fade-out is caught on
+  // its first tick and the kitchen's art can only come from the prefetch.
+  await page.keyboard.down("ArrowUp");
+  let transitioning = false;
+  for (let attempt = 0; attempt < 40 && !transitioning; attempt += 1) {
+    await step(page, 1);
+    transitioning = (await readState(page)).transition !== null;
+  }
+  await page.keyboard.up("ArrowUp");
+  expect(transitioning).toBe(true);
+  // The kitchen's art arrives in the Assets cache while the fade-out still
+  // covers the bedroom: ticks are frozen at the door, so nothing else could
+  // have loaded it.
+  await page.waitForFunction(() => {
+    const hook = window.__cloverhollow;
+    if (hook === undefined) return false;
+    return hook.renderInfo().cachedAreaTextures.some((url) => url.includes("kitchen"));
+  });
+  const mid = await readState(page);
+  expect(mid.area).toBe("bedroom");
+  expect(mid.transition?.phase).toBe("out");
+  await step(page, 40);
+  const kitchen = await readState(page);
+  expect(kitchen.area).toBe("kitchen");
 });

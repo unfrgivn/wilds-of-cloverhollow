@@ -152,6 +152,9 @@ export class GameView {
   private currentFrame = 0;
   private partyFrames: { id: string; animation: string; frame: number }[] = [];
   private readonly areaTextureUrls = new Set<string>();
+  // The URLs of the area one crossing back, kept resident so the way back
+  // through a door is a cache hit (the area two crossings back unloads).
+  private residentUrls: readonly string[] = [];
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
   private critterKeys = "";
   // Each overworld critter: `id` is its key (a set piece's id or `wild:<den>`).
@@ -271,9 +274,12 @@ export class GameView {
 
   async setArea(area: Area): Promise<void> {
     const previous = this.areaView;
-    if (previous !== undefined) await previous.destroy();
+    // The old sprites go; the old textures stay cached, so the door back is
+    // a reload from memory, not a white wait on the network.
+    previous?.destroy();
     const next = await AreaView.load(area, this.depth);
     this.areaView = next;
+    await this.evict(previous, next);
     for (const entry of this.glowSprites) entry.sprite.destroy();
     this.glowSprites = area.glows.map((glow) => {
       const sprite = new Sprite();
@@ -311,6 +317,31 @@ export class GameView {
     });
     this.previousCamera = undefined;
     this.staticWidth = 0;
+  }
+
+  // Unloads what a crossing displaced: everything resident that is neither
+  // the new area's art nor the one just left's. The area just left then
+  // becomes the resident one, so at most a current + previous pair of areas
+  // ever stays in the cache (spec 4, texture budget).
+  private async evict(previous: AreaView | undefined, next: AreaView): Promise<void> {
+    const previousUrls = new Set(previous?.textureUrls ?? []);
+    const evictions = this.residentUrls.filter((url) =>
+      !next.textureUrls.includes(url) && !previousUrls.has(url));
+    for (const url of evictions) this.areaTextureUrls.delete(url);
+    this.residentUrls = previous?.textureUrls ?? [];
+    if (evictions.length > 0)
+      await Promise.all(evictions.map((url) => Assets.unload(url)));
+  }
+
+  // Warms an area's art without touching the shown one. The warmed URLs join
+  // `areaTextureUrls` so the harness sees them cached; a failed prefetch says
+  // nothing the arrival's own load won't say louder.
+  prefetch(area: Area): void {
+    void AreaView.prefetch(area)
+      .then((urls) => {
+        for (const url of urls) this.areaTextureUrls.add(url);
+      })
+      .catch(() => {});
   }
 
   // Where everyone in the depth layer is drawn, in world units.

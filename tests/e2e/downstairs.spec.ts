@@ -146,7 +146,7 @@ test("a door's fade-out warms the area it leads to before the swap", async ({ pa
   await openHarness(page);
   await resetPaused(page, "new-game");
   // Walk to the bedroom door a tick at a time, so the fade-out is caught on
-  // its first tick and the kitchen's art can only come from the prefetch.
+  // its first tick with the world frozen.
   await page.keyboard.down("ArrowUp");
   let transitioning = false;
   for (let attempt = 0; attempt < 40 && !transitioning; attempt += 1) {
@@ -155,17 +155,37 @@ test("a door's fade-out warms the area it leads to before the swap", async ({ pa
   }
   await page.keyboard.up("ArrowUp");
   expect(transitioning).toBe(true);
+  const frozen = (await readState(page)).transition?.elapsed ?? 0;
+  // The warm-up belongs to the real-time loop (spec 11), so run just long
+  // enough for the fade to tick once more, then freeze again. The pause lands
+  // in the same task as the tick that moved the fade, and a resume can drain
+  // at most a capped burst before the next frame, so the crossing cannot run
+  // past the fade's own ticks.
+  const mid = await page.evaluate(async (frozenElapsed: number) => {
+    const hook = window.__cloverhollow;
+    if (hook === undefined) throw new Error("hook unavailable");
+    hook.resume();
+    await new Promise<void>((resolve) => {
+      const watch = (): void => {
+        if ((hook.getState().transition?.elapsed ?? 0) > frozenElapsed) resolve();
+        else requestAnimationFrame(watch);
+      };
+      watch();
+    });
+    hook.pause();
+    const state = hook.getState();
+    return { area: state.area, phase: state.transition?.phase ?? null };
+  }, frozen);
   // The kitchen's art arrives in the Assets cache while the fade-out still
-  // covers the bedroom: ticks are frozen at the door, so nothing else could
+  // covers the bedroom: the world is frozen again, so nothing else could
   // have loaded it.
   await page.waitForFunction(() => {
     const hook = window.__cloverhollow;
     if (hook === undefined) return false;
     return hook.renderInfo().cachedAreaTextures.some((url) => url.includes("kitchen"));
   });
-  const mid = await readState(page);
   expect(mid.area).toBe("bedroom");
-  expect(mid.transition?.phase).toBe("out");
+  expect(mid.phase).toBe("out");
   await step(page, 40);
   const kitchen = await readState(page);
   expect(kitchen.area).toBe("kitchen");

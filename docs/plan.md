@@ -3945,6 +3945,24 @@ more bad guys, and the blacklight lantern, made and built while away.
     showed. The page shows the view's name now, and the Misty Path e2e ends
     by opening the map and checking it names the forest (it fails without
     the fix). The gallery's view says "???", so no baseline changed.
+  - A fix (2026-11-23): the door-transition change (b44b23d7) warmed the
+    target area's art during every fade-out, the harness's synthetic steps
+    included. A stepped replay crossing a dozen doors then decoded every
+    room it passed through with no swap to unload any of it, and CI's
+    software-rendered WebKit paid minutes for it: the ending run timed out
+    at its 420 s budget on the door commit itself (15.6 times its recorded
+    27 s), and the kid's Trace and Talk run timed out at the same budget on
+    the console milestone's push and again on its rerun (7.1 minutes against
+    a 33 s record; the local suites never showed it, a Mac decodes a painting
+    before the fade ends). The warm-up now belongs to the real-time loop
+    (spec 11), extending the owner's own step policy from 2026-10-18: a
+    synthetic step loads and warms only the area it ends in. The door test
+    that proves the warm-up still catches the fade with the world frozen,
+    then runs a bounded real-time burst (resume, one tick past the frozen
+    fade, pause in the same task) so the prefetch fires and its mid-fade
+    assertions stay deterministic; six repeats pass unchanged. The game's
+    real door crossings are untouched, and the residency the door commit
+    added is the swap machinery's, which no step bypasses.
   - The kid's identity is kept for the very end (owner, 2026-10-07); the
     owner chose Milo for the finale (2026-10-17, Milestones 53 to 56).
 

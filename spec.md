@@ -2458,7 +2458,11 @@ ios/            Capacitor iOS project (from Milestone 4).
     running, advances exactly N ticks with the currently held input (queued
     `input()` frames first, then live devices), loads the area it ends in,
     then renders once. It loads no area it only passes through (owner,
-    2026-10-18): if it left its first area at any tick, the last is loaded
+    2026-10-18), and warms none either (2026-11-23): the door fade's prefetch
+    (section 4, transitions) belongs to the real-time loop, and a replay
+    warming every room it crossed left each one's decoded art in the Assets
+    cache with no swap to unload it, minutes of cost in CI's software-rendered
+    WebKit. If the step left its first area at any tick, the last is loaded
     afresh, so the view and camera are what loading each area in turn would
     leave. Pausing, holding real keys, then stepping gives deterministic
     tests with real key presses.

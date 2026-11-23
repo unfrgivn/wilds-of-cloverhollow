@@ -100,6 +100,9 @@ export function installHook(deps: {
   render: () => void;
   paused: () => boolean;
   setPaused: (paused: boolean) => void;
+  // Marks the synthetic ticks of `step`, so the shell can skip what belongs
+  // only to real-time play (the door fade's prefetch, spec 11).
+  setStepping: (stepping: boolean) => void;
   reset: (options: { seed?: number; fixture?: string }) => Promise<void>;
   renderInfo: CloverhollowHook["renderInfo"];
   save: CloverhollowHook["save"];
@@ -119,12 +122,19 @@ export function installHook(deps: {
       // a dozen doors loaded and dropped every room on the way. If the step
       // left its first area at any tick, even to come back, the last area is
       // loaded afresh, which leaves the view and camera as loading each one
-      // in turn did.
+      // in turn did. Nothing it passes through is warmed either: the door
+      // fade's prefetch belongs to the real-time loop, and warming every room
+      // on the way once more cost CI's software-rendered WebKit minutes.
       const first = deps.get().area;
       let moved = false;
-      for (let index = 0; index < Math.max(0, ticks); index += 1) {
-        deps.tick(deps.input.next());
-        if (deps.get().area !== first) moved = true;
+      deps.setStepping(true);
+      try {
+        for (let index = 0; index < Math.max(0, ticks); index += 1) {
+          deps.tick(deps.input.next());
+          if (deps.get().area !== first) moved = true;
+        }
+      } finally {
+        deps.setStepping(false);
       }
       await deps.ensureArea(moved);
       deps.render();

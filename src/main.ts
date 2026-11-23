@@ -785,6 +785,10 @@ async function boot(): Promise<void> {
   // The area a door's fade-out is warming. Cleared when the transition ends or
   // the game resets, so every crossing prefetches exactly once.
   let prefetchedTarget: string | undefined;
+  // True while the harness drives ticks synthetically (the hook's `step`): a
+  // replay crossing a dozen doors must load and warm only the area it ends in
+  // (spec 11), not every room it passes through.
+  let harnessStepping = false;
   const tick = (frame: ActionFrame): void => {
     if (qaJustPicked) { qaJustPicked = false; titlePrevious = frame; return; }
     if (qaMenuOpen) {
@@ -866,9 +870,12 @@ async function boot(): Promise<void> {
     state = stepped.state;
     // A door's fade-out knows where it's going: warm that area's art while the
     // fade still covers the screen, so the arrival isn't a white wait on the
-    // load (spec 4, transitions).
+    // load (spec 4, transitions). The warm-up belongs to the real-time loop:
+    // a synthetic step loads only the area it ends in (spec 11), and warming
+    // every room a replay passes through left hundreds of megabytes of decoded
+    // art in CI's software-rendered WebKit.
     if (state.transition === null) prefetchedTarget = undefined;
-    else {
+    else if (!harnessStepping) {
       const target =
         state.transition.phase === "out" ? state.transition.target.area : undefined;
       if (target !== undefined && target !== prefetchedTarget) {
@@ -1025,6 +1032,9 @@ async function boot(): Promise<void> {
       paused: () => paused,
       setPaused: (value) => {
         paused = value;
+      },
+      setStepping: (value) => {
+        harnessStepping = value;
       },
       reset: async (options) => {
         keyboard.clearTaps();

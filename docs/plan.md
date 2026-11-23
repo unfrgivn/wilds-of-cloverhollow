@@ -3077,7 +3077,7 @@ the old trail, the owl, and the clubhouse claim.
   is the balance sim, unit tests, real-key level tests, regenerated replays and
   QA packs, and viewed battle baselines at phone and desktop sizes.
 
-## Milestone 67: The cheat console **Status:** 📋 Planned
+## Milestone 67: The cheat console **Status:** ✅ Completed (2026-11-23)
 - In QA mode only (Milestone 65): the backtick key, or a tap on the QA
   badge, opens a console. It sets each party member's XP or level (up to
   99; a level sets XP to its threshold), coins, snacks, tickets, prizes,
@@ -3091,6 +3091,65 @@ the old trail, the owl, and the clubhouse claim.
 - The commands are pure functions with unit tests, and the console is a
   thin shell over them. A real-key e2e types commands and checks the
   journal.
+- Command syntax (an assumption, open to change): `help`; `xp <fae|member>
+  <n>` and `level <fae|member> <n>`; `coins|snacks|tickets <n>`;
+  `stickers|prizes all|<id>`; `lantern|lasso|flute|map on|off`; `save
+  <name>`; `export`. The four tools map to exactly `has_lantern`,
+  `has_lasso`, `has_flute`, and `has_map`, each checked against the
+  story's declared variables through `inkVariable`, so a renamed variable
+  errors instead of silently setting a dead one.
+- Notes and assumptions:
+  - The console opens only while a pack is active, and the world is frozen
+    while it is open, like the title (no core ticks; the harness's `step`
+    holds still too), with `data-qa-console="open"` on the root. Backquote
+    or Escape or its Close button closes it. The QA badge became a button
+    (its baseline is unchanged). Opening or closing redraws, so it works
+    over a harness-paused game.
+  - Supplies cap at the layouts the UI was tested at: 999 coins (the ♪
+    pill row), 99 snacks, 999 tickets. XP caps at level 99's threshold
+    (770,280). Only `fae` and the current party answer `xp` and `level`;
+    anyone else is an error naming who is available.
+  - QA slots live under `cloverhollow-qa-save:<name>` with an index at
+    `cloverhollow-qa-slots` (Capacitor Preferences), listed after the packs
+    in the QA menu and loaded through `parseSave` exactly as a pack is. A
+    slot whose save is gone drops from the list; the index self-heals.
+    `export` prints the save JSON in the console log as a copyable block.
+  - Game keys now ignore a focused text field (spec 3.2): the console's
+    input owns the keyboard while it is open. Before, the game's handler
+    preventDefaulted Enter, Space, and WASD mid-typing, which ate
+    characters and the form's submit.
+  - The console panel is built on its first open, not at boot: the
+    dev-only panel never sits in the page's DOM while unused. Its hidden
+    "Run" button had broken the kid battle's exact-text assertion (the
+    word "Run" must be nowhere on the page there).
+  - Found in the e2e: `page.reload()` keeps the `?qa=` URL and boots
+    straight back into the pack, so the slot-listing test navigates to the
+    plain URL instead; and under load WebKit could take typing before the
+    input took focus, so the tests wait for the input to be focused (which
+    also asserts the console's focus-on-open).
+- Evidence: `tests/unit/qa-console.test.ts` (9 tests: help lists every
+  command; fae and member XP with rejections and the level-99 cap; level
+  thresholds 1 to 99; the supplies' caps; stickers and prizes from the
+  real catalogues; the four tools' variables with only the named one
+  changed; save names; unknown commands; applied states round-trip
+  through `serializeSave`/`parseSave`); four new real-key tests in
+  `tests/e2e/qa.spec.ts` on Chromium and WebKit (commands with the
+  player's slot sentinel untouched and the world frozen while open, then
+  the journal reading Lv 6 and Coins 99/Snacks 7; a saved slot listed in
+  the QA menu, picked after navigating back, and restored; a touch tap on
+  the badge at 874x402; the export block). Baselines `qa-console.png`,
+  `qa-console-phone.png`, `qa-console-export.png` (Chromium): the image
+  viewer's provider was down all session (HTTP 403 on every child-model
+  call), so each was verified by DOM geometry instead (a scratch spec
+  asserted the panel's exact texts, colors, and in-viewport bounds at both
+  sizes, and the export block's contents); viewing the images themselves
+  is still pending the provider's return. `tools/check-dist.ts` now
+  requires the console in the harness bundle and refuses it in
+  production.
+- Gates: `just check` passed (typecheck, 122 unit files / 1021 tests, every
+  sim, `qa:check` 22 packs, purity, lint), `just build` passed both bundle
+  checks, and the full `just e2e` passed 930 with 2 skipped in 4.5 minutes
+  on Chromium and WebKit.
 
 ## Milestone 68: The golden path **Status:** 📋 Planned
 - One recorded run from a new game to the credits, the recorders chained in

@@ -133,7 +133,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
   cancel; J opens the journal (`menu`); L switches the blacklight lantern on or
-  off (`lantern`); F plays the flute (`flute`, Milestone 47). On touch, a
+  off (`lantern`); F plays the flute (`flute`, Milestone 47). Game keys never
+  respond while a text field has focus: the QA console's input owns the
+  keyboard then (section 11), so typing a command never moves Fae or submits
+  the dialogue. On touch, a
   lantern button beside the journal button appears once Fae has the lantern
   and glows lavender while it's on, and a ♪ flute button beside it once she
   has the flute. The tool buttons step aside while a conversation or a battle
@@ -2434,7 +2437,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   packs are separate files in the dev/harness-only save library; movement,
   doors, and ending events cannot change the player's slot. The QA menu can be
   cancelled back to the prior title mode, and a harness fixture reset clears
-  the active pack and badge.
+  the active pack and badge. The console's `save` command (section 11) keeps
+  slots under `cloverhollow-qa-save:<name>`, indexed by
+  `cloverhollow-qa-slots`, never inside the player's key.
 - `tools/qa/build-saves.ts` is the only writer of the save library: it cuts
   story and shortcut packs from recorded runs and setup packs from a QA
   fixture's first tick. `just check` fails when a pack or
@@ -2499,9 +2504,26 @@ ios/            Capacitor iOS project (from Milestone 4).
 - While dialogue is open, HTML carries `data-dialogue="open"`; movement, doors,
   cancel, and menu are ignored. Confirm reveals the current line, advances it,
   or selects the highlighted choice. Up/down edges wrap the selection.
+- The QA console (Milestone 67), dev and harness builds only: the backtick
+  key or a tap on the QA badge opens it while a QA pack is active, and
+  Backquote or Escape (or its Close button) closes it. While it is open the
+  world is frozen, like the title (no core ticks run), and the root carries
+  `data-qa-console="open"`. Its commands are pure functions
+  (`runConsoleCommand` in the dev module) over the real state, with the
+  console a thin DOM shell: `help`; `xp <fae|member> <n>` and `level
+  <fae|member> <n>` (levels 1 to 99; a level moves XP to its threshold);
+  `coins`, `snacks`, and `tickets` (capped at 999, 99, and 999, the layouts
+  the journal and battle menu were tested at); `stickers all|<id>` and `prizes
+  all|<id>` (granting from the catalogues); and `lantern|lasso|flute|map
+  on|off`, which set exactly the four story variables `has_lantern`,
+  `has_lasso`, `has_flute`, and `has_map` (a name the story doesn't declare
+  is an error). `save <name>` keeps the state in a QA-only slot listed in
+  the QA menu; `export` shows the state's save file for a bug report or the
+  library. Nothing the console does autosaves or touches the player's slot.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   and QA save packs are the labeled test-only shortcuts; teleporting, eval, and
-  arbitrary flag setting remain absent.
+  arbitrary flag setting remain absent, and the console's settable story
+  variables are its closed four.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
 - `renderInfo().arcade` is null outside an arcade game, otherwise the open

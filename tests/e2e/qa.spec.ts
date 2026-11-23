@@ -1,5 +1,41 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
 import { openHarness, readState, resetPaused, step } from "./helpers";
+
+// Picks a QA pack from the paused title and freezes the game at a
+// deterministic tick, so screenshots over the console hold still.
+async function pickPaused(page: Page, label: string): Promise<void> {
+  await page.goto("./");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  await page.keyboard.press("q");
+  await step(page, 2);
+  await page.locator(".qa-option", { hasText: label }).click();
+  await step(page, 2);
+  await expect(page.locator(".qa-badge")).toContainText(label);
+}
+
+function thresholds(): number[] {
+  const parsed: unknown = JSON.parse(readFileSync("content/levels.json", "utf8"));
+  if (typeof parsed !== "object" || parsed === null)
+    throw new Error("levels.json is not an object");
+  const record: Record<string, unknown> =
+    Object.fromEntries(Object.entries(parsed));
+  const list: unknown = record.thresholds;
+  if (!Array.isArray(list)) throw new Error("content/levels.json has no thresholds");
+  const numbers = list.filter((entry): entry is number => typeof entry === "number");
+  if (numbers.length !== list.length) throw new Error("levels.json thresholds are not numbers");
+  return numbers;
+}
+
+function catalogueCount(file: string, field: string): number {
+  const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
+  if (typeof parsed !== "object" || parsed === null) throw new Error(`${file} is not an object`);
+  const record: Record<string, unknown> = Object.fromEntries(Object.entries(parsed));
+  const list: unknown = record[field];
+  if (!Array.isArray(list)) throw new Error(`${file} has no ${field}`);
+  return list.length;
+}
 
 test(
   "QA menu loads a pack with real keys and never writes the player slot",
@@ -158,4 +194,136 @@ test("ordinary harness reset has no QA overlay", async ({ page }) => {
     const element = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
     return element?.closest(".qa-menu") !== null;
   })).toBe(false);
+});
+
+test(
+  "the console sets state with real keys and never writes the player slot",
+  async ({ page }, testInfo) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
+    });
+    await pickPaused(page, "Jordan shortcut");
+    const saveLast = await page.evaluate(() => window.__cloverhollow?.save.last() ?? null);
+    await page.keyboard.press("`");
+    await expect(page.locator(".qa-console")).toBeVisible();
+    await expect(page.locator(".qa-console-input")).toBeFocused();
+    if (testInfo.project.name === "chromium")
+      await expect(page).toHaveScreenshot("qa-console.png");
+    const before = await readState(page);
+    await page.keyboard.type("coins 99");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("level fae 6");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("snacks 7");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("stickers all");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("prizes all");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("lasso on");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".qa-console-log")).toContainText("has_lasso = true.");
+    // Errors answer in the log, not by guessing.
+    await page.keyboard.type("level fae 100");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".qa-console-log")).toContainText("Levels run from 1 to 99.");
+    await page.keyboard.type("frobnicate");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".qa-console-log")).toContainText("Unknown command");
+    // While the console is open the world is frozen: steps hold the tick.
+    await step(page, 5);
+    const state = await readState(page);
+    expect(state.tick, "the console holds the world still").toBe(before.tick);
+    expect(state.coins).toBe(99);
+    expect(state.snacks).toBe(7);
+    expect(state.xp).toBe(thresholds()[5]);
+    expect(state.stickers).toHaveLength(catalogueCount("content/stickers.json", "catalogue"));
+    expect(state.prizes).toHaveLength(catalogueCount("content/prizes.json", "catalogue"));
+    expect(JSON.parse(state.ink).variablesState.has_lasso).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".qa-console")).toBeHidden();
+    // The journal reads what the console set.
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await expect(page.locator(".journal-book")).toBeVisible();
+    await expect(page.locator(".journal-member-level").first()).toHaveText("Lv 6");
+    await expect(page.locator(".journal-supply")).toHaveText(["Coins 99", "Snacks 7"]);
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await expect(page.locator(".journal-book")).toBeHidden();
+    expect(await page.evaluate(() => localStorage.getItem(
+      "CapacitorStorage.cloverhollow-save",
+    ))).toBe("player-save-sentinel");
+    expect(await page.evaluate(() => window.__cloverhollow?.save.last() ?? null))
+      .toEqual(saveLast);
+  },
+);
+
+test("the console saves QA-only slots the QA menu lists and reloads", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("CapacitorStorage.cloverhollow-save", "player-save-sentinel");
+  });
+  await page.goto("./?qa=shortcut-jordan");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  await page.keyboard.press("`");
+  await expect(page.locator(".qa-console")).toBeVisible();
+  await expect(page.locator(".qa-console-input")).toBeFocused();
+  await page.keyboard.type("coins 42");
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("save evening");
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".qa-console-log")).toContainText(`Saved QA slot "evening"`);
+  // The backtick closes the console again.
+  await page.keyboard.press("`");
+  await expect(page.locator(".qa-console")).toBeHidden();
+  // Back to the plain URL: the title shows the save library again.
+  await page.goto("./");
+  await page.waitForFunction(() => Boolean(window.__cloverhollow));
+  await page.keyboard.press("q");
+  await step(page, 2);
+  const saved = page.locator(".qa-option", { hasText: "Saved: evening" });
+  await expect(saved).toBeVisible();
+  await saved.click();
+  await step(page, 2);
+  await expect(page.locator(".qa-badge")).toContainText("Saved: evening");
+  expect((await readState(page)).coins).toBe(42);
+  expect(await page.evaluate(() => localStorage.getItem(
+    "CapacitorStorage.cloverhollow-save",
+  ))).toBe("player-save-sentinel");
+  expect(await page.evaluate(() => localStorage.getItem(
+    "CapacitorStorage.cloverhollow-qa-save:evening",
+  ))).not.toBeNull();
+});
+
+test("tapping the QA badge opens the console on a phone", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 874, height: 402 });
+  await pickPaused(page, "Jordan shortcut");
+  await expect(page.locator(".qa-badge")).toBeVisible();
+  await page.evaluate(() => {
+    const badge = document.querySelector(".qa-badge");
+    if (badge === null) throw new Error("The page has no QA badge");
+    badge.dispatchEvent(new PointerEvent("pointerdown", { pointerType: "touch", bubbles: true }));
+    badge.dispatchEvent(new PointerEvent("pointerup", { pointerType: "touch", bubbles: true }));
+    badge.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+  await expect(page.locator(".qa-console")).toBeVisible();
+  await expect(page.locator(".qa-console-card")).toBeInViewport();
+  if (testInfo.project.name === "chromium")
+    await expect(page).toHaveScreenshot("qa-console-phone.png");
+  await page.click(".qa-console-close");
+  await expect(page.locator(".qa-console")).toBeHidden();
+});
+
+test("export shows the save file in the console", async ({ page }, testInfo) => {
+  await pickPaused(page, "Jordan shortcut");
+  await page.keyboard.press("`");
+  await expect(page.locator(".qa-console")).toBeVisible();
+  await expect(page.locator(".qa-console-input")).toBeFocused();
+  await page.keyboard.type("export");
+  await page.keyboard.press("Enter");
+  const block = page.locator("[data-qa-export]");
+  await expect(block).toBeVisible();
+  await expect(block).toContainText('"version"');
+  if (testInfo.project.name === "chromium")
+    await expect(page).toHaveScreenshot("qa-console-export.png");
 });

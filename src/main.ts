@@ -94,6 +94,9 @@ async function boot(): Promise<void> {
   const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
   const qaTools = qaEnabled ? await import("./dev/qa") : null;
   const qaPacks: PackState[] = qaTools?.loadQaPacks() ?? [];
+  // Console saves (Milestone 67), listed in the QA menu after the packs.
+  const qaSlots = qaTools === null ? [] : await qaTools.loadQaSlots();
+  let qaEntries: PackState[] = [...qaPacks, ...qaSlots];
   let qaUrlPack: PackState | null = null;
   let qaError: string | null = null;
   if (qaTools !== null) {
@@ -136,7 +139,7 @@ async function boot(): Promise<void> {
   journal.onToggleAudio(sound.toggle);
   journal.onSetAudioLevel((level: AudioLevel) => sound.setLevel(level));
   const title = createTitleScreen(uiRoot);
-  const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaPacks);
+  const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaEntries);
   const qaBadge = qaTools === null ? null : qaTools.createQaBadge(uiRoot);
   if (qaTools !== null && qaError !== null) qaTools.createQaError(uiRoot, qaError);
   const credits = createCredits(uiRoot);
@@ -235,13 +238,42 @@ async function boot(): Promise<void> {
     swallowed.add("confirm");
   };
   const openQa = (): void => {
-    if (qaTools === null || qaBlocked || qaPacks.length === 0 || titleMode === null) return;
+    if (qaTools === null || qaBlocked || qaEntries.length === 0 || titleMode === null) return;
     qaReturnMode = titleMode; qaMenuOpen = true;
   };
   title.onQa(openQa);
-  if (qaEnabled) window.addEventListener("keydown", (event) => {
-    if (event.code === "KeyQ") { event.preventDefault(); openQa(); }
+  // The QA console (spec 11): open with the backtick key or a tap on the QA
+  // badge, only while a pack is active. While it is open the game is frozen,
+  // like the title: no core ticks run.
+  let qaConsoleOpen = false;
+  const qaConsole = qaTools === null ? null : qaTools.createQaConsole(uiRoot, {
+    run: (line) => {
+      const outcome = qaTools.runConsoleCommand({
+        story: content.world.story,
+        stickerIds: content.world.stickers.catalogue.map((sticker) => sticker.id),
+        prizeIds: content.world.arcade.prizes.map((prize) => prize.id),
+        thresholds: content.world.levels.thresholds,
+      }, state, line);
+      if (outcome.kind === "applied") state = outcome.state;
+      return outcome;
+    },
+    saveSlot: async (name) => {
+      const tick = state.tick;
+      const hash = stableHash(state);
+      await qaTools.saveQaSlot({ name, tick, hash }, serializeSave(state));
+      qaEntries = [...qaPacks, ...await qaTools.loadQaSlots()];
+      qaMenu?.setEntries(qaEntries);
+      return `Saved QA slot "${name}" (tick ${tick}).`;
+    },
+    saveFile: () => serializeSave(state),
+    close: () => { qaConsoleOpen = false; },
   });
+  const openQaConsole = (): void => {
+    if (qaConsole === null || qaConsoleOpen || qaActivePack === null ||
+        titleMode !== null || qaMenuOpen) return;
+    qaConsoleOpen = true;
+  };
+  qaBadge?.onOpen(openQaConsole);
   qaMenu?.onChoose(pickQa);
   qaMenu?.onCancel(() => {
     qaMenuOpen = false; qaActivePack = null; titleMode = qaReturnMode;
@@ -502,6 +534,9 @@ async function boot(): Promise<void> {
     });
     qaMenu?.render(qaMenuOpen, qaSelected);
     qaBadge?.render(qaActivePack?.pack ?? null);
+    qaConsole?.render(qaConsoleOpen);
+    if (qaConsoleOpen) document.documentElement.dataset.qaConsole = "open";
+    else delete document.documentElement.dataset.qaConsole;
     const creditsOpen = state.finale === "credits";
     credits.render({
       visible: creditsOpen,
@@ -753,7 +788,7 @@ async function boot(): Promise<void> {
   const tick = (frame: ActionFrame): void => {
     if (qaJustPicked) { qaJustPicked = false; titlePrevious = frame; return; }
     if (qaMenuOpen) {
-      const result = qaFlow(qaPacks.length, qaSelected, {
+      const result = qaFlow(qaEntries.length, qaSelected, {
         up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
         down: frame.move.y > 0.5 && titlePrevious.move.y <= 0.5,
         confirm: frame.confirm && !titlePrevious.confirm,
@@ -766,10 +801,15 @@ async function boot(): Promise<void> {
         qaActivePack = null;
       }
       if (result.action !== null) {
-        const chosen = qaPacks[result.action];
+        const chosen = qaEntries[result.action];
         if (chosen === undefined) throw new Error("QA selection disappeared");
         pickQa(chosen);
       }
+      titlePrevious = frame;
+      return;
+    }
+    // The QA console holds the world still while it is open (spec 11).
+    if (qaConsoleOpen) {
       titlePrevious = frame;
       return;
     }
@@ -953,6 +993,24 @@ async function boot(): Promise<void> {
     }
   });
   render();
+  // The QA keys: Q opens the save library on the title, and the backtick key
+  // toggles the QA console while a pack is active (spec 11). Opening or
+  // closing redraws, so the console appears over a game the harness paused.
+  if (qaEnabled) window.addEventListener("keydown", (event) => {
+    if (event.code === "KeyQ") { event.preventDefault(); openQa(); return; }
+    if (event.code === "Backquote") {
+      event.preventDefault();
+      if (qaConsoleOpen) qaConsoleOpen = false;
+      else openQaConsole();
+      invalidate();
+      return;
+    }
+    if (event.code === "Escape" && qaConsoleOpen) {
+      event.preventDefault();
+      qaConsoleOpen = false;
+      invalidate();
+    }
+  });
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const { installHook } = await import("./dev/hook");
     installHook({
@@ -988,6 +1046,7 @@ async function boot(): Promise<void> {
         qaMenuOpen = false;
         qaActivePack = null;
         qaJustPicked = false;
+        qaConsoleOpen = false;
         swallowed.clear();
       },
       renderInfo: () => ({ ...view.renderInfo(state), arcade: arcade.info() }),

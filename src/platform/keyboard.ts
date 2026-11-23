@@ -31,6 +31,11 @@ export class Keyboard {
 
   constructor() {
     window.addEventListener("keydown", (event) => {
+      // A focused text field owns the keyboard (the QA console's input, spec
+      // 11): game keys neither act nor swallow the typing.
+      if (event.target instanceof HTMLElement &&
+          event.target.closest("input, textarea") !== null)
+        return;
       this.held.add(event.code);
       this.tapped.add(event.code);
       if (GAME_KEYS.has(event.code)) event.preventDefault();

@@ -224,45 +224,71 @@ ios/            Capacitor iOS project (from Milestone 4).
   for the latest state line to be in the new area with `fading: false`; an
   earlier version shot the plaza while the door fade still covered it.
 
-### 3.3 Gameplay sound (Milestone 37)
-- Sound effects only: no music, ambience beds, or voice. `src/core/sound.ts`
-  derives a closed set of `SoundCue` values from state diffs; it has no DOM,
-  timers, clock, randomness, or I/O. The cue layer is source-agnostic, so a
-  later synthesized or generated clip can replace a recipe without changing
-  gameplay. Arcade transitions add `claw-move`, `claw-drop`, `claw-grab`,
-  `claw-miss`, and `prize-won` for the claw machine, and `skee-aim`,
-  `skee-roll`, `skee-score`, `skee-hundred`, and `tickets-won` for skee-ball,
-  and `mole-pop`, `mole-boop`, and `mole-whiff` for Boop-a-Mole, `comet-move`,
-  `comet-star`, and `comet-bump` for Comet Cruise, and `cook-start`,
-  `cook-frozen`, and `cook-ding` for the clubhouse microwave.
-- `src/platform/audio.ts` creates the AudioContext first thing at boot,
+### 3.3 Gameplay sound, soundtrack, and ambience
+- Sound effects, synthesized cozy JRPG soundtrack, and procedural ambience beds
+  (still no voice acting, section 13). `src/core/sound.ts` derives a closed set
+  of `SoundCue` values from state diffs, and `src/core/music.ts` projects
+  `soundtrackFor(world, state, { titleOpen })` to `{ track, ambience, duck, title }`;
+  both stay 100% pure with no DOM, timers, clock, randomness, or I/O. The cue
+  and soundtrack layers are source-agnostic, so generated or recorded clips can
+  replace synthesized voices without changing gameplay. Arcade transitions add
+  `claw-move`, `claw-drop`, `claw-grab`, `claw-miss`, and `prize-won` for the
+  claw machine, and `skee-aim`, `skee-roll`, `skee-score`, `skee-hundred`, and
+  `tickets-won` for skee-ball, and `mole-pop`, `mole-boop`, and `mole-whiff`
+  for Boop-a-Mole, `comet-move`, `comet-star`, and `comet-bump` for Comet
+  Cruise, and `cook-start`, `cook-frozen`, and `cook-ding` for the clubhouse
+  microwave.
+- Soundtrack projection (`src/core/music.ts`): closed track set `title`
+  ("Watercolor Morning"), `home` ("Cloverhollow Town"), `school` ("Bell &
+  Chalk"), `bay` ("Bubblegum Breeze"), `pass` ("Pinecone Snowfall"), `woods`
+  ("Whispering Canopy"), `arcade` ("Star Racer Tokens"), `enchanted` ("Misty
+  Dream"), `enchanted-calm` ("Ancient Tree's Song", once `forest_fizzy` is
+  false), `battle` ("Fizzy Calm-Down!"), `boss` ("The Purple Hood", for
+  wind-up mini-bosses, Talk battles, or non-runnable battles), `talk`
+  ("Listening Heart", once Talk opens or calm reaches `talkAt`), `morning`
+  ("Waking Up", during the morning and credits finale), and `silent` ("Quiet",
+  for `harness`). Ambience beds (`none`, `town-breeze`, `ocean`,
+  `mountain-wind`, `hearth`, `forest`, `enchanted-shimmer`, `arcade-hum`) match
+  each outdoor area, the lodge, and the arcade, and pause in battles. Music
+  ducks smoothly during dialogue, the journal, arcade games, and battle rewards.
+- `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Browsers hold it (`suspended`, or WebKit's `interrupted`) until a key,
-  click, or tap; a gamepad press is not a user activation in any browser, so a
-  pad-only player on the web hears nothing until one. The iOS app's web view
-  lets it run at once (Capacitor sets `mediaTypesRequiringUserActionForPlayback`
-  to none), so pads get sound there from the start. It synthesizes short,
-  gentle tones in code at a moderate master gain. Audio unavailable or held
-  must never break the game. The context exists before the page has loaded:
-  Playwright runs each evaluate in Chromium as a user gesture, and a context
-  made after one would start without a key (`sound.spec.ts` slows every
-  script to check).
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 13
+  multi-voice scores in `src/platform/scores.ts`, dry plus warm stereo
+  ConvolverNode reverb), and procedural ambience (`src/platform/ambience.ts`)
+  through a shared `DynamicsCompressorNode`. Music crossfades (~0.55 s) on
+  track changes, ducks (~0.3 s to 0.55x), and pauses cleanly on
+  `visibilitychange` when backgrounded; ambience crossfades (~0.7 s) and cleans
+  up all nodes and timers on stop.
+  Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
+  key, click, or tap; a gamepad press is not a user activation in any browser,
+  so a pad-only player on the web hears nothing until one. The iOS app's web
+  view lets it run at once (Capacitor sets
+  `mediaTypesRequiringUserActionForPlayback` to none), so pads get sound there
+  from the start. Audio unavailable or held must never break the game. The
+  context exists before the page has loaded: Playwright runs each evaluate in
+  Chromium as a user gesture, and a context made after one would start without
+  a key (`sound.spec.ts` slows every script to check).
 - iOS: Web Audio keeps WebKit's default `ambient` session, so the ring/silent
   switch mutes the game (Apple's guidance for non-essential game sound).
-- Sound is on by default. Mute is toggled by M (ignored while typing in an
-  input or textarea) or the `♪ on/off` pill on the
-  journal's notes heading (a 44 px sticker pill, drawn taller than the coin
-  and snack pills because it is a control), and is stored separately under
-  `cloverhollow-audio` in Capacitor Preferences, never in the save.
+- Sound, music (default 75%), and ambience are on by default. Master mute is
+  toggled by M (ignored while typing in an input or textarea), the `♪ on/off`
+  pill on the journal's notes heading, or Sound Effects on the journal's
+  OPTIONS page; music mute, four-step music volume (25%..100%), and ambience
+  mute live on the OPTIONS page. All five preferences are stored together under
+  `cloverhollow-audio` in Capacitor Preferences, never in the save, while
+  remaining backwards-compatible with legacy boolean and `{ muted, level }`
+  shapes.
 - A four-step volume control (25%, 50%, 75%, 100%) sits beside the mute pill
-  in the notes heading. It is a sticker-style 44 CSS-pixel control with a
-  slider role: taps/clicks cycle through the levels, and arrows, Home, and End
-  work from the keyboard without stealing the journal's page-flip arrows. Its
-  visible value is accessible by keyboard, touch, and mouse. 100% keeps the
-  existing moderate master gain. There is no zero step, so mute stays an
-  independent choice and unmuting restores the selected level. The old
-  boolean-only preference shape loads at 100%.
+  in the notes heading (and mirrors Sound Effects volume on OPTIONS). It is a
+  sticker-style 44 CSS-pixel control with a slider role: taps/clicks cycle
+  through the levels, and arrows, Home, and End work from the keyboard without
+  stealing the journal's page-flip arrows. Its visible value is accessible by
+  keyboard, touch, and mouse. 100% keeps the existing moderate master gain.
+  There is no zero step, so mute stays an independent choice and unmuting
+  restores the selected level. The old boolean-only preference shape loads at
+  100% SFX and 75% music.
 - Story lines may carry one of the closed `sound:` tags `chime-red`,
   `chime-yellow`, `chime-green`, `chime-blue`, or `flute`. The tag is carried
   by dialogue state and projected as a cue whenever that line opens or replaces
@@ -2497,8 +2523,14 @@ trunks keep its two exits.
   inside the page without overlapping its neighbors.
 - A cream JOURNAL label sits on the top edge and a close sticker (at least
   44 px) in the top-right corner; the close button is how touch players leave.
-- Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The
-  journal opens on notes; ArrowLeft/ArrowRight and A/D also flip pages.
+- Bookmark tabs (at least 44 px, stacked in a non-overlapping flex column clear
+  of the close sticker) flip between NOTES, MAP, and OPTIONS. The journal opens
+  on notes; ArrowLeft/ArrowRight and A/D step between pages without stealing
+  arrow keys from any focused volume slider.
+- The OPTIONS page (`SOUND & MUSIC`) shows the current track (`♫ <title>`) and
+  touch-sized (>= 44 px) controls for Sound Effects (on/off + volume slider),
+  Music (on/off + volume slider), and Ambience (on/off), fitting without
+  scrolling at 874x402, 1180x820, and 1280x720.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").
@@ -2679,13 +2711,14 @@ trunks keep its two exits.
   either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, `sound.level()`
-  reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), and
-  `sound.state()` returns the AudioContext's state string (`running`,
-  `suspended`, `interrupted`, `closed`, or `unavailable`). Harness builds also log
-  `[cloverhollow] audio {state}`
-  on every state change and `[cloverhollow] sound {tick, cue, played}` per
-  cue, for native checks. These are harness only and are absent from
-  production.
+  reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), `sound.state()`
+  returns the AudioContext's state string (`running`, `suspended`,
+  `interrupted`, `closed`, or `unavailable`), and `sound.music()` returns
+  `{ track, ambience, duck, title, playing, muted, level, ambienceMuted }`.
+  Harness builds also log `[cloverhollow] audio {state}` on every state change,
+  `[cloverhollow] music {track, ambience, duck, title}` on soundtrack changes,
+  and `[cloverhollow] sound {tick, cue, played}` per cue, for native checks.
+  These are harness only and are absent from production.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

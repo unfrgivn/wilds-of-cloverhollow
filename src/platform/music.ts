@@ -1,0 +1,620 @@
+import type { MusicTrack } from "../core";
+import { scores, type InstrumentVoice, type PlayableTrack, type Score } from "./scores";
+
+export type MusicPlayer = {
+  setState: (next: { track: MusicTrack; duck: boolean }) => void;
+  setMix: (next: { active: boolean; gain: number }) => void;
+  isPlaying: () => boolean;
+  sync: () => void;
+};
+
+type ScheduledNote = {
+  voice: InstrumentVoice;
+  gain: number;
+  midi: number;
+  durationSteps: number;
+  velocity: number;
+};
+
+type CompiledScore = {
+  score: Score;
+  totalSteps: number;
+  stepSeconds: number;
+  byStep: Map<number, ScheduledNote[]>;
+};
+
+const INTERVAL_MS = 50;
+const LOOKAHEAD_SEC = 0.12;
+const CROSSFADE_SEC = 0.55;
+const DUCK_RAMP_SEC = 0.3;
+const DUCK_GAIN = 0.55;
+
+function midiToHz(midi: number): number {
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+function isPlayableTrack(track: MusicTrack): track is PlayableTrack {
+  return track !== "silent";
+}
+
+function compileScore(score: Score): CompiledScore {
+  const totalSteps = score.stepsPerBar * score.bars;
+  const byStep = new Map<number, ScheduledNote[]>();
+  for (const track of score.tracks) {
+    for (const [step, midi, durationSteps, velocity] of track.notes) {
+      const key = Math.floor(step);
+      let list = byStep.get(key);
+      if (list === undefined) {
+        list = [];
+        byStep.set(key, list);
+      }
+      list.push({
+        voice: track.voice,
+        gain: track.gain,
+        midi,
+        durationSteps,
+        velocity,
+      });
+    }
+  }
+  return {
+    score,
+    totalSteps,
+    stepSeconds: 60 / score.bpm / 4,
+    byStep,
+  };
+}
+
+function rampParam(param: AudioParam, target: number, now: number, seconds: number): void {
+  param.cancelScheduledValues(now);
+  param.setValueAtTime(param.value, now);
+  param.linearRampToValueAtTime(target, now + seconds);
+}
+
+export function createMusicPlayer(
+  context: AudioContext,
+  destination: AudioNode,
+): MusicPlayer {
+  const compiled = new Map<PlayableTrack, CompiledScore>();
+  const getCompiled = (track: PlayableTrack): CompiledScore => {
+    const existing = compiled.get(track);
+    if (existing !== undefined) return existing;
+    const built = compileScore(scores[track]);
+    compiled.set(track, built);
+    return built;
+  };
+
+  let noiseBuffer: AudioBuffer | null = null;
+  const getNoise = (): AudioBuffer => {
+    if (noiseBuffer !== null) return noiseBuffer;
+    const length = Math.max(1, Math.floor(context.sampleRate * 0.25));
+    noiseBuffer = context.createBuffer(1, length, context.sampleRate);
+    const channel = noiseBuffer.getChannelData(0);
+    for (let index = 0; index < length; index += 1) {
+      channel[index] = Math.random() * 2 - 1;
+    }
+    return noiseBuffer;
+  };
+
+  const masterGain = context.createGain();
+  masterGain.gain.value = 0;
+  const duckGain = context.createGain();
+  duckGain.gain.value = 1;
+  duckGain.connect(masterGain);
+  masterGain.connect(destination);
+
+  let currentTrack: MusicTrack = "silent";
+  let currentDuck = false;
+  let mixActive = false;
+  let mixGain = 0;
+  let lastMasterTarget = -1;
+  let trackGain: GainNode | null = null;
+  let activeCompiled: CompiledScore | null = null;
+  let currentStep = 0;
+  let nextStepTime = 0;
+  let timer: ReturnType<typeof setInterval> | null = null;
+
+  const scheduleVoice = (
+    target: GainNode,
+    note: ScheduledNote,
+    start: number,
+    duration: number,
+  ): void => {
+    const amp = Math.max(0.001, Math.min(1, note.gain * note.velocity));
+    const freq = midiToHz(note.midi);
+
+    if (note.voice === "shaker") {
+      const dur = Math.min(0.05, Math.max(0.025, duration * 0.5));
+      const src = context.createBufferSource();
+      src.buffer = getNoise();
+      const hp = context.createBiquadFilter();
+      hp.type = "highpass";
+      hp.frequency.setValueAtTime(4800, start);
+      const bp = context.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.setValueAtTime(7200, start);
+      bp.Q.setValueAtTime(1.4, start);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.42, start + 0.005);
+      env.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      src.connect(hp).connect(bp).connect(env).connect(target);
+      src.onended = () => {
+        src.disconnect();
+        hp.disconnect();
+        bp.disconnect();
+        env.disconnect();
+      };
+      src.start(start);
+      src.stop(start + dur + 0.01);
+      return;
+    }
+
+    if (note.voice === "woodblock") {
+      const dur = 0.065;
+      const osc = context.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq * 1.16, start);
+      osc.frequency.exponentialRampToValueAtTime(freq, start + 0.024);
+      const click = context.createOscillator();
+      click.type = "triangle";
+      click.frequency.setValueAtTime(freq * 2.4, start);
+      const clickGain = context.createGain();
+      clickGain.gain.setValueAtTime(amp * 0.25, start);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, start + 0.018);
+      const bp = context.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.setValueAtTime(freq * 1.2, start);
+      bp.Q.setValueAtTime(2.5, start);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.6, start + 0.003);
+      env.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.connect(bp);
+      click.connect(clickGain).connect(bp);
+      bp.connect(env).connect(target);
+      osc.onended = () => {
+        osc.disconnect();
+        click.disconnect();
+        clickGain.disconnect();
+        bp.disconnect();
+        env.disconnect();
+      };
+      osc.start(start);
+      click.start(start);
+      osc.stop(start + dur + 0.01);
+      click.stop(start + 0.025);
+      return;
+    }
+
+    if (note.voice === "piano") {
+      const end = start + duration + 0.28;
+      const osc1 = context.createOscillator();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(freq, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 2, start);
+      const overGain = context.createGain();
+      overGain.gain.setValueAtTime(0.26, start);
+      overGain.gain.exponentialRampToValueAtTime(0.04, start + duration + 0.12);
+      const filter = context.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(Math.min(2600, freq * 5), start);
+      filter.frequency.exponentialRampToValueAtTime(
+        Math.max(460, freq * 1.7),
+        start + duration + 0.2,
+      );
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.62, start + 0.012);
+      env.gain.exponentialRampToValueAtTime(amp * 0.24, start + Math.max(0.08, duration));
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(filter);
+      osc2.connect(overGain).connect(filter);
+      filter.connect(env).connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        overGain.disconnect();
+        filter.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(end + 0.02);
+      return;
+    }
+
+    if (note.voice === "celesta") {
+      const end = start + duration + 0.42;
+      const osc1 = context.createOscillator();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(freq, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 2, start);
+      const g2 = context.createGain();
+      g2.gain.setValueAtTime(0.32, start);
+      g2.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+      const osc3 = context.createOscillator();
+      osc3.type = "sine";
+      osc3.frequency.setValueAtTime(freq * 3, start);
+      const g3 = context.createGain();
+      g3.gain.setValueAtTime(0.11, start);
+      g3.gain.exponentialRampToValueAtTime(0.001, start + 0.09);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.52, start + 0.005);
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(env);
+      osc2.connect(g2).connect(env);
+      osc3.connect(g3).connect(env);
+      env.connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        osc3.disconnect();
+        g2.disconnect();
+        g3.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      osc3.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(start + 0.26);
+      osc3.stop(start + 0.12);
+      return;
+    }
+
+    if (note.voice === "marimba") {
+      const end = start + Math.min(0.45, duration + 0.18);
+      const osc1 = context.createOscillator();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(freq, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(freq * 4, start);
+      const knock = context.createGain();
+      knock.gain.setValueAtTime(0.16, start);
+      knock.gain.exponentialRampToValueAtTime(0.001, start + 0.042);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.68, start + 0.006);
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(env);
+      osc2.connect(knock).connect(env);
+      env.connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        knock.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(start + 0.055);
+      return;
+    }
+
+    if (note.voice === "harp") {
+      const end = start + duration + 0.36;
+      const osc1 = context.createOscillator();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(freq, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 2, start);
+      const g2 = context.createGain();
+      g2.gain.setValueAtTime(0.22, start);
+      g2.gain.exponentialRampToValueAtTime(0.001, start + 0.18);
+      const filter = context.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(Math.min(3400, freq * 6), start);
+      filter.frequency.exponentialRampToValueAtTime(Math.max(480, freq * 1.5), end);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.58, start + 0.006);
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(filter);
+      osc2.connect(g2).connect(filter);
+      filter.connect(env).connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        g2.disconnect();
+        filter.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(start + 0.22);
+      return;
+    }
+
+    if (note.voice === "flute") {
+      const end = start + duration + 0.12;
+      const osc1 = context.createOscillator();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(freq, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(freq, start);
+      const g2 = context.createGain();
+      g2.gain.setValueAtTime(0.2, start);
+      const lfo = context.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(5.2, start);
+      const vib = context.createGain();
+      vib.gain.setValueAtTime(0.001, start);
+      vib.gain.linearRampToValueAtTime(2.6, start + Math.min(0.18, duration * 0.6));
+      lfo.connect(vib);
+      vib.connect(osc1.frequency);
+      vib.connect(osc2.frequency);
+      const breath = context.createBufferSource();
+      breath.buffer = getNoise();
+      const breathFilter = context.createBiquadFilter();
+      breathFilter.type = "bandpass";
+      breathFilter.frequency.setValueAtTime(Math.min(2800, freq * 2.2), start);
+      breathFilter.Q.setValueAtTime(2, start);
+      const breathGain = context.createGain();
+      breathGain.gain.setValueAtTime(0.0001, start);
+      breathGain.gain.linearRampToValueAtTime(amp * 0.07, start + 0.025);
+      breathGain.gain.exponentialRampToValueAtTime(0.0001, start + 0.09);
+      const filter = context.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(Math.min(3000, freq * 3.5), start);
+      const env = context.createGain();
+      const atk = Math.min(0.048, duration * 0.35);
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.56, start + atk);
+      env.gain.setValueAtTime(amp * 0.5, start + Math.max(atk, duration - 0.02));
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(filter);
+      osc2.connect(g2).connect(filter);
+      breath.connect(breathFilter).connect(breathGain).connect(target);
+      filter.connect(env).connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        g2.disconnect();
+        lfo.disconnect();
+        vib.disconnect();
+        breath.disconnect();
+        breathFilter.disconnect();
+        breathGain.disconnect();
+        filter.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      lfo.start(start);
+      breath.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(end + 0.02);
+      lfo.stop(end + 0.02);
+      breath.stop(start + 0.11);
+      return;
+    }
+
+    if (note.voice === "bass") {
+      const end = start + duration + 0.14;
+      const osc1 = context.createOscillator();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(freq, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq, start);
+      const g2 = context.createGain();
+      g2.gain.setValueAtTime(0.55, start);
+      const filter = context.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(Math.min(880, freq * 4.2), start);
+      filter.frequency.exponentialRampToValueAtTime(Math.max(180, freq * 1.8), end);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.72, start + 0.01);
+      env.gain.exponentialRampToValueAtTime(amp * 0.34, start + Math.max(0.06, duration * 0.8));
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(filter);
+      osc2.connect(g2).connect(filter);
+      filter.connect(env).connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        g2.disconnect();
+        filter.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(end + 0.02);
+      return;
+    }
+
+    if (note.voice === "pad") {
+      const end = start + duration + 0.45;
+      const osc1 = context.createOscillator();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(freq, start);
+      osc1.detune.setValueAtTime(-4, start);
+      const osc2 = context.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq, start);
+      osc2.detune.setValueAtTime(4, start);
+      const filter = context.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(1100, start);
+      const env = context.createGain();
+      const atk = Math.min(0.28, duration * 0.4);
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(amp * 0.34, start + atk);
+      env.gain.setValueAtTime(amp * 0.3, start + Math.max(atk, duration - 0.04));
+      env.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(env).connect(target);
+      osc1.onended = () => {
+        osc1.disconnect();
+        osc2.disconnect();
+        filter.disconnect();
+        env.disconnect();
+      };
+      osc1.start(start);
+      osc2.start(start);
+      osc1.stop(end + 0.02);
+      osc2.stop(end + 0.02);
+      return;
+    }
+
+    // "chip": warm cozy filtered square + triangle blend
+    const end = start + duration + 0.08;
+    const osc1 = context.createOscillator();
+    osc1.type = "square";
+    osc1.frequency.setValueAtTime(freq, start);
+    const osc2 = context.createOscillator();
+    osc2.type = "triangle";
+    osc2.frequency.setValueAtTime(freq * 0.5, start);
+    const g2 = context.createGain();
+    g2.gain.setValueAtTime(0.28, start);
+    const filter = context.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(2200, start);
+    const env = context.createGain();
+    env.gain.setValueAtTime(0.0001, start);
+    env.gain.linearRampToValueAtTime(amp * 0.36, start + 0.008);
+    env.gain.exponentialRampToValueAtTime(amp * 0.22, start + Math.max(0.04, duration * 0.85));
+    env.gain.exponentialRampToValueAtTime(0.0001, end);
+    osc1.connect(filter);
+    osc2.connect(g2).connect(filter);
+    filter.connect(env).connect(target);
+    osc1.onended = () => {
+      osc1.disconnect();
+      osc2.disconnect();
+      g2.disconnect();
+      filter.disconnect();
+      env.disconnect();
+    };
+    osc1.start(start);
+    osc2.start(start);
+    osc1.stop(end + 0.02);
+    osc2.stop(end + 0.02);
+  };
+
+  const canRun = (): boolean =>
+    context.state === "running" && mixActive && isPlayableTrack(currentTrack);
+
+  const fadeOutChannel = (channel: GainNode | null): void => {
+    if (channel === null) return;
+    const now = context.currentTime;
+    rampParam(channel.gain, 0, now, CROSSFADE_SEC);
+    setTimeout(() => {
+      channel.disconnect();
+    }, Math.ceil((CROSSFADE_SEC + 0.15) * 1000));
+  };
+
+  const stopScheduler = (): void => {
+    if (timer !== null) {
+      clearInterval(timer);
+      timer = null;
+    }
+  };
+
+  const tickScheduler = (): void => {
+    if (!canRun() || activeCompiled === null || trackGain === null) {
+      stopScheduler();
+      return;
+    }
+    const now = context.currentTime;
+    if (nextStepTime < now - 0.1) nextStepTime = now + 0.03;
+    const horizon = now + LOOKAHEAD_SEC;
+    while (nextStepTime < horizon) {
+      const events = activeCompiled.byStep.get(currentStep);
+      if (events !== undefined) {
+        for (const note of events) {
+          scheduleVoice(
+            trackGain,
+            note,
+            nextStepTime,
+            note.durationSteps * activeCompiled.stepSeconds,
+          );
+        }
+      }
+      nextStepTime += activeCompiled.stepSeconds;
+      currentStep = (currentStep + 1) % activeCompiled.totalSteps;
+    }
+  };
+
+  const sync = (): void => {
+    const now = context.currentTime;
+    const targetGain = mixActive && isPlayableTrack(currentTrack) ? mixGain : 0;
+    if (targetGain !== lastMasterTarget) {
+      lastMasterTarget = targetGain;
+      rampParam(masterGain.gain, targetGain, now, 0.12);
+    }
+    if (!canRun()) {
+      stopScheduler();
+      return;
+    }
+    if (trackGain === null && isPlayableTrack(currentTrack)) {
+      activeCompiled = getCompiled(currentTrack);
+      trackGain = context.createGain();
+      trackGain.gain.setValueAtTime(0, now);
+      trackGain.gain.linearRampToValueAtTime(1, now + 0.2);
+      trackGain.connect(duckGain);
+      currentStep = 0;
+      nextStepTime = now + 0.04;
+    }
+    if (timer === null) {
+      nextStepTime = now + 0.04;
+      tickScheduler();
+      timer = setInterval(tickScheduler, INTERVAL_MS);
+    }
+  };
+
+  return {
+    setState: (next) => {
+      if (next.duck !== currentDuck) {
+        currentDuck = next.duck;
+        rampParam(
+          duckGain.gain,
+          currentDuck ? DUCK_GAIN : 1,
+          context.currentTime,
+          DUCK_RAMP_SEC,
+        );
+      }
+      if (next.track === currentTrack) {
+        sync();
+        return;
+      }
+      const hadTrack = trackGain !== null;
+      fadeOutChannel(trackGain);
+      trackGain = null;
+      currentTrack = next.track;
+      activeCompiled = isPlayableTrack(currentTrack) ? getCompiled(currentTrack) : null;
+      currentStep = 0;
+      if (canRun() && activeCompiled !== null) {
+        const now = context.currentTime;
+        const fresh = context.createGain();
+        fresh.gain.setValueAtTime(0, now);
+        fresh.gain.linearRampToValueAtTime(1, now + (hadTrack ? CROSSFADE_SEC : 0.2));
+        fresh.connect(duckGain);
+        trackGain = fresh;
+        nextStepTime = now + 0.04;
+      }
+      sync();
+    },
+    setMix: (next) => {
+      mixActive = next.active;
+      mixGain = next.gain;
+      sync();
+    },
+    isPlaying: () => canRun(),
+    sync,
+  };
+}

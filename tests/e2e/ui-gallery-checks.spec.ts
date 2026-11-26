@@ -43,6 +43,7 @@ const battleParts: Record<string, string[]> = {
   "journal-empty": [".journal-book"],
   "journal-notes": [".journal-book"],
   "journal-full": [".journal-book"],
+  "journal-options": [".journal-book"],
   ...Object.fromEntries(clawGalleryStates.map((state) => [state,
     state === "arcade-result" ? [".battle-reward", ".sticker-dialogue"] : []])),
   ...Object.fromEntries(skeeGalleryStates.map((state) => [state,
@@ -209,10 +210,11 @@ function measureContrast(): Contrast[] {
     return `${element.className} "${element.textContent}"`;
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
-  ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
-    ".battle-reward-name, .journal-label, " +
+    ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
+    ".battle-reward-name, .journal-label, .journal-tab, " +
     ".journal-heading, .journal-supply, .journal-tickets, .journal-note, .journal-empty, " +
-    ".journal-name, .journal-unknown, .journal-close";
+    ".journal-name, .journal-unknown, .journal-close, .journal-now-playing, " +
+    ".journal-opt-label, .journal-opt-sub, .journal-opt-toggle, .journal-opt-slider";
   return [...document.querySelectorAll(selectors)]
     .filter((element) => element.getClientRects().length > 0)
     .map((element) => {
@@ -878,22 +880,19 @@ test.describe("sticker gallery", () => {
         await page.setViewportSize(size);
         await page.goto(`/cloverhollow/ui-gallery.html?state=${state}&touch=1&insets=${insets}`);
         await page.evaluate(() => document.fonts.ready);
-        const facts = await page.evaluate(() => {
+        const facts = await page.evaluate((currentState) => {
           const style = getComputedStyle(document.documentElement);
           const safe = (name: string): number => parseFloat(style.getPropertyValue(name)) || 0;
           const rect = (selector: string): DOMRect | undefined =>
             document.querySelector(selector)?.getBoundingClientRect();
+          const intersects = (a: DOMRect, b: DOMRect): boolean =>
+            a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
           const book = rect(".journal-book");
           const close = rect(".journal-close");
           const label = rect(".journal-label");
-          const notes = rect(".journal-notes-page");
-          const headingControls = [...document.querySelectorAll(
-            ".journal-notes-head .journal-heading, .journal-supply, .journal-audio, " +
-              ".journal-volume",
-          )]
+          const tabs = [...document.querySelectorAll(".journal-tab")]
             .map((element) => element.getBoundingClientRect());
-          const album = rect(".journal-stickers-page");
-          if (!book || !close || !label || !notes || !album) return null;
+          if (!book || !close || !label) return null;
           const within = (inner: DOMRect, outer: DOMRect): boolean =>
             inner.left >= outer.left && inner.right <= outer.right &&
             inner.top >= outer.top && inner.bottom <= outer.bottom;
@@ -902,7 +901,15 @@ test.describe("sticker gallery", () => {
             inner.top >= outer.top && inner.bottom <= outer.bottom;
           const centre = document.elementFromPoint(book.left + book.width / 2,
             book.top + book.height / 2);
-          return {
+          const tabsSized = tabs.length === 3 &&
+            tabs.every((tab) => tab.width >= 44 && tab.height >= 44);
+          const tabsInside = tabs.every((tab) =>
+            tab.top >= book.top && tab.bottom <= book.bottom &&
+            tab.left >= book.left && tab.right <= innerWidth - safe("--safe-right"));
+          const tabsClear = tabs.every((tab, index) =>
+            !intersects(tab, close) &&
+            tabs.every((other, otherIndex) => otherIndex <= index || !intersects(tab, other)));
+          const base = {
             bookInside: book.left >= 20 + safe("--safe-left") &&
               book.right <= innerWidth - 20 - safe("--safe-right") &&
               book.top >= safe("--safe-top") &&
@@ -910,19 +917,56 @@ test.describe("sticker gallery", () => {
             labelOnScreen: label.top >= safe("--safe-top") && label.left >= book.left,
             closeSize: Math.min(close.width, close.height),
             closeInside: within(close, book),
-            pagesApart: notes.right <= album.left + 1,
-            headingControlsInside: headingControls.every((item) => headingInside(item, notes)),
+            tabsSized,
+            tabsInside,
+            tabsClear,
             onTop: centre?.closest(".journal-book") !== null,
           };
-        });
+          if (currentState === "journal-options") {
+            const optionsPage = document.querySelector<HTMLElement>(".journal-options-page");
+            const optionsRect = optionsPage?.getBoundingClientRect();
+            const controls = [...document.querySelectorAll(
+              ".journal-opt-toggle, .journal-opt-slider",
+            )].map((element) => element.getBoundingClientRect());
+            const rows = [...document.querySelectorAll(
+              ".journal-now-playing, .journal-opt-row",
+            )].map((element) => element.getBoundingClientRect());
+            if (!optionsPage || !optionsRect) return null;
+            return {
+              ...base,
+              pagesApart: true,
+              headingControlsInside: rows.every((item) => within(item, optionsRect)) &&
+                controls.every((item) => item.width >= 44 && item.height >= 44) &&
+                rows.every((item) => !intersects(item, close) &&
+                  tabs.every((tab) => !intersects(item, tab))) &&
+                optionsPage.scrollHeight <= optionsPage.clientHeight + 1,
+            };
+          }
+          const notes = rect(".journal-notes-page");
+          const headingControls = [...document.querySelectorAll(
+            ".journal-notes-head .journal-heading, .journal-supply, .journal-audio, " +
+              ".journal-volume",
+          )]
+            .map((element) => element.getBoundingClientRect());
+          const album = rect(".journal-stickers-page");
+          if (!notes || !album) return null;
+          return {
+            ...base,
+            pagesApart: notes.right <= album.left + 1,
+            headingControlsInside: headingControls.every((item) => headingInside(item, notes)),
+          };
+        }, state);
         expect(facts).not.toBeNull();
         expect(facts?.bookInside).toBe(true);
         expect(facts?.labelOnScreen).toBe(true);
         expect(facts?.closeSize ?? 0).toBeGreaterThanOrEqual(44);
         expect(facts?.closeInside).toBe(true);
+        expect(facts?.tabsSized, "every bookmark tab is >= 44px").toBe(true);
+        expect(facts?.tabsInside, "bookmark tabs stay inside book height & safe area").toBe(true);
+        expect(facts?.tabsClear, "bookmark tabs never overlap each other or close").toBe(true);
         expect(facts?.pagesApart).toBe(true);
         expect(facts?.headingControlsInside,
-          "notes heading controls stay inside the notes page").toBe(true);
+          "journal page controls stay inside bounds").toBe(true);
         expect(facts?.onTop, "nothing covers the open journal").toBe(true);
       });
     }
@@ -1019,14 +1063,14 @@ test.describe("sticker gallery", () => {
 
   test("journal text pairs meet contrast targets", async ({ page }) => {
     const results: Contrast[] = [];
-    for (const state of ["journal-empty", "journal-notes"]) {
+    for (const state of ["journal-empty", "journal-notes", "journal-options"]) {
       await gallery(page, state);
       results.push(...(await page.evaluate(measureContrast))
         .filter((result) => result.label.includes("journal")));
     }
     for (const result of results)
       console.log(`${result.label}: ${result.ratio.toFixed(2)}:1, opacity ${result.opacity}`);
-    expect(results.length).toBeGreaterThanOrEqual(12);
+    expect(results.length).toBeGreaterThanOrEqual(18);
     for (const result of results) {
       expect(result.ratio, result.label).toBeGreaterThanOrEqual(4.5);
       expect(result.opacity, result.label).toBe(1);

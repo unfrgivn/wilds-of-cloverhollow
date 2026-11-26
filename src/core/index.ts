@@ -20,3 +20,4 @@ export * from "./encounter";
 export * from "./mole";
 export * from "./comet";
 export * from "./credits";
+export * from "./music";

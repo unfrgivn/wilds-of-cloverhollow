@@ -10,7 +10,7 @@ export const battleStates = ["battle-command", "battle-timing", "battle-grade", 
   "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup",
   "battle-level-up",
   "battle-trace", "battle-trace-mid", "battle-trace-dry", "battle-talk", "battle-talk-reply"];
-export const journalStates = ["journal-empty", "journal-notes", "journal-full"];
+export const journalStates = ["journal-empty", "journal-notes", "journal-full", "journal-options"];
 export const phone = { width: 874, height: 402 };
 export const sizes = [phone, { width: 1180, height: 820 }, { width: 1280, height: 720 }];
 

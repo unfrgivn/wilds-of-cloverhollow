@@ -14,6 +14,7 @@ import {
   type State,
   battleView,
   soundCues,
+  soundtrackFor,
   arcadeView,
   mapLandName,
   creditEntries,
@@ -145,9 +146,36 @@ async function boot(): Promise<void> {
   const feelingBubble = createFeelingBubble(uiRoot);
   const windUpBubbles = createWindUpBubbles(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
+  // While the harness has the game paused, the frame is a pure function of a
+  // state that only `step` changes, yet software-rendered Chromium spent ~60 ms
+  // redrawing it every frame and every test command queued behind that draw
+  // (an evaluate took 64 ms, against 5 ms drawing only on change). Paused, we
+  // draw once after something changes; running, every frame as before.
+  let drawPending = true;
+  const invalidate = (): void => {
+    drawPending = true;
+  };
   const journal = createJournal(uiRoot);
-  journal.onToggleAudio(sound.toggle);
-  journal.onSetAudioLevel((level: AudioLevel) => sound.setLevel(level));
+  journal.onToggleAudio(() => {
+    sound.toggle();
+    invalidate();
+  });
+  journal.onSetAudioLevel((level: AudioLevel) => {
+    sound.setLevel(level);
+    invalidate();
+  });
+  journal.onToggleMusic(() => {
+    sound.toggleMusic();
+    invalidate();
+  });
+  journal.onSetMusicLevel((level: AudioLevel) => {
+    sound.setMusicLevel(level);
+    invalidate();
+  });
+  journal.onToggleAmbience(() => {
+    sound.toggleAmbience();
+    invalidate();
+  });
   const title = createTitleScreen(uiRoot);
   const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaEntries);
   const qaBadge = qaTools === null ? null : qaTools.createQaBadge(uiRoot);
@@ -563,6 +591,7 @@ async function boot(): Promise<void> {
   let lastBattleLog = "";
   let lastBattleTalkLog = "";
   let lastBattleButtonsLog = "";
+  let lastMusicLog = "";
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const {
       createStateLogger,
@@ -606,6 +635,17 @@ async function boot(): Promise<void> {
   };
   let wasJournalOpen = false;
   const render = (alpha = 1): void => {
+    const soundtrack = soundtrackFor(content.world, state, {
+      titleOpen: titleMode !== null || qaMenuOpen,
+    });
+    sound.setSoundtrack(soundtrack);
+    if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
+      const musicKey = `${soundtrack.track}|${soundtrack.ambience}|${soundtrack.duck}`;
+      if (musicKey !== lastMusicLog) {
+        console.log(`[cloverhollow] music ${JSON.stringify(soundtrack)}`);
+        lastMusicLog = musicKey;
+      }
+    }
     const arcadeState = arcadeView(content.world, state);
     if (arcadeState !== null && arcadeState.game !== "cook" && arcadeOverlay === null)
       void ensureArcadeOverlay().then(invalidate);
@@ -812,6 +852,10 @@ async function boot(): Promise<void> {
       tickets: state.tickets,
       muted: sound.muted(),
       level: sound.level(),
+      musicMuted: sound.musicMuted(),
+      musicLevel: sound.musicLevel(),
+      ambienceMuted: sound.ambienceMuted(),
+      nowPlaying: soundtrack.title,
       members: state.journalOpen
         ? [
             { id: "fae", name: "Fae", level: levelForXp(content.world.levels, state.xp),
@@ -1091,15 +1135,6 @@ async function boot(): Promise<void> {
         });
     }
   };
-  // While the harness has the game paused, the frame is a pure function of a
-  // state that only `step` changes, yet software-rendered Chromium spent ~60 ms
-  // redrawing it every frame and every test command queued behind that draw
-  // (an evaluate took 64 ms, against 5 ms drawing only on change). Paused, we
-  // draw once after something changes; running, every frame as before.
-  let drawPending = true;
-  const invalidate = (): void => {
-    drawPending = true;
-  };
   for (const type of ["resize", "pointerdown", "pointerup"])
     window.addEventListener(type, invalidate);
   let last = performance.now();
@@ -1223,6 +1258,7 @@ async function boot(): Promise<void> {
         muted: sound.muted,
         level: sound.level,
         state: sound.state,
+        music: sound.music,
       },
       boot: { title: () => titleMode },
     });

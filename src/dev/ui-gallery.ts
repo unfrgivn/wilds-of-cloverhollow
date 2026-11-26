@@ -336,6 +336,9 @@ journal.onClose(() => {
   root.dataset.journalClosed = "true";
 });
 journal.onSetAudioLevel(() => undefined);
+journal.onToggleMusic(() => undefined);
+journal.onSetMusicLevel(() => undefined);
+journal.onToggleAmbience(() => undefined);
 commands.onChoose((index) => {
   root.dataset.battleChosen = String(index);
 });
@@ -479,6 +482,10 @@ function renderGalleryState(): void {
     snacks: 2,
     muted: false,
     level: 1,
+    musicMuted: false,
+    musicLevel: 0.75,
+    ambienceMuted: false,
+    nowPlaying: "Cloverhollow Town",
     members: [
       { id: "fae", name: "Fae", level: 5, xp: 360, startXp: 340, nextXp: 464,
         stats: { power: 28, magic: 2, life: 6, guard: 0 }, friend: false },
@@ -495,6 +502,7 @@ function renderGalleryState(): void {
     }),
   };
   journal.render(journalView);
+  if (state === "journal-options") journal.setPage("options");
   // The battle is over once the reward shows, so the HUD steps aside; it does
   // too while a Talk question's answers are on screen.
   battleHud.render({

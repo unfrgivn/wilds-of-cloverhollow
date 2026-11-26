@@ -63,5 +63,36 @@
     "catch": "Hold up or down to catch each one!",
     "lean": "Hold left or right to balance!",
     "trace": "Trace the dots before the paint dries!"
+  },
+  "together": {
+    "chargeMax": 3,
+    "label": "Together!",
+    "hint": "Press together for each star!",
+    "check": {
+      "kind": "chain",
+      "travelTicks": 34,
+      "hitWindow": 9,
+      "arrivals": [
+        38,
+        60,
+        82
+      ],
+      "look": "star"
+    },
+    "lines": {
+      "great": "Fae and her friends shine together in a dazzling watercolor swirl!",
+      "good": "Fae and her friends cheer together! Warm sparkles fill the air.",
+      "miss": "Everyone tumbles together in a giggly heap, and the critter smiles!"
+    }
+  },
+  "fluteAssist": {
+    "pupCalm": 25,
+    "squirrelEnergy": 1,
+    "squirrelSoften": 1,
+    "lines": {
+      "pup": "Fae plays her flute! Pond Pup dashes in with a happy bark, calming the air!",
+      "squirrel": "Fae plays her flute! Acorn Squirrel drops crunchy hazelnuts: +1 leaf and softer bursts!",
+      "both": "Fae plays her flute! Pond Pup and Acorn Squirrel bound in together, calm and cozy!"
+    }
   }
 }

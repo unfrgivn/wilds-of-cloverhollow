@@ -414,6 +414,23 @@ export type BattleContent = {
   // The reward line: `sticker` when the species' sticker is new, `coins`
   // otherwise, with {sticker} and {coins} filled in (spec 8).
   rewards: { sticker: string; coins: string };
+  // Party sparkle finisher (spec 8): charges on GREAT checks once two battle
+  // friends are along, then triggers Together! on cancel.
+  together: {
+    chargeMax: number;
+    label: string;
+    hint: string;
+    check: ChainSpec;
+    lines: Record<Grade, string>;
+  };
+  // Flute Friends in battle (spec 8): once per battle, befriended animals help
+  // on a fresh flute press without ending Fae's turn.
+  fluteAssist: {
+    pupCalm: number;
+    squirrelEnergy: number;
+    squirrelSoften: number;
+    lines: { pup: string; squirrel: string; both: string };
+  };
 };
 // The closed set of feelings (spec 8); each has an icon drawn in code.
 export type FeelingId = "zoomy" | "curious" | "bored" | "grumpy" | "hungry";
@@ -446,7 +463,7 @@ export type ChargeSpec = {
   greatWindow: number;
   goodWindow: number;
 };
-export type ChainLook = "pinecone" | "bubble" | "dust";
+export type ChainLook = "pinecone" | "bubble" | "dust" | "star";
 export type ChainSpec = {
   kind: "chain";
   travelTicks: number;
@@ -673,6 +690,9 @@ export type Battle = {
   // Set as the reward shows: the species' sticker if it's new, else null.
   rewardSticker: string | null;
   phaseTicks: number;
+  sparkle?: number;
+  fluteUsed?: boolean;
+  burstSoften?: number;
 };
 export type BattleCheckView =
   | { kind: "ring"; side: CheckSide; progress: number; target: number }
@@ -763,6 +783,9 @@ export type BattleView = {
   lastGrade: Grade | null;
   rewardSticker: string | null;
   talk: BattleTalk | null;
+  sparkle: { count: number; max: number; ready: boolean } | null;
+  fluteAssist: { available: boolean; label: string; kind: "pup" | "squirrel" | "both" } | null;
+  burstSoften: number;
 };
 // `party` overrides who starts in the party (test fixtures); the default is
 // every roster member with `start: true`, in roster order.

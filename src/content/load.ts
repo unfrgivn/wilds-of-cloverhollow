@@ -297,7 +297,8 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
     return { kind, travelTicks, arrivals, toys: [...toys] };
   }
   const look = value.look;
-  field(look === "pinecone" || look === "bubble" || look === "dust", file, `${name}.look`);
+  field(look === "pinecone" || look === "bubble" || look === "dust" || look === "star", file,
+    `${name}.look`);
   return { kind, travelTicks, hitWindow, arrivals, look };
 }
 
@@ -1561,6 +1562,25 @@ export function parseBattleContent(
   const calms = friends.calms;
   field(typeof calms === "number" && Number.isInteger(calms) && calms >= 1, file,
     "oldFriends.calms");
+  const nonEmpty = (raw: unknown, name: string): string => {
+    field(typeof raw === "string" && raw.trim().length > 0, file, name);
+    return raw;
+  };
+  const togetherRaw = value.together;
+  field(record(togetherRaw), file, "together");
+  const chargeMax = integerIn(togetherRaw, "chargeMax", 1, file, "together.chargeMax");
+  const togetherCheck = faeSideCheck(togetherRaw.check, file, "together.check");
+  field(togetherCheck.kind === "chain", file, "together.check.kind");
+  const togetherLines = gradeMap(togetherRaw.lines, file, "together.lines");
+  field(
+    togetherLines.great.trim().length > 0 &&
+      togetherLines.good.trim().length > 0 &&
+      togetherLines.miss.trim().length > 0,
+    file,
+    "together.lines",
+  );
+  const fluteRaw = value.fluteAssist;
+  field(record(fluteRaw) && record(fluteRaw.lines), file, "fluteAssist");
   return {
     toyAtlas,
     hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean,
@@ -1587,6 +1607,23 @@ export function parseBattleContent(
     },
     oldFriends: { calms, line: named(friends.line, "oldFriends.line") },
     rewards: { sticker: rewards.sticker, coins: rewards.coins },
+    together: {
+      chargeMax,
+      label: nonEmpty(togetherRaw.label, "together.label"),
+      hint: nonEmpty(togetherRaw.hint, "together.hint"),
+      check: togetherCheck,
+      lines: togetherLines,
+    },
+    fluteAssist: {
+      pupCalm: integerIn(fluteRaw, "pupCalm", 1, file, "fluteAssist.pupCalm"),
+      squirrelEnergy: integerIn(fluteRaw, "squirrelEnergy", 1, file, "fluteAssist.squirrelEnergy"),
+      squirrelSoften: integerIn(fluteRaw, "squirrelSoften", 1, file, "fluteAssist.squirrelSoften"),
+      lines: {
+        pup: nonEmpty(fluteRaw.lines.pup, "fluteAssist.lines.pup"),
+        squirrel: nonEmpty(fluteRaw.lines.squirrel, "fluteAssist.lines.squirrel"),
+        both: nonEmpty(fluteRaw.lines.both, "fluteAssist.lines.both"),
+      },
+    },
   };
 }
 

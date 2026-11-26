@@ -145,6 +145,7 @@ const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
 const titleState = state.startsWith("title-");
 const dialogueShown = battleState
   ? state === "battle-command" || state === "battle-feelings" || state === "battle-windup" ||
+    state === "battle-together" ||
     state === "battle-talk" || state === "battle-talk-reply" || state === "battle-level-up" ||
     state === "battle-reward"
   : state !== "prompt" && !journalState && !titleState && !creditsState &&
@@ -344,6 +345,12 @@ journal.onToggleKeyHints(() => undefined);
 commands.onChoose((index) => {
   root.dataset.battleChosen = String(index);
 });
+battleHud.onTogether(() => {
+  root.dataset.battleTogether = "true";
+});
+battleHud.onFlute(() => {
+  root.dataset.battleFlute = "true";
+});
 dialogue.onChoose((index) => {
   root.dataset.chosen = String(index);
 });
@@ -535,6 +542,11 @@ function renderGalleryState(): void {
     level: state === "battle-windup" ? 6 : 1,
     calm: 0.45,
     critterName: state === "battle-windup" ? "Grumpy Gull" : "Fizzy Frog",
+    sparkle: state === "battle-together" ? { count: 3, max: 3, ready: true } : null,
+    fluteAssist: state === "battle-together"
+      ? { available: true, label: "Flute Friends", kind: "both" }
+      : null,
+    burstSoften: 0,
   });
   // `?party=N` previews a bigger party's menu: N friend commands between
   // Soothe and Snack (two columns on phones, one from 1000 px).
@@ -570,15 +582,16 @@ function renderGalleryState(): void {
     { id: "run", label: "Run", detail: null, disabled: false, feeling: null },
   ];
   const feelings = state === "battle-feelings";
+  const together = state === "battle-together";
   const windUp = state === "battle-windup";
   commands.render({
-    visible: state === "battle-command" || feelings || windUp,
-    selected: feelings ? 1 : windUp ? 0 : 2,
-    commands: feelings ? feelingCommands : windUp ? windUpCommands : commandList,
+    visible: state === "battle-command" || feelings || together || windUp,
+    selected: feelings || together ? 1 : windUp ? 0 : 2,
+    commands: feelings || together ? feelingCommands : windUp ? windUpCommands : commandList,
   });
   // Between the party (left) and the frog (centre), as the game places it.
   const cloudAt = { x: Math.round(innerWidth * 0.36), y: 96 };
-  feelingBubble.render(feelings
+  feelingBubble.render(feelings || together
     ? { now: { id: "zoomy", label: "Zoomy" }, next: "curious", later: "hungry", answered: false,
       ...cloudAt }
     : state === "battle-feelings-heart"

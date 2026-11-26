@@ -8,7 +8,7 @@ export type SoundCue =
   | `footstep-${import("./surfaces").Surface}`
   | "door" | "area-arrive" | "coin" | "item" | "sticker"
   | "lantern-on" | "lantern-off" | "battle-start" | "battle-command"
-  | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
+  | "battle-together" | "battle-hit" | "battle-win" | "battle-run" | "battle-rest"
   | "battle-beat"
   | "level-up"
   | "claw-move" | "claw-drop" | "claw-grab" | "claw-miss" | "prize-won"
@@ -96,8 +96,15 @@ export function soundCues(
     // A beat popped, a toy caught, or a puff held (a new check starts back
     // at none).
     if (hits(next.battle.check) > hits(previous.battle.check)) cues.push("battle-beat");
-    if (previous.battle.command !== next.battle.command && next.battle.command !== null)
+    const startedTogether = next.battle.command === "together" &&
+      (previous.battle.command !== "together" ||
+        (previous.battle.phase !== "check" && next.battle.phase === "check" &&
+          next.battle.check?.side === "critter"));
+    if (startedTogether) cues.push("battle-together");
+    else if (previous.battle.command !== next.battle.command && next.battle.command !== null)
       cues.push("battle-command");
+    if (previous.battle.fluteUsed !== true && next.battle.fluteUsed === true)
+      cues.push("flute");
     if (previous.battle.phase !== next.battle.phase &&
         (next.battle.phase === "result" || next.battle.phase === "burstResult"))
       cues.push("battle-hit");

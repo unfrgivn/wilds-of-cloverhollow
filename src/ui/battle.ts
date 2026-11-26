@@ -2,7 +2,7 @@ import "./battle.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
 import { feelingMarkup, heartMarkup, icon } from "./icons";
-import type { BattleTalk, FeelingId } from "../core";
+import type { BattleTalk, ChainLook, FeelingId } from "../core";
 import type { DialogueView } from "./sticker";
 
 /** Project battle Talk's core dialogue state onto the shared sticker dialogue. */
@@ -35,6 +35,9 @@ export type BattleHudView = {
   /** 0..1 */
   calm: number;
   critterName: string;
+  sparkle: { count: number; max: number; ready: boolean } | null;
+  fluteAssist: { available: boolean; label: string; kind: "pup" | "squirrel" | "both" } | null;
+  burstSoften: number;
 };
 
 export type BattleCommand = {
@@ -105,7 +108,7 @@ export type BattleCheckView =
         progress: number;
         result: "pending" | "hit" | "miss";
       }[];
-      look: "pinecone" | "bubble" | "dust";
+      look: ChainLook;
       grade: TimingGrade | null;
       hint: string | null;
       // The top centre of the hint sticker.
@@ -220,7 +223,7 @@ export function createBattleCheck(root: HTMLElement): {
   const icons: HTMLElement[] = [];
   const toyNodes: { node: HTMLElement; src: string }[] = [];
   const dotNodes: HTMLElement[] = [];
-  let iconLook: "pinecone" | "bubble" | "dust" | null = null;
+  let iconLook: ChainLook | null = null;
   const hide = (node: HTMLElement | SVGSVGElement, hidden: boolean): void => {
     node.style.display = hidden ? "none" : "";
   };
@@ -456,8 +459,8 @@ function renderGrade(
 
 // A chain beat's icon, drawn in code in the sticker style: a round pink
 // bubble with a shine (like the frog's own), a pinecone with ink scale marks,
-// a puff of dust with motion dashes.
-function chainIcon(look: "pinecone" | "bubble" | "dust"): SVGSVGElement {
+// a butter-gold star for Together!, or a puff of dust with motion dashes.
+function chainIcon(look: ChainLook): SVGSVGElement {
   const svg = svgElement("svg", `battle-icon battle-icon-${look}`);
   svg.setAttribute("viewBox", "0 0 32 32");
   svg.setAttribute("aria-hidden", "true");
@@ -482,6 +485,13 @@ function chainIcon(look: "pinecone" | "bubble" | "dust"): SVGSVGElement {
       d: "M9 12 Q16 16 23 12 M8 18 Q16 22.5 24 18 M10 24 Q16 27.5 22 24 " +
         "M13 6.5 Q12 17 14.5 29 M19 6.5 Q20 17 17.5 29",
     });
+  } else if (look === "star") {
+    part("path", "battle-icon-fill", {
+      d: "M16 2.5 L19.8 11.2 L29.2 12 L22 18.2 L24.2 27.5 L16 22.4 L7.8 27.5 " +
+        "L10 18.2 L2.8 12 L12.2 11.2 Z",
+    });
+    part("circle", "battle-icon-shine", { cx: "13.5", cy: "13", r: "2.2" });
+    part("circle", "battle-icon-shine", { cx: "17.8", cy: "10.5", r: "1.1" });
   } else {
     part("path", "battle-icon-fill", {
       d: "M7 24 C2 23 2 16 8 15.5 C8 9 16 7 19 12 C23 9 30 12 28 18.5 " +
@@ -557,9 +567,56 @@ function leafIcon(): SVGSVGElement {
   return icon;
 }
 
+function sparkleStarIcon(filled = false): SVGSVGElement {
+  const svg = svgElement("svg", filled ? "battle-sparkle-star is-full" : "battle-sparkle-star");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const path = svgElement("path", "battle-sparkle-star-path");
+  path.setAttribute(
+    "d",
+    "M12 2.2 L14.9 8.7 L22 9.4 L16.6 14 L18.3 21 L12 17.2 L5.7 21 L7.4 14 L2 9.4 L9.1 8.7 Z",
+  );
+  svg.append(path);
+  return svg;
+}
+
+function fluteNoteIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-flute-icon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const path = svgElement("path", "battle-flute-icon-path");
+  path.setAttribute("d", "M9 18 V6 L19 4 V16");
+  const headA = svgElement("ellipse", "battle-flute-icon-head");
+  headA.setAttribute("cx", "6.5");
+  headA.setAttribute("cy", "18");
+  headA.setAttribute("rx", "3");
+  headA.setAttribute("ry", "2.2");
+  const headB = svgElement("ellipse", "battle-flute-icon-head");
+  headB.setAttribute("cx", "16.5");
+  headB.setAttribute("cy", "16");
+  headB.setAttribute("rx", "3");
+  headB.setAttribute("ry", "2.2");
+  svg.append(path, headA, headB);
+  return svg;
+}
+
+function softenSparkleIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-soften-icon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const path = svgElement("path", "battle-soften-icon-path");
+  path.setAttribute("d", "M12 2 L14.8 9.2 L22 12 L14.8 14.8 L12 22 L9.2 14.8 L2 12 L9.2 9.2 Z");
+  svg.append(path);
+  return svg;
+}
+
 export function createBattleHud(root: HTMLElement): {
   render: (view: BattleHudView) => void;
+  onTogether: (callback: () => void) => void;
+  onFlute: (callback: () => void) => void;
 } {
+  let togetherHandler: () => void = () => undefined;
+  let fluteHandler: () => void = () => undefined;
   const hud = element("div", "battle-hud");
   const energy = element("section", "battle-meter battle-energy");
   const energyLabel = element("span", "battle-meter-label");
@@ -570,6 +627,36 @@ export function createBattleHud(root: HTMLElement): {
   count.hidden = true;
   energyRow.append(leaves, count);
   energy.append(energyLabel, energyRow);
+  const actionsLeft = element("div", "battle-actions-left");
+  actionsLeft.hidden = true;
+  const sparklePill = element("div", "battle-sparkle-pill");
+  sparklePill.setAttribute("role", "status");
+  sparklePill.hidden = true;
+  const togetherBtn = element("button", "battle-together-btn");
+  togetherBtn.type = "button";
+  togetherBtn.hidden = true;
+  const togetherLabel = element("span", "battle-action-label");
+  togetherLabel.textContent = "Together!";
+  const togetherKey = element("span", "battle-action-key");
+  togetherKey.setAttribute("aria-hidden", "true");
+  togetherKey.textContent = "X";
+  togetherBtn.append(sparkleStarIcon(true), togetherLabel, togetherKey);
+  togetherBtn.addEventListener("click", () => togetherHandler());
+  const fluteBtn = element("button", "battle-flute-btn");
+  fluteBtn.type = "button";
+  fluteBtn.hidden = true;
+  const fluteLabel = element("span", "battle-action-label");
+  const fluteKey = element("span", "battle-action-key");
+  fluteKey.setAttribute("aria-hidden", "true");
+  fluteKey.textContent = "F";
+  fluteBtn.append(fluteNoteIcon(), fluteLabel, fluteKey);
+  fluteBtn.addEventListener("click", () => fluteHandler());
+  const softenPill = element("div", "battle-soften-pill");
+  softenPill.hidden = true;
+  const softenLabel = element("span", "battle-action-label");
+  softenLabel.textContent = "Softened";
+  softenPill.append(softenSparkleIcon(), softenLabel);
+  actionsLeft.append(sparklePill, togetherBtn, fluteBtn, softenPill);
   const calm = element("section", "battle-meter battle-calm");
   const calmLabel = element("span", "battle-meter-label");
   const track = element("div", "battle-calm-track");
@@ -579,10 +666,16 @@ export function createBattleHud(root: HTMLElement): {
   const fill = element("div", "battle-calm-fill");
   track.append(fill);
   calm.append(calmLabel, track);
-  hud.append(energy, calm);
+  hud.append(energy, actionsLeft, calm);
   hud.hidden = true;
   root.append(hud);
   return {
+    onTogether: (callback) => {
+      togetherHandler = callback;
+    },
+    onFlute: (callback) => {
+      fluteHandler = callback;
+    },
     render: (view) => {
       hud.hidden = !view.visible;
       const max = Math.max(0, Math.floor(view.energyMax));
@@ -606,6 +699,29 @@ export function createBattleHud(root: HTMLElement): {
       setText(energyLabel, `ENERGY  Lv ${view.level}`);
       count.hidden = max <= 10;
       setText(count, `${current}/${max}`);
+      const showSparkle = view.visible && view.sparkle !== null &&
+        view.sparkle.count > 0 && !view.sparkle.ready;
+      sparklePill.hidden = !showSparkle;
+      if (view.sparkle !== null) {
+        const starMax = Math.max(1, view.sparkle.max);
+        while (sparklePill.children.length < starMax) sparklePill.append(sparkleStarIcon());
+        while (sparklePill.children.length > starMax) sparklePill.lastElementChild?.remove();
+        for (let index = 0; index < sparklePill.children.length; index += 1) {
+          sparklePill.children.item(index)?.classList.toggle("is-full", index < view.sparkle.count);
+        }
+        setAttribute(sparklePill, "aria-label", `Sparkle ${view.sparkle.count} of ${starMax}`);
+      }
+      const showTogether = view.visible && view.sparkle?.ready === true;
+      togetherBtn.hidden = !showTogether;
+      const showFlute = view.visible && view.fluteAssist?.available === true;
+      fluteBtn.hidden = !showFlute;
+      if (view.fluteAssist !== null) {
+        setText(fluteLabel, view.fluteAssist.label);
+        setAttribute(fluteBtn, "aria-label", `Flute: ${view.fluteAssist.label}`);
+      }
+      const showSoften = view.visible && view.burstSoften > 0;
+      softenPill.hidden = !showSoften;
+      actionsLeft.hidden = !showSparkle && !showTogether && !showFlute && !showSoften;
       setText(calmLabel, view.critterName.toUpperCase());
       setAttribute(track, "aria-label", `${view.critterName} calm`);
       setAttribute(

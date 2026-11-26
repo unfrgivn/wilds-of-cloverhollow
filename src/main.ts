@@ -205,6 +205,8 @@ async function boot(): Promise<void> {
   });
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   commandMenu.onChoose((index) => touch.tapChoice(index));
+  battleHud.onTogether(() => touch.tapButton("cancel"));
+  battleHud.onFlute(() => touch.tapButton("flute"));
   journal.onClose(() => touch.tapButton("cancel"));
   const view = new GameView(content.world, {
     debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
@@ -763,6 +765,8 @@ async function boot(): Promise<void> {
     if (checkKind !== "catch" && checkKind !== "lean" && state.arcade?.game !== "mole" &&
         state.arcade?.game !== "comet")
       touch.releaseArrows();
+    const hideActions = state.battle?.phase === "check" ||
+      state.battle?.phase === "burstResult";
     battleHud.render({
       visible: activeBattle && state.battle?.phase !== "reward" &&
         !talkChoicesShown(battle?.talk ?? null),
@@ -774,6 +778,9 @@ async function boot(): Promise<void> {
         ? `Lv ${content.world.critters[state.battle?.critterId ?? ""]?.level ?? 1} · ` +
           `${content.world.critters[state.battle?.critterId ?? ""]?.name ?? ""}`
         : "",
+      sparkle: hideActions ? null : (battle?.sparkle ?? null),
+      fluteAssist: hideActions ? null : (battle?.fluteAssist ?? null),
+      burstSoften: hideActions ? 0 : (battle?.burstSoften ?? 0),
     });
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,

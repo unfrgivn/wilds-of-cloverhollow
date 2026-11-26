@@ -169,6 +169,15 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "sine", frequency: 1047, offset: 0.26, duration: 0.24, gain: 0.09 },
   ],
   "battle-command": [{ wave: "triangle", frequency: 494, offset: 0, duration: 0.095, gain: 0.085 }],
+  "battle-together": [
+    { wave: "triangle", frequency: 523, offset: 0, duration: 0.11, gain: 0.095 },
+    { wave: "triangle", frequency: 659, offset: 0.055, duration: 0.11, gain: 0.095 },
+    { wave: "triangle", frequency: 784, offset: 0.11, duration: 0.12, gain: 0.1 },
+    { wave: "triangle", frequency: 988, offset: 0.165, duration: 0.13, gain: 0.1 },
+    { wave: "sine", frequency: 1175, offset: 0.22, duration: 0.18, gain: 0.095 },
+    { wave: "sine", frequency: 1568, offset: 0.275, duration: 0.26, gain: 0.09 },
+    { wave: "sine", frequency: 2349, offset: 0.29, duration: 0.18, gain: 0.035 },
+  ],
   "battle-hit": [
     { wave: "noise", offset: 0, duration: 0.055, gain: 0.024, lowpass: 1200 },
     { wave: "triangle", frequency: 247, offset: 0.02, duration: 0.12, gain: 0.07 },

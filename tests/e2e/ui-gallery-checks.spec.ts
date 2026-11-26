@@ -37,6 +37,8 @@ const battleParts: Record<string, string[]> = {
   "battle-feelings": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-feeling"],
   "battle-feelings-heart": [".battle-hud", ".battle-feeling", ".battle-feeling-heart"],
   "battle-windup": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-windup"],
+  "battle-together": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-feeling",
+    ".battle-actions-left", ".battle-together-btn", ".battle-flute-btn"],
   "battle-talk": [".sticker-dialogue"],
   "battle-talk-reply": [".battle-hud", ".sticker-dialogue"],
   "battle-reward": [".battle-reward", ".sticker-dialogue"],
@@ -62,6 +64,7 @@ const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".bat
   ".battle-check-hint", ".battle-grade",
   ".touch-reach", ".touch-lean", ".touch-comet",
   ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
+  ".battle-actions-left", ".battle-together-btn", ".battle-flute-btn",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
   ".touch-confirm", ".touch-cancel", ".touch-menu"];
 const touchButtonsShown = [".touch-confirm", ".touch-cancel", ".touch-menu"];
@@ -211,6 +214,8 @@ function measureContrast(): Contrast[] {
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
     ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
+    ".battle-together-btn .battle-action-label, .battle-flute-btn .battle-action-label, " +
+    ".battle-soften-pill .battle-action-label, .battle-action-key, " +
     ".battle-reward-name, .journal-label, .journal-tab, " +
     ".journal-heading, .journal-supply, .journal-tickets, .journal-note, .journal-empty, " +
     ".journal-name, .journal-unknown, .journal-close, .journal-now-playing, " +
@@ -1141,12 +1146,32 @@ test.describe("sticker gallery", () => {
             a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
           const commandRects = commands.map((item) => item.getBoundingClientRect());
           const hudRects = hud.map((item) => item.getBoundingClientRect());
+          const actionButtons = [...document.querySelectorAll<HTMLElement>(
+            ".battle-together-btn, .battle-flute-btn",
+          )].filter((item) => item.getBoundingClientRect().width > 0);
+          const actionRects = actionButtons.map((item) => item.getBoundingClientRect());
+          const feeling = document.querySelector<HTMLElement>(".battle-feeling");
+          const feelingRect = feeling === null || feeling.hidden
+            ? null : feeling.getBoundingClientRect();
+          const windUp = document.querySelector<HTMLElement>(".battle-windup");
+          const windUpRect = windUp === null || windUp.hidden
+            ? null : windUp.getBoundingClientRect();
           const choiceRects = choices.map((item) => item.getBoundingClientRect());
           const grade = document.querySelector<HTMLElement>(".battle-grade");
           const gradeRect = grade === null || grade.hidden ? null : grade.getBoundingClientRect();
           return { hudInside: hud.every((item) => inside(item.getBoundingClientRect())),
             commandHudOverlap: commandRects.some((rect) =>
               hudRects.some((meter) => intersects(rect, meter))),
+            actionsInside: actionRects.every(inside),
+            actionsTouchSized: actionRects.every((rect) => rect.height >= 44),
+            actionsClear: actionRects.every((rect) =>
+              !hudRects.some((meter) => intersects(rect, meter)) &&
+              !commandRects.some((cmd) => intersects(rect, cmd)) &&
+              !controls.some((button) => intersects(rect, button.getBoundingClientRect())) &&
+              (feelingRect === null || !intersects(rect, feelingRect)) &&
+              (windUpRect === null || !intersects(rect, windUpRect)) &&
+              (dialogue === null || dialogue.hidden ||
+                !intersects(rect, dialogue.getBoundingClientRect()))),
             gradeInside: gradeRect === null || inside(gradeRect),
             gradeHudOverlap: gradeRect !== null &&
               hudRects.some((meter) => intersects(gradeRect, meter)),
@@ -1174,6 +1199,9 @@ test.describe("sticker gallery", () => {
         expect(facts.hudInside).toBe(true);
         expect(facts.hudMenuOverlap).toBe(false);
         expect(facts.commandHudOverlap).toBe(false);
+        expect(facts.actionsInside).toBe(true);
+        expect(facts.actionsTouchSized).toBe(true);
+        expect(facts.actionsClear).toBe(true);
         expect(facts.gradeInside).toBe(true);
         expect(facts.gradeHudOverlap).toBe(false);
         expect(facts.commandInside).toBe(true);
@@ -1190,6 +1218,43 @@ test.describe("sticker gallery", () => {
       });
     }
   }
+
+  test("battle-together geometry 667x375", async ({ page }) => {
+    await gallery(page, "battle-together", true, "0,0,0,0", { width: 667, height: 375 });
+    const facts = await page.evaluate(() => {
+      const intersects = (a: DOMRect, b: DOMRect): boolean =>
+        a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+      const inside = (rect: DOMRect): boolean => rect.left >= 20 &&
+        rect.right <= innerWidth - 20 && rect.top >= 0 && rect.bottom <= innerHeight - 20;
+      const hudRects = [...document.querySelectorAll<HTMLElement>(".battle-meter")]
+        .filter((item) => item.getClientRects().length > 0)
+        .map((item) => item.getBoundingClientRect());
+      const actionRects = [...document.querySelectorAll<HTMLElement>(
+        ".battle-together-btn, .battle-flute-btn",
+      )].map((item) => item.getBoundingClientRect());
+      const commandRects = [...document.querySelectorAll<HTMLElement>(".battle-command")]
+        .map((item) => item.getBoundingClientRect());
+      const controls = [...document.querySelectorAll<HTMLElement>(
+        ".touch-confirm, .touch-cancel, .touch-menu",
+      )].map((item) => item.getBoundingClientRect());
+      const feeling = document.querySelector<HTMLElement>(".battle-feeling");
+      const dialogue = document.querySelector<HTMLElement>(".sticker-dialogue");
+      const feelingRect = feeling === null ? null : feeling.getBoundingClientRect();
+      const dialogueRect = dialogue === null ? null : dialogue.getBoundingClientRect();
+      return {
+        count: actionRects.length,
+        inside: actionRects.every(inside),
+        touchSized: actionRects.every((rect) => rect.height >= 44),
+        clear: actionRects.every((rect) =>
+          !hudRects.some((other) => intersects(rect, other)) &&
+          !commandRects.some((other) => intersects(rect, other)) &&
+          !controls.some((other) => intersects(rect, other)) &&
+          (feelingRect === null || !intersects(rect, feelingRect)) &&
+          (dialogueRect === null || !intersects(rect, dialogueRect))),
+      };
+    });
+    expect(facts).toEqual({ count: 2, inside: true, touchSized: true, clear: true });
+  });
 
   for (const [state, shown] of Object.entries(battleParts)) {
     test(`${state} shows exactly its parts`, async ({ page }) => {
@@ -1298,7 +1363,9 @@ test.describe("sticker gallery", () => {
 
   test("battle text pairs meet contrast targets", async ({ page }) => {
     const results: Contrast[] = [];
-    for (const state of ["battle-command", "battle-grade", "battle-reward", "battle-feelings"]) {
+    for (const state of [
+      "battle-command", "battle-grade", "battle-reward", "battle-feelings", "battle-together",
+    ]) {
       await gallery(page, state);
       results.push(...await page.evaluate(measureContrast));
     }

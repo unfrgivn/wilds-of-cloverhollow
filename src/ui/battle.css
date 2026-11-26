@@ -1,5 +1,10 @@
 /* Battle stickers. Layering comes from the --z-* scale in sticker.css. */
 .battle-hud[hidden],
+.battle-actions-left[hidden],
+.battle-sparkle-pill[hidden],
+.battle-together-btn[hidden],
+.battle-flute-btn[hidden],
+.battle-soften-pill[hidden],
 .battle-commands[hidden],
 .battle-command-detail[hidden],
 .battle-grade[hidden],
@@ -29,6 +34,140 @@
 .battle-energy {
   left: calc(20px + var(--safe-left));
   width: 210px;
+}
+.battle-actions-left {
+  position: absolute;
+  left: calc(20px + var(--safe-left));
+  top: calc(90px + var(--safe-top));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: auto;
+}
+@media (min-width: 1000px) {
+  .battle-actions-left {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+}
+.battle-sparkle-pill,
+.battle-soften-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.battle-together-btn,
+.battle-flute-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 11px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 14px 16px 13px 15px;
+  box-shadow: 0 4px 0 var(--sticker-ink), 0 8px 14px #47321f22;
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: transform 100ms ease-out;
+}
+.battle-together-btn {
+  background: #ffe27a;
+}
+.battle-flute-btn {
+  background: #e7f5ea;
+}
+.battle-together-btn:hover,
+.battle-flute-btn:hover {
+  transform: translateY(-2px);
+}
+.battle-together-btn:active,
+.battle-flute-btn:active {
+  transform: translateY(1px);
+}
+.battle-action-label {
+  display: inline-block;
+  line-height: 1;
+}
+.battle-action-key {
+  display: inline-block;
+  padding: 2px 5px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 6px;
+  background: var(--sticker-rim);
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+:root[data-touch="on"] .battle-action-key {
+  display: none;
+}
+.battle-sparkle-star {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.battle-sparkle-star-path {
+  fill: var(--sticker-paper);
+  stroke: var(--sticker-ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.battle-sparkle-star.is-full .battle-sparkle-star-path {
+  fill: #f4cb48;
+}
+.battle-flute-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.battle-flute-icon-path {
+  fill: none;
+  stroke: var(--sticker-ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.battle-flute-icon-head {
+  fill: var(--sticker-ink);
+}
+.battle-soften-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.battle-soften-icon-path {
+  fill: #f4cb48;
+  stroke: var(--sticker-ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
 }
 .battle-calm {
   right: calc(78px + var(--safe-right));
@@ -343,6 +482,7 @@
 .battle-icon-pinecone .battle-icon-fill { fill: #b77a48; }
 .battle-icon-bubble .battle-icon-fill { fill: #f3a5be; }
 .battle-icon-dust .battle-icon-fill { fill: #dcc08e; }
+.battle-icon-star .battle-icon-fill { fill: #f4cb48; }
 .battle-check-hint {
   position: fixed;
   z-index: var(--z-ring);
@@ -368,6 +508,8 @@
 @media (prefers-reduced-motion: reduce) {
   .battle-calm-fill,
   .battle-command,
+  .battle-together-btn,
+  .battle-flute-btn,
   .battle-chain-beat,
   .battle-catch-ring,
   .battle-catch-toy,

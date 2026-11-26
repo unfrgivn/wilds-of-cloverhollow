@@ -237,7 +237,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `tickets-won` for skee-ball, and `mole-pop`, `mole-boop`, and `mole-whiff`
   for Boop-a-Mole, `comet-move`, `comet-star`, and `comet-bump` for Comet
   Cruise, and `cook-start`, `cook-frozen`, and `cook-ding` for the clubhouse
-  microwave.
+  microwave. Battle depth adds `battle-together` (a rising C-major-9th sparkle
+  arpeggio when Together! launches, replacing `battle-command`) and projects
+  `flute` when Flute Friends assist in battle.
 - Soundtrack projection (`src/core/music.ts`): closed track set `title`
   ("Watercolor Morning"), `home` ("Cloverhollow Town"), `school` ("Bell &
   Chalk"), `bay` ("Bubblegum Breeze"), `pass` ("Pinecone Snowfall"), `woods`
@@ -1607,7 +1609,7 @@ trunks keep its two exits.
     miss (overwound), and so is no press by `waitTicks` (a press on that tick
     still starts the charge).
   - `chain` (`travelTicks`, `hitWindow`, `arrivals`, `look`: `pinecone`,
-    `bubble`, or `dust`): beat j lands at `arrivals[j]` and is seen travelling
+    `bubble`, `dust`, or `star`): beat j lands at `arrivals[j]` and is seen travelling
     for the `travelTicks` before. Each tick, a pending beat more than
     `hitWindow` past its arrival is a miss; then a confirm edge goes to the
     beat whose arrival is nearest (the earlier on a tie). If that beat is
@@ -1772,9 +1774,51 @@ trunks keep its two exits.
   - The loader checks a wind-up never starts on turn 1, leaves a plain turn
     between two (`every > bubbles`), shows no more bubbles than the kind has
     feelings, and has all three lines.
-- While a battle runs Fae is frozen, doors don't fire, cancel and menu are
-  ignored (v0), and the party keeps settling. `safeSpot` is set at new game
-  and on every area arrival.
+- Together! party sparkle finisher (`together` in `content/battle.json`,
+  validated by `parseBattleContent`: positive integer `chargeMax`, non-empty
+  `label` and `hint`, a Fae-side `chain` `check`, and non-empty `lines` for
+  `great`, `good`, and `miss`):
+  - Active whenever at least two battle party members are along
+    (`battleParty.length >= 2`) and the battle is not in Talk mode.
+  - Any check (Fae or friend command except `together`, plus enemy bursts)
+    resolving `great` adds 1 to `battle.sparkle`, capped at `chargeMax` (3).
+    `good` and `miss` leave `sparkle` unchanged; `sparkle` is omitted when 0.
+  - In the `command` phase (once the message has revealed) with
+    `sparkle >= chargeMax` and outside Talk mode, a fresh `cancel` press (X,
+    Escape, or tapping the Together! sticker) launches `command: "together"`
+    as a `critter`-side chain check (`look: "star"`, travel 34, hit window 9,
+    arrivals 38, 60, 82; widened by `gentleTiming`), resets `sparkle`, sets
+    `answered: true`, pops every active mini-boss wind-up bubble, ticks resting
+    friends down by 1 without resting anyone, and plays `battle-together`.
+  - Before the first star lands, `battleView.hint` carries `together.hint`.
+  - Resolution sums Fae's Soothe Power plus each `battleParty` member's command
+    Power at their current levels: `great` adds `teamPower + feelingBonus`,
+    `good` adds `round(teamPower * 0.75)`, and `miss` adds
+    `round(teamPower * 0.5)`, clamped to `calmLimit(critter)` (`calmMax - 1`
+    on Talk bosses until Talk finishes), and shows `together.lines[grade]`.
+    Winning a battle whose final command was `together` awards `+xp` to Fae
+    and to every `battleParty` member (excluding flute friends).
+- Flute Friends in battle (`fluteAssist` in `content/battle.json`, validated by
+  `parseBattleContent`: positive integers `pupCalm`, `squirrelEnergy`,
+  `squirrelSoften`, and non-empty `lines` for `pup`, `squirrel`, and `both`):
+  - Once per battle (`battle.fluteUsed`), in the `command` phase (after reveal)
+    outside Talk mode when `has_flute` is true and at least one of `pup_friend`
+    or `squirrel_friend` is true, a fresh `flute` press (F or tapping the flute
+    sticker) calls Fae's befriended animals and plays `flute`.
+  - Pond Pup (`pup_friend`) adds `pupCalm` (25) calm (clamped to
+    `calmLimit(critter)`). Acorn Squirrel (`squirrel_friend`) restores
+    `squirrelEnergy` (1) leaf (capped at `energyMax`) and adds `squirrelSoften`
+    (1) to `battle.burstSoften`. Both befriended apply all three effects.
+  - If calm reaches `calmMax`, the battle transitions straight to `soothed`
+    (clearing any wind-up); otherwise it stays in `command` with the assist
+    line so Fae still takes her turn.
+  - When a burst resolves with raw damage above 0 while `burstSoften > 0`,
+    damage is reduced by `burstSoften` (clamped at 0) and `burstSoften` clears;
+    a `great` 0-damage burst preserves `burstSoften` for the next damaging
+    burst.
+- While a battle runs Fae is frozen, doors don't fire, menu is ignored (v0),
+  cancel is ignored unless Together! is ready, and the party keeps settling.
+  `safeSpot` is set at new game and on every area arrival.
 - Ink: the adapter binds a pure external `calmed(name)`, answered from facts
   the core passes in (section 7). Once the fountain frog is calm the fountain
   has a new line, and the frog has his own talk (a first visit, then a revisit
@@ -1913,7 +1957,20 @@ trunks keep its two exits.
   to 10, compact for 6..10, and capped at 10 proportionally filled leaves plus
   a `current/max` count above 10; spent leaves outlined) at the top left and
   the critter's CALM meter (its level and name in capitals) at the top right,
-  left of the menu button, inside the safe area. It hides during the reward.
+  left of the menu button, inside the safe area. Directly under ENERGY sits
+  `.battle-actions-left` (a horizontal row from 1000 px wide, a compact left
+  column on phones, clear of ENERGY, thought clouds, wind-ups, commands,
+  dialogue, and touch controls): `.battle-sparkle-pill` (filled gold and
+  outlined stars while sparkle is 1..2), `.battle-together-btn` (sunny gold
+  44 px sticker button with `X` key badge hidden on touch when sparkle is
+  ready), `.battle-flute-btn` (soft mint 44 px sticker button naming Pond Pup,
+  Acorn Squirrel, or Flute Friends with `F` key badge hidden on touch while
+  available), and `.battle-soften-pill` (`Softened` badge while Acorn
+  Squirrel's burst soften is active). Like the feelings cloud,
+  `.battle-actions-left` steps aside during active checks and burst results
+  (`phase === "check"` or `"burstResult"`) so check overlays such as Lean's
+  balance track stay completely clear on notched phones. The HUD hides during
+  the reward.
   The dialogue box hides its advance triangle (`▼`) during the command phase.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
@@ -1934,7 +1991,8 @@ trunks keep its two exits.
 - Beat chain (Milestone 40): a dashed target circle with a cream rim and a
   soft paper fill (so it reads over whoever it sits on) and the beats in
   flight, small inline-SVG icons drawn in code: a pinecone with ink scale
-  marks, a round pink bubble with a shine (like the frog's own), a puff of
+  marks, a round pink bubble with a shine (like the frog's own), a butter-gold
+  five-point star with cream sparkle highlights (Together!), or a puff of
   dust. A hit pops (a quick grow and fade); a miss drops away grey. The grade
   sticker sits above the target. A chain with another look redraws its
   icons, and beats past a shorter chain's count are hidden.

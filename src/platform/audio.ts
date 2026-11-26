@@ -127,6 +127,7 @@ const recipes: Record<SoundCue, Recipe> = {
       gain: 0.095,
     },
     { wave: "sine", frequency: 220, offset: 0.04, duration: 0.16, gain: 0.04 },
+    { wave: "noise", lowpass: 950, offset: 0.03, duration: 0.14, gain: 0.018 },
   ],
   "area-arrive": [
     { wave: "triangle", frequency: 523, offset: 0, duration: 0.12, gain: 0.085 },

@@ -90,13 +90,15 @@ export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number
 import { interpolatePoint, smoothFollowCamera, worldToScreen } from "./camera";
 import { dialogueFacing, dialoguePartner, facingToward, selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
-import { fadeAlpha } from "./fade";
+import { fadeAlpha, transitionZoom } from "./fade";
 import { battleLayout, type BattleLayout } from "./battle-layout";
 import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
+import { evaluateOverworldEmotes } from "./emotes";
 import {
+  companionIdlePose,
   composePose,
   fairyHover,
   idleBreathing,
@@ -132,6 +134,7 @@ type FootstepPuff = {
 
 const FOOTSTEP_POOL_SIZE = 24;
 const BATTLE_VFX_POOL_SIZE = 64;
+const EMOTE_POOL_SIZE = 16;
 const FLUTE_CAMEO_DURATION = 45;
 
 const BATTLE_STAGE_MOODS: Record<
@@ -316,6 +319,12 @@ export class GameView {
   private readonly glowLayer = new Container();
   private readonly depth = new Container();
   private readonly ambientLayer = new Container();
+  private readonly emoteLayer = new Container();
+  private readonly emoteSprites: Sprite[] = [];
+  private activeDialoguePartner: { x: number; y: number; height: number } | null = null;
+  private recentTalk: { x: number; y: number; height: number; startTick: number } | null = null;
+  private lastEmoteArea = "";
+  private lastEmoteTick: number | undefined;
   private readonly player = new Sprite();
   private readonly playerShadow: Sprite;
   // One overworld sprite per roster member, labelled with its id; only the
@@ -442,6 +451,15 @@ export class GameView {
       this.battleVfxSprites.push(particle);
       this.battleVfxLayer.addChild(particle);
     }
+    this.emoteLayer.label = "emotes";
+    for (let i = 0; i < EMOTE_POOL_SIZE; i += 1) {
+      const bubble = new Sprite(this.vfx.emoteQuestion);
+      bubble.label = `emote:${i}`;
+      bubble.anchor.set(0.5);
+      bubble.visible = false;
+      this.emoteSprites.push(bubble);
+      this.emoteLayer.addChild(bubble);
+    }
 
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
     this.lanternSpotlight.label = "lantern:spotlight";
@@ -541,6 +559,7 @@ export class GameView {
       this.depth,
       this.ambientLayer,
       this.atmosphere.over,
+      this.emoteLayer,
       this.paperGrain,
     );
     this.depth.addChild(this.player);
@@ -654,6 +673,7 @@ export class GameView {
     this.lanternTick = undefined;
     this.staticWidth = 0;
     this.clearFootsteps();
+    this.clearEmotes();
   }
 
   // Unloads what a crossing displaced: everything resident that is neither
@@ -730,9 +750,17 @@ export class GameView {
     for (const sprite of this.footstepSprites) sprite.visible = false;
   }
 
+  private clearEmotes(): void {
+    this.activeDialoguePartner = null;
+    this.recentTalk = null;
+    this.lastEmoteTick = undefined;
+    for (const sprite of this.emoteSprites) sprite.visible = false;
+  }
+
   resetCamera(): void {
     this.previousCamera = undefined;
     this.clearFootsteps();
+    this.clearEmotes();
   }
 
   loadedAreaId(): string {
@@ -857,7 +885,7 @@ export class GameView {
         if (member.motion.moving) {
           pose = walkPose(member.motion.distance, content.walkCycleUnits, true, isSideBounder);
         } else {
-          pose = idleBreathing(state.tick, (index + 1) * 1.3);
+          pose = companionIdlePose(member.id, member.stillTicks, state.tick, index);
           if (content.sits) {
             pose = composePose(
               pose,
@@ -1032,14 +1060,22 @@ export class GameView {
       Math.round((letterboxX - camera.x * scale) * resolution) / resolution;
     const offsetY =
       Math.round((letterboxY - camera.y * scale) * resolution) / resolution;
-    this.scene.scale.set(scale);
-    this.scene.position.set(offsetX, offsetY);
-    this.lanternWorld.scale.set(scale);
-    this.lanternWorld.position.set(offsetX, offsetY);
-    this.emissiveLayer.scale.set(scale);
-    this.emissiveLayer.position.set(offsetX, offsetY);
-    this.glowLayer.scale.set(scale);
-    this.glowLayer.position.set(offsetX, offsetY);
+    const zoom = area.id === "harness"
+      ? 1
+      : transitionZoom(state.transition, this.world.tunables.doorFadeTicks);
+    const zoomScale = scale * zoom;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const zoomOffsetX = zoom === 1 ? offsetX : centerX + (offsetX - centerX) * zoom;
+    const zoomOffsetY = zoom === 1 ? offsetY : centerY + (offsetY - centerY) * zoom;
+    this.scene.scale.set(zoomScale);
+    this.scene.position.set(zoomOffsetX, zoomOffsetY);
+    this.lanternWorld.scale.set(zoomScale);
+    this.lanternWorld.position.set(zoomOffsetX, zoomOffsetY);
+    this.emissiveLayer.scale.set(zoomScale);
+    this.emissiveLayer.position.set(zoomOffsetX, zoomOffsetY);
+    this.glowLayer.scale.set(zoomScale);
+    this.glowLayer.position.set(zoomOffsetX, zoomOffsetY);
     const indoor = INDOOR_AREAS.has(area.id);
     const shadowAlpha = indoor ? 0.24 : 0.3;
     const livingMotion = area.id !== "harness";
@@ -1079,6 +1115,13 @@ export class GameView {
     );
     this.renderNpcs(state, shadowAlpha, livingMotion);
     this.renderAmbient(state);
+    this.renderEmotes(
+      state,
+      area,
+      playerPos,
+      canInterpolate ? previousState : undefined,
+      alpha,
+    );
     this.renderGlows(state, playerPos, paused);
     this.atmosphere.update(
       area.id,
@@ -1207,6 +1250,179 @@ export class GameView {
       frames.push({ id: flyer.id, x: position.x, y: position.y, frame: position.frame });
     }
     this.ambientFrames = frames;
+  }
+
+  private renderEmotes(
+    state: State,
+    area: Area,
+    playerPos: Point,
+    previousState: State | undefined,
+    alpha: number,
+  ): void {
+    const active = area.id !== "harness" &&
+      state.battle === null &&
+      state.arcade === null;
+    if (!active) {
+      this.emoteLayer.visible = false;
+      for (const sprite of this.emoteSprites) sprite.visible = false;
+      if (area.id !== this.lastEmoteArea ||
+          (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick) ||
+          state.battle !== null ||
+          state.arcade !== null) {
+        this.activeDialoguePartner = null;
+        this.recentTalk = null;
+      }
+      this.lastEmoteArea = area.id;
+      this.lastEmoteTick = state.tick;
+      return;
+    }
+
+    if (area.id !== this.lastEmoteArea ||
+        (this.lastEmoteTick !== undefined && state.tick < this.lastEmoteTick)) {
+      this.activeDialoguePartner = null;
+      this.recentTalk = null;
+    }
+
+    const present = presentCritters(this.world, state);
+    if (state.dialogue !== null) {
+      const knot = state.dialogue.knot;
+      const npc = area.npcs.find(
+        (item) => item.id !== "bus-stop" && npcVisible(this.world, state, item) &&
+          item.knot === knot,
+      );
+      if (npc !== undefined) {
+        const height = npc.id === "oliver" || npc.id.startsWith("fairy-")
+          ? 72
+          : ADULT_NPCS.has(npc.id)
+            ? 132
+            : 114;
+        this.activeDialoguePartner = { x: npc.point.x, y: npc.point.y, height };
+      } else {
+        const calm = present
+          .filter((item) => item.mood === "calm" && item.kind.calmKnot === knot)
+          .sort((a, b) =>
+            (a.point.x - state.player.x) ** 2 + (a.point.y - state.player.y) ** 2 -
+            ((b.point.x - state.player.x) ** 2 + (b.point.y - state.player.y) ** 2))[0];
+        if (calm !== undefined) {
+          this.activeDialoguePartner = {
+            x: calm.point.x,
+            y: calm.point.y,
+            height: calm.kind.overworldHeight,
+          };
+        }
+      }
+    } else if (this.activeDialoguePartner !== null) {
+      this.recentTalk = { ...this.activeDialoguePartner, startTick: state.tick };
+      this.activeDialoguePartner = null;
+    }
+
+    let recentTalk: { x: number; y: number; height: number; elapsed: number } | null = null;
+    if (this.recentTalk !== null) {
+      const elapsed = state.tick - this.recentTalk.startTick;
+      if (elapsed >= 0 && elapsed < 38) {
+        recentTalk = {
+          x: this.recentTalk.x,
+          y: this.recentTalk.y,
+          height: this.recentTalk.height,
+          elapsed,
+        };
+      } else {
+        this.recentTalk = null;
+      }
+    }
+
+    const noticeTicks = this.world.tunables.roam.noticeTicks;
+    const roamers: {
+      x: number;
+      y: number;
+      height: number;
+      notice: number;
+      noticeTicks: number;
+      chasing: boolean;
+    }[] = [];
+    const calmedCritters: { x: number; y: number; height: number; index: number }[] = [];
+    present.forEach((critter, index) => {
+      const roamer = critter.wild;
+      const prevWild = roamer === null || previousState === undefined
+        ? undefined
+        : previousState.wild.find(
+            (item) => item.den === roamer.den && item.kind === roamer.kind,
+          );
+      const point = prevWild !== undefined && alpha < 1
+        ? interpolatePoint(prevWild, critter.point, alpha)
+        : critter.point;
+      if (roamer !== null && critter.mood === "chaos") {
+        roamers.push({
+          x: point.x,
+          y: point.y,
+          height: critter.kind.overworldHeight,
+          notice: roamer.notice,
+          noticeTicks,
+          chasing: roamer.notice >= noticeTicks,
+        });
+      } else if (critter.mood === "calm") {
+        calmedCritters.push({
+          x: point.x,
+          y: point.y,
+          height: critter.kind.overworldHeight,
+          index,
+        });
+      }
+    });
+
+    const nappingMembers: {
+      x: number;
+      y: number;
+      height: number;
+      stillTicks: number;
+      index: number;
+    }[] = [];
+    state.party.forEach((member, index) => {
+      if (member.id !== "maddie") return;
+      const content = this.world.party[member.id];
+      if (content === undefined) return;
+      const prevMember = previousState?.party.find((item) => item.id === member.id);
+      const pos = prevMember !== undefined && alpha < 1
+        ? interpolatePoint(prevMember, member, alpha)
+        : member;
+      nappingMembers.push({
+        x: pos.x,
+        y: pos.y,
+        height: content.box.height,
+        stillTicks: member.stillTicks,
+        index,
+      });
+    });
+
+    const emotes = evaluateOverworldEmotes({
+      areaId: area.id,
+      tick: state.tick,
+      player: playerPos,
+      dialogueOpen: state.dialogue !== null || state.transition !== null || state.journalOpen,
+      roamers,
+      calmedCritters,
+      nappingMembers,
+      recentTalk,
+    });
+
+    this.emoteLayer.visible = emotes.length > 0;
+    for (let i = 0; i < this.emoteSprites.length; i += 1) {
+      const sprite = this.emoteSprites[i];
+      if (sprite === undefined) continue;
+      const emote = emotes[i];
+      if (emote === undefined || emote.alpha <= 0.01) {
+        sprite.visible = false;
+        continue;
+      }
+      sprite.visible = true;
+      sprite.texture = this.vfx[emote.texture];
+      sprite.position.set(emote.x, emote.y);
+      sprite.scale.set(emote.scale);
+      sprite.alpha = emote.alpha;
+      sprite.rotation = emote.rotation;
+    }
+    this.lastEmoteArea = area.id;
+    this.lastEmoteTick = state.tick;
   }
 
   // People in the area, y-sorted with everyone else. They face Fae while she

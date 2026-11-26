@@ -116,3 +116,90 @@ export function roamerHop(
   const rotation = sign * (chasing ? 0.08 : 0.03);
   return { offsetX: 0, offsetY: -lift, scaleX, scaleY, rotation };
 }
+
+export function companionIdlePose(
+  id: string,
+  stillTicks: number,
+  tick: number,
+  index: number,
+): MotionPose {
+  const base = idleBreathing(tick, (index + 1) * 1.3);
+  if (stillTicks < 180) return base;
+
+  if (id === "maddie") {
+    const wave = Math.sin(tick / 34);
+    return {
+      offsetX: 0,
+      offsetY: 0,
+      scaleX: 1.035,
+      scaleY: 0.96 + 0.02 * wave,
+      rotation: 0,
+    };
+  }
+
+  if (id === "pond-pup") {
+    const local = ((tick + index * 13) % 110 + 110) % 110;
+    if (local < 16) {
+      const phase = local / 16;
+      const arc = Math.sin(phase * Math.PI);
+      return {
+        offsetX: 0,
+        offsetY: -7 * arc,
+        scaleX: 1 - 0.03 * arc,
+        scaleY: 1 + 0.04 * arc,
+        rotation: 0.06 * Math.sin(phase * 3 * Math.PI),
+      };
+    }
+    return {
+      ...base,
+      rotation: 0.018 * Math.sin(tick / 14 + index),
+    };
+  }
+
+  if (id === "acorn-squirrel") {
+    const local = ((tick + index * 19) % 95 + 95) % 95;
+    if (local < 14) {
+      const phase = local / 14;
+      const hop = Math.abs(Math.sin(phase * Math.PI * 2));
+      return {
+        offsetX: 0,
+        offsetY: -5.5 * hop,
+        scaleX: 1 - 0.03 * hop,
+        scaleY: 1 + 0.05 * hop,
+        rotation: 0.045 * Math.sin(phase * Math.PI * 2),
+      };
+    }
+    return {
+      ...idleBreathing(tick, (index + 1) * 1.1, 0.018),
+      rotation: 0.015 * Math.sin(tick / 19 + index),
+    };
+  }
+
+  if (id === "ribbon-bunny") {
+    const local = ((tick + index * 23) % 100 + 100) % 100;
+    if (local < 16) {
+      const phase = local / 16;
+      const arc = Math.sin(phase * Math.PI);
+      return {
+        offsetX: 0,
+        offsetY: -6 * arc,
+        scaleX: 1 - 0.025 * arc,
+        scaleY: 1 + 0.055 * arc,
+        rotation: 0.03 * Math.sin(phase * Math.PI * 2),
+      };
+    }
+    return {
+      ...idleBreathing(tick, (index + 1) * 1.1, 0.017),
+      offsetY: -0.8 * Math.max(0, Math.sin(tick / 20 + index)),
+    };
+  }
+
+  const sway = Math.sin(tick / 38 + index);
+  return {
+    offsetX: 1.5 * sway,
+    offsetY: base.offsetY,
+    scaleX: base.scaleX,
+    scaleY: base.scaleY,
+    rotation: 0.024 * sway,
+  };
+}

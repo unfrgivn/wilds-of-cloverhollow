@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 84)
+Last updated: 2026-11-26 (Milestone 85)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -337,26 +337,32 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
-- Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73):
-  eleven small cached offscreen-canvas Pixi textures (`contactShadow`,
+- Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73,
+  84): sixteen small cached offscreen-canvas Pixi textures (`contactShadow`,
   `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`, `sunbeam`,
-  `paperGrain`, plus `puff`, `heart`, and `energyRing`), rendered with warm
-  plum-brown shadows (`#52455F`), pastel washes, gouache puffs, and seamless
-  cold-press paper tooth. In non-harness areas, a `shadowLayer` sits directly
-  above `ground` and below `depth` (with a pooled `footstepLayer` above it) to
-  ground Fae, party members, visible NPCs (hover shadows under the four
-  fairies, skipping the painted `bus-stop`), and overworld critters (scaling
-  slightly as characters bounce or hover); a deterministic `BiomeAtmosphere`
-  (`src/render/atmosphere.ts`, zero `Math.random()`) adds per-biome water
-  glints, lamp pools, drifting petals/pollen, snow and lodge chimney smoke,
-  sunbeams, lavender mist, fairy aura halos, hearth glow, arcade neon blooms,
-  and an `emissive` light layer mounted above `lanternLayer` (`emissiveLayer`,
-  boosted smoothly during lantern dusk for cavern crystals/lanterns, enchanted
-  fairies, plaza lamp arches, lodge hearth, and café counter glows, plus cool
-  subterranean edge framing and crossing shimmer rings in `cavern`); and a
-  world-anchored `paperGrain` `TilingSprite` (`multiply`, alpha `0.035`) gently
-  unifies sprites, shadows, and paintings. Door fades use cubic smoothstep
-  easing (`src/render/fade.ts`).
+  `paperGrain`, `puff`, `heart`, `energyRing`, plus five hand-inked 48x48 comic
+  emote bubbles `emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`, and
+  `emoteHeart`), rendered with warm plum-brown shadows (`#52455F`), pastel
+  washes, gouache puffs, and seamless cold-press paper tooth. In non-harness
+  areas, a `shadowLayer` sits directly above `ground` and below `depth` (with a
+  pooled `footstepLayer` above it) to ground Fae, party members, visible NPCs
+  (hover shadows under the four fairies, skipping the painted `bus-stop`), and
+  overworld critters (scaling slightly as characters bounce or hover); a
+  deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`, zero
+  `Math.random()`) adds per-biome water glints, lamp pools, drifting
+  petals/pollen, snow and lodge chimney smoke, sunbeams, lavender mist, fairy
+  aura halos, hearth glow, arcade neon blooms, and an `emissive` light layer
+  mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly during lantern
+  dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp arches, lodge
+  hearth, and café counter glows, plus cool subterranean edge framing and
+  crossing shimmer rings in `cavern`); a pooled `emoteLayer` sits above `depth`
+  and below `paperGrain`; and a world-anchored `paperGrain` `TilingSprite`
+  (`multiply`, alpha `0.035`) gently unifies sprites, shadows, and paintings.
+  Door fades use cubic smoothstep easing (`fadeAlpha`) paired with a subtle
+  viewport-centered page-turn zoom (`transitionZoom` in `src/render/fade.ts`:
+  `1.00 -> 1.022` on `"out"`, `0.972 -> 1.00` on `"in"`, strictly clipped inside
+  `viewportMask` and `1` outside transitions or in `harness`) and a whisper-soft
+  paper-rustle noise tail in the `"door"` sound recipe (`src/platform/audio.ts`).
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -383,17 +389,30 @@ ios/            Capacitor iOS project (from Milestone 4).
   in `state.motion.distance` (sliding along a wall counts only the slide), and
   one full cycle spans `walkCycleUnits` (126). Idle shows when a tick's
   displacement is below epsilon.
-- Procedural living motion (`src/render/motion.ts`, Milestone 73, non-harness
-  areas): pure deterministic pose offsets from `(state, tick)` apply subtle
-  stride-synced vertical bounce and elastic squash-stretch (`walkPose`, with
-  parabolic airborne bounds for `acorn-squirrel` side walks), gentle
+- Procedural living motion (`src/render/motion.ts`, Milestones 73 & 84,
+  non-harness areas): pure deterministic pose offsets from `(state, tick)` apply
+  subtle stride-synced vertical bounce and elastic squash-stretch (`walkPose`,
+  with parabolic airborne bounds for `acorn-squirrel` side walks), gentle
   feet-anchored idle breathing (`idleBreathing`, skipping `bus-stop`), 8-tick
-  landing squash-pop when sitters settle (`sitSquash`), continuous hover bob
-  and banking tilt on `fairy-*` NPCs (`fairyHover`, with grounded altitude-scaled
-  shadows), and playful startle jumps, snappy hops, and forward lean on roaming
-  critters (`roamerHop`). In live play (advancing 1..5 ticks per render in the
-  same non-harness area), each Fae half-stride spawns two surface-tinted gouache
-  `puff` particles (`surfaceAt` in `footstepLayer`) behind her feet.
+  landing squash-pop when sitters settle (`sitSquash`), distinct companion idle
+  personality poses after 180 ticks of stillness (`companionIdlePose`: Maddie's
+  cozy loaf nap breathing, Pond Pup's happy mini-hop & tail wag, Acorn
+  Squirrel's double-perk hop, Ribbon Bunny's gentle ear-bounce hop, and
+  standing friends' relaxed weight-shift sway; falling back to `idleBreathing`
+  below 180 ticks), continuous hover bob and banking tilt on `fairy-*` NPCs
+  (`fairyHover`, with grounded altitude-scaled shadows), and playful startle
+  jumps, snappy hops, and forward lean on roaming critters (`roamerHop`). In
+  live play (advancing 1..5 ticks per render in the same non-harness area), each
+  Fae half-stride spawns two surface-tinted gouache `puff` particles
+  (`surfaceAt` in `footstepLayer`) behind her feet.
+- Hand-painted overworld emote bubbles (`src/render/emotes.ts`, Milestone 85,
+  render-only, skipped on `harness`, dialogue, battles, and arcades): pure
+  deterministic `evaluateOverworldEmotes` drives a pooled `emoteLayer` with
+  `emoteQuestion` / `emoteExclaim` over noticing/chasing chaos roamers,
+  contented drifting `emoteNote` (`♪`) on a 90-tick loop over calmed critters
+  within 185 units of Fae, sleepy `emoteZzz` on a 100-tick loop over napping
+  Maddie (`stillTicks >= 240`), and a rising warm `emoteHeart` for 38 ticks
+  after finishing a chat with an NPC or calm critter.
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one PNG atlas plus JSON frame data per character (Pixi
@@ -523,6 +542,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   player at the named spawn facing the given direction, and fades in. The
   target's art is prefetched as the fade-out begins and its tiles and prop
   atlases load concurrently, so the fade covers the load.
+- Storybook area arrival banner (`src/ui/area-banner.ts`, `area-banner.css`,
+  Milestone 85, render/UI-only): on genuine area arrivals (never on initial
+  boot, fixture resets, QA loads, or `harness`), once the door transition
+  finishes, a die-cut parchment ribbon (`z-index: var(--z-hud)`,
+  `pointer-events: none`, high-contrast `#47321f`/`#543d2a` on `#f7f2e3`,
+  botanical leaf/star sprigs, `max-width: min(340px, calc(100vw - 220px))` to
+  clear touch buttons on 874x402 phones, shifting down cleanly below `.qa-badge`
+  when a QA pack is active, reduced-motion guarded) glides in over 150 ticks
+  (~2.5 s) showing the area's display title (`areaBannerInfo`) and its land
+  region eyebrow (omitted when the land name matches the area name). It hides
+  immediately on dialogue, battles, arcade close-ups, journal, title/QA
+  overlays, finale, or another transition.
 - Area triggers use `{ id, polygon, target: { area, spawn } }`. A trigger fires
   only when the player centre crosses from outside to inside. During the
   `doorFadeTicks` (18 ticks) fade-out and fade-in phases, input is ignored and

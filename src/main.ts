@@ -86,6 +86,7 @@ import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAudio } from "./platform/audio";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
+import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
 import { createHudHints } from "./ui/hud-hints";
 import { qaFlow } from "./shell/qa-flow";
 import type { PackState } from "./dev/qa";
@@ -167,6 +168,16 @@ async function boot(): Promise<void> {
   };
   const gameSettings = createGameSettings(invalidate);
   const hudHints = createHudHints(uiRoot);
+  const areaBanner = createAreaBanner(uiRoot);
+  const bannerDuration = 150;
+  let bannerArea: string | null = null;
+  let bannerStartTick = -1;
+  let bannerPendingFade = false;
+  const clearAreaBanner = (): void => {
+    bannerArea = null;
+    bannerStartTick = -1;
+    bannerPendingFade = false;
+  };
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(() => {
     sound.toggle();
@@ -254,6 +265,7 @@ async function boot(): Promise<void> {
     if (result.action === "new-game") {
       state = createState(content.world, initialFixture);
       previousState = state;
+      clearAreaBanner();
       void Preferences.remove({ key: saveKey });
       saveLast = null;
     }
@@ -296,6 +308,7 @@ async function boot(): Promise<void> {
         content.world.levels.critters[kind.id]?.xp ?? 0])), content.world.levels.thresholds);
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
     state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
+    clearAreaBanner();
     titleMode = null;
     qaJustPicked = true;
     swallowed.add("confirm");
@@ -321,6 +334,7 @@ async function boot(): Promise<void> {
       if (outcome.kind === "applied") {
         state = outcome.state;
         previousState = state;
+        clearAreaBanner();
       }
       return outcome;
     },
@@ -772,6 +786,35 @@ async function boot(): Promise<void> {
       hasFlute,
       muted: sound.muted(),
     });
+    if (bannerStartTick >= 0 && state.tick < bannerStartTick) clearAreaBanner();
+    const bannerInfo = bannerArea !== null && bannerArea === state.area && !bannerPendingFade
+      ? areaBannerInfo(content.world, state.area)
+      : null;
+    const bannerElapsed = bannerStartTick >= 0 ? state.tick - bannerStartTick : -1;
+    if (bannerElapsed >= bannerDuration) clearAreaBanner();
+    const showBanner =
+      bannerInfo !== null &&
+      bannerElapsed >= 0 &&
+      bannerElapsed < bannerDuration &&
+      state.area !== "harness" &&
+      state.dialogue === null &&
+      state.battle === null &&
+      state.arcade === null &&
+      !state.journalOpen &&
+      titleMode === null &&
+      !qaMenuOpen &&
+      !qaConsoleOpen &&
+      !qaBlocked &&
+      state.finale === null &&
+      state.transition === null &&
+      levelUpNotices.length === 0;
+    areaBanner.render({
+      visible: showBanner,
+      title: bannerInfo?.title ?? "",
+      region: bannerInfo?.region ?? null,
+      progress: showBanner ? (bannerElapsed + 1) / (bannerDuration + 1) : 0,
+      qaOffset: qaActivePack !== null,
+    });
     title.render({
       visible: titleMode !== null && !qaMenuOpen,
       mode: titleMode ?? "fresh",
@@ -1165,6 +1208,7 @@ async function boot(): Promise<void> {
           throw new Error("the credits closed with no dream to go back to");
         state = endingSnapshot;
         previousState = state;
+        clearAreaBanner();
         titleMode = "continue";
         titleSelected = "continue";
         return;
@@ -1178,6 +1222,23 @@ async function boot(): Promise<void> {
     });
     state = stepped.state;
     previousState = state.area === previous.area ? previous : state;
+    if (previous.area !== state.area) {
+      if (areaBannerInfo(content.world, state.area) !== null) {
+        bannerArea = state.area;
+        bannerStartTick = state.tick;
+        bannerPendingFade = state.transition !== null;
+      } else {
+        clearAreaBanner();
+      }
+    } else if (
+      previous.transition !== null &&
+      state.transition === null &&
+      bannerPendingFade &&
+      bannerArea === state.area
+    ) {
+      bannerStartTick = state.tick;
+      bannerPendingFade = false;
+    }
     // A door's fade-out knows where it's going: warm that area's art while the
     // fade still covers the screen, so the arrival isn't a white wait on the
     // load (spec 4, transitions). The warm-up belongs to the real-time loop:
@@ -1381,6 +1442,7 @@ async function boot(): Promise<void> {
         suppressSave = true;
         state = createState(content.world, fixture, options.seed);
         previousState = state;
+        clearAreaBanner();
         suppressSave = false;
         prefetchedTarget = undefined;
         await Promise.all([ensureArea(), warmOwnedJournalMedia(state)]);

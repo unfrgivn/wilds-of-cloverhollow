@@ -3903,7 +3903,6 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e`
   (990 passed, 2 skipped in 3.7 min).
 
-<<<<<<< HEAD
 ## Milestone 80: Collectible Star Gems & 3rd Flute Friend (Ribbon Bunny) **Status:** ✅ Completed (2026-11-26)
 - Third flute friend, **Ribbon Bunny** (`content/party/ribbon-bunny.json`,
   `joins: "bunny_with_me"`, `befriended: "bunny_friend"`, `critter: "bunny"`,
@@ -3984,7 +3983,6 @@ the old trail, the owl, and the clubhouse claim.
   replay hash changes, 23 QA packs, purity, lint), `just build` (production
   and harness hook checks), and full e2e verified across Chromium & WebKit.
 
-<<<<<<< HEAD
 ## Milestone 82: Peekaboo Check, Starry Owl & Chef Mateo (Taco Truck Talk Mini-Boss) **Status:** ✅ Completed (2026-11-26)
 - Seventh and final battle check kind from `docs/battle-ideas.md`: **Peekaboo**
   (`kind: "peekaboo"` in `src/core/types.ts`, `src/core/checks.ts`,
@@ -4098,6 +4096,44 @@ the old trail, the owl, and the clubhouse claim.
   QA console and Milestone 68 baseline composite visual audit via `vision`.
 - Gates: `just check`, `just build`, and targeted e2e verified cleanly on top
   of Milestone 83.
+
+## Milestone 85: Living World Immersion — Storybook Area Banners, Overworld Emote Bubbles, Companion Idle Charm & Page-Turn Transitions **Status:** ✅ Completed (2026-11-26)
+- Pure render/UI/audio immersion upgrade with zero changes to `src/core` or any
+  of the 64 recorded simulation hashes:
+  - Storybook area arrival banner (`src/ui/area-banner.ts`,
+    `src/ui/area-banner.css`, `src/main.ts`): die-cut parchment ribbon with
+    botanical leaf/star sprigs, pure `areaBannerInfo` (suppressing duplicate
+    land eyebrows and `harness`) and `areaBannerEnvelope`, gliding in over 150
+    ticks on genuine area arrivals after door fades settle, offsetting cleanly
+    below `.qa-badge` when QA packs are active, clearing touch buttons on
+    874x402 phones, and hiding immediately on dialogue/battle/arcade/journal/
+    title/finale/transitions.
+  - Hand-painted overworld emote bubbles (`src/render/vfx-textures.ts`,
+    `src/render/emotes.ts`, `src/render/view.ts`): five 48x48 comic bubble
+    textures (`emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`,
+    `emoteHeart`) driven by pure deterministic `evaluateOverworldEmotes` on a
+    pooled `emoteLayer` above `depth` and below `paperGrain`, covering noticing/
+    chasing chaos roamers, contented calmed critters within 185 units, napping
+    Maddie (`stillTicks >= 240`), and 38-tick post-dialogue warmth hearts.
+  - Companion idle personality charm (`src/render/motion.ts`,
+    `src/render/view.ts`): pure `companionIdlePose` preserving standard
+    `idleBreathing` below 180 ticks and layering distinct long-idle poses at
+    `>= 180` ticks for Maddie (cozy loaf breathing), Pond Pup (happy mini-hop
+    & tail wag), Acorn Squirrel (double-perk hop), Ribbon Bunny (ear-bounce
+    hop), and standing friends (relaxed weight-shift sway).
+  - Storybook page-turn door transitions (`src/render/fade.ts`,
+    `src/render/view.ts`, `src/platform/audio.ts`): pure `transitionZoom`
+    (`1.00 -> 1.022` on `"out"`, `0.972 -> 1.00` on `"in"`, viewport-centered
+    and clipped inside `viewportMask`) paired with a soft paper-page rustle
+    tail in the `"door"` sound recipe.
+- Evidence: `tests/unit/milestone-85.test.ts` (11 tests) and
+  `tests/e2e/immersion.spec.ts` (`@smoke` on Chromium & WebKit); reviewed
+  captures in `art/review/m85-kitchen-banner.jpg`, `m85-cavern-emote.jpg`, and
+  `m85-plaza-emote.jpg` verified with `vision`.
+- Gates: `just check` (143 unit files / 1,149 tests, all 64 sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4241 just e2e`
+  (1,008 passed, 2 skipped in 4.1 min).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

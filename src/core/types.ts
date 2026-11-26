@@ -13,6 +13,7 @@ export type ActionFrame = {
   menu: boolean;
   lantern?: boolean;
   flute?: boolean;
+  lasso?: boolean;
   choose?: number;
   pointer?: { x: number; y: number };
 };
@@ -457,6 +458,16 @@ export type BattleContent = {
     bunnyTogether: number;
     lines: Record<FluteAssistKind, string>;
   };
+  // Coach Ash's rainbow lasso in battle (spec 8): once per battle, pops an
+  // active wind-up bubble or snags coins and steadies the next burst.
+  lassoAssist: {
+    calm: number;
+    coins: number;
+    lines: {
+      windUp: string;
+      snag: string;
+    };
+  };
 };
 export type FluteAssistKind =
   | "pup"
@@ -777,6 +788,8 @@ export type Battle = {
   sparkle?: number;
   fluteUsed?: boolean;
   burstSoften?: number;
+  lassoUsed?: boolean;
+  lassoSteady?: boolean;
   treatMenu?: boolean;
   treatSelected?: number;
 };
@@ -901,6 +914,8 @@ export type BattleView = {
   sparkle: { count: number; max: number; ready: boolean } | null;
   fluteAssist: { available: boolean; label: string; kind: FluteAssistKind } | null;
   burstSoften: number;
+  lassoAssist: { available: boolean; windUp: boolean } | null;
+  lassoSteady: boolean;
   treatTray: TreatTrayView | null;
 };
 // `party` overrides who starts in the party (test fixtures); the default is

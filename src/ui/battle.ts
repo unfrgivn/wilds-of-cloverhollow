@@ -45,6 +45,8 @@ export type BattleHudView = {
   sparkle: { count: number; max: number; ready: boolean } | null;
   fluteAssist: { available: boolean; label: string; kind: FluteAssistKind } | null;
   burstSoften: number;
+  lassoAssist: { available: boolean; windUp: boolean } | null;
+  lassoSteady: boolean;
 };
 
 export type BattleCommand = {
@@ -853,6 +855,28 @@ function softenSparkleIcon(): SVGSVGElement {
   return svg;
 }
 
+function lassoIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-lasso-icon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const loop = svgElement("ellipse", "battle-lasso-loop");
+  loop.setAttribute("cx", "12.5");
+  loop.setAttribute("cy", "8.5");
+  loop.setAttribute("rx", "7.5");
+  loop.setAttribute("ry", "4.5");
+  loop.setAttribute("transform", "rotate(-16 12.5 8.5)");
+  const tail = svgElement("path", "battle-lasso-tail");
+  tail.setAttribute("d", "M8 12.5 C7 16 10 18.5 14 19.5 C16.5 20 19 19 20 17");
+  const star = svgElement("path", "battle-lasso-star");
+  star.setAttribute(
+    "d",
+    "M8.2 10.6 L9.3 12.6 L11.5 13 L9.9 14.5 L10.3 16.7 L8.2 15.6 " +
+      "L6.1 16.7 L6.5 14.5 L4.9 13 L7.1 12.6 Z",
+  );
+  svg.append(loop, tail, star);
+  return svg;
+}
+
 function calmHeartIcon(): SVGSVGElement {
   const svg = svgElement("svg", "battle-calm-heart");
   svg.setAttribute("viewBox", "0 0 20 20");
@@ -960,9 +984,11 @@ export function createBattleHud(root: HTMLElement): {
   render: (view: BattleHudView) => void;
   onTogether: (callback: () => void) => void;
   onFlute: (callback: () => void) => void;
+  onLasso: (callback: () => void) => void;
 } {
   let togetherHandler: () => void = () => undefined;
   let fluteHandler: () => void = () => undefined;
+  let lassoHandler: () => void = () => undefined;
   const hud = element("div", "battle-hud");
   const energy = element("section", "battle-meter battle-energy");
   const energyLabel = element("span", "battle-meter-label");
@@ -1002,7 +1028,22 @@ export function createBattleHud(root: HTMLElement): {
   const softenLabel = element("span", "battle-action-label");
   softenLabel.textContent = "Softened";
   softenPill.append(softenSparkleIcon(), softenLabel);
-  actionsLeft.append(sparklePill, togetherBtn, fluteBtn, softenPill);
+  const lassoBtn = element("button", "battle-lasso-btn");
+  lassoBtn.type = "button";
+  lassoBtn.hidden = true;
+  const lassoLabel = element("span", "battle-action-label");
+  const lassoKey = element("span", "battle-action-key");
+  lassoKey.setAttribute("aria-hidden", "true");
+  lassoKey.textContent = "R";
+  lassoBtn.append(lassoIcon(), lassoLabel, lassoKey);
+  lassoBtn.addEventListener("click", () => lassoHandler());
+  const steadyPill = element("div", "battle-steady-pill");
+  steadyPill.setAttribute("role", "status");
+  steadyPill.hidden = true;
+  const steadyLabel = element("span", "battle-action-label");
+  steadyLabel.textContent = "✦ Steady";
+  steadyPill.append(steadyLabel);
+  actionsLeft.append(sparklePill, togetherBtn, lassoBtn, fluteBtn, softenPill, steadyPill);
   const calm = element("section", "battle-meter battle-calm");
   const calmLabel = element("span", "battle-meter-label");
   const calmRow = element("div", "battle-calm-row");
@@ -1024,6 +1065,9 @@ export function createBattleHud(root: HTMLElement): {
     },
     onFlute: (callback) => {
       fluteHandler = callback;
+    },
+    onLasso: (callback) => {
+      lassoHandler = callback;
     },
     render: (view) => {
       hud.hidden = !view.visible;
@@ -1070,7 +1114,21 @@ export function createBattleHud(root: HTMLElement): {
       }
       const showSoften = view.visible && view.burstSoften > 0;
       softenPill.hidden = !showSoften;
-      actionsLeft.hidden = !showSparkle && !showTogether && !showFlute && !showSoften;
+      const showLasso = view.visible && view.lassoAssist?.available === true;
+      lassoBtn.hidden = !showLasso;
+      if (view.lassoAssist !== null) {
+        const text = view.lassoAssist.windUp ? "Pop Bubble!" : "Lasso";
+        setText(lassoLabel, text);
+        setAttribute(
+          lassoBtn,
+          "aria-label",
+          view.lassoAssist.windUp ? "Lasso: Pop Bubble!" : "Lasso",
+        );
+      }
+      const showSteady = view.visible && view.lassoSteady;
+      steadyPill.hidden = !showSteady;
+      actionsLeft.hidden =
+        !showSparkle && !showTogether && !showFlute && !showSoften && !showLasso && !showSteady;
       setText(calmLabel, view.critterName.toUpperCase());
       setAttribute(track, "aria-label", `${view.critterName} calm`);
       const calmFraction = clamp01(view.calm);

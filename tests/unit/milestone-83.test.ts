@@ -66,6 +66,8 @@ function baseBattleView(battle: Battle, overrides: Partial<BattleView> = {}): Ba
     sparkle: null,
     fluteAssist: null,
     burstSoften: 0,
+    lassoAssist: null,
+    lassoSteady: false,
     treatTray: null,
     ...overrides,
   };

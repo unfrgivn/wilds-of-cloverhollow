@@ -102,5 +102,13 @@
       "squirrelBunny": "Fae plays her flute! Acorn Squirrel and Ribbon Bunny bound in with hazelnuts and ribbon sparkles!",
       "all": "Fae plays her flute! Pond Pup, Acorn Squirrel, and Ribbon Bunny bound in together in a cozy flurry!"
     }
+  },
+  "lassoAssist": {
+    "calm": 15,
+    "coins": 4,
+    "lines": {
+      "windUp": "Fae twirls her rainbow lasso and pops a fizzy wind-up bubble!",
+      "snag": "Fae twirls her rainbow lasso! Snagged +4 coins and steadied the next burst!"
+    }
   }
 }

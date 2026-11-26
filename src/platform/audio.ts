@@ -437,6 +437,27 @@ const recipes: Record<SoundCue, Recipe> = {
       vibrato: { rate: 5, depth: 2 },
     },
   ],
+  "lasso-twirl": [
+    { wave: "noise", offset: 0, duration: 0.08, gain: 0.018, lowpass: 1600 },
+    {
+      wave: "triangle",
+      frequency: 340,
+      endFrequency: 740,
+      offset: 0,
+      duration: 0.14,
+      gain: 0.085,
+    },
+    {
+      wave: "triangle",
+      frequency: 520,
+      endFrequency: 980,
+      offset: 0.09,
+      duration: 0.11,
+      gain: 0.075,
+    },
+    { wave: "sine", frequency: 1175, offset: 0.16, duration: 0.16, gain: 0.08 },
+    { wave: "sine", frequency: 1760, offset: 0.19, duration: 0.12, gain: 0.045 },
+  ],
 };
 
 function createReverbImpulse(audio: AudioContext): AudioBuffer {

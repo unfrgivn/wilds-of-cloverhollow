@@ -19,6 +19,27 @@ export type MusicTrack =
   | "morning"
   | "silent";
 
+export type JukeboxTrack = Exclude<MusicTrack, "silent">;
+
+export const jukeboxTracks: readonly JukeboxTrack[] = [
+  "title",
+  "home",
+  "cafe",
+  "school",
+  "bay",
+  "pass",
+  "cavern",
+  "woods",
+  "hills",
+  "arcade",
+  "enchanted",
+  "enchanted-calm",
+  "battle",
+  "boss",
+  "talk",
+  "morning",
+];
+
 export type AmbienceBed =
   | "none"
   | "town-breeze"

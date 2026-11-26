@@ -564,6 +564,8 @@ function renderGalleryState(): void {
       ? { available: true, label: "Flute Friends", kind: "both" }
       : null,
     burstSoften: 0,
+    lassoAssist: state === "battle-together" ? { available: true, windUp: false } : null,
+    lassoSteady: false,
   });
   // `?party=N` previews a bigger party's menu: N friend commands between
   // Soothe and Snack (two columns on phones, one from 1000 px).

@@ -13,8 +13,11 @@ import {
   type Point,
   type State,
   battleView,
+  jukeboxTracks,
   soundCues,
   soundtrackFor,
+  trackTitles,
+  type JukeboxTrack,
   arcadeView,
   carriedTreats,
   critterFieldNote,
@@ -205,8 +208,22 @@ async function boot(): Promise<void> {
     sound.setMusicLevel(level);
     invalidate();
   });
+  let jukeboxTrack: JukeboxTrack | null = null;
   journal.onToggleAmbience(() => {
     sound.toggleAmbience();
+    invalidate();
+  });
+  journal.onStepTrack((delta) => {
+    if (!state.journalOpen) return;
+    const baseTrack = jukeboxTrack ?? soundtrackFor(content.world, state, {
+      titleOpen: titleMode !== null || qaMenuOpen,
+    }).track;
+    const currentIndex = baseTrack === "silent" ? -1 : jukeboxTracks.indexOf(baseTrack);
+    const startIndex = currentIndex >= 0 ? currentIndex : delta > 0 ? -1 : 0;
+    const nextIndex = (startIndex + delta + jukeboxTracks.length) % jukeboxTracks.length;
+    const nextTrack = jukeboxTracks[nextIndex];
+    if (nextTrack === undefined) return;
+    jukeboxTrack = nextTrack;
     invalidate();
   });
   journal.onToggleGentleTiming(() => {
@@ -233,6 +250,7 @@ async function boot(): Promise<void> {
   commandMenu.onChoose((index) => touch.tapChoice(index));
   battleHud.onTogether(() => touch.tapButton("cancel"));
   battleHud.onFlute(() => touch.tapButton("flute"));
+  battleHud.onLasso(() => touch.tapButton("lasso"));
   journal.onClose(() => touch.tapButton("cancel"));
   const view = new GameView(content.world, {
     debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
@@ -276,6 +294,7 @@ async function boot(): Promise<void> {
       state = createState(content.world, initialFixture);
       previousState = state;
       clearAreaBanner();
+      jukeboxTrack = null;
       void Preferences.remove({ key: saveKey });
       saveLast = null;
     }
@@ -737,9 +756,18 @@ async function boot(): Promise<void> {
   };
   let wasJournalOpen = false;
   const render = (alpha = 1): void => {
-    const soundtrack = soundtrackFor(content.world, state, {
+    if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
+    const baseSoundtrack = soundtrackFor(content.world, state, {
       titleOpen: titleMode !== null || qaMenuOpen,
     });
+    const soundtrack = jukeboxTrack !== null
+      ? {
+          ...baseSoundtrack,
+          track: jukeboxTrack,
+          duck: false,
+          title: trackTitles[jukeboxTrack],
+        }
+      : baseSoundtrack;
     sound.setSoundtrack(soundtrack);
     if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
       const musicKey = `${soundtrack.track}|${soundtrack.ambience}|${soundtrack.duck}`;
@@ -895,6 +923,8 @@ async function boot(): Promise<void> {
       sparkle: hideActions ? null : (battle?.sparkle ?? null),
       fluteAssist: hideActions ? null : (battle?.fluteAssist ?? null),
       burstSoften: hideActions ? 0 : (battle?.burstSoften ?? 0),
+      lassoAssist: hideActions ? null : (battle?.lassoAssist ?? null),
+      lassoSteady: hideActions ? false : (battle?.lassoSteady ?? false),
     });
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
@@ -1093,7 +1123,9 @@ async function boot(): Promise<void> {
           : null;
       const battleText = battle?.message ?? "";
       const commandSubtitle =
-        activeCmd !== null && !battleText.startsWith("Fae plays her flute!")
+        activeCmd !== null &&
+        !battleText.startsWith("Fae plays her flute!") &&
+        !battleText.startsWith("Fae twirls her rainbow lasso")
           ? battleCommandPreview(
               activeCmd,
               battle?.critterName ?? "the critter",
@@ -1469,6 +1501,7 @@ async function boot(): Promise<void> {
         prefetchedTarget = undefined;
         await Promise.all([ensureArea(), warmOwnedJournalMedia(state)]);
         titleMode = null;
+        jukeboxTrack = null;
         qaMenuOpen = false;
         qaActivePack = null;
         qaJustPicked = false;

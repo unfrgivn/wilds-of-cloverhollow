@@ -40,7 +40,7 @@ const battleParts: Record<string, string[]> = {
   "battle-feelings-heart": [".battle-hud", ".battle-feeling", ".battle-feeling-heart"],
   "battle-windup": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-windup"],
   "battle-together": [".battle-hud", ".battle-commands", ".sticker-dialogue", ".battle-feeling",
-    ".battle-actions-left", ".battle-together-btn", ".battle-flute-btn"],
+    ".battle-actions-left", ".battle-together-btn", ".battle-flute-btn", ".battle-lasso-btn"],
   "battle-talk": [".sticker-dialogue"],
   "battle-talk-reply": [".battle-hud", ".sticker-dialogue"],
   "battle-reward": [".battle-reward", ".sticker-dialogue"],
@@ -67,7 +67,7 @@ const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".bat
   ".battle-check-hint", ".battle-grade",
   ".touch-reach", ".touch-lean", ".touch-comet",
   ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
-  ".battle-actions-left", ".battle-together-btn", ".battle-flute-btn",
+  ".battle-actions-left", ".battle-together-btn", ".battle-flute-btn", ".battle-lasso-btn",
   ".battle-reward", ".journal-book", ".sticker-dialogue", ".sticker-prompt", ".touch-stick",
   ".touch-confirm", ".touch-cancel", ".touch-menu"];
 const touchButtonsShown = [".touch-confirm", ".touch-cancel", ".touch-menu"];
@@ -219,10 +219,12 @@ function measureContrast(): Contrast[] {
     ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
     ".battle-peekaboo-status, .battle-echo-phase, .battle-echo-name, .battle-echo-arrow, " +
     ".battle-together-btn .battle-action-label, .battle-flute-btn .battle-action-label, " +
-    ".battle-soften-pill .battle-action-label, .battle-action-key, " +
+    ".battle-lasso-btn .battle-action-label, .battle-soften-pill .battle-action-label, " +
+    ".battle-steady-pill .battle-action-label, .battle-action-key, " +
     ".battle-reward-name, .journal-label, .journal-tab, " +
     ".journal-heading, .journal-supply, .journal-tickets, .journal-note, .journal-empty, " +
     ".journal-name, .journal-unknown, .journal-close, .journal-now-playing, " +
+    ".journal-jukebox-prev, .journal-jukebox-next, " +
     ".journal-opt-label, .journal-opt-sub, .journal-opt-toggle, .journal-opt-slider, " +
     ".journal-controls-title, .journal-controls-line";
   return [...document.querySelectorAll(selectors)]
@@ -938,10 +940,11 @@ test.describe("sticker gallery", () => {
             const soundRect = soundPage?.getBoundingClientRect();
             const playRect = playPage?.getBoundingClientRect();
             const controls = [...document.querySelectorAll(
-              ".journal-opt-toggle, .journal-opt-slider",
+              ".journal-opt-toggle, .journal-opt-slider, " +
+                ".journal-jukebox-prev, .journal-jukebox-next",
             )].map((element) => element.getBoundingClientRect());
             const soundItems = [...document.querySelectorAll(
-              ".journal-options-sound-page .journal-now-playing, " +
+              ".journal-options-sound-page .journal-jukebox, " +
                 ".journal-options-sound-page .journal-opt-row",
             )].map((element) => element.getBoundingClientRect());
             const playItems = [...document.querySelectorAll(
@@ -958,7 +961,7 @@ test.describe("sticker gallery", () => {
               headingControlsInside:
                 soundItems.every((item) => within(item, soundRect)) &&
                 playItems.every((item) => within(item, playRect)) &&
-                controls.length === 7 &&
+                controls.length === 9 &&
                 controls.every((item) => item.width >= 44 && item.height >= 44) &&
                 allItems.every((item) => !intersects(item, close) &&
                   tabs.every((tab) => !intersects(item, tab))) &&
@@ -1151,7 +1154,7 @@ test.describe("sticker gallery", () => {
           const commandRects = commands.map((item) => item.getBoundingClientRect());
           const hudRects = hud.map((item) => item.getBoundingClientRect());
           const actionButtons = [...document.querySelectorAll<HTMLElement>(
-            ".battle-together-btn, .battle-flute-btn",
+            ".battle-together-btn, .battle-flute-btn, .battle-lasso-btn",
           )].filter((item) => item.getBoundingClientRect().width > 0);
           const actionRects = actionButtons.map((item) => item.getBoundingClientRect());
           const feeling = document.querySelector<HTMLElement>(".battle-feeling");
@@ -1291,7 +1294,7 @@ test.describe("sticker gallery", () => {
         .filter((item) => item.getClientRects().length > 0)
         .map((item) => item.getBoundingClientRect());
       const actionRects = [...document.querySelectorAll<HTMLElement>(
-        ".battle-together-btn, .battle-flute-btn",
+        ".battle-together-btn, .battle-flute-btn, .battle-lasso-btn",
       )].map((item) => item.getBoundingClientRect());
       const commandRects = [...document.querySelectorAll<HTMLElement>(".battle-command")]
         .map((item) => item.getBoundingClientRect());
@@ -1314,7 +1317,7 @@ test.describe("sticker gallery", () => {
           (dialogueRect === null || !intersects(rect, dialogueRect))),
       };
     });
-    expect(facts).toEqual({ count: 2, inside: true, touchSized: true, clear: true });
+    expect(facts).toEqual({ count: 3, inside: true, touchSized: true, clear: true });
   });
 
   for (const [state, shown] of Object.entries(battleParts)) {

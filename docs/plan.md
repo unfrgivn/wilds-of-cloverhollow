@@ -4135,6 +4135,64 @@ the old trail, the owl, and the clubhouse claim.
   and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4241 just e2e`
   (1,008 passed, 2 skipped in 4.1 min).
 
+## Milestone 86: Musical Echo Chimes Battle Check (Bouncy Lamb) **Status:** ✅ Completed (2026-11-26)
+- Pure core `"echo"` battle check (`src/core/types.ts`, `src/core/checks.ts`,
+  `src/core/sim.ts`, `src/core/sound.ts`, `src/content/load.ts`): seeded PRNG
+  draws 3 notes (4 when big) across 4 directional chimes (`0` Up/Red, `1`
+  Right/Yellow, `2` Down/Green, `3` Left/Blue). Demo phase plays each note with
+  real wooden xylophone bar cues (`chime-red`, `chime-yellow`, `chime-green`,
+  `chime-blue`) while ignoring input; playback phase reads fresh directional
+  edges (`echoNoteFromEdge`) or direct touch taps on the four chime stickers,
+  re-emitting each chime cue and grading `great` / `good` / `miss`. Supports
+  Gentle Timing (`demoTicks + 4`, `inputTicks + 36`) and strict loader checks.
+- Bouncy Lamb (`content/critters/lamb.json`) adopts Echo Chimes with collar-bell
+  burst lines; `content/battle.json` adds `hints.echo`. Zero golden-path replay
+  hash regressions and zero changes to Milestone 82's `peekaboo` check.
+- Right-stage Echo Chime Board UI & choreography (`src/render/view.ts`,
+  `src/render/battle-choreography.ts`, `src/ui/battle.ts`, `src/ui/battle.css`,
+  `src/main.ts`, `src/dev/ui-gallery.ts`): handcrafted cream die-cut board on
+  the open right stage (leaving Fae, Maddie, and Bouncy Lamb completely
+  unobstructed at phone and desktop sizes) with note progress dots,
+  `LISTEN...` / `YOUR TURN!` pill, remaining timer bar, 4 pastel directional
+  chime stickers (`>= 44 px`, `7.99:1` to `13.51:1` contrast) with double-ring
+  golden glow, and live demo/echo hop choreography.
+- Evidence: `tests/unit/echo-chimes.test.ts`, real-input
+  `tests/e2e/echo-chimes.spec.ts` (`@smoke` Chromium + WebKit + phone touch
+  sticker taps), `battle-echo` gallery baselines + multi-viewport checks, and
+  reviewed JPEGs `art/review/m85-echo-battle-{1280,874}.jpg` verified with
+  `vision`.
+
+## Milestone 87: Rainbow Lasso in Battle & Journal Music Box Jukebox **Status:** ✅ Completed (2026-11-26)
+- Completed Fae's three-tool combat trio alongside Blacklight Lantern (`L`) and
+  Painted Flute (`F`):
+  - Optional `lasso?: boolean` on `ActionFrame` (`KeyR`, gamepad `LB/L1` button
+    4, or tapping `.battle-lasso-btn`), omitted when false so `blankInput()`,
+    saves, and all 64 recorded hashes stay unchanged.
+  - Data-driven `lassoAssist` (`content/battle.json`, validated in
+    `src/content/load.ts`): usable once per battle during `command` phase
+    outside Talk mode once `has_lasso === true`. Pops an unpopped mini-boss
+    wind-up bubble + adds `+15` calm, or performs a Steady Snag (`+15` calm,
+    `+4` bonus coins, and `lassoSteady` preventing the next burst from upgrading
+    to big without altering PRNG draws), emitting `"lasso-twirl"` and `"coin"`.
+  - `.battle-lasso-btn` (`Lasso` / `Pop Bubble!`, `[R]` badge hidden on touch,
+    `10.42:1` contrast) and `.battle-steady-pill` (`✦ Steady`) sit cleanly in
+    `.battle-actions-left` under `ENERGY`, stepping aside during active checks.
+- Interactive Journal Music Box Jukebox (`src/core/music.ts`,
+  `src/ui/journal.ts`, `src/ui/journal.css`, `src/main.ts`): exported
+  `jukeboxTracks` (all 16 non-silent themes) and added 44x44 px `‹` / `›`
+  jukebox controls flanking `♫ <track title>` on the Journal `OPTIONS` page,
+  letting players preview any composed theme unducked and returning smoothly to
+  the live area theme on journal close.
+- Evidence: `tests/unit/lasso-jukebox.test.ts`, real-input
+  `tests/e2e/lasso-jukebox.spec.ts` (`@smoke` Chromium + WebKit), and reviewed
+  JPEGs `art/review/lasso-battle-{1280,874}.jpg` and
+  `art/review/jukebox-options-{1280,874}.jpg` verified with `vision`.
+- Gates (combined Milestones 86 and 87 on top of Milestone 85): `just check`
+  (145 unit files / 1,163 tests, all 64 sims with zero replay hash changes, 23
+  QA packs, purity, lint), `just build` (production and harness hook checks),
+  and full `CLOVERHOLLOW_E2E_PORT=4224 just e2e` (1,029 passed, 2 skipped
+  across Chromium & WebKit after refreshing the 2 post-lasso battle baselines).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

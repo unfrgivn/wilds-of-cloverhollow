@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 85)
+Last updated: 2026-11-26 (Milestone 87)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -123,8 +123,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
   -1..1) plus booleans `confirm`, `cancel`, and `menu`, and optional
-  `lantern` and `flute`, each present only while pressed (like a touch
-  `choose`): a blank
+  `lantern`, `flute`, and `lasso`, each present only while pressed (like a
+  touch `choose`): a blank
   frame, a recorded one, and a real key's frame then have the same shape, so a
   save's last input matches a new game's (section 10), and older recordings
   and their hashes stand. A trace check may additionally carry
@@ -138,7 +138,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   that tick, even if it was already released.
 - Keyboard: arrows or WASD move; Z, Space, or Enter confirm; X or Escape
   cancel; J opens the journal (`menu`); L switches the blacklight lantern on or
-  off (`lantern`); F plays the flute (`flute`, Milestone 47). Game keys never
+  off (`lantern`); F plays the flute (`flute`, Milestone 47); R twirls Coach
+  Ash's rainbow lasso in battle (`lasso`). Game keys never
   respond while a text field has focus: the QA console's input owns the
   keyboard then (section 11), so typing a command never moves Fae or submits
   the dialogue. On touch, a
@@ -151,7 +152,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   3.2.1) map to the same frame. The left stick uses a radial 25% dead zone,
   rescaled so its remaining range is 0..1; d-pad directions (standard buttons
   12..15) override the stick. A/Cross confirms, B/Circle cancels, Y/Triangle
-  or Start opens the journal, X/Square toggles the lantern, and the right
+  or Start opens the journal, X/Square toggles the lantern, the left shoulder
+  (LB/L1, standard button 4) twirls the lasso in battle, and the right
   shoulder (RB/R1, standard button 5) plays the flute. Only
   standard-mapping pads count; connected pads merge with button OR and first
   non-zero movement.
@@ -238,8 +240,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   for Boop-a-Mole, `comet-move`, `comet-star`, and `comet-bump` for Comet
   Cruise, and `cook-start`, `cook-frozen`, and `cook-ding` for the clubhouse
   microwave. Battle depth adds `battle-together` (a rising C-major-9th sparkle
-  arpeggio when Together! launches, replacing `battle-command`) and projects
-  `flute` when Flute Friends assist in battle.
+  arpeggio when Together! launches, replacing `battle-command`), projects
+  `flute` when Flute Friends assist in battle, and adds `lasso-twirl` (a rising
+  rope whoosh and wooden star ping) when Fae twirls Coach Ash's rainbow lasso
+  in battle.
 - Soundtrack projection (`src/core/music.ts`): closed track set `title`
   ("Watercolor Morning"), `home` ("Cloverhollow Town"), `cafe` ("Cinnamon
   Waltz"), `hills` ("Clover Meadow"), `school` ("Bell & Chalk"), `bay`
@@ -250,7 +254,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   Hood", for wind-up mini-bosses, Talk battles, or non-runnable battles),
   `talk` ("Listening Heart", once Talk opens or calm reaches `talkAt`),
   `morning` ("Waking Up", during the morning and credits finale), and `silent`
-  ("Quiet", for `harness`). Ambience beds (`none`, `town-breeze`, `ocean`,
+  ("Quiet", for `harness`). `jukeboxTracks` exports all 16 non-silent themes in
+  story/album order (`title`, `home`, `cafe`, `school`, `bay`, `pass`,
+  `cavern`, `woods`, `hills`, `arcade`, `enchanted`, `enchanted-calm`,
+  `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box
+  (shell-only override, never saved, plays unducked while the journal is open
+  and returns smoothly to the live area theme on close, title, or reset).
+  Ambience beds (`none`, `town-breeze`, `ocean`,
   `mountain-wind`, `hearth`, `forest`, `enchanted-shimmer`, `arcade-hum`,
   `cavern-drips`, `cafe-murmur`) match each outdoor area, the café, the lodge,
   the cavern, and the arcade, and pause in battles. Music ducks smoothly during
@@ -2059,6 +2069,26 @@ trunks keep its two exits.
     damage is reduced by `burstSoften` (clamped at 0) and `burstSoften` clears;
     a `great` 0-damage burst preserves `burstSoften` for the next damaging
     burst.
+- Coach Ash's Rainbow Lasso in battle (`lassoAssist` in `content/battle.json`,
+  validated by `parseBattleContent`: positive integers `calm` and `coins`, and
+  non-empty `lines.windUp` and `lines.snag`):
+  - Once per battle (`battle.lassoUsed`), in the `command` phase (after reveal)
+    outside Talk mode (`!talkMode`, `battle.talk === null`) when `has_lasso` is
+    true, a fresh `lasso` press (R, gamepad LB/L1, or clicking/tapping
+    `.battle-lasso-btn`) twirls the lasso without consuming Fae's turn and
+    emits `lasso-twirl`.
+  - If an active mini-boss wind-up has any unpopped bubble, the lasso pops the
+    first unpopped bubble, adds `lassoAssist.calm` (15, clamped to
+    `calmLimit(critter)`), and displays `lines.windUp`.
+  - Otherwise (Steady Snag), it adds `lassoAssist.calm` (15, clamped to
+    `calmLimit(critter)`), grants `lassoAssist.coins` (+4 coins), sets
+    `battle.lassoSteady = true`, and displays `lines.snag`. While `lassoSteady`
+    is set, the critter's next burst keeps its seeded `bigChance` PRNG draw
+    order untouched but cannot upgrade to `big`, clearing `lassoSteady` as that
+    burst starts.
+  - If calm reaches `calmMax`, the battle transitions straight to `soothed`
+    (clearing any wind-up); otherwise it stays in `command` so Fae still takes
+    her turn.
 - While a battle runs Fae is frozen, doors don't fire, menu is ignored (v0),
   cancel is ignored unless Together! is ready, and the party keeps settling.
   `safeSpot` is set at new game and on every area arrival.
@@ -2203,16 +2233,21 @@ trunks keep its two exits.
   beside the track that warms to soft coral-pink at `calm >= 0.75`, and subtle
   25% / 50% / 75% vertical milestone tick marks inside `.battle-calm-track`) at
   the top right, left of the menu button, inside the safe area. Directly under
-  ENERGY sits `.battle-actions-left` (a horizontal row from 1000 px wide, a
-  compact left column on phones, clear of ENERGY, thought clouds, wind-ups,
-  commands, dialogue, and touch controls): `.battle-sparkle-pill` (filled gold
-  and outlined stars while sparkle is 1..2), `.battle-together-btn` (sunny gold
+  ENERGY sits `.battle-actions-left` (a compact wrapping horizontal row on
+  phones and desktops, clear of ENERGY, thought clouds, wind-ups, commands,
+  dialogue, and touch controls): `.battle-sparkle-pill` (filled gold and
+  outlined stars while sparkle is 1..2), `.battle-together-btn` (sunny gold
   44 px sticker button with a reduced-motion-guarded diagonal sheen sweep and
   `X` key badge hidden on touch when sparkle is ready), `.battle-flute-btn`
-  (soft mint 44 px sticker button naming Pond Pup, Acorn Squirrel, or Flute
-  Friends with `F` key badge hidden on touch while available), and
+  (soft mint 44 px sticker button naming Pond Pup, Acorn Squirrel, Ribbon
+  Bunny, or Flute Friends with `F` key badge hidden on touch while available),
+  `.battle-lasso-btn` (warm peach-cream `#fdecd8` 44 px sticker button with an
+  inline SVG coiled-lasso-with-star icon, `"Lasso"` or `"Pop Bubble!"` during
+  an unpopped wind-up, and `R` key badge hidden on touch while available),
   `.battle-soften-pill` (`Softened` badge while Acorn Squirrel's burst soften
-  is active). Like the feelings cloud, `.battle-actions-left` steps aside
+  is active), and `.battle-steady-pill` (`✦ Steady` cream badge while
+  `lassoSteady` is active). Like the feelings cloud, `.battle-actions-left`
+  steps aside
   during active checks and burst results (`phase === "check"` or
   `"burstResult"`) so check overlays such as Lean's balance track stay
   completely clear on notched phones. The HUD hides during the reward.
@@ -2889,13 +2924,17 @@ trunks keep its two exits.
   compact footer strip displaying the active or clicked/hovered land's sticker
   progress alongside total Stickers, total Prizes, and the Bus legend.
 - The OPTIONS spread is a two-page open-book layout matching NOTES/STICKERS:
-  the left page (`SOUND & MUSIC`) shows the current track (`♫ <title>`) and
-  touch-sized (>= 44 px) controls for Sound Effects (on/off + volume slider),
-  Music (on/off + volume slider), and Ambience (on/off); the right page
-  (`GAMEPLAY`) shows touch-sized toggles for Gentle Timing and Key Hints
-  (`cloverhollow-settings`, defaulting to off) above a compact Controls
-  reference card (showing Lantern and Flute once unlocked). Both pages fit
-  without scrolling or overlap at 874x402, 1180x820, and 1280x720.
+  the left page (`SOUND & MUSIC`) shows the interactive Music Box pill
+  (`.journal-jukebox`: 44 px `‹` `.journal-jukebox-prev` and `›`
+  `.journal-jukebox-next` buttons flanking `.journal-now-playing`, `♫ <title>`,
+  cycling all 16 `jukeboxTracks` unducked while the journal is open and
+  returning to the live area theme when closed) and touch-sized (>= 44 px)
+  controls for Sound Effects (on/off + volume slider), Music (on/off + volume
+  slider), and Ambience (on/off); the right page (`GAMEPLAY`) shows touch-sized
+  toggles for Gentle Timing and Key Hints (`cloverhollow-settings`, defaulting
+  to off) above a compact Controls reference card (showing Lantern and Flute
+  once unlocked). Both pages fit without scrolling or overlap at 874x402,
+  1180x820, and 1280x720.
 - Optional desktop Key Hints ribbon (`src/ui/hud-hints.ts`): when Key Hints is
   enabled on non-touch desktop/gamepad setups, a cream die-cut ribbon anchored
   in the bottom-left safe area (`--z-hud`) shows keycap pills for Journal (`J`),

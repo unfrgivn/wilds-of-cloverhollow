@@ -1656,6 +1656,8 @@ export function parseBattleContent(
   );
   const fluteRaw = value.fluteAssist;
   field(record(fluteRaw) && record(fluteRaw.lines), file, "fluteAssist");
+  const lassoRaw = value.lassoAssist;
+  field(record(lassoRaw) && record(lassoRaw.lines), file, "lassoAssist");
   return {
     toyAtlas,
     hints: {
@@ -1710,6 +1712,14 @@ export function parseBattleContent(
         pupBunny: nonEmpty(fluteRaw.lines.pupBunny, "fluteAssist.lines.pupBunny"),
         squirrelBunny: nonEmpty(fluteRaw.lines.squirrelBunny, "fluteAssist.lines.squirrelBunny"),
         all: nonEmpty(fluteRaw.lines.all, "fluteAssist.lines.all"),
+      },
+    },
+    lassoAssist: {
+      calm: integerIn(lassoRaw, "calm", 1, file, "lassoAssist.calm"),
+      coins: integerIn(lassoRaw, "coins", 1, file, "lassoAssist.coins"),
+      lines: {
+        windUp: nonEmpty(lassoRaw.lines.windUp, "lassoAssist.lines.windUp"),
+        snag: nonEmpty(lassoRaw.lines.snag, "lassoAssist.lines.snag"),
       },
     },
   };

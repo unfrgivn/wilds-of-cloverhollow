@@ -17,7 +17,8 @@ export type SoundCue =
   | "comet-move" | "comet-star" | "comet-bump"
   | "cook-start" | "cook-frozen" | "cook-ding"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
-  | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue";
+  | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue"
+  | "lasso-twirl";
 
 export type StorySound = "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
   | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue";
@@ -118,6 +119,8 @@ export function soundCues(
       cues.push("battle-command");
     if (previous.battle.fluteUsed !== true && next.battle.fluteUsed === true)
       cues.push("flute");
+    if (previous.battle.lassoUsed !== true && next.battle.lassoUsed === true)
+      cues.push("lasso-twirl");
     if (previous.battle.phase !== next.battle.phase &&
         (next.battle.phase === "result" || next.battle.phase === "burstResult"))
       cues.push("battle-hit");

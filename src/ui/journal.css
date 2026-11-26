@@ -570,9 +570,9 @@
 .journal-options-head {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 .journal-options-head .journal-heading,
 .journal-options-play-head .journal-heading {
@@ -584,19 +584,81 @@
   padding-right: 44px;
   margin-bottom: 18px;
 }
-.journal-now-playing {
+.journal-jukebox {
+  display: flex;
+  align-items: center;
+  width: 100%;
   max-width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
   overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 3px 12px;
   border: 2px solid var(--sticker-ink);
   border-radius: 999px;
   background: #fffaf2;
   box-shadow: 0 2px 0 #47321f33;
+}
+.journal-jukebox-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  background: #f2e8cf;
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: 900 24px/1 var(--sticker-font);
+  touch-action: manipulation;
+}
+.journal-jukebox-prev {
+  border-right: 2px solid var(--sticker-ink);
+}
+.journal-jukebox-next {
+  border-left: 2px solid var(--sticker-ink);
+}
+.journal-jukebox-btn:hover,
+.journal-jukebox-btn:active {
+  background: #f2d88e;
+}
+.journal-now-playing {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 8px;
+  background: transparent;
   color: var(--sticker-ink);
   font-size: 12px;
   font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
   white-space: nowrap;
+}
+@media (max-height: 500px) {
+  .journal-options-sound-page {
+    padding: 8px 12px;
+  }
+  .journal-options-play-page {
+    padding: 8px 20px 8px 12px;
+  }
+  .journal-options-head {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .journal-options-play-head {
+    margin-bottom: 8px;
+  }
+  .journal-options-list {
+    gap: 5px;
+  }
+  .journal-opt-row {
+    padding: 4px 8px;
+  }
 }
 .journal-options-list {
   display: grid;

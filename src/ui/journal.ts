@@ -255,6 +255,7 @@ export function createJournal(root: HTMLElement): {
   onToggleMusic: (callback: () => void) => void;
   onSetMusicLevel: (callback: (level: AudioLevel) => void) => void;
   onToggleAmbience: (callback: () => void) => void;
+  onStepTrack: (callback: (delta: -1 | 1) => void) => void;
   onToggleGentleTiming: (callback: () => void) => void;
   onToggleKeyHints: (callback: () => void) => void;
 } {
@@ -341,9 +342,21 @@ export function createJournal(root: HTMLElement): {
   const optionsHead = element("div", "journal-options-head");
   const optionsHeading = element("h2", "journal-heading");
   optionsHeading.textContent = "SOUND & MUSIC";
+  const jukebox = element("div", "journal-jukebox");
+  jukebox.setAttribute("role", "group");
+  jukebox.setAttribute("aria-label", "Music Box");
+  const prevTrack = element("button", "journal-jukebox-btn journal-jukebox-prev");
+  prevTrack.type = "button";
+  prevTrack.textContent = "‹";
+  prevTrack.setAttribute("aria-label", "Previous track");
   const nowPlaying = element("div", "journal-now-playing");
   nowPlaying.setAttribute("aria-live", "polite");
-  optionsHead.append(optionsHeading, nowPlaying);
+  const nextTrack = element("button", "journal-jukebox-btn journal-jukebox-next");
+  nextTrack.type = "button";
+  nextTrack.textContent = "›";
+  nextTrack.setAttribute("aria-label", "Next track");
+  jukebox.append(prevTrack, nowPlaying, nextTrack);
+  optionsHead.append(optionsHeading, jukebox);
 
   const soundList = element("div", "journal-options-list");
   const optSfx = element("button", "journal-opt-toggle journal-opt-sfx");
@@ -485,6 +498,7 @@ export function createJournal(root: HTMLElement): {
   let onToggleMusic: () => void = () => undefined;
   let onSetMusicLevel: (level: AudioLevel) => void = () => undefined;
   let onToggleAmbience: () => void = () => undefined;
+  let onStepTrack: (delta: -1 | 1) => void = () => undefined;
   let onToggleGentleTiming: () => void = () => undefined;
   let onToggleKeyHints: () => void = () => undefined;
 
@@ -638,6 +652,8 @@ export function createJournal(root: HTMLElement): {
   optSfx.addEventListener("click", () => onToggleAudio());
   optMusic.addEventListener("click", () => onToggleMusic());
   optAmbience.addEventListener("click", () => onToggleAmbience());
+  prevTrack.addEventListener("click", () => onStepTrack(-1));
+  nextTrack.addEventListener("click", () => onStepTrack(1));
   optGentle.addEventListener("click", () => onToggleGentleTiming());
   optHints.addEventListener("click", () => onToggleKeyHints());
 
@@ -672,6 +688,9 @@ export function createJournal(root: HTMLElement): {
     },
     onToggleAmbience: (callback) => {
       onToggleAmbience = callback;
+    },
+    onStepTrack: (callback) => {
+      onStepTrack = callback;
     },
     onToggleGentleTiming: (callback) => {
       onToggleGentleTiming = callback;

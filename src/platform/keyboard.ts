@@ -17,8 +17,30 @@ const GAME_KEYS = new Set([
   "KeyD",
   "KeyL",
   "KeyF",
+  "KeyR",
   "KeyM",
 ]);
+
+export function keyboardFrame(pressed: ReadonlySet<string>): ActionFrame {
+  const has = (code: string): boolean => pressed.has(code);
+  return {
+    ...blankInput(),
+    move: {
+      x:
+        Number(has("ArrowRight") || has("KeyD")) -
+        Number(has("ArrowLeft") || has("KeyA")),
+      y:
+        Number(has("ArrowDown") || has("KeyS")) -
+        Number(has("ArrowUp") || has("KeyW")),
+    },
+    confirm: has("KeyZ") || has("Space") || has("Enter"),
+    cancel: has("KeyX") || has("Escape"),
+    menu: has("KeyJ"),
+    lantern: has("KeyL"),
+    flute: has("KeyF"),
+    ...(has("KeyR") ? { lasso: true } : {}),
+  };
+}
 
 /**
  * Samples the keyboard once per tick. A key pressed since the previous sample
@@ -53,25 +75,8 @@ export class Keyboard {
   }
 
   frame(): ActionFrame {
-    const has = (code: string): boolean =>
-      this.held.has(code) || this.tapped.has(code);
-    const frame: ActionFrame = {
-      ...blankInput(),
-      move: {
-        x:
-          Number(has("ArrowRight") || has("KeyD")) -
-          Number(has("ArrowLeft") || has("KeyA")),
-        y:
-          Number(has("ArrowDown") || has("KeyS")) -
-          Number(has("ArrowUp") || has("KeyW")),
-      },
-      confirm: has("KeyZ") || has("Space") || has("Enter"),
-      cancel: has("KeyX") || has("Escape"),
-      menu: has("KeyJ"),
-      lantern: has("KeyL"),
-      flute: has("KeyF"),
-    };
+    const active = new Set<string>([...this.held, ...this.tapped]);
     this.tapped.clear();
-    return frame;
+    return keyboardFrame(active);
   }
 }

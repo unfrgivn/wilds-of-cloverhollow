@@ -1071,6 +1071,19 @@ function fluteAssistView(
   return { available, label, kind };
 }
 
+function lassoAssistView(
+  world: World,
+  state: State,
+  battle: Battle,
+  critter: Critter,
+): BattleView["lassoAssist"] {
+  if (world.storyVariable(state.ink, "has_lasso") !== true) return null;
+  const available = battle.lassoUsed !== true && !inTalkMode(battle, critter) &&
+    (battle.talk ?? null) === null && battle.phase === "command";
+  const windUp = battle.windUp !== null && battle.windUp.popped.some((popped) => !popped);
+  return { available, windUp };
+}
+
 export function battleView(world: World, state: State): BattleView | null {
   const battle = state.battle;
   if (battle === null) return null;
@@ -1159,6 +1172,8 @@ export function battleView(world: World, state: State): BattleView | null {
     sparkle,
     fluteAssist: fluteAssistView(world, state, battle, critter),
     burstSoften: battle.burstSoften ?? 0,
+    lassoAssist: lassoAssistView(world, state, battle, critter),
+    lassoSteady: battle.lassoSteady === true,
     treatTray,
   };
 }
@@ -1401,9 +1416,11 @@ function battleStep(
       const letGo = next.windUp;
       const [roll, afterRoll]: [number, State] =
         letGo === null ? nextRandom(nextBase) : [1, nextBase];
-      const big = letGo === null
+      const rolledBig = letGo === null
         ? roll < critter.burst.bigChance
         : letGo.popped.every((popped) => !popped);
+      const steady = next.lassoSteady === true;
+      const big = steady ? false : rolledBig;
       const baseSpec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
       const spec = gentleTiming ? gentleCheckSpec(baseSpec) : baseSpec;
       let rolled = afterRoll;
@@ -1413,9 +1430,13 @@ function battleStep(
         picks.push(pickFromDraw(spec, value));
         rolled = after;
       }
+      const { lassoSteady: _lassoSteady, ...withoutSteady } = next;
       return {
         ...rolled,
-        battle: { ...startCheck(next, "fae", spec, big, picks), windUp: null },
+        battle: {
+          ...startCheck(steady ? withoutSteady : next, "fae", spec, big, picks),
+          windUp: null,
+        },
       };
     }
     else if (next.phase === "burstResult" && next.energy <= 0)
@@ -1610,6 +1631,54 @@ function battleStep(
           battle: battleMessage(updated, line, "command"),
         };
       }
+    }
+    // Coach Ash's rainbow lasso in battle (spec 8): once per battle, pops an
+    // active wind-up bubble or snags coins and steadies the next burst without
+    // consuming Fae's turn.
+    const lassoEdge = input.lasso === true && state.previousInput.lasso !== true;
+    if (lassoEdge && next.lassoUsed !== true && !talkActive && (next.talk ?? null) === null &&
+        world.storyVariable(state.ink, "has_lasso") === true) {
+      const assist = world.battle.lassoAssist;
+      const nextCalm = Math.min(calmLimit(critter), next.calm + assist.calm);
+      const going = next.windUp;
+      const popIndex = going?.popped.findIndex((popped) => !popped) ?? -1;
+      if (going !== null && popIndex >= 0) {
+        const windUp = {
+          ...going,
+          popped: going.popped.map((popped, index) => popped || index === popIndex),
+        };
+        const updated: Battle = {
+          ...next,
+          calm: nextCalm,
+          windUp,
+          lassoUsed: true,
+        };
+        if (nextCalm >= critter.calmMax)
+          return {
+            ...nextBase,
+            battle: { ...moveOn(updated, critter.lines.soothed, "soothed"), windUp: null },
+          };
+        return {
+          ...nextBase,
+          battle: battleMessage(updated, assist.lines.windUp, "command"),
+        };
+      }
+      const updated: Battle = {
+        ...next,
+        calm: nextCalm,
+        lassoUsed: true,
+        lassoSteady: true,
+      };
+      const rewardedBase = { ...nextBase, coins: state.coins + assist.coins };
+      if (nextCalm >= critter.calmMax)
+        return {
+          ...rewardedBase,
+          battle: { ...moveOn(updated, critter.lines.soothed, "soothed"), windUp: null },
+        };
+      return {
+        ...rewardedBase,
+        battle: battleMessage(updated, assist.lines.snag, "command"),
+      };
     }
     // Together! party sparkle finisher (spec 8): once charged, a fresh cancel
     // press launches the star chain check, pops all wind-up bubbles, and ticks

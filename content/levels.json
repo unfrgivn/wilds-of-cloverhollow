@@ -320,6 +320,20 @@
       "burst": 2,
       "bigBurst": 3,
       "xp": 70
+    },
+    "moon-owl": {
+      "level": 8,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 80
+    },
+    "taco-chef": {
+      "level": 7,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 70
     }
   }
 }

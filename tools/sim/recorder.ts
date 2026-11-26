@@ -369,6 +369,15 @@ export function createRecorder(world: World, initial: State): {
         };
         tick(frame(move));
       }
+    } else if (check.kind === "peekaboo") {
+      for (let current = live(); current?.kind === "peekaboo"; current = live()) {
+        if (current.result !== null) break;
+        const nextTick = current.tick + 1;
+        const mustFreeze = current.spec.peeks.some(
+          (peek) => nextTick >= peek.start - 2 && nextTick < peek.end,
+        );
+        tick(frame(undefined, !mustFreeze));
+      }
     } else {
       for (const arrival of check.spec.arrivals) {
         waitFor(arrival - 1);

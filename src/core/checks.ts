@@ -6,6 +6,8 @@ import type {
   CheckSpec,
   CheckState,
   Grade,
+  PeekabooState,
+  PeekabooStatus,
 } from "./types";
 
 // Which way Fae leans: back (-1), neither, or forward into the wind (1).
@@ -104,6 +106,18 @@ export function gentleCheckSpec(spec: CheckSpec): CheckSpec {
       spring: spec.spring + 1,
     };
   }
+  if (spec.kind === "peekaboo") {
+    const goal = spec.goal >= 20
+      ? Math.max(20, Math.round(spec.goal * 0.78))
+      : Math.max(1, Math.round(spec.goal * 0.78));
+    return {
+      ...spec,
+      warningTicks: Math.min(28, spec.warningTicks + 6),
+      graceTicks: Math.min(10, spec.graceTicks + 5),
+      goal,
+      peeks: spec.peeks.map((peek) => ({ ...peek })),
+    };
+  }
   return {
     ...spec,
     reachRadius: Math.round(spec.reachRadius * 1.35),
@@ -170,6 +184,22 @@ export function createCheck(
       big,
     };
   }
+  if (effective.kind === "peekaboo") {
+    return {
+      kind: "peekaboo",
+      side,
+      tick: 0,
+      spec: {
+        ...effective,
+        peeks: effective.peeks.map((peek) => ({ ...peek })),
+      },
+      progress: 0,
+      spotted: effective.peeks.map(() => 0),
+      peeksCleared: 0,
+      result: null,
+      big,
+    };
+  }
   return {
     kind: "chain",
     side,
@@ -203,7 +233,64 @@ export function stepCheck(
   if (check.kind === "catch") return stepCatch(check, tick, input.lane);
   if (check.kind === "lean") return stepLean(check, tick, input.lean);
   if (check.kind === "trace") return stepTrace(check, tick, input.pointer, input.move);
+  if (check.kind === "peekaboo") return stepPeekaboo(check, tick, input.confirmHeld);
   return stepChain(check, tick, input.confirmEdge);
+}
+
+/** Whether a peekaboo check is currently safe, telegraphing a turn, or watching. */
+export function peekabooStatus(check: PeekabooState): PeekabooStatus {
+  const { tick, spec } = check;
+  if (spec.peeks.some((peek) => tick >= peek.start && tick < peek.end)) return "watching";
+  if (spec.peeks.some((peek) => tick >= peek.start - spec.warningTicks && tick < peek.start))
+    return "warning";
+  return "safe";
+}
+
+/**
+ * Red-light green-light peekaboo check: hold confirm while the critter looks
+ * away to tiptoe toward `goal`, and freeze while it watches (with `graceTicks`
+ * reaction buffer at the start of each peek window).
+ */
+export function stepPeekaboo(
+  check: PeekabooState,
+  tick: number,
+  confirmHeld: boolean,
+): { check: PeekabooState; grade: Grade | null } {
+  const { spec } = check;
+  const spotted = [...check.spotted];
+  let progress = check.progress;
+  let peeksCleared = check.peeksCleared;
+  const watchingIndex = spec.peeks.findIndex((peek) => tick >= peek.start && tick < peek.end);
+  if (watchingIndex >= 0) {
+    const peek = spec.peeks[watchingIndex];
+    if (
+      peek !== undefined &&
+      confirmHeld &&
+      tick >= peek.start + spec.graceTicks &&
+      spotted[watchingIndex] === 0
+    ) {
+      spotted[watchingIndex] = 1;
+      progress = Math.max(0, progress - 8);
+    }
+  } else if (confirmHeld) {
+    progress = Math.min(spec.goal, progress + 1);
+  }
+  spec.peeks.forEach((peek, index) => {
+    if (tick === peek.end && spotted[index] === 0) peeksCleared += 1;
+  });
+  let result: Grade | null = null;
+  if (progress >= spec.goal && spotted.every((item) => item === 0)) {
+    result = "great";
+  } else if (tick >= spec.ticks) {
+    const spots = spotted.filter((item) => item === 1).length;
+    if (spots === 0 && progress >= spec.goal) result = "great";
+    else if (spots <= 1 && progress >= Math.ceil(spec.goal * 0.55)) result = "good";
+    else result = "miss";
+  }
+  return {
+    check: { ...check, tick, progress, spotted, peeksCleared, result },
+    grade: result,
+  };
 }
 
 function distance(x: number, y: number): number {
@@ -490,6 +577,20 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
       results: check.results,
       dry: Math.max(0, Math.min(1, check.tick / check.spec.dryTicks)),
     };
+  if (check.kind === "peekaboo")
+    return {
+      kind: "peekaboo",
+      side: check.side,
+      progress: Math.max(0, Math.min(1, check.progress / Math.max(1, check.spec.goal))),
+      status: peekabooStatus(check),
+      peeks: check.spec.peeks.map((peek, index) =>
+        check.spotted[index] === 1
+          ? "spotted"
+          : check.tick >= peek.end
+            ? "cleared"
+            : "pending",
+      ),
+    };
   return {
     kind: "chain",
     side: check.side,
@@ -506,7 +607,7 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
 /**
  * The hint while a check waits for the player: a charge before its first
  * press, a chain or catch before its first landing, a lean before its first
- * puff.
+ * puff, a peekaboo before Fae starts tiptoeing.
  */
 export function checkHint(check: CheckState, hints: BattleContent["hints"]): string | null {
   if (check.kind === "charge") return check.held === 0 ? hints.charge : null;
@@ -515,6 +616,8 @@ export function checkHint(check: CheckState, hints: BattleContent["hints"]): str
   if (check.kind === "lean")
     return check.tick < (check.spec.starts[0] ?? 0) ? hints.lean : null;
   if (check.kind === "trace") return check.results[1] === "pending" ? hints.trace : null;
+  if (check.kind === "peekaboo")
+    return check.tick < 28 && check.progress === 0 ? hints.peekaboo : null;
   return null;
 }
 

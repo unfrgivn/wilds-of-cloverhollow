@@ -29,6 +29,7 @@ const FRIEND_SPEAKERS = new Set([
   "toby",
   "pond pup",
   "acorn squirrel",
+  "ribbon bunny",
 ]);
 const SCHOOL_SPEAKERS = new Set([
   "ms. clover",
@@ -48,6 +49,8 @@ const SCHOOL_SPEAKERS = new Set([
 ]);
 const TOWN_SPEAKERS = new Set([
   "chef bea",
+  "chef mateo",
+  "fizzy chef mateo",
   "grandpa barnaby",
   "barnaby",
   "bree",
@@ -183,6 +186,8 @@ const CRITTER_PERSON_MAP: Record<string, string> = {
   "lodge keeper": "lodge-keeper",
   "mr. pip": "arcade-keeper",
   "arcade keeper": "arcade-keeper",
+  "chef mateo": "taco-chef",
+  "fizzy chef mateo": "taco-chef",
 };
 
 export function speakerPortraitSource(

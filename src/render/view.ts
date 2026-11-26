@@ -20,6 +20,7 @@ import {
   npcFacing,
   npcVisible,
   partyLeader,
+  peekabooStatus,
   presentCritters,
   surfaceAt,
   targetInteractable,
@@ -73,6 +74,13 @@ export type BattleCheckGeometry =
       brush: Point;
       points: Point[];
       checkpoint: number;
+      hintAt: Point;
+    }
+  | {
+      kind: "peekaboo";
+      x: number;
+      y: number;
+      track: { x: number; y: number; width: number; height: number };
       hintAt: Point;
     };
 // The check for tests (spec 11): its side and geometry, plus an anchor
@@ -1477,13 +1485,19 @@ export class GameView {
     if (critter === undefined) return;
     const sheet = Assets.get<Spritesheet | undefined>(critter.atlas);
     if (sheet === undefined) return;
+    const peekabooWatching =
+      battle.phase === "check" &&
+      battle.check?.kind === "peekaboo" &&
+      peekabooStatus(battle.check) === "watching";
     const critterFrame =
       battle.phase === "soothed"
         ? "soothed_01"
         : battle.phase === "reward"
           ? "calm_idle_01"
           : battle.phase === "burst" ||
-              (battle.phase === "check" && battle.check?.side === "fae")
+              (battle.phase === "check" &&
+                battle.check?.side === "fae" &&
+                (battle.check.kind !== "peekaboo" || peekabooWatching))
             ? "chaos_burst_01"
             : "chaos_idle_01";
     const body = sheet.textures[critterFrame];
@@ -1762,6 +1776,19 @@ export class GameView {
         // touch arrows bottom left.
         hintAt: hintAt((fae.x + critter.x) / 2),
       };
+    if (check.kind === "peekaboo") {
+      const trackWidth = Math.max(128, Math.min(200, 1.65 * fae.height));
+      const trackHeight = Math.max(14, Math.min(20, 0.13 * fae.height));
+      const x = Math.max(trackWidth / 2 + 24, fae.x);
+      const y = Math.max(131, fae.baseline - 1.52 * fae.height);
+      return {
+        kind: "peekaboo",
+        x,
+        y,
+        track: { x, y, width: trackWidth, height: trackHeight },
+        hintAt: hintAt((fae.x + critter.x) / 2),
+      };
+    }
     if (check.side === "fae" && check.kind !== "trace")
       return {
         kind: "chain",
@@ -1843,6 +1870,7 @@ export class GameView {
         x: geometry.rect.x + geometry.rect.width * geometry.brush.x / 1000,
         y: geometry.rect.y + geometry.rect.height * geometry.brush.y / 1000,
       };
+    if (geometry.kind === "peekaboo") return { ...geometry, side };
     return { ...geometry, side };
   }
 
@@ -1992,7 +2020,9 @@ export class GameView {
                       ? "calm_idle_01"
                       : state.battle.phase === "burst" ||
                           (state.battle.phase === "check" &&
-                            state.battle.check?.side === "fae")
+                            state.battle.check?.side === "fae" &&
+                            (state.battle.check.kind !== "peekaboo" ||
+                              peekabooStatus(state.battle.check) === "watching"))
                         ? "chaos_burst_01"
                         : "chaos_idle_01",
               },

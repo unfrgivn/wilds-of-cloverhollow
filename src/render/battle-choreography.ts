@@ -1,4 +1,4 @@
-import type { Battle, BattleView } from "../core";
+import { peekabooStatus, type Battle, type BattleView } from "../core";
 import { composePose, idleBreathing, NEUTRAL_POSE, type MotionPose } from "./motion";
 
 export type BattleVfxTexture = "sparkle" | "heart" | "energyRing" | "puff";
@@ -389,6 +389,57 @@ export function computeBattleChoreography(
     });
   }
 
+  // 8b. Fae & critter peekaboo: Fae tiptoes forward while safe and freezes low
+  // when watching; critter looks slightly away, twitches on warning, pops tall
+  // wide-eyed while watching.
+  if (battle.phase === "check" && battle.check?.kind === "peekaboo") {
+    const check = battle.check;
+    const ratio = clamp01(check.progress / Math.max(1, check.spec.goal));
+    const status = peekabooStatus(check);
+    if (status === "watching") {
+      fae = composePose(fae, {
+        offsetX: 34 * ratio,
+        offsetY: 4,
+        scaleX: 1.04,
+        scaleY: 0.93,
+        rotation: 0,
+      });
+      critter = composePose(critter, {
+        offsetX: -14,
+        offsetY: -8,
+        scaleX: 0.94,
+        scaleY: 1.1,
+        rotation: -0.04,
+      });
+    } else {
+      const bob = check.progress > 0 ? Math.abs(Math.sin(check.tick / 4.5)) : 0;
+      fae = composePose(fae, {
+        offsetX: 34 * ratio,
+        offsetY: -5 * bob,
+        scaleX: 1 - 0.02 * bob,
+        scaleY: 1 + 0.03 * bob,
+        rotation: 0.04 * bob,
+      });
+      if (status === "warning") {
+        critter = composePose(critter, {
+          offsetX: 4 + Math.sin(check.tick * 1.8) * 3,
+          offsetY: -3,
+          scaleX: 1.02,
+          scaleY: 1.03,
+          rotation: Math.sin(check.tick * 2.1) * 0.06,
+        });
+      } else {
+        critter = composePose(critter, {
+          offsetX: 10,
+          offsetY: 0,
+          scaleX: 0.96,
+          scaleY: 1,
+          rotation: 0.09,
+        });
+      }
+    }
+  }
+
   // 9. Critter burst anticipation crouch -> snappy forward lunge.
   if (battle.phase === "burst") {
     if (battle.phaseTicks < 10) {
@@ -410,7 +461,11 @@ export function computeBattleChoreography(
         rotation: 0,
       });
     }
-  } else if (battle.phase === "check" && battle.check?.side === "fae") {
+  } else if (
+    battle.phase === "check" &&
+    battle.check?.side === "fae" &&
+    battle.check.kind !== "peekaboo"
+  ) {
     critter = composePose(critter, {
       offsetX: -20,
       offsetY: 0,

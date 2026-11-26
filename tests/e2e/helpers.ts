@@ -187,6 +187,29 @@ export async function playBattleCheck(page: Page): Promise<void> {
     if (heldY !== null) await page.keyboard.up(heldY);
     return;
   }
+  if (check.kind === "peekaboo") {
+    let active = check;
+    let holding = false;
+    for (let index = 0; index < 200; index += 1) {
+      if (active.result !== null) break;
+      const nextTick = active.tick + 1;
+      const mustFreeze = active.spec.peeks.some(
+        (peek) => nextTick >= peek.start - 2 && nextTick < peek.end,
+      );
+      const wantHold = !mustFreeze;
+      if (wantHold !== holding) {
+        if (wantHold) await page.keyboard.down("Enter");
+        else await page.keyboard.up("Enter");
+        holding = wantHold;
+      }
+      await step(page, 1);
+      const current = (await readBattle(page))?.check;
+      if (current?.kind !== "peekaboo") break;
+      active = current;
+    }
+    if (holding) await page.keyboard.up("Enter");
+    return;
+  }
   for (const arrival of check.spec.arrivals) {
     const current = await readBattle(page);
     const active = current?.check;

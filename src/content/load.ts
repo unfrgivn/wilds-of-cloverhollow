@@ -128,6 +128,8 @@ import penguinData from "../../content/critters/penguin.json";
 import principalData from "../../content/critters/principal.json";
 import batData from "../../content/critters/bat.json";
 import crystalMoleData from "../../content/critters/crystal-mole.json";
+import moonOwlData from "../../content/critters/moon-owl.json";
+import tacoChefData from "../../content/critters/taco-chef.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import levelsData from "../../content/levels.json";
@@ -194,7 +196,7 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
   field(record(value), file, name);
   const kind = value.kind;
   field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch" ||
-    kind === "lean" || kind === "trace", file, `${name}.kind`);
+    kind === "lean" || kind === "trace" || kind === "peekaboo", file, `${name}.kind`);
   const integer = (key: string): number => {
     const item = value[key];
     field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
@@ -289,6 +291,40 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
     });
     return { kind, dryTicks, brushSpeed, reachRadius, paths };
   }
+  if (kind === "peekaboo") {
+    const ticks = integer("ticks");
+    const goal = integer("goal");
+    const warningTicks = integer("warningTicks");
+    const graceTicks = integer("graceTicks");
+    field(ticks >= 1 && ticks <= 180, file, `${name}.ticks`);
+    field(goal >= 1, file, `${name}.goal`);
+    field(warningTicks >= 1, file, `${name}.warningTicks`);
+    field(graceTicks >= 0, file, `${name}.graceTicks`);
+    const rawPeeks = value.peeks;
+    field(Array.isArray(rawPeeks) && rawPeeks.length > 0, file, `${name}.peeks`);
+    let peekTicks = 0;
+    const peeks = rawPeeks.map((rawPeek, peekIndex) => {
+      const label = `${name}.peeks[${peekIndex}]`;
+      field(record(rawPeek), file, label);
+      const start = rawPeek.start;
+      const end = rawPeek.end;
+      field(
+        typeof start === "number" && Number.isInteger(start) &&
+          typeof end === "number" && Number.isInteger(end) &&
+          start >= 1 && start < end && end <= ticks,
+        file,
+        label,
+      );
+      peekTicks += end - start;
+      return { start, end };
+    });
+    peeks.forEach((peek, index) => {
+      const previous = peeks[index - 1];
+      field(previous === undefined || peek.start >= previous.end, file, `${name}.peeks`);
+    });
+    field(ticks - peekTicks >= goal, file, `${name}.goal`);
+    return { kind, ticks, goal, warningTicks, graceTicks, peeks };
+  }
   const travelTicks = integer("travelTicks");
   field(travelTicks >= 1, file, `${name}.travelTicks`);
   const arrivals = integers("arrivals");
@@ -320,8 +356,8 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
 // (spec 8).
 function faeSideCheck(value: unknown, file: string, name: string): CheckSpec {
   const spec = checkSpec(value, file, name);
-  field(spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace", file,
-    `${name}.kind`);
+  field(spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace" &&
+    spec.kind !== "peekaboo", file, `${name}.kind`);
   return spec;
 }
 
@@ -1526,7 +1562,8 @@ export function parseBattleContent(
       typeof hints.chain === "string" &&
       typeof hints.catch === "string" &&
       typeof hints.lean === "string" &&
-      typeof hints.trace === "string",
+      typeof hints.trace === "string" &&
+      typeof hints.peekaboo === "string",
     file,
     "hints",
   );
@@ -1604,7 +1641,7 @@ export function parseBattleContent(
   return {
     toyAtlas,
     hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean,
-      trace: hints.trace },
+      trace: hints.trace, peekaboo: hints.peekaboo },
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),
@@ -2239,6 +2276,8 @@ export function loadContent(): {
     [principalData, "principal"],
     [batData, "bat"],
     [crystalMoleData, "crystal-mole"],
+    [moonOwlData, "moon-owl"],
+    [tacoChefData, "taco-chef"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {

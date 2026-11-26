@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 80)
+Last updated: 2026-11-26 (Milestone 82)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -840,6 +840,44 @@ ios/            Capacitor iOS project (from Milestone 4).
   coins, `+2` snacks (`chime-red`), and the Rainbow Star Geode keepsake for
   `club_chest` (`gem_reward_all`) when all 7 are found. The journal records
   Ribbon Bunny's friendship, Star Gem progress, and the Rainbow Star Geode.
+- Peekaboo check, Starry Owl & Chef Mateo (Milestone 81):
+  - First-class battle burst check `kind: "peekaboo"` (`PeekabooSpec`:
+    `ticks` 1..180, `goal >= 1`, `warningTicks >= 1`, `graceTicks >= 0`,
+    non-empty sorted non-overlapping `peeks: { start, end }[]` with safe ticks
+    `>= goal`; disallowed on Soothe/friend commands; zero extra PRNG draws
+    beyond the burst `bigChance` roll). Holding confirm while the critter looks
+    away (`"safe"` or `"warning"`) increments `progress`; holding confirm at or
+    past `start + graceTicks` inside an unspotted peek marks that peek spotted
+    and nudges `progress` back by 8. Cleanly freezing through a peek's end
+    increments `peeksCleared` (triggering `battle-beat`). Reaching `goal` with
+    zero spots wins early (`"great"`); on timeout, zero spots at `goal` is
+    `"great"`, at most 1 spot at `ceil(goal * 0.55)` is `"good"`, else `"miss"`.
+    `gentleCheckSpec` widens `warningTicks` (+6, cap 28), `graceTicks` (+5, cap
+    10), and softens `goal` (`round(goal * 0.78)`, floor 20 when `goal >= 20`).
+    Rendered as a die-cut sticker overlay above Fae (`battleCheckGeometry`
+    `kind: "peekaboo"`, `battle-peekaboo` gallery state) with inline SVG eyes
+    (`"LOOKING AWAY · HOLD!"`, `"TURN SOON..."`, `"WATCHING · FREEZE!"`), a
+    cream progress bar to a gold star, and peek dots; choreography tiptoes Fae
+    forward while safe, freezes her low when watching, and snaps the critter
+    wide-eyed tall while watching.
+  - Starey Owl / Starry Owl (`moon-owl`, Lv 8, 160 calmMax, 6 energyMax, 25
+    coins, 80 XP, sticker `starry-owl`): optional Whispering Woods Peekaboo
+    mini-boss summoned in the quiet southeast clearing (`moon-perch` Look point
+    once `clubhouse_claimed`, setting `moon_owl_out` with `chime-blue`). Calm
+    talk (`moon_owl_calm`) gifts the Moon Feather keepsake in `club_chest` and
+    hints toward Clover Hills (never names Milo).
+  - Fizzy Chef Mateo / Chef Mateo (`taco-chef`, Lv 7, 160 calmMax, 6 energyMax,
+    25 coins, 70 XP, sticker `taco-chef`): optional Clover Hills Taco Truck
+    Talk mini-boss (`canRun: true`, dust-cloud `chain` bursts, `talkAt: 85`,
+    3 graded Talk knots `mateo_talk_1`..`3` referencing Bon Appetit's Tuesday
+    crispy tacos chalkboard, Principal Bell's lunch announcement, and sharing
+    snacks with friends, never naming Milo) summoned via `taco-flyer`
+    (`taco_chef_out`). Calm talk (`taco_chef_calm`) gifts 2 snacks
+    (`mateo_snacks_given`) + Golden Taco Badge keepsake in `club_chest`, and
+    sells crispy taco snacks for 4 coins (`buy: snack 4`).
+  - Sticker catalogue expands to 24 slots (`starry-owl`, `taco-chef`);
+    Favourite Treats add `moon-owl` (`orchard-apple`, `cocoa-sundae`) and
+    `taco-chef` (`berry-cone`, `fish-cracker`).
 - The lodge keeper (Milestone 57): once Fae has calmed a hamster at Pinecone
   Pass (`calmed("hamster")`, its sticker), the lodge's note leads on
   (`lodge_door.back`): a snowball whizzes past, and its keeper, Mrs. Flurry,
@@ -2174,8 +2212,8 @@ trunks keep its two exits.
   `brushSpeed` 20, `reachRadius` 105, and `dryTicks` 180. The flower reads as
   a four-petal flower or a star.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
-  and leaves Milo calm under the tree. The sticker catalogue has 22 slots,
-  including Milo, Cozy Bat, and Gem Mole. The front-view NPC art is no longer
+  and leaves Milo calm under the tree. The sticker catalogue has 24 slots,
+  including Milo, Cozy Bat, Gem Mole, Starry Owl, and Chef Mateo. The front-view NPC art is no longer
   loaded by the runtime. Its raw source and recipe remain in `art/source/` and
   `art/recipes/` for provenance.
 - Feelings (Milestone 42): a thought cloud (a cream sticker) floats in the
@@ -2717,7 +2755,7 @@ trunks keep its two exits.
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
   catalogue (id, name, the critter whose atlas holds the art, and the frame):
-  twenty stickers, one per species and one per mini-boss, in twenty
+  twenty-four stickers, one per species and one per mini-boss, in twenty-four
   slots, the town's four first.
   A sticker is owned when `state.stickers` has its id. The shell sets
   `data-journal="open"` while the book is open.

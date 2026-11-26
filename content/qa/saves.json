@@ -7,7 +7,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 189,
     "interim": false,
-    "hash": "0e5f6044"
+    "hash": "e1e35daa"
   },
   {
     "id": "fountain-frog",
@@ -17,7 +17,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 1196,
     "interim": false,
-    "hash": "267e79e6"
+    "hash": "868ece40"
   },
   {
     "id": "tree-house",
@@ -27,7 +27,7 @@
     "run": "new-game/chapter-one.json",
     "tick": 5142,
     "interim": false,
-    "hash": "6ae442f3"
+    "hash": "c3032605"
   },
   {
     "id": "bubblegum-bay",
@@ -37,7 +37,7 @@
     "run": "new-game/east-road.json",
     "tick": 6204,
     "interim": false,
-    "hash": "e1c1728c"
+    "hash": "07ad3994"
   },
   {
     "id": "bay-bluebird",
@@ -47,7 +47,7 @@
     "run": "new-game/golden-bay.json",
     "tick": 7324,
     "interim": false,
-    "hash": "89b5a21d"
+    "hash": "3ac768bf"
   },
   {
     "id": "jordan",
@@ -57,7 +57,7 @@
     "run": "new-game/golden-jordan.json",
     "tick": 8757,
     "interim": false,
-    "hash": "50c262b9"
+    "hash": "2d0a9611"
   },
   {
     "id": "lantern",
@@ -67,7 +67,7 @@
     "run": "new-game/golden-lantern.json",
     "tick": 9401,
     "interim": false,
-    "hash": "44a54c66"
+    "hash": "f8f886ae"
   },
   {
     "id": "woods",
@@ -77,7 +77,7 @@
     "run": "new-game/golden-woods.json",
     "tick": 9589,
     "interim": false,
-    "hash": "00c84300"
+    "hash": "6e256b82"
   },
   {
     "id": "arcade",
@@ -87,7 +87,7 @@
     "run": "new-game/golden-arcade.json",
     "tick": 10882,
     "interim": false,
-    "hash": "cbeeb638"
+    "hash": "748b8b2e"
   },
   {
     "id": "lodge",
@@ -97,7 +97,7 @@
     "run": "new-game/golden-lodge.json",
     "tick": 10468,
     "interim": false,
-    "hash": "03f487ff"
+    "hash": "865aafb7"
   },
   {
     "id": "school",
@@ -107,7 +107,7 @@
     "run": "new-game/golden-school.json",
     "tick": 13095,
     "interim": false,
-    "hash": "fa9151a7"
+    "hash": "9edb9431"
   },
   {
     "id": "clubhouse",
@@ -117,7 +117,7 @@
     "run": "new-game/golden-clubhouse.json",
     "tick": 10197,
     "interim": false,
-    "hash": "c2d8165b"
+    "hash": "6870d4d1"
   },
   {
     "id": "gym",
@@ -127,7 +127,7 @@
     "run": "new-game/golden-gym.json",
     "tick": 15099,
     "interim": false,
-    "hash": "c29c7918"
+    "hash": "42bbab30"
   },
   {
     "id": "music",
@@ -137,7 +137,7 @@
     "run": "new-game/golden-music.json",
     "tick": 17053,
     "interim": false,
-    "hash": "6d316e52"
+    "hash": "02326a7e"
   },
   {
     "id": "field",
@@ -147,7 +147,7 @@
     "run": "new-game/golden-field.json",
     "tick": 17643,
     "interim": false,
-    "hash": "6d5d6e19"
+    "hash": "1bdce8fd"
   },
   {
     "id": "squirrel",
@@ -157,7 +157,7 @@
     "run": "new-game/golden-squirrel.json",
     "tick": 18296,
     "interim": false,
-    "hash": "3dc8da0e"
+    "hash": "8775d2a6"
   },
   {
     "id": "flute",
@@ -167,7 +167,7 @@
     "run": "new-game/golden-flute.json",
     "tick": 20046,
     "interim": false,
-    "hash": "eb0f55c9"
+    "hash": "2a265793"
   },
   {
     "id": "lasso",
@@ -177,7 +177,7 @@
     "run": "new-game/golden-lasso.json",
     "tick": 24473,
     "interim": false,
-    "hash": "4a3840a2"
+    "hash": "73c6b004"
   },
   {
     "id": "mist",
@@ -187,7 +187,7 @@
     "run": "new-game/golden-mist.json",
     "tick": 25854,
     "interim": false,
-    "hash": "0d76d4e9"
+    "hash": "cf475d7f"
   },
   {
     "id": "kitchen",
@@ -197,7 +197,7 @@
     "run": "new-game/golden-kitchen.json",
     "tick": 26099,
     "interim": false,
-    "hash": "2698e6e3"
+    "hash": "ad58aa65"
   },
   {
     "id": "forest",
@@ -207,7 +207,7 @@
     "run": "new-game/golden-forest.json",
     "tick": 26523,
     "interim": false,
-    "hash": "c67d90f5"
+    "hash": "33824163"
   },
   {
     "id": "kid",
@@ -217,7 +217,7 @@
     "run": "new-game/golden-kid.json",
     "tick": 27340,
     "interim": false,
-    "hash": "d94eb3cc"
+    "hash": "2b42fbdc"
   },
   {
     "id": "hills-lookout",
@@ -227,6 +227,6 @@
     "run": "hills/hills-lookout.json",
     "tick": 0,
     "interim": true,
-    "hash": "d857e2f0"
+    "hash": "004c87f2"
   }
 ]

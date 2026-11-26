@@ -702,6 +702,16 @@ function renderGalleryState(): void {
       hint: null,
       hintAt: { x: 315, y: 243 },
     },
+    "battle-peekaboo": {
+      kind: "peekaboo",
+      track: { x: 192, y: 131, width: 136, height: 14 },
+      progress: 0.58,
+      status: "watching",
+      peeks: ["cleared", "pending"],
+      grade: null,
+      hint: null,
+      hintAt: { x: 315, y: 243 },
+    },
     "battle-trace": {
       kind: "trace",
       rect: { x: 330, y: 96, width: 300, height: 300 },

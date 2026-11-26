@@ -220,8 +220,8 @@ describe("Crystal Cavern", () => {
       level: 7, calmMax: 100, burst: 2, bigBurst: 3, xp: 70,
     });
 
-    expect(world.stickers.slots).toBe(22);
-    expect(world.stickers.catalogue.length).toBe(22);
+    expect(world.stickers.slots).toBeGreaterThanOrEqual(22);
+    expect(world.stickers.catalogue.length).toBe(world.stickers.slots);
     expect(world.stickers.catalogue.map((entry) => entry.id)).toEqual(
       expect.arrayContaining(["cozy-bat", "gem-mole"]),
     );

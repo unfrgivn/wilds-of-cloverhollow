@@ -1,5 +1,5 @@
 {
-  "slots": 22,
+  "slots": 24,
   "catalogue": [
     {
       "id": "hooded-kid",
@@ -131,6 +131,18 @@
       "id": "gem-mole",
       "name": "Gem Mole",
       "critter": "crystal-mole",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "starry-owl",
+      "name": "Starry Owl",
+      "critter": "moon-owl",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "taco-chef",
+      "name": "Chef Mateo",
+      "critter": "taco-chef",
       "frame": "calm_idle_01"
     }
   ]

@@ -172,6 +172,18 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
     duration: 0.048,
     gain: 0.052,
   },
+  "chef mateo": {
+    wave: "triangle",
+    notes: [262, 294, 330, 392],
+    duration: 0.05,
+    gain: 0.054,
+  },
+  "fizzy chef mateo": {
+    wave: "triangle",
+    notes: [262, 294, 330, 392],
+    duration: 0.05,
+    gain: 0.054,
+  },
   "ms. clover": {
     wave: "sine",
     notes: [370, 415, 440, 415],

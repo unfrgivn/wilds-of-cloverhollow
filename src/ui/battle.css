@@ -605,6 +605,119 @@
 .battle-lean-swoosh path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .battle-lean-swoosh-rim { stroke: var(--sticker-rim); stroke-width: 7; }
 .battle-lean-swoosh-ink { stroke: var(--sticker-ink); stroke-width: 2.6; }
+/* Peekaboo (Milestone 81): die-cut status badge with inline SVG eyes over a
+   cream progress track filling to a gold star, plus small peek dots below. */
+.battle-peekaboo {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-ring);
+  pointer-events: none;
+  font-family: var(--sticker-font);
+}
+.battle-peekaboo-badge {
+  position: absolute;
+  left: clamp(
+    calc(110px + var(--safe-left)),
+    var(--peekaboo-x, 192px),
+    calc(100vw - 110px - var(--safe-right))
+  );
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  padding: 4px 10px 4px 8px;
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #dff4e5;
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+}
+.battle-peekaboo-badge[data-status="safe"] { background: #dff4e5; }
+.battle-peekaboo-badge[data-status="warning"] { background: #fce9a6; }
+.battle-peekaboo-badge[data-status="watching"] { background: #f7d4de; }
+.battle-peekaboo-eyes {
+  width: 26px;
+  height: 14px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.battle-peekaboo-eyes-safe,
+.battle-peekaboo-eyes-warning,
+.battle-peekaboo-eyes-watching {
+  display: none;
+}
+.battle-peekaboo-badge[data-status="safe"] .battle-peekaboo-eyes-safe,
+.battle-peekaboo-badge[data-status="warning"] .battle-peekaboo-eyes-warning,
+.battle-peekaboo-badge[data-status="watching"] .battle-peekaboo-eyes-watching {
+  display: inline;
+}
+.battle-peekaboo-lid {
+  fill: none;
+  stroke: var(--sticker-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.battle-peekaboo-sclera {
+  fill: #fffdf7;
+  stroke: var(--sticker-ink);
+  stroke-width: 1.8;
+}
+.battle-peekaboo-pupil { fill: var(--sticker-ink); }
+.battle-peekaboo-spark { fill: #fff8cf; }
+.battle-peekaboo-status {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+@media (min-width: 1000px) {
+  .battle-peekaboo-badge { padding: 5px 12px 5px 9px; gap: 7px; }
+  .battle-peekaboo-eyes { width: 30px; height: 16px; }
+  .battle-peekaboo-status { font-size: 13px; }
+}
+.battle-peekaboo-track {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+}
+.battle-peekaboo-fill {
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--sticker-green);
+  background-image: repeating-linear-gradient(
+    -35deg,
+    #ffffff4d 0 5px,
+    transparent 5px 10px
+  );
+}
+.battle-peekaboo-star {
+  position: absolute;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+}
+.battle-peekaboo-dots { position: absolute; inset: 0; }
+.battle-peekaboo-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--sticker-rim);
+  box-shadow: 0 0 0 2px var(--sticker-ink);
+}
+.battle-peekaboo-dot[hidden] { display: none; }
+.battle-peekaboo-dot.is-cleared { background: var(--sticker-green); }
+.battle-peekaboo-dot.is-spotted { background: #f0a08a; }
 .battle-icon { width: 100%; height: 100%; overflow: visible; }
 .battle-icon-fill { stroke: var(--sticker-ink); stroke-width: 2; stroke-linejoin: round; }
 .battle-icon-mark { fill: none; stroke: #6d4339; stroke-width: 1.6; stroke-linecap: round; }

@@ -82,7 +82,14 @@ describe("trace check", () => {
   });
 
   it("shows the hint until the second point is hit", () => {
-    const hints = { charge: "c", chain: "c", catch: "c", lean: "l", trace: "trace" };
+    const hints = {
+      charge: "c",
+      chain: "c",
+      catch: "c",
+      lean: "l",
+      trace: "trace",
+      peekaboo: "p",
+    };
     let check = createCheck({ ...spec, brushSpeed: 100 }, "critter");
     expect(checkHint(check, hints)).toBe("trace");
     check = traceState(stepCheck(check, input()).check);
@@ -115,7 +122,7 @@ describe("trace check", () => {
     expect(dried.results).toEqual(["hit", "miss", "miss", "miss"]);
     expect(stepCheck(dried, input()).grade).toBe("miss");
     expect(checkHint(dried, {
-      charge: "c", chain: "c", catch: "c", lean: "l", trace: "t",
+      charge: "c", chain: "c", catch: "c", lean: "l", trace: "t", peekaboo: "p",
     })).toBe(null);
     expect(viewCheck(dried, null)).toMatchObject({ kind: "trace", dry: 1 });
   });

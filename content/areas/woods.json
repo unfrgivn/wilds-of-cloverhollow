@@ -279,9 +279,27 @@
         "y": 950
       },
       "prompt": "Look"
+    },
+    {
+      "id": "moon-perch",
+      "knot": "moon_perch",
+      "point": {
+        "x": 1400,
+        "y": 820
+      },
+      "prompt": "Look"
     }
   ],
-  "critters": [],
+  "critters": [
+    {
+      "id": "moon-owl",
+      "point": {
+        "x": 1470,
+        "y": 680
+      },
+      "visibleWhile": "moon_owl_out"
+    }
+  ],
   "recurring": {
     "dens": [
       {

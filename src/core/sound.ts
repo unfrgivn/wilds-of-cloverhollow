@@ -158,9 +158,10 @@ function treatCount(treats: State["treats"]): number {
   return total;
 }
 
-// How many beats, toys, or puffs a chain, catch, or lean has hit so far;
+// How many beats, toys, puffs, or peeks a check has cleared so far;
 // other checks none.
 function hits(check: CheckState | null): number {
+  if (check?.kind === "peekaboo") return check.peeksCleared;
   return check?.kind === "chain" || check?.kind === "catch" ||
     check?.kind === "lean" || check?.kind === "trace"
     ? check.results.filter((result) => result === "hit").length

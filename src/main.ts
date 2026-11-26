@@ -641,6 +641,14 @@ async function boot(): Promise<void> {
     if (check.kind === "trace" && geometry.kind === "trace")
       return { ...geometry, ...shared, brush: check.brush, points: check.path.points,
         checkpoint: check.checkpoint, results: check.results, dry: check.dry };
+    if (check.kind === "peekaboo" && geometry.kind === "peekaboo")
+      return {
+        ...geometry,
+        ...shared,
+        progress: check.progress,
+        status: check.status,
+        peeks: check.peeks,
+      };
     return null;
   };
   let afterTick = (_next: State): void => undefined;

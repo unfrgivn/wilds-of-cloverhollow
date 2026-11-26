@@ -411,7 +411,14 @@ export type StickerCatalogue = {
 export type BattleContent = {
   // The sprite atlas of the toys a catch throws (Milestone 41).
   toyAtlas: string;
-  hints: { charge: string; chain: string; catch: string; lean: string; trace: string };
+  hints: {
+    charge: string;
+    chain: string;
+    catch: string;
+    lean: string;
+    trace: string;
+    peekaboo: string;
+  };
   commands: {
     soothe: { label: string; check: CheckSpec };
     snack: { label: string; snackDetail: string };
@@ -528,10 +535,38 @@ export type TraceSpec = {
   reachRadius: number;
   paths: TracePath[];
 };
-export type CheckSpec = RingSpec | ChargeSpec | ChainSpec | CatchSpec | LeanSpec | TraceSpec;
+export type PeekWindow = { start: number; end: number };
+export type PeekabooSpec = {
+  kind: "peekaboo";
+  ticks: number;
+  goal: number;
+  warningTicks: number;
+  graceTicks: number;
+  peeks: PeekWindow[];
+};
+export type PeekabooStatus = "safe" | "warning" | "watching";
+export type CheckSpec =
+  | RingSpec
+  | ChargeSpec
+  | ChainSpec
+  | CatchSpec
+  | LeanSpec
+  | TraceSpec
+  | PeekabooSpec;
 // "critter": Fae's side acts on the critter; "fae": the critter's burst.
 export type CheckSide = "critter" | "fae";
 export type BeatResult = "pending" | "hit" | "miss";
+export type PeekabooState = {
+  kind: "peekaboo";
+  side: CheckSide;
+  tick: number;
+  spec: PeekabooSpec;
+  progress: number;
+  spotted: number[];
+  peeksCleared: number;
+  result: Grade | null;
+  big: boolean;
+};
 // A check in play: a copy of its spec, its tick, and its own progress. `big`
 // is the burst's roll (always false on Fae's side).
 export type CheckState =
@@ -586,7 +621,8 @@ export type CheckState =
       brush: TracePoint;
       results: BeatResult[];
       big: boolean;
-    };
+    }
+  | PeekabooState;
 // The commands every battle has; the party's commands come from its roster.
 export type SharedCommandId = "soothe" | "snack" | "run";
 export type FriendCommand = {
@@ -769,6 +805,13 @@ export type BattleCheckView =
       checkpoint: number;
       results: BeatResult[];
       dry: number;
+    }
+  | {
+      kind: "peekaboo";
+      side: CheckSide;
+      progress: number;
+      status: PeekabooStatus;
+      peeks: ("pending" | "cleared" | "spotted")[];
     };
 export type TreatTrayItem = {
   id: string;

@@ -62,7 +62,8 @@
     "chain": "Press as each one lands!",
     "catch": "Hold up or down to catch each one!",
     "lean": "Hold left or right to balance!",
-    "trace": "Trace the dots before the paint dries!"
+    "trace": "Trace the dots before the paint dries!",
+    "peekaboo": "Hold confirm while it looks away; freeze when it watches!"
   },
   "together": {
     "chargeMax": 3,

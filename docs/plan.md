@@ -3984,6 +3984,51 @@ the old trail, the owl, and the clubhouse claim.
   replay hash changes, 23 QA packs, purity, lint), `just build` (production
   and harness hook checks), and full e2e verified across Chromium & WebKit.
 
+## Milestone 82: Peekaboo Check, Starry Owl & Chef Mateo (Taco Truck Talk Mini-Boss) **Status:** ✅ Completed (2026-11-26)
+- Seventh and final battle check kind from `docs/battle-ideas.md`: **Peekaboo**
+  (`kind: "peekaboo"` in `src/core/types.ts`, `src/core/checks.ts`,
+  `src/content/load.ts`, `src/core/sound.ts`, `src/render/view.ts`,
+  `src/render/battle-choreography.ts`, `src/ui/battle.ts`, `src/ui/battle.css`,
+  `tools/sim/recorder.ts`):
+  - Hold Confirm (`Z` / gamepad A / touch Confirm) to tiptoe toward the goal
+    star while the critter looks away, watch the amber `TURN SOON...` telegraph,
+    and freeze during `WATCHING · FREEZE!` peek windows (with grace buffer,
+    Gentle Timing softening in `gentleCheckSpec`, `battle-beat` cue on every
+    cleanly frozen peek, and zero extra PRNG draws).
+  - Live battle choreography (Fae tiptoe/freeze motion; critter swaps between
+    settled idle and wide-eyed burst pose when watching), sticker UI overlay
+    with inline SVG eyes and peek dots, and `battle-peekaboo` UI Gallery state
+    tested for geometry, contrast (`8.85:1`–`10.44:1`), and zero DOM churn on
+    Chromium and WebKit.
+- Two new hand-painted mini-bosses (both passing `tools/art/critter-check.ts`
+  with zero soft-edge spill and PSNR 32–33; `content/stickers.json` expanded
+  to a balanced 24-slot 8×3 album and credits grid; favourite treats added in
+  `content/treats.json`; expressive voices & dialogue portraits registered in
+  `src/platform/voices.ts` and `src/ui/portraits.ts`):
+  - **Starey Owl / Starry Owl (`moon-owl`, Lv 8, 25 coins, `starry-owl`
+    sticker)**: summoned in Whispering Woods via `moon-perch` after
+    `clubhouse_claimed` (`moon_owl_out`), featuring `Peekaboo` bursts, wind-ups,
+    calm lore, and the **Moon Feather** keepsake in `club_chest`.
+  - **Fizzy Chef Mateo / Chef Mateo (`taco-chef`, Lv 7, 25 coins, `taco-chef`
+    sticker)**: Cloverhollow's Taco Truck chef (`NOTES.md`), summoned in Clover
+    Hills via `taco-flyer` (`taco_chef_out`), featuring wind-ups, dust-cloud
+    chains, and the game's second multi-knot **Talk** phase (`talkAt: 85`,
+    `mateo_talk_1..3` drawing on real Cloverhollow clues from Bon Appetit Café
+    and Principal Bell, with Milo still unnamed). Calmed, gifts 2 snacks,
+    offers sticky 4-coin crispy taco snacks, and adds the **Golden Taco Badge**
+    keepsake to `club_chest`.
+- Evidence: `tests/unit/peekaboo-festival.test.ts`, `tests/unit/m81-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/m81-festival.json` (14,492 ticks,
+  all 63 earlier runs unchanged), real-key `tests/e2e/m81-festival.spec.ts`
+  matching Bun's hash at 1280x720 and 874x402, and `vision`-verified
+  `art/review/m81-{moon-owl,taco-chef}-{cream,dark}.jpg`,
+  `art/review/m81-festival-gameplay.jpg`, `battle-peekaboo`, and 24-sticker
+  `credits` baselines.
+- Gates: `just check` (141 unit files / 1,131 tests, 64 sims, 23 QA packs,
+  purity, lint), `just build` (production and harness hook checks), and full
+  `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (status `passed`, 0 failed across
+  Chromium and WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

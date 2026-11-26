@@ -136,7 +136,7 @@ describe("Talk in battle", () => {
       "invalid grade tag \"grade: nope\"",
     ]);
     expect(storyTags(content.world.story).filter((tag) => tag.startsWith("grade:")).length)
-      .toBe(9);
+      .toBe(18);
     expect(() => parseCritter(
       { ...raw, talk: { ...talk, talkAt: 0 } }, "talk.json",
     )).toThrow(/talk\.talkAt/);

@@ -233,9 +233,27 @@
         "y": 440
       },
       "prompt": "Look"
+    },
+    {
+      "id": "taco-flyer",
+      "knot": "taco_flyer",
+      "point": {
+        "x": 1320,
+        "y": 820
+      },
+      "prompt": "Look"
     }
   ],
-  "critters": [],
+  "critters": [
+    {
+      "id": "taco-chef",
+      "point": {
+        "x": 1460,
+        "y": 760
+      },
+      "visibleWhile": "taco_chef_out"
+    }
+  ],
   "recurring": {
     "dens": [
       {

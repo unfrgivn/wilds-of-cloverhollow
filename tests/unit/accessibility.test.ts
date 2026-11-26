@@ -111,9 +111,16 @@ describe("gentleCheckSpec", () => {
         expect(gentle.reachRadius, label).toBeGreaterThan(spec.reachRadius);
         expect(gentle.brushSpeed, label).toBeGreaterThan(spec.brushSpeed);
         expect(gentle.dryTicks, label).toBeGreaterThan(spec.dryTicks);
+      } else if (spec.kind === "peekaboo" && gentle.kind === "peekaboo") {
+        expect(gentle.warningTicks, label).toBeGreaterThanOrEqual(spec.warningTicks);
+        expect(gentle.graceTicks, label).toBeGreaterThanOrEqual(spec.graceTicks);
+        expect(gentle.goal, label).toBeLessThanOrEqual(spec.goal);
+        expect(gentle.goal, label).toBeGreaterThanOrEqual(1);
       }
     }
-    expect(seen).toEqual(new Set(["ring", "charge", "chain", "catch", "lean", "trace"]));
+    expect(seen).toEqual(
+      new Set(["ring", "charge", "chain", "catch", "lean", "trace", "peekaboo"]),
+    );
   });
 
   it("applies gentle spec when createCheck is called with gentle=true", () => {
@@ -207,9 +214,9 @@ describe("world map land progress and bus routes", () => {
     expect(initial.bay).toEqual({ owned: 0, total: 4 });
     expect(initial.pass).toEqual({ owned: 0, total: 5 });
     expect(initial.trail).toEqual({ owned: 0, total: 3 });
-    expect(initial.forest).toEqual({ owned: 0, total: 2 });
+    expect(initial.forest).toEqual({ owned: 0, total: 3 });
     expect(initial.enchanted).toEqual({ owned: 0, total: 1 });
-    expect(initial.hills).toEqual({ owned: 0, total: 5 });
+    expect(initial.hills).toEqual({ owned: 0, total: 6 });
 
     const withFrogAndKid = landStickerProgress(world, {
       stickers: ["fountain-frog", "hooded-kid"],

@@ -1,0 +1,154 @@
+{
+  "id": "taco-chef",
+  "species": "taco-chef",
+  "name": "Fizzy Chef Mateo",
+  "calmName": "Chef Mateo",
+  "atlas": "assets/critters/taco-chef/taco-chef.json",
+  "auraCentre": {
+    "x": 258.7,
+    "y": 260.72
+  },
+  "bodyCentre": {
+    "x": 251.24,
+    "y": 301.01
+  },
+  "figureHeight": 380,
+  "overworldHeight": 160,
+  "battleHeight": 280,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "coins": 25,
+  "level": 7,
+  "sticker": {
+    "id": "taco-chef",
+    "name": "Chef Mateo",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "taco_chef_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "hungry",
+    "zoomy",
+    "grumpy"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.45,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 38,
+      "hitWindow": 8,
+      "arrivals": [
+        42,
+        68,
+        94
+      ],
+      "look": "dust"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 36,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        62,
+        84,
+        106
+      ],
+      "look": "dust"
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Chef Mateo spins his wooden spoon faster and faster! Salsa spice clouds swirl everywhere!",
+      "puffing": "The spicy taco aroma puffs up even bigger across the meadow!",
+      "fizzle": "Poof! Every spicy fizz bubble pops into warm, tasty smells."
+    }
+  },
+  "talk": {
+    "label": "Talk",
+    "prompt": "Chef Mateo lowers his wooden spoon... and listens.",
+    "talkAt": 85,
+    "knots": [
+      "mateo_talk_1",
+      "mateo_talk_2",
+      "mateo_talk_3"
+    ],
+    "calm": {
+      "great": 35,
+      "good": 25,
+      "miss": 20
+    }
+  },
+  "canRun": true,
+  "lines": {
+    "intro": "Chef Mateo marches up waving a giant wooden spoon with swirly eyes! \"EVERYBODY NEEDS MORE SPICE!\"",
+    "command": "How can Fae calm Fizzy Chef Mateo?",
+    "soothe": {
+      "great": "Fae hums a cheerful suppertime tune. Chef Mateo's wooden spoon slows to a gentle stir!",
+      "good": "Fae hums softly. Chef Mateo pauses to tap his foot in rhythm.",
+      "miss": "Chef Mateo clanks his wooden spoon right over Fae's humming!"
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie bats a crispy tortilla chip high and catches it! Chef Mateo cheers \"BRAVO!\"",
+        "good": "Maddie pounces after a dancing lime slice. Chef Mateo cracks a grin.",
+        "miss": "Maddie skids on the clover and sneezes from a tiny pinch of cumin."
+      },
+      "cast": {
+        "great": "Sue's ribbon loops like a festival bunting banner! Chef Mateo's eyes light up!",
+        "good": "Sue twirls her bright ribbon above the grass. Chef Mateo watches it sway.",
+        "miss": "Sue's ribbon catches a stray paper napkin and flutters away."
+      },
+      "juggle": {
+        "great": "Jordan juggles three golden limes in a perfect kitchen loop! Chef Mateo applauds!",
+        "good": "Jordan tosses a lime high and catches it cleanly. Chef Mateo nods approvingly.",
+        "miss": "Jordan's lime rolls into the clover. Chef Mateo yells \"FIVE SECOND RULE!\""
+      }
+    },
+    "snack": "Fae shares a crisp snack. Chef Mateo takes a taste-test bite and nods thoughtfully.",
+    "burst": "Chef Mateo tosses a flurry of crunchy taco-spice clouds toward Fae!",
+    "burstResult": {
+      "great": "Fae fans away every single spice cloud without a single sneeze!",
+      "good": "Fae brushes past most of the zesty spice clouds!",
+      "miss": "ACHOO! A zesty cloud of taco spice tickles Fae's nose!"
+    },
+    "soothed": "Chef Mateo blinks away the purple swirls and laughs warmly, wiping his apron clean!",
+    "rest": "Fae's nose is all tickled from the taco spice. Time for a quick rest.",
+    "run": "Fae steps back across the meadow while Chef Mateo loudly critiques the breeze."
+  }
+}

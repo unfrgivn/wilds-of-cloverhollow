@@ -83,6 +83,10 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{calmed("taco-chef"): I calmed Chef Mateo in Clover Hills by talking about Cloverhollow's taco favorites! He sells crispy taco snacks for 4 coins. # speaker: Fae}
+{taco_chef_out and not calmed("taco-chef"): Chef Mateo is fizzy in Clover Hills, waving his wooden spoon over a spicy taco cloud! # speaker: Fae}
+{calmed("moon-owl"): I calmed the Starry Owl in Whispering Woods with a quiet game of peekaboo! Its Moon Feather sparkles in our chest. # speaker: Fae}
+{moon_owl_out and not calmed("moon-owl"): A huge Starey Owl swooped down in the southeast Whispering Woods clearing! Hold still whenever it watches. # speaker: Fae}
 {gem_reward_all: Grandpa Barnaby gifted me his Rainbow Star Geode for finding all seven Star Gems across Cloverhollow! # speaker: Fae}
 {gem_count() > 0 and not gem_reward_all: I've found {gem_count()} of Cloverhollow's 7 Star Gems! Grandpa Barnaby at Bon Appetit Cafe loves hearing about them. # speaker: Fae}
 {bunny_friend: Ribbon Bunny is my friend! When I play my flute, she comes hopping right over. # speaker: Fae}
@@ -1881,6 +1885,8 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {cavern_chime_rung: The shimmering star crystal from Crystal Cavern. It still hums when I hold it! # speaker: Fae}
 {spice_returned: Chef Bea's golden Bon Appetit Star Pin! It still smells faintly like warm cinnamon. # speaker: Fae}
 {gem_reward_all: Grandpa Barnaby's Rainbow Star Geode! All seven Star Gems sparkle inside like a tiny galaxy. # speaker: Fae}
+{calmed("moon-owl"): Starry Owl's iridescent Moon Feather! It shimmers softly even with the lid half closed. # speaker: Fae}
+{calmed("taco-chef"): Chef Mateo's shiny Golden Taco Badge! Best taste-tester in Cloverhollow Hills. # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -2444,3 +2450,114 @@ Tucked beside the meadow boulders is a clover-fringed burrow with a bright green
 = after
 Soft four-leaf clovers sway beside the meadow boulder burrow. # speaker: Fae
 -> DONE
+
+// Peekaboo mini-boss Starey Owl & Taco Truck Talk mini-boss Chef Mateo (Milestone 81).
+VAR moon_owl_out = false
+VAR taco_chef_out = false
+VAR mateo_snacks_given = false
+
+=== moon_perch ===
+{not clubhouse_claimed:
+    A smooth crescent of mossy bark tucked in the quiet southeast clearing. A few silver-blue owl feathers rest along the branch, waiting for a calmer evening. # speaker: Fae
+    -> DONE
+}
+{not moon_owl_out:
+    A crescent of mossy bark dusted with silver-blue feathers! A soft starry chime drifts down from the branches above... # speaker: Fae # sound: chime-blue
+    ~ moon_owl_out = true
+    WHOO-WHOO! A huge owl with shimmering starry eyes glides down into the clearing and stares right over its shoulder! # speaker: Fae
+    -> DONE
+}
+{calmed("moon-owl"):
+    The mossy moon perch glows softly with fallen stardust. Starry Owl hoots a peaceful hello from nearby! # speaker: Fae
+- else:
+    Silver-blue feathers flutter around the mossy moon perch while Starey Owl watches the clearing. # speaker: Fae
+}
+-> DONE
+
+=== moon_owl_calm ===
+{moon_owl_calm > 1: -> again}
+Hoo-hoo... what a gentle tiptoe, little explorer. # speaker: Starry Owl
+A wild purple breeze rattled my treetop nest after a kid in a purple hood raced through the pines, and everything turned blurry and bright. # speaker: Starry Owl
+Standing still under the stars together calmed my ruffled feathers right down. # speaker: Starry Owl
+Please take this shimmering Moon Feather for your woodland clubhouse chest! # speaker: Starry Owl # sound: chime-blue
+Whoa, it sparkles like tiny constellations! Thank you, Starry Owl! # speaker: Fae
+If you listen closely at twilight, the breeze carries warm cinnamon and crispy taco spices drifting up from Clover Hills to the south! # speaker: Starry Owl
+-> DONE
+= again
+Hoo-hoo! Walk softly under the pines, Fae. Your tiptoe steps are the quietest in all the woods! # speaker: Starry Owl
+-> DONE
+
+=== taco_flyer ===
+{not taco_chef_out:
+    A bright paper flyer fluttering in the Clover Hills grass: "CLOVERHOLLOW TACO TRUCK! Crispy Tacos, Lime Squeeze, & Warm Smiles!" # speaker: Flyer
+    Suddenly a swirling purple spice cloud puffs up beside the meadow path! # speaker: Fae
+    ~ taco_chef_out = true
+    WHOOSH! Chef Mateo marches into the clearing with swirly eyes, waving his wooden spoon! # speaker: Fae
+    -> DONE
+}
+{calmed("taco-chef"):
+    The colorful Cloverhollow Taco Truck flyer is pinned neatly to a clover post. It smells delicious out here! # speaker: Fae
+- else:
+    The bright Cloverhollow Taco Truck flyer flutters wildly in Chef Mateo's spicy breeze! # speaker: Fae
+}
+-> DONE
+
+=== mateo_talk_1 ===
+Nobody in Cloverhollow even CARES about crispy tacos anymore! My whole recipe feels fizzed up! # speaker: Chef Mateo
++ [Bon Appetit's chalkboard has Tuesday tacos!]
+    Wait... Chef Bea wrote my crispy tacos right on the cafe chalkboard?! That warms my whole apron! # speaker: Chef Mateo # grade: great
+    -> DONE
++ [Folks in town love your warm kitchen smell!]
+    Hmph... well, my salsa DOES smell pretty amazing across the hills. # speaker: Chef Mateo # grade: good
+    -> DONE
++ [Maybe tacos are just too crunchy?]
+    TOO CRUNCHY?! Crunch is the soul of a taco, kiddo! # speaker: Chef Mateo # grade: miss
+    -> DONE
+-> DONE
+
+=== mateo_talk_2 ===
+Even the kids at school probably forgot what taco day tastes like... # speaker: Chef Mateo
++ [Principal Bell announced "Lunch is tacos!"]
+    He announced taco day on the school speaker?! HA! I knew folks were excited! # speaker: Chef Mateo # grade: great
+    -> DONE
++ [My whole class gets hungry before recess!]
+    That's true! Hungry explorers always need a good lunch! # speaker: Chef Mateo # grade: good
+    -> DONE
++ [Maybe everyone only wants cinnamon buns?]
+    Hey, cinnamon buns are great, but you can't beat a warm taco for lunch! # speaker: Chef Mateo # grade: miss
+    -> DONE
+-> DONE
+
+=== mateo_talk_3 ===
+Why do you think folks keep coming back to my taco window anyway, Fae? # speaker: Chef Mateo
++ [Sharing crunchy snacks makes friends smile!]
+    ...You're right, Fae. Cooking isn't about shouting louder, it's about sharing with friends! # speaker: Chef Mateo # grade: great
+    -> DONE
++ [Your wooden spoon looks super professional!]
+    Haha, well it IS my favorite stirring spoon, and it works best with a calm chef! # speaker: Chef Mateo # grade: good
+    -> DONE
++ [Spicy clouds clear out stuffed noses?]
+    Whoa, nobody wants a sneezy taco! Let me dial down the cayenne! # speaker: Chef Mateo # grade: miss
+    -> DONE
+-> DONE
+
+=== taco_chef_calm ===
+{mateo_snacks_given: -> again}
+Whew... my head feels clear again! Thank you for talking me down, Fae! # speaker: Chef Mateo
+A kid in a purple hood zoomed past my truck and handed me a fizzy purple soda as a "new drink idea." One sip and I started tossing spice clouds everywhere! # speaker: Chef Mateo
+~ mateo_snacks_given = true
+Here, take two fresh crispy taco snacks on the house for you and your friends! # speaker: Chef Mateo # gift: snack 2
+And keep my shiny Golden Taco Badge in your clubhouse chest! You're officially Cloverhollow's best taste-tester! # speaker: Chef Mateo # sound: chime-yellow
+Awesome! Thanks, Chef Mateo! # speaker: Fae
+-> mateo_shop
+= again
+Hola, Fae! The grill is warm, the limes are fresh, and there's zero purple fizz in the salsa! # speaker: Chef Mateo
+-> mateo_shop
+= mateo_shop
+{coins() < 4: Crispy taco snacks are 4 coins apiece whenever you want a crunch! # speaker: Chef Mateo}
++ {coins() >= 4} [Buy a crispy taco snack for 4 coins]
+    One hot, crispy Cloverhollow taco, wrapped up tight for your backpack! # speaker: Chef Mateo # buy: snack 4
+    -> DONE
++ [Just saying hi!]
+    Always happy to see my favorite taste-tester, Fae! Come back anytime. # speaker: Chef Mateo
+    -> DONE

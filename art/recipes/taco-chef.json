@@ -1,0 +1,27 @@
+{
+  "asset": "taco-chef",
+  "milestone": 81,
+  "date": "2026-11-26",
+  "summary": "Chef Mateo (Cloverhollow Taco Truck chef), optional Talk-phase people mini-boss: 2x2 body sheet on flat magenta #FF00FF built via tools/art/build-person.ts taco-chef --key=#FF00FF --height=380.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 2,
+  "kept": "art/source/critters/taco-chef/body-sheet-raw.png",
+  "postProcessing": {
+    "build": "bun tools/art/build-person.ts taco-chef --key=#FF00FF --height=380",
+    "measuredCentres": {
+      "bodyCentre": { "x": 251.24, "y": 301.01 },
+      "auraCentre": { "x": 258.7, "y": 260.72 }
+    }
+  },
+  "checker": {
+    "bodyFrames": ["calm_idle_01", "chaos_idle_01", "chaos_burst_01", "soothed_01"],
+    "auraFrames": ["chaos_aura_01"],
+    "matteMethods": { "body": "magenta-key", "aura": "white-lift" },
+    "bodyHue": { "min": 0.02, "max": 0.14, "minFraction": 0.15 },
+    "psnrThreshold": 25
+  },
+  "review": [
+    "art/review/m81-taco-chef-cream.jpg",
+    "art/review/m81-taco-chef-dark.jpg"
+  ]
+}

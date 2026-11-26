@@ -31,6 +31,7 @@ const battleParts: Record<string, string[]> = {
   "battle-chain-burst": [".battle-hud", ".battle-chain", ".battle-check-hint"],
   "battle-catch": [".battle-hud", ".battle-catch", ".battle-check-hint", ".touch-reach"],
   "battle-lean": [".battle-hud", ".battle-lean", ".touch-lean"],
+  "battle-peekaboo": [".battle-hud", ".battle-peekaboo"],
   "battle-trace": [".battle-hud", ".battle-trace", ".battle-check-hint"],
   "battle-trace-mid": [".battle-hud", ".battle-trace"],
   "battle-trace-dry": [".battle-hud", ".battle-trace", ".battle-grade"],
@@ -60,7 +61,7 @@ const battleParts: Record<string, string[]> = {
     state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
-  ".battle-chain", ".battle-catch", ".battle-lean", ".battle-trace",
+  ".battle-chain", ".battle-catch", ".battle-lean", ".battle-peekaboo", ".battle-trace",
   ".battle-check-hint", ".battle-grade",
   ".touch-reach", ".touch-lean", ".touch-comet",
   ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
@@ -214,6 +215,7 @@ function measureContrast(): Contrast[] {
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
     ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
+    ".battle-peekaboo-status, " +
     ".battle-together-btn .battle-action-label, .battle-flute-btn .battle-action-label, " +
     ".battle-soften-pill .battle-action-label, .battle-action-key, " +
     ".battle-reward-name, .journal-label, .journal-tab, " +
@@ -1365,9 +1367,25 @@ test.describe("sticker gallery", () => {
     const results: Contrast[] = [];
     for (const state of [
       "battle-command", "battle-grade", "battle-reward", "battle-feelings", "battle-together",
+      "battle-peekaboo",
     ]) {
       await gallery(page, state);
       results.push(...await page.evaluate(measureContrast));
+    }
+    await gallery(page, "battle-peekaboo");
+    for (const status of ["safe", "warning"] as const) {
+      await page.evaluate((next) => window.__stickerGallery.renderCheck({
+        kind: "peekaboo",
+        track: { x: 192, y: 134, width: 136, height: 14 },
+        progress: 0.42,
+        status: next,
+        peeks: ["cleared", "pending"],
+        grade: null,
+        hint: null,
+        hintAt: { x: 315, y: 243 },
+      }), status);
+      results.push(...(await page.evaluate(measureContrast))
+        .filter((result) => result.label.includes("battle-peekaboo-status")));
     }
     await gallery(page, "battle-grade");
     for (const grade of ["good", "miss"] as const) {
@@ -1421,7 +1439,7 @@ test.describe("sticker gallery", () => {
         const observer = new MutationObserver(() => undefined);
         for (const part of document.querySelectorAll(
            ".battle-hud, .battle-commands, .battle-ring, .battle-charge-meter, .battle-chain, " +
-             ".battle-catch, .battle-lean, .battle-trace, .battle-check-hint, " +
+             ".battle-catch, .battle-lean, .battle-peekaboo, .battle-trace, .battle-check-hint, " +
              ".battle-feeling, .battle-grade, " +
              ".battle-windup, " +
              ".battle-reward")) {

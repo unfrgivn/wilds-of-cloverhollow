@@ -1,0 +1,153 @@
+{
+  "id": "moon-owl",
+  "species": "moon-owl",
+  "name": "Starey Owl",
+  "calmName": "Starry Owl",
+  "atlas": "assets/critters/moon-owl/moon-owl.json",
+  "auraCentre": {
+    "x": 258.7,
+    "y": 260.72
+  },
+  "bodyCentre": {
+    "x": 249.65,
+    "y": 326.63
+  },
+  "figureHeight": 360,
+  "overworldHeight": 115,
+  "battleHeight": 265,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "coins": 25,
+  "level": 8,
+  "sticker": {
+    "id": "starry-owl",
+    "name": "Starry Owl",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "moon_owl_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "curious",
+    "grumpy",
+    "bored"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.45,
+    "check": {
+      "kind": "peekaboo",
+      "ticks": 146,
+      "goal": 64,
+      "warningTicks": 16,
+      "graceTicks": 4,
+      "peeks": [
+        {
+          "start": 38,
+          "end": 64
+        },
+        {
+          "start": 94,
+          "end": 120
+        }
+      ]
+    },
+    "big": {
+      "kind": "peekaboo",
+      "ticks": 156,
+      "goal": 68,
+      "warningTicks": 14,
+      "graceTicks": 4,
+      "peeks": [
+        {
+          "start": 30,
+          "end": 52
+        },
+        {
+          "start": 74,
+          "end": 96
+        },
+        {
+          "start": 116,
+          "end": 138
+        }
+      ]
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Starey Owl puffs up its starry feathers and swivels its head round and round!",
+      "puffing": "Its wide golden eyes gleam brighter through the ferns!",
+      "fizzle": "Hoo-hoo! Every starry puff settles softly like moonlit snow."
+    }
+  },
+  "lines": {
+    "intro": "A huge starry-eyed owl swoops onto the moss and stares straight at Fae! \"WHOO-WHOO?!\"",
+    "command": "How can Fae calm Starey Owl?",
+    "soothe": {
+      "great": "Fae hums a quiet lullaby of crickets and moonlight. Starey Owl's feathers droop gently!",
+      "good": "Fae hums a soft woodland tune. Starey Owl blinks slowly.",
+      "miss": "Starey Owl hoots a loud starry echo right over Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie plays peekaboo behind a mossy fern. Starey Owl hoots a delighted giggle!",
+        "good": "Maddie wiggles a moonlit leaf. Starey Owl tilts its head to watch.",
+        "miss": "Maddie pounces at a firefly shadow and lands in a pile of moss."
+      },
+      "cast": {
+        "great": "Sue's ribbon twirls like a shooting star! Starey Owl follows every shimmering loop!",
+        "good": "Sue swishes her bright ribbon through the clearing. Starey Owl watches closely.",
+        "miss": "Sue's ribbon snags on a pine twig. Starey Owl puffs its cheeks."
+      },
+      "juggle": {
+        "great": "Jordan juggles glowing pinecones in a starry orbit. Starey Owl claps both wings!",
+        "good": "Jordan tosses pinecones high in a steady arc. Starey Owl tracks each one.",
+        "miss": "Jordan's pinecone bonks off a mossy root. Starey Owl gives a tiny grumpy hoot."
+      }
+    },
+    "snack": "Fae tosses a crisp cracker crumb. Starey Owl snaps it up with a satisfied clack.",
+    "burst": "Starey Owl plays peekaboo! Tiptoe close while it looks away, and freeze when it stares!",
+    "burstResult": {
+      "great": "Fae tiptoes right up and freezes like a statue under the starry gaze!",
+      "good": "Fae tiptoes most of the way, only rustling a single fern leaf!",
+      "miss": "WHOO! Starey Owl spots Fae moving and startles her with a starry hoot!"
+    },
+    "soothed": "Starey Owl blinks its golden eyes soft and sleepy. The purple fizz drifts away like stardust!",
+    "rest": "Fae yawns under the starry gaze. Time for a cozy rest.",
+    "run": "Fae backs softly down the mossy path while Starey Owl watches from its perch."
+  }
+}

@@ -15,7 +15,8 @@
         "hedgehog",
         "owl",
         "bat",
-        "crystal-mole"
+        "crystal-mole",
+        "moon-owl"
       ],
       "description": "Crisp red orchard slices from Cloverhollow Market.",
       "useLine": "Fae shares crisp Orchard Apple slices. Fresh and crunchy!",
@@ -36,7 +37,8 @@
         "crab",
         "penguin",
         "bluebird",
-        "gull"
+        "gull",
+        "taco-chef"
       ],
       "description": "Savoury little fish-shaped crackers from Cloverhollow Market.",
       "useLine": "Fae shares a crunchy Fish Cracker. Tasty and salty!",
@@ -58,7 +60,8 @@
         "frog",
         "bluebird",
         "gull",
-        "bat"
+        "bat",
+        "taco-chef"
       ],
       "description": "Double-scoop bubblegum-berry cone from the Ice Cream Shop.",
       "useLine": "Fae shares a chilly Berry Swirl Cone. Sweet and refreshing!",
@@ -79,7 +82,8 @@
         "cat",
         "pup",
         "hooded-kid",
-        "crystal-mole"
+        "crystal-mole",
+        "moon-owl"
       ],
       "description": "Warm fudge and marshmallow swirl from the Ice Cream Shop.",
       "useLine": "Fae shares a Cozy Cocoa Sundae. Warm, sweet, and soothing!",

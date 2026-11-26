@@ -2,7 +2,13 @@ import "./battle.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
 import { feelingMarkup, heartMarkup, icon } from "./icons";
-import type { BattleTalk, ChainLook, FeelingId, FluteAssistKind } from "../core";
+import type {
+  BattleTalk,
+  ChainLook,
+  FeelingId,
+  FluteAssistKind,
+  PeekabooStatus,
+} from "../core";
 import type { DialogueView } from "./sticker";
 
 /** Project battle Talk's core dialogue state onto the shared sticker dialogue. */
@@ -181,6 +187,16 @@ export type BattleCheckView =
       grade: TimingGrade | null;
       hint: string | null;
       hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "peekaboo";
+      track: { x: number; y: number; width: number; height: number };
+      progress: number;
+      status: PeekabooStatus;
+      peeks: ("pending" | "cleared" | "spotted")[];
+      grade: TimingGrade | null;
+      hint: string | null;
+      hintAt: { x: number; y: number };
     };
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
@@ -227,14 +243,38 @@ export function createBattleCheck(root: HTMLElement): {
   const traceBrush = element("div", "battle-trace-brush");
   const traceDry = element("div", "battle-trace-dry");
   traceLayer.append(traceSvg, traceDots, traceBrush, traceDry);
+  // Peekaboo (Milestone 81): status sticker with SVG eyes above a cream
+  // progress bar filling left-to-right toward a gold star, plus peek dots.
+  const peekabooLayer = element("div", "battle-peekaboo");
+  const peekabooBadge = element("div", "battle-peekaboo-badge");
+  const peekabooEyes = peekabooEyesIcon();
+  const peekabooStatusLabel = element("span", "battle-peekaboo-status");
+  peekabooBadge.append(peekabooEyes, peekabooStatusLabel);
+  const peekabooTrack = element("div", "battle-peekaboo-track");
+  const peekabooFill = element("div", "battle-peekaboo-fill");
+  peekabooTrack.append(peekabooFill);
+  const peekabooStar = peekabooStarIcon();
+  const peekabooDots = element("div", "battle-peekaboo-dots");
+  peekabooLayer.append(peekabooBadge, peekabooTrack, peekabooStar, peekabooDots);
   const hint = element("div", "battle-check-hint");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
   grade.hidden = true;
-  root.append(ring, meter, chain, catchLayer, leanLayer, traceLayer, hint, grade);
+  root.append(
+    ring,
+    meter,
+    chain,
+    catchLayer,
+    leanLayer,
+    traceLayer,
+    peekabooLayer,
+    hint,
+    grade,
+  );
   const icons: HTMLElement[] = [];
   const toyNodes: { node: HTMLElement; src: string }[] = [];
   const dotNodes: HTMLElement[] = [];
+  const peekDotNodes: HTMLElement[] = [];
   let iconLook: ChainLook | null = null;
   const hide = (node: HTMLElement | SVGSVGElement, hidden: boolean): void => {
     node.style.display = hidden ? "none" : "";
@@ -247,6 +287,7 @@ export function createBattleCheck(root: HTMLElement): {
       hide(catchLayer, view?.kind !== "catch");
       hide(leanLayer, view?.kind !== "lean");
       hide(traceLayer, view?.kind !== "trace");
+      hide(peekabooLayer, view?.kind !== "peekaboo");
       hide(hint, view?.hint === null || view === null);
       if (view === null) {
         grade.hidden = true;
@@ -415,6 +456,37 @@ export function createBattleCheck(root: HTMLElement): {
         // square, so a completed grade hangs just inside the paper, not over
         // the calm meter.
         renderGrade(grade, view.grade, rect.x + rect.width / 2, rect.y + 52);
+      } else if (view.kind === "peekaboo") {
+        const { x, y, width, height } = view.track;
+        setAttribute(peekabooBadge, "data-status", view.status);
+        setText(peekabooStatusLabel, peekabooLabels[view.status]);
+        peekabooBadge.style.setProperty("--peekaboo-x", `${x}px`);
+        peekabooBadge.style.top = `${y - height / 2 - 6}px`;
+        peekabooTrack.style.left = `${x}px`;
+        peekabooTrack.style.top = `${y}px`;
+        peekabooTrack.style.width = `${width}px`;
+        peekabooTrack.style.height = `${height}px`;
+        peekabooFill.style.width = `${clamp01(view.progress) * 100}%`;
+        const starSize = Math.round(Math.max(24, height * 1.7));
+        setAttribute(peekabooStar, "width", String(starSize));
+        setAttribute(peekabooStar, "height", String(starSize));
+        peekabooStar.style.left = `${x + width / 2}px`;
+        peekabooStar.style.top = `${y}px`;
+        while (peekDotNodes.length < view.peeks.length) {
+          const dot = element("span", "battle-peekaboo-dot");
+          peekabooDots.append(dot);
+          peekDotNodes.push(dot);
+        }
+        peekDotNodes.forEach((dot, index) => {
+          const state = view.peeks[index];
+          dot.hidden = state === undefined;
+          if (state === undefined) return;
+          dot.classList.toggle("is-cleared", state === "cleared");
+          dot.classList.toggle("is-spotted", state === "spotted");
+          dot.style.left = `${x + (index - (view.peeks.length - 1) / 2) * puffSpacing}px`;
+          dot.style.top = `${y + height / 2 + 8}px`;
+        });
+        renderGrade(grade, view.grade, x, y + height / 2 + 54);
       } else {
         chain.style.left = "0";
         chain.style.top = "0";
@@ -544,6 +616,61 @@ function swooshIcon(): SVGSVGElement {
   return svg;
 }
 
+// Peekaboo status eyes (Milestone 81): all three states pre-mounted in one
+// SVG and toggled by CSS on `[data-status]` so renders never churn DOM nodes.
+function peekabooEyesIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-peekaboo-eyes");
+  svg.setAttribute("viewBox", "0 0 36 18");
+  svg.setAttribute("aria-hidden", "true");
+  const add = <K extends "path" | "circle" | "ellipse">(
+    parent: Element,
+    tag: K,
+    className: string,
+    attributes: Record<string, string>,
+  ): void => {
+    const node = svgElement(tag, className);
+    for (const [name, value] of Object.entries(attributes)) node.setAttribute(name, value);
+    parent.append(node);
+  };
+  // Safe: closed cozy crescent eyes looking away.
+  const safeGroup = svgElement("g", "battle-peekaboo-eyes-safe");
+  add(safeGroup, "path", "battle-peekaboo-lid", { d: "M4 11 Q10 6 16 11" });
+  add(safeGroup, "path", "battle-peekaboo-lid", { d: "M20 11 Q26 6 32 11" });
+  // Warning: half-open blinking eyes peeking over.
+  const warnGroup = svgElement("g", "battle-peekaboo-eyes-warning");
+  add(warnGroup, "ellipse", "battle-peekaboo-sclera", { cx: "10", cy: "10", rx: "6", ry: "3.4" });
+  add(warnGroup, "ellipse", "battle-peekaboo-sclera", { cx: "26", cy: "10", rx: "6", ry: "3.4" });
+  add(warnGroup, "circle", "battle-peekaboo-pupil", { cx: "10", cy: "10.5", r: "2" });
+  add(warnGroup, "circle", "battle-peekaboo-pupil", { cx: "26", cy: "10.5", r: "2" });
+  add(warnGroup, "path", "battle-peekaboo-lid", { d: "M4 8.5 Q10 6.5 16 8.5" });
+  add(warnGroup, "path", "battle-peekaboo-lid", { d: "M20 8.5 Q26 6.5 32 8.5" });
+  // Watching: wide starry eyes with bright sparkle pupils.
+  const watchGroup = svgElement("g", "battle-peekaboo-eyes-watching");
+  add(watchGroup, "circle", "battle-peekaboo-sclera", { cx: "10", cy: "9", r: "6.4" });
+  add(watchGroup, "circle", "battle-peekaboo-sclera", { cx: "26", cy: "9", r: "6.4" });
+  add(watchGroup, "circle", "battle-peekaboo-pupil", { cx: "10", cy: "9", r: "3.5" });
+  add(watchGroup, "circle", "battle-peekaboo-pupil", { cx: "26", cy: "9", r: "3.5" });
+  add(watchGroup, "circle", "battle-peekaboo-spark", { cx: "8.5", cy: "7.5", r: "1.4" });
+  add(watchGroup, "circle", "battle-peekaboo-spark", { cx: "24.5", cy: "7.5", r: "1.4" });
+  svg.append(safeGroup, warnGroup, watchGroup);
+  return svg;
+}
+
+// Peekaboo's goal star at the end of the progress track: butter gold on cream rim.
+function peekabooStarIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-peekaboo-star");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const shape = "M12 1.6 L14.8 8.7 L22.5 9.2 L16.6 14.1 L18.5 21.5 L12 17.4 L5.5 21.5 " +
+    "L7.4 14.1 L1.5 9.2 L9.2 8.7 Z";
+  for (const className of ["battle-lean-star-rim", "battle-lean-star-fill"]) {
+    const path = svgElement("path", className);
+    path.setAttribute("d", shape);
+    svg.append(path);
+  }
+  return svg;
+}
+
 export type RewardStickerView = {
   visible: boolean;
   title: string;
@@ -563,6 +690,11 @@ const gradeLabels: Record<TimingGrade, string> = {
   great: "GREAT!",
   good: "GOOD!",
   miss: "MISS",
+};
+const peekabooLabels: Record<PeekabooStatus, string> = {
+  safe: "LOOKING AWAY · HOLD!",
+  warning: "TURN SOON...",
+  watching: "WATCHING · FREEZE!",
 };
 
 function clamp01(value: number): number {

@@ -64,7 +64,8 @@ for (let head = 0; head < queue.length; head += 1) {
 let changed = 0;
 for (let index = 0; index < width * height; index += 1) {
   const offset = index * 4;
-  if ((pixels[offset + 3] ?? 0) === 0 || (distance[index] ?? 65535) > band) continue;
+  const alpha = pixels[offset + 3] ?? 0;
+  if (alpha === 0 || (alpha >= 240 && (distance[index] ?? 65535) > band)) continue;
   const red = pixels[offset] ?? 0;
   const green = pixels[offset + 1] ?? 0;
   const blue = pixels[offset + 2] ?? 0;

@@ -1,50 +1,10 @@
 import "./claw.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import { clawLook, layoutClaw, type ClawLayout, type Line, type Rect } from "./claw-layout";
+import { clawLook, layoutClaw, type ClawLayout, type Line } from "./claw-layout";
+import {
+  element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
+} from "./dom";
 import type { ClawCalibration, ClawView } from "../core";
-
-const svgNamespace = "http://www.w3.org/2000/svg";
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-  parent: Element,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  parent.append(node);
-  return node;
-}
-
-function svgElement<K extends keyof SVGElementTagNameMap>(
-  tag: K,
-  className: string,
-  parent: Element,
-): SVGElementTagNameMap[K] {
-  const node = document.createElementNS(svgNamespace, tag);
-  node.setAttribute("class", className);
-  parent.append(node);
-  return node;
-}
-
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function setAttribute(node: Element, name: string, value: string): void {
-  if (node.getAttribute(name) !== value) node.setAttribute(name, value);
-}
-
-function setStyle(node: HTMLElement | SVGElement, name: string, value: string): void {
-  if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
-}
-
-function place(node: HTMLElement | SVGElement, rect: Rect): void {
-  setStyle(node, "left", `${rect.x}px`);
-  setStyle(node, "top", `${rect.y}px`);
-  setStyle(node, "width", `${rect.width}px`);
-  setStyle(node, "height", `${rect.height}px`);
-}
 
 function drawLine(node: SVGLineElement, line: Line): void {
   setAttribute(node, "x1", String(line.x1));
@@ -55,11 +15,6 @@ function drawLine(node: SVGLineElement, line: Line): void {
 
 function attributes(node: Element, values: Record<string, string | number>): void {
   for (const [name, value] of Object.entries(values)) setAttribute(node, name, String(value));
-}
-
-function pixels(value: string): number {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 // The claw in a 100 x 100 box: its head and collar at the top, three prongs
@@ -77,7 +32,6 @@ const prongs = {
   ],
 };
 
-export type Box = { x: number; y: number; width: number; height: number };
 // The close-up as drawn, in CSS px (spec 11, renderInfo().arcade): the claw's
 // prong tips, and where each plush stands (its base point) and its box's side.
 export type ClawInfo = {
@@ -90,11 +44,6 @@ export type ClawInfo = {
   claw: { x: number; y: number; open: boolean };
   plushes: { id: string; x: number; y: number; size: number; held: boolean }[];
 };
-
-export function measure(node: Element): Box {
-  const box = node.getBoundingClientRect();
-  return { x: box.x, y: box.y, width: box.width, height: box.height };
-}
 
 // The claw machine close-up (spec 8.2): the painted cabinet, the heap of plush
 // critters inside its glass box, the gantry, and the claw, laid out by

@@ -22,21 +22,15 @@ async function run(command: string[]): Promise<void> {
 await run(["rm", "-rf", frames]);
 await run(["mkdir", "-p", frames]);
 for (const [name, source] of bodies) {
-  const keyedSource = `${frames}/key-${name}.png`;
-  await run(["magick", `${root}/${source}`, "-fuzz", "10%", "-fill", "#00FF00",
-    "-draw", "color 0,0 floodfill", "-fuzz", "20%", "-transparent", "#FF00FF",
-    keyedSource]);
-  await run(["bun", "tools/art/postprocess.ts", "--input", keyedSource,
+  await run(["bun", "tools/art/postprocess.ts", "--input", `${root}/${source}`,
     "--output", `${frames}/${name}.png`, "--width", "512", "--height", "512",
-    "--scale-percent", uniformScale, "--bottom-margin", "8", "--key", "#00FF00",
-    "--fuzz", "18%", "--despill", "global-green", "--holes"]);
-  await run(["bun", "tools/art/despill-edge.ts", "--input",
-    `${frames}/${name}.png`, "--output", `${frames}/${name}.png`, "--key", "green",
-    "--band", "3"]);
-  await run(["magick", `${frames}/${name}.png`, "-fuzz", "40%", "-transparent",
-    "#00FF00", `${frames}/${name}.png`]);
+    "--scale-percent", uniformScale, "--bottom-margin", "8", "--key", "#FF00FF",
+    "--fuzz", "35%", "--despill", "edge", "--holes"]);
   await run(["bun", "tools/art/drop-islands.ts", "--input", `${frames}/${name}.png`,
     "--output", `${frames}/${name}.png`, "--min", "120"]);
+  await run(["bun", "tools/art/despill-edge.ts", "--input",
+    `${frames}/${name}.png`, "--output", `${frames}/${name}.png`, "--key", "magenta",
+    "--band", "6"]);
 }
 
 const alpha = `${frames}/aura-alpha.png`;

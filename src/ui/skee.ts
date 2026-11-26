@@ -1,55 +1,12 @@
 import "./skee.css";
-import { measure, type Box } from "./claw";
+import {
+  element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
+} from "./dom";
 import { layoutSkee, skeeFrame, type SkeeLayout, type Target } from "./skee-layout";
 import type { SkeeCalibration, SkeeView } from "../core";
 
-const svgNamespace = "http://www.w3.org/2000/svg";
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-  parent: Element,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  parent.append(node);
-  return node;
-}
-
-function svgElement<K extends keyof SVGElementTagNameMap>(
-  tag: K,
-  className: string,
-  parent: Element,
-): SVGElementTagNameMap[K] {
-  const node = document.createElementNS(svgNamespace, tag);
-  node.setAttribute("class", className);
-  parent.append(node);
-  return node;
-}
-
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
 function attributes(node: Element, values: Record<string, string | number>): void {
-  for (const [name, value] of Object.entries(values))
-    if (node.getAttribute(name) !== String(value)) node.setAttribute(name, String(value));
-}
-
-function setStyle(node: HTMLElement | SVGElement, name: string, value: string): void {
-  if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
-}
-
-function place(node: HTMLElement, rect: Box): void {
-  setStyle(node, "left", `${rect.x}px`);
-  setStyle(node, "top", `${rect.y}px`);
-  setStyle(node, "width", `${rect.width}px`);
-  setStyle(node, "height", `${rect.height}px`);
-}
-
-function pixels(value: string): number {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : 0;
+  for (const [name, value] of Object.entries(values)) setAttribute(node, name, String(value));
 }
 
 // The close-up as drawn (spec 11, renderInfo().arcade), in CSS px.

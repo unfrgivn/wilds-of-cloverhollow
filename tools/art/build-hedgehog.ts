@@ -8,7 +8,7 @@ const root = "art/source/critters/hedgehog";
 const frames = "art/scratch/hedgehog-build-frames";
 const scales: Record<string, string> = {
   "chaos_idle_01": "21.0",
-  "chaos_burst_01": "29.5",
+  "chaos_burst_01": "28.5",
   "soothed_01": "21.0",
   "calm_idle_01": "22.0",
 };
@@ -27,20 +27,15 @@ async function run(command: string[]): Promise<void> {
 await run(["rm", "-rf", frames]);
 await run(["mkdir", "-p", frames]);
 for (const [name, source] of bodies) {
-  const keyedSource = `${frames}/key-${name}.png`;
-  await run(["bun", "tools/art/key-alpha.ts", "--input", `${root}/${source}`,
-    "--output", keyedSource, "--key", "#FF00FF", "--fuzz", "65%", "--despill", "edge"]);
-  await run(["bun", "tools/art/postprocess.ts", "--input", keyedSource,
+  await run(["bun", "tools/art/postprocess.ts", "--input", `${root}/${source}`,
     "--output", `${frames}/${name}.png`, "--width", "512", "--height", "512",
     "--scale-percent", scales[name] ?? "26.0", "--bottom-margin", "8", "--key", "#FF00FF",
-    "--fuzz", "65%", "--despill", "edge", "--holes"]);
-  await run(["bun", "tools/art/despill-edge.ts", "--input",
-    `${frames}/${name}.png`, "--output", `${frames}/${name}.png`, "--key", "magenta",
-    "--band", "3"]);
-  await run(["magick", `${frames}/${name}.png`, "-fuzz", "40%", "-transparent",
-    "#FF00FF", `${frames}/${name}.png`]);
+    "--fuzz", "35%", "--despill", "edge", "--holes"]);
   await run(["bun", "tools/art/drop-islands.ts", "--input", `${frames}/${name}.png`,
     "--output", `${frames}/${name}.png`, "--min", "120"]);
+  await run(["bun", "tools/art/despill-edge.ts", "--input",
+    `${frames}/${name}.png`, "--output", `${frames}/${name}.png`, "--key", "magenta",
+    "--band", "6"]);
 }
 
 const alpha = `${frames}/aura-alpha.png`;

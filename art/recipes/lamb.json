@@ -23,9 +23,9 @@
     "chaos_aura_01": 0.2
   },
   "postProcessing": {
-    "keyColor": "#00FF00",
-    "fuzz": "18%",
-    "despill": "global-green after magenta-to-green border flood conversion, then edge cleanup",
+    "keyColor": "#FF00FF",
+    "fuzz": "35%",
+    "despill": "edge-only magenta despill on the 6 px alpha rim",
     "frameCanvas": "512x512 source px",
     "baseline": 504,
     "atlas": "3 columns by 2 rows, custom PixiJS v8 JSON",
@@ -42,16 +42,16 @@
       "chaos_aura_01"
     ],
     "matteMethods": {
-      "body": "green-key",
+      "body": "magenta-key",
       "aura": "white-lift"
     },
     "bodyHue": {
       "min": 0,
       "max": 0.18,
-      "minFraction": 0
+      "minFraction": 0.04
     }
   },
-  "keyColourJustification": "#00FF00 is absent from the lamb subject; selected raw backgrounds are magenta and are converted only in the deterministic matte pass.",
+  "keyColourJustification": "#FF00FF is absent from the lamb subject; raw magenta backgrounds are keyed directly and despilled only along the 3 px outer alpha rim so interior purple chaos marks stay intact.",
   "review": [
     "art/review/lamb-sheet-cream.png",
     "art/review/lamb-sheet-dark.png",
@@ -59,12 +59,12 @@
   ],
   "measuredCentres": {
     "auraCentre": {
-      "x": 256,
-      "y": 256
+      "x": 255.2,
+      "y": 261.9
     },
     "bodyCentre": {
-      "x": 256,
-      "y": 314
+      "x": 249.8,
+      "y": 310.3
     }
   }
 }

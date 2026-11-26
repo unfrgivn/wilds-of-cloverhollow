@@ -13,6 +13,32 @@ export type AtlasJson = {
   meta: { size?: { w: number; h: number } };
 };
 
+export function parseAtlasJson(value: unknown, file: string): AtlasJson {
+  if (typeof value !== "object" || value === null || !("frames" in value) || !("meta" in value))
+    throw new Error(`Invalid atlas JSON: ${file}`);
+  const framesRaw = value.frames;
+  const metaRaw = value.meta;
+  if (typeof framesRaw !== "object" || framesRaw === null ||
+      typeof metaRaw !== "object" || metaRaw === null)
+    throw new Error(`Invalid atlas JSON: ${file}`);
+  const frames: Record<string, { frame: AtlasFrame }> = {};
+  for (const [name, entry] of Object.entries(framesRaw)) {
+    if (typeof entry !== "object" || entry === null || !("frame" in entry)) continue;
+    const rect = entry.frame;
+    if (typeof rect !== "object" || rect === null) continue;
+    if ("x" in rect && "y" in rect && "w" in rect && "h" in rect &&
+        typeof rect.x === "number" && typeof rect.y === "number" &&
+        typeof rect.w === "number" && typeof rect.h === "number")
+      frames[name] = { frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h } };
+  }
+  let size: { w: number; h: number } | undefined;
+  if ("size" in metaRaw && typeof metaRaw.size === "object" && metaRaw.size !== null &&
+      "w" in metaRaw.size && "h" in metaRaw.size &&
+      typeof metaRaw.size.w === "number" && typeof metaRaw.size.h === "number")
+    size = { w: metaRaw.size.w, h: metaRaw.size.h };
+  return { frames, meta: { size } };
+}
+
 export function atlasImage(sheet: AtlasJson, src: string, frameName: string): AtlasImage {
   const frame = sheet.frames[frameName]?.frame;
   if (frame === undefined) throw new Error(`Unknown atlas frame: ${frameName}`);

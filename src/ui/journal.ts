@@ -1,5 +1,6 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { element, setAttribute, setText } from "./dom";
 import { coinMarkup, cookieMarkup, ticketMarkup } from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 import type { LevelStats } from "../core/levels";
@@ -38,24 +39,6 @@ type Slot = {
 };
 
 type MapLand = JournalView["lands"][number];
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  return node;
-}
-
-// The game renders every frame; only touch the DOM when something changed.
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function setAttribute(node: Element, name: string, value: string): void {
-  if (node.getAttribute(name) !== value) node.setAttribute(name, value);
-}
 
 function addSlot(grid: HTMLElement): Slot {
   const root = element("div", "journal-slot");

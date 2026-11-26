@@ -293,13 +293,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
-  excluded) and no single texture over 2048x2048. One `AreaView`
+  excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
+  ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
   (`src/render/area-view.ts`) owns an area's sprites; swapping areas destroys
   them, and the game neither ticks nor renders until the new area has loaded.
-  The area just left stays resident and the area two crossings back unloads on
-  transition, a bounded current + previous pair, so the way back through a
-  door is a cache hit instead of a reload (owner, 2026-11-23: every door
-  crossing held a paper-white screen for the whole target reload).
+  At boot, `GameView` loads only permanent core sheets (`fae-sheet`, party
+  members in `world.party`, `glow-sheet`, `ambient-sheet`, and the battle toy
+  atlas — deduplicating party members that also appear in `world.characters`).
+  Per-area NPC and critter atlases (`areaEntityAtlases`) load on demand with
+  their area (and warm on door fade-out prefetch) and unload on the same
+  bounded current + previous area residency window as ground tiles and prop
+  atlases, so the way back through a door is a cache hit instead of a reload
+  (owner, 2026-11-23: every door crossing held a paper-white screen for the
+  whole target reload). DOM-only sticker/prize/credits frame crops read tiny
+  atlas JSON metadata without loading unused WebGL textures or decoding all
+  critter PNGs up front; arcade and clubhouse microwave close-ups (paintings
+  and DOM atlases) load on demand when entering `arcade` or `clubhouse`.
 
 ## 5. Characters and animation (locked)
 - Frame-by-frame animation in 4 directions: down, up, left, right. Right may

@@ -3589,6 +3589,52 @@ the old trail, the owl, and the clubhouse claim.
   with zero Vite asset warnings), and full `CLOVERHOLLOW_E2E_PORT=4198 just e2e`
   (941 passed, 2 skipped in 4.0 min).
 
+## Milestone 71: Art Quality Polish, Mipmaps, iOS Memory Optimization & Architecture Cleanup **Status:** ✅ Completed (2026-11-26)
+- Art quality fixes (zero paid generation calls; deterministic rebuilds from
+  `art/source/`):
+  - Rebuilt `squirrel`, `hamster`, `lamb`, and `hedgehog` directly on `#FF00FF`
+    via `postprocess.ts --key #FF00FF --fuzz 35% --despill edge --holes` and
+    `despill-edge.ts --key magenta --band 6` (with seeded 18% hole-flood in
+    `key-alpha.ts` and soft-edge alpha despill in `despill-edge.ts`), removing
+    the 1,682 / 634 / 634 magenta soft-edge halo pixels on `calm_idle_01` and
+    preventing interior cutouts while preserving purple chaos details; review
+    sheet committed at `art/review/m71-cleaned-critters.jpg`.
+  - Updated `art/recipes/{squirrel,hamster,lamb,hedgehog}.json`
+    (`matteMethods.body: "magenta-key"`, positive `bodyHue.minFraction` of
+    `0.04` for `lamb` and `0.3` for `hedgehog`, and updated measured centres).
+  - Updated `content/critters/hedgehog.json` `figureHeight` from `380` to `287`
+    (matching its wide silhouette, like `crab.json`) and refreshed shifted
+    centroids on `lamb.json` and `hedgehog.json`.
+  - Hardened `tools/art/critter-check.ts` to enforce zero soft-edge spill
+    against both green and magenta keys on `calm_idle_01` regardless of
+    `matteMethods.body` and to reject `bodyHue.minFraction <= 0`.
+- Mipmaps & iOS on-demand atlas loading (`src/render/view.ts`, `src/main.ts`):
+  - Enabled `autoGenerateMipmaps: true` on all Pixi atlas loads and
+    deduplicated `sue-sheet` / `jordan-sheet`.
+  - Exported pure `areaEntityAtlases(world, area)` and moved per-area non-party
+    NPC and critter atlases onto on-demand area load, prefetch, and current +
+    previous area eviction (boot Pixi atlases reduced from 46 to 9 permanent
+    core sheets + 1 NPC for `bedroom`).
+  - Removed upfront DOM decoding of all 25 critter PNGs and upfront loading of
+    the 5 arcade/microwave paintings + 4 DOM atlases at boot; cached tiny
+    `AtlasJson` metadata in `src/main.ts` (`parseAtlasJson` in `src/ui/atlas.ts`)
+    so journal stickers, prizes, and credits work in any area, while warming
+    arcade/clubhouse close-ups and per-area critter PNGs on demand.
+- Shared UI DOM helpers (`src/ui/dom.ts`): consolidated `element`, `svgElement`,
+  `setText`, `setAttribute`, `setStyle`, `place`, `pixels`, and `measure` across
+  `battle.ts`, `title.ts`, `journal.ts`, `claw.ts`, `skee.ts`, `mole.ts`,
+  `comet.ts`, `cook.ts`, and `cook-layout.ts`.
+- Evidence: `tests/unit/milestone-71.test.ts` verifying zero soft-edge spill on
+  `calm_idle_01` and `figureHeight` within 15% of drawn `chaos_idle_01` across
+  all 25 critters, plus `areaEntityAtlases` scoping and deduplication;
+  `art/review/m71-cleaned-critters.jpg` verified with `vision` (zero outer
+  magenta halo on dark background, zero interior cutouts). Boot graphics
+  memory dropped from 473.4 MB to 92.8 MB (-80.4%).
+- Gates: `just check` (126 unit files / 1,039 tests, all 60+ sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4200 just e2e`
+  (941 passed, 2 skipped in 3.3 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

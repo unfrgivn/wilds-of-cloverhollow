@@ -1,4 +1,4 @@
-import type { Box } from "./claw";
+import type { Box } from "./dom";
 import type { CookCalibration, CookView } from "../core";
 
 // The food's cells (public/assets/arcade/cook-food.json): 512 x 320 image px,

@@ -9,10 +9,10 @@
     "y": 250.6
   },
   "bodyCentre": {
-    "x": 256.4,
-    "y": 351.4
+    "x": 260.9,
+    "y": 353.7
   },
-  "figureHeight": 380,
+  "figureHeight": 287,
   "overworldHeight": 70,
   "battleHeight": 190,
   "touchRadius": 70,

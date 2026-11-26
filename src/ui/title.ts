@@ -1,4 +1,5 @@
 import "./title.css";
+import { element, setAttribute, setText } from "./dom";
 
 export type TitleChoiceId = "continue" | "new-game" | "confirm-yes" | "confirm-no";
 
@@ -14,24 +15,6 @@ export type TitleView = {
 type Option = { id: TitleChoiceId; button: HTMLButtonElement };
 
 const svgNamespace = "http://www.w3.org/2000/svg";
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  return node;
-}
-
-// The title renders every frame; only touch the DOM when something changed.
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function setAttribute(node: Element, name: string, value: string): void {
-  if (node.getAttribute(name) !== value) node.setAttribute(name, value);
-}
 
 // A four-leaf clover sprig for the wordmark plate.
 function cloverIcon(): SVGSVGElement {

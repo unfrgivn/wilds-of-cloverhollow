@@ -1,39 +1,8 @@
 import "./cook.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import { measure, type Box } from "./claw";
+import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cookFront, layoutCook, type CookLayout } from "./cook-layout";
 import type { CookCalibration, CookView } from "../core";
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-  parent: Element,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  parent.append(node);
-  return node;
-}
-
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function setStyle(node: HTMLElement, name: string, value: string): void {
-  if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
-}
-
-function place(node: HTMLElement, rect: Box): void {
-  setStyle(node, "left", `${rect.x}px`);
-  setStyle(node, "top", `${rect.y}px`);
-  setStyle(node, "width", `${rect.width}px`);
-  setStyle(node, "height", `${rect.height}px`);
-}
-
-function pixels(value: string): number {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
 
 // The close-up as drawn (spec 11, renderInfo().arcade), in CSS px.
 export type CookInfo = {

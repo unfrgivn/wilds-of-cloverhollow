@@ -1,5 +1,6 @@
 import "./battle.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import { element, setAttribute, setText, svgElement } from "./dom";
 import { feelingMarkup, heartMarkup, icon } from "./icons";
 import type { BattleTalk, FeelingId } from "../core";
 import type { DialogueView } from "./sticker";
@@ -529,7 +530,6 @@ export type RewardStickerView = {
   image: AtlasImage | null;
 };
 
-const svgNamespace = "http://www.w3.org/2000/svg";
 const leafPath = "M 2 15 C 5 2, 15 1, 22 3 C 20 12, 12 18, 2 15 M 3 14 L 19 4";
 const gradeGap = 6;
 // A lean's puff dots: their spacing, and how far over the track they sit.
@@ -542,33 +542,6 @@ const gradeLabels: Record<TimingGrade, string> = {
   good: "GOOD!",
   miss: "MISS",
 };
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  return node;
-}
-
-function svgElement<K extends keyof SVGElementTagNameMap>(
-  tag: K,
-  className: string,
-): SVGElementTagNameMap[K] {
-  const node = document.createElementNS(svgNamespace, tag);
-  node.setAttribute("class", className);
-  return node;
-}
-
-// The game renders every frame; only touch the DOM when something changed.
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function setAttribute(node: Element, name: string, value: string): void {
-  if (node.getAttribute(name) !== value) node.setAttribute(name, value);
-}
 
 function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));

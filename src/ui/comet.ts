@@ -1,39 +1,8 @@
 import "./comet.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import { measure, type Box } from "./claw";
+import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cometFrame, layoutComet, type CometLayout, type Rect } from "./comet-layout";
 import type { CometCalibration, CometView } from "../core";
-
-function element<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-  parent: Element,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  parent.append(node);
-  return node;
-}
-
-function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
-}
-
-function setStyle(node: HTMLElement | SVGElement, name: string, value: string): void {
-  if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
-}
-
-function place(node: HTMLElement, rect: Rect): void {
-  setStyle(node, "left", `${rect.x}px`);
-  setStyle(node, "top", `${rect.y}px`);
-  setStyle(node, "width", `${rect.width}px`);
-  setStyle(node, "height", `${rect.height}px`);
-}
-
-function pixels(value: string): number {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
 
 // The close-up as drawn (spec 11, renderInfo().arcade), in CSS px.
 export type CometInfo = {

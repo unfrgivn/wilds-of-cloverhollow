@@ -107,8 +107,17 @@ for (let y = 0; y < dimensions.height; y += 1) {
 for (let x = 0; x < dimensions.width; x += 1) {
   queue.push(x, (dimensions.height - 1) * dimensions.width + x);
 }
-while (queue.length > 0) {
-  const index = queue.shift();
+if (holes) {
+  // Seed enclosed background pockets only from true key pixels (<= 18% fuzz)
+  // so interior subject colours (purple chaos marks, blush, pale fur) are not
+  // punched out when a wider outer fuzz is used for anti-aliased borders.
+  const holeSeedFuzz = Math.min(fuzz, 46);
+  for (const [index, pixel] of pixels.entries()) {
+    if (distance(pixel, key) <= holeSeedFuzz) queue.push(index);
+  }
+}
+for (let head = 0; head < queue.length; head += 1) {
+  const index = queue[head];
   if (index === undefined || seen[index] === 1) continue;
   const pixel = pixels[index];
   if (pixel === undefined || distance(pixel, key) > fuzz) continue;
@@ -119,11 +128,6 @@ while (queue.length > 0) {
   for (const next of neighbors) {
     if (next < 0 || next >= pixels.length) continue;
     if (Math.abs((next % dimensions.width) - x) <= 1) queue.push(next);
-  }
-}
-if (holes) {
-  for (const [index, pixel] of pixels.entries()) {
-    if (seen[index] === 0 && distance(pixel, key) <= fuzz) pixel.a = 0;
   }
 }
 const edge = edgeDistance(pixels, dimensions.width, dimensions.height);

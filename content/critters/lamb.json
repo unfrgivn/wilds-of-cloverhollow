@@ -5,12 +5,12 @@
   "calmName": "Clover Lamb",
   "atlas": "assets/critters/lamb/lamb.json",
   "auraCentre": {
-    "x": 256,
-    "y": 256
+    "x": 255.2,
+    "y": 261.9
   },
   "bodyCentre": {
-    "x": 256,
-    "y": 320
+    "x": 249.8,
+    "y": 310.3
   },
   "figureHeight": 380,
   "overworldHeight": 70,

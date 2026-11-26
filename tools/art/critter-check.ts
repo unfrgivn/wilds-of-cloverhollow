@@ -276,8 +276,13 @@ console.log(`atlas=${atlas}`);
 check(unchecked.length === 0, `frames no check covers: ${unchecked.join(", ")}`);
 const hueWidth = bodyHue.max - bodyHue.min;
 console.log(`bodyHue ${bodyHue.min}-${bodyHue.max} width=${hueWidth.toFixed(2)}`
-  + ` pass=${check(hueWidth > 0 && hueWidth <= maxHueWidth,
-    `bodyHue range ${hueWidth.toFixed(2)} wide (at most ${maxHueWidth})`)}`);
+  + ` minFraction=${bodyHue.minFraction}`
+  + ` pass=${check(hueWidth > 0 && hueWidth <= maxHueWidth && bodyHue.minFraction > 0,
+    bodyHue.minFraction <= 0
+      ? `bodyHue.minFraction ${bodyHue.minFraction} must be > 0`
+      : `bodyHue range ${hueWidth.toFixed(2)} wide (at most ${maxHueWidth})`)}`);
+const greenExcess = (pixel: Pixel): number => pixel.g - Math.max(pixel.r, pixel.b);
+const magentaExcess = (pixel: Pixel): number => Math.min(pixel.r, pixel.b) - pixel.g;
 for (const item of bodyStats) {
   const rawValue = rawSources?.[item.name];
   const rawPath = typeof rawValue === "string" ? rawValue : "";
@@ -292,8 +297,12 @@ for (const item of bodyStats) {
   const edge = item.bounds;
   const clear = check(edge.left >= 8 && edge.top >= 8 && edge.right >= 8 && edge.bottom >= 8,
     `${item.name}: clearance`);
+  // calm_idle_01 has no purple chaos marks, so enforce zero soft-edge spill
+  // against both green and magenta keys regardless of matteMethods.body.
   const spill = item.frame.pixels.filter((pixel) => pixel.a > 16 && pixel.a < 240
-    && keyExcess(pixel) > 40).length;
+    && (item.name === "calm_idle_01"
+      ? greenExcess(pixel) > 40 || magentaExcess(pixel) > 40
+      : keyExcess(pixel) > 40)).length;
   const left = item.frame.pixels.filter((pixel) => pixel.a > 128
     && Math.max(Math.abs(pixel.r - bodyKey.r), Math.abs(pixel.g - bodyKey.g),
       Math.abs(pixel.b - bodyKey.b)) <= 46).length;

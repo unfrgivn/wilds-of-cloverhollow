@@ -74,36 +74,22 @@ function cellName(x: number, y: number): string {
 }
 await run(["rm", "-rf", frames]);
 await run(["mkdir", "-p", frames]);
-const prepared = `${frames}/prepared.png`;
-await run([
-  "magick",
-  `${source}/body-sheet-raw.png`,
-  "-fuzz",
-  "10%",
-  "-fill",
-  "#00FF00",
-  "-draw",
-  "color 0,0 floodfill",
-  "-fuzz",
-  "20%",
-  "-transparent",
-  "#FF00FF",
-  prepared,
-]);
+const sheet = `${source}/body-sheet-raw.png`;
 const keyed = `${frames}/sheet-keyed.png`;
 await run([
   "bun",
   "tools/art/key-alpha.ts",
   "--input",
-  prepared,
+  sheet,
   "--output",
   keyed,
   "--key",
-  "#00FF00",
+  "#FF00FF",
   "--fuzz",
-  "65%",
+  "35%",
   "--despill",
   "edge",
+  "--holes",
 ]);
 const alpha = await output([
   "magick",
@@ -154,7 +140,7 @@ for (const name of names) {
   const frame = `${frames}/${name}.png`;
   await run([
     "magick",
-    prepared,
+    sheet,
     "-crop",
     `${right - left}x${bottom - top}+${left}+${top}`,
     "+repage",
@@ -176,11 +162,12 @@ for (const name of names) {
     "--bottom-margin",
     "8",
     "--key",
-    "#00FF00",
+    "#FF00FF",
     "--fuzz",
-    "65%",
+    "35%",
     "--despill",
     "edge",
+    "--holes",
   ]);
   await run([
     "bun",
@@ -200,9 +187,9 @@ for (const name of names) {
     "--output",
     frame,
     "--key",
-    "green",
+    "magenta",
     "--band",
-    "2",
+    "6",
   ]);
 }
 const aura = `${frames}/chaos_aura_01.png`;

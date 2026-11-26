@@ -83,6 +83,45 @@ import { battleLayout, type BattleLayout } from "./battle-layout";
 import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
 
+export type EntityAtlas = { alias: string; src: string };
+
+/**
+ * Unique per-area NPC and critter spritesheets, excluding party members
+ * (which stay resident across areas). Loaded with the area and evicted on the
+ * same current + previous residency window as AreaView textures (spec 4).
+ */
+export function areaEntityAtlases(world: World, area: Area): EntityAtlas[] {
+  const seen = new Set<string>();
+  const result: EntityAtlas[] = [];
+  const add = (alias: string, atlas: string): void => {
+    if (seen.has(alias)) return;
+    seen.add(alias);
+    result.push({ alias, src: assetUrl(atlas) });
+  };
+  for (const npc of area.npcs) {
+    if (world.party[npc.id] !== undefined) continue;
+    const character = world.characters[npc.id];
+    if (character !== undefined) add(`${npc.id}-sheet`, character.atlas);
+  }
+  const critterIds = [
+    ...area.critters.map((piece) => piece.id),
+    ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
+  ];
+  for (const id of critterIds) {
+    const critter = world.critters[id];
+    if (critter !== undefined) add(critter.atlas, critter.atlas);
+  }
+  return result;
+}
+
+function mipmapSheet(alias: string, src: string): Promise<Spritesheet> {
+  return Assets.load<Spritesheet>({
+    alias,
+    src,
+    data: { textureOptions: { autoGenerateMipmaps: true } },
+  });
+}
+
 // Critter frames are 512 px with the feet at y 504 (docs/art/critters.md).
 // Aura and body centroids are measured in each critter's content atlas.
 function placeAura(
@@ -159,6 +198,12 @@ export class GameView {
   // The URLs of the area one crossing back, kept resident so the way back
   // through a door is a cache hit (the area two crossings back unloads).
   private residentUrls: readonly string[] = [];
+  // Per-area NPC and critter atlas aliases kept on the same current + previous
+  // residency window, separate from `areaTextureUrls` so `cachedAreaTextures`
+  // reports only the area's ground tiles and prop atlases.
+  private currentEntityAliases: readonly string[] = [];
+  private residentEntityAliases: readonly string[] = [];
+  private readonly permanentAliases: ReadonlySet<string>;
   private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
   private critterKeys = "";
   // Each overworld critter: `id` is its key (a set piece's id or `wild:<den>`).
@@ -181,6 +226,13 @@ export class GameView {
     options: { debugLabel: boolean; renderer: Renderer },
   ) {
     this.renderer = options.renderer;
+    this.permanentAliases = new Set([
+      "fae-sheet",
+      "glow-sheet",
+      "ambient-sheet",
+      world.battle.toyAtlas,
+      ...Object.keys(world.party).map((id) => `${id}-sheet`),
+    ]);
     this.depth.sortableChildren = true;
     this.player.label = "fae";
     for (const id of Object.keys(world.party)) {
@@ -233,57 +285,41 @@ export class GameView {
 
   private async loadCharacter(): Promise<void> {
     await Promise.all([
-      Assets.load({
-        alias: "fae-sheet",
-        src: assetUrl("assets/characters/fae/fae.json"),
-        data: { textureOptions: { autoGenerateMipmaps: true } },
-      }),
-      // Kinds of one species can share an atlas (the fountain frog and the
-      // bay's frogs), so critter atlases are loaded, and found, by URL.
-      ...[
-        ...new Set(
-          Object.values(this.world.critters).map((critter) => critter.atlas),
-        ),
-      ].map((atlas) => Assets.load({ alias: atlas, src: assetUrl(atlas) })),
+      mipmapSheet("fae-sheet", assetUrl("assets/characters/fae/fae.json")),
       ...Object.entries(this.world.party).map(([id, member]) =>
-        Assets.load({
-          alias: `${id}-sheet`,
-          src: assetUrl(member.atlas),
-          data: { textureOptions: { autoGenerateMipmaps: true } },
-        }),
+        mipmapSheet(`${id}-sheet`, assetUrl(member.atlas)),
       ),
-      Assets.load({
-        alias: "glow-sheet",
-        src: assetUrl("assets/glows/glows.json"),
-      }),
-      Assets.load({
-        alias: "ambient-sheet",
-        src: assetUrl("assets/ambient/ambient.json"),
-      }),
+      mipmapSheet("glow-sheet", assetUrl("assets/glows/glows.json")),
+      mipmapSheet("ambient-sheet", assetUrl("assets/ambient/ambient.json")),
       // The toys a catch throws are cropped from this sheet by the DOM
       // overlay, which reads their frames here.
-      Assets.load({
-        alias: this.world.battle.toyAtlas,
-        src: assetUrl(this.world.battle.toyAtlas),
-      }),
-      ...Object.entries(this.world.characters).map(([id, character]) =>
-        Assets.load({
-          alias: `${id}-sheet`,
-          src: assetUrl(character.atlas),
-          data: { textureOptions: { autoGenerateMipmaps: true } },
-        }),
-      ),
+      mipmapSheet(this.world.battle.toyAtlas, assetUrl(this.world.battle.toyAtlas)),
     ]);
   }
 
   async setArea(area: Area): Promise<void> {
     const previous = this.areaView;
+    const previousEntities = this.currentEntityAliases;
     // The old sprites go; the old textures stay cached, so the door back is
     // a reload from memory, not a white wait on the network.
     previous?.destroy();
-    const next = await AreaView.load(area, this.depth);
+    for (const sprite of this.critterSprites) {
+      sprite.body.destroy();
+      sprite.aura.destroy();
+    }
+    this.critterSprites = [];
+    this.critterKeys = "";
+    for (const { sprite } of this.npcSprites) sprite.destroy();
+    this.npcSprites = [];
+    const entities = areaEntityAtlases(this.world, area);
+    const [next] = await Promise.all([
+      AreaView.load(area, this.depth),
+      ...entities.map((entry) => mipmapSheet(entry.alias, entry.src)),
+    ]);
     this.areaView = next;
-    await this.evict(previous, next);
+    const nextEntities = entities.map((entry) => entry.alias);
+    this.currentEntityAliases = nextEntities;
+    await this.evict(previous, next, previousEntities, nextEntities);
     for (const entry of this.glowSprites) entry.sprite.destroy();
     this.glowSprites = area.glows.map((glow) => {
       const sprite = new Sprite();
@@ -305,13 +341,6 @@ export class GameView {
     });
     for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
-    for (const sprite of this.critterSprites) {
-      sprite.body.destroy();
-      sprite.aura.destroy();
-    }
-    this.critterSprites = [];
-    this.critterKeys = "";
-    for (const { sprite } of this.npcSprites) sprite.destroy();
     this.npcSprites = area.npcs.map((npc) => {
       const sprite = new Sprite();
       sprite.label = `npc:${npc.id}`;
@@ -327,25 +356,39 @@ export class GameView {
   // the new area's art nor the one just left's. The area just left then
   // becomes the resident one, so at most a current + previous pair of areas
   // ever stays in the cache (spec 4, texture budget).
-  private async evict(previous: AreaView | undefined, next: AreaView): Promise<void> {
+  private async evict(
+    previous: AreaView | undefined,
+    next: AreaView,
+    previousEntities: readonly string[],
+    nextEntities: readonly string[],
+  ): Promise<void> {
     const previousUrls = new Set(previous?.textureUrls ?? []);
     const evictions = this.residentUrls.filter((url) =>
       !next.textureUrls.includes(url) && !previousUrls.has(url));
     for (const url of evictions) this.areaTextureUrls.delete(url);
     this.residentUrls = previous?.textureUrls ?? [];
-    if (evictions.length > 0)
-      await Promise.all(evictions.map((url) => Assets.unload(url)));
+    const keepEntities = new Set([...previousEntities, ...nextEntities]);
+    const entityEvictions = this.residentEntityAliases.filter(
+      (alias) => !keepEntities.has(alias) && !this.permanentAliases.has(alias),
+    );
+    this.residentEntityAliases = previousEntities;
+    const unloadKeys = [...evictions, ...entityEvictions];
+    if (unloadKeys.length > 0)
+      await Promise.all(unloadKeys.map((key) => Assets.unload(key)));
   }
 
   // Warms an area's art without touching the shown one. The warmed URLs join
   // `areaTextureUrls` so the harness sees them cached; a failed prefetch says
   // nothing the arrival's own load won't say louder.
   prefetch(area: Area): void {
-    void AreaView.prefetch(area)
-      .then((urls) => {
+    void Promise.all([
+      AreaView.prefetch(area).then((urls) => {
         for (const url of urls) this.areaTextureUrls.add(url);
-      })
-      .catch(() => {});
+      }),
+      ...areaEntityAtlases(this.world, area).map((entry) =>
+        mipmapSheet(entry.alias, entry.src),
+      ),
+    ]).catch(() => {});
   }
 
   // Where everyone in the depth layer is drawn, in world units.
@@ -875,7 +918,8 @@ export class GameView {
     drawWash(0.2);
     const critter = this.world.critters[battle.critterId];
     if (critter === undefined) return;
-    const sheet = Assets.get<Spritesheet>(critter.atlas);
+    const sheet = Assets.get<Spritesheet | undefined>(critter.atlas);
+    if (sheet === undefined) return;
     const critterFrame =
       battle.phase === "soothed"
         ? "soothed_01"

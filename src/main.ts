@@ -5,7 +5,10 @@ import {
   drainTicks,
   step,
   type ActionFrame,
+  type ArcadeView,
+  type Area,
   type BattleView,
+  type CookView,
   type MoleHole,
   type Point,
   type State,
@@ -32,7 +35,7 @@ import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView, type BattleCheckGeometry } from "./render/view";
-import { atlasImage, type AtlasImage } from "./ui/atlas";
+import { atlasImage, parseAtlasJson, type AtlasImage, type AtlasJson } from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import {
@@ -48,7 +51,12 @@ import {
 } from "./ui/battle";
 import { assetUrl } from "./platform/assets";
 import { createJournal } from "./ui/journal";
-import { createArcade } from "./ui/arcade";
+import type { ArcadeInfo } from "./ui/arcade";
+import { createClaw } from "./ui/claw";
+import { createSkee } from "./ui/skee";
+import { createMole } from "./ui/mole";
+import { createComet } from "./ui/comet";
+import { createCook, type CookInfo } from "./ui/cook";
 import {
   journalNotes,
   parseSave,
@@ -287,33 +295,52 @@ async function boot(): Promise<void> {
     if (!response.ok) throw new Error(`Failed to load ${mapFile}`);
     return parseMapCentres(await response.json(), mapFile);
   };
-  // Art the DOM draws is decoded before the game starts, so it never paints
-  // before its image is ready (on a busy phone, or a loaded test machine). An
-  // atlas Pixi loads as well is decoded after Pixi's load of it: in WebKit,
-  // when Pixi fetched the file second, the DOM drew a copy never decoded.
-  const decode = async (file: string): Promise<void> => {
-    const image = new Image();
-    image.src = assetUrl(file);
-    await image.decode();
+  // DOM image decode cache: each PNG is decoded at most once, only when its
+  // area or overlay needs it, so boot doesn't decode all 25 critter PNGs.
+  const decodedImages = new Map<string, Promise<void>>();
+  const decodeOnce = (file: string): Promise<void> => {
+    const existing = decodedImages.get(file);
+    if (existing !== undefined) return existing;
+    const promise = (async () => {
+      const image = new Image();
+      image.src = assetUrl(file);
+      await image.decode();
+    })();
+    decodedImages.set(file, promise);
+    return promise;
   };
-  // An atlas the DOM crops: its frames, then its PNG decoded.
-  const domAtlas = async (file: string): Promise<Spritesheet> => {
-    const sheet = await Assets.load<Spritesheet>(assetUrl(file));
-    await decode(file.replace(".json", ".png"));
-    return sheet;
+  // Tiny atlas JSON metadata cache (~1 KB per sheet, zero GPU VRAM): lets
+  // stickerArt, prizeArt, and credits crop any frame in any area regardless of
+  // whether that critter's WebGL texture is currently loaded.
+  const atlasJsonCache = new Map<string, AtlasJson>();
+  const atlasJsonPending = new Map<string, Promise<AtlasJson>>();
+  const loadAtlasJson = (file: string): Promise<AtlasJson> => {
+    const cached = atlasJsonCache.get(file);
+    if (cached !== undefined) return Promise.resolve(cached);
+    const pending = atlasJsonPending.get(file);
+    if (pending !== undefined) return pending;
+    const promise = (async () => {
+      const response = await fetch(assetUrl(file));
+      if (!response.ok) throw new Error(`Failed to load ${file}`);
+      const parsed = parseAtlasJson(await response.json(), file);
+      atlasJsonCache.set(file, parsed);
+      return parsed;
+    })();
+    atlasJsonPending.set(file, promise);
+    return promise;
   };
-  // Sticker art (the reward card and the journal album) is a CSS crop of a
-  // critter's atlas, which the view loads.
-  const atlases = new Set([
-    ...Object.values(content.world.critters).map((critter) => critter.atlas),
-    content.world.battle.toyAtlas,
-  ]);
+  // A DOM-only atlas (no WebGL texture): its frame metadata + decoded PNG.
+  const domAtlas = async (file: string): Promise<AtlasJson> => {
+    const data = await loadAtlasJson(file);
+    await decodeOnce(file.replace(".json", ".png"));
+    return data;
+  };
   // The moles' frames and Mom's dishes for the clubhouse microwave (spec 8.2).
   const moleAtlas = "assets/arcade/moles.json";
   const foodAtlas = "assets/arcade/cook-food.json";
   const cometAtlas = "assets/arcade/comet.json";
   // The arcade games' paintings and their calibrations (spec 8.2), each
-  // decoded before its close-up can open.
+  // decoded on demand before its close-up can open.
   const painting = async <T extends { image: string }>(
     file: string,
     parse: (value: unknown, file: string) => T,
@@ -321,39 +348,158 @@ async function boot(): Promise<void> {
     const response = await fetch(assetUrl(file));
     if (!response.ok) throw new Error(`Failed to load ${file}`);
     const calibration = parse(await response.json(), file);
-    const image = new Image();
-    image.src = assetUrl(`assets/arcade/${calibration.image}`);
-    await image.decode();
-    return { calibration, image: image.src };
+    const src = assetUrl(`assets/arcade/${calibration.image}`);
+    await decodeOnce(`assets/arcade/${calibration.image}`);
+    return { calibration, image: src };
   };
-  // These load at once (in turn, a boot took the sum of them): only the first
-  // area and the sticker art wait, on the view's own sheets.
-  const [
-    mapCentres,
-    prizeSheet,
-    moleSheet,
-    foodSheet,
-    cometSheet,
-    [clawPainting, skeePainting, molePainting, cometPainting, cookPainting],
-  ] = await Promise.all([
-    loadMapCentres(),
-    domAtlas(content.world.arcade.atlas),
-    domAtlas(moleAtlas),
-    domAtlas(foodAtlas),
-    domAtlas(cometAtlas),
-    Promise.all([
+  const atlasFrame = (file: string, frameName: string): AtlasImage | null => {
+    const data = atlasJsonCache.get(file) ?? Assets.get<Spritesheet | undefined>(file)?.data;
+    return data === undefined ? null : atlasImage(data, assetUrl(file.replace(".json", ".png")),
+      frameName);
+  };
+  const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
+    const critter = content.world.critters[critterId];
+    return critter === undefined ? null : atlasFrame(critter.atlas, frameName);
+  };
+  // A prize's art: its frame in the prize atlas (spec 8.2).
+  const prizeArt = (frameName: string): AtlasImage | null =>
+    atlasFrame(content.world.arcade.atlas, frameName);
+  // Each hole of Boop-a-Mole is a touch target (spec 8.2): the outer four
+  // hold their arrow, and the middle the confirm button, while pressed; a tap
+  // counts however quickly it lifts.
+  const holeArrows: Record<Exclude<MoleHole, "middle">, Point> = {
+    up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
+  };
+  const onHole = (hole: MoleHole, down: boolean): void => {
+    if (hole === "middle") {
+      touch.setButton("confirm", down);
+      if (down) touch.tapButton("confirm");
+    } else if (down) {
+      touch.holdArrow(holeArrows[hole]);
+      touch.tapArrow(holeArrows[hole]);
+    } else touch.releaseArrow(holeArrows[hole]);
+  };
+  // Arcade and clubhouse microwave close-ups load on demand when entering
+  // `arcade` or `clubhouse` (or on first open), keeping boot light on iOS.
+  type ArcadeOverlay = {
+    render: (view: ArcadeView | null) => void;
+    info: () => ArcadeInfo | null;
+  };
+  type CookOverlay = {
+    render: (view: CookView | null) => void;
+    info: () => CookInfo | null;
+  };
+  let arcadeOverlay: ArcadeOverlay | null = null;
+  let arcadeLoad: Promise<void> | undefined;
+  const ensureArcadeOverlay = (): Promise<void> => {
+    if (arcadeOverlay !== null) return Promise.resolve();
+    if (arcadeLoad !== undefined) return arcadeLoad;
+    arcadeLoad = Promise.all([
+      domAtlas(content.world.arcade.atlas),
+      domAtlas(moleAtlas),
+      domAtlas(cometAtlas),
       painting("assets/arcade/claw-machine.json", parseClawCalibration),
       painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
       painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
       painting("assets/arcade/comet-cabinet.json", parseCometCalibration),
+    ]).then(([
+      , , , clawPainting, skeePainting, molePainting, cometPainting,
+    ]) => {
+      const clawUp = createClaw(uiRoot, prizeArt, clawPainting.calibration, clawPainting.image);
+      const skeeUp = createSkee(uiRoot, skeePainting.calibration, skeePainting.image);
+      const moleUp = createMole(
+        uiRoot,
+        (frameName) => atlasFrame(moleAtlas, frameName),
+        molePainting.calibration,
+        molePainting.image,
+        onHole,
+      );
+      const cometUp = createComet(
+        uiRoot,
+        (frameName) => atlasFrame(cometAtlas, frameName),
+        cometPainting.calibration,
+        cometPainting.image,
+      );
+      arcadeOverlay = {
+        render: (view) => {
+          clawUp.render(view?.game === "claw" ? view : null);
+          skeeUp.render(view?.game === "skee" ? view : null);
+          moleUp.render(view?.game === "mole" ? view : null);
+          cometUp.render(view?.game === "comet" ? view : null);
+        },
+        info: () => clawUp.info() ?? skeeUp.info() ?? moleUp.info() ?? cometUp.info(),
+      };
+    });
+    return arcadeLoad;
+  };
+  let cookOverlay: CookOverlay | null = null;
+  let cookLoad: Promise<void> | undefined;
+  const ensureCookOverlay = (): Promise<void> => {
+    if (cookOverlay !== null) return Promise.resolve();
+    if (cookLoad !== undefined) return cookLoad;
+    cookLoad = Promise.all([
+      domAtlas(foodAtlas),
       painting("assets/arcade/microwave.json", parseCookCalibration),
-    ]),
+    ]).then(([, cookPainting]) => {
+      cookOverlay = createCook(
+        uiRoot,
+        (frameName) => atlasFrame(foodAtlas, frameName),
+        cookPainting.calibration,
+        cookPainting.image,
+      );
+    });
+    return cookLoad;
+  };
+  // Warms only the DOM media needed for `area`: arcade/cooking close-ups for
+  // those rooms, plus this area's critter PNGs so battle reward stickers never
+  // flicker in WebKit. Bedroom has 0 critters, so boot decodes 0 critter PNGs.
+  const warmAreaMedia = async (area: Area): Promise<void> => {
+    const loads: Promise<unknown>[] = [];
+    if (area.id === "arcade") loads.push(ensureArcadeOverlay());
+    if (area.id === "clubhouse") loads.push(ensureCookOverlay());
+    const areaCritters = new Set([
+      ...area.critters.map((piece) => piece.id),
+      ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
+    ]);
+    for (const id of areaCritters) {
+      const critter = content.world.critters[id];
+      if (critter !== undefined) loads.push(decodeOnce(critter.atlas.replace(".json", ".png")));
+    }
+    await Promise.all(loads);
+  };
+  const warmOwnedJournalMedia = async (snapshot: State): Promise<void> => {
+    const loads: Promise<unknown>[] = [];
+    for (const id of snapshot.stickers) {
+      const sticker = content.world.stickers.catalogue.find((item) => item.id === id);
+      const critter = sticker === undefined ? undefined : content.world.critters[sticker.critter];
+      if (critter !== undefined) loads.push(decodeOnce(critter.atlas.replace(".json", ".png")));
+    }
+    if (snapshot.prizes.length > 0)
+      loads.push(decodeOnce(content.world.arcade.atlas.replace(".json", ".png")));
+    await Promise.all(loads);
+  };
+  const critterJsonFiles = [
+    ...new Set(Object.values(content.world.critters).map((critter) => critter.atlas)),
+  ];
+  // Boot loads only permanent core sheets + tiny ~1 KB atlas JSON metadata
+  // (for journal/credits frame crops) + the initial area. No unused critter
+  // PNGs or arcade paintings are decoded up front.
+  const [mapCentres] = await Promise.all([
+    loadMapCentres(),
+    loadAtlasJson(content.world.arcade.atlas),
+    ...critterJsonFiles.map((file) => loadAtlasJson(file)),
     view.ready.then(async () => {
+      for (const [id, member] of Object.entries(content.world.party)) {
+        const sheet = Assets.get<Spritesheet | undefined>(`${id}-sheet`);
+        if (sheet !== undefined) atlasJsonCache.set(member.atlas, sheet.data);
+      }
       const initialArea = content.world.areas[state.area];
       if (initialArea === undefined) throw new Error("Missing initial area");
       await Promise.all([
         view.setArea(initialArea),
-        ...[...atlases].map((url) => decode(url.replace(".json", ".png"))),
+        warmAreaMedia(initialArea),
+        warmOwnedJournalMedia(state),
+        decodeOnce(content.world.battle.toyAtlas.replace(".json", ".png")),
       ]);
     }),
   ]);
@@ -406,49 +552,6 @@ async function boot(): Promise<void> {
         checkpoint: check.checkpoint, results: check.results, dry: check.dry };
     return null;
   };
-  // A frame of a loaded atlas (`file`, its PNG beside it) as the DOM draws it.
-  const sheetFrame = (
-    sheet: Spritesheet | undefined,
-    file: string,
-    frameName: string,
-  ): AtlasImage | null => {
-    if (sheet === undefined) return null;
-    return atlasImage(sheet.data, assetUrl(file.replace(".json", ".png")), frameName);
-  };
-  const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
-    const critter = content.world.critters[critterId];
-    return critter === undefined ? null : sheetFrame(
-      Assets.get<Spritesheet | undefined>(critter.atlas), critter.atlas, frameName);
-  };
-  // A prize's art: its frame in the prize atlas (spec 8.2).
-  const prizeArt = (frameName: string): AtlasImage | null =>
-    sheetFrame(prizeSheet, content.world.arcade.atlas, frameName);
-  // Each hole of Boop-a-Mole is a touch target (spec 8.2): the outer four
-  // hold their arrow, and the middle the confirm button, while pressed; a tap
-  // counts however quickly it lifts.
-  const holeArrows: Record<Exclude<MoleHole, "middle">, Point> = {
-    up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
-  };
-  const onHole = (hole: MoleHole, down: boolean): void => {
-    if (hole === "middle") {
-      touch.setButton("confirm", down);
-      if (down) touch.tapButton("confirm");
-    } else if (down) {
-      touch.holdArrow(holeArrows[hole]);
-      touch.tapArrow(holeArrows[hole]);
-    } else touch.releaseArrow(holeArrows[hole]);
-  };
-  const arcade = createArcade(uiRoot, prizeArt, clawPainting, skeePainting, {
-    ...molePainting,
-    art: (frameName) => sheetFrame(moleSheet, moleAtlas, frameName),
-    onHole,
-  }, {
-    ...cometPainting,
-    art: (frameName) => sheetFrame(cometSheet, cometAtlas, frameName),
-  }, {
-    ...cookPainting,
-    art: (frameName) => sheetFrame(foodSheet, foodAtlas, frameName),
-  });
   let afterTick = (_next: State): void => undefined;
   let logTitle = (_mode: TitleMode | null): void => undefined;
   let lastBattleLog = "";
@@ -495,9 +598,17 @@ async function boot(): Promise<void> {
       };
     return journalCache.notes;
   };
+  let wasJournalOpen = false;
   const render = (): void => {
     const arcadeState = arcadeView(content.world, state);
-    arcade.render(arcadeState);
+    if (arcadeState !== null && arcadeState.game !== "cook" && arcadeOverlay === null)
+      void ensureArcadeOverlay().then(invalidate);
+    if (arcadeState?.game === "cook" && cookOverlay === null)
+      void ensureCookOverlay().then(invalidate);
+    arcadeOverlay?.render(arcadeState !== null && arcadeState.game !== "cook" ? arcadeState : null);
+    cookOverlay?.render(arcadeState?.game === "cook" ? arcadeState : null);
+    if (state.journalOpen && !wasJournalOpen) void warmOwnedJournalMedia(state);
+    wasJournalOpen = state.journalOpen;
     if (arcadeState !== null) document.documentElement.dataset.arcade = "open";
     else delete document.documentElement.dataset.arcade;
     // Which game is open: Comet Cruise's steers by the touch arrows.
@@ -542,11 +653,7 @@ async function boot(): Promise<void> {
       entries: creditsOpen
         ? creditEntries(content.world, state).map((entry) => ({
             ...entry,
-            image: sheetFrame(
-              Assets.get<Spritesheet | undefined>(entry.image.atlas),
-              entry.image.atlas,
-              entry.image.frame,
-            ),
+            image: atlasFrame(entry.image.atlas, entry.image.frame),
           }))
         : [],
     });
@@ -885,7 +992,11 @@ async function boot(): Promise<void> {
         state.transition.phase === "out" ? state.transition.target.area : undefined;
       if (target !== undefined && target !== prefetchedTarget) {
         const targetArea = content.world.areas[target];
-        if (targetArea !== undefined) view.prefetch(targetArea);
+        if (targetArea !== undefined) {
+          view.prefetch(targetArea);
+          if (targetArea.id === "arcade") void ensureArcadeOverlay();
+          if (targetArea.id === "clubhouse") void ensureCookOverlay();
+        }
         prefetchedTarget = target;
       }
     }
@@ -955,10 +1066,12 @@ async function boot(): Promise<void> {
       }
       const area = content.world.areas[state.area];
       if (area === undefined) throw new Error(`Unknown area ${state.area}`);
-      if (!reload && view.loadedAreaId() === area.id) return;
+      if (!reload && view.loadedAreaId() === area.id) {
+        await warmAreaMedia(area);
+        return;
+      }
       reload = false;
-      areaLoad = view
-        .setArea(area)
+      areaLoad = Promise.all([view.setArea(area), warmAreaMedia(area)])
         .then(() => view.resetCamera())
         .finally(() => {
           areaLoad = undefined;
@@ -1062,7 +1175,7 @@ async function boot(): Promise<void> {
         state = createState(content.world, fixture, options.seed);
         suppressSave = false;
         prefetchedTarget = undefined;
-        await ensureArea();
+        await Promise.all([ensureArea(), warmOwnedJournalMedia(state)]);
         titleMode = null;
         qaMenuOpen = false;
         qaActivePack = null;
@@ -1071,7 +1184,10 @@ async function boot(): Promise<void> {
         levelUpNotices.length = 0;
         swallowed.clear();
       },
-      renderInfo: () => ({ ...view.renderInfo(state), arcade: arcade.info() }),
+      renderInfo: () => ({
+        ...view.renderInfo(state),
+        arcade: arcadeOverlay?.info() ?? cookOverlay?.info() ?? null,
+      }),
       qa: {
         active: () => qaActivePack !== null,
         packs: () => qaPacks.map((item) => item.pack),

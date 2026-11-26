@@ -3,9 +3,12 @@ import type { State, World } from "./types";
 export type MusicTrack =
   | "title"
   | "home"
+  | "cafe"
+  | "hills"
   | "school"
   | "bay"
   | "pass"
+  | "cavern"
   | "woods"
   | "arcade"
   | "enchanted"
@@ -24,7 +27,9 @@ export type AmbienceBed =
   | "hearth"
   | "forest"
   | "enchanted-shimmer"
-  | "arcade-hum";
+  | "arcade-hum"
+  | "cavern-drips"
+  | "cafe-murmur";
 
 export type SoundtrackState = {
   track: MusicTrack;
@@ -36,9 +41,12 @@ export type SoundtrackState = {
 export const trackTitles: Record<MusicTrack, string> = {
   title: "Watercolor Morning",
   home: "Cloverhollow Town",
+  cafe: "Cinnamon Waltz",
+  hills: "Clover Meadow",
   school: "Bell & Chalk",
   bay: "Bubblegum Breeze",
   pass: "Pinecone Snowfall",
+  cavern: "Crystal Echoes",
   woods: "Whispering Canopy",
   arcade: "Star Racer Tokens",
   enchanted: "Misty Dream",
@@ -54,9 +62,9 @@ const areaTracks: Record<string, MusicTrack> = {
   bedroom: "home",
   kitchen: "home",
   plaza: "home",
-  cafe: "home",
+  cafe: "cafe",
   park: "home",
-  hills: "home",
+  hills: "hills",
   school: "school",
   "east-hall": "school",
   classroom: "school",
@@ -68,7 +76,7 @@ const areaTracks: Record<string, MusicTrack> = {
   trail: "bay",
   pass: "pass",
   lodge: "pass",
-  cavern: "enchanted",
+  cavern: "cavern",
   woods: "woods",
   clubhouse: "woods",
   arcade: "arcade",
@@ -77,7 +85,7 @@ const areaTracks: Record<string, MusicTrack> = {
 
 const landTracks: Record<string, MusicTrack> = {
   cloverhollow: "home",
-  hills: "home",
+  hills: "hills",
   bay: "bay",
   trail: "bay",
   pass: "pass",
@@ -87,7 +95,7 @@ const landTracks: Record<string, MusicTrack> = {
 
 const areaAmbience: Record<string, AmbienceBed> = {
   plaza: "town-breeze",
-  cafe: "hearth",
+  cafe: "cafe-murmur",
   park: "town-breeze",
   hills: "town-breeze",
   field: "town-breeze",
@@ -95,7 +103,7 @@ const areaAmbience: Record<string, AmbienceBed> = {
   trail: "ocean",
   pass: "mountain-wind",
   lodge: "hearth",
-  cavern: "enchanted-shimmer",
+  cavern: "cavern-drips",
   woods: "forest",
   mist: "enchanted-shimmer",
   enchanted: "enchanted-shimmer",

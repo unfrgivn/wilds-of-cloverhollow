@@ -257,13 +257,13 @@ describe("Bon Appetit Café and Cloverhollow Town Life", () => {
     expect(surfaceAt(surface, { x: 600, y: 550 })).toBe("wood");
     expect(surfaceAt(surface, { x: 316, y: 496 })).toBe("carpet");
 
-    // Soundtrack: Cloverhollow Town + hearth room ambience.
+    // Soundtrack: Cinnamon Waltz + cafe-murmur room ambience.
     const cafeState = createState(world, fixtures.cafe!);
     expect(soundtrackFor(world, cafeState, { titleOpen: false })).toEqual({
-      track: "home",
-      ambience: "hearth",
+      track: "cafe",
+      ambience: "cafe-murmur",
       duck: false,
-      title: "Cloverhollow Town",
+      title: "Cinnamon Waltz",
     });
 
     // Atmosphere: warm counter glows, window sunbeams, and rising cocoa-steam motes.

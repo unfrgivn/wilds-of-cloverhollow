@@ -86,14 +86,14 @@
         "miss": "Maddie pounces at a shadow. The owl flaps away."
       },
       "cast": {
-        "great": "Sue Sue casts a ribbon into the air. The owl swoops after it!",
-        "good": "Sue Sue twirls her ribbon. The owl watches.",
-        "miss": "Sue The ribbon tangles in a branch."
+        "great": "Sue casts a ribbon into the air. The owl swoops after it!",
+        "good": "Sue twirls her ribbon. The owl watches.",
+        "miss": "Sue's ribbon tangles in a branch."
       },
       "juggle": {
-        "great": "Jordan Jordan juggles pinecones. The owl hoots in rhythm!",
-        "good": "Jordan Jordan tosses a pinecone. The owl tilts its head.",
-        "miss": "Jordan A pinecone drops with a thunk."
+        "great": "Jordan juggles pinecones. The owl hoots in rhythm!",
+        "good": "Jordan tosses a pinecone. The owl tilts its head.",
+        "miss": "Jordan drops a pinecone with a thunk."
       }
     },
     "snack": "Fae offers a fizzy cracker crumb. The owl nibbles carefully.",

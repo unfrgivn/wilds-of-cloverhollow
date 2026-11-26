@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 82)
+Last updated: 2026-11-26 (Milestone 84)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -241,22 +241,24 @@ ios/            Capacitor iOS project (from Milestone 4).
   arpeggio when Together! launches, replacing `battle-command`) and projects
   `flute` when Flute Friends assist in battle.
 - Soundtrack projection (`src/core/music.ts`): closed track set `title`
-  ("Watercolor Morning"), `home` ("Cloverhollow Town"), `school` ("Bell &
-  Chalk"), `bay` ("Bubblegum Breeze"), `pass` ("Pinecone Snowfall"), `woods`
-  ("Whispering Canopy"), `arcade` ("Star Racer Tokens"), `enchanted` ("Misty
-  Dream"), `enchanted-calm` ("Ancient Tree's Song", once `forest_fizzy` is
-  false), `battle` ("Fizzy Calm-Down!"), `boss` ("The Purple Hood", for
-  wind-up mini-bosses, Talk battles, or non-runnable battles), `talk`
-  ("Listening Heart", once Talk opens or calm reaches `talkAt`), `morning`
-  ("Waking Up", during the morning and credits finale), and `silent` ("Quiet",
-  for `harness`). Ambience beds (`none`, `town-breeze`, `ocean`,
-  `mountain-wind`, `hearth`, `forest`, `enchanted-shimmer`, `arcade-hum`) match
-  each outdoor area, the lodge, and the arcade, and pause in battles. Music
-  ducks smoothly during dialogue, the journal, arcade games, and battle rewards.
+  ("Watercolor Morning"), `home` ("Cloverhollow Town"), `cafe` ("Cinnamon
+  Waltz"), `hills` ("Clover Meadow"), `school` ("Bell & Chalk"), `bay`
+  ("Bubblegum Breeze"), `pass` ("Pinecone Snowfall"), `cavern` ("Crystal
+  Echoes"), `woods` ("Whispering Canopy"), `arcade` ("Star Racer Tokens"),
+  `enchanted` ("Misty Dream"), `enchanted-calm` ("Ancient Tree's Song", once
+  `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The Purple
+  Hood", for wind-up mini-bosses, Talk battles, or non-runnable battles),
+  `talk` ("Listening Heart", once Talk opens or calm reaches `talkAt`),
+  `morning` ("Waking Up", during the morning and credits finale), and `silent`
+  ("Quiet", for `harness`). Ambience beds (`none`, `town-breeze`, `ocean`,
+  `mountain-wind`, `hearth`, `forest`, `enchanted-shimmer`, `arcade-hum`,
+  `cavern-drips`, `cafe-murmur`) match each outdoor area, the café, the lodge,
+  the cavern, and the arcade, and pause in battles. Music ducks smoothly during
+  dialogue, the journal, arcade games, and battle rewards.
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 13
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 16
   multi-voice scores in `src/platform/scores.ts`, dry plus warm stereo
   ConvolverNode reverb), and procedural ambience (`src/platform/ambience.ts`)
   through a shared `DynamicsCompressorNode`. Music crossfades (~0.55 s) on
@@ -933,8 +935,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `cavern` starts at `entrance` with Maddie, Sue, Jordan, lantern, lasso,
   flute, and Pond Pup befriended. Its atmosphere (`src/render/atmosphere.ts`)
   adds soft pulsing crystal halos, turquoise water glints, and pastel crystal
-  sparkle motes; its soundtrack plays `"enchanted"` with `"enchanted-shimmer"`
-  ambience (`src/core/music.ts`); `bat` favours `orchard-apple` and
+  sparkle motes; its soundtrack plays `"cavern"` ("Crystal Echoes") with
+  `"cavern-drips"` ambience (`src/core/music.ts`); `bat` favours `orchard-apple` and
   `berry-cone` and `crystal-mole` favours `cocoa-sundae` and `orchard-apple`
   (`content/treats.json`).
 - Bon Appetit Café & Cloverhollow Town Life (Milestone 79): `cafe`, "Bon
@@ -961,7 +963,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   tip). Its fixture `cafe` starts at `door` with Maddie, Sue, and Jordan; its
   atmosphere (`src/render/atmosphere.ts`) adds warm counter glows, two NW
   window sunbeams, and ten rising cocoa-steam motes; its soundtrack plays
-  `"home"` with `"hearth"` ambience (`src/core/music.ts`).
+  `"cafe"` ("Cinnamon Waltz") with `"cafe-murmur"` ambience (`src/core/music.ts`).
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),

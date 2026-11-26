@@ -66,9 +66,9 @@ describe("soundtrackFor", () => {
       bedroom: ["home", "none"],
       kitchen: ["home", "none"],
       plaza: ["home", "town-breeze"],
-      cafe: ["home", "hearth"],
+      cafe: ["cafe", "cafe-murmur"],
       park: ["home", "town-breeze"],
-      hills: ["home", "town-breeze"],
+      hills: ["hills", "town-breeze"],
       school: ["school", "none"],
       "east-hall": ["school", "none"],
       classroom: ["school", "none"],
@@ -80,7 +80,7 @@ describe("soundtrackFor", () => {
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],
       lodge: ["pass", "hearth"],
-      cavern: ["enchanted", "enchanted-shimmer"],
+      cavern: ["cavern", "cavern-drips"],
       woods: ["woods", "forest"],
       clubhouse: ["woods", "none"],
       arcade: ["arcade", "arcade-hum"],
@@ -128,6 +128,7 @@ describe("soundtrackFor", () => {
       ...content.world.areas,
       "custom-bay": { ...content.world.areas.bay!, id: "custom-bay", land: "bay" },
       "custom-pass": { ...content.world.areas.pass!, id: "custom-pass", land: "pass" },
+      "custom-hills": { ...content.world.areas.hills!, id: "custom-hills", land: "hills" },
       "custom-forest": { ...content.world.areas.woods!, id: "custom-forest", land: "forest" },
       "custom-unknown": { ...content.world.areas.plaza!, id: "custom-unknown", land: undefined },
     };
@@ -136,6 +137,8 @@ describe("soundtrackFor", () => {
       .toBe("bay");
     expect(soundtrackFor(world, { ...baseState, area: "custom-pass" }, { titleOpen: false }).track)
       .toBe("pass");
+    expect(soundtrackFor(world, { ...baseState, area: "custom-hills" }, { titleOpen: false }).track)
+      .toBe("hills");
     expect(soundtrackFor(world, { ...baseState, area: "custom-forest" }, { titleOpen: false })
       .track).toBe("woods");
     expect(soundtrackFor(world, { ...baseState, area: "custom-unknown" }, { titleOpen: false })
@@ -306,9 +309,12 @@ describe("composed scores integrity", () => {
   const playableTracks: readonly PlayableTrack[] = [
     "title",
     "home",
+    "cafe",
+    "hills",
     "school",
     "bay",
     "pass",
+    "cavern",
     "woods",
     "arcade",
     "enchanted",

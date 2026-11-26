@@ -4069,6 +4069,36 @@ the old trail, the owl, and the clubhouse claim.
   replay hash changes, 23 QA packs, purity, lint), `just build` (production
   and harness hook checks), and full e2e verified across Chromium & WebKit.
 
+## Milestone 84: Bespoke Cavern, Café & Hills Soundtrack Themes, Ambience & Copy Polish **Status:** ✅ Completed (2026-11-26)
+- Pure core soundtrack expansion (`src/core/music.ts`): added three bespoke
+  themes (`cavern` "Crystal Echoes", `cafe` "Cinnamon Waltz", `hills` "Clover
+  Meadow") and two ambience beds (`cavern-drips`, `cafe-murmur`), giving
+  Crystal Cavern, Bon Appetit Café, and Clover Hills distinct musical
+  identities instead of reusing `enchanted`, `home`, and `hearth`.
+- Composed original multi-voice scores (`src/platform/scores.ts`) and matched
+  expressive voice harmonic scales (`src/platform/voices.ts`: `D_DORIAN` for
+  `cavern`, `G_MAJOR` for `cafe`, `A_MAJOR` for `hills`):
+  - **Crystal Echoes (`cavern`)**: 88 BPM 4/4 D Dorian / F major across pad,
+    harp, echoing celesta, marimba reflections, and Section B flute.
+  - **Cinnamon Waltz (`cafe`)**: 102 BPM 3/4 G major bistro waltz across felt
+    piano, upright bass, singing flute, and marimba accents.
+  - **Clover Meadow (`hills`)**: 110 BPM 4/4 A major open-air theme across
+    bright harp, flute, marimba, bass, and light breeze shaker.
+- Procedural ambience beds (`src/platform/ambience.ts`): `cavern-drips`
+  (subterranean cave hush + echoing sine water droplets) and `cafe-murmur`
+  (warm bistro room tone + occasional soft porcelain cup clinks), with full
+  node and timer cleanup on bed switch/mute.
+- Critter copy audit (`content/critters/owl.json`): fixed duplicated character
+  names and missing punctuation in the Screeching Owl's Cast and Juggle battle
+  lines (`"Sue Sue"`, `"Jordan Jordan"`), verified zero replay hash changes
+  across all 64 sim scripts.
+- Evidence: `tests/unit/soundtrack.test.ts` (all 16 composed scores validated),
+  `tests/unit/cafe.test.ts`, real-input `tests/e2e/soundtrack.spec.ts`,
+  `cavern.spec.ts`, and `cafe.spec.ts` (Chromium + WebKit); plus Milestone 67
+  QA console and Milestone 68 baseline composite visual audit via `vision`.
+- Gates: `just check`, `just build`, and targeted e2e verified cleanly on top
+  of Milestone 83.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -220,3 +220,57 @@ test(
     await context.close();
   },
 );
+
+test(
+  "cafe, cavern, and hills play their bespoke themes and ambience beds",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openHarness(page);
+
+    // Unlock Web Audio with a real Enter key press on the title screen.
+    await page.keyboard.press("Enter");
+    await expect.poll(() => page.evaluate(() => window.__cloverhollow?.boot.title())).toBeNull();
+
+    // Bon Appetit Café -> Cinnamon Waltz + cafe-murmur; real keys open journal OPTIONS & duck it.
+    await resetPaused(page, "cafe");
+    expect(await readMusic(page)).toMatchObject({
+      track: "cafe",
+      ambience: "cafe-murmur",
+      duck: false,
+      title: "Cinnamon Waltz",
+      playing: true,
+    });
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator(".journal-now-playing")).toHaveText("♫ Cinnamon Waltz");
+    expect((await readMusic(page)).duck).toBe(true);
+    await page.keyboard.press("j");
+    await step(page, 2);
+    expect((await readMusic(page)).duck).toBe(false);
+
+    // Crystal Cavern -> Crystal Echoes + cavern-drips; step with real keys to verify live loop.
+    await resetPaused(page, "cavern");
+    await hold(page, "ArrowUp", 10);
+    expect(await readMusic(page)).toMatchObject({
+      track: "cavern",
+      ambience: "cavern-drips",
+      duck: false,
+      title: "Crystal Echoes",
+      playing: true,
+    });
+
+    // Clover Hills -> Clover Meadow + town-breeze; step with real keys to verify live loop.
+    await resetPaused(page, "hills");
+    await hold(page, "ArrowRight", 10);
+    expect(await readMusic(page)).toMatchObject({
+      track: "hills",
+      ambience: "town-breeze",
+      duck: false,
+      title: "Clover Meadow",
+      playing: true,
+    });
+  },
+);

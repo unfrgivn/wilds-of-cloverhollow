@@ -194,6 +194,66 @@ export function createAmbiencePlayer(
     over.stop(now + 0.3);
   };
 
+  const playCaveDrop = (target: GainNode): void => {
+    const scale = 0.94 + Math.random() * 0.14;
+    const baseHz = 880 * scale;
+    const peakHz = 1480 * scale;
+    const now = context.currentTime + 0.02;
+    const drops: readonly (readonly [number, number])[] = [
+      [0, 0.075],
+      [0.19, 0.03],
+    ];
+    for (const [delay, peak] of drops) {
+      const start = now + delay;
+      const osc = context.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(baseHz, start);
+      osc.frequency.exponentialRampToValueAtTime(peakHz, start + 0.045);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(peak, start + 0.006);
+      env.gain.exponentialRampToValueAtTime(0.0001, start + 0.06);
+      osc.connect(env).connect(target);
+      osc.onended = () => {
+        osc.disconnect();
+        env.disconnect();
+      };
+      osc.start(start);
+      osc.stop(start + 0.07);
+    }
+  };
+
+  const playCafeClink = (target: GainNode): void => {
+    const scale = 0.96 + Math.random() * 0.08;
+    const now = context.currentTime + 0.02;
+    const osc = context.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(2600 * scale, now);
+    const over = context.createOscillator();
+    over.type = "sine";
+    over.frequency.setValueAtTime(3900 * scale, now);
+    const overGain = context.createGain();
+    overGain.gain.setValueAtTime(0.35, now);
+    overGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    const env = context.createGain();
+    env.gain.setValueAtTime(0.0001, now);
+    env.gain.linearRampToValueAtTime(0.045, now + 0.003);
+    env.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+    osc.connect(env);
+    over.connect(overGain).connect(env);
+    env.connect(target);
+    osc.onended = () => {
+      osc.disconnect();
+      over.disconnect();
+      overGain.disconnect();
+      env.disconnect();
+    };
+    osc.start(now);
+    over.start(now);
+    osc.stop(now + 0.065);
+    over.stop(now + 0.05);
+  };
+
   const startBed = (kind: Exclude<AmbienceBed, "none">): ActiveBed => {
     const now = context.currentTime;
     const gain = context.createGain();
@@ -305,6 +365,37 @@ export function createAmbiencePlayer(
       src.connect(bp).connect(level).connect(gain);
       src.start(now);
       scheduleAccent(bed, 3000, () => playEnchantedChime(gain));
+    } else if (kind === "cavern-drips") {
+      const src = addPink();
+      const lp = context.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(280, now);
+      lp.Q.setValueAtTime(0.7, now);
+      const lowLevel = context.createGain();
+      lowLevel.gain.setValueAtTime(0.34, now);
+      const hush = context.createBiquadFilter();
+      hush.type = "bandpass";
+      hush.frequency.setValueAtTime(950, now);
+      hush.Q.setValueAtTime(1.1, now);
+      const hushLevel = context.createGain();
+      hushLevel.gain.setValueAtTime(0.18, now);
+      nodes.push(lp, lowLevel, hush, hushLevel);
+      src.connect(lp).connect(lowLevel).connect(gain);
+      src.connect(hush).connect(hushLevel).connect(gain);
+      src.start(now);
+      scheduleAccent(bed, 2600, () => playCaveDrop(gain));
+    } else if (kind === "cafe-murmur") {
+      const src = addPink();
+      const lp = context.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(360, now);
+      lp.Q.setValueAtTime(0.7, now);
+      const level = context.createGain();
+      level.gain.setValueAtTime(0.42, now);
+      nodes.push(lp, level);
+      src.connect(lp).connect(level).connect(gain);
+      src.start(now);
+      scheduleAccent(bed, 4400, () => playCafeClink(gain));
     } else {
       // "arcade-hum": soft warm indoor room tone
       const src = addPink();

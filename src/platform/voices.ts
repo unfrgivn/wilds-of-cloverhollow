@@ -388,6 +388,8 @@ const G_MAJOR: readonly number[] = [392.0, 440.0, 493.88, 587.33, 659.25, 783.99
 const D_MAJOR: readonly number[] = [587.33, 659.25, 739.99, 880.0, 987.77, 1174.66];
 const EB_MAJOR: readonly number[] = [622.25, 698.46, 783.99, 932.33, 1046.5, 1244.51];
 const A_DORIAN: readonly number[] = [440.0, 493.88, 523.25, 587.33, 659.25, 783.99];
+const D_DORIAN: readonly number[] = [293.66, 329.63, 349.23, 392.0, 440.0, 493.88];
+const A_MAJOR: readonly number[] = [440.0, 493.88, 554.37, 659.25, 739.99, 880.0];
 const BB_MAJOR: readonly number[] = [466.16, 523.25, 587.33, 698.46, 783.99, 932.33];
 const F_LYDIAN: readonly number[] = [349.23, 392.0, 440.0, 493.88, 523.25, 659.25];
 const D_MINOR_PENTA: readonly number[] = [587.33, 698.46, 783.99, 880.0, 1046.5, 1174.66];
@@ -401,9 +403,12 @@ const TRACK_SCALES: Record<MusicTrack, readonly number[]> = {
   battle: C_MAJOR,
   silent: C_MAJOR,
   school: G_MAJOR,
+  cafe: G_MAJOR,
   bay: D_MAJOR,
   pass: EB_MAJOR,
+  cavern: D_DORIAN,
   woods: A_DORIAN,
+  hills: A_MAJOR,
   arcade: BB_MAJOR,
   enchanted: F_LYDIAN,
   boss: D_MINOR_PENTA,

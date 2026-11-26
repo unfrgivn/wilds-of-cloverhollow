@@ -63,6 +63,10 @@
   font: 700 28px sans-serif;
   padding: 0;
   touch-action: none;
+  transition: transform 90ms ease-out;
+}
+.touch-button:active {
+  transform: scale(0.95);
 }
 
 .touch-confirm {
@@ -176,4 +180,12 @@
   stroke: currentColor;
   stroke-width: 1.6;
   stroke-linejoin: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .touch-button {
+    transition: none;
+  }
+  .touch-button:active {
+    transform: none;
+  }
 }

@@ -53,12 +53,17 @@ export function createComet(
   const score = element("span", "comet-score", hud);
   const left = element("span", "comet-left", hud);
   const field = element("div", "comet-field", machine);
-  for (const twinkle of twinkles) {
-    const dot = element("i", "comet-twinkle", field);
-    dot.style.left = `${(twinkle.x * 100).toFixed(2)}%`;
-    dot.style.top = `${(twinkle.y * 100).toFixed(2)}%`;
-    dot.style.width = `${twinkle.size}px`;
-    dot.style.height = `${twinkle.size}px`;
+  const stars = element("div", "comet-stars", field);
+  for (const offset of [0, -100]) {
+    const layer = element("div", "comet-star-layer", stars);
+    layer.style.top = `${offset}%`;
+    for (const twinkle of twinkles) {
+      const dot = element("i", "comet-twinkle", layer);
+      dot.style.left = `${(twinkle.x * 100).toFixed(2)}%`;
+      dot.style.top = `${(twinkle.y * 100).toFixed(2)}%`;
+      dot.style.width = `${twinkle.size}px`;
+      dot.style.height = `${twinkle.size}px`;
+    }
   }
   const lines = document.createElementNS(svg, "svg");
   lines.setAttribute("class", "comet-lines");

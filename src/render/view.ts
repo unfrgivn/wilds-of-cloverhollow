@@ -21,16 +21,19 @@ import {
   npcVisible,
   partyLeader,
   presentCritters,
+  surfaceAt,
   targetInteractable,
   wildMarks,
   creditEntries,
   type Area,
   type CheckSide,
   type CreditEntry,
+  type Direction,
   type PartyContent,
   type PartyMember,
   type Point,
   type State,
+  type Surface,
   type World,
 } from "../core";
 import { AreaView, type Rect } from "./area-view";
@@ -76,7 +79,7 @@ export type BattleCheckGeometry =
 // (`x`, `y`: a ring's centre, a meter's top-left, a chain's target, the
 // catch where it is, a lean's star where it is).
 export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number; y: number };
-import { followCamera, worldToScreen } from "./camera";
+import { interpolatePoint, smoothFollowCamera, worldToScreen } from "./camera";
 import { dialogueFacing, dialoguePartner, facingToward, selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
 import { fadeAlpha } from "./fade";
@@ -85,6 +88,70 @@ import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
+import {
+  composePose,
+  fairyHover,
+  idleBreathing,
+  NEUTRAL_POSE,
+  roamerHop,
+  sitSquash,
+  walkPose,
+  type MotionPose,
+} from "./motion";
+import { computeBattleChoreography } from "./battle-choreography";
+
+export type RenderOptions = {
+  paused?: boolean;
+  alpha?: number;
+  previousState?: State;
+};
+
+type FootstepPuff = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  bornTick: number;
+  life: number;
+  tint: number;
+  baseAlpha: number;
+  baseScale: number;
+  rotation: number;
+};
+
+const FOOTSTEP_POOL_SIZE = 24;
+const BATTLE_VFX_POOL_SIZE = 36;
+
+const SURFACE_PUFFS: Record<Surface, { tint: number; alpha: number }> = {
+  sand: { tint: 0xebd7b8, alpha: 0.45 },
+  stone: { tint: 0xebd7b8, alpha: 0.45 },
+  snow: { tint: 0xffffff, alpha: 0.55 },
+  grass: { tint: 0xd3e8a8, alpha: 0.42 },
+  wood: { tint: 0xefe2cc, alpha: 0.2 },
+  tile: { tint: 0xefe2cc, alpha: 0.2 },
+  carpet: { tint: 0xefe2cc, alpha: 0.2 },
+};
+
+function facingBackVector(facing: Direction): Point {
+  if (facing === "left") return { x: 1, y: 0 };
+  if (facing === "right") return { x: -1, y: 0 };
+  if (facing === "up") return { x: 0, y: 1 };
+  return { x: 0, y: -1 };
+}
+
+function liftShadowScale(offsetY: number): number {
+  const lift = Math.max(0, -offsetY);
+  return Math.max(0.76, 1 - lift * 0.02);
+}
+
+function warmFlashTint(flash: number): number {
+  if (flash <= 0.005) return 0xffffff;
+  const t = Math.min(1, Math.max(0, flash));
+  const r = 255;
+  const g = Math.round(255 - (255 - 0xb4) * t);
+  const b = Math.round(255 - (255 - 0xa2) * t);
+  return (r << 16) | (g << 8) | b;
+}
 
 const INDOOR_AREAS = new Set([
   "bedroom",
@@ -180,6 +247,12 @@ export class GameView {
   private readonly viewport = new Container();
   private readonly scene = new Container();
   private readonly shadowLayer = new Container();
+  private readonly footstepLayer = new Container();
+  private readonly footstepSprites: Sprite[] = [];
+  private footstepPuffs: FootstepPuff[] = [];
+  private lastFootstepArea = "";
+  private lastFootstepTick: number | undefined;
+  private lastFootstepStride: number | undefined;
   private readonly paperGrain: TilingSprite;
   private readonly lanternLayer = new Container();
   private readonly lanternTint = new Graphics();
@@ -224,6 +297,8 @@ export class GameView {
   private readonly battleCritterAura = new Sprite();
   private readonly battleFae = new Sprite();
   private readonly battlePartySprites = new Map<string, Sprite>();
+  private readonly battleVfxLayer = new Container();
+  private readonly battleVfxSprites: Sprite[] = [];
   private readonly label: Text | undefined;
   private areaView: AreaView | undefined;
   private viewWidth = 960;
@@ -289,6 +364,24 @@ export class GameView {
     this.playerShadow = makeShadowSprite(this.vfx.contactShadow, "shadow:fae");
     this.shadowLayer.label = "shadows";
     this.shadowLayer.addChild(this.playerShadow);
+    this.footstepLayer.label = "footsteps";
+    for (let i = 0; i < FOOTSTEP_POOL_SIZE; i += 1) {
+      const puff = new Sprite(this.vfx.puff);
+      puff.label = `footstep:${i}`;
+      puff.anchor.set(0.5);
+      puff.visible = false;
+      this.footstepSprites.push(puff);
+      this.footstepLayer.addChild(puff);
+    }
+    this.battleVfxLayer.label = "battle:vfx";
+    for (let i = 0; i < BATTLE_VFX_POOL_SIZE; i += 1) {
+      const particle = new Sprite(this.vfx.sparkle);
+      particle.label = `battle:vfx:${i}`;
+      particle.anchor.set(0.5);
+      particle.visible = false;
+      this.battleVfxSprites.push(particle);
+      this.battleVfxLayer.addChild(particle);
+    }
 
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
     this.lanternSpotlight.label = "lantern:spotlight";
@@ -366,6 +459,7 @@ export class GameView {
     );
     this.scene.addChild(
       this.shadowLayer,
+      this.footstepLayer,
       this.atmosphere.under,
       this.depth,
       this.ambientLayer,
@@ -384,6 +478,7 @@ export class GameView {
       this.battleCritter,
       this.battleFae,
       ...this.battlePartySprites.values(),
+      this.battleVfxLayer,
     );
     if (options.debugLabel) {
       this.label = new Text({
@@ -478,6 +573,7 @@ export class GameView {
     this.previousCamera = undefined;
     this.lanternTick = undefined;
     this.staticWidth = 0;
+    this.clearFootsteps();
   }
 
   // Unloads what a crossing displaced: everything resident that is neither
@@ -547,8 +643,16 @@ export class GameView {
     this.viewHeight = 720;
   }
 
+  private clearFootsteps(): void {
+    this.footstepPuffs = [];
+    this.lastFootstepTick = undefined;
+    this.lastFootstepStride = undefined;
+    for (const sprite of this.footstepSprites) sprite.visible = false;
+  }
+
   resetCamera(): void {
     this.previousCamera = undefined;
+    this.clearFootsteps();
   }
 
   loadedAreaId(): string {
@@ -594,7 +698,7 @@ export class GameView {
     if (texture.defaultAnchor === undefined)
       throw new Error("Fae anchor missing");
     this.player.anchor.copyFrom(texture.defaultAnchor);
-    this.player.scale.x = selection.mirror ? -0.5 : 0.5;
+    this.player.scale.set(selection.mirror ? -0.5 : 0.5, 0.5);
     this.currentAnimation = selection.animation;
     this.currentFrame = selection.frame;
   }
@@ -642,7 +746,13 @@ export class GameView {
     return { id: member.id, animation, frame };
   }
 
-  private renderParty(state: State, shadowAlpha: number): void {
+  private renderParty(
+    state: State,
+    shadowAlpha: number,
+    previousState: State | undefined,
+    alpha: number,
+    livingMotion: boolean,
+  ): void {
     const inParty = new Set(state.party.map((member) => member.id));
     for (const [id, sprite] of this.partySprites) {
       const present = inParty.has(id);
@@ -651,22 +761,142 @@ export class GameView {
       if (shadow !== undefined) shadow.visible = present;
     }
     const partner = dialoguePartner(this.world, state);
-    this.partyFrames = state.party.flatMap((member) => {
+    this.partyFrames = state.party.flatMap((member, index) => {
       const sprite = this.partySprites.get(member.id);
       const content = this.world.party[member.id];
       if (sprite === undefined || content === undefined) return [];
-      sprite.position.set(member.x, member.y);
-      sprite.zIndex = member.y;
+      const prevMember = previousState?.party.find((item) => item.id === member.id);
+      const pos = prevMember !== undefined && alpha < 1
+        ? interpolatePoint(prevMember, member, alpha)
+        : member;
+      const frameInfo = this.setFollowerTexture(sprite, state, member, content, partner);
+      let pose: MotionPose = NEUTRAL_POSE;
+      if (livingMotion) {
+        const isSideBounder = member.id === "acorn-squirrel" &&
+          (member.facing === "left" || member.facing === "right");
+        if (member.motion.moving) {
+          pose = walkPose(member.motion.distance, content.walkCycleUnits, true, isSideBounder);
+        } else {
+          pose = idleBreathing(state.tick, (index + 1) * 1.3);
+          if (content.sits) {
+            pose = composePose(
+              pose,
+              sitSquash(member.stillTicks, this.world.tunables.follow.sitDelayTicks),
+            );
+          }
+        }
+      }
+      sprite.position.set(pos.x + pose.offsetX, pos.y + pose.offsetY);
+      sprite.scale.set(sprite.scale.x * pose.scaleX, sprite.scale.y * pose.scaleY);
+      sprite.rotation = pose.rotation;
+      sprite.zIndex = pos.y;
       const shadow = this.partyShadows.get(member.id);
       if (shadow !== undefined) {
-        const shadowWidth = content.box.width * 0.92;
-        shadow.position.set(member.x, member.y);
+        const shadowScale = liftShadowScale(pose.offsetY);
+        const shadowWidth = content.box.width * 0.92 * shadowScale;
+        shadow.position.set(pos.x, pos.y);
         shadow.width = shadowWidth;
         shadow.height = shadowWidth * 0.38;
-        shadow.alpha = shadowAlpha;
+        shadow.alpha = shadowAlpha * shadowScale;
       }
-      return [this.setFollowerTexture(sprite, state, member, content, partner)];
+      return [frameInfo];
     });
+  }
+
+  private updateFootsteps(state: State, areaId: string, playerPos: Point): void {
+    const active = areaId !== "harness" &&
+      state.battle === null &&
+      state.arcade === null &&
+      state.transition === null;
+    if (!active) {
+      if (areaId !== this.lastFootstepArea ||
+          (this.lastFootstepTick !== undefined && state.tick < this.lastFootstepTick)) {
+        this.clearFootsteps();
+      }
+      for (const sprite of this.footstepSprites) sprite.visible = false;
+      this.lastFootstepArea = areaId;
+      this.lastFootstepTick = state.tick;
+      return;
+    }
+    if (areaId !== this.lastFootstepArea ||
+        (this.lastFootstepTick !== undefined && state.tick < this.lastFootstepTick)) {
+      this.clearFootsteps();
+    }
+    const halfStride = this.world.tunables.walkCycleUnits / 2;
+    const stride = Math.floor(state.motion.distance / halfStride);
+    if (
+      state.motion.moving &&
+      this.lastFootstepArea === areaId &&
+      this.lastFootstepTick !== undefined &&
+      this.lastFootstepStride !== undefined
+    ) {
+      const delta = state.tick - this.lastFootstepTick;
+      if (delta >= 1 && delta <= 5 && stride > this.lastFootstepStride) {
+        const map = this.world.surfaces[areaId];
+        const surface = map === undefined ? "grass" : surfaceAt(map, state.player);
+        const style = SURFACE_PUFFS[surface];
+        const back = facingBackVector(state.facing);
+        const side = stride % 2 === 0 ? 1 : -1;
+        const perpX = -back.y;
+        const perpY = back.x;
+        const next: FootstepPuff[] = [
+          {
+            x: playerPos.x + back.x * 8 + perpX * side * 6,
+            y: playerPos.y - 2 + back.y * 5 + perpY * side * 3,
+            vx: back.x * 0.45 + perpX * side * 0.25,
+            vy: back.y * 0.25 - 0.35,
+            bornTick: state.tick,
+            life: 18,
+            tint: style.tint,
+            baseAlpha: style.alpha,
+            baseScale: 0.24,
+            rotation: (stride * 0.7) % (Math.PI * 2),
+          },
+          {
+            x: playerPos.x + back.x * 14 - perpX * side * 5,
+            y: playerPos.y - 1 + back.y * 7 - perpY * side * 3,
+            vx: back.x * 0.6 - perpX * side * 0.18,
+            vy: back.y * 0.2 - 0.45,
+            bornTick: state.tick,
+            life: 18,
+            tint: style.tint,
+            baseAlpha: style.alpha * 0.85,
+            baseScale: 0.18,
+            rotation: (stride * 1.3 + 1.1) % (Math.PI * 2),
+          },
+        ];
+        this.footstepPuffs.push(...next);
+        if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
+          this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
+        }
+      }
+    }
+    this.lastFootstepArea = areaId;
+    this.lastFootstepTick = state.tick;
+    this.lastFootstepStride = stride;
+
+    this.footstepPuffs = this.footstepPuffs.filter((puff) => {
+      const age = state.tick - puff.bornTick;
+      return age >= 0 && age < puff.life;
+    });
+    for (let i = 0; i < this.footstepSprites.length; i += 1) {
+      const sprite = this.footstepSprites[i];
+      if (sprite === undefined) continue;
+      const puff = this.footstepPuffs[i];
+      if (puff === undefined) {
+        sprite.visible = false;
+        continue;
+      }
+      const age = state.tick - puff.bornTick;
+      const u = age / puff.life;
+      const scale = puff.baseScale * (0.65 + u * 0.75);
+      sprite.visible = true;
+      sprite.position.set(puff.x + puff.vx * age, puff.y + puff.vy * age);
+      sprite.scale.set(scale);
+      sprite.rotation = puff.rotation + u * 0.35;
+      sprite.tint = puff.tint;
+      sprite.alpha = puff.baseAlpha * (1 - u) * (1 - u);
+    }
   }
 
   render(
@@ -674,7 +904,7 @@ export class GameView {
     width: number,
     height: number,
     resolution: number,
-    snapLantern = false,
+    options?: RenderOptions,
   ): void {
     const area = this.world.areas[state.area];
     if (area === undefined) return;
@@ -691,13 +921,29 @@ export class GameView {
       this.staticPaper !== loaded.paper
     )
       this.drawStatic(width, height, loaded.paper);
+    const paused = options?.paused ?? false;
+    const previousState = options?.previousState;
+    const canInterpolate = !paused &&
+      previousState !== undefined &&
+      previousState.area === state.area &&
+      state.transition === null;
+    const alpha = canInterpolate ? Math.max(0, Math.min(1, options?.alpha ?? 1)) : 1;
+    const playerPos = canInterpolate
+      ? interpolatePoint(previousState.player, state.player, alpha)
+      : state.player;
+    const snapCamera = paused ||
+      this.previousCamera === undefined ||
+      state.transition !== null ||
+      area.id === "harness";
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
-    const camera = followCamera(
+    const camera = smoothFollowCamera(
       this.previousCamera,
-      state.player,
+      playerPos,
+      state.facing,
       { width: this.viewWidth, height: this.viewHeight },
       area,
       { x: 80, y: 60 },
+      snapCamera,
     );
     this.previousCamera = camera;
     const letterboxX = (width - this.viewWidth * scale) / 2;
@@ -714,17 +960,42 @@ export class GameView {
     this.glowLayer.position.set(offsetX, offsetY);
     const indoor = INDOOR_AREAS.has(area.id);
     const shadowAlpha = indoor ? 0.24 : 0.3;
-    this.shadowLayer.visible = area.id !== "harness";
-    this.player.position.set(state.player.x, state.player.y);
-    this.player.zIndex = state.player.y;
-    this.playerShadow.position.set(state.player.x, state.player.y);
-    this.playerShadow.width = 46;
-    this.playerShadow.height = 18;
-    this.playerShadow.alpha = shadowAlpha;
+    const livingMotion = area.id !== "harness";
+    this.shadowLayer.visible = livingMotion;
     this.setFaeTexture(state);
-    this.renderParty(state, shadowAlpha);
-    this.renderCritters(state, shadowAlpha);
-    this.renderNpcs(state, shadowAlpha);
+    const faePose = !livingMotion
+      ? NEUTRAL_POSE
+      : state.motion.moving
+        ? walkPose(state.motion.distance, this.world.tunables.walkCycleUnits, true)
+        : idleBreathing(state.tick, 0);
+    this.player.position.set(playerPos.x + faePose.offsetX, playerPos.y + faePose.offsetY);
+    this.player.scale.set(
+      this.player.scale.x * faePose.scaleX,
+      this.player.scale.y * faePose.scaleY,
+    );
+    this.player.rotation = faePose.rotation;
+    this.player.zIndex = playerPos.y;
+    const faeShadowScale = liftShadowScale(faePose.offsetY);
+    this.playerShadow.position.set(playerPos.x, playerPos.y);
+    this.playerShadow.width = 46 * faeShadowScale;
+    this.playerShadow.height = 18 * faeShadowScale;
+    this.playerShadow.alpha = shadowAlpha * faeShadowScale;
+    this.updateFootsteps(state, area.id, playerPos);
+    this.renderParty(
+      state,
+      shadowAlpha,
+      canInterpolate ? previousState : undefined,
+      alpha,
+      livingMotion,
+    );
+    this.renderCritters(
+      state,
+      shadowAlpha,
+      canInterpolate ? previousState : undefined,
+      alpha,
+      livingMotion,
+    );
+    this.renderNpcs(state, shadowAlpha, livingMotion);
     this.renderAmbient(state);
     this.atmosphere.update(
       area.id,
@@ -740,7 +1011,7 @@ export class GameView {
       state.tick,
       this.figures(),
     );
-    this.renderGlows(state, snapLantern);
+    this.renderGlows(state, playerPos, paused);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
     if (this.label !== undefined) {
@@ -756,7 +1027,7 @@ export class GameView {
     this.fade.alpha = fade;
   }
 
-  private renderGlows(state: State, snapLantern = false): void {
+  private renderGlows(state: State, playerPos: Point, snapLantern = false): void {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
     const on = state.lantern && state.battle === null && state.arcade === null;
@@ -783,8 +1054,8 @@ export class GameView {
     this.lanternLayer.visible = showDusk;
     if (showDusk) {
       this.lanternTint.alpha = 0.63 * this.lanternBlend;
-      const centerX = state.player.x;
-      const centerY = state.player.y - 46;
+      const centerX = playerPos.x;
+      const centerY = playerPos.y - 46;
       this.lanternSpotlight.position.set(centerX, centerY);
       this.lanternSpotlight.alpha =
         (0.36 + 0.04 * Math.sin(state.tick / 16)) * this.lanternBlend;
@@ -858,9 +1129,13 @@ export class GameView {
   // People in the area, y-sorted with everyone else. They face Fae while she
   // talks to them; without a frame for that facing (Mom has no back view)
   // they show their front. idle_down steps through the character's idleTicks.
-  private renderNpcs(state: State, shadowAlpha: number): void {
+  private renderNpcs(
+    state: State,
+    shadowAlpha: number,
+    livingMotion: boolean,
+  ): void {
     const frames: { id: string; frame: string; facing: string }[] = [];
-    for (const { npc, sprite, shadow } of this.npcSprites) {
+    for (const [npcIndex, { npc, sprite, shadow }] of this.npcSprites.entries()) {
       const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
       const character = this.world.characters[npc.id];
       // Someone the story has sent away isn't drawn (spec 6).
@@ -902,15 +1177,23 @@ export class GameView {
       if (texture.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(texture.defaultAnchor);
       const s = character.scale ?? 0.5;
-      sprite.scale.set(mirror ? -s : s, s);
-      sprite.position.set(npc.point.x, npc.point.y);
+      const isFairy = npc.id.startsWith("fairy-");
+      const pose = !livingMotion || npc.id === "bus-stop"
+        ? NEUTRAL_POSE
+        : isFairy
+          ? fairyHover(state.tick, npcIndex)
+          : idleBreathing(state.tick, (npcIndex + 1) * 0.9);
+      sprite.scale.set((mirror ? -s : s) * pose.scaleX, s * pose.scaleY);
+      sprite.position.set(npc.point.x + pose.offsetX, npc.point.y + pose.offsetY);
+      sprite.rotation = pose.rotation;
       sprite.zIndex = npc.point.y;
       if (shadow !== null) {
-        if (npc.id.startsWith("fairy-")) {
+        if (isFairy) {
+          const altScale = liftShadowScale(pose.offsetY);
           shadow.position.set(npc.point.x, npc.point.y + 8);
-          shadow.width = 28;
-          shadow.height = 12;
-          shadow.alpha = 0.24;
+          shadow.width = 28 * altScale;
+          shadow.height = 12 * altScale;
+          shadow.alpha = 0.24 * altScale;
         } else {
           const width = npc.id === "oliver" ? 34 : ADULT_NPCS.has(npc.id) ? 52 : 48;
           shadow.position.set(npc.point.x, npc.point.y);
@@ -928,7 +1211,13 @@ export class GameView {
   // with Fae, her party, and props, their figures overworldHeight tall.
   // Who is out can change in an area (a rest rolls it again, a set piece
   // comes and goes), so the sprites follow the present critters' keys.
-  private renderCritters(state: State, shadowAlpha: number): void {
+  private renderCritters(
+    state: State,
+    shadowAlpha: number,
+    previousState: State | undefined,
+    alpha: number,
+    livingMotion: boolean,
+  ): void {
     const present =
       this.areaView === undefined ? [] : presentCritters(this.world, state);
     const keys = present
@@ -966,8 +1255,16 @@ export class GameView {
       const critter = present[index];
       if (critter === undefined) continue;
       const content = critter.kind;
-      const point = critter.point;
+      const logicalPoint = critter.point;
       const roamer = critter.wild;
+      const prevWild = roamer === null || previousState === undefined
+        ? undefined
+        : previousState.wild.find(
+            (item) => item.den === roamer.den && item.kind === roamer.kind,
+          );
+      const point = prevWild !== undefined && alpha < 1
+        ? interpolatePoint(prevWild, logicalPoint, alpha)
+        : logicalPoint;
       const sheet = Assets.get<Spritesheet>(content.atlas);
       if (sheet === undefined) continue;
       const calm = critter.mood === "calm";
@@ -982,12 +1279,25 @@ export class GameView {
       const flipX = talking
         ? state.player.x > point.x
         : roamer !== null && roamer.facing === "right";
-      body.scale.set(flipX ? -scale : scale, scale);
-      const bob = roamer?.moving === true ? Math.sin(state.tick / 4) * 3 : 0;
-      body.position.set(point.x, point.y + bob);
+      const noticeTicks = this.world.tunables.roam.noticeTicks;
+      const pose = !livingMotion
+        ? NEUTRAL_POSE
+        : roamer !== null
+          ? roamerHop(
+              state.tick,
+              roamer.moving,
+              roamer.notice >= noticeTicks,
+              roamer.notice,
+              noticeTicks,
+              roamer.facing,
+            )
+          : idleBreathing(state.tick, (index + 1) * 1.1, calm ? 0.012 : 0.02);
+      body.scale.set((flipX ? -scale : scale) * pose.scaleX, scale * pose.scaleY);
+      body.position.set(point.x + pose.offsetX, point.y + pose.offsetY);
+      body.rotation = pose.rotation;
       body.zIndex = point.y;
       const baseWidth = Math.min(76, Math.max(36, content.overworldHeight * 0.56));
-      const hopScale = bob < 0 ? 1 + bob * 0.025 : 1;
+      const hopScale = liftShadowScale(pose.offsetY);
       shadow.position.set(point.x, point.y);
       shadow.width = baseWidth * hopScale;
       shadow.height = baseWidth * 0.38 * hopScale;
@@ -996,7 +1306,7 @@ export class GameView {
       aura.texture = auraTexture;
       placeAura(
         aura,
-        { x: point.x, y: point.y + bob },
+        { x: point.x + pose.offsetX, y: point.y + pose.offsetY },
         scale,
         content.auraCentre,
         content.bodyCentre,
@@ -1005,7 +1315,7 @@ export class GameView {
       aura.zIndex = point.y - 0.5;
       aura.alpha = 0.65 + Math.sin(state.tick / 18) * 0.2;
       aura.rotation = state.tick / 180;
-      frames.push({ id, kind: content.id, frame, x: point.x, y: point.y });
+      frames.push({ id, kind: content.id, frame, x: logicalPoint.x, y: logicalPoint.y });
     }
     this.critterFrames = frames;
   }
@@ -1095,6 +1405,7 @@ export class GameView {
       this.viewport.visible = true;
       this.scene.visible = true;
       this.battleBackdrop = null;
+      for (const sprite of this.battleVfxSprites) sprite.visible = false;
       if (this.backdropTexture !== undefined) {
         this.backdropTexture.destroy(true);
         this.backdropTexture = undefined;
@@ -1129,8 +1440,25 @@ export class GameView {
     }
     if (battle === null) return;
     const layout = this.layoutFor(state, width, height);
+    const viewModel = battleView(this.world, state);
+    const fighting = battleParty(this.world, state.party);
+    const partyIds = fighting.map((member) => member.id);
+    const partyCommands: Record<string, string | null> = {};
+    for (const member of fighting) {
+      partyCommands[member.id] = this.world.party[member.id]?.command?.id ?? null;
+    }
+    const choreo = computeBattleChoreography(
+      battle,
+      viewModel,
+      state.tick,
+      partyIds,
+      partyCommands,
+    );
     this.battleLayer.scale.set(scale);
-    this.battleLayer.position.set(x, y);
+    this.battleLayer.position.set(
+      x + choreo.stageShake.x * scale,
+      y + choreo.stageShake.y * scale,
+    );
     drawWash(0.2);
     // Warm-cream radial focus spotlight centred behind the combatants, kept
     // well inside the viewport so the four painted corners stay untouched.
@@ -1160,25 +1488,35 @@ export class GameView {
     this.battleCritter.anchor.set(0.5, 504 / 512);
     // A wind-up swells the critter from its feet, 6% a turn, breathing a
     // little as it puffs (spec 8.1); the aura swells with it.
-    const puff = battleView(this.world, state)?.puff ?? 0;
+    const puff = viewModel?.puff ?? 0;
     const swell = puff === 0 ? 1 : 1 + 0.06 * puff + 0.012 * Math.sin(state.tick / 7);
     const critterScale = (critter.battleHeight / critter.figureHeight) * swell;
-    this.battleCritter.scale.set(critterScale);
+    const critterPose = choreo.critter;
+    this.battleCritter.scale.set(
+      critterScale * critterPose.scaleX,
+      critterScale * critterPose.scaleY,
+    );
     const critterX = (layout.critter.x - x) / scale + slideOffset;
     const critterY = (layout.critter.baseline - y) / scale;
-    this.battleCritter.position.set(critterX, critterY);
+    this.battleCritter.position.set(
+      critterX + critterPose.offsetX,
+      critterY + critterPose.offsetY,
+    );
+    this.battleCritter.rotation = critterPose.rotation;
     const critterShadowBase = Math.min(190, Math.max(92, critter.battleHeight * 0.58));
-    const critterShadowScale = 1 + (swell - 1) * 0.65;
-    this.battleCritterShadow.position.set(critterX, critterY);
+    const critterLift = liftShadowScale(critterPose.offsetY);
+    const critterShadowScale = (1 + (swell - 1) * 0.65) * critterLift;
+    this.battleCritterShadow.position.set(critterX + critterPose.offsetX * 0.85, critterY);
     this.battleCritterShadow.width = critterShadowBase * critterShadowScale;
-    this.battleCritterShadow.height = critterShadowBase * 0.32 * (1 + (swell - 1) * 0.5);
-    this.battleCritterShadow.alpha = 0.34;
+    this.battleCritterShadow.height =
+      critterShadowBase * 0.32 * (1 + (swell - 1) * 0.5) * critterLift;
+    this.battleCritterShadow.alpha = 0.34 * critterLift;
 
     this.battleCritterAura.texture = aura;
     placeAura(
       this.battleCritterAura,
       this.battleCritter.position,
-      critterScale,
+      critterScale * choreo.auraScaleBoost,
       critter.auraCentre,
       critter.bodyCentre,
     );
@@ -1196,21 +1534,24 @@ export class GameView {
     const fae = faeFrames?.[0];
     const faeX = (layout.fae.x - x) / scale - slideOffset;
     const faeY = (layout.fae.baseline - y) / scale;
+    const faePose = choreo.fae;
     if (fae !== undefined) {
       this.battleFae.texture = fae;
       if (fae.defaultAnchor !== undefined)
         this.battleFae.anchor.copyFrom(fae.defaultAnchor);
-      this.battleFae.scale.set(0.58);
-      this.battleFae.position.set(faeX, faeY);
+      this.battleFae.scale.set(0.58 * faePose.scaleX, 0.58 * faePose.scaleY);
+      this.battleFae.position.set(faeX + faePose.offsetX, faeY + faePose.offsetY);
+      this.battleFae.rotation = faePose.rotation;
+      this.battleFae.tint = warmFlashTint(faePose.tintFlash);
     }
-    this.battleFaeShadow.position.set(faeX, faeY);
-    this.battleFaeShadow.width = 68;
-    this.battleFaeShadow.height = 22;
-    this.battleFaeShadow.alpha = 0.34;
+    const faeLift = liftShadowScale(faePose.offsetY);
+    this.battleFaeShadow.position.set(faeX + faePose.offsetX * 0.85, faeY);
+    this.battleFaeShadow.width = 68 * faeLift;
+    this.battleFaeShadow.height = 22 * faeLift;
+    this.battleFaeShadow.alpha = 0.34 * faeLift;
 
     // The party stands with Fae: a sitter (Maddie) sits facing the critter,
     // anyone else is seen from behind like Fae. Flute friends sit it out.
-    const fighting = battleParty(this.world, state.party);
     const inParty = new Set(fighting.map((member) => member.id));
     for (const [id, sprite] of this.battlePartySprites) {
       const visible = inParty.has(id);
@@ -1218,6 +1559,7 @@ export class GameView {
       const shadow = this.battlePartyShadows.get(id);
       if (shadow !== undefined) shadow.visible = visible;
     }
+    const partyAnchors = new Map<string, Point>();
     fighting.forEach((member, index) => {
       const sprite = this.battlePartySprites.get(member.id);
       const content = this.world.party[member.id];
@@ -1232,19 +1574,60 @@ export class GameView {
       sprite.texture = frame;
       if (frame.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(frame.defaultAnchor);
-      sprite.scale.set(((content.scale ?? 0.5) / 0.5) * 0.58);
+      const baseScale = ((content.scale ?? 0.5) / 0.5) * 0.58;
+      const memberPose = choreo.party[member.id] ?? NEUTRAL_POSE;
+      sprite.scale.set(baseScale * memberPose.scaleX, baseScale * memberPose.scaleY);
       const memberX = (place.x - x) / scale - slideOffset;
       const memberY = (place.y - y) / scale;
-      sprite.position.set(memberX, memberY);
+      sprite.position.set(memberX + memberPose.offsetX, memberY + memberPose.offsetY);
+      sprite.rotation = memberPose.rotation;
+      partyAnchors.set(member.id, { x: memberX, y: memberY - 58 });
       const shadow = this.battlePartyShadows.get(member.id);
       if (shadow !== undefined) {
-        const shadowWidth = content.box.width * 1.15;
-        shadow.position.set(memberX, memberY);
+        const lift = liftShadowScale(memberPose.offsetY);
+        const shadowWidth = content.box.width * 1.15 * lift;
+        shadow.position.set(memberX + memberPose.offsetX * 0.85, memberY);
         shadow.width = shadowWidth;
         shadow.height = shadowWidth * 0.36;
-        shadow.alpha = 0.32;
+        shadow.alpha = 0.32 * lift;
       }
     });
+
+    const faeAnchor = { x: faeX, y: faeY - 72 };
+    const critterAnchor = { x: critterX, y: critterY - critter.battleHeight * 0.5 };
+    for (let i = 0; i < this.battleVfxSprites.length; i += 1) {
+      const sprite = this.battleVfxSprites[i];
+      if (sprite === undefined) continue;
+      const particle = choreo.vfx[i];
+      if (particle === undefined || particle.alpha <= 0.01) {
+        sprite.visible = false;
+        continue;
+      }
+      sprite.visible = true;
+      sprite.texture = this.vfx[particle.texture];
+      sprite.blendMode = particle.blend;
+      sprite.tint = particle.tint;
+      sprite.alpha = particle.alpha;
+      sprite.scale.set(particle.scaleX, particle.scaleY);
+      sprite.rotation = particle.rotation;
+      let baseX = critterAnchor.x;
+      let baseY = critterAnchor.y;
+      if (particle.anchor === "fae") {
+        baseX = faeAnchor.x;
+        baseY = faeAnchor.y;
+      } else if (particle.anchor === "between") {
+        const t = particle.t ?? 0.5;
+        baseX = faeAnchor.x + (critterAnchor.x - faeAnchor.x) * t;
+        baseY = faeAnchor.y + (critterAnchor.y - faeAnchor.y) * t;
+      } else if (particle.anchor === "party" && particle.actorId !== undefined) {
+        const actorAnchor = partyAnchors.get(particle.actorId);
+        if (actorAnchor !== undefined) {
+          baseX = actorAnchor.x;
+          baseY = actorAnchor.y;
+        }
+      }
+      sprite.position.set(baseX + particle.offsetX, baseY + particle.offsetY);
+    }
     this.battleLayer.alpha = introEase;
   }
 

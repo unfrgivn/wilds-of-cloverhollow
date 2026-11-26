@@ -156,6 +156,8 @@ export function createClaw(
       width: size, height: size });
     setStyle(claw, "z-index", clawZ);
     claw.classList.toggle("is-closed", !layout.claw.open);
+    claw.classList.toggle("is-sway-right", view.phase === "sliding");
+    claw.classList.toggle("is-sway-left", view.phase === "returning");
     const cableWidth = Math.max(2, Math.round(size * 0.05));
     place(cable, {
       x: layout.cable.x1 - Math.round(cableWidth / 2), y: layout.cable.y1,

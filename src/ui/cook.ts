@@ -56,6 +56,7 @@ export function createCook(
   const draw = (view: CookView, layout: CookLayout): void => {
     place(machine, { x: 0, y: 0, width: layout.width, height: layout.height });
     machine.dataset.scale = String(layout.scale);
+    machine.dataset.phase = view.phase;
     place(glass, layout.glass);
     setStyle(glass, "border-radius", `${layout.glass.radius}px`);
     if (view.dish !== lastDish) {
@@ -68,6 +69,14 @@ export function createCook(
     }
     place(food, layout.food);
     place(frost, layout.food);
+    // Gentle deterministic turntable oval sway while the microwave runs.
+    const sway = view.cooking ? Math.sin(view.cooked * 0.14) * 5 : 0;
+    const stretch = view.cooking ? 1 + Math.cos(view.cooked * 0.28) * 0.025 : 1;
+    const turnTransform = view.cooking
+      ? `translateX(${sway.toFixed(2)}px) scaleX(${stretch.toFixed(4)})`
+      : "";
+    setStyle(food, "transform", turnTransform);
+    setStyle(frost, "transform", turnTransform);
     // Darker and browner as it overcooks: a deep brown at burnt.
     const dark = view.darkness;
     setStyle(food, "filter", dark === 0 ? "none"

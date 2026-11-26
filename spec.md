@@ -104,8 +104,13 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Real time drives ticks through an accumulator in `src/main.ts`, at most 5
   ticks per animation frame (extra time is dropped at the cap; the
   `src/core/timing.ts` `drainTicks` function). While an area load is pending,
-  the accumulator is reset and no ticks run. Rendering may
-  interpolate between ticks for presentation only.
+  the accumulator is reset and no ticks run. In live running play (not paused,
+  same area, no door transition), `src/main.ts` passes `previousState` and
+  sub-tick `alpha = min(1, accumulator / (1000 / 60))` into `GameView.render`
+  to linearly interpolate (`interpolatePoint` in `src/render/camera.ts`) the
+  drawn positions of Fae, matching party members, and matching roaming critters
+  at 120 Hz for presentation only. When paused in the harness or crossing
+  areas, rendering snaps to `alpha = 1`.
 - The shell draws the canvas from its own animation-frame callback (Pixi's
   automatic per-frame render is removed). While the harness has the game
   paused, it draws only after something changes: a step or reset, an area
@@ -288,19 +293,25 @@ ios/            Capacitor iOS project (from Milestone 4).
   Capacitor's `capacitor://localhost` scheme.
 - Source art is authored at 2x logical units (1 unit = 2 source pixels).
 - The camera follows the player with a small dead zone, clamps to area bounds,
-  and snaps to whole device pixels.
+  and snaps to whole device pixels. `smoothFollowCamera` (`src/render/camera.ts`)
+  delegates straight to `followCamera` when `snap` is true (area load, reset,
+  `harness`, or paused harness stepping); during live running play (`snap`
+  false), it applies a subtle facing look-ahead (`±22u` x / `±14u` y) through
+  `followCamera` and smoothly damps toward it (`0.14` per frame, snapping within
+  `0.15u`), clamped cleanly to area bounds.
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
-- Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestone 72):
-  eight small cached offscreen-canvas Pixi textures (`contactShadow`,
+- Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73):
+  eleven small cached offscreen-canvas Pixi textures (`contactShadow`,
   `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`, `sunbeam`,
-  `paperGrain`), rendered with warm plum-brown shadows (`#52455F`), pastel
-  washes, and seamless cold-press paper tooth. In non-harness areas, a
-  multiply `shadowLayer` sits directly above `ground` and below `depth` to
+  `paperGrain`, plus `puff`, `heart`, and `energyRing`), rendered with warm
+  plum-brown shadows (`#52455F`), pastel washes, gouache puffs, and seamless
+  cold-press paper tooth. In non-harness areas, a `shadowLayer` sits directly
+  above `ground` and below `depth` (with a pooled `footstepLayer` above it) to
   ground Fae, party members, visible NPCs (hover shadows under the four
   fairies, skipping the painted `bus-stop`), and overworld critters (scaling
-  slightly as roamers bob); a deterministic `BiomeAtmosphere`
+  slightly as characters bounce or hover); a deterministic `BiomeAtmosphere`
   (`src/render/atmosphere.ts`, zero `Math.random()`) adds per-biome water
   glints, lamp pools, drifting petals/pollen, snow and lodge chimney smoke,
   sunbeams, lavender mist, fairy aura halos, hearth glow, and arcade neon
@@ -333,6 +344,17 @@ ios/            Capacitor iOS project (from Milestone 4).
   in `state.motion.distance` (sliding along a wall counts only the slide), and
   one full cycle spans `walkCycleUnits` (126). Idle shows when a tick's
   displacement is below epsilon.
+- Procedural living motion (`src/render/motion.ts`, Milestone 73, non-harness
+  areas): pure deterministic pose offsets from `(state, tick)` apply subtle
+  stride-synced vertical bounce and elastic squash-stretch (`walkPose`, with
+  parabolic airborne bounds for `acorn-squirrel` side walks), gentle
+  feet-anchored idle breathing (`idleBreathing`, skipping `bus-stop`), 8-tick
+  landing squash-pop when sitters settle (`sitSquash`), continuous hover bob
+  and banking tilt on `fairy-*` NPCs (`fairyHover`, with grounded altitude-scaled
+  shadows), and playful startle jumps, snappy hops, and forward lean on roaming
+  critters (`roamerHop`). In live play (advancing 1..5 ticks per render in the
+  same non-harness area), each Fae half-stride spawns two surface-tinted gouache
+  `puff` particles (`surfaceAt` in `footstepLayer`) behind her feet.
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one PNG atlas plus JSON frame data per character (Pixi
@@ -1972,9 +1994,20 @@ trunks keep its two exits.
 - The Pixi battle scene dims the loaded area painting and presents the critter,
   Fae (at scale `0.58`), the party (each at `((scale ?? 0.5) / 0.5) * 0.58` so
   classmates match Fae's crown height), and aura in a fixed logical
-  composition. It is render-only. The shell logs `[cloverhollow] battle` with
-  phase and message changes, and `renderInfo()` exposes the phase, the check's
-  geometry, and critter frame.
+  composition. It is render-only. `computeBattleChoreography`
+  (`src/render/battle-choreography.ts`, Milestone 73) drives deterministic
+  Paper Mario / EarthBound combat poses and pooled `battleVfxLayer` particles
+  (`sparkle`, `heart`, `energyRing`, `puff`): staggered breathing, highlighted
+  actor step-forward on command selection, Soothe hops with luminous aqua energy
+  ripples, Maddie pounce arcs, Sue charge lean-back proportional to `fill` and
+  pastel cast arcs, Jordan beat-synced juggle tosses, Snack hops with floating
+  hearts, live Lean balance tilting, live Catch lane posing with caught-toy
+  sparkles, critter burst crouch-and-lunge, `great`/`good`/`miss` reactions and
+  rainbow bursts, damped Fae recoil with warm blush flash and gentle 3 px stage
+  shake on spent energy, wind-up micro-tremble and fizzle wide squash-deflate,
+  and expanding aura dissolve with celebratory hearts and sparkles on `soothed`.
+  The shell logs `[cloverhollow] battle` with phase and message changes, and
+  `renderInfo()` exposes the phase, the check's geometry, and critter frame.
 
 ### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
 - The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip
@@ -2368,6 +2401,17 @@ trunks keep its two exits.
 - Its gallery states (`src/dev/cook-gallery.ts`), each a real game state the
   core cooked: `cook-ready`, `cook-golden` (cooking at the box's minute),
   `cook-frozen`, `cook-result` (mac n cheese, golden), and `cook-burnt`.
+- Minigame & UI micro-animation polish (Milestone 73, all CSS transitions and
+  keyframes guarded by `@media (prefers-reduced-motion: reduce)`): Claw Machine
+  tug wiggle and sliding/returning pendulum tilt; Skee-Ball contact shadow
+  lifting while hopping and bouncy `.skee-pop` entrance; Boop-a-Mole boop squash
+  (via CSS `scale` without clobbering `translateY`) and bouncy `.mole-pop`
+  entrance; Comet Cruise scrolling starfield during live `playing` and bumped
+  rocket glow/wobble (paused in `.gallery-body` so gallery measurements stay
+  exact); Clubhouse Microwave deterministic turntable oval sway while cooking
+  and celebratory pop on `ding`; smooth choice/command/title transitions,
+  `.touch-button:active` tactile squash, and subtle inner-label float on
+  `.sticker-prompt` keeping its arrow tip anchored.
 
 ## 9. Journal and stickers
 - Experience is saved as XP for Fae and each party member. A member's level is

@@ -166,6 +166,7 @@ export function createSkee(
       ghost.classList.toggle("is-over", layout.ghost.over);
     }
     ball.hidden = layout.ball === null;
+    ball.classList.toggle("is-hopping", view.phase === "hopping");
     if (layout.ball !== null) {
       const size = layout.ball.radius * 2;
       place(ball, { x: layout.ball.x - layout.ball.radius,

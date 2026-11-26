@@ -181,6 +181,7 @@ async function boot(): Promise<void> {
       (kind) => [kind.species, content.world.levels.critters[kind.id]?.xp ?? 0])),
     content.world.levels.thresholds);
   state = restored ?? fresh;
+  let previousState: State = state;
   // A real boot opens on the title (spec 7.3), with the game frozen behind it:
   // no core ticks run, so Continue resumes the save exactly as it was written.
   // Fixture resets (the harness) skip it.
@@ -202,6 +203,7 @@ async function boot(): Promise<void> {
     titleSelected = result.selected;
     if (result.action === "new-game") {
       state = createState(content.world, initialFixture);
+      previousState = state;
       void Preferences.remove({ key: saveKey });
       saveLast = null;
     }
@@ -243,7 +245,8 @@ async function boot(): Promise<void> {
       Object.fromEntries(Object.values(content.world.critters).map((kind) => [kind.species,
         content.world.levels.critters[kind.id]?.xp ?? 0])), content.world.levels.thresholds);
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
-    state = loaded; qaActivePack = item; qaMenuOpen = false; titleMode = null;
+    state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
+    titleMode = null;
     qaJustPicked = true;
     swallowed.add("confirm");
   };
@@ -264,7 +267,10 @@ async function boot(): Promise<void> {
         prizeIds: content.world.arcade.prizes.map((prize) => prize.id),
         thresholds: content.world.levels.thresholds,
       }, state, line);
-      if (outcome.kind === "applied") state = outcome.state;
+      if (outcome.kind === "applied") {
+        state = outcome.state;
+        previousState = state;
+      }
       return outcome;
     },
     saveSlot: async (name) => {
@@ -599,7 +605,7 @@ async function boot(): Promise<void> {
     return journalCache.notes;
   };
   let wasJournalOpen = false;
-  const render = (): void => {
+  const render = (alpha = 1): void => {
     const arcadeState = arcadeView(content.world, state);
     if (arcadeState !== null && arcadeState.game !== "cook" && arcadeOverlay === null)
       void ensureArcadeOverlay().then(invalidate);
@@ -619,7 +625,7 @@ async function boot(): Promise<void> {
       window.innerWidth,
       window.innerHeight,
       app.renderer.resolution,
-      paused,
+      { paused, alpha: paused ? 1 : alpha, previousState },
     );
     prompt.render(
       state.battle === null && state.arcade === null
@@ -971,6 +977,7 @@ async function boot(): Promise<void> {
         if (endingSnapshot === null)
           throw new Error("the credits closed with no dream to go back to");
         state = endingSnapshot;
+        previousState = state;
         titleMode = "continue";
         titleSelected = "continue";
         return;
@@ -981,6 +988,7 @@ async function boot(): Promise<void> {
     const previous = state;
     const stepped = step(content.world, state, input);
     state = stepped.state;
+    previousState = state.area === previous.area ? previous : state;
     // A door's fade-out knows where it's going: warm that area's art while the
     // fade still covers the screen, so the arrival isn't a white wait on the
     // load (spec 4, transitions). The warm-up belongs to the real-time loop:
@@ -1073,7 +1081,10 @@ async function boot(): Promise<void> {
       }
       reload = false;
       areaLoad = Promise.all([view.setArea(area), warmAreaMedia(area)])
-        .then(() => view.resetCamera())
+        .then(() => {
+          view.resetCamera();
+          previousState = state;
+        })
         .finally(() => {
           areaLoad = undefined;
           invalidate();
@@ -1114,7 +1125,10 @@ async function boot(): Promise<void> {
     }
     if (!paused || areaLoad !== undefined || drawPending) {
       drawPending = false;
-      render();
+      const alpha = paused || areaLoad !== undefined
+        ? 1
+        : Math.min(1, Math.max(0, accumulator / (1000 / 60)));
+      render(alpha);
       app.render();
     }
   });
@@ -1174,6 +1188,7 @@ async function boot(): Promise<void> {
           );
         suppressSave = true;
         state = createState(content.world, fixture, options.seed);
+        previousState = state;
         suppressSave = false;
         prefetchedTarget = undefined;
         await Promise.all([ensureArea(), warmOwnedJournalMedia(state)]);

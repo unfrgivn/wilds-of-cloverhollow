@@ -147,6 +147,7 @@
   font-size: 16px;
   font-weight: 600;
   text-align: left;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
 .battle-command[aria-selected="true"] {
   background: var(--sticker-green);
@@ -366,6 +367,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .battle-calm-fill,
+  .battle-command,
   .battle-chain-beat,
   .battle-catch-ring,
   .battle-catch-toy,

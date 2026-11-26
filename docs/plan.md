@@ -3679,6 +3679,39 @@ the old trail, the owl, and the clubhouse claim.
   and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4203 just e2e`
   (941 passed, 2 skipped in 4.0 min).
 
+## Milestone 73: Living Motion, 120 Hz Interpolation, Overworld & Battle Choreography, and Minigame Juice **Status:** ✅ Completed (2026-11-26)
+- Pure render/UI presentation milestone (zero `src/core` changes, zero replay
+  hash changes).
+- 120 Hz sub-tick interpolation (`interpolatePoint`) and smooth damped camera
+  (`smoothFollowCamera` with facing look-ahead during live play, exact
+  `followCamera` delegation when snapped/paused) in `src/render/camera.ts`,
+  wired through `previousState` and sub-tick `alpha` in `src/main.ts` and
+  `src/render/view.ts`.
+- Extended `src/render/vfx-textures.ts` with three procedural watercolor
+  textures (`puff`, `heart`, `energyRing`), added pure `src/render/motion.ts`
+  (`walkPose` with Acorn Squirrel airborne side bounds, `idleBreathing`,
+  `fairyHover`, `sitSquash`, `roamerHop`), and wired overworld living motion +
+  pooled surface-aware footstep dust puffs (`surfaceAt` -> `footstepLayer`) in
+  `src/render/view.ts`.
+- Added pure Paper Mario / EarthBound `src/render/battle-choreography.ts`
+  (`computeBattleChoreography`) and pooled `battleVfxLayer` in
+  `src/render/view.ts` covering idle/command step-forward, Soothe energy
+  ripples, Maddie pounce, Sue charge lean-back & pastel cast arc, Jordan
+  beat-synced juggle toss, Snack hearts, live Lean balance tilting, live Catch
+  lane poses & caught sparkles, critter burst crouch-and-lunge, result grade
+  reactions & rainbow bursts, Fae damped recoil/blush/stage shake, wind-up
+  tremble & fizzle deflate, and `soothed` aura expansion & celebration burst.
+- Added minigame and UI micro-animation polish (`src/ui/claw.*`, `skee.*`,
+  `mole.css`, `comet.*`, `cook.*`, `sticker.css`, `battle.css`, `title.css`,
+  `touch-controls.css`) with `@media (prefers-reduced-motion: reduce)` guards.
+- Evidence: `tests/unit/milestone-73.test.ts` (14 tests); reviewed captures in
+  `art/review/m73-lean.jpg`, `m73-catch.jpg`, `m73-windup.jpg`,
+  `m73-forest-hover.jpg`, and `m73-mole-booped.jpg` verified with `vision`.
+- Gates: `just check` (128 unit files / 1,056 tests, all 60+ sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4205 just e2e`
+  (941 passed, 2 skipped in 4.2 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

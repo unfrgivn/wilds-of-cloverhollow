@@ -182,7 +182,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sticker-advance.is-visible,
+  .sticker-prompt > span,
   .notice-mark.is-alert { animation: none; }
+  .sticker-choice { transition: none; }
 }
 
 .sticker-choices {
@@ -232,6 +234,7 @@
   text-align: left;
   touch-action: manipulation;
   pointer-events: auto;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
 
 .sticker-choice[aria-selected="true"] {
@@ -255,6 +258,14 @@
   letter-spacing: .1em;
   text-transform: uppercase;
   transform: translate(-50%, calc(-100% - 45px));
+}
+.sticker-prompt > span {
+  display: inline-block;
+  animation: prompt-float 1600ms ease-in-out infinite;
+}
+@keyframes prompt-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 .sticker-prompt::before {

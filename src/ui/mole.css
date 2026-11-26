@@ -52,6 +52,11 @@
   position: absolute;
   inset: 0;
   background-repeat: no-repeat;
+  transform-origin: 50% 100%;
+  transition: scale 90ms ease-out;
+}
+.mole-sprite[data-face="booped"] {
+  scale: 1.12 0.84;
 }
 .mole-sprite[hidden] {
   display: none;
@@ -80,6 +85,11 @@
 }
 
 /* "Boop!" over a wincing mole. */
+@keyframes mole-pop-in {
+  0% { transform: translate(-50%, -80%) scale(0.5); opacity: 0; }
+  65% { transform: translate(-50%, -106%) scale(1.18); opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+}
 .mole-pop {
   z-index: 6;
   transform: translate(-50%, -100%);
@@ -92,6 +102,9 @@
   font-weight: 900;
   white-space: nowrap;
   pointer-events: none;
+}
+.mole-pop:not([hidden]) {
+  animation: mole-pop-in 220ms ease-out;
 }
 .mole-pop[hidden],
 .mole-hud[hidden] {
@@ -161,4 +174,8 @@
 }
 .mole-left {
   color: #b5480f;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mole-sprite { transition: none; }
+  .mole-pop:not([hidden]) { animation: none; }
 }

@@ -8,7 +8,10 @@ export type VfxTextureKey =
   | "waterGlint"
   | "mistWisp"
   | "sunbeam"
-  | "paperGrain";
+  | "paperGrain"
+  | "puff"
+  | "heart"
+  | "energyRing";
 
 export type VfxTextures = Record<VfxTextureKey, Texture> & {
   destroy: () => void;
@@ -295,6 +298,84 @@ function buildPaperGrain(): Texture {
   return toTexture(canvas, "repeat");
 }
 
+// 64x64 soft multi-lobe gouache cloud puff: cream #FAF3DF -> sand #E4CFAF -> taupe #C3A27D.
+function buildPuff(): Texture {
+  const { canvas, ctx } = makeCanvas(64, 64);
+  const lobes: readonly [number, number, number, number][] = [
+    [24, 34, 18, 0.84],
+    [40, 34, 17, 0.82],
+    [32, 26, 20, 0.92],
+    [32, 38, 18, 0.76],
+    [22, 27, 13, 0.68],
+    [42, 28, 13, 0.68],
+  ];
+  for (const [cx, cy, r, peak] of lobes) {
+    const wash = ctx.createRadialGradient(cx - r * 0.16, cy - r * 0.18, 1, cx, cy, r);
+    wash.addColorStop(0, `rgba(250, 243, 223, ${peak})`);
+    wash.addColorStop(0.52, `rgba(228, 207, 175, ${peak * 0.78})`);
+    wash.addColorStop(0.82, `rgba(195, 162, 125, ${peak * 0.34})`);
+    wash.addColorStop(1, "rgba(195, 162, 125, 0)");
+    ctx.fillStyle = wash;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  return toTexture(canvas);
+}
+
+// 48x48 chubby soft watercolor heart, tintable for pastel rainbow bursts.
+function buildHeart(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  const halo = ctx.createRadialGradient(24, 24, 2, 24, 24, 22);
+  halo.addColorStop(0, "rgba(255, 255, 255, 0.45)");
+  halo.addColorStop(0.65, "rgba(255, 255, 255, 0.14)");
+  halo.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, 48, 48);
+
+  ctx.save();
+  ctx.translate(24, 25);
+  ctx.beginPath();
+  ctx.moveTo(0, 14);
+  ctx.bezierCurveTo(-15, 5, -18, -9, -9, -14);
+  ctx.bezierCurveTo(-4, -17, 0, -12, 0, -8);
+  ctx.bezierCurveTo(0, -12, 4, -17, 9, -14);
+  ctx.bezierCurveTo(18, -9, 15, 5, 0, 14);
+  ctx.closePath();
+  const fill = ctx.createRadialGradient(-4, -5, 1, 0, 0, 18);
+  fill.addColorStop(0, "rgba(255, 255, 255, 1)");
+  fill.addColorStop(0.68, "rgba(255, 253, 250, 0.92)");
+  fill.addColorStop(0.95, "rgba(255, 248, 244, 0.65)");
+  fill.addColorStop(1, "rgba(255, 248, 244, 0)");
+  ctx.fillStyle = fill;
+  ctx.fill();
+  // Soft painterly upper-left highlight.
+  ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+  ctx.beginPath();
+  ctx.ellipse(-6.5, -6.5, 3.4, 2.2, -0.55, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  return toTexture(canvas);
+}
+
+// 96x96 luminous soft aqua/mint energy ripple #D4FCF2 -> #67D5C4 -> transparent.
+function buildEnergyRing(): Texture {
+  const { canvas, ctx } = makeCanvas(96, 96);
+  const ring = ctx.createRadialGradient(48, 48, 8, 48, 48, 46);
+  ring.addColorStop(0, "rgba(212, 252, 242, 0)");
+  ring.addColorStop(0.42, "rgba(103, 213, 196, 0.08)");
+  ring.addColorStop(0.64, "rgba(103, 213, 196, 0.56)");
+  ring.addColorStop(0.76, "rgba(212, 252, 242, 0.95)");
+  ring.addColorStop(0.86, "rgba(103, 213, 196, 0.55)");
+  ring.addColorStop(0.96, "rgba(103, 213, 196, 0.12)");
+  ring.addColorStop(1, "rgba(103, 213, 196, 0)");
+  ctx.fillStyle = ring;
+  ctx.beginPath();
+  ctx.arc(48, 48, 46, 0, Math.PI * 2);
+  ctx.fill();
+  return toTexture(canvas);
+}
+
 export function createVfxTextures(): VfxTextures {
   const textures: Record<VfxTextureKey, Texture> = {
     contactShadow: buildContactShadow(),
@@ -305,6 +386,9 @@ export function createVfxTextures(): VfxTextures {
     mistWisp: buildMistWisp(),
     sunbeam: buildSunbeam(),
     paperGrain: buildPaperGrain(),
+    puff: buildPuff(),
+    heart: buildHeart(),
+    energyRing: buildEnergyRing(),
   };
   return {
     ...textures,

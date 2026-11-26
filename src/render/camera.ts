@@ -1,9 +1,47 @@
-import type { Point } from "../core";
+import type { Direction, Point } from "../core";
 
 type Size = { width: number; height: number };
 
+const LOOK_AHEAD_X = 22;
+const LOOK_AHEAD_Y = 14;
+const CAMERA_DAMP = 0.14;
+const CAMERA_SNAP_EPSILON = 0.15;
+
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, value));
+}
+
+export function interpolatePoint(
+  previous: Point,
+  current: Point,
+  alpha: number,
+): Point {
+  const t = clamp(alpha, 0, 1);
+  return {
+    x: previous.x + (current.x - previous.x) * t,
+    y: previous.y + (current.y - previous.y) * t,
+  };
+}
+
+function lookAhead(player: Point, facing: Direction): Point {
+  if (facing === "left") return { x: player.x - LOOK_AHEAD_X, y: player.y };
+  if (facing === "right") return { x: player.x + LOOK_AHEAD_X, y: player.y };
+  if (facing === "up") return { x: player.x, y: player.y - LOOK_AHEAD_Y };
+  return { x: player.x, y: player.y + LOOK_AHEAD_Y };
+}
+
+function dampAxis(
+  previous: number,
+  target: number,
+  viewSize: number,
+  areaSize: number,
+): number {
+  if (areaSize <= viewSize) return (areaSize - viewSize) / 2;
+  const gap = target - previous;
+  const next = Math.abs(gap) <= CAMERA_SNAP_EPSILON
+    ? target
+    : previous + gap * CAMERA_DAMP;
+  return clamp(next, 0, areaSize - viewSize);
 }
 
 function axisCamera(
@@ -32,6 +70,31 @@ export function followCamera(
   return {
     x: axisCamera(previous?.x, player.x, view.width, area.width, deadZone.x),
     y: axisCamera(previous?.y, player.y, view.height, area.height, deadZone.y),
+  };
+}
+
+export function smoothFollowCamera(
+  previous: Point | undefined,
+  player: Point,
+  facing: Direction,
+  view: Size,
+  area: Size,
+  deadZone: Point,
+  snap: boolean,
+): Point {
+  if (snap || previous === undefined) {
+    return followCamera(previous, player, view, area, deadZone);
+  }
+  const target = followCamera(
+    previous,
+    lookAhead(player, facing),
+    view,
+    area,
+    deadZone,
+  );
+  return {
+    x: dampAxis(previous.x, target.x, view.width, area.width),
+    y: dampAxis(previous.y, target.y, view.height, area.height),
   };
 }
 

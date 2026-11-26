@@ -113,3 +113,20 @@
   color: #fff6dc;
   text-shadow: 0 2px 0 rgb(20 24 50 / 70%);
 }
+@keyframes cook-ding-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.07, 0.94); }
+  75% { transform: scale(0.98, 1.04); }
+  100% { transform: scale(1); }
+}
+.cook-machine[data-phase="ding"] .cook-food,
+.cook-machine[data-phase="ding"] .cook-frost {
+  transform-origin: 50% 80%;
+  animation: cook-ding-pop 320ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cook-machine[data-phase="ding"] .cook-food,
+  .cook-machine[data-phase="ding"] .cook-frost {
+    animation: none;
+  }
+}

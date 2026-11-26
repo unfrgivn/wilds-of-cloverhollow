@@ -85,6 +85,7 @@
   font-size: 18px;
   font-weight: 600;
   text-align: center;
+  transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
 .title-option[aria-selected="true"],
 .title-confirm-button[aria-selected="true"] {
@@ -136,4 +137,10 @@
 .title-confirm-button {
   flex: 1;
   font-size: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-option,
+  .title-confirm-button {
+    transition: none;
+  }
 }

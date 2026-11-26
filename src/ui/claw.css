@@ -64,8 +64,13 @@
   background: radial-gradient(closest-side, #47321f38, #47321f00);
 }
 /* Held down by another plush: the claw tugs at it, and it won't come free. */
+@keyframes claw-tug {
+  0%, 100% { transform: translateY(-2%) rotate(-7deg); }
+  50% { transform: translateY(-3%) rotate(5deg); }
+}
 .arcade-plush.is-tug .arcade-plush-image {
   transform: translateY(-2%) rotate(-6deg);
+  animation: claw-tug 240ms ease-in-out infinite;
 }
 /* Where the claw would come down while Fae aims: its catch zone. */
 .arcade-marker {
@@ -84,6 +89,14 @@
 }
 .arcade-claw {
   overflow: visible;
+  transform-origin: 50% 0%;
+  transition: transform 140ms ease-out;
+}
+.arcade-claw.is-sway-right {
+  transform: rotate(5deg);
+}
+.arcade-claw.is-sway-left {
+  transform: rotate(-5deg);
 }
 .arcade-claw-head {
   fill: #f49ab4;
@@ -200,5 +213,13 @@
   }
   :root[data-arcade="open"] .battle-reward-name {
     font-size: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arcade-plush.is-tug .arcade-plush-image {
+    animation: none;
+  }
+  .arcade-claw {
+    transition: none;
   }
 }

@@ -34,6 +34,7 @@ type Slot = {
   image: HTMLDivElement;
   unknown: HTMLDivElement;
   name: HTMLDivElement;
+  imageKey: string;
 };
 
 type MapLand = JournalView["lands"][number];
@@ -66,7 +67,7 @@ function addSlot(grid: HTMLElement): Slot {
   const name = element("div", "journal-name");
   root.append(image, unknown, name);
   grid.append(root);
-  return { root, image, unknown, name };
+  return { root, image, unknown, name, imageKey: "" };
 }
 
 // The bus line's stop sign, as on the sprite: a gold star on a blue roundel
@@ -250,6 +251,9 @@ export function createJournal(root: HTMLElement): {
     },
     render: (view) => {
       book.hidden = !view.visible;
+      if (!view.visible && wasVisible) setPage("notes");
+      wasVisible = view.visible;
+      if (!view.visible) return;
       setText(coins.count, String(view.coins));
       setText(tickets.count, String(view.tickets));
       setText(snacks.count, String(view.snacks));
@@ -259,8 +263,6 @@ export function createJournal(root: HTMLElement): {
       setAttribute(volume, "aria-valuenow", String(volumePercent));
       setAttribute(volume, "aria-valuetext", `${volumePercent}%`);
       setText(volumeValue, `${volumePercent}%`);
-      if (!view.visible && wasVisible) setPage("notes");
-      wasVisible = view.visible;
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));
       while (notes.children.length > view.notes.length) notes.lastElementChild?.remove();
       view.notes.forEach((note, index) => {
@@ -308,9 +310,17 @@ export function createJournal(root: HTMLElement): {
         slot.name.hidden = image === null;
         setText(slot.name, image === null ? "" : sticker.name);
         setAttribute(slot.root, "data-owned", String(image !== null));
-        if (image === null) return;
+        if (image === null) {
+          slot.imageKey = "";
+          return;
+        }
         setAttribute(slot.image, "aria-label", sticker.name);
-        applyAtlasCrop(slot.image, image);
+        const key = `${image.src}#${image.frame.x},${image.frame.y},` +
+          `${image.frame.w},${image.frame.h}`;
+        if (slot.imageKey !== key) {
+          applyAtlasCrop(slot.image, image);
+          slot.imageKey = key;
+        }
       });
       while (prizeSlots.length < view.prizes.length) prizeSlots.push(addSlot(prizesGrid));
       while (prizeSlots.length > view.prizes.length) prizeSlots.pop()?.root.remove();
@@ -323,9 +333,16 @@ export function createJournal(root: HTMLElement): {
         slot.name.hidden = image === null;
         setText(slot.name, image === null ? "" : prize.name);
         setAttribute(slot.root, "data-owned", String(image !== null));
-        if (image !== null) {
-          setAttribute(slot.image, "aria-label", prize.name);
+        if (image === null) {
+          slot.imageKey = "";
+          return;
+        }
+        setAttribute(slot.image, "aria-label", prize.name);
+        const key = `${image.src}#${image.frame.x},${image.frame.y},` +
+          `${image.frame.w},${image.frame.h}`;
+        if (slot.imageKey !== key) {
           applyAtlasCrop(slot.image, image);
+          slot.imageKey = key;
         }
       });
       const nextMapSignature = view.lands

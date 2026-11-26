@@ -112,6 +112,7 @@ export function createSkee(
   const corners: TargetNodes[] = [];
   const floor = svgElement("text", "skee-label skee-floor", target);
   let lastKey = "";
+  let lastPlateKey = "";
   let lastView: SkeeView | null = null;
   let lastLayout: SkeeLayout | null = null;
 
@@ -151,11 +152,15 @@ export function createSkee(
     const lines = view.hint === null ? 1 : text.length > 16 ? 2 : 1;
     plate.classList.toggle("is-hint", view.hint !== null);
     setText(plateText, text);
-    const tall = Math.floor(layout.plate.height * (lines === 1 ? 0.5 : 0.36));
-    setStyle(plateText, "font-size", `${tall}px`);
-    const room = Math.min((plate.clientWidth * 0.92) / Math.max(1, plateText.scrollWidth),
-      (plate.clientHeight * 0.92) / Math.max(1, plateText.scrollHeight));
-    if (room < 1) setStyle(plateText, "font-size", `${Math.floor(tall * room)}px`);
+    const plateKey = `${text}|${layout.plate.width}|${layout.plate.height}`;
+    if (plateKey !== lastPlateKey) {
+      lastPlateKey = plateKey;
+      const tall = Math.floor(layout.plate.height * (lines === 1 ? 0.5 : 0.36));
+      setStyle(plateText, "font-size", `${tall}px`);
+      const room = Math.min((plate.clientWidth * 0.92) / Math.max(1, plateText.scrollWidth),
+        (plate.clientHeight * 0.92) / Math.max(1, plateText.scrollHeight));
+      if (room < 1) setStyle(plateText, "font-size", `${Math.floor(tall * room)}px`);
+    }
     setStyle(hud, "left", `${layout.hud.x}px`);
     setStyle(hud, "top", `${layout.hud.y}px`);
     // As large as the marquee's lettering allows, never under 14 px.
@@ -219,6 +224,7 @@ export function createSkee(
   // The marquee was measured in whatever font was usable, and Nunito swaps in
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
+    lastPlateKey = "";
     if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
   });
 

@@ -15,6 +15,7 @@ export type SoundCue =
   | "skee-aim" | "skee-roll" | "skee-score" | "skee-hundred" | "tickets-won"
   | "mole-pop" | "mole-boop" | "mole-whiff"
   | "comet-move" | "comet-star" | "comet-bump"
+  | "cook-start" | "cook-frozen" | "cook-ding"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
   | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue";
 
@@ -34,7 +35,7 @@ export function isStorySound(value: string): value is StorySound {
 export function soundCues(
   previous: State,
   next: State,
-  world: Pick<World, "surfaces" | "arcade" | "levels">,
+  world: Pick<World, "surfaces" | "arcade" | "levels" | "tunables">,
 ): SoundCue[] {
   const cues: SoundCue[] = [];
   const oldDialogue = previous.dialogue;
@@ -76,8 +77,10 @@ export function soundCues(
         return old !== undefined && levelForXp(world.levels, member.xp) >
           levelForXp(world.levels, old.xp);
       })) cues.push("level-up");
-  if (next.motion.moving && next.motion.distance > previous.motion.distance &&
-      next.tick % 8 === 0) {
+  const stride = world.tunables.walkCycleUnits / 2;
+  if (next.motion.moving &&
+      Math.floor(next.motion.distance / stride) >
+        Math.floor(previous.motion.distance / stride)) {
     const map = world.surfaces[next.area];
     if (map === undefined) throw new Error(`unknown area ${next.area}`);
     cues.push(`footstep-${surfaceAt(map, next.player)}`);
@@ -130,6 +133,11 @@ export function soundCues(
     if (was !== null && game.caught > was.caught) cues.push("comet-star");
     if (was !== null && game.bumps > was.bumps) cues.push("comet-bump");
     if (game.phase === "result" && newPhase) cues.push("tickets-won");
+  }
+  if (game?.game === "cook" && newPhase) {
+    if (game.phase === "cooking") cues.push("cook-start");
+    if (game.phase === "paused") cues.push("cook-frozen");
+    if (game.phase === "ding") cues.push("cook-ding");
   }
   return cues;
 }

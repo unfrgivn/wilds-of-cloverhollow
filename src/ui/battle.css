@@ -43,17 +43,41 @@
   line-height: 1;
   text-transform: uppercase;
 }
-.battle-leaves {
+.battle-energy-row {
   display: flex;
+  align-items: center;
   gap: 4px;
   margin-top: 7px;
 }
+.battle-leaves {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.battle-leaves.is-compact {
+  gap: 2px;
+}
+.battle-leaves.is-compact .battle-leaf {
+  width: 15px;
+  height: 12px;
+}
+.battle-leaves.is-capped {
+  gap: 1px;
+}
+.battle-leaves.is-capped .battle-leaf {
+  width: 12px;
+  height: 10px;
+}
 .battle-leaf-count {
-  align-self: center;
-  margin-left: 4px;
+  margin-left: auto;
   color: var(--sticker-ink);
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+.battle-leaf-count[hidden] {
+  display: none;
 }
 .battle-leaf {
   width: 22px;
@@ -341,10 +365,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .battle-calm-fill {
+  .battle-calm-fill,
+  .battle-chain-beat,
+  .battle-catch-ring,
+  .battle-catch-toy,
+  .battle-lean-puff {
     transition: none;
   }
-  .battle-reward.is-visible {
+  .battle-reward.is-visible,
+  .battle-trace-dot.is-next,
+  .battle-feeling-heart,
+  .battle-windup-bubble.is-popped {
     animation: none;
   }
 }

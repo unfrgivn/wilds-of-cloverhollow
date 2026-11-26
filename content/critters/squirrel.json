@@ -5,12 +5,12 @@
   "calmName": "Acorn Squirrel",
   "atlas": "assets/critters/squirrel/squirrel.json",
   "auraCentre": {
-    "x": 264,
-    "y": 275
+    "x": 256.9,
+    "y": 256.3
   },
   "bodyCentre": {
-    "x": 253,
-    "y": 311
+    "x": 268.3,
+    "y": 294.4
   },
   "figureHeight": 380,
   "overworldHeight": 70,

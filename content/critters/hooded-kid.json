@@ -5,12 +5,12 @@
   "calmName": "Milo",
   "atlas": "assets/critters/hooded-kid/hooded-kid.json",
   "auraCentre": {
-    "x": 259,
-    "y": 261.87
+    "x": 258.7,
+    "y": 260.7
   },
   "bodyCentre": {
-    "x": 242.83,
-    "y": 299.94
+    "x": 229.3,
+    "y": 303.7
   },
   "figureHeight": 380,
   "overworldHeight": 140,

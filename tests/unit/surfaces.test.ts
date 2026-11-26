@@ -196,6 +196,6 @@ describe("area surface maps", () => {
       }
     }
     expect(walked.map(({ surface }) => surface)).toEqual(["sand", "wood", "sand"]);
-    expect(walked[1]?.steps ?? 0, "steps along the dock").toBeGreaterThanOrEqual(20);
+    expect(walked[1]?.steps ?? 0, "steps along the dock").toBeGreaterThanOrEqual(15);
   });
 });

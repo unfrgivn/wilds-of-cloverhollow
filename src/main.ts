@@ -74,7 +74,7 @@ import type { PackState } from "./dev/qa";
 const content = loadContent();
 const app = new Application();
   let state: State;
-  let levelUpNotice: string | null = null;
+  const levelUpNotices: string[] = [];
 let paused = false;
 
 // One save slot (spec 10).
@@ -124,6 +124,8 @@ async function boot(): Promise<void> {
   const keyboard = new Keyboard();
   const gamepad = new GamepadInput();
   const touch = mountTouchControls();
+  const lanternButton = document.querySelector<HTMLButtonElement>(".touch-lantern");
+  const fluteButton = document.querySelector<HTMLButtonElement>(".touch-flute");
   const uiRoot = document.createElement("div");
   document.body.append(uiRoot);
   const dialogueBox = createDialogueBox(uiRoot);
@@ -338,7 +340,7 @@ async function boot(): Promise<void> {
     domAtlas(content.world.arcade.atlas),
     domAtlas(moleAtlas),
     domAtlas(foodAtlas),
-    Assets.load<Spritesheet>(assetUrl(cometAtlas)),
+    domAtlas(cometAtlas),
     Promise.all([
       painting("assets/arcade/claw-machine.json", parseClawCalibration),
       painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
@@ -516,14 +518,11 @@ async function boot(): Promise<void> {
     noticeMarks.render(view.noticeMarks(state));
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
-    const lanternButton =
-      document.querySelector<HTMLButtonElement>(".touch-lantern");
     if (lanternButton !== null) {
       lanternButton.hidden =
         content.world.storyVariable(state.ink, "has_lantern") !== true;
       lanternButton.classList.toggle("is-on", state.lantern);
     }
-    const fluteButton = document.querySelector<HTMLButtonElement>(".touch-flute");
     if (fluteButton !== null)
       fluteButton.hidden = content.world.storyVariable(state.ink, "has_flute") !== true;
     title.render({
@@ -577,9 +576,7 @@ async function boot(): Promise<void> {
         !talkChoicesShown(battle?.talk ?? null),
       energy: battle?.energy ?? 0,
       energyMax: battle?.energyMax ?? 0,
-      level: activeBattle
-        ? (content.world.critters[state.battle?.critterId ?? ""]?.level ?? 1)
-        : 1,
+      level: levelForXp(content.world.levels, state.xp),
       calm: battle === null ? 0 : battle.calm / Math.max(1, battle.calmMax),
       critterName: activeBattle
         ? `Lv ${content.world.critters[state.battle?.critterId ?? ""]?.level ?? 1} · ` +
@@ -687,36 +684,42 @@ async function boot(): Promise<void> {
               : null,
           }))
         : [],
-      lands: content.world.lands.map((land) => ({
-        ...land,
-        name: mapLandName(land, content.world.areas[state.area]?.land ?? null,
-          (variable) => content.world.storyVariable(state.ink, variable) === true),
-        ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
-      })),
+      lands: state.journalOpen
+        ? content.world.lands.map((land) => ({
+            ...land,
+            name: mapLandName(land, content.world.areas[state.area]?.land ?? null,
+              (variable) => content.world.storyVariable(state.ink, variable) === true),
+            ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
+          }))
+        : [],
       currentLand: content.world.areas[state.area]?.land ?? null,
       coins: state.coins,
       snacks: state.snacks,
       tickets: state.tickets,
       muted: sound.muted(),
       level: sound.level(),
-      members: [
-        { id: "fae", name: "Fae", level: levelForXp(content.world.levels, state.xp), xp: state.xp,
-          startXp: content.world.levels.thresholds[
-            levelForXp(content.world.levels, state.xp) - 1] ?? 0,
-          nextXp: content.world.levels.thresholds[
-            levelForXp(content.world.levels, state.xp)] ?? state.xp,
-          stats: statsForCommand(content.world.levels, "soothe",
-            levelForXp(content.world.levels, state.xp)), friend: false },
-        ...state.party.map((member) => {
-          const party = content.world.party[member.id];
-          const level = levelForXp(content.world.levels, member.xp);
-          return { id: member.id, name: party?.name ?? member.id, level, xp: member.xp,
-            startXp: content.world.levels.thresholds[level - 1] ?? 0,
-            nextXp: content.world.levels.thresholds[level] ?? member.xp,
-            stats: statsForCommand(content.world.levels, party?.command?.id ?? "soothe", level),
-            friend: true };
-        }),
-      ],
+      members: state.journalOpen
+        ? [
+            { id: "fae", name: "Fae", level: levelForXp(content.world.levels, state.xp),
+              xp: state.xp,
+              startXp: content.world.levels.thresholds[
+                levelForXp(content.world.levels, state.xp) - 1] ?? 0,
+              nextXp: content.world.levels.thresholds[
+                levelForXp(content.world.levels, state.xp)] ?? state.xp,
+              stats: statsForCommand(content.world.levels, "soothe",
+                levelForXp(content.world.levels, state.xp)), friend: false },
+            ...state.party.map((member) => {
+              const party = content.world.party[member.id];
+              const level = levelForXp(content.world.levels, member.xp);
+              return { id: member.id, name: party?.name ?? member.id, level, xp: member.xp,
+                startXp: content.world.levels.thresholds[level - 1] ?? 0,
+                nextXp: content.world.levels.thresholds[level] ?? member.xp,
+                stats: statsForCommand(content.world.levels,
+                  party?.command?.id ?? "soothe", level),
+                friend: true };
+            }),
+          ]
+        : [],
     });
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;
@@ -725,6 +728,7 @@ async function boot(): Promise<void> {
       (arcadeState !== null && arcadeState.phase !== "result")
     )
       dialogueBox.hide();
+    const levelUpNotice = levelUpNotices[0] ?? null;
     if (levelUpNotice !== null) {
       dialogueBox.render({ speaker: null, text: levelUpNotice, revealed: levelUpNotice.length,
         choices: [], selected: -1, canAdvance: true });
@@ -739,7 +743,8 @@ async function boot(): Promise<void> {
         revealed: battle?.revealed ?? 0,
         choices: [],
         selected: -1,
-        canAdvance: battle !== null && battle.revealed >= battle.message.length,
+        canAdvance: battle !== null && state.battle?.phase !== "command" &&
+          battle.revealed >= battle.message.length,
       });
       document.documentElement.dataset.dialogue = "open";
     } else if (activeBattle) {
@@ -845,8 +850,8 @@ async function boot(): Promise<void> {
       cancel: frame.cancel && !swallowed.has("cancel"),
       menu: frame.menu && !swallowed.has("menu"),
     };
-    if (levelUpNotice !== null && input.confirm && !state.previousInput.confirm)
-      levelUpNotice = null;
+    if (levelUpNotices.length > 0 && input.confirm && !state.previousInput.confirm)
+      levelUpNotices.shift();
     if (state.finale === "credits") {
       creditsTicks += 1;
       if (creditsConfirmAllowed(
@@ -894,7 +899,7 @@ async function boot(): Promise<void> {
       if (event.type === "level-up") {
         const friend = event.member !== "fae";
         const name = friend ? (content.world.party[event.member]?.name ?? event.member) : "Fae";
-        levelUpNotice = levelUpLine(name, event.from, event.to, event.deltas, friend);
+        levelUpNotices.push(levelUpLine(name, event.from, event.to, event.deltas, friend));
       }
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
@@ -1004,7 +1009,13 @@ async function boot(): Promise<void> {
   // toggles the QA console while a pack is active (spec 11). Opening or
   // closing redraws, so the console appears over a game the harness paused.
   if (qaEnabled) window.addEventListener("keydown", (event) => {
-    if (event.code === "KeyQ") { event.preventDefault(); openQa(); return; }
+    if (event.code === "KeyQ") {
+      if (event.target instanceof HTMLElement &&
+          event.target.closest("input, textarea") !== null) return;
+      event.preventDefault();
+      openQa();
+      return;
+    }
     if (event.code === "Backquote") {
       event.preventDefault();
       if (qaConsoleOpen) qaConsoleOpen = false;
@@ -1057,6 +1068,7 @@ async function boot(): Promise<void> {
         qaActivePack = null;
         qaJustPicked = false;
         qaConsoleOpen = false;
+        levelUpNotices.length = 0;
         swallowed.clear();
       },
       renderInfo: () => ({ ...view.renderInfo(state), arcade: arcade.info() }),

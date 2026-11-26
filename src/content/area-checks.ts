@@ -444,6 +444,16 @@ export function areaConnectionErrors(
           `${area.id}: interactable ${interactable.id} is unreachable`,
         );
     }
+    for (const npc of area.npcs) {
+      const range = tunables.interact.range;
+      const reachableNpc = reachable.some((point) => {
+        const dx = point.x - npc.point.x;
+        const dy = point.y - npc.point.y;
+        return dx * dx + dy * dy <= range * range;
+      });
+      if (!reachableNpc)
+        errors.push(`${area.id}: npc ${npc.id} is unreachable`);
+    }
     for (const critter of area.critters) {
       const config = critter.id;
       const touchRadius = critters[critter.id]?.touchRadius ?? 70;

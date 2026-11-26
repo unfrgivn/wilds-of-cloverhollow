@@ -75,9 +75,16 @@ export function levelUpDelta(table: LevelContent, previousXp: number, nextXp: nu
     beforeStats: statsForLevel(table, before), afterStats: statsForLevel(table, after) };
 }
 
-export function levelUpLine(name: string, from: number, to: number,
+export function levelUpLine(name: string, _from: number, to: number,
   deltas: LevelStats, friend = false): string {
-  const changes = [`Power +${deltas.power}`, `Magic +${deltas.magic}`];
-  if (!friend) changes.push(`Life +${deltas.life}`, `Guard +${deltas.guard}`);
-  return `${name} reached level ${to}! ${changes.join(", ")}.`;
+  const changes: string[] = [];
+  if (deltas.power > 0) changes.push(`Power +${deltas.power}`);
+  if (deltas.magic > 0) changes.push(`Magic +${deltas.magic}`);
+  if (!friend) {
+    if (deltas.life > 0) changes.push(`Life +${deltas.life}`);
+    if (deltas.guard > 0) changes.push(`Guard +${deltas.guard}`);
+  }
+  return changes.length === 0
+    ? `${name} reached level ${to}!`
+    : `${name} reached level ${to}! ${changes.join(", ")}.`;
 }

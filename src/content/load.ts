@@ -1685,6 +1685,12 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
     file,
     "start/joins",
   );
+  const scale = value.scale;
+  field(
+    scale === undefined || (typeof scale === "number" && Number.isFinite(scale) && scale > 0),
+    file,
+    "scale",
+  );
   return {
     id: text(value, "id"),
     name: text(value, "name"),
@@ -1705,6 +1711,7 @@ export function parsePartyMember(value: unknown, file: string): PartyContent {
           check: faeSideCheck(command.check, file, "command.check"),
         }
       : null,
+    ...(scale === undefined ? {} : { scale }),
   };
 }
 
@@ -1942,7 +1949,17 @@ export function parseCharacters(
       file,
       `${id}.idleTicks`,
     );
-    characters[id] = { atlas: raw.atlas, idleTicks: ticks };
+    const scale = raw.scale;
+    field(
+      scale === undefined || (typeof scale === "number" && Number.isFinite(scale) && scale > 0),
+      file,
+      `${id}.scale`,
+    );
+    characters[id] = {
+      atlas: raw.atlas,
+      idleTicks: ticks,
+      ...(scale === undefined ? {} : { scale }),
+    };
   }
   return characters;
 }

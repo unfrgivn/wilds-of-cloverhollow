@@ -213,6 +213,7 @@ export function createQaConsole(root: HTMLElement, handlers: QaConsoleHandlers):
   // count).
   let panel: HTMLElement | null = null;
   let input: HTMLInputElement | null = null;
+  let wasOpen = false;
   const build = (): void => {
     const madePanel = el("main", "qa-console");
     madePanel.hidden = true; madePanel.setAttribute("aria-label", "QA console");
@@ -267,9 +268,12 @@ export function createQaConsole(root: HTMLElement, handlers: QaConsoleHandlers):
       if (open && panel === null) build();
       if (panel === null) return;
       panel.hidden = !open;
-      if (input === null) return;
-      if (open) input.focus();
-      else input.blur();
+      if (wasOpen !== open) {
+        wasOpen = open;
+        if (input === null) return;
+        if (open) input.focus();
+        else input.blur();
+      }
     },
   };
 }

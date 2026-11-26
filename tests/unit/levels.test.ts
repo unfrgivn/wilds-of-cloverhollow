@@ -11,7 +11,7 @@ const table = content.world.levels;
 describe("experience and levels", () => {
   it("formats Fae and friend level-up lines", () => {
     expect(levelUpLine("Fae", 4, 5, { power: 2, magic: 1, life: 1, guard: 0 })).toBe(
-      "Fae reached level 5! Power +2, Magic +1, Life +1, Guard +0.",
+      "Fae reached level 5! Power +2, Magic +1, Life +1.",
     );
     expect(levelUpLine("Maddie", 4, 5, { power: 2, magic: 1, life: 1, guard: 0 }, true)).toBe(
       "Maddie reached level 5! Power +2, Magic +1.",

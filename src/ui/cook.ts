@@ -79,6 +79,7 @@ export function createCook(
   const front = element("div", "cook-front", machine);
   const frontText = element("span", "cook-front-text", front);
   let lastKey = "";
+  let lastFrontKey = "";
   let lastView: CookView | null = null;
   let lastLayout: CookLayout | null = null;
   let lastDish = "";
@@ -125,15 +126,20 @@ export function createCook(
     place(front, layout.front);
     const text = cookFront(view);
     setText(frontText, text);
-    const tall = Math.max(10, Math.floor(layout.front.height * 0.42));
-    setStyle(frontText, "font-size", `${tall}px`);
-    const room = (front.clientWidth * 0.94) / Math.max(1, frontText.scrollWidth);
-    if (room < 1) setStyle(frontText, "font-size", `${Math.max(9, Math.floor(tall * room))}px`);
+    const frontKey = `${text}|${layout.front.width}|${layout.front.height}`;
+    if (frontKey !== lastFrontKey) {
+      lastFrontKey = frontKey;
+      const tall = Math.max(10, Math.floor(layout.front.height * 0.42));
+      setStyle(frontText, "font-size", `${tall}px`);
+      const room = (front.clientWidth * 0.94) / Math.max(1, frontText.scrollWidth);
+      if (room < 1) setStyle(frontText, "font-size", `${Math.max(9, Math.floor(tall * room))}px`);
+    }
     front.hidden = view.phase === "result";
   };
   // The front was measured in whatever font was usable, and Nunito swaps in
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
+    lastFrontKey = "";
     if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
   });
 

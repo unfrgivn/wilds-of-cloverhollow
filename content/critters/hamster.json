@@ -5,12 +5,12 @@
   "calmName": "Hiker Hamster",
   "atlas": "assets/critters/hamster/hamster.json",
   "auraCentre": {
-    "x": 180,
-    "y": 190
+    "x": 258.7,
+    "y": 260.7
   },
   "bodyCentre": {
-    "x": 240,
-    "y": 315
+    "x": 257.5,
+    "y": 310.5
   },
   "figureHeight": 380,
   "overworldHeight": 66,

@@ -76,7 +76,7 @@ export type BattleCheckGeometry =
 // catch where it is, a lean's star where it is).
 export type BattleCheckInfo = BattleCheckGeometry & { side: CheckSide; x: number; y: number };
 import { followCamera, worldToScreen } from "./camera";
-import { selectFaeAnimation } from "./animation";
+import { dialogueFacing, dialoguePartner, facingToward, selectFaeAnimation } from "./animation";
 import { assetUrl } from "../platform/assets";
 import { fadeAlpha } from "./fade";
 import { battleLayout, type BattleLayout } from "./battle-layout";
@@ -91,11 +91,13 @@ function placeAura(
   scale: number,
   auraCentre: Point,
   bodyCentre: Point,
+  flipX = false,
 ): void {
   aura.anchor.set(auraCentre.x / 512, auraCentre.y / 512);
   aura.scale.set(scale * 1.15);
+  const dx = (bodyCentre.x - 256) * (flipX ? -1 : 1);
   aura.position.set(
-    feet.x + (bodyCentre.x - 256) * scale,
+    feet.x + dx * scale,
     feet.y + (bodyCentre.y - 504) * scale,
   );
 }
@@ -148,6 +150,8 @@ export class GameView {
   private staticWidth = 0;
   private staticHeight = 0;
   private staticPaper = 0;
+  private lanternTintSize = "";
+  private battleWashKey = "";
   private currentAnimation = "idle_down";
   private currentFrame = 0;
   private partyFrames: { id: string; animation: string; frame: number }[] = [];
@@ -420,16 +424,15 @@ export class GameView {
 
   private setFaeTexture(state: State): void {
     const sheet = Assets.get<Spritesheet>("fae-sheet");
-    const idleName =
-      state.facing === "right" ? "idle_left" : `idle_${state.facing}`;
-    const walkName =
-      state.facing === "right" ? "walk_left" : `walk_${state.facing}`;
+    const facing = dialogueFacing(this.world, state) ?? state.facing;
+    const idleName = facing === "right" ? "idle_left" : `idle_${facing}`;
+    const walkName = facing === "right" ? "walk_left" : `walk_${facing}`;
     const name = state.motion.moving ? walkName : idleName;
     const frames = sheet.animations[name];
     if (frames === undefined || frames.length === 0)
       throw new Error(`Missing Fae animation ${name}`);
     const selection = selectFaeAnimation(
-      state.facing,
+      facing,
       state.motion,
       frames.length,
       this.world.tunables.walkCycleUnits,
@@ -451,12 +454,19 @@ export class GameView {
   // and then sits (its idle), anyone else idles at once.
   private setFollowerTexture(
     sprite: Sprite,
+    state: State,
     member: PartyMember,
     content: PartyContent,
+    partner: Point | null,
   ): { id: string; animation: string; frame: number } {
     const sheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
-    const side = member.facing === "right" ? "left" : member.facing;
-    const mirror = member.facing === "right";
+    const settled = !content.sits && !member.motion.moving &&
+      member.stillTicks >= this.world.tunables.follow.settleDelayTicks;
+    const facing = settled
+      ? (partner !== null ? facingToward(member, partner) : state.facing)
+      : member.facing;
+    const side = facing === "right" ? "left" : facing;
+    const mirror = facing === "right";
     const resting =
       !member.motion.moving &&
       (!content.sits ||
@@ -477,7 +487,8 @@ export class GameView {
     if (texture.defaultAnchor === undefined)
       throw new Error(`${member.id} anchor missing`);
     sprite.anchor.copyFrom(texture.defaultAnchor);
-    sprite.scale.set(mirror ? -0.5 : 0.5, 0.5);
+    const s = content.scale ?? 0.5;
+    sprite.scale.set(mirror ? -s : s, s);
     return { id: member.id, animation, frame };
   }
 
@@ -485,13 +496,14 @@ export class GameView {
     const inParty = new Set(state.party.map((member) => member.id));
     for (const [id, sprite] of this.partySprites)
       sprite.visible = inParty.has(id);
+    const partner = dialoguePartner(this.world, state);
     this.partyFrames = state.party.flatMap((member) => {
       const sprite = this.partySprites.get(member.id);
       const content = this.world.party[member.id];
       if (sprite === undefined || content === undefined) return [];
       sprite.position.set(member.x, member.y);
       sprite.zIndex = member.y;
-      return [this.setFollowerTexture(sprite, member, content)];
+      return [this.setFollowerTexture(sprite, state, member, content, partner)];
     });
   }
 
@@ -552,10 +564,15 @@ export class GameView {
     this.renderGlows(state, width, height);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
-    if (this.label !== undefined)
+    if (this.label !== undefined) {
       this.label.text =
         `Cloverhollow • tick ${state.tick} · ` +
         `${Math.round(state.player.x)},${Math.round(state.player.y)}`;
+      if (state.battle !== null)
+        this.label.position.set(Math.round((width - this.label.width) / 2), 4);
+      else
+        this.label.position.set(20, 20);
+    }
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     this.fade.alpha = fade;
   }
@@ -564,13 +581,18 @@ export class GameView {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
     const on = state.lantern && state.battle === null;
-    this.lanternTint.clear();
     // Blacklight: the scene drops to a deep violet dusk so the added glows show;
     // on bright snow, added light would only saturate to white.
-    if (on)
-      this.lanternTint
-        .rect(0, 0, width, height)
-        .fill({ color: 0x1d0f3a, alpha: 0.55 });
+    if (on) {
+      const sizeKey = `${width}x${height}`;
+      if (sizeKey !== this.lanternTintSize) {
+        this.lanternTintSize = sizeKey;
+        this.lanternTint
+          .clear()
+          .rect(0, 0, width, height)
+          .fill({ color: 0x1d0f3a, alpha: 0.55 });
+      }
+    }
     this.lanternTint.visible = on;
     const drawn: string[] = [];
     for (const { id, sprite } of this.glowSprites) {
@@ -628,8 +650,15 @@ export class GameView {
         continue;
       const facing = npcFacing(state, npc);
       const wanted = `idle_${facing}`;
-      const animation =
-        sheet.data.animations?.[wanted] !== undefined ? wanted : "idle_down";
+      const mirror =
+        facing === "right" &&
+        sheet.data.animations?.[wanted] === undefined &&
+        sheet.data.animations?.idle_left !== undefined;
+      const animation = mirror
+        ? "idle_left"
+        : sheet.data.animations?.[wanted] !== undefined
+          ? wanted
+          : "idle_down";
       const names = sheet.data.animations?.[animation] ?? [];
       let index = 0;
       if (
@@ -652,6 +681,8 @@ export class GameView {
       sprite.texture = texture;
       if (texture.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(texture.defaultAnchor);
+      const s = character.scale ?? 0.5;
+      sprite.scale.set(mirror ? -s : s, s);
       sprite.position.set(npc.point.x, npc.point.y);
       sprite.zIndex = npc.point.y;
       frames.push({ id: npc.id, frame: name, facing });
@@ -707,12 +738,14 @@ export class GameView {
       const scale = content.overworldHeight / content.figureHeight;
       body.texture = texture;
       body.anchor.set(0.5, 504 / 512);
-      body.scale.set(scale);
+      const talking = calm && state.dialogue !== null && state.dialogue.knot === content.calmKnot;
+      const flipX = talking
+        ? state.player.x > point.x
+        : roamer !== null && roamer.facing === "right";
+      body.scale.set(flipX ? -scale : scale, scale);
       const bob = roamer?.moving === true ? Math.sin(state.tick / 4) * 3 : 0;
       body.position.set(point.x, point.y + bob);
       body.zIndex = point.y;
-      if (roamer !== null)
-        body.scale.x = roamer.facing === "right" ? -scale : scale;
       aura.visible = !calm;
       aura.texture = auraTexture;
       placeAura(
@@ -721,6 +754,7 @@ export class GameView {
         scale,
         content.auraCentre,
         content.bodyCentre,
+        flipX,
       );
       aura.zIndex = point.y - 0.5;
       aura.alpha = 0.65 + Math.sin(state.tick / 18) * 0.2;
@@ -824,18 +858,21 @@ export class GameView {
     const y = (height - this.viewHeight * scale) / 2;
     // The claw machine's close-up is DOM over the blurred room: no battle
     // figures, and a lighter wash.
+    const drawWash = (alpha: number): void => {
+      const washKey = `${width}x${height}@${alpha}`;
+      if (washKey === this.battleWashKey) return;
+      this.battleWashKey = washKey;
+      this.battleWash.clear().rect(0, 0, width, height).fill({ color: 0xfff6e6, alpha });
+    };
     if (arcade !== null) {
-      this.battleWash.clear().rect(0, 0, width, height).fill({ color: 0xfff6e6, alpha: 0.28 });
+      drawWash(0.28);
       return;
     }
     if (battle === null) return;
     const layout = this.layoutFor(state, width, height);
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(x, y);
-    this.battleWash
-      .clear()
-      .rect(0, 0, width, height)
-      .fill({ color: 0xfff6e6, alpha: 0.2 });
+    drawWash(0.2);
     const critter = this.world.critters[battle.critterId];
     if (critter === undefined) return;
     const sheet = Assets.get<Spritesheet>(critter.atlas);
@@ -888,7 +925,7 @@ export class GameView {
       this.battleFae.texture = fae;
       if (fae.defaultAnchor !== undefined)
         this.battleFae.anchor.copyFrom(fae.defaultAnchor);
-      this.battleFae.scale.set(0.65);
+      this.battleFae.scale.set(0.58);
       this.battleFae.position.set(
         (layout.fae.x - x) / scale,
         (layout.fae.baseline - y) / scale,
@@ -914,7 +951,7 @@ export class GameView {
       sprite.texture = frame;
       if (frame.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(frame.defaultAnchor);
-      sprite.scale.set(0.5);
+      sprite.scale.set(((content.scale ?? 0.5) / 0.5) * 0.58);
       sprite.position.set((place.x - x) / scale, (place.y - y) / scale);
     });
     this.battleLayer.alpha =
@@ -1201,10 +1238,6 @@ export class GameView {
       state.battle === null
         ? null
         : this.layoutFor(state, window.innerWidth, window.innerHeight);
-    const renderLayout = layout ?? {
-      critter: { x: 0, baseline: 0, height: 0 },
-      fae: { x: 0, baseline: 0, height: 0 },
-    };
     return {
       area: this.areaView?.area.id ?? "",
       finale: state.finale,

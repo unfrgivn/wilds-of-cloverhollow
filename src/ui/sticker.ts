@@ -101,19 +101,6 @@ export function clampPromptPosition(x: number, y: number, width: number, height:
     y: Math.min(Math.max(insets.top + height, y), viewportHeight - insets.bottom - 8) };
 }
 
-function readInsets(): Insets {
-  const probe = document.createElement("div");
-  probe.style.cssText = "position:fixed;inset:0;padding:var(--safe-top) " +
-    "var(--safe-right) var(--safe-bottom) var(--safe-left);";
-  document.body.append(probe);
-  const style = getComputedStyle(probe);
-  const parse = (value: string): number => parseFloat(value) || 0;
-  const insets = { top: parse(style.paddingTop), right: parse(style.paddingRight),
-    bottom: parse(style.paddingBottom), left: parse(style.paddingLeft) };
-  probe.remove();
-  return insets;
-}
-
 export function createPrompt(root: HTMLElement): { render: (view: PromptView) => void } {
   const prompt = document.createElement("div");
   prompt.className = "sticker-ui sticker-prompt";
@@ -137,13 +124,27 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
   arrow.append(rim, ink, tip);
   prompt.append(label, arrow);
   root.append(prompt);
-  let insets = readInsets();
-  window.addEventListener("resize", () => { insets = readInsets(); });
-  return { render: (view) => {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:fixed;inset:0;visibility:hidden;pointer-events:none;" +
+    "padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);";
+  root.append(probe);
+  const currentInsets = (): Insets => {
+    const style = getComputedStyle(probe);
+    const parse = (value: string): number => parseFloat(value) || 0;
+    return {
+      top: parse(style.paddingTop),
+      right: parse(style.paddingRight),
+      bottom: parse(style.paddingBottom),
+      left: parse(style.paddingLeft),
+    };
+  };
+  let lastKey = "";
+  let lastView: PromptView | null = null;
+  const apply = (view: PromptView): void => {
     label.textContent = view.label;
     prompt.hidden = !view.visible;
     if (view.visible) {
-      insets = readInsets();
+      const insets = currentInsets();
       const position = clampPromptPosition(view.x, view.y, prompt.offsetWidth,
         prompt.offsetHeight + 44, window.innerWidth, window.innerHeight, insets);
       prompt.style.left = `${position.x}px`;
@@ -159,6 +160,21 @@ export function createPrompt(root: HTMLElement): { render: (view: PromptView) =>
       prompt.dataset.tipX = String(position.x);
       prompt.dataset.tipY = String(position.y);
     }
+  };
+  const invalidate = (): void => {
+    lastKey = "";
+    if (lastView !== null && lastView.visible) apply(lastView);
+  };
+  window.addEventListener("resize", invalidate);
+  document.fonts?.addEventListener("loadingdone", invalidate);
+  return { render: (view) => {
+    lastView = view;
+    const key = view.visible
+      ? `${view.label}|${view.x}|${view.y}|${window.innerWidth}x${window.innerHeight}`
+      : "hidden";
+    if (key === lastKey) return;
+    lastKey = key;
+    apply(view);
   } };
 }
 

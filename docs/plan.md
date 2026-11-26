@@ -295,10 +295,6 @@ Goal: prove build, control, inspect, step, and screenshot before any content.
   Maddie as the party in the plaza, Soothe / Play / Snack / Run in the frog's
   menu), reviewed baselines.
 - Notes and assumptions:
-  - Milestone 44 uses a 1000 by 460 logical heap floor, nine authored plushes
-    in three levels, and the raccoon is freed only after the squirrel and
-    bluebird are won. The claw's two holds use separate x and z phases; the
-    painted-box UI is being redone by the UI worker.
   - Maddie's overworld sprite was drawn 2x too tall: only `scale.x` was set, so
     Pixi's default `scale.y` of 1 stretched her (the old plaza baseline shows
     an orange smear beside Fae). The generic follower uses one uniform scale,
@@ -1242,6 +1238,95 @@ the old trail, the owl, and the clubhouse claim.
   gone), `just build`, and `just e2e` (376 passed, 2 skipped) against
   unchanged baselines; no recording changed.
 - Notes: no content, runtime art, recordings, or baselines changed.
+
+## Milestone 36: Gamepad support **Status:** ✅ Completed (2026-10-08)
+- Standard-mapping gamepads now share the keyboard and touch `ActionFrame`:
+  radial 25% left-stick dead zone with rescaling, d-pad priority, and the
+  standard confirm, cancel, menu, and lantern buttons. Multiple standard pads
+  merge while preserving touch movement precedence over keyboard and gamepad.
+- The imperative poller samples on every animation frame and latches button
+  presses until the next game tick, including blur and reset clearing. Pure
+  mapping, latching, and merging rules have unit coverage, and a unit test
+  runs the new game with a pad's d-pad and buttons and with the same keys:
+  the merged frames are identical and the states hash the same.
+- Browser e2e uses only an `addInitScript` device-boundary replacement for
+  `navigator.getGamepads()`, then drives the real game: stick and d-pad
+  movement, Start and B for the journal, A for a dialogue, and X for the
+  lantern, on Chromium and WebKit. No dependencies or content were added.
+- iOS: WKWebView exposes the Gamepad API when the web view is first
+  responder (WebKit bug 269292); from iOS 18 it also notices when the view
+  becomes first responder after load (WebKit PR 26444). Capacitor makes the
+  web view first responder on appear, so pads should work on iOS 18+;
+  iOS 15 to 17 and real hardware are unverified. No native setting was added.
+- Gates: `just build`, typecheck, lint, the gamepad unit tests, and the
+  gamepad e2e (12 of 12, repeated on both browsers) passed. `just check` had
+  one time-out in an area test this milestone doesn't touch, under a load
+  average of about 130 from parallel milestones; alone it passed. The full
+  `just e2e` suite was deferred by the owner (2026-10-08) for the same load
+  and still needs a run.
+
+## Milestone 37: Gameplay sound **Status:** ✅ Completed (2026-10-08)
+- Sound effects only (owner, 2026-10-08): no music, ambience, or voice.
+  VoiceStudio was considered at the owner's suggestion and set aside: it
+  makes speech (TTS, cloning, dubbing), not sound effects, and voice acting
+  is out of scope (spec 13).
+- `soundCues(previous, next)` in `src/core/sound.ts` is a pure projection of
+  state changes, like `autosaveNeeded`; `step()`, the state shape, and the
+  save version are untouched. Cues: dialogue open, advance, close, and text
+  blips; choice move and select; journal open and close; footsteps; door and
+  arrival; coin, item, and sticker; lantern on and off; battle start,
+  command, hit, win, run, and rest (a battle that ends without calming never
+  plays the win chime).
+- `src/platform/audio.ts` synthesizes every cue with Web Audio from a
+  recipe table of short oscillator and filtered-noise segments; no files and
+  no dependency. A recipe is plain data, so a cue can later point at a clip.
+  The AudioContext unlocks on the first key, pointer, or touch.
+- Mute: M, or the `♪ on/off` button in the journal's Notes header. Stored
+  under its own Preferences key `cloverhollow-audio`, never in the save. A
+  first draft put the button in the touch HUD; it changed every phone
+  gameplay baseline (which Milestones 33 and 34 are re-baselining), so it
+  moved to the journal and only the six journal baselines changed.
+- Harness: `sound.log()` (recent `{ tick, cue, played }`) and `sound.muted()`.
+- Gates: `just check` (415 tests, sims, purity, lint) and `just build`
+  passed. The full `just e2e` suite, run in batches under a load average of
+  60 to 80 from parallel milestones: 410 of 414 passed. Two failures were the
+  shop journal baselines (`journal-supplies`, now showing the `♪` pill;
+  updated after viewing). Two were `ui-gallery` sticker tests timing out
+  under load; they passed 12 of 12 repeated alone.
+
+### Sound follow-ups done (2026-10-08)
+- Unlock: the AudioContext is made at boot and resumed right away, on every
+  key, pointer, or touch, and whenever a cue plays while it isn't running.
+  A gamepad press is not a user activation in any browser (the HTML spec's
+  activation-triggering events are keys, mouse, pointer, and touchend), so on
+  the web a pad-only player still needs one key or click. The iOS app is
+  different: Capacitor sets `mediaTypesRequiringUserActionForPlayback` to
+  none, and on the iPhone 17 simulator the harness logged `audio suspended`
+  then `running` at boot with no touch, and `journal-open` played. Pads get
+  sound on iOS from the start.
+- Fixed on the way: WebKit reports `interrupted`, not `suspended`, before a
+  gesture, and the old unlock only resumed `suspended`, so WebKit (and so
+  likely iOS Safari) never started. M37's e2e only checked that cues were
+  logged; `sound.spec.ts` now checks a cue really plays after a real key,
+  on Chromium and WebKit.
+- Silent switch: kept WebKit's default `ambient` session, so the switch mutes
+  the game, as Apple suggests for non-essential game sound.
+- The journal's `♪` pill is drawn like the coin and snack pills (26 px, the
+  same border, fill, weight, and shadow) with an invisible larger hit area.
+  With `♪ off` and 999 coins the row still fits on a phone, 34 px clear of
+  the heading. Ten journal baselines were updated after viewing them.
+- Harness: `sound.state()`, plus `[cloverhollow] audio` and
+  `[cloverhollow] sound` log lines for native checks (spec 11).
+- A fix (2026-10-18): the first `sound.spec.ts` test sometimes found the
+  audio already running before any key, on Chromium in a loaded full run.
+  Playwright runs each evaluate in Chromium as a user gesture, and the shell
+  made the AudioContext only after the renderer's `app.init`, which waits on
+  chunks from the preview server; when they came late, the harness's first
+  evaluate came first, and a context made after it starts running. Sound now
+  starts first in boot, before anything awaits, so its context exists before
+  the page has loaded (spec 3.3). The test now slows every script by 200 ms,
+  as a busy server would: with sound made after `app.init` it fails 6 runs in
+  6, and it passes in both browsers.
 
 ## Milestone 38: The music room and the flute **Status:** ✅ Completed (2026-10-09)
 - The school chapter goes on after PE. When Coach Ash thanks Fae, he sends
@@ -2734,6 +2819,126 @@ the old trail, the owl, and the clubhouse claim.
   - The sheet, the room, the door, the snowballs, and the wording are in the
     owner's review queue.
 
+## Milestone 58: The arcade, nearer its concept **Status:** ✅ Completed (2026-10-17)
+- The owner chose arcade polish next (2026-10-17): bring the room closer to
+  its concept (`docs/art/concepts/environments/arcade_interior.png`), which has
+  neon words on its walls, lettered machines, more machines on the floor,
+  and a middle row of cabinets.
+- Neon "ARCADE" in pink on the left wall beside the door, and "PLAY" in teal
+  on the right wall above the claw machine, beside the neon rocket, planet,
+  and stars already there. The counter has a yellow "TICKETS" board and the
+  claw machine "CLAW" on its top band.
+- On the open floor, where no recorded walk goes: a purple cabinet like the
+  concept's, its screen showing a little rocket and a neon rocket on its side,
+  near the room's front corner (`rocket-cabinet`, a canopy that fades while
+  Fae is behind it, look point at its front); and a red gumball machine
+  beside the claw machine, next to the three on stands. The cabinet has a
+  line before Mr. Pip is calm
+  and one after. The back-row Star Racer cabinet stays as it is: its
+  scribbled-out high score is a clue in the finale (Milestone 55).
+- Not yet: the concept's middle row of four cabinets. It stands where every
+  walk through the arcade goes, so it changes the arcade's recorded run and,
+  through the pass-party chain (woods, arcade, school, gym, music, field,
+  flute, lasso, kitchen), every run after it. The finale (Milestones 53 to
+  56) is recording runs on from that chain now, so the row waits for the
+  finale to land, and then the chain is re-recorded once.
+- Evidence: every recorded run replays unchanged (`bun run sim`, 47 runs)
+  and the area checks pass (nothing hides Fae; the cabinet is a canopy); the
+  new run `arcade/rocket.json` (`tools/sim/record-rocket.ts`: the cabinet
+  looked at fizzy, Mr. Pip calmed, looked at again) with its replay test and
+  its real-key e2e (`rocket.spec.ts`, the room at both sizes, hashing the
+  same as Bun's); the kit rebuilt from a clean checkout with no calls and no
+  change; the older props re-cut with their sizes and alpha unchanged, the
+  claw machine and counter by their lettering, the rest by re-encode noise
+  (on cream at most 0.87/255); every word read at 3x; and the room's
+  screenshots viewed.
+- Notes and assumptions:
+  - The owner's to review: the signs' words, the new cabinet's and gumball
+    machine's places, and what the cabinet becomes (Milestone 59).
+  - Planned as Milestone 53 and renumbered 58 at merge: the owner's finale
+    took Milestones 53 to 56 while this was in progress.
+  - The first art pass (the worker's) was redone: the model had redrawn the
+    whole top of the room for the words, and one transform can't register a
+    redrawing, so the walls came back nearly unreadable; its cabinet was a
+    tall, flat block. Each word was then painted in its own small crop (the
+    model keeps a small crop's composition), and the cabinet redrawn over a
+    box block-out with its marquee, screen, and controls. The gumball machine
+    (red, not the plan's yellow, to match the three by the wall) was painted
+    in front of the claw machine first, where it stood between Mr. Pip and
+    the claw machine in every arcade screenshot, so it was painted again
+    beside the claw machine.
+  - Three kit caches went stale after a painting edit, found because the
+    lettering didn't reach the frames: the assembled painting, each subject's
+    crop, and each subject's object and hole masks were only made when
+    missing, so an edited painting was cut as the old one (new subjects'
+    samples showed bare floor, and a local rebuild didn't match a clean
+    checkout's). The painting and crops are now taken afresh each run, and a
+    mask is made again when it's older than what it's made from
+    (`tools/art/kit.ts`, `docs/art/kit.md`). A clean checkout now rebuilds
+    the arcade byte for byte with no calls.
+  - Art, 21 Gemini calls (the generation log): 6 edits (4 kept) and 15 kit
+    isolates (2 kept); `art/recipes/arcade-concept-edits.json`.
+
+## Milestone 59: A fourth arcade game **Status:** ✅ Completed (2026-10-18)
+- Comet Cruise, on the teal cabinet beside Boop-a-Mole's (`cabinet-second`;
+  the rocket cabinet it was first planned for went in Milestone 61): 2 coins
+  a run, once Mr. Pip is calm. A little rocket at the foot of the cabinet's
+  screen steers between three lanes, catching the stars and slipping past
+  the space rocks that come down them; a star pays 2 tickets. A rock only
+  bumps it: the rocket wobbles and can't steer for a moment. Nothing is ever
+  lost, and a run never ends early.
+- A run is 16 stars and 8 rocks, drawn as it opens from the game's random
+  generator (a star first, never two rocks in a row, never the same lane
+  twice running), one setting off every 48 ticks, each coming down faster
+  than the one before (96 ticks to 60): about 20 seconds, like a round of
+  Boop-a-Mole. A fresh left or right press moves the rocket a lane; it
+  slides there, leaning into the turn.
+- The close-up: a painting of the teal cabinet's front (its screen dark
+  glass, a blank marquee, a stick and two buttons), with the run drawn in
+  code on the screen in perspective and painted sprites: the rocket in four
+  poses, a star and its sparkle, a rock and its puff. On a phone, left and
+  right arrow stickers steer, where the stick would be, like Lean's.
+- The back-row Star Racer cabinet stays as it is: its scribbled-out high
+  score and the Star Racer token are clues in the finale (Milestone 55).
+- Evidence: the rules' unit tests (`tests/unit/comet.test.ts`: the draw, the
+  travel, the moves, the slide and lean, catches, bumps, passing, the end
+  and its result, the cues, and the loader), the close-up's layout
+  (`comet-layout.test.ts`, on the real calibration and a real run) and
+  calibration (`comet-calibration.test.ts`). The recorded run
+  `arcade/comet.json` (`tools/sim/record-comet.ts`, 2047 ticks) calms Mr.
+  Pip and plays a run: 14 of 16 stars caught, 2 let go, 1 rock bumped, 28
+  tickets paid once (`comet-replay.test.ts`). `comet.spec.ts` plays it with
+  real keys, hashing the same as Bun's replay, and on a phone steers by
+  quick taps on the arrow stickers to a star outside the middle lane, in
+  both engines. The gallery's six states, each a real run's, are laid out
+  within a pixel of the layout at 874x402 and 1280x720 in both engines.
+  `just check` (112 test files, 978 tests; `bun run sim`, 53 runs) and
+  `just build` passed, and so did the full `just e2e` (883 tests on both
+  browsers, 2 browser-only skips; 201 WebKit tests that lost the test
+  server late in the first run passed when run again). 22 new baselines (6
+  of the real-key run, 16 of the gallery), each viewed before it was kept;
+  no existing baseline changed.
+- Notes and assumptions:
+  - Approved by the owner (2026-10-18) as built: the game and its name, its
+    numbers (2 coins; 16 stars and 8 rocks; 2 tickets a star, so 32 at
+    best; the travel from 96 ticks to 60; a 24-tick wobble), its lines
+    (`comet_cruise` in `content/story/main.ink`, and `comet` in
+    `content/arcade.json`), and the art.
+  - Art, 5 Gemini calls (the generation log), all kept as sources: the
+    cabinet, 2 (one used), and the sprites, 2 sheets (one used) and an edit
+    taking the used sheet's star glow away. It had been painted over the
+    magenta and came out pink, which keying can't separate; a glow, if
+    wanted, can be drawn in code. `art/recipes/comet-cabinet.json` and
+    `comet-sprites.json`. Openverse had nothing for either.
+  - Fae's look point is the cabinet's front, (366, 433); every recorded run
+    replays unchanged.
+  - On touch the close-up keeps clear of its arrows at the bottom left
+    (`--touch-reserve-left`, like the right buttons' reserve), so the
+    cabinet sits a little right of centre there.
+  - The new tests' timings come with CI's next record
+    (`tests/e2e/timings.json`); until then the sharder weighs each at its
+    project's median, as for Milestone 60's.
+
 ## Milestone 60: A second flute friend **Status:** ✅ Completed (2026-10-18)
 - The owner picked a second flute friend (2026-10-18). NOTES.md: the flute
   "calls animal friends to your side", a bond is built "by feeding them
@@ -2788,6 +2993,82 @@ the old trail, the owl, and the clubhouse claim.
   - Gemini calls: 25, all for the sprite, none failed.
   - The sprite, his size, the knothole, the reward, and the wording are in
     the owner's review queue.
+
+## Milestone 61: The arcade, rearranged **Status:** ✅ Completed (2026-10-18)
+- The owner rearranged the arcade (2026-10-18) from mockups built from the
+  room's own sprites (the sixth approved): one gumball machine, not four; the
+  skee-ball lane and the rocket cabinet no longer standing awkwardly on the
+  front floor.
+- The skee-ball lane stands in the room's right corner, its hood against the
+  back wall in front of the claw machine's right side, where the three
+  gumball machines on stands were, rolling out toward the middle of the room.
+  Fae plays it from its left (look point `skee-ball` at (850, 593)). One red
+  gumball machine, larger than the old ones, stands in the floor's front
+  corner facing into the room (its plain back to the camera); it has no look
+  point. The rocket cabinet goes: it was only ever looked at, and the painted
+  cabinets look better without it. Its knot, recorded run, replay test, and
+  e2e go with it. Mr. Pip stands at the back, left of the ticket counter, at
+  (630, 392). The middle of the floor stays open.
+- The claw machine's look point moves to (908, 477), the left of its front:
+  the lane's back is too close to the old spot below it for Fae to stand.
+- Art: the Milestone 58 painting takes the approved painting's pixels back
+  wherever the old lane, the rocket cabinet, and the gumball machine beside
+  the claw machine were (no calls). Then two edits, each a crop with a
+  flat-colour block-out at its exact place and one call: the lane (its
+  design the Milestone 45 lane, mirrored; the model also repainted the wall,
+  floor, and the claw machine's side where the stands were) and the gumball
+  machine (the Milestone 58 machine's silhouette 1.4 times, seen from
+  behind). The kit cuts the new lane and gumball machine (one isolate each)
+  and drops the five removed props. The lane's isolate kept three thin lines
+  that aren't the lane (the claw machine's bottom ink line, an upright line
+  on the wall, and the wall's base line); exclude polygons cut them. The
+  first would have drawn across Fae between the claw machine and the lane.
+- Every recorded run through the arcade is recorded again, since Mr. Pip
+  moved: the arcade's own (claw, skee-ball, Boop-a-Mole, the kit walk) and
+  the pass-party chain from the arcade on (arcade, school, gym, music, field,
+  flute, lasso, kitchen, squirrel, mist, forest, kid, and Milestone 56's
+  ending). Each reads the same beats; only the replay tests' tick pins
+  changed. The chain's runs end sooner (the arcade by 52 ticks, school to
+  squirrel by 111, mist by 94, forest to the ending by 101), and the arcade's
+  own moved by 91 fewer to 37 more. The kit walk now goes behind the
+  skee-ball lane: the counter's hiding spot is in Mr. Pip's touch circle, and
+  there's no room to stand in front of the gumball machine.
+- Evidence: `just check` passed (108 test files and 933 tests; `bun run
+  sim`, 52 runs), and so did `just build` and the full `just e2e` (828 tests
+  on both browsers, 2 browser-only skips). 143 baselines changed (123
+  Chromium, 20 WebKit), and each was viewed before it was replaced: the
+  arcade's against the approved mockup, the rest as old and new crops of what
+  changed. Outside the arcade only later moments that now come sooner
+  changed: the harness's tick label, idle frames, critters along their paths,
+  and, at the Misty Path's seal, a camera 25 pixels lower. The arcade's area
+  checks pass, and from a clean checkout its kit rebuilds with no calls and
+  no changes. `rocket.spec.ts` and its two baselines are gone.
+- Notes and assumptions:
+  - The owner's to review: the room (`art/review/m61-room.png`) and its
+    screenshots.
+  - Numbered 61, not 59: Milestone 60 (a second flute friend) landed while
+    this was in progress. Milestone 59 (a fourth game) now goes on the teal
+    cabinet beside Boop-a-Mole.
+  - Milestone 56 (Wake up) landed while this was in progress too: its kid
+    recorder and its new ending run were run again on the new chain.
+  - The changed baselines were viewed by a second model (the multimodal
+    reviewer): late in this milestone the agent's own image reads came back
+    empty (it couldn't read a probe image of a random number), and the
+    reviewer read three such probes exactly. One label it read was 17 ticks
+    off; the replay settled it.
+  - Mr. Pip's right side is behind the counter's left end, as in the
+    approved mockup. About (595, 396) would clear the counter, but he would
+    cover the Star Racer cabinet (a finale clue) and his touch circle would
+    reach its look point.
+  - The gumball machine covers at most 57% of Fae standing behind it (the
+    hiding check flags 75%), so it isn't a canopy.
+  - The claw machine keeps its isolate: its crop didn't change, and nothing
+    can stand behind it where the old stands and gumball machine notched it.
+  - The Milestone 45 recipe is retired, and the Milestone 58 recipe marks its
+    rocket cabinet and gumball machine edits removed. Their raw outputs,
+    block-outs, and masks stay; the masks outline what was put back.
+  - Art, 4 Gemini calls (the generation log), all kept: 2 edits and 2 kit
+    isolates; `art/recipes/arcade-rearranged.json`.
 
 ## Milestone 62: Clover Hills **Status:** ✅ Completed (2026-10-18)
 - The owner asked for more open world between the towns, to explore and to
@@ -3265,6 +3546,49 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (production and harness hook checks), and full
   `CLOVERHOLLOW_E2E_PORT=4195 just e2e` (941 passed, 2 skipped in 4.1 min).
 
+## Milestone 70: Proportions, Facing, Collisions, Performance & Hygiene Polish **Status:** ✅ Completed (2026-11-26)
+- Proportionality: optional positive finite `scale` on `PartyContent` and
+  `CharacterContent` (default `0.5`, with `0.46` for Sue and Jordan and `0.47`
+  for Rosie) and unified battle party scaling (`0.58` for Fae,
+  `((scale ?? 0.5) / 0.5) * 0.58` for battle party members).
+- Facing & orientation (render-only, zero replay hash churn): `renderNpcs`
+  mirrors `idle_left` when facing right without `idle_right`; `dialogueFacing`
+  turns Fae toward her active NPC or calm critter partner; calm critters mirror
+  toward Fae during dialogue; settled standing party members align toward Fae's
+  dialogue partner or match Fae's facing; `placeAura` flips horizontal body
+  offset when a roaming critter walks right.
+- Critter centroids & reachability: recalibrated `auraCentre` and `bodyCentre`
+  across `hamster`, `bunny`, `squirrel`, `oak-squirrel`, `art-teacher`,
+  `hedgehog`, and `hooded-kid`; moved `fairy-peach` in
+  `content/areas/enchanted.json` to `(1330, 680)` so she is reachable within
+  `interact.range`; added NPC reachability verification to
+  `areaConnectionErrors`.
+- Battle HUD, level-up queue, QA console, audio & DOM perf: battle HUD shows
+  Fae's actual level, keeps 1..99 energy leaves cleanly inside `.battle-energy`
+  (compact for 6..10, capped at 10 with `current/max` above 10), hides `▼`
+  during command selection, and centres the dev debug readout at top (`y = 4`);
+  level-up notices queue in order and omit `+0` stat deltas; `KeyQ`/`KeyM`
+  ignore text inputs, QA overlays stack above the journal (`z-index: 75/80`),
+  and console input focuses/blurs only on open transitions; footsteps sync to
+  walk half-cycles (`walkCycleUnits / 2`) and microwave cooking emits
+  `cook-start`, `cook-frozen`, and `cook-ding`; removed per-frame layout reads
+  (reusable inset probe + font-load invalidation in `sticker.ts`), redundant
+  atlas crop writes, and per-frame Graphics redraws; fixed Vite `lantern.png`
+  CSS URL and `prefers-reduced-motion` guards.
+- Repo & docs hygiene: removed retired `tools/art/build-hooded-kid-front.ts`,
+  stray `.DS_Store` files, 7 merged/superseded worktrees under `.worktrees/`
+  and 9 stale local branches, and the side-effect review screenshot in
+  `tests/e2e/map.spec.ts`; reordered misplaced sections in `spec.md` and
+  `docs/plan.md`.
+- Evidence: `tests/unit/milestone-70.test.ts` plus updated `levels.test.ts`,
+  `sound.test.ts`, and `surfaces.test.ts`; reviewed captures in
+  `art/review/m70-feelings-battle.jpg`, `m70-pass-party.jpg`,
+  `m70-bay-party.jpg`, and `m70-windup-leaves.jpg` verified with `vision`.
+- Gates: `just check` (125 unit files / 1,036 tests, all 60+ sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (clean build
+  with zero Vite asset warnings), and full `CLOVERHOLLOW_E2E_PORT=4198 just e2e`
+  (941 passed, 2 skipped in 4.0 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
@@ -3310,291 +3634,6 @@ more bad guys, and the blacklight lantern, made and built while away.
   Switched on, it shows what the chaos left behind: glowing purple paw
   prints, invisible-ink notes (journal clues), and trail markers that open
   hidden paths.
-
-## Milestone 58: The arcade, nearer its concept **Status:** ✅ Completed (2026-10-17)
-- The owner chose arcade polish next (2026-10-17): bring the room closer to
-  its concept (`docs/art/concepts/environments/arcade_interior.png`), which has
-  neon words on its walls, lettered machines, more machines on the floor,
-  and a middle row of cabinets.
-- Neon "ARCADE" in pink on the left wall beside the door, and "PLAY" in teal
-  on the right wall above the claw machine, beside the neon rocket, planet,
-  and stars already there. The counter has a yellow "TICKETS" board and the
-  claw machine "CLAW" on its top band.
-- On the open floor, where no recorded walk goes: a purple cabinet like the
-  concept's, its screen showing a little rocket and a neon rocket on its side,
-  near the room's front corner (`rocket-cabinet`, a canopy that fades while
-  Fae is behind it, look point at its front); and a red gumball machine
-  beside the claw machine, next to the three on stands. The cabinet has a
-  line before Mr. Pip is calm
-  and one after. The back-row Star Racer cabinet stays as it is: its
-  scribbled-out high score is a clue in the finale (Milestone 55).
-- Not yet: the concept's middle row of four cabinets. It stands where every
-  walk through the arcade goes, so it changes the arcade's recorded run and,
-  through the pass-party chain (woods, arcade, school, gym, music, field,
-  flute, lasso, kitchen), every run after it. The finale (Milestones 53 to
-  56) is recording runs on from that chain now, so the row waits for the
-  finale to land, and then the chain is re-recorded once.
-- Evidence: every recorded run replays unchanged (`bun run sim`, 47 runs)
-  and the area checks pass (nothing hides Fae; the cabinet is a canopy); the
-  new run `arcade/rocket.json` (`tools/sim/record-rocket.ts`: the cabinet
-  looked at fizzy, Mr. Pip calmed, looked at again) with its replay test and
-  its real-key e2e (`rocket.spec.ts`, the room at both sizes, hashing the
-  same as Bun's); the kit rebuilt from a clean checkout with no calls and no
-  change; the older props re-cut with their sizes and alpha unchanged, the
-  claw machine and counter by their lettering, the rest by re-encode noise
-  (on cream at most 0.87/255); every word read at 3x; and the room's
-  screenshots viewed.
-- Notes and assumptions:
-  - The owner's to review: the signs' words, the new cabinet's and gumball
-    machine's places, and what the cabinet becomes (Milestone 59).
-  - Planned as Milestone 53 and renumbered 58 at merge: the owner's finale
-    took Milestones 53 to 56 while this was in progress.
-  - The first art pass (the worker's) was redone: the model had redrawn the
-    whole top of the room for the words, and one transform can't register a
-    redrawing, so the walls came back nearly unreadable; its cabinet was a
-    tall, flat block. Each word was then painted in its own small crop (the
-    model keeps a small crop's composition), and the cabinet redrawn over a
-    box block-out with its marquee, screen, and controls. The gumball machine
-    (red, not the plan's yellow, to match the three by the wall) was painted
-    in front of the claw machine first, where it stood between Mr. Pip and
-    the claw machine in every arcade screenshot, so it was painted again
-    beside the claw machine.
-  - Three kit caches went stale after a painting edit, found because the
-    lettering didn't reach the frames: the assembled painting, each subject's
-    crop, and each subject's object and hole masks were only made when
-    missing, so an edited painting was cut as the old one (new subjects'
-    samples showed bare floor, and a local rebuild didn't match a clean
-    checkout's). The painting and crops are now taken afresh each run, and a
-    mask is made again when it's older than what it's made from
-    (`tools/art/kit.ts`, `docs/art/kit.md`). A clean checkout now rebuilds
-    the arcade byte for byte with no calls.
-  - Art, 21 Gemini calls (the generation log): 6 edits (4 kept) and 15 kit
-    isolates (2 kept); `art/recipes/arcade-concept-edits.json`.
-
-## Milestone 59: A fourth arcade game **Status:** ✅ Completed (2026-10-18)
-- Comet Cruise, on the teal cabinet beside Boop-a-Mole's (`cabinet-second`;
-  the rocket cabinet it was first planned for went in Milestone 61): 2 coins
-  a run, once Mr. Pip is calm. A little rocket at the foot of the cabinet's
-  screen steers between three lanes, catching the stars and slipping past
-  the space rocks that come down them; a star pays 2 tickets. A rock only
-  bumps it: the rocket wobbles and can't steer for a moment. Nothing is ever
-  lost, and a run never ends early.
-- A run is 16 stars and 8 rocks, drawn as it opens from the game's random
-  generator (a star first, never two rocks in a row, never the same lane
-  twice running), one setting off every 48 ticks, each coming down faster
-  than the one before (96 ticks to 60): about 20 seconds, like a round of
-  Boop-a-Mole. A fresh left or right press moves the rocket a lane; it
-  slides there, leaning into the turn.
-- The close-up: a painting of the teal cabinet's front (its screen dark
-  glass, a blank marquee, a stick and two buttons), with the run drawn in
-  code on the screen in perspective and painted sprites: the rocket in four
-  poses, a star and its sparkle, a rock and its puff. On a phone, left and
-  right arrow stickers steer, where the stick would be, like Lean's.
-- The back-row Star Racer cabinet stays as it is: its scribbled-out high
-  score and the Star Racer token are clues in the finale (Milestone 55).
-- Evidence: the rules' unit tests (`tests/unit/comet.test.ts`: the draw, the
-  travel, the moves, the slide and lean, catches, bumps, passing, the end
-  and its result, the cues, and the loader), the close-up's layout
-  (`comet-layout.test.ts`, on the real calibration and a real run) and
-  calibration (`comet-calibration.test.ts`). The recorded run
-  `arcade/comet.json` (`tools/sim/record-comet.ts`, 2047 ticks) calms Mr.
-  Pip and plays a run: 14 of 16 stars caught, 2 let go, 1 rock bumped, 28
-  tickets paid once (`comet-replay.test.ts`). `comet.spec.ts` plays it with
-  real keys, hashing the same as Bun's replay, and on a phone steers by
-  quick taps on the arrow stickers to a star outside the middle lane, in
-  both engines. The gallery's six states, each a real run's, are laid out
-  within a pixel of the layout at 874x402 and 1280x720 in both engines.
-  `just check` (112 test files, 978 tests; `bun run sim`, 53 runs) and
-  `just build` passed, and so did the full `just e2e` (883 tests on both
-  browsers, 2 browser-only skips; 201 WebKit tests that lost the test
-  server late in the first run passed when run again). 22 new baselines (6
-  of the real-key run, 16 of the gallery), each viewed before it was kept;
-  no existing baseline changed.
-- Notes and assumptions:
-  - Approved by the owner (2026-10-18) as built: the game and its name, its
-    numbers (2 coins; 16 stars and 8 rocks; 2 tickets a star, so 32 at
-    best; the travel from 96 ticks to 60; a 24-tick wobble), its lines
-    (`comet_cruise` in `content/story/main.ink`, and `comet` in
-    `content/arcade.json`), and the art.
-  - Art, 5 Gemini calls (the generation log), all kept as sources: the
-    cabinet, 2 (one used), and the sprites, 2 sheets (one used) and an edit
-    taking the used sheet's star glow away. It had been painted over the
-    magenta and came out pink, which keying can't separate; a glow, if
-    wanted, can be drawn in code. `art/recipes/comet-cabinet.json` and
-    `comet-sprites.json`. Openverse had nothing for either.
-  - Fae's look point is the cabinet's front, (366, 433); every recorded run
-    replays unchanged.
-  - On touch the close-up keeps clear of its arrows at the bottom left
-    (`--touch-reserve-left`, like the right buttons' reserve), so the
-    cabinet sits a little right of centre there.
-  - The new tests' timings come with CI's next record
-    (`tests/e2e/timings.json`); until then the sharder weighs each at its
-    project's median, as for Milestone 60's.
-
-## Milestone 61: The arcade, rearranged **Status:** ✅ Completed (2026-10-18)
-- The owner rearranged the arcade (2026-10-18) from mockups built from the
-  room's own sprites (the sixth approved): one gumball machine, not four; the
-  skee-ball lane and the rocket cabinet no longer standing awkwardly on the
-  front floor.
-- The skee-ball lane stands in the room's right corner, its hood against the
-  back wall in front of the claw machine's right side, where the three
-  gumball machines on stands were, rolling out toward the middle of the room.
-  Fae plays it from its left (look point `skee-ball` at (850, 593)). One red
-  gumball machine, larger than the old ones, stands in the floor's front
-  corner facing into the room (its plain back to the camera); it has no look
-  point. The rocket cabinet goes: it was only ever looked at, and the painted
-  cabinets look better without it. Its knot, recorded run, replay test, and
-  e2e go with it. Mr. Pip stands at the back, left of the ticket counter, at
-  (630, 392). The middle of the floor stays open.
-- The claw machine's look point moves to (908, 477), the left of its front:
-  the lane's back is too close to the old spot below it for Fae to stand.
-- Art: the Milestone 58 painting takes the approved painting's pixels back
-  wherever the old lane, the rocket cabinet, and the gumball machine beside
-  the claw machine were (no calls). Then two edits, each a crop with a
-  flat-colour block-out at its exact place and one call: the lane (its
-  design the Milestone 45 lane, mirrored; the model also repainted the wall,
-  floor, and the claw machine's side where the stands were) and the gumball
-  machine (the Milestone 58 machine's silhouette 1.4 times, seen from
-  behind). The kit cuts the new lane and gumball machine (one isolate each)
-  and drops the five removed props. The lane's isolate kept three thin lines
-  that aren't the lane (the claw machine's bottom ink line, an upright line
-  on the wall, and the wall's base line); exclude polygons cut them. The
-  first would have drawn across Fae between the claw machine and the lane.
-- Every recorded run through the arcade is recorded again, since Mr. Pip
-  moved: the arcade's own (claw, skee-ball, Boop-a-Mole, the kit walk) and
-  the pass-party chain from the arcade on (arcade, school, gym, music, field,
-  flute, lasso, kitchen, squirrel, mist, forest, kid, and Milestone 56's
-  ending). Each reads the same beats; only the replay tests' tick pins
-  changed. The chain's runs end sooner (the arcade by 52 ticks, school to
-  squirrel by 111, mist by 94, forest to the ending by 101), and the arcade's
-  own moved by 91 fewer to 37 more. The kit walk now goes behind the
-  skee-ball lane: the counter's hiding spot is in Mr. Pip's touch circle, and
-  there's no room to stand in front of the gumball machine.
-- Evidence: `just check` passed (108 test files and 933 tests; `bun run
-  sim`, 52 runs), and so did `just build` and the full `just e2e` (828 tests
-  on both browsers, 2 browser-only skips). 143 baselines changed (123
-  Chromium, 20 WebKit), and each was viewed before it was replaced: the
-  arcade's against the approved mockup, the rest as old and new crops of what
-  changed. Outside the arcade only later moments that now come sooner
-  changed: the harness's tick label, idle frames, critters along their paths,
-  and, at the Misty Path's seal, a camera 25 pixels lower. The arcade's area
-  checks pass, and from a clean checkout its kit rebuilds with no calls and
-  no changes. `rocket.spec.ts` and its two baselines are gone.
-- Notes and assumptions:
-  - The owner's to review: the room (`art/review/m61-room.png`) and its
-    screenshots.
-  - Numbered 61, not 59: Milestone 60 (a second flute friend) landed while
-    this was in progress. Milestone 59 (a fourth game) now goes on the teal
-    cabinet beside Boop-a-Mole.
-  - Milestone 56 (Wake up) landed while this was in progress too: its kid
-    recorder and its new ending run were run again on the new chain.
-  - The changed baselines were viewed by a second model (the multimodal
-    reviewer): late in this milestone the agent's own image reads came back
-    empty (it couldn't read a probe image of a random number), and the
-    reviewer read three such probes exactly. One label it read was 17 ticks
-    off; the replay settled it.
-  - Mr. Pip's right side is behind the counter's left end, as in the
-    approved mockup. About (595, 396) would clear the counter, but he would
-    cover the Star Racer cabinet (a finale clue) and his touch circle would
-    reach its look point.
-  - The gumball machine covers at most 57% of Fae standing behind it (the
-    hiding check flags 75%), so it isn't a canopy.
-  - The claw machine keeps its isolate: its crop didn't change, and nothing
-    can stand behind it where the old stands and gumball machine notched it.
-  - The Milestone 45 recipe is retired, and the Milestone 58 recipe marks its
-    rocket cabinet and gumball machine edits removed. Their raw outputs,
-    block-outs, and masks stay; the masks outline what was put back.
-  - Art, 4 Gemini calls (the generation log), all kept: 2 edits and 2 kit
-    isolates; `art/recipes/arcade-rearranged.json`.
-
-## Milestone 36: Gamepad support **Status:** ✅ Completed (2026-10-08)
-- Standard-mapping gamepads now share the keyboard and touch `ActionFrame`:
-  radial 25% left-stick dead zone with rescaling, d-pad priority, and the
-  standard confirm, cancel, menu, and lantern buttons. Multiple standard pads
-  merge while preserving touch movement precedence over keyboard and gamepad.
-- The imperative poller samples on every animation frame and latches button
-  presses until the next game tick, including blur and reset clearing. Pure
-  mapping, latching, and merging rules have unit coverage, and a unit test
-  runs the new game with a pad's d-pad and buttons and with the same keys:
-  the merged frames are identical and the states hash the same.
-- Browser e2e uses only an `addInitScript` device-boundary replacement for
-  `navigator.getGamepads()`, then drives the real game: stick and d-pad
-  movement, Start and B for the journal, A for a dialogue, and X for the
-  lantern, on Chromium and WebKit. No dependencies or content were added.
-- iOS: WKWebView exposes the Gamepad API when the web view is first
-  responder (WebKit bug 269292); from iOS 18 it also notices when the view
-  becomes first responder after load (WebKit PR 26444). Capacitor makes the
-  web view first responder on appear, so pads should work on iOS 18+;
-  iOS 15 to 17 and real hardware are unverified. No native setting was added.
-- Gates: `just build`, typecheck, lint, the gamepad unit tests, and the
-  gamepad e2e (12 of 12, repeated on both browsers) passed. `just check` had
-  one time-out in an area test this milestone doesn't touch, under a load
-  average of about 130 from parallel milestones; alone it passed. The full
-  `just e2e` suite was deferred by the owner (2026-10-08) for the same load
-  and still needs a run.
-
-## Milestone 37: Gameplay sound **Status:** ✅ Completed (2026-10-08)
-- Sound effects only (owner, 2026-10-08): no music, ambience, or voice.
-  VoiceStudio was considered at the owner's suggestion and set aside: it
-  makes speech (TTS, cloning, dubbing), not sound effects, and voice acting
-  is out of scope (spec 13).
-- `soundCues(previous, next)` in `src/core/sound.ts` is a pure projection of
-  state changes, like `autosaveNeeded`; `step()`, the state shape, and the
-  save version are untouched. Cues: dialogue open, advance, close, and text
-  blips; choice move and select; journal open and close; footsteps; door and
-  arrival; coin, item, and sticker; lantern on and off; battle start,
-  command, hit, win, run, and rest (a battle that ends without calming never
-  plays the win chime).
-- `src/platform/audio.ts` synthesizes every cue with Web Audio from a
-  recipe table of short oscillator and filtered-noise segments; no files and
-  no dependency. A recipe is plain data, so a cue can later point at a clip.
-  The AudioContext unlocks on the first key, pointer, or touch.
-- Mute: M, or the `♪ on/off` button in the journal's Notes header. Stored
-  under its own Preferences key `cloverhollow-audio`, never in the save. A
-  first draft put the button in the touch HUD; it changed every phone
-  gameplay baseline (which Milestones 33 and 34 are re-baselining), so it
-  moved to the journal and only the six journal baselines changed.
-- Harness: `sound.log()` (recent `{ tick, cue, played }`) and `sound.muted()`.
-- Gates: `just check` (415 tests, sims, purity, lint) and `just build`
-  passed. The full `just e2e` suite, run in batches under a load average of
-  60 to 80 from parallel milestones: 410 of 414 passed. Two failures were the
-  shop journal baselines (`journal-supplies`, now showing the `♪` pill;
-  updated after viewing). Two were `ui-gallery` sticker tests timing out
-  under load; they passed 12 of 12 repeated alone.
-
-### Sound follow-ups done (2026-10-08)
-- Unlock: the AudioContext is made at boot and resumed right away, on every
-  key, pointer, or touch, and whenever a cue plays while it isn't running.
-  A gamepad press is not a user activation in any browser (the HTML spec's
-  activation-triggering events are keys, mouse, pointer, and touchend), so on
-  the web a pad-only player still needs one key or click. The iOS app is
-  different: Capacitor sets `mediaTypesRequiringUserActionForPlayback` to
-  none, and on the iPhone 17 simulator the harness logged `audio suspended`
-  then `running` at boot with no touch, and `journal-open` played. Pads get
-  sound on iOS from the start.
-- Fixed on the way: WebKit reports `interrupted`, not `suspended`, before a
-  gesture, and the old unlock only resumed `suspended`, so WebKit (and so
-  likely iOS Safari) never started. M37's e2e only checked that cues were
-  logged; `sound.spec.ts` now checks a cue really plays after a real key,
-  on Chromium and WebKit.
-- Silent switch: kept WebKit's default `ambient` session, so the switch mutes
-  the game, as Apple suggests for non-essential game sound.
-- The journal's `♪` pill is drawn like the coin and snack pills (26 px, the
-  same border, fill, weight, and shadow) with an invisible larger hit area.
-  With `♪ off` and 999 coins the row still fits on a phone, 34 px clear of
-  the heading. Ten journal baselines were updated after viewing them.
-- Harness: `sound.state()`, plus `[cloverhollow] audio` and
-  `[cloverhollow] sound` log lines for native checks (spec 11).
-- A fix (2026-10-18): the first `sound.spec.ts` test sometimes found the
-  audio already running before any key, on Chromium in a loaded full run.
-  Playwright runs each evaluate in Chromium as a user gesture, and the shell
-  made the AudioContext only after the renderer's `app.init`, which waits on
-  chunks from the preview server; when they came late, the harness's first
-  evaluate came first, and a context made after it starts running. Sound now
-  starts first in boot, before anything awaits, so its context exists before
-  the page has loaded (spec 3.3). The test now slows every script by 200 ms,
-  as a busy server would: with sound made after `app.init` it fails 6 runs in
-  6, and it passes in both browsers.
 
 ### E2E suite speed (2026-10-08)
 - Cause, measured: with the game paused by the harness, Pixi still redrew

@@ -591,10 +591,12 @@ export function createBattleHud(root: HTMLElement): {
   const energy = element("section", "battle-meter battle-energy");
   const energyLabel = element("span", "battle-meter-label");
   energyLabel.textContent = "ENERGY";
+  const energyRow = element("div", "battle-energy-row");
   const leaves = element("div", "battle-leaves");
   const count = element("span", "battle-leaf-count");
   count.hidden = true;
-  energy.append(energyLabel, leaves, count);
+  energyRow.append(leaves, count);
+  energy.append(energyLabel, energyRow);
   const calm = element("section", "battle-meter battle-calm");
   const calmLabel = element("span", "battle-meter-label");
   const track = element("div", "battle-calm-track");
@@ -611,17 +613,26 @@ export function createBattleHud(root: HTMLElement): {
     render: (view) => {
       hud.hidden = !view.visible;
       const max = Math.max(0, Math.floor(view.energyMax));
-      while (leaves.children.length < max) leaves.append(leafIcon());
-      while (leaves.children.length > max) leaves.lastElementChild?.remove();
+      const shownLeaves = Math.min(10, max);
+      const current = Math.max(0, Math.min(max, Math.floor(view.energy)));
+      const filled = max <= 10
+        ? current
+        : current === 0
+          ? 0
+          : Math.min(10, Math.max(1, Math.round((current / max) * 10)));
+      while (leaves.children.length < shownLeaves) leaves.append(leafIcon());
+      while (leaves.children.length > shownLeaves) leaves.lastElementChild?.remove();
+      leaves.classList.toggle("is-compact", max > 5 && max <= 10);
+      leaves.classList.toggle("is-capped", max > 10);
       for (let index = 0; index < leaves.children.length; index += 1) {
         leaves.children
           .item(index)
-          ?.classList.toggle("is-full", index < view.energy);
+          ?.classList.toggle("is-full", index < filled);
       }
       setAttribute(energy, "aria-label", `Energy ${view.energy} of ${max}`);
       setText(energyLabel, `ENERGY  Lv ${view.level}`);
       count.hidden = max <= 10;
-      setText(count, String(max));
+      setText(count, `${current}/${max}`);
       setText(calmLabel, view.critterName.toUpperCase());
       setAttribute(track, "aria-label", `${view.critterName} calm`);
       setAttribute(

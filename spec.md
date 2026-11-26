@@ -227,7 +227,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   gameplay. Arcade transitions add `claw-move`, `claw-drop`, `claw-grab`,
   `claw-miss`, and `prize-won` for the claw machine, and `skee-aim`,
   `skee-roll`, `skee-score`, `skee-hundred`, and `tickets-won` for skee-ball,
-  and `mole-pop`, `mole-boop`, and `mole-whiff` for Boop-a-Mole.
+  and `mole-pop`, `mole-boop`, and `mole-whiff` for Boop-a-Mole, `comet-move`,
+  `comet-star`, and `comet-bump` for Comet Cruise, and `cook-start`,
+  `cook-frozen`, and `cook-ding` for the clubhouse microwave.
 - `src/platform/audio.ts` creates the AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
@@ -243,7 +245,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   script to check).
 - iOS: Web Audio keeps WebKit's default `ambient` session, so the ring/silent
   switch mutes the game (Apple's guidance for non-essential game sound).
-- Sound is on by default. Mute is toggled by M or the `♪ on/off` pill on the
+- Sound is on by default. Mute is toggled by M (ignored while typing in an
+  input or textarea) or the `♪ on/off` pill on the
   journal's notes heading (a 44 px sticker pill, drawn taller than the coin
   and snack pills because it is a control), and is stored separately under
   `cloverhollow-audio` in Capacitor Preferences, never in the save.
@@ -267,7 +270,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   rejects unknown surfaces, malformed or out-of-bounds polygons, and a missing
   file throws an error naming `content/surfaces/<id>.json` and directing registration
   in `src/content/load.ts`. Surface lookup is pure and footstep cues are
-  `footstep-<surface>`; the current platform recipes are synthesized and remain
+  `footstep-<surface>`, emitted on walk half-cycles (`walkCycleUnits / 2`) while
+  moving; the current platform recipes are synthesized and remain
   replaceable by clips pending the owner's pick. The plaza's default is stone,
   because it is a paved square.
 ## 4. Presentation (locked)
@@ -276,7 +280,8 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Canvas backing resolution: devicePixelRatio, capped at 2. The canvas CSS size
   always equals the viewport (Pixi `autoDensity`); an e2e test at
   deviceScaleFactor 3 guards this, because iPhones report a ratio of 3.
-- Dev and harness builds draw a `tick N · x,y` readout in the top-left so
+- Dev and harness builds draw a `tick N · x,y` readout in the top-left (centred
+  at the top edge during battles so it stays clear of the energy sticker) so
   screenshots describe state. Production builds draw no debug text.
 - Painted art, not pixel art: linear filtering with mipmaps. Runtime asset URLs
   are document-relative (`assets/...`), which works under Vite sub-paths and
@@ -335,9 +340,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   idle-only.
 - The party: the friends who walk behind Fae and fight beside her. The roster
   is `content/party/<id>.json` (validated by the loader; `world.party` keeps
-  roster order): `id`, `name`, `atlas`, the feet-anchored `box`
+  roster order): `id`, `name`, `atlas`, optional positive finite `scale`
+  (default `0.5`; Sue and Jordan use `0.46` to match Fae's crown height), the
+  feet-anchored `box`
   (`{ width, height }`), `walkCycleUnits`, `sits` (sits down after
-  `sitDelayTicks`; otherwise idles standing), `start` (in the party at a new
+  `sitDelayTicks`; otherwise idles standing; settled standing members turn
+  render-only toward Fae's active dialogue partner or match Fae's facing when
+  idle), `start` (in the party at a new
   game), an optional `joins` Ink variable (null for starters), an optional
   `befriended` Ink variable (true once the member is Fae's friend, where that
   differs from following her: a flute friend's `joins` is true only while it
@@ -593,8 +602,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   bar's `sound:` tag, then judges the song: red, yellow, blue, red earns Ms.
   Willow's very first flute, the painted wooden one (`has_flute`), which Fae
   plays once (`sound: flute`); a wrong song ends with a hint. After that the
-  xylophone is free play. Like the lasso, the flute is a story item with no
-  button yet.
+  xylophone is free play. From Milestone 47, once Fae has the flute, F, RB/R1,
+  or the touch `♪` button plays it.
 - The clubhouse kitchen (Milestone 52): once the club is claimed, Mom gives it
   her old microwave and her old toy chest, first thing when Fae talks to her
   (`mom.kitchen`: `has_microwave`, `has_chest`). Both are added props in the
@@ -843,12 +852,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   Milo, and Rosie in the classroom; Coach Ash in the gym; Mom and Oliver in
   the kitchen). Each is
   drawn from the atlas named for its id in
-  `content/characters.json` (`{ atlas, idleTicks }`, where `idleTicks` are the
-  ticks per `idle_down` frame: Mom holds her smile 180 ticks, then blinks for
-  8), y-sorted with everyone else, and targeted like an interactable. While
-  Fae talks to one (the dialogue's knot is theirs), they face her along the
-  larger axis of the gap between them (`npcFacing`); otherwise they face as
-  authored. Without a frame for that facing they show their front.
+  `content/characters.json` (`{ atlas, idleTicks, scale? }`, where `idleTicks`
+  are the ticks per `idle_down` frame: Mom holds her smile 180 ticks, then
+  blinks for 8, and optional positive finite `scale` defaults to `0.5`, with
+  `0.46` for Sue and Jordan and `0.47` for Rosie), y-sorted with everyone else,
+  and targeted like an interactable. Every NPC must have at least one reachable
+  floor point within `interact.range` (`areaConnectionErrors`). While Fae talks
+  to one (the dialogue's knot is theirs), they face her along the larger axis
+  of the gap between them (`npcFacing`), mirroring `idle_left` when facing
+  right without an `idle_right` animation, and Fae turns render-only toward her
+  conversation partner (`dialogueFacing`, also for calm critters, which mirror
+  toward Fae while speaking); otherwise people face as authored. Without a
+  frame for that facing they show their front.
   Standing props such as the plaza bus stop use the same person entry and
   y-sorted renderer, but are props rather than people.
 - A person's `footprint` polygon is solid, for Fae and for the party, like a
@@ -907,6 +922,23 @@ ios/            Capacitor iOS project (from Milestone 4).
   units) and furniture is proportional. Paintings are resampled uniformly to
   meet it, never stretched. The bedroom is 1050x700 units (the whole room fits
   on one phone screen); the plaza is 1750x1100 units.
+
+### Milestone 26 additions, The Whispering Woods
+The west Pinecone Pass arrow trigger requires `found_old_trail` and leads to the
+`woods` area, whose reverse trigger returns to the pass. The Whispering Woods is
+a 1750x1100 forest clearing in the `forest` land, with a north clubhouse,
+roaming `owl`, and `clubhouse` interactable. The owl uses `owl.json`, has chaos
+screeches and swoops, a wise `owl_calm` knot, and the full Soothe, Play, Cast,
+Juggle, Snack, and Run command set. The clubhouse knot records the purple soda,
+comic books, half-eaten fizzy cracker, and lantern-revealed note about meeting
+“the boss” at the sealed Ancient Tree in the Enchanted Forest. Once the owl is
+calm it sets `clubhouse_claimed`; Sue promises a fridge and Jordan a garden.
+Journal output records the trail, owl, and clubhouse beats newest first.
+Its stream is water (blockers along its banks); Fae crosses it on the stepping
+stones. Its floor is the painted clearing, one polygon round the open ground
+and the stream's banks: the forest behind the clearing, the big trunks, and
+the ground behind the clubhouse are off it, and corridors behind the edge
+trunks keep its two exits.
 
 ### 6.1 Critters out in an area (Milestone 28)
 - Critters come two ways. Story set pieces are an area's `critters`,
@@ -1164,7 +1196,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   container) and rejects a travel tag naming an unknown area or spawn, any
   `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>` or
   `coins <count>`, any `feed` tag but `snack <count>`, each count 1 or more,
-  and any `play` tag but `<game> <digits>` naming an arcade game (`claw`).
+  and any `play` tag but `<game> <digits>` naming an arcade or cooking game
+  (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`, `cook-mac`).
 - A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
   it to its close, and then, if Fae has the coins, she pays them and the game
   opens (spec 8.2). It is the one place a game's price is set.
@@ -1782,10 +1815,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   messages use the dialogue box with no speaker.
 - One stacking scale (`--z-*` in sticker.css), bottom to top: HUD, dialogue,
   commands, choices, prompt, check and grade, reward.
-- HUD: ENERGY (one leaf per point, spent leaves outlined, with a count once the
-  total is above 10) at the top left and the critter's CALM meter (its level and
-  name in capitals) at the top right, left of the menu button, inside the safe
-  area. It hides during the reward.
+- HUD: ENERGY (showing Fae's own level from `levelForXp`; one leaf per point up
+  to 10, compact for 6..10, and capped at 10 proportionally filled leaves plus
+  a `current/max` count above 10; spent leaves outlined) at the top left and
+  the critter's CALM meter (its level and name in capitals) at the top right,
+  left of the menu button, inside the safe area. It hides during the reward.
+  The dialogue box hides its advance triangle (`▼`) during the command phase.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. The menu grows with the party: four
@@ -1877,10 +1912,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   by CSS to 150 px wide, and the name. Stacked drop-shadows give the image a
   white rim and an ink outline that follow the critter's silhouette. Asset
   URLs are document-relative so they work on iOS.
-- Reward messages include the coin and XP payout. A level-up message names the
-  member and new level with its stat gains, and plays the level-up cue. The
+- Reward messages include the coin and XP payout. Level-up notices queue in
+  order (one per confirm), name the member and new level with only positive
+  stat gains (`levelUpLine` omits `+0` deltas), and play the level-up cue. The
   critter plate shows `Lv N`, the journal shows each member's XP bar and stats,
-  and the battle leaves show a number after ten leaves.
+  and the battle leaves cap at 10 with a `current/max` count above ten.
 - `data-battle="open"` on the root hides the movement stick; confirm and cancel
   stay. While a catch or a lean is in play the shell sets `data-check` to its
   kind, and two arrow stickers (the cancel button's size) stand where the
@@ -1898,111 +1934,11 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `content/fixtures/plaza-party.json` is the two-member visual and battle
   fixture: plaza fountain spawn, seed 1, party `["maddie", "sue"]`.
 - The Pixi battle scene dims the loaded area painting and presents the critter,
-  Fae, the party, and aura in a fixed logical composition. It is render-only. The
-  shell logs `[cloverhollow] battle` with phase and message changes, and
-  `renderInfo()` exposes the phase, the check's geometry, and critter frame.
-
-## 9. Journal and stickers
-- Experience is saved as XP for Fae and each party member. A member's level is
-  read from `content/levels.json` (cap 99), and the journal presents level, XP
- progress, Power, Magic, Life (5 at level 1, +1 every 3 levels), and Guard;
- friends show their Power and Magic command stats.
-- The Milestone 66 balance route is deliberately careful rather than a grind:
-  Fae calms each recurring critter that chases her once per visit on the story
-  route. The headless balance check requires ordinary area critters to be within
-  one level of Fae on arrival, and named encounters (mini-bosses and the hooded
-  kid) to be no more than two levels ahead. There are no chapter-end exemptions.
-- The journal is the pause menu: Notes (current goals, written from Ink), a
-  Sticker album, and a painted MAP page. The map labels all seven lands, shows
-  `???` only for lands with an unmet `revealVariable` (currently the Hills and
-  sealed Enchanted Forest), puts a bobbing gold star over Fae's current land,
-  and leads each
-  stop's name with the bus line's sign (lands with `busStop`). It is
-  presentation only, outside the core state and saves. The journal's view
-  carries each land's display name (`mapLandName` in `src/core/journal.ts`,
-  `???` while the forest is sealed), and the page shows it as given.
-- Stickers are collectibles and rewards.
-- Core: `journalOpen` in state. A menu press (J or the journal button) opens
-  it when no dialogue, battle, or door transition is running; a menu or cancel
-  press (or the book's close button, which sends cancel) closes it. While it's
-  open Fae is frozen, doors, battles, and interactions don't fire, and the
-  party keeps settling.
-- Notes: the `journal` Ink knot lists every note that applies, newest first:
-  on top, what's waiting at the clubhouse (cold strawberries in the fridge,
-  then the ripe garden; Milestone 43); the playing field's footbridge laid
-  down, the hooded kid's stash, the swing across the creek and the lever up
-  on the post, the fizzy squirrel, and recess (Milestone 39); Ms. Willow's
-  flute, the bluebird's note, the mallet given back, the bird with the
-  mallet, how the class song starts, the scribbled song, and music next
-  (Milestone 38); Coach Ash's lasso, once he has his things back; while Fae
-  hunts for them, the stopwatch and the clipboard both found, the fizzy pup with his
-  stopwatch, and where the clipboard is (somewhere up high, stuck on the hoop,
-  then the lasso lent), and the kid knocking over his cart and running out
-  the back door; time for PE; the locked gym doors, once Fae has tried them,
-  until PE; the kid in the purple hood running off toward the gym; story
-  time, until the glimpse; the way back to school for story time, until it
-  starts; once Mr. Pip is calm, his fizzy soda from the kid in the purple hood and the
-  scribbled-out Star Racer initials; before that, once the clubhouse is
-  claimed, its note sending Fae to the arcade; the garden planted and the
-  fridge fixed (Milestone 43), else the clubhouse claimed; the
-  hooded kid's glowing trail toward the Whispering
-  Woods; the grumpy gull; Jordan's lantern and the secret trail only it
-  shows; Jordan on the team; the Cliffside Trail's bunnies and squirrels
-  calmed (one of each); after the ride, Pinecone Pass's snow, lodge, cocoa,
-  and the hooded kid somewhere up there; before the ride, once a bluebird is
-  calm, the bus note; a calm bluebird's clue toward the mountains; Sue on the
-  team; the purple hood's school name tag; while the club is open and Sue
-  hasn't joined, the east road to Bubblegum Bay; the club password; the hall
-  pass; a calm pup's purple thread toward the school; while only the
-  fountain frog is calm, the purple fizz leading to the park; while Fae has
-  coins, the bakery's snacks; the calm fountain frog; the kid in the purple
-  hood from the notice board; then the morning plan. The troublemaker is
-  always "a kid in a purple hood" (or "the hooded kid"), never named.
-  `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
-  result, so reading the journal never changes the story.
-- Album: `content/stickers.json` (validated) holds the slot count and the
-  catalogue (id, name, the critter whose atlas holds the art, and the frame):
-  twenty stickers, one per species and one per mini-boss, in twenty
-  slots, the town's four first.
-  A sticker is owned when `state.stickers` has its id. The shell sets
-  `data-journal="open"` while the book is open.
-
-### 9.1 Journal layout
-- The journal (`src/ui/journal.ts`) is a modal open book inside the safe area,
-  above every other layer (`--z-journal`). The left page is NOTES: ruled notes
-  in the order the game passes (newest first), an empty line ("Nothing yet.
-  Look around!") when there are none, and scrolling only when they overflow.
-  The right page is the STICKERS album: a 5-column grid (a phone's page
-  shows two rows and scrolls to the rest, like the notes) where owned
-  stickers
-  show their atlas frame with a die-cut rim and their name, and unowned slots
-  are dashed `?` outlines with no name.
-- Fae's supplies sit at the right of the NOTES heading row: two small cream
-  stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
-  a cookie (inline SVG, like the map's bus-stop sign).
-- A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
-  fits the heading row at 874x402, including with `♪ off` and 999 coins. At
-  narrow widths, the supplies wrap beneath NOTES so every control remains
-  inside the page without overlapping its neighbors.
-- A cream JOURNAL label sits on the top edge and a close sticker (at least
-  44 px) in the top-right corner; the close button is how touch players leave.
-- Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The
-  journal opens on notes; ArrowLeft/ArrowRight and A/D also flip pages.
-- `data-journal="open"` hides all touch controls while the book is open.
-- The touch menu button is the JOURNAL sticker from the concept sheet: an open
-  book with a teal quill (inline SVG, aria-label "journal").
-- Shared pieces (`src/ui/atlas.ts`, `.die-cut` in sticker.css): atlas frames
-  are cropped with percentage backgrounds, exact at any box size, and the
-   die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
-   The reward card uses both.
-- The STICKERS page continues below the album with a PRIZES shelf from
-  `world.arcade.prizes`. Owned prizes use the prize atlas frame, die-cut rim,
-  and name; unowned prizes are dashed `?` slots without names. The shelf is
-  part of the page scroll on phones.
-  The shelf has a slot a prize: the claw machine's nine plushes, then the
-  ticket counter's four toys. The PRIZES heading carries Fae's tickets in a
-  pill like the notes page's Coins and Snacks (an orange ticket and the
-  count, Milestone 45).
+  Fae (at scale `0.58`), the party (each at `((scale ?? 0.5) / 0.5) * 0.58` so
+  classmates match Fae's crown height), and aura in a fixed logical
+  composition. It is render-only. The shell logs `[cloverhollow] battle` with
+  phase and message changes, and `renderInfo()` exposes the phase, the check's
+  geometry, and critter frame.
 
 ### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
 - The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip
@@ -2397,6 +2333,108 @@ ios/            Capacitor iOS project (from Milestone 4).
   core cooked: `cook-ready`, `cook-golden` (cooking at the box's minute),
   `cook-frozen`, `cook-result` (mac n cheese, golden), and `cook-burnt`.
 
+## 9. Journal and stickers
+- Experience is saved as XP for Fae and each party member. A member's level is
+  read from `content/levels.json` (cap 99), and the journal presents level, XP
+ progress, Power, Magic, Life (5 at level 1, +1 every 3 levels), and Guard;
+ friends show their Power and Magic command stats.
+- The Milestone 66 balance route is deliberately careful rather than a grind:
+  Fae calms each recurring critter that chases her once per visit on the story
+  route. The headless balance check requires ordinary area critters to be within
+  one level of Fae on arrival, and named encounters (mini-bosses and the hooded
+  kid) to be no more than two levels ahead. There are no chapter-end exemptions.
+- The journal is the pause menu: Notes (current goals, written from Ink), a
+  Sticker album, and a painted MAP page. The map labels all seven lands, shows
+  `???` only for lands with an unmet `revealVariable` (currently the Hills and
+  sealed Enchanted Forest), puts a bobbing gold star over Fae's current land,
+  and leads each
+  stop's name with the bus line's sign (lands with `busStop`). It is
+  presentation only, outside the core state and saves. The journal's view
+  carries each land's display name (`mapLandName` in `src/core/journal.ts`,
+  `???` while the forest is sealed), and the page shows it as given.
+- Stickers are collectibles and rewards.
+- Core: `journalOpen` in state. A menu press (J or the journal button) opens
+  it when no dialogue, battle, or door transition is running; a menu or cancel
+  press (or the book's close button, which sends cancel) closes it. While it's
+  open Fae is frozen, doors, battles, and interactions don't fire, and the
+  party keeps settling.
+- Notes: the `journal` Ink knot lists every note that applies, newest first:
+  on top, what's waiting at the clubhouse (cold strawberries in the fridge,
+  then the ripe garden; Milestone 43); the playing field's footbridge laid
+  down, the hooded kid's stash, the swing across the creek and the lever up
+  on the post, the fizzy squirrel, and recess (Milestone 39); Ms. Willow's
+  flute, the bluebird's note, the mallet given back, the bird with the
+  mallet, how the class song starts, the scribbled song, and music next
+  (Milestone 38); Coach Ash's lasso, once he has his things back; while Fae
+  hunts for them, the stopwatch and the clipboard both found, the fizzy pup with his
+  stopwatch, and where the clipboard is (somewhere up high, stuck on the hoop,
+  then the lasso lent), and the kid knocking over his cart and running out
+  the back door; time for PE; the locked gym doors, once Fae has tried them,
+  until PE; the kid in the purple hood running off toward the gym; story
+  time, until the glimpse; the way back to school for story time, until it
+  starts; once Mr. Pip is calm, his fizzy soda from the kid in the purple hood and the
+  scribbled-out Star Racer initials; before that, once the clubhouse is
+  claimed, its note sending Fae to the arcade; the garden planted and the
+  fridge fixed (Milestone 43), else the clubhouse claimed; the
+  hooded kid's glowing trail toward the Whispering
+  Woods; the grumpy gull; Jordan's lantern and the secret trail only it
+  shows; Jordan on the team; the Cliffside Trail's bunnies and squirrels
+  calmed (one of each); after the ride, Pinecone Pass's snow, lodge, cocoa,
+  and the hooded kid somewhere up there; before the ride, once a bluebird is
+  calm, the bus note; a calm bluebird's clue toward the mountains; Sue on the
+  team; the purple hood's school name tag; while the club is open and Sue
+  hasn't joined, the east road to Bubblegum Bay; the club password; the hall
+  pass; a calm pup's purple thread toward the school; while only the
+  fountain frog is calm, the purple fizz leading to the park; while Fae has
+  coins, the bakery's snacks; the calm fountain frog; the kid in the purple
+  hood from the notice board; then the morning plan. The troublemaker is
+  always "a kid in a purple hood" (or "the hooded kid"), never named.
+  `journalNotes(world, state)` runs it on a copy of the Ink state and keeps no
+  result, so reading the journal never changes the story.
+- Album: `content/stickers.json` (validated) holds the slot count and the
+  catalogue (id, name, the critter whose atlas holds the art, and the frame):
+  twenty stickers, one per species and one per mini-boss, in twenty
+  slots, the town's four first.
+  A sticker is owned when `state.stickers` has its id. The shell sets
+  `data-journal="open"` while the book is open.
+
+### 9.1 Journal layout
+- The journal (`src/ui/journal.ts`) is a modal open book inside the safe area,
+  above every other layer (`--z-journal`). The left page is NOTES: ruled notes
+  in the order the game passes (newest first), an empty line ("Nothing yet.
+  Look around!") when there are none, and scrolling only when they overflow.
+  The right page is the STICKERS album: a 5-column grid (a phone's page
+  shows two rows and scrolls to the rest, like the notes) where owned
+  stickers
+  show their atlas frame with a die-cut rim and their name, and unowned slots
+  are dashed `?` outlines with no name.
+- Fae's supplies sit at the right of the NOTES heading row: two small cream
+  stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
+  a cookie (inline SVG, like the map's bus-stop sign).
+- A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
+  fits the heading row at 874x402, including with `♪ off` and 999 coins. At
+  narrow widths, the supplies wrap beneath NOTES so every control remains
+  inside the page without overlapping its neighbors.
+- A cream JOURNAL label sits on the top edge and a close sticker (at least
+  44 px) in the top-right corner; the close button is how touch players leave.
+- Bookmark tabs (at least 44 px) flip between NOTES & STICKERS and MAP. The
+  journal opens on notes; ArrowLeft/ArrowRight and A/D also flip pages.
+- `data-journal="open"` hides all touch controls while the book is open.
+- The touch menu button is the JOURNAL sticker from the concept sheet: an open
+  book with a teal quill (inline SVG, aria-label "journal").
+- Shared pieces (`src/ui/atlas.ts`, `.die-cut` in sticker.css): atlas frames
+  are cropped with percentage backgrounds, exact at any box size, and the
+   die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
+   The reward card uses both.
+- The STICKERS page continues below the album with a PRIZES shelf from
+  `world.arcade.prizes`. Owned prizes use the prize atlas frame, die-cut rim,
+  and name; unowned prizes are dashed `?` slots without names. The shelf is
+  part of the page scroll on phones.
+  The shelf has a slot a prize: the claw machine's nine plushes, then the
+  ticket counter's four toys. The PRIZES heading carries Fae's tickets in a
+  pill like the notes page's Coins and Snacks (an orange ticket and the
+  count, Milestone 45).
+
 ## 10. Save and load
 - One slot, key `cloverhollow-save`, stored with `@capacitor/preferences`:
   UserDefaults on iOS (which iOS doesn't clear the way it can clear web
@@ -2716,20 +2754,3 @@ Multiplayer, merch, speedrun, boss rush, New Game Plus, achievements,
 analytics, voice acting, day/night, weather, fishing and bug minigames, photo
 mode, home customization, and non-English localization. Keep player-facing
 text in Ink or JSON so it stays translatable.
-
-### Milestone 26 additions, The Whispering Woods
-The west Pinecone Pass arrow trigger requires `found_old_trail` and leads to the
-`woods` area, whose reverse trigger returns to the pass. The Whispering Woods is
-a 1750x1100 forest clearing in the `forest` land, with a north clubhouse,
-roaming `owl`, and `clubhouse` interactable. The owl uses `owl.json`, has chaos
-screeches and swoops, a wise `owl_calm` knot, and the full Soothe, Play, Cast,
-Juggle, Snack, and Run command set. The clubhouse knot records the purple soda,
-comic books, half-eaten fizzy cracker, and lantern-revealed note about meeting
-“the boss” at the sealed Ancient Tree in the Enchanted Forest. Once the owl is
-calm it sets `clubhouse_claimed`; Sue promises a fridge and Jordan a garden.
-Journal output records the trail, owl, and clubhouse beats newest first.
-Its stream is water (blockers along its banks); Fae crosses it on the stepping
-stones. Its floor is the painted clearing, one polygon round the open ground
-and the stream's banks: the forest behind the clearing, the big trunks, and
-the ground behind the clubhouse are off it, and corridors behind the edge
-trunks keep its two exits.

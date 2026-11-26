@@ -132,6 +132,14 @@ const recipes: Record<SoundCue, Recipe> = {
   "comet-move": [{ wave: "triangle", frequency: 260, offset: 0, duration: .08, gain: .04 }],
   "comet-star": [{ wave: "triangle", frequency: 880, offset: 0, duration: .09, gain: .06 }],
   "comet-bump": [{ wave: "noise", offset: 0, duration: .08, gain: .04, lowpass: 500 }],
+  "cook-start": [{ wave: "triangle", frequency: 220, endFrequency: 260,
+    offset: 0, duration: .09, gain: .05 }],
+  "cook-frozen": [{ wave: "triangle", frequency: 330, endFrequency: 247,
+    offset: 0, duration: .11, gain: .05 }],
+  "cook-ding": [
+    { wave: "sine", frequency: 1319, offset: 0, duration: .28, gain: .09 },
+    { wave: "sine", frequency: 2637, offset: 0, duration: .14, gain: .035 },
+  ],
   "tickets-won": [{ wave: "triangle", frequency: 880, offset: 0, duration: .04, gain: .05 },
     { wave: "triangle", frequency: 880, offset: .07, duration: .04, gain: .05 },
     { wave: "triangle", frequency: 880, offset: .14, duration: .04, gain: .05 },
@@ -319,7 +327,10 @@ export function createAudio(onStateChange: (state: AudioState) => void = () => u
   window.addEventListener("touchstart", unlock, { passive: true });
   window.addEventListener("keydown", (event) => {
     unlock();
-    if (event.code === "KeyM") toggle();
+    if (event.code === "KeyM" &&
+        !(event.target instanceof HTMLElement &&
+          event.target.closest("input, textarea") !== null))
+      toggle();
   });
   void Preferences.get({ key: preferenceKey }).then(({ value }) => {
     preferenceLoaded = true;

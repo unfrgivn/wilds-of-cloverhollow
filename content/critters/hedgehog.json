@@ -5,12 +5,12 @@
   "calmName": "Meadow Hedgehog",
   "atlas": "assets/critters/hedgehog/hedgehog.json",
   "auraCentre": {
-    "x": 256,
-    "y": 256
+    "x": 257.5,
+    "y": 250.6
   },
   "bodyCentre": {
-    "x": 256,
-    "y": 320
+    "x": 256.4,
+    "y": 351.4
   },
   "figureHeight": 380,
   "overworldHeight": 70,

@@ -38,13 +38,15 @@
     "atlas": "assets/characters/sue/sue.json",
     "idleTicks": [
       32
-    ]
+    ],
+    "scale": 0.46
   },
   "jordan": {
     "atlas": "assets/characters/jordan/jordan.json",
     "idleTicks": [
       32
-    ]
+    ],
+    "scale": 0.46
   },
   "bus-stop": {
     "atlas": "assets/characters/bus-stop/bus-stop.json",
@@ -71,7 +73,8 @@
     "idleTicks": [
       190,
       8
-    ]
+    ],
+    "scale": 0.47
   },
   "hooded-kid": {
     "atlas": "assets/characters/hooded-kid/hooded-kid.json",

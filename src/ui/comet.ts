@@ -110,9 +110,11 @@ export function createComet(
     return key;
   });
   let lastKey = "";
+  let lastMarqueeKey = "";
   let lastView: CometView | null = null;
   let lastLayout: CometLayout | null = null;
   const frames = new Map<string, AtlasImage | null>();
+  const spriteFrame = new WeakMap<HTMLDivElement, string>();
   const frameArt = (name: string): AtlasImage | null => {
     if (!frames.has(name)) frames.set(name, art(name));
     return frames.get(name) ?? null;
@@ -122,8 +124,13 @@ export function createComet(
     place(node, at);
     setStyle(node, "opacity", String(at.opacity));
     node.dataset.frame = at.frame;
-    const frame = frameArt(at.frame);
-    if (frame !== null) applyAtlasCrop(node, frame);
+    if (spriteFrame.get(node) !== at.frame) {
+      const frame = frameArt(at.frame);
+      if (frame !== null) {
+        applyAtlasCrop(node, frame);
+        spriteFrame.set(node, at.frame);
+      }
+    }
   };
 
   const draw = (view: CometView, layout: CometLayout): void => {
@@ -139,11 +146,15 @@ export function createComet(
     const text = view.hint ?? "COMET CRUISE";
     marquee.classList.toggle("is-hint", view.hint !== null);
     setText(marqueeText, text);
-    const tall = Math.floor(layout.marquee.height * (text.length > 16 ? 0.3 : 0.42));
-    setStyle(marqueeText, "font-size", `${tall}px`);
-    const room = Math.min((marquee.clientWidth * 0.92) / Math.max(1, marqueeText.scrollWidth),
-      (marquee.clientHeight * 0.92) / Math.max(1, marqueeText.scrollHeight));
-    if (room < 1) setStyle(marqueeText, "font-size", `${Math.floor(tall * room)}px`);
+    const marqueeKey = `${text}|${layout.marquee.width}|${layout.marquee.height}`;
+    if (marqueeKey !== lastMarqueeKey) {
+      lastMarqueeKey = marqueeKey;
+      const tall = Math.floor(layout.marquee.height * (text.length > 16 ? 0.3 : 0.42));
+      setStyle(marqueeText, "font-size", `${tall}px`);
+      const room = Math.min((marquee.clientWidth * 0.92) / Math.max(1, marqueeText.scrollWidth),
+        (marquee.clientHeight * 0.92) / Math.max(1, marqueeText.scrollHeight));
+      if (room < 1) setStyle(marqueeText, "font-size", `${Math.floor(tall * room)}px`);
+    }
     setStyle(hud, "left", `${layout.hud.x}px`);
     setStyle(hud, "top", `${layout.hud.y}px`);
     setStyle(hud, "font-size", `${Math.max(14, Math.round(layout.marquee.height * 0.24))}px`);
@@ -183,6 +194,7 @@ export function createComet(
   // The marquee was measured in whatever font was usable, and Nunito swaps in
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
+    lastMarqueeKey = "";
     if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
   });
 

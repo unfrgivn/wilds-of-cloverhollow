@@ -29,10 +29,10 @@ describe("gameplay sound cues", () => {
     expect(soundCues(journalStart, journal, content.world)).toEqual(["journal-open"]);
   });
 
-  it("uses real movement steps for a throttled footstep and does not repeat while still", () => {
+  it("syncs footsteps to walk half-cycles and stays silent while still or blocked", () => {
     let state = createState(content.world, harness);
     let cues: string[] = [];
-    for (let index = 0; index < 16; index += 1) {
+    for (let index = 0; index < 32; index += 1) {
       const next = step(content.world, state, right).state;
       cues = [...cues, ...soundCues(state, next, content.world)];
       state = next;
@@ -42,6 +42,35 @@ describe("gameplay sound cues", () => {
     expect(soundCues(state, stopped, content.world)).toEqual([]);
     const held = step(content.world, stopped, none).state;
     expect(soundCues(stopped, held, content.world)).toEqual([]);
+    // Pushing against a wall without advancing distance emits no footsteps.
+    const blocked: State = {
+      ...stopped,
+      motion: { distance: stopped.motion.distance, moving: true },
+    };
+    expect(soundCues(stopped, blocked, content.world)).toEqual([]);
+  });
+
+  it("emits cook-start, cook-frozen, and cook-ding on microwave phase transitions", () => {
+    const start = createState(content.world, harness);
+    const ready: State = {
+      ...start,
+      arcade: {
+        game: "cook", dish: "nuggets", phase: "ready", phaseTicks: 0,
+        cooked: 0, message: "", revealed: 0,
+      },
+    };
+    const cooking = step(content.world, ready, { ...none, confirm: true }).state;
+    expect(soundCues(ready, cooking, content.world)).toEqual(["cook-start"]);
+    const paused = step(content.world, cooking, none).state;
+    expect(soundCues(cooking, paused, content.world)).toEqual(["cook-frozen"]);
+    let state = step(content.world, paused, { ...none, confirm: true }).state;
+    expect(soundCues(paused, state, content.world)).toEqual(["cook-start"]);
+    const frozenTicks = content.world.arcade.cook.dishes.nuggets.frozen *
+      content.world.arcade.cook.ticksPerSecond;
+    while (state.arcade?.game === "cook" && state.arcade.cooked < frozenTicks)
+      state = step(content.world, state, { ...none, confirm: true }).state;
+    const ding = step(content.world, state, none).state;
+    expect(soundCues(state, ding, content.world)).toEqual(["cook-ding"]);
   });
 
   it("starts a battle from a real step into a critter", () => {

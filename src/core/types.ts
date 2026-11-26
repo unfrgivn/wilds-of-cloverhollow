@@ -383,10 +383,11 @@ export type PartyContent = {
   critter: string | null;
   // Its battle command, or null for a flute friend.
   command: { id: string; label: string; resting: string; check: CheckSpec } | null;
+  scale?: number;
 };
 // An area person's atlas and idle timing: ticks per idle_down frame (Mom
 // holds her smile, then blinks briefly; Oliver waves his rattle evenly).
-export type CharacterContent = { atlas: string; idleTicks: number[] };
+export type CharacterContent = { atlas: string; idleTicks: number[]; scale?: number };
 export type StickerCatalogue = {
   slots: number;
   catalogue: { id: string; name: string; critter: string; frame: string }[];

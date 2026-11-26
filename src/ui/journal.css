@@ -324,8 +324,11 @@
   height: 100%;
 }
 @keyframes journal-star-bob {
-  0%, 100% { margin-top: -3px; }
-  50% { margin-top: 3px; }
+  0%, 100% { transform: translate(-50%, calc(-50% - 3px)); }
+  50% { transform: translate(-50%, calc(-50% + 3px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-map-star { animation: none; }
 }
 .journal-tab {
   position: absolute;

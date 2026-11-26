@@ -5,12 +5,12 @@
   "calmName": "Ms. Rowan",
   "atlas": "assets/critters/art-teacher/art-teacher.json",
   "auraCentre": {
-    "x": 256,
-    "y": 256
+    "x": 258.7,
+    "y": 260.7
   },
   "bodyCentre": {
-    "x": 256,
-    "y": 314
+    "x": 238.2,
+    "y": 302.4
   },
   "figureHeight": 380,
   "overworldHeight": 160,

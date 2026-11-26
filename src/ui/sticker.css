@@ -180,7 +180,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sticker-advance.is-visible { animation: none; }
+  .sticker-advance.is-visible,
+  .notice-mark.is-alert { animation: none; }
 }
 
 .sticker-choices {

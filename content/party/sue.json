@@ -2,6 +2,7 @@
   "id": "sue",
   "name": "Sue",
   "atlas": "assets/characters/sue/sue.json",
+  "scale": 0.46,
   "box": {
     "width": 50,
     "height": 140

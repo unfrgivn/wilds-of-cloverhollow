@@ -88,7 +88,7 @@ export function createMole(
   const score = element("span", "mole-score", hud);
   const left = element("span", "mole-left", hud);
   type HoleNodes = { hole: MoleHole; box: HTMLDivElement; sprite: HTMLDivElement;
-    hit: HTMLButtonElement; key: HTMLSpanElement };
+    hit: HTMLButtonElement; key: HTMLSpanElement; face: string };
   const holes: HoleNodes[] = (["up", "left", "middle", "right", "down"] as const).map((hole) => {
     const box = element("div", "mole-hole", machine);
     box.dataset.hole = hole;
@@ -107,7 +107,7 @@ export function createMole(
     hit.addEventListener("pointerup", release);
     hit.addEventListener("pointercancel", release);
     hit.addEventListener("lostpointercapture", release);
-    return { hole, box, sprite, hit, key };
+    return { hole, box, sprite, hit, key, face: "" };
   });
   const hammer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   hammer.setAttribute("class", "mole-hammer");
@@ -118,6 +118,7 @@ export function createMole(
   const pop = element("div", "mole-pop", machine);
   pop.textContent = "Boop!";
   let lastKey = "";
+  let lastPlateKey = "";
   let lastView: MoleView | null = null;
   let lastLayout: MoleLayout | null = null;
   const frames = new Map<string, AtlasImage | null>();
@@ -139,11 +140,15 @@ export function createMole(
     const text = view.hint ?? "BOOP-A-MOLE";
     plate.classList.toggle("is-hint", view.hint !== null);
     setText(plateText, text);
-    const tall = Math.floor(layout.plate.height * (text.length > 16 ? 0.36 : 0.5));
-    setStyle(plateText, "font-size", `${tall}px`);
-    const room = Math.min((plate.clientWidth * 0.92) / Math.max(1, plateText.scrollWidth),
-      (plate.clientHeight * 0.92) / Math.max(1, plateText.scrollHeight));
-    if (room < 1) setStyle(plateText, "font-size", `${Math.floor(tall * room)}px`);
+    const plateKey = `${text}|${layout.plate.width}|${layout.plate.height}`;
+    if (plateKey !== lastPlateKey) {
+      lastPlateKey = plateKey;
+      const tall = Math.floor(layout.plate.height * (text.length > 16 ? 0.36 : 0.5));
+      setStyle(plateText, "font-size", `${tall}px`);
+      const room = Math.min((plate.clientWidth * 0.92) / Math.max(1, plateText.scrollWidth),
+        (plate.clientHeight * 0.92) / Math.max(1, plateText.scrollHeight));
+      if (room < 1) setStyle(plateText, "font-size", `${Math.floor(tall * room)}px`);
+    }
     setStyle(hud, "left", `${layout.hud.x}px`);
     setStyle(hud, "top", `${layout.hud.y}px`);
     setStyle(hud, "font-size", `${Math.max(14, Math.round(layout.plate.height * 0.3))}px`);
@@ -165,8 +170,13 @@ export function createMole(
       setText(nodes.key, at.key.label);
       nodes.sprite.hidden = at.mole === null;
       if (at.mole === null) continue;
-      const frame = frameArt(`mole-${at.mole.face}`);
-      if (frame !== null) applyAtlasCrop(nodes.sprite, frame);
+      if (nodes.face !== at.mole.face) {
+        const frame = frameArt(`mole-${at.mole.face}`);
+        if (frame !== null) {
+          applyAtlasCrop(nodes.sprite, frame);
+          nodes.face = at.mole.face;
+        }
+      }
       nodes.sprite.dataset.face = at.mole.face;
       setStyle(nodes.sprite, "transform", `translateY(${at.mole.drop}px)`);
     }
@@ -189,6 +199,7 @@ export function createMole(
   // The marquee was measured in whatever font was usable, and Nunito swaps in
   // when it loads (spec 7.1): what's shown is drawn again then.
   document.fonts.addEventListener("loadingdone", () => {
+    lastPlateKey = "";
     if (lastView !== null && lastLayout !== null) draw(lastView, lastLayout);
   });
 

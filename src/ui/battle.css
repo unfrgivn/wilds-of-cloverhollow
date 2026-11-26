@@ -98,7 +98,31 @@
   transition: transform 100ms ease-out;
 }
 .battle-together-btn {
+  position: relative;
+  overflow: hidden;
   background: #ffe27a;
+}
+.battle-together-btn > * {
+  position: relative;
+  z-index: 1;
+}
+.battle-together-btn::after {
+  content: "";
+  position: absolute;
+  inset: -6px -45%;
+  background: linear-gradient(
+    110deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.62) 50%,
+    transparent 62%
+  );
+  transform: translateX(-100%);
+  animation: battle-together-shimmer 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes battle-together-shimmer {
+  0%, 26% { transform: translateX(-100%); }
+  74%, 100% { transform: translateX(100%); }
 }
 .battle-flute-btn {
   background: #e7f5ea;
@@ -233,14 +257,65 @@
 .battle-leaf.is-full path {
   fill: var(--sticker-green);
 }
+.battle-calm-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+}
+.battle-calm-heart {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.battle-calm-heart-path {
+  fill: #f9e8d2;
+  stroke: var(--sticker-ink);
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  transition: fill 180ms ease-out;
+}
+.battle-calm-heart.is-warm .battle-calm-heart-path {
+  fill: #ef8fa6;
+}
 .battle-calm-track {
   position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
   height: 20px;
-  margin-top: 7px;
   overflow: hidden;
   border: 2px solid var(--sticker-ink);
   border-radius: 10px;
   background: var(--sticker-border);
+}
+.battle-calm-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(25% - 1px),
+      #47321f44 calc(25% - 1px),
+      #47321f44 calc(25% + 1px),
+      transparent calc(25% + 1px)
+    ),
+    linear-gradient(
+      to right,
+      transparent calc(50% - 1px),
+      #47321f55 calc(50% - 1px),
+      #47321f55 calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(
+      to right,
+      transparent calc(75% - 1px),
+      #47321f44 calc(75% - 1px),
+      #47321f44 calc(75% + 1px),
+      transparent calc(75% + 1px)
+    );
 }
 .battle-calm-fill {
   width: 0;
@@ -272,12 +347,14 @@
   }
 }
 .battle-command {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
   min-height: 44px;
   box-sizing: border-box;
-  padding: 2px 12px;
+  padding: 2px 6px 2px 7px;
   border: 5px solid var(--sticker-rim);
   outline: 2px solid var(--sticker-ink);
   border-radius: 13px 16px 12px 15px;
@@ -286,33 +363,115 @@
   color: var(--sticker-ink);
   cursor: pointer;
   font: inherit;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   text-align: left;
   transition: transform 110ms ease-out, background-color 110ms ease-out;
+}
+@media (min-width: 1000px) {
+  .battle-command {
+    gap: 8px;
+    padding: 2px 10px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+.battle-command.is-match {
+  border-color: #f6d573;
+  background: #fff6d6;
+  box-shadow: 0 4px 0 #d9b65c;
+  animation: battle-match-pulse 1.9s ease-in-out infinite;
+}
+@keyframes battle-match-pulse {
+  0%, 100% { box-shadow: 0 4px 0 #d9b65c, 0 0 0 0 #ffe27a00; }
+  50% { box-shadow: 0 4px 0 #d9b65c, 0 0 0 3px #ffe27a88; }
 }
 .battle-command[aria-selected="true"] {
   background: var(--sticker-green);
   box-shadow: 0 5px 0 var(--sticker-ink);
   transform: translateY(-3px) rotate(-1deg);
 }
+.battle-command.is-match[aria-selected="true"] {
+  border-color: #ffe27a;
+  background: var(--sticker-green);
+  animation: none;
+}
+.battle-command[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ffe27a;
+  box-shadow: 0 0 0 1.5px var(--sticker-ink);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+@media (min-width: 1000px) {
+  .battle-command[aria-selected="true"]::before {
+    left: -13px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--sticker-ink);
+    border-radius: 2px 8px 2px 8px;
+    box-shadow: 0 0 0 2px var(--sticker-rim);
+    transform: translateY(-50%) rotate(-12deg);
+  }
+}
 /* Explicit colours, never opacity, so disabled text keeps its contrast. */
 .battle-command[aria-disabled="true"] {
   border-style: dashed;
+  border-color: var(--sticker-rim);
   background: #ddd6ca;
   box-shadow: none;
   color: var(--sticker-ink);
   cursor: not-allowed;
+  animation: none;
+}
+.battle-command-icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+}
+@media (min-width: 1000px) {
+  .battle-command-icon-slot {
+    width: 18px;
+    height: 18px;
+  }
+}
+.battle-command-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.battle-command-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .battle-command-label {
   display: block;
   line-height: 1.15;
+  white-space: nowrap;
 }
 .battle-command-detail {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1;
+}
+@media (min-width: 1000px) {
+  .battle-command-detail {
+    font-size: 13px;
+  }
 }
 
 /* Specialty Treat Tray: replaces the command menu slot when Fae carries treats. */
@@ -750,6 +909,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .battle-calm-fill,
+  .battle-calm-heart-path,
   .battle-command,
   .battle-together-btn,
   .battle-flute-btn,
@@ -762,25 +922,35 @@
   .battle-reward.is-visible,
   .battle-trace-dot.is-next,
   .battle-feeling-heart,
-  .battle-windup-bubble.is-popped {
+  .battle-windup-bubble.is-popped,
+  .battle-command.is-match,
+  .battle-together-btn::after {
     animation: none;
+  }
+  .battle-together-btn::after {
+    display: none;
   }
 }
 
-/* A command's feeling badge (Milestone 42): this turn's feeling, on the
-   command that answers it, at the button's top-right corner. */
-.battle-command { position: relative; }
+/* A command's feeling badge (Milestone 42, tucked inside in Milestone 82):
+   this turn's feeling, tucked cleanly inside the button's right edge. */
 .battle-command-badge {
-  position: absolute;
-  top: -9px;
-  right: -9px;
-  width: 24px;
-  height: 24px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 19px;
+  height: 19px;
   padding: 2px;
   box-sizing: border-box;
   border-radius: 50%;
   background: var(--sticker-rim);
-  box-shadow: 0 0 0 2px var(--sticker-ink);
+  box-shadow: 0 0 0 1.5px var(--sticker-ink);
+}
+@media (min-width: 1000px) {
+  .battle-command-badge {
+    width: 22px;
+    height: 22px;
+    box-shadow: 0 0 0 2px var(--sticker-ink);
+  }
 }
 .battle-command-badge[hidden] { display: none; }
 

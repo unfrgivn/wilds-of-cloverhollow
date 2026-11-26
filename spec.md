@@ -2144,29 +2144,40 @@ trunks keep its two exits.
 - HUD: ENERGY (showing Fae's own level from `levelForXp`; one leaf per point up
   to 10, compact for 6..10, and capped at 10 proportionally filled leaves plus
   a `current/max` count above 10; spent leaves outlined) at the top left and
-  the critter's CALM meter (its level and name in capitals) at the top right,
-  left of the menu button, inside the safe area. Directly under ENERGY sits
-  `.battle-actions-left` (a horizontal row from 1000 px wide, a compact left
-  column on phones, clear of ENERGY, thought clouds, wind-ups, commands,
-  dialogue, and touch controls): `.battle-sparkle-pill` (filled gold and
-  outlined stars while sparkle is 1..2), `.battle-together-btn` (sunny gold
-  44 px sticker button with `X` key badge hidden on touch when sparkle is
-  ready), `.battle-flute-btn` (soft mint 44 px sticker button naming Pond Pup,
-  Acorn Squirrel, or Flute Friends with `F` key badge hidden on touch while
-  available), and `.battle-soften-pill` (`Softened` badge while Acorn
-  Squirrel's burst soften is active). Like the feelings cloud,
-  `.battle-actions-left` steps aside during active checks and burst results
-  (`phase === "check"` or `"burstResult"`) so check overlays such as Lean's
-  balance track stay completely clear on notched phones. The HUD hides during
-  the reward.
-  The dialogue box hides its advance triangle (`▼`) during the command phase.
+  the critter's CALM meter (its level and name in capitals, a cozy heart emblem
+  beside the track that warms to soft coral-pink at `calm >= 0.75`, and subtle
+  25% / 50% / 75% vertical milestone tick marks inside `.battle-calm-track`) at
+  the top right, left of the menu button, inside the safe area. Directly under
+  ENERGY sits `.battle-actions-left` (a horizontal row from 1000 px wide, a
+  compact left column on phones, clear of ENERGY, thought clouds, wind-ups,
+  commands, dialogue, and touch controls): `.battle-sparkle-pill` (filled gold
+  and outlined stars while sparkle is 1..2), `.battle-together-btn` (sunny gold
+  44 px sticker button with a reduced-motion-guarded diagonal sheen sweep and
+  `X` key badge hidden on touch when sparkle is ready), `.battle-flute-btn`
+  (soft mint 44 px sticker button naming Pond Pup, Acorn Squirrel, or Flute
+  Friends with `F` key badge hidden on touch while available), and
+  `.battle-soften-pill` (`Softened` badge while Acorn Squirrel's burst soften
+  is active). Like the feelings cloud, `.battle-actions-left` steps aside
+  during active checks and burst results (`phase === "check"` or
+  `"burstResult"`) so check overlays such as Lean's balance track stay
+  completely clear on notched phones. The HUD hides during the reward.
+  The dialogue box hides its advance triangle (`▼`) during the command phase,
+  and during live command selection (outside Talk and the treat tray) displays
+  a high-contrast `.sticker-subtitle` preview line (`battleCommandPreview`)
+  describing the highlighted command, any active feeling match, or cooldown.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. The menu grows with the party: four
   commands with Maddie alone, up to six (three rows on a phone) with Sue and
-  Jordan; the gallery previews a bigger party with `?party=N`. The selected command is lifted and
-  green. Disabled commands are dashed and grey in explicit colours (never
-  opacity), carry a detail line such as "resting", and never emit a choice.
+  Jordan; the gallery previews a bigger party with `?party=N`. Each button
+  renders a zero-text inline-SVG storybook icon (`.battle-command-icon`), its
+  label/detail column, and a feeling-match badge tucked cleanly inside its
+  right edge (never clipping outside the button border). Commands matching a
+  current feeling receive `.is-match` (warm golden-honey accent border and
+  reduced-motion-guarded pulse). The selected command is lifted, green, and
+  marked with a zero-text CSS leaf/pill accent (`::before`). Disabled commands
+  are dashed and grey in explicit colours (never opacity), carry a detail line
+  such as "resting", and never emit a choice.
 - Timing ring: an SVG centred exactly on the CSS point the game passes (the
   critter or Fae on screen). The moving ring's radius is
   `radius * (1 - progress)` and the dashed target's is `radius * (1 - target)`.
@@ -2276,20 +2287,34 @@ trunks keep its two exits.
 - The Pixi battle scene dims the loaded area painting and presents the critter,
   Fae (at scale `0.58`), the party (each at `((scale ?? 0.5) / 0.5) * 0.58` so
   classmates match Fae's crown height), and aura in a fixed logical
-  composition. It is render-only. `computeBattleChoreography`
-  (`src/render/battle-choreography.ts`, Milestone 73) drives deterministic
-  Paper Mario / EarthBound combat poses and pooled `battleVfxLayer` particles
-  (`sparkle`, `heart`, `energyRing`, `puff`): staggered breathing, highlighted
-  actor step-forward on command selection, Soothe hops with luminous aqua energy
-  ripples, Maddie pounce arcs, Sue charge lean-back proportional to `fill` and
-  pastel cast arcs, Jordan beat-synced juggle tosses, Snack hops with floating
-  hearts, live Lean balance tilting, live Catch lane posing with caught-toy
-  sparkles, critter burst crouch-and-lunge, `great`/`good`/`miss` reactions and
-  rainbow bursts, damped Fae recoil with warm blush flash and gentle 3 px stage
+  composition. It is render-only. Inside the central 70% of the viewport (leaving
+  all four painted corners bright and textured), `battleLayer` draws a sunlit
+  butter-cream ground stage oval framing the combatants' shared baseline and two
+  slowly drifting sinusoidal watercolour mood washes (`battleMoodWaveA`,
+  `battleMoodWaveB`) tinted dynamically by `battleStageMood` (`"calm-normal"`,
+  `"windup"`, `"together-ready"`, `"together-active"`, `"soothed"`).
+  `computeBattleChoreography` (`src/render/battle-choreography.ts`, Milestones
+  73 and 82) drives deterministic Paper Mario / EarthBound combat poses,
+  `stageMood`, `hitStop`, and pooled `battleVfxLayer` particles (`sparkle`,
+  `heart`, `energyRing`, `puff`, `petal`, `softGlow`): staggered breathing,
+  highlighted actor step-forward on command selection, Soothe hops with luminous
+  aqua energy ripples, Maddie pounce arcs, Sue charge lean-back proportional to
+  `fill` and pastel cast arcs, Jordan beat-synced juggle tosses, Snack hops with
+  floating hearts, live Lean balance tilting, live Catch lane posing with
+  caught-toy sparkles, critter burst crouch-and-lunge, 3-tick render-only
+  impact hit-stop (`phaseTicks < 4` on `great` / `answered` / `together`
+  results: critter squash-stretch, golden starburst flash, and damped `±3.5 px`
+  directional stage shake), `great`/`good`/`miss` reactions and rainbow bursts,
+  on-field `Together!` ready eager bounce and curving golden sparkle tether,
+  synchronized team wave-hop and golden sunburst cascade during `Together!`
+  activation, damped Fae recoil with warm blush flash and gentle 3 px stage
   shake on spent energy, wind-up micro-tremble and fizzle wide squash-deflate,
-  and expanding aura dissolve with celebratory hearts and sparkles on `soothed`.
-  The shell logs `[cloverhollow] battle` with phase and message changes, and
-  `renderInfo()` exposes the phase, the check's geometry, and critter frame.
+  expanding aura dissolve with celebratory hearts, sparkles, and 8 gently rising
+  pastel watercolour Relief Bloom petals on `soothed`/`reward`, and a ~45-tick
+  on-stage hopping cameo with aqua/gold sparkles from resident flute-friend
+  atlases when Fae plays her flute in battle. The shell logs `[cloverhollow]
+  battle` with phase and message changes, and `renderInfo()` exposes the phase,
+  the check's geometry, and critter frame.
 
 ### 8.2 Arcade games (Milestones 44 to 46, and 59) and the clubhouse microwave (52)
 - The claw machine, skee-ball, Boop-a-Mole, and Comet Cruise, once Mr. Pip

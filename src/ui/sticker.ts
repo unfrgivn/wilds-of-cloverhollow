@@ -5,6 +5,7 @@ import type { SpeakerAccent } from "./portraits";
 export type DialogueView = {
   speaker: string | null;
   text: string;
+  subtitle?: string | null;
   revealed: number;
   choices: { text: string }[];
   selected: number;
@@ -41,6 +42,9 @@ export function createDialogueBox(root: HTMLElement): {
   const revealed = document.createElement("span");
   revealed.className = "sticker-text-revealed";
   text.append(full, revealed);
+  const subtitle = document.createElement("div");
+  subtitle.className = "sticker-subtitle";
+  subtitle.hidden = true;
   const live = document.createElement("div");
   live.className = "sticker-live";
   live.setAttribute("aria-live", "polite");
@@ -54,7 +58,7 @@ export function createDialogueBox(root: HTMLElement): {
   choices.className = "sticker-choices";
   choices.setAttribute("role", "listbox");
   choices.setAttribute("aria-label", "Choices");
-  box.append(portrait, speaker, text, live, choiceLive, advance, choices);
+  box.append(portrait, speaker, text, subtitle, live, choiceLive, advance, choices);
   root.append(box);
   let choose: ChoiceCallback = () => undefined;
   let announcedLine = "";
@@ -91,6 +95,12 @@ export function createDialogueBox(root: HTMLElement): {
     speaker.hidden = view.speaker === null;
     full.textContent = view.text;
     revealed.textContent = view.text.slice(0, Math.max(0, view.revealed));
+    const subtitleText = view.subtitle ?? null;
+    const showSubtitle = subtitleText !== null && subtitleText !== "";
+    subtitle.hidden = !showSubtitle;
+    box.classList.toggle("has-subtitle", showSubtitle);
+    const nextSubtitle = subtitleText ?? "";
+    if (subtitle.textContent !== nextSubtitle) subtitle.textContent = nextSubtitle;
     const line = `${view.speaker ?? ""}: ${view.text}`;
     if (line !== announcedLine) {
       live.textContent = line;

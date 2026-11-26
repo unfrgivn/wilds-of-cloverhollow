@@ -105,8 +105,29 @@
 
 .sticker-dialogue[hidden],
 .sticker-prompt[hidden],
-.sticker-portrait[hidden] {
+.sticker-portrait[hidden],
+.sticker-subtitle[hidden] {
   display: none;
+}
+
+.sticker-dialogue.has-subtitle {
+  padding: 15px 22px 14px;
+}
+
+.sticker-dialogue.has-subtitle::after {
+  inset: 10px 9px 7px;
+}
+
+.sticker-dialogue.has-subtitle .sticker-text {
+  min-height: 1.3em;
+}
+
+.sticker-subtitle {
+  margin-top: 4px;
+  color: #5a4330;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .sticker-portrait {

@@ -53,6 +53,7 @@ import {
   createFeelingBubble,
   createWindUpBubbles,
   createRewardSticker,
+  battleCommandPreview,
   battleTalkDialogueView,
   talkChoicesShown,
   type BattleCheckView as BattleCheckOverlayView,
@@ -1014,9 +1015,30 @@ async function boot(): Promise<void> {
       });
       document.documentElement.dataset.dialogue = "open";
     } else if (activeBattle && (battle?.message ?? "") !== "") {
+      const activeCmd =
+        state.battle?.phase === "command" &&
+        battle?.talk === null &&
+        !state.battle.treatMenu &&
+        battle.treatTray === null
+          ? (battle.commands[battle.selected] ?? null)
+          : null;
+      const feelingLabel =
+        activeCmd?.feeling !== null && activeCmd?.feeling !== undefined
+          ? (content.world.battle.feelings[activeCmd.feeling]?.label ?? null)
+          : null;
+      const battleText = battle?.message ?? "";
+      const commandSubtitle =
+        activeCmd !== null && !battleText.startsWith("Fae plays her flute!")
+          ? battleCommandPreview(
+              activeCmd,
+              battle?.critterName ?? "the critter",
+              feelingLabel,
+            )
+          : null;
       dialogueBox.render({
         speaker: null,
-        text: battle?.message ?? "",
+        text: battleText,
+        subtitle: commandSubtitle,
         revealed: battle?.revealed ?? 0,
         choices: [],
         selected: -1,

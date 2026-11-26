@@ -106,7 +106,10 @@ import {
   walkPose,
   type MotionPose,
 } from "./motion";
-import { computeBattleChoreography } from "./battle-choreography";
+import {
+  computeBattleChoreography,
+  type BattleStageMood,
+} from "./battle-choreography";
 
 export type RenderOptions = {
   paused?: boolean;
@@ -128,7 +131,49 @@ type FootstepPuff = {
 };
 
 const FOOTSTEP_POOL_SIZE = 24;
-const BATTLE_VFX_POOL_SIZE = 36;
+const BATTLE_VFX_POOL_SIZE = 64;
+const FLUTE_CAMEO_DURATION = 45;
+
+const BATTLE_STAGE_MOODS: Record<
+  BattleStageMood,
+  { waveA: number; waveB: number; alpha: number; pulse: boolean; spotlightTint: number }
+> = {
+  "calm-normal": {
+    waveA: 0xfff2cf,
+    waveB: 0xfff2cf,
+    alpha: 0.15,
+    pulse: false,
+    spotlightTint: 0xfff8e6,
+  },
+  windup: {
+    waveA: 0xe5c4ff,
+    waveB: 0xffc8d8,
+    alpha: 0.2,
+    pulse: false,
+    spotlightTint: 0xf7e8ff,
+  },
+  "together-ready": {
+    waveA: 0xffe794,
+    waveB: 0xfff4c2,
+    alpha: 0.22,
+    pulse: false,
+    spotlightTint: 0xfff3c8,
+  },
+  "together-active": {
+    waveA: 0x5c3e80,
+    waveB: 0xf7c33e,
+    alpha: 0.3,
+    pulse: true,
+    spotlightTint: 0xffe484,
+  },
+  soothed: {
+    waveA: 0xc4f2dc,
+    waveB: 0xfff2c2,
+    alpha: 0.24,
+    pulse: false,
+    spotlightTint: 0xf2fff7,
+  },
+};
 
 const SURFACE_PUFFS: Record<Surface, { tint: number; alpha: number }> = {
   sand: { tint: 0xebd7b8, alpha: 0.45 },
@@ -298,6 +343,9 @@ export class GameView {
   private readonly backdropSprite = new Sprite();
   private readonly renderer: Renderer;
   private backdropTexture: Texture | undefined;
+  private readonly battleMoodWaveA: Sprite;
+  private readonly battleMoodWaveB: Sprite;
+  private readonly battleGroundStage: Sprite;
   private readonly battleSpotlight: Sprite;
   private readonly battleCritterShadow: Sprite;
   private readonly battleFaeShadow: Sprite;
@@ -308,6 +356,9 @@ export class GameView {
   private readonly battlePartySprites = new Map<string, Sprite>();
   private readonly battleVfxLayer = new Container();
   private readonly battleVfxSprites: Sprite[] = [];
+  private battleFluteSeen = false;
+  private battleFluteCameoStartTick: number | undefined;
+  private battleFluteCameoIds: string[] = [];
   private readonly label: Text | undefined;
   private areaView: AreaView | undefined;
   private viewWidth = 960;
@@ -415,6 +466,21 @@ export class GameView {
     this.emissiveLayer.label = "emissive";
     this.emissiveLayer.addChild(this.atmosphere.emissive);
 
+    this.battleMoodWaveA = new Sprite(this.vfx.mistWisp);
+    this.battleMoodWaveA.label = "battle:mood-wave-a";
+    this.battleMoodWaveA.anchor.set(0.5);
+    this.battleMoodWaveA.tint = 0xfff2cf;
+    this.battleMoodWaveA.alpha = 0.15;
+    this.battleMoodWaveB = new Sprite(this.vfx.softGlow);
+    this.battleMoodWaveB.label = "battle:mood-wave-b";
+    this.battleMoodWaveB.anchor.set(0.5);
+    this.battleMoodWaveB.tint = 0xfff2cf;
+    this.battleMoodWaveB.alpha = 0.13;
+    this.battleGroundStage = new Sprite(this.vfx.softGlow);
+    this.battleGroundStage.label = "battle:ground-stage";
+    this.battleGroundStage.anchor.set(0.5);
+    this.battleGroundStage.tint = 0xfff3d4;
+    this.battleGroundStage.alpha = 0.26;
     this.battleSpotlight = new Sprite(this.vfx.softGlow);
     this.battleSpotlight.label = "battle:spotlight";
     this.battleSpotlight.anchor.set(0.5);
@@ -481,7 +547,10 @@ export class GameView {
     for (const sprite of this.partySprites.values())
       this.depth.addChild(sprite);
     this.battleLayer.addChild(
+      this.battleMoodWaveA,
+      this.battleMoodWaveB,
       this.battleSpotlight,
+      this.battleGroundStage,
       this.battleCritterShadow,
       this.battleFaeShadow,
       ...this.battlePartyShadows.values(),
@@ -1419,6 +1488,9 @@ export class GameView {
       this.viewport.visible = true;
       this.scene.visible = true;
       this.battleBackdrop = null;
+      this.battleFluteSeen = false;
+      this.battleFluteCameoStartTick = undefined;
+      this.battleFluteCameoIds = [];
       for (const sprite of this.battleVfxSprites) sprite.visible = false;
       if (this.backdropTexture !== undefined) {
         this.backdropTexture.destroy(true);
@@ -1442,11 +1514,11 @@ export class GameView {
     const y = (height - this.viewHeight * scale) / 2;
     // The claw machine's close-up is DOM over the blurred room: no battle
     // figures, and a lighter wash.
-    const drawWash = (alpha: number): void => {
-      const washKey = `${width}x${height}@${alpha}`;
+    const drawWash = (alpha: number, color = 0xfff6e6): void => {
+      const washKey = `${width}x${height}@${alpha}@${color}`;
       if (washKey === this.battleWashKey) return;
       this.battleWashKey = washKey;
-      this.battleWash.clear().rect(0, 0, width, height).fill({ color: 0xfff6e6, alpha });
+      this.battleWash.clear().rect(0, 0, width, height).fill({ color, alpha });
     };
     if (arcade !== null) {
       drawWash(0.28);
@@ -1473,12 +1545,38 @@ export class GameView {
       x + choreo.stageShake.x * scale,
       y + choreo.stageShake.y * scale,
     );
-    drawWash(0.2);
-    // Warm-cream radial focus spotlight centred behind the combatants, kept
-    // well inside the viewport so the four painted corners stay untouched.
+    if (choreo.stageMood === "together-active") {
+      drawWash(0.42, 0x2b1952);
+    } else {
+      drawWash(0.2);
+    }
+    // Drifting watercolour mood washes and radial spotlight kept strictly
+    // inside the central 70% so all four painted corners stay untouched.
+    const stageMood = BATTLE_STAGE_MOODS[choreo.stageMood];
+    const driftA = Math.sin(state.tick * 0.025);
+    const driftB = Math.cos(state.tick * 0.019);
+    const pulseBoost = stageMood.pulse ? 1 + 0.08 * Math.sin(state.tick * 0.22) : 1;
+    this.battleMoodWaveA.position.set(
+      this.viewWidth * 0.45 + driftA * 32,
+      this.viewHeight * 0.42 + driftB * 14,
+    );
+    this.battleMoodWaveA.width = this.viewWidth * 0.54 * pulseBoost;
+    this.battleMoodWaveA.height = this.viewHeight * 0.36 * pulseBoost;
+    this.battleMoodWaveA.tint = stageMood.waveA;
+    this.battleMoodWaveA.alpha = stageMood.alpha;
+    this.battleMoodWaveB.position.set(
+      this.viewWidth * 0.43 + driftB * 36,
+      this.viewHeight * 0.5 + driftA * 14,
+    );
+    this.battleMoodWaveB.width = this.viewWidth * 0.5 * pulseBoost;
+    this.battleMoodWaveB.height = this.viewHeight * 0.34 * pulseBoost;
+    this.battleMoodWaveB.tint = stageMood.waveB;
+    this.battleMoodWaveB.alpha = stageMood.alpha * 0.85;
     this.battleSpotlight.position.set(this.viewWidth * 0.44, this.viewHeight * 0.46);
-    this.battleSpotlight.width = this.viewWidth * 0.72;
-    this.battleSpotlight.height = this.viewHeight * 0.68;
+    this.battleSpotlight.width = this.viewWidth * 0.68 * pulseBoost;
+    this.battleSpotlight.height = this.viewHeight * 0.62 * pulseBoost;
+    this.battleSpotlight.tint = stageMood.spotlightTint;
+    this.battleSpotlight.alpha = stageMood.pulse ? 0.44 : 0.16;
 
     const slideOffset = 14 * (1 - introEase);
     const critter = this.world.critters[battle.critterId];
@@ -1569,13 +1667,27 @@ export class GameView {
     this.battleFaeShadow.width = 68 * faeLift;
     this.battleFaeShadow.height = 22 * faeLift;
     this.battleFaeShadow.alpha = 0.34 * faeLift;
+    const stageCenterX = Math.max(
+      this.viewWidth * 0.3,
+      Math.min(this.viewWidth * 0.52, (faeX + critterX) * 0.5),
+    );
+    this.battleGroundStage.position.set(stageCenterX, (faeY + critterY) * 0.5 - 4);
+    this.battleGroundStage.width = Math.min(
+      this.viewWidth * 0.62,
+      Math.max(360, (critterX - faeX) * 1.55),
+    );
+    this.battleGroundStage.height = 124;
+    this.battleGroundStage.tint = 0xfff3d4;
+    this.battleGroundStage.alpha = choreo.stageMood === "together-active" ? 0.34 : 0.26;
 
     // The party stands with Fae: a sitter (Maddie) sits facing the critter,
-    // anyone else is seen from behind like Fae. Flute friends sit it out.
+    // anyone else is seen from behind like Fae. Flute friends sit it out,
+    // hopping in only for a brief cameo when Fae calls them with the flute.
     const inParty = new Set(fighting.map((member) => member.id));
     for (const [id, sprite] of this.battlePartySprites) {
       const visible = inParty.has(id);
       sprite.visible = visible;
+      sprite.alpha = 1;
       const shadow = this.battlePartyShadows.get(id);
       if (shadow !== undefined) shadow.visible = visible;
     }
@@ -1613,16 +1725,116 @@ export class GameView {
       }
     });
 
+    // Flute friend on-stage cameo: stays happily bouncing beside Fae while her
+    // flute assist line is on screen, then fades out smoothly over ~30 ticks.
+    if (
+      this.battleFluteCameoStartTick !== undefined &&
+      state.tick < this.battleFluteCameoStartTick
+    ) {
+      this.battleFluteSeen = false;
+      this.battleFluteCameoStartTick = undefined;
+      this.battleFluteCameoIds = [];
+    }
+    const showingFluteLine =
+      battle.fluteUsed === true &&
+      battle.phase === "command" &&
+      battle.message.startsWith("Fae plays her flute!");
+    if (battle.fluteUsed !== true) {
+      this.battleFluteSeen = false;
+      this.battleFluteCameoStartTick = undefined;
+      this.battleFluteCameoIds = [];
+    } else if (
+      !this.battleFluteSeen ||
+      (showingFluteLine && this.battleFluteCameoIds.length === 0)
+    ) {
+      this.battleFluteSeen = true;
+      const cameoIds: string[] = [];
+      if (battle.message.includes("Pond Pup")) cameoIds.push("pond-pup");
+      if (battle.message.includes("Acorn Squirrel")) cameoIds.push("acorn-squirrel");
+      if (battle.message.includes("Ribbon Bunny")) cameoIds.push("ribbon-bunny");
+      if (cameoIds.length === 0) {
+        if (this.world.storyVariable(state.ink, "pup_friend") === true) cameoIds.push("pond-pup");
+        if (this.world.storyVariable(state.ink, "squirrel_friend") === true)
+          cameoIds.push("acorn-squirrel");
+        if (this.world.storyVariable(state.ink, "bunny_friend") === true)
+          cameoIds.push("ribbon-bunny");
+      }
+      this.battleFluteCameoIds = cameoIds;
+      this.battleFluteCameoStartTick = state.tick;
+    } else if (showingFluteLine) {
+      this.battleFluteCameoStartTick = state.tick;
+    }
+    const cameoElapsed =
+      this.battleFluteCameoStartTick === undefined
+        ? -1
+        : state.tick - this.battleFluteCameoStartTick;
+    const cameoSparkles: {
+      x: number;
+      y: number;
+      scale: number;
+      rotation: number;
+      alpha: number;
+      tint: number;
+    }[] = [];
+    if (
+      (showingFluteLine || (cameoElapsed >= 0 && cameoElapsed < FLUTE_CAMEO_DURATION)) &&
+      this.battleFluteCameoIds.length > 0
+    ) {
+      const cameoAlpha = showingFluteLine
+        ? 1
+        : Math.max(0, Math.min(1, (FLUTE_CAMEO_DURATION - cameoElapsed) / 8));
+      const animTick = state.tick;
+      this.battleFluteCameoIds.forEach((id, idx) => {
+        const sprite = this.battlePartySprites.get(id);
+        const content = this.world.party[id];
+        const memberSheet = Assets.get<Spritesheet | undefined>(`${id}-sheet`);
+        if (sprite === undefined || content === undefined || memberSheet === undefined) return;
+        const frames = memberSheet.animations.walk_left ?? memberSheet.animations.idle_down;
+        const frame = frames?.[Math.floor(animTick / 6) % frames.length];
+        if (frame === undefined) return;
+        const baseScale = ((content.scale ?? 0.5) / 0.5) * 0.58;
+        const hopY = -Math.abs(Math.sin((animTick + idx * 4) / 6)) * 16;
+        const cameoX = faeX + 106 + idx * 48;
+        const cameoY = faeY + 16 - idx * 8;
+        sprite.visible = true;
+        sprite.texture = frame;
+        if (frame.defaultAnchor !== undefined) sprite.anchor.copyFrom(frame.defaultAnchor);
+        sprite.scale.set(-baseScale, baseScale);
+        sprite.position.set(cameoX, cameoY + hopY);
+        sprite.rotation = Math.sin((animTick + idx * 4) / 6) * 0.08;
+        sprite.alpha = cameoAlpha;
+        const shadow = this.battlePartyShadows.get(id);
+        if (shadow !== undefined) {
+          const lift = liftShadowScale(hopY);
+          const shadowWidth = content.box.width * 1.15 * lift;
+          shadow.visible = true;
+          shadow.position.set(cameoX, cameoY);
+          shadow.width = shadowWidth;
+          shadow.height = shadowWidth * 0.36;
+          shadow.alpha = 0.3 * cameoAlpha * lift;
+        }
+        for (let s = 0; s < 4; s += 1) {
+          const angle = (s / 4) * Math.PI * 2 + animTick * 0.14 + idx;
+          cameoSparkles.push({
+            x: cameoX + Math.cos(angle) * 34,
+            y: cameoY - 46 + hopY * 0.5 + Math.sin(angle) * 20,
+            scale: 0.42 + (s % 2) * 0.16,
+            rotation: animTick * 0.1 + s,
+            alpha: 0.94 * cameoAlpha,
+            tint: s % 2 === 0 ? 0x67d5c4 : 0xf5b82e,
+          });
+        }
+      });
+    }
+
     const faeAnchor = { x: faeX, y: faeY - 72 };
     const critterAnchor = { x: critterX, y: critterY - critter.battleHeight * 0.5 };
-    for (let i = 0; i < this.battleVfxSprites.length; i += 1) {
-      const sprite = this.battleVfxSprites[i];
-      if (sprite === undefined) continue;
-      const particle = choreo.vfx[i];
-      if (particle === undefined || particle.alpha <= 0.01) {
-        sprite.visible = false;
-        continue;
-      }
+    let vfxSlot = 0;
+    for (const particle of choreo.vfx) {
+      if (vfxSlot >= this.battleVfxSprites.length) break;
+      const sprite = this.battleVfxSprites[vfxSlot];
+      if (sprite === undefined || particle.alpha <= 0.01) continue;
+      vfxSlot += 1;
       sprite.visible = true;
       sprite.texture = this.vfx[particle.texture];
       sprite.blendMode = particle.blend;
@@ -1647,6 +1859,24 @@ export class GameView {
         }
       }
       sprite.position.set(baseX + particle.offsetX, baseY + particle.offsetY);
+    }
+    for (const spark of cameoSparkles) {
+      if (vfxSlot >= this.battleVfxSprites.length) break;
+      const sprite = this.battleVfxSprites[vfxSlot];
+      if (sprite === undefined) break;
+      vfxSlot += 1;
+      sprite.visible = true;
+      sprite.texture = this.vfx.sparkle;
+      sprite.blendMode = "normal";
+      sprite.tint = spark.tint;
+      sprite.alpha = spark.alpha;
+      sprite.scale.set(spark.scale, spark.scale);
+      sprite.rotation = spark.rotation;
+      sprite.position.set(spark.x, spark.y);
+    }
+    for (let i = vfxSlot; i < this.battleVfxSprites.length; i += 1) {
+      const sprite = this.battleVfxSprites[i];
+      if (sprite !== undefined) sprite.visible = false;
     }
     this.battleLayer.alpha = introEase;
   }

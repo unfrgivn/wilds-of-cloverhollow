@@ -3984,6 +3984,7 @@ the old trail, the owl, and the clubhouse claim.
   replay hash changes, 23 QA packs, purity, lint), `just build` (production
   and harness hook checks), and full e2e verified across Chromium & WebKit.
 
+<<<<<<< HEAD
 ## Milestone 82: Peekaboo Check, Starry Owl & Chef Mateo (Taco Truck Talk Mini-Boss) **Status:** ✅ Completed (2026-11-26)
 - Seventh and final battle check kind from `docs/battle-ideas.md`: **Peekaboo**
   (`kind: "peekaboo"` in `src/core/types.ts`, `src/core/checks.ts`,
@@ -4028,6 +4029,45 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (production and harness hook checks), and full
   `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (status `passed`, 0 failed across
   Chromium and WebKit).
+
+## Milestone 83: Unforgettable Battle Spectacle — Together! Theater, Hit-Stop, Watercolor Stage & Command Craft **Status:** ✅ Completed (2026-11-26)
+- Render- and UI-only battle spectacle & craft upgrade with zero changes to
+  `src/core` or recorded sim hashes:
+  - Hypnotic watercolour battle stage & dynamic mood tinting
+    (`src/render/battle-choreography.ts`, `src/render/view.ts`): pure
+    `battleStageMood` (`calm-normal`, `windup`, `together-ready`,
+    `together-active`, `soothed`), sunlit butter-cream ground stage oval
+    (`battleGroundStage`), two slowly drifting sinusoidal watercolour mood
+    washes (`battleMoodWaveA`, `battleMoodWaveB`) strictly inside the central
+    70% of the stage (preserving corner brightness & texture spread), and a
+    cozy twilight-plum stage wash during `together-active` so golden beams and
+    rainbow hearts shine crisply.
+  - `Together!` on-field spectacle, 3-tick hit-stop, Relief Bloom & Flute
+    Friend cameo (`src/render/battle-choreography.ts`, `src/render/view.ts`):
+    eager bounce & 10-sparkle golden arc linking Fae and all fighting party
+    members (including Maddie) when `Together!` is ready, synchronized party
+    wave-hop + golden sunburst cascade when active, 3-tick impact hit-stop
+    (`phaseTicks < 4`) with critter squash-stretch, starburst flash, and damped
+    directional shake, 8 ascending pastel Relief Bloom petals on
+    `soothed`/`reward`, and hopping on-stage Flute Friend cameos (Pond Pup,
+    Acorn Squirrel, Ribbon Bunny from already-resident atlases) with aqua/gold
+    sparkles while Fae's flute assist line is active and fading smoothly after.
+  - Battle command menu, calm meter & prompt box UX craft (`src/ui/battle.ts`,
+    `src/ui/battle.css`, `src/ui/sticker.ts`, `src/ui/sticker.css`,
+    `src/main.ts`): zero-text inline-SVG storybook command icons, feeling-match
+    badge tucked cleanly inside the right edge of `.battle-command` with golden
+    `.is-match` highlight & pulse, zero-text CSS leaf selection pointer,
+    diagonal shimmer sweep on `.battle-together-btn`, Calm meter heart emblem
+    (warming to coral-pink at `calm >= 0.75`) + 25/50/75% milestone ticks, and
+    purposeful `battleCommandPreview` subtitle in `.sticker-dialogue` during
+    live command selection.
+- Evidence: `tests/unit/milestone-83.test.ts` (7 tests); reviewed captures in
+  `art/review/m83-together-ready.jpg`, `m83-together-active.jpg`,
+  `m83-flute-cameo.jpg`, `m83-windup-battle.jpg`, and `m83-bunny-assist.jpg`
+  verified with `vision`.
+- Gates: `just check` (142 unit files / 1,138 tests, all 64 sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full e2e verified across Chromium & WebKit.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

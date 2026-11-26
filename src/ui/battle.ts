@@ -754,6 +754,109 @@ function softenSparkleIcon(): SVGSVGElement {
   return svg;
 }
 
+function calmHeartIcon(): SVGSVGElement {
+  const svg = svgElement("svg", "battle-calm-heart");
+  svg.setAttribute("viewBox", "0 0 20 20");
+  svg.setAttribute("aria-hidden", "true");
+  const path = svgElement("path", "battle-calm-heart-path");
+  path.setAttribute(
+    "d",
+    "M10 17.2 C3.6 12.6 1.8 9.6 2.6 6.6 C3.6 3.4 7.6 2.8 10 6 " +
+      "C12.4 2.8 16.4 3.4 17.4 6.6 C18.2 9.6 16.4 12.6 10 17.2 Z",
+  );
+  svg.append(path);
+  return svg;
+}
+
+const commandIconMarkup: Record<string, string> = {
+  soothe:
+    '<path d="M8.5 14.2 V5.2 L16.2 3.4 V12.2" fill="none" stroke="#47321f" ' +
+    'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<ellipse cx="6.2" cy="14.4" rx="2.7" ry="2" fill="#8ad8cc" stroke="#47321f" ' +
+    'stroke-width="1.3"/>' +
+    '<ellipse cx="14" cy="12.6" rx="2.7" ry="2" fill="#8ad8cc" stroke="#47321f" ' +
+    'stroke-width="1.3"/>',
+  play:
+    '<ellipse cx="10" cy="13.2" rx="4.4" ry="3.4" fill="#f4b37c" stroke="#47321f" ' +
+    'stroke-width="1.4"/>' +
+    '<circle cx="5.2" cy="8.4" r="1.9" fill="#f4b37c" stroke="#47321f" stroke-width="1.3"/>' +
+    '<circle cx="10" cy="6.2" r="2" fill="#f4b37c" stroke="#47321f" stroke-width="1.3"/>' +
+    '<circle cx="14.8" cy="8.4" r="1.9" fill="#f4b37c" stroke="#47321f" stroke-width="1.3"/>',
+  cast:
+    '<path d="M3.2 16.6 L11.4 8.4" fill="none" stroke="#47321f" stroke-width="1.8" ' +
+    'stroke-linecap="round"/>' +
+    '<path d="M13.6 2.6 L14.9 6 L18.4 7.2 L14.9 8.4 L13.6 11.8 L12.3 8.4 ' +
+    'L8.8 7.2 L12.3 6 Z" fill="#f6cf4f" stroke="#47321f" stroke-width="1.2" ' +
+    'stroke-linejoin="round"/>',
+  juggle:
+    '<path d="M3.6 14.2 C5.2 6.8 14.8 6.8 16.4 14.2" fill="none" stroke="#47321f" ' +
+    'stroke-width="1.3" stroke-dasharray="2 2.2" stroke-linecap="round"/>' +
+    '<circle cx="4.6" cy="14.2" r="2.6" fill="#f3a5be" stroke="#47321f" stroke-width="1.3"/>' +
+    '<circle cx="10" cy="5.6" r="2.6" fill="#f6cf4f" stroke="#47321f" stroke-width="1.3"/>' +
+    '<circle cx="15.4" cy="14.2" r="2.6" fill="#9bd5cb" stroke="#47321f" stroke-width="1.3"/>',
+  snack:
+    '<path d="M10 6.2 C6.4 5.4 3.8 8.2 4.4 12.2 C5 15.8 7.8 17.6 10 16.4 ' +
+    'C12.2 17.6 15 15.8 15.6 12.2 C16.2 8.2 13.6 5.4 10 6.2 Z" ' +
+    'fill="#ef8fa6" stroke="#47321f" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<path d="M10 6.2 C10.2 4.2 11.4 3 13 2.8" fill="none" stroke="#47321f" ' +
+    'stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path d="M10.4 5.4 C12.2 3.2 14.6 3.4 15.4 5 C13.6 6.2 11.8 6.2 10.4 5.4 Z" ' +
+    'fill="#97c982" stroke="#47321f" stroke-width="1.1" stroke-linejoin="round"/>',
+  talk:
+    '<path d="M3.2 9.4 C3.2 5.8 6.2 3.6 10 3.6 C13.8 3.6 16.8 5.8 16.8 9.4 ' +
+    'C16.8 12.8 13.8 15 10 15 L6.8 17 L7.2 14.4 C4.8 13.6 3.2 11.8 3.2 9.4 Z" ' +
+    'fill="#fff3c4" stroke="#47321f" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<path d="M10 12.2 C7.8 10.6 7.2 9.4 7.6 8.3 C8.1 7.2 9.2 7.2 10 8.3 ' +
+    'C10.8 7.2 11.9 7.2 12.4 8.3 C12.8 9.4 12.2 10.6 10 12.2 Z" fill="#ef8fa6"/>',
+  run:
+    '<path d="M3.2 8 H12.4 C15.2 8 16.4 5.4 14.4 4.2 C12.8 3.2 11.4 4.4 11.8 5.8" ' +
+    'fill="none" stroke="#47321f" stroke-width="1.7" stroke-linecap="round"/>' +
+    '<path d="M4.8 12.6 H14.8 C17 12.6 17.6 15.2 15.8 16.2 C14.4 17 13 15.8 13.6 14.6" ' +
+    'fill="none" stroke="#47321f" stroke-width="1.7" stroke-linecap="round"/>',
+};
+
+const fallbackCommandMarkup =
+  '<path d="M10 2.4 L12.2 7.8 L17.6 10 L12.2 12.2 L10 17.6 L7.8 12.2 L2.4 10 L7.8 7.8 Z" ' +
+  'fill="#f6cf4f" stroke="#47321f" stroke-width="1.3" stroke-linejoin="round"/>';
+
+function commandIcon(commandId: string): SVGSVGElement {
+  return icon(commandIconMarkup[commandId] ?? fallbackCommandMarkup, "battle-command-icon");
+}
+
+/** Concise purposeful preview line shown under the battle prompt for the highlighted command. */
+export function battleCommandPreview(
+  command: BattleCommand,
+  critterName: string,
+  feelingLabel: string | null,
+): string {
+  if (command.disabled && command.detail !== null) {
+    if (command.id === "snack") return "No snacks or treats left right now.";
+    return `Catching a breath (${command.detail}).`;
+  }
+  let base: string;
+  if (command.id === "soothe") {
+    base = `Hum a gentle tune to calm ${critterName}.`;
+  } else if (command.id === "play") {
+    base = "Maddie bounces in with a playful pounce!";
+  } else if (command.id === "cast") {
+    base = "Sue casts a sparkling lure. Hold to charge!";
+  } else if (command.id === "juggle") {
+    base = "Jordan juggles glowing stars. Tap on the beat!";
+  } else if (command.id === "snack") {
+    base = "Share a snack or favourite treat.";
+  } else if (command.id === "talk") {
+    base = "Listen closely and speak from the heart.";
+  } else if (command.id === "run") {
+    base = "Step back calmly to explore more.";
+  } else {
+    base = `${command.label} helps calm ${critterName}.`;
+  }
+  if (command.feeling !== null && feelingLabel !== null) {
+    return `${base} Matches ${feelingLabel}!`;
+  }
+  return base;
+}
+
 export function createBattleHud(root: HTMLElement): {
   render: (view: BattleHudView) => void;
   onTogether: (callback: () => void) => void;
@@ -803,13 +906,16 @@ export function createBattleHud(root: HTMLElement): {
   actionsLeft.append(sparklePill, togetherBtn, fluteBtn, softenPill);
   const calm = element("section", "battle-meter battle-calm");
   const calmLabel = element("span", "battle-meter-label");
+  const calmRow = element("div", "battle-calm-row");
+  const calmHeart = calmHeartIcon();
   const track = element("div", "battle-calm-track");
   track.setAttribute("role", "progressbar");
   track.setAttribute("aria-valuemin", "0");
   track.setAttribute("aria-valuemax", "100");
   const fill = element("div", "battle-calm-fill");
   track.append(fill);
-  calm.append(calmLabel, track);
+  calmRow.append(calmHeart, track);
+  calm.append(calmLabel, calmRow);
   hud.append(energy, actionsLeft, calm);
   hud.hidden = true;
   root.append(hud);
@@ -868,18 +974,21 @@ export function createBattleHud(root: HTMLElement): {
       actionsLeft.hidden = !showSparkle && !showTogether && !showFlute && !showSoften;
       setText(calmLabel, view.critterName.toUpperCase());
       setAttribute(track, "aria-label", `${view.critterName} calm`);
+      const calmFraction = clamp01(view.calm);
+      calmHeart.classList.toggle("is-warm", calmFraction >= 0.75);
       setAttribute(
         track,
         "aria-valuenow",
-        String(Math.round(clamp01(view.calm) * 100)),
+        String(Math.round(calmFraction * 100)),
       );
-      fill.style.width = `${clamp01(view.calm) * 100}%`;
+      fill.style.width = `${calmFraction * 100}%`;
     },
   };
 }
 
 type CommandButton = {
   button: HTMLButtonElement;
+  icon: { node: HTMLSpanElement; id: string | null };
   label: HTMLSpanElement;
   detail: HTMLElement;
   // The feeling badge drawn now, so it's redrawn only when it changes.
@@ -917,17 +1026,27 @@ export function createCommandMenu(root: HTMLElement): {
     const button = element("button", "battle-command");
     button.type = "button";
     button.setAttribute("role", "option");
+    const iconSlot = element("span", "battle-command-icon-slot");
+    iconSlot.setAttribute("aria-hidden", "true");
+    const copy = element("span", "battle-command-copy");
     const label = element("span", "battle-command-label");
     const detail = element("small", "battle-command-detail");
+    copy.append(label, detail);
     const badge = element("span", "battle-command-badge");
     badge.hidden = true;
-    button.append(label, detail, badge);
+    button.append(iconSlot, copy, badge);
     // Disabled buttons never fire click; the check keeps that explicit.
     button.addEventListener("click", () => {
       if (!button.disabled) choose(index);
     });
     menu.append(button);
-    return { button, label, detail, badge: { node: badge, feeling: null } };
+    return {
+      button,
+      icon: { node: iconSlot, id: null },
+      label,
+      detail,
+      badge: { node: badge, feeling: null },
+    };
   };
   const addTreatButton = (index: number): TreatButton => {
     const button = element("button", "battle-treat-item");
@@ -981,6 +1100,10 @@ export function createCommandMenu(root: HTMLElement): {
       view.commands.forEach((command, index) => {
         const item = buttons[index];
         if (item === undefined) return;
+        if (item.icon.id !== command.id) {
+          item.icon.node.replaceChildren(commandIcon(command.id));
+          item.icon.id = command.id;
+        }
         setText(item.label, command.label);
         setText(item.detail, command.detail ?? "");
         item.detail.hidden = command.detail === null;
@@ -991,6 +1114,7 @@ export function createCommandMenu(root: HTMLElement): {
         );
         setAttribute(item.button, "aria-disabled", String(command.disabled));
         item.button.disabled = command.disabled;
+        item.button.classList.toggle("is-match", command.feeling !== null);
         if (item.badge.feeling !== command.feeling) {
           drawFeeling(item.badge.node, command.feeling);
           item.badge.feeling = command.feeling;

@@ -5,6 +5,7 @@ import {
   coinMarkup,
   cookieMarkup,
   feelingMarkup,
+  gemMarkup,
   heartMarkup,
   icon,
   ticketMarkup,
@@ -42,6 +43,7 @@ export type JournalView = {
   coins: number;
   tickets: number;
   snacks: number;
+  gems?: { found: number; total: number };
   muted: boolean;
   level: AudioLevel;
   musicMuted: boolean;
@@ -187,18 +189,24 @@ function busRoutePath(
 // Fae's supplies, each a pill with its count: a gold coin and a cookie for
 // her snacks on the notes page's heading row (`journal-supply`), and her
 // tickets on the PRIZES heading (`journal-tickets`, the same pill).
-function supply(kind: "coins" | "snacks" | "tickets", label: string): {
+function supply(kind: "coins" | "snacks" | "tickets" | "gems", label: string): {
   root: HTMLSpanElement;
   count: HTMLSpanElement;
 } {
   const pill = kind === "tickets" ? "journal-tickets" : "journal-supply";
-  const root = element("span", pill);
+  const root = element("span", kind === "gems" ? `${pill} journal-gems` : pill);
   setAttribute(root, "data-supply", kind);
   const svg = document.createElementNS(svgNamespace, "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
   svg.setAttribute("aria-hidden", "true");
   svg.innerHTML =
-    kind === "coins" ? coinMarkup : kind === "snacks" ? cookieMarkup : ticketMarkup;
+    kind === "coins"
+      ? coinMarkup
+      : kind === "snacks"
+        ? cookieMarkup
+        : kind === "gems"
+          ? gemMarkup
+          : ticketMarkup;
   const count = element("span", `${pill}-count`);
   root.append(svg, `${label} `, count);
   return { root, count };
@@ -254,6 +262,7 @@ export function createJournal(root: HTMLElement): {
   const supplies = element("div", "journal-supplies");
   const coins = supply("coins", "Coins");
   const snacks = supply("snacks", "Snacks");
+  const gems = supply("gems", "Gems");
   supplies.append(coins.root, snacks.root);
   const audio = element("button", "journal-audio");
   audio.type = "button";
@@ -665,6 +674,15 @@ export function createJournal(root: HTMLElement): {
       setText(coins.count, String(view.coins));
       setText(tickets.count, String(view.tickets));
       setText(snacks.count, String(view.snacks));
+      const showGems = view.gems !== undefined && view.gems.found > 0;
+      if (showGems) {
+        if (!gems.root.isConnected) snacks.root.after(gems.root);
+        if (view.gems !== undefined)
+          setText(gems.count, `${view.gems.found}/${view.gems.total}`);
+      } else if (gems.root.isConnected) {
+        gems.root.remove();
+      }
+      notesHead.classList.toggle("has-gems", showGems);
       setText(audio, view.muted ? "♪ off" : "♪ on");
       audio.classList.toggle("is-muted", view.muted);
       syncSlider(volume.button, volume.value, view.level);

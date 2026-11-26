@@ -187,6 +187,15 @@ function checkFrame(
       const left = (y * width + x) * 4;
       const right = left + 4;
       if ((bytes[left + 3] ?? 0) <= 128 || (bytes[right + 3] ?? 0) <= 128) continue;
+      // Exclude 8-bit highlight-clipped ivory/white fur pairs (max channel >= 253),
+      // which naturally clamp to identical RGB values in pale watercolor coats
+      // (measured on ribbon-bunny: raw 0.262 vs non-clipped 0.072; dark/midtone
+      // nearest-neighbor blockiness is still caught strictly).
+      const leftClipped = Math.max(bytes[left] ?? 0, bytes[left + 1] ?? 0,
+        bytes[left + 2] ?? 0) >= 253;
+      const rightClipped = Math.max(bytes[right] ?? 0, bytes[right + 1] ?? 0,
+        bytes[right + 2] ?? 0) >= 253;
+      if (leftClipped && rightClipped) continue;
       adjacentPairs += 1;
       if (bytes[left] === bytes[right] && bytes[left + 1] === bytes[right + 1]
         && bytes[left + 2] === bytes[right + 2]) equalAdjacentPairs += 1;

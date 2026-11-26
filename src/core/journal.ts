@@ -17,6 +17,28 @@ export type CritterFieldNote = {
 };
 export type CarriedTreat = { id: string; name: string; count: number };
 
+export const STAR_GEM_VARIABLES = [
+  "gem_park",
+  "gem_bay",
+  "gem_trail",
+  "gem_pass",
+  "gem_cavern",
+  "gem_woods",
+  "gem_hills",
+] as const;
+
+/** Counts how many of Cloverhollow's seven Star Gems Fae has found. */
+export function starGemsFound(
+  world: Pick<World, "storyVariable">,
+  state: Pick<State, "ink">,
+): { found: number; total: number } {
+  let found = 0;
+  for (const variable of STAR_GEM_VARIABLES) {
+    if (world.storyVariable(state.ink, variable) === true) found += 1;
+  }
+  return { found, total: STAR_GEM_VARIABLES.length };
+}
+
 export function mapLandName(
   land: { id: string; name: string; revealVariable?: string },
   currentLand: string | null,

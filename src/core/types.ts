@@ -445,9 +445,19 @@ export type BattleContent = {
     pupCalm: number;
     squirrelEnergy: number;
     squirrelSoften: number;
-    lines: { pup: string; squirrel: string; both: string };
+    bunnyCalm: number;
+    bunnyTogether: number;
+    lines: Record<FluteAssistKind, string>;
   };
 };
+export type FluteAssistKind =
+  | "pup"
+  | "squirrel"
+  | "bunny"
+  | "both"
+  | "pupBunny"
+  | "squirrelBunny"
+  | "all";
 // The closed set of feelings (spec 8); each has an icon drawn in code.
 export type FeelingId = "zoomy" | "curious" | "bored" | "grumpy" | "hungry";
 export type Grade = "great" | "good" | "miss";
@@ -813,7 +823,7 @@ export type BattleView = {
   rewardSticker: string | null;
   talk: BattleTalk | null;
   sparkle: { count: number; max: number; ready: boolean } | null;
-  fluteAssist: { available: boolean; label: string; kind: "pup" | "squirrel" | "both" } | null;
+  fluteAssist: { available: boolean; label: string; kind: FluteAssistKind } | null;
   burstSoften: number;
   treatTray: TreatTrayView | null;
 };

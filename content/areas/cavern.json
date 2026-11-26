@@ -171,6 +171,16 @@
       },
       "knot": "cavern_mural",
       "prompt": "Look"
+    },
+    {
+      "id": "cavern-gem-glow",
+      "frame": "bluebell_4",
+      "point": {
+        "x": 1425,
+        "y": 710
+      },
+      "knot": "cavern_gem",
+      "prompt": "Look"
     }
   ],
   "walkable": [

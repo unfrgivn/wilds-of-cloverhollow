@@ -499,6 +499,15 @@
         "y": 412
       },
       "prompt": "Look"
+    },
+    {
+      "id": "pass-gem",
+      "knot": "pass_gem",
+      "point": {
+        "x": 680,
+        "y": 950
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {

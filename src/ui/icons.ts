@@ -54,6 +54,24 @@ export const heartMarkup =
   'C18.2 9.6 16.4 12.6 10 17.2 Z" fill="#ef8fa6" stroke="#47321f" stroke-width="1.4" ' +
   'stroke-linejoin="round"/>';
 
+// A faceted amethyst Star Gem (collectibles_candy_gems.png): pastel lavender
+// facets, warm-brown ink outline, and a crisp white star glint.
+export const gemMarkup =
+  '<polygon points="6.2,3.4 13.8,3.4 17.6,8.2 10,17.4 2.4,8.2" fill="#c8a8f0"/>' +
+  '<polygon points="6.2,3.4 13.8,3.4 12.6,8.2 7.4,8.2" fill="#efe2ff"/>' +
+  '<polygon points="2.4,8.2 6.2,3.4 7.4,8.2" fill="#dfc4fa"/>' +
+  '<polygon points="13.8,3.4 17.6,8.2 12.6,8.2" fill="#b490e6"/>' +
+  '<polygon points="2.4,8.2 7.4,8.2 10,17.4" fill="#b996e9"/>' +
+  '<polygon points="12.6,8.2 17.6,8.2 10,17.4" fill="#9c7ad8"/>' +
+  '<path d="M2.8 8.2 H17.2 M7.4 8.2 L10 17 M12.6 8.2 L10 17" ' +
+  'stroke="#7f5db8" stroke-width="0.7" fill="none"/>' +
+  '<polygon points="6.2,3.4 13.8,3.4 17.6,8.2 10,17.4 2.4,8.2" fill="none" ' +
+  'stroke="#5B3530" stroke-width="1.4" stroke-linejoin="round"/>' +
+  '<path d="M6.2 4.6 L6.8 5.9 L8.1 6.5 L6.8 7.1 L6.2 8.4 L5.6 7.1 L4.3 6.5 L5.6 5.9 Z" ' +
+  'fill="#ffffff"/>';
+
+export const gemIconSvg = `<svg viewBox="0 0 20 20" aria-hidden="true">${gemMarkup}</svg>`;
+
 /** An icon as an SVG element (decoration: hidden from screen readers). */
 export function icon(markup: string, className: string): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");

@@ -6,6 +6,7 @@
 .journal-map-page[hidden],
 .journal-options-page[hidden],
 .journal-treats-strip[hidden],
+.journal-gems[hidden],
 .journal-field-backdrop[hidden],
 .journal-field-old-friend[hidden] {
   display: none;
@@ -157,6 +158,39 @@
     width: 100%;
     justify-content: flex-start;
   }
+}
+.journal-notes-head.has-gems {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: 4px;
+  row-gap: 5px;
+  padding-right: 4px;
+}
+.journal-notes-head.has-gems::after {
+  content: "";
+  flex-basis: 100%;
+  order: 4;
+  height: 0;
+}
+.journal-notes-head.has-gems .journal-heading {
+  flex-basis: auto;
+  order: 1;
+  margin-right: auto;
+}
+.journal-notes-head.has-gems .journal-supplies {
+  display: contents;
+}
+.journal-notes-head.has-gems .journal-audio {
+  order: 2;
+}
+.journal-notes-head.has-gems .journal-volume {
+  order: 3;
+}
+.journal-notes-head.has-gems .journal-supply {
+  order: 5;
+}
+.journal-supply.journal-gems {
+  background: #f0e4ff;
 }
 .journal-supply,
 .journal-tickets {

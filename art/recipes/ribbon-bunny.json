@@ -1,0 +1,27 @@
+{
+  "asset": "ribbon-bunny",
+  "milestone": 80,
+  "date": "2026-11-26",
+  "summary": "Ribbon Bunny, the third flute friend (Milestone 80): full 4-direction hop-walk follower atlas (256x256 frames, baseline 247, right mirrored from left) matching the approved Ribbon Bunny critter sprite.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 5,
+  "references": [
+    "public/assets/critters/bunny/bunny.png (calm_idle_01)",
+    "art/source/acorn-squirrel/"
+  ],
+  "kept": {
+    "model": "art/source/ribbon-bunny/model-sheet.png",
+    "front": "art/source/ribbon-bunny/front-strip.png",
+    "back": "art/source/ribbon-bunny/back-strip.png",
+    "left": "art/source/ribbon-bunny/left-grid.png"
+  },
+  "commands": [
+    "bun tools/art/build-ribbon-bunny.ts",
+    "bun tools/art/validate-sprite.ts --atlas public/assets/characters/ribbon-bunny/ribbon-bunny.png --json public/assets/characters/ribbon-bunny/ribbon-bunny.json --recipe art/recipes/ribbon-bunny.json"
+  ],
+  "key": "#00FF00",
+  "review": [
+    "art/review/ribbon-bunny-contact-cream.jpg",
+    "art/review/ribbon-bunny-contact-dark.jpg"
+  ]
+}

@@ -436,6 +436,95 @@
       "journal": [
         "ev",
         {
+          "VAR?": "gem_reward_all"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Grandpa Barnaby gifted me his Rainbow Star Geode for finding all seven Star Gems across Cloverhollow! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "f()": "gem_count"
+        },
+        0,
+        ">",
+        {
+          "VAR?": "gem_reward_all"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I've found ",
+              "ev",
+              {
+                "f()": "gem_count"
+              },
+              "out",
+              "/ev",
+              "^ of Cloverhollow's 7 Star Gems! Grandpa Barnaby at Bon Appetit Cafe loves hearing about them. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.16"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "bunny_friend"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Ribbon Bunny is my friend! When I play my flute, she comes hopping right over. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.23"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "spice_returned"
         },
         "/ev",
@@ -450,7 +539,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.4"
+                "->": ".^.^.^.30"
               },
               null
             ]
@@ -480,7 +569,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.14"
+                "->": ".^.^.^.40"
               },
               null
             ]
@@ -510,7 +599,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.24"
+                "->": ".^.^.^.50"
               },
               null
             ]
@@ -535,7 +624,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.31"
+                "->": ".^.^.^.57"
               },
               null
             ]
@@ -560,7 +649,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.38"
+                "->": ".^.^.^.64"
               },
               null
             ]
@@ -590,7 +679,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.48"
+                "->": ".^.^.^.74"
               },
               null
             ]
@@ -615,7 +704,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.55"
+                "->": ".^.^.^.81"
               },
               null
             ]
@@ -645,7 +734,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.65"
+                "->": ".^.^.^.91"
               },
               null
             ]
@@ -670,7 +759,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.72"
+                "->": ".^.^.^.98"
               },
               null
             ]
@@ -704,7 +793,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.85"
+                "->": ".^.^.^.111"
               },
               null
             ]
@@ -733,7 +822,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.95"
+                "->": ".^.^.^.121"
               },
               null
             ]
@@ -758,7 +847,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.102"
+                "->": ".^.^.^.128"
               },
               null
             ]
@@ -783,7 +872,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.109"
+                "->": ".^.^.^.135"
               },
               null
             ]
@@ -808,7 +897,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.116"
+                "->": ".^.^.^.142"
               },
               null
             ]
@@ -833,7 +922,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.123"
+                "->": ".^.^.^.149"
               },
               null
             ]
@@ -858,7 +947,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.130"
+                "->": ".^.^.^.156"
               },
               null
             ]
@@ -888,7 +977,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.166"
               },
               null
             ]
@@ -913,7 +1002,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.147"
+                "->": ".^.^.^.173"
               },
               null
             ]
@@ -938,7 +1027,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.154"
+                "->": ".^.^.^.180"
               },
               null
             ]
@@ -968,7 +1057,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.164"
+                "->": ".^.^.^.190"
               },
               null
             ]
@@ -993,7 +1082,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.171"
+                "->": ".^.^.^.197"
               },
               null
             ]
@@ -1020,7 +1109,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.180"
+                "->": ".^.^.^.206"
               },
               null
             ]
@@ -1045,7 +1134,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.187"
+                "->": ".^.^.^.213"
               },
               null
             ]
@@ -1074,7 +1163,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.197"
+                "->": ".^.^.^.223"
               },
               null
             ]
@@ -1103,7 +1192,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.207"
+                "->": ".^.^.^.233"
               },
               null
             ]
@@ -1137,7 +1226,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.220"
+                "->": ".^.^.^.246"
               },
               null
             ]
@@ -1166,7 +1255,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.230"
+                "->": ".^.^.^.256"
               },
               null
             ]
@@ -1200,7 +1289,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.243"
+                "->": ".^.^.^.269"
               },
               null
             ]
@@ -1234,7 +1323,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.256"
+                "->": ".^.^.^.282"
               },
               null
             ]
@@ -1263,7 +1352,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.266"
+                "->": ".^.^.^.292"
               },
               null
             ]
@@ -1297,7 +1386,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.279"
+                "->": ".^.^.^.305"
               },
               null
             ]
@@ -1322,7 +1411,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.286"
+                "->": ".^.^.^.312"
               },
               null
             ]
@@ -1347,7 +1436,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.293"
+                "->": ".^.^.^.319"
               },
               null
             ]
@@ -1381,7 +1470,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.305"
+                "->": ".^.^.^.331"
               },
               null
             ]
@@ -1406,7 +1495,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.312"
+                "->": ".^.^.^.338"
               },
               null
             ]
@@ -1431,7 +1520,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.319"
+                "->": ".^.^.^.345"
               },
               null
             ]
@@ -1461,7 +1550,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.329"
+                "->": ".^.^.^.355"
               },
               null
             ]
@@ -1491,7 +1580,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.339"
+                "->": ".^.^.^.365"
               },
               null
             ]
@@ -1516,7 +1605,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.346"
+                "->": ".^.^.^.372"
               },
               null
             ]
@@ -1546,7 +1635,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.356"
+                "->": ".^.^.^.382"
               },
               null
             ]
@@ -1576,7 +1665,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.366"
+                "->": ".^.^.^.392"
               },
               null
             ]
@@ -1601,7 +1690,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.373"
+                "->": ".^.^.^.399"
               },
               null
             ]
@@ -1631,7 +1720,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.383"
+                "->": ".^.^.^.409"
               },
               null
             ]
@@ -1661,7 +1750,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.393"
+                "->": ".^.^.^.419"
               },
               null
             ]
@@ -1686,7 +1775,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.400"
+                "->": ".^.^.^.426"
               },
               null
             ]
@@ -1711,7 +1800,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.407"
+                "->": ".^.^.^.433"
               },
               null
             ]
@@ -1741,7 +1830,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.417"
+                "->": ".^.^.^.443"
               },
               null
             ]
@@ -1775,7 +1864,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.430"
+                "->": ".^.^.^.456"
               },
               null
             ]
@@ -1805,7 +1894,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.440"
+                "->": ".^.^.^.466"
               },
               null
             ]
@@ -1830,7 +1919,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.447"
+                "->": ".^.^.^.473"
               },
               null
             ]
@@ -1860,7 +1949,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.457"
+                "->": ".^.^.^.483"
               },
               null
             ]
@@ -1894,7 +1983,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.470"
+                "->": ".^.^.^.496"
               },
               null
             ]
@@ -1928,7 +2017,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.483"
+                "->": ".^.^.^.509"
               },
               null
             ]
@@ -1958,7 +2047,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.493"
+                "->": ".^.^.^.519"
               },
               null
             ]
@@ -1988,7 +2077,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.503"
+                "->": ".^.^.^.529"
               },
               null
             ]
@@ -2018,7 +2107,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.513"
+                "->": ".^.^.^.539"
               },
               null
             ]
@@ -2043,7 +2132,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.520"
+                "->": ".^.^.^.546"
               },
               null
             ]
@@ -2085,7 +2174,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.537"
+                "->": ".^.^.^.563"
               },
               null
             ]
@@ -2119,7 +2208,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.550"
+                "->": ".^.^.^.576"
               },
               null
             ]
@@ -2219,7 +2308,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.560"
+                "->": ".^.^.^.586"
               },
               null
             ]
@@ -2244,7 +2333,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.567"
+                "->": ".^.^.^.593"
               },
               null
             ]
@@ -2274,7 +2363,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.577"
+                "->": ".^.^.^.603"
               },
               null
             ]
@@ -2308,7 +2397,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.589"
+                "->": ".^.^.^.615"
               },
               null
             ]
@@ -2333,7 +2422,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.596"
+                "->": ".^.^.^.622"
               },
               null
             ]
@@ -2363,7 +2452,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.606"
+                "->": ".^.^.^.632"
               },
               null
             ]
@@ -2397,7 +2486,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.619"
+                "->": ".^.^.^.645"
               },
               null
             ]
@@ -2426,7 +2515,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.629"
+                "->": ".^.^.^.655"
               },
               null
             ]
@@ -2455,7 +2544,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.639"
+                "->": ".^.^.^.665"
               },
               null
             ]
@@ -2489,7 +2578,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.652"
+                "->": ".^.^.^.678"
               },
               null
             ]
@@ -2519,7 +2608,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.662"
+                "->": ".^.^.^.688"
               },
               null
             ]
@@ -2544,7 +2633,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.669"
+                "->": ".^.^.^.695"
               },
               null
             ]
@@ -2578,7 +2667,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.681"
+                "->": ".^.^.^.707"
               },
               null
             ]
@@ -2603,7 +2692,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.688"
+                "->": ".^.^.^.714"
               },
               null
             ]
@@ -2632,7 +2721,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.698"
+                "->": ".^.^.^.724"
               },
               null
             ]
@@ -2657,7 +2746,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.705"
+                "->": ".^.^.^.731"
               },
               null
             ]
@@ -2682,7 +2771,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.712"
+                "->": ".^.^.^.738"
               },
               null
             ]
@@ -2719,7 +2808,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.727"
+                "->": ".^.^.^.753"
               },
               null
             ]
@@ -2744,7 +2833,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.734"
+                "->": ".^.^.^.760"
               },
               null
             ]
@@ -2778,7 +2867,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.747"
+                "->": ".^.^.^.773"
               },
               null
             ]
@@ -2807,7 +2896,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.757"
+                "->": ".^.^.^.783"
               },
               null
             ]
@@ -2832,7 +2921,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.764"
+                "->": ".^.^.^.790"
               },
               null
             ]
@@ -2857,7 +2946,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.771"
+                "->": ".^.^.^.797"
               },
               null
             ]
@@ -2887,7 +2976,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.781"
+                "->": ".^.^.^.807"
               },
               null
             ]
@@ -2917,7 +3006,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.791"
+                "->": ".^.^.^.817"
               },
               null
             ]
@@ -2942,7 +3031,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.798"
+                "->": ".^.^.^.824"
               },
               null
             ]
@@ -2971,7 +3060,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.808"
+                "->": ".^.^.^.834"
               },
               null
             ]
@@ -3009,7 +3098,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.824"
+                "->": ".^.^.^.850"
               },
               null
             ]
@@ -3036,7 +3125,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.833"
+                "->": ".^.^.^.859"
               },
               null
             ]
@@ -3065,7 +3154,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.843"
+                "->": ".^.^.^.869"
               },
               null
             ]
@@ -3090,7 +3179,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.850"
+                "->": ".^.^.^.876"
               },
               null
             ]
@@ -3119,7 +3208,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.861"
+                "->": ".^.^.^.887"
               },
               null
             ]
@@ -3148,7 +3237,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.872"
+                "->": ".^.^.^.898"
               },
               null
             ]
@@ -4889,9 +4978,250 @@
         "done",
         {
           "again": [
+            "ev",
+            {
+              "VAR?": "bunny_friend"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.friend"
+                  },
+                  {
+                    "->": ".^.^.^.4"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
             "^The clover up here is extra sweet. Want some? ",
             "#",
             "^speaker: Ribbon Bunny",
+            "/#",
+            "\n",
+            "ev",
+            {
+              "VAR?": "has_flute"
+            },
+            "/ev",
+            [
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "^ ",
+                  {
+                    "->": ".^.^.^.^.bond"
+                  },
+                  {
+                    "->": ".^.^.^.15"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
+            "done",
+            null
+          ],
+          "bond": [
+            [
+              "ev",
+              "str",
+              "^Smooth her ribbon",
+              "/str",
+              {
+                "VAR?": "bunny_petted"
+              },
+              "!",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Share a snack",
+              "/str",
+              {
+                "VAR?": "bunny_fed"
+              },
+              "!",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 5
+              },
+              "ev",
+              "str",
+              "^Wave bye",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-2",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "bunny_petted",
+                    "re": true
+                  },
+                  "^Fae gently smooths the silky ribbon between her ears. Her nose gives a happy twitch! ",
+                  "#",
+                  "^speaker: Fae",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "ev",
+                  {
+                    "x()": "snacks"
+                  },
+                  0,
+                  "==",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "\n",
+                        "^I'm out of snacks. The bakery sells them, and the clubhouse garden grows strawberries. ",
+                        "#",
+                        "^speaker: Fae",
+                        "/#",
+                        "\n",
+                        "done",
+                        {
+                          "->": ".^.^.^.7"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "\n",
+                  "ev",
+                  true,
+                  "/ev",
+                  {
+                    "VAR=": "bunny_fed",
+                    "re": true
+                  },
+                  "^Fae shares a snack. She nibbles it happily with her ears bobbing! ",
+                  "#",
+                  "^speaker: Fae ",
+                  "/#",
+                  "#",
+                  "^feed: snack 1",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "c-2": [
+                  "\n",
+                  "^Hop, hop! ",
+                  "#",
+                  "^speaker: Ribbon Bunny",
+                  "/#",
+                  "\n",
+                  "done",
+                  {
+                    "->": ".^.^.g-0"
+                  },
+                  null
+                ],
+                "g-0": [
+                  "ev",
+                  {
+                    "VAR?": "bunny_petted"
+                  },
+                  {
+                    "VAR?": "bunny_fed"
+                  },
+                  "&&",
+                  "/ev",
+                  [
+                    {
+                      "->": ".^.b",
+                      "c": true
+                    },
+                    {
+                      "b": [
+                        "^ ",
+                        {
+                          "->": "bunny_calm.befriend"
+                        },
+                        {
+                          "->": ".^.^.^.6"
+                        },
+                        null
+                      ]
+                    }
+                  ],
+                  "nop",
+                  "\n",
+                  {
+                    "->": ".^.^.^"
+                  },
+                  null
+                ]
+              }
+            ],
+            null
+          ],
+          "befriend": [
+            "ev",
+            true,
+            "/ev",
+            {
+              "VAR=": "bunny_friend",
+              "re": true
+            },
+            "^Ribbon Bunny does a happy twirl around Fae's boots, her ribbon fluttering! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "^She's my friend now! When I play my flute, she'll come hopping right over. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "friend": [
+            "^Hop, hop! Ribbon Bunny wiggles her nose at me like we're old friends! ",
+            "#",
+            "^speaker: Fae",
             "/#",
             "\n",
             "done",
@@ -14367,6 +14697,10 @@
             "VAR?": "squirrel_friend"
           },
           "||",
+          {
+            "VAR?": "bunny_friend"
+          },
+          "||",
           "!",
           "/ev",
           [
@@ -14381,7 +14715,7 @@
                   "->": "flute.nobody"
                 },
                 {
-                  "->": ".^.^.^.15"
+                  "->": ".^.^.^.17"
                 },
                 null
               ]
@@ -14449,11 +14783,40 @@
           },
           "ev",
           "str",
+          "^Call Ribbon Bunny",
+          "/str",
+          {
+            "VAR?": "bunny_friend"
+          },
+          {
+            "VAR?": "bunny_with_me"
+          },
+          "!",
+          "&&",
+          "/ev",
+          {
+            "*": ".^.c-4",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Send Ribbon Bunny home",
+          "/str",
+          {
+            "VAR?": "bunny_with_me"
+          },
+          "/ev",
+          {
+            "*": ".^.c-5",
+            "flg": 5
+          },
+          "ev",
+          "str",
           "^Just play",
           "/str",
           "/ev",
           {
-            "*": ".^.c-4",
+            "*": ".^.c-6",
             "flg": 4
           },
           {
@@ -14526,6 +14889,40 @@
               null
             ],
             "c-4": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "bunny_with_me",
+                "re": true
+              },
+              "^Hop, hop! Ribbon Bunny bounds right up, her ribbon fluttering! ",
+              "#",
+              "^speaker: Ribbon Bunny",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-5": [
+              "\n",
+              "ev",
+              false,
+              "/ev",
+              {
+                "VAR=": "bunny_with_me",
+                "re": true
+              },
+              "^See you soon! Ribbon Bunny hops back toward the clover, waving an ear. ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-6": [
               "\n",
               "done",
               null
@@ -15433,6 +15830,31 @@
               "^speaker: Fae",
               {
                 "->": ".^.^.^.77"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_reward_all"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Grandpa Barnaby's Rainbow Star Geode! All seven Star Gems sparkle inside like a tiny galaxy. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.84"
               },
               null
             ]
@@ -17731,6 +18153,159 @@
         ],
         "nop",
         "\n",
+        [
+          "ev",
+          {
+            "f()": "gem_count"
+          },
+          7,
+          ">=",
+          {
+            "VAR?": "gem_reward_all"
+          },
+          "!",
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_reward_all",
+                "re": true
+              },
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_reward_3",
+                "re": true
+              },
+              "^Well bless my teacup! You found ALL SEVEN Star Gems across Cloverhollow! Take these fifty coins for your grand treasure hunt! ",
+              "#",
+              "^speaker: Grandpa Barnaby ",
+              "/#",
+              "#",
+              "^gift: coins 50",
+              "/#",
+              "\n",
+              "^And keep this Rainbow Star Geode for your clubhouse chest, along with a pair of warm snacks for the road! ",
+              "#",
+              "^speaker: Grandpa Barnaby ",
+              "/#",
+              "#",
+              "^gift: snack 2 ",
+              "/#",
+              "#",
+              "^sound: chime-red",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.49"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "f()": "gem_count"
+          },
+          3,
+          ">=",
+          {
+            "VAR?": "gem_reward_3"
+          },
+          "!",
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_reward_3",
+                "re": true
+              },
+              "^My word, you've already found ",
+              "ev",
+              {
+                "f()": "gem_count"
+              },
+              "out",
+              "/ev",
+              "^ gleaming Star Gems! Here are fifteen coins to cheer you on! ",
+              "#",
+              "^speaker: Grandpa Barnaby ",
+              "/#",
+              "#",
+              "^gift: coins 15 ",
+              "/#",
+              "#",
+              "^sound: chime-yellow",
+              "/#",
+              "\n",
+              "^Legend says seven Star Gems are tucked across Cloverhollow's lands, waiting for curious eyes and clever friends. ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.49"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "f()": "gem_count"
+          },
+          0,
+          ">",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^I hear you've gathered ",
+              "ev",
+              {
+                "f()": "gem_count"
+              },
+              "out",
+              "/ev",
+              "^ of 7 Star Gems so far! Keep shining your lantern and bringing your animal friends along! ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.49"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "done",
         null
       ],
@@ -17873,6 +18448,1141 @@
         "\n",
         "done",
         null
+      ],
+      "gem_count": [
+        "ev",
+        0,
+        "/ev",
+        {
+          "temp=": "total"
+        },
+        "ev",
+        {
+          "VAR?": "gem_park"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_bay"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_trail"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.20"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_pass"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.26"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_cavern"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.32"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_woods"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.38"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "gem_hills"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "ev",
+              {
+                "VAR?": "total"
+              },
+              1,
+              "+",
+              {
+                "temp=": "total",
+                "re": true
+              },
+              "/ev",
+              {
+                "->": ".^.^.^.44"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "ev",
+        {
+          "VAR?": "total"
+        },
+        "/ev",
+        "~ret",
+        null
+      ],
+      "park_gem": [
+        "ev",
+        {
+          "VAR?": "gem_park"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.after"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Whoa! Under the blacklight lantern, a faceted lavender crystal glows right out of the north meadow clover! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "gem_park",
+          "re": true
+        },
+        "^Fae scoops up the Amethyst Star Gem! Its facets shimmer softly, and five shiny coins clink beneath it! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^sound: chime-blue ",
+        "/#",
+        "#",
+        "^gift: coins 5",
+        "/#",
+        "\n",
+        "done",
+        {
+          "after": [
+            "^Soft lavender sparkles linger in the north meadow clover where the Amethyst Star Gem rested. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "bay_gem": [
+        [
+          "ev",
+          {
+            "VAR?": "gem_bay"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "bay_gem.after"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Something bright aqua glitters out in the rocky tide pool surf! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ The waves are way too deep to wade out there on my own. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.16"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Fetch it, boy!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Splash! Pond Pup bounds into the sparkling tide pool and paddles straight out! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_bay",
+                "re": true
+              },
+              "^He trots back onto the sand carrying the Aqua Star Gem, with five sunny coins tucked beside it! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^sound: chime-blue ",
+              "/#",
+              "#",
+              "^gift: coins 5",
+              "/#",
+              "\n",
+              "^Good boy, Pond Pup! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The rocky tide pool shimmers in the breeze. Pond Pup's happy paw prints dot the wet sand. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "trail_gem": [
+        [
+          "ev",
+          {
+            "VAR?": "gem_trail"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.after"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^A cozy little burrow tucks under the cliffside rocks, and a sunny yellow sparkle glints deep inside! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "bunny_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ The burrow is way too tiny for my hand, just the right size for a clever bunny! ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.16"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "bunny_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Hop in, Ribbon Bunny!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Ribbon Bunny twitches her nose, zips straight down the rocky burrow, and pops back out! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_trail",
+                "re": true
+              },
+              "^She rolls the gleaming Citrine Star Gem right to Fae's boots, along with five shiny coins! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^sound: chime-yellow ",
+              "/#",
+              "#",
+              "^gift: coins 5",
+              "/#",
+              "\n",
+              "^Way to go, Ribbon Bunny! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The cozy cliffside burrow is quiet and soft with clover. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "pass_gem": [
+        [
+          "ev",
+          {
+            "VAR?": "gem_pass"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": "pass_gem.after"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^High up on a snow-dusted pine branch, an icy blue crystal catches the mountain sun! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "has_lasso"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ It's way too high up in the pine needles to reach by hand. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.16"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "has_lasso"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Loop it down!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Fae twirls Coach Ash's lasso and loops the sparkling branch cleanly! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_pass",
+                "re": true
+              },
+              "^Down tumbles the Frost Star Gem into the soft snow, along with five glittering coins! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^sound: chime-blue ",
+              "/#",
+              "#",
+              "^gift: coins 5",
+              "/#",
+              "\n",
+              "^Nice catch! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The snow-dusted pine branch sways gently in the crisp mountain air. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "cavern_gem": [
+        "ev",
+        {
+          "VAR?": "gem_cavern"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.after"
+              },
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^In the blacklight glow, a secret prism pocket sparkles along the east crystal grotto floor! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "gem_cavern",
+          "re": true
+        },
+        "^Fae lifts out the Prism Star Gem! Rainbow light dances across the cavern walls, and five bright coins shine beside it! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^sound: chime-red ",
+        "/#",
+        "#",
+        "^gift: coins 5",
+        "/#",
+        "\n",
+        "done",
+        {
+          "after": [
+            "^Faint rainbow glints dance across the east crystal grotto floor. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "woods_gem": [
+        [
+          "ev",
+          {
+            "VAR?": "gem_woods"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.after"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^High up in a mossy tree hollow on the east edge of the clearing, a warm golden gem winks down! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ That mossy hollow is way up in the branches, too high to climb. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.16"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "squirrel_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Climb up, buddy!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Chitter-chitter! Acorn Squirrel zips up the mossy bark and peeks into the hollow! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_woods",
+                "re": true
+              },
+              "^He scampers back down with the glowing Amber Star Gem and five shiny coins! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^sound: chime-yellow ",
+              "/#",
+              "#",
+              "^gift: coins 5",
+              "/#",
+              "\n",
+              "^Awesome climb, buddy! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The mossy tree hollow on the east side of the clearing is cozy and empty now. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "hills_gem": [
+        [
+          "ev",
+          {
+            "VAR?": "gem_hills"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.after"
+                },
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "^Tucked beside the meadow boulders is a clover-fringed burrow with a bright green twinkle inside! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "bunny_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ It's way too narrow for me to reach in, but a nimble little bunny could hop right through! ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.16"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "bunny_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Hop in, Ribbon Bunny!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Ribbon Bunny gives a cheerful hop and wiggles straight down the clover burrow! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "gem_hills",
+                "re": true
+              },
+              "^She pops right back out with the sparkling Clover Star Gem and five shiny coins! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^sound: chime-green ",
+              "/#",
+              "#",
+              "^gift: coins 5",
+              "/#",
+              "\n",
+              "^Best bunny explorer ever! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^Soft four-leaf clovers sway beside the meadow boulder burrow. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
       ],
       "global decl": [
         "ev",
@@ -18273,6 +19983,58 @@
         false,
         {
           "VAR=": "barnaby_gift"
+        },
+        false,
+        {
+          "VAR=": "bunny_petted"
+        },
+        false,
+        {
+          "VAR=": "bunny_fed"
+        },
+        false,
+        {
+          "VAR=": "bunny_friend"
+        },
+        false,
+        {
+          "VAR=": "bunny_with_me"
+        },
+        false,
+        {
+          "VAR=": "gem_park"
+        },
+        false,
+        {
+          "VAR=": "gem_bay"
+        },
+        false,
+        {
+          "VAR=": "gem_trail"
+        },
+        false,
+        {
+          "VAR=": "gem_pass"
+        },
+        false,
+        {
+          "VAR=": "gem_cavern"
+        },
+        false,
+        {
+          "VAR=": "gem_woods"
+        },
+        false,
+        {
+          "VAR=": "gem_hills"
+        },
+        false,
+        {
+          "VAR=": "gem_reward_3"
+        },
+        false,
+        {
+          "VAR=": "gem_reward_all"
         },
         "/ev",
         "end",

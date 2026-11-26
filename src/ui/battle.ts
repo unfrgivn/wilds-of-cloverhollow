@@ -2,7 +2,7 @@ import "./battle.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
 import { feelingMarkup, heartMarkup, icon } from "./icons";
-import type { BattleTalk, ChainLook, FeelingId } from "../core";
+import type { BattleTalk, ChainLook, FeelingId, FluteAssistKind } from "../core";
 import type { DialogueView } from "./sticker";
 
 /** Project battle Talk's core dialogue state onto the shared sticker dialogue. */
@@ -36,7 +36,7 @@ export type BattleHudView = {
   calm: number;
   critterName: string;
   sparkle: { count: number; max: number; ready: boolean } | null;
-  fluteAssist: { available: boolean; label: string; kind: "pup" | "squirrel" | "both" } | null;
+  fluteAssist: { available: boolean; label: string; kind: FluteAssistKind } | null;
   burstSoften: number;
 };
 

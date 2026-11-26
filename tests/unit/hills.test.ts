@@ -42,8 +42,8 @@ describe("Clover Hills", () => {
   });
 
   it("puts a gentle squirrel cache at the upper-right lookout", () => {
-    expect(hills.interactables).toEqual([{
+    expect(hills.interactables).toContainEqual({
       id: "lookout-cache", knot: "hills_lookout", point: { x: 1130, y: 345 }, prompt: "Look",
-    }]);
+    });
   });
 });

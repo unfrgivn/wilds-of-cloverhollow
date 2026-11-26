@@ -90,7 +90,7 @@ function compileStory(source: string): Record<string, unknown> {
 describe("Sue in the roster", () => {
   it("rosters Sue after Maddie: not there at the start, joins with sue_joined, brings Cast", () => {
     expect(Object.keys(world.party)).toEqual(["maddie", "sue", "jordan", "pond-pup",
-      "acorn-squirrel"]);
+      "acorn-squirrel", "ribbon-bunny"]);
     expect(world.party["sue"]).toMatchObject({
       id: "sue",
       name: "Sue",

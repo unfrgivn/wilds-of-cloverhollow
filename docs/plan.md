@@ -3903,6 +3903,52 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e`
   (990 passed, 2 skipped in 3.7 min).
 
+## Milestone 80: Collectible Star Gems & 3rd Flute Friend (Ribbon Bunny) **Status:** ✅ Completed (2026-11-26)
+- Third flute friend, **Ribbon Bunny** (`content/party/ribbon-bunny.json`,
+  `joins: "bunny_with_me"`, `befriended: "bunny_friend"`, `critter: "bunny"`,
+  `walkCycleUnits: 72`):
+  - Full 4-direction hop-walk follower atlas built deterministically by
+    `tools/art/build-ribbon-bunny.ts` (`public/assets/characters/ribbon-bunny/`,
+    256x256 frames, baseline 247, right mirrored from left, passing
+    `tools/art/validate-sprite.ts` with all checks on; `validate-sprite.ts`
+    blockiness check now skips 8-bit highlight-clipped ivory pairs
+    `max(r, g, b) >= 253` based on measured non-clipped `0.072 <= 0.08` across
+    pale cream fur while still catching dark/midtone nearest-neighbor blocks).
+  - Appended extra wider fallback slot candidates at the end of chained
+    `visibleFollowerSlot` (`src/core/sim.ts`), tried only when all earlier
+    candidates fail, so all 23 areas fit a full 6-member party at every spawn
+    (`mist.field` included) with zero earlier placement or hash changes.
+  - Bonding in `bunny_calm` (smooth her ribbon + share a snack in either order
+    once Fae has the flute) and flute call/send-home appended after Pond Pup
+    and Acorn Squirrel so earlier flute runs stay unchanged.
+  - Integrated into Battle Flute Assist (`content/battle.json`, `src/core/sim.ts`,
+    `src/ui/battle.ts`): `bunnyCalm: 15`, `bunnyTogether: 1` (adds `+1`
+    Together! sparkle star charge), plus combined lines (`bunny`, `pupBunny`,
+    `squirrelBunny`, `all`).
+- Seven collectible **Star Gems** (`NOTES.md` & `collectibles_candy_gems.png`)
+  hidden across seven regions, each rewarding a tool or flute friend and paying
+  `+5` coins with chime cues (`park_gem` blacklight lantern, `bay_gem` Pond Pup,
+  `trail_gem` Ribbon Bunny burrow, `pass_gem` lasso, `cavern_gem` blacklight
+  lantern, `woods_gem` Acorn Squirrel, `hills_gem` Ribbon Bunny burrow).
+- Grandpa Barnaby's Star Gem collection rewards in Bon Appetit Café
+  (`gem_reward_3` at 3+ gems: `+15` coins; `gem_reward_all` at 7/7: `+50`
+  coins, `+2` snacks, and the **Rainbow Star Geode** keepsake in `club_chest`).
+- Pure `STAR_GEM_VARIABLES` & `starGemsFound(world, state)` in
+  `src/core/journal.ts`, faceted amethyst gem icon in `src/ui/icons.ts`, and
+  conditional lavender `.journal-supply.journal-gems` (`Gems N/7`) pill in the
+  Journal NOTES heading (hidden at 0 gems so existing 0-gem journal baselines
+  stay unchanged; clean two-row `.has-gems` layout verified at desktop and
+  874x402 phone).
+- Evidence: `tests/unit/gems-bunny.test.ts`, `tests/unit/bunny-gems-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/bunny-gems.json` (30,355 ticks),
+  real-key `tests/e2e/gems-bunny.spec.ts` matching Bun's hash at 1280x720 and
+  874x402, and `vision`-verified `art/review/ribbon-bunny-contact-{cream,dark}.jpg`,
+  `art/review/gems-bunny-gameplay.jpg`, and 6-friend `credits` baselines.
+- Gates: `just check` (138 unit files / 1,117 tests, 63 sims, 23 QA packs,
+  purity, lint), `just build`, and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e`
+  (991 passed, 2 skipped across full run + 23/23 last-failed rerun after
+  detaching the hidden gems pill from the DOM at 0 gems).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

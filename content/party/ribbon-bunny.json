@@ -1,0 +1,17 @@
+{
+  "id": "ribbon-bunny",
+  "name": "Ribbon Bunny",
+  "atlas": "assets/characters/ribbon-bunny/ribbon-bunny.json",
+  "box": {
+    "width": 40,
+    "height": 56
+  },
+  "walkCycleUnits": 72,
+  "sits": true,
+  "start": false,
+  "joins": "bunny_with_me",
+  "befriended": "bunny_friend",
+  "flute": true,
+  "critter": "bunny",
+  "command": null
+}

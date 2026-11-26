@@ -21,6 +21,7 @@ import type {
   CheckState,
   Critter,
   FeelingId,
+  FluteAssistKind,
   Grade,
   PresentCritter,
   SetPiece,
@@ -1030,6 +1031,21 @@ function togetherCalm(world: World, state: State, result: Grade): number {
   return Math.round(teamPower * 0.5);
 }
 
+function fluteAssistKind(
+  hasPup: boolean,
+  hasSquirrel: boolean,
+  hasBunny: boolean,
+): FluteAssistKind | null {
+  if (hasPup && hasSquirrel && hasBunny) return "all";
+  if (hasPup && hasSquirrel) return "both";
+  if (hasPup && hasBunny) return "pupBunny";
+  if (hasSquirrel && hasBunny) return "squirrelBunny";
+  if (hasPup) return "pup";
+  if (hasSquirrel) return "squirrel";
+  if (hasBunny) return "bunny";
+  return null;
+}
+
 function fluteAssistView(
   world: World,
   state: State,
@@ -1039,9 +1055,16 @@ function fluteAssistView(
   if (world.storyVariable(state.ink, "has_flute") !== true) return null;
   const hasPup = world.storyVariable(state.ink, "pup_friend") === true;
   const hasSquirrel = world.storyVariable(state.ink, "squirrel_friend") === true;
-  if (!hasPup && !hasSquirrel) return null;
-  const kind = hasPup && hasSquirrel ? "both" : hasPup ? "pup" : "squirrel";
-  const label = kind === "both" ? "Flute Friends" : kind === "pup" ? "Pond Pup" : "Acorn Squirrel";
+  const hasBunny = world.storyVariable(state.ink, "bunny_friend") === true;
+  const kind = fluteAssistKind(hasPup, hasSquirrel, hasBunny);
+  if (kind === null) return null;
+  const label = kind === "pup"
+    ? "Pond Pup"
+    : kind === "squirrel"
+      ? "Acorn Squirrel"
+      : kind === "bunny"
+        ? "Ribbon Bunny"
+        : "Flute Friends";
   const available = battle.fluteUsed !== true && !inTalkMode(battle, critter) &&
     battle.phase === "command";
   return { available, label, kind };
@@ -1552,24 +1575,29 @@ function battleStep(
         world.storyVariable(state.ink, "has_flute") === true) {
       const hasPup = world.storyVariable(state.ink, "pup_friend") === true;
       const hasSquirrel = world.storyVariable(state.ink, "squirrel_friend") === true;
-      if (hasPup || hasSquirrel) {
+      const hasBunny = world.storyVariable(state.ink, "bunny_friend") === true;
+      const kind = fluteAssistKind(hasPup, hasSquirrel, hasBunny);
+      if (kind !== null) {
         const assist = world.battle.fluteAssist;
-        const calmGain = hasPup ? assist.pupCalm : 0;
+        const calmGain = (hasPup ? assist.pupCalm : 0) + (hasBunny ? assist.bunnyCalm : 0);
         const energyGain = hasSquirrel ? assist.squirrelEnergy : 0;
         const softenGain = hasSquirrel ? assist.squirrelSoften : 0;
+        const togetherGain = hasBunny && battleParty(world, state.party).length >= 2
+          ? assist.bunnyTogether
+          : 0;
         const nextCalm = Math.min(calmLimit(critter), next.calm + calmGain);
         const nextEnergy = Math.min(critter.energyMax, next.energy + energyGain);
-        const line = hasPup && hasSquirrel
-          ? assist.lines.both
-          : hasPup
-            ? assist.lines.pup
-            : assist.lines.squirrel;
+        const nextSparkleCount = togetherGain > 0
+          ? Math.min(world.battle.together.chargeMax, (next.sparkle ?? 0) + togetherGain)
+          : next.sparkle;
+        const line = assist.lines[kind];
         const updated: Battle = {
           ...next,
           calm: nextCalm,
           energy: nextEnergy,
           fluteUsed: true,
           ...(softenGain > 0 ? { burstSoften: (next.burstSoften ?? 0) + softenGain } : {}),
+          ...(nextSparkleCount !== undefined ? { sparkle: nextSparkleCount } : {}),
         };
         if (nextCalm >= critter.calmMax)
           return {
@@ -2207,6 +2235,18 @@ export function visibleFollowerSlot(
       x: leader.x - vector.x * slot,
       y: leader.y - vector.y * slot,
     });
+  }
+  if (chained) {
+    // Extra fallback offsets for 6-member chains in narrow corridors (e.g. mist.field),
+    // tried only after every existing candidate so 1-to-5 placements stay identical.
+    for (const dx of [96, 120, 144, 168, 210]) {
+      for (const dy of [-16, 16, -36, 36]) {
+        candidates.push(
+          { x: leader.x + sign * dx, y: leader.y + dy },
+          { x: leader.x - sign * dx, y: leader.y + dy },
+        );
+      }
+    }
   }
   return candidates.find((point) => {
     if (

@@ -110,11 +110,14 @@ const joinedInk = (ink: string, knot: string): string => {
   }
   throw new Error(`Could not complete gallery knot ${knot}`);
 };
-// The largest credits: every friend Fae can make (Sue and Jordan join, and both
-// flute friends are befriended) and every sticker in the catalogue.
+// The largest credits: every friend Fae can make (Sue and Jordan join, and all
+// three flute friends are befriended) and every sticker in the catalogue.
 const joinedState = state === "credits"
-  ? { ...creditsBase, ink: ["sue", "jordan", "pup_calm.befriend", "squirrel_calm.befriend"]
-      .reduce(joinedInk, creditsBase.ink) }
+  ? {
+      ...creditsBase,
+      ink: ["sue", "jordan", "pup_calm.befriend", "squirrel_calm.befriend", "bunny_calm.befriend"]
+        .reduce(joinedInk, creditsBase.ink),
+    }
   : creditsBase;
 const creditsGameState = {
   ...joinedState,

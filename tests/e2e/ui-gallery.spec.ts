@@ -100,7 +100,14 @@ test.describe("sticker gallery", () => {
         // The largest credits: every friend Fae can make, and the whole catalogue.
         if (state === "credits") {
           await expect(page.locator(".credits-entry-friends .credits-entry-name"))
-            .toHaveText(["Maddie", "Sue", "Jordan", "Pond Pup", "Acorn Squirrel"]);
+            .toHaveText([
+              "Maddie",
+              "Sue",
+              "Jordan",
+              "Pond Pup",
+              "Acorn Squirrel",
+              "Ribbon Bunny",
+            ]);
           const stickers: { catalogue: unknown[] } = JSON.parse(
             readFileSync("content/stickers.json", "utf8"),
           );

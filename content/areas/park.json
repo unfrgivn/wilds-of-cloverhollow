@@ -4,6 +4,18 @@
   "width": 1500,
   "height": 1000,
   "ground": "park",
+  "glows": [
+    {
+      "id": "park-gem-glow",
+      "frame": "bluebell_4",
+      "point": {
+        "x": 540,
+        "y": 315
+      },
+      "knot": "park_gem",
+      "prompt": "Look"
+    }
+  ],
   "walkable": [
     [
       150,

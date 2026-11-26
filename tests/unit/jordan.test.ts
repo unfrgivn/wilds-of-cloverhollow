@@ -72,7 +72,7 @@ function talk(state: State, choice: number): State {
 describe("Jordan in the roster", () => {
   it("rosters Jordan after Sue: joins with jordan_joined and brings Juggle", () => {
     expect(Object.keys(world.party)).toEqual(["maddie", "sue", "jordan", "pond-pup",
-      "acorn-squirrel"]);
+      "acorn-squirrel", "ribbon-bunny"]);
     expect(world.party["jordan"]).toMatchObject({
       id: "jordan",
       name: "Jordan",

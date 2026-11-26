@@ -83,6 +83,9 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{gem_reward_all: Grandpa Barnaby gifted me his Rainbow Star Geode for finding all seven Star Gems across Cloverhollow! # speaker: Fae}
+{gem_count() > 0 and not gem_reward_all: I've found {gem_count()} of Cloverhollow's 7 Star Gems! Grandpa Barnaby at Bon Appetit Cafe loves hearing about them. # speaker: Fae}
+{bunny_friend: Ribbon Bunny is my friend! When I play my flute, she comes hopping right over. # speaker: Fae}
 {spice_returned: I found Chef Bea's Star Cinnamon tin in Meadow Park and earned a golden Bon Appetit Star Pin! # speaker: Fae}
 {spice_found and not spice_returned: I found Chef Bea's Star Cinnamon tin in Meadow Park! Time to bring it back to Bon Appetit Cafe. # speaker: Fae}
 {spice_quest and not spice_found: Chef Bea at Bon Appetit Cafe lost her Star Cinnamon tin in Meadow Park. A fizzy raccoon dropped it near the picnic blanket! # speaker: Fae}
@@ -454,7 +457,34 @@ A kid in a purple hood zipped by, and everything went all fizzy! # speaker: Ribb
 That hooded kid again! # speaker: Fae
 -> DONE
 = again
+{bunny_friend: -> friend}
 The clover up here is extra sweet. Want some? # speaker: Ribbon Bunny
+{has_flute: -> bond}
+-> DONE
+// Smoothing her ribbon and sharing a snack make a friend (Milestone 80), in either order.
+= bond
++ {not bunny_petted} [Smooth her ribbon]
+    ~ bunny_petted = true
+    Fae gently smooths the silky ribbon between her ears. Her nose gives a happy twitch! # speaker: Fae
++ {not bunny_fed} [Share a snack]
+    {snacks() == 0:
+        I'm out of snacks. The bakery sells them, and the clubhouse garden grows strawberries. # speaker: Fae
+        -> DONE
+    }
+    ~ bunny_fed = true
+    Fae shares a snack. She nibbles it happily with her ears bobbing! # speaker: Fae # feed: snack 1
++ [Wave bye]
+    Hop, hop! # speaker: Ribbon Bunny
+    -> DONE
+- {bunny_petted and bunny_fed: -> befriend}
+-> bond
+= befriend
+~ bunny_friend = true
+Ribbon Bunny does a happy twirl around Fae's boots, her ribbon fluttering! # speaker: Fae
+She's my friend now! When I play my flute, she'll come hopping right over. # speaker: Fae
+-> DONE
+= friend
+Hop, hop! Ribbon Bunny wiggles her nose at me like we're old friends! # speaker: Fae
 -> DONE
 
 === squirrel_calm ===
@@ -1701,7 +1731,7 @@ VAR pond_tin = false
 // The flute (F) plays this: a friend called to Fae's side, or sent home.
 === flute ===
 Fae plays a little tune on her painted flute. # speaker: Fae # sound: flute
-{not (pup_friend or squirrel_friend): -> nobody}
+{not (pup_friend or squirrel_friend or bunny_friend): -> nobody}
 + {pup_friend and not pup_with_me} [Call the Pond Pup]
     ~ pup_with_me = true
     Woof! Woof! The Pond Pup comes running! # speaker: Pond Pup
@@ -1717,6 +1747,14 @@ Fae plays a little tune on her painted flute. # speaker: Fae # sound: flute
 + {squirrel_with_me} [Send the Acorn Squirrel home]
     ~ squirrel_with_me = false
     Off you go! The Acorn Squirrel bounds away, his tail bouncing. # speaker: Fae
+    -> DONE
++ {bunny_friend and not bunny_with_me} [Call Ribbon Bunny]
+    ~ bunny_with_me = true
+    Hop, hop! Ribbon Bunny bounds right up, her ribbon fluttering! # speaker: Ribbon Bunny
+    -> DONE
++ {bunny_with_me} [Send Ribbon Bunny home]
+    ~ bunny_with_me = false
+    See you soon! Ribbon Bunny hops back toward the clover, waving an ear. # speaker: Fae
     -> DONE
 + [Just play]
     -> DONE
@@ -1842,6 +1880,7 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {acorn_found: The golden acorn from the knothole in the big oak. The Acorn Squirrel found it! # speaker: Fae}
 {cavern_chime_rung: The shimmering star crystal from Crystal Cavern. It still hums when I hold it! # speaker: Fae}
 {spice_returned: Chef Bea's golden Bon Appetit Star Pin! It still smells faintly like warm cinnamon. # speaker: Fae}
+{gem_reward_all: Grandpa Barnaby's Rainbow Star Geode! All seven Star Gems sparkle inside like a tiny galaxy. # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -2211,6 +2250,19 @@ When I was your age, folks around Cloverhollow whispered storybook legends about
     ~ barnaby_gift = true
     Take these fifteen coins from an old storyteller, Fae. You've earned every single one keeping the valley peaceful! # speaker: Grandpa Barnaby # gift: coins 15
 }
+{
+- gem_count() >= 7 and not gem_reward_all:
+    ~ gem_reward_all = true
+    ~ gem_reward_3 = true
+    Well bless my teacup! You found ALL SEVEN Star Gems across Cloverhollow! Take these fifty coins for your grand treasure hunt! # speaker: Grandpa Barnaby # gift: coins 50
+    And keep this Rainbow Star Geode for your clubhouse chest, along with a pair of warm snacks for the road! # speaker: Grandpa Barnaby # gift: snack 2 # sound: chime-red
+- gem_count() >= 3 and not gem_reward_3:
+    ~ gem_reward_3 = true
+    My word, you've already found {gem_count()} gleaming Star Gems! Here are fifteen coins to cheer you on! # speaker: Grandpa Barnaby # gift: coins 15 # sound: chime-yellow
+    Legend says seven Star Gems are tucked across Cloverhollow's lands, waiting for curious eyes and clever friends. # speaker: Grandpa Barnaby
+- gem_count() > 0:
+    I hear you've gathered {gem_count()} of 7 Star Gems so far! Keep shining your lantern and bringing your animal friends along! # speaker: Grandpa Barnaby
+}
 -> DONE
 
 === bree ===
@@ -2246,4 +2298,149 @@ The little chalk drawings of steaming mugs are super cute. # speaker: Fae
 === cafe_window ===
 Sunlight pours through the arched window, looking right out over Cloverhollow Plaza's fountain and flower boxes! # speaker: Fae
 You can almost hear the water sparkling outside. # speaker: Fae
+-> DONE
+
+// A third flute friend & collectible Star Gems across Cloverhollow (Milestone 80).
+VAR bunny_petted = false
+VAR bunny_fed = false
+VAR bunny_friend = false
+VAR bunny_with_me = false
+VAR gem_park = false
+VAR gem_bay = false
+VAR gem_trail = false
+VAR gem_pass = false
+VAR gem_cavern = false
+VAR gem_woods = false
+VAR gem_hills = false
+VAR gem_reward_3 = false
+VAR gem_reward_all = false
+
+=== function gem_count() ===
+~ temp total = 0
+{ gem_park:
+    ~ total += 1
+}
+{ gem_bay:
+    ~ total += 1
+}
+{ gem_trail:
+    ~ total += 1
+}
+{ gem_pass:
+    ~ total += 1
+}
+{ gem_cavern:
+    ~ total += 1
+}
+{ gem_woods:
+    ~ total += 1
+}
+{ gem_hills:
+    ~ total += 1
+}
+~ return total
+
+=== park_gem ===
+{gem_park: -> after}
+Whoa! Under the blacklight lantern, a faceted lavender crystal glows right out of the north meadow clover! # speaker: Fae
+~ gem_park = true
+Fae scoops up the Amethyst Star Gem! Its facets shimmer softly, and five shiny coins clink beneath it! # speaker: Fae # sound: chime-blue # gift: coins 5
+-> DONE
+= after
+Soft lavender sparkles linger in the north meadow clover where the Amethyst Star Gem rested. # speaker: Fae
+-> DONE
+
+=== bay_gem ===
+{gem_bay: -> after}
+Something bright aqua glitters out in the rocky tide pool surf! # speaker: Fae
+{not pup_with_me: The waves are way too deep to wade out there on my own. # speaker: Fae}
+{not pup_with_me: -> DONE}
++ [Fetch it, boy!]
+    Splash! Pond Pup bounds into the sparkling tide pool and paddles straight out! # speaker: Fae
+    ~ gem_bay = true
+    He trots back onto the sand carrying the Aqua Star Gem, with five sunny coins tucked beside it! # speaker: Fae # sound: chime-blue # gift: coins 5
+    Good boy, Pond Pup! # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The rocky tide pool shimmers in the breeze. Pond Pup's happy paw prints dot the wet sand. # speaker: Fae
+-> DONE
+
+=== trail_gem ===
+{gem_trail: -> after}
+A cozy little burrow tucks under the cliffside rocks, and a sunny yellow sparkle glints deep inside! # speaker: Fae
+{not bunny_with_me: The burrow is way too tiny for my hand, just the right size for a clever bunny! # speaker: Fae}
+{not bunny_with_me: -> DONE}
++ [Hop in, Ribbon Bunny!]
+    Ribbon Bunny twitches her nose, zips straight down the rocky burrow, and pops back out! # speaker: Fae
+    ~ gem_trail = true
+    She rolls the gleaming Citrine Star Gem right to Fae's boots, along with five shiny coins! # speaker: Fae # sound: chime-yellow # gift: coins 5
+    Way to go, Ribbon Bunny! # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The cozy cliffside burrow is quiet and soft with clover. # speaker: Fae
+-> DONE
+
+=== pass_gem ===
+{gem_pass: -> after}
+High up on a snow-dusted pine branch, an icy blue crystal catches the mountain sun! # speaker: Fae
+{not has_lasso: It's way too high up in the pine needles to reach by hand. # speaker: Fae}
+{not has_lasso: -> DONE}
++ [Loop it down!]
+    Fae twirls Coach Ash's lasso and loops the sparkling branch cleanly! # speaker: Fae
+    ~ gem_pass = true
+    Down tumbles the Frost Star Gem into the soft snow, along with five glittering coins! # speaker: Fae # sound: chime-blue # gift: coins 5
+    Nice catch! # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The snow-dusted pine branch sways gently in the crisp mountain air. # speaker: Fae
+-> DONE
+
+=== cavern_gem ===
+{gem_cavern: -> after}
+In the blacklight glow, a secret prism pocket sparkles along the east crystal grotto floor! # speaker: Fae
+~ gem_cavern = true
+Fae lifts out the Prism Star Gem! Rainbow light dances across the cavern walls, and five bright coins shine beside it! # speaker: Fae # sound: chime-red # gift: coins 5
+-> DONE
+= after
+Faint rainbow glints dance across the east crystal grotto floor. # speaker: Fae
+-> DONE
+
+=== woods_gem ===
+{gem_woods: -> after}
+High up in a mossy tree hollow on the east edge of the clearing, a warm golden gem winks down! # speaker: Fae
+{not squirrel_with_me: That mossy hollow is way up in the branches, too high to climb. # speaker: Fae}
+{not squirrel_with_me: -> DONE}
++ [Climb up, buddy!]
+    Chitter-chitter! Acorn Squirrel zips up the mossy bark and peeks into the hollow! # speaker: Fae
+    ~ gem_woods = true
+    He scampers back down with the glowing Amber Star Gem and five shiny coins! # speaker: Fae # sound: chime-yellow # gift: coins 5
+    Awesome climb, buddy! # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The mossy tree hollow on the east side of the clearing is cozy and empty now. # speaker: Fae
+-> DONE
+
+=== hills_gem ===
+{gem_hills: -> after}
+Tucked beside the meadow boulders is a clover-fringed burrow with a bright green twinkle inside! # speaker: Fae
+{not bunny_with_me: It's way too narrow for me to reach in, but a nimble little bunny could hop right through! # speaker: Fae}
+{not bunny_with_me: -> DONE}
++ [Hop in, Ribbon Bunny!]
+    Ribbon Bunny gives a cheerful hop and wiggles straight down the clover burrow! # speaker: Fae
+    ~ gem_hills = true
+    She pops right back out with the sparkling Clover Star Gem and five shiny coins! # speaker: Fae # sound: chime-green # gift: coins 5
+    Best bunny explorer ever! # speaker: Fae
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+Soft four-leaf clovers sway beside the meadow boulder burrow. # speaker: Fae
 -> DONE

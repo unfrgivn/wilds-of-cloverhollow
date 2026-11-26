@@ -270,6 +270,15 @@
         "y": 635
       },
       "prompt": "Look"
+    },
+    {
+      "id": "woods-gem",
+      "knot": "woods_gem",
+      "point": {
+        "x": 1470,
+        "y": 950
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [],

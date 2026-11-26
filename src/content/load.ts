@@ -138,6 +138,7 @@ import sueData from "../../content/party/sue.json";
 import jordanData from "../../content/party/jordan.json";
 import pondPupData from "../../content/party/pond-pup.json";
 import acornSquirrelData from "../../content/party/acorn-squirrel.json";
+import ribbonBunnyData from "../../content/party/ribbon-bunny.json";
 import landsData from "../../content/lands.json";
 import { createInkState, createStoryReader, runInk, storyHasKnot } from "../core/ink";
 import { isStorySound } from "../core/sound";
@@ -1637,10 +1638,16 @@ export function parseBattleContent(
       pupCalm: integerIn(fluteRaw, "pupCalm", 1, file, "fluteAssist.pupCalm"),
       squirrelEnergy: integerIn(fluteRaw, "squirrelEnergy", 1, file, "fluteAssist.squirrelEnergy"),
       squirrelSoften: integerIn(fluteRaw, "squirrelSoften", 1, file, "fluteAssist.squirrelSoften"),
+      bunnyCalm: integerIn(fluteRaw, "bunnyCalm", 1, file, "fluteAssist.bunnyCalm"),
+      bunnyTogether: integerIn(fluteRaw, "bunnyTogether", 1, file, "fluteAssist.bunnyTogether"),
       lines: {
         pup: nonEmpty(fluteRaw.lines.pup, "fluteAssist.lines.pup"),
         squirrel: nonEmpty(fluteRaw.lines.squirrel, "fluteAssist.lines.squirrel"),
+        bunny: nonEmpty(fluteRaw.lines.bunny, "fluteAssist.lines.bunny"),
         both: nonEmpty(fluteRaw.lines.both, "fluteAssist.lines.both"),
+        pupBunny: nonEmpty(fluteRaw.lines.pupBunny, "fluteAssist.lines.pupBunny"),
+        squirrelBunny: nonEmpty(fluteRaw.lines.squirrelBunny, "fluteAssist.lines.squirrelBunny"),
+        all: nonEmpty(fluteRaw.lines.all, "fluteAssist.lines.all"),
       },
     },
   };
@@ -2255,9 +2262,11 @@ export function loadContent(): {
   const pondPup = parsePartyMember(pondPupData, "content/party/pond-pup.json");
   const acornSquirrel = parsePartyMember(acornSquirrelData,
     "content/party/acorn-squirrel.json");
+  const ribbonBunny = parsePartyMember(ribbonBunnyData,
+    "content/party/ribbon-bunny.json");
   const party = {
     [maddie.id]: maddie, [sue.id]: sue, [jordan.id]: jordan, [pondPup.id]: pondPup,
-    [acornSquirrel.id]: acornSquirrel,
+    [acornSquirrel.id]: acornSquirrel, [ribbonBunny.id]: ribbonBunny,
   };
   const storyVariable = createStoryReader(story);
   const initialInk = createInkState(story, 1);

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 79)
+Last updated: 2026-11-26 (Milestone 80)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -454,9 +454,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   `pup_friend`, critter `pup`. After
   him, the Acorn Squirrel is `acorn-squirrel` ("Acorn Squirrel", Milestone
   60): box 40x56, `walkCycleUnits` 72, sits, joins `squirrel_with_me`,
-  befriended `squirrel_friend`, critter `squirrel`, last in the roster. Both
-  can come along at once: the whole roster fits behind Fae at every spawn
-  (the area checks).
+  befriended `squirrel_friend`, critter `squirrel`. Last in the roster is
+  Ribbon Bunny (`ribbon-bunny`, "Ribbon Bunny", Milestone 80): atlas
+  `assets/characters/ribbon-bunny/ribbon-bunny.json`, box 40x56,
+  `walkCycleUnits` 72, sits, joins `bunny_with_me`, befriended `bunny_friend`,
+  critter `bunny`. All three can come along at once: the whole 6-member roster
+  fits behind Fae at every spawn (the area checks).
 - Chain rule: member 0 follows Fae; member i follows member i-1, with the same
   algorithm, the leader being the member ahead *after* its own move this tick
   (the party updates in order). Each member keeps its own breadcrumb trail of
@@ -531,7 +534,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   sides), member i at member i-1's, each with the follow radius clearance and
   two radii clear of Fae and the members ahead (`partySlots`; member 0 retains
   its original heel and perpendicular candidates, while chained members get
-  additional diagonal heel candidates before rear fallbacks; the area checks
+  additional diagonal heel candidates before rear fallbacks plus wide
+  shallow-vertical fallback offsets tried only if all earlier candidates fail,
+  ensuring narrow spawns like `mist.field` fit a 6-member party without
+  shifting any 1-to-5-member placement; the area checks
   test the whole roster so any party fits). At a door switch every member is
   placed in its slot, its trail resets to `[slot, leader]`, and everyone is
   frozen.
@@ -791,6 +797,40 @@ ios/            Capacitor iOS project (from Milestone 4).
   you go!" sends him up for a golden acorn and a pile of hazelnuts
   (`acorn_found`, `gift: snack 3`), once. The journal tells of the acorn, the
   knothole until then, and the friend, above the pup's notes.
+- A third flute friend & collectible Star Gems (Milestone 80): Ribbon Bunny,
+  the recurring trail and hills bunny, bonds like the pup and squirrel. Once
+  Fae has the flute, a calm Ribbon Bunny's talk (`bunny_calm`, after its first)
+  offers Smooth her ribbon (`bunny_petted`) and Share a snack (`bunny_fed`,
+  `feed: snack 1`, or a snack hint when `snacks() == 0`); both, in either
+  order, make her Fae's friend (`bunny_friend`). Revisit greets Fae as an old
+  friend. The `flute` knot appends Call Ribbon Bunny / Send Ribbon Bunny home
+  (`bunny_with_me`) after the pup and squirrel choices (leaving earlier choices
+  unchanged when `bunny_friend` is false). Seven collectible Star Gems
+  (`gem_park`, `gem_bay`, `gem_trail`, `gem_pass`, `gem_cavern`, `gem_woods`,
+  `gem_hills`, counted by pure `starGemsFound` in `src/core/journal.ts` and
+  `gem_count()` in Ink) hide across seven areas, each awarding `+5` coins and a
+  chime:
+  1. Meadow Park (`park-gem-glow`, `park_gem`): blacklight lantern glow in the
+     north meadow (Amethyst Star Gem, `chime-blue`).
+  2. Bubblegum Bay (`bay-gem`, `bay_gem`): east tide pool surf, fetched by Pond
+     Pup (`pup_with_me`, Aqua Star Gem, `chime-blue`).
+  3. Cliffside Trail (`trail-gem`, `trail_gem`): rocky cliffside burrow, fetched
+     by Ribbon Bunny (`bunny_with_me`, Citrine Star Gem, `chime-yellow`).
+  4. Pinecone Pass (`pass-gem`, `pass_gem`): high snow-dusted pine branch,
+     reeled down with Coach Ash's lasso (`has_lasso`, Frost Star Gem,
+     `chime-blue`).
+  5. Crystal Cavern (`cavern-gem-glow`, `cavern_gem`): blacklight lantern glow
+     on the east crystal grotto floor (Prism Star Gem, `chime-red`).
+  6. Whispering Woods (`woods-gem`, `woods_gem`): mossy east tree hollow,
+     fetched by Acorn Squirrel (`squirrel_with_me`, Amber Star Gem,
+     `chime-yellow`).
+  7. Clover Hills (`hills-gem`, `hills_gem`): meadow boulder clover burrow,
+     fetched by Ribbon Bunny (`bunny_with_me`, Clover Star Gem, `chime-green`).
+  Grandpa Barnaby (`barnaby` in Bon Appetit Cafe) celebrates Fae's gem count,
+  awarding `+15` coins (`gem_reward_3`, `chime-yellow`) at 3+ gems and `+50`
+  coins, `+2` snacks (`chime-red`), and the Rainbow Star Geode keepsake for
+  `club_chest` (`gem_reward_all`) when all 7 are found. The journal records
+  Ribbon Bunny's friendship, Star Gem progress, and the Rainbow Star Geode.
 - The lodge keeper (Milestone 57): once Fae has calmed a hamster at Pinecone
   Pass (`calmed("hamster")`, its sticker), the lodge's note leads on
   (`lodge_door.back`): a snowball whizzes past, and its keeper, Mrs. Flurry,
@@ -1887,15 +1927,22 @@ trunks keep its two exits.
     and to every `battleParty` member (excluding flute friends).
 - Flute Friends in battle (`fluteAssist` in `content/battle.json`, validated by
   `parseBattleContent`: positive integers `pupCalm`, `squirrelEnergy`,
-  `squirrelSoften`, and non-empty `lines` for `pup`, `squirrel`, and `both`):
+  `squirrelSoften`, `bunnyCalm`, `bunnyTogether`, and non-empty `lines` for
+  `pup`, `squirrel`, `bunny`, `both`, `pupBunny`, `squirrelBunny`, and `all`):
   - Once per battle (`battle.fluteUsed`), in the `command` phase (after reveal)
-    outside Talk mode when `has_flute` is true and at least one of `pup_friend`
-    or `squirrel_friend` is true, a fresh `flute` press (F or tapping the flute
-    sticker) calls Fae's befriended animals and plays `flute`.
+    outside Talk mode when `has_flute` is true and at least one of `pup_friend`,
+    `squirrel_friend`, or `bunny_friend` is true, a fresh `flute` press (F or
+    tapping the flute sticker) calls Fae's befriended animals and plays `flute`.
+    The HUD pill names the single befriended friend (`Pond Pup`, `Acorn
+    Squirrel`, or `Ribbon Bunny`) or `Flute Friends` when two or more are
+    befriended.
   - Pond Pup (`pup_friend`) adds `pupCalm` (25) calm (clamped to
     `calmLimit(critter)`). Acorn Squirrel (`squirrel_friend`) restores
     `squirrelEnergy` (1) leaf (capped at `energyMax`) and adds `squirrelSoften`
-    (1) to `battle.burstSoften`. Both befriended apply all three effects.
+    (1) to `battle.burstSoften`. Ribbon Bunny (`bunny_friend`) adds `bunnyCalm`
+    (15) calm and `bunnyTogether` (1) Together! sparkle star charge (clamped to
+    `chargeMax` when `battleParty` has at least two members). Multiple
+    befriended animals combine all of their effects.
   - If calm reaches `calmMax`, the battle transitions straight to `soothed`
     (clearing any wind-up); otherwise it stays in `command` with the assist
     line so Fae still takes her turn.
@@ -2671,7 +2718,12 @@ trunks keep its two exits.
   are dashed `?` outlines with no name.
 - Fae's supplies sit at the right of the NOTES heading row: two small cream
   stickers with ink outlines, `Coins N` with a gold coin and `Snacks N` with
-  a cookie (inline SVG, like the map's bus-stop sign).
+  a cookie (inline SVG, like the map's bus-stop sign). Once Fae has found at
+  least one Star Gem (`starGemsFound(world, state).found > 0`), a pale lavender
+  `Gems N/7` pill (with the faceted amethyst `gemIconSvg` from `src/ui/icons.ts`)
+  appears beside Coins and Snacks on a dedicated second pill row under NOTES
+  while the audio controls stay on the first row; when 0 gems are found, the
+  pill is hidden and the original single-row heading layout is preserved.
 - A chunky four-step sound volume slider sits beside the `♪ on/off` pill and
   fits the heading row at 874x402, including with `♪ off` and 999 coins. At
   narrow widths, the supplies wrap beneath NOTES so every control remains

@@ -89,10 +89,16 @@
     "pupCalm": 25,
     "squirrelEnergy": 1,
     "squirrelSoften": 1,
+    "bunnyCalm": 15,
+    "bunnyTogether": 1,
     "lines": {
       "pup": "Fae plays her flute! Pond Pup dashes in with a happy bark, calming the air!",
       "squirrel": "Fae plays her flute! Acorn Squirrel drops crunchy hazelnuts: +1 leaf and softer bursts!",
-      "both": "Fae plays her flute! Pond Pup and Acorn Squirrel bound in together, calm and cozy!"
+      "bunny": "Fae plays her flute! Ribbon Bunny twirls in with silky ribbons, calming the air and sparking a Together star!",
+      "both": "Fae plays her flute! Pond Pup and Acorn Squirrel bound in together, calm and cozy!",
+      "pupBunny": "Fae plays her flute! Pond Pup and Ribbon Bunny dash in with happy barks and ribbon sparkles!",
+      "squirrelBunny": "Fae plays her flute! Acorn Squirrel and Ribbon Bunny bound in with hazelnuts and ribbon sparkles!",
+      "all": "Fae plays her flute! Pond Pup, Acorn Squirrel, and Ribbon Bunny bound in together in a cozy flurry!"
     }
   }
 }

@@ -204,6 +204,15 @@
         "y": 960
       },
       "prompt": "Look"
+    },
+    {
+      "id": "bay-gem",
+      "knot": "bay_gem",
+      "point": {
+        "x": 1580,
+        "y": 760
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [

@@ -22,6 +22,15 @@
         "y": 520
       },
       "prompt": "Look"
+    },
+    {
+      "id": "trail-gem",
+      "knot": "trail_gem",
+      "point": {
+        "x": 385,
+        "y": 225
+      },
+      "prompt": "Look"
     }
   ],
   "critters": [

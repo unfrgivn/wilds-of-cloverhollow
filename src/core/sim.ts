@@ -194,16 +194,18 @@ export function createState(
  * arrival. Each den, in order, draws twice from the state's PRNG (is one out,
  * and which kind), so how many draws an arrival takes depends only on the
  * content, never on how the rolls came out. Until `after` is calm the area is
- * quiet and draws nothing.
+ * quiet and draws nothing; a den's own `after` keeps that den quiet alone.
  */
 export function rollWild(world: World, state: State, area: Area): Pick<State, "wild" | "rng"> {
   const recurring = area.recurring;
-  if (recurring === undefined ||
-      (recurring.after !== undefined && inkFacts(world, state).calmed[recurring.after] !== true))
+  if (recurring === undefined) return { wild: [], rng: state.rng };
+  const facts = inkFacts(world, state);
+  if (recurring.after !== undefined && facts.calmed[recurring.after] !== true)
     return { wild: [], rng: state.rng };
   let random = state;
   const wild: Wild[] = [];
   recurring.dens.forEach((den, index) => {
+    if (den.after !== undefined && facts.calmed[den.after] !== true) return;
     const [out, drawn] = nextRandom(random);
     const [pick, picked] = nextRandom(drawn);
     random = picked;

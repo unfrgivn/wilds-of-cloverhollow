@@ -84,7 +84,7 @@
   .credits-title { margin: 0 0 2px; padding: 5px 24px 7px; font-size: 52px; }
   .credits-screen { gap: 4px; padding-bottom: calc(94px + var(--safe-bottom)); }
   .credits-screen h2 { margin-top: 2px; }
-  .credits-list { max-width: 760px; gap: 8px; }
+  .credits-list { max-width: 960px; gap: 8px; }
   .credits-entry { width: 96px; min-height: 78px; padding: 3px 5px 5px; border-width: 2px; border-radius: 14px; box-shadow: 3px 4px 0 #c69b72; }
   .credits-entry-image { width: 52px; height: 48px; }
   .credits-entry-name { font-size: 18px; }

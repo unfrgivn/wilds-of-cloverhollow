@@ -238,6 +238,17 @@
           "frog"
         ],
         "chance": 0.8
+      },
+      {
+        "point": {
+          "x": 400,
+          "y": 920
+        },
+        "radius": 80,
+        "kinds": [
+          "crab"
+        ],
+        "after": "lifeguard"
       }
     ]
   },

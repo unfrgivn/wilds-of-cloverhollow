@@ -1,0 +1,129 @@
+{
+  "id": "penguin",
+  "species": "penguin",
+  "name": "Slippy Penguin",
+  "calmName": "Waddle Penguin",
+  "atlas": "assets/critters/penguin/penguin.json",
+  "auraCentre": {
+    "x": 258.76,
+    "y": 260.55
+  },
+  "bodyCentre": {
+    "x": 255.34,
+    "y": 310.87
+  },
+  "figureHeight": 380,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "waddle-penguin",
+    "name": "Waddle Penguin",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "penguin_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "bored",
+    "grumpy"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.3,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        66,
+        92
+      ],
+      "look": "dust"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        62,
+        84,
+        106,
+        128
+      ],
+      "look": "dust"
+    }
+  },
+  "lines": {
+    "intro": "A fizzy penguin belly-slides out of the snow, spinning wild circles!",
+    "command": "How can Fae calm the penguin?",
+    "soothe": {
+      "great": "Fae hums a soft snow song. The penguin's spins slow to a gentle wobble!",
+      "good": "Fae hums quietly. The penguin slides a calm little curve.",
+      "miss": "The penguin whooshes right past Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie slides on her belly right beside the penguin! Whee!",
+        "good": "Maddie hops through the snow. The penguin peeps along.",
+        "miss": "Maddie chases snowflakes. The penguin slides on without her."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber down the slope. The penguin chases it like a sled!",
+        "good": "Sue's bobber sails on the breeze. The penguin's flippers flap happily.",
+        "miss": "Sue's bobber plops into a drift. The penguin belly-flops after it."
+      },
+      "juggle": {
+        "great": "Jordan juggles three snowballs. The penguin balances one on its beak!",
+        "good": "Jordan lobs a snowball. The penguin catches it in a flipper hug.",
+        "miss": "Jordan's snowball rolls past. The penguin wheezes, dizzy from spinning."
+      }
+    },
+    "snack": "Fae shares a warm snack. The penguin gulps it, flippers out!",
+    "burst": "The penguin floofs up and whips a blizzard of snowballs at Fae!",
+    "burstResult": {
+      "great": "Fae sleds between the snowballs on her boots!",
+      "good": "Fae shields her face from most of the flurry!",
+      "miss": "POOF! Fae is a snowman now."
+    },
+    "soothed": "The penguin flops onto its belly, cozy and calm. The fizz melts into snow!",
+    "rest": "Fae is all snowdrifted out. Time for a rest.",
+    "run": "Fae trudges back up the slope. The penguin slides circles in the snow."
+  },
+  "coins": 8,
+  "level": 6
+}

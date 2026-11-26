@@ -115,6 +115,9 @@ import musicBirdData from "../../content/critters/music-bird.json";
 import oakSquirrelData from "../../content/critters/oak-squirrel.json";
 import hoodedKidData from "../../content/critters/hooded-kid.json";
 import artTeacherData from "../../content/critters/art-teacher.json";
+import crabData from "../../content/critters/crab.json";
+import penguinData from "../../content/critters/penguin.json";
+import principalData from "../../content/critters/principal.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import levelsData from "../../content/levels.json";
@@ -1255,7 +1258,8 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
 }
 
 // An area's recurring critters (spec 6): `after` (a calmed() fact) and the
-// dens, each `{ point, radius, kinds, chance? }` with `chance` in (0, 1].
+// dens, each `{ point, radius, kinds, chance?, after? }` with `chance` in
+// (0, 1] and `after` a calmed() fact that keeps that one den quiet.
 function parseRecurring(value: unknown, file: string): Recurring | undefined {
   if (value === undefined) return undefined;
   field(record(value), file, "recurring");
@@ -1279,7 +1283,15 @@ function parseRecurring(value: unknown, file: string): Recurring | undefined {
       field(names.length === kinds.length, file, `${name}.kinds`);
       const chance = den.chance ?? 1;
       field(typeof chance === "number" && chance > 0 && chance <= 1, file, `${name}.chance`);
-      return { point: { x: point.x, y: point.y }, radius, kinds: names, chance };
+      const denAfter = den.after;
+      field(denAfter === undefined || typeof denAfter === "string", file, `${name}.after`);
+      return {
+        point: { x: point.x, y: point.y },
+        radius,
+        kinds: names,
+        chance,
+        ...(denAfter === undefined ? {} : { after: denAfter }),
+      };
     }),
   };
 }
@@ -1782,6 +1794,9 @@ export function critterErrors(
       for (const kind of den.kinds)
         if (critters[kind] === undefined || placed.has(kind))
           errors.push(`${area.id}: den ${index} lists ${kind}, which isn't a recurring kind`);
+      if (den.after !== undefined && !placed.has(den.after) && !species.has(den.after))
+        errors.push(`${area.id}: den ${index} after ${den.after} is neither a set piece ` +
+          `nor a species`);
     });
   }
   return errors;
@@ -2088,6 +2103,9 @@ export function loadContent(): {
     [oakSquirrelData, "oak-squirrel"],
     [hoodedKidData, "hooded-kid"],
     [artTeacherData, "art-teacher"],
+    [crabData, "crab"],
+    [penguinData, "penguin"],
+    [principalData, "principal"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {

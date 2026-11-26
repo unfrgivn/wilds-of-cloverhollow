@@ -1,0 +1,129 @@
+{
+  "id": "crab",
+  "species": "crab",
+  "name": "Snappy Crab",
+  "calmName": "Sandy Crab",
+  "atlas": "assets/critters/crab/crab.json",
+  "auraCentre": {
+    "x": 258.76,
+    "y": 260.55
+  },
+  "bodyCentre": {
+    "x": 257.59,
+    "y": 356.62
+  },
+  "figureHeight": 300,
+  "overworldHeight": 70,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "sandy-crab",
+    "name": "Sandy Crab",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "crab_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "grumpy",
+    "curious",
+    "hungry"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.3,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        66,
+        92
+      ],
+      "look": "dust"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        62,
+        84,
+        106,
+        128
+      ],
+      "look": "dust"
+    }
+  },
+  "lines": {
+    "intro": "A fizzy crab scuttles out from the rocks, claws snap-snapping!",
+    "command": "How can Fae calm the crab?",
+    "soothe": {
+      "great": "Fae hums a slow wave song. The crab's claws settle, drifting like the tide!",
+      "good": "Fae hums softly. The crab sways side to side with the music.",
+      "miss": "The crab clacks right over Fae's humming."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie skitters sideways, and the crab copies her! Scuttle, scuttle!",
+        "good": "Maddie wiggles her tail. The crab taps a claw on the sand.",
+        "miss": "Maddie pounces at the crab's shadow. The crab snaps the air."
+      },
+      "cast": {
+        "great": "Sue casts her ribbon bobber past the rocks. The crab scoots after the ripples!",
+        "good": "Sue's bobber bobs in the foam. The crab's eyestalks follow it.",
+        "miss": "Sue's bobber plops in the sand. The crab buries itself up to its eyes."
+      },
+      "juggle": {
+        "great": "Jordan juggles three pebbles. The crab catches one in each claw, so proud!",
+        "good": "Jordan tosses a pebble high. The crab reaches up. Click!",
+        "miss": "Jordan's pebble bonks the sand. The crab snips it, unimpressed."
+      }
+    },
+    "snack": "Fae shares a crunchy snack. The crab munches it with tiny clicks!",
+    "burst": "The crab spins in a fizzy bubble storm, claws everywhere!",
+    "burstResult": {
+      "great": "Fae hops between the bubbles!",
+      "good": "Fae dodges most of the sea spray!",
+      "miss": "SPLASH! Fae gets a face full of fizzy foam."
+    },
+    "soothed": "The crab lets out a bubbly sigh. The fizz melts back into the tide!",
+    "rest": "Fae is all sandy and tired. Time for a rest.",
+    "run": "Fae tiptoes up the beach. The crab clicks at the waves."
+  },
+  "coins": 8,
+  "level": 5
+}

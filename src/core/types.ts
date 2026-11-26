@@ -142,9 +142,17 @@ export type Silhouette = { left: number; step: number; columns: [number, number]
 // puts it there only while it's true, as for people.
 export type SetPiece = { id: string; point: Point; visibleWhile?: string };
 // Nothing is out until `after` (a calmed() fact) is true. Each den rolls its
-// critter (one of `kinds`) with `chance` (0..1], and it wanders `radius`.
+// critter (one of `kinds`) with `chance` (0..1], and it wanders `radius`. A
+// den's own `after` (a calmed() fact) keeps that den quiet alone, so a new
+// kind can join an area without disturbing what the dens before it roll.
 export type Recurring = { after?: string; dens: Den[] };
-export type Den = { point: Point; radius: number; kinds: string[]; chance: number };
+export type Den = {
+  point: Point;
+  radius: number;
+  kinds: string[];
+  chance: number;
+  after?: string;
+};
 export type Npc = {
   id: string;
   point: Point;

@@ -518,6 +518,17 @@
           "hamster"
         ],
         "chance": 0.5
+      },
+      {
+        "point": {
+          "x": 760,
+          "y": 440
+        },
+        "radius": 80,
+        "kinds": [
+          "penguin"
+        ],
+        "after": "lodge-keeper"
       }
     ]
   },

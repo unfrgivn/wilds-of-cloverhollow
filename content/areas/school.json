@@ -161,6 +161,25 @@
       },
       "prompt": "Look",
       "knot": "trophies"
+    },
+    {
+      "id": "megaphone",
+      "point": {
+        "x": 450,
+        "y": 750
+      },
+      "prompt": "Look",
+      "knot": "megaphone"
+    }
+  ],
+  "critters": [
+    {
+      "id": "principal",
+      "point": {
+        "x": 530,
+        "y": 780
+      },
+      "visibleWhile": "principal_out"
     }
   ],
   "spawns": {

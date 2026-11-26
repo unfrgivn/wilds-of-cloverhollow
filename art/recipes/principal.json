@@ -1,0 +1,69 @@
+{
+ "asset": "principal",
+ "milestone": 69,
+ "date": "2026-11-23",
+ "summary": "Mr. Bell, the school principal, the Milestone 69 people mini-boss: a 2x2 body sheet (chaos idle, mid-shout into his megaphone; the burst, hall passes flying; soothed, rubbing his temple; calm, waving), drawn to Mrs. Flurry's sheet with the school staff concept for adult proportions.",
+ "generationSource": "Generated with Gemini from Mrs. Flurry's raw body sheet for the watercolour style, size, and swirly eyes, and the school staff concept sheet for adult proportions.",
+ "calls": 1,
+ "edits": [
+  {
+   "time": "2026-11-23T22:28:06.823Z",
+   "model": "gemini-3-pro-image-preview",
+   "refs": [
+    "art/source/critters/lodge-keeper/body-sheet-raw.png",
+    "docs/art/concepts/npcs/school_staff_npcs.png"
+   ],
+   "prompt": "A 2x2 character sheet of a NEW character, drawn in exactly the style of the first reference image (the woman in the four cells): the same chibi proportions with a big head, the same soft watercolour with thin warm-brown ink outlines, and the same size of figure in each of the four cells. The character is Mr. Bell, the kindly principal of a small-town elementary school: a grown-up man with round glasses, tidy gray hair, rosy cheeks, a brown tweed jacket with elbow patches, a mustard-yellow bow tie, dark trousers, and shiny brown shoes, holding a big silver megaphone in one hand. Top-left cell: Mr. Bell fizzy, his eyes swirly purple spirals, mouth wide open mid-shout into the megaphone, tiny purple fizz bubbles popping around his head. Top-right cell: bursting, arms flung wide, the megaphone blasting swirling purple sound waves and a flurry of small paper hall passes. Bottom-left cell: soothed, his swirly eyes drooping tired, the megaphone lowered, one hand rubbing his temple. Bottom-right cell: calm and warm, smiling gently, the megaphone resting at his side, his other hand raised in a friendly wave. Use a restrained warm palette and absolutely no pink or magenta anywhere on the character or his props; the plain background must be bright flat magenta (#FF00FF) filling every cell. No text, no labels, no shadows on the background, no faded copies, no extra figures, and every figure whole and uncropped inside its own cell.",
+   "output": "1795472886821-gemini-3-pro-image-preview-0.png",
+   "kept": "art/source/critters/principal/body-sheet-raw.png",
+   "note": "Kept as generated: four whole figures on a clean flat magenta key. The name Mr. Bell is a placeholder until the owner picks one."
+  }
+ ],
+ "postProcessing": {
+  "build": "bun tools/art/build-person.ts principal. The shared person builder keys magenta, drops detached islands under 120 px, despills the alpha edge, scales the chaos idle body to 380 px, and adds the shared hamster aura.",
+  "canvas": "1536x1024 atlas, six 512x512 frames, baseline 504, anchor (0.5, 0.984375).",
+  "measuredCentres": {
+   "bodyCentre": {
+    "x": 252.89,
+    "y": 310.54
+   },
+   "bodyCentreMethod": "mean opaque-pixel centroid across the four generated body frames",
+   "auraCentre": {
+    "x": 258.76,
+    "y": 260.55
+   }
+  },
+  "bodyHeights": {
+   "chaos_idle_01": 380,
+   "chaos_burst_01": 380,
+   "soothed_01": 380,
+   "calm_idle_01": 380
+  }
+ },
+ "checker": {
+  "bodyFrames": [
+   "calm_idle_01",
+   "chaos_idle_01",
+   "chaos_burst_01",
+   "soothed_01"
+  ],
+  "auraFrames": [
+   "chaos_aura_01"
+  ],
+  "matteMethods": {
+   "body": "magenta-key",
+   "aura": "white-lift"
+  },
+  "bodyHue": {
+   "min": 0.0,
+   "max": 0.15,
+   "minFraction": 0.3
+  },
+  "psnrThreshold": 25
+ },
+ "validator": "bun tools/art/critter-check.ts --recipe art/recipes/principal.json --atlas public/assets/critters/principal/principal.png",
+ "review": [
+  "art/review/m69-principal-sheet-cream.jpg",
+  "art/review/m69-principal-sheet-dark.jpg"
+ ]
+}

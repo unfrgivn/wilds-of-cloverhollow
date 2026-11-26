@@ -98,6 +98,8 @@ describe("Mrs. Flurry", () => {
     expect(variable(calm.ink, "lodge_open")).toBe(true);
     expect(play(calm.ink, "lodge_keeper").lines).toEqual([
       "Mrs. Flurry sweeps the snow off her porch. \"The fire's lit, dears. Come in and warm up!\"",
+      "A dizzy penguin keeps belly-sliding loops on the north slope, past the ski lift. " +
+      "Mind your toes out there!",
     ]);
     expect(play(calm.ink, "lodge_door").lines).toEqual([
       "The lodge door is open. Warm air and the smell of cocoa drift out.",

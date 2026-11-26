@@ -3219,7 +3219,7 @@ the old trail, the owl, and the clubhouse claim.
   `just e2e` passed 929 with 2 skipped in 3.9 minutes on Chromium and WebKit
   (the same 931-test list as main before it, checked by stashing the tree).
 
-## Milestone 69: More bad guys (in progress)
+## Milestone 69: More bad guys **Status:** ✅ Completed (2026-11-26)
 - The owner asked for more mini-bosses and casual enemies (2026-11-23;
   NOTES.md: "Need to add more mini-bosses and casual enemies", mostly people
   and animals under the chaos spell).
@@ -3236,18 +3236,34 @@ the old trail, the owl, and the clubhouse claim.
   owner picks one.
 - The golden chain must not move: each new den is appended last in its
   area's dens (`rollWild` draws two values per den in array order whatever
-  the outcome, so every existing roll is unchanged) and placed where no
-  recorded run walks, with the megaphone and the principal off those paths
-  too. The pinned replay tests are the guard; if any pinned hash shifts,
-  stop and find out why before touching a pin.
-- Evidence: unit tests (the new species' content and the appended dens, the
-  principal's set piece and gating), recorded runs from the golden
-  checkpoints (the crab, the penguin, the principal) with replay tests and
-  matching browser and Bun hashes, real-key e2e at both sizes, and committed
-  review captures.
-- Gates: `just check` (with the QA packs regenerated through
-  `tools/qa/build-saves.ts` after the story grows, never by hand), `just
-  e2e`, `just build`. No iOS changes.
+  the outcome, so every existing roll is unchanged) and gated on a
+  `calmed()` fact no recorded run has at any arrival in its area (the
+  crab waits for the bay's lifeguard, the penguin for the lodge keeper),
+  with the megaphone and the principal off those paths too. The pinned
+  replay tests are the guard; if any pinned hash shifts, stop and find
+  out why before touching a pin.
+- Fixes made during review:
+  - `src/render/view.ts`: battle critter scale now divides `battleHeight` by
+    `critter.figureHeight` instead of hardcoded `380`, so the crab
+    (`figureHeight: 300`) draws at its full 190-unit battle height instead of
+    150 units.
+  - `src/ui/credits.css`: desktop `.credits-list` max-width widened from 760 px
+    to 960 px so all 20 catalogue stickers plus 5 friends fit at 1280x720 and
+    1180x820 without scrolling; `tests/e2e/ui-gallery.spec.ts` reads the
+    catalogue count from `content/stickers.json`.
+  - Viewed all three M69 sprite sheets (`m69-crab-sheet-cream.jpg`,
+    `m69-penguin-sheet-cream.jpg`, `m69-principal-sheet-cream.jpg`), the
+    rescaled crab battle shot, and the 20-slot credits shot with `vision`.
+    Noted for owner review: Mr. Bell's burst flying paper spells "HALL PASSS"
+    and his soothed frame shows a tiny stray ticket/white ball near his feet.
+- Evidence: unit tests (`more-bad-guys.test.ts`, `more-bad-guys-replay.test.ts`),
+  recorded runs (`new-game/crab.json`, `penguin.json`, `principal.json`) with
+  matching browser and Bun hashes, real-key e2e (`more-bad-guys.spec.ts` at
+  1280x720 and 874x402 in Chromium and WebKit), and updated 20-slot journal
+  and credits baselines.
+- Gates: `just check` (124 unit files / 1,030 tests, all sims, 23 QA packs,
+  purity, lint), `just build` (production and harness hook checks), and full
+  `CLOVERHOLLOW_E2E_PORT=4195 just e2e` (941 passed, 2 skipped in 4.1 min).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

@@ -1,5 +1,5 @@
 {
-  "slots": 17,
+  "slots": 20,
   "catalogue": [
     {
       "id": "hooded-kid",
@@ -38,9 +38,21 @@
       "frame": "calm_idle_01"
     },
     {
+      "id": "sandy-crab",
+      "name": "Sandy Crab",
+      "critter": "crab",
+      "frame": "calm_idle_01"
+    },
+    {
       "id": "hiker-hamster",
       "name": "Hiker Hamster",
       "critter": "hamster",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "waddle-penguin",
+      "name": "Waddle Penguin",
+      "critter": "penguin",
       "frame": "calm_idle_01"
     },
     {
@@ -101,6 +113,12 @@
       "id": "art-teacher",
       "name": "Ms. Rowan",
       "critter": "art-teacher",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "principal",
+      "name": "Mr. Bell",
+      "critter": "principal",
       "frame": "calm_idle_01"
     }
   ]

@@ -25,6 +25,12 @@ const id = Bun.argv[2] ?? "";
 if (!/^[a-z][a-z0-9-]*$/.test(id)) throw new Error("usage: build-person.ts <id>");
 const key = Bun.argv.find((arg) => arg.startsWith("--key="))?.slice("--key=".length) ?? "#FF00FF";
 if (!/^#[0-9A-Fa-f]{6}$/.test(key)) throw new Error("--key must be a six-digit hex colour");
+// The chaos idle body is scaled to this height. A figure wider than tall
+// (a crab) targets less, so its width clears the 512 frame with margin.
+const heightArg = Bun.argv.find((arg) => arg.startsWith("--height="))?.slice("--height=".length);
+const idleBodyHeight = heightArg === undefined ? 380 : Number(heightArg);
+if (!Number.isInteger(idleBodyHeight) || idleBodyHeight < 64 || idleBodyHeight > 460)
+  throw new Error("--height must be an integer from 64 to 460");
 const despillKey = key.toUpperCase() === "#00FF00" ? "green" : "magenta";
 const frames = `art/scratch/${id}-build-frames`;
 const sheet = `art/source/critters/${id}/body-sheet-raw.png`;
@@ -35,7 +41,6 @@ const grid = [
   ["soothed_01", "calm_idle_01"],
 ];
 const names = grid.flat();
-const idleBodyHeight = 380;
 const padding = 12;
 const neighbours: [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 

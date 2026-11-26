@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
 import { cometGalleryStates } from "../../src/dev/comet-gallery";
 import { cookGalleryStates } from "../../src/dev/cook-gallery";
@@ -100,7 +101,11 @@ test.describe("sticker gallery", () => {
         if (state === "credits") {
           await expect(page.locator(".credits-entry-friends .credits-entry-name"))
             .toHaveText(["Maddie", "Sue", "Jordan", "Pond Pup", "Acorn Squirrel"]);
-          await expect(page.locator(".credits-entry-met")).toHaveCount(17);
+          const stickers: { catalogue: unknown[] } = JSON.parse(
+            readFileSync("content/stickers.json", "utf8"),
+          );
+          await expect(page.locator(".credits-entry-met"))
+            .toHaveCount(stickers.catalogue.length);
         }
         await expect(page).toHaveScreenshot(`${state}-${size.width}x${size.height}.png`, {
           animations: "disabled", scale: "device",

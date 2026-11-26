@@ -1,0 +1,300 @@
+{
+  "id": "principal",
+  "species": "principal",
+  "name": "Fizzy Mr. Bell",
+  "calmName": "Mr. Bell",
+  "atlas": "assets/critters/principal/principal.json",
+  "auraCentre": {
+    "x": 258.76,
+    "y": 260.55
+  },
+  "bodyCentre": {
+    "x": 252.89,
+    "y": 310.54
+  },
+  "figureHeight": 380,
+  "overworldHeight": 160,
+  "battleHeight": 280,
+  "touchRadius": 85,
+  "calmMax": 160,
+  "energyMax": 6,
+  "sticker": {
+    "id": "principal",
+    "name": "Mr. Bell",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "principal",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "grumpy",
+    "zoomy",
+    "curious"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.5,
+    "check": {
+      "kind": "trace",
+      "dryTicks": 180,
+      "brushSpeed": 20,
+      "reachRadius": 105,
+      "paths": [
+        {
+          "id": "star",
+          "points": [
+            {
+              "x": 500,
+              "y": 150
+            },
+            {
+              "x": 582,
+              "y": 387
+            },
+            {
+              "x": 833,
+              "y": 392
+            },
+            {
+              "x": 633,
+              "y": 543
+            },
+            {
+              "x": 706,
+              "y": 783
+            },
+            {
+              "x": 500,
+              "y": 640
+            },
+            {
+              "x": 294,
+              "y": 783
+            },
+            {
+              "x": 367,
+              "y": 543
+            },
+            {
+              "x": 167,
+              "y": 392
+            },
+            {
+              "x": 418,
+              "y": 387
+            },
+            {
+              "x": 500,
+              "y": 150
+            }
+          ]
+        },
+        {
+          "id": "stamp-swirl",
+          "points": [
+            {
+              "x": 500,
+              "y": 500
+            },
+            {
+              "x": 520,
+              "y": 180
+            },
+            {
+              "x": 830,
+              "y": 330
+            },
+            {
+              "x": 700,
+              "y": 700
+            },
+            {
+              "x": 280,
+              "y": 820
+            },
+            {
+              "x": 200,
+              "y": 430
+            }
+          ]
+        },
+        {
+          "id": "underline",
+          "points": [
+            {
+              "x": 100,
+              "y": 650
+            },
+            {
+              "x": 300,
+              "y": 450
+            },
+            {
+              "x": 500,
+              "y": 650
+            },
+            {
+              "x": 700,
+              "y": 450
+            },
+            {
+              "x": 900,
+              "y": 650
+            }
+          ]
+        }
+      ]
+    },
+    "big": {
+      "kind": "trace",
+      "dryTicks": 180,
+      "brushSpeed": 20,
+      "reachRadius": 105,
+      "paths": [
+        {
+          "id": "big-sparkle",
+          "points": [
+            {
+              "x": 500,
+              "y": 100
+            },
+            {
+              "x": 640,
+              "y": 380
+            },
+            {
+              "x": 900,
+              "y": 500
+            },
+            {
+              "x": 640,
+              "y": 620
+            },
+            {
+              "x": 500,
+              "y": 900
+            },
+            {
+              "x": 360,
+              "y": 620
+            },
+            {
+              "x": 100,
+              "y": 500
+            },
+            {
+              "x": 360,
+              "y": 380
+            },
+            {
+              "x": 500,
+              "y": 100
+            }
+          ]
+        },
+        {
+          "id": "big-underline",
+          "points": [
+            {
+              "x": 80,
+              "y": 860
+            },
+            {
+              "x": 280,
+              "y": 420
+            },
+            {
+              "x": 480,
+              "y": 860
+            },
+            {
+              "x": 680,
+              "y": 420
+            },
+            {
+              "x": 880,
+              "y": 860
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "windUp": {
+    "start": 2,
+    "every": 3,
+    "bubbles": 2,
+    "lines": {
+      "start": "Mr. Bell puffs up and fills a GIANT megaphone. It's getting louder and louder!",
+      "puffing": "The giant megaphone rumbles louder!",
+      "fizzle": "Pop-pop! Fae pops every sound bubble, and the megaphone fizzles."
+    }
+  },
+  "lines": {
+    "intro": "Mr. Bell marches out with swirly eyes. \"ATTENTION, EVERYONE! ATTENTION!\"",
+    "command": "How can Fae calm Mr. Bell?",
+    "soothe": {
+      "great": "Fae hums the school bell's soft ding-dong. Mr. Bell's swirls slow down!",
+      "good": "Fae hums quietly. Mr. Bell lowers the megaphone for a moment.",
+      "miss": "Mr. Bell blares an announcement right over Fae's song."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie fetches a lost hall pass. Mr. Bell stamps it \"BEST CAT\" and laughs!",
+        "good": "Maddie bats a paper airplane. Mr. Bell watches it glide.",
+        "miss": "Maddie skids on the hall floor. Mr. Bell announces \"NO SKIDDING!\""
+      },
+      "cast": {
+        "great": "Sue's ribbon loops like a jump rope. Mr. Bell jumps in, stepping in time!",
+        "good": "Sue's ribbon twirls through the hall. Mr. Bell's eyes follow it.",
+        "miss": "Sue's ribbon snags on the trophy cabinet. Mr. Bell harrumphs."
+      },
+      "juggle": {
+        "great": "Jordan juggles three hall passes in a perfect loop. Mr. Bell grades it an A+!",
+        "good": "Jordan tosses a hall pass high. Mr. Bell salutes it.",
+        "miss": "Jordan drops a hall pass. Mr. Bell announces \"PRACTICE!\""
+      }
+    },
+    "snack": "Fae shares a crunchy snack. Mr. Bell nibbles between announcements.",
+    "burst": "Wild purple stamp-swirls stamp at Fae! Trace them back before they dry!",
+    "burstResult": {
+      "great": "Fae traces every purple swirl back into neat little stars!",
+      "good": "Fae traces most of the stamps into shapes!",
+      "miss": "STAMP! A purple star lands right on Fae's shoe."
+    },
+    "soothed": "Mr. Bell blinks. The swirls fade, and his megaphone droops to his side.",
+    "rest": "Fae's ears are ringing. Time for a rest.",
+    "run": "Fae backs down the hall. Mr. Bell announces the lunch menu to nobody."
+  },
+  "coins": 25,
+  "level": 7
+}

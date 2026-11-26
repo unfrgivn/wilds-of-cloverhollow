@@ -35,6 +35,7 @@ VAR lifeguard_back = false
 
 VAR art_teacher_out = false
 VAR art_open = false
+VAR principal_out = false
 === window ===
 {plan != "none": -> again}
 Morning sun... and something sparkly over the plaza. # speaker: Fae
@@ -97,6 +98,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
 {calmed("lodge-keeper"): I calmed Mrs. Flurry, the lodge keeper at Pinecone Pass. Her lodge is open, and the fire's lit! # speaker: Fae}
+{calmed("principal"): I calmed Mr. Bell, the principal! Morning announcements sound like morning again. # speaker: Fae}
+{principal_out and not calmed("principal"): Mr. Bell the principal is fizzy in the hall, blaring announcements at everybody! # speaker: Fae}
 {calmed("art-teacher"): I calmed Ms. Rowan, the art teacher. Her room is open, and every purple marker is missing! # speaker: Fae}
 {art_teacher_out and not calmed("art-teacher"): Ms. Rowan is fizzy in the east hall, swishing wild purple paint. # speaker: Fae}
 {keeper_back and not calmed("lodge-keeper"): The lodge keeper at Pinecone Pass is fizzy, and flinging snowballs from her porch! # speaker: Fae}
@@ -536,6 +539,26 @@ A fizzy crumb? That sounds familiar. # speaker: Fae
 -> DONE
 = again
 My daisy is still tucked safely in my hat. # speaker: Meadow Hedgehog
+-> DONE
+
+=== crab_calm ===
+{crab_calm > 1: -> again}
+Click-click! Thank you, small friend. My claws feel calm as the tide. # speaker: Sandy Crab
+A kid in a purple hood handed me a fizzy soda bottle, and I snip-snipped it open! # speaker: Sandy Crab
+Then everything went bubbly, and I just HAD to snip everything! # speaker: Sandy Crab
+-> DONE
+= again
+The tide pools by the south rocks have the best bubbles. Click! # speaker: Sandy Crab
+-> DONE
+
+=== penguin_calm ===
+{penguin_calm > 1: -> again}
+Awrk! My flippers feel warm and cozy again. # speaker: Waddle Penguin
+A kid in a purple hood polished my favorite ice slide with fizzy soda. It went to my head! # speaker: Waddle Penguin
+Awrk-awrk! I slid all the way down the mountain without steering once! # speaker: Waddle Penguin
+-> DONE
+= again
+The best sledding hill is up behind the lodge. Belly down, flippers up! # speaker: Waddle Penguin
 -> DONE
 
 === lift_note ===
@@ -1147,6 +1170,31 @@ The door's still locked, and Ms. Rowan is swishing purple paint all over the hal
 -> DONE
 = open
 The art room door stands open. It smells like paint and glue sticks! # speaker: Fae
+-> DONE
+
+=== megaphone ===
+{calmed("principal"): -> calm}
+{principal_out: -> out}
+A silver megaphone leans against the lockers, fizzing tiny purple bubbles. # speaker: Fae
+Somebody shouts "GOOD MORNING, CLOVERHOLLOW!" and the principal marches out! # speaker: Fae
+~ principal_out = true
+-> DONE
+= out
+Mr. Bell is stomping up and down the hall, announcing EVERYTHING at once! # speaker: Fae
+-> DONE
+= calm
+The megaphone is quiet now. It smells like cocoa and chalk dust. # speaker: Fae
+-> DONE
+
+=== principal ===
+{principal > 1: -> again}
+Oh my stars. My head is clear, and my voice is my own again! # speaker: Mr. Bell
+A kid in a purple hood borrowed my megaphone for "special announcements"! # speaker: Mr. Bell
+They left a fizzy purple soda on my desk, and one sip... whoosh! # speaker: Mr. Bell
+All I remember is announcing EVERYTHING at once. Sorry about the noise! # speaker: Mr. Bell
+-> DONE
+= again
+Lunch today is tacos. That is all. # speaker: Mr. Bell
 -> DONE
 
 === art_teacher ===
@@ -1778,6 +1826,7 @@ Then come in, come in, all of you! Warm up by the fire. # speaker: Mrs. Flurry
 -> DONE
 = again
 Mrs. Flurry sweeps the snow off her porch. "The fire's lit, dears. Come in and warm up!" # speaker: Mrs. Flurry
+A dizzy penguin keeps belly-sliding loops on the north slope, past the ski lift. Mind your toes out there! # speaker: Mrs. Flurry
 -> DONE
 
 === lifeguard ===
@@ -1789,6 +1838,7 @@ Here, share my watermelon. # speaker: Ms. Coral # gift: snack 3
 -> DONE
 = again
 Ms. Coral smiles and checks the beach. "All clear, kiddos!" # speaker: Ms. Coral
+"Oh, and mind the south rocks! Little crabs have been skittering there all morning, clicky-clacky!" # speaker: Ms. Coral
 -> DONE
 
 // Inside the lodge (Milestone 57).

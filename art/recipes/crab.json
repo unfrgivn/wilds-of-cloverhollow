@@ -1,0 +1,80 @@
+{
+ "asset": "crab",
+ "milestone": 69,
+ "date": "2026-11-23",
+ "summary": "The Snappy Crab (calm: the Sandy Crab), Bubblegum Bay's new recurring chaos species for Milestone 69: a 2x2 body sheet (chaos idle, claws up; the burst, mid-hop with sand flying; soothed, claw to its shell; calm, waving), drawn to the owner's critter concept sheet's style.",
+ "generationSource": "Generated with Gemini from the owner's critter concept sheet for the watercolour style, proportions, and swirly purple chaos eyes, and the vfx particles sheet for the fizz marks.",
+ "calls": 2,
+ "edits": [
+  {
+   "time": "2026-11-23T22:27:19.961Z",
+   "model": "gemini-3-pro-image-preview",
+   "refs": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "docs/art/concepts/vfx/vfx_particles.png"
+   ],
+   "prompt": "A 2x2 character sheet of a NEW small cartoon animal character, drawn in exactly the style of the first reference image (the cozy critter concept sheet): the same soft watercolour painting with thin warm-brown ink outlines, the same friendly simple cartoon animal proportions, and the same size of figure in each of the four cells. The character is a cheerful orange-red cartoon crab with a rounded shell, big expressive eyes on short stalks, a tiny smiling mouth, four little legs, and two modest claws. Top-left cell: the crab standing fizzy and cranky, its eyes swirly purple spirals, tiny purple fizz bubbles popping around it, claws raised ready to snap. Top-right cell: bursting, mid-hop, claws snapping wildly, sand grains and purple bubbles flying around it. Bottom-left cell: soothed, its swirly eyes drooping sleepy, one claw rubbing its shell, the fizz fading. Bottom-right cell: calm and friendly, standing tall with a gentle smile, waving one claw. Use a restrained warm pastel palette and absolutely no pink or magenta anywhere on the crab or its props; the plain background must be bright flat magenta (#FF00FF) filling every cell. No text, no labels, no shadows on the background, no faded copies, no extra figures, and every figure whole and uncropped inside its own cell.",
+   "output": "1795472839959-gemini-3-pro-image-preview-0.png",
+   "note": "Rejected: the model textured the magenta background, leaving a web of background pixels that connected all four figures; the build's connected-component split failed loudly."
+  },
+  {
+   "time": "2026-11-23T22:29:06.818Z",
+   "model": "gemini-3-pro-image-preview",
+   "refs": [
+    "docs/art/concepts/npcs/npc_critter_set.png",
+    "art/source/critters/principal/body-sheet-raw.png"
+   ],
+   "prompt": "A 2x2 character sheet of a NEW small cartoon animal character, drawn in exactly the style of the first reference image (the cozy critter concept sheet): the same soft watercolour painting with thin warm-brown ink outlines, the same friendly simple cartoon animal proportions, and the same size of figure in each of the four cells. The background of the ENTIRE image must be one single perfectly uniform flat solid pure magenta colour #FF00FF, exactly like the background of the second reference image: absolutely flat, no texture, no noise, no speckles, no vignette, no gradient, no watercolour washes on the background, no shadows or halos on the background, with crisp clean silhouettes around each figure. The character is a cheerful orange-red cartoon crab with a rounded shell, big expressive eyes on short stalks, a tiny smiling mouth, four little legs, and two modest claws held close to its body. Top-left cell: the crab standing fizzy and cranky, its eyes swirly purple spirals, tiny purple fizz bubbles popping around it, claws raised. Top-right cell: bursting, mid-hop, claws snapping, a few sand grains and purple bubbles flying close around it. Bottom-left cell: soothed, its swirly eyes drooping sleepy, one claw rubbing its shell. Bottom-right cell: calm and friendly, standing tall with a gentle smile, waving one claw. Use a restrained warm pastel palette and absolutely no pink or magenta anywhere on the crab itself; every figure whole and uncropped inside its own cell, with generous empty magenta margin around each figure. No text, no labels, no extra figures, no faded copies.",
+   "output": "1795472946816-gemini-3-pro-image-preview-0.png",
+   "kept": "art/source/critters/crab/body-sheet-raw.png",
+   "note": "Kept as generated: four whole figures on a clean flat magenta key. Purple chaos eyes and fizz bubbles are intentional character details."
+  }
+ ],
+ "postProcessing": {
+  "build": "bun tools/art/build-person.ts crab --height=300. The shared person builder keys magenta, drops detached islands under 120 px, despills the alpha edge, scales the chaos idle body to 300 px (the crab is wider than tall; at 380 its width filled the 512 frame), and adds the shared hamster aura.",
+  "canvas": "1536x1024 atlas, six 512x512 frames, baseline 504, anchor (0.5, 0.984375).",
+  "measuredCentres": {
+   "bodyCentre": {
+    "x": 257.59,
+    "y": 356.62
+   },
+   "bodyCentreMethod": "mean opaque-pixel centroid across the four generated body frames",
+   "auraCentre": {
+    "x": 258.76,
+    "y": 260.55
+   }
+  },
+  "bodyHeights": {
+   "chaos_idle_01": 300,
+   "chaos_burst_01": 300,
+   "soothed_01": 300,
+   "calm_idle_01": 300
+  }
+ },
+ "checker": {
+  "bodyFrames": [
+   "calm_idle_01",
+   "chaos_idle_01",
+   "chaos_burst_01",
+   "soothed_01"
+  ],
+  "auraFrames": [
+   "chaos_aura_01"
+  ],
+  "matteMethods": {
+   "body": "magenta-key",
+   "aura": "white-lift"
+  },
+  "bodyHue": {
+   "min": 0.0,
+   "max": 0.1,
+   "minFraction": 0.3
+  },
+  "psnrThreshold": 25
+ },
+ "validator": "bun tools/art/critter-check.ts --recipe art/recipes/crab.json --atlas public/assets/critters/crab/crab.png",
+ "review": [
+  "art/review/m69-crab-sheet-cream.jpg",
+  "art/review/m69-crab-sheet-dark.jpg"
+ ]
+}

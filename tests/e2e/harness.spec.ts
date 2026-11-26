@@ -109,6 +109,9 @@ test.describe("deterministic replays", () => {
   { name: "golden-arcade", fixture: "new-game" },
   { name: "golden-school", fixture: "new-game" },
   { name: "golden-gym", fixture: "new-game" },
+  { name: "crab", fixture: "new-game" },
+  { name: "penguin", fixture: "new-game" },
+  { name: "principal", fixture: "new-game" },
   ]) {
     const { name, fixture } = item;
     test(`browser (V8) and Bun (JavaScriptCore) agree on ${name}`, async () => {

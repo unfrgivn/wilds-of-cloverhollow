@@ -181,6 +181,13 @@
       "bigBurst": 3,
       "xp": 50
     },
+    "crab": {
+      "level": 5,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 50
+    },
     "gull": {
       "level": 6,
       "calmMax": 160,
@@ -203,6 +210,13 @@
       "xp": 70
     },
     "hamster": {
+      "level": 6,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 60
+    },
+    "penguin": {
       "level": 6,
       "calmMax": 100,
       "burst": 2,
@@ -250,6 +264,13 @@
       "burst": 2,
       "bigBurst": 3,
       "xp": 80
+    },
+    "principal": {
+      "level": 7,
+      "calmMax": 160,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 70
     },
     "arcade-keeper": {
       "level": 7,

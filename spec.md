@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-10-18 (Milestones 53 to 58, 60, 63, and 64)
+Last updated: 2026-11-26 (Milestone 69)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -919,15 +919,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   keeper (the pass, on her porch at (1300, 590), while `keeper_back`), Ms.
   Coral, the lifeguard (the bay, on the sand by the dock approach at (760,
   590), while `lifeguard_back`), and Ms. Rowan, the art teacher (the east
-  hall, at (1040, 500), while `art_teacher_out`).
+  hall, at (1040, 500), while `art_teacher_out`), and Mr. Bell, the
+  principal (the school hall, by the south lockers, while `principal_out`,
+  Milestone 69).
 - Recurring critters, EarthBound style, are an area's `recurring`:
-  `{ after?, dens: { point, radius, kinds, chance? }[] }`. On every arrival
-  (a door, a bus ride, a rest's fade, and the start of a game or fixture)
-  each den, in order, draws twice from the state's PRNG: is one out
+  `{ after?, dens: { point, radius, kinds, chance?, after? }[] }`. On every
+  arrival (a door, a bus ride, a rest's fade, and the start of a game or
+  fixture) each den, in order, draws twice from the state's PRNG: is one out
   (`chance`, default 1), and which of its `kinds`. Every den draws whatever
   comes out, so an arrival's draws depend only on the content. Until
   `after` (a `calmed()` fact) is true the area draws nothing and is quiet:
-  the plaza waits for the fountain frog. The ones out this visit are
+  the plaza waits for the fountain frog. A den's own `after` keeps that one
+  den quiet alone (Milestone 69), so a new kind can join an area's dens
+  without disturbing what the dens before it roll: the bay's crabs wait for
+  the lifeguard and the pass's penguins for the lodge keeper. The ones out
+  this visit are
   `state.wild`: `{ kind, den, mood, x, y, target, pauseTicks,
   cooldownTicks, facing, moving, notice }`, starting at their den in chaos,
   `notice` 0. One Fae
@@ -938,8 +944,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   point.
 - The starting roster (owner, 2026-10-07): Cloverhollow's plaza (after the
   fountain frog) and the park, raccoons, pups, and cats; Bubblegum Bay,
-  frogs and bluebirds; the Cliffside Trail, bunnies and squirrels; Pinecone
-  Pass, hamsters; the Whispering Woods, owls and raccoons. A species the
+  frogs and bluebirds, and after its lifeguard, crabs; the Cliffside Trail,
+  bunnies and squirrels; Pinecone Pass, hamsters, and after its lodge keeper,
+  penguins; the Whispering Woods, owls and raccoons. A species the
   story needs has a den of its own with `chance` 1: the park's pond (pups),
   the bay's sand (bluebirds), and the pass's clearing (hamsters).
 - `presentCritters(world, state)` lists every critter out in Fae's area, set
@@ -1830,7 +1837,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   `brushSpeed` 20, `reachRadius` 105, and `dryTicks` 180. The flower reads as
   a four-petal flower or a star.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
-  and leaves Milo calm under the tree. The sticker catalogue has 17 slots,
+  and leaves Milo calm under the tree. The sticker catalogue has 20 slots,
   including the Milo sticker. The front-view NPC art is no longer loaded by
   the runtime. Its raw source and recipe remain in `art/source/` and
   `art/recipes/` for provenance.
@@ -1955,7 +1962,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   result, so reading the journal never changes the story.
 - Album: `content/stickers.json` (validated) holds the slot count and the
   catalogue (id, name, the critter whose atlas holds the art, and the frame):
-  seventeen stickers, one per species and one per mini-boss, in seventeen
+  twenty stickers, one per species and one per mini-boss, in twenty
   slots, the town's four first.
   A sticker is owned when `state.stickers` has its id. The shell sets
   `data-journal="open"` while the book is open.

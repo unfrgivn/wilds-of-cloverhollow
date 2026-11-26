@@ -5,7 +5,8 @@ export function fadeAlpha(
   doorFadeTicks: number,
 ): number {
   if (transition === null) return 0;
-  return transition.phase === "out"
-    ? Math.min(1, transition.elapsed / doorFadeTicks)
-    : Math.max(0, 1 - transition.elapsed / doorFadeTicks);
+  const raw = transition.phase === "out"
+    ? Math.min(1, Math.max(0, transition.elapsed / doorFadeTicks))
+    : Math.max(0, Math.min(1, 1 - transition.elapsed / doorFadeTicks));
+  return raw * raw * (3 - 2 * raw);
 }

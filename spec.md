@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 69)
+Last updated: 2026-11-26 (Milestone 72)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -292,6 +292,21 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Depth: the area ground layer is always at the back; characters y-sort by
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
+- Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestone 72):
+  eight small cached offscreen-canvas Pixi textures (`contactShadow`,
+  `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`, `sunbeam`,
+  `paperGrain`), rendered with warm plum-brown shadows (`#52455F`), pastel
+  washes, and seamless cold-press paper tooth. In non-harness areas, a
+  multiply `shadowLayer` sits directly above `ground` and below `depth` to
+  ground Fae, party members, visible NPCs (hover shadows under the four
+  fairies, skipping the painted `bus-stop`), and overworld critters (scaling
+  slightly as roamers bob); a deterministic `BiomeAtmosphere`
+  (`src/render/atmosphere.ts`, zero `Math.random()`) adds per-biome water
+  glints, lamp pools, drifting petals/pollen, snow and lodge chimney smoke,
+  sunbeams, lavender mist, fairy aura halos, hearth glow, and arcade neon
+  blooms; and a world-anchored `paperGrain` `TilingSprite` (`multiply`, alpha
+  `0.035`) gently unifies sprites, shadows, and paintings. Door fades use cubic
+  smoothstep easing (`src/render/fade.ts`).
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -890,29 +905,36 @@ ios/            Capacitor iOS project (from Milestone 4).
 - Areas may define `interactables` with `{ id, knot, point, prompt }`;
   `prompt` is `Look`, or `Play` for something Fae plays (the music room's
   xylophone). Each point must be reachable within the interaction range.
-- Glows (the blacklight lantern, Milestone 23): an area's `glows` are
-  `{ id, frame, point, knot?, prompt?, flip? }`, a frame of
+- Glows (the blacklight lantern, Milestone 23; overhauled Milestone 72): an
+  area's `glows` are `{ id, frame, point, knot?, prompt?, flip? }`, a frame of
   `assets/glows/glows.json` (light painted on black, lifted by brightness).
   They're never solid. While the lantern is on (`state.lantern`, switched by a
-  lantern press once `has_lantern` is true and Fae is free), the overworld
-  drops to a deep violet dusk (55%) and each glow is added on top with a
-  gentle pulse (render-only); a glow with a knot is a Look target
-  (`glow:<id>`) only then. `flip` mirrors the decal. At Pinecone Pass, three
-  glowing paw prints lead from the clearing to a trail marker on the west
-  pines (`old_trail_marker`, which sets `found_old_trail`), and a doodle is
-  painted on the north ski-lift tower (`lift_note`). `renderInfo().lantern`
-  reports `{ on, glows }`, the ids drawn.
-- Ambient flyers (Milestone 54): an area may define `ambient` as flyers with
+  lantern press once `has_lantern` is true and Fae is free), the viewport
+  (clipped inside `viewportMask`, never tinting letterbox bars) eases smoothly
+  into a deep indigo-plum dusk (`0x170b33`, up to 56% alpha) with an additive
+  radial UV blacklight pool (`0xb084ff`) and 12 drifting lavender UV motes
+  centred on Fae, and each glow is added on top with staggered pulse phases,
+  a subtle bloom pulse, and proximity brightening within 320 units (all
+  render-only); a glow with a knot is a Look target (`glow:<id>`) only then.
+  `flip` mirrors the decal. At Pinecone Pass, three glowing paw prints lead
+  from the clearing to a trail marker on the west pines (`old_trail_marker`,
+  which sets `found_old_trail`), and a doodle is painted on the north ski-lift
+  tower (`lift_note`). `renderInfo().lantern` reports `{ on, glows }`, the ids
+  drawn.
+- Ambient flyers (Milestone 54; Catmull-Rom splines Milestone 72): an area may
+  define `ambient` as flyers with
   `{ id, animation, path, loopTicks, phase, frameTicks, size }`. `path` is a
   closed loop of at least three in-bounds `[x, y]` world points; `loopTicks`
   and `phase` are integers with `loopTicks >= 120` and `0 <= phase <
   loopTicks`, `frameTicks` is an integer of at least 1, and `size` is the
   drawn height in world units. Animations are names in
-  `public/assets/ambient/ambient.json`. Flyers move at constant arc-length
-  speed with a small render-only bob, change atlas frames at `frameTicks`, and
-  mirror while travelling left. They draw above overworld figures and props,
-  below the fade, dusk tint, and glows, and are hidden in battles. They never
-  enter simulation state, hashes, or saves.
+  `public/assets/ambient/ambient.json`. Flyers follow a closed uniform
+  Catmull-Rom spline through `path` at constant chord-parameter speed with a
+  small render-only bob, cycle across their animation's full frame count at
+  `frameTicks`, and mirror from the smooth spline tangent while travelling
+  left. They draw above overworld figures and props, below the fade, dusk tint,
+  and glows, and are hidden in battles. They never enter simulation state,
+  hashes, or saves.
 - Canopies: a prop with `canopy: true` is a tree Fae can walk under (a palm,
   crown and trunk cut whole, its front edge at the trunk's foot). While it
   draws over more than 5% of her body box (its picture, in the columns where
@@ -1358,9 +1380,10 @@ trunks keep its two exits.
 - From the wake-up on, nothing is saved: `autosaveNeeded` is false while
   `finale` isn't null (section 10). The `ending-save` event's snapshot is the
   save; the shell writes it and keeps it for the credits.
-- The credits (`src/ui/credits.ts`) are a paper sheet over everything: "THE
-  END", FRIENDS, MET ALONG THE WAY, and "Thank you for playing!", from
-  `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
+- The credits (`src/ui/credits.ts`) are a paper sheet over everything
+  (`--z-credits` and shared `--sticker-*` tokens, with `.die-cut` on entry
+  images and centred desktop layout from 1000 px wide): "THE END", FRIENDS,
+  MET ALONG THE WAY, and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
   roster order, on the frame `down_idle_01`. MET is each sticker in
   `state.stickers`, by its name, on its critter's atlas at the sticker's
@@ -1786,8 +1809,12 @@ trunks keep its two exits.
 - Backdrop: the area painting itself, scaled so its painted interior (8% in
   from each side, past the watercolour's paper margins) covers the canvas plus
   a 32 px margin, centred on the critter where it stands (`battleFoe`) and
-  clamped, softly blurred, with a
-  light cream wash. The overworld characters hide during the battle.
+  clamped, softly blurred, with a light cream wash. In battle, a soft centred
+  warm-cream spotlight (`screen`, keeping the four corners untouched) and
+  multiply contact shadows sit behind Fae, her fighting party, and the critter
+  (scaling with wind-up swell); during the `intro` phase, the backdrop zoom,
+  layer fade, and opposing slide-in ease smoothly to their marks. The overworld
+  characters hide during the battle.
 - Shell: `data-battle="open"` is on the root while a battle runs. Battle
   messages use the dialogue box with no speaker and hide when empty. While
   `battle.talk` is non-null, that same box is a dialogue with its speaker,

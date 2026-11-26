@@ -619,6 +619,7 @@ async function boot(): Promise<void> {
       window.innerWidth,
       window.innerHeight,
       app.renderer.resolution,
+      paused,
     );
     prompt.render(
       state.battle === null && state.arcade === null

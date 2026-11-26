@@ -3635,6 +3635,50 @@ the old trail, the owl, and the clubhouse claim.
   and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4200 just e2e`
   (941 passed, 2 skipped in 3.3 min).
 
+## Milestone 72: Living Storybook Graphics (Contact Shadows, Biome Atmosphere, Dramatic Lantern Lighting & Transitions) **Status:** ✅ Completed (2026-11-26)
+- Pure render/UI presentation milestone (zero `src/core` changes, zero replay
+  hash changes).
+- Procedural watercolor VFX texture kit (`src/render/vfx-textures.ts`): eight
+  cached offscreen-canvas Pixi textures (`contactShadow`, `softGlow`,
+  `sparkle`, `petal`, `waterGlint`, `mistWisp`, `sunbeam`, `paperGrain`)
+  matching the watercolor storybook style bible and `vfx_particles.png`.
+- Ground contact shadows (`src/render/view.ts`): warm plum-brown `shadowLayer`
+  above `ground` and below `depth` grounding Fae, party members, visible NPCs
+  (hover shadows under the four Enchanted Forest fairies, skipping `bus-stop`),
+  and overworld critters (scaling with roamer bob), plus battle contact
+  shadows (scaling with wind-up swell) and a soft warm-cream stage spotlight
+  behind combatants that keeps the four painted corners untouched. Switched
+  contact shadows from `multiply` to `normal` alpha blending after first-pass
+  `vision` review showed premultiplied `multiply` washing out shadows over
+  bright cream backdrops.
+- Smooth Catmull-Rom spline ambient flyers (`src/render/ambient.ts`, full
+  frame count support) and deterministic biome atmosphere across all 21 real
+  areas (`src/render/atmosphere.ts`, skipped on `harness` and hidden in
+  battle/arcade): plaza fountain glints (layered over the basin), arch lamp
+  pools, and petals; meadow dandelion seeds and pollen; coastal sea glints and
+  breeze sparkles; mountain parallax snow and lodge chimney smoke; woods
+  sunbeams and golden motes; mist/enchanted lavender mist ribbons, fireflies,
+  and four pastel fairy aura halos; lodge flickering amber hearth glow; arcade
+  pink/teal neon wall halos; and indoor sunlit window beams and dust motes,
+  unified with a world-anchored multiply `paperGrain` `TilingSprite`.
+- Dramatic blacklight lantern overhaul (`src/render/view.ts`): dusk clipped
+  inside `viewportMask` with smooth `lanternBlend` easing, deep indigo-plum
+  tint (`0x140a2e`, 0.63 alpha), additive UV spotlight pool and 12 drifting
+  lavender motes centred on Fae, and staggered pulse + proximity brightening on
+  glow decals.
+- Transitions & credits cohesion: cubic smoothstep `fadeAlpha`
+  (`src/render/fade.ts`), eased battle intro zoom/fade/slide, `--z-credits`
+  token in `src/ui/sticker.css`, `.die-cut` on credits images
+  (`src/ui/credits.ts`), and shared `--sticker-*` styling with centred desktop
+  layout in `src/ui/credits.css`.
+- Evidence: `tests/unit/milestone-72.test.ts`; reviewed captures in
+  `art/review/m72-plaza.jpg`, `m72-pass-lantern.jpg`, `m72-forest.jpg`,
+  `m72-battle.jpg`, and `m72-credits.jpg` verified with `vision`.
+- Gates: `just check` (127 unit files / 1,042 tests, all 60+ sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4203 just e2e`
+  (941 passed, 2 skipped in 4.0 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

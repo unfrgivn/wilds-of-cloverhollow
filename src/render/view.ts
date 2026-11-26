@@ -7,6 +7,7 @@ import {
   Sprite,
   Spritesheet,
   Text,
+  TilingSprite,
   type Renderer,
   Texture,
 } from "pixi.js";
@@ -82,6 +83,33 @@ import { fadeAlpha } from "./fade";
 import { battleLayout, type BattleLayout } from "./battle-layout";
 import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
+import { createVfxTextures, type VfxTextures } from "./vfx-textures";
+import { BiomeAtmosphere } from "./atmosphere";
+
+const INDOOR_AREAS = new Set([
+  "bedroom",
+  "kitchen",
+  "school",
+  "east-hall",
+  "classroom",
+  "gym",
+  "music",
+  "art-room",
+  "arcade",
+  "lodge",
+  "clubhouse",
+]);
+
+const ADULT_NPCS = new Set(["mom", "teacher", "nurse", "coach", "music-teacher"]);
+const LANTERN_MOTE_COUNT = 12;
+const LANTERN_MOTE_TINTS: readonly number[] = [0xd4b0ff, 0xe9d8ff, 0xb69eff];
+
+function makeShadowSprite(texture: Texture, label: string): Sprite {
+  const sprite = new Sprite(texture);
+  sprite.label = label;
+  sprite.anchor.set(0.5);
+  return sprite;
+}
 
 export type EntityAtlas = { alias: string; src: string };
 
@@ -144,18 +172,29 @@ function placeAura(
 export class GameView {
   readonly root = new Container();
   readonly ready: Promise<void>;
+  private readonly vfx: VfxTextures;
+  private readonly atmosphere: BiomeAtmosphere;
   private readonly background = new Graphics();
   private readonly paper = new Graphics();
   private readonly fade = new Graphics();
+  private readonly viewport = new Container();
   private readonly scene = new Container();
+  private readonly shadowLayer = new Container();
+  private readonly paperGrain: TilingSprite;
+  private readonly lanternLayer = new Container();
   private readonly lanternTint = new Graphics();
+  private readonly lanternWorld = new Container();
+  private readonly lanternSpotlight: Sprite;
+  private readonly lanternMotes: Sprite[] = [];
   private readonly glowLayer = new Container();
   private readonly depth = new Container();
   private readonly ambientLayer = new Container();
   private readonly player = new Sprite();
+  private readonly playerShadow: Sprite;
   // One overworld sprite per roster member, labelled with its id; only the
   // members in the party are visible.
   private readonly partySprites = new Map<string, Sprite>();
+  private readonly partyShadows = new Map<string, Sprite>();
   private readonly viewportMask = new Graphics();
   private readonly battleLayer = new Container();
   // A light cream wash over the blurred backdrop so the figures stand out.
@@ -177,6 +216,10 @@ export class GameView {
   private readonly backdropSprite = new Sprite();
   private readonly renderer: Renderer;
   private backdropTexture: Texture | undefined;
+  private readonly battleSpotlight: Sprite;
+  private readonly battleCritterShadow: Sprite;
+  private readonly battleFaeShadow: Sprite;
+  private readonly battlePartyShadows = new Map<string, Sprite>();
   private readonly battleCritter = new Sprite();
   private readonly battleCritterAura = new Sprite();
   private readonly battleFae = new Sprite();
@@ -189,7 +232,8 @@ export class GameView {
   private staticWidth = 0;
   private staticHeight = 0;
   private staticPaper = 0;
-  private lanternTintSize = "";
+  private lanternBlend = 0;
+  private lanternTick: number | undefined;
   private battleWashKey = "";
   private currentAnimation = "idle_down";
   private currentFrame = 0;
@@ -204,7 +248,7 @@ export class GameView {
   private currentEntityAliases: readonly string[] = [];
   private residentEntityAliases: readonly string[] = [];
   private readonly permanentAliases: ReadonlySet<string>;
-  private critterSprites: { id: string; body: Sprite; aura: Sprite }[] = [];
+  private critterSprites: { id: string; body: Sprite; aura: Sprite; shadow: Sprite }[] = [];
   private critterKeys = "";
   // Each overworld critter: `id` is its key (a set piece's id or `wild:<den>`).
   private critterFrames: {
@@ -214,7 +258,11 @@ export class GameView {
     x: number;
     y: number;
   }[] = [];
-  private npcSprites: { npc: Area["npcs"][number]; sprite: Sprite }[] = [];
+  private npcSprites: {
+    npc: Area["npcs"][number];
+    sprite: Sprite;
+    shadow: Sprite | null;
+  }[] = [];
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
   private glowSprites: { id: string; sprite: Sprite }[] = [];
   private drawnGlows: string[] = [];
@@ -226,6 +274,55 @@ export class GameView {
     options: { debugLabel: boolean; renderer: Renderer },
   ) {
     this.renderer = options.renderer;
+    this.vfx = createVfxTextures();
+    this.atmosphere = new BiomeAtmosphere(this.vfx);
+    this.paperGrain = new TilingSprite({
+      texture: this.vfx.paperGrain,
+      width: 960,
+      height: 720,
+    });
+    this.paperGrain.label = "paper-grain";
+    this.paperGrain.blendMode = "multiply";
+    this.paperGrain.alpha = 0.035;
+    this.paperGrain.visible = false;
+
+    this.playerShadow = makeShadowSprite(this.vfx.contactShadow, "shadow:fae");
+    this.shadowLayer.label = "shadows";
+    this.shadowLayer.addChild(this.playerShadow);
+
+    this.lanternSpotlight = new Sprite(this.vfx.softGlow);
+    this.lanternSpotlight.label = "lantern:spotlight";
+    this.lanternSpotlight.anchor.set(0.5);
+    this.lanternSpotlight.tint = 0xb98eff;
+    this.lanternSpotlight.blendMode = "add";
+    this.lanternSpotlight.width = 540;
+    this.lanternSpotlight.height = 480;
+    this.lanternWorld.addChild(this.lanternSpotlight);
+    for (let i = 0; i < LANTERN_MOTE_COUNT; i += 1) {
+      const mote = new Sprite(this.vfx.sparkle);
+      mote.label = `lantern:mote:${i}`;
+      mote.anchor.set(0.5);
+      mote.blendMode = "add";
+      mote.tint = LANTERN_MOTE_TINTS[i % LANTERN_MOTE_TINTS.length] ?? 0xd4b0ff;
+      this.lanternMotes.push(mote);
+      this.lanternWorld.addChild(mote);
+    }
+    this.lanternLayer.label = "lantern";
+    this.lanternLayer.visible = false;
+    this.lanternLayer.addChild(this.lanternTint, this.lanternWorld);
+
+    this.battleSpotlight = new Sprite(this.vfx.softGlow);
+    this.battleSpotlight.label = "battle:spotlight";
+    this.battleSpotlight.anchor.set(0.5);
+    this.battleSpotlight.tint = 0xfff8e6;
+    this.battleSpotlight.blendMode = "screen";
+    this.battleSpotlight.alpha = 0.16;
+    this.battleCritterShadow = makeShadowSprite(
+      this.vfx.contactShadow,
+      "battle:shadow:critter",
+    );
+    this.battleFaeShadow = makeShadowSprite(this.vfx.contactShadow, "battle:shadow:fae");
+
     this.permanentAliases = new Set([
       "fae-sheet",
       "glow-sheet",
@@ -240,33 +337,49 @@ export class GameView {
       sprite.label = id;
       sprite.visible = false;
       this.partySprites.set(id, sprite);
+      const shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:${id}`);
+      shadow.visible = false;
+      this.partyShadows.set(id, shadow);
+      this.shadowLayer.addChild(shadow);
       const battleSprite = new Sprite();
       battleSprite.label = `battle:${id}`;
       battleSprite.visible = false;
       this.battlePartySprites.set(id, battleSprite);
+      const battleShadow = makeShadowSprite(this.vfx.contactShadow, `battle:shadow:${id}`);
+      battleShadow.visible = false;
+      this.battlePartyShadows.set(id, battleShadow);
     }
     this.battleCritter.label = "battle:critter";
     this.battleCritterAura.label = "battle:critter:aura";
     this.player.scale.set(0.5);
+    this.viewport.addChild(this.scene, this.lanternLayer, this.glowLayer);
+    this.viewport.mask = this.viewportMask;
     this.root.addChild(
       this.background,
       this.paper,
-      this.scene,
+      this.viewport,
       this.viewportMask,
       this.fade,
       this.backdropSprite,
       this.battleWash,
       this.battleLayer,
-      this.lanternTint,
-      this.glowLayer,
     );
-    this.scene.mask = this.viewportMask;
-    this.scene.addChild(this.depth);
-    this.scene.addChild(this.ambientLayer);
+    this.scene.addChild(
+      this.shadowLayer,
+      this.atmosphere.under,
+      this.depth,
+      this.ambientLayer,
+      this.atmosphere.over,
+      this.paperGrain,
+    );
     this.depth.addChild(this.player);
     for (const sprite of this.partySprites.values())
       this.depth.addChild(sprite);
     this.battleLayer.addChild(
+      this.battleSpotlight,
+      this.battleCritterShadow,
+      this.battleFaeShadow,
+      ...this.battlePartyShadows.values(),
       this.battleCritterAura,
       this.battleCritter,
       this.battleFae,
@@ -306,10 +419,14 @@ export class GameView {
     for (const sprite of this.critterSprites) {
       sprite.body.destroy();
       sprite.aura.destroy();
+      sprite.shadow.destroy();
     }
     this.critterSprites = [];
     this.critterKeys = "";
-    for (const { sprite } of this.npcSprites) sprite.destroy();
+    for (const { sprite, shadow } of this.npcSprites) {
+      sprite.destroy();
+      shadow?.destroy();
+    }
     this.npcSprites = [];
     const entities = areaEntityAtlases(this.world, area);
     const [next] = await Promise.all([
@@ -341,14 +458,25 @@ export class GameView {
     });
     for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
+    this.paperGrain.visible = area.id !== "harness";
+    this.paperGrain.width = area.width;
+    this.paperGrain.height = area.height;
+    this.paperGrain.position.set(0, 0);
     this.npcSprites = area.npcs.map((npc) => {
       const sprite = new Sprite();
       sprite.label = `npc:${npc.id}`;
       sprite.scale.set(0.5);
       this.depth.addChild(sprite);
-      return { npc, sprite };
+      let shadow: Sprite | null = null;
+      if (npc.id !== "bus-stop") {
+        shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:npc:${npc.id}`);
+        shadow.visible = false;
+        this.shadowLayer.addChild(shadow);
+      }
+      return { npc, sprite, shadow };
     });
     this.previousCamera = undefined;
+    this.lanternTick = undefined;
     this.staticWidth = 0;
   }
 
@@ -431,34 +559,13 @@ export class GameView {
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const letterboxX = (width - this.viewWidth * scale) / 2;
     const letterboxY = (height - this.viewHeight * scale) / 2;
+    const viewW = this.viewWidth * scale;
+    const viewH = this.viewHeight * scale;
     this.background.clear().rect(0, 0, width, height).fill(0xf8edcf);
-    this.paper
-      .clear()
-      .rect(
-        letterboxX,
-        letterboxY,
-        this.viewWidth * scale,
-        this.viewHeight * scale,
-      )
-      .fill(paper);
-    this.viewportMask
-      .clear()
-      .rect(
-        letterboxX,
-        letterboxY,
-        this.viewWidth * scale,
-        this.viewHeight * scale,
-      )
-      .fill(0xffffff);
-    this.fade
-      .clear()
-      .rect(
-        letterboxX,
-        letterboxY,
-        this.viewWidth * scale,
-        this.viewHeight * scale,
-      )
-      .fill(paper);
+    this.paper.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
+    this.viewportMask.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0xffffff);
+    this.lanternTint.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(0x140a2e);
+    this.fade.clear().rect(letterboxX, letterboxY, viewW, viewH).fill(paper);
     this.fade.alpha = 0;
     this.staticWidth = width;
     this.staticHeight = height;
@@ -535,10 +642,14 @@ export class GameView {
     return { id: member.id, animation, frame };
   }
 
-  private renderParty(state: State): void {
+  private renderParty(state: State, shadowAlpha: number): void {
     const inParty = new Set(state.party.map((member) => member.id));
-    for (const [id, sprite] of this.partySprites)
-      sprite.visible = inParty.has(id);
+    for (const [id, sprite] of this.partySprites) {
+      const present = inParty.has(id);
+      sprite.visible = present;
+      const shadow = this.partyShadows.get(id);
+      if (shadow !== undefined) shadow.visible = present;
+    }
     const partner = dialoguePartner(this.world, state);
     this.partyFrames = state.party.flatMap((member) => {
       const sprite = this.partySprites.get(member.id);
@@ -546,6 +657,14 @@ export class GameView {
       if (sprite === undefined || content === undefined) return [];
       sprite.position.set(member.x, member.y);
       sprite.zIndex = member.y;
+      const shadow = this.partyShadows.get(member.id);
+      if (shadow !== undefined) {
+        const shadowWidth = content.box.width * 0.92;
+        shadow.position.set(member.x, member.y);
+        shadow.width = shadowWidth;
+        shadow.height = shadowWidth * 0.38;
+        shadow.alpha = shadowAlpha;
+      }
       return [this.setFollowerTexture(sprite, state, member, content, partner)];
     });
   }
@@ -555,6 +674,7 @@ export class GameView {
     width: number,
     height: number,
     resolution: number,
+    snapLantern = false,
   ): void {
     const area = this.world.areas[state.area];
     if (area === undefined) return;
@@ -588,15 +708,31 @@ export class GameView {
       Math.round((letterboxY - camera.y * scale) * resolution) / resolution;
     this.scene.scale.set(scale);
     this.scene.position.set(offsetX, offsetY);
+    this.lanternWorld.scale.set(scale);
+    this.lanternWorld.position.set(offsetX, offsetY);
     this.glowLayer.scale.set(scale);
     this.glowLayer.position.set(offsetX, offsetY);
+    const indoor = INDOOR_AREAS.has(area.id);
+    const shadowAlpha = indoor ? 0.24 : 0.3;
+    this.shadowLayer.visible = area.id !== "harness";
     this.player.position.set(state.player.x, state.player.y);
     this.player.zIndex = state.player.y;
+    this.playerShadow.position.set(state.player.x, state.player.y);
+    this.playerShadow.width = 46;
+    this.playerShadow.height = 18;
+    this.playerShadow.alpha = shadowAlpha;
     this.setFaeTexture(state);
-    this.renderParty(state);
-    this.renderCritters(state);
-    this.renderNpcs(state);
+    this.renderParty(state, shadowAlpha);
+    this.renderCritters(state, shadowAlpha);
+    this.renderNpcs(state, shadowAlpha);
     this.renderAmbient(state);
+    this.atmosphere.update(
+      area.id,
+      area.width,
+      area.height,
+      state.tick,
+      state.battle === null && state.arcade === null,
+    );
     loaded.update(
       this.world,
       state.ink,
@@ -604,7 +740,7 @@ export class GameView {
       state.tick,
       this.figures(),
     );
-    this.renderGlows(state, width, height);
+    this.renderGlows(state, snapLantern);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
     if (this.label !== undefined) {
@@ -620,25 +756,58 @@ export class GameView {
     this.fade.alpha = fade;
   }
 
-  private renderGlows(state: State, width: number, height: number): void {
+  private renderGlows(state: State, snapLantern = false): void {
     const area = this.areaView?.area;
     const sheet = Assets.get<Spritesheet>("glow-sheet");
-    const on = state.lantern && state.battle === null;
-    // Blacklight: the scene drops to a deep violet dusk so the added glows show;
-    // on bright snow, added light would only saturate to white.
-    if (on) {
-      const sizeKey = `${width}x${height}`;
-      if (sizeKey !== this.lanternTintSize) {
-        this.lanternTintSize = sizeKey;
-        this.lanternTint
-          .clear()
-          .rect(0, 0, width, height)
-          .fill({ color: 0x1d0f3a, alpha: 0.55 });
+    const on = state.lantern && state.battle === null && state.arcade === null;
+    const target = on ? 1 : 0;
+    if (
+      snapLantern ||
+      this.lanternTick === undefined ||
+      state.tick < this.lanternTick ||
+      state.tick - this.lanternTick > 18
+    ) {
+      this.lanternBlend = target;
+    } else if (state.tick > this.lanternTick) {
+      const delta = state.tick - this.lanternTick;
+      const gap = target - this.lanternBlend;
+      this.lanternBlend += Math.sign(gap) * Math.min(Math.abs(gap), 0.12 * delta);
+    }
+    this.lanternTick = state.tick;
+
+    // Blacklight: deep indigo-plum dusk clipped inside viewportMask, paired with
+    // a luminous UV pool and drifting lavender motes centred on Fae.
+    const showDusk = this.lanternBlend > 0.001 &&
+      state.battle === null &&
+      state.arcade === null;
+    this.lanternLayer.visible = showDusk;
+    if (showDusk) {
+      this.lanternTint.alpha = 0.63 * this.lanternBlend;
+      const centerX = state.player.x;
+      const centerY = state.player.y - 46;
+      this.lanternSpotlight.position.set(centerX, centerY);
+      this.lanternSpotlight.alpha =
+        (0.36 + 0.04 * Math.sin(state.tick / 16)) * this.lanternBlend;
+      for (let i = 0; i < this.lanternMotes.length; i += 1) {
+        const mote = this.lanternMotes[i];
+        if (mote === undefined) continue;
+        const speed = 0.012 + (i % 4) * 0.004;
+        const angle = (i / this.lanternMotes.length) * Math.PI * 2 +
+          state.tick * speed * (i % 2 === 0 ? 1 : -1);
+        const baseRadius = 46 + ((i * 53) % 165);
+        const radius = baseRadius + Math.sin(state.tick * 0.03 + i * 1.7) * 16;
+        const mx = centerX + Math.cos(angle) * radius;
+        const my = centerY + Math.sin(angle) * radius * 0.72;
+        const twinkle = 0.5 + 0.5 * Math.sin(state.tick * 0.08 + i * 1.9);
+        const scale = 0.24 + (i % 3) * 0.11;
+        mote.position.set(mx, my);
+        mote.scale.set(scale);
+        mote.alpha = (0.24 + 0.36 * twinkle) * this.lanternBlend;
       }
     }
-    this.lanternTint.visible = on;
+
     const drawn: string[] = [];
-    for (const { id, sprite } of this.glowSprites) {
+    this.glowSprites.forEach(({ id, sprite }, index) => {
       const glow = area?.glows.find((item) => item.id === id);
       const texture =
         glow === undefined ? undefined : sheet?.textures[glow.frame];
@@ -646,17 +815,24 @@ export class GameView {
       if (texture !== undefined && glow !== undefined) {
         sprite.texture = texture;
         sprite.position.set(glow.point.x, glow.point.y);
-        sprite.scale.set(glow.flip === true ? -0.5 : 0.5, 0.5);
-        sprite.alpha = 0.82 + Math.sin(state.tick / 24) * 0.12;
+        const dx = glow.point.x - state.player.x;
+        const dy = glow.point.y - state.player.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const proximity = dist >= 320 ? 0.78 : 0.78 + 0.22 * (1 - dist / 320);
+        const pulse = 0.84 + Math.sin(state.tick / 24 + index * 1.15) * 0.12;
+        const bloom = 1 + 0.025 * Math.sin(state.tick / 18 + index * 1.15);
+        const s = 0.5 * bloom;
+        sprite.scale.set(glow.flip === true ? -s : s, s);
+        sprite.alpha = Math.min(1, pulse * proximity) * Math.max(0.35, this.lanternBlend);
         if (sprite.visible) drawn.push(id);
       }
-    }
+    });
     this.drawnGlows = drawn;
   }
 
   private renderAmbient(state: State): void {
     const sheet = Assets.get<Spritesheet>("ambient-sheet");
-    const visible = state.battle === null;
+    const visible = state.battle === null && state.arcade === null;
     if (!visible) {
       for (const { sprite } of this.ambientSprites) sprite.visible = false;
       this.ambientFrames = [];
@@ -664,8 +840,8 @@ export class GameView {
     }
     const frames: { id: string; x: number; y: number; frame: number }[] = [];
     for (const { flyer, sprite } of this.ambientSprites) {
-      const position = flyerAt(flyer, state.tick);
       const names = sheet?.data.animations?.[flyer.animation] ?? [];
+      const position = flyerAt(flyer, state.tick, Math.max(1, names.length));
       const frameName = names[position.frame] ?? names[0];
       const texture = frameName === undefined ? undefined : sheet?.textures[frameName];
       sprite.visible = texture !== undefined;
@@ -682,13 +858,14 @@ export class GameView {
   // People in the area, y-sorted with everyone else. They face Fae while she
   // talks to them; without a frame for that facing (Mom has no back view)
   // they show their front. idle_down steps through the character's idleTicks.
-  private renderNpcs(state: State): void {
+  private renderNpcs(state: State, shadowAlpha: number): void {
     const frames: { id: string; frame: string; facing: string }[] = [];
-    for (const { npc, sprite } of this.npcSprites) {
+    for (const { npc, sprite, shadow } of this.npcSprites) {
       const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
       const character = this.world.characters[npc.id];
       // Someone the story has sent away isn't drawn (spec 6).
       sprite.visible = npcVisible(this.world, state, npc);
+      if (shadow !== null) shadow.visible = sprite.visible;
       if (sheet === undefined || character === undefined || !sprite.visible)
         continue;
       const facing = npcFacing(state, npc);
@@ -728,6 +905,20 @@ export class GameView {
       sprite.scale.set(mirror ? -s : s, s);
       sprite.position.set(npc.point.x, npc.point.y);
       sprite.zIndex = npc.point.y;
+      if (shadow !== null) {
+        if (npc.id.startsWith("fairy-")) {
+          shadow.position.set(npc.point.x, npc.point.y + 8);
+          shadow.width = 28;
+          shadow.height = 12;
+          shadow.alpha = 0.24;
+        } else {
+          const width = npc.id === "oliver" ? 34 : ADULT_NPCS.has(npc.id) ? 52 : 48;
+          shadow.position.set(npc.point.x, npc.point.y);
+          shadow.width = width;
+          shadow.height = width * 0.38;
+          shadow.alpha = shadowAlpha;
+        }
+      }
       frames.push({ id: npc.id, frame: name, facing });
     }
     this.npcFrames = frames;
@@ -737,7 +928,7 @@ export class GameView {
   // with Fae, her party, and props, their figures overworldHeight tall.
   // Who is out can change in an area (a rest rolls it again, a set piece
   // comes and goes), so the sprites follow the present critters' keys.
-  private renderCritters(state: State): void {
+  private renderCritters(state: State, shadowAlpha: number): void {
     const present =
       this.areaView === undefined ? [] : presentCritters(this.world, state);
     const keys = present
@@ -748,14 +939,20 @@ export class GameView {
       for (const sprite of this.critterSprites) {
         sprite.body.destroy();
         sprite.aura.destroy();
+        sprite.shadow.destroy();
       }
       this.critterSprites = present.map((critter) => {
         const body = new Sprite();
         body.label = `critter:${critter.key}`;
         const aura = new Sprite();
         aura.label = `critter:${critter.key}:aura`;
+        const shadow = makeShadowSprite(
+          this.vfx.contactShadow,
+          `shadow:critter:${critter.key}`,
+        );
         this.depth.addChild(aura, body);
-        return { id: critter.key, body, aura };
+        this.shadowLayer.addChild(shadow);
+        return { id: critter.key, body, aura, shadow };
       });
     }
     const frames: {
@@ -765,7 +962,7 @@ export class GameView {
       x: number;
       y: number;
     }[] = [];
-    for (const [index, { id, body, aura }] of this.critterSprites.entries()) {
+    for (const [index, { id, body, aura, shadow }] of this.critterSprites.entries()) {
       const critter = present[index];
       if (critter === undefined) continue;
       const content = critter.kind;
@@ -789,6 +986,12 @@ export class GameView {
       const bob = roamer?.moving === true ? Math.sin(state.tick / 4) * 3 : 0;
       body.position.set(point.x, point.y + bob);
       body.zIndex = point.y;
+      const baseWidth = Math.min(76, Math.max(36, content.overworldHeight * 0.56));
+      const hopScale = bob < 0 ? 1 + bob * 0.025 : 1;
+      shadow.position.set(point.x, point.y);
+      shadow.width = baseWidth * hopScale;
+      shadow.height = baseWidth * 0.38 * hopScale;
+      shadow.alpha = shadowAlpha * hopScale;
       aura.visible = !calm;
       aura.texture = auraTexture;
       placeAura(
@@ -813,7 +1016,12 @@ export class GameView {
    * overworld zoom), centred on the critter and clamped, softly blurred. The
    * margin keeps the blur's edge fade off-screen.
    */
-  private renderBackdrop(state: State, width: number, height: number): void {
+  private renderBackdrop(
+    state: State,
+    width: number,
+    height: number,
+    zoom = 1,
+  ): void {
     const area = this.areaView?.area;
     if (area === undefined) return;
     // A battle centres on its critter; the claw machine on Fae, who stands at it.
@@ -828,11 +1036,12 @@ export class GameView {
     const insetX = area.width * 0.08;
     const insetY = area.height * 0.08;
     const margin = 32;
-    const cover = Math.max(
+    const baseCover = Math.max(
       (width + margin * 2) / (area.width - insetX * 2),
       (height + margin * 2) / (area.height - insetY * 2),
       Math.min(width / this.viewWidth, height / this.viewHeight),
     );
+    const cover = baseCover * zoom;
     const clamp = (value: number, low: number, high: number): number =>
       Math.min(high, Math.max(low, value));
     const x = clamp(
@@ -875,7 +1084,7 @@ export class GameView {
     state: State,
     width: number,
     height: number,
-    resolution: number,
+    _resolution: number,
   ): void {
     const battle = state.battle;
     const arcade = state.arcade;
@@ -883,6 +1092,7 @@ export class GameView {
       this.battleLayer.visible = false;
       this.battleWash.visible = false;
       this.backdropSprite.visible = false;
+      this.viewport.visible = true;
       this.scene.visible = true;
       this.battleBackdrop = null;
       if (this.backdropTexture !== undefined) {
@@ -894,8 +1104,14 @@ export class GameView {
     this.battleLayer.visible = battle !== null;
     this.battleWash.visible = true;
     this.backdropSprite.visible = true;
+    this.viewport.visible = false;
     this.scene.visible = false;
-    this.renderBackdrop(state, width, height);
+    const introProgress = battle?.phase === "intro"
+      ? Math.min(1, Math.max(0, battle.phaseTicks / 18))
+      : 1;
+    const introEase = introProgress * (2 - introProgress);
+    const backdropZoom = battle?.phase === "intro" ? 1 + 0.05 * (1 - introEase) : 1;
+    this.renderBackdrop(state, width, height, backdropZoom);
     const scale = Math.min(width / this.viewWidth, height / this.viewHeight);
     const x = (width - this.viewWidth * scale) / 2;
     const y = (height - this.viewHeight * scale) / 2;
@@ -916,6 +1132,13 @@ export class GameView {
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(x, y);
     drawWash(0.2);
+    // Warm-cream radial focus spotlight centred behind the combatants, kept
+    // well inside the viewport so the four painted corners stay untouched.
+    this.battleSpotlight.position.set(this.viewWidth * 0.44, this.viewHeight * 0.46);
+    this.battleSpotlight.width = this.viewWidth * 0.72;
+    this.battleSpotlight.height = this.viewHeight * 0.68;
+
+    const slideOffset = 14 * (1 - introEase);
     const critter = this.world.critters[battle.critterId];
     if (critter === undefined) return;
     const sheet = Assets.get<Spritesheet | undefined>(critter.atlas);
@@ -941,10 +1164,16 @@ export class GameView {
     const swell = puff === 0 ? 1 : 1 + 0.06 * puff + 0.012 * Math.sin(state.tick / 7);
     const critterScale = (critter.battleHeight / critter.figureHeight) * swell;
     this.battleCritter.scale.set(critterScale);
-    this.battleCritter.position.set(
-      (layout.critter.x - x) / scale,
-      (layout.critter.baseline - y) / scale,
-    );
+    const critterX = (layout.critter.x - x) / scale + slideOffset;
+    const critterY = (layout.critter.baseline - y) / scale;
+    this.battleCritter.position.set(critterX, critterY);
+    const critterShadowBase = Math.min(190, Math.max(92, critter.battleHeight * 0.58));
+    const critterShadowScale = 1 + (swell - 1) * 0.65;
+    this.battleCritterShadow.position.set(critterX, critterY);
+    this.battleCritterShadow.width = critterShadowBase * critterShadowScale;
+    this.battleCritterShadow.height = critterShadowBase * 0.32 * (1 + (swell - 1) * 0.5);
+    this.battleCritterShadow.alpha = 0.34;
+
     this.battleCritterAura.texture = aura;
     placeAura(
       this.battleCritterAura,
@@ -965,22 +1194,30 @@ export class GameView {
     const faeSheet = Assets.get<Spritesheet>("fae-sheet");
     const faeFrames = faeSheet.animations.idle_up;
     const fae = faeFrames?.[0];
+    const faeX = (layout.fae.x - x) / scale - slideOffset;
+    const faeY = (layout.fae.baseline - y) / scale;
     if (fae !== undefined) {
       this.battleFae.texture = fae;
       if (fae.defaultAnchor !== undefined)
         this.battleFae.anchor.copyFrom(fae.defaultAnchor);
       this.battleFae.scale.set(0.58);
-      this.battleFae.position.set(
-        (layout.fae.x - x) / scale,
-        (layout.fae.baseline - y) / scale,
-      );
+      this.battleFae.position.set(faeX, faeY);
     }
+    this.battleFaeShadow.position.set(faeX, faeY);
+    this.battleFaeShadow.width = 68;
+    this.battleFaeShadow.height = 22;
+    this.battleFaeShadow.alpha = 0.34;
+
     // The party stands with Fae: a sitter (Maddie) sits facing the critter,
     // anyone else is seen from behind like Fae. Flute friends sit it out.
     const fighting = battleParty(this.world, state.party);
     const inParty = new Set(fighting.map((member) => member.id));
-    for (const [id, sprite] of this.battlePartySprites)
-      sprite.visible = inParty.has(id);
+    for (const [id, sprite] of this.battlePartySprites) {
+      const visible = inParty.has(id);
+      sprite.visible = visible;
+      const shadow = this.battlePartyShadows.get(id);
+      if (shadow !== undefined) shadow.visible = visible;
+    }
     fighting.forEach((member, index) => {
       const sprite = this.battlePartySprites.get(member.id);
       const content = this.world.party[member.id];
@@ -996,10 +1233,19 @@ export class GameView {
       if (frame.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(frame.defaultAnchor);
       sprite.scale.set(((content.scale ?? 0.5) / 0.5) * 0.58);
-      sprite.position.set((place.x - x) / scale, (place.y - y) / scale);
+      const memberX = (place.x - x) / scale - slideOffset;
+      const memberY = (place.y - y) / scale;
+      sprite.position.set(memberX, memberY);
+      const shadow = this.battlePartyShadows.get(member.id);
+      if (shadow !== undefined) {
+        const shadowWidth = content.box.width * 1.15;
+        shadow.position.set(memberX, memberY);
+        shadow.width = shadowWidth;
+        shadow.height = shadowWidth * 0.36;
+        shadow.alpha = 0.32;
+      }
     });
-    this.battleLayer.alpha =
-      battle.phase === "intro" ? Math.min(1, battle.phaseTicks / 18) : 1;
+    this.battleLayer.alpha = introEase;
   }
 
   // The one battle layout (spec 8), for the scene, the ring, and renderInfo.

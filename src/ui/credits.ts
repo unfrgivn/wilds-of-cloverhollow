@@ -49,7 +49,7 @@ export function createCredits(root: HTMLElement): { render: (view: CreditsView) 
       const item = document.createElement("li");
       item.className = `credits-entry credits-entry-${entry.section}`;
       const image = document.createElement("div");
-      image.className = "credits-entry-image";
+      image.className = "credits-entry-image die-cut";
       const atlas = entry.image;
       if (atlas !== null) applyAtlasCrop(image, atlas);
       const label = document.createElement("span");

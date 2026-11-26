@@ -1,0 +1,133 @@
+{
+  "id": "bat",
+  "species": "bat",
+  "name": "Duzzy Bat",
+  "calmName": "Cozy Bat",
+  "atlas": "assets/critters/bat/bat.json",
+  "auraCentre": {
+    "x": 258.7,
+    "y": 260.72
+  },
+  "bodyCentre": {
+    "x": 263.59,
+    "y": 349.83
+  },
+  "figureHeight": 330,
+  "overworldHeight": 68,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "cozy-bat",
+    "name": "Cozy Bat",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "bat_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "zoomy",
+    "curious",
+    "grumpy"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.3,
+    "check": {
+      "kind": "lean",
+      "puffTicks": 56,
+      "starts": [
+        44,
+        116
+      ],
+      "forces": [
+        2,
+        3
+      ],
+      "steer": 5,
+      "spring": 3
+    },
+    "big": {
+      "kind": "lean",
+      "puffTicks": 36,
+      "starts": [
+        44,
+        94,
+        144
+      ],
+      "forces": [
+        3
+      ],
+      "steer": 5,
+      "spring": 3
+    }
+  },
+  "lines": {
+    "intro": "A fizzy bat loops down from the crystals, squeaking like a tiny kettle!",
+    "command": "How can Fae calm the dizzy bat?",
+    "soothe": {
+      "great": "Fae hums a soft cave echo. The bat folds its wings and listens, ears perked!",
+      "good": "Fae hums gently. The bat's wild loops slow to a dreamy flutter.",
+      "miss": "The bat squeaks right over Fae's humming, spinning in circles."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie leaps at a dancing crystal sparkle. The bat swoops after her, giggling!",
+        "good": "Maddie wags her tail in the glow. The bat hovers low to peek.",
+        "miss": "Maddie chases her own shadow. The bat zips back up to the ceiling."
+      },
+      "cast": {
+        "great": "Sue twirls her glowing ribbon bobber. The bat tracks every swoop, charmed!",
+        "good": "Sue casts her bobber past the crystals. The bat tilts its fuzzy head.",
+        "miss": "Sue's bobber bumps a stalagmite. The bat puffs its cheeks and flaps away."
+      },
+      "juggle": {
+        "great": "Jordan juggles three glowing pebbles. The bat beats its wings right in time!",
+        "good": "Jordan tosses a sparkly stone high. The bat chirps and glides after it.",
+        "miss": "Jordan's pebbles clatter across the cave floor. The bat flaps up in a tizzy."
+      }
+    },
+    "snack": "Fae holds up a sweet fruit snack. The bat nibbles it mid-hover, happy!",
+    "burst": "The bat swoops low, kicking up a fizzy cave breeze!",
+    "burstResult": {
+      "great": "Fae leans right into the cave breeze and keeps her footing!",
+      "good": "Fae sways in the sparkly gust, then plants her sneakers.",
+      "miss": "WHOOSH! The cave breeze ruffles Fae's bangs and pushes her back."
+    },
+    "soothed": "The bat lets out a cozy yawn and tucks its wings warm around its nose.",
+    "rest": "Fae is tuckered out from all that swirling air. Time for a rest.",
+    "run": "Fae tiptoes back toward the crystals. The bat swoops off into the rafters."
+  },
+  "coins": 8,
+  "level": 6
+}

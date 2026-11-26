@@ -108,7 +108,7 @@ describe("specialty treats catalogue & validation", () => {
       "cocoa-sundae",
     ]);
     const allSpecies = [...new Set(Object.values(world.critters).map((c) => c.species))].sort();
-    expect(allSpecies).toHaveLength(20);
+    expect(allSpecies).toHaveLength(world.stickers.catalogue.length);
     for (const species of allSpecies) {
       const liked = world.treats.filter((treat) => treat.favourites.includes(species));
       expect(liked.length, `${species} must have a favourite treat`).toBeGreaterThanOrEqual(1);

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 77)
+Last updated: 2026-11-26 (Milestone 78)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -822,6 +822,34 @@ ios/            Capacitor iOS project (from Milestone 4).
   out, and a paper plane doodled in the corner), and Biscuit asleep
   (`lodge_hamster`). Its floor is wood, and its fixture `lodge` stands at the
   door with the whole party.
+- Crystal Cavern: `cavern`, "Crystal Cavern", in the `pass` land, a 1650x1100
+  painted glowing cave off Pinecone Pass's north snow gap (trigger `cavern`
+  at x=795..875, y=155..185, `requires` `has_lantern`, knot `cavern_dark`;
+  return spawn `pass.cavern` at (940, 185) facing down). Inside, the SW
+  snow-dusted archway exits back to Pinecone Pass (`entrance` spawn at
+  (365, 785) facing up; east bank spawn `grotto` at (1005, 560) facing right).
+  Its kit has 8 props: five crystal clusters, two mossy stone lanterns, and
+  `crystal-steps` (hidden by default; `lit`, flat, while `cavern_bridge_lit`).
+  A turquoise stream and crystal pool split the cavern; the mid-stream
+  crossing `spring` opens on `cavern_bridge_lit`. Blacklight lantern glows
+  (`cavern-mote-1..3`, `cavern-mural-glow`) lead to the NW carved tablet where
+  `cavern_mural` lights the three crystal stepping stones (`chime-blue`). On
+  the east bank, `star-chime` (`cavern_chime`) uses Coach Ash's lasso for
+  15 coins and a Shimmering Star Crystal keepsake in `club_chest`, and
+  `crystal-spring` (`cavern_spring`) lets the Pond Pup dive for 2 snacks and
+  10 coins. Five `fairy_light` ambient flyers drift over the crystals and
+  water; stone is the default surface with sand on the mineral paths. Two
+  recurring dens roll two cave critters: `bat` (Duzzy Bat / Cozy Bat, Lv 6,
+  `lean` burst, `cozy-bat` sticker, `bat_calm`) on the west floor and
+  `crystal-mole` (Glimmer Mole / Gem Mole, Lv 7, `chain` dust burst,
+  `gem-mole` sticker, `crystal_mole_calm`) on the east floor. Its fixture
+  `cavern` starts at `entrance` with Maddie, Sue, Jordan, lantern, lasso,
+  flute, and Pond Pup befriended. Its atmosphere (`src/render/atmosphere.ts`)
+  adds soft pulsing crystal halos, turquoise water glints, and pastel crystal
+  sparkle motes; its soundtrack plays `"enchanted"` with `"enchanted-shimmer"`
+  ambience (`src/core/music.ts`); `bat` favours `orchard-apple` and
+  `berry-cone` and `crystal-mole` favours `cocoa-sundae` and `orchard-apple`
+  (`content/treats.json`).
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),
@@ -2058,9 +2086,9 @@ trunks keep its two exits.
   `brushSpeed` 20, `reachRadius` 105, and `dryTicks` 180. The flower reads as
   a four-petal flower or a star.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
-  and leaves Milo calm under the tree. The sticker catalogue has 20 slots,
-  including the Milo sticker. The front-view NPC art is no longer loaded by
-  the runtime. Its raw source and recipe remain in `art/source/` and
+  and leaves Milo calm under the tree. The sticker catalogue has 22 slots,
+  including Milo, Cozy Bat, and Gem Mole. The front-view NPC art is no longer
+  loaded by the runtime. Its raw source and recipe remain in `art/source/` and
   `art/recipes/` for provenance.
 - Feelings (Milestone 42): a thought cloud (a cream sticker) floats in the
   open ground between Fae's party and the critter (`battleFeelingAnchor`:

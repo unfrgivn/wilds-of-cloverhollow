@@ -1,0 +1,67 @@
+{
+  "asset": "cavern",
+  "date": "2026-11-26",
+  "summary": "Crystal Cavern, a cozy watercolor-and-ink calming cave biome branching north off Pinecone Pass: base 3300x2200 painting (1650x1100 logical units), localized horizontal three-stone crystal crossing edit, and an 8-subject depth-sorted area kit (5 crystal clusters, 2 stone lanterns, and the flat added crystal stepping stones).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 19,
+  "references": [
+    "art/source/areas/woods/woods-final.png",
+    "art/source/areas/enchanted/painting/",
+    "docs/art/concepts/collectibles/collectibles_candy_gems.png"
+  ],
+  "steps": [
+    {
+      "what": "Two 4K 3:2 candidates for Crystal Cavern base painting (open cutaway cavern, snow-dusted SW entrance arch, turquoise waterfall & vertical underground stream/pool with NO bridge, 7 crystal clusters, 4 mushroom beds, 2 stone lanterns, NW carved mural tablet, NE hanging star chime arch).",
+      "calls": 2,
+      "outputs": [
+        "art/scratch/1795712342404-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1795712344424-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "1795712342404 kept as art/source/areas/cavern/cavern-base.png (resized with Lanczos to 3300x2200 and tiled into four 1650x1100 WebP tiles, all <= 2048x2048)."
+    },
+    {
+      "what": "Whole-canvas stepping-stone edit rejected because stones ran diagonally lengthwise down the stream rather than west-to-east across the banks.",
+      "calls": 1,
+      "outputs": [
+        "art/scratch/1795712469084-gemini-3-pro-image-preview-0.png"
+      ],
+      "rejected": true
+    },
+    {
+      "what": "Localized 1200x800 crop edit over flat guide ovals spanning west-to-east at y=535 (lavender, mint-aqua, honey-gold faceted flat stepping stones), registered by pixel correlation (dx=-2, dy=0, meanAbsDiff=8.78) onto cavern-base.png -> art/source/areas/cavern/cavern-bridge.png.",
+      "calls": 1,
+      "outputs": [
+        "art/scratch/1795712783478-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "Kept as art/source/areas/cavern/cavern-bridge.png."
+    },
+    {
+      "what": "Area kit isolation (8 subjects x 2 samples = 16 calls) via art/kit/cavern.json; 0 warnings, 1 atlas page (3.6 MB decoded), rebuilt vs painting 0.00%.",
+      "calls": 16,
+      "config": "art/kit/cavern.json"
+    }
+  ],
+  "commands": [
+    "bun tools/art/kit.ts cavern gen",
+    "bun tools/art/kit.ts cavern masks",
+    "bun tools/art/kit.ts cavern fill",
+    "bun tools/art/kit.ts cavern pack",
+    "bun tools/art/kit.ts cavern place"
+  ],
+  "subjects": [
+    "crystal-west-purple",
+    "crystal-mid-teal",
+    "crystal-mid-gold",
+    "crystal-east-gold",
+    "crystal-east-teal",
+    "lantern-west",
+    "lantern-east",
+    "crystal-steps"
+  ],
+  "outputs": {
+    "painting": "art/source/areas/cavern/painting/ground.json",
+    "bridge": "art/source/areas/cavern/cavern-bridge.png",
+    "atlas": "public/assets/areas/cavern/props-0.json",
+    "catalogue": "content/props/cavern.json"
+  }
+}

@@ -116,7 +116,7 @@ describe("the lands", () => {
       "east-hall": "cloverhollow", "art-room": "cloverhollow", music: "cloverhollow",
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",
       plaza: "cloverhollow", park: "cloverhollow", school: "cloverhollow", woods: "forest",
-      bay: "bay", pass: "pass", trail: "trail", mist: "enchanted",
+      bay: "bay", pass: "pass", cavern: "pass", trail: "trail", mist: "enchanted",
       enchanted: "enchanted", hills: "hills",
     };
     for (const area of Object.values(world.areas)) {

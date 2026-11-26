@@ -90,6 +90,15 @@ const FIREFLY_TINTS: readonly number[] = [0xf9da8e, 0xa8f0d8];
 const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
 const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
+const CAVERN_CRYSTALS: readonly { x: number; y: number; tint: number; scale: number }[] = [
+  { x: 495, y: 520, tint: 0xd8b8ff, scale: 1.55 },
+  { x: 705, y: 425, tint: 0x67d5c4, scale: 1.35 },
+  { x: 825, y: 760, tint: 0xf9da8e, scale: 1.45 },
+  { x: 1040, y: 425, tint: 0xf9da8e, scale: 1.35 },
+  { x: 1180, y: 675, tint: 0x67d5c4, scale: 1.35 },
+  { x: 1280, y: 310, tint: 0xffe49c, scale: 1.4 },
+];
+const CAVERN_MOTE_TINTS: readonly number[] = [0xd8b8ff, 0x9cf2eb, 0xf9da8e];
 
 function pickTint(palette: readonly number[], index: number): number {
   return palette[index % palette.length] ?? 0xffffff;
@@ -513,6 +522,61 @@ export function evaluateAtmosphere(
       maxScale: 0.46,
       minAlpha: 0.22,
       maxAlpha: 0.58,
+    });
+    return out;
+  }
+
+  if (areaId === "cavern") {
+    // Soft pulsing pastel halos over the crystal clusters and hanging Star Chime.
+    CAVERN_CRYSTALS.forEach((crystal, i) => {
+      const pulse = Math.sin(tick * 0.038 + i * 1.4);
+      const scale = crystal.scale * (1 + 0.06 * pulse);
+      out.push({
+        layer: "under",
+        texture: "softGlow",
+        blend: "add",
+        x: crystal.x,
+        y: crystal.y,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(0.2 + 0.04 * pulse),
+        tint: crystal.tint,
+      });
+    });
+    // 10 shimmering aqua water glints along the underground stream and glowing crystal pool.
+    for (let i = 0; i < 10; i += 1) {
+      const h0 = hash01(seed + i * 29 + 1);
+      const h1 = hash01(seed + i * 29 + 2);
+      const h2 = hash01(seed + i * 29 + 3);
+      const inPool = i >= 4;
+      const x = inPool ? 880 + h0 * 230 : 815 + h0 * 90;
+      const y = inPool ? 660 + h1 * 270 : 275 + h1 * 210;
+      const shimmer = Math.sin(tick * (0.055 + h2 * 0.04) + i * 1.6);
+      const scale = 0.42 + h2 * 0.36;
+      out.push({
+        layer: "under",
+        texture: "waterGlint",
+        blend: "add",
+        x: x + Math.sin(tick * 0.02 + i) * 4,
+        y,
+        scaleX: scale,
+        scaleY: scale * 0.85,
+        rotation: 0,
+        alpha: clamp01(0.14 + shimmer * shimmer * 0.42),
+        tint: pickTint(WATER_TINTS, i),
+      });
+    }
+    // 14 gentle floating amethyst, aqua, and honey-gold crystal sparkle motes.
+    addFloatingMotes(out, seed + 800, width, height, tick, 14, CAVERN_MOTE_TINTS, {
+      marginX: 160,
+      marginY: 160,
+      driftX: 0.1,
+      driftY: -0.09,
+      minScale: 0.2,
+      maxScale: 0.4,
+      minAlpha: 0.2,
+      maxAlpha: 0.52,
     });
     return out;
   }

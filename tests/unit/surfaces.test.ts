@@ -87,7 +87,7 @@ describe("area surface maps", () => {
     }
   });
 
-  it("lays wood wherever a crossing opens a bridge", () => {
+  it("lays the right footing wherever a crossing opens a bridge or stepping stones", () => {
     const crossings = Object.values(areas).flatMap((area) =>
       (area.crossings ?? []).map((crossing) => ({ area, crossing })));
     expect(crossings.length).toBeGreaterThan(0);
@@ -100,7 +100,8 @@ describe("area surface maps", () => {
         { x: 0, y: 0 },
       );
       expect(pointInPolygon(point, crossing.polygon), `${area.id} test point`).toBe(true);
-      expect(surfaceAt(mapOf(area.id), point), `${area.id} ${crossing.id}`).toBe("wood");
+      const expected = area.id === "cavern" && crossing.id === "spring" ? "stone" : "wood";
+      expect(surfaceAt(mapOf(area.id), point), `${area.id} ${crossing.id}`).toBe(expected);
     }
   });
 

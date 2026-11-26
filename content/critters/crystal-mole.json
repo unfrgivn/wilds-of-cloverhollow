@@ -1,0 +1,129 @@
+{
+  "id": "crystal-mole",
+  "species": "crystal-mole",
+  "name": "Glimmer Mole",
+  "calmName": "Gem Mole",
+  "atlas": "assets/critters/crystal-mole/crystal-mole.json",
+  "auraCentre": {
+    "x": 258.7,
+    "y": 260.72
+  },
+  "bodyCentre": {
+    "x": 257.26,
+    "y": 347.86
+  },
+  "figureHeight": 330,
+  "overworldHeight": 68,
+  "battleHeight": 190,
+  "touchRadius": 70,
+  "calmMax": 100,
+  "energyMax": 5,
+  "sticker": {
+    "id": "gem-mole",
+    "name": "Gem Mole",
+    "frame": "calm_idle_01"
+  },
+  "calmKnot": "crystal_mole_calm",
+  "calmPrompt": "Talk",
+  "feelings": [
+    "bored",
+    "curious",
+    "hungry"
+  ],
+  "commands": {
+    "soothe": {
+      "calm": 20,
+      "great": 10,
+      "good": 5
+    },
+    "snack": {
+      "calm": 5,
+      "energy": 2
+    },
+    "friends": {
+      "play": {
+        "calm": 30,
+        "great": 10,
+        "good": 5,
+        "rest": 1
+      },
+      "cast": {
+        "calm": 35,
+        "great": 10,
+        "good": 5,
+        "rest": 2
+      },
+      "juggle": {
+        "calm": 30,
+        "great": 15,
+        "good": 5,
+        "rest": 2
+      }
+    }
+  },
+  "burst": {
+    "bigChance": 0.3,
+    "check": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        66,
+        92
+      ],
+      "look": "dust"
+    },
+    "big": {
+      "kind": "chain",
+      "travelTicks": 30,
+      "hitWindow": 8,
+      "arrivals": [
+        40,
+        62,
+        84,
+        106,
+        128
+      ],
+      "look": "dust"
+    }
+  },
+  "lines": {
+    "intro": "A fizzy crystal mole pops up from the cavern sand, paws sparkling with purple dust!",
+    "command": "How can Fae calm the glimmering mole?",
+    "soothe": {
+      "great": "Fae hums a steady lullaby. The mole's little nose twitches and its goggles gleam softly!",
+      "good": "Fae speaks softly. The mole pauses its digging to listen.",
+      "miss": "The mole scratches the sand so loudly it misses Fae's song."
+    },
+    "friends": {
+      "play": {
+        "great": "Maddie digs a playful little paw-scoop, and the mole cheers with a happy squeak!",
+        "good": "Maddie taps a sparkly pebble. The mole peeks over its goggles.",
+        "miss": "Maddie hops on a tiny mound. The mole huffs and ducks down low."
+      },
+      "cast": {
+        "great": "Sue lowers her shiny ribbon bobber. The mole thinks it's a treasure and beams!",
+        "good": "Sue's bobber glints in the crystal light. The mole reaches out a paw.",
+        "miss": "Sue's bobber bounces off a rock. The mole turns back to its gravel pile."
+      },
+      "juggle": {
+        "great": "Jordan juggles three shiny quartz stones. The mole claps its big digging paws!",
+        "good": "Jordan spins a smooth pebble in the air. The mole watches it twinkle.",
+        "miss": "Jordan drops a pebble with a clink. The mole tuts like a tiny gem expert."
+      }
+    },
+    "snack": "Fae offers a crunchy trail snack. The mole crunches happily, tail wiggling!",
+    "burst": "The mole flings a fizzy spray of glittery cave dust and pebbles!",
+    "burstResult": {
+      "great": "Fae hops cleanly over every glittery puff!",
+      "good": "Fae dodges most of the cave dust with a quick step.",
+      "miss": "POOF! Glittery crystal dust lands right on Fae's shoes."
+    },
+    "soothed": "The mole polishes its favorite quartz crystal and smiles a shy, cozy smile.",
+    "rest": "Fae is dusty and tired. Time for a quick breather.",
+    "run": "Fae tiptoes past the sand mound. The mole goes back to sorting pebbles."
+  },
+  "coins": 8,
+  "level": 7
+}

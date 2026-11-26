@@ -13,7 +13,9 @@
         "hamster",
         "lamb",
         "hedgehog",
-        "owl"
+        "owl",
+        "bat",
+        "crystal-mole"
       ],
       "description": "Crisp red orchard slices from Cloverhollow Market.",
       "useLine": "Fae shares crisp Orchard Apple slices. Fresh and crunchy!",
@@ -55,7 +57,8 @@
         "hooded-kid",
         "frog",
         "bluebird",
-        "gull"
+        "gull",
+        "bat"
       ],
       "description": "Double-scoop bubblegum-berry cone from the Ice Cream Shop.",
       "useLine": "Fae shares a chilly Berry Swirl Cone. Sweet and refreshing!",
@@ -75,7 +78,8 @@
         "owl",
         "cat",
         "pup",
-        "hooded-kid"
+        "hooded-kid",
+        "crystal-mole"
       ],
       "description": "Warm fudge and marshmallow swirl from the Ice Cream Shop.",
       "useLine": "Fae shares a Cozy Cocoa Sundae. Warm, sweet, and soothing!",

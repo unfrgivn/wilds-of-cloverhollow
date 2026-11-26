@@ -1,0 +1,597 @@
+{
+  "id": "cavern",
+  "name": "Crystal Cavern",
+  "land": "pass",
+  "width": 1650,
+  "height": 1100,
+  "ground": "cavern",
+  "ambient": [
+    {
+      "id": "cavern-light-west",
+      "animation": "fairy_light",
+      "path": [
+        [
+          360,
+          460
+        ],
+        [
+          560,
+          410
+        ],
+        [
+          640,
+          560
+        ],
+        [
+          450,
+          640
+        ]
+      ],
+      "loopTicks": 380,
+      "phase": 0,
+      "frameTicks": 16,
+      "size": 30
+    },
+    {
+      "id": "cavern-light-waterfall",
+      "animation": "fairy_light",
+      "path": [
+        [
+          780,
+          260
+        ],
+        [
+          950,
+          240
+        ],
+        [
+          930,
+          420
+        ],
+        [
+          770,
+          400
+        ]
+      ],
+      "loopTicks": 320,
+      "phase": 80,
+      "frameTicks": 14,
+      "size": 34
+    },
+    {
+      "id": "cavern-light-stream",
+      "animation": "fairy_light",
+      "path": [
+        [
+          730,
+          500
+        ],
+        [
+          940,
+          490
+        ],
+        [
+          960,
+          610
+        ],
+        [
+          750,
+          620
+        ]
+      ],
+      "loopTicks": 420,
+      "phase": 165,
+      "frameTicks": 18,
+      "size": 32
+    },
+    {
+      "id": "cavern-light-pool",
+      "animation": "fairy_light",
+      "path": [
+        [
+          920,
+          810
+        ],
+        [
+          1160,
+          790
+        ],
+        [
+          1260,
+          930
+        ],
+        [
+          990,
+          970
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 240,
+      "frameTicks": 16,
+      "size": 36
+    },
+    {
+      "id": "cavern-light-arch",
+      "animation": "fairy_light",
+      "path": [
+        [
+          1150,
+          340
+        ],
+        [
+          1360,
+          310
+        ],
+        [
+          1410,
+          470
+        ],
+        [
+          1190,
+          510
+        ]
+      ],
+      "loopTicks": 360,
+      "phase": 310,
+      "frameTicks": 15,
+      "size": 28
+    }
+  ],
+  "glows": [
+    {
+      "id": "cavern-mote-1",
+      "frame": "bluebell_1",
+      "point": {
+        "x": 540,
+        "y": 670
+      }
+    },
+    {
+      "id": "cavern-mote-2",
+      "frame": "bluebell_2",
+      "point": {
+        "x": 455,
+        "y": 530
+      }
+    },
+    {
+      "id": "cavern-mote-3",
+      "frame": "bluebell_3",
+      "point": {
+        "x": 420,
+        "y": 445
+      }
+    },
+    {
+      "id": "cavern-mural-glow",
+      "frame": "ink_note",
+      "point": {
+        "x": 420,
+        "y": 385
+      },
+      "knot": "cavern_mural",
+      "prompt": "Look"
+    }
+  ],
+  "walkable": [
+    [
+      260,
+      465
+    ],
+    [
+      340,
+      415
+    ],
+    [
+      425,
+      375
+    ],
+    [
+      510,
+      345
+    ],
+    [
+      565,
+      355
+    ],
+    [
+      655,
+      355
+    ],
+    [
+      755,
+      325
+    ],
+    [
+      785,
+      395
+    ],
+    [
+      795,
+      455
+    ],
+    [
+      770,
+      498
+    ],
+    [
+      908,
+      498
+    ],
+    [
+      902,
+      445
+    ],
+    [
+      935,
+      395
+    ],
+    [
+      995,
+      355
+    ],
+    [
+      1055,
+      415
+    ],
+    [
+      1115,
+      445
+    ],
+    [
+      1210,
+      445
+    ],
+    [
+      1245,
+      410
+    ],
+    [
+      1345,
+      410
+    ],
+    [
+      1395,
+      440
+    ],
+    [
+      1395,
+      505
+    ],
+    [
+      1345,
+      530
+    ],
+    [
+      1330,
+      585
+    ],
+    [
+      1365,
+      635
+    ],
+    [
+      1475,
+      645
+    ],
+    [
+      1485,
+      725
+    ],
+    [
+      1455,
+      805
+    ],
+    [
+      1395,
+      865
+    ],
+    [
+      1315,
+      910
+    ],
+    [
+      1270,
+      845
+    ],
+    [
+      1195,
+      805
+    ],
+    [
+      1120,
+      775
+    ],
+    [
+      1085,
+      690
+    ],
+    [
+      1015,
+      615
+    ],
+    [
+      945,
+      588
+    ],
+    [
+      800,
+      588
+    ],
+    [
+      855,
+      645
+    ],
+    [
+      925,
+      710
+    ],
+    [
+      955,
+      780
+    ],
+    [
+      890,
+      850
+    ],
+    [
+      845,
+      915
+    ],
+    [
+      750,
+      905
+    ],
+    [
+      625,
+      915
+    ],
+    [
+      520,
+      940
+    ],
+    [
+      495,
+      860
+    ],
+    [
+      475,
+      745
+    ],
+    [
+      405,
+      740
+    ],
+    [
+      390,
+      820
+    ],
+    [
+      395,
+      935
+    ],
+    [
+      250,
+      935
+    ],
+    [
+      245,
+      845
+    ],
+    [
+      225,
+      755
+    ],
+    [
+      175,
+      650
+    ],
+    [
+      180,
+      595
+    ],
+    [
+      245,
+      575
+    ],
+    [
+      260,
+      525
+    ]
+  ],
+  "blockers": [],
+  "crossings": [
+    {
+      "id": "spring",
+      "polygon": [
+        [
+          768,
+          492
+        ],
+        [
+          912,
+          492
+        ],
+        [
+          942,
+          594
+        ],
+        [
+          798,
+          594
+        ]
+      ],
+      "opens": "cavern_bridge_lit"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "pass",
+      "polygon": [
+        [
+          265,
+          870
+        ],
+        [
+          385,
+          870
+        ],
+        [
+          385,
+          920
+        ],
+        [
+          265,
+          920
+        ]
+      ],
+      "target": {
+        "area": "pass",
+        "spawn": "cavern"
+      }
+    }
+  ],
+  "spawns": {
+    "entrance": {
+      "x": 625,
+      "y": 760,
+      "facing": "up"
+    },
+    "grotto": {
+      "x": 1005,
+      "y": 560,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "cavern-tablet",
+      "point": {
+        "x": 520,
+        "y": 350
+      },
+      "knot": "cavern_tablet",
+      "prompt": "Look"
+    },
+    {
+      "id": "cavern-lantern",
+      "point": {
+        "x": 300,
+        "y": 535
+      },
+      "knot": "cavern_lantern_look",
+      "prompt": "Look"
+    },
+    {
+      "id": "cavern-stream",
+      "point": {
+        "x": 765,
+        "y": 545
+      },
+      "knot": "cavern_stream",
+      "prompt": "Look"
+    },
+    {
+      "id": "star-chime",
+      "point": {
+        "x": 1285,
+        "y": 425
+      },
+      "knot": "cavern_chime",
+      "prompt": "Look"
+    },
+    {
+      "id": "crystal-spring",
+      "point": {
+        "x": 1255,
+        "y": 845
+      },
+      "knot": "cavern_spring",
+      "prompt": "Look"
+    }
+  ],
+  "critters": [],
+  "recurring": {
+    "dens": [
+      {
+        "point": {
+          "x": 595,
+          "y": 445
+        },
+        "radius": 65,
+        "kinds": [
+          "bat"
+        ],
+        "chance": 1
+      },
+      {
+        "point": {
+          "x": 1270,
+          "y": 565
+        },
+        "radius": 60,
+        "kinds": [
+          "crystal-mole"
+        ],
+        "chance": 1
+      }
+    ]
+  },
+  "npcs": [],
+  "props": [
+    {
+      "id": "crystal-west-purple",
+      "prop": "crystal-west-purple",
+      "x": 495,
+      "y": 595
+    },
+    {
+      "id": "crystal-mid-teal",
+      "prop": "crystal-mid-teal",
+      "x": 705,
+      "y": 498
+    },
+    {
+      "id": "crystal-mid-gold",
+      "prop": "crystal-mid-gold",
+      "x": 825,
+      "y": 830
+    },
+    {
+      "id": "crystal-east-gold",
+      "prop": "crystal-east-gold",
+      "x": 1040,
+      "y": 488
+    },
+    {
+      "id": "crystal-east-teal",
+      "prop": "crystal-east-teal",
+      "x": 1180,
+      "y": 742
+    },
+    {
+      "id": "lantern-west",
+      "prop": "lantern-west",
+      "x": 298,
+      "y": 535
+    },
+    {
+      "id": "lantern-east",
+      "prop": "lantern-east",
+      "x": 1385,
+      "y": 810
+    },
+    {
+      "id": "crystal-steps",
+      "prop": "crystal-steps",
+      "x": 832,
+      "y": 560,
+      "rules": [
+        {
+          "state": "lit",
+          "while": "cavern_bridge_lit"
+        }
+      ]
+    }
+  ]
+}

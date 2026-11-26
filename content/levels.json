@@ -306,6 +306,20 @@
       "burst": 4,
       "bigBurst": 5,
       "xp": 80
+    },
+    "bat": {
+      "level": 6,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 60
+    },
+    "crystal-mole": {
+      "level": 7,
+      "calmMax": 100,
+      "burst": 2,
+      "bigBurst": 3,
+      "xp": 70
     }
   }
 }

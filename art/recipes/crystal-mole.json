@@ -1,0 +1,79 @@
+{
+  "asset": "crystal-mole",
+  "date": "2026-11-26",
+  "summary": "The Glimmer Mole (calm: the Gem Mole), Crystal Cavern's recurring chaos mole: a 2x2 body sheet (chaos idle with swirly eyes and purple bubbles; burst kicking up pebbles and dust puffs; soothed seated adjusting its yellow helmet; calm proudly holding a faceted lavender crystal), drawn to the owner's critter concept sheet.",
+  "generationSource": "Generated with Gemini from the owner's critter concept sheet and art-teacher's flat green body sheet reference.",
+  "calls": 2,
+  "edits": [
+    {
+      "time": "2026-11-26T16:58:53.296Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "docs/art/concepts/npcs/npc_critter_set.png",
+        "art/source/critters/art-teacher/body-sheet-raw.png"
+      ],
+      "prompt": "Initial 2x2 mole miner sheet on #00FF00.",
+      "output": "1795712333296-gemini-3-pro-image-preview-0.png",
+      "note": "Rejected: soft crystal halos and translucent burst ribbon blended into the green key and the bandana varied across poses."
+    },
+    {
+      "time": "2026-11-26T17:00:58.403Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "docs/art/concepts/npcs/npc_critter_set.png",
+        "art/source/critters/art-teacher/body-sheet-raw.png"
+      ],
+      "prompt": "2x2 character sheet of an adorable plump taupe cartoon mole miner wearing a yellow hard hat with an ink-outlined faceted lavender amethyst crystal (no fuzzy glow halo) and a consistent coral-red triangular bandana across all four poses on pure flat green #00FF00.",
+      "output": "1795712458403-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/critters/crystal-mole/body-sheet-raw.png",
+      "note": "Kept as generated: crisp ink outlines, zero green halo, consistent bandana and scale across all four cells."
+    }
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-person.ts crystal-mole --key=#00FF00 --height=330. Keys green, drops detached islands under 120 px, despills the alpha edge, scales chaos idle to 330 px, and adds the shared chaos aura.",
+    "canvas": "1536x1024 atlas, six 512x512 frames, baseline 504, anchor (0.5, 0.984375).",
+    "measuredCentres": {
+      "bodyCentre": {
+        "x": 257.26,
+        "y": 347.86
+      },
+      "bodyCentreMethod": "mean opaque-pixel centroid across the four generated body frames",
+      "auraCentre": {
+        "x": 258.7,
+        "y": 260.72
+      }
+    },
+    "bodyHeights": {
+      "chaos_idle_01": 329,
+      "chaos_burst_01": 328,
+      "soothed_01": 318,
+      "calm_idle_01": 327
+    }
+  },
+  "checker": {
+    "bodyFrames": [
+      "calm_idle_01",
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01"
+    ],
+    "auraFrames": [
+      "chaos_aura_01"
+    ],
+    "matteMethods": {
+      "body": "green-key",
+      "aura": "white-lift"
+    },
+    "bodyHue": {
+      "min": 0.03,
+      "max": 0.16,
+      "minFraction": 0.3
+    },
+    "psnrThreshold": 25
+  },
+  "validator": "bun tools/art/critter-check.ts --recipe art/recipes/crystal-mole.json --atlas public/assets/critters/crystal-mole/crystal-mole.png",
+  "review": [
+    "art/review/cavern-mole-sheet-cream.jpg",
+    "art/review/cavern-mole-sheet-dark.jpg"
+  ]
+}

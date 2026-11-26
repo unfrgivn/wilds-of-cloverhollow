@@ -311,6 +311,14 @@
     [
       889,
       155
+    ],
+    [
+      785,
+      155
+    ],
+    [
+      785,
+      214
     ]
   ],
   "blockers": [],
@@ -396,6 +404,35 @@
       "requires": {
         "variable": "lodge_open",
         "knot": "lodge_door"
+      }
+    },
+    {
+      "id": "cavern",
+      "polygon": [
+        [
+          795,
+          155
+        ],
+        [
+          875,
+          155
+        ],
+        [
+          875,
+          185
+        ],
+        [
+          795,
+          185
+        ]
+      ],
+      "target": {
+        "area": "cavern",
+        "spawn": "entrance"
+      },
+      "requires": {
+        "variable": "has_lantern",
+        "knot": "cavern_dark"
       }
     }
   ],
@@ -483,6 +520,11 @@
     "lodge": {
       "x": 1195,
       "y": 545,
+      "facing": "down"
+    },
+    "cavern": {
+      "x": 940,
+      "y": 185,
       "facing": "down"
     }
   },

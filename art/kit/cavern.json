@@ -1,0 +1,117 @@
+{
+  "area": "cavern",
+  "subjects": [
+    {
+      "id": "crystal-west-purple",
+      "crop": [380, 400, 230, 250],
+      "seed": [495, 520],
+      "home": [495, 595],
+      "painted": true,
+      "canopy": false,
+      "key": "bright",
+      "samples": { "object": 2 },
+      "ground": "the pale sandy cavern floor",
+      "object": "the complete freestanding cluster of tall faceted purple amethyst crystals in the middle of the crop, including every crystal spire, small base shards, and warm-brown ink outline down to its base; not the pale cavern floor, stone lantern, or other clusters",
+      "footprint": [[[450, 560], [540, 560], [545, 595], [445, 595]]]
+    },
+    {
+      "id": "crystal-mid-teal",
+      "crop": [600, 310, 210, 240],
+      "seed": [705, 430],
+      "home": [705, 498],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 2 },
+      "ground": "the pale sandy cavern floor beside the stream",
+      "object": "the complete freestanding cluster of faceted mint-teal crystals in the middle of the crop, including all its crystal spires, small base shards, and warm-brown ink outline down to the floor; not the stream, mushrooms, or sandy floor",
+      "footprint": [[[665, 468], [745, 468], [750, 498], [660, 498]]]
+    },
+    {
+      "id": "crystal-mid-gold",
+      "crop": [720, 640, 220, 240],
+      "seed": [825, 760],
+      "home": [825, 830],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 1 },
+      "ground": "the pale sandy cavern floor beside the pool",
+      "object": "the complete freestanding cluster of faceted honey-gold crystals in the middle of the crop, including all its crystal spires, small base shards, and warm-brown ink outline down to its base; not the water pool, mushrooms, or floor",
+      "footprint": [[[785, 795], [865, 795], [870, 830], [780, 830]]]
+    },
+    {
+      "id": "crystal-east-gold",
+      "crop": [930, 315, 220, 225],
+      "seed": [1040, 425],
+      "home": [1040, 488],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 1 },
+      "exclude": [
+        [[920, 310], [1160, 310], [1160, 355], [990, 395], [920, 395]],
+        [[1102, 460], [1160, 460], [1160, 545], [1102, 545]]
+      ],
+      "ground": "the pale sandy cavern floor beside the stream",
+      "object": "the complete freestanding cluster of faceted honey-gold crystals in the middle of the crop, including all its crystal spires, base shards, and warm-brown ink outline down to its base; not the stream, cave arch, or floor",
+      "footprint": [[[995, 455], [1085, 455], [1088, 488], [992, 488]]]
+    },
+    {
+      "id": "crystal-east-teal",
+      "crop": [1080, 570, 200, 220],
+      "seed": [1180, 680],
+      "home": [1180, 742],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 1 },
+      "ground": "the pale sandy cavern floor beside the pool",
+      "object": "the complete freestanding cluster of faceted mint-teal crystals in the middle of the crop, including all its crystal spires, base shards, and warm-brown ink outline down to its base; not the pool, stone lantern, or floor",
+      "footprint": [[[1140, 710], [1220, 710], [1222, 742], [1138, 742]]]
+    },
+    {
+      "id": "lantern-west",
+      "crop": [220, 360, 190, 220],
+      "seed": [298, 470],
+      "home": [298, 535],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 1 },
+      "core": 2,
+      "exclude": [
+        [[210, 355], [254, 355], [254, 585], [210, 585]],
+        [[210, 514], [270, 514], [270, 585], [210, 585]],
+        [[210, 355], [415, 355], [415, 392], [210, 392]],
+        [[376, 355], [415, 355], [415, 585], [376, 585]]
+      ],
+      "ground": "the pale lavender-cream cavern floor",
+      "object": "the complete mossy stone garden lantern standing in the middle of the crop, including its pagoda cap, glowing lantern box, pedestal, mossy base rocks, and warm-brown ink outline; not the peach mushrooms to its left or the cavern floor",
+      "footprint": [[[268, 505], [335, 505], [340, 535], [265, 535]]]
+    },
+    {
+      "id": "lantern-east",
+      "crop": [1265, 630, 225, 235],
+      "seed": [1385, 740],
+      "home": [1385, 810],
+      "painted": true,
+      "canopy": false,
+      "samples": { "object": 2 },
+      "ground": "the pale sandy cavern floor",
+      "object": "the complete mossy stone garden lantern in the middle of the crop, including its cap, glowing lantern box, pedestal, mossy base rocks, and warm-brown ink outline; not the lavender mushrooms above it or the cavern floor",
+      "footprint": [[[1345, 780], [1425, 780], [1430, 810], [1340, 810]]]
+    },
+    {
+      "id": "crystal-steps",
+      "painting": "art/source/areas/cavern/cavern-bridge.png",
+      "added": "lit",
+      "flat": true,
+      "keepPieces": true,
+      "home": [832, 560],
+      "crop": [690, 470, 290, 145],
+      "seed": [832, 535],
+      "painted": true,
+      "canopy": false,
+      "key": "bright",
+      "samples": { "object": 2 },
+      "ground": "the turquoise underground stream",
+      "object": "only the three flat-topped hexagonal pastel crystal stepping stones (lavender on the left, mint-aqua in the middle, honey-gold on the right) spanning horizontally across the turquoise stream, with their thin warm-brown ink outlines; not the turquoise stream water, banks, or surrounding floor"
+    }
+  ]
+}

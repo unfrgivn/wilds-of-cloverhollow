@@ -1,0 +1,204 @@
+{
+  "frames": {
+    "crystal-west-purple": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 270,
+        "h": 350
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 270,
+        "h": 350
+      },
+      "sourceSize": {
+        "w": 270,
+        "h": 350
+      },
+      "anchor": {
+        "x": 0.48889,
+        "y": 0.88857
+      }
+    },
+    "lantern-east": {
+      "frame": {
+        "x": 272,
+        "y": 0,
+        "w": 370,
+        "h": 330
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 370,
+        "h": 330
+      },
+      "sourceSize": {
+        "w": 370,
+        "h": 330
+      },
+      "anchor": {
+        "x": 0.52973,
+        "y": 0.92727
+      }
+    },
+    "crystal-mid-gold": {
+      "frame": {
+        "x": 644,
+        "y": 0,
+        "w": 260,
+        "h": 327
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 327
+      },
+      "sourceSize": {
+        "w": 260,
+        "h": 327
+      },
+      "anchor": {
+        "x": 0.46154,
+        "y": 0.91743
+      }
+    },
+    "lantern-west": {
+      "frame": {
+        "x": 906,
+        "y": 0,
+        "w": 250,
+        "h": 314
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 250,
+        "h": 314
+      },
+      "sourceSize": {
+        "w": 250,
+        "h": 314
+      },
+      "anchor": {
+        "x": 0.364,
+        "y": 0.92038
+      }
+    },
+    "crystal-mid-teal": {
+      "frame": {
+        "x": 1158,
+        "y": 0,
+        "w": 260,
+        "h": 299
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 299
+      },
+      "sourceSize": {
+        "w": 260,
+        "h": 299
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.01672
+      }
+    },
+    "crystal-east-teal": {
+      "frame": {
+        "x": 1420,
+        "y": 0,
+        "w": 230,
+        "h": 292
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 230,
+        "h": 292
+      },
+      "sourceSize": {
+        "w": 230,
+        "h": 292
+      },
+      "anchor": {
+        "x": 0.51304,
+        "y": 0.91781
+      }
+    },
+    "crystal-east-gold": {
+      "frame": {
+        "x": 1652,
+        "y": 0,
+        "w": 270,
+        "h": 243
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 270,
+        "h": 243
+      },
+      "sourceSize": {
+        "w": 270,
+        "h": 243
+      },
+      "anchor": {
+        "x": 0.4963,
+        "y": 0.89712
+      }
+    },
+    "crystal-steps": {
+      "frame": {
+        "x": 0,
+        "y": 352,
+        "w": 380,
+        "h": 109
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 380,
+        "h": 109
+      },
+      "sourceSize": {
+        "w": 380,
+        "h": 109
+      },
+      "anchor": {
+        "x": 0.48421,
+        "y": 0.78899
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 461
+    },
+    "scale": "1"
+  }
+}

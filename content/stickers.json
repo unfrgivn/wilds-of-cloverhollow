@@ -1,5 +1,5 @@
 {
-  "slots": 20,
+  "slots": 22,
   "catalogue": [
     {
       "id": "hooded-kid",
@@ -119,6 +119,18 @@
       "id": "principal",
       "name": "Mr. Bell",
       "critter": "principal",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "cozy-bat",
+      "name": "Cozy Bat",
+      "critter": "bat",
+      "frame": "calm_idle_01"
+    },
+    {
+      "id": "gem-mole",
+      "name": "Gem Mole",
+      "critter": "crystal-mole",
       "frame": "calm_idle_01"
     }
   ]

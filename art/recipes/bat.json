@@ -1,0 +1,68 @@
+{
+  "asset": "bat",
+  "date": "2026-11-26",
+  "summary": "The Duzzy Bat (calm: the Cozy Bat), Crystal Cavern's recurring chaos bat: a 2x2 body sheet (chaos idle hovering with purple spiral eyes and bubbles; burst fluttering with wind wisps; soothed curled cozy with wings folded; calm perched and waving one wing), drawn to the owner's critter concept sheet.",
+  "generationSource": "Generated with Gemini from the owner's critter concept sheet for the watercolour style and swirly chaos eyes, and art-teacher's flat green body sheet as the clean #00FF00 key reference.",
+  "calls": 1,
+  "edits": [
+    {
+      "time": "2026-11-26T16:58:52.780Z",
+      "model": "gemini-3-pro-image-preview",
+      "refs": [
+        "docs/art/concepts/npcs/npc_critter_set.png",
+        "art/source/critters/art-teacher/body-sheet-raw.png"
+      ],
+      "prompt": "A 2x2 character sheet of an adorable chubby pastel lavender-plum fruit bat with fluffy cream tummy, floppy ears, yellow star bandana, rosy cheeks, thin warm-brown ink outlines, and four poses (chaos idle, chaos burst, soothed, calm idle) on flat pure green #00FF00.",
+      "output": "1795712332780-gemini-3-pro-image-preview-0.png",
+      "kept": "art/source/critters/bat/body-sheet-raw.png",
+      "note": "Kept as generated: four whole figures on a clean flat green key with zero green on the bat."
+    }
+  ],
+  "postProcessing": {
+    "build": "bun tools/art/build-person.ts bat --key=#00FF00 --height=330. Keys green, drops detached islands under 120 px, despills the alpha edge, scales chaos idle to 330 px, and adds the shared chaos aura.",
+    "canvas": "1536x1024 atlas, six 512x512 frames, baseline 504, anchor (0.5, 0.984375).",
+    "measuredCentres": {
+      "bodyCentre": {
+        "x": 263.59,
+        "y": 349.83
+      },
+      "bodyCentreMethod": "mean opaque-pixel centroid across the four generated body frames",
+      "auraCentre": {
+        "x": 258.7,
+        "y": 260.72
+      }
+    },
+    "bodyHeights": {
+      "chaos_idle_01": 329,
+      "chaos_burst_01": 301,
+      "soothed_01": 272,
+      "calm_idle_01": 338
+    }
+  },
+  "checker": {
+    "bodyFrames": [
+      "calm_idle_01",
+      "chaos_idle_01",
+      "chaos_burst_01",
+      "soothed_01"
+    ],
+    "auraFrames": [
+      "chaos_aura_01"
+    ],
+    "matteMethods": {
+      "body": "green-key",
+      "aura": "white-lift"
+    },
+    "bodyHue": {
+      "min": 0.7,
+      "max": 0.95,
+      "minFraction": 0.15
+    },
+    "psnrThreshold": 25
+  },
+  "validator": "bun tools/art/critter-check.ts --recipe art/recipes/bat.json --atlas public/assets/critters/bat/bat.png",
+  "review": [
+    "art/review/cavern-bat-sheet-cream.jpg",
+    "art/review/cavern-bat-sheet-dark.jpg"
+  ]
+}

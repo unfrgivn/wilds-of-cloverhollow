@@ -79,6 +79,7 @@ describe("soundtrackFor", () => {
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],
       lodge: ["pass", "hearth"],
+      cavern: ["enchanted", "enchanted-shimmer"],
       woods: ["woods", "forest"],
       clubhouse: ["woods", "none"],
       arcade: ["arcade", "arcade-hum"],

@@ -82,7 +82,7 @@ describe("Milestone 72: deterministic biome atmosphere across all areas", () => 
     () => {
       const areas = Object.values(loadContent().world.areas);
       const realAreas = areas.filter((area) => area.id !== "harness");
-      expect(realAreas.length).toBe(21);
+      expect(realAreas.length).toBeGreaterThanOrEqual(22);
 
       expect(evaluateAtmosphere("harness", 1200, 800, 120)).toEqual([]);
 

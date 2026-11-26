@@ -205,7 +205,7 @@ describe("world map land progress and bus routes", () => {
     expect(Object.keys(initial)).toEqual(world.lands.map((land) => land.id));
     expect(initial.cloverhollow).toEqual({ owned: 0, total: 9 });
     expect(initial.bay).toEqual({ owned: 0, total: 4 });
-    expect(initial.pass).toEqual({ owned: 0, total: 3 });
+    expect(initial.pass).toEqual({ owned: 0, total: 5 });
     expect(initial.trail).toEqual({ owned: 0, total: 3 });
     expect(initial.forest).toEqual({ owned: 0, total: 2 });
     expect(initial.enchanted).toEqual({ owned: 0, total: 1 });

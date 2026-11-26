@@ -3829,6 +3829,40 @@ the old trail, the owl, and the clubhouse claim.
   checks), and full `CLOVERHOLLOW_E2E_PORT=4211 just e2e` (987 passed, 2
   skipped in 3.8 min).
 
+## Milestone 78: Crystal Cavern **Status:** ✅ Completed (2026-11-26)
+- New calming cave biome (`NOTES.md`: "Caves") branching north off Pinecone
+  Pass's snow gap (trigger `cavern` at `x=795..875, y=155..185`, requiring
+  `has_lantern`, knot `cavern_dark`; return spawn `pass.cavern` at `(940, 185)`
+  facing down). Keeps `pass.walkable`'s edge at `x <= 785` unchanged so every
+  existing Pinecone Pass replay and baseline stays pixel-identical.
+- Painted cutaway & depth-sorted kit (`cavern`, 1650x1100, `land: "pass"`):
+  tiled into four 1650x1100 WebP tiles (`<= 2048x2048`, paper `#f9efe0`), eight
+  kit subjects on one 3.6 MB atlas (`rebuilt vs painting 0.00%`, zero warnings)
+  including the flat added `crystal-steps` crossing prop, five `fairy_light`
+  ambient flyers, `content/surfaces/cavern.json` (`stone` default + `sand`
+  mineral paths), pulsing crystal halos & turquoise water glints
+  (`src/render/atmosphere.ts`), and `"enchanted"` / `"enchanted-shimmer"` audio.
+- Multi-tool cave puzzles: blacklight lantern glows (`cavern-mote-1..3`,
+  `cavern-mural-glow`) reveal the NW fairy inscription (`cavern_mural`) and
+  light the three crystal stepping stones (`cavern_bridge_lit`, crossing
+  `spring`); Coach Ash's lasso rings the NE hanging `star-chime` for 15 coins
+  and the Shimmering Star Crystal keepsake in `club_chest`; the Pond Pup flute
+  friend dives into `crystal-spring` for 2 snacks and 10 coins.
+- Two new cozy cave critters (built with `build-person.ts --key=#00FF00
+  --height=330`, zero soft-edge spill in `critter-check.ts`, PSNR 34-35):
+  `bat` (Duzzy Bat / Cozy Bat, Lv 6, `lean` burst, `cozy-bat` sticker, favours
+  `orchard-apple` and `berry-cone`) and `crystal-mole` (Glimmer Mole / Gem
+  Mole, Lv 7, `chain` dust burst, `gem-mole` sticker, favours `cocoa-sundae`
+  and `orchard-apple`). Sticker catalogue grows to 22 slots (`content/stickers.json`).
+- Evidence: `tests/unit/cavern.test.ts`, `tests/unit/cavern-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/cavern.json` (23,604 ticks),
+  real-key `tests/e2e/cavern.spec.ts` matching Bun's hash at 1280x720 and
+  874x402, and `vision`-verified review captures `art/review/cavern-{overlay,
+  depth,frames,gameplay}.jpg` and `cavern-{bat,mole}-sheet-{cream,dark}.jpg`.
+- Gates: `just check` (134 unit files / 1,103 tests, 61 sims, 23 QA packs,
+  purity, lint), `just build` (production and harness hook checks), and full
+  `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (989 passed, 2 skipped in 3.6 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -83,6 +83,11 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{cavern_spring_found: The Pond Pup dove into Crystal Cavern's glowing spring and fetched a pouch of snacks and coins! # speaker: Fae}
+{cavern_spring_seen and not cavern_spring_found: Something glints deep in Crystal Cavern's turquoise spring, too deep to reach. # speaker: Fae}
+{cavern_chime_rung: I lassoed the golden star chime in Crystal Cavern and caught a shimmering star crystal! # speaker: Fae}
+{cavern_chime_seen and not cavern_chime_rung: A golden star chime hangs high in Crystal Cavern's northeast arch, too high to reach. # speaker: Fae}
+{cavern_bridge_lit: Reading the glowing fairy mural in Crystal Cavern lit three crystal stepping stones across the stream! # speaker: Fae}
 {heard_wish and not calmed("hooded-kid"): The kid in the purple hood is waiting under the Ancient Tree. Their wish made all this fizz! # speaker: Fae}
 {calmed("hooded-kid"): The kid in the purple hood was MILO! He wished to be the best at everything, and the fizz got out of hand. # speaker: Fae}
 {heard_wish: The fairies told me the Ancient Tree dreams the whole land, and a wish made the Mystic Pond fizz purple. # speaker: Fae}
@@ -1831,6 +1836,7 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {has_map: The treasure map from the bottle by Sue's dock. X marked the spot! # speaker: Fae}
 {kite_returned: A bow from the tail of Rosie's kite. She gave it to me for getting it down! # speaker: Fae}
 {acorn_found: The golden acorn from the knothole in the big oak. The Acorn Squirrel found it! # speaker: Fae}
+{cavern_chime_rung: The shimmering star crystal from Crystal Cavern. It still hums when I hold it! # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -1978,4 +1984,116 @@ High up the big oak, there's a dark knothole. Something rattles inside it when t
     -> DONE
 = after
 The knothole high up the big oak is empty now. # speaker: Fae
+-> DONE
+
+// Crystal Cavern: a glowing cave off Pinecone Pass's north mountain gap,
+// unlocked with the blacklight lantern, showcasing all three tools and two
+// cozy cave critters.
+VAR cavern_visited = false
+VAR cavern_bridge_lit = false
+VAR cavern_chime_seen = false
+VAR cavern_chime_rung = false
+VAR cavern_spring_seen = false
+VAR cavern_spring_found = false
+
+=== cavern_dark ===
+A snow-dusted archway opens into the northern cliffs, sparkling faintly inside. # speaker: Fae
+It's way too dark to step inside without a lantern! # speaker: Fae
+-> DONE
+
+=== cavern_tablet ===
+~ cavern_visited = true
+{cavern_bridge_lit: -> after}
+Faint carved swirls cover the stone tablet, too dim to read. # speaker: Fae
+Maybe the blacklight lantern would make them glow! # speaker: Fae
+-> DONE
+= after
+The carved fairy swirls still shimmer softly across the stone tablet. # speaker: Fae
+-> DONE
+
+=== cavern_mural ===
+~ cavern_visited = true
+{cavern_bridge_lit: -> after}
+Whoa! In the blacklight glow, old fairy swirls light up across the stone tablet! # speaker: Fae
+"Where crystal water meets the mountain stone, step in light toward the song of the Mystic Pond." # speaker: Fae
+~ cavern_bridge_lit = true
+Three crystal stepping stones rise with a bright hum right across the turquoise stream! # speaker: Fae # sound: chime-blue
+Now we can cross to the far side of the cavern! # speaker: Fae
+-> DONE
+= after
+The glowing fairy swirls hum softly along the mural, keeping the crystal stepping stones bright. # speaker: Fae
+-> DONE
+
+=== cavern_lantern_look ===
+~ cavern_visited = true
+A mossy stone lantern tucked against the cavern wall, glowing soft and warm. # speaker: Fae
+Every tiny echo in here sounds like a gentle lullaby. # speaker: Fae
+-> DONE
+
+=== cavern_stream ===
+~ cavern_visited = true
+{cavern_bridge_lit: -> after}
+A bright turquoise stream rushes down from the waterfall. Way too deep to wade across! # speaker: Fae
+Three flat stones glint under the water, carved with the same swirls as the stone tablet on the north wall. # speaker: Fae
+-> DONE
+= after
+Three glowing crystal stepping stones bridge the turquoise stream. Safe to walk right across! # speaker: Fae
+-> DONE
+
+=== cavern_chime ===
+~ cavern_visited = true
+{cavern_chime_rung: -> after}
+~ cavern_chime_seen = true
+A sparkling golden star chime hangs high up in the crystal arch! # speaker: Fae
+{not has_lasso: It's way too high to reach without a rope. # speaker: Fae}
+{not has_lasso: -> DONE}
++ [Loop the lasso around the chime]
+    Fae twirls Coach Ash's lasso and loops it neatly around the star chime! # speaker: Fae
+    ~ cavern_chime_rung = true
+    One gentle tug sends a clear, shimmering chime echoing all around the cavern! # speaker: Fae # sound: chime-blue
+    A shimmering star crystal and a shower of sparkling coins tumble gently onto the sand! # speaker: Fae # gift: coins 15
+    I'll keep this star crystal safe in our clubhouse chest! # speaker: Fae
+    -> DONE
++ [Leave it]
+    -> DONE
+= after
+The golden star chime sways gently in the arch, still humming a quiet tune. # speaker: Fae
+-> DONE
+
+=== cavern_spring ===
+~ cavern_visited = true
+{cavern_spring_found: -> after}
+~ cavern_spring_seen = true
+The crystal spring glows bright turquoise! Something glints way down at the bottom. # speaker: Fae
+{not pup_with_me: It's too deep to reach, and way too chilly to wade in. # speaker: Fae}
+{not pup_with_me and pup_friend: Bet the Pond Pup would love a splash in here! # speaker: Fae}
+{not pup_with_me: -> DONE}
++ [Splash in, boy!]
+    Splash! The Pond Pup leaps into the sparkling turquoise spring and dives right down! # speaker: Fae
+    ~ cavern_spring_found = true
+    He paddles back grinning with a tucked-away crystal pouch packed with sweet berry snacks! # speaker: Fae # gift: snack 2
+    And ten shiny coins clinking inside too! Good boy! # speaker: Fae # gift: coins 10
+    -> DONE
++ [Not now]
+    -> DONE
+= after
+The crystal spring shimmers calm and clear. Nothing else glints on the sandy bottom. # speaker: Fae
+-> DONE
+
+=== bat_calm ===
+{bat_calm > 1: -> again}
+Squeak-squeak! My ears were buzzing like crazy from that purple fizz! # speaker: Cozy Bat
+Now I can hear the crystal chimes singing again. Thank you, Fae! # speaker: Cozy Bat
+-> DONE
+= again
+Squeak! This cavern is the coziest nap spot on the whole mountain. # speaker: Cozy Bat
+-> DONE
+
+=== crystal_mole_calm ===
+{crystal_mole_calm > 1: -> again}
+Sniffle-squeak! Thank goodness that purple dust cleared off my goggles! # speaker: Gem Mole
+I was digging for sparkly quartz and bumped right into a fizzy puddle. You're the nicest! # speaker: Gem Mole
+-> DONE
+= again
+Sniffle! Every crystal in this grotto is shining extra bright today. # speaker: Gem Mole
 -> DONE

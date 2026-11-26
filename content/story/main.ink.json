@@ -436,6 +436,141 @@
       "journal": [
         "ev",
         {
+          "VAR?": "cavern_spring_found"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The Pond Pup dove into Crystal Cavern's glowing spring and fetched a pouch of snacks and coins! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.4"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "cavern_spring_seen"
+        },
+        {
+          "VAR?": "cavern_spring_found"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Something glints deep in Crystal Cavern's turquoise spring, too deep to reach. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.14"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "cavern_chime_rung"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ I lassoed the golden star chime in Crystal Cavern and caught a shimmering star crystal! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "cavern_chime_seen"
+        },
+        {
+          "VAR?": "cavern_chime_rung"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ A golden star chime hangs high in Crystal Cavern's northeast arch, too high to reach. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.31"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "VAR?": "cavern_bridge_lit"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Reading the glowing fairy mural in Crystal Cavern lit three crystal stepping stones across the stream! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.38"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "heard_wish"
         },
         "str",
@@ -459,7 +594,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.10"
+                "->": ".^.^.^.51"
               },
               null
             ]
@@ -488,7 +623,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.20"
+                "->": ".^.^.^.61"
               },
               null
             ]
@@ -513,7 +648,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.27"
+                "->": ".^.^.^.68"
               },
               null
             ]
@@ -538,7 +673,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.34"
+                "->": ".^.^.^.75"
               },
               null
             ]
@@ -563,7 +698,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.41"
+                "->": ".^.^.^.82"
               },
               null
             ]
@@ -588,7 +723,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.48"
+                "->": ".^.^.^.89"
               },
               null
             ]
@@ -613,7 +748,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.55"
+                "->": ".^.^.^.96"
               },
               null
             ]
@@ -643,7 +778,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.65"
+                "->": ".^.^.^.106"
               },
               null
             ]
@@ -668,7 +803,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.72"
+                "->": ".^.^.^.113"
               },
               null
             ]
@@ -693,7 +828,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.79"
+                "->": ".^.^.^.120"
               },
               null
             ]
@@ -723,7 +858,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.89"
+                "->": ".^.^.^.130"
               },
               null
             ]
@@ -748,7 +883,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.96"
+                "->": ".^.^.^.137"
               },
               null
             ]
@@ -775,7 +910,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.105"
+                "->": ".^.^.^.146"
               },
               null
             ]
@@ -800,7 +935,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.112"
+                "->": ".^.^.^.153"
               },
               null
             ]
@@ -829,7 +964,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.122"
+                "->": ".^.^.^.163"
               },
               null
             ]
@@ -858,7 +993,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.132"
+                "->": ".^.^.^.173"
               },
               null
             ]
@@ -892,7 +1027,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.145"
+                "->": ".^.^.^.186"
               },
               null
             ]
@@ -921,7 +1056,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.155"
+                "->": ".^.^.^.196"
               },
               null
             ]
@@ -955,7 +1090,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.168"
+                "->": ".^.^.^.209"
               },
               null
             ]
@@ -989,7 +1124,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.181"
+                "->": ".^.^.^.222"
               },
               null
             ]
@@ -1018,7 +1153,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.191"
+                "->": ".^.^.^.232"
               },
               null
             ]
@@ -1052,7 +1187,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.204"
+                "->": ".^.^.^.245"
               },
               null
             ]
@@ -1077,7 +1212,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.211"
+                "->": ".^.^.^.252"
               },
               null
             ]
@@ -1102,7 +1237,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.218"
+                "->": ".^.^.^.259"
               },
               null
             ]
@@ -1136,7 +1271,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.230"
+                "->": ".^.^.^.271"
               },
               null
             ]
@@ -1161,7 +1296,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.237"
+                "->": ".^.^.^.278"
               },
               null
             ]
@@ -1186,7 +1321,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.244"
+                "->": ".^.^.^.285"
               },
               null
             ]
@@ -1216,7 +1351,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.254"
+                "->": ".^.^.^.295"
               },
               null
             ]
@@ -1246,7 +1381,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.264"
+                "->": ".^.^.^.305"
               },
               null
             ]
@@ -1271,7 +1406,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.271"
+                "->": ".^.^.^.312"
               },
               null
             ]
@@ -1301,7 +1436,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.281"
+                "->": ".^.^.^.322"
               },
               null
             ]
@@ -1331,7 +1466,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.291"
+                "->": ".^.^.^.332"
               },
               null
             ]
@@ -1356,7 +1491,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.298"
+                "->": ".^.^.^.339"
               },
               null
             ]
@@ -1386,7 +1521,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.308"
+                "->": ".^.^.^.349"
               },
               null
             ]
@@ -1416,7 +1551,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.318"
+                "->": ".^.^.^.359"
               },
               null
             ]
@@ -1441,7 +1576,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.325"
+                "->": ".^.^.^.366"
               },
               null
             ]
@@ -1466,7 +1601,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.332"
+                "->": ".^.^.^.373"
               },
               null
             ]
@@ -1496,7 +1631,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.342"
+                "->": ".^.^.^.383"
               },
               null
             ]
@@ -1530,7 +1665,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.355"
+                "->": ".^.^.^.396"
               },
               null
             ]
@@ -1560,7 +1695,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.365"
+                "->": ".^.^.^.406"
               },
               null
             ]
@@ -1585,7 +1720,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.372"
+                "->": ".^.^.^.413"
               },
               null
             ]
@@ -1615,7 +1750,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.382"
+                "->": ".^.^.^.423"
               },
               null
             ]
@@ -1649,7 +1784,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.395"
+                "->": ".^.^.^.436"
               },
               null
             ]
@@ -1683,7 +1818,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.408"
+                "->": ".^.^.^.449"
               },
               null
             ]
@@ -1713,7 +1848,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.418"
+                "->": ".^.^.^.459"
               },
               null
             ]
@@ -1743,7 +1878,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.428"
+                "->": ".^.^.^.469"
               },
               null
             ]
@@ -1773,7 +1908,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.438"
+                "->": ".^.^.^.479"
               },
               null
             ]
@@ -1798,7 +1933,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.445"
+                "->": ".^.^.^.486"
               },
               null
             ]
@@ -1840,7 +1975,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.462"
+                "->": ".^.^.^.503"
               },
               null
             ]
@@ -1874,7 +2009,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.475"
+                "->": ".^.^.^.516"
               },
               null
             ]
@@ -1974,7 +2109,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.485"
+                "->": ".^.^.^.526"
               },
               null
             ]
@@ -1999,7 +2134,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.492"
+                "->": ".^.^.^.533"
               },
               null
             ]
@@ -2029,7 +2164,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.502"
+                "->": ".^.^.^.543"
               },
               null
             ]
@@ -2063,7 +2198,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.514"
+                "->": ".^.^.^.555"
               },
               null
             ]
@@ -2088,7 +2223,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.521"
+                "->": ".^.^.^.562"
               },
               null
             ]
@@ -2118,7 +2253,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.531"
+                "->": ".^.^.^.572"
               },
               null
             ]
@@ -2152,7 +2287,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.544"
+                "->": ".^.^.^.585"
               },
               null
             ]
@@ -2181,7 +2316,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.554"
+                "->": ".^.^.^.595"
               },
               null
             ]
@@ -2210,7 +2345,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.564"
+                "->": ".^.^.^.605"
               },
               null
             ]
@@ -2244,7 +2379,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.577"
+                "->": ".^.^.^.618"
               },
               null
             ]
@@ -2274,7 +2409,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.587"
+                "->": ".^.^.^.628"
               },
               null
             ]
@@ -2299,7 +2434,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.594"
+                "->": ".^.^.^.635"
               },
               null
             ]
@@ -2333,7 +2468,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.606"
+                "->": ".^.^.^.647"
               },
               null
             ]
@@ -2358,7 +2493,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.613"
+                "->": ".^.^.^.654"
               },
               null
             ]
@@ -2387,7 +2522,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.623"
+                "->": ".^.^.^.664"
               },
               null
             ]
@@ -2412,7 +2547,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.630"
+                "->": ".^.^.^.671"
               },
               null
             ]
@@ -2437,7 +2572,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.637"
+                "->": ".^.^.^.678"
               },
               null
             ]
@@ -2474,7 +2609,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.652"
+                "->": ".^.^.^.693"
               },
               null
             ]
@@ -2499,7 +2634,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.659"
+                "->": ".^.^.^.700"
               },
               null
             ]
@@ -2533,7 +2668,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.672"
+                "->": ".^.^.^.713"
               },
               null
             ]
@@ -2562,7 +2697,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.682"
+                "->": ".^.^.^.723"
               },
               null
             ]
@@ -2587,7 +2722,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.689"
+                "->": ".^.^.^.730"
               },
               null
             ]
@@ -2612,7 +2747,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.696"
+                "->": ".^.^.^.737"
               },
               null
             ]
@@ -2642,7 +2777,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.706"
+                "->": ".^.^.^.747"
               },
               null
             ]
@@ -2672,7 +2807,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.716"
+                "->": ".^.^.^.757"
               },
               null
             ]
@@ -2697,7 +2832,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.723"
+                "->": ".^.^.^.764"
               },
               null
             ]
@@ -2726,7 +2861,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.733"
+                "->": ".^.^.^.774"
               },
               null
             ]
@@ -2764,7 +2899,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.749"
+                "->": ".^.^.^.790"
               },
               null
             ]
@@ -2791,7 +2926,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.758"
+                "->": ".^.^.^.799"
               },
               null
             ]
@@ -2820,7 +2955,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.768"
+                "->": ".^.^.^.809"
               },
               null
             ]
@@ -2845,7 +2980,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.775"
+                "->": ".^.^.^.816"
               },
               null
             ]
@@ -2874,7 +3009,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.786"
+                "->": ".^.^.^.827"
               },
               null
             ]
@@ -2903,7 +3038,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.797"
+                "->": ".^.^.^.838"
               },
               null
             ]
@@ -15146,6 +15281,31 @@
         "nop",
         "/#",
         "\n",
+        "ev",
+        {
+          "VAR?": "cavern_chime_rung"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ The shimmering star crystal from Crystal Cavern. It still hums when I hold it! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.70"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
         "^Fae closes the lid gently. ",
         "#",
         "^speaker: Fae",
@@ -15931,6 +16091,702 @@
           ]
         }
       ],
+      "cavern_dark": [
+        "^A snow-dusted archway opens into the northern cliffs, sparkling faintly inside. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^It's way too dark to step inside without a lantern! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "cavern_tablet": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "cavern_visited",
+          "re": true
+        },
+        "ev",
+        {
+          "VAR?": "cavern_bridge_lit"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.after"
+              },
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Faint carved swirls cover the stone tablet, too dim to read. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Maybe the blacklight lantern would make them glow! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "after": [
+            "^The carved fairy swirls still shimmer softly across the stone tablet. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "cavern_mural": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "cavern_visited",
+          "re": true
+        },
+        "ev",
+        {
+          "VAR?": "cavern_bridge_lit"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.after"
+              },
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Whoa! In the blacklight glow, old fairy swirls light up across the stone tablet! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^\"Where crystal water meets the mountain stone, step in light toward the song of the Mystic Pond.\" ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "cavern_bridge_lit",
+          "re": true
+        },
+        "^Three crystal stepping stones rise with a bright hum right across the turquoise stream! ",
+        "#",
+        "^speaker: Fae ",
+        "/#",
+        "#",
+        "^sound: chime-blue",
+        "/#",
+        "\n",
+        "^Now we can cross to the far side of the cavern! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "after": [
+            "^The glowing fairy swirls hum softly along the mural, keeping the crystal stepping stones bright. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "cavern_lantern_look": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "cavern_visited",
+          "re": true
+        },
+        "^A mossy stone lantern tucked against the cavern wall, glowing soft and warm. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Every tiny echo in here sounds like a gentle lullaby. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        null
+      ],
+      "cavern_stream": [
+        "ev",
+        true,
+        "/ev",
+        {
+          "VAR=": "cavern_visited",
+          "re": true
+        },
+        "ev",
+        {
+          "VAR?": "cavern_bridge_lit"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.after"
+              },
+              {
+                "->": ".^.^.^.8"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^A bright turquoise stream rushes down from the waterfall. Way too deep to wade across! ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "^Three flat stones glint under the water, carved with the same swirls as the stone tablet on the north wall. ",
+        "#",
+        "^speaker: Fae",
+        "/#",
+        "\n",
+        "done",
+        {
+          "after": [
+            "^Three glowing crystal stepping stones bridge the turquoise stream. Safe to walk right across! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "cavern_chime": [
+        [
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "cavern_visited",
+            "re": true
+          },
+          "ev",
+          {
+            "VAR?": "cavern_chime_rung"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.after"
+                },
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "cavern_chime_seen",
+            "re": true
+          },
+          "^A sparkling golden star chime hangs high up in the crystal arch! ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "has_lasso"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ It's way too high to reach without a rope. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "has_lasso"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.32"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Loop the lasso around the chime",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Leave it",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Fae twirls Coach Ash's lasso and loops it neatly around the star chime! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "cavern_chime_rung",
+                "re": true
+              },
+              "^One gentle tug sends a clear, shimmering chime echoing all around the cavern! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^sound: chime-blue",
+              "/#",
+              "\n",
+              "^A shimmering star crystal and a shower of sparkling coins tumble gently onto the sand! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^gift: coins 15",
+              "/#",
+              "\n",
+              "^I'll keep this star crystal safe in our clubhouse chest! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The golden star chime sways gently in the arch, still humming a quiet tune. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "cavern_spring": [
+        [
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "cavern_visited",
+            "re": true
+          },
+          "ev",
+          {
+            "VAR?": "cavern_spring_found"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                {
+                  "->": ".^.^.^.^.after"
+                },
+                {
+                  "->": ".^.^.^.8"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          true,
+          "/ev",
+          {
+            "VAR=": "cavern_spring_seen",
+            "re": true
+          },
+          "^The crystal spring glows bright turquoise! Something glints way down at the bottom. ",
+          "#",
+          "^speaker: Fae",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ It's too deep to reach, and way too chilly to wade in. ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.24"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          {
+            "VAR?": "pup_friend"
+          },
+          "&&",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ Bet the Pond Pup would love a splash in here! ",
+                "#",
+                "^speaker: Fae",
+                {
+                  "->": ".^.^.^.34"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "VAR?": "pup_with_me"
+          },
+          "!",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ ",
+                "done",
+                {
+                  "->": ".^.^.^.42"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Splash in, boy!",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Splash! The Pond Pup leaps into the sparkling turquoise spring and dives right down! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              true,
+              "/ev",
+              {
+                "VAR=": "cavern_spring_found",
+                "re": true
+              },
+              "^He paddles back grinning with a tucked-away crystal pouch packed with sweet berry snacks! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^gift: snack 2",
+              "/#",
+              "\n",
+              "^And ten shiny coins clinking inside too! Good boy! ",
+              "#",
+              "^speaker: Fae ",
+              "/#",
+              "#",
+              "^gift: coins 10",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "done",
+              null
+            ]
+          }
+        ],
+        {
+          "after": [
+            "^The crystal spring shimmers calm and clear. Nothing else glints on the sandy bottom. ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            null
+          ]
+        }
+      ],
+      "bat_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Squeak-squeak! My ears were buzzing like crazy from that purple fizz! ",
+        "#",
+        "^speaker: Cozy Bat",
+        "/#",
+        "\n",
+        "^Now I can hear the crystal chimes singing again. Thank you, Fae! ",
+        "#",
+        "^speaker: Cozy Bat",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Squeak! This cavern is the coziest nap spot on the whole mountain. ",
+            "#",
+            "^speaker: Cozy Bat",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
+      "crystal_mole_calm": [
+        "ev",
+        {
+          "CNT?": ".^"
+        },
+        1,
+        ">",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.again"
+              },
+              {
+                "->": ".^.^.^.6"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "^Sniffle-squeak! Thank goodness that purple dust cleared off my goggles! ",
+        "#",
+        "^speaker: Gem Mole",
+        "/#",
+        "\n",
+        "^I was digging for sparkly quartz and bumped right into a fizzy puddle. You're the nicest! ",
+        "#",
+        "^speaker: Gem Mole",
+        "/#",
+        "\n",
+        "done",
+        {
+          "again": [
+            "^Sniffle! Every crystal in this grotto is shining extra bright today. ",
+            "#",
+            "^speaker: Gem Mole",
+            "/#",
+            "\n",
+            "done",
+            null
+          ],
+          "#f": 1
+        }
+      ],
       "global decl": [
         "ev",
         "str",
@@ -16286,6 +17142,30 @@
         false,
         {
           "VAR=": "acorn_found"
+        },
+        false,
+        {
+          "VAR=": "cavern_visited"
+        },
+        false,
+        {
+          "VAR=": "cavern_bridge_lit"
+        },
+        false,
+        {
+          "VAR=": "cavern_chime_seen"
+        },
+        false,
+        {
+          "VAR=": "cavern_chime_rung"
+        },
+        false,
+        {
+          "VAR=": "cavern_spring_seen"
+        },
+        false,
+        {
+          "VAR=": "cavern_spring_found"
         },
         "/ev",
         "end",

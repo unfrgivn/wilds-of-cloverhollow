@@ -20,6 +20,8 @@ import mistData from "../../content/areas/mist.json";
 import enchantedData from "../../content/areas/enchanted.json";
 import hillsData from "../../content/areas/hills.json";
 import hillsPropsData from "../../content/props/hills.json";
+import cavernData from "../../content/areas/cavern.json";
+import cavernPropsData from "../../content/props/cavern.json";
 import artRoomData from "../../content/areas/art-room.json";
 import enchantedPropsData from "../../content/props/enchanted.json";
 import arcadeGameData from "../../content/arcade.json";
@@ -47,6 +49,7 @@ import lodgeSurfaceData from "../../content/surfaces/lodge.json";
 import mistSurfaceData from "../../content/surfaces/mist.json";
 import enchantedSurfaceData from "../../content/surfaces/enchanted.json";
 import hillsSurfaceData from "../../content/surfaces/hills.json";
+import cavernSurfaceData from "../../content/surfaces/cavern.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
 import plazaPropsData from "../../content/props/plaza.json";
 import bedroomPropsData from "../../content/props/bedroom.json";
@@ -91,6 +94,7 @@ import clubhouseFixtureData from "../../content/fixtures/clubhouse.json";
 import lodgeFixtureData from "../../content/fixtures/lodge.json";
 import musicFixtureData from "../../content/fixtures/music.json";
 import arcadeFixtureData from "../../content/fixtures/arcade.json";
+import cavernFixtureData from "../../content/fixtures/cavern.json";
 import tunableData from "../../content/tunables.json";
 import storyData from "../../content/story/main.ink.json";
 import fountainFrogData from "../../content/critters/fountain-frog.json";
@@ -118,6 +122,8 @@ import artTeacherData from "../../content/critters/art-teacher.json";
 import crabData from "../../content/critters/crab.json";
 import penguinData from "../../content/critters/penguin.json";
 import principalData from "../../content/critters/principal.json";
+import batData from "../../content/critters/bat.json";
+import crystalMoleData from "../../content/critters/crystal-mole.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import levelsData from "../../content/levels.json";
@@ -2170,6 +2176,8 @@ export function loadContent(): {
     parsePropCatalogue(enchantedPropsData, "content/props/enchanted.json"));
   const hills = parseArea(hillsData, "content/areas/hills.json",
     parsePropCatalogue(hillsPropsData, "content/props/hills.json"));
+  const cavern = parseArea(cavernData, "content/areas/cavern.json",
+    parsePropCatalogue(cavernPropsData, "content/props/cavern.json"));
   const artRoom = parseArea(artRoomData, "content/areas/art-room.json",
     parsePropCatalogue(artRoomPropsData, "content/props/art-room.json"));
   field(
@@ -2216,6 +2224,8 @@ export function loadContent(): {
     [crabData, "crab"],
     [penguinData, "penguin"],
     [principalData, "principal"],
+    [batData, "bat"],
+    [crystalMoleData, "crystal-mole"],
   ];
   const critters: Record<string, Critter> = {};
   for (const [data, name] of critterFiles) {
@@ -2284,6 +2294,7 @@ export function loadContent(): {
     lodge: parseFixture(lodgeFixtureData, "content/fixtures/lodge.json"),
     music: parseFixture(musicFixtureData, "content/fixtures/music.json"),
     arcade: parseFixture(arcadeFixtureData, "content/fixtures/arcade.json"),
+    cavern: parseFixture(cavernFixtureData, "content/fixtures/cavern.json"),
   };
   for (const [name, fixture] of Object.entries(fixtures))
     for (const id of fixture.party ?? [])
@@ -2312,6 +2323,7 @@ export function loadContent(): {
     [mist.id]: mist,
     [enchanted.id]: enchanted,
     [hills.id]: hills,
+    [cavern.id]: cavern,
   };
   const surfaceData: Record<string, unknown> = {
     harness: harnessSurfaceData, bedroom: bedroomSurfaceData, plaza: plazaSurfaceData,
@@ -2323,6 +2335,7 @@ export function loadContent(): {
     mist: mistSurfaceData,
     enchanted: enchantedSurfaceData,
     hills: hillsSurfaceData,
+    cavern: cavernSurfaceData,
     "art-room": artRoomSurfaceData,
   };
   const surfaces = completeSurfaceMaps(areas, surfaceData);

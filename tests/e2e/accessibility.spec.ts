@@ -233,6 +233,6 @@ test(
     // Click Pinecone Pass to inspect its progress.
     await page.locator('.journal-map-land[data-land="pass"]').click();
     await expect(page.locator(".journal-map-detail")).toContainText("Pinecone Pass");
-    await expect(page.locator(".journal-map-detail")).toContainText("/3 stickers");
+    await expect(page.locator(".journal-map-detail")).toContainText("/5 stickers");
   },
 );

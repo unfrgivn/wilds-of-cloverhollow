@@ -1,0 +1,16 @@
+{
+  "area": "cavern",
+  "spawn": "entrance",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "variables": {
+    "has_lantern": true,
+    "has_lasso": true,
+    "has_flute": true,
+    "pup_friend": true
+  }
+}

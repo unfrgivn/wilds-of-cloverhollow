@@ -88,6 +88,7 @@ const FOREST_MOTE_TINTS: readonly number[] = [0xf9da8e, 0xfff4cc];
 const LILAC_TINTS: readonly number[] = [0xe2c8ff, 0xf6eaff];
 const FIREFLY_TINTS: readonly number[] = [0xf9da8e, 0xa8f0d8];
 const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
+const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
 const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
 const CAVERN_CRYSTALS: readonly { x: number; y: number; tint: number; scale: number }[] = [
@@ -577,6 +578,67 @@ export function evaluateAtmosphere(
       maxScale: 0.4,
       minAlpha: 0.2,
       maxAlpha: 0.52,
+    });
+    return out;
+  }
+
+  if (areaId === "cafe") {
+    // Warm amber pastry-counter and cocoa-bar glow.
+    const counterPulse = 0.16 + 0.022 * Math.sin(tick * 0.045);
+    out.push({
+      layer: "under",
+      texture: "softGlow",
+      blend: "add",
+      x: 680,
+      y: 415,
+      scaleX: 2.35,
+      scaleY: 1.75,
+      rotation: 0.45,
+      alpha: clamp01(counterPulse),
+      tint: 0xffce7a,
+    });
+    out.push({
+      layer: "under",
+      texture: "softGlow",
+      blend: "add",
+      x: 780,
+      y: 472,
+      scaleX: 1.65,
+      scaleY: 1.35,
+      rotation: 0.45,
+      alpha: clamp01(counterPulse * 0.92),
+      tint: 0xffe4a8,
+    });
+    // 2 warm diagonal window sunbeams streaming from the NW arched window.
+    const beams: readonly [number, number, number][] = [
+      [445, 420, 1.85],
+      [515, 485, 1.65],
+    ];
+    beams.forEach(([bx, by, scale], i) => {
+      const alpha = 0.058 + 0.008 * Math.sin(tick * 0.018 + i * 2.2);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: bx,
+        y: by,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff2cf,
+      });
+    });
+    // 10 golden rising cocoa-steam and pastry-warmth motes.
+    addFloatingMotes(out, seed + 650, width, height, tick, 10, CAFE_MOTE_TINTS, {
+      marginX: 220,
+      marginY: 220,
+      driftX: 0.06,
+      driftY: -0.14,
+      minScale: 0.17,
+      maxScale: 0.34,
+      minAlpha: 0.17,
+      maxAlpha: 0.42,
     });
     return out;
   }

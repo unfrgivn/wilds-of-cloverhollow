@@ -367,6 +367,15 @@
         "y": 548
       },
       "prompt": "Look"
+    },
+    {
+      "id": "spice-tin",
+      "knot": "park_spice_tin",
+      "point": {
+        "x": 365,
+        "y": 575
+      },
+      "prompt": "Look"
     }
   ],
   "spawns": {

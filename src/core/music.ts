@@ -54,6 +54,7 @@ const areaTracks: Record<string, MusicTrack> = {
   bedroom: "home",
   kitchen: "home",
   plaza: "home",
+  cafe: "home",
   park: "home",
   hills: "home",
   school: "school",
@@ -86,6 +87,7 @@ const landTracks: Record<string, MusicTrack> = {
 
 const areaAmbience: Record<string, AmbienceBed> = {
   plaza: "town-breeze",
+  cafe: "hearth",
   park: "town-breeze",
   hills: "town-breeze",
   field: "town-breeze",

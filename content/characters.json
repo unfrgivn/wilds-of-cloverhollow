@@ -112,5 +112,41 @@
       180,
       8
     ]
+  },
+  "dad": {
+    "atlas": "assets/characters/dad/dad.json",
+    "idleTicks": [
+      175,
+      8
+    ]
+  },
+  "chef": {
+    "atlas": "assets/characters/chef/chef.json",
+    "idleTicks": [
+      185,
+      8
+    ]
+  },
+  "barnaby": {
+    "atlas": "assets/characters/barnaby/barnaby.json",
+    "idleTicks": [
+      200,
+      8
+    ]
+  },
+  "bree": {
+    "atlas": "assets/characters/bree/bree.json",
+    "idleTicks": [
+      165,
+      8
+    ]
+  },
+  "toby": {
+    "atlas": "assets/characters/toby/toby.json",
+    "idleTicks": [
+      155,
+      8
+    ],
+    "scale": 0.47
   }
 }

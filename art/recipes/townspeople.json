@@ -1,0 +1,26 @@
+{
+  "asset": "townspeople",
+  "milestone": 79,
+  "date": "2026-11-26",
+  "summary": "Five blinking Cloverhollow townspeople NPCs from NOTES.md (dad from fae_family.png, chef Bea, Grandpa barnaby, bus driver bree, and town kid toby): each built from a 2x2 spotless flat-magenta sheet into a 4x1 atlas (down_idle_01, down_idle_02 blink, left_idle_01, right_idle_01) at 448x448 frames, baseline 439.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 9,
+  "references": [
+    "docs/art/concepts/npcs/fae_family.png",
+    "docs/art/concepts/characters/character_concept_sheet_jordan.png"
+  ],
+  "kept": {
+    "dad": "art/source/townspeople/dad/sheet-raw.png",
+    "chef": "art/source/townspeople/chef/sheet-raw.png",
+    "barnaby": "art/source/townspeople/barnaby/sheet-raw.png",
+    "bree": "art/source/townspeople/bree/sheet-raw.png",
+    "toby": "art/source/townspeople/toby/sheet-raw.png"
+  },
+  "commands": [
+    "bun tools/art/build-townspeople.ts"
+  ],
+  "review": [
+    "art/review/cafe-townspeople-cream.jpg",
+    "art/review/cafe-townspeople-dark.jpg"
+  ]
+}

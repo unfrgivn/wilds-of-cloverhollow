@@ -83,6 +83,10 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{spice_returned: I found Chef Bea's Star Cinnamon tin in Meadow Park and earned a golden Bon Appetit Star Pin! # speaker: Fae}
+{spice_found and not spice_returned: I found Chef Bea's Star Cinnamon tin in Meadow Park! Time to bring it back to Bon Appetit Cafe. # speaker: Fae}
+{spice_quest and not spice_found: Chef Bea at Bon Appetit Cafe lost her Star Cinnamon tin in Meadow Park. A fizzy raccoon dropped it near the picnic blanket! # speaker: Fae}
+{met_dad: I bumped into Dad at Bon Appetit Cafe! He gave me a warm cinnamon bun and ten coins for my adventure. # speaker: Fae}
 {cavern_spring_found: The Pond Pup dove into Crystal Cavern's glowing spring and fetched a pouch of snacks and coins! # speaker: Fae}
 {cavern_spring_seen and not cavern_spring_found: Something glints deep in Crystal Cavern's turquoise spring, too deep to reach. # speaker: Fae}
 {cavern_chime_rung: I lassoed the golden star chime in Crystal Cavern and caught a shimmering star crystal! # speaker: Fae}
@@ -1837,6 +1841,7 @@ The note from under the comics: "NEXT STOP: THE ARCADE. FIZZ THE HIGH SCORES!" #
 {kite_returned: A bow from the tail of Rosie's kite. She gave it to me for getting it down! # speaker: Fae}
 {acorn_found: The golden acorn from the knothole in the big oak. The Acorn Squirrel found it! # speaker: Fae}
 {cavern_chime_rung: The shimmering star crystal from Crystal Cavern. It still hums when I hold it! # speaker: Fae}
+{spice_returned: Chef Bea's golden Bon Appetit Star Pin! It still smells faintly like warm cinnamon. # speaker: Fae}
 Fae closes the lid gently. # speaker: Fae
 -> DONE
 = drawings
@@ -2096,4 +2101,149 @@ I was digging for sparkly quartz and bumped right into a fizzy puddle. You're th
 -> DONE
 = again
 Sniffle! Every crystal in this grotto is shining extra bright today. # speaker: Gem Mole
+-> DONE
+
+// Bon Appetit Cafe, Dad, townspeople, and Chef Bea's Star Cinnamon errand (Milestone 79).
+VAR met_dad = false
+VAR spice_quest = false
+VAR spice_found = false
+VAR spice_returned = false
+VAR barnaby_gift = false
+
+=== dad ===
+{met_dad: -> again}
+Hey there, kiddo! Caught me sneaking a fresh cinnamon bun before work. # speaker: Dad
+How are Mom and baby Oliver holding up this morning? Still trying to eat his own socks? # speaker: Dad
+He almost got one in his mouth before breakfast! # speaker: Fae
+Sounds like our little guy. Hey, I'm glad you've been carrying that notebook everywhere, Fae. # speaker: Dad
+Your mom and I gave you that journal so you'd always have your own special adventures, even with baby Oliver keeping the house busy. # speaker: Dad
+~ met_dad = true
+Here, take an extra cinnamon bun for your backpack. # speaker: Dad # gift: snack 1
+And ten shiny coins in case you spot something fun in town! # speaker: Dad # gift: coins 10
+-> DONE
+= again
+{
+- has_lantern:
+    Whoa, is that Jordan's hiking lantern? Look at my brave explorer, lighting up the whole valley! # speaker: Dad
+    Save me a story for dinner tonight, okay kiddo? # speaker: Dad
+- clubhouse_claimed:
+    Mom told me you and your friends fixed up a real woodland clubhouse! # speaker: Dad
+    I'm so proud of you, kiddo. Don't forget to snack between adventures! # speaker: Dad
+- else:
+    Have a great day at school and around town, kiddo! # speaker: Dad
+    If you ever need a break, Bon Appetit's cocoa is always warm. # speaker: Dad
+}
+-> DONE
+
+=== chef_bea ===
+{spice_found and not spice_returned: -> return_spice}
+{not spice_quest: -> ask_spice}
+{not spice_found: -> remind_spice}
+Welcome back, Fae! My Star Cinnamon buns are rising golden and tall thanks to you! # speaker: Chef Bea
+-> cafe_shop
+
+= ask_spice
+Welcome to Bon Appetit Cafe, sweetie! Pull up a chair anytime. # speaker: Chef Bea
+I was all set to bake a fresh tray of my famous Star Cinnamon buns, except a fizzy little raccoon zipped right past the pastry window this morning! # speaker: Chef Bea
+It snatched my shiny Star Cinnamon tin and dropped it somewhere out in Meadow Park while tearing across the grass. # speaker: Chef Bea
+~ spice_quest = true
+If you spot a sparkly spice tin out by the picnic blanket in Meadow Park, would you bring it home to me? # speaker: Chef Bea
+You got it, Chef Bea! # speaker: Fae
+-> cafe_shop
+
+= remind_spice
+Any luck spotting my shiny Star Cinnamon tin out in Meadow Park, Fae? # speaker: Chef Bea
+That fizzy raccoon zoomed right past the picnic blanket, so check the clover near it! # speaker: Chef Bea
+-> cafe_shop
+
+= return_spice
+Oh my stars, you found my Star Cinnamon tin! Not even a single dent! # speaker: Chef Bea
+~ spice_returned = true
+You saved the whole morning bake, Fae! Here, take two fresh Star Cinnamon buns for the trail. # speaker: Chef Bea # gift: snack 2
+And fifteen coins for being Cloverhollow's finest helper! # speaker: Chef Bea # gift: coins 15
+Oh, and one more thing: my golden Bon Appetit Star Pin! Keep it safe with your favorite adventure treasures. # speaker: Chef Bea # sound: chime-blue
+Whoa, it smells like warm cinnamon! I'll keep it in our clubhouse chest! # speaker: Fae
+-> cafe_shop
+
+= cafe_shop
+{coins() < 5: Fresh cinnamon buns are 5 coins apiece whenever your backpack needs a snack! # speaker: Chef Bea}
++ {coins() >= 5} [Buy a warm cinnamon bun (5 coins)]
+    One warm, swirly cinnamon bun, wrapped in wax paper just for you! # speaker: Chef Bea # buy: snack 5
+    -> DONE
++ [Just saying hi!]
+    Always a treat to see your smiling face, Fae! Come back anytime. # speaker: Chef Bea
+    -> DONE
+
+=== park_spice_tin ===
+{spice_found: -> after}
+{spice_quest: -> collect}
+A sparkly little tin tucked in the clover by the picnic blanket. It smells amazing, like warm cinnamon and vanilla! # speaker: Fae
+-> DONE
+= collect
+A sparkly little tin tucked in the clover by the picnic blanket, stamped "Bon Appetit Star Cinnamon"! # speaker: Fae
+~ spice_found = true
+That's Chef Bea's missing spice tin! I'd better bring it right back to Bon Appetit Cafe. # speaker: Fae
+-> DONE
+= after
+Just soft green clover by the picnic blanket, still smelling faintly of warm cinnamon. # speaker: Fae
+-> DONE
+
+=== barnaby ===
+Ah, hello there, young Fae! Nothing beats a quiet cup of chamomile tea at Bon Appetit. # speaker: Grandpa Barnaby
+When I was your age, folks around Cloverhollow whispered storybook legends about the Ancient Tree deep in the woods, and a glowing crystal cavern tucked high in the snowy pass. # speaker: Grandpa Barnaby
+{
+- calmed("hooded-kid"):
+    And look at you now, bringing peace all the way to the Ancient Tree itself! The whole valley is humming again. # speaker: Grandpa Barnaby
+- calmed("bat"):
+    You even ventured into that glowing mountain cavern and calmed a bat! Those old legends really are alive! # speaker: Grandpa Barnaby
+- calmed("owl"):
+    Word reached town that you calmed the sleepy owl in Whispering Woods. That takes a steady heart! # speaker: Grandpa Barnaby
+- calmed("hamster"):
+    I heard you helped a snowy hamster up at Pinecone Pass! Nothing warms a mountain trail like kindness. # speaker: Grandpa Barnaby
+- calmed("bluebird"):
+    The breeze from Bubblegum Bay feels lighter already since you calmed that little bluebird! # speaker: Grandpa Barnaby
+- calmed("fountain-frog"):
+    Our town fountain sounds cheerful again since you sang to that grumpy frog! # speaker: Grandpa Barnaby
+- else:
+    If the town feels a little fizzy today, remember: a gentle song calms almost any ruffled feather. # speaker: Grandpa Barnaby
+}
+{(calmed("bluebird") or calmed("hamster") or calmed("bat") or calmed("owl")) and not barnaby_gift:
+    ~ barnaby_gift = true
+    Take these fifteen coins from an old storyteller, Fae. You've earned every single one keeping the valley peaceful! # speaker: Grandpa Barnaby # gift: coins 15
+}
+-> DONE
+
+=== bree ===
+Heya, Fae! Catching a quick cocoa break between routes! # speaker: Bree
+My Cloverhollow Star Bus loops right from the plaza's star sign out to Bubblegum Bay's sandy coast and all the way up to Pinecone Pass! # speaker: Bree
+{
+- has_lantern or rode_bus:
+    Psst, little mountain tip from your friendly bus driver: if you hike north past Pinecone Pass's cocoa stand, there's a snowy gap in the cliffs leading into Crystal Cavern! # speaker: Bree
+    I've seen amethyst and gold lights glittering right through the archway. Bring a good lantern if you go peeking! # speaker: Bree
+- else:
+    Whenever you're ready to visit the beach or the snowy mountains, just head to the star sign in the plaza and hop aboard! # speaker: Bree
+}
+-> DONE
+
+=== toby ===
+Whoa, hey Fae! Are you getting a cinnamon bun too? The icing swirls are HUGE today! # speaker: Toby
+I was just at the arcade trying to beat my record on Boop-a-Mole, Skee-Ball, and Comet Cruise! # speaker: Toby
+Star Racer's top high score is still scribbled out in purple marker, which is super mysterious. Nobody knows whose initials were under there! # speaker: Toby
+Oh, pro tip for calming fizzy critters: swing by the Grocery Market and Cloverhollow Scoops for Favourite Treats! # speaker: Toby
+If you toss a critter its favorite treat in a calm-down, it calms down WAY faster than a regular snack! # speaker: Toby
+-> DONE
+
+=== cafe_pastries ===
+Warm golden cinnamon rolls, flaky croissants, and berry tarts stacked under a gleaming glass dome! # speaker: Fae
+Everything smells like butter, brown sugar, and a cozy Saturday morning. # speaker: Fae
+-> DONE
+
+=== cafe_menu ===
+TODAY'S SPECIALS: Star Cinnamon Buns, Honey Marshmallow Cocoa, Warm Apple Tarts, and Crispy Tacos on Tuesdays! # speaker: Chalkboard
+The little chalk drawings of steaming mugs are super cute. # speaker: Fae
+-> DONE
+
+=== cafe_window ===
+Sunlight pours through the arched window, looking right out over Cloverhollow Plaza's fountain and flower boxes! # speaker: Fae
+You can almost hear the water sparkling outside. # speaker: Fae
 -> DONE

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 78)
+Last updated: 2026-11-26 (Milestone 79)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -850,6 +850,31 @@ ios/            Capacitor iOS project (from Milestone 4).
   ambience (`src/core/music.ts`); `bat` favours `orchard-apple` and
   `berry-cone` and `crystal-mole` favours `cocoa-sundae` and `orchard-apple`
   (`content/treats.json`).
+- Bon Appetit Café & Cloverhollow Town Life (Milestone 79): `cafe`, "Bon
+  Appetit Café", in the `cloverhollow` land, a 1200x800 painted isometric
+  cutaway off the plaza's muted-teal bakery/café doorway (plaza trigger
+  `cafe-door` at x=1040..1096, y=378..412 -> `cafe.door`; return spawn
+  `plaza.cafe-door` at (1068, 452) facing down, keeping `bakery`, `grocery`,
+  and `ice-cream` storefront talk windows untouched). Inside, the NW teal door
+  returns to `plaza.cafe-door` (`door` spawn at (360, 538) facing right). Its
+  five-prop kit lifts `table-west`, `table-east`, `counter`, `plant-east`, and
+  `stand-south`; floor surface is wood with a carpet doormat; three Look spots
+  cover `cafe-pastries` (`cafe_pastries`), `cafe-menu` (`cafe_menu`), and
+  `cafe-window` (`cafe_window`). Five blinking Cloverhollow townspeople
+  (`content/characters.json`: `dad`, `chef`, `barnaby`, `bree`, and `toby` at
+  kid scale `0.47`) inhabit the café: Dad (`dad`, first-visit journal pep talk
+  and `gift: snack 1` + `gift: coins 10`, dynamic progress revisits), Chef Bea
+  (`chef_bea`, Lost Star Cinnamon errand to Meadow Park's `spice-tin` /
+  `park_spice_tin` for `gift: snack 2`, `gift: coins 15`, and the Bon Appetit
+  Star Pin keepsake in `club_chest`, plus sticky 5-coin cinnamon bun sales),
+  Grandpa Barnaby (`barnaby`, Cloverhollow lore, calmed-critter milestones, and
+  one-time `gift: coins 15` after calming an out-of-town critter), Bree
+  (`bree`, Star Bus info and Crystal Cavern hint after `rode_bus` or
+  `has_lantern`), and Toby (`toby`, arcade hype and Favourite Treats battle
+  tip). Its fixture `cafe` starts at `door` with Maddie, Sue, and Jordan; its
+  atmosphere (`src/render/atmosphere.ts`) adds warm counter glows, two NW
+  window sunbeams, and ten rising cocoa-steam motes; its soundtrack plays
+  `"home"` with `"hearth"` ambience (`src/core/music.ts`).
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),

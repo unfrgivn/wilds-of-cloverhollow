@@ -66,6 +66,7 @@ describe("soundtrackFor", () => {
       bedroom: ["home", "none"],
       kitchen: ["home", "none"],
       plaza: ["home", "town-breeze"],
+      cafe: ["home", "hearth"],
       park: ["home", "town-breeze"],
       hills: ["home", "town-breeze"],
       school: ["school", "none"],

@@ -1,0 +1,27 @@
+{
+  "precedence": "first",
+  "default": "wood",
+  "regions": [
+    {
+      "surface": "carpet",
+      "polygon": [
+        [
+          252,
+          496
+        ],
+        [
+          322,
+          456
+        ],
+        [
+          378,
+          490
+        ],
+        [
+          308,
+          532
+        ]
+      ]
+    }
+  ]
+}

@@ -111,7 +111,7 @@ describe("the lands", () => {
 
   it("put every area in a land, except the test harness", () => {
     const lands: Record<string, string> = {
-      bedroom: "cloverhollow", kitchen: "cloverhollow",
+      bedroom: "cloverhollow", kitchen: "cloverhollow", cafe: "cloverhollow",
       arcade: "cloverhollow", classroom: "cloverhollow",
       "east-hall": "cloverhollow", "art-room": "cloverhollow", music: "cloverhollow",
       gym: "cloverhollow", field: "cloverhollow", clubhouse: "forest", lodge: "pass",

@@ -302,6 +302,31 @@
         "variable": "clubhouse_claimed",
         "knot": "arcade_closed"
       }
+    },
+    {
+      "id": "cafe-door",
+      "polygon": [
+        [
+          1040,
+          382
+        ],
+        [
+          1096,
+          378
+        ],
+        [
+          1096,
+          408
+        ],
+        [
+          1040,
+          412
+        ]
+      ],
+      "target": {
+        "area": "cafe",
+        "spawn": "door"
+      }
     }
   ],
   "interactables": [
@@ -385,6 +410,11 @@
     "bus-stop": {
       "x": 878,
       "y": 985,
+      "facing": "down"
+    },
+    "cafe-door": {
+      "x": 1068,
+      "y": 452,
       "facing": "down"
     }
   },

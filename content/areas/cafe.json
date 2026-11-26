@@ -1,0 +1,265 @@
+{
+  "id": "cafe",
+  "name": "Bon Appetit Café",
+  "land": "cloverhollow",
+  "ground": "cafe",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      200,
+      523
+    ],
+    [
+      600,
+      289
+    ],
+    [
+      1000,
+      523
+    ],
+    [
+      600,
+      757
+    ]
+  ],
+  "blockers": [],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          240,
+          494
+        ],
+        [
+          326,
+          444
+        ],
+        [
+          344,
+          472
+        ],
+        [
+          258,
+          522
+        ]
+      ],
+      "target": {
+        "area": "plaza",
+        "spawn": "cafe-door"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 360,
+      "y": 538,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "cafe-pastries",
+      "knot": "cafe_pastries",
+      "point": {
+        "x": 575,
+        "y": 415
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "cafe-menu",
+      "knot": "cafe_menu",
+      "point": {
+        "x": 720,
+        "y": 495
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "cafe-window",
+      "knot": "cafe_window",
+      "point": {
+        "x": 495,
+        "y": 378
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "chef",
+      "point": {
+        "x": 652,
+        "y": 476
+      },
+      "facing": "down",
+      "knot": "chef_bea",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          637,
+          466
+        ],
+        [
+          667,
+          466
+        ],
+        [
+          667,
+          486
+        ],
+        [
+          637,
+          486
+        ]
+      ]
+    },
+    {
+      "id": "dad",
+      "point": {
+        "x": 462,
+        "y": 624
+      },
+      "facing": "right",
+      "knot": "dad",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          447,
+          614
+        ],
+        [
+          477,
+          614
+        ],
+        [
+          477,
+          634
+        ],
+        [
+          447,
+          634
+        ]
+      ]
+    },
+    {
+      "id": "barnaby",
+      "point": {
+        "x": 604,
+        "y": 700
+      },
+      "facing": "right",
+      "knot": "barnaby",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          589,
+          690
+        ],
+        [
+          619,
+          690
+        ],
+        [
+          619,
+          710
+        ],
+        [
+          589,
+          710
+        ]
+      ]
+    },
+    {
+      "id": "bree",
+      "point": {
+        "x": 862,
+        "y": 560
+      },
+      "facing": "left",
+      "knot": "bree",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          847,
+          550
+        ],
+        [
+          877,
+          550
+        ],
+        [
+          877,
+          570
+        ],
+        [
+          847,
+          570
+        ]
+      ]
+    },
+    {
+      "id": "toby",
+      "point": {
+        "x": 398,
+        "y": 456
+      },
+      "facing": "right",
+      "knot": "toby",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          385,
+          446
+        ],
+        [
+          411,
+          446
+        ],
+        [
+          411,
+          464
+        ],
+        [
+          385,
+          464
+        ]
+      ]
+    }
+  ],
+  "critters": [],
+  "props": [
+    {
+      "id": "table-west",
+      "prop": "table-west",
+      "x": 526,
+      "y": 558
+    },
+    {
+      "id": "table-east",
+      "prop": "table-east",
+      "x": 712,
+      "y": 682
+    },
+    {
+      "id": "counter",
+      "prop": "counter",
+      "x": 708,
+      "y": 532
+    },
+    {
+      "id": "plant-east",
+      "prop": "plant-east",
+      "x": 940,
+      "y": 530
+    },
+    {
+      "id": "stand-south",
+      "prop": "stand-south",
+      "x": 526,
+      "y": 706
+    }
+  ]
+}

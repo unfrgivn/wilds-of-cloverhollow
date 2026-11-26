@@ -1,0 +1,48 @@
+{
+  "asset": "cafe",
+  "milestone": 79,
+  "date": "2026-11-26",
+  "summary": "Bon Appetit Café (NOTES.md), a 1200x800 painted isometric cutaway bistro entered through the muted-teal shop door on Cloverhollow Plaza's bakery/café building: two checkered bistro tables with chairs, bakery pastry display & cocoa counter, terracotta potted ficus plant, and wooden newspaper/baguette stand.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 12,
+  "references": [
+    "art/source/areas/art-room/art-room-final.png",
+    "art/source/areas/lodge/lodge-final.png",
+    "docs/art/concepts/props/town_shops_buildings.png"
+  ],
+  "steps": [
+    {
+      "what": "Two 4K 3:2 cutaway candidates for Bon Appetit Café.",
+      "calls": 2,
+      "outputs": [
+        "art/scratch/1795717690863-gemini-3-pro-image-preview-0.png",
+        "art/scratch/1795717691011-gemini-3-pro-image-preview-0.png"
+      ],
+      "selected": "1795717691011 resized with Lanczos to 2400x1600 and tiled into two 1200x1600 WebP tiles (paper #f4e8d2)."
+    },
+    {
+      "what": "Area kit isolation (5 subjects x 2 samples = 10 calls) via art/kit/cafe.json; 0 warnings, 1 atlas page (4.6 MB decoded), rebuilt vs painting 0.00%.",
+      "calls": 10,
+      "config": "art/kit/cafe.json"
+    }
+  ],
+  "commands": [
+    "bun tools/art/kit.ts cafe gen",
+    "bun tools/art/kit.ts cafe masks",
+    "bun tools/art/kit.ts cafe fill",
+    "bun tools/art/kit.ts cafe pack",
+    "bun tools/art/kit.ts cafe place"
+  ],
+  "subjects": [
+    "table-west",
+    "table-east",
+    "counter",
+    "plant-east",
+    "stand-south"
+  ],
+  "outputs": {
+    "painting": "art/source/areas/cafe/painting/ground.json",
+    "atlas": "public/assets/areas/cafe/props-0.json",
+    "catalogue": "content/props/cafe.json"
+  }
+}

@@ -3863,6 +3863,46 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (production and harness hook checks), and full
   `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (989 passed, 2 skipped in 3.6 min).
 
+## Milestone 79: Cloverhollow Town Life (Bon Appetit Café, Dad & Townspeople) **Status:** ✅ Completed (2026-11-26)
+- Enterable **Bon Appetit Café** (`cafe`, `land: "cloverhollow"`, 1200x800
+  painted cutaway interior from `town_shops_buildings.png`'s bistro, tiled into
+  two 1200x1600 WebP tiles, paper `#f4e8d2`), wired seamlessly through the
+  muted-teal door on the left half of Cloverhollow Plaza's bakery/café building
+  (trigger `cafe-door` at `x=1040..1096, y=378..412`, return spawn `(1068, 452)`
+  facing down; existing `bakery`, `grocery`, and `ice-cream` windows stay
+  untouched so zero existing plaza runs shift).
+- Five-prop depth-sorted café kit (`table-west`, `table-east`, `counter`,
+  `plant-east`, `stand-south`; 0 warnings, 1 page 4.6 MB decoded, `rebuilt vs
+  painting 0.00%`), `content/surfaces/cafe.json` (`wood` default + `carpet`
+  doormat), warm sunlit café atmosphere (amber counter glows, diagonal window
+  sunbeams, rising cocoa-steam motes in `src/render/atmosphere.ts`), and
+  `"home"` + `"hearth"` audio (`src/core/music.ts`).
+- Five new blinking Cloverhollow townspeople (`NOTES.md` & `fae_family.png`),
+  built deterministically by `tools/art/build-townspeople.ts` (448x448 4x1
+  atlases: front, happy blink, left, right; 0 islands dropped, zero magenta
+  halo/glass pockets verified on dark review sheets):
+  - **Dad (`dad`)**: warm family visit referencing Mom, baby Oliver, and Fae's
+    journal (`# gift: snack 1`, `# gift: coins 10`, dynamic progress revisits).
+  - **Chef Bea (`chef`)**: hosts the **Lost Star Cinnamon** side errand (find
+    her sparkly `spice-tin` by Meadow Park's picnic blanket, return for 2
+    snacks, 15 coins, `chime-blue`, and the **Bon Appetit Star Pin** keepsake
+    in `club_chest`), plus sticky 5-coin warm cinnamon bun sales.
+  - **Grandpa Barnaby (`barnaby`)**: Cloverhollow valley legends (Ancient Tree
+    & Crystal Cavern), dynamic calmed-critter reactions, and a 15-coin gift once
+    an out-of-town critter is calmed.
+  - **Bree (`bree`)**: Cloverhollow Star Bus driver sharing bus-line info and a
+    Crystal Cavern north-gap hint after `rode_bus` or `has_lantern`.
+  - **Toby (`toby`, scale `0.47`)**: neighborhood kid talking up the arcade
+    games (`Star Racer` clue with Milo still unnamed) and Favourite Treats.
+- Evidence: `tests/unit/cafe.test.ts`, `tests/unit/cafe-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/cafe.json` (9,341 ticks), real-key
+  `tests/e2e/cafe.spec.ts` matching Bun's hash at 1280x720 and 874x402, and
+  `vision`-verified `art/review/cafe-{overlay,depth,frames,gameplay}.jpg` and
+  `art/review/cafe-townspeople-{cream,dark}.jpg`.
+- Gates: `just check` (136 unit files / 1,110 tests, 62 sims, 23 QA packs,
+  purity, lint), `just build`, and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e`
+  (990 passed, 2 skipped in 3.7 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

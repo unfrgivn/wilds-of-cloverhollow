@@ -1,0 +1,132 @@
+{
+  "frames": {
+    "counter": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 630,
+        "h": 585
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 630,
+        "h": 585
+      },
+      "sourceSize": {
+        "w": 630,
+        "h": 585
+      },
+      "anchor": {
+        "x": 0.49524,
+        "y": 0.9812
+      }
+    },
+    "plant-east": {
+      "frame": {
+        "x": 632,
+        "y": 0,
+        "w": 260,
+        "h": 435
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 260,
+        "h": 435
+      },
+      "sourceSize": {
+        "w": 260,
+        "h": 435
+      },
+      "anchor": {
+        "x": 0.53077,
+        "y": 0.98161
+      }
+    },
+    "table-east": {
+      "frame": {
+        "x": 894,
+        "y": 0,
+        "w": 340,
+        "h": 358
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 340,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 340,
+        "h": 358
+      },
+      "anchor": {
+        "x": 0.49118,
+        "y": 0.97765
+      }
+    },
+    "table-west": {
+      "frame": {
+        "x": 1236,
+        "y": 0,
+        "w": 350,
+        "h": 358
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 350,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 350,
+        "h": 358
+      },
+      "anchor": {
+        "x": 0.48286,
+        "y": 0.97765
+      }
+    },
+    "stand-south": {
+      "frame": {
+        "x": 1588,
+        "y": 0,
+        "w": 160,
+        "h": 223
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 223
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 223
+      },
+      "anchor": {
+        "x": 0.49375,
+        "y": 0.97309
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.png",
+    "size": {
+      "w": 2048,
+      "h": 585
+    },
+    "scale": "1"
+  }
+}

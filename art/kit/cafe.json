@@ -1,0 +1,61 @@
+{
+  "area": "cafe",
+  "subjects": [
+    {
+      "id": "table-west",
+      "crop": [415, 365, 225, 220],
+      "seed": [526, 465],
+      "home": [526, 558],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm honey-wood floorboards",
+      "object": "the complete upper-left round café table with its red-and-white checkered tablecloth, flower bud vase, wooden pedestal, and BOTH wooden chairs flanking it, including all legs and warm-brown ink outlines; not the floor, other table, or pastry counter",
+      "footprint": [[[452, 488], [520, 478], [600, 522], [585, 556], [510, 542], [448, 512]]]
+    },
+    {
+      "id": "table-east",
+      "crop": [605, 490, 215, 220],
+      "seed": [712, 590],
+      "home": [712, 682],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm honey-wood floorboards",
+      "object": "the complete lower-right round café table with its red-and-white checkered tablecloth, flower bud vase, wooden pedestal, and BOTH wooden chairs flanking it, including all legs and warm-brown ink outlines; not the floor, other table, or newspaper stand",
+      "footprint": [[[640, 646], [712, 608], [786, 604], [786, 636], [726, 666], [648, 680]]]
+    },
+    {
+      "id": "counter",
+      "crop": [530, 230, 360, 330],
+      "seed": [700, 405],
+      "home": [708, 532],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm honey-wood floorboards and cream wainscoting",
+      "object": "the complete wooden bakery counter and curved glass pastry display case stocked with pastries, together with the attached wooden cocoa counter, brass teapot, and ceramic mugs on top, down to the floor; not the back wall, chalkboard menu, or floor",
+      "footprint": [[[556, 360], [612, 326], [860, 474], [860, 503], [808, 532], [556, 386]]]
+    },
+    {
+      "id": "plant-east",
+      "crop": [865, 305, 160, 250],
+      "seed": [940, 420],
+      "home": [940, 530],
+      "painted": true,
+      "canopy": false,
+      "core": 2,
+      "ground": "the warm honey-wood floorboards",
+      "object": "the complete potted ficus tree in its terracotta pot at the right corner, including all green leaves, woody stem, terracotta pot, and warm-brown ink outline; not the back wall, counter, or floor",
+      "footprint": [[[916, 512], [964, 512], [964, 530], [916, 530]]]
+    },
+    {
+      "id": "stand-south",
+      "crop": [468, 580, 120, 150],
+      "seed": [526, 650],
+      "home": [526, 706],
+      "painted": true,
+      "canopy": false,
+      "ground": "the warm honey-wood floorboards",
+      "object": "the complete small wooden newspaper and bread rack near the bottom corner, including its legs, folded newspaper, baguette, and warm-brown ink outline; not the wooden floorboards or edge slab",
+      "footprint": [[[492, 678], [526, 666], [560, 688], [532, 706]]]
+    }
+  ]
+}

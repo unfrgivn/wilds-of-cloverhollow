@@ -1,4 +1,6 @@
 import "./sticker.css";
+import { applyAtlasCrop, type AtlasImage } from "./atlas";
+import type { SpeakerAccent } from "./portraits";
 
 export type DialogueView = {
   speaker: string | null;
@@ -7,6 +9,8 @@ export type DialogueView = {
   choices: { text: string }[];
   selected: number;
   canAdvance: boolean;
+  portrait?: AtlasImage | null;
+  accent?: SpeakerAccent;
 };
 
 type ChoiceCallback = (index: number) => void;
@@ -19,6 +23,14 @@ export function createDialogueBox(root: HTMLElement): {
   const box = document.createElement("section");
   box.className = "sticker-ui sticker-dialogue";
   box.setAttribute("aria-label", "Dialogue");
+  const portrait = document.createElement("span");
+  portrait.className = "sticker-portrait";
+  portrait.setAttribute("role", "img");
+  portrait.setAttribute("aria-hidden", "true");
+  portrait.hidden = true;
+  const portraitImg = document.createElement("span");
+  portraitImg.className = "sticker-portrait-img";
+  portrait.append(portraitImg);
   const speaker = document.createElement("div");
   speaker.className = "sticker-speaker";
   const text = document.createElement("div");
@@ -42,15 +54,39 @@ export function createDialogueBox(root: HTMLElement): {
   choices.className = "sticker-choices";
   choices.setAttribute("role", "listbox");
   choices.setAttribute("aria-label", "Choices");
-  box.append(speaker, text, live, choiceLive, advance, choices);
+  box.append(portrait, speaker, text, live, choiceLive, advance, choices);
   root.append(box);
   let choose: ChoiceCallback = () => undefined;
   let announcedLine = "";
   let announcedChoice = "";
+  let lastPortraitKey = "";
+  let lastAccent = "";
 
   const onChoose = (callback: ChoiceCallback): void => { choose = callback; };
   const render = (view: DialogueView): void => {
     box.hidden = false;
+    const accent = view.accent ?? "default";
+    if (accent !== lastAccent) {
+      speaker.dataset.accent = accent;
+      portrait.dataset.accent = accent;
+      lastAccent = accent;
+    }
+    const portraitImage = view.portrait ?? null;
+    const showPortrait = portraitImage !== null && view.speaker !== null;
+    portrait.hidden = !showPortrait;
+    box.classList.toggle("has-portrait", showPortrait);
+    portrait.classList.toggle("is-talking", showPortrait && view.revealed < view.text.length);
+    if (showPortrait) {
+      const key =
+        `${portraitImage.src}#${portraitImage.frame.x},${portraitImage.frame.y},` +
+        `${portraitImage.frame.w},${portraitImage.frame.h}`;
+      if (key !== lastPortraitKey) {
+        applyAtlasCrop(portraitImg, portraitImage);
+        lastPortraitKey = key;
+      }
+    } else {
+      lastPortraitKey = "";
+    }
     speaker.textContent = view.speaker ?? "";
     speaker.hidden = view.speaker === null;
     full.textContent = view.text;

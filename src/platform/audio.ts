@@ -18,8 +18,15 @@ import {
 } from "./audio-settings";
 import { createAmbiencePlayer, type AmbiencePlayer } from "./ambience";
 import { createMusicPlayer, type MusicPlayer } from "./music";
+import { blipFrequency, trackScaleNotes } from "./voices";
 
 export type SoundLogEntry = { tick: number; cue: SoundCue; played: boolean };
+export type SoundPlayContext = {
+  speaker?: string | null;
+  text?: string;
+  revealed?: number;
+  choiceIndex?: number;
+};
 // WebKit adds "interrupted" (no gesture yet, or the audio session was taken)
 // to the standard states, so the DOM type doesn't cover what it reports.
 export type AudioState = "running" | "suspended" | "interrupted" | "closed" | "unavailable";
@@ -42,7 +49,7 @@ function stateOf(audio: AudioContext | null): AudioState {
 }
 
 export type AudioController = {
-  play: (cue: SoundCue, tick: number) => SoundLogEntry;
+  play: (cue: SoundCue, tick: number, context?: SoundPlayContext) => SoundLogEntry;
   toggle: () => void;
   muted: () => boolean;
   setLevel: (level: AudioLevel) => void;
@@ -59,7 +66,7 @@ export type AudioController = {
   state: () => AudioState;
 };
 
-type Timing = { offset: number; duration: number; gain: number };
+type Timing = { offset: number; duration: number; gain: number; attack?: number };
 type Segment =
   | (Timing & { wave: "noise"; lowpass: number })
   | (Timing & {
@@ -80,7 +87,7 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "triangle", frequency: 523, offset: 0, duration: 0.09, gain: 0.09 },
     { wave: "sine", frequency: 784, offset: 0.02, duration: 0.07, gain: 0.035 },
   ],
-  "dialogue-blip": [{ wave: "square", frequency: 660, offset: 0, duration: 0.032, gain: 0.038 }],
+  "dialogue-blip": [{ wave: "triangle", frequency: 523, offset: 0, duration: 0.04, gain: 0.042 }],
   "dialogue-close": [
     { wave: "triangle", frequency: 392, offset: 0, duration: 0.08, gain: 0.08 },
     { wave: "triangle", frequency: 330, offset: 0.05, duration: 0.11, gain: 0.09 },
@@ -620,8 +627,13 @@ export function createAudio(
     if (master === null) return;
     const gain = audio.createGain();
     const end = start + segment.duration;
+    const attack = Math.min(segment.attack ?? 0.006, segment.duration * 0.4);
     gain.gain.setValueAtTime(0.001, start);
-    gain.gain.exponentialRampToValueAtTime(segment.gain, start + 0.006);
+    if (segment.attack !== undefined) {
+      gain.gain.linearRampToValueAtTime(segment.gain, start + attack);
+    } else {
+      gain.gain.exponentialRampToValueAtTime(segment.gain, start + attack);
+    }
     gain.gain.exponentialRampToValueAtTime(0.001, end);
     if (segment.wave === "noise") {
       const source = audio.createBufferSource();
@@ -655,12 +667,97 @@ export function createAudio(
     oscillator.stop(end);
   };
 
-  const playRecipe = (cue: SoundCue): boolean => {
+  const dialogueBlipRecipe = (tick: number, info?: SoundPlayContext): Segment[] | null => {
+    const text = info?.text;
+    const revealed = info?.revealed;
+    let char: string | undefined;
+    if (text !== undefined && revealed !== undefined && revealed > 0) {
+      const current = text[revealed - 1];
+      const previous = revealed >= 2 ? text[revealed - 2] : undefined;
+      char = current !== undefined && /^[\s.,!?;:\u2014\u2013-]$/.test(current)
+        ? previous
+        : current;
+    }
+    const blip = blipFrequency(info?.speaker ?? null, revealed ?? tick, char);
+    if (blip === null) return null;
+    const segments: Segment[] = [
+      {
+        wave: blip.wave,
+        frequency: blip.frequency,
+        endFrequency: blip.endFrequency,
+        offset: 0,
+        duration: blip.duration,
+        gain: blip.gain,
+        attack: 0.002,
+      },
+    ];
+    if (blip.harmonic !== undefined) {
+      segments.push({
+        wave: "sine",
+        frequency: blip.frequency * blip.harmonic,
+        endFrequency:
+          blip.endFrequency === undefined ? undefined : blip.endFrequency * blip.harmonic,
+        offset: 0,
+        duration: blip.duration * 0.85,
+        gain: blip.gain * 0.28,
+        attack: 0.002,
+      });
+    }
+    return segments;
+  };
+
+  const scaleChoiceRecipe = (
+    cue: "choice-move" | "battle-command" | "choice-select",
+    tick: number,
+    info?: SoundPlayContext,
+  ): Segment[] => {
+    const scale = trackScaleNotes(soundtrack.track);
+    if (cue === "choice-select") {
+      const root = scale[0] ?? 523.25;
+      const fifth = scale[3] ?? 783.99;
+      return [
+        { wave: "triangle", frequency: root, offset: 0, duration: 0.095, gain: 0.1 },
+        { wave: "sine", frequency: fifth, offset: 0.045, duration: 0.115, gain: 0.075 },
+      ];
+    }
+    const raw = info?.choiceIndex ?? tick;
+    const index = ((Math.trunc(raw) % scale.length) + scale.length) % scale.length;
+    const note = scale[index] ?? 523.25;
+    const isCommand = cue === "battle-command";
+    return [
+      {
+        wave: "triangle",
+        frequency: note,
+        offset: 0,
+        duration: isCommand ? 0.09 : 0.072,
+        gain: isCommand ? 0.082 : 0.074,
+        attack: 0.003,
+      },
+      {
+        wave: "sine",
+        frequency: note * 2,
+        offset: 0,
+        duration: isCommand ? 0.055 : 0.045,
+        gain: 0.022,
+        attack: 0.003,
+      },
+    ];
+  };
+
+  const playRecipe = (cue: SoundCue, tick: number, info?: SoundPlayContext): boolean => {
     if (muted) return false;
     unlock();
     const audio = context;
     if (audio === null || master === null || stateOf(audio) !== "running") return false;
-    const recipe = recipes[cue];
+    let recipe: Recipe | null;
+    if (cue === "dialogue-blip") {
+      recipe = dialogueBlipRecipe(tick, info);
+    } else if (cue === "choice-move" || cue === "battle-command" || cue === "choice-select") {
+      recipe = scaleChoiceRecipe(cue, tick, info);
+    } else {
+      recipe = recipes[cue];
+    }
+    if (recipe === null) return true;
     const now = audio.currentTime;
     recipe.forEach((segment) => playSegment(audio, segment, now + segment.offset));
     return true;
@@ -705,8 +802,8 @@ export function createAudio(
   });
 
   return {
-    play: (cue, tick) => {
-      const entry = { tick, cue, played: playRecipe(cue) };
+    play: (cue, tick, info) => {
+      const entry = { tick, cue, played: playRecipe(cue, tick, info) };
       entries.push(entry);
       if (entries.length > 120) entries.shift();
       return entry;

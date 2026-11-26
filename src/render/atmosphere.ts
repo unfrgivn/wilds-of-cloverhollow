@@ -1,14 +1,15 @@
 import { Container, Sprite } from "pixi.js";
 import type { VfxTextures } from "./vfx-textures";
 
-export type AtmosphereLayer = "under" | "over";
+export type AtmosphereLayer = "under" | "over" | "emissive";
 export type AtmosphereTextureKey =
   | "softGlow"
   | "sparkle"
   | "petal"
   | "waterGlint"
   | "mistWisp"
-  | "sunbeam";
+  | "sunbeam"
+  | "energyRing";
 export type AtmosphereBlend = "normal" | "add";
 
 export type AtmosphereParticle = {
@@ -91,13 +92,37 @@ const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
 const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
 const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
-const CAVERN_CRYSTALS: readonly { x: number; y: number; tint: number; scale: number }[] = [
-  { x: 495, y: 520, tint: 0xd8b8ff, scale: 1.55 },
-  { x: 705, y: 425, tint: 0x67d5c4, scale: 1.35 },
-  { x: 825, y: 760, tint: 0xf9da8e, scale: 1.45 },
-  { x: 1040, y: 425, tint: 0xf9da8e, scale: 1.35 },
-  { x: 1180, y: 675, tint: 0x67d5c4, scale: 1.35 },
-  { x: 1280, y: 310, tint: 0xffe49c, scale: 1.4 },
+const CAVERN_CRYSTALS: readonly {
+  x: number;
+  y: number;
+  tint: number;
+  scale: number;
+  baseAlpha: number;
+}[] = [
+  { x: 495, y: 520, tint: 0xd8b8ff, scale: 1.65, baseAlpha: 0.34 },
+  { x: 705, y: 425, tint: 0x67d5c4, scale: 1.45, baseAlpha: 0.32 },
+  { x: 760, y: 295, tint: 0xd8b8ff, scale: 1.15, baseAlpha: 0.26 },
+  { x: 825, y: 760, tint: 0xf9da8e, scale: 1.55, baseAlpha: 0.33 },
+  { x: 1040, y: 425, tint: 0xf9da8e, scale: 1.45, baseAlpha: 0.32 },
+  { x: 1180, y: 675, tint: 0x67d5c4, scale: 1.45, baseAlpha: 0.32 },
+  { x: 1280, y: 310, tint: 0xffe49c, scale: 1.7, baseAlpha: 0.37 },
+  { x: 1410, y: 470, tint: 0xd8b8ff, scale: 1.15, baseAlpha: 0.26 },
+];
+const CAVERN_LANTERNS: readonly [number, number][] = [
+  [298, 415],
+  [1385, 690],
+];
+const CAVERN_STEP_RINGS: readonly [number, number][] = [
+  [785, 540],
+  [840, 542],
+  [895, 546],
+];
+const CAVERN_EDGE_SHADOWS: readonly [number, number, number, number][] = [
+  [110, 140, 5.2, 4.2],
+  [1540, 140, 5.2, 4.2],
+  [110, 970, 5.0, 3.8],
+  [1540, 970, 5.0, 3.8],
+  [825, 60, 8.0, 2.8],
 ];
 const CAVERN_MOTE_TINTS: readonly number[] = [0xd8b8ff, 0x9cf2eb, 0xf9da8e];
 
@@ -236,11 +261,11 @@ export function evaluateAtmosphere(
         tint: pickTint(WATER_TINTS, i),
       });
     }
-    // 4 subtle warm lantern light pools around the 4 lamp arches.
+    // 4 subtle warm lantern light pools around the 4 lamp arches (emissive over twilight).
     PLAZA_ARCHES.forEach(([ax, ay], i) => {
-      const breathe = 0.18 + 0.025 * Math.sin(tick * 0.03 + i * 1.5);
+      const breathe = 0.2 + 0.025 * Math.sin(tick * 0.03 + i * 1.5);
       out.push({
-        layer: "under",
+        layer: "emissive",
         texture: "softGlow",
         blend: "add",
         x: ax,
@@ -497,12 +522,12 @@ export function evaluateAtmosphere(
   }
 
   if (areaId === "enchanted") {
-    // 4 luminous pastel fairy aura halos anchored behind each fairy.
+    // 4 luminous pastel fairy aura halos anchored on each fairy (emissive over twilight).
     ENCHANTED_FAIRIES.forEach((fairy, i) => {
       const pulse = Math.sin(tick * 0.045 + i * 1.6);
       const scale = 1.08 + 0.08 * pulse;
       out.push({
-        layer: "under",
+        layer: "emissive",
         texture: "softGlow",
         blend: "add",
         x: fairy.x,
@@ -510,7 +535,7 @@ export function evaluateAtmosphere(
         scaleX: scale,
         scaleY: scale,
         rotation: 0,
-        alpha: clamp01(0.24 + 0.04 * pulse),
+        alpha: clamp01(0.26 + 0.04 * pulse),
         tint: fairy.tint,
       });
     });
@@ -528,12 +553,27 @@ export function evaluateAtmosphere(
   }
 
   if (areaId === "cavern") {
-    // Soft pulsing pastel halos over the crystal clusters and hanging Star Chime.
+    // Subtle cool subterranean indigo-slate edge framing along outer cavern walls.
+    CAVERN_EDGE_SHADOWS.forEach(([ex, ey, sx, sy]) => {
+      out.push({
+        layer: "over",
+        texture: "softGlow",
+        blend: "normal",
+        x: ex,
+        y: ey,
+        scaleX: sx,
+        scaleY: sy,
+        rotation: 0,
+        alpha: 0.22,
+        tint: 0x26204a,
+      });
+    });
+    // Radiant pastel halos on the crystal clusters and hanging Star Chime (emissive over dusk).
     CAVERN_CRYSTALS.forEach((crystal, i) => {
       const pulse = Math.sin(tick * 0.038 + i * 1.4);
-      const scale = crystal.scale * (1 + 0.06 * pulse);
+      const scale = crystal.scale * (1 + 0.07 * pulse);
       out.push({
-        layer: "under",
+        layer: "emissive",
         texture: "softGlow",
         blend: "add",
         x: crystal.x,
@@ -541,8 +581,41 @@ export function evaluateAtmosphere(
         scaleX: scale,
         scaleY: scale,
         rotation: 0,
-        alpha: clamp01(0.2 + 0.04 * pulse),
+        alpha: clamp01(crystal.baseAlpha + 0.045 * pulse),
         tint: crystal.tint,
+      });
+    });
+    // Warm amber glows on the two cavern lantern posts (emissive over twilight).
+    CAVERN_LANTERNS.forEach(([lx, ly], i) => {
+      const pulse = Math.sin(tick * 0.042 + i * 2.1);
+      out.push({
+        layer: "emissive",
+        texture: "softGlow",
+        blend: "add",
+        x: lx,
+        y: ly,
+        scaleX: 1.65 + 0.08 * pulse,
+        scaleY: 1.5 + 0.06 * pulse,
+        rotation: 0,
+        alpha: clamp01(0.31 + 0.03 * pulse),
+        tint: 0xffd27a,
+      });
+    });
+    // Soft aqua stream glints shimmering gently across the crystal-steps crossing.
+    CAVERN_STEP_RINGS.forEach(([rx, ry], i) => {
+      const shimmer = Math.sin(tick * 0.05 + i * 2.1);
+      const scale = 0.5 + 0.18 * shimmer;
+      out.push({
+        layer: "over",
+        texture: "waterGlint",
+        blend: "add",
+        x: rx + Math.sin(tick * 0.025 + i) * 4,
+        y: ry,
+        scaleX: scale,
+        scaleY: scale * 0.72,
+        rotation: 0,
+        alpha: clamp01(0.18 + shimmer * shimmer * 0.36),
+        tint: 0xaef2e8,
       });
     });
     // 10 shimmering aqua water glints along the underground stream and glowing crystal pool.
@@ -556,7 +629,7 @@ export function evaluateAtmosphere(
       const shimmer = Math.sin(tick * (0.055 + h2 * 0.04) + i * 1.6);
       const scale = 0.42 + h2 * 0.36;
       out.push({
-        layer: "under",
+        layer: "over",
         texture: "waterGlint",
         blend: "add",
         x: x + Math.sin(tick * 0.02 + i) * 4,
@@ -564,7 +637,7 @@ export function evaluateAtmosphere(
         scaleX: scale,
         scaleY: scale * 0.85,
         rotation: 0,
-        alpha: clamp01(0.14 + shimmer * shimmer * 0.42),
+        alpha: clamp01(0.16 + shimmer * shimmer * 0.42),
         tint: pickTint(WATER_TINTS, i),
       });
     }
@@ -583,10 +656,10 @@ export function evaluateAtmosphere(
   }
 
   if (areaId === "cafe") {
-    // Warm amber pastry-counter and cocoa-bar glow.
+    // Warm amber pastry-counter and cocoa-bar glow (emissive over twilight).
     const counterPulse = 0.16 + 0.022 * Math.sin(tick * 0.045);
     out.push({
-      layer: "under",
+      layer: "emissive",
       texture: "softGlow",
       blend: "add",
       x: 680,
@@ -598,7 +671,7 @@ export function evaluateAtmosphere(
       tint: 0xffce7a,
     });
     out.push({
-      layer: "under",
+      layer: "emissive",
       texture: "softGlow",
       blend: "add",
       x: 780,
@@ -644,12 +717,12 @@ export function evaluateAtmosphere(
   }
 
   if (areaId === "lodge") {
-    // Warm flickering amber hearth glow over the stone fireplace (907, 455).
+    // Warm flickering amber hearth glow over the stone fireplace (907, 455), emissive over dusk.
     const flicker = 0.18 +
       0.026 * Math.sin(tick * 0.11) +
       0.014 * Math.sin(tick * 0.23 + 1.1);
     out.push({
-      layer: "under",
+      layer: "emissive",
       texture: "softGlow",
       blend: "add",
       x: 907,
@@ -661,7 +734,7 @@ export function evaluateAtmosphere(
       tint: 0xffbe6b,
     });
     out.push({
-      layer: "under",
+      layer: "emissive",
       texture: "softGlow",
       blend: "add",
       x: 907,
@@ -776,12 +849,15 @@ export function evaluateAtmosphere(
 export class BiomeAtmosphere {
   readonly under = new Container();
   readonly over = new Container();
+  readonly emissive = new Container();
   private readonly underPool: Sprite[] = [];
   private readonly overPool: Sprite[] = [];
+  private readonly emissivePool: Sprite[] = [];
 
   constructor(private readonly textures: VfxTextures) {
     this.under.label = "atmosphere:under";
     this.over.label = "atmosphere:over";
+    this.emissive.label = "atmosphere:emissive";
   }
 
   update(
@@ -790,21 +866,39 @@ export class BiomeAtmosphere {
     height: number,
     tick: number,
     visible: boolean,
+    duskBlend = 0,
   ): void {
     const show = visible && areaId !== "harness";
     this.under.visible = show;
     this.over.visible = show;
+    this.emissive.visible = show;
     if (!show) return;
 
     const particles = evaluateAtmosphere(areaId, width, height, tick);
+    const duskBoost = 1 + clamp01(duskBlend) * 0.65;
     let underUsed = 0;
     let overUsed = 0;
+    let emissiveUsed = 0;
     for (const particle of particles) {
-      const pool = particle.layer === "under" ? this.underPool : this.overPool;
-      const container = particle.layer === "under" ? this.under : this.over;
-      const index = particle.layer === "under" ? underUsed : overUsed;
-      if (particle.layer === "under") underUsed += 1;
-      else overUsed += 1;
+      let pool: Sprite[];
+      let container: Container;
+      let index: number;
+      if (particle.layer === "under") {
+        pool = this.underPool;
+        container = this.under;
+        index = underUsed;
+        underUsed += 1;
+      } else if (particle.layer === "emissive") {
+        pool = this.emissivePool;
+        container = this.emissive;
+        index = emissiveUsed;
+        emissiveUsed += 1;
+      } else {
+        pool = this.overPool;
+        container = this.over;
+        index = overUsed;
+        overUsed += 1;
+      }
 
       let sprite = pool[index];
       if (sprite === undefined) {
@@ -819,7 +913,8 @@ export class BiomeAtmosphere {
       sprite.position.set(particle.x, particle.y);
       sprite.scale.set(particle.scaleX, particle.scaleY);
       sprite.rotation = particle.rotation;
-      sprite.alpha = particle.alpha;
+      sprite.alpha =
+        particle.layer === "emissive" ? clamp01(particle.alpha * duskBoost) : particle.alpha;
       sprite.tint = particle.tint;
     }
     for (let i = underUsed; i < this.underPool.length; i += 1) {
@@ -830,12 +925,18 @@ export class BiomeAtmosphere {
       const sprite = this.overPool[i];
       if (sprite !== undefined) sprite.visible = false;
     }
+    for (let i = emissiveUsed; i < this.emissivePool.length; i += 1) {
+      const sprite = this.emissivePool[i];
+      if (sprite !== undefined) sprite.visible = false;
+    }
   }
 
   destroy(): void {
     this.under.destroy({ children: true });
     this.over.destroy({ children: true });
+    this.emissive.destroy({ children: true });
     this.underPool.length = 0;
     this.overPool.length = 0;
+    this.emissivePool.length = 0;
   }
 }

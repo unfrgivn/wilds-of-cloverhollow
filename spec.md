@@ -262,7 +262,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   through a shared `DynamicsCompressorNode`. Music crossfades (~0.55 s) on
   track changes, ducks (~0.3 s to 0.55x), and pauses cleanly on
   `visibilitychange` when backgrounded; ambience crossfades (~0.7 s) and cleans
-  up all nodes and timers on stop.
+  up all nodes and timers on stop. Character-voiced talking blips and
+  key-aligned UI clicks (`src/platform/voices.ts`, Milestone 80) give every
+  named cast member, fairy, critter archetype, and narrator a distinct warm
+  sine/triangle register (with optional gentle pitch glide or harmonic overtone
+  and pauses on spaces/punctuation) and pitch `choice-move`, `battle-command`,
+  and `choice-select` clicks to the active soundtrack's pentatonic scale.
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -342,10 +347,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   slightly as characters bounce or hover); a deterministic `BiomeAtmosphere`
   (`src/render/atmosphere.ts`, zero `Math.random()`) adds per-biome water
   glints, lamp pools, drifting petals/pollen, snow and lodge chimney smoke,
-  sunbeams, lavender mist, fairy aura halos, hearth glow, and arcade neon
-  blooms; and a world-anchored `paperGrain` `TilingSprite` (`multiply`, alpha
-  `0.035`) gently unifies sprites, shadows, and paintings. Door fades use cubic
-  smoothstep easing (`src/render/fade.ts`).
+  sunbeams, lavender mist, fairy aura halos, hearth glow, arcade neon blooms,
+  and an `emissive` light layer mounted above `lanternLayer` (`emissiveLayer`,
+  boosted smoothly during lantern dusk for cavern crystals/lanterns, enchanted
+  fairies, plaza lamp arches, lodge hearth, and café counter glows, plus cool
+  subterranean edge framing and crossing shimmer rings in `cavern`); and a
+  world-anchored `paperGrain` `TilingSprite` (`multiply`, alpha `0.035`) gently
+  unifies sprites, shadows, and paintings. Door fades use cubic smoothstep
+  easing (`src/render/fade.ts`).
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -1471,10 +1480,17 @@ trunks keep its two exits.
   choice stays on screen at its 44 px height. It is pure CSS (no measuring in
   JavaScript), so it follows the insets as iOS applies them; `just ios-smoke`
   asserts it on the simulator.
-- Speaker tags are cream stickers with dark ink lettering, an ink outline,
-  light die-cut rim, and a soft shadow. Dialogue panels and TALK prompts use a
-  low-opacity inset dashed stitch border. Labels use Nunito 800, choices use
-  600, and body copy uses 400 for readable small-size text.
+- Speaker tags are cream or subtle pastel-tinted stickers (`speakerAccent` in
+  `src/ui/portraits.ts`, Milestone 80, >= 8:1 dark ink contrast) with dark ink
+  lettering, an ink outline, light die-cut rim, and a soft shadow. Named
+  speakers with an atlas also display a 46 px circular die-cut portrait
+  medallion (`.sticker-portrait`, cropped by `cropPortraitFrame` from cached
+  atlas metadata, shifting the speaker tag right without changing the dialogue
+  box width or text measure, and gently bobbing while text types). Dialogue
+  panels and choice stickers use brief reduced-motion-guarded pop-in motion;
+  dialogue panels and TALK prompts use a low-opacity inset dashed stitch
+  border. Labels use Nunito 800, choices use 600, and body copy uses 400 for
+  readable small-size text.
 
 ### 7.2 Title screen layout
 - The title screen (`src/ui/title.ts`) is the top layer (`--z-title`) over the
@@ -2771,12 +2787,15 @@ trunks keep its two exits.
   `src/core/journal.ts`): every owned sticker slot in `.journal-stickers` is
   clickable and keyboard-focusable (`role="button"`, `tabindex="0"`, Enter/Space
   or click/tap). Selecting an owned sticker opens a die-cut Field Note Card
-  (`.journal-field-note`) centered inside `.journal-book`, showing its calm
-  portrait, name, `Lv N · <chaosName>`, a golden `★ Old Friend` ribbon when
-  recurring and `calms >= 3`, revealed lands where it lives, calm count, inline
-  SVG feeling pills, and a coral-cream heart pill listing its favourite
-  treat(s). Dismissing via its 44 px `×` button, clicking the backdrop, pressing
-  Escape (which stops propagation so the journal stays open), switching tabs, or
+  (`.journal-field-note`) centered inside `.journal-book` (max 520 px wide,
+  warm paper gradient, dotted divider, reduced-motion-guarded spring pop-in),
+  showing its calm portrait grounded on a circular sage-cream watercolor
+  specimen wash with dashed collector ring, name, `Lv N · <chaosName>`, a
+  golden `★ Old Friend` ribbon when recurring and `calms >= 3`, revealed lands
+  where it lives, calm count, inline SVG feeling pills, individual coral-cream
+  heart pills for each favourite treat, and a short 1-line naturalist caption.
+  Dismissing via its 44 px `×` button, clicking the backdrop, pressing Escape
+  (which stops propagation so the journal stays open), switching tabs, or
   closing the journal closes the card.
 - The STICKERS page continues below the album with a PRIZES shelf from
   `world.arcade.prizes`. Owned prizes use the prize atlas frame, die-cut rim,

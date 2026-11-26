@@ -45,6 +45,7 @@ import { GameView, type BattleCheckGeometry } from "./render/view";
 import { atlasImage, parseAtlasJson, type AtlasImage, type AtlasJson } from "./ui/atlas";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
+import { cropPortraitFrame, speakerAccent, speakerPortraitSource } from "./ui/portraits";
 import {
   createBattleHud,
   createCommandMenu,
@@ -416,6 +417,22 @@ async function boot(): Promise<void> {
     const critter = content.world.critters[critterId];
     return critter === undefined ? null : atlasFrame(critter.atlas, frameName);
   };
+  const speakerPortrait = (speaker: string | null): AtlasImage | null => {
+    const source = speakerPortraitSource(content.world, speaker);
+    if (source === null) return null;
+    const data =
+      atlasJsonCache.get(source.atlas) ?? Assets.get<Spritesheet | undefined>(source.atlas)?.data;
+    if (data === undefined) {
+      void loadAtlasJson(source.atlas)
+        .then(() => decodeOnce(source.atlas.replace(".json", ".png")))
+        .then(invalidate)
+        .catch(() => undefined);
+      return null;
+    }
+    if (data.frames[source.frame] === undefined) return null;
+    const image = atlasImage(data, assetUrl(source.atlas.replace(".json", ".png")), source.frame);
+    return { ...image, frame: cropPortraitFrame(image.frame, source.cropMode) };
+  };
   // A prize's art: its frame in the prize atlas (spec 8.2).
   const prizeArt = (frameName: string): AtlasImage | null =>
     atlasFrame(content.world.arcade.atlas, frameName);
@@ -508,6 +525,14 @@ async function boot(): Promise<void> {
   // Warms only the DOM media needed for `area`: arcade/cooking close-ups for
   // those rooms, plus this area's critter PNGs so battle reward stickers never
   // flicker in WebKit. Bedroom has 0 critters, so boot decodes 0 critter PNGs.
+  const cacheAreaNpcPortraits = (area: Area): void => {
+    for (const npc of area.npcs) {
+      const character = content.world.characters[npc.id];
+      if (character === undefined || atlasJsonCache.has(character.atlas)) continue;
+      const sheet = Assets.get<Spritesheet | undefined>(`${npc.id}-sheet`);
+      if (sheet !== undefined) atlasJsonCache.set(character.atlas, sheet.data);
+    }
+  };
   const warmAreaMedia = async (area: Area): Promise<void> => {
     const loads: Promise<unknown>[] = [];
     if (area.id === "arcade") loads.push(ensureArcadeOverlay());
@@ -519,6 +544,12 @@ async function boot(): Promise<void> {
     for (const id of areaCritters) {
       const critter = content.world.critters[id];
       if (critter !== undefined) loads.push(decodeOnce(critter.atlas.replace(".json", ".png")));
+    }
+    for (const npc of area.npcs) {
+      const character = content.world.characters[npc.id];
+      if (character !== undefined) {
+        loads.push(decodeOnce(character.atlas.replace(".json", ".png")));
+      }
     }
     await Promise.all(loads);
   };
@@ -544,6 +575,10 @@ async function boot(): Promise<void> {
     loadAtlasJson(content.world.arcade.atlas),
     ...critterJsonFiles.map((file) => loadAtlasJson(file)),
     view.ready.then(async () => {
+      const faeSheet = Assets.get<Spritesheet | undefined>("fae-sheet");
+      if (faeSheet !== undefined) {
+        atlasJsonCache.set("assets/characters/fae/fae.json", faeSheet.data);
+      }
       for (const [id, member] of Object.entries(content.world.party)) {
         const sheet = Assets.get<Spritesheet | undefined>(`${id}-sheet`);
         if (sheet !== undefined) atlasJsonCache.set(member.atlas, sheet.data);
@@ -551,9 +586,10 @@ async function boot(): Promise<void> {
       const initialArea = content.world.areas[state.area];
       if (initialArea === undefined) throw new Error("Missing initial area");
       await Promise.all([
-        view.setArea(initialArea),
+        view.setArea(initialArea).then(() => cacheAreaNpcPortraits(initialArea)),
         warmAreaMedia(initialArea),
         warmOwnedJournalMedia(state),
+        decodeOnce("assets/characters/fae/fae.png"),
         decodeOnce(content.world.battle.toyAtlas.replace(".json", ".png")),
       ]);
     }),
@@ -962,7 +998,12 @@ async function boot(): Promise<void> {
         choices: [], selected: -1, canAdvance: true });
       document.documentElement.dataset.dialogue = "open";
     } else if (activeBattle && battle?.talk !== null && battle?.talk !== undefined) {
-      dialogueBox.render(battleTalkDialogueView(battle.talk));
+      const talkView = battleTalkDialogueView(battle.talk);
+      dialogueBox.render({
+        ...talkView,
+        portrait: speakerPortrait(talkView.speaker),
+        accent: speakerAccent(talkView.speaker),
+      });
       document.documentElement.dataset.dialogue = "open";
     } else if (activeBattle && (battle?.message ?? "") !== "") {
       dialogueBox.render({
@@ -1004,6 +1045,8 @@ async function boot(): Promise<void> {
             : [],
         selected: state.dialogue.selected,
         canAdvance: state.dialogue.choices.length === 0,
+        portrait: speakerPortrait(state.dialogue.speaker),
+        accent: speakerAccent(state.dialogue.speaker),
       });
     }
   };
@@ -1142,8 +1185,17 @@ async function boot(): Promise<void> {
         if (qaActivePack === null && !qaBlocked) void saveState(event.state);
       }
     }
+    const activeTalk = state.dialogue ?? state.battle?.talk ?? null;
+    const choiceIndex =
+      state.dialogue?.selected ?? state.battle?.talk?.selected ?? state.battle?.selected ?? 0;
+    const soundContext = {
+      speaker: activeTalk?.speaker ?? null,
+      text: activeTalk?.text,
+      revealed: activeTalk?.revealed,
+      choiceIndex,
+    };
     for (const cue of soundCues(previous, state, content.world)) {
-      const played = sound.play(cue, state.tick);
+      const played = sound.play(cue, state.tick, soundContext);
       if (import.meta.env.DEV || import.meta.env.MODE === "harness")
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
     }
@@ -1196,7 +1248,10 @@ async function boot(): Promise<void> {
         return;
       }
       reload = false;
-      areaLoad = Promise.all([view.setArea(area), warmAreaMedia(area)])
+      areaLoad = Promise.all([
+        view.setArea(area).then(() => cacheAreaNpcPortraits(area)),
+        warmAreaMedia(area),
+      ])
         .then(() => {
           view.resetCamera();
           previousState = state;

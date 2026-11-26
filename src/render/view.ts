@@ -259,6 +259,7 @@ export class GameView {
   private readonly lanternWorld = new Container();
   private readonly lanternSpotlight: Sprite;
   private readonly lanternMotes: Sprite[] = [];
+  private readonly emissiveLayer = new Container();
   private readonly glowLayer = new Container();
   private readonly depth = new Container();
   private readonly ambientLayer = new Container();
@@ -403,6 +404,8 @@ export class GameView {
     this.lanternLayer.label = "lantern";
     this.lanternLayer.visible = false;
     this.lanternLayer.addChild(this.lanternTint, this.lanternWorld);
+    this.emissiveLayer.label = "emissive";
+    this.emissiveLayer.addChild(this.atmosphere.emissive);
 
     this.battleSpotlight = new Sprite(this.vfx.softGlow);
     this.battleSpotlight.label = "battle:spotlight";
@@ -445,7 +448,7 @@ export class GameView {
     this.battleCritter.label = "battle:critter";
     this.battleCritterAura.label = "battle:critter:aura";
     this.player.scale.set(0.5);
-    this.viewport.addChild(this.scene, this.lanternLayer, this.glowLayer);
+    this.viewport.addChild(this.scene, this.lanternLayer, this.emissiveLayer, this.glowLayer);
     this.viewport.mask = this.viewportMask;
     this.root.addChild(
       this.background,
@@ -956,6 +959,8 @@ export class GameView {
     this.scene.position.set(offsetX, offsetY);
     this.lanternWorld.scale.set(scale);
     this.lanternWorld.position.set(offsetX, offsetY);
+    this.emissiveLayer.scale.set(scale);
+    this.emissiveLayer.position.set(offsetX, offsetY);
     this.glowLayer.scale.set(scale);
     this.glowLayer.position.set(offsetX, offsetY);
     const indoor = INDOOR_AREAS.has(area.id);
@@ -997,12 +1002,14 @@ export class GameView {
     );
     this.renderNpcs(state, shadowAlpha, livingMotion);
     this.renderAmbient(state);
+    this.renderGlows(state, playerPos, paused);
     this.atmosphere.update(
       area.id,
       area.width,
       area.height,
       state.tick,
       state.battle === null && state.arcade === null,
+      this.lanternBlend,
     );
     loaded.update(
       this.world,
@@ -1011,7 +1018,6 @@ export class GameView {
       state.tick,
       this.figures(),
     );
-    this.renderGlows(state, playerPos, paused);
     this.renderBattle(state, width, height, resolution);
     this.depth.sortChildren();
     if (this.label !== undefined) {

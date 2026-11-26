@@ -3903,6 +3903,7 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e`
   (990 passed, 2 skipped in 3.7 min).
 
+<<<<<<< HEAD
 ## Milestone 80: Collectible Star Gems & 3rd Flute Friend (Ribbon Bunny) **Status:** ✅ Completed (2026-11-26)
 - Third flute friend, **Ribbon Bunny** (`content/party/ribbon-bunny.json`,
   `joins: "bunny_with_me"`, `befriended: "bunny_friend"`, `critter: "bunny"`,
@@ -3948,6 +3949,40 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e`
   (991 passed, 2 skipped across full run + 23/23 last-failed rerun after
   detaching the hidden gems pill from the DOM at 0 gems).
+
+## Milestone 81: Expressive Voices, Storybook Dialogue Portraits, Emissive Glows & Compendium Craft **Status:** ✅ Completed (2026-11-26)
+- Presentation, audio, and UI craft pass with zero changes to `src/core` or
+  recorded sim hashes:
+  - Character-voiced talking blips and key-aligned UI clicks
+    (`src/platform/voices.ts`, `src/platform/audio.ts`, `src/main.ts`):
+    distinct warm sine/triangle voice registers across named cast members,
+    fairies, critter archetypes, and narration, plus `choice-move`,
+    `battle-command`, and `choice-select` clicks pitched to the active
+    soundtrack's pentatonic scale.
+  - Die-cut circular speaker portrait medallions and pastel speaker accents
+    (`src/ui/portraits.ts`, `src/ui/sticker.ts`, `src/ui/sticker.css`,
+    `src/main.ts`): lazily bust-cropped from existing character/critter atlases
+    with zero boot-memory impact, gentle talk bob while revealing, and
+    reduced-motion-guarded pop-in motion (bust framing tightened after
+    first-pass `vision` review).
+  - Emissive atmosphere layer (`src/render/atmosphere.ts`, `src/render/view.ts`):
+    mounted above `lanternLayer` with smooth dusk boost (`1 + lanternBlend * 0.65`)
+    so cavern crystals & lantern posts, enchanted fairies, plaza lamp arches,
+    lodge hearth, and café counter glows shine warmly over twilight, plus
+    subterranean edge framing and organic above-prop stream glints in `cavern`.
+  - Critter Compendium Field Note Card craft (`src/ui/journal.ts`,
+    `src/ui/journal.css`): individual `LOVES` treat pills, circular sage-cream
+    specimen wash with dashed ring, dotted rule, tighter 520 px paper card,
+    1-line deterministic naturalist caption, and opaque reduced-motion-guarded
+    spring pop-in.
+- Evidence: `tests/unit/milestone-81.test.ts` (plus updated `cafe.test.ts` and
+  `treats-compendium.spec.ts`); reviewed captures in
+  `art/review/m81-cafe-dad-portrait.jpg`, `m81-dialogue-portrait.jpg`,
+  `m81-cavern-lantern-emissive.jpg`, `m81-cavern-arrival.jpg`, and
+  `m81-field-note.jpg` verified with `vision`.
+- Gates: `just check` (139 unit files / 1,123 tests, all 63 sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full e2e verified across Chromium & WebKit.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

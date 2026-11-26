@@ -70,6 +70,7 @@
   background: var(--sticker-paper);
   box-shadow: var(--sticker-shadow), inset 0 0 0 2px var(--sticker-border);
   pointer-events: auto;
+  animation: sticker-fade-in 150ms ease-out;
 }
 
 :root[data-battle="open"] .sticker-dialogue {
@@ -103,8 +104,43 @@
 }
 
 .sticker-dialogue[hidden],
-.sticker-prompt[hidden] {
+.sticker-prompt[hidden],
+.sticker-portrait[hidden] {
   display: none;
+}
+
+.sticker-portrait {
+  position: absolute;
+  top: -28px;
+  left: 16px;
+  z-index: 2;
+  display: block;
+  box-sizing: border-box;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  border: 4px solid var(--sticker-rim);
+  border-radius: 50%;
+  outline: 2px solid var(--sticker-ink);
+  background-color: var(--portrait-bg, var(--sticker-paper));
+  box-shadow: var(--sticker-shadow);
+  pointer-events: none;
+  animation: sticker-medallion-pop 180ms cubic-bezier(0.22, 1.35, 0.36, 1);
+}
+
+.sticker-portrait-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+}
+
+.sticker-portrait.is-talking {
+  animation: portrait-bob 240ms ease-in-out infinite;
+}
+
+.sticker-dialogue.has-portrait .sticker-speaker {
+  left: 68px;
 }
 
 .sticker-speaker {
@@ -123,6 +159,23 @@
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+
+.sticker-speaker[data-accent="fae"],
+.sticker-portrait[data-accent="fae"] { --portrait-bg: #f3eaf9; background-color: #f3eaf9; }
+.sticker-speaker[data-accent="family"],
+.sticker-portrait[data-accent="family"] { --portrait-bg: #fdf0d5; background-color: #fdf0d5; }
+.sticker-speaker[data-accent="friend"],
+.sticker-portrait[data-accent="friend"] { --portrait-bg: #e4f3f0; background-color: #e4f3f0; }
+.sticker-speaker[data-accent="school"],
+.sticker-portrait[data-accent="school"] { --portrait-bg: #eaf1e4; background-color: #eaf1e4; }
+.sticker-speaker[data-accent="town"],
+.sticker-portrait[data-accent="town"] { --portrait-bg: #f8ece0; background-color: #f8ece0; }
+.sticker-speaker[data-accent="fairy"],
+.sticker-portrait[data-accent="fairy"] { --portrait-bg: #f0e8fb; background-color: #f0e8fb; }
+.sticker-speaker[data-accent="critter"],
+.sticker-portrait[data-accent="critter"] { --portrait-bg: #fbf3d4; background-color: #fbf3d4; }
+.sticker-speaker[data-accent="mystery"],
+.sticker-portrait[data-accent="mystery"] { --portrait-bg: #eae4f2; background-color: #eae4f2; }
 
 .sticker-text {
   position: relative;
@@ -180,7 +233,31 @@
   50% { transform: translateY(5px); }
 }
 
+@keyframes sticker-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sticker-medallion-pop {
+  from { opacity: 0; transform: scale(0.84) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes choice-pop-in {
+  from { opacity: 0; translate: 0 5px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes portrait-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.03, 0.98); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .sticker-dialogue,
+  .sticker-choice,
+  .sticker-portrait,
+  .sticker-portrait.is-talking,
   .sticker-advance.is-visible,
   .sticker-prompt > span,
   .notice-mark.is-alert { animation: none; }
@@ -234,6 +311,7 @@
   text-align: left;
   touch-action: manipulation;
   pointer-events: auto;
+  animation: choice-pop-in 150ms ease-out;
   transition: transform 110ms ease-out, background-color 110ms ease-out;
 }
 

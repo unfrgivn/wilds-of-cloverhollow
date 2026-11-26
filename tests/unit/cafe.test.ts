@@ -268,7 +268,7 @@ describe("Bon Appetit Café and Cloverhollow Town Life", () => {
 
     // Atmosphere: warm counter glows, window sunbeams, and rising cocoa-steam motes.
     const particles = evaluateAtmosphere("cafe", cafe.width, cafe.height, 120);
-    expect(particles.some((item) => item.texture === "softGlow" && item.layer === "under"))
+    expect(particles.some((item) => item.texture === "softGlow" && item.layer === "emissive"))
       .toBe(true);
     expect(particles.some((item) => item.texture === "sunbeam" && item.layer === "over"))
       .toBe(true);

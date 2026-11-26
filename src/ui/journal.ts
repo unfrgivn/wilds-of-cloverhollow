@@ -212,6 +212,19 @@ function supply(kind: "coins" | "snacks" | "tickets" | "gems", label: string): {
   return { root, count };
 }
 
+function fieldNoteBlurb(note: CritterFieldNote): string {
+  if (note.oldFriend) return "An old friend! Waves happily whenever Fae walks by.";
+  if (note.calms >= 2) return "Brightens up fast for a gentle song and a favorite snack.";
+  if (note.lands.length > 1) return "Loves wandering between sunny spots across the valley.";
+  const firstFeeling = note.feelings[0]?.id;
+  if (firstFeeling === "bored") return "A curious soul who just needed a playful friend.";
+  if (firstFeeling === "hungry") return "Follows its nose straight to warm snacks and treats.";
+  if (firstFeeling === "grumpy") return "A little prickly at first, then soft as moss once calm.";
+  if (firstFeeling === "zoomy") return "Full of bouncy energy until a gentle rhythm settles it.";
+  if (firstFeeling === "curious") return "Watches every sparkle and sound with bright, eager eyes.";
+  return "A cozy valley friend sketched right into Fae's notebook.";
+}
+
 function makeOptionRow(
   titleText: string,
   subtitleText: string | null,
@@ -425,12 +438,14 @@ export function createJournal(root: HTMLElement): {
   fieldClose.setAttribute("aria-label", "Close field note");
   fieldClose.textContent = "×";
   const fieldLeft = element("div", "journal-field-left");
+  const fieldSpecimen = element("div", "journal-field-specimen");
   const fieldPortrait = element("div", "journal-field-portrait die-cut");
   fieldPortrait.setAttribute("role", "img");
+  fieldSpecimen.append(fieldPortrait);
   const fieldOldFriend = element("span", "journal-field-old-friend");
   fieldOldFriend.textContent = "★ Old Friend";
   fieldOldFriend.hidden = true;
-  fieldLeft.append(fieldPortrait, fieldOldFriend);
+  fieldLeft.append(fieldSpecimen, fieldOldFriend);
   const fieldBody = element("div", "journal-field-body");
   const fieldName = element("h3", "journal-field-name");
   const fieldSub = element("div", "journal-field-sub");
@@ -438,8 +453,9 @@ export function createJournal(root: HTMLElement): {
   const makeFieldRow = (
     keyText: string,
     valueNode: HTMLElement,
+    pills = false,
   ): HTMLDivElement => {
-    const row = element("div", "journal-field-row");
+    const row = element("div", pills ? "journal-field-row is-pills" : "journal-field-row");
     const key = element("span", "journal-field-key");
     key.textContent = keyText;
     row.append(key, valueNode);
@@ -449,13 +465,14 @@ export function createJournal(root: HTMLElement): {
   const fieldCalms = element("span", "journal-field-val journal-field-calms");
   const fieldFeelings = element("div", "journal-field-feelings");
   const fieldLoves = element("div", "journal-field-loves");
+  const fieldBlurb = element("p", "journal-field-blurb");
   fieldMeta.append(
     makeFieldRow("Found in", fieldLands),
     makeFieldRow("Calmed", fieldCalms),
-    makeFieldRow("Feelings", fieldFeelings),
-    makeFieldRow("Loves", fieldLoves),
+    makeFieldRow("Feelings", fieldFeelings, true),
+    makeFieldRow("Loves", fieldLoves, true),
   );
-  fieldBody.append(fieldName, fieldSub, fieldMeta);
+  fieldBody.append(fieldName, fieldSub, fieldMeta, fieldBlurb);
   fieldCard.append(fieldClose, fieldLeft, fieldBody);
   fieldBackdrop.append(fieldCard);
 
@@ -530,12 +547,14 @@ export function createJournal(root: HTMLElement): {
         return pill;
       }),
     );
-    const lovesPill = element("span", "journal-field-love-pill");
-    lovesPill.append(
-      icon(heartMarkup, "journal-field-heart"),
-      note.favouriteTreats.join(", "),
+    fieldLoves.replaceChildren(
+      ...note.favouriteTreats.map((treat) => {
+        const pill = element("span", "journal-field-love-pill");
+        pill.append(icon(heartMarkup, "journal-field-heart"), treat);
+        return pill;
+      }),
     );
-    fieldLoves.replaceChildren(lovesPill);
+    setText(fieldBlurb, fieldNoteBlurb(note));
   };
 
   fieldClose.addEventListener("click", closeFieldNote);

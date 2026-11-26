@@ -143,8 +143,9 @@ test.describe("plaza specialty shops, Treat Tray, and Journal Compendium", () =>
       await expect(fieldNote.locator(".journal-field-feelings")).toContainText("Bored");
       await expect(fieldNote.locator(".journal-field-feelings")).toContainText("Curious");
       await expect(fieldNote.locator(".journal-field-feelings")).toContainText("Zoomy");
-      await expect(fieldNote.locator(".journal-field-loves"))
-        .toContainText("Fish Cracker, Berry Swirl Cone");
+      await expect(fieldNote.locator(".journal-field-love-pill")).toHaveCount(2);
+      await expect(fieldNote.locator(".journal-field-loves")).toContainText("Fish Cracker");
+      await expect(fieldNote.locator(".journal-field-loves")).toContainText("Berry Swirl Cone");
 
       // Verify Field Note Card stays inside .journal-book with >= 44px close button.
       for (const size of [{ width: 1280, height: 720 }, { width: 874, height: 402 }]) {

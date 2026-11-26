@@ -32,6 +32,7 @@ const battleParts: Record<string, string[]> = {
   "battle-catch": [".battle-hud", ".battle-catch", ".battle-check-hint", ".touch-reach"],
   "battle-lean": [".battle-hud", ".battle-lean", ".touch-lean"],
   "battle-peekaboo": [".battle-hud", ".battle-peekaboo"],
+  "battle-echo": [".battle-hud", ".battle-echo", ".battle-check-hint"],
   "battle-trace": [".battle-hud", ".battle-trace", ".battle-check-hint"],
   "battle-trace-mid": [".battle-hud", ".battle-trace"],
   "battle-trace-dry": [".battle-hud", ".battle-trace", ".battle-grade"],
@@ -61,7 +62,8 @@ const battleParts: Record<string, string[]> = {
     state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
-  ".battle-chain", ".battle-catch", ".battle-lean", ".battle-peekaboo", ".battle-trace",
+  ".battle-chain", ".battle-catch", ".battle-lean", ".battle-peekaboo", ".battle-echo",
+  ".battle-trace",
   ".battle-check-hint", ".battle-grade",
   ".touch-reach", ".touch-lean", ".touch-comet",
   ".battle-feeling", ".battle-feeling-heart", ".battle-windup",
@@ -215,7 +217,7 @@ function measureContrast(): Contrast[] {
   };
   const selectors = ".battle-command-label, .battle-command-detail, .battle-meter-label, " +
     ".battle-grade, .battle-check-hint, .battle-feeling-label, .battle-reward-title, " +
-    ".battle-peekaboo-status, " +
+    ".battle-peekaboo-status, .battle-echo-phase, .battle-echo-name, .battle-echo-arrow, " +
     ".battle-together-btn .battle-action-label, .battle-flute-btn .battle-action-label, " +
     ".battle-soften-pill .battle-action-label, .battle-action-key, " +
     ".battle-reward-name, .journal-label, .journal-tab, " +
@@ -1221,6 +1223,63 @@ test.describe("sticker gallery", () => {
     }
   }
 
+  test("battle-echo geometry across viewports", async ({ page }) => {
+    const viewports = [{ width: 667, height: 375 }, ...sizes];
+    for (const size of viewports) {
+      const insets = size.width === 874 ? "0,62,21,62" :
+        size.width === 1180 ? "0,0,20,0" : "0,0,0,0";
+      await gallery(page, "battle-echo", true, insets, size);
+      const facts = await page.evaluate(() => {
+        const intersects = (a: DOMRect, b: DOMRect): boolean =>
+          a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        const style = getComputedStyle(document.documentElement);
+        const safeLeft = parseFloat(style.getPropertyValue("--safe-left")) || 0;
+        const safeRight = parseFloat(style.getPropertyValue("--safe-right")) || 0;
+        const safeTop = parseFloat(style.getPropertyValue("--safe-top")) || 0;
+        const safeBottom = parseFloat(style.getPropertyValue("--safe-bottom")) || 0;
+        const inside = (rect: DOMRect): boolean =>
+          rect.left >= safeLeft && rect.right <= innerWidth - safeRight &&
+          rect.top >= safeTop && rect.bottom <= innerHeight - safeBottom;
+        const box = document.querySelector<HTMLElement>(".battle-echo");
+        if (box === null) throw new Error("missing battle-echo");
+        const boxRect = box.getBoundingClientRect();
+        const hudRects = [...document.querySelectorAll<HTMLElement>(".battle-meter")]
+          .filter((item) => item.getClientRects().length > 0)
+          .map((item) => item.getBoundingClientRect());
+        const controls = [...document.querySelectorAll<HTMLElement>(
+          ".touch-confirm, .touch-cancel, .touch-menu",
+        )].map((item) => item.getBoundingClientRect());
+        const hint = document.querySelector<HTMLElement>(".battle-check-hint");
+        const hintRect = hint !== null && hint.getClientRects().length > 0
+          ? hint.getBoundingClientRect() : null;
+        const chimes = [...document.querySelectorAll<HTMLElement>(".battle-echo-chime")]
+          .filter((item) => item.getClientRects().length > 0)
+          .map((item) => item.getBoundingClientRect());
+        const chimesClear = chimes.every((rect, index) =>
+          chimes.every((other, otherIndex) => otherIndex <= index || !intersects(rect, other)));
+        return {
+          inside: inside(boxRect),
+          hudClear: !hudRects.some((other) => intersects(boxRect, other)),
+          controlsClear: !controls.some((other) => intersects(boxRect, other)),
+          hintClear: hintRect === null || !intersects(boxRect, hintRect),
+          chimeCount: chimes.length,
+          chimesSized: chimes.every((rect) => rect.width >= 44 && rect.height >= 44),
+          chimesClear,
+        };
+      });
+      expect(facts.inside, `battle-echo ${size.width}x${size.height} inside`).toBe(true);
+      expect(facts.hudClear, `battle-echo ${size.width}x${size.height} hudClear`).toBe(true);
+      expect(facts.controlsClear, `battle-echo ${size.width}x${size.height} controlsClear`)
+        .toBe(true);
+      expect(facts.hintClear, `battle-echo ${size.width}x${size.height} hintClear`).toBe(true);
+      expect(facts.chimeCount).toBe(4);
+      expect(facts.chimesSized, `battle-echo ${size.width}x${size.height} chimesSized`)
+        .toBe(true);
+      expect(facts.chimesClear, `battle-echo ${size.width}x${size.height} chimesClear`)
+        .toBe(true);
+    }
+  });
+
   test("battle-together geometry 667x375", async ({ page }) => {
     await gallery(page, "battle-together", true, "0,0,0,0", { width: 667, height: 375 });
     const facts = await page.evaluate(() => {
@@ -1367,11 +1426,18 @@ test.describe("sticker gallery", () => {
     const results: Contrast[] = [];
     for (const state of [
       "battle-command", "battle-grade", "battle-reward", "battle-feelings", "battle-together",
-      "battle-peekaboo",
+      "battle-peekaboo", "battle-echo",
     ]) {
       await gallery(page, state);
       results.push(...await page.evaluate(measureContrast));
     }
+    await gallery(page, "battle-echo");
+    const echoResults = (await page.evaluate(measureContrast))
+      .filter((result) => result.label.includes("echo-name") ||
+        result.label.includes("echo-arrow"));
+    expect(echoResults.length).toBeGreaterThanOrEqual(8);
+    for (const result of echoResults)
+      expect(result.ratio, result.label).toBeGreaterThanOrEqual(7);
     await gallery(page, "battle-peekaboo");
     for (const status of ["safe", "warning"] as const) {
       await page.evaluate((next) => window.__stickerGallery.renderCheck({
@@ -1439,7 +1505,8 @@ test.describe("sticker gallery", () => {
         const observer = new MutationObserver(() => undefined);
         for (const part of document.querySelectorAll(
            ".battle-hud, .battle-commands, .battle-ring, .battle-charge-meter, .battle-chain, " +
-             ".battle-catch, .battle-lean, .battle-peekaboo, .battle-trace, .battle-check-hint, " +
+             ".battle-catch, .battle-lean, .battle-peekaboo, .battle-echo, .battle-trace, " +
+             ".battle-check-hint, " +
              ".battle-feeling, .battle-grade, " +
              ".battle-windup, " +
              ".battle-reward")) {

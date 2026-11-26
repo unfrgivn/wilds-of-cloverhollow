@@ -7,7 +7,7 @@ export const states = ["short", "long", "long-max", "revealing", "speaker-board"
   "two-choices", "three-choices", "five-choices", "prompt", "touch-overlap"];
 export const battleStates = ["battle-command", "battle-timing", "battle-grade", "battle-burst",
   "battle-charge", "battle-chain", "battle-chain-burst", "battle-catch", "battle-lean",
-  "battle-peekaboo",
+  "battle-peekaboo", "battle-echo",
   "battle-reward", "battle-feelings", "battle-feelings-heart", "battle-windup",
   "battle-together", "battle-level-up",
   "battle-trace", "battle-trace-mid", "battle-trace-dry", "battle-talk", "battle-talk-reply"];

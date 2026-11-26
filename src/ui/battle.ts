@@ -5,6 +5,7 @@ import { feelingMarkup, heartMarkup, icon } from "./icons";
 import type {
   BattleTalk,
   ChainLook,
+  EchoNote,
   FeelingId,
   FluteAssistKind,
   PeekabooStatus,
@@ -197,12 +198,29 @@ export type BattleCheckView =
       grade: TimingGrade | null;
       hint: string | null;
       hintAt: { x: number; y: number };
+    }
+  | {
+      kind: "echo";
+      x: number;
+      y: number;
+      phase: "demo" | "input";
+      sequence: EchoNote[];
+      results: ("pending" | "hit" | "miss")[];
+      litNote: EchoNote | null;
+      demoIndex: number;
+      entered: number;
+      time: number;
+      grade: TimingGrade | null;
+      hint: string | null;
+      hintAt: { x: number; y: number };
     };
 
 /** The complete check overlay, kept in one fixed DOM layer above the scene. */
 export function createBattleCheck(root: HTMLElement): {
   render: (view: BattleCheckView | null) => void;
+  onEchoNote: (callback: (note: EchoNote) => void) => void;
 } {
+  let echoNoteHandler: (note: EchoNote) => void = () => undefined;
   const ring = svgElement("svg", "battle-ring");
   ring.setAttribute("aria-hidden", "true");
   const rim = svgElement("circle", "battle-ring-rim");
@@ -256,6 +274,36 @@ export function createBattleCheck(root: HTMLElement): {
   const peekabooStar = peekabooStarIcon();
   const peekabooDots = element("div", "battle-peekaboo-dots");
   peekabooLayer.append(peekabooBadge, peekabooTrack, peekabooStar, peekabooDots);
+  // Echo chime board: note progress dots, phase pill, timer bar, and four
+  // directional chime stickers.
+  const echoLayer = element("div", "battle-echo");
+  const echoHead = element("div", "battle-echo-head");
+  const echoDots = element("div", "battle-echo-dots");
+  const echoPhase = element("span", "battle-echo-phase");
+  echoHead.append(echoDots, echoPhase);
+  const echoTimer = element("div", "battle-echo-timer");
+  const echoTimeFill = element("div", "battle-echo-time-fill");
+  echoTimer.append(echoTimeFill);
+  const echoPad = element("div", "battle-echo-pad");
+  const echoChimeButtons: HTMLButtonElement[] = echoChimeMeta.map((meta) => {
+    const button = element("button", `battle-echo-chime battle-echo-chime-${meta.key}`);
+    button.type = "button";
+    button.dataset.note = String(meta.note);
+    button.setAttribute("aria-label", `${meta.label} chime (${meta.dir})`);
+    const arrow = element("span", "battle-echo-arrow");
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = meta.arrow;
+    const name = element("span", "battle-echo-name");
+    name.textContent = meta.label;
+    button.append(arrow, name);
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      echoNoteHandler(meta.note);
+    });
+    echoPad.append(button);
+    return button;
+  });
+  echoLayer.append(echoHead, echoTimer, echoPad);
   const hint = element("div", "battle-check-hint");
   const grade = element("div", "battle-grade");
   grade.setAttribute("role", "status");
@@ -268,6 +316,7 @@ export function createBattleCheck(root: HTMLElement): {
     leanLayer,
     traceLayer,
     peekabooLayer,
+    echoLayer,
     hint,
     grade,
   );
@@ -275,11 +324,15 @@ export function createBattleCheck(root: HTMLElement): {
   const toyNodes: { node: HTMLElement; src: string }[] = [];
   const dotNodes: HTMLElement[] = [];
   const peekDotNodes: HTMLElement[] = [];
+  const echoDotNodes: HTMLElement[] = [];
   let iconLook: ChainLook | null = null;
   const hide = (node: HTMLElement | SVGSVGElement, hidden: boolean): void => {
     node.style.display = hidden ? "none" : "";
   };
   return {
+    onEchoNote: (callback) => {
+      echoNoteHandler = callback;
+    },
     render: (view) => {
       hide(ring, view?.kind !== "ring");
       hide(meter, view?.kind !== "charge");
@@ -288,6 +341,7 @@ export function createBattleCheck(root: HTMLElement): {
       hide(leanLayer, view?.kind !== "lean");
       hide(traceLayer, view?.kind !== "trace");
       hide(peekabooLayer, view?.kind !== "peekaboo");
+      hide(echoLayer, view?.kind !== "echo");
       hide(hint, view?.hint === null || view === null);
       if (view === null) {
         grade.hidden = true;
@@ -487,6 +541,38 @@ export function createBattleCheck(root: HTMLElement): {
           dot.style.top = `${y + height / 2 + 8}px`;
         });
         renderGrade(grade, view.grade, x, y + height / 2 + 54);
+      } else if (view.kind === "echo") {
+        echoLayer.style.left = `${view.x}px`;
+        echoLayer.style.setProperty("--echo-y", `${view.y}px`);
+        setAttribute(echoLayer, "data-phase", view.phase);
+        setText(echoPhase, view.phase === "demo" ? "LISTEN..." : "YOUR TURN!");
+        echoTimer.classList.toggle("is-active", view.phase === "input");
+        echoTimeFill.style.width = `${(view.phase === "input" ? clamp01(view.time) : 1) * 100}%`;
+        while (echoDotNodes.length < view.sequence.length) {
+          const dot = element("span", "battle-echo-dot");
+          echoDots.append(dot);
+          echoDotNodes.push(dot);
+        }
+        while (echoDotNodes.length > view.sequence.length) {
+          echoDotNodes.pop()?.remove();
+        }
+        echoDotNodes.forEach((dot, index) => {
+          const result = view.results[index] ?? "pending";
+          const note = view.sequence[index] ?? 0;
+          const isDemoLit = view.phase === "demo" && index === view.demoIndex;
+          const isCurrent = view.phase === "input" && index === view.entered &&
+            result === "pending";
+          setAttribute(dot, "data-note", isDemoLit ? String(note) : "");
+          dot.classList.toggle("is-demo", isDemoLit);
+          dot.classList.toggle("is-current", isCurrent);
+          dot.classList.toggle("is-hit", result === "hit");
+          dot.classList.toggle("is-miss", result === "miss");
+          setText(dot, result === "hit" ? "✓" : result === "miss" ? "×" : "");
+        });
+        echoChimeButtons.forEach((button, index) => {
+          button.classList.toggle("is-lit", view.litNote === index);
+        });
+        renderGrade(grade, view.grade, view.x, Math.max(132, view.y - 68));
       } else {
         chain.style.left = "0";
         chain.style.top = "0";
@@ -696,6 +782,19 @@ const peekabooLabels: Record<PeekabooStatus, string> = {
   warning: "TURN SOON...",
   watching: "WATCHING · FREEZE!",
 };
+
+const echoChimeMeta: readonly {
+  note: EchoNote;
+  key: string;
+  label: string;
+  arrow: string;
+  dir: string;
+}[] = [
+  { note: 0, key: "red", label: "Red", arrow: "↑", dir: "Up" },
+  { note: 1, key: "yellow", label: "Yellow", arrow: "→", dir: "Right" },
+  { note: 2, key: "green", label: "Green", arrow: "↓", dir: "Down" },
+  { note: 3, key: "blue", label: "Blue", arrow: "←", dir: "Left" },
+];
 
 function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));

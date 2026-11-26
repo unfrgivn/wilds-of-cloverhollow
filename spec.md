@@ -303,7 +303,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   by dialogue state and projected as a cue whenever that line opens or replaces
   another line, including when the text is repeated. Unknown story sounds are
   rejected by the content loader. The music-room recipes are synthesized
-  xylophone bars (C5, E5, G5, C6) and a short breathy rising flute call.
+  xylophone bars (C5, E5, G5, C6) and a short breathy rising flute call. Echo
+  Chimes battle checks (`kind: "echo"`) reuse `chime-red`, `chime-yellow`,
+  `chime-green`, and `chime-blue` (notes `0` through `3`) on each demo note
+  start and each echoed note press.
 - Footsteps use a closed surface set (`grass`, `sand`, `wood`, `snow`, `stone`,
   `tile`, `carpet`). Each area has a required `content/surfaces/<area>.json`
   with a default and first-match polygon regions in area units. The loader
@@ -1865,6 +1868,15 @@ trunks keep its two exits.
     time is held, on its last tick. Every puff held grades great, at least
     half good, fewer a miss, like a chain, and each held puff plays
     `battle-beat`.
+  - `echo` (Milestone 85; `notes`, `demoTicks`, `gapTicks`, `inputTicks`): only
+    a burst's (Clover Hills' Bouncy Lamb). Draws `notes` chime values in `0..3`
+    (`0` up/red, `1` right/yellow, `2` down/green, `3` left/blue) from the
+    seeded PRNG (`min(3, floor(value x 4))`). Plays each note for `demoTicks`
+    with `gapTicks` silence between them (ignoring player input while demoing),
+    then scores fresh directional edges (deterministic priority up, right,
+    down, left) or taps on the four chime stickers against the sequence until
+    all notes are entered or `inputTicks` elapse. All hits grade `great`, at
+    least half `good`, fewer `miss`.
   - **Gentle Timing accessibility** (`gentleCheckSpec` in `src/core/checks.ts`,
     `StepOptions.gentleTiming` in `src/core/sim.ts`): an optional preference
     (default `false`, stored outside the save slot under `cloverhollow-settings`
@@ -1872,8 +1884,10 @@ trunks keep its two exits.
     `ring` and `charge` great/good windows (clamped inside the check), wider
     non-overlapping `chain` hit windows, slower `catch` travel (+20%) and wider
     gaps (+4 ticks between toys), gentler `lean` gusts (`forces - 1`, `steer + 1`,
-    `spring + 1`), and larger `trace` reach (+35%), brush speed (+20%), and dry
-    time (+40%). When `gentleTiming` is `false` or omitted, `step()` is
+    `spring + 1`), larger `trace` reach (+35%), brush speed (+20%), and dry
+    time (+40%), gentler `peekaboo` (`warningTicks + 6` cap 28, `graceTicks + 5`
+    cap 10, `goal * 0.78`), and slower `echo` (`demoTicks + 4`,
+    `inputTicks + 36`). When `gentleTiming` is `false` or omitted, `step()` is
     bit-for-bit identical to standard timing.
 - Every critter kind has a content `level`; `content/levels.json` maps it to
   `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
@@ -1910,7 +1924,9 @@ trunks keep its two exits.
   ticks from 44, 94, and 144, all force 3; steer 5 and spring 3. Left alone,
   a puff blows her over; leaning blindly through it tips her over the other
   way; leaning back toward straight holds it. The owl's is a ring of 60
-  ticks, target 45, windows 5 and 11. Every timed part fits in 180 ticks; a
+  ticks, target 45, windows 5 and 11. Clover Hills' Bouncy Lamb uses `echo`
+  (3 notes, demo 20, gap 6, input 102; big 4 notes, demo 18, gap 5, input 88).
+  Every timed part fits in 180 ticks; a
   charge's wait for its first press isn't timed play (the player picks the
   moment) and gives up after its 180 ticks.
 - The loader validates every check: a known kind; integer ticks;
@@ -1923,14 +1939,20 @@ trunks keep its two exits.
   the one before, and at least one toy; for a lean, `puffTicks` and `spring`
   at least 1, the first start at least 1 and each later one at least
   `puffTicks` after the one before (one puff at a time), and one or more
-  forces, each at least 1 and under `steer`. A `burst.big` must be its burst
+  forces, each at least 1 and under `steer`; for `peekaboo`, `ticks` 1..180,
+  `goal >= 1`, `warningTicks >= 1`, `graceTicks >= 0`, sorted non-overlapping
+  `peeks` inside `1..ticks` leaving at least `goal` safe ticks; for `echo`,
+  integer `notes >= 2`, `demoTicks >= 4`, `gapTicks >= 1`, and
+  `inputTicks >= notes * 10`. A `burst.big` must be its burst
   check's kind, every party command needs a check, and neither Soothe's nor
-  a friend's may be a catch or a lean.
+  a friend's may be a catch, lean, trace, peekaboo, or echo.
 - Hints: while a charge waits for its first press, before a chain's first
-  beat or a catch's first toy lands, or before a lean's first puff blows, the
-  battle view carries that kind's hint from `content/battle.json`
-  (`hints.charge`, `hints.chain`, `hints.catch`, `hints.lean`, and
-  `hints.trace`). A trace hint is shown while its second checkpoint is pending.
+  beat or a catch's first toy lands, before a lean's first puff blows, before a
+  peekaboo moves (`tick < 28 && progress === 0`), or while an echo is in demo
+  or has `entered === 0`, the battle view carries that kind's hint from
+  `content/battle.json` (`hints.charge`, `hints.chain`, `hints.catch`,
+  `hints.lean`, `hints.trace`, `hints.peekaboo`, and `hints.echo`). A trace
+  hint is shown while its second checkpoint is pending.
   It never uses `battle.message`, whose reveal would eat a confirm press.
 - Feelings (Milestone 42): once two friends fight beside Fae, each bringing
   a battle command (Sue's arrival; a party member without one doesn't
@@ -2255,6 +2277,19 @@ trunks keep its two exits.
   are `big-flower` and `big-rainbow`. They use the kid's tuning:
   `brushSpeed` 20, `reachRadius` 105, and `dryTicks` 180. The flower reads as
   a four-petal flower or a star.
+- Echo Chimes (Milestone 85): a handcrafted cream die-cut board on the open
+  right stage (`x = min(width - (width >= 1000 ? 164 : 206), max(critter.x +
+  critter.height * 0.56 + 132, round(width * 0.77)))`, `y = max(width >= 1000 ?
+  214 : 166, round(critterCentre.y))`, keeping Fae and the critter completely
+  unobstructed while commands hide), showing note progress dots (`is-demo`,
+  pulsing `is-current`, teal `✓` hit, grey `×` miss), a phase pill
+  (`LISTEN...` / `YOUR TURN!`), a thin input timer strip, and four
+  clickable/tappable directional pastel chime stickers (`>= 44 px` touch
+  targets, `>= 7:1` ink contrast) in a diamond layout (Up Red `#f4a6a0`, Right
+  Yellow `#f7df85`, Down Green `#a8d99c`, Left Blue `#9ecaf2`). Tapping or
+  clicking any chime fires a directional tap via `touch.tapArrow(...)`,
+  matching keyboard arrows and gamepad directions. Live choreography bounces
+  the critter on each demo note and Fae on each echoed note.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
   and leaves Milo calm under the tree. The sticker catalogue has 24 slots,
   including Milo, Cozy Bat, Gem Mole, Starry Owl, and Chef Mateo. The front-view NPC art is no longer
@@ -3015,7 +3050,8 @@ trunks keep its two exits.
     (section 8). For Trace it is `{ kind: "trace", rect: { x, y, width,
     height }, brush: { x, y }, points: [{ x, y }], checkpoint, hintAt }`, all
     coordinates in CSS px except the brush and points, which are in the
-    authored 0..1000 square. `marks` lists the recurring critters' "?" and "!" as
+    authored 0..1000 square. For Echo it is `{ kind: "echo", side, x, y,
+    hintAt }` in CSS px. `marks` lists the recurring critters' "?" and "!" as
     `{ key, mark, x, y }`, each at its sticker's bottom centre in CSS px
     (Milestone 51). `finale` is the core's `finale` (`null`, `morning`, or
     `credits`); `credits` is `{ entries }` while the credits show (each

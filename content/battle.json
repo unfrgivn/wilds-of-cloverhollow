@@ -63,7 +63,8 @@
     "catch": "Hold up or down to catch each one!",
     "lean": "Hold left or right to balance!",
     "trace": "Trace the dots before the paint dries!",
-    "peekaboo": "Hold confirm while it looks away; freeze when it watches!"
+    "peekaboo": "Hold confirm while it looks away; freeze when it watches!",
+    "echo": "Listen, then echo the chimes!"
   },
   "together": {
     "chargeMax": 3,

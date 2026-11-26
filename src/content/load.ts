@@ -196,7 +196,8 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
   field(record(value), file, name);
   const kind = value.kind;
   field(kind === "ring" || kind === "charge" || kind === "chain" || kind === "catch" ||
-    kind === "lean" || kind === "trace" || kind === "peekaboo", file, `${name}.kind`);
+    kind === "lean" || kind === "trace" || kind === "peekaboo" || kind === "echo",
+    file, `${name}.kind`);
   const integer = (key: string): number => {
     const item = value[key];
     field(typeof item === "number" && Number.isInteger(item), file, `${name}.${key}`);
@@ -325,6 +326,17 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
     field(ticks - peekTicks >= goal, file, `${name}.goal`);
     return { kind, ticks, goal, warningTicks, graceTicks, peeks };
   }
+  if (kind === "echo") {
+    const notes = integer("notes");
+    const demoTicks = integer("demoTicks");
+    const gapTicks = integer("gapTicks");
+    const inputTicks = integer("inputTicks");
+    field(notes >= 2, file, `${name}.notes`);
+    field(demoTicks >= 4, file, `${name}.demoTicks`);
+    field(gapTicks >= 1, file, `${name}.gapTicks`);
+    field(inputTicks >= notes * 10, file, `${name}.inputTicks`);
+    return { kind, notes, demoTicks, gapTicks, inputTicks };
+  }
   const travelTicks = integer("travelTicks");
   field(travelTicks >= 1, file, `${name}.travelTicks`);
   const arrivals = integers("arrivals");
@@ -356,8 +368,12 @@ function checkSpec(value: unknown, file: string, name: string): CheckSpec {
 // (spec 8).
 function faeSideCheck(value: unknown, file: string, name: string): CheckSpec {
   const spec = checkSpec(value, file, name);
-  field(spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace" &&
-    spec.kind !== "peekaboo", file, `${name}.kind`);
+  field(
+    spec.kind !== "catch" && spec.kind !== "lean" && spec.kind !== "trace" &&
+      spec.kind !== "peekaboo" && spec.kind !== "echo",
+    file,
+    `${name}.kind`,
+  );
   return spec;
 }
 
@@ -1563,7 +1579,9 @@ export function parseBattleContent(
       typeof hints.catch === "string" &&
       typeof hints.lean === "string" &&
       typeof hints.trace === "string" &&
-      typeof hints.peekaboo === "string",
+      typeof hints.peekaboo === "string" &&
+      typeof hints.echo === "string" &&
+      hints.echo.trim().length > 0,
     file,
     "hints",
   );
@@ -1640,8 +1658,15 @@ export function parseBattleContent(
   field(record(fluteRaw) && record(fluteRaw.lines), file, "fluteAssist");
   return {
     toyAtlas,
-    hints: { charge: hints.charge, chain: hints.chain, catch: hints.catch, lean: hints.lean,
-      trace: hints.trace, peekaboo: hints.peekaboo },
+    hints: {
+      charge: hints.charge,
+      chain: hints.chain,
+      catch: hints.catch,
+      lean: hints.lean,
+      trace: hints.trace,
+      peekaboo: hints.peekaboo,
+      echo: hints.echo,
+    },
     commands: {
       soothe: command("soothe"),
       snack: command("snack"),

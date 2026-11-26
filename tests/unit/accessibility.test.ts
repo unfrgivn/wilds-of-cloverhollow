@@ -116,10 +116,13 @@ describe("gentleCheckSpec", () => {
         expect(gentle.graceTicks, label).toBeGreaterThanOrEqual(spec.graceTicks);
         expect(gentle.goal, label).toBeLessThanOrEqual(spec.goal);
         expect(gentle.goal, label).toBeGreaterThanOrEqual(1);
+      } else if (spec.kind === "echo" && gentle.kind === "echo") {
+        expect(gentle.demoTicks, label).toBeGreaterThan(spec.demoTicks);
+        expect(gentle.inputTicks, label).toBeGreaterThan(spec.inputTicks);
       }
     }
     expect(seen).toEqual(
-      new Set(["ring", "charge", "chain", "catch", "lean", "trace", "peekaboo"]),
+      new Set(["ring", "charge", "chain", "catch", "lean", "trace", "peekaboo", "echo"]),
     );
   });
 

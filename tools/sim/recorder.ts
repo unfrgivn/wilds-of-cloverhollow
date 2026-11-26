@@ -378,6 +378,16 @@ export function createRecorder(world: World, initial: State): {
         );
         tick(frame(undefined, !mustFreeze));
       }
+    } else if (check.kind === "echo") {
+      const demoEnd = check.spec.notes * (check.spec.demoTicks + check.spec.gapTicks);
+      waitFor(demoEnd);
+      const noteDirs = [directions.up, directions.right, directions.down, directions.left];
+      for (const note of check.sequence) {
+        const current = live();
+        if (state.battle?.phase !== "check" || current?.kind !== "echo") break;
+        tick(frame(noteDirs[note]));
+        if (state.battle?.phase === "check") tick(frame());
+      }
     } else {
       for (const arrival of check.spec.arrivals) {
         waitFor(arrival - 1);

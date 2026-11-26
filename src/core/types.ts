@@ -418,6 +418,7 @@ export type BattleContent = {
     lean: string;
     trace: string;
     peekaboo: string;
+    echo: string;
   };
   commands: {
     soothe: { label: string; check: CheckSpec };
@@ -545,6 +546,14 @@ export type PeekabooSpec = {
   peeks: PeekWindow[];
 };
 export type PeekabooStatus = "safe" | "warning" | "watching";
+export type EchoNote = 0 | 1 | 2 | 3;
+export type EchoSpec = {
+  kind: "echo";
+  notes: number;
+  demoTicks: number;
+  gapTicks: number;
+  inputTicks: number;
+};
 export type CheckSpec =
   | RingSpec
   | ChargeSpec
@@ -552,7 +561,8 @@ export type CheckSpec =
   | CatchSpec
   | LeanSpec
   | TraceSpec
-  | PeekabooSpec;
+  | PeekabooSpec
+  | EchoSpec;
 // "critter": Fae's side acts on the critter; "fae": the critter's burst.
 export type CheckSide = "critter" | "fae";
 export type BeatResult = "pending" | "hit" | "miss";
@@ -622,7 +632,19 @@ export type CheckState =
       results: BeatResult[];
       big: boolean;
     }
-  | PeekabooState;
+  | PeekabooState
+  | {
+      kind: "echo";
+      side: CheckSide;
+      tick: number;
+      spec: EchoSpec;
+      sequence: EchoNote[];
+      results: BeatResult[];
+      entered: number;
+      activeNote: EchoNote | null;
+      activeTicks: number;
+      big: boolean;
+    };
 // The commands every battle has; the party's commands come from its roster.
 export type SharedCommandId = "soothe" | "snack" | "run";
 export type FriendCommand = {
@@ -812,6 +834,17 @@ export type BattleCheckView =
       progress: number;
       status: PeekabooStatus;
       peeks: ("pending" | "cleared" | "spotted")[];
+    }
+  | {
+      kind: "echo";
+      side: CheckSide;
+      phase: "demo" | "input";
+      sequence: EchoNote[];
+      results: BeatResult[];
+      litNote: EchoNote | null;
+      demoIndex: number;
+      entered: number;
+      time: number;
     };
 export type TreatTrayItem = {
   id: string;

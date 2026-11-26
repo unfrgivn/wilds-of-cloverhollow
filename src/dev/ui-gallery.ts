@@ -162,6 +162,7 @@ if (state === "battle-talk" || state === "battle-talk-reply")
 if (state === "battle-catch") document.documentElement.dataset.check = "catch";
 if (state === "battle-lean") document.documentElement.dataset.check = "lean";
 if (state.startsWith("battle-trace")) document.documentElement.dataset.check = "trace";
+if (state === "battle-echo") document.documentElement.dataset.check = "echo";
 if (dialogueShown) document.documentElement.dataset.dialogue = "open";
 if (journalState) document.documentElement.dataset.journal = "open";
 if (arcadeState) document.documentElement.dataset.arcade = "open";
@@ -353,6 +354,9 @@ battleHud.onTogether(() => {
 });
 battleHud.onFlute(() => {
   root.dataset.battleFlute = "true";
+});
+check.onEchoNote((note) => {
+  root.dataset.echoNote = String(note);
 });
 dialogue.onChoose((index) => {
   root.dataset.chosen = String(index);
@@ -550,7 +554,11 @@ function renderGalleryState(): void {
     energyMax: state === "battle-windup" ? 12 : 5,
     level: state === "battle-windup" ? 6 : 1,
     calm: 0.45,
-    critterName: state === "battle-windup" ? "Grumpy Gull" : "Fizzy Frog",
+    critterName: state === "battle-windup"
+      ? "Grumpy Gull"
+      : state === "battle-echo"
+        ? "Bouncy Lamb"
+        : "Fizzy Frog",
     sparkle: state === "battle-together" ? { count: 3, max: 3, ready: true } : null,
     fluteAssist: state === "battle-together"
       ? { available: true, label: "Flute Friends", kind: "both" }
@@ -742,6 +750,30 @@ function renderGalleryState(): void {
       checkpoint: 4, dry: 1,
       results: ["hit", "hit", "hit", "hit", "miss"],
       grade: "good", hint: null, hintAt: { x: 480, y: 410 },
+    },
+    "battle-echo": {
+      kind: "echo",
+      x: Math.min(
+        innerWidth - (innerWidth >= 1000 ? 164 : 206),
+        Math.round(innerWidth * 0.77),
+      ),
+      y: Math.max(166, Math.round(innerHeight * 0.34)),
+      phase: "input",
+      sequence: [0, 1, 2, 3],
+      results: ["hit", "pending", "pending", "pending"],
+      litNote: 1,
+      demoIndex: -1,
+      entered: 1,
+      time: 0.68,
+      grade: null,
+      hint: "Listen, then echo the chimes!",
+      hintAt: {
+        x: Math.min(innerWidth - 130, Math.max(130, Math.round(innerWidth * 0.36))),
+        y: Math.min(
+          innerHeight - 46,
+          Math.max(268, Math.round(innerHeight * 0.57 + 0.18 * innerHeight * 0.194)),
+        ),
+      },
     },
   };
   check.render(galleryChecks[state] ?? null);

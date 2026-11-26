@@ -34,6 +34,7 @@ import {
   checkDraws,
   checkHint,
   createCheck,
+  echoNoteFromEdge,
   gentleCheckSpec,
   laneFromStick,
   leanFromStick,
@@ -1770,6 +1771,7 @@ function battleStep(
       lean: leanFromStick(input.move.x),
       move: input.move,
       pointer: input.pointer,
+      echoNote: echoNoteFromEdge(state.previousInput.move, input.move),
     });
     const result = stepped.grade;
     // The check stays in the battle through its result, as it ended: the

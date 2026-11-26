@@ -64,28 +64,18 @@
   "burst": {
     "bigChance": 0.3,
     "check": {
-      "kind": "chain",
-      "travelTicks": 30,
-      "hitWindow": 8,
-      "arrivals": [
-        40,
-        66,
-        92
-      ],
-      "look": "dust"
+      "kind": "echo",
+      "notes": 3,
+      "demoTicks": 20,
+      "gapTicks": 6,
+      "inputTicks": 102
     },
     "big": {
-      "kind": "chain",
-      "travelTicks": 30,
-      "hitWindow": 8,
-      "arrivals": [
-        40,
-        62,
-        84,
-        106,
-        128
-      ],
-      "look": "dust"
+      "kind": "echo",
+      "notes": 4,
+      "demoTicks": 18,
+      "gapTicks": 5,
+      "inputTicks": 88
     }
   },
   "lines": {
@@ -114,11 +104,11 @@
       }
     },
     "snack": "Fae shares a crunchy clover biscuit. The lamb munches happily!",
-    "burst": "The lamb bounds in a dizzy chain, sending clover petals everywhere!",
+    "burst": "The lamb's collar bells chime a bright tune! Echo the notes back!",
     "burstResult": {
-      "great": "Fae hops over every flying clover petal!",
-      "good": "Fae dodges most of the petals!",
-      "miss": "Poof! Fae gets a face full of clover."
+      "great": "Fae echoes every bell note cleanly! The lamb sways happily!",
+      "good": "Fae catches most of the jingling tune!",
+      "miss": "Cling-clang! The dizzy bells scatter in the breeze."
     },
     "soothed": "The lamb gives a tiny bell jingle. The fizzy spell melts away!",
     "rest": "Fae is all tuckered out. Time for a rest.",

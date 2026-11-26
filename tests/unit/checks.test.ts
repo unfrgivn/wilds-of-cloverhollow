@@ -254,6 +254,7 @@ describe("lean check rules", () => {
     lean: "lean",
     trace: "trace",
     peekaboo: "peekaboo",
+    echo: "echo",
   };
 
   function leanStep(state: CheckState, way: Lean): { check: CheckState; grade: string | null } {

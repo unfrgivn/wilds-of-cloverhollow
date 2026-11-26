@@ -467,6 +467,29 @@ export function computeBattleChoreography(
     }
   }
 
+  // 8c. Echo Chimes live musical bounce: critter hops on demo chimes, Fae hops
+  // on echoed chimes.
+  if (battle.phase === "check" && battle.check?.kind === "echo") {
+    const echoView = view?.check?.kind === "echo" ? view.check : null;
+    if (echoView?.phase === "demo" && echoView.litNote !== null) {
+      critter = composePose(critter, {
+        offsetX: 0,
+        offsetY: -5,
+        scaleX: 0.97,
+        scaleY: 1.05,
+        rotation: 0,
+      });
+    } else if (echoView?.phase === "input" && echoView.litNote !== null) {
+      fae = composePose(fae, {
+        offsetX: 4,
+        offsetY: -4,
+        scaleX: 0.98,
+        scaleY: 1.04,
+        rotation: 0,
+      });
+    }
+  }
+
   // 9. Critter burst anticipation crouch -> snappy forward lunge.
   if (battle.phase === "burst") {
     if (battle.phaseTicks < 10) {

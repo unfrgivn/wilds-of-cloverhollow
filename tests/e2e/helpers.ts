@@ -210,6 +210,23 @@ export async function playBattleCheck(page: Page): Promise<void> {
     if (holding) await page.keyboard.up("Enter");
     return;
   }
+  if (check.kind === "echo") {
+    const stride = check.spec.demoTicks + check.spec.gapTicks;
+    const demoEnd = check.spec.notes * stride;
+    if (check.tick <= demoEnd) await step(page, demoEnd - check.tick);
+    const echoKeys: readonly string[] = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
+    for (const note of check.sequence) {
+      const key = echoKeys[note];
+      if (key === undefined) continue;
+      await page.keyboard.down(key);
+      await step(page, 1);
+      await page.keyboard.up(key);
+      const current = await readBattle(page);
+      if (current?.phase !== "check") break;
+      await step(page, 1);
+    }
+    return;
+  }
   for (const arrival of check.spec.arrivals) {
     const current = await readBattle(page);
     const active = current?.check;

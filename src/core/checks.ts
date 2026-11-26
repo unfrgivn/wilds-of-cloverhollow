@@ -5,6 +5,7 @@ import type {
   CheckSide,
   CheckSpec,
   CheckState,
+  EchoNote,
   Grade,
   PeekabooState,
   PeekabooStatus,
@@ -22,6 +23,7 @@ export type CheckInput = {
   lean: Lean;
   pointer?: { x: number; y: number };
   move?: { x: number; y: number };
+  echoNote?: EchoNote | null;
 };
 
 // Fae's balance in a lean runs from -100 (blown over backward) to 100
@@ -118,6 +120,13 @@ export function gentleCheckSpec(spec: CheckSpec): CheckSpec {
       peeks: spec.peeks.map((peek) => ({ ...peek })),
     };
   }
+  if (spec.kind === "echo") {
+    return {
+      ...spec,
+      demoTicks: spec.demoTicks + 4,
+      inputTicks: spec.inputTicks + 36,
+    };
+  }
   return {
     ...spec,
     reachRadius: Math.round(spec.reachRadius * 1.35),
@@ -200,6 +209,22 @@ export function createCheck(
       big,
     };
   }
+  if (effective.kind === "echo") {
+    const sequence: EchoNote[] = Array.from({ length: effective.notes }, (_, index) =>
+      toEchoNote(picks[index] ?? 0));
+    return {
+      kind: "echo",
+      side,
+      tick: 0,
+      spec: { ...effective },
+      sequence,
+      results: sequence.map(() => "pending"),
+      entered: 0,
+      activeNote: null,
+      activeTicks: 0,
+      big,
+    };
+  }
   return {
     kind: "chain",
     side,
@@ -234,6 +259,7 @@ export function stepCheck(
   if (check.kind === "lean") return stepLean(check, tick, input.lean);
   if (check.kind === "trace") return stepTrace(check, tick, input.pointer, input.move);
   if (check.kind === "peekaboo") return stepPeekaboo(check, tick, input.confirmHeld);
+  if (check.kind === "echo") return stepEcho(check, tick, input.echoNote ?? null);
   return stepChain(check, tick, input.confirmEdge);
 }
 
@@ -291,6 +317,68 @@ export function stepPeekaboo(
     check: { ...check, tick, progress, spotted, peeksCleared, result },
     grade: result,
   };
+}
+
+/**
+ * Plays a chime demo, then scores each echoed directional note against the
+ * sequence until every note is entered or the input window expires.
+ */
+export function stepEcho(
+  check: Extract<CheckState, { kind: "echo" }>,
+  tick: number,
+  echoNote: EchoNote | null,
+): { check: CheckState; grade: Grade | null } {
+  const { spec } = check;
+  const stride = spec.demoTicks + spec.gapTicks;
+  const demoEnd = spec.notes * stride;
+  if (tick <= demoEnd) {
+    const slot = Math.floor((tick - 1) / stride);
+    const inSlot = (tick - 1) % stride;
+    const activeNote = inSlot < spec.demoTicks ? (check.sequence[slot] ?? null) : null;
+    const activeTicks = inSlot < spec.demoTicks ? inSlot + 1 : 0;
+    return { check: { ...check, tick, activeNote, activeTicks }, grade: null };
+  }
+  let activeTicks = check.activeTicks > 0 ? check.activeTicks - 1 : 0;
+  let activeNote = activeTicks > 0 ? check.activeNote : null;
+  const results = [...check.results];
+  let entered = check.entered;
+  if (echoNote !== null && entered < check.sequence.length) {
+    results[entered] = echoNote === check.sequence[entered] ? "hit" : "miss";
+    entered += 1;
+    activeNote = echoNote;
+    activeTicks = 14;
+  }
+  const finished = entered >= check.sequence.length || tick >= demoEnd + spec.inputTicks;
+  if (finished) {
+    for (let index = 0; index < results.length; index += 1)
+      if (results[index] === "pending") results[index] = "miss";
+  }
+  const next: Extract<CheckState, { kind: "echo" }> = {
+    ...check,
+    tick,
+    results,
+    entered,
+    activeNote,
+    activeTicks,
+  };
+  return { check: next, grade: finished ? gradeHits(results) : null };
+}
+
+/** Fresh directional edge mapped to an echo chime (up 0, right 1, down 2, left 3). */
+export function echoNoteFromEdge(
+  previousMove: { x: number; y: number },
+  move: { x: number; y: number },
+): EchoNote | null {
+  if (move.y < -0.5 && previousMove.y >= -0.5) return 0;
+  if (move.x > 0.5 && previousMove.x <= 0.5) return 1;
+  if (move.y > 0.5 && previousMove.y <= 0.5) return 2;
+  if (move.x < -0.5 && previousMove.x >= -0.5) return 3;
+  return null;
+}
+
+function toEchoNote(value: number): EchoNote {
+  if (value === 0 || value === 1 || value === 2 || value === 3) return value;
+  return 0;
 }
 
 function distance(x: number, y: number): number {
@@ -483,7 +571,7 @@ export function laneFromDraw(value: number): number {
   return Math.min(2, Math.floor(value * 3));
 }
 
-/** How many seeded draws a check takes as it starts: one per catch toy or lean puff. */
+/** How many seeded draws a check takes as it starts: one per toy, puff, or chime. */
 export function checkDraws(spec: CheckSpec): number {
   return spec.kind === "catch"
     ? spec.arrivals.length
@@ -491,16 +579,19 @@ export function checkDraws(spec: CheckSpec): number {
       ? spec.starts.length
       : spec.kind === "trace"
         ? 1
-      : 0;
+        : spec.kind === "echo"
+          ? spec.notes
+          : 0;
 }
 
 /**
- * What one draw in 0..1 picks: a lean puff's force (each of `forces` as
- * likely), or a catch toy's lane.
+ * What one draw in 0..1 picks: a lean puff's force, a trace path index, an
+ * echo chime note (0..3), or a catch toy's lane.
  */
 export function pickFromDraw(spec: CheckSpec, value: number): number {
   if (spec.kind === "trace")
     return Math.min(spec.paths.length - 1, Math.floor(value * spec.paths.length));
+  if (spec.kind === "echo") return Math.min(3, Math.floor(value * 4));
   if (spec.kind !== "lean") return laneFromDraw(value);
   const index = Math.min(spec.forces.length - 1, Math.floor(value * spec.forces.length));
   return spec.forces[index] ?? 0;
@@ -591,6 +682,26 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
             : "pending",
       ),
     };
+  if (check.kind === "echo") {
+    const stride = check.spec.demoTicks + check.spec.gapTicks;
+    const demoEnd = check.spec.notes * stride;
+    const inDemo = check.tick <= demoEnd;
+    const slot = check.tick > 0 ? Math.floor((check.tick - 1) / stride) : -1;
+    const inSlot = check.tick > 0 ? (check.tick - 1) % stride : stride;
+    const demoIndex = inDemo && inSlot < check.spec.demoTicks ? slot : -1;
+    const remaining = 1 - (check.tick - demoEnd) / Math.max(1, check.spec.inputTicks);
+    return {
+      kind: "echo",
+      side: check.side,
+      phase: inDemo ? "demo" : "input",
+      sequence: [...check.sequence],
+      results: [...check.results],
+      litNote: check.activeNote,
+      demoIndex,
+      entered: check.entered,
+      time: inDemo ? 0 : Math.max(0, Math.min(1, remaining)),
+    };
+  }
   return {
     kind: "chain",
     side: check.side,
@@ -607,7 +718,7 @@ export function viewCheck(check: CheckState, actor: number | null): BattleCheckV
 /**
  * The hint while a check waits for the player: a charge before its first
  * press, a chain or catch before its first landing, a lean before its first
- * puff, a peekaboo before Fae starts tiptoeing.
+ * puff, a peekaboo before Fae starts tiptoeing, an echo until her first chime.
  */
 export function checkHint(check: CheckState, hints: BattleContent["hints"]): string | null {
   if (check.kind === "charge") return check.held === 0 ? hints.charge : null;
@@ -618,6 +729,10 @@ export function checkHint(check: CheckState, hints: BattleContent["hints"]): str
   if (check.kind === "trace") return check.results[1] === "pending" ? hints.trace : null;
   if (check.kind === "peekaboo")
     return check.tick < 28 && check.progress === 0 ? hints.peekaboo : null;
+  if (check.kind === "echo") {
+    const demoEnd = check.spec.notes * (check.spec.demoTicks + check.spec.gapTicks);
+    return check.tick <= demoEnd || check.entered === 0 ? hints.echo : null;
+  }
   return null;
 }
 

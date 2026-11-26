@@ -97,7 +97,18 @@ export function soundCues(
   if (previous.battle !== null && next.battle !== null) {
     // A beat popped, a toy caught, or a puff held (a new check starts back
     // at none).
-    if (hits(next.battle.check) > hits(previous.battle.check)) cues.push("battle-beat");
+    const prevCheck = previous.battle.check;
+    const nextCheck = next.battle.check;
+    if (hits(nextCheck) > hits(prevCheck)) cues.push("battle-beat");
+    if (nextCheck?.kind === "echo" && nextCheck.activeNote !== null) {
+      const demoEnd = nextCheck.spec.notes * (nextCheck.spec.demoTicks + nextCheck.spec.gapTicks);
+      const demoStart = nextCheck.tick <= demoEnd && nextCheck.activeTicks === 1;
+      const echoed = prevCheck?.kind === "echo" && nextCheck.entered > prevCheck.entered;
+      if (demoStart || echoed) {
+        const chime = echoChimes[nextCheck.activeNote];
+        if (chime !== undefined) cues.push(chime);
+      }
+    }
     const startedTogether = next.battle.command === "together" &&
       (previous.battle.command !== "together" ||
         (previous.battle.phase !== "check" && next.battle.phase === "check" &&
@@ -157,6 +168,10 @@ function treatCount(treats: State["treats"]): number {
   for (const count of Object.values(treats)) total += count;
   return total;
 }
+
+const echoChimes: readonly SoundCue[] = [
+  "chime-red", "chime-yellow", "chime-green", "chime-blue",
+];
 
 // How many beats, toys, puffs, or peeks a check has cleared so far;
 // other checks none.

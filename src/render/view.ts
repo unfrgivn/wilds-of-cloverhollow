@@ -82,7 +82,8 @@ export type BattleCheckGeometry =
       y: number;
       track: { x: number; y: number; width: number; height: number };
       hintAt: Point;
-    };
+    }
+  | { kind: "echo"; x: number; y: number; hintAt: Point };
 // The check for tests (spec 11): its side and geometry, plus an anchor
 // (`x`, `y`: a ring's centre, a meter's top-left, a chain's target, the
 // catch where it is, a lean's star where it is).
@@ -2235,6 +2236,24 @@ export class GameView {
         hintAt: hintAt((fae.x + critter.x) / 2),
       };
     }
+    if (check.kind === "echo") {
+      // Right stage: wide open while commands hide, leaving Fae and the
+      // critter completely unobstructed at phone and desktop widths.
+      const x = Math.min(
+        width - (width >= 1000 ? 164 : 206),
+        Math.max(critter.x + critter.height * 0.56 + 132, Math.round(width * 0.77)),
+      );
+      const y = width >= 1000
+        ? Math.max(214, Math.round(critterCentre.y))
+        : Math.max(166, Math.round(critterCentre.y));
+      const baseHint = hintAt((fae.x + critter.x) / 2);
+      return {
+        kind: "echo",
+        x,
+        y,
+        hintAt: { x: baseHint.x, y: Math.min(height - 46, Math.max(baseHint.y, 268)) },
+      };
+    }
     if (check.side === "fae" && check.kind !== "trace")
       return {
         kind: "chain",
@@ -2316,7 +2335,7 @@ export class GameView {
         x: geometry.rect.x + geometry.rect.width * geometry.brush.x / 1000,
         y: geometry.rect.y + geometry.rect.height * geometry.brush.y / 1000,
       };
-    if (geometry.kind === "peekaboo") return { ...geometry, side };
+    if (geometry.kind === "peekaboo" || geometry.kind === "echo") return { ...geometry, side };
     return { ...geometry, side };
   }
 

@@ -9,7 +9,7 @@ describe("hills critters", () => {
     const hedgehog = content.world.critters.hedgehog;
     expect(lamb?.name).toBe("Bouncy Lamb");
     expect(lamb?.calmName).toBe("Clover Lamb");
-    expect(lamb?.burst.check.kind).toBe("chain");
+    expect(lamb?.burst.check.kind).toBe("echo");
     expect(lamb?.calmKnot).toBe("lamb_calm");
     expect(hedgehog?.name).toBe("Prickly Hedgehog");
     expect(hedgehog?.calmName).toBe("Meadow Hedgehog");

@@ -154,6 +154,16 @@ async function boot(): Promise<void> {
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
+  const echoArrows: readonly Point[] = [
+    { x: 0, y: -1 },
+    { x: 1, y: 0 },
+    { x: 0, y: 1 },
+    { x: -1, y: 0 },
+  ];
+  battleCheck.onEchoNote((note) => {
+    const direction = echoArrows[note];
+    if (direction !== undefined) touch.tapArrow(direction);
+  });
   const feelingBubble = createFeelingBubble(uiRoot);
   const windUpBubbles = createWindUpBubbles(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
@@ -664,6 +674,18 @@ async function boot(): Promise<void> {
         status: check.status,
         peeks: check.peeks,
       };
+    if (check.kind === "echo" && geometry.kind === "echo")
+      return {
+        ...geometry,
+        ...shared,
+        phase: check.phase,
+        sequence: check.sequence,
+        results: check.results,
+        litNote: check.litNote,
+        demoIndex: check.demoIndex,
+        entered: check.entered,
+        time: check.time,
+      };
     return null;
   };
   let afterTick = (_next: State): void => undefined;
@@ -854,8 +876,8 @@ async function boot(): Promise<void> {
     // An arrow held as a catch, a lean, or a round of Boop-a-Mole or Comet
     // Cruise ends is hidden mid-press and may never see its pointer lifted:
     // outside one, it lets go.
-    if (checkKind !== "catch" && checkKind !== "lean" && state.arcade?.game !== "mole" &&
-        state.arcade?.game !== "comet")
+    if (checkKind !== "catch" && checkKind !== "lean" && checkKind !== "echo" &&
+        state.arcade?.game !== "mole" && state.arcade?.game !== "comet")
       touch.releaseArrows();
     const hideActions = state.battle?.phase === "check" ||
       state.battle?.phase === "burstResult";

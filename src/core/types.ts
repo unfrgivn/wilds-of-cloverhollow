@@ -190,6 +190,22 @@ export type World = {
   storyVariable: (ink: string, name: string) => unknown;
   arcade: ArcadeContent;
   levels: import("./levels").LevelContent;
+  treats: TreatItem[];
+};
+export type TreatItem = {
+  id: string;
+  name: string;
+  price: number;
+  energy: number;
+  calm: number;
+  favouriteCalm: number;
+  favourites: string[];
+  description: string;
+  useLine: string;
+  favouriteLine: string;
+};
+export type TreatsContent = {
+  treats: TreatItem[];
 };
 export type ArcadeContent = {
   // The prize atlas (Pixi spritesheet JSON), one frame per prize.
@@ -693,6 +709,8 @@ export type Battle = {
   sparkle?: number;
   fluteUsed?: boolean;
   burstSoften?: number;
+  treatMenu?: boolean;
+  treatSelected?: number;
 };
 export type BattleCheckView =
   | { kind: "ring"; side: CheckSide; progress: number; target: number }
@@ -742,6 +760,17 @@ export type BattleCheckView =
       results: BeatResult[];
       dry: number;
     };
+export type TreatTrayItem = {
+  id: string;
+  label: string;
+  count: number;
+  favourite: boolean;
+  description: string;
+};
+export type TreatTrayView = {
+  items: TreatTrayItem[];
+  selected: number;
+};
 export type BattleView = {
   critterId: string;
   critterName: string;
@@ -786,6 +815,7 @@ export type BattleView = {
   sparkle: { count: number; max: number; ready: boolean } | null;
   fluteAssist: { available: boolean; label: string; kind: "pup" | "squirrel" | "both" } | null;
   burstSoften: number;
+  treatTray: TreatTrayView | null;
 };
 // `party` overrides who starts in the party (test fixtures); the default is
 // every roster member with `start: true`, in roster order.
@@ -851,6 +881,7 @@ export type State = {
   lantern: boolean;
   coins: number;
   snacks: number;
+  treats?: Record<string, number>;
   finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
 };

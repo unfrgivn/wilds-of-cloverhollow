@@ -49,10 +49,22 @@ export type BattleCommand = {
   feeling: FeelingId | null;
 };
 
+export type BattleTreatItem = {
+  id: string;
+  label: string;
+  count: number;
+  favourite: boolean;
+  description: string;
+};
+
 export type CommandMenuView = {
   visible: boolean;
   commands: BattleCommand[];
   selected: number;
+  treatTray?: {
+    items: BattleTreatItem[];
+    selected: number;
+  } | null;
 };
 
 // What the critter feels (spec 8.1): this turn's, with its label; the next
@@ -742,6 +754,13 @@ type CommandButton = {
   badge: { node: HTMLSpanElement; feeling: FeelingId | null };
 };
 
+type TreatButton = {
+  button: HTMLButtonElement;
+  name: HTMLSpanElement;
+  count: HTMLSpanElement;
+  fav: HTMLSpanElement;
+};
+
 export function createCommandMenu(root: HTMLElement): {
   render: (view: CommandMenuView) => void;
   onChoose: (callback: (index: number) => void) => void;
@@ -750,9 +769,18 @@ export function createCommandMenu(root: HTMLElement): {
   menu.setAttribute("role", "listbox");
   menu.setAttribute("aria-label", "Battle commands");
   menu.hidden = true;
-  root.append(menu);
+  const tray = element("div", "battle-treat-tray");
+  tray.setAttribute("role", "listbox");
+  tray.setAttribute("aria-label", "Treat tray");
+  tray.hidden = true;
+  const trayTitle = element("div", "battle-treat-title");
+  trayTitle.textContent = "TREATS";
+  const trayList = element("div", "battle-treat-list");
+  tray.append(trayTitle, trayList);
+  root.append(menu, tray);
   let choose: (index: number) => void = () => undefined;
   const buttons: CommandButton[] = [];
+  const treatButtons: TreatButton[] = [];
   const addButton = (index: number): CommandButton => {
     const button = element("button", "battle-command");
     button.type = "button";
@@ -769,12 +797,51 @@ export function createCommandMenu(root: HTMLElement): {
     menu.append(button);
     return { button, label, detail, badge: { node: badge, feeling: null } };
   };
+  const addTreatButton = (index: number): TreatButton => {
+    const button = element("button", "battle-treat-item");
+    button.type = "button";
+    button.setAttribute("role", "option");
+    const name = element("span", "battle-treat-name");
+    const fav = element("span", "battle-treat-fav");
+    const favHeart = icon(heartMarkup, "battle-treat-heart");
+    const favText = element("span", "battle-treat-fav-text");
+    favText.textContent = "Fav!";
+    fav.append(favHeart, favText);
+    fav.hidden = true;
+    const count = element("span", "battle-treat-count");
+    button.append(name, fav, count);
+    button.addEventListener("click", () => choose(index));
+    trayList.append(button);
+    return { button, name, count, fav };
+  };
   return {
     onChoose: (callback) => {
       choose = callback;
     },
     render: (view) => {
-      menu.hidden = !view.visible;
+      const trayView = view.visible ? (view.treatTray ?? null) : null;
+      const showTray = trayView !== null;
+      menu.hidden = !view.visible || showTray;
+      tray.hidden = !showTray;
+      if (showTray) {
+        while (treatButtons.length < trayView.items.length)
+          treatButtons.push(addTreatButton(treatButtons.length));
+        while (treatButtons.length > trayView.items.length)
+          treatButtons.pop()?.button.remove();
+        trayView.items.forEach((item, index) => {
+          const entry = treatButtons[index];
+          if (entry === undefined) return;
+          const isBack = item.id === "back";
+          setText(entry.name, item.label);
+          setText(entry.count, isBack ? "" : `×${item.count}`);
+          entry.count.hidden = isBack;
+          entry.fav.hidden = !item.favourite;
+          entry.button.classList.toggle("is-back", isBack);
+          setAttribute(entry.button, "data-treat", item.id);
+          setAttribute(entry.button, "aria-selected", String(index === trayView.selected));
+        });
+        return;
+      }
       while (buttons.length < view.commands.length)
         buttons.push(addButton(buttons.length));
       while (buttons.length > view.commands.length)

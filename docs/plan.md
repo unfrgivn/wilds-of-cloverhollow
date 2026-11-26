@@ -3712,13 +3712,131 @@ the old trail, the owl, and the clubhouse claim.
   and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4205 just e2e`
   (941 passed, 2 skipped in 4.2 min).
 
+## Milestone 74: Cozy Soundtrack, Ambient Soundscapes & Expressive Audio **Status:** ✅ Completed (2026-11-26)
+- Pure core soundtrack projection (`src/core/music.ts`, re-exported from
+  `src/core/index.ts`): `soundtrackFor(world, state, { titleOpen })` derives
+  the active `MusicTrack` (13 composed themes plus `silent`), `AmbienceBed`
+  (7 per-land beds plus `none`), display `title`, and `duck` state with zero
+  DOM, timers, or PRNG changes. Covers title screen, all overworld/indoor
+  areas (with `forest_fizzy` switching `enchanted` to `enchanted-calm`),
+  ordinary battles, mini-bosses, the intimate solo-piano `talk` phase during
+  Milo's heart-to-heart, and the morning/credits reprise.
+- Multi-voice procedural Web Audio engine (`src/platform/scores.ts`,
+  `src/platform/music.ts`, `src/platform/ambience.ts`, `src/platform/audio.ts`,
+  `src/platform/audio-settings.ts`): zero new dependencies and zero paid
+  generation. Single shared `AudioContext` routing SFX, music (dry + 1.0s
+  stereo algorithmic convolution reverb), and procedural per-land ambience
+  (`town-breeze` with distant pentatonic birds, `ocean` wave LFO, `mountain-wind`,
+  `hearth` crackles, `forest` canopy rustle, `enchanted-shimmer` F-Lydian
+  chimes, `arcade-hum`) through a soft `DynamicsCompressorNode`. Includes
+  smooth track crossfades, dialogue/journal/arcade/reward ducking,
+  `visibilitychange` pause/resume, backwards-compatible `cloverhollow-audio`
+  preferences (`musicMuted`, `musicLevel`, `ambienceMuted`), and dev/harness
+  `window.__cloverhollow.sound.music()` + `[cloverhollow] music` logging.
+- Journal `OPTIONS` bookmark tab and tab-overlap fix (`src/ui/journal.ts`,
+  `src/ui/journal.css`): replaced overlapping absolute tabs with a flex-column
+  `.journal-tabs` stack (`NOTES`, `MAP`, `OPTIONS`), centered volume pill
+  labels, and added the `SOUND & MUSIC` controls (`Now Playing`, Sound Effects,
+  Music, Ambience) with >= 44 px targets and >= 8.5:1 contrast.
+- Evidence: `tests/unit/soundtrack.test.ts`, `tests/unit/audio-settings.test.ts`,
+  real-input `tests/e2e/soundtrack.spec.ts` (Chromium + WebKit `@smoke`),
+  `ui-gallery-checks.spec.ts` journal geometry & contrast checks, and viewed
+  review JPEGs `art/review/soundtrack-options-desktop.jpg` and
+  `art/review/soundtrack-options-phone.jpg`.
+
+## Milestone 75: Gentle Timing Accessibility, Richer World Map & Desktop Key Hints **Status:** ✅ Completed (2026-11-26)
+- Pure core Gentle Timing (`src/core/checks.ts`, `src/core/sim.ts`):
+  `gentleCheckSpec(spec)` widens Ring/Charge/Chain hit windows, slows Catch
+  toys, softens Lean wind forces, and enlarges Trace reach/speed/dry time
+  through optional `step(world, state, input, { gentleTiming })` with zero
+  state-shape or replay-hash changes when off (default). Stored outside saves
+  under `cloverhollow-settings` (`src/platform/game-settings.ts`).
+- Two-page open-book Journal `OPTIONS` spread (`src/ui/journal.ts`,
+  `src/ui/journal.css`): left page `SOUND & MUSIC`, right page `GAMEPLAY`
+  (`Gentle Timing`, `Key Hints`, and a dynamic `CONTROLS` reference card that
+  adds `Lantern: L` and `Flute: F` once unlocked), fitting 874x402, 1180x820,
+  and 1280x720 with zero overflow or clipping.
+- Richer Journal `MAP` (`src/core/journal.ts`, `src/ui/journal.ts`): pure
+  `landStickerProgress` and `mapBusRoutes` power curved SVG bus route lines
+  (highlighted blue when open), sibling green `✓` completion badges on
+  finished lands, interactive land inspection, and a compact `.journal-map-footer`
+  progress strip (`Stickers X/20`, `Prizes Y/13`, Bus legend).
+- Optional Desktop Key Hints ribbon (`src/ui/hud-hints.ts`, `hud-hints.css`):
+  story-styled bottom-left keycap strip (`J`, `Z` highlighted on target, `L`
+  with lavender glow once unlocked, `F` once unlocked, `M`) hidden by default,
+  auto-hidden on touch and overlays, toggled in `OPTIONS` and exposed on
+  `window.__cloverhollow.settings` in dev/harness only.
+- Evidence: `tests/unit/accessibility.test.ts`, real-input
+  `tests/e2e/accessibility.spec.ts` (Chromium + WebKit `@smoke`), and viewed
+  review JPEGs `art/review/jrpg-options-spread.jpg`, `art/review/jrpg-map-routes.jpg`,
+  and `art/review/jrpg-key-hints.jpg`.
+
+## Milestone 76: Battle Depth (Together! Party Sparkle & Flute Friends in Battle) **Status:** ✅ Completed (2026-11-26)
+- Data-driven `together` and `fluteAssist` blocks in `content/battle.json`
+  (strictly validated in `src/content/load.ts`), plus `"star"` chain look.
+- **Together! Party Sparkle Finisher** (`src/core/sim.ts`, `src/core/sound.ts`,
+  `src/platform/audio.ts`, `src/ui/battle.ts`): once two or more fighting
+  friends stand beside Fae (outside Talk mode), every `GREAT` check charges
+  optional `battle.sparkle` up to 3 stars. At 3 stars, a fresh `cancel` press
+  (`X`/Escape/B or tapping the sunny gold `.battle-together-btn`) launches a
+  3-star golden chain check with a shimmering `"battle-together"` arpeggio,
+  deals combined party-power calm, pops all active mini-boss wind-up bubbles,
+  and shares full battle XP across every fighting friend on win.
+- **Flute Friends in Battle**: once Fae has `has_flute` and at least one
+  befriended animal (`pup_friend` / `squirrel_friend`), a once-per-battle
+  `flute` press (`F`/RB or tapping `.battle-flute-btn`) calls Pond Pup (+25
+  calm), Acorn Squirrel (+1 Energy leaf and next damaging burst softened by 1,
+  preserved across 0-damage `GREAT` bursts), or both together, without altering
+  `battleCommands` indices or `battleParty`.
+- `.battle-actions-left` steps aside during active checks and burst results
+  (`phase === "check"` or `"burstResult"`) so Lean/Catch/Trace overlays stay
+  100% unobstructed on notched phones.
+- Evidence: `tests/unit/battle-depth.test.ts` (12 tests), real-input
+  `tests/e2e/battle-depth.spec.ts` (Chromium + WebKit `@smoke`), `battle-together`
+  gallery state checked across 667x375..1280x720, and viewed review JPEGs
+  `art/review/jrpg-battle-together.jpg`, `art/review/jrpg-battle-stars.jpg`,
+  and `art/review/jrpg-battle-flute.jpg`.
+
+## Milestone 77: Cloverhollow Shops Alive, Favourite Treats & Critter Compendium **Status:** ✅ Completed (2026-11-26)
+- Specialty treats catalogue (`content/treats.json`, validated in
+  `src/content/load.ts`): four cozy treats (`orchard-apple`, `fish-cracker`,
+  `berry-cone`, `cocoa-sundae`) covering all 20 critter species across the game.
+- Cloverhollow Plaza's two unvisited painted storefronts now live
+  (`content/areas/plaza.json`, `content/story/main.ink`, compiled
+  `main.ink.json`): **Grocery Market** (`grocery` at `(655, 345)`) and
+  **Ice Cream Shop** (`ice-cream` at `(895, 340)`), using sticky `# buy-treat:`
+  shop knots with zero new Ink `VAR`s so all golden-path hashes stay unchanged.
+- Optional `state.treats` (omitted when empty, validated in `src/core/save.ts`
+  at save version 10 with zero QA pack churn) and **Battle Treat Tray**
+  (`src/core/sim.ts`, `src/ui/battle.ts`): `Snack` acts directly with 0 treats
+  and opens the die-cut `.battle-treat-tray` when carrying treats, showing a
+  `♥ Fav!` badge once the critter's sticker is owned, granting big favourite
+  calm + energy + hungry-feeling bonus/wind-up pop, and supporting Cancel/Back
+  without losing a turn.
+- **Interactive Journal Critter Compendium** (`src/core/journal.ts`,
+  `src/ui/journal.ts`, `src/dev/console.ts`): clicking/tapping any owned
+  sticker opens a die-cut Field Note Card showing portrait, level, revealed
+  lands, calm count, `★ Old Friend` ribbon, SVG feeling pills, and favourite
+  treats; carried treats also show in `.journal-treats-strip` and can be
+  granted via QA console `treats all|<id>`.
+- Evidence: `tests/unit/treats-compendium.test.ts`, real-input
+  `tests/e2e/treats-compendium.spec.ts` (Chromium + WebKit `@smoke`), and
+  viewed review JPEGs `art/review/treats-journal-field-note-{1280,874}.jpg`
+  and `art/review/treats-battle-tray-{1280,874}.jpg`.
+- Gates (combined Milestones 74 to 77 on top of Milestone 73): `just check`
+  (132 unit files / 1,095 tests, all 60+ sims with zero replay hash changes,
+  23 QA packs, purity, lint), `just build` (production and harness hook
+  checks), and full `CLOVERHOLLOW_E2E_PORT=4211 just e2e` (987 passed, 2
+  skipped in 3.8 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the
   hood falls in the finale's calm-down (owner, 2026-10-17; Milestones 53 to
   56).
-- Audio: sound effects landed in Milestone 37 (owner, 2026-10-08); music and
-  ambience are still later. TestFlight and a paid developer account: later.
+- Audio: sound effects landed in Milestone 37 (owner, 2026-10-08), and the
+  soundtrack and per-land ambience landed in Milestone 74. TestFlight and a
+  paid developer account: later.
 
 ### The world and how it's played (decided 2026-10-07, open to the owner's review)
 The owner asked for EarthBound-style decisions for travel between the lands,

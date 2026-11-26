@@ -148,7 +148,9 @@ describe("coins and shops", () => {
     expect(tags).toEqual(expect.arrayContaining(["buy: snack 5", "travel: pass.bus"]));
     const prices = Object.fromEntries(
       content.world.arcade.counter.prizes.map((item) => [item.prize, item.price]));
-    expect(storyTagErrors(tags, content.world.areas, prices)).toEqual([]);
+    const treatPrices = Object.fromEntries(
+      content.world.treats.map((item) => [item.id, item.price]));
+    expect(storyTagErrors(tags, content.world.areas, prices, treatPrices)).toEqual([]);
     expect(storyTagErrors(
       ["buy: cake 5", "buy: snack nope", "travel: pass.nowhere", "travel: moon.bus"],
       content.world.areas,

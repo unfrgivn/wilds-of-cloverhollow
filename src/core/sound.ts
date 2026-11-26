@@ -69,7 +69,9 @@ export function soundCues(
     cues.push("lantern-on");
   if (previous.lantern && !next.lantern) cues.push("lantern-off");
   if (next.coins > previous.coins) cues.push("coin");
-  if (next.snacks > previous.snacks) cues.push("item");
+  if (next.snacks > previous.snacks ||
+      treatCount(next.treats) > treatCount(previous.treats))
+    cues.push("item");
   if (next.stickers.length > previous.stickers.length) cues.push("sticker");
   if (levelForXp(world.levels, next.xp) > levelForXp(world.levels, previous.xp) ||
       next.party.some((member) => {
@@ -147,6 +149,13 @@ export function soundCues(
     if (game.phase === "ding") cues.push("cook-ding");
   }
   return cues;
+}
+
+function treatCount(treats: State["treats"]): number {
+  if (treats === undefined) return 0;
+  let total = 0;
+  for (const count of Object.values(treats)) total += count;
+  return total;
 }
 
 // How many beats, toys, or puffs a chain, catch, or lean has hit so far;

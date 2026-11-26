@@ -24,6 +24,7 @@ import type {
   Grade,
   PresentCritter,
   SetPiece,
+  TreatTrayItem,
   Wild,
 } from "./types";
 import { createInkState, runInk, setInkVariables, storyHasKnot, type InkFacts } from "./ink";
@@ -234,6 +235,40 @@ export function purchaseSnack(state: State, price: number): State {
   return price < 0 || state.coins < price
     ? state
     : { ...state, coins: state.coins - price, snacks: state.snacks + 1 };
+}
+
+export function totalTreatCount(treats: State["treats"]): number {
+  if (treats === undefined) return 0;
+  let total = 0;
+  for (const count of Object.values(treats)) total += count;
+  return total;
+}
+
+export function addTreat(state: State, id: string, delta = 1): State {
+  if (delta <= 0) return state;
+  const current = state.treats?.[id] ?? 0;
+  const nextCount = Math.min(99, current + delta);
+  return { ...state, treats: { ...(state.treats ?? {}), [id]: nextCount } };
+}
+
+export function consumeTreat(state: State, id: string): State {
+  const current = state.treats?.[id] ?? 0;
+  if (current <= 0) return state;
+  const remaining: Record<string, number> = {};
+  for (const [key, count] of Object.entries(state.treats ?? {})) {
+    const updated = key === id ? count - 1 : count;
+    if (updated > 0) remaining[key] = updated;
+  }
+  if (Object.keys(remaining).length === 0) {
+    const { treats: _removed, ...rest } = state;
+    return rest;
+  }
+  return { ...state, treats: remaining };
+}
+
+export function purchaseTreat(state: State, id: string, price: number): State {
+  if (price < 0 || state.coins < price) return state;
+  return addTreat({ ...state, coins: state.coins - price }, id, 1);
 }
 
 // Draws `count` feelings for a battle's critter, one PRNG value each, in
@@ -872,6 +907,7 @@ export function battleCommands(
       },
     ];
   });
+  const totalSnacks = state.snacks + totalTreatCount(state.treats);
   return [
     {
       id: "soothe",
@@ -884,8 +920,8 @@ export function battleCommands(
     {
       id: "snack",
       label: world.battle.commands.snack.label,
-      detail: world.battle.commands.snack.snackDetail.replace("N", String(state.snacks)),
-      disabled: state.snacks === 0,
+      detail: world.battle.commands.snack.snackDetail.replace("N", String(totalSnacks)),
+      disabled: totalSnacks === 0,
       feeling: feeling("snack"),
     },
     ...(critter.canRun ? [{
@@ -896,6 +932,38 @@ export function battleCommands(
       feeling: null,
     }] : []),
   ];
+}
+
+function treatTrayItems(world: World, state: State, critter: Critter): TreatTrayItem[] {
+  const items: TreatTrayItem[] = [];
+  if (state.snacks > 0) {
+    items.push({
+      id: "snack",
+      label: "Plain Snack",
+      count: state.snacks,
+      favourite: false,
+      description: `+${critter.commands.snack.energy} leaves, +${critter.commands.snack.calm} calm`,
+    });
+  }
+  const knownSpecies = state.stickers.includes(critter.sticker.id);
+  for (const treat of world.treats) {
+    const count = state.treats?.[treat.id] ?? 0;
+    if (count <= 0) continue;
+    items.push({
+      id: treat.id,
+      label: treat.name,
+      count,
+      favourite: knownSpecies && treat.favourites.includes(critter.species),
+      description: treat.description,
+    });
+  }
+  items.push({ id: "back", label: "Back", count: 0, favourite: false, description: "" });
+  return items;
+}
+
+function closeTreatMenu(battle: Battle): Battle {
+  const { treatMenu: _menu, treatSelected: _selected, ...rest } = battle;
+  return rest;
 }
 
 // A turn passes: every resting friend is one turn closer to ready. Entries at
@@ -1032,6 +1100,15 @@ export function battleView(world: World, state: State): BattleView | null {
         max: sparkleMax,
         ready: sparkleCount >= sparkleMax && battle.phase === "command",
       };
+  const trayItems = battle.phase === "command" && battle.treatMenu === true
+    ? treatTrayItems(world, state, critter)
+    : null;
+  const treatTray = trayItems === null
+    ? null
+    : {
+        items: trayItems,
+        selected: Math.max(0, Math.min(trayItems.length - 1, battle.treatSelected ?? 0)),
+      };
   return {
     critterId: critter.id,
     critterName: critter.name,
@@ -1058,6 +1135,7 @@ export function battleView(world: World, state: State): BattleView | null {
     sparkle,
     fluteAssist: fluteAssistView(world, state, battle, critter),
     burstSoften: battle.burstSoften ?? 0,
+    treatTray,
   };
 }
 
@@ -1392,6 +1470,74 @@ function battleStep(
     return { ...nextBase, battle: next };
   }
   if (next.phase === "command") {
+    if (next.treatMenu === true) {
+      const items = treatTrayItems(world, state, critter);
+      const currentSelected = Math.max(0, Math.min(items.length - 1, next.treatSelected ?? 0));
+      const cancelEdge = input.cancel && !state.previousInput.cancel;
+      if (cancelEdge) return { ...nextBase, battle: closeTreatMenu(next) };
+      const up = input.move.y < -0.5 && state.previousInput.move.y >= -0.5;
+      const down = input.move.y > 0.5 && state.previousInput.move.y <= 0.5;
+      if (up || down) {
+        const nextSel = (currentSelected + (down ? 1 : -1) + items.length) % items.length;
+        return { ...nextBase, battle: { ...next, treatSelected: nextSel } };
+      }
+      const tapped = input.choose !== undefined && input.choose >= 0 &&
+        input.choose < items.length ? input.choose : undefined;
+      if (tapped === undefined && !confirm) return { ...nextBase, battle: next };
+      const picked = items[tapped ?? currentSelected];
+      if (picked === undefined || picked.id === "back")
+        return { ...nextBase, battle: closeTreatMenu(next) };
+      const going = next.windUp;
+      const pop = going === null ? -1 : bubbleAnswered(world, going, "snack");
+      const answered = going === null ? answers(world, next.feelings[0], "snack") : pop >= 0;
+      const windUp = going === null || pop < 0
+        ? going
+        : { ...going, popped: going.popped.map((popped, index) => popped || index === pop) };
+      const closed = closeTreatMenu(next);
+      if (picked.id === "snack") {
+        const message = battleMessage(closed, critter.lines.snack, "result");
+        return {
+          ...nextBase,
+          snacks: state.snacks - 1,
+          battle: {
+            ...message,
+            answered,
+            windUp,
+            rest: restTurn(closed.rest),
+            energy: Math.min(
+              critter.energyMax,
+              closed.energy + critter.commands.snack.energy,
+            ),
+            calm: Math.min(
+              calmLimit(critter),
+              closed.calm + critter.commands.snack.calm +
+                (answered ? world.battle.feelingBonus : 0),
+            ),
+          },
+        };
+      }
+      const treat = world.treats.find((item) => item.id === picked.id);
+      if (treat === undefined) return { ...nextBase, battle: closed };
+      const isFav = treat.favourites.includes(critter.species);
+      const calmGain = (isFav ? treat.favouriteCalm : treat.calm) +
+        (answered ? world.battle.feelingBonus : 0);
+      const message = battleMessage(
+        closed,
+        isFav ? treat.favouriteLine : treat.useLine,
+        "result",
+      );
+      return {
+        ...consumeTreat(nextBase, treat.id),
+        battle: {
+          ...message,
+          answered,
+          windUp,
+          rest: restTurn(closed.rest),
+          energy: Math.min(critter.energyMax, closed.energy + treat.energy),
+          calm: Math.min(calmLimit(critter), closed.calm + calmGain),
+        },
+      };
+    }
     // The lantern, once Fae has it, shows the turn-after feeling too, for the
     // rest of the battle (spec 8); not in a wind-up, whose bubbles hide it.
     const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
@@ -1534,6 +1680,12 @@ function battleStep(
       ? going
       : { ...going, popped: going.popped.map((popped, index) => popped || index === pop) };
     if (chosen.id === "snack") {
+      if (totalTreatCount(state.treats) > 0) {
+        return {
+          ...nextBase,
+          battle: { ...next, treatMenu: true, treatSelected: 0 },
+        };
+      }
       const message = battleMessage(next, critter.lines.snack, "result");
       return {
         ...nextBase,
@@ -1722,6 +1874,9 @@ function applyItemTags(state: State, tags: string[]): State {
     const tag = raw.trim();
     const price = /^buy:\s*snack\s+(\d+)$/.exec(tag)?.[1];
     if (price !== undefined) next = purchaseSnack(next, Number(price));
+    const treat = /^buy-treat:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
+    if (treat?.[1] !== undefined && treat[2] !== undefined)
+      next = purchaseTreat(next, treat[1], Number(treat[2]));
     const gift = /^gift:\s*(snack|coins)\s+(\d+)$/.exec(tag);
     if (gift?.[1] === "snack") next = { ...next, snacks: next.snacks + Number(gift[2]) };
     if (gift?.[1] === "coins") next = { ...next, coins: next.coins + Number(gift[2]) };

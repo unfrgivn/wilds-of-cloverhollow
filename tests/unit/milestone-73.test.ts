@@ -71,6 +71,10 @@ function baseBattleView(battle: Battle, overrides: Partial<BattleView> = {}): Ba
     lastGrade: battle.lastGrade,
     rewardSticker: battle.rewardSticker,
     talk: null,
+    sparkle: null,
+    fluteAssist: null,
+    burstSoften: 0,
+    treatTray: null,
     ...overrides,
   };
 }

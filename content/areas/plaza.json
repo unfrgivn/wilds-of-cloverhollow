@@ -331,6 +331,24 @@
         "y": 420
       },
       "prompt": "Talk"
+    },
+    {
+      "id": "grocery",
+      "knot": "grocery",
+      "point": {
+        "x": 655,
+        "y": 345
+      },
+      "prompt": "Talk"
+    },
+    {
+      "id": "ice-cream",
+      "knot": "ice_cream",
+      "point": {
+        "x": 895,
+        "y": 340
+      },
+      "prompt": "Talk"
     }
   ],
   "spawns": {

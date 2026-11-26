@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 72)
+Last updated: 2026-11-26 (Milestone 77)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -571,6 +571,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   footprint and a `Look` prompt. The pass stop returns to `plaza.bus-stop`.
   The placeholder `harness` area stays for deterministic tests (fixture
   `harness`). Areas have a display `name` (the title's Continue line).
+- The plaza's north storefronts host three active shops: the bakery (`bakery` at
+  (1180, 420), selling plain snacks for 5 coins), the Grocery Market (`grocery`
+  at (655, 345), knot `grocery`, selling `Orchard Apple` and `Fish Cracker` for
+  8 coins each), and the Ice Cream Shop (`ice-cream` at (895, 340), knot
+  `ice_cream`, selling `Berry Swirl Cone` for 10 coins and `Cozy Cocoa Sundae`
+  for 12 coins). Specialty treats are authored in `content/treats.json` and
+  validated at load (`parseTreats`): unique valid ids, positive integer
+  `price`/`energy`/`calm`/`favouriteCalm` (`favouriteCalm >= calm`), and
+  non-empty `favourites` species lists covering every critter species in the
+  game.
 - The arcade (Milestone 29): `arcade`, "Cloverhollow Arcade", a 1200x800
   painted cutaway from `arcade_interior.png` (arcade cabinets, the ticket
   counter, a claw machine, a skee-ball lane, a gumball machine). Its door is on the back-left
@@ -1261,10 +1271,17 @@ trunks keep its two exits.
 - A line may carry `# buy: snack <price>`: as it's shown, Fae pays `price`
   coins for one snack if she has them (`purchaseSnack`). The story's
   `coins()` external answers her coins, so a shop only offers to sell when
-  she can pay. The shops are the plaza bakery (interactable `bakery` at
+  she can pay. The snack shops are the plaza bakery (interactable `bakery` at
   (1180, 420), under its window) and Pinecone Pass's cocoa stand
   (`cocoa_stand`), 5 coins a snack. Their choices are sticky (`+`), so they
   sell on every visit.
+- A line may carry `# buy-treat: <treat-id> <price>`: as it's shown, if Fae has
+  `price` coins she pays them and gains one of `<treat-id>` in `state.treats`
+  (capped at 99 per treat, `purchaseTreat`), emitting the `item` sound cue. Load
+  validation (`storyTagErrors`) checks every `buy-treat` tag against
+  `content/treats.json` so only known treats at their exact content prices are
+  accepted. The plaza's `grocery` and `ice_cream` knots use sticky choices
+  (`+`) gated on `coins()` with zero new Ink `VAR` declarations.
 - A line may carry `# gift: snack <count>`: as it's shown, Fae gets `count`
   snacks for free (the clubhouse fridge, Milestone 43). `# gift: coins
   <count>` gives her coins (the pond's tin, Milestone 47), and `# feed: snack
@@ -1588,7 +1605,24 @@ trunks keep its two exits.
   (Soothe, Snack, or a friend's) takes one turn off every other resting
   friend. A resting command is disabled with its member's `resting` detail.
   Snack spends one of Fae's `snacks` (gone for good, whatever happens next),
-  shows how many she has (`×N`), and is disabled at zero.
+  shows her combined snack and specialty treat count (`×N`), and is disabled at
+  zero.
+- Specialty Treats & Battle Treat Tray (`content/treats.json`): when Fae carries
+  zero specialty treats, choosing `Snack` spends a plain snack immediately as
+  before. When Fae carries one or more specialty treats (`totalTreatCount > 0`),
+  choosing `Snack` opens the die-cut Battle Treat Tray (`battle.treatMenu`,
+  `battleView.treatTray`, `.battle-treat-tray`) inside the command menu slot,
+  listing Plain Snack (if `snacks > 0`), each carried specialty treat in
+  catalogue order, and `Back`. Up/down wraps the tray selection; Cancel (`X` /
+  Escape, without firing Together!) or `Back` closes the tray without spending
+  a turn; confirm or click/tap picks. Once Fae owns a critter's sticker in her
+  album, any carried treat listing that critter's species displays a coral-cream
+  heart `Fav!` badge (inline SVG). Using a specialty treat decrements its count
+  (dropping the key at zero and omitting `state.treats` when empty), restores
+  `treat.energy` leaves, adds `treat.favouriteCalm` (if the critter's species is
+  a favourite) or `treat.calm` calm, answers a `hungry` feeling or pops a
+  `hungry` wind-up bubble for the feeling bonus, ticks resting friends, and
+  shows `treat.favouriteLine` or `treat.useLine`.
 - Checks (Milestone 40): every Fae-side command (side `critter`) and every
   burst (side `fae`) plays a check, `battle.check` (the phase is `check`): a
   copy of its spec plus its own progress. It stays as it ended, with its
@@ -2624,6 +2658,21 @@ trunks keep its two exits.
   are cropped with percentage backgrounds, exact at any box size, and the
    die-cut rim is stacked hard drop-shadows that follow the image's silhouette.
    The reward card uses both.
+- Backpack Treats Strip: when Fae carries one or more specialty treats
+  (`carriedTreats`), a dashed cream strip (`.journal-treats-strip`) renders
+  below the `NOTES` heading row showing each carried treat pill (`<Name> ×N`).
+  When Fae carries no specialty treats, the strip stays hidden.
+- Interactive Journal Critter Compendium (`critterFieldNote` in
+  `src/core/journal.ts`): every owned sticker slot in `.journal-stickers` is
+  clickable and keyboard-focusable (`role="button"`, `tabindex="0"`, Enter/Space
+  or click/tap). Selecting an owned sticker opens a die-cut Field Note Card
+  (`.journal-field-note`) centered inside `.journal-book`, showing its calm
+  portrait, name, `Lv N · <chaosName>`, a golden `★ Old Friend` ribbon when
+  recurring and `calms >= 3`, revealed lands where it lives, calm count, inline
+  SVG feeling pills, and a coral-cream heart pill listing its favourite
+  treat(s). Dismissing via its 44 px `×` button, clicking the backdrop, pressing
+  Escape (which stops propagation so the journal stays open), switching tabs, or
+  closing the journal closes the card.
 - The STICKERS page continues below the album with a PRIZES shelf from
   `world.arcade.prizes`. Owned prizes use the prize atlas frame, die-cut rim,
   and name; unowned prizes are dashed `?` slots without names. The shelf is
@@ -2640,7 +2689,10 @@ trunks keep its two exits.
 - Format: `{ version: 10, state }`, the whole core state, including the
   serialized Ink state (story variables and choices), the party, stickers,
   the set pieces' moods, this visit's recurring critters, the calm counts,
-  the lantern, coins and snacks, the PRNG, the tick, arcade state, prizes,
+  the lantern, coins and snacks, optional specialty `treats` (omitted when
+  empty so saves without treats remain bit-identical at version 10; validated
+  when present as a record of valid treat ids with integer counts `1..99`), the
+  PRNG, the tick, arcade state, prizes,
   XP and the party's XP are included. Version 1 (Maddie in `maddie` and
   `trail`), version 2 (no lantern), version 3 (no coins or snacks), and
   version 4 (one critter of each kind, no recurring critters) are refused and
@@ -2761,7 +2813,9 @@ trunks keep its two exits.
   console a thin DOM shell: `help`; `xp <fae|member> <n>` and `level
   <fae|member> <n>` (levels 1 to 99; a level moves XP to its threshold);
   `coins`, `snacks`, and `tickets` (capped at 999, 99, and 999, the layouts
-  the journal and battle menu were tested at); `stickers all|<id>` and `prizes
+  the journal and battle menu were tested at); `treats all|<id>` (adding +1 of
+  every specialty treat or the named treat id, capped at 99); `stickers
+  all|<id>` and `prizes
   all|<id>` (granting from the catalogues); and `lantern|lasso|flute|map
   on|off`, which set exactly the four story variables `has_lantern`,
   `has_lasso`, `has_flute`, and `has_map` (a name the story doesn't declare

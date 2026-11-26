@@ -29,7 +29,7 @@ import {
   parseCometCalibration,
   parseSkeeCalibration,
 } from "../content/load";
-import { createState, creditEntries, inkFacts, runInk } from "../core";
+import { createState, creditEntries, critterFieldNote, inkFacts, runInk } from "../core";
 import { atlasImage, type AtlasJson } from "../ui/atlas";
 import { clawGalleryView } from "./claw-gallery";
 import type { BattleTalk } from "../core";
@@ -446,6 +446,11 @@ function renderGalleryState(): void {
     "bell",
     "cloud",
   ];
+  const frogFieldNote = critterFieldNote(
+    content.world,
+    { ...creditsBase, stickers: ["fountain-frog"], calms: { frog: 1 } },
+    "fountain-frog",
+  );
   const stickers = stickerIds.map((id) => ({
     id,
     name: id === "frog" ? "Fountain Frog" : id,
@@ -458,6 +463,7 @@ function renderGalleryState(): void {
             atlas: { w: 1536, h: 1024 },
           }
         : null,
+    fieldNote: id === "frog" && state !== "journal-empty" ? frogFieldNote : null,
   }));
   const journalView: JournalView = {
     visible: journalState,

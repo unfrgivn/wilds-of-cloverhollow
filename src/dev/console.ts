@@ -1,4 +1,5 @@
 import { inkVariable, setInkVariables } from "../core/ink";
+import { addTreat } from "../core/sim";
 import type { State } from "../core/types";
 
 // The QA console's commands (Milestone 67, spec 11). Pure functions over the
@@ -12,6 +13,7 @@ export type ConsoleContext = {
   story: Record<string, unknown>;
   stickerIds: string[];
   prizeIds: string[];
+  treatIds: string[];
   thresholds: number[];
 };
 
@@ -44,6 +46,7 @@ const CONSOLE_HELP = [
   "coins <n>          set coins (0-999)",
   "snacks <n>         set snacks (0-99)",
   "tickets <n>        set tickets (0-999)",
+  "treats all|<id>    grant specialty treats",
   "stickers all|<id>  grant stickers",
   "prizes all|<id>    grant prizes",
   "lantern on|off     carry the lantern",
@@ -187,6 +190,28 @@ function toolCommand(
   };
 }
 
+function treatCommand(
+  context: ConsoleContext,
+  state: State,
+  args: string[],
+): ConsoleOutcome {
+  const [id] = args;
+  if (id === undefined) return { kind: "error", message: "Usage: treats all|<id>." };
+  if (id === "all") {
+    let next = state;
+    for (const treatId of context.treatIds) next = addTreat(next, treatId, 1);
+    return {
+      kind: "applied",
+      state: next,
+      message: `+1 of all ${context.treatIds.length} treats.`,
+    };
+  }
+  if (!context.treatIds.includes(id))
+    return { kind: "error", message: `No treat "${id}". Try "treats all".` };
+  const next = addTreat(state, id, 1);
+  return { kind: "applied", state: next, message: `${id} = ${next.treats?.[id] ?? 0}.` };
+}
+
 function saveCommand(args: string[]): ConsoleOutcome {
   const [name] = args;
   if (name === undefined || !/^[a-z0-9][a-z0-9-]{0,23}$/.test(name))
@@ -213,6 +238,7 @@ export function runConsoleCommand(
     case "coins": return supplyCommand(state, args, "coins");
     case "snacks": return supplyCommand(state, args, "snacks");
     case "tickets": return supplyCommand(state, args, "tickets");
+    case "treats": return treatCommand(context, state, args);
     case "stickers": return collectionCommand(context, state, args, "stickers");
     case "prizes": return collectionCommand(context, state, args, "prizes");
     case "lantern": return toolCommand(context, state, args, "lantern");

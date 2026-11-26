@@ -9500,6 +9500,256 @@
         ],
         null
       ],
+      "grocery": [
+        [
+          "^Fresh orchard apples and crunchy fish crackers! Every critter has a favourite. ",
+          "#",
+          "^speaker: Grocer",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          8,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Treats are 8 coins each. Come back after calming a few critters! ",
+                "#",
+                "^speaker: Grocer",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.11"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Orchard Apple (8 coins)",
+          "/str",
+          {
+            "x()": "coins"
+          },
+          8,
+          ">=",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Fish Cracker (8 coins)",
+          "/str",
+          {
+            "x()": "coins"
+          },
+          8,
+          ">=",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Crisp orchard slices, packed in paper! Meadow and forest critters love these. ",
+              "#",
+              "^speaker: Grocer ",
+              "/#",
+              "#",
+              "^buy-treat: orchard-apple 8",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^Crunchy fish crackers, fresh from the jar! Pups, cats, and beach critters adore them. ",
+              "#",
+              "^speaker: Grocer ",
+              "/#",
+              "#",
+              "^buy-treat: fish-cracker 8",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-2": [
+              "\n",
+              "^Stop by whenever your backpack needs a treat! ",
+              "#",
+              "^speaker: Grocer",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
+      "ice_cream": [
+        [
+          "^Welcome to Cloverhollow Scoops! Nothing calms a fizzy day like ice cream. ",
+          "#",
+          "^speaker: Scoops",
+          "/#",
+          "\n",
+          "ev",
+          {
+            "x()": "coins"
+          },
+          10,
+          "<",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^A Berry Swirl Cone is 10 coins, and a Cozy Cocoa Sundae is 12. See you soon! ",
+                "#",
+                "^speaker: Scoops",
+                "/#",
+                "\n",
+                "done",
+                {
+                  "->": ".^.^.^.11"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^Berry Swirl Cone (10 coins)",
+          "/str",
+          {
+            "x()": "coins"
+          },
+          10,
+          ">=",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Cozy Cocoa Sundae (12 coins)",
+          "/str",
+          {
+            "x()": "coins"
+          },
+          12,
+          ">=",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 5
+          },
+          "ev",
+          "str",
+          "^Not now",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 4
+          },
+          {
+            "c-0": [
+              "\n",
+              "^One double-scoop Berry Swirl Cone! Folks around town can't resist it. ",
+              "#",
+              "^speaker: Scoops ",
+              "/#",
+              "#",
+              "^buy-treat: berry-cone 10",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-1": [
+              "\n",
+              "^A warm Cozy Cocoa Sundae with marshmallows! Winter friends go wild for this. ",
+              "#",
+              "^speaker: Scoops ",
+              "/#",
+              "#",
+              "^buy-treat: cocoa-sundae 12",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "c-2": [
+              "\n",
+              "^Keep cool out there, Fae! ",
+              "#",
+              "^speaker: Scoops",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.g-0"
+              },
+              null
+            ],
+            "g-0": [
+              "done",
+              null
+            ]
+          }
+        ],
+        null
+      ],
       "music_closed": [
         "^The music room is locked. Music class is after PE. ",
         "#",

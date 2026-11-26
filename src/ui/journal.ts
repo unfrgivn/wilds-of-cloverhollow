@@ -1,9 +1,16 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
-import { coinMarkup, cookieMarkup, ticketMarkup } from "./icons";
+import {
+  coinMarkup,
+  cookieMarkup,
+  feelingMarkup,
+  heartMarkup,
+  icon,
+  ticketMarkup,
+} from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
-import type { BusRoute, LandProgress } from "../core/journal";
+import type { BusRoute, CarriedTreat, CritterFieldNote, LandProgress } from "../core/journal";
 import type { LevelStats } from "../core/levels";
 
 export type JournalPage = "notes" | "map" | "options";
@@ -13,6 +20,7 @@ export type JournalSticker = {
   name: string;
   owned: boolean;
   image: AtlasImage | null;
+  fieldNote?: CritterFieldNote | null;
 };
 export type JournalPrize = JournalSticker;
 
@@ -20,6 +28,7 @@ export type JournalView = {
   visible: boolean;
   /** Newest first; the game decides the order. */
   notes: string[];
+  treats?: CarriedTreat[];
   stickers: JournalSticker[];
   prizes: JournalPrize[];
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
@@ -123,7 +132,7 @@ function makeSliderButton(className: string, ariaLabel: string): {
   return { button, value };
 }
 
-function addSlot(grid: HTMLElement): Slot {
+function addSlot(grid: HTMLElement, onInspect?: () => void): Slot {
   const root = element("div", "journal-slot");
   const image = element("div", "journal-sticker-image die-cut");
   image.setAttribute("role", "img");
@@ -132,6 +141,15 @@ function addSlot(grid: HTMLElement): Slot {
   unknown.setAttribute("aria-label", "A sticker still to find");
   const name = element("div", "journal-name");
   root.append(image, unknown, name);
+  if (onInspect !== undefined) {
+    root.addEventListener("click", () => onInspect());
+    root.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onInspect();
+      }
+    });
+  }
   grid.append(root);
   return { root, image, unknown, name, imageKey: "" };
 }
@@ -247,11 +265,14 @@ export function createJournal(root: HTMLElement): {
   volumeLabel.append(volume.button);
   supplies.append(volumeLabel);
   notesHead.append(notesHeading, supplies);
+  const treatsStrip = element("div", "journal-treats-strip");
+  treatsStrip.setAttribute("aria-label", "Specialty treats");
+  treatsStrip.hidden = true;
   const notes = element("ul", "journal-notes");
   const empty = element("p", "journal-empty");
   empty.textContent = "Nothing yet. Look around!";
   const members = element("div", "journal-members");
-  notesPage.append(notesHead, members, notes, empty);
+  notesPage.append(notesHead, treatsStrip, members, notes, empty);
 
   const stickersPage = element("section", "journal-page journal-stickers-page");
   const stickersHeading = element("h2", "journal-heading");
@@ -384,7 +405,52 @@ export function createJournal(root: HTMLElement): {
   optionsTab.setAttribute("aria-label", "Options");
   tabs.append(notesTab, mapTab, optionsTab);
 
-  book.append(label, close, notesPage, stickersPage, mapPage, optionsPage, tabs);
+  const fieldBackdrop = element("div", "journal-field-backdrop");
+  fieldBackdrop.hidden = true;
+  const fieldCard = element("article", "journal-field-note");
+  fieldCard.setAttribute("role", "dialog");
+  fieldCard.setAttribute("aria-modal", "true");
+  fieldCard.setAttribute("aria-label", "Critter field note");
+  const fieldClose = element("button", "journal-field-close");
+  fieldClose.type = "button";
+  fieldClose.setAttribute("aria-label", "Close field note");
+  fieldClose.textContent = "×";
+  const fieldLeft = element("div", "journal-field-left");
+  const fieldPortrait = element("div", "journal-field-portrait die-cut");
+  fieldPortrait.setAttribute("role", "img");
+  const fieldOldFriend = element("span", "journal-field-old-friend");
+  fieldOldFriend.textContent = "★ Old Friend";
+  fieldOldFriend.hidden = true;
+  fieldLeft.append(fieldPortrait, fieldOldFriend);
+  const fieldBody = element("div", "journal-field-body");
+  const fieldName = element("h3", "journal-field-name");
+  const fieldSub = element("div", "journal-field-sub");
+  const fieldMeta = element("div", "journal-field-meta");
+  const makeFieldRow = (
+    keyText: string,
+    valueNode: HTMLElement,
+  ): HTMLDivElement => {
+    const row = element("div", "journal-field-row");
+    const key = element("span", "journal-field-key");
+    key.textContent = keyText;
+    row.append(key, valueNode);
+    return row;
+  };
+  const fieldLands = element("span", "journal-field-val journal-field-lands");
+  const fieldCalms = element("span", "journal-field-val journal-field-calms");
+  const fieldFeelings = element("div", "journal-field-feelings");
+  const fieldLoves = element("div", "journal-field-loves");
+  fieldMeta.append(
+    makeFieldRow("Found in", fieldLands),
+    makeFieldRow("Calmed", fieldCalms),
+    makeFieldRow("Feelings", fieldFeelings),
+    makeFieldRow("Loves", fieldLoves),
+  );
+  fieldBody.append(fieldName, fieldSub, fieldMeta);
+  fieldCard.append(fieldClose, fieldLeft, fieldBody);
+  fieldBackdrop.append(fieldCard);
+
+  book.append(label, close, notesPage, stickersPage, mapPage, optionsPage, tabs, fieldBackdrop);
   root.append(book);
 
   let onClose: () => void = () => undefined;
@@ -401,9 +467,72 @@ export function createJournal(root: HTMLElement): {
   let mapSignature = "";
   let routeSignature = "";
   let badgeSignature = "";
+  let treatsSignature = "";
+  let fieldSignature = "";
+  let inspectedStickerId: string | null = null;
   let selectedLandId: string | null = null;
   let hoveredLandId: string | null = null;
   let latestView: JournalView | null = null;
+
+  const closeFieldNote = (): void => {
+    if (inspectedStickerId === null && fieldBackdrop.hidden) return;
+    inspectedStickerId = null;
+    fieldSignature = "";
+    fieldBackdrop.hidden = true;
+  };
+
+  const syncFieldNote = (view: JournalView): void => {
+    if (inspectedStickerId === null) {
+      if (!fieldBackdrop.hidden) fieldBackdrop.hidden = true;
+      return;
+    }
+    const sticker = view.stickers.find(
+      (candidate) => candidate.id === inspectedStickerId && candidate.owned &&
+        candidate.fieldNote != null,
+    );
+    const note = sticker?.fieldNote ?? null;
+    if (sticker === undefined || note === null) {
+      closeFieldNote();
+      return;
+    }
+    fieldBackdrop.hidden = false;
+    const signature = [
+      sticker.id,
+      note.level,
+      note.calms,
+      note.oldFriend,
+      note.lands.join(","),
+      note.feelings.map((item) => item.id).join(","),
+      note.favouriteTreats.join(","),
+    ].join("|");
+    if (signature === fieldSignature) return;
+    fieldSignature = signature;
+    if (sticker.image !== null) applyAtlasCrop(fieldPortrait, sticker.image);
+    setAttribute(fieldPortrait, "aria-label", note.name);
+    setText(fieldName, note.name);
+    setText(fieldSub, `Lv ${note.level} · ${note.chaosName}`);
+    fieldOldFriend.hidden = !note.oldFriend;
+    setText(fieldLands, note.lands.join(", "));
+    setText(fieldCalms, `${note.calms} ${note.calms === 1 ? "time" : "times"}`);
+    fieldFeelings.replaceChildren(
+      ...note.feelings.map((feeling) => {
+        const pill = element("span", "journal-field-feeling");
+        pill.append(icon(feelingMarkup[feeling.id], "journal-field-feeling-icon"), feeling.label);
+        return pill;
+      }),
+    );
+    const lovesPill = element("span", "journal-field-love-pill");
+    lovesPill.append(
+      icon(heartMarkup, "journal-field-heart"),
+      note.favouriteTreats.join(", "),
+    );
+    fieldLoves.replaceChildren(lovesPill);
+  };
+
+  fieldClose.addEventListener("click", closeFieldNote);
+  fieldBackdrop.addEventListener("click", (event) => {
+    if (event.target === fieldBackdrop) closeFieldNote();
+  });
 
   const syncMapDetail = (view: JournalView): void => {
     const inspectId = hoveredLandId ?? selectedLandId;
@@ -431,6 +560,7 @@ export function createJournal(root: HTMLElement): {
   };
 
   const setPage = (next: JournalPage): void => {
+    closeFieldNote();
     if (page === next && book.getAttribute("data-journal-page") === next) return;
     page = next;
     setAttribute(book, "data-journal-page", page);
@@ -451,6 +581,14 @@ export function createJournal(root: HTMLElement): {
   ]);
   const keydown = (event: KeyboardEvent): void => {
     if (book.hidden) return;
+    if (inspectedStickerId !== null) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeFieldNote();
+      }
+      return;
+    }
     if (event.target !== null && sliders.has(event.target)) return;
     if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
       event.preventDefault();
@@ -517,6 +655,7 @@ export function createJournal(root: HTMLElement): {
       latestView = view;
       book.hidden = !view.visible;
       if (!view.visible && wasVisible) {
+        closeFieldNote();
         setPage("notes");
         selectedLandId = null;
         hoveredLandId = null;
@@ -555,6 +694,28 @@ export function createJournal(root: HTMLElement): {
       if (view.hasFlute) toolParts.push("Flute: F");
       controlsTools.hidden = toolParts.length === 0;
       setText(controlsTools, toolParts.join(" · "));
+
+      const treats = view.treats ?? [];
+      const nextTreatsSignature = treats.map((item) => `${item.id}:${item.count}`).join("|");
+      if (nextTreatsSignature !== treatsSignature) {
+        treatsSignature = nextTreatsSignature;
+        treatsStrip.hidden = treats.length === 0;
+        if (treats.length === 0) {
+          treatsStrip.replaceChildren();
+        } else {
+          const stripLabel = element("span", "journal-treats-label");
+          stripLabel.textContent = "TREATS";
+          treatsStrip.replaceChildren(
+            stripLabel,
+            ...treats.map((item) => {
+              const pill = element("span", "journal-treat-pill");
+              setAttribute(pill, "data-treat", item.id);
+              pill.append(icon(heartMarkup, "journal-treat-heart"), `${item.name} ×${item.count}`);
+              return pill;
+            }),
+          );
+        }
+      }
 
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));
       while (notes.children.length > view.notes.length) notes.lastElementChild?.remove();
@@ -612,17 +773,36 @@ export function createJournal(root: HTMLElement): {
                 `Life ${member.stats.life} · Guard ${member.stats.guard}`,
         );
       });
-      while (slots.length < view.stickers.length) slots.push(addSlot(grid));
+      while (slots.length < view.stickers.length) {
+        const slotIndex = slots.length;
+        slots.push(addSlot(grid, () => {
+          const current = latestView?.stickers[slotIndex];
+          if (current === undefined || !current.owned || current.fieldNote == null) return;
+          inspectedStickerId = current.id;
+          if (latestView !== null) syncFieldNote(latestView);
+        }));
+      }
       while (slots.length > view.stickers.length) slots.pop()?.root.remove();
       view.stickers.forEach((sticker, index) => {
         const slot = slots[index];
         if (slot === undefined) return;
         const image = sticker.owned ? sticker.image : null;
+        const inspectable = image !== null && sticker.fieldNote != null;
         slot.image.hidden = image === null;
         slot.unknown.hidden = image !== null;
         slot.name.hidden = image === null;
         setText(slot.name, image === null ? "" : sticker.name);
         setAttribute(slot.root, "data-owned", String(image !== null));
+        slot.root.classList.toggle("is-inspectable", inspectable);
+        if (inspectable) {
+          setAttribute(slot.root, "tabindex", "0");
+          setAttribute(slot.root, "role", "button");
+          setAttribute(slot.root, "aria-label", `Inspect ${sticker.name}`);
+        } else {
+          if (slot.root.hasAttribute("tabindex")) slot.root.removeAttribute("tabindex");
+          if (slot.root.hasAttribute("role")) slot.root.removeAttribute("role");
+          if (slot.root.hasAttribute("aria-label")) slot.root.removeAttribute("aria-label");
+        }
         if (image === null) {
           slot.imageKey = "";
           return;
@@ -636,6 +816,7 @@ export function createJournal(root: HTMLElement): {
           slot.imageKey = key;
         }
       });
+      syncFieldNote(view);
       while (prizeSlots.length < view.prizes.length) prizeSlots.push(addSlot(prizesGrid));
       while (prizeSlots.length > view.prizes.length) prizeSlots.pop()?.root.remove();
       view.prizes.forEach((prize, index) => {

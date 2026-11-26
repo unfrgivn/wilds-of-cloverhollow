@@ -1,0 +1,85 @@
+{
+  "treats": [
+    {
+      "id": "orchard-apple",
+      "name": "Orchard Apple",
+      "price": 8,
+      "energy": 2,
+      "calm": 15,
+      "favouriteCalm": 45,
+      "favourites": [
+        "bunny",
+        "squirrel",
+        "hamster",
+        "lamb",
+        "hedgehog",
+        "owl"
+      ],
+      "description": "Crisp red orchard slices from Cloverhollow Market.",
+      "useLine": "Fae shares crisp Orchard Apple slices. Fresh and crunchy!",
+      "favouriteLine": "Ooh, Orchard Apple! Their absolute favourite! They munch happily!"
+    },
+    {
+      "id": "fish-cracker",
+      "name": "Fish Cracker",
+      "price": 8,
+      "energy": 2,
+      "calm": 15,
+      "favouriteCalm": 45,
+      "favourites": [
+        "frog",
+        "cat",
+        "raccoon",
+        "pup",
+        "crab",
+        "penguin",
+        "bluebird",
+        "gull"
+      ],
+      "description": "Savoury little fish-shaped crackers from Cloverhollow Market.",
+      "useLine": "Fae shares a crunchy Fish Cracker. Tasty and salty!",
+      "favouriteLine": "Crunchy Fish Crackers! Their favourite! Tail, wings, or flippers wiggle with joy!"
+    },
+    {
+      "id": "berry-cone",
+      "name": "Berry Swirl Cone",
+      "price": 10,
+      "energy": 3,
+      "calm": 20,
+      "favouriteCalm": 50,
+      "favourites": [
+        "arcade-keeper",
+        "lifeguard",
+        "art-teacher",
+        "principal",
+        "hooded-kid",
+        "frog",
+        "bluebird",
+        "gull"
+      ],
+      "description": "Double-scoop bubblegum-berry cone from the Ice Cream Shop.",
+      "useLine": "Fae shares a chilly Berry Swirl Cone. Sweet and refreshing!",
+      "favouriteLine": "A Berry Swirl Cone! Their favourite scoop! Every bit of fizz melts into a smile!"
+    },
+    {
+      "id": "cocoa-sundae",
+      "name": "Cozy Cocoa Sundae",
+      "price": 12,
+      "energy": 3,
+      "calm": 20,
+      "favouriteCalm": 55,
+      "favourites": [
+        "lodge-keeper",
+        "penguin",
+        "hamster",
+        "owl",
+        "cat",
+        "pup",
+        "hooded-kid"
+      ],
+      "description": "Warm fudge and marshmallow swirl from the Ice Cream Shop.",
+      "useLine": "Fae shares a Cozy Cocoa Sundae. Warm, sweet, and soothing!",
+      "favouriteLine": "A Cozy Cocoa Sundae! Their favourite! Warmth washes all the fizz right away!"
+    }
+  ]
+}

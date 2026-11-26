@@ -7,6 +7,9 @@
 .battle-soften-pill[hidden],
 .battle-commands[hidden],
 .battle-command-detail[hidden],
+.battle-treat-tray[hidden],
+.battle-treat-count[hidden],
+.battle-treat-fav[hidden],
 .battle-grade[hidden],
 .battle-reward[hidden] {
   display: none;
@@ -310,6 +313,133 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 1;
+}
+
+/* Specialty Treat Tray: replaces the command menu slot when Fae carries treats. */
+.battle-treat-tray {
+  position: fixed;
+  right: calc(24px + var(--safe-right));
+  bottom: calc(114px + var(--safe-bottom));
+  z-index: var(--z-commands);
+  box-sizing: border-box;
+  width: 260px;
+  padding: 6px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 18px;
+  background: var(--sticker-paper);
+  box-shadow: var(--sticker-shadow);
+  pointer-events: auto;
+  font-family: var(--sticker-font);
+}
+.battle-treat-title {
+  position: absolute;
+  top: -17px;
+  left: 14px;
+  padding: 2px 10px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 10px;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  line-height: 1.2;
+}
+.battle-treat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: calc(100vh - 236px - var(--safe-top) - var(--safe-bottom));
+  overflow-y: auto;
+  padding: 2px;
+}
+@media (max-height: 500px) {
+  .battle-treat-title {
+    display: none;
+  }
+  :root:not([data-touch="on"]) .battle-treat-tray {
+    bottom: calc(20px + var(--safe-bottom));
+  }
+  :root:not([data-touch="on"]) .battle-treat-list {
+    max-height: calc(100vh - 140px - var(--safe-top) - var(--safe-bottom));
+  }
+}
+@media (min-width: 1000px) {
+  .battle-treat-tray {
+    bottom: calc(128px + var(--safe-bottom));
+    width: 266px;
+    padding: 12px 8px 8px;
+  }
+  .battle-treat-list {
+    gap: 7px;
+    max-height: none;
+    overflow: visible;
+  }
+}
+.battle-treat-item {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 13px 15px 12px 14px;
+  background: var(--sticker-rim);
+  box-shadow: 0 3px 0 var(--sticker-border);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  touch-action: manipulation;
+}
+.battle-treat-item.is-back {
+  background: var(--sticker-border);
+}
+.battle-treat-item[aria-selected="true"] {
+  background: var(--sticker-green);
+  box-shadow: 0 4px 0 var(--sticker-ink);
+  transform: translateY(-2px) rotate(-0.8deg);
+}
+.battle-treat-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.15;
+}
+.battle-treat-count {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+.battle-treat-fav {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 3px;
+  padding: 1px 6px 1px 4px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fde2d8;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.battle-treat-heart {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
 }
 
 .battle-ring {

@@ -1,9 +1,21 @@
 import { runInk } from "./ink";
 import { inkFacts } from "./sim";
-import type { State, World } from "./types";
+import type { FeelingId, State, World } from "./types";
 
 export type LandProgress = { owned: number; total: number };
 export type BusRoute = { from: string; to: string; open: boolean };
+export type CritterFieldNote = {
+  stickerId: string;
+  name: string;
+  chaosName: string;
+  level: number;
+  lands: string[];
+  calms: number;
+  oldFriend: boolean;
+  feelings: { id: FeelingId; label: string }[];
+  favouriteTreats: string[];
+};
+export type CarriedTreat = { id: string; name: string; count: number };
 
 export function mapLandName(
   land: { id: string; name: string; revealVariable?: string },
@@ -94,6 +106,82 @@ export function journalNotes(world: World, state: State): string[] {
     result = runInk(world.story, result.ink, { type: "next" }, facts);
   }
   return notes;
+}
+
+/**
+ * Field guide entry for an owned critter sticker (spec 9.1): returns null for
+ * unowned or unknown stickers, otherwise data-driven lands, calms, Old Friend
+ * status, feelings, and favourite treats.
+ */
+export function critterFieldNote(
+  world: Pick<
+    World,
+    "areas" | "battle" | "critters" | "lands" | "stickers" | "storyVariable" | "treats"
+  >,
+  state: Pick<State, "area" | "calms" | "ink" | "stickers">,
+  stickerId: string,
+): CritterFieldNote | null {
+  if (!state.stickers.includes(stickerId)) return null;
+  const entry = world.stickers.catalogue.find((item) => item.id === stickerId);
+  if (entry === undefined) return null;
+  const critter = world.critters[entry.critter];
+  if (critter === undefined) return null;
+  const species = critter.species;
+  const kindIds = new Set(
+    Object.values(world.critters)
+      .filter((candidate) => candidate.species === species)
+      .map((candidate) => candidate.id),
+  );
+  const foundLandIds = new Set<string>();
+  let recurring = false;
+  for (const area of Object.values(world.areas)) {
+    const hasSetPiece = area.critters.some((piece) => kindIds.has(piece.id));
+    const hasRecurring = area.recurring?.dens.some(
+      (den) => den.kinds.some((kind) => kindIds.has(kind)),
+    ) === true;
+    if (hasRecurring) recurring = true;
+    if ((hasSetPiece || hasRecurring) && area.land !== undefined)
+      foundLandIds.add(area.land);
+  }
+  const currentLand = world.areas[state.area]?.land ?? null;
+  const isSet = (variable: string): boolean => world.storyVariable(state.ink, variable) === true;
+  const revealed = world.lands
+    .filter((land) => foundLandIds.has(land.id))
+    .map((land) => mapLandName(land, currentLand, isSet))
+    .filter((name) => name !== "???");
+  const lands = revealed.length > 0 ? revealed : foundLandIds.size > 0 ? ["???"] : [];
+  const calms = state.calms[species] ?? 0;
+  const oldFriend = recurring && calms >= world.battle.oldFriends.calms;
+  const feelings = critter.feelings.map((id) => ({
+    id,
+    label: world.battle.feelings[id].label,
+  }));
+  const favouriteTreats = world.treats
+    .filter((treat) => treat.favourites.includes(species))
+    .map((treat) => treat.name);
+  return {
+    stickerId: entry.id,
+    name: entry.name,
+    chaosName: critter.name,
+    level: critter.level,
+    lands,
+    calms,
+    oldFriend,
+    feelings,
+    favouriteTreats,
+  };
+}
+
+/** Specialty treats currently in Fae's backpack, in catalogue order. */
+export function carriedTreats(
+  world: Pick<World, "treats">,
+  state: Pick<State, "treats">,
+): CarriedTreat[] {
+  if (state.treats === undefined) return [];
+  return world.treats.flatMap((treat) => {
+    const count = state.treats?.[treat.id] ?? 0;
+    return count > 0 ? [{ id: treat.id, name: treat.name, count }] : [];
+  });
 }
 
 export function autosaveNeeded(previous: State, next: State): boolean {

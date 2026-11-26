@@ -104,9 +104,23 @@ function sameShape(template: unknown, value: unknown): boolean {
   return typeof template === typeof value;
 }
 
+function validTreats(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!record(value) || Array.isArray(value)) return false;
+  return Object.entries(value).every(
+    ([id, count]) =>
+      /^[a-z][a-z0-9-]*$/.test(id) &&
+      typeof count === "number" &&
+      Number.isInteger(count) &&
+      count >= 1 &&
+      count <= 99,
+  );
+}
+
 function isState(value: unknown, template: State): value is State {
   return sameShape(template, value) && record(value) && Array.isArray(value.wild) &&
-    value.wild.every((item) => sameShape(wildShape, item));
+    value.wild.every((item) => sameShape(wildShape, item)) &&
+    validTreats(value.treats);
 }
 
 export function serializeSave(state: State): string {

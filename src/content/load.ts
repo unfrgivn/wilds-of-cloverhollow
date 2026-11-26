@@ -121,6 +121,7 @@ import principalData from "../../content/critters/principal.json";
 import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import levelsData from "../../content/levels.json";
+import treatsData from "../../content/treats.json";
 import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
@@ -173,6 +174,7 @@ import type {
   SkeeContent,
   WindUp,
   LevelContent,
+  TreatItem,
 } from "../core";
 
 // A battle check's spec (spec 8), validated by kind. Every number is an
@@ -393,6 +395,7 @@ export function storyTagErrors(
   tags: string[],
   areas: Record<string, Area>,
   prices: Record<string, number> = {},
+  treatPrices: Record<string, number> = {},
 ): string[] {
   return tags.flatMap((tag) => {
     if (tag.startsWith("grade:"))
@@ -407,6 +410,12 @@ export function storyTagErrors(
     }
     if (tag.startsWith("buy:"))
       return /^buy:\s*snack\s+\d+$/.test(tag) ? [] : [`invalid buy tag "${tag}"`];
+    if (tag.startsWith("buy-treat:")) {
+      const match = /^buy-treat:\s*([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
+      const price = match === null ? undefined : treatPrices[match[1] ?? ""];
+      return price !== undefined && price === Number(match?.[2])
+        ? [] : [`invalid buy-treat tag "${tag}" (not a treat at its price)`];
+    }
     if (tag.startsWith("gift:"))
       return /^gift:\s*(snack|coins)\s+[1-9]\d*$/.test(tag) ? [] : [`invalid gift tag "${tag}"`];
     if (tag.startsWith("feed:"))
@@ -2064,6 +2073,53 @@ function parseLevels(value: unknown, file: string): LevelContent {
   }, critters };
 }
 
+export function parseTreats(
+  value: unknown,
+  file: string,
+  critters: Record<string, Critter>,
+): TreatItem[] {
+  field(record(value) && Array.isArray(value.treats) && value.treats.length > 0, file, "treats");
+  const species = new Set(Object.values(critters).map((critter) => critter.species));
+  const seen = new Set<string>();
+  const nonEmpty = (source: Record<string, unknown>, key: string, label: string): string => {
+    const raw = source[key];
+    field(typeof raw === "string" && raw.trim().length > 0, file, label);
+    return raw;
+  };
+  return value.treats.map((item, index): TreatItem => {
+    const label = `treats[${index}]`;
+    field(record(item), file, label);
+    const id = nonEmpty(item, "id", `${label}.id`);
+    field(/^[a-z][a-z0-9-]*$/.test(id) && id !== "snack" && id !== "back", file, `${label}.id`);
+    field(!seen.has(id), file, `${label}.id (duplicate ${id})`);
+    seen.add(id);
+    const price = integerIn(item, "price", 1, file, `${label}.price`);
+    const energy = integerIn(item, "energy", 1, file, `${label}.energy`);
+    const calm = integerIn(item, "calm", 1, file, `${label}.calm`);
+    const favouriteCalm = integerIn(item, "favouriteCalm", calm, file, `${label}.favouriteCalm`);
+    const rawFavourites = item.favourites;
+    field(strings(rawFavourites) && rawFavourites.length > 0, file, `${label}.favourites`);
+    const favSeen = new Set<string>();
+    for (const entry of rawFavourites) {
+      field(species.has(entry), file, `${label}.favourites (unknown species ${entry})`);
+      field(!favSeen.has(entry), file, `${label}.favourites (duplicate species ${entry})`);
+      favSeen.add(entry);
+    }
+    return {
+      id,
+      name: nonEmpty(item, "name", `${label}.name`),
+      price,
+      energy,
+      calm,
+      favouriteCalm,
+      favourites: [...rawFavourites],
+      description: nonEmpty(item, "description", `${label}.description`),
+      useLine: nonEmpty(item, "useLine", `${label}.useLine`),
+      favouriteLine: nonEmpty(item, "favouriteLine", `${label}.favouriteLine`),
+    };
+  });
+}
+
 export function loadContent(): {
   world: World;
   fixtures: Record<string, Fixture>;
@@ -2173,6 +2229,7 @@ export function loadContent(): {
     critters[critter.id] = critter;
   }
   const battle = parseBattleContent(battleData, "content/battle.json");
+  const treats = parseTreats(treatsData, "content/treats.json", critters);
   const arcadeGames = parseArcade(arcadeGameData, prizesData);
   const stickers = parseStickers(stickerData, "content/stickers.json");
   const characters = parseCharacters(charactersData, "content/characters.json");
@@ -2274,8 +2331,12 @@ export function loadContent(): {
   const critterProblems = critterErrors(areas, critters, stickers);
   if (critterProblems.length > 0)
     throw new Error(`content/critters: ${critterProblems.join("; ")}`);
-  const tagProblems = storyTagErrors(storyTags(story), areas, Object.fromEntries(
-    arcadeGames.counter.prizes.map((item) => [item.prize, item.price])));
+  const tagProblems = storyTagErrors(
+    storyTags(story),
+    areas,
+    Object.fromEntries(arcadeGames.counter.prizes.map((item) => [item.prize, item.price])),
+    Object.fromEntries(treats.map((item) => [item.id, item.price])),
+  );
   if (tagProblems.length > 0)
     throw new Error(`content/story/main.ink: ${tagProblems.join("; ")}`);
   const talkProblems = talkErrors(story, initialInk, Object.values(critters));
@@ -2299,6 +2360,7 @@ export function loadContent(): {
       storyVariable,
       arcade: arcadeGames,
       levels,
+      treats,
     },
     fixtures,
   };

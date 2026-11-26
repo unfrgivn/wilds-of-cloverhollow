@@ -1140,6 +1140,34 @@ The bakery smells like warm cinnamon buns. # speaker: Baker
     No rush! Come back when you're hungry. # speaker: Baker
 - -> DONE
 
+=== grocery ===
+Fresh orchard apples and crunchy fish crackers! Every critter has a favourite. # speaker: Grocer
+{coins() < 8:
+    Treats are 8 coins each. Come back after calming a few critters! # speaker: Grocer
+    -> DONE
+}
++ {coins() >= 8} [Orchard Apple (8 coins)]
+    Crisp orchard slices, packed in paper! Meadow and forest critters love these. # speaker: Grocer # buy-treat: orchard-apple 8
++ {coins() >= 8} [Fish Cracker (8 coins)]
+    Crunchy fish crackers, fresh from the jar! Pups, cats, and beach critters adore them. # speaker: Grocer # buy-treat: fish-cracker 8
++ [Not now]
+    Stop by whenever your backpack needs a treat! # speaker: Grocer
+- -> DONE
+
+=== ice_cream ===
+Welcome to Cloverhollow Scoops! Nothing calms a fizzy day like ice cream. # speaker: Scoops
+{coins() < 10:
+    A Berry Swirl Cone is 10 coins, and a Cozy Cocoa Sundae is 12. See you soon! # speaker: Scoops
+    -> DONE
+}
++ {coins() >= 10} [Berry Swirl Cone (10 coins)]
+    One double-scoop Berry Swirl Cone! Folks around town can't resist it. # speaker: Scoops # buy-treat: berry-cone 10
++ {coins() >= 12} [Cozy Cocoa Sundae (12 coins)]
+    A warm Cozy Cocoa Sundae with marshmallows! Winter friends go wild for this. # speaker: Scoops # buy-treat: cocoa-sundae 12
++ [Not now]
+    Keep cool out there, Fae! # speaker: Scoops
+- -> DONE
+
 // The music room (Milestone 38).
 VAR music_time = false
 VAR music_quest = false

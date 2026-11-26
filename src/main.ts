@@ -16,6 +16,8 @@ import {
   soundCues,
   soundtrackFor,
   arcadeView,
+  carriedTreats,
+  critterFieldNote,
   landStickerProgress,
   mapBusRoutes,
   mapLandName,
@@ -310,6 +312,7 @@ async function boot(): Promise<void> {
         story: content.world.story,
         stickerIds: content.world.stickers.catalogue.map((sticker) => sticker.id),
         prizeIds: content.world.arcade.prizes.map((prize) => prize.id),
+        treatIds: content.world.treats.map((treat) => treat.id),
         thresholds: content.world.levels.thresholds,
       }, state, line);
       if (outcome.kind === "applied") {
@@ -786,6 +789,7 @@ async function boot(): Promise<void> {
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
       commands: battle?.commands ?? [],
       selected: battle?.selected ?? 0,
+      treatTray: battle?.treatTray ?? null,
     });
     // What the critter feels (spec 8.1), in the menu and over its result.
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
@@ -856,6 +860,7 @@ async function boot(): Promise<void> {
     journal.render({
       visible: state.journalOpen,
       notes: state.journalOpen ? notesNow() : [],
+      treats: state.journalOpen ? carriedTreats(content.world, state) : [],
       stickers: state.journalOpen
         ? Array.from({ length: content.world.stickers.slots }, (_, index) => {
             const sticker = content.world.stickers.catalogue[index];
@@ -872,6 +877,7 @@ async function boot(): Promise<void> {
               name: sticker.name,
               owned,
               image: owned ? stickerArt(sticker.critter, sticker.frame) : null,
+              fieldNote: owned ? critterFieldNote(content.world, state, sticker.id) : null,
             };
           })
         : [],

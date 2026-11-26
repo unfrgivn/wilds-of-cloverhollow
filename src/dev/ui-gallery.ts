@@ -339,6 +339,8 @@ journal.onSetAudioLevel(() => undefined);
 journal.onToggleMusic(() => undefined);
 journal.onSetMusicLevel(() => undefined);
 journal.onToggleAmbience(() => undefined);
+journal.onToggleGentleTiming(() => undefined);
+journal.onToggleKeyHints(() => undefined);
 commands.onChoose((index) => {
   root.dataset.battleChosen = String(index);
 });
@@ -477,6 +479,23 @@ function renderGalleryState(): void {
       },
     ],
     currentLand: "cloverhollow",
+    landProgress: {
+      cloverhollow: { owned: 1, total: 9 },
+      bay: { owned: 0, total: 4 },
+      pass: { owned: 0, total: 3 },
+      trail: { owned: 0, total: 3 },
+      forest: { owned: 0, total: 2 },
+      enchanted: { owned: 0, total: 1 },
+    },
+    busRoutes: [
+      { from: "cloverhollow", to: "bay", open: true },
+      { from: "cloverhollow", to: "pass", open: false },
+      { from: "bay", to: "pass", open: false },
+    ],
+    stickersOwned: state === "journal-empty" ? 0 : 1,
+    stickersTotal: content.world.stickers.catalogue.length,
+    prizesOwned: state === "journal-empty" ? 0 : 2,
+    prizesTotal: content.world.arcade.prizes.length,
     coins: 8,
     tickets: state === "journal-empty" ? 0 : 23,
     snacks: 2,
@@ -486,6 +505,10 @@ function renderGalleryState(): void {
     musicLevel: 0.75,
     ambienceMuted: false,
     nowPlaying: "Cloverhollow Town",
+    gentleTiming: false,
+    keyHints: false,
+    hasLantern: true,
+    hasFlute: true,
     members: [
       { id: "fae", name: "Fae", level: 5, xp: 360, startXp: 340, nextXp: 464,
         stats: { power: 28, magic: 2, life: 6, guard: 0 }, friend: false },

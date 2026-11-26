@@ -3,6 +3,7 @@ import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText } from "./dom";
 import { coinMarkup, cookieMarkup, ticketMarkup } from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
+import type { BusRoute, LandProgress } from "../core/journal";
 import type { LevelStats } from "../core/levels";
 
 export type JournalPage = "notes" | "map" | "options";
@@ -23,6 +24,12 @@ export type JournalView = {
   prizes: JournalPrize[];
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
   currentLand: string | null;
+  landProgress: Record<string, LandProgress>;
+  busRoutes: BusRoute[];
+  stickersOwned: number;
+  stickersTotal: number;
+  prizesOwned: number;
+  prizesTotal: number;
   coins: number;
   tickets: number;
   snacks: number;
@@ -32,6 +39,10 @@ export type JournalView = {
   musicLevel: AudioLevel;
   ambienceMuted: boolean;
   nowPlaying: string;
+  gentleTiming: boolean;
+  keyHints: boolean;
+  hasLantern: boolean;
+  hasFlute: boolean;
   members: {
     id: string;
     name: string;
@@ -55,6 +66,7 @@ type Slot = {
 type MapLand = JournalView["lands"][number];
 
 const journalPages: readonly JournalPage[] = ["notes", "map", "options"];
+const svgNamespace = "http://www.w3.org/2000/svg";
 
 function syncSlider(slider: HTMLButtonElement, valueNode: HTMLElement, level: AudioLevel): void {
   const percent = String(Math.round(level * 100));
@@ -127,7 +139,7 @@ function addSlot(grid: HTMLElement): Slot {
 // The bus line's stop sign, as on the sprite: a gold star on a blue roundel
 // atop a pole.
 function busStopIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const svg = document.createElementNS(svgNamespace, "svg");
   svg.setAttribute("viewBox", "0 0 20 30");
   svg.setAttribute("aria-hidden", "true");
   svg.innerHTML =
@@ -137,6 +149,21 @@ function busStopIcon(): SVGSVGElement {
     '<path d="M10 3.6l1.6 3.3 3.6.5-2.6 2.5.6 3.6L10 11.8l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" ' +
     'fill="#f2c94c" stroke="#47321f" stroke-width="0.5"/>';
   return svg;
+}
+
+function busRoutePath(
+  from: { id: string; x: number; y: number },
+  to: { id: string; x: number; y: number },
+): string {
+  const mx = (from.x + to.x) / 2;
+  const my = (from.y + to.y) / 2;
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const key = [from.id, to.id].sort().join("-");
+  const bend = key === "bay-cloverhollow" ? 0.16 : key === "cloverhollow-pass" ? -0.32 : 0.14;
+  const cx = Math.round(mx - dy * bend);
+  const cy = Math.round(my + dx * bend);
+  return `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`;
 }
 
 // Fae's supplies, each a pill with its count: a gold coin and a cookie for
@@ -149,7 +176,7 @@ function supply(kind: "coins" | "snacks" | "tickets", label: string): {
   const pill = kind === "tickets" ? "journal-tickets" : "journal-supply";
   const root = element("span", pill);
   setAttribute(root, "data-supply", kind);
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const svg = document.createElementNS(svgNamespace, "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
   svg.setAttribute("aria-hidden", "true");
   svg.innerHTML =
@@ -157,6 +184,27 @@ function supply(kind: "coins" | "snacks" | "tickets", label: string): {
   const count = element("span", `${pill}-count`);
   root.append(svg, `${label} `, count);
   return { root, count };
+}
+
+function makeOptionRow(
+  titleText: string,
+  subtitleText: string | null,
+  controls: HTMLElement[],
+): HTMLDivElement {
+  const row = element("div", "journal-opt-row");
+  const copy = element("div", "journal-opt-copy");
+  const title = element("div", "journal-opt-label");
+  title.textContent = titleText;
+  copy.append(title);
+  if (subtitleText !== null) {
+    const sub = element("div", "journal-opt-sub");
+    sub.textContent = subtitleText;
+    copy.append(sub);
+  }
+  const right = element("div", "journal-opt-controls");
+  right.append(...controls);
+  row.append(copy, right);
+  return row;
 }
 
 export function createJournal(root: HTMLElement): {
@@ -168,6 +216,8 @@ export function createJournal(root: HTMLElement): {
   onToggleMusic: (callback: () => void) => void;
   onSetMusicLevel: (callback: (level: AudioLevel) => void) => void;
   onToggleAmbience: (callback: () => void) => void;
+  onToggleGentleTiming: (callback: () => void) => void;
+  onToggleKeyHints: (callback: () => void) => void;
 } {
   const book = element("section", "journal-book");
   book.setAttribute("aria-label", "Journal");
@@ -215,15 +265,36 @@ export function createJournal(root: HTMLElement): {
   stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
 
   const mapPage = element("section", "journal-map-page");
+  const mapStage = element("div", "journal-map-stage");
   const map = element("div", "journal-map");
+  const mapRoutes = document.createElementNS(svgNamespace, "svg");
+  mapRoutes.setAttribute("class", "journal-map-routes");
+  mapRoutes.setAttribute("viewBox", "0 0 2400 1610");
+  mapRoutes.setAttribute("aria-hidden", "true");
   const mapLabels = element("div", "journal-map-labels");
+  const mapBadges = element("div", "journal-map-badges");
   const star = element("div", "journal-map-star");
   star.textContent = "★";
   star.setAttribute("aria-label", "You are here");
-  map.append(mapLabels, star);
-  mapPage.append(map);
+  map.append(mapRoutes, mapLabels, mapBadges, star);
+  mapStage.append(map);
 
+  const mapFooter = element("div", "journal-map-footer");
+  const mapDetail = element("span", "journal-map-detail");
+  const mapSummary = element("div", "journal-map-summary");
+  const mapStickersPill = element("span", "journal-map-pill");
+  setAttribute(mapStickersPill, "data-stat", "stickers");
+  const mapPrizesPill = element("span", "journal-map-pill");
+  setAttribute(mapPrizesPill, "data-stat", "prizes");
+  const mapLegend = element("span", "journal-map-legend");
+  mapLegend.append(busStopIcon(), "Bus");
+  mapSummary.append(mapStickersPill, mapPrizesPill, mapLegend);
+  mapFooter.append(mapDetail, mapSummary);
+  mapPage.append(mapStage, mapFooter);
+
+  // Two-page open-book OPTIONS spread: Sound & Music on the left, Gameplay on the right.
   const optionsPage = element("section", "journal-options-page");
+  const soundPage = element("section", "journal-options-sound-page");
   const optionsHead = element("div", "journal-options-head");
   const optionsHeading = element("h2", "journal-heading");
   optionsHeading.textContent = "SOUND & MUSIC";
@@ -231,29 +302,7 @@ export function createJournal(root: HTMLElement): {
   nowPlaying.setAttribute("aria-live", "polite");
   optionsHead.append(optionsHeading, nowPlaying);
 
-  const optionsList = element("div", "journal-options-list");
-
-  const makeOptionRow = (
-    titleText: string,
-    subtitleText: string | null,
-    controls: HTMLElement[],
-  ): HTMLDivElement => {
-    const row = element("div", "journal-opt-row");
-    const copy = element("div", "journal-opt-copy");
-    const title = element("div", "journal-opt-label");
-    title.textContent = titleText;
-    copy.append(title);
-    if (subtitleText !== null) {
-      const sub = element("div", "journal-opt-sub");
-      sub.textContent = subtitleText;
-      copy.append(sub);
-    }
-    const right = element("div", "journal-opt-controls");
-    right.append(...controls);
-    row.append(copy, right);
-    return row;
-  };
-
+  const soundList = element("div", "journal-options-list");
   const optSfx = element("button", "journal-opt-toggle journal-opt-sfx");
   optSfx.type = "button";
   optSfx.setAttribute("aria-label", "Toggle sound effects");
@@ -280,9 +329,45 @@ export function createJournal(root: HTMLElement): {
     "Waves, wind, birds & hearth",
     [optAmbience],
   );
+  soundList.append(sfxRow, musicRow, ambienceRow);
+  soundPage.append(optionsHead, soundList);
 
-  optionsList.append(sfxRow, musicRow, ambienceRow);
-  optionsPage.append(optionsHead, optionsList);
+  const playPage = element("section", "journal-options-play-page");
+  const playHead = element("div", "journal-options-play-head");
+  const playHeading = element("h2", "journal-heading");
+  playHeading.textContent = "GAMEPLAY";
+  playHead.append(playHeading);
+
+  const playList = element("div", "journal-options-list");
+  const optGentle = element("button", "journal-opt-toggle journal-opt-gentle");
+  optGentle.type = "button";
+  optGentle.setAttribute("aria-label", "Toggle gentle timing");
+  const gentleRow = makeOptionRow(
+    "Gentle Timing",
+    "Wider windows in calm-downs",
+    [optGentle],
+  );
+
+  const optHints = element("button", "journal-opt-toggle journal-opt-hints");
+  optHints.type = "button";
+  optHints.setAttribute("aria-label", "Toggle key hints");
+  const hintsRow = makeOptionRow(
+    "Key Hints",
+    "Show keys while exploring",
+    [optHints],
+  );
+  playList.append(gentleRow, hintsRow);
+
+  const controlsCard = element("div", "journal-controls-card");
+  const controlsTitle = element("div", "journal-controls-title");
+  controlsTitle.textContent = "CONTROLS";
+  const controlsLine = element("div", "journal-controls-line");
+  const controlsTools = element("div", "journal-controls-line journal-controls-tools");
+  controlsTools.hidden = true;
+  controlsCard.append(controlsTitle, controlsLine, controlsTools);
+  playPage.append(playHead, playList, controlsCard);
+
+  optionsPage.append(soundPage, playPage);
 
   const tabs = element("div", "journal-tabs");
   const notesTab = element("button", "journal-tab journal-notes-tab");
@@ -308,10 +393,42 @@ export function createJournal(root: HTMLElement): {
   let onToggleMusic: () => void = () => undefined;
   let onSetMusicLevel: (level: AudioLevel) => void = () => undefined;
   let onToggleAmbience: () => void = () => undefined;
+  let onToggleGentleTiming: () => void = () => undefined;
+  let onToggleKeyHints: () => void = () => undefined;
 
   let page: JournalPage = "notes";
   let wasVisible = false;
   let mapSignature = "";
+  let routeSignature = "";
+  let badgeSignature = "";
+  let selectedLandId: string | null = null;
+  let hoveredLandId: string | null = null;
+  let latestView: JournalView | null = null;
+
+  const syncMapDetail = (view: JournalView): void => {
+    const inspectId = hoveredLandId ?? selectedLandId;
+    const inspected = inspectId === null
+      ? undefined
+      : view.lands.find((land) => land.id === inspectId && land.name !== "???");
+    const current = view.lands.find((land) => land.id === view.currentLand);
+    const active = inspected ?? current;
+    const prefix = inspected !== undefined && inspected.id !== view.currentLand ? "" : "Here: ";
+    if (active === undefined) {
+      setText(mapDetail, "Cloverhollow World");
+    } else {
+      const progress = view.landProgress[active.id];
+      const suffix =
+        progress === undefined || progress.total === 0
+          ? ""
+          : ` · ${progress.owned}/${progress.total} stickers`;
+      setText(mapDetail, `${prefix}${active.name}${suffix}`);
+    }
+    for (const node of mapLabels.children) {
+      if (!(node instanceof HTMLElement)) continue;
+      const landId = node.getAttribute("data-land");
+      node.classList.toggle("is-selected", landId !== null && landId === selectedLandId);
+    }
+  };
 
   const setPage = (next: JournalPage): void => {
     if (page === next && book.getAttribute("data-journal-page") === next) return;
@@ -355,6 +472,8 @@ export function createJournal(root: HTMLElement): {
   optSfx.addEventListener("click", () => onToggleAudio());
   optMusic.addEventListener("click", () => onToggleMusic());
   optAmbience.addEventListener("click", () => onToggleAmbience());
+  optGentle.addEventListener("click", () => onToggleGentleTiming());
+  optHints.addEventListener("click", () => onToggleKeyHints());
 
   wireSlider(volume.button, volume.value, () => (next) => {
     syncSlider(optSfxSlider.button, optSfxSlider.value, next);
@@ -388,9 +507,20 @@ export function createJournal(root: HTMLElement): {
     onToggleAmbience: (callback) => {
       onToggleAmbience = callback;
     },
+    onToggleGentleTiming: (callback) => {
+      onToggleGentleTiming = callback;
+    },
+    onToggleKeyHints: (callback) => {
+      onToggleKeyHints = callback;
+    },
     render: (view) => {
+      latestView = view;
       book.hidden = !view.visible;
-      if (!view.visible && wasVisible) setPage("notes");
+      if (!view.visible && wasVisible) {
+        setPage("notes");
+        selectedLandId = null;
+        hoveredLandId = null;
+      }
       wasVisible = view.visible;
       if (!view.visible) return;
       setText(coins.count, String(view.coins));
@@ -411,6 +541,20 @@ export function createJournal(root: HTMLElement): {
       setText(optAmbience, view.ambienceMuted ? "off" : "on");
       optAmbience.classList.toggle("is-muted", view.ambienceMuted);
       setAttribute(optAmbience, "aria-pressed", String(!view.ambienceMuted));
+
+      setText(optGentle, view.gentleTiming ? "on" : "off");
+      optGentle.classList.toggle("is-muted", !view.gentleTiming);
+      setAttribute(optGentle, "aria-pressed", String(view.gentleTiming));
+      setText(optHints, view.keyHints ? "on" : "off");
+      optHints.classList.toggle("is-muted", !view.keyHints);
+      setAttribute(optHints, "aria-pressed", String(view.keyHints));
+
+      setText(controlsLine, "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M");
+      const toolParts: string[] = [];
+      if (view.hasLantern) toolParts.push("Lantern: L");
+      if (view.hasFlute) toolParts.push("Flute: F");
+      controlsTools.hidden = toolParts.length === 0;
+      setText(controlsTools, toolParts.join(" · "));
 
       while (notes.children.length < view.notes.length) notes.append(element("li", "journal-note"));
       while (notes.children.length > view.notes.length) notes.lastElementChild?.remove();
@@ -516,8 +660,9 @@ export function createJournal(root: HTMLElement): {
           slot.imageKey = key;
         }
       });
+
       const nextMapSignature = view.lands
-        .map((land) => `${land.id}:${land.name}:${land.x}:${land.y}`)
+        .map((land) => `${land.id}:${land.name}:${land.busStop}:${land.x}:${land.y}`)
         .join("|");
       if (nextMapSignature !== mapSignature) {
         mapSignature = nextMapSignature;
@@ -528,6 +673,24 @@ export function createJournal(root: HTMLElement): {
           item.style.left = `${(land.x / 2400) * 100}%`;
           item.style.top = `${(land.y / 1610) * 100}%`;
           setAttribute(item, "data-land", land.id);
+          const revealed = land.name !== "???";
+          if (revealed) {
+            item.classList.add("is-revealed");
+            item.addEventListener("click", () => {
+              selectedLandId = selectedLandId === land.id ? null : land.id;
+              if (latestView !== null) syncMapDetail(latestView);
+            });
+            item.addEventListener("pointerenter", () => {
+              hoveredLandId = land.id;
+              if (latestView !== null) syncMapDetail(latestView);
+            });
+            item.addEventListener("pointerleave", () => {
+              if (hoveredLandId === land.id) {
+                hoveredLandId = null;
+                if (latestView !== null) syncMapDetail(latestView);
+              }
+            });
+          }
           mapLabels.append(item);
           if (!land.busStop) return;
           // The bus line's sign (a gold star on a blue roundel) leads the name.
@@ -538,6 +701,69 @@ export function createJournal(root: HTMLElement): {
           item.prepend(stop);
         });
       }
+
+      const landLookup = new Map(view.lands.map((land) => [land.id, land]));
+      const nextRouteSignature = view.busRoutes
+        .map((route) => {
+          const a = landLookup.get(route.from);
+          const b = landLookup.get(route.to);
+          return `${route.from}-${route.to}:${route.open}:` +
+            `${a?.x ?? 0},${a?.y ?? 0}:${b?.x ?? 0},${b?.y ?? 0}`;
+        })
+        .join("|");
+      if (nextRouteSignature !== routeSignature) {
+        routeSignature = nextRouteSignature;
+        mapRoutes.replaceChildren();
+        for (const route of view.busRoutes) {
+          const from = landLookup.get(route.from);
+          const to = landLookup.get(route.to);
+          if (from === undefined || to === undefined) continue;
+          const d = busRoutePath(from, to);
+          const halo = document.createElementNS(svgNamespace, "path");
+          halo.setAttribute(
+            "class",
+            route.open ? "journal-map-route-halo is-open" : "journal-map-route-halo",
+          );
+          halo.setAttribute("d", d);
+          mapRoutes.append(halo);
+          const line = document.createElementNS(svgNamespace, "path");
+          line.setAttribute(
+            "class",
+            route.open ? "journal-map-route is-open" : "journal-map-route",
+          );
+          line.setAttribute("data-route", `${route.from}-${route.to}`);
+          line.setAttribute("data-open", String(route.open));
+          line.setAttribute("d", d);
+          mapRoutes.append(line);
+        }
+      }
+
+      const completedLands = view.lands.filter((land) => {
+        if (land.name === "???") return false;
+        const progress = view.landProgress[land.id];
+        return progress !== undefined && progress.total > 0 && progress.owned >= progress.total;
+      });
+      const nextBadgeSignature = completedLands
+        .map((land) => `${land.id}:${land.x}:${land.y}`)
+        .join("|");
+      if (nextBadgeSignature !== badgeSignature) {
+        badgeSignature = nextBadgeSignature;
+        mapBadges.replaceChildren();
+        for (const land of completedLands) {
+          const badge = element("span", "journal-map-complete");
+          badge.textContent = "✓";
+          badge.style.left = `${(land.x / 2400) * 100}%`;
+          badge.style.top = `${(land.y / 1610) * 100}%`;
+          setAttribute(badge, "data-land", land.id);
+          setAttribute(badge, "aria-label", `${land.name} stickers complete`);
+          mapBadges.append(badge);
+        }
+      }
+
+      setText(mapStickersPill, `Stickers ${view.stickersOwned}/${view.stickersTotal}`);
+      setText(mapPrizesPill, `Prizes ${view.prizesOwned}/${view.prizesTotal}`);
+      syncMapDetail(view);
+
       const here = view.lands.find((land) => land.id === view.currentLand);
       star.hidden = here === undefined;
       setAttribute(star, "data-land", here?.id ?? "");

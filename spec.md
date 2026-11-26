@@ -1649,6 +1649,16 @@ trunks keep its two exits.
     time is held, on its last tick. Every puff held grades great, at least
     half good, fewer a miss, like a chain, and each held puff plays
     `battle-beat`.
+  - **Gentle Timing accessibility** (`gentleCheckSpec` in `src/core/checks.ts`,
+    `StepOptions.gentleTiming` in `src/core/sim.ts`): an optional preference
+    (default `false`, stored outside the save slot under `cloverhollow-settings`
+    in `@capacitor/preferences`) that softens every check when enabled: wider
+    `ring` and `charge` great/good windows (clamped inside the check), wider
+    non-overlapping `chain` hit windows, slower `catch` travel (+20%) and wider
+    gaps (+4 ticks between toys), gentler `lean` gusts (`forces - 1`, `steer + 1`,
+    `spring + 1`), and larger `trace` reach (+35%), brush speed (+20%), and dry
+    time (+40%). When `gentleTiming` is `false` or omitted, `step()` is
+    bit-for-bit identical to standard timing.
 - Every critter kind has a content `level`; `content/levels.json` maps it to
   `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
   use the actor's Power (20 at level 1, +2 per level), with Magic (+1) on great
@@ -2527,10 +2537,28 @@ trunks keep its two exits.
   of the close sticker) flip between NOTES, MAP, and OPTIONS. The journal opens
   on notes; ArrowLeft/ArrowRight and A/D step between pages without stealing
   arrow keys from any focused volume slider.
-- The OPTIONS page (`SOUND & MUSIC`) shows the current track (`♫ <title>`) and
+- The painted MAP page overlays hand-drawn SVG bus routes (`mapBusRoutes` in
+  `src/core/journal.ts`, dashed sky-blue with cream halo when open, subtle
+  dashed ink when locked) connecting the three bus-stop lands, shows crisp `✓`
+  completion badges beside revealed lands whose discoverable stickers are all
+  owned (`landStickerProgress` in `src/core/journal.ts`), and sits above a
+  compact footer strip displaying the active or clicked/hovered land's sticker
+  progress alongside total Stickers, total Prizes, and the Bus legend.
+- The OPTIONS spread is a two-page open-book layout matching NOTES/STICKERS:
+  the left page (`SOUND & MUSIC`) shows the current track (`♫ <title>`) and
   touch-sized (>= 44 px) controls for Sound Effects (on/off + volume slider),
-  Music (on/off + volume slider), and Ambience (on/off), fitting without
-  scrolling at 874x402, 1180x820, and 1280x720.
+  Music (on/off + volume slider), and Ambience (on/off); the right page
+  (`GAMEPLAY`) shows touch-sized toggles for Gentle Timing and Key Hints
+  (`cloverhollow-settings`, defaulting to off) above a compact Controls
+  reference card (showing Lantern and Flute once unlocked). Both pages fit
+  without scrolling or overlap at 874x402, 1180x820, and 1280x720.
+- Optional desktop Key Hints ribbon (`src/ui/hud-hints.ts`): when Key Hints is
+  enabled on non-touch desktop/gamepad setups, a cream die-cut ribbon anchored
+  in the bottom-left safe area (`--z-hud`) shows keycap pills for Journal (`J`),
+  Talk/Look/Play (`Z`, highlighted warmly when targeting an interactable),
+  Lantern (`L`, shown once unlocked and glowing lavender when lit), Flute (`F`,
+  shown once unlocked), and Mute (`M`). It hides automatically during touch
+  mode, title, dialogue, battle, arcade, journal, credits, or QA overlays.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").
@@ -2719,6 +2747,9 @@ trunks keep its two exits.
   `[cloverhollow] music {track, ambience, duck, title}` on soundtrack changes,
   and `[cloverhollow] sound {tick, cue, played}` per cue, for native checks.
   These are harness only and are absent from production.
+- `settings` exposes `gentleTiming()`, `setGentleTiming(on)`, `keyHints()`, and
+  `setKeyHints(on)` for toggling and reading the separate `cloverhollow-settings`
+  gameplay preferences in harness tests.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

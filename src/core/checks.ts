@@ -27,6 +27,93 @@ export type CheckInput = {
 const balanceEnd = 100;
 
 /**
+ * Returns a gentler copy of a check spec with wider timing windows, slower
+ * incoming toys, softer wind puffs, and more generous trace reach and dry time.
+ * Keeps every timing invariant valid for the simulation.
+ */
+export function gentleCheckSpec(spec: CheckSpec): CheckSpec {
+  if (spec.kind === "ring") {
+    const maxWin = Math.max(
+      1,
+      Math.min(spec.targetTick - 1, spec.ticks - 1 - spec.targetTick),
+    );
+    const greatWindow = Math.min(
+      maxWin,
+      Math.max(spec.greatWindow + 1, Math.round(spec.greatWindow * 1.6)),
+    );
+    const goodWindow = Math.min(
+      maxWin,
+      Math.max(greatWindow, Math.round(spec.goodWindow * 1.5)),
+    );
+    return { ...spec, greatWindow, goodWindow };
+  }
+  if (spec.kind === "charge") {
+    const maxWin = Math.max(
+      1,
+      Math.min(spec.targetTick - 1, spec.maxTicks - 1 - spec.targetTick),
+    );
+    const greatWindow = Math.min(
+      maxWin,
+      Math.max(spec.greatWindow + 1, Math.round(spec.greatWindow * 1.6)),
+    );
+    const goodWindow = Math.min(
+      maxWin,
+      Math.max(greatWindow, Math.round(spec.goodWindow * 1.5)),
+    );
+    return { ...spec, greatWindow, goodWindow };
+  }
+  if (spec.kind === "chain") {
+    let minGap = Infinity;
+    for (let index = 1; index < spec.arrivals.length; index += 1) {
+      const previous = spec.arrivals[index - 1];
+      const current = spec.arrivals[index];
+      if (previous !== undefined && current !== undefined)
+        minGap = Math.min(minGap, current - previous);
+    }
+    const maxHit =
+      minGap === Infinity
+        ? spec.hitWindow * 2
+        : Math.max(spec.hitWindow, Math.floor((minGap - 2) / 2));
+    const hitWindow = Math.min(
+      maxHit,
+      Math.max(spec.hitWindow + 1, Math.round(spec.hitWindow * 1.5)),
+    );
+    return { ...spec, arrivals: [...spec.arrivals], hitWindow };
+  }
+  if (spec.kind === "catch") {
+    const travelTicks = Math.round(spec.travelTicks * 1.2);
+    const shift = travelTicks - spec.travelTicks;
+    const arrivals: number[] = [];
+    spec.arrivals.forEach((arrival, index) => {
+      if (index === 0) {
+        arrivals.push(Math.max(travelTicks, arrival + shift));
+      } else {
+        const previousOriginal = spec.arrivals[index - 1] ?? arrival;
+        const previousGentle = arrivals[index - 1] ?? travelTicks;
+        arrivals.push(previousGentle + (arrival - previousOriginal) + 4);
+      }
+    });
+    return { ...spec, travelTicks, arrivals, toys: [...spec.toys] };
+  }
+  if (spec.kind === "lean") {
+    return {
+      ...spec,
+      starts: [...spec.starts],
+      forces: spec.forces.map((force) => Math.max(1, force - 1)),
+      steer: spec.steer + 1,
+      spring: spec.spring + 1,
+    };
+  }
+  return {
+    ...spec,
+    reachRadius: Math.round(spec.reachRadius * 1.35),
+    brushSpeed: Math.round(spec.brushSpeed * 1.2),
+    dryTicks: Math.round(spec.dryTicks * 1.4),
+    paths: spec.paths.map((item) => ({ ...item, points: [...item.points] })),
+  };
+}
+
+/**
  * Creates the tick-zero state for a check. A catch's toys need their lanes
  * and a lean's puffs their forces, picked by the caller from the seeded PRNG
  * (`checkDraws`, `pickFromDraw`).
@@ -36,41 +123,46 @@ export function createCheck(
   side: CheckSide,
   big = false,
   picks: number[] = [],
+  gentle = false,
 ): CheckState {
-  if (spec.kind === "ring")
-    return { kind: "ring", side, tick: 0, spec: { ...spec }, big };
-  if (spec.kind === "charge")
-    return { kind: "charge", side, tick: 0, spec: { ...spec }, held: 0, big };
-  if (spec.kind === "catch")
+  const effective = gentle ? gentleCheckSpec(spec) : spec;
+  if (effective.kind === "ring")
+    return { kind: "ring", side, tick: 0, spec: { ...effective }, big };
+  if (effective.kind === "charge")
+    return { kind: "charge", side, tick: 0, spec: { ...effective }, held: 0, big };
+  if (effective.kind === "catch")
     return {
       kind: "catch",
       side,
       tick: 0,
-      spec: { ...spec, arrivals: [...spec.arrivals], toys: [...spec.toys] },
-      lanes: spec.arrivals.map((_, index) => picks[index] ?? 1),
+      spec: { ...effective, arrivals: [...effective.arrivals], toys: [...effective.toys] },
+      lanes: effective.arrivals.map((_, index) => picks[index] ?? 1),
       catcher: 1,
-      results: spec.arrivals.map(() => "pending"),
+      results: effective.arrivals.map(() => "pending"),
       big,
     };
-  if (spec.kind === "lean")
+  if (effective.kind === "lean")
     return {
       kind: "lean",
       side,
       tick: 0,
-      spec: { ...spec, starts: [...spec.starts], forces: [...spec.forces] },
-      strengths: spec.starts.map((_, index) => picks[index] ?? spec.forces[0] ?? 0),
+      spec: { ...effective, starts: [...effective.starts], forces: [...effective.forces] },
+      strengths: effective.starts.map((_, index) => picks[index] ?? effective.forces[0] ?? 0),
       balance: 0,
-      results: spec.starts.map(() => "pending"),
+      results: effective.starts.map(() => "pending"),
       big,
     };
-  if (spec.kind === "trace") {
-    const path = spec.paths[picks[0] ?? 0] ?? spec.paths[0] ?? { id: "", points: [] };
+  if (effective.kind === "trace") {
+    const path = effective.paths[picks[0] ?? 0] ?? effective.paths[0] ?? { id: "", points: [] };
     const points = path?.points ?? [];
     return {
       kind: "trace",
       side,
       tick: 0,
-      spec: { ...spec, paths: spec.paths.map((item) => ({ ...item, points: [...item.points] })) },
+      spec: {
+        ...effective,
+        paths: effective.paths.map((item) => ({ ...item, points: [...item.points] })),
+      },
       path: { ...path, points: [...points] },
       checkpoint: 0,
       brush: { ...(points[0] ?? { x: 0, y: 0 }) },
@@ -82,8 +174,8 @@ export function createCheck(
     kind: "chain",
     side,
     tick: 0,
-    spec: { ...spec, arrivals: [...spec.arrivals] },
-    results: spec.arrivals.map(() => "pending"),
+    spec: { ...effective, arrivals: [...effective.arrivals] },
+    results: effective.arrivals.map(() => "pending"),
     big,
   };
 }

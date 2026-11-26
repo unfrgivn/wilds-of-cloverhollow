@@ -91,6 +91,12 @@ export type CloverhollowHook = {
     state: AudioController["state"];
     music: AudioController["music"];
   };
+  settings: {
+    gentleTiming: () => boolean;
+    setGentleTiming: (on: boolean) => void;
+    keyHints: () => boolean;
+    setKeyHints: (on: boolean) => void;
+  };
 };
 
 export function installHook(deps: {
@@ -110,6 +116,7 @@ export function installHook(deps: {
   boot: CloverhollowHook["boot"];
   qa: CloverhollowHook["qa"];
   sound: CloverhollowHook["sound"];
+  settings: CloverhollowHook["settings"];
 }): void {
   const hook: CloverhollowHook = {
     version: 1,
@@ -161,6 +168,7 @@ export function installHook(deps: {
     boot: deps.boot,
     qa: deps.qa,
     sound: deps.sound,
+    settings: deps.settings,
   };
   window.__cloverhollow = hook;
 }

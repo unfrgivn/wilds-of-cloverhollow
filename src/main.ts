@@ -16,7 +16,10 @@ import {
   soundCues,
   soundtrackFor,
   arcadeView,
+  landStickerProgress,
+  mapBusRoutes,
   mapLandName,
+  targetInteractable,
   creditEntries,
   levelForXp,
   levelUpLine,
@@ -77,6 +80,8 @@ import {
 import { creditsConfirmAllowed } from "./shell/credits-flow";
 import { createAudio } from "./platform/audio";
 import type { AudioLevel } from "./platform/audio-settings";
+import { createGameSettings } from "./platform/game-settings";
+import { createHudHints } from "./ui/hud-hints";
 import { qaFlow } from "./shell/qa-flow";
 import type { PackState } from "./dev/qa";
 
@@ -155,6 +160,8 @@ async function boot(): Promise<void> {
   const invalidate = (): void => {
     drawPending = true;
   };
+  const gameSettings = createGameSettings(invalidate);
+  const hudHints = createHudHints(uiRoot);
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(() => {
     sound.toggle();
@@ -174,6 +181,14 @@ async function boot(): Promise<void> {
   });
   journal.onToggleAmbience(() => {
     sound.toggleAmbience();
+    invalidate();
+  });
+  journal.onToggleGentleTiming(() => {
+    gameSettings.toggleGentleTiming();
+    invalidate();
+  });
+  journal.onToggleKeyHints(() => {
+    gameSettings.toggleKeyHints();
     invalidate();
   });
   const title = createTitleScreen(uiRoot);
@@ -676,13 +691,36 @@ async function boot(): Promise<void> {
     noticeMarks.render(view.noticeMarks(state));
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
+    const hasLantern = content.world.storyVariable(state.ink, "has_lantern") === true;
+    const hasFlute = content.world.storyVariable(state.ink, "has_flute") === true;
     if (lanternButton !== null) {
-      lanternButton.hidden =
-        content.world.storyVariable(state.ink, "has_lantern") !== true;
+      lanternButton.hidden = !hasLantern;
       lanternButton.classList.toggle("is-on", state.lantern);
     }
     if (fluteButton !== null)
-      fluteButton.hidden = content.world.storyVariable(state.ink, "has_flute") !== true;
+      fluteButton.hidden = !hasFlute;
+    const touchActive = document.documentElement.dataset.touch === "on";
+    const overworldFree =
+      titleMode === null &&
+      !qaMenuOpen &&
+      !qaConsoleOpen &&
+      !qaBlocked &&
+      state.dialogue === null &&
+      state.battle === null &&
+      state.arcade === null &&
+      !state.journalOpen &&
+      state.finale !== "credits" &&
+      levelUpNotices.length === 0;
+    const interactTarget = overworldFree ? targetInteractable(content.world, state) : undefined;
+    hudHints.render({
+      visible: gameSettings.keyHints() && !touchActive && overworldFree,
+      canInteract: interactTarget !== undefined,
+      interactLabel: interactTarget?.prompt ?? "Talk",
+      hasLantern,
+      lanternOn: state.lantern,
+      hasFlute,
+      muted: sound.muted(),
+    });
     title.render({
       visible: titleMode !== null && !qaMenuOpen,
       mode: titleMode ?? "fresh",
@@ -806,6 +844,8 @@ async function boot(): Promise<void> {
             }
           : { visible: false, title: "", name: "", image: null },
     );
+    const isStorySet = (variable: string): boolean =>
+      content.world.storyVariable(state.ink, variable) === true;
     journal.render({
       visible: state.journalOpen,
       notes: state.journalOpen ? notesNow() : [],
@@ -841,12 +881,23 @@ async function boot(): Promise<void> {
       lands: state.journalOpen
         ? content.world.lands.map((land) => ({
             ...land,
-            name: mapLandName(land, content.world.areas[state.area]?.land ?? null,
-              (variable) => content.world.storyVariable(state.ink, variable) === true),
+            name: mapLandName(land, content.world.areas[state.area]?.land ?? null, isStorySet),
             ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
           }))
         : [],
       currentLand: content.world.areas[state.area]?.land ?? null,
+      landProgress: state.journalOpen ? landStickerProgress(content.world, state) : {},
+      busRoutes: state.journalOpen
+        ? mapBusRoutes(
+            content.world.lands,
+            isStorySet,
+            (id) => state.stickers.includes(id),
+          )
+        : [],
+      stickersOwned: state.stickers.length,
+      stickersTotal: content.world.stickers.catalogue.length,
+      prizesOwned: state.prizes.length,
+      prizesTotal: content.world.arcade.prizes.length,
       coins: state.coins,
       snacks: state.snacks,
       tickets: state.tickets,
@@ -856,6 +907,10 @@ async function boot(): Promise<void> {
       musicLevel: sound.musicLevel(),
       ambienceMuted: sound.ambienceMuted(),
       nowPlaying: soundtrack.title,
+      gentleTiming: gameSettings.gentleTiming(),
+      keyHints: gameSettings.keyHints(),
+      hasLantern,
+      hasFlute,
       members: state.journalOpen
         ? [
             { id: "fae", name: "Fae", level: levelForXp(content.world.levels, state.xp),
@@ -1030,7 +1085,9 @@ async function boot(): Promise<void> {
     // The credits step the core like any other tick: it holds the world still
     // (spec 7.4), and the tick and its input stay the same as a replay's.
     const previous = state;
-    const stepped = step(content.world, state, input);
+    const stepped = step(content.world, state, input, {
+      gentleTiming: gameSettings.gentleTiming(),
+    });
     state = stepped.state;
     previousState = state.area === previous.area ? previous : state;
     // A door's fade-out knows where it's going: warm that area's art while the
@@ -1259,6 +1316,18 @@ async function boot(): Promise<void> {
         level: sound.level,
         state: sound.state,
         music: sound.music,
+      },
+      settings: {
+        gentleTiming: gameSettings.gentleTiming,
+        setGentleTiming: (on) => {
+          gameSettings.setGentleTiming(on);
+          invalidate();
+        },
+        keyHints: gameSettings.keyHints,
+        setKeyHints: (on) => {
+          gameSettings.setKeyHints(on);
+          invalidate();
+        },
       },
       boot: { title: () => titleMode },
     });

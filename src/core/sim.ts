@@ -32,6 +32,7 @@ import {
   checkDraws,
   checkHint,
   createCheck,
+  gentleCheckSpec,
   laneFromStick,
   leanFromStick,
   pickFromDraw,
@@ -1072,7 +1073,16 @@ function haltedParty(party: PartyMember[]): PartyMember[] {
   }));
 }
 
-function battleStep(world: World, state: State, input: ActionFrame): State {
+export type StepOptions = {
+  gentleTiming?: boolean;
+};
+
+function battleStep(
+  world: World,
+  state: State,
+  input: ActionFrame,
+  gentleTiming: boolean,
+): State {
   const battle = state.battle;
   if (battle === null) return state;
   const critter = world.critters[battle.critterId];
@@ -1218,7 +1228,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
       const big = letGo === null
         ? roll < critter.burst.bigChance
         : letGo.popped.every((popped) => !popped);
-      const spec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
+      const baseSpec = big ? (critter.burst.big ?? critter.burst.check) : critter.burst.check;
+      const spec = gentleTiming ? gentleCheckSpec(baseSpec) : baseSpec;
       let rolled = afterRoll;
       const picks: number[] = [];
       for (let item = 0; item < checkDraws(spec); item += 1) {
@@ -1403,6 +1414,8 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
     );
     const friendContent =
       partyOwner === undefined ? undefined : world.party[partyOwner.id];
+    const baseSpec = friendContent?.command?.check ?? world.battle.commands.soothe.check;
+    const spec = gentleTiming ? gentleCheckSpec(baseSpec) : baseSpec;
     return {
       ...nextBase,
       battle: startCheck(
@@ -1417,7 +1430,7 @@ function battleStep(world: World, state: State, input: ActionFrame): State {
               : { ...restTurn(next.rest), [chosen.id]: friend.rest },
         },
         "critter",
-        friendContent?.command?.check ?? world.battle.commands.soothe.check,
+        spec,
       ),
     };
   }
@@ -2101,6 +2114,7 @@ function stepTick(
   world: World,
   state: State,
   input: ActionFrame,
+  gentleTiming: boolean,
 ): { state: State; events: Event[] } {
   if (state.finale === "credits")
     return {
@@ -2116,7 +2130,7 @@ function stepTick(
   const area = world.areas[state.area];
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
   if (state.battle !== null)
-    return { state: battleStep(world, state, input), events: [] };
+    return { state: battleStep(world, state, input, gentleTiming), events: [] };
   if (state.arcade !== null) {
     const nextBase = { ...state, tick: state.tick + 1, previousInput: { ...input },
       motion: { ...state.motion, moving: false }, party: restingParty(state.party) };
@@ -2405,8 +2419,9 @@ export function step(
   world: World,
   state: State,
   input: ActionFrame,
+  options?: StepOptions,
 ): { state: State; events: Event[] } {
-  const result = stepTick(world, state, input);
+  const result = stepTick(world, state, input, options?.gentleTiming === true);
   const joined = joinReady(world, result.state);
   const events = [...result.events];
   const addLevelEvent = (member: string, beforeXp: number, afterXp: number): void => {

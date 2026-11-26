@@ -214,7 +214,8 @@ function measureContrast(): Contrast[] {
     ".battle-reward-name, .journal-label, .journal-tab, " +
     ".journal-heading, .journal-supply, .journal-tickets, .journal-note, .journal-empty, " +
     ".journal-name, .journal-unknown, .journal-close, .journal-now-playing, " +
-    ".journal-opt-label, .journal-opt-sub, .journal-opt-toggle, .journal-opt-slider";
+    ".journal-opt-label, .journal-opt-sub, .journal-opt-toggle, .journal-opt-slider, " +
+    ".journal-controls-title, .journal-controls-line";
   return [...document.querySelectorAll(selectors)]
     .filter((element) => element.getClientRects().length > 0)
     .map((element) => {
@@ -923,23 +924,37 @@ test.describe("sticker gallery", () => {
             onTop: centre?.closest(".journal-book") !== null,
           };
           if (currentState === "journal-options") {
-            const optionsPage = document.querySelector<HTMLElement>(".journal-options-page");
-            const optionsRect = optionsPage?.getBoundingClientRect();
+            const soundPage = document.querySelector<HTMLElement>(".journal-options-sound-page");
+            const playPage = document.querySelector<HTMLElement>(".journal-options-play-page");
+            const soundRect = soundPage?.getBoundingClientRect();
+            const playRect = playPage?.getBoundingClientRect();
             const controls = [...document.querySelectorAll(
               ".journal-opt-toggle, .journal-opt-slider",
             )].map((element) => element.getBoundingClientRect());
-            const rows = [...document.querySelectorAll(
-              ".journal-now-playing, .journal-opt-row",
+            const soundItems = [...document.querySelectorAll(
+              ".journal-options-sound-page .journal-now-playing, " +
+                ".journal-options-sound-page .journal-opt-row",
             )].map((element) => element.getBoundingClientRect());
-            if (!optionsPage || !optionsRect) return null;
+            const playItems = [...document.querySelectorAll(
+              ".journal-options-play-page .journal-opt-row, .journal-controls-card",
+            )].map((element) => element.getBoundingClientRect());
+            const allItems = [...soundItems, ...playItems];
+            const gentle = document.querySelector(".journal-opt-gentle");
+            const hints = document.querySelector(".journal-opt-hints");
+            if (!soundPage || !playPage || !soundRect || !playRect || !gentle || !hints)
+              return null;
             return {
               ...base,
-              pagesApart: true,
-              headingControlsInside: rows.every((item) => within(item, optionsRect)) &&
+              pagesApart: soundRect.right <= playRect.left + 1,
+              headingControlsInside:
+                soundItems.every((item) => within(item, soundRect)) &&
+                playItems.every((item) => within(item, playRect)) &&
+                controls.length === 7 &&
                 controls.every((item) => item.width >= 44 && item.height >= 44) &&
-                rows.every((item) => !intersects(item, close) &&
+                allItems.every((item) => !intersects(item, close) &&
                   tabs.every((tab) => !intersects(item, tab))) &&
-                optionsPage.scrollHeight <= optionsPage.clientHeight + 1,
+                soundPage.scrollHeight <= soundPage.clientHeight + 1 &&
+                playPage.scrollHeight <= playPage.clientHeight + 1,
             };
           }
           const notes = rect(".journal-notes-page");

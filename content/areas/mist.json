@@ -5,6 +5,112 @@
   "width": 1650,
   "height": 1100,
   "ground": "mist",
+  "ambient": [
+    {
+      "id": "mist-firefly-west",
+      "animation": "fairy_light",
+      "path": [
+        [
+          180,
+          400
+        ],
+        [
+          370,
+          380
+        ],
+        [
+          410,
+          540
+        ],
+        [
+          220,
+          580
+        ]
+      ],
+      "loopTicks": 400,
+      "phase": 0,
+      "frameTicks": 15,
+      "size": 17
+    },
+    {
+      "id": "mist-firefly-stones",
+      "animation": "fairy_light",
+      "path": [
+        [
+          520,
+          450
+        ],
+        [
+          740,
+          430
+        ],
+        [
+          780,
+          620
+        ],
+        [
+          550,
+          660
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 110,
+      "frameTicks": 16,
+      "size": 19
+    },
+    {
+      "id": "mist-firefly-bridge",
+      "animation": "fairy_light",
+      "path": [
+        [
+          920,
+          410
+        ],
+        [
+          1160,
+          380
+        ],
+        [
+          1210,
+          590
+        ],
+        [
+          970,
+          630
+        ]
+      ],
+      "loopTicks": 500,
+      "phase": 230,
+      "frameTicks": 18,
+      "size": 20
+    },
+    {
+      "id": "mist-firefly-seal",
+      "animation": "fairy_light",
+      "path": [
+        [
+          1060,
+          670
+        ],
+        [
+          1340,
+          640
+        ],
+        [
+          1390,
+          810
+        ],
+        [
+          1110,
+          840
+        ]
+      ],
+      "loopTicks": 430,
+      "phase": 315,
+      "frameTicks": 14,
+      "size": 16
+    }
+  ],
   "walkable": [
     [
       0,

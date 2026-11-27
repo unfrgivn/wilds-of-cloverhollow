@@ -30,6 +30,7 @@ import {
 } from "../content/load";
 import { createState, creditEntries, critterFieldNote, inkFacts, runInk } from "../core";
 import { atlasImage, atlasImagePath, type AtlasJson } from "../ui/atlas";
+import { cropCreditFrame } from "../shell/assets";
 import { clawGalleryView } from "./claw-gallery";
 import type { BattleTalk } from "../core";
 import { cookGalleryView } from "./cook-gallery";
@@ -133,7 +134,8 @@ const creditImage = (image: { atlas: string; frame: string }) => {
   const key = Object.keys(atlasFiles).find((path) => path.endsWith(image.atlas));
   const sheet = key === undefined ? undefined : atlasFiles[key];
   if (sheet === undefined) throw new Error(`Missing gallery atlas ${image.atlas}`);
-  return atlasImage(sheet, atlasImagePath(image.atlas, sheet), image.frame);
+  const loaded = atlasImage(sheet, atlasImagePath(image.atlas, sheet), image.frame);
+  return { ...loaded, frame: cropCreditFrame(loaded.frame) };
 };
 const frogAtlasKey = Object.keys(atlasFiles).find(
   (path) => path.endsWith("assets/critters/frog/frog.json"),

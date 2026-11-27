@@ -3,6 +3,60 @@
   "width": 1750,
   "height": 1100,
   "ground": "plaza",
+  "ambient": [
+    {
+      "id": "plaza-pink-flowerbed",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1310,
+          720
+        ],
+        [
+          1480,
+          690
+        ],
+        [
+          1530,
+          830
+        ],
+        [
+          1350,
+          860
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 30,
+      "frameTicks": 10,
+      "size": 17
+    },
+    {
+      "id": "plaza-blue-planter",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          540,
+          880
+        ],
+        [
+          720,
+          860
+        ],
+        [
+          750,
+          990
+        ],
+        [
+          570,
+          1000
+        ]
+      ],
+      "loopTicks": 520,
+      "phase": 210,
+      "frameTicks": 11,
+      "size": 17
+    }
+  ],
   "walkable": [
     [
       125,

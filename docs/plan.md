@@ -4904,6 +4904,44 @@ the old trail, the owl, and the clubhouse claim.
   `ending.spec.ts` re-verified across Chromium & WebKit after fixing the
   Credits prompt leak.
 
+## Milestone 106: Valley-Wide Ambient Wildlife Flyers, Auto-Save Quill Toast, Credits Friend Scaling & Spacing Polish, Regional Shopkeeper Voices & 14-Area Cozy Resting **Status:** ✅ Completed (2026-11-27)
+- Valley-Wide Ambient Wildlife Flyers (`content/areas/{park,hills,field,woods,mist,plaza}.json`):
+  - Authored 17 hand-crafted closed Catmull-Rom `ambient` loops using the
+    permanently resident `ambient-sheet` (`butterfly_pink`, `butterfly_blue`,
+    `fairy_light`) across Meadow Park (3), Clover Hills (3), Playing Field (2),
+    Whispering Woods (3), Misty Path (4), and Town Plaza (2), with zero extra
+    memory or `src/core` changes.
+- Storybook Auto-Save Quill Toast (`src/ui/save-toast.ts`,
+  `src/ui/save-toast.css`, `src/main.ts`):
+  - Added compact non-blocking bottom-right die-cut pill with inline SVG ink
+    quill + `"Saved"` (`#47321f` on `#f7f2e3`, contrast >= 10:1), auto-hiding
+    after 1800 ms, respecting reduced motion, hiding in photo/battle/journal/
+    title/credits modes, and firing only on live unpaused gameplay saves.
+- Credits Small-Friend Proportion & Spacing Polish (`src/shell/assets.ts`,
+  `src/ui/credits.css`, `src/dev/ui-gallery.ts`, `src/main.ts`):
+  - Exported pure `cropCreditFrame(frame)` cropping `<= 280x280` small animal
+    party sheets (`maddie`, `pond-pup`, `acorn-squirrel`, `ribbon-bunny`) to
+    their lower-centre silhouette while keeping larger frames untouched.
+  - Added balanced desktop (`10px 0 8px`) and compact phone (`4px 0 4px`)
+    vertical breathing room around `.credits-summary`.
+- Regional Shopkeeper Voices, Accents & 14-Area Cozy Resting
+  (`src/platform/voices.ts`, `src/ui/portraits.ts`, `src/render/companions.ts`):
+  - Gave `Baker`, `Grocer`, `Scoops`, and `Cocoa seller` distinct warm musical
+    timbres with `"town"` accents, and mapped sign/note speakers cleanly.
+  - Expanded curated `REST_SPOTS` from 9 to 14 areas (`bedroom`, `pass`,
+    `woods`, `hills`, `enchanted`), all validated inside `walkable` and clear
+    of blockers, prop footprints, triggers, and interactables.
+- Evidence: `tests/unit/milestone-106.test.ts` (4 tests), live Auto-Save Quill
+  Toast real-key test in `tests/e2e/immersion.spec.ts`, and review captures
+  `art/review/m106-credits-scaled.jpg` and `art/review/m106-park-butterflies.jpg`
+  verified with `vision`.
+- Gates: `just check` (165 unit files / 1,269 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4341 just e2e --update-snapshots` (all 1,092+ specs
+  green across Chromium & WebKit; only the 6 ambient-flyer area baselines and
+  proportional Credits baselines updated).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -5,6 +5,86 @@
   "width": 1750,
   "height": 1100,
   "ground": "woods",
+  "ambient": [
+    {
+      "id": "woods-firefly-cabin",
+      "animation": "fairy_light",
+      "path": [
+        [
+          470,
+          470
+        ],
+        [
+          690,
+          430
+        ],
+        [
+          740,
+          570
+        ],
+        [
+          520,
+          610
+        ]
+      ],
+      "loopTicks": 420,
+      "phase": 0,
+      "frameTicks": 15,
+      "size": 17
+    },
+    {
+      "id": "woods-firefly-stream",
+      "animation": "fairy_light",
+      "path": [
+        [
+          860,
+          560
+        ],
+        [
+          1110,
+          510
+        ],
+        [
+          1180,
+          660
+        ],
+        [
+          910,
+          700
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 145,
+      "frameTicks": 17,
+      "size": 18
+    },
+    {
+      "id": "woods-firefly-east",
+      "animation": "fairy_light",
+      "path": [
+        [
+          1220,
+          700
+        ],
+        [
+          1440,
+          660
+        ],
+        [
+          1500,
+          820
+        ],
+        [
+          1270,
+          860
+        ]
+      ],
+      "loopTicks": 450,
+      "phase": 280,
+      "frameTicks": 16,
+      "size": 16
+    }
+  ],
   "glows": [
     {
       "id": "clubhouse-note",

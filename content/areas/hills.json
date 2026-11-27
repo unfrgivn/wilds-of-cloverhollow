@@ -5,6 +5,86 @@
   "width": 1650,
   "height": 1100,
   "ground": "hills",
+  "ambient": [
+    {
+      "id": "hills-pink-west",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          290,
+          430
+        ],
+        [
+          520,
+          380
+        ],
+        [
+          600,
+          540
+        ],
+        [
+          340,
+          590
+        ]
+      ],
+      "loopTicks": 450,
+      "phase": 0,
+      "frameTicks": 9,
+      "size": 19
+    },
+    {
+      "id": "hills-blue-ridge",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          760,
+          260
+        ],
+        [
+          1030,
+          230
+        ],
+        [
+          1120,
+          380
+        ],
+        [
+          830,
+          410
+        ]
+      ],
+      "loopTicks": 520,
+      "phase": 160,
+      "frameTicks": 10,
+      "size": 20
+    },
+    {
+      "id": "hills-pink-south",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          620,
+          740
+        ],
+        [
+          890,
+          720
+        ],
+        [
+          970,
+          870
+        ],
+        [
+          670,
+          900
+        ]
+      ],
+      "loopTicks": 490,
+      "phase": 295,
+      "frameTicks": 11,
+      "size": 18
+    }
+  ],
   "walkable": [
     [
       1000,

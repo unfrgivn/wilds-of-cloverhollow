@@ -5,6 +5,60 @@
   "ground": "field",
   "width": 1650,
   "height": 1100,
+  "ambient": [
+    {
+      "id": "field-blue-oak",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          760,
+          360
+        ],
+        [
+          990,
+          320
+        ],
+        [
+          1060,
+          470
+        ],
+        [
+          820,
+          510
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 40,
+      "frameTicks": 10,
+      "size": 18
+    },
+    {
+      "id": "field-pink-edge",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          310,
+          760
+        ],
+        [
+          560,
+          720
+        ],
+        [
+          640,
+          880
+        ],
+        [
+          360,
+          910
+        ]
+      ],
+      "loopTicks": 510,
+      "phase": 215,
+      "frameTicks": 9,
+      "size": 18
+    }
+  ],
   "walkable": [
     [
       1430,

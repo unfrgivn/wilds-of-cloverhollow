@@ -62,6 +62,7 @@ import {
   buildRewardStickerView,
   createMoleHoleHandler,
   createShellAssets,
+  cropCreditFrame,
   FAE_ATLAS,
   FISH_ATLAS,
 } from "./shell/assets";
@@ -72,6 +73,7 @@ import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
 import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
 import { createHudHints, resolveHudInteractHint } from "./ui/hud-hints";
+import { createSaveToast } from "./ui/save-toast";
 import { qaFlow } from "./shell/qa-flow";
 import type { PackState } from "./dev/qa";
 
@@ -177,6 +179,7 @@ async function boot(): Promise<void> {
   });
   syncReducedMotion();
   const hudHints = createHudHints(uiRoot);
+  const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
   const bannerDuration = 150;
   let bannerArea: string | null = null;
@@ -302,6 +305,7 @@ async function boot(): Promise<void> {
       state = createState(content.world, initialFixture);
       previousState = state;
       clearAreaBanner();
+      saveToast.hide();
       jukeboxTrack = null;
       void Preferences.remove({ key: saveKey });
       saveLast = null;
@@ -325,16 +329,41 @@ async function boot(): Promise<void> {
   let saveLast: { tick: number; hash: string } | null = saveLoaded;
   let suppressSave = false;
   let saveQueue = Promise.resolve();
+  // True while the harness drives ticks synthetically (the hook's `step`): a
+  // replay crossing a dozen doors must load and warm only the area it ends in
+  // (spec 11), not every room it passes through.
+  let harnessStepping = false;
   const saveState = (snapshot: State): Promise<void> => {
     if (suppressSave || qaBlocked || qaActivePack !== null) return Promise.resolve();
     const serialized = serializeSave(snapshot);
     const hash = stableHash(snapshot);
+    const liveSave =
+      !paused &&
+      !harnessStepping &&
+      qaActivePack === null &&
+      !qaBlocked &&
+      titleMode === null &&
+      snapshot.area !== "harness";
     saveQueue = saveQueue.then(async () => {
       await Preferences.set({
         key: saveKey,
         value: serialized,
       });
       saveLast = { tick: snapshot.tick, hash };
+      if (
+        liveSave &&
+        !paused &&
+        !harnessStepping &&
+        qaActivePack === null &&
+        !qaBlocked &&
+        titleMode === null &&
+        !photoMode &&
+        state.battle === null &&
+        !state.journalOpen &&
+        state.finale === null
+      ) {
+        saveToast.show();
+      }
     });
     return saveQueue;
   };
@@ -344,6 +373,7 @@ async function boot(): Promise<void> {
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
     state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
     clearAreaBanner();
+    saveToast.hide();
     titleMode = null;
     qaJustPicked = true;
     swallowed.add("confirm");
@@ -490,6 +520,7 @@ async function boot(): Promise<void> {
     photoMode = next;
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
+    if (next) saveToast.hide();
     invalidate();
   };
   const render = (alpha = 1): void => {
@@ -644,13 +675,19 @@ async function boot(): Promise<void> {
     if (qaConsoleOpen) document.documentElement.dataset.qaConsole = "open";
     else delete document.documentElement.dataset.qaConsole;
     const creditsOpen = state.finale === "credits";
+    if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen) {
+      saveToast.hide();
+    }
     credits.render({
       visible: creditsOpen,
       entries: creditsOpen
-        ? creditEntries(content.world, state).map((entry) => ({
-            ...entry,
-            image: assets.atlasFrame(entry.image.atlas, entry.image.frame),
-          }))
+        ? creditEntries(content.world, state).map((entry) => {
+            const image = assets.atlasFrame(entry.image.atlas, entry.image.frame);
+            return {
+              ...entry,
+              image: image === null ? null : { ...image, frame: cropCreditFrame(image.frame) },
+            };
+          })
         : [],
       summary: creditsOpen ? creditsSummary(content.world, state) : [],
     });
@@ -801,10 +838,6 @@ async function boot(): Promise<void> {
   // The area a door's fade-out is warming. Cleared when the transition ends or
   // the game resets, so every crossing prefetches exactly once.
   let prefetchedTarget: string | undefined;
-  // True while the harness drives ticks synthetically (the hook's `step`): a
-  // replay crossing a dozen doors must load and warm only the area it ends in
-  // (spec 11), not every room it passes through.
-  let harnessStepping = false;
   const tick = (frame: ActionFrame): void => {
     if (qaJustPicked) { qaJustPicked = false; titlePrevious = frame; return; }
     if (qaMenuOpen) {
@@ -1232,6 +1265,7 @@ async function boot(): Promise<void> {
         state = createState(content.world, fixture, options.seed);
         previousState = state;
         clearAreaBanner();
+        saveToast.hide();
         suppressSave = false;
         prefetchedTarget = undefined;
         await Promise.all([ensureArea(), assets.warmJournalAssets(state)]);

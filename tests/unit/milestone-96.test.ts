@@ -118,24 +118,30 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
     }
   });
 
-  it("every REST_SPOTS entry across all 9 areas sits inside walkable and outside blockers", () => {
+  it("every REST_SPOTS entry across all 14 areas sits inside walkable and outside blockers", () => {
     const areas = new Set(REST_SPOTS.map((spot) => spot.area));
     expect([...areas].sort()).toEqual([
       "bay",
+      "bedroom",
       "cafe",
       "clubhouse",
+      "enchanted",
+      "hills",
       "jordan-cabin",
       "lodge",
       "park",
+      "pass",
       "plaza",
       "sanctuary",
       "sue-cottage",
+      "woods",
     ]);
 
     for (const spot of REST_SPOTS) {
       const area = world.areas[spot.area];
       if (area === undefined) throw new Error(`Unknown rest spot area ${spot.area}`);
-      const base = stateIn(spot.area);
+      const fixtureKey = fixtures[spot.area] === undefined ? "new-game" : spot.area;
+      const base = stateIn(fixtureKey, { area: spot.area });
       const scenery = sceneryArea(world, base.ink, area);
 
       for (const [label, point] of [

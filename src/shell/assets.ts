@@ -45,6 +45,7 @@ import {
   atlasImage,
   atlasImagePath,
   parseAtlasJson,
+  type AtlasFrame,
   type AtlasImage,
   type AtlasJson,
 } from "../ui/atlas";
@@ -67,6 +68,25 @@ export const FOOD_ATLAS = "assets/arcade/cook-food.json";
 export const FISH_ATLAS = "assets/arcade/fish-catches.json";
 export const COMET_ATLAS = "assets/arcade/comet.json";
 export const FAE_ATLAS = "assets/characters/fae/fae.json";
+
+/**
+ * Tightly crops small animal party frames (`<= 280x280`, where the figure sits in the lower half)
+ * so they fill Credits cards at the same scale as larger character and critter frames.
+ */
+export function cropCreditFrame(frame: AtlasFrame): AtlasFrame {
+  if (frame.w > 280 || frame.h > 280) return frame;
+  const w = Math.max(1, Math.min(frame.w, Math.round(frame.w * 0.64)));
+  const h = Math.max(1, Math.min(frame.h, Math.round(frame.h * 0.58)));
+  const x = Math.max(
+    frame.x,
+    Math.min(frame.x + frame.w - w, Math.round(frame.x + frame.w * 0.18)),
+  );
+  const y = Math.max(
+    frame.y,
+    Math.min(frame.y + frame.h - h, Math.round(frame.y + frame.h * 0.4)),
+  );
+  return { x, y, w, h };
+}
 
 export type MoleHoleTouch = {
   setButton: (button: "confirm", down: boolean) => void;

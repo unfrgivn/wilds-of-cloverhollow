@@ -4,6 +4,86 @@
   "width": 1500,
   "height": 1000,
   "ground": "park",
+  "ambient": [
+    {
+      "id": "park-pink-picnic",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          280,
+          520
+        ],
+        [
+          490,
+          470
+        ],
+        [
+          560,
+          620
+        ],
+        [
+          340,
+          660
+        ]
+      ],
+      "loopTicks": 440,
+      "phase": 0,
+      "frameTicks": 9,
+      "size": 19
+    },
+    {
+      "id": "park-blue-pond",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          780,
+          740
+        ],
+        [
+          1020,
+          720
+        ],
+        [
+          1110,
+          860
+        ],
+        [
+          840,
+          880
+        ]
+      ],
+      "loopTicks": 500,
+      "phase": 135,
+      "frameTicks": 10,
+      "size": 20
+    },
+    {
+      "id": "park-pink-meadow",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1040,
+          490
+        ],
+        [
+          1250,
+          440
+        ],
+        [
+          1310,
+          610
+        ],
+        [
+          1100,
+          640
+        ]
+      ],
+      "loopTicks": 480,
+      "phase": 265,
+      "frameTicks": 11,
+      "size": 18
+    }
+  ],
   "glows": [
     {
       "id": "park-gem-glow",

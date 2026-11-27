@@ -1280,10 +1280,11 @@ ios/            Capacitor iOS project (from Milestone 4).
     42-tick joyful squash-and-stretch double bounce, affectionate nod, 3 rising
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
-    chairs, rugs, picnic blanket, and the Clubhouse beanbag across 9 areas
-    (`plaza`, `park`, `bay`, `cafe`, `lodge`, `clubhouse`, `sue-cottage`,
-    `jordan-cabin`, `sanctuary`), settling into a cozy seated-rest pose with a
-    warm harp chord and lazily drifting `emoteNote` (`♪`) until any movement,
+    chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
+    across 14 areas (`plaza`, `park`, `bay`, `cafe`, `lodge`, `clubhouse`,
+    `sue-cottage`, `jordan-cabin`, `sanctuary`, `bedroom`, `pass`, `woods`,
+    `hills`, `enchanted`), settling into a cozy seated-rest pose with a warm
+    harp chord and lazily drifting `emoteNote` (`♪`) until any movement,
     cancel, menu, or confirm input stands her back up.
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),
     `petting` (currently petted companion id or `null`), and `resting` (active
@@ -1413,20 +1414,22 @@ ios/            Capacitor iOS project (from Milestone 4).
   which sets `found_old_trail`), and a doodle is painted on the north ski-lift
   tower (`lift_note`). `renderInfo().lantern` reports `{ on, glows }`, the ids
   drawn.
-- Ambient flyers (Milestone 54; Catmull-Rom splines Milestone 72): an area may
-  define `ambient` as flyers with
+- Ambient flyers (Milestone 54; Catmull-Rom splines Milestone 72; valley-wide
+  wildlife Milestone 106): an area may define `ambient` as flyers with
   `{ id, animation, path, loopTicks, phase, frameTicks, size }`. `path` is a
   closed loop of at least three in-bounds `[x, y]` world points; `loopTicks`
   and `phase` are integers with `loopTicks >= 120` and `0 <= phase <
   loopTicks`, `frameTicks` is an integer of at least 1, and `size` is the
   drawn height in world units. Animations are names in
-  `public/assets/ambient/ambient.json`. Flyers follow a closed uniform
-  Catmull-Rom spline through `path` at constant chord-parameter speed with a
-  small render-only bob, cycle across their animation's full frame count at
-  `frameTicks`, and mirror from the smooth spline tangent while travelling
-  left. They draw above overworld figures and props, below the fade, dusk tint,
-  and glows, and are hidden in battles. They never enter simulation state,
-  hashes, or saves.
+  `public/assets/ambient/ambient.json` (`butterfly_pink`, `butterfly_blue`,
+  `fairy_light`). Across the valley, butterflies and fireflies drift in
+  `enchanted`, `sanctuary`, `cavern`, `park`, `hills`, `field`, `woods`,
+  `mist`, and `plaza`. Flyers follow a closed uniform Catmull-Rom spline
+  through `path` at constant chord-parameter speed with a small render-only
+  bob, cycle across their animation's full frame count at `frameTicks`, and
+  mirror from the smooth spline tangent while travelling left. They draw above
+  overworld figures and props, below the fade, dusk tint, and glows, and are
+  hidden in battles. They never enter simulation state, hashes, or saves.
 - Canopies: a prop with `canopy: true` is a tree Fae can walk under (a palm,
   crown and trunk cut whole, its front edge at the trunk's foot). While it
   draws over more than 5% of her body box (its picture, in the columns where
@@ -1906,14 +1909,16 @@ trunks keep its two exits.
   pills for each non-zero collection category among Stickers, Star Gems, Fish,
   Keepsakes, and Prizes, hidden when empty), and "Thank you for playing!", from `creditEntries` (`src/core/credits.ts`). FRIENDS is each roster member who
   starts with Fae or whose `befriended` (else `joins`) variable is true, in
-  roster order, on the frame `down_idle_01`. MET is each sticker in
-  `state.stickers`, by its name, on its critter's atlas at the sticker's
-  frame. Each entry is a small sticker over its name; the stickers show
-  together, once their atlases are decoded (decoded whole, WebKit draws them
-  the same way every time). The names and the thanks are at least 18 px. At
-  1180x820 and 1280x720 the largest credits (every friend and the whole
-  catalogue) fit without scrolling; on a phone the sheet scrolls. On touch
-  only the confirm button shows, at least 44 px and clear of the entries.
+  roster order, on the frame `down_idle_01`; small animal party frames
+  (`<= 280x280`, via `cropCreditFrame` in `src/shell/assets.ts`) tightly crop
+  to their lower-centre figure so they match Sue, Jordan, and critters in scale.
+  MET is each sticker in `state.stickers`, by its name, on its critter's atlas
+  at the sticker's frame. Each entry is a small sticker over its name; the
+  stickers show together, once their atlases are decoded (decoded whole, WebKit
+  draws them the same way every time). The names and the thanks are at least
+  18 px. At 1180x820 and 1280x720 the largest credits (every friend and the
+  whole catalogue) fit without scrolling; on a phone the sheet scrolls. On
+  touch only the confirm button shows, at least 44 px and clear of the entries.
 - The shell steps the core on every credits tick, and the core holds the
   world still (only the tick, the previous input, and the resting pose
   change), so the ticks and their input stay a replay's.
@@ -3412,6 +3417,11 @@ trunks keep its two exits.
   trigger is a pure function of the previous and next state
   (`autosaveNeeded`), and it is false while `finale` isn't null: the dream's
   last save is the ending's snapshot (section 7.4). Fixture resets don't save.
+  In live unpaused gameplay outside QA packs, title, and the harness room, a
+  successful autosave displays a compact non-blocking bottom-right die-cut
+  quill pill (`createSaveToast` in `src/ui/save-toast.ts`, `"Saved"`,
+  auto-hiding after 1800 ms, respecting reduced motion, and hidden during
+  photo, battle, journal, title, and credits overlays).
 - Boot: a valid save resumes the game; otherwise a new game starts.
 - QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
   packs are separate files in the dev/harness-only save library; movement,

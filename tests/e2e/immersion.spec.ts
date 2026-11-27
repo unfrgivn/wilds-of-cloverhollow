@@ -146,3 +146,51 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test(
+  "auto-save quill toast appears on live unpaused area arrival and auto-hides cleanly",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openHarness(page);
+    await page.evaluate(() => window.__cloverhollow?.save.clear());
+    await resetPaused(page, "new-game");
+
+    const toast = page.locator(".save-toast");
+    await expect(toast).toBeHidden();
+
+    // Paused harness transitions must never flash the save toast.
+    await enterKitchen(page);
+    await expect(toast).toBeHidden();
+
+    // Live unpaused play: walk through the bedroom door into the kitchen with real keys.
+    await resetPaused(page, "new-game");
+    await page.evaluate(() => window.__cloverhollow?.resume());
+    await page.keyboard.down("ArrowUp");
+    await page.waitForFunction(
+      () => {
+        const st = window.__cloverhollow?.getState();
+        return st?.area === "kitchen" && st.transition === null;
+      },
+      undefined,
+      { timeout: 10000 },
+    );
+    await page.keyboard.up("ArrowUp");
+
+    await expect(toast).toBeVisible();
+    await expect(toast.locator(".save-toast-label")).toHaveText("Saved");
+
+    const colors = await toast.evaluate((node) => {
+      const label = node.querySelector(".save-toast-label");
+      return {
+        bg: getComputedStyle(node).backgroundColor,
+        fg: label === null ? "" : getComputedStyle(label).color,
+      };
+    });
+    expect(contrastRatio(parseRgb(colors.fg), parseRgb(colors.bg))).toBeGreaterThanOrEqual(10);
+
+    // Auto-hides cleanly after its 1800 ms window.
+    await expect(toast).toBeHidden({ timeout: 4000 });
+    await page.evaluate(() => window.__cloverhollow?.save.clear());
+  },
+);

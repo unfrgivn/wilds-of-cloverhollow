@@ -78,7 +78,15 @@ const MYSTERY_SPEAKERS = new Set([
   "mysterious voice",
   "???",
 ]);
-const SIGN_SPEAKERS = new Set(["sign", "notice board", "chalkboard", "sanctuary board"]);
+const SIGN_SPEAKERS = new Set([
+  "sign",
+  "notice board",
+  "chalkboard",
+  "sanctuary board",
+  "flyer",
+  "glow note",
+  "trail note",
+]);
 const CRITTER_KEYWORDS = [
   "frog",
   "pup",

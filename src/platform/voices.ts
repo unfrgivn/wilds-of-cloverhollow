@@ -309,27 +309,29 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
   },
   baker: {
     wave: "sine",
-    notes: [349, 392, 440, 392],
+    notes: [349, 392, 440, 523],
     duration: 0.05,
-    gain: 0.05,
+    gain: 0.052,
   },
   grocer: {
     wave: "triangle",
-    notes: [330, 370, 415, 370],
+    notes: [311, 349, 392, 349],
     duration: 0.05,
-    gain: 0.05,
+    gain: 0.052,
   },
   scoops: {
     wave: "sine",
-    notes: [415, 440, 466, 440],
-    duration: 0.046,
+    notes: [415, 466, 523, 466],
+    duration: 0.045,
     gain: 0.05,
+    harmonic: 1.5,
   },
   "cocoa seller": {
     wave: "sine",
-    notes: [370, 415, 440, 415],
-    duration: 0.05,
-    gain: 0.05,
+    notes: [330, 392, 440, 392],
+    duration: 0.054,
+    gain: 0.052,
+    glide: 1.03,
   },
   milo: {
     wave: "triangle",
@@ -360,7 +362,11 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
   peach: FAIRY_VOICE,
   sign: NARRATION_VOICE,
   "notice board": NARRATION_VOICE,
+  "sanctuary board": NARRATION_VOICE,
   chalkboard: NARRATION_VOICE,
+  flyer: NARRATION_VOICE,
+  "glow note": NARRATION_VOICE,
+  "trail note": NARRATION_VOICE,
 };
 
 const BIRD_KEYWORDS = ["bird", "gull", "owl", "penguin", "bat"] as const;

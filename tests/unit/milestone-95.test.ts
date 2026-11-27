@@ -48,7 +48,9 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
   it("journalKeepsakes returns all 8 keepsakes in canonical order and tracks each unlock", () => {
     const empty = stateIn("plaza");
     const initial = journalKeepsakes(world, empty);
-    expect(initial).toEqual([
+    expect(
+      initial.map(({ id, name, source, owned }) => ({ id, name, source, owned })),
+    ).toEqual([
       { id: "star-crystal", name: "Star Crystal", source: "Crystal Cavern", owned: false },
       { id: "star-pin", name: "Bon Appetit Star Pin", source: "Bon Appetit Café", owned: false },
       { id: "star-geode", name: "Rainbow Star Geode", source: "7 Star Gems", owned: false },
@@ -122,7 +124,7 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
       "minnow",
       "starfish",
     ]);
-    expect(list.find((item) => item.id === "starfish")).toEqual({
+    expect(list.find((item) => item.id === "starfish")).toMatchObject({
       id: "starfish",
       name: "Golden Starfish Crown",
       frame: "starfish",

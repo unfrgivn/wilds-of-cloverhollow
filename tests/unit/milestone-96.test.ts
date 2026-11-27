@@ -50,7 +50,7 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
     expect(empty.every((item) => !item.owned)).toBe(true);
 
     const compassOnly = journalKeepsakes(world, stateIn("plaza", {}, { sue_compass: true }));
-    expect(compassOnly.filter((item) => item.owned)).toEqual([
+    expect(compassOnly.filter((item) => item.owned)).toMatchObject([
       {
         id: "sea-compass",
         name: "Sea-Glass Compass",
@@ -60,7 +60,7 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
     ]);
 
     const cloverOnly = journalKeepsakes(world, stateIn("plaza", {}, { jordan_clover: true }));
-    expect(cloverOnly.filter((item) => item.owned)).toEqual([
+    expect(cloverOnly.filter((item) => item.owned)).toMatchObject([
       {
         id: "alpine-clover",
         name: "Pressed Alpine Clover",

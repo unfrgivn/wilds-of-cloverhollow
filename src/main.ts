@@ -1,16 +1,10 @@
-import { Application, Assets, type Spritesheet } from "pixi.js";
+import { Application } from "pixi.js";
 import {
   blankInput,
   createState,
   drainTicks,
   step,
   type ActionFrame,
-  type ArcadeView,
-  type Area,
-  type BattleView,
-  type CookView,
-  type FishView,
-  type MoleHole,
   type Point,
   type State,
   battleParty,
@@ -21,46 +15,24 @@ import {
   trackTitles,
   type JukeboxTrack,
   arcadeView,
-  carriedTreats,
-  critterFieldNote,
-  journalFish,
-  journalKeepsakes,
-  landStickerProgress,
-  mapBusRoutes,
-  mapLandName,
-  starGemsFound,
   targetInteractable,
-  treasuresSummary,
   creditEntries,
   levelForXp,
   levelUpLine,
-  statsForCommand,
+  journalNotes,
+  parseSave,
+  serializeSave,
+  autosaveNeeded,
+  stableHash,
 } from "./core";
-import {
-  loadContent,
-  parseClawCalibration,
-  parseMapCentres,
-  parseMoleCalibration,
-  parseCookCalibration,
-  parseFishCalibration,
-  parseSkeeCalibration,
-  parseCometCalibration,
-} from "./content/load";
+import { loadContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
 import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
-import { GameView, type BattleCheckGeometry } from "./render/view";
-import {
-  atlasImage,
-  atlasImagePath,
-  parseAtlasJson,
-  type AtlasImage,
-  type AtlasJson,
-} from "./ui/atlas";
+import { GameView } from "./render/view";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
-import { cropPortraitFrame, speakerAccent, speakerPortraitSource } from "./ui/portraits";
 import { evaluateBattlePortraits } from "./ui/battle-portraits";
 import {
   createBattleHud,
@@ -69,27 +41,9 @@ import {
   createFeelingBubble,
   createWindUpBubbles,
   createRewardSticker,
-  battleCommandPreview,
-  battleTalkDialogueView,
   talkChoicesShown,
-  type BattleCheckView as BattleCheckOverlayView,
 } from "./ui/battle";
-import { assetUrl } from "./platform/assets";
 import { createJournal } from "./ui/journal";
-import type { ArcadeInfo } from "./ui/arcade";
-import { createClaw } from "./ui/claw";
-import { createSkee } from "./ui/skee";
-import { createMole } from "./ui/mole";
-import { createComet } from "./ui/comet";
-import { createCook, type CookInfo } from "./ui/cook";
-import { createFish, type FishInfo } from "./ui/fish";
-import {
-  journalNotes,
-  parseSave,
-  serializeSave,
-  autosaveNeeded,
-  stableHash,
-} from "./core";
 import { Preferences } from "@capacitor/preferences";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
@@ -100,13 +54,23 @@ import {
   type TitleMode,
 } from "./shell/title-flow";
 import { creditsConfirmAllowed } from "./shell/credits-flow";
+import {
+  battleCheckOverlay,
+  buildDialogueView,
+  buildJournalView,
+  buildRewardStickerView,
+  createMoleHoleHandler,
+  createShellAssets,
+  FAE_ATLAS,
+  FISH_ATLAS,
+} from "./shell/assets";
 import { createAudio, type CompanionAudioEffect } from "./platform/audio";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
 import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
-import { createHudHints } from "./ui/hud-hints";
+import { createHudHints, resolveHudInteractHint } from "./ui/hud-hints";
 import { qaFlow } from "./shell/qa-flow";
 import type { PackState } from "./dev/qa";
 
@@ -299,15 +263,19 @@ async function boot(): Promise<void> {
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
   const fresh = createState(content.world, initialFixture);
+  const speciesXp = Object.fromEntries(
+    Object.values(content.world.critters).map((kind) => [
+      kind.species,
+      content.world.levels.critters[kind.id]?.xp ?? 0,
+    ]),
+  );
+  const parseWorldSave = (raw: string): State | null =>
+    parseSave(raw, fresh, speciesXp, content.world.levels.thresholds);
   const saved = qaUrlPack === null && qaError === null
     ? await Preferences.get({ key: saveKey }) : { value: null };
   const restored = qaUrlPack === null
-    ? saved.value === null ? null : parseSave(saved.value, fresh,
-      Object.fromEntries(Object.values(content.world.critters).map((kind) => [kind.species,
-        content.world.levels.critters[kind.id]?.xp ?? 0])), content.world.levels.thresholds)
-    : parseSave(qaUrlPack.save, fresh, Object.fromEntries(Object.values(content.world.critters).map(
-      (kind) => [kind.species, content.world.levels.critters[kind.id]?.xp ?? 0])),
-    content.world.levels.thresholds);
+    ? saved.value === null ? null : parseWorldSave(saved.value)
+    : parseWorldSave(qaUrlPack.save);
   state = restored ?? fresh;
   let previousState: State = state;
   // A real boot opens on the title (spec 7.3), with the game frozen behind it:
@@ -371,9 +339,7 @@ async function boot(): Promise<void> {
   };
   const save = (): Promise<void> => saveState(state);
   const pickQa = (item: PackState): void => {
-    const loaded = parseSave(item.save, fresh,
-      Object.fromEntries(Object.values(content.world.critters).map((kind) => [kind.species,
-        content.world.levels.critters[kind.id]?.xp ?? 0])), content.world.levels.thresholds);
+    const loaded = parseWorldSave(item.save);
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
     state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
     clearAreaBanner();
@@ -429,372 +395,34 @@ async function boot(): Promise<void> {
   qaMenu?.onCancel(() => {
     qaMenuOpen = false; qaActivePack = null; titleMode = qaReturnMode;
   });
-  // Each land's centre on the painted map (the journal's MAP page).
-  const loadMapCentres = async () => {
-    const mapFile = "assets/ui/map/world-map.json";
-    const response = await fetch(assetUrl(mapFile));
-    if (!response.ok) throw new Error(`Failed to load ${mapFile}`);
-    return parseMapCentres(await response.json(), mapFile);
-  };
-  // DOM image decode cache: each PNG is decoded at most once, only when its
-  // area or overlay needs it, so boot doesn't decode all 25 critter PNGs.
-  const decodedImages = new Map<string, Promise<void>>();
-  const decodeOnce = (file: string): Promise<void> => {
-    const existing = decodedImages.get(file);
-    if (existing !== undefined) return existing;
-    const promise = (async () => {
-      const image = new Image();
-      image.src = assetUrl(file);
-      await image.decode();
-    })();
-    decodedImages.set(file, promise);
-    return promise;
-  };
-  // Tiny atlas JSON metadata cache (~1 KB per sheet, zero GPU VRAM): lets
-  // stickerArt, prizeArt, and credits crop any frame in any area regardless of
-  // whether that critter's WebGL texture is currently loaded.
-  const atlasJsonCache = new Map<string, AtlasJson>();
-  const atlasJsonPending = new Map<string, Promise<AtlasJson>>();
-  const loadAtlasJson = (file: string): Promise<AtlasJson> => {
-    const cached = atlasJsonCache.get(file);
-    if (cached !== undefined) return Promise.resolve(cached);
-    const pending = atlasJsonPending.get(file);
-    if (pending !== undefined) return pending;
-    const promise = (async () => {
-      const response = await fetch(assetUrl(file));
-      if (!response.ok) throw new Error(`Failed to load ${file}`);
-      const parsed = parseAtlasJson(await response.json(), file);
-      atlasJsonCache.set(file, parsed);
-      return parsed;
-    })();
-    atlasJsonPending.set(file, promise);
-    return promise;
-  };
-  // A DOM-only atlas (no WebGL texture): its frame metadata + decoded image.
-  const domAtlas = async (file: string): Promise<AtlasJson> => {
-    const data = await loadAtlasJson(file);
-    await decodeOnce(atlasImagePath(file, data));
-    return data;
-  };
-  const decodeAtlasImage = async (file: string): Promise<void> => {
-    const cached = atlasJsonCache.get(file) ?? Assets.get<Spritesheet | undefined>(file)?.data;
-    const data = cached ?? await loadAtlasJson(file);
-    await decodeOnce(atlasImagePath(file, data));
-  };
-  // The moles' frames and Mom's dishes for the clubhouse microwave (spec 8.2).
-  const moleAtlas = "assets/arcade/moles.json";
-  const foodAtlas = "assets/arcade/cook-food.json";
-  const fishAtlas = "assets/arcade/fish-catches.json";
-  const cometAtlas = "assets/arcade/comet.json";
-  // The arcade games' paintings and their calibrations (spec 8.2), each
-  // decoded on demand before its close-up can open.
-  const painting = async <T extends { image: string }>(
-    file: string,
-    parse: (value: unknown, file: string) => T,
-  ): Promise<{ calibration: T; image: string }> => {
-    const response = await fetch(assetUrl(file));
-    if (!response.ok) throw new Error(`Failed to load ${file}`);
-    const calibration = parse(await response.json(), file);
-    const src = assetUrl(`assets/arcade/${calibration.image}`);
-    await decodeOnce(`assets/arcade/${calibration.image}`);
-    return { calibration, image: src };
-  };
-  const atlasFrame = (file: string, frameName: string): AtlasImage | null => {
-    const data = atlasJsonCache.get(file) ?? Assets.get<Spritesheet | undefined>(file)?.data;
-    return data === undefined
-      ? null
-      : atlasImage(data, assetUrl(atlasImagePath(file, data)), frameName);
-  };
-  const stickerArt = (critterId: string, frameName: string): AtlasImage | null => {
-    const critter = content.world.critters[critterId];
-    return critter === undefined ? null : atlasFrame(critter.atlas, frameName);
-  };
-  const speakerPortrait = (speaker: string | null): AtlasImage | null => {
-    const source = speakerPortraitSource(content.world, speaker);
-    if (source === null) return null;
-    const data =
-      atlasJsonCache.get(source.atlas) ?? Assets.get<Spritesheet | undefined>(source.atlas)?.data;
-    if (data === undefined) {
-      void loadAtlasJson(source.atlas)
-        .then((loaded) => decodeOnce(atlasImagePath(source.atlas, loaded)))
-        .then(invalidate)
-        .catch(() => undefined);
-      return null;
-    }
-    if (data.frames[source.frame] === undefined) return null;
-    const image = atlasImage(data, assetUrl(atlasImagePath(source.atlas, data)), source.frame);
-    return { ...image, frame: cropPortraitFrame(image.frame, source.cropMode) };
-  };
-  // A prize's art: its frame in the prize atlas (spec 8.2).
-  const prizeArt = (frameName: string): AtlasImage | null =>
-    atlasFrame(content.world.arcade.atlas, frameName);
-  // A caught fish's art: lazily decoded only when opening the journal with catches.
-  const fishArt = (frameName: string): AtlasImage | null => atlasFrame(fishAtlas, frameName);
-  // Each hole of Boop-a-Mole is a touch target (spec 8.2): the outer four
-  // hold their arrow, and the middle the confirm button, while pressed; a tap
-  // counts however quickly it lifts.
-  const holeArrows: Record<Exclude<MoleHole, "middle">, Point> = {
-    up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
-  };
-  const onHole = (hole: MoleHole, down: boolean): void => {
-    if (hole === "middle") {
-      touch.setButton("confirm", down);
-      if (down) touch.tapButton("confirm");
-    } else if (down) {
-      touch.holdArrow(holeArrows[hole]);
-      touch.tapArrow(holeArrows[hole]);
-    } else touch.releaseArrow(holeArrows[hole]);
-  };
-  // Arcade and clubhouse microwave close-ups load on demand when entering
-  // `arcade` or `clubhouse` (or on first open), keeping boot light on iOS.
-  type ArcadeOverlay = {
-    render: (view: ArcadeView | null) => void;
-    info: () => ArcadeInfo | null;
-  };
-  type CookOverlay = {
-    render: (view: CookView | null) => void;
-    info: () => CookInfo | null;
-  };
-  type FishOverlay = {
-    render: (view: FishView | null) => void;
-    info: () => FishInfo | null;
-  };
-  let arcadeOverlay: ArcadeOverlay | null = null;
-  let arcadeLoad: Promise<void> | undefined;
-  const ensureArcadeOverlay = (): Promise<void> => {
-    if (arcadeOverlay !== null) return Promise.resolve();
-    if (arcadeLoad !== undefined) return arcadeLoad;
-    arcadeLoad = Promise.all([
-      domAtlas(content.world.arcade.atlas),
-      domAtlas(moleAtlas),
-      domAtlas(cometAtlas),
-      painting("assets/arcade/claw-machine.json", parseClawCalibration),
-      painting("assets/arcade/skee-lane.json", parseSkeeCalibration),
-      painting("assets/arcade/mole-cabinet.json", parseMoleCalibration),
-      painting("assets/arcade/comet-cabinet.json", parseCometCalibration),
-    ]).then(([
-      , , , clawPainting, skeePainting, molePainting, cometPainting,
-    ]) => {
-      const clawUp = createClaw(uiRoot, prizeArt, clawPainting.calibration, clawPainting.image);
-      const skeeUp = createSkee(uiRoot, skeePainting.calibration, skeePainting.image);
-      const moleUp = createMole(
-        uiRoot,
-        (frameName) => atlasFrame(moleAtlas, frameName),
-        molePainting.calibration,
-        molePainting.image,
-        onHole,
-      );
-      const cometUp = createComet(
-        uiRoot,
-        (frameName) => atlasFrame(cometAtlas, frameName),
-        cometPainting.calibration,
-        cometPainting.image,
-      );
-      arcadeOverlay = {
-        render: (view) => {
-          clawUp.render(view?.game === "claw" ? view : null);
-          skeeUp.render(view?.game === "skee" ? view : null);
-          moleUp.render(view?.game === "mole" ? view : null);
-          cometUp.render(view?.game === "comet" ? view : null);
-        },
-        info: () => clawUp.info() ?? skeeUp.info() ?? moleUp.info() ?? cometUp.info(),
-      };
-    });
-    return arcadeLoad;
-  };
-  let cookOverlay: CookOverlay | null = null;
-  let cookLoad: Promise<void> | undefined;
-  const ensureCookOverlay = (): Promise<void> => {
-    if (cookOverlay !== null) return Promise.resolve();
-    if (cookLoad !== undefined) return cookLoad;
-    cookLoad = Promise.all([
-      domAtlas(foodAtlas),
-      painting("assets/arcade/microwave.json", parseCookCalibration),
-    ]).then(([, cookPainting]) => {
-      cookOverlay = createCook(
-        uiRoot,
-        (frameName) => atlasFrame(foodAtlas, frameName),
-        cookPainting.calibration,
-        cookPainting.image,
-      );
-    });
-    return cookLoad;
-  };
-  let fishOverlay: FishOverlay | null = null;
-  let fishLoad: Promise<void> | undefined;
-  const ensureFishOverlay = (): Promise<void> => {
-    if (fishOverlay !== null) return Promise.resolve();
-    if (fishLoad !== undefined) return fishLoad;
-    fishLoad = Promise.all([
-      domAtlas(fishAtlas),
-      painting("assets/arcade/fishing-dock.json", parseFishCalibration),
-    ]).then(([, fishPainting]) => {
-      fishOverlay = createFish(
-        uiRoot,
-        (frameName) => atlasFrame(fishAtlas, frameName),
-        fishPainting.calibration,
-        fishPainting.image,
-      );
-    });
-    return fishLoad;
-  };
-  // Warms only the DOM media needed for `area`: arcade/cooking close-ups for
-  // those rooms, plus this area's critter PNGs so battle reward stickers never
-  // flicker in WebKit. Bedroom has 0 critters, so boot decodes 0 critter PNGs.
-  const cacheAreaNpcPortraits = (area: Area): void => {
-    for (const npc of area.npcs) {
-      const character = content.world.characters[npc.id];
-      if (character === undefined || atlasJsonCache.has(character.atlas)) continue;
-      const sheet = Assets.get<Spritesheet | undefined>(`${npc.id}-sheet`);
-      if (sheet !== undefined) atlasJsonCache.set(character.atlas, sheet.data);
-    }
-  };
-  const warmAreaMedia = async (area: Area): Promise<void> => {
-    const loads: Promise<unknown>[] = [];
-    if (area.id === "arcade") loads.push(ensureArcadeOverlay());
-    if (area.id === "clubhouse") loads.push(ensureCookOverlay());
-    if (area.id === "bay") loads.push(ensureFishOverlay());
-    const areaCritters = new Set([
-      ...area.critters.map((piece) => piece.id),
-      ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
-      ...area.npcs.flatMap((npc) =>
-        npc.visibleWhenCalmed === undefined ? [] : [npc.visibleWhenCalmed]),
-    ]);
-    for (const id of areaCritters) {
-      const critter = content.world.critters[id];
-      if (critter !== undefined) loads.push(decodeAtlasImage(critter.atlas));
-    }
-    for (const npc of area.npcs) {
-      const character = content.world.characters[npc.id];
-      if (character !== undefined) {
-        loads.push(decodeAtlasImage(character.atlas));
-      }
-    }
-    await Promise.all(loads);
-  };
-  const warmOwnedJournalMedia = async (snapshot: State): Promise<void> => {
-    const loads: Promise<unknown>[] = [];
-    for (const id of snapshot.stickers) {
-      const sticker = content.world.stickers.catalogue.find((item) => item.id === id);
-      const critter = sticker === undefined ? undefined : content.world.critters[sticker.critter];
-      if (critter !== undefined) loads.push(decodeAtlasImage(critter.atlas));
-    }
-    if (snapshot.prizes.length > 0)
-      loads.push(decodeAtlasImage(content.world.arcade.atlas));
-    if (Object.values(snapshot.caughtFish ?? {}).some((count) => count > 0))
-      loads.push(decodeAtlasImage(fishAtlas));
-    await Promise.all(loads);
-  };
+  const assets = createShellAssets({
+    world: content.world,
+    uiRoot,
+    invalidate,
+    onHole: createMoleHoleHandler(touch),
+  });
   const partyCommands: Record<string, string | null> = Object.fromEntries(
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),
   );
-  const warmBattlePortraits = async (snapshot: State): Promise<void> => {
-    const loads: Promise<unknown>[] = [decodeAtlasImage("assets/characters/fae/fae.json")];
-    for (const member of battleParty(content.world, snapshot.party)) {
-      const info = content.world.party[member.id];
-      if (info !== undefined) loads.push(decodeAtlasImage(info.atlas));
-    }
-    await Promise.all(loads);
-  };
-  const critterJsonFiles = [
-    ...new Set(Object.values(content.world.critters).map((critter) => critter.atlas)),
-  ];
   // Boot loads only permanent core sheets + tiny ~1 KB atlas JSON metadata
   // (for journal/credits frame crops) + the initial area. No unused critter
   // images or arcade paintings are decoded up front.
   const [mapCentres] = await Promise.all([
-    loadMapCentres(),
-    loadAtlasJson(content.world.arcade.atlas),
-    ...critterJsonFiles.map((file) => loadAtlasJson(file)),
+    assets.loadMapCentres(),
+    assets.preloadCoreAtlasMeta(),
     view.ready.then(async () => {
-      const faeSheet = Assets.get<Spritesheet | undefined>("fae-sheet");
-      if (faeSheet !== undefined) {
-        atlasJsonCache.set("assets/characters/fae/fae.json", faeSheet.data);
-      }
-      for (const [id, member] of Object.entries(content.world.party)) {
-        const sheet = Assets.get<Spritesheet | undefined>(`${id}-sheet`);
-        if (sheet !== undefined) atlasJsonCache.set(member.atlas, sheet.data);
-      }
+      assets.seedCoreSheets();
       const initialArea = content.world.areas[state.area];
       if (initialArea === undefined) throw new Error("Missing initial area");
       await Promise.all([
-        view.setArea(initialArea).then(() => cacheAreaNpcPortraits(initialArea)),
-        warmAreaMedia(initialArea),
-        warmOwnedJournalMedia(state),
-        decodeAtlasImage("assets/characters/fae/fae.json"),
-        decodeAtlasImage(content.world.battle.toyAtlas),
+        view.setArea(initialArea).then(() => assets.cacheAreaNpcPortraits(initialArea)),
+        assets.warmAreaMedia(initialArea),
+        assets.warmJournalAssets(state),
+        assets.decodeAtlasImage(FAE_ATLAS),
+        assets.decodeAtlasImage(content.world.battle.toyAtlas),
       ]);
     }),
   ]);
-  // A toy a catch throws: a crop of the toy atlas (spec 8.1).
-  const toyArt = (frameName: string): AtlasImage | null => {
-    const atlas = content.world.battle.toyAtlas;
-    const sheet = Assets.get<Spritesheet | undefined>(atlas);
-    const rect = sheet?.data.frames[frameName]?.frame;
-    const size = sheet?.data.meta.size;
-    if (sheet === undefined || rect === undefined || size === undefined) return null;
-    return {
-      src: assetUrl(atlasImagePath(atlas, sheet.data)),
-      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
-      atlas: { w: size.w, h: size.h },
-    };
-  };
-  // The check overlay's view: the core's check with its place on screen.
-  const checkOverlay = (
-    battle: BattleView | null,
-    geometry: BattleCheckGeometry | null,
-  ): BattleCheckOverlayView | null => {
-    const check = battle?.check ?? null;
-    if (battle === null || check === null || geometry === null) return null;
-    const shared = { grade: battle.lastGrade, hint: battle.hint };
-    if (check.kind === "ring" && geometry.kind === "ring")
-      return { ...geometry, ...shared, progress: check.progress, target: check.target };
-    if (check.kind === "charge" && geometry.kind === "charge")
-      return { ...geometry, ...shared, fill: check.fill, great: check.great, good: check.good };
-    if (check.kind === "chain" && geometry.kind === "chain")
-      return { ...geometry, ...shared, beats: check.beats, look: check.look };
-    if (check.kind === "catch" && geometry.kind === "catch")
-      return {
-        ...geometry,
-        ...shared,
-        catcher: check.catcher,
-        toys: check.toys.map((toy) => {
-          const image = toyArt(toy.frame);
-          return {
-            ...toy,
-            image,
-            width: (image?.frame.w ?? 0) * geometry.toyScale,
-            height: (image?.frame.h ?? 0) * geometry.toyScale,
-          };
-        }),
-      };
-    if (check.kind === "lean" && geometry.kind === "lean")
-      return { ...geometry, ...shared, balance: check.balance, puffs: check.puffs };
-    if (check.kind === "trace" && geometry.kind === "trace")
-      return { ...geometry, ...shared, brush: check.brush, points: check.path.points,
-        checkpoint: check.checkpoint, results: check.results, dry: check.dry };
-    if (check.kind === "peekaboo" && geometry.kind === "peekaboo")
-      return {
-        ...geometry,
-        ...shared,
-        progress: check.progress,
-        status: check.status,
-        peeks: check.peeks,
-      };
-    if (check.kind === "echo" && geometry.kind === "echo")
-      return {
-        ...geometry,
-        ...shared,
-        phase: check.phase,
-        sequence: check.sequence,
-        results: check.results,
-        litNote: check.litNote,
-        demoIndex: check.demoIndex,
-        entered: check.entered,
-        time: check.time,
-      };
-    return null;
-  };
   let afterTick = (_next: State): void => undefined;
   let logTitle = (_mode: TitleMode | null): void => undefined;
   let lastBattleLog = "";
@@ -890,29 +518,17 @@ async function boot(): Promise<void> {
       }
     }
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
-    if (arcadeState !== null && arcadeState.game !== "cook" && arcadeState.game !== "fish" &&
-        arcadeOverlay === null)
-      void ensureArcadeOverlay().then(invalidate);
-    if (arcadeState?.game === "cook" && cookOverlay === null)
-      void ensureCookOverlay().then(invalidate);
-    if (arcadeState?.game === "fish" && fishOverlay === null)
-      void ensureFishOverlay().then(invalidate);
-    arcadeOverlay?.render(
-      arcadeState !== null && arcadeState.game !== "cook" && arcadeState.game !== "fish"
-        ? arcadeState : null,
-    );
-    cookOverlay?.render(arcadeState?.game === "cook" ? arcadeState : null);
-    fishOverlay?.render(arcadeState?.game === "fish" ? arcadeState : null);
+    assets.renderOverlays(arcadeState);
     if (state.journalOpen && !wasJournalOpen) {
-      void warmOwnedJournalMedia(state).then(() => {
+      void assets.warmJournalAssets(state).then(() => {
         if (state.journalOpen) invalidate();
       });
     } else if (
       state.journalOpen &&
       Object.values(state.caughtFish ?? {}).some((count) => count > 0) &&
-      atlasJsonCache.get(fishAtlas) === undefined
+      !assets.hasAtlasMeta(FISH_ATLAS)
     ) {
-      void decodeAtlasImage(fishAtlas).then(() => {
+      void assets.decodeAtlasImage(FISH_ATLAS).then(() => {
         if (state.journalOpen) invalidate();
       });
     }
@@ -940,6 +556,7 @@ async function boot(): Promise<void> {
     const activeBattle = battle !== null;
     const hasLantern = content.world.storyVariable(state.ink, "has_lantern") === true;
     const hasFlute = content.world.storyVariable(state.ink, "has_flute") === true;
+    const hasLasso = content.world.storyVariable(state.ink, "has_lasso") === true;
     if (lanternButton !== null) {
       lanternButton.hidden = !hasLantern;
       lanternButton.classList.toggle("is-on", state.lantern);
@@ -959,10 +576,24 @@ async function boot(): Promise<void> {
       state.finale !== "credits" &&
       levelUpNotices.length === 0;
     const interactTarget = overworldFree ? targetInteractable(content.world, state) : undefined;
+    const interactHint = overworldFree
+      ? resolveHudInteractHint({
+          hasInteractable: interactTarget !== undefined,
+          interactPrompt: interactTarget?.prompt,
+          isResting: view.isResting(),
+          player: state.player,
+          facing: state.facing,
+          pettableCompanion: interactTarget === undefined && !view.isResting()
+            ? findPettableCompanion(content.world, state)
+            : null,
+          hasRestSpot: interactTarget === undefined && !view.isResting() &&
+            findRestSpot(content.world, state) !== null,
+        })
+      : { canInteract: false, interactLabel: "Talk" };
     hudHints.render({
       visible: gameSettings.keyHints() && !touchActive && overworldFree,
-      canInteract: interactTarget !== undefined,
-      interactLabel: interactTarget?.prompt ?? "Talk",
+      canInteract: interactHint.canInteract,
+      interactLabel: interactHint.interactLabel,
       hasLantern,
       lanternOn: state.lantern,
       hasFlute,
@@ -1014,7 +645,7 @@ async function boot(): Promise<void> {
       entries: creditsOpen
         ? creditEntries(content.world, state).map((entry) => ({
             ...entry,
-            image: atlasFrame(entry.image.atlas, entry.image.frame),
+            image: assets.atlasFrame(entry.image.atlas, entry.image.frame),
           }))
         : [],
     });
@@ -1041,7 +672,7 @@ async function boot(): Promise<void> {
       touch.releaseArrows();
     const hideActions = state.battle?.phase === "check" ||
       state.battle?.phase === "burstResult";
-    if (activeBattle && !wasBattleOpen) void warmBattlePortraits(state).then(invalidate);
+    if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
     wasBattleOpen = activeBattle;
     const showBattleHud = activeBattle && state.battle?.phase !== "reward" &&
       !talkChoicesShown(battle?.talk ?? null);
@@ -1052,7 +683,7 @@ async function boot(): Promise<void> {
           partyIds: battleParty(content.world, state.party).map((member) => member.id),
           partyCommands,
           energy: battle?.energy ?? state.battle.energy,
-          resolveImage: (id) => speakerPortrait(id),
+          resolveImage: (id) => assets.speakerPortrait(id),
         })
       : [];
     battleHud.render({
@@ -1110,230 +741,48 @@ async function boot(): Promise<void> {
       window.innerHeight,
     );
     touch.setTraceElement(geometry?.kind === "trace" ? geometry.rect : undefined);
-    battleCheck.render(checkOverlay(battle, geometry));
-    // The card shows a new sticker; a species already in the album only pays.
-    const rewardCritter =
-      state.battle === null
-        ? undefined
-        : content.world.critters[state.battle.critterId];
-    const battleReward =
-      activeBattle &&
-      state.battle?.phase === "reward" &&
-      state.battle.rewardSticker !== null;
-    // One reward card: a battle's new sticker, else a prize won at the arcade.
-    const arcadePrize = battleReward || arcadeState?.game !== "claw" ? null : arcadeState.prize;
+    battleCheck.render(battleCheckOverlay(battle, geometry, assets.toyArt));
     rewardSticker.render(
-      battleReward
-        ? {
-            visible: true,
-            title: "NEW STICKER!",
-            name: rewardCritter?.sticker.name ?? "",
-            image:
-              rewardCritter === undefined
-                ? null
-                : stickerArt(rewardCritter.id, rewardCritter.sticker.frame),
-          }
-        : arcadePrize !== null
-          ? {
-              visible: true,
-              title: arcadePrize.title,
-              name: arcadePrize.name,
-              image: prizeArt(arcadePrize.frame),
-            }
-          : { visible: false, title: "", name: "", image: null },
+      buildRewardStickerView(content.world, state, activeBattle, arcadeState, assets),
     );
-    const isStorySet = (variable: string): boolean =>
-      content.world.storyVariable(state.ink, variable) === true;
-    journal.render({
-      visible: state.journalOpen,
-      notes: state.journalOpen ? notesNow() : [],
-      treats: state.journalOpen ? carriedTreats(content.world, state) : [],
-      stickers: state.journalOpen
-        ? Array.from({ length: content.world.stickers.slots }, (_, index) => {
-            const sticker = content.world.stickers.catalogue[index];
-            if (sticker === undefined)
-              return {
-                id: `empty-${index}`,
-                name: "",
-                owned: false,
-                image: null,
-              };
-            const owned = state.stickers.includes(sticker.id);
-            return {
-              id: sticker.id,
-              name: sticker.name,
-              owned,
-              image: owned ? stickerArt(sticker.critter, sticker.frame) : null,
-              fieldNote: owned ? critterFieldNote(content.world, state, sticker.id) : null,
-            };
-          })
-        : [],
-      prizes: state.journalOpen
-        ? content.world.arcade.prizes.map((prize) => ({
-            id: prize.id,
-            name: prize.name,
-            owned: state.prizes.includes(prize.id),
-            image: state.prizes.includes(prize.id)
-              ? prizeArt(prize.frame)
-              : null,
-          }))
-        : [],
-      fish: state.journalOpen
-        ? journalFish(content.world, state).map((item) => ({
-            id: item.id,
-            name: item.name,
-            owned: item.owned,
-            rare: item.rare,
-            image: item.owned ? fishArt(item.frame) : null,
-          }))
-        : [],
-      keepsakes: state.journalOpen ? journalKeepsakes(content.world, state) : [],
-      lands: state.journalOpen
-        ? content.world.lands.map((land) => ({
-            ...land,
-            name: mapLandName(land, content.world.areas[state.area]?.land ?? null, isStorySet),
-            ...(mapCentres[land.id] ?? { x: 0, y: 0 }),
-          }))
-        : [],
-      currentLand: content.world.areas[state.area]?.land ?? null,
-      landProgress: state.journalOpen ? landStickerProgress(content.world, state) : {},
-      busRoutes: state.journalOpen
-        ? mapBusRoutes(
-            content.world.lands,
-            isStorySet,
-            (id) => state.stickers.includes(id),
-          )
-        : [],
-      stickersOwned: state.stickers.length,
-      stickersTotal: content.world.stickers.catalogue.length,
-      prizesOwned: state.prizes.length,
-      prizesTotal: content.world.arcade.prizes.length,
-      coins: state.coins,
-      snacks: state.snacks,
-      tickets: state.tickets,
-      gems: state.journalOpen ? starGemsFound(content.world, state) : undefined,
-      muted: sound.muted(),
-      level: sound.level(),
-      musicMuted: sound.musicMuted(),
-      musicLevel: sound.musicLevel(),
-      ambienceMuted: sound.ambienceMuted(),
-      nowPlaying: soundtrack.title,
-      gentleTiming: gameSettings.gentleTiming(),
-      keyHints: gameSettings.keyHints(),
-      textSpeed: gameSettings.textSpeed(),
-      reducedMotion: gameSettings.reducedMotion(),
-      treasures: state.journalOpen ? treasuresSummary(content.world, state) : undefined,
-      hasLantern,
-      hasFlute,
-      members: state.journalOpen
-        ? [
-            { id: "fae", name: "Fae", level: levelForXp(content.world.levels, state.xp),
-              xp: state.xp,
-              startXp: content.world.levels.thresholds[
-                levelForXp(content.world.levels, state.xp) - 1] ?? 0,
-              nextXp: content.world.levels.thresholds[
-                levelForXp(content.world.levels, state.xp)] ?? state.xp,
-              stats: statsForCommand(content.world.levels, "soothe",
-                levelForXp(content.world.levels, state.xp)), friend: false },
-            ...state.party.map((member) => {
-              const party = content.world.party[member.id];
-              const level = levelForXp(content.world.levels, member.xp);
-              return { id: member.id, name: party?.name ?? member.id, level, xp: member.xp,
-                startXp: content.world.levels.thresholds[level - 1] ?? 0,
-                nextXp: content.world.levels.thresholds[level] ?? member.xp,
-                stats: statsForCommand(content.world.levels,
-                  party?.command?.id ?? "soothe", level),
-                friend: true };
-            }),
-          ]
-        : [],
-    });
+    journal.render(
+      buildJournalView({
+        world: content.world,
+        state,
+        notes: state.journalOpen ? notesNow() : [],
+        mapCentres,
+        art: assets,
+        muted: sound.muted(),
+        level: sound.level(),
+        musicMuted: sound.musicMuted(),
+        musicLevel: sound.musicLevel(),
+        ambienceMuted: sound.ambienceMuted(),
+        nowPlaying: soundtrack.title,
+        gentleTiming: gameSettings.gentleTiming(),
+        keyHints: gameSettings.keyHints(),
+        textSpeed: gameSettings.textSpeed(),
+        reducedMotion: gameSettings.reducedMotion(),
+        hasLantern,
+        hasFlute,
+        hasLasso,
+      }),
+    );
     if (state.journalOpen) document.documentElement.dataset.journal = "open";
     else delete document.documentElement.dataset.journal;
-    if (
-      activeBattle ||
-      (arcadeState !== null && arcadeState.phase !== "result")
-    )
-      dialogueBox.hide();
-    const levelUpNotice = levelUpNotices[0] ?? null;
-    if (levelUpNotice !== null) {
-      dialogueBox.render({ speaker: null, text: levelUpNotice, revealed: levelUpNotice.length,
-        choices: [], selected: -1, canAdvance: true });
-      document.documentElement.dataset.dialogue = "open";
-    } else if (activeBattle && battle?.talk !== null && battle?.talk !== undefined) {
-      const talkView = battleTalkDialogueView(battle.talk);
-      dialogueBox.render({
-        ...talkView,
-        portrait: speakerPortrait(talkView.speaker),
-        accent: speakerAccent(talkView.speaker),
-      });
-      document.documentElement.dataset.dialogue = "open";
-    } else if (activeBattle && (battle?.message ?? "") !== "") {
-      const activeCmd =
-        state.battle?.phase === "command" &&
-        battle?.talk === null &&
-        !state.battle.treatMenu &&
-        battle.treatTray === null
-          ? (battle.commands[battle.selected] ?? null)
-          : null;
-      const feelingLabel =
-        activeCmd?.feeling !== null && activeCmd?.feeling !== undefined
-          ? (content.world.battle.feelings[activeCmd.feeling]?.label ?? null)
-          : null;
-      const battleText = battle?.message ?? "";
-      const commandSubtitle =
-        activeCmd !== null &&
-        !battleText.startsWith("Fae plays her flute!") &&
-        !battleText.startsWith("Fae twirls her rainbow lasso")
-          ? battleCommandPreview(
-              activeCmd,
-              battle?.critterName ?? "the critter",
-              feelingLabel,
-            )
-          : null;
-      dialogueBox.render({
-        speaker: null,
-        text: battleText,
-        subtitle: commandSubtitle,
-        revealed: battle?.revealed ?? 0,
-        choices: [],
-        selected: -1,
-        canAdvance: battle !== null && state.battle?.phase !== "command" &&
-          battle.revealed >= battle.message.length,
-      });
-      document.documentElement.dataset.dialogue = "open";
-    } else if (activeBattle) {
-      dialogueBox.hide();
-      delete document.documentElement.dataset.dialogue;
-    } else if (arcadeState !== null && arcadeState.phase === "result") {
-      document.documentElement.dataset.dialogue = "open";
-      dialogueBox.render({
-        speaker: null,
-        text: arcadeState.message,
-        revealed: arcadeState.revealed,
-        choices: [],
-        selected: -1,
-        canAdvance: arcadeState.revealed >= arcadeState.message.length,
-      });
-    } else if (state.dialogue === null) {
+    const dialogueView = buildDialogueView({
+      world: content.world,
+      state,
+      battle,
+      arcadeState,
+      levelUpNotice: levelUpNotices[0] ?? null,
+      speakerPortrait: assets.speakerPortrait,
+    });
+    if (dialogueView === null) {
       dialogueBox.hide();
       delete document.documentElement.dataset.dialogue;
     } else {
+      dialogueBox.render(dialogueView);
       document.documentElement.dataset.dialogue = "open";
-      dialogueBox.render({
-        speaker: state.dialogue.speaker,
-        text: state.dialogue.text,
-        revealed: state.dialogue.revealed,
-        // Choices appear once the line has finished typing (spec section 7).
-        choices:
-          state.dialogue.revealed >= state.dialogue.text.length
-            ? state.dialogue.choices.map((text) => ({ text }))
-            : [],
-        selected: state.dialogue.selected,
-        canAdvance: state.dialogue.choices.length === 0,
-        portrait: speakerPortrait(state.dialogue.speaker),
-        accent: speakerAccent(state.dialogue.speaker),
-      });
     }
   };
   // The title reads its own input edges from here, never from the core state.
@@ -1520,9 +969,7 @@ async function boot(): Promise<void> {
         const targetArea = content.world.areas[target];
         if (targetArea !== undefined) {
           view.prefetch(targetArea);
-          if (targetArea.id === "arcade") void ensureArcadeOverlay();
-          if (targetArea.id === "clubhouse") void ensureCookOverlay();
-          if (targetArea.id === "bay") void ensureFishOverlay();
+          void assets.warmAreaOverlays(targetArea.id);
         }
         prefetchedTarget = target;
       }
@@ -1624,16 +1071,16 @@ async function boot(): Promise<void> {
       if (area === undefined) throw new Error(`Unknown area ${state.area}`);
       if (!reload && view.loadedAreaId() === area.id) {
         await Promise.all([
-          warmAreaMedia(area),
-          state.battle !== null ? warmBattlePortraits(state) : Promise.resolve(),
+          assets.warmAreaMedia(area),
+          state.battle !== null ? assets.warmBattlePortraits(state) : Promise.resolve(),
         ]);
         return;
       }
       reload = false;
       areaLoad = Promise.all([
-        view.setArea(area).then(() => cacheAreaNpcPortraits(area)),
-        warmAreaMedia(area),
-        state.battle !== null ? warmBattlePortraits(state) : Promise.resolve(),
+        view.setArea(area).then(() => assets.cacheAreaNpcPortraits(area)),
+        assets.warmAreaMedia(area),
+        state.battle !== null ? assets.warmBattlePortraits(state) : Promise.resolve(),
       ])
         .then(() => {
           view.resetCamera();
@@ -1754,7 +1201,7 @@ async function boot(): Promise<void> {
         clearAreaBanner();
         suppressSave = false;
         prefetchedTarget = undefined;
-        await Promise.all([ensureArea(), warmOwnedJournalMedia(state)]);
+        await Promise.all([ensureArea(), assets.warmJournalAssets(state)]);
         titleMode = null;
         jukeboxTrack = null;
         qaMenuOpen = false;
@@ -1767,7 +1214,7 @@ async function boot(): Promise<void> {
       },
       renderInfo: () => ({
         ...view.renderInfo(state),
-        arcade: arcadeOverlay?.info() ?? cookOverlay?.info() ?? fishOverlay?.info() ?? null,
+        arcade: assets.overlayInfo(),
       }),
       qa: {
         active: () => qaActivePack !== null,

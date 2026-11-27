@@ -4815,6 +4815,43 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, and targeted `more-bad-guys.spec`,
   `m81-festival.spec`, and `ui-gallery.spec` passed across Chromium & WebKit.
 
+## Milestone 104: Interactive Fish & Keepsake Lore Cards, Context-Aware Key Hints, Dynamic Tool Controls & `src/shell/assets.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Interactive Fish Catch & Keepsake Memory Cards (`src/core/journal.ts`,
+  `src/ui/journal.ts`, `src/ui/journal.css`):
+  - Enriched `JournalFish` with `coins`, `snacks`, and 1-line Bubblegum Bay
+    `blurb` for all 6 catches, and `JournalKeepsake` with Clubhouse
+    `displaySpot` and Fae's 1-line `memory` for all 9 keepsakes (zero
+    save-format or replay-hash shifts).
+  - Made owned `.journal-fish` and `.journal-keepsakes` slots inspectable via
+    click/tap or keyboard `Enter`/`Space`, reusing `.journal-field-note` for
+    `"sticker"`, `"fish"` (with golden rare specimen ring and coin/snack
+    reward), and `"keepsake"` (with large inline SVG charm in
+    `.journal-field-charm`, source, Clubhouse display spot, and memory).
+- Context-Aware Desktop Key Hints & Dynamic Tool Controls (`src/ui/hud-hints.ts`,
+  `src/ui/journal.ts`, `src/main.ts`):
+  - Added pure `resolveHudInteractHint` / `isFacingPoint` in `src/ui/hud-hints.ts`
+    so the desktop `Z` pill dynamically shows interactable prompts, `Stand`
+    while resting, `Pet` only when facing a pettable companion (`dot >= 0.15`),
+    or `Rest` at a rest spot with zero DOM churn.
+  - Added optional `hasLasso` on `JournalView` so `OPTIONS` `CONTROLS` renders
+    `Lasso: R` alongside `Lantern: L` and `Flute: F` once unlocked.
+- Shell Asset Loader Extraction (`src/shell/assets.ts`, `src/main.ts`):
+  - Extracted lazy atlas metadata caching, single-decode DOM image warming,
+    portrait/sticker/prize/fish/toy crop resolvers, per-area close-up overlay
+    loaders, and shell view projectors (`battleCheckOverlay`,
+    `buildJournalView`, `buildRewardStickerView`, `buildDialogueView`) into
+    `src/shell/assets.ts`, trimming `src/main.ts` from 1,831 to 1,278 lines
+    with zero behavioral changes.
+- Evidence: `tests/unit/milestone-104.test.ts` (4 tests) and extended
+  `tests/e2e/journal-collections.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m104-fish-field-note.jpg` and
+  `art/review/m104-keepsake-field-note.jpg` verified with `vision`.
+- Gates: `just check` (163 unit files / 1,261 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4325 just e2e` (1,088 passed, 2 skipped, 0 failed in
+  4.7 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

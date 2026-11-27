@@ -30,6 +30,8 @@ export type JournalKeepsake = {
   id: KeepsakeId;
   name: string;
   source: string;
+  displaySpot: string;
+  memory: string;
   owned: boolean;
 };
 export type JournalFish = {
@@ -38,6 +40,9 @@ export type JournalFish = {
   frame: string;
   owned: boolean;
   rare: boolean;
+  coins: number;
+  snacks: number;
+  blurb: string;
 };
 export type JournalProgress = {
   stickers: LandProgress;
@@ -236,6 +241,15 @@ export function carriedTreats(
   });
 }
 
+const FISH_BLURBS: Readonly<Record<string, string>> = {
+  minnow: "A rosy little minnow that loves darting between the dock pilings.",
+  perch: "A sunny golden perch that nibbles right near the warm shallows.",
+  shell: "A rosy spiral shell tucked into Bubblegum Bay's sandy bottom.",
+  koi: "A shimmering rainbow koi that dances under the afternoon ripples.",
+  jelly: "A glowing lavender jelly that winks softly before drifting home.",
+  starfish: "A dazzling golden starfish from Bubblegum Bay's deepest waters!",
+};
+
 /** All nine quest keepsakes in canonical display order with ownership state. */
 export function journalKeepsakes(
   world: Pick<World, "storyVariable">,
@@ -247,54 +261,72 @@ export function journalKeepsakes(
       id: "star-crystal",
       name: "Star Crystal",
       source: "Crystal Cavern",
+      displaySpot: "Clubhouse Crate",
+      memory: "A shimmering crystal from Crystal Cavern. It still hums when I hold it!",
       owned: flag("cavern_chime_rung"),
     },
     {
       id: "star-pin",
       name: "Bon Appetit Star Pin",
       source: "Bon Appetit Café",
+      displaySpot: "Clubhouse Shelf",
+      memory: "Chef Bea's golden pin still smells faintly like warm star cinnamon!",
       owned: flag("spice_returned"),
     },
     {
       id: "star-geode",
       name: "Rainbow Star Geode",
       source: "7 Star Gems",
+      displaySpot: "Clubhouse Shelf",
+      memory: "All seven Star Gems sparkle inside Grandpa Barnaby's geode like a tiny galaxy!",
       owned: flag("gem_reward_all"),
     },
     {
       id: "moon-feather",
       name: "Moon Feather",
       source: "Starry Owl",
+      displaySpot: "Clubhouse Crate",
+      memory: "Starry Owl's iridescent feather shimmers softly even when the lights are low.",
       owned: state.stickers.includes("starry-owl"),
     },
     {
       id: "taco-badge",
       name: "Golden Taco Badge",
       source: "Chef Mateo",
+      displaySpot: "Clubhouse Wall",
+      memory: "Chef Mateo's shiny golden badge for best taste-tester in Cloverhollow Hills!",
       owned: state.stickers.includes("taco-chef"),
     },
     {
       id: "clover-wreath",
       name: "Sanctuary Clover Wreath",
       source: "Wildlife Sanctuary",
+      displaySpot: "Clubhouse Wall",
+      memory: "Dried alpine wildflower petals still smell like meadow sunshine.",
       owned: flag("sanctuary_reward_14"),
     },
     {
       id: "sea-compass",
       name: "Sea-Glass Compass",
       source: "Sue's Beach Cottage",
+      displaySpot: "Clubhouse Crate",
+      memory: "Its needle always points gently toward Bubblegum Bay!",
       owned: flag("sue_compass"),
     },
     {
       id: "alpine-clover",
       name: "Pressed Alpine Clover",
       source: "Jordan's Mountain Cabin",
+      displaySpot: "Clubhouse Wall",
+      memory: "A four-leaf clover pressed from Jordan's grandma's mountain botany book.",
       owned: flag("jordan_clover"),
     },
     {
       id: "star-whistle",
       name: "Golden Star-Line Whistle",
       source: "Buster · Star-Line",
+      displaySpot: "Clubhouse Shelf",
+      memory: "Buster's golden bus whistle shines like a tiny Star-Line stop sign!",
       owned: flag("buster_reward"),
     },
   ];
@@ -312,6 +344,9 @@ export function journalFish(
     frame: item.frame,
     owned: (caught[item.id] ?? 0) > 0,
     rare: item.rarity === "rare",
+    coins: item.coins,
+    snacks: item.snacks,
+    blurb: FISH_BLURBS[item.id] ?? "A bright little treasure from Bubblegum Bay.",
   }));
 }
 

@@ -40,6 +40,9 @@ export type JournalFishEntry = {
   image: AtlasImage | null;
   owned: boolean;
   rare: boolean;
+  coins: number;
+  snacks: number;
+  blurb: string;
 };
 
 export type JournalView = {
@@ -76,6 +79,7 @@ export type JournalView = {
   treasures?: TreasuresSummary;
   hasLantern: boolean;
   hasFlute: boolean;
+  hasLasso?: boolean;
   members: {
     id: string;
     name: string;
@@ -190,7 +194,7 @@ function addSlot(
   return { root, image, unknown, name, imageKey: "" };
 }
 
-function addKeepsakeSlot(grid: HTMLElement): KeepsakeSlot {
+function addKeepsakeSlot(grid: HTMLElement, onInspect?: () => void): KeepsakeSlot {
   const root = element("div", "journal-slot journal-keepsake-slot");
   const charm = element("div", "journal-keepsake-charm");
   charm.setAttribute("role", "img");
@@ -199,8 +203,30 @@ function addKeepsakeSlot(grid: HTMLElement): KeepsakeSlot {
   unknown.setAttribute("aria-label", "A keepsake still to find");
   const name = element("div", "journal-name");
   root.append(charm, unknown, name);
+  if (onInspect !== undefined) {
+    root.addEventListener("click", () => onInspect());
+    root.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onInspect();
+      }
+    });
+  }
   grid.append(root);
   return { root, charm, unknown, name, iconId: null };
+}
+
+function syncInspectableSlot(root: HTMLElement, inspectable: boolean, name: string): void {
+  root.classList.toggle("is-inspectable", inspectable);
+  if (inspectable) {
+    setAttribute(root, "tabindex", "0");
+    setAttribute(root, "role", "button");
+    setAttribute(root, "aria-label", `Inspect ${name}`);
+  } else {
+    if (root.hasAttribute("tabindex")) root.removeAttribute("tabindex");
+    if (root.hasAttribute("role")) root.removeAttribute("role");
+    if (root.hasAttribute("aria-label")) root.removeAttribute("aria-label");
+  }
 }
 
 function makeCompleteRibbon(): HTMLSpanElement {
@@ -569,7 +595,10 @@ export function createJournal(root: HTMLElement): {
   const fieldSpecimen = element("div", "journal-field-specimen");
   const fieldPortrait = element("div", "journal-field-portrait die-cut");
   fieldPortrait.setAttribute("role", "img");
-  fieldSpecimen.append(fieldPortrait);
+  const fieldCharm = element("div", "journal-field-charm");
+  fieldCharm.setAttribute("role", "img");
+  fieldCharm.hidden = true;
+  fieldSpecimen.append(fieldPortrait, fieldCharm);
   const fieldOldFriend = element("span", "journal-field-old-friend");
   fieldOldFriend.textContent = "★ Old Friend";
   fieldOldFriend.hidden = true;
@@ -582,23 +611,27 @@ export function createJournal(root: HTMLElement): {
     keyText: string,
     valueNode: HTMLElement,
     pills = false,
-  ): HTMLDivElement => {
+  ): { row: HTMLDivElement; key: HTMLSpanElement } => {
     const row = element("div", pills ? "journal-field-row is-pills" : "journal-field-row");
     const key = element("span", "journal-field-key");
     key.textContent = keyText;
     row.append(key, valueNode);
-    return row;
+    return { row, key };
   };
   const fieldLands = element("span", "journal-field-val journal-field-lands");
   const fieldCalms = element("span", "journal-field-val journal-field-calms");
   const fieldFeelings = element("div", "journal-field-feelings");
   const fieldLoves = element("div", "journal-field-loves");
   const fieldBlurb = element("p", "journal-field-blurb");
+  const fieldFoundRow = makeFieldRow("Found in", fieldLands);
+  const fieldDetailRow = makeFieldRow("Calmed", fieldCalms);
+  const fieldFeelingsRow = makeFieldRow("Feelings", fieldFeelings, true);
+  const fieldLovesRow = makeFieldRow("Loves", fieldLoves, true);
   fieldMeta.append(
-    makeFieldRow("Found in", fieldLands),
-    makeFieldRow("Calmed", fieldCalms),
-    makeFieldRow("Feelings", fieldFeelings, true),
-    makeFieldRow("Loves", fieldLoves, true),
+    fieldFoundRow.row,
+    fieldDetailRow.row,
+    fieldFeelingsRow.row,
+    fieldLovesRow.row,
   );
   fieldBody.append(fieldName, fieldSub, fieldMeta, fieldBlurb);
   fieldCard.append(fieldClose, fieldLeft, fieldBody);
@@ -677,15 +710,15 @@ export function createJournal(root: HTMLElement): {
   let treatsSignature = "";
   let fieldSignature = "";
   let treasuresSignature = "";
-  let inspectedStickerId: string | null = null;
+  let inspectedItem: { kind: "sticker" | "fish" | "keepsake"; id: string } | null = null;
   let treasuresOpen = false;
   let selectedLandId: string | null = null;
   let hoveredLandId: string | null = null;
   let latestView: JournalView | null = null;
 
   const closeFieldNote = (): void => {
-    if (inspectedStickerId === null && fieldBackdrop.hidden) return;
-    inspectedStickerId = null;
+    if (inspectedItem === null && fieldBackdrop.hidden) return;
+    inspectedItem = null;
     fieldSignature = "";
     fieldBackdrop.hidden = true;
   };
@@ -777,53 +810,137 @@ export function createJournal(root: HTMLElement): {
   };
 
   const syncFieldNote = (view: JournalView): void => {
-    if (inspectedStickerId === null) {
+    if (inspectedItem === null) {
       if (!fieldBackdrop.hidden) fieldBackdrop.hidden = true;
       return;
     }
-    const sticker = view.stickers.find(
-      (candidate) => candidate.id === inspectedStickerId && candidate.owned &&
-        candidate.fieldNote != null,
+    if (inspectedItem.kind === "sticker") {
+      const sticker = view.stickers.find(
+        (candidate) => candidate.id === inspectedItem?.id && candidate.owned &&
+          candidate.fieldNote != null,
+      );
+      const note = sticker?.fieldNote ?? null;
+      if (sticker === undefined || note === null) {
+        closeFieldNote();
+        return;
+      }
+      fieldBackdrop.hidden = false;
+      const signature = [
+        "sticker",
+        sticker.id,
+        note.level,
+        note.calms,
+        note.oldFriend,
+        note.lands.join(","),
+        note.feelings.map((item) => item.id).join(","),
+        note.favouriteTreats.join(","),
+      ].join("|");
+      if (signature === fieldSignature) return;
+      fieldSignature = signature;
+      setAttribute(fieldCard, "aria-label", "Critter field note");
+      setAttribute(fieldCard, "data-field-kind", "sticker");
+      fieldSpecimen.classList.toggle("is-rare", false);
+      fieldPortrait.hidden = false;
+      fieldCharm.hidden = true;
+      if (sticker.image !== null) applyAtlasCrop(fieldPortrait, sticker.image);
+      setAttribute(fieldPortrait, "aria-label", note.name);
+      setText(fieldName, note.name);
+      setText(fieldSub, `Lv ${note.level} · ${note.chaosName}`);
+      fieldOldFriend.hidden = !note.oldFriend;
+      setText(fieldLands, note.lands.join(", "));
+      setText(fieldDetailRow.key, "Calmed");
+      setText(fieldCalms, `${note.calms} ${note.calms === 1 ? "time" : "times"}`);
+      fieldFeelingsRow.row.hidden = false;
+      fieldLovesRow.row.hidden = false;
+      fieldFeelings.replaceChildren(
+        ...note.feelings.map((feeling) => {
+          const pill = element("span", "journal-field-feeling");
+          pill.append(icon(feelingMarkup[feeling.id], "journal-field-feeling-icon"), feeling.label);
+          return pill;
+        }),
+      );
+      fieldLoves.replaceChildren(
+        ...note.favouriteTreats.map((treat) => {
+          const pill = element("span", "journal-field-love-pill");
+          pill.append(icon(heartMarkup, "journal-field-heart"), treat);
+          return pill;
+        }),
+      );
+      setText(fieldBlurb, fieldNoteBlurb(note));
+      return;
+    }
+    if (inspectedItem.kind === "fish") {
+      const fish = (view.fish ?? []).find(
+        (candidate) => candidate.id === inspectedItem?.id && candidate.owned,
+      );
+      if (fish === undefined) {
+        closeFieldNote();
+        return;
+      }
+      fieldBackdrop.hidden = false;
+      const signature = [
+        "fish",
+        fish.id,
+        fish.rare,
+        fish.coins,
+        fish.snacks,
+        fish.blurb,
+        fish.image !== null,
+      ].join("|");
+      if (signature === fieldSignature) return;
+      fieldSignature = signature;
+      setAttribute(fieldCard, "aria-label", "Fish catch note");
+      setAttribute(fieldCard, "data-field-kind", "fish");
+      fieldSpecimen.classList.toggle("is-rare", fish.rare);
+      fieldPortrait.hidden = fish.image === null;
+      fieldCharm.hidden = true;
+      if (fish.image !== null) applyAtlasCrop(fieldPortrait, fish.image);
+      setAttribute(fieldPortrait, "aria-label", fish.name);
+      setText(fieldName, fish.name);
+      setText(fieldSub, fish.rare ? "Bubblegum Bay · Rare Catch" : "Bubblegum Bay · Bay Catch");
+      fieldOldFriend.hidden = true;
+      setText(fieldLands, "Bubblegum Bay Dock");
+      setText(fieldDetailRow.key, "Reward");
+      const snackBonus = fish.snacks > 0 ? `, +${fish.snacks} snack` : "";
+      setText(fieldCalms, `+${fish.coins} coins${snackBonus}`);
+      fieldFeelingsRow.row.hidden = true;
+      fieldLovesRow.row.hidden = true;
+      setText(fieldBlurb, fish.blurb);
+      return;
+    }
+    const keepsake = (view.keepsakes ?? []).find(
+      (candidate) => candidate.id === inspectedItem?.id && candidate.owned,
     );
-    const note = sticker?.fieldNote ?? null;
-    if (sticker === undefined || note === null) {
+    if (keepsake === undefined) {
       closeFieldNote();
       return;
     }
     fieldBackdrop.hidden = false;
     const signature = [
-      sticker.id,
-      note.level,
-      note.calms,
-      note.oldFriend,
-      note.lands.join(","),
-      note.feelings.map((item) => item.id).join(","),
-      note.favouriteTreats.join(","),
+      "keepsake",
+      keepsake.id,
+      keepsake.source,
+      keepsake.displaySpot,
+      keepsake.memory,
     ].join("|");
     if (signature === fieldSignature) return;
     fieldSignature = signature;
-    if (sticker.image !== null) applyAtlasCrop(fieldPortrait, sticker.image);
-    setAttribute(fieldPortrait, "aria-label", note.name);
-    setText(fieldName, note.name);
-    setText(fieldSub, `Lv ${note.level} · ${note.chaosName}`);
-    fieldOldFriend.hidden = !note.oldFriend;
-    setText(fieldLands, note.lands.join(", "));
-    setText(fieldCalms, `${note.calms} ${note.calms === 1 ? "time" : "times"}`);
-    fieldFeelings.replaceChildren(
-      ...note.feelings.map((feeling) => {
-        const pill = element("span", "journal-field-feeling");
-        pill.append(icon(feelingMarkup[feeling.id], "journal-field-feeling-icon"), feeling.label);
-        return pill;
-      }),
-    );
-    fieldLoves.replaceChildren(
-      ...note.favouriteTreats.map((treat) => {
-        const pill = element("span", "journal-field-love-pill");
-        pill.append(icon(heartMarkup, "journal-field-heart"), treat);
-        return pill;
-      }),
-    );
-    setText(fieldBlurb, fieldNoteBlurb(note));
+    setAttribute(fieldCard, "aria-label", "Keepsake memory note");
+    setAttribute(fieldCard, "data-field-kind", "keepsake");
+    fieldSpecimen.classList.toggle("is-rare", false);
+    fieldPortrait.hidden = true;
+    fieldCharm.hidden = false;
+    fieldCharm.replaceChildren(keepsakeIcon(keepsake.id));
+    setAttribute(fieldCharm, "aria-label", keepsake.name);
+    setText(fieldName, keepsake.name);
+    setText(fieldSub, "Clubhouse Keepsake");
+    fieldOldFriend.hidden = true;
+    setText(fieldLands, keepsake.source);
+    setText(fieldDetailRow.key, "Displayed");
+    setText(fieldCalms, keepsake.displaySpot);
+    fieldFeelingsRow.row.hidden = true;
+    fieldLovesRow.row.hidden = true;
+    setText(fieldBlurb, keepsake.memory);
   };
 
   fieldClose.addEventListener("click", closeFieldNote);
@@ -896,7 +1013,7 @@ export function createJournal(root: HTMLElement): {
       }
       return;
     }
-    if (inspectedStickerId !== null) {
+    if (inspectedItem !== null) {
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
@@ -1037,6 +1154,7 @@ export function createJournal(root: HTMLElement): {
       const toolParts: string[] = [];
       if (view.hasLantern) toolParts.push("Lantern: L");
       if (view.hasFlute) toolParts.push("Flute: F");
+      if (view.hasLasso === true) toolParts.push("Lasso: R");
       controlsTools.hidden = toolParts.length === 0;
       setText(controlsTools, toolParts.join(" · "));
 
@@ -1123,7 +1241,7 @@ export function createJournal(root: HTMLElement): {
         slots.push(addSlot(grid, () => {
           const current = latestView?.stickers[slotIndex];
           if (current === undefined || !current.owned || current.fieldNote == null) return;
-          inspectedStickerId = current.id;
+          inspectedItem = { kind: "sticker", id: current.id };
           if (latestView !== null) syncFieldNote(latestView);
         }));
       }
@@ -1138,16 +1256,7 @@ export function createJournal(root: HTMLElement): {
         slot.name.hidden = image === null;
         setText(slot.name, image === null ? "" : sticker.name);
         setAttribute(slot.root, "data-owned", String(image !== null));
-        slot.root.classList.toggle("is-inspectable", inspectable);
-        if (inspectable) {
-          setAttribute(slot.root, "tabindex", "0");
-          setAttribute(slot.root, "role", "button");
-          setAttribute(slot.root, "aria-label", `Inspect ${sticker.name}`);
-        } else {
-          if (slot.root.hasAttribute("tabindex")) slot.root.removeAttribute("tabindex");
-          if (slot.root.hasAttribute("role")) slot.root.removeAttribute("role");
-          if (slot.root.hasAttribute("aria-label")) slot.root.removeAttribute("aria-label");
-        }
+        syncInspectableSlot(slot.root, inspectable, sticker.name);
         if (image === null) {
           slot.imageKey = "";
           return;
@@ -1161,7 +1270,6 @@ export function createJournal(root: HTMLElement): {
           slot.imageKey = key;
         }
       });
-      syncFieldNote(view);
       const allStickersOwned =
         view.stickers.length > 0 && view.stickers.every((sticker) => sticker.owned);
       stickersHeading.classList.toggle("is-complete", allStickersOwned);
@@ -1204,7 +1312,13 @@ export function createJournal(root: HTMLElement): {
         setText(fishCount, `${fishOwned}/${fishList.length}`);
         syncChild(fishHeading, fishComplete, fishList.length > 0 && fishOwned >= fishList.length);
         while (fishSlots.length < fishList.length) {
-          fishSlots.push(addSlot(fishGrid, undefined, "A fish still to catch"));
+          const slotIndex = fishSlots.length;
+          fishSlots.push(addSlot(fishGrid, () => {
+            const current = latestView?.fish?.[slotIndex];
+            if (current === undefined || !current.owned) return;
+            inspectedItem = { kind: "fish", id: current.id };
+            if (latestView !== null) syncFieldNote(latestView);
+          }, "A fish still to catch"));
         }
         while (fishSlots.length > fishList.length) fishSlots.pop()?.root.remove();
         fishList.forEach((item, index) => {
@@ -1218,6 +1332,7 @@ export function createJournal(root: HTMLElement): {
           setAttribute(slot.root, "data-owned", String(item.owned));
           setAttribute(slot.root, "data-fish", item.id);
           slot.root.classList.toggle("is-rare", item.owned && item.rare);
+          syncInspectableSlot(slot.root, item.owned, item.name);
           if (image === null) {
             slot.imageKey = "";
             return;
@@ -1247,7 +1362,13 @@ export function createJournal(root: HTMLElement): {
           keepsakesList.length > 0 && keepsakesOwned >= keepsakesList.length,
         );
         while (keepsakeSlots.length < keepsakesList.length) {
-          keepsakeSlots.push(addKeepsakeSlot(keepsakesGrid));
+          const slotIndex = keepsakeSlots.length;
+          keepsakeSlots.push(addKeepsakeSlot(keepsakesGrid, () => {
+            const current = latestView?.keepsakes?.[slotIndex];
+            if (current === undefined || !current.owned) return;
+            inspectedItem = { kind: "keepsake", id: current.id };
+            if (latestView !== null) syncFieldNote(latestView);
+          }));
         }
         while (keepsakeSlots.length > keepsakesList.length) keepsakeSlots.pop()?.root.remove();
         keepsakesList.forEach((item, index) => {
@@ -1259,6 +1380,7 @@ export function createJournal(root: HTMLElement): {
           setText(slot.name, item.owned ? item.name : "");
           setAttribute(slot.root, "data-owned", String(item.owned));
           setAttribute(slot.root, "data-keepsake", item.id);
+          syncInspectableSlot(slot.root, item.owned, item.name);
           if (item.owned) {
             setAttribute(slot.root, "title", item.source);
             setAttribute(slot.charm, "aria-label", item.name);
@@ -1275,6 +1397,7 @@ export function createJournal(root: HTMLElement): {
           }
         });
       }
+      syncFieldNote(view);
 
       const nextMapSignature = view.lands
         .map((land) => `${land.id}:${land.name}:${land.busStop}:${land.x}:${land.y}`)

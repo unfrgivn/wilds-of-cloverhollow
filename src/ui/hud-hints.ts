@@ -1,4 +1,5 @@
 import "./hud-hints.css";
+import type { Direction, Point } from "../core";
 
 export type HudHintsView = {
   visible: boolean;
@@ -9,6 +10,64 @@ export type HudHintsView = {
   hasFlute: boolean;
   muted: boolean;
 };
+
+export type HudInteractHint = {
+  canInteract: boolean;
+  interactLabel: string;
+};
+
+export type HudInteractContext = {
+  hasInteractable: boolean;
+  interactPrompt?: string;
+  isResting: boolean;
+  player: Point;
+  facing: Direction;
+  pettableCompanion: Point | null;
+  hasRestSpot: boolean;
+};
+
+const FACING_VECTORS: Readonly<Record<Direction, Point>> = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};
+
+const PET_HINT_FRONT_DOT = 0.15;
+
+export function isFacingPoint(origin: Point, facing: Direction, target: Point): boolean {
+  const dx = target.x - origin.x;
+  const dy = target.y - origin.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance === 0) return true;
+  const vector = FACING_VECTORS[facing];
+  return (dx * vector.x + dy * vector.y) / distance >= PET_HINT_FRONT_DOT;
+}
+
+/**
+ * Resolves the context-aware Z keycap label while roaming the overworld:
+ * real interactables win, then Stand (while resting), Pet (only when facing a
+ * pettable companion within the forward cone), Rest (at a cozy rest spot), or
+ * inactive Talk.
+ */
+export function resolveHudInteractHint(context: HudInteractContext): HudInteractHint {
+  if (context.hasInteractable) {
+    return { canInteract: true, interactLabel: context.interactPrompt ?? "Talk" };
+  }
+  if (context.isResting) {
+    return { canInteract: true, interactLabel: "Stand" };
+  }
+  if (
+    context.pettableCompanion !== null &&
+    isFacingPoint(context.player, context.facing, context.pettableCompanion)
+  ) {
+    return { canInteract: true, interactLabel: "Pet" };
+  }
+  if (context.hasRestSpot) {
+    return { canInteract: true, interactLabel: "Rest" };
+  }
+  return { canInteract: false, interactLabel: "Talk" };
+}
 
 type HintPill = {
   root: HTMLSpanElement;

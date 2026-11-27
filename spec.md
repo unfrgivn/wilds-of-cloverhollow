@@ -137,6 +137,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   96).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91).
+- Lazy DOM atlas metadata caching, single-decode image warming, frame crop
+  resolvers (`stickerArt`, `prizeArt`, `speakerPortrait`, `fishArt`, `toyArt`),
+  per-area close-up overlays (`ensureClawOverlay`, `ensureSkeeOverlay`,
+  `ensureMoleOverlay`, `ensureCometOverlay`, `ensureArcadeOverlay`,
+  `ensureCookOverlay`, `ensureFishOverlay`, `warmAreaOverlays`,
+  `warmAreaMedia`, `warmJournalAssets`, `warmBattlePortraits`), and shell view
+  projectors (`battleCheckOverlay`, `buildJournalView`,
+  `buildRewardStickerView`, `buildDialogueView`) live in `src/shell/assets.ts`
+  so `src/main.ts` stays focused on composition and lifecycle.
 - Tactile haptics (`src/platform/haptics.ts`, Milestone 91): progressive
   enhancement with zero new npm dependencies. `createHaptics()` checks for a
   native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via strict type
@@ -3227,7 +3236,8 @@ trunks keep its two exits.
   controls for Gentle Timing, Key Hints, Text Speed (`Cozy` / `Brisk` /
   `Instant`), and Reduced Motion (`Off` / `On`, stored under
   `cloverhollow-settings`, upgrading legacy preferences cleanly) above a compact
-  Controls reference card (showing Lantern and Flute once unlocked). Both pages
+  Controls reference card (showing Lantern, Flute, and Lasso once unlocked:
+  `Lantern: L`, `Flute: F`, `Lasso: R`). Both pages
   fit without scrolling or overlap at 667x375, 874x402, 1180x820, and 1280x720
   (switching Gameplay into a 2x2 touch tile grid at `max-height: 500px`).
 - **Interactive Field Treasures Card** (`treasuresSummary` in
@@ -3246,10 +3256,13 @@ trunks keep its two exits.
 - Optional desktop Key Hints ribbon (`src/ui/hud-hints.ts`): when Key Hints is
   enabled on non-touch desktop/gamepad setups, a cream die-cut ribbon anchored
   in the bottom-left safe area (`--z-hud`) shows keycap pills for Journal (`J`),
-  Talk/Look/Play (`Z`, highlighted warmly when targeting an interactable),
-  Lantern (`L`, shown once unlocked and glowing lavender when lit), Flute (`F`,
-  shown once unlocked), and Mute (`M`). It hides automatically during touch
-  mode, title, dialogue, battle, arcade, journal, credits, or QA overlays.
+  context-aware Confirm (`Z`, resolved via `resolveHudInteractHint`: active
+  interactable prompt or `Talk`, `Stand` while resting, `Pet` when actively
+  facing a pettable companion with forward dot `>= 0.15`, `Rest` at a rest
+  spot, or inactive `Talk`), Lantern (`L`, shown once unlocked and glowing
+  lavender when lit), Flute (`F`, shown once unlocked), and Mute (`M`). It
+  hides automatically during touch mode, title, dialogue, battle, arcade,
+  journal, credits, or QA overlays.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").
@@ -3306,6 +3319,22 @@ trunks keep its two exits.
     `.journal-keepsakes` grid rendering hand-crafted inline SVG charms
     (`keepsakeIcon` in `src/ui/icons.ts`, zero `<text>` nodes) + names for owned
     keepsakes or dashed `?` for locked keepsakes.
+  - **Interactive Fish Catch & Keepsake Memory Cards**: owned slots in
+    `.journal-fish` and `.journal-keepsakes` are clickable and
+    keyboard-focusable (`role="button"`, `tabindex="0"`, Enter/Space or
+    click/tap, subtle reduced-motion-guarded hover/focus lift) and reuse the
+    die-cut `.journal-field-note` card centered inside `.journal-book`
+    (`Escape`, `×`, backdrop click, tab switch, or closing the journal
+    dismisses only the card):
+    - Caught Fish (`kind: "fish"`): displays the fish's `AtlasImage` (with a
+      golden specimen ring when `rare`), name, `"Bubblegum Bay · Rare Catch"`
+      or `"Bubblegum Bay · Bay Catch"`, `Found in: Bubblegum Bay Dock`,
+      `Reward: +<coins> coins` (with `, +<snacks> snack` when `snacks > 0`),
+      and Fae's 1-line catch note (`JournalFish.blurb`).
+    - Owned Keepsakes (`kind: "keepsake"`): displays a large inline SVG charm
+      (`keepsakeIcon` in `.journal-field-charm`), name, `"Clubhouse Keepsake"`,
+      `Found in: <source>`, `Displayed: <displaySpot>`, and Fae's 1-line
+      memory (`JournalKeepsake.memory`).
   - **Completion Ribbons & MAP Footer Pills**: `STICKERS` and `PRIZES` headings
     also show the golden `★ Complete!` ribbon once every entry in their shelf is
     owned. The MAP footer dynamically attaches `Fish N/6` and `Keepsakes N/8`

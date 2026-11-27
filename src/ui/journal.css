@@ -10,6 +10,9 @@
 .journal-gems[hidden],
 .journal-field-backdrop[hidden],
 .journal-field-old-friend[hidden],
+.journal-field-portrait[hidden],
+.journal-field-charm[hidden],
+.journal-field-row[hidden],
 .journal-treasures-btn[hidden],
 .journal-treasures-backdrop[hidden],
 .journal-treasures-stamps[hidden] {
@@ -289,11 +292,32 @@
 }
 .journal-slot.is-inspectable {
   cursor: pointer;
+  transition: transform 120ms ease;
+}
+.journal-slot.is-inspectable:hover,
+.journal-slot.is-inspectable:focus-visible {
+  transform: translateY(-2px);
 }
 .journal-slot.is-inspectable:focus-visible {
   border-radius: 12px;
   outline: 2px solid var(--sticker-ink);
   outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-slot.is-inspectable {
+    transition: none;
+  }
+  .journal-slot.is-inspectable:hover,
+  .journal-slot.is-inspectable:focus-visible {
+    transform: none;
+  }
+}
+html[data-reduced-motion="on"] .journal-slot.is-inspectable {
+  transition: none;
+}
+html[data-reduced-motion="on"] .journal-slot.is-inspectable:hover,
+html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
+  transform: none;
 }
 .journal-sticker-image {
   --cut: 2px;
@@ -1007,12 +1031,29 @@
   background: radial-gradient(circle, #edf3df 0%, #f6f0dc 68%, #f7f2e3 100%);
   box-shadow: inset 0 2px 6px #47321f14;
 }
+.journal-field-specimen.is-rare {
+  border-color: #b57c18;
+  background: radial-gradient(circle, #fff8d6 0%, #f9e6a8 72%, #f7f2e3 100%);
+  box-shadow: 0 0 0 2px #f2c94c66, inset 0 2px 6px #47321f14;
+}
 .journal-field-portrait {
   --cut: 3px;
   --cut-ink: 1.5px;
   width: 98px;
   height: 98px;
   background-repeat: no-repeat;
+}
+.journal-field-charm {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+}
+.journal-field-charm .journal-keepsake-icon {
+  --cut: 3px;
+  --cut-ink: 1.5px;
+  width: 82px;
+  height: 82px;
 }
 .journal-field-old-friend {
   display: inline-flex;
@@ -1052,7 +1093,7 @@
 }
 .journal-field-row {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-columns: 78px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
 }
@@ -1138,10 +1179,12 @@
   }
   .journal-field-specimen { width: 94px; height: 94px; }
   .journal-field-portrait { width: 82px; height: 82px; }
+  .journal-field-charm { width: 74px; height: 74px; }
+  .journal-field-charm .journal-keepsake-icon { width: 70px; height: 70px; }
   .journal-field-name { font-size: 17px; }
   .journal-field-sub { margin-bottom: 5px; padding-bottom: 4px; font-size: 11.5px; }
   .journal-field-meta { gap: 3px; }
-  .journal-field-row { grid-template-columns: 64px minmax(0, 1fr); gap: 6px; }
+  .journal-field-row { grid-template-columns: 74px minmax(0, 1fr); gap: 6px; }
   .journal-field-row.is-pills { margin-top: 1px; }
   .journal-field-val, .journal-field-feeling, .journal-field-love-pill { font-size: 11px; }
   .journal-field-blurb { margin-top: 5px; padding-top: 4px; font-size: 10.5px; line-height: 1.2; }

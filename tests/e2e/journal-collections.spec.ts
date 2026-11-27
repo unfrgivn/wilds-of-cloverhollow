@@ -253,3 +253,123 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test(
+  "interactive Fish & Keepsake Field Note Cards and dynamic Lasso tool controls",
+  { tag: "@smoke" },
+  async ({ page }, testInfo) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("./?qa=fountain-frog");
+    await page.waitForFunction(() => Boolean(window.__cloverhollow));
+    await page.evaluate(() => window.__cloverhollow?.pause());
+    await step(page, 1);
+
+    await runQaCommands(page, ["fish all", "keepsakes on", "lantern on", "flute on", "lasso on"]);
+
+    await press(page, "j");
+    await expect(page.locator(".journal-book")).toBeVisible();
+
+    // Wait for lazily decoded fish atlas to paint on caught fish slots.
+    await expect.poll(() =>
+      page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>(".journal-fish .journal-sticker-image")]
+          .every((node) => node.style.backgroundImage.includes("fish-catches")),
+      ),
+    ).toBe(true);
+
+    const checkFieldNoteGeometry = async (label: string): Promise<void> => {
+      for (const size of [{ width: 1280, height: 720 }, { width: 874, height: 402 }]) {
+        await page.setViewportSize(size);
+        await step(page, 1);
+        const geom = await page.evaluate(() => {
+          const book = document.querySelector(".journal-book")?.getBoundingClientRect();
+          const card = document.querySelector<HTMLElement>(".journal-field-note");
+          const close = document.querySelector(".journal-field-close")?.getBoundingClientRect();
+          if (!book || !card || !close) return null;
+          const rect = card.getBoundingClientRect();
+          return {
+            inside: rect.left >= book.left && rect.right <= book.right &&
+              rect.top >= book.top && rect.bottom <= book.bottom,
+            noScroll: card.scrollHeight <= card.clientHeight + 1,
+            closeSize: Math.min(close.width, close.height),
+          };
+        });
+        expect(geom, `${label} ${size.width}x${size.height}`).toEqual({
+          inside: true,
+          noScroll: true,
+          closeSize: 44,
+        });
+      }
+      await page.setViewportSize({ width: 1280, height: 720 });
+      await step(page, 1);
+    };
+
+    // 1. Inspect Golden Starfish Crown in the Fish Catch Book.
+    const starfishSlot = page.locator(
+      '.journal-fish .journal-slot[aria-label="Inspect Golden Starfish Crown"]',
+    );
+    await starfishSlot.scrollIntoViewIfNeeded();
+    await starfishSlot.click();
+
+    const fieldNote = page.locator(".journal-field-note");
+    await expect(fieldNote).toBeVisible();
+    await expect(fieldNote).toHaveAttribute("data-field-kind", "fish");
+    await expect(fieldNote.locator(".journal-field-name")).toHaveText("Golden Starfish Crown");
+    await expect(fieldNote.locator(".journal-field-sub")).toHaveText("Bubblegum Bay · Rare Catch");
+    await expect(fieldNote.locator(".journal-field-lands")).toHaveText("Bubblegum Bay Dock");
+    await expect(fieldNote.locator(".journal-field-calms")).toContainText("+20 coins");
+    await expect(fieldNote.locator(".journal-field-specimen")).toHaveClass(/is-rare/);
+    await expect(fieldNote.locator(".journal-field-portrait")).toBeVisible();
+    await expect(fieldNote.locator(".journal-field-charm")).toBeHidden();
+    await expect(fieldNote.locator(".journal-field-blurb")).toContainText("golden starfish");
+
+    await captureReview(page, testInfo, "m104-fish-field-note");
+    await checkFieldNoteGeometry("fish field note");
+
+    // Escape closes ONLY the Field Note Card; Journal remains open.
+    await page.keyboard.press("Escape");
+    await step(page, 1);
+    await expect(fieldNote).toBeHidden();
+    await expect(page.locator(".journal-book")).toBeVisible();
+
+    // 2. Inspect Sea-Glass Compass in the Keepsakes Gallery.
+    const compassSlot = page.locator(
+      '.journal-keepsakes .journal-slot[aria-label="Inspect Sea-Glass Compass"]',
+    );
+    await compassSlot.scrollIntoViewIfNeeded();
+    await compassSlot.click();
+
+    await expect(fieldNote).toBeVisible();
+    await expect(fieldNote).toHaveAttribute("data-field-kind", "keepsake");
+    await expect(fieldNote.locator(".journal-field-name")).toHaveText("Sea-Glass Compass");
+    await expect(fieldNote.locator(".journal-field-sub")).toHaveText("Clubhouse Keepsake");
+    await expect(fieldNote.locator(".journal-field-lands")).toHaveText("Sue's Beach Cottage");
+    await expect(fieldNote.locator(".journal-field-calms")).toHaveText("Clubhouse Crate");
+    await expect(fieldNote.locator(".journal-field-portrait")).toBeHidden();
+    await expect(fieldNote.locator(".journal-field-charm")).toBeVisible();
+    await expect(fieldNote.locator(".journal-field-charm svg.journal-keepsake-icon"))
+      .toHaveCount(1);
+    await expect(fieldNote.locator(".journal-field-blurb")).toContainText("Bubblegum Bay");
+
+    await captureReview(page, testInfo, "m104-keepsake-field-note");
+    await checkFieldNoteGeometry("keepsake field note");
+
+    // Escape closes ONLY the Field Note Card; Journal remains open.
+    await page.keyboard.press("Escape");
+    await step(page, 1);
+    await expect(fieldNote).toBeHidden();
+    await expect(page.locator(".journal-book")).toBeVisible();
+
+    // 3. Switch to OPTIONS tab and verify Lantern, Flute, and Lasso tool controls appear.
+    await page.locator(".journal-options-tab").click();
+    await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "options");
+    await expect(page.locator(".journal-controls-tools")).toHaveText(
+      "Lantern: L · Flute: F · Lasso: R",
+    );
+
+    expect(errors).toEqual([]);
+  },
+);

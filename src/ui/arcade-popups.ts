@@ -96,6 +96,26 @@ export function classifyClawPopup(
   return null;
 }
 
+export function classifyTacoPopup(
+  prevScore: number | null,
+  prevPhase: string | null,
+  nextScore: number,
+  nextPhase: string,
+  spotless: boolean,
+): ArcadePopupSpec | null {
+  if (prevPhase === null || prevScore === null) return null;
+  if (prevPhase !== "result" && nextPhase === "result" && spotless) {
+    return { kind: "rare", text: "★ SPOTLESS!" };
+  }
+  if (prevPhase !== "order-clear" && nextPhase === "order-clear") {
+    return { kind: "star", text: "ORDER UP! ★" };
+  }
+  if (nextScore > prevScore) {
+    return { kind: "boop", text: `+${nextScore - prevScore}` };
+  }
+  return null;
+}
+
 export function formatArcadeBestText(record: ArcadeRecordBadge): string {
   return record.isNewBest ? `★ NEW BEST! ${record.best}` : `Best: ${record.best}`;
 }

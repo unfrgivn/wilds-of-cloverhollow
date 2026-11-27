@@ -390,12 +390,16 @@ export function startDialogue(world: World, state: State, knot: string): State {
 
 export const FLUTE_KNOT = "flute";
 
-function closeDialogue(world: World, state: State): { state: State; events: Event[] } {
+function closeDialogue(
+  world: World,
+  state: State,
+  gentleTiming = false,
+): { state: State; events: Event[] } {
   const dialogue = state.dialogue;
   if (dialogue === null) return { state, events: [] };
   const play = dialogue.play;
   const opened = play !== undefined && state.arcade === null && state.coins >= play.price
-    ? openArcade(world, state, play.game, play.price) : state;
+    ? openArcade(world, state, play.game, play.price, gentleTiming) : state;
   if (dialogue.ending === true) {
     const snapshot: State = {
       ...state,
@@ -466,6 +470,7 @@ function dialogueStep(
   state: State,
   input: ActionFrame,
   textSpeed: TextSpeed | undefined,
+  gentleTiming = false,
 ): { state: State; events: Event[] } {
   const dialogue = state.dialogue;
   if (dialogue === null) return { state, events: [] };
@@ -486,7 +491,7 @@ function dialogueStep(
   const count = dialogue.choices.length;
   if (count === 0) {
     if (!confirm) return { state: next, events: [] };
-    if (dialogue.ended) return closeDialogue(world, next);
+    if (dialogue.ended) return closeDialogue(world, next, gentleTiming);
     const result = runInk(
       world.story,
       state.ink,
@@ -504,7 +509,7 @@ function dialogueStep(
         );
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
-      ? closeDialogue(world, advanced)
+      ? closeDialogue(world, advanced, gentleTiming)
       : { state: { ...advanced, dialogue: following }, events: [] };
   }
   const tapped =
@@ -533,7 +538,7 @@ function dialogueStep(
         );
     const advanced = applyItemTags({ ...next, ink: result.ink }, result.line?.tags ?? []);
     return following === null
-      ? closeDialogue(world, advanced)
+      ? closeDialogue(world, advanced, gentleTiming)
       : { state: { ...advanced, dialogue: following }, events: [] };
   }
   const up = input.move.y < -0.5 && previous.move.y >= -0.5;
@@ -584,7 +589,7 @@ function stepTick(
     };
   }
   if (state.dialogue !== null)
-    return dialogueStep(world, state, input, textSpeed);
+    return dialogueStep(world, state, input, textSpeed, gentleTiming);
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
   const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;

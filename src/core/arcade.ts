@@ -4,24 +4,33 @@ import { fishView, newFish, stepFish, type FishGame, type FishView } from "./fis
 import { moleView, newMole, stepMole, type MoleGame, type MoleView } from "./mole";
 import { cometView, newComet, stepComet, type CometGame, type CometView } from "./comet";
 import { newSkee, skeeView, stepSkee, type SkeeGame, type SkeeView } from "./skee";
+import { newTaco, stepTaco, tacoView, type TacoGame, type TacoView } from "./taco";
 import type { ActionFrame, ArcadeStep, State, World } from "./types";
 
 // The arcade's games (spec 8.2): a line tagged `play: <game> <price>` opens one.
-// The clubhouse microwave's cooking game and Bubblegum Bay's fishing spot open
-// the same way.
+// The clubhouse microwave's cooking game, Bubblegum Bay's fishing spot, and
+// Chef Mateo's Taco Truck kitchen open the same way.
 export const arcadeGames = [
-  "claw", "skee", "mole", "comet", "cook-nuggets", "cook-mac", "fish",
+  "claw", "skee", "mole", "comet", "cook-nuggets", "cook-mac", "fish", "taco",
 ] as const;
 export type ArcadeGameId = (typeof arcadeGames)[number];
 export function isArcadeGameId(value: string): value is ArcadeGameId {
   return arcadeGames.some((game) => game === value);
 }
-export type ArcadeGame = ClawGame | SkeeGame | MoleGame | CometGame | CookGame | FishGame;
-export type ArcadeView = ClawView | SkeeView | MoleView | CometView | CookView | FishView;
+export type ArcadeGame =
+  | ClawGame | SkeeGame | MoleGame | CometGame | CookGame | FishGame | TacoGame;
+export type ArcadeView =
+  | ClawView | SkeeView | MoleView | CometView | CookView | FishView | TacoView;
 
-// Pays for a game and starts it. Boop-a-Mole draws its round's holes from
-// the game's random generator as it opens.
-export function openArcade(world: World, state: State, game: ArcadeGameId, price: number): State {
+// Pays for a game and starts it. Boop-a-Mole, Comet Cruise, and Chef Mateo's
+// Taco Truck draw their round from the game's random generator as they open.
+export function openArcade(
+  world: World,
+  state: State,
+  game: ArcadeGameId,
+  price: number,
+  gentleTiming = false,
+): State {
   const paid = { ...state, coins: state.coins - price };
   switch (game) {
     case "claw":
@@ -42,6 +51,10 @@ export function openArcade(world: World, state: State, game: ArcadeGameId, price
       return { ...paid, arcade: newCook("mac") };
     case "fish":
       return { ...paid, arcade: newFish(world.arcade.fish) };
+    case "taco": {
+      const [round, drawn] = newTaco(world.arcade.taco, paid, gentleTiming);
+      return { ...drawn, arcade: round };
+    }
   }
 }
 
@@ -69,6 +82,8 @@ export function stepArcade(
       return stepCook(world, state, game, input, gentleTiming);
     case "fish":
       return stepFish(world, state, game, input, gentleTiming);
+    case "taco":
+      return stepTaco(world, state, game, input, gentleTiming);
   }
 }
 
@@ -92,5 +107,7 @@ export function arcadeView(
       return cookView(world, game, gentleTiming);
     case "fish":
       return fishView(world, state, game, gentleTiming);
+    case "taco":
+      return tacoView(world, game, gentleTiming);
   }
 }

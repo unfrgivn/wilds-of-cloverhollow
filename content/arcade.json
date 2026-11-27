@@ -333,5 +333,45 @@
       "early": "Oops, pulled a little early! The ripples drifted away.",
       "missed": "Aww, it nibbled and swam off! Try casting again."
     }
+  },
+  "taco": {
+    "orders": 3,
+    "orderSizes": [
+      3,
+      4,
+      5
+    ],
+    "shiftTicks": 1080,
+    "clearTicks": 42,
+    "oopsTicks": 20,
+    "coinsPerOrder": 5,
+    "snacksTwoOrders": 1,
+    "snacksSpotless": 2,
+    "customers": [
+      "Fountain Frog",
+      "Sue",
+      "Jordan",
+      "Buster",
+      "Ranger Fern",
+      "Dad",
+      "Rosie",
+      "Chef Bea"
+    ],
+    "toppings": {
+      "beans": "Beans",
+      "cheese": "Cheese",
+      "salsa": "Salsa",
+      "avocado": "Avocado"
+    },
+    "lines": {
+      "ready": "Chef Mateo's Taco Truck! Press Confirm to start the lunch rush!",
+      "serving": "Match the order ticket! Up Beans · Right Cheese · Down Salsa · Left Avocado.",
+      "oops": "Oops! Check the highlighted topping on the order ticket!",
+      "orderUp": "ORDER UP! {customer} grins from ear to ear!",
+      "spotless": "SPOTLESS TACO SHIFT! All 3 orders served! Coins +{coins}, Snacks +{snacks}!",
+      "great": "Tasty shift! {orders} crispy orders served! Coins +{coins}, Snacks +{snacks}!",
+      "good": "Warm crunchy tacos served! {orders} order(s) complete! Coins +{coins}.",
+      "timeUp": "Lunch bell rang! Give the grill another try anytime!"
+    }
   }
 }

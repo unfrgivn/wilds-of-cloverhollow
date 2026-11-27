@@ -1,0 +1,26 @@
+{
+  "asset": "taco",
+  "date": "2026-11-27",
+  "summary": "Chef Mateo's Taco Truck Kitchen 7th minigame assets (NOTES.md: 39): full-bleed 1600x1048 watercolor taco-truck serving window & honey-wood counter (`taco-truck.webp`, 230 KB) and 6-item 3x2 alpha-WebP ingredients atlas (`taco-ingredients.{webp,json}`: shell, beans, cheese, salsa, avocado, lime; 80 KB) built deterministically by `tools/art/build-taco.ts`.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 3,
+  "references": [
+    "docs/art/concepts/props/town_shops_buildings.png",
+    "public/assets/arcade/fishing-dock.webp",
+    "art/source/areas/hills/hills-final.png",
+    "docs/art/concepts/collectibles/collectibles_candy_gems.png",
+    "art/source/townspeople/barnaby/sheet-raw.png"
+  ],
+  "kept": {
+    "backdrop": "public/assets/arcade/taco-truck.webp",
+    "ingredientsSource": "art/source/arcade/taco/ingredients-raw.png",
+    "ingredientsAtlas": "public/assets/arcade/taco-ingredients.json"
+  },
+  "commands": [
+    "bun tools/art/build-taco.ts"
+  ],
+  "review": [
+    "art/review/taco-ingredients-cream.jpg",
+    "art/review/taco-ingredients-dark.jpg"
+  ]
+}

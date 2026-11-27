@@ -6,6 +6,7 @@ import { cookGalleryStates } from "../../src/dev/cook-gallery";
 import { fishGalleryStates } from "../../src/dev/fish-gallery";
 import { moleGalleryStates } from "../../src/dev/mole-gallery";
 import { skeeGalleryStates } from "../../src/dev/skee-gallery";
+import { tacoGalleryStates } from "../../src/dev/taco-gallery";
 import { battleStates, gallery, journalStates, phone, sizes, states } from "./gallery";
 
 test.use({ deviceScaleFactor: 2 });
@@ -197,9 +198,18 @@ test.describe("sticker gallery", () => {
       });
     });
   }
+  for (const state of tacoGalleryStates) {
+    test(`${state} phone visual baseline`, async ({ page }) => {
+      await gallery(page, state);
+      await expect(page).toHaveScreenshot(`${state}.png`, {
+        animations: "disabled", scale: "device",
+      });
+    });
+  }
   for (const state of ["arcade-ready", "arcade-result", "skee-aiming", "skee-result", "mole-up",
     "mole-result", "comet-coming", "comet-result", "cook-ready", "cook-result",
-    "arcade-fish-aim", "arcade-fish-reeling", "arcade-fish-catch"]) {
+    "arcade-fish-aim", "arcade-fish-reeling", "arcade-fish-catch",
+    ...tacoGalleryStates]) {
     test(`${state} desktop visual baseline`, async ({ page }) => {
       await gallery(page, state, false, "0,0,0,0", { width: 1280, height: 720 });
       await expect(page).toHaveScreenshot(`${state}-desktop.png`, {

@@ -38,6 +38,8 @@ import type {
   MoleContent,
   SkeeCalibration,
   SkeeContent,
+  TacoCalibration,
+  TacoContent,
 } from "../core";
 
 // The prize catalogue (content/prizes.json): its atlas and one entry a prize.
@@ -137,6 +139,7 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
     comet: parseComet(value.comet, file),
     cook: parseCook(value.cook, file),
     fish: parseFish(value.fish, file),
+    taco: parseTaco(value.taco, file),
     counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
   };
@@ -332,6 +335,67 @@ function parseFish(value: unknown, file: string): FishContent {
   };
 }
 
+function parseTaco(value: unknown, file: string): TacoContent {
+  field(record(value), file, "taco");
+  const integer = (source: Record<string, unknown>, name: string, minimum: number,
+    label = `taco.${name}`): number => integerIn(source, name, minimum, file, label);
+  const orders = integer(value, "orders", 1);
+  field(array(value.orderSizes) && value.orderSizes.length >= orders, file, "taco.orderSizes");
+  const orderSizes = value.orderSizes.map((item, index) => {
+    field(typeof item === "number" && Number.isInteger(item) && item >= 1, file,
+      `taco.orderSizes[${index}]`);
+    return item;
+  });
+  field(strings(value.customers) && value.customers.length >= orders &&
+    value.customers.every((item) => item.trim().length > 0), file, "taco.customers");
+  const toppings = value.toppings;
+  field(record(toppings) &&
+    typeof toppings.beans === "string" && toppings.beans.length > 0 &&
+    typeof toppings.cheese === "string" && toppings.cheese.length > 0 &&
+    typeof toppings.salsa === "string" && toppings.salsa.length > 0 &&
+    typeof toppings.avocado === "string" && toppings.avocado.length > 0,
+  file, "taco.toppings");
+  const lines = value.lines;
+  field(record(lines) &&
+    typeof lines.ready === "string" && typeof lines.serving === "string" &&
+    typeof lines.oops === "string" && typeof lines.orderUp === "string" &&
+    lines.orderUp.includes("{customer}") &&
+    typeof lines.spotless === "string" && lines.spotless.includes("{coins}") &&
+    lines.spotless.includes("{snacks}") &&
+    typeof lines.great === "string" && lines.great.includes("{orders}") &&
+    lines.great.includes("{coins}") && lines.great.includes("{snacks}") &&
+    typeof lines.good === "string" && lines.good.includes("{orders}") &&
+    lines.good.includes("{coins}") && typeof lines.timeUp === "string",
+  file, "taco.lines");
+  return {
+    orders,
+    orderSizes,
+    shiftTicks: integer(value, "shiftTicks", 60),
+    clearTicks: integer(value, "clearTicks", 1),
+    oopsTicks: integer(value, "oopsTicks", 1),
+    coinsPerOrder: integer(value, "coinsPerOrder", 1),
+    snacksTwoOrders: integer(value, "snacksTwoOrders", 0),
+    snacksSpotless: integer(value, "snacksSpotless", 0),
+    customers: [...value.customers],
+    toppings: {
+      beans: toppings.beans,
+      cheese: toppings.cheese,
+      salsa: toppings.salsa,
+      avocado: toppings.avocado,
+    },
+    lines: {
+      ready: lines.ready,
+      serving: lines.serving,
+      oops: lines.oops,
+      orderUp: lines.orderUp,
+      spotless: lines.spotless,
+      great: lines.great,
+      good: lines.good,
+      timeUp: lines.timeUp,
+    },
+  };
+}
+
 // Boop-a-Mole (spec 8.2): positive integers throughout, at least two moles, a
 // window that shrinks (or holds) across the round, a boop long enough to show
 // both faces, and a result line with `{booped}`, `{moles}`, and `{tickets}`.
@@ -492,6 +556,21 @@ export function parseFishCalibration(value: unknown, file: string): FishCalibrat
   const rodTip = pointField(raw, "rodTip", file);
   field(rodTip.x >= 0 && rodTip.x <= size.w && rodTip.y >= 0 && rodTip.y <= size.h, file, "rodTip");
   return { image, size, water, horizonY, dockY, rodTip, front };
+}
+
+export function parseTacoCalibration(value: unknown, file: string): TacoCalibration {
+  const { raw, image, size, bounds } = calibrationHeader(value, file, { positiveSize: true });
+  const servingWindow = calibrationRect(raw, "window", bounds, file);
+  const placemat = calibrationRect(raw, "placemat", bounds, file);
+  const front = calibrationRect(raw, "front", bounds, file);
+  const counterY = number(raw, "counterY", file);
+  field(
+    counterY >= servingWindow.y + servingWindow.h && counterY <= placemat.y,
+    file,
+    "counterY",
+  );
+  field(front.y >= counterY, file, "front");
+  return { image, size, servingWindow, counterY, placemat, front };
 }
 
 // The Boop-a-Mole painting's calibration (spec 8.2): every number finite, the

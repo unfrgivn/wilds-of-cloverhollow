@@ -2,6 +2,7 @@ import type { StorySound } from "./sound";
 import type { SurfaceMap } from "./surfaces";
 import type { ArcadeGame, ArcadeGameId } from "./arcade";
 import type { MoleHole } from "./mole";
+import type { TacoTopping } from "./taco";
 
 export type Point = { x: number; y: number };
 export type Polygon = [number, number][];
@@ -344,6 +345,7 @@ export type ArcadeContent = {
   comet: CometContent;
   cook: CookContent;
   fish: FishContent;
+  taco: TacoContent;
   counter: CounterContent;
   prizes: { id: string; name: string; frame: string }[];
 };
@@ -541,6 +543,40 @@ export type FishCalibration = {
   horizonY: number;
   dockY: number;
   rodTip: { x: number; y: number };
+  front: { x: number; y: number; w: number; h: number };
+};
+// Chef Mateo's Taco Truck Kitchen (spec 8.2): match 3 hanging order tickets
+// with directional inputs (up beans, right cheese, down salsa, left avocado).
+export type TacoContent = {
+  orders: number;
+  orderSizes: number[];
+  shiftTicks: number;
+  clearTicks: number;
+  oopsTicks: number;
+  coinsPerOrder: number;
+  snacksTwoOrders: number;
+  snacksSpotless: number;
+  customers: string[];
+  toppings: Record<TacoTopping, string>;
+  lines: {
+    ready: string;
+    serving: string;
+    oops: string;
+    orderUp: string;
+    spotless: string;
+    great: string;
+    good: string;
+    timeUp: string;
+  };
+};
+// Painted Taco Truck serving counter (`public/assets/arcade/taco-truck.json`):
+// serving window bounds, wooden counter line, woven placemat, and front bar.
+export type TacoCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  servingWindow: { x: number; y: number; w: number; h: number };
+  counterY: number;
+  placemat: { x: number; y: number; w: number; h: number };
   front: { x: number; y: number; w: number; h: number };
 };
 export type MoleCalibration = {

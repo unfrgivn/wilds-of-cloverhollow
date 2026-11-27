@@ -20,6 +20,7 @@ export * from "./claw";
 export * from "./skee";
 export * from "./cook";
 export * from "./fish";
+export * from "./taco";
 export * from "./encounter";
 export * from "./mole";
 export * from "./comet";

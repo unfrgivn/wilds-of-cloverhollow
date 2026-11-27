@@ -459,6 +459,7 @@ describe("Milestone 81: Starry Owl & Chef Mateo story, battles, keepsakes & 24 s
     expect(calmFirst.tags).toContain("buy: snack 4");
     expect(calmFirst.choicesSeen[0]).toEqual([
       "Buy a crispy taco snack for 4 coins",
+      "Help run the Taco Truck kitchen!",
       "Just saying hi!",
     ]);
 

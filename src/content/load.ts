@@ -194,7 +194,7 @@ import type { Area, Critter, Fixture, NpcProfile, PartyContent, World } from "..
 
 export {
   parseArcade, parseClawCalibration, parseCometCalibration, parseCookCalibration,
-  parseFishCalibration, parseMoleCalibration, parseSkeeCalibration,
+  parseFishCalibration, parseMoleCalibration, parseSkeeCalibration, parseTacoCalibration,
 } from "./arcade-parsers";
 export {
   completeSurfaceMaps, parseArea, parseCharacters, parseFixture, parseGroundManifest,

@@ -1,0 +1,425 @@
+/* Chef Mateo's Taco Truck Kitchen close-up (spec 8.2). Fits the safe area left
+   of the touch buttons, keeping the hanging order ticket, timer pill, live taco
+   assembly, four clickable painted topping bowls, and counter hint bar inside
+   the painted frame with crisp storybook ink contrast. */
+.taco-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--safe-top) + 46px)
+    max(calc(20px + var(--safe-right)), var(--touch-reserve-right))
+    calc(var(--safe-bottom) + 10px) calc(20px + var(--safe-left));
+  box-sizing: border-box;
+  pointer-events: none;
+  font-family: var(--sticker-font);
+  color: #3d281c;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.taco-overlay[hidden] {
+  display: none;
+}
+
+.taco-stage {
+  position: relative;
+  flex: none;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border: 3px solid #5c3d2e;
+  box-shadow: 0 10px 26px rgb(48 30 22 / 34%), 0 2px 0 rgb(255 248 235 / 60%) inset;
+  overflow: hidden;
+  box-sizing: border-box;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.taco-stage[data-phase="ready"],
+.taco-stage[data-phase="result"] {
+  cursor: pointer;
+}
+
+.taco-ticket,
+.taco-hud,
+.taco-escape,
+.taco-order-banner,
+.taco-shell,
+.taco-layer,
+.taco-bowl,
+.taco-front {
+  position: absolute;
+  box-sizing: border-box;
+}
+.taco-escape[hidden],
+.taco-order-banner[hidden],
+.taco-bowl[hidden],
+.taco-front[hidden] {
+  display: none;
+}
+
+/* Hanging customer order ticket clipped onto the shutter rail inside the window */
+.taco-ticket {
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff9ec;
+  border: 2.5px solid #5c3d2e;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgb(58 36 26 / 24%);
+}
+.taco-ticket::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 24px;
+  height: 10px;
+  transform: translateX(-50%);
+  background: #d79c5b;
+  border: 2px solid #5c3d2e;
+  border-radius: 4px;
+  box-shadow: 0 2px 3px rgb(48 30 22 / 24%);
+}
+.taco-ticket.is-oops {
+  animation: taco-ticket-wobble 260ms ease-in-out;
+}
+@keyframes taco-ticket-wobble {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-1deg); }
+  75% { transform: translateX(5px) rotate(1deg); }
+}
+
+.taco-ticket-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-bottom: 1.5px dashed #c8aa86;
+  padding-bottom: 3px;
+}
+.taco-ticket-order {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #3d281c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.taco-ticket-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  padding-top: 2px;
+}
+.taco-step {
+  position: relative;
+  border-radius: 50%;
+  background: #efe1c4;
+  border: 2px solid #8a6b4d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  transition: transform 110ms ease-out, border-color 110ms ease-out, background-color 110ms ease-out;
+}
+.taco-step.is-done {
+  background: #c8ebd4;
+  border-color: #276e4a;
+}
+.taco-step.is-active {
+  background: #ffe07d;
+  border-color: #b46910;
+  box-shadow: 0 0 0 3px rgb(245 190 70 / 80%);
+  animation: taco-step-pulse 860ms ease-in-out infinite;
+}
+.taco-step.is-oops {
+  background: #ffd6ce;
+  border-color: #c23f32;
+  box-shadow: 0 0 0 3px rgb(232 90 80 / 65%);
+}
+@keyframes taco-step-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+.taco-step-sprite {
+  width: 82%;
+  height: 82%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 1px 1.5px rgb(61 40 28 / 45%));
+}
+.taco-step-check {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: #2b8a5a;
+  color: #fffdf5;
+  border: 1.5px solid #204531;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  line-height: 1;
+}
+.taco-step-check[hidden] {
+  display: none;
+}
+
+/* Top-right shift timer & score pill */
+.taco-hud {
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff8eb;
+  border: 2.5px solid #5c3d2e;
+  border-radius: 999px;
+  box-shadow: 0 5px 12px rgb(58 36 26 / 22%);
+}
+.taco-hud-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+  flex: 1;
+  min-width: 0;
+}
+.taco-hud-label {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #5c3d2e;
+  white-space: nowrap;
+}
+.taco-hud-value {
+  font-weight: 900;
+  color: #3d281c;
+  white-space: nowrap;
+}
+.taco-hud-value.is-timer {
+  color: #1f656e;
+}
+.taco-hud-value.is-low {
+  color: #b43225;
+}
+.taco-hud-divider {
+  width: 1.5px;
+  height: 60%;
+  background: #d7be9e;
+  flex: none;
+}
+
+/* Touch-aware leave pill during ready */
+.taco-escape {
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff8eb;
+  border: 2.5px solid #5c3d2e;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgb(58 36 26 / 20%);
+  padding: 2px 10px;
+  margin: 0;
+  font-family: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+.taco-escape-text {
+  font-weight: 800;
+  color: #3d281c;
+  white-space: nowrap;
+}
+
+/* Celebratory ORDER UP! ribbon */
+.taco-order-banner {
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #ffe277 0%, #f5b642 100%);
+  border: 3px solid #5c3d2e;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgb(74 42 20 / 32%), 0 0 0 4px #fff8eb;
+  pointer-events: none;
+  animation: taco-banner-pop 240ms ease-out;
+}
+.taco-order-banner-text {
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #3d281c;
+  white-space: nowrap;
+}
+@keyframes taco-banner-pop {
+  0% { transform: scale(0.76) translateY(8px); opacity: 0.3; }
+  65% { transform: scale(1.06) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Center live taco shell + stacked toppings on woven placemat */
+.taco-shell {
+  z-index: 3;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 8px rgb(68 40 20 / 28%));
+}
+.taco-layer {
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 4px rgb(62 34 18 / 26%));
+  animation: taco-layer-drop 160ms ease-out;
+}
+@keyframes taco-layer-drop {
+  0% { transform: translateY(-10px) scale(0.84); opacity: 0.35; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Four direct-click / direct-tap painted ceramic topping bowls flanking the placemat */
+.taco-bowl {
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  border: 2.5px solid #5c3d2e;
+  border-radius: 24px;
+  background: radial-gradient(circle at 50% 38%, #fffdf6 0%, #f8ebd3 74%, #e5c69b 100%);
+  box-shadow:
+    0 6px 12px rgb(62 38 22 / 26%),
+    0 0 0 3px rgb(240 198 140 / 48%) inset;
+  font-family: inherit;
+  color: #3d281c;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+.taco-bowl:hover {
+  box-shadow: 0 8px 16px rgb(62 38 22 / 30%), 0 0 0 3px rgb(247 201 92 / 75%);
+}
+.taco-bowl:active {
+  transform: scale(0.95);
+}
+.taco-bowl:disabled {
+  cursor: default;
+  opacity: 0.92;
+}
+.taco-bowl-sprite {
+  flex: 1;
+  width: 78%;
+  min-height: 0;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.taco-bowl-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  pointer-events: none;
+}
+.taco-bowl-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  padding: 1px 4px;
+  border-radius: 999px;
+  background: #ffe38f;
+  border: 1.5px solid #5c3d2e;
+  color: #3d281c;
+  font-weight: 900;
+  line-height: 1.05;
+  flex: none;
+}
+.taco-bowl-label {
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  color: #3d281c;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+/* Bottom counter caption bar */
+.taco-front {
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.taco-front-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 96%;
+  padding: 4px 18px;
+  background: #fff8eb;
+  border: 2.5px solid #5c3d2e;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgb(58 36 26 / 26%);
+  box-sizing: border-box;
+}
+.taco-front-text {
+  white-space: nowrap;
+  font-weight: 900;
+  color: #3d281c;
+}
+
+/* Center shift-result dialogue cleanly beneath the taco window on desktop */
+:root[data-arcade-game="taco"] .sticker-dialogue {
+  margin-inline: auto;
+}
+
+/* Pause gallery animations so visual baselines stay exact */
+.gallery-body .taco-step.is-active,
+.gallery-body .taco-order-banner,
+.gallery-body .taco-layer,
+.gallery-body .taco-ticket.is-oops {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .taco-step,
+  .taco-bowl {
+    transition: none;
+  }
+  .taco-step.is-active,
+  .taco-order-banner,
+  .taco-layer,
+  .taco-ticket.is-oops {
+    animation: none;
+  }
+  .taco-bowl:active {
+    transform: none;
+  }
+}
+:root[data-reduced-motion="on"] .taco-step,
+:root[data-reduced-motion="on"] .taco-bowl {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .taco-step.is-active,
+:root[data-reduced-motion="on"] .taco-order-banner,
+:root[data-reduced-motion="on"] .taco-layer,
+:root[data-reduced-motion="on"] .taco-ticket.is-oops {
+  animation: none;
+}
+:root[data-reduced-motion="on"] .taco-bowl:active {
+  transform: none;
+}

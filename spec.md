@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 156)
+Last updated: 2026-11-27 (Milestone 157)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -752,8 +752,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   (owner, 2026-11-23: every door crossing held a paper-white screen for the
   whole target reload). DOM-only sticker/prize/credits frame crops read tiny
   atlas JSON metadata without loading unused WebGL textures or decoding all
-  critter sheets up front; arcade and clubhouse microwave close-ups (paintings
-  and DOM atlases) load on demand when entering `arcade` or `clubhouse`.
+  critter sheets up front; arcade, clubhouse microwave, fishing dock, and taco
+  truck close-ups (paintings and DOM atlases) load on demand when entering
+  `arcade`, `clubhouse`, `bay`, or `hills`.
   Runtime spritesheet and prop atlases under `public/assets/` ship as WebP with
   lossless alpha (`cwebp -q 90/92 -alpha_q 100 -m 6`, falling back to
   `-lossless -z 9` if PSNR < 42 dB, via `tools/art/optimize-atlases.ts`,
@@ -2343,9 +2344,9 @@ trunks keep its two exits.
   `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>`,
   `coins <count>`, or `treat <known-treat-id> <count>`, any `feed` tag but
   `snack <count>`, each count 1 or more,
-  and any `play` tag but `<game> <digits>` naming an arcade, cooking, or
-  fishing game (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`, `cook-mac`,
-  `fish`).
+  and any `play` tag but `<game> <digits>` naming an arcade, cooking, fishing,
+  or taco truck game (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`,
+  `cook-mac`, `fish`, `taco`).
 - A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
   it to its close, and then, if Fae has the coins, she pays them and the game
   opens (spec 8.2). It is the one place a game's price is set.
@@ -2861,11 +2862,11 @@ trunks keep its two exits.
     (`src/platform/reduced-motion.ts`). When active, it collapses UI CSS
     animations/transitions across every UI stylesheet with explicit
     `:root[data-reduced-motion="on"]` parity mirroring every
-    `@media (prefers-reduced-motion: reduce)` rule (all 6 minigames:
+    `@media (prefers-reduced-motion: reduce)` rule (all 7 minigames:
     `claw.css`, `skee.css`, `mole.css`, `comet.css`, `cook.css`, `fish.css`,
-    plus `area-banner.css`, `title.css`, `touch-controls.css`, `battle.css`,
-    `journal.css`, `sticker.css`, `save-toast.css`, and `arcade-popups.css`,
-    Milestone 140), silences
+    `taco.css`, plus `area-banner.css`, `title.css`, `touch-controls.css`,
+    `battle.css`, `journal.css`, `sticker.css`, `save-toast.css`, and
+    `arcade-popups.css`, Milestone 140), silences
     haptics (`src/platform/haptics.ts`), keeps door transitions as calm opacity
     fades (`transitionZoom = 1`), snaps camera follow (`smoothFollowCamera`
     with `snap = true`, zero look-ahead swing), holds overworld figures in
@@ -2890,7 +2891,7 @@ trunks keep its two exits.
     `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/sticker.css`,
     `src/ui/touch-controls.css`, `src/ui/credits.css`, `src/ui/claw.css`,
     `src/ui/skee.css`, `src/ui/mole.css`, `src/ui/comet.css`, `src/ui/cook.css`,
-    and `src/ui/fish.css` declare
+    `src/ui/fish.css`, and `src/ui/taco.css` declare
     `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
     so rapid taps and long-presses on Safari/WebKit and iOS never trigger
     accidental text selection or link callouts, while keeping dev QA console
@@ -3937,6 +3938,48 @@ trunks keep its two exits.
   `! BITE !` sticker, and 2-column Catch Reveal card. Its gallery states
   (`src/dev/fish-gallery.ts`) are `arcade-fish-aim`, `arcade-fish-reeling`, and
   `arcade-fish-catch`.
+- Chef Mateo's Taco Truck Kitchen (`taco_chef_calm.mateo_shop` in
+  `content/story/main.ink`, choice 1 `Help run the Taco Truck kitchen!`, keeping
+  choice 0's 4-coin crispy taco snack unchanged) opens via `play: taco 0`, free.
+  `state.arcade` is then `TacoGame` (`src/core/taco.ts`, phases `ready`,
+  `serving`, `order-clear`, `result`). When opened, `newTaco` deterministically
+  draws `orders` (3) distinct customers from `taco.customers` in
+  `content/arcade.json` (parsed by `parseArcade` in
+  `src/content/arcade-parsers.ts`) and 3 topping recipes (`orderSizes`
+  `[3, 4, 5]`, capped at `[3, 4, 4]` under Gentle Timing) with no 3 identical
+  toppings in a row. During `ready`, fresh `cancel` exits cleanly (`arcade:
+  null`) and fresh `confirm` starts the lunch shift (`shiftTicks` 1080 = 18 s,
+  widened to 1620 = 27 s under Gentle Timing). During `serving`, fresh
+  directional edges map directly to the 4 toppings (`up` `beans`, `right`
+  `cheese`, `down` `salsa`, `left` `avocado`): matching the next ticket step
+  advances `stepIndex`, adds +10 score, and emits `mole-boop`; a wrong topping
+  increments `mistakes`, sets `oopsTicks` (20) for a gentle wobble without
+  resetting progress, and emits `mole-whiff`. Completing an order adds +25
+  bonus, enters `order-clear` (`clearTicks` 42), and emits `cook-ding`. Serving
+  all 3 orders (or timing out) enters `result`, awarding `coinsPerOrder` (5)
+  coins per order (+5 spotless bonus for 3/3 with 0 mistakes -> up to 20 coins)
+  and 1 snack for 2+ orders or 2 snacks for a spotless 3/3 shift (emitting
+  `prize-won` on spotless shifts alongside standard `coin` / `item` cues).
+- The Taco Truck close-up (`src/ui/taco.ts`, laid out by `layoutTaco` in
+  `src/ui/taco-layout.ts`, styled in `src/ui/taco.css`, loaded on demand in
+  `hills` via `ensureTacoOverlay` in `src/shell/assets.ts`) renders the painted
+  serving counter (`public/assets/arcade/taco-truck.{webp,json}`, parsed by
+  `parseTacoCalibration`), the 6-item ingredient atlas
+  (`public/assets/arcade/taco-ingredients.{webp,json}`: `shell`, `beans`,
+  `cheese`, `salsa`, `avocado`, `lime`), the top-left hanging customer order
+  ticket, top-right shift timer/orders/score pill (plus touch-aware Leave pill
+  during `ready`), center live layered taco assembly on the woven placemat with
+  star-lime garnish and `ORDER UP! ★` ribbon on clear, four direct-click /
+  direct-tap painted topping bowls (`onPickTopping` via
+  `createTacoToppingHandler`), and the bottom counter caption bar. Its gallery
+  states (`src/dev/taco-gallery.ts`) are `arcade-taco-serving` and
+  `arcade-taco-clear`; `renderInfo().arcade` reports `TacoInfo` (`game: "taco"`,
+  `phase`, `stage`, `ticket`, `hud`, `shell`, `bowls`, `orderBanner`, `served`,
+  `totalOrders`, `orderIndex`, `stepIndex`, `timeLeft`, `score`, `front`).
+  Recorded run `new-game/taco.json` (`tools/sim/record-taco.ts`, chaining from
+  `new-game/m81-festival.json`) plays a spotless 3/3 shift (`+20 coins`,
+  `+2 snacks`) and is verified in `tests/unit/taco-replay.test.ts` and
+  `tests/e2e/taco.spec.ts` (real keys + direct mouse bowl click `@smoke`).
 - Direct mouse & touch pointer play across all 6 minigames (Milestones 127 and
   128): `createClaw`, `createFish`, `createCook`, `createSkee`, `createComet`,
   `createArcade`, and `createShellAssets` accept an optional

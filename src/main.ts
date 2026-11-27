@@ -1,21 +1,7 @@
 import { Application, Rectangle } from "pixi.js";
 import {
-  blankInput,
-  createState,
-  drainTicks,
-  step,
-  type ActionFrame,
-  type Point,
-  type State,
-  battleView,
-  soundCues,
-  type JukeboxTrack,
-  type SoundtrackState,
-  arcadeView,
-  parseSave,
-  serializeSave,
-  autosaveNeeded,
-  stableHash,
+  arcadeView, autosaveNeeded, battleView, blankInput, createState, drainTicks, soundCues,
+  stableHash, step, type ActionFrame, type JukeboxTrack, type Point, type State,
 } from "./core";
 import { loadContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
@@ -26,52 +12,29 @@ import { GameView } from "./render/view";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
 import {
-  createBattleHud,
-  createCommandMenu,
-  createBattleCheck,
-  createFeelingBubble,
-  createWindUpBubbles,
-  createRewardSticker,
+  createBattleCheck, createBattleHud, createCommandMenu, createFeelingBubble,
+  createRewardSticker, createWindUpBubbles,
 } from "./ui/battle";
 import { createJournal } from "./ui/journal";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
 import {
-  continueDetail,
-  titleEffectForTransition,
-  titleFlow,
-  type TitleInput,
-  type TitleMode,
+  continueDetail, titleEffectForTransition, titleFlow, type TitleInput, type TitleMode,
 } from "./shell/title-flow";
 import { creditsConfirmAllowed } from "./shell/credits-flow";
+import { createAreaLoader } from "./shell/area-loader";
+import { formatDocumentTitle } from "./shell/document-title";
 import {
-  battleCheckOverlay,
-  buildBattleHudView,
-  buildCreditsView,
-  buildDialogueView,
-  buildHudHintsView,
-  buildJournalView,
-  buildRewardStickerView,
-  createMoleHoleHandler,
-  createShellAssets,
-  FAE_ATLAS,
-  FISH_ATLAS,
+  battleCheckOverlay, buildBattleHudView, buildCreditsView, buildDialogueView,
+  buildHudHintsView, buildJournalView, buildRewardStickerView, createMoleHoleHandler,
+  createShellAssets, FAE_ATLAS,
 } from "./shell/assets";
 import {
-  buildSoundContext,
-  captureAreaPostcard,
-  collectLevelUpNotices,
-  createAreaBannerTracker,
-  createJournalNotesCache,
-  hapticForTick,
-  isOverworldConfirm,
-  petEffectForCompanion,
-  resolveArcadeOutcome,
-  resolveSoundtrack,
-  shouldClearRest,
-  stepJukeboxTrack,
+  buildSoundContext, captureAreaPostcard, collectLevelUpNotices, createAreaBannerTracker,
+  createJournalNotesCache, hapticForTick, isOverworldConfirm, petEffectForCompanion,
+  resolveArcadeOutcome, resolveSoundtrack, shouldClearRest, stepJukeboxTrack,
 } from "./shell/feedback";
-import { createSaveStore, shouldShowSaveToast } from "./shell/save-storage";
+import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio } from "./platform/audio";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
@@ -82,24 +45,14 @@ import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { createAreaBanner } from "./ui/area-banner";
 import { createHudHints } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
+import { createPhotoTouchBar, createShutterFlash, type PostcardCapture } from "./ui/postcard";
 import {
-  createPhotoTouchBar,
-  createShutterFlash,
-  type PostcardCapture,
-} from "./ui/postcard";
-import {
-  canBattlePeek,
-  canOverworldSteer,
-  canPhotoMode,
-  createInputShortcuts,
-  isBannerEligible,
-  isOverworldFree,
-  type OverlayGateContext,
+  canBattlePeek, canOverworldSteer, canPhotoMode, createInputShortcuts, isBannerEligible,
+  isOverworldFree, type OverlayGateContext,
 } from "./shell/input-shortcuts";
 import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
-import { qaFlow } from "./shell/qa-flow";
-import { shouldFlushSaveOnHide, shouldFreezeLiveLoop } from "./shell/lifecycle";
-import type { PackState } from "./dev/qa";
+import { shouldFreezeLiveLoop } from "./shell/lifecycle";
+import type { QaSession } from "./shell/qa-session";
 
 const content = loadContent();
 const app = new Application();
@@ -121,20 +74,8 @@ async function boot(): Promise<void> {
   });
   const haptics = createHaptics();
   const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
-  const qaTools = qaEnabled ? await import("./dev/qa") : null;
-  const qaPacks: PackState[] = qaTools?.loadQaPacks() ?? [];
-  // Console saves (Milestone 67), listed in the QA menu after the packs.
-  const qaSlots = qaTools === null ? [] : await qaTools.loadQaSlots();
-  let qaEntries: PackState[] = [...qaPacks, ...qaSlots];
-  let qaUrlPack: PackState | null = null;
-  let qaError: string | null = null;
-  if (qaTools !== null) {
-    try {
-      qaUrlPack = qaTools.qaPackFromUrl(qaPacks, window.location.search);
-    } catch (error: unknown) {
-      qaError = error instanceof Error ? error.message : String(error);
-    }
-  }
+  const qaModule = qaEnabled ? await import("./shell/qa-session") : null;
+  const qaBoot = qaModule === null ? null : await qaModule.loadQaBoot(window.location.search);
   await app.init({
     resizeTo: window,
     backgroundColor: 0xf8edcf,
@@ -181,11 +122,8 @@ async function boot(): Promise<void> {
   const feelingBubble = createFeelingBubble(uiRoot);
   const windUpBubbles = createWindUpBubbles(uiRoot);
   const rewardSticker = createRewardSticker(uiRoot);
-  // While the harness has the game paused, the frame is a pure function of a
-  // state that only `step` changes, yet software-rendered Chromium spent ~60 ms
-  // redrawing it every frame and every test command queued behind that draw
-  // (an evaluate took 64 ms, against 5 ms drawing only on change). Paused, we
-  // draw once after something changes; running, every frame as before.
+  // While the harness has the game paused, redraw only after something changes;
+  // while running, draw every frame as before.
   let drawPending = true;
   const invalidate = (): void => {
     drawPending = true;
@@ -209,38 +147,38 @@ async function boot(): Promise<void> {
   const areaBanner = createAreaBanner(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
   const bannerTracker = createAreaBannerTracker();
-  // True while the harness drives ticks synthetically (the hook's `step`): a
-  // replay crossing a dozen doors must load and warm only the area it ends in
-  // (spec 11), not every room it passes through.
+  // True while the harness drives ticks synthetically (the hook's `step`).
   let harnessStepping = false;
-  const playToggleFeedback = (on: boolean): void => {
-    sound.playEffect(on ? "toggle-on" : "toggle-off");
+  const lightHaptic = (): void => {
     if (!harnessStepping) haptics.trigger("light");
   };
+  const playToggleFeedback = (on: boolean): void => {
+    sound.playEffect(on ? "toggle-on" : "toggle-off");
+    lightHaptic();
+  };
+  const bindToggle = (toggle: () => void, isOn: () => boolean): (() => void) =>
+    withInvalidate(() => {
+      toggle();
+      playToggleFeedback(isOn());
+    });
   const journal = createJournal(uiRoot);
+  let jukeboxTrack: JukeboxTrack | null = null;
   journal.onPageChange(() => {
     sound.playEffect("page-turn");
-    if (!harnessStepping) haptics.trigger("light");
+    lightHaptic();
   });
   journal.onOverlayChange((open) => {
     sound.playEffect(open ? "card-open" : "card-close");
-    if (open && !harnessStepping) haptics.trigger("light");
+    if (open) lightHaptic();
   });
   journal.onToggleAudio(withInvalidate(() => {
     sound.toggle();
     if (!sound.muted()) playToggleFeedback(true);
   }));
   journal.onSetAudioLevel(withInvalidate((level: AudioLevel) => sound.setLevel(level)));
-  journal.onToggleMusic(withInvalidate(() => {
-    sound.toggleMusic();
-    playToggleFeedback(!sound.musicMuted());
-  }));
+  journal.onToggleMusic(bindToggle(sound.toggleMusic, () => !sound.musicMuted()));
   journal.onSetMusicLevel(withInvalidate((level: AudioLevel) => sound.setMusicLevel(level)));
-  let jukeboxTrack: JukeboxTrack | null = null;
-  journal.onToggleAmbience(withInvalidate(() => {
-    sound.toggleAmbience();
-    playToggleFeedback(!sound.ambienceMuted());
-  }));
+  journal.onToggleAmbience(bindToggle(sound.toggleAmbience, () => !sound.ambienceMuted()));
   journal.onStepTrack((delta) => {
     if (!state.journalOpen) return;
     const nextTrack = stepJukeboxTrack(
@@ -248,7 +186,7 @@ async function boot(): Promise<void> {
       state,
       jukeboxTrack,
       delta,
-      titleMode !== null || qaMenuOpen,
+      titleMode !== null || (qa?.isMenuOpen() ?? false),
     );
     if (nextTrack === null) return;
     jukeboxTrack = nextTrack;
@@ -259,26 +197,17 @@ async function boot(): Promise<void> {
     jukeboxTrack = null;
     invalidate();
   });
-  journal.onToggleGentleTiming(withInvalidate(() => {
-    gameSettings.toggleGentleTiming();
-    playToggleFeedback(gameSettings.gentleTiming());
-  }));
-  journal.onToggleKeyHints(withInvalidate(() => {
-    gameSettings.toggleKeyHints();
-    playToggleFeedback(gameSettings.keyHints());
-  }));
-  journal.onCycleTextSpeed(withInvalidate(() => {
-    gameSettings.cycleTextSpeed();
-    playToggleFeedback(gameSettings.textSpeed() !== "cozy");
-  }));
-  journal.onToggleReducedMotion(withInvalidate(() => {
-    gameSettings.toggleReducedMotion();
-    playToggleFeedback(gameSettings.reducedMotion());
-  }));
+  journal.onToggleGentleTiming(
+    bindToggle(gameSettings.toggleGentleTiming, gameSettings.gentleTiming),
+  );
+  journal.onToggleKeyHints(bindToggle(gameSettings.toggleKeyHints, gameSettings.keyHints));
+  journal.onCycleTextSpeed(
+    bindToggle(gameSettings.cycleTextSpeed, () => gameSettings.textSpeed() !== "cozy"),
+  );
+  journal.onToggleReducedMotion(
+    bindToggle(gameSettings.toggleReducedMotion, gameSettings.reducedMotion),
+  );
   const title = createTitleScreen(uiRoot);
-  const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaEntries);
-  const qaBadge = qaTools === null ? null : qaTools.createQaBadge(uiRoot);
-  if (qaTools !== null && qaError !== null) qaTools.createQaError(uiRoot, qaError);
   const credits = createCredits(uiRoot);
   dialogueBox.onChoose((index) => touch.tapChoice(index));
   dialogueBox.onAdvance(() => touch.tapButton("confirm"));
@@ -291,44 +220,46 @@ async function boot(): Promise<void> {
   journal.onClose(() => touch.tapButton("cancel"));
   credits.onClose(() => touch.tapButton("confirm"));
   const view = new GameView(content.world, {
-    debugLabel: import.meta.env.DEV || import.meta.env.MODE === "harness",
+    debugLabel: qaEnabled,
     renderer: app.renderer,
   });
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
   const fresh = createState(content.world, initialFixture);
-  const speciesXp = Object.fromEntries(
-    Object.values(content.world.critters).map((kind) => [
-      kind.species,
-      content.world.levels.critters[kind.id]?.xp ?? 0,
-    ]),
-  );
-  const parseWorldSave = (raw: string): State | null =>
-    parseSave(raw, fresh, speciesXp, content.world.levels.thresholds);
   const saveStore = createSaveStore(saveKey);
-  const savedRaw = qaUrlPack === null && qaError === null ? await saveStore.load() : null;
+  let photoMode = false;
+  let qa: QaSession | null = null;
+  let titleMode: TitleMode | null = null;
+  const saveSession = createSaveSession({
+    store: saveStore,
+    world: content.world,
+    fresh,
+    getState: () => state,
+    isDocumentHidden: () => document.hidden,
+    isPaused: () => paused,
+    isHarnessStepping: () => harnessStepping,
+    isTitleOpen: () => titleMode !== null,
+    isPhotoMode: () => photoMode,
+    isQaRestricted: () => qa?.isRestricted() ?? false,
+    isQaOverlayOpen: () => qa !== null && (qa.isMenuOpen() || qa.isConsoleOpen()),
+    showSaveToast: () => saveToast.show(),
+  });
+  const qaUrlPack = qaBoot?.urlPack ?? null;
+  const qaBlocked = qaBoot !== null && qaBoot.error !== null;
+  const savedRaw = qaUrlPack === null && !qaBlocked ? await saveStore.load() : null;
   const restored = qaUrlPack === null
-    ? savedRaw === null ? null : parseWorldSave(savedRaw)
-    : parseWorldSave(qaUrlPack.save);
+    ? savedRaw === null ? null : saveSession.parse(savedRaw)
+    : saveSession.parse(qaUrlPack.save);
   state = restored ?? fresh;
   let previousState: State = state;
-  // A real boot opens on the title (spec 7.3), with the game frozen behind it:
-  // no core ticks run, so Continue resumes the save exactly as it was written.
-  // Fixture resets (the harness) skip it.
-  let titleMode: TitleMode | null = qaError !== null ? null : qaUrlPack === null
+  // A real boot opens on the title (spec 7.3), with the game frozen behind it.
+  titleMode = qaBlocked ? null : qaUrlPack === null
     ? restored === null ? "fresh" : "continue"
     : null;
-  let qaMenuOpen = false;
-  let qaActivePack: PackState | null = qaUrlPack;
-  const qaBlocked = qaError !== null;
-  let qaJustPicked = false;
-  let qaSelected = 0;
-  let qaReturnMode: TitleMode = restored === null ? "fresh" : "continue";
-  let titleSelected: TitleChoiceId =
-    restored === null ? "new-game" : "continue";
+  let titleSelected: TitleChoiceId = restored === null ? "new-game" : "continue";
   const applyTitle = (input: TitleInput): void => {
-    if (titleMode === null || qaBlocked || qaActivePack !== null) return;
+    if (titleMode === null || (qa?.isRestricted() ?? false)) return;
     const before = { mode: titleMode, selected: titleSelected };
     const result = titleFlow(titleMode, titleSelected, input);
     titleMode = result.mode;
@@ -336,7 +267,7 @@ async function boot(): Promise<void> {
     const effect = titleEffectForTransition(before, result);
     if (effect !== null) {
       sound.playEffect(effect);
-      if (effect === "title-start" && !harnessStepping) haptics.trigger("light");
+      if (effect === "title-start") lightHaptic();
     }
     if (result.action === "new-game") {
       state = createState(content.world, initialFixture);
@@ -344,8 +275,7 @@ async function boot(): Promise<void> {
       bannerTracker.clear();
       saveToast.hide();
       jukeboxTrack = null;
-      void saveStore.clear();
-      saveDirty = false;
+      saveSession.clear();
     }
   };
   title.onChoose((choose) => applyTitle({
@@ -354,123 +284,38 @@ async function boot(): Promise<void> {
   saveStore.setLoaded(
     restored === null ? null : { tick: restored.tick, hash: stableHash(restored) },
   );
-  let saveDirty = false;
-  let suppressSave = false;
-  const saveState = async (
-    snapshot: State,
-    options?: { silent?: boolean },
-  ): Promise<void> => {
-    if (suppressSave || qaBlocked || qaActivePack !== null) return;
-    const serialized = serializeSave(snapshot);
-    const hash = stableHash(snapshot);
-    if (snapshot === state) saveDirty = false;
-    const silent = options?.silent ?? false;
-    const liveAtStart =
-      !silent && !document.hidden && !paused && !harnessStepping && titleMode === null;
-    const wrote = await saveStore.write(serialized, { tick: snapshot.tick, hash });
-    if (
-      liveAtStart &&
-      shouldShowSaveToast({
-        wrote,
-        silent,
-        documentHidden: document.hidden,
-        paused,
-        harnessStepping,
-        qaActive: qaActivePack !== null || qaBlocked,
-        titleOpen: titleMode !== null,
-        area: snapshot.area,
-        photoMode,
-        inBattle: state.battle !== null,
-        journalOpen: state.journalOpen,
-        inFinale: state.finale !== null,
-      })
-    ) {
-      saveToast.show();
-    }
-  };
-  const save = (): Promise<void> => saveState(state);
-  const flushSaveOnHide = (): void => {
-    if (
-      shouldFlushSaveOnHide({
-        qaActive: qaActivePack !== null || qaBlocked || qaMenuOpen || qaConsoleOpen,
-        titleOpen: titleMode !== null,
-        area: state.area,
-        inFinale: state.finale !== null,
-        inBattle: state.battle !== null,
-        inArcade: state.arcade !== null,
-        autosaveNeeded:
-          saveDirty &&
-          !paused &&
-          !harnessStepping &&
-          !suppressSave &&
-          state.transition === null,
-      })
-    ) {
-      void saveState(state, { silent: true });
-    }
-  };
-  const pickQa = (item: PackState): void => {
-    const loaded = parseWorldSave(item.save);
-    if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
-    state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
-    saveDirty = false;
-    bannerTracker.clear();
-    saveToast.hide();
-    titleMode = null;
-    qaJustPicked = true;
-    overworldPointer.release();
-    swallowed.add("confirm");
-  };
-  const openQa = (): void => {
-    if (qaTools === null || qaBlocked || qaEntries.length === 0 || titleMode === null) return;
-    qaReturnMode = titleMode; qaMenuOpen = true;
-    overworldPointer.release();
-  };
-  title.onQa(openQa);
-  // The QA console (spec 11): open with the backtick key or a tap on the QA
-  // badge, only while a pack is active. While it is open the game is frozen,
-  // like the title: no core ticks run.
-  let qaConsoleOpen = false;
-  const qaConsole = qaTools === null ? null : qaTools.createQaConsole(uiRoot, {
-    run: (line) => {
-      const outcome = qaTools.runConsoleCommand({
-        story: content.world.story,
-        stickerIds: content.world.stickers.catalogue.map((sticker) => sticker.id),
-        prizeIds: content.world.arcade.prizes.map((prize) => prize.id),
-        treatIds: content.world.treats.map((treat) => treat.id),
-        fishIds: content.world.arcade.fish.catches.map((item) => item.id),
-        thresholds: content.world.levels.thresholds,
-      }, state, line);
-      if (outcome.kind === "applied") {
-        state = outcome.state;
-        previousState = state;
+  // Buttons held when the title closed stay hidden from the game until they're
+  // released, so the press that starts the game can't also act in it.
+  const swallowed = new Set<"confirm" | "cancel" | "menu">();
+  qa = qaModule === null || qaBoot === null
+    ? null
+    : qaModule.createQaSession(qaBoot, {
+      uiRoot,
+      world: content.world,
+      initialReturnMode: restored === null ? "fresh" : "continue",
+      getState: () => state,
+      setState: (next) => {
+        state = next;
+        previousState = next;
+      },
+      parseSave: saveSession.parse,
+      getTitleMode: () => titleMode,
+      setTitleMode: (mode) => { titleMode = mode; },
+      onPickPack: () => {
+        saveSession.clearDirty();
+        bannerTracker.clear();
+        saveToast.hide();
+        overworldPointer.release();
+        swallowed.add("confirm");
+      },
+      onConsoleApplied: () => {
         bannerTracker.clear();
         invalidate();
-      }
-      return outcome;
-    },
-    saveSlot: async (name) => {
-      const tick = state.tick;
-      const hash = stableHash(state);
-      await qaTools.saveQaSlot({ name, tick, hash }, serializeSave(state));
-      qaEntries = [...qaPacks, ...await qaTools.loadQaSlots()];
-      qaMenu?.setEntries(qaEntries);
-      return `Saved QA slot "${name}" (tick ${tick}).`;
-    },
-    saveFile: () => serializeSave(state),
-    close: () => { qaConsoleOpen = false; invalidate(); },
-  });
-  const openQaConsole = (): void => {
-    if (qaConsole === null || qaConsoleOpen || qaActivePack === null ||
-        titleMode !== null || qaMenuOpen) return;
-    qaConsoleOpen = true;
-    overworldPointer.release();
-  };
-  qaBadge?.onOpen(openQaConsole);
-  qaMenu?.onChoose(pickQa);
-  qaMenu?.onCancel(() => {
-    qaMenuOpen = false; qaActivePack = null; titleMode = qaReturnMode;
-  });
+      },
+      onReleasePointer: () => overworldPointer.release(),
+      invalidate,
+    });
+  if (qa !== null) title.onQa(qa.openMenu);
   const assets = createShellAssets({
     world: content.world,
     uiRoot,
@@ -483,8 +328,7 @@ async function boot(): Promise<void> {
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),
   );
   // Boot loads only permanent core sheets + tiny ~1 KB atlas JSON metadata
-  // (for journal/credits frame crops) + the initial area. No unused critter
-  // images or arcade paintings are decoded up front.
+  // (for journal/credits frame crops) + the initial area.
   const [mapCentres] = await Promise.all([
     assets.loadMapCentres(),
     assets.preloadCoreAtlasMeta(),
@@ -501,41 +345,19 @@ async function boot(): Promise<void> {
       ]);
     }),
   ]);
-  let afterTick = (_next: State): void => undefined;
-  let logTitle = (_mode: TitleMode | null): void => undefined;
-  let logMusic = (_soundtrack: SoundtrackState): void => undefined;
-  let logBattle = (_next: State): void => undefined;
-  let logBattleButtons = (_active: boolean, _next: State): void => undefined;
-  if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-    const {
-      createBattleButtonsLogger,
-      createBattleLogger,
-      createMusicLogger,
-      createStateLogger,
-      createTitleLogger,
-      logPointers,
-      logTouchLayout,
-    } = await import("./dev/state-log");
-    logTouchLayout();
-    logPointers();
-    afterTick = createStateLogger(content.world);
-    logTitle = createTitleLogger();
-    logMusic = createMusicLogger();
-    logBattle = createBattleLogger();
-    logBattleButtons = createBattleButtonsLogger(uiRoot);
-    afterTick(state);
-  }
+  const devLog = qaEnabled
+    ? (await import("./dev/state-log")).createDevLoggers(content.world, uiRoot, state)
+    : null;
   const notesNow = createJournalNotesCache(content.world);
   let wasJournalOpen = false;
   let wasBattleOpen = false;
-  let photoMode = false;
   document.documentElement.dataset.photo = "off";
   const overlayContext = (): OverlayGateContext => ({
     state,
     titleMode,
-    qaMenuOpen,
-    qaConsoleOpen,
-    qaBlocked,
+    qaMenuOpen: qa?.isMenuOpen() ?? false,
+    qaConsoleOpen: qa?.isConsoleOpen() ?? false,
+    qaBlocked: qa?.isBlocked() ?? false,
     photoMode,
   });
   const setPhotoMode = (on: boolean, silent = false): void => {
@@ -552,7 +374,7 @@ async function boot(): Promise<void> {
     }
     if (changed && !silent && titleMode === null && state.battle === null) {
       sound.playEffect(next ? "toggle-on" : "toggle-off");
-      if (next && !harnessStepping) haptics.trigger("light");
+      if (next) lightHaptic();
     }
     invalidate();
   };
@@ -563,7 +385,7 @@ async function boot(): Promise<void> {
     battlePeekOpen = next;
     if (state.battle !== null) {
       sound.playEffect(next ? "card-open" : "card-close");
-      if (next && !harnessStepping) haptics.trigger("light");
+      if (next) lightHaptic();
     }
     invalidate();
   };
@@ -580,9 +402,6 @@ async function boot(): Promise<void> {
       setBattlePeek(!battlePeekOpen);
     }
   });
-  // Buttons held when the title closed stay hidden from the game until they're
-  // released, so the press that starts the game can't also act in it.
-  const swallowed = new Set<"confirm" | "cancel" | "menu">();
   const overworldPointer = bindOverworldPointerSteer({
     canvas: app.canvas,
     canSteer: () => canOverworldSteer(overlayContext()),
@@ -614,14 +433,23 @@ async function boot(): Promise<void> {
     swallow: (button) => swallowed.add(button),
     playChoiceMove: () => { sound.play("choice-move", state.tick); },
     invalidate,
-    ...(qaEnabled ? {
-      qa: {
-        openMenu: openQa,
-        isConsoleOpen: () => qaConsoleOpen,
-        setConsoleOpen: (open: boolean) => { qaConsoleOpen = open; },
-        openConsole: openQaConsole,
-      },
-    } : {}),
+    ...(qa !== null ? { qa: qa.shortcuts() } : {}),
+  });
+  const areaLoader = createAreaLoader({
+    getArea: (areaId) => content.world.areas[areaId],
+    getState: () => state,
+    loadedAreaId: () => view.loadedAreaId(),
+    setArea: (area) => view.setArea(area),
+    prefetchArea: (area) => view.prefetch(area),
+    warmAreaOverlays: assets.warmAreaOverlays,
+    cacheAreaNpcPortraits: assets.cacheAreaNpcPortraits,
+    warmAreaMedia: assets.warmAreaMedia,
+    warmBattlePortraits: assets.warmBattlePortraits,
+    onLoaded: (loadedState) => {
+      view.resetCamera();
+      previousState = loadedState;
+    },
+    invalidate,
   });
   const syncOpenFlag = (
     name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal",
@@ -630,8 +458,10 @@ async function boot(): Promise<void> {
     if (open) document.documentElement.dataset[name] = "open";
     else delete document.documentElement.dataset[name];
   };
+  let lastDocumentTitle = document.title;
   const render = (alpha = 1): void => {
     const gate = overlayContext();
+    const qaMenuOpen = gate.qaMenuOpen;
     if (!canOverworldSteer(gate)) overworldPointer.release();
     if (photoMode && !canPhotoMode(gate)) {
       photoMode = false;
@@ -648,25 +478,12 @@ async function boot(): Promise<void> {
       titleMode !== null || qaMenuOpen,
     );
     sound.setSoundtrack(soundtrack);
-    logMusic(soundtrack);
+    devLog?.logMusic(soundtrack);
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
     assets.renderOverlays(arcadeState, activeArcadeRecord, inputShortcuts.inputMode());
-    if (state.journalOpen && !wasJournalOpen) {
-      void assets.warmJournalAssets(state).then(() => {
-        if (state.journalOpen) invalidate();
-      });
-    } else if (
-      state.journalOpen &&
-      Object.values(state.caughtFish ?? {}).some((count) => count > 0) &&
-      !assets.hasAtlasMeta(FISH_ATLAS)
-    ) {
-      void assets.decodeAtlasImage(FISH_ATLAS).then(() => {
-        if (state.journalOpen) invalidate();
-      });
-    }
+    assets.warmJournalOnRender(state, wasJournalOpen, () => state.journalOpen);
     wasJournalOpen = state.journalOpen;
     syncOpenFlag("arcade", arcadeState !== null);
-    // Which game is open: Comet Cruise's steers by the touch arrows.
     if (state.arcade !== null) document.documentElement.dataset.arcadeGame = state.arcade.game;
     else delete document.documentElement.dataset.arcadeGame;
     view.render(state, window.innerWidth, window.innerHeight, app.renderer.resolution, {
@@ -680,7 +497,6 @@ async function boot(): Promise<void> {
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
     );
-    // The recurring critters' "?" and "!" (Milestone 51).
     noticeMarks.render(view.noticeMarks(state));
     const battle = battleView(content.world, state);
     const activeBattle = battle !== null;
@@ -691,8 +507,7 @@ async function boot(): Promise<void> {
       lanternButton.hidden = !hasLantern;
       lanternButton.classList.toggle("is-on", state.lantern);
     }
-    if (fluteButton !== null)
-      fluteButton.hidden = !hasFlute;
+    if (fluteButton !== null) fluteButton.hidden = !hasFlute;
     const touchActive = document.documentElement.dataset.touch === "on";
     const hasLevelUpNotice = levelUpNotices.length > 0;
     hudHints.render(
@@ -716,7 +531,7 @@ async function boot(): Promise<void> {
         content.world,
         state,
         isBannerEligible(gate, hasLevelUpNotice),
-        qaActivePack !== null,
+        qa?.isActive() ?? false,
       ),
     );
     title.render({
@@ -725,28 +540,29 @@ async function boot(): Promise<void> {
       selected: titleSelected,
       continueDetail: continueDetail(content.world, state),
     });
-    qaMenu?.render(qaMenuOpen, qaSelected);
-    qaBadge?.render(qaActivePack?.pack ?? null);
-    qaConsole?.render(qaConsoleOpen);
-    syncOpenFlag("qaConsole", qaConsoleOpen);
+    qa?.render();
+    syncOpenFlag("qaConsole", gate.qaConsoleOpen);
     const creditsOpen = state.finale === "credits";
+    const nextTitle = formatDocumentTitle(content.world, state, {
+      titleOpen: titleMode !== null,
+      creditsOpen,
+    });
+    if (nextTitle !== lastDocumentTitle) {
+      lastDocumentTitle = nextTitle;
+      document.title = nextTitle;
+    }
     if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen) {
       saveToast.hide();
     }
     credits.render(buildCreditsView(content.world, state, assets));
-    logTitle(titleMode);
+    devLog?.logTitle(titleMode);
     syncOpenFlag("title", titleMode !== null);
     syncOpenFlag("credits", creditsOpen);
     syncOpenFlag("battle", activeBattle);
     syncOpenFlag("talk", battle?.talk !== null && battle?.talk !== undefined);
-    // Which check is in play (spec 8.1): a catch or a lean shows its touch
-    // arrows.
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
     if (checkKind !== undefined) document.documentElement.dataset.check = checkKind;
     else delete document.documentElement.dataset.check;
-    // An arrow held as a catch, a lean, or a round of Boop-a-Mole or Comet
-    // Cruise ends is hidden mid-press and may never see its pointer lifted:
-    // outside one, it lets go unless desktop overworld steering is active.
     if (
       checkKind !== "catch" &&
       checkKind !== "lean" &&
@@ -778,22 +594,18 @@ async function boot(): Promise<void> {
       selected: battle?.selected ?? 0,
       treatTray: battle?.treatTray ?? null,
     });
-    // What the critter feels (spec 8.1), in the menu and over its result.
-    // Step aside while the Battle Field Guide Peek card is open so the cloud
-    // never peeks out behind the card.
     const feelingAt = view.battleFeelingAnchor(state, window.innerWidth, window.innerHeight);
     feelingBubble.render(
       battlePeekOpen || battle === null || battle.feelings === null || feelingAt === null
         ? null
         : { ...battle.feelings, ...feelingAt },
     );
-    // A mini-boss's wind-up shows its bubbles there instead (Milestone 50).
     windUpBubbles.render(
       battlePeekOpen || battle === null || battle.windUp === null || feelingAt === null
         ? null
         : { ...battle.windUp, ...feelingAt },
     );
-    logBattleButtons(activeBattle, state);
+    devLog?.logBattleButtons(activeBattle, state);
     const geometry = view.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
     touch.setTraceElement(geometry?.kind === "trace" ? geometry.rect : undefined);
     battleCheck.render(battleCheckOverlay(battle, geometry, assets.toyArt));
@@ -848,45 +660,8 @@ async function boot(): Promise<void> {
   let endingSnapshot: State | null = null;
   let creditsTicks = 0;
   let cancelDown = false;
-  // The area a door's fade-out is warming. Cleared when the transition ends or
-  // the game resets, so every crossing prefetches exactly once.
-  let prefetchedTarget: string | undefined;
   const tick = (frame: ActionFrame): void => {
-    if (qaJustPicked) {
-      qaJustPicked = false;
-      titlePrevious = frame;
-      cancelDown = frame.cancel;
-      return;
-    }
-    if (qaMenuOpen) {
-      const result = qaFlow(qaEntries.length, qaSelected, {
-        up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
-        down: frame.move.y > 0.5 && titlePrevious.move.y <= 0.5,
-        confirm: frame.confirm && !titlePrevious.confirm,
-        cancel: frame.cancel && !titlePrevious.cancel,
-      });
-      qaSelected = result.selected;
-      if (!result.open) {
-        qaMenuOpen = false;
-        titleMode = qaReturnMode;
-        qaActivePack = null;
-      }
-      if (result.action !== null) {
-        const chosen = qaEntries[result.action];
-        if (chosen === undefined) throw new Error("QA selection disappeared");
-        pickQa(chosen);
-      }
-      titlePrevious = frame;
-      cancelDown = frame.cancel;
-      return;
-    }
-    // The QA console holds the world still while it is open (spec 11).
-    if (qaConsoleOpen) {
-      titlePrevious = frame;
-      cancelDown = frame.cancel;
-      return;
-    }
-    if (qaBlocked) {
+    if (qa?.stepQaMenu(frame, titlePrevious) === true) {
       titlePrevious = frame;
       cancelDown = frame.cancel;
       return;
@@ -929,12 +704,7 @@ async function boot(): Promise<void> {
     }
     if (state.finale === "credits") {
       creditsTicks += 1;
-      if (creditsConfirmAllowed(
-        creditsTicks,
-        confirmEdge,
-      )) {
-        // The credits follow the ending in the same session (the morning is
-        // never saved), so the dream it saved is always here to wake back into.
+      if (creditsConfirmAllowed(creditsTicks, confirmEdge)) {
         if (endingSnapshot === null)
           throw new Error("the credits closed with no dream to go back to");
         state = endingSnapshot;
@@ -945,14 +715,12 @@ async function boot(): Promise<void> {
         return;
       }
     }
-    // The credits step the core like any other tick: it holds the world still
-    // (spec 7.4), and the tick and its input stay the same as a replay's.
     const previous = state;
     const stepped = step(content.world, state, input, {
       gentleTiming: gameSettings.gentleTiming(), textSpeed: gameSettings.textSpeed(),
     });
     state = stepped.state;
-    if (!paused && !harnessStepping && state.tick !== previous.tick) saveDirty = true;
+    if (!paused && !harnessStepping && state.tick !== previous.tick) saveSession.markDirty();
     previousState = state.area === previous.area ? previous : state;
     const arcadeOutcome = resolveArcadeOutcome(
       content.world, previous, state, gameSettings.gentleTiming(),
@@ -976,34 +744,15 @@ async function boot(): Promise<void> {
           if (companion !== null) {
             view.triggerPet(companion.id, state.tick);
             sound.playEffect(petEffectForCompanion(companion.id));
-            if (!harnessStepping) haptics.trigger("light");
+            lightHaptic();
           }
         }
       }
     }
     bannerTracker.update(content.world, previous, state);
-    // A door's fade-out knows where it's going: warm that area's art while the
-    // fade still covers the screen, so the arrival isn't a white wait on the
-    // load (spec 4, transitions). The warm-up belongs to the real-time loop:
-    // a synthetic step loads only the area it ends in (spec 11), and warming
-    // every room a replay passes through left hundreds of megabytes of decoded
-    // art in CI's software-rendered WebKit.
-    if (state.transition === null) prefetchedTarget = undefined;
-    else if (!harnessStepping) {
-      const target =
-        state.transition.phase === "out" ? state.transition.target.area : undefined;
-      if (target !== undefined && target !== prefetchedTarget) {
-        const targetArea = content.world.areas[target];
-        if (targetArea !== undefined) {
-          view.prefetch(targetArea);
-          void assets.warmAreaOverlays(targetArea.id);
-        }
-        prefetchedTarget = target;
-      }
-    }
+    areaLoader.syncTransition(state.transition, harnessStepping);
     if (state.finale !== lastFinale) {
-      if (import.meta.env.DEV || import.meta.env.MODE === "harness")
-        console.log(`[cloverhollow] finale ${state.finale ?? "null"}`);
+      if (qaEnabled) console.log(`[cloverhollow] finale ${state.finale ?? "null"}`);
       lastFinale = state.finale;
       if (state.finale === "credits") creditsTicks = 0;
     }
@@ -1011,15 +760,14 @@ async function boot(): Promise<void> {
     for (const event of stepped.events) {
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
-        if (qaActivePack === null && !qaBlocked) void saveState(event.state);
+        if (!(qa?.isRestricted() ?? false)) void saveSession.saveState(event.state);
       }
     }
     const soundContext = buildSoundContext(state);
     const cues = soundCues(previous, state, content.world);
     for (const cue of cues) {
       const played = sound.play(cue, state.tick, soundContext);
-      if (import.meta.env.DEV || import.meta.env.MODE === "harness")
-        console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
+      if (qaEnabled) console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
     }
     if (!harnessStepping) {
       const haptic = hapticForTick(previous, state, cues, {
@@ -1027,45 +775,11 @@ async function boot(): Promise<void> {
       });
       if (haptic !== null) haptics.trigger(haptic);
     }
-    if (qaActivePack === null && !qaBlocked && autosaveNeeded(previous, state)) void save();
-    logBattle(state);
-    afterTick(state);
-  };
-  let areaLoad: Promise<void> | undefined;
-  // Loads whatever area the state is in. If a load for an older target is still
-  // in flight, waits for it and checks again, so callers always end up with the
-  // current area loaded. `fresh` loads it again even if it's the one shown.
-  const ensureArea = async (fresh = false): Promise<void> => {
-    let reload = fresh;
-    for (;;) {
-      if (areaLoad !== undefined) {
-        await areaLoad;
-        continue;
-      }
-      const area = content.world.areas[state.area];
-      if (area === undefined) throw new Error(`Unknown area ${state.area}`);
-      if (!reload && view.loadedAreaId() === area.id) {
-        await Promise.all([
-          assets.warmAreaMedia(area),
-          state.battle !== null ? assets.warmBattlePortraits(state) : Promise.resolve(),
-        ]);
-        return;
-      }
-      reload = false;
-      areaLoad = Promise.all([
-        view.setArea(area).then(() => assets.cacheAreaNpcPortraits(area)),
-        assets.warmAreaMedia(area),
-        state.battle !== null ? assets.warmBattlePortraits(state) : Promise.resolve(),
-      ])
-        .then(() => {
-          view.resetCamera();
-          previousState = state;
-        })
-        .finally(() => {
-          areaLoad = undefined;
-          invalidate();
-        });
+    if (!(qa?.isRestricted() ?? false) && autosaveNeeded(previous, state)) {
+      void saveSession.save();
     }
+    devLog?.logBattle(state);
+    devLog?.afterTick(state);
   };
   const snapPostcard = async (
     options?: { download?: boolean },
@@ -1073,7 +787,7 @@ async function boot(): Promise<void> {
     if (!photoMode || !canPhotoMode(overlayContext())) return null;
     sound.playEffect("camera-shutter");
     shutterFlash.trigger();
-    if (!harnessStepping) haptics.trigger("light");
+    lightHaptic();
     render(1);
     app.render();
     const extracted = app.renderer.extract.canvas({
@@ -1107,13 +821,8 @@ async function boot(): Promise<void> {
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
-    if (
-      shouldFreezeLiveLoop({
-        documentHidden: document.hidden,
-        paused,
-        areaLoading: areaLoad !== undefined,
-      })
-    ) {
+    const areaLoading = areaLoader.isLoading();
+    if (shouldFreezeLiveLoop({ documentHidden: document.hidden, paused, areaLoading })) {
       accumulator = 0;
     } else if (!paused) {
       const drained = drainTicks(accumulator, 1000 / 60, 5);
@@ -1122,14 +831,15 @@ async function boot(): Promise<void> {
         tick(input.next());
         if (view.loadedAreaId() !== state.area) {
           accumulator = 0;
-          void ensureArea();
+          void areaLoader.ensureArea();
           break;
         }
       }
     }
-    if ((!paused && !document.hidden) || areaLoad !== undefined || drawPending) {
+    const stillLoading = areaLoader.isLoading();
+    if ((!paused && !document.hidden) || stillLoading || drawPending) {
       drawPending = false;
-      const alpha = paused || areaLoad !== undefined
+      const alpha = paused || stillLoading
         ? 1
         : Math.min(1, Math.max(0, accumulator / (1000 / 60)));
       render(alpha);
@@ -1143,128 +853,84 @@ async function boot(): Promise<void> {
       overworldPointer.release();
       touch.releaseArrows();
       accumulator = 0;
-      flushSaveOnHide();
+      saveSession.flushOnHide();
     } else {
       last = performance.now();
       accumulator = 0;
       invalidate();
     }
   });
-  window.addEventListener("pagehide", flushSaveOnHide);
+  window.addEventListener("pagehide", saveSession.flushOnHide);
   render();
   inputShortcuts.bind();
-  if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-    const [{ installHook }, { formatSaveBackup, parseSaveBackup }] = await Promise.all([
-      import("./dev/hook"),
-      import("./shell/save-backup"),
-    ]);
-    installHook({
+  if (qaEnabled) {
+    const resetTransientUi = (): void => {
+      titleMode = null;
+      jukeboxTrack = null;
+      battlePeekOpen = false;
+      activeArcadeRecord = null;
+      fishStreak = 0;
+      setPhotoMode(false, true);
+      levelUpNotices.length = 0;
+      swallowed.clear();
+    };
+    const { installShellHook } = await import("./dev/hook");
+    installShellHook({
+      world: content.world,
+      fixtures: content.fixtures,
+      fresh,
+      speciesXp: saveSession.speciesXp,
       input,
       get: () => state,
       tick,
-      ensureArea,
-      render: () => { render(); invalidate(); },
+      ensureArea: areaLoader.ensureArea,
+      render: () => render(),
+      invalidate,
       paused: () => paused,
       setPaused: (value) => { paused = value; },
       setStepping: (value) => { harnessStepping = value; },
-      reset: async (options) => {
+      applyResetState: async (next) => {
         keyboard.clearTaps();
         gamepad.clearTaps();
         overworldPointer.release();
-        const name = options.fixture ?? "new-game";
-        const fixture = content.fixtures[name];
-        if (fixture === undefined)
-          throw new Error(
-            `Unknown fixture "${name}". Known fixtures: ${Object.keys(
-              content.fixtures,
-            ).join(", ")}`,
-          );
-        suppressSave = true;
-        saveDirty = false;
-        state = createState(content.world, fixture, options.seed);
+        saveSession.setSuppressed(true);
+        saveSession.clearDirty();
+        state = next;
         previousState = state;
         bannerTracker.clear();
         saveToast.hide();
-        suppressSave = false;
-        prefetchedTarget = undefined;
-        await Promise.all([ensureArea(), assets.warmJournalAssets(state)]);
-        titleMode = null;
-        jukeboxTrack = null;
-        qaMenuOpen = false;
-        qaActivePack = null;
-        qaJustPicked = false;
-        qaConsoleOpen = false;
-        battlePeekOpen = false;
-        activeArcadeRecord = null;
-        fishStreak = 0;
-        setPhotoMode(false, true);
+        saveSession.setSuppressed(false);
+        areaLoader.reset();
+        await Promise.all([areaLoader.ensureArea(), assets.warmJournalAssets(state)]);
+        resetTransientUi();
+        qa?.reset();
         sound.clearEffects();
         inputShortcuts.resetInputMode();
         cancelDown = false;
-        levelUpNotices.length = 0;
-        swallowed.clear();
       },
       renderInfo: () => ({ ...view.renderInfo(state), arcade: assets.overlayInfo() }),
-      qa: {
-        active: () => qaActivePack !== null,
-        packs: () => qaPacks.map((item) => item.pack),
+      qa: { active: () => qa?.isActive() ?? false, packs: () => qa?.packs() ?? [] },
+      isQaRestricted: () => qa?.isRestricted() ?? false,
+      saveStore,
+      clearSaveDirty: saveSession.clearDirty,
+      applyImportedSave: async (imported) => {
+        state = imported;
+        previousState = state;
+        saveSession.clearDirty();
+        bannerTracker.clear();
+        saveToast.hide();
+        areaLoader.reset();
+        resetTransientUi();
+        await Promise.all([areaLoader.ensureArea(true), assets.warmJournalAssets(state)]);
+        render();
+        invalidate();
       },
-      save: {
-        clear: async () => {
-          if (qaActivePack !== null || qaBlocked) return;
-          await saveStore.clear();
-          saveDirty = false;
-        },
-        last: () => saveStore.last(),
-        loaded: () => (qaActivePack === null && !qaBlocked ? saveStore.loaded() : null),
-        exportBackup: () => formatSaveBackup(state, content.world, new Date().toISOString()),
-        importBackup: async (raw) => {
-          if (qaActivePack !== null || qaBlocked) return false;
-          const imported = parseSaveBackup(raw, fresh, speciesXp, content.world.levels.thresholds);
-          if (imported === null) return false;
-          const wrote = await saveStore.write(serializeSave(imported), {
-            tick: imported.tick,
-            hash: stableHash(imported),
-          });
-          if (!wrote) return false;
-          state = imported;
-          previousState = state;
-          saveDirty = false;
-          bannerTracker.clear();
-          saveToast.hide();
-          titleMode = null;
-          prefetchedTarget = undefined;
-          jukeboxTrack = null;
-          battlePeekOpen = false;
-          activeArcadeRecord = null;
-          fishStreak = 0;
-          setPhotoMode(false, true);
-          levelUpNotices.length = 0;
-          swallowed.clear();
-          await Promise.all([ensureArea(true), assets.warmJournalAssets(state)]);
-          render();
-          invalidate();
-          return true;
-        },
-      },
-      sound: {
-        log: sound.log, effects: sound.effects, muted: sound.muted, level: sound.level,
-        state: sound.state, music: sound.music,
-      },
-      settings: {
-        gentleTiming: gameSettings.gentleTiming,
-        setGentleTiming: withInvalidate((on: boolean) => gameSettings.setGentleTiming(on)),
-        keyHints: gameSettings.keyHints,
-        setKeyHints: withInvalidate((on: boolean) => gameSettings.setKeyHints(on)),
-        textSpeed: gameSettings.textSpeed,
-        setTextSpeed: withInvalidate((speed) => gameSettings.setTextSpeed(speed)),
-        reducedMotion: gameSettings.reducedMotion,
-        setReducedMotion: withInvalidate((on: boolean) => gameSettings.setReducedMotion(on)),
-        photoMode: () => photoMode,
-        setPhotoMode: (on) => setPhotoMode(on),
-        snapPostcard,
-        minigameRecords: () => minigameRecords.records(),
-      },
+      sound,
+      gameSettings,
+      photoMode: () => photoMode,
+      setPhotoMode: (on) => setPhotoMode(on),
+      snapPostcard,
+      minigameRecords: () => minigameRecords.records(),
       boot: { title: () => titleMode },
     });
   }

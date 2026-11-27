@@ -204,6 +204,11 @@ export type ShellAssets = {
   warmAreaOverlays: (areaId: string) => Promise<void>;
   warmAreaMedia: (area: Area) => Promise<void>;
   warmJournalAssets: (snapshot: State) => Promise<void>;
+  warmJournalOnRender: (
+    snapshot: State,
+    wasJournalOpen: boolean,
+    isStillOpen: () => boolean,
+  ) => void;
   warmBattlePortraits: (snapshot: State) => Promise<void>;
   renderOverlays: (
     arcadeState: ArcadeView | null,
@@ -508,6 +513,26 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     await Promise.all(ownedJournalAtlases(world, snapshot).map((atlas) => decodeAtlasImage(atlas)));
   };
 
+  const warmJournalOnRender = (
+    snapshot: State,
+    wasJournalOpen: boolean,
+    isStillOpen: () => boolean,
+  ): void => {
+    if (snapshot.journalOpen && !wasJournalOpen) {
+      void warmJournalAssets(snapshot).then(() => {
+        if (isStillOpen()) invalidate();
+      });
+    } else if (
+      snapshot.journalOpen &&
+      Object.values(snapshot.caughtFish ?? {}).some((count) => count > 0) &&
+      !hasAtlasMeta(FISH_ATLAS)
+    ) {
+      void decodeAtlasImage(FISH_ATLAS).then(() => {
+        if (isStillOpen()) invalidate();
+      });
+    }
+  };
+
   const warmBattlePortraits = async (snapshot: State): Promise<void> => {
     await Promise.all(
       battlePortraitAtlases(world, snapshot).map((atlas) => decodeAtlasImage(atlas)),
@@ -591,6 +616,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     warmAreaOverlays,
     warmAreaMedia,
     warmJournalAssets,
+    warmJournalOnRender,
     warmBattlePortraits,
     renderOverlays,
     overlayInfo,

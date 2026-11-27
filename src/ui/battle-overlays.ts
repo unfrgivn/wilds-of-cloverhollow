@@ -396,6 +396,8 @@ export function createRewardSticker(root: HTMLElement): {
 } {
   let confirmHandler: () => void = () => undefined;
   const card = element("section", "battle-reward");
+  card.setAttribute("role", "status");
+  card.setAttribute("aria-live", "polite");
   const title = element("div", "battle-reward-title");
   const image = element("div", "battle-reward-image die-cut");
   image.setAttribute("role", "img");

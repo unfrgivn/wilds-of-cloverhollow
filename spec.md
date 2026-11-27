@@ -188,8 +188,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   shell keyboard/gamepad overlay & journal shortcut orchestration
   (`canPhotoMode`, `canBattlePeek`, `canOverworldSteer`,
   `isJournalShortcutActive`, `isOverworldFree`, `isBannerEligible`,
-  `createInputShortcuts`) lives in `src/shell/input-shortcuts.ts` so
-  `src/main.ts` stays focused on composition and lifecycle.
+  `createInputShortcuts`) lives in `src/shell/input-shortcuts.ts`; dynamic
+  browser tab title formatting (`formatDocumentTitle`) lives in
+  `src/shell/document-title.ts`, serialized area loading and door-fade target
+  prefetching (`createAreaLoader`) live in `src/shell/area-loader.ts`, and
+  dev/harness-only QA menu, console, badge, and pack/slot session management
+  (`loadQaBoot`, `createQaSession`) live in `src/shell/qa-session.ts`
+  (dynamically imported only outside production builds, Milestone 138) so
+  `src/main.ts` stays cleanly under 950 lines and focused on composition and
+  lifecycle.
 - Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121 & 122):
   progressive enhancement with zero new npm dependencies. `createHaptics()`
   checks for a native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via
@@ -2195,6 +2202,15 @@ trunks keep its two exits.
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
   rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
   them on a fresh install and Continue after the relaunch.
+- Dynamic browser tab title (`src/shell/document-title.ts`, Milestone 138):
+  `formatDocumentTitle(world, state, { titleOpen, creditsOpen })` keeps
+  `document.title` in sync on change only (zero per-frame DOM churn):
+  `"Wilds of Cloverhollow"` on the title screen or `harness`, `"Thank You for
+  Playing · Wilds of Cloverhollow"` during credits, `"Calming <Critter> · Wilds
+  of Cloverhollow"` during calm-down battles, `"<Minigame> · Wilds of
+  Cloverhollow"` across all six minigames (`Claw Machine`, `Skee-Ball`,
+  `Boop-a-Mole`, `Comet Cruise`, `Clubhouse Microwave`, `Bubblegum Bay
+  Fishing`), and `"<Area Name> · Wilds of Cloverhollow"` in overworld areas.
 
 ### 7.4 The wake-up and the credits (Milestone 56)
 - `state.finale` is `null` in the dream, `morning` once the ending wakes Fae,
@@ -2842,6 +2858,7 @@ trunks keep its two exits.
   menu, a check overlay (a ring, a charge meter, a beat chain, a catch, or a
   lean) with its
   grade sticker and hint, and a reward card (`.battle-reward`, which exposes
+  `role="status"` and `aria-live="polite"` in Milestone 138 and
   `onConfirm` in Milestone 126 with `cursor: pointer; pointer-events: auto` so
   clicking or tapping the reward sticker or arcade prize card emits a `confirm`
   tap). For confirm-driven checks (`ring`, `charge`, `chain`, `peekaboo`,
@@ -2910,7 +2927,8 @@ trunks keep its two exits.
   `src/ui/battle-popups.ts` & `src/ui/battle.ts`): purely UI-driven by diffing
   consecutive live battle HUD snapshots (zero `src/core` changes, zero popups on
   battle open/close/switch or static gallery renders). Ephemeral `.battle-popup`
-  pills mount inside `.battle-popups` (`z-index: 28`, `pointer-events: none`),
+  pills mount inside `.battle-popups` (`z-index: 28`, `pointer-events: none`,
+  `aria-live="polite"`, `aria-atomic="false"`, Milestone 138),
   rising and fading over 850 ms (or a calm 450 ms fade under
   `prefers-reduced-motion: reduce` and `data-reduced-motion="on"`), clearing
   immediately on battle end/reset: calm gains spawn over the critter (`+N`
@@ -3601,8 +3619,9 @@ trunks keep its two exits.
   initial open, reset, or static `ui-gallery` renders, and spawn crisp
   `#47321f`-inked `.arcade-popup` pills (`+N`, `+50!`, `+100 ★!`, `BOOP! +2`,
   `★ +1`, `NICE CATCH!`, `★ RARE!`, `★ GOLDEN!`, `GOT IT! ★`, `TUG!`,
-  `★ PRIZE!`) in the upper-right margin on live gains or Claw Machine lift/prize
-  transitions.
+  `★ PRIZE!`) in the upper-right margin inside `.arcade-popups`
+  (`aria-live="polite"`, `aria-atomic="false"`, Milestone 138) on live gains or
+  Claw Machine lift/prize transitions.
   When a live round enters `phase === "result"`, the minigame renders a die-cut
   `.arcade-best-badge` pill (`★ NEW BEST! <best>` in gold when beating a
   non-zero record, or `Best: <best>` in warm cream otherwise) in the vacated

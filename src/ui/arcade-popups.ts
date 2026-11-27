@@ -123,7 +123,8 @@ function isReducedMotion(): boolean {
 
 export function createArcadePopupLayer(host: HTMLElement): ArcadePopupLayer {
   const layer = element("div", "arcade-popups", host);
-  layer.setAttribute("aria-hidden", "true");
+  layer.setAttribute("aria-live", "polite");
+  layer.setAttribute("aria-atomic", "false");
   type ActivePopup = { node: HTMLElement; timer: number };
   const active = new Set<ActivePopup>();
   let sequence = 0;

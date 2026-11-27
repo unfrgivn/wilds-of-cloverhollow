@@ -1,9 +1,21 @@
-import { stableHash, type ActionFrame, type State, type TextSpeed } from "../core";
+import {
+  createState,
+  serializeSave,
+  stableHash,
+  type ActionFrame,
+  type Fixture,
+  type State,
+  type TextSpeed,
+  type World,
+} from "../core";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
+import type { GameSettingsController } from "../platform/game-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
 import type { BattleCheckInfo } from "../render/view";
 import type { TimeOfDayPhase } from "../render/time-of-day";
+import { formatSaveBackup, parseSaveBackup } from "../shell/save-backup";
+import type { SaveStore } from "../shell/save-storage";
 import type { ArcadeInfo } from "../ui/arcade";
 import type { PostcardCapture } from "../ui/postcard";
 import type { QaPack } from "./qa";
@@ -193,6 +205,119 @@ export function installHook(deps: {
     settings: deps.settings,
   };
   window.__cloverhollow = hook;
+}
+
+/** Wires shell subsystems and portable backup import/export into `installHook`. */
+export function installShellHook(deps: {
+  world: World;
+  fixtures: Record<string, Fixture>;
+  fresh: State;
+  speciesXp: Record<string, number>;
+  input: InputSource;
+  get: () => State;
+  tick: (frame: ActionFrame) => void;
+  ensureArea: (fresh?: boolean) => Promise<void>;
+  render: () => void;
+  invalidate: () => void;
+  paused: () => boolean;
+  setPaused: (paused: boolean) => void;
+  setStepping: (stepping: boolean) => void;
+  applyResetState: (next: State) => Promise<void>;
+  renderInfo: CloverhollowHook["renderInfo"];
+  boot: CloverhollowHook["boot"];
+  qa: CloverhollowHook["qa"];
+  isQaRestricted: () => boolean;
+  saveStore: SaveStore;
+  clearSaveDirty: () => void;
+  applyImportedSave: (imported: State) => Promise<void>;
+  sound: AudioController;
+  gameSettings: GameSettingsController;
+  photoMode: () => boolean;
+  setPhotoMode: (on: boolean) => void;
+  snapPostcard: (options?: { download?: boolean }) => Promise<PostcardCapture | null>;
+  minigameRecords: () => MinigameRecords;
+}): void {
+  const invalidateAfter = <Args extends unknown[]>(
+    fn: (...args: Args) => void,
+  ): ((...args: Args) => void) => (...args: Args): void => {
+    fn(...args);
+    deps.invalidate();
+  };
+  installHook({
+    input: deps.input,
+    get: deps.get,
+    tick: deps.tick,
+    ensureArea: deps.ensureArea,
+    render: () => {
+      deps.render();
+      deps.invalidate();
+    },
+    paused: deps.paused,
+    setPaused: deps.setPaused,
+    setStepping: deps.setStepping,
+    reset: async (options) => {
+      const name = options.fixture ?? "new-game";
+      const fixture = deps.fixtures[name];
+      if (fixture === undefined) {
+        const known = Object.keys(deps.fixtures).join(", ");
+        throw new Error(`Unknown fixture "${name}". Known fixtures: ${known}`);
+      }
+      await deps.applyResetState(createState(deps.world, fixture, options.seed));
+    },
+    renderInfo: deps.renderInfo,
+    boot: deps.boot,
+    qa: deps.qa,
+    save: {
+      clear: async () => {
+        if (deps.isQaRestricted()) return;
+        await deps.saveStore.clear();
+        deps.clearSaveDirty();
+      },
+      last: () => deps.saveStore.last(),
+      loaded: () => (deps.isQaRestricted() ? null : deps.saveStore.loaded()),
+      exportBackup: () =>
+        formatSaveBackup(deps.get(), deps.world, new Date().toISOString()),
+      importBackup: async (raw) => {
+        if (deps.isQaRestricted()) return false;
+        const imported = parseSaveBackup(
+          raw,
+          deps.fresh,
+          deps.speciesXp,
+          deps.world.levels.thresholds,
+        );
+        if (imported === null) return false;
+        const wrote = await deps.saveStore.write(serializeSave(imported), {
+          tick: imported.tick,
+          hash: stableHash(imported),
+        });
+        if (!wrote) return false;
+        await deps.applyImportedSave(imported);
+        return true;
+      },
+    },
+    sound: {
+      log: deps.sound.log,
+      effects: deps.sound.effects,
+      muted: deps.sound.muted,
+      level: deps.sound.level,
+      state: deps.sound.state,
+      music: deps.sound.music,
+    },
+    settings: {
+      gentleTiming: deps.gameSettings.gentleTiming,
+      setGentleTiming: invalidateAfter((on: boolean) => deps.gameSettings.setGentleTiming(on)),
+      keyHints: deps.gameSettings.keyHints,
+      setKeyHints: invalidateAfter((on: boolean) => deps.gameSettings.setKeyHints(on)),
+      textSpeed: deps.gameSettings.textSpeed,
+      setTextSpeed: invalidateAfter((speed: TextSpeed) => deps.gameSettings.setTextSpeed(speed)),
+      reducedMotion: deps.gameSettings.reducedMotion,
+      setReducedMotion: invalidateAfter((on: boolean) => deps.gameSettings.setReducedMotion(on)),
+      photoMode: deps.photoMode,
+      setPhotoMode: deps.setPhotoMode,
+      snapPostcard: deps.snapPostcard,
+      minigameRecords: deps.minigameRecords,
+    },
+  });
 }
 
 declare global {

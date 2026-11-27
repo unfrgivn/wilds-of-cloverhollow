@@ -476,6 +476,8 @@
   font-size: 17px;
   text-align: left;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   pointer-events: auto;
   animation: choice-pop-in 150ms ease-out;
   transition: transform 110ms ease-out, background-color 110ms ease-out;

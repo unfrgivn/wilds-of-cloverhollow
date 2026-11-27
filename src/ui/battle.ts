@@ -385,7 +385,8 @@ export function createBattleHud(root: HTMLElement): {
   peekCard.append(peekHead, peekMeta, peekFeelingsRow, peekTreatsRow, peekTip);
   let lastPeekSig = "";
   const popupsLayer = element("div", "battle-popups");
-  popupsLayer.setAttribute("aria-hidden", "true");
+  popupsLayer.setAttribute("aria-live", "polite");
+  popupsLayer.setAttribute("aria-atomic", "false");
   root.append(hud, peekCard, popupsLayer);
   type ActivePopup = {
     node: HTMLElement;

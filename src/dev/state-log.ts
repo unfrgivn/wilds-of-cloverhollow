@@ -190,3 +190,30 @@ export function createBattleButtonsLogger(
     }
   };
 }
+
+export type DevLoggers = {
+  afterTick: (state: State) => void;
+  logTitle: (mode: string | null) => void;
+  logMusic: (soundtrack: SoundtrackState) => void;
+  logBattle: (state: State) => void;
+  logBattleButtons: (active: boolean, state: State) => void;
+};
+
+/** Installs all dev/harness console loggers and emits initial layout and state logs. */
+export function createDevLoggers(
+  world: World,
+  uiRoot: HTMLElement,
+  initialState: State,
+): DevLoggers {
+  logTouchLayout();
+  logPointers();
+  const afterTick = createStateLogger(world);
+  afterTick(initialState);
+  return {
+    afterTick,
+    logTitle: createTitleLogger(),
+    logMusic: createMusicLogger(),
+    logBattle: createBattleLogger(),
+    logBattleButtons: createBattleButtonsLogger(uiRoot),
+  };
+}

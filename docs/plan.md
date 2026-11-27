@@ -6065,6 +6065,47 @@ the old trail, the owl, and the clubhouse claim.
   2 skipped, 0 snapshot diffs, plus 45/45 WebKit repeat check on
   `milestone-126.spec.ts`).
 
+## Milestone 138: Dynamic Storybook Document Title (`src/shell/document-title.ts`), Accessible Live Regions & Final `src/main.ts` Modular Split (`< 950` lines via `src/shell/qa-session.ts` & `src/shell/area-loader.ts`) **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims.
+- Dynamic Storybook Browser Tab Title (`src/shell/document-title.ts`,
+  `src/main.ts`):
+  - Exports pure `formatDocumentTitle(world, state, { titleOpen, creditsOpen })`
+    formatting the browser tab title across Title/harness (`"Wilds of
+    Cloverhollow"`), Credits (`"Thank You for Playing · Wilds of
+    Cloverhollow"`), active calm-down battles (`"Calming <Name> · Wilds of
+    Cloverhollow"`), all six minigames (`Claw Machine`, `Skee-Ball`,
+    `Boop-a-Mole`, `Comet Cruise`, `Clubhouse Microwave`, `Bubblegum Bay
+    Fishing`), and overworld areas (`"<Area Name> · Wilds of Cloverhollow"`),
+    updating `document.title` inside `render()` only when the value changes.
+- Accessible Status Live Regions (`src/ui/battle-overlays.ts`,
+  `src/ui/battle.ts`, `src/ui/arcade-popups.ts`):
+  - Adds zero-visual-change ARIA live region attributes (`role="status"` and
+    `aria-live="polite"` on `.battle-reward`; `aria-live="polite"` and
+    `aria-atomic="false"` replacing `aria-hidden="true"` on `.battle-popups`
+    and `.arcade-popups`).
+- Final `src/main.ts` Modular Split (`1,279` -> `< 950` lines):
+  - Extracts `src/shell/area-loader.ts` (`createAreaLoader`: serialized
+    in-flight `ensureArea(fresh?)`, deduplicated door-fade `prefetch` /
+    `clearPrefetch` / `syncTransition`, `isLoading`, `reset`) and
+    `src/shell/qa-session.ts` (`loadQaBoot`, `createQaSession`: dev/harness-only
+    QA menu, console, badge, pack/slot reloading, and `stepQaMenu`, dynamically
+    imported behind `qaEnabled` so zero QA bytes enter production `dist/`),
+    plus cohesive shell/dev helpers in `src/shell/save-storage.ts`,
+    `src/shell/assets.ts`, `src/dev/state-log.ts`, and `src/dev/hook.ts`,
+    bringing every implementation `.ts` file in `src/` cleanly under 1,000 lines.
+- WebKit/Safari Choice Click Fix (`src/ui/sticker.css`):
+  - Added `user-select: none; -webkit-user-select: none;` to `.sticker-choice` so
+    rapid clicks during `choice-pop-in` on Safari/WebKit never get swallowed as
+    accidental text selection.
+- Evidence: `tests/unit/milestone-138.test.ts` (6 tests) and real-input
+  `tests/e2e/milestone-138.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (198 unit files / 1,449 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  e2e across Chromium (637 passed) & WebKit (542 passed; 1,179 total passed,
+  2 skipped, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

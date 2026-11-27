@@ -6530,6 +6530,55 @@ the old trail, the owl, and the clubhouse claim.
   WebKit; note pre-existing `kid-restored-1280` 432 px diff from PR #3's
   `forest_calm` celebration untouched).
 
+## Milestone 150: Party Companion Overworld Banter & Interactive Tool Micro-Events **Status:** ✅ Completed (2026-11-27)
+- **Pure Core Types, Strict Validation & World Loading (`src/core/types.ts`,
+  `src/content/npc-parsers.ts`, `src/content/load.ts`)**:
+  - Added `NpcDialogueTurn`, `NpcPartyBanter`, `NpcToolTrigger`,
+    `NpcToolEventTone`, and `NpcToolEvent` types, extended `NpcProfilesContent`
+    and `World` with `partyBanter` and `toolEvents`, and added strict loader
+    validation (unique ids, valid areas, valid party/area speakers, positive
+    finite radius, valid triggers/tones, `<= 48`-char turn lines, and valid
+    conditions) with zero `State`, save-version, or Ink `VAR` changes.
+- **Deterministic Party Life & Tool Micro-Event Brain (`src/core/npc-context.ts`)**:
+  - Extended `NpcLifeSnapshot` with `party: PartyLifeEntry[]` (`lantern-awe`,
+    `celebrate`, `music-delight`, `party-chat`, `idle`) and
+    `activeToolEventId: string | null`.
+  - Added high-priority `toolEvents` evaluation across `lantern` (bypassing
+    48-tick arrival grace with distance ripple), `flute` (within 180 ticks,
+    bypassing arrival grace), and `lasso` (`hasLasso` after 48-tick grace)
+    with crisp 180-tick turn alternation anchored at each speaker's live `(x, y)`.
+  - Added `partyBanter` evaluation on a calm 360-tick cycle staggered cleanly
+    around area NPC banter, anchored at live `(member.x, member.y)` with both
+    participating companions entering `party-chat` and the listener showing a
+    floating heart/note emote.
+- **Authored Content (`content/npc-profiles.json`)**:
+  - Added **7 interactive tool micro-events** (`cavern-crystal-resonance`,
+    `mist-bluebell-awakening` + solo fallback `mist-sage-lantern`,
+    `hills-flute-jam`, `park-flute-concert`, `bay-lasso-cheer`,
+    `gym-lasso-salute`) and **15 traveling party companion banter entries**
+    across Clubhouse (pre/post `garden_ripe`), Crystal Cavern, Arcade,
+    Bubblegum Bay, Pinecone Pass, Ice Cream Parlor, Grocery Market, Wildlife
+    Sanctuary, Enchanted Forest (fizzy vs post-finale calm), Sue's Beach
+    Cottage (Sue + Jordan and Sue + Maddie before Jordan joins), Jordan's
+    Mountain Cabin, and post-finale Cloverhollow Plaza — all `<= 44` chars,
+    zero early Milo spoilers, and zero weather/day-night references.
+- **Presentation, Party Emotes & Reduced Motion (`src/render/npc-life.ts`,
+  `src/render/overworld-effects.ts`, `src/render/view.ts`)**:
+  - Wired party companion emotes into `OverworldEffectsController.renderEmotes`
+    (suppressing active speaker overlap and napping Maddie, gating ambient tool
+    emotes cleanly to preserve zero visual baseline drift, and honoring
+    `reducedMotion`), emitted pooled celebration sparkles on fresh `toolEvent`
+    activation (skipped under `reducedMotion` and `harness`), and exposed
+    `activeToolEventId` and `party` in `renderInfo().npcLife` (`src/main.ts`
+    kept at 938 lines).
+- **Evidence**: expanded `tests/unit/living-npcs.test.ts` (strict loader
+  validation, spoiler safety, lantern/flute/lasso tool micro-events, live
+  moving party banter, and party attention states), added `@smoke` Playwright
+  test in `tests/e2e/living-npcs.spec.ts`, verified zero regressions in
+  `clubhouse.spec.ts` and `cavern.spec.ts`, and captured `vision`-audited
+  1280×720 review JPEGs (`art/review/living-npcs-party-banter.jpg` and
+  `art/review/living-npcs-tool-event.jpg`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

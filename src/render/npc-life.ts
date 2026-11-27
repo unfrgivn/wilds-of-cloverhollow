@@ -10,6 +10,7 @@ import {
   type NpcLifeEntry,
   type NpcLifeSnapshot,
   type NpcStoryStage,
+  type PartyAttention,
   type State,
   type World,
 } from "../core";
@@ -27,10 +28,16 @@ type NpcReactionPuff = {
 
 export type NpcLifeRenderInfo = {
   stage: NpcStoryStage;
+  activeToolEventId: string | null;
   npcs: {
     id: string;
     attention: NpcAttention;
     facing: Direction;
+    emote: NpcEmoteKind | null;
+  }[];
+  party: {
+    id: string;
+    attention: PartyAttention;
     emote: NpcEmoteKind | null;
   }[];
   chatter: {
@@ -73,6 +80,7 @@ export class NpcLifeController {
   private fluteDialogueActive = false;
   private lanternOnTick: number | null = null;
   private prevLanternOn = false;
+  private prevToolEventId: string | null = null;
   private readonly attentionState = new Map<
     string,
     { attention: NpcAttention; sinceTick: number }
@@ -124,6 +132,7 @@ export class NpcLifeController {
     this.fluteDialogueActive = false;
     this.lanternOnTick = null;
     this.prevLanternOn = false;
+    this.prevToolEventId = null;
     this.attentionState.clear();
     this.facingState.clear();
     this.clearReactions();
@@ -164,6 +173,7 @@ export class NpcLifeController {
       this.fluteDialogueActive = false;
       this.lanternOnTick = null;
       this.prevLanternOn = state.lantern;
+      this.prevToolEventId = null;
       this.clearReactions();
     } else if (calmCount > this.lastCalmedCount) {
       this.lastCalmedTick = state.tick;
@@ -209,7 +219,7 @@ export class NpcLifeController {
     this.lastTick = state.tick;
   }
 
-  update(state: State): NpcLifeSnapshot {
+  update(state: State, livingMotion = false): NpcLifeSnapshot {
     this.observeTick(state);
     const life = evaluateNpcLife(this.world, state, {
       areaTicks: this.areaTicks(state.tick),
@@ -219,6 +229,23 @@ export class NpcLifeController {
       lastFluteTick: this.lastFluteTick,
       lanternOnTick: this.lanternOnTick,
     });
+    if (life.activeToolEventId !== null && life.activeToolEventId !== this.prevToolEventId) {
+      if (state.area !== "harness" && livingMotion && life.chatter !== null) {
+        const burstAttention =
+          life.chatter.tone === "lantern"
+            ? "lantern-awe"
+            : life.chatter.tone === "music"
+              ? "music-delight"
+              : "celebrate";
+        this.spawnReactionBurst(
+          life.chatter.x,
+          life.chatter.y - (life.chatter.adult ? 116 : 96),
+          burstAttention,
+          state.tick,
+        );
+      }
+    }
+    this.prevToolEventId = life.activeToolEventId;
     this.latestSnapshot = life;
     return life;
   }
@@ -355,10 +382,16 @@ export class NpcLifeController {
     const snap = this.latestSnapshot;
     return {
       stage: snap?.situation.storyStage ?? "morning",
+      activeToolEventId: snap?.activeToolEventId ?? null,
       npcs: (snap?.npcs ?? []).map((entry) => ({
         id: entry.id,
         attention: entry.attention,
         facing: entry.facing,
+        emote: entry.emote,
+      })),
+      party: (snap?.party ?? []).map((entry) => ({
+        id: entry.id,
+        attention: entry.attention,
         emote: entry.emote,
       })),
       chatter:

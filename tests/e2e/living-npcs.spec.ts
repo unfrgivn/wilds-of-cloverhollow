@@ -630,3 +630,98 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test(
+  "party companion overworld banter and interactive tool micro-events",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    // 1. Live Sue & Jordan partyBanter in Clubhouse (?qa=clubhouse) with contrast & clamping.
+    await openQaPaused(page, "clubhouse");
+    expect((await readState(page)).area).toBe("clubhouse");
+    const clubBanter = await stepUntilChatter(
+      page,
+      (bubble) => bubble.npcId === "sue" || bubble.npcId === "jordan",
+      420,
+    );
+    expect(["Sue", "Jordan"]).toContain(clubBanter.speakerName);
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+    const clubParty = (await renderInfo(page)).npcLife.party;
+    expect(clubParty.find((m) => m.id === "sue")?.attention).toBe("party-chat");
+    expect(clubParty.find((m) => m.id === "jordan")?.attention).toBe("party-chat");
+
+    await page.setViewportSize({ width: 874, height: 402 });
+    await step(page, 2);
+    await assertChatterInViewport(page, 874, 402);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await step(page, 2);
+
+    // 2. Meadow Park Flute Concert micro-event (?qa=flute -> F -> "Just play").
+    await openQaPaused(page, "flute");
+    expect((await readState(page)).area).toBe("park");
+    await walk(page, "x", 455);
+    await walk(page, "y", 535);
+    await walk(page, "x", 375);
+
+    await page.keyboard.press("f");
+    await step(page, 4);
+    expect((await readState(page)).dialogue?.knot).toBe("flute");
+    await finishDialogue(page, "Just play");
+    await step(page, 22);
+
+    const parkInfo = await renderInfo(page);
+    expect(parkInfo.npcLife.activeToolEventId).toBe("park-flute-concert");
+    expect(parkInfo.npcLife.chatter?.npcId).toBe("pippa");
+    expect(parkInfo.npcLife.npcs.find((n) => n.id === "pippa")?.attention).toBe("music-delight");
+    expect(parkInfo.npcLife.npcs.find((n) => n.id === "hazel")?.attention).toBe("music-delight");
+    expect(parkInfo.npcLife.party.find((m) => m.id === "sue")).toMatchObject({
+      attention: "music-delight", emote: "note",
+    });
+    expect(parkInfo.npcLife.party.find((m) => m.id === "jordan")).toMatchObject({
+      attention: "music-delight", emote: "note",
+    });
+    await expect(page.locator(".npc-chatter")).toBeVisible();
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "music");
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+
+    // 3. Crystal Cavern Blacklight Crystal Resonance micro-event (L key, Pebble -> Gemma).
+    await openHarness(page);
+    await resetPaused(page, "cavern");
+    expect((await readState(page)).area).toBe("cavern");
+    assertNpcsRendered((await renderInfo(page)).npcs, ["pebble", "gemma"]);
+
+    await page.keyboard.press("l");
+    await step(page, 24);
+    expect((await readState(page)).lantern).toBe(true);
+
+    const cavernTurn0 = await renderInfo(page);
+    expect(cavernTurn0.npcLife.activeToolEventId).toBe("cavern-crystal-resonance");
+    expect(cavernTurn0.npcLife.chatter?.npcId).toBe("pebble");
+    expect(cavernTurn0.npcLife.party.find((m) => m.id === "sue")).toMatchObject({
+      attention: "lantern-awe", emote: "sparkle",
+    });
+    expect(cavernTurn0.npcLife.party.find((m) => m.id === "jordan")).toMatchObject({
+      attention: "lantern-awe", emote: "sparkle",
+    });
+    await expect(page.locator(".npc-chatter")).toBeVisible();
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "lantern");
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-npc", "pebble");
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+
+    // Step into turn 1 and confirm Gemma replies smoothly.
+    await step(page, 100);
+    const cavernTurn1 = await renderInfo(page);
+    expect(cavernTurn1.npcLife.activeToolEventId).toBe("cavern-crystal-resonance");
+    expect(cavernTurn1.npcLife.chatter?.npcId).toBe("gemma");
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-npc", "gemma");
+
+    expect(errors).toEqual([]);
+  },
+);

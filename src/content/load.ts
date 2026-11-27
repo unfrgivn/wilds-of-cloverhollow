@@ -836,6 +836,8 @@ export function loadContent(): {
       treats,
       npcProfiles,
       npcBanter: parsedProfiles.banter,
+      partyBanter: parsedProfiles.partyBanter ?? [],
+      toolEvents: parsedProfiles.toolEvents ?? [],
     },
     fixtures,
   };

@@ -4,12 +4,18 @@ import type {
   Critter,
   NpcAmbientRule,
   NpcBanterPair,
+  NpcChatterTone,
   NpcCondition,
+  NpcDialogueTurn,
   NpcEmoteKind,
+  NpcPartyBanter,
   NpcPersonality,
   NpcProfile,
   NpcProfilesContent,
   NpcStoryStage,
+  NpcToolEvent,
+  NpcToolEventTone,
+  NpcToolTrigger,
   PartyContent,
 } from "../core";
 import { field, record, strings } from "./parsers";
@@ -36,6 +42,26 @@ const npcStoryStages: readonly NpcStoryStage[] = [
 
 function isNpcStoryStage(value: unknown): value is NpcStoryStage {
   return npcStoryStages.some((item) => item === value);
+}
+
+const npcChatterTones: readonly NpcChatterTone[] = [
+  "normal", "lantern", "worry", "warm", "banter", "music",
+];
+
+function isNpcChatterTone(value: unknown): value is NpcChatterTone {
+  return npcChatterTones.some((item) => item === value);
+}
+
+const npcToolTriggers: readonly NpcToolTrigger[] = ["lantern", "flute", "lasso"];
+
+function isNpcToolTrigger(value: unknown): value is NpcToolTrigger {
+  return npcToolTriggers.some((item) => item === value);
+}
+
+const npcToolEventTones: readonly NpcToolEventTone[] = ["lantern", "music", "warm"];
+
+function isNpcToolEventTone(value: unknown): value is NpcToolEventTone {
+  return npcToolEventTones.some((item) => item === value);
 }
 
 function knownCalmNames(
@@ -245,5 +271,98 @@ export function parseNpcProfiles(
       ...(when === undefined ? {} : { when }),
     };
   });
-  return { profiles, banter };
+
+  const parseTurns = (
+    rawTurns: unknown,
+    label: string,
+    allowedSpeaker: (speaker: string) => boolean,
+  ): NpcDialogueTurn[] => {
+    field(Array.isArray(rawTurns) && rawTurns.length >= 1 && rawTurns.length <= 2,
+      file, `${label}.turns`);
+    return rawTurns.map((rawTurn, turnIndex): NpcDialogueTurn => {
+      const turnLabel = `${label}.turns[${turnIndex}]`;
+      field(record(rawTurn), file, turnLabel);
+      const speaker = rawTurn.speaker;
+      field(typeof speaker === "string" && allowedSpeaker(speaker),
+        file, `${turnLabel}.speaker (${String(speaker)})`);
+      const text = rawTurn.text;
+      field(typeof text === "string" && text.trim().length >= 1 && text.length <= 48,
+        file, `${turnLabel}.text`);
+      return { speaker, text };
+    });
+  };
+
+  const rawPartyBanter = raw.partyBanter ?? [];
+  field(Array.isArray(rawPartyBanter), file, "partyBanter");
+  const seenPartyBanter = new Set<string>();
+  const partyBanter: NpcPartyBanter[] = rawPartyBanter.map((entry, index): NpcPartyBanter => {
+    const label = `partyBanter[${index}]`;
+    field(record(entry), file, label);
+    const id = entry.id;
+    field(typeof id === "string" && id.trim().length > 0 && !seenPartyBanter.has(id),
+      file, `${label}.id`);
+    seenPartyBanter.add(id);
+    const areaId = entry.area;
+    field(typeof areaId === "string" && areas[areaId] !== undefined, file, `${label}.area`);
+    const turns = parseTurns(entry.turns, label, (speaker) => party[speaker] !== undefined);
+    const tone = entry.tone;
+    field(tone === undefined || isNpcChatterTone(tone), file, `${label}.tone`);
+    const when = parseNpcCondition(
+      entry.when, file, `${label}.when`, calms, party, storyVariable,
+    );
+    return {
+      id,
+      area: areaId,
+      turns,
+      ...(tone === undefined ? {} : { tone }),
+      ...(when === undefined ? {} : { when }),
+    };
+  });
+
+  const rawToolEvents = raw.toolEvents ?? [];
+  field(Array.isArray(rawToolEvents), file, "toolEvents");
+  const seenToolEvents = new Set<string>();
+  const toolEvents: NpcToolEvent[] = rawToolEvents.map((entry, index): NpcToolEvent => {
+    const label = `toolEvents[${index}]`;
+    field(record(entry), file, label);
+    const id = entry.id;
+    field(typeof id === "string" && id.trim().length > 0 && !seenToolEvents.has(id),
+      file, `${label}.id`);
+    seenToolEvents.add(id);
+    const areaId = entry.area;
+    field(typeof areaId === "string" && areas[areaId] !== undefined, file, `${label}.area`);
+    const area = areas[areaId];
+    const trigger = entry.trigger;
+    field(isNpcToolTrigger(trigger), file, `${label}.trigger`);
+    const radius = entry.radius;
+    field(typeof radius === "number" && Number.isFinite(radius) && radius > 0,
+      file, `${label}.radius`);
+    const tone = entry.tone;
+    field(isNpcToolEventTone(tone), file, `${label}.tone`);
+    const turns = parseTurns(
+      entry.turns,
+      label,
+      (speaker) =>
+        area.npcs.some((npc) => npc.id === speaker) || party[speaker] !== undefined,
+    );
+    field(
+      turns.some((turn) => area.npcs.some((npc) => npc.id === turn.speaker)),
+      file,
+      `${label}.turns (needs an area NPC speaker)`,
+    );
+    const when = parseNpcCondition(
+      entry.when, file, `${label}.when`, calms, party, storyVariable,
+    );
+    return {
+      id,
+      area: areaId,
+      trigger,
+      radius,
+      tone,
+      turns,
+      ...(when === undefined ? {} : { when }),
+    };
+  });
+
+  return { profiles, banter, partyBanter, toolEvents };
 }

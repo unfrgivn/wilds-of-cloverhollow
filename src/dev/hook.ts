@@ -1,4 +1,4 @@
-import { stableHash, type ActionFrame, type State } from "../core";
+import { stableHash, type ActionFrame, type State, type TextSpeed } from "../core";
 import type { InputSource } from "../platform/input";
 import type { AudioController } from "../platform/audio";
 import type { BattleCheckInfo } from "../render/view";
@@ -102,6 +102,10 @@ export type CloverhollowHook = {
     setGentleTiming: (on: boolean) => void;
     keyHints: () => boolean;
     setKeyHints: (on: boolean) => void;
+    textSpeed: () => TextSpeed;
+    setTextSpeed: (speed: TextSpeed) => void;
+    reducedMotion: () => boolean;
+    setReducedMotion: (on: boolean) => void;
     photoMode: () => boolean;
     setPhotoMode: (on: boolean) => void;
   };

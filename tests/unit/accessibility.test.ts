@@ -192,15 +192,31 @@ describe("step with gentleTiming", () => {
 
 describe("game preferences serialization", () => {
   it("defaults safely on null or malformed values and round-trips cleanly", () => {
-    expect(readGamePreferences(null)).toEqual({ gentleTiming: false, keyHints: false });
-    expect(readGamePreferences("not-json")).toEqual({ gentleTiming: false, keyHints: false });
-    expect(readGamePreferences("true")).toEqual({ gentleTiming: false, keyHints: false });
-    expect(readGamePreferences('{"gentleTiming":true}')).toEqual({
-      gentleTiming: true,
+    const defaults = {
+      gentleTiming: false,
       keyHints: false,
+      textSpeed: "cozy" as const,
+      reducedMotion: false,
+    };
+    expect(readGamePreferences(null)).toEqual(defaults);
+    expect(readGamePreferences("not-json")).toEqual(defaults);
+    expect(readGamePreferences("true")).toEqual(defaults);
+    expect(readGamePreferences('{"gentleTiming":true}')).toEqual({
+      ...defaults,
+      gentleTiming: true,
     });
-    const encoded = writeGamePreferences({ gentleTiming: true, keyHints: true });
-    expect(readGamePreferences(encoded)).toEqual({ gentleTiming: true, keyHints: true });
+    const encoded = writeGamePreferences({
+      gentleTiming: true,
+      keyHints: true,
+      textSpeed: "brisk",
+      reducedMotion: true,
+    });
+    expect(readGamePreferences(encoded)).toEqual({
+      gentleTiming: true,
+      keyHints: true,
+      textSpeed: "brisk",
+      reducedMotion: true,
+    });
   });
 });
 

@@ -25,3 +25,4 @@ export * from "./mole";
 export * from "./comet";
 export * from "./credits";
 export * from "./music";
+export * from "./treasures";

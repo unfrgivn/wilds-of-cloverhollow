@@ -50,9 +50,11 @@ import {
   battleView,
   consumeTreat,
   purchaseTreat,
+  revealCharacters,
   startBattle,
   stepBattle,
   totalTreatCount,
+  type TextSpeed,
 } from "./battle";
 import { levelUpDelta } from "./levels";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
@@ -79,6 +81,7 @@ export {
   purchaseTreat,
   resolveCollision,
   resolveMove,
+  revealCharacters,
   rollWild,
   startBattle,
   stepBattle,
@@ -88,6 +91,7 @@ export {
   totalTreatCount,
   touchingCritter,
   visibleFollowerSlot,
+  type TextSpeed,
 };
 
 // No `lantern`: it's optional, present only while pressed, so a blank frame,
@@ -258,6 +262,7 @@ export function npcFacing(state: State, npc: Npc): Direction {
 
 export type StepOptions = {
   gentleTiming?: boolean;
+  textSpeed?: TextSpeed;
 };
 
 // A line tagged `travel: <area>.<spawn>` sends Fae there when the
@@ -433,6 +438,7 @@ function dialogueStep(
   world: World,
   state: State,
   input: ActionFrame,
+  textSpeed: TextSpeed | undefined,
 ): { state: State; events: Event[] } {
   const dialogue = state.dialogue;
   if (dialogue === null) return { state, events: [] };
@@ -447,10 +453,7 @@ function dialogueStep(
   if (dialogue.revealed < dialogue.text.length) {
     const revealed = confirm
       ? dialogue.text.length
-      : Math.min(
-          dialogue.text.length,
-          dialogue.revealed + world.tunables.interact.revealPerTick,
-        );
+      : revealCharacters(world, textSpeed, dialogue.revealed, dialogue.text.length);
     return { state: { ...next, dialogue: { ...dialogue, revealed } }, events: [] };
   }
   const count = dialogue.choices.length;
@@ -506,6 +509,7 @@ function stepTick(
   state: State,
   input: ActionFrame,
   gentleTiming: boolean,
+  textSpeed: TextSpeed | undefined,
 ): { state: State; events: Event[] } {
   if (state.finale === "credits")
     return {
@@ -521,7 +525,7 @@ function stepTick(
   const area = world.areas[state.area];
   if (area === undefined) throw new Error(`Unknown state area: ${state.area}`);
   if (state.battle !== null)
-    return { state: stepBattle(world, state, input, gentleTiming), events: [] };
+    return { state: stepBattle(world, state, input, gentleTiming, textSpeed), events: [] };
   if (state.arcade !== null) {
     const nextBase = { ...state, tick: state.tick + 1, previousInput: { ...input },
       motion: { ...state.motion, moving: false }, party: restingParty(state.party) };
@@ -541,7 +545,7 @@ function stepTick(
     };
   }
   if (state.dialogue !== null)
-    return dialogueStep(world, state, input);
+    return dialogueStep(world, state, input, textSpeed);
   const menuEdge = input.menu && !state.previousInput.menu;
   const cancelEdge = input.cancel && !state.previousInput.cancel;
   const lanternEdge = input.lantern === true && state.previousInput.lantern !== true;
@@ -711,7 +715,7 @@ function stepTick(
   const wildTouch = touched?.wildTouch;
   const critter = touched?.critter;
   if (critter !== undefined) {
-    const battle = startBattle(world, state, critter, wildTouch, player);
+    const battle = startBattle(world, state, critter, wildTouch, player, textSpeed);
     // A recurring critter met Fae where it stood; a set piece keeps her
     // on the tick before she reached it.
     return {
@@ -771,8 +775,20 @@ export function step(
   input: ActionFrame,
   options?: StepOptions,
 ): { state: State; events: Event[] } {
-  const result = stepTick(world, state, input, options?.gentleTiming === true);
-  const joined = syncParty(world, result.state);
+  const result = stepTick(
+    world,
+    state,
+    input,
+    options?.gentleTiming === true,
+    options?.textSpeed,
+  );
+  const synced = syncParty(world, result.state);
+  const joined = options?.textSpeed === "instant" && synced.dialogue !== null
+    ? {
+        ...synced,
+        dialogue: { ...synced.dialogue, revealed: synced.dialogue.text.length },
+      }
+    : synced;
   const events = [...result.events];
   const addLevelEvent = (member: string, beforeXp: number, afterXp: number): void => {
     const delta = levelUpDelta(world.levels, beforeXp, afterXp);

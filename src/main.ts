@@ -30,6 +30,7 @@ import {
   mapLandName,
   starGemsFound,
   targetInteractable,
+  treasuresSummary,
   creditEntries,
   levelForXp,
   levelUpLine,
@@ -202,7 +203,14 @@ async function boot(): Promise<void> {
   const invalidate = (): void => {
     drawPending = true;
   };
-  const gameSettings = createGameSettings(invalidate);
+  const syncReducedMotion = (): void => {
+    document.documentElement.dataset.reducedMotion = gameSettings.reducedMotion() ? "on" : "off";
+  };
+  const gameSettings = createGameSettings(() => {
+    syncReducedMotion();
+    invalidate();
+  });
+  syncReducedMotion();
   const hudHints = createHudHints(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
   const bannerDuration = 150;
@@ -255,6 +263,14 @@ async function boot(): Promise<void> {
   });
   journal.onToggleKeyHints(() => {
     gameSettings.toggleKeyHints();
+    invalidate();
+  });
+  journal.onCycleTextSpeed(() => {
+    gameSettings.cycleTextSpeed();
+    invalidate();
+  });
+  journal.onToggleReducedMotion(() => {
+    gameSettings.toggleReducedMotion();
     invalidate();
   });
   const title = createTitleScreen(uiRoot);
@@ -1204,6 +1220,9 @@ async function boot(): Promise<void> {
       nowPlaying: soundtrack.title,
       gentleTiming: gameSettings.gentleTiming(),
       keyHints: gameSettings.keyHints(),
+      textSpeed: gameSettings.textSpeed(),
+      reducedMotion: gameSettings.reducedMotion(),
+      treasures: state.journalOpen ? treasuresSummary(content.world, state) : undefined,
       hasLantern,
       hasFlute,
       members: state.journalOpen
@@ -1417,6 +1436,7 @@ async function boot(): Promise<void> {
     const previous = state;
     const stepped = step(content.world, state, input, {
       gentleTiming: gameSettings.gentleTiming(),
+      textSpeed: gameSettings.textSpeed(),
     });
     state = stepped.state;
     previousState = state.area === previous.area ? previous : state;
@@ -1779,6 +1799,16 @@ async function boot(): Promise<void> {
         keyHints: gameSettings.keyHints,
         setKeyHints: (on) => {
           gameSettings.setKeyHints(on);
+          invalidate();
+        },
+        textSpeed: gameSettings.textSpeed,
+        setTextSpeed: (speed) => {
+          gameSettings.setTextSpeed(speed);
+          invalidate();
+        },
+        reducedMotion: gameSettings.reducedMotion,
+        setReducedMotion: (on) => {
+          gameSettings.setReducedMotion(on);
           invalidate();
         },
         photoMode: () => photoMode,

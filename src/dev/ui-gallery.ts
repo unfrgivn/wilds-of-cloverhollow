@@ -553,6 +553,8 @@ function renderGalleryState(): void {
     nowPlaying: "Cloverhollow Town",
     gentleTiming: false,
     keyHints: false,
+    textSpeed: "cozy",
+    reducedMotion: false,
     hasLantern: true,
     hasFlute: true,
     members: [

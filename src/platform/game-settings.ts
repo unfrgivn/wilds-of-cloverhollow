@@ -1,8 +1,11 @@
 import { Preferences } from "@capacitor/preferences";
+import type { TextSpeed } from "../core/sim";
 
 export type GamePreferences = {
   gentleTiming: boolean;
   keyHints: boolean;
+  textSpeed: TextSpeed;
+  reducedMotion: boolean;
 };
 
 export type GameSettingsController = {
@@ -12,6 +15,12 @@ export type GameSettingsController = {
   keyHints: () => boolean;
   toggleKeyHints: () => void;
   setKeyHints: (on: boolean) => void;
+  textSpeed: () => TextSpeed;
+  cycleTextSpeed: () => void;
+  setTextSpeed: (speed: TextSpeed) => void;
+  reducedMotion: () => boolean;
+  toggleReducedMotion: () => void;
+  setReducedMotion: (on: boolean) => void;
 };
 
 const preferenceKey = "cloverhollow-settings";
@@ -20,8 +29,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function parseTextSpeed(value: unknown): TextSpeed {
+  return value === "cozy" || value === "brisk" || value === "instant" ? value : "cozy";
+}
+
+function nextTextSpeed(current: TextSpeed): TextSpeed {
+  if (current === "cozy") return "brisk";
+  if (current === "brisk") return "instant";
+  return "cozy";
+}
+
 function defaultGamePreferences(): GamePreferences {
-  return { gentleTiming: false, keyHints: false };
+  return { gentleTiming: false, keyHints: false, textSpeed: "cozy", reducedMotion: false };
 }
 
 export function readGamePreferences(value: string | null): GamePreferences {
@@ -32,6 +51,8 @@ export function readGamePreferences(value: string | null): GamePreferences {
     return {
       gentleTiming: parsed.gentleTiming === true,
       keyHints: parsed.keyHints === true,
+      textSpeed: parseTextSpeed(parsed.textSpeed),
+      reducedMotion: parsed.reducedMotion === true,
     };
   } catch {
     return defaultGamePreferences();
@@ -42,6 +63,8 @@ export function writeGamePreferences(preferences: GamePreferences): string {
   return JSON.stringify({
     gentleTiming: preferences.gentleTiming,
     keyHints: preferences.keyHints,
+    textSpeed: parseTextSpeed(preferences.textSpeed),
+    reducedMotion: preferences.reducedMotion,
   });
 }
 
@@ -50,12 +73,14 @@ export function createGameSettings(
 ): GameSettingsController {
   let gentleTiming = false;
   let keyHints = false;
+  let textSpeed: TextSpeed = "cozy";
+  let reducedMotion = false;
   let preferenceLoaded = false;
   let locallyChanged = false;
   let preferenceWrite = Promise.resolve();
 
   const persist = (): void => {
-    const value = writeGamePreferences({ gentleTiming, keyHints });
+    const value = writeGamePreferences({ gentleTiming, keyHints, textSpeed, reducedMotion });
     preferenceWrite = preferenceWrite.then(() =>
       Preferences.set({ key: preferenceKey, value }),
     );
@@ -75,6 +100,20 @@ export function createGameSettings(
     onChange();
   };
 
+  const setTextSpeed = (speed: TextSpeed): void => {
+    textSpeed = parseTextSpeed(speed);
+    locallyChanged = true;
+    if (preferenceLoaded) persist();
+    onChange();
+  };
+
+  const setReducedMotion = (on: boolean): void => {
+    reducedMotion = on;
+    locallyChanged = true;
+    if (preferenceLoaded) persist();
+    onChange();
+  };
+
   void Preferences.get({ key: preferenceKey }).then(({ value }) => {
     preferenceLoaded = true;
     if (locallyChanged) persist();
@@ -82,6 +121,8 @@ export function createGameSettings(
       const preferences = readGamePreferences(value);
       gentleTiming = preferences.gentleTiming;
       keyHints = preferences.keyHints;
+      textSpeed = preferences.textSpeed;
+      reducedMotion = preferences.reducedMotion;
       onChange();
     }
   });
@@ -93,5 +134,11 @@ export function createGameSettings(
     keyHints: () => keyHints,
     toggleKeyHints: () => setKeyHints(!keyHints),
     setKeyHints,
+    textSpeed: () => textSpeed,
+    cycleTextSpeed: () => setTextSpeed(nextTextSpeed(textSpeed)),
+    setTextSpeed,
+    reducedMotion: () => reducedMotion,
+    toggleReducedMotion: () => setReducedMotion(!reducedMotion),
+    setReducedMotion,
   };
 }

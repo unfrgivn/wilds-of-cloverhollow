@@ -4691,6 +4691,43 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (150 unit files / 1,190 tests, all 65 sims, 23 QA packs,
   purity, lint), `just build`, and targeted e2e (34/34 Chromium passed).
 
+## Milestone 96: JRPG Comfort & Craft Suite — Text Speed, In-Game Reduced Motion & Journal Field Treasures Card **Status:** ✅ Completed (2026-11-27)
+- Adds classic JRPG comfort & accessibility controls plus an interactive
+  Journal Field Treasures showcase with zero save-version bumps and zero replay
+  hash drift across all 65 recorded sims.
+- Dialogue & Battle Text Speed (`src/core/sim.ts`, `src/platform/game-settings.ts`,
+  `src/main.ts`, `src/dev/hook.ts`):
+  - Exported `TextSpeed = "cozy" | "brisk" | "instant"` and pure
+    `revealCharacters(world, textSpeed, revealed, total)` via optional
+    `StepOptions.textSpeed` (`"cozy"` / omitted stays bit-exact with default
+    `revealPerTick`; `"brisk"` reveals 2.5x faster; `"instant"` shows full
+    story, battle, and Talk-phase lines immediately).
+  - Persisted in `cloverhollow-settings` with strict validation and legacy
+    upgrade fallback, exposed on `window.__cloverhollow.settings`.
+- In-Game Reduced Motion Toggle (`src/platform/game-settings.ts`, `src/main.ts`,
+  `src/ui/sticker.css`, `src/render/view.ts`):
+  - One-click `Reduced Motion` (`off` / `on`) persisted in
+    `cloverhollow-settings`, syncing `document.documentElement.dataset.reducedMotion`
+    to calm CSS animations/transitions and Pixi battle `stageShake` / mood drift
+    without requiring OS accessibility changes.
+- Journal `OPTIONS` Right Page & `MAP` Field Treasures Card (`src/core/treasures.ts`,
+  `src/ui/journal.ts`, `src/ui/journal.css`, `src/dev/ui-gallery.ts`):
+  - Added `Text Speed` and `Reduced Motion` controls to the `OPTIONS` Gameplay
+    page (responsive 2x2 touch tile grid on short landscape phones `<= 500px`
+    height, zero clipping/scrollbars at `1280x720`, `874x402`, and `667x375`).
+  - Added pure `treasuresSummary(world, state)` projecting Buster's Star-Line
+    Stamp Card, all 6 Clubhouse Keepsakes, and all 6 Bubblegum Bay Catch Book
+    species; conditional golden `.journal-treasures-btn` on the `MAP` footer
+    opens `.journal-treasures-card` (`Escape` / backdrop / `×` dismisses only
+    the card while keeping Journal open).
+- Evidence: `tests/unit/milestone-93.test.ts` (7 tests), updated
+  `tests/unit/accessibility.test.ts`, and `tests/e2e/milestone-93.spec.ts`
+  (`@smoke` Chromium + WebKit); all 4 review captures (`art/review/m93-options-{1280,874}.jpg`,
+  `m93-treasures-{1280,874}.jpg`) and refreshed `journal-options` & `journal-map-1280`
+  baselines independently verified via `vision`.
+- Gates: `just check` (152 unit files / 1,207 tests, all 65 sims, 23 QA packs,
+  purity, lint), `just build`, and 58/58 targeted Chromium + WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

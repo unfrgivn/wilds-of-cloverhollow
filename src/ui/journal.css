@@ -9,7 +9,10 @@
 .journal-treats-strip[hidden],
 .journal-gems[hidden],
 .journal-field-backdrop[hidden],
-.journal-field-old-friend[hidden] {
+.journal-field-old-friend[hidden],
+.journal-treasures-btn[hidden],
+.journal-treasures-backdrop[hidden],
+.journal-treasures-stamps[hidden] {
   display: none;
 }
 .journal-members { display: grid; gap: 8px; margin-top: 16px; }
@@ -635,6 +638,29 @@
   width: 10px;
   height: 14px;
 }
+.journal-treasures-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #f6e09a;
+  box-shadow: 0 1px 0 #47321f33;
+  color: var(--sticker-ink);
+  font: 800 11px var(--sticker-font);
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.journal-treasures-btn:hover,
+.journal-treasures-btn:focus-visible {
+  background: #f2cf66;
+}
+.journal-treasures-btn:focus-visible {
+  outline: 2px solid var(--sticker-ink);
+  outline-offset: 2px;
+}
 @keyframes journal-star-bob {
   0%, 100% { transform: translate(-50%, calc(-50% - 3px)); }
   50% { transform: translate(-50%, calc(-50% + 3px)); }
@@ -658,10 +684,10 @@
   background: #fbf6e9;
 }
 .journal-options-sound-page {
-  padding: 14px 14px 12px 14px;
+  padding: 12px 14px 10px 14px;
 }
 .journal-options-play-page {
-  padding: 14px 24px 12px 14px;
+  padding: 12px 24px 8px 14px;
   border-left: 2px solid #47321f44;
   box-shadow: inset 8px 0 12px #47321f16;
 }
@@ -680,7 +706,7 @@
   display: flex;
   align-items: flex-start;
   padding-right: 44px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 .journal-jukebox {
   display: flex;
@@ -817,22 +843,48 @@
 .journal-opt-toggle.is-muted {
   background: #eadbff;
 }
+.journal-option-text-speed {
+  min-width: 68px;
+  background: #f8e9b5;
+}
+.journal-option-text-speed[data-speed="brisk"] {
+  background: #dff2e8;
+}
+.journal-option-text-speed[data-speed="instant"] {
+  background: #f6cf4f;
+}
+.journal-options-play-page .journal-options-list {
+  gap: 4px;
+}
+.journal-options-play-page .journal-opt-row {
+  padding: 3px 9px;
+  gap: 6px;
+}
+.journal-options-play-page .journal-opt-label {
+  font-size: 13px;
+  line-height: 1.15;
+}
+.journal-options-play-page .journal-opt-sub {
+  margin-top: 1px;
+  font-size: 10.5px;
+  line-height: 1.15;
+}
 .journal-opt-slider .journal-volume-value {
   min-width: 34px;
   font-size: 12px;
 }
 .journal-controls-card {
-  margin-top: 10px;
-  padding: 8px 10px;
+  margin-top: 6px;
+  padding: 5px 9px;
   border: 2px dashed var(--sticker-ink);
   border-radius: 12px;
   background: #fffaf2;
   color: var(--sticker-ink);
 }
 .journal-controls-title {
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   color: var(--sticker-ink);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: .08em;
 }
@@ -841,9 +893,9 @@
 }
 .journal-controls-line {
   color: var(--sticker-ink);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.25;
 }
 .journal-tabs {
   position: absolute;
@@ -1107,8 +1159,9 @@
   .journal-keepsake-icon { width: 36px; height: 36px; }
   .journal-fish .journal-name,
   .journal-keepsakes .journal-name { font-size: 10px; }
+  .journal-treasures-btn { font-size: 10.5px; padding: 1px 7px; }
   .journal-options-sound-page { padding: 8px 10px 8px 10px; }
-  .journal-options-play-page { padding: 8px 22px 8px 10px; }
+  .journal-options-play-page { padding: 8px 22px 6px 10px; }
   .journal-options-head { gap: 4px; margin-bottom: 6px; }
   .journal-options-play-head { padding-right: 44px; margin-bottom: 18px; }
   .journal-now-playing { padding: 2px 10px; font-size: 11px; }
@@ -1117,6 +1170,272 @@
   .journal-opt-label { font-size: 13px; }
   .journal-opt-sub { font-size: 10.5px; }
   .journal-opt-toggle, .journal-opt-slider { min-width: 54px; padding: 0 9px; font-size: 12px; }
-  .journal-controls-card { margin-top: 8px; padding: 6px 8px; }
-  .journal-controls-line { font-size: 11px; line-height: 1.3; }
+  .journal-options-play-page .journal-options-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .journal-options-play-page .journal-opt-row {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 3px;
+    padding: 4px 6px;
+  }
+  .journal-options-play-page .journal-opt-label {
+    font-size: 11.5px;
+    text-align: center;
+  }
+  .journal-options-play-page .journal-opt-sub {
+    display: none;
+  }
+  .journal-options-play-page .journal-opt-controls {
+    width: 100%;
+  }
+  .journal-options-play-page .journal-opt-toggle {
+    width: 100%;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 6px;
+    font-size: 12px;
+  }
+  .journal-controls-card { margin-top: 6px; padding: 4px 7px; }
+  .journal-controls-line { font-size: 10.5px; line-height: 1.25; }
+}
+
+.journal-treasures-backdrop {
+  position: absolute;
+  inset: 12px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: rgb(71 50 31 / 0.36);
+}
+.journal-treasures-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(650px, calc(100% - 24px));
+  max-height: calc(100% - 14px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 8px 14px 10px;
+  border: 5px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fbf6e9 0%, #f6eed8 100%);
+  box-shadow: var(--sticker-shadow);
+  color: var(--sticker-ink);
+}
+.journal-treasures-title,
+.journal-treasures-stamps,
+.journal-treasures-section {
+  animation: field-note-pop 170ms cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal-treasures-title,
+  .journal-treasures-stamps,
+  .journal-treasures-section { animation: none; }
+}
+.journal-treasures-close {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 4px solid var(--sticker-rim);
+  outline: 2px solid var(--sticker-ink);
+  border-radius: 50%;
+  background: var(--sticker-paper);
+  color: var(--sticker-ink);
+  cursor: pointer;
+  font: 700 22px var(--sticker-font);
+  touch-action: manipulation;
+}
+.journal-treasures-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.journal-treasures-title {
+  margin: 0;
+  color: var(--sticker-ink);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.journal-treasures-stamps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 12px;
+  background: #fffaf2;
+}
+.journal-stamps-label {
+  margin-right: 2px;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.journal-stamp-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1.5px dashed #47321f77;
+  border-radius: 999px;
+  background: #f4ecda;
+  color: #6b5239;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.journal-stamp-pill.is-stamped {
+  border-style: solid;
+  border-color: var(--sticker-ink);
+  background: #e1f2d9;
+  color: var(--sticker-ink);
+}
+.journal-stamp-complete {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 9px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #f6cf4f;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.journal-treasures-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.journal-treasures-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.journal-treasures-section-title {
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .07em;
+}
+.journal-treasures-count {
+  padding: 1px 7px;
+  border: 1.5px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #fffaf2;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+.journal-keepsakes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+.journal-keepsake-item {
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 10px;
+}
+.journal-keepsake-item.is-unlocked {
+  border: 1.5px solid var(--sticker-ink);
+  background: linear-gradient(180deg, #fffdf4 0%, #f9eec9 100%);
+  box-shadow: 0 1px 0 #47321f22;
+}
+.journal-keepsake-item.is-locked {
+  border: 1.5px dashed #47321f77;
+  background: #f4ecda;
+  color: #6b5239;
+}
+.journal-keepsake-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+.journal-keepsake-detail {
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #5a4028;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.journal-catch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.journal-catch-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.journal-catch-pill.is-caught {
+  border: 1.5px solid var(--sticker-ink);
+  background: #def2ed;
+  color: var(--sticker-ink);
+}
+.journal-catch-pill.is-caught.is-rare {
+  background: #f8df94;
+}
+.journal-catch-pill.is-uncaught {
+  border: 1.5px dashed #47321f77;
+  background: #f4ecda;
+  color: #6b5239;
+}
+@media (max-height: 500px) {
+  .journal-treasures-card {
+    gap: 4px;
+    padding: 6px 12px 8px;
+  }
+  .journal-treasures-title {
+    font-size: 14px;
+  }
+  .journal-treasures-stamps {
+    padding: 3px 7px;
+    gap: 4px;
+  }
+  .journal-stamps-label,
+  .journal-stamp-pill,
+  .journal-stamp-complete {
+    font-size: 10px;
+  }
+  .journal-keepsakes-grid {
+    gap: 4px;
+  }
+  .journal-keepsake-item {
+    padding: 3px 7px;
+  }
+  .journal-keepsake-name {
+    font-size: 11px;
+  }
+  .journal-keepsake-detail {
+    font-size: 10px;
+  }
+  .journal-catch-pill {
+    padding: 1px 7px;
+    font-size: 10.5px;
+  }
 }

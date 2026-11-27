@@ -1069,7 +1069,10 @@ test.describe("sticker gallery", () => {
             const allItems = [...soundItems, ...playItems];
             const gentle = document.querySelector(".journal-opt-gentle");
             const hints = document.querySelector(".journal-opt-hints");
-            if (!soundPage || !playPage || !soundRect || !playRect || !gentle || !hints)
+            const textSpeed = document.querySelector(".journal-option-text-speed");
+            const reducedMotion = document.querySelector(".journal-option-reduced-motion");
+            if (!soundPage || !playPage || !soundRect || !playRect || !gentle || !hints ||
+                !textSpeed || !reducedMotion)
               return null;
             return {
               ...base,
@@ -1077,7 +1080,7 @@ test.describe("sticker gallery", () => {
               headingControlsInside:
                 soundItems.every((item) => within(item, soundRect)) &&
                 playItems.every((item) => within(item, playRect)) &&
-                controls.length === 9 &&
+                controls.length === 11 &&
                 controls.every((item) => item.width >= 44 && item.height >= 44) &&
                 allItems.every((item) => !intersects(item, close) &&
                   tabs.every((tab) => !intersects(item, tab))) &&

@@ -21,6 +21,8 @@ import type {
   LandProgress,
 } from "../core/journal";
 import type { LevelStats } from "../core/levels";
+import type { TextSpeed } from "../core/sim";
+import type { TreasuresSummary } from "../core/treasures";
 
 export type JournalPage = "notes" | "map" | "options";
 
@@ -69,6 +71,9 @@ export type JournalView = {
   nowPlaying: string;
   gentleTiming: boolean;
   keyHints: boolean;
+  textSpeed: TextSpeed;
+  reducedMotion: boolean;
+  treasures?: TreasuresSummary;
   hasLantern: boolean;
   hasFlute: boolean;
   members: {
@@ -289,6 +294,12 @@ function fieldNoteBlurb(note: CritterFieldNote): string {
   return "A cozy valley friend sketched right into Fae's notebook.";
 }
 
+function textSpeedLabel(speed: TextSpeed): string {
+  if (speed === "brisk") return "Brisk";
+  if (speed === "instant") return "Instant";
+  return "Cozy";
+}
+
 function makeOptionRow(
   titleText: string,
   subtitleText: string | null,
@@ -322,6 +333,8 @@ export function createJournal(root: HTMLElement): {
   onStepTrack: (callback: (delta: -1 | 1) => void) => void;
   onToggleGentleTiming: (callback: () => void) => void;
   onToggleKeyHints: (callback: () => void) => void;
+  onCycleTextSpeed: (callback: () => void) => void;
+  onToggleReducedMotion: (callback: () => void) => void;
 } {
   const book = element("section", "journal-book");
   book.setAttribute("aria-label", "Journal");
@@ -410,9 +423,13 @@ export function createJournal(root: HTMLElement): {
   setAttribute(mapFishPill, "data-stat", "fish");
   const mapKeepsakesPill = element("span", "journal-map-pill");
   setAttribute(mapKeepsakesPill, "data-stat", "keepsakes");
+  const mapTreasuresBtn = element("button", "journal-treasures-btn");
+  mapTreasuresBtn.type = "button";
+  mapTreasuresBtn.hidden = true;
+  mapTreasuresBtn.setAttribute("aria-label", "Open field treasures");
   const mapLegend = element("span", "journal-map-legend");
   mapLegend.append(busStopIcon(), "Bus");
-  mapSummary.append(mapStickersPill, mapPrizesPill, mapLegend);
+  mapSummary.append(mapStickersPill, mapPrizesPill, mapTreasuresBtn, mapLegend);
   mapFooter.append(mapDetail, mapSummary);
   mapPage.append(mapStage, mapFooter);
 
@@ -492,7 +509,25 @@ export function createJournal(root: HTMLElement): {
     "Show keys while exploring",
     [optHints],
   );
-  playList.append(gentleRow, hintsRow);
+
+  const optTextSpeed = element("button", "journal-opt-toggle journal-option-text-speed");
+  optTextSpeed.type = "button";
+  optTextSpeed.setAttribute("aria-label", "Cycle text speed");
+  const textSpeedRow = makeOptionRow(
+    "Text Speed",
+    "How fast story and battle lines appear",
+    [optTextSpeed],
+  );
+
+  const optReducedMotion = element("button", "journal-opt-toggle journal-option-reduced-motion");
+  optReducedMotion.type = "button";
+  optReducedMotion.setAttribute("aria-label", "Toggle reduced motion");
+  const reducedMotionRow = makeOptionRow(
+    "Reduced Motion",
+    "Calms animations, shakes, and fluttering effects",
+    [optReducedMotion],
+  );
+  playList.append(gentleRow, hintsRow, textSpeedRow, reducedMotionRow);
 
   const controlsCard = element("div", "journal-controls-card");
   const controlsTitle = element("div", "journal-controls-title");
@@ -569,7 +604,57 @@ export function createJournal(root: HTMLElement): {
   fieldCard.append(fieldClose, fieldLeft, fieldBody);
   fieldBackdrop.append(fieldCard);
 
-  book.append(label, close, notesPage, stickersPage, mapPage, optionsPage, tabs, fieldBackdrop);
+  const treasuresBackdrop = element("div", "journal-treasures-backdrop");
+  treasuresBackdrop.hidden = true;
+  const treasuresCard = element("article", "journal-treasures-card");
+  treasuresCard.setAttribute("role", "dialog");
+  treasuresCard.setAttribute("aria-modal", "true");
+  treasuresCard.setAttribute("aria-label", "Field treasures");
+  const treasuresClose = element("button", "journal-treasures-close");
+  treasuresClose.type = "button";
+  treasuresClose.setAttribute("aria-label", "Close field treasures");
+  treasuresClose.textContent = "×";
+  const treasuresHead = element("div", "journal-treasures-head");
+  const treasuresTitle = element("h3", "journal-treasures-title");
+  treasuresTitle.textContent = "FIELD TREASURES";
+  treasuresHead.append(treasuresTitle, treasuresClose);
+  const treasuresStamps = element("div", "journal-treasures-stamps");
+  treasuresStamps.hidden = true;
+  const keepsakesSection = element("section", "journal-treasures-section");
+  const keepsakesHead = element("div", "journal-treasures-section-head");
+  const treasuresKeepsakesHeading = element("span", "journal-treasures-section-title");
+  treasuresKeepsakesHeading.textContent = "CLUBHOUSE KEEPSAKES";
+  const treasuresKeepsakesCount = element("span", "journal-treasures-count");
+  keepsakesHead.append(treasuresKeepsakesHeading, treasuresKeepsakesCount);
+  const treasuresKeepsakesGrid = element("div", "journal-keepsakes-grid");
+  keepsakesSection.append(keepsakesHead, treasuresKeepsakesGrid);
+  const catchSection = element("section", "journal-treasures-section");
+  const catchHead = element("div", "journal-treasures-section-head");
+  const catchHeading = element("span", "journal-treasures-section-title");
+  catchHeading.textContent = "BUBBLEGUM BAY CATCH BOOK";
+  const catchCount = element("span", "journal-treasures-count");
+  catchHead.append(catchHeading, catchCount);
+  const catchRow = element("div", "journal-catch-row");
+  catchSection.append(catchHead, catchRow);
+  treasuresCard.append(
+    treasuresHead,
+    treasuresStamps,
+    keepsakesSection,
+    catchSection,
+  );
+  treasuresBackdrop.append(treasuresCard);
+
+  book.append(
+    label,
+    close,
+    notesPage,
+    stickersPage,
+    mapPage,
+    optionsPage,
+    tabs,
+    fieldBackdrop,
+    treasuresBackdrop,
+  );
   root.append(book);
 
   let onClose: () => void = () => undefined;
@@ -581,6 +666,8 @@ export function createJournal(root: HTMLElement): {
   let onStepTrack: (delta: -1 | 1) => void = () => undefined;
   let onToggleGentleTiming: () => void = () => undefined;
   let onToggleKeyHints: () => void = () => undefined;
+  let onCycleTextSpeed: () => void = () => undefined;
+  let onToggleReducedMotion: () => void = () => undefined;
 
   let page: JournalPage = "notes";
   let wasVisible = false;
@@ -589,7 +676,9 @@ export function createJournal(root: HTMLElement): {
   let badgeSignature = "";
   let treatsSignature = "";
   let fieldSignature = "";
+  let treasuresSignature = "";
   let inspectedStickerId: string | null = null;
+  let treasuresOpen = false;
   let selectedLandId: string | null = null;
   let hoveredLandId: string | null = null;
   let latestView: JournalView | null = null;
@@ -599,6 +688,92 @@ export function createJournal(root: HTMLElement): {
     inspectedStickerId = null;
     fieldSignature = "";
     fieldBackdrop.hidden = true;
+  };
+
+  const closeTreasures = (): void => {
+    if (!treasuresOpen && treasuresBackdrop.hidden) return;
+    treasuresOpen = false;
+    treasuresBackdrop.hidden = true;
+  };
+
+  const syncTreasures = (view: JournalView): void => {
+    const summary = view.treasures;
+    if (!treasuresOpen || summary === undefined || !summary.hasAny) {
+      if (!treasuresBackdrop.hidden) closeTreasures();
+      return;
+    }
+    treasuresBackdrop.hidden = false;
+    const signature = [
+      summary.stamps.started,
+      summary.stamps.bay,
+      summary.stamps.pass,
+      summary.stamps.complete,
+      summary.keepsakes.map((item) => `${item.id}:${item.unlocked}`).join(","),
+      summary.catches.map((item) => `${item.id}:${item.caught}`).join(","),
+    ].join("|");
+    if (signature === treasuresSignature) return;
+    treasuresSignature = signature;
+
+    treasuresStamps.hidden = !summary.stamps.started;
+    if (summary.stamps.started) {
+      const stripLabel = element("span", "journal-stamps-label");
+      stripLabel.textContent = "STAR-LINE STAMP CARD";
+      const bayPill = element(
+        "span",
+        summary.stamps.bay ? "journal-stamp-pill is-stamped" : "journal-stamp-pill",
+      );
+      bayPill.textContent = `${summary.stamps.bay ? "✓" : "○"} Bay Wave Stamp`;
+      const passPill = element(
+        "span",
+        summary.stamps.pass ? "journal-stamp-pill is-stamped" : "journal-stamp-pill",
+      );
+      passPill.textContent = `${summary.stamps.pass ? "✓" : "○"} Pass Pine Stamp`;
+      const nodes: HTMLElement[] = [stripLabel, bayPill, passPill];
+      if (summary.stamps.complete) {
+        const badge = element("span", "journal-stamp-complete");
+        badge.textContent = "★ Star-Line Explorer!";
+        nodes.push(badge);
+      }
+      treasuresStamps.replaceChildren(...nodes);
+    } else {
+      treasuresStamps.replaceChildren();
+    }
+
+    setText(treasuresKeepsakesCount, `${summary.unlockedKeepsakes}/${summary.totalKeepsakes}`);
+    treasuresKeepsakesGrid.replaceChildren(
+      ...summary.keepsakes.map((item) => {
+        const card = element(
+          "div",
+          item.unlocked
+            ? "journal-keepsake-item is-unlocked"
+            : "journal-keepsake-item is-locked",
+        );
+        setAttribute(card, "data-keepsake", item.id);
+        const title = element("div", "journal-keepsake-name");
+        title.textContent = item.unlocked ? `★ ${item.name}` : "???";
+        const detail = element("div", "journal-keepsake-detail");
+        detail.textContent = item.unlocked ? `${item.source} · ${item.note}` : item.source;
+        card.append(title, detail);
+        return card;
+      }),
+    );
+
+    setText(catchCount, `${summary.caughtFish}/${summary.totalFish}`);
+    catchRow.replaceChildren(
+      ...summary.catches.map((entry) => {
+        const classes = entry.caught
+          ? entry.rare
+            ? "journal-catch-pill is-caught is-rare"
+            : "journal-catch-pill is-caught"
+          : "journal-catch-pill is-uncaught";
+        const pill = element("span", classes);
+        setAttribute(pill, "data-fish", entry.id);
+        pill.textContent = entry.caught
+          ? `${entry.rare ? "★ " : ""}${entry.name}`
+          : "???";
+        return pill;
+      }),
+    );
   };
 
   const syncFieldNote = (view: JournalView): void => {
@@ -655,6 +830,15 @@ export function createJournal(root: HTMLElement): {
   fieldBackdrop.addEventListener("click", (event) => {
     if (event.target === fieldBackdrop) closeFieldNote();
   });
+  mapTreasuresBtn.addEventListener("click", () => {
+    if (latestView?.treasures?.hasAny !== true) return;
+    treasuresOpen = true;
+    syncTreasures(latestView);
+  });
+  treasuresClose.addEventListener("click", closeTreasures);
+  treasuresBackdrop.addEventListener("click", (event) => {
+    if (event.target === treasuresBackdrop) closeTreasures();
+  });
 
   const syncMapDetail = (view: JournalView): void => {
     const inspectId = hoveredLandId ?? selectedLandId;
@@ -683,6 +867,7 @@ export function createJournal(root: HTMLElement): {
 
   const setPage = (next: JournalPage): void => {
     closeFieldNote();
+    closeTreasures();
     if (page === next && book.getAttribute("data-journal-page") === next) return;
     page = next;
     setAttribute(book, "data-journal-page", page);
@@ -703,6 +888,14 @@ export function createJournal(root: HTMLElement): {
   ]);
   const keydown = (event: KeyboardEvent): void => {
     if (book.hidden) return;
+    if (treasuresOpen) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeTreasures();
+      }
+      return;
+    }
     if (inspectedStickerId !== null) {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -736,6 +929,8 @@ export function createJournal(root: HTMLElement): {
   nextTrack.addEventListener("click", () => onStepTrack(1));
   optGentle.addEventListener("click", () => onToggleGentleTiming());
   optHints.addEventListener("click", () => onToggleKeyHints());
+  optTextSpeed.addEventListener("click", () => onCycleTextSpeed());
+  optReducedMotion.addEventListener("click", () => onToggleReducedMotion());
 
   wireSlider(volume.button, volume.value, () => (next) => {
     syncSlider(optSfxSlider.button, optSfxSlider.value, next);
@@ -780,11 +975,18 @@ export function createJournal(root: HTMLElement): {
     onToggleKeyHints: (callback) => {
       onToggleKeyHints = callback;
     },
+    onCycleTextSpeed: (callback) => {
+      onCycleTextSpeed = callback;
+    },
+    onToggleReducedMotion: (callback) => {
+      onToggleReducedMotion = callback;
+    },
     render: (view) => {
       latestView = view;
       book.hidden = !view.visible;
       if (!view.visible && wasVisible) {
         closeFieldNote();
+        closeTreasures();
         setPage("notes");
         selectedLandId = null;
         hoveredLandId = null;
@@ -825,6 +1027,11 @@ export function createJournal(root: HTMLElement): {
       setText(optHints, view.keyHints ? "on" : "off");
       optHints.classList.toggle("is-muted", !view.keyHints);
       setAttribute(optHints, "aria-pressed", String(view.keyHints));
+      setText(optTextSpeed, textSpeedLabel(view.textSpeed));
+      setAttribute(optTextSpeed, "data-speed", view.textSpeed);
+      setText(optReducedMotion, view.reducedMotion ? "on" : "off");
+      optReducedMotion.classList.toggle("is-muted", !view.reducedMotion);
+      setAttribute(optReducedMotion, "aria-pressed", String(view.reducedMotion));
 
       setText(controlsLine, "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M");
       const toolParts: string[] = [];
@@ -1176,6 +1383,16 @@ export function createJournal(root: HTMLElement): {
       if (showKeepsakes) {
         setText(mapKeepsakesPill, `Keepsakes ${keepsakesOwned}/${keepsakesList.length}`);
       }
+      const treasures = view.treasures;
+      const showTreasures = treasures !== undefined && treasures.hasAny;
+      mapTreasuresBtn.hidden = !showTreasures;
+      if (showTreasures) {
+        setText(
+          mapTreasuresBtn,
+          `Treasures · ${treasures.unlockedKeepsakes}/${treasures.totalKeepsakes}`,
+        );
+      }
+      syncTreasures(view);
       syncMapDetail(view);
 
       const here = view.lands.find((land) => land.id === view.currentLand);

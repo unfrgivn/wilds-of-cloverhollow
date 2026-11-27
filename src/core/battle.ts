@@ -567,12 +567,44 @@ function afterCalm(world: World, state: State): State {
     : state;
 }
 
+export type TextSpeed = "cozy" | "brisk" | "instant";
+
+export function revealCharacters(
+  world: Pick<World, "tunables">,
+  textSpeed: TextSpeed | undefined,
+  revealed: number,
+  total: number,
+): number {
+  if (textSpeed === "instant") return total;
+  if (textSpeed === "brisk") {
+    return Math.min(total, revealed + world.tunables.interact.revealPerTick * 2.5);
+  }
+  return Math.min(total, revealed + world.tunables.interact.revealPerTick);
+}
+
+function revealBattleInstant(state: State, instant: boolean): State {
+  if (!instant || state.battle === null) return state;
+  const battle = state.battle;
+  const talk = battle.talk;
+  return {
+    ...state,
+    battle: {
+      ...battle,
+      revealed: battle.message.length,
+      ...(talk !== null && talk !== undefined
+        ? { talk: { ...talk, revealed: talk.text.length } }
+        : {}),
+    },
+  };
+}
+
 export function startBattle(
   world: World,
   state: State,
   critter: Critter,
   wildTouch?: Wild,
   player: Point = state.player,
+  textSpeed?: TextSpeed,
 ): Battle {
   // Meeting a recurring critter (Milestone 51): one of a species Fae knows
   // well calms at once, soothed and paid; else whoever got the jump shows
@@ -583,17 +615,18 @@ export function startBattle(
     : firstTouch(wildTouch, world.tunables.roam, state.player, player);
   const named = (line: string): string => line.replace("{name}", critter.name);
   const { firstTouch: touchContent, oldFriends } = world.battle;
+  const message = friend
+    ? named(oldFriends.line)
+    : jump === "even"
+      ? critter.lines.intro
+      : named(touchContent.lines[jump]);
   return {
     critterId: critter.id,
     den: wildTouch?.den ?? null,
     entry: { ...state.player },
     phase: friend ? "soothed" : "intro",
-    message: friend
-      ? named(oldFriends.line)
-      : jump === "even"
-        ? critter.lines.intro
-        : named(touchContent.lines[jump]),
-    revealed: 0,
+    message,
+    revealed: textSpeed === "instant" ? message.length : 0,
     selected: 0,
     command: null,
     energy: critter.energyMax,
@@ -623,6 +656,18 @@ export function stepBattle(
   state: State,
   input: ActionFrame,
   gentleTiming = false,
+  textSpeed?: TextSpeed,
+): State {
+  const next = stepBattleInner(world, state, input, gentleTiming, textSpeed);
+  return revealBattleInstant(next, textSpeed === "instant");
+}
+
+function stepBattleInner(
+  world: World,
+  state: State,
+  input: ActionFrame,
+  gentleTiming: boolean,
+  textSpeed: TextSpeed | undefined,
 ): State {
   const battle = state.battle;
   if (battle === null) return state;
@@ -648,7 +693,7 @@ export function stepBattle(
             ...talk,
             revealed: confirm
               ? talk.text.length
-              : Math.min(talk.text.length, talk.revealed + world.tunables.interact.revealPerTick),
+              : revealCharacters(world, textSpeed, talk.revealed, talk.text.length),
           },
         },
       };
@@ -709,10 +754,7 @@ export function stepBattle(
         ...next,
         revealed: confirm
           ? next.message.length
-          : Math.min(
-              next.message.length,
-              next.revealed + world.tunables.interact.revealPerTick,
-            ),
+          : revealCharacters(world, textSpeed, next.revealed, next.message.length),
       },
     };
   if (

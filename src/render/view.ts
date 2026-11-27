@@ -1775,10 +1775,16 @@ export class GameView {
       partyIds,
       partyCommands,
     );
+    const reducedMotion =
+      (typeof document !== "undefined" &&
+        document.documentElement.dataset.reducedMotion === "on") ||
+      (typeof window !== "undefined" &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(
-      x + choreo.stageShake.x * scale,
-      y + choreo.stageShake.y * scale,
+      x + (reducedMotion ? 0 : choreo.stageShake.x * scale),
+      y + (reducedMotion ? 0 : choreo.stageShake.y * scale),
     );
     if (choreo.stageMood === "together-active") {
       drawWash(0.54, 0x201042);
@@ -1789,7 +1795,7 @@ export class GameView {
     // inside the central 70% so all four painted corners stay untouched.
     const moodLayout = computeBattleStageMoodLayout(
       choreo.stageMood,
-      state.tick,
+      reducedMotion ? 0 : state.tick,
       this.viewWidth,
       this.viewHeight,
     );

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 99)
+Last updated: 2026-11-27 (Milestone 100)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -2110,6 +2110,20 @@ trunks keep its two exits.
     cap 10, `goal * 0.78`), and slower `echo` (`demoTicks + 4`,
     `inputTicks + 36`). When `gentleTiming` is `false` or omitted, `step()` is
     bit-for-bit identical to standard timing.
+  - **Dialogue & Battle Text Speed** (`TextSpeed = "cozy" | "brisk" | "instant"`,
+    `revealCharacters`, and `StepOptions.textSpeed` in `src/core/sim.ts`): an
+    optional preference (default `"cozy"`, stored under `cloverhollow-settings`
+    alongside `gentleTiming`, `keyHints`, and `reducedMotion`) controlling text
+    reveal speed across overworld dialogue, battle messages, and battle Talk
+    lines. `"cozy"` (and omitted) uses `world.tunables.interact.revealPerTick`
+    bit-identically (zero replay hash drift), `"brisk"` reveals 2.5x faster,
+    and `"instant"` reveals each line in full immediately.
+  - **In-Game Reduced Motion** (`reducedMotion` in `src/platform/game-settings.ts`,
+    default `false`): synced to `document.documentElement.dataset.reducedMotion`
+    (`"on"` / `"off"`), collapsing UI CSS animations/transitions
+    (`:root[data-reduced-motion="on"]`) and calming battle stage shake and
+    ambient mood wash drift/pulse in `src/render/view.ts` (alongside OS
+    `prefers-reduced-motion: reduce`).
 - Every critter kind has a content `level`; `content/levels.json` maps it to
   `calmMax`, burst base/big strength, and calm XP. Soothe and a friend's command
   use the actor's Power (20 at level 1, +2 per level), with Magic (+1) on great
@@ -3181,10 +3195,25 @@ trunks keep its two exits.
   returning to the live area theme when closed) and touch-sized (>= 44 px)
   controls for Sound Effects (on/off + volume slider), Music (on/off + volume
   slider), and Ambience (on/off); the right page (`GAMEPLAY`) shows touch-sized
-  toggles for Gentle Timing and Key Hints (`cloverhollow-settings`, defaulting
-  to off) above a compact Controls reference card (showing Lantern and Flute
-  once unlocked). Both pages fit without scrolling or overlap at 874x402,
-  1180x820, and 1280x720.
+  controls for Gentle Timing, Key Hints, Text Speed (`Cozy` / `Brisk` /
+  `Instant`), and Reduced Motion (`Off` / `On`, stored under
+  `cloverhollow-settings`, upgrading legacy preferences cleanly) above a compact
+  Controls reference card (showing Lantern and Flute once unlocked). Both pages
+  fit without scrolling or overlap at 667x375, 874x402, 1180x820, and 1280x720
+  (switching Gameplay into a 2x2 touch tile grid at `max-height: 500px`).
+- **Interactive Field Treasures Card** (`treasuresSummary` in
+  `src/core/treasures.ts`, `src/ui/journal.ts`): summarizes Fae's Star-Line
+  Stamp Card (`buster_quest`, `stamp_bay`, `stamp_pass`, `buster_reward`),
+  all six Clubhouse Keepsakes (`star-crystal`, `star-pin`, `star-geode`,
+  `moon-feather`, `taco-badge`, `star-whistle`), and all six Bubblegum Bay Catch
+  Book species (`world.arcade.fish.catches` vs `state.caughtFish`). When
+  `hasAny` is true, a golden clickable `Treasures · N/6` pill
+  (`.journal-treasures-btn`) appears in the MAP page footer beside Stickers and
+  Prizes (hidden when `hasAny` is false so early-game MAP baselines stay
+  untouched). Clicking it opens the Field Treasures Card modal
+  (`.journal-treasures-card`) inside `.journal-book`; clicking its 44 px `×`
+  button, clicking the backdrop, pressing Escape (which stops propagation so the
+  Journal stays open), switching tabs, or closing the Journal dismisses it.
 - Optional desktop Key Hints ribbon (`src/ui/hud-hints.ts`): when Key Hints is
   enabled on non-touch desktop/gamepad setups, a cream die-cut ribbon anchored
   in the bottom-left safe area (`--z-hud`) shows keycap pills for Journal (`J`),
@@ -3440,9 +3469,10 @@ trunks keep its two exits.
   `[cloverhollow] music {track, ambience, duck, title}` on soundtrack changes,
   and `[cloverhollow] sound {tick, cue, played}` per cue, for native checks.
   These are harness only and are absent from production.
-- `settings` exposes `gentleTiming()`, `setGentleTiming(on)`, `keyHints()`, and
-  `setKeyHints(on)` for toggling and reading the separate `cloverhollow-settings`
-  gameplay preferences in harness tests.
+- `settings` exposes `gentleTiming()`, `setGentleTiming(on)`, `keyHints()`,
+  `setKeyHints(on)`, `textSpeed()`, `setTextSpeed(speed)`, `reducedMotion()`,
+  `setReducedMotion(on)`, `photoMode()`, and `setPhotoMode(on)` for toggling
+  and reading gameplay preferences in harness tests.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

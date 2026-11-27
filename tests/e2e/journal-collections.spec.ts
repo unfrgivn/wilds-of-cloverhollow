@@ -363,12 +363,25 @@ test(
     await expect(fieldNote).toBeHidden();
     await expect(page.locator(".journal-book")).toBeVisible();
 
-    // 3. Switch to OPTIONS tab and verify Lantern, Flute, and Lasso tool controls appear.
+    // 3. Re-open Keepsake Field Note and verify X (cancel) closes ONLY the card, then closes
+    // the Journal on a second X press (Milestone 117).
+    await compassSlot.scrollIntoViewIfNeeded();
+    await compassSlot.click();
+    await expect(fieldNote).toBeVisible();
+    await press(page, "x");
+    await expect(fieldNote).toBeHidden();
+    await expect(page.locator(".journal-book")).toBeVisible();
+
+    // 4. Switch to OPTIONS tab and verify Lantern, Flute, and Lasso tool controls appear.
     await page.locator(".journal-options-tab").click();
     await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "options");
     await expect(page.locator(".journal-controls-tools")).toHaveText(
       "Lantern: L · Flute: F · Lasso: R",
     );
+
+    // Pressing X again with no overlay open closes Fae's Journal cleanly.
+    await press(page, "x");
+    await expect(page.locator(".journal-book")).toBeHidden();
 
     expect(errors).toEqual([]);
   },

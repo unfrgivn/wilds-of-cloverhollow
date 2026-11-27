@@ -20,7 +20,7 @@ test('real keys enter the Whispering Woods and meet its owl', async ({ page }) =
   await expect(page).toHaveScreenshot('woods-owl-battle.png');
 });
 
-test('the recorded lantern replay reaches the clubhouse', async ({ page }) => {
+test('the recorded lantern replay reaches the clubhouse', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
   await resetPaused(page, 'new-game');
@@ -31,5 +31,12 @@ test('the recorded lantern replay reaches the clubhouse', async ({ page }) => {
   expect(state?.area).toBe('woods');
   expect(state?.wild.find((critter) => critter.kind === 'owl')?.mood).toBe('calm');
   expect(state?.lantern).toBe(true);
+  if (process.env.CLOVERHOLLOW_REVIEW_SHOTS === '1' && testInfo.project.name === 'chromium') {
+    await page.screenshot({
+      path: 'art/review/m117-woods-fireflies.jpg',
+      type: 'jpeg',
+      quality: 90,
+    });
+  }
   await expect(page).toHaveScreenshot('woods-clubhouse-lantern-1280.png');
 });

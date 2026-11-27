@@ -28,12 +28,7 @@ import {
 } from "./core";
 import { loadContent } from "./content/load";
 import { Keyboard } from "./platform/keyboard";
-import {
-  combineInputFrames,
-  gamepadFrame,
-  GamepadInput,
-  gamepadSelectPressed,
-} from "./platform/gamepad";
+import { combineInputFrames, GamepadInput } from "./platform/gamepad";
 import { createInputSource } from "./platform/input";
 import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
@@ -80,7 +75,11 @@ import { createGameSettings } from "./platform/game-settings";
 import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
 import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
-import { createHudHints, resolveHudInteractHint } from "./ui/hud-hints";
+import {
+  createHudHints,
+  resolveHudInteractHint,
+  type HudInputMode,
+} from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
 import {
   composePostcardFrame,
@@ -199,6 +198,7 @@ async function boot(): Promise<void> {
   let fishStreak = 0;
   syncReducedMotion();
   const hudHints = createHudHints(uiRoot);
+  let lastInputMode: HudInputMode = "keyboard";
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
@@ -690,6 +690,7 @@ async function boot(): Promise<void> {
       muted: sound.muted(),
       canPhoto: canPhotoMode() && !photoMode,
       battlePeekHint,
+      inputMode: lastInputMode,
     });
     if (bannerStartTick >= 0 && state.tick < bannerStartTick) clearAreaBanner();
     const bannerInfo = bannerArea !== null && bannerArea === state.area && !bannerPendingFade
@@ -927,11 +928,17 @@ async function boot(): Promise<void> {
   // Buttons held when the title closed stay hidden from the game until they're
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
+  let journalCancelDown = false;
   // The area a door's fade-out is warming. Cleared when the transition ends or
   // the game resets, so every crossing prefetches exactly once.
   let prefetchedTarget: string | undefined;
   const tick = (frame: ActionFrame): void => {
-    if (qaJustPicked) { qaJustPicked = false; titlePrevious = frame; return; }
+    if (qaJustPicked) {
+      qaJustPicked = false;
+      titlePrevious = frame;
+      journalCancelDown = frame.cancel;
+      return;
+    }
     if (qaMenuOpen) {
       const result = qaFlow(qaEntries.length, qaSelected, {
         up: frame.move.y < -0.5 && titlePrevious.move.y >= -0.5,
@@ -951,15 +958,18 @@ async function boot(): Promise<void> {
         pickQa(chosen);
       }
       titlePrevious = frame;
+      journalCancelDown = frame.cancel;
       return;
     }
     // The QA console holds the world still while it is open (spec 11).
     if (qaConsoleOpen) {
       titlePrevious = frame;
+      journalCancelDown = frame.cancel;
       return;
     }
     if (qaBlocked) {
       titlePrevious = frame;
+      journalCancelDown = frame.cancel;
       return;
     }
     if (titleMode !== null) {
@@ -972,6 +982,7 @@ async function boot(): Promise<void> {
         cancel: frame.cancel && !titlePrevious.cancel,
       });
       titlePrevious = frame;
+      journalCancelDown = frame.cancel;
       if (titleMode === null) {
         for (const button of ["confirm", "cancel", "menu"] as const)
           if (frame[button]) swallowed.add(button);
@@ -980,6 +991,19 @@ async function boot(): Promise<void> {
     }
     for (const button of swallowed)
       if (!frame[button]) swallowed.delete(button);
+    const journalCancelEdge = frame.cancel && !journalCancelDown;
+    journalCancelDown = frame.cancel;
+    if (
+      journalCancelEdge &&
+      !swallowed.has("cancel") &&
+      state.journalOpen &&
+      journal.hasOpenOverlay()
+    ) {
+      journal.dismissOverlay();
+      swallowed.add("cancel");
+      sound.play("choice-move", state.tick);
+      invalidate();
+    }
     const input: ActionFrame = {
       ...frame,
       confirm: frame.confirm && !swallowed.has("confirm"),
@@ -1285,44 +1309,37 @@ async function boot(): Promise<void> {
       dataUrl: composed.dataUrl,
     };
   };
-  let previousPadSelect = false;
-  let previousPadConfirm = false;
-  let previousPadCancel = false;
   for (const type of ["resize", "pointerdown", "pointerup"])
     window.addEventListener(type, invalidate);
   let last = performance.now();
   let accumulator = 0;
   app.ticker.add(() => {
-    const pads = gamepad.poll();
-    const padSelect = gamepadSelectPressed(pads);
-    const padActions = gamepadFrame(pads);
-    const padSelectEdge = padSelect && !previousPadSelect;
-    const padConfirmEdge = padActions.confirm && !previousPadConfirm;
-    const padCancelEdge = padActions.cancel && !previousPadCancel;
-    previousPadSelect = padSelect;
-    previousPadConfirm = padActions.confirm;
-    previousPadCancel = padActions.cancel;
-
-    if (padSelectEdge) {
+    gamepad.poll();
+    if (gamepad.consumeActivity() && lastInputMode !== "gamepad") {
+      lastInputMode = "gamepad";
+      invalidate();
+    }
+    const photoAction = gamepad.consumePhotoAction();
+    if (photoAction === "toggle") {
       if (canBattlePeek()) {
         setBattlePeek(!battlePeekOpen);
       } else if (canPhotoMode() && state.transition === null) {
         setPhotoMode(!photoMode);
       }
-    } else if (photoMode) {
-      if (padConfirmEdge && canPhotoMode()) {
-        swallowed.add("confirm");
-        gamepad.clearTaps();
-        void snapPostcard({ download: true });
-      } else if (padCancelEdge) {
+    } else if (photoAction === "snap" && photoMode && canPhotoMode()) {
+      swallowed.add("confirm");
+      gamepad.clearTaps();
+      void snapPostcard({ download: true });
+    } else if (photoAction === "exit") {
+      if (photoMode) {
         setPhotoMode(false);
         swallowed.add("cancel");
         gamepad.clearTaps();
+      } else if (battlePeekOpen) {
+        setBattlePeek(false);
+        swallowed.add("cancel");
+        gamepad.clearTaps();
       }
-    } else if (battlePeekOpen && padCancelEdge) {
-      setBattlePeek(false);
-      swallowed.add("cancel");
-      gamepad.clearTaps();
     }
 
     const bumperStep = gamepad.consumeBumperStep();
@@ -1367,9 +1384,13 @@ async function boot(): Promise<void> {
   // Photo / showcase mode (spec 4): P hides overworld chrome for unobstructed
   // storybook views; Enter/Space snaps a framed Postcard PNG; Escape exits cleanly.
   window.addEventListener("keydown", (event) => {
-    if (event.repeat) return;
     if (event.target instanceof HTMLElement &&
         event.target.closest("input, textarea") !== null) return;
+    if (lastInputMode !== "keyboard") {
+      lastInputMode = "keyboard";
+      invalidate();
+    }
+    if (event.repeat) return;
     if (state.journalOpen && titleMode === null && !qaMenuOpen && !qaConsoleOpen) {
       if (event.code === "BracketLeft" || event.code === "PageUp") {
         event.preventDefault();
@@ -1488,6 +1509,8 @@ async function boot(): Promise<void> {
         activeArcadeRecord = null;
         fishStreak = 0;
         setPhotoMode(false);
+        lastInputMode = "keyboard";
+        journalCancelDown = false;
         levelUpNotices.length = 0;
         swallowed.clear();
       },

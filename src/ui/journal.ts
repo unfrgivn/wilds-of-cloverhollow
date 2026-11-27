@@ -368,6 +368,8 @@ export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   setPage: (page: JournalPage) => void;
   stepPage: (delta: -1 | 1) => void;
+  hasOpenOverlay: () => boolean;
+  dismissOverlay: () => boolean;
   onClose: (callback: () => void) => void;
   onToggleAudio: (callback: () => void) => void;
   onSetAudioLevel: (callback: (level: AudioLevel) => void) => void;
@@ -791,6 +793,8 @@ export function createJournal(root: HTMLElement): {
   return {
     setPage,
     stepPage,
+    hasOpenOverlay: () => fieldOverlays.hasOpen(),
+    dismissOverlay: () => fieldOverlays.dismiss(),
     onClose: (callback) => {
       onClose = callback;
     },

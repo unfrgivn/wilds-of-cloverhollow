@@ -14,6 +14,7 @@ import {
   type World,
 } from "../core";
 import { assetUrl } from "../platform/assets";
+import type { AmbientFlyer } from "../content/ambient";
 import { facingToward } from "./animation";
 import { interpolatePoint } from "./camera";
 import type { RestSpot } from "./companions";
@@ -82,6 +83,66 @@ export type ShadowTransform = {
   height: number;
   alpha: number;
 };
+
+export type FlyerGlowTransform = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  alpha: number;
+  tint: number;
+};
+
+export type FlyerVisual = {
+  shadow: ShadowTransform | null;
+  glow: FlyerGlowTransform | null;
+};
+
+function flyerPhase(id: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < id.length; index += 1) {
+    hash = Math.imul(hash ^ id.charCodeAt(index), 16777619);
+  }
+  return ((hash >>> 0) / 0x100000000) * Math.PI * 2;
+}
+
+export function computeFlyerVisual(
+  flyer: Pick<AmbientFlyer, "id" | "animation" | "size">,
+  position: Point,
+  tick: number,
+  reducedMotion: boolean,
+): FlyerVisual {
+  if (flyer.animation.startsWith("butterfly")) {
+    return {
+      shadow: {
+        x: position.x,
+        y: position.y + 18,
+        width: flyer.size * 0.72,
+        height: flyer.size * 0.28,
+        alpha: 0.16,
+      },
+      glow: null,
+    };
+  }
+  if (flyer.animation === "fairy_light") {
+    const phase = flyerPhase(flyer.id);
+    const alpha = reducedMotion
+      ? 0.44
+      : 0.34 + 0.24 * (0.5 + 0.5 * Math.sin(tick * 0.08 + phase));
+    return {
+      shadow: null,
+      glow: {
+        x: position.x,
+        y: position.y,
+        width: flyer.size * 2.6,
+        height: flyer.size * 2.6,
+        alpha,
+        tint: 0xffe484,
+      },
+    };
+  }
+  return { shadow: null, glow: null };
+}
 
 export type CompanionEmoteSpec = {
   textureKey: "emoteHeart" | "sparkle" | "emoteNote";

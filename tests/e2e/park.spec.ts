@@ -52,7 +52,7 @@ async function toThePark(page: Page): Promise<void> {
 
 test("the plaza's lower path leads to Meadow Park, and its exit path leads back", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await toThePark(page);
   const park = await readState(page);
@@ -73,6 +73,13 @@ test("the plaza's lower path leads to Meadow Park, and its exit path leads back"
   // cache hit.
   expect(info.cachedAreaTextures.some((url) => url.includes("plaza"))).toBe(true);
   expect(info.cachedAreaTextures.some((url) => url.includes("park"))).toBe(true);
+  if (process.env.CLOVERHOLLOW_REVIEW_SHOTS === "1" && testInfo.project.name === "chromium") {
+    await page.screenshot({
+      path: "art/review/m117-park-butterfly-shadows.jpg",
+      type: "jpeg",
+      quality: 90,
+    });
+  }
   await expect(page).toHaveScreenshot("park-arrival.png");
 
   await walk(page, "x", 200);

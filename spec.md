@@ -210,13 +210,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   or Start opens the journal, X/Square toggles the lantern, the left shoulder
   (LB/L1, standard button 4) twirls the lasso in battle, and the right
   shoulder (RB/R1, standard button 5) plays the flute. Select/Back/View
-  (standard button 8, read via pure `gamepadSelectPressed` in
-  `src/platform/gamepad.ts` without altering `ActionFrame`, Milestone 114)
+  (standard button 8, read via pure `gamepadSelectPressed` and
+  `gamepadPhotoButtons` in `src/platform/gamepad.ts` without altering
+  `ActionFrame`, Milestones 115 & 117)
   toggles the Battle Field Guide Peek card during battle `command` phase or
   Photo Mode in the free overworld; while Photo Mode is active, gamepad A
   (button 0) snaps a framed Postcard (swallowing overworld confirm) and B
   (button 1) exits Photo Mode; while Battle Peek is open, gamepad B dismisses
-  only the peek card (swallowing `cancel`). Only
+  only the peek card (swallowing `cancel`). `gamepadHasActivity` detects active
+  standard-pad stick movement (`> 0.25`) or button presses (`0..15`) so the HUD
+  Key Hints ribbon adapts dynamically between keyboard and gamepad glyphs. Only
   standard-mapping pads count; connected pads merge with button OR and first
   non-zero movement.
   When devices provide different movement vectors, touch wins, then keyboard,
@@ -1515,7 +1518,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   bob, cycle across their animation's full frame count at `frameTicks`, and
   mirror from the smooth spline tangent while travelling left. They draw above
   overworld figures and props, below the fade, dusk tint, and glows, and are
-  hidden in battles. They never enter simulation state, hashes, or saves.
+  hidden in battles. Via `computeFlyerVisual` (`src/render/overworld-render.ts`,
+  Milestone 117), butterflies project subtle grounded contact shadows onto
+  `shadowLayer` (`y + 18`, `size * 0.72 x size * 0.28`, alpha `0.16`), and
+  `fairy_light` fireflies cast warm-gold additive halos (`0xffe484`,
+  `size * 2.6`, pulsing alpha `0.34..0.58` from a deterministic id phase or
+  steady `0.44` under Reduced Motion) onto `emissiveLayer` above twilight and
+  blacklight dusk (hidden on `harness` and outside the overworld). They never
+  enter simulation state, hashes, or saves.
 - Canopies: a prop with `canopy: true` is a tree Fae can walk under (a palm,
   crown and trunk cut whole, its front edge at the trunk's foot). While it
   draws over more than 5% of her body box (its picture, in the columns where
@@ -3451,23 +3461,31 @@ trunks keep its two exits.
   untouched). Clicking it opens the Field Treasures Card modal
   (`.journal-treasures-card`) inside `.journal-book`; clicking its 44 px `×`
   button, clicking the backdrop, pressing Escape (which stops propagation so the
-  Journal stays open), switching tabs, or closing the Journal dismisses it.
+  Journal stays open), pressing `cancel` (`X`, gamepad `B`, or touch `×`, which
+  dismisses the open overlay via `journal.dismissOverlay()`, swallows `cancel`
+  for that tick, plays `choice-move`, and keeps the Journal open until the next
+  `cancel` press, Milestone 117), switching tabs, or closing the Journal
+  dismisses it.
 - Optional desktop Key Hints ribbon (`src/ui/hud-hints.ts`): when Key Hints is
   enabled on non-touch desktop/gamepad setups, a cream die-cut ribbon anchored
-  in the bottom-left safe area (`--z-hud`) shows keycap pills for Journal (`J`),
-  context-aware Confirm (`Z`, resolved via `resolveHudInteractHint`: active
-  interactable prompt or `Talk`, `Stand` while resting, `Pet` when actively
-  facing a pettable companion with forward dot `>= 0.15`, `Rest` at a rest
-  spot, or inactive `Talk`), Lantern (`L`, shown once unlocked and glowing
-  lavender when lit), Flute (`F`, shown once unlocked), Mute (`M`), and Photo
-  (`P`, `[data-hint="photo"]`, shown beside Mute whenever `canPhoto` is true in
-  the free overworld outside Photo Mode). During battle `command` phase (outside
-  the treat tray and touch mode) with Key Hints enabled, a single compact
-  die-cut pill (`.hud-battle-hint`, `[data-hint="battle-guide"]`: `I` `Field
+  in the bottom-left safe area (`--z-hud`) shows keycap pills for Journal
+  (`J` / `Y`), context-aware Confirm (`Z` / `A`, resolved via
+  `resolveHudInteractHint`: active interactable prompt or `Talk`, `Stand` while
+  resting, `Pet` when actively facing a pettable companion with forward dot
+  `>= 0.15`, `Rest` at a rest spot, or inactive `Talk`), Lantern (`L` / `X`,
+  shown once unlocked and glowing lavender when lit), Flute (`F` / `RB`, shown
+  once unlocked), Mute (`M`), and Photo (`P` / `View`, `[data-hint="photo"]`,
+  shown beside Mute whenever `canPhoto` is true in the free overworld outside
+  Photo Mode). During battle `command` phase (outside the treat tray and touch
+  mode) with Key Hints enabled, a single compact die-cut pill
+  (`.hud-battle-hint`, `[data-hint="battle-guide"]`: `I` / `View` `Field
   Guide`, resolved via `resolveHudHintVisibility`) docks cleanly at bottom-right
-  clear of commands, dialogue, portraits, and the Field Guide Peek card. Both
-  hide automatically when Key Hints is off or during touch mode, title,
-  dialogue, arcade, journal, credits, or QA overlays.
+  clear of commands, dialogue, portraits, and the Field Guide Peek card. Key
+  badges adapt automatically between `"keyboard"` and `"gamepad"` via
+  `hudHintKeys(mode)` (defaulting to `"keyboard"`, switching to `"gamepad"` on
+  standard-pad activity and back to `"keyboard"` on real keydowns, Milestone
+  117). Both hide automatically when Key Hints is off or during touch mode,
+  title, dialogue, arcade, journal, credits, or QA overlays.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open
   book with a teal quill (inline SVG, aria-label "journal").

@@ -135,12 +135,44 @@ export function gamepadSelectPressed(pads: readonly StandardGamepad[]): boolean 
   return false;
 }
 
+export function gamepadPhotoButtons(
+  pads: readonly StandardGamepad[],
+): { toggle: boolean; snap: boolean; exit: boolean } {
+  let toggle = false;
+  let snap = false;
+  let exit = false;
+  for (const pad of pads) {
+    if (pad.mapping !== "standard") continue;
+    if (pressed(pad, 8)) toggle = true;
+    if (pressed(pad, 0)) snap = true;
+    if (pressed(pad, 1)) exit = true;
+  }
+  return { toggle, snap, exit };
+}
+
+export function gamepadHasActivity(pads: readonly StandardGamepad[]): boolean {
+  for (const pad of pads) {
+    if (pad.mapping !== "standard") continue;
+    const move = stick(pad.axes);
+    if (move.x !== 0 || move.y !== 0) return true;
+    for (let index = 0; index < 16; index += 1) {
+      if (pressed(pad, index)) return true;
+    }
+  }
+  return false;
+}
+
 export class GamepadInput {
   private readonly latch = new GamepadLatch();
   private readonly getPads: () => readonly StandardGamepad[];
   private prevBumperLeft = false;
   private prevBumperRight = false;
   private pendingBumperStep: -1 | 0 | 1 = 0;
+  private prevPhotoToggle = false;
+  private prevPhotoSnap = false;
+  private prevPhotoExit = false;
+  private pendingPhotoAction: "toggle" | "snap" | "exit" | null = null;
+  private pendingActivity = false;
 
   constructor(getPads: () => readonly StandardGamepad[] = () => {
     const pads = navigator.getGamepads();
@@ -162,6 +194,14 @@ export class GamepadInput {
     else if (bumpers.right && !this.prevBumperRight) this.pendingBumperStep = 1;
     this.prevBumperLeft = bumpers.left;
     this.prevBumperRight = bumpers.right;
+    const photo = gamepadPhotoButtons(pads);
+    if (photo.toggle && !this.prevPhotoToggle) this.pendingPhotoAction = "toggle";
+    else if (photo.snap && !this.prevPhotoSnap) this.pendingPhotoAction = "snap";
+    else if (photo.exit && !this.prevPhotoExit) this.pendingPhotoAction = "exit";
+    this.prevPhotoToggle = photo.toggle;
+    this.prevPhotoSnap = photo.snap;
+    this.prevPhotoExit = photo.exit;
+    if (gamepadHasActivity(pads)) this.pendingActivity = true;
     return pads;
   }
 
@@ -171,6 +211,18 @@ export class GamepadInput {
     return step;
   }
 
+  consumePhotoAction(): "toggle" | "snap" | "exit" | null {
+    const action = this.pendingPhotoAction;
+    this.pendingPhotoAction = null;
+    return action;
+  }
+
+  consumeActivity(): boolean {
+    const active = this.pendingActivity;
+    this.pendingActivity = false;
+    return active;
+  }
+
   frame(): ActionFrame {
     return this.latch.frame();
   }
@@ -178,5 +230,7 @@ export class GamepadInput {
   clearTaps(): void {
     this.latch.clearTaps();
     this.pendingBumperStep = 0;
+    this.pendingPhotoAction = null;
+    this.pendingActivity = false;
   }
 }

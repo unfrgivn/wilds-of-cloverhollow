@@ -5269,6 +5269,42 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build`, 48/48 Chromium & WebKit e2e, and 95/95 Chromium
   `ui-gallery` tests.
 
+## Milestone 117: Adaptive Controller HUD Glyphs, Journal Overlay Cancel Fix & Luminous Firefly Halos + Grounded Butterfly Shadows **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 67 recorded sims.
+- Journal Overlay `X` / `B` / Touch `×` Cancel Fix (`src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/main.ts`):
+  - Exposed `hasOpen()` and `dismiss()` on `createJournalFieldOverlays` (covering
+    both the Field Note Card and Field Treasures Card) and `hasOpenOverlay()` /
+    `dismissOverlay()` on `createJournal`.
+  - Edge-triggered `cancel` while Fae's Journal and an overlay are open dismisses
+    ONLY the overlay, swallows `cancel` for that tick, plays `choice-move`, and
+    keeps `.journal-book` open until the next `cancel` press.
+- Steam Deck / Gamepad Photo & Adaptive Controller Key Hints
+  (`src/platform/gamepad.ts`, `src/ui/hud-hints.ts`, `src/main.ts`):
+  - Exported pure `gamepadPhotoButtons`, `gamepadHasActivity`, and edge-triggered
+    `consumePhotoAction()` / `consumeActivity()` on `GamepadInput`.
+  - Exported `HudInputMode` and pure `hudHintKeys(mode)` (`Z/J/L/F/M` vs
+    `A/Y/X/RB/M`, plus `P/I` -> `View` on gamepad), switching live between
+    gamepad activity and keyboard `keydown` events while keeping keyboard
+    defaults 100% pixel-identical.
+- Luminous Firefly Halos & Grounded Butterfly Shadows
+  (`src/render/overworld-render.ts`, `src/render/view.ts`):
+  - Exported pure `computeFlyerVisual` projecting subtle contact shadows on
+    `shadowLayer` for butterflies and pulsing warm-gold additive halos
+    (`0xffe484`, steady under Reduced Motion) on `emissiveLayer` above twilight
+    and blacklight dusk for `fairy_light` fireflies (cleanly destroyed on area
+    swaps and hidden on `harness` / battle / arcade).
+- Evidence: `tests/unit/milestone-117.test.ts` (7 tests), extended
+  `tests/e2e/journal-collections.spec.ts` (`x` dismisses Field Note then Journal),
+  and review captures `art/review/m117-woods-fireflies.jpg` and
+  `art/review/m117-park-butterfly-shadows.jpg` verified with `vision`.
+- Gates: `just check` (176 unit files / 1,346 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4381 just e2e --update-snapshots` (1,124 passed, 2
+  skipped, 0 failed across Chromium & WebKit; only the 4 glowing-firefly area
+  baselines updated).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

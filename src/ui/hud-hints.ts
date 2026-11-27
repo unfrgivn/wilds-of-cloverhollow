@@ -1,6 +1,35 @@
 import "./hud-hints.css";
 import type { Direction, Point } from "../core";
 
+export type HudInputMode = "keyboard" | "gamepad";
+
+export type HudHintKeys = {
+  interact: string;
+  journal: string;
+  lantern: string;
+  flute: string;
+  mute: string;
+};
+
+export function hudHintKeys(mode: HudInputMode): HudHintKeys {
+  if (mode === "gamepad") {
+    return {
+      interact: "A",
+      journal: "Y",
+      lantern: "X",
+      flute: "RB",
+      mute: "M",
+    };
+  }
+  return {
+    interact: "Z",
+    journal: "J",
+    lantern: "L",
+    flute: "F",
+    mute: "M",
+  };
+}
+
 export type HudHintsView = {
   visible: boolean;
   canInteract: boolean;
@@ -11,6 +40,7 @@ export type HudHintsView = {
   muted: boolean;
   canPhoto?: boolean;
   battlePeekHint?: boolean;
+  inputMode?: HudInputMode;
 };
 
 export type ResolvedHudHints = {
@@ -87,6 +117,7 @@ export function resolveHudInteractHint(context: HudInteractContext): HudInteract
 
 type HintPill = {
   root: HTMLSpanElement;
+  key: HTMLElement;
   label: HTMLSpanElement;
 };
 
@@ -101,7 +132,7 @@ function makeHintPill(id: string, keyText: string, labelText: string): HintPill 
   label.className = "hud-hint-label";
   label.textContent = labelText;
   root.append(key, label);
-  return { root, label };
+  return { root, key, label };
 }
 
 function setText(node: Node, text: string): void {
@@ -148,17 +179,29 @@ export function createHudHints(root: HTMLElement): {
 
   return {
     render: (view) => {
+      const mode: HudInputMode = view.inputMode ?? "keyboard";
       const resolved = resolveHudHintVisibility(view);
       const signature =
         `${resolved.showRibbon}|${resolved.showPhoto}|${resolved.showBattleGuide}|` +
         `${view.canInteract}|${view.interactLabel}|` +
-        `${view.hasLantern}|${view.lanternOn}|${view.hasFlute}|${view.muted}`;
+        `${view.hasLantern}|${view.lanternOn}|${view.hasFlute}|${view.muted}|${mode}`;
       if (signature === lastSignature) return;
       lastSignature = signature;
 
       ribbon.hidden = !resolved.showRibbon;
       battleHint.hidden = !resolved.showBattleGuide;
+      if (resolved.showBattleGuide) {
+        setText(battleGuidePill.key, mode === "gamepad" ? "View" : "I");
+      }
       if (!resolved.showRibbon) return;
+
+      const keys = hudHintKeys(mode);
+      setText(journalPill.key, keys.journal);
+      setText(interactPill.key, keys.interact);
+      setText(lanternPill.key, keys.lantern);
+      setText(flutePill.key, keys.flute);
+      setText(mutePill.key, keys.mute);
+      setText(photoPill.key, mode === "gamepad" ? "View" : "P");
 
       interactPill.root.classList.toggle("is-active", view.canInteract);
       setText(interactPill.label, view.canInteract ? view.interactLabel : "Talk");

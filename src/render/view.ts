@@ -54,6 +54,7 @@ import {
   computeCompanionEmoteSpecs,
   computeCritterShadow,
   computeFaePose,
+  computeFlyerVisual,
   computeGlowTransform,
   computeLanternBlend,
   computeLanternMote,
@@ -190,7 +191,12 @@ export class GameView {
   private npcFrames: { id: string; frame: string; facing: string }[] = [];
   private glowSprites: { id: string; sprite: Sprite }[] = [];
   private drawnGlows: string[] = [];
-  private ambientSprites: { flyer: AmbientFlyer; sprite: Sprite }[] = [];
+  private ambientSprites: {
+    flyer: AmbientFlyer;
+    sprite: Sprite;
+    shadow: Sprite | null;
+    glow: Sprite | null;
+  }[] = [];
   private ambientFrames: { id: string; x: number; y: number; frame: number }[] = [];
   private clubhousePrizePool: { container: Container; shadow: Sprite; item: Sprite }[] = [];
   private clubhouseKeepsakePool: {
@@ -390,13 +396,32 @@ export class GameView {
       this.glowLayer.addChild(sprite);
       return { id: glow.id, sprite };
     });
-    for (const entry of this.ambientSprites) entry.sprite.destroy();
+    for (const entry of this.ambientSprites) {
+      entry.sprite.destroy();
+      entry.shadow?.destroy();
+      entry.glow?.destroy();
+    }
     this.ambientSprites = ambientFor(area).map((flyer) => {
       const sprite = new Sprite();
       sprite.label = `ambient:${flyer.id}`;
       sprite.anchor.set(0.5);
       this.ambientLayer.addChild(sprite);
-      return { flyer, sprite };
+      let shadow: Sprite | null = null;
+      if (flyer.animation.startsWith("butterfly")) {
+        shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:ambient:${flyer.id}`);
+        shadow.visible = false;
+        this.shadowLayer.addChild(shadow);
+      }
+      let glow: Sprite | null = null;
+      if (flyer.animation === "fairy_light") {
+        glow = new Sprite(this.vfx.softGlow);
+        glow.label = `glow:ambient:${flyer.id}`;
+        glow.anchor.set(0.5);
+        glow.blendMode = "add";
+        glow.visible = false;
+        this.emissiveLayer.addChild(glow);
+      }
+      return { flyer, sprite, shadow, glow };
     });
     for (const url of next.textureUrls) this.areaTextureUrls.add(url);
     this.scene.addChildAt(next.ground, 0);
@@ -877,7 +902,7 @@ export class GameView {
     );
     this.renderNpcs(state, shadowAlpha, livingMotion);
     this.renderClubhouseDisplay(state, area, reducedMotion);
-    this.renderAmbient(state);
+    this.renderAmbient(state, area, reducedMotion);
     this.renderEmotes(
       state,
       area,
@@ -1184,26 +1209,50 @@ export class GameView {
     this.clubhouseDisplayCount = prizeShown + keepsakeShown;
   }
 
-  private renderAmbient(state: State): void {
+  private renderAmbient(state: State, area: Area, reducedMotion: boolean): void {
     const sheet = Assets.get<Spritesheet>("ambient-sheet");
     const visible = state.battle === null && state.arcade === null;
+    const showEffects = visible && area.id !== "harness";
     if (!visible) {
-      for (const { sprite } of this.ambientSprites) sprite.visible = false;
+      for (const { sprite, shadow, glow } of this.ambientSprites) {
+        sprite.visible = false;
+        if (shadow !== null) shadow.visible = false;
+        if (glow !== null) glow.visible = false;
+      }
       this.ambientFrames = [];
       return;
     }
     const frames: { id: string; x: number; y: number; frame: number }[] = [];
-    for (const { flyer, sprite } of this.ambientSprites) {
+    for (const { flyer, sprite, shadow, glow } of this.ambientSprites) {
       const names = sheet?.data.animations?.[flyer.animation] ?? [];
       const position = flyerAt(flyer, state.tick, Math.max(1, names.length));
       const frameName = names[position.frame] ?? names[0];
       const texture = frameName === undefined ? undefined : sheet?.textures[frameName];
       sprite.visible = texture !== undefined;
-      if (texture === undefined) continue;
+      if (texture === undefined) {
+        if (shadow !== null) shadow.visible = false;
+        if (glow !== null) glow.visible = false;
+        continue;
+      }
       sprite.texture = texture;
       sprite.position.set(position.x, position.y);
       const scale = flyer.size / 96;
       sprite.scale.set(position.flip ? -scale : scale, scale);
+      const visual = computeFlyerVisual(flyer, position, state.tick, reducedMotion);
+      if (shadow !== null) {
+        shadow.visible = showEffects && visual.shadow !== null;
+        if (visual.shadow !== null) applyShadow(shadow, visual.shadow);
+      }
+      if (glow !== null) {
+        glow.visible = showEffects && visual.glow !== null;
+        if (visual.glow !== null) {
+          glow.position.set(visual.glow.x, visual.glow.y);
+          glow.width = visual.glow.width;
+          glow.height = visual.glow.height;
+          glow.alpha = visual.glow.alpha;
+          glow.tint = visual.glow.tint;
+        }
+      }
       frames.push({ id: flyer.id, x: position.x, y: position.y, frame: position.frame });
     }
     this.ambientFrames = frames;

@@ -45,6 +45,8 @@ export type JournalFieldOverlays = {
   closeFieldNote: () => void;
   closeTreasures: () => void;
   closeAll: () => void;
+  hasOpen: () => boolean;
+  dismiss: () => boolean;
   handleKeydown: (event: KeyboardEvent) => boolean;
 };
 
@@ -404,6 +406,20 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
     closeTreasures();
   };
 
+  const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null;
+
+  const dismiss = (): boolean => {
+    if (treasuresOpen) {
+      closeTreasures();
+      return true;
+    }
+    if (inspectedItem !== null) {
+      closeFieldNote();
+      return true;
+    }
+    return false;
+  };
+
   return {
     fieldBackdrop,
     treasuresBackdrop,
@@ -421,6 +437,8 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
     closeFieldNote,
     closeTreasures,
     closeAll,
+    hasOpen,
+    dismiss,
     handleKeydown: (event) => {
       if (treasuresOpen) {
         if (event.key === "Escape") {

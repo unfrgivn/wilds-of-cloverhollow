@@ -211,7 +211,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   `renderBootError` mounts a self-contained inline-styled `#f8edcf` / `#47321f`
   storybook recovery card (`"Cloverhollow hit a bump!"`, safe error summary,
   and `"Reload"` button) inside `#app` with zero cost on normal boot.
-- Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121 & 122):
+- Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121, 122 & 142):
   progressive enhancement with zero new npm dependencies. `createHaptics()`
   checks for a native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via
   strict type guards, then fires dual-rumble Gamepad haptic actuators via
@@ -223,10 +223,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   `prefers-reduced-motion: reduce` and the in-game Reduced Motion toggle via
   `isReducedMotionActive()` (`src/platform/reduced-motion.ts`) and no-oping
   safely on unsupported browsers or during synthetic harness steps.
-  Projected via `hapticForTick` (`src/shell/feedback.ts`) on `GREAT!` battle
-  checks (`"medium"`), `Together!` / `soothed` / `prize-won` / `fish-catch` /
-  Golden Chef (`"celebrate"`), and `claw-grab` / `mole-boop` / `fish-bite` /
-  companion pet (`"light"`).
+  Projected via `hapticForTick` (`src/shell/feedback.ts`) with strict priority
+  `"celebrate"` > `"medium"` > `"light"`:
+  `"celebrate"` on Golden Chef (`goldenCooked`), `soothed` transition,
+  `battle-together`, `prize-won`, `fish-catch`, `level-up`, `sticker`, and
+  `skee-hundred`; `"medium"` on `GREAT!` `battle-hit`, `comet-bump`,
+  `lasso-twirl`, and `cook-ding`; and `"light"` on `claw-grab`, `mole-boop`,
+  `fish-bite`, `skee-score`, `comet-star`, `flute`, `lantern-on`, `coin`,
+  `item`, and companion pet.
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -445,11 +449,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
   disconnected on `onended`), and cleans up all nodes and timers on stop.
   Character-voiced talking blips and
-  key-aligned UI clicks (`src/platform/voices.ts`, Milestone 80) give every
-  named cast member, fairy, critter archetype, and narrator a distinct warm
+  key-aligned UI clicks (`src/platform/voices.ts`, Milestones 80 & 142) give
+  every named cast member, `"Fizzy "` mini-boss (via optional leading `"fizzy "`
+  prefix stripping after exact lookup, plus `"Fizzy Kid"` / `"Kid"` mapped to
+  `MYSTERY_VOICE`), fairy, critter archetype, and narrator a distinct warm
   sine/triangle register (with optional gentle pitch glide or harmonic overtone
-  and pauses on spaces/punctuation) and pitch `choice-move`, `battle-command`,
-  and `choice-select` clicks to the active soundtrack's pentatonic scale.
+  and pauses on spaces/punctuation, achieving 100% cast voice coverage across
+  all compiled story speakers and battle critters) and pitch `choice-move`,
+  `battle-command`, and `choice-select` clicks to the active soundtrack's
+  pentatonic scale.
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -2151,16 +2159,21 @@ trunks keep its two exits.
   JavaScript), so it follows the insets as iOS applies them; `just ios-smoke`
   asserts it on the simulator.
 - Speaker tags are cream or subtle pastel-tinted stickers (`speakerAccent` in
-  `src/ui/portraits.ts`, Milestone 80, >= 8:1 dark ink contrast) with dark ink
-  lettering, an ink outline, light die-cut rim, and a soft shadow. Named
-  speakers with an atlas also display a 46 px circular die-cut portrait
-  medallion (`.sticker-portrait`, cropped by `cropPortraitFrame` from cached
-  atlas metadata, shifting the speaker tag right without changing the dialogue
-  box width or text measure, and gently bobbing while text types). Dialogue
-  panels and choice stickers use brief reduced-motion-guarded pop-in motion;
-  dialogue panels and TALK prompts use a low-opacity inset dashed stitch
-  border. Labels use Nunito 800, choices use 600, and body copy uses 400 for
-  readable small-size text.
+  `src/ui/portraits.ts`, Milestones 80 & 142, >= 8:1 dark ink contrast) with
+  dark ink lettering, an ink outline, light die-cut rim, and a soft shadow.
+  `speakerAccent` also strips an optional leading `"fizzy "` prefix and maps
+  `"Fizzy Kid"` to `"mystery"`, so every non-sign story speaker and all six
+  mini-bosses (`Fizzy Mr. Pip`, `Fizzy Mrs. Flurry`, `Fizzy Ms. Coral`,
+  `Fizzy Ms. Rowan`, `Fizzy Mr. Bell`, `Fizzy Kid`) wear their true speaker
+  accent. Named speakers with an atlas (including Plaza sidewalk windows
+  `Grocer` -> `pippin` and `Scoops` -> `penny`) also display a 46 px circular
+  die-cut portrait medallion (`.sticker-portrait`, cropped by
+  `cropPortraitFrame` from cached atlas metadata, shifting the speaker tag right
+  without changing the dialogue box width or text measure, and gently bobbing
+  while text types). Dialogue panels and choice stickers use brief
+  reduced-motion-guarded pop-in motion; dialogue panels and TALK prompts use a
+  low-opacity inset dashed stitch border. Labels use Nunito 800, choices use
+  600, and body copy uses 400 for readable small-size text.
 
 ### 7.2 Title screen layout
 - The title screen (`src/ui/title.ts`, Milestone 97 polish) is the top layer

@@ -378,6 +378,8 @@ const NAMED_VOICES: Record<string, VoiceProfile> = {
     gain: 0.05,
   },
   "hooded kid": MYSTERY_VOICE,
+  "fizzy kid": MYSTERY_VOICE,
+  kid: MYSTERY_VOICE,
   "purple hood": MYSTERY_VOICE,
   "kid in purple": MYSTERY_VOICE,
   "mysterious voice": MYSTERY_VOICE,
@@ -415,6 +417,11 @@ export function voiceForSpeaker(speaker: string | null): VoiceProfile {
   if (key.length === 0) return NARRATION_VOICE;
   const named = NAMED_VOICES[key];
   if (named !== undefined) return named;
+  const unfizzed = key.startsWith("fizzy ") ? key.slice(6).trim() : null;
+  if (unfizzed !== null && unfizzed.length > 0) {
+    const baseNamed = NAMED_VOICES[unfizzed];
+    if (baseNamed !== undefined) return baseNamed;
+  }
   if (key.includes("fairy")) return FAIRY_VOICE;
   if (BIRD_KEYWORDS.some((word) => key.includes(word))) return BIRD_CRITTER_VOICE;
   if (BOOPY_KEYWORDS.some((word) => key.includes(word))) return BOOPY_CRITTER_VOICE;

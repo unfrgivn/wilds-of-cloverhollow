@@ -42,6 +42,33 @@ export function petEffectForCompanion(id: string): CompanionAudioEffect {
   return "pet-cat";
 }
 
+const CELEBRATE_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
+  "battle-together",
+  "prize-won",
+  "fish-catch",
+  "level-up",
+  "sticker",
+  "skee-hundred",
+]);
+
+const MEDIUM_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
+  "comet-bump",
+  "lasso-twirl",
+  "cook-ding",
+]);
+
+const LIGHT_HAPTIC_CUES: ReadonlySet<SoundCue> = new Set<SoundCue>([
+  "claw-grab",
+  "mole-boop",
+  "fish-bite",
+  "skee-score",
+  "comet-star",
+  "flute",
+  "lantern-on",
+  "coin",
+  "item",
+]);
+
 /** Projects a simulation tick's transitions and sound cues to a tactile haptic kind. */
 export function hapticForTick(
   previous: Pick<State, "battle">,
@@ -53,20 +80,17 @@ export function hapticForTick(
   if (
     options?.goldenCooked === true ||
     soothedNow ||
-    cues.includes("battle-together") ||
-    cues.includes("prize-won") ||
-    cues.includes("fish-catch")
+    cues.some((cue) => CELEBRATE_HAPTIC_CUES.has(cue))
   ) {
     return "celebrate";
   }
-  if (cues.includes("battle-hit") && next.battle?.lastGrade === "great") {
+  if (
+    (cues.includes("battle-hit") && next.battle?.lastGrade === "great") ||
+    cues.some((cue) => MEDIUM_HAPTIC_CUES.has(cue))
+  ) {
     return "medium";
   }
-  if (
-    cues.includes("claw-grab") ||
-    cues.includes("mole-boop") ||
-    cues.includes("fish-bite")
-  ) {
+  if (cues.some((cue) => LIGHT_HAPTIC_CUES.has(cue))) {
     return "light";
   }
   return null;

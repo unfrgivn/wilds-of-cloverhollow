@@ -77,6 +77,7 @@ const TOWN_SPEAKERS = new Set([
 const FAIRY_SPEAKERS = new Set(["lavender", "mint", "sky", "peach"]);
 const MYSTERY_SPEAKERS = new Set([
   "hooded kid",
+  "fizzy kid",
   "purple hood",
   "kid in purple",
   "mysterious voice",
@@ -110,10 +111,7 @@ const CRITTER_KEYWORDS = [
   "mole",
 ] as const;
 
-export function speakerAccent(speaker: string | null): SpeakerAccent {
-  if (speaker === null) return "default";
-  const key = speaker.trim().toLowerCase();
-  if (key.length === 0 || SIGN_SPEAKERS.has(key)) return "default";
+function accentForKey(key: string): SpeakerAccent | null {
   if (key === "fae") return "fae";
   if (FAMILY_SPEAKERS.has(key)) return "family";
   if (FRIEND_SPEAKERS.has(key)) return "friend";
@@ -121,6 +119,22 @@ export function speakerAccent(speaker: string | null): SpeakerAccent {
   if (TOWN_SPEAKERS.has(key)) return "town";
   if (FAIRY_SPEAKERS.has(key) || key.includes("fairy")) return "fairy";
   if (MYSTERY_SPEAKERS.has(key)) return "mystery";
+  return null;
+}
+
+export function speakerAccent(speaker: string | null): SpeakerAccent {
+  if (speaker === null) return "default";
+  const key = speaker.trim().toLowerCase();
+  if (key.length === 0 || SIGN_SPEAKERS.has(key)) return "default";
+  const direct = accentForKey(key);
+  if (direct !== null) return direct;
+  if (key.startsWith("fizzy ")) {
+    const unfizzed = key.slice(6).trim();
+    if (unfizzed.length > 0) {
+      const base = accentForKey(unfizzed);
+      if (base !== null) return base;
+    }
+  }
   if (CRITTER_KEYWORDS.some((word) => key.includes(word))) return "critter";
   return "default";
 }
@@ -175,8 +189,10 @@ const CHARACTER_MAP: Record<string, readonly [string, PortraitCropMode]> = {
   "bay keeper": ["bay-keeper", "adult"],
   "pass keeper": ["pass-keeper", "adult"],
   "grocer pippin": ["pippin", "adult"],
+  grocer: ["pippin", "adult"],
   pippin: ["pippin", "adult"],
   "scooper penny": ["penny", "adult"],
+  scoops: ["penny", "adult"],
   penny: ["penny", "adult"],
   "ms. clover": ["teacher", "adult"],
   "ms. maple": ["teacher", "adult"],

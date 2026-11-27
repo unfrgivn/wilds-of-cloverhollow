@@ -6226,6 +6226,34 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4601/4602 just e2e` (640 Chromium + 545 WebKit = 1,185
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 142: 100% Cast Voice & Portrait Parity (All 92 Speakers, All 6 Mini-Bosses & Plaza Window Shopkeepers) + Complete Tactile Haptic Coverage **Status:** ✅ Completed (2026-11-27)
+- 100% Cast Voice & Portrait Parity (`src/platform/voices.ts`, `src/ui/portraits.ts`):
+  - Strips an optional leading `"fizzy "` prefix after exact lookup in
+    `voiceForSpeaker` and maps `"fizzy kid"` / `"kid"` to `MYSTERY_VOICE` so
+    all six mini-bosses match their base character timbres with zero generic
+    fallback voices across all 92 compiled story speakers and battle critters.
+  - Adds `"fizzy kid"` to `MYSTERY_SPEAKERS` and strips an optional leading
+    `"fizzy "` prefix in `speakerAccent` so all six mini-bosses wear their true
+    cast accents (`town`, `school`, `mystery`).
+  - Maps Plaza sidewalk shopkeeper aliases `grocer` -> `["pippin", "adult"]`
+    and `scoops` -> `["penny", "adult"]` in `CHARACTER_MAP` so sidewalk Grocery
+    & Ice Cream window dialogue displays Grocer Pippin's and Scooper Penny's
+    painted bust portraits.
+- Complete Tactile Haptic Coverage (`src/shell/feedback.ts`):
+  - Expands `hapticForTick` while preserving `"celebrate"` > `"medium"` >
+    `"light"` priority: adds `"level-up"`, `"sticker"`, and `"skee-hundred"` to
+    `"celebrate"`; `"comet-bump"`, `"lasso-twirl"`, and `"cook-ding"` to
+    `"medium"`; and `"skee-score"`, `"comet-star"`, `"flute"`, `"lantern-on"`,
+    `"coin"`, and `"item"` to `"light"`.
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded sims.
+- Evidence: `tests/unit/milestone-142.test.ts` (4 tests: full-cast voice/accent
+  gate, mini-boss & Plaza shopkeeper checks, complete `hapticForTick` matrix).
+- Gates: `just check` (202 unit files / 1,469 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4611/4613 just e2e` (640 Chromium + 545 WebKit = 1,185
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

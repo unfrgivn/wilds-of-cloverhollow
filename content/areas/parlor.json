@@ -1,0 +1,195 @@
+{
+  "id": "parlor",
+  "name": "Sweet Scoop Ice Cream Parlor",
+  "land": "cloverhollow",
+  "ground": "parlor",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      42,
+      540
+    ],
+    [
+      238,
+      454
+    ],
+    [
+      248,
+      480
+    ],
+    [
+      300,
+      476
+    ],
+    [
+      312,
+      422
+    ],
+    [
+      515,
+      332
+    ],
+    [
+      548,
+      418
+    ],
+    [
+      551,
+      434
+    ],
+    [
+      645,
+      477
+    ],
+    [
+      800,
+      548
+    ],
+    [
+      868,
+      578
+    ],
+    [
+      945,
+      589
+    ],
+    [
+      1025,
+      558
+    ],
+    [
+      1162,
+      496
+    ],
+    [
+      1162,
+      517
+    ],
+    [
+      582,
+      779
+    ]
+  ],
+  "blockers": [],
+  "glows": [
+    {
+      "id": "parlor-secret-glow",
+      "frame": "ink_note",
+      "point": {
+        "x": 910,
+        "y": 618
+      },
+      "knot": "parlor_secret_glow",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          94,
+          516
+        ],
+        [
+          199,
+          468
+        ],
+        [
+          220,
+          488
+        ],
+        [
+          115,
+          536
+        ]
+      ],
+      "target": {
+        "area": "plaza",
+        "spawn": "parlor-door"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 280,
+      "y": 555,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "parlor-gelato",
+      "knot": "parlor_gelato",
+      "point": {
+        "x": 775,
+        "y": 540
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "parlor-menu",
+      "knot": "parlor_menu",
+      "point": {
+        "x": 645,
+        "y": 472
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "parlor-window",
+      "knot": "parlor_window",
+      "point": {
+        "x": 415,
+        "y": 385
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "penny",
+      "point": {
+        "x": 545,
+        "y": 505
+      },
+      "facing": "down",
+      "knot": "scooper_penny",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          530,
+          495
+        ],
+        [
+          560,
+          495
+        ],
+        [
+          560,
+          515
+        ],
+        [
+          530,
+          515
+        ]
+      ]
+    }
+  ],
+  "critters": [],
+  "props": [
+    {
+      "id": "table-west",
+      "prop": "table-west",
+      "x": 415,
+      "y": 660
+    },
+    {
+      "id": "table-east",
+      "prop": "table-east",
+      "x": 670,
+      "y": 696
+    }
+  ]
+}

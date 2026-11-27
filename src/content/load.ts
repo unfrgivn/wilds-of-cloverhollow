@@ -26,6 +26,10 @@ import cavernData from "../../content/areas/cavern.json";
 import cavernPropsData from "../../content/props/cavern.json";
 import cafeData from "../../content/areas/cafe.json";
 import cafePropsData from "../../content/props/cafe.json";
+import marketData from "../../content/areas/market.json";
+import marketPropsData from "../../content/props/market.json";
+import parlorData from "../../content/areas/parlor.json";
+import parlorPropsData from "../../content/props/parlor.json";
 import sueCottageData from "../../content/areas/sue-cottage.json";
 import sueCottagePropsData from "../../content/props/sue-cottage.json";
 import jordanCabinData from "../../content/areas/jordan-cabin.json";
@@ -59,6 +63,8 @@ import hillsSurfaceData from "../../content/surfaces/hills.json";
 import sanctuarySurfaceData from "../../content/surfaces/sanctuary.json";
 import cavernSurfaceData from "../../content/surfaces/cavern.json";
 import cafeSurfaceData from "../../content/surfaces/cafe.json";
+import marketSurfaceData from "../../content/surfaces/market.json";
+import parlorSurfaceData from "../../content/surfaces/parlor.json";
 import sueCottageSurfaceData from "../../content/surfaces/sue-cottage.json";
 import jordanCabinSurfaceData from "../../content/surfaces/jordan-cabin.json";
 import artRoomSurfaceData from "../../content/surfaces/art-room.json";
@@ -107,6 +113,8 @@ import musicFixtureData from "../../content/fixtures/music.json";
 import arcadeFixtureData from "../../content/fixtures/arcade.json";
 import cavernFixtureData from "../../content/fixtures/cavern.json";
 import cafeFixtureData from "../../content/fixtures/cafe.json";
+import marketFixtureData from "../../content/fixtures/market.json";
+import parlorFixtureData from "../../content/fixtures/parlor.json";
 import sanctuaryFixtureData from "../../content/fixtures/sanctuary.json";
 import sueCottageFixtureData from "../../content/fixtures/sue-cottage.json";
 import jordanCabinFixtureData from "../../content/fixtures/jordan-cabin.json";
@@ -710,6 +718,8 @@ export function loadContent(): {
   const sanctuary = loadArea(sanctuaryData, sanctuaryPropsData, "sanctuary");
   const cavern = loadArea(cavernData, cavernPropsData, "cavern");
   const cafe = loadArea(cafeData, cafePropsData, "cafe");
+  const market = loadArea(marketData, marketPropsData, "market");
+  const parlor = loadArea(parlorData, parlorPropsData, "parlor");
   const sueCottage = loadArea(sueCottageData, sueCottagePropsData, "sue-cottage");
   const jordanCabin = loadArea(jordanCabinData, jordanCabinPropsData, "jordan-cabin");
   const artRoom = loadArea(artRoomData, artRoomPropsData, "art-room");
@@ -827,6 +837,8 @@ export function loadContent(): {
     arcade: loadFixture(arcadeFixtureData, "arcade"),
     cavern: loadFixture(cavernFixtureData, "cavern"),
     cafe: loadFixture(cafeFixtureData, "cafe"),
+    market: loadFixture(marketFixtureData, "market"),
+    parlor: loadFixture(parlorFixtureData, "parlor"),
     sanctuary: loadFixture(sanctuaryFixtureData, "sanctuary"),
     "sue-cottage": loadFixture(sueCottageFixtureData, "sue-cottage"),
     "jordan-cabin": loadFixture(jordanCabinFixtureData, "jordan-cabin"),
@@ -861,6 +873,8 @@ export function loadContent(): {
     [sanctuary.id]: sanctuary,
     [cavern.id]: cavern,
     [cafe.id]: cafe,
+    [market.id]: market,
+    [parlor.id]: parlor,
     [sueCottage.id]: sueCottage,
     [jordanCabin.id]: jordanCabin,
   };
@@ -877,6 +891,8 @@ export function loadContent(): {
     sanctuary: sanctuarySurfaceData,
     cavern: cavernSurfaceData,
     cafe: cafeSurfaceData,
+    market: marketSurfaceData,
+    parlor: parlorSurfaceData,
     "sue-cottage": sueCottageSurfaceData,
     "jordan-cabin": jordanCabinSurfaceData,
     "art-room": artRoomSurfaceData,

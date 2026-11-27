@@ -179,5 +179,19 @@
       10
     ],
     "scale": 0.48
+  },
+  "pippin": {
+    "atlas": "assets/characters/pippin/pippin.json",
+    "idleTicks": [
+      175,
+      8
+    ]
+  },
+  "penny": {
+    "atlas": "assets/characters/penny/penny.json",
+    "idleTicks": [
+      165,
+      8
+    ]
   }
 }

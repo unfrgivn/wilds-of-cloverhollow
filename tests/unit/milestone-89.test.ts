@@ -280,6 +280,8 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
       enchanted: "down",
       kitchen: "down",
       trail: "up",
+      market: "left",
+      parlor: "right",
     };
 
     for (const spot of REST_SPOTS) {

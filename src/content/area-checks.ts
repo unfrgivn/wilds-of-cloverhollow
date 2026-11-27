@@ -485,19 +485,37 @@ export function areaConnectionErrors(
     }
     // A den's critters start at its point (spec 6): it must be on the floor,
     // and far enough from every spawn and door that Fae arriving there isn't
-    // in its sight, nor caught the moment she steps through.
+    // in its sight, nor caught the moment she steps through. Single-door
+    // peaceful indoor shop portals whose rollWild keeps nearby dens quiet on
+    // return still must keep their door and doorstep clear of the den's touch.
+    const quietShopDoor = (trigger: Area["triggers"][number]): boolean => {
+      const target = areas[trigger.target.area];
+      return target !== undefined &&
+        target.critters.length === 0 &&
+        target.recurring === undefined &&
+        target.triggers.length === 1 &&
+        target.triggers[0]?.target.area === area.id &&
+        target.triggers[0]?.target.spawn === trigger.id;
+    };
+    const quietShopSpawns = new Set(
+      area.triggers.filter(quietShopDoor).map((trigger) => trigger.id),
+    );
     area.recurring?.dens.forEach((den, index) => {
       const touch = Math.max(...den.kinds.map((kind) => critters[kind]?.touchRadius ?? 70));
       const clear = tunables.roam.sight + touch;
       if (!walkable(area, solidOf(area, closedScenario(area)), tunables.follow.radius, den.point))
         errors.push(`${area.id}: den ${index} is off the floor`);
-      for (const [name, spawn] of Object.entries(area.spawns))
-        if (distance(spawn, den.point) <= clear)
-          errors.push(`${area.id}: den ${index} is within ${clear} of spawn ${name}`);
-      for (const trigger of area.triggers)
+      for (const [name, spawn] of Object.entries(area.spawns)) {
+        const minGap = quietShopSpawns.has(name) ? touch : clear;
+        if (distance(spawn, den.point) <= minGap)
+          errors.push(`${area.id}: den ${index} is within ${minGap} of spawn ${name}`);
+      }
+      for (const trigger of area.triggers) {
+        const minGap = quietShopDoor(trigger) ? touch : den.radius + touch;
         if (pointInPolygon(den.point, trigger.polygon) ||
-            distanceToPolygon(den.point, trigger.polygon) <= den.radius + touch)
+            distanceToPolygon(den.point, trigger.polygon) <= minGap)
           errors.push(`${area.id}: den ${index} reaches door ${trigger.id}`);
+      }
       // Its critters must be seen: a den mostly behind scenery hides them.
       // At sample spots on rings round the den, no more than a tenth may have
       // over half a critter's body (50 by 70 units) drawn behind scenery.

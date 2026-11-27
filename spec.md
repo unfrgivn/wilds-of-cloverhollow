@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 118)
+Last updated: 2026-11-27 (Milestone 130)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -500,11 +500,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   and below `depth` (with a pooled `footstepLayer` above it) to ground Fae, party
   members, visible NPCs (hover shadows under the four fairies, skipping the
   painted `bus-stop`, soft indoor `0.24` alpha across all 14 indoor rooms in
-  `INDOOR_AREAS` including `cafe`, `sue-cottage`, and `jordan-cabin` vs `0.30`
-  outdoors, and `52 px` adult contact shadows / `132 px` adult emote head
-  clearance across all 13 adult townspeople in `ADULT_NPCS`: `mom`, `dad`,
-  `teacher`, `nurse`, `coach`, `music-teacher`, `fern`, `chef`, `barnaby`,
-  `bree`, `buster`, `bay-keeper`, and `pass-keeper`, Milestone 123), and
+  `INDOOR_AREAS` including `cafe`, `market`, `parlor`, `sue-cottage`, and
+  `jordan-cabin` vs `0.30` outdoors, and `52 px` adult contact shadows / `132 px`
+  adult emote head clearance across all 15 adult townspeople in `ADULT_NPCS`:
+  `mom`, `dad`, `teacher`, `nurse`, `coach`, `music-teacher`, `fern`, `chef`,
+  `barnaby`, `bree`, `buster`, `bay-keeper`, `pass-keeper`, `pippin`, and
+  `penny`, Milestone 123), and
   overworld critters (scaling slightly as characters
   bounce or hover); a deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`,
   with pure stateless zero-Pixi particle recipes and `evaluateAtmosphere` extracted
@@ -1283,6 +1284,54 @@ ios/            Capacitor iOS project (from Milestone 4).
   atmosphere (`src/render/atmosphere.ts`) adds warm counter glows, two NW
   window sunbeams, and ten rising cocoa-steam motes; its soundtrack plays
   `"cafe"` ("Cinnamon Waltz") with `"cafe-murmur"` ambience (`src/core/music.ts`).
+- Cloverhollow's Final Two Plaza Shops (`market` & `parlor`, making all five
+  painted buildings on Cloverhollow Town Plaza enterable):
+  - `market`, "Cloverhollow Grocery Market", in the `cloverhollow` land, a
+    1200x800 painted isometric cutaway off the plaza's Grocery Store door
+    (plaza trigger `market-door` at x=672..728, y=335..368 -> `market.door`;
+    return spawn `plaza.market-door` at (685, 415) facing down, keeping
+    sidewalk talk windows `grocery` at (655, 345) and `ice-cream` at (895, 340)
+    untouched). Inside, the back-left sage door returns to `plaza.market-door`
+    (`door` spawn at (315, 535) facing right). Its 2-prop alpha-WebP kit lifts
+    `produce-island` at (668, 496) and `berry-barrel` at (756, 680); floor
+    surface is wood with carpet polygons for the entrance doormat and checkout
+    counter rug. Blinking adult shopkeeper Grocer Pippin (`pippin`, `grocer_pippin`)
+    greets Fae on first visit (`market_visited`) with a free Orchard Apple sample
+    (`gift: snack 1`) and runs a sticky treat & snack shop (`orchard-apple` 8,
+    `fish-cracker` 8, `snack` 5). Three Look spots (`market-produce`,
+    `market-shelves`, `market-berries`) and one blacklight lantern glow
+    `market-list-glow` (`frame: "ink_note"`, `market_list_glow`, sets
+    `market_note_read`, `gift: coins 10`, `chime-yellow`) share orchard treat
+    tips. Its fixture `market` starts at `door` with Maddie, Sue, Jordan, and
+    the blacklight lantern; its atmosphere adds two golden NW window sunbeams
+    and ten produce-stand warmth motes; its soundtrack plays `"home"`
+    ("Cloverhollow Town") with `"cafe-murmur"` ambience.
+  - `parlor`, "Sweet Scoop Ice Cream Parlor", in the `cloverhollow` land, a
+    1200x800 painted isometric cutaway off the plaza's Ice Cream Parlor door
+    (plaza trigger `parlor-door` at x=912..964, y=335..364 -> `parlor.door`;
+    return spawn `plaza.parlor-door` at (948, 410) facing down). Inside, the
+    back-left sky-blue door returns to `plaza.parlor-door` (`door` spawn at
+    (280, 555) facing right). Its 2-prop alpha-WebP kit lifts `table-west` at
+    (415, 660) and `table-east` at (670, 696); floor surface is tile with a
+    carpet polygon for the scalloped cream doormat. Blinking adult shopkeeper
+    Scooper Penny (`penny`, `scooper_penny`) offers a first-visit free
+    "Cloverhollow Dream Sundae" tasting choice (`Strawberry Swirl!`, `Mint Cloud
+    Chip!`, or `Warm Honey Caramel!` with Maddie/Sue/Jordan reactions,
+    `gift: snack 1`, `chime-blue`, `parlor_visited`) and runs a sticky treat
+    shop (`berry-cone` 10, `cocoa-sundae` 12). Three Look spots (`parlor-gelato`,
+    `parlor-menu`, `parlor-window`) and one blacklight lantern glow
+    `parlor-secret-glow` (`frame: "ink_note"`, `parlor_secret_glow`, sets
+    `parlor_note_read`, `gift: coins 10`, `chime-yellow`) reveal the "Secret
+    Sundae Club" doodle. Its fixture `parlor` starts at `door` with Maddie, Sue,
+    Jordan, and the blacklight lantern; its atmosphere adds two pastel window
+    sunbeams and ten mint-pink gelato-case shimmer sparkles; its soundtrack
+    plays `"cafe"` ("Cinnamon Waltz") with `"cafe-murmur"` ambience.
+  - Quiet shop-exit arrival (`src/core/roam.ts` & `src/content/area-checks.ts`):
+    `rollWild` always draws two PRNG values per den (preserving RNG cadence) and
+    suppresses spawning a wild critter from any den within `sight + touch` of
+    Fae's arrival position so stepping out of single-door plaza shops (`market`,
+    `parlor`) back onto Cloverhollow Plaza never ambushes Fae beside the north
+    plaza den.
 - The Wildlife Sanctuary: `sanctuary`, "Wildlife Sanctuary", in the `hills`
   land, a 1650x1100 sunlit alpine meadow branching east off Clover Hills
   (`hills` trigger `sanctuary` at x=1555..1615, y=375..445 ->
@@ -1433,9 +1482,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
     chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
-    across 16 areas (`plaza`, `park`, `bay`, `cafe`, `lodge`, `clubhouse`,
-    `sue-cottage`, `jordan-cabin`, `sanctuary`, `bedroom`, `kitchen`, `pass`,
-    `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
+    across 18 areas (`plaza`, `park`, `bay`, `cafe`, `market`, `parlor`,
+    `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`, `sanctuary`,
+    `bedroom`, `kitchen`, `pass`, `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
     pose with a warm harp chord and lazily drifting `emoteNote` (`♪`) until any
     movement, cancel, menu, or confirm input stands her back up.
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),

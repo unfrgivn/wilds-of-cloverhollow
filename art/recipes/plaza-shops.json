@@ -1,0 +1,31 @@
+{
+  "asset": "plaza-shops",
+  "date": "2026-11-27",
+  "summary": "Cloverhollow Plaza's remaining two enterable shops (NOTES.md: 42): Cloverhollow Grocery Market (`market`, 1200x800 cutaway, paper #fcf5ed, 55 KB alpha-WebP kit with produce-island & berry-barrel), Sweet Scoop Ice Cream Parlor (`parlor`, 1200x800 cutaway, paper #fffbf6, 56 KB alpha-WebP kit with table-west & table-east), and blinking shopkeepers Grocer Pippin (`pippin`, 66 KB WebP) and Scooper Penny (`penny`, 70 KB WebP).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 12,
+  "references": [
+    "art/source/areas/lodge/lodge-final.png",
+    "art/source/areas/classroom/classroom-final.png",
+    "art/source/areas/art-room/art-room-final.png",
+    "docs/art/concepts/props/town_shops_buildings.png",
+    "docs/art/concepts/npcs/fae_family.png",
+    "art/source/townspeople/barnaby/sheet-raw.png"
+  ],
+  "kept": {
+    "market": "art/source/areas/market/painting/ground.json",
+    "parlor": "art/source/areas/parlor/painting/ground.json",
+    "pippin": "art/source/plaza-keepers/pippin/sheet-raw.png",
+    "penny": "art/source/plaza-keepers/penny/sheet-raw.png"
+  },
+  "commands": [
+    "bun tools/art/build-plaza-keepers.ts",
+    "bun tools/art/kit.ts market gen && masks && fill && pack",
+    "bun tools/art/kit.ts parlor gen && masks && fill && pack",
+    "convert props-0.png -> props-0.webp (quality 92, alpha-quality 100)"
+  ],
+  "review": [
+    "art/review/plaza-keepers-cream.jpg",
+    "art/review/plaza-keepers-dark.jpg"
+  ]
+}

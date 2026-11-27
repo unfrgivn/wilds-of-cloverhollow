@@ -1,0 +1,27 @@
+{
+  "area": "parlor",
+  "subjects": [
+    {
+      "id": "table-west",
+      "crop": [295, 460, 230, 225],
+      "seed": [415, 550],
+      "home": [415, 660],
+      "painted": true,
+      "canopy": false,
+      "ground": "the cream and pale-mint checkered parlor tile floor",
+      "object": "the complete upper-left round cream pedestal ice-cream parlor table with its napkin holder and shaker on top together with BOTH round wooden stools flanking it, including all legs and warm-brown ink outlines; not the checkered floor tiles or door mat",
+      "footprint": [[[319, 612], [351, 595], [417, 602], [499, 646], [465, 662], [352, 626]]]
+    },
+    {
+      "id": "table-east",
+      "crop": [550, 520, 240, 200],
+      "seed": [668, 615],
+      "home": [670, 696],
+      "painted": true,
+      "canopy": false,
+      "ground": "the cream and pale-mint checkered parlor tile floor",
+      "object": "the complete lower-right round cream pedestal ice-cream parlor table with its napkin holder and shaker on top together with BOTH round wooden stools flanking it, including all legs and warm-brown ink outlines; not the checkered floor tiles or gelato counter",
+      "footprint": [[[575, 674], [606, 657], [668, 665], [735, 667], [767, 682], [735, 698], [668, 695], [606, 688]]]
+    }
+  ]
+}

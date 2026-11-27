@@ -1,0 +1,13 @@
+{
+  "area": "parlor",
+  "spawn": "door",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "variables": {
+    "has_lantern": true
+  }
+}

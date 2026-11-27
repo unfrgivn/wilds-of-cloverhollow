@@ -1,0 +1,175 @@
+{
+  "id": "market",
+  "name": "Cloverhollow Grocery Market",
+  "land": "cloverhollow",
+  "ground": "market",
+  "width": 1200,
+  "height": 800,
+  "walkable": [
+    [
+      44,
+      535
+    ],
+    [
+      600,
+      288
+    ],
+    [
+      609,
+      339
+    ],
+    [
+      788,
+      405
+    ],
+    [
+      854,
+      431
+    ],
+    [
+      858,
+      507
+    ],
+    [
+      1010,
+      567
+    ],
+    [
+      1067,
+      540
+    ],
+    [
+      1120,
+      524
+    ],
+    [
+      1158,
+      510
+    ],
+    [
+      582,
+      780
+    ]
+  ],
+  "blockers": [],
+  "glows": [
+    {
+      "id": "market-list-glow",
+      "frame": "ink_note",
+      "point": {
+        "x": 510,
+        "y": 395
+      },
+      "knot": "market_list_glow",
+      "prompt": "Look"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "door",
+      "polygon": [
+        [
+          118,
+          506
+        ],
+        [
+          233,
+          454
+        ],
+        [
+          254,
+          474
+        ],
+        [
+          139,
+          526
+        ]
+      ],
+      "target": {
+        "area": "plaza",
+        "spawn": "market-door"
+      }
+    }
+  ],
+  "spawns": {
+    "door": {
+      "x": 315,
+      "y": 535,
+      "facing": "right"
+    }
+  },
+  "interactables": [
+    {
+      "id": "market-produce",
+      "knot": "market_produce",
+      "point": {
+        "x": 655,
+        "y": 496
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "market-shelves",
+      "knot": "market_shelves",
+      "point": {
+        "x": 820,
+        "y": 420
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "market-berries",
+      "knot": "market_berries",
+      "point": {
+        "x": 756,
+        "y": 680
+      },
+      "prompt": "Look"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "pippin",
+      "point": {
+        "x": 825,
+        "y": 520
+      },
+      "facing": "left",
+      "knot": "grocer_pippin",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          810,
+          510
+        ],
+        [
+          840,
+          510
+        ],
+        [
+          840,
+          530
+        ],
+        [
+          810,
+          530
+        ]
+      ]
+    }
+  ],
+  "critters": [],
+  "props": [
+    {
+      "id": "produce-island",
+      "prop": "produce-island",
+      "x": 668,
+      "y": 496
+    },
+    {
+      "id": "berry-barrel",
+      "prop": "berry-barrel",
+      "x": 756,
+      "y": 680
+    }
+  ]
+}

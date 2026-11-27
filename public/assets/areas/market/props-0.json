@@ -1,0 +1,60 @@
+{
+  "frames": {
+    "produce-island": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 510,
+        "h": 405
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 510,
+        "h": 405
+      },
+      "sourceSize": {
+        "w": 510,
+        "h": 405
+      },
+      "anchor": {
+        "x": 0.50392,
+        "y": 0.99012
+      }
+    },
+    "berry-barrel": {
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 190,
+        "h": 229
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 190,
+        "h": 229
+      },
+      "sourceSize": {
+        "w": 190,
+        "h": 229
+      },
+      "anchor": {
+        "x": 0.47368,
+        "y": 0.9607
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 405
+    },
+    "scale": "1"
+  }
+}

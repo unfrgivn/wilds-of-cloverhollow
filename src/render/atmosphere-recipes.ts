@@ -95,6 +95,8 @@ const LILAC_TINTS: readonly number[] = [0xe2c8ff, 0xf6eaff];
 const FIREFLY_TINTS: readonly number[] = [0xf9da8e, 0xa8f0d8];
 const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
 const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
+const MARKET_MOTE_TINTS: readonly number[] = [0xfff4cc, 0xf9db8e, 0xffd99e];
+const PARLOR_MOTE_TINTS: readonly number[] = [0xffc6df, 0xb8f3e4, 0xfff5d4];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
 const COTTAGE_MOTE_TINTS: readonly number[] = [0xfff8e2, 0xc7f7ee, 0xffe6ba];
 const CLUBHOUSE_BLOOM_TINTS: readonly number[] = [0xfff2b2, 0xf9d28c, 0xf7b2c7];
@@ -864,6 +866,94 @@ export function evaluateAtmosphere(
           tint: 0xffe2a8,
         });
       }
+    }
+    return out;
+  }
+
+  if (areaId === "market") {
+    // 2 warm golden window sunbeams streaming from the NW arched grocery window.
+    const beams: readonly [number, number, number][] = [
+      [425, 395, 1.9],
+      [505, 465, 1.7],
+    ];
+    beams.forEach(([bx, by, scale], i) => {
+      const alpha = 0.06 + 0.008 * Math.sin(tick * 0.017 + i * 2.1);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: bx,
+        y: by,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff3cb,
+      });
+    });
+    // 10 soft golden produce-stand warmth motes drifting across the market floor.
+    addFloatingMotes(out, seed + 655, width, height, tick, 10, MARKET_MOTE_TINTS, {
+      marginX: 200,
+      marginY: 210,
+      driftX: 0.07,
+      driftY: -0.08,
+      minScale: 0.17,
+      maxScale: 0.34,
+      minAlpha: 0.17,
+      maxAlpha: 0.42,
+    });
+    return out;
+  }
+
+  if (areaId === "parlor") {
+    // 2 pastel sunlit window sunbeams streaming from the blue-striped parlor window.
+    const beams: readonly [number, number, number][] = [
+      [395, 405, 1.85],
+      [475, 470, 1.65],
+    ];
+    beams.forEach(([bx, by, scale], i) => {
+      const alpha = 0.058 + 0.008 * Math.sin(tick * 0.018 + i * 2.2);
+      out.push({
+        layer: "over",
+        texture: "sunbeam",
+        blend: "add",
+        x: bx,
+        y: by,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(alpha),
+        tint: 0xfff8e2,
+      });
+    });
+    // 10 gentle mint-pink parlor shimmer sparkles dancing above the curved gelato case.
+    for (let i = 0; i < 10; i += 1) {
+      const h0 = hash01(seed + i * 43 + 11);
+      const h1 = hash01(seed + i * 43 + 12);
+      const h2 = hash01(seed + i * 43 + 13);
+      const h3 = hash01(seed + i * 43 + 14);
+      const x = 670 + wrap(
+        h0 * 410 + tick * (0.06 + h2 * 0.05) + Math.sin(tick * 0.02 + h3 * 6.28) * 10,
+        410,
+      );
+      const y = 360 + wrap(
+        h1 * 185 - tick * (0.05 + h3 * 0.04) + Math.cos(tick * 0.018 + h0 * 6.28) * 8,
+        185,
+      );
+      const twinkle = 0.5 + 0.5 * Math.sin(tick * (0.045 + h3 * 0.04) + h1 * Math.PI * 2);
+      const scale = 0.18 + h2 * 0.18;
+      out.push({
+        layer: "over",
+        texture: "sparkle",
+        blend: "add",
+        x,
+        y,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: clamp01(0.18 + twinkle * 0.28),
+        tint: pickTint(PARLOR_MOTE_TINTS, i),
+      });
     }
     return out;
   }

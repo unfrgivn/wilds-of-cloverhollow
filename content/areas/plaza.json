@@ -381,6 +381,56 @@
         "area": "cafe",
         "spawn": "door"
       }
+    },
+    {
+      "id": "market-door",
+      "polygon": [
+        [
+          672,
+          335
+        ],
+        [
+          728,
+          335
+        ],
+        [
+          728,
+          368
+        ],
+        [
+          672,
+          368
+        ]
+      ],
+      "target": {
+        "area": "market",
+        "spawn": "door"
+      }
+    },
+    {
+      "id": "parlor-door",
+      "polygon": [
+        [
+          912,
+          335
+        ],
+        [
+          964,
+          335
+        ],
+        [
+          964,
+          364
+        ],
+        [
+          912,
+          364
+        ]
+      ],
+      "target": {
+        "area": "parlor",
+        "spawn": "door"
+      }
     }
   ],
   "interactables": [
@@ -469,6 +519,16 @@
     "cafe-door": {
       "x": 1068,
       "y": 452,
+      "facing": "down"
+    },
+    "market-door": {
+      "x": 685,
+      "y": 415,
+      "facing": "down"
+    },
+    "parlor-door": {
+      "x": 948,
+      "y": 410,
       "facing": "down"
     }
   },

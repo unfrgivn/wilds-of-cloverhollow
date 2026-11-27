@@ -1,0 +1,60 @@
+{
+  "frames": {
+    "table-west": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 370,
+        "h": 365
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 370,
+        "h": 365
+      },
+      "sourceSize": {
+        "w": 370,
+        "h": 365
+      },
+      "anchor": {
+        "x": 0.52432,
+        "y": 0.9863
+      }
+    },
+    "table-east": {
+      "frame": {
+        "x": 372,
+        "y": 0,
+        "w": 390,
+        "h": 317
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 317
+      },
+      "sourceSize": {
+        "w": 390,
+        "h": 317
+      },
+      "anchor": {
+        "x": 0.49744,
+        "y": 0.98107
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 365
+    },
+    "scale": "1"
+  }
+}

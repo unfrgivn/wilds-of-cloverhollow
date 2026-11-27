@@ -48,6 +48,8 @@ export const INDOOR_AREAS = new Set([
   "lodge",
   "clubhouse",
   "cafe",
+  "market",
+  "parlor",
   "sue-cottage",
   "jordan-cabin",
 ]);
@@ -66,6 +68,8 @@ export const ADULT_NPCS = new Set([
   "buster",
   "bay-keeper",
   "pass-keeper",
+  "pippin",
+  "penny",
 ]);
 
 export const SURFACE_PUFFS: Record<Surface, { tint: number; alpha: number }> = {

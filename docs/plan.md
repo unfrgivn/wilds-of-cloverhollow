@@ -5757,6 +5757,52 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4491 just e2e` (1,160 passed, 2 skipped, 0 snapshot
   diffs across Chromium & WebKit).
 
+## Milestone 130: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor **Status:** ✅ Completed (2026-11-27)
+- Completed all five enterable buildings on Cloverhollow Town Plaza
+  (`NOTES.md: 42`: Fae's House, Grocery Market, Ice Cream Parlor, Bon Appetit
+  Café, and Arcade), keeping existing sidewalk windows (`grocery`, `ice-cream`,
+  `bakery`) and all 67 earlier recorded runs untouched:
+  - **Cloverhollow Plaza doors (`content/areas/plaza.json`, `triggers` & `spawns` only)**:
+    added `market-door` (`x: 672..728, y: 335..368` -> `market.door`, return
+    spawn `(685, 415)`) and `parlor-door` (`x: 912..964, y: 335..364` ->
+    `parlor.door`, return spawn `(948, 410)`). Updated `rollWild`
+    (`src/core/roam.ts`) to keep exact 2-draw-per-den PRNG parity while
+    suppressing ambushes from dens within `sight + touch` of arrival, and
+    relaxed `areaConnectionErrors` (`src/content/area-checks.ts`) for peaceful
+    indoor shop return spawns accordingly.
+  - **Cloverhollow Grocery Market (`market`, 1200x800 cutaway, `land: "cloverhollow"`)**:
+    two-tile WebP plate (`paper #fcf5ed`), 2-prop alpha-WebP kit
+    (`produce-island` & `berry-barrel`, `55 KB`, `rebuilt vs painting 0.00%`),
+    `wood` + `carpet` surfaces, golden window sunbeams + produce warmth motes
+    (`src/render/atmosphere-recipes.ts`), `market-rug` companion rest spot
+    (`src/render/companions.ts`), `"home"` / `"cafe-murmur"` audio, blinking
+    **Grocer Pippin (`pippin`, `66 KB` WebP)** with free Orchard Apple sample +
+    sticky treat/snack shop, 3 Look spots, and blacklight `market-list-glow`
+    (`+10` coins).
+  - **Sweet Scoop Ice Cream Parlor (`parlor`, 1200x800 cutaway, `land: "cloverhollow"`)**:
+    two-tile WebP plate (`paper #fffbf6`), 2-prop alpha-WebP kit (`table-west`
+    & `table-east`, `56 KB`, `rebuilt vs painting 0.00%`), `tile` + `carpet`
+    surfaces, pastel window sunbeams + gelato shimmer sparkles, `parlor-sunbeam`
+    companion rest spot, `"cafe"` / `"cafe-murmur"` audio, blinking **Scooper
+    Penny (`penny`, `70 KB` WebP)** with interactive free "Cloverhollow Dream
+    Sundae" tasting (`Strawberry Swirl!`, `Mint Cloud Chip!`, `Warm Honey
+    Caramel!`) + sticky treat shop (`berry-cone` 10c, `cocoa-sundae` 12c), 3
+    Look spots, and blacklight `parlor-secret-glow` (`+10` coins).
+  - Registered `pippin` & `penny` in `content/characters.json`, `ADULT_NPCS` &
+    `INDOOR_AREAS` (`src/render/overworld-render.ts`), `src/ui/portraits.ts`,
+    and `src/platform/voices.ts`, plus Fae-voice journal notes (Milo unnamed).
+- Evidence: `tests/unit/plaza-shops.test.ts`, `tests/unit/plaza-shops-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/plaza-shops.json` (13,190 ticks,
+  zero shifted prior runs), real-key `tests/e2e/plaza-shops.spec.ts` matching
+  Bun's exact hash at 1280x720 and 874x402, and `vision`-verified
+  `art/review/{market,parlor}-{overlay,depth}.jpg`,
+  `art/review/plaza-keepers-{cream,dark}.jpg`, and
+  `art/review/plaza-shops-gameplay.jpg`.
+- Gates: `just check` (190 unit files / 1,414 tests, 68 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (zero chunk warnings,
+  production and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215
+  just e2e` (1,161 passed, 2 skipped, 0 failed across Chromium & WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

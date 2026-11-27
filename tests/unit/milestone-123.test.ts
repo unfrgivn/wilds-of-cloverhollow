@@ -30,7 +30,7 @@ function makeNpc(id: string): Npc {
 }
 
 describe("Milestone 123: Adult NPC & indoor shadow calibration + journal-map extraction", () => {
-  it("classifies all 14 indoor rooms in INDOOR_AREAS and excludes all 12 outdoor areas", () => {
+  it("classifies all 16 indoor rooms in INDOOR_AREAS and excludes all 12 outdoor areas", () => {
     const expectedIndoor = [
       "bedroom",
       "kitchen",
@@ -44,6 +44,8 @@ describe("Milestone 123: Adult NPC & indoor shadow calibration + journal-map ext
       "lodge",
       "clubhouse",
       "cafe",
+      "market",
+      "parlor",
       "sue-cottage",
       "jordan-cabin",
     ] as const;
@@ -74,7 +76,7 @@ describe("Milestone 123: Adult NPC & indoor shadow calibration + journal-map ext
     }
   });
 
-  it("calibrates all 13 adult NPCs to 132 height and 52 shadow width while preserving kids", () => {
+  it("calibrates all 15 adult NPCs to 132 height and 52 shadow width while preserving kids", () => {
     const adults = [
       "mom",
       "dad",
@@ -89,6 +91,8 @@ describe("Milestone 123: Adult NPC & indoor shadow calibration + journal-map ext
       "buster",
       "bay-keeper",
       "pass-keeper",
+      "pippin",
+      "penny",
     ] as const;
 
     const kids = ["milo", "rosie", "toby", "sue", "jordan"] as const;

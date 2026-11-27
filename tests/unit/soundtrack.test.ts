@@ -69,6 +69,8 @@ describe("soundtrackFor", () => {
       kitchen: ["home", "none"],
       plaza: ["home", "town-breeze"],
       cafe: ["cafe", "cafe-murmur"],
+      market: ["home", "cafe-murmur"],
+      parlor: ["cafe", "cafe-murmur"],
       park: ["home", "town-breeze"],
       hills: ["hills", "town-breeze"],
       sanctuary: ["sanctuary", "forest"],

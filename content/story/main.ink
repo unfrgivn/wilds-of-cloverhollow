@@ -83,6 +83,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{parlor_visited: I visited Sweet Scoop Ice Cream Parlor! Scooper Penny whipped up a free Cloverhollow Dream Sundae and scoops Berry Swirl Cones and Cozy Cocoa Sundaes. # speaker: Fae}
+{market_visited: I stepped inside Cloverhollow Grocery Market! Grocer Pippin shared a crisp orchard apple sample and stocks Orchard Apples and Fish Crackers for our critter friends. # speaker: Fae}
 {jordan_cabin_visited: I visited Jordan's timber cabin along the west trail at Pinecone Pass! He shared hot cocoa and his grandma's Pressed Alpine Clover. # speaker: Fae}
 {sue_cottage_visited: I visited Sue's mint-green beach cottage up the cove at Bubblegum Bay! She gave me her Sea-Glass Compass and a tip for catching the Golden Starfish Crown. # speaker: Fae}
 {sanctuary_reward_14: Ranger Fern wove me a Sanctuary Clover Wreath for welcoming so many calm critters to the Wildlife Sanctuary! # speaker: Fae}
@@ -3197,4 +3199,129 @@ Logged mountain & woodland friends in the snow tracks: {friends} of 8! # speaker
     -> DONE
 }
 Calm 3 mountain or woodland critters and check back for a Sanctuary Ranger thank-you basket! # speaker: Fae
+-> DONE
+
+// Cloverhollow's Final Two Plaza Shops: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor.
+VAR market_visited = false
+VAR market_note_read = false
+VAR parlor_visited = false
+VAR parlor_note_read = false
+
+=== grocer_pippin ===
+{market_visited: -> again}
+~ market_visited = true
+Well hello there, Fae! Welcome inside Cloverhollow Grocery Market! # speaker: Grocer Pippin
+Every morning I pick crisp red apples out by the orchard fence and bake tiny crunchy fish crackers so every critter in the valley has a favourite snack. # speaker: Grocer Pippin
+Here, take a complimentary Orchard Apple sample straight from the front crate! # speaker: Grocer Pippin # gift: snack 1
+Ooh, it smells so fresh and crunchy! Thank you, Grocer Pippin! # speaker: Fae
+Need any critter treats or trail snacks for your backpack today? # speaker: Grocer Pippin
+-> market_shop
+= again
+Welcome back to Cloverhollow Grocery Market, Fae! Fresh apples and crunchy crackers straight off the shelves! # speaker: Grocer Pippin
+-> market_shop
+= market_shop
+{coins() < 5:
+    Trail Snacks are 5 coins and critter treats are 8 coins apiece. Stop back in anytime your pockets jingle! # speaker: Grocer Pippin
+    -> DONE
+}
++ {coins() >= 8} [Orchard Apple — 8 coins (sweet critters love it!)]
+    Crisp orchard slices, wrapped in brown paper! Sweet critters in the meadows, hills, and caves adore these! # speaker: Grocer Pippin # buy-treat: orchard-apple 8
+    -> DONE
++ {coins() >= 8} [Fish Cracker — 8 coins (pond & bay friends love it!)]
+    Crunchy little fish crackers, warm from the jar! Pups, cats, and bay friends can't resist them! # speaker: Grocer Pippin # buy-treat: fish-cracker 8
+    -> DONE
++ {coins() >= 5} [Trail Snack — 5 coins]
+    One tidy trail snack wrapped up for the road! Happy exploring, Fae! # speaker: Grocer Pippin # buy: snack 5
+    -> DONE
++ [Just browsing!]
+    Take your time! The jam shelves smell especially cozy today. # speaker: Grocer Pippin
+    -> DONE
+
+=== market_produce ===
+Wooden produce bins brim with glossy red orchard apples, sunny oranges, and honey pears, all stacked into neat pyramids! # speaker: Fae
+-> DONE
+
+=== market_shelves ===
+Tidy rows of homemade strawberry jam jars, crusty golden bread loaves, and brown paper grocery bags line the pine shelves! # speaker: Fae
+-> DONE
+
+=== market_berries ===
+A stout timber barrel overflows with fresh wild berries picked along the meadow edges. # speaker: Fae
+{has_lantern: Wait... Grocer Pippin mentioned someone tucked a glowing grocery list over by the jam shelves! Let's switch on Jordan's blacklight lantern and take a peek. # speaker: Fae|A tiny chalk doodle on the barrel rim hints that someone tucked an invisible-ink grocery list over by the jam shelves!}
+-> DONE
+
+=== market_list_glow ===
+{market_note_read: -> again}
+~ market_note_read = true
+Under Jordan's blacklight lantern, a hidden lavender-ink recipe note lights up on the floorboards near the jam shelves! # speaker: Fae
+\"SECRET ORCHARD TIP: Sweet critters in the meadows, hills, and caves go wild for Orchard Apples, while bay & pond friends can't resist Fish Crackers!\" # speaker: Glow Note
+Ooh, and ten lucky change coins are tucked neatly under the note! # speaker: Fae # sound: chime-yellow # gift: coins 10
+-> DONE
+= again
+The glowing Cloverhollow Recipe Note shimmers softly: Orchard Apples for sweet meadow, hill, and cave critters, and Fish Crackers for bay and pond friends! # speaker: Fae
+-> DONE
+
+=== scooper_penny ===
+{parlor_visited: -> again}
+~ parlor_visited = true
+Yay, welcome inside Sweet Scoop Ice Cream Parlor, Fae! Pull up a stool! # speaker: Scooper Penny
+Every first-time visitor gets a complimentary Cloverhollow Dream Sundae made to order! Which flavor should I scoop for your crew? # speaker: Scooper Penny
++ [Strawberry Swirl!]
+    One towering Strawberry Swirl Dream Sundae, coming right up! # speaker: Scooper Penny # gift: snack 1 # sound: chime-blue
+    Maddie's whiskers twitch as she happily licks a tiny pink ribbon of foam right off her nose! # speaker: Fae
+    {sue_joined: Best strawberry swirl in town! Even sweeter than bay boardwalk taffy! # speaker: Sue}
+    {jordan_joined: Whoa, it tastes like fresh clubhouse berries! # speaker: Jordan}
+    -> parlor_shop
++ [Mint Cloud Chip!]
+    One fluffy Mint Cloud Chip Dream Sundae with crispy cocoa sprinkles! # speaker: Scooper Penny # gift: snack 1 # sound: chime-blue
+    Maddie gives one curious sniff, sneezes a tiny minty puff, and purrs like a motorboat! # speaker: Fae
+    {sue_joined: Minty and cool like a sea breeze! Ten out of ten! # speaker: Sue}
+    {jordan_joined: Reminds me of snowy Pinecone Pass air, only way tastier! # speaker: Jordan}
+    -> parlor_shop
++ [Warm Honey Caramel!]
+    One golden Warm Honey Caramel Dream Sundae, swirled nice and cozy! # speaker: Scooper Penny # gift: snack 1 # sound: chime-blue
+    Maddie curls right around Fae's boots, eyes half-closed in pure caramel bliss! # speaker: Fae
+    {sue_joined: Ooh, sticky-sweet perfection! Save me a spoonful! # speaker: Sue}
+    {jordan_joined: Now THAT is prime mountain-explorer fuel! # speaker: Jordan}
+    -> parlor_shop
+= again
+Welcome back to Sweet Scoop Ice Cream Parlor, Fae! The waffle cones are extra crispy today! # speaker: Scooper Penny
+-> parlor_shop
+= parlor_shop
+{coins() < 10:
+    Berry Swirl Cones are 10 coins and Cozy Cocoa Sundaes are 12 coins. Come cool off anytime! # speaker: Scooper Penny
+    -> DONE
+}
++ {coins() >= 10} [Berry Swirl Cone — 10 coins (sunny friends & shopkeepers love it!)]
+    One double-scoop Berry Swirl Cone! Sunny critters and Cloverhollow shopkeepers adore this scoop! # speaker: Scooper Penny # buy-treat: berry-cone 10
+    -> DONE
++ {coins() >= 12} [Cozy Cocoa Sundae — 12 coins (cozy winter & cave friends love it!)]
+    One warm Cozy Cocoa Sundae with fluffy marshmallows! Winter and cave friends melt into smiles for this! # speaker: Scooper Penny # buy-treat: cocoa-sundae 12
+    -> DONE
++ [Just admiring the flavors!]
+    Keep cool out there, Fae! Our pastel tubs are always ready for a scoop break! # speaker: Scooper Penny
+    -> DONE
+
+=== parlor_gelato ===
+Seven pastel tubs of strawberry, mint, vanilla-bean, and hot-cocoa swirl ice cream gleam beneath the curved glass case beside tall stacks of crispy waffle cones! # speaker: Fae
+-> DONE
+
+=== parlor_menu ===
+Hand-lettered pastel chalk spells out today's parlor specials: Berry Swirl Cones, Cozy Cocoa Sundaes, and Double-Scoop Rainbow Bowls! # speaker: Fae
+-> DONE
+
+=== parlor_window ===
+Through the sunny blue-striped awning window, Cloverhollow Plaza's fountain sparkles beside the flower planters! # speaker: Fae
+{has_lantern: A tiny pastel sticker on the sill winks about a \"Secret Sundae Club\" invisible-ink doodle over by the curved gelato case! # speaker: Fae|A tiny pastel sticker on the sill winks about an invisible-ink \"Secret Sundae Club\" doodle hidden near the curved gelato case! # speaker: Fae}
+-> DONE
+
+=== parlor_secret_glow ===
+{parlor_note_read: -> again}
+~ parlor_note_read = true
+Under Jordan's blacklight lantern, a sparkling lavender \"Secret Sundae Club\" doodle glows right beside the curved gelato case! # speaker: Fae
+\"SCOOP MASTER SECRET: Try sharing a Berry Swirl Cone or Cozy Cocoa Sundae in battle—seeing their favourite treat melts chaos fizz right away!\" # speaker: Glow Note
+And ten shiny parlor coins gleam neatly beside the secret doodle! # speaker: Fae # sound: chime-yellow # gift: coins 10
+-> DONE
+= again
+The sparkling \"Secret Sundae Club\" glow-ink doodle reminds Fae that sharing a critter's favourite Berry Swirl Cone or Cozy Cocoa Sundae melts chaos fizz right away! # speaker: Fae
 -> DONE

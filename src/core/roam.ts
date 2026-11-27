@@ -69,7 +69,10 @@ export function rollWild(world: World, state: State, area: Area): Pick<State, "w
     const [pick, picked] = nextRandom(drawn);
     random = picked;
     const kind = den.kinds[Math.floor(pick * den.kinds.length)];
-    if (out >= den.chance || kind === undefined) return;
+    const touch = Math.max(...den.kinds.map((id) => world.critters[id]?.touchRadius ?? 70));
+    const clear = world.tunables.roam.sight + touch;
+    if (out >= den.chance || kind === undefined || distance(state.player, den.point) <= clear)
+      return;
     wild.push({
       kind,
       den: index,

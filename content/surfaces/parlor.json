@@ -1,0 +1,27 @@
+{
+  "precedence": "first",
+  "default": "tile",
+  "regions": [
+    {
+      "surface": "carpet",
+      "polygon": [
+        [
+          104,
+          525
+        ],
+        [
+          207,
+          480
+        ],
+        [
+          270,
+          510
+        ],
+        [
+          167,
+          557
+        ]
+      ]
+    }
+  ]
+}

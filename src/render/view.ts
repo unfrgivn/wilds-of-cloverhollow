@@ -521,7 +521,7 @@ export class GameView {
       livingMotion,
       reducedMotion,
     );
-    const npcLife = this.npcLife.update(state);
+    const npcLife = this.npcLife.update(state, livingMotion);
     this.entities.renderNpcs(state, shadowAlpha, livingMotion, npcLife, this.npcLife);
     this.npcLife.renderReactions(state, livingMotion);
     this.effects.renderClubhouseDisplay(state, area, reducedMotion);
@@ -738,8 +738,15 @@ export class GameView {
     ) {
       return null;
     }
+    const partyMember = this.world.party[chatter.npcId];
+    const headOffset =
+      partyMember !== undefined
+        ? partyMember.box.height + 18
+        : chatter.adult
+          ? 190
+          : 158;
     const point = worldToScreen(
-      { x: chatter.x, y: chatter.y - (chatter.adult ? 190 : 158) },
+      { x: chatter.x, y: chatter.y - headOffset },
       this.previousCamera,
       this.viewWidth,
       this.viewHeight,

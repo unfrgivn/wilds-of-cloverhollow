@@ -238,6 +238,35 @@ export type NpcProfile = {
   favoriteParty: string[];
   rules: NpcAmbientRule[];
 };
+export type NpcChatterTone =
+  | "normal"
+  | "lantern"
+  | "worry"
+  | "warm"
+  | "banter"
+  | "music";
+export type NpcDialogueTurn = {
+  speaker: string;
+  text: string;
+};
+export type NpcPartyBanter = {
+  id: string;
+  area: string;
+  turns: NpcDialogueTurn[];
+  tone?: NpcChatterTone;
+  when?: NpcCondition;
+};
+export type NpcToolTrigger = "lantern" | "flute" | "lasso";
+export type NpcToolEventTone = "lantern" | "music" | "warm";
+export type NpcToolEvent = {
+  id: string;
+  area: string;
+  trigger: NpcToolTrigger;
+  radius: number;
+  tone: NpcToolEventTone;
+  turns: NpcDialogueTurn[];
+  when?: NpcCondition;
+};
 export type NpcBanterPair = {
   id: string;
   area: string;
@@ -248,6 +277,8 @@ export type NpcBanterPair = {
 export type NpcProfilesContent = {
   profiles: NpcProfile[];
   banter: NpcBanterPair[];
+  partyBanter?: NpcPartyBanter[];
+  toolEvents?: NpcToolEvent[];
 };
 export type GroundManifest = {
   paper: string;
@@ -280,6 +311,8 @@ export type World = {
   treats: TreatItem[];
   npcProfiles: Record<string, NpcProfile>;
   npcBanter: NpcBanterPair[];
+  partyBanter: NpcPartyBanter[];
+  toolEvents: NpcToolEvent[];
 };
 export type TreatItem = {
   id: string;

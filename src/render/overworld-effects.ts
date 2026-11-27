@@ -611,6 +611,31 @@ export class OverworldEffectsController {
         index,
       });
     });
+    const maddieNapping = nappingMembers.some((member) => member.stillTicks >= 240);
+    npcLife.party.forEach((entry, index) => {
+      if (entry.emote === null || entry.id === activeChatterNpcId) return;
+      if (entry.id === "maddie" && maddieNapping) return;
+      const showPartyEmote =
+        entry.attention === "party-chat" ||
+        npcLife.activeToolEventId !== null;
+      if (!showPartyEmote) return;
+      const content = this.world.party[entry.id];
+      if (content === undefined) return;
+      const member = state.party.find((item) => item.id === entry.id);
+      const prevMember = previousState?.party.find((item) => item.id === entry.id);
+      const pos =
+        member !== undefined && prevMember !== undefined && alpha < 1
+          ? interpolatePoint(prevMember, member, alpha)
+          : member ?? { x: entry.x, y: entry.y };
+      npcEmotes.push({
+        id: entry.id,
+        x: pos.x,
+        y: pos.y,
+        height: content.box.height,
+        kind: entry.emote,
+        index: npcLife.npcs.length + index,
+      });
+    });
 
     const emotes = evaluateOverworldEmotes({
       areaId: area.id,

@@ -4005,5 +4005,370 @@
         "calmed": "hooded-kid"
       }
     }
+  ],
+  "partyBanter": [
+    {
+      "id": "party-clubhouse-cozy",
+      "area": "clubhouse",
+      "tone": "banter",
+      "when": {
+        "notVariable": "garden_ripe"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Our tree house headquarters looks so cozy!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Wait till those sunberries sprout big!"
+        }
+      ]
+    },
+    {
+      "id": "party-clubhouse-ripe",
+      "area": "clubhouse",
+      "tone": "warm",
+      "when": {
+        "variable": "garden_ripe"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Fridge humming and ripe berries! Best base!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Dibs on the first strawberry snack, Fae!"
+        }
+      ]
+    },
+    {
+      "id": "party-cavern-crystals",
+      "area": "cavern",
+      "tone": "lantern",
+      "turns": [
+        {
+          "speaker": "jordan",
+          "text": "These glowing cavern crystals are epic!"
+        },
+        {
+          "speaker": "sue",
+          "text": "Like giant sea-glass tucked underground!"
+        }
+      ]
+    },
+    {
+      "id": "party-arcade-challenge",
+      "area": "arcade",
+      "tone": "banter",
+      "when": {
+        "calmed": "arcade-keeper"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Bet I beat your Skee-Ball score, Jordan!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "You're on! Then Comet Cruise rematch!"
+        }
+      ]
+    },
+    {
+      "id": "party-bay-breeze",
+      "area": "bay",
+      "tone": "warm",
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Smell that salty Bubblegum Bay breeze!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Best fishing dock in the whole valley!"
+        }
+      ]
+    },
+    {
+      "id": "party-pass-cocoa",
+      "area": "pass",
+      "tone": "warm",
+      "when": {
+        "areaCalm": true
+      },
+      "turns": [
+        {
+          "speaker": "jordan",
+          "text": "Pinecone Pass calls for cocoa and sleds!"
+        },
+        {
+          "speaker": "sue",
+          "text": "Only if we save marshmallows for Maddie!"
+        }
+      ]
+    },
+    {
+      "id": "party-parlor-flavors",
+      "area": "parlor",
+      "tone": "banter",
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Berry Swirl Cone wins every single time!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "No way, Cozy Cocoa Sundae is champion!"
+        }
+      ]
+    },
+    {
+      "id": "party-market-snacks",
+      "area": "market",
+      "tone": "banter",
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Ooh, crispy Fish Crackers on the shelf!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Grab Orchard Apples too for the trail!"
+        }
+      ]
+    },
+    {
+      "id": "party-sanctuary-meadow",
+      "area": "sanctuary",
+      "tone": "warm",
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Look how peaceful every animal is here!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "They all remember Fae calming them down!"
+        }
+      ]
+    },
+    {
+      "id": "party-enchanted-fizzy",
+      "area": "enchanted",
+      "tone": "worry",
+      "when": {
+        "variable": "forest_fizzy"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Whoa... look at that giant Ancient Tree!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Stay close, Fae. We've got your back!"
+        }
+      ]
+    },
+    {
+      "id": "party-enchanted-calm",
+      "area": "enchanted",
+      "tone": "warm",
+      "when": {
+        "notVariable": "forest_fizzy",
+        "calmed": "hooded-kid"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "The Ancient Tree glows so softly now!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "So glad Milo is part of the crew now!"
+        }
+      ]
+    },
+    {
+      "id": "party-sue-cottage",
+      "area": "sue-cottage",
+      "tone": "warm",
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Welcome to my beach cottage, you two!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Love all the shells by your workbench!"
+        }
+      ]
+    },
+    {
+      "id": "party-sue-cottage-maddie",
+      "area": "sue-cottage",
+      "tone": "warm",
+      "when": {
+        "notVariable": "jordan_joined"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Welcome to my beach cottage, Fae & Maddie!"
+        },
+        {
+          "speaker": "maddie",
+          "text": "Mrrp! *Maddie sniffs the sea-glass shells*"
+        }
+      ]
+    },
+    {
+      "id": "party-jordan-cabin",
+      "area": "jordan-cabin",
+      "tone": "warm",
+      "turns": [
+        {
+          "speaker": "jordan",
+          "text": "Mi casa es su casa, Fae and Sue!"
+        },
+        {
+          "speaker": "sue",
+          "text": "Your mountain cabin smells like pine!"
+        }
+      ]
+    },
+    {
+      "id": "party-plaza-finale",
+      "area": "plaza",
+      "tone": "warm",
+      "when": {
+        "calmed": "hooded-kid"
+      },
+      "turns": [
+        {
+          "speaker": "sue",
+          "text": "Cloverhollow Plaza looks so happy again!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Wait till Milo joins our next hangout!"
+        }
+      ]
+    }
+  ],
+  "toolEvents": [
+    {
+      "id": "cavern-crystal-resonance",
+      "area": "cavern",
+      "trigger": "lantern",
+      "radius": 360,
+      "tone": "lantern",
+      "turns": [
+        {
+          "speaker": "pebble",
+          "text": "UV resonance on the quartz, Gemma!"
+        },
+        {
+          "speaker": "gemma",
+          "text": "The stepping crystals are humming!"
+        }
+      ]
+    },
+    {
+      "id": "mist-bluebell-awakening",
+      "area": "mist",
+      "trigger": "lantern",
+      "radius": 340,
+      "tone": "lantern",
+      "turns": [
+        {
+          "speaker": "sage",
+          "text": "Look! The mist-bluebells woke in violet!"
+        },
+        {
+          "speaker": "jordan",
+          "text": "Whoa, the whole path is sparkling purple!"
+        }
+      ]
+    },
+    {
+      "id": "mist-sage-lantern",
+      "area": "mist",
+      "trigger": "lantern",
+      "radius": 340,
+      "tone": "lantern",
+      "turns": [
+        {
+          "speaker": "sage",
+          "text": "Your lantern makes the bluebells sing!"
+        }
+      ]
+    },
+    {
+      "id": "hills-flute-jam",
+      "area": "hills",
+      "trigger": "flute",
+      "radius": 380,
+      "tone": "music",
+      "turns": [
+        {
+          "speaker": "bram",
+          "text": "Hit that sunny chord with Fae, Sunny!"
+        },
+        {
+          "speaker": "sunny",
+          "text": "Even the lambs are tapping along!"
+        }
+      ]
+    },
+    {
+      "id": "park-flute-concert",
+      "area": "park",
+      "trigger": "flute",
+      "radius": 380,
+      "tone": "music",
+      "turns": [
+        {
+          "speaker": "pippa",
+          "text": "Encore, Fae! Best park concert ever!"
+        },
+        {
+          "speaker": "hazel",
+          "text": "What a darling melody on that flute!"
+        }
+      ]
+    },
+    {
+      "id": "bay-lasso-cheer",
+      "area": "bay",
+      "trigger": "lasso",
+      "radius": 260,
+      "tone": "warm",
+      "turns": [
+        {
+          "speaker": "sal",
+          "text": "Ahoy! Fine sailor's knot on that lasso!"
+        },
+        {
+          "speaker": "kai",
+          "text": "Show us a trick spin sometime, Fae!"
+        }
+      ]
+    },
+    {
+      "id": "gym-lasso-salute",
+      "area": "gym",
+      "trigger": "lasso",
+      "radius": 260,
+      "tone": "warm",
+      "turns": [
+        {
+          "speaker": "coach",
+          "text": "Look at that rainbow lasso form, Fae!"
+        }
+      ]
+    }
   ]
 }

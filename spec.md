@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 149)
+Last updated: 2026-11-27 (Milestone 150)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -769,20 +769,29 @@ ios/            Capacitor iOS project (from Milestone 4).
   - Pure deterministic `npcWorldSituation`, `reactionRippleTicks`, and
     `evaluateNpcLife` (zero banned trig, zero `State` or save-version changes)
     read `content/npc-profiles.json` (53 named character profiles covering the
-    entire town cast and 34 biome-wide NPC-to-NPC social banter entries,
-    including shop duos and six post-finale celebration banter pairs, skipping
-    `bus-stop` and `sanctuary-*` critters) to drive live organic facing,
-    distance-rippled attention (`dialogue` > `lantern-awe` > `celebrate` >
-    `music-delight` > `chaos-worry` > `companion-greet` > `player-greet` >
-    `social-chat` > `idle`, preserving authored arrival facing during a 48-tick
-    arrival grace window), post-finale `forest_calm` celebration warmth
-    (festive `heart`/`sparkle` emotes for `player-greet` and `idle` NPCs within
-    240 units after arrival grace, plus `warm` chatter tone on matching
-    `notVariable: "forest_fizzy"` / `calmed: "hooded-kid"` ambient rules),
-    personality-driven living motion (`npcLivingPose` including `mystic`,
-    `celebrate`, and 6-tick turn-squash, respecting `reducedMotion`), pooled
-    celebration sparkles (skipped under `reducedMotion`), whisper-soft voiced
-    ambient chatter chimes during live running play
+    entire town cast, 34 biome-wide NPC-to-NPC social banter entries including
+    shop duos and six post-finale celebration banter pairs, 15 traveling party
+    companion banter entries `partyBanter`, and 7 interactive tool micro-events
+    `toolEvents` across `lantern`, `flute`, and `lasso`, skipping `bus-stop`
+    and `sanctuary-*` critters) to drive live organic facing, distance-rippled
+    attention (`dialogue` > `lantern-awe` > `celebrate` > `music-delight` >
+    `chaos-worry` > `companion-greet` > `player-greet` > `social-chat` > `idle`,
+    preserving authored arrival facing during a 48-tick arrival grace window),
+    party companion attention (`party: PartyLifeEntry[]` with `lantern-awe`,
+    `celebrate`, `music-delight`, `party-chat`, and `idle`, rendering floating
+    party emotes during active tool micro-events and party chat while skipping
+    napping Maddie and respecting `reducedMotion`), interactive tool micro-events (`activeToolEventId` with 180-tick turn alternation and
+    pooled celebration sparkles on fresh activation, skipped under
+    `reducedMotion` and `harness`), traveling party companion banter anchored
+    at live `(member.x, member.y)` coordinates on a calm 360-tick cycle
+    staggered cleanly around area NPC banter, post-finale `forest_calm`
+    celebration warmth (festive `heart`/`sparkle` emotes for `player-greet` and
+    `idle` NPCs within 240 units after arrival grace, plus `warm` chatter tone
+    on matching `notVariable: "forest_fizzy"` / `calmed: "hooded-kid"` ambient
+    rules), personality-driven living motion (`npcLivingPose` including
+    `mystic`, `celebrate`, and 6-tick turn-squash, respecting `reducedMotion`),
+    pooled celebration sparkles (skipped under `reducedMotion`), whisper-soft
+    voiced ambient chatter chimes during live running play
     (`AudioController.playAmbientChatter`), and at most one crisp die-cut
     watercolor overworld chatter bubble (`.npc-chatter` with six high-contrast
     tones `normal`, `lantern`, `worry`, `warm`, `banter`, and `music`, inline
@@ -792,8 +801,9 @@ ios/            Capacitor iOS project (from Milestone 4).
     defensive CSS hiding across all root overlay flags `data-photo="on"`,
     `data-battle="open"`, `data-journal="open"`, `data-title="open"`,
     `data-credits="open"`, and `data-arcade="open"` plus `harness`, Milestone
-    147).
-    `renderInfo().npcLife` exposes read-only `{ stage, npcs, chatter }`.
+    148).
+    `renderInfo().npcLife` exposes read-only
+    `{ stage, activeToolEventId, npcs, party, chatter }`.
   - Cross-biome living errands, automatic Journal `NOTES` tracking &
     snack-sharing (all stitch-gated with zero new global Ink `VAR`s): Mailman
     Gus's Postal Chain (`Gus -> Captain Sal -> Mina -> Gus`), Wren's Botanical

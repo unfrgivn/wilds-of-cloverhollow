@@ -1408,3 +1408,307 @@ describe("Living NPC presentation craft (voices, portraits, motion, emotes, chat
     expect(emotes[0]?.rotation).toBe(0);
   });
 });
+
+describe("Party companion banter and interactive tool micro-events (Milestone 148)", () => {
+  it("validates partyBanter and toolEvents strictly in parseNpcProfiles", () => {
+    const initialInk = makeState("plaza", "front-door").ink;
+    const readVar = (name: string) => world.storyVariable(initialInk, name);
+
+    expect(world.partyBanter.length).toBeGreaterThanOrEqual(14);
+    expect(world.toolEvents.length).toBeGreaterThanOrEqual(6);
+    for (const entry of world.partyBanter) {
+      expect(entry.turns.length).toBeGreaterThanOrEqual(1);
+      expect(entry.turns.length).toBeLessThanOrEqual(2);
+      for (const turn of entry.turns) {
+        expect(turn.text.length, `${entry.id}: ${turn.text}`).toBeLessThanOrEqual(44);
+        if (entry.when?.calmed !== "hooded-kid") {
+          expect(turn.text, `${entry.id} spoiled Milo early`).not.toMatch(/\bmilo\b/i);
+        }
+        expect(turn.text, `${entry.id} weather/time`).not.toMatch(
+          /\b(rain|storm|thunder|midnight|sunset|sunrise)\b/i,
+        );
+      }
+    }
+    for (const event of world.toolEvents) {
+      expect(event.turns.length).toBeGreaterThanOrEqual(1);
+      expect(event.turns.length).toBeLessThanOrEqual(2);
+      for (const turn of event.turns) {
+        expect(turn.text.length, `${event.id}: ${turn.text}`).toBeLessThanOrEqual(44);
+        if (event.when?.calmed !== "hooded-kid") {
+          expect(turn.text, `${event.id} spoiled Milo early`).not.toMatch(/\bmilo\b/i);
+        }
+      }
+    }
+
+    const parse = (extra: Record<string, unknown>) =>
+      parseNpcProfiles(
+        { profiles: [], banter: [], ...extra },
+        world.characters, world.areas, world.critters, world.party, readVar, "test.json",
+      );
+
+    expect(() => parse({
+      partyBanter: [{
+        id: "bad-area", area: "mars", turns: [{ speaker: "sue", text: "Hi!" }],
+      }],
+    })).toThrow(/partyBanter\[0\]\.area/);
+
+    expect(() => parse({
+      partyBanter: [{
+        id: "bad-speaker", area: "clubhouse", turns: [{ speaker: "flora", text: "Hi!" }],
+      }],
+    })).toThrow(/partyBanter\[0\]\.turns\[0\]\.speaker/);
+
+    expect(() => parse({
+      partyBanter: [{
+        id: "too-long", area: "clubhouse",
+        turns: [{ speaker: "sue", text: "x".repeat(49) }],
+      }],
+    })).toThrow(/partyBanter\[0\]\.turns\[0\]\.text/);
+
+    expect(() => parse({
+      toolEvents: [{
+        id: "bad-trigger", area: "cavern", trigger: "umbrella", radius: 300, tone: "lantern",
+        turns: [{ speaker: "pebble", text: "Glow!" }],
+      }],
+    })).toThrow(/toolEvents\[0\]\.trigger/);
+
+    expect(() => parse({
+      toolEvents: [{
+        id: "bad-radius", area: "cavern", trigger: "lantern", radius: 0, tone: "lantern",
+        turns: [{ speaker: "pebble", text: "Glow!" }],
+      }],
+    })).toThrow(/toolEvents\[0\]\.radius/);
+
+    expect(() => parse({
+      toolEvents: [{
+        id: "bad-speaker", area: "cavern", trigger: "lantern", radius: 300, tone: "lantern",
+        turns: [{ speaker: "flora", text: "Wrong area!" }],
+      }],
+    })).toThrow(/toolEvents\[0\]\.turns\[0\]\.speaker/);
+
+    expect(() => parse({
+      toolEvents: [{
+        id: "party-only", area: "cavern", trigger: "lantern", radius: 300, tone: "lantern",
+        turns: [{ speaker: "sue", text: "No area NPC!" }],
+      }],
+    })).toThrow(/needs an area NPC speaker/);
+  });
+
+  it("fires lantern, flute, and lasso tool micro-events and party attention states", () => {
+    // 1. Cavern Crystal Resonance (lantern ON, alternates Pebble -> Gemma over 180-tick cycle).
+    const cavernBase = makeState("cavern", "entrance", { has_lantern: true }, [
+      "maddie", "sue", "jordan",
+    ]);
+    const pebble = findNpc("cavern", "pebble");
+    const cavernOn: State = {
+      ...cavernBase,
+      tick: 24,
+      lantern: true,
+      player: { x: pebble.point.x - 120, y: pebble.point.y + 40 },
+    };
+    const resTurn0 = evaluateNpcLife(world, cavernOn, {
+      ...settledMemory, areaTicks: 10, lanternOnTick: 4,
+    });
+    expect(resTurn0.activeToolEventId).toBe("cavern-crystal-resonance");
+    expect(resTurn0.chatter?.npcId).toBe("pebble");
+    expect(resTurn0.chatter?.tone).toBe("lantern");
+    expect(resTurn0.chatter?.text).toContain("UV resonance");
+    expect(resTurn0.party.find((m) => m.id === "sue")).toMatchObject({
+      attention: "lantern-awe", emote: "sparkle",
+    });
+    expect(resTurn0.party.find((m) => m.id === "jordan")).toMatchObject({
+      attention: "lantern-awe", emote: "sparkle",
+    });
+    expect(resTurn0.party.find((m) => m.id === "maddie")).toMatchObject({
+      attention: "idle", emote: null,
+    });
+
+    const resTurn1 = evaluateNpcLife(world, { ...cavernOn, tick: 130 }, {
+      ...settledMemory, areaTicks: 10, lanternOnTick: 4,
+    });
+    expect(resTurn1.activeToolEventId).toBe("cavern-crystal-resonance");
+    expect(resTurn1.chatter?.npcId).toBe("gemma");
+    expect(resTurn1.chatter?.text).toContain("stepping crystals");
+
+    // 2. Misty Path Bluebell Awakening (Sage + live moving Jordan, plus solo Sage fallback).
+    const mistBase = makeState("mist", "field", { has_lantern: true }, [
+      "maddie", "sue", "jordan",
+    ]);
+    const sage = findNpc("mist", "sage");
+    const movedParty = mistBase.party.map((member) =>
+      member.id === "jordan" ? { ...member, x: 412, y: 505 } : member,
+    );
+    const mistOn: State = {
+      ...mistBase,
+      tick: 130,
+      lantern: true,
+      player: { x: sage.point.x + 80, y: sage.point.y + 40 },
+      party: movedParty,
+    };
+    const mistTurn1 = evaluateNpcLife(world, mistOn, {
+      ...settledMemory, areaTicks: 8, lanternOnTick: 2,
+    });
+    expect(mistTurn1.activeToolEventId).toBe("mist-bluebell-awakening");
+    expect(mistTurn1.chatter?.npcId).toBe("jordan");
+    expect(mistTurn1.chatter?.speakerName).toBe("Jordan");
+    expect(mistTurn1.chatter?.x).toBe(412);
+    expect(mistTurn1.chatter?.y).toBe(505);
+
+    const mistSolo = evaluateNpcLife(world, {
+      ...mistOn,
+      party: mistBase.party.filter((m) => m.id === "maddie"),
+    }, { ...settledMemory, areaTicks: 8, lanternOnTick: 2 });
+    expect(mistSolo.activeToolEventId).toBe("mist-sage-lantern");
+    expect(mistSolo.chatter?.npcId).toBe("sage");
+
+    // 3. Hills Flute Jam & Park Flute Concert (bypasses arrival grace, party music-delight).
+    const bram = findNpc("hills", "bram");
+    const hillsBase = makeState("hills", "park", { has_flute: true }, [
+      "maddie", "sue", "jordan", "pond-pup",
+    ]);
+    const hillsFlute: State = {
+      ...hillsBase,
+      tick: 130,
+      player: { x: bram.point.x + 90, y: bram.point.y },
+      wild: [],
+    };
+    const jamTurn0 = evaluateNpcLife(world, hillsFlute, {
+      ...settledMemory, areaTicks: 10, lastFluteTick: 100,
+    });
+    expect(jamTurn0.activeToolEventId).toBe("hills-flute-jam");
+    expect(jamTurn0.chatter?.npcId).toBe("bram");
+    expect(jamTurn0.chatter?.tone).toBe("music");
+    expect(jamTurn0.party.find((m) => m.id === "sue")).toMatchObject({
+      attention: "music-delight", emote: "note",
+    });
+    expect(jamTurn0.party.find((m) => m.id === "pond-pup")).toMatchObject({
+      attention: "music-delight", emote: "note",
+    });
+
+    const jamTurn1 = evaluateNpcLife(world, { ...hillsFlute, tick: 225 }, {
+      ...settledMemory, areaTicks: 10, lastFluteTick: 100,
+    });
+    expect(jamTurn1.activeToolEventId).toBe("hills-flute-jam");
+    expect(jamTurn1.chatter?.npcId).toBe("sunny");
+
+    // 4. Bay Lasso Cheer & Gym Lasso Salute (after 48-tick arrival grace).
+    const sal = findNpc("bay", "sal");
+    const bayLasso: State = {
+      ...makeState("bay", "plaza-road", { has_lasso: true }, ["maddie", "sue", "jordan"]),
+      tick: 30,
+      player: { x: sal.point.x, y: sal.point.y + 110 },
+      wild: [],
+    };
+    expect(evaluateNpcLife(world, bayLasso, { ...settledMemory, areaTicks: 20 }).activeToolEventId)
+      .toBeNull();
+    const bayCheer0 = evaluateNpcLife(world, bayLasso, settledMemory);
+    expect(bayCheer0.activeToolEventId).toBe("bay-lasso-cheer");
+    expect(bayCheer0.chatter?.npcId).toBe("sal");
+    expect(bayCheer0.chatter?.tone).toBe("warm");
+    const bayCheer1 = evaluateNpcLife(world, { ...bayLasso, tick: 130 }, settledMemory);
+    expect(bayCheer1.activeToolEventId).toBe("bay-lasso-cheer");
+    expect(bayCheer1.chatter?.npcId).toBe("kai");
+
+    const coach = findNpc("gym", "coach");
+    const gymLasso: State = {
+      ...makeState("gym", "door", { has_lasso: true }, ["maddie", "sue", "jordan"]),
+      tick: 30,
+      player: { x: coach.point.x, y: coach.point.y + 110 },
+      critters: { ...makeState("gym", "door").critters, "gym-pup": "calm" },
+    };
+    const gymSalute = evaluateNpcLife(world, gymLasso, settledMemory);
+    expect(gymSalute.activeToolEventId).toBe("gym-lasso-salute");
+    expect(gymSalute.chatter?.npcId).toBe("coach");
+    expect(gymSalute.chatter?.tone).toBe("warm");
+  });
+
+  it("drives live-anchored partyBanter in clubhouse & enchanted without early Milo spoilers",
+    () => {
+    const clubBase = makeState("clubhouse", "ladder", { clubhouse_claimed: true }, [
+      "maddie", "sue", "jordan",
+    ]);
+    const customParty = clubBase.party.map((member) =>
+      member.id === "sue"
+        ? { ...member, x: 512, y: 618 }
+        : member.id === "jordan"
+          ? { ...member, x: 590, y: 634 }
+          : member,
+    );
+    const clubState: State = { ...clubBase, tick: 30, party: customParty };
+
+    // Arrival grace holds off party banter until areaTicks >= 48.
+    expect(evaluateNpcLife(world, clubState, { ...settledMemory, areaTicks: 20 }).chatter)
+      .toBeNull();
+
+    // Turn 0: Sue speaks at her live coordinates; Jordan listens with heart emote.
+    const turn0 = evaluateNpcLife(world, clubState, settledMemory);
+    expect(turn0.chatter?.npcId).toBe("sue");
+    expect(turn0.chatter?.speakerName).toBe("Sue");
+    expect(turn0.chatter?.x).toBe(512);
+    expect(turn0.chatter?.y).toBe(618);
+    expect(turn0.chatter?.adult).toBe(false);
+    expect(turn0.chatter?.text).toContain("headquarters");
+    expect(turn0.party.find((m) => m.id === "sue")?.attention).toBe("party-chat");
+    expect(turn0.party.find((m) => m.id === "jordan")).toMatchObject({
+      attention: "party-chat", emote: "heart",
+    });
+
+    // Brief pause between turns (95..120).
+    expect(evaluateNpcLife(world, { ...clubState, tick: 105 }, settledMemory).chatter).toBeNull();
+
+    // Turn 1: Jordan replies at his live coordinates; Sue listens with heart emote.
+    const turn1 = evaluateNpcLife(world, { ...clubState, tick: 150 }, settledMemory);
+    expect(turn1.chatter?.npcId).toBe("jordan");
+    expect(turn1.chatter?.speakerName).toBe("Jordan");
+    expect(turn1.chatter?.x).toBe(590);
+    expect(turn1.chatter?.y).toBe(634);
+    expect(turn1.party.find((m) => m.id === "sue")).toMatchObject({
+      attention: "party-chat", emote: "heart",
+    });
+
+    // Quiet rest (215..360).
+    expect(evaluateNpcLife(world, { ...clubState, tick: 260 }, settledMemory).chatter).toBeNull();
+
+    // Garden ripe upgrades clubhouse banter cleanly.
+    const ripeState: State = {
+      ...clubState,
+      ink: setInkVariables(clubState.ink, { garden_ripe: true }),
+    };
+    const ripeTurn0 = evaluateNpcLife(world, ripeState, settledMemory);
+    expect(ripeTurn0.chatter?.tone).toBe("warm");
+    expect(ripeTurn0.chatter?.text).toContain("ripe berries");
+
+    // Just-calmed switches standing friends into celebrate + heart emote.
+    const calmedLife = evaluateNpcLife(world, { ...clubState, tick: 250 }, {
+      ...settledMemory, lastCalmedTick: 230,
+    });
+    expect(calmedLife.party.find((m) => m.id === "sue")).toMatchObject({
+      attention: "celebrate", emote: "heart",
+    });
+    expect(calmedLife.party.find((m) => m.id === "jordan")).toMatchObject({
+      attention: "celebrate", emote: "heart",
+    });
+
+    // Enchanted forest never mentions Milo while forest_fizzy is true / hooded-kid uncalmed.
+    const fizzyForest: State = {
+      ...makeState("enchanted", "mist", { forest_fizzy: true }, ["maddie", "sue", "jordan"]),
+      tick: 150,
+      player: { x: 180, y: 740 },
+    };
+    const fizzyLife = evaluateNpcLife(world, fizzyForest, settledMemory);
+    expect(fizzyLife.chatter?.text ?? "").not.toMatch(/\bmilo\b/i);
+
+    const calmForestBase = makeState("enchanted", "mist", { forest_fizzy: false }, [
+      "maddie", "sue", "jordan",
+    ]);
+    const calmForest: State = {
+      ...calmForestBase,
+      tick: 150,
+      player: { x: 180, y: 740 },
+      critters: { ...calmForestBase.critters, "hooded-kid": "calm" },
+    };
+    const calmForestLife = evaluateNpcLife(world, calmForest, settledMemory);
+    expect(calmForestLife.chatter?.npcId).toBe("jordan");
+    expect(calmForestLife.chatter?.text).toContain("Milo");
+  });
+});

@@ -12,10 +12,32 @@ type ActiveBed = {
   sources: AudioScheduledSourceNode[];
   nodes: AudioNode[];
   timer: ReturnType<typeof setTimeout> | null;
+  accentSeed: number;
   stopped: boolean;
 };
 
 const FADE_SEC = 0.7;
+const GOLDEN_ANGLE = 2.399963229728653;
+
+const AMBIENCE_STEREO: Readonly<Record<AmbienceBed, { width: number; phase: number }>> = {
+  none: { width: 0, phase: 0 },
+  "town-breeze": { width: 0.48, phase: 0.4 },
+  ocean: { width: 0.44, phase: 1.1 },
+  "mountain-wind": { width: 0.36, phase: 0.8 },
+  hearth: { width: 0.28, phase: 0.2 },
+  forest: { width: 0.52, phase: 0.7 },
+  "enchanted-shimmer": { width: 0.55, phase: 1.4 },
+  "arcade-hum": { width: 0.16, phase: 0.5 },
+  "cavern-drips": { width: 0.54, phase: 1.9 },
+  "cafe-murmur": { width: 0.42, phase: 2.3 },
+};
+
+export function ambiencePan(bed: AmbienceBed, seed: number): number {
+  const { width, phase } = AMBIENCE_STEREO[bed];
+  if (width === 0) return 0;
+  const safeSeed = Number.isFinite(seed) ? seed : 0;
+  return Math.sin(safeSeed * GOLDEN_ANGLE + phase) * width;
+}
 
 function rampParam(param: AudioParam, target: number, now: number, seconds: number): void {
   param.cancelScheduledValues(now);
@@ -107,18 +129,44 @@ export function createAmbiencePlayer(
     }, Math.ceil((dur + 0.12) * 1000));
   };
 
-  const scheduleAccent = (bed: ActiveBed, delayMs: number, play: () => void): void => {
+  const createAccentOutput = (
+    target: GainNode,
+    pan: number,
+    atTime: number,
+  ): { input: AudioNode; cleanup: () => void } => {
+    if (pan === 0 || typeof context.createStereoPanner !== "function") {
+      return { input: target, cleanup: () => {} };
+    }
+    const panner = context.createStereoPanner();
+    panner.pan.setValueAtTime(pan, atTime);
+    panner.connect(target);
+    return {
+      input: panner,
+      cleanup: () => {
+        panner.disconnect();
+      },
+    };
+  };
+
+  const scheduleAccent = (
+    bed: ActiveBed,
+    delayMs: number,
+    play: (pan: number) => void,
+  ): void => {
     bed.timer = setTimeout(() => {
       if (bed.stopped || context.state !== "running") return;
-      play();
+      const pan = ambiencePan(bed.bed, bed.accentSeed);
+      bed.accentSeed += 1;
+      play(pan);
       scheduleAccent(bed, delayMs * (0.7 + Math.random() * 0.7), play);
     }, delayMs);
   };
 
-  const playBirdChirp = (target: GainNode): void => {
+  const playBirdChirp = (target: GainNode, pan: number, peakGain = 0.11): void => {
     const pentatonic = [1046.5, 1174.66, 1318.51, 1567.98, 1760];
     const base = pentatonic[Math.floor(Math.random() * pentatonic.length)] ?? 1318.51;
     const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
     for (let note = 0; note < 2; note += 1) {
       const start = now + note * 0.14;
       const osc = context.createOscillator();
@@ -129,20 +177,46 @@ export function createAmbiencePlayer(
       osc.frequency.exponentialRampToValueAtTime(freq * 0.98, start + 0.11);
       const env = context.createGain();
       env.gain.setValueAtTime(0.0001, start);
-      env.gain.linearRampToValueAtTime(0.11, start + 0.02);
+      env.gain.linearRampToValueAtTime(peakGain, start + 0.02);
       env.gain.exponentialRampToValueAtTime(0.0001, start + 0.12);
-      osc.connect(env).connect(target);
+      osc.connect(env).connect(output.input);
+      const isLast = note === 1;
       osc.onended = () => {
         osc.disconnect();
         env.disconnect();
+        if (isLast) output.cleanup();
       };
       osc.start(start);
       osc.stop(start + 0.14);
     }
   };
 
-  const playHearthCrackle = (target: GainNode): void => {
+  const playWaveShimmer = (target: GainNode, pan: number): void => {
+    const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
+    const src = context.createBufferSource();
+    src.buffer = getPink();
+    const bp = context.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.setValueAtTime(1250 + Math.random() * 550, now);
+    bp.Q.setValueAtTime(1.6, now);
+    const env = context.createGain();
+    env.gain.setValueAtTime(0.0001, now);
+    env.gain.linearRampToValueAtTime(0.055, now + 0.28);
+    env.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+    src.connect(bp).connect(env).connect(output.input);
+    src.onended = () => {
+      src.disconnect();
+      bp.disconnect();
+      env.disconnect();
+      output.cleanup();
+    };
+    src.start(now, Math.random() * 1.5, 0.9);
+  };
+
+  const playHearthCrackle = (target: GainNode, pan: number): void => {
     const now = context.currentTime + 0.01;
+    const output = createAccentOutput(target, pan, now);
     const src = context.createBufferSource();
     src.buffer = getPink();
     const hp = context.createBiquadFilter();
@@ -152,20 +226,22 @@ export function createAmbiencePlayer(
     env.gain.setValueAtTime(0.0001, now);
     env.gain.linearRampToValueAtTime(0.16, now + 0.004);
     env.gain.exponentialRampToValueAtTime(0.0001, now + 0.032);
-    src.connect(hp).connect(env).connect(target);
+    src.connect(hp).connect(env).connect(output.input);
     src.onended = () => {
       src.disconnect();
       hp.disconnect();
       env.disconnect();
+      output.cleanup();
     };
     src.start(now, Math.random() * 2, 0.04);
   };
 
-  const playEnchantedChime = (target: GainNode): void => {
+  const playEnchantedChime = (target: GainNode, pan: number): void => {
     // F Lydian high twinkles (C6, D6, E6, F6, G6, A6, B6)
     const freqs = [1046.5, 1174.66, 1318.51, 1396.91, 1567.98, 1760, 1975.53];
     const freq = freqs[Math.floor(Math.random() * freqs.length)] ?? 1396.91;
     const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
     const osc = context.createOscillator();
     osc.type = "sine";
     osc.frequency.setValueAtTime(freq, now);
@@ -181,12 +257,13 @@ export function createAmbiencePlayer(
     env.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
     osc.connect(env);
     over.connect(overGain).connect(env);
-    env.connect(target);
+    env.connect(output.input);
     osc.onended = () => {
       osc.disconnect();
       over.disconnect();
       overGain.disconnect();
       env.disconnect();
+      output.cleanup();
     };
     osc.start(now);
     over.start(now);
@@ -194,16 +271,17 @@ export function createAmbiencePlayer(
     over.stop(now + 0.3);
   };
 
-  const playCaveDrop = (target: GainNode): void => {
+  const playCaveDrop = (target: GainNode, pan: number): void => {
     const scale = 0.94 + Math.random() * 0.14;
     const baseHz = 880 * scale;
     const peakHz = 1480 * scale;
     const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
     const drops: readonly (readonly [number, number])[] = [
       [0, 0.075],
       [0.19, 0.03],
     ];
-    for (const [delay, peak] of drops) {
+    drops.forEach(([delay, peak], index) => {
       const start = now + delay;
       const osc = context.createOscillator();
       osc.type = "sine";
@@ -213,19 +291,22 @@ export function createAmbiencePlayer(
       env.gain.setValueAtTime(0.0001, start);
       env.gain.linearRampToValueAtTime(peak, start + 0.006);
       env.gain.exponentialRampToValueAtTime(0.0001, start + 0.06);
-      osc.connect(env).connect(target);
+      osc.connect(env).connect(output.input);
+      const isLast = index === drops.length - 1;
       osc.onended = () => {
         osc.disconnect();
         env.disconnect();
+        if (isLast) output.cleanup();
       };
       osc.start(start);
       osc.stop(start + 0.07);
-    }
+    });
   };
 
-  const playCafeClink = (target: GainNode): void => {
+  const playCafeClink = (target: GainNode, pan: number): void => {
     const scale = 0.96 + Math.random() * 0.08;
     const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
     const osc = context.createOscillator();
     osc.type = "sine";
     osc.frequency.setValueAtTime(2600 * scale, now);
@@ -241,12 +322,13 @@ export function createAmbiencePlayer(
     env.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
     osc.connect(env);
     over.connect(overGain).connect(env);
-    env.connect(target);
+    env.connect(output.input);
     osc.onended = () => {
       osc.disconnect();
       over.disconnect();
       overGain.disconnect();
       env.disconnect();
+      output.cleanup();
     };
     osc.start(now);
     over.start(now);
@@ -272,7 +354,15 @@ export function createAmbiencePlayer(
       return src;
     };
 
-    const bed: ActiveBed = { bed: kind, gain, sources, nodes, timer: null, stopped: false };
+    const bed: ActiveBed = {
+      bed: kind,
+      gain,
+      sources,
+      nodes,
+      timer: null,
+      accentSeed: 0,
+      stopped: false,
+    };
 
     if (kind === "town-breeze") {
       const src = addPink();
@@ -285,7 +375,7 @@ export function createAmbiencePlayer(
       nodes.push(bp, level);
       src.connect(bp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 4200, () => playBirdChirp(gain));
+      scheduleAccent(bed, 4200, (pan) => playBirdChirp(gain, pan));
     } else if (kind === "ocean") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -305,6 +395,7 @@ export function createAmbiencePlayer(
       src.connect(lp).connect(waveGain).connect(gain);
       src.start(now);
       lfo.start(now);
+      scheduleAccent(bed, 5600, (pan) => playWaveShimmer(gain, pan));
     } else if (kind === "mountain-wind") {
       const src = addPink();
       const bp = context.createBiquadFilter();
@@ -335,7 +426,7 @@ export function createAmbiencePlayer(
       nodes.push(lp, level);
       src.connect(lp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 1200, () => playHearthCrackle(gain));
+      scheduleAccent(bed, 1200, (pan) => playHearthCrackle(gain, pan));
     } else if (kind === "forest") {
       const src = addPink();
       const bp = context.createBiquadFilter();
@@ -353,6 +444,7 @@ export function createAmbiencePlayer(
       src.connect(bp).connect(level).connect(gain);
       src.connect(low).connect(lowLevel).connect(gain);
       src.start(now);
+      scheduleAccent(bed, 5200, (pan) => playBirdChirp(gain, pan, 0.085));
     } else if (kind === "enchanted-shimmer") {
       const src = addPink();
       const bp = context.createBiquadFilter();
@@ -364,7 +456,7 @@ export function createAmbiencePlayer(
       nodes.push(bp, level);
       src.connect(bp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 3000, () => playEnchantedChime(gain));
+      scheduleAccent(bed, 3000, (pan) => playEnchantedChime(gain, pan));
     } else if (kind === "cavern-drips") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -383,7 +475,7 @@ export function createAmbiencePlayer(
       src.connect(lp).connect(lowLevel).connect(gain);
       src.connect(hush).connect(hushLevel).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 2600, () => playCaveDrop(gain));
+      scheduleAccent(bed, 2600, (pan) => playCaveDrop(gain, pan));
     } else if (kind === "cafe-murmur") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -395,7 +487,7 @@ export function createAmbiencePlayer(
       nodes.push(lp, level);
       src.connect(lp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 4400, () => playCafeClink(gain));
+      scheduleAccent(bed, 4400, (pan) => playCafeClink(gain, pan));
     } else {
       // "arcade-hum": soft warm indoor room tone
       const src = addPink();

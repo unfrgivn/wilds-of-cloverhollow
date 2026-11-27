@@ -23,11 +23,85 @@ type CompiledScore = {
   byStep: Map<number, ScheduledNote[]>;
 };
 
+type TrackChannel = {
+  gain: GainNode;
+  voiceTargets: Readonly<Record<InstrumentVoice, AudioNode>>;
+  panners: StereoPannerNode[];
+};
+
+export type PhraseDynamics = {
+  gainScale: number;
+  microDelaySec: number;
+  sparkleMidi: number | null;
+};
+
+export const VOICE_PAN: Readonly<Record<InstrumentVoice, number>> = {
+  bass: 0,
+  pad: 0,
+  chip: 0,
+  flute: -0.08,
+  marimba: 0.18,
+  piano: -0.22,
+  woodblock: 0.26,
+  shaker: -0.28,
+  celesta: 0.32,
+  harp: -0.34,
+};
+
 const INTERVAL_MS = 50;
 const LOOKAHEAD_SEC = 0.12;
 const CROSSFADE_SEC = 0.55;
 const DUCK_RAMP_SEC = 0.3;
 const DUCK_GAIN = 0.55;
+const PHRASE_SPAN_STEPS = 16;
+const SPARKLE_VELOCITY_SCALE = 0.16;
+const SPARKLE_MAX_MIDI = 76;
+
+function hasMicroTiming(voice: InstrumentVoice): boolean {
+  switch (voice) {
+    case "harp":
+    case "piano":
+    case "marimba":
+    case "celesta":
+    case "flute":
+      return true;
+    case "bass":
+    case "woodblock":
+    case "shaker":
+    case "chip":
+    case "pad":
+      return false;
+  }
+}
+
+export function phraseDynamics(
+  step: number,
+  totalSteps: number,
+  loopCount: number,
+  voice: InstrumentVoice,
+  midi: number,
+): PhraseDynamics {
+  const safeStep = Number.isFinite(step) ? Math.trunc(step) : 0;
+  const safeMidi = Number.isFinite(midi) ? Math.trunc(midi) : 0;
+  const phase = ((safeStep % PHRASE_SPAN_STEPS) + PHRASE_SPAN_STEPS) % PHRASE_SPAN_STEPS;
+  const gainScale = 0.995 + 0.075 * Math.sin((phase / PHRASE_SPAN_STEPS) * Math.PI * 2);
+
+  let microDelaySec = 0;
+  if (hasMicroTiming(voice)) {
+    const hash = Math.imul((safeStep * 31 + safeMidi) | 0, 2654435761) >>> 0;
+    microDelaySec = (hash % 801) / 100_000;
+  }
+
+  const halfStep = totalSteps > 0 ? Math.floor(totalSteps / 2) : 0;
+  const isDownbeat = safeStep === 0 || (halfStep > 0 && safeStep === halfStep);
+  const isShimmerVoice = voice === "harp" || voice === "piano";
+  const sparkleMidi =
+    loopCount >= 1 && isDownbeat && isShimmerVoice && safeMidi <= SPARKLE_MAX_MIDI
+      ? safeMidi + 12
+      : null;
+
+  return { gainScale, microDelaySec, sparkleMidi };
+}
 
 function midiToHz(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
@@ -108,14 +182,49 @@ export function createMusicPlayer(
   let mixActive = false;
   let mixGain = 0;
   let lastMasterTarget = -1;
-  let trackGain: GainNode | null = null;
+  let trackChannel: TrackChannel | null = null;
   let activeCompiled: CompiledScore | null = null;
   let currentStep = 0;
+  let loopCount = 0;
   let nextStepTime = 0;
   let timer: ReturnType<typeof setInterval> | null = null;
 
+  const createTrackChannel = (now: number, fadeInSec: number): TrackChannel => {
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(1, now + fadeInSec);
+    gain.connect(duckGain);
+
+    const panners: StereoPannerNode[] = [];
+    const supportsPan = typeof context.createStereoPanner === "function";
+    const targetFor = (voice: InstrumentVoice): AudioNode => {
+      const pan = VOICE_PAN[voice];
+      if (!supportsPan || pan === 0) return gain;
+      const panner = context.createStereoPanner();
+      panner.pan.setValueAtTime(pan, now);
+      panner.connect(gain);
+      panners.push(panner);
+      return panner;
+    };
+
+    const voiceTargets: Readonly<Record<InstrumentVoice, AudioNode>> = {
+      piano: targetFor("piano"),
+      celesta: targetFor("celesta"),
+      marimba: targetFor("marimba"),
+      harp: targetFor("harp"),
+      flute: targetFor("flute"),
+      bass: targetFor("bass"),
+      pad: targetFor("pad"),
+      chip: targetFor("chip"),
+      shaker: targetFor("shaker"),
+      woodblock: targetFor("woodblock"),
+    };
+
+    return { gain, voiceTargets, panners };
+  };
+
   const scheduleVoice = (
-    target: GainNode,
+    target: AudioNode,
     note: ScheduledNote,
     start: number,
     duration: number,
@@ -509,12 +618,13 @@ export function createMusicPlayer(
   const canRun = (): boolean =>
     context.state === "running" && mixActive && isPlayableTrack(currentTrack);
 
-  const fadeOutChannel = (channel: GainNode | null): void => {
+  const fadeOutChannel = (channel: TrackChannel | null): void => {
     if (channel === null) return;
     const now = context.currentTime;
-    rampParam(channel.gain, 0, now, CROSSFADE_SEC);
+    rampParam(channel.gain.gain, 0, now, CROSSFADE_SEC);
     setTimeout(() => {
-      channel.disconnect();
+      for (const panner of channel.panners) panner.disconnect();
+      channel.gain.disconnect();
     }, Math.ceil((CROSSFADE_SEC + 0.15) * 1000));
   };
 
@@ -526,7 +636,7 @@ export function createMusicPlayer(
   };
 
   const tickScheduler = (): void => {
-    if (!canRun() || activeCompiled === null || trackGain === null) {
+    if (!canRun() || activeCompiled === null || trackChannel === null) {
       stopScheduler();
       return;
     }
@@ -537,16 +647,46 @@ export function createMusicPlayer(
       const events = activeCompiled.byStep.get(currentStep);
       if (events !== undefined) {
         for (const note of events) {
-          scheduleVoice(
-            trackGain,
-            note,
-            nextStepTime,
-            note.durationSteps * activeCompiled.stepSeconds,
+          const dynamics = phraseDynamics(
+            currentStep,
+            activeCompiled.totalSteps,
+            loopCount,
+            note.voice,
+            note.midi,
           );
+          const noteStart = nextStepTime + dynamics.microDelaySec;
+          const noteDuration = note.durationSteps * activeCompiled.stepSeconds;
+          const shapedVelocity = note.velocity * dynamics.gainScale;
+          scheduleVoice(
+            trackChannel.voiceTargets[note.voice],
+            { ...note, velocity: shapedVelocity },
+            noteStart,
+            noteDuration,
+          );
+          if (dynamics.sparkleMidi !== null) {
+            scheduleVoice(
+              trackChannel.voiceTargets.celesta,
+              {
+                voice: "celesta",
+                gain: note.gain,
+                midi: dynamics.sparkleMidi,
+                durationSteps: note.durationSteps,
+                velocity: shapedVelocity * SPARKLE_VELOCITY_SCALE,
+              },
+              noteStart + 0.012,
+              noteDuration,
+            );
+          }
         }
       }
       nextStepTime += activeCompiled.stepSeconds;
-      currentStep = (currentStep + 1) % activeCompiled.totalSteps;
+      const nextStep = currentStep + 1;
+      if (nextStep >= activeCompiled.totalSteps) {
+        currentStep = 0;
+        loopCount += 1;
+      } else {
+        currentStep = nextStep;
+      }
     }
   };
 
@@ -561,13 +701,11 @@ export function createMusicPlayer(
       stopScheduler();
       return;
     }
-    if (trackGain === null && isPlayableTrack(currentTrack)) {
+    if (trackChannel === null && isPlayableTrack(currentTrack)) {
       activeCompiled = getCompiled(currentTrack);
-      trackGain = context.createGain();
-      trackGain.gain.setValueAtTime(0, now);
-      trackGain.gain.linearRampToValueAtTime(1, now + 0.2);
-      trackGain.connect(duckGain);
+      trackChannel = createTrackChannel(now, 0.2);
       currentStep = 0;
+      loopCount = 0;
       nextStepTime = now + 0.04;
     }
     if (timer === null) {
@@ -592,19 +730,16 @@ export function createMusicPlayer(
         sync();
         return;
       }
-      const hadTrack = trackGain !== null;
-      fadeOutChannel(trackGain);
-      trackGain = null;
+      const hadTrack = trackChannel !== null;
+      fadeOutChannel(trackChannel);
+      trackChannel = null;
       currentTrack = next.track;
       activeCompiled = isPlayableTrack(currentTrack) ? getCompiled(currentTrack) : null;
       currentStep = 0;
+      loopCount = 0;
       if (canRun() && activeCompiled !== null) {
         const now = context.currentTime;
-        const fresh = context.createGain();
-        fresh.gain.setValueAtTime(0, now);
-        fresh.gain.linearRampToValueAtTime(1, now + (hadTrack ? CROSSFADE_SEC : 0.2));
-        fresh.connect(duckGain);
-        trackGain = fresh;
+        trackChannel = createTrackChannel(now, hadTrack ? CROSSFADE_SEC : 0.2);
         nextStepTime = now + 0.04;
       }
       sync();

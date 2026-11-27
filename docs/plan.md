@@ -5005,6 +5005,32 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (165 unit files / 1,278 tests, all 67 sims, 23 QA packs,
   purity, lint), `just build`, and 24/24 targeted Chromium & WebKit e2e tests.
 
+## Milestone 109: Stereo Chamber Soundstage & Expressive Musical Phrasing **Status:** ✅ Completed (2026-11-27)
+- Upgrades the entire 20-track original soundtrack and all 9 per-land ambience
+  beds into a warm, spacious stereo chamber soundscape with zero `src/core`
+  changes, zero save-version bumps, and zero replay hash drift across all 67
+  recorded sims.
+- Stereo chamber soundstage & expressive phrasing (`src/platform/music.ts`):
+  - Exported exhaustive `VOICE_PAN` mapping all 10 `InstrumentVoice` roles
+    within `[-0.4, 0.4]` (grounded center bass/pad/chip, parlor-left harp &
+    piano, sparkling right celesta & marimba) wired through feature-guarded
+    per-voice `StereoPannerNode` buses disconnected cleanly on track fadeout.
+  - Exported deterministic `phraseDynamics(step, totalSteps, loopCount, voice, midi)`:
+    16-step sinusoidal phrase breath (`[0.92, 1.07]`), subtle hashed `<= 8 ms`
+    pluck micro-timing on melodic/accompaniment voices (zero drift on rhythmic
+    anchors), and delicate loop-2+ `celesta` octave shimmer overtones on bar 1
+    and bar 9 downbeats.
+- Spatialized biome ambience (`src/platform/ambience.ts`):
+  - Exported deterministic `ambiencePan(bed, seed)` (`[-0.55, 0.55]`, `0` for
+    `"none"`) and routed scheduled one-shot biome accents (birds, shoreline
+    shimmer, hearth crackles, Lydian chimes, cavern water drops, café clinks)
+    through feature-guarded, self-disconnecting `StereoPannerNode`s.
+- Evidence: `tests/unit/milestone-109.test.ts` (6 pure unit tests, zero mocks)
+  and `tests/e2e/soundtrack.spec.ts` + `lasso-jukebox.spec.ts` (18/18 Chromium
+  & WebKit passed).
+- Gates: `just check` (167 unit files / 1,288 tests, all 67 sims, 23 QA packs,
+  purity, lint), `just build`, and 18/18 soundtrack & jukebox e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

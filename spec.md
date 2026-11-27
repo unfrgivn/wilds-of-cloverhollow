@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 108)
+Last updated: 2026-11-27 (Milestone 109)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -322,10 +322,20 @@ ios/            Capacitor iOS project (from Milestone 4).
   Its master chain routes SFX, music (`src/platform/music.ts` over the 20
   multi-voice scores in `src/platform/scores.ts`, dry plus warm stereo
   ConvolverNode reverb), and procedural ambience (`src/platform/ambience.ts`)
-  through a shared `DynamicsCompressorNode`. Music crossfades (~0.55 s) on
-  track changes, ducks (~0.3 s to 0.55x), and pauses cleanly on
-  `visibilitychange` when backgrounded; ambience crossfades (~0.7 s) and cleans
-  up all nodes and timers on stop. Character-voiced talking blips and
+  through a shared `DynamicsCompressorNode`. Music arranges its 10 instrument
+  voices across a balanced stereo chamber soundstage (`VOICE_PAN` in
+  `src/platform/music.ts`, within `[-0.4, 0.4]` via feature-guarded per-voice
+  `StereoPannerNode`s cleaned up on track crossfade) and shapes every note with
+  deterministic `phraseDynamics` (a smooth 16-step sinusoidal phrase breath in
+  `[0.92, 1.07]`, subtle `0..8 ms` pluck micro-timing on melodic voices with
+  zero drift on rhythmic anchors, and a whisper-soft `0.16x` celesta octave
+  shimmer on loop-2+ bar 1 and mid-score downbeats for harp/piano notes `<= 76`).
+  Music crossfades (~0.55 s) on track changes, ducks (~0.3 s to 0.55x), and
+  pauses cleanly on `visibilitychange` when backgrounded; ambience crossfades
+  (~0.7 s), places one-shot biome accents across the stereo field via
+  deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
+  disconnected on `onended`), and cleans up all nodes and timers on stop.
+  Character-voiced talking blips and
   key-aligned UI clicks (`src/platform/voices.ts`, Milestone 80) give every
   named cast member, fairy, critter archetype, and narrator a distinct warm
   sine/triangle register (with optional gentle pitch glide or harmonic overtone

@@ -4,7 +4,7 @@
  "date": "2026-11-23",
  "summary": "Mr. Bell, the school principal, the Milestone 69 people mini-boss: a 2x2 body sheet (chaos idle, mid-shout into his megaphone; the burst, hall passes flying; soothed, rubbing his temple; calm, waving), drawn to Mrs. Flurry's sheet with the school staff concept for adult proportions.",
  "generationSource": "Generated with Gemini from Mrs. Flurry's raw body sheet for the watercolour style, size, and swirly eyes, and the school staff concept sheet for adult proportions.",
- "calls": 1,
+ "calls": 2,
  "edits": [
   {
    "time": "2026-11-23T22:28:06.823Z",
@@ -17,15 +17,26 @@
    "output": "1795472886821-gemini-3-pro-image-preview-0.png",
    "kept": "art/source/critters/principal/body-sheet-raw.png",
    "note": "Kept as generated: four whole figures on a clean flat magenta key. The name Mr. Bell is a placeholder until the owner picks one."
+  },
+  {
+   "time": "2026-11-27T01:02:42.220Z",
+   "model": "gemini-3-pro-image-preview",
+   "refs": [
+    "art/scratch/m99/principal-burst-in.png"
+   ],
+   "prompt": "Exact pixel-faithful touch-up of this single game sprite pose on a flat pure #FF00FF magenta background. Keep the character's exact body, head, glasses, hair, face, megaphone, jacket, bowtie, trousers, shoes, pose, size, position, colors, thin warm-brown ink outlines, and composition 100% unchanged. Fix ONLY the text printed on the flying paper hall passes so there are zero typos: on the lower-left paper slip that currently reads 'HALL PASSS' and on the lower-right paper slip that currently has garbled letters ('AAASS'), replace the corrupted text so every legible paper slip cleanly spells 'HALL PASS' (two S's, never three, crisp warm-brown hand-lettered print matching the existing 'HALL' lettering) or simple ruled lines without typos. Keep flat solid #FF00FF pure magenta everywhere outside the artwork, with no shadows, gradients, or borders.",
+   "output": "1795762962220-gemini-3-pro-image-preview-0.png",
+   "kept": "art/source/critters/principal/body-sheet-raw.png",
+   "note": "Milestone 99 polish: composited the clean 1024x1024 top-right chaos_burst_01 touch-up back into body-sheet-raw.png (fixing 'HALL PASSS' and garbled 'AAASS' to crisp 'HALL PASS' with zero drift on Mr. Bell), and filled only the two disconnected stray floor components flanking his shoes in bottom-left soothed_01 (orange ticket stub 6126 px, white sphere 9335 px, plus 4 px AA halo disjoint from body) with pure #FF00FF. Top-left chaos_idle_01 and bottom-right calm_idle_01 stayed 100% bit-identical. Rebuilt via build-person.ts and optimized to Alpha WebP (0.16 MB, q92, PSNR 46.58 dB); critter-check PASS."
   }
  ],
  "postProcessing": {
-  "build": "bun tools/art/build-person.ts principal. The shared person builder keys magenta, drops detached islands under 120 px, despills the alpha edge, scales the chaos idle body to 380 px, and adds the shared hamster aura.",
+  "build": "bun tools/art/build-person.ts principal && bun tools/art/optimize-atlases.ts. The shared person builder keys magenta, drops detached islands under 120 px, despills the alpha edge, scales the chaos idle body to 380 px, and adds the shared hamster aura; optimize-atlases converts to Alpha WebP (q92, alpha_q 100).",
   "canvas": "1536x1024 atlas, six 512x512 frames, baseline 504, anchor (0.5, 0.984375).",
   "measuredCentres": {
    "bodyCentre": {
-    "x": 252.89,
-    "y": 310.54
+    "x": 248.78,
+    "y": 309.13
    },
    "bodyCentreMethod": "mean opaque-pixel centroid across the four generated body frames",
    "auraCentre": {
@@ -61,9 +72,11 @@
   },
   "psnrThreshold": 25
  },
- "validator": "bun tools/art/critter-check.ts --recipe art/recipes/principal.json --atlas public/assets/critters/principal/principal.png",
+ "validator": "bun tools/art/critter-check.ts --recipe art/recipes/principal.json --atlas public/assets/critters/principal/principal.webp",
  "review": [
   "art/review/m69-principal-sheet-cream.jpg",
-  "art/review/m69-principal-sheet-dark.jpg"
+  "art/review/m69-principal-sheet-dark.jpg",
+  "art/review/m99-principal-clean-cream.jpg",
+  "art/review/m99-principal-clean-dark.jpg"
  ]
 }

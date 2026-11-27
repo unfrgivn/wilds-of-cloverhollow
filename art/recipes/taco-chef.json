@@ -6,11 +6,19 @@
   "model": "gemini-3-pro-image-preview",
   "calls": 2,
   "kept": "art/source/critters/taco-chef/body-sheet-raw.png",
+  "edits": [
+    {
+      "time": "2026-11-27T01:05:00.000Z",
+      "method": "source-crease-cleanup",
+      "kept": "art/source/critters/taco-chef/body-sheet-raw.png",
+      "note": "Milestone 99 polish: restored trapped darkened/anti-aliased magenta background pockets inside narrow crevices back to pure #FF00FF (soothed_01 cheek-arm crease 371 px & boot-pants crease 65 px, chaos_burst_01 neck-collar crease 114 px, chaos_idle_01 jaw-sleeve V-crease 236 px, calm_idle_01 thumb-finger notch 102 px; strict magenta-cast filter r-g>=24 && b-g>=18 leaving all outlines/skin/clothes untouched) and cleared the lone disconnected 703 px floating crumb below the upper-right taco in chaos_burst_01 (1299 px incl. 4 px halo disjoint from tacos/body). Rebuilt via build-person.ts taco-chef --key=#FF00FF --height=380 and optimized to Alpha WebP (0.14 MB, q92, PSNR 46.52 dB); critter-check PASS."
+    }
+  ],
   "postProcessing": {
-    "build": "bun tools/art/build-person.ts taco-chef --key=#FF00FF --height=380",
+    "build": "bun tools/art/build-person.ts taco-chef --key=#FF00FF --height=380 && bun tools/art/optimize-atlases.ts",
     "measuredCentres": {
-      "bodyCentre": { "x": 251.24, "y": 301.01 },
-      "auraCentre": { "x": 258.7, "y": 260.72 }
+      "bodyCentre": { "x": 251.18, "y": 301.08 },
+      "auraCentre": { "x": 258.76, "y": 260.55 }
     }
   },
   "checker": {
@@ -20,8 +28,11 @@
     "bodyHue": { "min": 0.02, "max": 0.14, "minFraction": 0.15 },
     "psnrThreshold": 25
   },
+  "validator": "bun tools/art/critter-check.ts --recipe art/recipes/taco-chef.json --atlas public/assets/critters/taco-chef/taco-chef.webp",
   "review": [
     "art/review/m81-taco-chef-cream.jpg",
-    "art/review/m81-taco-chef-dark.jpg"
+    "art/review/m81-taco-chef-dark.jpg",
+    "art/review/m99-taco-chef-clean-cream.jpg",
+    "art/review/m99-taco-chef-clean-dark.jpg"
   ]
 }

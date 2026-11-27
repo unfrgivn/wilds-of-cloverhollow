@@ -4655,7 +4655,7 @@ the old trail, the owl, and the clubhouse claim.
   independently inspected and passed with `vision`.
 - Gates: `just check`, `just build`, and full e2e verified across Chromium & WebKit.
 
-## Milestone 95: Living Biome Shopkeepers, Golden Star-Line Whistle Clubhouse Display & QA Console Polish **Status:** ✅ Completed (2026-11-27)
+## Milestone 99: Living Biome Shopkeepers, Golden Star-Line Whistle Clubhouse Display & QA Console Polish **Status:** ✅ Completed (2026-11-27)
 - Turns Bubblegum Bay's and Pinecone Pass's regional souvenir stops into living
   biome shopkeepers (`NOTES.md` biome NPCs), displays Buster's Golden Star-Line
   Whistle on the Living Clubhouse window sill, and resolves the `.qa-console-save`
@@ -4691,7 +4691,7 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (150 unit files / 1,190 tests, all 65 sims, 23 QA packs,
   purity, lint), `just build`, and targeted e2e (34/34 Chromium passed).
 
-## Milestone 96: JRPG Comfort & Craft Suite — Text Speed, In-Game Reduced Motion & Journal Field Treasures Card **Status:** ✅ Completed (2026-11-27)
+## Milestone 100: JRPG Comfort & Craft Suite — Text Speed, In-Game Reduced Motion & Journal Field Treasures Card **Status:** ✅ Completed (2026-11-27)
 - Adds classic JRPG comfort & accessibility controls plus an interactive
   Journal Field Treasures showcase with zero save-version bumps and zero replay
   hash drift across all 65 recorded sims.
@@ -4728,7 +4728,7 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (152 unit files / 1,207 tests, all 65 sims, 23 QA packs,
   purity, lint), `just build`, and 58/58 targeted Chromium + WebKit e2e tests.
 
-## Milestone 97: Living World Landmarks — Nurse Holly Clinic Care, Bubblegum Bay Rowboat Cruise & Pinecone Pass Wildlife Sanctuary **Status:** ✅ Completed (2026-11-27)
+## Milestone 101: Living World Landmarks — Nurse Holly Clinic Care, Bubblegum Bay Rowboat Cruise & Pinecone Pass Wildlife Sanctuary **Status:** ✅ Completed (2026-11-27)
 - Completes the remaining cozy `NOTES.md` biome & school touchpoints with zero
   `src/core` changes, zero save-version bumps, and zero replay hash drift
   across all 65 recorded sims.
@@ -4759,7 +4759,7 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (153 unit files / 1,214 tests, all 65 sims, 23 QA packs,
   purity, lint), `just build`, and 17/17 targeted Chromium + WebKit e2e tests.
 
-## Milestone 98: Complete 20-Track Original Soundtrack — Wildlife Sanctuary, Ski Lodge, Clubhouse & Fishing Dock Themes **Status:** ✅ Completed (2026-11-27)
+## Milestone 102: Complete 20-Track Original Soundtrack — Wildlife Sanctuary, Ski Lodge, Clubhouse & Fishing Dock Themes **Status:** ✅ Completed (2026-11-27)
 - Gives the final four iconic spaces their own bespoke multi-voice Web Audio
   scores and track-aligned dialogue harmonic scales — expanding the Journal
   Music Box Jukebox from 16 to **20 original composed themes** with zero replay
@@ -4782,6 +4782,38 @@ the old trail, the owl, and the clubhouse claim.
   `tests/e2e/soundtrack.spec.ts` (12/12 Chromium & WebKit).
 - Gates: `just check` (157 unit files / 1,234 tests, all 66 sims, 23 QA packs,
   purity, lint), `just build`, and 32/32 targeted Chromium + WebKit e2e tests.
+
+## Milestone 103: Mini-Boss Art Polish — Mr. Bell "HALL PASS" & Soothed Cleanup + Chef Mateo Crease Cleanup **Status:** ✅ Completed (2026-11-27)
+- Resolves the final two documented art defects in `docs/review-queue.md`
+  cleanly at the source (`art/source/critters/*/body-sheet-raw.png`) with zero
+  code or simulation changes.
+- Mr. Bell (`principal`):
+  - Single targeted Gemini edit on the cropped `chaos_burst_01` quadrant fixed
+    both misspelled flying paper slips (`HALL PASSS` / garbled `HALL AAASS`) to
+    crisp `HALL PASS` while keeping `chaos_idle_01` and `calm_idle_01`
+    bit-identical (`0` pixel diffs).
+  - Removed the two disconnected stray ground objects flanking his shoes in
+    `soothed_01` at the source (`#FF00FF`), rebuilt via
+    `bun tools/art/build-person.ts principal` + `optimize-atlases.ts`
+    (`principal.webp`, PSNR `46.58 dB`), passing `critter-check.ts` with
+    `spill=0 keyLeft=0 chromaLeft=0 edgeKey=0 debris=0 cuts=0` and
+    `soothed_01 components=1`.
+- Chef Mateo (`taco-chef`):
+  - Restored darkened/anti-aliased magenta pixels in 5 tight enclosed creases
+    (`soothed_01` arm-cheek & boot/pants, `chaos_burst_01` neck/collar,
+    `chaos_idle_01` jaw/sleeve, `calm_idle_01` thumb-finger notch) back to pure
+    `#FF00FF` and cleared the isolated floating crumb under the upper-right
+    taco in `chaos_burst_01`, rebuilt via `build-person.ts` +
+    `optimize-atlases.ts` (`taco-chef.webp`, PSNR `46.52 dB`), passing
+    `critter-check.ts` cleanly (`chaos_burst_01 components=5`).
+- Evidence: `art/review/m99-principal-clean-{cream,dark}.jpg` and
+  `art/review/m99-taco-chef-clean-{cream,dark}.jpg` independently audited and
+  passed with `vision`; updated `art/recipes/{principal,taco-chef}.json`,
+  `docs/review-queue.md`, and the 3 refreshed Chromium snapshots
+  (`m81-mateo-talk-1280`, `credits-{1180x820,1280x720}`).
+- Gates: `just check` (157 unit files / 1,234 tests, all 66 sims, 23 QA packs,
+  purity, lint), `just build`, and targeted `more-bad-guys.spec`,
+  `m81-festival.spec`, and `ui-gallery.spec` passed across Chromium & WebKit.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

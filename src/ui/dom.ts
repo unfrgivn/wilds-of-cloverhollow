@@ -53,3 +53,11 @@ export function measure(node: Element): Box {
   const box = node.getBoundingClientRect();
   return { x: box.x, y: box.y, width: box.width, height: box.height };
 }
+
+export function syncAttachedAfter(anchor: Element, node: Element, show: boolean): void {
+  if (show) {
+    if (!node.isConnected || anchor.nextElementSibling !== node) anchor.after(node);
+  } else if (node.isConnected) {
+    node.remove();
+  }
+}

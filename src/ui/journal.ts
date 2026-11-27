@@ -1,6 +1,6 @@
 import "./journal.css";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
-import { element, setAttribute, setText } from "./dom";
+import { element, setAttribute, setText, syncAttachedAfter } from "./dom";
 import {
   coinMarkup,
   cookieMarkup,
@@ -11,6 +11,7 @@ import {
   ticketMarkup,
 } from "./icons";
 import { createJournalFieldOverlays } from "./journal-field-note";
+import { createJournalMapPage } from "./journal-map";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
 import type {
@@ -165,8 +166,6 @@ type KeepsakeSlot = {
   iconId: KeepsakeId | null;
 };
 
-type MapLand = JournalView["lands"][number];
-
 const journalPages: readonly JournalPage[] = ["notes", "map", "options"];
 
 /** Steps cleanly across Journal tabs with wrap-around in either direction. */
@@ -234,6 +233,17 @@ function makeSliderButton(className: string, ariaLabel: string): {
   return { button, value };
 }
 
+function wireInspectable(root: HTMLElement, onInspect?: () => void): void {
+  if (onInspect === undefined) return;
+  root.addEventListener("click", () => onInspect());
+  root.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onInspect();
+    }
+  });
+}
+
 function addSlot(
   grid: HTMLElement,
   onInspect?: () => void,
@@ -247,15 +257,7 @@ function addSlot(
   unknown.setAttribute("aria-label", unknownLabel);
   const name = element("div", "journal-name");
   root.append(image, unknown, name);
-  if (onInspect !== undefined) {
-    root.addEventListener("click", () => onInspect());
-    root.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        onInspect();
-      }
-    });
-  }
+  wireInspectable(root, onInspect);
   grid.append(root);
   return { root, image, unknown, name, imageKey: "" };
 }
@@ -269,15 +271,7 @@ function addKeepsakeSlot(grid: HTMLElement, onInspect?: () => void): KeepsakeSlo
   unknown.setAttribute("aria-label", "A keepsake still to find");
   const name = element("div", "journal-name");
   root.append(charm, unknown, name);
-  if (onInspect !== undefined) {
-    root.addEventListener("click", () => onInspect());
-    root.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        onInspect();
-      }
-    });
-  }
+  wireInspectable(root, onInspect);
   grid.append(root);
   return { root, charm, unknown, name, iconId: null };
 }
@@ -301,11 +295,41 @@ function makeCompleteRibbon(): HTMLSpanElement {
   return ribbon;
 }
 
-function syncAttachedAfter(anchor: Element, node: Element, show: boolean): void {
-  if (show) {
-    if (!node.isConnected || anchor.nextElementSibling !== node) anchor.after(node);
-  } else if (node.isConnected) {
-    node.remove();
+function makeButton(className: string, ariaLabel: string, text?: string): HTMLButtonElement {
+  const button = element("button", className);
+  button.type = "button";
+  button.setAttribute("aria-label", ariaLabel);
+  if (text !== undefined) button.textContent = text;
+  return button;
+}
+
+function syncOptionToggle(button: HTMLButtonElement, enabled: boolean): void {
+  setText(button, enabled ? "on" : "off");
+  button.classList.toggle("is-muted", !enabled);
+  setAttribute(button, "aria-pressed", String(enabled));
+}
+
+function syncSlotVisual(
+  slot: Slot,
+  owned: boolean,
+  name: string,
+  image: AtlasImage | null,
+): void {
+  slot.image.hidden = !owned;
+  slot.unknown.hidden = owned;
+  slot.name.hidden = !owned;
+  setText(slot.name, owned ? name : "");
+  setAttribute(slot.root, "data-owned", String(owned));
+  if (image === null) {
+    slot.imageKey = "";
+    return;
+  }
+  setAttribute(slot.image, "aria-label", name);
+  const key =
+    `${image.src}#${image.frame.x},${image.frame.y},${image.frame.w},${image.frame.h}`;
+  if (slot.imageKey !== key) {
+    applyAtlasCrop(slot.image, image);
+    slot.imageKey = key;
   }
 }
 
@@ -315,36 +339,6 @@ function syncChild(parent: Element, node: Element, show: boolean): void {
   } else if (node.isConnected) {
     node.remove();
   }
-}
-
-// The bus line's stop sign, as on the sprite: a gold star on a blue roundel
-// atop a pole.
-function busStopIcon(): SVGSVGElement {
-  const svg = document.createElementNS(svgNamespace, "svg");
-  svg.setAttribute("viewBox", "0 0 20 30");
-  svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML =
-    '<rect x="9" y="14" width="2" height="15" rx="1" fill="#8a8f98" stroke="#47321f" ' +
-    'stroke-width="0.8"/>' +
-    '<circle cx="10" cy="9" r="8" fill="#3f7fc0" stroke="#47321f" stroke-width="1.2"/>' +
-    '<path d="M10 3.6l1.6 3.3 3.6.5-2.6 2.5.6 3.6L10 11.8l-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" ' +
-    'fill="#f2c94c" stroke="#47321f" stroke-width="0.5"/>';
-  return svg;
-}
-
-function busRoutePath(
-  from: { id: string; x: number; y: number },
-  to: { id: string; x: number; y: number },
-): string {
-  const mx = (from.x + to.x) / 2;
-  const my = (from.y + to.y) / 2;
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const key = [from.id, to.id].sort().join("-");
-  const bend = key === "bay-cloverhollow" ? 0.16 : key === "cloverhollow-pass" ? -0.32 : 0.14;
-  const cx = Math.round(mx - dy * bend);
-  const cy = Math.round(my + dx * bend);
-  return `M ${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`;
 }
 
 // Fae's supplies, each a pill with its count: a gold coin and a cookie for
@@ -424,10 +418,7 @@ export function createJournal(root: HTMLElement): {
   book.hidden = true;
   const label = element("div", "journal-label");
   label.textContent = "JOURNAL";
-  const close = element("button", "journal-close");
-  close.type = "button";
-  close.setAttribute("aria-label", "Close journal");
-  close.textContent = "×";
+  const close = makeButton("journal-close", "Close journal", "×");
 
   const notesPage = element("section", "journal-page journal-notes-page");
   const notesHead = element("div", "journal-notes-head");
@@ -438,9 +429,7 @@ export function createJournal(root: HTMLElement): {
   const snacks = supply("snacks", "Snacks");
   const gems = supply("gems", "Gems");
   supplies.append(coins.root, snacks.root);
-  const audio = element("button", "journal-audio");
-  audio.type = "button";
-  audio.setAttribute("aria-label", "Toggle sound");
+  const audio = makeButton("journal-audio", "Toggle sound");
   supplies.append(audio);
   const volumeLabel = element("label", "journal-volume");
   volumeLabel.setAttribute("aria-label", "Sound volume");
@@ -483,43 +472,9 @@ export function createJournal(root: HTMLElement): {
   const keepsakesGrid = element("div", "journal-stickers journal-keepsakes");
   stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
 
-  const mapPage = element("section", "journal-map-page");
-  const mapStage = element("div", "journal-map-stage");
-  const map = element("div", "journal-map");
-  const mapRoutes = document.createElementNS(svgNamespace, "svg");
-  mapRoutes.setAttribute("class", "journal-map-routes");
-  mapRoutes.setAttribute("viewBox", "0 0 2400 1610");
-  mapRoutes.setAttribute("aria-hidden", "true");
-  const mapLabels = element("div", "journal-map-labels");
-  const mapBadges = element("div", "journal-map-badges");
-  const star = element("div", "journal-map-star");
-  star.textContent = "★";
-  star.setAttribute("aria-label", "You are here");
-  map.append(mapRoutes, mapLabels, mapBadges, star);
-  mapStage.append(map);
-
-  const mapFooter = element("div", "journal-map-footer");
-  const mapDetail = element("span", "journal-map-detail");
-  const mapSummary = element("div", "journal-map-summary");
-  const mapMasterCrest = element("span", "journal-master-crest");
-  mapMasterCrest.textContent = "★ 100% Valley Explorer!";
-  const mapStickersPill = element("span", "journal-map-pill");
-  setAttribute(mapStickersPill, "data-stat", "stickers");
-  const mapPrizesPill = element("span", "journal-map-pill");
-  setAttribute(mapPrizesPill, "data-stat", "prizes");
-  const mapFishPill = element("span", "journal-map-pill");
-  setAttribute(mapFishPill, "data-stat", "fish");
-  const mapKeepsakesPill = element("span", "journal-map-pill");
-  setAttribute(mapKeepsakesPill, "data-stat", "keepsakes");
-  const mapTreasuresBtn = element("button", "journal-treasures-btn");
-  mapTreasuresBtn.type = "button";
-  mapTreasuresBtn.hidden = true;
-  mapTreasuresBtn.setAttribute("aria-label", "Open field treasures");
-  const mapLegend = element("span", "journal-map-legend");
-  mapLegend.append(busStopIcon(), "Bus");
-  mapSummary.append(mapStickersPill, mapPrizesPill, mapTreasuresBtn, mapLegend);
-  mapFooter.append(mapDetail, mapSummary);
-  mapPage.append(mapStage, mapFooter);
+  let latestView: JournalView | null = null;
+  const fieldOverlays = createJournalFieldOverlays();
+  const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView));
 
   // Two-page open-book OPTIONS spread: Sound & Music on the left, Gameplay on the right.
   const optionsPage = element("section", "journal-options-page");
@@ -531,42 +486,27 @@ export function createJournal(root: HTMLElement): {
   jukebox.setAttribute("role", "group");
   jukebox.setAttribute("aria-label", "Music Box");
   jukebox.tabIndex = -1;
-  const prevTrack = element("button", "journal-jukebox-btn journal-jukebox-prev");
-  prevTrack.type = "button";
-  prevTrack.textContent = "‹";
-  prevTrack.setAttribute("aria-label", "Previous track");
+  const prevTrack = makeButton("journal-jukebox-btn journal-jukebox-prev", "Previous track", "‹");
   const nowPlaying = element("button", "journal-now-playing");
   nowPlaying.type = "button";
   nowPlaying.setAttribute("aria-live", "polite");
-  const nextTrack = element("button", "journal-jukebox-btn journal-jukebox-next");
-  nextTrack.type = "button";
-  nextTrack.textContent = "›";
-  nextTrack.setAttribute("aria-label", "Next track");
+  const nextTrack = makeButton("journal-jukebox-btn journal-jukebox-next", "Next track", "›");
   jukebox.append(prevTrack, nowPlaying, nextTrack);
   optionsHead.append(optionsHeading, jukebox);
 
   const soundList = element("div", "journal-options-list");
-  const optSfx = element("button", "journal-opt-toggle journal-opt-sfx");
-  optSfx.type = "button";
-  optSfx.setAttribute("aria-label", "Toggle sound effects");
+  const optSfx = makeButton("journal-opt-toggle journal-opt-sfx", "Toggle sound effects");
   const optSfxSlider = makeSliderButton(
     "journal-opt-slider journal-opt-sfx-slider",
     "Sound effects volume",
   );
   const sfxRow = makeOptionRow("Sound Effects", null, [optSfx, optSfxSlider.button]);
 
-  const optMusic = element("button", "journal-opt-toggle journal-opt-music");
-  optMusic.type = "button";
-  optMusic.setAttribute("aria-label", "Toggle music");
-  const musicSlider = makeSliderButton(
-    "journal-opt-slider journal-music-slider",
-    "Music volume",
-  );
+  const optMusic = makeButton("journal-opt-toggle journal-opt-music", "Toggle music");
+  const musicSlider = makeSliderButton("journal-opt-slider journal-music-slider", "Music volume");
   const musicRow = makeOptionRow("Music", null, [optMusic, musicSlider.button]);
 
-  const optAmbience = element("button", "journal-opt-toggle journal-opt-ambience");
-  optAmbience.type = "button";
-  optAmbience.setAttribute("aria-label", "Toggle ambience");
+  const optAmbience = makeButton("journal-opt-toggle journal-opt-ambience", "Toggle ambience");
   const ambienceRow = makeOptionRow(
     "Ambience",
     "Waves, wind, birds & hearth",
@@ -582,36 +522,26 @@ export function createJournal(root: HTMLElement): {
   playHead.append(playHeading);
 
   const playList = element("div", "journal-options-list");
-  const optGentle = element("button", "journal-opt-toggle journal-opt-gentle");
-  optGentle.type = "button";
-  optGentle.setAttribute("aria-label", "Toggle gentle timing");
-  const gentleRow = makeOptionRow(
-    "Gentle Timing",
-    "Wider windows in calm-downs",
-    [optGentle],
-  );
+  const optGentle = makeButton("journal-opt-toggle journal-opt-gentle", "Toggle gentle timing");
+  const gentleRow = makeOptionRow("Gentle Timing", "Wider windows in calm-downs", [optGentle]);
 
-  const optHints = element("button", "journal-opt-toggle journal-opt-hints");
-  optHints.type = "button";
-  optHints.setAttribute("aria-label", "Toggle key hints");
-  const hintsRow = makeOptionRow(
-    "Key Hints",
-    "Show keys while exploring",
-    [optHints],
-  );
+  const optHints = makeButton("journal-opt-toggle journal-opt-hints", "Toggle key hints");
+  const hintsRow = makeOptionRow("Key Hints", "Show keys while exploring", [optHints]);
 
-  const optTextSpeed = element("button", "journal-opt-toggle journal-option-text-speed");
-  optTextSpeed.type = "button";
-  optTextSpeed.setAttribute("aria-label", "Cycle text speed");
+  const optTextSpeed = makeButton(
+    "journal-opt-toggle journal-option-text-speed",
+    "Cycle text speed",
+  );
   const textSpeedRow = makeOptionRow(
     "Text Speed",
     "How fast story and battle lines appear",
     [optTextSpeed],
   );
 
-  const optReducedMotion = element("button", "journal-opt-toggle journal-option-reduced-motion");
-  optReducedMotion.type = "button";
-  optReducedMotion.setAttribute("aria-label", "Toggle reduced motion");
+  const optReducedMotion = makeButton(
+    "journal-opt-toggle journal-option-reduced-motion",
+    "Toggle reduced motion",
+  );
   const reducedMotionRow = makeOptionRow(
     "Reduced Motion",
     "Calms animations, shakes, and fluttering effects",
@@ -631,28 +561,17 @@ export function createJournal(root: HTMLElement): {
   optionsPage.append(soundPage, playPage);
 
   const tabs = element("div", "journal-tabs");
-  const notesTab = element("button", "journal-tab journal-notes-tab");
-  notesTab.type = "button";
-  notesTab.textContent = "NOTES";
-  notesTab.setAttribute("aria-label", "Notes and stickers");
-  const mapTab = element("button", "journal-tab journal-map-tab");
-  mapTab.type = "button";
-  mapTab.textContent = "MAP";
-  mapTab.setAttribute("aria-label", "Map");
-  const optionsTab = element("button", "journal-tab journal-options-tab");
-  optionsTab.type = "button";
-  optionsTab.textContent = "OPTIONS";
-  optionsTab.setAttribute("aria-label", "Options");
+  const notesTab = makeButton("journal-tab journal-notes-tab", "Notes and stickers", "NOTES");
+  const mapTab = makeButton("journal-tab journal-map-tab", "Map", "MAP");
+  const optionsTab = makeButton("journal-tab journal-options-tab", "Options", "OPTIONS");
   tabs.append(notesTab, mapTab, optionsTab);
-
-  const fieldOverlays = createJournalFieldOverlays();
 
   book.append(
     label,
     close,
     notesPage,
     stickersPage,
-    mapPage,
+    mapPage.root,
     optionsPage,
     tabs,
     fieldOverlays.fieldBackdrop,
@@ -675,61 +594,8 @@ export function createJournal(root: HTMLElement): {
 
   let page: JournalPage = "notes";
   let wasVisible = false;
-  let mapSignature = "";
-  let routeSignature = "";
-  let badgeSignature = "";
   let treatsSignature = "";
   let recordsSignature = "";
-  let selectedLandId: string | null = null;
-  let hoveredLandId: string | null = null;
-  let latestView: JournalView | null = null;
-
-  mapTreasuresBtn.addEventListener("click", () => {
-    fieldOverlays.openTreasures(latestView);
-  });
-
-  const syncMapDetail = (view: JournalView): void => {
-    const inspectId = hoveredLandId ?? selectedLandId;
-    const inspected = inspectId === null
-      ? undefined
-      : view.lands.find((land) => land.id === inspectId && land.name !== "???");
-    const current = view.lands.find((land) => land.id === view.currentLand);
-    const active = inspected ?? current;
-    const prefix = inspected !== undefined && inspected.id !== view.currentLand ? "" : "Here: ";
-    if (active === undefined) {
-      setText(mapDetail, "Cloverhollow World");
-      if (mapDetail.hasAttribute("title")) mapDetail.removeAttribute("title");
-    } else if (inspected !== undefined) {
-      const guide = view.landGuides?.[inspected.id];
-      if (guide !== undefined && guide.length > 0) {
-        const text = `${prefix}${guide}`;
-        setText(mapDetail, text);
-        setAttribute(mapDetail, "title", text);
-      } else {
-        const progress = view.landProgress[inspected.id];
-        const suffix =
-          progress === undefined || progress.total === 0
-            ? ""
-            : ` · ${progress.owned}/${progress.total} stickers`;
-        const text = `${prefix}${inspected.name}${suffix}`;
-        setText(mapDetail, text);
-        setAttribute(mapDetail, "title", text);
-      }
-    } else {
-      const progress = view.landProgress[active.id];
-      const suffix =
-        progress === undefined || progress.total === 0
-          ? ""
-          : ` · ${progress.owned}/${progress.total} stickers`;
-      setText(mapDetail, `${prefix}${active.name}${suffix}`);
-      if (mapDetail.hasAttribute("title")) mapDetail.removeAttribute("title");
-    }
-    for (const node of mapLabels.children) {
-      if (!(node instanceof HTMLElement)) continue;
-      const landId = node.getAttribute("data-land");
-      node.classList.toggle("is-selected", landId !== null && landId === selectedLandId);
-    }
-  };
 
   const setPage = (next: JournalPage): void => {
     fieldOverlays.closeAll();
@@ -738,7 +604,7 @@ export function createJournal(root: HTMLElement): {
     setAttribute(book, "data-journal-page", page);
     notesPage.hidden = page !== "notes";
     stickersPage.hidden = page !== "notes";
-    mapPage.hidden = page !== "map";
+    mapPage.root.hidden = page !== "map";
     optionsPage.hidden = page !== "options";
   };
 
@@ -833,50 +699,25 @@ export function createJournal(root: HTMLElement): {
     stepPage,
     hasOpenOverlay: () => fieldOverlays.hasOpen(),
     dismissOverlay: () => fieldOverlays.dismiss(),
-    onClose: (callback) => {
-      onClose = callback;
-    },
-    onToggleAudio: (callback) => {
-      onToggleAudio = callback;
-    },
-    onSetAudioLevel: (callback) => {
-      onSetAudioLevel = callback;
-    },
-    onToggleMusic: (callback) => {
-      onToggleMusic = callback;
-    },
-    onSetMusicLevel: (callback) => {
-      onSetMusicLevel = callback;
-    },
-    onToggleAmbience: (callback) => {
-      onToggleAmbience = callback;
-    },
-    onStepTrack: (callback) => {
-      onStepTrack = callback;
-    },
-    onResetJukebox: (callback) => {
-      onResetJukebox = callback;
-    },
-    onToggleGentleTiming: (callback) => {
-      onToggleGentleTiming = callback;
-    },
-    onToggleKeyHints: (callback) => {
-      onToggleKeyHints = callback;
-    },
-    onCycleTextSpeed: (callback) => {
-      onCycleTextSpeed = callback;
-    },
-    onToggleReducedMotion: (callback) => {
-      onToggleReducedMotion = callback;
-    },
+    onClose: (cb) => { onClose = cb; },
+    onToggleAudio: (cb) => { onToggleAudio = cb; },
+    onSetAudioLevel: (cb) => { onSetAudioLevel = cb; },
+    onToggleMusic: (cb) => { onToggleMusic = cb; },
+    onSetMusicLevel: (cb) => { onSetMusicLevel = cb; },
+    onToggleAmbience: (cb) => { onToggleAmbience = cb; },
+    onStepTrack: (cb) => { onStepTrack = cb; },
+    onResetJukebox: (cb) => { onResetJukebox = cb; },
+    onToggleGentleTiming: (cb) => { onToggleGentleTiming = cb; },
+    onToggleKeyHints: (cb) => { onToggleKeyHints = cb; },
+    onCycleTextSpeed: (cb) => { onCycleTextSpeed = cb; },
+    onToggleReducedMotion: (cb) => { onToggleReducedMotion = cb; },
     render: (view) => {
       latestView = view;
       book.hidden = !view.visible;
       if (!view.visible && wasVisible) {
         fieldOverlays.closeAll();
         setPage("notes");
-        selectedLandId = null;
-        hoveredLandId = null;
+        mapPage.resetSelection();
       }
       wasVisible = view.visible;
       if (!view.visible) return;
@@ -902,29 +743,17 @@ export function createJournal(root: HTMLElement): {
       setAttribute(nowPlaying, "data-browsing", String(jukeboxBrowsing));
       setAttribute(nowPlaying, "aria-label", jukeboxLabel);
       setAttribute(nowPlaying, "title", jukeboxLabel);
-      setText(optSfx, view.muted ? "off" : "on");
-      optSfx.classList.toggle("is-muted", view.muted);
-      setAttribute(optSfx, "aria-pressed", String(!view.muted));
+      syncOptionToggle(optSfx, !view.muted);
       syncSlider(optSfxSlider.button, optSfxSlider.value, view.level);
-      setText(optMusic, view.musicMuted ? "off" : "on");
-      optMusic.classList.toggle("is-muted", view.musicMuted);
-      setAttribute(optMusic, "aria-pressed", String(!view.musicMuted));
+      syncOptionToggle(optMusic, !view.musicMuted);
       syncSlider(musicSlider.button, musicSlider.value, view.musicLevel);
-      setText(optAmbience, view.ambienceMuted ? "off" : "on");
-      optAmbience.classList.toggle("is-muted", view.ambienceMuted);
-      setAttribute(optAmbience, "aria-pressed", String(!view.ambienceMuted));
+      syncOptionToggle(optAmbience, !view.ambienceMuted);
 
-      setText(optGentle, view.gentleTiming ? "on" : "off");
-      optGentle.classList.toggle("is-muted", !view.gentleTiming);
-      setAttribute(optGentle, "aria-pressed", String(view.gentleTiming));
-      setText(optHints, view.keyHints ? "on" : "off");
-      optHints.classList.toggle("is-muted", !view.keyHints);
-      setAttribute(optHints, "aria-pressed", String(view.keyHints));
+      syncOptionToggle(optGentle, view.gentleTiming);
+      syncOptionToggle(optHints, view.keyHints);
       setText(optTextSpeed, textSpeedLabel(view.textSpeed));
       setAttribute(optTextSpeed, "data-speed", view.textSpeed);
-      setText(optReducedMotion, view.reducedMotion ? "on" : "off");
-      optReducedMotion.classList.toggle("is-muted", !view.reducedMotion);
-      setAttribute(optReducedMotion, "aria-pressed", String(view.reducedMotion));
+      syncOptionToggle(optReducedMotion, view.reducedMotion);
 
       const controls = journalControlsLines(view.inputMode ?? "keyboard", {
         hasLantern: view.hasLantern,
@@ -1027,24 +856,8 @@ export function createJournal(root: HTMLElement): {
         if (slot === undefined) return;
         const image = sticker.owned ? sticker.image : null;
         const inspectable = image !== null && sticker.fieldNote != null;
-        slot.image.hidden = image === null;
-        slot.unknown.hidden = image !== null;
-        slot.name.hidden = image === null;
-        setText(slot.name, image === null ? "" : sticker.name);
-        setAttribute(slot.root, "data-owned", String(image !== null));
+        syncSlotVisual(slot, image !== null, sticker.name, image);
         syncInspectableSlot(slot.root, inspectable, sticker.name);
-        if (image === null) {
-          slot.imageKey = "";
-          return;
-        }
-        setAttribute(slot.image, "aria-label", sticker.name);
-        const key =
-          `${image.src}#${image.frame.x},${image.frame.y},` +
-          `${image.frame.w},${image.frame.h}`;
-        if (slot.imageKey !== key) {
-          applyAtlasCrop(slot.image, image);
-          slot.imageKey = key;
-        }
       });
       const allStickersOwned =
         view.stickers.length > 0 && view.stickers.every((sticker) => sticker.owned);
@@ -1057,23 +870,7 @@ export function createJournal(root: HTMLElement): {
         const slot = prizeSlots[index];
         if (slot === undefined) return;
         const image = prize.owned ? prize.image : null;
-        slot.image.hidden = image === null;
-        slot.unknown.hidden = image !== null;
-        slot.name.hidden = image === null;
-        setText(slot.name, image === null ? "" : prize.name);
-        setAttribute(slot.root, "data-owned", String(image !== null));
-        if (image === null) {
-          slot.imageKey = "";
-          return;
-        }
-        setAttribute(slot.image, "aria-label", prize.name);
-        const key =
-          `${image.src}#${image.frame.x},${image.frame.y},` +
-          `${image.frame.w},${image.frame.h}`;
-        if (slot.imageKey !== key) {
-          applyAtlasCrop(slot.image, image);
-          slot.imageKey = key;
-        }
+        syncSlotVisual(slot, image !== null, prize.name, image);
       });
       const allPrizesOwned =
         view.prizes.length > 0 && view.prizes.every((prize) => prize.owned);
@@ -1128,26 +925,10 @@ export function createJournal(root: HTMLElement): {
           const slot = fishSlots[index];
           if (slot === undefined) return;
           const image = item.owned ? item.image : null;
-          slot.image.hidden = !item.owned;
-          slot.unknown.hidden = item.owned;
-          slot.name.hidden = !item.owned;
-          setText(slot.name, item.owned ? item.name : "");
-          setAttribute(slot.root, "data-owned", String(item.owned));
           setAttribute(slot.root, "data-fish", item.id);
           slot.root.classList.toggle("is-rare", item.owned && item.rare);
           syncInspectableSlot(slot.root, item.owned, item.name);
-          if (image === null) {
-            slot.imageKey = "";
-            return;
-          }
-          setAttribute(slot.image, "aria-label", item.name);
-          const key =
-            `${image.src}#${image.frame.x},${image.frame.y},` +
-            `${image.frame.w},${image.frame.h}`;
-          if (slot.imageKey !== key) {
-            applyAtlasCrop(slot.image, image);
-            slot.imageKey = key;
-          }
+          syncSlotVisual(slot, item.owned, item.name, image);
         });
       }
 
@@ -1200,141 +981,13 @@ export function createJournal(root: HTMLElement): {
         });
       }
       fieldOverlays.syncFieldNote(view);
-
-      const nextMapSignature = view.lands
-        .map((land) => `${land.id}:${land.name}:${land.busStop}:${land.x}:${land.y}`)
-        .join("|");
-      if (nextMapSignature !== mapSignature) {
-        mapSignature = nextMapSignature;
-        mapLabels.replaceChildren();
-        view.lands.forEach((land: MapLand) => {
-          const item = element("span", "journal-map-land");
-          item.textContent = land.name;
-          item.style.left = `${(land.x / 2400) * 100}%`;
-          item.style.top = `${(land.y / 1610) * 100}%`;
-          setAttribute(item, "data-land", land.id);
-          const revealed = land.name !== "???";
-          if (revealed) {
-            item.classList.add("is-revealed");
-            item.addEventListener("click", () => {
-              selectedLandId = selectedLandId === land.id ? null : land.id;
-              if (latestView !== null) syncMapDetail(latestView);
-            });
-            item.addEventListener("pointerenter", () => {
-              hoveredLandId = land.id;
-              if (latestView !== null) syncMapDetail(latestView);
-            });
-            item.addEventListener("pointerleave", () => {
-              if (hoveredLandId === land.id) {
-                hoveredLandId = null;
-                if (latestView !== null) syncMapDetail(latestView);
-              }
-            });
-          }
-          mapLabels.append(item);
-          if (!land.busStop) return;
-          // The bus line's sign (a gold star on a blue roundel) leads the name.
-          const stop = element("span", "journal-map-stop");
-          setAttribute(stop, "data-land", land.id);
-          setAttribute(stop, "aria-label", `Bus stop: ${land.name}`);
-          stop.append(busStopIcon());
-          item.prepend(stop);
-        });
-      }
-
-      const landLookup = new Map(view.lands.map((land) => [land.id, land]));
-      const nextRouteSignature = view.busRoutes
-        .map((route) => {
-          const a = landLookup.get(route.from);
-          const b = landLookup.get(route.to);
-          return `${route.from}-${route.to}:${route.open}:` +
-            `${a?.x ?? 0},${a?.y ?? 0}:${b?.x ?? 0},${b?.y ?? 0}`;
-        })
-        .join("|");
-      if (nextRouteSignature !== routeSignature) {
-        routeSignature = nextRouteSignature;
-        mapRoutes.replaceChildren();
-        for (const route of view.busRoutes) {
-          const from = landLookup.get(route.from);
-          const to = landLookup.get(route.to);
-          if (from === undefined || to === undefined) continue;
-          const d = busRoutePath(from, to);
-          const halo = document.createElementNS(svgNamespace, "path");
-          halo.setAttribute(
-            "class",
-            route.open ? "journal-map-route-halo is-open" : "journal-map-route-halo",
-          );
-          halo.setAttribute("d", d);
-          mapRoutes.append(halo);
-          const line = document.createElementNS(svgNamespace, "path");
-          line.setAttribute(
-            "class",
-            route.open ? "journal-map-route is-open" : "journal-map-route",
-          );
-          line.setAttribute("data-route", `${route.from}-${route.to}`);
-          line.setAttribute("data-open", String(route.open));
-          line.setAttribute("d", d);
-          mapRoutes.append(line);
-        }
-      }
-
-      const completedLands = view.lands.filter((land) => {
-        if (land.name === "???") return false;
-        const progress = view.landProgress[land.id];
-        return progress !== undefined && progress.total > 0 && progress.owned >= progress.total;
-      });
-      const nextBadgeSignature = completedLands
-        .map((land) => `${land.id}:${land.x}:${land.y}`)
-        .join("|");
-      if (nextBadgeSignature !== badgeSignature) {
-        badgeSignature = nextBadgeSignature;
-        mapBadges.replaceChildren();
-        for (const land of completedLands) {
-          const badge = element("span", "journal-map-complete");
-          badge.textContent = "✓";
-          badge.style.left = `${(land.x / 2400) * 100}%`;
-          badge.style.top = `${(land.y / 1610) * 100}%`;
-          setAttribute(badge, "data-land", land.id);
-          setAttribute(badge, "aria-label", `${land.name} stickers complete`);
-          mapBadges.append(badge);
-        }
-      }
-
-      const showMasterCrest = view.valleyComplete === true;
-      if (showMasterCrest) {
-        if (!mapMasterCrest.isConnected) mapSummary.prepend(mapMasterCrest);
-      } else if (mapMasterCrest.isConnected) {
-        mapMasterCrest.remove();
-      }
-      mapFooter.classList.toggle("has-master-crest", showMasterCrest);
-      setText(mapStickersPill, `Stickers ${view.stickersOwned}/${view.stickersTotal}`);
-      setText(mapPrizesPill, `Prizes ${view.prizesOwned}/${view.prizesTotal}`);
-      syncAttachedAfter(mapPrizesPill, mapFishPill, showFish);
-      if (showFish) setText(mapFishPill, `Fish ${fishOwned}/${fishList.length}`);
-      syncAttachedAfter(showFish ? mapFishPill : mapPrizesPill, mapKeepsakesPill, showKeepsakes);
-      if (showKeepsakes) {
-        setText(mapKeepsakesPill, `Keepsakes ${keepsakesOwned}/${keepsakesList.length}`);
-      }
-      const treasures = view.treasures;
-      const showTreasures = treasures !== undefined && treasures.hasAny;
-      mapTreasuresBtn.hidden = !showTreasures;
-      if (showTreasures) {
-        setText(
-          mapTreasuresBtn,
-          `Treasures · ${treasures.unlockedKeepsakes}/${treasures.totalKeepsakes}`,
-        );
-      }
       fieldOverlays.syncTreasures(view);
-      syncMapDetail(view);
-
-      const here = view.lands.find((land) => land.id === view.currentLand);
-      star.hidden = here === undefined;
-      setAttribute(star, "data-land", here?.id ?? "");
-      if (here !== undefined) {
-        // Just above the land's name, so the name stays readable.
-        star.style.left = `${(here.x / 2400) * 100}%`;
-        star.style.top = `${(here.y / 1610) * 100 - 7}%`;
-      }
+      mapPage.render(view, {
+        fishOwned,
+        fishTotal: fishList.length,
+        keepsakesOwned,
+        keepsakesTotal: keepsakesList.length,
+      });
     },
   };
 }

@@ -473,7 +473,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   paper tooth. In non-harness areas, a `shadowLayer` sits directly above `ground`
   and below `depth` (with a pooled `footstepLayer` above it) to ground Fae, party
   members, visible NPCs (hover shadows under the four fairies, skipping the
-  painted `bus-stop`), and overworld critters (scaling slightly as characters
+  painted `bus-stop`, soft indoor `0.24` alpha across all 14 indoor rooms in
+  `INDOOR_AREAS` including `cafe`, `sue-cottage`, and `jordan-cabin` vs `0.30`
+  outdoors, and `52 px` adult contact shadows / `132 px` adult emote head
+  clearance across all 13 adult townspeople in `ADULT_NPCS`: `mom`, `dad`,
+  `teacher`, `nurse`, `coach`, `music-teacher`, `fern`, `chef`, `barnaby`,
+  `bree`, `buster`, `bay-keeper`, and `pass-keeper`, Milestone 123), and
+  overworld critters (scaling slightly as characters
   bounce or hover); a deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`,
   with pure stateless zero-Pixi particle recipes and `evaluateAtmosphere` extracted
   into `src/render/atmosphere-recipes.ts` and re-exported from `atmosphere.ts`,
@@ -3462,7 +3468,9 @@ trunks keep its two exits.
   of the close sticker) flip between NOTES, MAP, and OPTIONS. The journal opens
   on notes; ArrowLeft/ArrowRight and A/D step between pages without stealing
   arrow keys from any focused volume slider.
-- The painted MAP page overlays hand-drawn SVG bus routes (`mapBusRoutes` in
+- The painted MAP page (extracted cleanly into `src/ui/journal-map.ts` via
+  `createJournalMapPage`, `busRoutePath`, and `busStopIcon`, Milestone 123)
+  overlays hand-drawn SVG bus routes (`mapBusRoutes` in
   `src/core/journal.ts`, dashed sky-blue with cream halo when open, subtle
   dashed ink when locked) connecting the three bus-stop lands, shows crisp `✓`
   completion badges beside revealed lands whose discoverable stickers are all

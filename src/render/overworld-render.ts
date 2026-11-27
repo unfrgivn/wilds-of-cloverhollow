@@ -47,9 +47,26 @@ export const INDOOR_AREAS = new Set([
   "arcade",
   "lodge",
   "clubhouse",
+  "cafe",
+  "sue-cottage",
+  "jordan-cabin",
 ]);
 
-export const ADULT_NPCS = new Set(["mom", "teacher", "nurse", "coach", "music-teacher", "fern"]);
+export const ADULT_NPCS = new Set([
+  "mom",
+  "dad",
+  "teacher",
+  "nurse",
+  "coach",
+  "music-teacher",
+  "fern",
+  "chef",
+  "barnaby",
+  "bree",
+  "buster",
+  "bay-keeper",
+  "pass-keeper",
+]);
 
 export const SURFACE_PUFFS: Record<Surface, { tint: number; alpha: number }> = {
   sand: { tint: 0xebd7b8, alpha: 0.45 },

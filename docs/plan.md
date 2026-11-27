@@ -5511,6 +5511,43 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4421 just e2e` (1,134 passed, 2 skipped, 0 failed,
   zero snapshot diffs across Chromium & WebKit in 5.3 min).
 
+## Milestone 123: Adult NPC Overworld Proportion & Indoor Shadow Calibration + `src/ui/journal-map.ts` Modular Extraction **Status:** ✅ Completed (2026-11-27)
+- Calibrates indoor contact-shadow lighting across all 14 indoor rooms and
+  completes the 13-character adult NPC shadow and emote-clearance roster in
+  `src/render/overworld-render.ts`, and extracts the interactive Journal MAP
+  page into `src/ui/journal-map.ts` with zero `src/core` changes and zero
+  replay hash shifts across all 67 recorded sims.
+- Adult NPC & Indoor Shadow Calibration (`src/render/overworld-render.ts`):
+  - Adds `"cafe"`, `"sue-cottage"`, and `"jordan-cabin"` to `INDOOR_AREAS`
+    (all 14 indoor rooms receive soft warm `0.24` indoor contact shadows
+    instead of `0.30` outdoor sun shadows).
+  - Adds `"dad"`, `"chef"`, `"barnaby"`, `"bree"`, `"buster"`, `"bay-keeper"`,
+    and `"pass-keeper"` to `ADULT_NPCS` (all 13 adult townspeople receive
+    `52 px` adult contact shadows via `computeNpcShadow` and `132 px` adult
+    emote head clearance via `computeNpcOverworldHeight`, while preserving
+    existing `content/characters.json` scales including `0.48` on Buster,
+    Bay Keeper, and Pass Keeper).
+- Modular Journal MAP Extraction (`src/ui/journal-map.ts`, `src/ui/journal.ts`,
+  `src/ui/dom.ts`):
+  - Extracts `createJournalMapPage`, `busRoutePath`, `busStopIcon`, Land Guide
+    pin interactivity, SVG bus routes, completion badges, 100% Valley Explorer
+    Master Crest, Treasures button, and signature caches into
+    `src/ui/journal-map.ts`, sharing `syncAttachedAfter` in `src/ui/dom.ts`
+    and deduplicating slot/option/button sync helpers in `src/ui/journal.ts`
+    (trimming `src/ui/journal.ts` from `1,340` lines to `993` lines with zero
+    pixel diffs on MAP/Journal UI).
+- Evidence: `tests/unit/milestone-123.test.ts` (3 tests), review JPEGs
+  `art/review/m123-cafe-adults.jpg` and `art/review/m123-kitchen-parents.jpg`
+  verified with `vision`.
+- Gates: `just check` (182 unit files / 1,379 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), full
+  `CLOVERHOLLOW_E2E_PORT=4431 just e2e` (1,134 passed, 2 skipped, 0 failed,
+  zero snapshot diffs across Chromium & WebKit in 5.9 min), `just ios-smoke`
+  (passed end-to-end on iPhone 17 / iOS 27.0 with the new Storybook App Icon
+  and Launch Splash), and `just ios-device-build` (`Release-iphoneos/App.app`
+  unsigned arm64 built cleanly).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

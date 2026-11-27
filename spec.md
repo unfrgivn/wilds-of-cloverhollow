@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 103)
+Last updated: 2026-11-27 (Milestone 106)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -381,6 +381,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   variation (`footstepPitchFactor(tick)` in `src/platform/voices.ts`,
   `0.94..1.06`, zero `Math.random()`), remaining replaceable by clips pending
   the owner's pick. The plaza's default is stone, because it is a paved square.
+- Celebration fanfares & camera shutter audio (Milestone 106, `src/platform/audio.ts`):
+  `sticker` plays a warm 6-note storybook harp/celesta sparkle flourish
+  (C5→E5→G5→B5→C6 + C7 sparkle overtone, ~0.48 s); `level-up` plays an uplifting
+  7-note celebratory RPG arpeggio (C5→D5→E5→G5→A5→C6→E6 over a C4 bass root +
+  C7 shimmer, ~0.55 s); and `AudioController.playEffect` adds `"camera-shutter"`
+  (dual-transient mechanical click + soft lowpass lens whirr, ~0.12 s). Read-only
+  `soundCueRecipe` and `effectRecipe` helpers expose the synthesized recipes for
+  unit verification.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -450,13 +458,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   adventure areas (`plaza`, `park`, `bay`, `pass`, `trail`, `woods`, `hills`,
   `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
-- Photo / Showcase mode (Milestone 90): pressing `P` (`KeyP`) while exploring
-  the free overworld (ignored inside inputs, on title, dialogue, battle, arcade,
-  journal, finale, or QA overlays) toggles `data-photo="on"` on the root, hiding
-  `.sticker-prompt`, `.touch-controls`, `.hud-hints`, `.area-banner`,
-  `.qa-badge`, `.notice-marks`, and the dev debug readout (`view.setPhotoMode`)
-  for unobstructed storybook views. Pressing `P` again, `Escape`, or opening any
-  overlay exits Photo Mode automatically.
+- Photo / Showcase mode (Milestone 90) & Postcard Camera (Milestone 106): pressing
+  `P` (`KeyP`) while exploring the free overworld (ignored inside inputs, on title,
+  dialogue, battle, arcade, journal, finale, or QA overlays) toggles
+  `data-photo="on"` on the root, hiding `.sticker-prompt`, `.touch-controls`,
+  `.hud-hints`, `.area-banner`, `.qa-badge`, `.notice-marks`, and the dev debug
+  readout (`view.setPhotoMode`) for unobstructed storybook views. While Photo Mode
+  is active, pressing `Enter` or `Space` (swallowing confirm so it never interacts
+  or scrolls) plays `camera-shutter`, triggers a 240 ms warm-cream
+  `.photo-shutter-flash` overlay (softened to a subtle 220 ms pulse under Reduced
+  Motion), extracts the live viewport via Pixi `app.renderer.extract.canvas`,
+  frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
+  `#47321f` hand-inked inner rule, four-leaf clover emblem, region subcaption, and
+  bottom-right `"<Area> · Wilds of Cloverhollow"` stamp in `src/ui/postcard.ts`),
+  and downloads `cloverhollow-postcard-<areaId>.png`. Pressing `P` again, `Escape`,
+  or opening any overlay exits Photo Mode automatically.
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -1268,10 +1284,12 @@ ios/            Capacitor iOS project (from Milestone 4).
     `moon-feather` on sticker `starry-owl`, `taco-badge` on sticker `taco-chef`,
     `clover-wreath` on `sanctuary_reward_14` mounted on the left wood wall at
     `(468, 314)`, `sea-compass` on `sue_compass` perched on the crate
-    front-right corner at `(782, 348)`, `alpine-clover` on `jordan_clover`
+    front-right corner at `(796, 350)`, `alpine-clover` on `jordan_clover`
     mounted beside the wreath at `(516, 308)`, and `star-whistle` on
     `buster_reward` perched on the round window sill at `(805, 259)` — 22 total
-    Living Clubhouse items), each grounded with a miniature contact shadow and
+    Living Clubhouse items, with Milestone 106 spacing polish across the upper
+    and lower right shelves, beanbag 2×2 cuddle arc, crate keepsake row, and
+    left floor perches), each grounded with a miniature contact shadow and
     subtle breathing sparkle aura.
   - `findPettableCompanion` & `findRestSpot` (`src/render/companions.ts`): on a
     fresh overworld confirm press when no real interactable (`targetInteractable`)
@@ -2551,6 +2569,17 @@ trunks keep its two exits.
   and during live command selection (outside Talk and the treat tray) displays
   a high-contrast `.sticker-subtitle` preview line (`battleCommandPreview`)
   describing the highlighted command, any active feeling match, or cooldown.
+- Die-cut Paper-Mario battle popups (Milestone 106, `src/ui/battle-popups.ts` &
+  `src/ui/battle.ts`): purely UI-driven by diffing consecutive live battle HUD
+  snapshots (zero `src/core` changes, zero popups on battle open/close/switch or
+  static gallery renders). Ephemeral `.battle-popup` pills mount inside
+  `.battle-popups` (`z-index: 28`, `pointer-events: none`), rising and fading over
+  850 ms (or a calm 450 ms fade under `prefers-reduced-motion: reduce` and
+  `data-reduced-motion="on"`), clearing immediately on battle end/reset: calm gains
+  spawn over the critter (`+N` mint-cream `#dff2cf`, `+N ★` butter-yellow `#ffe896`
+  for `>= 28`, `+N ♥` coral-pink `#ffd7e2` for `>= 45` or favourite-treat text),
+  popped wind-up bubbles spawn sky-blue `"POP!"` (`#d6eefc`), and energy restores
+  spawn peach-mint `+N ⚡` (`#e6f5d5`) over Fae.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. The menu grows with the party: four
@@ -3566,8 +3595,9 @@ trunks keep its two exits.
   These are harness only and are absent from production.
 - `settings` exposes `gentleTiming()`, `setGentleTiming(on)`, `keyHints()`,
   `setKeyHints(on)`, `textSpeed()`, `setTextSpeed(speed)`, `reducedMotion()`,
-  `setReducedMotion(on)`, `photoMode()`, and `setPhotoMode(on)` for toggling
-  and reading gameplay preferences in harness tests.
+  `setReducedMotion(on)`, `photoMode()`, `setPhotoMode(on)`, and
+  `snapPostcard(options?)` for toggling and reading gameplay preferences and
+  testing Photo Mode postcard captures in harness tests.
 - The iOS shell's native evidence uses the untouched Capacitor SPM template
   for native code and AXe for simulator UI description and touch gestures.
   `just ios-smoke` is the automated native evidence step; it resolves an

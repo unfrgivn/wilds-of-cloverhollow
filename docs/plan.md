@@ -4942,6 +4942,39 @@ the old trail, the owl, and the clubhouse claim.
   green across Chromium & WebKit; only the 6 ambient-flyer area baselines and
   proportional Credits baselines updated).
 
+## Milestone 107: Paper-Mario Battle Popups, Lush Celebration Fanfares, Photo Mode Postcard Camera & Clubhouse Diorama Polish **Status:** ✅ Completed (2026-11-27)
+- Pure presentation & audio craft milestone with zero `src/core` changes, zero
+  save-version bumps, and zero replay hash drift across all 67 recorded sims.
+- Die-cut Paper-Mario battle calm popups (`src/ui/battle-popups.ts`,
+  `src/ui/battle.ts`, `src/ui/battle.css`, `src/main.ts`):
+  - Pure `classifyBattlePopup(prev, next)` diffs live calm, energy, and popped
+    wind-up bubbles into crisp die-cut pills (`+N`, `+N ★`, `+N ♥`, `POP!`,
+    `+N ⚡`), returning `[]` on initial battle open, close, critter switch, or
+    tick rewind so static snapshots stay untouched, and respecting both
+    `prefers-reduced-motion: reduce` and `:root[data-reduced-motion="on"]`.
+- Lush celebration fanfares & shutter audio (`src/platform/audio.ts`):
+  - Upgraded `sticker` (6-note storybook harp/celesta flourish) and `level-up`
+    (7-note ascending arpeggio over C4 bass root + shimmer), and added
+    `"camera-shutter"` effect (dual-transient click + lens whirr).
+- Photo Mode Postcard Camera (`src/ui/postcard.ts`, `src/ui/sticker.css`,
+  `src/main.ts`, `src/dev/hook.ts`):
+  - Pressing `Enter` or `Space` in Photo Mode (`P`) plays `"camera-shutter"`,
+    flashes `.photo-shutter-flash`, extracts the live Pixi v8 viewport via
+    `app.renderer.extract.canvas`, frames it in a warm cream watercolor postcard
+    mat with four-leaf clover emblem and area stamp, and downloads
+    `cloverhollow-postcard-<areaId>.png`; exposed via
+    `window.__cloverhollow.settings.snapPostcard`.
+- Living Clubhouse 22-item diorama perch polish (`src/render/clubhouse-display.ts`):
+  - Refined spacing across the upper-right shelf, lower-right shelf, 2x2 beanbag
+    cuddle arc, wooden crate keepsake row, and left floor so all 13 prizes and
+    9 keepsakes sit strictly off walkable floor with clear visual separation.
+- Evidence: `tests/unit/milestone-106.test.ts` (7 tests) and
+  `tests/e2e/milestone-106.spec.ts` (`@smoke` Chromium + WebKit); all 3 review
+  captures (`art/review/m106-battle-popup-1280.jpg`,
+  `art/review/m106-postcard-sample.jpg`, `art/review/m106-clubhouse-diorama-1280.jpg`)
+  independently verified via `vision`.
+- Gates: `just check`, `just build`, and 659/659 targeted Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

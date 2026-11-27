@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Rectangle } from "pixi.js";
 import {
   blankInput,
   createState,
@@ -74,6 +74,13 @@ import { createGameSettings } from "./platform/game-settings";
 import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
 import { createHudHints, resolveHudInteractHint } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
+import {
+  composePostcardFrame,
+  createShutterFlash,
+  postcardMetadata,
+  triggerPostcardDownload,
+  type PostcardCapture,
+} from "./ui/postcard";
 import { qaFlow } from "./shell/qa-flow";
 import type { PackState } from "./dev/qa";
 
@@ -181,6 +188,7 @@ async function boot(): Promise<void> {
   const hudHints = createHudHints(uiRoot);
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
+  const shutterFlash = createShutterFlash(uiRoot);
   const bannerDuration = 150;
   let bannerArea: string | null = null;
   let bannerStartTick = -1;
@@ -728,6 +736,19 @@ async function boot(): Promise<void> {
           resolveImage: (id) => assets.speakerPortrait(id),
         })
       : [];
+    const poppedCount = battle?.windUp?.bubbles.filter((item) => item.popped).length ?? 0;
+    const popupSnapshot =
+      activeBattle && state.battle !== null && state.battle.phase !== "reward" && battle !== null
+        ? {
+            battleKey: state.battle.critterId,
+            calm: battle.calm,
+            energy: battle.energy,
+            poppedCount,
+            message: battle.message,
+            tick: state.tick,
+            paused,
+          }
+        : null;
     battleHud.render({
       visible: showBattleHud,
       energy: battle?.energy ?? 0,
@@ -744,6 +765,7 @@ async function boot(): Promise<void> {
       lassoAssist: hideActions ? null : (battle?.lassoAssist ?? null),
       lassoSteady: hideActions ? false : (battle?.lassoSteady ?? false),
       portraits: battlePortraits,
+      popupSnapshot,
     });
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
@@ -1175,8 +1197,43 @@ async function boot(): Promise<void> {
     }
   });
   render();
+  const snapPostcard = async (
+    options?: { download?: boolean },
+  ): Promise<PostcardCapture | null> => {
+    if (!photoMode || !canPhotoMode()) return null;
+    sound.playEffect("camera-shutter");
+    shutterFlash.trigger();
+    render(1);
+    app.render();
+    const extracted = app.renderer.extract.canvas({
+      target: app.stage,
+      frame: new Rectangle(0, 0, app.screen.width, app.screen.height),
+      resolution: app.renderer.resolution,
+      clearColor: 0xf8edcf,
+    });
+    const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
+    const area = content.world.areas[state.area];
+    const areaName = area?.name ?? state.area;
+    const land =
+      area?.land === undefined
+        ? undefined
+        : content.world.lands.find((entry) => entry.id === area.land);
+    const meta = postcardMetadata(state.area, areaName, land?.name ?? "");
+    const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
+    if (composed === null) return null;
+    if (options?.download !== false) {
+      triggerPostcardDownload(composed.dataUrl, meta.filename);
+    }
+    return {
+      filename: meta.filename,
+      caption: meta.caption,
+      width: composed.width,
+      height: composed.height,
+      dataUrl: composed.dataUrl,
+    };
+  };
   // Photo / showcase mode (spec 4): P hides overworld chrome for unobstructed
-  // storybook views; Escape exits cleanly.
+  // storybook views; Enter/Space snaps a framed Postcard PNG; Escape exits cleanly.
   window.addEventListener("keydown", (event) => {
     if (event.repeat) return;
     if (event.target instanceof HTMLElement &&
@@ -1201,6 +1258,13 @@ async function boot(): Promise<void> {
       if (!canPhotoMode()) return;
       event.preventDefault();
       setPhotoMode(!photoMode);
+      return;
+    }
+    if ((event.code === "Enter" || event.code === "Space") && photoMode && canPhotoMode()) {
+      event.preventDefault();
+      swallowed.add("confirm");
+      keyboard.clearTaps();
+      void snapPostcard({ download: true });
       return;
     }
     if (event.code === "Escape" && photoMode) {
@@ -1329,6 +1393,7 @@ async function boot(): Promise<void> {
         setPhotoMode: (on) => {
           setPhotoMode(on);
         },
+        snapPostcard,
       },
       boot: { title: () => titleMode },
     });

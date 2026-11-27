@@ -4,6 +4,7 @@ import type { AudioController } from "../platform/audio";
 import type { BattleCheckInfo } from "../render/view";
 import type { TimeOfDayPhase } from "../render/time-of-day";
 import type { ArcadeInfo } from "../ui/arcade";
+import type { PostcardCapture } from "../ui/postcard";
 import type { QaPack } from "./qa";
 
 export type CloverhollowHook = {
@@ -108,6 +109,7 @@ export type CloverhollowHook = {
     setReducedMotion: (on: boolean) => void;
     photoMode: () => boolean;
     setPhotoMode: (on: boolean) => void;
+    snapPostcard: (options?: { download?: boolean }) => Promise<PostcardCapture | null>;
   };
 };
 

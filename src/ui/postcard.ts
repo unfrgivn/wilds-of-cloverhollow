@@ -1,0 +1,250 @@
+import { element } from "./dom";
+
+export type PostcardMetadata = {
+  filename: string;
+  caption: string;
+  subcaption: string;
+};
+
+export type PostcardCapture = {
+  filename: string;
+  caption: string;
+  width: number;
+  height: number;
+  dataUrl: string;
+};
+
+export type ComposedPostcard = {
+  dataUrl: string;
+  width: number;
+  height: number;
+};
+
+function slugAreaId(areaId: string): string {
+  const cleaned = areaId
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return cleaned.length > 0 ? cleaned : "cloverhollow";
+}
+
+/** Pure formatter for Photo Mode postcard filenames, captions, and region labels. */
+export function postcardMetadata(
+  areaId: string,
+  areaName: string,
+  landName: string,
+): PostcardMetadata {
+  const slug = slugAreaId(areaId);
+  const cleanArea = areaName.trim().length > 0 ? areaName.trim() : "Cloverhollow";
+  const cleanLand = landName.trim();
+  return {
+    filename: `cloverhollow-postcard-${slug}.png`,
+    caption: `${cleanArea} · Wilds of Cloverhollow`,
+    subcaption: cleanLand,
+  };
+}
+
+function drawRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+): void {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawCloverStamp(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+): void {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.fillStyle = "#97c982";
+  ctx.strokeStyle = "#47321f";
+  ctx.lineWidth = Math.max(1.5, size * 0.14);
+  const offsets: readonly [number, number][] = [
+    [0, -size * 0.44],
+    [size * 0.44, 0],
+    [0, size * 0.44],
+    [-size * 0.44, 0],
+  ];
+  for (const [ox, oy] of offsets) {
+    ctx.beginPath();
+    ctx.arc(ox, oy, size * 0.38, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.22, 0, Math.PI * 2);
+  ctx.fillStyle = "#ffe896";
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function formatStampText(caption: string): string {
+  const trimmed = caption.trim();
+  if (trimmed.length === 0) return "Wilds of Cloverhollow";
+  if (/wilds of cloverhollow/i.test(trimmed)) return trimmed;
+  return `Wilds of Cloverhollow · ${trimmed}`;
+}
+
+/**
+ * Composes a live WebGL snapshot onto an offscreen 2D canvas framed inside a
+ * warm cream watercolor postcard border with thin hand-inked rules and a
+ * bottom-right storybook stamp.
+ */
+export function composePostcardFrame(
+  sourceCanvas: HTMLCanvasElement,
+  caption: string,
+  subcaption = "",
+): ComposedPostcard | null {
+  const srcWidth = sourceCanvas.width;
+  const srcHeight = sourceCanvas.height;
+  if (srcWidth <= 0 || srcHeight <= 0) return null;
+
+  const padX = Math.max(24, Math.round(srcWidth * 0.032));
+  const padTop = padX;
+  const padBottom = Math.max(60, Math.round(srcHeight * 0.095));
+  const width = srcWidth + padX * 2;
+  const height = srcHeight + padTop + padBottom;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (ctx === null) return null;
+
+  // Cozy warm cream watercolor paper stock.
+  ctx.fillStyle = "#fbf6e8";
+  ctx.fillRect(0, 0, width, height);
+
+  // Subtle inner cream mat trim and hand-drawn outer border.
+  const outerInset = Math.max(8, Math.round(padX * 0.26));
+  const outerRadius = Math.max(10, Math.round(padX * 0.34));
+  ctx.strokeStyle = "#e6dac0";
+  ctx.lineWidth = Math.max(2, Math.round(padX * 0.08));
+  drawRoundedRect(
+    ctx,
+    outerInset,
+    outerInset,
+    width - outerInset * 2,
+    height - outerInset * 2,
+    outerRadius,
+  );
+  ctx.stroke();
+
+  ctx.strokeStyle = "#47321f";
+  ctx.lineWidth = Math.max(2, Math.round(srcWidth * 0.002));
+  drawRoundedRect(
+    ctx,
+    outerInset + 4,
+    outerInset + 4,
+    width - (outerInset + 4) * 2,
+    height - (outerInset + 4) * 2,
+    Math.max(8, outerRadius - 3),
+  );
+  ctx.stroke();
+
+  // Live painting window with a crisp hand-inked inner rule.
+  ctx.drawImage(sourceCanvas, padX, padTop, srcWidth, srcHeight);
+  ctx.strokeStyle = "#47321f";
+  ctx.lineWidth = Math.max(2, Math.round(srcWidth * 0.0022));
+  ctx.strokeRect(padX, padTop, srcWidth, srcHeight);
+
+  // Bottom strip: clover emblem + region subcaption on left, storybook stamp on right.
+  const stripMidY = padTop + srcHeight + padBottom * 0.52;
+  const fontSize = Math.max(16, Math.round(padBottom * 0.34));
+  const subFontSize = Math.max(13, Math.round(padBottom * 0.25));
+  const cloverSize = Math.max(10, Math.round(padBottom * 0.19));
+
+  drawCloverStamp(ctx, padX + cloverSize + 4, stripMidY, cloverSize);
+
+  const cleanSub = subcaption.trim();
+  if (cleanSub.length > 0) {
+    ctx.fillStyle = "#6f5947";
+    ctx.font = `700 ${subFontSize}px Nunito, "Trebuchet MS", sans-serif`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(cleanSub.toUpperCase(), padX + cloverSize * 2 + 16, stripMidY);
+  }
+
+  ctx.fillStyle = "#47321f";
+  ctx.font = `800 ${fontSize}px Nunito, "Trebuchet MS", sans-serif`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText(formatStampText(caption), width - padX - 4, stripMidY);
+
+  const dataUrl = canvas.toDataURL("image/png");
+  if (!dataUrl.startsWith("data:image/png;base64,")) return null;
+  return { dataUrl, width, height };
+}
+
+/** Composes a framed Cloverhollow Postcard PNG and returns its data URL. */
+export function composePostcard(
+  sourceCanvas: HTMLCanvasElement,
+  caption: string,
+): string | null {
+  return composePostcardFrame(sourceCanvas, caption)?.dataUrl ?? null;
+}
+
+/** Triggers a browser file download for a composed postcard data URL. */
+export function triggerPostcardDownload(dataUrl: string, filename: string): void {
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = filename;
+  link.style.display = "none";
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+/** Crisp warm-cream shutter flash overlay used when snapping a Photo Mode postcard. */
+export function createShutterFlash(root: HTMLElement): { trigger: () => void } {
+  const node = element("div", "photo-shutter-flash");
+  node.setAttribute("aria-hidden", "true");
+  node.dataset.shutterCount = "0";
+  node.hidden = true;
+  root.append(node);
+  let timer = 0;
+  let count = 0;
+
+  const finish = (): void => {
+    window.clearTimeout(timer);
+    timer = 0;
+    node.classList.remove("is-flashing");
+    node.hidden = true;
+  };
+
+  node.addEventListener("animationend", finish);
+
+  return {
+    trigger: () => {
+      window.clearTimeout(timer);
+      count += 1;
+      node.dataset.shutterCount = String(count);
+      node.hidden = false;
+      node.classList.remove("is-flashing");
+      // Force layout restart so rapid consecutive snaps re-trigger the flash.
+      void node.offsetWidth;
+      node.classList.add("is-flashing");
+      timer = window.setTimeout(finish, 280);
+    },
+  };
+}

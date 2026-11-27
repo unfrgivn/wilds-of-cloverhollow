@@ -9,6 +9,21 @@ import type {
 } from "../core";
 import type { DialogueView } from "./sticker";
 import type { BattlePortraitItem } from "./battle-portraits";
+import {
+  classifyBattlePopup,
+  type BattlePopupKind,
+  type BattlePopupSide,
+  type BattlePopupSnapshot,
+  type BattlePopupSpec,
+} from "./battle-popups";
+
+export {
+  classifyBattlePopup,
+  type BattlePopupKind,
+  type BattlePopupSide,
+  type BattlePopupSnapshot,
+  type BattlePopupSpec,
+};
 
 export { createBattleCheck, type BattleCheckView, type TimingGrade } from "./battle-checks";
 
@@ -48,6 +63,7 @@ export type BattleHudView = {
   lassoAssist: { available: boolean; windUp: boolean } | null;
   lassoSteady: boolean;
   portraits?: readonly BattlePortraitItem[];
+  popupSnapshot?: BattlePopupSnapshot | null;
 };
 
 export type BattleCommand = {
@@ -421,7 +437,57 @@ export function createBattleHud(root: HTMLElement): {
   calm.append(calmLabel, calmRow);
   hud.append(energy, portraits, actionsLeft, calm);
   hud.hidden = true;
-  root.append(hud);
+  const popupsLayer = element("div", "battle-popups");
+  popupsLayer.setAttribute("aria-hidden", "true");
+  root.append(hud, popupsLayer);
+  type ActivePopup = {
+    node: HTMLElement;
+    spawnedAtTick: number | null;
+    timer: number;
+  };
+  const activePopups = new Set<ActivePopup>();
+  let prevPopupSnapshot: BattlePopupSnapshot | null = null;
+  let popupSequence = 0;
+  const popupMaxPausedTicks = 36;
+  const clearPopups = (): void => {
+    for (const entry of activePopups) {
+      window.clearTimeout(entry.timer);
+      entry.node.remove();
+    }
+    activePopups.clear();
+  };
+  const isReducedMotion = (): boolean =>
+    document.documentElement.dataset.reducedMotion === "on" ||
+    (typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const spawnPopup = (
+    spec: BattlePopupSpec,
+    indexInBurst: number,
+    spawnedAtTick: number | null,
+  ): void => {
+    const classes = ["battle-popup", `is-${spec.side}`];
+    if (spec.kind !== "normal") classes.push(`is-${spec.kind}`);
+    const node = element("div", classes.join(" "));
+    node.dataset.popupKind = spec.kind;
+    setText(node, spec.text);
+    const jitterSlot = (popupSequence + indexInBurst) % 3;
+    popupSequence += 1;
+    const dx = (jitterSlot - 1) * 18;
+    const dy = indexInBurst * -30 + (jitterSlot === 1 ? -6 : 0);
+    node.style.setProperty("--popup-dx", `${dx}px`);
+    node.style.setProperty("--popup-dy", `${dy}px`);
+    popupsLayer.append(node);
+    const entry: ActivePopup = { node, spawnedAtTick, timer: 0 };
+    const remove = (): void => {
+      if (!activePopups.has(entry)) return;
+      activePopups.delete(entry);
+      window.clearTimeout(entry.timer);
+      node.remove();
+    };
+    node.addEventListener("animationend", remove, { once: true });
+    entry.timer = window.setTimeout(remove, isReducedMotion() ? 520 : 920);
+    activePopups.add(entry);
+  };
   return {
     onTogether: (callback) => {
       togetherHandler = callback;
@@ -528,6 +594,32 @@ export function createBattleHud(root: HTMLElement): {
         String(Math.round(calmFraction * 100)),
       );
       fill.style.width = `${calmFraction * 100}%`;
+      const nextPopup = view.popupSnapshot ?? null;
+      const battleReset =
+        nextPopup === null ||
+        (prevPopupSnapshot !== null && prevPopupSnapshot.battleKey !== nextPopup.battleKey) ||
+        (prevPopupSnapshot?.tick !== undefined &&
+          nextPopup.tick !== undefined &&
+          nextPopup.tick < prevPopupSnapshot.tick);
+      if (battleReset) {
+        clearPopups();
+      } else if (nextPopup.paused === true && nextPopup.tick !== undefined) {
+        for (const entry of activePopups) {
+          if (
+            entry.spawnedAtTick !== null &&
+            nextPopup.tick - entry.spawnedAtTick >= popupMaxPausedTicks
+          ) {
+            window.clearTimeout(entry.timer);
+            entry.node.remove();
+            activePopups.delete(entry);
+          }
+        }
+      }
+      const spawned = classifyBattlePopup(prevPopupSnapshot, nextPopup);
+      spawned.forEach((spec, index) => {
+        spawnPopup(spec, index, nextPopup?.tick ?? null);
+      });
+      prevPopupSnapshot = nextPopup;
     },
   };
 }

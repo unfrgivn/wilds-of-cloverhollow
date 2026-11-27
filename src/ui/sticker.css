@@ -93,6 +93,35 @@
   display: none;
 }
 
+.photo-shutter-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  background: #fbf6e8;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.photo-shutter-flash[hidden] {
+  display: none;
+}
+
+.photo-shutter-flash.is-flashing {
+  animation: photo-shutter-pulse 240ms ease-out forwards;
+}
+
+@keyframes photo-shutter-pulse {
+  0% { opacity: 0; }
+  22% { opacity: 0.84; }
+  100% { opacity: 0; }
+}
+
+@keyframes photo-shutter-pulse-gentle {
+  0% { opacity: 0; }
+  30% { opacity: 0.24; }
+  100% { opacity: 0; }
+}
+
 .sticker-dialogue::before,
 .sticker-choice::before {
   content: "";
@@ -294,6 +323,9 @@
   .sticker-prompt > span,
   .notice-mark.is-alert { animation: none; }
   .sticker-choice { transition: none; }
+  .photo-shutter-flash.is-flashing {
+    animation: photo-shutter-pulse-gentle 220ms ease-out forwards;
+  }
 }
 
 :root[data-reduced-motion="on"] *,
@@ -302,6 +334,13 @@
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
+}
+
+:root[data-reduced-motion="on"] .photo-shutter-flash.is-flashing {
+  animation-name: photo-shutter-pulse-gentle !important;
+  animation-duration: 220ms !important;
+  animation-timing-function: ease-out !important;
+  animation-fill-mode: forwards !important;
 }
 
 .sticker-choices {

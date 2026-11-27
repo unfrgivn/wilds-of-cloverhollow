@@ -92,10 +92,10 @@ describe("Milestone 96: 8-Keepsake Showcase, 9 Resting Areas & core/battle Extra
     expect(display.keepsakes.find((item) => item.id === "sea-compass")).toEqual({
       id: "sea-compass",
       texture: "keepsakeCompass",
-      x: 782,
-      y: 348,
+      x: 796,
+      y: 350,
       zIndex: 414,
-      scale: 0.72,
+      scale: 0.66,
       sparkleTint: 0x7ae2d8,
     });
     expect(display.keepsakes.find((item) => item.id === "alpine-clover")).toEqual({

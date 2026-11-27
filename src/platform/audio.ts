@@ -53,7 +53,8 @@ export type CompanionAudioEffect =
   | "pet-pup"
   | "pet-squirrel"
   | "pet-bunny"
-  | "rest-sit";
+  | "rest-sit"
+  | "camera-shutter";
 
 export type AudioController = {
   play: (cue: SoundCue, tick: number, context?: SoundPlayContext) => SoundLogEntry;
@@ -75,7 +76,7 @@ export type AudioController = {
 };
 
 type Timing = { offset: number; duration: number; gain: number; attack?: number };
-type Segment =
+export type AudioSegment =
   | (Timing & { wave: "noise"; lowpass: number })
   | (Timing & {
       wave: "sine" | "square" | "triangle";
@@ -83,6 +84,7 @@ type Segment =
       endFrequency?: number;
       vibrato?: { rate: number; depth: number };
     });
+type Segment = AudioSegment;
 type Recipe = readonly Segment[];
 
 const preferenceKey = "cloverhollow-audio";
@@ -219,10 +221,26 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "sine", frequency: 1175, offset: 0.14, duration: 0.15, gain: 0.045 },
   ],
   sticker: [
-    { wave: "triangle", frequency: 523, offset: 0, duration: 0.12, gain: 0.095 },
-    { wave: "triangle", frequency: 659, offset: 0.085, duration: 0.12, gain: 0.095 },
-    { wave: "triangle", frequency: 784, offset: 0.17, duration: 0.16, gain: 0.105 },
-    { wave: "sine", frequency: 1047, offset: 0.25, duration: 0.22, gain: 0.06 },
+    { wave: "triangle", frequency: 523.25, offset: 0, duration: 0.11, gain: 0.09, attack: 0.004 },
+    {
+      wave: "triangle",
+      frequency: 659.25,
+      offset: 0.06,
+      duration: 0.11,
+      gain: 0.09,
+      attack: 0.004,
+    },
+    {
+      wave: "triangle",
+      frequency: 783.99,
+      offset: 0.12,
+      duration: 0.12,
+      gain: 0.095,
+      attack: 0.004,
+    },
+    { wave: "sine", frequency: 987.77, offset: 0.18, duration: 0.13, gain: 0.09, attack: 0.004 },
+    { wave: "sine", frequency: 1046.5, offset: 0.24, duration: 0.24, gain: 0.1, attack: 0.004 },
+    { wave: "sine", frequency: 2093, offset: 0.26, duration: 0.2, gain: 0.032, attack: 0.004 },
   ],
   "lantern-on": [
     { wave: "triangle", frequency: 392, offset: 0, duration: 0.1, gain: 0.07 },
@@ -245,10 +263,36 @@ const recipes: Record<SoundCue, Recipe> = {
     { wave: "sine", frequency: 880, offset: 0.25, duration: 0.14, gain: 0.05 },
   ],
   "level-up": [
-    { wave: "triangle", frequency: 523, offset: 0, duration: 0.1, gain: 0.1 },
-    { wave: "triangle", frequency: 659, offset: 0.085, duration: 0.1, gain: 0.1 },
-    { wave: "triangle", frequency: 784, offset: 0.17, duration: 0.12, gain: 0.105 },
-    { wave: "sine", frequency: 1047, offset: 0.26, duration: 0.24, gain: 0.09 },
+    { wave: "triangle", frequency: 261.63, offset: 0, duration: 0.46, gain: 0.065, attack: 0.008 },
+    { wave: "triangle", frequency: 523.25, offset: 0, duration: 0.09, gain: 0.085, attack: 0.003 },
+    {
+      wave: "triangle",
+      frequency: 587.33,
+      offset: 0.055,
+      duration: 0.09,
+      gain: 0.085,
+      attack: 0.003,
+    },
+    {
+      wave: "triangle",
+      frequency: 659.25,
+      offset: 0.11,
+      duration: 0.095,
+      gain: 0.09,
+      attack: 0.003,
+    },
+    {
+      wave: "triangle",
+      frequency: 783.99,
+      offset: 0.165,
+      duration: 0.1,
+      gain: 0.095,
+      attack: 0.003,
+    },
+    { wave: "sine", frequency: 880, offset: 0.22, duration: 0.11, gain: 0.09, attack: 0.003 },
+    { wave: "sine", frequency: 1046.5, offset: 0.275, duration: 0.15, gain: 0.095, attack: 0.003 },
+    { wave: "sine", frequency: 1318.51, offset: 0.33, duration: 0.22, gain: 0.095, attack: 0.004 },
+    { wave: "sine", frequency: 2093, offset: 0.34, duration: 0.18, gain: 0.032, attack: 0.004 },
   ],
   "battle-command": [{ wave: "triangle", frequency: 494, offset: 0, duration: 0.095, gain: 0.085 }],
   "battle-together": [
@@ -703,7 +747,40 @@ const effectRecipes: Record<CompanionAudioEffect, Recipe> = {
     { wave: "sine", frequency: 440, offset: 0.055, duration: 0.32, gain: 0.055, attack: 0.02 },
     { wave: "sine", frequency: 523.25, offset: 0.11, duration: 0.34, gain: 0.05, attack: 0.02 },
   ],
+  "camera-shutter": [
+    { wave: "noise", offset: 0, duration: 0.022, gain: 0.055, lowpass: 3400, attack: 0.001 },
+    {
+      wave: "triangle",
+      frequency: 1180,
+      endFrequency: 520,
+      offset: 0,
+      duration: 0.024,
+      gain: 0.045,
+      attack: 0.001,
+    },
+    { wave: "noise", offset: 0.042, duration: 0.024, gain: 0.048, lowpass: 2800, attack: 0.001 },
+    {
+      wave: "triangle",
+      frequency: 940,
+      endFrequency: 420,
+      offset: 0.042,
+      duration: 0.026,
+      gain: 0.038,
+      attack: 0.001,
+    },
+    { wave: "noise", offset: 0.055, duration: 0.065, gain: 0.02, lowpass: 1100, attack: 0.006 },
+  ],
 };
+
+/** Read-only cue recipe lookup for audio craft verification. */
+export function soundCueRecipe(cue: SoundCue): readonly AudioSegment[] {
+  return recipes[cue];
+}
+
+/** Read-only shell effect recipe lookup for audio craft verification. */
+export function effectRecipe(effect: CompanionAudioEffect): readonly AudioSegment[] {
+  return effectRecipes[effect];
+}
 
 function createReverbImpulse(audio: AudioContext): AudioBuffer {
   const length = Math.max(1, Math.floor(audio.sampleRate * 1.0));

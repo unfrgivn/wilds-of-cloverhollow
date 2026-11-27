@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 154)
+Last updated: 2026-11-27 (Milestone 156)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -832,11 +832,14 @@ ios/            Capacitor iOS project (from Milestone 4).
     painted bust-portrait parity across every profile, banter pair, party
     banter entry, and tool event speaker including `"Nurse Clover"` aliased to
     Nurse Holly's warm clinical timbre, `"school"` accent, and `["nurse",
-    "adult"]` portrait in Milestone 155, 34 biome-wide NPC-to-NPC social banter entries including
-    shop duos and six post-finale celebration banter pairs, 15 traveling party
-    companion banter entries `partyBanter`, and 7 interactive tool micro-events
-    `toolEvents` across `lantern`, `flute`, and `lasso`, skipping `bus-stop`
-    and `sanctuary-*` critters) to drive live organic facing, distance-rippled
+    "adult"]` portrait in Milestone 155, 34 biome-wide NPC-to-NPC social
+    banter entries including shop duos and six post-finale celebration banter
+    pairs, 17 traveling party companion banter entries `partyBanter` including
+    two Alpine Summit Overlook scenes, and 8 interactive tool micro-events
+    `toolEvents` across `lantern`, `flute`, and `lasso` including party-only
+    `summit-aurora-lantern` on the NPC-free Alpine Summit Overlook, skipping
+    `bus-stop` and `sanctuary-*` critters) to drive live organic facing,
+    distance-rippled
     attention (`dialogue` > `lantern-awe` > `celebrate` > `music-delight` >
     `chaos-worry` > `companion-greet` > `player-greet` > `social-chat` > `idle`,
     preserving authored arrival facing during a 48-tick arrival grace window),
@@ -868,7 +871,30 @@ ios/            Capacitor iOS project (from Milestone 4).
     `data-credits="open"`, and `data-arcade="open"` plus `harness`, Milestone
     148).
     `renderInfo().npcLife` exposes read-only
-    `{ stage, activeToolEventId, npcs, party, chatter }`.
+    `{ stage, activeToolEventId, npcs, party, chatter }` (with each `npcs` entry
+    including live `{ id, x, y, moving, attention, facing, emote }`).
+  - Deterministic Kinetic Strolling NPCs (Milestone 156,
+    `src/core/npc-stroll.ts`, `src/content/npc-parsers.ts`,
+    `src/content/area-checks.ts`, `src/render/entity-layer.ts`,
+    `src/render/overworld-effects.ts`): optional `stroll: { waypoints, speed,
+    pauseTicks }` on outdoor NPCs (strictly validated: `>= 2` finite waypoints
+    starting at `npc.point`, `speed` in `(0, 2]`, integer `pauseTicks >= 30`,
+    and every waypoint and segment midpoint inside `area.walkable`, clear of
+    static blockers/props/crossings, and within interaction reach). Seven
+    outdoor townspeople stroll along sunlit closed loops (`bay.sal`, `bay.nora`,
+    `hills.sunny`, `hills.bram`, `pass.tuck`, `woods.wren`, `field.leo`):
+    `npcStrollAt` glides linearly between `pauseTicks` rests (holding incoming
+    segment facing during pauses, or `"down"` at `waypoints[0]`) with exact
+    walked `distance` and cycle periodicity; `npcLivePoint` freezes a strolling
+    NPC in place via `dialogue.partnerPoint` for the full duration of a
+    conversation (`state.dialogue` remains `null` in saves so save shape and
+    version stay unchanged); `npcLiveFootprint` translates solid collision and
+    interaction targets live; presentation interpolates at 120 Hz with
+    Paper-Mario `walkPose(distance, 72, true)` bounce, lift-scaled contact
+    shadows, seamless y-sorting, and surface-tinted footstep dust puffs on
+    walk half-cycles (`Math.floor(distance / 36)`), while honoring 100%
+    `reducedMotion` parity (holding strolling NPCs calmly at `waypoints[0]`
+    with `NEUTRAL_POSE`, anchored chatter/emotes, and zero footstep puffs).
   - Cross-biome living errands, automatic Journal `NOTES` tracking &
     snack-sharing (all stitch-gated with zero new global Ink `VAR`s): Mailman
     Gus's Postal Chain (`Gus -> Captain Sal -> Mina -> Gus`), Wren's Botanical

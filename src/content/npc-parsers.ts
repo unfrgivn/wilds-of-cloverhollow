@@ -13,10 +13,12 @@ import type {
   NpcProfile,
   NpcProfilesContent,
   NpcStoryStage,
+  NpcStroll,
   NpcToolEvent,
   NpcToolEventTone,
   NpcToolTrigger,
   PartyContent,
+  Point,
 } from "../core";
 import { field, record, strings } from "./parsers";
 
@@ -73,6 +75,49 @@ function knownCalmNames(
     for (const piece of area.critters) known.add(piece.id);
   for (const critter of Object.values(critters)) known.add(critter.species);
   return known;
+}
+
+export function parseNpcStroll(
+  raw: unknown,
+  npcPoint: Point,
+  file: string,
+  label: string,
+): NpcStroll | undefined {
+  if (raw === undefined) return undefined;
+  field(record(raw), file, label);
+  const rawWaypoints = raw.waypoints;
+  field(Array.isArray(rawWaypoints) && rawWaypoints.length >= 2, file, `${label}.waypoints`);
+  const waypoints: Point[] = rawWaypoints.map((entry, index): Point => {
+    field(
+      record(entry) &&
+        typeof entry.x === "number" &&
+        Number.isFinite(entry.x) &&
+        typeof entry.y === "number" &&
+        Number.isFinite(entry.y),
+      file,
+      `${label}.waypoints[${index}]`,
+    );
+    return { x: entry.x, y: entry.y };
+  });
+  const first = waypoints[0];
+  field(
+    first !== undefined && first.x === npcPoint.x && first.y === npcPoint.y,
+    file,
+    `${label}.waypoints[0] (must match npc.point)`,
+  );
+  const speed = raw.speed;
+  field(
+    typeof speed === "number" && Number.isFinite(speed) && speed > 0 && speed <= 2,
+    file,
+    `${label}.speed`,
+  );
+  const pauseTicks = raw.pauseTicks;
+  field(
+    typeof pauseTicks === "number" && Number.isInteger(pauseTicks) && pauseTicks >= 30,
+    file,
+    `${label}.pauseTicks`,
+  );
+  return { waypoints, speed, pauseTicks };
 }
 
 export function npcScheduleErrors(
@@ -345,8 +390,11 @@ export function parseNpcProfiles(
       (speaker) =>
         area.npcs.some((npc) => npc.id === speaker) || party[speaker] !== undefined,
     );
+    const hasAreaNpcs = area.npcs.some(
+      (npc) => npc.id !== "bus-stop" && !npc.id.startsWith("sanctuary-"),
+    );
     field(
-      turns.some((turn) => area.npcs.some((npc) => npc.id === turn.speaker)),
+      !hasAreaNpcs || turns.some((turn) => area.npcs.some((npc) => npc.id === turn.speaker)),
       file,
       `${label}.turns (needs an area NPC speaker)`,
     );

@@ -79,7 +79,7 @@ describe("the Living NPCs tour recording", () => {
     expect(state.snacks).toBe(7);
     expect(state.coins - baseline.coins).toBe(5);
     expect(state.snacks - baseline.snacks).toBe(5);
-    expect(state.tick).toBe(9251);
-    expect(stableHash(state)).toBe("e68d690a");
+    expect(state.tick).toBe(9193);
+    expect(stableHash(state)).toBe("19875e33");
   });
 });

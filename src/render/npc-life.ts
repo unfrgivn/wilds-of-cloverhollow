@@ -31,6 +31,9 @@ export type NpcLifeRenderInfo = {
   activeToolEventId: string | null;
   npcs: {
     id: string;
+    x: number;
+    y: number;
+    moving: boolean;
     attention: NpcAttention;
     facing: Direction;
     emote: NpcEmoteKind | null;
@@ -219,9 +222,9 @@ export class NpcLifeController {
     this.lastTick = state.tick;
   }
 
-  update(state: State, livingMotion = false): NpcLifeSnapshot {
+  update(state: State, livingMotion = false, reducedMotion = false): NpcLifeSnapshot {
     this.observeTick(state);
-    const life = evaluateNpcLife(this.world, state, {
+    const rawLife = evaluateNpcLife(this.world, state, {
       areaTicks: this.areaTicks(state.tick),
       lastCalmedTick: this.lastCalmedTick,
       lastTalkNpcId: this.lastTalkNpcId,
@@ -229,6 +232,34 @@ export class NpcLifeController {
       lastFluteTick: this.lastFluteTick,
       lanternOnTick: this.lanternOnTick,
     });
+    const area = this.world.areas[state.area];
+    const life: NpcLifeSnapshot = !reducedMotion || area === undefined
+      ? rawLife
+      : (() => {
+          const strollingHome = new Map<string, Npc>();
+          for (const npc of area.npcs) {
+            if (npc.stroll !== undefined) strollingHome.set(npc.id, npc);
+          }
+          if (strollingHome.size === 0) return rawLife;
+          const npcs = rawLife.npcs.map((entry) => {
+            const home = strollingHome.get(entry.id);
+            if (home === undefined) return entry;
+            return {
+              ...entry,
+              x: home.point.x,
+              y: home.point.y,
+              moving: false,
+              facing: entry.attention === "idle" ? home.facing : entry.facing,
+            };
+          });
+          const chatterHome = rawLife.chatter === null
+            ? undefined
+            : strollingHome.get(rawLife.chatter.npcId);
+          const chatter = rawLife.chatter === null || chatterHome === undefined
+            ? rawLife.chatter
+            : { ...rawLife.chatter, x: chatterHome.point.x, y: chatterHome.point.y };
+          return { ...rawLife, npcs, chatter };
+        })();
     if (life.activeToolEventId !== null && life.activeToolEventId !== this.prevToolEventId) {
       if (state.area !== "harness" && livingMotion && life.chatter !== null) {
         const burstAttention =
@@ -275,8 +306,8 @@ export class NpcLifeController {
           attention === "companion-greet")
       ) {
         this.spawnReactionBurst(
-          npc.point.x,
-          npc.point.y - (entry?.adult ? 116 : 96),
+          entry?.x ?? npc.point.x,
+          (entry?.y ?? npc.point.y) - (entry?.adult ? 116 : 96),
           attention,
           state.tick,
         );
@@ -385,6 +416,9 @@ export class NpcLifeController {
       activeToolEventId: snap?.activeToolEventId ?? null,
       npcs: (snap?.npcs ?? []).map((entry) => ({
         id: entry.id,
+        x: entry.x,
+        y: entry.y,
+        moving: entry.moving,
         attention: entry.attention,
         facing: entry.facing,
         emote: entry.emote,

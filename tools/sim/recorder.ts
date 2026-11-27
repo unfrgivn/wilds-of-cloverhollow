@@ -7,6 +7,8 @@ import {
   battleCommands,
   blankInput,
   distanceToPolygon,
+  npcLiveFootprint,
+  npcLivePoint,
   pointInPolygon,
   presentCritters,
   sceneryArea,
@@ -140,8 +142,9 @@ export function createRecorder(world: World, initial: State): {
   const targetPoint = (id: string): Point => {
     const area = world.areas[state.area];
     const [kind, name] = id.includes(":") ? id.split(":", 2) : ["", id];
+    const npc = kind === "npc" ? area?.npcs.find((item) => item.id === name) : undefined;
     const point = kind === "npc"
-      ? area?.npcs.find((npc) => npc.id === name)?.point
+      ? (npc === undefined ? undefined : npcLivePoint(state, npc))
       : kind === "critter"
         ? presentCritters(world, state).find((critter) => `critter:${critter.key}` === id)?.point
         : kind === "glow"
@@ -155,7 +158,10 @@ export function createRecorder(world: World, initial: State): {
     if (room === undefined) return false;
     const area = sceneryArea(world, state.ink, room);
     const radius = world.tunables.playerRadius;
-    const solid = [...area.blockers, ...area.npcs.map((npc) => npc.footprint)];
+    const solid = [
+      ...area.blockers,
+      ...area.npcs.map((npc) => npcLiveFootprint(npc, npcLivePoint(state, npc))),
+    ];
     return pointInPolygon(point, area.walkable) &&
       distanceToPolygon(point, area.walkable) >= radius &&
       solid.every((polygon) =>
@@ -166,7 +172,36 @@ export function createRecorder(world: World, initial: State): {
   // stand there, else beside it, else above; or first on the side `from`,
   // where a watcher sees them both) and turns to face it.
   const approach = (id: string, from?: Direction): void => {
-    const point = targetPoint(id);
+    const area = world.areas[state.area];
+    const [kind, name] = id.includes(":") ? id.split(":", 2) : ["", id];
+    const strollingNpc = kind === "npc"
+      ? area?.npcs.find((item) => item.id === name && item.stroll !== undefined)
+      : undefined;
+    if (strollingNpc !== undefined) {
+      const areaId = state.area;
+      route(
+        (next) => {
+          if (
+            next.area !== areaId ||
+            next.battle !== null ||
+            next.dialogue !== null ||
+            next.transition !== null
+          ) {
+            return false;
+          }
+          const live = npcLivePoint(next, strollingNpc);
+          return Math.hypot(next.player.x - live.x, next.player.y - live.y) <= 52;
+        },
+        `approach strolling ${id}`,
+      );
+      const live = npcLivePoint(state, strollingNpc);
+      const dx = live.x - state.player.x;
+      const dy = live.y - state.player.y;
+      const dir: Direction =
+        Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
+      face(dir);
+      if (targetInteractable(world, state)?.id === id) return;
+    }
     const sides: Record<Direction, [number, number, Direction]> = {
       down: [0, 45, "up"], left: [-45, 0, "right"], right: [45, 0, "left"], up: [0, -45, "down"],
     };
@@ -174,6 +209,7 @@ export function createRecorder(world: World, initial: State): {
     const spots = (from === undefined ? order : [from, ...order.filter((side) => side !== from)])
       .map((side) => sides[side]);
     for (const [dx, dy, facing] of spots) {
+      const point = targetPoint(id);
       const spot = { x: point.x + dx, y: point.y + dy };
       if (!standable(spot)) continue;
       navigate(spot, 6);

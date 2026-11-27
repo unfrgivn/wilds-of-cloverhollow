@@ -1,3 +1,4 @@
+import { npcLivePoint } from "./npc-stroll";
 import { calmedFact, presentCritters } from "./sim";
 import type {
   Npc,
@@ -216,6 +217,7 @@ export function profileForNpc(world: World, npc: Npc): NpcProfile {
 
 export function makeNpcBubble(
   npc: Npc,
+  point: Point,
   profile: NpcProfile,
   text: string,
   tone: NpcChatterTone,
@@ -229,8 +231,8 @@ export function makeNpcBubble(
     text,
     tone,
     emote,
-    x: npc.point.x,
-    y: npc.point.y,
+    x: point.x,
+    y: point.y,
     adult: profile.adult,
     progress: clamp01(progress),
     alpha: clamp01(alpha),
@@ -294,8 +296,10 @@ export function evaluateToolEventForTrigger(
   for (const event of world.toolEvents) {
     if (event.area !== state.area || event.trigger !== trigger) continue;
     let validSpeakers = true;
-    let anchorNpc: Npc | null = null;
+    let anchorPoint: Point | null = null;
     let minNpcGap = Infinity;
+    let partyAnchor: Point | null = null;
+    let minPartyGap = Infinity;
     for (const turn of event.turns) {
       const npc = npcById.get(turn.speaker);
       const member = partyById.get(turn.speaker);
@@ -304,25 +308,34 @@ export function evaluateToolEventForTrigger(
         break;
       }
       if (npc !== undefined) {
-        const gap = dist(state.player, npc.point);
+        const live = npcLivePoint(state, npc);
+        const gap = dist(state.player, live);
         if (gap < minNpcGap) {
           minNpcGap = gap;
-          anchorNpc = npc;
+          anchorPoint = live;
+        }
+      } else if (member !== undefined) {
+        const gap = dist(state.player, member);
+        if (gap < minPartyGap) {
+          minPartyGap = gap;
+          partyAnchor = member;
         }
       }
     }
-    if (!validSpeakers || anchorNpc === null || minNpcGap > event.radius) continue;
-    const ripple = reactionRippleTicks(minNpcGap);
+    const effectiveAnchor = anchorPoint ?? partyAnchor;
+    const effectiveGap = anchorPoint !== null ? minNpcGap : minPartyGap;
+    if (!validSpeakers || effectiveAnchor === null || effectiveGap > event.radius) continue;
+    const ripple = reactionRippleTicks(effectiveGap);
     if (trigger === "lantern" && lanternTick !== null) {
       if (state.tick < lanternTick || state.tick - lanternTick < ripple) continue;
     }
     if (trigger === "flute" && fluteTick !== null) {
       if (state.tick < fluteTick || state.tick - fluteTick < ripple) continue;
     }
-    if (!matchesConditionAt(world, state, situation, anchorNpc.point, memory, event.when)) {
+    if (!matchesConditionAt(world, state, situation, effectiveAnchor, memory, event.when)) {
       continue;
     }
-    candidates.push({ event, minNpcGap });
+    candidates.push({ event, minNpcGap: effectiveGap });
   }
   if (candidates.length === 0) return null;
 
@@ -360,8 +373,16 @@ export function evaluateToolEventForTrigger(
     if (turn === undefined) return null;
     const npc = npcById.get(turn.speaker);
     if (npc !== undefined) {
-      return makeNpcBubble(npc, profileForNpc(world, npc), turn.text, event.tone, emote,
-        progress, alpha);
+      return makeNpcBubble(
+        npc,
+        npcLivePoint(state, npc),
+        profileForNpc(world, npc),
+        turn.text,
+        event.tone,
+        emote,
+        progress,
+        alpha,
+      );
     }
     const member = partyById.get(turn.speaker);
     if (member !== undefined) {

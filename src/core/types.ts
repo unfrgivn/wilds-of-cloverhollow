@@ -154,6 +154,11 @@ export type Den = {
   chance: number;
   after?: string;
 };
+export type NpcStroll = {
+  waypoints: Point[];
+  speed: number;
+  pauseTicks: number;
+};
 export type Npc = {
   id: string;
   point: Point;
@@ -161,6 +166,7 @@ export type Npc = {
   footprint: Polygon;
   knot: string;
   prompt: "Look" | "Talk" | "Pet";
+  stroll?: NpcStroll;
   visibleWhile?: string;
   hiddenWhile?: string;
   visibleWhenCalmed?: string;
@@ -1139,6 +1145,7 @@ export type State = {
     play?: { game: ArcadeGameId; price: number };
     ending?: true;
     credits?: true;
+    partnerPoint?: Point;
   } | null;
   // The set pieces' moods, for the whole game.
   critters: Record<string, Mood>;

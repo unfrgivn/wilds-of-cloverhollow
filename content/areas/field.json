@@ -1783,6 +1783,24 @@
           470
         ]
       ],
+      "stroll": {
+        "waypoints": [
+          {
+            "x": 360,
+            "y": 460
+          },
+          {
+            "x": 420,
+            "y": 460
+          },
+          {
+            "x": 390,
+            "y": 425
+          }
+        ],
+        "speed": 0.68,
+        "pauseTicks": 170
+      },
       "visibleWhile": "recess"
     },
     {

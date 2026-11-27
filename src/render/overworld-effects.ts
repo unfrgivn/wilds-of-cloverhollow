@@ -7,6 +7,7 @@ import {
   type Texture,
 } from "pixi.js";
 import {
+  npcLivePoint,
   npcVisible,
   presentCritters,
   surfaceAt,
@@ -31,6 +32,7 @@ import {
   LANTERN_MOTE_COUNT,
   LANTERN_MOTE_TINTS,
   spawnFootstepPuffs,
+  spawnNpcFootstepPuff,
   type FootstepPuff,
 } from "./overworld-render";
 import { storyTimeOfDay } from "./time-of-day";
@@ -74,6 +76,7 @@ export class OverworldEffectsController {
   private lastFootstepArea = "";
   private lastFootstepTick: number | undefined;
   private lastFootstepStride: number | undefined;
+  private readonly lastNpcFootstepStride = new Map<string, number>();
 
   private readonly lanternMotes: Sprite[] = [];
 
@@ -179,6 +182,7 @@ export class OverworldEffectsController {
     this.footstepPuffs = [];
     this.lastFootstepTick = undefined;
     this.lastFootstepStride = undefined;
+    this.lastNpcFootstepStride.clear();
     for (const sprite of this.footstepSprites) sprite.visible = false;
   }
 
@@ -254,6 +258,36 @@ export class OverworldEffectsController {
         if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
           this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
         }
+      }
+    }
+    const area = this.world.areas[areaId];
+    if (area !== undefined) {
+      const canEmit =
+        this.lastFootstepArea === areaId &&
+        this.lastFootstepTick !== undefined &&
+        state.tick - this.lastFootstepTick >= 1 &&
+        state.tick - this.lastFootstepTick <= 5;
+      for (const npc of area.npcs) {
+        if (npc.stroll === undefined || !npcVisible(this.world, state, npc)) continue;
+        const live = npcLivePoint(state, npc);
+        const npcStride = Math.floor(live.distance / 36);
+        const prevNpcStride = this.lastNpcFootstepStride.get(npc.id);
+        if (
+          canEmit &&
+          live.moving &&
+          prevNpcStride !== undefined &&
+          npcStride !== prevNpcStride
+        ) {
+          const map = this.world.surfaces[areaId];
+          const surface = map === undefined ? "grass" : surfaceAt(map, live);
+          this.footstepPuffs.push(
+            spawnNpcFootstepPuff(live, live.facing, surface, npcStride, state.tick),
+          );
+          if (this.footstepPuffs.length > FOOTSTEP_POOL_SIZE) {
+            this.footstepPuffs = this.footstepPuffs.slice(-FOOTSTEP_POOL_SIZE);
+          }
+        }
+        this.lastNpcFootstepStride.set(npc.id, npcStride);
       }
     }
     this.lastFootstepArea = areaId;
@@ -536,7 +570,10 @@ export class OverworldEffectsController {
             : profile !== undefined
               ? profile.adult ? 174 : 146
               : computeNpcOverworldHeight(npc, critter);
-        this.activeDialoguePartner = { npcId: npc.id, x: npc.point.x, y: npc.point.y, height };
+        const live = reducedMotion && npc.stroll !== undefined
+          ? npc.point
+          : npcLivePoint(state, npc);
+        this.activeDialoguePartner = { npcId: npc.id, x: live.x, y: live.y, height };
       } else {
         const calm = present
           .filter((item) => item.mood === "calm" && item.kind.calmKnot === knot)
@@ -602,10 +639,16 @@ export class OverworldEffectsController {
         : entry.adult
           ? 174
           : 146;
+      const npcObj = !reducedMotion && previousState !== undefined && alpha < 1
+        ? area.npcs.find((item) => item.id === entry.id && item.stroll !== undefined)
+        : undefined;
+      const pos = npcObj !== undefined && previousState !== undefined
+        ? interpolatePoint(npcLivePoint(previousState, npcObj), entry, alpha)
+        : { x: entry.x, y: entry.y };
       npcEmotes.push({
         id: entry.id,
-        x: entry.x,
-        y: entry.y,
+        x: pos.x,
+        y: pos.y,
         height,
         kind: entry.emote,
         index,

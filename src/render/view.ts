@@ -521,8 +521,17 @@ export class GameView {
       livingMotion,
       reducedMotion,
     );
-    const npcLife = this.npcLife.update(state, livingMotion);
-    this.entities.renderNpcs(state, shadowAlpha, livingMotion, npcLife, this.npcLife);
+    const npcLife = this.npcLife.update(state, livingMotion, reducedMotion);
+    this.entities.renderNpcs(
+      state,
+      shadowAlpha,
+      livingMotion,
+      npcLife,
+      this.npcLife,
+      canInterpolate ? previousState : undefined,
+      alpha,
+      reducedMotion,
+    );
     this.npcLife.renderReactions(state, livingMotion);
     this.effects.renderClubhouseDisplay(state, area, reducedMotion);
     this.entities.renderAmbient(state, area, reducedMotion);

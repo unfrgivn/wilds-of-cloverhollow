@@ -6762,6 +6762,19 @@ the old trail, the owl, and the clubhouse claim.
   budget + harness checks), and full e2e across Chromium (655 passed) & WebKit
   (558 passed; 1,213 total passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 156: Kinetic Living World — Deterministic Strolling NPCs & Alpine Summit Overlook Living Support **Status:** ✅ Completed (2026-11-27)
+- **Pure Deterministic Strolling Engine (`src/core/npc-stroll.ts`, `src/core/types.ts`, `src/core/index.ts`, `src/core/sim.ts`, `src/core/party.ts`, `src/core/npc-context.ts`, `src/core/npc-events.ts`)**:
+  - Added `NpcStroll`, optional `Npc["stroll"]`, and optional `State["dialogue"]["partnerPoint"]` (zero top-level `State` shape, save-version, or Ink `VAR` changes; `dialogue` is always `null` in saves).
+  - Implemented pure, `WeakMap`-compiled, V8/JSC-deterministic `npcStrollAt`, `npcStrollCycleTicks`, `npcLivePoint`, and `npcLiveFootprint` (closed-loop waypoint segments with `pauseTicks` rests, linear velocity, incoming-segment pause facing, exact walked `distance`, and cycle periodicity).
+  - Wired `npcLivePoint` and `npcLiveFootprint` through `solidArea`, `targetInteractable`, `npcFacing`, `openTalk`/`dialogueStep` (carrying `partnerPoint` across every line and choice so strolling NPCs freeze politely for the entire conversation), stationary-Fae zero-move collision push, `npc-context`, and `npc-events` (including party-only speaker support for `toolEvents` in NPC-free areas like `summit`).
+- **Strict Loader, Area Checks & Authored Content (`src/content/npc-parsers.ts`, `src/content/load.ts`, `src/content/area-checks.ts`, `content/areas/{bay,hills,pass,woods,field}.json`, `content/npc-profiles.json`)**:
+  - Added `parseNpcStroll` validation (`>= 2` finite waypoints with `waypoints[0] === npc.point`, `0 < speed <= 2`, integer `pauseTicks >= 30`), allowed party-only `toolEvents` speakers in NPC-free areas, and added waypoint + segment-midpoint walkability, static solid clearance, and reachability checks in `areaConnectionErrors`.
+  - Wired 7 sunlit strolling routines (`bay.sal`, `bay.nora`, `hills.sunny`, `hills.bram`, `pass.tuck`, `woods.wren`, `field.leo`) with staggered pauses (`165..210` ticks), plus 2 Alpine Summit Overlook `partyBanter` scenes (`party-summit-vista` and post-finale `party-summit-celebration`) and `summit-aurora-lantern` `toolEvent` (`jordan` -> `sue`).
+- **Kinetic Presentation Craft (`src/render/entity-layer.ts`, `src/render/overworld-render.ts`, `src/render/overworld-effects.ts`, `src/render/npc-life.ts`, `src/render/animation.ts`, `src/render/view.ts`)**:
+  - Interpolated strolling NPC positions at 120 Hz (`interpolatePoint`), composed `walkPose(live.distance, 72, true)` with lift-scaled contact shadows and live `zIndex`, emitted subtle surface-tinted gouache footstep dust puffs (`spawnNpcFootstepPuff`) on walk half-cycles (`Math.floor(distance / 36)`), tracked live dialogue partners and interpolated emotes, and enforced 100% `reducedMotion` parity (holding strolling NPCs calmly at `waypoints[0]` with `NEUTRAL_POSE`, home-anchored chatter/emotes, and zero footstep puffs).
+  - Exposed live `x`, `y`, and `moving` on `renderInfo().npcLife.npcs`.
+- **Evidence**: re-recorded `tests/sim/scripts/new-game/living-npcs.json` (9,193 ticks, hash `19875e33`; updated `tools/sim/recorder.ts` to intercept strolling NPCs cleanly and verified all 70 `origin/main` recordings keep exact hashes), expanded `tests/unit/living-npcs.test.ts`, added `@smoke` Chromium + WebKit E2E coverage in `tests/e2e/living-npcs.spec.ts`, verified `hills.spec.ts` and `summit.spec.ts` with zero regressions, and captured `vision`-audited 1280×720 review JPEG `art/review/living-npcs-strolling-hills.jpg`.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

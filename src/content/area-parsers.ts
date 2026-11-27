@@ -10,6 +10,7 @@ import type {
 } from "../core";
 import { parseAmbient, setAreaAmbient } from "./ambient";
 import { parseRecurring } from "./battle-parsers";
+import { parseNpcStroll } from "./npc-parsers";
 import {
   array,
   direction,
@@ -244,25 +245,30 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
       ...(item.visibleWhile === undefined ? {} : { visibleWhile: item.visibleWhile }),
     })),
     ...(recurring === undefined ? {} : { recurring }),
-    npcs: (value.npcs ?? []).map((item) => ({
-      id: item.id,
-      point: { x: item.point.x, y: item.point.y },
-      facing: item.facing,
-      footprint: item.footprint,
-      knot: item.knot,
-      prompt: item.prompt,
-      ...(item.visibleWhile === undefined ? {} : { visibleWhile: item.visibleWhile }),
-      ...(item.hiddenWhile === undefined ? {} : { hiddenWhile: item.hiddenWhile }),
-      ...(item.visibleWhenCalmed === undefined
-        ? {}
-        : { visibleWhenCalmed: item.visibleWhenCalmed }),
-      ...(item.visibleAfterCalm === undefined
-        ? {}
-        : { visibleAfterCalm: item.visibleAfterCalm }),
-      ...(item.hiddenAfterCalm === undefined
-        ? {}
-        : { hiddenAfterCalm: item.hiddenAfterCalm }),
-    })),
+    npcs: (value.npcs ?? []).map((item) => {
+      const npcPoint = { x: item.point.x, y: item.point.y };
+      const stroll = parseNpcStroll(item.stroll, npcPoint, file, `npcs.${item.id}.stroll`);
+      return {
+        id: item.id,
+        point: npcPoint,
+        facing: item.facing,
+        footprint: item.footprint,
+        knot: item.knot,
+        prompt: item.prompt,
+        ...(stroll === undefined ? {} : { stroll }),
+        ...(item.visibleWhile === undefined ? {} : { visibleWhile: item.visibleWhile }),
+        ...(item.hiddenWhile === undefined ? {} : { hiddenWhile: item.hiddenWhile }),
+        ...(item.visibleWhenCalmed === undefined
+          ? {}
+          : { visibleWhenCalmed: item.visibleWhenCalmed }),
+        ...(item.visibleAfterCalm === undefined
+          ? {}
+          : { visibleAfterCalm: item.visibleAfterCalm }),
+        ...(item.hiddenAfterCalm === undefined
+          ? {}
+          : { hiddenAfterCalm: item.hiddenAfterCalm }),
+      };
+    }),
     props: placeProps(parsePropPlacements(value.props, file), catalogue, file),
     atlases: catalogue?.atlases ?? [],
     spawns,

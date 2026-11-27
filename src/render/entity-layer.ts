@@ -2,6 +2,7 @@ import { Assets, Container, Sprite, Spritesheet, Texture } from "pixi.js";
 import {
   hiddenFraction,
   npcFacing,
+  npcLivePoint,
   npcVisible,
   partyLeader,
   presentCritters,
@@ -19,7 +20,7 @@ import type { Rect } from "./area-view";
 import { makeShadowSprite, placeAura } from "./battle-view";
 import { interpolatePoint } from "./camera";
 import type { RestSpot } from "./companions";
-import { idleBreathing, NEUTRAL_POSE, npcLivingPose } from "./motion";
+import { composePose, idleBreathing, NEUTRAL_POSE, npcLivingPose, walkPose } from "./motion";
 import { isAdultNpc, type NpcLifeController } from "./npc-life";
 import {
   computeCritterShadow,
@@ -437,6 +438,9 @@ export class OverworldEntityLayer {
     livingMotion: boolean,
     npcLife: NpcLifeSnapshot,
     lifeController: NpcLifeController,
+    previousState?: State,
+    alpha = 1,
+    reducedMotion = false,
   ): void {
     const lifeById = new Map(npcLife.npcs.map((entry) => [entry.id, entry]));
     const frames: NpcFrameInfo[] = [];
@@ -444,6 +448,15 @@ export class OverworldEntityLayer {
       sprite.visible = npcVisible(this.world, state, npc);
       if (shadow !== null) shadow.visible = sprite.visible;
       if (!sprite.visible) continue;
+      const currLive = npcLivePoint(state, npc);
+      const holdHome = reducedMotion && npc.stroll !== undefined;
+      const livePos: Point = holdHome
+        ? npc.point
+        : npc.stroll !== undefined && previousState !== undefined && alpha < 1
+          ? interpolatePoint(npcLivePoint(previousState, npc), currLive, alpha)
+          : { x: currLive.x, y: currLive.y };
+      const isMoving = !holdHome && currLive.moving;
+      const liveDistance = holdHome ? 0 : currLive.distance;
       if (npc.visibleWhenCalmed !== undefined) {
         const critter = this.world.critters[npc.visibleWhenCalmed];
         const sheet = critter === undefined ? undefined : Assets.get<Spritesheet>(critter.atlas);
@@ -451,7 +464,7 @@ export class OverworldEntityLayer {
         if (critter === undefined || texture === undefined) continue;
         const facing = npcFacing(state, npc);
         const talking = state.dialogue !== null && state.dialogue.knot === npc.knot;
-        const flipX = talking ? state.player.x > npc.point.x : npc.facing === "right";
+        const flipX = talking ? state.player.x > livePos.x : npc.facing === "right";
         const scale = critter.overworldHeight / critter.figureHeight;
         const pose = !livingMotion
           ? NEUTRAL_POSE
@@ -459,11 +472,11 @@ export class OverworldEntityLayer {
         sprite.texture = texture;
         sprite.anchor.set(0.5, 504 / 512);
         sprite.scale.set((flipX ? -scale : scale) * pose.scaleX, scale * pose.scaleY);
-        sprite.position.set(npc.point.x + pose.offsetX, npc.point.y + pose.offsetY);
+        sprite.position.set(livePos.x + pose.offsetX, livePos.y + pose.offsetY);
         sprite.rotation = pose.rotation;
-        sprite.zIndex = npc.point.y;
+        sprite.zIndex = livePos.y;
         if (shadow !== null) {
-          applyShadow(shadow, computeCritterShadow(npc.point, critter.overworldHeight, 0,
+          applyShadow(shadow, computeCritterShadow(livePos, critter.overworldHeight, 0,
             shadowAlpha));
         }
         frames.push({ id: npc.id, frame: "calm_idle_01", facing });
@@ -491,28 +504,48 @@ export class OverworldEntityLayer {
       if (texture.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(texture.defaultAnchor);
       const s = character.scale ?? 0.5;
-      const pose = !livingMotion || npc.id === "bus-stop"
+      const basePose = !livingMotion || npc.id === "bus-stop"
         ? NEUTRAL_POSE
         : npc.id.startsWith("fairy-")
           ? computeNpcPose(npc.id, npcIndex, state.tick, livingMotion)
-          : entry !== undefined && (entry.attention !== "idle" || areaTicks >= 48)
-            ? npcLivingPose(
+          : isMoving
+            ? walkPose(liveDistance, 72, true)
+            : entry !== undefined && (entry.attention !== "idle" || areaTicks >= 48)
+              ? npcLivingPose(
+                  entry.personality,
+                  entry.attention,
+                  state.tick,
+                  npcIndex,
+                  attentionAge,
+                  turnAge,
+                )
+              : computeNpcPose(npc.id, npcIndex, state.tick, livingMotion);
+      const pose =
+        isMoving &&
+        livingMotion &&
+        !reducedMotion &&
+        entry !== undefined &&
+        entry.attention !== "idle"
+          ? composePose(
+              basePose,
+              npcLivingPose(
                 entry.personality,
                 entry.attention,
                 state.tick,
                 npcIndex,
                 attentionAge,
                 turnAge,
-              )
-            : computeNpcPose(npc.id, npcIndex, state.tick, livingMotion);
+              ),
+            )
+          : basePose;
       sprite.scale.set((mirror ? -s : s) * pose.scaleX, s * pose.scaleY);
-      sprite.position.set(npc.point.x + pose.offsetX, npc.point.y + pose.offsetY);
+      sprite.position.set(livePos.x + pose.offsetX, livePos.y + pose.offsetY);
       sprite.rotation = pose.rotation;
-      sprite.zIndex = npc.point.y;
+      sprite.zIndex = livePos.y;
       if (shadow !== null) {
         applyShadow(
           shadow,
-          computeNpcShadow(npc.id, npc.point, pose, shadowAlpha, isAdultNpc(this.world, npc.id)),
+          computeNpcShadow(npc.id, livePos, pose, shadowAlpha, isAdultNpc(this.world, npc.id)),
         );
       }
       frames.push({ id: npc.id, frame: name, facing });

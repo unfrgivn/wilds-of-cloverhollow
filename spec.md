@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 157)
+Last updated: 2026-11-27 (Milestone 158)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -156,14 +156,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   `classifySnackTheater`, `isTalkTheater`, `radialBurst`, `applyTalkTheater`,
   `applySnackTheater`, `applyTogetherReady`, `applyTogetherActive`,
   `applyWindUpAndFizzle`, `applySoothedAndReward`) live in Pixi-free
-  `src/render/battle-vfx.ts` (re-exported through
-  `src/render/battle-choreography.ts`, Milestone 137). The
-  Pixi battle stage container, sprites, check geometry, and `renderBattle`
-  orchestration live in `BattleViewController` (`src/render/battle-view.ts`,
-  mounted by `GameView` in `src/render/view.ts`), delegating blurred backdrop
-  texture caching/invalidation, stage wash scrim, painted lighting waves,
-  spotlight, ground ellipse, sunburst rays, contact shadows, flute cameo
-  staging, and pooled stage VFX sprites to `BattleStageRenderer`
+  `src/render/battle-vfx.ts` and the six stage VFX choreography emitters
+  (`isLassoActionActive`, `emitRainbowLassoVfx`, `echoNoteColor`,
+  `emitEchoChimeVfx`, `emitSoothedConfettiVfx`, `emitLeanWindVfx`,
+  `emitPeekabooVfx`, `emitTraceBrushVfx`) live in Pixi-free
+  `src/render/battle-vfx-stage.ts` (re-exported identically through
+  `src/render/battle-vfx.ts` and `src/render/battle-choreography.ts`,
+  Milestones 137 & 157). The Pixi battle stage container, sprites, check
+  geometry, and `renderBattle` orchestration live in `BattleViewController`
+  (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
+  delegating blurred backdrop texture caching/invalidation, stage wash scrim,
+  painted lighting waves, spotlight, ground ellipse, sunburst rays, contact
+  shadows, flute cameo staging, and pooled stage VFX sprites
+  (`BATTLE_VFX_POOL_SIZE = 80`) to `BattleStageRenderer`
   (`src/render/battle-stage-render.ts`, Milestone 155),
   and the eight active battle timing-check DOM overlays (`ring`, `charge`,
   `chain`, `catch`, `lean`, `trace`, `peekaboo`, `echo`) live in
@@ -3399,6 +3404,52 @@ trunks keep its two exits.
   clicking any chime fires a directional tap via `touch.tapArrow(...)`,
   matching keyboard arrows and gamepad directions. Live choreography bounces
   the critter on each demo note and Fae on each echoed note.
+- Battle stage VFX choreography (Milestone 155, `src/render/battle-vfx.ts`,
+  `src/render/battle-vfx-stage.ts`, `src/render/battle-choreography.ts`,
+  `src/render/battle-view.ts` with `BATTLE_VFX_POOL_SIZE = 80` and `"mistWisp"`
+  in `BattleVfxTexture`): six reduced-motion-aware stage VFX emitters (all
+  holding `rotation: 0` and steady positions across ticks when `reducedMotion`
+  is enabled) join Snack Theater (Milestone 135) and Talk Theater (Milestone
+  136) to complete 8-of-8 battle stage choreography with zero `src/core`
+  changes:
+  - Rainbow Lasso Arc (`LASSO_ARC_DURATION = 32`, `RAINBOW_LASSO_COLORS`,
+    `isLassoActionActive`, `emitRainbowLassoVfx`): during live Rainbow Lasso
+    command lines (`phaseTicks < 32`), Fae leans forward while a 7-color pastel
+    rainbow arc (`alpha <= 0.96`) whips across `anchor: "between"` into a double
+    shimmering critter loop with orbiting sparkles, plus 4 golden Steady Snag
+    glints (`lassoSteady === true`) or 4 sky-blue wind-up bubble-pop puffs &
+    sparkles.
+  - Synesthetic Echo Chimes (`EchoColor`, `EchoChimeMotion`,
+    `ECHO_CHIME_COLORS`, `echoNoteColor`, `emitEchoChimeVfx`): maps each
+    `EchoNote` (`0..3`) to `red`/`yellow`/`green`/`blue`, emitting a
+    color-matched glow, ripple ring, and 4 rising sparkles over the critter on
+    demo notes or arcing from Fae on echoed notes, paired with gentle musical
+    sway (held neutral under `reducedMotion`).
+  - Wind-Gust Lean (`LEAN_WIND_TINTS` `[0x7ac7ea, 0x82d8be]`,
+    `emitLeanWindVfx`): strictly while a Lean gust is `blowing`, emits 6 crisp
+    sky-blue/seafoam-mint horizontal `mistWisp` ribbons and 3 wind sparkles
+    streaming right-to-left across `anchor: "between"` (`t = 0.66 -> 0.16`,
+    strictly clear of both sprites; held steady in `0.22..0.66` under
+    `reducedMotion`).
+  - Starry Owl Peekaboo Freeze (`PEEKABOO_WARNING_TINT`,
+    `PEEKABOO_WATCH_TINTS`, `PEEKABOO_DUST_TINT`, `emitPeekabooVfx`): emits an
+    amber-gold alert halo + 3 sparkles above the critter during `"warning"`, a
+    luminous moonbeam watch ring + lavender-blue gaze glow + 4 starlight flecks
+    during `"watching"`, and 2 subtle tiptoe dust `puff`s behind Fae during
+    `"safe"` when `progress > 0` (all held steady under `reducedMotion`).
+  - Shape Trace Watercolor Brush Choreography (`TRACE_BRUSH_COLORS`,
+    `TraceBrushMotion`, `emitTraceBrushVfx`): emits 0 particles and neutral sway
+    before tracing starts (`progress <= 0 && !drawing`); once actively painting,
+    blooms 1 pastel `softGlow` + 2–6 pastel `sparkle` particles (scaling with
+    progress) beside Fae's right hand (`anchor: "fae"`, `offsetX: 24..64`,
+    `offsetY: -56..-10`, strictly clear of Fae's face and the Trace canvas) with
+    gentle painting sway (`faeOffsetX`, `faeOffsetY`, `faeRotation`), holding
+    zero sway and zero particle rotation across ticks under `reducedMotion`.
+  - Soothed Victory Confetti (`SOOTHED_CONFETTI_COLORS`,
+    `emitSoothedConfettiVfx`): strictly during `phase === "soothed"`, frames the
+    critter outside `|offsetX| >= 90` with a warm golden halo and 10 pastel
+    petals & sparkles (5 petals + 5 sparkles), leaving `phase === "reward"` (8
+    Relief Bloom petals) untouched.
 - The kid's reveal plays `milo_calm`, clears `forest_fizzy` through `on_calm`,
   and leaves Milo calm under the tree. The sticker catalogue has 24 slots,
   including Milo, Cozy Bat, Gem Mole, Starry Owl, and Chef Mateo. The front-view NPC art is no longer
@@ -3471,10 +3522,11 @@ trunks keep its two exits.
   `battleMoodWaveB`) tinted dynamically by `battleStageMood` (`"calm-normal"`,
   `"windup"`, `"together-ready"`, `"together-active"`, `"soothed"`).
   `computeBattleChoreography` (`src/render/battle-choreography.ts`, paired with
-  pure theater VFX helpers in `src/render/battle-vfx.ts`, Milestones
-  73, 82, 135, 136, and 137) drives deterministic Paper Mario / EarthBound combat poses,
+  pure theater VFX helpers in `src/render/battle-vfx.ts` and
+  `src/render/battle-vfx-stage.ts`, Milestones
+  73, 82, 135, 136, 137, and 155) drives deterministic Paper Mario / EarthBound combat poses,
   `stageMood`, `hitStop`, and pooled `battleVfxLayer` particles (`sparkle`,
-  `heart`, `energyRing`, `puff`, `petal`, `softGlow`): staggered breathing,
+  `heart`, `energyRing`, `puff`, `petal`, `softGlow`, `mistWisp`, pool size 80): staggered breathing,
   highlighted actor step-forward on command selection, Heart-to-Heart `Talk`
   climax choreography classified by `isTalkTheater` (Fae's warm empathetic lean
   forward `offsetX: 6`, Milo/critter's calm lowered listening posture wrapped in

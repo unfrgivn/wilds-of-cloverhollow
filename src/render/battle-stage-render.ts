@@ -23,7 +23,7 @@ import {
 import { computeBackdropTransform } from "./overworld-render";
 import type { VfxTextures } from "./vfx-textures";
 
-const BATTLE_VFX_POOL_SIZE = 64;
+const BATTLE_VFX_POOL_SIZE = 80;
 
 export type BattleBackdropBounds = {
   x: number;

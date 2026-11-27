@@ -9,25 +9,76 @@ import {
   applyWindUpAndFizzle,
   clamp01,
   classifySnackTheater,
+  ECHO_CHIME_COLORS,
+  echoNoteColor,
+  emitEchoChimeVfx,
+  emitLeanWindVfx,
+  emitPeekabooVfx,
+  emitRainbowLassoVfx,
+  emitSoothedConfettiVfx,
+  emitTraceBrushVfx,
+  FIZZ_TINTS,
+  isLassoActionActive,
   isTalkTheater,
+  LASSO_ARC_DURATION,
+  LEAN_WIND_TINTS,
+  PEEKABOO_DUST_TINT,
+  PEEKABOO_WARNING_TINT,
+  PEEKABOO_WATCH_TINTS,
   radialBurst,
   RAINBOW_HEARTS,
+  RAINBOW_LASSO_COLORS,
+  RELIEF_PETALS,
+  SOOTHED_CONFETTI_COLORS,
   SPARKLE_TINTS,
+  TRACE_BRUSH_COLORS,
   type BattleStageMood,
   type BattleVfxAnchor,
+  type BattleVfxBlend,
   type BattleVfxParticle,
   type BattleVfxTexture,
+  type BattleVfxTextureKey,
+  type EchoChimeMotion,
+  type EchoColor,
   type SnackTheaterKind,
+  type TraceBrushMotion,
 } from "./battle-vfx";
 
 export {
   classifySnackTheater,
+  ECHO_CHIME_COLORS,
+  echoNoteColor,
+  emitEchoChimeVfx,
+  emitLeanWindVfx,
+  emitPeekabooVfx,
+  emitRainbowLassoVfx,
+  emitSoothedConfettiVfx,
+  emitTraceBrushVfx,
+  FIZZ_TINTS,
+  isLassoActionActive,
   isTalkTheater,
+  LASSO_ARC_DURATION,
+  LEAN_WIND_TINTS,
+  PEEKABOO_DUST_TINT,
+  PEEKABOO_WARNING_TINT,
+  PEEKABOO_WATCH_TINTS,
+  radialBurst,
+  RAINBOW_HEARTS,
+  RAINBOW_LASSO_COLORS,
+  RELIEF_PETALS,
+  SOOTHED_CONFETTI_COLORS,
+  SPARKLE_TINTS,
+  TRACE_BRUSH_COLORS,
   type BattleStageMood,
   type BattleVfxAnchor,
+  type BattleVfxBlend,
   type BattleVfxParticle,
   type BattleVfxTexture,
+  type BattleVfxTextureKey,
+  type EchoChimeMotion,
+  type EchoColor,
   type SnackTheaterKind,
+  type TraceBrushMotion,
 };
 
 export type BattleChoreography = {
@@ -128,6 +179,52 @@ export function computeBattleChoreography(
       const actor = actorForCommand(partyIds, partyCommands, selectedId);
       applyParty(actor, { offsetX: 10, offsetY: 0, scaleX: 1, scaleY: 1.02, rotation: 0 });
     }
+  }
+
+  // 1b. Rainbow Lasso throw choreography: forward lean + pastel rainbow arc & loop.
+  if (isLassoActionActive(battle)) {
+    const p = battle.phaseTicks;
+    const throwCurve =
+      p <= 10
+        ? Math.sin(((p + 1) / 11) * Math.PI * 0.5)
+        : 0.5 * (1 + Math.cos(((p - 10) / (LASSO_ARC_DURATION - 10)) * Math.PI));
+    const stretch = Math.sin(clamp01(p / 16) * Math.PI);
+    fae = composePose(
+      fae,
+      reducedMotion
+        ? { offsetX: 8 * throwCurve, offsetY: 0, scaleX: 1, scaleY: 1, rotation: 0 }
+        : {
+            offsetX: 18 * throwCurve,
+            offsetY: -7 * stretch,
+            scaleX: 1 + 0.05 * stretch,
+            scaleY: 1 - 0.04 * stretch,
+            rotation: 0.08 * throwCurve,
+          },
+    );
+    if (p >= 7) {
+      const catchU = clamp01((p - 7) / 22);
+      const hopEnv = Math.sin(catchU * Math.PI);
+      const wiggle = Math.sin((p - 7) * 0.9) * hopEnv;
+      critter = composePose(
+        critter,
+        reducedMotion
+          ? {
+              offsetX: 0,
+              offsetY: 0,
+              scaleX: 1 + 0.02 * hopEnv,
+              scaleY: 1 - 0.02 * hopEnv,
+              rotation: 0,
+            }
+          : {
+              offsetX: wiggle * 4,
+              offsetY: -10 * Math.abs(Math.sin(catchU * Math.PI * 1.5)) * hopEnv,
+              scaleX: 1 - 0.05 * hopEnv,
+              scaleY: 1 + 0.06 * hopEnv,
+              rotation: wiggle * 0.09,
+            },
+      );
+    }
+    emitRainbowLassoVfx(vfx, battle, reducedMotion);
   }
 
   // 2. Soothe check & result.
@@ -309,14 +406,17 @@ export function computeBattleChoreography(
     critter = shared.critter;
   }
 
-  // 7. Fae lean: tilt live with balance + wind-braced squash when blowing.
+  // 7. Fae lean: tilt live with balance + wind-braced squash + sweeping wind-gust ribbons.
   if (battle.phase === "check" && battle.check?.kind === "lean") {
     const check = battle.check;
     const balance = view?.check?.kind === "lean" ? view.check.balance : check.balance / 100;
     const blowing = view?.check?.kind === "lean"
       ? view.check.puffs.some((item) => item.blowing)
       : check.spec.starts.some(
-          (start) => check.tick >= start && check.tick < start + check.spec.puffTicks,
+          (start, index) =>
+            (check.results[index] ?? "pending") === "pending" &&
+            check.tick >= start &&
+            check.tick < start + check.spec.puffTicks,
         );
     fae = composePose(fae, {
       offsetX: balance * 14 + (blowing && !reducedMotion ? Math.sin(tick * 1.4) * 1.2 : 0),
@@ -325,6 +425,7 @@ export function computeBattleChoreography(
       scaleY: blowing ? 0.94 : 1,
       rotation: balance * 0.28,
     });
+    emitLeanWindVfx(vfx, blowing, tick, reducedMotion);
   }
 
   // 8. Fae catch: pose live with catcher lane + brief sparkle burst on caught toys.
@@ -410,27 +511,49 @@ export function computeBattleChoreography(
         });
       }
     }
+    emitPeekabooVfx(vfx, status, check.progress, check.tick, reducedMotion, ratio);
   }
 
-  // 8c. Echo Chimes live musical bounce: critter hops on demo chimes, Fae hops
-  // on echoed chimes.
+  // 8c. Echo Chimes synesthetic musical VFX & live bounce: critter sings with
+  // color-matched rising notes on demo; Fae echoes them arching lightly back.
   if (battle.phase === "check" && battle.check?.kind === "echo") {
     const echoView = view?.check?.kind === "echo" ? view.check : null;
-    if (echoView?.phase === "demo" && echoView.litNote !== null) {
+    const echoMotion = emitEchoChimeVfx(vfx, battle.check, echoView, reducedMotion);
+    if (echoMotion.critterOffsetY !== 0) {
       critter = composePose(critter, {
         offsetX: 0,
-        offsetY: -5,
+        offsetY: echoMotion.critterOffsetY,
         scaleX: 0.97,
         scaleY: 1.05,
-        rotation: 0,
+        rotation: echoMotion.critterRotation,
       });
-    } else if (echoView?.phase === "input" && echoView.litNote !== null) {
+    } else if (echoMotion.faeOffsetY !== 0) {
       fae = composePose(fae, {
         offsetX: 4,
-        offsetY: -4,
+        offsetY: echoMotion.faeOffsetY,
         scaleX: 0.98,
         scaleY: 1.04,
-        rotation: 0,
+        rotation: echoMotion.faeRotation,
+      });
+    }
+  }
+
+  // 8d. Shape Trace watercolor brush choreography: pastel brush sparkles beside
+  // Fae's right hand + gentle painting sway once tracing is actively underway.
+  if (battle.phase === "check" && battle.check?.kind === "trace") {
+    const traceView = view?.check?.kind === "trace" ? view.check : null;
+    const traceMotion = emitTraceBrushVfx(vfx, battle.check, traceView, tick, reducedMotion);
+    if (
+      traceMotion.faeOffsetX !== 0 ||
+      traceMotion.faeOffsetY !== 0 ||
+      traceMotion.faeRotation !== 0
+    ) {
+      fae = composePose(fae, {
+        offsetX: traceMotion.faeOffsetX,
+        offsetY: traceMotion.faeOffsetY,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: traceMotion.faeRotation,
       });
     }
   }
@@ -615,10 +738,14 @@ export function computeBattleChoreography(
     reducedMotion,
   );
 
-  // 13. Soothed -> reward: expanding aura dissolve, celebratory burst, Relief Bloom petals.
+  // 13. Soothed -> reward: expanding aura dissolve, celebratory burst, Relief Bloom petals,
+  // and pastel victory confetti shower strictly during "soothed" (keeping "reward" untouched).
   const settled = applySoothedAndReward(battle, tick, critter, vfx, reducedMotion);
   critter = settled.critter;
   auraScaleBoost = settled.auraScaleBoost;
+  if (battle.phase === "soothed") {
+    emitSoothedConfettiVfx(vfx, battle.phaseTicks, reducedMotion);
+  }
 
   return {
     fae: { ...fae, tintFlash },

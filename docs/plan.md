@@ -6812,6 +6812,48 @@ the old trail, the owl, and the clubhouse claim.
   Playwright checks (`taco.spec`, `m81-festival.spec`, `ui-gallery`,
   `ui-gallery-checks`, `soundtrack.spec`).
 
+## Milestone 158: Complete 8-of-8 Battle Stage VFX Choreography (`src/render/battle-vfx-stage.ts`) **Status:** ✅ Completed (2026-11-27)
+- Completes bespoke reduced-motion-aware stage VFX across every single battle
+  check kind and calm-down celebration while preserving M135 Snack Theater,
+  M136 Talk Theater, M140 zero-rotation reduced-motion parity, and `< 1,000`
+  lines per implementation module — zero `src/core` changes, zero save-version
+  bumps, and zero replay hash drift across all 72 sims.
+- Pure zero-Pixi stage VFX module (`src/render/battle-vfx-stage.ts`, 707 lines;
+  re-exported via `src/render/battle-vfx.ts` & `src/render/battle-choreography.ts`;
+  `BATTLE_VFX_POOL_SIZE = 80` in `src/render/battle-view.ts`):
+  - **Rainbow Lasso Arc (`emitRainbowLassoVfx`)**: 7-color pastel rainbow Bézier
+    rope arc (`anchor: "between"`), double shimmering critter loop + orbiting
+    sparkles, golden Steady Snag coin glints, sky-blue wind-up bubble pops, and
+    Fae/critter throw poses.
+  - **Synesthetic Musical Echo Chimes (`emitEchoChimeVfx`)**: color-matched
+    `ECHO_CHIME_COLORS` glow halo, ripple ring, and 4 rising/arcing sparkles
+    plus gentle musical sway for demo & player echo.
+  - **Tactile Wind-Gust Lean (`emitLeanWindVfx`)**: 6 crisp sky-blue &
+    seafoam-mint horizontal `mistWisp` ribbons + 3 wind sparkles streaming
+    right-to-left across `t = 0.66 -> 0.16` strictly while `blowing === true`.
+  - **Starry Owl Peekaboo Freeze (`emitPeekabooVfx`)**: amber-gold alert halo +
+    3 sparkles on `"warning"`, luminous moonbeam watch ring + lavender-blue
+    gaze glow + 4 starlight flecks on `"watching"`, and subtle tiptoe dust
+    `puff`s when sneaking (`progress > 0`).
+  - **Shape Trace Watercolor Brush (`emitTraceBrushVfx`)**: 2–6 pastel diamond
+    brush sparkles + warm `softGlow` beside Fae with gentle painting sway while
+    drawing (`0` particles before drawing so `art.spec` stays untouched).
+  - **Soothed Calm-Down Victory Confetti (`emitSoothedConfettiVfx`)**: warm
+    golden halo + 10 flanking pastel petals & sparkles outside `|offsetX| >= 90`
+    strictly during `phase === "soothed"` (leaving `phase === "reward"` &
+    `battle-reward.png` pixel-identical).
+  - Enforces `rotation: 0` and calm steady placement across all 6 emitters
+    under `reducedMotion`.
+- Evidence: `tests/unit/milestone-155.test.ts` (11 tests),
+  `tests/e2e/milestone-155.spec.ts` (`@smoke` Chromium + WebKit), 6 verified
+  review captures (`art/review/m123-lasso-arc-1280.jpg`,
+  `m125-echo-vfx-1280.jpg`, `m125-soothed-confetti-1280.jpg`,
+  `m128-lean-gust-1280.jpg`, `m128-peekaboo-watch-1280.jpg`,
+  `m147-trace-brush-1280.jpg`), and 15 `vision`-verified live-VFX snapshots.
+- Gates: `just check` (217 unit files / 1,597 tests, all 72 sims, 23 QA packs,
+  purity, lint), `just build` (`index` `474.11 kB < 500 kB`), 34/34 Chromium &
+  WebKit battle e2e, and 95/95 Chromium `ui-gallery` tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

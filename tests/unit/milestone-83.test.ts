@@ -239,8 +239,10 @@ describe("Milestone 83: Together! theater, hit-stop, and Relief Bloom choreograp
     const soothedChoreo = computeBattleChoreography(soothed, null, 20, partyIds, partyCommands);
     const soothedPetals = soothedChoreo.vfx.filter((particle) => particle.texture === "petal");
     expect(soothedChoreo.stageMood).toBe("soothed");
-    expect(soothedPetals).toHaveLength(8);
-    expect(soothedPetals.filter((petal) => petal.alpha > 0.05).length).toBeGreaterThanOrEqual(7);
+    // 8 rising Relief Bloom petals + 5 drifting pastel confetti petals on soothed (Milestone 155).
+    expect(soothedPetals).toHaveLength(13);
+    expect(soothedPetals.slice(0, 8).filter((petal) => petal.alpha > 0.05).length)
+      .toBeGreaterThanOrEqual(7);
     const nextChoreo = computeBattleChoreography(soothed, null, 22, partyIds, partyCommands);
     const nextPetals = nextChoreo.vfx.filter((particle) => particle.texture === "petal");
     expect(nextPetals[0]?.offsetY ?? 0).toBeLessThan(soothedPetals[0]?.offsetY ?? 0);

@@ -1,5 +1,27 @@
 import type { Battle } from "../core";
 import { composePose, idleBreathing, type MotionPose } from "./motion";
+export {
+  ECHO_CHIME_COLORS,
+  echoNoteColor,
+  emitEchoChimeVfx,
+  emitLeanWindVfx,
+  emitPeekabooVfx,
+  emitRainbowLassoVfx,
+  emitSoothedConfettiVfx,
+  emitTraceBrushVfx,
+  isLassoActionActive,
+  LASSO_ARC_DURATION,
+  LEAN_WIND_TINTS,
+  PEEKABOO_DUST_TINT,
+  PEEKABOO_WARNING_TINT,
+  PEEKABOO_WATCH_TINTS,
+  RAINBOW_LASSO_COLORS,
+  SOOTHED_CONFETTI_COLORS,
+  TRACE_BRUSH_COLORS,
+  type EchoChimeMotion,
+  type EchoColor,
+  type TraceBrushMotion,
+} from "./battle-vfx-stage";
 
 export type BattleVfxTexture =
   | "sparkle"
@@ -7,7 +29,10 @@ export type BattleVfxTexture =
   | "energyRing"
   | "puff"
   | "petal"
-  | "softGlow";
+  | "softGlow"
+  | "mistWisp";
+export type BattleVfxTextureKey = BattleVfxTexture;
+export type BattleVfxBlend = "normal" | "add";
 export type BattleVfxAnchor = "fae" | "critter" | "between" | "party";
 export type BattleStageMood =
   | "calm-normal"
@@ -18,7 +43,7 @@ export type BattleStageMood =
 
 export type BattleVfxParticle = {
   texture: BattleVfxTexture;
-  blend: "normal" | "add";
+  blend: BattleVfxBlend;
   anchor: BattleVfxAnchor;
   actorId?: string;
   t?: number;
@@ -41,8 +66,8 @@ export const RAINBOW_HEARTS: readonly number[] = [
 ];
 
 export const SPARKLE_TINTS: readonly number[] = [0xfff099, 0xffe074, 0xd4fcf2, 0xffd2e6];
-const FIZZ_TINTS: readonly number[] = [0xe6b8ff, 0xffb8d8, 0xd8c4ff];
-const RELIEF_PETALS: readonly number[] = [0xa8e6cf, 0xfff099, 0xffc8dc, 0xd8b8ff];
+export const FIZZ_TINTS: readonly number[] = [0xe6b8ff, 0xffb8d8, 0xd8c4ff];
+export const RELIEF_PETALS: readonly number[] = [0xa8e6cf, 0xfff099, 0xffc8dc, 0xd8b8ff];
 const SNACK_SPARKLE_TINTS: readonly number[] = [0x9be38a, 0xffe58a];
 const TALK_HEART_TINTS: readonly number[] = [0xffb7cf, 0xffe599, 0xc5e8d5, 0xd8c4ff];
 const FAVOURITE_HEART_TINTS: readonly number[] = [

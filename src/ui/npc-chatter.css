@@ -1,4 +1,10 @@
-.npc-chatter[hidden] {
+.npc-chatter[hidden],
+:root[data-photo="on"] .npc-chatter,
+:root[data-battle="open"] .npc-chatter,
+:root[data-journal="open"] .npc-chatter,
+:root[data-title="open"] .npc-chatter,
+:root[data-credits="open"] .npc-chatter,
+:root[data-arcade="open"] .npc-chatter {
   display: none;
 }
 
@@ -30,6 +36,7 @@
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transform: translate(-50%, -100%);
   transform-origin: 50% 100%;
   transition: opacity 90ms ease-out;

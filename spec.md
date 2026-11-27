@@ -788,7 +788,11 @@ ios/            Capacitor iOS project (from Milestone 4).
     tones `normal`, `lantern`, `worry`, `warm`, `banter`, and `music`, inline
     SVG emblems, smart top-or-side placement clamping
     `data-side="top|left|right"`, `TALK`-prompt yielding, reduced-motion &
-    Safari tap-selection hygiene, and hiding across overlays and `harness`).
+    Safari tap-selection hygiene including `-webkit-touch-callout: none`, and
+    defensive CSS hiding across all root overlay flags `data-photo="on"`,
+    `data-battle="open"`, `data-journal="open"`, `data-title="open"`,
+    `data-credits="open"`, and `data-arcade="open"` plus `harness`, Milestone
+    147).
     `renderInfo().npcLife` exposes read-only `{ stage, npcs, chatter }`.
   - Cross-biome living errands, automatic Journal `NOTES` tracking &
     snack-sharing (all stitch-gated with zero new global Ink `VAR`s): Mailman
@@ -2161,7 +2165,10 @@ trunks keep its two exits.
   none; the story only offers it when `snacks()` says she has one. Item tags
   (`buy`, `gift`, `feed`) act on every line they're on, a conversation's
   opening line and a locked door's included.
-- Load validation reads every tag in the compiled story (`storyTags`: a
+- Load validation (`src/content/story-checks.ts`, re-exported identically from
+  `src/content/load.ts` via `parseStoryJson`, `storyTags`, `storyTagErrors`,
+  and `endingContentErrors`, Milestone 148) reads every tag in the compiled
+  story (`storyTags`: a
   tag's text follows its `#` command, and its `/#` may close in an enclosing
   container) and rejects a travel tag naming an unknown area or spawn, any
   `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>`,
@@ -3972,16 +3979,26 @@ trunks keep its two exits.
   (`notes` -> `map` -> `options` -> `notes`), closes any open Field Note or
   Field Treasures card, and plays the in-key `choice-move` page-flip ping
   without intercepting `ArrowLeft` / `ArrowRight` slider navigation.
-- **Full Keyboard & Gamepad Journal Navigation** (Milestone 124,
+- **Full Keyboard & Gamepad Journal Navigation** (Milestone 124 / Milestone 148,
   `src/ui/journal-nav.ts`, `src/ui/journal.ts`, `src/ui/journal-map.ts`,
   `src/platform/gamepad.ts`, `src/main.ts`): while the Journal is open with no
   field modal overlay, `journal.scrollActivePage`, `journal.navigateFocus`, and
   `journal.activateFocused` provide mouse-free navigation across all three tabs
-  using pure `cycleIndex`, `computeJournalScrollDelta`, and `isElementVisible`:
-  - `NOTES` / `STICKERS`: `ArrowDown` / `ArrowUp` (when no inspectable slot is
-    focused) scrolls `.journal-stickers-page` (or `.journal-notes-page`) by
-    `±72 px` while keeping Fae frozen; Gamepad right stick Y scrolls smoothly
-    every tick; focusing any `.journal-slot.is-inspectable` (or pressing Gamepad
+  using pure `cycleIndex`, `computeJournalScrollDelta`, `pickNotesScrollTarget`,
+  and `isElementVisible`:
+  - `NOTES` / `STICKERS`: `.journal-notes-page` is keyboard focusable
+    (`tabindex="0"`, `aria-label="Journal notes"`, crisp `:focus-visible`
+    outline with zero resting pixel change). `ArrowDown` / `ArrowUp` (when no
+    inspectable slot is focused) and Gamepad right stick Y route vertical
+    scrolling through `pickNotesScrollTarget` (`scrollActivePage`), scrolling
+    `.journal-stickers-page` first and seamlessly continuing into
+    `.journal-notes-page` once `.journal-stickers-page` reaches its top/bottom
+    limit (or immediately when `.journal-stickers-page` does not overflow), or
+    preferring `.journal-notes-page` when focus is inside it. Pressing
+    `Shift+ArrowDown` / `Shift+ArrowUp` anywhere on the `NOTES` spread, or
+    plain `ArrowDown` / `ArrowUp` while `.journal-notes-page` has focus,
+    scrolls `.journal-notes-page` directly by `±72 px` while keeping Fae
+    frozen. Focusing any `.journal-slot.is-inspectable` (or pressing Gamepad
     D-Pad / Left Stick) cycles focus across visible Critter, Arcade Prize,
     Fish, and Keepsake slots (`Enter` / `Space` / `A` opens the Field Note
     card).

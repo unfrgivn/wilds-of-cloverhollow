@@ -252,6 +252,8 @@ export function createJournal(root: HTMLElement): JournalControl {
   const close = makeJournalButton("journal-close", "Close journal", "×");
 
   const notesPage = element("section", "journal-page journal-notes-page");
+  notesPage.setAttribute("tabindex", "0");
+  notesPage.setAttribute("aria-label", "Journal notes");
   const notesHead = element("div", "journal-notes-head");
   const notesHeading = element("h2", "journal-heading");
   notesHeading.textContent = "NOTES";

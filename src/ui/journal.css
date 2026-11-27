@@ -62,6 +62,11 @@
   padding: 18px 18px 12px;
   background: #fbf6e9;
 }
+.journal-notes-page:focus-visible {
+  outline: 2px solid var(--sticker-ink);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
 /* The spine: a soft fold shadow down the middle. */
 .journal-page + .journal-page {
   border-left: 2px solid #47321f44;

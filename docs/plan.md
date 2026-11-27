@@ -6459,6 +6459,42 @@ the old trail, the owl, and the clubhouse claim.
   `vision`), and captured `vision`-verified 1280×720 shop duo review shots
   (`art/review/living-npcs-market-duo.jpg`, `art/review/living-npcs-parlor-duo.jpg`).
 
+## Milestone 148: Living NPC Chatter Overlay Guard & Safari Hygiene, Keyboard/Gamepad Journal `NOTES` Column Scrolling & `src/content/story-checks.ts` Modular Extraction **Status:** ✅ Completed (2026-11-27)
+- Living NPC Chatter Defensive Overlay Hiding & Safari Hygiene
+  (`src/ui/npc-chatter.css`):
+  - Adds defensive CSS hiding on `.npc-chatter` across all six root overlay
+    flags (`data-photo="on"`, `data-battle="open"`, `data-journal="open"`,
+    `data-title="open"`, `data-credits="open"`, `data-arcade="open"`), matching
+    `.save-toast` and `.sticker-prompt` so chatter never flashes over a modal.
+  - Adds `-webkit-touch-callout: none;` alongside `user-select: none` and
+    `-webkit-user-select: none` on `.npc-chatter`.
+- Keyboard & Gamepad Left-Column `NOTES` Scrolling (`src/ui/journal-nav.ts`,
+  `src/ui/journal.ts`, `src/ui/journal.css`):
+  - Exports pure `pickNotesScrollTarget` routing `NOTES` spread vertical scroll
+    across `.journal-notes-page` (the left scrollable column) and
+    `.journal-stickers-page`, continuing cleanly into the alternate column once
+    the primary column reaches its top/bottom limit or does not overflow.
+  - Makes `.journal-notes-page` keyboard focusable (`tabindex="0"`,
+    `aria-label="Journal notes"`) with a crisp `:focus-visible` outline and zero
+    resting pixel change or DOM render churn.
+  - Supports `Shift+ArrowDown` / `Shift+ArrowUp` anywhere on the `NOTES` spread
+    and plain `ArrowDown` / `ArrowUp` while `.journal-notes-page` is focused to
+    scroll `.journal-notes-page` directly by `±72 px` without moving Fae.
+- Modular `src/content/story-checks.ts` Extraction (`src/content/story-checks.ts`,
+  `src/content/load.ts`):
+  - Extracts `parseStoryJson`, `storyTags`, `storyTagErrors`, and
+    `endingContentErrors` cleanly into `src/content/story-checks.ts` and
+    re-exports all four identically from `src/content/load.ts`, trimming
+    `src/content/load.ts` cleanly below 860 lines with zero breadcrumbs.
+- Zero `src/core` changes and zero replay hash shifts across all 70 recorded
+  sims.
+- Evidence: `tests/unit/milestone-148.test.ts` (3 tests) and real-key
+  `tests/e2e/milestone-148.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (zero replay hash shifts across all 70 sims, 23 QA packs,
+  purity, lint), `just build` (zero chunk or deprecation warnings; production
+  and harness hook checks green), and full e2e across Chromium & WebKit
+  (0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -22,6 +22,36 @@ export function computeJournalScrollDelta(
   return axisY < 0 ? -clamped : clamped;
 }
 
+/** Picks whether vertical scrolling on the NOTES spread targets notes or stickers. */
+export function pickNotesScrollTarget(options: {
+  deltaY: number;
+  notesFocused: boolean;
+  notesScrollTop: number;
+  notesMaxScroll: number;
+  stickersScrollTop: number;
+  stickersMaxScroll: number;
+}): "notes" | "stickers" | null {
+  const {
+    deltaY,
+    notesFocused,
+    notesScrollTop,
+    notesMaxScroll,
+    stickersScrollTop,
+    stickersMaxScroll,
+  } = options;
+  if (deltaY === 0) return null;
+  const canScroll = (top: number, max: number, dy: number): boolean =>
+    max > 0 && (dy > 0 ? top < max - 1 : top > 1);
+  const canNotes = canScroll(notesScrollTop, notesMaxScroll, deltaY);
+  const canStickers = canScroll(stickersScrollTop, stickersMaxScroll, deltaY);
+  if (notesFocused) {
+    if (canNotes) return "notes";
+    return canStickers ? "stickers" : null;
+  }
+  if (canStickers) return "stickers";
+  return canNotes ? "notes" : null;
+}
+
 /** Returns true when a Journal DOM control is visible and enabled for focus cycling. */
 export function isElementVisible(node: HTMLElement): boolean {
   return (
@@ -88,11 +118,21 @@ export function createJournalNavController(host: JournalNavHost): {
     const page = host.getPage();
     const active = document.activeElement;
     if (page === "notes") {
-      const focusInNotes = active instanceof Node && host.notesPage.contains(active);
-      const primary = focusInNotes ? host.notesPage : host.stickersPage;
-      const fallback = focusInNotes ? host.stickersPage : host.notesPage;
-      if (primary.scrollHeight > primary.clientHeight + 1) return scrollPane(primary, deltaY);
-      return scrollPane(fallback, deltaY);
+      const notesFocused = active instanceof Node && host.notesPage.contains(active);
+      const target = pickNotesScrollTarget({
+        deltaY,
+        notesFocused,
+        notesScrollTop: host.notesPage.scrollTop,
+        notesMaxScroll: Math.max(0, host.notesPage.scrollHeight - host.notesPage.clientHeight),
+        stickersScrollTop: host.stickersPage.scrollTop,
+        stickersMaxScroll: Math.max(
+          0,
+          host.stickersPage.scrollHeight - host.stickersPage.clientHeight,
+        ),
+      });
+      if (target === "notes") return scrollPane(host.notesPage, deltaY);
+      if (target === "stickers") return scrollPane(host.stickersPage, deltaY);
+      return false;
     }
     if (page === "options") {
       const focusInPlay = active instanceof Node && host.playPage.contains(active);
@@ -175,8 +215,26 @@ export function createJournalNavController(host: JournalNavHost): {
 
   const handleKeydown = (event: KeyboardEvent): void => {
     if (host.book.hidden) return;
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.closest("input, textarea") !== null
+    ) {
+      return;
+    }
     if (host.handleOverlayKeydown(event)) return;
     if (event.target !== null && host.sliderSteppers.has(event.target)) return;
+    const page = host.getPage();
+    if (
+      page === "notes" &&
+      !host.hasOpenOverlay() &&
+      (event.key === "ArrowDown" || event.key === "ArrowUp") &&
+      (event.shiftKey || document.activeElement === host.notesPage)
+    ) {
+      scrollPane(host.notesPage, event.key === "ArrowDown" ? 72 : -72);
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     if (
       event.target instanceof Node &&
       host.jukebox.contains(event.target) &&
@@ -200,7 +258,6 @@ export function createJournalNavController(host: JournalNavHost): {
       event.preventDefault();
       return;
     }
-    const page = host.getPage();
     if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
       event.preventDefault();
       const next = navPages[Math.min(navPages.length - 1, navPages.indexOf(page) + 1)];

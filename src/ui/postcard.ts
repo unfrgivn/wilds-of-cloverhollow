@@ -29,19 +29,50 @@ function slugAreaId(areaId: string): string {
   return cleaned.length > 0 ? cleaned : "cloverhollow";
 }
 
+/** Pure formatter for active companion display names stamped on Photo Mode postcards. */
+export function formatPostcardCompanions(names: readonly string[]): string {
+  const unique: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of names) {
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(trimmed);
+  }
+  if (unique.length === 0) return "";
+  if (unique.length === 1) return `with ${unique[0]}`;
+  if (unique.length === 2) return `with ${unique[0]} & ${unique[1]}`;
+  if (unique.length > 4) {
+    return `with ${unique[0]}, ${unique[1]}, ${unique[2]} & friends`;
+  }
+  const head = unique.slice(0, -1).join(", ");
+  const last = unique[unique.length - 1];
+  return `with ${head} & ${last}`;
+}
+
 /** Pure formatter for Photo Mode postcard filenames, captions, and region labels. */
 export function postcardMetadata(
   areaId: string,
   areaName: string,
   landName: string,
+  partyNames?: readonly string[],
 ): PostcardMetadata {
   const slug = slugAreaId(areaId);
   const cleanArea = areaName.trim().length > 0 ? areaName.trim() : "Cloverhollow";
   const cleanLand = landName.trim();
+  const companions = partyNames === undefined ? "" : formatPostcardCompanions(partyNames);
+  const subcaption =
+    cleanLand.length > 0 && companions.length > 0
+      ? `${cleanLand} · ${companions}`
+      : cleanLand.length > 0
+        ? cleanLand
+        : companions;
   return {
     filename: `cloverhollow-postcard-${slug}.png`,
     caption: `${cleanArea} · Wilds of Cloverhollow`,
-    subcaption: cleanLand,
+    subcaption,
   };
 }
 
@@ -176,20 +207,24 @@ export function composePostcardFrame(
 
   drawCloverStamp(ctx, padX + cloverSize + 4, stripMidY, cloverSize);
 
-  const cleanSub = subcaption.trim();
-  if (cleanSub.length > 0) {
-    ctx.fillStyle = "#6f5947";
-    ctx.font = `700 ${subFontSize}px Nunito, "Trebuchet MS", sans-serif`;
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-    ctx.fillText(cleanSub.toUpperCase(), padX + cloverSize * 2 + 16, stripMidY);
-  }
-
+  const stampText = formatStampText(caption);
   ctx.fillStyle = "#47321f";
   ctx.font = `800 ${fontSize}px Nunito, "Trebuchet MS", sans-serif`;
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
-  ctx.fillText(formatStampText(caption), width - padX - 4, stripMidY);
+  const stampWidth = ctx.measureText(stampText).width;
+  ctx.fillText(stampText, width - padX - 4, stripMidY);
+
+  const cleanSub = subcaption.trim();
+  if (cleanSub.length > 0) {
+    const subX = padX + cloverSize * 2 + 16;
+    const maxSubWidth = Math.max(120, width - padX - 20 - stampWidth - subX);
+    ctx.fillStyle = "#6f5947";
+    ctx.font = `700 ${subFontSize}px Nunito, "Trebuchet MS", sans-serif`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(cleanSub.toUpperCase(), subX, stripMidY, maxSubWidth);
+  }
 
   const dataUrl = canvas.toDataURL("image/png");
   if (!dataUrl.startsWith("data:image/png;base64,")) return null;

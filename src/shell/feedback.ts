@@ -380,6 +380,7 @@ export function captureAreaPostcard(
   areaId: string,
   sourceCanvas: HTMLCanvasElement,
   download = true,
+  partyNames?: readonly string[],
 ): PostcardCapture | null {
   const area = world.areas[areaId];
   const areaName = area?.name ?? areaId;
@@ -387,7 +388,7 @@ export function captureAreaPostcard(
     area?.land === undefined
       ? undefined
       : world.lands.find((entry) => entry.id === area.land);
-  const meta = postcardMetadata(areaId, areaName, land?.name ?? "");
+  const meta = postcardMetadata(areaId, areaName, land?.name ?? "", partyNames);
   const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
   if (composed === null) return null;
   if (download) triggerPostcardDownload(composed.dataUrl, meta.filename);

@@ -1083,11 +1083,15 @@ async function boot(): Promise<void> {
       clearColor: 0xf8edcf,
     });
     const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
+    const partyNames = state.party
+      .map((member) => content.world.party[member.id]?.name ?? "")
+      .filter((name) => name.length > 0);
     return captureAreaPostcard(
       content.world,
       state.area,
       sourceCanvas,
       options?.download !== false,
+      partyNames,
     );
   };
   createPhotoTouchBar(uiRoot, {

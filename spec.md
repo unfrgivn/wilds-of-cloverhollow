@@ -552,9 +552,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   `penny`, Milestone 123), and
   overworld critters (scaling slightly as characters
   bounce or hover); a deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`,
-  with pure stateless zero-Pixi particle recipes and `evaluateAtmosphere` extracted
-  into `src/render/atmosphere-recipes.ts` and re-exported from `atmosphere.ts`,
-  Milestone 118; zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
+  with pure stateless zero-Pixi particle recipes modularized across
+  `src/render/atmosphere-shared.ts`, `src/render/atmosphere-outdoor.ts`,
+  `src/render/atmosphere-indoor.ts`, and the `< 120`-line dispatcher barrel
+  `src/render/atmosphere-recipes.ts`, re-exported from `atmosphere.ts`,
+  Milestones 118 and 136; zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
   petals/pollen, snow and lodge chimney smoke, sunbeams, lavender mist, fairy
   aura halos, hearth glow, arcade neon blooms, blooming clubhouse planter-deck
   pollen sparkles (while `garden_sprouted` or `garden_ripe`), Milestone 108
@@ -617,8 +619,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   pulse under Reduced Motion, hidden cleanly on exit or reset), extracts the live
   viewport via Pixi `app.renderer.extract.canvas`,
   frames it inside a warm cream watercolor postcard border (`#fbf6e8` margin,
-  `#47321f` hand-inked inner rule, four-leaf clover emblem, region subcaption, and
-  bottom-right `"<Area> · Wilds of Cloverhollow"` stamp in `src/ui/postcard.ts`),
+  `#47321f` hand-inked inner rule, four-leaf clover emblem, region + active
+  companion subcaption via `formatPostcardCompanions` / `postcardMetadata` in
+  `src/ui/postcard.ts` and `captureAreaPostcard` in `src/shell/feedback.ts`,
+  stamping `"with Maddie"`, `"with Maddie & Sue"`, `"with Maddie, Sue & Jordan"`,
+  or trimming `> 4` followers to the first 3 plus `"& friends"`, Milestone 136,
+  and bottom-right `"<Area> · Wilds of Cloverhollow"` stamp),
   and downloads `cloverhollow-postcard-<areaId>.png`. Pressing `P` again,
   `Escape`, gamepad Select/B (button 8 / button 1), or opening any overlay exits
   Photo Mode automatically.
@@ -3073,10 +3079,18 @@ trunks keep its two exits.
   `battleMoodWaveB`) tinted dynamically by `battleStageMood` (`"calm-normal"`,
   `"windup"`, `"together-ready"`, `"together-active"`, `"soothed"`).
   `computeBattleChoreography` (`src/render/battle-choreography.ts`, Milestones
-  73, 82, and 135) drives deterministic Paper Mario / EarthBound combat poses,
+  73, 82, 135, and 136) drives deterministic Paper Mario / EarthBound combat poses,
   `stageMood`, `hitStop`, and pooled `battleVfxLayer` particles (`sparkle`,
   `heart`, `energyRing`, `puff`, `petal`, `softGlow`): staggered breathing,
-  highlighted actor step-forward on command selection, Soothe hops with luminous
+  highlighted actor step-forward on command selection, Heart-to-Heart `Talk`
+  climax choreography classified by `isTalkTheater` (Fae's warm empathetic lean
+  forward `offsetX: 6`, Milo/critter's calm lowered listening posture wrapped in
+  a warm amber-cream `softGlow` `0xffebb8` at `alpha: 0.24..0.34`, 4 pastel
+  hearts `0xffb7cf`/`0xffe599`/`0xc5e8d5`/`0xd8c4ff` and 3 warm golden sparkles
+  `0xfff0b2` drifting gently along `"between"` `t: 0.22..0.82`, plus 3 extra
+  soft rising golden sparkles around Milo during graded Talk replies when
+  `battle.talk.grade !== null`, holding steady with `rotation: 0` and zero
+  oscillation under `reducedMotion`), Soothe hops with luminous
   aqua energy ripples, Maddie pounce arcs, Sue charge lean-back proportional to
   `fill` and pastel cast arcs, Jordan beat-synced juggle tosses, three-tier
   Snack & Specialty Treat sharing theater classified by `classifySnackTheater`

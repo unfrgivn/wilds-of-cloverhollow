@@ -44,7 +44,8 @@ async function phone(page: Page): Promise<void> {
   await resetPaused(page, "new-game");
 }
 
-test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" }, async ({ page }) => {
+test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" },
+  async ({ page }, testInfo) => {
   const expectedHash = bunHash(path, "new-game");
   await page.setViewportSize({ width: 1280, height: 720 });
   await openHarness(page);
@@ -100,6 +101,13 @@ test("real keys play the kid's Trace and Talk reveal", { tag: "@smoke" }, async 
       expect(state.battle.talk.choices).toHaveLength(3);
       // The meters step aside while the answers are on screen (spec 8.1).
       await expect(page.locator(".battle-hud")).toBeHidden();
+      if (process.env.CLOVERHOLLOW_REVIEW_SHOTS === "1" && testInfo.project.name === "chromium") {
+        await page.screenshot({
+          path: "art/review/m136-milo-heart-to-heart.jpg",
+          type: "jpeg",
+          quality: 90,
+        });
+      }
       await take("kid-talk");
     }
     if (!reveal && state.battle?.phase === "soothed" &&

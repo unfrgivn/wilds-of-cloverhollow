@@ -55,6 +55,7 @@ const SPARKLE_TINTS: readonly number[] = [0xfff099, 0xffe074, 0xd4fcf2, 0xffd2e6
 const FIZZ_TINTS: readonly number[] = [0xe6b8ff, 0xffb8d8, 0xd8c4ff];
 const RELIEF_PETALS: readonly number[] = [0xa8e6cf, 0xfff099, 0xffc8dc, 0xd8b8ff];
 const SNACK_SPARKLE_TINTS: readonly number[] = [0x9be38a, 0xffe58a];
+const TALK_HEART_TINTS: readonly number[] = [0xffb7cf, 0xffe599, 0xc5e8d5, 0xd8c4ff];
 const FAVOURITE_HEART_TINTS: readonly number[] = [
   0xffd859,
   0xf27ea3,
@@ -63,6 +64,15 @@ const FAVOURITE_HEART_TINTS: readonly number[] = [
   0x6bc7b4,
   0xb68cf0,
 ];
+
+export function isTalkTheater(battle: Pick<Battle, "phase" | "talk">): boolean {
+  return (
+    battle.talk !== null &&
+    battle.talk !== undefined &&
+    battle.phase !== "soothed" &&
+    battle.phase !== "reward"
+  );
+}
 
 export type SnackTheaterKind = "none" | "snack" | "treat" | "favourite";
 
@@ -187,6 +197,7 @@ export function computeBattleChoreography(
   });
 
   const calmMood = battle.phase === "soothed" || battle.phase === "reward";
+  const talkTheater = isTalkTheater(battle);
   let critter: MotionPose = calmMood
     ? idleBreathing(tick, 0.5, 0.012)
     : {
@@ -202,6 +213,142 @@ export function computeBattleChoreography(
   let hitStop = false;
   const vfx: BattleVfxParticle[] = [];
   const snackKind = classifySnackTheater(battle);
+
+  // 0. Heart-to-Heart Talk climax theater: empathetic lean, warm glow, floating bridge.
+  if (talkTheater) {
+    fae = reducedMotion
+      ? { offsetX: 6, offsetY: 0, scaleX: 1, scaleY: 1, rotation: 0 }
+      : composePose(idleBreathing(tick, 0, 0.012), {
+          offsetX: 6,
+          offsetY: 0,
+          scaleX: 1,
+          scaleY: 1.01,
+          rotation: 0.02,
+        });
+    critter = reducedMotion
+      ? { offsetX: 0, offsetY: 2, scaleX: 1.01, scaleY: 0.985, rotation: 0 }
+      : composePose(idleBreathing(tick, 0.5, 0.012), {
+          offsetX: 0,
+          offsetY: 2,
+          scaleX: 1.01,
+          scaleY: 0.985,
+          rotation: 0,
+        });
+    const glowPulse = 0.5 + 0.5 * Math.sin(tick * 0.05);
+    vfx.push({
+      texture: "softGlow",
+      blend: "normal",
+      anchor: "critter",
+      offsetX: 0,
+      offsetY: -8,
+      scaleX: 1.9,
+      scaleY: 1.6,
+      rotation: 0,
+      alpha: reducedMotion ? 0.29 : 0.24 + glowPulse * 0.1,
+      tint: 0xffebb8,
+    });
+    for (let i = 0; i < 4; i += 1) {
+      const tint = TALK_HEART_TINTS[i % TALK_HEART_TINTS.length] ?? 0xffb7cf;
+      if (reducedMotion) {
+        vfx.push({
+          texture: "heart",
+          blend: "normal",
+          anchor: "between",
+          t: 0.22 + (i / 3) * 0.6,
+          offsetX: 0,
+          offsetY: -18 - Math.sin(((i + 0.5) / 4) * Math.PI) * 26,
+          scaleX: 0.44,
+          scaleY: 0.44,
+          rotation: 0,
+          alpha: 0.72,
+          tint,
+        });
+        continue;
+      }
+      const cycle = (((tick + i * 24 + 12) % 96) + 0.5) / 96;
+      const scale = 0.4 + (i % 2) * 0.08;
+      vfx.push({
+        texture: "heart",
+        blend: "normal",
+        anchor: "between",
+        t: 0.22 + cycle * 0.6,
+        offsetX: Math.sin(cycle * Math.PI * 2 + i) * 6,
+        offsetY: -14 - Math.sin(cycle * Math.PI) * 32 + (i % 2 === 0 ? -7 : 7),
+        scaleX: scale,
+        scaleY: scale,
+        rotation: Math.sin(cycle * Math.PI * 2 + i) * 0.16,
+        alpha: 0.22 + 0.6 * Math.sin(cycle * Math.PI),
+        tint,
+      });
+    }
+    for (let i = 0; i < 3; i += 1) {
+      if (reducedMotion) {
+        vfx.push({
+          texture: "sparkle",
+          blend: "normal",
+          anchor: "between",
+          t: 0.3 + i * 0.22,
+          offsetX: 0,
+          offsetY: -12 - (i % 2) * 18,
+          scaleX: 0.34,
+          scaleY: 0.34,
+          rotation: 0,
+          alpha: 0.76,
+          tint: 0xfff0b2,
+        });
+        continue;
+      }
+      const cycle = (((tick + i * 28 + 16) % 84) + 0.5) / 84;
+      const scale = 0.3 + (i % 2) * 0.08;
+      vfx.push({
+        texture: "sparkle",
+        blend: "normal",
+        anchor: "between",
+        t: 0.22 + cycle * 0.6,
+        offsetX: Math.cos(cycle * Math.PI * 2 + i) * 8,
+        offsetY: -10 - Math.sin(cycle * Math.PI) * 26 + ((i % 3) - 1) * 10,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: cycle * 1.4 + i * 0.7,
+        alpha: 0.25 + 0.62 * Math.sin(cycle * Math.PI),
+        tint: 0xfff0b2,
+      });
+    }
+    const talk = battle.talk;
+    if (talk !== null && talk !== undefined && talk.grade !== null) {
+      for (let i = 0; i < 3; i += 1) {
+        if (reducedMotion) {
+          vfx.push({
+            texture: "sparkle",
+            blend: "normal",
+            anchor: "critter",
+            offsetX: (i - 1) * 32,
+            offsetY: -26 - (i % 2) * 16,
+            scaleX: 0.42,
+            scaleY: 0.42,
+            rotation: 0,
+            alpha: 0.8,
+            tint: 0xfff0b2,
+          });
+          continue;
+        }
+        const cycle = (((tick + i * 20 + 8) % 60) + 0.5) / 60;
+        const scale = 0.36 + (i % 2) * 0.1;
+        vfx.push({
+          texture: "sparkle",
+          blend: "normal",
+          anchor: "critter",
+          offsetX: (i - 1) * 34 + Math.sin(cycle * Math.PI * 2 + i) * 8,
+          offsetY: 16 - cycle * 88 - (i % 2) * 8,
+          scaleX: scale,
+          scaleY: scale,
+          rotation: cycle * 1.6 + i * 0.8,
+          alpha: 0.24 + 0.68 * Math.sin(cycle * Math.PI),
+          tint: 0xfff0b2,
+        });
+      }
+    }
+  }
 
   const applyParty = (actorId: string | null, delta: MotionPose): void => {
     if (actorId === null) return;

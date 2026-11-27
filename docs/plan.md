@@ -5985,6 +5985,47 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4541/4542 just e2e` (635 Chromium + 540 WebKit = 1,175
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 136: Heart-to-Heart `Talk` Climax Choreography (`src/render/battle-choreography.ts`), Postcard Companion Stamp (`src/ui/postcard.ts`) & `src/render/atmosphere-{shared,outdoor,indoor}.ts` Modular Split **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims.
+- Heart-to-Heart `Talk` Climax Choreography (`src/render/battle-choreography.ts`):
+  - Exports pure `isTalkTheater(battle)` returning true whenever `battle.talk`
+    is active outside `soothed`/`reward`.
+  - During `Talk`, Fae leans warmly forward (`offsetX: 6`), Milo/critter holds a
+    calm lowered listening posture wrapped in a warm amber-cream `softGlow`
+    (`0xffebb8`, `alpha: 0.24..0.34`, `scaleX: 1.9, scaleY: 1.6`), and 4 pastel
+    hearts (`0xffb7cf`/`0xffe599`/`0xc5e8d5`/`0xd8c4ff`) plus 3 tiny warm golden
+    sparkles (`0xfff0b2`) drift gently along `"between"` (`t: 0.22..0.82`).
+  - When `battle.talk.grade !== null` (Milo's graded reply line after Fae
+    answers), emits 3 extra soft rising golden sparkles around Milo
+    (`anchor: "critter"`). Under `reducedMotion`, holds steady warm glow and
+    still hearts/sparkles (`rotation: 0`, zero oscillation/bounce).
+- Photo Mode Postcard Companion Stamp (`src/ui/postcard.ts`,
+  `src/shell/feedback.ts`, `src/main.ts`):
+  - Exports `formatPostcardCompanions(names)` deduplicating/trimming companion
+    names (`""`, `"with Maddie"`, `"with Maddie & Sue"`,
+    `"with Maddie, Sue & Jordan"`, and trimming `> 4` names to the first 3 plus
+    `"& friends"`).
+  - Extends `postcardMetadata` and `captureAreaPostcard` with optional
+    `partyNames` (100% byte-identical when omitted/empty) and wires active
+    party display names in `src/main.ts` (`snapPostcard`).
+- Modular `src/render/atmosphere-{shared,outdoor,indoor}.ts` Split:
+  - Splits `src/render/atmosphere-recipes.ts` (`1,246` -> `51` lines) into
+    `atmosphere-shared.ts` (types, palettes, constants, pure helpers),
+    `atmosphere-outdoor.ts` (`evaluateOutdoorAtmosphere` for 12 outdoor/wilds/
+    cavern areas), `atmosphere-indoor.ts` (`evaluateIndoorAtmosphere` for 16
+    indoor/cozy areas), and the thin `atmosphere-recipes.ts` barrel with
+    bit-for-bit identical particle output across all 28 playable areas.
+- Evidence: `tests/unit/milestone-136.test.ts` (7 tests) and review capture
+  `art/review/m136-milo-heart-to-heart.jpg` verified with `vision` (plus
+  `m81-mateo-talk-1280` verified with `vision` before baseline update).
+- Gates: `just check` (196 unit files / 1,437 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4552/4555 just e2e` (635 Chromium + 540 WebKit = 1,175
+  passed, 2 skipped, 0 failed; only `kid-talk` and `m81-mateo-talk` baselines
+  updated for the new Talk climax hearts & warm glow).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

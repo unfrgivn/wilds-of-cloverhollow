@@ -122,7 +122,64 @@
       }
     ]
   },
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "lark",
+      "point": {
+        "x": 960,
+        "y": 380
+      },
+      "facing": "down",
+      "knot": "npc_lark",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          945,
+          370
+        ],
+        [
+          975,
+          370
+        ],
+        [
+          975,
+          390
+        ],
+        [
+          945,
+          390
+        ]
+      ]
+    },
+    {
+      "id": "bramble",
+      "point": {
+        "x": 920,
+        "y": 260
+      },
+      "facing": "down",
+      "knot": "npc_bramble",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          905,
+          250
+        ],
+        [
+          935,
+          250
+        ],
+        [
+          935,
+          270
+        ],
+        [
+          905,
+          270
+        ]
+      ]
+    }
+  ],
   "triggers": [
     {
       "id": "bay",

@@ -6284,6 +6284,61 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4621/4622 just e2e` (641 Chromium + 546 WebKit = 1,187
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 144: Living NPCs & Organic World Intelligence **Status:** ✅ Completed (2026-11-27)
+- Expanded Cloverhollow's living population with **26 brand-new hand-painted,
+  blinking, 4-direction watercolor NPCs** across 14 biomes and interiors
+  (`tools/art/build-living-npcs.ts`, `art/recipes/living-npcs.json`; lossless
+  WebP atlases, 37 Gemini calls, all 104 frames verified zero halo and zero
+  interior cutouts on cream & dark review sheets with `vision`), preserving all
+  existing townspeople (`fern`, `penny`, `pippin`, `buster`, `bay-keeper`,
+  `pass-keeper`, and `sanctuary-*`):
+  - **Adults** (`336 px` figure height, default scale `0.5`): Flora (`flora`),
+    Mailman Gus (`gus`), Captain Sal (`sal`), Hiker Lark (`lark`), Bramble
+    (`bramble`), Mina (`mina`), Otis (`otis`), Clara (`clara`), Professor Pebble
+    (`pebble`), Ranger Moss (`moss`), Grandma Hazel (`hazel`), Bram (`bram`),
+    Custodian Bert (`bert`), and Star-Watcher Sage (`sage`).
+  - **Kids** (`280 px` figure height, `scale: 0.47`): Sammy (`sammy`), Poppy
+    (`poppy`), Pippa (`pippa`), Leo (`leo`), Maya (`maya`), Theo (`theo`), Nora
+    (`nora`), Kai (`kai`), Sunny (`sunny`), Wren (`wren`), Tuck (`tuck`), and
+    Gemma (`gemma`).
+- **Dynamic Story Schedules & Relocations** (`src/core/types.ts`,
+  `src/core/party.ts`, `src/content/npc-parsers.ts`): validated `hiddenWhile`,
+  `visibleAfterCalm`, and `hiddenAfterCalm` predicates relocate Sammy into the
+  Arcade (joined by Poppy) after Mr. Pip is calmed, Leo onto the Playing Field
+  at recess, and Maya into the Art Room (joined by Theo) once it opens.
+- **Pure Deterministic Living NPC Intelligence Brain**
+  (`src/core/npc-context.ts`, `content/npc-profiles.json`): 51 named character
+  profiles (including `fern`, `penny`, `pippin`, `buster`, `bay-keeper`, and
+  `pass-keeper`) and 26 biome-wide neighbor banter pairs drive live
+  distance-rippled attention (`dialogue` > `lantern-awe` > `celebrate` >
+  `music-delight` > `chaos-worry` > `companion-greet` > `player-greet` >
+  `social-chat` > `idle`), 48-tick arrival grace, and zero changes to `State`,
+  save version, QA packs, or any earlier recorded sim hashes.
+- **7 Live Ink Externals, 29 Reactive Knots & Cross-Biome Errands**
+  (`src/core/ink.ts`, `src/core/roam.ts`, `content/story/main.ink`): added
+  `withParty`, `lanternOn`, `areaCalm`, `level`, `stickers`, `treats`, and
+  `bossesCalmed`, Mailman Gus's Postal Chain (`Gus -> Sal -> Mina -> Gus`),
+  Wren's Botanical & Crystal Sketchbook (`Wren -> Pebble & Sunny -> Wren ->
+  Maya/Theo`), and cozy neighbor snack-sharing (`# feed: snack 1`), all
+  stitch-gated with zero new global `VAR`s and zero early Milo spoilers.
+- **Modular Presentation, Reduced-Motion Parity & Ambient Audio Craft**:
+  - Die-cut storybook overworld chatter bubbles (`src/ui/npc-chatter.ts`,
+    `src/ui/npc-chatter.css`) in six high-contrast (`>= 8.5:1`) tones with smart
+    top-or-side placement clamping (`data-side="top|left|right"`), `TALK`-prompt
+    yielding, reduced-motion and `-webkit-user-select: none` parity, and soft
+    voiced ambient chimes (`AudioController.playAmbientChatter`).
+  - `src/render/npc-life.ts`, `src/render/vfx-textures.ts` (`emoteSparkle`,
+    `emoteWave`, `emoteWorry`), `src/render/motion.ts` (`npcLivingPose` with
+    `mystic`, `celebrate`, and 6-tick turn-squash), `src/render/emotes.ts`,
+    `src/platform/voices.ts`, and `src/ui/portraits.ts`, keeping `src/main.ts`
+    under 950 lines.
+- **Evidence**: `tests/unit/living-npcs.test.ts`, deterministic recording
+  `tests/sim/scripts/new-game/living-npcs.json` (`tools/sim/record-living-npcs.ts`,
+  `tests/unit/living-npcs-replay.test.ts`, tick 9,251, hash `e68d690a`),
+  real-key `@smoke` Playwright suite `tests/e2e/living-npcs.spec.ts` (3 tests
+  across Chromium & WebKit), and `vision`-verified review captures in
+  `art/review/living-npcs-*.jpg` plus visual audit of refreshed baselines.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

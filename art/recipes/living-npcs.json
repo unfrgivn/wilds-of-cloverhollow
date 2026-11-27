@@ -1,0 +1,55 @@
+{
+  "asset": "living-npcs",
+  "milestone": 144,
+  "date": "2026-11-27",
+  "summary": "Twenty-six blinking hand-painted Cloverhollow townspeople, classmates, and regional residents (flora, sal, lark, mina, otis, pebble, moss, sammy, pippa, leo, maya, nora, sunny, gus, hazel, bram, wren, tuck, kai, sage, clara, bramble, bert, poppy, gemma, theo): each built from a spotless flat-magenta 2x2 sheet into a 4x1 atlas (down_idle_01, down_idle_02 blink, left_idle_01, right_idle_01) at 448x448 frames, baseline 439, verified zero halo and zero interior cutouts on cream and dark review sheets.",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 37,
+  "references": [
+    "docs/art/concepts/npcs/fae_family.png",
+    "docs/art/concepts/characters/character_concept_sheet_jordan.png",
+    "art/source/townspeople/barnaby/sheet-raw.png",
+    "art/source/townspeople/toby/sheet-raw.png"
+  ],
+  "kept": {
+    "flora": "art/source/living-npcs/flora/sheet-raw.png",
+    "sal": "art/source/living-npcs/sal/sheet-raw.png",
+    "lark": "art/source/living-npcs/lark/sheet-raw.png",
+    "mina": "art/source/living-npcs/mina/sheet-raw.png",
+    "otis": "art/source/living-npcs/otis/sheet-raw.png",
+    "pebble": "art/source/living-npcs/pebble/sheet-raw.png",
+    "moss": "art/source/living-npcs/moss/sheet-raw.png",
+    "sammy": "art/source/living-npcs/sammy/sheet-raw.png",
+    "pippa": "art/source/living-npcs/pippa/sheet-raw.png",
+    "leo": "art/source/living-npcs/leo/sheet-raw.png",
+    "maya": "art/source/living-npcs/maya/sheet-raw.png",
+    "nora": "art/source/living-npcs/nora/sheet-raw.png",
+    "sunny": "art/source/living-npcs/sunny/sheet-raw.png",
+    "gus": "art/source/living-npcs/gus/sheet-raw.png",
+    "hazel": "art/source/living-npcs/hazel/sheet-raw.png",
+    "bram": "art/source/living-npcs/bram/sheet-raw.png",
+    "wren": "art/source/living-npcs/wren/sheet-raw.png",
+    "tuck": "art/source/living-npcs/tuck/sheet-raw.png",
+    "kai": "art/source/living-npcs/kai/sheet-raw.png",
+    "sage": "art/source/living-npcs/sage/sheet-raw.png",
+    "clara": "art/source/living-npcs/clara/sheet-raw.png",
+    "bramble": "art/source/living-npcs/bramble/sheet-raw.png",
+    "bert": "art/source/living-npcs/bert/sheet-raw.png",
+    "poppy": "art/source/living-npcs/poppy/sheet-raw.png",
+    "gemma": "art/source/living-npcs/gemma/sheet-raw.png",
+    "theo": "art/source/living-npcs/theo/sheet-raw.png"
+  },
+  "commands": [
+    "bun tools/art/build-living-npcs.ts"
+  ],
+  "review": [
+    "art/review/living-npcs-adults-cream.jpg",
+    "art/review/living-npcs-adults-dark.jpg",
+    "art/review/living-npcs-kids-cream.jpg",
+    "art/review/living-npcs-kids-dark.jpg",
+    "art/review/living-npcs-wave2-cream.jpg",
+    "art/review/living-npcs-wave2-dark.jpg",
+    "art/review/living-npcs-wave3-cream.jpg",
+    "art/review/living-npcs-wave3-dark.jpg"
+  ]
+}

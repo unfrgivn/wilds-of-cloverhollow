@@ -4,6 +4,7 @@ import {
   jukeboxTracks,
   levelUpLine,
   soundtrackFor,
+  targetInteractable,
   trackTitles,
   type ActionFrame,
   type Event,
@@ -19,6 +20,7 @@ import type { MinigameRecordsController } from "../platform/minigame-records";
 import type { ArcadeRecordBadge } from "../ui/arcade-popups";
 import { areaBannerInfo, type AreaBannerView } from "../ui/area-banner";
 import type { JukeboxMeta } from "../ui/journal";
+import { createNpcChatter, type NpcChatterView } from "../ui/npc-chatter";
 import {
   composePostcardFrame,
   postcardMetadata,
@@ -422,5 +424,43 @@ export function captureAreaPostcard(
     width: composed.width,
     height: composed.height,
     dataUrl: composed.dataUrl,
+  };
+}
+
+/** Mounts ambient NPC chatter UI and plays a soft voice blip once per fresh line. */
+export function createNpcChatterSync(
+  world: World,
+  uiRoot: HTMLElement,
+  project: (
+    state: State,
+    width: number,
+    height: number,
+    suppress: string | null,
+  ) => NpcChatterView | null,
+  playChatter: (speaker: string) => void,
+): (state: State, overworldFree: boolean, photoMode: boolean, paused: boolean) => void {
+  const npcChatter = createNpcChatter(uiRoot);
+  let lastChatterKey = "";
+  return (state, overworldFree, photoMode, paused) => {
+    const interactTarget = overworldFree ? targetInteractable(world, state) : undefined;
+    const suppressNpcId =
+      interactTarget !== undefined && interactTarget.id.startsWith("npc:")
+        ? interactTarget.id.slice(4)
+        : null;
+    const chatterView =
+      overworldFree && !photoMode && state.transition === null
+        ? project(state, window.innerWidth, window.innerHeight, suppressNpcId)
+        : null;
+    npcChatter.render(chatterView);
+    const chatterKey =
+      chatterView !== null && chatterView.visible && chatterView.text !== ""
+        ? `${chatterView.npcId}|${chatterView.text}`
+        : "";
+    if (chatterKey !== lastChatterKey) {
+      lastChatterKey = chatterKey;
+      if (!paused && state.area !== "harness" && chatterView !== null && chatterKey !== "") {
+        playChatter(chatterView.speakerName);
+      }
+    }
   };
 }

@@ -13,6 +13,7 @@ import type { AudioController } from "../platform/audio";
 import type { GameSettingsController } from "../platform/game-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
 import type { BattleCheckInfo } from "../render/view";
+import type { NpcLifeRenderInfo } from "../render/npc-life";
 import type { TimeOfDayPhase } from "../render/time-of-day";
 import { formatSaveBackup, parseSaveBackup } from "../shell/save-backup";
 import type { SaveStore } from "../shell/save-storage";
@@ -62,6 +63,7 @@ export type CloverhollowHook = {
       y: number;
     }[];
     npcs: { id: string; frame: string; facing: string }[];
+    npcLife: NpcLifeRenderInfo;
     ambient: { id: string; x: number; y: number; frame: number }[];
     canopies: { id: string; alpha: number }[];
     // Each prop's current state, whether it lies flat (drawn under everyone)

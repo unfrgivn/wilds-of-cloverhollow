@@ -153,6 +153,7 @@ import charactersData from "../../content/characters.json";
 import battleData from "../../content/battle.json";
 import levelsData from "../../content/levels.json";
 import treatsData from "../../content/treats.json";
+import npcProfilesData from "../../content/npc-profiles.json";
 import stickerData from "../../content/stickers.json";
 import maddieData from "../../content/party/maddie.json";
 import sueData from "../../content/party/sue.json";
@@ -198,12 +199,14 @@ import {
   partyJoinErrors,
   talkErrors,
 } from "./battle-parsers";
+import { npcScheduleErrors, parseNpcProfiles } from "./npc-parsers";
 import type {
   Area,
   CharacterContent,
   Critter,
   Fixture,
   GroundManifest,
+  NpcProfile,
   PartyContent,
   Spawn,
   Tunables,
@@ -232,6 +235,7 @@ export {
   partyJoinErrors,
   talkErrors,
 } from "./battle-parsers";
+export { npcScheduleErrors, parseNpcProfiles } from "./npc-parsers";
 
 export function parseStoryJson(value: unknown, file: string): Record<string, unknown> {
   field(record(value), file, "story");
@@ -432,7 +436,10 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
             direction(item.facing) && polygon(item.footprint) && typeof item.knot === "string" &&
             (item.prompt === "Look" || item.prompt === "Talk" || item.prompt === "Pet") &&
             (item.visibleWhile === undefined || typeof item.visibleWhile === "string") &&
-            (item.visibleWhenCalmed === undefined || typeof item.visibleWhenCalmed === "string"),
+            (item.hiddenWhile === undefined || typeof item.hiddenWhile === "string") &&
+            (item.visibleWhenCalmed === undefined || typeof item.visibleWhenCalmed === "string") &&
+            (item.visibleAfterCalm === undefined || typeof item.visibleAfterCalm === "string") &&
+            (item.hiddenAfterCalm === undefined || typeof item.hiddenAfterCalm === "string"),
         )),
     file, "npcs",
   );
@@ -530,9 +537,18 @@ export function parseArea(value: unknown, file: string, catalogue?: PropCatalogu
       ...(item.visibleWhile === undefined
         ? {}
         : { visibleWhile: item.visibleWhile }),
+      ...(item.hiddenWhile === undefined
+        ? {}
+        : { hiddenWhile: item.hiddenWhile }),
       ...(item.visibleWhenCalmed === undefined
         ? {}
         : { visibleWhenCalmed: item.visibleWhenCalmed }),
+      ...(item.visibleAfterCalm === undefined
+        ? {}
+        : { visibleAfterCalm: item.visibleAfterCalm }),
+      ...(item.hiddenAfterCalm === undefined
+        ? {}
+        : { hiddenAfterCalm: item.hiddenAfterCalm }),
     })),
     props: placeProps(parsePropPlacements(value.props, file), catalogue, file),
     atlases: catalogue?.atlases ?? [],
@@ -917,6 +933,18 @@ export function loadContent(): {
   const endingProblems = endingContentErrors(story, areas);
   if (endingProblems.length > 0)
     throw new Error(`content/story/main.ink: ${endingProblems.join("; ")}`);
+  const scheduleProblems = npcScheduleErrors(
+    areas, critters, (name) => storyVariable(initialInk, name),
+  );
+  if (scheduleProblems.length > 0)
+    throw new Error(`content/areas: ${scheduleProblems.join("; ")}`);
+  const parsedProfiles = parseNpcProfiles(
+    npcProfilesData, characters, areas, critters, party,
+    (name) => storyVariable(initialInk, name),
+  );
+  const npcProfiles: Record<string, NpcProfile> = Object.fromEntries(
+    parsedProfiles.profiles.map((profile) => [profile.id, profile]),
+  );
   return {
     world: {
       tunables: parseTunables(tunableData, "content/tunables.json"),
@@ -933,6 +961,8 @@ export function loadContent(): {
       arcade: arcadeGames,
       levels,
       treats,
+      npcProfiles,
+      npcBanter: parsedProfiles.banter,
     },
     fixtures,
   };

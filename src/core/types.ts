@@ -162,7 +162,92 @@ export type Npc = {
   knot: string;
   prompt: "Look" | "Talk" | "Pet";
   visibleWhile?: string;
+  hiddenWhile?: string;
   visibleWhenCalmed?: string;
+  visibleAfterCalm?: string;
+  hiddenAfterCalm?: string;
+};
+export type NpcPersonality =
+  | "gardener"
+  | "sailor"
+  | "naturalist"
+  | "cozy"
+  | "scholar"
+  | "ranger"
+  | "kid-bouncy"
+  | "artist"
+  | "shepherd"
+  | "chef"
+  | "teacher"
+  | "family"
+  | "fairy"
+  | "mystic";
+export type NpcAttention =
+  | "dialogue"
+  | "lantern-awe"
+  | "celebrate"
+  | "music-delight"
+  | "chaos-worry"
+  | "companion-greet"
+  | "player-greet"
+  | "social-chat"
+  | "idle";
+export type NpcEmoteKind = "wave" | "sparkle" | "worry" | "note" | "heart";
+export type NpcStoryStage =
+  | "morning"
+  | "fountain_chaos"
+  | "park_trail"
+  | "school_mystery"
+  | "bay_pass"
+  | "clubhouse"
+  | "recess"
+  | "finale_ready"
+  | "forest_calm"
+  | "awake";
+export type NpcCondition = {
+  variable?: string;
+  notVariable?: string;
+  calmed?: string;
+  notCalmed?: string;
+  withParty?: string;
+  lanternOn?: boolean;
+  areaCalm?: boolean;
+  chaosNearby?: boolean;
+  justCalmed?: boolean;
+  recentFlute?: boolean;
+  hasTreats?: boolean;
+  minStickers?: number;
+  minGems?: number;
+  minBossesCalmed?: number;
+  storyStage?: NpcStoryStage;
+};
+export type NpcAmbientRule = {
+  id: string;
+  text: string;
+  priority: number;
+  emote?: NpcEmoteKind;
+  when?: NpcCondition;
+};
+export type NpcProfile = {
+  id: string;
+  name: string;
+  adult: boolean;
+  personality: NpcPersonality;
+  greetRange: number;
+  lookAroundTicks: number;
+  favoriteParty: string[];
+  rules: NpcAmbientRule[];
+};
+export type NpcBanterPair = {
+  id: string;
+  area: string;
+  speakers: [string, string];
+  lines: [string, string];
+  when?: NpcCondition;
+};
+export type NpcProfilesContent = {
+  profiles: NpcProfile[];
+  banter: NpcBanterPair[];
 };
 export type GroundManifest = {
   paper: string;
@@ -193,6 +278,8 @@ export type World = {
   arcade: ArcadeContent;
   levels: import("./levels").LevelContent;
   treats: TreatItem[];
+  npcProfiles: Record<string, NpcProfile>;
+  npcBanter: NpcBanterPair[];
 };
 export type TreatItem = {
   id: string;

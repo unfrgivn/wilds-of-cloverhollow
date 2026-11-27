@@ -218,7 +218,65 @@
       "prompt": "Look"
     }
   ],
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "leo",
+      "point": {
+        "x": 660,
+        "y": 560
+      },
+      "facing": "up",
+      "knot": "npc_leo_hall",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          645,
+          550
+        ],
+        [
+          675,
+          550
+        ],
+        [
+          675,
+          570
+        ],
+        [
+          645,
+          570
+        ]
+      ],
+      "hiddenWhile": "recess"
+    },
+    {
+      "id": "bert",
+      "point": {
+        "x": 780,
+        "y": 560
+      },
+      "facing": "left",
+      "knot": "npc_bert",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          765,
+          550
+        ],
+        [
+          795,
+          550
+        ],
+        [
+          795,
+          570
+        ],
+        [
+          765,
+          570
+        ]
+      ]
+    }
+  ],
   "critters": [
     {
       "id": "art-teacher",

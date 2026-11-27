@@ -126,9 +126,29 @@ export type InkFacts = {
   // How many plushes are still in the claw machine.
   plushesLeft: number;
   tickets: number;
+  party?: string[];
+  lantern?: boolean;
+  areaCalm?: boolean;
+  level?: number;
+  stickers?: number;
+  treats?: number;
+  bossesCalmed?: number;
 };
-const newGameFacts: InkFacts =
-  { calmed: {}, coins: 0, snacks: 2, prizes: [], plushesLeft: 0, tickets: 0 };
+const newGameFacts: InkFacts = {
+  calmed: {},
+  coins: 0,
+  snacks: 2,
+  prizes: [],
+  plushesLeft: 0,
+  tickets: 0,
+  party: [],
+  lantern: false,
+  areaCalm: true,
+  level: 1,
+  stickers: 0,
+  treats: 0,
+  bossesCalmed: 0,
+};
 
 // One Story per compiled story: building one from the compiled JSON took
 // 2.2 ms, most of a command's time. Each command resets it to a new Story's
@@ -154,6 +174,16 @@ function runner(storyJson: StoryJson): Runner {
   );
   story.BindExternalFunction("plushesLeft", () => made.facts.plushesLeft);
   story.BindExternalFunction("tickets", () => made.facts.tickets);
+  story.BindExternalFunction(
+    "withParty",
+    (id: unknown) => typeof id === "string" && (made.facts.party ?? []).includes(id),
+  );
+  story.BindExternalFunction("lanternOn", () => made.facts.lantern ?? false);
+  story.BindExternalFunction("areaCalm", () => made.facts.areaCalm ?? true);
+  story.BindExternalFunction("level", () => made.facts.level ?? 1);
+  story.BindExternalFunction("stickers", () => made.facts.stickers ?? 0);
+  story.BindExternalFunction("treats", () => made.facts.treats ?? 0);
+  story.BindExternalFunction("bossesCalmed", () => made.facts.bossesCalmed ?? 0);
   runners.set(storyJson, made);
   return made;
 }

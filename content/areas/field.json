@@ -1755,7 +1755,67 @@
       "prompt": "Look"
     }
   ],
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "leo",
+      "point": {
+        "x": 360,
+        "y": 460
+      },
+      "facing": "down",
+      "knot": "npc_leo_field",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          345,
+          450
+        ],
+        [
+          375,
+          450
+        ],
+        [
+          375,
+          470
+        ],
+        [
+          345,
+          470
+        ]
+      ],
+      "visibleWhile": "recess"
+    },
+    {
+      "id": "maya",
+      "point": {
+        "x": 220,
+        "y": 520
+      },
+      "facing": "right",
+      "knot": "npc_maya_field",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          205,
+          510
+        ],
+        [
+          235,
+          510
+        ],
+        [
+          235,
+          530
+        ],
+        [
+          205,
+          530
+        ]
+      ],
+      "visibleWhile": "recess",
+      "hiddenWhile": "art_open"
+    }
+  ],
   "critters": [
     {
       "id": "oak-squirrel",

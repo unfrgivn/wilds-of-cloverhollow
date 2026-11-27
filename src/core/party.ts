@@ -56,6 +56,34 @@ export function isSpeciesCalmed(
   );
 }
 
+export const BOSS_SET_PIECES = [
+  "arcade-keeper",
+  "lodge-keeper",
+  "lifeguard",
+  "art-teacher",
+  "principal",
+  "taco-chef",
+  "moon-owl",
+  "gull",
+  "hooded-kid",
+] as const;
+
+export function calmedFact(world: World, state: State, name: string): boolean {
+  if (state.critters[name] === "calm") return true;
+  for (const kind of Object.values(world.critters)) {
+    if (kind.species === name && state.stickers.includes(kind.sticker.id)) return true;
+  }
+  return false;
+}
+
+export function bossesCalmedCount(world: World, state: State): number {
+  let count = 0;
+  for (const id of BOSS_SET_PIECES) {
+    if (calmedFact(world, state, id)) count += 1;
+  }
+  return count;
+}
+
 export function npcVisible(
   world: World,
   state: State,
@@ -65,8 +93,14 @@ export function npcVisible(
     !state.party.some((member) => member.id === npc.id) &&
     (npc.visibleWhile === undefined ||
       world.storyVariable(state.ink, npc.visibleWhile) === true) &&
+    (npc.hiddenWhile === undefined ||
+      world.storyVariable(state.ink, npc.hiddenWhile) !== true) &&
     (npc.visibleWhenCalmed === undefined ||
-      isSpeciesCalmed(world, state, npc.visibleWhenCalmed))
+      isSpeciesCalmed(world, state, npc.visibleWhenCalmed)) &&
+    (npc.visibleAfterCalm === undefined ||
+      calmedFact(world, state, npc.visibleAfterCalm)) &&
+    (npc.hiddenAfterCalm === undefined ||
+      !calmedFact(world, state, npc.hiddenAfterCalm))
   );
 }
 

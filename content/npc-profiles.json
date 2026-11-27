@@ -1,0 +1,3576 @@
+{
+  "profiles": [
+    {
+      "id": "flora",
+      "name": "Flora",
+      "adult": true,
+      "personality": "gardener",
+      "greetRange": 150,
+      "lookAroundTicks": 190,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Oh! Your lantern makes the petals glow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "The flowers perked right back up, Fae!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "What a sweet flute song! Even the tulips sway!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa, watch out for those fizzy bubbles!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "bunny",
+          "text": "Ribbon Bunny loves sniffing my marigolds!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "ribbon-bunny"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Every blossom in Cloverhollow is smiling!",
+          "priority": 50,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "garden-ripe",
+          "text": "I heard your clubhouse berries ripened!",
+          "priority": 40,
+          "emote": "heart",
+          "when": {
+            "variable": "garden_ripe"
+          }
+        },
+        {
+          "id": "fountain-calm",
+          "text": "The plaza smells like sweet clover again!",
+          "priority": 30,
+          "emote": "wave",
+          "when": {
+            "calmed": "fountain-frog"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Pink bubbles keep landing on my tulips!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "sammy",
+      "name": "Sammy",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 155,
+      "lookAroundTicks": 140,
+      "favoriteParty": [
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa, purple glow-light! Like an arcade!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "High score calm-down! You crushed it!",
+          "priority": 95,
+          "emote": "sparkle",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa, a fizzy critter! Boss battle vibe!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "party-sue",
+          "text": "Sue! Wanna team up on Skee-Ball later?",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "arcade-open",
+          "text": "Comet Cruise is calling my name today!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "arcade-keeper"
+          }
+        },
+        {
+          "id": "clubhouse",
+          "text": "Psst! The arcade lights just blinked on!",
+          "priority": 30,
+          "emote": "note",
+          "when": {
+            "variable": "clubhouse_claimed"
+          }
+        },
+        {
+          "id": "default",
+          "text": "I'm saving tokens for the claw machine!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "pippa",
+      "name": "Pippa",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 155,
+      "lookAroundTicks": 150,
+      "favoriteParty": [
+        "pond-pup",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Secret glowing clover! Let me see!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Yay! That critter looks so happy now!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Ooh, a flute tune! Best park concert ever!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Eep! The park critters got super zoomy!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "pup",
+          "text": "Pond Pup! Your tail is wagging so fast!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "pond-pup"
+          }
+        },
+        {
+          "id": "club-open",
+          "text": "You solved the tree house password?!",
+          "priority": 40,
+          "emote": "sparkle",
+          "when": {
+            "variable": "club_open"
+          }
+        },
+        {
+          "id": "default",
+          "text": "I know every critter hiding in this park!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "leo",
+      "name": "Leo",
+      "adult": false,
+      "personality": "scholar",
+      "greetRange": 145,
+      "lookAroundTicks": 170,
+      "favoriteParty": [
+        "acorn-squirrel",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ultraviolet glow! Fascinating optics!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Logged that calm-down in my field notes!",
+          "priority": 95,
+          "emote": "note",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Careful! Fizz levels spiking nearby!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "squirrel",
+          "text": "An Acorn Squirrel! Amazing tree climber!",
+          "priority": 80,
+          "emote": "sparkle",
+          "when": {
+            "withParty": "acorn-squirrel"
+          }
+        },
+        {
+          "id": "stickers-6",
+          "text": "Six stickers already? True researcher!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "minStickers": 6
+          }
+        },
+        {
+          "id": "recess",
+          "text": "Recess! Time to inspect the old oak!",
+          "priority": 35,
+          "emote": "note",
+          "when": {
+            "variable": "recess"
+          }
+        },
+        {
+          "id": "default",
+          "text": "I'm charting every fizz clue at school!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "adult": false,
+      "personality": "artist",
+      "greetRange": 150,
+      "lookAroundTicks": 165,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "sue"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! That lavender light is pure art!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Such peaceful colors after a calm-down!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa, wild purple fizz everywhere!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "bunny",
+          "text": "Hold still, Ribbon Bunny, let me sketch!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "ribbon-bunny"
+          }
+        },
+        {
+          "id": "art-open",
+          "text": "Back at my easel! Best room at school!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "art_open"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Someone borrowed every purple marker!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "sal",
+      "name": "Captain Sal",
+      "adult": true,
+      "personality": "sailor",
+      "greetRange": 155,
+      "lookAroundTicks": 200,
+      "favoriteParty": [
+        "sue",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Shiver me compass! A glowing beacon!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Smooth sailing now, little skipper!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Now that is a sea shanty worth whistling!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Steady! Fizzy critter off the bow!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Ahoy, Sue! Best angler on the bay!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "lifeguard-calm",
+          "text": "Ms. Coral's back and the beach sings!",
+          "priority": 40,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "lifeguard"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Ahoy! Tide's bringing bright shells in!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "nora",
+      "name": "Nora",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 150,
+      "lookAroundTicks": 155,
+      "favoriteParty": [
+        "pond-pup",
+        "sue"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Look at the sand sparkling purple!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Awesome! Now my sandcastle is safe!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Hey! Don't bounce into my shell fort!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "pup",
+          "text": "Pond Pup! Wanna dig for shiny shells?",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "pond-pup"
+          }
+        },
+        {
+          "id": "treasure",
+          "text": "Wait, you found real pirate treasure?!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "treasure_found"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Bet I find a pink spiral shell today!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "lark",
+      "name": "Hiker Lark",
+      "adult": true,
+      "personality": "naturalist",
+      "greetRange": 155,
+      "lookAroundTicks": 185,
+      "favoriteParty": [
+        "jordan",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Trail light on! Smart mountaineering!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Hear that? The cliff birds are singing!",
+          "priority": 95,
+          "emote": "note",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Easy now! Fizzy wildlife on the path!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! Still setting the ridge pace?",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "gull-calm",
+          "text": "The lookout gull is peaceful again!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "gull"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Best birdwatching ridge in Cloverhollow!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "mina",
+      "name": "Mina",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 150,
+      "lookAroundTicks": 180,
+      "favoriteParty": [
+        "jordan",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "How cozy! Your lantern shines on snow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "What a kind touch on the snowy slopes!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Lovely flute notes floating across the snow!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Oh my! That critter's full of snow-fizz!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan, remember your extra mittens!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "lodge-open",
+          "text": "Mrs. Flurry's hearth is crackling warm!",
+          "priority": 45,
+          "emote": "heart",
+          "when": {
+            "variable": "lodge_open"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Pinecone Pass smells like fresh cocoa!",
+          "priority": 10,
+          "emote": "wave"
+        },
+        {
+          "id": "has-treats",
+          "text": "Smells like tasty critter treats in your pack!",
+          "priority": 52,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "otis",
+      "name": "Otis",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 145,
+      "lookAroundTicks": 210,
+      "favoriteParty": [
+        "maddie",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Fancy purple beam! Lights up the rafters!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Warm hearts keep this mountain gentle!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Maddie looks ready for a fireside nap!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Even the mountain pines feel restful!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Warm fire, marshmallows, zero rush.",
+          "priority": 10,
+          "emote": "wave"
+        },
+        {
+          "id": "has-treats",
+          "text": "Carrying fresh treats? Critters will adore you!",
+          "priority": 52,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "pebble",
+      "name": "Professor Pebble",
+      "adult": true,
+      "personality": "scholar",
+      "greetRange": 150,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "pond-pup",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Aha! Fluorescence on the quartz veins!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Splendid! The echoes ring crystal-clear!",
+          "priority": 95,
+          "emote": "sparkle",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Oh dear! Fizzy resonance in the grotto!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "pup",
+          "text": "A swimming pup? Ideal spring assistant!",
+          "priority": 80,
+          "emote": "sparkle",
+          "when": {
+            "withParty": "pond-pup"
+          }
+        },
+        {
+          "id": "bridge-lit",
+          "text": "Those glowing stepping stones are pure art!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "cavern_bridge_lit"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Listen closely... every crystal hums!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "moss",
+      "name": "Ranger Moss",
+      "adult": true,
+      "personality": "ranger",
+      "greetRange": 155,
+      "lookAroundTicks": 195,
+      "favoriteParty": [
+        "acorn-squirrel",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "That lantern reveals secret forest paths!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "The pines whisper their thanks, Fae!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "The tall pines love a gentle woodland flute!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Stay sharp! Fizzy critter in the ferns!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "squirrel",
+          "text": "Acorn Squirrel knows every tall branch!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "acorn-squirrel"
+          }
+        },
+        {
+          "id": "moon-owl",
+          "text": "Starry Owl's soft hoot guards the woods!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "moon-owl"
+          }
+        },
+        {
+          "id": "clubhouse",
+          "text": "Your woodland clubhouse looks cozy!",
+          "priority": 35,
+          "emote": "wave",
+          "when": {
+            "variable": "clubhouse_claimed"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Tread light under the Whispering Woods.",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "sunny",
+      "name": "Sunny",
+      "adult": false,
+      "personality": "shepherd",
+      "greetRange": 155,
+      "lookAroundTicks": 160,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Firefly light in broad daylight!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "All the clover lambs are smiling again!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Play it again! The clover lambs are dancing!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa! Fluffy fizz-critters on the loose!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "bunny",
+          "text": "Ribbon Bunny fits right into the hills!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "ribbon-bunny"
+          }
+        },
+        {
+          "id": "taco-chef",
+          "text": "Chef Mateo's crispy tacos smell amazing!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "taco-chef"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Best breeze and softest clover up here!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "mom",
+      "name": "Mom",
+      "adult": true,
+      "personality": "family",
+      "greetRange": 145,
+      "lookAroundTicks": 210,
+      "favoriteParty": [
+        "maddie",
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh, nifty lantern! Mind Oliver's eyes!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "awake",
+          "text": "Blueberry pancakes are hot, sweetie!",
+          "priority": 60,
+          "emote": "heart",
+          "when": {
+            "variable": "awake"
+          }
+        },
+        {
+          "id": "clubhouse",
+          "text": "So proud of your woodland clubhouse!",
+          "priority": 40,
+          "emote": "heart",
+          "when": {
+            "variable": "clubhouse_claimed"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Stay curious out there, sweetie!",
+          "priority": 10,
+          "emote": "heart"
+        }
+      ]
+    },
+    {
+      "id": "dad",
+      "name": "Dad",
+      "adult": true,
+      "personality": "family",
+      "greetRange": 150,
+      "lookAroundTicks": 200,
+      "favoriteParty": [
+        "maddie",
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Look at my brave explorer's lantern!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "You brought peace to the whole valley!",
+          "priority": 50,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Listen to our kid play! Pure magic, Fae!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "clubhouse",
+          "text": "Save me a clubhouse story for dinner!",
+          "priority": 35,
+          "emote": "heart",
+          "when": {
+            "variable": "clubhouse_claimed"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Cinnamon buns taste best with adventure!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "oliver",
+      "name": "Oliver",
+      "adult": false,
+      "personality": "family",
+      "greetRange": 130,
+      "lookAroundTicks": 120,
+      "favoriteParty": [
+        "maddie",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Shiny-shiny! Ba-ba!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Kitty! Ma-dee! Hee hee!",
+          "priority": 50,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Ba-ba! *waves rattle*",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "chef",
+      "name": "Chef Bea",
+      "adult": true,
+      "personality": "chef",
+      "greetRange": 150,
+      "lookAroundTicks": 195,
+      "favoriteParty": [
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "My stars, what a bright bakery glow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "spice-done",
+          "text": "Star Cinnamon buns are rising golden!",
+          "priority": 45,
+          "emote": "heart",
+          "when": {
+            "variable": "spice_returned"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Warm cinnamon rolls, fresh out the oven!",
+          "priority": 10,
+          "emote": "wave"
+        },
+        {
+          "id": "has-treats",
+          "text": "Ooh, specialty treats! Smart explorer snack!",
+          "priority": 52,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "barnaby",
+      "name": "Grandpa Barnaby",
+      "adult": true,
+      "personality": "scholar",
+      "greetRange": 145,
+      "lookAroundTicks": 220,
+      "favoriteParty": [
+        "maddie",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ah! Fairy-light from the old legends!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "gems-all",
+          "text": "All seven Star Gems! Pure legend, Fae!",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "minGems": 7
+          }
+        },
+        {
+          "id": "gems-some",
+          "text": "Tell me about the Star Gems you found!",
+          "priority": 35,
+          "emote": "note",
+          "when": {
+            "minGems": 1
+          }
+        },
+        {
+          "id": "default",
+          "text": "A warm cup of tea and a good legend...",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "bree",
+      "name": "Bree",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 150,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Brighter than my Star Bus headlights!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "rode-bus",
+          "text": "Mountain road up to the Pass is clear!",
+          "priority": 40,
+          "emote": "wave",
+          "when": {
+            "variable": "rode_bus"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Star Bus loops from Plaza to the Bay!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "toby",
+      "name": "Toby",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 150,
+      "lookAroundTicks": 145,
+      "favoriteParty": [
+        "sue",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Secret detective flashlight!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "arcade-calm",
+          "text": "The arcade is back! Let's play Skee-Ball!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "arcade-keeper"
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Whoa! Play a victory fanfare on that flute!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Favourite treats calm critters super fast!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "teacher",
+      "name": "Ms. Maple",
+      "adult": true,
+      "personality": "teacher",
+      "greetRange": 145,
+      "lookAroundTicks": 200,
+      "favoriteParty": [
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "My goodness, what a luminous science tool!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Stay calm, everyone! Let Fae help!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "recess",
+          "text": "Enjoy fresh air out on the field!",
+          "priority": 40,
+          "emote": "wave",
+          "when": {
+            "variable": "recess"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Kind words make the brightest classroom!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "nurse",
+      "name": "Nurse Clover",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 145,
+      "lookAroundTicks": 190,
+      "favoriteParty": [
+        "maddie",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "What a gentle purple lantern glow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Deep breaths! Fizzy spells pass soon!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Need a breather? Always happy to help!",
+          "priority": 10,
+          "emote": "heart"
+        }
+      ]
+    },
+    {
+      "id": "coach",
+      "name": "Coach Ash",
+      "adult": true,
+      "personality": "ranger",
+      "greetRange": 155,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Bright beam, champ! Ready for adventure!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Heads up! Zoomy pup on the court!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "lasso",
+          "text": "Keep twirling that rainbow lasso, Fae!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "coach_thanked"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Teamwork makes every obstacle small!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "music-teacher",
+      "name": "Ms. Willow",
+      "adult": true,
+      "personality": "artist",
+      "greetRange": 145,
+      "lookAroundTicks": 185,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Like a spotlight on concert night!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Oh my! That bluebird's singing off-key!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Bravo, Fae! Bright tone and steady rhythm!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "flute",
+          "text": "Play that flute whenever friends call!",
+          "priority": 45,
+          "emote": "note",
+          "when": {
+            "variable": "has_flute"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Every melody starts with listening.",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "milo",
+      "name": "Milo",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 140,
+      "lookAroundTicks": 150,
+      "favoriteParty": [
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa... cool glowy lantern, Fae.",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "calmed-hood",
+          "text": "Thanks for being my friend, Fae.",
+          "priority": 60,
+          "emote": "heart",
+          "when": {
+            "calmed": "hooded-kid"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Just folding a super fast paper plane!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "rosie",
+      "name": "Rosie",
+      "adult": false,
+      "personality": "artist",
+      "greetRange": 145,
+      "lookAroundTicks": 160,
+      "favoriteParty": [
+        "maddie",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Starry purple sparkles everywhere!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "kite-back",
+          "text": "My kite flies higher than ever now!",
+          "priority": 45,
+          "emote": "heart",
+          "when": {
+            "variable": "kite_returned"
+          }
+        },
+        {
+          "id": "default",
+          "text": "I'm sketching ribbons for my kite tail!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "sue",
+      "name": "Sue",
+      "adult": false,
+      "personality": "sailor",
+      "greetRange": 155,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa, bright lantern! Good for night docks!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Fish are biting off the end of the dock!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "jordan",
+      "name": "Jordan",
+      "adult": false,
+      "personality": "naturalist",
+      "greetRange": 155,
+      "lookAroundTicks": 180,
+      "favoriteParty": [
+        "sue",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Looking sharp with a blacklight beam!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Ever seen glowing trails in the snow?",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "fairy-lavender",
+      "name": "Lavender Fairy",
+      "adult": false,
+      "personality": "fairy",
+      "greetRange": 165,
+      "lookAroundTicks": 140,
+      "favoriteParty": [
+        "maddie",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Your lantern sings with our fairy light!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "The Ancient Tree dreams in gold again!",
+          "priority": 55,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Your flute harmonizes with the Ancient Tree!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Listen to the Ancient Tree's gentle hum!",
+          "priority": 10,
+          "emote": "sparkle"
+        }
+      ]
+    },
+    {
+      "id": "fairy-mint",
+      "name": "Mint Fairy",
+      "adult": false,
+      "personality": "fairy",
+      "greetRange": 160,
+      "lookAroundTicks": 135,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "acorn-squirrel"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Twinkle, twinkle! Even brighter now!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "The butterflies are dancing in circles!",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Hee hee! My wings flutter right on the beat!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Tickle my wings again, little butterfly!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "fairy-sky",
+      "name": "Sky Fairy",
+      "adult": false,
+      "personality": "fairy",
+      "greetRange": 160,
+      "lookAroundTicks": 145,
+      "favoriteParty": [
+        "pond-pup",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Starlight in a jar! How clever!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Peace ripples from root to canopy!",
+          "priority": 55,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Every leaf remembers a kind song!",
+          "priority": 10,
+          "emote": "sparkle"
+        }
+      ]
+    },
+    {
+      "id": "fairy-peach",
+      "name": "Peach Fairy",
+      "adult": false,
+      "personality": "fairy",
+      "greetRange": 160,
+      "lookAroundTicks": 130,
+      "favoriteParty": [
+        "maddie",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Hee hee! My shoes glow purple too!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "No more squeaky fizz bubbles! Yay!",
+          "priority": 55,
+          "emote": "heart",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Squeak, squeak go my pond-bubble shoes!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "gus",
+      "name": "Mailman Gus",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 155,
+      "lookAroundTicks": 185,
+      "favoriteParty": [
+        "maddie",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Now that lantern could read tiny postcards!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "First-class calm-down! Stamps all around!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "What a cheery tune for the mail route!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa! Hold onto the postcards, fizzy ahead!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "pup",
+          "text": "Pond Pup! Best tail-wagging mail helper!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "pond-pup"
+          }
+        },
+        {
+          "id": "bosses-3",
+          "text": "Letters from every land praise your kindness!",
+          "priority": 56,
+          "emote": "sparkle",
+          "when": {
+            "minBossesCalmed": 3
+          }
+        },
+        {
+          "id": "has-treats",
+          "text": "Ooh, bakery treats? Better than parcel post!",
+          "priority": 52,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "fountain-calm",
+          "text": "Dry cobblestones again! Smooth mail run!",
+          "priority": 30,
+          "emote": "wave",
+          "when": {
+            "calmed": "fountain-frog"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Special delivery for every Cloverhollow porch!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "hazel",
+      "name": "Grandma Hazel",
+      "adult": true,
+      "personality": "family",
+      "greetRange": 150,
+      "lookAroundTicks": 210,
+      "favoriteParty": [
+        "maddie",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "My stars, what a warm glowing treasure!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Bless your gentle heart, sweet Fae!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Oh, what a darling melody on your flute!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Oh my! Mind that bouncy fizzy critter, dear!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Maddie looks so cozy strolling with you!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "bosses-5",
+          "text": "Half the valley is calm because of you, dear!",
+          "priority": 56,
+          "emote": "heart",
+          "when": {
+            "minBossesCalmed": 5
+          }
+        },
+        {
+          "id": "club-open",
+          "text": "The old tree house brings back sweet memories!",
+          "priority": 40,
+          "emote": "heart",
+          "when": {
+            "variable": "club_open"
+          }
+        },
+        {
+          "id": "default",
+          "text": "This bench has the best view of Meadow Park!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "bram",
+      "name": "Bram",
+      "adult": true,
+      "personality": "artist",
+      "greetRange": 155,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "sue"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh, stage-light violet! Inspires a ballad!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Sweet harmony! That deserves a chorus!",
+          "priority": 95,
+          "emote": "note",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Flute and ukulele! What a jam session, Fae!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa, fizzy tempo! Hold steady, Fae!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "bunny",
+          "text": "Ribbon Bunny taps her paws right on beat!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "ribbon-bunny"
+          }
+        },
+        {
+          "id": "bosses-4",
+          "text": "Ballads of your calm-downs ring up the hills!",
+          "priority": 56,
+          "emote": "note",
+          "when": {
+            "minBossesCalmed": 4
+          }
+        },
+        {
+          "id": "taco-chef",
+          "text": "Crispy tacos and ukulele chords: pure bliss!",
+          "priority": 42,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "taco-chef"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Strumming clover tunes up on the breezy ridge!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "wren",
+      "name": "Wren",
+      "adult": false,
+      "personality": "artist",
+      "greetRange": 150,
+      "lookAroundTicks": 165,
+      "favoriteParty": [
+        "acorn-squirrel",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Glow-lantern turns fern ink violet!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Now I can sketch that critter holding still!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Ooh! Your flute sounds like woodland birds!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Eep! Fizzy critters smudge my field sketches!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "squirrel",
+          "text": "Acorn Squirrel! Best treetop pose model!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "acorn-squirrel"
+          }
+        },
+        {
+          "id": "moon-owl",
+          "text": "I drew Starry Owl perching in the pines!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "moon-owl"
+          }
+        },
+        {
+          "id": "clubhouse",
+          "text": "Your treehouse clubhouse looks super cozy!",
+          "priority": 35,
+          "emote": "note",
+          "when": {
+            "variable": "clubhouse_claimed"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Drawing spotted mushrooms in my sketchbook!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "tuck",
+      "name": "Tuck",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 155,
+      "lookAroundTicks": 145,
+      "favoriteParty": [
+        "jordan",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Snow sparkles purple under your beam!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Awesome! Now we can build ten more snowmen!",
+          "priority": 95,
+          "emote": "sparkle",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Sweet flute song! Snowman dance party!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Hey! Watch out for my snowball fortress!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! Race you to the next snowdrift!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "lodge-open",
+          "text": "Hot cocoa at the lodge after snow-sculpting!",
+          "priority": 45,
+          "emote": "heart",
+          "when": {
+            "variable": "lodge_open"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Rolling the biggest snowman in Pinecone Pass!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "kai",
+      "name": "Kai",
+      "adult": false,
+      "personality": "sailor",
+      "greetRange": 150,
+      "lookAroundTicks": 155,
+      "favoriteParty": [
+        "sue",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Like a mini lighthouse on the shore!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Nice! The harbor crabs can scuttle in peace!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Cool flute tune! Even the waves clap along!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa! Fizzy critter splashing near the boats!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Sue! Teach me your dockside casting trick!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "lifeguard-calm",
+          "text": "Ms. Coral is back on watch! Smooth harbor!",
+          "priority": 42,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "lifeguard"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Folding paper sailboats for the harbor tide!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "sage",
+      "name": "Star-Watcher Sage",
+      "adult": true,
+      "personality": "mystic",
+      "greetRange": 160,
+      "lookAroundTicks": 205,
+      "favoriteParty": [
+        "maddie",
+        "ribbon-bunny"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Your violet lamp wakes the mist-bluebells!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "A gentle hush ripples across the path!",
+          "priority": 95,
+          "emote": "sparkle",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Your flute resonates with the stone seal!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Maddie's whiskers sense ancient paths too.",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "The Enchanted Forest shines clear again.",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "seal-open",
+          "text": "The ancient seal opens for kind melodies.",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "seal_open"
+          }
+        },
+        {
+          "id": "mist-way",
+          "text": "Glowing bluebells always guide true hearts.",
+          "priority": 35,
+          "emote": "note",
+          "when": {
+            "variable": "found_mist_way"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Watch the bluebells shimmer in the mist.",
+          "priority": 10,
+          "emote": "sparkle"
+        }
+      ]
+    },
+    {
+      "id": "clara",
+      "name": "Clara",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 150,
+      "lookAroundTicks": 190,
+      "favoriteParty": [
+        "maddie",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Oh! That soft purple beam feels so cozy!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Peaceful hearts warm the whole mountain!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "What a lovely flute tune by the hearth!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Maddie's purr pairs nicely with warm tea!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "has-treats",
+          "text": "Fresh treats! Perfect for a fireside chat!",
+          "priority": 52,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "forest-calm",
+          "text": "Every mountain trail feels peaceful now!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "notVariable": "forest_fizzy"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Knitting striped scarves by the fire!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "bramble",
+      "name": "Bramble",
+      "adult": true,
+      "personality": "naturalist",
+      "greetRange": 155,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "acorn-squirrel",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Trail lantern lights up rare mosses!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Smooth cliffs! Even the bunnies cheered!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "That tune echoes right down the canyon!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Heads up! Fizzy critter on the bend!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "squirrel",
+          "text": "Acorn Squirrel! Ace cliff-pine scout!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "acorn-squirrel"
+          }
+        },
+        {
+          "id": "gull-calm",
+          "text": "With the gull calm, the lookout sings!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "calmed": "gull"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Packing pinecones and trail maps for all!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "bert",
+      "name": "Custodian Bert",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 150,
+      "lookAroundTicks": 195,
+      "favoriteParty": [
+        "maddie",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Handy light! Spots every stray chalk mark!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Phew! Clean floors and calm halls again!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Nice melody! Makes sweeping a breeze!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Whoa there! Fizzy paint down East Hall!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "art-open",
+          "text": "Art Room's spotless and ready for paint!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "art_open"
+          }
+        },
+        {
+          "id": "recess",
+          "text": "Quiet halls while everyone plays outside!",
+          "priority": 35,
+          "emote": "wave",
+          "when": {
+            "variable": "recess"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Keeping Cloverhollow School squeaky clean!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "poppy",
+      "name": "Poppy",
+      "adult": false,
+      "personality": "kid-bouncy",
+      "greetRange": 155,
+      "lookAroundTicks": 145,
+      "favoriteParty": [
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Purple light makes the arcade glow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Bonus points! Best hero in Cloverhollow!",
+          "priority": 95,
+          "emote": "sparkle",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Whoa, real-life victory jingle on flute!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Sue! Watch me aim for the plushie heap!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "bosses-3",
+          "text": "Whoa, superstar calm-down streak, Fae!",
+          "priority": 50,
+          "emote": "sparkle",
+          "when": {
+            "minBossesCalmed": 3
+          }
+        },
+        {
+          "id": "default",
+          "text": "Three more tickets for a shiny new prize!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "gemma",
+      "name": "Gemma",
+      "adult": false,
+      "personality": "scholar",
+      "greetRange": 150,
+      "lookAroundTicks": 160,
+      "favoriteParty": [
+        "pond-pup",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Look how the quartz veins light up!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Yay! The cave echoes sound peaceful now!",
+          "priority": 95,
+          "emote": "sparkle",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Listen! Your flute echoes off the quartz!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Careful! Fizzy critters near the stream!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "pup",
+          "text": "Pond Pup! Check out these shiny geodes!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "pond-pup"
+          }
+        },
+        {
+          "id": "bridge-lit",
+          "text": "Crystal stepping stones! So sparkly!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "variable": "cavern_bridge_lit"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Cataloging every crystal in the grotto!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "theo",
+      "name": "Theo",
+      "adult": false,
+      "personality": "artist",
+      "greetRange": 150,
+      "lookAroundTicks": 165,
+      "favoriteParty": [
+        "ribbon-bunny",
+        "sue"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Glow-light makes my clay glazes pop!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "So calm! My tiny clay critters won't tip!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Sweet tune! Great soundtrack for sculpting!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "bunny",
+          "text": "Ribbon Bunny! May I sculpt your pink bow?",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "ribbon-bunny"
+          }
+        },
+        {
+          "id": "stickers-6",
+          "text": "Six stickers! Tons of sculpture models!",
+          "priority": 45,
+          "emote": "sparkle",
+          "when": {
+            "minStickers": 6
+          }
+        },
+        {
+          "id": "default",
+          "text": "Sculpting tiny clay critters on the table!",
+          "priority": 10,
+          "emote": "note"
+        }
+      ]
+    },
+    {
+      "id": "fern",
+      "name": "Ranger Fern",
+      "adult": true,
+      "personality": "ranger",
+      "greetRange": 165,
+      "lookAroundTicks": 185,
+      "favoriteParty": [
+        "jordan",
+        "ribbon-bunny",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! Purple lantern light makes the clover shimmer!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Another calm friend might visit the meadow soon!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Your flute melody brings all the meadow critters close!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! The mountain wildlife board still mentions you!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "bunny",
+          "text": "Look at Ribbon Bunny hopping right through the clover!",
+          "priority": 78,
+          "emote": "heart",
+          "when": {
+            "withParty": "ribbon-bunny"
+          }
+        },
+        {
+          "id": "treats",
+          "text": "Critter treats in your pack? Every guest will smile!",
+          "priority": 64,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "sanctuary-14",
+          "text": "Our meadow is brimming with happy valley friends!",
+          "priority": 52,
+          "emote": "sparkle",
+          "when": {
+            "variable": "sanctuary_reward_14"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Every calm critter has a cozy spot in this meadow!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "penny",
+      "name": "Scooper Penny",
+      "adult": true,
+      "personality": "chef",
+      "greetRange": 155,
+      "lookAroundTicks": 165,
+      "favoriteParty": [
+        "sue",
+        "maddie"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Purple light makes the gelato tubs sparkle!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Sweet flute jingle! Sounds like ice-cream chimes!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Sue! Mint Cloud Chip is freshly churned for you!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Aww, Maddie always smells strawberry swirl from outside!",
+          "priority": 76,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "parlor-secret",
+          "text": "You found our Secret Sundae Club doodle, Fae!",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "variable": "parlor_note_read"
+          }
+        },
+        {
+          "id": "treats",
+          "text": "Sweet cones ready for any critter who needs a smile!",
+          "priority": 48,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Crispy waffle cones and pastel scoops, fresh and ready!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "pippin",
+      "name": "Grocer Pippin",
+      "adult": true,
+      "personality": "gardener",
+      "greetRange": 155,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "maddie",
+        "acorn-squirrel"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Aha! Shining that lantern near the jam shelves, Fae?",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "What a cheery market tune! Even the apples perked up!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "squirrel",
+          "text": "Careful, Acorn Squirrel! Those orchard apples are stacked!",
+          "priority": 80,
+          "emote": "heart",
+          "when": {
+            "withParty": "acorn-squirrel"
+          }
+        },
+        {
+          "id": "maddie",
+          "text": "Hello, Maddie! Smelling the crunchy fish crackers again?",
+          "priority": 76,
+          "emote": "heart",
+          "when": {
+            "withParty": "maddie"
+          }
+        },
+        {
+          "id": "market-secret",
+          "text": "Smart eye spotting that secret orchard recipe note!",
+          "priority": 55,
+          "emote": "sparkle",
+          "when": {
+            "variable": "market_note_read"
+          }
+        },
+        {
+          "id": "treats",
+          "text": "Stocked up on crisp orchard treats for the road!",
+          "priority": 48,
+          "emote": "heart",
+          "when": {
+            "hasTreats": true
+          }
+        },
+        {
+          "id": "default",
+          "text": "Crisp orchard apples and warm jam jars on every shelf!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "buster",
+      "name": "Buster",
+      "adult": true,
+      "personality": "sailor",
+      "greetRange": 165,
+      "lookAroundTicks": 180,
+      "favoriteParty": [
+        "sue",
+        "jordan"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Whoa! Brighter than my Star-Line bus headlights, kiddo!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Honk-honk! Smooth sailing across Cloverhollow Plaza!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Sweeter than my brass Star-Line bus whistle, Fae!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Hold onto your bus tickets! Fizzy critter on the curb!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Hey Sue! Ready for another express run to the bay?",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! Pinecone Pass route is clear and cozy!",
+          "priority": 78,
+          "emote": "wave",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "reward",
+          "text": "All aboard anytime, official Star-Line Explorer!",
+          "priority": 52,
+          "emote": "sparkle",
+          "when": {
+            "variable": "buster_reward"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Star-Line express to the bay and snowy pass!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "bay-keeper",
+      "name": "Bay Keeper",
+      "adult": true,
+      "personality": "sailor",
+      "greetRange": 155,
+      "lookAroundTicks": 175,
+      "favoriteParty": [
+        "sue",
+        "pond-pup"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "Ooh! That purple lantern makes our sea glass glow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "Hurrah! Calm waves and happy critters on the beach!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Lovely seaside tune! Even the shells seem to hum!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Mind the taffy jars! Fizzy critters near the sand!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "sue",
+          "text": "Sue! Your favorite pastel sea-salt taffy is fresh!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "sue"
+          }
+        },
+        {
+          "id": "stamp",
+          "text": "Your Bubblegum Bay wave stamp looks shiny, Fae!",
+          "priority": 52,
+          "emote": "sparkle",
+          "when": {
+            "variable": "stamp_bay"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Fresh sea-salt taffy and sunny bay souvenirs right here!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    },
+    {
+      "id": "pass-keeper",
+      "name": "Pass Keeper",
+      "adult": true,
+      "personality": "cozy",
+      "greetRange": 155,
+      "lookAroundTicks": 190,
+      "favoriteParty": [
+        "jordan",
+        "acorn-squirrel"
+      ],
+      "rules": [
+        {
+          "id": "lantern",
+          "text": "What a cozy purple glow against the pine snow!",
+          "priority": 100,
+          "emote": "sparkle",
+          "when": {
+            "lanternOn": true
+          }
+        },
+        {
+          "id": "just-calmed",
+          "text": "That settled the whole snowy ridge! Nice work, Fae!",
+          "priority": 95,
+          "emote": "heart",
+          "when": {
+            "justCalmed": true
+          }
+        },
+        {
+          "id": "flute-delight",
+          "text": "Clear mountain flute notes ring through the pines!",
+          "priority": 92,
+          "emote": "note",
+          "when": {
+            "recentFlute": true
+          }
+        },
+        {
+          "id": "chaos",
+          "text": "Steady footing! A fizzy critter is zipping past!",
+          "priority": 90,
+          "emote": "worry",
+          "when": {
+            "chaosNearby": true
+          }
+        },
+        {
+          "id": "jordan",
+          "text": "Jordan! Fresh maple brittle right off the warm tray!",
+          "priority": 80,
+          "emote": "wave",
+          "when": {
+            "withParty": "jordan"
+          }
+        },
+        {
+          "id": "stamp",
+          "text": "That crisp pine stamp fits your Star-Line card!",
+          "priority": 52,
+          "emote": "sparkle",
+          "when": {
+            "variable": "stamp_pass"
+          }
+        },
+        {
+          "id": "default",
+          "text": "Warm maple pine brittle for chilly mountain explorers!",
+          "priority": 10,
+          "emote": "wave"
+        }
+      ]
+    }
+  ],
+  "banter": [
+    {
+      "id": "cafe-dad-barnaby",
+      "area": "cafe",
+      "speakers": [
+        "dad",
+        "barnaby"
+      ],
+      "lines": [
+        "Fae's journal is already half full!",
+        "Just like the explorers of old Cloverhollow!"
+      ]
+    },
+    {
+      "id": "cafe-chef-toby",
+      "area": "cafe",
+      "speakers": [
+        "chef",
+        "toby"
+      ],
+      "lines": [
+        "Fresh cinnamon bun before the arcade, Toby?",
+        "Yes please! Gotta fuel my Skee-Ball arm!"
+      ]
+    },
+    {
+      "id": "cafe-bree-barnaby",
+      "area": "cafe",
+      "speakers": [
+        "bree",
+        "barnaby"
+      ],
+      "lines": [
+        "Star Bus climbs Pinecone Pass like a dream!",
+        "Watch for glowing crystal arches up north!"
+      ]
+    },
+    {
+      "id": "kitchen-mom-oliver",
+      "area": "kitchen",
+      "speakers": [
+        "mom",
+        "oliver"
+      ],
+      "lines": [
+        "No eating your socks before pancakes, Ollie!",
+        "Ba-ba! *giggles and shakes rattle*"
+      ]
+    },
+    {
+      "id": "school-teacher-nurse",
+      "area": "school",
+      "speakers": [
+        "teacher",
+        "nurse"
+      ],
+      "lines": [
+        "Did you hear that fizzy pop in the hall?",
+        "Got chamomile tea ready for any jitters!"
+      ],
+      "when": {
+        "variable": "maple_in_hall"
+      }
+    },
+    {
+      "id": "classroom-rosie-milo",
+      "area": "classroom",
+      "speakers": [
+        "rosie",
+        "milo"
+      ],
+      "lines": [
+        "Check out the ribbons I drew for my kite!",
+        "Cool! Bet my paper plane flies just as far!"
+      ],
+      "when": {
+        "notCalmed": "hooded-kid"
+      }
+    },
+    {
+      "id": "field-leo-maya",
+      "area": "field",
+      "speakers": [
+        "leo",
+        "maya"
+      ],
+      "lines": [
+        "Spot any purple chalk clues by hopscotch?",
+        "Just doodles! Someone zoomed past fast!"
+      ],
+      "when": {
+        "variable": "recess",
+        "notVariable": "art_open"
+      }
+    },
+    {
+      "id": "enchanted-fairies-fizzy",
+      "area": "enchanted",
+      "speakers": [
+        "fairy-lavender",
+        "fairy-sky"
+      ],
+      "lines": [
+        "The Mystic Pond is still bubbling purple!",
+        "A kind heart will quiet the wish soon!"
+      ],
+      "when": {
+        "variable": "forest_fizzy"
+      }
+    },
+    {
+      "id": "enchanted-fairies-calm",
+      "area": "enchanted",
+      "speakers": [
+        "fairy-lavender",
+        "fairy-sky"
+      ],
+      "lines": [
+        "Listen! The Ancient Tree's song returned!",
+        "Every star above the canopy is smiling!"
+      ],
+      "when": {
+        "notVariable": "forest_fizzy"
+      }
+    },
+    {
+      "id": "plaza-flora-sammy",
+      "area": "plaza",
+      "speakers": [
+        "flora",
+        "sammy"
+      ],
+      "lines": [
+        "Pink fizz drifted right over my flowers!",
+        "And the arcade door's still locked tight!"
+      ],
+      "when": {
+        "notCalmed": "arcade-keeper"
+      }
+    },
+    {
+      "id": "bay-sal-nora",
+      "area": "bay",
+      "speakers": [
+        "sal",
+        "nora"
+      ],
+      "lines": [
+        "Any rare spiral shells in today's tide?",
+        "Found three pink ones near the big palms!"
+      ]
+    },
+    {
+      "id": "plaza-flora-gus",
+      "area": "plaza",
+      "speakers": [
+        "flora",
+        "gus"
+      ],
+      "lines": [
+        "Any seed catalogs in the mailbag, Gus?",
+        "Two bundles, Flora, fresh from the press!"
+      ]
+    },
+    {
+      "id": "park-pippa-hazel",
+      "area": "park",
+      "speakers": [
+        "pippa",
+        "hazel"
+      ],
+      "lines": [
+        "Grandma Hazel, look at my park chalk map!",
+        "Every hidden burrow marked with a star!"
+      ]
+    },
+    {
+      "id": "bay-sal-kai",
+      "area": "bay",
+      "speakers": [
+        "sal",
+        "kai"
+      ],
+      "lines": [
+        "Counted every painted hull in harbor, Kai?",
+        "Yep! Plus Sue landed a whopper off pier!"
+      ]
+    },
+    {
+      "id": "pass-mina-tuck",
+      "area": "pass",
+      "speakers": [
+        "mina",
+        "tuck"
+      ],
+      "lines": [
+        "Warm cocoa waiting once you finish, Tuck!",
+        "Wait till you see my giant snowman hat!"
+      ]
+    },
+    {
+      "id": "woods-moss-wren",
+      "area": "woods",
+      "speakers": [
+        "moss",
+        "wren"
+      ],
+      "lines": [
+        "Sketching red-cap mushrooms again, Wren?",
+        "Yep, and the cozy treehouse high above!"
+      ]
+    },
+    {
+      "id": "hills-sunny-bram",
+      "area": "hills",
+      "speakers": [
+        "sunny",
+        "bram"
+      ],
+      "lines": [
+        "Play that clover tune again, Bram!",
+        "Watch the lambs bounce right on the beat!"
+      ]
+    },
+    {
+      "id": "arcade-sammy-poppy",
+      "area": "arcade",
+      "speakers": [
+        "sammy",
+        "poppy"
+      ],
+      "lines": [
+        "Bet I beat the Comet Cruise score, Poppy!",
+        "Only if I don't clear Skee-Ball first!"
+      ],
+      "when": {
+        "calmed": "arcade-keeper"
+      }
+    },
+    {
+      "id": "lodge-otis-clara",
+      "area": "lodge",
+      "speakers": [
+        "otis",
+        "clara"
+      ],
+      "lines": [
+        "Is that scarf getting even longer, Clara?",
+        "Extra warm stripes for every trail guest!"
+      ]
+    },
+    {
+      "id": "trail-lark-bramble-gull",
+      "area": "trail",
+      "speakers": [
+        "lark",
+        "bramble"
+      ],
+      "lines": [
+        "That lookout gull is extra fizzy today!",
+        "Good thing Fae's got steady trail boots!"
+      ],
+      "when": {
+        "notCalmed": "gull"
+      }
+    },
+    {
+      "id": "trail-lark-bramble-calm",
+      "area": "trail",
+      "speakers": [
+        "lark",
+        "bramble"
+      ],
+      "lines": [
+        "The ridge songbirds are right back, Lark!",
+        "Best lookout view in the whole valley!"
+      ],
+      "when": {
+        "calmed": "gull"
+      }
+    },
+    {
+      "id": "cavern-pebble-gemma",
+      "area": "cavern",
+      "speakers": [
+        "pebble",
+        "gemma"
+      ],
+      "lines": [
+        "Spot any violet geodes by the wall, Gemma?",
+        "Three new clusters, all humming in tune!"
+      ]
+    },
+    {
+      "id": "east-hall-bert-leo",
+      "area": "east-hall",
+      "speakers": [
+        "bert",
+        "leo"
+      ],
+      "lines": [
+        "Spot any stray chalk dust down hall, Leo?",
+        "Logged two sparkles by the art door, Bert!"
+      ],
+      "when": {
+        "notVariable": "recess"
+      }
+    },
+    {
+      "id": "art-room-maya-theo",
+      "area": "art-room",
+      "speakers": [
+        "maya",
+        "theo"
+      ],
+      "lines": [
+        "Save me some lavender glaze, Theo!",
+        "Only if you paint my tiny clay frog!"
+      ],
+      "when": {
+        "variable": "art_open"
+      }
+    },
+    {
+      "id": "pass-keeper-tuck",
+      "area": "pass",
+      "speakers": [
+        "pass-keeper",
+        "tuck"
+      ],
+      "lines": [
+        "Maple brittle keeps every trail buddy cozy, Tuck!",
+        "Save me two squares after my pine-cone toss!"
+      ]
+    },
+    {
+      "id": "bay-keeper-sal",
+      "area": "bay",
+      "speakers": [
+        "bay-keeper",
+        "sal"
+      ],
+      "lines": [
+        "Fresh sea-salt taffy ready for the dock crew, Sal!",
+        "Sweetest pastel catch on Bubblegum Bay's pier!"
+      ]
+    }
+  ]
+}

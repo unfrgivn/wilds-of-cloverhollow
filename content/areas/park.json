@@ -599,5 +599,63 @@
         }
       ]
     }
+  ],
+  "npcs": [
+    {
+      "id": "pippa",
+      "point": {
+        "x": 310,
+        "y": 520
+      },
+      "facing": "right",
+      "knot": "npc_pippa",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          295,
+          510
+        ],
+        [
+          325,
+          510
+        ],
+        [
+          325,
+          530
+        ],
+        [
+          295,
+          530
+        ]
+      ]
+    },
+    {
+      "id": "hazel",
+      "point": {
+        "x": 440,
+        "y": 460
+      },
+      "facing": "down",
+      "knot": "npc_hazel",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          425,
+          450
+        ],
+        [
+          455,
+          450
+        ],
+        [
+          455,
+          470
+        ],
+        [
+          425,
+          470
+        ]
+      ]
+    }
   ]
 }

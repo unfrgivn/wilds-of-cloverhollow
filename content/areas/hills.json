@@ -386,7 +386,64 @@
       }
     ]
   },
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "sunny",
+      "point": {
+        "x": 880,
+        "y": 280
+      },
+      "facing": "down",
+      "knot": "npc_sunny",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          865,
+          270
+        ],
+        [
+          895,
+          270
+        ],
+        [
+          895,
+          290
+        ],
+        [
+          865,
+          290
+        ]
+      ]
+    },
+    {
+      "id": "bram",
+      "point": {
+        "x": 580,
+        "y": 420
+      },
+      "facing": "right",
+      "knot": "npc_bram",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          565,
+          410
+        ],
+        [
+          595,
+          410
+        ],
+        [
+          595,
+          430
+        ],
+        [
+          565,
+          430
+        ]
+      ]
+    }
+  ],
   "spawns": {
     "park": {
       "x": 180,

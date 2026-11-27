@@ -79,7 +79,7 @@ describe("people who come and go with the story", () => {
     expect(walker.player.x, "stopped by her footprint").toBeGreaterThanOrEqual(645);
   });
 
-  it("people without visibleWhile are always there; every visibleWhile is a story variable", () => {
+  it("unscheduled people are always there; every schedule rule references real content", () => {
     const state = inKitchen(500, 650, "right");
     for (const area of Object.values(content.world.areas))
       for (const npc of area.npcs) {
@@ -87,12 +87,21 @@ describe("people who come and go with the story", () => {
           expect(npcVisible(content.world, state, npc), `${area.id}/${npc.id}`).toBe(false);
           continue;
         }
-        if (npc.visibleWhile === undefined) {
+        const scheduled =
+          npc.visibleWhile !== undefined ||
+          npc.hiddenWhile !== undefined ||
+          npc.visibleAfterCalm !== undefined ||
+          npc.hiddenAfterCalm !== undefined;
+        if (!scheduled) {
           expect(npcVisible(content.world, state, npc), `${area.id}/${npc.id}`).toBe(true);
           continue;
         }
-        expect(inkVariable(story, state.ink, npc.visibleWhile), `${area.id}/${npc.id}`)
-          .toBeDefined();
+        if (npc.visibleWhile !== undefined)
+          expect(inkVariable(story, state.ink, npc.visibleWhile), `${area.id}/${npc.id}`)
+            .toBeDefined();
+        if (npc.hiddenWhile !== undefined)
+          expect(inkVariable(story, state.ink, npc.hiddenWhile), `${area.id}/${npc.id}`)
+            .toBeDefined();
       }
   });
 });

@@ -31,8 +31,8 @@ import {
 } from "./shell/assets";
 import {
   buildSoundContext, captureAreaPostcard, collectLevelUpNotices, createAreaBannerTracker,
-  createJournalNotesCache, hapticForTick, isOverworldConfirm, petEffectForCompanion,
-  resolveArcadeOutcome, resolveSoundtrack, shouldClearRest, stepJukeboxTrack,
+  createJournalNotesCache, createNpcChatterSync, hapticForTick, isOverworldConfirm,
+  petEffectForCompanion, resolveArcadeOutcome, resolveSoundtrack, shouldClearRest, stepJukeboxTrack,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio } from "./platform/audio";
@@ -219,10 +219,10 @@ async function boot(): Promise<void> {
   battleHud.onLasso(() => touch.tapButton("lasso"));
   journal.onClose(() => touch.tapButton("cancel"));
   credits.onClose(() => touch.tapButton("confirm"));
-  const view = new GameView(content.world, {
-    debugLabel: qaEnabled,
-    renderer: app.renderer,
-  });
+  const view = new GameView(content.world, { debugLabel: qaEnabled, renderer: app.renderer });
+  const syncNpcChatter = createNpcChatterSync(
+    content.world, uiRoot, view.npcChatterScreen.bind(view), sound.playAmbientChatter,
+  );
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
@@ -490,9 +490,7 @@ async function boot(): Promise<void> {
       paused, alpha: paused ? 1 : alpha, previousState,
     });
     prompt.render(
-      state.battle === null &&
-        state.arcade === null &&
-        state.finale !== "credits" &&
+      state.battle === null && state.arcade === null && state.finale !== "credits" &&
         titleMode === null
         ? view.promptView(state)
         : { visible: false, label: "", x: 0, y: 0 },
@@ -510,22 +508,14 @@ async function boot(): Promise<void> {
     if (fluteButton !== null) fluteButton.hidden = !hasFlute;
     const touchActive = document.documentElement.dataset.touch === "on";
     const hasLevelUpNotice = levelUpNotices.length > 0;
-    hudHints.render(
-      buildHudHintsView({
-        world: content.world,
-        state,
-        keyHints: gameSettings.keyHints(),
-        touchActive,
-        overworldFree: isOverworldFree(gate, hasLevelUpNotice),
-        isResting: view.isResting(),
-        hasLantern,
-        hasFlute,
-        muted: sound.muted(),
-        canPhoto: canPhotoMode(gate) && !photoMode,
-        canBattlePeek: canBattlePeek(gate),
-        inputMode: inputShortcuts.inputMode(),
-      }),
-    );
+    const overworldFree = isOverworldFree(gate, hasLevelUpNotice);
+    syncNpcChatter(state, overworldFree, photoMode, paused);
+    hudHints.render(buildHudHintsView({
+      world: content.world, state, keyHints: gameSettings.keyHints(), touchActive, overworldFree,
+      isResting: view.isResting(), hasLantern, hasFlute, muted: sound.muted(),
+      canPhoto: canPhotoMode(gate) && !photoMode, canBattlePeek: canBattlePeek(gate),
+      inputMode: inputShortcuts.inputMode(),
+    }));
     areaBanner.render(
       bannerTracker.view(
         content.world,
@@ -720,6 +710,7 @@ async function boot(): Promise<void> {
       gentleTiming: gameSettings.gentleTiming(), textSpeed: gameSettings.textSpeed(),
     });
     state = stepped.state;
+    view.observeNpcTick(state);
     if (!paused && !harnessStepping && state.tick !== previous.tick) saveSession.markDirty();
     previousState = state.area === previous.area ? previous : state;
     const arcadeOutcome = resolveArcadeOutcome(

@@ -172,6 +172,20 @@ export function soundCues(
     if (newPhase && game.phase === "reeling") cues.push("fish-reel");
     if (newPhase && game.phase === "result" && game.caught !== null) cues.push("fish-catch");
   }
+  if (game?.game === "taco") {
+    const was = previous.arcade?.game === "taco" ? previous.arcade : null;
+    if (was !== null && game.stepIndex > was.stepIndex) cues.push("mole-boop");
+    if (was !== null && game.mistakes > was.mistakes) cues.push("mole-whiff");
+    if (newPhase && game.phase === "order-clear") cues.push("cook-ding");
+    if (
+      newPhase &&
+      game.phase === "result" &&
+      game.served >= game.orders.length &&
+      game.mistakes === 0
+    ) {
+      cues.push("prize-won");
+    }
+  }
   return cues;
 }
 

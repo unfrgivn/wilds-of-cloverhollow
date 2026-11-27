@@ -2729,6 +2729,9 @@ Hola, Fae! The grill is warm, the limes are fresh, and there's zero purple fizz 
 + {coins() >= 4} [Buy a crispy taco snack for 4 coins]
     One hot, crispy Cloverhollow taco, wrapped up tight for your backpack! # speaker: Chef Mateo # buy: snack 4
     -> DONE
++ [Help run the Taco Truck kitchen!]
+    Put on your lucky apron, Fae—let's build some crispy Cloverhollow tacos! # speaker: Chef Mateo # play: taco 0
+    -> DONE
 + [Just saying hi!]
     Always happy to see my favorite taste-tester, Fae! Come back anytime. # speaker: Chef Mateo
     -> DONE

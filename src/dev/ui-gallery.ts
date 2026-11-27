@@ -26,7 +26,7 @@ import { createTitleScreen, type TitleView } from "../ui/title";
 import { createCredits } from "../ui/credits";
 import {
   loadContent, parseClawCalibration, parseCookCalibration, parseFishCalibration,
-  parseMoleCalibration, parseCometCalibration, parseSkeeCalibration,
+  parseMoleCalibration, parseCometCalibration, parseSkeeCalibration, parseTacoCalibration,
 } from "../content/load";
 import { createState, creditEntries, critterFieldNote, inkFacts, runInk } from "../core";
 import { atlasImage, atlasImagePath, type AtlasJson } from "../ui/atlas";
@@ -38,14 +38,17 @@ import { fishGalleryView } from "./fish-gallery";
 import { moleGalleryView } from "./mole-gallery";
 import { cometGalleryView } from "./comet-gallery";
 import { skeeGalleryView } from "./skee-gallery";
+import { tacoGalleryView } from "./taco-gallery";
 import calibrationData from "../../public/assets/arcade/claw-machine.json";
 import skeeCalibrationData from "../../public/assets/arcade/skee-lane.json";
 import moleCalibrationData from "../../public/assets/arcade/mole-cabinet.json";
 import cometCalibrationData from "../../public/assets/arcade/comet-cabinet.json";
 import cookCalibrationData from "../../public/assets/arcade/microwave.json";
 import fishCalibrationData from "../../public/assets/arcade/fishing-dock.json";
+import tacoCalibrationData from "../../public/assets/arcade/taco-truck.json";
 import foodAtlas from "../../public/assets/arcade/cook-food.json";
 import fishAtlas from "../../public/assets/arcade/fish-catches.json";
+import tacoAtlas from "../../public/assets/arcade/taco-ingredients.json";
 import moleAtlas from "../../public/assets/arcade/moles.json";
 import cometAtlas from "../../public/assets/arcade/comet.json";
 import prizeAtlas from "../../public/assets/prizes/prizes.json";
@@ -151,7 +154,8 @@ const moleView = moleGalleryView(content.world, arcadeFixture, state);
 const cometView = cometGalleryView(content.world, arcadeFixture, state);
 const cookView = cookGalleryView(content.world, arcadeFixture, state);
 const fishView = fishGalleryView(content.world, arcadeFixture, state);
-const gameView = clawView ?? skeeView ?? moleView ?? cometView ?? cookView ?? fishView;
+const tacoView = tacoGalleryView(content.world, arcadeFixture, state);
+const gameView = clawView ?? skeeView ?? moleView ?? cometView ?? cookView ?? fishView ?? tacoView;
 const battleState = state.startsWith("battle-");
 const journalState = state.startsWith("journal-");
 const arcadeState = state.startsWith("arcade-") || state.startsWith("skee-") ||
@@ -320,6 +324,7 @@ const galleryCometArt = (frame: string): AtlasImage | null => {
 };
 const foodAtlasSrc = atlasImagePath("assets/arcade/cook-food.json", foodAtlas);
 const fishAtlasSrc = atlasImagePath("assets/arcade/fish-catches.json", fishAtlas);
+const tacoAtlasSrc = atlasImagePath("assets/arcade/taco-ingredients.json", tacoAtlas);
 const toysAtlasSrc = atlasImagePath("assets/battle/toys/toys.json", toysJson);
 const arcade = createArcade(stage, galleryPrizeArt, {
   calibration: parseClawCalibration(calibrationData, "public/assets/arcade/claw-machine.json"),
@@ -358,6 +363,17 @@ const arcade = createArcade(stage, galleryPrizeArt, {
       src: fishAtlasSrc,
       frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
       atlas: { w: fishAtlas.meta.size.w, h: fishAtlas.meta.size.h },
+    };
+  },
+}, undefined, undefined, {
+  calibration: parseTacoCalibration(tacoCalibrationData, "public/assets/arcade/taco-truck.json"),
+  image: "assets/arcade/taco-truck.webp",
+  art: (frame) => {
+    const rect = Object.entries(tacoAtlas.frames).find(([name]) => name === frame)?.[1].frame;
+    return rect === undefined ? null : {
+      src: tacoAtlasSrc,
+      frame: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+      atlas: { w: tacoAtlas.meta.size.w, h: tacoAtlas.meta.size.h },
     };
   },
 });
@@ -867,6 +883,7 @@ const arcadeArt = ["assets/arcade/claw-machine.webp", "assets/arcade/skee-lane.w
   "assets/arcade/mole-cabinet.webp", moleAtlasSrc, prizeAtlasSrc,
   "assets/arcade/microwave.webp", foodAtlasSrc,
   "assets/arcade/fishing-dock.webp", fishAtlasSrc,
+  "assets/arcade/taco-truck.webp", tacoAtlasSrc,
   "assets/arcade/comet-cabinet.webp", cometAtlasSrc];
 const backgrounds = [...document.body.querySelectorAll<HTMLElement>("*")]
   .filter((element) => element.checkVisibility())

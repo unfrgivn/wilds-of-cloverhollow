@@ -27,7 +27,7 @@ import { formatDocumentTitle } from "./shell/document-title";
 import {
   battleCheckOverlay, buildBattleHudView, buildCreditsView, buildDialogueView,
   buildHudHintsView, buildJournalView, buildRewardStickerView, createMoleHoleHandler,
-  createShellAssets, FAE_ATLAS,
+  createShellAssets, createTacoToppingHandler, FAE_ATLAS,
 } from "./shell/assets";
 import {
   buildSoundContext, captureAreaPostcard, collectLevelUpNotices, createAreaBannerTracker,
@@ -327,6 +327,8 @@ async function boot(): Promise<void> {
     onHole: createMoleHoleHandler(touch),
     onConfirmHold: handleConfirmHold,
     onLaneStep: (delta) => touch.tapArrow({ x: delta, y: 0 }),
+    onPickTopping: createTacoToppingHandler(touch),
+    onCancel: () => touch.tapButton("cancel"),
   });
   const partyCommands: Record<string, string | null> = Object.fromEntries(
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),
@@ -571,6 +573,7 @@ async function boot(): Promise<void> {
       checkKind !== "echo" &&
       state.arcade?.game !== "mole" &&
       state.arcade?.game !== "comet" &&
+      state.arcade?.game !== "taco" &&
       !overworldPointer.isActive()
     ) {
       touch.releaseArrows();

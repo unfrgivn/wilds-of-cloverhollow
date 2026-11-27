@@ -12,6 +12,8 @@ import {
   type Point,
   type SkeeView,
   type State,
+  type TacoTopping,
+  type TacoView,
   type World,
 } from "../core";
 import {
@@ -22,6 +24,7 @@ import {
   parseMapCentres,
   parseMoleCalibration,
   parseSkeeCalibration,
+  parseTacoCalibration,
 } from "../content/load";
 import { assetUrl } from "../platform/assets";
 import type { ArcadeInfo } from "../ui/arcade";
@@ -41,6 +44,7 @@ import type { HudInputMode } from "../ui/hud-hints";
 import { createMole, type MoleInfo } from "../ui/mole";
 import { cropPortraitFrame, speakerPortraitSource } from "../ui/portraits";
 import { createSkee, type SkeeInfo } from "../ui/skee";
+import { createTaco, type TacoInfo } from "../ui/taco";
 
 export {
   battleCheckOverlay,
@@ -64,6 +68,7 @@ export {
 export const MOLE_ATLAS = "assets/arcade/moles.json";
 export const FOOD_ATLAS = "assets/arcade/cook-food.json";
 export const FISH_ATLAS = "assets/arcade/fish-catches.json";
+export const TACO_ATLAS = "assets/arcade/taco-ingredients.json";
 export const COMET_ATLAS = "assets/arcade/comet.json";
 export const FAE_ATLAS = "assets/characters/fae/fae.json";
 
@@ -81,6 +86,20 @@ const HOLE_ARROWS: Readonly<Record<Exclude<MoleHole, "middle">, Point>> = {
   left: { x: -1, y: 0 },
   right: { x: 1, y: 0 },
 };
+
+const TOPPING_ARROWS: Readonly<Record<TacoTopping, Point>> = {
+  beans: { x: 0, y: -1 },
+  cheese: { x: 1, y: 0 },
+  salsa: { x: 0, y: 1 },
+  avocado: { x: -1, y: 0 },
+};
+
+/** Maps Taco Truck bowl taps to 1-tick directional arrow presses. */
+export function createTacoToppingHandler(
+  touch: Pick<MoleHoleTouch, "tapArrow">,
+): (topping: TacoTopping) => void {
+  return (topping) => touch.tapArrow(TOPPING_ARROWS[topping]);
+}
 
 /** Maps Boop-a-Mole touch holes to directional arrows and confirm presses. */
 export function createMoleHoleHandler(
@@ -170,6 +189,15 @@ type MoleOverlay = {
   info: () => MoleInfo | null;
 };
 
+type TacoOverlay = {
+  render: (
+    view: TacoView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
+  info: () => TacoInfo | null;
+};
+
 export type ShellAssetsOptions = {
   world: World;
   uiRoot: HTMLElement;
@@ -177,6 +205,8 @@ export type ShellAssetsOptions = {
   onHole: (hole: MoleHole, down: boolean) => void;
   onConfirmHold?: (held: boolean) => void;
   onLaneStep?: (delta: -1 | 1) => void;
+  onPickTopping?: (topping: TacoTopping) => void;
+  onCancel?: () => void;
 };
 
 export type ShellAssets = {
@@ -201,6 +231,7 @@ export type ShellAssets = {
   ensureArcadeOverlay: () => Promise<void>;
   ensureCookOverlay: () => Promise<void>;
   ensureFishOverlay: () => Promise<void>;
+  ensureTacoOverlay: () => Promise<void>;
   warmAreaOverlays: (areaId: string) => Promise<void>;
   warmAreaMedia: (area: Area) => Promise<void>;
   warmJournalAssets: (snapshot: State) => Promise<void>;
@@ -224,7 +255,9 @@ export type ShellAssets = {
  * composition and lifecycle.
  */
 export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
-  const { world, uiRoot, invalidate, onHole, onConfirmHold, onLaneStep } = options;
+  const {
+    world, uiRoot, invalidate, onHole, onConfirmHold, onLaneStep, onPickTopping, onCancel,
+  } = options;
 
   const loadMapCentres = async (): Promise<Record<string, Point>> => {
     const mapFile = "assets/ui/map/world-map.json";
@@ -494,10 +527,33 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return fishLoad;
   };
 
+  let tacoOverlay: TacoOverlay | null = null;
+  let tacoLoad: Promise<void> | undefined;
+  const ensureTacoOverlay = (): Promise<void> => {
+    if (tacoOverlay !== null) return Promise.resolve();
+    if (tacoLoad !== undefined) return tacoLoad;
+    tacoLoad = Promise.all([
+      domAtlas(TACO_ATLAS),
+      painting("assets/arcade/taco-truck.json", parseTacoCalibration),
+    ]).then(([, tacoPainting]) => {
+      tacoOverlay = createTaco(
+        uiRoot,
+        (frameName) => atlasFrame(TACO_ATLAS, frameName),
+        tacoPainting.calibration,
+        tacoPainting.image,
+        onPickTopping,
+        onConfirmHold,
+        onCancel,
+      );
+    });
+    return tacoLoad;
+  };
+
   const warmAreaOverlays = (areaId: string): Promise<void> => {
     if (areaId === "arcade") return ensureArcadeOverlay();
     if (areaId === "clubhouse") return ensureCookOverlay();
     if (areaId === "bay") return ensureFishOverlay();
+    if (areaId === "hills") return ensureTacoOverlay();
     return Promise.resolve();
   };
 
@@ -557,6 +613,8 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
         void ensureCookOverlay().then(invalidate);
       else if (arcadeState.game === "fish" && fishOverlay === null)
         void ensureFishOverlay().then(invalidate);
+      else if (arcadeState.game === "taco" && tacoOverlay === null)
+        void ensureTacoOverlay().then(invalidate);
     }
     clawOverlay?.render(arcadeState?.game === "claw" ? arcadeState : null);
     skeeOverlay?.render(
@@ -580,6 +638,11 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       arcadeState?.game === "fish" ? arcadeState : null,
       arcadeState?.game === "fish" ? record : null,
     );
+    tacoOverlay?.render(
+      arcadeState?.game === "taco" ? arcadeState : null,
+      arcadeState?.game === "taco" ? record : null,
+      inputMode,
+    );
   };
 
   const overlayInfo = (): ArcadeInfo | null =>
@@ -589,6 +652,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     cometOverlay?.info() ??
     cookOverlay?.info() ??
     fishOverlay?.info() ??
+    tacoOverlay?.info() ??
     null;
 
   return {
@@ -613,6 +677,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     ensureArcadeOverlay,
     ensureCookOverlay,
     ensureFishOverlay,
+    ensureTacoOverlay,
     warmAreaOverlays,
     warmAreaMedia,
     warmJournalAssets,

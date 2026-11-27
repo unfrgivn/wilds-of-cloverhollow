@@ -6775,6 +6775,43 @@ the old trail, the owl, and the clubhouse claim.
   - Exposed live `x`, `y`, and `moving` on `renderInfo().npcLife.npcs`.
 - **Evidence**: re-recorded `tests/sim/scripts/new-game/living-npcs.json` (9,193 ticks, hash `19875e33`; updated `tools/sim/recorder.ts` to intercept strolling NPCs cleanly and verified all 70 `origin/main` recordings keep exact hashes), expanded `tests/unit/living-npcs.test.ts`, added `@smoke` Chromium + WebKit E2E coverage in `tests/e2e/living-npcs.spec.ts`, verified `hills.spec.ts` and `summit.spec.ts` with zero regressions, and captured `vision`-audited 1280×720 review JPEG `art/review/living-npcs-strolling-hills.jpg`.
 
+## Milestone 157: Chef Mateo's Taco Truck Kitchen (7th Playable Minigame) **Status:** ✅ Completed (2026-11-27)
+- Built **Chef Mateo's Taco Truck Kitchen (`game: "taco"`, `NOTES.md: 39`)**, the
+  7th playable minigame, launched right from calmed Chef Mateo in Clover Hills
+  (`taco_chef_calm` choice 1 `[Help run the Taco Truck kitchen!]` -> `# play: taco 0`,
+  keeping choice 0 `[Buy a crispy taco snack for 4 coins]` 100% unchanged and
+  zero new Ink `VAR`s or shifts across all 72 earlier recorded sims):
+  - **Pure Core Simulation (`src/core/taco.ts`, `src/core/arcade.ts`, `src/core/types.ts`, `src/core/sound.ts`, `content/arcade.json`, `src/content/arcade-parsers.ts`)**:
+    deterministic 3-order lunch rush (`ready`, `serving`, `order-clear`, `result`),
+    4 directional toppings (`up -> beans`, `right -> cheese`, `down -> salsa`,
+    `left -> avocado`), distinct customer & recipe generation (no 3 identical
+    toppings in a row), Gentle Timing parity (`1620` ticks = 27s & `[3, 4, 4]`
+    order cap), `ready` Cancel exit, gentle wrong-topping wobble (`oopsTicks`
+    without resetting order progress), and shift payouts (`5 coins/order`,
+    `+5` spotless bonus up to `20 coins`, `+1 snack` for 2+ orders, `+2 snacks`
+    for spotless 3/3) reusing existing cues (`mole-boop`, `mole-whiff`,
+    `cook-ding`, `prize-won`, `coin`).
+  - **Hand-Painted Art & Responsive Overlay (`public/assets/arcade/taco-truck.{webp,json}`, `taco-ingredients.{webp,json}`, `tools/art/build-taco.ts`, `src/ui/taco-layout.ts`, `src/ui/taco.ts`, `src/ui/taco.css`, `src/shell/assets.ts`, `src/dev/taco-gallery.ts`)**:
+    full-bleed 1600x1048 watercolor taco-truck window overlooking Clover Hills
+    (`230 KB`) and 6-item alpha-WebP ingredients atlas (`shell`, `beans`,
+    `cheese`, `salsa`, `avocado`, `lime`; `80 KB`), hanging customer order
+    ticket with live progress badges, diagonal layered taco assembly with
+    star-lime garnish & `"ORDER UP! ★"` ribbon, 4 direct-click/tap painted
+    topping bowls (`onPickTopping`), lazy on-demand asset loading (`src/main.ts`
+    at 948 lines), full reduced-motion + Safari/iOS tap-selection hygiene, and
+    2 `ui-gallery` states (`arcade-taco-serving`, `arcade-taco-clear`).
+- Evidence: `tests/unit/taco.test.ts`, `tests/unit/taco-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/taco.json` (14,767 ticks), real-key
+  + direct-click `tests/e2e/taco.spec.ts` matching Bun's exact hash at 1280x720
+  and 874x402, `ui-gallery` + `ui-gallery-checks` on Chromium & WebKit, and
+  `vision`-verified `art/review/taco-ingredients-{cream,dark}.jpg` and
+  `art/review/taco-gameplay.jpg`.
+- Gates: `just check` (219 unit files / 1,604 tests, 73 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (production hook leak +
+  `< 500 kB` app-chunk budget + harness checks), and 36/36 Chromium & WebKit
+  Playwright checks (`taco.spec`, `m81-festival.spec`, `ui-gallery`,
+  `ui-gallery-checks`, `soundtrack.spec`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

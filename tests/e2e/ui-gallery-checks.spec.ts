@@ -7,6 +7,7 @@ import { cookGalleryStates } from "../../src/dev/cook-gallery";
 import { fishGalleryStates } from "../../src/dev/fish-gallery";
 import { moleGalleryStates } from "../../src/dev/mole-gallery";
 import { skeeGalleryStates } from "../../src/dev/skee-gallery";
+import { tacoGalleryStates } from "../../src/dev/taco-gallery";
 import { battleStates, gallery, journalStates, phone, sizes, states } from "./gallery";
 import { bunClawLayout, bunCometLayout, bunMoleLayout, bunSkeeLayout } from "./helpers";
 
@@ -65,6 +66,7 @@ const battleParts: Record<string, string[]> = {
     state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
   ...Object.fromEntries(fishGalleryStates.map((state) => [state,
     state === "arcade-fish-catch" ? [".sticker-dialogue"] : []])),
+  ...Object.fromEntries(tacoGalleryStates.map((state) => [state, []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-peekaboo", ".battle-echo",
@@ -996,6 +998,134 @@ test.describe("sticker gallery", () => {
             expect(overlaps(drawn.dialogue, button)).toBe(false);
           }
         }
+      });
+    }
+  }
+
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of tacoGalleryStates) {
+      test(`${state} taco truck as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const insets = size.width === 874 ? "0,62,21,62" : "0,0,0,0";
+        await gallery(page, state, true, insets, size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | Range | null): {
+            x: number; y: number; width: number; height: number;
+          } => {
+            if (element === null) throw new Error("missing a part of the taco truck");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const shown = (selector: string): Element | null => {
+            const node = document.querySelector(selector);
+            return node !== null && node.getClientRects().length > 0 ? node : null;
+          };
+          const glyphs = (selector: string): ReturnType<typeof box> | null => {
+            const node = shown(selector);
+            if (node === null) return null;
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            return box(range);
+          };
+          const parseRgb = (colour: string): number[] =>
+            colour.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+          const channel = (value: number): number => {
+            const part = value / 255;
+            return part <= 0.03928 ? part / 12.92 : ((part + 0.055) / 1.055) ** 2.4;
+          };
+          const luminance = (colour: string): number => {
+            const [r = 0, g = 0, b = 0] = parseRgb(colour);
+            return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+          };
+          const contrastOf = (selector: string): number => {
+            const el = shown(selector);
+            if (el === null) return 0;
+            let bg: string | null = null;
+            for (let node: Element | null = el; node !== null; node = node.parentElement) {
+              const col = getComputedStyle(node).backgroundColor;
+              const alpha = parseRgb(col)[3] ?? 1;
+              if (alpha > 0.9) {
+                bg = col;
+                break;
+              }
+            }
+            if (bg === null) return 0;
+            const fgL = luminance(getComputedStyle(el).color);
+            const bgL = luminance(bg);
+            return (Math.max(fgL, bgL) + 0.05) / (Math.min(fgL, bgL) + 0.05);
+          };
+          return {
+            viewport: { width: window.innerWidth, height: window.innerHeight },
+            stage: box(document.querySelector(".taco-stage")),
+            ticket: box(document.querySelector(".taco-ticket")),
+            hud: box(document.querySelector(".taco-hud")),
+            shell: box(document.querySelector(".taco-shell")),
+            bowls: [...document.querySelectorAll(".taco-bowl")]
+              .filter((node) => node.getClientRects().length > 0)
+              .map((node) => box(node)),
+            banner: shown(".taco-order-banner") === null
+              ? null
+              : box(document.querySelector(".taco-order-banner")),
+            front: shown(".taco-front") === null
+              ? null
+              : box(document.querySelector(".taco-front")),
+            frontText: glyphs(".taco-front-text"),
+            contrasts: {
+              ticket: contrastOf(".taco-ticket-order"),
+              timer: contrastOf(".taco-hud-value.is-timer"),
+              front: contrastOf(".taco-front-text"),
+              bowlKey: contrastOf(".taco-bowl-key"),
+            },
+            buttons: [
+              box(document.querySelector(".touch-confirm")),
+              box(document.querySelector(".touch-cancel")),
+              box(document.querySelector(".touch-menu")),
+            ],
+          };
+        });
+        const within = (inner: Rect, outer: Rect, label: string): void => {
+          expect(inner.x, `${label} left`).toBeGreaterThanOrEqual(outer.x - 1);
+          expect(inner.y, `${label} top`).toBeGreaterThanOrEqual(outer.y - 1);
+          expect(inner.x + inner.width, `${label} right`)
+            .toBeLessThanOrEqual(outer.x + outer.width + 1);
+          expect(inner.y + inner.height, `${label} bottom`)
+            .toBeLessThanOrEqual(outer.y + outer.height + 1);
+        };
+        within(drawn.stage, { x: 0, y: 0, ...drawn.viewport }, "the taco truck stage");
+        within(drawn.ticket, drawn.stage, "order ticket");
+        within(drawn.hud, drawn.stage, "shift hud");
+        within(drawn.shell, drawn.stage, "taco shell");
+        expect(drawn.bowls).toHaveLength(4);
+        for (const bowl of drawn.bowls) {
+          within(bowl, drawn.stage, "topping bowl");
+          expect(overlaps(bowl, drawn.shell)).toBe(false);
+          expect(overlaps(bowl, drawn.ticket)).toBe(false);
+          expect(overlaps(bowl, drawn.hud)).toBe(false);
+          expect(Math.min(bowl.width, bowl.height)).toBeGreaterThanOrEqual(44);
+        }
+        expect(overlaps(drawn.ticket, drawn.hud)).toBe(false);
+        expect(overlaps(drawn.ticket, drawn.shell)).toBe(false);
+        for (const button of drawn.buttons) {
+          expect(overlaps(drawn.stage, button)).toBe(false);
+        }
+        if (drawn.front === null || drawn.frontText === null) {
+          throw new Error("taco front hint should be visible");
+        }
+        within(drawn.front, drawn.stage, "front hint");
+        within(drawn.frontText, drawn.front, "front hint text");
+        for (const bowl of drawn.bowls) expect(overlaps(bowl, drawn.front)).toBe(false);
+        if (state === "arcade-taco-clear") {
+          if (drawn.banner === null) throw new Error("order-clear should show ORDER UP banner");
+          within(drawn.banner, drawn.stage, "order banner");
+          expect(overlaps(drawn.banner, drawn.ticket)).toBe(false);
+          expect(overlaps(drawn.banner, drawn.hud)).toBe(false);
+          for (const bowl of drawn.bowls) expect(overlaps(drawn.banner, bowl)).toBe(false);
+        } else {
+          expect(drawn.banner).toBeNull();
+        }
+        expect(drawn.contrasts.ticket).toBeGreaterThanOrEqual(4.5);
+        expect(drawn.contrasts.timer).toBeGreaterThanOrEqual(4.5);
+        expect(drawn.contrasts.front).toBeGreaterThanOrEqual(4.5);
+        expect(drawn.contrasts.bowlKey).toBeGreaterThanOrEqual(4.5);
       });
     }
   }

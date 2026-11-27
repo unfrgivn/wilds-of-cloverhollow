@@ -9,6 +9,7 @@ const ARCADE_TITLES: Record<NonNullable<State["arcade"]>["game"], string> = {
   comet: "Comet Cruise",
   cook: "Clubhouse Microwave",
   fish: "Bubblegum Bay Fishing",
+  taco: "Chef Mateo's Taco Truck",
 };
 
 export type DocumentTitleFlags = {

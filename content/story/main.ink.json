@@ -22662,11 +22662,20 @@
               },
               "ev",
               "str",
-              "^Just saying hi!",
+              "^Help run the Taco Truck kitchen!",
               "/str",
               "/ev",
               {
                 "*": ".^.c-1",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Just saying hi!",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-2",
                 "flg": 4
               },
               {
@@ -22684,6 +22693,19 @@
                   null
                 ],
                 "c-1": [
+                  "\n",
+                  "^Put on your lucky apron, Fae—let's build some crispy Cloverhollow tacos! ",
+                  "#",
+                  "^speaker: Chef Mateo ",
+                  "/#",
+                  "#",
+                  "^play: taco 0",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-2": [
                   "\n",
                   "^Always happy to see my favorite taste-tester, Fae! Come back anytime. ",
                   "#",

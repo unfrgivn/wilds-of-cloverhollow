@@ -6,18 +6,20 @@ import { createMole, type MoleInfo } from "./mole";
 import type { MoleInputMode } from "./mole-layout";
 import { createComet, type CometInfo } from "./comet";
 import { createSkee, type SkeeInfo } from "./skee";
+import { createTaco, type TacoInfo } from "./taco";
 import type { AtlasImage } from "./atlas";
 import type {
   ArcadeView, ClawCalibration, CookCalibration, FishCalibration, MoleCalibration, MoleHole,
-  SkeeCalibration, CometCalibration,
+  SkeeCalibration, CometCalibration, TacoCalibration, TacoTopping,
 } from "../core";
 
 // What renderInfo().arcade reports (spec 11): the open game's close-up as drawn.
-export type ArcadeInfo = ClawInfo | SkeeInfo | MoleInfo | CometInfo | CookInfo | FishInfo;
+export type ArcadeInfo =
+  | ClawInfo | SkeeInfo | MoleInfo | CometInfo | CookInfo | FishInfo | TacoInfo;
 
-// The arcade's close-ups (spec 8.2), one per game (the clubhouse microwave and
-// Bubblegum Bay fishing dock too): each frame, the open game's view goes to its
-// own, and the others are hidden.
+// The arcade's close-ups (spec 8.2), one per game (the clubhouse microwave,
+// Bubblegum Bay fishing dock, and Chef Mateo's Taco Truck too): each frame,
+// the open game's view goes to its own, and the others are hidden.
 export function createArcade(
   root: HTMLElement,
   prizeArt: (frame: string) => AtlasImage | null,
@@ -46,6 +48,13 @@ export function createArcade(
   },
   onConfirmHold: (held: boolean) => void = () => undefined,
   onLaneStep: (delta: -1 | 1) => void = () => undefined,
+  taco?: {
+    calibration: TacoCalibration;
+    image: string;
+    art: (frame: string) => AtlasImage | null;
+    onPickTopping?: (topping: TacoTopping) => void;
+    onCancel?: () => void;
+  },
 ): {
   render: (
     view: ArcadeView | null,
@@ -67,6 +76,17 @@ export function createArcade(
   );
   const cookUp = createCook(root, cook.art, cook.calibration, cook.image, onConfirmHold);
   const fishUp = createFish(root, fish.art, fish.calibration, fish.image, onConfirmHold);
+  const tacoUp = taco === undefined
+    ? null
+    : createTaco(
+        root,
+        taco.art,
+        taco.calibration,
+        taco.image,
+        taco.onPickTopping,
+        onConfirmHold,
+        taco.onCancel,
+      );
   return {
     render: (view, record = null, inputMode = "keyboard") => {
       clawUp.render(view?.game === "claw" ? view : null);
@@ -85,8 +105,13 @@ export function createArcade(
         view?.game === "cook" ? record : null,
       );
       fishUp.render(view?.game === "fish" ? view : null, view?.game === "fish" ? record : null);
+      tacoUp?.render(
+        view?.game === "taco" ? view : null,
+        view?.game === "taco" ? record : null,
+        inputMode,
+      );
     },
     info: () => clawUp.info() ?? skeeUp.info() ?? moleUp.info() ?? cometUp.info() ??
-      cookUp.info() ?? fishUp.info(),
+      cookUp.info() ?? fishUp.info() ?? tacoUp?.info() ?? null,
   };
 }

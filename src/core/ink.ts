@@ -31,7 +31,10 @@ export function createInkState(storyJson: StoryJson, seed: number): string {
   return json;
 }
 
-export function setInkVariables(inkJson: string, variables: Record<string, boolean>): string {
+export function setInkVariables(
+  inkJson: string,
+  variables: Record<string, boolean | number>,
+): string {
   const value: unknown = JSON.parse(inkJson);
   if (typeof value !== "object" || value === null || Array.isArray(value))
     throw new Error("Ink state was not an object");

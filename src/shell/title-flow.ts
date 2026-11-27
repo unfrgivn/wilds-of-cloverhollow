@@ -1,4 +1,4 @@
-import type { State, World } from "../core";
+import { journalProgress, type State, type World } from "../core";
 import type { TitleChoiceId } from "../ui/title";
 
 export type TitleMode = "fresh" | "continue" | "confirm";
@@ -74,9 +74,24 @@ export function titleFlow(
   return { mode, selected: picked, action: null };
 }
 
-// The line under Continue: where Fae is and how many stickers she has.
+// The line under Continue: where Fae is, sticker count, and up to two highlights.
 export function continueDetail(world: World, state: State): string {
   const area = world.areas[state.area]?.name ?? state.area;
   const count = state.stickers.length;
-  return `${area} · ${count} sticker${count === 1 ? "" : "s"}`;
+  const parts = [`${area} · ${count} sticker${count === 1 ? "" : "s"}`];
+  const progress = journalProgress(world, state);
+  const highlights: string[] = [];
+  if (progress.gems.owned > 0) {
+    highlights.push(`${progress.gems.owned}/${progress.gems.total} gems`);
+  }
+  if (progress.keepsakes.owned > 0) {
+    highlights.push(
+      `${progress.keepsakes.owned} keepsake${progress.keepsakes.owned === 1 ? "" : "s"}`,
+    );
+  }
+  if (progress.fish.owned > 0) {
+    highlights.push(`${progress.fish.owned} fish`);
+  }
+  parts.push(...highlights.slice(0, 2));
+  return parts.join(" · ");
 }

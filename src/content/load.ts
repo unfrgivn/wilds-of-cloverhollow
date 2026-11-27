@@ -285,8 +285,12 @@ export function storyTagErrors(
       return price !== undefined && price === Number(match?.[2])
         ? [] : [`invalid buy-treat tag "${tag}" (not a treat at its price)`];
     }
-    if (tag.startsWith("gift:"))
-      return /^gift:\s*(snack|coins)\s+[1-9]\d*$/.test(tag) ? [] : [`invalid gift tag "${tag}"`];
+    if (tag.startsWith("gift:")) {
+      if (/^gift:\s*(snack|coins)\s+[1-9]\d*$/.test(tag)) return [];
+      const match = /^gift:\s*treat\s+([a-z][a-z0-9-]*)\s+([1-9]\d*)$/.exec(tag);
+      const known = match !== null && treatPrices[match[1] ?? ""] !== undefined;
+      return known ? [] : [`invalid gift tag "${tag}"`];
+    }
     if (tag.startsWith("feed:"))
       return /^feed:\s*snack\s+[1-9]\d*$/.test(tag) ? [] : [`invalid feed tag "${tag}"`];
     if (tag.startsWith("play:")) {

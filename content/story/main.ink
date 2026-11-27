@@ -119,6 +119,7 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 {pond_tin: The Pond Pup swam out into the park pond and fetched an old tin of coins! # speaker: Fae}
 {pond_seen and not pond_tin: Something glints at the bottom of the park pond, too far out to reach. # speaker: Fae}
 {pup_friend: The Pond Pup is my friend! When I play my flute, he comes running. # speaker: Fae}
+{sunberry_harvests > 0: Our clubhouse garden bloomed with magical Golden Sunberries! They restore energy and calm critters with meadow light. # speaker: Fae}
 {fridge_baskets > 0: There are cold strawberries in the clubhouse fridge: snacks for the road! # speaker: Fae}
 {garden_ripe: The strawberries on the clubhouse deck are ripe! # speaker: Fae}
 {calmed("lodge-keeper"): I calmed Mrs. Flurry, the lodge keeper at Pinecone Pass. Her lodge is open, and the fire's lit! # speaker: Fae}
@@ -1650,6 +1651,7 @@ VAR garden_planted = false
 VAR garden_calms = 0
 VAR garden_sprouted = false
 VAR garden_ripe = false
+VAR sunberry_harvests = 0
 
 // The core runs this after every calm (spec 7). It only counts: it never
 // prints. The garden sprouts after one calm and ripens after three.
@@ -1749,12 +1751,29 @@ Little green leaves, and tiny white flowers! # speaker: Fae
 Ripe strawberries, red and juicy! # speaker: Fae
 {not fridge_fixed: The fridge isn't working yet. Let's ask Sue to fix it, so they stay fresh! # speaker: Jordan}
 {not fridge_fixed: -> DONE}
+{fridge_baskets > 0 or sunberry_harvests > 0: -> sunberry_choice}
 Fae and Jordan fill a whole basket, and tuck it into the fridge. # speaker: Fae
 ~ fridge_baskets += 1
 ~ garden_ripe = false
 ~ garden_calms = 1
 The plants are still growing. Two more calm critters, and there'll be more! # speaker: Jordan
 -> DONE
+= sunberry_choice
+Wait, look! A glowing Golden Sunberry bloomed right beside the strawberries! # speaker: Jordan
++ [Pick a strawberry basket]
+    Fae and Jordan fill a whole basket, and tuck it into the fridge. # speaker: Fae
+    ~ fridge_baskets += 1
+    ~ garden_ripe = false
+    ~ garden_calms = 1
+    The plants are still growing. Two more calm critters, and there'll be more! # speaker: Jordan
+    -> DONE
++ [Pluck a magical Golden Sunberry]
+    Fae gently plucks the glowing Golden Sunberry! Warm meadow sparkles tickle her palm! # speaker: Fae # gift: treat sunberry-nectar 1 # sound: chime-yellow
+    ~ sunberry_harvests += 1
+    ~ garden_ripe = false
+    ~ garden_calms = 1
+    Whoa, my grandma wasn't kidding! That Golden Sunberry is packed with cozy energy for battles! # speaker: Jordan
+    -> DONE
 
 // Flute friends (Milestone 47).
 VAR pup_petted = false

@@ -320,7 +320,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
   Its master chain routes SFX, music (`src/platform/music.ts` over the 20
-  multi-voice scores in `src/platform/scores.ts`, dry plus warm stereo
+  multi-voice scores split across `src/platform/scores-helpers.ts`,
+  `src/platform/scores-town.ts`, and `src/platform/scores-wilds.ts` and
+  re-exported by `src/platform/scores.ts`, dry plus warm stereo
   ConvolverNode reverb), and procedural ambience (`src/platform/ambience.ts`)
   through a shared `DynamicsCompressorNode`. Music arranges its 10 instrument
   voices across a balanced stereo chamber soundstage (`VOICE_PAN` in
@@ -1288,10 +1290,18 @@ ios/            Capacitor iOS project (from Milestone 4).
   that holds wins) are cut from three more paintings of the room. Sue fixes
   the fridge; Jordan plants strawberries. Through the calm hook (section 7)
   every calm after the planting grows the garden: one sprouts it, three ripen
-  it, and a ripe garden waits to be picked. Picked (once the fridge works), a
-  basket goes into the fridge (`fridge_baskets`) and the plants are left one
+  it, and a ripe garden waits to be picked. Picked (once the fridge works), the
+  first harvest (`fridge_baskets == 0` and `sunberry_harvests == 0`) puts a
+  strawberry basket into the fridge (`fridge_baskets`) and leaves the plants one
   calm along, so two more calms ripen them again. Each basket is three snacks
-  (`gift: snack 3`), all taken at once.
+  (`gift: snack 3`), all taken at once. On subsequent ripe harvests
+  (`fridge_baskets > 0` or `sunberry_harvests > 0`, Milestone 111), warm golden
+  shimmer motes (`0xffd966`, `evaluateSunberryMotes` in
+  `src/render/clubhouse-display.ts`) float above the planter boxes, and Jordan
+  offers a choice between picking a strawberry basket or plucking a homegrown
+  magical Golden Sunberry (`sunberry-nectar`, `# gift: treat sunberry-nectar 1`,
+  `sunberry_harvests += 1`, restoring 4 energy and +45 calm, or +60 for woodland
+  and magical favourites, with its own journal note).
 - Living Clubhouse display, companion petting & cozy resting (Milestone 88,
   pure presentation shell — zero `src/core` state or replay hash changes):
   - `evaluateClubhouseDisplay` (`src/render/clubhouse-display.ts`) places every
@@ -1770,7 +1780,9 @@ trunks keep its two exits.
   (`+`) gated on `coins()` with zero new Ink `VAR` declarations.
 - A line may carry `# gift: snack <count>`: as it's shown, Fae gets `count`
   snacks for free (the clubhouse fridge, Milestone 43). `# gift: coins
-  <count>` gives her coins (the pond's tin, Milestone 47), and `# feed: snack
+  <count>` gives her coins (the pond's tin, Milestone 47), `# gift: treat
+  <treat-id> <count>` (Milestone 111) grants `count` of a known treat from
+  `content/treats.json` via `addTreat` (capped at 99), and `# feed: snack
   <count>` gives snacks away (a treat for an animal friend), never below
   none; the story only offers it when `snacks()` says she has one. Item tags
   (`buy`, `gift`, `feed`) act on every line they're on, a conversation's
@@ -1778,8 +1790,9 @@ trunks keep its two exits.
 - Load validation reads every tag in the compiled story (`storyTags`: a
   tag's text follows its `#` command, and its `/#` may close in an enclosing
   container) and rejects a travel tag naming an unknown area or spawn, any
-  `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>` or
-  `coins <count>`, any `feed` tag but `snack <count>`, each count 1 or more,
+  `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>`,
+  `coins <count>`, or `treat <known-treat-id> <count>`, any `feed` tag but
+  `snack <count>`, each count 1 or more,
   and any `play` tag but `<game> <digits>` naming an arcade, cooking, or
   fishing game (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`, `cook-mac`,
   `fish`).
@@ -1927,8 +1940,12 @@ trunks keep its two exits.
   unchanged. The menu can be cancelled back to the prior title mode, and a
   harness fixture reset clears the active pack and badge. QA mode is also left
   by reload or relaunch.
-- The Continue detail is the area's `name` (area JSON) and the sticker count
-  ("0 stickers", "1 sticker", "2 stickers").
+- The Continue detail (`continueDetail` in `src/shell/title-flow.ts`) is the
+  area's `name` (area JSON) and the sticker count (`"0 stickers"`,
+  `"1 sticker"`, `"2 stickers"`), followed by up to two non-zero adventure
+  highlights from `journalProgress` in order (`"<found>/<total> gems"`,
+  `"<n> keepsake(s)"`, `"<n> fish"`), separated by `" · "` (Milestone 111;
+  unchanged when all three are zero).
 - Dev builds log `[cloverhollow] title {mode, options}` (the visible buttons'
   rects, CSS px) when the mode changes; `just ios-smoke` taps New game from
   them on a fresh install and Continue after the relaunch.

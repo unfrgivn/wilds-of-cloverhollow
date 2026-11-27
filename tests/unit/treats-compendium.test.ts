@@ -100,7 +100,7 @@ function battleState(
 }
 
 describe("specialty treats catalogue & validation", () => {
-  it("loads all 6 treats and covers every critter species across the game", () => {
+  it("loads all 7 treats and covers every critter species across the game", () => {
     expect(world.treats.map((item) => item.id)).toEqual([
       "orchard-apple",
       "fish-cracker",
@@ -108,6 +108,7 @@ describe("specialty treats catalogue & validation", () => {
       "cocoa-sundae",
       "sea-salt-taffy",
       "maple-brittle",
+      "sunberry-nectar",
     ]);
     const allSpecies = [...new Set(Object.values(world.critters).map((c) => c.species))].sort();
     expect(allSpecies).toHaveLength(world.stickers.catalogue.length);

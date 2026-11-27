@@ -481,7 +481,11 @@ describe("Milestone 81: Starry Owl & Chef Mateo story, battles, keepsakes & 24 s
     );
     const treatsFor = (species: string): string[] =>
       world.treats.filter((treat) => treat.favourites.includes(species)).map((treat) => treat.id);
-    expect(treatsFor("moon-owl")).toEqual(["orchard-apple", "cocoa-sundae"]);
+    expect(treatsFor("moon-owl")).toEqual([
+      "orchard-apple",
+      "cocoa-sundae",
+      "sunberry-nectar",
+    ]);
     expect(treatsFor("taco-chef")).toEqual(["fish-cracker", "berry-cone"]);
 
     // Verify ZERO Milo mentions in all M81 knots and critter lines.

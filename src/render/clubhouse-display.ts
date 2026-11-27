@@ -36,6 +36,27 @@ export type ClubhouseDisplay = {
   keepsakes: ClubhouseKeepsakePlacement[];
 };
 
+export type ClubhouseSunberryMote = {
+  x: number;
+  y: number;
+  zIndex: number;
+  scale: number;
+  alpha: number;
+  tint: number;
+};
+
+const SUNBERRY_SHIMMER_TINT = 0xffd966;
+
+// Anchors spanning the three diagonal clubhouse garden planter boxes (prop home 795, 720).
+const SUNBERRY_MOTE_ANCHORS: readonly (readonly [number, number])[] = [
+  [650, 646],
+  [706, 616],
+  [774, 584],
+  [828, 558],
+  [902, 522],
+  [952, 496],
+];
+
 type PrizePerch = {
   x: number;
   y: number;
@@ -211,4 +232,51 @@ export function evaluateClubhouseDisplay(world: World, state: State): ClubhouseD
   }
 
   return { prizes, keepsakes };
+}
+
+function storyCount(world: World, state: State, name: string): number {
+  const raw = world.storyVariable(state.ink, name);
+  if (typeof raw === "number") return raw;
+  if (typeof raw === "string") {
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+/** True when the Clubhouse garden is ripe and ready to bloom a Golden Sunberry. */
+export function hasSunberryBloom(world: World, state: State): boolean {
+  if (state.area !== "clubhouse") return false;
+  if (world.storyVariable(state.ink, "garden_ripe") !== true) return false;
+  return (
+    storyCount(world, state, "fridge_baskets") > 0 ||
+    storyCount(world, state, "sunberry_harvests") > 0
+  );
+}
+
+/**
+ * Pure evaluator placing warm golden sunberry shimmer motes (0xffd966) floating gently
+ * above the Clubhouse garden planter when a Golden Sunberry bloom is ready to harvest.
+ */
+export function evaluateSunberryMotes(
+  world: World,
+  state: State,
+  reducedMotion = false,
+): ClubhouseSunberryMote[] {
+  if (!hasSunberryBloom(world, state)) return [];
+  const t = reducedMotion ? 0 : state.tick;
+  return SUNBERRY_MOTE_ANCHORS.map(([baseX, baseY], index) => {
+    const phase = t * 0.05 + index * 1.15;
+    const pulse = 0.5 + 0.5 * Math.sin(phase);
+    const driftX = reducedMotion ? 0 : Math.sin(t * 0.03 + index * 1.7) * 5;
+    const lift = reducedMotion ? 10 : ((t * 0.28 + index * 7) % 28);
+    return {
+      x: baseX + driftX,
+      y: baseY - lift,
+      zIndex: 730,
+      scale: 0.34 + 0.18 * pulse,
+      alpha: 0.52 + 0.42 * pulse,
+      tint: SUNBERRY_SHIMMER_TINT,
+    };
+  });
 }

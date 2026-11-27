@@ -5083,6 +5083,37 @@ the old trail, the owl, and the clubhouse claim.
   5.1 min), `just ios-smoke` (passed on iPhone 17 / iOS 27.0), and
   `just ios-device-build` (passed).
 
+## Milestone 111: Clubhouse Magical Sunberry Harvest (`NOTES.md: 77`), Enriched Title `Continue` Summary & `scores.ts` Modular Split **Status:** ✅ Completed (2026-11-27)
+- Clubhouse Magical Sunberry Harvest (`content/treats.json`, `src/core/sim.ts`,
+  `src/content/load.ts`, `content/story/main.ink`, `src/render/clubhouse-display.ts`,
+  `src/render/view.ts`, `src/dev/console.ts`):
+  - Added the 7th specialty treat (`sunberry-nectar`, `"Golden Sunberry"`,
+    energy +4, calm +45, favouriteCalm +60 for woodland and magical friends).
+  - Added `# gift: treat <id> <count>` support in `applyItemTags` (`src/core/sim.ts`)
+    and validated it in `storyTagErrors` (`src/content/load.ts`).
+  - Extended `club_garden.ripe` in `content/story/main.ink` (preserving first-harvest
+    behavior identically for zero replay drift) so subsequent ripe harvests let Fae
+    pick a strawberry basket or pluck a glowing Golden Sunberry (`sunberry_harvests`),
+    with a dedicated journal note and warm golden shimmer motes (`0xffd966`) above
+    the Clubhouse planter (`evaluateSunberryMotes`).
+  - Added `garden ripe` to the QA console (`src/dev/console.ts`).
+- Enriched Title Screen `Continue` Summary (`src/shell/title-flow.ts`):
+  - Appends up to two non-zero adventure highlights from `journalProgress`
+    (`gems`, `keepsakes`, `fish`) to the `Continue` subtitle while keeping zero-highlight
+    saves byte-identical.
+- Modularized `src/platform/scores.ts` (`1,780` -> `33` lines):
+  - Split into `src/platform/scores-helpers.ts`, `src/platform/scores-town.ts`,
+    `src/platform/scores-wilds.ts`, and the barrel `src/platform/scores.ts` with
+    bit-for-bit identical score output.
+- Evidence: `tests/unit/milestone-111.test.ts` (6 tests), real-key
+  `tests/e2e/sunberry-garden.spec.ts` (`@smoke` Chromium & WebKit), and review
+  capture `art/review/m111-sunberry-garden.jpg` verified with `vision`.
+- Gates: `just check` (170 unit files / 1,303 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4361 just e2e` (1,106 passed, 2 skipped, 0 failed in
+  5.0 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

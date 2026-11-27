@@ -303,11 +303,11 @@ function dialogueState(
 }
 
 // A line's item tags act as it's shown (spec 7): `buy: snack <price>` sells
-// Fae a snack; `gift: snack <count>` and `gift: coins <count>` give her snacks
-// (the clubhouse fridge) or coins (the pond's tin); `feed: snack <count>` gives
-// snacks away (a treat for a friend), never below none; `trade: <prize>
-// <price>` buys a prize at the ticket counter. The loader allows no other item
-// or format.
+// Fae a snack; `gift: snack <count>`, `gift: coins <count>`, and
+// `gift: treat <id> <count>` give her snacks, coins, or specialty treats;
+// `feed: snack <count>` gives snacks away (a treat for a friend), never below
+// none; `trade: <prize> <price>` buys a prize at the ticket counter. The
+// loader allows no other item or format.
 function applyItemTags(state: State, tags: string[]): State {
   let next = state;
   for (const raw of tags) {
@@ -320,6 +320,9 @@ function applyItemTags(state: State, tags: string[]): State {
     const gift = /^gift:\s*(snack|coins)\s+(\d+)$/.exec(tag);
     if (gift?.[1] === "snack") next = { ...next, snacks: next.snacks + Number(gift[2]) };
     if (gift?.[1] === "coins") next = { ...next, coins: next.coins + Number(gift[2]) };
+    const giftTreat = /^gift:\s*treat\s+([a-z][a-z0-9-]*)\s+(\d+)$/.exec(tag);
+    if (giftTreat?.[1] !== undefined && giftTreat[2] !== undefined)
+      next = addTreat(next, giftTreat[1], Number(giftTreat[2]));
     const fed = /^feed:\s*snack\s+(\d+)$/.exec(tag)?.[1];
     if (fed !== undefined) next = { ...next, snacks: Math.max(0, next.snacks - Number(fed)) };
     // A prize from the ticket counter, if Fae has the tickets and not the prize.

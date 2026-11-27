@@ -130,6 +130,26 @@
       "description": "Golden maple crunch from Pinecone Pass.",
       "useLine": "Fae shares warm Maple Pine Brittle. Sweet and snappy!",
       "favouriteLine": "Maple Pine Brittle! Their mountain favourite! Cozy smiles all around!"
+    },
+    {
+      "id": "sunberry-nectar",
+      "name": "Golden Sunberry",
+      "price": 15,
+      "energy": 4,
+      "calm": 45,
+      "favouriteCalm": 60,
+      "favourites": [
+        "squirrel",
+        "bunny",
+        "hedgehog",
+        "lamb",
+        "owl",
+        "moon-owl",
+        "hooded-kid"
+      ],
+      "description": "Homegrown magical golden berry from Fae's clubhouse garden. Restores 4 energy and delights woodland friends!",
+      "useLine": "Fae shares a glowing Golden Sunberry from the clubhouse garden! Warm meadow light swirls!",
+      "favouriteLine": "A magical Golden Sunberry! Their woodland favourite! Warm golden light washes the fizz right away!"
     }
   ]
 }

@@ -67,6 +67,7 @@ const CONSOLE_HELP = [
   "flute on|off       carry the flute",
   "map on|off         carry the map",
   "keepsakes on|off   toggle quest keepsakes",
+  "garden ripe        ripen the clubhouse garden for Golden Sunberry harvest",
   "save <name>        keep this state in a QA-only slot",
   "export             show this state as a save file",
 ].join("\n");
@@ -228,6 +229,32 @@ function keepsakesCommand(
   };
 }
 
+function gardenCommand(
+  context: ConsoleContext,
+  state: State,
+  args: string[],
+): ConsoleOutcome {
+  const [raw] = args;
+  if (raw?.toLowerCase() !== "ripe")
+    return { kind: "error", message: "Usage: garden ripe." };
+  const updates: Record<string, boolean | number> = {
+    fridge_fixed: true,
+    garden_planted: true,
+    garden_sprouted: true,
+    garden_ripe: true,
+    fridge_baskets: 1,
+  };
+  for (const variable of Object.keys(updates)) {
+    if (inkVariable(context.story, state.ink, variable) === undefined)
+      return { kind: "error", message: `${variable} is not a story variable.` };
+  }
+  return {
+    kind: "applied",
+    state: { ...state, ink: setInkVariables(state.ink, updates) },
+    message: "Clubhouse garden is ripe with a Golden Sunberry bloom.",
+  };
+}
+
 function treatCommand(
   context: ConsoleContext,
   state: State,
@@ -311,6 +338,7 @@ export function runConsoleCommand(
     case "flute": return toolCommand(context, state, args, "flute");
     case "map": return toolCommand(context, state, args, "map");
     case "keepsakes": return keepsakesCommand(context, state, args);
+    case "garden": return gardenCommand(context, state, args);
     case "save": return saveCommand(args);
     case "export": return { kind: "export" };
     default:

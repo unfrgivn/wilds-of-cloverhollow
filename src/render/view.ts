@@ -37,7 +37,7 @@ import { flyerAt } from "./ambient";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere, type AtmosphereOptions } from "./atmosphere";
 import { evaluateOverworldEmotes } from "./emotes";
-import { evaluateClubhouseDisplay } from "./clubhouse-display";
+import { evaluateClubhouseDisplay, evaluateSunberryMotes } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
 import { storyTimeOfDay, type TimeOfDayPhase } from "./time-of-day";
 import { idleBreathing, NEUTRAL_POSE } from "./motion";
@@ -200,6 +200,7 @@ export class GameView {
     item: Sprite;
     sparkle: Sprite;
   }[] = [];
+  private clubhouseSunberryPool: Sprite[] = [];
   private clubhouseDisplayCount = 0;
   private petReaction: { id: string; startTick: number } | null = null;
   private restingSpot: { spot: RestSpot; startTick: number } | null = null;
@@ -516,6 +517,7 @@ export class GameView {
   private hideClubhouseDisplay(): void {
     for (const entry of this.clubhousePrizePool) entry.container.visible = false;
     for (const entry of this.clubhouseKeepsakePool) entry.container.visible = false;
+    for (const mote of this.clubhouseSunberryPool) mote.visible = false;
     this.clubhouseDisplayCount = 0;
   }
 
@@ -874,7 +876,7 @@ export class GameView {
       livingMotion,
     );
     this.renderNpcs(state, shadowAlpha, livingMotion);
-    this.renderClubhouseDisplay(state, area);
+    this.renderClubhouseDisplay(state, area, reducedMotion);
     this.renderAmbient(state);
     this.renderEmotes(
       state,
@@ -1046,7 +1048,7 @@ export class GameView {
     this.drawnGlows = drawn;
   }
 
-  private renderClubhouseDisplay(state: State, area: Area): void {
+  private renderClubhouseDisplay(state: State, area: Area, reducedMotion: boolean): void {
     const visible =
       area.id === "clubhouse" &&
       state.battle === null &&
@@ -1152,6 +1154,31 @@ export class GameView {
     for (let i = keepsakeShown; i < this.clubhouseKeepsakePool.length; i += 1) {
       const entry = this.clubhouseKeepsakePool[i];
       if (entry !== undefined) entry.container.visible = false;
+    }
+
+    const sunberryMotes = evaluateSunberryMotes(this.world, state, reducedMotion);
+    for (let i = 0; i < sunberryMotes.length; i += 1) {
+      const mote = sunberryMotes[i];
+      if (mote === undefined) continue;
+      let sprite = this.clubhouseSunberryPool[i];
+      if (sprite === undefined) {
+        sprite = new Sprite(this.vfx.sparkle);
+        sprite.anchor.set(0.5);
+        sprite.blendMode = "add";
+        sprite.label = `clubhouse:sunberry:${i}`;
+        this.depth.addChild(sprite);
+        this.clubhouseSunberryPool.push(sprite);
+      }
+      sprite.visible = true;
+      sprite.position.set(mote.x, mote.y);
+      sprite.zIndex = mote.zIndex;
+      sprite.scale.set(mote.scale);
+      sprite.alpha = mote.alpha;
+      sprite.tint = mote.tint;
+    }
+    for (let i = sunberryMotes.length; i < this.clubhouseSunberryPool.length; i += 1) {
+      const sprite = this.clubhouseSunberryPool[i];
+      if (sprite !== undefined) sprite.visible = false;
     }
 
     this.clubhouseDisplayCount = prizeShown + keepsakeShown;

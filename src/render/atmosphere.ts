@@ -25,6 +25,10 @@ export type AtmosphereParticle = {
   tint: number;
 };
 
+export type AtmosphereOptions = {
+  clubhouseBloom?: boolean;
+};
+
 // Pure deterministic hash in [0, 1) from integer inputs (zero Math.random).
 function hash01(seed: number): number {
   let x = (seed ^ 0x9e3779b9) >>> 0;
@@ -91,6 +95,7 @@ const FIREFLY_TINTS: readonly number[] = [0xf9da8e, 0xa8f0d8];
 const HEARTH_MOTE_TINTS: readonly number[] = [0xffe3a8, 0xffcfa0];
 const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
+const CLUBHOUSE_BLOOM_TINTS: readonly number[] = [0xfff2b2, 0xf9d28c, 0xf7b2c7];
 const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
 const CAVERN_CRYSTALS: readonly {
   x: number;
@@ -230,6 +235,7 @@ export function evaluateAtmosphere(
   width: number,
   height: number,
   tick: number,
+  options?: AtmosphereOptions,
 ): AtmosphereParticle[] {
   if (areaId === "harness") return [];
   const out: AtmosphereParticle[] = [];
@@ -831,6 +837,31 @@ export function evaluateAtmosphere(
       minAlpha: 0.15,
       maxAlpha: 0.36,
     });
+    if (areaId === "clubhouse" && options?.clubhouseBloom === true) {
+      // Subtle warm golden/blossom pollen sparkles over the blooming planter deck.
+      for (let i = 0; i < 8; i += 1) {
+        const h0 = hash01(seed + i * 59 + 11);
+        const h1 = hash01(seed + i * 59 + 12);
+        const h2 = hash01(seed + i * 59 + 13);
+        const h3 = hash01(seed + i * 59 + 14);
+        const x = 720 + wrap(h0 * 200 + tick * 0.12 + Math.sin(tick * 0.025 + i) * 10, 200);
+        const y = 560 + wrap(h1 * 100 - tick * (0.09 + h2 * 0.06), 100);
+        const twinkle = 0.5 + 0.5 * Math.sin(tick * (0.05 + h3 * 0.04) + i * 1.4);
+        const scale = 0.18 + h2 * 0.16;
+        out.push({
+          layer: "over",
+          texture: "sparkle",
+          blend: "add",
+          x,
+          y,
+          scaleX: scale,
+          scaleY: scale,
+          rotation: 0,
+          alpha: clamp01(0.18 + twinkle * 0.26),
+          tint: pickTint(CLUBHOUSE_BLOOM_TINTS, i),
+        });
+      }
+    }
     return out;
   }
 
@@ -867,6 +898,7 @@ export class BiomeAtmosphere {
     tick: number,
     visible: boolean,
     duskBlend = 0,
+    options?: AtmosphereOptions,
   ): void {
     const show = visible && areaId !== "harness";
     this.under.visible = show;
@@ -874,7 +906,7 @@ export class BiomeAtmosphere {
     this.emissive.visible = show;
     if (!show) return;
 
-    const particles = evaluateAtmosphere(areaId, width, height, tick);
+    const particles = evaluateAtmosphere(areaId, width, height, tick, options);
     const duskBoost = 1 + clamp01(duskBlend) * 0.65;
     let underUsed = 0;
     let overUsed = 0;

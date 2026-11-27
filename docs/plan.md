@@ -4193,6 +4193,7 @@ the old trail, the owl, and the clubhouse claim.
   and full `CLOVERHOLLOW_E2E_PORT=4224 just e2e` (1,029 passed, 2 skipped
   across Chromium & WebKit after refreshing the 2 post-lasso battle baselines).
 
+<<<<<<< HEAD
 ## Milestone 88: Bubblegum Bay Fishing Minigame **Status:** ✅ Completed (2026-11-26)
 - Playable cozy **Bubblegum Bay Fishing** minigame (`NOTES.md: 47–48`,
   `game: "fish"`, launched via `# play: fish 0` from `dock_end` once
@@ -4234,6 +4235,44 @@ the old trail, the owl, and the clubhouse claim.
   prior runs, 23 QA packs, purity, lint), `just build` (production and harness
   hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (1,060 passed,
   2 skipped across Chromium & WebKit).
+
+## Milestone 89: Living Clubhouse Display, Companion Petting & Cozy Resting **Status:** ✅ Completed (2026-11-26)
+- Pure presentation-shell milestone — zero `src/core` changes and zero replay
+  hash shifts across all 65 recorded sims.
+- Living Clubhouse prize & keepsake display (`src/render/clubhouse-display.ts`,
+  `src/render/vfx-textures.ts`, `src/render/view.ts`, `src/render/atmosphere.ts`):
+  - Maps all 13 catalogue prizes from `state.prizes` onto non-blocking Clubhouse
+    perches (beanbag chair, right-wall shelves, wooden crate top, and wall
+    nooks) using lazily loaded `world.arcade.atlas` (`clubhouse-prizes` alias,
+    evicted with the current + previous area residency window).
+  - Adds 5 hand-inked 48x48 watercolor keepsake token textures
+    (`keepsakeCrystal`, `keepsakePin`, `keepsakeGeode`, `keepsakeFeather`,
+    `keepsakeTaco`) with miniature contact shadows and gentle breathing sparkle
+    motes for `cavern_chime_rung`, `spice_returned`, `gem_reward_all`,
+    `starry-owl`, and `taco-chef`.
+  - Adds subtle warm golden/pastel bloom pollen sparkles over the Clubhouse
+    outdoor planter deck while `garden_sprouted` or `garden_ripe`.
+- Interactive companion petting & cozy bench resting (`src/render/companions.ts`,
+  `src/platform/audio.ts`, `src/render/view.ts`, `src/main.ts`):
+  - Pet Maddie or active Flute Friends (`pond-pup`, `acorn-squirrel`,
+    `ribbon-bunny`) with a fresh overworld confirm press (yielding strictly to
+    real interactables and overlays): joyful double-bounce squash-and-stretch,
+    companion faces Fae, Fae gives an affectionate nod, 3 rising `emoteHeart` +
+    pastel `sparkle` puffs, and synthesized species affection audio cues via
+    `AudioController.playEffect`.
+  - Relax at curated painted benches, chairs, and the Clubhouse beanbag across
+    `plaza`, `park`, `bay`, `cafe`, `lodge`, and `clubhouse` with a cozy seated
+    breathing pose, warm harp chord, and lazy `emoteNote` (`♪`), standing back
+    up immediately on movement, cancel, menu, or confirm.
+  - Exposes `clubhouseDisplay`, `petting`, and `resting` on `renderInfo()` and
+    adds closed-set `keepsakes on|off` to `src/dev/console.ts`.
+- Evidence: `tests/unit/milestone-89.test.ts` (8 tests) and
+  `tests/e2e/clubhouse-petting.spec.ts` (`@smoke` Chromium + WebKit); reviewed
+  captures `art/review/m89-clubhouse-full.jpg` and
+  `art/review/m89-petting-maddie.jpg` verified with `vision`.
+- Gates: `just check` (148 unit files / 1,182 tests, all 65 sims with zero
+  replay hash changes, 23 QA packs, purity, lint), `just build` (production
+  and harness hook checks), and full e2e verified across Chromium & WebKit.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

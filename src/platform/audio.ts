@@ -48,8 +48,16 @@ function stateOf(audio: AudioContext | null): AudioState {
   return state === "running" || state === "closed" || state === "interrupted" ? state : "suspended";
 }
 
+export type CompanionAudioEffect =
+  | "pet-cat"
+  | "pet-pup"
+  | "pet-squirrel"
+  | "pet-bunny"
+  | "rest-sit";
+
 export type AudioController = {
   play: (cue: SoundCue, tick: number, context?: SoundPlayContext) => SoundLogEntry;
+  playEffect: (effect: CompanionAudioEffect) => void;
   toggle: () => void;
   muted: () => boolean;
   setLevel: (level: AudioLevel) => void;
@@ -531,6 +539,106 @@ const recipes: Record<SoundCue, Recipe> = {
   ],
 };
 
+// Companion petting & cozy resting cues kept in the platform shell (zero core SoundCue changes).
+const effectRecipes: Record<CompanionAudioEffect, Recipe> = {
+  "pet-cat": [
+    {
+      wave: "sine",
+      frequency: 520,
+      endFrequency: 680,
+      offset: 0,
+      duration: 0.22,
+      gain: 0.08,
+      attack: 0.015,
+      vibrato: { rate: 18, depth: 14 },
+    },
+    {
+      wave: "triangle",
+      frequency: 260,
+      endFrequency: 310,
+      offset: 0.02,
+      duration: 0.2,
+      gain: 0.032,
+      attack: 0.02,
+      vibrato: { rate: 22, depth: 8 },
+    },
+  ],
+  "pet-pup": [
+    {
+      wave: "triangle",
+      frequency: 360,
+      endFrequency: 490,
+      offset: 0,
+      duration: 0.095,
+      gain: 0.085,
+      attack: 0.004,
+    },
+    {
+      wave: "triangle",
+      frequency: 420,
+      endFrequency: 580,
+      offset: 0.11,
+      duration: 0.115,
+      gain: 0.09,
+      attack: 0.004,
+    },
+  ],
+  "pet-squirrel": [
+    {
+      wave: "sine",
+      frequency: 780,
+      endFrequency: 960,
+      offset: 0,
+      duration: 0.07,
+      gain: 0.075,
+      attack: 0.003,
+    },
+    {
+      wave: "sine",
+      frequency: 960,
+      endFrequency: 880,
+      offset: 0.07,
+      duration: 0.07,
+      gain: 0.07,
+      attack: 0.003,
+    },
+    {
+      wave: "sine",
+      frequency: 880,
+      endFrequency: 1020,
+      offset: 0.14,
+      duration: 0.08,
+      gain: 0.065,
+      attack: 0.003,
+    },
+  ],
+  "pet-bunny": [
+    {
+      wave: "sine",
+      frequency: 660,
+      endFrequency: 840,
+      offset: 0,
+      duration: 0.11,
+      gain: 0.075,
+      attack: 0.005,
+    },
+    {
+      wave: "sine",
+      frequency: 760,
+      endFrequency: 920,
+      offset: 0.12,
+      duration: 0.09,
+      gain: 0.055,
+      attack: 0.005,
+    },
+  ],
+  "rest-sit": [
+    { wave: "triangle", frequency: 349.23, offset: 0, duration: 0.34, gain: 0.065, attack: 0.02 },
+    { wave: "sine", frequency: 440, offset: 0.055, duration: 0.32, gain: 0.055, attack: 0.02 },
+    { wave: "sine", frequency: 523.25, offset: 0.11, duration: 0.34, gain: 0.05, attack: 0.02 },
+  ],
+};
+
 function createReverbImpulse(audio: AudioContext): AudioBuffer {
   const length = Math.max(1, Math.floor(audio.sampleRate * 1.0));
   const buffer = audio.createBuffer(2, length, audio.sampleRate);
@@ -856,6 +964,15 @@ export function createAudio(
     return true;
   };
 
+  const playEffect = (effect: CompanionAudioEffect): void => {
+    if (muted) return;
+    unlock();
+    const audio = context;
+    if (audio === null || master === null || stateOf(audio) !== "running") return;
+    const now = audio.currentTime;
+    effectRecipes[effect].forEach((segment) => playSegment(audio, segment, now + segment.offset));
+  };
+
   const booted = ensureContext();
   if (booted === null) onStateChange(stateOf(booted));
   else {
@@ -901,6 +1018,7 @@ export function createAudio(
       if (entries.length > 120) entries.shift();
       return entry;
     },
+    playEffect,
     toggle,
     muted: () => muted,
     setLevel,

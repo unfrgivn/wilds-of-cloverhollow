@@ -34,6 +34,13 @@ const toolVariables: Record<ToolName, string> = {
   map: "has_map",
 };
 
+// Closed set of quest keepsake story variables for Clubhouse display QA.
+const keepsakeVariables: readonly string[] = [
+  "cavern_chime_rung",
+  "spice_returned",
+  "gem_reward_all",
+];
+
 // The supplies' caps are the layouts the journal and the battle menu were
 // tested at (999 coins beside the ♪ pill, 99 snacks, 999 tickets).
 type SupplyName = "coins" | "snacks" | "tickets";
@@ -53,6 +60,7 @@ const CONSOLE_HELP = [
   "lasso on|off       carry the lasso",
   "flute on|off       carry the flute",
   "map on|off         carry the map",
+  "keepsakes on|off   toggle quest keepsakes",
   "save <name>        keep this state in a QA-only slot",
   "export             show this state as a save file",
 ].join("\n");
@@ -190,6 +198,30 @@ function toolCommand(
   };
 }
 
+function keepsakesCommand(
+  context: ConsoleContext,
+  state: State,
+  args: string[],
+): ConsoleOutcome {
+  const [raw] = args;
+  if (raw === undefined) return { kind: "error", message: "Usage: keepsakes on|off." };
+  const setting = raw.toLowerCase();
+  if (setting !== "on" && setting !== "off")
+    return { kind: "error", message: `"${raw}" is not on or off.` };
+  const on = setting === "on";
+  const updates: Record<string, boolean> = {};
+  for (const variable of keepsakeVariables) {
+    if (inkVariable(context.story, state.ink, variable) === undefined)
+      return { kind: "error", message: `${variable} is not a story variable.` };
+    updates[variable] = on;
+  }
+  return {
+    kind: "applied",
+    state: { ...state, ink: setInkVariables(state.ink, updates) },
+    message: `keepsakes = ${on}.`,
+  };
+}
+
 function treatCommand(
   context: ConsoleContext,
   state: State,
@@ -245,6 +277,7 @@ export function runConsoleCommand(
     case "lasso": return toolCommand(context, state, args, "lasso");
     case "flute": return toolCommand(context, state, args, "flute");
     case "map": return toolCommand(context, state, args, "map");
+    case "keepsakes": return keepsakesCommand(context, state, args);
     case "save": return saveCommand(args);
     case "export": return { kind: "export" };
     default:

@@ -352,26 +352,30 @@ ios/            Capacitor iOS project (from Milestone 4).
   their feet, and props sort against them column by column by the front edge
   of their footprints (section 6.2).
 - Procedural watercolor VFX kit (`src/render/vfx-textures.ts`, Milestones 72–73,
-  84): sixteen small cached offscreen-canvas Pixi textures (`contactShadow`,
+  84, 88): twenty-one small cached offscreen-canvas Pixi textures (`contactShadow`,
   `softGlow`, `sparkle`, `petal`, `waterGlint`, `mistWisp`, `sunbeam`,
-  `paperGrain`, `puff`, `heart`, `energyRing`, plus five hand-inked 48x48 comic
+  `paperGrain`, `puff`, `heart`, `energyRing`, five hand-inked 48x48 comic
   emote bubbles `emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`, and
-  `emoteHeart`), rendered with warm plum-brown shadows (`#52455F`), pastel
-  washes, gouache puffs, and seamless cold-press paper tooth. In non-harness
-  areas, a `shadowLayer` sits directly above `ground` and below `depth` (with a
-  pooled `footstepLayer` above it) to ground Fae, party members, visible NPCs
-  (hover shadows under the four fairies, skipping the painted `bus-stop`), and
-  overworld critters (scaling slightly as characters bounce or hover); a
-  deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`, zero
-  `Math.random()`) adds per-biome water glints, lamp pools, drifting
+  `emoteHeart`, plus five hand-inked 48x48 quest keepsake tokens
+  `keepsakeCrystal`, `keepsakePin`, `keepsakeGeode`, `keepsakeFeather`, and
+  `keepsakeTaco`), rendered with warm plum-brown shadows (`#52455F`), warm
+  `#47321F` ink outlines, pastel washes, gouache puffs, and seamless cold-press
+  paper tooth. In non-harness areas, a `shadowLayer` sits directly above `ground`
+  and below `depth` (with a pooled `footstepLayer` above it) to ground Fae, party
+  members, visible NPCs (hover shadows under the four fairies, skipping the
+  painted `bus-stop`), and overworld critters (scaling slightly as characters
+  bounce or hover); a deterministic `BiomeAtmosphere` (`src/render/atmosphere.ts`,
+  zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
   petals/pollen, snow and lodge chimney smoke, sunbeams, lavender mist, fairy
-  aura halos, hearth glow, arcade neon blooms, and an `emissive` light layer
-  mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly during lantern
-  dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp arches, lodge
-  hearth, and café counter glows, plus cool subterranean edge framing and
-  crossing shimmer rings in `cavern`); a pooled `emoteLayer` sits above `depth`
-  and below `paperGrain`; and a world-anchored `paperGrain` `TilingSprite`
-  (`multiply`, alpha `0.035`) gently unifies sprites, shadows, and paintings.
+  aura halos, hearth glow, arcade neon blooms, blooming clubhouse planter-deck
+  pollen sparkles (while `garden_sprouted` or `garden_ripe`), and an `emissive`
+  light layer mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly
+  during lantern dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp
+  arches, lodge hearth, and café counter glows, plus cool subterranean edge
+  framing and crossing shimmer rings in `cavern`); a pooled `emoteLayer` sits
+  above `depth` and below `paperGrain`; and a world-anchored `paperGrain`
+  `TilingSprite` (`multiply`, alpha `0.035`) gently unifies sprites, shadows, and
+  paintings.
   Door fades use cubic smoothstep easing (`fadeAlpha`) paired with a subtle
   viewport-centered page-turn zoom (`transitionZoom` in `src/render/fade.ts`:
   `1.00 -> 1.022` on `"out"`, `0.972 -> 1.00` on `"in"`, strictly clipped inside
@@ -1049,6 +1053,33 @@ ios/            Capacitor iOS project (from Milestone 4).
   basket goes into the fridge (`fridge_baskets`) and the plants are left one
   calm along, so two more calms ripen them again. Each basket is three snacks
   (`gift: snack 3`), all taken at once.
+- Living Clubhouse display, companion petting & cozy resting (Milestone 88,
+  pure presentation shell — zero `src/core` state or replay hash changes):
+  - `evaluateClubhouseDisplay` (`src/render/clubhouse-display.ts`) places every
+    owned arcade prize from `state.prizes` (all 13 catalogue prizes, lazily
+    loading `world.arcade.atlas` under alias `clubhouse-prizes` only when
+    entering `clubhouse` and evicting it on the same current + previous area
+    residency window) onto non-blocking Clubhouse perches (beanbag cushion,
+    right-wall shelves, crate top, and wall nooks) alongside Fae's five
+    shimmering hand-inked quest keepsakes (`star-crystal` on `cavern_chime_rung`,
+    `star-pin` on `spice_returned`, `star-geode` on `gem_reward_all`,
+    `moon-feather` on sticker `starry-owl`, and `taco-badge` on sticker
+    `taco-chef`), each grounded with a miniature contact shadow and subtle
+    breathing sparkle aura.
+  - `findPettableCompanion` & `findRestSpot` (`src/render/companions.ts`): on a
+    fresh overworld confirm press when no real interactable (`targetInteractable`)
+    or overlay is active, Fae can pet Maddie or any active Flute Friend
+    (`pond-pup`, `acorn-squirrel`, `ribbon-bunny`) within range (triggering a
+    42-tick joyful squash-and-stretch double bounce, affectionate nod, 3 rising
+    `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
+    cue via `AudioController.playEffect`), or relax at curated painted benches,
+    chairs, and the Clubhouse beanbag (`plaza`, `park`, `bay`, `cafe`, `lodge`,
+    `clubhouse`), settling into a cozy seated-rest pose with a warm harp chord
+    and lazily drifting `emoteNote` (`♪`) until any movement, cancel, menu, or
+    confirm input stands her back up.
+  - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),
+    `petting` (currently petted companion id or `null`), and `resting` (active
+    rest spot id or `null`).
 - Recess (Milestone 39): the flute's last line rings the bell (`recess`), and
   Coach Ash props the gym's back door open. `field`, "Playing Field", is a
   1650x1100 painted schoolyard behind the school (no concept sheet): the
@@ -3143,16 +3174,18 @@ trunks keep its two exits.
   the journal and battle menu were tested at); `treats all|<id>` (adding +1 of
   every specialty treat or the named treat id, capped at 99); `stickers
   all|<id>` and `prizes
-  all|<id>` (granting from the catalogues); and `lantern|lasso|flute|map
-  on|off`, which set exactly the four story variables `has_lantern`,
-  `has_lasso`, `has_flute`, and `has_map` (a name the story doesn't declare
-  is an error). `save <name>` keeps the state in a QA-only slot listed in
-  the QA menu; `export` shows the state's save file for a bug report or the
-  library. Nothing the console does autosaves or touches the player's slot.
+  all|<id>` (granting from the catalogues); `lantern|lasso|flute|map on|off`,
+  which set exactly the four tool story variables `has_lantern`, `has_lasso`,
+  `has_flute`, and `has_map`; and `keepsakes on|off`, which toggles the closed
+  three quest-keepsake variables (`cavern_chime_rung`, `spice_returned`,
+  `gem_reward_all`; an undeclared story variable is an error). `save <name>`
+  keeps the state in a QA-only slot listed in the QA menu; `export` shows the
+  state's save file for a bug report or the library. Nothing the console does
+  autosaves or touches the player's slot.
 - Deliberately absent: arbitrary flag setting, teleporting, and eval. Fixtures
   and QA save packs are the labeled test-only shortcuts; teleporting, eval, and
   arbitrary flag setting remain absent, and the console's settable story
-  variables are its closed four.
+  variables are its closed tool and keepsake sets.
 - Screenshots come from the browser (Playwright or Chrome DevTools MCP), so
   they include the DOM UI.
 - `renderInfo().arcade` is null outside an arcade game, otherwise the open

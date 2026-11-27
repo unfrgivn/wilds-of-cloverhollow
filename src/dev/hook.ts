@@ -62,6 +62,9 @@ export type CloverhollowHook = {
     lantern: { on: boolean; glows: string[] };
     // The recurring critters' "?" and "!" over their heads (Milestone 51).
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
+    clubhouseDisplay: number;
+    petting: string | null;
+    resting: string | null;
     battle: {
       phase: string | null;
       check: BattleCheckInfo | null;

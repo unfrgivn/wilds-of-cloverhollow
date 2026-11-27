@@ -98,6 +98,8 @@ import { flyerAt } from "./ambient";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
 import { BiomeAtmosphere } from "./atmosphere";
 import { evaluateOverworldEmotes } from "./emotes";
+import { evaluateClubhouseDisplay } from "./clubhouse-display";
+import type { RestSpot } from "./companions";
 import {
   companionIdlePose,
   composePose,
@@ -135,8 +137,11 @@ type FootstepPuff = {
 
 const FOOTSTEP_POOL_SIZE = 24;
 const BATTLE_VFX_POOL_SIZE = 64;
-const EMOTE_POOL_SIZE = 16;
+const EMOTE_POOL_SIZE = 24;
 const FLUTE_CAMEO_DURATION = 45;
+const CLUBHOUSE_PRIZES_ALIAS = "clubhouse-prizes";
+const PET_REACTION_DURATION = 42;
+const PET_SPARKLE_TINTS: readonly number[] = [0xff9ebc, 0xf6c94c, 0x67d5c4];
 
 const BATTLE_STAGE_MOODS: Record<
   BattleStageMood,
@@ -413,6 +418,17 @@ export class GameView {
   private drawnGlows: string[] = [];
   private ambientSprites: { flyer: AmbientFlyer; sprite: Sprite }[] = [];
   private ambientFrames: { id: string; x: number; y: number; frame: number }[] = [];
+  private clubhousePrizePool: { container: Container; shadow: Sprite; item: Sprite }[] = [];
+  private clubhouseKeepsakePool: {
+    container: Container;
+    shadow: Sprite;
+    glow: Sprite;
+    item: Sprite;
+    sparkle: Sprite;
+  }[] = [];
+  private clubhouseDisplayCount = 0;
+  private petReaction: { id: string; startTick: number } | null = null;
+  private restingSpot: { spot: RestSpot; startTick: number } | null = null;
 
   constructor(
     private readonly world: World,
@@ -624,12 +640,15 @@ export class GameView {
     }
     this.npcSprites = [];
     const entities = areaEntityAtlases(this.world, area);
+    const areaAtlases: EntityAtlas[] = area.id === "clubhouse"
+      ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
+      : entities;
     const [next] = await Promise.all([
       AreaView.load(area, this.depth),
-      ...entities.map((entry) => mipmapSheet(entry.alias, entry.src)),
+      ...areaAtlases.map((entry) => mipmapSheet(entry.alias, entry.src)),
     ]);
     this.areaView = next;
-    const nextEntities = entities.map((entry) => entry.alias);
+    const nextEntities = areaAtlases.map((entry) => entry.alias);
     this.currentEntityAliases = nextEntities;
     await this.evict(previous, next, previousEntities, nextEntities);
     for (const entry of this.glowSprites) entry.sprite.destroy();
@@ -675,6 +694,8 @@ export class GameView {
     this.staticWidth = 0;
     this.clearFootsteps();
     this.clearEmotes();
+    this.clearCompanionActions();
+    this.hideClubhouseDisplay();
   }
 
   // Unloads what a crossing displaced: everything resident that is neither
@@ -706,13 +727,15 @@ export class GameView {
   // `areaTextureUrls` so the harness sees them cached; a failed prefetch says
   // nothing the arrival's own load won't say louder.
   prefetch(area: Area): void {
+    const entities = areaEntityAtlases(this.world, area);
+    const areaAtlases: EntityAtlas[] = area.id === "clubhouse"
+      ? [...entities, { alias: CLUBHOUSE_PRIZES_ALIAS, src: assetUrl(this.world.arcade.atlas) }]
+      : entities;
     void Promise.all([
       AreaView.prefetch(area).then((urls) => {
         for (const url of urls) this.areaTextureUrls.add(url);
       }),
-      ...areaEntityAtlases(this.world, area).map((entry) =>
-        mipmapSheet(entry.alias, entry.src),
-      ),
+      ...areaAtlases.map((entry) => mipmapSheet(entry.alias, entry.src)),
     ]).catch(() => {});
   }
 
@@ -758,10 +781,70 @@ export class GameView {
     for (const sprite of this.emoteSprites) sprite.visible = false;
   }
 
+  private clearCompanionActions(): void {
+    this.petReaction = null;
+    this.restingSpot = null;
+  }
+
+  private hideClubhouseDisplay(): void {
+    for (const entry of this.clubhousePrizePool) entry.container.visible = false;
+    for (const entry of this.clubhouseKeepsakePool) entry.container.visible = false;
+    this.clubhouseDisplayCount = 0;
+  }
+
+  triggerPet(id: string, tick: number): void {
+    this.petReaction = { id, startTick: tick };
+  }
+
+  setResting(spot: RestSpot | null, tick: number): void {
+    this.restingSpot = spot === null ? null : { spot, startTick: tick };
+  }
+
+  isResting(): boolean {
+    return this.restingSpot !== null;
+  }
+
+  private activePetReaction(state: State): { id: string; elapsed: number } | null {
+    if (this.petReaction === null) return null;
+    const overworldClear =
+      state.battle === null &&
+      state.arcade === null &&
+      state.dialogue === null &&
+      state.transition === null &&
+      !state.journalOpen &&
+      state.finale === null;
+    const elapsed = state.tick - this.petReaction.startTick;
+    if (!overworldClear || elapsed < 0 || elapsed >= PET_REACTION_DURATION) {
+      this.petReaction = null;
+      return null;
+    }
+    return { id: this.petReaction.id, elapsed };
+  }
+
+  private activeRestSpot(state: State): { spot: RestSpot; elapsed: number } | null {
+    if (this.restingSpot === null) return null;
+    const overworldClear =
+      state.battle === null &&
+      state.arcade === null &&
+      state.dialogue === null &&
+      state.transition === null &&
+      !state.journalOpen &&
+      state.finale === null &&
+      !state.motion.moving &&
+      state.area === this.restingSpot.spot.area;
+    const elapsed = state.tick - this.restingSpot.startTick;
+    if (!overworldClear || elapsed < 0) {
+      this.restingSpot = null;
+      return null;
+    }
+    return { spot: this.restingSpot.spot, elapsed };
+  }
+
   resetCamera(): void {
     this.previousCamera = undefined;
     this.clearFootsteps();
     this.clearEmotes();
+    this.clearCompanionActions();
   }
 
   loadedAreaId(): string {
@@ -785,9 +868,9 @@ export class GameView {
     this.staticPaper = paper;
   }
 
-  private setFaeTexture(state: State): void {
+  private setFaeTexture(state: State, facingOverride?: Direction): void {
     const sheet = Assets.get<Spritesheet>("fae-sheet");
-    const facing = dialogueFacing(this.world, state) ?? state.facing;
+    const facing = dialogueFacing(this.world, state) ?? facingOverride ?? state.facing;
     const idleName = facing === "right" ? "idle_left" : `idle_${facing}`;
     const walkName = facing === "right" ? "walk_left" : `walk_${facing}`;
     const name = state.motion.moving ? walkName : idleName;
@@ -821,13 +904,16 @@ export class GameView {
     member: PartyMember,
     content: PartyContent,
     partner: Point | null,
+    petting = false,
   ): { id: string; animation: string; frame: number } {
     const sheet = Assets.get<Spritesheet>(`${member.id}-sheet`);
     const settled = !content.sits && !member.motion.moving &&
       member.stillTicks >= this.world.tunables.follow.settleDelayTicks;
-    const facing = settled
-      ? (partner !== null ? facingToward(member, partner) : state.facing)
-      : member.facing;
+    const facing = petting && !member.motion.moving
+      ? facingToward(member, state.player)
+      : settled
+        ? (partner !== null ? facingToward(member, partner) : state.facing)
+        : member.facing;
     const side = facing === "right" ? "left" : facing;
     const mirror = facing === "right";
     const resting =
@@ -861,6 +947,7 @@ export class GameView {
     previousState: State | undefined,
     alpha: number,
     livingMotion: boolean,
+    activePet: { id: string; elapsed: number } | null,
   ): void {
     const inParty = new Set(state.party.map((member) => member.id));
     for (const [id, sprite] of this.partySprites) {
@@ -878,7 +965,15 @@ export class GameView {
       const pos = prevMember !== undefined && alpha < 1
         ? interpolatePoint(prevMember, member, alpha)
         : member;
-      const frameInfo = this.setFollowerTexture(sprite, state, member, content, partner);
+      const beingPetted = activePet !== null && activePet.id === member.id;
+      const frameInfo = this.setFollowerTexture(
+        sprite,
+        state,
+        member,
+        content,
+        partner,
+        beingPetted,
+      );
       let pose: MotionPose = NEUTRAL_POSE;
       if (livingMotion) {
         const isSideBounder = member.id === "acorn-squirrel" &&
@@ -893,6 +988,18 @@ export class GameView {
               sitSquash(member.stillTicks, this.world.tunables.follow.sitDelayTicks),
             );
           }
+        }
+        if (activePet !== null && activePet.id === member.id) {
+          const e = activePet.elapsed;
+          const decay = Math.max(0, 1 - e / PET_REACTION_DURATION);
+          const hop = Math.abs(Math.sin(e / 4.2));
+          pose = composePose(pose, {
+            offsetX: 0,
+            offsetY: -hop * 14 * (0.45 + 0.55 * decay),
+            scaleX: 1 + (0.08 * (1 - hop) - 0.06 * hop) * decay,
+            scaleY: 1 + (0.08 * hop - 0.06 * (1 - hop)) * decay,
+            rotation: Math.sin(e / 3.8) * 0.12 * decay,
+          });
         }
       }
       sprite.position.set(pos.x + pose.offsetX, pos.y + pose.offsetY);
@@ -1080,13 +1187,29 @@ export class GameView {
     const indoor = INDOOR_AREAS.has(area.id);
     const shadowAlpha = indoor ? 0.24 : 0.3;
     const livingMotion = area.id !== "harness";
+    const activePet = this.activePetReaction(state);
+    const activeRest = this.activeRestSpot(state);
     this.shadowLayer.visible = livingMotion;
-    this.setFaeTexture(state);
-    const faePose = !livingMotion
+    this.setFaeTexture(state, activeRest?.spot.facing);
+    let faePose: MotionPose = !livingMotion
       ? NEUTRAL_POSE
       : state.motion.moving
         ? walkPose(state.motion.distance, this.world.tunables.walkCycleUnits, true)
-        : idleBreathing(state.tick, 0);
+        : activeRest !== null
+          ? {
+              offsetX: 0,
+              offsetY: 3,
+              scaleX: 1.04 - Math.sin(activeRest.elapsed * 0.055) * 0.01,
+              scaleY: 0.94 + Math.sin(activeRest.elapsed * 0.055) * 0.015,
+              rotation: Math.sin(activeRest.elapsed * 0.04) * 0.025,
+            }
+          : idleBreathing(state.tick, 0);
+    if (livingMotion && activePet !== null && activePet.elapsed < 22 && !state.motion.moving) {
+      const petMember = state.party.find((item) => item.id === activePet.id);
+      const nodDir = petMember !== undefined && petMember.x < playerPos.x ? -1 : 1;
+      const nod = Math.sin((activePet.elapsed / 22) * Math.PI) * 0.05 * nodDir;
+      faePose = { ...faePose, rotation: faePose.rotation + nod };
+    }
     this.player.position.set(playerPos.x + faePose.offsetX, playerPos.y + faePose.offsetY);
     this.player.scale.set(
       this.player.scale.x * faePose.scaleX,
@@ -1106,6 +1229,7 @@ export class GameView {
       canInterpolate ? previousState : undefined,
       alpha,
       livingMotion,
+      activePet,
     );
     this.renderCritters(
       state,
@@ -1115,6 +1239,7 @@ export class GameView {
       livingMotion,
     );
     this.renderNpcs(state, shadowAlpha, livingMotion);
+    this.renderClubhouseDisplay(state, area);
     this.renderAmbient(state);
     this.renderEmotes(
       state,
@@ -1122,8 +1247,14 @@ export class GameView {
       playerPos,
       canInterpolate ? previousState : undefined,
       alpha,
+      activePet,
+      activeRest,
     );
     this.renderGlows(state, playerPos, paused);
+    const clubhouseBloom = area.id === "clubhouse" && (
+      this.world.storyVariable(state.ink, "garden_sprouted") === true ||
+      this.world.storyVariable(state.ink, "garden_ripe") === true
+    );
     this.atmosphere.update(
       area.id,
       area.width,
@@ -1131,6 +1262,7 @@ export class GameView {
       state.tick,
       state.battle === null && state.arcade === null,
       this.lanternBlend,
+      clubhouseBloom ? { clubhouseBloom: true } : undefined,
     );
     loaded.update(
       this.world,
@@ -1228,6 +1360,117 @@ export class GameView {
     this.drawnGlows = drawn;
   }
 
+  private renderClubhouseDisplay(state: State, area: Area): void {
+    const visible =
+      area.id === "clubhouse" &&
+      state.battle === null &&
+      state.arcade === null;
+    if (!visible) {
+      this.hideClubhouseDisplay();
+      return;
+    }
+    const display = evaluateClubhouseDisplay(this.world, state);
+    const prizeSheet = Assets.get<Spritesheet | undefined>(CLUBHOUSE_PRIZES_ALIAS);
+
+    let prizeShown = 0;
+    for (const placement of display.prizes) {
+      const texture = prizeSheet?.textures[placement.frame];
+      if (texture === undefined) continue;
+      let entry = this.clubhousePrizePool[prizeShown];
+      if (entry === undefined) {
+        const container = new Container();
+        const shadow = makeShadowSprite(this.vfx.contactShadow, `shadow:prize:${prizeShown}`);
+        const item = new Sprite();
+        container.addChild(shadow, item);
+        this.depth.addChild(container);
+        entry = { container, shadow, item };
+        this.clubhousePrizePool.push(entry);
+      }
+      entry.container.visible = true;
+      entry.container.label = `clubhouse:prize:${placement.id}`;
+      entry.container.position.set(placement.x, placement.y);
+      entry.container.zIndex = placement.zIndex;
+
+      entry.shadow.position.set(0, -1);
+      entry.shadow.width = 48 * (placement.scale / 0.3);
+      entry.shadow.height = 16 * (placement.scale / 0.3);
+      entry.shadow.alpha = 0.24;
+
+      entry.item.texture = texture;
+      if (texture.defaultAnchor !== undefined) {
+        entry.item.anchor.copyFrom(texture.defaultAnchor);
+      } else {
+        entry.item.anchor.set(0.5, 0.9375);
+      }
+      entry.item.scale.set(placement.scale);
+      entry.item.rotation = placement.rotation;
+      prizeShown += 1;
+    }
+    for (let i = prizeShown; i < this.clubhousePrizePool.length; i += 1) {
+      const entry = this.clubhousePrizePool[i];
+      if (entry !== undefined) entry.container.visible = false;
+    }
+
+    let keepsakeShown = 0;
+    for (const placement of display.keepsakes) {
+      let entry = this.clubhouseKeepsakePool[keepsakeShown];
+      if (entry === undefined) {
+        const container = new Container();
+        const shadow = makeShadowSprite(
+          this.vfx.contactShadow,
+          `shadow:keepsake:${keepsakeShown}`,
+        );
+        const glow = new Sprite(this.vfx.softGlow);
+        glow.anchor.set(0.5);
+        glow.blendMode = "add";
+        const item = new Sprite();
+        item.anchor.set(0.5, 0.85);
+        const sparkle = new Sprite(this.vfx.sparkle);
+        sparkle.anchor.set(0.5);
+        sparkle.blendMode = "normal";
+        container.addChild(shadow, glow, item, sparkle);
+        this.depth.addChild(container);
+        entry = { container, shadow, glow, item, sparkle };
+        this.clubhouseKeepsakePool.push(entry);
+      }
+      const phase = state.tick * 0.055 + keepsakeShown * 1.4;
+      const pulse = 0.5 + 0.5 * Math.sin(phase);
+      entry.container.visible = true;
+      entry.container.label = `clubhouse:keepsake:${placement.id}`;
+      entry.container.position.set(placement.x, placement.y);
+      entry.container.zIndex = placement.zIndex;
+
+      entry.shadow.position.set(0, -1);
+      entry.shadow.width = 26 * placement.scale;
+      entry.shadow.height = 10 * placement.scale;
+      entry.shadow.alpha = 0.22;
+
+      entry.glow.position.set(0, -14 * placement.scale);
+      entry.glow.tint = placement.sparkleTint;
+      entry.glow.scale.set(0.42 * placement.scale * (0.94 + 0.12 * pulse));
+      entry.glow.alpha = 0.18 + 0.1 * pulse;
+
+      entry.item.texture = this.vfx[placement.texture];
+      entry.item.scale.set(placement.scale);
+      entry.item.position.set(0, 0);
+
+      entry.sparkle.position.set(
+        10 * placement.scale + Math.sin(phase * 0.9) * 3,
+        -24 * placement.scale + Math.cos(phase * 1.1) * 2.5,
+      );
+      entry.sparkle.tint = placement.sparkleTint;
+      entry.sparkle.scale.set(0.32 + 0.16 * pulse);
+      entry.sparkle.alpha = 0.55 + 0.4 * pulse;
+      keepsakeShown += 1;
+    }
+    for (let i = keepsakeShown; i < this.clubhouseKeepsakePool.length; i += 1) {
+      const entry = this.clubhouseKeepsakePool[i];
+      if (entry !== undefined) entry.container.visible = false;
+    }
+
+    this.clubhouseDisplayCount = prizeShown + keepsakeShown;
+  }
+
   private renderAmbient(state: State): void {
     const sheet = Assets.get<Spritesheet>("ambient-sheet");
     const visible = state.battle === null && state.arcade === null;
@@ -1259,6 +1502,8 @@ export class GameView {
     playerPos: Point,
     previousState: State | undefined,
     alpha: number,
+    activePet: { id: string; elapsed: number } | null,
+    activeRest: { spot: RestSpot; elapsed: number } | null,
   ): void {
     const active = area.id !== "harness" &&
       state.battle === null &&
@@ -1406,21 +1651,105 @@ export class GameView {
       recentTalk,
     });
 
-    this.emoteLayer.visible = emotes.length > 0;
+    type EmoteSpriteItem = {
+      texture: Texture;
+      x: number;
+      y: number;
+      scale: number;
+      alpha: number;
+      rotation: number;
+      tint: number;
+      blend: "normal" | "add";
+    };
+    const items: EmoteSpriteItem[] = emotes.map((emote) => ({
+      texture: this.vfx[emote.texture],
+      x: emote.x,
+      y: emote.y,
+      scale: emote.scale,
+      alpha: emote.alpha,
+      rotation: emote.rotation,
+      tint: 0xffffff,
+      blend: "normal",
+    }));
+
+    // Joyful rising hearts + pastel sparkles over a freshly petted companion.
+    if (activePet !== null) {
+      const member = state.party.find((entry) => entry.id === activePet.id);
+      const content = this.world.party[activePet.id];
+      if (member !== undefined && content !== undefined) {
+        const prevMember = previousState?.party.find((entry) => entry.id === activePet.id);
+        const pos = prevMember !== undefined && alpha < 1
+          ? interpolatePoint(prevMember, member, alpha)
+          : member;
+        const offsets: readonly [number, number, number][] = [
+          [-16, 0, 0.72],
+          [0, 7, 0.82],
+          [16, 14, 0.68],
+        ];
+        offsets.forEach(([dx, delay, baseScale], idx) => {
+          const age = activePet.elapsed - delay;
+          const life = PET_REACTION_DURATION - delay;
+          if (age < 0 || age >= life) return;
+          const progress = age / life;
+          const fadeIn = Math.min(1, (age + 1) / 5);
+          const fadeOut = Math.min(1, (life - age) / 10);
+          items.push({
+            texture: this.vfx.emoteHeart,
+            x: pos.x + dx + Math.sin(progress * Math.PI * 2 + idx) * 4,
+            y: pos.y - content.box.height - 14 - age * 1.15,
+            scale: baseScale * (0.72 + 0.28 * fadeIn),
+            alpha: 0.96 * fadeIn * fadeOut,
+            rotation: Math.sin(progress * Math.PI * 2 + idx) * 0.14,
+            tint: 0xffffff,
+            blend: "normal",
+          });
+          items.push({
+            texture: this.vfx.sparkle,
+            x: pos.x - dx * 1.1 + Math.cos(progress * Math.PI * 2 + idx) * 6,
+            y: pos.y - content.box.height - 4 - age * 0.95,
+            scale: 0.46 + 0.18 * (1 - progress),
+            alpha: 0.94 * fadeIn * fadeOut,
+            rotation: age * 0.08 + idx,
+            tint: PET_SPARKLE_TINTS[idx % PET_SPARKLE_TINTS.length] ?? 0xff9ebc,
+            blend: "normal",
+          });
+        });
+      }
+    }
+
+    // Gentle lazily drifting eighth-note over Fae while cozily resting.
+    if (activeRest !== null) {
+      const cycle = (activeRest.elapsed % 90) / 90;
+      const envelope = Math.sin(cycle * Math.PI);
+      items.push({
+        texture: this.vfx.emoteNote,
+        x: playerPos.x + 12 + Math.sin(cycle * Math.PI * 2) * 6,
+        y: playerPos.y - faeBox.height - 18 - cycle * 22,
+        scale: 0.56 + 0.18 * envelope,
+        alpha: 0.9 * envelope,
+        rotation: Math.sin(cycle * Math.PI * 2) * 0.14,
+        tint: 0xffffff,
+        blend: "normal",
+      });
+    }
+
+    this.emoteLayer.visible = items.length > 0;
     for (let i = 0; i < this.emoteSprites.length; i += 1) {
       const sprite = this.emoteSprites[i];
       if (sprite === undefined) continue;
-      const emote = emotes[i];
-      if (emote === undefined || emote.alpha <= 0.01) {
+      const item = items[i];
+      if (item === undefined || item.alpha <= 0.01) {
         sprite.visible = false;
         continue;
       }
       sprite.visible = true;
-      sprite.texture = this.vfx[emote.texture];
-      sprite.position.set(emote.x, emote.y);
-      sprite.scale.set(emote.scale);
-      sprite.alpha = emote.alpha;
-      sprite.rotation = emote.rotation;
+      sprite.texture = item.texture;
+      sprite.position.set(item.x, item.y);
+      sprite.scale.set(item.scale);
+      sprite.alpha = item.alpha;
+      sprite.rotation = item.rotation;
+      sprite.tint = item.tint;
+      sprite.blendMode = item.blend;
     }
     this.lastEmoteArea = area.id;
     this.lastEmoteTick = state.tick;
@@ -2384,6 +2713,9 @@ export class GameView {
     lantern: { on: boolean; glows: string[] };
     // The recurring critters' "?" and "!" over their heads (Milestone 51).
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
+    clubhouseDisplay: number;
+    petting: string | null;
+    resting: string | null;
     battle: {
       phase: string | null;
       talk: {
@@ -2459,6 +2791,9 @@ export class GameView {
         glows: this.drawnGlows.slice(),
       },
       marks: this.noticeMarks(state),
+      clubhouseDisplay: this.clubhouseDisplayCount,
+      petting: this.activePetReaction(state)?.id ?? null,
+      resting: this.activeRestSpot(state)?.spot.id ?? null,
       battle: {
         phase: state.battle?.phase ?? null,
         talk: state.battle?.talk === null || state.battle?.talk === undefined

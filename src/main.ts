@@ -89,7 +89,8 @@ import {
   type TitleMode,
 } from "./shell/title-flow";
 import { creditsConfirmAllowed } from "./shell/credits-flow";
-import { createAudio } from "./platform/audio";
+import { createAudio, type CompanionAudioEffect } from "./platform/audio";
+import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
 import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
@@ -105,6 +106,13 @@ let paused = false;
 
 // One save slot (spec 10).
 const saveKey = "cloverhollow-save";
+
+function petEffectForCompanion(id: string): CompanionAudioEffect {
+  if (id === "pond-pup") return "pet-pup";
+  if (id === "acorn-squirrel") return "pet-squirrel";
+  if (id === "ribbon-bunny") return "pet-bunny";
+  return "pet-cat";
+}
 
 async function boot(): Promise<void> {
   preventPinchZoom();
@@ -367,6 +375,7 @@ async function boot(): Promise<void> {
         state = outcome.state;
         previousState = state;
         clearAreaBanner();
+        invalidate();
       }
       return outcome;
     },
@@ -379,7 +388,7 @@ async function boot(): Promise<void> {
       return `Saved QA slot "${name}" (tick ${tick}).`;
     },
     saveFile: () => serializeSave(state),
-    close: () => { qaConsoleOpen = false; },
+    close: () => { qaConsoleOpen = false; invalidate(); },
   });
   const openQaConsole = (): void => {
     if (qaConsole === null || qaConsoleOpen || qaActivePack === null ||
@@ -1282,13 +1291,17 @@ async function boot(): Promise<void> {
       cancel: frame.cancel && !swallowed.has("cancel"),
       menu: frame.menu && !swallowed.has("menu"),
     };
-    if (levelUpNotices.length > 0 && input.confirm && !state.previousInput.confirm)
+    const confirmEdge = input.confirm && !state.previousInput.confirm;
+    let dismissedLevelUp = false;
+    if (levelUpNotices.length > 0 && confirmEdge) {
       levelUpNotices.shift();
+      dismissedLevelUp = true;
+    }
     if (state.finale === "credits") {
       creditsTicks += 1;
       if (creditsConfirmAllowed(
         creditsTicks,
-        input.confirm && !state.previousInput.confirm,
+        confirmEdge,
       )) {
         // The credits follow the ending in the same session (the morning is
         // never saved), so the dream it saved is always here to wake back into.
@@ -1310,6 +1323,54 @@ async function boot(): Promise<void> {
     });
     state = stepped.state;
     previousState = state.area === previous.area ? previous : state;
+    const clearRest =
+      input.move.x !== 0 ||
+      input.move.y !== 0 ||
+      input.cancel ||
+      input.menu ||
+      previous.area !== state.area ||
+      state.dialogue !== null ||
+      state.battle !== null ||
+      state.arcade !== null ||
+      state.journalOpen ||
+      state.transition !== null ||
+      state.finale !== null;
+    if (clearRest && view.isResting()) {
+      view.setResting(null, state.tick);
+    }
+    const overworldConfirm =
+      confirmEdge &&
+      !dismissedLevelUp &&
+      previous.dialogue === null &&
+      previous.battle === null &&
+      previous.arcade === null &&
+      !previous.journalOpen &&
+      previous.transition === null &&
+      previous.finale === null &&
+      state.dialogue === null &&
+      state.battle === null &&
+      state.arcade === null &&
+      !state.journalOpen &&
+      state.transition === null &&
+      state.finale === null &&
+      previous.area === state.area;
+    if (overworldConfirm) {
+      if (view.isResting()) {
+        view.setResting(null, state.tick);
+      } else {
+        const restSpot = findRestSpot(content.world, state);
+        if (restSpot !== null) {
+          view.setResting(restSpot, state.tick);
+          sound.playEffect("rest-sit");
+        } else {
+          const companion = findPettableCompanion(content.world, state);
+          if (companion !== null) {
+            view.triggerPet(companion.id, state.tick);
+            sound.playEffect(petEffectForCompanion(companion.id));
+          }
+        }
+      }
+    }
     if (previous.area !== state.area) {
       if (areaBannerInfo(content.world, state.area) !== null) {
         bannerArea = state.area;

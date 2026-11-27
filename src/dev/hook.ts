@@ -67,6 +67,7 @@ export type CloverhollowHook = {
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     clubhouseDisplay: number;
     atmosphereParticles: number;
+    footstepPuffs: number;
     petting: string | null;
     resting: string | null;
     timeOfDay: TimeOfDayPhase;

@@ -5341,6 +5341,44 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check`, `just build`, 23/23 targeted Chromium & WebKit e2e, and
   95/95 Chromium `ui-gallery` tests.
 
+## Milestone 119: Resilient Tab/iOS Background Lifecycle, `pagehide` Autosave Flush, Reduced-Motion Footstep & Atmosphere Guard, and 16-Area Cozy Resting + Coastal Trail Butterflies **Status:** ✅ Completed (2026-11-27)
+- Hardens tab and iOS app backgrounding, prevents particle motion under Reduced
+  Motion across footsteps and all biome atmospheres, and expands cozy resting to
+  16 areas plus two butterflies on the Coastal Trail with zero `src/core`
+  changes and zero replay hash drift across all 67 sims.
+- Resilient background lifecycle & `pagehide` autosave flush (`src/shell/lifecycle.ts`,
+  `src/platform/keyboard.ts`, `src/main.ts`):
+  - Pure `shouldFreezeLiveLoop` and `shouldFlushSaveOnHide` rules freeze live
+    ticking/accumulator while hidden or loading without affecting paused harness
+    stepping, release held keys (`Keyboard.clearAll`), gamepad taps, and touch
+    arrows on `visibilitychange`, and flush quiet autosaves (suppressing the
+    toast while hidden) on `visibilitychange` and `pagehide`.
+- Reduced-motion footstep & biome atmosphere calm (`src/render/view.ts`,
+  `src/render/atmosphere-recipes.ts`, `src/dev/hook.ts`):
+  - `updateFootsteps` checks `isReducedMotionActive()`, clears active puffs, and
+    returns early so walking stays particle-free under Reduced Motion;
+    `renderInfo()` exposes `footstepPuffs`.
+  - `evaluateAtmosphere` freezes `tick` across all biomes when `reducedMotion`
+    is active while keeping non-reduced-motion frames bit-for-bit identical.
+- 16-area cozy resting & Coastal Trail butterflies (`src/render/companions.ts`,
+  `content/areas/trail.json`):
+  - Added `kitchen-sofa-rug` (`kitchen`, on the living-room oval rug beside the
+    sofa) and `trail-stream-overlook` (`trail`, south downstream grassy bank)
+    bringing cozy resting from 14 to 16 areas.
+  - Added `trail-blue-meadow` (`butterfly_blue`, size 18) and `trail-pink-stream`
+    (`butterfly_pink`, size 19) closed Catmull-Rom butterflies to
+    `content/areas/trail.json`.
+- Evidence: `tests/unit/milestone-119.test.ts` (5 tests), real-key e2e coverage
+  in `tests/e2e/accessibility.spec.ts` and `tests/e2e/immersion.spec.ts`, and
+  `art/review/m119-trail-butterflies.jpg` verified with `vision`.
+- Gates: `just check` (178 unit files / 1,355 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4391 just e2e --update-snapshots` (1,132 passed, 2
+  skipped, 0 failed across Chromium & WebKit; only the 4 `trail` butterfly
+  baselines updated: `trail-arrival-874`, `trail-bridge`, `bunny-following-874`,
+  and `squirrel-flute-1280`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

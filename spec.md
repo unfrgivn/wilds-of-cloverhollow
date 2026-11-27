@@ -476,8 +476,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `plazaStarGlow` in `plaza` when `buster_reward`: 8 pastel-gold `#FFE89A` and
   sky-blue `#B8E8FF` fountain mist sparkles; `passHearthWisps` in `pass` when
   `sanctuary_gift`: 6 cream-gold `#FFF5DF` chimney smoke curls above Mrs.
-  Flurry's Ski Lodge roof, all respecting `reducedMotion` by holding still
-  across ticks), and an `emissive`
+  Flurry's Ski Lodge roof; all biomes and story-reactive accents respect
+  `reducedMotion` by holding positions and pulses steady across ticks,
+  Milestone 119), and an `emissive`
   light layer mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly
   during lantern dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp
   arches, lodge hearth, and café counter glows, plus cool subterranean edge
@@ -585,7 +586,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   jumps, snappy hops, and forward lean on roaming critters (`roamerHop`). In
   live play (advancing 1..5 ticks per render in the same non-harness area), each
   Fae half-stride spawns two surface-tinted gouache `puff` particles
-  (`surfaceAt` in `footstepLayer`) behind her feet.
+  (`surfaceAt` in `footstepLayer`) behind her feet; when Reduced Motion is
+  active (`isReducedMotionActive()`), `updateFootsteps` clears active puffs and
+  returns early so walking stays calm and particle-free (Milestone 119).
 - Hand-painted overworld emote bubbles (`src/render/emotes.ts`, Milestone 85,
   render-only, skipped on `harness`, dialogue, battles, and arcades): pure
   deterministic `evaluateOverworldEmotes` drives a pooled `emoteLayer` with
@@ -1369,13 +1372,14 @@ ios/            Capacitor iOS project (from Milestone 4).
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
     chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
-    across 14 areas (`plaza`, `park`, `bay`, `cafe`, `lodge`, `clubhouse`,
-    `sue-cottage`, `jordan-cabin`, `sanctuary`, `bedroom`, `pass`, `woods`,
-    `hills`, `enchanted`), settling into a cozy seated-rest pose with a warm
-    harp chord and lazily drifting `emoteNote` (`♪`) until any movement,
-    cancel, menu, or confirm input stands her back up.
+    across 16 areas (`plaza`, `park`, `bay`, `cafe`, `lodge`, `clubhouse`,
+    `sue-cottage`, `jordan-cabin`, `sanctuary`, `bedroom`, `kitchen`, `pass`,
+    `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
+    pose with a warm harp chord and lazily drifting `emoteNote` (`♪`) until any
+    movement, cancel, menu, or confirm input stands her back up.
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),
     `atmosphereParticles` (active `BiomeAtmosphere` particle count),
+    `footstepPuffs` (active footstep gouache puff count),
     `petting` (currently petted companion id or `null`), and `resting` (active
     rest spot id or `null`).
   - Living Valley Townspeople Milestone Reactions (Milestone 108,
@@ -1523,8 +1527,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   drawn height in world units. Animations are names in
   `public/assets/ambient/ambient.json` (`butterfly_pink`, `butterfly_blue`,
   `fairy_light`). Across the valley, butterflies and fireflies drift in
-  `enchanted`, `sanctuary`, `cavern`, `park`, `hills`, `field`, `woods`,
-  `mist`, and `plaza`. Flyers follow a closed uniform Catmull-Rom spline
+  `enchanted`, `sanctuary`, `cavern`, `park`, `hills`, `field`, `trail`,
+  `woods`, `mist`, and `plaza`. Flyers follow a closed uniform Catmull-Rom spline
   through `path` at constant chord-parameter speed with a small render-only
   bob, cycle across their animation's full frame count at `frameTicks`, and
   mirror from the smooth spline tangent while travelling left. They draw above
@@ -3642,6 +3646,17 @@ trunks keep its two exits.
   never overlaps the bottom-right `✓`/`×` buttons, auto-hiding after 1800 ms,
   respecting reduced motion, and hidden during photo, battle, journal, title,
   and credits overlays).
+- Tab/iOS background lifecycle and `pagehide` flush (`src/shell/lifecycle.ts`,
+  Milestone 119): `shouldFreezeLiveLoop` pauses live fixed-timestep ticking,
+  drops elapsed accumulator time, and avoids background WebGL redraws while
+  `document.hidden` during unpaused play (or while an area loads) without
+  affecting paused harness stepping. On `visibilitychange` when hidden, the
+  shell clears held keys (`Keyboard.clearAll()`), gamepad taps, and touch
+  arrows, resets the accumulator, and (along with `pagehide`) flushes a quiet
+  autosave without showing the save toast whenever `shouldFlushSaveOnHide`
+  confirms eligible unsaved live overworld progress (never in QA mode, title,
+  harness, finale/credits, or mid-battle/arcade). On returning visible, the
+  ticker clock resets cleanly and queues a fresh draw.
 - Boot: a valid save resumes the game; otherwise a new game starts.
 - QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
   packs are separate files in the dev/harness-only save library; movement,

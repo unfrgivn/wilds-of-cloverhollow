@@ -721,6 +721,10 @@ export class GameView {
   }
 
   private updateFootsteps(state: State, areaId: string, playerPos: Point): void {
+    if (isReducedMotionActive()) {
+      this.clearFootsteps();
+      return;
+    }
     const active = areaId !== "harness" &&
       state.battle === null &&
       state.arcade === null &&
@@ -1708,6 +1712,7 @@ export class GameView {
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     clubhouseDisplay: number;
     atmosphereParticles: number;
+    footstepPuffs: number;
     petting: string | null;
     resting: string | null;
     timeOfDay: TimeOfDayPhase;
@@ -1766,6 +1771,7 @@ export class GameView {
       marks: this.noticeMarks(state),
       clubhouseDisplay: this.clubhouseDisplayCount,
       atmosphereParticles: this.atmosphere.activeCount,
+      footstepPuffs: this.footstepPuffs.length,
       petting: this.activePetReaction(state)?.id ?? null,
       resting: this.activeRestSpot(state)?.spot.id ?? null,
       timeOfDay: storyTimeOfDay(this.world, state).phase,

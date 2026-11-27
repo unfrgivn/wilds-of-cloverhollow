@@ -4,6 +4,60 @@
   "width": 1750,
   "height": 1100,
   "ground": "trail",
+  "ambient": [
+    {
+      "id": "trail-blue-meadow",
+      "animation": "butterfly_blue",
+      "path": [
+        [
+          640,
+          440
+        ],
+        [
+          880,
+          410
+        ],
+        [
+          935,
+          560
+        ],
+        [
+          690,
+          590
+        ]
+      ],
+      "loopTicks": 460,
+      "phase": 200,
+      "frameTicks": 10,
+      "size": 18
+    },
+    {
+      "id": "trail-pink-stream",
+      "animation": "butterfly_pink",
+      "path": [
+        [
+          1180,
+          675
+        ],
+        [
+          1425,
+          650
+        ],
+        [
+          1480,
+          745
+        ],
+        [
+          1230,
+          770
+        ]
+      ],
+      "loopTicks": 500,
+      "phase": 455,
+      "frameTicks": 9,
+      "size": 19
+    }
+  ],
   "interactables": [
     {
       "id": "trail-signpost",

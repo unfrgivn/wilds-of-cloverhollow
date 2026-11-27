@@ -5,6 +5,7 @@ import {
   openMap,
   readBattle,
   readState,
+  renderInfo,
   resetPaused,
   step,
 } from "./helpers";
@@ -288,5 +289,37 @@ test(
     await expect
       .poll(() => page.evaluate(() => document.documentElement.dataset.reducedMotion))
       .toBe("off");
+  },
+);
+
+test(
+  "Reduced Motion clears active footstep puffs and suppresses new puffs while walking",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openHarness(page);
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
+    await resetPaused(page, "plaza");
+
+    // Normal walking in live-frame strides spawns footstep puffs behind Fae.
+    await page.keyboard.down("ArrowDown");
+    for (let i = 0; i < 10; i += 1) await step(page, 2);
+    await page.keyboard.up("ArrowDown");
+    expect((await renderInfo(page)).footstepPuffs).toBeGreaterThan(0);
+
+    // Enabling Reduced Motion clears active puffs immediately and keeps walking particle-free.
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(true));
+    await step(page, 1);
+    expect((await renderInfo(page)).footstepPuffs).toBe(0);
+
+    const before = (await readState(page)).player.y;
+    await page.keyboard.down("ArrowDown");
+    for (let i = 0; i < 10; i += 1) await step(page, 2);
+    await page.keyboard.up("ArrowDown");
+    const after = (await readState(page)).player.y;
+    expect(after).toBeGreaterThan(before);
+    expect((await renderInfo(page)).footstepPuffs).toBe(0);
+
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
   },
 );

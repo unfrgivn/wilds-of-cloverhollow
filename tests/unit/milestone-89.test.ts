@@ -262,7 +262,7 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
     ).toBeNull();
   });
 
-  it("resolves curated rest spots across all 14 areas and yields to interactables and pets", () => {
+  it("resolves curated rest spots across all 16 areas and yields to interactables and pets", () => {
     const areaDirections: Record<string, Direction> = {
       plaza: "down",
       park: "down",
@@ -278,6 +278,8 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
       woods: "down",
       hills: "down",
       enchanted: "down",
+      kitchen: "down",
+      trail: "up",
     };
 
     for (const spot of REST_SPOTS) {

@@ -63,10 +63,13 @@ export class Keyboard {
       if (GAME_KEYS.has(event.code)) event.preventDefault();
     });
     window.addEventListener("keyup", (event) => this.held.delete(event.code));
-    window.addEventListener("blur", () => {
-      this.held.clear();
-      this.tapped.clear();
-    });
+    window.addEventListener("blur", () => this.clearAll());
+  }
+
+  /** Releases all held keys and pending taps (used on blur or tab hide). */
+  clearAll(): void {
+    this.held.clear();
+    this.tapped.clear();
   }
 
   /** Forgets taps that have not been sampled yet (used when the game resets). */

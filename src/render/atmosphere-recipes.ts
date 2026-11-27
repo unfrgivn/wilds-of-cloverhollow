@@ -232,15 +232,17 @@ function addFloatingMotes(
 /**
  * Pure deterministic biome atmosphere particle evaluator for any area and tick.
  * Zero Math.random(), zero core state. Returns [] for `harness`.
+ * Holds particle positions and pulses steady across ticks under `reducedMotion`.
  */
 export function evaluateAtmosphere(
   areaId: string,
   width: number,
   height: number,
-  tick: number,
+  rawTick: number,
   options?: AtmosphereOptions,
 ): AtmosphereParticle[] {
   if (areaId === "harness") return [];
+  const tick = options?.reducedMotion === true ? 0 : rawTick;
   const out: AtmosphereParticle[] = [];
   const seed = areaSeed(areaId);
 

@@ -1,5 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openHarness, readHash, readState, resetPaused, step, walk } from "./helpers";
+import {
+  openHarness,
+  readHash,
+  readState,
+  renderInfo,
+  resetPaused,
+  step,
+  walk,
+} from "./helpers";
 
 async function hold(page: Page, key: string, ticks: number): Promise<void> {
   await page.keyboard.down(key);
@@ -192,5 +200,39 @@ test(
     // Auto-hides cleanly after its 1800 ms window.
     await expect(toast).toBeHidden({ timeout: 4000 });
     await page.evaluate(() => window.__cloverhollow?.save.clear());
+  },
+);
+
+test(
+  "Coastal Trail renders both ambient butterflies and supports stream-overlook cozy resting",
+  { tag: "@smoke" },
+  async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openHarness(page);
+    await resetPaused(page, "trail");
+
+    const arrivalInfo = await renderInfo(page);
+    expect(arrivalInfo.ambient.map((item) => item.id).sort()).toEqual([
+      "trail-blue-meadow",
+      "trail-pink-stream",
+    ]);
+
+    // Walk with real keys to the south downstream overlook and sit with Z.
+    await walk(page, "x", 1420);
+    await walk(page, "y", 735);
+    await page.keyboard.press("z");
+    await step(page, 10);
+    expect((await renderInfo(page)).resting).toBe("trail-stream-overlook");
+
+    if (process.env.CLOVERHOLLOW_REVIEW_SHOTS === "1" && testInfo.project.name === "chromium") {
+      await page.screenshot({
+        path: "art/review/m119-trail-butterflies.jpg",
+        type: "jpeg",
+        quality: 90,
+      });
+    }
+
+    await hold(page, "ArrowDown", 4);
+    expect((await renderInfo(page)).resting).toBeNull();
   },
 );

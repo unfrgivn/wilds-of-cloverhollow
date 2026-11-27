@@ -91,6 +91,7 @@ import {
   type PostcardCapture,
 } from "./ui/postcard";
 import { qaFlow } from "./shell/qa-flow";
+import { shouldFlushSaveOnHide, shouldFreezeLiveLoop } from "./shell/lifecycle";
 import type { PackState } from "./dev/qa";
 
 const content = loadContent();
@@ -337,6 +338,7 @@ async function boot(): Promise<void> {
       jukeboxTrack = null;
       void Preferences.remove({ key: saveKey });
       saveLast = null;
+      saveDirty = false;
     }
   };
   title.onChoose((id) =>
@@ -355,17 +357,21 @@ async function boot(): Promise<void> {
       ? null
       : { tick: restored.tick, hash: stableHash(restored) };
   let saveLast: { tick: number; hash: string } | null = saveLoaded;
+  let saveDirty = false;
   let suppressSave = false;
   let saveQueue = Promise.resolve();
   // True while the harness drives ticks synthetically (the hook's `step`): a
   // replay crossing a dozen doors must load and warm only the area it ends in
   // (spec 11), not every room it passes through.
   let harnessStepping = false;
-  const saveState = (snapshot: State): Promise<void> => {
+  const saveState = (snapshot: State, options?: { silent?: boolean }): Promise<void> => {
     if (suppressSave || qaBlocked || qaActivePack !== null) return Promise.resolve();
     const serialized = serializeSave(snapshot);
     const hash = stableHash(snapshot);
+    if (snapshot === state) saveDirty = false;
     const liveSave =
+      !(options?.silent ?? false) &&
+      !document.hidden &&
       !paused &&
       !harnessStepping &&
       qaActivePack === null &&
@@ -380,6 +386,7 @@ async function boot(): Promise<void> {
       saveLast = { tick: snapshot.tick, hash };
       if (
         liveSave &&
+        !document.hidden &&
         !paused &&
         !harnessStepping &&
         qaActivePack === null &&
@@ -396,10 +403,31 @@ async function boot(): Promise<void> {
     return saveQueue;
   };
   const save = (): Promise<void> => saveState(state);
+  const flushSaveOnHide = (): void => {
+    if (
+      shouldFlushSaveOnHide({
+        qaActive: qaActivePack !== null || qaBlocked || qaMenuOpen || qaConsoleOpen,
+        titleOpen: titleMode !== null,
+        area: state.area,
+        inFinale: state.finale !== null,
+        inBattle: state.battle !== null,
+        inArcade: state.arcade !== null,
+        autosaveNeeded:
+          saveDirty &&
+          !paused &&
+          !harnessStepping &&
+          !suppressSave &&
+          state.transition === null,
+      })
+    ) {
+      void saveState(state, { silent: true });
+    }
+  };
   const pickQa = (item: PackState): void => {
     const loaded = parseWorldSave(item.save);
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
     state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
+    saveDirty = false;
     clearAreaBanner();
     saveToast.hide();
     titleMode = null;
@@ -1044,6 +1072,7 @@ async function boot(): Promise<void> {
       textSpeed: gameSettings.textSpeed(),
     });
     state = stepped.state;
+    if (!paused && !harnessStepping && state.tick !== previous.tick) saveDirty = true;
     previousState = state.area === previous.area ? previous : state;
     if (previous.area !== state.area) fishStreak = 0;
     const nextArcade = state.arcade;
@@ -1378,7 +1407,13 @@ async function boot(): Promise<void> {
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
-    if (areaLoad !== undefined) {
+    if (
+      shouldFreezeLiveLoop({
+        documentHidden: document.hidden,
+        paused,
+        areaLoading: areaLoad !== undefined,
+      })
+    ) {
       accumulator = 0;
     } else if (!paused) {
       const drained = drainTicks(accumulator, 1000 / 60, 5);
@@ -1392,7 +1427,7 @@ async function boot(): Promise<void> {
         }
       }
     }
-    if (!paused || areaLoad !== undefined || drawPending) {
+    if ((!paused && !document.hidden) || areaLoad !== undefined || drawPending) {
       drawPending = false;
       const alpha = paused || areaLoad !== undefined
         ? 1
@@ -1400,6 +1435,22 @@ async function boot(): Promise<void> {
       render(alpha);
       app.render();
     }
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      keyboard.clearAll();
+      gamepad.clearTaps();
+      touch.releaseArrows();
+      accumulator = 0;
+      flushSaveOnHide();
+    } else {
+      last = performance.now();
+      accumulator = 0;
+      invalidate();
+    }
+  });
+  window.addEventListener("pagehide", () => {
+    flushSaveOnHide();
   });
   render();
   // Photo / showcase mode (spec 4): P hides overworld chrome for unobstructed
@@ -1513,6 +1564,7 @@ async function boot(): Promise<void> {
             ).join(", ")}`,
           );
         suppressSave = true;
+        saveDirty = false;
         state = createState(content.world, fixture, options.seed);
         previousState = state;
         clearAreaBanner();
@@ -1549,6 +1601,7 @@ async function boot(): Promise<void> {
           await saveQueue;
           await Preferences.remove({ key: saveKey });
           saveLast = null;
+          saveDirty = false;
         },
         last: () => saveLast,
         loaded: () => qaActivePack === null && !qaBlocked ? saveLoaded : null,

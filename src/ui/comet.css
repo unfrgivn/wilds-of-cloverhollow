@@ -30,6 +30,9 @@
 .comet-machine {
   position: relative;
   flex: none;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: none;
 }
 .comet-paint {
   position: absolute;
@@ -147,7 +150,8 @@ body:not(.gallery-body) .comet-rocket[data-frame="rocket-wobble"] {
   font-weight: 900;
   line-height: 1.1;
   text-align: center;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 .comet-key.is-left {
   transform: translate(-100%, -50%);

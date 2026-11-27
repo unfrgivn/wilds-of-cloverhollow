@@ -5684,6 +5684,43 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4471 just e2e` (1,150 passed, 2 skipped, 0 failed,
   zero snapshot diffs across Chromium & WebKit in 5.6 min).
 
+## Milestone 128: Complete Mouse & Touch Pointer Play for Claw Machine, Comet Cruise, Toy Catch (`catch`) & Wind-Gust Lean (`lean`) **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 67 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Directional Pointer Helpers (`src/ui/pointer-hold.ts`):
+  - Exports pure `isDirectionalCheckKind` (`true` for `catch` and `lean`),
+    `resolveCatchDirection(pointerY, laneTop, laneBottom, laneCount)` mapping
+    the pointer Y band onto the core's `laneFromStick` hold vector (`-1` high,
+    `0` middle, `1` low without oscillation), `resolveLeanDirection(pointerX,
+    trackCenterX)` (`-1` left of track centre, `1` at or right of centre),
+    `resolveCometLaneStep(pointerX, fieldLeft, fieldWidth, rocketLane)` (`-1`,
+    `0`, or `1` across Comet Cruise's three lanes), and sticky-proof
+    `bindPointerMoveHold(target, onDirection, resolve, canStart)` with
+    `refresh()` and idempotent `release()` to `{ x: 0, y: 0 }`.
+- Claw Machine & Comet Cruise Direct Pointer Play (`src/ui/claw.ts`,
+  `src/ui/claw.css`, `src/ui/comet.ts`, `src/ui/comet.css`, `src/ui/arcade.ts`,
+  `src/shell/assets.ts`, `src/main.ts`):
+  - Wires `onConfirmHold` through `createClaw`, `createComet`, `createArcade`,
+    and `createShellAssets`, plus `onLaneStep` (`touch.tapArrow`) for Comet
+    Cruise so clicking `.comet-key.is-left` / `.comet-key.is-right` or any
+    lane of `.comet-field` shifts the rocket cleanly during `playing`, while
+    `.arcade-machine` and `.comet-machine` keep their outer overlays at
+    `pointer-events: none`.
+- Battle `catch` & `lean` Direct Pointer Play (`src/ui/battle-checks.ts`,
+  `src/ui/battle.css`, `src/platform/touch.ts`, `src/main.ts`):
+  - Reuses the pre-mounted `.battle-check-tap` overlay for both confirm and
+    directional checks, binds `bindPointerMoveHold` alongside `bindPointerHold`
+    with automatic release on grade/hide, exposes `onDirectionHold`, and adds
+    `TouchInput.setPointerArrow` so stage directional holds never clobber
+    `.touch-reach` / `.touch-lean` arrow buttons.
+- Evidence: `tests/unit/milestone-128.test.ts` (6 tests) and real-mouse
+  `tests/e2e/milestone-128.spec.ts` (`@smoke`, 4 tests across Chromium & WebKit).
+- Gates: `just check` (187 unit files / 1,399 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4481 just e2e` (1,158 passed, 2 skipped, 0 failed,
+  zero snapshot diffs across Chromium & WebKit in 5.7 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

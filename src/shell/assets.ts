@@ -692,6 +692,7 @@ export type ShellAssetsOptions = {
   invalidate: () => void;
   onHole: (hole: MoleHole, down: boolean) => void;
   onConfirmHold?: (held: boolean) => void;
+  onLaneStep?: (delta: -1 | 1) => void;
 };
 
 export type ShellAssets = {
@@ -730,7 +731,7 @@ export type ShellAssets = {
  * composition and lifecycle.
  */
 export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
-  const { world, uiRoot, invalidate, onHole, onConfirmHold } = options;
+  const { world, uiRoot, invalidate, onHole, onConfirmHold, onLaneStep } = options;
 
   const loadMapCentres = async (): Promise<Record<string, Point>> => {
     const mapFile = "assets/ui/map/world-map.json";
@@ -882,7 +883,13 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
       domAtlas(world.arcade.atlas),
       painting("assets/arcade/claw-machine.json", parseClawCalibration),
     ]).then(([, clawPainting]) => {
-      clawOverlay = createClaw(uiRoot, prizeArt, clawPainting.calibration, clawPainting.image);
+      clawOverlay = createClaw(
+        uiRoot,
+        prizeArt,
+        clawPainting.calibration,
+        clawPainting.image,
+        onConfirmHold,
+      );
     });
     return clawLoad;
   };
@@ -939,6 +946,8 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
         (frameName) => atlasFrame(COMET_ATLAS, frameName),
         cometPainting.calibration,
         cometPainting.image,
+        onConfirmHold,
+        onLaneStep,
       );
     });
     return cometLoad;

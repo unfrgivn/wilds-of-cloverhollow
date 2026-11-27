@@ -28,6 +28,9 @@ export class TouchInput {
   // lean's back or forward, a Boop-a-Mole hole), as a step along one axis;
   // the stick is hidden in battle and in the arcade, so the two never fight.
   private arrow: Point = { x: 0, y: 0 };
+  // A stage-pointer directional hold (direct mouse/touch play on catch/lean),
+  // tracked separately so releasing it never clobbers a held touch arrow sticker.
+  private pointerArrow: Point = { x: 0, y: 0 };
   // An arrow tapped since the last sample: like a tapped button, it counts
   // for the next frame even if let go before it.
   private arrowTap: Point | undefined;
@@ -38,7 +41,8 @@ export class TouchInput {
 
   frame(): ActionFrame {
     const arrowHeld = this.arrow.x !== 0 || this.arrow.y !== 0;
-    const arrow = arrowHeld ? this.arrow : this.arrowTap;
+    const pointerHeld = this.pointerArrow.x !== 0 || this.pointerArrow.y !== 0;
+    const arrow = arrowHeld ? this.arrow : pointerHeld ? this.pointerArrow : this.arrowTap;
     return {
       ...blankInput(),
       move: this.stickId === undefined && arrow !== undefined ? arrow : this.move,
@@ -133,10 +137,18 @@ export class TouchInput {
       this.arrow = { x: 0, y: 0 };
   }
 
+  /** Holds or clears a stage-pointer directional vector without clobbering touch arrows. */
+  setPointerArrow(direction: Point | null): void {
+    this.pointerArrow = direction === null
+      ? { x: 0, y: 0 }
+      : { x: Math.sign(direction.x), y: Math.sign(direction.y) };
+  }
+
   /** Lets go of every arrow, taps included, as the shell does outside a catch, a lean,
    * or a round of Boop-a-Mole or Comet Cruise. */
   releaseArrows(): void {
     this.arrow = { x: 0, y: 0 };
+    this.pointerArrow = { x: 0, y: 0 };
     this.arrowTap = undefined;
   }
 }

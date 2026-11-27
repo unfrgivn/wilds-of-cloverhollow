@@ -44,14 +44,22 @@ export function createArcade(
     art: (frame: string) => AtlasImage | null;
   },
   onConfirmHold: (held: boolean) => void = () => undefined,
+  onLaneStep: (delta: -1 | 1) => void = () => undefined,
 ): {
   render: (view: ArcadeView | null, record?: ArcadeRecordBadge | null) => void;
   info: () => ArcadeInfo | null;
 } {
-  const clawUp = createClaw(root, prizeArt, claw.calibration, claw.image);
+  const clawUp = createClaw(root, prizeArt, claw.calibration, claw.image, onConfirmHold);
   const skeeUp = createSkee(root, skee.calibration, skee.image, onConfirmHold);
   const moleUp = createMole(root, mole.art, mole.calibration, mole.image, mole.onHole);
-  const cometUp = createComet(root, comet.art, comet.calibration, comet.image);
+  const cometUp = createComet(
+    root,
+    comet.art,
+    comet.calibration,
+    comet.image,
+    onConfirmHold,
+    onLaneStep,
+  );
   const cookUp = createCook(root, cook.art, cook.calibration, cook.image, onConfirmHold);
   const fishUp = createFish(root, fish.art, fish.calibration, fish.image, onConfirmHold);
   return {

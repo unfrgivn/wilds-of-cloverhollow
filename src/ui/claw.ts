@@ -4,6 +4,7 @@ import { clawLook, layoutClaw, type ClawLayout, type Line } from "./claw-layout"
 import {
   element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
 } from "./dom";
+import { bindPointerHold } from "./pointer-hold";
 import type { ClawCalibration, ClawView } from "../core";
 
 function drawLine(node: SVGLineElement, line: Line): void {
@@ -54,10 +55,16 @@ export function createClaw(
   art: (frame: string) => AtlasImage | null,
   calibration: ClawCalibration,
   cabinet: string,
+  onConfirmHold: (held: boolean) => void = () => undefined,
 ): { render: (view: ClawView | null) => void; info: () => ClawInfo | null } {
   const overlay = element("section", "arcade-overlay", root);
   overlay.setAttribute("aria-label", "Claw machine");
   overlay.hidden = true;
+  const pointerHold = bindPointerHold(
+    overlay,
+    (held) => onConfirmHold(held),
+    () => !overlay.hidden,
+  );
   const machine = element("div", "arcade-machine", overlay);
   machine.style.backgroundImage = `url("${cabinet}")`;
   const scene = element("div", "arcade-scene", machine);
@@ -189,6 +196,7 @@ export function createClaw(
       overlay.hidden = view === null;
       lastView = view;
       if (view === null) {
+        pointerHold.release();
         lastKey = "";
         return;
       }

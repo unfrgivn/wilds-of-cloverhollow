@@ -831,9 +831,10 @@
   pointer-events: none;
   transform: translate(-50%, -50%);
 }
-/* Full-stage direct click/hold target for ring, charge, chain, and peekaboo
-   battle checks (Milestone 127): sits below touch controls (z-index 10) and
-   all battle HUD/echo buttons so phone controls are never obstructed. */
+/* Full-stage direct click/hold target for confirm (`ring`, `charge`, `chain`,
+   `peekaboo`) and directional (`catch`, `lean`) battle checks (Milestones
+   127–128): sits below touch controls (z-index 10) and all battle HUD/echo
+   buttons so phone controls are never obstructed. */
 .battle-check-tap {
   position: fixed;
   inset: 0;

@@ -2710,14 +2710,21 @@ trunks keep its two exits.
   clicking or tapping the reward sticker or arcade prize card emits a `confirm`
   tap). For confirm-driven checks (`ring`, `charge`, `chain`, `peekaboo`,
   classified by `isConfirmCheckKind` in `src/ui/pointer-hold.ts`, Milestone
-  127), `createBattleCheck` pre-mounts a transparent full-stage
-  `.battle-check-tap` (`z-index: 9`, below `.touch-controls` at `10`,
-  `.battle-hud`, and `.battle-echo`, hidden whenever inactive or graded) bound
-  via `bindPointerHold` and wired through `onConfirmHold` to `confirm` press
-  and hold (with `:root[data-battle="open"] .touch-controls` at
-  `pointer-events: none` and `.touch-button` keeping `pointer-events: auto` so
-  phone controls stay unobstructed while direct taps reach the stage). The game
-  passes a full view to
+  127) and directional checks (`catch`, `lean`, classified by
+  `isDirectionalCheckKind`, Milestone 128), `createBattleCheck` pre-mounts a
+  transparent full-stage `.battle-check-tap` (`z-index: 9`, below
+  `.touch-controls` at `10`, `.battle-hud`, and `.battle-echo`, hidden whenever
+  inactive or graded). Confirm checks bind via `bindPointerHold` and wire
+  through `onConfirmHold` to `confirm` press and hold; directional checks bind
+  via `bindPointerMoveHold` (`resolveCatchDirection` across the three lane
+  heights, `resolveLeanDirection` around `track.x`) and wire through
+  `onDirectionHold` to `TouchInput.setPointerArrow` (kept separate from touch
+  arrow stickers so `.touch-reach` and `.touch-lean` stay unobstructed while
+  direct taps/drags reach the stage; with `:root[data-battle="open"]
+  .touch-controls` at `pointer-events: none` and `.touch-button` keeping
+  `pointer-events: auto`). Combined with `trace` (direct pointer drawing) and
+  `echo` (clickable chime stickers), all 8 battle timing checks support direct
+  mouse and touch pointer play. The game passes a full view to
   each `render` every frame; identical views change no DOM nodes. Battle
   messages use the dialogue box with no speaker.
 - One stacking scale (`--z-*` in sticker.css), bottom to top: HUD, dialogue,
@@ -3383,16 +3390,24 @@ trunks keep its two exits.
   `! BITE !` sticker, and 2-column Catch Reveal card. Its gallery states
   (`src/dev/fish-gallery.ts`) are `arcade-fish-aim`, `arcade-fish-reeling`, and
   `arcade-fish-catch`.
-- Direct mouse & touch pointer play for confirm-driven minigames (Milestone
-  127): `createFish`, `createCook`, `createSkee`, `createArcade`, and
-  `createShellAssets` accept an optional `onConfirmHold?: (held: boolean) => void`
-  callback bound to `.fish-overlay`, `.cook-overlay`, and `.skee-overlay` via
-  the shared sticky-proof `bindPointerHold` helper (`src/ui/pointer-hold.ts`),
-  releasing automatically when hidden (`view === null`), on pointer end / lost
-  capture, or on window blur. Only the visible close-up stage (`.fish-stage`,
-  `.cook-machine`, `.skee-frame`) enables `pointer-events: auto; cursor: pointer;
-  touch-action: none;` so `.touch-controls` buttons outside the close-up remain
-  unobstructed and gallery baselines stay pixel-identical.
+- Direct mouse & touch pointer play across all 6 minigames (Milestones 127 and
+  128): `createClaw`, `createFish`, `createCook`, `createSkee`, `createComet`,
+  `createArcade`, and `createShellAssets` accept an optional
+  `onConfirmHold?: (held: boolean) => void` callback bound via the shared
+  sticky-proof `bindPointerHold` helper (`src/ui/pointer-hold.ts`), releasing
+  automatically when hidden (`view === null`), on pointer end / lost capture,
+  or on window blur. `createComet`, `createArcade`, and `createShellAssets`
+  also accept an optional `onLaneStep?: (delta: -1 | 1) => void` callback
+  wired to `touch.tapArrow({ x: delta, y: 0 })`: during `playing`, clicking or
+  tapping `.comet-key.is-left` / `.comet-key.is-right` or the three horizontal
+  lanes of `.comet-field` (`resolveCometLaneStep`) steps the rocket one lane
+  toward the target, while pressing `.comet-machine` in `ready` or `result`
+  emits confirm through `bindPointerHold`. Only the visible close-up stage
+  (`.arcade-machine`, `.comet-machine` + `.comet-key`, `.fish-stage`,
+  `.cook-machine`, `.skee-frame`, alongside Boop-a-Mole's clickable holes)
+  enables `pointer-events: auto; cursor: pointer; touch-action: none;` so
+  `.touch-controls` buttons outside each close-up remain unobstructed and
+  gallery baselines stay pixel-identical.
 - Minigame & UI micro-animation polish (Milestone 73, all CSS transitions and
   keyframes guarded by `@media (prefers-reduced-motion: reduce)`): Claw Machine
   tug wiggle and sliding/returning pendulum tilt; Skee-Ball contact shadow

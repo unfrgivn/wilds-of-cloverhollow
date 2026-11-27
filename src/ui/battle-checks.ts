@@ -1,7 +1,14 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
-import { bindPointerHold, isConfirmCheckKind } from "./pointer-hold";
-import type { ChainLook, EchoNote, PeekabooStatus } from "../core";
+import {
+  bindPointerHold,
+  bindPointerMoveHold,
+  isConfirmCheckKind,
+  isDirectionalCheckKind,
+  resolveCatchDirection,
+  resolveLeanDirection,
+} from "./pointer-hold";
+import type { ChainLook, EchoNote, PeekabooStatus, Point } from "../core";
 
 export type TimingGrade = "great" | "good" | "miss";
 
@@ -169,10 +176,14 @@ export function createBattleCheck(root: HTMLElement): {
   render: (view: BattleCheckView | null) => void;
   onEchoNote: (callback: (note: EchoNote) => void) => void;
   onConfirmHold: (callback: (held: boolean) => void) => void;
+  onDirectionHold: (callback: (dir: Point) => void) => void;
 } {
   let echoNoteHandler: (note: EchoNote) => void = () => undefined;
   let confirmHoldHandler: (held: boolean) => void = () => undefined;
+  let directionHoldHandler: (dir: Point) => void = () => undefined;
+  let activeView: BattleCheckView | null = null;
   let confirmActive = false;
+  let directionalActive = false;
   const ring = svgElement("svg", "battle-ring");
   ring.setAttribute("aria-hidden", "true");
   const rim = svgElement("circle", "battle-ring-rim");
@@ -229,10 +240,30 @@ export function createBattleCheck(root: HTMLElement): {
   const tapStage = element("div", "battle-check-tap");
   tapStage.setAttribute("aria-hidden", "true");
   tapStage.hidden = true;
-  const pointerHold = bindPointerHold(
+  const confirmHold = bindPointerHold(
     tapStage,
     (held) => confirmHoldHandler(held),
     () => confirmActive,
+  );
+  const dirHold = bindPointerMoveHold(
+    tapStage,
+    (dir) => directionHoldHandler(dir),
+    (clientX, clientY) => {
+      if (activeView === null) return { x: 0, y: 0 };
+      if (activeView.kind === "catch") {
+        return resolveCatchDirection(
+          clientY,
+          activeView.lanes[0],
+          activeView.lanes[2],
+          activeView.lanes.length,
+        );
+      }
+      if (activeView.kind === "lean") {
+        return resolveLeanDirection(clientX, activeView.track.x);
+      }
+      return { x: 0, y: 0 };
+    },
+    () => directionalActive,
   );
   // Echo chime board: note progress dots, phase pill, timer bar, and four
   // directional chime stickers.
@@ -297,10 +328,18 @@ export function createBattleCheck(root: HTMLElement): {
     onConfirmHold: (callback) => {
       confirmHoldHandler = callback;
     },
+    onDirectionHold: (callback) => {
+      directionHoldHandler = callback;
+    },
     render: (view) => {
+      activeView = view;
       confirmActive = view !== null && isConfirmCheckKind(view.kind) && view.grade === null;
-      tapStage.hidden = !confirmActive;
-      if (!confirmActive) pointerHold.release();
+      directionalActive =
+        view !== null && isDirectionalCheckKind(view.kind) && view.grade === null;
+      tapStage.hidden = !confirmActive && !directionalActive;
+      if (!confirmActive) confirmHold.release();
+      if (!directionalActive) dirHold.release();
+      else dirHold.refresh();
       hide(ring, view?.kind !== "ring");
       hide(meter, view?.kind !== "charge");
       hide(chain, view?.kind !== "chain");

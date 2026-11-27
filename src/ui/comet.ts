@@ -8,6 +8,7 @@ import {
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cometFrame, layoutComet, type CometLayout, type Rect } from "./comet-layout";
+import { bindPointerHold, resolveCometLaneStep } from "./pointer-hold";
 import type { CometCalibration, CometView } from "../core";
 
 // The close-up as drawn (spec 11, renderInfo().arcade), in CSS px.
@@ -46,6 +47,8 @@ export function createComet(
   art: (frame: string) => AtlasImage | null,
   calibration: CometCalibration,
   image: string,
+  onConfirmHold: (held: boolean) => void = () => undefined,
+  onLaneStep: (delta: -1 | 1) => void = () => undefined,
 ): {
   render: (view: CometView | null, record?: ArcadeRecordBadge | null) => void;
   info: () => CometInfo | null;
@@ -101,6 +104,38 @@ export function createComet(
   let lastLayout: CometLayout | null = null;
   let lastRecord: ArcadeRecordBadge | null = null;
   let prevCaught: number | null = null;
+  const confirmHold = bindPointerHold(
+    machine,
+    (held) => onConfirmHold(held),
+    () => !overlay.hidden && (lastView?.phase === "ready" || lastView?.phase === "result"),
+  );
+  const [leftKey, rightKey] = keys;
+  machine.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (overlay.hidden || lastView === null || lastView.phase !== "playing") return;
+    if (
+      event.target instanceof Element &&
+      event.target.closest("button, a, input, textarea") !== null
+    ) {
+      return;
+    }
+    if (event.target instanceof Node && leftKey !== undefined && leftKey.contains(event.target)) {
+      event.preventDefault();
+      onLaneStep(-1);
+      return;
+    }
+    if (event.target instanceof Node && rightKey !== undefined && rightKey.contains(event.target)) {
+      event.preventDefault();
+      onLaneStep(1);
+      return;
+    }
+    const rect = field.getBoundingClientRect();
+    const step = resolveCometLaneStep(event.clientX, rect.left, rect.width, lastView.rocket.lane);
+    if (step !== 0) {
+      event.preventDefault();
+      onLaneStep(step);
+    }
+  });
   const frames = new Map<string, AtlasImage | null>();
   const spriteFrame = new WeakMap<HTMLDivElement, string>();
   const frameArt = (name: string): AtlasImage | null => {
@@ -204,12 +239,14 @@ export function createComet(
       lastView = view;
       lastRecord = record;
       if (view === null) {
+        confirmHold.release();
         lastKey = "";
         prevCaught = null;
         popups.clear();
         bestBadge.hidden = true;
         return;
       }
+      if (view.phase !== "ready" && view.phase !== "result") confirmHold.release();
       const popupSpec = classifyCometPopup(prevCaught, view.caught);
       prevCaught = view.caught;
       if (view.phase === "result") popups.clear();

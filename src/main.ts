@@ -160,6 +160,9 @@ async function boot(): Promise<void> {
     if (held) touch.tapButton("confirm");
   };
   battleCheck.onConfirmHold(handleConfirmHold);
+  battleCheck.onDirectionHold((dir) => {
+    touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir);
+  });
   const echoArrows: readonly Point[] = [
     { x: 0, y: -1 },
     { x: 1, y: 0 },
@@ -469,6 +472,7 @@ async function boot(): Promise<void> {
     invalidate,
     onHole: createMoleHoleHandler(touch),
     onConfirmHold: handleConfirmHold,
+    onLaneStep: (delta) => touch.tapArrow({ x: delta, y: 0 }),
   });
   const partyCommands: Record<string, string | null> = Object.fromEntries(
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),

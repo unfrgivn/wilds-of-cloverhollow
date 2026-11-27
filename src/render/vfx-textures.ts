@@ -23,7 +23,9 @@ export type VfxTextureKey =
   | "keepsakeGeode"
   | "keepsakeFeather"
   | "keepsakeTaco"
-  | "keepsakeWreath";
+  | "keepsakeWreath"
+  | "keepsakeCompass"
+  | "keepsakeClover";
 
 export type VfxTextures = Record<VfxTextureKey, Texture> & {
   destroy: () => void;
@@ -1021,6 +1023,197 @@ function buildKeepsakeWreath(): Texture {
   return toTexture(canvas);
 }
 
+// 48x48 hand-inked Sea-Glass Compass keepsake (seafoam aqua glass dial, warm
+// brass bezel + hanging bail, and coral/gold compass needle pointing toward the bay).
+function buildKeepsakeCompass(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  const halo = ctx.createRadialGradient(24, 25, 4, 24, 25, 22);
+  halo.addColorStop(0, "rgba(122, 226, 216, 0.42)");
+  halo.addColorStop(1, "rgba(122, 226, 216, 0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, 48, 48);
+
+  // Top brass bail loop.
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 4.4;
+  ctx.beginPath();
+  ctx.arc(24, 8.5, 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = "#F0C762";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(24, 8.5, 4, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Warm brass compass case.
+  const rim = ctx.createRadialGradient(20, 20, 3, 24, 26, 16);
+  rim.addColorStop(0, "#FFF1B5");
+  rim.addColorStop(0.65, "#F0C762");
+  rim.addColorStop(1, "#D69D3A");
+  ctx.fillStyle = rim;
+  ctx.beginPath();
+  ctx.arc(24, 26, 15.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.lineWidth = 2.4;
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+
+  // Frosted seafoam-aqua sea-glass face.
+  const dial = ctx.createRadialGradient(20, 21, 1.5, 24, 26, 12);
+  dial.addColorStop(0, "#E4FFF9");
+  dial.addColorStop(0.55, "#9BECE2");
+  dial.addColorStop(1, "#69D4C8");
+  ctx.fillStyle = dial;
+  ctx.beginPath();
+  ctx.arc(24, 26, 11.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+
+  // Four cardinal pips (N/E/S/W).
+  ctx.fillStyle = "#47321F";
+  for (const [px, py] of [[24, 17.2], [32.8, 26], [24, 34.8], [15.2, 26]] as const) {
+    ctx.beginPath();
+    ctx.arc(px, py, 1.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Coral + butter-gold compass needle pointing toward Bubblegum Bay.
+  ctx.fillStyle = "#E87594";
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(31.4, 18.6);
+  ctx.lineTo(25.8, 27.8);
+  ctx.lineTo(22.2, 24.2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#FCE488";
+  ctx.beginPath();
+  ctx.moveTo(16.6, 33.4);
+  ctx.lineTo(22.2, 24.2);
+  ctx.lineTo(25.8, 27.8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Brass center pivot pin + soft sea-glass gleam arc.
+  ctx.fillStyle = "#FFF5CC";
+  ctx.beginPath();
+  ctx.arc(24, 26, 2.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.82)";
+  ctx.lineWidth = 2.1;
+  ctx.beginPath();
+  ctx.arc(24, 26, 9.2, Math.PI * 1.15, Math.PI * 1.44);
+  ctx.stroke();
+
+  return toTexture(canvas);
+}
+
+// 48x48 hand-inked Pressed Alpine Clover keepsake (warm ivory botany card with
+// pastel tape corners holding a vivid sage-green four-leaf alpine clover).
+function buildKeepsakeClover(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  const halo = ctx.createRadialGradient(24, 24, 4, 24, 24, 22);
+  halo.addColorStop(0, "rgba(162, 206, 143, 0.4)");
+  halo.addColorStop(1, "rgba(162, 206, 143, 0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, 48, 48);
+
+  // Warm ivory pressed-botany specimen card.
+  const card = ctx.createLinearGradient(9, 6, 39, 42);
+  card.addColorStop(0, "#FFFDF5");
+  card.addColorStop(1, "#F4E7C8");
+  ctx.fillStyle = card;
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 2.3;
+  ctx.beginPath();
+  ctx.roundRect(9, 6, 30, 36, 4.5);
+  ctx.fill();
+  ctx.stroke();
+
+  // Delicate inner botanical border.
+  ctx.save();
+  ctx.setLineDash([2.4, 2.2]);
+  ctx.strokeStyle = "#C8AE82";
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.roundRect(12.5, 9.5, 23, 29, 2.5);
+  ctx.stroke();
+  ctx.restore();
+
+  // Gentle curved clover stem.
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(24, 23);
+  ctx.quadraticCurveTo(23.5, 31, 27, 36.2);
+  ctx.stroke();
+
+  // Four vivid sage-green alpine clover leaflets.
+  const leafAngles = [-Math.PI / 2, 0, Math.PI / 2, Math.PI];
+  leafAngles.forEach((angle, idx) => {
+    ctx.save();
+    ctx.translate(24, 22.5);
+    ctx.rotate(angle);
+    const fill = ctx.createRadialGradient(5, 0, 1, 6, 0, 8);
+    fill.addColorStop(0, idx % 2 === 0 ? "#B7ECA6" : "#A2DF96");
+    fill.addColorStop(1, idx % 2 === 0 ? "#6EB874" : "#5CA765");
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = "#47321F";
+    ctx.lineWidth = 1.7;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(6.5, -4.5, 11, -2.5, 9, 0);
+    ctx.bezierCurveTo(11, 2.5, 6.5, 4.5, 0, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Soft golden-green leaf heart center.
+  ctx.fillStyle = "#D9F7BE";
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.arc(24, 22.5, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Pastel lavender masking-tape corners holding the pressed card.
+  const drawTape = (pts: readonly [number, number][]): void => {
+    ctx.beginPath();
+    pts.forEach(([tx, ty], i) => {
+      if (i === 0) ctx.moveTo(tx, ty);
+      else ctx.lineTo(tx, ty);
+    });
+    ctx.closePath();
+    ctx.fillStyle = "#E8D6F5";
+    ctx.fill();
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = "#47321F";
+    ctx.stroke();
+  };
+  drawTape([[10.5, 8.5], [17, 6.5], [15.5, 11], [9, 13]]);
+  drawTape([[32.5, 37], [39, 35], [37.5, 39.5], [31, 41.5]]);
+
+  return toTexture(canvas);
+}
+
 export function createVfxTextures(): VfxTextures {
   const textures: Record<VfxTextureKey, Texture> = {
     contactShadow: buildContactShadow(),
@@ -1046,6 +1239,8 @@ export function createVfxTextures(): VfxTextures {
     keepsakeFeather: buildKeepsakeFeather(),
     keepsakeTaco: buildKeepsakeTaco(),
     keepsakeWreath: buildKeepsakeWreath(),
+    keepsakeCompass: buildKeepsakeCompass(),
+    keepsakeClover: buildKeepsakeClover(),
   };
   return {
     ...textures,

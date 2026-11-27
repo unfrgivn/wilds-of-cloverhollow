@@ -164,6 +164,34 @@ describe("QA console commands", () => {
     expect(runConsoleCommand(context, start, "wrench on").kind).toBe("error");
   });
 
+  it("keepsakes on|off toggles all six story-variable quest keepsakes", () => {
+    const start = base();
+    const on = runConsoleCommand(context, start, "keepsakes on");
+    if (on.kind !== "applied") throw new Error("expected an applied outcome");
+    for (const name of [
+      "cavern_chime_rung",
+      "spice_returned",
+      "gem_reward_all",
+      "sanctuary_reward_14",
+      "sue_compass",
+      "jordan_clover",
+    ]) {
+      expect(variable(on.state, name), name).toBe(true);
+    }
+    const off = runConsoleCommand(context, on.state, "keepsakes off");
+    if (off.kind !== "applied") throw new Error("expected an applied outcome");
+    for (const name of [
+      "cavern_chime_rung",
+      "spice_returned",
+      "gem_reward_all",
+      "sanctuary_reward_14",
+      "sue_compass",
+      "jordan_clover",
+    ]) {
+      expect(variable(off.state, name), name).toBe(false);
+    }
+  });
+
   it("save names a QA slot and export asks for the save file", () => {
     const start = base();
     const saved = runConsoleCommand(context, start, "save evening");

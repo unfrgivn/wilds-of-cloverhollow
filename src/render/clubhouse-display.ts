@@ -16,7 +16,9 @@ export type ClubhouseKeepsakeKey =
   | "keepsakeGeode"
   | "keepsakeFeather"
   | "keepsakeTaco"
-  | "keepsakeWreath";
+  | "keepsakeWreath"
+  | "keepsakeCompass"
+  | "keepsakeClover";
 
 export type ClubhouseKeepsakePlacement = {
   id: string;
@@ -139,6 +141,30 @@ const KEEPSAKE_RULES: readonly KeepsakeRule[] = [
       sparkleTint: 0xa8e6cf,
     },
     unlocked: (world, state) => world.storyVariable(state.ink, "sanctuary_reward_14") === true,
+  },
+  {
+    placement: {
+      id: "sea-compass",
+      texture: "keepsakeCompass",
+      x: 782,
+      y: 348,
+      zIndex: 414,
+      scale: 0.72,
+      sparkleTint: 0x7ae2d8,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "sue_compass") === true,
+  },
+  {
+    placement: {
+      id: "alpine-clover",
+      texture: "keepsakeClover",
+      x: 516,
+      y: 308,
+      zIndex: 320,
+      scale: 0.74,
+      sparkleTint: 0xa2ce8f,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "jordan_clover") === true,
   },
 ];
 

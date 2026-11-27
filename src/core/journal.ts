@@ -22,7 +22,9 @@ export type KeepsakeId =
   | "star-geode"
   | "moon-feather"
   | "taco-badge"
-  | "clover-wreath";
+  | "clover-wreath"
+  | "sea-compass"
+  | "alpine-clover";
 export type JournalKeepsake = {
   id: KeepsakeId;
   name: string;
@@ -233,7 +235,7 @@ export function carriedTreats(
   });
 }
 
-/** All six quest keepsakes in canonical display order with ownership state. */
+/** All eight quest keepsakes in canonical display order with ownership state. */
 export function journalKeepsakes(
   world: Pick<World, "storyVariable">,
   state: Pick<State, "ink" | "stickers">,
@@ -275,6 +277,18 @@ export function journalKeepsakes(
       name: "Sanctuary Clover Wreath",
       source: "Wildlife Sanctuary",
       owned: flag("sanctuary_reward_14"),
+    },
+    {
+      id: "sea-compass",
+      name: "Sea-Glass Compass",
+      source: "Sue's Beach Cottage",
+      owned: flag("sue_compass"),
+    },
+    {
+      id: "alpine-clover",
+      name: "Pressed Alpine Clover",
+      source: "Jordan's Mountain Cabin",
+      owned: flag("jordan_clover"),
     },
   ];
 }

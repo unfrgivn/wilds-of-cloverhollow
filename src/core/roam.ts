@@ -10,6 +10,7 @@ import type {
 } from "./types";
 import { nextNotice, noticed } from "./encounter";
 import { distance, resolveCollision, resolveMove } from "./geometry";
+import type { InkFacts } from "./ink";
 import { sceneryArea } from "./props";
 import { nextRandom } from "./random";
 
@@ -30,6 +31,21 @@ export function calmedCritters(world: World, state: State): Record<string, boole
       }
     }
   return calmed;
+}
+
+// What the story's externals answer from (spec 7, 8): coins() from Fae's
+// purse, and calmed(name) for a species once she owns its sticker (she has
+// calmed one of them, anywhere) and for a set piece by its own mood.
+export function inkFacts(world: World, state: State): InkFacts {
+  return {
+    calmed: calmedCritters(world, state),
+    coins: state.coins,
+    snacks: state.snacks,
+    prizes: state.prizes,
+    tickets: state.tickets,
+    plushesLeft: world.arcade.claw.heap.filter((plush) => !state.prizes.includes(plush.prize))
+      .length,
+  };
 }
 
 /*

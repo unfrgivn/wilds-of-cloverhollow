@@ -4363,7 +4363,6 @@ the old trail, the owl, and the clubhouse claim.
   (1,062/1,066 passed with zero diffs on first run + 4/4 WebKit 1–11 px WebP
   subpixel baselines refreshed via `--last-failed --update-snapshots`).
 
-<<<<<<< HEAD
 ## Milestone 92: The Wildlife Sanctuary (Living Calm-Critter Meadow & Ranger Fern) **Status:** ✅ Completed (2026-11-26)
 - New sunlit alpine **Wildlife Sanctuary** meadow (`NOTES.md: 59`,
   `content/areas/sanctuary.json`, `land: "hills"`, 1650x1100), branching east
@@ -4457,7 +4456,6 @@ the old trail, the owl, and the clubhouse claim.
   deprecation warnings; production and harness hook checks green), and full e2e
   verified across Chromium & WebKit.
 
-<<<<<<< HEAD
 ## Milestone 94: Other Kids' Houses (Sue's Beach Cottage & Jordan's Mountain Cabin) **Status:** ✅ Completed (2026-11-27)
 - Two brand-new hand-painted enterable friend homes (`NOTES.md: 34`), with zero
   edits to core sim, renderer, UI, audio, or character/sticker/treat registries
@@ -4527,6 +4525,51 @@ the old trail, the owl, and the clubhouse claim.
   replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
   deprecation warnings; production and harness hook checks green), and full e2e
   verified across Chromium & WebKit.
+
+## Milestone 96: Complete 8-Keepsake Showcase, Friend-Home & Sanctuary Resting Spots, Journal Scroll Polish & `src/core/battle.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Complete 8-Keepsake Showcase (`src/core/journal.ts`, `src/ui/icons.ts`,
+  `src/render/vfx-textures.ts`, `src/render/clubhouse-display.ts`,
+  `src/dev/console.ts`, `src/ui/journal.css`):
+  - Extended `KeepsakeId` and `journalKeepsakes` with `sea-compass`
+    (`"Sea-Glass Compass"`, `sue_compass`, Sue's Beach Cottage) and
+    `alpine-clover` (`"Pressed Alpine Clover"`, `jordan_clover`, Jordan's
+    Mountain Cabin), bringing the Journal & MAP collection totals to 8/8.
+  - Added hand-inked 48×48 inline SVG charms in `keepsakeIcon` (zero `<text>`
+    nodes) and matching 48×48 watercolor `keepsakeCompass` & `keepsakeClover`
+    textures in `src/render/vfx-textures.ts`.
+  - Mounted `sea-compass` on the Clubhouse crate front-right corner `(782, 348)`
+    and `alpine-clover` beside the Sanctuary Clover Wreath `(516, 308)`, bringing
+    the full Living Clubhouse display to 21 items (13 prizes + 8 keepsakes), and
+    extended QA console `keepsakes on|off` to toggle all 6 story-variable keepsakes.
+  - Added `scroll-margin-top: 8px; padding-top: 8px;` on `.journal-fish-heading`
+    and `.journal-keepsakes-heading` so count/ribbon pill borders never clip
+    against the top scroll edge.
+- Cozy resting spots in Friend Homes & Wildlife Sanctuary (`src/render/companions.ts`):
+  - Added `sue-cottage-rug` `(582, 560)` on Sue's woven cottage rug,
+    `jordan-cabin-rug` `(552, 584)` on Jordan's fireside cabin rug, and
+    `sanctuary-blanket` `(890, 915)` on the sunlit Wildlife Sanctuary picnic
+    blanket (expanding cozy resting across all 9 areas), and adjusted
+    `plaza-ne-bench` to `(1095, 640)` clear of `bench-southeast`'s footprint so
+    every rest spot sits strictly inside walkable floor and outside all blockers.
+- Pure core battle engine extraction (`src/core/battle.ts`, `src/core/roam.ts`,
+  `src/core/sim.ts`, `src/core/index.ts`):
+  - Extracted the turn-based calm-down battle engine (`battleCommands`,
+    `battleView`, `startBattle`, `stepBattle`, `CALM_HOOK`, treat helpers, and
+    all battle-private helpers) into pure, acyclic `src/core/battle.ts`, moving
+    `inkFacts` beside `calmedCritters` in `src/core/roam.ts` and re-exporting
+    every symbol identically from `src/core/sim.ts` and `src/core/index.ts`
+    (reducing `src/core/sim.ts` from 2,085 to 838 lines with zero save-format or
+    replay-hash changes across all 67 recorded sims).
+- Evidence: `tests/unit/milestone-96.test.ts` (5 tests), updated unit & e2e suites
+  (`milestone-89`, `milestone-95`, `qa-console`, `clubhouse-petting`,
+  `journal-collections`), and review captures
+  `art/review/m96-journal-8-keepsakes.jpg` and
+  `art/review/m96-clubhouse-21-items.jpg` verified with `vision`.
+- Gates: `just check` (157 unit files / 1,230 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4301 just e2e` (1,072 passed, 2 skipped, 0 failed in
+  4.4 min).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

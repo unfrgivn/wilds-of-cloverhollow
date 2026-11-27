@@ -167,9 +167,46 @@ const keepsakeMarkup: Record<KeepsakeId, string> = {
     '<ellipse cx="27.8" cy="36" rx="3.4" ry="2.2" transform="rotate(18 27.8 36)" ' +
     'fill="#e8849f" stroke="#47321f" stroke-width="1.6"/>' +
     '<circle cx="24" cy="36" r="2" fill="#fff3c4" stroke="#47321f" stroke-width="1.4"/>',
+  "sea-compass":
+    '<circle cx="24" cy="8.5" r="4" fill="none" stroke="#47321f" stroke-width="4.4"/>' +
+    '<circle cx="24" cy="8.5" r="4" fill="none" stroke="#f0c762" stroke-width="2"/>' +
+    '<circle cx="24" cy="26" r="15.5" fill="#f0c762" stroke="#47321f" stroke-width="2.4"/>' +
+    '<circle cx="24" cy="26" r="11.6" fill="#89e5db" stroke="#47321f" stroke-width="1.8"/>' +
+    '<circle cx="24" cy="26" r="8.8" fill="#c9fbf5" opacity="0.62"/>' +
+    '<circle cx="24" cy="17.2" r="1.3" fill="#47321f"/>' +
+    '<circle cx="32.8" cy="26" r="1.3" fill="#47321f"/>' +
+    '<circle cx="24" cy="34.8" r="1.3" fill="#47321f"/>' +
+    '<circle cx="15.2" cy="26" r="1.3" fill="#47321f"/>' +
+    '<polygon points="31.4,18.6 25.8,27.8 22.2,24.2" fill="#e87594" stroke="#47321f" ' +
+    'stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<polygon points="16.6,33.4 22.2,24.2 25.8,27.8" fill="#fce488" stroke="#47321f" ' +
+    'stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<circle cx="24" cy="26" r="2.3" fill="#fff5cc" stroke="#47321f" stroke-width="1.5"/>' +
+    '<path d="M16.4 20.4 A9.4 9.4 0 0 1 22.2 16.4" fill="none" stroke="#ffffff" ' +
+    'stroke-width="2.1" stroke-linecap="round" opacity="0.82"/>',
+  "alpine-clover":
+    '<rect x="9" y="6" width="30" height="36" rx="4.5" fill="#fbf3dc" stroke="#47321f" ' +
+    'stroke-width="2.3" stroke-linejoin="round"/>' +
+    '<rect x="12.5" y="9.5" width="23" height="29" rx="2.5" fill="none" stroke="#c8ae82" ' +
+    'stroke-width="1.3" stroke-dasharray="2.4 2.2"/>' +
+    '<path d="M24 23 Q23.5 31 27 36.2" fill="none" stroke="#47321f" stroke-width="2.2" ' +
+    'stroke-linecap="round"/>' +
+    '<path d="M24 22.5 C20 15.5 21.5 11.5 24 13.5 C26.5 11.5 28 15.5 24 22.5 Z" ' +
+    'fill="#86cf84" stroke="#47321f" stroke-width="1.7" stroke-linejoin="round"/>' +
+    '<path d="M24 22.5 C31 18.5 35 20 33 22.5 C35 25 31 26.5 24 22.5 Z" ' +
+    'fill="#72bf74" stroke="#47321f" stroke-width="1.7" stroke-linejoin="round"/>' +
+    '<path d="M24 22.5 C28 29.5 26.5 33.5 24 31.5 C21.5 33.5 20 29.5 24 22.5 Z" ' +
+    'fill="#86cf84" stroke="#47321f" stroke-width="1.7" stroke-linejoin="round"/>' +
+    '<path d="M24 22.5 C17 26.5 13 25 15 22.5 C13 20 17 18.5 24 22.5 Z" ' +
+    'fill="#72bf74" stroke="#47321f" stroke-width="1.7" stroke-linejoin="round"/>' +
+    '<circle cx="24" cy="22.5" r="1.8" fill="#d9f7be" stroke="#47321f" stroke-width="1.2"/>' +
+    '<polygon points="10.5,8.5 17,6.5 15.5,11 9,13" fill="#e8d6f5" stroke="#47321f" ' +
+    'stroke-width="1.2" stroke-linejoin="round"/>' +
+    '<polygon points="32.5,37 39,35 37.5,39.5 31,41.5" fill="#e8d6f5" stroke="#47321f" ' +
+    'stroke-width="1.2" stroke-linejoin="round"/>',
 };
 
-/** Hand-crafted inline SVG icon for each of Fae's six quest keepsakes. */
+/** Hand-crafted inline SVG icon for each of Fae's eight quest keepsakes. */
 export function keepsakeIcon(id: KeepsakeId): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", "journal-keepsake-icon die-cut");

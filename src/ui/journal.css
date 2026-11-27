@@ -332,7 +332,8 @@
   flex-wrap: wrap;
   gap: 7px;
   margin: 8px 0 3px;
-  padding-top: 6px;
+  padding-top: 8px;
+  scroll-margin-top: 8px;
 }
 .journal-section-count {
   display: inline-flex;

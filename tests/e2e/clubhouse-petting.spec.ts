@@ -22,7 +22,7 @@ async function runQaCommands(page: Page, commands: readonly string[]): Promise<v
 }
 
 test(
-  "clubhouse renders all 13 prizes and 6 keepsakes, pets Maddie cleanly, and rests on beanbag",
+  "clubhouse renders all 13 prizes and 8 keepsakes, pets Maddie cleanly, and rests on beanbag",
   { tag: "@smoke" },
   async ({ page }, testInfo) => {
     const errors: string[] = [];
@@ -33,13 +33,13 @@ test(
 
     const displayInfo = await renderInfo(page);
     expect(displayInfo.area).toBe("clubhouse");
-    expect(displayInfo.clubhouseDisplay).toBeGreaterThanOrEqual(19);
+    expect(displayInfo.clubhouseDisplay).toBeGreaterThanOrEqual(21);
     expect(
       displayInfo.drawOrder.filter((item) => item.label.startsWith("clubhouse:prize:")),
     ).toHaveLength(13);
     expect(
       displayInfo.drawOrder.filter((item) => item.label.startsWith("clubhouse:keepsake:")),
-    ).toHaveLength(6);
+    ).toHaveLength(8);
 
     // Clean framing at both desktop (1280x720) and phone landscape (874x402).
     const canvas = page.locator("canvas");
@@ -47,7 +47,7 @@ test(
     await expect.poll(async () => (await canvas.boundingBox())?.height).toBe(720);
     if (process.env.CLOVERHOLLOW_REVIEW_SHOTS === "1" && testInfo.project.name === "chromium") {
       await page.screenshot({
-        path: "art/review/m89-clubhouse-full.jpg",
+        path: "art/review/m96-clubhouse-21-items.jpg",
         type: "jpeg",
         quality: 90,
       });
@@ -57,7 +57,7 @@ test(
     await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(874);
     await expect.poll(async () => (await canvas.boundingBox())?.height).toBe(402);
     await step(page, 1);
-    expect((await renderInfo(page)).clubhouseDisplay).toBeGreaterThanOrEqual(19);
+    expect((await renderInfo(page)).clubhouseDisplay).toBeGreaterThanOrEqual(21);
 
     await page.setViewportSize({ width: 1280, height: 720 });
     await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(1280);

@@ -41,6 +41,8 @@ const keepsakeVariables: readonly string[] = [
   "spice_returned",
   "gem_reward_all",
   "sanctuary_reward_14",
+  "sue_compass",
+  "jordan_clover",
 ];
 
 // The supplies' caps are the layouts the journal and the battle menu were

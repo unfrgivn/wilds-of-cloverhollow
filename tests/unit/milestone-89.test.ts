@@ -118,7 +118,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
     }
   });
 
-  it("activates all 6 shimmering quest keepsakes when their story or sticker flags hold", () => {
+  it("activates all 8 shimmering quest keepsakes when their story or sticker flags hold", () => {
     const empty = stateIn("clubhouse");
     expect(evaluateClubhouseDisplay(world, empty).keepsakes).toEqual([]);
 
@@ -130,6 +130,8 @@ describe("Milestone 89: Living Clubhouse display", () => {
         spice_returned: true,
         gem_reward_all: true,
         sanctuary_reward_14: true,
+        sue_compass: true,
+        jordan_clover: true,
       },
     );
     const display = evaluateClubhouseDisplay(world, full);
@@ -141,6 +143,8 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "moon-feather",
       "taco-badge",
       "clover-wreath",
+      "sea-compass",
+      "alpine-clover",
     ]);
     expect(display.keepsakes.map((item) => item.texture)).toEqual([
       "keepsakeCrystal",
@@ -149,6 +153,8 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "keepsakeFeather",
       "keepsakeTaco",
       "keepsakeWreath",
+      "keepsakeCompass",
+      "keepsakeClover",
     ]);
   });
 
@@ -253,7 +259,7 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
     ).toBeNull();
   });
 
-  it("resolves curated rest spots across all 6 areas and yields to interactables and pets", () => {
+  it("resolves curated rest spots across all 9 areas and yields to interactables and pets", () => {
     const areaDirections: Record<string, Direction> = {
       plaza: "down",
       park: "down",
@@ -261,6 +267,9 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
       cafe: "right",
       lodge: "down",
       clubhouse: "right",
+      "sue-cottage": "down",
+      "jordan-cabin": "down",
+      sanctuary: "up",
     };
 
     for (const spot of REST_SPOTS) {
@@ -323,7 +332,9 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
     expect(world.storyVariable(on.state.ink, "spice_returned")).toBe(true);
     expect(world.storyVariable(on.state.ink, "gem_reward_all")).toBe(true);
     expect(world.storyVariable(on.state.ink, "sanctuary_reward_14")).toBe(true);
-    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(4);
+    expect(world.storyVariable(on.state.ink, "sue_compass")).toBe(true);
+    expect(world.storyVariable(on.state.ink, "jordan_clover")).toBe(true);
+    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(6);
 
     const off = runConsoleCommand(context, on.state, "keepsakes off");
     expect(off.kind).toBe("applied");

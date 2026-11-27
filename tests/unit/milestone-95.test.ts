@@ -45,7 +45,7 @@ function pointInPolygon(point: Point, polygon: Polygon): boolean {
 }
 
 describe("Milestone 95: Complete Journal Collection Showcase", () => {
-  it("journalKeepsakes returns all 6 keepsakes in canonical order and tracks each unlock", () => {
+  it("journalKeepsakes returns all 8 keepsakes in canonical order and tracks each unlock", () => {
     const empty = stateIn("plaza");
     const initial = journalKeepsakes(world, empty);
     expect(initial).toEqual([
@@ -58,6 +58,18 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
         id: "clover-wreath",
         name: "Sanctuary Clover Wreath",
         source: "Wildlife Sanctuary",
+        owned: false,
+      },
+      {
+        id: "sea-compass",
+        name: "Sea-Glass Compass",
+        source: "Sue's Beach Cottage",
+        owned: false,
+      },
+      {
+        id: "alpine-clover",
+        name: "Pressed Alpine Clover",
+        source: "Jordan's Mountain Cabin",
         owned: false,
       },
     ]);
@@ -73,6 +85,8 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
       { id: "moon-feather", overrides: { stickers: ["starry-owl"] } },
       { id: "taco-badge", overrides: { stickers: ["taco-chef"] } },
       { id: "clover-wreath", variables: { sanctuary_reward_14: true } },
+      { id: "sea-compass", variables: { sue_compass: true } },
+      { id: "alpine-clover", variables: { jordan_clover: true } },
     ];
     for (const check of checks) {
       const state = stateIn("plaza", check.overrides, check.variables);
@@ -116,7 +130,7 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
       stickers: { owned: 0, total: world.stickers.catalogue.length },
       prizes: { owned: 0, total: world.arcade.prizes.length },
       fish: { owned: 0, total: 6 },
-      keepsakes: { owned: 0, total: 6 },
+      keepsakes: { owned: 0, total: 8 },
       gems: { owned: 0, total: 7 },
     });
 
@@ -137,18 +151,20 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
         spice_returned: true,
         gem_reward_all: true,
         sanctuary_reward_14: true,
+        sue_compass: true,
+        jordan_clover: true,
       },
     );
     expect(journalProgress(world, full)).toEqual({
       stickers: { owned: allStickers.length, total: allStickers.length },
       prizes: { owned: allPrizes.length, total: allPrizes.length },
       fish: { owned: 6, total: 6 },
-      keepsakes: { owned: 6, total: 6 },
+      keepsakes: { owned: 8, total: 8 },
       gems: { owned: 7, total: 7 },
     });
   });
 
-  it("Clubhouse display places all 6 keepsakes (19 total) strictly outside walkable floor", () => {
+  it("Clubhouse display places all 8 keepsakes (21 total) strictly outside walkable floor", () => {
     const allPrizes = world.arcade.prizes.map((entry) => entry.id);
     const full = stateIn(
       "clubhouse",
@@ -158,12 +174,14 @@ describe("Milestone 95: Complete Journal Collection Showcase", () => {
         spice_returned: true,
         gem_reward_all: true,
         sanctuary_reward_14: true,
+        sue_compass: true,
+        jordan_clover: true,
       },
     );
     const display = evaluateClubhouseDisplay(world, full);
     expect(display.prizes).toHaveLength(13);
-    expect(display.keepsakes).toHaveLength(6);
-    expect(display.prizes.length + display.keepsakes.length).toBe(19);
+    expect(display.keepsakes).toHaveLength(8);
+    expect(display.prizes.length + display.keepsakes.length).toBe(21);
 
     const wreath = display.keepsakes.find((item) => item.id === "clover-wreath");
     expect(wreath).toEqual({

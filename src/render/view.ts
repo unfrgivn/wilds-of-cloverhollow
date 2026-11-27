@@ -40,10 +40,12 @@ import {
   type NpcFrameInfo,
   type PartyFrameInfo,
 } from "./entity-layer";
+import { NpcLifeController, type NpcLifeRenderInfo } from "./npc-life";
 import {
   CLUBHOUSE_PRIZES_ALIAS,
   OverworldEffectsController,
 } from "./overworld-effects";
+import type { NpcChatterView } from "../ui/npc-chatter";
 import {
   areaEntityAtlases,
   computeGlowTransform,
@@ -76,6 +78,7 @@ export class GameView {
   private readonly atmosphere: BiomeAtmosphere;
   private readonly effects: OverworldEffectsController;
   private readonly entities: OverworldEntityLayer;
+  private readonly npcLife: NpcLifeController;
   private readonly background = new Graphics();
   private readonly paper = new Graphics();
   private readonly fade = new Graphics();
@@ -153,6 +156,7 @@ export class GameView {
       ambientLayer: this.ambientLayer,
       emissiveLayer: this.emissiveLayer,
     });
+    this.npcLife = new NpcLifeController(this.world, this.vfx);
 
     this.lanternSpotlight = new Sprite(this.vfx.softGlow);
     this.lanternSpotlight.label = "lantern:spotlight";
@@ -196,6 +200,7 @@ export class GameView {
       this.depth,
       this.ambientLayer,
       this.atmosphere.over,
+      this.npcLife.reactionLayer,
       this.effects.emoteLayer,
       this.paperGrain,
     );
@@ -268,6 +273,7 @@ export class GameView {
     this.effects.clearFootsteps();
     this.effects.clearStarGemGlints();
     this.effects.clearEmotes();
+    this.npcLife.clear();
     this.clearCompanionActions();
     this.effects.hideClubhouseDisplay();
   }
@@ -371,10 +377,15 @@ export class GameView {
     return { spot: this.restingSpot.spot, elapsed };
   }
 
+  observeNpcTick(state: State): void {
+    this.npcLife.observeTick(state);
+  }
+
   resetCamera(): void {
     this.previousCamera = undefined;
     this.effects.clearFootsteps();
     this.effects.clearEmotes();
+    this.npcLife.clear();
     this.clearCompanionActions();
   }
 
@@ -510,7 +521,9 @@ export class GameView {
       livingMotion,
       reducedMotion,
     );
-    this.entities.renderNpcs(state, shadowAlpha, livingMotion);
+    const npcLife = this.npcLife.update(state);
+    this.entities.renderNpcs(state, shadowAlpha, livingMotion, npcLife, this.npcLife);
+    this.npcLife.renderReactions(state, livingMotion);
     this.effects.renderClubhouseDisplay(state, area, reducedMotion);
     this.entities.renderAmbient(state, area, reducedMotion);
     this.effects.renderEmotes(
@@ -521,6 +534,7 @@ export class GameView {
       alpha,
       activePet,
       activeRest,
+      npcLife,
       reducedMotion,
     );
     this.effects.renderTimeOfDay(state, this.viewportRect);
@@ -702,6 +716,48 @@ export class GameView {
     };
   }
 
+  /** The active ambient NPC chatter bubble projected into CSS px, or null when hidden. */
+  npcChatterScreen(
+    state: State,
+    viewportWidth: number,
+    viewportHeight: number,
+    suppressNpcId: string | null,
+  ): NpcChatterView | null {
+    const chatter = this.npcLife.latest?.chatter ?? null;
+    if (
+      chatter === null ||
+      this.previousCamera === undefined ||
+      chatter.alpha <= 0.01 ||
+      chatter.npcId === suppressNpcId ||
+      state.battle !== null ||
+      state.arcade !== null ||
+      state.dialogue !== null ||
+      state.journalOpen ||
+      state.transition !== null ||
+      state.finale === "credits"
+    ) {
+      return null;
+    }
+    const point = worldToScreen(
+      { x: chatter.x, y: chatter.y - (chatter.adult ? 190 : 158) },
+      this.previousCamera,
+      this.viewWidth,
+      this.viewHeight,
+      viewportWidth,
+      viewportHeight,
+    );
+    return {
+      visible: true,
+      npcId: chatter.npcId,
+      speakerName: chatter.speakerName,
+      text: chatter.text,
+      tone: chatter.tone,
+      x: point.x,
+      y: point.y,
+      alpha: chatter.alpha,
+    };
+  }
+
   /**
    * The recurring critters' "?" and "!" (spec 8.1), each at the bottom
    * centre of where it hangs, just over the critter's head, in CSS px. None
@@ -764,6 +820,7 @@ export class GameView {
     };
     critters: CritterFrameInfo[];
     npcs: NpcFrameInfo[];
+    npcLife: NpcLifeRenderInfo;
     ambient: AmbientFrameInfo[];
     // Each canopy's alpha: below 1 while Fae is behind it.
     canopies: { id: string; alpha: number }[];
@@ -821,6 +878,7 @@ export class GameView {
       },
       critters: this.entities.critters,
       npcs: this.entities.npcs,
+      npcLife: this.npcLife.renderInfo(),
       ambient: this.entities.ambient,
       canopies: this.areaView?.canopyAlphas ?? [],
       props: this.areaView?.propInfo ?? [],

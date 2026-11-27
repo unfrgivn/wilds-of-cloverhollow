@@ -182,5 +182,65 @@
       "y": 751
     }
   ],
-  "blockers": []
+  "blockers": [],
+  "npcs": [
+    {
+      "id": "sammy",
+      "point": {
+        "x": 540,
+        "y": 680
+      },
+      "facing": "up",
+      "knot": "npc_sammy_arcade",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          525,
+          670
+        ],
+        [
+          555,
+          670
+        ],
+        [
+          555,
+          690
+        ],
+        [
+          525,
+          690
+        ]
+      ],
+      "visibleAfterCalm": "arcade-keeper"
+    },
+    {
+      "id": "poppy",
+      "point": {
+        "x": 680,
+        "y": 680
+      },
+      "facing": "up",
+      "knot": "npc_poppy",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          665,
+          670
+        ],
+        [
+          695,
+          670
+        ],
+        [
+          695,
+          690
+        ],
+        [
+          665,
+          690
+        ]
+      ],
+      "visibleAfterCalm": "arcade-keeper"
+    }
+  ]
 }

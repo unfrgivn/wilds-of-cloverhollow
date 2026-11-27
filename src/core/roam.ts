@@ -8,9 +8,12 @@ import type {
   Wild,
   World,
 } from "./types";
+import { totalTreatCount } from "./battle-view";
 import { nextNotice, noticed } from "./encounter";
 import { distance, resolveCollision, resolveMove } from "./geometry";
 import type { InkFacts } from "./ink";
+import { levelForXp } from "./levels";
+import { bossesCalmedCount } from "./party";
 import { sceneryArea } from "./props";
 import { nextRandom } from "./random";
 
@@ -37,6 +40,7 @@ export function calmedCritters(world: World, state: State): Record<string, boole
 // purse, and calmed(name) for a species once she owns its sticker (she has
 // calmed one of them, anywhere) and for a set piece by its own mood.
 export function inkFacts(world: World, state: State): InkFacts {
+  const areaCalm = presentCritters(world, state).every((critter) => critter.mood === "calm");
   return {
     calmed: calmedCritters(world, state),
     coins: state.coins,
@@ -45,6 +49,13 @@ export function inkFacts(world: World, state: State): InkFacts {
     tickets: state.tickets,
     plushesLeft: world.arcade.claw.heap.filter((plush) => !state.prizes.includes(plush.prize))
       .length,
+    party: state.party.map((member) => member.id),
+    lantern: state.lantern,
+    areaCalm,
+    level: levelForXp(world.levels, state.xp),
+    stickers: state.stickers.length,
+    treats: totalTreatCount(state.treats),
+    bossesCalmed: bossesCalmedCount(world, state),
   };
 }
 

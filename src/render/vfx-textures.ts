@@ -27,6 +27,9 @@ export type VfxTextureKey =
   | "emoteNote"
   | "emoteZzz"
   | "emoteHeart"
+  | "emoteSparkle"
+  | "emoteWave"
+  | "emoteWorry"
   | KeepsakeTextureKey;
 
 export const STAR_GEM_CHARM_SPEC = {
@@ -659,6 +662,117 @@ function buildEmoteHeart(): Texture {
   return toTexture(canvas);
 }
 
+// 48x48 warm lavender-gold cream bubble with hand-inked golden 4-point star + 2 tiny sparkles.
+function buildEmoteSparkle(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  drawComicBubble(ctx, "#FAF5FE", "#EFE6FA");
+  const drawStar = (cx: number, cy: number, r: number, waist: number): void => {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r);
+    ctx.quadraticCurveTo(cx + waist, cy - waist, cx + r, cy);
+    ctx.quadraticCurveTo(cx + waist, cy + waist, cx, cy + r);
+    ctx.quadraticCurveTo(cx - waist, cy + waist, cx - r, cy);
+    ctx.quadraticCurveTo(cx - waist, cy - waist, cx, cy - r);
+    ctx.closePath();
+  };
+  ctx.save();
+  drawStar(22.5, 22.8, 9.2, 2.5);
+  const starFill = ctx.createRadialGradient(21, 20.5, 1, 22.5, 22.8, 9.5);
+  starFill.addColorStop(0, "#FFF4B5");
+  starFill.addColorStop(0.55, "#F9D154");
+  starFill.addColorStop(1, "#E7AE32");
+  ctx.fillStyle = starFill;
+  ctx.fill();
+  ctx.lineWidth = 1.7;
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+  ctx.fillStyle = "#FBE07A";
+  ctx.lineWidth = 1.3;
+  drawStar(33.2, 15.2, 3.8, 1.1);
+  ctx.fill();
+  ctx.stroke();
+  drawStar(13.8, 29.2, 3.1, 0.9);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+  return toTexture(canvas);
+}
+
+// 48x48 warm peach-cream speech bubble with 3 cheerful hand-inked welcome wave arcs.
+function buildEmoteWave(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  drawComicBubble(ctx, "#FFF8EF", "#FBE9D4");
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#EE9A64";
+  ctx.lineWidth = 3.2;
+  ctx.beginPath();
+  ctx.moveTo(15.2, 26.8);
+  ctx.quadraticCurveTo(19, 21.4, 16.4, 15.4);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(23.5, 28.4);
+  ctx.quadraticCurveTo(25.2, 21.2, 23.5, 14.2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(31.8, 26.8);
+  ctx.quadraticCurveTo(28.4, 21.4, 31.2, 15.4);
+  ctx.stroke();
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 2.3;
+  ctx.beginPath();
+  ctx.moveTo(15.6, 26.5);
+  ctx.quadraticCurveTo(18.6, 21.4, 16.5, 15.6);
+  ctx.moveTo(23.8, 28.2);
+  ctx.quadraticCurveTo(25.2, 21.2, 23.8, 14.4);
+  ctx.moveTo(31.8, 26.5);
+  ctx.quadraticCurveTo(28.8, 21.4, 31.1, 15.6);
+  ctx.stroke();
+  ctx.restore();
+  return toTexture(canvas);
+}
+
+// 48x48 pale periwinkle-cream bubble with cozy blue-grey sweat-drop and startled squiggle.
+function buildEmoteWorry(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  drawComicBubble(ctx, "#F3F6FD", "#E4ECFA");
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(20.5, 13);
+  ctx.bezierCurveTo(25.8, 19.5, 27.2, 24.4, 25.4, 28.1);
+  ctx.bezierCurveTo(23.8, 31.2, 17.2, 31.2, 15.6, 28.1);
+  ctx.bezierCurveTo(13.8, 24.4, 15.2, 19.5, 20.5, 13);
+  ctx.closePath();
+  const dropFill = ctx.createRadialGradient(18.6, 21.5, 1, 20.5, 24, 9);
+  dropFill.addColorStop(0, "#CFE4FA");
+  dropFill.addColorStop(0.55, "#8AB3E2");
+  dropFill.addColorStop(1, "#6C95C8");
+  ctx.fillStyle = dropFill;
+  ctx.fill();
+  ctx.lineWidth = 1.9;
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#47321F";
+  ctx.stroke();
+  ctx.fillStyle = "rgba(255, 253, 248, 0.85)";
+  ctx.beginPath();
+  ctx.ellipse(18.3, 23.6, 1.5, 2.7, -0.25, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 2.1;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(29.8, 16.4);
+  ctx.lineTo(33.2, 19.2);
+  ctx.lineTo(29.8, 22.2);
+  ctx.lineTo(33.2, 25.2);
+  ctx.stroke();
+  ctx.restore();
+  return toTexture(canvas);
+}
+
 export function createVfxTextures(): VfxTextures {
   const textures: Record<VfxTextureKey, Texture> = {
     contactShadow: buildContactShadow(),
@@ -679,6 +793,9 @@ export function createVfxTextures(): VfxTextures {
     emoteNote: buildEmoteNote(),
     emoteZzz: buildEmoteZzz(),
     emoteHeart: buildEmoteHeart(),
+    emoteSparkle: buildEmoteSparkle(),
+    emoteWave: buildEmoteWave(),
+    emoteWorry: buildEmoteWorry(),
     ...createKeepsakeTextures(makeCanvas, toTexture),
   };
   return {

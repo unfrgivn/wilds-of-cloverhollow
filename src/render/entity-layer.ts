@@ -7,6 +7,7 @@ import {
   presentCritters,
   type Area,
   type Direction,
+  type NpcLifeSnapshot,
   type Point,
   type State,
   type World,
@@ -18,7 +19,8 @@ import type { Rect } from "./area-view";
 import { makeShadowSprite, placeAura } from "./battle-view";
 import { interpolatePoint } from "./camera";
 import type { RestSpot } from "./companions";
-import { idleBreathing, NEUTRAL_POSE } from "./motion";
+import { idleBreathing, NEUTRAL_POSE, npcLivingPose } from "./motion";
+import { isAdultNpc, type NpcLifeController } from "./npc-life";
 import {
   computeCritterShadow,
   computeFaePose,
@@ -433,7 +435,10 @@ export class OverworldEntityLayer {
     state: State,
     shadowAlpha: number,
     livingMotion: boolean,
+    npcLife: NpcLifeSnapshot,
+    lifeController: NpcLifeController,
   ): void {
+    const lifeById = new Map(npcLife.npcs.map((entry) => [entry.id, entry]));
     const frames: NpcFrameInfo[] = [];
     for (const [npcIndex, { npc, sprite, shadow }] of this.npcSprites.entries()) {
       sprite.visible = npcVisible(this.world, state, npc);
@@ -467,7 +472,13 @@ export class OverworldEntityLayer {
       const sheet = Assets.get<Spritesheet>(`${npc.id}-sheet`);
       const character = this.world.characters[npc.id];
       if (sheet === undefined || character === undefined) continue;
-      const facing = npcFacing(state, npc);
+      const entry = lifeById.get(npc.id);
+      const { facing, attentionAge, turnAge, areaTicks } = lifeController.stepPresentation(
+        npc,
+        entry,
+        state,
+        livingMotion,
+      );
       const { mirror, frameName: name } = resolveNpcTextureFrame(
         sheet.data.animations,
         facing,
@@ -480,13 +491,29 @@ export class OverworldEntityLayer {
       if (texture.defaultAnchor !== undefined)
         sprite.anchor.copyFrom(texture.defaultAnchor);
       const s = character.scale ?? 0.5;
-      const pose = computeNpcPose(npc.id, npcIndex, state.tick, livingMotion);
+      const pose = !livingMotion || npc.id === "bus-stop"
+        ? NEUTRAL_POSE
+        : npc.id.startsWith("fairy-")
+          ? computeNpcPose(npc.id, npcIndex, state.tick, livingMotion)
+          : entry !== undefined && (entry.attention !== "idle" || areaTicks >= 48)
+            ? npcLivingPose(
+                entry.personality,
+                entry.attention,
+                state.tick,
+                npcIndex,
+                attentionAge,
+                turnAge,
+              )
+            : computeNpcPose(npc.id, npcIndex, state.tick, livingMotion);
       sprite.scale.set((mirror ? -s : s) * pose.scaleX, s * pose.scaleY);
       sprite.position.set(npc.point.x + pose.offsetX, npc.point.y + pose.offsetY);
       sprite.rotation = pose.rotation;
       sprite.zIndex = npc.point.y;
       if (shadow !== null) {
-        applyShadow(shadow, computeNpcShadow(npc.id, npc.point, pose, shadowAlpha));
+        applyShadow(
+          shadow,
+          computeNpcShadow(npc.id, npc.point, pose, shadowAlpha, isAdultNpc(this.world, npc.id)),
+        );
       }
       frames.push({ id: npc.id, frame: name, facing });
     }

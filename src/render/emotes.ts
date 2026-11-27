@@ -1,11 +1,14 @@
-import type { Point } from "../core";
+import type { NpcEmoteKind, Point } from "../core";
 
 export type EmoteTextureKey =
   | "emoteQuestion"
   | "emoteExclaim"
   | "emoteNote"
   | "emoteZzz"
-  | "emoteHeart";
+  | "emoteHeart"
+  | "emoteSparkle"
+  | "emoteWave"
+  | "emoteWorry";
 
 export type OverworldEmote = {
   texture: EmoteTextureKey;
@@ -48,13 +51,30 @@ export type OverworldEmoteInput = {
     height: number;
     elapsed: number;
   } | null;
+  npcEmotes?: readonly {
+    id: string;
+    x: number;
+    y: number;
+    height: number;
+    kind: NpcEmoteKind;
+    index: number;
+  }[];
   reducedMotion?: boolean;
 };
 
 const CALMED_HUM_RANGE = 185;
+const NPC_EMOTE_RANGE = 360;
 const NAP_STILL_TICKS = 240;
 const EXCLAIM_WINDOW_TICKS = 30;
 const RECENT_TALK_TICKS = 38;
+
+const NPC_EMOTE_TEXTURES: Record<NpcEmoteKind, EmoteTextureKey> = {
+  sparkle: "emoteSparkle",
+  wave: "emoteWave",
+  worry: "emoteWorry",
+  note: "emoteNote",
+  heart: "emoteHeart",
+};
 
 export function evaluateOverworldEmotes(input: OverworldEmoteInput): OverworldEmote[] {
   if (input.areaId === "harness" || input.dialogueOpen) return [];
@@ -203,6 +223,36 @@ export function evaluateOverworldEmotes(input: OverworldEmoteInput): OverworldEm
         scale: pop * 0.8,
         alpha: 0.95 * fadeIn * fadeOut,
         rotation: Math.sin(progress * Math.PI * 2) * 0.1,
+      });
+    }
+  }
+
+  for (const item of input.npcEmotes ?? []) {
+    const distance = Math.hypot(item.x - input.player.x, item.y - input.player.y);
+    if (distance > NPC_EMOTE_RANGE) continue;
+    if (reduced) {
+      emotes.push({
+        texture: NPC_EMOTE_TEXTURES[item.kind],
+        x: item.x,
+        y: item.y - item.height - 16,
+        scale: 0.78,
+        alpha: 0.94,
+        rotation: 0,
+      });
+    } else {
+      const phase = input.tick / 14 + item.index * 1.15;
+      const bob = Math.sin(phase) * 2.6;
+      const pulse = 0.78 + 0.06 * Math.sin(phase * 1.3);
+      const tilt = item.kind === "worry"
+        ? Math.sin(input.tick * 0.45 + item.index) * 0.11
+        : Math.sin(phase * 0.8) * 0.08;
+      emotes.push({
+        texture: NPC_EMOTE_TEXTURES[item.kind],
+        x: item.x,
+        y: item.y - item.height - 16 + bob,
+        scale: pulse,
+        alpha: 0.94,
+        rotation: tilt,
       });
     }
   }

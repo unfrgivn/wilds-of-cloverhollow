@@ -427,7 +427,64 @@
       "facing": "up"
     }
   },
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "moss",
+      "point": {
+        "x": 560,
+        "y": 680
+      },
+      "facing": "right",
+      "knot": "npc_moss",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          545,
+          670
+        ],
+        [
+          575,
+          670
+        ],
+        [
+          575,
+          690
+        ],
+        [
+          545,
+          690
+        ]
+      ]
+    },
+    {
+      "id": "wren",
+      "point": {
+        "x": 910,
+        "y": 400
+      },
+      "facing": "down",
+      "knot": "npc_wren",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          895,
+          390
+        ],
+        [
+          925,
+          390
+        ],
+        [
+          925,
+          410
+        ],
+        [
+          895,
+          410
+        ]
+      ]
+    }
+  ],
   "props": [
     {
       "id": "oak-west",

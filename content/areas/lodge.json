@@ -100,7 +100,64 @@
       "prompt": "Look"
     }
   ],
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "otis",
+      "point": {
+        "x": 600,
+        "y": 680
+      },
+      "facing": "up",
+      "knot": "npc_otis",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          585,
+          670
+        ],
+        [
+          615,
+          670
+        ],
+        [
+          615,
+          690
+        ],
+        [
+          585,
+          690
+        ]
+      ]
+    },
+    {
+      "id": "clara",
+      "point": {
+        "x": 480,
+        "y": 680
+      },
+      "facing": "right",
+      "knot": "npc_clara",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          465,
+          670
+        ],
+        [
+          495,
+          670
+        ],
+        [
+          495,
+          690
+        ],
+        [
+          465,
+          690
+        ]
+      ]
+    }
+  ],
   "critters": [],
   "props": [
     {

@@ -1,4 +1,4 @@
-import type { Direction } from "../core";
+import type { Direction, NpcAttention, NpcPersonality } from "../core";
 
 export type MotionPose = {
   offsetX: number;
@@ -202,4 +202,223 @@ export function companionIdlePose(
     scaleY: base.scaleY,
     rotation: 0.024 * sway,
   };
+}
+
+// 6-tick Paper-Mario turn-squash pulse layered when an NPC pivots facing direction.
+const TURN_SQUASH_X: readonly number[] = [0.94, 0.96, 1.02, 1.015, 1.005, 1.0];
+const TURN_SQUASH_Y: readonly number[] = [1.03, 1.02, 0.99, 0.994, 0.998, 1.0];
+
+function applyTurnSquash(pose: MotionPose, turnAge: number): MotionPose {
+  if (turnAge < 0 || turnAge >= TURN_SQUASH_X.length) return pose;
+  const idx = Math.floor(turnAge);
+  return {
+    ...pose,
+    scaleX: pose.scaleX * (TURN_SQUASH_X[idx] ?? 1),
+    scaleY: pose.scaleY * (TURN_SQUASH_Y[idx] ?? 1),
+  };
+}
+
+function npcBaseLivingPose(
+  personality: NpcPersonality,
+  attention: NpcAttention,
+  tick: number,
+  index: number,
+  attentionAge: number,
+): MotionPose {
+  const phase = (index + 1) * 0.9;
+  const base = idleBreathing(tick, phase);
+  const age = Math.max(0, attentionAge);
+
+  if (attention === "lantern-awe") {
+    if (age < 22) {
+      const u = age / 22;
+      const doublePerk = Math.abs(Math.sin(u * Math.PI * 2)) * (1 - u * 0.35);
+      return {
+        offsetX: 0,
+        offsetY: -doublePerk * 6.5,
+        scaleX: 1 - doublePerk * 0.03,
+        scaleY: 1 + doublePerk * 0.045,
+        rotation: Math.sin(u * Math.PI * 2) * 0.04,
+      };
+    }
+    const wonder = Math.sin(tick / 18 + phase);
+    return {
+      offsetX: wonder * 0.9,
+      offsetY: -1.2 - Math.abs(wonder) * 1.4,
+      scaleX: base.scaleX,
+      scaleY: base.scaleY * 1.012,
+      rotation: wonder * 0.032,
+    };
+  }
+
+  if (attention === "celebrate") {
+    if (age < 26) {
+      const u = age / 26;
+      const hop = Math.abs(Math.sin(u * Math.PI * 2));
+      return {
+        offsetX: Math.sin(u * Math.PI * 2) * 1.4,
+        offsetY: -hop * 7.5,
+        scaleX: 1 - hop * 0.032,
+        scaleY: 1 + hop * 0.048,
+        rotation: Math.sin(u * Math.PI * 4) * 0.045,
+      };
+    }
+    const cheer = Math.sin(tick / 12 + phase);
+    const lift = Math.abs(cheer);
+    return {
+      offsetX: cheer * 1.0,
+      offsetY: -1.4 - lift * 2.4,
+      scaleX: base.scaleX * (1 - lift * 0.014),
+      scaleY: base.scaleY * (1 + lift * 0.022),
+      rotation: cheer * 0.032,
+    };
+  }
+
+  if (attention === "music-delight") {
+    const beat = Math.sin(tick / 9 + index);
+    const hop = Math.abs(beat);
+    const perk = age < 14 ? Math.sin((age / 14) * Math.PI) * 1.8 : 0;
+    return {
+      offsetX: beat * 1.1,
+      offsetY: -hop * 4.5 - perk,
+      scaleX: 1 - hop * 0.026,
+      scaleY: 1 + hop * 0.038,
+      rotation: 0.042 * beat,
+    };
+  }
+
+  if (attention === "chaos-worry") {
+    const quiver = Math.sin(tick * 1.15 + index);
+    const lean = Math.sin(tick / 16 + phase) * 0.022;
+    return {
+      offsetX: quiver * 1.4,
+      offsetY: 0,
+      scaleX: 1.015,
+      scaleY: 0.985,
+      rotation: lean,
+    };
+  }
+
+  if (attention === "player-greet" || attention === "companion-greet") {
+    if (age < 16) {
+      const u = age / 16;
+      const arc = Math.sin(u * Math.PI);
+      return {
+        offsetX: 0,
+        offsetY: -arc * 5.5,
+        scaleX: 1 - arc * 0.028,
+        scaleY: 1 + arc * 0.042,
+        rotation: Math.sin(u * Math.PI * 2) * 0.03,
+      };
+    }
+    const sway = Math.sin(tick / 26 + phase);
+    return {
+      offsetX: sway * 0.7,
+      offsetY: -0.6 * Math.max(0, sway),
+      scaleX: base.scaleX,
+      scaleY: base.scaleY,
+      rotation: sway * 0.018,
+    };
+  }
+
+  if (attention === "social-chat") {
+    const talk = Math.sin(tick / 11 + phase);
+    const bob = Math.abs(Math.sin(tick / 14 + phase)) * 1.8;
+    return {
+      offsetX: Math.sin(tick / 28 + phase) * 1.1,
+      offsetY: -bob,
+      scaleX: base.scaleX * (1 - bob * 0.006),
+      scaleY: base.scaleY * (1 + bob * 0.008),
+      rotation: talk * 0.024,
+    };
+  }
+
+  if (attention === "dialogue") {
+    const bob = Math.abs(Math.sin(tick / 16 + phase)) * 1.2;
+    return {
+      offsetX: 0,
+      offsetY: -bob,
+      scaleX: base.scaleX,
+      scaleY: base.scaleY,
+      rotation: Math.sin(tick / 24 + phase) * 0.012,
+    };
+  }
+
+  if (personality === "gardener") {
+    const sway = Math.sin(tick / 36 + phase);
+    return {
+      ...base,
+      offsetX: sway * 1.1,
+      rotation: sway * 0.02,
+    };
+  }
+
+  if (personality === "sailor") {
+    const roll = Math.sin(tick / 30 + phase);
+    return {
+      ...base,
+      offsetX: roll * 1.3,
+      rotation: roll * 0.024,
+    };
+  }
+
+  if (personality === "kid-bouncy") {
+    const local = (((tick + index * 29) % 130) + 130) % 130;
+    if (local < 14) {
+      const u = local / 14;
+      const arc = Math.sin(u * Math.PI);
+      return {
+        offsetX: 0,
+        offsetY: -arc * 4.5,
+        scaleX: 1 - arc * 0.025,
+        scaleY: 1 + arc * 0.038,
+        rotation: Math.sin(u * Math.PI * 2) * 0.025,
+      };
+    }
+    return base;
+  }
+
+  if (personality === "artist" || personality === "scholar") {
+    return {
+      ...base,
+      rotation: Math.sin(tick / 44 + phase) * 0.018,
+    };
+  }
+
+  if (personality === "naturalist" || personality === "ranger") {
+    const sway = Math.sin(tick / 40 + phase);
+    return {
+      ...base,
+      offsetX: sway * 0.8,
+      rotation: sway * 0.014,
+    };
+  }
+
+  if (personality === "mystic") {
+    const floatWave = Math.sin(tick / 28 + phase);
+    const sway = Math.sin(tick / 42 + phase * 1.3);
+    return {
+      offsetX: sway * 1.2,
+      offsetY: -2.2 - 1.6 * floatWave,
+      scaleX: base.scaleX,
+      scaleY: base.scaleY,
+      rotation: sway * 0.022,
+    };
+  }
+
+  if (personality === "fairy") return fairyHover(tick, index);
+
+  return base;
+}
+
+export function npcLivingPose(
+  personality: NpcPersonality,
+  attention: NpcAttention,
+  tick: number,
+  index: number,
+  attentionAge: number,
+  turnAge = 99,
+): MotionPose {
+  const pose = npcBaseLivingPose(personality, attention, tick, index, attentionAge);
+  return applyTurnSquash(pose, turnAge);
 }

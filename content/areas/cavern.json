@@ -547,7 +547,64 @@
       }
     ]
   },
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "pebble",
+      "point": {
+        "x": 740,
+        "y": 680
+      },
+      "facing": "up",
+      "knot": "npc_pebble",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          725,
+          670
+        ],
+        [
+          755,
+          670
+        ],
+        [
+          755,
+          690
+        ],
+        [
+          725,
+          690
+        ]
+      ]
+    },
+    {
+      "id": "gemma",
+      "point": {
+        "x": 380,
+        "y": 580
+      },
+      "facing": "right",
+      "knot": "npc_gemma",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          365,
+          570
+        ],
+        [
+          395,
+          570
+        ],
+        [
+          395,
+          590
+        ],
+        [
+          365,
+          590
+        ]
+      ]
+    }
+  ],
   "props": [
     {
       "id": "crystal-west-purple",

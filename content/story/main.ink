@@ -31,6 +31,13 @@ EXTERNAL snacks()
 EXTERNAL won(id)
 EXTERNAL plushesLeft()
 EXTERNAL tickets()
+EXTERNAL withParty(id)
+EXTERNAL lanternOn()
+EXTERNAL areaCalm()
+EXTERNAL level()
+EXTERNAL stickers()
+EXTERNAL treats()
+EXTERNAL bossesCalmed()
 VAR lifeguard_back = false
 
 VAR art_teacher_out = false
@@ -3324,4 +3331,1134 @@ And ten shiny parlor coins gleam neatly beside the secret doodle! # speaker: Fae
 -> DONE
 = again
 The sparkling \"Secret Sundae Club\" glow-ink doodle reminds Fae that sharing a critter's favourite Berry Swirl Cone or Cozy Cocoa Sundae melts chaos fizz right away! # speaker: Fae
+-> DONE
+
+// Living NPCs across Cloverhollow: reactive townfolk, classmates, and trail neighbors.
+
+=== npc_flora ===
+{lanternOn():
+    Oh, my word! Shining that little lantern makes every petal in the plaza shimmer like starlight! # speaker: Flora
+}
+{
+- calmed("hooded-kid"):
+    Look at these tulips now, Fae! Ever since you helped Milo feel right at home, every flowerbed in Cloverhollow is beaming! # speaker: Flora
+- calmed("fountain-frog") and areaCalm():
+    Hello, dear! With the fountain sparkling clean again, the whole plaza smells like sweet clover and sunshine. # speaker: Flora
+- not areaCalm():
+    Goodness me, Fae! A fizzy critter is bouncing right near my flower boxes! Mind your boots out there! # speaker: Flora
+- else:
+    Good morning, Fae! Pink bubbles from that fountain keep drifting straight into my marigolds. # speaker: Flora
+}
+{withParty("sue"):
+    Your tulips always make the plaza feel brighter, Flora! # speaker: Sue
+}
+{withParty("jordan"):
+    Those marigolds look even healthier than the wildflowers up on Pinecone Pass. # speaker: Jordan
+}
+{not garden_gift and (garden_ripe or withParty("ribbon-bunny")): -> garden_gift}
++ [Ask about her flowers]
+    I planted clover, daisies, and sweet marigolds along the plaza walk. Kind hearts make a town bloom faster than fertilizer! # speaker: Flora
+    {stickers() >= 5: With {stickers()} calm-down stickers in your book, you've been spreading kindness everywhere! # speaker: Flora}
+    -> DONE
++ [Ask if she saw anything unusual]
+    {calmed("hooded-kid"):
+        Just happy neighbors and calm critters now! Every trail feels peaceful again. # speaker: Flora
+    - else:
+        Early this morning, a kid in a purple hood zoomed past my planters carrying a fizzy soda bottle. Left a trail of pink bubbles! # speaker: Flora
+    }
+    -> DONE
+= garden_gift
+{withParty("ribbon-bunny"):
+    Why, look at your darling Ribbon Bunny sniffing my garden basket! She has the softest nose! # speaker: Flora
+- else:
+    I heard your clubhouse strawberry patch ripened! Fellow gardeners always share the harvest! # speaker: Flora
+}
+Here, take two honey-clover garden snacks for your backpack, Fae! # speaker: Flora # gift: snack 2 # sound: chime-green
+Thank you so much, Flora! # speaker: Fae
+-> DONE
+
+=== npc_sammy_plaza ===
+{lanternOn():
+    Whoa! Purple glow-light! That looks like a secret arcade power-up! # speaker: Sammy
+}
+{
+- not areaCalm():
+    Whoa, Fae! There's a fizzy critter zooming around the plaza! Total boss battle energy! # speaker: Sammy
+- clubhouse_claimed:
+    Psst, Fae! The Cloverhollow Arcade lights just flickered back on! Someone inside sounded super fizzy though... # speaker: Sammy
+- else:
+    Heya, Fae! I've got a pocket full of shiny coins waiting for the arcade doors to open up! # speaker: Sammy
+}
+{withParty("sue"):
+    Save us a turn on Skee-Ball once Mr. Pip opens up, Sammy! # speaker: Sue
+}
++ [Ask about the arcade games]
+    Boop-a-Mole, Skee-Ball, Comet Cruise, AND the claw machine! I'm totally winning a plushie today! # speaker: Sammy
+    {stickers() >= 3: You've got {stickers()} stickers already? You've got serious gamer reflexes, Fae! # speaker: Sammy}
+    -> DONE
++ [Ask about the purple fizz]
+    {calmed("hooded-kid"):
+        Wild that Milo could zip around so fast with that pond fizz! Glad he's hanging out with everyone again! # speaker: Sammy
+    - else:
+        I saw a kid in a purple hood peek right through the arcade window earlier, grinning like they had a cheat code! # speaker: Sammy
+    }
+    -> DONE
+
+=== npc_sammy_arcade ===
+{lanternOn():
+    Whoa, purple lantern light in the arcade! This place looks twice as awesome! # speaker: Sammy
+}
+{
+- won("star-racer-keychain"):
+    NO WAY! You snagged the Star Racer Keychain from the ticket counter?! Legend status, Fae! # speaker: Sammy
+- tickets() >= 10:
+    Whoa, you've already racked up {tickets()} arcade tickets! Check out the counter before the good stuff goes! # speaker: Sammy
+- else:
+    YES! The arcade is back open, and Mr. Pip is totally chilled out again! Thanks a million, Fae! # speaker: Sammy
+}
+{withParty("sue"):
+    First one to hit the top corner ring on Skee-Ball buys the cinnamon buns! # speaker: Sue
+}
+{withParty("jordan"):
+    I'm aiming straight for Comet Cruise. Let's see how many stars we can catch! # speaker: Jordan
+}
+{not arcade_coins: -> arcade_coins}
++ [Ask for a high-score tip]
+    On Skee-Ball, watch the aim arrow bounce cleanly off the edges. And on Boop-a-Mole, each mole gets a little quicker! # speaker: Sammy
+    -> DONE
++ [Compare favorite machines]
+    I love Comet Cruise, even when the rocks wobble past! {level() >= 4: At level {level()}, your timing must be unstoppable!|Keep practicing and you'll rule the scoreboard!} # speaker: Sammy
+    -> DONE
+= arcade_coins
+Hey, you saved the whole arcade for all of us! Take ten arcade coins from my spare token pouch! # speaker: Sammy # gift: coins 10 # sound: chime-yellow
+Awesome! Thanks, Sammy! # speaker: Fae
+-> DONE
+
+=== npc_pippa ===
+{lanternOn():
+    Ooh! Your blacklight lantern makes the park clover twinkle like tiny fireflies! # speaker: Pippa
+}
+{
+- not areaCalm():
+    Eep! Look out, Fae! The park critters got super bouncy from that purple fizz! # speaker: Pippa
+- club_open:
+    Whoa, you actually figured out the tree house password?! You're the coolest detective in Meadow Park! # speaker: Pippa
+- else:
+    Hi, Fae! Welcome to Meadow Park! I know every hiding spot, tree branch, and giggling critter in this meadow! # speaker: Pippa
+}
+{withParty("pond-pup"):
+    AWW! Pond Pup is trotting right beside you! Look at that happy tail wag! # speaker: Pippa
+}
+{withParty("maddie"):
+    Maddie looks extra fluffy in the park breeze today! # speaker: Pippa
+}
+{treats() > 0: Ooh, you're carrying specialty treats! Park critters go bananas for their favorite flavor! # speaker: Pippa}
++ [Try Pippa's Park Critter Riddle]
+    -> riddle
++ [Ask what she spotted in the park]
+    {calmed("hooded-kid"):
+        Everything in Meadow Park is calm and cozy now! Even the pond ripples sound like a lullaby. # speaker: Pippa
+    - else:
+        Earlier a kid in a purple hood scrambled right past the picnic blanket whispering some silly password to the tree house! # speaker: Pippa
+    }
+    -> DONE
+= riddle
+Okay, ready? Which Meadow Park critter loves splashing by the water and once chased a fuzzy tennis ball? # speaker: Pippa
++ [The Pond Pup!]
+    DING DING DING! You nailed it, Fae! Pond Pup is the splashiest friend in the whole park! # speaker: Pippa
+    {not riddle_prize: -> riddle_prize}
+    You're a certified park critter pro! # speaker: Pippa
+    -> DONE
++ [A flying marshmallow?]
+    Hee hee! If there's a flying marshmallow in Meadow Park, I want to meet it too! Try again anytime! # speaker: Pippa
+    -> DONE
+= riddle_prize
+For acing my Meadow Park riddle, here's a crunchy park snack and five shiny coins! # speaker: Pippa # gift: snack 1 # gift: coins 5 # sound: chime-yellow
+Yay, thanks Pippa! # speaker: Fae
+-> DONE
+
+=== npc_leo_hall ===
+{lanternOn():
+    Whoa! An ultraviolet blacklight beam! You could spot invisible ink all down East Hall with that! # speaker: Leo
+}
+{
+- art_open:
+    Ms. Rowan's Art Room is back open! I logged every purple paint swirl in my notebook before it cleared. # speaker: Leo
+- art_teacher_out:
+    Careful down the east end of the hall, Fae! Ms. Rowan got hit with purple fizz and is painting mid-air loops! # speaker: Leo
+- else:
+    Hey, Fae! I'm keeping a scientific log of every fizzy happening at Cloverhollow School! # speaker: Leo
+}
+{withParty("jordan"):
+    Smart thinking taking notes, Leo. Good field logs always solve a trail mystery! # speaker: Jordan
+}
+{not npc_leo_hall.grant and not npc_leo_field.grant and stickers() >= 6: -> grant}
++ [Share your sticker count]
+    Let's see... {stickers()} stickers recorded so far, and explorer level {level()}! # speaker: Leo
+    {stickers() < 6: Bring me at least six critter stickers and I'll award you a Junior Field-Research Grant!|That's extraordinary field data, Fae!} # speaker: Leo
+    -> DONE
++ [Ask about East Hall clues]
+    {calmed("hooded-kid"):
+        Now that Milo explained the Mystic Pond wish, every single fizz spike in my chart fits together! # speaker: Leo
+    - else:
+        Someone in a purple hood sprinted past these lockers way faster than normal jogging speed. Definitely fizz-powered! # speaker: Leo
+    }
+    -> DONE
+= grant
+Wait a second! You've already gathered {stickers()} critter stickers?! That qualifies for my official Junior Field-Research Grant! # speaker: Leo
+Here are fifteen shiny coins to fund your continuing valley fieldwork! # speaker: Leo # gift: coins 15 # sound: chime-blue
+Whoa, thanks Professor Leo! # speaker: Fae
+-> DONE
+
+=== npc_leo_field ===
+{lanternOn():
+    Testing your blacklight out in the sunshine? Clever! Hidden markers still react under UV light! # speaker: Leo
+}
+{
+- not areaCalm():
+    Heads up, Fae! That oak squirrel by the creek is tossing acorns at warp speed! # speaker: Leo
+- stash_found:
+    You found the hidden stash behind the stump?! Purple markers and a Star Racer token, huge breakthrough! # speaker: Leo
+- bridge_down:
+    Lowering the old footbridge with a lasso was pure engineering brilliance, Fae! # speaker: Leo
+- else:
+    Recess! Best time to map the playing field and check why the creek squirrel got so jumpy! # speaker: Leo
+}
+{withParty("acorn-squirrel"):
+    An actual Acorn Squirrel on your team?! Hold on, let me sketch its climbing posture! # speaker: Leo
+}
+{not npc_leo_hall.grant and not npc_leo_field.grant and stickers() >= 6: -> grant}
++ [Ask about the playing field]
+    The old oak branch stretches right over the creek, and there's a wooden lever across on the far bank. # speaker: Leo
+    -> DONE
++ [Check your explorer stats]
+    Explorer level {level()}, {stickers()} stickers logged, and {gem_count()} Star Gems charted! Top-notch work, Fae! # speaker: Leo
+    -> DONE
+= grant
+Hold everything! {stickers()} critter stickers in your field album?! You earned my Junior Field-Research Grant! # speaker: Leo
+Take fifteen shiny coins for your explorer supply kit! # speaker: Leo # gift: coins 15 # sound: chime-blue
+Awesome, thanks Leo! # speaker: Fae
+-> DONE
+
+=== npc_maya_field ===
+{lanternOn():
+    Ooh! Your lantern casts the dreamiest lavender glow across the grass! # speaker: Maya
+}
+{
+- not areaCalm():
+    Whoa, watch your sketchbook! That fizzy squirrel by the oak is flinging acorns everywhere! # speaker: Maya
+- saw_hood:
+    Did you see that kid in a purple hood bolt past hopscotch? They dropped purple chalk sparks all over my shoes! # speaker: Maya
+- else:
+    Hey, Fae! Since the Art Room door is locked right now, I'm sketching clouds out here during recess! # speaker: Maya
+}
+{withParty("ribbon-bunny"):
+    Eek, a Ribbon Bunny! Her pink bow matches my watercolor palette! # speaker: Maya
+}
++ [Ask about the missing purple markers]
+    Every single purple marker in the Art Room vanished overnight! Somebody must be on the world's biggest doodle spree. # speaker: Maya
+    -> DONE
++ [Ask what she's drawing]
+    A giant rainbow mural of Cloverhollow School, with extra sparkles around the oak tree! # speaker: Maya
+    -> DONE
+
+=== npc_maya_art ===
+{lanternOn():
+    Ooh, blacklight glow in the Art Room! All the neon paint tubes are lighting up like magic! # speaker: Maya
+}
+{
+- calmed("hooded-kid"):
+    Milo told us he wants to help repaint the hallway banner together! Having all our classmates back feels wonderful! # speaker: Maya
+- else:
+    Hooray! Ms. Rowan is feeling calm again, and the Art Room is finally open! Thank you, Fae! # speaker: Maya
+}
+{withParty("sue"):
+    Your ocean paintings on the wall look just like Bubblegum Bay at sunset, Maya! # speaker: Sue
+}
+{withParty("jordan"):
+    Next time you paint Pinecone Pass, add a couple of happy snow hamsters! # speaker: Jordan
+}
+{npc_wren.sketch_complete:
+    Did you see Wren's finished Field Compendium?! That crystal rubbing and pressed clover inspired my whole new gallery series! # speaker: Maya
+}
+{not art_snack: -> art_snack}
++ [Look at her easel]
+    I'm painting all the calm critters you've helped! {stickers() >= 8: With {stickers()} stickers in your album, I'm going to need a bigger canvas!|Tell me every new critter you meet!} # speaker: Maya
+    -> DONE
++ [Ask about Ms. Rowan's paints]
+    Ms. Rowan mixed a fresh batch of lavender paint: zero fizz, maximum sparkle! # speaker: Maya
+    -> DONE
+= art_snack
+Before you head back out, take one of my lucky studio snacks! Artists and explorers both need fuel! # speaker: Maya # gift: snack 1 # sound: chime-yellow
+Thanks, Maya! # speaker: Fae
+-> DONE
+
+=== npc_sal ===
+{lanternOn():
+    Shiver me compass! That glowing purple lantern shines brighter than the harbor lighthouse! # speaker: Captain Sal
+}
+{
+- not areaCalm():
+    Steady on deck, young skipper! There's a fizzy critter kicking up sand along the cove! # speaker: Captain Sal
+- calmed("lifeguard"):
+    Ahoy, Fae! With Ms. Coral back in good spirits and the beach calm, Bubblegum Bay is pure smooth sailing! # speaker: Captain Sal
+- else:
+    Ahoy there, Fae! Welcome to Bubblegum Bay, where the sand stays warm and the tide brings shiny surprises! # speaker: Captain Sal
+}
+{withParty("sue"):
+    Ahoy, Sue! Still the sharpest fisher on the pier, I see! # speaker: Captain Sal
+    You bet, Captain Sal! Saving the biggest waves for Fae's crew! # speaker: Sue
+}
+{withParty("pond-pup"):
+    Ha! A seafaring Pond Pup! Bet that little matey could fetch treasure right out of the tide pools! # speaker: Captain Sal
+}
+{not harbor_snack: -> harbor_snack}
++ [Ask for a Bubblegum Bay sea tale]
+    {treasure_found:
+        Blimey, you actually dug up the old pirate treasure between the palms! That tale's true after all! # speaker: Captain Sal
+    - else:
+        Legend says an old sea captain corked a treasure map in a glass bottle and tossed it off the eastern dock! # speaker: Captain Sal
+    }
+    -> DONE
++ [Talk about Star Gems and tides]
+    {gem_count() > 0:
+        You've already charted {gem_count()} Star Gems?! Even the deep tide pools glint with hidden gems if a good swimmer looks! # speaker: Captain Sal
+    - else:
+        Keep your eyes peeled along the rocky surf. Shimmering treasures love hiding where the sea foam sparkles! # speaker: Captain Sal
+    }
+    -> DONE
++ {npc_gus.gave_postcard and not gave_mountain_letter} [Deliver Gus's Seashell Postcard!]
+    -> gave_mountain_letter
+= harbor_snack
+Every brave harbor explorer deserves rations for the voyage! Take two salty-sweet sea-breeze snacks, Fae! # speaker: Captain Sal # gift: snack 2 # sound: chime-blue
+Aye-aye, Captain Sal! Thank you! # speaker: Fae
+-> DONE
+= gave_mountain_letter
+Well blow me down! Mailman Gus's Seashell Postcard sailed straight to the pier! Take eight shiny harbor coins for your swift feet, Fae! # speaker: Captain Sal # gift: coins 8 # sound: chime-blue
+While you're charting the high roads, would you carry this Mountain Reply Letter up to Mina in Pinecone Pass? # speaker: Captain Sal
+You bet, Captain Sal! I'll deliver it straight to Mina! # speaker: Fae
+-> DONE
+
+=== npc_nora ===
+{lanternOn():
+    Whoa! Your lantern makes all the wet seashells along the shore glow neon! # speaker: Nora
+}
+{
+- not areaCalm():
+    Hey! Keep those fizzy critters away from my shell collection! They almost flattened my tower! # speaker: Nora
+- calmed("crab"):
+    The little south-beach crabs stopped pinching and started tapping funny rhythms on the shells! So cute! # speaker: Nora
+- else:
+    Hi, Fae! I'm hunting for the rarest pink spiral shells in all of Bubblegum Bay! # speaker: Nora
+}
+{withParty("pond-pup"):
+    Ooh, Pond Pup! Wanna help me sniff out shiny shells near the surf? # speaker: Nora
+}
+{withParty("sue"):
+    Save me a lucky pink shell for my tackle box, Nora! # speaker: Sue
+}
++ [Ask about her shell collection]
+    I've got scalloped shells, star-striped shells, and a tiny pearl button! {treasure_found: Still nothing beats your real pirate treasure though!|One day I'll find pirate treasure too!} # speaker: Nora
+    -> DONE
++ [Ask if she saw the hooded kid]
+    {calmed("hooded-kid"):
+        Hard to believe Milo zoomed all the way from town to the beach and back! Glad everything's chill now! # speaker: Nora
+    - else:
+        Someone in a purple hood sprinted right past the palm trees leaving fizzy purple footprints that popped in the surf! # speaker: Nora
+    }
+    -> DONE
+
+=== npc_lark ===
+{lanternOn():
+    Aha! Carrying a trusty lantern on the cliffside ridge! Textbook backcountry preparedness, Fae! # speaker: Hiker Lark
+}
+{
+- not areaCalm():
+    Easy on the gravel, Fae! Fizzy critters have been hopping right across the Cliffside Trail! # speaker: Hiker Lark
+- calmed("gull"):
+    Listen to that ridge breeze now! Ever since you calmed the lookout gull, the cliffside songbirds came right back! # speaker: Hiker Lark
+- else:
+    Well hello, fellow trailblazer! Nothing beats birdwatching along the ridge between Bubblegum Bay and Pinecone Pass! # speaker: Hiker Lark
+}
+{withParty("jordan"):
+    Jordan! Still hiking these switchbacks faster than the mountain squirrels? # speaker: Hiker Lark
+    Only because I know where all the best lookout snacks are, Lark! # speaker: Jordan
+}
+{withParty("ribbon-bunny"):
+    Oh, a Ribbon Bunny! Look how nimbly she spots tiny clover burrows tucked beneath the cliff boulders! # speaker: Hiker Lark
+}
+{shared_snack:
+    Still grateful for that trail snack you shared, Fae! Best hiking fuel on the ridge! # speaker: Hiker Lark
+}
+{not gull_reward and calmed("gull"): -> gull_reward}
++ [Ask about wildlife on the trail]
+    Bunnies and squirrels dart across the clover bends, and there's a grand ocean view out east by the lookout bench! # speaker: Hiker Lark
+    {gem_count() > 0: And with {gem_count()} Star Gems found already, you've got true naturalist eyes! # speaker: Hiker Lark}
+    -> DONE
++ [Ask where the trail leads]
+    South winds down to warm Bubblegum Bay, and northwest climbs straight into the snowy pines of Pinecone Pass! # speaker: Hiker Lark
+    -> DONE
++ {snacks() > 0 and not shared_snack} [Share a cozy snack!]
+    -> shared_snack
+= gull_reward
+You calmed the lookout gull and brought peace back to my favorite birdwatching bench! # speaker: Hiker Lark
+Please take fifteen shiny coins from my trail-spotter pouch! You earned every single one, Fae! # speaker: Hiker Lark # gift: coins 15 # sound: chime-green
+Thanks so much, Hiker Lark! # speaker: Fae
+-> DONE
+= shared_snack
+Here, Hiker Lark! I brought a trail snack to share! # speaker: Fae # feed: snack 1
+Well now, that's proper trail fellowship, Fae! Crispy, sweet, and just what a ridge walker needs! # speaker: Hiker Lark
+Here are eight shiny trail coins from my field pouch to say thank you! # speaker: Hiker Lark # gift: coins 8 # sound: chime-green
+-> DONE
+
+=== npc_mina ===
+{lanternOn():
+    Oh, how magical! Your blacklight beam turns the fresh snow on Pinecone Pass into sparkling stardust! # speaker: Mina
+}
+{
+- not areaCalm():
+    Oh my mittens! A fizzy mountain critter is darting through the drifts nearby! Stay warm and careful, Fae! # speaker: Mina
+- lodge_open:
+    What a joy seeing smoke curl from Mrs. Flurry's chimney again! The whole snowy pass feels ten degrees warmer! # speaker: Mina
+- else:
+    Welcome up to Pinecone Pass, dear! Nothing wakes you up like crisp mountain pine air and sweet cocoa! # speaker: Mina
+}
+{withParty("jordan"):
+    Jordan, sweetheart, don't forget to zip up your jacket on the high ridge! # speaker: Mina
+    Already zipped, Mina! And Fae's got snacks for the whole crew! # speaker: Jordan
+}
++ [Ask about Pinecone Pass sights]
+    {scarf_returned:
+        The cocoa stand's smiling ear to ear ever since you lassoed that red scarf right off the ski lift! # speaker: Mina
+    - else:
+        Between the cocoa stand, the ski lift, and the snowy northern archways, this mountain is full of cozy secrets! # speaker: Mina
+    }
+    {calmed("penguin"): Even the belly-sliding penguin on the north slope is waddling happily now! # speaker: Mina}
+    -> DONE
++ [Ask about the purple fizz up here]
+    {calmed("hooded-kid"):
+        I'm so glad Milo's wish turned out peacefully in the end. Everybody needs good friends to cheer them on! # speaker: Mina
+    - else:
+        A kid in a purple hood raced past the ski lift earlier, leaving glowing prints in the snow! # speaker: Mina
+    }
+    -> DONE
++ {npc_sal.gave_mountain_letter and not received_letter} [Deliver Captain Sal's Mountain Letter!]
+    -> received_letter
+= received_letter
+Oh, goodness! A Mountain Reply Letter all the way from Captain Sal down at Bubblegum Bay! # speaker: Mina
+Thank you from the bottom of my cocoa mug, Fae! Take twenty coins and two cozy mountain snacks for your pack! # speaker: Mina # gift: coins 20 # gift: snack 2 # sound: chime-red
+Do let Mailman Gus know his cross-valley letter arrived safe and sound! # speaker: Mina
+I will, Mina! Thank you so much! # speaker: Fae
+-> DONE
+
+=== npc_otis ===
+{lanternOn():
+    Hoho! Bringing a glowing blacklight right beside the hearth? Makes the lodge beams look like a starry night! # speaker: Otis
+}
+{
+- calmed("hooded-kid"):
+    The whole mountain feels restful tonight, Fae. Stories travel fast, and everyone thanks you for bringing peace back to Cloverhollow! # speaker: Otis
+- else:
+    Come on in from the snow, Fae! Pull up a chair by Mrs. Flurry's fireplace and thaw out your boots! # speaker: Otis
+}
+{withParty("maddie"):
+    Look at Maddie eyeing the warm rug! Smart cat knows the coziest square foot in the lodge! # speaker: Otis
+}
+{withParty("jordan"):
+    Still exploring every hidden trail past the lodge, Jordan? # speaker: Otis
+    Every single one, Otis, especially with Fae leading the way! # speaker: Jordan
+}
+{shared_snack:
+    That snack you shared tasted better than hearth-roasted marshmallows, Fae! # speaker: Otis
+}
++ [Ask for a fireside story]
+    Years ago, travelers up at Pinecone Pass heard chimes singing from the northern cliffs, right where Crystal Cavern hides! # speaker: Otis
+    {calmed("bat"): And I hear you already ventured inside and calmed the cavern critters! What a tale! # speaker: Otis}
+    -> DONE
++ [Warm up by the hearth]
+    Nothing beats crackling pine logs and floating marshmallows. At explorer level {level()} with {stickers()} stickers, you've earned a cozy pause! # speaker: Otis
+    -> DONE
++ {snacks() > 0 and not shared_snack} [Share a cozy snack!]
+    -> shared_snack
+= shared_snack
+Here you go, Otis! Have a cozy snack by the fire! # speaker: Fae # feed: snack 1
+Hoho, well isn't that the warmest kindness in Pinecone Pass! Goes down mighty fine beside the hearth! # speaker: Otis
+Take eight shiny lodge coins for your explorer pouch, Fae! # speaker: Otis # gift: coins 8 # sound: chime-green
+-> DONE
+
+=== npc_pebble ===
+{lanternOn():
+    AHA! Magnificent! Your blacklight beam makes the cavern's quartz veins fluoresce in vivid violet! # speaker: Professor Pebble
+}
+{
+- not areaCalm():
+    Careful with your footing, young explorer! Fizzy vibrations are making the cave critters bounce off the stalagmites! # speaker: Professor Pebble
+- cavern_bridge_lit:
+    Extraordinary! Illuminating that ancient fairy mural raised crystal stepping stones right across the turquoise stream! # speaker: Professor Pebble
+- else:
+    Greetings, fellow scholar! Welcome to Crystal Cavern, Cloverhollow's most resonant subterranean marvel! # speaker: Professor Pebble
+}
+{withParty("pond-pup"):
+    Wait, a swimming Pond Pup?! That turquoise spring across the stream might hide sunken treasures just for him! # speaker: Professor Pebble
+}
+{not bridge_reward and cavern_bridge_lit: -> bridge_reward}
++ [Ask about the cavern's crystals]
+    {cavern_chime_rung:
+        When you lassoed that high golden star chime, every crystal pillar in the grotto sang in harmony! # speaker: Professor Pebble
+    - else:
+        Notice the golden star chime hanging high in the northeast arch, and those carved fairy swirls along the northern tablet! # speaker: Professor Pebble
+    }
+    -> DONE
++ [Talk about Star Gems]
+    {gem_count() >= 5:
+        Astonishing! {gem_count()} Star Gems catalogued already! You rival the great mineralogists of Cloverhollow! # speaker: Professor Pebble
+    - else:
+        Legend tells of seven Star Gems scattered across the valley, and one sleeps in a prism pocket right inside this cavern! # speaker: Professor Pebble
+    }
+    -> DONE
++ {npc_wren.started_sketch and not gave_rubbing} [Ask for a crystal rubbing for Wren]
+    -> gave_rubbing
+= bridge_reward
+Solving the glowing mural and lighting the crystal bridge is a landmark discovery! # speaker: Professor Pebble
+Please accept this twenty-coin geology prize from my expedition satchel! # speaker: Professor Pebble # gift: coins 20 # sound: chime-blue
+Whoa! Thank you, Professor Pebble! # speaker: Fae
+-> DONE
+= gave_rubbing
+Aha! For young Wren's Cloverhollow Field Compendium! I made a crisp violet charcoal rubbing of our finest singing quartz pillar! # speaker: Professor Pebble # sound: chime-blue
+Carry it safely back to Whispering Woods, Fae! # speaker: Professor Pebble
+Got it, Professor Pebble! Wren is going to love this! # speaker: Fae
+-> DONE
+
+=== npc_moss ===
+{lanternOn():
+    Good eye, Fae. That blacklight lantern reveals woodland trails invisible to hurried feet! # speaker: Ranger Moss
+}
+{
+- not areaCalm():
+    Tread lightly through the ferns, Fae. A fizzy woodland critter is stirring up the clearing! # speaker: Ranger Moss
+- calmed("hooded-kid"):
+    The Whispering Woods are truly whispering again: gentle wind, soft owls, and not a speck of purple fizz left! # speaker: Ranger Moss
+- calmed("moon-owl"):
+    I heard Starry Owl's peaceful hoot from the southeast clearing! You have the quietest footsteps in the whole forest, Fae. # speaker: Ranger Moss
+- clubhouse_claimed:
+    Your team fixed up that old treehouse clubhouse nicely! Every great forest needs caring stewards. # speaker: Ranger Moss
+- else:
+    Welcome beneath the pines, Fae. Walk softly in the Whispering Woods and the trees will show you their secrets. # speaker: Ranger Moss
+}
+{withParty("acorn-squirrel"):
+    Ah, an Acorn Squirrel riding along! Nobody knows the high oak hollows better than that nimble climber. # speaker: Ranger Moss
+}
+{withParty("jordan"):
+    Good to see you back under the big oaks, Jordan! # speaker: Ranger Moss
+    Wouldn't miss it, Ranger Moss! Fae spotted the secret trail herself! # speaker: Jordan
+}
++ [Ask about the Whispering Woods]
+    The big west oak hides a rattling knothole high in its bark, and the southern path opens out onto sunny Clover Hills. # speaker: Ranger Moss
+    -> DONE
++ [Ask about the woodland critters]
+    {calmed("owl"):
+        The sleepy owls are gliding quietly overhead again. Gentle songs always carry farthest under the canopy. # speaker: Ranger Moss
+    - else:
+        Owls and raccoons roam this clearing. Step kindly, watch their moods, and your song will settle them right down! # speaker: Ranger Moss
+    }
+    -> DONE
+
+=== npc_sunny ===
+{lanternOn():
+    Whoa! A glowing firefly lantern in the middle of Clover Hills! Even the clover leaves sparkle! # speaker: Sunny
+}
+{
+- not areaCalm():
+    Whoa, watch out! Fluffy fizz-critters are bouncing like popcorn down the hillside! # speaker: Sunny
+- calmed("taco-chef"):
+    Chef Mateo's salsa is back to normal, and the whole hillside smells like warm crispy tacos! Best day ever! # speaker: Sunny
+- calmed("lamb"):
+    All the clover lambs are grazing happily again! Thank you for calming them down, Fae! # speaker: Sunny
+- else:
+    Hi, Fae! Welcome up to Clover Hills: best breeze, softest grass, and fluffiest sheep in the whole valley! # speaker: Sunny
+}
+{withParty("ribbon-bunny"):
+    Aww, Ribbon Bunny! Look how excited she gets near the clover-fringed burrows by the meadow boulders! # speaker: Sunny
+}
+{withParty("sue"):
+    You can almost see Bubblegum Bay sparkling from up on this ridge, Sunny! # speaker: Sue
+}
+{treats() > 0: Ooh, you brought specialty treats up the hills! The lambs and hedgehogs LOVE snack time! # speaker: Sunny}
++ [Ask about Clover Hills trails]
+    West drops right back into Meadow Park, and north winds up into the shady pines of Whispering Woods! # speaker: Sunny
+    {gem_count() > 0: With {gem_count()} Star Gems in your pocket, check every cozy burrow between the boulders! # speaker: Sunny}
+    -> DONE
++ [Ask about the valley view]
+    From up here you can watch the whole valley breathe. {calmed("hooded-kid"): Even the Enchanted Forest glow looks extra warm today!|Whenever things get fizzy, a sunny hillside breeze helps!} # speaker: Sunny
+    -> DONE
++ {npc_wren.started_sketch and not gave_clover} [Ask for a pressed clover for Wren]
+    -> gave_clover
+= gave_clover
+Ooh, for Wren's nature sketchbook?! Here's my luckiest four-leaf clover, pressed crisp between two buttercup petals! # speaker: Sunny # sound: chime-green
+Tell Wren the clover lambs say hi! # speaker: Sunny
+Will do, Sunny! Thanks a bunch! # speaker: Fae
+-> DONE
+
+=== npc_gus ===
+{lanternOn():
+    Ho-ho! Shining that violet lantern right over my mail satchel? I could read tiny postcard stamps in the shade with that! # speaker: Mailman Gus
+}
+{
+- calmed("hooded-kid"):
+    Letters are pouring in from every corner of Cloverhollow, Fae! Ever since you helped Milo feel welcome again, everyone's writing thank-you cards! # speaker: Mailman Gus
+- not areaCalm():
+    Whoa there, Fae! Hold onto your hat, there's a fizzy critter zipping across my cobblestones! # speaker: Mailman Gus
+- bossesCalmed() >= 3:
+    Three-star special delivery news, Fae! Folks from the bay to the mountain pass are writing letters about your {bossesCalmed()} big calm-downs! # speaker: Mailman Gus
+- calmed("fountain-frog"):
+    Nothing beats a dry plaza walk for the mail route! Thank you for soothing that fizzy frog, Fae. # speaker: Mailman Gus
+- else:
+    Special delivery, Fae! Pink fountain bubbles nearly stamped my whole stack of Cloverhollow postcards! # speaker: Mailman Gus
+}
+{withParty("sue"):
+    Did my new fishing tackle catalog arrive yet, Gus? # speaker: Sue
+    Top of the satchel, Sue, dry as a whistle! # speaker: Mailman Gus
+}
+{withParty("jordan"):
+    Any trail maps from Pinecone Pass in today's pouch, Gus? # speaker: Jordan
+    Fresh bundle tied with blue twine, Jordan! # speaker: Mailman Gus
+}
+{treats() > 0: Smells like specialty critter treats in your backpack! Better aroma than parcel post! # speaker: Mailman Gus}
+{mail_complete: Good seeing my favorite Honorary Junior Mail Carrier out on the plaza, Fae! # speaker: Mailman Gus}
+{not mail_bonus and bossesCalmed() >= 2: -> mail_bonus}
++ [Ask about Cloverhollow's mail route]
+    I walk from Bon Appetit Cafe past Flora's tulips, out to Bubblegum Bay, and clear up to Pinecone Lodge! # speaker: Mailman Gus
+    {stickers() >= 4: With {stickers()} stickers in your album, half the valley already knows your name! # speaker: Mailman Gus}
+    -> DONE
++ [Ask if any curious letters came in]
+    {calmed("hooded-kid"):
+        Mostly postcards inviting Milo and your friends to picnics! Best bundle I've carried all year! # speaker: Mailman Gus
+    - else:
+        One unaddressed envelope smelled strongly of purple fizz, and a kid in a purple hood dashed right past my mailbox! # speaker: Mailman Gus
+    }
+    -> DONE
++ {areaCalm() and not gave_postcard} [Offer to help deliver mail to the bay]
+    -> gave_postcard
++ {npc_mina.received_letter and not mail_complete} [Tell Gus the mountain mail arrived!]
+    -> mail_complete
+= mail_bonus
+Hold everything, Fae! The Cloverhollow Neighbors Club pooled a thank-you parcel for calming {bossesCalmed()} big valley troubles! # speaker: Mailman Gus
+Ten crisp coins and a crunchy mail-route snack, signed and sealed just for you! # speaker: Mailman Gus # gift: coins 10 # gift: snack 1 # sound: chime-yellow
+Whoa, special delivery! Thank you, Mailman Gus! # speaker: Fae
+-> DONE
+= gave_postcard
+Why, bless your swift boots, Fae! Captain Sal down at Bubblegum Bay has been waiting on this Seashell Postcard all week! # speaker: Mailman Gus # sound: chime-blue
+Tuck it safe in your journal pocket and hand it right to him down by the pier! # speaker: Mailman Gus
+Count on me, Mailman Gus! # speaker: Fae
+-> DONE
+= mail_complete
+Mina got Captain Sal's Mountain Reply Letter safe and sound?! Hold everything, that's cross-valley express service! # speaker: Mailman Gus
+By the power of my brass mail whistle, I hereby name you Honorary Junior Mail Carrier of Cloverhollow! # speaker: Mailman Gus # gift: coins 15 # sound: chime-yellow
+Whoa, Honorary Junior Mail Carrier! Thanks, Mailman Gus! # speaker: Fae
+-> DONE
+
+=== npc_hazel ===
+{lanternOn():
+    Oh, my stars! What a warm violet lantern glow, dear. It makes the meadow clover look dusted in fairy sugar! # speaker: Grandma Hazel
+}
+{
+- calmed("hooded-kid"):
+    Look how peaceful Meadow Park feels now, sweet Fae. Hearing that Milo made such kind friends warms this old heart right through. # speaker: Grandma Hazel
+- not areaCalm():
+    Oh dearie, step lightly! The meadow critters have caught a dreadful case of the purple zoomies! # speaker: Grandma Hazel
+- bossesCalmed() >= 5:
+    My goodness, {bossesCalmed()} major calm-downs across the valley! Cloverhollow has never seen a kinder explorer, Fae. # speaker: Grandma Hazel
+- club_open:
+    You opened the old park tree house! Why, kids have been whispering silly passwords to those branches since I was your age! # speaker: Grandma Hazel
+- else:
+    Hello there, sweet Fae! Nothing lifts the spirits like watching the meadow clover sway from this park bench. # speaker: Grandma Hazel
+}
+{withParty("maddie"):
+    Why, hello Maddie! Your orange fur looks softer than my best knitted blanket! # speaker: Grandma Hazel
+}
+{withParty("sue"):
+    Grandma Hazel always knows where the best picnic spots are, Fae! # speaker: Sue
+}
+{shared_snack:
+    Thank you again for sharing that sweet snack earlier, dearie! Made my whole park sit extra cozy! # speaker: Grandma Hazel
+}
+{not basket_treat and (stickers() >= 2 or areaCalm()): -> basket_treat}
++ [Ask about Meadow Park's history]
+    Long before the boardwalks were painted, neighbors planted these clover rings so anyone feeling lonely would find a friendly bench. # speaker: Grandma Hazel
+    {gem_count() > 0: And look at you, already finding {gem_count()} of the valley's hidden Star Gems! # speaker: Grandma Hazel}
+    -> DONE
++ [Share a quiet park moment]
+    {has_flute:
+        If you ever play a gentle tune on that painted flute, the whole meadow seems to lean in and listen! # speaker: Grandma Hazel
+    - else:
+        A deep breath and a kind song can untangle almost any knot, Fae. Take good care of your friends! # speaker: Grandma Hazel
+    }
+    -> DONE
++ {snacks() > 0 and not shared_snack} [Share a cozy snack!]
+    -> shared_snack
+= basket_treat
+Wait a tick, dear! I baked extra honey-oat snacks for Pippa and any explorer passing through Meadow Park. # speaker: Grandma Hazel
+Pop two right into your backpack before your next adventure! # speaker: Grandma Hazel # gift: snack 2 # sound: chime-green
+Thank you so much, Grandma Hazel! # speaker: Fae
+-> DONE
+= shared_snack
+Here, Grandma Hazel! Let's share a cozy snack on the bench! # speaker: Fae # feed: snack 1
+Oh, bless your sweet heart, Fae! Nothing tastes finer than a snack shared with a kind neighbor! # speaker: Grandma Hazel
+Take eight shiny coins from my knitting purse for your travels, sweetheart! # speaker: Grandma Hazel # gift: coins 8 # sound: chime-green
+-> DONE
+
+=== npc_bram ===
+{lanternOn():
+    Whoa! Stage-light violet right here on the hillside! Now that's the spotlight for a clover meadow encore! # speaker: Bram
+}
+{
+- calmed("hooded-kid"):
+    I'm writing a brand-new ballad about how you helped Milo find his groove again, Fae! Every lamb up here hums the chorus! # speaker: Bram
+- not areaCalm():
+    Easy on the strings! A fizzy critter is bouncing off-beat right through the clover! # speaker: Bram
+- calmed("taco-chef"):
+    Chef Mateo's grill is sizzling calm again, and the whole ridge smells like crispy tacos and sweet acoustic chords! # speaker: Bram
+- bossesCalmed() >= 4:
+    Four verses and counting! With {bossesCalmed()} big calm-downs under your belt, you're a valley folk hero, Fae! # speaker: Bram
+- else:
+    Hey there, Fae! Pull up a patch of clover and listen to the hills sing with my ukulele! # speaker: Bram
+}
+{withParty("sue"):
+    Can we hear the Bubblegum Bay shanty next, Bram? # speaker: Sue
+    Coming right up, Sue, with extra bounce! # speaker: Bram
+}
+{withParty("jordan"):
+    Those chords carry clear down toward the Whispering Woods trail, Bram! # speaker: Jordan
+}
+{not melody_coins and (has_flute or calmed("lamb")): -> melody_coins}
++ [Talk about music in the hills]
+    {has_flute:
+        Play a note on your flute whenever you pass by! Ukulele and flute make the coziest meadow duet! # speaker: Bram
+    - else:
+        The lambs up on Clover Hills love echo melodies. Listen close to the notes and they'll bounce right along with you! # speaker: Bram
+    }
+    -> DONE
++ [Ask about the ridge trails]
+    Sunny watches the eastern flock while I keep an eye on the clover meadows. {treats() > 0: And with {treats()} specialty treats in your pack, every critter up here will be your biggest fan!|Pack a snack or two if you head north into the woods!} # speaker: Bram
+    -> DONE
+= melody_coins
+Hey, fellow musician! Anyone spreading calm tunes across Clover Hills deserves a busker's share from my hat! # speaker: Bram
+Here's twelve shiny coins for your travels, Fae! Keep playing from the heart! # speaker: Bram # gift: coins 12 # sound: chime-blue
+Awesome! Thanks, Bram! # speaker: Fae
+-> DONE
+
+=== npc_wren ===
+{lanternOn():
+    Ooh! Hold your lantern right there! Violet light makes the mossy bark patterns jump straight off the page! # speaker: Wren
+}
+{
+- calmed("hooded-kid"):
+    I drew a whole double-page spread of the calm Enchanted Forest, Fae! Even Milo signed the corner of my sketchbook! # speaker: Wren
+- not areaCalm():
+    Eep! Careful, Fae! Fizzy woodland critters keep jiggling the ferns while I try to ink my sketches! # speaker: Wren
+- calmed("moon-owl"):
+    I finally sketched Starry Owl perching peacefully in the high pines! Best drawing in my whole notebook! # speaker: Wren
+- clubhouse_claimed:
+    Your woodland clubhouse looks like something straight out of a storybook! I drew the porch roof three times already! # speaker: Wren
+- else:
+    Hi, Fae! Shh, look closely at these spotted red-cap mushrooms. I'm sketching every woodland secret I can spot! # speaker: Wren
+}
+{withParty("jordan"):
+    Wren's sketches are almost as accurate as Ranger Moss's trail maps, Fae! # speaker: Jordan
+}
+{withParty("acorn-squirrel"):
+    NO WAY! Your Acorn Squirrel actually sat still long enough for a portrait! # speaker: Wren
+}
+{sketch_complete:
+    My completed Cloverhollow Field Compendium is my prized possession, Fae! Thanks for helping finish every chapter! # speaker: Wren
+}
+{not sketch_reward and (stickers() >= 5 or gem_count() >= 3): -> sketch_reward}
++ [Peek at Wren's woodland sketchbook]
+    Let's see... mossy roots, spotted mushrooms, Ranger Moss's hat, and a dotted trail pointing south to Clover Hills! # speaker: Wren
+    {bossesCalmed() >= 2: Plus I added {bossesCalmed()} gold stars for every big valley calm-down you've pulled off! # speaker: Wren}
+    -> DONE
++ [Ask about hidden things in the woods]
+    {calmed("hooded-kid"):
+        Just cozy owls, fluttering leaves, and friendly critters from oak to creek! # speaker: Wren
+    - else:
+        Earlier I saw a kid in a purple hood hurry past the mossy stones muttering about some glowing pond deeper in the forest! # speaker: Wren
+    }
+    -> DONE
++ {not started_sketch} [Offer to help collect valley sketches]
+    -> started_sketch
++ {npc_pebble.gave_rubbing and npc_sunny.gave_clover and not sketch_complete} [Share the crystal rubbing and clover!]
+    -> sketch_complete
+= sketch_reward
+Wait, Fae! With {stickers()} critter stickers and {gem_count()} Star Gems, you're a real-life field naturalist! # speaker: Wren
+Take eight coins and a trail snack from my sketching pack! # speaker: Wren # gift: coins 8 # gift: snack 1 # sound: chime-green
+Thanks, Wren! Your drawings are awesome! # speaker: Fae
+-> DONE
+= started_sketch
+Really?! You'd help me finish my Cloverhollow Field Compendium? # speaker: Wren
+I still need a crystal rubbing from Professor Pebble in Crystal Cavern and a pressed clover from Sunny up on Clover Hills! # speaker: Wren
+Leave it to me, Wren! I'll bring both right back! # speaker: Fae
+-> DONE
+= sketch_complete
+NO WAY! A sparkling quartz rubbing from Professor Pebble AND a four-leaf pressed clover from Sunny?! # speaker: Wren
+My Cloverhollow Field Compendium is finally complete! Maya and Theo in the Art Room are going to flip when they hear! # speaker: Wren
+Take eighteen coins and two sketchbook snacks as my co-author prize, Fae! # speaker: Wren # gift: coins 18 # gift: snack 2 # sound: chime-yellow
+We make a great team, Wren! # speaker: Fae
+-> DONE
+
+=== npc_tuck ===
+{lanternOn():
+    WHOA! Your purple lantern makes my snowdrift glitter like a giant grape popsicle! # speaker: Tuck
+}
+{
+- calmed("hooded-kid"):
+    The snow up here feels extra fluffy now that the purple fizz is gone! Wait till Milo sees our next snow fort! # speaker: Tuck
+- not areaCalm():
+    Whoa, duck! Fizzy critters are bowling straight toward my giant snowman! # speaker: Tuck
+- lodge_open:
+    Mrs. Flurry opened Pinecone Lodge back up! Mina promised hot cocoa with extra marshmallows once my snowman's done! # speaker: Tuck
+- else:
+    Heya, Fae! Welcome to Pinecone Pass! I'm rolling the absolute biggest, roundest snowman in Cloverhollow history! # speaker: Tuck
+}
+{withParty("jordan"):
+    That bottom snowball is already taller than your snowshoes, Tuck! # speaker: Jordan
+    Just wait till I stack the scarf and pinecone buttons, Jordan! # speaker: Tuck
+}
+{withParty("sue"):
+    Bet a snowman out here could hold a fishing rod too! # speaker: Sue
+}
+{shared_snack:
+    That snack you shared gave me turbo snowman-rolling power, Fae! # speaker: Tuck
+}
+{not snow_snack and (lodge_open or bossesCalmed() >= 2): -> snow_snack}
++ [Help inspect Tuck's giant snowman]
+    Three stacked snowballs, two pine-twig arms, and a bright knit cap! {treats() > 0: And hey, carrying {treats()} warm treats up the pass is super smart!|Just don't tell the penguins, they try to slide off its nose!} # speaker: Tuck
+    -> DONE
++ [Ask what's up the mountain trail]
+    North leads past the warm lodge toward the sparkling Crystal Cavern, and the Star Bus stops right down the bend! # speaker: Tuck
+    {stickers() >= 4: With {stickers()} stickers already, you're practically a mountain-pass legend, Fae! # speaker: Tuck}
+    -> DONE
++ {snacks() > 0 and not shared_snack} [Share a cozy snack!]
+    -> shared_snack
+= snow_snack
+Hey, thanks for keeping Pinecone Pass safe for snowman-building, Fae! # speaker: Tuck
+I dug up seven lucky coins from the snowbank plus a cozy lodge snack for you! # speaker: Tuck # gift: coins 7 # gift: snack 1 # sound: chime-yellow
+Whoa, awesome! Thanks, Tuck! # speaker: Fae
+-> DONE
+= shared_snack
+Here, Tuck! Have a warm snack for your snowman-building break! # speaker: Fae # feed: snack 1
+WHOA, snacks in the snow?! You are officially the coolest mountain buddy ever, Fae! # speaker: Tuck
+Take eight shiny snow-fort coins I found by the pine bench! # speaker: Tuck # gift: coins 8 # sound: chime-green
+-> DONE
+
+=== npc_kai ===
+{lanternOn():
+    Whoa! A pocket lighthouse! You could signal every sailboat in Bubblegum Bay with that glow! # speaker: Kai
+}
+{
+- calmed("hooded-kid"):
+    Even the harbor ripples look calm and shiny now! Captain Sal says we should invite Milo down to launch paper boats too! # speaker: Kai
+- not areaCalm():
+    Watch your step on the sand, Fae! A fizzy critter is kicking up pink sea-foam near my paper boats! # speaker: Kai
+- calmed("lifeguard"):
+    Ms. Coral is back on beach watch and the whole bay is cheering! Best harbor day ever! # speaker: Kai
+- treasure_found:
+    HOLD EVERYTHING! You actually found the sunken pirate treasure on Bubblegum Bay?! Tell me everything! # speaker: Kai
+- else:
+    Ahoy, Fae! Captain Sal taught me how to fold seaworthy paper sailboats for the harbor tide! # speaker: Kai
+}
+{withParty("sue"):
+    Sue! Captain Sal said you hooked the biggest shiny fish off the pier! # speaker: Kai
+    Anytime you want a casting lesson, Kai, grab a pole! # speaker: Sue
+}
+{withParty("pond-pup"):
+    AWW! Pond Pup wants to chase my paper sailboat right along the shallows! # speaker: Kai
+}
+{not harbor_find and (calmed("lifeguard") or treasure_found or bossesCalmed() >= 1): -> harbor_find}
++ [Ask about his paper sailboats]
+    Fold the prow sharp, tuck the sail high, and launch right where the gentle waves curl! # speaker: Kai
+    {gem_count() > 0: And with {gem_count()} Star Gems gleaming in your pack, you've got better treasure eyes than any pirate! # speaker: Kai}
+    -> DONE
++ [Ask about Bubblegum Bay]
+    Captain Sal watches the boats, Nora hunts pink spiral shells, and the Cliffside Trail climbs up east if you want an ocean view! # speaker: Kai
+    -> DONE
+= harbor_find
+Ahoy, Fae! Thanks for making Bubblegum Bay smooth sailing for everyone! # speaker: Kai
+I found nine shiny sand-dollars, I mean coins, tucked near the pier pilings, all yours! # speaker: Kai # gift: coins 9 # sound: chime-blue
+Score! Thanks a bunch, Kai! # speaker: Fae
+-> DONE
+
+=== npc_sage ===
+{lanternOn():
+    Ah! Your violet lantern wakes every sleeping bluebell along the Misty Path! Even the ancient stones remember that glow. # speaker: Star-Watcher Sage
+}
+{
+- calmed("hooded-kid"):
+    Look how clear the silver mist hangs now, Fae. Ever since you helped Milo feel heard, the Enchanted Forest hums like a harp. # speaker: Star-Watcher Sage
+- seal_open:
+    You played the melody that opened the ancient stone seal! Beyond that archway waits the heart of the Enchanted Forest. # speaker: Star-Watcher Sage
+- rope_bridge:
+    The old rope bridge holds firm across the gully, Fae. Only the singing stone seal stands ahead now! # speaker: Star-Watcher Sage
+- found_mist_way:
+    You followed the lantern-lit bluebells right across the mist-band! Trusting your light always reveals the true path. # speaker: Star-Watcher Sage
+- not areaCalm():
+    Tread gently through the silver haze, young traveler. Fizzy currents ripple nearby! # speaker: Star-Watcher Sage
+- else:
+    Welcome to the Misty Path, Fae. Listen closely, and the bluebells will whisper where safe footing hides. # speaker: Star-Watcher Sage
+}
+{withParty("sue"):
+    This mist reminds me of the sea fog rolling off Bubblegum Bay, Sage! # speaker: Sue
+    Both hide wonders for patient eyes, Sue. # speaker: Star-Watcher Sage
+}
+{withParty("jordan"):
+    Good thing we brought our lantern, lasso, and flute for this trail! # speaker: Jordan
+    Well prepared, Jordan. Every tool you earned along the way has a part to play here. # speaker: Star-Watcher Sage
+}
+{not star_gift and (seal_open or bossesCalmed() >= 4): -> star_gift}
++ [Ask how to cross the Misty Path]
+    Three gentle trials guard the enchanted gate: shine a violet lantern to find the bluebell stones, lasso the gully posts to swing the bridge, and play the chime melody at the seal! # speaker: Star-Watcher Sage
+    {stickers() >= 6: With {stickers()} calm-down stickers in your journal, the forest already knows your kindness! # speaker: Star-Watcher Sage}
+    -> DONE
++ [Ask about the Enchanted Forest ahead]
+    {calmed("hooded-kid"):
+        The fairies dance under a peaceful canopy, and Milo's laughter drifts back along the breeze. Well done, Fae. # speaker: Star-Watcher Sage
+    - else:
+        A lonely wish stirred the Mystic Pond deeper inside, sending fizzy ripples across Cloverhollow. A steady heart will settle it. # speaker: Star-Watcher Sage
+    }
+    -> DONE
+= star_gift
+For walking the valley with such patience and calming {bossesCalmed()} major troubles, please accept this starlight token! # speaker: Star-Watcher Sage
+Twelve shiny coins and a trail snack to keep your step light, Fae! # speaker: Star-Watcher Sage # gift: coins 12 # gift: snack 1 # sound: chime-blue
+Thank you so much, Star-Watcher Sage! # speaker: Fae
+-> DONE
+
+=== npc_poppy ===
+{lanternOn():
+    WHOA! Your purple lantern makes every arcade cabinet glow like a secret bonus stage! # speaker: Poppy
+}
+{
+- calmed("hooded-kid"):
+    Sammy and I are saving a whole row of Skee-Ball lanes for you and Milo! Best hangout in Cloverhollow! # speaker: Poppy
+- not areaCalm():
+    Whoa, watch the cabinets! Fizzy sparks are bouncing near the prize counter! # speaker: Poppy
+- won("star-racer-keychain"):
+    HOLD ON! You actually won the Star Racer Keychain?! Let me see it shine under the arcade lights! # speaker: Poppy
+- bossesCalmed() >= 3:
+    Three-plus big calm-downs AND arcade champion?! You've got {bossesCalmed()} hero stars already, Fae! # speaker: Poppy
+- else:
+    Heya, Fae! Thanks for calming Mr. Pip down so Sammy and I could get back to our favorite machines! # speaker: Poppy
+}
+{withParty("sue"):
+    Ready for a friendly Boop-a-Mole rematch, Poppy? # speaker: Sue
+    You're on, Sue! My mallet reflexes are warmed up! # speaker: Poppy
+}
+{withParty("jordan"):
+    I'm still trying to figure out the claw machine physics, Poppy. # speaker: Jordan
+    Pick plushes from the top of the heap first, Jordan! # speaker: Poppy
+}
+{not token_tip and (tickets() >= 5 or stickers() >= 4): -> token_tip}
++ [Ask for her secret arcade trick]
+    In the claw machine, grab the top plushies before digging for the bottom ones! And in Comet Cruise, nudge early around wobbling rocks! # speaker: Poppy
+    {stickers() >= 5: With {stickers()} critter stickers, your rhythm checks must be unstoppable! # speaker: Poppy}
+    -> DONE
++ [Check her ticket tally]
+    I'm only three tickets away from trading at Mr. Pip's counter! {tickets() > 0: Looks like you've got {tickets()} tickets saved up too!|Try a round of Skee-Ball and watch those tickets pour out!} # speaker: Poppy
+    -> DONE
+= token_tip
+Hey, arcade pros always share spare coins! Take ten shiny tokens from my lucky coin cup, Fae! # speaker: Poppy # gift: coins 10 # sound: chime-yellow
+Sweet! Thanks a million, Poppy! # speaker: Fae
+-> DONE
+
+=== npc_clara ===
+{lanternOn():
+    Oh, my! That soft violet lantern makes my knitted stripes shimmer like mountain auroras! # speaker: Clara
+}
+{
+- calmed("hooded-kid"):
+    The whole lodge feels like a warm hug now that Milo and all the valley critters are resting easy, Fae! # speaker: Clara
+- not areaCalm():
+    Oh dear, stay close to the hearth! Something fizzy is rustling outside the lodge porch! # speaker: Clara
+- bossesCalmed() >= 4:
+    Word travels fast up Pinecone Pass! With {bossesCalmed()} major calm-downs behind you, everyone here raises a cocoa mug to you! # speaker: Clara
+- else:
+    Welcome inside Pinecone Lodge, dear! Pull up a stool near Otis and let the crackling fireplace warm your mittens! # speaker: Clara
+}
+{withParty("sue"):
+    Your knitted scarves are way warmer than my harbor raincoat, Clara! # speaker: Sue
+    I'll knit you a sea-blue striped one next, Sue! # speaker: Clara
+}
+{withParty("jordan"):
+    Clara makes the best pine-berry tea on the whole mountain, Fae! # speaker: Jordan
+    Always a hot kettle waiting whenever you drop by, Jordan! # speaker: Clara
+}
+{shared_snack:
+    Thank you again for sharing that delicious snack by the fire, Fae! Best tea companion in the pass! # speaker: Clara
+}
++ [Ask about her knitting]
+    I'm knitting cozy striped scarves for Mrs. Flurry, Otis, and every snowy explorer who braves Pinecone Pass! # speaker: Clara
+    {stickers() >= 5: And with {stickers()} calm-down stickers in your book, you've brought warmth to half the valley! # speaker: Clara}
+    -> DONE
++ [Ask about Pinecone Lodge]
+    Otis tells fireside tales while Mrs. Flurry keeps the cocoa kettle singing. Even the little lodge hamster loves the cozy quiet! # speaker: Clara
+    -> DONE
++ {snacks() > 0 and not shared_snack} [Share a cozy snack!]
+    -> shared_snack
+= shared_snack
+Here, Clara! Would you like to share a cozy snack by the hearth? # speaker: Fae # feed: snack 1
+Oh, how thoughtful, Fae! A crunchy snack pairs wonderfully with hot lodge tea! # speaker: Clara
+Please tuck these eight shiny coins into your explorer pouch with my warmest thanks! # speaker: Clara # gift: coins 8 # sound: chime-green
+-> DONE
+
+=== npc_bramble ===
+{lanternOn():
+    Whoa, trail lantern! That violet glow picks out rare silver moss right along the cliff rocks! # speaker: Bramble
+}
+{
+- calmed("hooded-kid"):
+    Every bend from Bubblegum Bay up to Pinecone Pass is humming peaceful again! Tell Milo he's welcome on our ridge hikes anytime! # speaker: Bramble
+- not areaCalm():
+    Watch your boots on the gravel, Fae! A fizzy critter is zipping right around the cliff switchbacks! # speaker: Bramble
+- calmed("gull"):
+    Hooray! With that lookout gull settled down, Hiker Lark and I can hear the canyon songbirds clear down to the surf! # speaker: Bramble
+- else:
+    Howdy, trailblazer! Welcome to Cliffside Trail! I keep the signposts tidy and pack extra trail maps for hikers! # speaker: Bramble
+}
+{withParty("sue"):
+    You can spot every fishing boat in Bubblegum Bay from up here, Bramble! # speaker: Sue
+    Sure can, Sue! Best coastal overlook in Cloverhollow! # speaker: Bramble
+}
+{withParty("jordan"):
+    Bramble showed me the quickest clover shortcut up to Pinecone Pass! # speaker: Jordan
+    And Jordan still beats my ridge time by two minutes flat! # speaker: Bramble
+}
+{not ridge_gift and (calmed("gull") or bossesCalmed() >= 2): -> ridge_gift}
++ [Ask about the Cliffside Trail]
+    Hiker Lark tracks the songbirds down near the signpost while I check the upper switchback toward Pinecone Pass. # speaker: Bramble
+    {stickers() >= 4: With {stickers()} critter stickers already, you're a natural trail ranger, Fae! # speaker: Bramble}
+    -> DONE
++ [Ask if he spotted anything unusual]
+    {calmed("hooded-kid"):
+        Just cheerful bunnies, calm squirrels, and neighbors waving across the ridge! # speaker: Bramble
+    - else:
+        Earlier a kid in a purple hood sprinted uphill faster than a startled jackrabbit, trailing fizzy purple sparkles! # speaker: Bramble
+    }
+    -> DONE
+= ridge_gift
+Any explorer who helps keep the valley trails calm deserves a ridge-walker's bonus! # speaker: Bramble
+Take ten shiny coins and a crunchy trail snack from my pack, Fae! # speaker: Bramble # gift: coins 10 # gift: snack 1 # sound: chime-green
+Awesome, thanks Bramble! # speaker: Fae
+-> DONE
+
+=== npc_gemma ===
+{lanternOn():
+    OH! Shine your lantern right over this wall! Every tiny quartz vein lights up like purple starlight! # speaker: Gemma
+}
+{
+- calmed("hooded-kid"):
+    The cavern crystals chime so sweetly now! Professor Pebble says we should show Milo the glowing prism arch sometime! # speaker: Gemma
+- not areaCalm():
+    Careful near the stream, Fae! Fizzy bats and crystal moles are echoing extra loud in here! # speaker: Gemma
+- cavern_bridge_lit:
+    WHOA! You lit the fairy mural and raised the crystal stepping stones! Best geological miracle ever! # speaker: Gemma
+- else:
+    Hi, Fae! I'm helping Professor Pebble map every humming quartz cluster inside Crystal Cavern! # speaker: Gemma
+}
+{withParty("sue"):
+    That underground spring is almost as turquoise as Bubblegum Bay, Gemma! # speaker: Sue
+    And it sparkles twice as bright under Fae's lantern, Sue! # speaker: Gemma
+}
+{withParty("jordan"):
+    Wait till you hear the golden star chime ring across the grotto, Gemma! # speaker: Jordan
+    I've got my notebook open and ready to sketch the soundwaves, Jordan! # speaker: Gemma
+}
+{not crystal_gift and (cavern_chime_rung or cavern_bridge_lit or gem_count() >= 2): -> crystal_gift}
++ [Ask about the cavern crystals]
+    Purple quartz hums low, teal crystals ring bright, and golden clusters chime right along with a flute! # speaker: Gemma
+    {bossesCalmed() >= 2: With {bossesCalmed()} major calm-downs logged, even the crystal moles trust your footsteps! # speaker: Gemma}
+    -> DONE
++ [Compare Star Gem notes]
+    {gem_count() > 0:
+        You've already discovered {gem_count()} Star Gems?! Plus {stickers()} critter stickers? You're a legend in Professor Pebble's logbook! # speaker: Gemma
+    - else:
+        Professor Pebble says seven Star Gems hide across Cloverhollow, and one glints right inside this cavern's far eastern pocket! # speaker: Gemma
+    }
+    -> DONE
+= crystal_gift
+Whoa, you're a real-life cavern explorer! Here are twelve shiny coins from my geology jar! # speaker: Gemma # gift: coins 12 # sound: chime-blue
+Whoa, thanks Gemma! # speaker: Fae
+-> DONE
+
+=== npc_bert ===
+{lanternOn():
+    Well I'll be! That purple lantern spots stray glitter and invisible chalk marks faster than my best dustpan! # speaker: Custodian Bert
+}
+{
+- calmed("hooded-kid"):
+    Not a single smudge of purple fizz left on the linoleum! And Milo even offered to help me stack chairs after school! # speaker: Custodian Bert
+- not areaCalm():
+    Hold onto your backpack, Fae! Fizzy paint splashes are bouncing right down East Hall! # speaker: Custodian Bert
+- art_open:
+    Ms. Rowan's Art Room is spotless and back open! Maya and Theo already have the clay table humming! # speaker: Custodian Bert
+- recess:
+    Nice and quiet in East Hall while Leo and the class run around outside for recess! # speaker: Custodian Bert
+- else:
+    Howdy, Fae! Custodian Bert here, keeping Cloverhollow School's hallways shiny enough to see your smile in! # speaker: Custodian Bert
+}
+{withParty("sue"):
+    Your hallway floor shines brighter than a polished boat deck, Bert! # speaker: Sue
+    Haha, high praise from a Bubblegum Bay sailor, Sue! # speaker: Custodian Bert
+}
+{withParty("jordan"):
+    Sorry if we tracked any pinecone dust in from the pass, Custodian Bert! # speaker: Jordan
+    No worries at all, Jordan! Adventures leave a few footprints, that's what brooms are for! # speaker: Custodian Bert
+}
+{not hall_gift and (art_open or bossesCalmed() >= 2): -> hall_gift}
++ [Ask about East Hall]
+    Gym doors on the west, Ms. Willow's Music Room in the middle, and Ms. Rowan's Art Room down east! # speaker: Custodian Bert
+    {stickers() >= 4: With {stickers()} critter stickers already, you've calmed more critters than I've swept chalk erasers! # speaker: Custodian Bert}
+    -> DONE
++ [Ask if he saw anyone rush past]
+    {calmed("hooded-kid"):
+        Just cheerful students heading to art and music! Best sound in the whole building! # speaker: Custodian Bert
+    - else:
+        Somebody in a purple hood zoomed past my broom cart leaving fizzy purple sneaker prints that popped like soda bubbles! # speaker: Custodian Bert
+    }
+    -> DONE
+= hall_gift
+Thanks for helping keep our school calm and bright, Fae! Take nine shiny coins I found beneath the lost-and-found bench! # speaker: Custodian Bert # gift: coins 9 # sound: chime-yellow
+Aw, thank you, Custodian Bert! # speaker: Fae
+-> DONE
+
+=== npc_theo ===
+{lanternOn():
+    WHOA! Your purple lantern makes my ceramic glaze samples glow neon right on the work table! # speaker: Theo
+}
+{
+- calmed("hooded-kid"):
+    Milo asked if I'd teach him how to sculpt a tiny clay frog next art class! Having everyone back together is the best! # speaker: Theo
+- not areaCalm():
+    Eep! Hold the clay table steady! Fizzy shakes might topple my tiny turtle! # speaker: Theo
+- else:
+    Hi, Fae! Thanks for helping Ms. Rowan calm down so Maya and I could get back to our clay and easels! # speaker: Theo
+}
+{withParty("sue"):
+    Could you sculpt a tiny clay bluebird or harbor crab next, Theo? # speaker: Sue
+    Ooh, a clay harbor crab with tiny pinchers! Adding it to my list, Sue! # speaker: Theo
+}
+{withParty("jordan"):
+    Those miniature pine-tree stamps on your pottery look awesome, Theo! # speaker: Jordan
+    Thanks, Jordan! I pressed real Pinecone Pass needles into the soft clay! # speaker: Theo
+}
+{npc_wren.sketch_complete:
+    Maya told me you helped Wren finish the Field Compendium! I'm already sculpting a tiny crystal quartz and four-leaf clover bowl to celebrate! # speaker: Theo
+}
+{not studio_gift and (stickers() >= 3 or bossesCalmed() >= 2): -> studio_gift}
++ [Look at Theo's clay sculptures]
+    I'm making a miniature set of every calm critter in Cloverhollow! {stickers() >= 6: With {stickers()} stickers in your album, you've given me a whole gallery to sculpt!|Show me every new critter you befriend!} # speaker: Theo
+    -> DONE
++ [Ask about working with Maya]
+    Maya paints the bright watercolor backdrops and I sculpt the tiny clay critters to stand in front! Teamwork makes the coolest art shows! # speaker: Theo
+    -> DONE
+= studio_gift
+You inspired a whole shelf of calm-critter sculptures, Fae! Take ten shiny studio coins and a crunchy art-room snack! # speaker: Theo # gift: coins 10 # gift: snack 1 # sound: chime-green
+Whoa, thank you, Theo! # speaker: Fae
 -> DONE

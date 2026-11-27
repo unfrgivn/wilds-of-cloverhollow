@@ -71,6 +71,7 @@ export function shouldResumeAudioOnVisible(hidden: boolean, state: AudioState): 
 
 export type AudioController = {
   play: (cue: SoundCue, tick: number, context?: SoundPlayContext) => SoundLogEntry;
+  playAmbientChatter: (speaker: string) => void;
   playEffect: (effect: CompanionAudioEffect) => void;
   effects: () => readonly CompanionAudioEffect[];
   clearEffects: () => void;
@@ -499,6 +500,38 @@ export function createAudio(
     }
   });
 
+  const playAmbientChatter = (speaker: string): void => {
+    if (muted || !pageVisible()) return;
+    const audio = context;
+    if (audio === null || master === null || stateOf(audio) !== "running") return;
+    const blip = blipFrequency(speaker, speaker.length, speaker[0]);
+    if (blip === null) return;
+    const now = audio.currentTime;
+    const duration = 0.038;
+    const gain = blip.gain * 0.32;
+    playSegment(audio, {
+      wave: blip.wave,
+      frequency: blip.frequency,
+      endFrequency: blip.endFrequency,
+      offset: 0,
+      duration,
+      gain,
+      attack: 0.004,
+    }, now);
+    if (blip.harmonic !== undefined) {
+      playSegment(audio, {
+        wave: "sine",
+        frequency: blip.frequency * blip.harmonic,
+        endFrequency:
+          blip.endFrequency === undefined ? undefined : blip.endFrequency * blip.harmonic,
+        offset: 0,
+        duration: duration * 0.85,
+        gain: gain * 0.25,
+        attack: 0.004,
+      }, now);
+    }
+  };
+
   return {
     play: (cue, tick, info) => {
       const entry = { tick, cue, played: playRecipe(cue, tick, info) };
@@ -506,6 +539,7 @@ export function createAudio(
       if (entries.length > 120) entries.shift();
       return entry;
     },
+    playAmbientChatter,
     playEffect,
     effects: () => playedEffects.slice(),
     clearEffects: () => {

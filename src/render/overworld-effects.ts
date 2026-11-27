@@ -11,6 +11,8 @@ import {
   presentCritters,
   surfaceAt,
   type Area,
+  type NpcEmoteKind,
+  type NpcLifeSnapshot,
   type Point,
   type State,
   type World,
@@ -92,8 +94,19 @@ export class OverworldEffectsController {
   private activeClubhouseDisplay = 0;
 
   private readonly emoteSprites: Sprite[] = [];
-  private activeDialoguePartner: { x: number; y: number; height: number } | null = null;
-  private recentTalk: { x: number; y: number; height: number; startTick: number } | null = null;
+  private activeDialoguePartner: {
+    npcId: string | null;
+    x: number;
+    y: number;
+    height: number;
+  } | null = null;
+  private recentTalk: {
+    npcId: string | null;
+    x: number;
+    y: number;
+    height: number;
+    startTick: number;
+  } | null = null;
   private lastEmoteArea = "";
   private lastEmoteTick: number | undefined;
 
@@ -477,6 +490,7 @@ export class OverworldEffectsController {
     alpha: number,
     activePet: { id: string; elapsed: number } | null,
     activeRest: { spot: RestSpot; elapsed: number } | null,
+    npcLife: NpcLifeSnapshot,
     reducedMotion = false,
   ): void {
     const active = area.id !== "harness" &&
@@ -514,8 +528,15 @@ export class OverworldEffectsController {
         const critter = npc.visibleWhenCalmed === undefined
           ? undefined
           : this.world.critters[npc.visibleWhenCalmed];
-        const height = computeNpcOverworldHeight(npc, critter);
-        this.activeDialoguePartner = { x: npc.point.x, y: npc.point.y, height };
+        const profile = this.world.npcProfiles[npc.id];
+        const height = critter !== undefined
+          ? critter.overworldHeight
+          : npc.id === "oliver" || npc.id.startsWith("fairy-")
+            ? 84
+            : profile !== undefined
+              ? profile.adult ? 174 : 146
+              : computeNpcOverworldHeight(npc, critter);
+        this.activeDialoguePartner = { npcId: npc.id, x: npc.point.x, y: npc.point.y, height };
       } else {
         const calm = present
           .filter((item) => item.mood === "calm" && item.kind.calmKnot === knot)
@@ -524,6 +545,7 @@ export class OverworldEffectsController {
             ((b.point.x - state.player.x) ** 2 + (b.point.y - state.player.y) ** 2))[0];
         if (calm !== undefined) {
           this.activeDialoguePartner = {
+            npcId: null,
             x: calm.point.x,
             y: calm.point.y,
             height: calm.kind.overworldHeight,
@@ -536,6 +558,7 @@ export class OverworldEffectsController {
     }
 
     let recentTalk: { x: number; y: number; height: number; elapsed: number } | null = null;
+    let recentTalkNpcId: string | null = null;
     if (this.recentTalk !== null) {
       const elapsed = state.tick - this.recentTalk.startTick;
       if (elapsed >= 0 && elapsed < 38) {
@@ -545,6 +568,7 @@ export class OverworldEffectsController {
           height: this.recentTalk.height,
           elapsed,
         };
+        recentTalkNpcId = this.recentTalk.npcId;
       } else {
         this.recentTalk = null;
       }
@@ -558,6 +582,36 @@ export class OverworldEffectsController {
       alpha,
     );
 
+    const activeChatterNpcId =
+      npcLife.chatter !== null && npcLife.chatter.alpha > 0.01
+        ? npcLife.chatter.npcId
+        : null;
+    const npcEmotes: {
+      id: string;
+      x: number;
+      y: number;
+      height: number;
+      kind: NpcEmoteKind;
+      index: number;
+    }[] = [];
+    npcLife.npcs.forEach((entry, index) => {
+      if (entry.emote === null) return;
+      if (entry.id === activeChatterNpcId || entry.id === recentTalkNpcId) return;
+      const height = entry.id === "oliver" || entry.id.startsWith("fairy-")
+        ? 84
+        : entry.adult
+          ? 174
+          : 146;
+      npcEmotes.push({
+        id: entry.id,
+        x: entry.x,
+        y: entry.y,
+        height,
+        kind: entry.emote,
+        index,
+      });
+    });
+
     const emotes = evaluateOverworldEmotes({
       areaId: area.id,
       tick: state.tick,
@@ -567,6 +621,7 @@ export class OverworldEffectsController {
       calmedCritters,
       nappingMembers,
       recentTalk,
+      npcEmotes,
       reducedMotion,
     });
 

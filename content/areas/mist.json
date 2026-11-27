@@ -474,7 +474,36 @@
     }
   ],
   "critters": [],
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "sage",
+      "point": {
+        "x": 320,
+        "y": 440
+      },
+      "facing": "right",
+      "knot": "npc_sage",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          305,
+          430
+        ],
+        [
+          335,
+          430
+        ],
+        [
+          335,
+          450
+        ],
+        [
+          305,
+          450
+        ]
+      ]
+    }
+  ],
   "props": [
     {
       "id": "pine-west",

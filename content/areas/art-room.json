@@ -159,7 +159,66 @@
       "prompt": "Look"
     }
   ],
-  "npcs": [],
+  "npcs": [
+    {
+      "id": "maya",
+      "point": {
+        "x": 480,
+        "y": 320
+      },
+      "facing": "down",
+      "knot": "npc_maya_art",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          465,
+          310
+        ],
+        [
+          495,
+          310
+        ],
+        [
+          495,
+          330
+        ],
+        [
+          465,
+          330
+        ]
+      ],
+      "visibleWhile": "art_open"
+    },
+    {
+      "id": "theo",
+      "point": {
+        "x": 360,
+        "y": 640
+      },
+      "facing": "right",
+      "knot": "npc_theo",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          345,
+          630
+        ],
+        [
+          375,
+          630
+        ],
+        [
+          375,
+          650
+        ],
+        [
+          345,
+          650
+        ]
+      ],
+      "visibleWhile": "art_open"
+    }
+  ],
   "critters": [],
   "props": [
     {

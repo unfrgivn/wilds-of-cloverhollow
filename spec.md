@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 130)
+Last updated: 2026-11-27 (Milestone 144)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -728,18 +728,65 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`surfaceAt` in `footstepLayer`) behind her feet; when Reduced Motion is
   active (`isReducedMotionActive()`), `updateFootsteps` clears active puffs and
   returns early so walking stays calm and particle-free (Milestone 119).
-- Hand-painted overworld emote bubbles (`src/render/emotes.ts`, Milestone 85,
-  render-only, skipped on `harness`, dialogue, battles, and arcades): pure
-  deterministic `evaluateOverworldEmotes` drives a pooled `emoteLayer` with
-  `emoteQuestion` / `emoteExclaim` over noticing/chasing chaos roamers,
-  contented drifting `emoteNote` (`♪`) on a 90-tick loop over calmed critters
-  within 185 units of Fae, sleepy `emoteZzz` on a 100-tick loop over napping
-  Maddie (`stillTicks >= 240`), and a rising warm `emoteHeart` for 38 ticks
-  after finishing a chat with an NPC or calm critter. When `reducedMotion` is
-  `true` (Milestone 139), every overworld emote holds upright (`rotation = 0`)
-  at a steady anchor without bob, bounce, sway, or vertical drift (`emoteNote`
-  and `emoteZzz` at fixed `scale: 0.66`, `alpha: 0.85`; `emoteHeart` keeping
-  gentle fade in/out at `x = talk.x`).
+- Hand-painted overworld emote bubbles (`src/render/emotes.ts`, Milestones 85 &
+  144, render-only, skipped on `harness`, dialogue, battles, and arcades): pure
+  deterministic `evaluateOverworldEmotes` drives a pooled 20-slot `emoteLayer`
+  (`vfx-textures.ts` adds hand-inked 48x48 `emoteSparkle`, `emoteWave`, and
+  `emoteWorry` beside `emoteQuestion`, `emoteExclaim`, `emoteNote`, `emoteZzz`,
+  and `emoteHeart`) with `emoteQuestion` / `emoteExclaim` over noticing/chasing
+  chaos roamers, contented drifting `emoteNote` (`♪`) on a 90-tick loop over
+  calmed critters within 185 units of Fae, sleepy `emoteZzz` on a 100-tick loop
+  over napping Maddie (`stillTicks >= 240`), a rising warm `emoteHeart` for 38
+  ticks after finishing a chat with an NPC or calm critter, and reactive NPC
+  emotes (skipping any NPC displaying an active chatter bubble or post-talk
+  heart). When `reducedMotion` is `true` (Milestone 139), every overworld emote
+  holds upright (`rotation = 0`) at a steady anchor without bob, bounce, sway,
+  or vertical drift (`emoteNote` and `emoteZzz` at fixed `scale: 0.66`,
+  `alpha: 0.85`; `emoteHeart` keeping gentle fade in/out at `x = talk.x`).
+- Living NPC Intelligence & Organic World Cast (Milestone 144,
+  `src/core/npc-context.ts`, `content/npc-profiles.json`,
+  `src/render/npc-life.ts`, `src/ui/npc-chatter.ts`, `src/render/motion.ts`):
+  - Twenty-six additional blinking 4-direction hand-painted watercolor NPCs
+    (`tools/art/build-living-npcs.ts`, `art/recipes/living-npcs.json`; lossless
+    WebP atlases, 14 adults at default scale `0.5` and 12 kids at `scale: 0.47`)
+    populate Cloverhollow's plaza, park, arcade, school east hall, playing
+    field, art room, Bubblegum Bay, Cliffside Trail, Pinecone Pass, Mountain
+    Lodge, Crystal Cavern, Whispering Woods, Clover Hills, and Misty Path:
+    `flora`, `gus`, `sammy`, `poppy`, `pippa`, `hazel`, `leo`, `maya`, `theo`,
+    `bert`, `sal`, `kai`, `nora`, `lark`, `bramble`, `mina`, `tuck`, `otis`,
+    `clara`, `pebble`, `gemma`, `moss`, `wren`, `sunny`, `bram`, and `sage`,
+    each with bespoke voice profiles (`src/platform/voices.ts`) and circular
+    die-cut dialogue portraits (`src/ui/portraits.ts`).
+  - Dynamic story relocations via optional NPC schedule fields (`hiddenWhile`,
+    `visibleAfterCalm`, `hiddenAfterCalm`, validated in
+    `src/content/npc-parsers.ts`): Sammy moves from `plaza` into `arcade`
+    (joined by Poppy) once `arcade-keeper` is calmed; Leo moves from
+    `east-hall` to `field` once `recess` is true; Maya moves from `field` to
+    `art-room` (joined by Theo) once `art_open` is true.
+  - Pure deterministic `npcWorldSituation`, `reactionRippleTicks`, and
+    `evaluateNpcLife` (zero banned trig, zero `State` or save-version changes)
+    read `content/npc-profiles.json` (51 named character profiles covering the
+    entire town cast and 26 biome-wide NPC-to-NPC social banter entries,
+    skipping `bus-stop` and `sanctuary-*` critters) to drive live organic
+    facing, distance-rippled attention (`dialogue` > `lantern-awe` >
+    `celebrate` > `music-delight` > `chaos-worry` > `companion-greet` >
+    `player-greet` > `social-chat` > `idle`, preserving authored arrival facing
+    during a 48-tick arrival grace window), personality-driven living motion
+    (`npcLivingPose` including `mystic`, `celebrate`, and 6-tick turn-squash,
+    respecting `reducedMotion`), pooled celebration sparkles (skipped under
+    `reducedMotion`), whisper-soft voiced ambient chatter chimes during live
+    running play (`AudioController.playAmbientChatter`), and at most one crisp
+    die-cut watercolor overworld chatter bubble (`.npc-chatter` with six
+    high-contrast tones `normal`, `lantern`, `worry`, `warm`, `banter`, and
+    `music`, inline SVG emblems, smart top-or-side placement clamping
+    `data-side="top|left|right"`, `TALK`-prompt yielding, reduced-motion &
+    Safari tap-selection hygiene, and hiding across overlays and `harness`).
+    `renderInfo().npcLife` exposes read-only `{ stage, npcs, chatter }`.
+  - Cross-biome living errands & snack-sharing (all stitch-gated with zero new
+    global Ink `VAR`s): Mailman Gus's Postal Chain (`Gus -> Captain Sal ->
+    Mina -> Gus`), Wren's Botanical & Crystal Sketchbook (`Wren -> Professor
+    Pebble & Sunny -> Wren -> Maya/Theo`), and cozy neighbor snack-sharing
+    (`# feed: snack 1`) with Otis, Grandma Hazel, Tuck, Hiker Lark, and Clara.
 - Idle: 1 to 4 frames per direction.
 - Fae is about 140 units tall (about 280 source pixels).
 - Sprite sheets: one WebP atlas (lossless alpha, generated from lossless PNG
@@ -1668,16 +1715,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   only where a link turns her round (the bay's south edge and the trail's
   beach), where a kid holding down would otherwise bounce between them.
 - People: an area's `npcs` are `{ id, point, facing, knot, prompt, footprint,
-  visibleWhile?, visibleWhenCalmed? }` (Ms. Maple the teacher and Nurse Holly
+  visibleWhile?, hiddenWhile?, visibleWhenCalmed?, visibleAfterCalm?,
+  hiddenAfterCalm? }` (Ms. Maple the teacher and Nurse Holly
   in the school hallway, and the kid in the purple hood there for a moment; Ms.
   Maple, Milo, and Rosie in the classroom; Coach Ash in the gym; Mom and Oliver
   in the kitchen; Ranger Fern and the 17 calm-animal visitors in the Wildlife
-  Sanctuary). `prompt` is `"Look"`, `"Talk"`, or `"Pet"`. Regular NPCs are
+  Sanctuary; plus Cloverhollow's expanded living townspeople, classmates, and
+  biome residents from Milestone 144). `prompt` is `"Look"`, `"Talk"`, or
+  `"Pet"`. Regular NPCs are
   drawn from the atlas named for their id in `content/characters.json` (`{ atlas,
   idleTicks, scale? }`, where `idleTicks` are the ticks per `idle_down` frame:
   Mom holds her smile 180 ticks, then blinks for 8, and optional positive finite
   `scale` defaults to `0.5`, with `0.46` for Sue and Jordan and `0.47` for
-  Rosie); an NPC with `visibleWhenCalmed` names a critter kind in
+  kid NPCs); an NPC with `visibleWhenCalmed` names a critter kind in
   `world.critters`, renders its `calm_idle_01` frame scaled to
   `overworldHeight / figureHeight` with gentle calm breathing and a contact
   shadow, and appears only once `isSpeciesCalmed(world, state, species)` is
@@ -1688,18 +1738,20 @@ ios/            Capacitor iOS project (from Milestone 4).
   between them (`npcFacing`), mirroring `idle_left` when facing right without an
   `idle_right` animation, and Fae turns render-only toward her conversation
   partner (`dialogueFacing`, also for calm critters, which mirror toward Fae
-  while speaking); otherwise people face as authored. Without a frame for that
-  facing they show their front.
+  while speaking); outside dialogue, non-prop people use `evaluateNpcLife` for
+  organic facing and living motion after the 48-tick arrival grace window.
+  Without a frame for that facing they show their front.
   Standing props such as the plaza bus stop use the same person entry and
   y-sorted renderer, but are props rather than people.
 - A person's `footprint` polygon is solid, for Fae and for the party, like a
-  blocker. A person with `visibleWhile` (an Ink variable) or
-  `visibleWhenCalmed` (a calmed critter kind/species) is only there while those
-  conditions hold; otherwise they aren't drawn, can't be talked to or petted,
-  and aren't solid (`npcVisible`). The area checks count every footprint as
-  solid, since someone may be standing there. Story variables are read per tick
-  through `world.storyVariable(ink, name)`: one Story built at load, reused for
-  each read, since building one costs about 0.2 ms.
+  blocker. A person with `visibleWhile` / `hiddenWhile` (Ink variables),
+  `visibleWhenCalmed` (a calmed critter kind/species), or `visibleAfterCalm` /
+  `hiddenAfterCalm` (`calmedFact` critter/species ids) is only there while all
+  specified conditions hold; otherwise they aren't drawn, can't be talked to or
+  petted, and aren't solid (`npcVisible`). The area checks count every footprint
+  as solid, since someone may be standing there. Story variables are read per
+  tick through `world.storyVariable(ink, name)`: one Story built at load, reused
+  for each read, since building one costs about 0.2 ms.
 - Area paintings: opaque WebP tiles (each at most 2048x2048) at 2 source px
   per unit, listed in `public/assets/areas/<id>/ground.json` (tile offsets in
   source px and the painting's `paper` margin colour). The paper colour fills
@@ -2068,11 +2120,13 @@ trunks keep its two exits.
   them come with that line rather than as an empty step. The story's
   externals, `calmed(name)`, `coins()` (Fae's coins), `snacks()` (her
   snacks, Milestone 47), `won(prize)` (a prize she has won),
-  `plushesLeft()` (how many plushes are still in the claw machine), and
-  `tickets()` (her tickets, Milestone 45), are answered from
-  the core's state (`inkFacts`) for every command, not only a knot's first
-  line. `calmed` answers a set piece by its id from its own mood, and a
-  species once Fae owns its sticker (she has calmed one of them, anywhere).
+  `plushesLeft()` (how many plushes are still in the claw machine),
+  `tickets()` (her tickets, Milestone 45), `withParty(id)`, `lanternOn()`,
+  `areaCalm()`, `level()`, `stickers()`, `treats()`, and `bossesCalmed()`
+  (Milestone 144), are answered from the core's state (`inkFacts`) for every
+  command, not only a knot's first line. `calmed` answers a set piece by its id
+  from its own mood, and a species once Fae owns its sticker (she has calmed one
+  of them, anywhere).
 - The flute (Milestone 47): a flute press, once `has_flute` is true and Fae is
   free (no dialogue, battle, journal, or door), opens the story's `flute` knot
   like a talk. Its first line plays the `flute` story sound.

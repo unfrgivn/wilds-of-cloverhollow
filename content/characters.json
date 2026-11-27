@@ -193,5 +193,199 @@
       165,
       8
     ]
+  },
+  "flora": {
+    "atlas": "assets/characters/flora/flora.json",
+    "idleTicks": [
+      172,
+      8
+    ]
+  },
+  "sal": {
+    "atlas": "assets/characters/sal/sal.json",
+    "idleTicks": [
+      195,
+      8
+    ]
+  },
+  "lark": {
+    "atlas": "assets/characters/lark/lark.json",
+    "idleTicks": [
+      164,
+      8
+    ]
+  },
+  "mina": {
+    "atlas": "assets/characters/mina/mina.json",
+    "idleTicks": [
+      182,
+      8
+    ]
+  },
+  "otis": {
+    "atlas": "assets/characters/otis/otis.json",
+    "idleTicks": [
+      204,
+      8
+    ]
+  },
+  "pebble": {
+    "atlas": "assets/characters/pebble/pebble.json",
+    "idleTicks": [
+      158,
+      8
+    ]
+  },
+  "moss": {
+    "atlas": "assets/characters/moss/moss.json",
+    "idleTicks": [
+      188,
+      8
+    ]
+  },
+  "sammy": {
+    "atlas": "assets/characters/sammy/sammy.json",
+    "idleTicks": [
+      148,
+      8
+    ],
+    "scale": 0.47
+  },
+  "pippa": {
+    "atlas": "assets/characters/pippa/pippa.json",
+    "idleTicks": [
+      156,
+      8
+    ],
+    "scale": 0.47
+  },
+  "leo": {
+    "atlas": "assets/characters/leo/leo.json",
+    "idleTicks": [
+      168,
+      8
+    ],
+    "scale": 0.47
+  },
+  "maya": {
+    "atlas": "assets/characters/maya/maya.json",
+    "idleTicks": [
+      160,
+      8
+    ],
+    "scale": 0.47
+  },
+  "nora": {
+    "atlas": "assets/characters/nora/nora.json",
+    "idleTicks": [
+      152,
+      8
+    ],
+    "scale": 0.47
+  },
+  "sunny": {
+    "atlas": "assets/characters/sunny/sunny.json",
+    "idleTicks": [
+      176,
+      8
+    ],
+    "scale": 0.47
+  },
+  "gus": {
+    "atlas": "assets/characters/gus/gus.json",
+    "idleTicks": [
+      184,
+      8
+    ]
+  },
+  "hazel": {
+    "atlas": "assets/characters/hazel/hazel.json",
+    "idleTicks": [
+      208,
+      8
+    ]
+  },
+  "bram": {
+    "atlas": "assets/characters/bram/bram.json",
+    "idleTicks": [
+      174,
+      8
+    ]
+  },
+  "wren": {
+    "atlas": "assets/characters/wren/wren.json",
+    "idleTicks": [
+      162,
+      8
+    ],
+    "scale": 0.47
+  },
+  "tuck": {
+    "atlas": "assets/characters/tuck/tuck.json",
+    "idleTicks": [
+      146,
+      8
+    ],
+    "scale": 0.47
+  },
+  "kai": {
+    "atlas": "assets/characters/kai/kai.json",
+    "idleTicks": [
+      154,
+      8
+    ],
+    "scale": 0.47
+  },
+  "sage": {
+    "atlas": "assets/characters/sage/sage.json",
+    "idleTicks": [
+      198,
+      8
+    ]
+  },
+  "clara": {
+    "atlas": "assets/characters/clara/clara.json",
+    "idleTicks": [
+      178,
+      8
+    ]
+  },
+  "bramble": {
+    "atlas": "assets/characters/bramble/bramble.json",
+    "idleTicks": [
+      166,
+      8
+    ]
+  },
+  "bert": {
+    "atlas": "assets/characters/bert/bert.json",
+    "idleTicks": [
+      192,
+      8
+    ]
+  },
+  "poppy": {
+    "atlas": "assets/characters/poppy/poppy.json",
+    "idleTicks": [
+      144,
+      8
+    ],
+    "scale": 0.47
+  },
+  "gemma": {
+    "atlas": "assets/characters/gemma/gemma.json",
+    "idleTicks": [
+      150,
+      8
+    ],
+    "scale": 0.47
+  },
+  "theo": {
+    "atlas": "assets/characters/theo/theo.json",
+    "idleTicks": [
+      164,
+      8
+    ],
+    "scale": 0.47
   }
 }

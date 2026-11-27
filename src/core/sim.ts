@@ -20,7 +20,10 @@ import {
   resolveMove,
 } from "./geometry";
 import {
+  BOSS_SET_PIECES,
   battleParty,
+  bossesCalmedCount,
+  calmedFact,
   faeBox,
   haltedParty,
   hiddenFraction,
@@ -60,12 +63,15 @@ import { levelUpDelta } from "./levels";
 import { openArcade, stepArcade, isArcadeGameId, type ArcadeGameId } from "./arcade";
 
 export {
+  BOSS_SET_PIECES,
   CALM_HOOK,
   addTreat,
   battleCommands,
   battleFoe,
   battleParty,
   battleView,
+  bossesCalmedCount,
+  calmedFact,
   closestPointOnPolygon,
   consumeTreat,
   distanceToPolygon,

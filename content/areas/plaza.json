@@ -637,6 +637,91 @@
           790
         ]
       ]
+    },
+    {
+      "id": "flora",
+      "point": {
+        "x": 475,
+        "y": 410
+      },
+      "facing": "down",
+      "knot": "npc_flora",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          460,
+          400
+        ],
+        [
+          490,
+          400
+        ],
+        [
+          490,
+          420
+        ],
+        [
+          460,
+          420
+        ]
+      ]
+    },
+    {
+      "id": "sammy",
+      "point": {
+        "x": 1565,
+        "y": 895
+      },
+      "facing": "left",
+      "knot": "npc_sammy_plaza",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          1550,
+          885
+        ],
+        [
+          1580,
+          885
+        ],
+        [
+          1580,
+          905
+        ],
+        [
+          1550,
+          905
+        ]
+      ],
+      "hiddenAfterCalm": "arcade-keeper"
+    },
+    {
+      "id": "gus",
+      "point": {
+        "x": 495,
+        "y": 340
+      },
+      "facing": "down",
+      "knot": "npc_gus",
+      "prompt": "Talk",
+      "footprint": [
+        [
+          480,
+          330
+        ],
+        [
+          510,
+          330
+        ],
+        [
+          510,
+          350
+        ],
+        [
+          480,
+          350
+        ]
+      ]
     }
   ],
   "land": "cloverhollow",

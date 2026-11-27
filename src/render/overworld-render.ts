@@ -404,6 +404,7 @@ export function computeNpcShadow(
   point: Point,
   pose: MotionPose,
   shadowAlpha: number,
+  adultOverride?: boolean,
 ): ShadowTransform {
   if (npcId.startsWith("fairy-")) {
     const altScale = liftShadowScale(pose.offsetY);
@@ -415,13 +416,15 @@ export function computeNpcShadow(
       alpha: 0.24 * altScale,
     };
   }
-  const width = npcId === "oliver" ? 34 : ADULT_NPCS.has(npcId) ? 52 : 48;
+  const isAdult = adultOverride ?? ADULT_NPCS.has(npcId);
+  const width = npcId === "oliver" ? 34 : isAdult ? 52 : 48;
+  const hopScale = liftShadowScale(pose.offsetY);
   return {
     x: point.x,
     y: point.y,
-    width,
-    height: width * 0.38,
-    alpha: shadowAlpha,
+    width: width * hopScale,
+    height: width * 0.38 * hopScale,
+    alpha: shadowAlpha * hopScale,
   };
 }
 

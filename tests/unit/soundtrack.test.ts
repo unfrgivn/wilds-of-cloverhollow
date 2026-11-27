@@ -69,8 +69,8 @@ describe("soundtrackFor", () => {
       kitchen: ["home", "none"],
       plaza: ["home", "town-breeze"],
       cafe: ["cafe", "cafe-murmur"],
-      market: ["home", "cafe-murmur"],
-      parlor: ["cafe", "cafe-murmur"],
+      market: ["market", "cafe-murmur"],
+      parlor: ["parlor", "cafe-murmur"],
       park: ["home", "town-breeze"],
       "milo-house": ["home", "none"],
       "rosie-cottage": ["home", "none"],
@@ -85,12 +85,12 @@ describe("soundtrackFor", () => {
       field: ["school", "town-breeze"],
       bay: ["bay", "ocean"],
       island: ["bay", "ocean"],
-      "sue-cottage": ["bay", "ocean"],
+      "sue-cottage": ["cottage", "ocean"],
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],
       summit: ["pass", "mountain-wind"],
       lodge: ["lodge", "hearth"],
-      "jordan-cabin": ["pass", "hearth"],
+      "jordan-cabin": ["cabin", "hearth"],
       cavern: ["cavern", "cavern-drips"],
       woods: ["woods", "forest"],
       clubhouse: ["clubhouse", "none"],
@@ -414,9 +414,9 @@ describe("complete 20-track world audio identity", () => {
     ).toBe(true);
   });
 
-  test("covers all 20 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
-    expect(jukeboxTracks).toHaveLength(20);
-    expect(new Set(jukeboxTracks).size).toBe(20);
+  test("covers all 24 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
+    expect(jukeboxTracks).toHaveLength(24);
+    expect(new Set(jukeboxTracks).size).toBe(24);
     for (const id of jukeboxTracks) {
       expect(trackTitles[id].trim().length, `${id} title`).toBeGreaterThan(0);
       const score = scores[id];
@@ -428,7 +428,16 @@ describe("complete 20-track world audio identity", () => {
       const scale = trackScaleNotes(id);
       expect(scale.length, `${id} scale length`).toBeGreaterThanOrEqual(5);
     }
-    for (const id of ["sanctuary", "lodge", "clubhouse", "fishing"] as const) {
+    for (const id of [
+      "sanctuary",
+      "lodge",
+      "clubhouse",
+      "fishing",
+      "market",
+      "parlor",
+      "cottage",
+      "cabin",
+    ] as const) {
       expect(scores[id].bars, `${id} bars`).toBeGreaterThanOrEqual(16);
       expect(scores[id].tracks.length, `${id} voices`).toBeGreaterThanOrEqual(4);
     }
@@ -440,13 +449,17 @@ describe("composed scores integrity", () => {
     "title",
     "home",
     "cafe",
+    "market",
+    "parlor",
     "hills",
     "sanctuary",
     "school",
     "bay",
     "fishing",
+    "cottage",
     "pass",
     "lodge",
+    "cabin",
     "cavern",
     "woods",
     "clubhouse",

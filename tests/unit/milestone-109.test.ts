@@ -152,7 +152,7 @@ describe("Milestone 109: Stereo Chamber Soundstage & Expressive Phrasing", () =>
     }
   });
 
-  test("phraseDynamics stays finite and bounded across every note of all 20 scores", () => {
+  test("phraseDynamics stays finite and bounded across every note of all 24 scores", () => {
     let loop2Sparkles = 0;
     for (const [id, score] of Object.entries(scores)) {
       const totalSteps = score.stepsPerBar * score.bars;

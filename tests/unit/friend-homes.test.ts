@@ -307,18 +307,18 @@ describe("Other Kids' Houses: Sue's Beach Cottage & Jordan's Mountain Cabin", ()
 
     const sueState = createState(world, fixtures["sue-cottage"]!);
     expect(soundtrackFor(world, sueState, { titleOpen: false })).toEqual({
-      track: "bay",
+      track: "cottage",
       ambience: "ocean",
       duck: false,
-      title: "Bubblegum Breeze",
+      title: "Sea-Glass Sunroom",
     });
 
     const jordanState = createState(world, fixtures["jordan-cabin"]!);
     expect(soundtrackFor(world, jordanState, { titleOpen: false })).toEqual({
-      track: "pass",
+      track: "cabin",
       ambience: "hearth",
       duck: false,
-      title: "Pinecone Snowfall",
+      title: "Timber & Tea",
     });
 
     const sueAtmo = evaluateAtmosphere("sue-cottage", sueCottage.width, sueCottage.height, 90);

@@ -4,13 +4,17 @@ export type MusicTrack =
   | "title"
   | "home"
   | "cafe"
+  | "market"
+  | "parlor"
   | "hills"
   | "sanctuary"
   | "school"
   | "bay"
   | "fishing"
+  | "cottage"
   | "pass"
   | "lodge"
+  | "cabin"
   | "cavern"
   | "woods"
   | "clubhouse"
@@ -29,11 +33,15 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "title",
   "home",
   "cafe",
+  "market",
+  "parlor",
   "school",
   "bay",
   "fishing",
+  "cottage",
   "pass",
   "lodge",
+  "cabin",
   "cavern",
   "woods",
   "clubhouse",
@@ -71,13 +79,17 @@ export const trackTitles: Record<MusicTrack, string> = {
   title: "Watercolor Morning",
   home: "Cloverhollow Town",
   cafe: "Cinnamon Waltz",
+  market: "Pippin's Basket Waltz",
+  parlor: "Sweet Scoop Rag",
   hills: "Clover Meadow",
   sanctuary: "Meadow of Friends",
   school: "Bell & Chalk",
   bay: "Bubblegum Breeze",
   fishing: "Docked by the Tide",
+  cottage: "Sea-Glass Sunroom",
   pass: "Pinecone Snowfall",
   lodge: "Hearth & Cocoa",
+  cabin: "Timber & Tea",
   cavern: "Crystal Echoes",
   woods: "Whispering Canopy",
   clubhouse: "Our Secret Treehouse",
@@ -96,8 +108,8 @@ const areaTracks: Record<string, MusicTrack> = {
   kitchen: "home",
   plaza: "home",
   cafe: "cafe",
-  market: "home",
-  parlor: "cafe",
+  market: "market",
+  parlor: "parlor",
   park: "home",
   "milo-house": "home",
   "rosie-cottage": "home",
@@ -112,12 +124,12 @@ const areaTracks: Record<string, MusicTrack> = {
   field: "school",
   bay: "bay",
   island: "bay",
-  "sue-cottage": "bay",
+  "sue-cottage": "cottage",
   trail: "bay",
   pass: "pass",
   summit: "pass",
   lodge: "lodge",
-  "jordan-cabin": "pass",
+  "jordan-cabin": "cabin",
   cavern: "cavern",
   woods: "woods",
   clubhouse: "clubhouse",

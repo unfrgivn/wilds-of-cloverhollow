@@ -27,7 +27,7 @@ import {
 } from "./audio-recipes";
 import { createMusicPlayer, type MusicPlayer } from "./music";
 import { createPreferenceStore } from "./preference-store";
-import { blipFrequency, footstepPitchFactor, trackScaleNotes } from "./voices";
+import { blipFrequency, dialogueProsody, footstepPitchFactor, trackScaleNotes } from "./voices";
 
 export {
   effectRecipe,
@@ -334,7 +334,8 @@ export function createAudio(
         ? previous
         : current;
     }
-    const blip = blipFrequency(info?.speaker ?? null, revealed ?? tick, char);
+    const prosody = dialogueProsody(text, revealed);
+    const blip = blipFrequency(info?.speaker ?? null, revealed ?? tick, char, prosody);
     if (blip === null) return null;
     const segments: Segment[] = [
       {

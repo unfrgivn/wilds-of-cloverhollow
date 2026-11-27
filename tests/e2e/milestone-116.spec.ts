@@ -251,25 +251,28 @@ test.describe("Milestone 116: Journal Arcade Shelf, Keyboard Jukebox & Key Hints
       expect((await readMusic(page)).track).toBe("home");
       expect((await readMusic(page)).duck).toBe(true);
 
-      // Focus the track pill and scrub forward twice with ArrowRight: home -> cafe -> school.
+      // Focus the track pill and scrub forward twice with ArrowRight: home -> cafe -> market.
       await nowPlaying.focus();
       await page.keyboard.press("ArrowRight");
       await expect.poll(async () => (await readMusic(page)).track).toBe("cafe");
       await expect(book).toHaveAttribute("data-journal-page", "options");
       await page.keyboard.press("ArrowRight");
-      await expect.poll(async () => (await readMusic(page)).track).toBe("school");
+      await expect.poll(async () => (await readMusic(page)).track).toBe("market");
       await expect(book).toHaveAttribute("data-journal-page", "options");
 
-      await expect(nowPlaying).toHaveText("♫ Bell & Chalk");
+      await expect(nowPlaying).toHaveText("♫ Pippin's Basket Waltz");
       await expect(nowPlaying).toHaveAttribute("data-browsing", "true");
-      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 4 of 20: Bell & Chalk/);
+      await expect(nowPlaying).toHaveAttribute(
+        "aria-label",
+        /Track 4 of 24: Pippin's Basket Waltz/,
+      );
       expect((await readMusic(page)).duck).toBe(false);
 
-      // Scrub backward once with ArrowLeft: school -> cafe.
+      // Scrub backward once with ArrowLeft: market -> cafe.
       await page.keyboard.press("ArrowLeft");
       await expect.poll(async () => (await readMusic(page)).track).toBe("cafe");
       await expect(nowPlaying).toHaveText("♫ Cinnamon Waltz");
-      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 3 of 20: Cinnamon Waltz/);
+      await expect(nowPlaying).toHaveAttribute("aria-label", /Track 3 of 24: Cinnamon Waltz/);
 
       // Click .journal-now-playing to reset smoothly back to live area theme.
       await nowPlaying.click();

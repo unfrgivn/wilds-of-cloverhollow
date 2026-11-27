@@ -293,10 +293,26 @@ export const soundCueRecipes: Record<SoundCue, AudioRecipe> = {
     { wave: "triangle", frequency: 660, offset: 0.08, duration: 0.12, gain: 0.07 },
   ],
   "skee-hundred": [
-    { wave: "triangle", frequency: 523, offset: 0, duration: 0.08, gain: 0.07 },
-    { wave: "triangle", frequency: 659, offset: 0.08, duration: 0.08, gain: 0.07 },
-    { wave: "triangle", frequency: 784, offset: 0.16, duration: 0.08, gain: 0.08 },
-    { wave: "triangle", frequency: 1047, offset: 0.24, duration: 0.2, gain: 0.08 },
+    { wave: "triangle", frequency: 523.25, offset: 0, duration: 0.09, gain: 0.08, attack: 0.003 },
+    {
+      wave: "triangle",
+      frequency: 659.25,
+      offset: 0.055,
+      duration: 0.095,
+      gain: 0.085,
+      attack: 0.003,
+    },
+    {
+      wave: "triangle",
+      frequency: 783.99,
+      offset: 0.11,
+      duration: 0.105,
+      gain: 0.09,
+      attack: 0.003,
+    },
+    { wave: "sine", frequency: 1046.5, offset: 0.165, duration: 0.14, gain: 0.095, attack: 0.003 },
+    { wave: "sine", frequency: 1318.51, offset: 0.22, duration: 0.24, gain: 0.095, attack: 0.004 },
+    { wave: "sine", frequency: 2637, offset: 0.235, duration: 0.19, gain: 0.032, attack: 0.004 },
   ],
   "mole-pop": [
     {
@@ -360,8 +376,11 @@ export const soundCueRecipes: Record<SoundCue, AudioRecipe> = {
     },
   ],
   "cook-ding": [
-    { wave: "sine", frequency: 1319, offset: 0, duration: 0.28, gain: 0.09 },
-    { wave: "sine", frequency: 2637, offset: 0, duration: 0.14, gain: 0.035 },
+    { wave: "sine", frequency: 1319, offset: 0, duration: 0.3, gain: 0.095, attack: 0.002 },
+    { wave: "sine", frequency: 2637, offset: 0, duration: 0.16, gain: 0.038, attack: 0.002 },
+    { wave: "sine", frequency: 3951, offset: 0, duration: 0.09, gain: 0.016, attack: 0.002 },
+    { wave: "triangle", frequency: 1047, offset: 0.11, duration: 0.14, gain: 0.06, attack: 0.004 },
+    { wave: "sine", frequency: 1568, offset: 0.19, duration: 0.23, gain: 0.075, attack: 0.004 },
   ],
   "fish-cast": [
     { wave: "noise", offset: 0, duration: 0.08, gain: 0.016, lowpass: 1500 },
@@ -435,10 +454,12 @@ export const soundCueRecipes: Record<SoundCue, AudioRecipe> = {
     { wave: "sine", frequency: 1568, offset: 0.31, duration: 0.18, gain: 0.045 },
   ],
   "tickets-won": [
-    { wave: "triangle", frequency: 880, offset: 0, duration: 0.04, gain: 0.05 },
-    { wave: "triangle", frequency: 880, offset: 0.07, duration: 0.04, gain: 0.05 },
-    { wave: "triangle", frequency: 880, offset: 0.14, duration: 0.04, gain: 0.05 },
-    { wave: "triangle", frequency: 1175, offset: 0.21, duration: 0.14, gain: 0.07 },
+    { wave: "triangle", frequency: 784, offset: 0, duration: 0.07, gain: 0.07, attack: 0.003 },
+    { wave: "triangle", frequency: 880, offset: 0.05, duration: 0.07, gain: 0.075, attack: 0.003 },
+    { wave: "triangle", frequency: 1047, offset: 0.1, duration: 0.08, gain: 0.08, attack: 0.003 },
+    { wave: "triangle", frequency: 1175, offset: 0.15, duration: 0.09, gain: 0.085, attack: 0.003 },
+    { wave: "sine", frequency: 1568, offset: 0.2, duration: 0.2, gain: 0.09, attack: 0.003 },
+    { wave: "sine", frequency: 3136, offset: 0.215, duration: 0.15, gain: 0.028, attack: 0.003 },
   ],
   "battle-win": [
     { wave: "triangle", frequency: 523, offset: 0, duration: 0.12, gain: 0.09 },

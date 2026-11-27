@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 152)
+Last updated: 2026-11-27 (Milestone 153)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -396,20 +396,25 @@ ios/            Capacitor iOS project (from Milestone 4).
   in battle.
 - Soundtrack projection (`src/core/music.ts`): closed track set `title`
   ("Watercolor Morning"), `home` ("Cloverhollow Town"), `cafe` ("Cinnamon
-  Waltz"), `hills` ("Clover Meadow"), `sanctuary` ("Meadow of Friends"),
-  `school` ("Bell & Chalk"), `bay` ("Bubblegum Breeze"), `fishing` ("Docked by
-  the Tide", unducked over `"ocean"` ambience while `state.arcade.game ===
-  "fish"` at Bubblegum Bay's dock, ducking only when dialogue opens), `pass`
-  ("Pinecone Snowfall"), `lodge` ("Hearth & Cocoa"), `cavern` ("Crystal
-  Echoes"), `woods` ("Whispering Canopy"), `clubhouse` ("Our Secret Treehouse"),
-  `arcade` ("Star Racer Tokens"), `enchanted` ("Misty Dream"), `enchanted-calm`
-  ("Ancient Tree's Song", once `forest_fizzy` is false), `battle` ("Fizzy
-  Calm-Down!"), `boss` ("The Purple Hood", for wind-up mini-bosses, Talk
-  battles, or non-runnable battles), `talk` ("Listening Heart", once Talk opens
-  or calm reaches `talkAt`), `morning` ("Waking Up", during the morning and
-  credits finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks`
-  exports all 20 non-silent themes in story/album order (`title`, `home`,
-  `cafe`, `school`, `bay`, `fishing`, `pass`, `lodge`, `cavern`, `woods`,
+  Waltz"), `market` ("Pippin's Basket Waltz", 102 BPM 3/4 G major corner-grocer
+  waltz for `market`), `parlor` ("Sweet Scoop Rag", 112 BPM 4/4 Bb major parlor
+  ragtime for `parlor`), `hills` ("Clover Meadow"), `sanctuary` ("Meadow of
+  Friends"), `school` ("Bell & Chalk"), `bay` ("Bubblegum Breeze"), `fishing`
+  ("Docked by the Tide", unducked over `"ocean"` ambience while
+  `state.arcade.game === "fish"` at Bubblegum Bay's dock, ducking only when
+  dialogue opens), `cottage` ("Sea-Glass Sunroom", 88 BPM 4/4 Eb major coastal
+  lullaby for `sue-cottage`), `pass` ("Pinecone Snowfall"), `lodge` ("Hearth &
+  Cocoa"), `cabin` ("Timber & Tea", 92 BPM 3/4 A major alpine folk air for
+  `jordan-cabin`), `cavern` ("Crystal Echoes"), `woods` ("Whispering Canopy"),
+  `clubhouse` ("Our Secret Treehouse"), `arcade` ("Star Racer Tokens"),
+  `enchanted` ("Misty Dream"), `enchanted-calm` ("Ancient Tree's Song", once
+  `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The Purple
+  Hood", for wind-up mini-bosses, Talk battles, or non-runnable battles),
+  `talk` ("Listening Heart", once Talk opens or calm reaches `talkAt`),
+  `morning` ("Waking Up", during the morning and credits finale), and `silent`
+  ("Quiet", for `harness`). `jukeboxTracks` exports all 24 non-silent themes in
+  story/album order (`title`, `home`, `cafe`, `market`, `parlor`, `school`,
+  `bay`, `fishing`, `cottage`, `pass`, `lodge`, `cabin`, `cavern`, `woods`,
   `clubhouse`, `hills`, `sanctuary`, `arcade`, `enchanted`, `enchanted-calm`,
   `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box
   (shell-only override, never saved, plays unducked while the journal is open
@@ -423,41 +428,59 @@ ios/            Capacitor iOS project (from Milestone 4).
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 20
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 24
   multi-voice scores split across `src/platform/scores-helpers.ts`,
-  `src/platform/scores-town.ts`, and `src/platform/scores-wilds.ts` and
-  re-exported by `src/platform/scores.ts`, dry plus warm stereo
-  ConvolverNode reverb), and procedural ambience (`src/platform/ambience.ts`)
-  through a shared `DynamicsCompressorNode`. Music arranges its 10 instrument
-  voices across a balanced stereo chamber soundstage (`VOICE_PAN` in
-  `src/platform/music.ts`, within `[-0.4, 0.4]` via feature-guarded per-voice
-  `StereoPannerNode`s cleaned up on track crossfade) and shapes every note with
-  deterministic `phraseDynamics` (a smooth 16-step sinusoidal phrase breath in
-  `[0.92, 1.07]`, subtle `0..8 ms` pluck micro-timing on melodic voices with
-  zero drift on rhythmic anchors, and a whisper-soft `0.16x` celesta octave
-  shimmer on loop-2+ bar 1 and mid-score downbeats for harp/piano notes `<= 76`).
-  Music crossfades (~0.55 s) on track changes, ducks (~0.3 s to 0.55x), and
-  pauses cleanly on `visibilitychange` when backgrounded; when returning
+  `src/platform/scores-town.ts`, `src/platform/scores-wilds.ts`, and
+  `src/platform/scores-interiors.ts` and re-exported by `src/platform/scores.ts`,
+  dry plus warm stereo ConvolverNode reverb), and procedural ambience
+  (`src/platform/ambience.ts`) through a shared `DynamicsCompressorNode`. Music
+  arranges its 10 instrument voices across a balanced stereo chamber soundstage
+  (`VOICE_PAN` in `src/platform/music.ts`, within `[-0.4, 0.4]` via
+  feature-guarded per-voice `StereoPannerNode`s cleaned up on track crossfade)
+  and shapes every note with deterministic `phraseDynamics` (a smooth 16-step
+  sinusoidal phrase breath in `[0.92, 1.07]`, subtle `0..8 ms` pluck
+  micro-timing on melodic voices with zero drift on rhythmic anchors, and a
+  whisper-soft `0.16x` celesta octave shimmer on loop-2+ bar 1 and mid-score
+  downbeats for harp/piano notes `<= 76`). Music crossfades (~0.55 s) on track
+  changes, ducks smoothly over ~0.3 s to 0.55x gain while gently rolling off
+  highs through a feature-guarded warm low-pass `BiquadFilterNode` (`Q = 0.55`,
+  `duckFilterCutoff` ramping between `DUCK_FILTER_DUCKED_HZ = 2600` Hz and
+  `DUCK_FILTER_OPEN_HZ = 18000` Hz so character voice prosody stays clear,
+  Milestone 152), resumes exploration themes on the nearest bar downbeat after
+  battles or shop visits via `resumeBarStep` (preserving `stepsPerBar` alignment
+  across 4/4 and 3/4 waltz scores while `FRESH_START_TRACKS` (`title`, `battle`,
+  `boss`, `talk`, and `morning`) always start fresh at step 0, Milestone 152),
+  and pauses cleanly on `visibilitychange` when backgrounded; when returning
   visible on `visibilitychange` or `pageshow` (Milestone 132), pure
   `shouldResumeAudioOnVisible(hidden, state)` (`src/platform/audio.ts`)
   triggers `unlock()` before `syncPlayers()` whenever the context is
   `interrupted` or was previously unlocked by a user gesture (`suspended`),
   so iOS WKWebView and Safari auto-resume music and ambience after lock-screen
   or app-switch interruptions without violating initial browser autoplay gates;
-  ambience crossfades
-  (~0.7 s), places one-shot biome accents across the stereo field via
-  deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
+  ambience crossfades (~0.7 s), schedules spatialized one-shot biome accents
+  across all 9 active ambience beds via `AMBIENCE_ACCENT_CADENCE_MS` (including
+  `mountain-wind` sweeping alpine pine gusts with whisper-soft D6/F6 frost-bell
+  harmonics and `arcade-hum` distant Star Racer cabinet twinkles, Milestone 152)
+  and deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
   disconnected on `onended`), and cleans up all nodes and timers on stop.
-  Character-voiced talking blips and
-  key-aligned UI clicks (`src/platform/voices.ts`, Milestones 80 & 142) give
-  every named cast member, `"Fizzy "` mini-boss (via optional leading `"fizzy "`
-  prefix stripping after exact lookup, plus `"Fizzy Kid"` / `"Kid"` mapped to
-  `MYSTERY_VOICE`), fairy, critter archetype, and narrator a distinct warm
-  sine/triangle register (with optional gentle pitch glide or harmonic overtone
-  and pauses on spaces/punctuation, achieving 100% cast voice coverage across
-  all compiled story speakers and battle critters) and pitch `choice-move`,
-  `battle-command`, and `choice-select` clicks to the active soundtrack's
-  pentatonic scale.
+  Character-voiced talking blips and key-aligned UI clicks
+  (`src/platform/voices.ts`, Milestones 80, 142 & 152) give every named cast
+  member, `"Fizzy "` mini-boss (via optional leading `"fizzy "` prefix stripping
+  after exact lookup, plus `"Fizzy Kid"` / `"Kid"` mapped to `MYSTERY_VOICE`),
+  fairy, critter archetype, and narrator a distinct warm sine/triangle register
+  (with optional gentle pitch glide or harmonic overtone and pauses on
+  spaces/punctuation, achieving 100% cast voice coverage across all compiled
+  story speakers and battle critters), apply deterministic sentence-aware voice
+  prosody (`dialogueProsody(text, revealed)` and
+  `blipFrequency(speaker, step, char, prosody)` in `src/platform/voices.ts`,
+  wired in `dialogueBlipRecipe` in `src/platform/audio.ts`, Milestone 152:
+  inquisitive rising tail on `?` clauses, bright enthusiastic lift on `!`, soft
+  hushed tone on trailing/leading `...`/`…` whispers, and gentle pitch/gain
+  emphasis on uppercase words like `REALLY`/`THAT'S`, clamped to `[0.85, 1.25]`
+  pitch and `[0.65, 1.25]` gain with bit-identical output when `prosody` is
+  omitted or `NEUTRAL_PROSODY`), and pitch `choice-move`, `battle-command`, and
+  `choice-select` clicks to the active soundtrack's pentatonic scale (across all
+  24 tracks + `silent`).
   Browsers hold the context (`suspended`, or WebKit's `interrupted`) until a
   key, click, or tap; a gamepad press is not a user activation in any browser,
   so a pad-only player on the web hears nothing until one. The iOS app's web
@@ -542,6 +565,16 @@ ios/            Capacitor iOS project (from Milestone 4).
   backup import), and Journal `OPTIONS` toggles (`Sound Effects` when unmuting,
   `Music`, `Ambience`, `Gentle Timing`, `Key Hints`, `Text Speed`, and `Reduced
   Motion`) play `"toggle-on"` / `"toggle-off"` + `"light"` haptic.
+- Celebratory minigame audio flourishes (Milestone 152,
+  `src/platform/audio-recipes.ts`, re-exported via `src/platform/audio.ts`):
+  upgrades three key minigame reward cues into warm multi-segment storybook
+  flourishes (gains `<= 0.10`, zero core `SoundCue` changes): `skee-hundred`
+  plays a 6-segment boardwalk bullseye bell arpeggio (C5->E5->G5->C6->E6 +
+  2637 Hz high harmonic shimmer, 0.46 s); `cook-ding` plays a 5-segment vintage
+  microwave bell resonance (1319 Hz, 2637 Hz, 3951 Hz) with a warm two-note
+  golden chime (1047 -> 1568 Hz, 0.42 s); and `tickets-won` plays a 6-segment
+  ascending ticket/coin twinkle cascade (784 -> 880 -> 1047 -> 1175 -> 1568 Hz +
+  3136 Hz sparkle overtone, 0.40 s).
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -1479,8 +1512,8 @@ ios/            Capacitor iOS project (from Milestone 4).
     `market_note_read`, `gift: coins 10`, `chime-yellow`) share orchard treat
     tips. Its fixture `market` starts at `door` with Maddie, Sue, Jordan, and
     the blacklight lantern; its atmosphere adds two golden NW window sunbeams
-    and ten produce-stand warmth motes; its soundtrack plays `"home"`
-    ("Cloverhollow Town") with `"cafe-murmur"` ambience.
+    and ten produce-stand warmth motes; its soundtrack plays `"market"`
+    ("Pippin's Basket Waltz") with `"cafe-murmur"` ambience.
   - `parlor`, "Sweet Scoop Ice Cream Parlor", in the `cloverhollow` land, a
     1200x800 painted isometric cutaway off the plaza's Ice Cream Parlor door
     (plaza trigger `parlor-door` at x=912..964, y=335..364 -> `parlor.door`;
@@ -1500,7 +1533,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     Sundae Club" doodle. Its fixture `parlor` starts at `door` with Maddie, Sue,
     Jordan, and the blacklight lantern; its atmosphere adds two pastel window
     sunbeams and ten mint-pink gelato-case shimmer sparkles; its soundtrack
-    plays `"cafe"` ("Cinnamon Waltz") with `"cafe-murmur"` ambience.
+    plays `"parlor"` ("Sweet Scoop Rag") with `"cafe-murmur"` ambience.
   - Quiet shop-exit arrival (`src/core/roam.ts` & `src/content/area-checks.ts`):
     `rollWild` always draws two PRNG values per den (preserving RNG cadence) and
     suppresses spawning a wild critter from any den within `sight + touch` of
@@ -1554,7 +1587,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     fixture `sue-cottage` starts at `door` with Maddie, Sue, Jordan, and the
     blacklight lantern; its atmosphere adds warm coastal window sunbeams, an
     emissive aqua-mint sea-glass lamp halo at (756, 305), and 10 sunlit sea-dust
-    motes; its soundtrack plays `"bay"` ("Bubblegum Breeze") with `"ocean"`
+    motes; its soundtrack plays `"cottage"` ("Sea-Glass Sunroom") with `"ocean"`
     ambience.
   - `jordan-cabin`, "Jordan's Mountain Cabin", in the `pass` land, a 1200x800
     painted isometric cutaway entered from Pinecone Pass's west snow trail
@@ -1579,7 +1612,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     with Maddie, Sue, Jordan, and the blacklight lantern; its atmosphere adds a
     crisp snowy window sunbeam, warm amber emissive halos over the steaming
     cocoa kettle (890, 360) and brass camp lantern (1080, 380), and rising warm
-    cocoa-steam wisps; its soundtrack plays `"pass"` ("Pinecone Snowfall") with
+    cocoa-steam wisps; its soundtrack plays `"cabin"` ("Timber & Tea") with
     `"hearth"` ambience.
   - `milo-house`, "Milo's Sketch Loft", in the `cloverhollow` land, a 1200x800
     painted isometric cutaway entered from Meadow Park's west-northwest fence
@@ -4041,7 +4074,7 @@ trunks keep its two exits.
   the left page (`SOUND & MUSIC`) shows the interactive Music Box pill
   (`.journal-jukebox`: `role="group"`, 44 px `‹` `.journal-jukebox-prev` and `›`
   `.journal-jukebox-next` buttons flanking the interactive `.journal-now-playing`
-  button, `♫ <title>`, cycling all 20 `jukeboxTracks` unducked while the journal
+  button, `♫ <title>`, cycling all 24 `jukeboxTracks` unducked while the journal
   is open; focusing `.journal-jukebox` or any button inside it scrubs tracks with
   `ArrowLeft` / `ArrowRight` without flipping journal pages, exposes the active
   track index in `aria-label` / `title` via `formatJukeboxLabel`, and clicking or

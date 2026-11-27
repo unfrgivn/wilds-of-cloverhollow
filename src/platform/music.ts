@@ -53,9 +53,36 @@ const LOOKAHEAD_SEC = 0.12;
 const CROSSFADE_SEC = 0.55;
 const DUCK_RAMP_SEC = 0.3;
 const DUCK_GAIN = 0.55;
+const DUCK_FILTER_Q = 0.55;
+export const DUCK_FILTER_OPEN_HZ = 18000;
+export const DUCK_FILTER_DUCKED_HZ = 2600;
+export const FRESH_START_TRACKS: ReadonlySet<PlayableTrack> = new Set([
+  "title", "battle", "boss", "talk", "morning",
+]);
 const PHRASE_SPAN_STEPS = 16;
 const SPARKLE_VELOCITY_SCALE = 0.16;
 const SPARKLE_MAX_MIDI = 76;
+
+export function duckFilterCutoff(duck: boolean): number {
+  return duck ? DUCK_FILTER_DUCKED_HZ : DUCK_FILTER_OPEN_HZ;
+}
+
+export function resumeBarStep(
+  track: PlayableTrack,
+  savedStep: number | undefined,
+  totalSteps: number,
+  stepsPerBar: number,
+): number {
+  if (
+    FRESH_START_TRACKS.has(track) ||
+    savedStep === undefined ||
+    !Number.isFinite(savedStep) ||
+    !Number.isFinite(totalSteps) || totalSteps <= 0 ||
+    !Number.isFinite(stepsPerBar) || stepsPerBar <= 0
+  ) return 0;
+  const wrapped = ((Math.floor(savedStep) % totalSteps) + totalSteps) % totalSteps;
+  return Math.floor(wrapped / stepsPerBar) * stepsPerBar;
+}
 
 function hasMicroTiming(voice: InstrumentVoice): boolean {
   switch (voice) {
@@ -174,9 +201,19 @@ export function createMusicPlayer(
   masterGain.gain.value = 0;
   const duckGain = context.createGain();
   duckGain.gain.value = 1;
-  duckGain.connect(masterGain);
+  let duckFilter: BiquadFilterNode | null = null;
+  if (typeof context.createBiquadFilter === "function") {
+    duckFilter = context.createBiquadFilter();
+    duckFilter.type = "lowpass";
+    duckFilter.Q.value = DUCK_FILTER_Q;
+    duckFilter.frequency.value = DUCK_FILTER_OPEN_HZ;
+    duckGain.connect(duckFilter).connect(masterGain);
+  } else {
+    duckGain.connect(masterGain);
+  }
   masterGain.connect(destination);
 
+  const savedSteps = new Map<PlayableTrack, number>();
   let currentTrack: MusicTrack = "silent";
   let currentDuck = false;
   let mixActive = false;
@@ -690,6 +727,9 @@ export function createMusicPlayer(
     }
   };
 
+  const startStepFor = (track: PlayableTrack, score: CompiledScore): number =>
+    resumeBarStep(track, savedSteps.get(track), score.totalSteps, score.score.stepsPerBar);
+
   const sync = (): void => {
     const now = context.currentTime;
     const targetGain = mixActive && isPlayableTrack(currentTrack) ? mixGain : 0;
@@ -704,7 +744,7 @@ export function createMusicPlayer(
     if (trackChannel === null && isPlayableTrack(currentTrack)) {
       activeCompiled = getCompiled(currentTrack);
       trackChannel = createTrackChannel(now, 0.2);
-      currentStep = 0;
+      currentStep = startStepFor(currentTrack, activeCompiled);
       loopCount = 0;
       nextStepTime = now + 0.04;
     }
@@ -719,23 +759,28 @@ export function createMusicPlayer(
     setState: (next) => {
       if (next.duck !== currentDuck) {
         currentDuck = next.duck;
-        rampParam(
-          duckGain.gain,
-          currentDuck ? DUCK_GAIN : 1,
-          context.currentTime,
-          DUCK_RAMP_SEC,
-        );
+        const now = context.currentTime;
+        rampParam(duckGain.gain, currentDuck ? DUCK_GAIN : 1, now, DUCK_RAMP_SEC);
+        if (duckFilter !== null) {
+          rampParam(duckFilter.frequency, duckFilterCutoff(currentDuck), now, DUCK_RAMP_SEC);
+        }
       }
       if (next.track === currentTrack) {
         sync();
         return;
+      }
+      if (isPlayableTrack(currentTrack) && !FRESH_START_TRACKS.has(currentTrack)) {
+        savedSteps.set(currentTrack, currentStep);
       }
       const hadTrack = trackChannel !== null;
       fadeOutChannel(trackChannel);
       trackChannel = null;
       currentTrack = next.track;
       activeCompiled = isPlayableTrack(currentTrack) ? getCompiled(currentTrack) : null;
-      currentStep = 0;
+      currentStep =
+        isPlayableTrack(currentTrack) && activeCompiled !== null
+          ? startStepFor(currentTrack, activeCompiled)
+          : 0;
       loopCount = 0;
       if (canRun() && activeCompiled !== null) {
         const now = context.currentTime;

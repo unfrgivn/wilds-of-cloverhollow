@@ -14,6 +14,7 @@ import {
 import { inkVariable, setInkVariables } from "../../src/core/ink";
 import { runConsoleCommand, type ConsoleContext } from "../../src/dev/console";
 import { scores, type PlayableTrack } from "../../src/platform/scores";
+import { interiorScores } from "../../src/platform/scores-interiors";
 import { townScores } from "../../src/platform/scores-town";
 import { wildsScores } from "../../src/platform/scores-wilds";
 import { evaluateSunberryMotes, hasSunberryBloom } from "../../src/render/clubhouse-display";
@@ -296,18 +297,22 @@ describe("Milestone 111: Enriched Title Continue summary", () => {
 });
 
 describe("Milestone 111: Modular scores.ts split", () => {
-  it("exposes all 20 tracks across townScores and wildsScores with valid structure", () => {
+  it("exposes all 24 tracks across townScores, wildsScores, and interiorScores", () => {
     const expectedTracks: readonly PlayableTrack[] = [
       "title",
       "home",
       "cafe",
+      "market",
+      "parlor",
       "hills",
       "sanctuary",
       "school",
       "bay",
       "fishing",
+      "cottage",
       "pass",
       "lodge",
+      "cabin",
       "cavern",
       "woods",
       "clubhouse",
@@ -322,6 +327,7 @@ describe("Milestone 111: Modular scores.ts split", () => {
     expect(Object.keys(scores)).toEqual(expectedTracks);
     expect(Object.keys(townScores)).toHaveLength(10);
     expect(Object.keys(wildsScores)).toHaveLength(10);
+    expect(Object.keys(interiorScores)).toHaveLength(4);
     for (const trackId of expectedTracks) {
       const score = scores[trackId];
       expect(score.bpm, `${trackId} bpm`).toBeGreaterThan(0);

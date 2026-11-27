@@ -341,16 +341,16 @@ describe("Cloverhollow's Final Two Plaza Shops: Market & Ice Cream Parlor", () =
       const marketState = createState(world, fixtures.market!);
       const parlorState = createState(world, fixtures.parlor!);
       expect(soundtrackFor(world, marketState, { titleOpen: false })).toEqual({
-        track: "home",
+        track: "market",
         ambience: "cafe-murmur",
         duck: false,
-        title: "Cloverhollow Town",
+        title: "Pippin's Basket Waltz",
       });
       expect(soundtrackFor(world, parlorState, { titleOpen: false })).toEqual({
-        track: "cafe",
+        track: "parlor",
         ambience: "cafe-murmur",
         duck: false,
-        title: "Cinnamon Waltz",
+        title: "Sweet Scoop Rag",
       });
 
       // Atmosphere

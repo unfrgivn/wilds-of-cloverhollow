@@ -32,6 +32,20 @@ const AMBIENCE_STEREO: Readonly<Record<AmbienceBed, { width: number; phase: numb
   "cafe-murmur": { width: 0.42, phase: 2.3 },
 };
 
+export const AMBIENCE_ACCENT_CADENCE_MS: Readonly<
+  Record<Exclude<AmbienceBed, "none">, number>
+> = {
+  "town-breeze": 4200,
+  ocean: 5600,
+  "mountain-wind": 5400,
+  hearth: 1200,
+  forest: 5200,
+  "enchanted-shimmer": 3000,
+  "cavern-drips": 2600,
+  "cafe-murmur": 4400,
+  "arcade-hum": 4800,
+};
+
 export function ambiencePan(bed: AmbienceBed, seed: number): number {
   const { width, phase } = AMBIENCE_STEREO[bed];
   if (width === 0) return 0;
@@ -336,6 +350,80 @@ export function createAmbiencePlayer(
     over.stop(now + 0.05);
   };
 
+  const playMountainGust = (target: GainNode, pan: number): void => {
+    const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
+    let active = 2;
+    const finish = (): void => {
+      active -= 1;
+      if (active === 0) output.cleanup();
+    };
+    const src = context.createBufferSource();
+    src.buffer = getPink();
+    const bp = context.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.setValueAtTime(620, now);
+    bp.frequency.exponentialRampToValueAtTime(1120, now + 0.42);
+    bp.frequency.exponentialRampToValueAtTime(560, now + 0.95);
+    bp.Q.setValueAtTime(2.2, now);
+    const gustEnv = context.createGain();
+    gustEnv.gain.setValueAtTime(0.0001, now);
+    gustEnv.gain.linearRampToValueAtTime(0.048, now + 0.34);
+    gustEnv.gain.exponentialRampToValueAtTime(0.0001, now + 0.95);
+    src.connect(bp).connect(gustEnv).connect(output.input);
+    src.onended = () => {
+      src.disconnect();
+      bp.disconnect();
+      gustEnv.disconnect();
+      finish();
+    };
+    src.start(now, Math.random() * 1.5, 1.0);
+
+    // Whisper-soft alpine frost-bell harmonic (D6 or F6, matching Pinecone Pass).
+    const bellStart = now + 0.14;
+    const bell = context.createOscillator();
+    bell.type = "sine";
+    bell.frequency.setValueAtTime(Math.random() < 0.5 ? 1174.66 : 1396.91, bellStart);
+    const bellEnv = context.createGain();
+    bellEnv.gain.setValueAtTime(0.0001, bellStart);
+    bellEnv.gain.linearRampToValueAtTime(0.024, bellStart + 0.03);
+    bellEnv.gain.exponentialRampToValueAtTime(0.0001, bellStart + 0.65);
+    bell.connect(bellEnv).connect(output.input);
+    bell.onended = () => {
+      bell.disconnect();
+      bellEnv.disconnect();
+      finish();
+    };
+    bell.start(bellStart);
+    bell.stop(bellStart + 0.68);
+  };
+
+  const playArcadeChime = (target: GainNode, pan: number): void => {
+    const pair: readonly [number, number] =
+      Math.random() < 0.5 ? [880, 1318.51] : [1046.5, 1567.98];
+    const now = context.currentTime + 0.02;
+    const output = createAccentOutput(target, pan, now);
+    pair.forEach((freq, index) => {
+      const start = now + index * 0.065;
+      const osc = context.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, start);
+      const env = context.createGain();
+      env.gain.setValueAtTime(0.0001, start);
+      env.gain.linearRampToValueAtTime(0.022, start + 0.008);
+      env.gain.exponentialRampToValueAtTime(0.0001, start + 0.055);
+      osc.connect(env).connect(output.input);
+      const isLast = index === pair.length - 1;
+      osc.onended = () => {
+        osc.disconnect();
+        env.disconnect();
+        if (isLast) output.cleanup();
+      };
+      osc.start(start);
+      osc.stop(start + 0.062);
+    });
+  };
+
   const startBed = (kind: Exclude<AmbienceBed, "none">): ActiveBed => {
     const now = context.currentTime;
     const gain = context.createGain();
@@ -375,7 +463,7 @@ export function createAmbiencePlayer(
       nodes.push(bp, level);
       src.connect(bp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 4200, (pan) => playBirdChirp(gain, pan));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playBirdChirp(gain, pan));
     } else if (kind === "ocean") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -395,7 +483,7 @@ export function createAmbiencePlayer(
       src.connect(lp).connect(waveGain).connect(gain);
       src.start(now);
       lfo.start(now);
-      scheduleAccent(bed, 5600, (pan) => playWaveShimmer(gain, pan));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playWaveShimmer(gain, pan));
     } else if (kind === "mountain-wind") {
       const src = addPink();
       const bp = context.createBiquadFilter();
@@ -415,6 +503,7 @@ export function createAmbiencePlayer(
       src.connect(bp).connect(level).connect(gain);
       src.start(now);
       lfo.start(now);
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playMountainGust(gain, pan));
     } else if (kind === "hearth") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -426,7 +515,7 @@ export function createAmbiencePlayer(
       nodes.push(lp, level);
       src.connect(lp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 1200, (pan) => playHearthCrackle(gain, pan));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playHearthCrackle(gain, pan));
     } else if (kind === "forest") {
       const src = addPink();
       const bp = context.createBiquadFilter();
@@ -444,7 +533,9 @@ export function createAmbiencePlayer(
       src.connect(bp).connect(level).connect(gain);
       src.connect(low).connect(lowLevel).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 5200, (pan) => playBirdChirp(gain, pan, 0.085));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) =>
+        playBirdChirp(gain, pan, 0.085),
+      );
     } else if (kind === "enchanted-shimmer") {
       const src = addPink();
       const bp = context.createBiquadFilter();
@@ -456,7 +547,7 @@ export function createAmbiencePlayer(
       nodes.push(bp, level);
       src.connect(bp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 3000, (pan) => playEnchantedChime(gain, pan));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playEnchantedChime(gain, pan));
     } else if (kind === "cavern-drips") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -475,7 +566,7 @@ export function createAmbiencePlayer(
       src.connect(lp).connect(lowLevel).connect(gain);
       src.connect(hush).connect(hushLevel).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 2600, (pan) => playCaveDrop(gain, pan));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playCaveDrop(gain, pan));
     } else if (kind === "cafe-murmur") {
       const src = addPink();
       const lp = context.createBiquadFilter();
@@ -487,7 +578,7 @@ export function createAmbiencePlayer(
       nodes.push(lp, level);
       src.connect(lp).connect(level).connect(gain);
       src.start(now);
-      scheduleAccent(bed, 4400, (pan) => playCafeClink(gain, pan));
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playCafeClink(gain, pan));
     } else {
       // "arcade-hum": soft warm indoor room tone
       const src = addPink();
@@ -507,6 +598,7 @@ export function createAmbiencePlayer(
       hum.connect(humGain).connect(gain);
       src.start(now);
       hum.start(now);
+      scheduleAccent(bed, AMBIENCE_ACCENT_CADENCE_MS[kind], (pan) => playArcadeChime(gain, pan));
     }
     return bed;
   };

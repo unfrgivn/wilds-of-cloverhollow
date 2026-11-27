@@ -6645,6 +6645,43 @@ the old trail, the owl, and the clubhouse claim.
   (16/16 Chromium + 11/11 WebKit passing across `island.spec`, `bay.spec`,
   `milestone-101.spec`, `soundtrack.spec`, `showcase-polish.spec`).
 
+## Milestone 153: Complete Studio Audio Craft Suite — 24-Track World Soundtrack, Celebratory Minigame Flourishes, 9-of-9 Spatialized Ambience, Dialogue Voice Prosody & Warm Low-Pass Ducking + Bar-Quantized Track Resume **Status:** ✅ Completed (2026-11-27)
+- Elevates *Wilds of Cloverhollow*'s entire Web Audio engine into a complete
+  studio soundtrack & expressive voice suite with zero `src/core` simulation
+  changes, zero save-version bumps, zero replay hash drift across all 71
+  recorded sims, and zero visual baseline diffs.
+- Complete 24-track original soundtrack (`src/core/music.ts`,
+  `src/platform/scores-interiors.ts`, `src/platform/scores.ts`):
+  - Added 4 bespoke 16-bar 5-voice stereo chamber scores (`market` `"Pippin's
+    Basket Waltz"`, `parlor` `"Sweet Scoop Rag"`, `cottage` `"Sea-Glass Sunroom"`,
+    `cabin` `"Timber & Tea"`), expanding the Music Box Jukebox from 20 to **24
+    composed themes** (preserving `milo-house`, `rosie-cottage`, `summit`).
+- Celebratory minigame audio flourishes (`src/platform/audio-recipes.ts`):
+  - Upgraded `skee-hundred` (6-segment boardwalk bullseye bell arpeggio),
+    `cook-ding` (5-segment vintage microwave bell resonance + golden chime), and
+    `tickets-won` (6-segment ascending twinkle cascade).
+- Complete 9-of-9 spatialized biome ambience (`src/platform/ambience.ts`):
+  - Exported exhaustive `AMBIENCE_ACCENT_CADENCE_MS` and added stereo
+    `playMountainGust` (alpine pine gust + D6/F6 frost-bell harmonic) and
+    `playArcadeChime` (distant Star Racer cabinet twinkle).
+- Expressive sentence-aware dialogue voice prosody (`src/platform/voices.ts`,
+  `src/platform/audio.ts`):
+  - Exported `dialogueProsody(text, revealed)` adding inquisitive rising
+    questions (`?`), bright exclamations (`!`), soft ellipses whispers (`...` /
+    `…`), and all-caps word emphasis across all cast voices (preserving all
+    living-NPC speaker voices and adding 24-track `TRACK_SCALES`).
+- Warm dialogue low-pass music ducking & bar-quantized track resume
+  (`src/platform/music.ts`):
+  - Exported `duckFilterCutoff(duck)` (`2600 Hz <-> 18000 Hz` low-pass
+    `BiquadFilterNode`, `Q = 0.55`) and `resumeBarStep(...)` so exploration
+    themes resume cleanly on exact bar downbeats after short battles or shop
+    visits.
+- Evidence: `tests/unit/milestone-152.test.ts` (full 5-pillar unit coverage)
+  plus updated `soundtrack`, `lasso-jukebox`, `plaza-shops`, `friend-homes`,
+  and `milestone-116` suites.
+- Gates: `just check` (213 unit files / 1,563 tests, all 71 sims, 23 QA packs,
+  purity, lint), `just build`, and 26/26 Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

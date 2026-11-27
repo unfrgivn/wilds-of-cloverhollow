@@ -276,7 +276,7 @@ test(
 );
 
 test(
-  "lodge, clubhouse, and sanctuary play bespoke themes and Jukebox cycles all 20 tracks",
+  "lodge, clubhouse, sanctuary, and interiors play bespoke themes and Jukebox cycles all 24 tracks",
   { tag: "@smoke" },
   async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -285,6 +285,50 @@ test(
     // Unlock Web Audio with a real Enter key press on the title screen.
     await page.keyboard.press("Enter");
     await expect.poll(() => page.evaluate(() => window.__cloverhollow?.boot.title())).toBeNull();
+
+    // Cloverhollow Grocery Market -> Pippin's Basket Waltz + cafe-murmur ambience.
+    await resetPaused(page, "market");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "market",
+      ambience: "cafe-murmur",
+      duck: false,
+      title: "Pippin's Basket Waltz",
+      playing: true,
+    });
+
+    // Sweet Scoop Ice Cream Parlor -> Sweet Scoop Rag + cafe-murmur ambience.
+    await resetPaused(page, "parlor");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "parlor",
+      ambience: "cafe-murmur",
+      duck: false,
+      title: "Sweet Scoop Rag",
+      playing: true,
+    });
+
+    // Sue's Beach Cottage -> Sea-Glass Sunroom + ocean ambience.
+    await resetPaused(page, "sue-cottage");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "cottage",
+      ambience: "ocean",
+      duck: false,
+      title: "Sea-Glass Sunroom",
+      playing: true,
+    });
+
+    // Jordan's Mountain Cabin -> Timber & Tea + hearth ambience.
+    await resetPaused(page, "jordan-cabin");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "cabin",
+      ambience: "hearth",
+      duck: false,
+      title: "Timber & Tea",
+      playing: true,
+    });
 
     // Pinecone Lodge -> Hearth & Cocoa + hearth ambience.
     await resetPaused(page, "lodge");
@@ -319,7 +363,7 @@ test(
       playing: true,
     });
 
-    // Open journal OPTIONS and cycle cleanly through all 20 jukebox tracks back to sanctuary.
+    // Open journal OPTIONS and cycle cleanly through all 24 jukebox tracks back to sanctuary.
     await page.keyboard.press("j");
     await step(page, 2);
     await page.keyboard.press("ArrowRight");
@@ -330,7 +374,7 @@ test(
     const nextBtn = page.locator(".journal-jukebox-next");
     const visited: string[] = [];
     let prevTrack = "sanctuary";
-    for (let i = 0; i < 20; i += 1) {
+    for (let i = 0; i < 24; i += 1) {
       await nextBtn.click();
       await expect.poll(async () => (await readMusic(page)).track).not.toBe(prevTrack);
       const info = await readMusic(page);
@@ -339,7 +383,11 @@ test(
       expect(info.duck).toBe(false);
       await expect(nowPlaying).toHaveText(`♫ ${info.title}`);
     }
-    expect(new Set(visited).size).toBe(20);
+    expect(new Set(visited).size).toBe(24);
+    expect(visited).toContain("market");
+    expect(visited).toContain("parlor");
+    expect(visited).toContain("cottage");
+    expect(visited).toContain("cabin");
     expect(visited).toContain("sanctuary");
     expect(visited).toContain("lodge");
     expect(visited).toContain("clubhouse");

@@ -4457,6 +4457,7 @@ the old trail, the owl, and the clubhouse claim.
   deprecation warnings; production and harness hook checks green), and full e2e
   verified across Chromium & WebKit.
 
+<<<<<<< HEAD
 ## Milestone 94: Other Kids' Houses (Sue's Beach Cottage & Jordan's Mountain Cabin) **Status:** ✅ Completed (2026-11-27)
 - Two brand-new hand-painted enterable friend homes (`NOTES.md: 34`), with zero
   edits to core sim, renderer, UI, audio, or character/sticker/treat registries
@@ -4497,6 +4498,35 @@ the old trail, the owl, and the clubhouse claim.
   prior runs, 23 QA packs, purity, lint), `just build` (zero chunk warnings,
   production and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215
   just e2e` (1,068 passed, 2 skipped across Chromium & WebKit).
+
+## Milestone 95: Complete Journal Collection Showcase (Fish Catch Book, 6 Keepsakes Gallery, Sanctuary Clover Wreath Display & Completion Ribbons) **Status:** ✅ Completed (2026-11-27)
+- Pure collection core helpers (`src/core/journal.ts`, `src/core/index.ts`):
+  - Added `KeepsakeId`, `JournalKeepsake`, `journalKeepsakes`, `JournalFish`,
+    `journalFish`, `JournalProgress`, and `journalProgress` with zero save-format
+    or replay-hash changes.
+- Living Clubhouse 6th keepsake (`src/render/vfx-textures.ts`,
+  `src/render/clubhouse-display.ts`, `src/dev/console.ts`):
+  - Added hand-inked 48×48 watercolor `keepsakeWreath` texture and mounted
+    `clover-wreath` (`sanctuary_reward_14`) on the Clubhouse left wood wall at
+    `(468, 314)` below the taped drawings (`zIndex: 320`, `scale: 0.78`,
+    `sparkleTint: 0xa8e6cf`), bringing the full Living Clubhouse display to 19
+    items (13 prizes + 6 keepsakes).
+  - Updated QA console `keepsakes on|off` to include `sanctuary_reward_14` and
+    added `fish all|clear`.
+- Journal Collection Showcase UI (`src/ui/icons.ts`, `src/ui/journal.ts`,
+  `src/ui/journal.css`, `src/main.ts`):
+  - Added hand-crafted inline SVG `keepsakeIcon(id)` charms (zero `<text>` nodes),
+    detached-when-empty Fish Catch Book and 6 Keepsakes Gallery shelves, golden
+    `★ Complete!` completion ribbons, lazily decoded fish catch atlas, and
+    dynamic MAP footer `Fish N/6` & `Keepsakes N/6` pills.
+- Evidence: `tests/unit/milestone-95.test.ts` (4 tests) and
+  `tests/e2e/journal-collections.spec.ts` (`@smoke` Chromium + WebKit); review
+  captures `art/review/m95-journal-collections-1280.jpg` and
+  `art/review/m95-clubhouse-wreath.jpg` verified with `vision`.
+- Gates: `just check` (156 unit files / 1,225 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full e2e
+  verified across Chromium & WebKit.
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

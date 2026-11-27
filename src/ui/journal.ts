@@ -8,10 +8,18 @@ import {
   gemMarkup,
   heartMarkup,
   icon,
+  keepsakeIcon,
   ticketMarkup,
 } from "./icons";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
-import type { BusRoute, CarriedTreat, CritterFieldNote, LandProgress } from "../core/journal";
+import type {
+  BusRoute,
+  CarriedTreat,
+  CritterFieldNote,
+  JournalKeepsake,
+  KeepsakeId,
+  LandProgress,
+} from "../core/journal";
 import type { LevelStats } from "../core/levels";
 
 export type JournalPage = "notes" | "map" | "options";
@@ -24,6 +32,13 @@ export type JournalSticker = {
   fieldNote?: CritterFieldNote | null;
 };
 export type JournalPrize = JournalSticker;
+export type JournalFishEntry = {
+  id: string;
+  name: string;
+  image: AtlasImage | null;
+  owned: boolean;
+  rare: boolean;
+};
 
 export type JournalView = {
   visible: boolean;
@@ -32,6 +47,8 @@ export type JournalView = {
   treats?: CarriedTreat[];
   stickers: JournalSticker[];
   prizes: JournalPrize[];
+  fish?: JournalFishEntry[];
+  keepsakes?: JournalKeepsake[];
   lands: { id: string; name: string; busStop: boolean; x: number; y: number }[];
   currentLand: string | null;
   landProgress: Record<string, LandProgress>;
@@ -72,6 +89,14 @@ type Slot = {
   unknown: HTMLDivElement;
   name: HTMLDivElement;
   imageKey: string;
+};
+
+type KeepsakeSlot = {
+  root: HTMLDivElement;
+  charm: HTMLDivElement;
+  unknown: HTMLDivElement;
+  name: HTMLDivElement;
+  iconId: KeepsakeId | null;
 };
 
 type MapLand = JournalView["lands"][number];
@@ -134,13 +159,17 @@ function makeSliderButton(className: string, ariaLabel: string): {
   return { button, value };
 }
 
-function addSlot(grid: HTMLElement, onInspect?: () => void): Slot {
+function addSlot(
+  grid: HTMLElement,
+  onInspect?: () => void,
+  unknownLabel = "A sticker still to find",
+): Slot {
   const root = element("div", "journal-slot");
   const image = element("div", "journal-sticker-image die-cut");
   image.setAttribute("role", "img");
   const unknown = element("div", "journal-unknown");
   unknown.textContent = "?";
-  unknown.setAttribute("aria-label", "A sticker still to find");
+  unknown.setAttribute("aria-label", unknownLabel);
   const name = element("div", "journal-name");
   root.append(image, unknown, name);
   if (onInspect !== undefined) {
@@ -154,6 +183,41 @@ function addSlot(grid: HTMLElement, onInspect?: () => void): Slot {
   }
   grid.append(root);
   return { root, image, unknown, name, imageKey: "" };
+}
+
+function addKeepsakeSlot(grid: HTMLElement): KeepsakeSlot {
+  const root = element("div", "journal-slot journal-keepsake-slot");
+  const charm = element("div", "journal-keepsake-charm");
+  charm.setAttribute("role", "img");
+  const unknown = element("div", "journal-unknown");
+  unknown.textContent = "?";
+  unknown.setAttribute("aria-label", "A keepsake still to find");
+  const name = element("div", "journal-name");
+  root.append(charm, unknown, name);
+  grid.append(root);
+  return { root, charm, unknown, name, iconId: null };
+}
+
+function makeCompleteRibbon(): HTMLSpanElement {
+  const ribbon = element("span", "journal-complete-ribbon");
+  ribbon.textContent = "★ Complete!";
+  return ribbon;
+}
+
+function syncAttachedAfter(anchor: Element, node: Element, show: boolean): void {
+  if (show) {
+    if (!node.isConnected || anchor.nextElementSibling !== node) anchor.after(node);
+  } else if (node.isConnected) {
+    node.remove();
+  }
+}
+
+function syncChild(parent: Element, node: Element, show: boolean): void {
+  if (show) {
+    if (!node.isConnected) parent.append(node);
+  } else if (node.isConnected) {
+    node.remove();
+  }
 }
 
 // The bus line's stop sign, as on the sprite: a gold star on a blue roundel
@@ -300,12 +364,24 @@ export function createJournal(root: HTMLElement): {
   const stickersPage = element("section", "journal-page journal-stickers-page");
   const stickersHeading = element("h2", "journal-heading");
   stickersHeading.textContent = "STICKERS";
+  const stickersComplete = makeCompleteRibbon();
   const grid = element("div", "journal-stickers");
   const prizesHeading = element("h3", "journal-prizes-heading");
   prizesHeading.append("PRIZES");
   const tickets = supply("tickets", "Tickets");
   prizesHeading.append(tickets.root);
+  const prizesComplete = makeCompleteRibbon();
   const prizesGrid = element("div", "journal-stickers journal-prizes");
+  const fishHeading = element("h3", "journal-prizes-heading journal-fish-heading");
+  const fishCount = element("span", "journal-section-count");
+  fishHeading.append("FISH", fishCount);
+  const fishComplete = makeCompleteRibbon();
+  const fishGrid = element("div", "journal-stickers journal-fish");
+  const keepsakesHeading = element("h3", "journal-prizes-heading journal-keepsakes-heading");
+  const keepsakesCount = element("span", "journal-section-count");
+  keepsakesHeading.append("KEEPSAKES", keepsakesCount);
+  const keepsakesComplete = makeCompleteRibbon();
+  const keepsakesGrid = element("div", "journal-stickers journal-keepsakes");
   stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
 
   const mapPage = element("section", "journal-map-page");
@@ -330,6 +406,10 @@ export function createJournal(root: HTMLElement): {
   setAttribute(mapStickersPill, "data-stat", "stickers");
   const mapPrizesPill = element("span", "journal-map-pill");
   setAttribute(mapPrizesPill, "data-stat", "prizes");
+  const mapFishPill = element("span", "journal-map-pill");
+  setAttribute(mapFishPill, "data-stat", "fish");
+  const mapKeepsakesPill = element("span", "journal-map-pill");
+  setAttribute(mapKeepsakesPill, "data-stat", "keepsakes");
   const mapLegend = element("span", "journal-map-legend");
   mapLegend.append(busStopIcon(), "Bus");
   mapSummary.append(mapStickersPill, mapPrizesPill, mapLegend);
@@ -669,6 +749,8 @@ export function createJournal(root: HTMLElement): {
 
   const slots: Slot[] = [];
   const prizeSlots: Slot[] = [];
+  const fishSlots: Slot[] = [];
+  const keepsakeSlots: KeepsakeSlot[] = [];
   return {
     setPage,
     onClose: (callback) => {
@@ -873,6 +955,11 @@ export function createJournal(root: HTMLElement): {
         }
       });
       syncFieldNote(view);
+      const allStickersOwned =
+        view.stickers.length > 0 && view.stickers.every((sticker) => sticker.owned);
+      stickersHeading.classList.toggle("is-complete", allStickersOwned);
+      syncChild(stickersHeading, stickersComplete, allStickersOwned);
+
       while (prizeSlots.length < view.prizes.length) prizeSlots.push(addSlot(prizesGrid));
       while (prizeSlots.length > view.prizes.length) prizeSlots.pop()?.root.remove();
       view.prizes.forEach((prize, index) => {
@@ -897,6 +984,90 @@ export function createJournal(root: HTMLElement): {
           slot.imageKey = key;
         }
       });
+      const allPrizesOwned =
+        view.prizes.length > 0 && view.prizes.every((prize) => prize.owned);
+      syncChild(prizesHeading, prizesComplete, allPrizesOwned);
+
+      const fishList = view.fish ?? [];
+      const fishOwned = fishList.filter((item) => item.owned).length;
+      const showFish = fishOwned > 0;
+      syncAttachedAfter(prizesGrid, fishHeading, showFish);
+      syncAttachedAfter(fishHeading, fishGrid, showFish);
+      if (showFish) {
+        setText(fishCount, `${fishOwned}/${fishList.length}`);
+        syncChild(fishHeading, fishComplete, fishList.length > 0 && fishOwned >= fishList.length);
+        while (fishSlots.length < fishList.length) {
+          fishSlots.push(addSlot(fishGrid, undefined, "A fish still to catch"));
+        }
+        while (fishSlots.length > fishList.length) fishSlots.pop()?.root.remove();
+        fishList.forEach((item, index) => {
+          const slot = fishSlots[index];
+          if (slot === undefined) return;
+          const image = item.owned ? item.image : null;
+          slot.image.hidden = !item.owned;
+          slot.unknown.hidden = item.owned;
+          slot.name.hidden = !item.owned;
+          setText(slot.name, item.owned ? item.name : "");
+          setAttribute(slot.root, "data-owned", String(item.owned));
+          setAttribute(slot.root, "data-fish", item.id);
+          slot.root.classList.toggle("is-rare", item.owned && item.rare);
+          if (image === null) {
+            slot.imageKey = "";
+            return;
+          }
+          setAttribute(slot.image, "aria-label", item.name);
+          const key =
+            `${image.src}#${image.frame.x},${image.frame.y},` +
+            `${image.frame.w},${image.frame.h}`;
+          if (slot.imageKey !== key) {
+            applyAtlasCrop(slot.image, image);
+            slot.imageKey = key;
+          }
+        });
+      }
+
+      const keepsakesList = view.keepsakes ?? [];
+      const keepsakesOwned = keepsakesList.filter((item) => item.owned).length;
+      const showKeepsakes = keepsakesOwned > 0;
+      const keepsakesAnchor = showFish ? fishGrid : prizesGrid;
+      syncAttachedAfter(keepsakesAnchor, keepsakesHeading, showKeepsakes);
+      syncAttachedAfter(keepsakesHeading, keepsakesGrid, showKeepsakes);
+      if (showKeepsakes) {
+        setText(keepsakesCount, `${keepsakesOwned}/${keepsakesList.length}`);
+        syncChild(
+          keepsakesHeading,
+          keepsakesComplete,
+          keepsakesList.length > 0 && keepsakesOwned >= keepsakesList.length,
+        );
+        while (keepsakeSlots.length < keepsakesList.length) {
+          keepsakeSlots.push(addKeepsakeSlot(keepsakesGrid));
+        }
+        while (keepsakeSlots.length > keepsakesList.length) keepsakeSlots.pop()?.root.remove();
+        keepsakesList.forEach((item, index) => {
+          const slot = keepsakeSlots[index];
+          if (slot === undefined) return;
+          slot.charm.hidden = !item.owned;
+          slot.unknown.hidden = item.owned;
+          slot.name.hidden = !item.owned;
+          setText(slot.name, item.owned ? item.name : "");
+          setAttribute(slot.root, "data-owned", String(item.owned));
+          setAttribute(slot.root, "data-keepsake", item.id);
+          if (item.owned) {
+            setAttribute(slot.root, "title", item.source);
+            setAttribute(slot.charm, "aria-label", item.name);
+            if (slot.iconId !== item.id) {
+              slot.charm.replaceChildren(keepsakeIcon(item.id));
+              slot.iconId = item.id;
+            }
+          } else {
+            if (slot.root.hasAttribute("title")) slot.root.removeAttribute("title");
+            if (slot.iconId !== null) {
+              slot.charm.replaceChildren();
+              slot.iconId = null;
+            }
+          }
+        });
+      }
 
       const nextMapSignature = view.lands
         .map((land) => `${land.id}:${land.name}:${land.busStop}:${land.x}:${land.y}`)
@@ -999,6 +1170,12 @@ export function createJournal(root: HTMLElement): {
 
       setText(mapStickersPill, `Stickers ${view.stickersOwned}/${view.stickersTotal}`);
       setText(mapPrizesPill, `Prizes ${view.prizesOwned}/${view.prizesTotal}`);
+      syncAttachedAfter(mapPrizesPill, mapFishPill, showFish);
+      if (showFish) setText(mapFishPill, `Fish ${fishOwned}/${fishList.length}`);
+      syncAttachedAfter(showFish ? mapFishPill : mapPrizesPill, mapKeepsakesPill, showKeepsakes);
+      if (showKeepsakes) {
+        setText(mapKeepsakesPill, `Keepsakes ${keepsakesOwned}/${keepsakesList.length}`);
+      }
       syncMapDetail(view);
 
       const here = view.lands.find((land) => land.id === view.currentLand);

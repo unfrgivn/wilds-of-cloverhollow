@@ -22,7 +22,7 @@ async function runQaCommands(page: Page, commands: readonly string[]): Promise<v
 }
 
 test(
-  "clubhouse renders all 13 prizes and 5 keepsakes, pets Maddie cleanly, and rests on beanbag",
+  "clubhouse renders all 13 prizes and 6 keepsakes, pets Maddie cleanly, and rests on beanbag",
   { tag: "@smoke" },
   async ({ page }, testInfo) => {
     const errors: string[] = [];
@@ -33,13 +33,13 @@ test(
 
     const displayInfo = await renderInfo(page);
     expect(displayInfo.area).toBe("clubhouse");
-    expect(displayInfo.clubhouseDisplay).toBeGreaterThanOrEqual(18);
+    expect(displayInfo.clubhouseDisplay).toBeGreaterThanOrEqual(19);
     expect(
       displayInfo.drawOrder.filter((item) => item.label.startsWith("clubhouse:prize:")),
     ).toHaveLength(13);
     expect(
       displayInfo.drawOrder.filter((item) => item.label.startsWith("clubhouse:keepsake:")),
-    ).toHaveLength(5);
+    ).toHaveLength(6);
 
     // Clean framing at both desktop (1280x720) and phone landscape (874x402).
     const canvas = page.locator("canvas");
@@ -57,7 +57,7 @@ test(
     await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(874);
     await expect.poll(async () => (await canvas.boundingBox())?.height).toBe(402);
     await step(page, 1);
-    expect((await renderInfo(page)).clubhouseDisplay).toBeGreaterThanOrEqual(18);
+    expect((await renderInfo(page)).clubhouseDisplay).toBeGreaterThanOrEqual(19);
 
     await page.setViewportSize({ width: 1280, height: 720 });
     await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(1280);

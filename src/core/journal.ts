@@ -16,6 +16,33 @@ export type CritterFieldNote = {
   favouriteTreats: string[];
 };
 export type CarriedTreat = { id: string; name: string; count: number };
+export type KeepsakeId =
+  | "star-crystal"
+  | "star-pin"
+  | "star-geode"
+  | "moon-feather"
+  | "taco-badge"
+  | "clover-wreath";
+export type JournalKeepsake = {
+  id: KeepsakeId;
+  name: string;
+  source: string;
+  owned: boolean;
+};
+export type JournalFish = {
+  id: string;
+  name: string;
+  frame: string;
+  owned: boolean;
+  rare: boolean;
+};
+export type JournalProgress = {
+  stickers: LandProgress;
+  prizes: LandProgress;
+  fish: LandProgress;
+  keepsakes: LandProgress;
+  gems: LandProgress;
+};
 
 export const STAR_GEM_VARIABLES = [
   "gem_park",
@@ -204,6 +231,88 @@ export function carriedTreats(
     const count = state.treats?.[treat.id] ?? 0;
     return count > 0 ? [{ id: treat.id, name: treat.name, count }] : [];
   });
+}
+
+/** All six quest keepsakes in canonical display order with ownership state. */
+export function journalKeepsakes(
+  world: Pick<World, "storyVariable">,
+  state: Pick<State, "ink" | "stickers">,
+): JournalKeepsake[] {
+  const flag = (variable: string): boolean => world.storyVariable(state.ink, variable) === true;
+  return [
+    {
+      id: "star-crystal",
+      name: "Star Crystal",
+      source: "Crystal Cavern",
+      owned: flag("cavern_chime_rung"),
+    },
+    {
+      id: "star-pin",
+      name: "Bon Appetit Star Pin",
+      source: "Bon Appetit Café",
+      owned: flag("spice_returned"),
+    },
+    {
+      id: "star-geode",
+      name: "Rainbow Star Geode",
+      source: "7 Star Gems",
+      owned: flag("gem_reward_all"),
+    },
+    {
+      id: "moon-feather",
+      name: "Moon Feather",
+      source: "Starry Owl",
+      owned: state.stickers.includes("starry-owl"),
+    },
+    {
+      id: "taco-badge",
+      name: "Golden Taco Badge",
+      source: "Chef Mateo",
+      owned: state.stickers.includes("taco-chef"),
+    },
+    {
+      id: "clover-wreath",
+      name: "Sanctuary Clover Wreath",
+      source: "Wildlife Sanctuary",
+      owned: flag("sanctuary_reward_14"),
+    },
+  ];
+}
+
+/** Bubblegum Bay fishing catches mapped against Fae's caught species log. */
+export function journalFish(
+  world: Pick<World, "arcade">,
+  state: Pick<State, "caughtFish">,
+): JournalFish[] {
+  const caught = state.caughtFish ?? {};
+  return world.arcade.fish.catches.map((item) => ({
+    id: item.id,
+    name: item.name,
+    frame: item.frame,
+    owned: (caught[item.id] ?? 0) > 0,
+    rare: item.rarity === "rare",
+  }));
+}
+
+/** Unified collection completion counters across stickers, prizes, fish, keepsakes, and gems. */
+export function journalProgress(
+  world: Pick<World, "arcade" | "stickers" | "storyVariable">,
+  state: Pick<State, "caughtFish" | "ink" | "prizes" | "stickers">,
+): JournalProgress {
+  const validStickers = new Set(world.stickers.catalogue.map((entry) => entry.id));
+  const ownedStickers = new Set(state.stickers.filter((id) => validStickers.has(id)));
+  const validPrizes = new Set(world.arcade.prizes.map((entry) => entry.id));
+  const ownedPrizes = new Set(state.prizes.filter((id) => validPrizes.has(id)));
+  const fish = journalFish(world, state);
+  const keepsakes = journalKeepsakes(world, state);
+  const gems = starGemsFound(world, state);
+  return {
+    stickers: { owned: ownedStickers.size, total: world.stickers.catalogue.length },
+    prizes: { owned: ownedPrizes.size, total: world.arcade.prizes.length },
+    fish: { owned: fish.filter((item) => item.owned).length, total: fish.length },
+    keepsakes: { owned: keepsakes.filter((item) => item.owned).length, total: keepsakes.length },
+    gems: { owned: gems.found, total: gems.total },
+  };
 }
 
 export function autosaveNeeded(previous: State, next: State): boolean {

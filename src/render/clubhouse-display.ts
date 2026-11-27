@@ -15,7 +15,8 @@ export type ClubhouseKeepsakeKey =
   | "keepsakePin"
   | "keepsakeGeode"
   | "keepsakeFeather"
-  | "keepsakeTaco";
+  | "keepsakeTaco"
+  | "keepsakeWreath";
 
 export type ClubhouseKeepsakePlacement = {
   id: string;
@@ -126,6 +127,18 @@ const KEEPSAKE_RULES: readonly KeepsakeRule[] = [
       sparkleTint: 0xffd27a,
     },
     unlocked: (_world, state) => state.stickers.includes("taco-chef"),
+  },
+  {
+    placement: {
+      id: "clover-wreath",
+      texture: "keepsakeWreath",
+      x: 468,
+      y: 314,
+      zIndex: 320,
+      scale: 0.78,
+      sparkleTint: 0xa8e6cf,
+    },
+    unlocked: (world, state) => world.storyVariable(state.ink, "sanctuary_reward_14") === true,
   },
 ];
 

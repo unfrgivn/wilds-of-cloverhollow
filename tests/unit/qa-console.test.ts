@@ -10,6 +10,7 @@ const context: ConsoleContext = {
   stickerIds: content.world.stickers.catalogue.map((sticker) => sticker.id),
   prizeIds: content.world.arcade.prizes.map((prize) => prize.id),
   treatIds: content.world.treats.map((treat) => treat.id),
+  fishIds: content.world.arcade.fish.catches.map((item) => item.id),
   thresholds: content.world.levels.thresholds,
 };
 
@@ -31,7 +32,7 @@ describe("QA console commands", () => {
     if (outcome.kind !== "help") throw new Error("expected help");
     for (const word of [
       "help", "xp", "level", "coins", "snacks", "tickets", "treats", "stickers", "prizes",
-      "lantern", "lasso", "flute", "map", "save", "export",
+      "fish", "lantern", "lasso", "flute", "map", "keepsakes", "save", "export",
     ])
       expect(outcome.message, word).toContain(word);
   });
@@ -130,6 +131,13 @@ describe("QA console commands", () => {
     if (oneTreat.kind !== "applied") throw new Error("expected an applied outcome");
     expect(oneTreat.state.treats?.["fish-cracker"]).toBe(2);
     expect(runConsoleCommand(context, start, "treats nope").kind).toBe("error");
+    const allFish = runConsoleCommand(context, start, "fish all");
+    if (allFish.kind !== "applied") throw new Error("expected an applied outcome");
+    expect(Object.keys(allFish.state.caughtFish ?? {}).sort()).toEqual([...context.fishIds].sort());
+    const clearedFish = runConsoleCommand(context, allFish.state, "fish clear");
+    if (clearedFish.kind !== "applied") throw new Error("expected an applied outcome");
+    expect(clearedFish.state.caughtFish).toBeUndefined();
+    expect(runConsoleCommand(context, start, "fish salmon").kind).toBe("error");
   });
 
   it("the four tools set their story variables and nothing else", () => {

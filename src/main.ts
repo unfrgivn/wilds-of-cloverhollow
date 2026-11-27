@@ -23,6 +23,8 @@ import {
   arcadeView,
   carriedTreats,
   critterFieldNote,
+  journalFish,
+  journalKeepsakes,
   landStickerProgress,
   mapBusRoutes,
   mapLandName,
@@ -379,6 +381,7 @@ async function boot(): Promise<void> {
         stickerIds: content.world.stickers.catalogue.map((sticker) => sticker.id),
         prizeIds: content.world.arcade.prizes.map((prize) => prize.id),
         treatIds: content.world.treats.map((treat) => treat.id),
+        fishIds: content.world.arcade.fish.catches.map((item) => item.id),
         thresholds: content.world.levels.thresholds,
       }, state, line);
       if (outcome.kind === "applied") {
@@ -509,6 +512,8 @@ async function boot(): Promise<void> {
   // A prize's art: its frame in the prize atlas (spec 8.2).
   const prizeArt = (frameName: string): AtlasImage | null =>
     atlasFrame(content.world.arcade.atlas, frameName);
+  // A caught fish's art: lazily decoded only when opening the journal with catches.
+  const fishArt = (frameName: string): AtlasImage | null => atlasFrame(fishAtlas, frameName);
   // Each hole of Boop-a-Mole is a touch target (spec 8.2): the outer four
   // hold their arrow, and the middle the confirm button, while pressed; a tap
   // counts however quickly it lifts.
@@ -660,6 +665,8 @@ async function boot(): Promise<void> {
     }
     if (snapshot.prizes.length > 0)
       loads.push(decodeAtlasImage(content.world.arcade.atlas));
+    if (Object.values(snapshot.caughtFish ?? {}).some((count) => count > 0))
+      loads.push(decodeAtlasImage(fishAtlas));
     await Promise.all(loads);
   };
   const partyCommands: Record<string, string | null> = Object.fromEntries(
@@ -880,7 +887,19 @@ async function boot(): Promise<void> {
     );
     cookOverlay?.render(arcadeState?.game === "cook" ? arcadeState : null);
     fishOverlay?.render(arcadeState?.game === "fish" ? arcadeState : null);
-    if (state.journalOpen && !wasJournalOpen) void warmOwnedJournalMedia(state);
+    if (state.journalOpen && !wasJournalOpen) {
+      void warmOwnedJournalMedia(state).then(() => {
+        if (state.journalOpen) invalidate();
+      });
+    } else if (
+      state.journalOpen &&
+      Object.values(state.caughtFish ?? {}).some((count) => count > 0) &&
+      atlasJsonCache.get(fishAtlas) === undefined
+    ) {
+      void decodeAtlasImage(fishAtlas).then(() => {
+        if (state.journalOpen) invalidate();
+      });
+    }
     wasJournalOpen = state.journalOpen;
     if (arcadeState !== null) document.documentElement.dataset.arcade = "open";
     else delete document.documentElement.dataset.arcade;
@@ -1143,6 +1162,16 @@ async function boot(): Promise<void> {
               : null,
           }))
         : [],
+      fish: state.journalOpen
+        ? journalFish(content.world, state).map((item) => ({
+            id: item.id,
+            name: item.name,
+            owned: item.owned,
+            rare: item.rare,
+            image: item.owned ? fishArt(item.frame) : null,
+          }))
+        : [],
+      keepsakes: state.journalOpen ? journalKeepsakes(content.world, state) : [],
       lands: state.journalOpen
         ? content.world.lands.map((land) => ({
             ...land,

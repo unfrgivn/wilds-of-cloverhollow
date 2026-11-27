@@ -118,14 +118,19 @@ describe("Milestone 89: Living Clubhouse display", () => {
     }
   });
 
-  it("activates all 5 shimmering quest keepsakes when their story or sticker flags hold", () => {
+  it("activates all 6 shimmering quest keepsakes when their story or sticker flags hold", () => {
     const empty = stateIn("clubhouse");
     expect(evaluateClubhouseDisplay(world, empty).keepsakes).toEqual([]);
 
     const full = stateIn(
       "clubhouse",
       { prizes: allPrizeIds, stickers: ["starry-owl", "taco-chef"] },
-      { cavern_chime_rung: true, spice_returned: true, gem_reward_all: true },
+      {
+        cavern_chime_rung: true,
+        spice_returned: true,
+        gem_reward_all: true,
+        sanctuary_reward_14: true,
+      },
     );
     const display = evaluateClubhouseDisplay(world, full);
     expect(display.prizes).toHaveLength(13);
@@ -135,6 +140,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "star-geode",
       "moon-feather",
       "taco-badge",
+      "clover-wreath",
     ]);
     expect(display.keepsakes.map((item) => item.texture)).toEqual([
       "keepsakeCrystal",
@@ -142,6 +148,7 @@ describe("Milestone 89: Living Clubhouse display", () => {
       "keepsakeGeode",
       "keepsakeFeather",
       "keepsakeTaco",
+      "keepsakeWreath",
     ]);
   });
 
@@ -305,6 +312,7 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
       stickerIds: world.stickers.catalogue.map((sticker) => sticker.id),
       prizeIds: world.arcade.prizes.map((prize) => prize.id),
       treatIds: world.treats.map((treat) => treat.id),
+      fishIds: world.arcade.fish.catches.map((item) => item.id),
       thresholds: world.levels.thresholds,
     };
     const start = stateIn("clubhouse");
@@ -314,7 +322,8 @@ describe("Milestone 89: Companion petting & cozy resting", () => {
     expect(world.storyVariable(on.state.ink, "cavern_chime_rung")).toBe(true);
     expect(world.storyVariable(on.state.ink, "spice_returned")).toBe(true);
     expect(world.storyVariable(on.state.ink, "gem_reward_all")).toBe(true);
-    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(3);
+    expect(world.storyVariable(on.state.ink, "sanctuary_reward_14")).toBe(true);
+    expect(evaluateClubhouseDisplay(world, on.state).keepsakes).toHaveLength(4);
 
     const off = runConsoleCommand(context, on.state, "keepsakes off");
     expect(off.kind).toBe("applied");

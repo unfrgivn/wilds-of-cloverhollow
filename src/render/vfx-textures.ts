@@ -22,7 +22,8 @@ export type VfxTextureKey =
   | "keepsakePin"
   | "keepsakeGeode"
   | "keepsakeFeather"
-  | "keepsakeTaco";
+  | "keepsakeTaco"
+  | "keepsakeWreath";
 
 export type VfxTextures = Record<VfxTextureKey, Texture> & {
   destroy: () => void;
@@ -922,6 +923,104 @@ function buildKeepsakeTaco(): Texture {
   return toTexture(canvas);
 }
 
+// 48x48 hand-inked Sanctuary Clover Wreath keepsake (braided sage-green clover
+// ring with pastel buttercup, rose, and lavender wildflower blossoms).
+function buildKeepsakeWreath(): Texture {
+  const { canvas, ctx } = makeCanvas(48, 48);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  const halo = ctx.createRadialGradient(24, 24, 4, 24, 24, 23);
+  halo.addColorStop(0, "rgba(168, 230, 207, 0.42)");
+  halo.addColorStop(1, "rgba(168, 230, 207, 0)");
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, 48, 48);
+
+  // Braided sage-green clover leaves arranged in a cozy ring.
+  const leafCount = 10;
+  for (let i = 0; i < leafCount; i += 1) {
+    const angle = (i * Math.PI * 2) / leafCount - Math.PI / 2;
+    const lx = 24 + Math.cos(angle) * 13.4;
+    const ly = 23 + Math.sin(angle) * 13.4;
+    ctx.save();
+    ctx.translate(lx, ly);
+    ctx.rotate(angle + Math.PI / 2);
+    const leafFill = ctx.createRadialGradient(-1, -1, 1, 0, 0, 7.5);
+    leafFill.addColorStop(0, i % 2 === 0 ? "#C2ECB8" : "#A7DFAD");
+    leafFill.addColorStop(1, i % 2 === 0 ? "#6EB876" : "#5AA667");
+    ctx.fillStyle = leafFill;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 6.6, 4.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = "#47321F";
+    ctx.stroke();
+    // Tiny inner leaf vein accent.
+    ctx.strokeStyle = "rgba(71, 50, 31, 0.3)";
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(-3.2, 0);
+    ctx.lineTo(3.2, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Pastel wildflower blossoms: buttercup, rose, and lavender around the ring.
+  const blossoms: readonly [number, number, string][] = [
+    [24, 9.5, "#FFE37D"],
+    [36.5, 16.5, "#F49CB4"],
+    [36.5, 30, "#D4B6FA"],
+    [11.5, 30, "#FFE37D"],
+    [11.5, 16.5, "#D4B6FA"],
+    [30.5, 11.5, "#F49CB4"],
+  ];
+  for (const [bx, by, petalColor] of blossoms) {
+    ctx.fillStyle = petalColor;
+    ctx.strokeStyle = "#47321F";
+    ctx.lineWidth = 1.1;
+    for (let p = 0; p < 5; p += 1) {
+      const pa = (p * Math.PI * 2) / 5;
+      ctx.beginPath();
+      ctx.arc(bx + Math.cos(pa) * 2.5, by + Math.sin(pa) * 2.5, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#FFF7CC";
+    ctx.beginPath();
+    ctx.arc(bx, by, 1.7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Small fluttering rose-coral ribbon bow tucked at the bottom of the wreath.
+  ctx.fillStyle = "#E8849F";
+  ctx.strokeStyle = "#47321F";
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(24, 36);
+  ctx.lineTo(17.5, 43.5);
+  ctx.lineTo(22.2, 41.5);
+  ctx.lineTo(24, 37.5);
+  ctx.lineTo(25.8, 41.5);
+  ctx.lineTo(30.5, 43.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.ellipse(20.2, 36.2, 3.6, 2.3, -0.35, 0, Math.PI * 2);
+  ctx.ellipse(27.8, 36.2, 3.6, 2.3, 0.35, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#FFF3C4";
+  ctx.beginPath();
+  ctx.arc(24, 36.2, 2.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  return toTexture(canvas);
+}
+
 export function createVfxTextures(): VfxTextures {
   const textures: Record<VfxTextureKey, Texture> = {
     contactShadow: buildContactShadow(),
@@ -946,6 +1045,7 @@ export function createVfxTextures(): VfxTextures {
     keepsakeGeode: buildKeepsakeGeode(),
     keepsakeFeather: buildKeepsakeFeather(),
     keepsakeTaco: buildKeepsakeTaco(),
+    keepsakeWreath: buildKeepsakeWreath(),
   };
   return {
     ...textures,

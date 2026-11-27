@@ -14,6 +14,7 @@ export type ConsoleContext = {
   stickerIds: string[];
   prizeIds: string[];
   treatIds: string[];
+  fishIds: string[];
   thresholds: number[];
 };
 
@@ -39,6 +40,7 @@ const keepsakeVariables: readonly string[] = [
   "cavern_chime_rung",
   "spice_returned",
   "gem_reward_all",
+  "sanctuary_reward_14",
 ];
 
 // The supplies' caps are the layouts the journal and the battle menu were
@@ -56,6 +58,7 @@ const CONSOLE_HELP = [
   "treats all|<id>    grant specialty treats",
   "stickers all|<id>  grant stickers",
   "prizes all|<id>    grant prizes",
+  "fish all|clear     catch all or clear fish",
   "lantern on|off     carry the lantern",
   "lasso on|off       carry the lasso",
   "flute on|off       carry the flute",
@@ -244,6 +247,32 @@ function treatCommand(
   return { kind: "applied", state: next, message: `${id} = ${next.treats?.[id] ?? 0}.` };
 }
 
+function fishCommand(
+  context: ConsoleContext,
+  state: State,
+  args: string[],
+): ConsoleOutcome {
+  const [raw] = args;
+  if (raw === undefined) return { kind: "error", message: "Usage: fish all|clear." };
+  const setting = raw.toLowerCase();
+  if (setting === "all") {
+    const caughtFish: Record<string, number> = {};
+    for (const id of context.fishIds) {
+      caughtFish[id] = Math.max(1, state.caughtFish?.[id] ?? 0);
+    }
+    return {
+      kind: "applied",
+      state: { ...state, caughtFish },
+      message: `Caught all ${context.fishIds.length} fish.`,
+    };
+  }
+  if (setting === "clear") {
+    const { caughtFish: _dropped, ...rest } = state;
+    return { kind: "applied", state: rest, message: "Cleared caught fish." };
+  }
+  return { kind: "error", message: `"${raw}" is not all or clear.` };
+}
+
 function saveCommand(args: string[]): ConsoleOutcome {
   const [name] = args;
   if (name === undefined || !/^[a-z0-9][a-z0-9-]{0,23}$/.test(name))
@@ -273,6 +302,7 @@ export function runConsoleCommand(
     case "treats": return treatCommand(context, state, args);
     case "stickers": return collectionCommand(context, state, args, "stickers");
     case "prizes": return collectionCommand(context, state, args, "prizes");
+    case "fish": return fishCommand(context, state, args);
     case "lantern": return toolCommand(context, state, args, "lantern");
     case "lasso": return toolCommand(context, state, args, "lasso");
     case "flute": return toolCommand(context, state, args, "flute");

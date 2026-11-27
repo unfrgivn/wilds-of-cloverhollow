@@ -1,6 +1,7 @@
 .journal-book[hidden],
 .journal-empty[hidden],
 .journal-sticker-image[hidden],
+.journal-keepsake-charm[hidden],
 .journal-unknown[hidden],
 .journal-name[hidden],
 .journal-map-page[hidden],
@@ -65,6 +66,12 @@
   font-size: 16px;
   font-weight: 800;
   letter-spacing: .1em;
+}
+.journal-heading.is-complete {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 /* NOTES on the left, Fae's coins and snacks as small stickers on the right. */
 .journal-notes-head {
@@ -319,6 +326,96 @@
 }
 .journal-prizes-heading .journal-tickets {
   letter-spacing: normal;
+}
+.journal-fish-heading,
+.journal-keepsakes-heading {
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 8px 0 3px;
+  padding-top: 6px;
+}
+.journal-section-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: var(--sticker-paper);
+  box-shadow: 0 2px 0 #47321f22;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+.journal-complete-ribbon {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 2px solid var(--sticker-ink);
+  border-radius: 999px;
+  background: #ffe794;
+  box-shadow: 0 2px 0 #47321f22;
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.journal-fish,
+.journal-keepsakes {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 2px 4px;
+}
+.journal-fish .journal-slot,
+.journal-keepsakes .journal-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 3px 3px 3px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+}
+.journal-fish .journal-slot[data-owned="true"],
+.journal-keepsakes .journal-slot[data-owned="true"] {
+  border-color: #47321f33;
+  background: #fffaf2;
+}
+.journal-fish .journal-slot.is-rare {
+  border: 2px solid #b57c18;
+  background: #fff5cf;
+  box-shadow: 0 2px 0 #47321f22;
+}
+.journal-fish .journal-sticker-image,
+.journal-fish .journal-unknown,
+.journal-keepsakes .journal-unknown,
+.journal-keepsake-charm {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto;
+}
+.journal-keepsake-charm {
+  display: grid;
+  place-items: center;
+}
+.journal-keepsake-icon {
+  --cut: 2px;
+  --cut-ink: 1px;
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+.journal-fish .journal-name,
+.journal-keepsakes .journal-name {
+  margin-top: 2px;
+  color: var(--sticker-ink);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.08;
+  word-break: break-word;
 }
 .journal-label {
   position: absolute;
@@ -1000,7 +1097,15 @@
   .journal-map-page { padding: 8px 22px 8px 14px; gap: 4px; }
   .journal-map-footer { padding: 3px 8px; }
   .journal-map-detail { font-size: 11px; }
+  .journal-map-summary { gap: 4px; }
   .journal-map-pill, .journal-map-legend { font-size: 10.5px; padding: 1px 6px; }
+  .journal-fish .journal-sticker-image,
+  .journal-fish .journal-unknown,
+  .journal-keepsakes .journal-unknown,
+  .journal-keepsake-charm { width: 38px; height: 38px; }
+  .journal-keepsake-icon { width: 36px; height: 36px; }
+  .journal-fish .journal-name,
+  .journal-keepsakes .journal-name { font-size: 10px; }
   .journal-options-sound-page { padding: 8px 10px 8px 10px; }
   .journal-options-play-page { padding: 8px 22px 8px 10px; }
   .journal-options-head { gap: 4px; margin-bottom: 6px; }

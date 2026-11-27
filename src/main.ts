@@ -116,9 +116,7 @@ async function boot(): Promise<void> {
   // so only a gesture made after that can have unlocked it.
   const sound = createAudio((audioState) => {
     if (import.meta.env.DEV || import.meta.env.MODE === "harness")
-      console.log(
-        `[cloverhollow] audio ${JSON.stringify({ state: audioState })}`,
-      );
+      console.log(`[cloverhollow] audio ${JSON.stringify({ state: audioState })}`);
   });
   const haptics = createHaptics();
   const qaEnabled = import.meta.env.DEV || import.meta.env.MODE === "harness";
@@ -173,10 +171,7 @@ async function boot(): Promise<void> {
     touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir);
   });
   const echoArrows: readonly Point[] = [
-    { x: 0, y: -1 },
-    { x: 1, y: 0 },
-    { x: 0, y: 1 },
-    { x: -1, y: 0 },
+    { x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 },
   ];
   battleCheck.onEchoNote((note) => {
     const direction = echoArrows[note];
@@ -526,6 +521,17 @@ async function boot(): Promise<void> {
   };
   battleHud.onPeekToggle(() => setBattlePeek(!battlePeekOpen));
   battleHud.onPeekClose(() => setBattlePeek(false));
+  hudHints.onAction((action) => {
+    if (action === "interact") touch.tapButton("confirm");
+    else if (action === "journal") touch.tapButton("menu");
+    else if (action === "lantern") touch.tapButton("lantern");
+    else if (action === "flute") touch.tapButton("flute");
+    else if (action === "photo" && canPhotoMode(overlayContext())) setPhotoMode(true);
+    else if (action === "mute") { sound.toggle(); invalidate(); }
+    else if (action === "battle-guide" && canBattlePeek(overlayContext())) {
+      setBattlePeek(!battlePeekOpen);
+    }
+  });
   // Buttons held when the title closed stay hidden from the game until they're
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
@@ -534,6 +540,15 @@ async function boot(): Promise<void> {
     canSteer: () => canOverworldSteer(overlayContext()),
     playerScreen: () => view.playerScreenPoint(state),
     onMove: (dir) => touch.setPointerArrow(dir.x === 0 && dir.y === 0 ? null : dir),
+    onTapNearPlayer: () => {
+      if (
+        view.isResting() ||
+        findRestSpot(content.world, state) !== null ||
+        findPettableCompanion(content.world, state) !== null
+      ) {
+        touch.tapButton("confirm");
+      }
+    },
   });
   const input = createInputSource(() => {
     overworldPointer.sync();
@@ -606,13 +621,9 @@ async function boot(): Promise<void> {
     // Which game is open: Comet Cruise's steers by the touch arrows.
     if (state.arcade !== null) document.documentElement.dataset.arcadeGame = state.arcade.game;
     else delete document.documentElement.dataset.arcadeGame;
-    view.render(
-      state,
-      window.innerWidth,
-      window.innerHeight,
-      app.renderer.resolution,
-      { paused, alpha: paused ? 1 : alpha, previousState },
-    );
+    view.render(state, window.innerWidth, window.innerHeight, app.renderer.resolution, {
+      paused, alpha: paused ? 1 : alpha, previousState,
+    });
     prompt.render(
       state.battle === null &&
         state.arcade === null &&
@@ -734,11 +745,7 @@ async function boot(): Promise<void> {
         : { ...battle.windUp, ...feelingAt },
     );
     logBattleButtons(activeBattle, state);
-    const geometry = view.battleCheckGeometry(
-      state,
-      window.innerWidth,
-      window.innerHeight,
-    );
+    const geometry = view.battleCheckGeometry(state, window.innerWidth, window.innerHeight);
     touch.setTraceElement(geometry?.kind === "trace" ? geometry.rect : undefined);
     battleCheck.render(battleCheckOverlay(battle, geometry, assets.toyArt));
     rewardSticker.render(
@@ -893,20 +900,14 @@ async function boot(): Promise<void> {
     // (spec 7.4), and the tick and its input stay the same as a replay's.
     const previous = state;
     const stepped = step(content.world, state, input, {
-      gentleTiming: gameSettings.gentleTiming(),
-      textSpeed: gameSettings.textSpeed(),
+      gentleTiming: gameSettings.gentleTiming(), textSpeed: gameSettings.textSpeed(),
     });
     state = stepped.state;
     if (!paused && !harnessStepping && state.tick !== previous.tick) saveDirty = true;
     previousState = state.area === previous.area ? previous : state;
     const arcadeOutcome = resolveArcadeOutcome(
-      content.world,
-      previous,
-      state,
-      gameSettings.gentleTiming(),
-      minigameRecords,
-      fishStreak,
-      activeArcadeRecord,
+      content.world, previous, state, gameSettings.gentleTiming(),
+      minigameRecords, fishStreak, activeArcadeRecord,
     );
     activeArcadeRecord = arcadeOutcome.record;
     fishStreak = arcadeOutcome.fishStreak;
@@ -1146,10 +1147,7 @@ async function boot(): Promise<void> {
         levelUpNotices.length = 0;
         swallowed.clear();
       },
-      renderInfo: () => ({
-        ...view.renderInfo(state),
-        arcade: assets.overlayInfo(),
-      }),
+      renderInfo: () => ({ ...view.renderInfo(state), arcade: assets.overlayInfo() }),
       qa: {
         active: () => qaActivePack !== null,
         packs: () => qaPacks.map((item) => item.pack),
@@ -1164,11 +1162,8 @@ async function boot(): Promise<void> {
         loaded: () => (qaActivePack === null && !qaBlocked ? saveStore.loaded() : null),
       },
       sound: {
-        log: sound.log,
-        muted: sound.muted,
-        level: sound.level,
-        state: sound.state,
-        music: sound.music,
+        log: sound.log, muted: sound.muted, level: sound.level,
+        state: sound.state, music: sound.music,
       },
       settings: {
         gentleTiming: gameSettings.gentleTiming,
@@ -1191,9 +1186,8 @@ async function boot(): Promise<void> {
 
 boot().catch((error: unknown) => {
   // Capacitor forwards console.error to the native log, so iOS failures are visible.
-  const detail =
-    error instanceof Error
-      ? `${error.message}\n${error.stack ?? ""}`
-      : String(error);
+  const detail = error instanceof Error
+    ? `${error.message}\n${error.stack ?? ""}`
+    : String(error);
   console.error(`[cloverhollow] boot failed: ${detail}`);
 });

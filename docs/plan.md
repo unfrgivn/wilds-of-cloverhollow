@@ -5757,6 +5757,7 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4491 just e2e` (1,160 passed, 2 skipped, 0 snapshot
   diffs across Chromium & WebKit).
 
+<<<<<<< HEAD
 ## Milestone 130: Cloverhollow Grocery Market & Sweet Scoop Ice Cream Parlor **Status:** ✅ Completed (2026-11-27)
 - Completed all five enterable buildings on Cloverhollow Town Plaza
   (`NOTES.md: 42`: Fae's House, Grocery Market, Ice Cream Parlor, Bon Appetit
@@ -5802,6 +5803,43 @@ the old trail, the owl, and the clubhouse claim.
   prior runs, 23 QA packs, purity, lint), `just build` (zero chunk warnings,
   production and harness hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215
   just e2e` (1,161 passed, 2 skipped, 0 failed across Chromium & WebKit).
+
+## Milestone 131: Clickable Key Hints Action Ribbon (`src/ui/hud-hints.ts`), Overworld Click-to-Pet / Click-to-Rest & `src/render/entity-layer.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Clickable Desktop Key Hints Action Ribbon (`src/ui/hud-hints.ts`,
+  `src/ui/hud-hints.css`, `src/main.ts`):
+  - Exports `HudHintAction` (`"interact" | "journal" | "lantern" | "flute" |
+    "photo" | "mute" | "battle-guide"`) and `onAction` on `createHudHints`.
+  - Adds `role="button"`, `tabindex="0"`, synced `aria-label`, click +
+    `Enter`/`Space` handlers (stopping propagation), and `pointer-events: auto;
+    cursor: pointer;` on `.hud-hint` and `.hud-battle-hint` while keeping
+    identical ribbon layout and visual pixels.
+  - Wires all seven actions in `src/main.ts` (`interact` -> confirm, `journal`
+    -> menu, `lantern` -> lantern, `flute` -> flute, `photo` -> Photo Mode,
+    `mute` -> audio toggle, `battle-guide` -> Battle Field Guide Peek toggle).
+- Overworld Click-to-Pet & Click-to-Rest (`src/shell/overworld-pointer.ts`,
+  `src/main.ts`):
+  - Exports pure `isOverworldTap(downPoint, upPoint, elapsedMs, playerScreen,
+    maxDragPx = 12, maxDurationMs = 260, nearPlayerRadius = 96)` and optional
+    `onTapNearPlayer` on `bindOverworldPointerSteer`.
+  - Wires `onTapNearPlayer` in `src/main.ts` to trigger overworld `confirm`
+    strictly when Fae is resting (`view.isResting()`), at a rest spot
+    (`findRestSpot`), or beside a pettable companion (`findPettableCompanion`).
+- Overworld Entity Layer Extraction (`src/render/entity-layer.ts`,
+  `src/render/view.ts`):
+  - Extracts `OverworldEntityLayer` (player, party followers, NPCs, critters
+    with auras, and ambient flyers with shadows/halos) out of
+    `src/render/view.ts`, trimming `src/render/view.ts` from 1,314 lines down
+    to 837 lines so every TypeScript file in `src/` stays under 1,200 lines
+    with identical z-ordering, labels, `drawOrder`, `renderInfo()`, and area
+    teardown.
+- Evidence: `tests/unit/milestone-131.test.ts` (3 tests) and real-mouse
+  `tests/e2e/milestone-131.spec.ts` (`@smoke` on Chromium & WebKit).
+- Gates: `just check` (191 unit files / 1,417 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  e2e across Chromium & WebKit (0 failed, 0 snapshot diffs).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

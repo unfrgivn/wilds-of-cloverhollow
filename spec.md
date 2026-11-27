@@ -170,8 +170,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
   `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
   `captureAreaPostcard`) live in `src/shell/feedback.ts`; desktop mouse/pen
-  overworld press-and-hold steering (`computeOverworldSteer`,
-  `bindOverworldPointerSteer`) lives in `src/shell/overworld-pointer.ts`; and
+  overworld press-and-hold steering and near-player tap detection
+  (`computeOverworldSteer`, `isOverworldTap`, `bindOverworldPointerSteer`) live
+  in `src/shell/overworld-pointer.ts`; and
   shell keyboard/gamepad overlay & journal shortcut orchestration
   (`canPhotoMode`, `canBattlePeek`, `canOverworldSteer`,
   `isJournalShortcutActive`, `isOverworldFree`, `isBannerEligible`,
@@ -249,18 +250,25 @@ ios/            Capacitor iOS project (from Milestone 4).
   non-zero movement.
   When devices provide different movement vectors, touch wins, then keyboard,
   then gamepad.
-- Overworld desktop mouse/pen steering (`src/shell/overworld-pointer.ts`,
-  Milestone 129): pressing and holding the primary mouse or pen button
-  (`(pointerType === "mouse" || pointerType === "pen") && button === 0`) on the
-  overworld canvas steers Fae toward the cursor via `computeOverworldSteer`
-  using `GameView.playerScreenPoint(state)` (18 px dead radius so Fae stops
-  cleanly beside the cursor without jitter; smooth linear speed ramp out to
-  64 px at full stride, fed through `TouchInput.setPointerArrow` clamped to
-  `-1..1` without interfering with touch virtual-stick controls). Active holds
-  recompute per tick via `sync()` and release idempotently on pointer end, lost
-  capture, window blur, hidden visibility, harness reset, or opening any
-  overlay, transition, battle, dialogue, arcade game, journal, photo mode,
-  title, or QA panel (`canOverworldSteer` in `src/shell/input-shortcuts.ts`).
+- Overworld desktop mouse/pen steering and near-player tap actions
+  (`src/shell/overworld-pointer.ts`, Milestones 129 & 130): pressing and holding
+  the primary mouse or pen button (`(pointerType === "mouse" || pointerType ===
+  "pen") && button === 0`) on the overworld canvas steers Fae toward the cursor
+  via `computeOverworldSteer` using `GameView.playerScreenPoint(state)` (18 px
+  dead radius so Fae stops cleanly beside the cursor without jitter; smooth
+  linear speed ramp out to 64 px at full stride, fed through
+  `TouchInput.setPointerArrow` clamped to `-1..1` without interfering with touch
+  virtual-stick controls). Active holds recompute per tick via `sync()` and
+  release idempotently on pointer end, lost capture, window blur, hidden
+  visibility, harness reset, or opening any overlay, transition, battle,
+  dialogue, arcade game, journal, photo mode, title, or QA panel
+  (`canOverworldSteer` in `src/shell/input-shortcuts.ts`). On `pointerup`, a
+  brief low-drag click near Fae (`isOverworldTap`: `<= 12 px` drag, `<= 260 ms`,
+  within `96 px` of `playerScreen`) invokes `onTapNearPlayer`, which triggers
+  overworld `confirm` only when Fae is resting (`view.isResting()`), at a rest
+  spot (`findRestSpot`), or beside a pettable companion (`findPettableCompanion`)
+  so random canvas clicks never open unintended dialogue while clicking near
+  Maddie or a bench cleanly pets or rests.
 
 ### 3.2.1 iOS shell decisions (Milestone 4)
 - WKWebView exposes the Gamepad API when the web view is first responder. With
@@ -589,8 +597,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   Per-area NPC and critter atlases (`areaEntityAtlases`, extracted with pure
   stateless overworld render helpers into `src/render/overworld-render.ts` and
   re-exported from `src/render/view.ts`, alongside pooled overworld visual
-  effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`,
-  Milestone 120, reusable primitive/geometry JSON validators in
+  effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`
+  (Milestone 120), overworld entity sprite pools (player, party followers, NPCs,
+  critters, and ambient flyers) in `OverworldEntityLayer` inside
+  `src/render/entity-layer.ts` (Milestone 130), reusable primitive/geometry JSON
+  validators in
   `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
   calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
   battle/critter/party/feeling/sticker/level/treat parsers & validators in
@@ -3717,7 +3728,14 @@ trunks keep its two exits.
   badges adapt automatically between `"keyboard"` and `"gamepad"` via
   `hudHintKeys(mode)` (defaulting to `"keyboard"`, switching to `"gamepad"` on
   standard-pad activity and back to `"keyboard"` on real keydowns, Milestone
-  117). Both hide automatically when Key Hints is off or during touch mode,
+  117). Every visible `.hud-hint` pill and `.hud-battle-hint` is directly
+  clickable and keyboard-activatable (`HudHintAction`, `onAction`,
+  `role="button"`, `tabindex="0"`, synced `aria-label`, click + `Enter`/`Space`
+  with propagation stopped so clicks never trigger canvas steering, Milestone
+  130), letting one-handed mouse/trackpad players open Journal, interact
+  (`Talk`/`Pet`/`Rest`/`Stand`), toggle Lantern/Flute/Mute, enter Photo Mode,
+  and toggle the Battle Field Guide while keeping identical visual geometry.
+  Both hide automatically when Key Hints is off or during touch mode,
   title, dialogue, arcade, journal, credits, or QA overlays.
 - `data-journal="open"` hides all touch controls while the book is open.
 - The touch menu button is the JOURNAL sticker from the concept sheet: an open

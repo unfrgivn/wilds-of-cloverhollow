@@ -3,6 +3,15 @@ import type { Direction, Point } from "../core";
 
 export type HudInputMode = "keyboard" | "gamepad";
 
+export type HudHintAction =
+  | "interact"
+  | "journal"
+  | "lantern"
+  | "flute"
+  | "photo"
+  | "mute"
+  | "battle-guide";
+
 export type HudHintKeys = {
   interact: string;
   journal: string;
@@ -121,10 +130,28 @@ type HintPill = {
   label: HTMLSpanElement;
 };
 
-function makeHintPill(id: string, keyText: string, labelText: string): HintPill {
+function makeHintPill(
+  action: HudHintAction,
+  keyText: string,
+  labelText: string,
+  onActivate: (action: HudHintAction) => void,
+): HintPill {
   const root = document.createElement("span");
   root.className = "hud-hint";
-  root.setAttribute("data-hint", id);
+  root.setAttribute("data-hint", action);
+  root.setAttribute("role", "button");
+  root.tabIndex = 0;
+  root.setAttribute("aria-label", labelText);
+  root.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!root.hidden) onActivate(action);
+  });
+  root.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (!root.hidden) onActivate(action);
+  });
   const key = document.createElement("kbd");
   key.className = "hud-hint-key";
   key.textContent = keyText;
@@ -141,20 +168,26 @@ function setText(node: Node, text: string): void {
 
 export function createHudHints(root: HTMLElement): {
   render: (view: HudHintsView) => void;
+  onAction: (callback: (action: HudHintAction) => void) => void;
 } {
+  let actionHandler: (action: HudHintAction) => void = () => undefined;
+  const fire = (action: HudHintAction): void => {
+    actionHandler(action);
+  };
+
   const ribbon = document.createElement("aside");
   ribbon.className = "hud-hints";
   ribbon.setAttribute("aria-label", "Keyboard controls");
   ribbon.hidden = true;
 
-  const journalPill = makeHintPill("journal", "J", "Journal");
-  const interactPill = makeHintPill("interact", "Z", "Talk");
-  const lanternPill = makeHintPill("lantern", "L", "Lantern");
+  const journalPill = makeHintPill("journal", "J", "Journal", fire);
+  const interactPill = makeHintPill("interact", "Z", "Talk", fire);
+  const lanternPill = makeHintPill("lantern", "L", "Lantern", fire);
   lanternPill.root.hidden = true;
-  const flutePill = makeHintPill("flute", "F", "Flute");
+  const flutePill = makeHintPill("flute", "F", "Flute", fire);
   flutePill.root.hidden = true;
-  const mutePill = makeHintPill("mute", "M", "Mute");
-  const photoPill = makeHintPill("photo", "P", "Photo");
+  const mutePill = makeHintPill("mute", "M", "Mute", fire);
+  const photoPill = makeHintPill("photo", "P", "Photo", fire);
   photoPill.root.hidden = true;
 
   ribbon.append(
@@ -170,7 +203,11 @@ export function createHudHints(root: HTMLElement): {
   battleHint.className = "hud-battle-hint";
   battleHint.setAttribute("aria-label", "Battle keyboard hint");
   battleHint.hidden = true;
-  const battleGuidePill = makeHintPill("battle-guide", "I", "Field Guide");
+  battleHint.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!battleHint.hidden) fire("battle-guide");
+  });
+  const battleGuidePill = makeHintPill("battle-guide", "I", "Field Guide", fire);
   battleHint.append(battleGuidePill.root);
 
   root.append(ribbon, battleHint);
@@ -178,6 +215,9 @@ export function createHudHints(root: HTMLElement): {
   let lastSignature = "";
 
   return {
+    onAction: (callback) => {
+      actionHandler = callback;
+    },
     render: (view) => {
       const mode: HudInputMode = view.inputMode ?? "keyboard";
       const resolved = resolveHudHintVisibility(view);
@@ -203,16 +243,22 @@ export function createHudHints(root: HTMLElement): {
       setText(mutePill.key, keys.mute);
       setText(photoPill.key, mode === "gamepad" ? "View" : "P");
 
+      const interactText = view.canInteract ? view.interactLabel : "Talk";
       interactPill.root.classList.toggle("is-active", view.canInteract);
-      setText(interactPill.label, view.canInteract ? view.interactLabel : "Talk");
+      setText(interactPill.label, interactText);
+      interactPill.root.setAttribute("aria-label", interactText);
 
+      const lanternOn = view.hasLantern && view.lanternOn;
       lanternPill.root.hidden = !view.hasLantern;
-      lanternPill.root.classList.toggle("is-on", view.hasLantern && view.lanternOn);
+      lanternPill.root.classList.toggle("is-on", lanternOn);
+      lanternPill.root.setAttribute("aria-label", lanternOn ? "Lantern on" : "Lantern");
 
       flutePill.root.hidden = !view.hasFlute;
 
+      const muteText = view.muted ? "Muted" : "Mute";
       mutePill.root.classList.toggle("is-muted", view.muted);
-      setText(mutePill.label, view.muted ? "Muted" : "Mute");
+      setText(mutePill.label, muteText);
+      mutePill.root.setAttribute("aria-label", muteText);
 
       photoPill.root.hidden = !resolved.showPhoto;
     },

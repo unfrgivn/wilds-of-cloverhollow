@@ -45,6 +45,8 @@
   font-weight: 800;
   line-height: 1.2;
   white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .hud-hint.is-active {
@@ -100,6 +102,7 @@
   box-shadow: var(--sticker-shadow);
   color: var(--sticker-ink);
   font-family: var(--sticker-font);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   user-select: none;
 }

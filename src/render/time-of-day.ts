@@ -21,6 +21,7 @@ const OUTDOOR_GOLDEN_AREAS = new Set([
   "park",
   "bay",
   "pass",
+  "summit",
   "trail",
   "woods",
   "hills",

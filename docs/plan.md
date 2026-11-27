@@ -6494,6 +6494,41 @@ the old trail, the owl, and the clubhouse claim.
   purity, lint), `just build` (zero chunk or deprecation warnings; production
   and harness hook checks green), and full e2e across Chromium & WebKit
   (0 snapshot diffs).
+## Milestone 149: Alpine Summit Overlook & Rideable Pinecone Pass Ski Lift **Status:** ✅ Completed (2026-11-27)
+- Made the Pinecone Pass ski lift rideable (`NOTES.md: 55`) once the lodge
+  keeper is calmed (`calmed("lodge-keeper")`), gliding Fae & friends up to a
+  new 1650x1100 snow-capped mountaintop plateau (`summit`, `land: "pass"`,
+  32 total areas, 21 resting areas; zero changes to all 70 earlier recorded
+  sims):
+  - **Pinecone Pass return & ride (`content/areas/pass.json`, `content/story/main.ink`)**:
+    added `pass.spawns["ski-lift"]` at `(485, 490)` facing down (`>= 268u` clear
+    of all pass dens, fits all 6 party slots); `ski_lift` keeps
+    `{has_lasso and not scarf_down: -> scarf}` first, then routes to `= lift_ride`
+    (`# sound: chime-blue # travel: summit.lift-top`).
+  - **Alpine Summit Overlook (`content/areas/summit.json`, `content/props/summit.json`, `content/surfaces/summit.json`, `content/fixtures/summit.json`)**:
+    four 1650x1100 WebP ground tiles (`paper #f7eedd`), 2-prop alpha-WebP kit
+    (`stone-cairn` & `bench-thermos`, `36 KB`, `rebuilt vs painting 0.00%`),
+    `snow`/`stone`/`wood` surfaces, pastel aurora sky ribbons + snowflakes +
+    warming-hut chimney smoke wisps (`src/render/atmosphere-outdoor.ts`), story
+    time-of-day golden-hour support (`src/render/time-of-day.ts`), `summit-bench`
+    companion rest spot (`src/render/companions.ts`), and `"pass"` /
+    `"mountain-wind"` audio (`src/core/music.ts`).
+  - **Summit Landmarks & Blacklight Aurora**: interactive 4-direction
+    **Panoramic Valley Telescope** (`summit_telescope`, one-time `+10` coins),
+    Mrs. Flurry's **Warming-Hut Cocoa Thermos** (`summit_thermos`, `+2` snacks),
+    `summit_cabin`, `summit_lift` return ride (`# travel: pass.ski-lift`), and
+    blacklight aurora rune trail (`summit-aurora-1..3`, `summit-cairn-glow` ->
+    `+15` coins + `chime-red`), plus Fae-voice journal notes (Milo unnamed).
+- Evidence: `tests/unit/summit.test.ts`, `tests/unit/summit-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/summit.json` (13,580 ticks), real-key
+  `tests/e2e/summit.spec.ts` matching Bun's exact hash at 1280x720 and 874x402,
+  and `vision`-reviewed `art/review/summit-{overlay,depth,gameplay}.jpg`.
+- Gates: `just check` (210 unit files / 1,527 tests, 71 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (production and harness
+  hook checks), and Playwright e2e (`summit.spec`, `bus.spec`, `lodge.spec`,
+  `lasso.spec`, `soundtrack.spec`, `showcase-polish.spec` passing on Chromium &
+  WebKit; note pre-existing `kid-restored-1280` 432 px diff from PR #3's
+  `forest_calm` celebration untouched).
 
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.

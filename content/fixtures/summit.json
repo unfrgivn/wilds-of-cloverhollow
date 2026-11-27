@@ -1,0 +1,18 @@
+{
+  "area": "summit",
+  "spawn": "lift-top",
+  "seed": 1,
+  "party": [
+    "maddie",
+    "sue",
+    "jordan"
+  ],
+  "variables": {
+    "has_lantern": true,
+    "has_lasso": true,
+    "lodge_open": true
+  },
+  "calms": {
+    "lodge-keeper": 1
+  }
+}

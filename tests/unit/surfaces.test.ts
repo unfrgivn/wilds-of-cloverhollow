@@ -109,6 +109,14 @@ describe("area surface maps", () => {
       surface: "carpet" },
     { area: "rosie-cottage", what: "the daisy doormat", point: { x: 205, y: 515 },
       surface: "carpet" },
+    { area: "summit", what: "the summit snow clearing", point: spawn("summit", "lift-top"),
+      surface: "snow" },
+    { area: "summit", what: "the warming-hut stepping stones", point: { x: 1200, y: 740 },
+      surface: "stone" },
+    { area: "summit", what: "the stone cairn ring", point: { x: 436, y: 550 },
+      surface: "stone" },
+    { area: "summit", what: "the ski-lift wooden unloading deck", point: { x: 410, y: 865 },
+      surface: "wood" },
   ];
   it.each(truths)("$area: $what is $surface", ({ area, point, surface }) => {
     expect(surfaceAt(mapOf(area), point)).toBe(surface);

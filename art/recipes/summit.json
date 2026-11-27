@@ -1,0 +1,20 @@
+{
+  "asset": "summit",
+  "date": "2026-11-27",
+  "summary": "Alpine Summit Overlook (NOTES.md: 55), a 1650x1100 snow-capped mountaintop plateau reached by riding the Pinecone Pass ski lift: four 1650x1100 WebP tiles (paper #f7eedd) and a 2-prop alpha-WebP depth-sorted kit (stone-cairn, bench-thermos; 36 KB, 0 warnings, rebuilt vs painting 0.00%).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 6,
+  "references": [
+    "art/source/areas/hills/hills-final.png",
+    "art/source/areas/pass/painting/ground_0_0.webp"
+  ],
+  "kept": {
+    "painting": "art/source/areas/summit/painting/ground.json",
+    "atlas": "public/assets/areas/summit/props-0.json",
+    "catalogue": "content/props/summit.json"
+  },
+  "commands": [
+    "bun tools/art/kit.ts summit gen && masks && fill && pack",
+    "convert props-0.png -> props-0.webp (quality 92, alpha-quality 100)"
+  ]
+}

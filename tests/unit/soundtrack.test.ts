@@ -87,6 +87,7 @@ describe("soundtrackFor", () => {
       "sue-cottage": ["bay", "ocean"],
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],
+      summit: ["pass", "mountain-wind"],
       lodge: ["lodge", "hearth"],
       "jordan-cabin": ["pass", "hearth"],
       cavern: ["cavern", "cavern-drips"],

@@ -578,6 +578,11 @@
       "x": 325,
       "y": 575,
       "facing": "right"
+    },
+    "ski-lift": {
+      "x": 485,
+      "y": 490,
+      "facing": "down"
     }
   },
   "critters": [

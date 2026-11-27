@@ -90,6 +90,8 @@ Has anyone seen a kid in a purple hood? They ran off from the fountain, giggling
 -> DONE
 
 === journal ===
+{summit_aurora_read: Under Jordan's blacklight lantern, ancient aurora runes on Alpine Summit's stone cairn lit up with a valley legend! # speaker: Fae}
+{summit_visited: I rode the Pinecone Pass ski lift up to Alpine Summit Overlook and gazed across Cloverhollow through the brass valley telescope! # speaker: Fae}
 {rosie_cottage_visited: I visited Rosie's flower cottage by Meadow Park! She showed off her pressed-clover bookmarks and shared a Sunlit Clover Tea Snack. # speaker: Fae}
 {milo_loft_visited: I visited Milo's sunlit sketch loft beside Meadow Park! His desk is covered in rocket watercolor comics and a jar of Star Racer tokens. # speaker: Fae}
 {npc_gus.mail_complete: Mailman Gus made me Cloverhollow's Honorary Junior Mail Carrier after our cross-town postcard delivery! # speaker: Fae}
@@ -1924,8 +1926,16 @@ X marks the spot: right here, between the two palms! # speaker: Fae
 
 === ski_lift ===
 {has_lasso and not scarf_down: -> scarf}
+{calmed("lodge-keeper"): -> lift_ride}
 The ski lift creaks along its cable, the empty chairs swinging. # speaker: Fae
 -> DONE
+= lift_ride
+The Pinecone Pass ski lift hums smoothly along its cable, carrying sunny red chairs right up to Alpine Summit Overlook! # speaker: Fae
++ [Ride up to Alpine Summit!]
+    Hold onto your hats—we're gliding above the treetops! # speaker: Jordan # sound: chime-blue # travel: summit.lift-top
+    -> DONE
++ [Stay at Pinecone Pass]
+    -> DONE
 = scarf
 ~ scarf_seen = true
 A long red scarf is caught on the pink lift chair, flapping in the wind. # speaker: Fae
@@ -4651,4 +4661,79 @@ Ooh, thank you so much, Mrs. Marigold! # speaker: Fae
 Wait, strawberry swirl WITH crunchy honey drizzle?! That's genius, Fae! I'm telling Scooper Penny right away! # speaker: Danny
 Here, take my spare Berry Swirl Cone treat and six lucky parlor coins for the pro scoop tip! # speaker: Danny # gift: treat berry-cone 1 # gift: coins 6 # sound: chime-blue
 Awesome, thanks, Danny! # speaker: Fae
+-> DONE
+
+// Alpine Summit Overlook (reached by riding the Pinecone Pass ski lift).
+VAR summit_visited = false
+VAR summit_telescope_used = false
+VAR summit_cocoa_taken = false
+VAR summit_aurora_read = false
+
+=== summit_lift ===
+The sunny red ski-lift chair sways gently beside the snowy unloading deck, ready for the glide back down to Pinecone Pass. # speaker: Fae
++ [Ride the ski lift back down to Pinecone Pass]
+    Down we glide over the snowy pines! # speaker: Fae # sound: chime-blue # travel: pass.ski-lift
+    -> DONE
++ [Stay up at the summit]
+    Let's take in the mountaintop air a little longer! # speaker: Fae
+    -> DONE
+
+=== summit_telescope ===
+~ summit_visited = true
+{not summit_telescope_used:
+    ~ summit_telescope_used = true
+    Fae wipes a dusting of snow off the gleaming brass panoramic telescope! Ten lucky lookout coins glint right in the coin tray! # speaker: Fae # gift: coins 10 # sound: chime-yellow
+    {jordan_joined: On a clear day like this, you can see the whole Cloverhollow valley from up here! # speaker: Jordan}
+- else:
+    The gleaming brass panoramic telescope swivels smoothly along the north railing. # speaker: Fae
+}
+-> lookout
+= lookout
++ [Look south toward Cloverhollow]
+    Way down in the sunny valley, Cloverhollow Plaza's fountain sparkles between the red roofs of Bon Appetit Cafe, the Grocery Market, and our own house! # speaker: Fae
+    -> lookout
++ [Look east toward Bubblegum Bay]
+    {sue_joined: Hey, swing it east! I can spot my wooden fishing dock and the turquoise waves of Bubblegum Bay sparkling from way up here! # speaker: Sue|Far to the east, Bubblegum Bay's wooden fishing dock stretches out into sparkling turquoise waves! # speaker: Fae}
+    -> lookout
++ [Look west toward Whispering Woods & the Ancient Tree]
+    {calmed("hooded-kid"):
+        West past Whispering Woods, the Ancient Tree shines with warm golden light now that Milo and the whole valley are calm again! # speaker: Fae
+    - else:
+        {forest_fizzy:
+            West beyond the pine canopy of Whispering Woods, a faint swirling violet shimmer rises above the Ancient Tree. # speaker: Fae
+        - else:
+            West past Whispering Woods, the Ancient Tree glows peacefully above a calm sunlit canopy! # speaker: Fae
+        }
+    }
+    -> lookout
++ [Step back from the telescope]
+    What a view! # speaker: Fae
+    -> DONE
+
+=== summit_thermos ===
+{summit_cocoa_taken: -> again}
+~ summit_cocoa_taken = true
+A cheerful red-and-silver thermos rests on the sunny wooden bench with a note from Mrs. Flurry: "Warming-Hut Cocoa for summit hikers!" # speaker: Fae
+Fae pours steaming mugs of marshmallow cocoa for the whole crew—and packs two cozy summit snacks for the trail! # speaker: Fae # gift: snack 2 # sound: chime-green
+{sue_joined: Whoa, hot cocoa above the clouds! Best pit stop ever! # speaker: Sue}
+{jordan_joined: Mrs. Flurry's cinnamon marshmallow blend never misses! # speaker: Jordan}
+-> DONE
+= again
+Mrs. Flurry's red-and-silver warming-hut thermos sits cozily on the wooden bench, still radiating a faint hint of cinnamon cocoa. # speaker: Fae
+-> DONE
+
+=== summit_cabin ===
+Warm golden light glows through the frosted panes of the ski-patrol warming hut, smelling of cedar smoke and cinnamon. # speaker: Fae
+{has_lantern: A weathered brass plaque beside the door notes that mountain hikers sometimes leave hidden trail runes over by the west stone cairn—only visible under a special violet light! # speaker: Fae|A weathered brass plaque beside the door welcomes hikers to rest by the thermos bench and admire the ancient west stone cairn. # speaker: Fae}
+-> DONE
+
+=== summit_cairn_glow ===
+{summit_aurora_read: -> again}
+~ summit_aurora_read = true
+Under Jordan's blacklight lantern, shimmering lavender-and-gold runes wake across the ancient stacked summit stones! # speaker: Fae
+"ALPINE AURORA LEGEND: When the valley below is calm and kind, the mountaintop snow dances with lavender and gold light!" # speaker: Glow Note
+Whoa... and fifteen gleaming mountaintop coins sparkle inside a tiny hollow beneath the cairn! # speaker: Fae # sound: chime-red # gift: coins 15
+-> DONE
+= again
+The glowing Alpine Aurora Legend shimmers softly across the stone cairn: "When the valley below is calm and kind, the mountaintop snow dances with lavender and gold light!" # speaker: Fae
 -> DONE

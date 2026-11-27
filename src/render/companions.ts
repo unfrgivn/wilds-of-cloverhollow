@@ -236,6 +236,16 @@ export const REST_SPOTS: readonly RestSpot[] = [
     seatY: 576,
     facing: "down",
   },
+  {
+    id: "summit-bench",
+    area: "summit",
+    x: 1335,
+    y: 860,
+    radius: 60,
+    seatX: 1335,
+    seatY: 856,
+    facing: "down",
+  },
 ];
 
 const FACING_VECTORS: Readonly<Record<Direction, Point>> = {

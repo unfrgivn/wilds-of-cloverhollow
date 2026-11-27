@@ -1,0 +1,27 @@
+{
+  "area": "summit",
+  "subjects": [
+    {
+      "id": "stone-cairn",
+      "crop": [330, 345, 215, 260],
+      "seed": [435, 480],
+      "home": [436, 581],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sunlit snow clearing",
+      "object": "the complete freestanding stacked snow-capped ancient stone cairn in the middle of the crop, including every stacked boulder, snow cap, and warm-brown ink outline down to its snowy base; not the cast shadow or open snow",
+      "footprint": [[[354, 548], [405, 515], [490, 518], [515, 548], [442, 581], [382, 560]]]
+    },
+    {
+      "id": "bench-thermos",
+      "crop": [1218, 682, 174, 158],
+      "seed": [1305, 760],
+      "home": [1305, 816],
+      "painted": true,
+      "canopy": false,
+      "ground": "the sunlit snow beside the cabin",
+      "object": "the complete freestanding wooden bench with the standing red-and-silver thermos resting on its left seat end, including all wooden bench legs and warm-brown ink outlines; not the cabin wall or snow",
+      "footprint": [[[1276, 750], [1362, 796], [1330, 816], [1246, 768]]]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "frames": {
+    "stone-cairn": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 340,
+        "h": 416
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 340,
+        "h": 416
+      },
+      "sourceSize": {
+        "w": 340,
+        "h": 416
+      },
+      "anchor": {
+        "x": 0.48824,
+        "y": 1.00481
+      }
+    },
+    "bench-thermos": {
+      "frame": {
+        "x": 342,
+        "y": 0,
+        "w": 270,
+        "h": 225
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 270,
+        "h": 225
+      },
+      "sourceSize": {
+        "w": 270,
+        "h": 225
+      },
+      "anchor": {
+        "x": 0.48148,
+        "y": 1.00889
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 416
+    },
+    "scale": "1"
+  }
+}

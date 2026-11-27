@@ -2,6 +2,7 @@ import {
   addFloatingMotes,
   addMistRibbons,
   areaSeed,
+  AURORA_TINTS,
   BLOSSOM_TINTS,
   BUTTERFLY_TINTS,
   CAVERN_CRYSTALS,
@@ -388,6 +389,106 @@ export function evaluateOutdoorAtmosphere(
           tint: 0xfff5df,
         });
       }
+    }
+    return out;
+  }
+
+  if (areaId === "summit") {
+    // 6 shimmering pastel lavender/mint/gold aurora glow ribbons along the north overlook sky.
+    for (let i = 0; i < 6; i += 1) {
+      const h0 = hash01(seed + i * 31 + 1);
+      const h1 = hash01(seed + i * 31 + 2);
+      const wave = Math.sin(tick * (0.016 + h0 * 0.008) + i * 1.15);
+      const x = 240 + i * 235 + Math.sin(tick * 0.01 + i * 0.9) * 28;
+      const y = 92 + h1 * 92 + wave * 16;
+      out.push({
+        layer: "emissive",
+        texture: "softGlow",
+        blend: "add",
+        x,
+        y,
+        scaleX: 2.8 + h0 * 1.1 + 0.14 * wave,
+        scaleY: 0.95 + h1 * 0.45,
+        rotation: -0.08 + 0.04 * wave,
+        alpha: clamp01(0.22 + 0.09 * (0.5 + 0.5 * wave)),
+        tint: pickTint(AURORA_TINTS, i),
+      });
+    }
+    // 3 gentle aurora sunbeam shimmer curtains across the northern mountain sky (y = 70..220).
+    const curtains: readonly [number, number, number][] = [
+      [420, 130, 1.9],
+      [840, 115, 2.2],
+      [1240, 145, 1.85],
+    ];
+    curtains.forEach(([cx, cy, scale], i) => {
+      const pulse = 0.5 + 0.5 * Math.sin(tick * 0.02 + i * 1.9);
+      out.push({
+        layer: "emissive",
+        texture: "sunbeam",
+        blend: "add",
+        x: cx + Math.sin(tick * 0.012 + i) * 18,
+        y: cy,
+        scaleX: scale,
+        scaleY: scale * 0.65,
+        rotation: 0,
+        alpha: clamp01(0.095 + pulse * 0.065),
+        tint: pickTint(AURORA_TINTS, i),
+      });
+    });
+    // 22 crisp mountain snowflakes drifting gently across the summit clearing.
+    const insetX = width * 0.06;
+    const insetY = height * 0.05;
+    const spanX = Math.max(80, width - insetX * 2);
+    const spanY = Math.max(80, height - insetY * 2);
+    for (let i = 0; i < 22; i += 1) {
+      const near = i < 10;
+      const h0 = hash01(seed + i * 43 + 11);
+      const h1 = hash01(seed + i * 43 + 12);
+      const h2 = hash01(seed + i * 43 + 13);
+      const h3 = hash01(seed + i * 43 + 14);
+      const fallSpeed = near ? 0.56 + h2 * 0.32 : 0.32 + h2 * 0.2;
+      const windSpeed = near ? 0.38 + h3 * 0.22 : 0.2 + h3 * 0.14;
+      const swayAmp = near ? 20 : 12;
+      const x = insetX + wrap(
+        h0 * spanX + tick * windSpeed + Math.sin(tick * 0.026 + h1 * 6.28) * swayAmp,
+        spanX,
+      );
+      const y = insetY + wrap(h1 * spanY + tick * fallSpeed, spanY);
+      const scale = near ? 0.28 + h2 * 0.15 : 0.17 + h2 * 0.1;
+      out.push({
+        layer: "over",
+        texture: "petal",
+        blend: "normal",
+        x,
+        y,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: tick * 0.01 + h3 * 6.28,
+        alpha: clamp01(near ? 0.6 + h3 * 0.22 : 0.45 + h3 * 0.18),
+        tint: pickTint(SNOW_TINTS, i),
+      });
+    }
+    // 6 warm rising chimney smoke wisps from the warming hut stone flue (1458, 380).
+    const cycle = 240;
+    for (let i = 0; i < 6; i += 1) {
+      const age = wrap(tick + i * (cycle / 6), cycle) / cycle;
+      const fadeIn = Math.min(1, age / 0.18);
+      const fadeOut = Math.min(1, (1 - age) / 0.45);
+      const x = 1458 + age * 82 + Math.sin(age * Math.PI * 2 + i) * 10;
+      const y = 380 - age * 150;
+      const scale = 0.28 + age * 0.68;
+      out.push({
+        layer: "over",
+        texture: "mistWisp",
+        blend: "normal",
+        x,
+        y,
+        scaleX: scale,
+        scaleY: scale * 0.78,
+        rotation: 0.08 * Math.sin(age * 4 + i),
+        alpha: clamp01(0.24 * fadeIn * fadeOut),
+        tint: 0xf5eee4,
+      });
     }
     return out;
   }

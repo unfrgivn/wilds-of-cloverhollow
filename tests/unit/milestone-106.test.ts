@@ -112,9 +112,9 @@ describe("Milestone 106: Wildlife Flyers, Credits Scaling, Shop Voices & 14-Area
     expect(voiceForSpeaker("Trail Note")).toEqual(voiceForSpeaker(null));
   });
 
-  it("validates all 20 resting areas strictly inside walkable floor and clear of obstacles", () => {
+  it("validates all 21 resting areas strictly inside walkable floor and clear of obstacles", () => {
     const areas = new Set(REST_SPOTS.map((spot) => spot.area));
-    expect(areas.size).toBe(20);
+    expect(areas.size).toBe(21);
     expect([...areas].sort()).toEqual([
       "bay",
       "bedroom",
@@ -134,6 +134,7 @@ describe("Milestone 106: Wildlife Flyers, Credits Scaling, Shop Voices & 14-Area
       "rosie-cottage",
       "sanctuary",
       "sue-cottage",
+      "summit",
       "trail",
       "woods",
     ]);

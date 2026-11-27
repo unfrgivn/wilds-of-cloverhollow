@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 147)
+Last updated: 2026-11-27 (Milestone 149)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -630,8 +630,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   warms the Morning Wake-Up finale (`state.finale !== null`);
   `enchanted-twilight` washes `mist` and fizzy `enchanted`; `golden-meadow`
   warms calmed `enchanted` (`forest_fizzy === false`); `golden-hour` bathes outdoor
-  adventure areas (`plaza`, `park`, `bay`, `pass`, `trail`, `woods`, `hills`,
-  `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
+  adventure areas (`plaza`, `park`, `bay`, `pass`, `summit`, `trail`, `woods`, `hills`,
+  `sanctuary`, `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
 - Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
   Gamepad Parity (Milestone 114), & Touch Camera Controls (Milestone 118):
@@ -1614,6 +1614,36 @@ ios/            Capacitor iOS project (from Milestone 4).
     blacklight lantern, and `hall_pass`; its atmosphere adds 2 floral-window
     sunbeams and 10 pastel petal/sunbeam motes; its soundtrack plays `"home"`
     ("Cloverhollow Town") with `"none"` ambience.
+- Alpine Summit Overlook & Rideable Pinecone Pass Ski Lift: `summit`,
+  "Alpine Summit Overlook", in the `pass` land, is a 1650x1100 snow-capped
+  mountaintop clearing reached by riding Pinecone Pass's ski lift (`ski_lift`
+  keeps `{has_lasso and not scarf_down: -> scarf}` first, and once
+  `calmed("lodge-keeper")` holds, offers riding up to `summit.lift-top` with
+  `sound: chime-blue` and `travel: summit.lift-top`; returning via `summit-lift`
+  at (425, 875), knot `summit_lift`, glides back to `pass.ski-lift` at (485,
+  490) facing down). Its 2-prop alpha-WebP kit lifts the depth-sorted
+  `stone-cairn` at (436, 581) and `bench-thermos` at (1305, 816); a thin rear
+  blocker behind the cairn keeps Fae cleanly visible; its floor surface is snow
+  with stone polygons under the cabin stepping stones and stone cairn ring and
+  wood along the ski-lift unloading deck. Four Look spots cover `summit-lift`
+  (`summit_lift`), `summit-telescope` at (1015, 365) (`summit_telescope`: sets
+  `summit_visited` & `summit_telescope_used`, awards one-time `gift: coins 10`
+  with `chime-yellow`, and opens a sticky 4-direction lookout menu over
+  Cloverhollow, Bubblegum Bay, Whispering Woods & the Ancient Tree without
+  pre-finale Milo spoilers, or stepping back), `summit-thermos` at (1270, 810)
+  (`summit_thermos`: sets `summit_cocoa_taken` and awards one-time
+  `gift: snack 2` with `chime-green` from Mrs. Flurry's cocoa thermos), and
+  `summit-cabin` at (1205, 720) (`summit_cabin`: ski-patrol warming hut plaque
+  hinting at blacklight cairn runes). A blacklight aurora trail (`summit-aurora-1..3`
+  using `bluebell_1..3` leading to `summit-cairn-glow` at (530, 560),
+  `frame: "trail_marker"`, knot `summit_cairn_glow`) reveals the Alpine Aurora
+  Legend (`summit_aurora_read`, one-time `gift: coins 15` with `chime-red`). Its
+  fixture `summit` starts at `lift-top` (525, 825, facing up) with Maddie, Sue,
+  Jordan, `has_lantern`, `has_lasso`, `lodge_open`, and `lodge-keeper` calmed;
+  its outdoor atmosphere emits 6 pastel aurora `softGlow` ribbons + 3 `sunbeam`
+  curtains (`y = 70..220`), 22 mountain snowflakes, and 6 warming-hut chimney
+  smoke wisps from `(1458, 380)`; its soundtrack plays `"pass"` with
+  `"mountain-wind"` ambience; its rest spot `summit-bench` sits at (1335, 860).
 - The lifeguard (Milestone 64): once Sue has joined (`sue_joined`), the bay's
   picnic leads on (`bay_picnic.back`): a whistle blasts, and the picnic's
   owner, Ms. Coral, the bay's lifeguard, is back and fizzy (`lifeguard_back`),
@@ -1690,10 +1720,10 @@ ios/            Capacitor iOS project (from Milestone 4).
     `emoteHeart` + pastel `sparkle` puffs, and a synthesized species affection
     cue via `AudioController.playEffect`), or relax at curated painted benches,
     chairs, rugs, picnic blanket, glades, overlooks, and the Clubhouse beanbag
-    across 20 areas (`plaza`, `park`, `bay`, `cafe`, `market`, `parlor`,
+    across 21 areas (`plaza`, `park`, `bay`, `cafe`, `market`, `parlor`,
     `lodge`, `clubhouse`, `sue-cottage`, `jordan-cabin`, `milo-house`,
     `rosie-cottage`, `sanctuary`,
-    `bedroom`, `kitchen`, `pass`, `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
+    `bedroom`, `kitchen`, `pass`, `summit`, `trail`, `woods`, `hills`, `enchanted`), settling into a cozy seated-rest
     pose with a warm harp chord and lazily drifting `emoteNote` (`♪`) until any
     movement, cancel, menu, or confirm input stands her back up.
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),

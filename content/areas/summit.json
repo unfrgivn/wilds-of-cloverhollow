@@ -1,0 +1,248 @@
+{
+  "id": "summit",
+  "name": "Alpine Summit Overlook",
+  "land": "pass",
+  "width": 1650,
+  "height": 1100,
+  "ground": "summit",
+  "walkable": [
+    [
+      145,
+      585
+    ],
+    [
+      220,
+      502
+    ],
+    [
+      344,
+      394
+    ],
+    [
+      499,
+      330
+    ],
+    [
+      667,
+      306
+    ],
+    [
+      840,
+      300
+    ],
+    [
+      1019,
+      340
+    ],
+    [
+      1176,
+      365
+    ],
+    [
+      1120,
+      415
+    ],
+    [
+      1105,
+      500
+    ],
+    [
+      1105,
+      638
+    ],
+    [
+      1166,
+      678
+    ],
+    [
+      1255,
+      732
+    ],
+    [
+      1386,
+      793
+    ],
+    [
+      1425,
+      835
+    ],
+    [
+      1380,
+      930
+    ],
+    [
+      1365,
+      1025
+    ],
+    [
+      695,
+      1035
+    ],
+    [
+      665,
+      955
+    ],
+    [
+      610,
+      925
+    ],
+    [
+      525,
+      965
+    ],
+    [
+      475,
+      1030
+    ],
+    [
+      335,
+      1030
+    ],
+    [
+      305,
+      990
+    ],
+    [
+      380,
+      935
+    ],
+    [
+      442,
+      878
+    ],
+    [
+      385,
+      822
+    ],
+    [
+      405,
+      748
+    ],
+    [
+      335,
+      678
+    ],
+    [
+      215,
+      625
+    ]
+  ],
+  "blockers": [
+    [
+      [
+        410,
+        502
+      ],
+      [
+        462,
+        502
+      ],
+      [
+        462,
+        513
+      ],
+      [
+        410,
+        513
+      ]
+    ]
+  ],
+  "triggers": [],
+  "interactables": [
+    {
+      "id": "summit-lift",
+      "knot": "summit_lift",
+      "point": {
+        "x": 425,
+        "y": 875
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "summit-telescope",
+      "knot": "summit_telescope",
+      "point": {
+        "x": 1015,
+        "y": 365
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "summit-thermos",
+      "knot": "summit_thermos",
+      "point": {
+        "x": 1270,
+        "y": 810
+      },
+      "prompt": "Look"
+    },
+    {
+      "id": "summit-cabin",
+      "knot": "summit_cabin",
+      "point": {
+        "x": 1205,
+        "y": 720
+      },
+      "prompt": "Look"
+    }
+  ],
+  "glows": [
+    {
+      "id": "summit-aurora-1",
+      "frame": "bluebell_1",
+      "point": {
+        "x": 740,
+        "y": 695
+      }
+    },
+    {
+      "id": "summit-aurora-2",
+      "frame": "bluebell_2",
+      "point": {
+        "x": 650,
+        "y": 640
+      }
+    },
+    {
+      "id": "summit-aurora-3",
+      "frame": "bluebell_3",
+      "point": {
+        "x": 580,
+        "y": 595
+      }
+    },
+    {
+      "id": "summit-cairn-glow",
+      "frame": "trail_marker",
+      "point": {
+        "x": 530,
+        "y": 560
+      },
+      "knot": "summit_cairn_glow",
+      "prompt": "Look"
+    }
+  ],
+  "spawns": {
+    "lift-top": {
+      "x": 525,
+      "y": 825,
+      "facing": "up"
+    }
+  },
+  "critters": [],
+  "npcs": [],
+  "props": [
+    {
+      "id": "stone-cairn",
+      "prop": "stone-cairn",
+      "x": 436,
+      "y": 581
+    },
+    {
+      "id": "bench-thermos",
+      "prop": "bench-thermos",
+      "x": 1305,
+      "y": 816
+    }
+  ]
+}

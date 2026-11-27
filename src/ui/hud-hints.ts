@@ -18,6 +18,8 @@ export type HudHintKeys = {
   lantern: string;
   flute: string;
   mute: string;
+  photo: string;
+  guide: string;
 };
 
 export function hudHintKeys(mode: HudInputMode): HudHintKeys {
@@ -28,6 +30,8 @@ export function hudHintKeys(mode: HudInputMode): HudHintKeys {
       lantern: "X",
       flute: "RB",
       mute: "M",
+      photo: "View",
+      guide: "View",
     };
   }
   return {
@@ -36,6 +40,8 @@ export function hudHintKeys(mode: HudInputMode): HudHintKeys {
     lantern: "L",
     flute: "F",
     mute: "M",
+    photo: "P",
+    guide: "I",
   };
 }
 
@@ -228,20 +234,20 @@ export function createHudHints(root: HTMLElement): {
       if (signature === lastSignature) return;
       lastSignature = signature;
 
+      const keys = hudHintKeys(mode);
       ribbon.hidden = !resolved.showRibbon;
       battleHint.hidden = !resolved.showBattleGuide;
       if (resolved.showBattleGuide) {
-        setText(battleGuidePill.key, mode === "gamepad" ? "View" : "I");
+        setText(battleGuidePill.key, keys.guide);
       }
       if (!resolved.showRibbon) return;
 
-      const keys = hudHintKeys(mode);
       setText(journalPill.key, keys.journal);
       setText(interactPill.key, keys.interact);
       setText(lanternPill.key, keys.lantern);
       setText(flutePill.key, keys.flute);
       setText(mutePill.key, keys.mute);
-      setText(photoPill.key, mode === "gamepad" ? "View" : "P");
+      setText(photoPill.key, keys.photo);
 
       const interactText = view.canInteract ? view.interactLabel : "Talk";
       interactPill.root.classList.toggle("is-active", view.canInteract);

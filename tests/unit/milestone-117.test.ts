@@ -120,6 +120,8 @@ describe("Milestone 117: Adaptive Controller HUD Key Hints", () => {
       lantern: "L",
       flute: "F",
       mute: "M",
+      photo: "P",
+      guide: "I",
     });
     expect(hudHintKeys("gamepad")).toEqual({
       interact: "A",
@@ -127,6 +129,8 @@ describe("Milestone 117: Adaptive Controller HUD Key Hints", () => {
       lantern: "X",
       flute: "RB",
       mute: "M",
+      photo: "View",
+      guide: "View",
     });
   });
 });

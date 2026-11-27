@@ -650,7 +650,7 @@ async function boot(): Promise<void> {
     sound.setSoundtrack(soundtrack);
     logMusic(soundtrack);
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
-    assets.renderOverlays(arcadeState, activeArcadeRecord);
+    assets.renderOverlays(arcadeState, activeArcadeRecord, inputShortcuts.inputMode());
     if (state.journalOpen && !wasJournalOpen) {
       void assets.warmJournalAssets(state).then(() => {
         if (state.journalOpen) invalidate();

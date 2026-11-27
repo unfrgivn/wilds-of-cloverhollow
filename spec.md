@@ -242,8 +242,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   (button 1) exits Photo Mode; while Battle Peek is open, gamepad B dismisses
   only the peek card (swallowing `cancel`). `gamepadHasActivity` detects active
   standard-pad stick movement (`> 0.25`, left or right stick Y) or button
-  presses (`0..15`) so the HUD Key Hints ribbon and Journal `OPTIONS` Controls
-  card adapt dynamically between keyboard and gamepad glyphs. While the Journal
+  presses (`0..15`) so the HUD Key Hints ribbon (including `P`/`View` Photo and
+  `I`/`View` Field Guide), Journal `OPTIONS` Controls card, battle action
+  badges, and Boop-a-Mole's middle hole cap (`Z`/`A`) adapt dynamically between
+  keyboard and gamepad glyphs. While the Journal
   is open without an overlay, `gamepadRightStickY` (`axes[3]`),
   `gamepadNavDirection` (D-Pad `12..15` or left stick past `0.55`), and
   `GamepadInput.consumeNavStep` / `consumeConfirmEdge` / `rightStickY` drive
@@ -3071,13 +3073,21 @@ trunks keep its two exits.
   `battleMoodWaveB`) tinted dynamically by `battleStageMood` (`"calm-normal"`,
   `"windup"`, `"together-ready"`, `"together-active"`, `"soothed"`).
   `computeBattleChoreography` (`src/render/battle-choreography.ts`, Milestones
-  73 and 82) drives deterministic Paper Mario / EarthBound combat poses,
+  73, 82, and 135) drives deterministic Paper Mario / EarthBound combat poses,
   `stageMood`, `hitStop`, and pooled `battleVfxLayer` particles (`sparkle`,
   `heart`, `energyRing`, `puff`, `petal`, `softGlow`): staggered breathing,
   highlighted actor step-forward on command selection, Soothe hops with luminous
   aqua energy ripples, Maddie pounce arcs, Sue charge lean-back proportional to
-  `fill` and pastel cast arcs, Jordan beat-synced juggle tosses, Snack hops with
-  floating hearts, live Lean balance tilting, live Catch lane posing with
+  `fill` and pastel cast arcs, Jordan beat-synced juggle tosses, three-tier
+  Snack & Specialty Treat sharing theater classified by `classifySnackTheater`
+  (`"snack"`: Fae refreshed bob + warm `softGlow` + 5 rising sunlit green-gold
+  restorative sparkles `0x9be38a`/`0xffe58a`; `"treat"`: Fae toss lean +
+  critter happy munch bounce + 4 arcing pastel hearts/sparkles along
+  `"between"`; `"favourite"` / Golden Sunberry: Fae toss lean + bigger critter
+  munch bounce + 7 golden/rainbow arcing hearts & sparkles + golden critter
+  `softGlow` + 6-heart / 6-sparkle `radialBurst`, collapsing to steady non-
+  bouncing glow/hearts when `reducedMotion` is enabled), live Lean balance
+  tilting, live Catch lane posing with
   caught-toy sparkles, critter burst crouch-and-lunge, 3-tick render-only
   impact hit-stop (`phaseTicks < 4` on `great` / `answered` / `together`
   results: critter squash-stretch, golden starburst flash, and damped `±3.5 px`
@@ -3319,7 +3329,9 @@ trunks keep its two exits.
   inside the box. The squeaky hammer (drawn in code) comes down on the top of
   the mole's head, then lifts, turns back, and fades over `hammerTicks`;
   "Boop!" pops up over a wincing mole. With a keyboard, each hole's key (↑ ←
-  Z → ↓) is lettered on a little cap just left of it; on touch the holes
+  Z → ↓) is lettered on a little cap just left of it; with gamepad input active,
+  `layoutMole` switches the middle hole cap from `Z` to `A` (`↑ ← A → ↓`,
+  Milestone 135); on touch the holes
   themselves are the targets (at least 48 px each way), so the caps are
   hidden. A score sticker (BOOPS, MOLES still to come) sits just left of the
   marquee, which is lettered with the hint (BOOP-A-MOLE when there's none).
@@ -3776,7 +3788,8 @@ trunks keep its two exits.
   (`.hud-battle-hint`, `[data-hint="battle-guide"]`: `I` / `View` `Field
   Guide`, resolved via `resolveHudHintVisibility`) docks cleanly at bottom-right
   clear of commands, dialogue, portraits, and the Field Guide Peek card. Key
-  badges adapt automatically between `"keyboard"` and `"gamepad"` via
+  badges (including `photo` and `guide`, Milestone 135) adapt automatically
+  between `"keyboard"` and `"gamepad"` via
   `hudHintKeys(mode)` (defaulting to `"keyboard"`, switching to `"gamepad"` on
   standard-pad activity and back to `"keyboard"` on real keydowns, Milestone
   117). Every visible `.hud-hint` pill and `.hud-battle-hint` is directly

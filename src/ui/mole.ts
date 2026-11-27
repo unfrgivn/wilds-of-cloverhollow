@@ -7,7 +7,7 @@ import {
 } from "./arcade-popups";
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
-import { layoutMole, moleFrame, type MoleLayout } from "./mole-layout";
+import { layoutMole, moleFrame, type MoleInputMode, type MoleLayout } from "./mole-layout";
 import type { MoleCalibration, MoleHole, MoleView } from "../core";
 
 // The close-up as drawn (spec 11, renderInfo().arcade), in CSS px.
@@ -50,7 +50,11 @@ export function createMole(
   image: string,
   onHole: (hole: MoleHole, down: boolean) => void,
 ): {
-  render: (view: MoleView | null, record?: ArcadeRecordBadge | null) => void;
+  render: (
+    view: MoleView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: MoleInputMode,
+  ) => void;
   info: () => MoleInfo | null;
 } {
   const overlay = element("section", "mole-overlay", root);
@@ -194,7 +198,7 @@ export function createMole(
   });
 
   return {
-    render: (view, record = null) => {
+    render: (view, record = null, inputMode = "keyboard") => {
       overlay.hidden = view === null;
       lastView = view;
       lastRecord = record;
@@ -214,12 +218,12 @@ export function createMole(
       const height = overlay.clientHeight - pixels(style.paddingTop) -
         pixels(style.paddingBottom);
       const recordKey = record === null ? "" : `${record.best}:${record.isNewBest ? 1 : 0}`;
-      const key = `${width}x${height} ${recordKey} ${JSON.stringify(view)}`;
+      const key = `${width}x${height} ${recordKey} ${inputMode} ${JSON.stringify(view)}`;
       if (key === lastKey) return;
       lastKey = key;
       const shown = moleFrame(calibration);
       const scale = Math.max(0.01, Math.min(width / shown.w, height / shown.h));
-      lastLayout = layoutMole(view, calibration, scale);
+      lastLayout = layoutMole(view, calibration, scale, inputMode);
       draw(view, lastLayout, record);
     },
     info: () => {

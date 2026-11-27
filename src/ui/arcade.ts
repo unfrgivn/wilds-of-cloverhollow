@@ -3,6 +3,7 @@ import { createClaw, type ClawInfo } from "./claw";
 import { createCook, type CookInfo } from "./cook";
 import { createFish, type FishInfo } from "./fish";
 import { createMole, type MoleInfo } from "./mole";
+import type { MoleInputMode } from "./mole-layout";
 import { createComet, type CometInfo } from "./comet";
 import { createSkee, type SkeeInfo } from "./skee";
 import type { AtlasImage } from "./atlas";
@@ -46,7 +47,11 @@ export function createArcade(
   onConfirmHold: (held: boolean) => void = () => undefined,
   onLaneStep: (delta: -1 | 1) => void = () => undefined,
 ): {
-  render: (view: ArcadeView | null, record?: ArcadeRecordBadge | null) => void;
+  render: (
+    view: ArcadeView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: MoleInputMode,
+  ) => void;
   info: () => ArcadeInfo | null;
 } {
   const clawUp = createClaw(root, prizeArt, claw.calibration, claw.image, onConfirmHold);
@@ -63,10 +68,14 @@ export function createArcade(
   const cookUp = createCook(root, cook.art, cook.calibration, cook.image, onConfirmHold);
   const fishUp = createFish(root, fish.art, fish.calibration, fish.image, onConfirmHold);
   return {
-    render: (view, record = null) => {
+    render: (view, record = null, inputMode = "keyboard") => {
       clawUp.render(view?.game === "claw" ? view : null);
       skeeUp.render(view?.game === "skee" ? view : null, view?.game === "skee" ? record : null);
-      moleUp.render(view?.game === "mole" ? view : null, view?.game === "mole" ? record : null);
+      moleUp.render(
+        view?.game === "mole" ? view : null,
+        view?.game === "mole" ? record : null,
+        inputMode,
+      );
       cometUp.render(
         view?.game === "comet" ? view : null,
         view?.game === "comet" ? record : null,

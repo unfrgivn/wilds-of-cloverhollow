@@ -69,11 +69,25 @@ export function moleFrame(calibration: MoleCalibration): { x: number; y: number;
   return { x: 0, y, w: size.w, h: bottom - y };
 }
 
+export type MoleInputMode = "keyboard" | "gamepad";
+
 const keys: Record<MoleHole, string> = { up: "↑", left: "←", middle: "Z", right: "→", down: "↓" };
+const gamepadKeys: Record<MoleHole, string> = {
+  up: "↑",
+  left: "←",
+  middle: "A",
+  right: "→",
+  down: "↓",
+};
 
 // The close-up in CSS px, from the shown part's top-left corner.
-export function layoutMole(view: MoleView, calibration: MoleCalibration, scale: number):
-  MoleLayout {
+export function layoutMole(
+  view: MoleView,
+  calibration: MoleCalibration,
+  scale: number,
+  inputMode: MoleInputMode = "keyboard",
+): MoleLayout {
+  const holeKeys = inputMode === "gamepad" ? gamepadKeys : keys;
   const round = Math.round;
   const frame = moleFrame(calibration);
   const dy = frame.y * scale;
@@ -95,7 +109,7 @@ export function layoutMole(view: MoleView, calibration: MoleCalibration, scale: 
       hole: item.hole, cx: round(cx), cy: round(cy), rx: round(rx), ry: round(ry), box, clip,
       mole: item.mole === null ? null
         : { drop: round((1 - item.mole.rise) * size), face: item.mole.face },
-      key: { x: round(cx - rx - 4), y: round(cy), label: keys[item.hole] },
+      key: { x: round(cx - rx - 4), y: round(cy), label: holeKeys[item.hole] },
     };
   });
   const byHole = (hole: MoleHole): HoleLayout => {

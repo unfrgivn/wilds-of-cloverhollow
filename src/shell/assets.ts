@@ -695,6 +695,15 @@ type RecordOverlay<V, I> = {
   info: () => I | null;
 };
 
+type MoleOverlay = {
+  render: (
+    view: MoleView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
+  info: () => MoleInfo | null;
+};
+
 export type ShellAssetsOptions = {
   world: World;
   uiRoot: HTMLElement;
@@ -730,7 +739,11 @@ export type ShellAssets = {
   warmAreaMedia: (area: Area) => Promise<void>;
   warmJournalAssets: (snapshot: State) => Promise<void>;
   warmBattlePortraits: (snapshot: State) => Promise<void>;
-  renderOverlays: (arcadeState: ArcadeView | null, record?: ArcadeRecordBadge | null) => void;
+  renderOverlays: (
+    arcadeState: ArcadeView | null,
+    record?: ArcadeRecordBadge | null,
+    inputMode?: HudInputMode,
+  ) => void;
   overlayInfo: () => ArcadeInfo | null;
 };
 
@@ -921,7 +934,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     return skeeLoad;
   };
 
-  let moleOverlay: RecordOverlay<MoleView, MoleInfo> | null = null;
+  let moleOverlay: MoleOverlay | null = null;
   let moleLoad: Promise<void> | undefined;
   const ensureMoleOverlay = (): Promise<void> => {
     if (moleOverlay !== null) return Promise.resolve();
@@ -1038,6 +1051,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
   const renderOverlays = (
     arcadeState: ArcadeView | null,
     record: ArcadeRecordBadge | null = null,
+    inputMode: HudInputMode = "keyboard",
   ): void => {
     if (arcadeState !== null) {
       if (arcadeState.game === "claw" && clawOverlay === null)
@@ -1061,6 +1075,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     moleOverlay?.render(
       arcadeState?.game === "mole" ? arcadeState : null,
       arcadeState?.game === "mole" ? record : null,
+      inputMode,
     );
     cometOverlay?.render(
       arcadeState?.game === "comet" ? arcadeState : null,

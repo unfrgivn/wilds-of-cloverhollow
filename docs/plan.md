@@ -5950,6 +5950,41 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4531/4532 just e2e` (633 Chromium + 538 WebKit = 1,171
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 135: Battle Snack & Specialty Treat Sharing Theater VFX & Final Gamepad Keycap Parity **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Battle Snack & Specialty Treat Sharing Theater (`src/render/battle-choreography.ts`,
+  `src/render/battle-view.ts`):
+  - Exports pure `classifySnackTheater(battle)` returning `"none"`, `"snack"`,
+    `"treat"`, or `"favourite"` (matching favourite lines & Golden Sunberry,
+    specialty treat lines, and classic plain snacks accurately).
+  - Upgrades `computeBattleChoreography` (with optional `reducedMotion = false`
+    passed from `BattleViewController`) so plain `"snack"` gives Fae a cozy
+    refreshed bob + warm `softGlow` + 5 rising sunlit green-gold sparkles
+    (`0x9be38a`/`0xffe58a`), `"treat"` gives Fae a cheerful toss lean + critter
+    munch bounce + 4 arcing pastel hearts & sparkles along `"between"`, and
+    `"favourite"` / Golden Sunberry gives a bigger critter munch bounce + 7
+    golden/rainbow arcing hearts & sparkles + golden critter `softGlow` + a
+    6-heart / 6-sparkle `radialBurst` (keeping steady non-bouncing glow/hearts
+    under `reducedMotion`).
+- Final Gamepad Keycap Parity (`src/ui/hud-hints.ts`, `src/ui/mole-layout.ts`,
+  `src/ui/mole.ts`, `src/ui/arcade.ts`, `src/shell/assets.ts`, `src/main.ts`):
+  - Extends `HudHintKeys` / `hudHintKeys(mode)` with `photo` (`"P"` / `"View"`)
+    and `guide` (`"I"` / `"View"`) and wires `photoPill.key` and
+    `battleGuidePill.key` cleanly inside `createHudHints`.
+  - Adds optional `inputMode: "keyboard" | "gamepad" = "keyboard"` to
+    `layoutMole`, `createMole.render`, `createArcade.render`, and
+    `assets.renderOverlays`, switching Boop-a-Mole's middle cap `"Z"` -> `"A"`
+    on gamepad activity while keeping `"keyboard"` byte-identical.
+- Evidence: `tests/unit/milestone-135.test.ts` (4 tests), real-input
+  `tests/e2e/milestone-135.spec.ts` (`@smoke`, Chromium & WebKit), and review
+  capture `art/review/m135-snack-treat-theater.jpg` verified with `vision`.
+- Gates: `just check` (195 unit files / 1,430 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4541/4542 just e2e` (635 Chromium + 540 WebKit = 1,175
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

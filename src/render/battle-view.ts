@@ -391,6 +391,7 @@ export class BattleViewController {
       state.tick,
       partyIds,
       partyCommands,
+      reducedMotion,
     );
     this.battleLayer.scale.set(scale);
     this.battleLayer.position.set(

@@ -11252,6 +11252,70 @@
             "^speaker: Mr. Bell",
             "/#",
             "\n",
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Oh, and one quiet announcement: Cloverhollow School is mighty proud of its Star-Line Explorer! ",
+                  "#",
+                  "^speaker: Mr. Bell",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.7"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              "str",
+              "^art-teacher",
+              "/str",
+              {
+                "x()": "calmed",
+                "exArgs": 1
+              },
+              {
+                "VAR?": "has_flute"
+              },
+              "&&",
+              {
+                "VAR?": "has_lasso"
+              },
+              "&&",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Art, music, and gym are all humming happily again. Gold star for hallway teamwork, Fae! ",
+                  "#",
+                  "^speaker: Mr. Bell",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.7"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
             "done",
             null
           ],
@@ -16839,6 +16903,58 @@
             "^speaker: Mrs. Flurry",
             "/#",
             "\n",
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_gift"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Ranger Fern dropped by with warm alpine trail news! She said you earned a Sanctuary Ranger Basket! ",
+                  "#",
+                  "^speaker: Mrs. Flurry",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "jordan_cabin_visited"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Saw smoke curling from Jordan's mountain cabin earlier. Glad you stopped by to warm up there too! ",
+                  "#",
+                  "^speaker: Mrs. Flurry",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
+            "\n",
             "done",
             null
           ],
@@ -16908,6 +17024,58 @@
             "#",
             "^speaker: Ms. Coral",
             "/#",
+            "\n",
+            [
+              "ev",
+              {
+                "VAR?": "bay_boat_charm"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^\"I waved from the lifeguard chair when I saw your pastel rowboat gliding across the sunny cove!\" ",
+                  "#",
+                  "^speaker: Ms. Coral",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sue_cottage_visited"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^\"Sue's beach cottage looks extra bright today! Nothing beats friends hanging out by the tide!\" ",
+                  "#",
+                  "^speaker: Ms. Coral",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.12"
+                  },
+                  null
+                ]
+              }
+            ],
+            "nop",
             "\n",
             "done",
             null
@@ -18304,6 +18472,160 @@
             [
               "ev",
               {
+                "VAR?": "milo_revealed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Mom told me you brought Milo right back to himself under the Ancient Tree. ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  "^That's my Fae. Brave, kind, and never giving up on a friend! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "gem_reward_all"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Grandpa Barnaby told the whole cafe you found all seven Star Gems across the valley! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  "^Wait till Oliver's old enough to hear your treasure-hunting stories! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sanctuary_reward_14"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Whoa, Ranger Fern wove you a real Sanctuary Clover Wreath? It smells like sunshine! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  "^Every critter in Cloverhollow sure is lucky to have you, kiddo. ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "buster_reward"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Look at Cloverhollow's official Star-Line Explorer! Buster was beaming about your stamps! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  "^Save me a story from the coast and the mountains for dinner tonight, okay? ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "sue_compass"
+              },
+              {
+                "VAR?": "jordan_clover"
+              },
+              "&&",
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^You visited Sue's beach cottage and Jordan's mountain cabin? What a crew you've got! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  "^Sounds like your journal is bursting with memories already, kiddo! ",
+                  "#",
+                  "^speaker: Dad",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.8"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
                 "VAR?": "has_lantern"
               },
               "/ev",
@@ -18325,7 +18647,7 @@
                   "/#",
                   "\n",
                   {
-                    "->": ".^.^.^.3"
+                    "->": ".^.^.^.8"
                   },
                   null
                 ]
@@ -18355,7 +18677,7 @@
                   "/#",
                   "\n",
                   {
-                    "->": ".^.^.^.3"
+                    "->": ".^.^.^.8"
                   },
                   null
                 ]
@@ -18379,7 +18701,7 @@
                   "/#",
                   "\n",
                   {
-                    "->": ".^.^.^.3"
+                    "->": ".^.^.^.8"
                   },
                   null
                 ]
@@ -18475,10 +18797,120 @@
         ],
         "nop",
         "\n",
-        "^Welcome back, Fae! My Star Cinnamon buns are rising golden and tall thanks to you! ",
-        "#",
-        "^speaker: Chef Bea",
-        "/#",
+        [
+          "ev",
+          "str",
+          "^taco-chef",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Chef Mateo and I have been trading Star Cinnamon and taco spice notes all week! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              "^Cloverhollow's kitchens have never smelled happier, all thanks to you! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.27"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "buster_reward"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^I've been baking extra travel buns for Buster's Star-Line riders, Star-Line Explorer! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              "^Nothing pairs better with a window seat than warm Star Cinnamon! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.27"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "bay_boat_charm"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^I heard you rowed a pastel boat out to Bubblegum Bay's sunny cove! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              "^Sea air works up a big appetite, so my Star Cinnamon tray is fresh for you! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.27"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^Welcome back, Fae! My Star Cinnamon buns are rising golden and tall thanks to you! ",
+              "#",
+              "^speaker: Chef Bea",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.27"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         {
           "->": ".^.cafe_shop"
@@ -19087,7 +19519,98 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.49"
+                "->": ".^.^.^.52"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "gem_reward_all"
+          },
+          {
+            "VAR?": "sanctuary_reward_14"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^All seven Star Gems AND Ranger Fern's Sanctuary Clover Wreath! What a golden chapter! ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.52"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "gem_reward_all"
+          },
+          {
+            "VAR?": "buster_reward"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^A Rainbow Star Geode and Buster's Golden Star-Line Whistle? A true valley legend, Fae! ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.52"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "gem_reward_all"
+          },
+          {
+            "VAR?": "sue_compass"
+          },
+          "&&",
+          {
+            "VAR?": "jordan_clover"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Sue's sea-glass compass, Jordan's pressed clover, and all seven Star Gems! Pure magic! ",
+              "#",
+              "^speaker: Grandpa Barnaby",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.52"
               },
               null
             ]
@@ -19144,7 +19667,7 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.49"
+                "->": ".^.^.^.52"
               },
               null
             ]
@@ -19178,7 +19701,7 @@
               "/#",
               "\n",
               {
-                "->": ".^.^.^.49"
+                "->": ".^.^.^.52"
               },
               null
             ]
@@ -19255,6 +19778,191 @@
         ],
         "nop",
         "\n",
+        [
+          "ev",
+          {
+            "VAR?": "milo_revealed"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Word on my whole bus route is you helped Milo find his smile again! Best news all week! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "buster_reward"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Buster showed off your full Star-Line Stamp Card in the break room! Welcome to the club! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "sanctuary_visited"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Passengers keep raving about Ranger Fern's Wildlife Sanctuary meadow up above the hills! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "sue_cottage_visited"
+          },
+          {
+            "VAR?": "jordan_cabin_visited"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Cozy stops at Sue's beach cottage AND Jordan's mountain cabin? You're riding like a pro! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "sue_cottage_visited"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Sue's little beach cottage smells like sea salt and sunshine. Best stop near the coast! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "jordan_cabin_visited"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^I always spot chimney smoke curling from Jordan's mountain cabin on my Pinecone Pass run! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          "str",
+          "^principal",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Even Mr. Bell waved at my bus this morning without a megaphone! Town feels cozy again! ",
+              "#",
+              "^speaker: Bree",
+              "/#",
+              "\n",
+              {
+                "->": "bree.21"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "done",
         null
       ],
@@ -19269,10 +19977,51 @@
         "^speaker: Toby",
         "/#",
         "\n",
-        "^Star Racer's top high score is still scribbled out in purple marker, which is super mysterious. Nobody knows whose initials were under there! ",
-        "#",
-        "^speaker: Toby",
-        "/#",
+        "ev",
+        {
+          "VAR?": "milo_revealed"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Whoa, turns out those scribbled Star Racer initials belonged to Milo! Good thing you helped him out! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.15"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          {
+            "->": ".^.b"
+          },
+          {
+            "b": [
+              "\n",
+              "^Star Racer's top high score is still scribbled out in purple marker, which is super mysterious. Nobody knows whose initials were under there! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.15"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "^Oh, pro tip for calming fizzy critters: swing by the Grocery Market and Cloverhollow Scoops for Favourite Treats! ",
         "#",
@@ -19283,6 +20032,166 @@
         "#",
         "^speaker: Toby",
         "/#",
+        "\n",
+        [
+          "ev",
+          {
+            "VAR?": "buster_reward"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Whoa, you finished Buster's whole Star-Line Stamp Card?! That Golden Whistle is SO cool! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.33"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "sanctuary_visited"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Wait, you found Ranger Fern's Wildlife Sanctuary?! I bet all those calm critters love pets! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.33"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "sue_cottage_visited"
+          },
+          {
+            "VAR?": "jordan_cabin_visited"
+          },
+          "&&",
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^You got to hang out at Sue's beach cottage AND Jordan's cabin? Best hangout spots ever! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.33"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "sue_cottage_visited"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Sue invited you to her beach cottage? Her sea-glass lamp sounds like arcade neon, only cozier! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.33"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "jordan_cabin_visited"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Jordan's cabin up in Pinecone Pass sounds awesome! Bet the cocoa kettle never cools down! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.33"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          "str",
+          "^principal",
+          "/str",
+          {
+            "x()": "calmed",
+            "exArgs": 1
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Heard you calmed Mr. Bell down in the school hall! No more super-loud megaphone pop quizzes! ",
+              "#",
+              "^speaker: Toby",
+              "/#",
+              "\n",
+              {
+                "->": "toby.33"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
         "\n",
         "done",
         null
@@ -22115,7 +23024,6 @@
               "^speaker: Ranger Fern",
               "/#",
               "\n",
-              "done",
               {
                 "->": ".^.^.^.18"
               },
@@ -22148,7 +23056,6 @@
               "^speaker: Ranger Fern",
               "/#",
               "\n",
-              "done",
               {
                 "->": ".^.^.^.18"
               },
@@ -22180,7 +23087,6 @@
               "^speaker: Ranger Fern",
               "/#",
               "\n",
-              "done",
               {
                 "->": ".^.^.^.18"
               },
@@ -22190,6 +23096,59 @@
         ],
         "nop",
         "\n",
+        [
+          "ev",
+          {
+            "VAR?": "sanctuary_gift"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^And thank you for checking our Pinecone Pass trail board! Hope the Ranger Basket came in handy! ",
+              "#",
+              "^speaker: Ranger Fern",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.22"
+              },
+              null
+            ]
+          }
+        ],
+        [
+          "ev",
+          {
+            "VAR?": "buster_reward"
+          },
+          "/ev",
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "\n",
+              "^Look at you, an official Star-Line Explorer! Buster tells all the mountain hikers about you! ",
+              "#",
+              "^speaker: Ranger Fern",
+              "/#",
+              "\n",
+              {
+                "->": ".^.^.^.22"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
+        "done",
         null
       ],
       "sanctuary_board": [
@@ -23818,91 +24777,155 @@
             "^speaker: Buster",
             "/#",
             "\n",
-            "ev",
-            {
-              "VAR?": "clubhouse_claimed"
-            },
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "sanctuary_visited"
+              },
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Heard your crew fixed up a cozy woodland clubhouse too! Now that's first-class travel! ",
+                  "\n",
+                  "^Heard Ranger Fern's Sanctuary meadow is full of calm critters! Best detour in the valley! ",
                   "#",
                   "^speaker: Buster",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.9"
+                    "->": ".^.^.^.11"
                   },
                   null
                 ]
               }
             ],
-            "nop",
-            "/#",
-            "\n",
-            "ev",
-            {
-              "VAR?": "has_flute"
-            },
-            {
-              "VAR?": "clubhouse_claimed"
-            },
-            "!",
-            "&&",
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "sue_cottage_visited"
+              },
+              {
+                "VAR?": "jordan_cabin_visited"
+              },
+              "&&",
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ That wooden flute sounds sweeter than my morning bus horn, kiddo! ",
+                  "\n",
+                  "^Stops at Sue's beach cottage AND Jordan's mountain cabin? You've mastered the whole Star-Line route! ",
                   "#",
                   "^speaker: Buster",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.19"
+                    "->": ".^.^.^.11"
                   },
                   null
                 ]
               }
             ],
-            "nop",
-            "/#",
-            "\n",
-            "ev",
-            {
-              "VAR?": "has_flute"
-            },
-            "!",
-            {
-              "VAR?": "clubhouse_claimed"
-            },
-            "!",
-            "&&",
-            "/ev",
             [
+              "ev",
+              {
+                "VAR?": "bay_boat_charm"
+              },
+              "/ev",
               {
                 "->": ".^.b",
                 "c": true
               },
               {
                 "b": [
-                  "^ Whenever you want sea air or mountain snow, just tap the star sign down by the southern bus bench! ",
+                  "\n",
+                  "^I spotted your pastel rowboat bobbing out in Bubblegum Bay from the coastal bus stop! Smooth sailing! ",
                   "#",
                   "^speaker: Buster",
+                  "/#",
+                  "\n",
                   {
-                    "->": ".^.^.^.30"
+                    "->": ".^.^.^.11"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "clubhouse_claimed"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Heard your crew fixed up a cozy woodland clubhouse too! Now that's first-class travel! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.11"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              "ev",
+              {
+                "VAR?": "has_flute"
+              },
+              "/ev",
+              {
+                "->": ".^.b",
+                "c": true
+              },
+              {
+                "b": [
+                  "\n",
+                  "^That wooden flute sounds sweeter than my morning bus horn, kiddo! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.11"
+                  },
+                  null
+                ]
+              }
+            ],
+            [
+              {
+                "->": ".^.b"
+              },
+              {
+                "b": [
+                  "\n",
+                  "^Whenever you want sea air or mountain snow, just tap the star sign down by the southern bus bench! ",
+                  "#",
+                  "^speaker: Buster",
+                  "/#",
+                  "\n",
+                  {
+                    "->": ".^.^.^.11"
                   },
                   null
                 ]
               }
             ],
             "nop",
-            "/#",
             "\n",
             "done",
             null

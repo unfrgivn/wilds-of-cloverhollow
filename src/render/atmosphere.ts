@@ -27,6 +27,10 @@ export type AtmosphereParticle = {
 
 export type AtmosphereOptions = {
   clubhouseBloom?: boolean;
+  cafeCinnamonSteam?: boolean;
+  plazaStarGlow?: boolean;
+  passHearthWisps?: boolean;
+  reducedMotion?: boolean;
 };
 
 // Pure deterministic hash in [0, 1) from integer inputs (zero Math.random).
@@ -97,6 +101,7 @@ const CAFE_MOTE_TINTS: readonly number[] = [0xfff2cc, 0xffe0a6, 0xffd29d];
 const SUNLIT_MOTE_TINTS: readonly number[] = [0xfff6dc, 0xf9e4ab];
 const COTTAGE_MOTE_TINTS: readonly number[] = [0xfff8e2, 0xc7f7ee, 0xffe6ba];
 const CLUBHOUSE_BLOOM_TINTS: readonly number[] = [0xfff2b2, 0xf9d28c, 0xf7b2c7];
+const PLAZA_STAR_GLOW_TINTS: readonly number[] = [0xffe89a, 0xb8e8ff];
 const ARCADE_MOTE_TINTS: readonly number[] = [0xffa6da, 0x9cf2eb, 0xf9e29c];
 const CAVERN_CRYSTALS: readonly {
   x: number;
@@ -312,6 +317,35 @@ export function evaluateAtmosphere(
         alpha: clamp01(0.55 + h1 * 0.28),
         tint: pickTint(BLOSSOM_TINTS, i),
       });
+    }
+    if (options?.plazaStarGlow === true) {
+      // 8 soft pastel-gold fountain mist sparkles celebrating Cloverhollow's Star-Line Explorer.
+      const t = options.reducedMotion === true ? 0 : tick;
+      for (let i = 0; i < 8; i += 1) {
+        const h0 = hash01(seed + i * 67 + 11);
+        const h1 = hash01(seed + i * 67 + 12);
+        const h2 = hash01(seed + i * 67 + 13);
+        const h3 = hash01(seed + i * 67 + 14);
+        const x = 825 + wrap(h0 * 120 + t * 0.08 + Math.sin(t * 0.022 + i * 1.1) * 8, 120);
+        const y = 545 + wrap(h1 * 90 - t * (0.08 + h2 * 0.05), 90);
+        const twinkle =
+          options.reducedMotion === true
+            ? 0.5
+            : 0.5 + 0.5 * Math.sin(t * (0.045 + h3 * 0.035) + i * 1.3);
+        const scale = 0.42 + h2 * 0.32;
+        out.push({
+          layer: "over",
+          texture: "sparkle",
+          blend: "add",
+          x,
+          y,
+          scaleX: scale,
+          scaleY: scale,
+          rotation: 0,
+          alpha: clamp01(0.24 + twinkle * 0.2),
+          tint: pickTint(PLAZA_STAR_GLOW_TINTS, i),
+        });
+      }
     }
     return out;
   }
@@ -533,6 +567,32 @@ export function evaluateAtmosphere(
         alpha: clamp01(0.24 * fadeIn * fadeOut),
         tint: 0xf5eee4,
       });
+    }
+    if (options?.passHearthWisps === true) {
+      // 6 cozy cream-gold chimney curls rising above Mrs. Flurry's Ski Lodge roof.
+      const t = options.reducedMotion === true ? 0 : tick;
+      const hearthCycle = 260;
+      for (let i = 0; i < 6; i += 1) {
+        const h0 = hash01(seed + i * 71 + 11);
+        const h1 = hash01(seed + i * 71 + 12);
+        const age = wrap(t + i * (hearthCycle / 6) + h0 * 24, hearthCycle) / hearthCycle;
+        const x = 1228 + age * 54 + Math.sin(age * Math.PI * 2 + i * 1.2) * 9 + (h1 - 0.5) * 8;
+        const y = 306 - age * 112;
+        const wave = options.reducedMotion === true ? 0.5 : Math.sin(age * Math.PI);
+        const scale = 0.42 + age * 0.56;
+        out.push({
+          layer: "over",
+          texture: "mistWisp",
+          blend: "normal",
+          x,
+          y,
+          scaleX: scale,
+          scaleY: scale * 0.78,
+          rotation: options.reducedMotion === true ? 0 : 0.08 * Math.sin(age * 4 + i),
+          alpha: clamp01(0.18 + wave * 0.14),
+          tint: 0xfff5df,
+        });
+      }
     }
     return out;
   }
@@ -776,6 +836,36 @@ export function evaluateAtmosphere(
       minAlpha: 0.17,
       maxAlpha: 0.42,
     });
+    if (options?.cafeCinnamonSteam === true) {
+      // 6 rising golden-warm cinnamon aroma wisps & sparkles above Chef Bea's kitchen counter.
+      const t = options.reducedMotion === true ? 0 : tick;
+      const steamCycle = 220;
+      for (let i = 0; i < 6; i += 1) {
+        const h0 = hash01(seed + i * 61 + 11);
+        const h1 = hash01(seed + i * 61 + 12);
+        const h2 = hash01(seed + i * 61 + 13);
+        const age = wrap(t + i * (steamCycle / 6) + h0 * 35, steamCycle) / steamCycle;
+        const baseX = 435 + (i / 5) * 200 + (h1 - 0.5) * 16;
+        const sway = options.reducedMotion === true ? 0 : Math.sin(age * Math.PI * 2 + i) * 8;
+        const x = baseX + sway;
+        const y = 355 - age * 110;
+        const isWisp = i % 2 === 0;
+        const wave = options.reducedMotion === true ? 0.5 : Math.sin(age * Math.PI);
+        const scale = isWisp ? 0.36 + age * 0.34 : 0.34 + h2 * 0.22;
+        out.push({
+          layer: "over",
+          texture: isWisp ? "mistWisp" : "sparkle",
+          blend: isWisp ? "normal" : "add",
+          x,
+          y,
+          scaleX: scale,
+          scaleY: isWisp ? scale * 0.72 : scale,
+          rotation: isWisp && options.reducedMotion !== true ? 0.06 * Math.sin(age * 4 + i) : 0,
+          alpha: clamp01(0.18 + wave * 0.16),
+          tint: 0xffe2a8,
+        });
+      }
+    }
     return out;
   }
 
@@ -1024,14 +1114,18 @@ export function evaluateAtmosphere(
     });
     if (areaId === "clubhouse" && options?.clubhouseBloom === true) {
       // Subtle warm golden/blossom pollen sparkles over the blooming planter deck.
+      const t = options.reducedMotion === true ? 0 : tick;
       for (let i = 0; i < 8; i += 1) {
         const h0 = hash01(seed + i * 59 + 11);
         const h1 = hash01(seed + i * 59 + 12);
         const h2 = hash01(seed + i * 59 + 13);
         const h3 = hash01(seed + i * 59 + 14);
-        const x = 720 + wrap(h0 * 200 + tick * 0.12 + Math.sin(tick * 0.025 + i) * 10, 200);
-        const y = 560 + wrap(h1 * 100 - tick * (0.09 + h2 * 0.06), 100);
-        const twinkle = 0.5 + 0.5 * Math.sin(tick * (0.05 + h3 * 0.04) + i * 1.4);
+        const x = 720 + wrap(h0 * 200 + t * 0.12 + Math.sin(t * 0.025 + i) * 10, 200);
+        const y = 560 + wrap(h1 * 100 - t * (0.09 + h2 * 0.06), 100);
+        const twinkle =
+          options.reducedMotion === true
+            ? 0.5
+            : 0.5 + 0.5 * Math.sin(t * (0.05 + h3 * 0.04) + i * 1.4);
         const scale = 0.18 + h2 * 0.16;
         out.push({
           layer: "over",
@@ -1069,11 +1163,16 @@ export class BiomeAtmosphere {
   private readonly underPool: Sprite[] = [];
   private readonly overPool: Sprite[] = [];
   private readonly emissivePool: Sprite[] = [];
+  private visibleCount = 0;
 
   constructor(private readonly textures: VfxTextures) {
     this.under.label = "atmosphere:under";
     this.over.label = "atmosphere:over";
     this.emissive.label = "atmosphere:emissive";
+  }
+
+  get activeCount(): number {
+    return this.visibleCount;
   }
 
   update(
@@ -1089,9 +1188,13 @@ export class BiomeAtmosphere {
     this.under.visible = show;
     this.over.visible = show;
     this.emissive.visible = show;
-    if (!show) return;
+    if (!show) {
+      this.visibleCount = 0;
+      return;
+    }
 
     const particles = evaluateAtmosphere(areaId, width, height, tick, options);
+    this.visibleCount = particles.length;
     const duskBoost = 1 + clamp01(duskBlend) * 0.65;
     let underUsed = 0;
     let overUsed = 0;

@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-27 (Milestone 106)
+Last updated: 2026-11-27 (Milestone 108)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -381,7 +381,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   variation (`footstepPitchFactor(tick)` in `src/platform/voices.ts`,
   `0.94..1.06`, zero `Math.random()`), remaining replaceable by clips pending
   the owner's pick. The plaza's default is stone, because it is a paved square.
-- Celebration fanfares & camera shutter audio (Milestone 106, `src/platform/audio.ts`):
+- Celebration fanfares & camera shutter audio (Milestone 107, `src/platform/audio.ts`):
   `sticker` plays a warm 6-note storybook harp/celesta sparkle flourish
   (C5→E5→G5→B5→C6 + C7 sparkle overtone, ~0.48 s); `level-up` plays an uplifting
   7-note celebratory RPG arpeggio (C5→D5→E5→G5→A5→C6→E6 over a C4 bass root +
@@ -431,7 +431,15 @@ ios/            Capacitor iOS project (from Milestone 4).
   zero `Math.random()`) adds per-biome water glints, lamp pools, drifting
   petals/pollen, snow and lodge chimney smoke, sunbeams, lavender mist, fairy
   aura halos, hearth glow, arcade neon blooms, blooming clubhouse planter-deck
-  pollen sparkles (while `garden_sprouted` or `garden_ripe`), and an `emissive`
+  pollen sparkles (while `garden_sprouted` or `garden_ripe`), Milestone 108
+  story-reactive world atmosphere accents (`cafeCinnamonSteam` in `cafe` when
+  `spice_returned` and (`buster_reward` or `taco-chef` calmed): 6 warm amber
+  `#FFE2A8` rising cinnamon wisps and sparkles over Chef Bea's counter;
+  `plazaStarGlow` in `plaza` when `buster_reward`: 8 pastel-gold `#FFE89A` and
+  sky-blue `#B8E8FF` fountain mist sparkles; `passHearthWisps` in `pass` when
+  `sanctuary_gift`: 6 cream-gold `#FFF5DF` chimney smoke curls above Mrs.
+  Flurry's Ski Lodge roof, all respecting `reducedMotion` by holding still
+  across ticks), and an `emissive`
   light layer mounted above `lanternLayer` (`emissiveLayer`, boosted smoothly
   during lantern dusk for cavern crystals/lanterns, enchanted fairies, plaza lamp
   arches, lodge hearth, and café counter glows, plus cool subterranean edge
@@ -458,7 +466,7 @@ ios/            Capacitor iOS project (from Milestone 4).
   adventure areas (`plaza`, `park`, `bay`, `pass`, `trail`, `woods`, `hills`,
   `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
-- Photo / Showcase mode (Milestone 90) & Postcard Camera (Milestone 106): pressing
+- Photo / Showcase mode (Milestone 90) & Postcard Camera (Milestone 107): pressing
   `P` (`KeyP`) while exploring the free overworld (ignored inside inputs, on title,
   dialogue, battle, arcade, journal, finale, or QA overlays) toggles
   `data-photo="on"` on the root, hiding `.sticker-prompt`, `.touch-controls`,
@@ -1287,7 +1295,7 @@ ios/            Capacitor iOS project (from Milestone 4).
     front-right corner at `(796, 350)`, `alpine-clover` on `jordan_clover`
     mounted beside the wreath at `(516, 308)`, and `star-whistle` on
     `buster_reward` perched on the round window sill at `(805, 259)` — 22 total
-    Living Clubhouse items, with Milestone 106 spacing polish across the upper
+    Living Clubhouse items, with Milestone 107 spacing polish across the upper
     and lower right shelves, beanbag 2×2 cuddle arc, crate keepsake row, and
     left floor perches), each grounded with a miniature contact shadow and
     subtle breathing sparkle aura.
@@ -1305,8 +1313,20 @@ ios/            Capacitor iOS project (from Milestone 4).
     harp chord and lazily drifting `emoteNote` (`♪`) until any movement,
     cancel, menu, or confirm input stands her back up.
   - `renderInfo()` exposes `clubhouseDisplay` (visible display item count),
+    `atmosphereParticles` (active `BiomeAtmosphere` particle count),
     `petting` (currently petted companion id or `null`), and `resting` (active
     rest spot id or `null`).
+  - Living Valley Townspeople Milestone Reactions (Milestone 108,
+    `content/story/main.ink`): zero-drift late-game and post-completion revisit
+    dialogue across ten beloved valley characters (`dad`, `chef_bea`, `barnaby`,
+    `bree`, `toby`, `buster`, `lodge_keeper`, `lifeguard`, `principal`, and
+    `ranger_fern`) reacting warmly to cross-biome achievements (`milo_revealed`,
+    never naming Milo beforehand; `gem_reward_all`; `sanctuary_reward_14`;
+    `sanctuary_visited`; `sanctuary_gift`; `buster_reward`; `sue_compass` and
+    `jordan_clover`; `sue_cottage_visited` and `jordan_cabin_visited`;
+    `bay_boat_charm`; and calmed school/town friends `taco-chef`, `principal`,
+    and `art-teacher`), with every new line sized to fit cleanly in 2 lines
+    inside `.sticker-box`.
 - Recess (Milestone 39): the flute's last line rings the bell (`recess`), and
   Coach Ash props the gym's back door open. `field`, "Playing Field", is a
   1650x1100 painted schoolyard behind the school (no concept sheet): the
@@ -2569,7 +2589,7 @@ trunks keep its two exits.
   and during live command selection (outside Talk and the treat tray) displays
   a high-contrast `.sticker-subtitle` preview line (`battleCommandPreview`)
   describing the highlighted command, any active feeling match, or cooldown.
-- Die-cut Paper-Mario battle popups (Milestone 106, `src/ui/battle-popups.ts` &
+- Die-cut Paper-Mario battle popups (Milestone 107, `src/ui/battle-popups.ts` &
   `src/ui/battle.ts`): purely UI-driven by diffing consecutive live battle HUD
   snapshots (zero `src/core` changes, zero popups on battle open/close/switch or
   static gallery renders). Ephemeral `.battle-popup` pills mount inside

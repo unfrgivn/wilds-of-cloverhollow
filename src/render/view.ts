@@ -35,7 +35,7 @@ import { fadeAlpha, transitionZoom } from "./fade";
 import { ambientFor, type AmbientFlyer } from "../content/ambient";
 import { flyerAt } from "./ambient";
 import { createVfxTextures, type VfxTextures } from "./vfx-textures";
-import { BiomeAtmosphere } from "./atmosphere";
+import { BiomeAtmosphere, type AtmosphereOptions } from "./atmosphere";
 import { evaluateOverworldEmotes } from "./emotes";
 import { evaluateClubhouseDisplay } from "./clubhouse-display";
 import type { RestSpot } from "./companions";
@@ -887,10 +887,6 @@ export class GameView {
     );
     this.renderTimeOfDay(state);
     this.renderGlows(state, playerPos, paused);
-    const clubhouseBloom = area.id === "clubhouse" && (
-      this.world.storyVariable(state.ink, "garden_sprouted") === true ||
-      this.world.storyVariable(state.ink, "garden_ripe") === true
-    );
     this.atmosphere.update(
       area.id,
       area.width,
@@ -898,7 +894,7 @@ export class GameView {
       state.tick,
       state.battle === null && state.arcade === null,
       this.lanternBlend,
-      clubhouseBloom ? { clubhouseBloom: true } : undefined,
+      this.storyAtmosphereOptions(area.id, state, reducedMotion),
     );
     loaded.update(
       this.world,
@@ -931,6 +927,45 @@ export class GameView {
     }
     const fade = fadeAlpha(state.transition, this.world.tunables.doorFadeTicks);
     this.fade.alpha = fade;
+  }
+
+  private storyAtmosphereOptions(
+    areaId: string,
+    state: State,
+    reducedMotion: boolean,
+  ): AtmosphereOptions | undefined {
+    const clubhouseBloom =
+      areaId === "clubhouse" &&
+      (this.world.storyVariable(state.ink, "garden_sprouted") === true ||
+        this.world.storyVariable(state.ink, "garden_ripe") === true);
+    const cafeCinnamonSteam =
+      areaId === "cafe" &&
+      this.world.storyVariable(state.ink, "spice_returned") === true &&
+      (this.world.storyVariable(state.ink, "buster_reward") === true ||
+        state.critters["taco-chef"] === "calm" ||
+        state.stickers.includes("taco-chef"));
+    const plazaStarGlow =
+      areaId === "plaza" &&
+      this.world.storyVariable(state.ink, "buster_reward") === true;
+    const passHearthWisps =
+      areaId === "pass" &&
+      this.world.storyVariable(state.ink, "sanctuary_gift") === true;
+    if (
+      !clubhouseBloom &&
+      !cafeCinnamonSteam &&
+      !plazaStarGlow &&
+      !passHearthWisps &&
+      !reducedMotion
+    ) {
+      return undefined;
+    }
+    return {
+      ...(clubhouseBloom ? { clubhouseBloom: true } : {}),
+      ...(cafeCinnamonSteam ? { cafeCinnamonSteam: true } : {}),
+      ...(plazaStarGlow ? { plazaStarGlow: true } : {}),
+      ...(passHearthWisps ? { passHearthWisps: true } : {}),
+      ...(reducedMotion ? { reducedMotion: true } : {}),
+    };
   }
 
   private renderTimeOfDay(state: State): void {
@@ -1596,6 +1631,7 @@ export class GameView {
     // The recurring critters' "?" and "!" over their heads (Milestone 51).
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     clubhouseDisplay: number;
+    atmosphereParticles: number;
     petting: string | null;
     resting: string | null;
     timeOfDay: TimeOfDayPhase;
@@ -1653,6 +1689,7 @@ export class GameView {
       },
       marks: this.noticeMarks(state),
       clubhouseDisplay: this.clubhouseDisplayCount,
+      atmosphereParticles: this.atmosphere.activeCount,
       petting: this.activePetReaction(state)?.id ?? null,
       resting: this.activeRestSpot(state)?.spot.id ?? null,
       timeOfDay: storyTimeOfDay(this.world, state).phase,

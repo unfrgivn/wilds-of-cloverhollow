@@ -1292,6 +1292,12 @@ All I remember is announcing EVERYTHING at once. Sorry about the noise! # speake
 -> DONE
 = again
 Lunch today is tacos. That is all. # speaker: Mr. Bell
+{
+- buster_reward:
+    Oh, and one quiet announcement: Cloverhollow School is mighty proud of its Star-Line Explorer! # speaker: Mr. Bell
+- calmed("art-teacher") and has_flute and has_lasso:
+    Art, music, and gym are all humming happily again. Gold star for hallway teamwork, Fae! # speaker: Mr. Bell
+}
 -> DONE
 
 === art_teacher ===
@@ -1949,6 +1955,12 @@ Then come in, come in, all of you! Warm up by the fire. # speaker: Mrs. Flurry
 = again
 Mrs. Flurry sweeps the snow off her porch. "The fire's lit, dears. Come in and warm up!" # speaker: Mrs. Flurry
 A dizzy penguin keeps belly-sliding loops on the north slope, past the ski lift. Mind your toes out there! # speaker: Mrs. Flurry
+{
+- sanctuary_gift:
+    Ranger Fern dropped by with warm alpine trail news! She said you earned a Sanctuary Ranger Basket! # speaker: Mrs. Flurry
+- jordan_cabin_visited:
+    Saw smoke curling from Jordan's mountain cabin earlier. Glad you stopped by to warm up there too! # speaker: Mrs. Flurry
+}
 -> DONE
 
 === lifeguard ===
@@ -1961,6 +1973,12 @@ Here, share my watermelon. # speaker: Ms. Coral # gift: snack 3
 = again
 Ms. Coral smiles and checks the beach. "All clear, kiddos!" # speaker: Ms. Coral
 "Oh, and mind the south rocks! Little crabs have been skittering there all morning, clicky-clacky!" # speaker: Ms. Coral
+{
+- bay_boat_charm:
+    "I waved from the lifeguard chair when I saw your pastel rowboat gliding across the sunny cove!" # speaker: Ms. Coral
+- sue_cottage_visited:
+    "Sue's beach cottage looks extra bright today! Nothing beats friends hanging out by the tide!" # speaker: Ms. Coral
+}
 -> DONE
 
 // Inside the lodge (Milestone 57).
@@ -2206,6 +2224,21 @@ And ten shiny coins in case you spot something fun in town! # speaker: Dad # gif
 -> DONE
 = again
 {
+- milo_revealed:
+    Mom told me you brought Milo right back to himself under the Ancient Tree. # speaker: Dad
+    That's my Fae. Brave, kind, and never giving up on a friend! # speaker: Dad
+- gem_reward_all:
+    Grandpa Barnaby told the whole cafe you found all seven Star Gems across the valley! # speaker: Dad
+    Wait till Oliver's old enough to hear your treasure-hunting stories! # speaker: Dad
+- sanctuary_reward_14:
+    Whoa, Ranger Fern wove you a real Sanctuary Clover Wreath? It smells like sunshine! # speaker: Dad
+    Every critter in Cloverhollow sure is lucky to have you, kiddo. # speaker: Dad
+- buster_reward:
+    Look at Cloverhollow's official Star-Line Explorer! Buster was beaming about your stamps! # speaker: Dad
+    Save me a story from the coast and the mountains for dinner tonight, okay? # speaker: Dad
+- sue_compass and jordan_clover:
+    You visited Sue's beach cottage and Jordan's mountain cabin? What a crew you've got! # speaker: Dad
+    Sounds like your journal is bursting with memories already, kiddo! # speaker: Dad
 - has_lantern:
     Whoa, is that Jordan's hiking lantern? Look at my brave explorer, lighting up the whole valley! # speaker: Dad
     Save me a story for dinner tonight, okay kiddo? # speaker: Dad
@@ -2222,7 +2255,19 @@ And ten shiny coins in case you spot something fun in town! # speaker: Dad # gif
 {spice_found and not spice_returned: -> return_spice}
 {not spice_quest: -> ask_spice}
 {not spice_found: -> remind_spice}
-Welcome back, Fae! My Star Cinnamon buns are rising golden and tall thanks to you! # speaker: Chef Bea
+{
+- calmed("taco-chef"):
+    Chef Mateo and I have been trading Star Cinnamon and taco spice notes all week! # speaker: Chef Bea
+    Cloverhollow's kitchens have never smelled happier, all thanks to you! # speaker: Chef Bea
+- buster_reward:
+    I've been baking extra travel buns for Buster's Star-Line riders, Star-Line Explorer! # speaker: Chef Bea
+    Nothing pairs better with a window seat than warm Star Cinnamon! # speaker: Chef Bea
+- bay_boat_charm:
+    I heard you rowed a pastel boat out to Bubblegum Bay's sunny cove! # speaker: Chef Bea
+    Sea air works up a big appetite, so my Star Cinnamon tray is fresh for you! # speaker: Chef Bea
+- else:
+    Welcome back, Fae! My Star Cinnamon buns are rising golden and tall thanks to you! # speaker: Chef Bea
+}
 -> cafe_shop
 
 = ask_spice
@@ -2300,6 +2345,12 @@ When I was your age, folks around Cloverhollow whispered storybook legends about
     ~ gem_reward_3 = true
     Well bless my teacup! You found ALL SEVEN Star Gems across Cloverhollow! Take these fifty coins for your grand treasure hunt! # speaker: Grandpa Barnaby # gift: coins 50
     And keep this Rainbow Star Geode for your clubhouse chest, along with a pair of warm snacks for the road! # speaker: Grandpa Barnaby # gift: snack 2 # sound: chime-red
+- gem_reward_all and sanctuary_reward_14:
+    All seven Star Gems AND Ranger Fern's Sanctuary Clover Wreath! What a golden chapter! # speaker: Grandpa Barnaby
+- gem_reward_all and buster_reward:
+    A Rainbow Star Geode and Buster's Golden Star-Line Whistle? A true valley legend, Fae! # speaker: Grandpa Barnaby
+- gem_reward_all and sue_compass and jordan_clover:
+    Sue's sea-glass compass, Jordan's pressed clover, and all seven Star Gems! Pure magic! # speaker: Grandpa Barnaby
 - gem_count() >= 3 and not gem_reward_3:
     ~ gem_reward_3 = true
     My word, you've already found {gem_count()} gleaming Star Gems! Here are fifteen coins to cheer you on! # speaker: Grandpa Barnaby # gift: coins 15 # sound: chime-yellow
@@ -2319,14 +2370,48 @@ My Cloverhollow Star Bus loops right from the plaza's star sign out to Bubblegum
 - else:
     Whenever you're ready to visit the beach or the snowy mountains, just head to the star sign in the plaza and hop aboard! # speaker: Bree
 }
+{
+- milo_revealed:
+    Word on my whole bus route is you helped Milo find his smile again! Best news all week! # speaker: Bree
+- buster_reward:
+    Buster showed off your full Star-Line Stamp Card in the break room! Welcome to the club! # speaker: Bree
+- sanctuary_visited:
+    Passengers keep raving about Ranger Fern's Wildlife Sanctuary meadow up above the hills! # speaker: Bree
+- sue_cottage_visited and jordan_cabin_visited:
+    Cozy stops at Sue's beach cottage AND Jordan's mountain cabin? You're riding like a pro! # speaker: Bree
+- sue_cottage_visited:
+    Sue's little beach cottage smells like sea salt and sunshine. Best stop near the coast! # speaker: Bree
+- jordan_cabin_visited:
+    I always spot chimney smoke curling from Jordan's mountain cabin on my Pinecone Pass run! # speaker: Bree
+- calmed("principal"):
+    Even Mr. Bell waved at my bus this morning without a megaphone! Town feels cozy again! # speaker: Bree
+}
 -> DONE
 
 === toby ===
 Whoa, hey Fae! Are you getting a cinnamon bun too? The icing swirls are HUGE today! # speaker: Toby
 I was just at the arcade trying to beat my record on Boop-a-Mole, Skee-Ball, and Comet Cruise! # speaker: Toby
-Star Racer's top high score is still scribbled out in purple marker, which is super mysterious. Nobody knows whose initials were under there! # speaker: Toby
+{milo_revealed:
+    Whoa, turns out those scribbled Star Racer initials belonged to Milo! Good thing you helped him out! # speaker: Toby
+- else:
+    Star Racer's top high score is still scribbled out in purple marker, which is super mysterious. Nobody knows whose initials were under there! # speaker: Toby
+}
 Oh, pro tip for calming fizzy critters: swing by the Grocery Market and Cloverhollow Scoops for Favourite Treats! # speaker: Toby
 If you toss a critter its favorite treat in a calm-down, it calms down WAY faster than a regular snack! # speaker: Toby
+{
+- buster_reward:
+    Whoa, you finished Buster's whole Star-Line Stamp Card?! That Golden Whistle is SO cool! # speaker: Toby
+- sanctuary_visited:
+    Wait, you found Ranger Fern's Wildlife Sanctuary?! I bet all those calm critters love pets! # speaker: Toby
+- sue_cottage_visited and jordan_cabin_visited:
+    You got to hang out at Sue's beach cottage AND Jordan's cabin? Best hangout spots ever! # speaker: Toby
+- sue_cottage_visited:
+    Sue invited you to her beach cottage? Her sea-glass lamp sounds like arcade neon, only cozier! # speaker: Toby
+- jordan_cabin_visited:
+    Jordan's cabin up in Pinecone Pass sounds awesome! Bet the cocoa kettle never cools down! # speaker: Toby
+- calmed("principal"):
+    Heard you calmed Mr. Bell down in the school hall! No more super-loud megaphone pop quizzes! # speaker: Toby
+}
 -> DONE
 
 === cafe_pastries ===
@@ -2695,16 +2780,20 @@ VAR sanctuary_picnic_basket = false
 - count == 17:
     All 17 of 17 valley animals are visiting the Wildlife Sanctuary together! Listen to them chirp, purr, and splash! # speaker: Ranger Fern
     Feel free to pet any of your friends or spread out on the checkered picnic blanket whenever you like, Fae! # speaker: Ranger Fern
-    -> DONE
 - count == 0:
     Right now 0 of 17 valley animals have wandered up here yet. # speaker: Ranger Fern
     Once you calm critters around Cloverhollow, Bubblegum Bay, Pinecone Pass, and the woods, they'll start visiting this meadow! # speaker: Ranger Fern
-    -> DONE
 - else:
     Right now {count} of 17 valley animals are visiting the sanctuary meadow! # speaker: Ranger Fern
     Walk right up and pet anyone you've calmed, or check the wooden bulletin board to see which valley regions still have shy critters! # speaker: Ranger Fern
-    -> DONE
 }
+{
+- sanctuary_gift:
+    And thank you for checking our Pinecone Pass trail board! Hope the Ranger Basket came in handy! # speaker: Ranger Fern
+- buster_reward:
+    Look at you, an official Star-Line Explorer! Buster tells all the mountain hikers about you! # speaker: Ranger Fern
+}
+-> DONE
 
 === sanctuary_board ===
 ~ temp count = sanctuary_count()
@@ -2974,9 +3063,20 @@ Whoa, a real Golden Star-Line Whistle! Thanks, Buster! # speaker: Fae
 -> DONE
 = after
 All aboard anytime, Star-Line Explorer! Keep that Golden Star-Line Whistle shining bright! # speaker: Buster
-{clubhouse_claimed: Heard your crew fixed up a cozy woodland clubhouse too! Now that's first-class travel! # speaker: Buster}
-{has_flute and not clubhouse_claimed: That wooden flute sounds sweeter than my morning bus horn, kiddo! # speaker: Buster}
-{not has_flute and not clubhouse_claimed: Whenever you want sea air or mountain snow, just tap the star sign down by the southern bus bench! # speaker: Buster}
+{
+- sanctuary_visited:
+    Heard Ranger Fern's Sanctuary meadow is full of calm critters! Best detour in the valley! # speaker: Buster
+- sue_cottage_visited and jordan_cabin_visited:
+    Stops at Sue's beach cottage AND Jordan's mountain cabin? You've mastered the whole Star-Line route! # speaker: Buster
+- bay_boat_charm:
+    I spotted your pastel rowboat bobbing out in Bubblegum Bay from the coastal bus stop! Smooth sailing! # speaker: Buster
+- clubhouse_claimed:
+    Heard your crew fixed up a cozy woodland clubhouse too! Now that's first-class travel! # speaker: Buster
+- has_flute:
+    That wooden flute sounds sweeter than my morning bus horn, kiddo! # speaker: Buster
+- else:
+    Whenever you want sea air or mountain snow, just tap the star sign down by the southern bus bench! # speaker: Buster
+}
 -> DONE
 
 === bay_souvenirs ===

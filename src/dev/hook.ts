@@ -65,6 +65,7 @@ export type CloverhollowHook = {
     // The recurring critters' "?" and "!" over their heads (Milestone 51).
     marks: { key: string; mark: "?" | "!"; x: number; y: number }[];
     clubhouseDisplay: number;
+    atmosphereParticles: number;
     petting: string | null;
     resting: string | null;
     timeOfDay: TimeOfDayPhase;

@@ -4975,6 +4975,36 @@ the old trail, the owl, and the clubhouse claim.
   independently verified via `vision`.
 - Gates: `just check`, `just build`, and 659/659 targeted Chromium & WebKit e2e tests.
 
+## Milestone 108: Living Valley Townspeople Heart & Story-Reactive World Atmosphere **Status:** ✅ Completed (2026-11-27)
+- Makes Cloverhollow's townspeople react warmly across late-game valley
+  milestones and rewards completed errands with subtle story-reactive
+  atmospheric accents — zero `src/core` changes, zero save-version bumps, zero
+  replay hash drift across all 67 recorded sims, and zero visual baseline
+  regressions.
+- Living valley milestone dialogue (`content/story/main.ink`, compiled
+  `content/story/main.ink.json`):
+  - Enriched 10 valley characters (`dad`, `chef_bea`, `barnaby`, `bree`,
+    `toby`, `buster`, `lodge_keeper`, `lifeguard`, `principal`, `ranger_fern`)
+    with crisp 2-line (`<= 105` chars) cross-milestone revisit reactions
+    (`buster_reward`, `sanctuary_reward_14`, `sue_compass` & `jordan_clover`,
+    `bay_boat_charm`, `sanctuary_gift`, `calmed("taco-chef")`,
+    `calmed("principal")`, `milo_revealed` — never naming Milo pre-reveal)
+    while keeping every sim-executed path byte-identical.
+- Story-reactive world atmosphere (`src/render/atmosphere.ts`,
+  `src/render/view.ts`, `src/dev/hook.ts`):
+  - Added deterministic `cafeCinnamonSteam` (6 warm-amber rising steam/sparkle
+    motes above Chef Bea's counter), `plazaStarGlow` (8 pastel-gold & sky-blue
+    fountain sparkles for Star-Line Explorers), and `passHearthWisps` (6 cozy
+    cream-gold chimney curls above Mrs. Flurry's Ski Lodge), all honoring
+    `reducedMotion` cleanly and exposing `atmosphereParticles` on `renderInfo()`.
+- Evidence: `tests/unit/milestone-107.test.ts` (10 tests) and
+  `tests/e2e/milestone-107.spec.ts` (`@smoke` Chromium + WebKit); all 3 review
+  captures (`art/review/m107-dad-milestone-1280.jpg`,
+  `m107-plaza-starglow-1280.jpg`, `m107-pass-hearth-1280.jpg`) independently
+  verified via `vision`.
+- Gates: `just check` (165 unit files / 1,278 tests, all 67 sims, 23 QA packs,
+  purity, lint), `just build`, and 24/24 targeted Chromium & WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -398,7 +398,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   zero drift on rhythmic anchors, and a whisper-soft `0.16x` celesta octave
   shimmer on loop-2+ bar 1 and mid-score downbeats for harp/piano notes `<= 76`).
   Music crossfades (~0.55 s) on track changes, ducks (~0.3 s to 0.55x), and
-  pauses cleanly on `visibilitychange` when backgrounded; ambience crossfades
+  pauses cleanly on `visibilitychange` when backgrounded; when returning
+  visible on `visibilitychange` or `pageshow` (Milestone 132), pure
+  `shouldResumeAudioOnVisible(hidden, state)` (`src/platform/audio.ts`)
+  triggers `unlock()` before `syncPlayers()` whenever the context is
+  `interrupted` or was previously unlocked by a user gesture (`suspended`),
+  so iOS WKWebView and Safari auto-resume music and ambience after lock-screen
+  or app-switch interruptions without violating initial browser autoplay gates;
+  ambience crossfades
   (~0.7 s), places one-shot biome accents across the stereo field via
   deterministic `ambiencePan` (`[-0.55, 0.55]`, guarded `StereoPannerNode`s
   disconnected on `onended`), and cleans up all nodes and timers on stop.
@@ -2028,8 +2035,12 @@ trunks keep its two exits.
     interactive button (`role="button"`, `aria-label` synced to `view.label`
     while visible, `cursor: pointer; pointer-events: auto; touch-action: manipulation`
     with `.sticker-prompt-arrow` kept at `pointer-events: none`) and exposes
-    `onActivate`, wired to `touch.tapButton("confirm")` so clicking or tapping
-    the floating `TALK`/`LOOK`/`PLAY`/`PET` pill opens the interaction directly.
+    `onActivate`, wired to `touch.tapButton("confirm")` so clicking the
+    floating `TALK`/`LOOK`/`PLAY`/`PET` pill on desktop opens the interaction
+    directly. Under `:root[data-touch="on"]`, `.sticker-prompt` stays
+    pass-through (`pointer-events: none`) so world prompts near the lower-left
+    touch stick never intercept movement drags (touch players use the dedicated
+    confirm thumb sticker).
 - Ink choices are once-only by default, so every knot must still say
   something sensible on a revisit (the window's `again` stitch remembers the
   plan). A choice offered on every visit (the shops, the bus stops, the
@@ -3907,6 +3918,16 @@ trunks keep its two exits.
   harness, finale/credits, or mid-battle/arcade). On returning visible, the
   ticker clock resets cleanly and queues a fresh draw.
 - Boot: a valid save resumes the game; otherwise a new game starts.
+- Portable save backup envelope (`src/shell/save-backup.ts`, Milestone 132):
+  pure export/import helpers wrapping `serializeSave` without bumping the core
+  save version (`SaveBackupEnvelope` with `app: "wilds-of-cloverhollow"`,
+  `format: 1`, `exportedAt`, `area`, `areaName`, `stickers`, `save`),
+  `saveBackupFilename(area, tick)` sanitizing area ids to lowercase
+  `[a-z0-9-]`, `formatSaveBackup(state, world, exportedAtIso)` emitting
+  pretty-printed JSON, and `parseSaveBackup(raw, fresh, speciesXp, thresholds)`
+  strictly validating either a `SaveBackupEnvelope` or a raw `serializeSave`
+  JSON string via `parseSave` and returning `null` (never throwing) on any
+  malformed, unknown-app, unknown-format, or corrupted payload.
 - QA mode never reads or writes `cloverhollow-save` and never autosaves. QA
   packs are separate files in the dev/harness-only save library; movement,
   doors, and ending events cannot change the player's slot. The QA menu can be
@@ -3957,7 +3978,10 @@ trunks keep its two exits.
     the dev/harness-only pack metadata.
   - `save`: `clear()` deletes the slot; `last()` is the tick and hash of the
     latest completed save write; `loaded()` is the tick and hash of the save
-    restored at boot, or null for a new game.
+    restored at boot, or null for a new game; optional `exportBackup()` formats
+    the active state as a `SaveBackupEnvelope` JSON string and optional
+    `importBackup(raw)` validates, persists, and reloads a backup envelope or
+    raw save string (returning `false` on invalid input or in QA mode).
   - `renderInfo()`: read-only render facts for tests: the loaded `area`, the
     fade alpha, `cachedAreaTextures` (area texture URLs still in Pixi's Assets
     cache), the depth layer's draw order (`{ label, zIndex }[]`, with `fae`,

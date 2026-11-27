@@ -707,13 +707,16 @@ async function main(): Promise<void> {
       );
     }
     // Go round the top of the plaza, then down into Meadow Park, never near
-    // the frog's circle. Stop in the open aisle left of arch-ne's north post
-    // (x 945-990), nudging down-left if a drag overshoots into the narrow
-    // corner between the bakery and arch-ne (x >= 995), then step down past
-    // arch-ne's post before heading right under the arcade and south to park.
+    // the frog's circle. Stop at y <= 412 so each 43-unit upward drag lands in
+    // y 372-412, below both market-door (y <= 368) and parlor-door (y <= 364)
+    // and clear of the fountain/benches. Then walk right into the open aisle
+    // left of arch-ne's north post (x 945-990), nudging down-left if a drag
+    // overshoots into the narrow corner between the bakery and arch-ne
+    // (x >= 995), then step down past arch-ne's post before heading right
+    // under the arcade and south to park.
     await walkTo(
       { x: latest().x, y: 260 },
-      (value) => !value.moving && value.y <= 380,
+      (value) => !value.moving && value.y <= 412,
       "up around the plaza",
       "y",
     );

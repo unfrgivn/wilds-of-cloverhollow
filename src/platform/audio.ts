@@ -65,6 +65,10 @@ function stateOf(audio: AudioContext | null): AudioState {
   return state === "running" || state === "closed" || state === "interrupted" ? state : "suspended";
 }
 
+export function shouldResumeAudioOnVisible(hidden: boolean, state: AudioState): boolean {
+  return !hidden && (state === "interrupted" || state === "suspended");
+}
+
 export type AudioController = {
   play: (cue: SoundCue, tick: number, context?: SoundPlayContext) => SoundLogEntry;
   playEffect: (effect: CompanionAudioEffect) => void;
@@ -434,20 +438,38 @@ export function createAudio(
     effectRecipes[effect].forEach((segment) => playSegment(audio, segment, now + segment.offset));
   };
 
+  let hasUserGesture = false;
+  const unlockFromGesture = (): void => {
+    hasUserGesture = true;
+    unlock();
+  };
+  const handleVisible = (): void => {
+    const current = stateOf(context);
+    if (
+      shouldResumeAudioOnVisible(document.hidden, current) &&
+      (current === "interrupted" || hasUserGesture)
+    ) {
+      unlock();
+    }
+    syncPlayers();
+  };
+
   const booted = ensureContext();
   if (booted === null) onStateChange(stateOf(booted));
   else {
+    if (stateOf(booted) === "running") hasUserGesture = true;
     booted.addEventListener("statechange", () => {
+      if (stateOf(booted) === "running") hasUserGesture = true;
       syncPlayers();
       onStateChange(stateOf(booted));
     });
     onStateChange(stateOf(booted));
     unlock();
   }
-  window.addEventListener("pointerdown", unlock, { passive: true });
-  window.addEventListener("touchstart", unlock, { passive: true });
+  window.addEventListener("pointerdown", unlockFromGesture, { passive: true });
+  window.addEventListener("touchstart", unlockFromGesture, { passive: true });
   window.addEventListener("keydown", (event) => {
-    unlock();
+    unlockFromGesture();
     if (
       event.code === "KeyM" &&
       !(
@@ -457,7 +479,8 @@ export function createAudio(
     )
       toggle();
   });
-  document.addEventListener("visibilitychange", syncPlayers);
+  document.addEventListener("visibilitychange", handleVisible);
+  window.addEventListener("pageshow", handleVisible);
   void store.load((value) => {
     if (store.isDirty()) persist();
     else {

@@ -5841,6 +5841,44 @@ the old trail, the owl, and the clubhouse claim.
   deprecation warnings; production and harness hook checks green), and full
   e2e across Chromium & WebKit (0 failed, 0 snapshot diffs).
 
+## Milestone 132: iOS Audio Interruption Auto-Resume (`src/platform/audio.ts`), Portable Save Backup Envelope (`src/shell/save-backup.ts`), Touch-Safe World Prompts & iOS Smoke Plaza Route Fix **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- iOS Audio Interruption Auto-Resume (`src/platform/audio.ts`):
+  - Exports pure `shouldResumeAudioOnVisible(hidden, state)` returning
+    `!hidden && (state === "interrupted" || state === "suspended")`.
+  - Updates `visibilitychange` and registers `pageshow` to invoke `unlock()`
+    before `syncPlayers()` when returning visible with an `interrupted`
+    context or after a prior user gesture / running session, keeping initial
+    browser autoplay behavior intact.
+- Portable Save Backup Envelope (`src/shell/save-backup.ts`, `src/dev/hook.ts`,
+  `src/main.ts`):
+  - Adds pure `SaveBackupEnvelope`, `saveBackupFilename`, `formatSaveBackup`,
+    and `parseSaveBackup` accepting both valid envelopes and raw `serializeSave`
+    JSON via `parseSave` without throwing or bumping the core save version.
+  - Wires optional `exportBackup` and `importBackup` onto dev/harness-only
+    `window.__cloverhollow.save` with zero production bundle leakage.
+- Touch-Safe World Prompt Pass-Through (`src/ui/sticker.css`, `spec.md`):
+  - Caught live on iPhone 17 (`just ios-smoke`): when a floating `.sticker-prompt`
+    appeared over the lower-left thumb stick zone in Meadow Park, `pointer-events: auto`
+    intercepted touch joystick drags. Scoped `:root[data-touch="on"] .sticker-prompt`
+    to `pointer-events: none; cursor: default;` so touch movement drags never get
+    stolen while desktop click-to-interact stays active.
+- iOS Smoke Plaza Route Fix (`tools/ios/smoke.ts`):
+  - Stops `"up around the plaza"` at `y <= 412` so 43-unit drags land cleanly
+    in `y = 372..412`, below Milestone 130's `market-door` (`y <= 368`) and
+    `parlor-door` (`y <= 364`) and clear of the fountain/benches.
+- Evidence: `tests/unit/milestone-132.test.ts` (4 tests covering audio
+  visibility auto-resume, save backup filename/round-trip/rejection, and
+  headless Town Plaza route clearance across `y = 372..412`).
+- Gates: `just check` (192 unit files / 1,421 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), full
+  `CLOVERHOLLOW_E2E_PORT=4511/4512 just e2e` (630 Chromium + 535 WebKit = 1,165
+  passed, 2 skipped, 0 failed, 0 snapshot diffs), `just ios-smoke` (passed
+  end-to-end on iPhone 17 / iOS 27.0), and `just ios-device-build` (unsigned
+  arm64 `Release-iphoneos/App.app` built cleanly).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -1101,7 +1101,10 @@ async function boot(): Promise<void> {
   render();
   inputShortcuts.bind();
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-    const { installHook } = await import("./dev/hook");
+    const [{ installHook }, { formatSaveBackup, parseSaveBackup }] = await Promise.all([
+      import("./dev/hook"),
+      import("./shell/save-backup"),
+    ]);
     installHook({
       input,
       get: () => state,
@@ -1160,6 +1163,35 @@ async function boot(): Promise<void> {
         },
         last: () => saveStore.last(),
         loaded: () => (qaActivePack === null && !qaBlocked ? saveStore.loaded() : null),
+        exportBackup: () => formatSaveBackup(state, content.world, new Date().toISOString()),
+        importBackup: async (raw) => {
+          if (qaActivePack !== null || qaBlocked) return false;
+          const imported = parseSaveBackup(raw, fresh, speciesXp, content.world.levels.thresholds);
+          if (imported === null) return false;
+          const wrote = await saveStore.write(serializeSave(imported), {
+            tick: imported.tick,
+            hash: stableHash(imported),
+          });
+          if (!wrote) return false;
+          state = imported;
+          previousState = state;
+          saveDirty = false;
+          bannerTracker.clear();
+          saveToast.hide();
+          titleMode = null;
+          prefetchedTarget = undefined;
+          jukeboxTrack = null;
+          battlePeekOpen = false;
+          activeArcadeRecord = null;
+          fishStreak = 0;
+          setPhotoMode(false);
+          levelUpNotices.length = 0;
+          swallowed.clear();
+          await Promise.all([ensureArea(true), assets.warmJournalAssets(state)]);
+          render();
+          invalidate();
+          return true;
+        },
       },
       sound: {
         log: sound.log, muted: sound.muted, level: sound.level,

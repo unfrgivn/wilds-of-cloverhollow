@@ -92,6 +92,8 @@ export type CloverhollowHook = {
     clear: () => Promise<void>;
     last: () => { tick: number; hash: string } | null;
     loaded: () => { tick: number; hash: string } | null;
+    exportBackup?: () => string;
+    importBackup?: (raw: string) => Promise<boolean>;
   };
   boot: { title: () => "fresh" | "continue" | "confirm" | null };
   qa: { active: () => boolean; packs: () => QaPack[] };

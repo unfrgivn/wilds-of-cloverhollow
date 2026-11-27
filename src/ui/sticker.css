@@ -506,6 +506,13 @@
   touch-action: manipulation;
   transform: translate(-50%, calc(-100% - 45px));
 }
+/* On touch screens the left-hand stick spans the lower-left zone; keep the
+   floating world prompt pass-through so a sign near the stick never steals a
+   movement drag (players use the dedicated confirm thumb sticker). */
+:root[data-touch="on"] .sticker-prompt {
+  cursor: default;
+  pointer-events: none;
+}
 .sticker-prompt > span {
   display: inline-block;
   animation: prompt-float 1600ms ease-in-out infinite;

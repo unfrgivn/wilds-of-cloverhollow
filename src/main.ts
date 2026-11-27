@@ -38,6 +38,7 @@ import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
 import {
   continueDetail,
+  titleEffectForTransition,
   titleFlow,
   type TitleInput,
   type TitleMode,
@@ -208,13 +209,38 @@ async function boot(): Promise<void> {
   const areaBanner = createAreaBanner(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
   const bannerTracker = createAreaBannerTracker();
+  // True while the harness drives ticks synthetically (the hook's `step`): a
+  // replay crossing a dozen doors must load and warm only the area it ends in
+  // (spec 11), not every room it passes through.
+  let harnessStepping = false;
+  const playToggleFeedback = (on: boolean): void => {
+    sound.playEffect(on ? "toggle-on" : "toggle-off");
+    if (!harnessStepping) haptics.trigger("light");
+  };
   const journal = createJournal(uiRoot);
-  journal.onToggleAudio(withInvalidate(() => sound.toggle()));
+  journal.onPageChange(() => {
+    sound.playEffect("page-turn");
+    if (!harnessStepping) haptics.trigger("light");
+  });
+  journal.onOverlayChange((open) => {
+    sound.playEffect(open ? "card-open" : "card-close");
+    if (open && !harnessStepping) haptics.trigger("light");
+  });
+  journal.onToggleAudio(withInvalidate(() => {
+    sound.toggle();
+    if (!sound.muted()) playToggleFeedback(true);
+  }));
   journal.onSetAudioLevel(withInvalidate((level: AudioLevel) => sound.setLevel(level)));
-  journal.onToggleMusic(withInvalidate(() => sound.toggleMusic()));
+  journal.onToggleMusic(withInvalidate(() => {
+    sound.toggleMusic();
+    playToggleFeedback(!sound.musicMuted());
+  }));
   journal.onSetMusicLevel(withInvalidate((level: AudioLevel) => sound.setMusicLevel(level)));
   let jukeboxTrack: JukeboxTrack | null = null;
-  journal.onToggleAmbience(withInvalidate(() => sound.toggleAmbience()));
+  journal.onToggleAmbience(withInvalidate(() => {
+    sound.toggleAmbience();
+    playToggleFeedback(!sound.ambienceMuted());
+  }));
   journal.onStepTrack((delta) => {
     if (!state.journalOpen) return;
     const nextTrack = stepJukeboxTrack(
@@ -233,10 +259,22 @@ async function boot(): Promise<void> {
     jukeboxTrack = null;
     invalidate();
   });
-  journal.onToggleGentleTiming(withInvalidate(() => gameSettings.toggleGentleTiming()));
-  journal.onToggleKeyHints(withInvalidate(() => gameSettings.toggleKeyHints()));
-  journal.onCycleTextSpeed(withInvalidate(() => gameSettings.cycleTextSpeed()));
-  journal.onToggleReducedMotion(withInvalidate(() => gameSettings.toggleReducedMotion()));
+  journal.onToggleGentleTiming(withInvalidate(() => {
+    gameSettings.toggleGentleTiming();
+    playToggleFeedback(gameSettings.gentleTiming());
+  }));
+  journal.onToggleKeyHints(withInvalidate(() => {
+    gameSettings.toggleKeyHints();
+    playToggleFeedback(gameSettings.keyHints());
+  }));
+  journal.onCycleTextSpeed(withInvalidate(() => {
+    gameSettings.cycleTextSpeed();
+    playToggleFeedback(gameSettings.textSpeed() !== "cozy");
+  }));
+  journal.onToggleReducedMotion(withInvalidate(() => {
+    gameSettings.toggleReducedMotion();
+    playToggleFeedback(gameSettings.reducedMotion());
+  }));
   const title = createTitleScreen(uiRoot);
   const qaMenu = qaTools === null ? null : qaTools.createQaMenu(uiRoot, qaEntries);
   const qaBadge = qaTools === null ? null : qaTools.createQaBadge(uiRoot);
@@ -291,9 +329,15 @@ async function boot(): Promise<void> {
     restored === null ? "new-game" : "continue";
   const applyTitle = (input: TitleInput): void => {
     if (titleMode === null || qaBlocked || qaActivePack !== null) return;
+    const before = { mode: titleMode, selected: titleSelected };
     const result = titleFlow(titleMode, titleSelected, input);
     titleMode = result.mode;
     titleSelected = result.selected;
+    const effect = titleEffectForTransition(before, result);
+    if (effect !== null) {
+      sound.playEffect(effect);
+      if (effect === "title-start" && !harnessStepping) haptics.trigger("light");
+    }
     if (result.action === "new-game") {
       state = createState(content.world, initialFixture);
       previousState = state;
@@ -312,10 +356,6 @@ async function boot(): Promise<void> {
   );
   let saveDirty = false;
   let suppressSave = false;
-  // True while the harness drives ticks synthetically (the hook's `step`): a
-  // replay crossing a dozen doors must load and warm only the area it ends in
-  // (spec 11), not every room it passes through.
-  let harnessStepping = false;
   const saveState = async (
     snapshot: State,
     options?: { silent?: boolean },
@@ -498,8 +538,9 @@ async function boot(): Promise<void> {
     qaBlocked,
     photoMode,
   });
-  const setPhotoMode = (on: boolean): void => {
+  const setPhotoMode = (on: boolean, silent = false): void => {
     const next = on && canPhotoMode(overlayContext());
+    const changed = next !== photoMode;
     photoMode = next;
     document.documentElement.dataset.photo = next ? "on" : "off";
     view.setPhotoMode(next);
@@ -509,6 +550,10 @@ async function boot(): Promise<void> {
     } else {
       shutterFlash.hide();
     }
+    if (changed && !silent && titleMode === null && state.battle === null) {
+      sound.playEffect(next ? "toggle-on" : "toggle-off");
+      if (next && !harnessStepping) haptics.trigger("light");
+    }
     invalidate();
   };
   let battlePeekOpen = false;
@@ -516,7 +561,10 @@ async function boot(): Promise<void> {
     const next = on && canBattlePeek(overlayContext());
     if (next === battlePeekOpen) return;
     battlePeekOpen = next;
-    sound.play("choice-move", state.tick);
+    if (state.battle !== null) {
+      sound.playEffect(next ? "card-open" : "card-close");
+      if (next && !harnessStepping) haptics.trigger("light");
+    }
     invalidate();
   };
   battleHud.onPeekToggle(() => setBattlePeek(!battlePeekOpen));
@@ -1144,7 +1192,8 @@ async function boot(): Promise<void> {
         battlePeekOpen = false;
         activeArcadeRecord = null;
         fishStreak = 0;
-        setPhotoMode(false);
+        setPhotoMode(false, true);
+        sound.clearEffects();
         inputShortcuts.resetInputMode();
         cancelDown = false;
         levelUpNotices.length = 0;
@@ -1184,7 +1233,7 @@ async function boot(): Promise<void> {
           battlePeekOpen = false;
           activeArcadeRecord = null;
           fishStreak = 0;
-          setPhotoMode(false);
+          setPhotoMode(false, true);
           levelUpNotices.length = 0;
           swallowed.clear();
           await Promise.all([ensureArea(true), assets.warmJournalAssets(state)]);
@@ -1194,7 +1243,7 @@ async function boot(): Promise<void> {
         },
       },
       sound: {
-        log: sound.log, muted: sound.muted, level: sound.level,
+        log: sound.log, effects: sound.effects, muted: sound.muted, level: sound.level,
         state: sound.state, music: sound.music,
       },
       settings: {

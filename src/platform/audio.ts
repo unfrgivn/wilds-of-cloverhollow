@@ -72,6 +72,8 @@ export function shouldResumeAudioOnVisible(hidden: boolean, state: AudioState): 
 export type AudioController = {
   play: (cue: SoundCue, tick: number, context?: SoundPlayContext) => SoundLogEntry;
   playEffect: (effect: CompanionAudioEffect) => void;
+  effects: () => readonly CompanionAudioEffect[];
+  clearEffects: () => void;
   toggle: () => void;
   muted: () => boolean;
   setLevel: (level: AudioLevel) => void;
@@ -145,6 +147,7 @@ export function createAudio(
     return noise;
   };
   const entries: SoundLogEntry[] = [];
+  const playedEffects: CompanionAudioEffect[] = [];
 
   const pageVisible = (): boolean =>
     typeof document === "undefined" || !document.hidden;
@@ -436,6 +439,8 @@ export function createAudio(
     if (audio === null || master === null || stateOf(audio) !== "running") return;
     const now = audio.currentTime;
     effectRecipes[effect].forEach((segment) => playSegment(audio, segment, now + segment.offset));
+    playedEffects.push(effect);
+    if (playedEffects.length > 64) playedEffects.shift();
   };
 
   let hasUserGesture = false;
@@ -502,6 +507,10 @@ export function createAudio(
       return entry;
     },
     playEffect,
+    effects: () => playedEffects.slice(),
+    clearEffects: () => {
+      playedEffects.length = 0;
+    },
     toggle,
     muted: () => muted,
     setLevel,

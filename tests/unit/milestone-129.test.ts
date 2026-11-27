@@ -449,16 +449,17 @@ describe("Milestone 129: Overworld Pointer Steering & Input Shortcuts", () => {
     shortcuts.handleKeydown(makeKeyEvent("Escape").event);
     expect(ctx.photoMode).toBe(false);
 
-    // Journal keyboard tab flip & layered cancel-edge dismissal.
+    // Journal keyboard tab flip & layered cancel-edge dismissal use bespoke foley callbacks.
     ctx = makeOverlayContext({ state: { ...ctx.state, journalOpen: true } });
     shortcuts.handleKeydown(makeKeyEvent("BracketRight").event);
     expect(pageSteps).toEqual([1]);
-    expect(choiceMoves).toBe(1);
+    expect(choiceMoves).toBe(0);
 
     hasJournalOverlay = true;
     expect(shortcuts.handleCancelEdge(false)).toBe("swallow");
     expect(hasJournalOverlay).toBe(false);
     expect(swallowed.at(-1)).toBe("cancel");
+    expect(choiceMoves).toBe(0);
 
     // Gamepad activity switches HUD mode and drives journal bumper + focus nav.
     padActivity = true;

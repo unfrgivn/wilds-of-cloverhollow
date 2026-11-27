@@ -248,14 +248,12 @@ export function createInputShortcuts(
       if (event.code === "BracketLeft" || event.code === "PageUp") {
         event.preventDefault();
         deps.journal.stepPage(-1);
-        deps.playChoiceMove();
         deps.invalidate();
         return;
       }
       if (event.code === "BracketRight" || event.code === "PageDown") {
         event.preventDefault();
         deps.journal.stepPage(1);
-        deps.playChoiceMove();
         deps.invalidate();
         return;
       }
@@ -361,7 +359,6 @@ export function createInputShortcuts(
     const journalActive = isJournalShortcutActive(ctx);
     if (bumperStep !== 0 && journalActive) {
       deps.journal.stepPage(bumperStep);
-      deps.playChoiceMove();
       deps.invalidate();
     }
     if (journalActive && !deps.journal.hasOpenOverlay()) {
@@ -386,7 +383,6 @@ export function createInputShortcuts(
     if (ctx.state.journalOpen && deps.journal.hasOpenOverlay()) {
       deps.journal.dismissOverlay();
       deps.swallow("cancel");
-      deps.playChoiceMove();
       deps.invalidate();
       return "swallow";
     }

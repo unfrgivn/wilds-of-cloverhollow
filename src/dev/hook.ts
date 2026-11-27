@@ -99,6 +99,7 @@ export type CloverhollowHook = {
   qa: { active: () => boolean; packs: () => QaPack[] };
   sound: {
     log: AudioController["log"];
+    effects: AudioController["effects"];
     muted: AudioController["muted"];
     level: AudioController["level"];
     state: AudioController["state"];

@@ -244,36 +244,48 @@ function wireInspectable(root: HTMLElement, onInspect?: () => void): void {
   });
 }
 
+function createSlotShell(
+  grid: HTMLElement,
+  rootClass: string,
+  mediaClass: string,
+  unknownLabel: string,
+  onInspect?: () => void,
+): {
+  root: HTMLDivElement;
+  media: HTMLDivElement;
+  unknown: HTMLDivElement;
+  name: HTMLDivElement;
+} {
+  const root = element("div", rootClass);
+  const media = element("div", mediaClass);
+  media.setAttribute("role", "img");
+  const unknown = element("div", "journal-unknown");
+  unknown.textContent = "?";
+  unknown.setAttribute("aria-label", unknownLabel);
+  const name = element("div", "journal-name");
+  root.append(media, unknown, name);
+  wireInspectable(root, onInspect);
+  grid.append(root);
+  return { root, media, unknown, name };
+}
+
 function addSlot(
   grid: HTMLElement,
   onInspect?: () => void,
   unknownLabel = "A sticker still to find",
 ): Slot {
-  const root = element("div", "journal-slot");
-  const image = element("div", "journal-sticker-image die-cut");
-  image.setAttribute("role", "img");
-  const unknown = element("div", "journal-unknown");
-  unknown.textContent = "?";
-  unknown.setAttribute("aria-label", unknownLabel);
-  const name = element("div", "journal-name");
-  root.append(image, unknown, name);
-  wireInspectable(root, onInspect);
-  grid.append(root);
-  return { root, image, unknown, name, imageKey: "" };
+  const s = createSlotShell(
+    grid, "journal-slot", "journal-sticker-image die-cut", unknownLabel, onInspect,
+  );
+  return { root: s.root, image: s.media, unknown: s.unknown, name: s.name, imageKey: "" };
 }
 
 function addKeepsakeSlot(grid: HTMLElement, onInspect?: () => void): KeepsakeSlot {
-  const root = element("div", "journal-slot journal-keepsake-slot");
-  const charm = element("div", "journal-keepsake-charm");
-  charm.setAttribute("role", "img");
-  const unknown = element("div", "journal-unknown");
-  unknown.textContent = "?";
-  unknown.setAttribute("aria-label", "A keepsake still to find");
-  const name = element("div", "journal-name");
-  root.append(charm, unknown, name);
-  wireInspectable(root, onInspect);
-  grid.append(root);
-  return { root, charm, unknown, name, iconId: null };
+  const s = createSlotShell(
+    grid, "journal-slot journal-keepsake-slot", "journal-keepsake-charm",
+    "A keepsake still to find", onInspect,
+  );
+  return { root: s.root, charm: s.media, unknown: s.unknown, name: s.name, iconId: null };
 }
 
 function syncInspectableSlot(root: HTMLElement, inspectable: boolean, name: string): void {
@@ -283,9 +295,9 @@ function syncInspectableSlot(root: HTMLElement, inspectable: boolean, name: stri
     setAttribute(root, "role", "button");
     setAttribute(root, "aria-label", `Inspect ${name}`);
   } else {
-    if (root.hasAttribute("tabindex")) root.removeAttribute("tabindex");
-    if (root.hasAttribute("role")) root.removeAttribute("role");
-    if (root.hasAttribute("aria-label")) root.removeAttribute("aria-label");
+    for (const attr of ["tabindex", "role", "aria-label"]) {
+      if (root.hasAttribute(attr)) root.removeAttribute(attr);
+    }
   }
 }
 
@@ -344,7 +356,14 @@ function syncChild(parent: Element, node: Element, show: boolean): void {
 // Fae's supplies, each a pill with its count: a gold coin and a cookie for
 // her snacks on the notes page's heading row (`journal-supply`), and her
 // tickets on the PRIZES heading (`journal-tickets`, the same pill).
-function supply(kind: "coins" | "snacks" | "tickets" | "gems", label: string): {
+const supplyMarkup = {
+  coins: coinMarkup,
+  snacks: cookieMarkup,
+  gems: gemMarkup,
+  tickets: ticketMarkup,
+} as const;
+
+function supply(kind: keyof typeof supplyMarkup, label: string): {
   root: HTMLSpanElement;
   count: HTMLSpanElement;
 } {
@@ -354,14 +373,7 @@ function supply(kind: "coins" | "snacks" | "tickets" | "gems", label: string): {
   const svg = document.createElementNS(svgNamespace, "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
   svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML =
-    kind === "coins"
-      ? coinMarkup
-      : kind === "snacks"
-        ? cookieMarkup
-        : kind === "gems"
-          ? gemMarkup
-          : ticketMarkup;
+  svg.innerHTML = supplyMarkup[kind];
   const count = element("span", `${pill}-count`);
   root.append(svg, `${label} `, count);
   return { root, count };
@@ -403,6 +415,8 @@ export function createJournal(root: HTMLElement): {
   activateFocused: () => boolean;
   hasOpenOverlay: () => boolean;
   dismissOverlay: () => boolean;
+  onPageChange: (callback: (page: JournalPage) => void) => void;
+  onOverlayChange: (callback: (open: boolean) => void) => void;
   onClose: (callback: () => void) => void;
   onToggleAudio: (callback: () => void) => void;
   onSetAudioLevel: (callback: (level: AudioLevel) => void) => void;
@@ -476,7 +490,11 @@ export function createJournal(root: HTMLElement): {
   stickersPage.append(stickersHeading, grid, prizesHeading, prizesGrid);
 
   let latestView: JournalView | null = null;
-  const fieldOverlays = createJournalFieldOverlays();
+  let onPageChange: (page: JournalPage) => void = () => undefined;
+  let onOverlayChange: (open: boolean) => void = () => undefined;
+  const fieldOverlays = createJournalFieldOverlays({
+    onVisibilityChange: (open) => onOverlayChange(open),
+  });
   const mapPage = createJournalMapPage(() => fieldOverlays.openTreasures(latestView));
 
   // Two-page open-book OPTIONS spread: Sound & Music on the left, Gameplay on the right.
@@ -503,19 +521,14 @@ export function createJournal(root: HTMLElement): {
     "journal-opt-slider journal-opt-sfx-slider",
     "Sound effects volume",
   );
-  const sfxRow = makeOptionRow("Sound Effects", null, [optSfx, optSfxSlider.button]);
-
   const optMusic = makeButton("journal-opt-toggle journal-opt-music", "Toggle music");
   const musicSlider = makeSliderButton("journal-opt-slider journal-music-slider", "Music volume");
-  const musicRow = makeOptionRow("Music", null, [optMusic, musicSlider.button]);
-
   const optAmbience = makeButton("journal-opt-toggle journal-opt-ambience", "Toggle ambience");
-  const ambienceRow = makeOptionRow(
-    "Ambience",
-    "Waves, wind, birds & hearth",
-    [optAmbience],
+  soundList.append(
+    makeOptionRow("Sound Effects", null, [optSfx, optSfxSlider.button]),
+    makeOptionRow("Music", null, [optMusic, musicSlider.button]),
+    makeOptionRow("Ambience", "Waves, wind, birds & hearth", [optAmbience]),
   );
-  soundList.append(sfxRow, musicRow, ambienceRow);
   soundPage.append(optionsHead, soundList);
 
   const playPage = element("section", "journal-options-play-page");
@@ -526,31 +539,25 @@ export function createJournal(root: HTMLElement): {
 
   const playList = element("div", "journal-options-list");
   const optGentle = makeButton("journal-opt-toggle journal-opt-gentle", "Toggle gentle timing");
-  const gentleRow = makeOptionRow("Gentle Timing", "Wider windows in calm-downs", [optGentle]);
-
   const optHints = makeButton("journal-opt-toggle journal-opt-hints", "Toggle key hints");
-  const hintsRow = makeOptionRow("Key Hints", "Show keys while exploring", [optHints]);
-
   const optTextSpeed = makeButton(
     "journal-opt-toggle journal-option-text-speed",
     "Cycle text speed",
   );
-  const textSpeedRow = makeOptionRow(
-    "Text Speed",
-    "How fast story and battle lines appear",
-    [optTextSpeed],
-  );
-
   const optReducedMotion = makeButton(
     "journal-opt-toggle journal-option-reduced-motion",
     "Toggle reduced motion",
   );
-  const reducedMotionRow = makeOptionRow(
-    "Reduced Motion",
-    "Calms animations, shakes, and fluttering effects",
-    [optReducedMotion],
+  playList.append(
+    makeOptionRow("Gentle Timing", "Wider windows in calm-downs", [optGentle]),
+    makeOptionRow("Key Hints", "Show keys while exploring", [optHints]),
+    makeOptionRow("Text Speed", "How fast story and battle lines appear", [optTextSpeed]),
+    makeOptionRow(
+      "Reduced Motion",
+      "Calms animations, shakes, and fluttering effects",
+      [optReducedMotion],
+    ),
   );
-  playList.append(gentleRow, hintsRow, textSpeedRow, reducedMotionRow);
 
   const controlsCard = element("div", "journal-controls-card");
   const controlsTitle = element("div", "journal-controls-title");
@@ -570,15 +577,8 @@ export function createJournal(root: HTMLElement): {
   tabs.append(notesTab, mapTab, optionsTab);
 
   book.append(
-    label,
-    close,
-    notesPage,
-    stickersPage,
-    mapPage.root,
-    optionsPage,
-    tabs,
-    fieldOverlays.fieldBackdrop,
-    fieldOverlays.treasuresBackdrop,
+    label, close, notesPage, stickersPage, mapPage.root, optionsPage, tabs,
+    fieldOverlays.fieldBackdrop, fieldOverlays.treasuresBackdrop,
   );
   root.append(book);
 
@@ -600,20 +600,21 @@ export function createJournal(root: HTMLElement): {
   let treatsSignature = "";
   let recordsSignature = "";
 
-  const setPage = (next: JournalPage): void => {
+  const applyPage = (next: JournalPage, notify: boolean): void => {
     fieldOverlays.closeAll();
-    if (page === next && book.getAttribute("data-journal-page") === next) return;
+    const changed = page !== next;
+    if (!changed && book.getAttribute("data-journal-page") === next) return;
     page = next;
     setAttribute(book, "data-journal-page", page);
     notesPage.hidden = page !== "notes";
     stickersPage.hidden = page !== "notes";
     mapPage.root.hidden = page !== "map";
     optionsPage.hidden = page !== "options";
+    if (notify && changed) onPageChange(page);
   };
 
-  const stepPage = (delta: -1 | 1): void => {
-    setPage(stepJournalPage(page, delta));
-  };
+  const setPage = (next: JournalPage): void => applyPage(next, true);
+  const stepPage = (delta: -1 | 1): void => setPage(stepJournalPage(page, delta));
 
   notesTab.addEventListener("click", () => setPage("notes"));
   mapTab.addEventListener("click", () => setPage("map"));
@@ -621,24 +622,15 @@ export function createJournal(root: HTMLElement): {
 
   const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
   const nav = createJournalNavController({
-    book,
-    notesPage,
-    stickersPage,
-    optionsPage,
-    soundPage,
-    playPage,
-    jukebox,
-    mapRoot: mapPage.root,
-    sliderSteppers,
-    getPage: () => page,
-    setPage,
+    book, notesPage, stickersPage, optionsPage, soundPage, playPage, jukebox,
+    mapRoot: mapPage.root, sliderSteppers, getPage: () => page, setPage,
     hasOpenOverlay: () => fieldOverlays.hasOpen(),
     handleOverlayKeydown: (event) => fieldOverlays.handleKeydown(event),
     stepMapLandFocus: (delta) => mapPage.stepLandFocus(delta),
     stepTrack: (delta) => onStepTrack(delta),
   });
   document.addEventListener("keydown", nav.handleKeydown);
-  setPage("notes");
+  applyPage("notes", false);
 
   close.addEventListener("click", () => onClose());
   audio.addEventListener("click", () => onToggleAudio());
@@ -701,6 +693,8 @@ export function createJournal(root: HTMLElement): {
     activateFocused: nav.activateFocused,
     hasOpenOverlay: () => fieldOverlays.hasOpen(),
     dismissOverlay: () => fieldOverlays.dismiss(),
+    onPageChange: (cb) => { onPageChange = cb; },
+    onOverlayChange: (cb) => { onOverlayChange = cb; },
     onClose: (cb) => { onClose = cb; },
     onToggleAudio: (cb) => { onToggleAudio = cb; },
     onSetAudioLevel: (cb) => { onSetAudioLevel = cb; },
@@ -718,7 +712,7 @@ export function createJournal(root: HTMLElement): {
       book.hidden = !view.visible;
       if (!view.visible && wasVisible) {
         fieldOverlays.closeAll();
-        setPage("notes");
+        applyPage("notes", false);
         mapPage.resetSelection();
       }
       wasVisible = view.visible;
@@ -822,16 +816,9 @@ export function createJournal(root: HTMLElement): {
           return;
         setText(name, member.name);
         setText(level, `Lv ${member.level}`);
-        const progress =
-          member.nextXp <= member.xp
-            ? 1
-            : Math.max(
-                0,
-                Math.min(
-                  1,
-                  (member.xp - member.startXp) / Math.max(1, member.nextXp - member.startXp),
-                ),
-              );
+        const span = Math.max(1, member.nextXp - member.startXp);
+        const ratio = (member.xp - member.startXp) / span;
+        const progress = member.nextXp <= member.xp ? 1 : Math.max(0, Math.min(1, ratio));
         const xpMarkup =
           `<div class="journal-xp-fill" style="width:${progress * 100}%"></div>` +
           `<span>${member.xp} XP</span>`;

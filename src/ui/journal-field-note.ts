@@ -63,7 +63,9 @@ export function fieldNoteBlurb(note: CritterFieldNote): string {
   return "A cozy valley friend sketched right into Fae's notebook.";
 }
 
-export function createJournalFieldOverlays(): JournalFieldOverlays {
+export function createJournalFieldOverlays(options?: {
+  onVisibilityChange?: (open: boolean) => void;
+}): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop");
   fieldBackdrop.hidden = true;
   const fieldCard = element("article", "journal-field-note");
@@ -164,24 +166,44 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
   let treasuresSignature = "";
   let inspectedItem: InspectedJournalItem | null = null;
   let treasuresOpen = false;
+  const onVisibilityChange = options?.onVisibilityChange;
 
-  const closeFieldNote = (): void => {
+  const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null;
+
+  const notifyVisibility = (wasOpen: boolean): void => {
+    const nowOpen = hasOpen();
+    if (nowOpen !== wasOpen) onVisibilityChange?.(nowOpen);
+  };
+
+  const clearFieldNote = (): void => {
     if (inspectedItem === null && fieldBackdrop.hidden) return;
     inspectedItem = null;
     fieldSignature = "";
     fieldBackdrop.hidden = true;
   };
 
-  const closeTreasures = (): void => {
+  const clearTreasures = (): void => {
     if (!treasuresOpen && treasuresBackdrop.hidden) return;
     treasuresOpen = false;
     treasuresBackdrop.hidden = true;
   };
 
+  const closeFieldNote = (): void => {
+    const wasOpen = hasOpen();
+    clearFieldNote();
+    notifyVisibility(wasOpen);
+  };
+
+  const closeTreasures = (): void => {
+    const wasOpen = hasOpen();
+    clearTreasures();
+    notifyVisibility(wasOpen);
+  };
+
   const syncTreasures = (view: JournalFieldNoteSource): void => {
     const summary = view.treasures;
     if (!treasuresOpen || summary === undefined || !summary.hasAny) {
-      if (!treasuresBackdrop.hidden) closeTreasures();
+      if (!treasuresBackdrop.hidden) clearTreasures();
       return;
     }
     treasuresBackdrop.hidden = false;
@@ -270,7 +292,7 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
       );
       const note = sticker?.fieldNote ?? null;
       if (sticker === undefined || note === null) {
-        closeFieldNote();
+        clearFieldNote();
         return;
       }
       fieldBackdrop.hidden = false;
@@ -323,7 +345,7 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
         (candidate) => candidate.id === inspectedItem?.id && candidate.owned,
       );
       if (fish === undefined) {
-        closeFieldNote();
+        clearFieldNote();
         return;
       }
       fieldBackdrop.hidden = false;
@@ -361,7 +383,7 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
       (candidate) => candidate.id === inspectedItem?.id && candidate.owned,
     );
     if (keepsake === undefined) {
-      closeFieldNote();
+      clearFieldNote();
       return;
     }
     fieldBackdrop.hidden = false;
@@ -402,11 +424,9 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
   });
 
   const closeAll = (): void => {
-    closeFieldNote();
-    closeTreasures();
+    clearFieldNote();
+    clearTreasures();
   };
-
-  const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null;
 
   const dismiss = (): boolean => {
     if (treasuresOpen) {
@@ -424,13 +444,17 @@ export function createJournalFieldOverlays(): JournalFieldOverlays {
     fieldBackdrop,
     treasuresBackdrop,
     inspect: (item, view) => {
+      const wasOpen = hasOpen();
       inspectedItem = item;
       if (view !== null) syncFieldNote(view);
+      notifyVisibility(wasOpen);
     },
     openTreasures: (view) => {
       if (view?.treasures?.hasAny !== true) return;
+      const wasOpen = hasOpen();
       treasuresOpen = true;
       syncTreasures(view);
+      notifyVisibility(wasOpen);
     },
     syncFieldNote,
     syncTreasures,

@@ -475,6 +475,30 @@ ios/            Capacitor iOS project (from Milestone 4).
   `soundCueRecipe`, `effectRecipe`, `AudioSegment`, `CompanionAudioEffect`) live
   in `src/platform/audio-recipes.ts` (Milestone 114) and are re-exported from
   `src/platform/audio.ts` for backwards-compatible unit verification.
+- Tactile storybook UI foley & haptic micro-feedback (Milestone 133,
+  `src/platform/audio-recipes.ts`, `src/platform/audio.ts`,
+  `src/shell/title-flow.ts`, `src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/shell/input-shortcuts.ts`, `src/main.ts`): extends
+  `CompanionAudioEffect` / `effectRecipes` with seven gentle (`<= 0.08` gain,
+  zero square wave) acoustic recipes: `"title-move"` (soft wooden-marimba
+  cursor tick), `"title-start"` (4-note sunlit harp/celesta chord with gentle
+  harmonic bloom), `"page-turn"` (feathery lowpass paper-rustle + bookmark tap),
+  `"card-open"` (crisp cardstock lift + rising chime), `"card-close"` (soft
+  cardstock tuck + settling tone), `"toggle-on"` (cheerful wooden-button click),
+  and `"toggle-off"` (gentle wooden-button release). `AudioController` records
+  played non-core effects in a rolling 64-entry buffer (`effects()`, cleared via
+  `clearEffects()` on harness resets) while keeping `log()` strictly
+  `SoundCue[]`. Title transitions map via pure `titleEffectForTransition`
+  (adding `"light"` haptic on `"title-start"`), Journal tab flips fire
+  `onPageChange` (`"page-turn"` + `"light"` haptic without double-playing
+  `"choice-move"`), Field Note / Field Treasures cards fire `onOverlayChange`
+  only on real user open/dismiss flips (`"card-open"` / `"card-close"` +
+  `"light"` haptic on open), Battle Field Guide Peek plays `"card-open"` /
+  `"card-close"` during active battle only, Photo Mode plays `"toggle-on"` /
+  `"toggle-off"` during live overworld transitions (silent on harness reset or
+  backup import), and Journal `OPTIONS` toggles (`Sound Effects` when unmuting,
+  `Music`, `Ambience`, `Gentle Timing`, `Key Hints`, `Text Speed`, and `Reduced
+  Motion`) play `"toggle-on"` / `"toggle-off"` + `"light"` haptic.
 ## 4. Presentation (locked)
 - Logical view: 720 units tall. Width = 720 x screen aspect, clamped to
   960..1600 (4:3 to 20:9). Letterbox outside that range.
@@ -2124,7 +2148,9 @@ trunks keep its two exits.
   Up/down move between the options and left/right between the confirm
   buttons; confirm picks; cancel backs out of the question. Defaults:
   Continue with a save, New game without; "No, go back" in the question,
-  which returns to Continue.
+  which returns to Continue. Pure `titleEffectForTransition(before, after)`
+  maps title transitions to `"title-start"`, `"card-open"` / `"card-close"`,
+  `"title-move"`, or `null` (Milestone 133).
 - Continue starts ticking the restored state as it is. New game (with no
   save, or "Yes, start over") replaces the state with a new game and deletes
   the old save. A button held when the title closes stays hidden from the
@@ -4066,6 +4092,8 @@ trunks keep its two exits.
   caughtSpecies, totalSpecies, front }`. Harness builds log
   `[cloverhollow] arcade { phase, message }` when either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
+  `sound.effects()` returns the rolling list (up to 64 entries) of played
+  non-core `CompanionAudioEffect` cues (cleared on harness resets),
   `sound.muted()` reports the separate audio preference, `sound.level()`
   reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), `sound.state()`
   returns the AudioContext's state string (`running`, `suspended`,

@@ -5879,6 +5879,44 @@ the old trail, the owl, and the clubhouse claim.
   end-to-end on iPhone 17 / iOS 27.0), and `just ios-device-build` (unsigned
   arm64 `Release-iphoneos/App.app` built cleanly).
 
+## Milestone 133: Tactile Storybook UI Foley, Paper Page-Turns, Title Chimes & Haptic Micro-Feedback **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Bespoke Tactile Storybook UI Foley Recipes (`src/platform/audio-recipes.ts`,
+  `src/platform/audio.ts`, `src/dev/hook.ts`, `src/main.ts`):
+  - Extends `CompanionAudioEffect` / `effectRecipes` with seven warm, gentle
+    (`<= 0.08` gain, zero square waves) acoustic recipes: `"title-move"`,
+    `"title-start"`, `"page-turn"`, `"card-open"`, `"card-close"`,
+    `"toggle-on"`, and `"toggle-off"`.
+  - Records played non-core shell effects in a rolling 64-entry buffer exposed
+    as `AudioController.effects()` (cleared via `clearEffects()` on harness
+    reset) and surfaced on dev/harness-only `window.__cloverhollow.sound.effects()`
+    while keeping `sound.log()` strictly `SoundCue[]`.
+- Pure Title Transition Audio Helper (`src/shell/title-flow.ts`, `src/main.ts`):
+  - Exports `TitleAction` and `titleEffectForTransition(before, after)` mapping
+    start actions to `"title-start"` (+ `"light"` haptic), confirm prompt
+    open/close to `"card-open"` / `"card-close"`, selection moves to
+    `"title-move"`, and no-ops to `null`.
+- Journal, Card, Photo Mode & Options Foley Wiring (`src/ui/journal-field-note.ts`,
+  `src/ui/journal.ts`, `src/shell/input-shortcuts.ts`, `src/main.ts`):
+  - Adds `onVisibilityChange` to `createJournalFieldOverlays` firing strictly on
+    real user open/dismiss flips (silent on programmatic close/sync), and
+    exposes `onPageChange` and `onOverlayChange` on `createJournal`.
+  - Wires `"page-turn"` + `"light"` haptic on Journal tab switches (removing
+    redundant `"choice-move"` double-triggers in `input-shortcuts.ts`),
+    `"card-open"` / `"card-close"` on Field Note, Field Treasures, and active
+    Battle Field Guide Peek cards, `"toggle-on"` / `"toggle-off"` on Photo Mode
+    transitions and all seven Journal `OPTIONS` toggles (`Sound Effects` on
+    unmute, `Music`, `Ambience`, `Gentle Timing`, `Key Hints`, `Text Speed`,
+    and `Reduced Motion`).
+- Evidence: `tests/unit/milestone-133.test.ts` (2 tests) and real-input
+  `tests/e2e/milestone-133.spec.ts` (`@smoke` on Chromium & WebKit).
+- Gates: `just check` (193 unit files / 1,423 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4521/4522 just e2e` (631 Chromium + 536 WebKit = 1,167
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -6,7 +6,14 @@ export type CompanionAudioEffect =
   | "pet-squirrel"
   | "pet-bunny"
   | "rest-sit"
-  | "camera-shutter";
+  | "camera-shutter"
+  | "title-move"
+  | "title-start"
+  | "page-turn"
+  | "card-open"
+  | "card-close"
+  | "toggle-on"
+  | "toggle-off";
 
 type Timing = { offset: number; duration: number; gain: number; attack?: number };
 export type AudioSegment =
@@ -700,6 +707,82 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
       attack: 0.001,
     },
     { wave: "noise", offset: 0.055, duration: 0.065, gain: 0.02, lowpass: 1100, attack: 0.006 },
+  ],
+  "title-move": [
+    {
+      wave: "triangle",
+      frequency: 494,
+      endFrequency: 523,
+      offset: 0,
+      duration: 0.055,
+      gain: 0.06,
+      attack: 0.003,
+    },
+  ],
+  "title-start": [
+    { wave: "triangle", frequency: 523, offset: 0, duration: 0.14, gain: 0.068, attack: 0.004 },
+    { wave: "triangle", frequency: 659, offset: 0.055, duration: 0.15, gain: 0.07, attack: 0.004 },
+    { wave: "sine", frequency: 784, offset: 0.11, duration: 0.17, gain: 0.072, attack: 0.004 },
+    { wave: "sine", frequency: 1046.5, offset: 0.165, duration: 0.24, gain: 0.075, attack: 0.005 },
+    { wave: "sine", frequency: 2093, offset: 0.18, duration: 0.18, gain: 0.022, attack: 0.005 },
+  ],
+  "page-turn": [
+    { wave: "noise", offset: 0, duration: 0.06, gain: 0.018, lowpass: 1700, attack: 0.006 },
+    {
+      wave: "triangle",
+      frequency: 587,
+      endFrequency: 659,
+      offset: 0.014,
+      duration: 0.05,
+      gain: 0.055,
+      attack: 0.003,
+    },
+  ],
+  "card-open": [
+    { wave: "noise", offset: 0, duration: 0.042, gain: 0.015, lowpass: 2100, attack: 0.004 },
+    {
+      wave: "sine",
+      frequency: 523,
+      endFrequency: 659,
+      offset: 0.008,
+      duration: 0.075,
+      gain: 0.06,
+      attack: 0.004,
+    },
+  ],
+  "card-close": [
+    { wave: "noise", offset: 0, duration: 0.038, gain: 0.013, lowpass: 1500, attack: 0.004 },
+    {
+      wave: "sine",
+      frequency: 587,
+      endFrequency: 440,
+      offset: 0.008,
+      duration: 0.068,
+      gain: 0.054,
+      attack: 0.004,
+    },
+  ],
+  "toggle-on": [
+    {
+      wave: "triangle",
+      frequency: 440,
+      endFrequency: 659,
+      offset: 0,
+      duration: 0.065,
+      gain: 0.062,
+      attack: 0.003,
+    },
+  ],
+  "toggle-off": [
+    {
+      wave: "triangle",
+      frequency: 523,
+      endFrequency: 392,
+      offset: 0,
+      duration: 0.062,
+      gain: 0.055,
+      attack: 0.003,
+    },
   ],
 };
 

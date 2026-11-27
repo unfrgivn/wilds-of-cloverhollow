@@ -195,6 +195,13 @@ describe("Milestone 114: modular audio-recipes.ts extraction & audio.ts re-expor
     "pet-bunny",
     "rest-sit",
     "camera-shutter",
+    "title-move",
+    "title-start",
+    "page-turn",
+    "card-open",
+    "card-close",
+    "toggle-on",
+    "toggle-off",
   ];
 
   it("defines valid non-empty recipes for every SoundCue and matches audio.ts re-exports", () => {

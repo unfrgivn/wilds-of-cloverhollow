@@ -1,7 +1,9 @@
 import { journalProgress, type State, type World } from "../core";
+import type { CompanionAudioEffect } from "../platform/audio";
 import type { TitleChoiceId } from "../ui/title";
 
 export type TitleMode = "fresh" | "continue" | "confirm";
+export type TitleAction = "continue" | "new-game" | null;
 export type TitleInput = {
   up: boolean;
   down: boolean;
@@ -14,8 +16,19 @@ export type TitleInput = {
 export type TitleResult = {
   mode: TitleMode | null;
   selected: TitleChoiceId;
-  action: "continue" | "new-game" | null;
+  action: TitleAction;
 };
+
+/** Maps a title screen transition to its storybook UI foley effect, or null on no-op. */
+export function titleEffectForTransition(
+  before: { mode: TitleMode; selected: TitleChoiceId },
+  after: { mode: TitleMode | null; selected: TitleChoiceId; action: TitleAction },
+): CompanionAudioEffect | null {
+  if (after.action === "continue" || after.action === "new-game") return "title-start";
+  if (before.mode !== after.mode) return after.mode === "confirm" ? "card-open" : "card-close";
+  if (before.selected !== after.selected) return "title-move";
+  return null;
+}
 
 export function titleFlow(
   mode: TitleMode,

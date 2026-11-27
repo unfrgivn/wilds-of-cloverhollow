@@ -3,8 +3,10 @@ import {
   longFlowTimeout,
   openHarness,
   openMap,
+  queueScript,
   readBattle,
   readState,
+  recording,
   renderInfo,
   resetPaused,
   step,
@@ -402,5 +404,92 @@ test(
 
     // Restore default cleanly.
     await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
+  },
+);
+
+test(
+  "Reduced Motion OPTIONS parity suppresses minigame animations and disables tap selection",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    test.setTimeout(longFlowTimeout);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    const readUserSelect = async (selector: string): Promise<string> =>
+      page.locator(selector).first().evaluate((el) => {
+        const style = getComputedStyle(el);
+        return style.userSelect || style.getPropertyValue("-webkit-user-select");
+      });
+
+    // 1) Toggle Reduced Motion: on via Journal OPTIONS with real keys + click.
+    await openHarness(page);
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
+    await resetPaused(page, "arcade");
+
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await page.keyboard.press("BracketLeft");
+    await expect(page.locator(".journal-book")).toHaveAttribute("data-journal-page", "options");
+    const reducedBtn = page.locator(".journal-option-reduced-motion");
+    await expect(reducedBtn).toHaveText("off");
+    await reducedBtn.click();
+    await expect(reducedBtn).toHaveText("on");
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.reducedMotion))
+      .toBe("on");
+    await page.keyboard.press("Escape");
+    await step(page, 2);
+
+    // 2) Open Claw Machine: verify user-select: none and suppressed claw transition.
+    for (const segment of recording("tests/sim/scripts/arcade/claw.json")) {
+      await queueScript(page, [segment]);
+      await step(page, segment.ticks);
+      const state = await readState(page);
+      if (state.arcade?.game === "claw" && state.arcade.phase === "ready") break;
+    }
+    await step(page, 1);
+    await expect(page.locator(".arcade-machine")).toBeVisible();
+    expect(await readUserSelect(".arcade-overlay")).toBe("none");
+    expect(await readUserSelect(".arcade-machine")).toBe("none");
+    const clawTransition = await page.locator(".arcade-claw").evaluate((el) => {
+      const style = getComputedStyle(el);
+      return { property: style.transitionProperty, duration: style.transitionDuration };
+    });
+    expect(clawTransition.property).toBe("none");
+
+    // 3) Open Bubblegum Bay Fishing: verify user-select: none and suppressed bite/card animations.
+    await resetPaused(page, "new-game");
+    const bayScript = recording("tests/sim/scripts/new-game/golden-bay.json");
+    const fishScript = recording("tests/sim/scripts/new-game/fish.json");
+    const arriveAtDock = fishScript.slice(0, bayScript.length + 8);
+    const arriveTicks = arriveAtDock.reduce((total, segment) => total + segment.ticks, 0);
+    await queueScript(page, arriveAtDock);
+    await step(page, arriveTicks);
+    await page.keyboard.press("z");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 2);
+
+    await expect(page.locator(".fish-overlay")).toBeVisible();
+    expect(await readUserSelect(".fish-overlay")).toBe("none");
+    expect(await readUserSelect(".fish-stage")).toBe("none");
+    const fishMotion = await page.locator(".fish-bite-badge").evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        animationName: style.animationName,
+        animationDuration: style.animationDuration,
+      };
+    });
+    expect(fishMotion.animationName).toBe("none");
+
+    // Restore default cleanly.
+    await page.evaluate(() => window.__cloverhollow?.settings.setReducedMotion(false));
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.reducedMotion))
+      .toBe("off");
   },
 );

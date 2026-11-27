@@ -17,6 +17,9 @@
   pointer-events: none;
   font-family: var(--sticker-font);
   color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .mole-overlay[hidden] {
   display: none;
@@ -28,6 +31,9 @@
 .mole-machine {
   position: relative;
   flex: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .mole-paint {
   position: absolute;
@@ -60,6 +66,12 @@
 }
 .mole-sprite[hidden] {
   display: none;
+}
+.mole-hole,
+.mole-hit {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .mole-hit {
   z-index: 4;
@@ -178,4 +190,10 @@
 @media (prefers-reduced-motion: reduce) {
   .mole-sprite { transition: none; }
   .mole-pop:not([hidden]) { animation: none; }
+}
+:root[data-reduced-motion="on"] .mole-sprite {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .mole-pop:not([hidden]) {
+  animation: none;
 }

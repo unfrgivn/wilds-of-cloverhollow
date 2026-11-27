@@ -17,6 +17,9 @@
   pointer-events: none;
   font-family: var(--sticker-font);
   color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .cook-overlay[hidden] {
   display: none;
@@ -29,6 +32,9 @@
   pointer-events: auto;
   cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .cook-glass,
 .cook-display,
@@ -135,4 +141,8 @@
   .cook-machine[data-phase="ding"] .cook-frost {
     animation: none;
   }
+}
+:root[data-reduced-motion="on"] .cook-machine[data-phase="ding"] .cook-food,
+:root[data-reduced-motion="on"] .cook-machine[data-phase="ding"] .cook-frost {
+  animation: none;
 }

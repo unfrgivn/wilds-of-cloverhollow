@@ -235,3 +235,11 @@
     transform: none;
   }
 }
+:root[data-reduced-motion="on"] .title-option,
+:root[data-reduced-motion="on"] .title-confirm-button {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .title-option[aria-selected="true"],
+:root[data-reduced-motion="on"] .title-confirm-button[aria-selected="true"] {
+  transform: none;
+}

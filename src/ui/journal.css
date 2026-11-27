@@ -321,11 +321,11 @@
     transform: none;
   }
 }
-html[data-reduced-motion="on"] .journal-slot.is-inspectable {
+:root[data-reduced-motion="on"] .journal-slot.is-inspectable {
   transition: none;
 }
-html[data-reduced-motion="on"] .journal-slot.is-inspectable:hover,
-html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
+:root[data-reduced-motion="on"] .journal-slot.is-inspectable:hover,
+:root[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   transform: none;
 }
 .journal-sticker-image {
@@ -798,6 +798,9 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .journal-map-star { animation: none; }
 }
+:root[data-reduced-motion="on"] .journal-map-star {
+  animation: none;
+}
 .journal-options-page {
   position: absolute;
   inset: 18px;
@@ -1136,6 +1139,10 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   .journal-field-left,
   .journal-field-body { animation: none; }
 }
+:root[data-reduced-motion="on"] .journal-field-left,
+:root[data-reduced-motion="on"] .journal-field-body {
+  animation: none;
+}
 .journal-field-close {
   position: absolute;
   top: 10px;
@@ -1425,6 +1432,11 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   .journal-treasures-title,
   .journal-treasures-stamps,
   .journal-treasures-section { animation: none; }
+}
+:root[data-reduced-motion="on"] .journal-treasures-title,
+:root[data-reduced-motion="on"] .journal-treasures-stamps,
+:root[data-reduced-motion="on"] .journal-treasures-section {
+  animation: none;
 }
 .journal-treasures-close {
   flex: 0 0 44px;

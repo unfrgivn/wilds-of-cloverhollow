@@ -6139,6 +6139,53 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4581/4582 just e2e` (638 Chromium + 543 WebKit = 1,181
   passed, 2 skipped, 0 failed, 0 snapshot diffs).
 
+## Milestone 140: 100% End-to-End In-Game Reduced-Motion Parity (All 6 Minigames, Title, Touch Controls, Area Banner & Battle Wind-Up Tremble) + Minigame Safari/iOS Tap-Selection Hygiene **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 68 recorded
+  sims.
+- Complete In-Game `:root[data-reduced-motion="on"]` CSS Parity across every
+  UI stylesheet (`src/ui/claw.css`, `src/ui/skee.css`, `src/ui/mole.css`,
+  `src/ui/comet.css`, `src/ui/cook.css`, `src/ui/fish.css`,
+  `src/ui/area-banner.css`, `src/ui/title.css`, `src/ui/touch-controls.css`,
+  `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/sticker.css`):
+  - Every `@media (prefers-reduced-motion: reduce)` rule is mirrored
+    identically under `:root[data-reduced-motion="on"]` with zero visual pixel
+    changes when `data-reduced-motion="off"`.
+- Minigame Safari / iOS Press-and-Hold Tap-Selection Hygiene (`src/ui/claw.css`,
+  `src/ui/skee.css`, `src/ui/mole.css`, `src/ui/comet.css`, `src/ui/cook.css`,
+  `src/ui/fish.css`):
+  - Adds `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
+    to each minigame's interactive cabinet/stage overlay (`.arcade-overlay`,
+    `.arcade-machine`, `.skee-overlay`, `.skee-frame`, `.skee-machine`,
+    `.mole-overlay`, `.mole-machine`, `.mole-hole`, `.mole-hit`,
+    `.comet-overlay`, `.comet-machine`, `.comet-key`, `.cook-overlay`,
+    `.cook-machine`, `.fish-overlay`, `.fish-stage`) with zero visual pixel
+    changes.
+- Battle Wind-Up Micro-Tremble & Soothed/Check Reduced-Motion Guard
+  (`src/render/battle-vfx.ts`, `src/render/battle-choreography.ts`):
+  - Passes `reducedMotion` into `applyWindUpAndFizzle`, `applyTogetherReady`,
+    `applyTogetherActive`, and `applySoothedAndReward`: suppresses critter
+    wind-up micro-tremble (`offsetX = 0`, `rotation = 0`), suppresses
+    `stageShake` in `burstResult` and impact `result`, calms lean wind-jitter
+    and peekaboo warning twitch, and keeps `Together!` ready/active & Relief
+    Bloom petals calm and upright (`rotation = 0`), while `reducedMotion = false`
+    remains 100% bit-for-bit identical.
+- iOS 27 Simulator Smoke Hardening (`tools/ios/smoke.ts`):
+  - Targeted `y: 395` on `"up around the plaza"` so proportional drag durations
+    never overshoot into `market-door` (`y <= 368`), and added iOS 27's
+    transient AXe landscape `"screenshot probing failed"` error to
+    `transientAxeErrors`.
+- Evidence: `tests/unit/milestone-140.test.ts` (6 tests: automated CSS parity
+  gate, minigame tap-selection gate, and battle choreography reduced-motion
+  unit tests) and real-key minigame reduced-motion & tap-selection verification
+  in `tests/e2e/accessibility.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (200 unit files / 1,460 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), full
+  `CLOVERHOLLOW_E2E_PORT=4591/4592 just e2e` (639 Chromium + 544 WebKit = 1,183
+  passed, 2 skipped, 0 failed, 0 snapshot diffs), `just ios-smoke` (passed
+  end-to-end on iPhone 17 / iOS 27.0), and `just ios-device-build` (unsigned
+  arm64 `Release-iphoneos/App.app` built cleanly).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

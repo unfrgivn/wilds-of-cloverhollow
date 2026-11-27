@@ -19,6 +19,9 @@
   pointer-events: none;
   font-family: var(--sticker-font);
   color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .comet-overlay[hidden] {
   display: none;
@@ -33,6 +36,9 @@
   pointer-events: auto;
   cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .comet-paint {
   position: absolute;
@@ -152,6 +158,9 @@ body:not(.gallery-body) .comet-rocket[data-frame="rocket-wobble"] {
   text-align: center;
   pointer-events: auto;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .comet-key.is-left {
   transform: translate(-100%, -50%);
@@ -193,4 +202,13 @@ body:not(.gallery-body) .comet-rocket[data-frame="rocket-wobble"] {
   body:not(.gallery-body) .comet-rocket[data-frame="rocket-wobble"] {
     animation: none;
   }
+}
+:root[data-reduced-motion="on"]
+  body:not(.gallery-body)
+  .comet-machine[data-phase="playing"]
+  .comet-stars,
+:root[data-reduced-motion="on"]
+  body:not(.gallery-body)
+  .comet-rocket[data-frame="rocket-wobble"] {
+  animation: none;
 }

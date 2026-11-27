@@ -2532,7 +2532,13 @@ trunks keep its two exits.
     (`"on"` / `"off"`) and checked alongside OS
     `prefers-reduced-motion: reduce` via `isReducedMotionActive()`
     (`src/platform/reduced-motion.ts`). When active, it collapses UI CSS
-    animations/transitions (`:root[data-reduced-motion="on"]`), silences
+    animations/transitions across every UI stylesheet with explicit
+    `:root[data-reduced-motion="on"]` parity mirroring every
+    `@media (prefers-reduced-motion: reduce)` rule (all 6 minigames:
+    `claw.css`, `skee.css`, `mole.css`, `comet.css`, `cook.css`, `fish.css`,
+    plus `area-banner.css`, `title.css`, `touch-controls.css`, `battle.css`,
+    `journal.css`, `sticker.css`, `save-toast.css`, and `arcade-popups.css`,
+    Milestone 140), silences
     haptics (`src/platform/haptics.ts`), keeps door transitions as calm opacity
     fades (`transitionZoom = 1`), snaps camera follow (`smoothFollowCamera`
     with `snap = true`, zero look-ahead swing), holds overworld figures in
@@ -2544,13 +2550,20 @@ trunks keep its two exits.
     clubhouse keepsake sparkles, chaos critter auras, and ambient flyers
     (`flyerAt(flyer, 0)`, steady `frame: 0`) calm, upright, and tick-invariant
     (Milestone 139), and calms battle presentation
-    (skipping `battleIntro` slide/zoom, zeroing `stageShake`, holding
-    `battleSunburst` at steady orientation, and freezing ambient mood wash
-    drift/pulse in `src/render/battle-view.ts`).
-  - **Universal Safari / iOS Tap-Selection Hygiene** (Milestone 139):
-    interactive game UI controls and tap surfaces across `src/ui/title.css`,
+    (skipping `battleIntro` slide/zoom, zeroing `stageShake` in both
+    `battle-view.ts` and `computeBattleChoreography` impact/`burstResult`,
+    suppressing critter wind-up high-frequency micro-tremble and spinning fizz,
+    holding `Together!` ready/active sparkles, hearts, rings, and Relief Bloom
+    petals calm and upright in `src/render/battle-vfx.ts` (Milestone 140),
+    holding `battleSunburst` at steady orientation, and freezing ambient mood
+    wash drift/pulse in `src/render/battle-view.ts`).
+  - **Universal Safari / iOS Tap-Selection Hygiene** (Milestones 139–140):
+    interactive game UI controls, tap surfaces, and all 6 direct press-and-hold
+    minigame overlays/cabinets across `src/ui/title.css`,
     `src/ui/battle.css`, `src/ui/journal.css`, `src/ui/sticker.css`,
-    `src/ui/touch-controls.css`, and `src/ui/credits.css` declare
+    `src/ui/touch-controls.css`, `src/ui/credits.css`, `src/ui/claw.css`,
+    `src/ui/skee.css`, `src/ui/mole.css`, `src/ui/comet.css`, `src/ui/cook.css`,
+    and `src/ui/fish.css` declare
     `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
     so rapid taps and long-presses on Safari/WebKit and iOS never trigger
     accidental text selection or link callouts, while keeping dev QA console
@@ -3612,8 +3625,11 @@ trunks keep its two exits.
   enables `pointer-events: auto; cursor: pointer; touch-action: none;` so
   `.touch-controls` buttons outside each close-up remain unobstructed and
   gallery baselines stay pixel-identical.
-- Minigame & UI micro-animation polish (Milestone 73, all CSS transitions and
-  keyframes guarded by `@media (prefers-reduced-motion: reduce)`): Claw Machine
+- Minigame & UI micro-animation polish (Milestone 73, extended with
+  `:root[data-reduced-motion="on"]` in-game parity and Safari/iOS press-and-hold
+  `user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;`
+  hygiene in Milestone 140; all CSS transitions and keyframes guarded by both
+  `@media (prefers-reduced-motion: reduce)` and `:root[data-reduced-motion="on"]`): Claw Machine
   tug wiggle and sliding/returning pendulum tilt; Skee-Ball contact shadow
   lifting while hopping and bouncy `.skee-pop` entrance; Boop-a-Mole boop squash
   (via CSS `scale` without clobbering `translateY`) and bouncy `.mole-pop`

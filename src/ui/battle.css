@@ -1200,6 +1200,37 @@
     animation: battle-popup-fade 450ms ease-out forwards;
   }
 }
+:root[data-reduced-motion="on"] .battle-calm-fill,
+:root[data-reduced-motion="on"] .battle-calm-heart-path,
+:root[data-reduced-motion="on"] .battle-command,
+:root[data-reduced-motion="on"] .battle-together-btn,
+:root[data-reduced-motion="on"] .battle-flute-btn,
+:root[data-reduced-motion="on"] .battle-lasso-btn,
+:root[data-reduced-motion="on"] .battle-chain-beat,
+:root[data-reduced-motion="on"] .battle-catch-ring,
+:root[data-reduced-motion="on"] .battle-catch-toy,
+:root[data-reduced-motion="on"] .battle-lean-puff,
+:root[data-reduced-motion="on"] .battle-portrait,
+:root[data-reduced-motion="on"] .battle-echo-chime {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .battle-reward.is-visible,
+:root[data-reduced-motion="on"] .battle-trace-dot.is-next,
+:root[data-reduced-motion="on"] .battle-echo-dot.is-current,
+:root[data-reduced-motion="on"] .battle-feeling-heart,
+:root[data-reduced-motion="on"] .battle-windup-bubble.is-popped,
+:root[data-reduced-motion="on"] .battle-command.is-match,
+:root[data-reduced-motion="on"] .battle-portrait[data-mood="cheering"],
+:root[data-reduced-motion="on"] .battle-portrait[data-mood="flustered"],
+:root[data-reduced-motion="on"] .battle-portrait[data-mood="radiant"],
+:root[data-reduced-motion="on"] .battle-portrait[data-mood="radiant"].is-active,
+:root[data-reduced-motion="on"] .battle-portrait[data-mood="radiant"][data-active="true"],
+:root[data-reduced-motion="on"] .battle-together-btn::after {
+  animation: none;
+}
+:root[data-reduced-motion="on"] .battle-together-btn::after {
+  display: none;
+}
 
 /* Die-cut Paper-Mario battle popups (Milestone 104): ephemeral calm gain,
    wind-up pop, and energy restore pills floating cleanly between HUD & dialogue. */
@@ -1889,4 +1920,7 @@
   .battle-peek-card {
     animation: none;
   }
+}
+:root[data-reduced-motion="on"] .battle-peek-card {
+  animation: none;
 }

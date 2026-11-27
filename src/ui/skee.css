@@ -17,6 +17,9 @@
   pointer-events: none;
   font-family: var(--sticker-font);
   color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .skee-overlay[hidden] {
   display: none;
@@ -32,11 +35,17 @@
   pointer-events: auto;
   cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .skee-machine {
   position: absolute;
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .skee-board,
 .skee-plate,
@@ -221,4 +230,10 @@
 @media (prefers-reduced-motion: reduce) {
   .skee-ball { transition: none; }
   .skee-pop:not([hidden]) { animation: none; }
+}
+:root[data-reduced-motion="on"] .skee-ball {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .skee-pop:not([hidden]) {
+  animation: none;
 }

@@ -429,6 +429,10 @@
   transition-duration: 0.001ms !important;
 }
 
+:root[data-reduced-motion="on"] .photo-touch-btn:active {
+  transform: none;
+}
+
 :root[data-reduced-motion="on"] .photo-shutter-flash.is-flashing {
   animation-name: photo-shutter-pulse-gentle !important;
   animation-duration: 220ms !important;

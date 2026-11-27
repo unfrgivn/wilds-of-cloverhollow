@@ -68,6 +68,7 @@ function findAxe(): string {
 // session); the same command succeeds a moment later.
 const transientAxeErrors = [
   "Unable to determine rotated simulator orientation",
+  "Unable to determine coordinate mapping because screenshot probing failed",
   "Timed out creating the simulator remote automation session",
 ];
 
@@ -715,7 +716,7 @@ async function main(): Promise<void> {
     // (x >= 995), then step down past arch-ne's post before heading right
     // under the arcade and south to park.
     await walkTo(
-      { x: latest().x, y: 260 },
+      { x: latest().x, y: 395 },
       (value) => !value.moving && value.y <= 412,
       "up around the plaza",
       "y",

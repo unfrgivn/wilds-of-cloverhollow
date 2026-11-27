@@ -127,3 +127,6 @@
     transform: translateX(-50%);
   }
 }
+:root[data-reduced-motion="on"] .area-banner {
+  transform: translateX(-50%);
+}

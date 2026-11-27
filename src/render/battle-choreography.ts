@@ -319,7 +319,7 @@ export function computeBattleChoreography(
           (start) => check.tick >= start && check.tick < start + check.spec.puffTicks,
         );
     fae = composePose(fae, {
-      offsetX: balance * 14 + (blowing ? Math.sin(tick * 1.4) * 1.2 : 0),
+      offsetX: balance * 14 + (blowing && !reducedMotion ? Math.sin(tick * 1.4) * 1.2 : 0),
       offsetY: 0,
       scaleX: blowing ? 1.05 : 1,
       scaleY: blowing ? 0.94 : 1,
@@ -394,11 +394,11 @@ export function computeBattleChoreography(
       });
       if (status === "warning") {
         critter = composePose(critter, {
-          offsetX: 4 + Math.sin(check.tick * 1.8) * 3,
+          offsetX: 4 + (reducedMotion ? 0 : Math.sin(check.tick * 1.8) * 3),
           offsetY: -3,
           scaleX: 1.02,
           scaleY: 1.03,
-          rotation: Math.sin(check.tick * 2.1) * 0.06,
+          rotation: reducedMotion ? 0 : Math.sin(check.tick * 2.1) * 0.06,
         });
       } else {
         critter = composePose(critter, {
@@ -486,11 +486,13 @@ export function computeBattleChoreography(
         rotation: 0,
       };
       const decay = 1 - battle.phaseTicks / 4;
-      const dir = battle.phaseTicks % 2 === 0 ? 1 : -1;
-      stageShake = {
-        x: dir * 3.5 * decay,
-        y: -1.8 * decay * (battle.phaseTicks % 2 === 0 ? 1 : -0.6),
-      };
+      if (!reducedMotion) {
+        const dir = battle.phaseTicks % 2 === 0 ? 1 : -1;
+        stageShake = {
+          x: dir * 3.5 * decay,
+          y: -1.8 * decay * (battle.phaseTicks % 2 === 0 ? 1 : -0.6),
+        };
+      }
       vfx.push(
         {
           texture: "softGlow",
@@ -561,12 +563,12 @@ export function computeBattleChoreography(
 
   // 10b. Together! Ready on-field telegraph: eager bounce + golden sparkle tether.
   if (stageMood === "together-ready") {
-    fae = applyTogetherReady(tick, partyIds, fae, applyParty, vfx);
+    fae = applyTogetherReady(tick, partyIds, fae, applyParty, vfx, reducedMotion);
   }
 
   // 10c. Together! Activation theater: synchronized team wave-hop + golden cascade.
   if (stageMood === "together-active") {
-    fae = applyTogetherActive(battle, tick, partyIds, fae, applyParty, vfx);
+    fae = applyTogetherActive(battle, tick, partyIds, fae, applyParty, vfx, reducedMotion);
   }
 
   // 11. Fae burstResult reaction + subtle stage shake on spent energy.
@@ -578,10 +580,10 @@ export function computeBattleChoreography(
         offsetY: 0,
         scaleX: 1 + 0.03 * decay,
         scaleY: 1 - 0.03 * decay,
-        rotation: Math.sin(battle.phaseTicks * 0.75) * 0.09 * decay,
+        rotation: reducedMotion ? 0 : Math.sin(battle.phaseTicks * 0.75) * 0.09 * decay,
       });
       tintFlash = Math.max(0, 1 - battle.phaseTicks / 12) * 0.65;
-      if (battle.phaseTicks < 14) {
+      if (!reducedMotion && battle.phaseTicks < 14) {
         const amp = (1 - battle.phaseTicks / 14) * 3;
         stageShake = {
           x: Math.sin(battle.phaseTicks * 2.1) * amp,
@@ -603,10 +605,18 @@ export function computeBattleChoreography(
   }
 
   // 12. Wind-up micro-tremble + rising fizz bubbles; fizzle wide squash-deflate + puffs.
-  critter = applyWindUpAndFizzle(battle, puffLevel(battle, view), calmMood, tick, critter, vfx);
+  critter = applyWindUpAndFizzle(
+    battle,
+    puffLevel(battle, view),
+    calmMood,
+    tick,
+    critter,
+    vfx,
+    reducedMotion,
+  );
 
   // 13. Soothed -> reward: expanding aura dissolve, celebratory burst, Relief Bloom petals.
-  const settled = applySoothedAndReward(battle, tick, critter, vfx);
+  const settled = applySoothedAndReward(battle, tick, critter, vfx, reducedMotion);
   critter = settled.critter;
   auraScaleBoost = settled.auraScaleBoost;
 

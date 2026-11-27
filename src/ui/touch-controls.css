@@ -207,3 +207,9 @@
     transform: none;
   }
 }
+:root[data-reduced-motion="on"] .touch-button {
+  transition: none;
+}
+:root[data-reduced-motion="on"] .touch-button:active {
+  transform: none;
+}

@@ -18,6 +18,9 @@
   pointer-events: none;
   font-family: var(--sticker-font);
   color: var(--sticker-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .arcade-overlay[hidden] {
   display: none;
@@ -31,6 +34,9 @@
   pointer-events: auto;
   cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Inside the glass. Back to front: the plushes, the claw, and the cable by
@@ -225,4 +231,10 @@
   .arcade-claw {
     transition: none;
   }
+}
+:root[data-reduced-motion="on"] .arcade-plush.is-tug .arcade-plush-image {
+  animation: none;
+}
+:root[data-reduced-motion="on"] .arcade-claw {
+  transition: none;
 }

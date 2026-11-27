@@ -457,24 +457,29 @@ export function applyTogetherReady(
   fae: MotionPose,
   applyParty: (actorId: string | null, delta: MotionPose) => void,
   vfx: BattleVfxParticle[],
+  reducedMotion = false,
 ): MotionPose {
-  const nextFae = composePose(fae, {
-    offsetX: 0,
-    offsetY: -Math.abs(Math.sin(tick / 10)) * 2.8,
-    scaleX: 1,
-    scaleY: 1,
-    rotation: 0,
-  });
-  partyIds.forEach((id, idx) => {
-    applyParty(id, {
-      offsetX: 0,
-      offsetY: -Math.abs(Math.sin(tick / 10 + (idx + 1) * 0.7)) * 2.8,
-      scaleX: 1,
-      scaleY: 1,
-      rotation: 0,
+  const nextFae = reducedMotion
+    ? fae
+    : composePose(fae, {
+        offsetX: 0,
+        offsetY: -Math.abs(Math.sin(tick / 10)) * 2.8,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      });
+  if (!reducedMotion) {
+    partyIds.forEach((id, idx) => {
+      applyParty(id, {
+        offsetX: 0,
+        offsetY: -Math.abs(Math.sin(tick / 10 + (idx + 1) * 0.7)) * 2.8,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      });
     });
-  });
-  const pulse = 0.5 + 0.5 * Math.sin(tick * 0.14);
+  }
+  const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.14);
   vfx.push({
     texture: "softGlow",
     blend: "normal",
@@ -491,17 +496,18 @@ export function applyTogetherReady(
   const rightSpan = 74;
   for (let i = 0; i < 10; i += 1) {
     const frac = i / 9;
-    const twinkle = 0.5 + 0.5 * Math.sin(tick * 0.18 + i * 0.9);
+    const twinkle = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.18 + i * 0.9);
     const scale = 0.36 + twinkle * 0.24;
     vfx.push({
       texture: "sparkle",
       blend: "normal",
       anchor: "fae",
       offsetX: leftSpan + (rightSpan - leftSpan) * frac,
-      offsetY: 16 - Math.sin(frac * Math.PI) * 52 + Math.sin(tick * 0.15 + i) * 5,
+      offsetY: 16 - Math.sin(frac * Math.PI) * 52 +
+        (reducedMotion ? 0 : Math.sin(tick * 0.15 + i) * 5),
       scaleX: scale,
       scaleY: scale,
-      rotation: tick * 0.04 + i * 0.7,
+      rotation: reducedMotion ? 0 : tick * 0.04 + i * 0.7,
       alpha: 0.78 + twinkle * 0.2,
       tint: i % 2 === 0 ? 0xf5b324 : 0xfff08a,
     });
@@ -516,9 +522,16 @@ export function applyTogetherActive(
   faeIn: MotionPose,
   applyParty: (actorId: string | null, delta: MotionPose) => void,
   vfx: BattleVfxParticle[],
+  reducedMotion = false,
 ): MotionPose {
   let fae = faeIn;
-  if (battle.phase === "check") {
+  if (reducedMotion) {
+    const leanIn: MotionPose = { offsetX: 10, offsetY: 0, scaleX: 1, scaleY: 1, rotation: 0 };
+    fae = composePose(fae, leanIn);
+    for (const id of partyIds) {
+      applyParty(id, leanIn);
+    }
+  } else if (battle.phase === "check") {
     const faeWave = 0.35 + 0.65 * Math.abs(Math.sin(tick / 6));
     fae = composePose(fae, {
       offsetX: 16 * faeWave,
@@ -559,7 +572,7 @@ export function applyTogetherActive(
       });
     });
   }
-  const sunPulse = 0.5 + 0.5 * Math.sin(tick * 0.22);
+  const sunPulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(tick * 0.22);
   vfx.push({
     texture: "softGlow",
     blend: "normal",
@@ -573,9 +586,11 @@ export function applyTogetherActive(
     tint: 0xf7c33e,
   });
   for (let i = 0; i < 3; i += 1) {
-    const ru = battle.phase === "check"
-      ? (((tick + i * 10 + 3) % 30) + 0.5) / 30
-      : clamp01((battle.phaseTicks + 6 - i * 4) / 26);
+    const ru = reducedMotion
+      ? 0.25 + i * 0.25
+      : battle.phase === "check"
+        ? (((tick + i * 10 + 3) % 30) + 0.5) / 30
+        : clamp01((battle.phaseTicks + 6 - i * 4) / 26);
     if (ru <= 0 || ru >= 1) continue;
     const scale = 0.65 + ru * 1.35;
     vfx.push({
@@ -593,6 +608,23 @@ export function applyTogetherActive(
     });
   }
   for (let i = 0; i < 6; i += 1) {
+    if (reducedMotion) {
+      const frac = (i + 0.5) / 6;
+      vfx.push({
+        texture: "sparkle",
+        blend: "normal",
+        anchor: "between",
+        t: 0.14 + frac * 0.72,
+        offsetX: 0,
+        offsetY: -Math.sin(frac * Math.PI) * 44 + ((i % 3) - 1) * 14,
+        scaleX: 0.56,
+        scaleY: 0.56,
+        rotation: 0,
+        alpha: 0.82,
+        tint: i % 2 === 0 ? 0xffe066 : 0xfff6c4,
+      });
+      continue;
+    }
     const su = battle.phase === "check"
       ? (((tick + i * 5 + 2) % 30) + 0.5) / 30
       : clamp01((battle.phaseTicks + 12 - i * 2) / 30);
@@ -614,6 +646,24 @@ export function applyTogetherActive(
   }
   const heartScales: readonly number[] = [0.56, 0.64, 0.72];
   for (let i = 0; i < 6; i += 1) {
+    if (reducedMotion) {
+      const frac = (i + 0.5) / 6;
+      const scale = heartScales[i % heartScales.length] ?? 0.64;
+      vfx.push({
+        texture: "heart",
+        blend: "normal",
+        anchor: "between",
+        t: 0.16 + frac * 0.68,
+        offsetX: 0,
+        offsetY: -Math.sin(frac * Math.PI) * 48 + ((i % 3) - 1) * 12,
+        scaleX: scale,
+        scaleY: scale,
+        rotation: 0,
+        alpha: 0.84,
+        tint: RAINBOW_HEARTS[i % RAINBOW_HEARTS.length] ?? 0xff9bb8,
+      });
+      continue;
+    }
     const hu = battle.phase === "check"
       ? (((tick + i * 5 + 3) % 30) + 0.5) / 30
       : clamp01((battle.phaseTicks + 12 - i * 2) / 32);
@@ -643,17 +693,35 @@ export function applyWindUpAndFizzle(
   tick: number,
   critterIn: MotionPose,
   vfx: BattleVfxParticle[],
+  reducedMotion = false,
 ): MotionPose {
   let critter = critterIn;
   if (puff >= 2 && battle.phase !== "fizzle" && !calmMood) {
-    critter = composePose(critter, {
-      offsetX: Math.sin(tick * 1.9) * 2.2,
-      offsetY: 0,
-      scaleX: 1,
-      scaleY: 1,
-      rotation: Math.cos(tick * 2.3) * 0.025,
-    });
+    if (!reducedMotion) {
+      critter = composePose(critter, {
+        offsetX: Math.sin(tick * 1.9) * 2.2,
+        offsetY: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: Math.cos(tick * 2.3) * 0.025,
+      });
+    }
     for (let i = 0; i < 4; i += 1) {
+      if (reducedMotion) {
+        vfx.push({
+          texture: i % 2 === 0 ? "sparkle" : "puff",
+          blend: i % 2 === 0 ? "add" : "normal",
+          anchor: "critter",
+          offsetX: (i - 1.5) * 26,
+          offsetY: -22 - (i % 2) * 18,
+          scaleX: 0.36,
+          scaleY: 0.36,
+          rotation: 0,
+          alpha: 0.62,
+          tint: FIZZ_TINTS[i % FIZZ_TINTS.length] ?? 0xe6b8ff,
+        });
+        continue;
+      }
       const cycle = ((tick + i * 9) % 36) / 36;
       vfx.push({
         texture: i % 2 === 0 ? "sparkle" : "puff",
@@ -671,29 +739,31 @@ export function applyWindUpAndFizzle(
   }
   if (battle.phase === "fizzle") {
     const u = Math.max(0, 1 - battle.phaseTicks / 28);
-    critter = composePose(critter, {
-      offsetX: 0,
-      offsetY: 0,
-      scaleX: 1 + 0.18 * u,
-      scaleY: 1 - 0.2 * u,
-      rotation: 0,
-    });
+    if (!reducedMotion) {
+      critter = composePose(critter, {
+        offsetX: 0,
+        offsetY: 0,
+        scaleX: 1 + 0.18 * u,
+        scaleY: 1 - 0.2 * u,
+        rotation: 0,
+      });
+    }
     const puffU = clamp01((battle.phaseTicks + 2) / 28);
     const puffAlpha = (1 - puffU) * 0.78;
     if (puffAlpha > 0.02) {
       for (let i = 0; i < 5; i += 1) {
         const angle = -Math.PI + (i / 4) * Math.PI;
-        const dist = 28 + puffU * 66;
-        const scale = 0.45 + puffU * 0.55;
+        const dist = reducedMotion ? 56 : 28 + puffU * 66;
+        const scale = reducedMotion ? 0.68 : 0.45 + puffU * 0.55;
         vfx.push({
           texture: "puff",
           blend: "normal",
           anchor: "critter",
           offsetX: Math.cos(angle) * dist,
-          offsetY: Math.sin(angle) * dist * 0.55 - puffU * 24,
+          offsetY: Math.sin(angle) * dist * 0.55 - (reducedMotion ? 12 : puffU * 24),
           scaleX: scale,
           scaleY: scale,
-          rotation: angle * 0.25,
+          rotation: reducedMotion ? 0 : angle * 0.25,
           alpha: puffAlpha,
           tint: i % 2 === 0 ? 0xf2d8ee : 0xfaf3df,
         });
@@ -708,25 +778,62 @@ export function applySoothedAndReward(
   tick: number,
   critterIn: MotionPose,
   vfx: BattleVfxParticle[],
+  reducedMotion = false,
 ): { critter: MotionPose; auraScaleBoost: number } {
   let critter = critterIn;
   let auraScaleBoost = 1;
   if (battle.phase === "soothed") {
     const p = clamp01(battle.phaseTicks / 30);
     auraScaleBoost = 1 + p * 0.45;
-    const bounce = Math.abs(Math.sin(battle.phaseTicks / 7)) *
-      Math.max(0, 1 - battle.phaseTicks / 36);
-    critter = composePose(critter, {
-      offsetX: 0,
-      offsetY: -bounce * 10,
-      scaleX: 1 - bounce * 0.03,
-      scaleY: 1 + bounce * 0.04,
-      rotation: 0,
-    });
-    radialBurst(vfx, "critter", battle.phaseTicks, 7, 9, 108, 36);
+    if (reducedMotion) {
+      for (let i = 0; i < 6; i += 1) {
+        const angle = -Math.PI * 0.88 + (i / 5) * Math.PI * 0.76;
+        vfx.push({
+          texture: "heart",
+          blend: "normal",
+          anchor: "critter",
+          offsetX: Math.cos(angle) * 68,
+          offsetY: Math.sin(angle) * 56 - 16,
+          scaleX: 0.56,
+          scaleY: 0.56,
+          rotation: 0,
+          alpha: 0.82,
+          tint: RAINBOW_HEARTS[i % RAINBOW_HEARTS.length] ?? 0xff9bb8,
+        });
+      }
+    } else {
+      const bounce = Math.abs(Math.sin(battle.phaseTicks / 7)) *
+        Math.max(0, 1 - battle.phaseTicks / 36);
+      critter = composePose(critter, {
+        offsetX: 0,
+        offsetY: -bounce * 10,
+        scaleX: 1 - bounce * 0.03,
+        scaleY: 1 + bounce * 0.04,
+        rotation: 0,
+      });
+      radialBurst(vfx, "critter", battle.phaseTicks, 7, 9, 108, 36);
+    }
   }
   if (battle.phase === "soothed" || battle.phase === "reward") {
     for (let i = 0; i < 8; i += 1) {
+      if (reducedMotion) {
+        const spreadX = ((i % 4) - 1.5) * 44;
+        const riseY = -12 - Math.floor(i / 4) * 42 - (i % 2) * 14;
+        const scale = 0.44 + (i % 3) * 0.14;
+        vfx.push({
+          texture: "petal",
+          blend: "normal",
+          anchor: "critter",
+          offsetX: spreadX,
+          offsetY: riseY,
+          scaleX: scale,
+          scaleY: scale,
+          rotation: 0,
+          alpha: 0.72,
+          tint: RELIEF_PETALS[i % RELIEF_PETALS.length] ?? 0xa8e6cf,
+        });
+        continue;
+      }
       const cycle = ((tick + i * 8 + 4) % 64) / 64;
       const spreadX = ((i % 4) - 1.5) * 44 + Math.sin(cycle * Math.PI * 2 + i * 1.4) * 18;
       const riseY = 38 - cycle * 155;

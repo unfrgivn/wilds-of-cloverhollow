@@ -716,6 +716,11 @@ export class GameView {
     };
   }
 
+  /** Latest living-NPC snapshot summary for overworld tool-event feedback. */
+  npcLifeInfo(): NpcLifeRenderInfo | null {
+    return this.npcLife.latest === null ? null : this.npcLife.renderInfo();
+  }
+
   /** The active ambient NPC chatter bubble projected into CSS px, or null when hidden. */
   npcChatterScreen(
     state: State,

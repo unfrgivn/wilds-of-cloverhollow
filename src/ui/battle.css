@@ -1731,6 +1731,10 @@
   pointer-events: auto;
   animation: battle-peek-in 140ms ease-out;
 }
+.battle-peek-card:focus,
+.battle-peek-card:focus-visible {
+  outline: 2px solid var(--sticker-ink);
+}
 @media (min-width: 1180px) and (min-height: 600px) {
   .battle-peek-card {
     top: max(28px, calc(var(--safe-top) + 28px));

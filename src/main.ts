@@ -31,8 +31,9 @@ import {
 } from "./shell/assets";
 import {
   buildSoundContext, captureAreaPostcard, collectLevelUpNotices, createAreaBannerTracker,
-  createJournalNotesCache, createNpcChatterSync, hapticForTick, isOverworldConfirm,
-  petEffectForCompanion, resolveArcadeOutcome, resolveSoundtrack, shouldClearRest, stepJukeboxTrack,
+  createJournalNotesCache, createNpcChatterSync, createToolEventChimeSync, hapticForTick,
+  isOverworldConfirm, petEffectForCompanion, resolveArcadeOutcome, resolveSoundtrack,
+  shouldClearRest, stepJukeboxTrack,
 } from "./shell/feedback";
 import { createSaveSession, createSaveStore } from "./shell/save-storage";
 import { createAudio } from "./platform/audio";
@@ -222,6 +223,9 @@ async function boot(): Promise<void> {
   const syncNpcChatter = createNpcChatterSync(
     content.world, uiRoot, view.npcChatterScreen.bind(view), sound.playAmbientChatter,
   );
+  const toolEventChime = createToolEventChimeSync(() => {
+    sound.playEffect("tool-sparkle"); lightHaptic();
+  });
   app.stage.addChild(view.root);
   const initialFixture = content.fixtures["new-game"];
   if (initialFixture === undefined) throw new Error("Missing new-game fixture");
@@ -272,6 +276,7 @@ async function boot(): Promise<void> {
       state = createState(content.world, initialFixture);
       previousState = state;
       bannerTracker.clear();
+      toolEventChime.reset();
       saveToast.hide();
       jukeboxTrack = null;
       saveSession.clear();
@@ -513,6 +518,10 @@ async function boot(): Promise<void> {
     const hasLevelUpNotice = levelUpNotices.length > 0;
     const overworldFree = isOverworldFree(gate, hasLevelUpNotice);
     syncNpcChatter(state, overworldFree, photoMode, paused);
+    toolEventChime.sync(
+      state.area, overworldFree && state.area !== "harness" && state.transition === null,
+      !paused && !harnessStepping, view.npcLifeInfo()?.activeToolEventId ?? null,
+    );
     hudHints.render(buildHudHintsView({
       world: content.world, state, keyHints: gameSettings.keyHints(), touchActive, overworldFree,
       isResting: view.isResting(), hasLantern, hasFlute, muted: sound.muted(),
@@ -862,14 +871,9 @@ async function boot(): Promise<void> {
   inputShortcuts.bind();
   if (qaEnabled) {
     const resetTransientUi = (): void => {
-      titleMode = null;
-      jukeboxTrack = null;
-      battlePeekOpen = false;
-      activeArcadeRecord = null;
-      fishStreak = 0;
-      setPhotoMode(false, true);
-      levelUpNotices.length = 0;
-      swallowed.clear();
+      titleMode = null; jukeboxTrack = null; battlePeekOpen = false; activeArcadeRecord = null;
+      fishStreak = 0; toolEventChime.reset(); setPhotoMode(false, true);
+      levelUpNotices.length = 0; swallowed.clear();
     };
     const { installShellHook } = await import("./dev/hook");
     installShellHook({

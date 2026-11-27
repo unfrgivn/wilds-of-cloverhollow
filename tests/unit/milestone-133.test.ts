@@ -20,6 +20,7 @@ const ALL_EFFECTS: readonly CompanionAudioEffect[] = [
   "card-close",
   "toggle-on",
   "toggle-off",
+  "tool-sparkle",
 ];
 
 const UI_FOLEY_EFFECTS: readonly CompanionAudioEffect[] = [
@@ -30,10 +31,11 @@ const UI_FOLEY_EFFECTS: readonly CompanionAudioEffect[] = [
   "card-close",
   "toggle-on",
   "toggle-off",
+  "tool-sparkle",
 ];
 
 describe("Milestone 133: Tactile Storybook UI Foley & Title Transition Helpers", () => {
-  it("defines all 13 CompanionAudioEffect recipes with valid gentle segments", () => {
+  it("defines all 14 CompanionAudioEffect recipes with valid gentle segments", () => {
     expect(Object.keys(effectRecipes).sort()).toEqual([...ALL_EFFECTS].sort());
     for (const effect of ALL_EFFECTS) {
       const recipe = effectRecipe(effect);

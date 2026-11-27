@@ -66,6 +66,21 @@ export type JournalFieldOverlays = {
   handleKeydown: (event: KeyboardEvent) => boolean;
 };
 
+/** CSS selector for the Journal collection slot matching an inspected item. */
+export function focusRestoreSelector(item: InspectedJournalItem | null): string | null {
+  if (item === null) return null;
+  if (item.kind === "sticker") {
+    return `.journal-stickers .journal-slot[data-sticker="${item.id}"]`;
+  }
+  if (item.kind === "prize") {
+    return `.journal-prizes .journal-slot[data-prize="${item.id}"]`;
+  }
+  if (item.kind === "fish") {
+    return `.journal-fish .journal-slot[data-fish="${item.id}"]`;
+  }
+  return `.journal-keepsakes .journal-slot[data-keepsake="${item.id}"]`;
+}
+
 /** Lists the inspectable owned entry IDs for a given Journal collection shelf in display order. */
 export function inspectableShelfIds(
   view: JournalFieldNoteSource,
@@ -213,12 +228,14 @@ export function fieldNoteBlurb(note: CritterFieldNote): string {
 }
 
 export function createJournalFieldOverlays(options?: {
+  focusRoot?: HTMLElement;
   onVisibilityChange?: (open: boolean) => void;
   onStep?: () => void;
 }): JournalFieldOverlays {
   const fieldBackdrop = element("div", "journal-field-backdrop");
   fieldBackdrop.hidden = true;
   const fieldCard = element("article", "journal-field-note");
+  fieldCard.tabIndex = -1;
   fieldCard.setAttribute("role", "dialog");
   fieldCard.setAttribute("aria-modal", "true");
   fieldCard.setAttribute("aria-label", "Critter field note");
@@ -288,6 +305,7 @@ export function createJournalFieldOverlays(options?: {
   const treasuresBackdrop = element("div", "journal-treasures-backdrop");
   treasuresBackdrop.hidden = true;
   const treasuresCard = element("article", "journal-treasures-card");
+  treasuresCard.tabIndex = -1;
   treasuresCard.setAttribute("role", "dialog");
   treasuresCard.setAttribute("aria-modal", "true");
   treasuresCard.setAttribute("aria-label", "Field treasures");
@@ -330,8 +348,29 @@ export function createJournalFieldOverlays(options?: {
   let inspectedItem: InspectedJournalItem | null = null;
   let latestView: JournalFieldNoteSource | null = null;
   let treasuresOpen = false;
+  let fieldReturnFocusEl: HTMLElement | null = null;
+  let treasuresReturnFocusEl: HTMLElement | null = null;
   const onVisibilityChange = options?.onVisibilityChange;
   const onStep = options?.onStep;
+
+  const isFocusableTarget = (node: HTMLElement | null): node is HTMLElement =>
+    node !== null && node.isConnected && node.closest("[hidden]") === null;
+
+  const restoreFieldFocus = (
+    closingItem: InspectedJournalItem | null,
+    fallback: HTMLElement | null,
+  ): void => {
+    const selector = focusRestoreSelector(closingItem);
+    const root = options?.focusRoot ?? fieldBackdrop.parentElement;
+    if (selector !== null && root !== null) {
+      const slot = root.querySelector(selector);
+      if (slot instanceof HTMLElement && slot.tabIndex >= 0 && isFocusableTarget(slot)) {
+        slot.focus({ preventScroll: true });
+        return;
+      }
+    }
+    if (isFocusableTarget(fallback)) fallback.focus({ preventScroll: true });
+  };
 
   const hasOpen = (): boolean => treasuresOpen || inspectedItem !== null;
 
@@ -356,6 +395,7 @@ export function createJournalFieldOverlays(options?: {
   };
 
   const clearFieldNote = (): void => {
+    fieldReturnFocusEl = null;
     if (inspectedItem === null && fieldBackdrop.hidden) return;
     inspectedItem = null;
     fieldSignature = "";
@@ -364,6 +404,7 @@ export function createJournalFieldOverlays(options?: {
   };
 
   const clearTreasures = (): void => {
+    treasuresReturnFocusEl = null;
     if (!treasuresOpen && treasuresBackdrop.hidden) return;
     treasuresOpen = false;
     treasuresBackdrop.hidden = true;
@@ -371,14 +412,19 @@ export function createJournalFieldOverlays(options?: {
 
   const closeFieldNote = (): void => {
     const wasOpen = hasOpen();
+    const closingItem = inspectedItem;
+    const returnTarget = fieldReturnFocusEl;
     clearFieldNote();
     notifyVisibility(wasOpen);
+    restoreFieldFocus(closingItem, returnTarget);
   };
 
   const closeTreasures = (): void => {
     const wasOpen = hasOpen();
+    const returnTarget = treasuresReturnFocusEl;
     clearTreasures();
     notifyVisibility(wasOpen);
+    if (isFocusableTarget(returnTarget)) returnTarget.focus({ preventScroll: true });
   };
 
   const syncTreasures = (view: JournalFieldNoteSource): void => {
@@ -695,26 +741,41 @@ export function createJournalFieldOverlays(options?: {
     treasuresBackdrop,
     inspect: (item, view) => {
       const wasOpen = hasOpen();
+      if (inspectedItem === null) {
+        fieldReturnFocusEl =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      }
       inspectedItem = item;
       if (view !== null) syncFieldNote(view);
+      if (!fieldBackdrop.hidden) fieldCard.focus({ preventScroll: true });
       notifyVisibility(wasOpen);
     },
     openPrize: (prize, view) => {
       if (!prize.owned || prize.image === null) return;
       const wasOpen = hasOpen();
+      if (inspectedItem === null) {
+        fieldReturnFocusEl =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      }
       inspectedItem = { kind: "prize", id: prize.id };
       if (view !== undefined && view !== null) {
         syncFieldNote(view);
       } else {
         renderPrizeNote(prize, null);
       }
+      if (!fieldBackdrop.hidden) fieldCard.focus({ preventScroll: true });
       notifyVisibility(wasOpen);
     },
     openTreasures: (view) => {
       if (view?.treasures?.hasAny !== true) return;
       const wasOpen = hasOpen();
+      if (!treasuresOpen) {
+        treasuresReturnFocusEl =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      }
       treasuresOpen = true;
       syncTreasures(view);
+      if (!treasuresBackdrop.hidden) treasuresCard.focus({ preventScroll: true });
       notifyVisibility(wasOpen);
     },
     syncFieldNote,

@@ -13,7 +13,8 @@ export type CompanionAudioEffect =
   | "card-open"
   | "card-close"
   | "toggle-on"
-  | "toggle-off";
+  | "toggle-off"
+  | "tool-sparkle";
 
 type Timing = { offset: number; duration: number; gain: number; attack?: number };
 export type AudioSegment =
@@ -804,6 +805,11 @@ export const effectRecipes: Record<CompanionAudioEffect, AudioRecipe> = {
       gain: 0.055,
       attack: 0.003,
     },
+  ],
+  "tool-sparkle": [
+    { wave: "sine", frequency: 659, offset: 0, duration: 0.14, gain: 0.055, attack: 0.004 },
+    { wave: "sine", frequency: 880, offset: 0.055, duration: 0.15, gain: 0.05, attack: 0.004 },
+    { wave: "sine", frequency: 1318.5, offset: 0.11, duration: 0.2, gain: 0.045, attack: 0.004 },
   ],
 };
 

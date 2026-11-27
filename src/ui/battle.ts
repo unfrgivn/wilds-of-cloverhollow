@@ -352,6 +352,7 @@ export function createBattleHud(root: HTMLElement): {
   hud.append(energy, portraits, actionsLeft, calm);
   hud.hidden = true;
   const peekCard = element("section", "battle-peek-card");
+  peekCard.tabIndex = -1;
   peekCard.setAttribute("role", "region");
   peekCard.setAttribute("aria-label", "Critter field guide");
   peekCard.hidden = true;
@@ -384,6 +385,8 @@ export function createBattleHud(root: HTMLElement): {
   const peekTip = element("div", "battle-peek-tip");
   peekCard.append(peekHead, peekMeta, peekFeelingsRow, peekTreatsRow, peekTip);
   let lastPeekSig = "";
+  let prevPeekOpen = false;
+  let peekReturnFocusEl: HTMLElement | null = null;
   const popupsLayer = element("div", "battle-popups");
   popupsLayer.setAttribute("aria-live", "polite");
   popupsLayer.setAttribute("aria-atomic", "false");
@@ -568,7 +571,25 @@ export function createBattleHud(root: HTMLElement): {
         if (calm.hasAttribute("title")) calm.removeAttribute("title");
       }
       const peek = view.visible && view.peekOpen === true ? (view.peek ?? null) : null;
-      peekCard.hidden = peek === null;
+      const nextPeekOpen = peek !== null;
+      peekCard.hidden = !nextPeekOpen;
+      if (nextPeekOpen && !prevPeekOpen) {
+        peekReturnFocusEl =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        peekCard.focus({ preventScroll: true });
+      } else if (!nextPeekOpen && prevPeekOpen) {
+        const returnTarget = peekReturnFocusEl;
+        peekReturnFocusEl = null;
+        if (
+          view.visible &&
+          returnTarget !== null &&
+          returnTarget.isConnected &&
+          returnTarget.closest("[hidden]") === null
+        ) {
+          returnTarget.focus({ preventScroll: true });
+        }
+      }
+      prevPeekOpen = nextPeekOpen;
       if (peek !== null) {
         const sig = [
           peek.critterId,

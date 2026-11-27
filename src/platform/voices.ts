@@ -508,6 +508,8 @@ const VOICE_ALIASES: Record<string, string> = {
   "ms. maple": "ms. clover",
   teacher: "ms. clover",
   holly: "nurse holly",
+  "nurse clover": "nurse holly",
+  nurse: "nurse holly",
   "art teacher": "ms. rowan",
   "ms. willow": "ms. reed",
   "music teacher": "ms. reed",

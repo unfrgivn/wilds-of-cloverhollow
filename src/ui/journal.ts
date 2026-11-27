@@ -313,6 +313,7 @@ export function createJournal(root: HTMLElement): JournalControl {
   let onClose: () => void = () => undefined;
 
   const fieldOverlays = createJournalFieldOverlays({
+    focusRoot: book,
     onVisibilityChange: (open) => onOverlayChange(open),
     onStep: () => onOverlayStep(),
   });
@@ -514,6 +515,7 @@ export function createJournal(root: HTMLElement): JournalControl {
         if (slot === undefined) return;
         const image = sticker.owned ? sticker.image : null;
         const inspectable = image !== null && sticker.fieldNote != null;
+        setAttribute(slot.root, "data-sticker", sticker.id);
         syncSlotVisual(slot, image !== null, sticker.name, image);
         syncInspectableSlot(slot.root, inspectable, `Inspect ${sticker.name}`);
       });

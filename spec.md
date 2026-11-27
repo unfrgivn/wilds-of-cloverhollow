@@ -158,9 +158,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `applyWindUpAndFizzle`, `applySoothedAndReward`) live in Pixi-free
   `src/render/battle-vfx.ts` (re-exported through
   `src/render/battle-choreography.ts`, Milestone 137). The
-  Pixi battle stage container, sprites, backdrop blur, check geometry, and
-  `renderBattle` orchestration live in `BattleViewController`
-  (`src/render/battle-view.ts`, mounted by `GameView` in `src/render/view.ts`),
+  Pixi battle stage container, sprites, check geometry, and `renderBattle`
+  orchestration live in `BattleViewController` (`src/render/battle-view.ts`,
+  mounted by `GameView` in `src/render/view.ts`), delegating blurred backdrop
+  texture caching/invalidation, stage wash scrim, painted lighting waves,
+  spotlight, ground ellipse, sunburst rays, contact shadows, flute cameo
+  staging, and pooled stage VFX sprites to `BattleStageRenderer`
+  (`src/render/battle-stage-render.ts`, Milestone 155),
   and the eight active battle timing-check DOM overlays (`ring`, `charge`,
   `chain`, `catch`, `lean`, `trace`, `peekaboo`, `echo`) live in
   `src/ui/battle-checks.ts` (re-exported through `src/ui/battle.ts`, Milestone
@@ -184,7 +188,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
   `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
   `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
-  `captureAreaPostcard`) live in `src/shell/feedback.ts`; desktop mouse/pen
+  `captureAreaPostcard`, `shouldPlayToolEventChime`, `createToolEventChimeSync`,
+  `createNpcChatterSync`) live in `src/shell/feedback.ts`; desktop mouse/pen
   overworld press-and-hold steering and near-player tap detection
   (`computeOverworldSteer`, `isOverworldTap`, `bindOverworldPointerSteer`) live
   in `src/shell/overworld-pointer.ts`; and
@@ -567,7 +572,13 @@ ios/            Capacitor iOS project (from Milestone 4).
   `"toggle-off"` during live overworld transitions (silent on harness reset or
   backup import), and Journal `OPTIONS` toggles (`Sound Effects` when unmuting,
   `Music`, `Ambience`, `Gentle Timing`, `Key Hints`, `Text Speed`, and `Reduced
-  Motion`) play `"toggle-on"` / `"toggle-off"` + `"light"` haptic.
+  Motion`) play `"toggle-on"` / `"toggle-off"` + `"light"` haptic. Interactive
+  NPC tool micro-events also play `"tool-sparkle"` (Milestone 155: delicate
+  3-note sunlit celesta shimmer, `sine` 659 -> 880 -> 1318.5 Hz at `0 / 0.055 /
+  0.11 s`, gentle gains `0.055 / 0.05 / 0.045`, zero square waves) + `"light"`
+  haptic once per fresh activation in live overworld play via
+  `shouldPlayToolEventChime` / `createToolEventChimeSync`
+  (`src/shell/feedback.ts`, `src/main.ts`).
 - Celebratory minigame audio flourishes (Milestone 152,
   `src/platform/audio-recipes.ts`, re-exported via `src/platform/audio.ts`):
   upgrades three key minigame reward cues into warm multi-segment storybook
@@ -817,7 +828,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   - Pure deterministic `npcWorldSituation`, `reactionRippleTicks`, and
     `evaluateNpcLife` (zero banned trig, zero `State` or save-version changes)
     read `content/npc-profiles.json` (53 named character profiles covering the
-    entire town cast, 34 biome-wide NPC-to-NPC social banter entries including
+    entire town cast with 100% bespoke voice, non-default speaker accent, and
+    painted bust-portrait parity across every profile, banter pair, party
+    banter entry, and tool event speaker including `"Nurse Clover"` aliased to
+    Nurse Holly's warm clinical timbre, `"school"` accent, and `["nurse",
+    "adult"]` portrait in Milestone 155, 34 biome-wide NPC-to-NPC social banter entries including
     shop duos and six post-finale celebration banter pairs, 15 traveling party
     companion banter entries `partyBanter`, and 7 interactive tool micro-events
     `toolEvents` across `lantern`, `flute`, and `lasso`, skipping `bus-stop`
@@ -828,9 +843,11 @@ ios/            Capacitor iOS project (from Milestone 4).
     party companion attention (`party: PartyLifeEntry[]` with `lantern-awe`,
     `celebrate`, `music-delight`, `party-chat`, and `idle`, rendering floating
     party emotes during active tool micro-events and party chat while skipping
-    napping Maddie and respecting `reducedMotion`), interactive tool micro-events (`activeToolEventId` with 180-tick turn alternation and
-    pooled celebration sparkles on fresh activation, skipped under
-    `reducedMotion` and `harness`), traveling party companion banter anchored
+    napping Maddie and respecting `reducedMotion`), interactive tool
+    micro-events (`activeToolEventId` with 180-tick turn alternation, pooled
+    celebration sparkles on fresh activation skipped under `reducedMotion` and
+    `harness`, and live `"tool-sparkle"` celesta chime + light haptic via
+    `createToolEventChimeSync`), traveling party companion banter anchored
     at live `(member.x, member.y)` coordinates on a calm 360-tick cycle
     staggered cleanly around area NPC banter, post-finale `forest_calm`
     celebration warmth (festive `heart`/`sparkle` emotes for `player-greet` and
@@ -3265,9 +3282,12 @@ trunks keep its two exits.
   8), or clicking/tapping the top-right
   foe plate (`.battle-calm`, styled identically at rest so existing battle
   baselines stay unchanged) toggles a compact warm-paper `.battle-peek-card`
-  (`role="region"`, `aria-label="Critter field guide"`, `hidden` by default,
-  `z-index: var(--z-prompt)`, `#fbf6e8` card with `#47321f` dark-ink text and
-  pills). It shows critter name, level, familiarity (`New Friend` /
+  (`role="region"`, `aria-label="Critter field guide"`, `tabindex="-1"`, `hidden`
+  by default, `z-index: var(--z-prompt)`, `#fbf6e8` card with `#47321f`
+  dark-ink text and pills; opening moves focus to `.battle-peek-card` without
+  altering its 2 px ink outline and closing restores focus to the prior
+  connected, visible trigger element when battle remains active, Milestone
+  152). It shows critter name, level, familiarity (`New Friend` /
   `Befriended ✓` / `Old Friend ★` using `state.calms[species]` and
   `world.battle.oldFriends.calms`), region name, check mechanic badge
   (`checkMechanicLabel`, exhaustive over all 8 `CheckSpec["kind"]` values),
@@ -4311,6 +4331,20 @@ trunks keep its two exits.
       Gamepad D-Pad / Left Stick Left or Right flips directly across owned
       entries on that shelf with wrap-around, firing `"page-turn"` foley and a
       light haptic without leaving the card.
+    - **WCAG 2.4.3 Modal Focus Management & Browse-Synced Restoration**
+      (Milestone 155, pure `focusRestoreSelector` in
+      `src/ui/journal-field-note.ts`, `data-sticker` on sticker slots in
+      `src/ui/journal.ts`): `.journal-field-note` and `.journal-treasures-card`
+      carry `tabindex="-1"` while preserving their 2 px storybook ink outline on
+      focus (zero browser ring or pixel shift). User opening moves focus into
+      the active dialog card (`preventScroll: true`), and user dismissal (`×`,
+      backdrop click, `Escape`, `X`, Gamepad `B`, skipping programmatic clears
+      on Journal close or tab switch) restores focus directly onto the
+      currently inspected entry's visible slot via `focusRestoreSelector` (e.g.
+      browsing `Frog Plush` -> `Pup Plush` with `ArrowRight` restores focus
+      onto `[data-prize="pup-plush"]`), falling back to the saved trigger
+      element if still connected and visible. `.journal-treasures-card`
+      similarly saves and restores focus to its trigger button on dismissal.
   - **Completion Ribbons & MAP Footer Pills**: `STICKERS` and `PRIZES` headings
     also show the golden `★ Complete!` ribbon once every entry in their shelf is
     owned. The MAP footer dynamically attaches `Fish N/6` and `Keepsakes N/8`

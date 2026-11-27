@@ -6719,6 +6719,49 @@ the old trail, the owl, and the clubhouse claim.
   budget + harness checks), 52/52 Chromium & WebKit e2e, and 95/95 Chromium
   `ui-gallery` tests.
 
+## Milestone 155: 100% Living NPC Profile Voice/Portrait Parity (`Nurse Clover`), Interactive Tool Micro-Event Sparkle Chime (`"tool-sparkle"`), Accessible Dialog Focus Restoration & `src/render/battle-stage-render.ts` Split **Status:** ✅ Completed (2026-11-27)
+- 100% Living NPC Profile Voice, Accent & Portrait Parity (`src/platform/voices.ts`,
+  `src/ui/portraits.ts`):
+  - Aliases `"nurse clover"` (and `"nurse"`) to Nurse Holly's warm clinical
+    sine voice profile in `NAMED_VOICES`, adds `"nurse clover"` (and `"nurse"`)
+    to `SCHOOL_SPEAKERS`, and maps both to `["nurse", "adult"]` in
+    `CHARACTER_MAP`, reaching 53/53 Living NPC profile parity across all
+    profiles, banter pairs, party banter entries, and tool events.
+- Interactive Tool Micro-Event Celebration Chime & Haptic
+  (`src/platform/audio-recipes.ts`, `src/shell/feedback.ts`,
+  `src/render/view.ts`, `src/main.ts`):
+  - Adds `"tool-sparkle"` to `CompanionAudioEffect` and `effectRecipes` (3-note
+    sunlit celesta shimmer: `sine` 659 -> 880 -> 1318.5 Hz at `0 / 0.055 / 0.11 s`,
+    gentle gains `0.055 / 0.05 / 0.045`, zero square waves).
+  - Exports pure `shouldPlayToolEventChime` and stateful
+    `createToolEventChimeSync` in `src/shell/feedback.ts`, exposes
+    `GameView.npcLifeInfo()`, and fires `sound.playEffect("tool-sparkle")` +
+    `lightHaptic()` once per fresh interactive tool micro-event activation in
+    live overworld play.
+- Accessible Modal Focus Management & Browse-Synced Restoration
+  (`src/ui/journal-field-note.ts`, `src/ui/journal.ts`, `src/ui/journal.css`,
+  `src/ui/battle.ts`, `src/ui/battle.css`):
+  - Exports pure `focusRestoreSelector`, sets `data-sticker` on Journal sticker
+    slots, sets `tabIndex = -1` on `.journal-field-note`,
+    `.journal-treasures-card`, and `.battle-peek-card` (preserving their exact
+    `2px solid var(--sticker-ink)` border outline on focus for zero visual
+    pixel drift), moves focus cleanly into opened modal cards, and restores
+    focus to the currently inspected shelf slot (or prior connected visible
+    trigger) on user dismissal.
+- `src/render/battle-stage-render.ts` Extraction (`src/render/battle-view.ts`
+  944 -> 649 lines):
+  - Extracts `BattleStageRenderer` (blurred backdrop texture cache &
+    invalidation, wash scrim, painted lighting mood waves/spotlight/ground
+    ellipse/sunburst rays, contact shadows, flute cameo staging, and pooled
+    battle VFX sprites) into `src/render/battle-stage-render.ts` (439 lines)
+    with zero visual or behavioral changes and zero `src/core` edits.
+- Evidence: `tests/unit/milestone-155.test.ts` (6 tests) and real-input
+  `tests/e2e/milestone-155.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (all 72 sims with zero replay hash shifts, 23 QA packs,
+  purity, lint), `just build` (production hook leak + `< 500 kB` app-chunk
+  budget + harness checks), and full e2e across Chromium (655 passed) & WebKit
+  (558 passed; 1,213 total passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

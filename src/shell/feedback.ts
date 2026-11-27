@@ -427,6 +427,50 @@ export function captureAreaPostcard(
   };
 }
 
+/** True when an interactive NPC tool micro-event freshly activates. */
+export function shouldPlayToolEventChime(
+  prevEventId: string | null,
+  nextEventId: string | null,
+): boolean {
+  return nextEventId !== null && nextEventId !== prevEventId;
+}
+
+/** Tracks live overworld tool micro-event transitions to trigger a celebration chime once. */
+export function createToolEventChimeSync(
+  onChime: () => void,
+): {
+  sync: (
+    area: string,
+    overworldActive: boolean,
+    live: boolean,
+    activeToolEventId: string | null,
+  ) => void;
+  reset: () => void;
+} {
+  let lastArea: string | null = null;
+  let lastToolEventId: string | null = null;
+  return {
+    reset: () => {
+      lastArea = null;
+      lastToolEventId = null;
+    },
+    sync: (area, overworldActive, live, activeToolEventId) => {
+      if (area !== lastArea) {
+        lastArea = area;
+        lastToolEventId = null;
+      }
+      if (!overworldActive) {
+        lastToolEventId = null;
+        return;
+      }
+      if (live && shouldPlayToolEventChime(lastToolEventId, activeToolEventId)) {
+        onChime();
+      }
+      lastToolEventId = activeToolEventId;
+    },
+  };
+}
+
 /** Mounts ambient NPC chatter UI and plays a soft voice blip once per fresh line. */
 export function createNpcChatterSync(
   world: World,

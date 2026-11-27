@@ -96,6 +96,7 @@ const JUST_CALMED_RANGE = 320;
 const PARTY_CHATTER_RANGE = 210;
 const BANTER_RANGE = 400;
 const AMBIENT_CHATTER_RANGE = 185;
+const FINALE_CELEBRATION_RANGE = 240;
 const BANTER_CYCLE_TICKS = 360;
 const BANTER_SPEAK_TICKS = 105;
 const BANTER_SECOND_START = 135;
@@ -369,6 +370,17 @@ function bestMatchingRule(
   return best;
 }
 
+function celebrationEmoteFor(personality: NpcPersonality): NpcEmoteKind {
+  return (
+    personality === "kid-bouncy" ||
+    personality === "scholar" ||
+    personality === "mystic" ||
+    personality === "fairy"
+  )
+    ? "sparkle"
+    : "heart";
+}
+
 function makeBubble(
   npc: Npc,
   profile: NpcProfile,
@@ -565,8 +577,12 @@ function evaluateChatter(
           candidate.when?.chaosNearby !== true,
       );
       if (rule !== undefined) {
+        const isFinaleRule =
+          rule.when?.notVariable === "forest_fizzy" || rule.when?.calmed === "hooded-kid";
         const tone: NpcChatterBubble["tone"] =
-          rule.when?.hasTreats === true || rule.when?.minBossesCalmed !== undefined
+          rule.when?.hasTreats === true ||
+          rule.when?.minBossesCalmed !== undefined ||
+          isFinaleRule
             ? "warm"
             : "normal";
         return makeBubble(
@@ -650,13 +666,6 @@ export function evaluateNpcLife(
       playerGap <= CELEBRATE_RANGE &&
       state.tick - memory.lastCalmedTick >= ripple
     ) {
-      const celebrateEmote: NpcEmoteKind =
-        profile.personality === "kid-bouncy" ||
-        profile.personality === "scholar" ||
-        profile.personality === "mystic" ||
-        profile.personality === "fairy"
-          ? "sparkle"
-          : "heart";
       return {
         id: npc.id,
         x: npc.point.x,
@@ -665,7 +674,7 @@ export function evaluateNpcLife(
         attention: "celebrate",
         personality: profile.personality,
         adult: profile.adult,
-        emote: celebrateEmote,
+        emote: celebrationEmoteFor(profile.personality),
         attentionStrength: clamp01(1 - playerGap / (CELEBRATE_RANGE + 30)),
         focusTarget: { x: state.player.x, y: state.player.y },
       };
@@ -742,6 +751,10 @@ export function evaluateNpcLife(
       };
     }
 
+    const festiveFinale =
+      situation.storyStage === "forest_calm" && playerGap <= FINALE_CELEBRATION_RANGE;
+    const festiveEmote = celebrationEmoteFor(profile.personality);
+
     if (playerGap <= profile.greetRange) {
       return {
         id: npc.id,
@@ -751,7 +764,7 @@ export function evaluateNpcLife(
         attention: "player-greet",
         personality: profile.personality,
         adult: profile.adult,
-        emote: state.dialogue === null ? "wave" : null,
+        emote: state.dialogue === null ? (festiveFinale ? festiveEmote : "wave") : null,
         attentionStrength: clamp01(1 - playerGap / (profile.greetRange + 25)),
         focusTarget: { x: state.player.x, y: state.player.y },
       };
@@ -794,8 +807,8 @@ export function evaluateNpcLife(
       attention: "idle",
       personality: profile.personality,
       adult: profile.adult,
-      emote: null,
-      attentionStrength: 0,
+      emote: state.dialogue === null && festiveFinale ? festiveEmote : null,
+      attentionStrength: festiveFinale ? 0.35 : 0,
       focusTarget: null,
     };
   });

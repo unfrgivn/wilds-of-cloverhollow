@@ -6,12 +6,13 @@ export {};
 
 type Spec = {
   id: string;
-  group: "adults" | "kids" | "wave2" | "wave3";
+  group: "adults" | "kids" | "wave2" | "wave3" | "shops";
   figureHeight: number;
   cols: number;
   rows: number;
   // [col, row] (0-indexed) for [down_idle_01, down_idle_02, left_idle_01, right_idle_01]
   cells: readonly (readonly [number, number])[];
+  flopLeft?: boolean;
 };
 
 const people: readonly Spec[] = [
@@ -67,6 +68,10 @@ const people: readonly Spec[] = [
     cells: [[0, 0], [1, 0], [0, 1], [1, 1]] },
   { id: "theo", group: "wave3", figureHeight: 280, cols: 2, rows: 2,
     cells: [[0, 0], [1, 0], [0, 1], [1, 1]] },
+  { id: "marigold", group: "shops", figureHeight: 336, cols: 2, rows: 2,
+    cells: [[0, 0], [1, 0], [1, 1], [0, 1]] },
+  { id: "danny", group: "shops", figureHeight: 280, cols: 2, rows: 2,
+    cells: [[0, 0], [1, 0], [0, 1], [1, 1]], flopLeft: true },
 ];
 
 const frameNames = [
@@ -99,6 +104,7 @@ for (const person of selected) {
       "-crop",
       `${cellW}x${cellH}+${col * cellW}+${row * cellH}`,
       "+repage",
+      ...(name === "left_idle_01" && person.flopLeft === true ? ["-flop"] : []),
       cropPath,
     ]);
     await run([
@@ -196,7 +202,7 @@ for (const person of selected) {
 }
 
 async function buildReviewSheet(
-  group: "adults" | "kids" | "wave2" | "wave3",
+  group: "adults" | "kids" | "wave2" | "wave3" | "shops",
   bg: string,
   suffix: string,
 ): Promise<void> {
@@ -240,11 +246,8 @@ async function buildReviewSheet(
   console.log(`Built review sheet: ${out}`);
 }
 
-await buildReviewSheet("adults", "#F5F1E0", "cream");
-await buildReviewSheet("adults", "#1E1926", "dark");
-await buildReviewSheet("kids", "#F5F1E0", "cream");
-await buildReviewSheet("kids", "#1E1926", "dark");
-await buildReviewSheet("wave2", "#F5F1E0", "cream");
-await buildReviewSheet("wave2", "#1E1926", "dark");
-await buildReviewSheet("wave3", "#F5F1E0", "cream");
-await buildReviewSheet("wave3", "#1E1926", "dark");
+const groupsToBuild = new Set(selected.map((person) => person.group));
+for (const group of groupsToBuild) {
+  await buildReviewSheet(group, "#F5F1E0", "cream");
+  await buildReviewSheet(group, "#1E1926", "dark");
+}

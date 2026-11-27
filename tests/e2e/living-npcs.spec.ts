@@ -464,3 +464,169 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test(
+  "shop regulars, journal neighborhood errands, and post-finale celebration",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openQaPaused(page, "fountain-frog");
+    expect((await readState(page)).area).toBe("plaza");
+
+    // 1. Start Mailman Gus's Postal Chain & verify Fae's Journal NOTES records it cleanly.
+    await walk(page, "x", 600);
+    await walk(page, "y", 390);
+    await walk(page, "x", 495);
+    await page.keyboard.down("ArrowUp");
+    await step(page, 2);
+    await page.keyboard.up("ArrowUp");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 4);
+    expect((await readState(page)).dialogue?.knot).toBe("npc_gus");
+    await finishDialogue(page, "Offer to help deliver mail to the bay");
+    await step(page, 4);
+
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await expect(page.locator(".journal-book")).toBeVisible();
+    await expect(page.locator(".journal-book")).toContainText("Seashell Postcard to Captain Sal");
+    await page.keyboard.press("Escape");
+    await step(page, 2);
+
+    // 2. Enter Cloverhollow Grocery Market: verify Marigold + Pippin banter & gift.
+    await walk(page, "y", 400);
+    await walk(page, "x", 700);
+    await holdThroughDoor(page, "ArrowUp", "market");
+    expect((await readState(page)).area).toBe("market");
+    assertNpcsRendered((await renderInfo(page)).npcs, ["marigold", "pippin"]);
+
+    const marketBanter = await stepUntilChatter(
+      page,
+      (bubble) =>
+        bubble.tone === "banter" &&
+        (bubble.npcId === "marigold" || bubble.npcId === "pippin"),
+    );
+    expect(["Mrs. Marigold", "Grocer Pippin"]).toContain(marketBanter.speakerName);
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "banter");
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+
+    const coinsBeforeMarigold = (await readState(page)).coins;
+    await walk(page, "y", 640);
+    await walk(page, "x", 470);
+    await page.keyboard.down("ArrowRight");
+    await step(page, 2);
+    await page.keyboard.up("ArrowRight");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 4);
+    expect((await readState(page)).dialogue?.knot).toBe("npc_marigold");
+    await expect(page.locator(".sticker-speaker")).toHaveText("Mrs. Marigold");
+    await expect(page.locator(".sticker-portrait")).toBeVisible();
+    await finishDialogue(page, "Help Mrs. Marigold pick a ripe orchard apple");
+    await step(page, 4);
+    const afterMarigold = await readState(page);
+    expect(afterMarigold.coins).toBe(coinsBeforeMarigold + 6);
+    expect(afterMarigold.treats?.["orchard-apple"]).toBe(1);
+
+    // 3. Exit to Plaza and enter Sweet Scoop Ice Cream Parlor: Danny + Penny banter & gift.
+    await walk(page, "y", 540);
+    await walk(page, "x", 200);
+    await holdThroughDoor(page, "ArrowUp", "plaza");
+    expect((await readState(page)).area).toBe("plaza");
+    await walk(page, "y", 400);
+    await walk(page, "x", 938);
+    await holdThroughDoor(page, "ArrowUp", "parlor");
+    expect((await readState(page)).area).toBe("parlor");
+    assertNpcsRendered((await renderInfo(page)).npcs, ["danny", "penny"]);
+
+    const parlorBanter = await stepUntilChatter(
+      page,
+      (bubble) =>
+        bubble.tone === "banter" &&
+        (bubble.npcId === "danny" || bubble.npcId === "penny"),
+    );
+    expect(["Danny", "Scooper Penny"]).toContain(parlorBanter.speakerName);
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "banter");
+    await assertChatterContrast(page);
+    await assertChatterInViewport(page, 1280, 720);
+
+    const coinsBeforeDanny = (await readState(page)).coins;
+    await walk(page, "y", 695);
+    await walk(page, "x", 488);
+    await page.keyboard.down("ArrowRight");
+    await step(page, 2);
+    await page.keyboard.up("ArrowRight");
+    await step(page, 2);
+    await page.keyboard.press("z");
+    await step(page, 4);
+    expect((await readState(page)).dialogue?.knot).toBe("npc_danny");
+    await expect(page.locator(".sticker-speaker")).toHaveText("Danny");
+    await expect(page.locator(".sticker-portrait")).toBeVisible();
+    await finishDialogue(page, "Trade ice-cream flavor tips with Danny");
+    await step(page, 4);
+    const afterDanny = await readState(page);
+    expect(afterDanny.coins).toBe(coinsBeforeDanny + 6);
+    expect(afterDanny.treats?.["berry-cone"]).toBe(1);
+
+    // 4. Post-finale celebration pass (forest_calm): festive banter, warm chatter & emotes.
+    await walk(page, "x", 360);
+    await walk(page, "y", 600);
+    const finaleBackup = await page.evaluate(() => {
+      const raw = window.__cloverhollow?.save.exportBackup?.();
+      if (raw === undefined) return null;
+      const isObj = (v: unknown): v is Record<string, unknown> =>
+        typeof v === "object" && v !== null && !Array.isArray(v);
+      const env: unknown = JSON.parse(raw);
+      if (!isObj(env) || typeof env.save !== "string") return null;
+      const payload: unknown = JSON.parse(env.save);
+      if (!isObj(payload) || !isObj(payload.state)) return null;
+      const st = payload.state;
+      if (!isObj(st.critters) || typeof st.ink !== "string") return null;
+      st.critters["hooded-kid"] = "calm";
+      const inkObj: unknown = JSON.parse(st.ink);
+      if (!isObj(inkObj) || !isObj(inkObj.variablesState)) return null;
+      inkObj.variablesState.forest_fizzy = false;
+      st.ink = JSON.stringify(inkObj);
+      return JSON.stringify(payload);
+    });
+    expect(finaleBackup).not.toBeNull();
+    await openHarness(page);
+    const imported = await page.evaluate(async (saveJson) => {
+      const hook = window.__cloverhollow;
+      if (hook?.save.importBackup === undefined || saveJson === null) return false;
+      return hook.save.importBackup(saveJson);
+    }, finaleBackup);
+    expect(imported).toBe(true);
+    await step(page, 60);
+
+    expect((await renderInfo(page)).npcLife.stage).toBe("forest_calm");
+    const finaleBanter = await stepUntilChatter(
+      page,
+      (bubble) =>
+        bubble.tone === "banter" &&
+        (bubble.text.includes("Victory Dream Sundaes") || bubble.text.includes("Milo")),
+    );
+    expect(["Danny", "Scooper Penny"]).toContain(finaleBanter.speakerName);
+
+    // Walk within Danny's greet/celebration range & verify warm finale chatter + sparkle emote.
+    await walk(page, "y", 700);
+    await walk(page, "x", 420);
+    const finaleWarm = await stepUntilChatter(
+      page,
+      (bubble) => bubble.tone === "warm" && bubble.npcId === "danny",
+      480,
+    );
+    expect(finaleWarm.text).toContain("Victory Rainbow Sundae");
+    await expect(page.locator(".npc-chatter")).toHaveAttribute("data-tone", "warm");
+    await assertChatterContrast(page);
+    const dannyLife = (await renderInfo(page)).npcLife.npcs.find((n) => n.id === "danny");
+    expect(dannyLife?.emote).toBe("sparkle");
+
+    expect(errors).toEqual([]);
+  },
+);

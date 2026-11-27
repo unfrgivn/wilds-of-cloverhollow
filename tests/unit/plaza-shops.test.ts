@@ -97,7 +97,7 @@ describe("Cloverhollow's Final Two Plaza Shops: Market & Ice Cream Parlor", () =
     expect(market.land).toBe("cloverhollow");
     expect(market.width).toBe(1200);
     expect(market.height).toBe(800);
-    expect(market.npcs.map((npc) => npc.id)).toEqual(["pippin"]);
+    expect(market.npcs.map((npc) => npc.id)).toEqual(["pippin", "marigold"]);
     expect(market.interactables.map((item) => item.id)).toEqual([
       "market-produce",
       "market-shelves",
@@ -110,7 +110,7 @@ describe("Cloverhollow's Final Two Plaza Shops: Market & Ice Cream Parlor", () =
     expect(parlor.land).toBe("cloverhollow");
     expect(parlor.width).toBe(1200);
     expect(parlor.height).toBe(800);
-    expect(parlor.npcs.map((npc) => npc.id)).toEqual(["penny"]);
+    expect(parlor.npcs.map((npc) => npc.id)).toEqual(["penny", "danny"]);
     expect(parlor.interactables.map((item) => item.id)).toEqual([
       "parlor-gelato",
       "parlor-menu",
@@ -366,7 +366,10 @@ describe("Cloverhollow's Final Two Plaza Shops: Market & Ice Cream Parlor", () =
       expect(INDOOR_AREAS.has("parlor")).toBe(true);
       expect(ADULT_NPCS.has("pippin")).toBe(true);
       expect(ADULT_NPCS.has("penny")).toBe(true);
-      for (const npc of [...market.npcs, ...parlor.npcs]) {
+      const keepers = [...market.npcs, ...parlor.npcs].filter(
+        (npc) => npc.id === "pippin" || npc.id === "penny",
+      );
+      for (const npc of keepers) {
         expect(computeNpcOverworldHeight(npc, undefined)).toBe(132);
         expect(computeNpcShadow(npc.id, npc.point, NEUTRAL_POSE, 0.24).width).toBe(52);
       }

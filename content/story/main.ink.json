@@ -486,6 +486,176 @@
         "\n",
         "ev",
         {
+          "CNT?": "npc_gus.mail_complete"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Mailman Gus made me Cloverhollow's Honorary Junior Mail Carrier after our cross-town postcard delivery! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.18"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "CNT?": "npc_mina.received_letter"
+        },
+        {
+          "CNT?": "npc_gus.mail_complete"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Mina loved Captain Sal's Mountain Letter at Pinecone Pass! I should tell Mailman Gus back in the plaza. ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.28"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "CNT?": "npc_sal.gave_mountain_letter"
+        },
+        {
+          "CNT?": "npc_mina.received_letter"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Captain Sal gave me a Mountain Reply Letter to deliver up to Mina at Pinecone Pass! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.38"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "CNT?": "npc_gus.gave_postcard"
+        },
+        {
+          "CNT?": "npc_sal.gave_mountain_letter"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Mailman Gus asked me to deliver a Seashell Postcard to Captain Sal down at Bubblegum Bay! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.48"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "CNT?": "npc_wren.sketch_complete"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Wren finished the Cloverhollow valley sketchbook with Professor Pebble's crystal rubbing and Sunny's pressed clover! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.55"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
+          "CNT?": "npc_wren.started_sketch"
+        },
+        {
+          "CNT?": "npc_wren.sketch_complete"
+        },
+        "!",
+        "&&",
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ Wren in Whispering Woods is collecting a crystal rubbing from Professor Pebble and a pressed clover from Sunny for a valley sketchbook! ",
+              "#",
+              "^speaker: Fae",
+              {
+                "->": ".^.^.^.65"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "/#",
+        "\n",
+        "ev",
+        {
           "VAR?": "parlor_visited"
         },
         "/ev",
@@ -500,7 +670,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.18"
+                "->": ".^.^.^.72"
               },
               null
             ]
@@ -525,7 +695,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.25"
+                "->": ".^.^.^.79"
               },
               null
             ]
@@ -550,7 +720,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.32"
+                "->": ".^.^.^.86"
               },
               null
             ]
@@ -575,7 +745,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.39"
+                "->": ".^.^.^.93"
               },
               null
             ]
@@ -600,7 +770,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.46"
+                "->": ".^.^.^.100"
               },
               null
             ]
@@ -630,7 +800,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.56"
+                "->": ".^.^.^.110"
               },
               null
             ]
@@ -655,7 +825,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.63"
+                "->": ".^.^.^.117"
               },
               null
             ]
@@ -680,7 +850,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.70"
+                "->": ".^.^.^.124"
               },
               null
             ]
@@ -705,7 +875,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.77"
+                "->": ".^.^.^.131"
               },
               null
             ]
@@ -843,7 +1013,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.87"
+                "->": ".^.^.^.141"
               },
               null
             ]
@@ -872,7 +1042,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.97"
+                "->": ".^.^.^.151"
               },
               null
             ]
@@ -906,7 +1076,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.110"
+                "->": ".^.^.^.164"
               },
               null
             ]
@@ -935,7 +1105,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.120"
+                "->": ".^.^.^.174"
               },
               null
             ]
@@ -969,7 +1139,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.133"
+                "->": ".^.^.^.187"
               },
               null
             ]
@@ -994,7 +1164,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.140"
+                "->": ".^.^.^.194"
               },
               null
             ]
@@ -1033,7 +1203,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.152"
+                "->": ".^.^.^.206"
               },
               null
             ]
@@ -1058,7 +1228,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.159"
+                "->": ".^.^.^.213"
               },
               null
             ]
@@ -1083,7 +1253,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.166"
+                "->": ".^.^.^.220"
               },
               null
             ]
@@ -1113,7 +1283,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.176"
+                "->": ".^.^.^.230"
               },
               null
             ]
@@ -1143,7 +1313,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.186"
+                "->": ".^.^.^.240"
               },
               null
             ]
@@ -1168,7 +1338,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.193"
+                "->": ".^.^.^.247"
               },
               null
             ]
@@ -1193,7 +1363,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.200"
+                "->": ".^.^.^.254"
               },
               null
             ]
@@ -1223,7 +1393,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.210"
+                "->": ".^.^.^.264"
               },
               null
             ]
@@ -1248,7 +1418,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.217"
+                "->": ".^.^.^.271"
               },
               null
             ]
@@ -1278,7 +1448,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.227"
+                "->": ".^.^.^.281"
               },
               null
             ]
@@ -1303,7 +1473,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.234"
+                "->": ".^.^.^.288"
               },
               null
             ]
@@ -1337,7 +1507,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.247"
+                "->": ".^.^.^.301"
               },
               null
             ]
@@ -1366,7 +1536,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.257"
+                "->": ".^.^.^.311"
               },
               null
             ]
@@ -1391,7 +1561,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.264"
+                "->": ".^.^.^.318"
               },
               null
             ]
@@ -1416,7 +1586,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.271"
+                "->": ".^.^.^.325"
               },
               null
             ]
@@ -1441,7 +1611,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.278"
+                "->": ".^.^.^.332"
               },
               null
             ]
@@ -1466,7 +1636,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.285"
+                "->": ".^.^.^.339"
               },
               null
             ]
@@ -1491,7 +1661,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.292"
+                "->": ".^.^.^.346"
               },
               null
             ]
@@ -1521,7 +1691,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.302"
+                "->": ".^.^.^.356"
               },
               null
             ]
@@ -1546,7 +1716,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.309"
+                "->": ".^.^.^.363"
               },
               null
             ]
@@ -1571,7 +1741,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.316"
+                "->": ".^.^.^.370"
               },
               null
             ]
@@ -1601,7 +1771,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.326"
+                "->": ".^.^.^.380"
               },
               null
             ]
@@ -1626,7 +1796,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.333"
+                "->": ".^.^.^.387"
               },
               null
             ]
@@ -1653,7 +1823,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.342"
+                "->": ".^.^.^.396"
               },
               null
             ]
@@ -1680,7 +1850,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.351"
+                "->": ".^.^.^.405"
               },
               null
             ]
@@ -1705,7 +1875,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.358"
+                "->": ".^.^.^.412"
               },
               null
             ]
@@ -1734,7 +1904,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.368"
+                "->": ".^.^.^.422"
               },
               null
             ]
@@ -1763,7 +1933,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.378"
+                "->": ".^.^.^.432"
               },
               null
             ]
@@ -1797,7 +1967,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.391"
+                "->": ".^.^.^.445"
               },
               null
             ]
@@ -1826,7 +1996,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.401"
+                "->": ".^.^.^.455"
               },
               null
             ]
@@ -1860,7 +2030,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.414"
+                "->": ".^.^.^.468"
               },
               null
             ]
@@ -1894,7 +2064,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.427"
+                "->": ".^.^.^.481"
               },
               null
             ]
@@ -1923,7 +2093,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.437"
+                "->": ".^.^.^.491"
               },
               null
             ]
@@ -1957,7 +2127,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.450"
+                "->": ".^.^.^.504"
               },
               null
             ]
@@ -1982,7 +2152,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.457"
+                "->": ".^.^.^.511"
               },
               null
             ]
@@ -2007,7 +2177,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.464"
+                "->": ".^.^.^.518"
               },
               null
             ]
@@ -2041,7 +2211,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.476"
+                "->": ".^.^.^.530"
               },
               null
             ]
@@ -2066,7 +2236,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.483"
+                "->": ".^.^.^.537"
               },
               null
             ]
@@ -2091,7 +2261,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.490"
+                "->": ".^.^.^.544"
               },
               null
             ]
@@ -2121,7 +2291,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.500"
+                "->": ".^.^.^.554"
               },
               null
             ]
@@ -2151,7 +2321,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.510"
+                "->": ".^.^.^.564"
               },
               null
             ]
@@ -2176,7 +2346,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.517"
+                "->": ".^.^.^.571"
               },
               null
             ]
@@ -2206,7 +2376,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.527"
+                "->": ".^.^.^.581"
               },
               null
             ]
@@ -2236,7 +2406,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.537"
+                "->": ".^.^.^.591"
               },
               null
             ]
@@ -2261,7 +2431,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.544"
+                "->": ".^.^.^.598"
               },
               null
             ]
@@ -2291,7 +2461,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.554"
+                "->": ".^.^.^.608"
               },
               null
             ]
@@ -2321,7 +2491,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.564"
+                "->": ".^.^.^.618"
               },
               null
             ]
@@ -2346,7 +2516,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.571"
+                "->": ".^.^.^.625"
               },
               null
             ]
@@ -2371,7 +2541,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.578"
+                "->": ".^.^.^.632"
               },
               null
             ]
@@ -2401,7 +2571,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.588"
+                "->": ".^.^.^.642"
               },
               null
             ]
@@ -2435,7 +2605,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.601"
+                "->": ".^.^.^.655"
               },
               null
             ]
@@ -2465,7 +2635,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.611"
+                "->": ".^.^.^.665"
               },
               null
             ]
@@ -2490,7 +2660,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.618"
+                "->": ".^.^.^.672"
               },
               null
             ]
@@ -2520,7 +2690,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.628"
+                "->": ".^.^.^.682"
               },
               null
             ]
@@ -2554,7 +2724,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.641"
+                "->": ".^.^.^.695"
               },
               null
             ]
@@ -2588,7 +2758,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.654"
+                "->": ".^.^.^.708"
               },
               null
             ]
@@ -2618,7 +2788,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.664"
+                "->": ".^.^.^.718"
               },
               null
             ]
@@ -2648,7 +2818,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.674"
+                "->": ".^.^.^.728"
               },
               null
             ]
@@ -2678,7 +2848,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.684"
+                "->": ".^.^.^.738"
               },
               null
             ]
@@ -2703,7 +2873,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.691"
+                "->": ".^.^.^.745"
               },
               null
             ]
@@ -2745,7 +2915,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.708"
+                "->": ".^.^.^.762"
               },
               null
             ]
@@ -2779,7 +2949,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.721"
+                "->": ".^.^.^.775"
               },
               null
             ]
@@ -2879,7 +3049,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.731"
+                "->": ".^.^.^.785"
               },
               null
             ]
@@ -2904,7 +3074,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.738"
+                "->": ".^.^.^.792"
               },
               null
             ]
@@ -2934,7 +3104,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.748"
+                "->": ".^.^.^.802"
               },
               null
             ]
@@ -2968,7 +3138,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.760"
+                "->": ".^.^.^.814"
               },
               null
             ]
@@ -2993,7 +3163,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.767"
+                "->": ".^.^.^.821"
               },
               null
             ]
@@ -3023,7 +3193,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.777"
+                "->": ".^.^.^.831"
               },
               null
             ]
@@ -3057,7 +3227,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.790"
+                "->": ".^.^.^.844"
               },
               null
             ]
@@ -3086,7 +3256,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.800"
+                "->": ".^.^.^.854"
               },
               null
             ]
@@ -3115,7 +3285,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.810"
+                "->": ".^.^.^.864"
               },
               null
             ]
@@ -3149,7 +3319,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.823"
+                "->": ".^.^.^.877"
               },
               null
             ]
@@ -3179,7 +3349,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.833"
+                "->": ".^.^.^.887"
               },
               null
             ]
@@ -3204,7 +3374,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.840"
+                "->": ".^.^.^.894"
               },
               null
             ]
@@ -3238,7 +3408,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.852"
+                "->": ".^.^.^.906"
               },
               null
             ]
@@ -3263,7 +3433,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.859"
+                "->": ".^.^.^.913"
               },
               null
             ]
@@ -3292,7 +3462,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.869"
+                "->": ".^.^.^.923"
               },
               null
             ]
@@ -3317,7 +3487,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.876"
+                "->": ".^.^.^.930"
               },
               null
             ]
@@ -3342,7 +3512,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.883"
+                "->": ".^.^.^.937"
               },
               null
             ]
@@ -3379,7 +3549,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.898"
+                "->": ".^.^.^.952"
               },
               null
             ]
@@ -3404,7 +3574,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.905"
+                "->": ".^.^.^.959"
               },
               null
             ]
@@ -3438,7 +3608,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.918"
+                "->": ".^.^.^.972"
               },
               null
             ]
@@ -3467,7 +3637,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.928"
+                "->": ".^.^.^.982"
               },
               null
             ]
@@ -3492,7 +3662,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.935"
+                "->": ".^.^.^.989"
               },
               null
             ]
@@ -3517,7 +3687,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.942"
+                "->": ".^.^.^.996"
               },
               null
             ]
@@ -3547,7 +3717,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.952"
+                "->": ".^.^.^.1006"
               },
               null
             ]
@@ -3577,7 +3747,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.962"
+                "->": ".^.^.^.1016"
               },
               null
             ]
@@ -3602,7 +3772,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.969"
+                "->": ".^.^.^.1023"
               },
               null
             ]
@@ -3631,7 +3801,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.979"
+                "->": ".^.^.^.1033"
               },
               null
             ]
@@ -3669,7 +3839,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.995"
+                "->": ".^.^.^.1049"
               },
               null
             ]
@@ -3696,7 +3866,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1004"
+                "->": ".^.^.^.1058"
               },
               null
             ]
@@ -3725,7 +3895,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1014"
+                "->": ".^.^.^.1068"
               },
               null
             ]
@@ -3750,7 +3920,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1021"
+                "->": ".^.^.^.1075"
               },
               null
             ]
@@ -3779,7 +3949,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1032"
+                "->": ".^.^.^.1086"
               },
               null
             ]
@@ -3808,7 +3978,7 @@
               "#",
               "^speaker: Fae",
               {
-                "->": ".^.^.^.1043"
+                "->": ".^.^.^.1097"
               },
               null
             ]
@@ -38885,6 +39055,758 @@
             "\n",
             "done",
             null
+          ]
+        }
+      ],
+      "npc_marigold": [
+        [
+          "ev",
+          {
+            "x()": "lanternOn"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Oh, my stars! That violet lantern makes Grocer Pippin's berry barrel shimmer like velvet jewels! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          [
+            "ev",
+            "str",
+            "^hooded-kid",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Oh, Fae, sweetheart! Ever since you helped Milo feel right at home with everyone, the whole plaza has been stopping by for celebratory berry pies and crisp orchard apples! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.9"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            "ev",
+            {
+              "VAR?": "market_note_read"
+            },
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Grocer Pippin told me you spotted that secret lavender orchard tip near the jam shelves! What a sharp explorer's eye you have, Fae! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.9"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "^Well hello there, Fae! Nothing beats wandering down these pine shelves while Grocer Pippin stacks fresh red apples and meadow berries! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.9"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^sue",
+          "/str",
+          {
+            "x()": "withParty",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Mrs. Marigold! Think Grocer Pippin saved a jar of those crunchy Fish Crackers for my dock snacks? ",
+                "#",
+                "^speaker: Sue",
+                "/#",
+                "\n",
+                "^Front shelf, Sue dear, baked nice and crisp for you and your seaside friends! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.18"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^jordan",
+          "/str",
+          {
+            "x()": "withParty",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Those wild berries smell almost as sweet as the strawberries from our clubhouse deck, Mrs. Marigold! ",
+                "#",
+                "^speaker: Jordan",
+                "/#",
+                "\n",
+                "^Why, thank you, Jordan! You and Fae have quite the green thumb up in Whispering Woods! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.27"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "x()": "treats"
+          },
+          0,
+          ">",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ Ooh, I can smell lovely critter treats tucked in your backpack! You're ready to brighten any furry friend's mood! ",
+                "#",
+                "^speaker: Mrs. Marigold",
+                {
+                  "->": ".^.^.^.35"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Ask about Grocer Pippin's best produce",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Ask what Mrs. Marigold is baking",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Help Mrs. Marigold pick a ripe orchard apple",
+          "/str",
+          {
+            "CNT?": ".^.^.basket_treat"
+          },
+          "!",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 5
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Orchard Apples are a dream for sweet meadow, hill, and cavern critters, while Fish Crackers make every bay and pond friend wiggle with delight! ",
+              "#",
+              "^speaker: Mrs. Marigold",
+              "/#",
+              "\n",
+              "ev",
+              {
+                "x()": "stickers"
+              },
+              5,
+              ">=",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ With ",
+                    "ev",
+                    {
+                      "x()": "stickers"
+                    },
+                    "out",
+                    "/ev",
+                    "^ calm friends in your sticker album, you probably know every critter's favorite snack by heart! ",
+                    "#",
+                    "^speaker: Mrs. Marigold",
+                    {
+                      "->": ".^.^.^.12"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "ev",
+              "str",
+              "^hooded-kid",
+              "/str",
+              {
+                "x()": "calmed",
+                "exArgs": 1
+              },
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "\n",
+                    "^A giant four-berry celebration tart for you, Sue, Jordan, and Milo! Cloverhollow has so much to cheer about! ",
+                    "#",
+                    "^speaker: Mrs. Marigold",
+                    "/#",
+                    "\n",
+                    {
+                      "->": ".^.^.^.9"
+                    },
+                    null
+                  ]
+                }
+              ],
+              [
+                {
+                  "->": ".^.b"
+                },
+                {
+                  "b": [
+                    "\n",
+                    "^Wild meadow berry hand pies! The berries in Pippin's barrel are plump and sweet, just right for a cozy kitchen tray. ",
+                    "#",
+                    "^speaker: Mrs. Marigold",
+                    "/#",
+                    "\n",
+                    {
+                      "->": ".^.^.^.9"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "\n",
+              "done",
+              null
+            ],
+            "c-2": [
+              "\n",
+              {
+                "->": ".^.^.^.basket_treat"
+              },
+              null
+            ]
+          }
+        ],
+        {
+          "basket_treat": [
+            "^Oh, bless your kind heart, Fae! You picked the glossiest red apple in the whole crate! ",
+            "#",
+            "^speaker: Mrs. Marigold",
+            "/#",
+            "\n",
+            "^Please take this crisp Orchard Apple treat and six shiny market coins as my thank-you! ",
+            "#",
+            "^speaker: Mrs. Marigold ",
+            "/#",
+            "#",
+            "^gift: treat orchard-apple 1 ",
+            "/#",
+            "#",
+            "^gift: coins 6 ",
+            "/#",
+            "#",
+            "^sound: chime-green",
+            "/#",
+            "\n",
+            "^Ooh, thank you so much, Mrs. Marigold! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            {
+              "#f": 1
+            }
+          ]
+        }
+      ],
+      "npc_danny": [
+        [
+          "ev",
+          {
+            "x()": "lanternOn"
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^WHOA! Your purple blacklight makes the pastel gelato tubs glow like cosmic neon space scoops! ",
+                "#",
+                "^speaker: Danny",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.4"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          [
+            "ev",
+            "str",
+            "^hooded-kid",
+            "/str",
+            {
+              "x()": "calmed",
+              "exArgs": 1
+            },
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Fae! You're a total legend! Scooper Penny let Milo and me design a Victory Rainbow Dream Sundae to celebrate you calming the whole forest! ",
+                "#",
+                "^speaker: Danny",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.9"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            "ev",
+            {
+              "VAR?": "parlor_note_read"
+            },
+            "/ev",
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^No way! You found the Secret Sundae Club glow doodle by the curved gelato case?! That officially makes you top-tier parlor royalty! ",
+                "#",
+                "^speaker: Danny",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.9"
+                },
+                null
+              ]
+            }
+          ],
+          [
+            {
+              "->": ".^.b"
+            },
+            {
+              "b": [
+                "\n",
+                "^Hey, Fae! Pull up a stool! Scooper Penny's crispy waffle cones smell SO amazing right now! ",
+                "#",
+                "^speaker: Danny",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.9"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^sue",
+          "/str",
+          {
+            "x()": "withParty",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Danny! Tell me Mint Cloud Chip didn't run out before I got here! ",
+                "#",
+                "^speaker: Sue",
+                "/#",
+                "\n",
+                "^Relax, Sue! Penny just wheeled out a giant fresh tub with extra cocoa sprinkles! ",
+                "#",
+                "^speaker: Danny",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.18"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          "str",
+          "^jordan",
+          "/str",
+          {
+            "x()": "withParty",
+            "exArgs": 1
+          },
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "\n",
+                "^Have you tried the Warm Honey Caramel Dream Sundae yet, Danny? Best mountain-explorer fuel around! ",
+                "#",
+                "^speaker: Jordan",
+                "/#",
+                "\n",
+                "^Ooh, YES! Two scoops of caramel plus a crispy cone is unbeatable, Jordan! ",
+                "#",
+                "^speaker: Danny",
+                "/#",
+                "\n",
+                {
+                  "->": ".^.^.^.27"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "\n",
+          "ev",
+          {
+            "x()": "treats"
+          },
+          0,
+          ">",
+          "/ev",
+          [
+            {
+              "->": ".^.b",
+              "c": true
+            },
+            {
+              "b": [
+                "^ Whoa, nice! You're already carrying critter treats! Every critter in Cloverhollow flips for Berry Swirl Cones! ",
+                "#",
+                "^speaker: Danny",
+                {
+                  "->": ".^.^.^.35"
+                },
+                null
+              ]
+            }
+          ],
+          "nop",
+          "/#",
+          "\n",
+          "ev",
+          "str",
+          "^Ask Danny's favorite Dream Sundae flavor",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-0",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Ask about the Secret Sundae Club",
+          "/str",
+          "/ev",
+          {
+            "*": ".^.c-1",
+            "flg": 4
+          },
+          "ev",
+          "str",
+          "^Trade ice-cream flavor tips with Danny",
+          "/str",
+          {
+            "CNT?": ".^.^.scoop_bonus"
+          },
+          "!",
+          "/ev",
+          {
+            "*": ".^.c-2",
+            "flg": 5
+          },
+          {
+            "c-0": [
+              "\n",
+              "^Tough call between Strawberry Swirl and Cozy Cocoa Sundae with fluffy marshmallows! Penny says Berry Swirl Cones even cheer up the grumpiest shopkeepers! ",
+              "#",
+              "^speaker: Danny",
+              "/#",
+              "\n",
+              "ev",
+              {
+                "x()": "bossesCalmed"
+              },
+              2,
+              ">=",
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "^ Heard you already calmed ",
+                    "ev",
+                    {
+                      "x()": "bossesCalmed"
+                    },
+                    "out",
+                    "/ev",
+                    "^ big valley troubles, so you definitely deserve a triple scoop! ",
+                    "#",
+                    "^speaker: Danny",
+                    {
+                      "->": ".^.^.^.12"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "/#",
+              "\n",
+              "done",
+              null
+            ],
+            "c-1": [
+              "\n",
+              "ev",
+              "str",
+              "^hooded-kid",
+              "/str",
+              {
+                "x()": "calmed",
+                "exArgs": 1
+              },
+              "/ev",
+              [
+                {
+                  "->": ".^.b",
+                  "c": true
+                },
+                {
+                  "b": [
+                    "\n",
+                    "^We just made you, Sue, Jordan, and Milo honorary VIPs of the Secret Sundae Club! Extra sprinkles forever! ",
+                    "#",
+                    "^speaker: Danny",
+                    "/#",
+                    "\n",
+                    {
+                      "->": ".^.^.^.9"
+                    },
+                    null
+                  ]
+                }
+              ],
+              [
+                {
+                  "->": ".^.b"
+                },
+                {
+                  "b": [
+                    "\n",
+                    "^Scooper Penny keeps a super-secret sundae doodle tucked near the gelato case, and rumor says only a purple glow reveals it! ",
+                    "#",
+                    "^speaker: Danny",
+                    "/#",
+                    "\n",
+                    {
+                      "->": ".^.^.^.9"
+                    },
+                    null
+                  ]
+                }
+              ],
+              "nop",
+              "\n",
+              "done",
+              null
+            ],
+            "c-2": [
+              "\n",
+              {
+                "->": ".^.^.^.scoop_bonus"
+              },
+              null
+            ]
+          }
+        ],
+        {
+          "scoop_bonus": [
+            "^Wait, strawberry swirl WITH crunchy honey drizzle?! That's genius, Fae! I'm telling Scooper Penny right away! ",
+            "#",
+            "^speaker: Danny",
+            "/#",
+            "\n",
+            "^Here, take my spare Berry Swirl Cone treat and six lucky parlor coins for the pro scoop tip! ",
+            "#",
+            "^speaker: Danny ",
+            "/#",
+            "#",
+            "^gift: treat berry-cone 1 ",
+            "/#",
+            "#",
+            "^gift: coins 6 ",
+            "/#",
+            "#",
+            "^sound: chime-blue",
+            "/#",
+            "\n",
+            "^Awesome, thanks, Danny! ",
+            "#",
+            "^speaker: Fae",
+            "/#",
+            "\n",
+            "done",
+            {
+              "#f": 1
+            }
           ]
         }
       ],

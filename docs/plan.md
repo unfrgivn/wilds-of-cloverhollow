@@ -6415,6 +6415,50 @@ the old trail, the owl, and the clubhouse claim.
   deprecation warnings; production and harness hook checks green), and full
   e2e across Chromium & WebKit (0 failed, 0 snapshot diffs).
 
+## Milestone 147: Shop Regulars, Journal Neighborhood Errands & Post-Finale Celebration Pass **Status:** ✅ Completed (2026-11-27)
+- **Shop Regulars (`marigold` in `market`, `danny` in `parlor`)**:
+  - Added two blinking 4-direction lossless WebP watercolor regulars
+    (`art/recipes/living-npcs.json` bumped to 39 Gemini calls;
+    `art/review/living-npcs-shops-{cream,dark}.jpg`), registered in
+    `content/characters.json` (`marigold` adult `idleTicks: [176, 8]`, `danny`
+    kid `idleTicks: [152, 8]`, `scale: 0.47`), placed in
+    `content/areas/market.json` at `(520, 640)` (`npc_marigold`) and
+    `content/areas/parlor.json` at `(540, 700)` (`npc_danny`) with zero
+    occlusion and zero `plaza-shops.json` replay drift.
+  - Added bespoke voices (`src/platform/voices.ts`) and circular die-cut
+    portraits (`src/ui/portraits.ts`) for `Mrs. Marigold` / `Marigold` (`town`,
+    `adult`) and `Danny` (`friend`, `kid`), plus rich multi-branch reactive Ink
+    knots (`npc_marigold`, `npc_danny` in `content/story/main.ink`) reacting to
+    `lanternOn()`, `treats()`, Sue & Jordan party interjections,
+    `calmed("hooded-kid")` celebration, and stitch-gated one-time treat & coin
+    thank-you gifts (`orchard-apple` / `berry-cone` + 6 coins).
+- **Automatic Journal Neighborhood Errand Notes (`content/story/main.ink`
+  `journal` knot)**:
+  - Added 6 Fae-voice Journal `NOTES` entries driven purely by native Ink
+    stitch visit counts (`npc_gus.gave_postcard`, `npc_sal.gave_mountain_letter`,
+    `npc_mina.received_letter`, `npc_gus.mail_complete`,
+    `npc_wren.started_sketch`, `npc_wren.sketch_complete`), introducing zero
+    new global `VAR`s and preserving 100% baseline 0-visit parity across all
+    existing saves, QA packs, and replays.
+- **Post-Finale Celebration Pass (`forest_calm` / `calmed("hooded-kid")`)**:
+  - Expanded `content/npc-profiles.json` to **53 named profiles** and **34
+    banter entries** (adding `marigold`, `danny`, `market-pippin-marigold`,
+    `parlor-penny-danny`, post-finale celebration ambient rules across town and
+    regional hubs, and 6 post-finale celebration banter pairs across Plaza,
+    Meadow Park, Bon Appetit Café, Grocery Market, Ice Cream Parlor, and
+    Bubblegum Bay — naming Milo strictly behind `calmed: "hooded-kid"`).
+  - Enhanced `src/core/npc-context.ts` so when `storyStage === "forest_calm"`,
+    nearby `player-greet` and `idle` NPCs within 240u (after arrival grace)
+    glow with festive `heart`/`sparkle` celebration emotes and matching
+    post-finale ambient rules display with `warm` chatter tone.
+- **Evidence**: expanded `tests/unit/living-npcs.test.ts` (28 living NPCs, 53
+  profiles, 34 banter pairs, 31-knot early-Milo spoiler safety, full Postal &
+  Sketchbook `journalNotes` progression, and `forest_calm` celebration checks),
+  added `@smoke` Playwright test in `tests/e2e/living-npcs.spec.ts`, verified
+  `tests/e2e/plaza-shops.spec.ts` (6 refreshed shop baselines audited with
+  `vision`), and captured `vision`-verified 1280×720 shop duo review shots
+  (`art/review/living-npcs-market-duo.jpg`, `art/review/living-npcs-parlor-duo.jpg`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

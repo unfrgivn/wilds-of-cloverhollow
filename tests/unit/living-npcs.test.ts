@@ -6,6 +6,7 @@ import {
   createState,
   evaluateNpcLife,
   inkFacts,
+  journalNotes,
   matchesNpcCondition,
   npcVisible,
   npcWorldSituation,
@@ -105,11 +106,13 @@ describe("Living NPC schedules and dynamic relocations", () => {
     expect(npcVisible(world, artOpen, artMaya)).toBe(true);
   });
 
-  it("places all 26 living NPCs across all 29 authored placements and 51 profiles", () => {
+  it("places all 28 living NPCs across all 31 authored placements and 53 profiles", () => {
     const placements: readonly [string, string][] = [
       ["plaza", "flora"],
       ["plaza", "sammy"],
       ["plaza", "gus"],
+      ["market", "marigold"],
+      ["parlor", "danny"],
       ["arcade", "sammy"],
       ["arcade", "poppy"],
       ["park", "pippa"],
@@ -137,8 +140,8 @@ describe("Living NPC schedules and dynamic relocations", () => {
       ["hills", "bram"],
       ["mist", "sage"],
     ];
-    expect(placements.length).toBe(29);
-    expect(Object.keys(world.npcProfiles).length).toBe(51);
+    expect(placements.length).toBe(31);
+    expect(Object.keys(world.npcProfiles).length).toBe(53);
     const uniqueIds = new Set<string>();
     for (const [areaId, npcId] of placements) {
       const npc = findNpc(areaId, npcId);
@@ -146,7 +149,7 @@ describe("Living NPC schedules and dynamic relocations", () => {
       expect(world.npcProfiles[npcId], `profile for ${npcId}`).toBeDefined();
       uniqueIds.add(npcId);
     }
-    expect(uniqueIds.size).toBe(26);
+    expect(uniqueIds.size).toBe(28);
 
     const poppy = findNpc("arcade", "poppy");
     const beforeArcade = makeState("arcade", "door");
@@ -351,6 +354,154 @@ describe("Living NPC Ink externals, knots, and spoiler safety", () => {
     expect(revisit.lines.some((line) => /Honorary Junior Mail Carrier/i.test(line))).toBe(true);
   });
 
+  it("records Mailman Gus postal & Wren sketchbook errands in journalNotes with 0-visit parity",
+    () => {
+      const pickChoice = (
+        initial: State,
+        knot: string,
+        choiceMatch: RegExp,
+      ): { state: State; matched: boolean } => {
+        let state = startDialogue(world, initial, knot);
+        let matched = false;
+        for (let i = 0; i < 80 && state.dialogue !== null; i += 1) {
+          const dlg = state.dialogue;
+          const done = dlg.revealed >= dlg.text.length;
+          if (done && dlg.choices.length > 0) {
+            const idx = dlg.choices.findIndex((text) => choiceMatch.test(text));
+            if (idx >= 0) matched = true;
+            state = step(world, state, { ...none, choose: idx >= 0 ? idx : 0 }).state;
+          } else {
+            state = step(world, state, { ...none, confirm: i % 2 === 0 }).state;
+          }
+        }
+        return { state, matched };
+      };
+
+      const fresh = makeState("plaza", "front-door");
+      expect(journalNotes(world, fresh)).toEqual([]);
+
+      let state: State = {
+        ...fresh,
+        critters: { ...fresh.critters, "fountain-frog": "calm" },
+      };
+      const beforeNotes = journalNotes(world, state);
+      expect(beforeNotes.some((n) => /Postcard|Mountain Letter|sketchbook/i.test(n))).toBe(false);
+
+      // Postal stage 1: Gus -> Seashell Postcard.
+      state = pickChoice(state, "npc_gus", /deliver mail to the bay/i).state;
+      expect(journalNotes(world, state)[0]).toContain("Seashell Postcard to Captain Sal");
+
+      // Postal stage 2: Sal -> Mountain Reply Letter (consume harbor_snack first if needed).
+      let salStep = pickChoice(state, "npc_sal", /Seashell Postcard/i);
+      state = salStep.state;
+      if (!salStep.matched) {
+        salStep = pickChoice(state, "npc_sal", /Seashell Postcard/i);
+        state = salStep.state;
+      }
+      expect(journalNotes(world, state)[0]).toContain("Mountain Reply Letter to deliver up to");
+      expect(journalNotes(world, state).some((n) => /Seashell Postcard/i.test(n))).toBe(false);
+
+      // Postal stage 3: Mina -> tell Mailman Gus.
+      state = pickChoice(state, "npc_mina", /Mountain Letter/i).state;
+      expect(journalNotes(world, state)[0]).toContain("Mina loved Captain Sal's Mountain Letter");
+      expect(journalNotes(world, state).some((n) => /Mountain Reply Letter/i.test(n))).toBe(false);
+
+      // Postal stage 4: Gus -> Honorary Junior Mail Carrier.
+      state = pickChoice(state, "npc_gus", /mountain mail arrived/i).state;
+      expect(journalNotes(world, state)[0]).toContain("Honorary Junior Mail Carrier");
+
+      // Sketchbook stage 1: Wren starts collecting.
+      state = pickChoice(state, "npc_wren", /collect valley sketches/i).state;
+      expect(journalNotes(world, state).some((n) => /collecting a crystal rubbing/i.test(n)))
+        .toBe(true);
+
+      // Sketchbook stage 2: Pebble + Sunny + Wren finishes.
+      state = pickChoice(state, "npc_pebble", /crystal rubbing/i).state;
+      state = pickChoice(state, "npc_sunny", /pressed clover/i).state;
+      state = pickChoice(state, "npc_wren", /crystal rubbing and clover/i).state;
+      const doneNotes = journalNotes(world, state);
+      expect(doneNotes.some((n) => /Wren finished the Cloverhollow valley sketchbook/i.test(n)))
+        .toBe(true);
+      expect(doneNotes.some((n) => /is collecting a crystal rubbing/i.test(n))).toBe(false);
+    });
+
+  it("runs Mrs. Marigold and Danny reactive shop knots and one-time treat/coin gifts", () => {
+    const pickChoice = (
+      initial: State,
+      knot: string,
+      choiceMatch: RegExp,
+    ): { state: State; lines: string[]; matched: boolean } => {
+      let state = startDialogue(world, initial, knot);
+      const lines: string[] = [];
+      let matched = false;
+      for (let i = 0; i < 80 && state.dialogue !== null; i += 1) {
+        const dlg = state.dialogue;
+        if (lines.at(-1) !== dlg.text) lines.push(dlg.text);
+        const done = dlg.revealed >= dlg.text.length;
+        if (done && dlg.choices.length > 0) {
+          const idx = dlg.choices.findIndex((text) => choiceMatch.test(text));
+          if (idx >= 0) matched = true;
+          state = step(world, state, { ...none, choose: idx >= 0 ? idx : 0 }).state;
+        } else {
+          state = step(world, state, { ...none, confirm: i % 2 === 0 }).state;
+        }
+      }
+      return { state, lines, matched };
+    };
+
+    const marketBase: State = {
+      ...makeState("market", "door", undefined, ["maddie", "sue", "jordan"]),
+      lantern: true,
+      treats: { "fish-cracker": 1 },
+      coins: 10,
+    };
+    const marigold = pickChoice(marketBase, "npc_marigold", /pick a ripe orchard apple/i);
+    expect(marigold.matched).toBe(true);
+    expect(marigold.lines.some((line) => /violet lantern/i.test(line))).toBe(true);
+    expect(marigold.lines.some((line) => /Fish Crackers/i.test(line))).toBe(true);
+    expect(marigold.lines.some((line) => /clubhouse deck/i.test(line))).toBe(true);
+    expect(marigold.lines.some((line) => /critter treats/i.test(line))).toBe(true);
+    expect(marigold.state.coins).toBe(16);
+    expect(marigold.state.treats?.["orchard-apple"]).toBe(1);
+
+    const marigoldAgain = pickChoice(marigold.state, "npc_marigold", /pick a ripe orchard apple/i);
+    expect(marigoldAgain.matched).toBe(false);
+    expect(marigoldAgain.state.coins).toBe(16);
+
+    const parlorBase: State = {
+      ...makeState("parlor", "door", undefined, ["maddie", "sue", "jordan"]),
+      lantern: true,
+      treats: { "orchard-apple": 1 },
+      coins: 10,
+    };
+    const danny = pickChoice(parlorBase, "npc_danny", /Trade ice-cream flavor tips/i);
+    expect(danny.matched).toBe(true);
+    expect(danny.lines.some((line) => /neon space scoops/i.test(line))).toBe(true);
+    expect(danny.lines.some((line) => /Mint Cloud Chip/i.test(line))).toBe(true);
+    expect(danny.lines.some((line) => /Warm Honey Caramel/i.test(line))).toBe(true);
+    expect(danny.lines.some((line) => /critter treats/i.test(line))).toBe(true);
+    expect(danny.state.coins).toBe(16);
+    expect(danny.state.treats?.["berry-cone"]).toBe(1);
+
+    const dannyAgain = pickChoice(danny.state, "npc_danny", /Trade ice-cream flavor tips/i);
+    expect(dannyAgain.matched).toBe(false);
+    expect(dannyAgain.state.coins).toBe(16);
+
+    // Post-finale celebration mentions Milo cleanly once hooded-kid is calmed.
+    const finaleMarket: State = {
+      ...marketBase,
+      critters: { ...marketBase.critters, "hooded-kid": "calm" },
+    };
+    const marigoldFinale = pickChoice(finaleMarket, "npc_marigold", /baking/i);
+    expect(marigoldFinale.lines.some((line) => /Milo/i.test(line))).toBe(true);
+    const finaleParlor: State = {
+      ...parlorBase,
+      critters: { ...parlorBase.critters, "hooded-kid": "calm" },
+    };
+    const dannyFinale = pickChoice(finaleParlor, "npc_danny", /Secret Sundae Club/i);
+    expect(dannyFinale.lines.some((line) => /Milo/i.test(line))).toBe(true);
+  });
+
   it("runs Wren's sketchbook chain and updates Maya and Theo reactions", () => {
     const pickChoice = (
       initial: State,
@@ -453,8 +604,9 @@ describe("Living NPC Ink externals, knots, and spoiler safety", () => {
       "npc_pebble", "npc_moss", "npc_sunny",
       "npc_gus", "npc_hazel", "npc_bram", "npc_wren", "npc_tuck", "npc_kai",
       "npc_sage", "npc_poppy", "npc_clara", "npc_bramble", "npc_gemma",
-      "npc_bert", "npc_theo",
+      "npc_bert", "npc_theo", "npc_marigold", "npc_danny",
     ];
+    expect(newKnots.length).toBe(31);
     const base = makeState("plaza", "front-door", {
       read_notice: true, saw_hood: true, recess: true, art_open: true,
       clubhouse_claimed: true, lodge_open: true, cavern_bridge_lit: true,
@@ -807,8 +959,8 @@ describe("Living NPC deterministic brain (npc-context)", () => {
     expect(floraCeleb?.emote === "heart" || floraCeleb?.emote === "sparkle").toBe(true);
   });
 
-  it("verifies all 26 banter pairs and foodie treats ambient notices", () => {
-    expect(world.npcBanter.length).toBe(26);
+  it("verifies all 34 banter pairs, shop duos, and foodie treats ambient notices", () => {
+    expect(world.npcBanter.length).toBe(34);
     const wave2And3Banter = [
       "plaza-flora-gus",
       "park-pippa-hazel",
@@ -823,6 +975,14 @@ describe("Living NPC deterministic brain (npc-context)", () => {
       "cavern-pebble-gemma",
       "east-hall-bert-leo",
       "art-room-maya-theo",
+      "market-pippin-marigold",
+      "parlor-penny-danny",
+      "plaza-flora-gus-finale",
+      "park-pippa-hazel-finale",
+      "cafe-dad-barnaby-finale",
+      "market-pippin-marigold-finale",
+      "parlor-penny-danny-finale",
+      "bay-sal-kai-finale",
     ];
     for (const id of wave2And3Banter) {
       const pair = world.npcBanter.find((item) => item.id === id);
@@ -831,6 +991,17 @@ describe("Living NPC deterministic brain (npc-context)", () => {
         expect(line.length, `${id}: ${line}`).toBeLessThanOrEqual(44);
       }
     }
+
+    // Shop banter fires in market (Pippin & Marigold) and parlor (Penny & Danny).
+    const marketAtDoor: State = { ...makeState("market", "door"), tick: 30 };
+    const marketLife = evaluateNpcLife(world, marketAtDoor, settledMemory);
+    expect(marketLife.chatter?.tone).toBe("banter");
+    expect(marketLife.chatter?.npcId).toBe("pippin");
+
+    const parlorAtDoor: State = { ...makeState("parlor", "door"), tick: 160 };
+    const parlorLife = evaluateNpcLife(world, parlorAtDoor, settledMemory);
+    expect(parlorLife.chatter?.tone).toBe("banter");
+    expect(parlorLife.chatter?.npcId).toBe("danny");
 
     // Carrying treats triggers Gus's cozy foodie notice with warm tone.
     const gus = findNpc("plaza", "gus");
@@ -846,6 +1017,75 @@ describe("Living NPC deterministic brain (npc-context)", () => {
     expect(gusLife.chatter?.npcId).toBe("gus");
     expect(gusLife.chatter?.tone).toBe("warm");
     expect(gusLife.chatter?.text).toContain("treats");
+  });
+
+  it("applies post-finale forest_calm celebration emotes, warm chatter, and festive banter", () => {
+    const marigold = findNpc("market", "marigold");
+    const danny = findNpc("parlor", "danny");
+    const calmMarketBase = makeState("market", "door", { forest_fizzy: false });
+    const calmMarket: State = {
+      ...calmMarketBase,
+      tick: 260,
+      player: { x: marigold.point.x - 80, y: marigold.point.y },
+      critters: { ...calmMarketBase.critters, "hooded-kid": "calm" },
+    };
+
+    // Player-greet in forest_calm upgrades wave -> heart (cozy) and emits warm finale chatter.
+    const greetLife = evaluateNpcLife(world, calmMarket, settledMemory);
+    expect(greetLife.situation.storyStage).toBe("forest_calm");
+    const marigoldGreet = greetLife.npcs.find((n) => n.id === "marigold");
+    expect(marigoldGreet?.attention).toBe("player-greet");
+    expect(marigoldGreet?.emote).toBe("heart");
+    expect(greetLife.chatter?.npcId).toBe("marigold");
+    expect(greetLife.chatter?.tone).toBe("warm");
+    expect(greetLife.chatter?.text).toContain("Milo");
+
+    // Idle within 240u in forest_calm gets festive sparkle (kid-bouncy); beyond 240u stays null.
+    const calmParlorBase = makeState("parlor", "door", { forest_fizzy: false });
+    const nearIdleParlor: State = {
+      ...calmParlorBase,
+      tick: 260,
+      player: { x: danny.point.x - 200, y: danny.point.y },
+      critters: { ...calmParlorBase.critters, "hooded-kid": "calm" },
+    };
+    const idleLife = evaluateNpcLife(world, nearIdleParlor, settledMemory);
+    const dannyIdle = idleLife.npcs.find((n) => n.id === "danny");
+    expect(dannyIdle?.attention).toBe("idle");
+    expect(dannyIdle?.emote).toBe("sparkle");
+
+    // Arrival grace still suppresses idle celebration emotes.
+    const graceLife = evaluateNpcLife(world, nearIdleParlor, { ...settledMemory, areaTicks: 20 });
+    expect(graceLife.npcs.find((n) => n.id === "danny")?.emote).toBeNull();
+
+    // Far beyond 240u stays null.
+    const farParlor: State = {
+      ...nearIdleParlor,
+      player: { x: danny.point.x - 320, y: danny.point.y },
+    };
+    expect(evaluateNpcLife(world, farParlor, settledMemory).npcs.find((n) => n.id === "danny")
+      ?.emote).toBeNull();
+
+    // Post-finale banter cleanly replaces pre-finale banter in market & plaza.
+    const marketBanter = evaluateNpcLife(world, { ...calmMarket, tick: 30 }, settledMemory);
+    expect(marketBanter.chatter?.tone).toBe("banter");
+    expect(marketBanter.chatter?.text).toContain("Victory Orchard Apples");
+
+    const plazaBase = makeState("plaza", "front-door", { forest_fizzy: false });
+    const flora = findNpc("plaza", "flora");
+    const calmPlaza: State = {
+      ...plazaBase,
+      tick: 30,
+      player: { x: flora.point.x + 190, y: flora.point.y },
+      critters: {
+        ...plazaBase.critters,
+        "fountain-frog": "calm",
+        "arcade-keeper": "calm",
+        "hooded-kid": "calm",
+      },
+    };
+    const plazaBanter = evaluateNpcLife(world, calmPlaza, settledMemory);
+    expect(plazaBanter.chatter?.tone).toBe("banter");
+    expect(plazaBanter.chatter?.text).toContain("Milo");
   });
 
   it("validates npc-profiles and schedule errors in loader", () => {
@@ -896,7 +1136,7 @@ describe("Living NPC deterministic brain (npc-context)", () => {
 });
 
 describe("Living NPC presentation craft (voices, portraits, motion, emotes, chatter)", () => {
-  it("gives all 26 new NPCs distinct non-fallback voices, portraits, and speaker accents", () => {
+  it("gives all 28 new NPCs distinct non-fallback voices, portraits, and speaker accents", () => {
     const fallback = voiceForSpeaker("totally-unknown-character");
     type AdultSpec = { id: string; speakers: readonly string[]; accent: "town" | "school" };
     const adults: readonly AdultSpec[] = [
@@ -914,6 +1154,7 @@ describe("Living NPC presentation craft (voices, portraits, motion, emotes, chat
         { id: "clara", speakers: ["Clara"], accent: "town" },
         { id: "bramble", speakers: ["Bramble"], accent: "town" },
         { id: "bert", speakers: ["Custodian Bert", "Bert"], accent: "school" },
+        { id: "marigold", speakers: ["Mrs. Marigold", "Marigold"], accent: "town" },
       ];
     const kids = [
       { id: "sammy", speakers: ["Sammy"] },
@@ -928,6 +1169,7 @@ describe("Living NPC presentation craft (voices, portraits, motion, emotes, chat
       { id: "poppy", speakers: ["Poppy"] },
       { id: "gemma", speakers: ["Gemma"] },
       { id: "theo", speakers: ["Theo"] },
+      { id: "danny", speakers: ["Danny"] },
     ];
 
     const voiceSignatures = new Set<string>();
@@ -958,7 +1200,7 @@ describe("Living NPC presentation craft (voices, portraits, motion, emotes, chat
         expect(portrait?.atlas, name).toBe(world.characters[entry.id]?.atlas);
       }
     }
-    expect(voiceSignatures.size).toBe(26);
+    expect(voiceSignatures.size).toBe(28);
   });
 
   it("computes bounded deterministic npcLivingPose across all personalities and attentions", () => {

@@ -16,6 +16,7 @@ export type SoundCue =
   | "mole-pop" | "mole-boop" | "mole-whiff"
   | "comet-move" | "comet-star" | "comet-bump"
   | "cook-start" | "cook-frozen" | "cook-ding"
+  | "fish-cast" | "fish-nibble" | "fish-bite" | "fish-reel" | "fish-catch"
   | "chime-red" | "chime-yellow" | "chime-green" | "chime-blue" | "flute"
   | "flute-red" | "flute-yellow" | "flute-green" | "flute-blue"
   | "lasso-twirl";
@@ -161,6 +162,15 @@ export function soundCues(
     if (game.phase === "cooking") cues.push("cook-start");
     if (game.phase === "paused") cues.push("cook-frozen");
     if (game.phase === "ding") cues.push("cook-ding");
+  }
+  if (game?.game === "fish") {
+    const was = previous.arcade?.game === "fish" ? previous.arcade : null;
+    if (newPhase && game.phase === "casting") cues.push("fish-cast");
+    if (was !== null && game.phase === "waiting" && game.nibblesLeft < was.nibblesLeft)
+      cues.push("fish-nibble");
+    if (newPhase && game.phase === "bite") cues.push("fish-bite");
+    if (newPhase && game.phase === "reeling") cues.push("fish-reel");
+    if (newPhase && game.phase === "result" && game.caught !== null) cues.push("fish-catch");
   }
   return cues;
 }

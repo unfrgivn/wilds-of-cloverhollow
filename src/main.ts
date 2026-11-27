@@ -9,6 +9,7 @@ import {
   type Area,
   type BattleView,
   type CookView,
+  type FishView,
   type MoleHole,
   type Point,
   type State,
@@ -37,6 +38,7 @@ import {
   parseMapCentres,
   parseMoleCalibration,
   parseCookCalibration,
+  parseFishCalibration,
   parseSkeeCalibration,
   parseCometCalibration,
 } from "./content/load";
@@ -69,6 +71,7 @@ import { createSkee } from "./ui/skee";
 import { createMole } from "./ui/mole";
 import { createComet } from "./ui/comet";
 import { createCook, type CookInfo } from "./ui/cook";
+import { createFish, type FishInfo } from "./ui/fish";
 import {
   journalNotes,
   parseSave,
@@ -438,6 +441,7 @@ async function boot(): Promise<void> {
   // The moles' frames and Mom's dishes for the clubhouse microwave (spec 8.2).
   const moleAtlas = "assets/arcade/moles.json";
   const foodAtlas = "assets/arcade/cook-food.json";
+  const fishAtlas = "assets/arcade/fish-catches.json";
   const cometAtlas = "assets/arcade/comet.json";
   // The arcade games' paintings and their calibrations (spec 8.2), each
   // decoded on demand before its close-up can open.
@@ -505,6 +509,10 @@ async function boot(): Promise<void> {
     render: (view: CookView | null) => void;
     info: () => CookInfo | null;
   };
+  type FishOverlay = {
+    render: (view: FishView | null) => void;
+    info: () => FishInfo | null;
+  };
   let arcadeOverlay: ArcadeOverlay | null = null;
   let arcadeLoad: Promise<void> | undefined;
   const ensureArcadeOverlay = (): Promise<void> => {
@@ -566,6 +574,24 @@ async function boot(): Promise<void> {
     });
     return cookLoad;
   };
+  let fishOverlay: FishOverlay | null = null;
+  let fishLoad: Promise<void> | undefined;
+  const ensureFishOverlay = (): Promise<void> => {
+    if (fishOverlay !== null) return Promise.resolve();
+    if (fishLoad !== undefined) return fishLoad;
+    fishLoad = Promise.all([
+      domAtlas(fishAtlas),
+      painting("assets/arcade/fishing-dock.json", parseFishCalibration),
+    ]).then(([, fishPainting]) => {
+      fishOverlay = createFish(
+        uiRoot,
+        (frameName) => atlasFrame(fishAtlas, frameName),
+        fishPainting.calibration,
+        fishPainting.image,
+      );
+    });
+    return fishLoad;
+  };
   // Warms only the DOM media needed for `area`: arcade/cooking close-ups for
   // those rooms, plus this area's critter PNGs so battle reward stickers never
   // flicker in WebKit. Bedroom has 0 critters, so boot decodes 0 critter PNGs.
@@ -581,6 +607,7 @@ async function boot(): Promise<void> {
     const loads: Promise<unknown>[] = [];
     if (area.id === "arcade") loads.push(ensureArcadeOverlay());
     if (area.id === "clubhouse") loads.push(ensureCookOverlay());
+    if (area.id === "bay") loads.push(ensureFishOverlay());
     const areaCritters = new Set([
       ...area.critters.map((piece) => piece.id),
       ...(area.recurring?.dens ?? []).flatMap((den) => den.kinds),
@@ -776,13 +803,20 @@ async function boot(): Promise<void> {
         lastMusicLog = musicKey;
       }
     }
-    const arcadeState = arcadeView(content.world, state);
-    if (arcadeState !== null && arcadeState.game !== "cook" && arcadeOverlay === null)
+    const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
+    if (arcadeState !== null && arcadeState.game !== "cook" && arcadeState.game !== "fish" &&
+        arcadeOverlay === null)
       void ensureArcadeOverlay().then(invalidate);
     if (arcadeState?.game === "cook" && cookOverlay === null)
       void ensureCookOverlay().then(invalidate);
-    arcadeOverlay?.render(arcadeState !== null && arcadeState.game !== "cook" ? arcadeState : null);
+    if (arcadeState?.game === "fish" && fishOverlay === null)
+      void ensureFishOverlay().then(invalidate);
+    arcadeOverlay?.render(
+      arcadeState !== null && arcadeState.game !== "cook" && arcadeState.game !== "fish"
+        ? arcadeState : null,
+    );
     cookOverlay?.render(arcadeState?.game === "cook" ? arcadeState : null);
+    fishOverlay?.render(arcadeState?.game === "fish" ? arcadeState : null);
     if (state.journalOpen && !wasJournalOpen) void warmOwnedJournalMedia(state);
     wasJournalOpen = state.journalOpen;
     if (arcadeState !== null) document.documentElement.dataset.arcade = "open";
@@ -1309,6 +1343,7 @@ async function boot(): Promise<void> {
           view.prefetch(targetArea);
           if (targetArea.id === "arcade") void ensureArcadeOverlay();
           if (targetArea.id === "clubhouse") void ensureCookOverlay();
+          if (targetArea.id === "bay") void ensureFishOverlay();
         }
         prefetchedTarget = target;
       }
@@ -1511,7 +1546,7 @@ async function boot(): Promise<void> {
       },
       renderInfo: () => ({
         ...view.renderInfo(state),
-        arcade: arcadeOverlay?.info() ?? cookOverlay?.info() ?? null,
+        arcade: arcadeOverlay?.info() ?? cookOverlay?.info() ?? fishOverlay?.info() ?? null,
       }),
       qa: {
         active: () => qaActivePack !== null,

@@ -4193,6 +4193,48 @@ the old trail, the owl, and the clubhouse claim.
   and full `CLOVERHOLLOW_E2E_PORT=4224 just e2e` (1,029 passed, 2 skipped
   across Chromium & WebKit after refreshing the 2 post-lasso battle baselines).
 
+## Milestone 88: Bubblegum Bay Fishing Minigame **Status:** ✅ Completed (2026-11-26)
+- Playable cozy **Bubblegum Bay Fishing** minigame (`NOTES.md: 47–48`,
+  `game: "fish"`, launched via `# play: fish 0` from `dock_end` once
+  `sue_joined` is true, strictly after the existing lasso bottle quest so all
+  64 earlier sims stay byte-identical and `bay.json` stays untouched):
+  - Pure deterministic core (`src/core/fish.ts`, `src/core/arcade.ts`,
+    `src/core/types.ts`, `src/core/save.ts`, `src/core/sim.ts`): six phases
+    (`aim` → `casting` → `waiting` → `bite` → `reeling` → `result`) driven by
+    bit-exact algebraic waves (`fishAimPower`, `fishWavePosition`), Gentle
+    Timing support (`+20` tick bite window, `+0.08` wider reel zone, `0.5×`
+    drain), Cancel pack-up during `aim` and `waiting`, and optional
+    `State.caughtFish` (omitted when empty, validated cleanly in save v10 with
+    zero QA pack churn).
+  - Six Bubblegum Bay catches in `content/arcade.json` (parsed in
+    `src/content/load.ts`): **Bubblegum Minnow** (`+4` coins), **Sunny Perch**
+    (`+6` coins, `+1` snack), **Starfish Shell** (`+8` coins), **Rainbow Koi**
+    (`+12` coins, `+1` snack), **Moonlight Jelly** (`+15` coins), and rare
+    **Golden Starfish Crown** (`+20` coins, `+1` snack).
+  - Hand-painted watercolor close-up vista (`public/assets/arcade/fishing-dock.{webp,json}`,
+    1600x1048, 196 KB) and 6-item catches atlas (`public/assets/arcade/fish-catches.{png,json}`
+    built deterministically by `tools/art/build-fish.ts`, zero green spill or
+    holes verified on dark purple), loaded strictly on demand via
+    `ensureFishOverlay()` (`src/main.ts`).
+  - Responsive dock overlay (`src/ui/fish-layout.ts`, `src/ui/fish.ts`,
+    `src/ui/fish.css`) with flexing wooden fishing rod, cork grip, brass
+    spinning reel, arching Bezier line, cork bobber, water ripples, swimming
+    fish shadow, Catch Book (`N / 6`), Cast Power Gauge with `RARE` threshold
+    tick, Watercolor Reel-In Meter with star cap, `! BITE !` pop badge, and
+    sunburst Catch Reveal card, plus 5 watery sound cues (`fish-cast`,
+    `fish-nibble`, `fish-bite`, `fish-reel`, `fish-catch`) in `src/core/sound.ts`
+    and `src/platform/audio.ts`.
+- Evidence: `tests/unit/fish.test.ts`, `tests/unit/fish-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/fish.json` (7,945 ticks), real-key
+  `tests/e2e/fish.spec.ts` matching Bun's exact hash at 1280x720 and 874x402,
+  `arcade-fish-{aim,reeling,catch}` UI Gallery states across Chromium & WebKit,
+  and `vision`-reviewed `art/review/fishing-catches-{cream,dark}.jpg` and
+  `art/review/fishing-gameplay.jpg`.
+- Gates: `just check` (147 unit files / 1,174 tests, 65 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (production and harness
+  hook checks), and full `CLOVERHOLLOW_E2E_PORT=4215 just e2e` (1,060 passed,
+  2 skipped across Chromium & WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

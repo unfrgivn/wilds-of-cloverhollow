@@ -1816,8 +1816,16 @@ A kite is caught on top of the play tower, hanging down the wall! # speaker: Fae
 
 === dock_end ===
 {has_lasso and not has_map: -> bottle}
+{sue_joined: -> fish_spot}
 The end of Sue's dock. The water sparkles all the way to the sky. # speaker: Fae
 -> DONE
+= fish_spot
+The end of Sue's dock. Shimmering fish dart beneath the turquoise ripples! # speaker: Fae
++ [Go fishing with Sue!]
+    I've got our lucky bobber right here, let's see what's biting! # speaker: Sue # play: fish 0
+    -> DONE
++ [Just enjoy the view]
+    -> DONE
 = bottle
 ~ bottle_seen = true
 A bottle is bobbing in the water past the end of the dock! There's a rolled-up paper inside. # speaker: Fae

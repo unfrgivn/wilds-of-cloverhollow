@@ -216,6 +216,7 @@ export type ArcadeContent = {
   mole: MoleContent;
   comet: CometContent;
   cook: CookContent;
+  fish: FishContent;
   counter: CounterContent;
   prizes: { id: string; name: string; frame: string }[];
 };
@@ -362,6 +363,57 @@ export type CookCalibration = {
   plate: { cx: number; cy: number; rx: number; ry: number };
   display: { x: number; y: number; w: number; h: number };
   button: { cx: number; cy: number; r: number };
+  front: { x: number; y: number; w: number; h: number };
+};
+// Bubblegum Bay fishing (spec 8.2): aim cast power, watch the bobber for
+// nibbles and the splash bite, then keep the bobber zone over the fish to reel
+// in one of six lake treasures.
+export type FishRarity = "common" | "uncommon" | "rare";
+export type FishCatchSpec = {
+  id: string;
+  name: string;
+  frame: string;
+  coins: number;
+  snacks: number;
+  rarity: FishRarity;
+  minPower: number;
+  weight: number;
+  fightSpeed: number;
+  line: string;
+};
+export type FishContent = {
+  aimPeriod: number;
+  castTicks: number;
+  biteTicks: number;
+  nibbleGapMin: number;
+  nibbleGapMax: number;
+  reelStart: number;
+  reelGain: number;
+  reelDrain: number;
+  zoneHalf: number;
+  hookAccel: number;
+  hookGravity: number;
+  hookMaxSpeed: number;
+  reelMaxTicks: number;
+  catches: FishCatchSpec[];
+  lines: {
+    aim: string;
+    wait: string;
+    bite: string;
+    reel: string;
+    early: string;
+    missed: string;
+  };
+};
+// Painted close-up of Sue's dock (`public/assets/arcade/fishing-dock.json`):
+// water bounds, horizon and dock lines, fishing rod tip, and front caption bar.
+export type FishCalibration = {
+  image: string;
+  size: { w: number; h: number };
+  water: { x: number; y: number; w: number; h: number };
+  horizonY: number;
+  dockY: number;
+  rodTip: { x: number; y: number };
   front: { x: number; y: number; w: number; h: number };
 };
 export type MoleCalibration = {
@@ -983,13 +1035,19 @@ export type State = {
   coins: number;
   snacks: number;
   treats?: Record<string, number>;
+  caughtFish?: Record<string, number>;
   finale: "morning" | "credits" | null;
   backLink?: { area: string; direction: Direction };
 };
 // What a tick of an arcade game changes: the game itself and what it pays out.
 export type ArcadeOwned = Pick<State, "arcade" | "prizes" | "tickets">;
-// A tick of any of them: the cooking game pays snacks too.
-export type ArcadeStep = ArcadeOwned & Pick<State, "snacks">;
+// A tick of any of them: cooking pays snacks, and fishing pays coins, snacks,
+// RNG draws, and caught species counts.
+export type ArcadeStep = ArcadeOwned & Pick<State, "snacks"> & {
+  coins?: number;
+  rng?: number;
+  caughtFish?: Record<string, number>;
+};
 export type Mood = "chaos" | "calm";
 // A critter out in Fae's area, set piece or recurring (`presentCritters`):
 // `key` is a set piece's id or `wild:<den>`.

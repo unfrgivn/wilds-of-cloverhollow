@@ -1,20 +1,23 @@
 import { clawView, newClaw, stepClaw, type ClawGame, type ClawView } from "./claw";
 import { cookView, newCook, stepCook, type CookGame, type CookView } from "./cook";
+import { fishView, newFish, stepFish, type FishGame, type FishView } from "./fish";
 import { moleView, newMole, stepMole, type MoleGame, type MoleView } from "./mole";
 import { cometView, newComet, stepComet, type CometGame, type CometView } from "./comet";
 import { newSkee, skeeView, stepSkee, type SkeeGame, type SkeeView } from "./skee";
 import type { ActionFrame, ArcadeStep, State, World } from "./types";
 
 // The arcade's games (spec 8.2): a line tagged `play: <game> <price>` opens one.
-// The clubhouse microwave's cooking game opens the same way, with Mom's dino
-// nuggets or her mac n cheese.
-export const arcadeGames = ["claw", "skee", "mole", "comet", "cook-nuggets", "cook-mac"] as const;
+// The clubhouse microwave's cooking game and Bubblegum Bay's fishing spot open
+// the same way.
+export const arcadeGames = [
+  "claw", "skee", "mole", "comet", "cook-nuggets", "cook-mac", "fish",
+] as const;
 export type ArcadeGameId = (typeof arcadeGames)[number];
 export function isArcadeGameId(value: string): value is ArcadeGameId {
   return arcadeGames.some((game) => game === value);
 }
-export type ArcadeGame = ClawGame | SkeeGame | MoleGame | CometGame | CookGame;
-export type ArcadeView = ClawView | SkeeView | MoleView | CometView | CookView;
+export type ArcadeGame = ClawGame | SkeeGame | MoleGame | CometGame | CookGame | FishGame;
+export type ArcadeView = ClawView | SkeeView | MoleView | CometView | CookView | FishView;
 
 // Pays for a game and starts it. Boop-a-Mole draws its round's holes from
 // the game's random generator as it opens.
@@ -37,11 +40,18 @@ export function openArcade(world: World, state: State, game: ArcadeGameId, price
       return { ...paid, arcade: newCook("nuggets") };
     case "cook-mac":
       return { ...paid, arcade: newCook("mac") };
+    case "fish":
+      return { ...paid, arcade: newFish(world.arcade.fish) };
   }
 }
 
-// One tick of the open game, if there is one. Only cooking pays snacks.
-export function stepArcade(world: World, state: State, input: ActionFrame): ArcadeStep {
+// One tick of the open game, if there is one.
+export function stepArcade(
+  world: World,
+  state: State,
+  input: ActionFrame,
+  gentleTiming = false,
+): ArcadeStep {
   const game = state.arcade;
   const snacks = state.snacks;
   if (game === null)
@@ -57,10 +67,16 @@ export function stepArcade(world: World, state: State, input: ActionFrame): Arca
       return { ...stepComet(world, state, game, input), snacks };
     case "cook":
       return stepCook(world, state, game, input);
+    case "fish":
+      return stepFish(world, state, game, input, gentleTiming);
   }
 }
 
-export function arcadeView(world: World, state: State): ArcadeView | null {
+export function arcadeView(
+  world: World,
+  state: State,
+  gentleTiming = false,
+): ArcadeView | null {
   const game = state.arcade;
   if (game === null) return null;
   switch (game.game) {
@@ -74,5 +90,7 @@ export function arcadeView(world: World, state: State): ArcadeView | null {
       return cometView(world, game);
     case "cook":
       return cookView(world, game);
+    case "fish":
+      return fishView(world, state, game, gentleTiming);
   }
 }

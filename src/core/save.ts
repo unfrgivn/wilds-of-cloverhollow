@@ -104,7 +104,7 @@ function sameShape(template: unknown, value: unknown): boolean {
   return typeof template === typeof value;
 }
 
-function validTreats(value: unknown): boolean {
+function validCounts(value: unknown, max: number): boolean {
   if (value === undefined) return true;
   if (!record(value) || Array.isArray(value)) return false;
   return Object.entries(value).every(
@@ -113,14 +113,15 @@ function validTreats(value: unknown): boolean {
       typeof count === "number" &&
       Number.isInteger(count) &&
       count >= 1 &&
-      count <= 99,
+      count <= max,
   );
 }
 
 function isState(value: unknown, template: State): value is State {
   return sameShape(template, value) && record(value) && Array.isArray(value.wild) &&
     value.wild.every((item) => sameShape(wildShape, item)) &&
-    validTreats(value.treats);
+    validCounts(value.treats, 99) &&
+    validCounts(value.caughtFish, 9999);
 }
 
 export function serializeSave(state: State): string {

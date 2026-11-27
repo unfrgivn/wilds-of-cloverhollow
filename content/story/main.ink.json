@@ -15369,6 +15369,31 @@
         ],
         "nop",
         "\n",
+        "ev",
+        {
+          "VAR?": "sue_joined"
+        },
+        "/ev",
+        [
+          {
+            "->": ".^.b",
+            "c": true
+          },
+          {
+            "b": [
+              "^ ",
+              {
+                "->": ".^.^.^.fish_spot"
+              },
+              {
+                "->": ".^.^.^.13"
+              },
+              null
+            ]
+          }
+        ],
+        "nop",
+        "\n",
         "^The end of Sue's dock. The water sparkles all the way to the sky. ",
         "#",
         "^speaker: Fae",
@@ -15376,6 +15401,54 @@
         "\n",
         "done",
         {
+          "fish_spot": [
+            [
+              "^The end of Sue's dock. Shimmering fish dart beneath the turquoise ripples! ",
+              "#",
+              "^speaker: Fae",
+              "/#",
+              "\n",
+              "ev",
+              "str",
+              "^Go fishing with Sue!",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-0",
+                "flg": 4
+              },
+              "ev",
+              "str",
+              "^Just enjoy the view",
+              "/str",
+              "/ev",
+              {
+                "*": ".^.c-1",
+                "flg": 4
+              },
+              {
+                "c-0": [
+                  "\n",
+                  "^I've got our lucky bobber right here, let's see what's biting! ",
+                  "#",
+                  "^speaker: Sue ",
+                  "/#",
+                  "#",
+                  "^play: fish 0",
+                  "/#",
+                  "\n",
+                  "done",
+                  null
+                ],
+                "c-1": [
+                  "\n",
+                  "done",
+                  null
+                ]
+              }
+            ],
+            null
+          ],
           "bottle": [
             [
               "ev",

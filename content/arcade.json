@@ -236,5 +236,102 @@
       "over": "A little crispy, but yummy! Snacks +{snacks}.",
       "burnt": "DING! Extra crispy... Snacks +{snacks}."
     }
+  },
+  "fish": {
+    "aimPeriod": 96,
+    "castTicks": 28,
+    "biteTicks": 48,
+    "nibbleGapMin": 36,
+    "nibbleGapMax": 66,
+    "reelStart": 0.36,
+    "reelGain": 0.0125,
+    "reelDrain": 0.0055,
+    "zoneHalf": 0.155,
+    "hookAccel": 0.0042,
+    "hookGravity": 0.0028,
+    "hookMaxSpeed": 0.036,
+    "reelMaxTicks": 480,
+    "catches": [
+      {
+        "id": "minnow",
+        "name": "Bubblegum Minnow",
+        "frame": "minnow",
+        "coins": 4,
+        "snacks": 0,
+        "rarity": "common",
+        "minPower": 0,
+        "weight": 32,
+        "fightSpeed": 0.011,
+        "line": "A wiggly Bubblegum Minnow! Sue cheers from the dock. Coins +4."
+      },
+      {
+        "id": "perch",
+        "name": "Sunny Perch",
+        "frame": "perch",
+        "coins": 6,
+        "snacks": 1,
+        "rarity": "common",
+        "minPower": 0,
+        "weight": 26,
+        "fightSpeed": 0.013,
+        "line": "Ooh, a Sunny Perch! Coins +6, Snacks +1."
+      },
+      {
+        "id": "shell",
+        "name": "Starfish Shell",
+        "frame": "shell",
+        "coins": 8,
+        "snacks": 0,
+        "rarity": "uncommon",
+        "minPower": 0.25,
+        "weight": 20,
+        "fightSpeed": 0.012,
+        "line": "A glittering Starfish Shell from the sandy bottom! Coins +8."
+      },
+      {
+        "id": "koi",
+        "name": "Rainbow Koi",
+        "frame": "koi",
+        "coins": 12,
+        "snacks": 1,
+        "rarity": "uncommon",
+        "minPower": 0.45,
+        "weight": 14,
+        "fightSpeed": 0.016,
+        "line": "Whoa! A shimmering Rainbow Koi! Coins +12, Snacks +1."
+      },
+      {
+        "id": "jelly",
+        "name": "Moonlight Jelly",
+        "frame": "jelly",
+        "coins": 15,
+        "snacks": 0,
+        "rarity": "rare",
+        "minPower": 0.62,
+        "weight": 10,
+        "fightSpeed": 0.017,
+        "line": "A glowing Moonlight Jelly! It winks and floats back into the bay. Coins +15."
+      },
+      {
+        "id": "starfish",
+        "name": "Golden Starfish Crown",
+        "frame": "starfish",
+        "coins": 20,
+        "snacks": 1,
+        "rarity": "rare",
+        "minPower": 0.78,
+        "weight": 7,
+        "fightSpeed": 0.019,
+        "line": "JACKPOT! The rare Golden Starfish Crown! Coins +20, Snacks +1!"
+      }
+    ],
+    "lines": {
+      "aim": "Press Confirm to cast! Farther casts reach rare lake treasures.",
+      "wait": "Shh... watch the bobber and wait for the big SPLASH!",
+      "bite": "BITE! Press Confirm NOW!",
+      "reel": "Hold or tap Confirm to keep the bobber on the fish!",
+      "early": "Oops, pulled a little early! The ripples drifted away.",
+      "missed": "Aww, it nibbled and swam off! Try casting again."
+    }
   }
 }

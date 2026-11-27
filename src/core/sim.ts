@@ -2578,7 +2578,20 @@ function stepTick(
   if (state.arcade !== null) {
     const nextBase = { ...state, tick: state.tick + 1, previousInput: { ...input },
       motion: { ...state.motion, moving: false }, party: restingParty(state.party) };
-    return { state: { ...nextBase, ...stepArcade(world, state, input) }, events: [] };
+    const stepped = stepArcade(world, state, input, gentleTiming);
+    return {
+      state: {
+        ...nextBase,
+        arcade: stepped.arcade,
+        prizes: stepped.prizes,
+        tickets: stepped.tickets,
+        snacks: stepped.snacks,
+        ...(stepped.coins === undefined ? {} : { coins: stepped.coins }),
+        ...(stepped.rng === undefined ? {} : { rng: stepped.rng }),
+        ...(stepped.caughtFish === undefined ? {} : { caughtFish: stepped.caughtFish }),
+      },
+      events: [],
+    };
   }
   if (state.dialogue !== null)
     return dialogueStep(world, state, input);

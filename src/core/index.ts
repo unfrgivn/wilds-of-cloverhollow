@@ -16,6 +16,7 @@ export * from "./arcade";
 export * from "./claw";
 export * from "./skee";
 export * from "./cook";
+export * from "./fish";
 export * from "./encounter";
 export * from "./mole";
 export * from "./comet";

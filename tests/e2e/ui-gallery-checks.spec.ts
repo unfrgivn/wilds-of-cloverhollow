@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { clawGalleryStates } from "../../src/dev/claw-gallery";
 import { cometGalleryStates } from "../../src/dev/comet-gallery";
 import { cookGalleryStates } from "../../src/dev/cook-gallery";
+import { fishGalleryStates } from "../../src/dev/fish-gallery";
 import { moleGalleryStates } from "../../src/dev/mole-gallery";
 import { skeeGalleryStates } from "../../src/dev/skee-gallery";
 import { battleStates, gallery, journalStates, phone, sizes, states } from "./gallery";
@@ -60,6 +61,8 @@ const battleParts: Record<string, string[]> = {
     state === "comet-result" ? [".sticker-dialogue"] : [".touch-comet"]])),
   ...Object.fromEntries(cookGalleryStates.map((state) => [state,
     state === "cook-result" || state === "cook-burnt" ? [".sticker-dialogue"] : []])),
+  ...Object.fromEntries(fishGalleryStates.map((state) => [state,
+    state === "arcade-fish-catch" ? [".sticker-dialogue"] : []])),
 };
 const allBattleParts = [".battle-hud", ".battle-commands", ".battle-ring", ".battle-charge-meter",
   ".battle-chain", ".battle-catch", ".battle-lean", ".battle-peekaboo", ".battle-echo",
@@ -880,6 +883,109 @@ test.describe("sticker gallery", () => {
           for (const button of drawn.buttons)
             expect(overlaps(drawn.dialogue, button)).toBe(false);
         } else expect(drawn.dialogue).toBeNull();
+      });
+    }
+  }
+
+  for (const size of [phone, { width: 1280, height: 720 }]) {
+    for (const state of fishGalleryStates) {
+      test(`${state} fishing dock as laid out ${size.width}x${size.height}`, async ({ page }) => {
+        const insets = size.width === 874 ? "0,62,21,62" : "0,0,0,0";
+        await gallery(page, state, true, insets, size);
+        const drawn = await page.evaluate(() => {
+          const box = (element: Element | Range | null): {
+            x: number; y: number; width: number; height: number;
+          } => {
+            if (element === null) throw new Error("missing a part of the fishing dock");
+            const rect = element.getBoundingClientRect();
+            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+          };
+          const shown = (selector: string): Element | null => {
+            const node = document.querySelector(selector);
+            return node !== null && node.getClientRects().length > 0 ? node : null;
+          };
+          const glyphs = (selector: string): ReturnType<typeof box> | null => {
+            const node = shown(selector);
+            if (node === null) return null;
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            return box(range);
+          };
+          const dialogue = shown(".sticker-dialogue");
+          const atDialogue = dialogue === null ? null : document.elementFromPoint(
+            box(dialogue).x + box(dialogue).width / 2,
+            box(dialogue).y + box(dialogue).height / 2);
+          return {
+            viewport: { width: window.innerWidth, height: window.innerHeight },
+            stage: box(document.querySelector(".fish-stage")),
+            book: box(document.querySelector(".fish-book")),
+            slots: [...document.querySelectorAll(".fish-book-slot")].map((node) => box(node)),
+            power: shown(".fish-power") === null
+              ? null
+              : box(document.querySelector(".fish-power")),
+            reel: shown(".fish-reel") === null
+              ? null
+              : box(document.querySelector(".fish-reel")),
+            catchCard: shown(".fish-catch-card") === null
+              ? null
+              : box(document.querySelector(".fish-catch-card")),
+            catchPills: [...document.querySelectorAll(".fish-pill")]
+              .filter((node) => node.getClientRects().length > 0)
+              .map((node) => box(node)),
+            front: shown(".fish-front") === null
+              ? null
+              : box(document.querySelector(".fish-front")),
+            frontText: glyphs(".fish-front-text"),
+            dialogue: dialogue === null ? null : box(dialogue),
+            dialogueOnTop: dialogue !== null && atDialogue !== null &&
+              dialogue.contains(atDialogue),
+            buttons: [
+              box(document.querySelector(".touch-confirm")),
+              box(document.querySelector(".touch-cancel")),
+              box(document.querySelector(".touch-menu")),
+            ],
+          };
+        });
+        const within = (inner: Rect, outer: Rect, label: string): void => {
+          expect(inner.x, `${label} left`).toBeGreaterThanOrEqual(outer.x - 1);
+          expect(inner.y, `${label} top`).toBeGreaterThanOrEqual(outer.y - 1);
+          expect(inner.x + inner.width, `${label} right`)
+            .toBeLessThanOrEqual(outer.x + outer.width + 1);
+          expect(inner.y + inner.height, `${label} bottom`)
+            .toBeLessThanOrEqual(outer.y + outer.height + 1);
+        };
+        within(drawn.stage, { x: 0, y: 0, ...drawn.viewport }, "the fishing dock");
+        within(drawn.book, drawn.stage, "the catch book");
+        expect(drawn.slots).toHaveLength(6);
+        for (const slot of drawn.slots) within(slot, drawn.book, "catch book slot");
+        for (const button of drawn.buttons)
+          expect(overlaps(drawn.stage, button)).toBe(false);
+        if (state === "arcade-fish-aim") {
+          if (drawn.power === null || drawn.front === null || drawn.frontText === null)
+            throw new Error("aim should show power gauge and hint");
+          within(drawn.power, drawn.stage, "power gauge");
+          within(drawn.frontText, drawn.front, "aim hint");
+          expect(drawn.dialogue).toBeNull();
+        } else if (state === "arcade-fish-reeling") {
+          if (drawn.reel === null || drawn.front === null || drawn.frontText === null)
+            throw new Error("reeling should show reel meter and hint");
+          within(drawn.reel, drawn.stage, "reel meter");
+          within(drawn.frontText, drawn.front, "reeling hint");
+          expect(drawn.dialogue).toBeNull();
+        } else if (state === "arcade-fish-catch") {
+          if (drawn.catchCard === null || drawn.dialogue === null)
+            throw new Error("catch result should show catch card and dialogue");
+          within(drawn.catchCard, drawn.stage, "catch card");
+          for (const pill of drawn.catchPills)
+            within(pill, drawn.catchCard, "catch card pill");
+          expect(overlaps(drawn.catchCard, drawn.book)).toBe(false);
+          expect(overlaps(drawn.catchCard, drawn.dialogue)).toBe(false);
+          expect(drawn.dialogueOnTop).toBe(true);
+          for (const button of drawn.buttons) {
+            expect(overlaps(drawn.catchCard, button)).toBe(false);
+            expect(overlaps(drawn.dialogue, button)).toBe(false);
+          }
+        }
       });
     }
   }

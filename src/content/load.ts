@@ -181,6 +181,10 @@ import type {
   CookContent,
   CookDish,
   CookZone,
+  FishCalibration,
+  FishCatchSpec,
+  FishContent,
+  FishRarity,
   MoleContent,
   CometContent,
   SkeeCalibration,
@@ -652,6 +656,7 @@ export function parseArcade(value: unknown, prizesValue: unknown): ArcadeContent
     mole: parseMole(value.mole, file),
     comet: parseComet(value.comet, file),
     cook: parseCook(value.cook, file),
+    fish: parseFish(value.fish, file),
     counter: parseCounter(value.counter, file, prizes, heap),
     prizes,
   };
@@ -783,6 +788,79 @@ function parseCook(value: unknown, file: string): CookContent {
     dingTicks: integer(value, "dingTicks", 1),
     lines: { start: lines.start, frozen: lines.frozen, under: said("under"),
       golden: said("golden"), over: said("over"), burnt: said("burnt") },
+  };
+}
+
+function isFishRarity(value: unknown): value is FishRarity {
+  return value === "common" || value === "uncommon" || value === "rare";
+}
+
+function parseFish(value: unknown, file: string): FishContent {
+  field(record(value), file, "fish");
+  const integer = (source: Record<string, unknown>, name: string, minimum: number,
+    label = `fish.${name}`): number => integerIn(source, name, minimum, file, label);
+  const ratio = (source: Record<string, unknown>, name: string, min: number, max: number,
+    label = `fish.${name}`): number => {
+    const item = source[name];
+    field(typeof item === "number" && Number.isFinite(item) && item >= min && item <= max,
+      file, label);
+    return item;
+  };
+  const nibbleGapMin = integer(value, "nibbleGapMin", 1);
+  const nibbleGapMax = integer(value, "nibbleGapMax", nibbleGapMin);
+  field(list(value.catches) && value.catches.length > 0, file, "fish.catches");
+  const seen = new Set<string>();
+  const catches: FishCatchSpec[] = value.catches.map((item, index) => {
+    const label = `fish.catches[${index}]`;
+    field(record(item) && typeof item.id === "string" && /^[a-z][a-z0-9-]*$/.test(item.id) &&
+      typeof item.name === "string" && item.name.length > 0 &&
+      typeof item.frame === "string" && item.frame.length > 0 &&
+      isFishRarity(item.rarity) && typeof item.line === "string" && item.line.length > 0,
+    file, label);
+    field(!seen.has(item.id), file, `${label} (duplicate catch ${item.id})`);
+    seen.add(item.id);
+    return {
+      id: item.id,
+      name: item.name,
+      frame: item.frame,
+      coins: integer(item, "coins", 1, `${label}.coins`),
+      snacks: integer(item, "snacks", 0, `${label}.snacks`),
+      rarity: item.rarity,
+      minPower: ratio(item, "minPower", 0, 1, `${label}.minPower`),
+      weight: integer(item, "weight", 1, `${label}.weight`),
+      fightSpeed: ratio(item, "fightSpeed", 0.001, 0.2, `${label}.fightSpeed`),
+      line: item.line,
+    };
+  });
+  field(catches.some((item) => item.minPower === 0), file,
+    "fish.catches (at least one catch must unlock at power 0)");
+  const lines = value.lines;
+  field(record(lines) && typeof lines.aim === "string" && typeof lines.wait === "string" &&
+    typeof lines.bite === "string" && typeof lines.reel === "string" &&
+    typeof lines.early === "string" && typeof lines.missed === "string", file, "fish.lines");
+  return {
+    aimPeriod: integer(value, "aimPeriod", 8),
+    castTicks: integer(value, "castTicks", 1),
+    biteTicks: integer(value, "biteTicks", 8),
+    nibbleGapMin,
+    nibbleGapMax,
+    reelStart: ratio(value, "reelStart", 0.05, 0.9),
+    reelGain: ratio(value, "reelGain", 0.001, 0.2),
+    reelDrain: ratio(value, "reelDrain", 0.001, 0.2),
+    zoneHalf: ratio(value, "zoneHalf", 0.04, 0.4),
+    hookAccel: ratio(value, "hookAccel", 0.0005, 0.1),
+    hookGravity: ratio(value, "hookGravity", 0.0005, 0.1),
+    hookMaxSpeed: ratio(value, "hookMaxSpeed", 0.005, 0.2),
+    reelMaxTicks: integer(value, "reelMaxTicks", 60),
+    catches,
+    lines: {
+      aim: lines.aim,
+      wait: lines.wait,
+      bite: lines.bite,
+      reel: lines.reel,
+      early: lines.early,
+      missed: lines.missed,
+    },
   };
 }
 
@@ -969,6 +1047,43 @@ export function parseCookCalibration(value: unknown, file: string): CookCalibrat
     plate: { cx: plate.cx, cy: plate.cy, rx: plate.rx, ry: plate.ry },
     display,
     button: { cx: button.cx, cy: button.cy, r: button.r },
+    front,
+  };
+}
+
+export function parseFishCalibration(value: unknown, file: string): FishCalibration {
+  const number = (item: unknown): item is number =>
+    typeof item === "number" && Number.isFinite(item);
+  type Box = { x: number; y: number; w: number; h: number };
+  field(record(value) && typeof value.image === "string", file, "image");
+  field(record(value.size) && number(value.size.w) && number(value.size.h) &&
+    value.size.w > 0 && value.size.h > 0, file, "size");
+  const size = { w: value.size.w, h: value.size.h };
+  const inside = (box: Box): boolean =>
+    box.x >= 0 && box.y >= 0 && box.x + box.w <= size.w && box.y + box.h <= size.h;
+  const rect = (item: unknown, name: string): Box => {
+    field(record(item) && number(item.x) && number(item.y) && number(item.w) &&
+      number(item.h) && item.w > 0 && item.h > 0, file, name);
+    const box = { x: item.x, y: item.y, w: item.w, h: item.h };
+    field(inside(box), file, `${name} (inside the image)`);
+    return box;
+  };
+  const water = rect(value.water, "water");
+  const front = rect(value.front, "front");
+  const horizonY = value.horizonY;
+  const dockY = value.dockY;
+  field(number(horizonY) && horizonY >= 0 && horizonY <= water.y, file, "horizonY");
+  field(number(dockY) && dockY >= water.y + water.h && dockY <= front.y, file, "dockY");
+  const rodTip = value.rodTip;
+  field(record(rodTip) && number(rodTip.x) && number(rodTip.y) &&
+    rodTip.x >= 0 && rodTip.x <= size.w && rodTip.y >= 0 && rodTip.y <= size.h, file, "rodTip");
+  return {
+    image: value.image,
+    size,
+    water,
+    horizonY,
+    dockY,
+    rodTip: { x: rodTip.x, y: rodTip.y },
     front,
   };
 }

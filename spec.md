@@ -1,6 +1,6 @@
 # Wilds of Cloverhollow: spec
 
-Last updated: 2026-11-26 (Milestone 87)
+Last updated: 2026-11-26 (Milestone 88)
 
 This file is the single source of truth. If code changes behavior, interfaces,
 file formats, or decisions, update this file in the same commit. The previous
@@ -238,8 +238,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   claw machine, and `skee-aim`, `skee-roll`, `skee-score`, `skee-hundred`, and
   `tickets-won` for skee-ball, and `mole-pop`, `mole-boop`, and `mole-whiff`
   for Boop-a-Mole, `comet-move`, `comet-star`, and `comet-bump` for Comet
-  Cruise, and `cook-start`, `cook-frozen`, and `cook-ding` for the clubhouse
-  microwave. Battle depth adds `battle-together` (a rising C-major-9th sparkle
+  Cruise, `cook-start`, `cook-frozen`, and `cook-ding` for the clubhouse
+  microwave, and `fish-cast`, `fish-nibble`, `fish-bite`, `fish-reel`, and
+  `fish-catch` for Bubblegum Bay fishing. Battle depth adds `battle-together` (a rising C-major-9th sparkle
   arpeggio when Together! launches, replacing `battle-command`), projects
   `flute` when Flute Friends assist in battle, and adds `lasso-twirl` (a rising
   rope whoosh and wooden star ping) when Fae twirls Coach Ash's rainbow lasso
@@ -1480,8 +1481,9 @@ trunks keep its two exits.
   container) and rejects a travel tag naming an unknown area or spawn, any
   `buy` tag but `snack <digits>`, any `gift` tag but `snack <count>` or
   `coins <count>`, any `feed` tag but `snack <count>`, each count 1 or more,
-  and any `play` tag but `<game> <digits>` naming an arcade or cooking game
-  (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`, `cook-mac`).
+  and any `play` tag but `<game> <digits>` naming an arcade, cooking, or
+  fishing game (`claw`, `skee`, `mole`, `comet`, `cook-nuggets`, `cook-mac`,
+  `fish`).
 - A line may carry `# play: <game> <price>` (Milestone 44): the dialogue keeps
   it to its close, and then, if Fae has the coins, she pays them and the game
   opens (spec 8.2). It is the one place a game's price is set.
@@ -2811,6 +2813,36 @@ trunks keep its two exits.
 - Its gallery states (`src/dev/cook-gallery.ts`), each a real game state the
   core cooked: `cook-ready`, `cook-golden` (cooking at the box's minute),
   `cook-frozen`, `cook-result` (mac n cheese, golden), and `cook-burnt`.
+- Bubblegum Bay's fishing spot (`dock_end` in `content/story/main.ink`) opens
+  once `sue_joined` is true (preserving the lasso bottle quest whenever
+  `has_lasso and not has_map`) via `play: fish 0`, free. `state.arcade` is then
+  `FishGame` (`src/core/fish.ts`, phases `aim`, `casting`, `waiting`, `bite`,
+  `reeling`, `result`). During `aim`, cast power sweeps smoothly `0..1..0` over
+  `aimPeriod` ticks via pure algebraic interpolation (`fishAimPower`); pressing
+  Confirm rolls deterministic `castX`, `castY` (farther casts unlock rarer
+  species), 1-2 nibbles, nibble gaps, and a weighted species from `fish.catches`
+  (`minnow`, `perch`, `shell`, `koi`, `jelly`, `starfish`) in
+  `content/arcade.json`, then arcs out over `castTicks`. During `waiting`,
+  Cancel packs up cleanly, early Confirm ends with `lines.early`, and nibbles
+  emit `fish-nibble` until the `bite` splash (`biteTicks`, widened by +20 ticks
+  under Gentle Timing). Pressing Confirm during `bite` starts `reeling`: hold
+  or tap Confirm to keep the catch zone (`zoneHalf`, widened by +0.08 with
+  halved drain under Gentle Timing) over the deterministic swimming wave
+  (`fishWavePosition`) until `reelProgress` reaches 1. Landing a catch awards
+  the species' `coins` and `snacks`, records species counts in optional
+  `state.caughtFish` (omitted when empty, validated alongside `treats` in save
+  version 10), and shows the Catch Reveal card alongside the dialogue line.
+- The fishing close-up (`src/ui/fish.ts`, laid out by `layoutFish` in
+  `src/ui/fish-layout.ts`, loaded on demand in `bay`) renders the painted dock
+  vista (`public/assets/arcade/fishing-dock.{webp,json}`, parsed by
+  `parseFishCalibration`), the 6-item catch atlas (`public/assets/arcade/
+  fish-catches.{png,json}`, built by `tools/art/build-fish.ts`), a live SVG
+  wooden fishing rod, quadratic Bezier line, cork bobber, water ripples, and
+  submerged fish shadow, plus the top-left Bubblegum Bay Catch Book (`N / 6`),
+  touch-aware pack-up pill, Cast Power Gauge, Watercolor Reel-In Meter,
+  `! BITE !` sticker, and 2-column Catch Reveal card. Its gallery states
+  (`src/dev/fish-gallery.ts`) are `arcade-fish-aim`, `arcade-fish-reeling`, and
+  `arcade-fish-catch`.
 - Minigame & UI micro-animation polish (Milestone 73, all CSS transitions and
   keyframes guarded by `@media (prefers-reduced-motion: reduce)`): Claw Machine
   tug wiggle and sliding/returning pendulum tilt; Skee-Ball contact shadow
@@ -3142,8 +3174,10 @@ trunks keep its two exits.
   `x, y` a centre. The microwave: `{ game: "cook", phase, machine,
   glass, food, display, front, frost, darkness, light, wisps, smoke }`,
   `front` the fridge's lettering ("" in the result) and `frost` its frost's
-  opacity. Harness builds log `[cloverhollow] arcade { phase, message }` when
-  either value changes.
+  opacity. Bubblegum Bay fishing: `{ game: "fish", phase, stage, water,
+  bobber: { x, y, visible }, power, reelProgress, inZone, caught, catchCard,
+  caughtSpecies, totalSpecies, front }`. Harness builds log
+  `[cloverhollow] arcade { phase, message }` when either value changes.
 - `sound.log()` returns recent read-only `{ tick, cue, played }` entries,
   `sound.muted()` reports the separate audio preference, `sound.level()`
   reports the selected level (`0.25`, `0.5`, `0.75`, or `1`), `sound.state()`

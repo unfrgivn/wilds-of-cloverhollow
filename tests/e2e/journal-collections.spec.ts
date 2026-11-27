@@ -402,7 +402,7 @@ test(
 
     // Uncollected Clover Hills Star Gem shimmers with a prismatic emissive glint.
     expect((await renderInfo(page)).starGemGlints).toBe(1);
-    await captureReview(page, testInfo, "m120-star-gem-glint");
+    await captureReview(page, testInfo, "m121-star-gem-glint");
 
     // Below 100% completion, the Journal MAP footer omits the Master Crest.
     await press(page, "j");
@@ -438,28 +438,50 @@ test(
     expect(crestContrast).toHaveLength(1);
     expect(crestContrast[0]?.ratio ?? 0).toBeGreaterThanOrEqual(9.5);
 
-    await captureReview(page, testInfo, "m120-valley-explorer-100");
+    await captureReview(page, testInfo, "m121-valley-explorer-100");
 
     for (const size of [{ width: 1280, height: 720 }, { width: 874, height: 402 }]) {
       await page.setViewportSize(size);
       await step(page, 1);
-      const footerFits = await page.evaluate(() => {
+      const footerCheck = await page.evaluate(() => {
+        const book = document.querySelector<HTMLElement>(".journal-book");
         const footer = document.querySelector<HTMLElement>(".journal-map-footer");
+        const detail = document.querySelector<HTMLElement>(".journal-map-detail");
+        const crestEl = document.querySelector<HTMLElement>(".journal-master-crest");
         const items = [
           ...document.querySelectorAll<HTMLElement>(
-            ".journal-master-crest, .journal-map-pill, .journal-treasures-btn, .journal-map-legend",
+            ".journal-map-detail, .journal-master-crest, .journal-map-pill, " +
+              ".journal-treasures-btn, .journal-map-legend",
           ),
         ];
-        if (footer === null || items.length === 0) return false;
+        if (book === null || footer === null || detail === null || crestEl === null) return null;
+        if (items.length === 0) return null;
+        const bookBox = book.getBoundingClientRect();
         const box = footer.getBoundingClientRect();
-        return footer.scrollWidth <= footer.clientWidth + 1 &&
-          items.every((item) => {
+        const crestBox = crestEl.getBoundingClientRect();
+        return {
+          footerNoOverflow: footer.scrollWidth <= footer.clientWidth + 1,
+          detailNotTruncated: detail.scrollWidth <= detail.clientWidth + 1,
+          crestInsideBook:
+            crestBox.left >= bookBox.left - 1 && crestBox.right <= bookBox.right + 1 &&
+            crestBox.top >= bookBox.top - 1 && crestBox.bottom <= bookBox.bottom + 1,
+          footerInsideBook:
+            box.left >= bookBox.left - 1 && box.right <= bookBox.right + 1 &&
+            box.top >= bookBox.top - 1 && box.bottom <= bookBox.bottom + 1,
+          allItemsInsideFooter: items.every((item) => {
             const rect = item.getBoundingClientRect();
             return rect.left >= box.left - 1 && rect.right <= box.right + 1 &&
               rect.top >= box.top - 1 && rect.bottom <= box.bottom + 1;
-          });
+          }),
+        };
       });
-      expect(footerFits, `${size.width}x${size.height} master crest map footer`).toBe(true);
+      expect(footerCheck, `${size.width}x${size.height} master crest map footer`).toEqual({
+        footerNoOverflow: true,
+        detailNotTruncated: true,
+        crestInsideBook: true,
+        footerInsideBook: true,
+        allItemsInsideFooter: true,
+      });
     }
 
     expect(errors).toEqual([]);

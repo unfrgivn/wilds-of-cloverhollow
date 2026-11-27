@@ -5425,6 +5425,53 @@ the old trail, the owl, and the clubhouse claim.
   skipped, 0 failed across Chromium & WebKit; only the uncollected Star Gem
   area baselines on `bay`, `pass`, and `trail` updated).
 
+## Milestone 121: Hand-Inked Star Gem Sparkle Charm, 100% MAP Footer No-Truncation Polish, Dual-Rumble Gamepad Haptics & `src/content/battle-parsers.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Sharpens uncollected overworld Star Gem sparkles with a bespoke hand-inked
+  storybook star charm, removes horizontal text truncation in the 100% Valley
+  Explorer Journal MAP footer, adds dual-rumble Gamepad haptics, and extracts
+  battle/critter/party/sticker/level/treat parsers from `src/content/load.ts`
+  into `src/content/battle-parsers.ts` with zero `src/core` changes and zero
+  replay hash shifts across all 67 recorded sims.
+- Hand-Inked 4-Point Star Gem Sparkle Charm (`src/render/vfx-textures.ts`,
+  `src/render/overworld-effects.ts`):
+  - Adds bespoke 48x48 `starGemCharm` texture (`STAR_GEM_CHARM_SPEC`: 4-point
+    storybook diamond star, `outerR = 17`, `innerR = 5.5`, golden-cream radial
+    fill `#fffdf0` -> `#ffe37a` -> `#f4b93a`, cocoa-brown `#47321f` ink outline
+    `lineWidth = 2.6`, bright ivory center glint dot `r = 3.2`).
+  - `OverworldEffectsController.updateStarGemGlints` renders `starGemCharm`
+    (`tint = 0xffffff`, `blendMode = "normal"`, `scale = glint.starScale * 1.15`)
+    over the soft pastel `softGlow` halo so uncollected Star Gems pop cleanly on
+    both bright meadow grass and dark Crystal Cavern floors.
+- 100% MAP Footer Zero-Truncation Polish (`src/ui/journal.css`,
+  `tests/e2e/journal-collections.spec.ts`):
+  - Scopes clean wrapping (`flex-wrap: wrap`, `row-gap: 4px`, `column-gap: 8px`,
+    `padding: 5px 10px`, `border-radius: 16px`) exclusively to
+    `.journal-map-footer.has-master-crest` so all `< 100%` MAP baselines stay
+    pixel-identical while `.journal-map-detail` never truncates at 100%.
+- Dual-Rumble Gamepad Haptics (`src/platform/haptics.ts`):
+  - Exports `RumbleParams`, `GAMEPAD_RUMBLE_EFFECTS`, `hasRumbleGamepad`, and
+    `triggerGamepadRumble` using strict type guards with zero `any`/`as` casts.
+  - `createHaptics()` checks Capacitor Haptics -> connected dual-rumble Gamepad
+    actuators -> Web Vibration API while honoring `isReducedMotionActive()`.
+- Modular `src/content/battle-parsers.ts` extraction (`src/content/load.ts`):
+  - Extracts `talkErrors`, `parseRecurring`, `parseCritter`,
+    `parseBattleContent`, `feelingErrors`, `parsePartyMember`,
+    `partyJoinErrors`, `partyErrors`, `critterErrors`, `parseStickers`,
+    `parseLevels`, and `parseTreats` into `src/content/battle-parsers.ts` and
+    re-exports all public symbols identically from `src/content/load.ts`
+    (trimming `src/content/load.ts` from 1,629 lines to 923 lines).
+- Evidence: `tests/unit/milestone-121.test.ts` (5 tests), extended
+  `tests/e2e/journal-collections.spec.ts` (zero-truncation assertion at 100%
+  completion), and review captures `art/review/m121-star-gem-glint.jpg` and
+  `art/review/m121-valley-explorer-100.jpg` verified with `vision`.
+- Gates: `just check` (180 unit files / 1,366 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4411 just e2e --update-snapshots` (1,134 passed, 2
+  skipped, 0 failed across Chromium & WebKit; only the uncollected Star Gem
+  area baselines on `bay`, `pass`, and `trail` updated for the new hand-inked
+  star charm).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

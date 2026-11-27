@@ -294,11 +294,11 @@ export class OverworldEffectsController {
         halo.label = `stargem:halo:${i}`;
         halo.anchor.set(0.5);
         halo.blendMode = "add";
-        const star = new Sprite(this.vfx.sparkle);
+        const star = new Sprite(this.vfx.starGemCharm);
         star.label = `stargem:star:${i}`;
         star.anchor.set(0.5);
         star.blendMode = "normal";
-        star.tint = 0xfff8cf;
+        star.tint = 0xffffff;
         this.starGemLayer.addChild(halo, star);
         entry = { halo, star };
         this.starGemPool.push(entry);
@@ -312,10 +312,10 @@ export class OverworldEffectsController {
 
       entry.star.visible = true;
       entry.star.position.set(glint.x, glint.y);
-      entry.star.scale.set(glint.starScale);
+      entry.star.scale.set(glint.starScale * 1.15);
       entry.star.alpha = glint.starAlpha;
       entry.star.rotation = glint.starRotation;
-      entry.star.tint = 0xfff8cf;
+      entry.star.tint = 0xffffff;
     }
     for (let i = glints.length; i < this.starGemPool.length; i += 1) {
       const entry = this.starGemPool[i];

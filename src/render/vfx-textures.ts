@@ -12,6 +12,7 @@ export type VfxTextureKey =
   | "contactShadow"
   | "softGlow"
   | "sparkle"
+  | "starGemCharm"
   | "petal"
   | "waterGlint"
   | "mistWisp"
@@ -27,6 +28,14 @@ export type VfxTextureKey =
   | "emoteZzz"
   | "emoteHeart"
   | KeepsakeTextureKey;
+
+export const STAR_GEM_CHARM_SPEC = {
+  size: 48,
+  outerR: 17,
+  innerR: 5.5,
+  strokeWidth: 2.6,
+  glintRadius: 3.2,
+};
 
 export type VfxTextures = Record<VfxTextureKey, Texture> & {
   destroy: () => void;
@@ -115,6 +124,43 @@ function buildSparkle(): Texture {
   core.addColorStop(0.48, "rgba(255, 252, 238, 0.92)");
   core.addColorStop(1, "rgba(255, 244, 212, 0.15)");
   ctx.fillStyle = core;
+  ctx.fill();
+  ctx.restore();
+  return toTexture(canvas);
+}
+
+// 48x48 hand-inked 4-point storybook diamond star sparkle for overworld Star Gems:
+// golden-cream radial wash, crisp warm cocoa-brown outline, and bright ivory core dot.
+function buildStarGemCharm(): Texture {
+  const { size, outerR, innerR, strokeWidth, glintRadius } = STAR_GEM_CHARM_SPEC;
+  const center = size * 0.5;
+  const { canvas, ctx } = makeCanvas(size, size);
+  ctx.save();
+  ctx.translate(center, center);
+  ctx.beginPath();
+  for (let i = 0; i < 8; i += 1) {
+    const angle = (i * Math.PI) / 4 - Math.PI / 2;
+    const r = i % 2 === 0 ? outerR : innerR;
+    const px = Math.cos(angle) * r;
+    const py = Math.sin(angle) * r;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  const fill = ctx.createRadialGradient(0, 0, 1, 0, 0, outerR);
+  fill.addColorStop(0, "#fffdf0");
+  fill.addColorStop(0.55, "#ffe37a");
+  fill.addColorStop(1, "#f4b93a");
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.lineWidth = strokeWidth;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#47321f";
+  ctx.stroke();
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(0, 0, glintRadius, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
   return toTexture(canvas);
@@ -618,6 +664,7 @@ export function createVfxTextures(): VfxTextures {
     contactShadow: buildContactShadow(),
     softGlow: buildSoftGlow(),
     sparkle: buildSparkle(),
+    starGemCharm: buildStarGemCharm(),
     petal: buildPetal(),
     waterGlint: buildWaterGlint(),
     mistWisp: buildMistWisp(),

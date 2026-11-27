@@ -163,10 +163,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   projectors (`battleCheckOverlay`, `buildJournalView`,
   `buildRewardStickerView`, `buildDialogueView`) live in `src/shell/assets.ts`
   so `src/main.ts` stays focused on composition and lifecycle.
-- Tactile haptics (`src/platform/haptics.ts`, Milestone 91): progressive
+- Tactile haptics (`src/platform/haptics.ts`, Milestones 91 & 121): progressive
   enhancement with zero new npm dependencies. `createHaptics()` checks for a
   native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via strict type
-  guards and falls back to `navigator.vibrate` (`light: 10`, `medium: 18`,
+  guards, then fires dual-rumble Gamepad haptic actuators via
+  `triggerGamepadRumble(pads, kind)` (`GAMEPAD_RUMBLE_EFFECTS`: `light` 35 ms
+  0.08/0.22, `medium` 70 ms 0.22/0.45, `celebrate` 150 ms 0.38/0.65; probed by
+  `hasRumbleGamepad(pads)` across `navigator.getGamepads?.()`), and finally
+  falls back to `navigator.vibrate` (`light: 10`, `medium: 18`,
   `celebrate: [14, 40, 22]`), respecting both OS
   `prefers-reduced-motion: reduce` and the in-game Reduced Motion toggle via
   `isReducedMotionActive()` (`src/platform/reduced-motion.ts`) and no-oping
@@ -547,9 +551,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   re-exported from `src/render/view.ts`, alongside pooled overworld visual
   effects in `OverworldEffectsController` inside `src/render/overworld-effects.ts`,
   Milestone 120, reusable primitive/geometry JSON validators in
-  `src/content/parsers.ts`, Milestone 97, and arcade/minigame content &
-  calibration parsers in `src/content/arcade-parsers.ts`, re-exported from
-  `src/content/load.ts`, Milestone 110) load on demand with
+  `src/content/parsers.ts`, Milestone 97, arcade/minigame content &
+  calibration parsers in `src/content/arcade-parsers.ts`, Milestone 110, and
+  battle/critter/party/feeling/sticker/level/treat parsers & validators in
+  `src/content/battle-parsers.ts`, re-exported from `src/content/load.ts`,
+  Milestone 121) load on demand with
   their area (and warm on door fade-out prefetch) and unload on the same
   bounded current + previous area residency window as ground tiles and prop
   atlases, so the way back through a door is a cache hit instead of a reload
@@ -1103,8 +1109,11 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`src/render/overworld-effects.ts`): an additive pastel halo cycling smoothly
   across lavender (`0xd4b2ff`), aqua (`0x9be7f2`), and butter-gold (`0xffe58f`,
   steady `0xffe58f` at `haloAlpha: 0.42` under Reduced Motion) paired with a
-  rotating pearl-gold 4-point sparkle star (`0xfff8cf`, stationary under Reduced
-  Motion). The five open-air interactable gems shimmer whenever uncollected;
+  rotating bespoke 48x48 hand-inked 4-point storybook star sparkle charm
+  (`starGemCharm` in `src/render/vfx-textures.ts`, Milestone 121: golden-cream
+  radial fill `#fffdf0` -> `#ffe37a` -> `#f4b93a`, warm cocoa-brown ink outline
+  `#47321f`, ivory center glint dot, drawn at `starScale * 1.15`, stationary
+  under Reduced Motion). The five open-air interactable gems shimmer whenever uncollected;
   the two blacklight-secret glow gems (`park_gem`, `cavern_gem`) shimmer only
   while Fae's lantern is active (`state.lantern === true`), and all glints hide
   during battle, arcade, `harness`, or once collected.
@@ -3456,7 +3465,10 @@ trunks keep its two exits.
   `valleyCompletion` in `src/core/journal.ts` reaches 100%, a gleaming golden
   `.journal-master-crest` pill `"★ 100% Valley Explorer!"` prepended to
   `.journal-map-summary` with `#ffe68a` fill, `#c98f22` inner accent, and
-  `#47321f` ink, detached whenever below 100%, Milestone 120). Clicking
+  `#47321f` ink, detached whenever below 100%, Milestone 120; under
+  `.journal-map-footer.has-master-crest`, the footer wraps cleanly so
+  `.journal-map-detail` never truncates beside the 7 completion pills,
+  Milestone 121). Clicking
   or hovering any revealed land pin enriches the footer detail line with
   `landFieldGuide` (`src/core/journal.ts`, Milestone 110): sticker progress,
   Star Gem status (`★ Gem` / `◇ Gem` once any Star Gem is found or `gem_quest`

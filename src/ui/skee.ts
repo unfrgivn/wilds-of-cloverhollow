@@ -8,6 +8,7 @@ import {
 import {
   element, measure, pixels, place, setAttribute, setStyle, setText, svgElement, type Box,
 } from "./dom";
+import { bindPointerHold } from "./pointer-hold";
 import { layoutSkee, skeeFrame, type SkeeLayout, type Target } from "./skee-layout";
 import type { SkeeCalibration, SkeeView } from "../core";
 
@@ -45,6 +46,7 @@ export function createSkee(
   root: HTMLElement,
   calibration: SkeeCalibration,
   image: string,
+  onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
   render: (view: SkeeView | null, record?: ArcadeRecordBadge | null) => void;
   info: () => SkeeInfo | null;
@@ -52,6 +54,11 @@ export function createSkee(
   const overlay = element("section", "skee-overlay", root);
   overlay.setAttribute("aria-label", "Skee-ball");
   overlay.hidden = true;
+  const pointerHold = bindPointerHold(
+    overlay,
+    (held) => onConfirmHold(held),
+    () => !overlay.hidden,
+  );
   const popups = createArcadePopupLayer(overlay);
   // The close-up shows part of the painting (`skeeFrame`): a frame that clips
   // it, holding the whole painting moved so that part shows.
@@ -214,6 +221,7 @@ export function createSkee(
       lastView = view;
       lastRecord = record;
       if (view === null) {
+        pointerHold.release();
         lastKey = "";
         prevScore = null;
         popups.clear();

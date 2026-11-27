@@ -5647,6 +5647,43 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4461 just e2e` (1,146 passed, 2 skipped, 0 failed,
   zero snapshot diffs across Chromium & WebKit in 5.5 min).
 
+## Milestone 127: Direct Mouse & Touch Pointer Play for Battle Timing Checks (`ring`, `charge`, `chain`, `peekaboo`) & Minigames (Bubblegum Bay Fishing, Microwave Cooking, Skee-Ball) **Status:** ✅ Completed (2026-11-27)
+- Zero `src/core` changes and zero replay hash shifts across all 67 recorded
+  sims; zero visual pixel changes across all existing Playwright snapshots.
+- Shared Sticky-Proof Pointer Hold Helper (`src/ui/pointer-hold.ts`):
+  - Exports pure `isConfirmCheckKind` (`true` for `ring`, `charge`, `chain`,
+    `peekaboo`; `false` for `catch`, `lean`, `trace`, `echo`, `null`,
+    `undefined`) and `bindPointerHold(target, onHold, canStart)` tracking one
+    active `pointerId`, ignoring non-primary mouse buttons and interactive
+    controls (`button, a, input, textarea`), capturing pointers safely, and
+    releasing idempotently on `pointerup`, `pointercancel`,
+    `lostpointercapture`, `window` `blur`, and programmatic `release()`.
+- Battle Timing Checks Pointer Play (`src/ui/battle-checks.ts`,
+  `src/ui/battle.css`, `src/ui/touch-controls.css`, `src/main.ts`):
+  - Pre-mounts a transparent full-stage `.battle-check-tap` layer before
+    `echoLayer` (zero DOM churn, `z-index: 9` below `.touch-controls` and
+    `.battle-hud`), exposes `onConfirmHold` wired to `confirm` press/hold in
+    `src/main.ts`, hides and releases automatically whenever a check is
+    inactive or graded (`view === null || !isConfirmCheckKind(view.kind) ||
+    view.grade !== null`), and keeps `.touch-button` interactive while
+    `:root[data-battle="open"] .touch-controls` passes stage taps through.
+- Minigames Direct Pointer Play (`src/ui/fish.ts`, `src/ui/fish.css`,
+  `src/ui/cook.ts`, `src/ui/cook.css`, `src/ui/skee.ts`, `src/ui/skee.css`,
+  `src/ui/arcade.ts`, `src/shell/assets.ts`, `src/main.ts`):
+  - Adds optional `onConfirmHold` across `createFish`, `createCook`,
+    `createSkee`, `createArcade`, and `createShellAssets`, binds
+    `bindPointerHold` on `.fish-overlay`, `.cook-overlay`, and `.skee-overlay`
+    with automatic release when `view === null`, and enables `pointer-events:
+    auto; cursor: pointer; touch-action: none;` strictly on `.fish-stage`,
+    `.cook-machine`, and `.skee-frame`.
+- Evidence: `tests/unit/milestone-127.test.ts` (2 tests) and real-mouse
+  `tests/e2e/milestone-127.spec.ts` (`@smoke` on Chromium & WebKit).
+- Gates: `just check` (186 unit files / 1,393 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4471 just e2e` (1,150 passed, 2 skipped, 0 failed,
+  zero snapshot diffs across Chromium & WebKit in 5.6 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

@@ -14,6 +14,7 @@
 .battle-treat-count[hidden],
 .battle-treat-fav[hidden],
 .battle-grade[hidden],
+.battle-check-tap[hidden],
 .battle-reward[hidden],
 .battle-peek-card[hidden] {
   display: none;
@@ -829,6 +830,18 @@
   overflow: visible;
   pointer-events: none;
   transform: translate(-50%, -50%);
+}
+/* Full-stage direct click/hold target for ring, charge, chain, and peekaboo
+   battle checks (Milestone 127): sits below touch controls (z-index 10) and
+   all battle HUD/echo buttons so phone controls are never obstructed. */
+.battle-check-tap {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: none;
+  background: transparent;
 }
 .battle-ring-rim,
 .battle-ring-ink,

@@ -155,6 +155,11 @@ async function boot(): Promise<void> {
   const battleHud = createBattleHud(uiRoot);
   const commandMenu = createCommandMenu(uiRoot);
   const battleCheck = createBattleCheck(uiRoot);
+  const handleConfirmHold = (held: boolean): void => {
+    touch.setButton("confirm", held);
+    if (held) touch.tapButton("confirm");
+  };
+  battleCheck.onConfirmHold(handleConfirmHold);
   const echoArrows: readonly Point[] = [
     { x: 0, y: -1 },
     { x: 1, y: 0 },
@@ -463,6 +468,7 @@ async function boot(): Promise<void> {
     uiRoot,
     invalidate,
     onHole: createMoleHoleHandler(touch),
+    onConfirmHold: handleConfirmHold,
   });
   const partyCommands: Record<string, string | null> = Object.fromEntries(
     Object.entries(content.world.party).map(([id, member]) => [id, member.command?.id ?? null]),

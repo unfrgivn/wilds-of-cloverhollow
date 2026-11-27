@@ -62,6 +62,7 @@
   box-shadow: 0 4px 8px #513b3240;
   font: 700 28px sans-serif;
   padding: 0;
+  pointer-events: auto;
   touch-action: none;
   transition: transform 90ms ease-out;
 }
@@ -119,6 +120,10 @@
 
 :root[data-dialogue="open"] .touch-stick {
   display: none;
+}
+
+:root[data-battle="open"] .touch-controls {
+  pointer-events: none;
 }
 
 :root[data-battle="open"] .touch-stick {

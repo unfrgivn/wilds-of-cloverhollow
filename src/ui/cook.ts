@@ -8,6 +8,7 @@ import {
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { cookFront, layoutCook, type CookLayout } from "./cook-layout";
+import { bindPointerHold } from "./pointer-hold";
 import type { CookCalibration, CookView } from "../core";
 
 // The close-up as drawn (spec 11, renderInfo().arcade), in CSS px.
@@ -37,6 +38,7 @@ export function createCook(
   art: (frame: string) => AtlasImage | null,
   calibration: CookCalibration,
   image: string,
+  onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
   render: (view: CookView | null, record?: ArcadeRecordBadge | null) => void;
   info: () => CookInfo | null;
@@ -44,6 +46,11 @@ export function createCook(
   const overlay = element("section", "cook-overlay", root);
   overlay.setAttribute("aria-label", "The clubhouse microwave");
   overlay.hidden = true;
+  const pointerHold = bindPointerHold(
+    overlay,
+    (held) => onConfirmHold(held),
+    () => !overlay.hidden,
+  );
   const popups = createArcadePopupLayer(overlay);
   const machine = element("div", "cook-machine", overlay);
   machine.style.backgroundImage = `url("${image}")`;
@@ -149,6 +156,7 @@ export function createCook(
       lastView = view;
       lastRecord = record;
       if (view === null) {
+        pointerHold.release();
         lastKey = "";
         prevPhase = null;
         popups.clear();

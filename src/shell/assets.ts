@@ -691,6 +691,7 @@ export type ShellAssetsOptions = {
   uiRoot: HTMLElement;
   invalidate: () => void;
   onHole: (hole: MoleHole, down: boolean) => void;
+  onConfirmHold?: (held: boolean) => void;
 };
 
 export type ShellAssets = {
@@ -729,7 +730,7 @@ export type ShellAssets = {
  * composition and lifecycle.
  */
 export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
-  const { world, uiRoot, invalidate, onHole } = options;
+  const { world, uiRoot, invalidate, onHole, onConfirmHold } = options;
 
   const loadMapCentres = async (): Promise<Record<string, Point>> => {
     const mapFile = "assets/ui/map/world-map.json";
@@ -893,7 +894,12 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
     if (skeeLoad !== undefined) return skeeLoad;
     skeeLoad = painting("assets/arcade/skee-lane.json", parseSkeeCalibration).then(
       (skeePainting) => {
-        skeeOverlay = createSkee(uiRoot, skeePainting.calibration, skeePainting.image);
+        skeeOverlay = createSkee(
+          uiRoot,
+          skeePainting.calibration,
+          skeePainting.image,
+          onConfirmHold,
+        );
       },
     );
     return skeeLoad;
@@ -960,6 +966,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
         (frameName) => atlasFrame(FOOD_ATLAS, frameName),
         cookPainting.calibration,
         cookPainting.image,
+        onConfirmHold,
       );
     });
     return cookLoad;
@@ -979,6 +986,7 @@ export function createShellAssets(options: ShellAssetsOptions): ShellAssets {
         (frameName) => atlasFrame(FISH_ATLAS, frameName),
         fishPainting.calibration,
         fishPainting.image,
+        onConfirmHold,
       );
     });
     return fishLoad;

@@ -43,16 +43,17 @@ export function createArcade(
     image: string;
     art: (frame: string) => AtlasImage | null;
   },
+  onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
   render: (view: ArcadeView | null, record?: ArcadeRecordBadge | null) => void;
   info: () => ArcadeInfo | null;
 } {
   const clawUp = createClaw(root, prizeArt, claw.calibration, claw.image);
-  const skeeUp = createSkee(root, skee.calibration, skee.image);
+  const skeeUp = createSkee(root, skee.calibration, skee.image, onConfirmHold);
   const moleUp = createMole(root, mole.art, mole.calibration, mole.image, mole.onHole);
   const cometUp = createComet(root, comet.art, comet.calibration, comet.image);
-  const cookUp = createCook(root, cook.art, cook.calibration, cook.image);
-  const fishUp = createFish(root, fish.art, fish.calibration, fish.image);
+  const cookUp = createCook(root, cook.art, cook.calibration, cook.image, onConfirmHold);
+  const fishUp = createFish(root, fish.art, fish.calibration, fish.image, onConfirmHold);
   return {
     render: (view, record = null) => {
       clawUp.render(view?.game === "claw" ? view : null);

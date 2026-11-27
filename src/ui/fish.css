@@ -29,6 +29,9 @@
   box-shadow: 0 10px 26px rgb(48 30 22 / 34%), 0 2px 0 rgb(255 248 235 / 60%) inset;
   overflow: hidden;
   box-sizing: border-box;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: none;
 }
 
 .fish-svg {

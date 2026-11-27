@@ -26,6 +26,9 @@
   flex: none;
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: none;
 }
 .cook-glass,
 .cook-display,

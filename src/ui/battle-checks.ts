@@ -1,5 +1,6 @@
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, setAttribute, setText, svgElement } from "./dom";
+import { bindPointerHold, isConfirmCheckKind } from "./pointer-hold";
 import type { ChainLook, EchoNote, PeekabooStatus } from "../core";
 
 export type TimingGrade = "great" | "good" | "miss";
@@ -167,8 +168,11 @@ function clamp01(value: number): number {
 export function createBattleCheck(root: HTMLElement): {
   render: (view: BattleCheckView | null) => void;
   onEchoNote: (callback: (note: EchoNote) => void) => void;
+  onConfirmHold: (callback: (held: boolean) => void) => void;
 } {
   let echoNoteHandler: (note: EchoNote) => void = () => undefined;
+  let confirmHoldHandler: (held: boolean) => void = () => undefined;
+  let confirmActive = false;
   const ring = svgElement("svg", "battle-ring");
   ring.setAttribute("aria-hidden", "true");
   const rim = svgElement("circle", "battle-ring-rim");
@@ -222,6 +226,14 @@ export function createBattleCheck(root: HTMLElement): {
   const peekabooStar = peekabooStarIcon();
   const peekabooDots = element("div", "battle-peekaboo-dots");
   peekabooLayer.append(peekabooBadge, peekabooTrack, peekabooStar, peekabooDots);
+  const tapStage = element("div", "battle-check-tap");
+  tapStage.setAttribute("aria-hidden", "true");
+  tapStage.hidden = true;
+  const pointerHold = bindPointerHold(
+    tapStage,
+    (held) => confirmHoldHandler(held),
+    () => confirmActive,
+  );
   // Echo chime board: note progress dots, phase pill, timer bar, and four
   // directional chime stickers.
   const echoLayer = element("div", "battle-echo");
@@ -264,6 +276,7 @@ export function createBattleCheck(root: HTMLElement): {
     leanLayer,
     traceLayer,
     peekabooLayer,
+    tapStage,
     echoLayer,
     hint,
     grade,
@@ -281,7 +294,13 @@ export function createBattleCheck(root: HTMLElement): {
     onEchoNote: (callback) => {
       echoNoteHandler = callback;
     },
+    onConfirmHold: (callback) => {
+      confirmHoldHandler = callback;
+    },
     render: (view) => {
+      confirmActive = view !== null && isConfirmCheckKind(view.kind) && view.grade === null;
+      tapStage.hidden = !confirmActive;
+      if (!confirmActive) pointerHold.release();
       hide(ring, view?.kind !== "ring");
       hide(meter, view?.kind !== "charge");
       hide(chain, view?.kind !== "chain");

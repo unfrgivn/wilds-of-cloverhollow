@@ -8,6 +8,7 @@ import {
 import { applyAtlasCrop, type AtlasImage } from "./atlas";
 import { element, measure, pixels, place, setStyle, setText, type Box } from "./dom";
 import { layoutFish, type FishLayout } from "./fish-layout";
+import { bindPointerHold } from "./pointer-hold";
 import type { FishCalibration, FishPhase, FishView } from "../core";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -47,6 +48,7 @@ export function createFish(
   art: (frame: string) => AtlasImage | null,
   calibration: FishCalibration,
   image: string,
+  onConfirmHold: (held: boolean) => void = () => undefined,
 ): {
   render: (view: FishView | null, record?: ArcadeRecordBadge | null) => void;
   info: () => FishInfo | null;
@@ -54,6 +56,11 @@ export function createFish(
   const overlay = element("section", "fish-overlay", root);
   overlay.setAttribute("aria-label", "Bubblegum Bay fishing dock");
   overlay.hidden = true;
+  const pointerHold = bindPointerHold(
+    overlay,
+    (held) => onConfirmHold(held),
+    () => !overlay.hidden,
+  );
   const popups = createArcadePopupLayer(overlay);
 
   const stage = element("div", "fish-stage", overlay);
@@ -491,6 +498,7 @@ export function createFish(
       lastView = view;
       lastRecord = record;
       if (view === null) {
+        pointerHold.release();
         lastKey = "";
         prevPhase = null;
         popups.clear();

@@ -382,13 +382,14 @@ export function stepFish(
       };
     }
     case "result": {
+      const dismiss = press || pressCancel;
       if (game.revealed < game.message.length) {
-        const revealed = press
+        const revealed = dismiss
           ? game.message.length
           : Math.min(game.message.length, game.revealed + world.tunables.interact.revealPerTick);
         return { arcade: { ...game, revealed }, ...kept };
       }
-      return { arcade: press ? null : game, ...kept };
+      return { arcade: dismiss ? null : game, ...kept };
     }
   }
 }

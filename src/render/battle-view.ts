@@ -330,6 +330,15 @@ export class BattleViewController {
     this.battleBackdrop = transform.bounds;
   }
 
+  /** Destroys the cached blurred backdrop texture so a restored GPU context rebuilds it. */
+  invalidateBackdrop(): void {
+    if (this.backdropTexture !== undefined) {
+      this.backdropTexture.destroy(true);
+      this.backdropTexture = undefined;
+    }
+    this.battleWashKey = "";
+  }
+
   /** Renders battle/arcade backdrop and stage; returns true if the overworld stays visible. */
   render(context: BattleRenderContext): boolean {
     const { state, areaView, width, height, viewWidth, viewHeight, reducedMotion } = context;

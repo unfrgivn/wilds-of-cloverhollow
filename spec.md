@@ -197,6 +197,20 @@ ios/            Capacitor iOS project (from Milestone 4).
   (dynamically imported only outside production builds, Milestone 138) so
   `src/main.ts` stays cleanly under 950 lines and focused on composition and
   lifecycle.
+- WebGL context-loss recovery and cozy boot-error fallback
+  (`src/shell/lifecycle.ts`, `src/render/battle-view.ts`, `src/render/view.ts`,
+  `src/main.ts`, Milestone 141): `LifecycleContext` carries optional
+  `contextLost?: boolean` so `shouldFreezeLiveLoop` freezes fixed-timestep
+  accumulation and rendering whenever GPU context is lost. `bindWebGlRecovery`
+  listens on the game canvas for `webglcontextlost` (calling
+  `event.preventDefault()` so the GPU context can be restored, clearing live
+  inputs, zeroing the accumulator, and flushing any eligible save) and
+  `webglcontextrestored` (invalidating the cached blurred battle/arcade
+  backdrop via `view.invalidateBackdrop()`, reloading the active area via
+  `areaLoader.ensureArea(true)`, and redrawing). If `boot()` ever rejects,
+  `renderBootError` mounts a self-contained inline-styled `#f8edcf` / `#47321f`
+  storybook recovery card (`"Cloverhollow hit a bump!"`, safe error summary,
+  and `"Reload"` button) inside `#app` with zero cost on normal boot.
 - Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121 & 122):
   progressive enhancement with zero new npm dependencies. `createHaptics()`
   checks for a native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via
@@ -3666,6 +3680,16 @@ trunks keep its two exits.
   argument so gallery baselines stay pixel-identical. All popup and badge
   animations respect both `@media (prefers-reduced-motion: reduce)` and
   `:root[data-reduced-motion="on"]`.
+- Minigame `Cancel` (`X` / `Escape` / Gamepad `B`) exit ergonomics
+  (`src/core/{claw,skee,mole,comet,cook,fish}.ts`, Milestone 141): across all
+  six minigames, a fresh `cancel` edge press during `phase === "result"`
+  matches `confirm` (finishing any still-typing reveal line first, then
+  closing the minigame cleanly). In the free Clubhouse Microwave (`cook`), a
+  fresh `cancel` edge press during `phase === "ready"` also closes the
+  microwave cleanly without cooking (matching free Bubblegum Bay Fishing's
+  `aim` / `waiting` cancel exit), while paid arcade machines (`claw`, `skee`,
+  `mole`, `comet`) never exit on `ready` so players cannot accidentally forfeit
+  spent coins.
 
 ## 9. Journal and stickers
 - Experience is saved as XP for Fae and each party member. A member's level is

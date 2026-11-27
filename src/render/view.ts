@@ -378,6 +378,10 @@ export class GameView {
     this.clearCompanionActions();
   }
 
+  invalidateBackdrop(): void {
+    this.battleView.invalidateBackdrop();
+  }
+
   loadedAreaId(): string {
     return this.areaView?.area.id ?? "";
   }

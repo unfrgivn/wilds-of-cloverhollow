@@ -51,7 +51,7 @@ import {
   isOverworldFree, type OverlayGateContext,
 } from "./shell/input-shortcuts";
 import { bindOverworldPointerSteer } from "./shell/overworld-pointer";
-import { shouldFreezeLiveLoop } from "./shell/lifecycle";
+import { bindWebGlRecovery, renderBootError, shouldFreezeLiveLoop } from "./shell/lifecycle";
 import type { QaSession } from "./shell/qa-session";
 
 const content = loadContent();
@@ -816,13 +816,16 @@ async function boot(): Promise<void> {
     window.addEventListener(type, invalidate);
   let last = performance.now();
   let accumulator = 0;
+  let contextLost = false;
   app.ticker.add(() => {
     inputShortcuts.pollGamepad();
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
     last = now;
-    const areaLoading = areaLoader.isLoading();
-    if (shouldFreezeLiveLoop({ documentHidden: document.hidden, paused, areaLoading })) {
+    const frozen = shouldFreezeLiveLoop({
+      documentHidden: document.hidden, paused, areaLoading: areaLoader.isLoading(), contextLost,
+    });
+    if (frozen) {
       accumulator = 0;
     } else if (!paused) {
       const drained = drainTicks(accumulator, 1000 / 60, 5);
@@ -837,7 +840,7 @@ async function boot(): Promise<void> {
       }
     }
     const stillLoading = areaLoader.isLoading();
-    if ((!paused && !document.hidden) || stillLoading || drawPending) {
+    if (!contextLost && ((!paused && !document.hidden) || stillLoading || drawPending)) {
       drawPending = false;
       const alpha = paused || stillLoading
         ? 1
@@ -846,19 +849,20 @@ async function boot(): Promise<void> {
       app.render();
     }
   });
+  const suspendLiveInput = (): void => {
+    keyboard.clearAll(); gamepad.clearTaps(); overworldPointer.release();
+    touch.releaseArrows(); accumulator = 0; saveSession.flushOnHide();
+  };
+  bindWebGlRecovery(app.canvas, {
+    onLost: () => { contextLost = true; suspendLiveInput(); },
+    onRestored: () => {
+      contextLost = false; last = performance.now();
+      view.invalidateBackdrop(); void areaLoader.ensureArea(true); invalidate();
+    },
+  });
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      keyboard.clearAll();
-      gamepad.clearTaps();
-      overworldPointer.release();
-      touch.releaseArrows();
-      accumulator = 0;
-      saveSession.flushOnHide();
-    } else {
-      last = performance.now();
-      accumulator = 0;
-      invalidate();
-    }
+    if (document.hidden) suspendLiveInput();
+    else { last = performance.now(); accumulator = 0; invalidate(); }
   });
   window.addEventListener("pagehide", saveSession.flushOnHide);
   render();
@@ -938,8 +942,7 @@ async function boot(): Promise<void> {
 
 boot().catch((error: unknown) => {
   // Capacitor forwards console.error to the native log, so iOS failures are visible.
-  const detail = error instanceof Error
-    ? `${error.message}\n${error.stack ?? ""}`
-    : String(error);
+  const detail = error instanceof Error ? `${error.message}\n${error.stack ?? ""}` : String(error);
   console.error(`[cloverhollow] boot failed: ${detail}`);
+  renderBootError(document.querySelector<HTMLElement>("#app"), error);
 });

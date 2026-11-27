@@ -6186,6 +6186,46 @@ the old trail, the owl, and the clubhouse claim.
   end-to-end on iPhone 17 / iOS 27.0), and `just ios-device-build` (unsigned
   arm64 `Release-iphoneos/App.app` built cleanly).
 
+## Milestone 141: WebGL Context-Loss Recovery, Cozy Boot-Error Fallback, Minigame `Cancel` (`X`/`Escape`/`B`) Result/Ready Exit Ergonomics & PWA Icon Metadata Polish **Status:** ✅ Completed (2026-11-27)
+- WebGL Context-Loss Recovery & Cozy Boot-Error Fallback
+  (`src/shell/lifecycle.ts`, `src/render/battle-view.ts`, `src/render/view.ts`,
+  `src/main.ts`):
+  - Extends `LifecycleContext` with optional `contextLost?: boolean` so
+    `shouldFreezeLiveLoop` freezes fixed-timestep ticking while GPU context is
+    lost without breaking existing callers.
+  - Exports `bindWebGlRecovery(canvas, { onLost, onRestored })` (calling
+    `event.preventDefault()` on `webglcontextlost`, clearing live inputs,
+    flushing eligible saves, and on `webglcontextrestored` invalidating the
+    cached blurred backdrop via `view.invalidateBackdrop()`, reloading the
+    active area via `areaLoader.ensureArea(true)`, and redrawing).
+  - Exports `renderBootError(root, error)` rendering a cozy self-contained
+    inline-styled Cloverhollow storybook recovery card (`#f8edcf` cream paper,
+    `#47321f` ink, `"Cloverhollow hit a bump!"`, safe error summary, and
+    `"Reload"` button) only when `boot()` rejects.
+- Minigame `Cancel` (`X` / `Escape` / Gamepad `B`) Ergonomics
+  (`src/core/{claw,skee,mole,comet,cook,fish}.ts`):
+  - All 6 minigames accept a fresh `cancel` edge press in `phase === "result"`
+    just like `confirm` (finishing any remaining reveal step first, then
+    closing cleanly).
+  - Free Clubhouse Microwave (`cook`) accepts a fresh `cancel` edge press in
+    `phase === "ready"` to exit cleanly without cooking (matching free
+    Bubblegum Bay Fishing), while paid arcade machines (`claw`, `skee`, `mole`,
+    `comet`) stay open on `ready` so players never accidentally forfeit coins.
+  - Zero save-format changes and zero replay hash shifts across all 68 recorded
+    sims.
+- PWA Metadata Polish (`index.html`, `public/manifest.webmanifest`):
+  - Adds `<meta name="mobile-web-app-capable" content="yes">` and
+    `<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">`
+    fallback in `index.html`, keeping `icons/icon-512.png` with
+    `"purpose": "any"` in `public/manifest.webmanifest`.
+- Evidence: `tests/unit/milestone-141.test.ts` (5 tests) and
+  `tests/e2e/milestone-141.spec.ts` (`@smoke`, Chromium & WebKit).
+- Gates: `just check` (201 unit files / 1,465 tests, all 68 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4601/4602 just e2e` (640 Chromium + 545 WebKit = 1,185
+  passed, 2 skipped, 0 failed, 0 snapshot diffs).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

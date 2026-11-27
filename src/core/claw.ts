@@ -114,6 +114,7 @@ export function stepClaw(
   const claw = world.arcade.claw;
   const aimSpeed = gentleTiming ? claw.speed * GENTLE_CLAW_SPEED_SCALE : claw.speed;
   const press = input.confirm && !state.previousInput.confirm;
+  const pressCancel = input.cancel && !state.previousInput.cancel;
   const to = (phase: ClawPhase, changes: Partial<ClawGame> = {}): ArcadeOwned =>
     ({ arcade: { ...game, ...changes, phase, phaseTicks: 0 }, prizes, tickets });
   const stay = (changes: Partial<ClawGame> = {}): ArcadeOwned =>
@@ -140,12 +141,13 @@ export function stepClaw(
         ? to("releasing", { x, z }) : stay({ x, z });
     }
     case "result": {
+      const dismiss = press || pressCancel;
       if (game.revealed < game.message.length) {
-        const revealed = press ? game.message.length
+        const revealed = dismiss ? game.message.length
           : Math.min(game.message.length, game.revealed + world.tunables.interact.revealPerTick);
         return { arcade: { ...game, revealed }, prizes, tickets };
       }
-      return { arcade: press ? null : game, prizes, tickets };
+      return { arcade: dismiss ? null : game, prizes, tickets };
     }
     case "dropping":
     case "grabbing":

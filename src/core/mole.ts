@@ -89,13 +89,14 @@ export function stepMole(
   const kept = { prizes: state.prizes, tickets: state.tickets };
   const owned = (changed: MoleGame): ArcadeOwned => ({ arcade: changed, ...kept });
   if (game.phase === "result") {
-    const press = input.confirm && !state.previousInput.confirm;
+    const dismiss = (input.confirm && !state.previousInput.confirm) ||
+      (input.cancel && !state.previousInput.cancel);
     if (game.revealed < game.message.length) {
-      const revealed = press ? game.message.length
+      const revealed = dismiss ? game.message.length
         : Math.min(game.message.length, game.revealed + world.tunables.interact.revealPerTick);
       return owned({ ...game, revealed });
     }
-    return { arcade: press ? null : game, ...kept };
+    return { arcade: dismiss ? null : game, ...kept };
   }
   if (game.phase === "ready") {
     return game.phaseTicks + 1 < mole.readyTicks

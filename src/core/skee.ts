@@ -83,6 +83,7 @@ export function stepSkee(
 ): ArcadeOwned {
   const skee = world.arcade.skee;
   const press = input.confirm && !state.previousInput.confirm;
+  const pressCancel = input.cancel && !state.previousInput.cancel;
   const kept = { prizes: state.prizes, tickets: state.tickets };
   const to = (phase: SkeePhase, changes: Partial<SkeeGame> = {}): ArcadeOwned =>
     ({ arcade: { ...game, ...changes, phase, phaseTicks: 0 }, ...kept });
@@ -138,12 +139,13 @@ export function stepSkee(
         };
       });
     case "result": {
+      const dismiss = press || pressCancel;
       if (game.revealed < game.message.length) {
-        const revealed = press ? game.message.length
+        const revealed = dismiss ? game.message.length
           : Math.min(game.message.length, game.revealed + world.tunables.interact.revealPerTick);
         return { arcade: { ...game, revealed }, ...kept };
       }
-      return { arcade: press ? null : game, ...kept };
+      return { arcade: dismiss ? null : game, ...kept };
     }
   }
 }

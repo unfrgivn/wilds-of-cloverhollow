@@ -73,6 +73,7 @@ export function stepCook(
   const cook = world.arcade.cook;
   const dish = cook.dishes[game.dish];
   const press = input.confirm && !state.previousInput.confirm;
+  const pressCancel = input.cancel && !state.previousInput.cancel;
   const kept = { prizes: state.prizes, tickets: state.tickets, snacks: state.snacks };
   const to = (phase: CookGame["phase"], changes: Partial<CookGame> = {}): ArcadeStep =>
     ({ arcade: { ...game, ...changes, phase, phaseTicks: 0 }, ...kept });
@@ -80,6 +81,8 @@ export function stepCook(
     ({ arcade: { ...game, ...changes, phaseTicks: game.phaseTicks + 1 }, ...kept });
   switch (game.phase) {
     case "ready":
+      if (pressCancel) return { arcade: null, ...kept };
+      return press ? to("cooking", { cooked: game.cooked + 1 }) : stay();
     case "paused":
       return press ? to("cooking", { cooked: game.cooked + 1 }) : stay();
     case "cooking": {
@@ -103,12 +106,13 @@ export function stepCook(
       };
     }
     case "result": {
+      const dismiss = press || pressCancel;
       if (game.revealed < game.message.length) {
-        const revealed = press ? game.message.length
+        const revealed = dismiss ? game.message.length
           : Math.min(game.message.length, game.revealed + world.tunables.interact.revealPerTick);
         return { arcade: { ...game, revealed }, ...kept };
       }
-      return { arcade: press ? null : game, ...kept };
+      return { arcade: dismiss ? null : game, ...kept };
     }
   }
 }

@@ -611,6 +611,7 @@ html[data-reduced-motion="on"] .journal-slot.is-inspectable:focus-visible {
   cursor: pointer;
 }
 .journal-map-land.is-revealed:hover,
+.journal-map-land.is-revealed:focus-visible,
 .journal-map-land.is-selected {
   background: #fffaf2dd;
   outline: 2px solid #47321f;

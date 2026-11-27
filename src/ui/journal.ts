@@ -12,6 +12,7 @@ import {
 } from "./icons";
 import { createJournalFieldOverlays } from "./journal-field-note";
 import { createJournalMapPage } from "./journal-map";
+import { createJournalNavController, cycleIndex, type JournalNavDirection } from "./journal-nav";
 import { AUDIO_LEVELS, type AudioLevel } from "../platform/audio-settings";
 import { formatArcadeRecordPills, type MinigameRecords } from "../platform/minigame-records";
 import type {
@@ -171,9 +172,7 @@ const journalPages: readonly JournalPage[] = ["notes", "map", "options"];
 /** Steps cleanly across Journal tabs with wrap-around in either direction. */
 export function stepJournalPage(current: JournalPage, delta: -1 | 1): JournalPage {
   const index = journalPages.indexOf(current);
-  const start = index === -1 ? 0 : index;
-  const nextIndex = (start + delta + journalPages.length) % journalPages.length;
-  return journalPages[nextIndex] ?? "notes";
+  return journalPages[cycleIndex(index === -1 ? 0 : index, journalPages.length, delta)] ?? "notes";
 }
 
 const svgNamespace = "http://www.w3.org/2000/svg";
@@ -189,7 +188,7 @@ function wireSlider(
   slider: HTMLButtonElement,
   valueNode: HTMLElement,
   onChange: () => (level: AudioLevel) => void,
-): void {
+): (direction: -1 | 1) => void {
   const apply = (next: AudioLevel): void => {
     syncSlider(slider, valueNode, next);
     onChange()(next);
@@ -215,6 +214,7 @@ function wireSlider(
       apply(event.key === "Home" ? AUDIO_LEVELS[0] : AUDIO_LEVELS[3]);
     }
   });
+  return stepLevel;
 }
 
 function makeSliderButton(className: string, ariaLabel: string): {
@@ -398,6 +398,9 @@ export function createJournal(root: HTMLElement): {
   render: (view: JournalView) => void;
   setPage: (page: JournalPage) => void;
   stepPage: (delta: -1 | 1) => void;
+  scrollActivePage: (deltaY: number) => boolean;
+  navigateFocus: (direction: JournalNavDirection) => boolean;
+  activateFocused: () => boolean;
   hasOpenOverlay: () => boolean;
   dismissOverlay: () => boolean;
   onClose: (callback: () => void) => void;
@@ -616,35 +619,25 @@ export function createJournal(root: HTMLElement): {
   mapTab.addEventListener("click", () => setPage("map"));
   optionsTab.addEventListener("click", () => setPage("options"));
 
-  const sliders = new Set<EventTarget>([
-    volume.button,
-    optSfxSlider.button,
-    musicSlider.button,
-  ]);
-  const keydown = (event: KeyboardEvent): void => {
-    if (book.hidden) return;
-    if (fieldOverlays.handleKeydown(event)) return;
-    if (event.target !== null && sliders.has(event.target)) return;
-    if (
-      event.target instanceof Node &&
-      jukebox.contains(event.target) &&
-      (event.key === "ArrowLeft" || event.key === "ArrowRight")
-    ) {
-      return;
-    }
-    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
-      event.preventDefault();
-      const index = journalPages.indexOf(page);
-      const next = journalPages[Math.min(journalPages.length - 1, index + 1)];
-      if (next !== undefined) setPage(next);
-    } else if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
-      event.preventDefault();
-      const index = journalPages.indexOf(page);
-      const prev = journalPages[Math.max(0, index - 1)];
-      if (prev !== undefined) setPage(prev);
-    }
-  };
-  document.addEventListener("keydown", keydown);
+  const sliderSteppers = new Map<EventTarget, (direction: -1 | 1) => void>();
+  const nav = createJournalNavController({
+    book,
+    notesPage,
+    stickersPage,
+    optionsPage,
+    soundPage,
+    playPage,
+    jukebox,
+    mapRoot: mapPage.root,
+    sliderSteppers,
+    getPage: () => page,
+    setPage,
+    hasOpenOverlay: () => fieldOverlays.hasOpen(),
+    handleOverlayKeydown: (event) => fieldOverlays.handleKeydown(event),
+    stepMapLandFocus: (delta) => mapPage.stepLandFocus(delta),
+    stepTrack: (delta) => onStepTrack(delta),
+  });
+  document.addEventListener("keydown", nav.handleKeydown);
   setPage("notes");
 
   close.addEventListener("click", () => onClose());
@@ -680,15 +673,21 @@ export function createJournal(root: HTMLElement): {
   optTextSpeed.addEventListener("click", () => onCycleTextSpeed());
   optReducedMotion.addEventListener("click", () => onToggleReducedMotion());
 
-  wireSlider(volume.button, volume.value, () => (next) => {
+  const bindSlider = (
+    pair: { button: HTMLButtonElement; value: HTMLSpanElement },
+    onChange: () => (level: AudioLevel) => void,
+  ): void => {
+    sliderSteppers.set(pair.button, wireSlider(pair.button, pair.value, onChange));
+  };
+  bindSlider(volume, () => (next) => {
     syncSlider(optSfxSlider.button, optSfxSlider.value, next);
     onSetAudioLevel(next);
   });
-  wireSlider(optSfxSlider.button, optSfxSlider.value, () => (next) => {
+  bindSlider(optSfxSlider, () => (next) => {
     syncSlider(volume.button, volume.value, next);
     onSetAudioLevel(next);
   });
-  wireSlider(musicSlider.button, musicSlider.value, () => onSetMusicLevel);
+  bindSlider(musicSlider, () => onSetMusicLevel);
 
   const slots: Slot[] = [];
   const prizeSlots: Slot[] = [];
@@ -697,6 +696,9 @@ export function createJournal(root: HTMLElement): {
   return {
     setPage,
     stepPage,
+    scrollActivePage: nav.scrollActivePage,
+    navigateFocus: nav.navigateFocus,
+    activateFocused: nav.activateFocused,
     hasOpenOverlay: () => fieldOverlays.hasOpen(),
     dismissOverlay: () => fieldOverlays.dismiss(),
     onClose: (cb) => { onClose = cb; },

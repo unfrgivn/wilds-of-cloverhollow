@@ -1,5 +1,6 @@
 import { blankInput, type ActionFrame } from "../core";
 import type { Point } from "../core";
+import type { JournalNavDirection } from "../ui/journal-nav";
 
 export type StandardGamepad = {
   mapping: string;
@@ -150,11 +151,44 @@ export function gamepadPhotoButtons(
   return { toggle, snap, exit };
 }
 
+export function gamepadRightStickY(pads: readonly StandardGamepad[]): number {
+  for (const pad of pads) {
+    if (pad.mapping !== "standard") continue;
+    const y = pad.axes[3] ?? 0;
+    if (Math.abs(y) > 0.25) return y;
+  }
+  return 0;
+}
+
+export function gamepadNavDirection(
+  pads: readonly StandardGamepad[],
+): JournalNavDirection | null {
+  for (const pad of pads) {
+    if (pad.mapping !== "standard") continue;
+    const dpadY = Number(pressed(pad, 13)) - Number(pressed(pad, 12));
+    const dpadX = Number(pressed(pad, 15)) - Number(pressed(pad, 14));
+    if (dpadY < 0) return "up";
+    if (dpadY > 0) return "down";
+    if (dpadX < 0) return "left";
+    if (dpadX > 0) return "right";
+    const x = pad.axes[0] ?? 0;
+    const y = pad.axes[1] ?? 0;
+    if (Math.abs(y) >= Math.abs(x) && Math.abs(y) > 0.55) {
+      return y < 0 ? "up" : "down";
+    }
+    if (Math.abs(x) > 0.55) {
+      return x < 0 ? "left" : "right";
+    }
+  }
+  return null;
+}
+
 export function gamepadHasActivity(pads: readonly StandardGamepad[]): boolean {
   for (const pad of pads) {
     if (pad.mapping !== "standard") continue;
     const move = stick(pad.axes);
     if (move.x !== 0 || move.y !== 0) return true;
+    if (Math.abs(pad.axes[3] ?? 0) > 0.25) return true;
     for (let index = 0; index < 16; index += 1) {
       if (pressed(pad, index)) return true;
     }
@@ -172,6 +206,11 @@ export class GamepadInput {
   private prevPhotoSnap = false;
   private prevPhotoExit = false;
   private pendingPhotoAction: "toggle" | "snap" | "exit" | null = null;
+  private prevNavDirection: JournalNavDirection | null = null;
+  private pendingNavStep: JournalNavDirection | null = null;
+  private prevConfirm = false;
+  private pendingConfirmEdge = false;
+  private latestRightStickY = 0;
   private pendingActivity = false;
 
   constructor(getPads: () => readonly StandardGamepad[] = () => {
@@ -201,6 +240,17 @@ export class GamepadInput {
     this.prevPhotoToggle = photo.toggle;
     this.prevPhotoSnap = photo.snap;
     this.prevPhotoExit = photo.exit;
+    const navDir = gamepadNavDirection(pads);
+    if (navDir !== null && navDir !== this.prevNavDirection) {
+      this.pendingNavStep = navDir;
+    }
+    this.prevNavDirection = navDir;
+    const confirmDown = pads.some((pad) => pad.mapping === "standard" && pressed(pad, 0));
+    if (confirmDown && !this.prevConfirm) {
+      this.pendingConfirmEdge = true;
+    }
+    this.prevConfirm = confirmDown;
+    this.latestRightStickY = gamepadRightStickY(pads);
     if (gamepadHasActivity(pads)) this.pendingActivity = true;
     return pads;
   }
@@ -217,6 +267,22 @@ export class GamepadInput {
     return action;
   }
 
+  consumeNavStep(): JournalNavDirection | null {
+    const step = this.pendingNavStep;
+    this.pendingNavStep = null;
+    return step;
+  }
+
+  consumeConfirmEdge(): boolean {
+    const edge = this.pendingConfirmEdge;
+    this.pendingConfirmEdge = false;
+    return edge;
+  }
+
+  rightStickY(): number {
+    return this.latestRightStickY;
+  }
+
   consumeActivity(): boolean {
     const active = this.pendingActivity;
     this.pendingActivity = false;
@@ -231,6 +297,9 @@ export class GamepadInput {
     this.latch.clearTaps();
     this.pendingBumperStep = 0;
     this.pendingPhotoAction = null;
+    this.pendingNavStep = null;
+    this.pendingConfirmEdge = false;
+    this.latestRightStickY = 0;
     this.pendingActivity = false;
   }
 }

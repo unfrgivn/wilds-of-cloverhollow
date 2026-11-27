@@ -34,6 +34,7 @@ import {
   createRewardSticker,
 } from "./ui/battle";
 import { createJournal } from "./ui/journal";
+import { computeJournalScrollDelta } from "./ui/journal-nav";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
 import {
@@ -1083,6 +1084,8 @@ async function boot(): Promise<void> {
     }
 
     const bumperStep = gamepad.consumeBumperStep();
+    const navStep = gamepad.consumeNavStep();
+    const journalConfirmEdge = gamepad.consumeConfirmEdge();
     if (
       bumperStep !== 0 &&
       state.journalOpen &&
@@ -1093,6 +1096,26 @@ async function boot(): Promise<void> {
       journal.stepPage(bumperStep);
       sound.play("choice-move", state.tick);
       invalidate();
+    }
+    if (
+      state.journalOpen &&
+      titleMode === null &&
+      !qaMenuOpen &&
+      !qaConsoleOpen &&
+      !journal.hasOpenOverlay()
+    ) {
+      const scrollDelta = computeJournalScrollDelta(gamepad.rightStickY());
+      if (scrollDelta !== 0 && journal.scrollActivePage(scrollDelta)) {
+        invalidate();
+      }
+      if (navStep !== null && journal.navigateFocus(navStep)) {
+        sound.play("choice-move", state.tick);
+        invalidate();
+      }
+      if (journalConfirmEdge && journal.activateFocused()) {
+        sound.play("choice-move", state.tick);
+        invalidate();
+      }
     }
     const now = performance.now();
     accumulator += Math.min(now - last, 250);
@@ -1151,6 +1174,38 @@ async function boot(): Promise<void> {
     if (lastInputMode !== "keyboard") {
       lastInputMode = "keyboard";
       invalidate();
+    }
+    if (
+      state.journalOpen &&
+      titleMode === null &&
+      !qaMenuOpen &&
+      !qaConsoleOpen &&
+      !journal.hasOpenOverlay()
+    ) {
+      const target = event.target instanceof HTMLElement ? event.target : null;
+      const inSlider =
+        target !== null && target.closest(".journal-opt-slider, .journal-volume-slider") !== null;
+      if ((event.code === "ArrowUp" || event.code === "ArrowDown") && !inSlider) {
+        if (journal.navigateFocus(event.code === "ArrowUp" ? "up" : "down")) {
+          event.preventDefault();
+          invalidate();
+        }
+        return;
+      }
+      if (
+        !event.repeat &&
+        (event.code === "ArrowLeft" || event.code === "ArrowRight") &&
+        !inSlider &&
+        target !== null &&
+        target.closest(".journal-jukebox") === null &&
+        target.closest(".journal-map-page, .journal-slot.is-inspectable") !== null
+      ) {
+        if (journal.navigateFocus(event.code === "ArrowLeft" ? "left" : "right")) {
+          event.preventDefault();
+          invalidate();
+        }
+        return;
+      }
     }
     if (event.repeat) return;
     if (state.journalOpen && titleMode === null && !qaMenuOpen && !qaConsoleOpen) {

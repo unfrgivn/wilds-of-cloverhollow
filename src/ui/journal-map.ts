@@ -1,4 +1,5 @@
 import { element, setAttribute, setText, syncAttachedAfter } from "./dom";
+import { cycleIndex, isElementVisible } from "./journal-nav";
 import type { BusRoute, LandProgress } from "../core/journal";
 import type { TreasuresSummary } from "../core/treasures";
 
@@ -37,6 +38,7 @@ export type JournalMapPage = {
   root: HTMLElement;
   render: (view: JournalMapView, counts: JournalMapCollectionCounts) => void;
   resetSelection: () => void;
+  stepLandFocus: (delta: -1 | 1) => boolean;
 };
 
 // The bus line's stop sign, as on the sprite: a gold star on a blue roundel
@@ -162,8 +164,30 @@ export function createJournalMapPage(onOpenTreasures: () => void): JournalMapPag
     }
   };
 
+  const stepLandFocus = (delta: -1 | 1): boolean => {
+    const items: HTMLElement[] = [
+      ...mapLabels.querySelectorAll<HTMLElement>(".journal-map-land.is-revealed"),
+    ].filter(isElementVisible);
+    if (isElementVisible(mapTreasuresBtn)) items.push(mapTreasuresBtn);
+    if (items.length === 0) return false;
+    const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    let currentIndex = active === null ? -1 : items.indexOf(active);
+    if (currentIndex === -1 && selectedLandId !== null) {
+      currentIndex = items.findIndex((node) => node.getAttribute("data-land") === selectedLandId);
+    }
+    const nextIndex = cycleIndex(currentIndex, items.length, delta);
+    const target = items[nextIndex];
+    if (target === undefined) return false;
+    target.focus();
+    selectedLandId = target.getAttribute("data-land");
+    hoveredLandId = null;
+    if (latestView !== null) syncMapDetail(latestView);
+    return true;
+  };
+
   return {
     root: mapPage,
+    stepLandFocus,
     resetSelection: () => {
       selectedLandId = null;
       hoveredLandId = null;
@@ -185,6 +209,8 @@ export function createJournalMapPage(onOpenTreasures: () => void): JournalMapPag
           const revealed = land.name !== "???";
           if (revealed) {
             item.classList.add("is-revealed");
+            setAttribute(item, "tabindex", "0");
+            setAttribute(item, "role", "button");
             item.addEventListener("click", () => {
               selectedLandId = selectedLandId === land.id ? null : land.id;
               if (latestView !== null) syncMapDetail(latestView);

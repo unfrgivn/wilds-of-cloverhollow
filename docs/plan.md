@@ -5548,6 +5548,35 @@ the old trail, the owl, and the clubhouse claim.
   and Launch Splash), and `just ios-device-build` (`Release-iphoneos/App.app`
   unsigned arm64 built cleanly).
 
+## Milestone 124: Full Keyboard & Gamepad Journal Navigation (Scrolling, Interactive Focus Cycling, Map Land Guide Stepping & Options Control) **Status:** ✅ Completed (2026-11-27)
+- Adds mouse-free keyboard and gamepad navigation across all three Journal
+  spreads (`NOTES`, `MAP`, `OPTIONS`) with zero `src/core` changes and zero
+  replay hash shifts across all 67 recorded sims.
+- Pure Journal Navigation Helpers (`src/ui/journal-nav.ts`):
+  - Exports `JournalNavDirection`, `cycleIndex`, `computeJournalScrollDelta`,
+    and `isElementVisible`.
+- Journal & Map Navigation Controllers (`src/ui/journal.ts`,
+  `src/ui/journal-map.ts`, `src/ui/journal.css`):
+  - Exposes `scrollActivePage`, `navigateFocus`, and `activateFocused` on
+    `createJournal` plus `stepLandFocus` on `createJournalMapPage`.
+  - Makes revealed `.journal-map-land.is-revealed` pins keyboard-focusable
+    (`tabindex="0"`, `role="button"`, `:focus-visible`) so keyboard and gamepad
+    stepping immediately updates `.journal-map-detail`.
+  - Preserves existing `ArrowLeft`/`ArrowRight` tab flipping when focus is not
+    on a map pin, inspectable slot, volume slider, or Music Box jukebox, and
+    handles `Enter`/`Space` activation on focused Journal buttons cleanly.
+- Gamepad Navigation Signals (`src/platform/gamepad.ts`, `src/main.ts`):
+  - Exports `gamepadRightStickY` and `gamepadNavDirection`, adds edge-triggered
+    `consumeNavStep`, `consumeConfirmEdge`, and live `rightStickY` to
+    `GamepadInput`, and wires ticker + keydown handlers in `src/main.ts`.
+- Evidence: `tests/unit/milestone-124.test.ts` (5 tests) and real-key / gamepad
+  `tests/e2e/milestone-124.spec.ts` (`@smoke` on Chromium & WebKit).
+- Gates: `just check` (183 unit files / 1,384 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4441 just e2e` (1,138 passed, 2 skipped, 0 snapshot
+  diffs across Chromium & WebKit).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

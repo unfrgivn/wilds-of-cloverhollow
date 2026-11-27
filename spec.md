@@ -229,8 +229,14 @@ ios/            Capacitor iOS project (from Milestone 4).
   (button 0) snaps a framed Postcard (swallowing overworld confirm) and B
   (button 1) exits Photo Mode; while Battle Peek is open, gamepad B dismisses
   only the peek card (swallowing `cancel`). `gamepadHasActivity` detects active
-  standard-pad stick movement (`> 0.25`) or button presses (`0..15`) so the HUD
-  Key Hints ribbon adapts dynamically between keyboard and gamepad glyphs. Only
+  standard-pad stick movement (`> 0.25`, left or right stick Y) or button
+  presses (`0..15`) so the HUD Key Hints ribbon and Journal `OPTIONS` Controls
+  card adapt dynamically between keyboard and gamepad glyphs. While the Journal
+  is open without an overlay, `gamepadRightStickY` (`axes[3]`),
+  `gamepadNavDirection` (D-Pad `12..15` or left stick past `0.55`), and
+  `GamepadInput.consumeNavStep` / `consumeConfirmEdge` / `rightStickY` drive
+  smooth page scrolling, focus cycling, Land Guide pin stepping, and option
+  activation alongside `LB`/`RB` tab flipping (Milestone 124). Only
   standard-mapping pads count; connected pads merge with button OR and first
   non-zero movement.
   When devices provide different movement vectors, touch wins, then keyboard,
@@ -3521,6 +3527,31 @@ trunks keep its two exits.
   (`notes` -> `map` -> `options` -> `notes`), closes any open Field Note or
   Field Treasures card, and plays the in-key `choice-move` page-flip ping
   without intercepting `ArrowLeft` / `ArrowRight` slider navigation.
+- **Full Keyboard & Gamepad Journal Navigation** (Milestone 124,
+  `src/ui/journal-nav.ts`, `src/ui/journal.ts`, `src/ui/journal-map.ts`,
+  `src/platform/gamepad.ts`, `src/main.ts`): while the Journal is open with no
+  field modal overlay, `journal.scrollActivePage`, `journal.navigateFocus`, and
+  `journal.activateFocused` provide mouse-free navigation across all three tabs
+  using pure `cycleIndex`, `computeJournalScrollDelta`, and `isElementVisible`:
+  - `NOTES` / `STICKERS`: `ArrowDown` / `ArrowUp` (when no inspectable slot is
+    focused) scrolls `.journal-stickers-page` (or `.journal-notes-page`) by
+    `±72 px` while keeping Fae frozen; Gamepad right stick Y scrolls smoothly
+    every tick; focusing any `.journal-slot.is-inspectable` (or pressing Gamepad
+    D-Pad / Left Stick) cycles focus across visible Critter, Fish, and Keepsake
+    slots (`Enter` / `Space` / `A` opens the Field Note card).
+  - `MAP`: revealed land pins (`.journal-map-land.is-revealed`) are keyboard
+    focusable (`tabindex="0"`, `role="button"`) with crisp `:focus-visible`
+    outlines; `ArrowUp` / `ArrowDown` (and `ArrowLeft` / `ArrowRight` once a
+    map pin or `.journal-treasures-btn` has focus, or Gamepad D-Pad / Left Stick
+    in any direction) steps across revealed Land Guide pins and the visible
+    Field Treasures button via `mapPage.stepLandFocus`, immediately updating
+    `.journal-map-detail`, while `ArrowLeft` / `ArrowRight` with no map pin
+    focused keeps tab-flipping compatibility.
+  - `OPTIONS`: `ArrowUp` / `ArrowDown` (skipping focused volume sliders so
+    existing ARIA slider adjustment stays intact) and Gamepad D-Pad / Left Stick
+    cycle visible option buttons (`scrollIntoView({ block: "nearest" })`);
+    `ArrowLeft` / `ArrowRight` step focused sliders or scrub Music Box tracks;
+    `Enter` / `Space` / Gamepad `A` activates the focused control cleanly.
 - **Interactive Field Treasures Card** (`treasuresSummary` in
   `src/core/treasures.ts`, `src/ui/journal-field-note.ts` mounted by
   `src/ui/journal.ts`): summarizes Fae's Star-Line

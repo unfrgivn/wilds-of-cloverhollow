@@ -2,6 +2,8 @@ import { Assets, type Spritesheet } from "pixi.js";
 import {
   battleParty,
   carriedTreats,
+  creditEntries,
+  creditsSummary,
   critterFieldNote,
   journalFish,
   journalKeepsakes,
@@ -13,6 +15,7 @@ import {
   mapLandName,
   starGemsFound,
   statsForCommand,
+  targetInteractable,
   treasuresSummary,
   valleyCompletion,
   type ArcadeView,
@@ -32,7 +35,15 @@ import {
 } from "../core";
 import type { AudioLevel } from "../platform/audio-settings";
 import type { MinigameRecords } from "../platform/minigame-records";
-import type { JournalView, JukeboxMeta } from "../ui/journal";
+import type { CreditsView } from "../ui/credits";
+import type { JournalInputMode, JournalView, JukeboxMeta } from "../ui/journal";
+import { findPettableCompanion, findRestSpot } from "../render/companions";
+import { evaluateBattlePortraits } from "../ui/battle-portraits";
+import {
+  resolveHudInteractHint,
+  type HudHintsView,
+  type HudInputMode,
+} from "../ui/hud-hints";
 import {
   parseClawCalibration,
   parseCometCalibration,
@@ -56,8 +67,11 @@ import {
 } from "../ui/atlas";
 import {
   battleCommandPreview,
+  battlePeekData,
   battleTalkDialogueView,
+  talkChoicesShown,
   type BattleCheckView as BattleCheckOverlayView,
+  type BattleHudView,
 } from "../ui/battle";
 import { createClaw, type ClawInfo } from "../ui/claw";
 import { createComet, type CometInfo } from "../ui/comet";
@@ -309,6 +323,7 @@ export type JournalViewParams = {
   hasLantern: boolean;
   hasFlute: boolean;
   hasLasso: boolean;
+  inputMode?: JournalInputMode;
 };
 
 /** Builds the complete DOM JournalView from core state, map centres, and atlas resolvers. */
@@ -405,6 +420,7 @@ export function buildJournalView(params: JournalViewParams): JournalView {
     hasLantern: params.hasLantern,
     hasFlute: params.hasFlute,
     hasLasso: params.hasLasso,
+    inputMode: params.inputMode,
     members: open
       ? [
           {
@@ -519,6 +535,144 @@ export function buildDialogueView(params: DialogueViewParams): DialogueView | nu
     canAdvance: state.dialogue.choices.length === 0,
     portrait: speakerPortrait(state.dialogue.speaker),
     accent: speakerAccent(state.dialogue.speaker),
+  };
+}
+
+export type HudHintsViewParams = {
+  world: World;
+  state: State;
+  keyHints: boolean;
+  touchActive: boolean;
+  overworldFree: boolean;
+  isResting: boolean;
+  hasLantern: boolean;
+  hasFlute: boolean;
+  muted: boolean;
+  canPhoto: boolean;
+  canBattlePeek: boolean;
+  inputMode: HudInputMode;
+};
+
+/** Projects overworld context and battle Field Guide state onto HudHintsView. */
+export function buildHudHintsView(params: HudHintsViewParams): HudHintsView {
+  const { world, state, overworldFree, isResting } = params;
+  const interactTarget = overworldFree ? targetInteractable(world, state) : undefined;
+  const interactHint = overworldFree
+    ? resolveHudInteractHint({
+        hasInteractable: interactTarget !== undefined,
+        interactPrompt: interactTarget?.prompt,
+        isResting,
+        player: state.player,
+        facing: state.facing,
+        pettableCompanion:
+          interactTarget === undefined && !isResting ? findPettableCompanion(world, state) : null,
+        hasRestSpot:
+          interactTarget === undefined && !isResting && findRestSpot(world, state) !== null,
+      })
+    : { canInteract: false, interactLabel: "Talk" };
+  const battlePeekHint =
+    params.keyHints &&
+    !params.touchActive &&
+    params.canBattlePeek &&
+    !(state.battle?.treatMenu ?? false);
+  return {
+    visible: params.keyHints && !params.touchActive && overworldFree,
+    canInteract: interactHint.canInteract,
+    interactLabel: interactHint.interactLabel,
+    hasLantern: params.hasLantern,
+    lanternOn: state.lantern,
+    hasFlute: params.hasFlute,
+    muted: params.muted,
+    canPhoto: params.canPhoto,
+    battlePeekHint,
+    inputMode: params.inputMode,
+  };
+}
+
+export type BattleHudViewParams = {
+  world: World;
+  state: State;
+  battle: BattleView | null;
+  partyCommands: Record<string, string | null>;
+  paused: boolean;
+  canPeek: boolean;
+  peekOpen: boolean;
+  speakerPortrait: (speaker: string | null) => AtlasImage | null;
+};
+
+/** Projects core battle state, party portraits, and Field Guide peek onto BattleHudView. */
+export function buildBattleHudView(params: BattleHudViewParams): BattleHudView {
+  const { world, state, battle, partyCommands, paused, canPeek, peekOpen, speakerPortrait } =
+    params;
+  const activeBattle = battle !== null;
+  const hideActions =
+    state.battle?.phase === "check" || state.battle?.phase === "burstResult";
+  const showBattleHud =
+    activeBattle && state.battle?.phase !== "reward" && !talkChoicesShown(battle?.talk ?? null);
+  const portraits =
+    showBattleHud && state.battle !== null
+      ? evaluateBattlePortraits({
+          battle: state.battle,
+          view: battle,
+          partyIds: battleParty(world, state.party).map((member) => member.id),
+          partyCommands,
+          energy: battle?.energy ?? state.battle.energy,
+          resolveImage: speakerPortrait,
+        })
+      : [];
+  const poppedCount = battle?.windUp?.bubbles.filter((item) => item.popped).length ?? 0;
+  const popupSnapshot =
+    activeBattle && state.battle !== null && state.battle.phase !== "reward" && battle !== null
+      ? {
+          battleKey: state.battle.critterId,
+          calm: battle.calm,
+          energy: battle.energy,
+          poppedCount,
+          message: battle.message,
+          tick: state.tick,
+          paused,
+        }
+      : null;
+  const critter = world.critters[state.battle?.critterId ?? ""];
+  return {
+    visible: showBattleHud,
+    energy: battle?.energy ?? 0,
+    energyMax: battle?.energyMax ?? 0,
+    level: levelForXp(world.levels, state.xp),
+    calm: battle === null ? 0 : battle.calm / Math.max(1, battle.calmMax),
+    critterName: activeBattle ? `Lv ${critter?.level ?? 1} · ${critter?.name ?? ""}` : "",
+    sparkle: hideActions ? null : (battle?.sparkle ?? null),
+    fluteAssist: hideActions ? null : (battle?.fluteAssist ?? null),
+    burstSoften: hideActions ? 0 : (battle?.burstSoften ?? 0),
+    lassoAssist: hideActions ? null : (battle?.lassoAssist ?? null),
+    lassoSteady: hideActions ? false : (battle?.lassoSteady ?? false),
+    portraits,
+    popupSnapshot,
+    canPeek,
+    peekOpen,
+    peek: peekOpen ? battlePeekData(world, state) : null,
+  };
+}
+
+/** Projects the credits finale state and cropped character frames onto CreditsView. */
+export function buildCreditsView(
+  world: World,
+  state: State,
+  art: Pick<ShellAssets, "atlasFrame">,
+): CreditsView {
+  const visible = state.finale === "credits";
+  return {
+    visible,
+    entries: visible
+      ? creditEntries(world, state).map((entry) => {
+          const image = art.atlasFrame(entry.image.atlas, entry.image.frame);
+          return {
+            ...entry,
+            image: image === null ? null : { ...image, frame: cropCreditFrame(image.frame) },
+          };
+        })
+      : [],
+    summary: visible ? creditsSummary(world, state) : [],
   };
 }
 

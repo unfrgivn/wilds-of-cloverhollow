@@ -7,21 +7,11 @@ import {
   type ActionFrame,
   type Point,
   type State,
-  battleParty,
   battleView,
-  jukeboxTracks,
   soundCues,
-  soundtrackFor,
-  trackTitles,
   type JukeboxTrack,
+  type SoundtrackState,
   arcadeView,
-  cookZone,
-  targetInteractable,
-  creditEntries,
-  creditsSummary,
-  levelForXp,
-  levelUpLine,
-  journalNotes,
   parseSave,
   serializeSave,
   autosaveNeeded,
@@ -35,19 +25,15 @@ import { mountTouchControls } from "./ui/touch-controls";
 import { GameView } from "./render/view";
 import { preventPinchZoom } from "./platform/gestures";
 import { createDialogueBox, createNoticeMarks, createPrompt } from "./ui/sticker";
-import { evaluateBattlePortraits } from "./ui/battle-portraits";
 import {
-  battlePeekData,
   createBattleHud,
   createCommandMenu,
   createBattleCheck,
   createFeelingBubble,
   createWindUpBubbles,
   createRewardSticker,
-  talkChoicesShown,
 } from "./ui/battle";
 import { createJournal } from "./ui/journal";
-import { Preferences } from "@capacitor/preferences";
 import { createTitleScreen, type TitleChoiceId } from "./ui/title";
 import { createCredits } from "./ui/credits";
 import {
@@ -59,35 +45,45 @@ import {
 import { creditsConfirmAllowed } from "./shell/credits-flow";
 import {
   battleCheckOverlay,
+  buildBattleHudView,
+  buildCreditsView,
   buildDialogueView,
+  buildHudHintsView,
   buildJournalView,
   buildRewardStickerView,
   createMoleHoleHandler,
   createShellAssets,
-  cropCreditFrame,
   FAE_ATLAS,
   FISH_ATLAS,
 } from "./shell/assets";
-import { createAudio, type CompanionAudioEffect } from "./platform/audio";
+import {
+  buildSoundContext,
+  captureAreaPostcard,
+  collectLevelUpNotices,
+  createAreaBannerTracker,
+  createJournalNotesCache,
+  hapticForTick,
+  isOverworldConfirm,
+  petEffectForCompanion,
+  resolveArcadeOutcome,
+  resolveSoundtrack,
+  shouldClearRest,
+  stepJukeboxTrack,
+} from "./shell/feedback";
+import { createSaveStore, shouldShowSaveToast } from "./shell/save-storage";
+import { createAudio } from "./platform/audio";
 import { createHaptics } from "./platform/haptics";
 import { findPettableCompanion, findRestSpot } from "./render/companions";
 import type { AudioLevel } from "./platform/audio-settings";
 import { createGameSettings } from "./platform/game-settings";
 import { createMinigameRecords } from "./platform/minigame-records";
 import type { ArcadeRecordBadge } from "./ui/arcade-popups";
-import { areaBannerInfo, createAreaBanner } from "./ui/area-banner";
-import {
-  createHudHints,
-  resolveHudInteractHint,
-  type HudInputMode,
-} from "./ui/hud-hints";
+import { createAreaBanner } from "./ui/area-banner";
+import { createHudHints, type HudInputMode } from "./ui/hud-hints";
 import { createSaveToast } from "./ui/save-toast";
 import {
-  composePostcardFrame,
   createPhotoTouchBar,
   createShutterFlash,
-  postcardMetadata,
-  triggerPostcardDownload,
   type PostcardCapture,
 } from "./ui/postcard";
 import { qaFlow } from "./shell/qa-flow";
@@ -96,19 +92,12 @@ import type { PackState } from "./dev/qa";
 
 const content = loadContent();
 const app = new Application();
-  let state: State;
-  const levelUpNotices: string[] = [];
+let state: State;
+const levelUpNotices: string[] = [];
 let paused = false;
 
 // One save slot (spec 10).
 const saveKey = "cloverhollow-save";
-
-function petEffectForCompanion(id: string): CompanionAudioEffect {
-  if (id === "pond-pup") return "pet-pup";
-  if (id === "acorn-squirrel") return "pet-squirrel";
-  if (id === "ribbon-bunny") return "pet-bunny";
-  return "pet-cat";
-}
 
 async function boot(): Promise<void> {
   preventPinchZoom();
@@ -205,15 +194,7 @@ async function boot(): Promise<void> {
   const saveToast = createSaveToast(uiRoot);
   const areaBanner = createAreaBanner(uiRoot);
   const shutterFlash = createShutterFlash(uiRoot);
-  const bannerDuration = 150;
-  let bannerArea: string | null = null;
-  let bannerStartTick = -1;
-  let bannerPendingFade = false;
-  const clearAreaBanner = (): void => {
-    bannerArea = null;
-    bannerStartTick = -1;
-    bannerPendingFade = false;
-  };
+  const bannerTracker = createAreaBannerTracker();
   const journal = createJournal(uiRoot);
   journal.onToggleAudio(() => {
     sound.toggle();
@@ -238,14 +219,14 @@ async function boot(): Promise<void> {
   });
   journal.onStepTrack((delta) => {
     if (!state.journalOpen) return;
-    const baseTrack = jukeboxTrack ?? soundtrackFor(content.world, state, {
-      titleOpen: titleMode !== null || qaMenuOpen,
-    }).track;
-    const currentIndex = baseTrack === "silent" ? -1 : jukeboxTracks.indexOf(baseTrack);
-    const startIndex = currentIndex >= 0 ? currentIndex : delta > 0 ? -1 : 0;
-    const nextIndex = (startIndex + delta + jukeboxTracks.length) % jukeboxTracks.length;
-    const nextTrack = jukeboxTracks[nextIndex];
-    if (nextTrack === undefined) return;
+    const nextTrack = stepJukeboxTrack(
+      content.world,
+      state,
+      jukeboxTrack,
+      delta,
+      titleMode !== null || qaMenuOpen,
+    );
+    if (nextTrack === null) return;
     jukeboxTrack = nextTrack;
     invalidate();
   });
@@ -304,10 +285,10 @@ async function boot(): Promise<void> {
   );
   const parseWorldSave = (raw: string): State | null =>
     parseSave(raw, fresh, speciesXp, content.world.levels.thresholds);
-  const saved = qaUrlPack === null && qaError === null
-    ? await Preferences.get({ key: saveKey }) : { value: null };
+  const saveStore = createSaveStore(saveKey);
+  const savedRaw = qaUrlPack === null && qaError === null ? await saveStore.load() : null;
   const restored = qaUrlPack === null
-    ? saved.value === null ? null : parseWorldSave(saved.value)
+    ? savedRaw === null ? null : parseWorldSave(savedRaw)
     : parseWorldSave(qaUrlPack.save);
   state = restored ?? fresh;
   let previousState: State = state;
@@ -333,11 +314,10 @@ async function boot(): Promise<void> {
     if (result.action === "new-game") {
       state = createState(content.world, initialFixture);
       previousState = state;
-      clearAreaBanner();
+      bannerTracker.clear();
       saveToast.hide();
       jukeboxTrack = null;
-      void Preferences.remove({ key: saveKey });
-      saveLast = null;
+      void saveStore.clear();
       saveDirty = false;
     }
   };
@@ -352,55 +332,46 @@ async function boot(): Promise<void> {
       choose: id,
     }),
   );
-  const saveLoaded =
-    restored === null
-      ? null
-      : { tick: restored.tick, hash: stableHash(restored) };
-  let saveLast: { tick: number; hash: string } | null = saveLoaded;
+  saveStore.setLoaded(
+    restored === null ? null : { tick: restored.tick, hash: stableHash(restored) },
+  );
   let saveDirty = false;
   let suppressSave = false;
-  let saveQueue = Promise.resolve();
   // True while the harness drives ticks synthetically (the hook's `step`): a
   // replay crossing a dozen doors must load and warm only the area it ends in
   // (spec 11), not every room it passes through.
   let harnessStepping = false;
-  const saveState = (snapshot: State, options?: { silent?: boolean }): Promise<void> => {
-    if (suppressSave || qaBlocked || qaActivePack !== null) return Promise.resolve();
+  const saveState = async (
+    snapshot: State,
+    options?: { silent?: boolean },
+  ): Promise<void> => {
+    if (suppressSave || qaBlocked || qaActivePack !== null) return;
     const serialized = serializeSave(snapshot);
     const hash = stableHash(snapshot);
     if (snapshot === state) saveDirty = false;
-    const liveSave =
-      !(options?.silent ?? false) &&
-      !document.hidden &&
-      !paused &&
-      !harnessStepping &&
-      qaActivePack === null &&
-      !qaBlocked &&
-      titleMode === null &&
-      snapshot.area !== "harness";
-    saveQueue = saveQueue.then(async () => {
-      await Preferences.set({
-        key: saveKey,
-        value: serialized,
-      });
-      saveLast = { tick: snapshot.tick, hash };
-      if (
-        liveSave &&
-        !document.hidden &&
-        !paused &&
-        !harnessStepping &&
-        qaActivePack === null &&
-        !qaBlocked &&
-        titleMode === null &&
-        !photoMode &&
-        state.battle === null &&
-        !state.journalOpen &&
-        state.finale === null
-      ) {
-        saveToast.show();
-      }
-    });
-    return saveQueue;
+    const silent = options?.silent ?? false;
+    const liveAtStart =
+      !silent && !document.hidden && !paused && !harnessStepping && titleMode === null;
+    const wrote = await saveStore.write(serialized, { tick: snapshot.tick, hash });
+    if (
+      liveAtStart &&
+      shouldShowSaveToast({
+        wrote,
+        silent,
+        documentHidden: document.hidden,
+        paused,
+        harnessStepping,
+        qaActive: qaActivePack !== null || qaBlocked,
+        titleOpen: titleMode !== null,
+        area: snapshot.area,
+        photoMode,
+        inBattle: state.battle !== null,
+        journalOpen: state.journalOpen,
+        inFinale: state.finale !== null,
+      })
+    ) {
+      saveToast.show();
+    }
   };
   const save = (): Promise<void> => saveState(state);
   const flushSaveOnHide = (): void => {
@@ -428,7 +399,7 @@ async function boot(): Promise<void> {
     if (loaded === null) throw new Error(`QA save ${item.pack.id} is invalid`);
     state = loaded; previousState = state; qaActivePack = item; qaMenuOpen = false;
     saveDirty = false;
-    clearAreaBanner();
+    bannerTracker.clear();
     saveToast.hide();
     titleMode = null;
     qaJustPicked = true;
@@ -456,7 +427,7 @@ async function boot(): Promise<void> {
       if (outcome.kind === "applied") {
         state = outcome.state;
         previousState = state;
-        clearAreaBanner();
+        bannerTracker.clear();
         invalidate();
       }
       return outcome;
@@ -512,12 +483,14 @@ async function boot(): Promise<void> {
   ]);
   let afterTick = (_next: State): void => undefined;
   let logTitle = (_mode: TitleMode | null): void => undefined;
-  let lastBattleLog = "";
-  let lastBattleTalkLog = "";
-  let lastBattleButtonsLog = "";
-  let lastMusicLog = "";
+  let logMusic = (_soundtrack: SoundtrackState): void => undefined;
+  let logBattle = (_next: State): void => undefined;
+  let logBattleButtons = (_active: boolean, _next: State): void => undefined;
   if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
     const {
+      createBattleButtonsLogger,
+      createBattleLogger,
+      createMusicLogger,
       createStateLogger,
       createTitleLogger,
       logPointers,
@@ -527,36 +500,12 @@ async function boot(): Promise<void> {
     logPointers();
     afterTick = createStateLogger(content.world);
     logTitle = createTitleLogger();
+    logMusic = createMusicLogger();
+    logBattle = createBattleLogger();
+    logBattleButtons = createBattleButtonsLogger(uiRoot);
     afterTick(state);
   }
-  // The journal's notes come from running its Ink knot (a Story per line).
-  // They only change with what the story reads (its variables, the set
-  // pieces, the stickers, and Fae's coins), and the world is frozen while the
-  // journal is open, so they're computed once per change, not per frame.
-  let journalCache: {
-    ink: string;
-    critters: State["critters"];
-    stickers: State["stickers"];
-    coins: number;
-    notes: string[];
-  } | null = null;
-  const notesNow = (): string[] => {
-    if (
-      journalCache === null ||
-      journalCache.ink !== state.ink ||
-      journalCache.critters !== state.critters ||
-      journalCache.stickers !== state.stickers ||
-      journalCache.coins !== state.coins
-    )
-      journalCache = {
-        ink: state.ink,
-        critters: state.critters,
-        stickers: state.stickers,
-        coins: state.coins,
-        notes: journalNotes(content.world, state),
-      };
-    return journalCache.notes;
-  };
+  const notesNow = createJournalNotesCache(content.world);
   let wasJournalOpen = false;
   let wasBattleOpen = false;
   let photoMode = false;
@@ -599,6 +548,13 @@ async function boot(): Promise<void> {
   };
   battleHud.onPeekToggle(() => setBattlePeek(!battlePeekOpen));
   battleHud.onPeekClose(() => setBattlePeek(false));
+  const syncOpenFlag = (
+    name: "arcade" | "qaConsole" | "title" | "credits" | "battle" | "talk" | "journal",
+    open: boolean,
+  ): void => {
+    if (open) document.documentElement.dataset[name] = "open";
+    else delete document.documentElement.dataset[name];
+  };
   const render = (alpha = 1): void => {
     if (photoMode && !canPhotoMode()) {
       photoMode = false;
@@ -610,25 +566,14 @@ async function boot(): Promise<void> {
       battlePeekOpen = false;
     }
     if (!state.journalOpen || titleMode !== null || qaMenuOpen) jukeboxTrack = null;
-    const baseSoundtrack = soundtrackFor(content.world, state, {
-      titleOpen: titleMode !== null || qaMenuOpen,
-    });
-    const soundtrack = jukeboxTrack !== null
-      ? {
-          ...baseSoundtrack,
-          track: jukeboxTrack,
-          duck: false,
-          title: trackTitles[jukeboxTrack],
-        }
-      : baseSoundtrack;
+    const { soundtrack, jukebox } = resolveSoundtrack(
+      content.world,
+      state,
+      jukeboxTrack,
+      titleMode !== null || qaMenuOpen,
+    );
     sound.setSoundtrack(soundtrack);
-    if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-      const musicKey = `${soundtrack.track}|${soundtrack.ambience}|${soundtrack.duck}`;
-      if (musicKey !== lastMusicLog) {
-        console.log(`[cloverhollow] music ${JSON.stringify(soundtrack)}`);
-        lastMusicLog = musicKey;
-      }
-    }
+    logMusic(soundtrack);
     const arcadeState = arcadeView(content.world, state, gameSettings.gentleTiming());
     assets.renderOverlays(arcadeState, activeArcadeRecord);
     if (state.journalOpen && !wasJournalOpen) {
@@ -645,8 +590,7 @@ async function boot(): Promise<void> {
       });
     }
     wasJournalOpen = state.journalOpen;
-    if (arcadeState !== null) document.documentElement.dataset.arcade = "open";
-    else delete document.documentElement.dataset.arcade;
+    syncOpenFlag("arcade", arcadeState !== null);
     // Which game is open: Comet Cruise's steers by the touch arrows.
     if (state.arcade !== null) document.documentElement.dataset.arcadeGame = state.arcade.game;
     else delete document.documentElement.dataset.arcadeGame;
@@ -690,67 +634,31 @@ async function boot(): Promise<void> {
       !state.journalOpen &&
       state.finale !== "credits" &&
       levelUpNotices.length === 0;
-    const interactTarget = overworldFree ? targetInteractable(content.world, state) : undefined;
-    const interactHint = overworldFree
-      ? resolveHudInteractHint({
-          hasInteractable: interactTarget !== undefined,
-          interactPrompt: interactTarget?.prompt,
-          isResting: view.isResting(),
-          player: state.player,
-          facing: state.facing,
-          pettableCompanion: interactTarget === undefined && !view.isResting()
-            ? findPettableCompanion(content.world, state)
-            : null,
-          hasRestSpot: interactTarget === undefined && !view.isResting() &&
-            findRestSpot(content.world, state) !== null,
-        })
-      : { canInteract: false, interactLabel: "Talk" };
-    const battlePeekHint =
-      gameSettings.keyHints() &&
-      !touchActive &&
-      canBattlePeek() &&
-      !(state.battle?.treatMenu ?? false);
-    hudHints.render({
-      visible: gameSettings.keyHints() && !touchActive && overworldFree,
-      canInteract: interactHint.canInteract,
-      interactLabel: interactHint.interactLabel,
-      hasLantern,
-      lanternOn: state.lantern,
-      hasFlute,
-      muted: sound.muted(),
-      canPhoto: canPhotoMode() && !photoMode,
-      battlePeekHint,
-      inputMode: lastInputMode,
-    });
-    if (bannerStartTick >= 0 && state.tick < bannerStartTick) clearAreaBanner();
-    const bannerInfo = bannerArea !== null && bannerArea === state.area && !bannerPendingFade
-      ? areaBannerInfo(content.world, state.area)
-      : null;
-    const bannerElapsed = bannerStartTick >= 0 ? state.tick - bannerStartTick : -1;
-    if (bannerElapsed >= bannerDuration) clearAreaBanner();
-    const showBanner =
-      bannerInfo !== null &&
-      bannerElapsed >= 0 &&
-      bannerElapsed < bannerDuration &&
-      state.area !== "harness" &&
-      state.dialogue === null &&
-      state.battle === null &&
-      state.arcade === null &&
-      !state.journalOpen &&
+    hudHints.render(
+      buildHudHintsView({
+        world: content.world,
+        state,
+        keyHints: gameSettings.keyHints(),
+        touchActive,
+        overworldFree,
+        isResting: view.isResting(),
+        hasLantern,
+        hasFlute,
+        muted: sound.muted(),
+        canPhoto: canPhotoMode() && !photoMode,
+        canBattlePeek: canBattlePeek(),
+        inputMode: lastInputMode,
+      }),
+    );
+    const bannerEligible =
       titleMode === null &&
       !qaMenuOpen &&
       !qaConsoleOpen &&
       !qaBlocked &&
-      state.finale === null &&
-      state.transition === null &&
       levelUpNotices.length === 0;
-    areaBanner.render({
-      visible: showBanner,
-      title: bannerInfo?.title ?? "",
-      region: bannerInfo?.region ?? null,
-      progress: showBanner ? (bannerElapsed + 1) / (bannerDuration + 1) : 0,
-      qaOffset: qaActivePack !== null,
-    });
+    areaBanner.render(
+      bannerTracker.view(content.world, state, bannerEligible, qaActivePack !== null),
+    );
     title.render({
       visible: titleMode !== null && !qaMenuOpen,
       mode: titleMode ?? "fresh",
@@ -760,35 +668,17 @@ async function boot(): Promise<void> {
     qaMenu?.render(qaMenuOpen, qaSelected);
     qaBadge?.render(qaActivePack?.pack ?? null);
     qaConsole?.render(qaConsoleOpen);
-    if (qaConsoleOpen) document.documentElement.dataset.qaConsole = "open";
-    else delete document.documentElement.dataset.qaConsole;
+    syncOpenFlag("qaConsole", qaConsoleOpen);
     const creditsOpen = state.finale === "credits";
     if (photoMode || titleMode !== null || activeBattle || state.journalOpen || creditsOpen) {
       saveToast.hide();
     }
-    credits.render({
-      visible: creditsOpen,
-      entries: creditsOpen
-        ? creditEntries(content.world, state).map((entry) => {
-            const image = assets.atlasFrame(entry.image.atlas, entry.image.frame);
-            return {
-              ...entry,
-              image: image === null ? null : { ...image, frame: cropCreditFrame(image.frame) },
-            };
-          })
-        : [],
-      summary: creditsOpen ? creditsSummary(content.world, state) : [],
-    });
+    credits.render(buildCreditsView(content.world, state, assets));
     logTitle(titleMode);
-    if (titleMode !== null) document.documentElement.dataset.title = "open";
-    else delete document.documentElement.dataset.title;
-    if (state.finale === "credits") document.documentElement.dataset.credits = "open";
-    else delete document.documentElement.dataset.credits;
-    if (activeBattle) document.documentElement.dataset.battle = "open";
-    else delete document.documentElement.dataset.battle;
-    if (battle?.talk !== null && battle?.talk !== undefined)
-      document.documentElement.dataset.talk = "open";
-    else delete document.documentElement.dataset.talk;
+    syncOpenFlag("title", titleMode !== null);
+    syncOpenFlag("credits", creditsOpen);
+    syncOpenFlag("battle", activeBattle);
+    syncOpenFlag("talk", battle?.talk !== null && battle?.talk !== undefined);
     // Which check is in play (spec 8.1): a catch or a lean shows its touch
     // arrows.
     const checkKind = state.battle?.phase === "check" ? state.battle.check?.kind : undefined;
@@ -800,56 +690,20 @@ async function boot(): Promise<void> {
     if (checkKind !== "catch" && checkKind !== "lean" && checkKind !== "echo" &&
         state.arcade?.game !== "mole" && state.arcade?.game !== "comet")
       touch.releaseArrows();
-    const hideActions = state.battle?.phase === "check" ||
-      state.battle?.phase === "burstResult";
     if (activeBattle && !wasBattleOpen) void assets.warmBattlePortraits(state).then(invalidate);
     wasBattleOpen = activeBattle;
-    const showBattleHud = activeBattle && state.battle?.phase !== "reward" &&
-      !talkChoicesShown(battle?.talk ?? null);
-    const battlePortraits = showBattleHud && state.battle !== null
-      ? evaluateBattlePortraits({
-          battle: state.battle,
-          view: battle,
-          partyIds: battleParty(content.world, state.party).map((member) => member.id),
-          partyCommands,
-          energy: battle?.energy ?? state.battle.energy,
-          resolveImage: (id) => assets.speakerPortrait(id),
-        })
-      : [];
-    const poppedCount = battle?.windUp?.bubbles.filter((item) => item.popped).length ?? 0;
-    const popupSnapshot =
-      activeBattle && state.battle !== null && state.battle.phase !== "reward" && battle !== null
-        ? {
-            battleKey: state.battle.critterId,
-            calm: battle.calm,
-            energy: battle.energy,
-            poppedCount,
-            message: battle.message,
-            tick: state.tick,
-            paused,
-          }
-        : null;
-    battleHud.render({
-      visible: showBattleHud,
-      energy: battle?.energy ?? 0,
-      energyMax: battle?.energyMax ?? 0,
-      level: levelForXp(content.world.levels, state.xp),
-      calm: battle === null ? 0 : battle.calm / Math.max(1, battle.calmMax),
-      critterName: activeBattle
-        ? `Lv ${content.world.critters[state.battle?.critterId ?? ""]?.level ?? 1} · ` +
-          `${content.world.critters[state.battle?.critterId ?? ""]?.name ?? ""}`
-        : "",
-      sparkle: hideActions ? null : (battle?.sparkle ?? null),
-      fluteAssist: hideActions ? null : (battle?.fluteAssist ?? null),
-      burstSoften: hideActions ? 0 : (battle?.burstSoften ?? 0),
-      lassoAssist: hideActions ? null : (battle?.lassoAssist ?? null),
-      lassoSteady: hideActions ? false : (battle?.lassoSteady ?? false),
-      portraits: battlePortraits,
-      popupSnapshot,
-      canPeek: canBattlePeek(),
-      peekOpen: battlePeekOpen,
-      peek: battlePeekOpen ? battlePeekData(content.world, state) : null,
-    });
+    battleHud.render(
+      buildBattleHudView({
+        world: content.world,
+        state,
+        battle,
+        partyCommands,
+        paused,
+        canPeek: canBattlePeek(),
+        peekOpen: battlePeekOpen,
+        speakerPortrait: assets.speakerPortrait,
+      }),
+    );
     commandMenu.render({
       visible: activeBattle && state.battle?.phase === "command" && battle?.talk === null,
       commands: battle?.commands ?? [],
@@ -871,23 +725,7 @@ async function boot(): Promise<void> {
         ? null
         : { ...battle.windUp, ...feelingAt },
     );
-    if (
-      activeBattle &&
-      state.battle?.phase === "command" &&
-      (import.meta.env.DEV || import.meta.env.MODE === "harness")
-    ) {
-      const rects = [
-        ...uiRoot.querySelectorAll<HTMLElement>(".battle-command"),
-      ].map((item) => {
-        const rect = item.getBoundingClientRect();
-        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-      });
-      const encoded = JSON.stringify(rects);
-      if (encoded !== lastBattleButtonsLog) {
-        console.log(`[cloverhollow] battle-buttons ${encoded}`);
-        lastBattleButtonsLog = encoded;
-      }
-    }
+    logBattleButtons(activeBattle, state);
     const geometry = view.battleCheckGeometry(
       state,
       window.innerWidth,
@@ -898,17 +736,11 @@ async function boot(): Promise<void> {
     rewardSticker.render(
       buildRewardStickerView(content.world, state, activeBattle, arcadeState, assets),
     );
-    const jukeboxIndex =
-      jukeboxTrack !== null
-        ? jukeboxTracks.indexOf(jukeboxTrack)
-        : soundtrack.track === "silent"
-          ? -1
-          : jukeboxTracks.indexOf(soundtrack.track);
     journal.render(
       buildJournalView({
         world: content.world,
         state,
-        notes: state.journalOpen ? notesNow() : [],
+        notes: state.journalOpen ? notesNow(state) : [],
         mapCentres,
         art: assets,
         muted: sound.muted(),
@@ -917,11 +749,7 @@ async function boot(): Promise<void> {
         musicLevel: sound.musicLevel(),
         ambienceMuted: sound.ambienceMuted(),
         nowPlaying: soundtrack.title,
-        jukebox: {
-          active: jukeboxTrack !== null,
-          index: jukeboxIndex,
-          total: jukeboxTracks.length,
-        },
+        jukebox,
         arcadeRecords: minigameRecords.records(),
         gentleTiming: gameSettings.gentleTiming(),
         keyHints: gameSettings.keyHints(),
@@ -930,10 +758,10 @@ async function boot(): Promise<void> {
         hasLantern,
         hasFlute,
         hasLasso,
+        inputMode: lastInputMode,
       }),
     );
-    if (state.journalOpen) document.documentElement.dataset.journal = "open";
-    else delete document.documentElement.dataset.journal;
+    syncOpenFlag("journal", state.journalOpen);
     const dialogueView = buildDialogueView({
       world: content.world,
       state,
@@ -1058,7 +886,7 @@ async function boot(): Promise<void> {
           throw new Error("the credits closed with no dream to go back to");
         state = endingSnapshot;
         previousState = state;
-        clearAreaBanner();
+        bannerTracker.clear();
         titleMode = "continue";
         titleSelected = "continue";
         return;
@@ -1074,78 +902,21 @@ async function boot(): Promise<void> {
     state = stepped.state;
     if (!paused && !harnessStepping && state.tick !== previous.tick) saveDirty = true;
     previousState = state.area === previous.area ? previous : state;
-    if (previous.area !== state.area) fishStreak = 0;
-    const nextArcade = state.arcade;
-    if (nextArcade === null || nextArcade.phase !== "result") {
-      activeArcadeRecord = null;
-    } else if (
-      previous.arcade !== null &&
-      previous.arcade.game === nextArcade.game &&
-      previous.arcade.phase !== "result"
-    ) {
-      if (nextArcade.game === "skee") {
-        const total = nextArcade.throws.reduce((sum, item) => sum + item.points, 0);
-        activeArcadeRecord = minigameRecords.submit("skee", total);
-      } else if (nextArcade.game === "mole") {
-        activeArcadeRecord = minigameRecords.submit("mole", nextArcade.booped);
-      } else if (nextArcade.game === "comet") {
-        activeArcadeRecord = minigameRecords.submit("comet", nextArcade.caught);
-      } else if (nextArcade.game === "fish") {
-        if (nextArcade.caught !== null) {
-          fishStreak += 1;
-          activeArcadeRecord = minigameRecords.submit("fish", fishStreak);
-        } else {
-          fishStreak = 0;
-          const best = minigameRecords.bestOf("fish");
-          activeArcadeRecord = best > 0 ? { best, isNewBest: false } : null;
-        }
-      } else if (nextArcade.game === "cook") {
-        const zone = cookZone(
-          content.world.arcade.cook,
-          nextArcade.dish,
-          nextArcade.cooked,
-          gameSettings.gentleTiming(),
-        );
-        if (zone === "golden") {
-          activeArcadeRecord = minigameRecords.submit("cook", minigameRecords.bestOf("cook") + 1);
-        } else {
-          const best = minigameRecords.bestOf("cook");
-          activeArcadeRecord = best > 0 ? { best, isNewBest: false } : null;
-        }
-      }
-    }
-    const clearRest =
-      input.move.x !== 0 ||
-      input.move.y !== 0 ||
-      input.cancel ||
-      input.menu ||
-      previous.area !== state.area ||
-      state.dialogue !== null ||
-      state.battle !== null ||
-      state.arcade !== null ||
-      state.journalOpen ||
-      state.transition !== null ||
-      state.finale !== null;
-    if (clearRest && view.isResting()) {
+    const arcadeOutcome = resolveArcadeOutcome(
+      content.world,
+      previous,
+      state,
+      gameSettings.gentleTiming(),
+      minigameRecords,
+      fishStreak,
+      activeArcadeRecord,
+    );
+    activeArcadeRecord = arcadeOutcome.record;
+    fishStreak = arcadeOutcome.fishStreak;
+    if (shouldClearRest(input, previous, state) && view.isResting()) {
       view.setResting(null, state.tick);
     }
-    const overworldConfirm =
-      confirmEdge &&
-      !dismissedLevelUp &&
-      previous.dialogue === null &&
-      previous.battle === null &&
-      previous.arcade === null &&
-      !previous.journalOpen &&
-      previous.transition === null &&
-      previous.finale === null &&
-      state.dialogue === null &&
-      state.battle === null &&
-      state.arcade === null &&
-      !state.journalOpen &&
-      state.transition === null &&
-      state.finale === null &&
-      previous.area === state.area;
-    if (overworldConfirm) {
+    if (isOverworldConfirm(confirmEdge, dismissedLevelUp, previous, state)) {
       if (view.isResting()) {
         view.setResting(null, state.tick);
       } else {
@@ -1163,23 +934,7 @@ async function boot(): Promise<void> {
         }
       }
     }
-    if (previous.area !== state.area) {
-      if (areaBannerInfo(content.world, state.area) !== null) {
-        bannerArea = state.area;
-        bannerStartTick = state.tick;
-        bannerPendingFade = state.transition !== null;
-      } else {
-        clearAreaBanner();
-      }
-    } else if (
-      previous.transition !== null &&
-      state.transition === null &&
-      bannerPendingFade &&
-      bannerArea === state.area
-    ) {
-      bannerStartTick = state.tick;
-      bannerPendingFade = false;
-    }
+    bannerTracker.update(content.world, previous, state);
     // A door's fade-out knows where it's going: warm that area's art while the
     // fade still covers the screen, so the arrival isn't a white wait on the
     // load (spec 4, transitions). The warm-up belongs to the real-time loop:
@@ -1205,26 +960,14 @@ async function boot(): Promise<void> {
       lastFinale = state.finale;
       if (state.finale === "credits") creditsTicks = 0;
     }
+    levelUpNotices.push(...collectLevelUpNotices(content.world, stepped.events));
     for (const event of stepped.events) {
-      if (event.type === "level-up") {
-        const friend = event.member !== "fae";
-        const name = friend ? (content.world.party[event.member]?.name ?? event.member) : "Fae";
-        levelUpNotices.push(levelUpLine(name, event.from, event.to, event.deltas, friend));
-      }
       if (event.type === "ending-save") {
         endingSnapshot = event.state;
         if (qaActivePack === null && !qaBlocked) void saveState(event.state);
       }
     }
-    const activeTalk = state.dialogue ?? state.battle?.talk ?? null;
-    const choiceIndex =
-      state.dialogue?.selected ?? state.battle?.talk?.selected ?? state.battle?.selected ?? 0;
-    const soundContext = {
-      speaker: activeTalk?.speaker ?? null,
-      text: activeTalk?.text,
-      revealed: activeTalk?.revealed,
-      choiceIndex,
-    };
+    const soundContext = buildSoundContext(state);
     const cues = soundCues(previous, state, content.world);
     for (const cue of cues) {
       const played = sound.play(cue, state.tick, soundContext);
@@ -1232,53 +975,13 @@ async function boot(): Promise<void> {
         console.log(`[cloverhollow] sound ${JSON.stringify(played)}`);
     }
     if (!harnessStepping) {
-      const soothedNow = previous.battle?.phase !== "soothed" && state.battle?.phase === "soothed";
-      if (
-        soothedNow ||
-        cues.includes("battle-together") ||
-        cues.includes("prize-won") ||
-        cues.includes("fish-catch")
-      ) {
-        haptics.trigger("celebrate");
-      } else if (cues.includes("battle-hit") && state.battle?.lastGrade === "great") {
-        haptics.trigger("medium");
-      } else if (
-        cues.includes("claw-grab") ||
-        cues.includes("mole-boop") ||
-        cues.includes("fish-bite")
-      ) {
-        haptics.trigger("light");
-      }
+      const haptic = hapticForTick(previous, state, cues, {
+        goldenCooked: arcadeOutcome.goldenCooked,
+      });
+      if (haptic !== null) haptics.trigger(haptic);
     }
     if (qaActivePack === null && !qaBlocked && autosaveNeeded(previous, state)) void save();
-    if (import.meta.env.DEV || import.meta.env.MODE === "harness") {
-      const log =
-        state.battle === null
-          ? "closed"
-          : `${state.battle.phase}|${state.battle.message}`;
-      if (log !== lastBattleLog) {
-        const payload = {
-          phase: state.battle?.phase ?? null,
-          message: state.battle?.message ?? "",
-        };
-        console.log(`[cloverhollow] battle ${JSON.stringify(payload)}`);
-        lastBattleLog = log;
-      }
-      const talk = state.battle?.talk ?? null;
-      const talkLog = talk === null
-        ? "closed"
-        : `${talk.speaker ?? ""}|${talk.choices.join("|")}`;
-      if (talkLog !== lastBattleTalkLog) {
-        if (talk !== null)
-          console.log(
-            `[cloverhollow] battle-talk ${JSON.stringify({
-              speaker: talk.speaker,
-              choices: talk.choices,
-            })}`,
-          );
-        lastBattleTalkLog = talkLog;
-      }
-    }
+    logBattle(state);
     afterTick(state);
   };
   let areaLoad: Promise<void> | undefined;
@@ -1333,25 +1036,12 @@ async function boot(): Promise<void> {
       clearColor: 0xf8edcf,
     });
     const sourceCanvas = extracted instanceof HTMLCanvasElement ? extracted : app.canvas;
-    const area = content.world.areas[state.area];
-    const areaName = area?.name ?? state.area;
-    const land =
-      area?.land === undefined
-        ? undefined
-        : content.world.lands.find((entry) => entry.id === area.land);
-    const meta = postcardMetadata(state.area, areaName, land?.name ?? "");
-    const composed = composePostcardFrame(sourceCanvas, meta.caption, meta.subcaption);
-    if (composed === null) return null;
-    if (options?.download !== false) {
-      triggerPostcardDownload(composed.dataUrl, meta.filename);
-    }
-    return {
-      filename: meta.filename,
-      caption: meta.caption,
-      width: composed.width,
-      height: composed.height,
-      dataUrl: composed.dataUrl,
-    };
+    return captureAreaPostcard(
+      content.world,
+      state.area,
+      sourceCanvas,
+      options?.download !== false,
+    );
   };
   createPhotoTouchBar(uiRoot, {
     onSnap: () => {
@@ -1567,7 +1257,7 @@ async function boot(): Promise<void> {
         saveDirty = false;
         state = createState(content.world, fixture, options.seed);
         previousState = state;
-        clearAreaBanner();
+        bannerTracker.clear();
         saveToast.hide();
         suppressSave = false;
         prefetchedTarget = undefined;
@@ -1598,13 +1288,11 @@ async function boot(): Promise<void> {
       save: {
         clear: async () => {
           if (qaActivePack !== null || qaBlocked) return;
-          await saveQueue;
-          await Preferences.remove({ key: saveKey });
-          saveLast = null;
+          await saveStore.clear();
           saveDirty = false;
         },
-        last: () => saveLast,
-        loaded: () => qaActivePack === null && !qaBlocked ? saveLoaded : null,
+        last: () => saveStore.last(),
+        loaded: () => (qaActivePack === null && !qaBlocked ? saveStore.loaded() : null),
       },
       sound: {
         log: sound.log,

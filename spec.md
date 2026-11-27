@@ -160,13 +160,19 @@ ios/            Capacitor iOS project (from Milestone 4).
   `ensureMoleOverlay`, `ensureCometOverlay`, `ensureArcadeOverlay`,
   `ensureCookOverlay`, `ensureFishOverlay`, `warmAreaOverlays`,
   `warmAreaMedia`, `warmJournalAssets`, `warmBattlePortraits`), and shell view
-  projectors (`battleCheckOverlay`, `buildJournalView`,
-  `buildRewardStickerView`, `buildDialogueView`) live in `src/shell/assets.ts`
-  so `src/main.ts` stays focused on composition and lifecycle.
-- Tactile haptics (`src/platform/haptics.ts`, Milestones 91 & 121): progressive
-  enhancement with zero new npm dependencies. `createHaptics()` checks for a
-  native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via strict type
-  guards, then fires dual-rumble Gamepad haptic actuators via
+  projectors (`battleCheckOverlay`, `buildBattleHudView`, `buildCreditsView`,
+  `buildDialogueView`, `buildHudHintsView`, `buildJournalView`,
+  `buildRewardStickerView`) live in `src/shell/assets.ts`; pure gameplay
+  feedback and outcome helpers (`petEffectForCompanion`, `hapticForTick`,
+  `buildSoundContext`, `resolveArcadeOutcome`, `collectLevelUpNotices`,
+  `shouldClearRest`, `isOverworldConfirm`, `stepJukeboxTrack`,
+  `resolveSoundtrack`, `createAreaBannerTracker`, `createJournalNotesCache`,
+  `captureAreaPostcard`) live in `src/shell/feedback.ts` so `src/main.ts` stays
+  focused on composition and lifecycle.
+- Tactile haptics (`src/platform/haptics.ts`, Milestones 91, 121 & 122):
+  progressive enhancement with zero new npm dependencies. `createHaptics()`
+  checks for a native Capacitor Haptics plugin (`Capacitor.Plugins.Haptics`) via
+  strict type guards, then fires dual-rumble Gamepad haptic actuators via
   `triggerGamepadRumble(pads, kind)` (`GAMEPAD_RUMBLE_EFFECTS`: `light` 35 ms
   0.08/0.22, `medium` 70 ms 0.22/0.45, `celebrate` 150 ms 0.38/0.65; probed by
   `hasRumbleGamepad(pads)` across `navigator.getGamepads?.()`), and finally
@@ -175,9 +181,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   `prefers-reduced-motion: reduce` and the in-game Reduced Motion toggle via
   `isReducedMotionActive()` (`src/platform/reduced-motion.ts`) and no-oping
   safely on unsupported browsers or during synthetic harness steps.
-  Wired in `src/main.ts` on `GREAT!` battle checks (`"medium"`), `Together!` /
-  `soothed` / `prize-won` / `fish-catch` (`"celebrate"`), and `claw-grab` /
-  `mole-boop` / `fish-bite` / companion pet (`"light"`).
+  Projected via `hapticForTick` (`src/shell/feedback.ts`) on `GREAT!` battle
+  checks (`"medium"`), `Together!` / `soothed` / `prize-won` / `fish-catch` /
+  Golden Chef (`"celebrate"`), and `claw-grab` / `mole-boop` / `fish-bite` /
+  companion pet (`"light"`).
 
 ### 3.2 Input
 - Devices produce one `ActionFrame` per tick: a `move` vector (x and y in
@@ -3491,8 +3498,13 @@ trunks keep its two exits.
   controls for Gentle Timing, Key Hints, Text Speed (`Cozy` / `Brisk` /
   `Instant`), and Reduced Motion (`Off` / `On`, stored under
   `cloverhollow-settings`, upgrading legacy preferences cleanly) above a compact
-  Controls reference card (showing Lantern, Flute, and Lasso once unlocked:
-  `Lantern: L`, `Flute: F`, `Lasso: R`). Both pages
+  adaptive Controls reference card (`journalControlsLines` in
+  `src/ui/journal.ts`, Milestone 122): in default `"keyboard"` mode it displays
+  `Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M` plus unlocked tools
+  (`Lantern: L`, `Flute: F`, `Lasso: R`); when a gamepad is active (`"gamepad"`
+  mode) it switches cleanly to
+  `Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y` plus unlocked tools
+  (`Lantern: X`, `Flute: RB`, `Lasso: LB`) and `Photo / Guide: View`. Both pages
   fit without scrolling or overlap at 667x375, 874x402, 1180x820, and 1280x720
   (switching Gameplay into a 2x2 touch tile grid at `max-height: 500px`).
   While the Journal is open (outside Title / QA overlays), pressing `[` /
@@ -3679,6 +3691,15 @@ trunks keep its two exits.
   never overlaps the bottom-right `✓`/`×` buttons, auto-hiding after 1800 ms,
   respecting reduced motion, and hidden during photo, battle, journal, title,
   and credits overlays).
+- Resilient save storage queue (`createSaveStore` & `shouldShowSaveToast` in
+  `src/shell/save-storage.ts`, Milestone 122): wraps Capacitor `Preferences`
+  behind an injectable `SaveStorageAdapter` (`{ get, set, remove }`) and
+  serializes concurrent `write()` and `clear()` operations on a strict FIFO
+  queue that always recovers from errors. A rejected `set()` (e.g. Safari
+  Private Mode or storage quota failure) resolves to `false`, leaves `last()`
+  untouched, suppresses the `"Saved"` toast, and never poisons subsequent saves;
+  a rejected `get()` returns `null` cleanly, and `clear()` resets `last()` even
+  if `remove()` rejects.
 - Tab/iOS background lifecycle and `pagehide` flush (`src/shell/lifecycle.ts`,
   Milestone 119): `shouldFreezeLiveLoop` pauses live fixed-timestep ticking,
   drops elapsed accumulator time, and avoids background WebGL redraws while

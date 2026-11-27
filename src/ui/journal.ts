@@ -52,6 +52,40 @@ export type JukeboxMeta = {
   total: number;
 };
 
+export type JournalInputMode = "keyboard" | "gamepad";
+
+export type JournalControlTools = {
+  hasLantern: boolean;
+  hasFlute: boolean;
+  hasLasso: boolean;
+};
+
+/** Formats the Journal OPTIONS Controls reference lines for keyboard or gamepad play. */
+export function journalControlsLines(
+  inputMode: JournalInputMode,
+  tools: JournalControlTools,
+): { primary: string; tools: string } {
+  if (inputMode === "gamepad") {
+    const toolParts: string[] = [];
+    if (tools.hasLantern) toolParts.push("Lantern: X");
+    if (tools.hasFlute) toolParts.push("Flute: RB");
+    if (tools.hasLasso) toolParts.push("Lasso: LB");
+    toolParts.push("Photo / Guide: View");
+    return {
+      primary: "Move: Stick / D-Pad · Talk: A · Back: B · Journal: Y",
+      tools: toolParts.join(" · "),
+    };
+  }
+  const toolParts: string[] = [];
+  if (tools.hasLantern) toolParts.push("Lantern: L");
+  if (tools.hasFlute) toolParts.push("Flute: F");
+  if (tools.hasLasso) toolParts.push("Lasso: R");
+  return {
+    primary: "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M",
+    tools: toolParts.join(" · "),
+  };
+}
+
 /** Formats the accessible label and tooltip for the Music Box now-playing pill. */
 export function formatJukeboxLabel(nowPlaying: string, meta?: JukeboxMeta): string {
   if (meta !== undefined && meta.active && meta.total > 0) {
@@ -102,6 +136,7 @@ export type JournalView = {
   hasLantern: boolean;
   hasFlute: boolean;
   hasLasso?: boolean;
+  inputMode?: JournalInputMode;
   members: {
     id: string;
     name: string;
@@ -891,13 +926,14 @@ export function createJournal(root: HTMLElement): {
       optReducedMotion.classList.toggle("is-muted", !view.reducedMotion);
       setAttribute(optReducedMotion, "aria-pressed", String(view.reducedMotion));
 
-      setText(controlsLine, "Move: Arrows / WASD · Talk: Z · Journal: J · Mute: M");
-      const toolParts: string[] = [];
-      if (view.hasLantern) toolParts.push("Lantern: L");
-      if (view.hasFlute) toolParts.push("Flute: F");
-      if (view.hasLasso === true) toolParts.push("Lasso: R");
-      controlsTools.hidden = toolParts.length === 0;
-      setText(controlsTools, toolParts.join(" · "));
+      const controls = journalControlsLines(view.inputMode ?? "keyboard", {
+        hasLantern: view.hasLantern,
+        hasFlute: view.hasFlute,
+        hasLasso: view.hasLasso === true,
+      });
+      setText(controlsLine, controls.primary);
+      controlsTools.hidden = controls.tools.length === 0;
+      setText(controlsTools, controls.tools);
 
       const treats = view.treats ?? [];
       const nextTreatsSignature = treats.map((item) => `${item.id}:${item.count}`).join("|");

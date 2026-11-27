@@ -1,4 +1,4 @@
-import { targetInteractable, type State, type World } from "../core";
+import { targetInteractable, type SoundtrackState, type State, type World } from "../core";
 
 export function createStateLogger(world: World): (state: State) => void {
   let previous: State | undefined;
@@ -129,5 +129,64 @@ export function createTitleLogger(): (mode: string | null) => void {
         });
       console.log(`[cloverhollow] title ${JSON.stringify({ mode, options })}`);
     }));
+  };
+}
+
+export function createMusicLogger(): (soundtrack: SoundtrackState) => void {
+  let previous = "";
+  return (soundtrack) => {
+    const key = `${soundtrack.track}|${soundtrack.ambience}|${soundtrack.duck}`;
+    if (key === previous) return;
+    console.log(`[cloverhollow] music ${JSON.stringify(soundtrack)}`);
+    previous = key;
+  };
+}
+
+export function createBattleLogger(): (state: State) => void {
+  let lastBattleLog = "";
+  let lastBattleTalkLog = "";
+  return (state) => {
+    const log =
+      state.battle === null ? "closed" : `${state.battle.phase}|${state.battle.message}`;
+    if (log !== lastBattleLog) {
+      const payload = {
+        phase: state.battle?.phase ?? null,
+        message: state.battle?.message ?? "",
+      };
+      console.log(`[cloverhollow] battle ${JSON.stringify(payload)}`);
+      lastBattleLog = log;
+    }
+    const talk = state.battle?.talk ?? null;
+    const talkLog =
+      talk === null ? "closed" : `${talk.speaker ?? ""}|${talk.choices.join("|")}`;
+    if (talkLog !== lastBattleTalkLog) {
+      if (talk !== null) {
+        console.log(
+          `[cloverhollow] battle-talk ${JSON.stringify({
+            speaker: talk.speaker,
+            choices: talk.choices,
+          })}`,
+        );
+      }
+      lastBattleTalkLog = talkLog;
+    }
+  };
+}
+
+export function createBattleButtonsLogger(
+  uiRoot: HTMLElement,
+): (activeBattle: boolean, state: State) => void {
+  let lastEncoded = "";
+  return (activeBattle, state) => {
+    if (!activeBattle || state.battle?.phase !== "command") return;
+    const rects = [...uiRoot.querySelectorAll<HTMLElement>(".battle-command")].map((item) => {
+      const rect = item.getBoundingClientRect();
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    });
+    const encoded = JSON.stringify(rects);
+    if (encoded !== lastEncoded) {
+      console.log(`[cloverhollow] battle-buttons ${encoded}`);
+      lastEncoded = encoded;
+    }
   };
 }

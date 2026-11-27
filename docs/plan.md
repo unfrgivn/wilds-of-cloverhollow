@@ -5472,6 +5472,45 @@ the old trail, the owl, and the clubhouse claim.
   area baselines on `bay`, `pass`, and `trail` updated for the new hand-inked
   star charm).
 
+## Milestone 122: Resilient Save Queue & Error Recovery (`src/shell/save-storage.ts`), Adaptive Gamepad Controls Reference in Journal `OPTIONS` & Shell Feedback Extraction (`src/shell/feedback.ts`) **Status:** ✅ Completed (2026-11-27)
+- Hardens save persistence against rejected storage writes, adapts the Journal
+  `OPTIONS` Controls card when a gamepad is active while keeping default
+  keyboard layouts byte-identical, and extracts shell gameplay feedback,
+  arcade-record resolution, and view projection out of `src/main.ts` with zero
+  `src/core` changes and zero replay hash shifts across all 67 recorded sims.
+- Resilient Save Queue & Error Recovery (`src/shell/save-storage.ts`,
+  `src/main.ts`):
+  - Adds injectable `SaveStorageAdapter`, `createSaveStore`, and
+    `shouldShowSaveToast` serializing concurrent `write()` / `clear()` calls on
+    a self-recovering FIFO queue so rejected storage writes return `false`,
+    preserve `last()`, suppress `saveToast.show()`, and never poison future
+    autosaves.
+- Adaptive Gamepad Controls Reference (`src/ui/journal.ts`,
+  `src/shell/assets.ts`, `src/main.ts`):
+  - Exports pure `journalControlsLines(inputMode, tools)` and wires
+    `lastInputMode` through `buildJournalView` so `"keyboard"` stays 100%
+    identical to existing `journal-options` baselines while `"gamepad"` shows
+    Stick/D-Pad, A/B/Y, unlocked X/RB/LB tools, and `Photo / Guide: View`.
+- Shell Feedback & Telemetry Extraction (`src/shell/feedback.ts`,
+  `src/shell/assets.ts`, `src/dev/state-log.ts`, `src/main.ts`):
+  - Extracts `petEffectForCompanion`, `hapticForTick` (adding Golden Chef
+    `"celebrate"` haptic), `buildSoundContext`, `resolveArcadeOutcome`,
+    `collectLevelUpNotices`, `shouldClearRest`, `isOverworldConfirm`,
+    `stepJukeboxTrack`, `resolveSoundtrack`, `createAreaBannerTracker`,
+    `createJournalNotesCache`, and `captureAreaPostcard` into
+    `src/shell/feedback.ts`, adds `buildHudHintsView` / `buildBattleHudView` /
+    `buildCreditsView` to `src/shell/assets.ts`, and moves dev/harness battle &
+    music console loggers to `src/dev/state-log.ts` (trimming `src/main.ts` from
+    1,656 lines to 1,344 lines so every file in `src/` stays under 1,350 lines).
+- Evidence: `tests/unit/milestone-122.test.ts` (10 tests) covering save queue
+  recovery, FIFO ordering, adaptive keyboard/gamepad controls, haptic/arcade
+  feedback routing, and `src/main.ts` line reduction (`1,656` -> `1,344`).
+- Gates: `just check` (181 unit files / 1,376 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4421 just e2e` (1,134 passed, 2 skipped, 0 failed,
+  zero snapshot diffs across Chromium & WebKit in 5.3 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

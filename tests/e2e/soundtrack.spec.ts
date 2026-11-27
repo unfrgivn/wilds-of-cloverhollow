@@ -274,3 +274,86 @@ test(
     });
   },
 );
+
+test(
+  "lodge, clubhouse, and sanctuary play bespoke themes and Jukebox cycles all 20 tracks",
+  { tag: "@smoke" },
+  async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await openHarness(page);
+
+    // Unlock Web Audio with a real Enter key press on the title screen.
+    await page.keyboard.press("Enter");
+    await expect.poll(() => page.evaluate(() => window.__cloverhollow?.boot.title())).toBeNull();
+
+    // Pinecone Lodge -> Hearth & Cocoa + hearth ambience.
+    await resetPaused(page, "lodge");
+    await hold(page, "ArrowUp", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "lodge",
+      ambience: "hearth",
+      duck: false,
+      title: "Hearth & Cocoa",
+      playing: true,
+    });
+
+    // Secret Clubhouse -> Our Secret Treehouse + none ambience.
+    await resetPaused(page, "clubhouse");
+    await hold(page, "ArrowRight", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "clubhouse",
+      ambience: "none",
+      duck: false,
+      title: "Our Secret Treehouse",
+      playing: true,
+    });
+
+    // Wildlife Sanctuary -> Meadow of Friends + forest ambience.
+    await resetPaused(page, "sanctuary");
+    await hold(page, "ArrowUp", 8);
+    expect(await readMusic(page)).toMatchObject({
+      track: "sanctuary",
+      ambience: "forest",
+      duck: false,
+      title: "Meadow of Friends",
+      playing: true,
+    });
+
+    // Open journal OPTIONS and cycle cleanly through all 20 jukebox tracks back to sanctuary.
+    await page.keyboard.press("j");
+    await step(page, 2);
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    const nowPlaying = page.locator(".journal-now-playing");
+    await expect(nowPlaying).toHaveText("♫ Meadow of Friends");
+
+    const nextBtn = page.locator(".journal-jukebox-next");
+    const visited: string[] = [];
+    let prevTrack = "sanctuary";
+    for (let i = 0; i < 20; i += 1) {
+      await nextBtn.click();
+      await expect.poll(async () => (await readMusic(page)).track).not.toBe(prevTrack);
+      const info = await readMusic(page);
+      prevTrack = info.track;
+      visited.push(info.track);
+      expect(info.duck).toBe(false);
+      await expect(nowPlaying).toHaveText(`♫ ${info.title}`);
+    }
+    expect(new Set(visited).size).toBe(20);
+    expect(visited).toContain("sanctuary");
+    expect(visited).toContain("lodge");
+    expect(visited).toContain("clubhouse");
+    expect(visited).toContain("fishing");
+    expect(visited.at(-1)).toBe("sanctuary");
+
+    // Closing journal returns to live area theme cleanly.
+    await page.keyboard.press("j");
+    await step(page, 2);
+    expect(await readMusic(page)).toMatchObject({
+      track: "sanctuary",
+      ambience: "forest",
+      duck: false,
+      title: "Meadow of Friends",
+    });
+  },
+);

@@ -4759,6 +4759,30 @@ the old trail, the owl, and the clubhouse claim.
 - Gates: `just check` (153 unit files / 1,214 tests, all 65 sims, 23 QA packs,
   purity, lint), `just build`, and 17/17 targeted Chromium + WebKit e2e tests.
 
+## Milestone 98: Complete 20-Track Original Soundtrack — Wildlife Sanctuary, Ski Lodge, Clubhouse & Fishing Dock Themes **Status:** ✅ Completed (2026-11-27)
+- Gives the final four iconic spaces their own bespoke multi-voice Web Audio
+  scores and track-aligned dialogue harmonic scales — expanding the Journal
+  Music Box Jukebox from 16 to **20 original composed themes** with zero replay
+  hash drift across all 66 recorded sims.
+- Pure soundtrack projection (`src/core/music.ts`):
+  - Added `"sanctuary"` (`"Meadow of Friends"`, `"forest"` ambience),
+    `"lodge"` (`"Hearth & Cocoa"`, `"hearth"` ambience), `"clubhouse"`
+    (`"Our Secret Treehouse"`), and `"fishing"` (`"Docked by the Tide"`,
+    `"ocean"` ambience while `state.arcade?.game === "fish"`).
+  - Updated `jukeboxTracks` album order to all 20 composed themes.
+- Four bespoke 16-bar multi-voice scores (`src/platform/scores.ts`) &
+  exhaustive voice scales (`src/platform/voices.ts`):
+  - `sanctuaryScore` (88 BPM, 4/4, D major / Lydian: harp, flute, pad, bass, celesta).
+  - `lodgeScore` (100 BPM, 3/4 waltz, F major: piano, celesta, bass, harp, pad).
+  - `clubhouseScore` (108 BPM, 4/4, C major: marimba, flute, harp, bass, woodblock).
+  - `fishingScore` (84 BPM, 4/4 dock sway, G major: harp, celesta, flute, bass, pad).
+- Evidence: expanded `tests/unit/soundtrack.test.ts` (all 20 tracks, scores,
+  scales, and area/fishing routing), updated `tests/unit/{lasso-jukebox,milestone-81,sanctuary}.test.ts`,
+  and added end-to-end 20-track Jukebox & bespoke-room verification to
+  `tests/e2e/soundtrack.spec.ts` (12/12 Chromium & WebKit).
+- Gates: `just check` (157 unit files / 1,234 tests, all 66 sims, 23 QA packs,
+  purity, lint), `just build`, and 32/32 targeted Chromium + WebKit e2e tests.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

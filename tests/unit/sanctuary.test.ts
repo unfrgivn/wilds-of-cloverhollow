@@ -337,9 +337,10 @@ describe("The Wildlife Sanctuary", () => {
 
     const fresh = createState(world, { area: "sanctuary", spawn: "entrance", seed: 1 });
     expect(soundtrackFor(world, fresh, { titleOpen: false })).toMatchObject({
-      track: "hills",
+      track: "sanctuary",
       ambience: "forest",
       duck: false,
+      title: "Meadow of Friends",
     });
 
     const map = world.surfaces.sanctuary;

@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { loadContent } from "../../src/content/load";
 import {
   createState,
+  jukeboxTracks,
   soundtrackFor,
   trackTitles,
   type AmbienceBed,
@@ -18,6 +19,7 @@ import {
   writeAudioPreferences,
 } from "../../src/platform/audio-settings";
 import { scores, type PlayableTrack } from "../../src/platform/scores";
+import { trackScaleNotes } from "../../src/platform/voices";
 
 const content = loadContent();
 const newGame = content.fixtures["new-game"];
@@ -69,7 +71,7 @@ describe("soundtrackFor", () => {
       cafe: ["cafe", "cafe-murmur"],
       park: ["home", "town-breeze"],
       hills: ["hills", "town-breeze"],
-      sanctuary: ["hills", "forest"],
+      sanctuary: ["sanctuary", "forest"],
       school: ["school", "none"],
       "east-hall": ["school", "none"],
       classroom: ["school", "none"],
@@ -81,11 +83,11 @@ describe("soundtrackFor", () => {
       "sue-cottage": ["bay", "ocean"],
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],
-      lodge: ["pass", "hearth"],
+      lodge: ["lodge", "hearth"],
       "jordan-cabin": ["pass", "hearth"],
       cavern: ["cavern", "cavern-drips"],
       woods: ["woods", "forest"],
-      clubhouse: ["woods", "none"],
+      clubhouse: ["clubhouse", "none"],
       arcade: ["arcade", "arcade-hum"],
       mist: ["enchanted", "enchanted-shimmer"],
       harness: ["silent", "none"],
@@ -308,17 +310,140 @@ describe("audio preferences backwards compatibility", () => {
   });
 });
 
+describe("complete 20-track world audio identity", () => {
+  test("routes sanctuary, lodge, clubhouse, and fishing to their bespoke themes and beds", () => {
+    const sanctuaryState: State = { ...baseState, area: "sanctuary" };
+    expect(soundtrackFor(content.world, sanctuaryState, { titleOpen: false })).toEqual({
+      track: "sanctuary",
+      ambience: "forest",
+      duck: false,
+      title: "Meadow of Friends",
+    });
+
+    const lodgeState: State = { ...baseState, area: "lodge" };
+    expect(soundtrackFor(content.world, lodgeState, { titleOpen: false })).toEqual({
+      track: "lodge",
+      ambience: "hearth",
+      duck: false,
+      title: "Hearth & Cocoa",
+    });
+
+    const clubhouseState: State = { ...baseState, area: "clubhouse" };
+    expect(soundtrackFor(content.world, clubhouseState, { titleOpen: false })).toEqual({
+      track: "clubhouse",
+      ambience: "none",
+      duck: false,
+      title: "Our Secret Treehouse",
+    });
+
+    // Microwave cooking in the clubhouse keeps the clubhouse theme and ducks it.
+    const cookingState: State = {
+      ...clubhouseState,
+      arcade: {
+        game: "cook",
+        dish: "nuggets",
+        phase: "ready",
+        phaseTicks: 0,
+        cooked: 0,
+        message: "",
+        revealed: 0,
+      },
+    };
+    expect(soundtrackFor(content.world, cookingState, { titleOpen: false })).toEqual({
+      track: "clubhouse",
+      ambience: "none",
+      duck: true,
+      title: "Our Secret Treehouse",
+    });
+
+    // Bubblegum Bay dock fishing plays Docked by the Tide unducked over ocean ambience.
+    const fishingState: State = {
+      ...baseState,
+      area: "bay",
+      arcade: {
+        game: "fish",
+        phase: "waiting",
+        phaseTicks: 0,
+        power: 0.6,
+        castX: 0.6,
+        castY: 0.5,
+        nibblesLeft: 1,
+        nextEventTick: 90,
+        nibblePulse: 0,
+        fishId: "sunny-perch",
+        fishSeed: 1,
+        reelProgress: 0,
+        hookPos: 0.5,
+        hookVel: 0,
+        fishPos: 0.5,
+        caught: null,
+        isNew: false,
+        message: "",
+        revealed: 0,
+      },
+    };
+    expect(soundtrackFor(content.world, fishingState, { titleOpen: false })).toEqual({
+      track: "fishing",
+      ambience: "ocean",
+      duck: false,
+      title: "Docked by the Tide",
+    });
+    expect(
+      soundtrackFor(
+        content.world,
+        {
+          ...fishingState,
+          dialogue: {
+            knot: "dock",
+            speaker: "Sue",
+            text: "Nice cast!",
+            revealed: 10,
+            choices: [],
+            selected: 0,
+            ended: false,
+          },
+        },
+        { titleOpen: false },
+      ).duck,
+    ).toBe(true);
+  });
+
+  test("covers all 20 jukebox tracks with titles, multi-voice scores, and harmonic scales", () => {
+    expect(jukeboxTracks).toHaveLength(20);
+    expect(new Set(jukeboxTracks).size).toBe(20);
+    for (const id of jukeboxTracks) {
+      expect(trackTitles[id].trim().length, `${id} title`).toBeGreaterThan(0);
+      const score = scores[id];
+      expect(score.tracks.length, `${id} voices`).toBeGreaterThanOrEqual(2);
+      const uniquePitches = new Set(
+        score.tracks.flatMap((track) => track.notes.map(([, midi]) => midi)),
+      );
+      expect(uniquePitches.size, `${id} pitch variety`).toBeGreaterThanOrEqual(8);
+      const scale = trackScaleNotes(id);
+      expect(scale.length, `${id} scale length`).toBeGreaterThanOrEqual(5);
+    }
+    for (const id of ["sanctuary", "lodge", "clubhouse", "fishing"] as const) {
+      expect(scores[id].bars, `${id} bars`).toBeGreaterThanOrEqual(16);
+      expect(scores[id].tracks.length, `${id} voices`).toBeGreaterThanOrEqual(4);
+    }
+  });
+});
+
 describe("composed scores integrity", () => {
   const playableTracks: readonly PlayableTrack[] = [
     "title",
     "home",
     "cafe",
     "hills",
+    "sanctuary",
     "school",
     "bay",
+    "fishing",
     "pass",
+    "lodge",
     "cavern",
     "woods",
+    "clubhouse",
     "arcade",
     "enchanted",
     "enchanted-calm",

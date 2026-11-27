@@ -5,11 +5,15 @@ export type MusicTrack =
   | "home"
   | "cafe"
   | "hills"
+  | "sanctuary"
   | "school"
   | "bay"
+  | "fishing"
   | "pass"
+  | "lodge"
   | "cavern"
   | "woods"
+  | "clubhouse"
   | "arcade"
   | "enchanted"
   | "enchanted-calm"
@@ -27,10 +31,14 @@ export const jukeboxTracks: readonly JukeboxTrack[] = [
   "cafe",
   "school",
   "bay",
+  "fishing",
   "pass",
+  "lodge",
   "cavern",
   "woods",
+  "clubhouse",
   "hills",
+  "sanctuary",
   "arcade",
   "enchanted",
   "enchanted-calm",
@@ -64,11 +72,15 @@ export const trackTitles: Record<MusicTrack, string> = {
   home: "Cloverhollow Town",
   cafe: "Cinnamon Waltz",
   hills: "Clover Meadow",
+  sanctuary: "Meadow of Friends",
   school: "Bell & Chalk",
   bay: "Bubblegum Breeze",
+  fishing: "Docked by the Tide",
   pass: "Pinecone Snowfall",
+  lodge: "Hearth & Cocoa",
   cavern: "Crystal Echoes",
   woods: "Whispering Canopy",
+  clubhouse: "Our Secret Treehouse",
   arcade: "Star Racer Tokens",
   enchanted: "Misty Dream",
   "enchanted-calm": "Ancient Tree's Song",
@@ -86,7 +98,7 @@ const areaTracks: Record<string, MusicTrack> = {
   cafe: "cafe",
   park: "home",
   hills: "hills",
-  sanctuary: "hills",
+  sanctuary: "sanctuary",
   school: "school",
   "east-hall": "school",
   classroom: "school",
@@ -98,11 +110,11 @@ const areaTracks: Record<string, MusicTrack> = {
   "sue-cottage": "bay",
   trail: "bay",
   pass: "pass",
-  lodge: "pass",
+  lodge: "lodge",
   "jordan-cabin": "pass",
   cavern: "cavern",
   woods: "woods",
-  clubhouse: "woods",
+  clubhouse: "clubhouse",
   arcade: "arcade",
   mist: "enchanted",
 };
@@ -170,6 +182,9 @@ export function soundtrackFor(
     return makeSoundtrack(track, "none", state.battle.phase === "reward");
   }
   if (state.area === "harness") return makeSoundtrack("silent", "none", false);
+  if (state.arcade?.game === "fish") {
+    return makeSoundtrack("fishing", "ocean", state.dialogue !== null);
+  }
   let track: MusicTrack;
   if (state.area === "enchanted") {
     track = world.storyVariable(state.ink, "forest_fizzy") === false

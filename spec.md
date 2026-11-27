@@ -274,17 +274,21 @@ ios/            Capacitor iOS project (from Milestone 4).
   in battle.
 - Soundtrack projection (`src/core/music.ts`): closed track set `title`
   ("Watercolor Morning"), `home` ("Cloverhollow Town"), `cafe` ("Cinnamon
-  Waltz"), `hills` ("Clover Meadow"), `school` ("Bell & Chalk"), `bay`
-  ("Bubblegum Breeze"), `pass` ("Pinecone Snowfall"), `cavern` ("Crystal
-  Echoes"), `woods` ("Whispering Canopy"), `arcade` ("Star Racer Tokens"),
-  `enchanted` ("Misty Dream"), `enchanted-calm` ("Ancient Tree's Song", once
-  `forest_fizzy` is false), `battle` ("Fizzy Calm-Down!"), `boss` ("The Purple
-  Hood", for wind-up mini-bosses, Talk battles, or non-runnable battles),
-  `talk` ("Listening Heart", once Talk opens or calm reaches `talkAt`),
-  `morning` ("Waking Up", during the morning and credits finale), and `silent`
-  ("Quiet", for `harness`). `jukeboxTracks` exports all 16 non-silent themes in
-  story/album order (`title`, `home`, `cafe`, `school`, `bay`, `pass`,
-  `cavern`, `woods`, `hills`, `arcade`, `enchanted`, `enchanted-calm`,
+  Waltz"), `hills` ("Clover Meadow"), `sanctuary` ("Meadow of Friends"),
+  `school` ("Bell & Chalk"), `bay` ("Bubblegum Breeze"), `fishing` ("Docked by
+  the Tide", unducked over `"ocean"` ambience while `state.arcade.game ===
+  "fish"` at Bubblegum Bay's dock, ducking only when dialogue opens), `pass`
+  ("Pinecone Snowfall"), `lodge` ("Hearth & Cocoa"), `cavern` ("Crystal
+  Echoes"), `woods` ("Whispering Canopy"), `clubhouse` ("Our Secret Treehouse"),
+  `arcade` ("Star Racer Tokens"), `enchanted` ("Misty Dream"), `enchanted-calm`
+  ("Ancient Tree's Song", once `forest_fizzy` is false), `battle` ("Fizzy
+  Calm-Down!"), `boss` ("The Purple Hood", for wind-up mini-bosses, Talk
+  battles, or non-runnable battles), `talk` ("Listening Heart", once Talk opens
+  or calm reaches `talkAt`), `morning` ("Waking Up", during the morning and
+  credits finale), and `silent` ("Quiet", for `harness`). `jukeboxTracks`
+  exports all 20 non-silent themes in story/album order (`title`, `home`,
+  `cafe`, `school`, `bay`, `fishing`, `pass`, `lodge`, `cavern`, `woods`,
+  `clubhouse`, `hills`, `sanctuary`, `arcade`, `enchanted`, `enchanted-calm`,
   `battle`, `boss`, `talk`, `morning`) for the Journal OPTIONS Music Box
   (shell-only override, never saved, plays unducked while the journal is open
   and returns smoothly to the live area theme on close, title, or reset).
@@ -292,11 +296,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   `mountain-wind`, `hearth`, `forest`, `enchanted-shimmer`, `arcade-hum`,
   `cavern-drips`, `cafe-murmur`) match each outdoor area, the café, the lodge,
   the cavern, and the arcade, and pause in battles. Music ducks smoothly during
-  dialogue, the journal, arcade games, and battle rewards.
+  dialogue, the journal, non-fishing arcade games (and clubhouse microwave
+  cooking), and battle rewards.
 - `src/platform/audio.ts` creates a single AudioContext first thing at boot,
   before anything awaits, and resumes it at every chance: right away, on each
   key, pointer, or touch, and whenever a cue plays while it isn't running.
-  Its master chain routes SFX, music (`src/platform/music.ts` over the 16
+  Its master chain routes SFX, music (`src/platform/music.ts` over the 20
   multi-voice scores in `src/platform/scores.ts`, dry plus warm stereo
   ConvolverNode reverb), and procedural ambience (`src/platform/ambience.ts`)
   through a shared `DynamicsCompressorNode`. Music crossfades (~0.55 s) on
@@ -3215,7 +3220,7 @@ trunks keep its two exits.
   the left page (`SOUND & MUSIC`) shows the interactive Music Box pill
   (`.journal-jukebox`: 44 px `‹` `.journal-jukebox-prev` and `›`
   `.journal-jukebox-next` buttons flanking `.journal-now-playing`, `♫ <title>`,
-  cycling all 16 `jukeboxTracks` unducked while the journal is open and
+  cycling all 20 `jukeboxTracks` unducked while the journal is open and
   returning to the live area theme when closed) and touch-sized (>= 44 px)
   controls for Sound Effects (on/off + volume slider), Music (on/off + volume
   slider), and Ambience (on/off); the right page (`GAMEPLAY`) shows touch-sized

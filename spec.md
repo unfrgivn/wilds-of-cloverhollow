@@ -141,10 +141,12 @@ ios/            Capacitor iOS project (from Milestone 4).
   (`src/core/geometry.ts` for polygon/collision math, `src/core/party.ts` for
   party formation, follower slots, trail following, and battle party helpers,
   `src/core/roam.ts` for recurring critter rolling, wandering, sight, touch
-  checks, and `inkFacts`, and `src/core/battle.ts` for the turn-based calm-down
-  battle state machine, commands, views, assists, and treat helpers), all
-  re-exported through `src/core/sim.ts` and `src/core/index.ts` (Milestones 91,
-  96).
+  checks, and `inkFacts`, `src/core/battle-view.ts` for pure read-only battle
+  view projection, command lists, treat tray items, assist views, and battle
+  scoring helpers, and `src/core/battle.ts` for the turn-based calm-down battle
+  state machine and treat inventory mutations, re-exporting all public battle
+  views), all re-exported through `src/core/sim.ts` and `src/core/index.ts`
+  (Milestones 91, 96, 125).
 - Battle stage mood washes, Flute Friend on-stage cameo poses, and battle VFX
   anchor resolution live in `src/render/battle-stage.ts` (Milestone 91). The
   Pixi battle stage container, sprites, backdrop blur, check geometry, and
@@ -2751,11 +2753,13 @@ trunks keep its two exits.
   gentle hint), discovered favourite treats (revealed only after calming once so
   undiscovered favourites are never spoiled), and a concise `<= 72`-char
   tactical tip tailored to Talk, Peekaboo, Echo Chimes, wind-ups, or burst check
-  kind. Pressing `Escape` or gamepad B (button 1) dismisses only the peek card
-  (swallowing `cancel`),
-  and leaving `command` phase or closing battle auto-hides it. Responsive layout
-  keeps it clear of HUD meters, party medallions, commands, dialogue, sprites,
-  and touch buttons at `1280x720`, `874x402`, and `667x375`.
+  kind. Pressing `Escape`, `X` (`KeyX`), touch `×`, or gamepad B (button 1)
+  dismisses only the peek card (swallowing `cancel` and returning early from
+  `tick` in `src/main.ts` so `stepBattle` never receives a leaked `cancel` press
+  such as launching `Together!` or backing out of the treat tray, Milestone
+  125), and leaving `command` phase or closing battle auto-hides it. Responsive
+  layout keeps it clear of HUD meters, party medallions, commands, dialogue,
+  sprites, and touch buttons at `1280x720`, `874x402`, and `667x375`.
 - Commands: a two-column grid of sticker buttons on phones (one column from
   1000 px wide), right-aligned above confirm and cancel, clear of the HUD, the
   dialogue box, and the touch buttons. The menu grows with the party: four
@@ -3739,6 +3743,15 @@ trunks keep its two exits.
   untouched, suppresses the `"Saved"` toast, and never poisons subsequent saves;
   a rejected `get()` returns `null` cleanly, and `clear()` resets `last()` even
   if `remove()` rejects.
+- Shared resilient preference store (`createPreferenceStore` in
+  `src/platform/preference-store.ts`, Milestone 125): wraps a single
+  `@capacitor/preferences` key behind an injectable `PreferenceAdapter`
+  (`{ get, set }`), serializes writes on a self-recovering FIFO queue (so a
+  rejected `set()` returns `false` without poisoning future writes), and always
+  marks `isLoaded() === true` even if `get()` rejects (delivering `null`
+  cleanly). Used by `src/platform/audio.ts` (`cloverhollow-audio`),
+  `src/platform/game-settings.ts` (`cloverhollow-settings`), and
+  `src/platform/minigame-records.ts` (`cloverhollow-records`).
 - Tab/iOS background lifecycle and `pagehide` flush (`src/shell/lifecycle.ts`,
   Milestone 119): `shouldFreezeLiveLoop` pauses live fixed-timestep ticking,
   drops elapsed accumulator time, and avoids background WebGL redraws while

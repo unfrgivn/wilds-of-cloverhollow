@@ -3,6 +3,7 @@ import {
   longFlowTimeout,
   openHarness,
   openMap,
+  playBattleCheck,
   readBattle,
   resetPaused,
   step,
@@ -179,6 +180,62 @@ test.describe("Milestone 110: Battle Field Guide Peek & Interactive Map Land Gui
       await expect(peekCard).toBeVisible();
       await peekCard.locator(".battle-peek-close").click();
       await expect(peekCard).toBeHidden();
+
+      expect(errors).toEqual([]);
+    },
+  );
+
+  test(
+    "KeyX while Battle Field Guide Peek is open closes only Peek without triggering Together!",
+    { tag: "@smoke" },
+    async ({ page }) => {
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+
+      await page.setViewportSize({ width: 1280, height: 720 });
+      await openHarness(page);
+      await resetPaused(page, "plaza-party");
+      await walkToFrogCommand(page);
+
+      // Charge 3 GREAT checks so Together! is armed and listening on cancel (KeyX).
+      await tapKey(page, "Enter");
+      await playBattleCheck(page);
+      await advanceUntil(page, (battle) => battle?.phase === "check");
+      await playBattleCheck(page);
+      await advanceUntil(
+        page,
+        (battle) => battle?.phase === "command" && battle.revealed >= battle.message.length,
+      );
+      await tapKey(page, "Enter");
+      await playBattleCheck(page);
+      await advanceUntil(page, (battle) => battle?.phase === "check");
+      await playBattleCheck(page);
+      await advanceUntil(
+        page,
+        (battle) => battle?.phase === "command" && battle.revealed >= battle.message.length,
+      );
+
+      expect((await readBattle(page))?.sparkle).toBe(3);
+      await expect(page.locator(".battle-together-btn")).toBeVisible();
+
+      const peekCard = page.locator(".battle-peek-card");
+      await page.keyboard.press("i");
+      await expect(peekCard).toBeVisible();
+
+      // Press real KeyX: must close ONLY Peek and leave Together! charged & unlaunched.
+      await tapKey(page, "x");
+      await expect(peekCard).toBeHidden();
+      const afterClose = await readBattle(page);
+      expect(afterClose?.phase).toBe("command");
+      expect(afterClose?.sparkle).toBe(3);
+      await expect(page.locator(".battle-together-btn")).toBeVisible();
+
+      // A second real KeyX now that Peek is closed launches Together! normally.
+      await tapKey(page, "x");
+      const launched = await readBattle(page);
+      expect(launched?.phase).toBe("check");
+      expect(launched?.command).toBe("together");
+      expect(launched?.sparkle).toBeUndefined();
 
       expect(errors).toEqual([]);
     },

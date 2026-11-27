@@ -1,4 +1,4 @@
-import { Preferences } from "@capacitor/preferences";
+import { createPreferenceStore } from "./preference-store";
 
 export type MinigameKey = "skee" | "mole" | "comet" | "fish" | "cook";
 
@@ -110,23 +110,18 @@ export function createMinigameRecords(
   onChange: () => void = () => undefined,
 ): MinigameRecordsController {
   let current: MinigameRecords = defaultMinigameRecords();
-  let preferenceLoaded = false;
-  let locallyChanged = false;
-  let preferenceWrite = Promise.resolve();
+  const store = createPreferenceStore(preferenceKey);
 
   const persist = (): void => {
-    const value = writeMinigameRecords(current);
-    preferenceWrite = preferenceWrite.then(() =>
-      Preferences.set({ key: preferenceKey, value }),
-    );
+    void store.save(writeMinigameRecords(current));
   };
 
   const submit = (game: MinigameKey, score: number): MinigameRecordBadge => {
     const result = recordMinigameResult(current, game, score);
     if (result.isNewBest) {
       current = result.records;
-      locallyChanged = true;
-      if (preferenceLoaded) persist();
+      store.markDirty();
+      if (store.isLoaded()) persist();
       onChange();
     }
     return { best: result.best, isNewBest: result.isNewBest };
@@ -134,14 +129,13 @@ export function createMinigameRecords(
 
   const reset = (): void => {
     current = defaultMinigameRecords();
-    locallyChanged = true;
-    if (preferenceLoaded) persist();
+    store.markDirty();
+    if (store.isLoaded()) persist();
     onChange();
   };
 
-  void Preferences.get({ key: preferenceKey }).then(({ value }) => {
-    preferenceLoaded = true;
-    if (locallyChanged) persist();
+  void store.load((value) => {
+    if (store.isDirty()) persist();
     else {
       current = readMinigameRecords(value);
       onChange();

@@ -1,5 +1,5 @@
-import { Preferences } from "@capacitor/preferences";
 import type { TextSpeed } from "../core/sim";
+import { createPreferenceStore } from "./preference-store";
 
 export type GamePreferences = {
   gentleTiming: boolean;
@@ -75,48 +75,44 @@ export function createGameSettings(
   let keyHints = false;
   let textSpeed: TextSpeed = "cozy";
   let reducedMotion = false;
-  let preferenceLoaded = false;
-  let locallyChanged = false;
-  let preferenceWrite = Promise.resolve();
+  const store = createPreferenceStore(preferenceKey);
 
   const persist = (): void => {
-    const value = writeGamePreferences({ gentleTiming, keyHints, textSpeed, reducedMotion });
-    preferenceWrite = preferenceWrite.then(() =>
-      Preferences.set({ key: preferenceKey, value }),
+    void store.save(
+      writeGamePreferences({ gentleTiming, keyHints, textSpeed, reducedMotion }),
     );
   };
 
   const setGentleTiming = (on: boolean): void => {
     gentleTiming = on;
-    locallyChanged = true;
-    if (preferenceLoaded) persist();
+    store.markDirty();
+    if (store.isLoaded()) persist();
     onChange();
   };
 
   const setKeyHints = (on: boolean): void => {
     keyHints = on;
-    locallyChanged = true;
-    if (preferenceLoaded) persist();
+    store.markDirty();
+    if (store.isLoaded()) persist();
     onChange();
   };
 
   const setTextSpeed = (speed: TextSpeed): void => {
     textSpeed = parseTextSpeed(speed);
-    locallyChanged = true;
-    if (preferenceLoaded) persist();
+    store.markDirty();
+    if (store.isLoaded()) persist();
     onChange();
   };
 
   const setReducedMotion = (on: boolean): void => {
     reducedMotion = on;
-    locallyChanged = true;
-    if (preferenceLoaded) persist();
+    store.markDirty();
+    if (store.isLoaded()) persist();
     onChange();
   };
 
-  void Preferences.get({ key: preferenceKey }).then(({ value }) => {
-    preferenceLoaded = true;
-    if (locallyChanged) persist();
+  void store.load((value) => {
+    if (store.isDirty()) persist();
     else {
       const preferences = readGamePreferences(value);
       gentleTiming = preferences.gentleTiming;

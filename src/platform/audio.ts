@@ -1,4 +1,3 @@
-import { Preferences } from "@capacitor/preferences";
 import {
   trackTitles,
   type AmbienceBed,
@@ -27,6 +26,7 @@ import {
   type CompanionAudioEffect,
 } from "./audio-recipes";
 import { createMusicPlayer, type MusicPlayer } from "./music";
+import { createPreferenceStore } from "./preference-store";
 import { blipFrequency, footstepPitchFactor, trackScaleNotes } from "./voices";
 
 export {
@@ -125,9 +125,7 @@ export function createAudio(
     duck: false,
     title: trackTitles.silent,
   };
-  let preferenceLoaded = false;
-  let locallyChanged = false;
-  let preferenceWrite = Promise.resolve();
+  const store = createPreferenceStore(preferenceKey);
   let context: AudioContext | null = null;
   let master: GainNode | null = null;
   let musicPlayer: MusicPlayer | null = null;
@@ -160,23 +158,22 @@ export function createAudio(
   };
 
   const persist = (): void => {
-    const value = writeAudioPreferences({
-      muted,
-      level,
-      musicMuted,
-      musicLevel,
-      ambienceMuted,
-    });
-    preferenceWrite = preferenceWrite.then(() =>
-      Preferences.set({ key: preferenceKey, value }),
+    void store.save(
+      writeAudioPreferences({
+        muted,
+        level,
+        musicMuted,
+        musicLevel,
+        ambienceMuted,
+      }),
     );
   };
 
   const toggle = (): void => {
     muted = !muted;
-    locallyChanged = true;
+    store.markDirty();
     syncPlayers();
-    if (preferenceLoaded) persist();
+    if (store.isLoaded()) persist();
   };
 
   const applyLevel = (next: AudioLevel): void => {
@@ -185,30 +182,30 @@ export function createAudio(
   };
 
   const setLevel = (next: AudioLevel): void => {
-    locallyChanged = true;
+    store.markDirty();
     applyLevel(next);
-    if (preferenceLoaded) persist();
+    if (store.isLoaded()) persist();
   };
 
   const toggleMusic = (): void => {
     musicMuted = !musicMuted;
-    locallyChanged = true;
+    store.markDirty();
     syncPlayers();
-    if (preferenceLoaded) persist();
+    if (store.isLoaded()) persist();
   };
 
   const setMusicLevel = (next: AudioLevel): void => {
     musicLevel = next;
-    locallyChanged = true;
+    store.markDirty();
     syncPlayers();
-    if (preferenceLoaded) persist();
+    if (store.isLoaded()) persist();
   };
 
   const toggleAmbience = (): void => {
     ambienceMuted = !ambienceMuted;
-    locallyChanged = true;
+    store.markDirty();
     syncPlayers();
-    if (preferenceLoaded) persist();
+    if (store.isLoaded()) persist();
   };
 
   const setSoundtrack = (next: SoundtrackState): void => {
@@ -461,9 +458,8 @@ export function createAudio(
       toggle();
   });
   document.addEventListener("visibilitychange", syncPlayers);
-  void Preferences.get({ key: preferenceKey }).then(({ value }) => {
-    preferenceLoaded = true;
-    if (locallyChanged) persist();
+  void store.load((value) => {
+    if (store.isDirty()) persist();
     else {
       const preferences = readAudioPreferences(value);
       muted = preferences.muted;

@@ -787,7 +787,7 @@ async function boot(): Promise<void> {
   // Buttons held when the title closed stay hidden from the game until they're
   // released, so the press that starts the game can't also act in it.
   const swallowed = new Set<"confirm" | "cancel" | "menu">();
-  let journalCancelDown = false;
+  let cancelDown = false;
   // The area a door's fade-out is warming. Cleared when the transition ends or
   // the game resets, so every crossing prefetches exactly once.
   let prefetchedTarget: string | undefined;
@@ -795,7 +795,7 @@ async function boot(): Promise<void> {
     if (qaJustPicked) {
       qaJustPicked = false;
       titlePrevious = frame;
-      journalCancelDown = frame.cancel;
+      cancelDown = frame.cancel;
       return;
     }
     if (qaMenuOpen) {
@@ -817,18 +817,18 @@ async function boot(): Promise<void> {
         pickQa(chosen);
       }
       titlePrevious = frame;
-      journalCancelDown = frame.cancel;
+      cancelDown = frame.cancel;
       return;
     }
     // The QA console holds the world still while it is open (spec 11).
     if (qaConsoleOpen) {
       titlePrevious = frame;
-      journalCancelDown = frame.cancel;
+      cancelDown = frame.cancel;
       return;
     }
     if (qaBlocked) {
       titlePrevious = frame;
-      journalCancelDown = frame.cancel;
+      cancelDown = frame.cancel;
       return;
     }
     if (titleMode !== null) {
@@ -841,7 +841,7 @@ async function boot(): Promise<void> {
         cancel: frame.cancel && !titlePrevious.cancel,
       });
       titlePrevious = frame;
-      journalCancelDown = frame.cancel;
+      cancelDown = frame.cancel;
       if (titleMode === null) {
         for (const button of ["confirm", "cancel", "menu"] as const)
           if (frame[button]) swallowed.add(button);
@@ -850,10 +850,10 @@ async function boot(): Promise<void> {
     }
     for (const button of swallowed)
       if (!frame[button]) swallowed.delete(button);
-    const journalCancelEdge = frame.cancel && !journalCancelDown;
-    journalCancelDown = frame.cancel;
+    const cancelEdge = frame.cancel && !cancelDown;
+    cancelDown = frame.cancel;
     if (
-      journalCancelEdge &&
+      cancelEdge &&
       !swallowed.has("cancel") &&
       state.journalOpen &&
       journal.hasOpenOverlay()
@@ -862,6 +862,18 @@ async function boot(): Promise<void> {
       swallowed.add("cancel");
       sound.play("choice-move", state.tick);
       invalidate();
+    }
+    if (
+      cancelEdge &&
+      !swallowed.has("cancel") &&
+      battlePeekOpen &&
+      titleMode === null &&
+      !qaMenuOpen &&
+      !qaConsoleOpen
+    ) {
+      setBattlePeek(false);
+      swallowed.add("cancel");
+      return;
     }
     const input: ActionFrame = {
       ...frame,
@@ -1328,7 +1340,7 @@ async function boot(): Promise<void> {
         fishStreak = 0;
         setPhotoMode(false);
         lastInputMode = "keyboard";
-        journalCancelDown = false;
+        cancelDown = false;
         levelUpNotices.length = 0;
         swallowed.clear();
       },

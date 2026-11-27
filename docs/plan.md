@@ -5577,6 +5577,37 @@ the old trail, the owl, and the clubhouse claim.
   `CLOVERHOLLOW_E2E_PORT=4441 just e2e` (1,138 passed, 2 skipped, 0 snapshot
   diffs across Chromium & WebKit).
 
+## Milestone 125: Shared Resilient Preference Store (`src/platform/preference-store.ts`), Battle Field Guide Peek `X`/Touch-`×` Cancel Guard & Pure `src/core/battle-view.ts` Extraction **Status:** ✅ Completed (2026-11-27)
+- Shared Resilient Preference Store (`src/platform/preference-store.ts`,
+  `src/platform/audio.ts`, `src/platform/game-settings.ts`,
+  `src/platform/minigame-records.ts`):
+  - Exports `PreferenceAdapter`, `PreferenceStore`, and `createPreferenceStore`
+    with a self-recovering FIFO write queue and safe `load()` that always marks
+    `isLoaded() === true` even on storage rejection (e.g. Safari Private Mode /
+    quota errors), eliminating three duplicated unrecovered write chains.
+- Battle Field Guide Peek `X`/Touch-`×` Cancel Guard (`src/main.ts`):
+  - Unifies `cancelDown` / `cancelEdge` tracking in `tick(frame)` and intercepts
+    fresh `cancel` edges while `battlePeekOpen` is active so keyboard `KeyX` and
+    touch `×` dismiss only the Field Guide Peek card (swallowing `cancel` and
+    returning early) instead of leaking into `stepBattle` to trigger `Together!`
+    or close battle submenus behind the card.
+- Pure `src/core/battle-view.ts` Extraction (`src/core/battle-view.ts`,
+  `src/core/battle.ts`):
+  - Extracts pure read-only battle view projection, command list builders, treat
+    tray items, assist views, and pure battle lookup/scoring helpers into
+    `src/core/battle-view.ts` while re-exporting all public functions identically
+    from `src/core/battle.ts`, `src/core/sim.ts`, and `src/core/index.ts`,
+    trimming `src/core/battle.ts` from 1,317 lines down to 871 lines with zero
+    replay hash shifts across all 67 recorded sims.
+- Evidence: `tests/unit/milestone-125.test.ts` (5 tests) and real-key `KeyX`
+  Peek cancel guard test in `tests/e2e/milestone-113.spec.ts` (`@smoke`
+  Chromium & WebKit).
+- Gates: `just check` (184 unit files / 1,389 tests, all 67 sims with zero
+  replay hash shifts, 23 QA packs, purity, lint), `just build` (zero chunk or
+  deprecation warnings; production and harness hook checks green), and full
+  `CLOVERHOLLOW_E2E_PORT=4451 just e2e` (1,140 passed, 2 skipped, 0 failed,
+  zero snapshot diffs across Chromium & WebKit in 5.6 min).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

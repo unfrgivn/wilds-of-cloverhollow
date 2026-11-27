@@ -287,7 +287,7 @@
   background-repeat: no-repeat;
 }
 
-.sticker-portrait.is-talking {
+.sticker-portrait.is-talking .sticker-portrait-img {
   animation: portrait-bob 240ms ease-in-out infinite;
 }
 
@@ -409,7 +409,7 @@
   .sticker-dialogue,
   .sticker-choice,
   .sticker-portrait,
-  .sticker-portrait.is-talking,
+  .sticker-portrait.is-talking .sticker-portrait-img,
   .sticker-advance.is-visible,
   .sticker-prompt > span,
   .notice-mark.is-alert { animation: none; }
@@ -427,6 +427,10 @@
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
+}
+
+:root[data-reduced-motion="on"] .sticker-portrait.is-talking .sticker-portrait-img {
+  animation: none;
 }
 
 :root[data-reduced-motion="on"] .photo-touch-btn:active {

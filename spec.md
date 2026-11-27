@@ -634,7 +634,8 @@ ios/            Capacitor iOS project (from Milestone 4).
   `sanctuary`, `field`) once `has_lantern` is set; and `morning` washes `bedroom` and
   `kitchen` before any sticker is earned and before `has_lantern`.
 - Photo / Showcase mode (Milestone 90), Postcard Camera (Milestone 107),
-  Gamepad Parity (Milestone 114), & Touch Camera Controls (Milestone 118):
+  Gamepad Parity (Milestone 114), Touch Camera Controls (Milestone 118), &
+  Desktop Click-to-Snap / Right-Click-to-Exit (Milestone 151):
   pressing `P` (`KeyP`) or gamepad Select
   (standard button 8) while exploring the free overworld (ignored inside inputs,
   on title, dialogue, battle, arcade, journal, transition, finale, or QA
@@ -650,7 +651,10 @@ ios/            Capacitor iOS project (from Milestone 4).
   zero `<text>` nodes) and `.photo-touch-close` (`aria-label="Exit photo mode"`,
   `×`), completely hidden on desktop and outside Photo Mode and excluded from Pixi
   `extract.canvas` captures. While Photo Mode
-  is active, pressing `Enter`, `Space`, or gamepad A (button 0) (swallowing
+  is active, pressing `Enter`, `Space`, gamepad A (button 0), or left-clicking
+  the canvas on desktop (via pure `photoModePointerAction` in
+  `src/shell/overworld-pointer.ts`, requiring `<= 12 px` drag from `pointerdown`
+  and ignoring touch UI or `pointerType === "touch"`) (swallowing
   confirm so it never interacts
   or scrolls) plays `camera-shutter`, triggers a gentle `light` haptic tap and a
   240 ms warm-cream `.photo-shutter-flash` overlay (softened to a subtle 220 ms
@@ -664,8 +668,9 @@ ios/            Capacitor iOS project (from Milestone 4).
   or trimming `> 4` followers to the first 3 plus `"& friends"`, Milestone 136,
   and bottom-right `"<Area> · Wilds of Cloverhollow"` stamp),
   and downloads `cloverhollow-postcard-<areaId>.png`. Pressing `P` again,
-  `Escape`, gamepad Select/B (button 8 / button 1), or opening any overlay exits
-  Photo Mode automatically.
+  `Escape`, gamepad Select/B (button 8 / button 1), right-clicking the canvas on
+  desktop (`contextmenu` prevented via `photoModePointerAction`), or opening any
+  overlay exits Photo Mode automatically.
 - Texture budget: at most 96 MB of decoded textures per loaded area (UI
   excluded) and no single texture over 2048x2048. Every Pixi spritesheet and
   ground tile loads with `autoGenerateMipmaps: true`. One `AreaView`
@@ -2329,12 +2334,19 @@ trunks keep its two exits.
   `"Fizzy Kid"` to `"mystery"`, so every non-sign story speaker and all six
   mini-bosses (`Fizzy Mr. Pip`, `Fizzy Mrs. Flurry`, `Fizzy Ms. Coral`,
   `Fizzy Ms. Rowan`, `Fizzy Mr. Bell`, `Fizzy Kid`) wear their true speaker
-  accent. Named speakers with an atlas (including Plaza sidewalk windows
-  `Grocer` -> `pippin` and `Scoops` -> `penny`) also display a 46 px circular
+  accent. Every non-sign speaker across all compiled `# speaker:` tags and
+  critters (113/113 = 100%, including Plaza sidewalk windows `Baker` -> `chef`,
+  `Grocer` -> `pippin`, `Scoops` -> `penny`, and Pinecone Pass `Cocoa seller`
+  -> `pass-keeper`, Milestone 151) also displays a 46 px circular
   die-cut portrait medallion (`.sticker-portrait`, cropped by
   `cropPortraitFrame` from cached atlas metadata, shifting the speaker tag right
-  without changing the dialogue box width or text measure, and gently bobbing
-  while text types). Dialogue panels and choice stickers use brief
+  without changing the dialogue box width or text measure). Talking bob motion
+  (`portrait-bob`) is scoped strictly to
+  `.sticker-portrait.is-talking .sticker-portrait-img` in `src/ui/sticker.css`
+  (suppressed under both `@media (prefers-reduced-motion: reduce)` and
+  `:root[data-reduced-motion="on"]`) so removing `.is-talking` when a line
+  finishes revealing never restarts `sticker-medallion-pop` on
+  `.sticker-portrait`. Dialogue panels and choice stickers use brief
   reduced-motion-guarded pop-in motion; dialogue panels and TALK prompts use a
   low-opacity inset dashed stitch border. Labels use Nunito 800, choices use
   600, and body copy uses 400 for readable small-size text.

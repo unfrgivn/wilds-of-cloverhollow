@@ -22,7 +22,8 @@ export type OverworldPointerTarget = {
       | "pointermove"
       | "pointerup"
       | "pointercancel"
-      | "lostpointercapture",
+      | "lostpointercapture"
+      | "contextmenu",
     listener: (event: OverworldPointerEvent) => void,
   ) => void;
   setPointerCapture?: (pointerId: number) => void;
@@ -34,10 +35,40 @@ export type OverworldPointerSteerOptions = {
   playerScreen: () => Point | null;
   onMove: (dir: Point) => void;
   onTapNearPlayer?: () => void;
+  isPhotoMode?: () => boolean;
+  isTouchUi?: () => boolean;
+  onPhotoSnap?: () => void;
+  onPhotoExit?: () => void;
   now?: () => number;
   deadRadius?: number;
   rampRadius?: number;
 };
+
+export type PhotoModePointerActionOptions = {
+  photoMode: boolean;
+  touchUiActive: boolean;
+  pointerType: string;
+  button: number;
+  eventType: "pointerup" | "contextmenu";
+};
+
+export type PhotoModePointerAction = "snap" | "exit" | null;
+
+/**
+ * Classifies desktop canvas pointer gestures while Photo Mode is active: primary
+ * mouse/pen clicks snap a postcard and right-click contextmenu exits Photo Mode.
+ * Touch UI and touch pointers always return null (handled by .photo-touch-bar).
+ */
+export function photoModePointerAction(
+  options: PhotoModePointerActionOptions,
+): PhotoModePointerAction {
+  if (!options.photoMode || options.touchUiActive || options.pointerType === "touch") {
+    return null;
+  }
+  if (options.eventType === "pointerup" && options.button === 0) return "snap";
+  if (options.eventType === "contextmenu") return "exit";
+  return null;
+}
 
 export type OverworldPointerSteer = {
   sync: () => void;
@@ -114,6 +145,8 @@ export function bindOverworldPointerSteer(
   let downPoint: Point = { x: 0, y: 0 };
   let downTime = 0;
   let lastMoveEvent: OverworldPointerEvent | null = null;
+  let photoPointerId: number | null = null;
+  let photoDownPoint: Point = { x: 0, y: 0 };
 
   const emitSteer = (): void => {
     const player = options.playerScreen();
@@ -131,7 +164,12 @@ export function bindOverworldPointerSteer(
     );
   };
 
+  const clearPhotoPointer = (): void => {
+    photoPointerId = null;
+  };
+
   const release = (): void => {
+    if (options.isPhotoMode?.() !== true) photoPointerId = null;
     if (activePointerId === null) return;
     activePointerId = null;
     lastMoveEvent = null;
@@ -150,6 +188,18 @@ export function bindOverworldPointerSteer(
   const isActive = (): boolean => activePointerId !== null;
 
   const onPointerDown = (event: OverworldPointerEvent): void => {
+    if (options.isPhotoMode?.() === true) {
+      if (
+        !(options.isTouchUi?.() ?? false) &&
+        event.pointerType !== "touch" &&
+        event.button === 0
+      ) {
+        event.preventDefault();
+        photoPointerId = event.pointerId;
+        photoDownPoint = { x: event.clientX, y: event.clientY };
+      }
+      return;
+    }
     if (
       (event.pointerType !== "mouse" && event.pointerType !== "pen") ||
       event.button !== 0
@@ -184,6 +234,24 @@ export function bindOverworldPointerSteer(
   };
 
   const onPointerUp = (event: OverworldPointerEvent): void => {
+    if (photoPointerId !== null && event.pointerId === photoPointerId) {
+      photoPointerId = null;
+      const drag = Math.hypot(
+        event.clientX - photoDownPoint.x,
+        event.clientY - photoDownPoint.y,
+      );
+      const action = photoModePointerAction({
+        photoMode: options.isPhotoMode?.() ?? false,
+        touchUiActive: options.isTouchUi?.() ?? false,
+        pointerType: event.pointerType,
+        button: event.button,
+        eventType: "pointerup",
+      });
+      if (action === "snap" && Number.isFinite(drag) && drag <= DEFAULT_OVERWORLD_TAP_DRAG) {
+        options.onPhotoSnap?.();
+      }
+      return;
+    }
     if (activePointerId === null || event.pointerId !== activePointerId) return;
     const shouldTap =
       options.onTapNearPlayer !== undefined &&
@@ -199,8 +267,30 @@ export function bindOverworldPointerSteer(
   };
 
   const onPointerCancel = (event: OverworldPointerEvent): void => {
+    if (photoPointerId !== null && event.pointerId === photoPointerId) {
+      photoPointerId = null;
+    }
     if (activePointerId === null || event.pointerId !== activePointerId) return;
     release();
+  };
+
+  const onContextMenu = (event: OverworldPointerEvent): void => {
+    const pointerType =
+      typeof event.pointerType === "string" && event.pointerType.length > 0
+        ? event.pointerType
+        : "mouse";
+    const action = photoModePointerAction({
+      photoMode: options.isPhotoMode?.() ?? false,
+      touchUiActive: options.isTouchUi?.() ?? false,
+      pointerType,
+      button: event.button,
+      eventType: "contextmenu",
+    });
+    if (action === "exit") {
+      event.preventDefault();
+      photoPointerId = null;
+      options.onPhotoExit?.();
+    }
   };
 
   options.canvas.addEventListener("pointerdown", onPointerDown);
@@ -208,16 +298,23 @@ export function bindOverworldPointerSteer(
   options.canvas.addEventListener("pointerup", onPointerUp);
   options.canvas.addEventListener("pointercancel", onPointerCancel);
   options.canvas.addEventListener("lostpointercapture", onPointerCancel);
+  options.canvas.addEventListener("contextmenu", onContextMenu);
 
   if (typeof window !== "undefined") {
-    window.addEventListener("blur", release);
+    window.addEventListener("blur", () => {
+      clearPhotoPointer();
+      release();
+    });
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
     window.addEventListener("pointercancel", onPointerCancel);
   }
   if (typeof document !== "undefined") {
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) release();
+      if (document.hidden) {
+        clearPhotoPointer();
+        release();
+      }
     });
   }
 

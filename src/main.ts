@@ -415,6 +415,10 @@ async function boot(): Promise<void> {
         touch.tapButton("confirm");
       }
     },
+    isPhotoMode: () => photoMode,
+    isTouchUi: () => document.documentElement.dataset.touch === "on",
+    onPhotoSnap: () => { void snapPostcard({ download: true }); },
+    onPhotoExit: () => setPhotoMode(false),
   });
   const input = createInputSource(() => {
     overworldPointer.sync();

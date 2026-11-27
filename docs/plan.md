@@ -6579,6 +6579,34 @@ the old trail, the owl, and the clubhouse claim.
   1280×720 review JPEGs (`art/review/living-npcs-party-banter.jpg` and
   `art/review/living-npcs-tool-event.jpg`).
 
+## Milestone 151: 100% Cast Bust-Portrait Coverage (`Baker` & `Cocoa seller`), Dialogue Portrait End-of-Sentence Re-Pop Fix & Desktop Photo Mode Click-to-Snap / Right-Click-to-Exit **Status:** ✅ Completed (2026-11-27)
+- Dialogue Portrait End-of-Sentence Re-Pop Fix (`src/ui/sticker.css`):
+  - Moves `portrait-bob` from `.sticker-portrait.is-talking` onto
+    `.sticker-portrait.is-talking .sticker-portrait-img` so removing
+    `.is-talking` when a line finishes revealing never restarts
+    `sticker-medallion-pop` on `.sticker-portrait`.
+  - Updates both `@media (prefers-reduced-motion: reduce)` and
+    `:root[data-reduced-motion="on"]` to suppress
+    `.sticker-portrait.is-talking .sticker-portrait-img { animation: none; }`.
+- 100% Cast Bust-Portrait Coverage (`src/ui/portraits.ts`):
+  - Adds `baker: ["chef", "adult"]` and `"cocoa seller": ["pass-keeper", "adult"]`
+    to `CHARACTER_MAP`, reaching 100% bust-portrait coverage across all 113
+    non-sign compiled speakers and critters.
+- Desktop Photo Mode Click-to-Snap & Right-Click-to-Exit
+  (`src/shell/overworld-pointer.ts`, `src/main.ts`):
+  - Exports pure `photoModePointerAction` classifying desktop Photo Mode primary
+    `pointerup` (`"snap"`) and `contextmenu` (`"exit"`), returning `null` when
+    outside Photo Mode, when touch UI is active, or on `pointerType === "touch"`.
+  - Wires `isPhotoMode`, `isTouchUi`, `onPhotoSnap` (guarded by `<= 12 px` drag
+    from `pointerdown`), and `onPhotoExit` (calling `event.preventDefault()`) in
+    `bindOverworldPointerSteer` and `src/main.ts`.
+- Zero `src/core` changes and zero replay hash shifts across all 70 recorded
+  sims.
+- Evidence: `tests/unit/milestone-151.test.ts` (automated 100% cast portrait
+  gate, `photoModePointerAction` + pointer wiring, and CSS scoping/reduced-motion
+  parity), real-input `tests/e2e/milestone-151.spec.ts` (`@smoke`, Chromium &
+  WebKit), and review screenshot `art/review/m151-bakery-portrait.jpg`.
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

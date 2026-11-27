@@ -484,6 +484,11 @@
       "x": 285,
       "y": 190,
       "facing": "down"
+    },
+    "boats": {
+      "x": 1450,
+      "y": 685,
+      "facing": "left"
     }
   },
   "land": "bay",

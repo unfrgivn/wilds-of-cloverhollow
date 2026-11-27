@@ -1,0 +1,20 @@
+{
+  "asset": "island",
+  "date": "2026-11-27",
+  "summary": "Starlight Island (NOTES.md: 47), a 1650x1100 pastel beach islet floating in Bubblegum Bay reached via the community rowboats: four 1650x1100 WebP tiles (paper #fefbf6) and a 4-prop alpha-WebP depth-sorted kit (lighthouse, driftwood-log, west-palm, east-palm; 143 KB, 0 warnings, rebuilt vs painting 0.00%).",
+  "model": "gemini-3-pro-image-preview",
+  "calls": 10,
+  "references": [
+    "art/scratch/bay-ref.png",
+    "art/source/areas/hills/hills-final.png"
+  ],
+  "kept": {
+    "painting": "art/source/areas/island/painting/ground.json",
+    "atlas": "public/assets/areas/island/props-0.json",
+    "catalogue": "content/props/island.json"
+  },
+  "commands": [
+    "bun tools/art/kit.ts island gen && masks && fill && pack",
+    "convert props-0.png -> props-0.webp (quality 92, alpha-quality 100)"
+  ]
+}

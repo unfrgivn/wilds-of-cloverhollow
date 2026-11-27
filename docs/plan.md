@@ -6607,6 +6607,44 @@ the old trail, the owl, and the clubhouse claim.
   parity), real-input `tests/e2e/milestone-151.spec.ts` (`@smoke`, Chromium &
   WebKit), and review screenshot `art/review/m151-bakery-portrait.jpg`.
 
+## Milestone 152: Starlight Island & Bubblegum Bay Rowboat Crossing **Status:** ✅ Completed (2026-11-27)
+- Turned Bubblegum Bay's community pastel rowboats (`NOTES.md: 47`, `bay_boats`)
+  into a real crossing out to a new 1650x1100 hand-painted coastal islet
+  (**Starlight Island (`island`)**, `land: "bay"`, 33 total playable areas, 22
+  companion resting areas; zero shifts across all 71 earlier recorded sims):
+  - **Bubblegum Bay Crossing (`content/areas/bay.json`, `content/story/main.ink`)**:
+    added `bay.spawns["boats"]` at `(1450, 685)` facing left (`>= 280u` clear
+    of all 3 bay dens, fits all 6 party slots); kept `bay_boats` choice 0
+    (`[Take a row out to the sunny cove]`) 100% unchanged and added
+    `+ {sue_joined} [Row out to Starlight Island!]` (`# sound: chime-blue #
+    travel: island.pier`).
+  - **Starlight Island (`content/areas/island.json`, `content/props/island.json`, `content/surfaces/island.json`, `content/fixtures/island.json`)**:
+    four 1650x1100 WebP tiles (`paper #fefbf6`), 4-prop alpha-WebP depth-sorted
+    kit (`lighthouse`, `driftwood-log`, `west-palm` canopy, `east-palm` canopy;
+    `143 KB`, `rebuilt vs painting 0.00%`), `sand`/`wood`/`carpet`/`grass`
+    surfaces, 4 looping coastal butterflies, emissive golden Lighthouse Beacon
+    Halo at `(1260, 152)` + 14 turquoise water glints + 10 sea-breeze motes
+    (`src/render/atmosphere-outdoor.ts`), golden-hour time-of-day support
+    (`src/render/time-of-day.ts`), `island-mat` rest spot (`src/render/companions.ts`),
+    and `"bay"` / `"ocean"` audio.
+  - **Island Puzzles & Secrets**: playable **4-Note Seashell Chime Xylophone**
+    (`island_shells` beside the Red/Yellow/Green/Blue giant pastel shells +
+    flute harmony bonus + `+20 coins` Tide-Pool Pearl Cache), **Tide-Pool
+    Lighthouse** (`island_lighthouse`, `+2 snacks` Sea-Breeze Snack Tin), SE
+    **Message-in-a-Bottle** (`island_bottle`, `+15 coins`), `island_boat`
+    return crossing (`# travel: bay.boats`), and blacklight **Starlight Beacon
+    Verse** (`island_beacon_glow`, `+10 coins` + `chime-red`), plus 2 Fae-voice
+    journal notes (zero Milo spoilers).
+- Evidence: `tests/unit/island.test.ts`, `tests/unit/island-replay.test.ts`,
+  recorded run `tests/sim/scripts/new-game/island.json` (23,464 ticks), real-key
+  `tests/e2e/island.spec.ts` matching Bun's exact hash at 1280x720 and 874x402,
+  and `vision`-reviewed `art/review/island-{overlay,depth,gameplay}.jpg`.
+- Gates: `just check` (214 unit files / 1,550 tests, 72 sims with zero shifted
+  prior runs, 23 QA packs, purity, lint), `just build` (zero chunk warnings,
+  production and harness hook checks), and Chromium + WebKit Playwright e2e
+  (16/16 Chromium + 11/11 WebKit passing across `island.spec`, `bay.spec`,
+  `milestone-101.spec`, `soundtrack.spec`, `showcase-polish.spec`).
+
 ## Roadmap after Milestone 19
 Chapter one ends with the purple hood's Cloverhollow School name tag.
 - Who the kid in the hood is, and how Fae finds out: Milo, unmasked when the

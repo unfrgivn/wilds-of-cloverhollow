@@ -1,0 +1,108 @@
+{
+  "frames": {
+    "lighthouse": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 330,
+        "h": 737
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 330,
+        "h": 737
+      },
+      "sourceSize": {
+        "w": 330,
+        "h": 737
+      },
+      "anchor": {
+        "x": 0.48788,
+        "y": 0.99322
+      }
+    },
+    "east-palm": {
+      "frame": {
+        "x": 332,
+        "y": 0,
+        "w": 440,
+        "h": 632
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 440,
+        "h": 632
+      },
+      "sourceSize": {
+        "w": 440,
+        "h": 632
+      },
+      "anchor": {
+        "x": 0.17955,
+        "y": 0.99367
+      }
+    },
+    "west-palm": {
+      "frame": {
+        "x": 774,
+        "y": 0,
+        "w": 450,
+        "h": 591
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 450,
+        "h": 591
+      },
+      "sourceSize": {
+        "w": 450,
+        "h": 591
+      },
+      "anchor": {
+        "x": 0.88222,
+        "y": 0.98985
+      }
+    },
+    "driftwood-log": {
+      "frame": {
+        "x": 1226,
+        "y": 0,
+        "w": 400,
+        "h": 257
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 257
+      },
+      "sourceSize": {
+        "w": 400,
+        "h": 257
+      },
+      "anchor": {
+        "x": 0.505,
+        "y": 0.99222
+      }
+    }
+  },
+  "meta": {
+    "image": "props-0.webp",
+    "size": {
+      "w": 2048,
+      "h": 737
+    },
+    "scale": "1"
+  }
+}

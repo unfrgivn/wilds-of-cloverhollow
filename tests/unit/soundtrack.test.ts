@@ -84,6 +84,7 @@ describe("soundtrackFor", () => {
       "art-room": ["school", "none"],
       field: ["school", "town-breeze"],
       bay: ["bay", "ocean"],
+      island: ["bay", "ocean"],
       "sue-cottage": ["bay", "ocean"],
       trail: ["bay", "ocean"],
       pass: ["pass", "mountain-wind"],

@@ -142,8 +142,8 @@ describe("story travel", () => {
     const source = readFileSync("content/story/main.ink", "utf8");
     const targets = [...source.matchAll(/#\s*travel:\s*([^\s#]+)/g)].map((match) => match[1] ?? "");
     expect([...new Set(targets)].sort()).toEqual([
-      "bay.bus-stop", "field.east-bank", "mist.stones", "pass.bus", "pass.ski-lift",
-      "plaza.bus-stop", "summit.lift-top",
+      "bay.boats", "bay.bus-stop", "field.east-bank", "island.pier", "mist.stones", "pass.bus",
+      "pass.ski-lift", "plaza.bus-stop", "summit.lift-top",
     ]);
     for (const target of targets) {
       const [area, spawn] = target.split(".");

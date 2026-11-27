@@ -62,6 +62,23 @@ export const BLOSSOM_TINTS: readonly number[] = [0xf29eb6, 0xf5cf72, 0xf7b2c7, 0
 export const MEADOW_TINTS: readonly number[] = [0xfff8e6, 0xf9da8e, 0xf7eab5];
 export const BUTTERFLY_TINTS: readonly number[] = [0xf8c4d8, 0xbce3f5, 0xfae09e];
 export const WATER_TINTS: readonly number[] = [0x67d5c4, 0xaef2e8, 0xfffdf2];
+export const ISLAND_BEACON_TINTS: readonly number[] = [0xffe796, 0xffd27a];
+export const ISLAND_SHORE_GLINTS: readonly [number, number][] = [
+  [210, 190],
+  [440, 130],
+  [820, 145],
+  [1040, 185],
+  [1495, 250],
+  [1545, 515],
+  [1490, 935],
+  [975, 990],
+  [540, 965],
+  [145, 725],
+  [470, 420],
+  [535, 382],
+  [605, 368],
+  [648, 392],
+];
 export const SNOW_TINTS: readonly number[] = [0xffffff, 0xe8f4ff];
 export const AURORA_TINTS: readonly number[] = [0xd8b8ff, 0x9ef0dc, 0xffe89e];
 export const FOREST_MOTE_TINTS: readonly number[] = [0xf9da8e, 0xfff4cc];
